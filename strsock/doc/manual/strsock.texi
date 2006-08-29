@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strsock.texi,v 0.9.2.3 2006/08/27 12:27:12 brian Exp $
+% @(#) $Id: strsock.texi,v 0.9.2.6 2006/08/29 11:44:05 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/27 12:27:12 $ by $Author: brian $
+% Last Modified $Date: 2006/08/29 11:44:05 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -338,13 +338,13 @@ Installation and Reference Manual}.}.  In stark contrast to many other software 
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
 other parties.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
 and other sources).  Consult the permission notices contained in the documentation for more
 information.
 
-This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This document, is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 
 @node Abstract
@@ -410,6 +410,15 @@ package.
 @smallexample
 
 $Log: strsock.texi,v $
+Revision 0.9.2.6  2006/08/29 11:44:05  brian
+- added manual pages, working up docs
+
+Revision 0.9.2.5  2006/08/28 10:47:10  brian
+- correction
+
+Revision 0.9.2.4  2006/08/28 10:32:58  brian
+- updated references
+
 Revision 0.9.2.3  2006/08/27 12:27:12  brian
 - finalizing auto release files
 
@@ -481,7 +490,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 @auindex Bidulock, Brian
 @end multitable
 
-See @ref{Author Index}, for a complete listing and cross-index of authors to
+See @refman{Author Index}, for a complete listing and cross-index of authors to
 sections of this document.
 
 @node Maintainer
@@ -495,8 +504,8 @@ The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
 @end multitable
 
 Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
 
 @node Web Resources
 @unnumberedsec Web Resources
@@ -542,12 +551,12 @@ Installation and Reference Manual}.}.  In stark contrast to many other software 
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
 other parties.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from X/Open publications and other sources).  Consult the permission notices
 contained in the documentation for more information.
 
-This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This manual is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 @end ignore
 
@@ -595,19 +604,19 @@ This manual is organized (loosely) into several sections as follows:
 @end ifnotinfo
 @ifplaintext
 @multitable @columnfractions .50 .50
-@item @ref{Introduction}.
+@item @cite{Introduction}.
 @tab This introduction
-@item @ref{Objective}.
+@item @cite{Objective}.
 @tab Objective of the package
-@item @ref{Reference}.
+@item @cite{Reference}.
 @tab Contents of the package
-@item @ref{Conformance}.
+@item @cite{Conformance}.
 @tab Conformance of the package
-@item @ref{Releases}.
+@item @cite{Releases}.
 @tab Releases of the package
-@item @ref{Installation}.
+@item @cite{Installation}.
 @tab Installation of the package
-@item @ref{Troubleshooting}.
+@item @cite{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
 @end ifplaintext
@@ -625,6 +634,416 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Objective
 @chapter Objective
 @cindex objective
+
+The objective of the @cite{@value{PACKAGE_TITLE}} package is to provide
+@dfn{Sockets} capability for @dfn{STREAMS} in a similar manner as provided by
+@cite{SVR 4.2} and later @cite{Solaris} implementations.  To accomplish this
+there are three (3) approaches that can be taked to implementing @dfn{Sockets}
+over @dfn{STREAMS}:
+
+@menu
+* Socket Module::		The socket module approach
+* Socket System::		The socket system approach
+* Socket Integration::		The socket integration approach
+* Solaris::			The Solaris approaches
+@end menu
+
+@node Socket Module
+@section Socket Module
+@cindex socket module
+
+This approach implements the @cite{SVR 4.2} @manref{sockmod(4)} module and
+cooperating @manref{libsocket(3)} library.  The library and cooperating
+@dfn{STREAMS} module behave in a similar fashion to the @manref{libxnet(3)}
+library and @manref{timod(4)} module for XTI.
+
+There are a set of input-output controls defined for sockets (explicitly for
+compatibility with @cite{SVR 4.2}) that can be accepted by the
+@manpage{sockmod(4)} module.  These input-output controls permit direct
+conversion between sockets function and kernel-space facilities.
+
+The original
+@manpage{sockmod(4)} approach keep much of the socket state in
+user space in the fashion of @manref{xti(3)}; however, this approach is just
+asking for trouble.  Also, @cite{Linux} also implements the @cite{SVR 4.2}
+input-output controls for native Sockets and the resulting
+@manpage{libsocket(3)} library would then work for both @dfn{STREAMS}-based
+sockets and Linux native sockets.
+
+Socket input-output controls defined for @cite{SVR 4.2} are:
+
+@multitable @columnfractions .25 .75
+@item @var{O_SI_GETUDATA} @tab
+@item @var{SI_SHUTDOWN} @tab
+@item @var{SI_LISTEN} @tab
+@item @var{SI_SETMYNAME} @tab
+@item @var{SI_SETPEERNAME} @tab
+@item @var{SI_GETINTRANSIT} @tab
+@item @var{SI_TCL_LINK} @tab
+@item @var{SI_TCL_UNLINK} @tab
+@item @var{SI_SOCKPARAMS} @tab
+@item @var{SI_GETUDATA} @tab
+@end multitable
+
+@node Socket System
+@section Socket System
+@cindex socket system
+
+This approach implements the @cite{SVR 4.2} @manref{socksys(4)} driver.
+Opening @dfn{Streams} via the
+@manpage{socksys(4)} driver causes them to be
+transformed into native Sockets against which standard @file{libc} socket
+system calls are sufficient.  For compatibility with the
+@manpage{sockmod(4)}
+approach, the pushing the
+@manpage{sockmod(4)} module can be made to cause the
+same effect.
+
+Before @cite{Linux Fast-STREAMS} was developed, taking this approach was next
+to impossible due to the obfuscated nature and non-standard behaviour of the
+@cite{LiS} @dfn{Stream head}.  Now that @cite{LiS} is completely deprecated,
+this approach is now possible.
+
+@cite{SVR 4.2} behaviour for the @dfn{Stream head} dictates that it respond to
+both
+@manpage{termio(7)} and
+@manpage{sockio(7)} input-output controls in
+addition to @*
+@manpage{streamio(7)} controls.  That is, each @dfn{Stream head}
+can be a
+@manpage{fifo(4)}, a
+@manpage{pipe(4)}, a
+@manpage{tty(4)}, a
+@command{socket} or a @command{stream}.  @cite{LiS} never followed this
+behaviour: @cite{Linux Fast-STREAMS} was built with it from the start.
+
+Socket input-output controls recognized and intercepted by the @cite{Linux
+Fast-STREAMS} @dfn{Stream head} are:
+
+@multitable @columnfractions .33 .33 .34
+@item SIOCATMARK
+@item SIOCGPGRP
+@item SIOCSPGRP
+@end multitable
+
+Additional Sockets input-output controls are passed to the Stream as
+@var{TRANSPARENT} or @ioctlref{I_STR} input-output controls.
+
+@multitable @columnfractions .30 .40 .30
+@item SIOCHIWAT			@tab Set the high water mark.		@tab @var{TRANSPARENT}
+@item SIOGHIWAT			@tab Get the high water mark.		@tab @var{TRANSPARENT}
+@item SIOCLOWAT			@tab Set the low water mark.		@tab @var{TRANSPARENT}
+@item SIOGLOWAT			@tab Get the low water mark.		@tab @var{TRANSPARENT}
+@item SIOCATMARK		@tab Test whether at  mark.		@tab @dfn{Stream head}
+@item SIOCGPGRP FIOCGPGRP	@tab Get process group.			@tab @dfn{Stream head}
+@item SIOCSPGRP FIOCSPGRP	@tab Set process group.			@tab @dfn{Stream head}
+@item FIONREAD TIOCINQ		@tab Number of bytes to be read.	@tab @ioctlref{I_STR}
+@item TIOOUTQ			@tab Number of bytes to be sent.	@tab @ioctlref{I_STR}
+@item FIONBIO			@tab Set blocking i/o.			@tab @var{TRANSPARENT}
+@item SIOCPROTO			@tab Set a new protocol entry.		@tab @var{TRANSPARENT}
+@item SIOCGETNAME		@tab Get socket's name.			@tab @var{TRANSPARENT}
+@item SIOCGETPEER		@tab Get socket's peer.			@tab @var{TRANSPARENT}
+@item SIOCXPROTO		@tab Clear protocol entry table.	@tab @var{TRANSPARENT}
+@item SIOCSOCKSYS		@tab (See table below.)			@tab @var{TRANSPARENT}
+@end multitable
+
+@multitable @columnfractions .30 .40 .30
+@item @b{Command}		@tab @b{Library Call}		@tab @b{System Call}
+@item --------			@tab -------------		@tab ------------
+@item @var{SO_SOCKET}		@tab @manpage{socket(3)}	@tab --
+@item @var{SO_ACCEPT}		@tab @manpage{accept(3)}	@tab @manpage{accept(2)}
+@item @var{SO_BIND}		@tab @manpage{bind(3)}		@tab @manpage{bind(2)}
+@item @var{SO_CONNECT}		@tab @manpage{connect(3)}	@tab @manpage{connect(2)}
+@item @var{SO_GETPEERNAME}	@tab @manpage{getpeername(3)}	@tab @manpage{getpeername(2)}
+@item @var{SO_GETSOCKNAME}	@tab @manpage{getsockname(3)}	@tab @manpage{getsockname(2)}
+@item @var{SO_GETSOCKOPT}	@tab @manpage{getsockopt(3)}	@tab @manpage{getsockopt(2)}
+@item @var{SO_LISTEN}		@tab @manpage{listen(3)}	@tab @manpage{listen(2)}
+@item @var{SO_RECV}		@tab @manpage{recv(3)}		@tab @manpage{recv(2)}
+@item @var{SO_RECVFROM}		@tab @manpage{recvfrom(3)}	@tab @manpage{recvfrom(2)}
+@item @var{SO_SEND}		@tab @manpage{send(3)}		@tab @manpage{send(2)}
+@item @var{SO_SENDTO}		@tab @manpage{sendto(3)}	@tab @manpage{sendto(2)}
+@item @var{SO_SETSOCKOPT}	@tab @manpage{setsockopt(3)}	@tab @manpage{setsockopt(2)}
+@item @var{SO_SHUTDOWN}		@tab @manpage{shutdown(3)}	@tab @manpage{shutdown(2)}
+@item @var{SO_GETIPDOMAIN}	@tab --				@tab @manpage{getipdomain(2)}
+@item @var{SO_SETIPDOMAIN}	@tab --				@tab @manpage{setipdomain(2)}
+@item @var{SO_SETREUID}		@tab --				@tab @manpage{setreuid(2)}
+@item @var{SO_SETREGID}		@tab --				@tab @manpage{getreuid(2)}
+@item @var{SO_GETTIME}		@tab --				@tab @manpage{gettime(2)}
+@item @var{SO_SETTIME}		@tab --				@tab @manpage{settime(2)}
+@item @var{SO_GETITIMER}	@tab --				@tab @manpage{getitimer(2)}
+@item @var{SO_SETITIMER}	@tab --				@tab @manpage{setitimer(2)}
+@item @var{SO_SELECT}		@tab --				@tab @manpage{select(2)}
+@item @var{SO_ADJTIME}		@tab --				@tab @manpage{adjtimex(2)}
+@item @var{SO_RECVMSG}		@tab @manpage{recvmsg(3)}	@tab @manpage{recvmsg(2)}
+@item @var{SO_SENDMS}		@tab @manpage{sendmsg(3)}	@tab @manpage{sendmsg(2)}
+@item @var{SO_SOCKPAIR}		@tab @manpage{socketpair(3)}	@tab @manpage{socketpair(2)}
+@end multitable
+
+@node Socket Integration
+@section Socket Integration
+@cindex socket integration
+
+With this approach, @dfn{Streams} that are usable for sockets are given the
+@var{IF_SOCK} attribute during registration.  The @dfn{Stream head} is aware
+of this and creates a socket structure for each @dfn{Stream head} opened for
+the driver.
+
+@node Solaris
+@section Solaris Approaches
+@cindex solaris approaches
+
+The following is reprinted from an article in @cite{UNIX(R) Insider} issue
+@samp{3/9/01} written by @cite{Jim Mauro}.
+
+@quotation
+Prior to @cite{Solaris 2.6}, sockets were an abstraction that existed at the
+library level.  That is, much of the socket state and socket semantics support
+were provided with the @file{libsocket} library.  The kernel's view of a
+process's socket connection entailed a file descriptor and linkage to a
+@dfn{Stream head}, which provided the path to the underlying transport.  The
+disparity between the library socket state and the kernel's view was one of
+several reasons a new implementation was introduced in @cite{Solaris 2.6}.
+
+To provide a relevant basis for comparison, we will start by looking at what
+happens in the pre-@cite{Solaris 2.6} release (this is, releases up to and
+including @cite{Solaris 2.5.1}) when a socket is created.  The major software
+layers are shown in Figure XXX for reference.
+
+The primary software components are the socket library and the
+@manpage{sockmod(4)} @dfn{STREAMS} module.  The @manpage{specfs(5)} layer is
+shown for completeness and is part of the layering, due to the use of
+pseudo-devices as an entry point into the networking layers.  To digress for a
+moment, the special file system, @manpage{specfs(5)} came out of @cite{SVR 4
+UNIX(R)} as a means of addressing the issue of @dfn{device special files} that
+exist on @cite{UNIX(R)} on-disk file systems (e.g.  @cite{UFS}).
+@cite{UNIX(R)} system have always abstracted I/O (input/output) devices
+through device special files.  The @file{/dev} directory name space stores
+files that represent physical devices and pseudo-devices on the system.  Using
+device major numbers, those device files provide an entry point into the
+appropriate device driver, and using minor numbers, they are able to uniquely
+identify one of potentially many devices of the same type.  (That is something
+of an oversimplification, but it is sufficient for our purpose here in
+describing @manpage{specfs(5)}).
+
+The @file{/dev} directory resides on the @file{root} file system, which is an
+instance of @cite{UFS}.  As such, references to the file system and its files
+and directories are handed using the @cite{UFS} file system operations and
+@cite{UFS} file operations.  That is usually sufficient, but not desired
+behaviour for device special files.  I/O to a device special file requires
+entry into a device driver.  That is, issuing an @manpage{open(2)} system call
+on @file{/dev/rmt/0} means someone wishes to open the tape device represented
+by @file{/dev/rmt/0}, thereby entering the appropriate driver's
+@command{xx_open()} routine.  As a file on a @cite{UFS} file system, the
+typical open routine called would be the @command{ufs_open()} code, but that
+is not what we want for devices.  The @file{specfs(5)} file system was
+designed to address such situations; it provides a straightforward mechanism
+for linking the underlying structures for file support in the kernel to the
+required device driver interfaces.  Like all file systems in @cite{Solaris}
+(and any @cite{SVR4}-based @cite{UNIX(R)}) it is based on the
+@cite{VFS}/@command{vnode} infrastructure.  (See @cite{Solaris Internals} and
+@cite{UNIX(R) Internals} in the Resources section for detailed information on
+@cite{VFS}.)
+
+Getting back to sockets in @cite{Solaris 2.5.1}, the @manpage{specfs(5)} layer
+comes into play because the socket open ultimately results in an
+@manpage{open(2)} system call issued on the @manpage{tcp(4)} or
+@manpage{udp(4)} pseudo-device.  More precisely, the socket library passes the
+arguments given to the @manpage{socket(3)} call to a lookup function that
+searches an internal (internal to @file{libsocket.so}) array to match the
+domain argument and retrieve a corresponding character string.  It then uses
+the character string to find a match in the @file{/etc/netconfig} file, which
+is used for transport selection and describes all the available transport
+protocols in @cite{Solaris}.  (See @manref{netconfig(5)}.)  This transport
+selection mechanism is an essential part of a network programming
+implementation; it allows for the interfaces to be protocol-independent, so
+the programmer is not required to maintain a different source base for
+Ethernet-based networks versus FDDI-based networks, etc.
+
+A @manpage{netconfig(5)} data structure (defined in
+@file{/usr/include/sys/netconfig.h}) is populated based on the line entries in
+@file{/etc/netconfig} that match the domain (as per the character string
+retrieved from the internal table), type, and protocol family specified in the
+@manpage{socket(3)} call.  Among the @manpage{netconfig(5)} parameters, a
+device is defined that provides the entry point into the transport provider
+kernel module.  For example, a call to @samp{socket(AF_INET, SOCK_STREAM, 0)}
+indicates an Internet transport that provides reliable, connection-oriented
+behaviour is desired.  The @cite{TCP} layer of the @cite{TCP/IP} protocol
+family provides such a service, and the @file{/etc/netconfig} entry defines
+@samp{/dev/tcp} as the device to open for entry into that transport layer.
+The socket library code will issue an @manpage{open(2)} on @samp{/dev/tcp}
+accordingly.  If one were developing a network-based application using the
+@cite{X/Open Transport Interface (XTI)} -- a superset of what was the
+@cite{Transport Layer Interface (TLI)} -- the @manpage{t_open(3)} call would
+receive the @samp{/dev/tcp} argument explicitly for a connection using
+@cite{TCP} as a transport protocol.
+
+The block sitting below the @manpage{specfs(5)} in Figure XXX, the @dfn{Stream
+head}, is a generic part of a @dfn{STREAMS}-based communication path.  The
+@dfn{Stream head} is created when a @dfn{STREAMS} device is opened.  In Figure
+XXX, the @manpage{open(2)} to the @samp{/dev/tcp} transport layer, which is a
+@dfn{STREAMS} device, resulted in the creation of the @dfn{Stream head}.  The
+@dfn{Stream head} translates the interface calls made by the socket library
+into @dfn{STREAMS} messages (the @dfn{STREAMS} framework is message-based and
+uses queues to move data downstream [from the user process to the
+@dfn{STREAMS} driver] and upstream [from the driver to the user process]).
+The @dfn{STREAMS} facility provides for the insertion (pushing) and removal
+(popping) of @dfn{STREAMS} modules in the data flow, between the @dfn{Stream
+head} and the underlying driver.  Each module implements a set of queues -- a
+read queue and a write queue -- for processing the data and messages.  The
+generic picture is shown in Figure YYY.
+
+In the context of @cite{Solaris 2.5.1} sockets, the @dfn{STREAMS} module shown
+in Figure YYY is a kernel @manpage{sockmod(4)} module (located in the
+@file{/kernel/strmod} directory).  @manpage{sockmod(4)} provides, in
+conjunction with @file{libsocket.so}, support for socket semantics using the
+@dfn{STREAMS} facility.  That is, socket calls are handled initially by the
+socket library, then passed down to the @dfn{Stream head}, which transforms
+the calls into @dfn{STREAMS} messages and passes them down to
+@manpage{sockmod(4)}.  Upstream messages are passed from the underlying device
+driver and transport provider through @manpage{sockmod(4)} and back up to the
+process.  Thus, the functions contained in the @manpage{sockmod(4)} module
+include @dfn{STREAMS} queue reading and writing in the form of queue
+@samp{read put} and @samp{write put} code for moving data up and down the
+@dfn{Stream} as data is read and written from the socket.  The
+@manpage{sockmod(4)} module communicates with the underlying transport using
+primitives and structures defines in the @file{/usr/include/sys/tihdr.h}
+header file.
+
+The socket state maintained at the library level is in the form of a
+library-internal data structure, @command{_si_user}, which maintains various
+bits of information about the socket, and is what the internal socket create
+function returns on a socket call.  Yes, it is the file descriptor that
+represents the socket that is returned to the user code @command{_si_user} is
+visible only to the library.  You will find the structure definition for
+@command{_si_user} and associated structures that it links to
+(@command{si_udata} and @command{si_sockparams}) in
+@file{/usr/include/sys/sockmod.h}.  If you look at the structure definition,
+you will see that the @command{_si_user} embeds the @command{si_udata} and
+@command{si_sockparams} structures, which maintain stat information (e.g.
+connected, bound), socket options (accept connection), information on the
+transport provider (e.g. service type), and family, type, and protocol used
+for the socket.
+
+At the @manpage{sockmod(4)} layer, a socket is internally represented in the
+@command{so_so} data structure.  Fields of interest there include an embedded
+@command{ti_info} structure (@file{/usr/include/sys/tiuser.h}) that manages
+transport provider information, a network buffer (@command{netbuf}) for data
+transfer, a @command{si_udata} structure that replicates the socket state
+(among other things), and message blocks (@command{mblk_t}), which are the
+basic unit of communication across @dfn{STREAMS}.
+
+In @cite{Solaris 2.6}, we did away with the @manpage{sockmod(4)} @dfn{STREAMS}
+module and trimmed a lot of code from @file{libsocket}.  Most of the
+socket-related library interfaces result in system call traps into the kernel,
+without any library-level code executing.  A few of the interfaces
+(@manpage{socket(3)} and @manpage{sockpair(3)}) execute some library-level
+code before entering the kernel.  However, all the state information is
+maintained in the kernel, where it belongs.  This creates a nice visibility
+feature -- we can now see file descriptors that represent sockets.
+
+@smallexample
+sunsys> uname -a
+SunOS sunsys 5.8 Generic_108528-01 sun4u sparc SUNW, Ultra-60
+sunsys> srv &
+[1]     7153
+Socket port: # 34940
+Send bug: 16384, Rcv buf: 24576
+
+sunsys> pfiles 7153
+7153:   srv
+  Current rlimit: 1024 file descriptors
+   0: S_IFCHR mode:0620 dev:32,0 ino:91176 uid:19822 gid:7 rdev:24,14
+      O_RDWR|O_LARGEFILE
+   1: S_IFCHR mode:0620 dev:32,0 ino:91176 uid:19822 gid:7 rdev:24,14
+      O_RDWR|O_LARGEFILE
+   2: S_IFCHR mode:0620 dev:32,0 ino:91176 uid:19822 gid:7 rdev:24,14
+      O_RDWR|O_LARGEFILE
+   3: S_IFSOCK mode:0666 dev:186,0 ino:63137 uid:0 gid:0 size:0
+      O_RDWR
+        sockname: AF_INET 0.0.0.0  port: 34940
+sunsys>
+@end smallexample
+
+In the above example, a simple @cite{TCP} socket server process is started
+(@command{srv}, PID 7153). (The @samp{Socket port} and @samp{Send buf} lines
+are output from the @command{srv} process when it starts.)  Using the
+@manpage{pfiles(1)} command to dump the process's open file descriptors, we
+see that the file descriptor is identified as a socket, and we even get the
+socket type (@var{AF_INET}) and port number.  (The freeware command,
+@manpage{lsof(1)}, is a great utility for extracting process file descriptor
+information if you are on an older @cite{Sun OS} that does not have
+@manpage{pfiles(1)}.  You can get @manpage{lsof(1)} from
+@uref{ftp://vic.cc.purdue.edu/pub/tools/unix/lsof/}.)
+
+The @file{libsocket} changes associated with @manpage{sockfs(5)} maintain the
+documented interfaces.  Both source and binary compatibility are maintained,
+as socket code compiled on early version of @cite{Solaris} should work without
+recompilation on @cite{Solaris 6} and later releases.  Source code should move
+over and recompile with no changes as well.
+
+The trimming down of the library-level socket code required providing a new
+means to map the domain type passed as an argument to @manpage{socket(3)} to
+facility lookup in @file{/etc/netconfig}.  Recall that the @cite{Solaris
+2.5.1} socket library did this using an internal table.  In @cite{Solaris 6}
+and later, a new configuration file and command is introduced to provide that
+functionality.  The @file{/etc/sock2path} contains the necessary information
+to map the @manpage{socket(3)} call parameters to the appropriate transport
+provider and device.  A new command, @manpage{soconfig(8)}, is used to
+maintain @file{/etc/sock2path}.  It is executed automatically at boot time via
+an entry in the @file{/etc/inittab} file.  Reference the
+@manpage{sock2path(4)} and @manpage{soconfig(8)} manual pages for specifics.
+For most applications, the default entries in @manpage{sock2path(5)} are
+sufficient.
+
+As a file system (pseudo-file system), @manpage{sockfs(5)} implements the
+generic @cite{VFS}/@code{vnode} related support structures and exports the
+required file-system-specific functions.  However, the entry into the
+@manpage{sockfs(5)}-specific functions does not necessarily follow the typical
+flow of a regular file open, which is vectored to the file-type-specific
+function through the use of macros and an operations table.  That is, the
+issuing of an @manpage{open(2)} system call on a file enters a generic
+@code{vnode} code path and ultimately resolves through a @code{VOP_OPEN()}
+macro to the appropriate file-system-specific open code (e.g.  @code{ufs_open}
+for a file an a @cite{UFS} file system).
+
+Sockets are created an opened using the @manpage{socket(3)} API.  A call to
+@manpage{socket(3)} from user code enters the @file{libsocket} library, which
+handles the mapping to the transport provider device, then enters the
+@manpage{sockfs(5)} kernel module through an internal @code{so_create()}
+system call.  The @code{sock_open()} (file system specific open routine) is
+invoked through the @code{so_create()} call, which is how other necessary
+create functions, such as an initialization function for the socket
+@dfn{Stream}, are called.
+
+Other conventional system calls, such as @manpage{read(2)} or
+@manpage{write(2)} on a socket, are vectored into the @manpage{sockfs(5)}
+specific read and write code (@code{sock_read()} and @code{sock_write()})
+through the standard @cite{VFS}/@code{vnode} mechanism.  Once entered, the
+@manpage{sockfs(5)} read/write code makes lower-level calls into the
+@manpage{sockfs(5)} subsystem designed to interface with the transport
+provider.  For example, a @manpage{read(2)} system call on a socket vectors
+into @code{sock_read()}, which does some basic housekeeping and calls an
+internal @code{sorecvmsg()} (socket receive message) function.  In
+@code{sorecvmsg()}, socket stat is tested and the request is moved downstream
+via a call to the @dfn{STREAMS} get-message function.
+
+The most compelling part of the @manpage{sockfs(5)} implementation is that
+consolidation of all socket stat information is in a single structure,
+maintained in one place: the kernel.  Sockets are represented internally as a
+@code{sonode}, defined in @file{/usr/include/sys/socketvar.h}.  All operations
+on a @code{sonode} take place within the kernel @manpage{sockfs(5)} subsystem,
+isolating state changes and eliminating the need to replicate state for
+consistency.
+@ignore
+which created some problems alluded to last month.
+
+That is a wrap for this month.  It occurred to me as I was working through
+this material that it really should have been preceded by detailed coverage of
+the generic @dfn{STREAMS} subsystem.  At the risk of moving in a backward
+direction, I will add that to the editorial calendar for the not-to-distant
+future.  (It is a huge subsystem.)
+@end ignore
+@end quotation
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.1 2006/08/26 09:14:34 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.2 2006/08/29 11:48:21 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:14:34 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:48:21 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -78,16 +78,31 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is primarily a maintenance release correcting reported bugs, but also includes the latest
-packaging improvements.
+This is primarily a maintenance release correcting reported bugs, but also
+includes the latest packaging improvements.
 
-@itemize @bullet
-@item Added @samp{--enable-devel} @command{configure} option for embedded targets.
-@item Added @command{send-pr} script for automatic problem report generation.
-@item Fixed problems with unresolved symbols on some systems.
-@item Fixed glaring error in @code{sctp_init} preventing kernel module from loading.
-@item Added init scripts and system control configuration data.
-@item Removed old preload approach to kernel module loading.
+@itemize
+@item
+Automated release file generation making for vastly improved and timely text
+documentation present in the release directory.
+
+@item
+Added @samp{--enable-devel} @command{configure} option for embedded targets.
+
+@item
+Added @command{send-pr} script for automatic problem report generation.
+
+@item
+Fixed problems with unresolved symbols on some systems.
+
+@item
+Fixed glaring error in @code{sctp_init} preventing kernel module from loading.
+
+@item
+Added init scripts and system control configuration data.
+
+@item
+Removed old preload approach to kernel module loading.
 @end itemize
 
 @c ----------------------------------------------------------------------------

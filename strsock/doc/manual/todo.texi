@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c -*- texinfo -*- vim: ft=texinfo tw=78 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:38:09 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/08/29 11:44:05 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:38:09 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:44:05 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,10 +64,42 @@ Things to do:
 Testing.  This package is completely untested.
 
 @item
-The strtty package is currently incomplete.  The purpose of the package was to move STREAMS terminal
-capabilities outside of the STREAMS release package so as to allow them to be used with both LiS and
-Linux Fast-STREAMS.  As Linux Fast-STREAMS has already shown superior to LiS in terms of both
-performance and conformance, it is no longer necessary to keep these packages separate and they can
-be combined once again (or still) with Linux Fast-STREAMS.
+Create a @manref{socksys(4)} @cite{Socket System} @dfn{STREAMS} driver.
+
+@item
+It would be interesting to perform some @cite{Netperf} and @cite{Iperf}
+performance tests against @dfn{STREAMS}-based network drivers supporting
+@cite{Transport Provider Interface (TPI)} and @dfn{Sockets} using this socket
+system.  Without @manpage{sockmod(4)} and @file{libsocket} it was only
+possible to use @cite{Netperf} for performance testing, and then only using
+the XTI tests.
+
+@item
+Create the @manref{socket(3)} @file{libsocket} shared library.
+
+@item
+Create a @manref{sockmod(4)} @cite{Socket Module} @dfn{STREAMS} module.
+
+@item
+Move already written code from the @file{stacks} or @file{strss7} directories
+into the @file{src} directory.
+
+@item
+Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
+a subpackage in the @cite{OpenSS7 Master Package}.
+
+@emph{*done*}
+
+You are reading it.
 @end itemize
+
+The @command{@value{PACKAGE}} package is currently incomplete.
+
+The purpose of the package was to move @dfn{STREAMS} socket capabilities
+outside of the @dfn{STREAMS} release package so as to allow them to be used
+with both @cite{LiS} and @cite{Linux Fast-STREAMS}.  As @cite{Linux
+Fast-STREAMS} has already shown superior to @cite{LiS} in terms of both
+performance and conformance, it is no longer necessary to keep these packages
+separate and they can be combined once again (or still) with @cite{Linux
+Fast-STREAMS}.
 

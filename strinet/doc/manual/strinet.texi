@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strinet.texi,v 0.9.2.18 2006/08/27 12:27:03 brian Exp $
+% @(#) $Id: strinet.texi,v 0.9.2.20 2006/08/28 10:47:07 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/27 12:27:03 $ by $Author: brian $
+% Last Modified $Date: 2006/08/28 10:47:07 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -331,13 +331,13 @@ Indices
 @cindex document notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
 and other sources).  Consult the permission notices contained in the documentation for more
 information.
 
-This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This document, is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 
 @node Abstract
@@ -403,6 +403,12 @@ package.
 @smallexample
 
 $Log: strinet.texi,v $
+Revision 0.9.2.20  2006/08/28 10:47:07  brian
+- correction
+
+Revision 0.9.2.19  2006/08/28 10:32:55  brian
+- updated references
+
 Revision 0.9.2.18  2006/08/27 12:27:03  brian
 - finalizing auto release files
 
@@ -521,7 +527,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 @auindex Bidulock, Brian
 @end multitable
 
-See @ref{Author Index}, for a complete listing and cross-index of authors to
+See @refman{Author Index}, for a complete listing and cross-index of authors to
 sections of this document.
 
 @node Maintainer
@@ -535,8 +541,8 @@ The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
 @end multitable
 
 Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
 
 @node Web Resources
 @unnumberedsec Web Resources
@@ -574,12 +580,12 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @section Notice
 @cindex notice
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from X/Open publications and other sources).  Consult the permission notices
 contained in the documentation for more information.
 
-This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This manual is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 @end ignore
 
@@ -636,19 +642,19 @@ This manual is organized (loosely) into several sections as follows:
 @end ifnotinfo
 @ifplaintext
 @multitable @columnfractions .50 .50
-@item @ref{Introduction}.
+@item @cite{Introduction}.
 @tab This introduction
-@item @ref{Objective}.
+@item @cite{Objective}.
 @tab Objective of the package
-@item @ref{Reference}.
+@item @cite{Reference}.
 @tab Contents of the package
-@item @ref{Conformance}.
+@item @cite{Conformance}.
 @tab Conformance of the package
-@item @ref{Releases}.
+@item @cite{Releases}.
 @tab Releases of the package
-@item @ref{Installation}.
+@item @cite{Installation}.
 @tab Installation of the package
-@item @ref{Troubleshooting}.
+@item @cite{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
 @end ifplaintext

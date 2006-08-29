@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.14 $) $Date: 2006/08/27 12:26:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.15 $) $Date: 2006/08/29 11:51:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/27 12:26:26 $ by $Author: brian $
+# Last Modified $Date: 2006/08/29 11:51:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.15  2006/08/29 11:51:20  brian
+# - removed useless files
+#
 # Revision 1.1.6.14  2006/08/27 12:26:26  brian
 # - finalizing auto release files
 #
@@ -93,7 +96,6 @@ EXTRA_info_TEXINFOS	= \
 			  prerequisites.texi \
 			  releases.texi \
 			  rpm.texi \
-			  testsuite.texi \
 			  todo.texi \
 			  tree.texi \
 			  texi/args.texi \

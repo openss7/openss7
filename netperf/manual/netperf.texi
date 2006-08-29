@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 0.9.2.11 2006/08/27 12:26:32 brian Exp $
+% @(#) $Id: netperf.texi,v 0.9.2.13 2006/08/28 10:46:52 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/27 12:26:32 $ by $Author: brian $
+% Last Modified $Date: 2006/08/28 10:46:52 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -472,6 +472,12 @@ package.
 @smallexample
 
 $Log: netperf.texi,v $
+Revision 0.9.2.13  2006/08/28 10:46:52  brian
+- correction
+
+Revision 0.9.2.12  2006/08/28 10:32:43  brian
+- updated references
+
 Revision 0.9.2.11  2006/08/27 12:26:32  brian
 - finalizing auto release files
 
@@ -566,7 +572,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 @auindex Bidulock, Brian
 @end multitable
 
-See @ref{Author Index}, for a complete listing and cross-index of authors to
+See @refman{Author Index}, for a complete listing and cross-index of authors to
 sections of this document.
 
 @node Maintainer
@@ -580,8 +586,8 @@ The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
 @end multitable
 
 Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
 
 @node Web Resources
 @unnumberedsec Web Resources
@@ -695,21 +701,21 @@ This manual is organized (loosely) into several sections as follows:
 @end ifnotinfo
 @ifplaintext
 @multitable @columnfractions .50 .50
-@item @ref{Introduction}.
+@item @cite{Introduction}.
 @tab This introduction
-@item @ref{Objective}.
+@item @cite{Objective}.
 @tab Objective of the package
-@item @ref{Reference}.
+@item @cite{Reference}.
 @tab Contents of the package
-@item @ref{Tests}.
+@item @cite{Tests}.
 @tab Tests included in the package
-@item @ref{Conformance}.
+@item @cite{Conformance}.
 @tab Conformance of the package
-@item @ref{Releases}.
+@item @cite{Releases}.
 @tab Releases of the package
-@item @ref{Installation}.
+@item @cite{Installation}.
 @tab Installation of the package
-@item @ref{Troubleshooting}.
+@item @cite{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
 @end ifplaintext

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:38:07 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/08/29 11:49:02 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:38:07 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:49:02 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -61,6 +61,32 @@ Things to do:
 
 @itemize @minus
 @item
-Want to support ISOT, ITOT, LPP, CMOT.
+Testing.  This package is completely untested.
+
+@item
+Create @manpage{isot(4)}, @manpage{itot(4)}, @manpage{lpp(4)} and
+@manpage{cmot(4)} @dfn{STREAMS} modules and drivers.
+
+@item
+Move already written code from the @file{stacks} or @file{strss7} directories
+into the @file{src} directory.
+
+@item
+Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
+a subpackage in the @cite{OpenSS7 Master Package}.
+
+@emph{*done*}
+
+You are reading it.
 @end itemize
+
+The @command{@value{PACKAGE}} package is currently incomplete.
+
+The purpose of the package was to move @dfn{STREAMS} ISO networking capabilities
+outside of the @dfn{STREAMS} release package so as to allow them to be used
+with both @cite{LiS} and @cite{Linux Fast-STREAMS}.  As @cite{Linux
+Fast-STREAMS} has already shown superior to @cite{LiS} in terms of both
+performance and conformance, it is no longer necessary to keep these packages
+separate and they can be combined once again (or still) with @cite{Linux
+Fast-STREAMS}.
 

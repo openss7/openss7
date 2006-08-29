@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strbcm.texi,v 0.9.2.7 2006/08/27 12:26:41 brian Exp $
+% @(#) $Id: strbcm.texi,v 0.9.2.9 2006/08/28 10:46:56 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/27 12:26:41 $ by $Author: brian $
+% Last Modified $Date: 2006/08/28 10:46:56 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -338,13 +338,13 @@ Installation and Reference Manual}.}.  In stark contrast to many other software 
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
 other parties.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
 and other sources).  Consult the permission notices contained in the documentation for more
 information.
 
-This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This document, is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 
 @node Abstract
@@ -410,6 +410,12 @@ package.
 @smallexample
 
 $Log: strbcm.texi,v $
+Revision 0.9.2.9  2006/08/28 10:46:56  brian
+- correction
+
+Revision 0.9.2.8  2006/08/28 10:32:52  brian
+- updated references
+
 Revision 0.9.2.7  2006/08/27 12:26:41  brian
 - finalizing auto release files
 
@@ -492,7 +498,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 @auindex Bidulock, Brian
 @end multitable
 
-See @ref{Author Index}, for a complete listing and cross-index of authors to
+See @refman{Author Index}, for a complete listing and cross-index of authors to
 sections of this document.
 
 @node Maintainer
@@ -506,8 +512,8 @@ The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
 @end multitable
 
 Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
 
 @node Web Resources
 @unnumberedsec Web Resources
@@ -553,12 +559,12 @@ Installation and Reference Manual}.}.  In stark contrast to many other software 
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
 other parties.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from X/Open publications and other sources).  Consult the permission notices
 contained in the documentation for more information.
 
-This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This manual is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 @end ignore
 
@@ -606,19 +612,19 @@ This manual is organized (loosely) into several sections as follows:
 @end ifnotinfo
 @ifplaintext
 @multitable @columnfractions .50 .50
-@item @ref{Introduction}.
+@item @cite{Introduction}.
 @tab This introduction
-@item @ref{Objective}.
+@item @cite{Objective}.
 @tab Objective of the package
-@item @ref{Reference}.
+@item @cite{Reference}.
 @tab Contents of the package
-@item @ref{Conformance}.
+@item @cite{Conformance}.
 @tab Conformance of the package
-@item @ref{Releases}.
+@item @cite{Releases}.
 @tab Releases of the package
-@item @ref{Installation}.
+@item @cite{Installation}.
 @tab Installation of the package
-@item @ref{Troubleshooting}.
+@item @cite{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
 @end ifplaintext

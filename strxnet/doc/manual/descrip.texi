@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.2 2006/08/27 12:27:17 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.3 2006/08/28 10:33:01 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 12:27:17 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/28 10:33:01 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -66,7 +66,7 @@ removed from the @cite{LiS} distribution and separated so that they could build 
 The package contains the following standard @cite{Open Systems Interconnect (OSI)} conforming header
 files:
 
-@multitable @columnfractions .05. .95
+@multitable @columnfractions .05 .95
 @item @tab @minus{} @file{<sys/tiusr.h>} @cite{Transport Provider Interface Version 2.0.0} user
 @item @tab @minus{} @file{<sys/tihdr.h>} @cite{Transport Provider Interface Version 2.0.0} kernel
 @item @tab @minus{} @file{<sys/ticots.h>} @cite{TPI COTS}
@@ -79,7 +79,7 @@ contained in the @samp{strxns-@value{VERSION_STRXNS}} package.
 
 The package builds and installs the following @dfn{STREAMS} kernel modules and drivers:
 
-@multitable @columnfractions .05. .95
+@multitable @columnfractions .05 .95
 @item @tab @minus{} @file{streams_timod.ko} module @dfn{timod}
 @item @tab @minus{} @file{streams_tirdwr.ko} module @dfn{tirdwr}
 @end multitable

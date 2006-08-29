@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.26 2006/08/27 12:26:27 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.27 2006/08/28 10:15:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 12:26:27 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/28 10:15:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -87,7 +87,7 @@ drivers, as well as Linux kernel compatibility.
 @include prerequisites.texi
 
 If you need to rebuild the package from sources with modifications, you will need a larger GNU
-toolchain as described in @xref{Downloading from CVS}.
+toolchain as described in @xrefman{Downloading from CVS}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -260,16 +260,16 @@ LiS spin locks and semaphores have been rearranged so that the kernel memory is 
 structure instead of the beginning.
 @item
 The former change allows for there to be dynamic allocation routines for spin locks and semaphores.
-(@pxref{LiS Spin Locks})
+(@pxrefman{LiS Spin Locks})
 @item
-LiS now provides an abstraction for read/write locks, with dynamic allocation.  (@pxref{LiS
+LiS now provides an abstraction for read/write locks, with dynamic allocation.  (@pxrefman{LiS
 Read/Write Locks})
 @item
 Those experimenting with 2.5 kernels will notice that the "sleep while holding spin lock" problems
 have been fixed.
 @item
 Porting to 2.5 has necessitated some changes to the major/minor device structure handling.
-(@pxref{Major/Minor Device Numbering})
+(@pxrefman{Major/Minor Device Numbering})
 @item
 The fattach related functions are functional on kernels version 2.4.7 and later.
 @item
@@ -299,7 +299,7 @@ fattach/fdetach functions on kernel versions 2.4.7 and beyond.  There are also k
 pipe/FIFO code.  All of these problems are scheduled to be fixed in early 2002.
 
 LiS-2.13 adds the ability for drivers to make their own "/dev" nodes via the @dfn{lis_mknod}
-function (@pxref{System Calls from within the Kernel}).  Also provided is an @dfn{lis_unlink}
+function (@pxrefman{System Calls from within the Kernel}).  Also provided is an @dfn{lis_unlink}
 function that allows drivers to remove their device files.
 
 There is almost no new functionality added by LiS-2.13.  The differences between LiS-2.13 and
@@ -315,12 +315,12 @@ If you have drivers that have worked with LiS-2.10 or LiS-2.11 (or earlier) plea
 using the header files from LiS-2.12.  This may be the last recompile in quite some time that you
 will need for your driver code.
 
-LiS-2.12 contains a sufficient Driver/Kernel Interface (DKI), (@pxref{Development}), that it is
+LiS-2.12 contains a sufficient Driver/Kernel Interface (DKI), (@pxrefman{Development}), that it is
 straightforward to write a STREAMS driver that can be compiled against LiS-2.12 and the resulting
 object modules used either on a 2.2 or 2.4 kernel, with only LiS needing recompilation on the target
 machine.
 
-When run on 2.4 kernels, LiS makes full use of multiple CPUs (@pxref{LiS SMP Implementation}).  It
+When run on 2.4 kernels, LiS makes full use of multiple CPUs (@pxrefman{LiS SMP Implementation}).  It
 forks a queue runner task for each CPU and locks each task onto its CPU.  Queue runner tasks are
 awakened to assist with service procedure processing as the number of scheduled queues increases.
 
@@ -329,11 +329,11 @@ properly when run with LiS-2.12 in a multi-CPU SMP environment.  You should expe
 worked in single-CPU environments will continue to work as before.
 
 Making your drivers MP safe involves the use of spin locks.  The DKI documentation contains advice
-on the use of these locks.  @xref{LiS Spin Locks}.
+on the use of these locks.  @xrefman{LiS Spin Locks}.
 
 This version of LiS also contains a rewrite of the flushing code and tests added to strtst for
 flushing.  In particular the details of the rules for flushing queue bands are now adhered to.
-@xref{Flushing Queue Bands}.  Be advised, however, that Solaris STREAMS does not adhere strictly to
+@xrefman{Flushing Queue Bands}.  Be advised, however, that Solaris STREAMS does not adhere strictly to
 these rules so there may be some subtle differences in behavior between LiS and Solaris when
 flushing queue bands.
 
@@ -356,7 +356,7 @@ compile STREAMS drivers against LiS-2.10 header files and use the resulting obje
 2.2.x kernels and 2.4.x kernels.
 
 For more details about the interface between STREAMS drivers and the kernel, see the Driver/Kernel
-Interface documentation, (@pxref{Development}).
+Interface documentation, (@pxrefman{Development}).
 
 
 @node Linux Fast-STREAMS
@@ -503,7 +503,7 @@ stable that software in this category.
 defects might be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7
 Project} on this software.  The software might not even configure or compile.  The @cite{OpenSS7
 Project} recommends that you @b{do not use this software}. Use at your own risk.  Remember that
-there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public
+there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
 License}.}
 
 @b{This software is @i{pre-alpha} software.  As such, it will crash your kernel.  Installation of
@@ -521,7 +521,7 @@ be harmful.  No validation testing whatsoever has been performed by the @cite{Op
 this software.  The software might fail to configure or compile on some systems.  The @cite{OpenSS7
 Project} recommends that you @b{do not use this software for purposes other than develoment or
 evaluation, and then only with great care}. Use at your own risk.  Remember that there is @b{NO
-WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public License}.}
+WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public License}.}
 
 @b{This software is @i{alpha} software.  As such, it can likely crash your kernel.  Installation of
 the software can irreparably mangle your header files or Linux distribution in such a way as to make
@@ -538,7 +538,7 @@ defects could be harmful.  Validation testing has been performed by the @cite{Op
 this software for only a restricted set of systems.  The software might fail to configure or compile
 on other systems.  The @cite{OpenSS7 Project} recommends that you @b{do not use this software for
 purposes other than validation testing and evaluation, and then only with care}. Use at your own
-risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU
+risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU
 General Public License}.}
 
 @b{This software is @i{beta} software.  As such, it might crash your kernel.  Installation of the
@@ -558,7 +558,7 @@ the @cite{OpenSS7 Project} on this software for a set of systems and external va
 been performed on other systems.  Nevertheless, the software might still fail to configure or
 compile on other systems.  The @cite{OpenSS7 Project} recommends that you @b{validate this software
 for your target system with care before using this software}.  Use at your own risk.  Remember that
-there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public
+there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
 License}.}
 
 @b{This software is @i{gamma} software.  As such, it is quite stable but might still crash your
@@ -579,7 +579,7 @@ testing has been performed by the @cite{OpenSS7 Project} and external entities o
 the set of systems listed in the release notes.  Nevertheless, the software might still fail to
 configure or compile on other systems.  The @cite{OpenSS7 Project} recommends that you @b{validate
 this software for your target system before using this software}.  Use at your own risk.  Remember
-that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @ref{GNU General Public
+that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
 License}.}
 
 @b{This software is @i{production} software.  As such, it is stable on validated systems but might
@@ -598,13 +598,13 @@ Some defects could be harmful.  Validation testing has been performed by the @ci
 on this software and it has revealed itself to be unstable and irreparable.  The software might not
 even configure or compile.  The @cite{OpenSS7 Project} recommends that you @b{do not use this
 software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section
-@b{NO WARRANTY} under @ref{GNU General Public License}.}
+@b{NO WARRANTY} under @refman{GNU General Public License}.}
 
 @dfn{@value{PACKAGE_TITLE}}, both releases from @cite{OpenSS7} and @cite{GCOM}, contain many known
 bugs. These are unstable releases.  Although there are no bugs known directly to be harmful, the
 @cite{OpenSS7 Project} has tested the release and found defects that cause the kernel to lock or
 crash. Use at your own risk.  Remember that there is @b{NO WARRANTY}@footnote{See section @b{NO
-WARRANTY} under @ref{GNU General Public License}.} and that the package is no longer actively
+WARRANTY} under @refman{GNU General Public License}.} and that the package is no longer actively
 maintained.
 
 @b{This software is @i{unstable} software.  As such, it will lock or crash your kernel.

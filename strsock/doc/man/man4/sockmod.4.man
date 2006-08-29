@@ -1,0 +1,913 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: sockmod.4.man,v 0.9.2.1 2006/08/29 11:41:02 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/08/29 11:41:02 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: sockmod.4.man,v $
+.\" Revision 0.9.2.1  2006/08/29 11:41:02  brian
+.\" - added manual pages
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:44:46  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsock.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsock.macros
+.\"
+.\"
+.TH SOCKMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B sockmod
+\- a STREAMS socket compatability module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/socket.h>
+.br
+.B #include <sys/socksys.h>
+.HP 8
+.BI "" t " = open(\*(lq" /dev/tcp "\*(rq, 0);
+.HP 8
+.BI ioctl( t ", I_PUSH, \*(lqsockmod\*(rq);
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.PP
+.B sockmod
+is a socket library compatibility module for the STREAMS Transport Provider
+Interface
+.[
+TPI Revision 2.0.0
+.]
+.BR tpi (7).
+It translates a set of
+.B sockmod
+ioctls into TPI
+.[
+TPI Revision 2.0
+.]
+primitives.  These
+.B sockmod
+ioctls are intended to be used by a library level Sockets compatibility
+library.
+.\"
+.\"
+.SH USAGE
+.PP
+.B sockmod
+is not normally pushed by a user program: it is pushed by the
+.BR libsocket (3)
+library as part of the
+.BR socket (3)
+or
+.BR socketpair (3)
+library calls.
+Also, none of the input-output controls provided by the module (with the
+exception of a few of the
+.BR sockio (7)
+input-output controls) are meant to be directly invoked by the user.  In
+particular, the
+.B SIOCSOCKSYS
+input-output control is intended to be used only by the
+.BR libsocket (3)
+library to emulate socket API system calls.
+.PP
+When the user invokes the
+.BR socket (3)
+or
+.BR socketpair (3)
+library call, the
+.BR libsocket (3)
+library uses the
+.B /etc/netconfig
+file to map the
+.IR family ", " type " and " protocol
+parameters to the call to a
+.I STREAMS
+pseudo-device providing the
+.IR "Tranport Provider Interface",
+.BR tpi (7).
+The library then opens the specified device with the
+.BR open (2)
+system call and pushes the
+.B sockmod
+module over the Stream using the
+.BR I_PUSH (7)
+.I STREAMS
+input-output control.
+Subsequent sockets API calls made on the file descriptor are translated by the
+.BR libsocket (3)
+library into
+.B SIOCSOCKSYS
+input-output control commands.
+The
+.B sockmod
+module receives and processes these input-output commands and translates them
+into
+.BR tpi (7)
+messages that are exchanged with the underlying
+.IR Stream .
+.PP
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+does not require or use the
+.B sockmod
+module.  It is provided for
+.I LiS
+.[
+lis
+.]
+that is incapable of providing the socket input-output controls directly from
+the
+.I "Stream head" .
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+instead uses the
+.I S_IFSOCK
+designation on a
+.I Stream
+and can emulate
+.I BSD
+system calls using the
+.BR socksys (4)
+driver for backward compatibility.
+See
+.BR socksys (4)
+for more information.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SS IOCTLS (SOCKMOD)
+.PP
+These are the traditional
+.B sockmod
+input-output controls.  The
+.B sockmod
+module recognizes these input-output controls for backwards compatiblity.  The
+.BR libsocket (3)
+library does not use these input-output controls.  They are deprecated.  Avoid
+them.
+.TP \w'\fBSI_GETINTRANSIT\fR\(em'u
+.B SI_GETUDATA
+.\"('I' 101)
+get user data.
+.PD 0
+.TP
+.B SI_SHUTDOWN
+.\"('I' 102)
+suspend receive and send operations.
+.br
+Obsolete
+.BR shutdown (3)
+implementation.
+.TP
+.B SI_LISTEN
+.\"('I' 103)
+listen for a transport connection.
+.br
+Obsolete
+.BR listen (3)
+implementation.
+.TP
+.B SI_SETMYNAME
+.\"('I' 104)
+set the socket name.
+.br
+Obsolete
+.BR bind (3)
+implementation.
+.TP
+.B SI_SETPEERNAME
+.\"('I' 105)
+set the peer name.
+.br
+Obsolete
+.BR connect (3)
+implementation.
+.TP
+.B SI_GETINTRANSIT
+.\"('I' 106)
+.TP
+.B SI_TCL_LINK
+.\"('I' 107)
+.TP
+.B SI_TCL_UNLINK
+.\"('I' 108)
+.PD
+.\"
+.\"
+.SS IOCTLS (FILEIO)
+.PP
+These are standard input-output controls applicable to all files (including
+.I STREAMS
+special files).
+These input-output controls should be handled by the
+.IR "Stream head" .
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+lfs
+.]
+these input-output controls are recognized and processed correctly by the
+.IR "Stream head" .
+.PP
+.I LiS
+.[
+lis
+.]
+does not properly recognize the full set of input-output controls that must be
+recognized and processed by the
+.IR "Stream head" .
+Under
+.I LiS
+.[
+lis
+.]
+.B sockmod
+also recognizes and processes these system controls (to the best of its
+ability, but most of them cannot be set or examined under
+.IR LiS ).
+Never use
+.IR LiS .
+.TP \w'\fBSI_GETINTRANSIT\fR\(em'u
+.B FIOCGPGRP
+Get process group.
+.PD 0
+.TP
+.B FIOCSPGRP
+Set process group.
+.TP
+.B FIONREAD
+Number of bytes remaining to be read.
+.TP
+.B FIONBIO
+Set non-blocking input-output.
+.PD
+.\"
+.\"
+.SS IOCTLS (TERMIO)
+.PP
+These standard input-output controls are applicable to all terminals (including
+.I STREAMS
+terminals).  These input-output controls should be handled by the
+.IR "Stream head" .
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+lfs
+.]
+these input-output controls are recognized and processed by the
+.IR "Stream head" .
+.PP
+.I LiS
+.[
+lis
+.]
+does not properly recognize the full set of input-output controls that must be
+recognized and processed by the
+.IR "Stream head" .
+Under
+.I LiS
+.[
+lis
+.]
+.B sockmod
+also recognizes and processes these system controls (to the best of its
+ability).
+Never use
+.IR LiS .
+.TP \w'\fBSI_GETINTRANSIT\fR\(em'u
+.B TIOCINQ
+Number of bytes remaining to be read.
+.PD 0
+.TP
+.B TIOOUTQ
+Number of bytes available to be sent.
+.PD
+.\"
+.\"
+.SS IOCTLS (SOCKIO)
+.PP
+These standard input-output controls are applicable to all sockets (including
+.I STREAMS
+sockets).  These input-output controls should be handled by the
+.IR "Stream head" .
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+lfs
+.]
+these input-output controls are recognized and processed by the
+.IR "Stream head" .
+.PP
+.I LiS
+.[
+lis
+.]
+does not properly recognize the full set of input-output controls that must be
+recognized and processed by the
+.IR "Stream head" .
+Under
+.I LiS
+.[
+lis
+.]
+.B sockmod
+also recognizes and processes these system controls (to the best of its
+ability, but most of them cannot be set or examined under
+.IR LiS ).
+Never use
+.IR LiS .
+.\"
+.TP \w'\fBSI_GETINTRANSIT\fR\(em'u
+.B SIOCHIWAT
+Sets the high water mark.
+.PD 0
+.\"
+.TP
+.B SIOGHIWAT
+Gets the high water mark.
+.\"
+.TP
+.B SIOCLOWAT
+Sets the low water mark.
+.\"
+.TP
+.B SIOGLOWAT
+Gets the low water mark.
+.\"
+.TP
+.B SIOCATMARK
+Tests whether urgent message has been received.
+.\"
+.TP
+.B SIOCGPGRP
+Get process group.
+.\"
+.TP
+.B SIOCSPGRP
+Set process group.
+.\"
+.TP
+.B SIOCPROTO
+Set a new protocol entry.
+.\"
+.TP
+.B SIOCGETNAME
+Get socket's name.
+.\"
+.TP
+.B SIOCGETPEER
+Get socket's peer.
+.\"
+.TP
+.B SIOXPROTO
+Clear protocol entry table.
+.\"
+.TP
+.B SIOSOCKSYS
+Emulate a BSD system call.
+.PD
+.\"
+.\"
+.SS IOCTLS (SOCKSYS)
+.PP
+.B sockmod
+provides the full set of commands to the
+.B SIOCSOCKSYS
+input-output control used by
+.I SVR 4.2
+.[
+svr42
+.]
+to emulate
+.I BSD
+system calls.
+It is not the traditional role of the
+.B sockmod
+module to process these input-output controls; however, the
+.I LiS
+.[
+lis
+.]
+.I Stream head
+does not properly process them.  As they support the sockets API library, they
+are implemented here only for
+.IR LiS .
+The commands are as follows:
+.\"
+.TP \w'\fBSI_GETINTRANSIT\fR\(em'u
+.B SO_SOCKET
+Emulates the
+.I BSD
+.BR socket (2)
+system call.
+.\"
+.PD 0
+.TP
+.B SO_ACCEPT
+Emulates the
+.I BSD
+.BR accept (2)
+system call.
+.\"
+.TP
+.B SO_BIND
+Emulates the
+.I BSD
+.BR bind (2)
+system call.
+.\"
+.TP
+.B SO_CONNECT
+Emulates the
+.I BSD
+.BR connect (2)
+system call.
+.\"
+.TP
+.B SO_GETPEERNAME
+Emulates the
+.I BSD
+.BR getpeername (2)
+system call.
+.\"
+.TP
+.B SO_GETSOCKNAME
+Emulates the
+.I BSD
+.BR getsockname (2)
+system call.
+.\"
+.TP
+.B SO_LISTEN
+Emulates the
+.I BSD
+.BR listen (2)
+system call.
+.\"
+.TP
+.B SO_RECV
+Emulates the
+.I BSD
+.BR recv (2)
+system call.
+.\"
+.TP
+.B SO_RECVFROM
+Emulates the
+.I BSD
+.BR recvfrom (2)
+system call.
+.\"
+.TP
+.B SO_SEND
+Emulates the
+.I BSD
+.BR send (2)
+system call.
+.\"
+.TP
+.B SO_SENDTO
+Emulates the
+.I BSD
+.BR sendto (2)
+system call.
+.\"
+.TP
+.B SO_SETSOCKOPT
+Emulates the
+.I BSD
+.BR setsockopt (2)
+system call.
+.\"
+.TP
+.B SO_SHUTDOWN
+Emulates the
+.I BSD
+.BR shutdown (2)
+system call.
+.\"
+.TP
+.B SO_GETIPDOMAIN
+Emulates the
+.I BSD
+.BR getipdomain (2)
+system call.
+.\"
+.TP
+.B SO_SETIPDOMAIN
+Emulates the
+.I BSD
+.BR setipdomain (2)
+system call.
+.\"
+.TP
+.B SO_SETREUID
+Emulates the
+.I BSD
+.BR setreuid (2)
+system call.
+.\"
+.TP
+.B SO_SETREGID
+Emulates the
+.I BSD
+.BR setregid (2)
+system call.
+.\"
+.TP
+.B SO_GETTIME
+Emulates the
+.I BSD
+.BR gettimeofday (2)
+system call.
+.\"
+.TP
+.B SO_SETTIME
+Emulates the
+.I BSD
+.BR settimeofday (2)
+system call.
+.\"
+.TP
+.B SO_GETITIMER
+Emulates the
+.I BSD
+.BR getitimer (2)
+system call.
+.\"
+.TP
+.B SO_SETITIMER
+Emulates the
+.I BSD
+.BR setitimer (2)
+system call.
+.\"
+.TP
+.B SO_SELECT
+Emulates the
+.I BSD
+.BR select (2)
+system call.
+.\"
+.TP
+.B SO_ADJTIME
+Emulates the
+.I BSD
+.BR adjtime (2)
+system call.
+.\"
+.TP
+.B SO_RECVMSG
+Emulates the
+.I BSD
+.BR recvmsg (2)
+system call.
+.\"
+.TP
+.B SO_SENDMSG
+Emulates the
+.I BSD
+.BR sendmsg (2)
+system call.
+.\"
+.TP
+.B SO_SOCKPAIR
+Emulates the
+.I BSD
+.BR socketpair (2)
+system call.
+.PD
+.\"
+.\"
+.SH NOTICES
+.PP
+Unfortunately,
+.I STREAMS
+modules and drivers cannot handle 32/64-bit conversion of input-output
+controls properly under
+.IR LiS .
+.[
+lis
+.]
+This means that
+.B sockmod
+simply cannot support 32/64-bit under
+.IR LiS .
+.[
+lis
+.]
+.\"
+.\"
+.SH NOTICES
+.PP
+When writing or converting a
+.BR tpi (7)
+driver for use with the
+.B sockmod
+module, there are several considerations that must be made in the design and
+implementation of the
+.BR tpi (7)
+driver, as follows:
+.\"
+.SS ADDRESS FORMAT
+.PP
+.IP " 1." 4
+The
+.B sockmod
+module uses the
+.B sockaddr
+structure to
+.BR socket (7)
+calls.  Therefore, the
+.BR tpi (7)
+driver must accept a
+.B sockaddr
+structure as the transport endpoint address.
+.SS "OPTIONS"
+.PP
+.IP " 2." 4
+All
+.BR tpi (7)
+options will be converted directly into
+.BR socket (7)
+options without any
+modifications.  That is, there must be an identity relationship between
+.BR socket (7)
+option levels and
+.BR tpi (7)
+option levels.  Also, there must be an identity relationship between
+.BR socket (7)
+options and
+.BR tpi (7)
+options.  The argument format of
+.BR socket (7)
+options must be the same as the argument format of the
+.BR tpi (7)
+option.
+.IP " 3." 4
+All
+.BR socket (7)
+options using the
+.BR getsockopt (3)
+and
+.BR setsockopt (3)
+.BR socket (7)
+calls, will generate
+.BR T_OPTMGMT_REQ (7)
+primitives with the either the
+.B T_CURRENT
+or
+.B T_NEGOTIATE
+management flags set.  Socket options passed as an argument to
+.BR setsockopt (3)
+and
+.BR getsockopt (3)
+will be passed directly in the
+.IR OPT_length " and " OPT_offset
+fields of the
+.BR T_OPTMGMT_REQ (7)
+primitive.
+.IP " 4." 4
+Options passed as ancilliary data in a control message to
+.BR sendmsg (3)
+will be directly converted directly into
+.BR tpi (7)
+options and passed
+to
+.BR T_OPTDATA_REQ (7)
+or
+.BR T_UNITDATA_REQ (7)
+depending on the mode of the transport service provider.
+.IP " 5." 4
+.BR tpi (7)
+options received in a
+.BR T_OPTDATA_IND (7)
+or
+.BR T_UNITDATA_IND (7)
+primtive will be converted directly and passed as an ancillary control message to
+.BR recvmsg (7).
+.SS IOCTLS
+.PP
+.IP " 6." 4
+All non-socket IO controls received by the
+.B sockmod
+module will be passed directly to the
+.BR tpi (7)
+driver.
+.IP " 7." 4
+.BR tpi (7)
+drivers need not be installed for use with the
+.B sockmod
+module using the
+.BR SIOCPROTO
+IO control: an entry in the
+.B /etc/netconfig
+file is required.
+.SS "ERROR HANDLING"
+.PP
+.IP " 8." 4
+The
+.BR tpi (7)
+driver must be written to always return a
+.IR UNIX \(rg
+system error in the
+.I UNIX_error
+field of the
+.BR T_ERROR_ACK (7)
+primitive.  This error will be used to set the system error number,
+.IR errno (3),
+upon error return from
+.BR socket (7)
+calls.
+If the
+.I UNIX_error
+field is not set to a non-zero value in
+.BR T_ERROR_ACK (7),
+the
+.BR socket (7)
+call will return
+.RB [ EINVAL ]
+only, if
+.B sockmod
+cannot determine a better error number.
+.IP " 9." 4
+The following
+.BR tpi (7)
+error numbers returned in the
+.I TLI_error
+field of the
+.BR T_ERROR_ACK (7)
+primitive, will return the following
+.IR UNIX \(rg
+errors when the
+.I UNIX_error
+field is zero:
+.sp
+.TS
+tab(:);
+lblb
+lblb.
+TPI Error:UNIX\(rg Error
+_
+TBADADDR:EINVAL
+TBADOPT:EINVAL
+TACCES:EPERM
+TBADF:EBADF
+TNOADDR:EADDRNOTAVAIL
+TOUTSTATE:EPROTO
+TBADSEQ:EIO
+TSYSERR:\fIUNIX_error\fB
+TBADDATA:EMSGSIZE
+TBADFLAG:EINVAL
+TNOREL:EOPNOTSUPP
+TNOTSUPPORT:EOPNOTSUPP
+TBADQLEN:EIO
+TADDRBUSY:EADDRINUSE
+TPROVMISMATCH:EIO
+TRESQLEN:EIO
+TRESADDR:EIO
+TPROTO:EPROTO
+.TE
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR socksys (4),
+.BR timod (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B sockmod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.B sockmod
+is compatible with
+.I UnixWare\(rg
+and
+.IR Solaris\(rg .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR SVID ,
+.[
+svid
+.]
+.BR XID ,
+.[
+xbd5
+.]
+.BR "XNS 5.2" ,
+.[
+xns
+.]
+.BR SUSv2 ,
+.[
+susv2
+.]
+.BR SUSv3 / POSIX ,
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B sockmod
+first appeared in
+.BR "SVR 4" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

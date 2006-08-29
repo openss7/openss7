@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.19 2006/08/27 12:26:26 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.21 2006/08/28 10:46:49 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/27 12:26:26 $ by $Author: brian $
+% Last Modified $Date: 2006/08/28 10:46:49 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -331,13 +331,13 @@ Indices
 @cindex document notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
 and other sources).  Consult the permission notices contained in the documentation for more
 information.
 
-This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This document, is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 
 @node Abstract
@@ -403,6 +403,12 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.21  2006/08/28 10:46:49  brian
+- correction
+
+Revision 1.1.6.20  2006/08/28 10:32:41  brian
+- updated references
+
 Revision 1.1.6.19  2006/08/27 12:26:26  brian
 - finalizing auto release files
 
@@ -709,7 +715,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 @auindex Bidulock, Brian
 @end multitable
 
-See @ref{Author Index}, for a complete listing and cross-index of authors to
+See @refman{Author Index}, for a complete listing and cross-index of authors to
 sections of this document.
 
 @node Maintainer
@@ -751,8 +757,8 @@ The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
 @end multitable
 
 Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
 
 @node Web Resources
 @unnumberedsec Web Resources
@@ -802,12 +808,12 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @cindex notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from X/Open publications and other sources).  Consult the permission notices
 contained in the documentation for more information.
 
-This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This manual is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 @end ignore
 
@@ -821,13 +827,13 @@ the @cite{@value{PACKAGE_TITLE}} package.
 LiS is a software package that comprises an implementation of SVR4 compatible
 STREAMS for Linux.  It takes the form of a loadable module for the Linux kernel.
 LiS installs in any directory on your system, not in the kernel source tree.
-(@pxref{Installation})
+(@pxrefman{Installation})
 
 @ignore
 When it is built it is possible to link pre-compiled STREAMS drivers with it so
 that when LiS loads into the kernel it brings "application" drivers with it.
-(@pxref{Installing Pre-Compiled Drivers}) Alternatively, STREAMS drivers can be
-coded as loadable Linux drivers which depend upon LiS.  (@pxref{Demand Loading
+(@pxrefman{Installing Pre-Compiled Drivers}) Alternatively, STREAMS drivers can be
+coded as loadable Linux drivers which depend upon LiS.  (@pxrefman{Demand Loading
 LiS Modules}) In this way, individual STREAMS drivers can be loaded and unloaded
 dynamically.
 @end ignore
@@ -835,13 +841,13 @@ dynamically.
 @ignore
 LiS includes two adapter drivers to assist in interfacing STREAMS drivers to the
 Linux Kernel's TCP/IP protocols.  One driver, @dfn{ip_strm_mod}
-(@pxref{ip_strms}), acts as an IP interface driver.  It fits below IP using
+(@pxrefman{ip_strms}), acts as an IP interface driver.  It fits below IP using
 standard ifconfig procedures.  It, in turn, communicates downstream with any
 STREAMS driver using the DLPI protocol in a fashion similar to the manner in
 which IP on Unix systems interfaces to lower interface drivers.  This allows a
 DLPI STREAMS driver to act as an interface driver to Linux TCP/IP.
 
-A second driver, @dfn{ldl} (@pxref{link-drvr}), sits on top of any existing
+A second driver, @dfn{ldl} (@pxrefman{link-drvr}), sits on top of any existing
 Linux IP interface driver and presents a DLPI interface to STREAMS drivers
 above.  This allows any STREAMS driver that communicates downstream using DLPI
 to utilize the services of existing Linux drivers for Ethernet, token ring, etc.
@@ -849,7 +855,7 @@ to utilize the services of existing Linux drivers for Ethernet, token ring, etc.
 
 LiS-2.12 and beyond utilizes aggressive multi-tasking in multiple CPU SMP
 environments.  For further information concerning this implementation,
-@pxref{LiS SMP Implementation}.
+@pxrefman{LiS SMP Implementation}.
 
 @ignore
 LiS is licensed using the GNU General Public Library License.
@@ -918,19 +924,19 @@ This manual is organized (loosely) into several sections as follows:
 @end ifnotinfo
 @ifplaintext
 @multitable @columnfractions .50 .50
-@item @ref{Introduction}.
+@item @cite{Introduction}.
 @tab This introduction
-@item @ref{Objective}.
+@item @cite{Objective}.
 @tab Objective of the package
-@item @ref{Reference}.
+@item @cite{Reference}.
 @tab Contents of the package
-@item @ref{Conformance}.
+@item @cite{Conformance}.
 @tab Conformance of the package
-@item @ref{Releases}.
+@item @cite{Releases}.
 @tab Releases of the package
-@item @ref{Installation}.
+@item @cite{Installation}.
 @tab Installation of the package
-@item @ref{Troubleshooting}.
+@item @cite{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
 @end ifplaintext

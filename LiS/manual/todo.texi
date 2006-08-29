@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:54 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/08/29 11:48:48 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,27 +53,35 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:37:54 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:48:48 $ by $Author: brian $
 @c
 @c =========================================================================
 
+The @uref{http://www.openss7.org/,, OpenSS7} release of @value{PACKAGE_TITLE}
+was in maintenance mode for over a year and the latest @samp{2.18} releases
+are quite stable.  However, @value{PACKAGE} is fraught with bugs and suffers
+from a aging design approach making it unsuitable for production use.  It
+fails many of the conformance test cases in the test suite and even locks the
+kernel on a number of cases on @samp{SMP} kernels regardless of their being
+run on a @samp{UP} machine.
+
+@uref{http://www.openss7.org/,, The OpenSS7 Project} wrote a new @dfn{STREAMS}
+package for Linux called @cite{Linux Fast-STREAMS}.  @cite{Linux Fast-STREAMS}
+is now far more stable than @value{PACKAGE}, and
+@uref{http://www.openss7.org/,, The OpenSS7 Project} will no longer perform
+develoment on the @value{PACKAGE} package, unless at the bequest of a project
+sponsor.  As such, @value{PACKAGE} is deprecated.  Use the latest
+@command{streams-@value{VERSION_STREAMS}} package from the
+@uref{http://www.openss7.org/download.html, OpenSS7 download site} instead.
+
 Things to do:
-
-The OpenSS7 release of Linux STREAMS was in maintenance mode for over a year and the latest 2.18
-releases are quite stable.  However, LiS is fraught with bugs and suffers from a aging design
-approach making it unsuitable for production use.  It fails many of the conformance test cases in
-the test suite and even locks the kernel on a number of cases on SMP kernels regardless of their
-being run on a UP machine.
-
-The OpenSS7 Project wrote a new STREAMS package for Linux called Linux Fast-STREAMS.  Linux
-Fast-STREAMS is now far more stable than LiS, and The OpenSS7 Project will no longer perform
-develoment on the LiS package, unless at the bequest of a project sponsor.  As such, LiS is
-deprecated.  Use the latest streams package from the OpenSS7 download site at
-<http://www.openss7.org/download.html> instead.
 
 @itemize @minus
 @item
-Last remaining to do item is to release the LiS-2.18.3 release that might very well be the last
-release.
+Last remaining to do item is to release the @value{PACKAGE}-2.18.3 release
+that might very well be the last release.
+
+@emph{*done*}
+
 @end itemize
 

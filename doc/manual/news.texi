@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.1 2006/08/26 09:14:17 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.2 2006/08/29 11:48:30 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,91 +53,13 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:14:17 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:48:30 $ by $Author: brian $
 @c
 @c =========================================================================
 
 The sections that follow provide information on OpenSS7 releases of the @*
 @value{PACKAGE_TITLE} package.
 
-
-@c ----------------------------------------------------------------------------
-
-@ignore
-@subheading Major changes for release @value{PACKAGE}-@value{VERSION}
-
-Third release candidate.
-
-This release candidate provides support for additional SuSE distributions on ix86 as well as x86_64.
-Added distribution support includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
-
-This release candidate includes the changes made to the strsctp drivers at the 2006 SCTP Interop at
-the University of British Columbia.  This version was interoperability tested with all
-implementations present.
-
-This was an subscriber release.
-
-@subheading Major changes for release @value{PACKAGE}-0.9.2.D.rc2
-
-Second release candidate.
-
-This release candidate also contains the results of performance testing of the new second generation
-UDP driver (implemented completely in STREAMS instead of using an internal socket).
-
-This release candidate also contains support for SuSE 10.1.
-
-This was an subscriber release.
-
-@subheading Major changes for release @value{PACKAGE}-0.9.2.Drc1
-
-First release candidate.
-
-@itemize @minus
-@item Release candidate for Mark Fugate.
-@item Added --enable-devel configure option for embedded targets.
-@item Added send-pr script for automatic problem report generation.
-@end itemize
-
-This was an subscriber release.
-
-@subheading Major changes for release @value{PACKAGE}-0.9.2.C
-
-Distribution check for entire master package.  Trying to get master package into form where it can
-be released as a complete package.
-
-This was a public release.
-
-@subheading Major changes for release @value{PACKAGE}-0.9.2.B
-
-Minor changes for wider release, better master packaging and bug fixes.
-
-This was a public release.
-
-@subheading Initial release @value{PACKAGE}-0.9.2.A
-
-With this release version numbers were changed to reflect an upstream version only to be consistent
-with other OpenSS7 package releases.  All RPM release numbers will be -1$(PACKAGE_RPMEXTRA) and all
-Debian release numbers will be _0.  If you wish to apply patches and relelease the package, please
-bump up the release number and apply a suitable release suffix for your organization.  We leave
-Debian release number _1 reserved for your use, so you can still bundle the source in the .dsc file.
-
-Major changes for this release include build against Linux 2.6 kernels and popular distributions
-based on the 2.6 kernel as well as wider distribution support.
-
-This was a public release.
-
-@c ----------------------------------------------------------------------------
-
-@subheading Initial release @value{PACKAGE}-0.9.2-1
-
-Initial autoconf/RPM release of the OpenSS7 master package.
-
-This master package contains all other OpenSS7 releases.
-@end ignore
-
-@c ----------------------------------------------------------------------------
-@c ----------------------------------------------------------------------------
-@c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @ifnotplaintext
@@ -162,12 +84,43 @@ This master package contains all other OpenSS7 releases.
 
 Third release candidate.
 
-This release candidate provides support for additional SuSE distributions on ix86 as well as x86_64.
-Added distribution support includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+@itemize
+@item
+Added complete documentation and @cite{Installation and Reference Manual} for
+the @cite{@value{PACKAGE_TITLE}} (this manual).
 
-This release candidate includes the changes made to the strsctp drivers at the 2006 SCTP Interop at
-the University of British Columbia.  This version was interoperability tested with all
-implementations present.
+@item
+Added the following subpackages to the master build (and release):
+
+@multitable @columnfractions .05 .95
+@item @tab -- @file{strbcm-@value{VERSION_STRBCM}}
+@item @tab -- @file{striso-@value{VERSION_STRISO}}
+@item @tab -- @file{strsock-@value{VERSION_STRSOCK}}
+@item @tab -- @file{strtty-@value{VERSION_STRTTY}}
+@item @tab -- @file{strutil-@value{VERSION_STRUTIL}}
+@end multitable
+
+@item
+Automated release file generation making for vastly improved and timely text
+documentation present in the release directory.
+
+@item
+Dropped support for @cite{LiS}.
+
+@item
+Subpackages will now support extended ranges of minor devices on 2.6 kernels
+under @cite{Linux Fast-STREAMS} only.
+
+@item
+This release candidate provides support for additional SuSE distributions on
+ix86 as well as x86_64.  Added distribution support includes SLES 9, SLES 9
+SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+
+@item
+This release candidate includes the changes made to the strsctp drivers at the
+2006 SCTP Interop at the University of British Columbia.  This version was
+interoperability tested with all implementations present.
+@end itemize
 
 This was an subscriber release.
 
@@ -177,8 +130,9 @@ This was an subscriber release.
 
 Second release candidate.
 
-This release candidate also contains the results of performance testing of the new second generation
-UDP driver (implemented completely in STREAMS instead of using an internal socket).
+This release candidate also contains the results of performance testing of the
+new second generation UDP driver (implemented completely in STREAMS instead of
+using an internal socket).
 
 This release candidate also contains support for SuSE 10.1.
 
@@ -202,8 +156,8 @@ This was an subscriber release.
 @unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.C
 @cindex release @value{PACKAGE}-0.9.2.C
 
-Distribution check for entire master package.  Trying to get master package into form where it can
-be released as a complete package.
+Distribution check for entire master package.  Trying to get master package
+into form where it can be released as a complete package.
 
 This was a public release.
 
@@ -219,14 +173,17 @@ This was a public release.
 @unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.A
 @cindex release @value{PACKAGE}-0.9.2.A
 
-With this release version numbers were changed to reflect an upstream version only to be consistent
-with other OpenSS7 package releases.  All RPM release numbers will be -1$(PACKAGE_RPMEXTRA) and all
-Debian release numbers will be _0.  If you wish to apply patches and relelease the package, please
-bump up the release number and apply a suitable release suffix for your organization.  We leave
-Debian release number _1 reserved for your use, so you can still bundle the source in the .dsc file.
+With this release version numbers were changed to reflect an upstream version
+only to be consistent with other OpenSS7 package releases.  All RPM release
+numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian release numbers will be
+@samp{_0}.  If you wish to apply patches and release the package, please bump
+up the release number and apply a suitable release suffix for your
+organization.  We leave Debian release number _1 reserved for your use, so you
+can still bundle the source in the .dsc file.
 
-Major changes for this release include build against Linux 2.6 kernels and popular distributions
-based on the 2.6 kernel as well as wider distribution support.
+Major changes for this release include build against Linux 2.6 kernels and
+popular distributions based on the 2.6 kernel as well as wider distribution
+support.
 
 This was a public release.
 

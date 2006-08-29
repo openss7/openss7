@@ -1,0 +1,528 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: sockets.3.man,v 0.9.2.1 2006/08/29 11:40:56 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/08/29 11:40:56 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: sockets.3.man,v $
+.\" Revision 0.9.2.1  2006/08/29 11:40:56  brian
+.\" - added manual pages
+.\"
+.\" Revision 0.9.2.4  2006/04/05 09:44:44  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsock.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsock.macros
+.\"
+.\"
+.\"
+.\"
+.TH SOCKETS 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B libsocket, sockets
+\- Linux Fast-STREAMS Sockets Library
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.B #include <sys/socket.h>
+.HP 12
+.BI "int accept(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.PD 0
+.HP
+.BI "int bind(int " socket ", const struct sockaddr *" address ", socklen_t " address_len );
+.HP
+.BI "int connect(int " socket ", const struct sockaddr *" address ", socklen_t " address_len );
+.HP
+.BI "int getpeername(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "int getsockname(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "int getsockopt(int " socket ", int " level ", int " option_name ", void *" option_value ", socklen_t *" option_len );
+.HP
+.BI "int listen(int " socket ", int " backlog );
+.HP
+.BI "ssize_t recv(int " socket ", void *" buffer ", size_t " length ", int " flags );
+.HP
+.BI "ssize_t recvfrom(int " socket ", void *" buffer ", size_t " length ", int " flags ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "ssize_t recvmsg(int " socket ", struct msghdr *" message ", int " flags );
+.HP
+.BI "ssize_t send(int " socket ", const void *" buffer ", size_t " length ", int " flags );
+.HP
+.BI "ssize_t sendmsg(int " socket ", const struct msghdr *" message ", int " flags );
+.HP
+.BI "ssize_t sendto(int " socket ", const void *" message ", size_t " length ", int " flags ", const struct sockaddr *" dest_addr ", socklen_t " dest_len );
+.HP
+.BI "int setsockopt(int " socket ", int " level ", int " option_name ", const void *" option_value ", socklen_t " option_len );
+.HP
+.BI "int shutdown(int " socket ", int " how );
+.HP
+.BI "int socket(int " domain ", int " type ", int " protocol );
+.HP
+.BI "int socketpair(int " domain ", int " type ", int " protocol ", int " socket_vector[2] );
+.PD
+.ad b
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B libsocket
+is a Linux
+.IR STREAMS (4)
+socket library that uses the
+.BR sockmod (4)
+module or
+.BR socksys (4)
+driver.
+It implements the following sockets API library functions:
+.TP \w'\fBgetsockname\fR(3)\ 'u
+.BR accept (3)
+accept a new connection on a socket
+.PD 0
+.TP
+.BR bind (3)
+bind a name to a socket.
+.TP
+.BR connect (3)
+connnect a socket.
+.TP
+.BR getpeername (3)
+get the name of the peer socket.
+.TP
+.BR getsockname (3)
+get the socket name.
+.TP
+.BR getsockopt (3)
+get the socket options.
+.TP
+.BR listen (3)
+listen for socket connections and limit the queue of incoming connections.
+.TP
+.BR recv (3)
+receive a message from a connected socket.
+.TP
+.BR recvfrom (3)
+receive a message from a socket.
+.TP
+.BR recvmsg (3)
+receive a message from a socket.
+.TP
+.BR send (3)
+send a message on a socket.
+.TP
+.BR sendmsg (3)
+send a message on a socket using a message structure.
+.TP
+.BR sendto (3)
+sned a message on a socket.
+.TP
+.BR setsockopt (3)
+set the socket options.
+.TP
+.BR shutdown (3)
+shut down socket send and receive operations.
+.TP
+.BR socket (3)
+create an endpoint for communications.
+.TP
+.BR socketpair (3)
+create a pair of connected sockets.
+.PD
+.PP
+See the associated manual page in section 3 of the manual for descriptions of
+the socket API functions.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+There are three traditional approaches to providing sockets over
+.I STREAMS
+as follows:
+.\"
+.\"
+.SS SVR 3.2 Approach
+The
+.I SVR 3.2
+.[
+svr3
+.]
+approach consists of
+a user-space library that performs most of the conversion between
+.BR npi (7)
+or
+.BR tpi (7)
+Streams and the sockets API using a cooperating
+.BR sockmod (4)
+.I STREAMS
+module and the
+.I SI_
+input-output controls and other
+.I STREAMS
+facilities such as
+.BR streamio (7),
+.BR getmsg (2)
+and
+.BR putmsg (2).
+.PP
+Socket state information is maintained in user-space data structures
+associated with each active file descriptor in a manner similar to the
+.BR libxnet (3)
+XTI/TLI library.
+All socket API calls are implemented mostly in the user-space library with
+some input-output control calls to
+.BR sockmod (4).
+.PP
+This library approach uses the
+.B /etc/netconfig
+configuration file to map
+.BR socket (3)
+parameters onto
+.I STREAMS
+pseudo-devices within the library.
+.PP
+This approach is problematic for handling threaded programs and issues during
+.BR fork (2).
+.B @PACKAGE_TITLE@
+implements compatibile
+.I SI_
+input-output controls in the
+.BR sockmod (4)
+module and the
+.BR socksys (4)
+driver, and provides a usable
+.B /etc/netconfig
+file, to support older binaries statically compiled against such a library;
+but it does not implement such a library directly.
+.PP
+See
+.BR sockmod (4)
+for more information.
+.\"
+.\"
+.SS SVR 4 Approach
+The
+.I SVR 4
+.[
+svr4
+.]
+approach consists of
+a user-space library that performs few conversions between
+.BR tpi (7)
+Streams and the sockets API using a cooperating
+.BR sockmod (4)
+.I STREAMS
+module and the
+.I SIOCSOCKSYS
+input-output control with
+.I SO_
+commands.
+.PP
+Socket state information is maintained in kernel data structures
+associated with each Stream.
+All socket API calls are implemented as emulated system calls using
+.B SIOCSOCKSYS
+input-output control calls to
+.BR sockmod (4).
+.PP
+This library approach also uses the
+.B /etc/netconfig
+configuration file to map
+.BR socket (3)
+parameters onto
+.I STREAMS
+pseudo-devices within the library.
+This approach does not support
+.BR npi (7)
+Streams.
+.PP
+This approach is less problematic from the point of view that state
+information is maintained within the kernel instead of the library; however,
+use of
+.I SIOCSOCKSYS
+input-output controls for each socket API call is not very efficient on older
+kernels.
+The
+.BR sockmod (4)
+module is still used and still supports the older
+.I SI_
+input-output controls for backward compatibility with the
+.I SVR 3.2
+.[
+svr3
+.]
+approach above.
+.B @PACKAGE_TITLE@
+implements this approach for
+.I LiS
+.[
+LiS
+.]
+which is incapable of the more sophisticated approach below.
+.PP
+See
+.BR sockmod (4)
+for more information.
+.\"
+.\"
+.SS \fISolaris\fP\(rg \fI6\fP Approach
+The
+.IR Solaris "\(rg " 6
+.[
+soldoc
+.]
+approach consists of
+a user-space library that performs almost no conversions between
+.BR tpi (7)
+Streams and the sockets API using a special
+.BR sockfs (5)
+filesystem and a special
+.B so_create
+system call beneath
+.BR socket (3).
+.PP
+The
+.B @PACKAGE_TITLE@
+package emulates the
+.B so_create
+system call as an input-output control against the
+.BR socksys (4)
+driver.
+.PP
+Socket state information is maintained in kernel data structures
+associated with each Stream.
+All socket API calls (with the exception of
+.BR socket (3))
+are implemented as system calls.
+.PP
+This library approach uses the
+.B /etc/sock2path
+configuration file and the
+.BR soconfig (8)
+utility to create socket to stream mappings within the kernel.
+This approach does not support
+.BR npi (7)
+Streams.
+.PP
+Aside from the method used to create a socket, this method is
+indistinguishable from native
+.B Linux
+sockets and is the preferred approach.
+.B @PACKAGE_TITLE@
+uses this approach under
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+which is capable of supporting it.
+.PP
+See
+.BR socksys (4)
+for more information.
+.\"
+.\"
+.\".SH NOTES
+.\".PP
+.\"
+.\"
+.\".SH CAVEATS
+.\".PP
+.\"
+.\"
+.SH "RETURN VALUES"
+.PP
+Upon success, most sockets API library functions return zero (0) or a positive
+integer reflecting a returned parameter value.
+Upon failure,
+sockets API library functions return -1 and set
+.IR t_errno (3)
+to an applicable error number.
+.\"
+.\"
+.\".SH "ERROR HANDLING"
+.\".PP
+.\"
+.\"
+.SH ERRORS
+.PP
+The errors that can be returned by socket API library calls are detailed in
+.IR errno (3).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR accept (3),
+.BR bind (3),
+.BR connect (3),
+.BR getpeername (3),
+.BR getsockname (3),
+.BR getsockopt (3),
+.BR listen (3),
+.BR recv (3),
+.BR recvfrom (3),
+.BR recvmsg (3),
+.BR send (3),
+.BR sendmsg (3),
+.BR sendto (3),
+.BR setsockopt (3),
+.BR shutdown (3),
+.BR socket (3),
+.BR socketpair (3).
+.\"
+.\"
+.SH BUGS
+.PP
+The sockets API library has been tested with the
+.BR test-sock (8)
+and
+.BR test-sock_thr (8)
+conformance test suites.
+.PP
+The sockets API library has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The sockets API library functions are compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+.IR "XNS 5.2" ,
+.[
+xns
+.]
+.IR SUSv2 ,
+.[
+susv2
+.]
+.IR POSIX/SUSv3 .
+.[
+susv3
+.]
+.PP
+Compatibility is tested using the
+.BR test-sock (8)
+and
+.BR test-sock_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+.IR "The Open Group XNS Issue 5.2" ,
+.[
+xns
+.]
+.IR "Single UNIX\(rg Specification Version 2" ,
+.[
+susv2
+.]
+.IR "Single UNIX\(rg Specification Version 3" .
+.[
+susv3
+.]
+.PP
+Conformance is tested using the
+.BR test-sock (8)
+and
+.BR test-sock_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Sockets API interface first appeared in
+.BR SVR4 .
+.[
+svr4
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 Sockets Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

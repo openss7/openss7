@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2006/08/26 18:31:32 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2006/08/29 11:49:04 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 18:31:32 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:49:04 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -61,51 +61,66 @@ Things to do:
 
 @itemize @minus
 
-@item
-Get master build package working better.  Currently the master build package does not build a master
-tarball or RPM distribution, which would be nice, only individual RPMs for subpackages.
+@item Packaging.
 
-@item
-Cross-testing framework.  We have nice autotest test suites that are fine for native builds, but for
-cross-compile builds, it would also be nice to cross-test.  We can accomplish this nicely within the
-autoconf framework using DejaGNU.  DejaGNU configured under the LiS, but we need a more general
-autoconf .m4 fragement check for the existence of DejaGNU, and automake and DejaGNU expect wrappers
-for the existing test programs (and integration into the make check-DEJAGNU target).  Then we could
-cross-build the package (e.g. for NexusWare) and then execute the test scripts on the result on a
-remote board using DEJAGNU.
+Get master build package working better.  Currently the master build package
+does not build a master tarball or RPM distribution, which would be nice, only
+individual RPMs for subpackages.
 
-@item
-Distributed testing framework.  Because these are mostly communications protocols implemented using
-STREAMS, it is important to be able to do consistent distributed testing and validation of the
-protocol implementations.  We can perform much validation using Ferry-Clip approaches (linking or
-pushing STREAMS-based pipes beneath drivers or modules), however, acceptance and performance testing
-would benefit from a distributed framework.  Perhaps the most direct yet general approach to this is
-TETware from OpenGroup and is used for POSIX (and XNS 5.2, by the way) test suites from OpenGroup.
-Although netperf incorporates its own client-server subsystem, TETware provides these mechanisms
-separately.  TETware also provides mechanisms for test case syncrhonization points between
-distributed systems that makes distributed conformance test cases quite possible.  Note that TETware
-does not really require any external tools but does require network access and installation on the
-target systems (unlike DejaGNU that can execute test cases over a serial port if necessary).
+@item Cross-testing framework.
 
-@item
-I have all these /** comments that use either kerneldoc or doxygen format sprinkled throughout the
-code.  I would like to get doxygen running, or kerneldoc, or write a script of my own.  This
-documentation would be useful for developers and troubleshooters, particularly if the code was
-included with the documentation.  Doxygen does this nicely, but only in html, but does not generate
-manual pages or other things very nicely.  Well, I have to do something with that.  A start would be
-just providing the autoconf .m4 and automake .am fragments necessary to generate doxygen or
-kerneldoc documentation.
+We have nice autotest test suites that are fine for native builds, but for
+cross-compile builds, it would also be nice to cross-test.  We can accomplish
+this nicely within the autoconf framework using DejaGNU.  DejaGNU configured
+under the LiS, but we need a more general autoconf .m4 fragement check for the
+existence of DejaGNU, and automake and DejaGNU expect wrappers for the
+existing test programs (and integration into the make check-DEJAGNU target).
+Then we could cross-build the package (e.g.  for NexusWare) and then execute
+the test scripts on the result on a remote board using DEJAGNU.
 
-@item
-Automake files (Makefile.am) are too static.  The strbcm package needs the list of sources and
-objects to be rather dynamic.  It would be nice to convert all packges to the same approach.  We
-could perhaps use strconf-sh to generate Makefile.in fragments at configuration time and then
-include them in a far more general main Makefile.am file.
+@item Distributed testing framework.
 
-@item
-I really want to put all these packages back together, it is too time consuming maintaining the
-various administrative files for each of seven or so packages.  Once some more testing has been done
-on Linux Fast-STREAMS, I will drop LiS altogether and wrap the following packages together:
+Because these are mostly communications protocols implemented using STREAMS,
+it is important to be able to do consistent distributed testing and validation
+of the protocol implementations.  We can perform much validation using
+Ferry-Clip approaches (linking or pushing STREAMS-based pipes beneath drivers
+or modules), however, acceptance and performance testing would benefit from a
+distributed framework.  Perhaps the most direct yet general approach to this
+is TETware from OpenGroup and is used for POSIX (and XNS 5.2, by the way) test
+suites from OpenGroup.  Although netperf incorporates its own client-server
+subsystem, TETware provides these mechanisms separately.  TETware also
+provides mechanisms for test case syncrhonization points between distributed
+systems that makes distributed conformance test cases quite possible.  Note
+that TETware does not really require any external tools but does require
+network access and installation on the target systems (unlike DejaGNU that can
+execute test cases over a serial port if necessary).
+
+@item Documentation generation.
+
+I have all these @samp{/**} comments that use either kerneldoc or doxygen
+format sprinkled throughout the code.  I would like to get doxygen running, or
+kerneldoc, or write a script of my own.  This documentation would be useful
+for developers and troubleshooters, particularly if the code was included with
+the documentation.  Doxygen does this nicely, but only in html, but does not
+generate manual pages or other things very nicely.  Well, I have to do
+something with that.  A start would be just providing the autoconf .m4 and
+automake .am fragments necessary to generate doxygen or kerneldoc
+documentation.
+
+@item Dynamic configuration.
+
+Automake files (Makefile.am) are too static.  The strbcm package needs the
+list of sources and objects to be rather dynamic.  It would be nice to convert
+all packges to the same approach.  We could perhaps use strconf-sh to generate
+Makefile.in fragments at configuration time and then include them in a far
+more general main Makefile.am file.
+
+@item Merge sub-packages.
+
+I really want to put all these packages back together, it is too time
+consuming maintaining the various administrative files for each of seven or so
+packages.  Once some more testing has been done on Linux Fast-STREAMS, I will
+drop LiS altogether and wrap the following packages together:
 
 @multitable @columnfractions .05 .95
 @item @tab @bullet{} streams-0.7a.5
@@ -118,18 +133,26 @@ on Linux Fast-STREAMS, I will drop LiS altogether and wrap the following package
 @item @tab @bullet{} netperf-2.3.2
 @end multitable
 
-The result will be just a streams-0.9.4 release.  The only two (STREAMS) packages left will be
-strbcm and strss7.
+The result will be just a streams-0.9.4 release.  The only two (STREAMS)
+packages left will be strbcm and strss7.
 
-@item
-I want to someday write an ldterm for Linux Fast-STREAMS and provide truly STREAMS-based pseudo
-terminals.
+@item STREAMS Terminals
 
-@item
-Bug reporting.  We have these nice autotest test suites that generate a lot of information when a
-test case fails in testsuite.log.  What I would like to do is integrate that to our GNATS problem
-report system so that testsuite will generate the template for a new problem report upon test case
-failure.  Unfortunately autotest does not provide an m4 diversion point at which to hook into the
+I want to someday write an ldterm for Linux Fast-STREAMS and provide truly
+STREAMS-based pseudo terminals.
+
+@emph{*done*}
+
+Added package @command{strtty-0.9.2.1} for @dfn{STREAMS}-based terminals.
+Pick up the todo list there...
+
+@item Bug reporting.
+
+We have these nice autotest test suites that generate a lot of information
+when a test case fails in testsuite.log.  What I would like to do is integrate
+that to our GNATS problem report system so that testsuite will generate the
+template for a new problem report upon test case failure.  Unfortunately
+autotest does not provide an m4 diversion point at which to hook into the
 failure branch of the test script.  Several choices:
 
 @itemize @minus
@@ -137,20 +160,23 @@ failure branch of the test script.  Several choices:
 @item submit a change to autoconf (2.59 is not going away soon).
 @end itemize
 
-Perhaps a better alternative is to provide a make target for problem reports that will collect the
-testsuite.log and any other pertinent information and generate a problem report template as a mail
-text file that can then be editted by the user and mailed to the bugs address.  I like that.  That
-will work better.
+Perhaps a better alternative is to provide a make target for problem reports
+that will collect the testsuite.log and any other pertinent information and
+generate a problem report template as a mail text file that can then be
+editted by the user and mailed to the bugs address.  I like that.  That will
+work better.
 
-Better still, it might be a good idea to modify the logging targets to automatically generate a
-problem report when they fail.  That would be better.
+Better still, it might be a good idea to modify the logging targets to
+automatically generate a problem report when they fail.  That would be better.
 
 @emph{*done*}
 
-@item
-Provide an option for not installing documentation and development headers, etc.  Just the runtime.
-This is mostly for embedded targets.  Make it a --without-devel configure flag that defaults to
-including documentation and development environment.
+@item Embedded install.
+
+Provide an option for not installing documentation and development headers,
+etc.  Just the runtime.  This is mostly for embedded targets.  Make it a
+@option{--without-devel} configure flag that defaults to including
+documentation and development environment.
 
 @emph{*done*}
 @end itemize

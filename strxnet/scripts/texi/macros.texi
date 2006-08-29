@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: macros.texi,v 0.9.2.3 2006/08/27 12:20:32 brian Exp $
+@c @(#) $Id: macros.texi,v 0.9.2.4 2006/08/28 08:51:39 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 12:20:32 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/28 08:51:39 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -284,4 +284,32 @@
 @file{\name\}
 @end macro
 
+@c Simplify references that go into plaintext
 
+@ifplaintext
+@macro refman {arg1}
+@cite{\arg1\}, in the manual
+@end macro
+
+@macro xrefman {arg1}
+see @cite{\arg1\}, in the manual
+@end macro
+
+@macro pxrefman {arg1}
+see @cite{\arg1\}, in the manual
+@end macro
+@end ifplaintext
+
+@ifnotplaintext
+@macro refman {arg1}
+@ref{\arg1\}
+@end macro
+
+@macro xrefman {arg1}
+@xref{\arg1\}
+@end macro
+
+@macro pxrefman {arg1}
+@pxref{\arg1\}
+@end macro
+@end ifnotplaintext

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strsctp.texi,v 0.9.2.19 2006/08/27 12:27:09 brian Exp $
+% @(#) $Id: strsctp.texi,v 0.9.2.21 2006/08/28 10:47:09 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/27 12:27:09 $ by $Author: brian $
+% Last Modified $Date: 2006/08/28 10:47:09 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -338,13 +338,13 @@ subsequent releases are intended to be loaded on top of an OpenSS7 release of Li
 If you wish to use these packages over a GCOM release of LiS, you will now need to also download and
 install the @file{strcompat}, @file{strxns} and @file{strxnet} package from Tar Ball.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
 and other sources).  Consult the permission notices contained in the documentation for more
 information.
 
-This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This document, is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 
 @node Abstract
@@ -410,6 +410,12 @@ package.
 @smallexample
 
 $Log: strsctp.texi,v $
+Revision 0.9.2.21  2006/08/28 10:47:09  brian
+- correction
+
+Revision 0.9.2.20  2006/08/28 10:32:57  brian
+- updated references
+
 Revision 0.9.2.19  2006/08/27 12:27:09  brian
 - finalizing auto release files
 
@@ -542,7 +548,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 @auindex Bidulock, Brian
 @end multitable
 
-See @ref{Author Index}, for a complete listing and cross-index of authors to
+See @refman{Author Index}, for a complete listing and cross-index of authors to
 sections of this document.
 
 @node Maintainer
@@ -556,8 +562,8 @@ The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
 @end multitable
 
 Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
 
 @node Web Resources
 @unnumberedsec Web Resources
@@ -603,12 +609,12 @@ subsequent releases are intended to be loaded on top of an OpenSS7 release of Li
 If you wish to use these packages over a GCOM release of LiS, you will now need to also download and
 install the @file{strcompat}, @file{strxns} and @file{strxnet} package from Tar Ball.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from X/Open publications and other sources).  Consult the permission notices
 contained in the documentation for more information.
 
-This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This manual is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 @end ignore
 
@@ -665,19 +671,19 @@ This manual is organized (loosely) into several sections as follows:
 @end ifnotinfo
 @ifplaintext
 @multitable @columnfractions .50 .50
-@item @ref{Introduction}.
+@item @cite{Introduction}.
 @tab This introduction
-@item @ref{Objective}.
+@item @cite{Objective}.
 @tab Objective of the package
-@item @ref{Reference}.
+@item @cite{Reference}.
 @tab Contents of the package
-@item @ref{Conformance}.
+@item @cite{Conformance}.
 @tab Conformance of the package
-@item @ref{Releases}.
+@item @cite{Releases}.
 @tab Releases of the package
-@item @ref{Installation}.
+@item @cite{Installation}.
 @tab Installation of the package
-@item @ref{Troubleshooting}.
+@item @cite{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
 @end ifplaintext
@@ -965,8 +971,8 @@ add @samp{-I/usr/include/strsctp} to your compile line.
 Although @cite{OpenSS7 Project} software is of high quality, and untested behaviour is often correct
 behaviour, the principle of the @cite{OpenSS7 Project} is to test all functional requirements
 against the behaviour of the package in a repeatable validation test suite that can be used to
-perform regression, target architecture validation and trouble shooting, (@pxref{Maturity}, and
-@pxref{Test Suites}).
+perform regression, target architecture validation and trouble shooting, (@pxrefman{Maturity}, and
+@pxrefman{Test Suites}).
 
 @menu
 * NPI Interface Conformance::	    Conformance to the NPI.

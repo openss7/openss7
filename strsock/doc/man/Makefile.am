@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:03:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/08/29 11:44:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/23 10:03:58 $ by $Author: brian $
+# Last Modified $Date: 2006/08/29 11:44:04 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/08/29 11:44:04  brian
+# - added manual pages, working up docs
+#
 # Revision 0.9.2.1  2006/08/23 10:03:58  brian
 # - started STREAMS Sockets package
 #
@@ -72,9 +75,55 @@ if PKG_BUILD_INDEP
 ## distribution.  Manual pages ending in '.man' are uncooked.  Manual pages
 ## ending in '.[1-9]' are cooked.
 ##
-man_MANS = 
+man_MANS = \
+	man3/accept.3 \
+	man3/bind.3 \
+	man3/connect.3 \
+	man3/getpeername.3 \
+	man3/getsockname.3 \
+	man3/getsockopt.3 \
+	man3/libsocket.3 \
+	man3/listen.3 \
+	man3/recv.3 \
+	man3/recvfrom.3 \
+	man3/recvmsg.3 \
+	man3/send.3 \
+	man3/sendmsg.3 \
+	man3/sendto.3 \
+	man3/setsockopt.3 \
+	man3/shutdown.3 \
+	man3/socket.3 \
+	man3/socketpair.3 \
+	man3/sockets.3 \
+	man4/sockmod.4 \
+	man4/socksys.4 \
+	man5/sock2path.5 \
+	man8/soconfig.8
 
-dist_noinst_MANS =
+dist_noinst_MANS = \
+	man3/accept.3.man \
+	man3/bind.3.man \
+	man3/connect.3.man \
+	man3/getpeername.3.man \
+	man3/getsockname.3.man \
+	man3/getsockopt.3.man \
+	man3/libsocket.3.man \
+	man3/listen.3.man \
+	man3/recv.3.man \
+	man3/recvfrom.3.man \
+	man3/recvmsg.3.man \
+	man3/send.3.man \
+	man3/sendmsg.3.man \
+	man3/sendto.3.man \
+	man3/setsockopt.3.man \
+	man3/shutdown.3.man \
+	man3/socket.3.man \
+	man3/socketpair.3.man \
+	man3/sockets.3.man \
+	man4/sockmod.4.man \
+	man4/socksys.4.man \
+	man5/sock2path.5.man \
+	man8/soconfig.8.man
 
 ## PKG_BUILD_INDEP
 endif

@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c -*- texinfo -*- vim: ft=texinfo tw=78 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:56 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/08/29 11:49:00 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:37:56 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:49:00 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -61,19 +61,35 @@ Things to do:
 
 @itemize @minus
 @item
-Merge in upstream changes into the OpenSS7 Modified version.
+Merge in upstream changes from the latest @cite{Hewlett-Packard} release of
+the @cite{Netperf} package into the @cite{OpenSS7 Modified} version.  I would
+really like to do this but don't have the time for it right now.  If someone
+is willing to dive in and give this a try, send me the patches.
 
 @item
-Get the OpenSS7 Modified version working also with Linux Native Sockets SCTP in addition to the
-current STREAMS SCTP XTI support.  This would not only allow Netperf to be used successfully with
-OpenSS7 Linux Native SCTP, but it would also comparison tests between STREAMS an Sockets versions.
-This is something that I would really like to do.  Since Linux Fast-STREAMS STREAMS-based pipes beat
-FC4 Native pipes on 2.6.14 in a performance test, it would be interesting to see whether the STREAMS
-version can outpace the Sockets version.  This would be an answer to the time old question as to
-whether Sockets or STREAMS is faster.
+@cite{Netperf} is capable of performing performance testing on @cite{lksctp}
+as well.  I would like to modify the @cite{OpenSS7} version of @cite{Netperf}
+to support both so that performance comparison testing can be done between
+@cite{lkstcp} (which sucks of course) and @cite{OpenSS7 Linux Natve Sockets}
+version.
 
 @item
-Redo performance tests for strxnet/strinet package using recent release of OpenSS7 Modified Netperf.
+Get the @cite{@value{PACKAGE_TITLE}} version working also with @cite{OpenSS7
+Linux Native Sockets SCTP} in addition to the current @cite{STREAMS SCTP XTI}
+support.  This would not only allow @cite{Netperf} to be used successfully
+with @cite{OpenSS7 Linux Native SCTP}, but it would also comparison tests
+between @dfn{STREAMS} and @dfn{Sockets} versions.  This is something that I
+would really like to do.  As @cite{Linux Fast-STREAMS} @dfn{STREAMS}-based
+pipes beat FC4 Native pipes on 2.6.14 in a performance test, it would be
+interesting to see whether the @dfn{STREAMS} version can outpace the
+@dfn{Sockets} version.  This would be an answer to the time old question as to
+whether @dfn{Sockets} or @dfn{STREAMS} is faster.
+@end itemize
+
+@itemize @bullet
+@item
+Redo performance tests for @command{strxnet}/@command{strinet} package using
+recent release of @cite{@value{PACKAGE_TITLE}}.
 
 @emph{*done*}
 

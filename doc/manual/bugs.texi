@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.1 2006/08/27 12:02:50 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.2 2006/08/29 11:52:01 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 12:02:50 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:52:01 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -61,4 +61,7 @@
 @item (no items)
 @end table
 
+For a history of defects for each of the individual subpackages, see the
+@cite{Defect History} section of the @cite{Installation and Reference Manual}
+for the appropriate subpackage.
 

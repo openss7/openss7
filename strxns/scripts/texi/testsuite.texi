@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: testsuite.texi,v 0.9.2.8 2006/08/27 12:20:32 brian Exp $
+@c @(#) $Id: testsuite.texi,v 0.9.2.11 2006/08/28 10:40:45 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 12:20:32 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/28 10:40:45 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,13 +89,13 @@ that are shipped in the @file{scripts} subdirectory as well as specialized @comm
 that perform the checks.
 
 When building and installing the package from @dfn{RPM} or @dfn{DEB} source packages
-(@pxref{Building from the Source RPM}; and @ref{Building from the Debian DSC}), a fundamental set of
+(@pxrefman{Building from the Source RPM}; and @refman{Building from the Debian DSC}), a fundamental set of
 post-compile, pre-installation checks are performed prior to building binary packages.  This is
-performed automagically and does not require any special actions on the part of the user creating
+performed automatically and does not require any special actions on the part of the user creating
 binary packages from source packages.
 
-When building and installing the package from @dfn{tarball} (@pxref{Building from the Tar Ball}; and
-@ref{Installing the Tar Ball}), however, pre-installation checks are only performed if specifically
+When building and installing the package from @dfn{tarball} (@pxrefman{Building from the Tar Ball}; and
+@refman{Installing the Tar Ball}), however, pre-installation checks are only performed if specifically
 invoked by the builder of the package.  Pre-installation checks are invoked after building the
 package and before installing the package.  Pre-installation checks are performed by invoking the
 @samp{check} or @samp{check.log} target to @command{make} when building the package, as shown
@@ -153,7 +153,7 @@ For example, the steps shown in @ref{testsuite:ex2} will perform @dfn{Maintenanc
 
 @cartouche
 @float Example,testsuite:ex2
-@caption{@emph{Invoking Maintenace Checks}}
+@caption{@emph{Invoking Maintenance Checks}}
 @example
 % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
@@ -175,7 +175,7 @@ perform both @dfn{System} and @dfn{Maintenance} checks.  These are as follows:
 @table @command
 @item check_commands
 
-This check performs both @dfn{System} and @dfn{Maintainance} checks.
+This check performs both @dfn{System} and @dfn{Maintenance} checks.
 
 When performing @dfn{System} tests, the following tests are performed:
 
@@ -183,7 +183,7 @@ Unless cross-compiling, or unless a program is included in @code{AM_INSTALLCHECK
 every program in @code{bin_PROGRAMS}, @code{sbin_PROGRAMS}, and @code{libexec_PROGRAMS} is tested to
 ensure that the @option{--help}, @option{--version}, and @option{--copying} options are accepted.
 When cross-compiling is is not possible to execute cross-compiled binaries, and these checks are
-skpped in that case.
+skipped in that case.
 
 Script executables, on the other hand, can be executed on the build host, so, unless listed in
 @code{AM_INSTALLCHECK_STD_OPTIONS_EXEMPT}, every program in @code{dist_bit_SCRIPTS},
@@ -193,7 +193,7 @@ Script executables, on the other hand, can be executed on the build host, so, un
 When performing @dfn{Maintenance} tests, @command{check_commands} also checks to ensure that a
 manual page exists in section 1 for every executable binary or script that will be installed from
 @code{bin_PROGRAMS} and @code{dist_bin_SCRIPTS}.  It also checks to ensure that a manual page exists
-in section 8 for every executable binary or script that wil be installed from @code{sbin_PROGRAMS},
+in section 8 for every executable binary or script that will be installed from @code{sbin_PROGRAMS},
 @code{dist_sbin_SCRIPTS}, @code{libexec_PROGRAMS}, and @code{pkglibexec_SCRIPTS}.
 
 @item check_decls
@@ -218,8 +218,8 @@ installed header files.  It then checks to ensure that a manual page exists in s
 9, as appropriate, for the type of declaration.  It also checks to see if a manual page source file
 exists in the source directory for a declaration that has not been included in the distribution.
 Function or prototype declarations that do not have a manual page in sections 2, 3, or 9 will cause
-the check to fail.  Other declarations (variable, externvar, macro, enumerate, enum, struct, union,
-typedef, member, etc.) will only warn if a manual page does not exist, but will not fail the check.
+the check to fail.  Other declarations (@samp{variable}, @samp{externvar}, @samp{macro}, @samp{enumerate}, @samp{enum}, @samp{struct}, @samp{union},
+@samp{typedef}, @samp{member}, etc.) will only warn if a manual page does not exist, but will not fail the check.
 
 @item check_libs
 
@@ -227,7 +227,7 @@ This check only performs @dfn{Maintenance} checks.
 
 When performing @dfn{Maintenance} tests, it checks that each exported symbol in each to be installed
 shared object library has a manual page in section 3.  It also checks that each exported symbol has
-a function, prototype or externvar declaration in the to be installed header files.  A missing
+a @samp{function}, @samp{prototype} or @samp{externvar} declaration in the to be installed header files.  A missing
 declaration or manual page will cause this check to fail.
 
 @item check_mans
@@ -255,15 +255,15 @@ This check performs both @dfn{System} and @dfn{Maintenance} checks.
 When performing @dfn{System} tests, it checks each to be installed kernel module to ensure that all
 undefined symbols can be resolved to either the kernel or another module.  It also checks whether an
 exported or externally declared symbol conflicts with an exported or externally declared symbol
-present in the kernel or another module.@footnote{This particular check has caught some namespace
-polution that has occurred in the 2.6.11 kernel.}
+present in the kernel or another module.@footnote{This particular check has caught some name space
+pollution that has occurred in the 2.6.11 kernel.}
 
 When performing @dfn{Maintenance} tests, this check script tests that each to be installed kernel
 module has a manual page in section 9 and that each exported symbol that does not begin with an
 underscore, and that belongs to an exported function or exported variable, has a manual page in
 section 9.  It also checks to ensure that each exported symbol that does not begin with an
-underscore, and that blongs to an exported function or exported variable, has a function, prototype
-or externvar declaration in the to be installed header files.
+underscore, and that belongs to an exported function or exported variable, has a @samp{function}, @samp{prototype}
+or @samp{externvar} declaration in the to be installed header files.
 
 @item check_streams
 
@@ -295,7 +295,7 @@ check-clean} should be run before each successive run of @samp{make check}.
 * Running Test Suites::		Running Test Suites in the package
 @end menu
 
-Most OpenSS7 packages ship with a combatibility and conformance test suite built using the
+Most OpenSS7 packages ship with a compatibility and conformance test suite built using the
 @samp{autotest} capabilities of @samp{autoconf 2.59}.  These test suites act as a wrapper for the
 compatibility and conformance test programs that are shipped with the package.
 
@@ -327,7 +327,7 @@ installation directory by invoking the @command{testsuite} shell script directly
 
 @end enumerate
 
-Typical steps for invoking the testsuites directly from @command{make} are shown in
+Typical steps for invoking the test suites directly from @command{make} are shown in
 @ref{testsuite:ex3}.
 
 @cartouche
@@ -352,9 +352,9 @@ should always be performed from the build directory, either with @samp{make inst
 invoking @command{testsuite} directly from the @file{tests} subdirectory of the build directory.
 This ensures that all of the information known to @command{configure} and pertinent to the
 configuration of the system for which a test case failed, will be collected in the resulting
-@file{testsuite.log} file depositied upon test suite failure in the @file{tests} directory.  This
+@file{testsuite.log} file deposited upon test suite failure in the @file{tests} directory.  This
 @file{testsuite.log} file can then be attached as part of the problem report and provides rich
-details to maintainers of the package.  See also @xref{Problem Reports}, below.
+details to maintainers of the package.  See also @xrefman{Problem Reports}, below.
 
 Typical steps for invoking and installed @command{testsuite} standalone are shown in
 @ref{testsuite:ex4}.
@@ -370,7 +370,7 @@ Typical steps for invoking and installed @command{testsuite} standalone are show
 
 When invoked directly, @command{testsuite} will generate a @file{testsuite.log} file in the current
 directory, and a @file{testsuite.dir} directory of failed tests cases and debugging scripts.  For
-generating a problem report for failed test cases, see @ref{Stand Alone Problem Reports}.
+generating a problem report for failed test cases, see @refman{Stand Alone Problem Reports}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -457,7 +457,7 @@ by the kernel (@code{cmn_err(9)}) or by the @command{strerr(8)} or @command{stra
 
 Therefore, the @cite{@value{PACKAGE_TITLE}} package provides the @samp{send-pr} shell script that
 can be used for problem reporting.  The @samp{send-pr} shell script can invoked directly and is a
-workalike for the @cite{GNU} @samp{send-pr} tool.
+work-alike for the @cite{GNU} @samp{send-pr} tool.
 
 The @samp{send-pr} tool takes the same flags and can be used in the same fashion, however, whereas
 @samp{send-pr} is an interactive tool@footnote{@samp{send-pr} launches the user's @var{EDITOR} to
@@ -466,7 +466,7 @@ processing.  Whereas @samp{send-pr} takes its field information from local datab
 the @samp{query-pr} C-language program to query a remote database, the @samp{send-pr} tool has the
 field database internal to the tool.
 
-Problem reports can be generate using @command{make}, @xref{Problem Report Targets}.  An example of
+Problem reports can be generate using @command{make}, @xrefman{Problem Report Targets}.  An example of
 how simple it is to generate a problem report is illustrated in @ref{autopr:ex0}.
 @mkindex pr
 
@@ -480,7 +480,7 @@ SEND-PR: send-pr:  send-pr was invoked to generate an external report.  An
 SEND-PR: automated problem report has been created in the file named
 SEND-PR: 'problem.pr' in the current directory.  This problem report can
 SEND-PR: be sent to bugs@@openss7.org by calling this script as
-SEND-PR: '/home/brian/os7/scripts/send-pr --file problem.pr'.
+SEND-PR: '/home/brian/os7/scripts/send-pr --file="problem.pr"'.
 SEND-PR:
 SEND-PR: It is possible to edit some of the fields before sending on the
 SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
@@ -511,9 +511,9 @@ report.
 The @cite{@value{PACKAGE_TITLE}} package also provides a feature for automatic problem report
 generation that meets the problem report submission guidelines detailed in the preceding sections.
 
-Whenever a logging makefile target (@pxref{Logging Targets}) is invoked, if the primary target
+Whenever a logging makefile target (@pxrefman{Logging Targets}) is invoked, if the primary target
 fails, the @command{send-pr} shell script is invoked to automatically generate a problem report
-file suitable for the corresponding target (as described above under @pxref{Problem Report
+file suitable for the corresponding target (as described above under @pxrefman{Problem Report
 Guidelines}).  An example is shown in @ref{autopr:ex2}.
 
 @cartouche
@@ -563,7 +563,7 @@ SEND-PR:
 
 The @cite{@value{PACKAGE_TITLE}} package installs the @command{send-pr} script and its configuration
 file @file{send-pr.config} in @file{$@{libexecdir@}/@value{PACKAGE}} along with the validation
-@command{testsuite}, see @xref{Test Suites}.  As with the @command{testsuite}, this allows the
+@command{testsuite}, see @xrefman{Test Suites}.  As with the @command{testsuite}, this allows the
 @command{send-pr} script to be used for problem report generation on an installed system that does
 not have a build directory.
 
@@ -620,4 +620,4 @@ Unverified behaviour may contain unknown bugs.
 
 Please remember that there is @strong{NO WARRANTY}.
 
-See also @ref{Bugs}, in the manual, or file @file{BUGS} in the release directory.
+See also @refman{Bugs}, or file @file{BUGS} in the release directory.

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: quick.texi,v 0.9.2.6 2006/08/28 02:51:20 brian Exp $
+@c @(#) $Id: quick.texi,v 0.9.2.7 2006/08/28 10:07:53 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/28 02:51:20 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/28 10:07:53 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,7 +64,7 @@
 @unnumberedsubsec Release
 
 This is the @command{@value{PACKAGE}-@value{VERSION}} package, released @value{PACKAGE_DATE}.  This
-@samp{@value{VERSION}} release, and the lastest version, can be obtained from the
+@samp{@value{VERSION}} release, and the latest version, can be obtained from the
 @uref{http://www.openss7.org/download.html, download area} of @uref{http://www.openss7.org/,, The
 OpenSS7 Project} website using a command such as:
 
@@ -72,22 +72,47 @@ OpenSS7 Project} website using a command such as:
 $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2
 @end example
 
-Please see the @file{NEWS} file for release notes and history of user visible changes for the
-current version, and the @file{ChangeLog} file for a more detailed history of implementation
-changes.  The @file{TODO} file lists features not yet implemented and other outstanding items.
+The release is available as an @manpage{autoconf(1)} tarball, @file{src.rpm} or @file{dsc}, or as a
+set of binary @file{rpm}s or @file{deb}s.  See the @uref{http://www.openss7.org/download.html,
+download page} for the @manpage{autoconf(1)} tarballs, @file{src.rpm}s or @file{dsc}s.  See the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @command{@value{PACKAGE}} package page} for
+tarballs, source and binary packages.
 
-Please see the @file{INSTALL}, @file{INSTALL-@value{PACKAGE}} and @file{README-make} files (or the
-@cite{Installation and Reference Manual}) for installation instructions.  When working from CVS or
-git, please see the @file{README-cvs} file.  An abbreviated installation procedure that works for
-most applications appears below.
+Please see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS,, @file{NEWS}}
+file for release notes and history of user visible changes for the current version, and the
+@uref{http://www.opesns7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog,, @file{ChangeLog}}
+file for a more detailed history of implementation changes.  The
+@uref{http://www.opesns7.org/codefiles/@value{PACKAGE}-@value{VERSION}/TODO,, @file{TODO}}
+file lists features not yet implemented and other outstanding items.
+
+Please see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL,, @file{INSTALL}},
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL-@value{PACKAGE},, @file{INSTALL-@value{PACKAGE}}}
+and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-make,, @file{README-make}},
+files (or
+@pxrefman{Installation})
+for installation instructions.
+
+When working from @manpage{cvs(1)} or @manpage{git(1)}, please see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-cvs,, @file{README-cvs}},
+file (or
+@pxrefman{Downloading from CVS}).
+An abbreviated installation procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 2 of the @cite{GNU Public License}
-which can be found in the file @file{COPYING}.  Package specific licensing terms (if any) can be
-found in the file @file{LICENSING}.  Please respect these licensing arrangements.  If you are
-interested in different licensing terms, please contact the copyright holder,
-@uref{http://www.openss7.com/, OpenSS7 Corporation}, or @url{mailto:bidulock@@openss7.org}.
+which can be found in the file
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/COPYING,, @file{COPYING}}.
+Package specific licensing terms (if any) can be found in the file
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/LICENSING,, @file{LICENSING}}.
+Please respect these licensing arrangements.  If you are interested in different licensing terms,
+please contact the copyright holder, or
+@uref{mailto:sales@@openss7.com?subject=Licensing,, OpenSS7 Corporation <@t{sales@@openss7.com}>}.
 
-See @file{README-alpha} (if it exists) for alpha release information.
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-alpha,, @file{README-alpha}}
+(if it exists) for alpha release information.
 
 @unnumberedsubsec Prerequisites
 
@@ -102,11 +127,11 @@ development package installed.  For the following distributions, use the followi
 
 @example
 Ubuntu:  $> apt-get install linux-headers
-Debain:  $> apt-get install kernel-headers
+Debian:  $> apt-get install kernel-headers
 Fedora:  $> yum install kernel-devel
 @end example
 
-You also need the same version of gcc compiple with which the kernel was built.  If it is not the
+You also need the same version of @manpage{gcc(1)} compiler with which the kernel was built.  If it is not the
 default, add @samp{CC=kgcc} on the line after @samp{./configure}, for example:
 
 @example
@@ -137,8 +162,11 @@ $> rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
 
 If you have problems, try building with the logging targets instead.  If the make of a logging
 target fails, an automatic problem report will be generated that can be mailed to
-@email{bugs@@openss7.org, The OpenSS7 Project}.@footnote{Please see @xref{Problem Reports}, in the
-manual, or the file @file{PROBLEMS} in the release directory for more information on filing a proper
+@email{bugs@@openss7.org, The OpenSS7 Project}.@footnote{Please see
+@refman{Problem Reports},
+or the file
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/PROBLEMS,, @file{PROBLEMS}}
+in the release directory for more information on filing a proper
 @dfn{Problem Report}.} Installation steps using the logging targets proceed as follows:
 
 @example
@@ -158,12 +186,19 @@ $> rm -rf @value{PACKAGE}-@value{VERSION}
 $> rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end example
 
-See @file{README-make} for additional specialized make targets.
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-make,, @file{README-make}}
+for additional specialized make targets.
 
-For custom applications, see the @file{INSTALL} and @file{INSTALL-@value{PACKAGE}} files or the
-@cite{Installation and Reference Manual} as listed below.  If you encounter troubles, see the
-trouble shooting section of the @cite{Installation and Reference Manual} before issuing a bug
-report.
+For custom applications, see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL,, @file{INSTALL}}
+and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL-@value{PACKAGE},, @file{INSTALL-@value{PACKAGE}}}
+files or the see
+@refman{Installation},
+as listed below.  If you encounter troubles, see
+@refman{Troubleshooting},
+before issuing a bug report.
 
 @unnumberedsubsec Brief Installation Instructions
 
@@ -194,13 +229,16 @@ $> ../@value{PACKAGE}-@value{VERSION}/configure
 
 In general, the package configures and builds without adding any special options to the
 @file{configure} script.  For general options to the @file{configure} script, see the GNU
-@file{INSTALL} file in the distribution:
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL,, @file{INSTALL}}
+file in the distribution:
 
 @example
 $> less ../@value{PACKAGE}-@value{VERSION}/INSTALL
 @end example
 
-For specific options to the @file{configure} script, see the @file{INSTALL-@value{PACKAGE}} file in
+For specific options to the @file{configure} script, see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/INSTALL-@value{PACKAGE},, @file{INSTALL-@value{PACKAGE}}}
+file in
 the distribution, or simply execute the configure script with the @option{--help} option like so:
 
 @example
@@ -214,8 +252,9 @@ command:
 $> make
 @end example
 
-Some specialized makefile targets exists, see the @file{README-make} file in the distribution or
-simply invoke the @samp{help} target like so:
+Some specialized makefile targets exists, see the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-make,, @file{README-make}}
+file in the distribution or simply invoke the @samp{help} target like so:
 
 @example
 $> make help | less
@@ -228,14 +267,14 @@ make target like so:
 $> make check
 @end example
 
-After succesffully checking the package, the package can be installed by invoking the @samp{install}
+After successfully checking the package, the package can be installed by invoking the @samp{install}
 make target (as root) like so:
 
 @example
 $> sudo make install
 @end example
 
-The testsuites that ship with the package can be invoked after the package has been installed by
+The test suites that ship with the package can be invoked after the package has been installed by
 invoking the @samp{installcheck} target.  This target can either be invoked as root, or as a normal
 user, like so:
 
@@ -244,7 +283,7 @@ $> make installcheck
 @end example
 
 (Note: you must add the @option{--enable-autotest} flag to @file{configure}, above for the
-testsuites to be invoked with @samp{make installcheck}.)
+test suites to be invoked with @samp{make installcheck}.)
 
 The package can be cleanly removed by invoking the @samp{uninstall} target (as root):
 
@@ -263,8 +302,9 @@ $> rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
 
 @unnumberedsubsec Detailed Installation Instructions
 
-More detailed installation instructions can be found in the @cite{Installation and Reference
-Manual}, contained in the distribution in @samp{text}, @samp{info}, @samp{html} and @samp{pdf}
+More detailed installation instructions can be found in the
+@refman{Installation},
+contained in the distribution in @samp{text}, @samp{info}, @samp{html} and @samp{pdf}
 formats:
 
 @example
@@ -275,7 +315,9 @@ $> info doc/manual/@value{PACKAGE}.info
 $> xpdf doc/manual/@value{PACKAGE}.pdf
 @end example
 
-The @samp{text} version of the manual is always available in the @file{MANUAL} file in the release.
+The @samp{text} version of the manual is always available in the
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/MANUAL,, @file{MANUAL}}
+file in the release.
 
 The current manual is also always available online from @cite{The OpenSS7 Project} website at:
 

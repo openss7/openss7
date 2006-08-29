@@ -1,0 +1,254 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: bind.3.man,v 0.9.2.1 2006/08/29 11:40:56 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/08/29 11:40:56 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: bind.3.man,v $
+.\" Revision 0.9.2.1  2006/08/29 11:40:56  brian
+.\" - added manual pages
+.\"
+.\" Revision 0.9.2.4  2006/04/05 09:44:44  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsock.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsock.macros
+.\"
+.\"
+.TH BIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B bind
+\- bind a name to a socket
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.HP
+.BI "int bind(int " socket ", const struct sockaddr *" address ", socklen_t " address_len );
+.SH DESCRIPTION
+.PP
+The
+.BR bind ()
+function assigns an address to an unnamed socket.  Sockets
+created with the
+.BR socket (3)
+function are initially unnamed; they are
+identified only by their address family.
+.PP
+The function takes the following arguments:
+.TP
+.I socket
+Specifies the file descriptor of the socket to be bound.
+.TP
+.I address
+Points to a sockaddr structure containing the address to be bound to the
+socket.  The length and format of the address depend on the address family
+of the socket.
+.TP
+.I address_len
+Specifies the length of the sockaddr structure pointed to by the address
+argument.
+.PP
+The socket in use may require the process to have appropriate privileges
+to use the
+.BR bind ()
+function.
+.SH NOTES
+.PP
+An application program can retrieve the assigned socket name with the
+.BR getsockname (3)
+function.
+.SH CAVEATS
+.PP
+This system call is implemented as a
+.B SIOCSOCKSYS
+IOCTL.  See
+.BR socksys (4)
+for more information.
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR bind ()
+returns 0.  Otherwise, -1 is returned
+and
+.IR errno (3)
+is set to indicate the error.
+.SH ERRORS
+.PP
+The
+.BR bind ()
+function will fail if:
+.TP
+.RB [ EADDRINUSE ]
+The specified address is already in use.
+.TP
+.RB [ EADDRNOTAVAIL ]
+The specified address is not available from the local machine.
+.TP
+.RB [ EAFNOSUPPORT ]
+The specified address is not a valid address for the address family of the
+specified socket.
+.TP
+.RB [ EBADF ]
+The socket argument is not a valid file descriptor.
+.TP
+.RB [ EFAULT ]
+The address argument can not be accessed.
+.TP
+.RB [ EINVAL ]
+The socket is already bound to an address, and the protocol does not
+support binding to a new address; or the socket has been shut down.
+.TP
+.RB [ ENOTSOCK ]
+The socket argument does not refer to a socket.
+.TP
+.RB [ EOPNOTSUPP ]
+The socket type of the specified socket does not support binding to an
+address.
+.PP
+If the address family of the socket is
+.BR AF_UNIX ,
+then
+.BR bind ()
+will fail if:
+.TP
+.RB [ EACCES ]
+A component of the path prefix denies search permission, or the requested name
+requires writing in a directory with a mode that denies write permission.
+.TP
+.RB [ EDESTADDRREQ "] or [" EISDIR ]
+The address argument is a null pointer.
+.TP
+.RB [ EIO ]
+An I/O error occurred.
+.TP
+.RB [ ELOOP ]
+Too many symbolic links were encountered in translating the pathname in
+address.
+.TP
+.RB [ ENAMETOOLONG ]
+A component of a pathname exceeded
+.RI { NAME_MAX }
+characters, or an entire
+pathname exceeded
+.RI { PATH_MAX }
+characters.
+.TP
+.RB [ ENOENT ]
+A component of the pathname does not name an existing file or the pathname
+is an empty string.
+.TP
+.RB [ ENOTDIR ]
+A component of the path prefix of the pathname in address is not a
+directory.
+.TP
+.RB [ EROFS ]
+The name would reside on a read-only filesystem.
+.PP
+The
+.BR bind ()
+function may fail if:
+.TP
+.RB [ EACCES ]
+The specified address is protected and the current user does not have
+permission to bind to it.
+.TP
+.RB [ EINVAL ]
+The address_len argument is not a valid length for the address family.
+.TP
+.RB [ EISCONN ]
+The socket is already connected.
+.TP
+.RB [ ENAMETOOLONG ]
+Pathname resolution of a symbolic link produced an intermediate result whose
+length exceeds
+.IR { PATH_MAX }.
+.TP
+.RB [ ENOBUFS ]
+Insufficient resources were available to complete the call.
+.TP
+.RB [ ENOSR ]
+There were insufficient STREAMS resources for the operation to complete.
+.SH "SEE ALSO"
+.PP
+.BR connect (3),
+.BR getsockname (3),
+.BR listen (3),
+.BR socket (3),
+.BR <sys/socket.h> (5).
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

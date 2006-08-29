@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: striso.texi,v 0.9.2.6 2006/08/27 12:27:06 brian Exp $
+% @(#) $Id: striso.texi,v 0.9.2.8 2006/08/28 10:47:08 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/27 12:27:06 $ by $Author: brian $
+% Last Modified $Date: 2006/08/28 10:47:08 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -338,13 +338,13 @@ Installation and Reference Manual}.}.  In stark contrast to many other software 
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
 other parties.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
 and other sources).  Consult the permission notices contained in the documentation for more
 information.
 
-This document, is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This document, is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 
 @node Abstract
@@ -410,6 +410,12 @@ package.
 @smallexample
 
 $Log: striso.texi,v $
+Revision 0.9.2.8  2006/08/28 10:47:08  brian
+- correction
+
+Revision 0.9.2.7  2006/08/28 10:32:56  brian
+- updated references
+
 Revision 0.9.2.6  2006/08/27 12:27:06  brian
 - finalizing auto release files
 
@@ -489,7 +495,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 @auindex Bidulock, Brian
 @end multitable
 
-See @ref{Author Index}, for a complete listing and cross-index of authors to
+See @refman{Author Index}, for a complete listing and cross-index of authors to
 sections of this document.
 
 @node Maintainer
@@ -503,8 +509,8 @@ The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
 @end multitable
 
 Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
-included in the package, only after reading the @file{BUGS} file in the release, or @xref{Problem
-Reports}, in the manual.
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
 
 @node Web Resources
 @unnumberedsec Web Resources
@@ -550,12 +556,12 @@ Installation and Reference Manual}.}.  In stark contrast to many other software 
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
 other parties.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from X/Open publications and other sources).  Consult the permission notices
 contained in the documentation for more information.
 
-This manual is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+This manual is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
 sections invariant.
 @end ignore
 
@@ -641,19 +647,19 @@ This manual is organized (loosely) into several sections as follows:
 @end ifnotinfo
 @ifplaintext
 @multitable @columnfractions .50 .50
-@item @ref{Introduction}.
+@item @cite{Introduction}.
 @tab This introduction
-@item @ref{Objective}.
+@item @cite{Objective}.
 @tab Objective of the package
-@item @ref{Reference}.
+@item @cite{Reference}.
 @tab Contents of the package
-@item @ref{Conformance}.
+@item @cite{Conformance}.
 @tab Conformance of the package
-@item @ref{Releases}.
+@item @cite{Releases}.
 @tab Releases of the package
-@item @ref{Installation}.
+@item @cite{Installation}.
 @tab Installation of the package
-@item @ref{Troubleshooting}.
+@item @cite{Troubleshooting}.
 @tab Troubleshooting of the package
 @end multitable
 @end ifplaintext
@@ -715,7 +721,7 @@ Linux drivers for Ethernet, Token Ring, etc.
 
 The LDL driver and the @command{ldltest} and @command{ldlconfig} programs were
 originally written by Ole Husgaard and is licensed under the GNU General
-Public License, @xref{GNU General Public License}.  This OpenSS7 release of the LDL driver also
+Public License, @xrefman{GNU General Public License}.  This OpenSS7 release of the LDL driver also
 includes Hewlett-Packard proposed patches.
 An OpenSS7 GPL header has been added to the source code files to make this
 clear.
@@ -725,9 +731,9 @@ clear.
 @subsubheading Licensing
 
 The ip_to_dlpi driver was originally written by @cite{The Software Group
-Limited} and in licensed under the GNU Lesser General Public License @xref{LGPL}.
+Limited} and in licensed under the GNU Lesser General Public License @xrefman{LGPL}.
 Nevertheless, this OpenSS7 release of the @file{ip_to_dlpi} driver is released
-under the GNU General Public License @xref{GNU General Public License}.
+under the GNU General Public License @xrefman{GNU General Public License}.
 An OpenSS7 GPL header has been added to the source code to make this clear.
 
 @c ----------------------------------------------------------------------------
@@ -742,14 +748,13 @@ An OpenSS7 GPL header has been added to the source code to make this clear.
 @subsubheading Licensing
 
 The @file{ip_strm_mod} module was originally written by Mikel L. Mathews and is licensed under the
-GNU Lesser General Public License @xref{LGPL}.  However, this OpenSS7 release is distributed under
-the GNU General Public License @xref{GNU General Public License}.  An OpenSS7 GPL header has been added to the source code
+GNU Lesser General Public License @xrefman{LGPL}.  However, this OpenSS7 release is distributed under
+the GNU General Public License @xrefman{GNU General Public License}.  An OpenSS7 GPL header has been added to the source code
 to make this clear.
 
 LiS includes two adapter drivers to assist in interfacing STREAMS drivers to the Linux Kernel's
 TCP/IP protocols.  One driver, @dfn{ip_strm_mod} acts as an IP interface driver.  It fits below IP
-using standard @command{ifconfig}@footnote{@xref{ifconfig(8), ifconfig(8), ifconfig(8), *manpages*,
-The Manual Pages}.} procedures.  It, in turn, communicates downstream with any STREAMS driver using
+using standard @manref{ifconfig(8)} procedures.  It, in turn, communicates downstream with any STREAMS driver using
 the DLPI protocol in a fashion similar to the manner in which IP on Unix systems interfaces to lower
 interface drivers.  This allows a DLPI STREAMS driver to act as an interface driver to Linux TCP/IP.
 
@@ -771,12 +776,12 @@ interface drivers.  This allows a DLPI STREAMS driver to act as an interface dri
 @subsection @command{ldltest}
 
 Note that @command{ldltest} is mainatined as a manual page,
-@ref{ldltest(8), ldltest(8), ldltest(8), *manpages*, The Manual Pages}.
+@manref{ldltest(8)}.
 
 @subsection @command{ldlconfig}
 
 Note that @command{ldlconfig} is mainatined as a manual page,
-@ref{ldlconfig(8), ldlconfig(8), ldlconfig(8), *manpages*, The Manual Pages}.
+@manref{ldlconfig(8)}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.1 2006/08/26 09:14:54 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.2 2006/08/29 11:48:23 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:14:54 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/29 11:48:23 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -84,13 +84,26 @@ The sections that follow provide information on OpenSS7 releases of the
 
 Third release candidate.
 
-This release candidate provides support for additional @cite{SuSE} distributions on @code{ix86} as
-well as @code{x86_64}.  Added distribution support includes @cite{SLES 9}, @cite{SLES 9 SP2},
-@cite{SLES 9 SP3}, @cite{SLES 10}, @cite{SuSE 10.1}.
+@itemize
+@item
+Automated release file generation making for vastly improved and timely text
+documentation present in the release directory.
 
-This release candidate includes the changes made to the strsctp drivers at the @cite{2006 SCTP
-Interop} at the @cite{University of British Columbia}.  This version was interoperability tested
-with all implementations present.
+@item
+Package will now support extended ranges of minor devices on 2.6 kernels.
+@cite{LiS} cannot support this feature but has been dropped with this release.
+
+@item
+This release candidate provides support for additional @cite{SuSE}
+distributions on @code{ix86} as well as @code{x86_64}.  Added distribution
+support includes @cite{SLES 9}, @cite{SLES 9 SP2}, @cite{SLES 9 SP3},
+@cite{SLES 10}, @cite{SuSE 10.1}.
+
+@item
+This release candidate includes the changes made to the strsctp drivers at the
+@cite{2006 SCTP Interop} at the @cite{University of British Columbia}.  This
+version was interoperability tested with all implementations present.
+@end itemize
 
 This release is an internal release candidate and was not publicly released.
 
@@ -100,8 +113,9 @@ This release is an internal release candidate and was not publicly released.
 
 Second release candidate.
 
-This release candidate also contains the results of performance testing of the new second generation
-@dfn{UDP} driver (implemented completely in @dfn{STREAMS} instead of using an internal socket).
+This release candidate also contains the results of performance testing of the
+new second generation @dfn{UDP} driver (implemented completely in
+@dfn{STREAMS} instead of using an internal socket).
 
 This release candidate also contains support for @cite{SuSE 10.1}.
 
@@ -122,22 +136,36 @@ This release is an internal release candidate and was not publicly released.
 @unnumberedsubsec Major changes for release @value{PACKAGE_TARNAME}-0.7a.5
 @cindex release @value{PACKAGE_TARNAME}-0.7a.5
 
-This release is primarily to support additional compilers (gcc 4.0.2), architectures (x86_64, SMP,
-32-bit compatibility), recent Linux distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels
-(2.6.15).
+This release is primarily to support additional compilers (gcc 4.0.2),
+architectures (x86_64, SMP, 32-bit compatibility), recent Linux distributions
+(EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
 
 @itemize @bullet
-@item Changes to wait queues.  Split single wait queue into four independent wait queues.  Reworked
-wait queues for both old style (2.4) and new style (2.6) semantics.
-@item Changes to satisfy gcc 4.0.2 compiler.
-@item Corrected build flags for Gentoo and 2.6.15 kernels as reported on mailing list.  Build and
-run tested on FC4 i686 and x86_64 kernels based on 2.6.15.
-@item Corrections for and testing of 64-bit clean compile and test runs on x86_64 architecture.
-Some bug corrections resulting from gcc 4.0.2 compiler warnings.
-@item Initial corrections for and testing of SMP operation on Intel 630 Hyper-Threaded SMP on
-x86_64.  This package should now run well on N-way Xeons even with Hyper-Threading enabled.
-@item Corrections and validation of 32-bit compatibilty over 64-bit on x86_64.  Should apply well to
-other 64-bit architectures as well.
+@item
+Changes to wait queues.  Split single wait queue into four independent wait
+queues.  Reworked wait queues for both old style (2.4) and new style (2.6)
+semantics.
+
+@item
+Changes to satisfy gcc 4.0.2 compiler.
+
+@item
+Corrected build flags for Gentoo and 2.6.15 kernels as reported on mailing
+list.  Build and run tested on FC4 i686 and x86_64 kernels based on 2.6.15.
+
+@item
+Corrections for and testing of 64-bit clean compile and test runs on x86_64
+architecture.  Some bug corrections resulting from gcc 4.0.2 compiler
+warnings.
+
+@item
+Initial corrections for and testing of SMP operation on Intel 630
+Hyper-Threaded SMP on x86_64.  This package should now run well on N-way Xeons
+even with Hyper-Threading enabled.
+
+@item
+Corrections and validation of 32-bit compatibilty over 64-bit on x86_64.
+Should apply well to other 64-bit architectures as well.
 @end itemize
 
 This is a public beta test release of the package.
@@ -152,15 +180,18 @@ This is primarily a bug fixes release and corrections resulting from testing.
 @unnumberedsubsec Major changes for release @value{PACKAGE_TARNAME}-0.7a.3
 @cindex release @value{PACKAGE_TARNAME}-0.7a.3
 
-With this release version numbers were changed to reflect an upstream version only to be consistent
-with other OpenSS7 package releases.  All @cite{RPM} release numbers will be
-@samp{-1$(PACKAGE_RPMEXTRA)} and all @cite{Debian} release numbers will be @samp{_0}.  If you wish
-to apply patches and relelease the package, please bump up the release number and apply a suitable
-release suffix for your organization.  We leave @cite{Debian} release number @samp{_1} reserved for
-your use, so you can still bundle the source in the @file{.dsc} file.
+With this release version numbers were changed to reflect an upstream version
+only to be consistent with other OpenSS7 package releases.  All @cite{RPM}
+release numbers will be @samp{-1$(PACKAGE_RPMEXTRA)} and all @cite{Debian}
+release numbers will be @samp{_0}.  If you wish to apply patches and relelease
+the package, please bump up the release number and apply a suitable release
+suffix for your organization.  We leave @cite{Debian} release number @samp{_1}
+reserved for your use, so you can still bundle the source in the @file{.dsc}
+file.
 
-Major changes for this release include build against Linux 2.6 kernels and popular distributions
-based on the 2.6 kernel as well as wider distribution support.
+Major changes for this release include build against Linux 2.6 kernels and
+popular distributions based on the 2.6 kernel as well as wider distribution
+support.
 
 This was an internal beta test release and was not released publicly.
 
@@ -176,11 +207,12 @@ This was an internal alpha test release and was not released publicly.
 @unnumberedsubsec Major changes for release @value{PACKAGE_TARNAME}-0.7a-2
 @cindex release @value{PACKAGE_TARNAME}-0.7a-2
 
-Removed all XTI/TLI and Linux networking code, headers and documentation from streams distribution
-and set epoch at 0.  Linux networking code has been migrated to the strxnet, strinet and strsctp
-packages.  The purpose for doing this was to allow the Linux networking to build against
-@cite{@value{PACKAGE_TITLE}} as well as @cite{Linux STREAMS} and is a preparation for phasing out
-LiS and phasing in LfS.
+Removed all XTI/TLI and Linux networking code, headers and documentation from
+streams distribution and set epoch at 0.  Linux networking code has been
+migrated to the strxnet, strinet and strsctp packages.  The purpose for doing
+this was to allow the Linux networking to build against
+@cite{@value{PACKAGE_TITLE}} as well as @cite{Linux STREAMS} and is a
+preparation for phasing out LiS and phasing in LfS.
 
 This was an internal alpha test release and was not released publicly.
 
@@ -190,9 +222,9 @@ This was an internal alpha test release and was not released publicly.
 @unnumberedsubsec Initial release @value{PACKAGE_TARNAME}-0.7a-1
 @cindex release @value{PACKAGE_TARNAME}-0.7a-1
 
-This is the initial release of the @value{PACKAGE_TITLE} package for Linux.  This is intended as a
-high-performance, production replacement for @cite{Linux STREAMS (LiS)}.  @value{PACKAGE_TITLE} has
-the following features:
+This is the initial release of the @value{PACKAGE_TITLE} package for Linux.
+This is intended as a high-performance, production replacement for @cite{Linux
+STREAMS (LiS)}.  @value{PACKAGE_TITLE} has the following features:
 
 @itemize --
 @item optimized for Linux kernels.

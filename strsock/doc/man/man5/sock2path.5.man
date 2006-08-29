@@ -1,0 +1,326 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: sock2path.5.man,v 0.9.2.1 2006/08/29 11:41:03 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/08/29 11:41:03 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: sock2path.5.man,v $
+.\" Revision 0.9.2.1  2006/08/29 11:41:03  brian
+.\" - added manual pages
+.\"
+.\" Revision 0.9.2.4  2006/04/05 09:44:48  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsock.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsock.macros
+.\"
+.\"
+.TH SOCK2PATH 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B sock2path
+\- file that maps sockets to transport providers
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B /etc/sock2path
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The socket mapping file,
+.BR /etc/sock2path ,
+is a system file that contains the mappings between the
+.BR socket (3)
+call parameters and the transport provider driver.  Its format is described on
+the
+.BR soconfig (8)
+manual page.
+.PP
+The
+.BR init (8)
+utility uses the
+.BR soconfig (8)
+utility with the
+.B /etc/sock2path
+file during the booting sequence.
+.PP
+With
+.IR Solaris "\(rg " 2.6 ,
+the
+.BR sockmod (4)
+module and much of the
+.BR libsocket (3)
+library were removed and many of the socket compatibility library operations
+moved into the kernel.  The old
+.BR libsocket (3)
+library used the
+.B /dev/netconfig
+file, described under
+.BR netconfig (5),
+directly.  Having moved the mapping function directly into the kernel, another
+approach was necessary to populate the mapping within the kernel.  The
+.BR soconfig (8)
+utility and the associated
+.B /etc/sock2path
+file were formed to populate the kernel mapping file at boot time and to
+perform modifications to the kernel mapping as required while the system is
+running.
+.PP
+.B @PACKAGE_TITLE@
+also uses this approach for populating kernel-level mapping files for use with
+the
+.BR socksys (4)
+driver.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+The file format consists of lines with 4 fields as follows:
+.RS
+.RI < family "> <" type "> <" protocol "> <" path >
+.RE
+All fields are mandatory.  Comments begin with an octothorpe (#) and continue
+to the end of a line.  Empty lines, or lines consisting of whitespace or
+containing only a comment are ignored.
+.PP
+The fields, separated by any arbitrary amount of leading or intervening
+whitespace are interpreted follows:
+.TP
+.I family
+Protocol family, as listed in
+.RB < sys/socket.h >,
+expressed as a decimal number.
+.TP
+.I type
+Socket type, as listed in
+.RB < sys/socket.h >,
+expressed as decimal number.
+.TP
+.I protocol
+Protocol within a protocol family, as listed in the protocol specific file
+(e.g.
+.RB < netinet/in.h >
+for
+.BR PF_INET ),
+expressed as a decimal number.
+.TP
+.I path
+The filesystem path to a device file that will be opened as the underlying
+transport provider (e.g.
+.RB \*(lq /dev/tcp \*(rq).
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Example 1: A Sample
+.B sock2path
+File
+.PP
+The following is a sample
+.B sock2path
+file:
+.sp
+.RS
+.nf
+\fC\s-1\
+# Family   Type  Protocol    Path
+      2       2       0      /dev/tcp
+      2       2       6      /dev/tcp
+
+      26      2       0      /dev/tcp6
+      26      2       6      /dev/tcp6
+
+      2       1       0      /dev/udp
+      2       1       17     /dev/udp
+
+      26      1       0      /dev/udp6
+      26      1       17     /dev/udp6
+
+      1       2       0      /dev/ticotsord
+      1       6       0      /dev/ticotsord
+      1       1       0      /dev/ticlts
+
+      2       4       0      /dev/rawip
+      26      4       0      /dev/rawip
+
+      24      4       0      /dev/rts
+
+      27      4       2      /dev/keysock
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/sock2path
+contains the
+.B soconfig
+configuration.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR soconfig (8),
+.BR socket (3),
+.BR netconfig (5).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B /etc/sock2path
+file is compatible with
+.IR Solaris \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+uses the same format of file as described here with one extension: it is
+possible to use symbolic names (e.g.
+.BR AF_INET )
+for the
+.IR family ", " type " and " protocol
+fields.  However, not all symbolic names are populated in the
+.BR soconfig (8)
+tool.  See
+.BR soconfig (8)
+for more information.
+.IP \(em
+.IR Solaris \(rg
+does not support symbolic names (e.g.
+.BR AF_INET )
+for the fields.
+.IP \(em
+The mechanism that actually uses the kernel-populated socket mapping is
+different under
+.IR Solaris \(rg
+and
+.BR "@PACKAGE_TITLE@" .
+.IP \(em
+At boot time, the kernel mapping is populated using the
+.BR soconfig (8)
+utility and the
+.B /etc/sock2path
+file.  This is performed with the
+.B @PACKAGE@
+or
+.B @PACKAGE@.sh
+init script and not directly by the
+.BR init (8)
+process.
+.IP \(em
+The
+.B /etc/sock2path
+file is only compatible with
+.IR Solaris \(rg
+for the purposes of populating the kernel mapping for use by
+.B libsocket.so
+in the
+.B "@PACKAGE_TITLE@"
+package.  Any other use of the
+.B /etc/sock2path
+file is unsupported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR Solaris \(rg
+documentation.
+.[
+soldoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B /etc/sock2path
+file first appeared in
+.IR Solaris "\(rg " 2.6 .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

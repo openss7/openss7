@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: mail.texi,v 0.9.2.1 2006/08/27 10:14:15 brian Exp $
+@c @(#) $Id: mail.texi,v 0.9.2.4 2006/08/28 10:41:40 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 10:14:15 $ by $Author: brian $
+@c Last Modified $Date: 2006/08/28 10:41:40 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,11 +64,11 @@ packages released by the @uref{http://www.openss7.org/,, OpenSS7 Project}.
 
 Please send bug reports to @email{bugs@@openss7.org} using the @file{send-pr} script included in the
 @cite{@value{PACKAGE_TITLE}} package, only after reading the @file{BUGS} file in the release, or
-@xref{Problem Reports}, in the manual.  You can access the
+@xrefman{Problem Reports}.  You can access the
 @uref{http://www.openss7.org/bugreport.html, OpenSS7 GNATS database} directly via the web, however,
-the prefered method for sending new bug reports is via mail with the @file{send-pr} script.
+the preferred method for sending new bug reports is via mail with the @file{send-pr} script.
 
-@subsubheading Mailng Lists
+@subsubheading Mailing Lists
 
 @uref{http://www.openss7.org/,, The OpenSS7 Project} provides a number of general discussion
 @uref{http://www.openss7.org/mailman/listinfo,, Mailing Lists} for discussion concerning the
@@ -82,32 +82,32 @@ The mailing lists are as follows:
 
 @table @file
 @item @uref{http://www.openss7.org/mailman/listinfo/openss7,, openss7}
-The @file{openss7} mailing list is for general inquiries, information exchange and announcements
+The @file{openss7} mailing list is for general enquiries, information exchange and announcements
 regarding the @uref{http://www.openss7.org/,, OpenSS7 Project}.  This is our original mailing list
 and takes the highest amount of traffic.
 
 @item @uref{http://www.openss7.org/mailman/listinfo/openss7-announce,, openss7-announce}
 The @file{openss7-announce} mailing list is for announcements related to the
 @uref{http://www.openss7.org/,, OpenSS7 Project}.  This list will accept announcements posted by
-subscribers.  Subscribe to this list if you are interested in announcments from the
+subscribers.  Subscribe to this list if you are interested in announcements from the
 @uref{http://www.openss7.org,, OpenSS7 Project}, subscribers and sponsors, related to the
 @uref{http://www.openss7.org,, OpenSS7 Project} or STREAMS, SS7, SIGTRAN or SCTP in general.
 
 @item @uref{http://www.openss7.org/mailman/listinfo/openss7-cvs,, openss7-cvs}
-The @file{openss7-cvs} mailing list is for automatic CVS log reporting.  You must get permssion of
+The @file{openss7-cvs} mailing list is for automatic CVS log reporting.  You must get permission of
 the owner to subscribe to this list.  Subscribers are not allowed to post to this list, this is
 merely for distributing notification of changes to the CVS repository.h
 
 @item @uref{http://www.openss7.org/mailman/listinfo/openss7-develop,, openss7-develop}
-The @file{openss7-develop} mailing list is for email echange related to the development projects
+The @file{openss7-develop} mailing list is for email exchange related to the development projects
 under the @uref{http://www.openss7.org/,, OpenSS7 Project}.  This includes development requests,
 proposals, requests for comment or proposal.  Subscribe to this list if you are interested in
 ongoing development details regarding the @uref{http://www.openss7.org/,, OpenSS7 Project}.
 
 @item @uref{http://www.openss7.org/mailman/listinfo/openss7-test,, openss7-test}
-The @file{openss7-test} mailing list is for email echange related to the testing of code under the
-@uref{http://www.openss7.org/,, OpenSS7 Project}.  This specifically relates to conformance tsting,
-verification testing, interoperablity testing and beta testing.  Subscribe to this list if you are
+The @file{openss7-test} mailing list is for email exchange related to the testing of code under the
+@uref{http://www.openss7.org/,, OpenSS7 Project}.  This specifically relates to conformance testing,
+verification testing, interoperability testing and beta testing.  Subscribe to this list if you are
 interested in participating in and receiving ongoing details of test activities under the
 @uref{http://www.openss7.org/,, OpenSS7 Project}.
 
@@ -139,9 +139,9 @@ Project} @dfn{STREAMS} components.
 
 To avoid spam being sent to the members of the @cite{OpenSS7} mailing list(s), we have blocked mail
 from non-subscribers.  Please subscribe to the mailing list before attempting to post to them.
-(Attempts to post when unsubscribed get bounced.)
+(Attempts to post when not subscribed get bounced.)
 
-As an additional measure agains spam, subscriber lists for all @cite{OpenSS7} mailing lists are not
+As an additional measure against spam, subscriber lists for all @cite{OpenSS7} mailing lists are not
 accessible to non-subscribers; for most lists subscriber  lists are only accessible to the list
 administrator.  This keeps your mailing address from being picked off our website by bulk mailers.
 
@@ -157,5 +157,5 @@ The mailing list is blocked from messages of greater than @code{40k}.   If you h
 (patches, test programs, etc.) and you mail them to the list, it will bounce to the list
 administrator.  If you are interested in  making your patches, test programs, test results or other
 large attachments available to the members of the mailing list, state in the message that you would
-like them posted and the list adminstrator will place them in the mail archives.
+like them posted and the list administrator will place them in the mail archives.
 
