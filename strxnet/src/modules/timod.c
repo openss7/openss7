@@ -991,8 +991,8 @@ timod_pop(queue_t *q)
 	switch (priv->state) {
 	case TS_WREQ_ORDREL:
 		if (!(priv->flags & TIMOD_EPROTO)) {
-			if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
-				struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+			if ((mp = allocb(sizeof(struct T_ordrel_req), BPRI_WAITOK))) {
+				struct T_ordrel_req *prim = (typeof(prim)) mp->b_wptr;
 
 				mp->b_wptr = (unsigned char *) (prim + 1);
 				mp->b_datap->db_type = M_PROTO;

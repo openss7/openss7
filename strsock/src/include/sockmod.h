@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef _TICOTSORD_H
-#define _TICOTSORD_H
+#ifndef _SOCKMOD_H
+#define _SOCKMOD_H
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
@@ -60,7 +60,7 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <sys/ticotsord.h>
+#include <sys/sockmod.h>
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -68,4 +68,5 @@ __END_DECLS
 /* *INDENT-ON* */
 #endif
 
-#endif				/* _TICOTSORD_H */
+#endif				/* _SOCKMOD_H */
+

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tihdr.h,v 0.9.2.3 2005/05/14 08:28:28 brian Exp $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,27 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:28 $ by $Author: brian $
-
- $Log: tihdr.h,v $
- Revision 0.9.2.3  2005/05/14 08:28:28  brian
- - copyright header correction
-
- Revision 0.9.2.2  2004/05/16 04:12:32  brian
- - Updating strxnet release.
-
- Revision 1.3  2004/05/14 08:00:01  brian
- - Updated xns, tli, inet, xnet and documentation.
-
- Revision 0.9.4.2  2004/04/13 12:12:51  brian
- - Rearranged header files.
+ Last Modified $Date$ by $Author$
 
  *****************************************************************************/
 
 #ifndef _TIHDR_H
 #define _TIHDR_H
 
-#ident "@(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:28:28 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

@@ -49,23 +49,54 @@
 
  *****************************************************************************/
 
-#ifndef _TICOTSORD_H
-#define _TICOTSORD_H
+#ifndef __SYS_SOCKSYS_H__
+#define __SYS_SOCKSYS_H__
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+struct socksysreq {
+	long args[7];
+};
 
-#include <sys/ticotsord.h>
+struct socknewproto {
+	int family;				/* address family */
+	int type;				/* socket type */
+	int proto;				/* protocol */
+	dev_t dev;				/* major/minor (must be clone) */
+	int flags;				/* protosw flags */
+};
 
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
+#define SO_ACCEPT	     1
+#define SO_BIND		     2
+#define SO_CONNECT	     3
+#define SO_GETPEERNAME	     4
+#define SO_GETSOCKNAME	     5
+#define SO_GETSOCKOPT	     6
+#define SO_LISTEN	     7
+#define SO_RECV		     8
+#define SO_RECVFROM	     9
+#define SO_SEND		    10
+#define SO_SENDTO	    11
+#define SO_SETSOCKOPT	    12
+#define SO_SHUTDOWN	    13
+#define SO_SOCKET	    14
+#define SO_SELECT	    15
+#define SO_GETIPDOMAIN	    16
+#define SO_SETIPDOMAIN	    17
+#define SO_ADJTIME	    18
+#define SO_SETREUID	    19
+#define SO_SETREGID	    20
+#define SO_GETTIME	    21
+#define SO_SETTIME	    22
+#define SO_GETITIMER	    23
+#define SO_SETITIMER	    24
+#define SO_RECVMSG	    25
+#define SO_SENDMSG	    26
+#define SO_SOCKPAIR	    27
 
-#endif				/* _TICOTSORD_H */
+#define SIOCSOCKSYS	    0x8966
+
+#define SOCKSYS_TIMEOUT	    -1
+
+#endif				/* __SYS_SOCKSYS_H__ */
+

@@ -775,7 +775,7 @@ Additional Sockets input-output controls are passed to the Stream as
 @item @var{SO_SELECT}		@tab --				@tab @manpage{select(2)}
 @item @var{SO_ADJTIME}		@tab --				@tab @manpage{adjtimex(2)}
 @item @var{SO_RECVMSG}		@tab @manpage{recvmsg(3)}	@tab @manpage{recvmsg(2)}
-@item @var{SO_SENDMS}		@tab @manpage{sendmsg(3)}	@tab @manpage{sendmsg(2)}
+@item @var{SO_SENDMSG}		@tab @manpage{sendmsg(3)}	@tab @manpage{sendmsg(2)}
 @item @var{SO_SOCKPAIR}		@tab @manpage{socketpair(3)}	@tab @manpage{socketpair(2)}
 @end multitable
 

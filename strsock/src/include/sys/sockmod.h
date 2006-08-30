@@ -49,23 +49,64 @@
 
  *****************************************************************************/
 
-#ifndef _TICOTSORD_H
-#define _TICOTSORD_H
+#ifndef __SYS_SOCKMOD_H__
+#define __SYS_SOCKMOD_H__
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
+#define SOCKMOD_IOC_MAGIC	'I'
+
+#define O_SI_GETUDATA	((SOCKMOD_IOC_MAGIC<<8)|101)
+#define SI_SHUTDOWN	((SOCKMOD_IOC_MAGIC<<8)|102)
+#define SI_LISTEN	((SOCKMOD_IOC_MAGIC<<8)|103)
+#define SI_SETMYNAME	((SOCKMOD_IOC_MAGIC<<8)|104)
+#define SI_SETPEERNAME	((SOCKMOD_IOC_MAGIC<<8)|105)
+#define SI_GETINTRANSIT	((SOCKMOD_IOC_MAGIC<<8)|106)
+#define SI_TCL_LINK	((SOCKMOD_IOC_MAGIC<<8)|107)
+#define SI_TCL_UNLINK	((SOCKMOD_IOC_MAGIC<<8)|108)
+#define SI_SOCKPARAMS	((SOCKMOD_IOC_MAGIC<<8)|109)
+#define SI_GETUDATA	((SOCKMOD_IOC_MAGIC<<8)|110)
+
+struct si_sockparams {
+	int sp_family;
+	int sp_type;
+	int sp_protocol;
+};
+
+struct o_si_udata {
+	int tidusize;
+	int addrsize;
+	int optsize;
+	int etsdusize;
+	int servtype;
+	int so_state;
+	int so_options;
+	int tsdusize;
+};
+
+struct si_udata {
+	int tidusize;
+	int addrsize;
+	int optsize;
+	int etsdusize;
+	int servtype;
+	int so_state;
+	int so_options;
+	int tsdusize;
+	struct si_sockparams sockparams;
+};
+
+#if 0
+#define O_SI_GETUDATA		_IORW(SOCKMOD_IOC_MAGIC, 101, struct o_si_udata)
+#define SI_SHUTDOWN		_IORW(SOCKMOD_IOC_MAGIC, 102, void)
+#define SI_LISTEN		_IORW(SOCKMOD_IOC_MAGIC, 103, void)
+#define SI_SETMYNAME		_IORW(SOCKMOD_IOC_MAGIC, 104, void)
+#define SI_SETPEERNAME		_IORW(SOCKMOD_IOC_MAGIC, 105, void)
+#define SI_GETINTRANSIT		_IORW(SOCKMOD_IOC_MAGIC, 106, void)
+#define SI_TCL_LINK		_IORW(SOCKMOD_IOC_MAGIC, 107, void)
+#define SI_TCL_UNLINK		_IORW(SOCKMOD_IOC_MAGIC, 108, void)
+#define SI_SOCKPARAMS		_IORW(SOCKMOD_IOC_MAGIC, 109, struct si_sockparams)
+#define SI_GETUDATA		_IORW(SOCKMOD_IOC_MAGIC, 110, struct si_udata)
 #endif
 
-#include <sys/ticotsord.h>
-
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
-
-#endif				/* _TICOTSORD_H */
+#endif				/* __SYS_SOCKMOD_H__ */

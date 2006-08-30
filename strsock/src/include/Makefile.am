@@ -61,7 +61,11 @@ include ../../am/openss7.am
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-nobase_pkginclude_HEADERS =
+nobase_pkginclude_HEADERS = \
+	sockmod.h \
+	socksys.h \
+	sys/sockmod.h \
+	sys/socksys.h
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/${PACKAGE}/version.h \
