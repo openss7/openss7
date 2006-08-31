@@ -58,12 +58,24 @@ struct socksysreq {
 	long args[7];
 };
 
+struct socksysreq32 {
+	int32_t args[7];
+};
+
 struct socknewproto {
-	int family;				/* address family */
-	int type;				/* socket type */
-	int proto;				/* protocol */
-	dev_t dev;				/* major/minor (must be clone) */
-	int flags;				/* protosw flags */
+	int family;			/* address family */
+	int type;			/* socket type */
+	int proto;			/* protocol */
+	dev_t dev;			/* major/minor (must be clone) */
+	int flags;			/* protosw flags */
+};
+
+struct socknewproto32 {
+	int32_t family;			/* address family */
+	int32_t type;			/* socket type */
+	int32_t proto;			/* protocol */
+	dev32_t dev;			/* major/minor (must be clone) */
+	int32_t flags;			/* protosw flags */
 };
 
 #define SO_ACCEPT	     1
@@ -99,4 +111,3 @@ struct socknewproto {
 #define SOCKSYS_TIMEOUT	    -1
 
 #endif				/* __SYS_SOCKSYS_H__ */
-

@@ -55,6 +55,52 @@
 static char const ident[] =
     "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.8.2.1 $) $Date: 2003/05/27 09:52:34 $";
 
+/*
+ *  SOCKMOD - A socket module for Linux Fast-STREAMS.
+ *
+ *  Discussion: There are three approaches to providing sockets with STREAMS as follows:
+ *
+ *  1. Provide a library (libsocket(3)) and cooperating sockmod(4) module much in the same manner as
+ *     the libxnet(3) library and the timod(4) module.  This is what I call the SVR 3.2 approach.
+ *     Much of the translation between the sockets API and the underlying TPI provider is performed
+ *     by the library.  The library uses ioctl(2) and getmsg(2)/putmsg(2) calls to effect the
+ *     translation.
+ *
+ *     When a socket is opened using the socket(3), socketpair(3) or accept(3) subroutines, the
+ *     library checks the /etc/netconfig file and determines a device path name to open the
+ *     corresponding TPI device.  The sockmod(4) module is pushed and then the library communicates
+ *     with the TPI device using normal TPI messagein (getmsg(2)/putmsg(2)) and a few special
+ *     sockmod(4) ioctl(2) calls.
+ *
+ *     This mechanism is rather inefficient and presents many challenges with regard to state
+ *     synchronization.  This approach is obsolete.  This version of sockmod(4) supports the SI_
+ *     ioctl(2) commands for backward compatibility (to what??) only.
+ *
+ *  2. Provide a library (libsocket(3)) and cooperating sockmod(4) module.
+ *
+ *     When a socket is opened using the socket(3) or socketpair(3) library subroutines, the library
+ *     checks the /etc/netconfig file and determines the TPI device to open and then pushes the
+ *     sockmod(4) module on that device.  Pushing the sockmod(4) module transforms the Stream into a
+ *     socket (by acquiring an inode from the sockfs(3) and transforming the open file descriptor).
+ *     The transformed file descriptor represents a file within the sockfs(5) filesystem, and under
+ *     Linux, is a true socket, at least down to the struct socket.  An ioctl(2) on the freshly
+ *     created socket informs.  All other socket API calls use the system call interface.
+ *
+ *     If the sockmod(4) module is ever popped, the smod_qclose() transforms the socket back into a
+ *     Stream before the module is popped.
+ *
+ *  3. Provide a library (libsocket(3)) and cooperating socksys(4) driver.
+ *     
+ *     When a socket is opened using the socket(3) or socketpair(3) library subroutines, the library
+ *     opens the socksys(4) driver and uses the SIOCSOCKSYS input-output control with the SO_SOCKET
+ *     or SO_SOCKPAIR command to open a socket (or pair of sockets) of the appropriate type.  The
+ *     socksys(4) driver knows what driver to open internally according to the population of an
+ *     internal mapping table performed from user space during system intialization frrom the
+ *     /etc/sock2path file with the SIOCPROTO and SIOCXPROTO input-output controls.  The returned
+ *     file descriptors represent files within the sockfs(5) filesystem, and under Linux, are true
+ *     sockets, at least down to the struct socket.  All other socket API calls use the system call
+ *     interface.
+ */
 #include <sys/os7/compat.h>
 
 #include <sys/sockmod.h>
@@ -1959,6 +2005,14 @@ struct proto_ops tpi_socket_ops = {
  * It is possible under Linux-Fast STREAMS that we can just transform the Stream into a socket.
  * This can be accomplished most easily by setting the inode to look like a socket (place a struct
  * socket inside of it and set i_sock) and implement the socket.ops as above.
+ *
+ * The trick here is when sockmod is pushed to transform the Stream head into a socket (from the
+ * filesystem and system call perspective).  This can be accomplished most eaily in a similar manner
+ * to the way that Streams are linked under a multiplexing driver: the procedures associated with
+ * the file operations are replaced with socket procedures.  Also, the associated inode is changed
+ * to appear the same as a socket inode.  This is best accomplished by allocating a new inode from
+ * the sockfs.  The stream head can be referenced with the f_private data pointer.  The sockmod
+ * instance can reference the new inode with the q->q_ptr.
  */
 STATIC streamscall int
 smod_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)

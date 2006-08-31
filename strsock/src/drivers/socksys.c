@@ -57,8 +57,34 @@
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*
- *  This driver provides a sockfs(5) based approach to providing sockets
- *  interface to TPI streams.
+ *  A Socket System (SOCKSYS) Driver.
+ *
+ *  This driver provides a sockfs(5) based approach to providing sockets interface to TPI streams.
+ *
+ *  Discussion:  This driver implements one of three approaches to providing sockets for STREAMS.
+ *  Under this approach there is a user-space library (libsocket(3)) and a cooperating socket system
+ *  driver (socksys(4)).  When a socket is opened using the socket(3) or socketpair(3) library
+ *  subroutines, the library opens the socksys(4) driver and uses the SIOCSOCKSYS input-output
+ *  control with the SO_SOCKET or SO_SOCKPAIR command to open a socket (or pair of sockets) of the
+ *  appropriate type.  The socksys(4) driver knows what driver to open internally according to the
+ *  population of an internall mapping table performed from user space during system intialization
+ *  from the /etc/sock2path configuration file using the soconfig(8) utility and the SIOCPROTO and
+ *  SIOCXPROTO input-output controls.  The returned file descriptors represent files within the
+ *  sockfs(5) filesystem, and are true sockets, at least down to the struct socket.  All other
+ *  socket API calls use the libc sockets system call interface.  The library also supports the
+ *  remaining SIOCSOCKSYS commands for backward compatibility (to what!?).
+ *
+ *  Ok, rather than transforming Streams into Sockets here, the SO_SOCKET and SO_SOCKETPAIR calls
+ *  will return either a Stream (if there is a Stream defined for the call parameters) or a Socket
+ *  (if there is no Stream defined for the call parameters).
+ *
+ *  Because, paticularly LiS, cannot execute the topmost module put procedure in user context, calls
+ *  that are supposed to return file descriptors cannot.  Therefore, these calls will have to return
+ *  0 and the send an M_PASSFP message upstream.  The library will have to perform an I_RECVFD if
+ *  the ioctl is successful, to obtain the file descriptor(s).  SO_SOCKET returns 1 file descriptor
+ *  on success.  SO_ACCEPT returns 1 file descriptor on success.  SO_SOCKPAIR returns 2 file
+ *  descriptors on success.  If these file descriptors are Streams, it is the responsibility of the
+ *  library to push "sockmod" to transform them into sockets.
  */
 
 #include <sys/os7/compat.h>
@@ -71,43 +97,48 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <sys/socksys.h>
 
-#define SSYS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SSYS_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SSYS_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
-#define SSYS_DEVICE	"SVR 4.2 STREAMS SOCKSYS Driver"
-#define SSYS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SSYS_LICENSE	"GPL"
-#define SSYS_BANNER	SSYS_DESCRIP		"\n" \
-			SSYS_EXTRA		"\n" \
-			SSYS_REVISION		"\n" \
-			SSYS_COPYRIGHT		"\n" \
-			SSYS_DEVICE		"\n" \
-			SSYS_CONTACT		"\n"
-#define SSYS_SPLASH	SSYS_DESCRIP		" - " \
-			SSYS_REVISION
+#define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
+#define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define SOCKSYS_LICENSE		"GPL"
+#define SOCKSYS_BANNER		SOCKSYS_DESCRIP		"\n" \
+				SOCKSYS_COPYRIGHT	"\n" \
+				SOCKSYS_REVISION	"\n" \
+				SOCKSYS_DEVICE		"\n" \
+				SOCKSYS_CONTACT		"\n"
+#define SOCKSYS_SPLASH		SOCKSYS_DEVICE		" - " \
+				SOCKSYS_REVISION
+
+#ifdef CONFIG_STREAMS_SOCKSYS_MODULE
+MODULE_AUTHOR(SOCKSYS_CONTACT);
+MODULE_DESCRIPTION(SOCKSYS_DESCRIP);
+MODULE_SUPPORTED_DEVICE(SOCKSYS_DEVICE);
+MODULE_LICENSE(SOCKSYS_LICENSE);
+#endif				/* CONFIG_STREAMS_SOCKSYS_MODULE */
 
 #ifdef LFS
-#define SSYS_DRV_ID	CONFIG_STREAMS_SSYS_MODID
-#define SSYS_DRV_NAME	CONFIG_STREAMS_SSYS_NAME
-#define SSYS_CMAJORS	CONFIG_STREAMS_SSYS_NMAJORS
-#define SSYS_CMAJOR_0	CONFIG_STREAMS_SSYS_MAJOR
-#define SSYS_UNITS	CONFIG_STREAMS_SSYS_NMINORS
+#define SOCKSYS_DRV_ID	CONFIG_STREAMS_SOCKSYS_MODID
+#define SOCKSYS_DRV_NAME	CONFIG_STREAMS_SOCKSYS_NAME
+#define SOCKSYS_CMAJORS	CONFIG_STREAMS_SOCKSYS_NMAJORS
+#define SOCKSYS_CMAJOR_0	CONFIG_STREAMS_SOCKSYS_MAJOR
+#define SOCKSYS_UNITS	CONFIG_STREAMS_SOCKSYS_NMINORS
 #endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SSYS_MODID));
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SOCKSYS_MODID));
 MODULE_ALIAS("streams-driver-socksys");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SSYS_MAJOR));
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SOCKSYS_MAJOR));
 MODULE_ALIAS("/dev/streams/socksys");
 MODULE_ALIAS("/dev/streams/socksys/*");
 MODULE_ALIAS("/dev/streams/clone/socksys");
 #endif
-MODULE_ALIAS("char-major-" __stringify(SSYS_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(SSYS_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(SSYS_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/socksys");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
@@ -117,57 +148,753 @@ MODULE_ALIAS("/dev/socksys");
  *  ==========================================================================
  */
 
-#define DRV_ID		SSYS_DRV_ID
-#define DRV_NAME	SSYS_DRV_NAME
-#define CMAJORS		SSYS_CMAJORS
-#define CMAJOR_0	SSYS_CMAJOR_0
-#define UNITS		SSYS_UNITS
+#define DRV_ID		SOCKSYS_DRV_ID
+#define DRV_NAME	SOCKSYS_DRV_NAME
+#define CMAJORS		SOCKSYS_CMAJORS
+#define CMAJOR_0	SOCKSYS_CMAJOR_0
+#define UNITS		SOCKSYS_UNITS
 #ifdef MODULE
-#define DRV_BANNER	SSYS_BANNER
+#define DRV_BANNER	SOCKSYS_BANNER
 #else				/* MODULE */
-#define DRV_BANNER	SSYS_SPLASH
+#define DRV_BANNER	SOCKSYS_SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info ssys_minfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
-	.mi_idname = DRV_NAME,	/* Module name */
-	.mi_minpsz = 0,		/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
-	.mi_hiwat = (1 << 18),	/* Hi water mark */
-	.mi_lowat = 0,		/* Lo water mark */
+STATIC struct module_info socksys_minfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = STRMINPSZ,		/* Min packet size accepted */
+	.mi_maxpsz = STRMAXPSZ,		/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
-STATIC struct module_stat ssys_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat ssys_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat socksys_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
-STATIC streamscall int ssys_qopen(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int ssys_qclose(queue_t *, int, cred_t *);
+STATIC streamscall int socksys_qopen(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int socksys_qclose(queue_t *, int, cred_t *);
 
-streamscall int ssys_rput(queue_t *, mblk_t *);
-streamscall int ssys_wput(queue_t *, mblk_t *);
+STATIC streamscall int socksys_rput(queue_t *, mblk_t *);
+STATIC streamscall int socksys_wput(queue_t *, mblk_t *);
 
-STATIC struct qinit ssys_rinit = {
-	.qi_putp = ssys_rput,	/* Read put procedure (messgae from below) */
-	.qi_qopen = ssys_qopen,	/* Each open */
-	.qi_qclose = ssys_qclose,	/* Last close */
-	.qi_minfo = &ssys_minfo,	/* Module information */
-	.qi_mstat = &ssys_rstat,	/* Module statistics */
+STATIC struct qinit socksys_qinit = {
+	.qi_putp = socksys_rput,	/* Put procedure (messgae from above or below) */
+	.qi_qopen = socksys_qopen,	/* Each open */
+	.qi_qclose = socksys_qclose,	/* Last close */
+	.qi_minfo = &socksys_minfo,	/* Module information */
+	.qi_mstat = &socksys_mstat,	/* Module statistics */
 };
 
-STATIC struct qinit ssys_winit = {
-	.qi_putp = ssys_wput,	/* Write put procedure (message from above) */
-	.qi_minfo = &ssys_minfo,	/* Module information */
-	.qi_mstat = &ssys_wstat,	/* Module statistics */
-};
-
-MODULE_STATIC struct streamtab ssys_info = {
-	.st_rdinit = &ssys_rinit,	/* Upper read queue */
-	.st_wrinit = &ssys_winit,	/* Upper write queue */
+MODULE_STATIC struct streamtab socksys_info = {
+	.st_rdinit = &socksys_qinit,	/* Upper read queue */
+	.st_wrinit = &socksys_qinit,	/* Upper write queue */
 };
 
 /*
  *  Primary data structures.
  */
+
+#ifdef __LP64__
+#  undef  WITH_32BIT_CONVERSION
+#  define WITH_32BIT_CONVERSION 1
+#endif
+
+/* private structures */
+struct socksys {
+	int assigned;
+	int iocstate;
+	int transparent;
+};
+
+#if 0
+/*
+ * This is not a good way to do things.  Transforming the Stream with a sockmod(4) approach is
+ * better.  This also relies on the fact that the put procedure of the socksys(4) must execute in
+ * user context.  Unfortunately, this is not always the case for LiS-2.18 derived implementations.
+ * This will probably not work with LiS.  Do not use LiS.  Use Linux Fast-STREAMS instead.  In fact,
+ * I cannot see how this will work, so strap it out for now...
+ */
+
+long
+tpi_accept(int fd, struct sockaddr *addr, int *alen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_bind(int fd, struct sockaddr *addr, int alen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_connect(int fd, struct sockaddr *addr, int alen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_getpeername(int fd, struct sockaddr *addr, int *alen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_getsockname(int fd, struct sockaddr *addr, int *alen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_getsockopt(int fd, int level, int name, char *value, int *olen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_listen(int fd, int backlog)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_recv(int fd, void *ubuf, size_t size, unsigned flags)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_recvfrom(int fd, void *ubuf, size_t size, unsigned flags, struct sockaddr *addr, int *alen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_send(int fd, void *buff, size_t len, unsigned flags)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_sendto(int fd, void *buff, size_t len, unsigned flags, struct sockaddr *addr, int alen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_setsockopt(int fd, int level, int name, char *value, int olen)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_shutdown(int fd, int how)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_recvmsg(int fd, struct msghdr *msg, unsigned int flags)
+{
+	return (-ENOTSOCK);
+}
+
+long
+tpi_sendmsg(int fd, struct msghdr *msg, unsigned flags)
+{
+	return (-ENOTSOCK);
+}
+#endif
+
+int
+so_socksys(struct socksysreq *req)
+{
+	int err = -EINVAL;
+	int cmd = req->args[0];
+
+	if ((1 << cmd) & ((1 << SO_ACCEPT) | (1 << SO_BIND) | (1 << SO_CONNECT) |
+			  (1 << SO_GETPEERNAME) | (1 << SO_GETSOCKNAME) | (1 << SO_GETSOCKOPT) |
+			  (1 << SO_LISTEN) | (1 << SO_RECV) | (1 << SO_RECVFROM) | (1 << SO_SEND) |
+			  (1 << SO_SENDTO) | (1 << SO_SETSOCKOPT) | (1 << SO_SHUTDOWN) |
+			  (1 << SO_RECVMSG) | (1 << SO_SENDMSG))) {
+		int fd = req->args[1];
+
+		/* These are all socket related and accept a file (socket) descriptor as their
+		   first argument.  In situations where we are incapable of providing back a real
+		   socket, we must here first distinguish if the file descriptor corresponds to a
+		   socket or a stream. */
+#if 0
+		if (it_is_a_socket) {
+#endif
+			/* In this case, we have a real socket from the operating system's
+			   perspective and we can simply pass the arguments to the appropriate
+			   system call. */
+			switch (cmd) {
+			case SO_ACCEPT:
+				/* FIXME: 32/64 conversion */
+				err = sys_accept(fd, (struct sockaddr *) req->args[2],
+						 req->args[3]);
+				break;
+			case SO_BIND:
+				/* FIXME: 32/64 conversion */
+				err = sys_bind(fd, (struct sockaddr *) req->args[2], req->args[3]);
+				break;
+			case SO_CONNECT:
+				/* FIXME: 32/64 conversion */
+				err = sys_connect(fd, (struct sockaddr *) req->args[2],
+						  req->args[3]);
+				break;
+			case SO_GETPEERNAME:
+				/* FIXME: 32/64 conversion */
+				err = sys_getpeername(fd, (struct sockaddr *) req->args[2],
+						      (int *) req->args[3]);
+				break;
+			case SO_GETSOCKNAME:
+				/* FIXME: 32/64 conversion */
+				err = sys_getsockname(fd, (struct sockaddr *) req->args[2],
+						      (int *) req->args[3]);
+				break;
+			case SO_GETSOCKOPT:
+				/* FIXME: 32/64 conversion */
+				err = sys_getsockopt(fd, req->args[2], req->args[3],
+						     (char *) req->args[4], (int *) req->args[5]);
+				break;
+			case SO_LISTEN:
+				/* FIXME: 32/64 conversion */
+				err = sys_listen(fd, req->args[2]);
+				break;
+			case SO_RECV:
+				/* FIXME: 32/64 conversion */
+				err = sys_recv(fd, (void *) req->args[2], req->args[3],
+					       req->args[4]);
+				break;
+			case SO_RECVFROM:
+				/* FIXME: 32/64 conversion */
+				err = sys_recvfrom(fd, (void *) req->args[2], req->args[3],
+						   req->args[4], (struct sockaddr *) req->args[5],
+						   (int *) req->args[6]);
+				break;
+			case SO_SEND:
+				/* FIXME: 32/64 conversion */
+				err = sys_send(fd, (void *) req->args[2], req->args[3],
+					       req->args[4]);
+				break;
+			case SO_SENDTO:
+				/* FIXME: 32/64 conversion */
+				err = sys_sendto(fd, (void *) req->args[2], req->args[3],
+						 req->args[4], (struct sockaddr *) req->args[5],
+						 req->args[6]);
+				break;
+			case SO_SETSOCKOPT:
+				/* FIXME: 32/64 conversion */
+				err = sys_setsockopt(fd, req->args[2], req->args[3],
+						     (char *) req->args[4], req->args[5]);
+				break;
+			case SO_SHUTDOWN:
+				/* FIXME: 32/64 conversion */
+				err = sys_shutdown(fd, req->args[2]);
+				break;
+			case SO_RECVMSG:
+				/* FIXME: 32/64 conversion */
+				err = sys_recvmsg(fd, (struct msghdr *) req->args[2], req->args[3]);
+				break;
+			case SO_SENDMSG:
+				/* FIXME: 32/64 conversion */
+				err = sys_sendmsg(fd, (struct msghdr *) req->args[2], req->args[3]);
+				break;
+			}
+#if 0
+		} else {
+			/* In this case, we do not have a real socket, but have a TPI stream from
+			   the operating system's perspective, and we will directly call the
+			   associated TPI routine. */
+			switch (cmd) {
+			case SO_ACCEPT:
+				/* FIXME: 32/64 conversion */
+				err = tpi_accept(fd, (struct sockaddr *) req->args[2],
+						 req->args[3]);
+				break;
+			case SO_BIND:
+				/* FIXME: 32/64 conversion */
+				err = tpi_bind(fd, (struct sockaddr *) req->args[2], req->args[3]);
+				break;
+			case SO_CONNECT:
+				/* FIXME: 32/64 conversion */
+				err = tpi_connect(fd, (struct sockaddr *) req->args[2],
+						  req->args[3]);
+				break;
+			case SO_GETPEERNAME:
+				/* FIXME: 32/64 conversion */
+				err = tpi_getpeername(fd, (struct sockaddr *) req->args[2],
+						      (int *) req->args[3]);
+				break;
+			case SO_GETSOCKNAME:
+				/* FIXME: 32/64 conversion */
+				err = tpi_getsockname(fd, (struct sockaddr *) req->args[2],
+						      (int *) req->args[3]);
+				break;
+			case SO_GETSOCKOPT:
+				/* FIXME: 32/64 conversion */
+				err = tpi_getsockopt(fd, req->args[2], req->args[3],
+						     (char *) req->args[4], (int *) req->args[5]);
+				break;
+			case SO_LISTEN:
+				/* FIXME: 32/64 conversion */
+				err = tpi_listen(fd, req->args[2]);
+				break;
+			case SO_RECV:
+				/* FIXME: 32/64 conversion */
+				err = tpi_recv(fd, (void *) req->args[2], req->args[3],
+					       req->args[4]);
+				break;
+			case SO_RECVFROM:
+				/* FIXME: 32/64 conversion */
+				err = tpi_recvfrom(fd, (void *) req->args[2], req->args[3],
+						   req->args[4], (struct sockaddr *) req->args[5],
+						   (int *) req->args[6]);
+				break;
+			case SO_SEND:
+				/* FIXME: 32/64 conversion */
+				err = tpi_send(fd, (void *) req->args[2], req->args[3],
+					       req->args[4]);
+				break;
+			case SO_SENDTO:
+				/* FIXME: 32/64 conversion */
+				err = tpi_sendto(fd, (void *) req->args[2], req->args[3],
+						 req->args[4], (struct sockaddr *) req->args[5],
+						 req->args[6]);
+				break;
+			case SO_SETSOCKOPT:
+				/* FIXME: 32/64 conversion */
+				err = tpi_setsockopt(fd, req->args[2], req->args[3],
+						     (char *) req->args[4], req->args[5]);
+				break;
+			case SO_SHUTDOWN:
+				/* FIXME: 32/64 conversion */
+				err = tpi_shutdown(fd, req->args[2]);
+				break;
+			case SO_RECVMSG:
+				/* FIXME: 32/64 conversion */
+				err = tpi_recvmsg(fd, (struct msghdr *) req->args[2], req->args[3]);
+				break;
+			case SO_SENDMSG:
+				/* FIXME: 32/64 conversion */
+				err = tpi_sendmsg(fd, (struct msghdr *) req->args[2], req->args[3]);
+				break;
+			}
+		}
+#endif
+	}
+	if ((1 << cmd) & ((1 << SO_SOCKET) | (1 << SO_SOCKPAIR) | (1 << SO_SELECT) |
+			  (1 << SO_GETIPDOMAIN) | (1 << SO_SETIPDOMAIN) | (1 << SO_ADJTIME) |
+			  (1 << SO_SETREUID) | (1 << SO_SETREGID) | (1 << SO_GETTIME) |
+			  (1 << SO_SETTIME) | (1 << SO_GETITIMER) | (1 << SO_SETITIMER))) {
+		/* These are BSD compatibiltiy functions and are how we create sockets in the first
+		   place.  The BSD compatibility functions all have system calls in Linux, but we
+		   provide them for backward compatibility (to what!?). */
+		switch (cmd) {
+		case SO_SOCKET:
+			/* FIXME: 32/64 conversion */
+			/* XXX: don't think so..., after checking for a stream */
+			err = sys_socket(req->args[1], req->args[2], req->args[3]);
+			break;
+		case SO_SOCKPAIR:
+			/* FIXME: 32/64 conversion */
+			/* XXX: don't think so..., after checking for a stream */
+			err = sys_socketpair(req->args[1], req->args[2], req->args[3],
+					     (int *) req->args[4]);
+			err = -EOPNOTSUPP;
+			break;
+		case SO_SELECT:
+			/* FIXME: 32/64 conversion */
+			err = sys_select(req->args[1], (fd_set *) req->args[2],
+					 (fd_set *) req->args[3], (fd_set *) req->args[4],
+					 (struct timeval *) req->args[5]);
+			break;
+		case SO_GETIPDOMAIN:
+			/* FIXME: 32/64 conversion */
+			todo(("Process SO_GETIPDOMAIN for compatibility.\n"));
+			/* does not exist in Linux, need to use sys_newuname and copy the domainname portion */
+			err = -ENOSYS;
+			break;
+		case SO_SETIPDOMAIN:
+			/* FIXME: 32/64 conversion */
+			err = sys_setdomainname((char *)req->args[1], req->args[2]);
+			break;
+		case SO_ADJTIME:
+			/* FIXME: 32/64 conversion */
+			err = sys_admtimex((struct timex *)req->args[1]);
+			break;
+		case SO_SETREUID:
+			/* FIXME: 32/64 conversion */
+			err = sys_setreuid(req->args[1], req->args[2]);
+			break;
+		case SO_SETREGID:
+			/* FIXME: 32/64 conversion */
+			err = sys_setregid(req->args[1], req->args[2]);
+			break;
+		case SO_GETTIME:
+			/* FIXME: 32/64 conversion */
+			err = sys_gettimeofday((struct timeval *) req->args[1],
+					     (struct timezone *) req->args[2]);
+			break;
+		case SO_SETTIME:
+			/* FIXME: 32/64 conversion */
+			err = sys_settimeofday((struct timeval *) req->args[1],
+					     (struct timezone *) req->args[2]);
+			break;
+		case SO_GETITIMER:
+			/* FIXME: 32/64 conversion */
+			err = sys_getitimer(req->args[1], (struct itimerval *) req->args[2]);
+			break;
+		case SO_SETITIMER:
+			/* FIXME: 32/64 conversion */
+			err = sys_getitimer(req->args[1], (struct itimerval *) req->args[2],
+					  (struct itimerval *) req->args[3]);
+			break;
+		}
+	}
+
+	return (err);
+}
+
+/*
+ *  Put procedure.
+ */
+STATIC streamscall int
+socksys_put(queue_t *q, mblk_t *mp)
+{
+	struct socksys *ss = q->q_ptr;
+	union ioctypes *ioc;
+	int err = 0, rval = 0, count = 0;
+	mblk_t *dp = mp->b_cont;
+	caddr_t req_addr, prot_addr;
+	size_t req_size, prot_size;
+
+	switch (mp->b_datap->db_type) {
+	case M_FLUSH:
+		mp->b_rptr[0] &= ~FLUSHW;
+		if (mp->b_rptr[0] & FLUSHR) {
+			qreply(q, mp);
+			return (0);
+		}
+		break;
+	case M_IOCTL:
+		ioc = (typeof(ioc)) mp->b_rptr;
+#ifdef WITH_32BIT_CONVERSION
+		if (ioc->iocblk.ioc_flag == IOC_ILP32) {
+			/* XXX: following pointer conversion does not work on all architectures */
+			req_addr =
+			    (caddr_t) (unsigned long) (uint32_t) *(unsigned long *) dp->b_rptr;
+			req_size = sizeof(struct socksysreq32);
+		} else
+#endif				/* WITH_32BIT_CONVERSION */
+		{
+			req_addr = (caddr_t) *(unsigned long *) dp->b_rptr;
+			req_size = sizeof(struct socksysreq);
+		}
+		switch (ioc->iocblk.ioc_cmd) {
+		case SIOCHIWAT:
+		case SIOGHIWAT:
+		case SIOCLOWAT:
+		case SIOGLOWAT:
+		case SIOCATMARK:
+		case SIOCGPGRP:
+		case SIOCSPGRP:
+		case SIOCPROTO:
+		case SIOCGETNAME:
+		case SIOCGETPEER:
+		case SIOXPROTO:
+		case SIOCSOCKSYS:
+			err = -EFAULT;
+			if (!dp || dp->b_wptr < dp->b_rptr + cmd_size)
+				goto nak;
+			if (ioc->iocblk.ioc_count == TRANSPARENT) {
+				mp->b_datap->dbtype = M_COPYIN;
+				ioc->copyreq.cq_addr = cmd_addr;
+				ioc->copyreq.cq_size = cmd_size;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) ioc->copyreq.cq_addr;
+				ss->transparent = 1;
+				ss->iocstate = 1;
+				qreply(q, mp);
+				return (0);
+			}
+			ss->transparent = 0;
+			ss->iocstate = 1;
+			goto socksys_state_1;
+		}
+		break;
+	case M_IOCDATA:
+		ioc = (typeof(ioc)) mp->b_rptr;
+		if (ioc->copyresp.cp_rval != (caddr_t) 0) {
+			ss->transparent = 0;
+			ss->iocstate = 0;
+			goto abort;
+		}
+		switch (ioc->copyresp.cp_cmd) {
+		case SIOCHIWAT:
+		case SIOGHIWAT:
+		case SIOCLOWAT:
+		case SIOGLOWAT:
+		case SIOCATMARK:
+		case SIOCGPGRP:
+		case SIOCSPGRP:
+		case SIOCPROTO:
+		case SIOCGETNAME:
+		case SIOCGETPEER:
+		case SIOXPROTO:
+		case SIOCSOCKSYS:
+		{
+			struct socksysreq sr, *req = &sr;
+
+#ifdef WITH_32BIT_CONVERSION
+			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
+				struct socksysreq32 *req32 = (typeof(req32)) dp->b_rptr;
+
+				err = -EFAULT;
+				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(*req32))
+					goto nak;
+				req->args[0] = (unsigned long) (uint32_t) req32->args[0];
+				req->args[1] = (unsigned long) (uint32_t) req32->args[1];
+				req->args[2] = (unsigned long) (uint32_t) req32->args[2];
+				req->args[3] = (unsigned long) (uint32_t) req32->args[3];
+				req->args[4] = (unsigned long) (uint32_t) req32->args[4];
+				req->args[5] = (unsigned long) (uint32_t) req32->args[5];
+				req->args[6] = (unsigned long) (uint32_t) req32->args[6];
+			} else
+#endif				/* WITH_32BIT_CONVERSION */
+			{
+				err = -EFAULT;
+				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(*req))
+					goto nak;
+				bcopy(dp->b_rptr, req, sizeof(*req));
+			}
+			switch (ss->iocstate) {
+			case 1:
+			      socksys_state_1:
+				err = -EINVAL;
+				if (sr.args[0] < SO_ACCEPT || sr.args[0] > SO_SOCKPAIR)
+					goto nak;
+				rval = err = so_socksys(req);
+				if (err < 0)
+					goto nak;
+				count = 0;
+				goto ack;
+			}
+			err = -EIO;
+			goto nak;
+		}
+		}
+		break;
+	}
+      abort:
+	freemsg(mp);
+	return (0);
+      nak:
+	mp->b_datap->db_type = M_IOCNAK;
+	ioc->iocblk.ioc_count = 0;
+	ioc->iocblk.ioc_rval = -1;
+	ioc->iocblk.ioc_error = -err;
+	ss->transparent = 0;
+	ss->iocstate = 0;
+	qreply(q, mp);
+	return (0);
+      ack:
+	mp->b_datap->db_type = M_IOCACK;
+	ioc->iocblk.ioc_count = count;
+	ioc->iocblk.ioc_rval = rval;
+	ioc->iocblk.ioc_error = 0;
+	ss->transparent = 0;
+	ss->iocstate = 0;
+	qreply(q, mp);
+	return (0);
+}
+
+/**
+ * ssys_free_priv - deallocate a private structure for the close routine
+ * @q: read queue of closing Stream
+ */
+STATIC noinline void
+ssys_free_priv(queue_t *q)
+{
+	struct ssys *s;
+
+	ensure(q, return);
+	s = SOCKSYS_PRIV(q);
+	ensure(q, return);
+#if 0
+	strlog(DRV_ID, s->u.dev.cminor, 0, SL_TRACE,
+	       "unlinking private structure: reference count = %d", atomic_read(&s->refcnt));
+#else
+	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME,
+		atomic_read(&s->refcnt)));
+#endif
+	/* remove from master list */
+	if ((*s->prev = s->next))
+		s->next->prev = s->prev;
+	s->next = NULL;
+
+}
+
+/*
+ *  Open and Close
+ */
+#define FIRST_CMINOR	0
+#define  LAST_CMINOR	0
+#define  FREE_CMINOR	1
+
+STATIC int ssys_majors[CMAJORS] = { CMAJOR_0, };
+
+/**
+ * socksys_qopen - SOCKSYS driver STREAMS open routine
+ * @q: read queue of opened Stream
+ * @devp: pointer to device number opened
+ * @oflag: flags to the open call
+ * @sflag: STREAMS flag: DRVOPEN, MODOPEN or CLONEOPEN
+ * @crp: pointer to opener's credentials
+ */
+STATIC streamscall int
+socksys_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+{
+	int mindex = 0;
+	int type = 0;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	struct ssys *s, **sp, = &master.ssys.list;
+	unsigned long flags;
+
+	if (q->q_ptr != NULL) {
+		return (0);	/* already open */
+	}
+	if (sflag == MODOPEN || WR(q)->q_next) {
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
+		return (EIO);
+	}
+	/* Linux Fast-STREAMS always passes internal major device number (module id).  Note also,
+	   however, that strconf-sh attempts to allocate module ids that are identical to the base
+	   major device number anyway. */
+#if defined LIS
+	if (cmajor != CMAJOR_0)
+		return (ENXIO);
+#endif
+#if defined LFS
+	/* Linux Fast-STREAMS always passes internal major device numbers (module ids) */
+	if (cmajor != DRV_ID)
+		return (ENXIO);
+#endif
+	/* sorry, you cannot open by minor device */
+	if (cmajor > LAST_CMINOR) {
+		return (ENXIO);
+	}
+	type = cminor;
+#if 0
+	if (sflag == CLONEOPEN)
+#endif
+		cminor = FREE_CMINOR;
+	write_lock_str2(&master.lock, flags);
+	for (; *sp, sp = &(*sp)->next) {
+		if (cmajor != (*sp)->u.dev.cmajor)
+			break;
+		if (cmajor == (*sp)->u.dev.cmajor) {
+			if (cminor < (*sp)->u.dev.cminor)
+				break;
+			if (cminor == (*sp)->u.dev.cminor) {
+				if (++cminor >= NMINORS) {
+					if (++mindex >= CMAJORS || !(cmajor = ssys_majors[mindex]))
+						break;
+					cminor = 0;	/* start next major */
+				}
+				continue;
+			}
+		}
+	}
+	if (mindex >= CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
+		write_unlock_str2(&master.lock, flags);
+		return (ENXIO);
+	}
+	_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
+	*devp = makedevice(cmajor, cminor);
+	if (!(sp = ssys_alloc_priv(q, sp, type, devp, crp))) {
+		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
+		write_unlock_str2(&master.lock, flags);
+		return (ENOMEM);
+	}
+	write_unlock_str2(&master.lock, flags);
+	qprocson(q);
+	return (0);
+}
+
+/**
+ * socksys_qclose - SOCKSYS driver STREAMS close routine
+ * @q: read queue of closing Stream
+ * @oflag: flags to open call
+ * @crp: pointer to closer's credentials
+ */
+STATIC streamscall int
+socksys_qclose(queue_t *q, int oflag, cred_t *crp)
+{
+	struct ssys *s = SOCKSYS_PRIV(q);
+
+	(void) oflag;
+	(void) crp;
+	(void) s;
+	_printd(("%s: closing character device %d:%d\n", DRV_NAME, s->u.dev.cmajor,
+		 s->u.dev.cminor));
+#if defined LIS
+	/* protect against LiS bugs */
+	if (q->q_ptr == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
+		goto quit;
+	}
+	if (q->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			DRV_NAME, __FUNCTION__);
+		goto skip_pop;
+	}
+#endif				/* defined LIS */
+	goto skip_pop;
+      skip_pop:
+	/* make sure procedures are off */
+	qprocsoff(q);
+	ssys_free_priv(q);	/* free and unlink the structure */
+	goto quit;
+      quit:
+	return (0);
+}
+
+/*
+ *  Private struct reference counting, allocation, deallocation and cache
+ */
+STATIC __unlikely int
+ssys_term_caches(void)
+{
+	if (ssys_priv_cachep != NULL) {
+		if (kmem_cache_destroy(ssys_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy ssys_priv_cachep", __FUNCTION__);
+			return (-EBUSY);
+		}
+		_printd(("%s: destroyed ssys_priv_cachep\n", DRV_NAME));
+		ssys_priv_cachep = NULL;
+	}
+	return (0);
+}
+STATIC __unlikely int
+ssys_init_caches(void)
+{
+	if (ssys_priv_cachep == NULL) {
+		ssys_priv_cachep =
+		    kmem_cache_create("ssys_priv_cachep", sizeof(struct ssys), 0,
+				      SLAB_HWCACHE_ALIGN, NULL, NULL);
+		if (ssys_priv_cachep == NULL) {
+			cmn_err(CE_WARN, "%s: Cannot allocation ssys_priv_cachep", __FUNCTION__);
+			ssys_term_caches();
+			return (-ENOMEM);
+		}
+		_printd(("%s: initialize driver private structure cache\n", DRV_NAME));
+	}
+	return (0);
+}
 
 /*
  *  Registration and initialization
@@ -186,6 +913,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for the SOCKSYS driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 MODULE_PARM(major, "h");
 #else
 MODULE_PARM(major, uint, 0);
@@ -198,7 +926,7 @@ MODULE_PARM_DESC(major, "Device number for the SOCKSYS driver. (0 for allocation
  */
 STATIC struct cdevsw ssys_cdev = {
 	.d_name = DRV_NAME,
-	.d_str = &ssys_info,
+	.d_str = &socksys_info,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
@@ -235,7 +963,7 @@ ssys_register_strdev(major_t major)
 {
 	int err;
 
-	if ((err = lis_register_strdev(major, &ssys_info, UNITS, DRV_NAME)) < 0)
+	if ((err = lis_register_strdev(major, &socksys_info, UNITS, DRV_NAME)) < 0)
 		return (err);
 	return (0);
 }
