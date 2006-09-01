@@ -1,3 +1,9 @@
+2006-09-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/drv_hztomsec.9.man (drv_msectohz): bug fix reported by Neil Fagan
+	* include/sys/streams/ddi.h (drv_msectohz): bug fix reported by Neil Fagan
+	* include/sys/streams/stream.h (rmvb): bug fix reported by Neil Fagan
+
 2006-08-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/todo.texi: added todo file
