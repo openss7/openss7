@@ -163,27 +163,34 @@ copyout(const void *from, void *to, size_t len)
 	return (-EFAULT);
 }
 
-/* FIXME: There are faster ways to do these... */
 __STRUTIL_EXTERN_INLINE unsigned long
 drv_hztousec(unsigned long hz)
 {
+	if (((1000000 / HZ) * HZ) == 1000000)
+		return (hz * (1000000 / HZ));
 	return ((hz * 1000000) / HZ);
 }
 __STRUTIL_EXTERN_INLINE unsigned long
 drv_usectohz(unsigned long usec)
 {
-	return (((usec + 999999) * HZ) / 1000000);
+	if (((1000000 / HZ) * HZ) == 1000000)
+		return (usec / (1000000 / HZ));
+	return ((usec * HZ) / 1000000);
 }
 
 __STRUTIL_EXTERN_INLINE unsigned long
 drv_hztomsec(unsigned long hz)
 {
+	if (((1000 / HZ) * HZ) == 1000)
+		return (hz * (1000 / HZ));
 	return ((hz * 1000) / HZ);
 }
 __STRUTIL_EXTERN_INLINE unsigned long
 drv_msectohz(unsigned long msec)
 {
-	return (((msec + 999) * HZ) / 1000);
+	if (((1000 / HZ) * HZ) == 1000)
+		return (msec / (1000 / HZ));
+	return ((msec * HZ) / 1000);
 }
 
 #undef min
