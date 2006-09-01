@@ -1230,7 +1230,7 @@ __STRUTIL_EXTERN_INLINE mblk_t *
 rmvb(register mblk_t *mp, register mblk_t *bp)
 {
 	mblk_t **mpp;
-	mblk_t *b;
+	mblk_t *b = mp;
 
 	if (likely(bp != NULL)) {
 		for (mpp = &b; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
