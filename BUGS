@@ -31,7 +31,8 @@ YOU HAVE BEEN WARNED.
 
 ---------- Footnotes ----------
 
-(1) See section NO WARRANTY under *Note GNU General Public License::.
+(1) See section NO WARRANTY under `GNU General Public License', in the
+manual.
 
 5.5.2 Known Defects
 -------------------
@@ -59,6 +60,10 @@ development and their resolutions.  This list serves two purposes:
 .....
 
 `(no items)'
+
+For a history of defects for each of the individual subpackages, see the
+`Defect History' section of the `Installation and Reference Manual' for
+the appropriate subpackage.
 
 -----
 

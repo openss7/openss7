@@ -76,7 +76,7 @@ electronic mail, it is not always convenient to download and install the
 
 Therefore, the `OpenSS7 Linux Native SCTP' package provides the
 `send-pr' shell script that can be used for problem reporting.  The
-`send-pr' shell script can invoked directly and is a workalike for the
+`send-pr' shell script can invoked directly and is a work-alike for the
 `GNU' `send-pr' tool.
 
 The `send-pr' tool takes the same flags and can be used in the same
@@ -86,9 +86,9 @@ takes its field information from local databases or from using the
 `query-pr' C-language program to query a remote database, the `send-pr'
 tool has the field database internal to the tool.
 
-Problem reports can be generate using `make', *Note Problem Report
-Targets::.  An example of how simple it is to generate a problem report
-is illustrated in *Note autopr:ex0::.  
+Problem reports can be generate using `make', see `Problem Report
+Targets', in the manual.  An example of how simple it is to generate a
+problem report is illustrated in *Note autopr:ex0::.  
 
      % make pr
      SEND-PR:
@@ -128,11 +128,12 @@ The `OpenSS7 Linux Native SCTP' package also provides a feature for
 automatic problem report generation that meets the problem report
 submission guidelines detailed in the preceding sections.
 
-Whenever a logging makefile target (*note Logging Targets::) is
-invoked, if the primary target fails, the `send-pr' shell script is
-invoked to automatically generate a problem report file suitable for
-the corresponding target (as described above under *note Problem Report
-Guidelines::).  An example is shown in *Note autopr:ex2::.
+Whenever a logging makefile target (see `Logging Targets', in the
+manual) is invoked, if the primary target fails, the `send-pr' shell
+script is invoked to automatically generate a problem report file
+suitable for the corresponding target (as described above under see
+`Problem Report Guidelines', in the manual).  An example is shown in
+*Note autopr:ex2::.
 
      % make compile.log
      ...
@@ -172,10 +173,10 @@ Example 7.7: _Problem Report from Failed Logging Target_
 
 The `OpenSS7 Linux Native SCTP' package installs the `send-pr' script
 and its configuration file `send-pr.config' in `${libexecdir}/sctp'
-along with the validation `testsuite', see *Note Test Suites::.  As
-with the `testsuite', this allows the `send-pr' script to be used for
-problem report generation on an installed system that does not have a
-build directory.
+along with the validation `testsuite', see see `Test Suites', in the
+manual.  As with the `testsuite', this allows the `send-pr' script to
+be used for problem report generation on an installed system that does
+not have a build directory.
 
 An example of invoking the package `testsuite' and then generating a
 problem report for failed cases is shown in *Note Example 7.7:
@@ -225,8 +226,7 @@ Unverified behaviour may contain unknown bugs.
 
 Please remember that there is *NO WARRANTY*.
 
-See also *Note Bugs::, in the manual, or file `BUGS' in the release
-directory.
+See also `Bugs', in the manual, or file `BUGS' in the release directory.
 
 -----
 

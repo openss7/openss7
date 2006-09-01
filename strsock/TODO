@@ -8,14 +8,38 @@ Things to do:
 
    - Testing.  This package is completely untested.
 
-   - The strtty package is currently incomplete.  The purpose of the
-     package was to move STREAMS terminal capabilities outside of the
-     STREAMS release package so as to allow them to be used with both
-     LiS and Linux Fast-STREAMS.  As Linux Fast-STREAMS has already
-     shown superior to LiS in terms of both performance and
-     conformance, it is no longer necessary to keep these packages
-     separate and they can be combined once again (or still) with Linux
-     Fast-STREAMS.
+   - Create a `socksys(4)' `Socket System' "STREAMS" driver.
+
+   - It would be interesting to perform some `Netperf' and `Iperf'
+     performance tests against "STREAMS"-based network drivers
+     supporting `Transport Provider Interface (TPI)' and "Sockets"
+     using this socket system.  Without `sockmod(4)' and `libsocket' it
+     was only possible to use `Netperf' for performance testing, and
+     then only using the XTI tests.
+
+   - Create the `socket(3)' `libsocket' shared library.
+
+   - Create a `sockmod(4)' `Socket Module' "STREAMS" module.
+
+   - Move already written code from the `stacks' or `strss7' directories
+     into the `src' directory.
+
+   - Create a skeleton directory and manual and place `strsock' as a
+     subpackage in the `OpenSS7 Master Package'.
+
+     _*done*_
+
+     You are reading it.
+
+The `strsock' package is currently incomplete.
+
+The purpose of the package was to move "STREAMS" socket capabilities
+outside of the "STREAMS" release package so as to allow them to be used
+with both `LiS' and `Linux Fast-STREAMS'.  As `Linux Fast-STREAMS' has
+already shown superior to `LiS' in terms of both performance and
+conformance, it is no longer necessary to keep these packages separate
+and they can be combined once again (or still) with `Linux
+Fast-STREAMS'.
 
 -----
 

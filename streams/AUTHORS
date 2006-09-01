@@ -11,8 +11,8 @@ The authors of the `OpenSS7 Linux Fast-STREAMS' package include:
 
      - Brian Bidulock <bidulock@openss7.org>
 
-See *Note Author Index::, for a complete listing and cross-index of
-authors to sections of this document.
+See `Author Index', in the manual, for a complete listing and
+cross-index of authors to sections of this document.
 
  Maintainer
 ===========
@@ -23,7 +23,7 @@ The maintainer of the `OpenSS7 Linux Fast-STREAMS' package is:
 
 Please send bug reports to <bugs@openss7.org> using the `send-pr' script
 included in the package, only after reading the `BUGS' file in the
-release, or *Note Problem Reports::, in the manual.
+release, or see `Problem Reports', in the manual.
 
  Web Resources
 ==============
@@ -36,14 +36,14 @@ dedicated to the software packages released by the OpenSS7 Project.
 
 Please send bug reports to <bugs@openss7.org> using the `send-pr'
 script included in the `Linux Fast-STREAMS' package, only after reading
-the `BUGS' file in the release, or *Note Problem Reports::, in the
+the `BUGS' file in the release, or see `Problem Reports', in the
 manual.  You can access the OpenSS7 GNATS database
 (http://www.openss7.org/bugreport.html) directly via the web, however,
-the prefered method for sending new bug reports is via mail with the
+the preferred method for sending new bug reports is via mail with the
 `send-pr' script.
 
- Mailng Lists
-.............
+ Mailing Lists
+..............
 
 The OpenSS7 Project provides a number of general discussion Mailing
 Lists for discussion concerning the `OpenSS7 Linux Fast-STREAMS'
@@ -56,7 +56,7 @@ for subscribers to control their settings.  See
 The mailing lists are as follows:
 
 `openss7'
-     The `openss7' mailing list is for general inquiries, information
+     The `openss7' mailing list is for general enquiries, information
      exchange and announcements regarding the OpenSS7 Project.  This is
      our original mailing list and takes the highest amount of traffic.
 
@@ -64,28 +64,28 @@ The mailing lists are as follows:
      The `openss7-announce' mailing list is for announcements related
      to the OpenSS7 Project.  This list will accept announcements
      posted by subscribers.  Subscribe to this list if you are
-     interested in announcments from the OpenSS7 Project, subscribers
+     interested in announcements from the OpenSS7 Project, subscribers
      and sponsors, related to the OpenSS7 Project or STREAMS, SS7,
      SIGTRAN or SCTP in general.
 
 `openss7-cvs'
      The `openss7-cvs' mailing list is for automatic CVS log reporting.
-     You must get permssion of the owner to subscribe to this list.
+     You must get permission of the owner to subscribe to this list.
      Subscribers are not allowed to post to this list, this is merely
      for distributing notification of changes to the CVS repository.h
 
 `openss7-develop'
-     The `openss7-develop' mailing list is for email echange related to
-     the development projects under the OpenSS7 Project.  This includes
-     development requests, proposals, requests for comment or proposal.
-     Subscribe to this list if you are interested in ongoing
+     The `openss7-develop' mailing list is for email exchange related
+     to the development projects under the OpenSS7 Project.  This
+     includes development requests, proposals, requests for comment or
+     proposal.  Subscribe to this list if you are interested in ongoing
      development details regarding the OpenSS7 Project.
 
 `openss7-test'
-     The `openss7-test' mailing list is for email echange related to
+     The `openss7-test' mailing list is for email exchange related to
      the testing of code under the OpenSS7 Project.  This specifically
-     relates to conformance tsting, verification testing,
-     interoperablity testing and beta testing.  Subscribe to this list
+     relates to conformance testing, verification testing,
+     interoperability testing and beta testing.  Subscribe to this list
      if you are interested in participating in and receiving ongoing
      details of test activities under the OpenSS7 Project.
 
@@ -121,9 +121,9 @@ The mailing lists are as follows:
 To avoid spam being sent to the members of the `OpenSS7' mailing
 list(s), we have blocked mail from non-subscribers.  Please subscribe
 to the mailing list before attempting to post to them.  (Attempts to
-post when unsubscribed get bounced.)
+post when not subscribed get bounced.)
 
-As an additional measure agains spam, subscriber lists for all
+As an additional measure against spam, subscriber lists for all
 `OpenSS7' mailing lists are not accessible to non-subscribers; for most
 lists subscriber  lists are only accessible to the list administrator.
 This keeps your mailing address from being picked off our website by
@@ -146,7 +146,7 @@ to the list, it will bounce to the list administrator.  If you are
 interested in  making your patches, test programs, test results or other
 large attachments available to the members of the mailing list, state
 in the message that you would like them posted and the list
-adminstrator will place them in the mail archives.
+administrator will place them in the mail archives.
 
 -----
 

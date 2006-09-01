@@ -9,15 +9,15 @@ The following is an extract from the manual to assist NexusWare developers:
 6.3.3 Building from the Tar Ball
 --------------------------------
 
-If you have downloaded the tar ball (*note Downloading the Tar Ball::),
-then the following instructions will rebuild the package on your
-system.  (Note that the build process does not required `root'
+If you have downloaded the tar ball (see `Downloading the Tar Ball', in
+the manual), then the following instructions will rebuild the package
+on your system.  (Note that the build process does not required `root'
 privilege.)
 
 6.3.3.1 Native Build
 ....................
 
-Folowing is an example of a native build against the running kernel:
+Following is an example of a native build against the running kernel:
 
      % wget http://www.openss7.org/strxnet-0.9.2.9.rc3.tar.bz2
      % tar -xjvf strxnet-0.9.2.9.rc3.tar.bz2
@@ -76,15 +76,15 @@ operation for these targets.  The following steps describe the process:
           % . SETUP.sh
           % popd
 
-  2. Next download, unpack (*note Downloading the Tar Ball::) and
-     configure (*note Configuring the Tar Ball::) using the provided
-     `configure.nexusware' wrapper for `configure'.  This wrapper
-     simply tells the `configure' script where to find the `NexusWare'
-     sources and which `NexusWare' cross-building tools to use for a
-     cross-compile.(2)
+  2. Next download, unpack (see `Downloading the Tar Ball', in the
+     manual) and configure (see `Configuring the Tar Ball', in the
+     manual) using the provided `configure.nexusware' wrapper for
+     `configure'.  This wrapper simply tells the `configure' script
+     where to find the `NexusWare' sources and which `NexusWare'
+     cross-building tools to use for a cross-compile.(2)
 
-     Any of the normal `configure' script options (*note Configuring
-     the Tar Ball::) can be used on the same line as
+     Any of the normal `configure' script options (see `Configuring the
+     Tar Ball', in the manual) can be used on the same line as
      `./configure.nexusware'.  One of particular interest to embedded
      targets is `--with-k-optimize=size' to attempt to reduce the size
      of the kernel modules.
@@ -94,12 +94,12 @@ operation for these targets.  The following steps describe the process:
      older `NexusWare' releases, `--with-k-release=2.4.25' or
      `--with-k-release=2.6.12' for more current `NexusWare' releases.
 
-  3. Install as normal (*note Installing the Tar Ball::), however, for
-     embedded targets the `install-strip' `automake(1)' target should
-     be used instead of the `install' `automake(1)' target.  The
-     `install-strip' target will strip unnecessary symbols from kernel
-     modules and further reduce the size in the root file system flash
-     image.
+  3. Install as normal (see `Installing the Tar Ball', in the manual),
+     however, for embedded targets the `install-strip' `automake(1)'
+     target should be used instead of the `install' `automake(1)'
+     target.  The `install-strip' target will strip unnecessary symbols
+     from kernel modules and further reduce the size in the root file
+     system flash image.
 
 
 Following is what I use for configuration and installation: (My
@@ -140,9 +140,9 @@ default, it will be necessary to add one or edit your `rc.4' file to `insmod(8)'
 the necessary `strxnet' modules at boot time.
 
 `NexusWare' does not configure its kernels for CONFIG_KMOD, so any
-kernel modules must be loaded by the `rc.4' init script at boot.  On
-more recent `NexusWare' releases, the init scripts will be installed in
-`$NEXUSWARE_PREFIX/etc/rc.d/init.d/' but you must manually edit your
+kernel modules must be loaded by the `rc.4' `init' script at boot.  On
+more recent `NexusWare' releases, the `init' scripts will be installed
+in `$NEXUSWARE_PREFIX/etc/rc.d/init.d/' but you must manually edit your
 `rc.4' script to invoke these scripts.
 
 Once you have completed the necessary `.spec' and `rc.4' file entries,

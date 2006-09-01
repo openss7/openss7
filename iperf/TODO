@@ -8,9 +8,20 @@ Things to do:
 
    - Write a texinfo manual for Iperf.
 
-   - Merge upstream changes into OpenSS7 modified version of Iperf.
+     _*done*_
 
-   - Also modify for lksctp for comparison performance testing.
+     You are reading it.
+
+   - Merge upstream changes from the latest `University of Illinois'
+     release of the `Iperf' package into the `OpenSS7 Modified'
+     version.  It would really like to do this but don't have the time
+     for it right now.  If someone is willing to dive in and give this
+     a try, send me the patches.
+
+   - `Iperf' is capable of performing performance testing on `lksctp' as
+     well.  I would like to modify the `OpenSS7' version of `Iperf' to
+     support both so that performance comparison testing can be done
+     between `lkstcp' (which sucks of course) and `OpenSS7'.
 
 -----
 

@@ -13,6 +13,9 @@ OpenSS7 Linux Native SCTP package.
 This is primarily a maintenance release correcting reported bugs, but
 also includes the latest packaging improvements.
 
+   * Automated release file generation making for vastly improved and
+     timely text documentation present in the release directory.
+
    * Added `--enable-devel' `configure' option for embedded targets.
 
    * Added `send-pr' script for automatic problem report generation.

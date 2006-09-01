@@ -7,26 +7,36 @@ See the end for copying conditions (for this file).
  OpenSS7 NETPERF Utility
 ========================
 
-`OpenSS7 NETPERF Utility' is a general purpose tool for benchmarking
-bandwidth and performance of the `Internet Protocol' suite.  The
-`OpenSS7 NETPERF Utility' package is an `OpenSS7' modified release of
-the `Hewlett-Packard' `netperf' package configured to run with `OpenSS7
-STREAMS SCTP (Stream Control Transmission Protocol)' and the `OpenSS7
-STREAMS XNS, XTI/TLI' and `INET' packages.
+`Netperf' is a general purpose tool for benchmarking bandwidth and
+performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
+OpenSS7 NETPERF Utility' package is an OpenSS7 Project
+(http://www.openss7.org/) release of the of the `Hewlett-Packard'
+`netperf' package configured to run with `OpenSS7 STREAMS SCTP (Stream
+Control Transmission Protocol)' and the `OpenSS7 STREAMS XNS, XTI/TLI'
+and `INET' packages.
 
-This is a version of the `OpenSS7 NETPERF Utility' package released by
-`Hewlett-Packard' modified by the OpenSS7 Project
-(http://www.openss7.org/) for use with `OpenSS7 STREAMS XNS',
-`XTI/TLI', `INET' and `SCTP' packages.  This `OpenSS7' release of the
-package is based on the `Netperf-2.3' release from `Hewlett-Packard'.
+The `OpenSS7 NETPERF Utility' package provide primarily the `netperf(1)'
+and `netserver(8)', C Lanuage programs that ace as `Netperf' client or
+server for testing connections and networking.  The `netserver(8)'
+program is executed on one host acting as a server, and then `netperf(1)'
+is executed on another host acting in client mode.  Characteristics of
+the connection or association can be altered when formed.  Reporting
+formats and sample intervals can also be altered when the connection or
+association is formed.  Users executing `netperf(1)' do not need to
+have shell access to the `netserver(8)' host.
+
+This is a fork of the `Netperf' package released by `Hewlett-Packard'
+modified by the OpenSS7 Project (http://www.openss7.org/) for use with
+`OpenSS7 STREAMS XNS', `XTI/TLI', `INET' and `SCTP' packages.  This
+`OpenSS7' release of the package is based on the `Netperf-2.3' release
+from `Hewlett-Packard'.
 
 Modifications to the package are derived from the `OpenSS7 STREAMS
 XNS', `XTI/TLI', `INET' and `SCTP' implementations and are release
-under the `GNU General Public License (GPL) Version 2'.  The
-NETPERF tool itself is licensed under specific terms by
-`Hewlett-Packard'.  Please see file `LICENSE' for the `Hewlett-Packard'
-`Netperf' copyright notices and licensing restrictions.  The `Netperf'
-tool is
+under the `GNU General Public License (GPL) Version 2'.  The "Netperf"
+tool itself is licensed under specific terms by `Hewlett-Packard'.
+Please see file `LICENSE' for the `Hewlett-Packard' "Netperf" copyright
+notices and licensing restrictions.  The "Netperf" tool is
 
      Copyright (C) 1993, 1994, 1995  Hewlett-Packard Company
       All Rights Reserved
@@ -34,7 +44,7 @@ tool is
 See the `Hewlett-Packard' License in the `LICENSE' file for complete
 details.
 
-Please note that this modified version of the `Netperf' package is not
+Please note that this modified version of the "Netperf" package is not
 endorsed by `Hewlett-Packard' in any way and that neither the original
 copyright holders nor `OpenSS7 Corporation' will take any
 responsibility in it.
@@ -43,30 +53,37 @@ responsibility in it.
 --------
 
 This is the `netperf-2.3.4.rc3' package, released 2006-08-26.  This
-`2.3.4.rc3' release, and the lastest version, can be obtained from the
+`2.3.4.rc3' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
      $> wget http://www.openss7.org/tarballs/netperf-2.3.4.rc3.tar.bz2
+
+The release is available as an `autoconf(1)' tarball, `src.rpm' or
+`dsc', or as a set of binary `rpm's or `deb's.  See the download page
+(http://www.openss7.org/download.html) for the `autoconf(1)' tarballs,
+`src.rpm's or `dsc's.  See the `netperf' package page
+(http://www.openss7.org/netperf_pkg.html) for tarballs, source and
+binary packages.
 
 Please see the `NEWS' file for release notes and history of user
 visible changes for the current version, and the `ChangeLog' file for a
 more detailed history of implementation changes.  The `TODO' file lists
 features not yet implemented and other outstanding items.
 
-Please see the `INSTALL', `INSTALL-netperf' and `README-make' files (or
-the `Installation and Reference Manual') for installation instructions.
-When working from CVS or git, please see the `README-cvs' file.  An
-abbreviated installation procedure that works for most applications
-appears below.
+Please see the `INSTALL', `INSTALL-netperf' and `README-make', files (or
+see `Installation', in the manual) for installation instructions.
+
+When working from `cvs(1)' or `git(1)', please see the `README-cvs',
+file (or see `Downloading from CVS', in the manual).  An abbreviated
+installation procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 2 of
 the `GNU Public License' which can be found in the file `COPYING'.
 Package specific licensing terms (if any) can be found in the file
 `LICENSING'.  Please respect these licensing arrangements.  If you are
 interested in different licensing terms, please contact the copyright
-holder, OpenSS7 Corporation (http://www.openss7.com/), or
-`mailto:bidulock@openss7.org'.
+holder, or OpenSS7 Corporation <sales@openss7.com>.
 
 See `README-alpha' (if it exists) for alpha release information.
 
@@ -83,8 +100,8 @@ Prerequisites for the OpenSS7 NETPERF Utility package are as follows:
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
      compiling out-of-tree kenrel modules.  Most recent `Linux'
      distributions are okay out of the box, but some development
-     packages must be installed.  For more information, see *Note
-     Compatibility::, in the manual.
+     packages must be installed.  For more information, see
+     `Compatibility', in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.  (1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
@@ -129,12 +146,12 @@ necessary to have the correct kernel development package installed.
 For the following distributions, use the following commands:
 
      Ubuntu:  $> apt-get install linux-headers
-     Debain:  $> apt-get install kernel-headers
+     Debian:  $> apt-get install kernel-headers
      Fedora:  $> yum install kernel-devel
 
-You also need the same version of gcc compiple with which the kernel
-was built.  If it is not the default, add `CC=kgcc' on the line after
-`./configure', for example:
+You also need the same version of `gcc(1)' compiler with which the
+kernel was built.  If it is not the default, add `CC=kgcc' on the line
+after `./configure', for example:
 
      $> ../netperf-2.3.4.rc3/configure CC='gcc-3.4'
 
@@ -183,9 +200,9 @@ proceed as follows:
 See `README-make' for additional specialized make targets.
 
 For custom applications, see the `INSTALL' and `INSTALL-netperf' files
-or the `Installation and Reference Manual' as listed below.  If you
-encounter troubles, see the trouble shooting section of the
-`Installation and Reference Manual' before issuing a bug report.
+or the see `Installation', in the manual, as listed below.  If you
+encounter troubles, see `Troubleshooting', in the manual, before
+issuing a bug report.
 
  Brief Installation Instructions
 --------------------------------
@@ -238,19 +255,19 @@ invoking the `check' make target like so:
 
      $> make check
 
-After succesffully checking the package, the package can be installed
+After successfully checking the package, the package can be installed
 by invoking the `install' make target (as root) like so:
 
      $> sudo make install
 
-The testsuites that ship with the package can be invoked after the
+The test suites that ship with the package can be invoked after the
 package has been installed by invoking the `installcheck' target.  This
 target can either be invoked as root, or as a normal user, like so:
 
      $> make installcheck
 
 (Note: you must add the `--enable-autotest' flag to `configure', above
-for the testsuites to be invoked with `make installcheck'.)
+for the test suites to be invoked with `make installcheck'.)
 
 The package can be cleanly removed by invoking the `uninstall' target
 (as root):
@@ -268,8 +285,8 @@ Then the build directory and tarball can be simply removed:
 -----------------------------------
 
 More detailed installation instructions can be found in the
-`Installation and Reference Manual', contained in the distribution in
-`text', `info', `html' and `pdf' formats:
+`Installation', in the manual, contained in the distribution in `text',
+`info', `html' and `pdf' formats:
 
      $> cd ../netperf-2.3.4.rc3
      $> less doc/manual/netperf.txt
@@ -287,7 +304,7 @@ Project' website at:
 
 ---------- Footnotes ----------
 
-(1) *Note GNU/Linux Distributions::, for more information.
+(1) See `GNU/Linux Distributions', in the manual, for more information.
 
 (2) If you are using a Debian release, please make sure to install the
 groff extension package (`groff_ext'), as it contains the `refer' or
@@ -297,9 +314,9 @@ pages.
 (3) Although, at one time, this package supported `LiS', `LiS' is now
 deprecated and unsupported.
 
-(4) Please see *Note Problem Reports::, in the manual, or the file
-`PROBLEMS' in the release directory for more information on filing a
-proper "Problem Report".
+(4) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
+in the release directory for more information on filing a proper
+"Problem Report".
 
 -----
 

@@ -11,8 +11,65 @@ OpenSS7 releases to the original Hewlett-Packard Company releases.
  Major changes for release netperf-2.3.4.rc3
 --------------------------------------------
 
-Added `--enable-devel' `configure' option for embedded targets.  Added
-`send-pr' script for automatic problem report generation.
+Third release candidate.  This is a "maintenance" release candidate.
+This release candidate includes:
+
+   * Automated release file generation making for vastly improved and
+     timely text documentation present in the release directory.
+
+   * Many documentation updates (for all OpenSS7 packages).
+
+   * Includes the changes made to the `strsctp' drivers at the `2006
+     SCTP Interop' at the `University of British Columbia'.  This
+     version was interoperability tested with all implementations
+     present.
+
+   * Provides support for additional `SuSE' distributions on `ix86' as
+     well as `x86_64'.  Added distribution support includes `SLES 9',
+     `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
+
+   * Includes workup of benchmark scripts for SCTP, TCP and UDP.  Added
+     a scls_show option to perform `scls -c' (see `scls(1)') to show
+     "STREAMS" module and driver statistics between test sample points
+     when verbosity is set to 2 and XTI is being used.  This assists
+     with performance testing as it shows the counts accumulated to put
+     and service routinge throughout the "Stream".  It was used in
+     "UDP2" testing of the `strinet' package and will come in handy for
+     the "SCTP" testing.
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
+
+ Major changes for release netperf-2.3.4.rc2
+--------------------------------------------
+
+Second release candidate.  This is a "maintenance" release candidate.
+This release candidate includes:
+
+   * Includes results of performance testing of the new second
+     generation UDP driver (implemented completely in STREAMS instead
+     of using an internal socket).
+
+   * Includes support for SuSE 10.1.
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
+
+ Major changes for release netperf-2.3.4rc1
+-------------------------------------------
+
+First release candidate for Mark Fugate.  This is a "maintenance"
+release candidate.  This release candidate includes:
+
+   * Added `--enable-devel' configure option for embedded targets.
+
+   * Added `send-pr' script for automatic problem report generation.
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
 
  Major changes for release netperf-2.3.3
 ----------------------------------------

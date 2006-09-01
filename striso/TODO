@@ -6,7 +6,30 @@ See the end for copying conditions (for this file).
 
 Things to do:
 
-   - Want to support ISOT, ITOT, LPP, CMOT.
+   - Testing.  This package is completely untested.
+
+   - Create `isot(4)', `itot(4)', `lpp(4)' and `cmot(4)' "STREAMS"
+     modules and drivers.
+
+   - Move already written code from the `stacks' or `strss7' directories
+     into the `src' directory.
+
+   - Create a skeleton directory and manual and place `striso' as a
+     subpackage in the `OpenSS7 Master Package'.
+
+     _*done*_
+
+     You are reading it.
+
+The `striso' package is currently incomplete.
+
+The purpose of the package was to move "STREAMS" ISO networking
+capabilities outside of the "STREAMS" release package so as to allow
+them to be used with both `LiS' and `Linux Fast-STREAMS'.  As `Linux
+Fast-STREAMS' has already shown superior to `LiS' in terms of both
+performance and conformance, it is no longer necessary to keep these
+packages separate and they can be combined once again (or still) with
+`Linux Fast-STREAMS'.
 
 -----
 

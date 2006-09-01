@@ -15,7 +15,7 @@ can download release, mid-release or release candidate versions of the
 `LiS' package from the project CVS archive.
 
 The Linux STREAMS (LiS) package is located in the `LiS' module of
-`/var/cvs'.  For release tag information, see *Note Releases::.
+`/var/cvs'.  For release tag information, see `Releases', in the manual.
 
 To access the archive from the project CVS pserver, use the following
 commands to check out a version from the archive:
@@ -74,7 +74,7 @@ some server-style installations (e.g. `Ubuntu'-server or `SLES 9') will
 not and they must be installed separately.
 
 For uncooked manual pages, the entire `groff(1)' package is required on
-`Debian' and `Ubuntu' systems (the base package does not include grefer
+`Debian' and `Ubuntu' systems (the base package does not include `grefer(1)'
 which is used extensively by uncooked manual pages).  The following
 will get what you need:
 
@@ -87,7 +87,7 @@ and others.
 
 If you wish to package `rpms' on an `rpm(1)' system, or `debs' on a `dpkg(1)'
 system, you will need the appropriate tool chain.  Systems based on `rpm(1)'
-typically have the necessary toolchain available, however, `dpkg(1)'
+typically have the necessary tool chain available, however, `dpkg(1)'
 systems do not.  The following on a `Debian' or `Ubuntu' system will
 get what you need:
 
@@ -113,14 +113,14 @@ may need to perform something like the following:
 
 After reconfiguring the directory, the package can then be configured
 and built using the same instructions as are used for the Tar Ball, see
-*Note Configuring the Tar Ball::, and *Note Building from the Tar
-Ball::.
+`Configuring the Tar Ball', in the manual, and `Building from the Tar
+Ball', in the manual.
 
 Do note, however, that `make(1)' will rebuild the documentation that is
 normally released with the package.  Additional tools may be necessary
 for building the documentation.  To avoid building and installing the
 documentation, use the `--disable-devel' option to configure described
-in *Note Configuring the Tar Ball::.
+in `Configuring the Tar Ball', in the manual.
 
 When configuring the package in a working directory and while working a
 change-compile-test cycle that involves configuration macros or

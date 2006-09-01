@@ -13,6 +13,19 @@ OpenSS7 INET Networking package.
 This release is a maintenance release.  It provides the following
 enhancements and fixes:
 
+   * Automated release file generation making for vastly improved and
+     timely text documentation present in the release directory.
+
+   * Dropped support for `LiS'.
+
+   * Package will now support extended ranges of minor devices on 2.6
+     kernels under `Linux Fast-STREAMS' only.
+
+   * This release candidate provides support for additional SuSE
+     distributions on ix86 as well as x86_64.  Added distribution
+     support includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE
+     10.1.
+
    * Added `--enable-devel' `configure' option for embedded targets.
 
    * Added `send-pr' script for automatic problem report generation.

@@ -6,25 +6,36 @@ See the end for copying conditions (for this file).
 
 Things to do:
 
-   - Merge in upstream changes into the OpenSS7 Modified version.
+   - Merge in upstream changes from the latest `Hewlett-Packard'
+     release of the `Netperf' package into the `OpenSS7 Modified'
+     version.  I would really like to do this but don't have the time
+     for it right now.  If someone is willing to dive in and give this
+     a try, send me the patches.
 
-   - Get the OpenSS7 Modified version working also with Linux Native
-     Sockets SCTP in addition to the current STREAMS SCTP XTI support.
-     This would not only allow Netperf to be used successfully with
-     OpenSS7 Linux Native SCTP, but it would also comparison tests
-     between STREAMS an Sockets versions.  This is something that I
-     would really like to do.  Since Linux Fast-STREAMS STREAMS-based
-     pipes beat FC4 Native pipes on 2.6.14 in a performance test, it
-     would be interesting to see whether the STREAMS version can
-     outpace the Sockets version.  This would be an answer to the time
-     old question as to whether Sockets or STREAMS is faster.
+   - `Netperf' is capable of performing performance testing on `lksctp'
+     as well.  I would like to modify the `OpenSS7' version of `Netperf'
+     to support both so that performance comparison testing can be done
+     between `lkstcp' (which sucks of course) and `OpenSS7 Linux Natve
+     Sockets' version.
 
-   - Redo performance tests for strxnet/strinet package using recent
-     release of OpenSS7 Modified Netperf.
+   - Get the `OpenSS7 NETPERF Utility' version working also with
+     `OpenSS7 Linux Native Sockets SCTP' in addition to the current
+     `STREAMS SCTP XTI' support.  This would not only allow `Netperf'
+     to be used successfully with `OpenSS7 Linux Native SCTP', but it
+     would also comparison tests between "STREAMS" and "Sockets"
+     versions.  This is something that I would really like to do.  As
+     `Linux Fast-STREAMS' "STREAMS"-based pipes beat FC4 Native pipes
+     on 2.6.14 in a performance test, it would be interesting to see
+     whether the "STREAMS" version can outpace the "Sockets" version.
+     This would be an answer to the time old question as to whether
+     "Sockets" or "STREAMS" is faster.
+
+   * Redo performance tests for `strxnet'/`strinet' package using
+     recent release of `OpenSS7 NETPERF Utility'.
 
      _*done*_
 
-   - Perform x86_64 HT SMP testing.
+   * Perform x86_64 HT SMP testing.
 
      _*done*_
 

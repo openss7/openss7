@@ -12,15 +12,22 @@ The sections that follow provide information on OpenSS7 releases of the
 
 Third release candidate.
 
-This release candidate provides support for additional `SuSE'
-distributions on `ix86' as well as `x86_64'.  Added distribution
-support includes `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE
-10.1'.
+   * Automated release file generation making for vastly improved and
+     timely text documentation present in the release directory.
 
-This release candidate includes the changes made to the strsctp drivers
-at the `2006 SCTP Interop' at the `University of British Columbia'.
-This version was interoperability tested with all implementations
-present.
+   * Package will now support extended ranges of minor devices on 2.6
+     kernels.  `LiS' cannot support this feature but has been dropped
+     with this release.
+
+   * This release candidate provides support for additional `SuSE'
+     distributions on `ix86' as well as `x86_64'.  Added distribution
+     support includes `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10',
+     `SuSE 10.1'.
+
+   * This release candidate includes the changes made to the strsctp
+     drivers at the `2006 SCTP Interop' at the `University of British
+     Columbia'.  This version was interoperability tested with all
+     implementations present.
 
 This release is an internal release candidate and was not publicly
 released.
@@ -126,10 +133,9 @@ This was an internal alpha test release and was not released publicly.
  Initial release streams-0.7a-1
 -------------------------------
 
-This is the initial release of the Linux Fast-STREAMS package for
-Linux.  This is intended as a high-performance, production replacement
-for `Linux STREAMS (LiS)'.  Linux Fast-STREAMS has the following
-features:
+This is the initial release of the Linux Fast-STREAMS package for Linux.
+This is intended as a high-performance, production replacement for
+`Linux STREAMS (LiS)'.  Linux Fast-STREAMS has the following features:
 
    - optimized for Linux kernels.
 

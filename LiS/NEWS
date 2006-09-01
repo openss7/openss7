@@ -7,11 +7,93 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 Linux STREAMS (LiS) package.
 
+ Major changes for release LiS-2.18.4
+-------------------------------------
+
+This would have been a maintenance release; however, LiS is no longer
+distributed.
+
  Major changes for release LiS-2.18.4.rc3
 -----------------------------------------
 
-Added `--enable-devel' `configure' option for embedded targets.  Added
-`send-pr' script for automatic problem report generation.
+Third release candidiate.
+
+   * Automated release file generation making for vastly improved and
+     timely text documentation present in the release directory.
+
+   * Many documentation updates for all OpenSS7 packages.
+
+   * This release candidate includes the changes made to the strsctp
+     drivers at the `2006 SCTP Interop' at the `University of British
+     Columbia'.  This version was interoperability tested with all
+     implementations present.
+
+   * This release candidate provides support for additional `SuSE'
+     distributions on `ix86' as well as `x86_64'.  Added distribution
+     support includes `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10',
+     `SuSE 10.1'.
+
+   * Better detection of SUSE distributions, release numbers and SLES
+     distributions.
+
+   * Optimized compilation is now available also for user level
+     programs in addition to kernel programs.  Added new
+     `--with-optimize' option to `configure' to accomplish this.
+
+   * Improved compiler flag generation and optimizations for recent
+     `gcc' compilers and some idiosynchratic behaviour for some
+     distributions (primarily SUSE):
+
+     - Remove `-fno-reorder-blocks' and `-fno-reorder-functions' options
+       added by some recent 2.6 `Makefile's for `x86_64' architecture:
+       it impedes performance optimizations.
+     - Remove `-ffunction-sections' option added by some rececent 2.6
+       `Makefile's for `x86_64' architecture: this is an insane option
+       and should never have been used.
+     - Add `-ffreestanding' that some older 2.6 `Makefile's (such as
+       that with `SLES 9 2.6.5' kernel) neglect to add to the `gcc'
+       command line.
+     - `SLES 10' expands the directory before `autoconf.h' on the `gcc'
+       command line for some reason.  `configure' script watches out for
+       this now.
+
+   * Updated `init' scripts for proper addition and removal of modules.
+
+   * Start assigning majors at major device number 231 instead of major
+     device number 230.  Assign major device number 230 explicitly to
+     the clone device.
+
+   * `Linux Fast-STREAMS' now supports expanded addressable minor device
+     numbers, permitting 2^16 addressable minor devices per major
+     device number on 2.6 kernels: unfortunately, LiS cannot support
+     this change.
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
+
+ Major changes for release LiS-2.18.4.rc2
+-----------------------------------------
+
+Second release candidiate.
+
+   * Added `--enable-devel' `configure' option for embedded targets.
+
+   * Added `send-pr' script for automatic problem report generation.
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
+
+ Major changes for release LiS-2.18.4rc1
+----------------------------------------
+
+First release candidiate.
+
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
 
  Major changes for release LiS-2.18.3
 -------------------------------------
@@ -26,9 +108,9 @@ mailing list.  Builds on FC4 2.6.15 kernel and with gcc 4.0.2.
 Added in many of Paul's 64-bit corrections.
 
 The `Linux STREAMS (LiS) 2.18.3' is still largely unusable on 64-bit or
-SMP kernels.  Linux STREAMS (LiS) package is deprecated.  Do not use
-it.  The package contains many unresovled bugs. Use `Linux
-Fast-STREAMS' instead.
+SMP kernels.  Linux STREAMS (LiS) package is deprecated.  Do not use it.
+The package contains many unresovled bugs. Use `Linux Fast-STREAMS'
+instead.
 
  Major changes for release LiS-2.18.2
 -------------------------------------
@@ -37,9 +119,9 @@ Cross-build support for newer `NexusWare' releases.  Build support for
 (recent FC4) 2.6.14 kernel.  Corrected installation support (init
 scripts) for SuSE 9.2.
 
-Binary compatibility backwards compatible to GCOM 2.18.0 included.
-This includes exported symbols changed to not generate versioned
-symbols on 2.4 kernels.  Also, exported symbols are always compiled
+Binary compatibility backwards compatible to GCOM 2.18.0 included.  This
+includes exported symbols changed to not generate versioned symbols on
+2.4 kernels.  Also, exported symbols are always compiled
 `attribute((regparm(0)))' on regparm capable architectures, regardless
 of the kernel version or compile options.(1) For actual binary
 compatibilty packaging, see the `strcompat' package.
@@ -181,11 +263,10 @@ statements.
 Added HP patches.  There are a couple of questionable components in the
 HP patches that I reversed.  They include;
 
-   * modification of `lis_msgsize' to `lis_msgdsize'.  This would
-     change the calculation of queue counts.  Queue counts aren't
-     `M_DATA' counts, they are "data" message counts.  LiS probably
-     doesn't have this the right way, but `lis_msgdsize' is not correct
-     either.
+   * modification of `lis_msgsize' to `lis_msgdsize'.  This would change
+     the calculation of queue counts.  Queue counts aren't `M_DATA'
+     counts, they are "data" message counts.  LiS probably doesn't have
+     this the right way, but `lis_msgdsize' is not correct either.
 
    * addition of `qi_mstat->ms_pcnt' increment on `lis_safe_putmsg'.
      Same for `ms_scnt', `ms_ocnt', `ms_ccnt'.  STREAMS is not supposed
@@ -283,10 +364,10 @@ were missing in -10 release.
 -----------------------------------------
 
 Added support for cooked manpages both for non-rpm systems and for rpm
-systems.  It is still better to leave manpages uncooked for rpm
-releases because they are much smaller that way.  Give the
--with-cooked-manpages flag to configure if you want cooked manpages.
-You still need grefer on the build system.
+systems.  It is still better to leave manpages uncooked for rpm releases
+because they are much smaller that way.  Give the -with-cooked-manpages
+flag to configure if you want cooked manpages.  You still need grefer
+on the build system.
 
 Updates to all manual pages in man7, and some others (xti) in man3.
 Removed unused .macros and .refs files.
@@ -323,11 +404,11 @@ converted to multiple child processes.  A number of fixes to SMP lock
 behavior and M_FLUSH have beend added as reported by Dave Grothe.
 Corrected all level and TBADOPT behavior on negotiation.
 
-Although this driver is now closer to expected behavior, it has not
-been tested for XNS 5.2 compliance, nor will it be until someone has
-the time to extend the test programs to handle all test cases in a
-similar manner as was done for the library.  Your mileage many vary.
-Remember, there is no warranty.
+Although this driver is now closer to expected behavior, it has not been
+tested for XNS 5.2 compliance, nor will it be until someone has the
+time to extend the test programs to handle all test cases in a similar
+manner as was done for the library.  Your mileage many vary.  Remember,
+there is no warranty.
 
  Major changes for release LiS-2.16.18-9
 ----------------------------------------
@@ -341,8 +422,8 @@ provided.
  Major changes for release LiS-2.16.18-8
 ----------------------------------------
 
-Changes to permit better builds on recent RedHat kernels, and
-especially kernel-2.4.20-30.9.
+Changes to permit better builds on recent RedHat kernels, and especially
+kernel-2.4.20-30.9.
 
  Major changes for release LiS-2.16.18-7
 ----------------------------------------
@@ -390,10 +471,10 @@ rpm release to the lastest LiS-2.16 release level.
 ------------------------------
 
 This OpenSS7 release of LiS-2.16.16 includes autoconf for
-configuration, complete manual pages and documentation, and packaging
-in source and binary RPMs for ease and repeatability of installation.
-The package also builds and installs properly versioned LiS shared
-object libraries.
+configuration, complete manual pages and documentation, and packaging in
+source and binary RPMs for ease and repeatability of installation.  The
+package also builds and installs properly versioned LiS shared object
+libraries.
 
 Before the OpenSS7 release of LiS, it was necessary to have a
 significant working knowledge of the Linux kernel, kernel source,
@@ -433,8 +514,8 @@ Following are the new features of the OpenSS7 release of LiS:
 
      Use of the RPM mechanism for release permits add-on packages to
      ensure that they have sufficient level of support and verionsing
-     of the LiS load during their build and installation process.  It is
-     now also possible to ensure that add on binaries are compatible
+     of the LiS load during their build and installation process.  It
+     is now also possible to ensure that add on binaries are compatible
      with a loaded LiS during installation.
 
    * includes a complete set of kernel programmer manual pages for all

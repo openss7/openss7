@@ -27,30 +27,37 @@ well.
 --------
 
 This is the `strbcm-0.9.2.2.rc3' package, released 2006-08-26.  This
-`0.9.2.2.rc3' release, and the lastest version, can be obtained from the
+`0.9.2.2.rc3' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
      $> wget http://www.openss7.org/tarballs/strbcm-0.9.2.2.rc3.tar.bz2
+
+The release is available as an `autoconf(1)' tarball, `src.rpm' or
+`dsc', or as a set of binary `rpm's or `deb's.  See the download page
+(http://www.openss7.org/download.html) for the `autoconf(1)' tarballs,
+`src.rpm's or `dsc's.  See the `strbcm' package page
+(http://www.openss7.org/strbcm_pkg.html) for tarballs, source and
+binary packages.
 
 Please see the `NEWS' file for release notes and history of user
 visible changes for the current version, and the `ChangeLog' file for a
 more detailed history of implementation changes.  The `TODO' file lists
 features not yet implemented and other outstanding items.
 
-Please see the `INSTALL', `INSTALL-strbcm' and `README-make' files (or
-the `Installation and Reference Manual') for installation instructions.
-When working from CVS or git, please see the `README-cvs' file.  An
-abbreviated installation procedure that works for most applications
-appears below.
+Please see the `INSTALL', `INSTALL-strbcm' and `README-make', files (or
+see `Installation', in the manual) for installation instructions.
+
+When working from `cvs(1)' or `git(1)', please see the `README-cvs',
+file (or see `Downloading from CVS', in the manual).  An abbreviated
+installation procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 2 of
 the `GNU Public License' which can be found in the file `COPYING'.
 Package specific licensing terms (if any) can be found in the file
 `LICENSING'.  Please respect these licensing arrangements.  If you are
 interested in different licensing terms, please contact the copyright
-holder, OpenSS7 Corporation (http://www.openss7.com/), or
-`mailto:bidulock@openss7.org'.
+holder, or OpenSS7 Corporation <sales@openss7.com>.
 
 See `README-alpha' (if it exists) for alpha release information.
 
@@ -68,8 +75,8 @@ package are as follows:
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
      compiling out-of-tree kenrel modules.  Most recent `Linux'
      distributions are okay out of the box, but some development
-     packages must be installed.  For more information, see *Note
-     Compatibility::, in the manual.
+     packages must be installed.  For more information, see
+     `Compatibility', in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.  (1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
@@ -99,12 +106,12 @@ necessary to have the correct kernel development package installed.
 For the following distributions, use the following commands:
 
      Ubuntu:  $> apt-get install linux-headers
-     Debain:  $> apt-get install kernel-headers
+     Debian:  $> apt-get install kernel-headers
      Fedora:  $> yum install kernel-devel
 
-You also need the same version of gcc compiple with which the kernel
-was built.  If it is not the default, add `CC=kgcc' on the line after
-`./configure', for example:
+You also need the same version of `gcc(1)' compiler with which the
+kernel was built.  If it is not the default, add `CC=kgcc' on the line
+after `./configure', for example:
 
      $> ../strbcm-0.9.2.2.rc3/configure CC='gcc-3.4'
 
@@ -153,9 +160,9 @@ proceed as follows:
 See `README-make' for additional specialized make targets.
 
 For custom applications, see the `INSTALL' and `INSTALL-strbcm' files
-or the `Installation and Reference Manual' as listed below.  If you
-encounter troubles, see the trouble shooting section of the
-`Installation and Reference Manual' before issuing a bug report.
+or the see `Installation', in the manual, as listed below.  If you
+encounter troubles, see `Troubleshooting', in the manual, before
+issuing a bug report.
 
  Brief Installation Instructions
 --------------------------------
@@ -187,9 +194,9 @@ special options to the `configure' script.  For general options to the
 
      $> less ../strbcm-0.9.2.2.rc3/INSTALL
 
-For specific options to the `configure' script, see the
-`INSTALL-strbcm' file in the distribution, or simply execute the
-configure script with the `--help' option like so:
+For specific options to the `configure' script, see the `INSTALL-strbcm'
+file in the distribution, or simply execute the configure script with
+the `--help' option like so:
 
      $> ../strbcm-0.9.2.2.rc3/configure --help
 
@@ -208,19 +215,19 @@ invoking the `check' make target like so:
 
      $> make check
 
-After succesffully checking the package, the package can be installed
+After successfully checking the package, the package can be installed
 by invoking the `install' make target (as root) like so:
 
      $> sudo make install
 
-The testsuites that ship with the package can be invoked after the
+The test suites that ship with the package can be invoked after the
 package has been installed by invoking the `installcheck' target.  This
 target can either be invoked as root, or as a normal user, like so:
 
      $> make installcheck
 
 (Note: you must add the `--enable-autotest' flag to `configure', above
-for the testsuites to be invoked with `make installcheck'.)
+for the test suites to be invoked with `make installcheck'.)
 
 The package can be cleanly removed by invoking the `uninstall' target
 (as root):
@@ -238,8 +245,8 @@ Then the build directory and tarball can be simply removed:
 -----------------------------------
 
 More detailed installation instructions can be found in the
-`Installation and Reference Manual', contained in the distribution in
-`text', `info', `html' and `pdf' formats:
+`Installation', in the manual, contained in the distribution in `text',
+`info', `html' and `pdf' formats:
 
      $> cd ../strbcm-0.9.2.2.rc3
      $> less doc/manual/strbcm.txt
@@ -257,7 +264,7 @@ Project' website at:
 
 ---------- Footnotes ----------
 
-(1) *Note GNU/Linux Distributions::, for more information.
+(1) See `GNU/Linux Distributions', in the manual, for more information.
 
 (2) If you are using a Debian release, please make sure to install the
 groff extension package (`groff_ext'), as it contains the `refer' or
@@ -267,9 +274,9 @@ pages.
 (3) Although, at one time, this package supported `LiS', `LiS' is now
 deprecated and unsupported.
 
-(4) Please see *Note Problem Reports::, in the manual, or the file
-`PROBLEMS' in the release directory for more information on filing a
-proper "Problem Report".
+(4) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
+in the release directory for more information on filing a proper
+"Problem Report".
 
 -----
 

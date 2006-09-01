@@ -11,37 +11,64 @@ OpenSS7 releases to the original `University of Illinois' releases.
  Major changes for release iperf-2.0.5.rc3
 ------------------------------------------
 
-Third release candidate.
+Third release candidate.  This is a "maintenance" release candidate.
+This release candidate includes:
 
-This release candidate provides support for additional SuSE
-distributions on ix86 as well as x86_64.  Added distribution support
-includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+   * Automated release file generation making for vastly improved and
+     timely text documentation present in the release directory.
 
-This release candidate includes the changes made to the strsctp drivers
-at the 2006 SCTP Interop at the University of British Columbia.  This
-version was interoperability tested with all implementations present.
+   * Many documentation updates for all OpenSS7 packages.
+
+   * Changes made to the strsctp drivers at the `2006 SCTP Interop' at
+     the `University of British Columbia'.  This version was
+     interoperability tested with all implementations present.
+
+   * Support for additional `SuSE' distributions on `ix86' as well as
+     `x86_64'.  Added distribution support includes `SLES 9', `SLES 9
+     SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
+
+   * Better detection of SUSE distributions, release numbers and SLES
+     distributions.
+
+   * Optimized compilation for user level programs.  New
+     `--with-optimize' option to `configure'.
+
+   * Now includes an `Installation and Reference Manual' (you are
+     reading it).
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
 
  Major changes for release iperf-2.0.5.rc2
 ------------------------------------------
 
-Second release candidate.
+Second release candidate.  This is a "maintenance" release candidate.
+This release candidate includes:
 
-This release candidate also contains the results of performance testing
-of the new second generation UDP driver (implemented completely in
-STREAMS instead of using an internal socket).
+   * Results of performance testing of the new second generation UDP
+     driver (implemented completely in STREAMS instead of using an
+     internal socket).
 
-This release candidate also contains support for SuSE 10.1.
+   * Support for SuSE 10.1.
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
 
  Major changes for release iperf-2.0.5rc1
 -----------------------------------------
 
-Release candidate for Mark Fugate.
+Release candidate for Mark Fugate.  This is a "maintenance" release
+candidate.  This release candidate includes:
 
- Major changes for release iperf-2.0.5
---------------------------------------
+   * Added `--enable-devel' configure option for embedded targets.
 
-Added -enable-devel configure option for embedded targets.  Added
-send-pr script for automatic problem report generation.
+   * Added `send-pr' script for automatic problem report generation.
+
+This was an internal alpha test release candidate and was not released
+publicly.  This release was only available to subscribers to and
+sponsors of the OpenSS7 Project.
 
  Major changes for release iperf-2.0.4
 --------------------------------------
