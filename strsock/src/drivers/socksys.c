@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/01 08:55:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: socksys.c,v $
+ Revision 0.9.2.1  2006/09/01 08:55:42  brian
+ - added headers and working up code
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:42 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:42 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -99,7 +102,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:42 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

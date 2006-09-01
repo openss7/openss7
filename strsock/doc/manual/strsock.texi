@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strsock.texi,v 0.9.2.6 2006/08/29 11:44:05 brian Exp $
+% @(#) $Id: strsock.texi,v 0.9.2.7 2006/09/01 08:55:40 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/29 11:44:05 $ by $Author: brian $
+% Last Modified $Date: 2006/09/01 08:55:40 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -410,6 +410,9 @@ package.
 @smallexample
 
 $Log: strsock.texi,v $
+Revision 0.9.2.7  2006/09/01 08:55:40  brian
+- added headers and working up code
+
 Revision 0.9.2.6  2006/08/29 11:44:05  brian
 - added manual pages, working up docs
 

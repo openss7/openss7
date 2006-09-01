@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: socksys.h,v 0.9.2.1 2006/09/01 08:55:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/01 08:55:45 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SOCKSYS_H__
 #define __SYS_SOCKSYS_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: socksys.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 struct socksysreq {
 	long args[7];

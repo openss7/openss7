@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/01 08:55:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: socket.c,v $
+ Revision 0.9.2.1  2006/09/01 08:55:47  brian
+ - added headers and working up code
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT

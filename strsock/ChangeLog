@@ -1,3 +1,17 @@
+2006-09-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/strsock.texi: spelling
+	* src/drivers/socksys.c: added file
+	* src/include/Makefile.am: added headers
+	* src/include/sockmod.h: added file
+	* src/include/socksys.h: added file
+	* src/include/sys/sockmod.h: added file
+	* src/include/sys/socksys.h: added file
+	* src/include/sys/strsock/config.h.in: updated headers
+	* src/include/sys/strsock/version.h.in: updated headers
+	* src/lib/socket.c: added file
+	* src/modules/sockmod.c: added file
+
 2006-08-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: added manual pages
