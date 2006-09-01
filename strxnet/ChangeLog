@@ -1,3 +1,16 @@
+2006-09-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/ticlts.h: updated headers
+	* src/include/ticots.h: updated headers
+	* src/include/ticotsord.h: updated headers
+	* src/include/tihdr.h: updated headers
+	* src/include/timod.h: updated headers
+	* src/include/tirdwr.h: updated headers
+	* src/include/tiuser.h: updated headers
+	* src/include/xti.h: updated headers
+	* src/include/xti_inet.h: updated headers
+	* src/modules/timod.c: correction from inspection
+
 2006-08-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/todo.texi: added todo file
