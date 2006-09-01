@@ -218,12 +218,17 @@ functions and with optimization these calculations will be inline.
 .BR drv_usectohz ()
 and
 .BR drv_msectohz ()
-always round up to the next highest integer tick value.  This ensures that,
-when converting a value less than a tick, the result will always be 1 tick.
-This makes these functions safe for use with
+always truncate to the next lowest integer tick value.  This means that,
+when converting a value less than a tick, the result will always be 0 ticks.
+This makes these functions unsafe for use directly with
 .BR timeout (9)
 and
 .BR qtimeout (9).
+The caller should test whether the result is zero before passing it to
+.BR timeout (9)
+or
+.BR qtimeout (9),
+unless it is acceptable to cause a possibly immediate timeout callback.
 .PP
 Care should be taken with the
 .BR drv_hztousec ()
@@ -237,7 +242,8 @@ or retrieval of
 .BR lbolt (9)
 with
 .BR drv_hztousec ()
-instead of converting each value and then taking the difference.
+instead of converting each value (possibly causing an overflow on each) and
+then taking the difference.
 .\"
 .\"
 .SH "SEE ALSO"
