@@ -104,9 +104,10 @@ AC_ARG_VAR([LD], [Linker loader command])
 AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-dnl AM_GNU_GETTEXT_VERSION(0.14.1)
+AM_GNU_GETTEXT_VERSION(0.14.5)
 
 dnl
 dnl Checks for libraries.
@@ -127,29 +128,73 @@ AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h stdlib.h string.h sys/ioctl.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h
+		  fcntl.h
+		  libintl.h
+		  locale.h
+		  stddef.h
+		  stdlib.h
+		  string.h
+		  sys/ioctl.h
+		  sys/socket.h
+		  sys/time.h
+		  unistd.h
+		  values.h])
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
 dnl
+AC_HEADER_STAT
+AC_HEADER_STDBOOL
 AC_C_CONST
+AC_TYPE_UID_T
 AC_C_INLINE
+AC_TYPE_MODE_T
+AC_TYPE_PID_T
 AC_TYPE_SIZE_T
+AC_CHECK_MEMBERS([struct stat.st_blksize])
+AC_STRUCT_ST_BLOCKS
+AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_HEADER_TIME
+AC_STRUCT_TM
 AC_C_VOLATILE
+AC_CHECK_TYPES([ptrdiff_t])
 
 dnl
 dnl Checks for library functions.
 dnl
+AM_GNU_GETTEXT
+AC_FUNC_ERROR_AT_LINE
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
+AC_FUNC_LSTAT
+AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_MALLOC fi
 AC_FUNC_MEMCMP
+AC_FUNC_MMAP
+AC_FUNC_REALLOC
+AC_FUNC_SELECT_ARGTYPES
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_SETPGRP fi
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([alarm gettimeofday inet_ntoa memset strtol strtoul])
+AC_FUNC_STAT
+AC_FUNC_STRNLEN
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([alarm
+		bzero
+		gettimeofday
+		inet_ntoa
+		memset
+		strerror
+		strtol
+		strtoul])
 
 AC_SOCK
 
 AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
+		 intl/Makefile
+		 po/Makefile.in
+		 m4/Makefile
 		 src/include/Makefile
 		 src/Makefile
 		 doc/Makefile

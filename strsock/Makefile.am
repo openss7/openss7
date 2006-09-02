@@ -240,6 +240,13 @@ if RPM_BUILD_USER
 
 SUBDIRS = src . tests
 
+if PKG_BUILD_ARCH
+SUBDIRS += intl m4 po
+CLEANFILES += po/stamp-po
+endif
+
+SUBDIRS += . tests
+
 if DEVELOPMENT
 SUBDIRS += doc
 endif

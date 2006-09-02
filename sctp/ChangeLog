@@ -1,6 +1,7 @@
 2006-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: missing bugs.texi from release
+	* am/release.am: changes to pass distcheck
 
 2006-08-26  Brian Bidulock  <bidulock@openss7.org>
 

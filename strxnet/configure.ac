@@ -99,7 +99,7 @@ AC_PROG_MAKE_SET
 AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION(0.14.1)
+AM_GNU_GETTEXT_VERSION(0.14.5)
 
 dnl
 dnl Checks for libraries.
@@ -120,7 +120,19 @@ AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h libintl.h locale.h netinet/in.h stddef.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h values.h])
+AC_CHECK_HEADERS([arpa/inet.h
+		  fcntl.h
+		  libintl.h
+		  locale.h
+		  netinet/in.h
+		  stddef.h
+		  stdlib.h
+		  string.h
+		  sys/ioctl.h
+		  sys/socket.h
+		  sys/time.h
+		  unistd.h
+		  values.h])
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -160,7 +172,14 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([bzero gettimeofday memset strerror strtol])
+AC_CHECK_FUNCS([alarm
+		bzero
+		gettimeofday
+		inet_ntoa
+		memset
+		strerror
+		strtol
+		strtoul])
 
 AC_XNET
 

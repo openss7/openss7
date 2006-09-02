@@ -258,6 +258,8 @@ if RPM_BUILD_USER
 
 SUBDIRS = src . tests
 
+CLEANFILES += pkg/*_wrapper.c
+
 if DEVELOPMENT
 SUBDIRS += doc
 endif
