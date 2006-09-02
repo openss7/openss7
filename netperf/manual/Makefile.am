@@ -95,6 +95,7 @@ EXTRA_info_TEXINFOS	= \
 			  rpm.texi \
 			  todo.texi \
 			  tree.texi \
+			  bugs.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \

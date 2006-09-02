@@ -98,6 +98,7 @@ EXTRA_info_TEXINFOS	= \
 			  drivers.texi \
 			  modules.texi \
 			  utilities.texi \
+			  bugs.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \

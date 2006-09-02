@@ -95,6 +95,7 @@ EXTRA_info_TEXINFOS	= \
 			  todo.texi \
 			  tree.texi \
 			  sctp.7.texi \
+			  bugs.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
