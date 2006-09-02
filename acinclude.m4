@@ -474,6 +474,12 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STRUTIL:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strutil])
     fi
+    if test :${with_STRBCM:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strbcm])
+    fi
+    if test :${with_STRTTY:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strtty])
+    fi
     if test :${with_STRXNS:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strxns])
     fi
@@ -489,20 +495,14 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STRSCTP:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strsctp])
     fi
+    if test :${with_STRISO:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([striso])
+    fi
     if test :${with_NETPERF:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([netperf])
     fi
     if test :${with_STACKS:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([stacks])
-    fi
-    if test :${with_STRBCM:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strbcm])
-    fi
-    if test :${with_STRTTY:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strtty])
-    fi
-    if test :${with_STRISO:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([striso])
     fi
     AC_CACHE_CHECK([for master srcdir],[os7_cv_master_srcdir],[dnl
 	os7_cv_master_srcdir=`(cd $srcdir; pwd)`
