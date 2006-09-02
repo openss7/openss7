@@ -947,8 +947,8 @@ See @manref{clone(4)} for more information.
 @pgindex echo
 
 Echo (loopback) device driver.
-This is a commonly implemented @dfn{STREAMS} driver.  It is implemented by @cite{HP-UX(R)} and
-@cite{OSF/1(R)}.  The @manpage{echo(4)} driver provides a simple FIFO-like device without full
+This is a commonly implemented @dfn{STREAMS} driver.  It is implemented by @cite{HP-UX@registeredsymbol{}} and
+@cite{OSF/1@registeredsymbol{}}.  The @manpage{echo(4)} driver provides a simple FIFO-like device without full
 @cite{POSIX} FIFO semantics.  Its primary purpose is for the @dfn{STREAMS} Verficiation function,
 @manref{strvf(8)}, and the @manref{test-streams(8)} validation test suite.
 
@@ -1075,7 +1075,7 @@ See @manref{sfx(4)} for more information.
 This is commonly implemented @dfn{STREAMS} driver that is used to implement @dfn{STREAMS} pipes
 using a regular character device.
 The @manpage{spx(4)} driver provides a character based device approach to creating FIFOs and pipes.
-Only @cite{UnixWare(R)} and @cite{AIX(4)} document this device.
+Only @cite{UnixWare@registeredsymbol{}} and @cite{AIX(4)} document this device.
 
 See @manref{spx(4)} for more information.
 

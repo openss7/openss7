@@ -59,7 +59,7 @@
 
 The @cite{OpenSS7 @value{PACKAGE_TITLE}} package is a High-Performance @dfn{STREAMS} framework for
 @cite{Linux} that is compatible with @cite{SVR 4.2 MP} @dfn{STREAMS} and a host of other commercial
-@cite{UNIX(R)} @dfn{STREAMS} implementations, with complete debugging and production release
+@cite{UNIX@registeredsymbol{}} @dfn{STREAMS} implementations, with complete debugging and production release
 capabilities.  It is as a high-performance, production replacement for the buggy and now deprecated
 @cite{Linux STREAMS (LiS)}.
 
@@ -137,7 +137,7 @@ development of @dfn{STREAMS} applications, or kernel level @dfn{STREAMS} drivers
 @item @tab @bullet{} @tab proper programming by assertion; @tab
 @item @tab @bullet{} @tab proper use of lightweight spin locks; @tab
 @item @tab @bullet{} @tab race free locking strategies and synchronization; @tab
-@item @tab @bullet{} @tab compatible with all mainstream @cite{UNIX(R)} implementations; @tab
+@item @tab @bullet{} @tab compatible with all mainstream @cite{UNIX@registeredsymbol{}} implementations; @tab
 @item @tab @bullet{} @tab conforms to @cite{POSIX/SUSv3 XSR}; @tab
 @item @tab @bullet{} @tab complete set of standard drivers and modules; @tab
 @item @tab @bullet{} @tab complete set of diagnostic and administrative utilities; @tab

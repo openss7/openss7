@@ -452,11 +452,11 @@ compatibility with @cite{HP-UX} and @cite{OSF/1}.
 @command{echo} has no known bugs.
 
 @subheading Compatibility
-@cite{HP-UX(R)}.  This is an @cite{HP-UX}
+@cite{HP-UX@registeredsymbol{}}.  This is an @cite{HP-UX}
 @footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo Alto, California),
 Hewlett-Packard Company, HP.  <@url{http://docs.hp.com/}>}}
 and @cite{OSF/1}
-@footnote{@cite{Digital(R) UNIX (OSF/1.2), Digital UNIX: Network Programmers Guide, 1996, (Palo Alto,
+@footnote{@cite{Digital@registeredsymbol{} UNIX (OSF/1.2), Digital UNIX: Network Programmers Guide, 1996, (Palo Alto,
 California), Digital Equipment Corporation, Hewlett-Packard Company.}
 <@url{http://www.true64unix.compaq.com/docs/}>}
 specific device.
@@ -480,10 +480,10 @@ For an @cite{AIX} and @cite{UnixWare} equivalent, see
 
 @subheading Conformance
 @cite{HP-UX}
-@footnote{@cite{HP-UX(R) 11i v2, HP-UX 11i v2 Documentation, 2001, (Palo Alto, California), Hewlett-Packard
+@footnote{@cite{HP-UX@registeredsymbol{} 11i v2, HP-UX 11i v2 Documentation, 2001, (Palo Alto, California), Hewlett-Packard
 Company, HP.  <@url{http://docs.hp.com/}>}}
 and @cite{OSF/1}
-@footnote{@cite{Digital(R) UNIX (OSF/1.2), Digital UNIX Documentation Library, 2003, (Palo Alto, California),
+@footnote{@cite{Digital@registeredsymbol{} UNIX (OSF/1.2), Digital UNIX Documentation Library, 2003, (Palo Alto, California),
 Digital Equipment Corporation, Hewlett-Packard Company.
 <@url{http://www.true64unix.compaq.com/docs/}>}}
 documentation.
@@ -723,7 +723,7 @@ Instances of
 
 @subheading Compatibility
 The @cite{@value{PACKAGE_TITLE}} implementation of @dfn{FIFO}s is compatible with @cite{SVR
-4.2}@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992, (Englewood
+4.2}@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual, 1992, (Englewood
 Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and implementations based
 on @cite{SVR 4.2}, with the following portability considerations:
 
@@ -732,11 +732,11 @@ on @cite{SVR 4.2}, with the following portability considerations:
 @item
 @cite{@value{PACKAGE_TITLE}} provides character device special file @dfn{FIFO}s as well as providing
 an option to make all @cite{Linux} system @dfn{FIFO}s @dfn{STREAMS}-based, or to leave system
-@dfn{FIFO}s using the @cite{Linux} @cite{SVR 3.2}-sytle@footnote{@cite{SVR 3, UNIX(R) System V
+@dfn{FIFO}s using the @cite{Linux} @cite{SVR 3.2}-sytle@footnote{@cite{SVR 3, UNIX@registeredsymbol{} System V
 Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
 Prentice Hall.}} implementation.  A number of implementations do not normally support
 @dfn{STREAMS}-based @dfn{FIFO}s, but, instead, opt for @cite{SVR 3.2}-sytle@footnote{@cite{SVR 3,
-UNIX(R) System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
+UNIX@registeredsymbol{} System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
 Laboratories, Inc., Prentice Hall.}} @dfn{FIFO}s that are not @dfn{STREAMS}-based.  Some
 implementations support making all @dfn{FIFO}s @dfn{STREAMS}-based as a system configuration option.
 Some implementations support character device special file implementations of @dfn{FIFO}s.  (See
@@ -801,7 +801,7 @@ Conformance is verified using the
 @manpage{test-fifo(8)} verification test suite.
 
 @subheading History
-fifos first appeared in SVR 3,@footnote{@cite{SVR 3, UNIX(R) System V Release 3 Programmer's Manual,
+fifos first appeared in SVR 3,@footnote{@cite{SVR 3, UNIX@registeredsymbol{} System V Release 3 Programmer's Manual,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} but were not
 implemented using @dfn{STREAMS}.
 
@@ -1077,7 +1077,7 @@ Indicates a console logger.  No @var{trace_ids} is required.
 
 @subheading Notices
 This device is provided as @file{/dev/strlog} instead of @file{/dev/log} as is the case for
-@cite{SVR 4.2}@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+@cite{SVR 4.2}@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual, 1992,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 systems, because @cite{Linux} already has a non-@dfn{STREAMS} driver called @file{/dev/log}.
 
@@ -1175,7 +1175,7 @@ The
 The operation of the @dfn{STREAMS} error logger and trace logger are described in the @cite{SVR 4.2
 SPG}.@footnote{@cite{SVR 4.2, STREAMS Programmer's Guide, 1992, (Engle- wood Cliffs, New Jersey),
 AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
-@command{strlog} is compatible with systems based on @cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R)
+@command{strlog} is compatible with systems based on @cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{}
 System V Release 4.2 Programmer's Manual, 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System
 Laboratories, Inc., Prentice Hall.}}
 including @cite{AIX},
@@ -1214,25 +1214,25 @@ On most systems, the @dfn{STREAMS} log device is called @file{/dev/log}; however
 @end itemize
 
 @subheading Conformance
-@cite{SVR 4.2},@footnote{@cite{SVR 4.2 CR, UNIX(R) System V Release 4.2 Command Reference Manual,
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2 CR, UNIX@registeredsymbol{} System V Release 4.2 Command Reference Manual,
 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
-@cite{AIX},@footnote{@cite{AIX(R) 5L Version 5.1, AIX 5L Version 5.1 Documenta- tion, 2001,
+@cite{AIX},@footnote{@cite{AIX@registeredsymbol{} 5L Version 5.1, AIX 5L Version 5.1 Documenta- tion, 2001,
 (Boulder, Colorado), Internatonal Business Machines Corp., IBM.
-<@url{http://publibn.boulder.ibm.com/}>}} @cite{HP-UX},@footnote{@cite{HP-UX(R) 11i v2, HP-UX 11i v2
+<@url{http://publibn.boulder.ibm.com/}>}} @cite{HP-UX},@footnote{@cite{HP-UX@registeredsymbol{} 11i v2, HP-UX 11i v2
 Documentation, 2001, (Palo Alto, California), Hewlett-Packard Company, HP.
-<@url{http://docs.hp.com/}>}} @cite{OSF/1},@footnote{@cite{Digital(R) UNIX (OSF/1.2), Digital UNIX
+<@url{http://docs.hp.com/}>}} @cite{OSF/1},@footnote{@cite{Digital@registeredsymbol{} UNIX (OSF/1.2), Digital UNIX
 Documentation Library, 2003, (Palo Alto, California), Digital Equipment Corporation, Hewlett-Packard
-Company.  <@url{http://www.true64unix.compaq.com/docs/}>}} @cite{Solaris},@footnote{@cite{Solaris(R)
+Company.  <@url{http://www.true64unix.compaq.com/docs/}>}} @cite{Solaris},@footnote{@cite{Solaris@registeredsymbol{}
 8, Solaris 8 Docmentation, 2001, (Santa Clara, California), Sun Microsystems, Inc., Sun.
-<@url{http://docs.sun.com/}>}} @cite{SUPER-UX}@footnote{@cite{SUPER-UX(R) Release 9.2, SUPER-UX
+<@url{http://docs.sun.com/}>}} @cite{SUPER-UX}@footnote{@cite{SUPER-UX@registeredsymbol{} Release 9.2, SUPER-UX
 Release 9.2 Documentation, 1999, NEC Corporation, NEC.}} and
-@cite{UnixWare}@footnote{@cite{UnixWare(R) 7.1.3, UnixWare 7.1.3 (OpenUnix 8) Documentation, 2002,
+@cite{UnixWare}@footnote{@cite{UnixWare@registeredsymbol{} 7.1.3, UnixWare 7.1.3 (OpenUnix 8) Documentation, 2002,
 (Lindon, Utah), Caldera International, Inc., Caldera.  <@url{http://uw713doc.sco.com/}>}}
 documentation.
 
 @subheading History
 @command{strlog} first appeared in @cite{SVR 4}.
-@footnote{@cite{SVR 4, UNIX(R) System V Release 4 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T
+@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T
 UNIX System Laboratories, Inc., Prentice Hall.}}
 
 @c ============================================================================
@@ -1246,8 +1246,8 @@ UNIX System Laboratories, Inc., Prentice Hall.}}
 
 @subheading Description
 The @command{loop} psuedo-device multiplexing driver is an implementation of the loop-around driver
-described in the @cite{UNIX(R) System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
-4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
+described in the @cite{UNIX@registeredsymbol{} System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
+4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
 UNIX System Laboratories, Inc., Prentice Hall.}} with a number of exceptions and enhancments.  The
 primary purposes of the @command{loop} pseudo-device driver are: to provide a capability to the
 @manpage{test-streams(8)} conformance and verification test program, for testing passing of
@@ -1298,8 +1298,8 @@ sent to the other @dfn{Stream}.
 
 @subheading Usage
 The @command{loop} pseudo-device loop-around driver is an implementation of the loop-around driver
-described in the @cite{UNIX(R) System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
-4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
+described in the @cite{UNIX@registeredsymbol{} System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
+4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
 UNIX System Laboratories, Inc., Prentice Hall.}} with a number of considerations as follows:
 
 @itemize @bullet
@@ -1322,7 +1322,7 @@ specific to testing and cannot be altered without impacting the ability of the
 @manpage{test-streams(8)} conformance and verification test program results.
 
 @subheading Implementation
-@command{loop} is implemented as described in the @cite{SVR4 SPG}.@footnote{@cite{SVR 4, UNIX(R)
+@command{loop} is implemented as described in the @cite{SVR4 SPG}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{}
 System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX
 System Laboratories, Inc., Prentice Hall.}}
 
@@ -1354,7 +1354,7 @@ OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} with the following porta
 considerations:
 
 @itemize --
-@item Although this driver is described in the @cite{SVR4 SPG}@footnote{@cite{SVR 4, UNIX(R) System
+@item Although this driver is described in the @cite{SVR4 SPG}@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System
 V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System
 Laboratories, Inc., Prentice Hall.}} as a driver example, most @dfn{STREAMS} implementations do not
 actually provide such a driver.
@@ -1371,7 +1371,7 @@ See
 @manpage{STREAMS(9)} for additional compatibility information.
 
 @subheading Conformance
-@cite{SVR4}@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+@cite{SVR4}@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and
 @cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
 OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} documentation.  Conformance is verified using
@@ -1380,7 +1380,7 @@ the
 
 @subheading History
 @command{loop} is described as an example loop-around driver in the @cite{SVR4
-SPG}@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
+SPG}@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
 Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 
 @c ============================================================================
@@ -1394,8 +1394,8 @@ Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 
 @subheading Description
 The @command{mux} psuedo-device multiplexing driver is an implementation of the multplexing driver
-described in the @cite{UNIX(R) System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
-4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
+described in the @cite{UNIX@registeredsymbol{} System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
+4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
 UNIX System Laboratories, Inc., Prentice Hall.}} with a number of exceptions and enhancments.  The
 primary purposes of the @command{mux} pseudo-device driver are: to provide a capability to the
 @manpage{test-streams(8)} conformance and verification test program, for testing linking and
@@ -1468,8 +1468,8 @@ connection or unlink operation.
 
 @subheading Usage
 The @command{mux} pseudo-device multiplexing driver is an implementation of the multplexing
-driver described in the @cite{UNIX(R) System V Release 4 -- STREAMS Programmer's
-Guide},@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+driver described in the @cite{UNIX@registeredsymbol{} System V Release 4 -- STREAMS Programmer's
+Guide},@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} with a number
 of considerations as follows:
 
@@ -1572,7 +1572,7 @@ behaviour is specific to testing and cannot be altered without impacting the abi
 @manpage{test-streams(8)} conformance and verification test program results.
 
 @subheading Implementation
-@command{mux} is implemented as described in the @cite{SVR4 SPG}.@footnote{@cite{SVR 4, UNIX(R)
+@command{mux} is implemented as described in the @cite{SVR4 SPG}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{}
 System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX
 System Laboratories, Inc., Prentice Hall.}}
 
@@ -1605,7 +1605,7 @@ Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>
 @itemize --
 
 @item
-Although this driver is described in the @cite{SVR4 SPG}@footnote{@cite{SVR 4, UNIX(R) System V
+Although this driver is described in the @cite{SVR4 SPG}@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V
 Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System
 Laboratories, Inc., Prentice Hall.}} as a driver example, most @dfn{STREAMS} implementations do not
 actually provide such a driver.
@@ -1623,7 +1623,7 @@ See
 @manpage{STREAMS(9)} for additional compatibility information.
 
 @subheading Conformance
-@cite{SVR4}@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+@cite{SVR4}@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and
 @cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
 OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} documentation.  Conformance is verified using
@@ -1632,7 +1632,7 @@ the
 
 @subheading History
 @command{mux} is described as an example multiplexing driver in the @cite{SVR4
-SPG}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
+SPG}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
 Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 
 @c ============================================================================
@@ -1726,7 +1726,7 @@ Fast-STREAMS (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
 @code{nsdev_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the
 @command{nsdev} device to intercept and redirect the open call to the appropriate device.  This is
 consitent with the descriptions for the internal @code{clone_open()} under @cite{SVR
-4}.@footnote{@cite{Magic Garden, The Magic Garden Explained: The Internals of UNIX(R) System V
+4}.@footnote{@cite{Magic Garden, The Magic Garden Explained: The Internals of UNIX@registeredsymbol{} System V
 Release 4 / An Open Systems Design, 1994, (Australia), B. Goodheart, J. Cox, Prentice Hall.  [ISBN
 0-13-098138-9]}}
 
@@ -1802,11 +1802,11 @@ The
 @command{nsdev} has no known bugs.
 
 @subheading Compatiblity
-@command{nsdev} is compatible with @cite{SVR 4.2}@footnote{@cite{SVR 4.2, UNIX(R) System V Release
+@command{nsdev} is compatible with @cite{SVR 4.2}@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{} System V Release
 4.2 Programmer's Manual, 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
-Prentice Hall.}} and implementations based on @cite{SVR 4.2}, including @cite{AIX(R)},
-@cite{HP-UX(R)}, @cite{LiS}, @cite{OSF/1(R)}, @cite{Solaris(R)}, @cite{SUPER-UX(R)},
-@cite{UXP/V(R)}, with the following compatibility considerations:
+Prentice Hall.}} and implementations based on @cite{SVR 4.2}, including @cite{AIX@registeredsymbol{}},
+@cite{HP-UX@registeredsymbol{}}, @cite{LiS}, @cite{OSF/1@registeredsymbol{}}, @cite{Solaris@registeredsymbol{}}, @cite{SUPER-UX@registeredsymbol{}},
+@cite{UXP/V@registeredsymbol{}}, with the following compatibility considerations:
 
 @itemize --
 
@@ -1917,14 +1917,14 @@ device is a method of providing administrative drivers without consuming major d
 
 @subheading Notices
 The @command{nuls} device is used on systems that provide the older @cite{SVR 3}@footnote{@cite{SVR
-3, UNIX(R) System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
+3, UNIX@registeredsymbol{} System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
 Laboratories, Inc., Prentice Hall.}} style @file{/dev/null} or @file{/dev/zero}.  On those systems,
 the @file{/dev/null} and @file{/dev/zero} devices are not @dfn{STREAMS} based and will not respond
 to @dfn{STREAMS} I/O controls.
 
 The @command{nuls} device is used with the
-@manpage{sc(4)} module as on @cite{AIX(R)},
-@cite{HP-UX(R)}, and @cite{OSF/1(R)} systems in support of the
+@manpage{sc(4)} module as on @cite{AIX@registeredsymbol{}},
+@cite{HP-UX@registeredsymbol{}}, and @cite{OSF/1@registeredsymbol{}} systems in support of the
 @manpage{autopush(8)},
 @manpage{scls(8)},
 @manpage{strinfo(8)},
@@ -1962,8 +1962,8 @@ The
 @command{nuls} has no known bugs.
 
 @subheading Compatibility
-The @command{nuls} device is compatible with @cite{SVR 4.2}, @cite{AIX(R)}, @cite{HP-UX(R)}, and
-@cite{OSF/1(R)} with the following portability considerations:
+The @command{nuls} device is compatible with @cite{SVR 4.2}, @cite{AIX@registeredsymbol{}}, @cite{HP-UX@registeredsymbol{}}, and
+@cite{OSF/1@registeredsymbol{}} with the following portability considerations:
 
 @itemize --
 
@@ -1974,23 +1974,23 @@ which those devices are used.
 @end itemize
 
 @subheading Conformance
-@cite{SVR 4.2},@footnote{@cite{SVR 4.2 CR, UNIX(R) System V Release 4.2 Command Reference Manual,
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2 CR, UNIX@registeredsymbol{} System V Release 4.2 Command Reference Manual,
 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and
-@cite{AIX(R)},@footnote{@cite{AIX(R) 5L Version 5.1, AIX 5L Version 5.1 Documentation, 2001,
+@cite{AIX@registeredsymbol{}},@footnote{@cite{AIX@registeredsymbol{} 5L Version 5.1, AIX 5L Version 5.1 Documentation, 2001,
 (Boulder, Colorado), Internatonal Business Machines Corp., IBM.
-<@url{http://publibn.boulder.ibm.com/}>}} @cite{HP-UX(R)},@footnote{@cite{HP-UX(R) 11i v2, HP-UX 11i
+<@url{http://publibn.boulder.ibm.com/}>}} @cite{HP-UX@registeredsymbol{}},@footnote{@cite{HP-UX@registeredsymbol{} 11i v2, HP-UX 11i
 v2 Documentation, 2001, (Palo Alto, California), Hewlett-Packard Company, HP.
-<@url{http://docs.hp.com/}>}} and @cite{OSF/1(R)}@footnote{@cite{Digital(R) UNIX (OSF/1.2), Digital
+<@url{http://docs.hp.com/}>}} and @cite{OSF/1@registeredsymbol{}}@footnote{@cite{Digital@registeredsymbol{} UNIX (OSF/1.2), Digital
 UNIX Documentation Library, 2003, (Palo Alto, California), Digital Equipment Corporation,
 Hewlett-Packard Company.  <@url{http://www.true64unix.compaq.com/docs/}>}} documentation.
 Conformance is verified using the
 @manpage{test-nuls(8)} verification test suite.
 
 @subheading History
-The @command{nuls} device first appeared in @cite{SVR 4.2}@footnote{@cite{Digital(R) UNIX (OSF/1.2),
+The @command{nuls} device first appeared in @cite{SVR 4.2}@footnote{@cite{Digital@registeredsymbol{} UNIX (OSF/1.2),
 Digital UNIX Documentation Library, 2003, (Palo Alto, California), Digital Equipment Corporation,
 Hewlett-Packard Company.  <@url{http://www.true64unix.compaq.com/docs/}>}} implementations for
-@cite{AIX(R)}, @cite{HP-UX(R)}, and @cite{OSF/1(R)}.
+@cite{AIX@registeredsymbol{}}, @cite{HP-UX@registeredsymbol{}}, and @cite{OSF/1@registeredsymbol{}}.
 
 @c ============================================================================
 
@@ -2336,13 +2336,13 @@ and then downgrade its credentials for security, but still have the ability to m
 @subheading Devices
 @ftable @file
 @item /dev/sad
-Systems other than @cite{Solaris(R)} use this external filesystem device.  This may be a symbolic
+Systems other than @cite{Solaris@registeredsymbol{}} use this external filesystem device.  This may be a symbolic
 link to the
 @manpage{specfs(5)} device.
 
 @item /dev/sad/admin
 @itemx /dev/sad/user
-@cite{Solaris(R)} uses these two external filesystem devices.  This (or @file{/dev/sad}) may be a
+@cite{Solaris@registeredsymbol{}} uses these two external filesystem devices.  This (or @file{/dev/sad}) may be a
 symbolic link to a
 @manpage{specfs(5)} device.
 
@@ -2365,18 +2365,18 @@ administrative device.
 @command{sad} has no know bugs.
 
 @subheading Compatibility
-@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual, 1992,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
-@cite{Solaris(R)},
-@cite{UnixWare(R)}
+@cite{Solaris@registeredsymbol{}},
+@cite{UnixWare@registeredsymbol{}}
 and @cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
 OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}}
 with the following considerations:
 
 @itemize --
 @item
-@command{sad} implements the @cite{UnixWare(R)} @var{SAP_CLONE} command for specifying clone minor
-devices.  This command is not implemented by @cite{SVR 4.2}, @cite{Solaris(R)} or @cite{LiS}.
+@command{sad} implements the @cite{UnixWare@registeredsymbol{}} @var{SAP_CLONE} command for specifying clone minor
+devices.  This command is not implemented by @cite{SVR 4.2}, @cite{Solaris@registeredsymbol{}} or @cite{LiS}.
 @end itemize
 
 @subheading Conformance
@@ -2390,7 +2390,7 @@ UNIX Specification, Open Group, Open Group Publication.
 @manpage{test-sad(8)} verification test suite.
 
 @subheading History
-@command{sad} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4
+@command{sad} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4
 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
 Prentice Hall.}}
 
@@ -2598,7 +2598,7 @@ UNIX Specification, Open Group, Open Group Publication.
 @manpage{test-fifo(8)} verification test suite.
 
 @subheading History
-@command{fifo}s first appeared in @cite{SVR 3},@footnote{@cite{SVR 3, UNIX(R) System V Release 3
+@command{fifo}s first appeared in @cite{SVR 3},@footnote{@cite{SVR 3, UNIX@registeredsymbol{} System V Release 3
 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice
 Hall.}} but were not implemented using @dfn{STREAMS}.
 
@@ -2721,7 +2721,7 @@ fail on a regular @dfn{STREAMS} character special file).
 
 @subheading Usage
 The characteristics of bi-directional @dfn{STREAMS}-based pipes, by comparison to @cite{SVR
-3}@footnote{@cite{SVR 3, UNIX(R) System V Release 3 Programmer's Manual, (Englewood Cliffs, New
+3}@footnote{@cite{SVR 3, UNIX@registeredsymbol{} System V Release 3 Programmer's Manual, (Englewood Cliffs, New
 Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} style pipes is as follows:
 
 @itemize @bullet
@@ -2766,14 +2766,14 @@ Although an
 character special device with a device number corresponding to the @command{spx} driver, an
 @manpage{fstat(2)} on the file descriptor resulting from an
 @manpage{open(2s)} call on
-@file{/dev/spx} will indicate that the file is a fifo.  This is rather normal @cite{UNIX(R)}
+@file{/dev/spx} will indicate that the file is a fifo.  This is rather normal @cite{UNIX@registeredsymbol{}}
 behaviour.
 
-Depending on @cite{Linux(R)} kernel configuration parameters, it might not be necessary to go to
+Depending on @cite{Linux@registeredsymbol{}} kernel configuration parameters, it might not be necessary to go to
 this extent to create a @dfn{STREAMS}-based bi-directional pipe.  When kernel configuration
 parameter @var{CONFIG_STREAMS_PIPES_REPLACE} is set, then the @cite{SVR 3}@footnote{@cite{SVR 3,
-UNIX(R) System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
-Laboratories, Inc., Prentice Hall.}} pipe approach used by @cite{Linux(R)} will be replaced with a
+UNIX@registeredsymbol{} System V Release 3 Programmer's Manual, (Englewood Cliffs, New Jersey), AT&T UNIX System
+Laboratories, Inc., Prentice Hall.}} pipe approach used by @cite{Linux@registeredsymbol{}} will be replaced with a
 bi-directional @dfn{STREAMS}-based pipe.  Then, a simple call to
 @manpage{pipe(2s)} will return a
 bi-directional pipe and it is not necessary to open the @command{spx} driver to obtain one.
@@ -2794,7 +2794,7 @@ Fast-STREAMS (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
 @code{pipe_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the pipe device
 to intercept and redirect the open call to the appropriate device.  This is consistent with the
 descriptions for the internal @code{pipe_open()} under @cite{SVR 4}.@footnote{@cite{Magic Garden,
-The Magic Garden Explained: The Internals of UNIX(R) System V Release 4 / An Open Systems Design,
+The Magic Garden Explained: The Internals of UNIX@registeredsymbol{} System V Release 4 / An Open Systems Design,
 1994, (Australia), B. Goodheart, J. Cox, Prentice Hall.  [ISBN 0-13-098138-9]}}
 
 @subheading Examples
@@ -2861,25 +2861,25 @@ The
 @subheading Compatibility
 @cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
 Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} provides the
-@command{spx} device for compatibility with @cite{UnixWare(R)} and @cite{AIX(R)}.  @cite{Solaris(R)}
+@command{spx} device for compatibility with @cite{UnixWare@registeredsymbol{}} and @cite{AIX@registeredsymbol{}}.  @cite{Solaris@registeredsymbol{}}
 and @cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
 OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} do not provide an @command{spx} driver.
 
 @itemize --
 
 @item
-@cite{AIX(R)} provides a @command{spx} driver.  The use of the @command{spx} driver under
-@cite{AIX(R)} is not well documented.
+@cite{AIX@registeredsymbol{}} provides a @command{spx} driver.  The use of the @command{spx} driver under
+@cite{AIX@registeredsymbol{}} is not well documented.
 
 @item
-@cite{UnixWare(R)} provides a @command{spx} driver.  The use of the @command{spx} driver under
-@cite{UnixWare(R)} is not well documented.
+@cite{UnixWare@registeredsymbol{}} provides a @command{spx} driver.  The use of the @command{spx} driver under
+@cite{UnixWare@registeredsymbol{}} is not well documented.
 
 @item
 @cite{LiS} does not provide a @command{spx} driver.
 
 @item
-@cite{UnixWare(R)} documentation@footnote{@cite{UnixWare(R) 7.1.3, UnixWare 7.1.3 (OpenUnix 8)
+@cite{UnixWare@registeredsymbol{}} documentation@footnote{@cite{UnixWare@registeredsymbol{} 7.1.3, UnixWare 7.1.3 (OpenUnix 8)
 Documentation, 2002, (Lindon, Utah), Caldera International, Inc., Caldera.
 <@url{http://uw713doc.sco.com/}>}} describes naming an unnamed pipe by making a device node with the
 device number returned by a call to
@@ -2891,10 +2891,10 @@ instead.
 @end itemize
 
 @subheading Conformance
-@cite{AIX(R)} and @cite{UnixWare(R)} documentation.  Conformance is verified using the
+@cite{AIX@registeredsymbol{}} and @cite{UnixWare@registeredsymbol{}} documentation.  Conformance is verified using the
 @manpage{test-pipe(8)} verification test suite.
 
 @subheading History
-@command{spx} appears in @cite{AIX(R)} and @cite{UnixWare(R)}.
+@command{spx} appears in @cite{AIX@registeredsymbol{}} and @cite{UnixWare@registeredsymbol{}}.
 
 

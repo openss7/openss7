@@ -795,7 +795,7 @@ the driver.
 @section Solaris Approaches
 @cindex solaris approaches
 
-The following is reprinted from an article in @cite{UNIX(R) Insider} issue
+The following is reprinted from an article in @cite{UNIX@registeredsymbol{} Insider} issue
 @samp{3/9/01} written by @cite{Jim Mauro}.
 
 @quotation
@@ -817,9 +817,9 @@ The primary software components are the socket library and the
 shown for completeness and is part of the layering, due to the use of
 pseudo-devices as an entry point into the networking layers.  To digress for a
 moment, the special file system, @manpage{specfs(5)} came out of @cite{SVR 4
-UNIX(R)} as a means of addressing the issue of @dfn{device special files} that
-exist on @cite{UNIX(R)} on-disk file systems (e.g.  @cite{UFS}).
-@cite{UNIX(R)} system have always abstracted I/O (input/output) devices
+UNIX@registeredsymbol{}} as a means of addressing the issue of @dfn{device special files} that
+exist on @cite{UNIX@registeredsymbol{}} on-disk file systems (e.g.  @cite{UFS}).
+@cite{UNIX@registeredsymbol{}} system have always abstracted I/O (input/output) devices
 through device special files.  The @file{/dev} directory name space stores
 files that represent physical devices and pseudo-devices on the system.  Using
 device major numbers, those device files provide an entry point into the
@@ -842,9 +842,9 @@ is not what we want for devices.  The @file{specfs(5)} file system was
 designed to address such situations; it provides a straightforward mechanism
 for linking the underlying structures for file support in the kernel to the
 required device driver interfaces.  Like all file systems in @cite{Solaris}
-(and any @cite{SVR4}-based @cite{UNIX(R)}) it is based on the
+(and any @cite{SVR4}-based @cite{UNIX@registeredsymbol{}}) it is based on the
 @cite{VFS}/@command{vnode} infrastructure.  (See @cite{Solaris Internals} and
-@cite{UNIX(R) Internals} in the Resources section for detailed information on
+@cite{UNIX@registeredsymbol{} Internals} in the Resources section for detailed information on
 @cite{VFS}.)
 
 Getting back to sockets in @cite{Solaris 2.5.1}, the @manpage{specfs(5)} layer

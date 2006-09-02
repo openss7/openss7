@@ -768,9 +768,9 @@ All Rights Reserved.
 @format
 @flushleft
 OpenSS7tm  is a trademark of OpenSS7 Corporation.
-Linux(R)  is a registered trademark of Linus Torvalds.
-UNIX(R)  is a registered trademark of The Open Group.
-Solaris(R)  is a registered trademark of Sun Microsystems.
+Linux@registeredsymbol{}  is a registered trademark of Linus Torvalds.
+UNIX@registeredsymbol{}  is a registered trademark of The Open Group.
+Solaris@registeredsymbol{}  is a registered trademark of Sun Microsystems.
 Other trademarks are the property of their respective owners.
 @end flushleft
 @end format

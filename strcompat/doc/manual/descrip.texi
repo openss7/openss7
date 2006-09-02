@@ -70,17 +70,17 @@ The @cite{@value{PACKAGE_TITLE}} package provides compatibility with the followi
 implementations:
 
 @multitable @columnfractions .05 .95
-@item @tab @bullet{} @cite{UNIX(R) System V Release 3.2}
-@item @tab @bullet{} @cite{UNIX(R) System V Release 4.2}
-@item @tab @bullet{} @cite{MPS(R) Mentat Portable Streams}
+@item @tab @bullet{} @cite{UNIX@registeredsymbol{} System V Release 3.2}
+@item @tab @bullet{} @cite{UNIX@registeredsymbol{} System V Release 4.2}
+@item @tab @bullet{} @cite{MPS@registeredsymbol{} Mentat Portable Streams}
 @item @tab @bullet{} @cite{Linux STREAMS 2.18.0}
-@item @tab @bullet{} @cite{AIX(R) 5L Version 5.1 Portable STREAMS Environment}
-@item @tab @bullet{} @cite{HP-UX(R) 11.0i v2 STREAMS/UX}
-@item @tab @bullet{} @cite{IRIX(R) 6.5.17}
-@item @tab @bullet{} @cite{Mac(R) OS 9 Open Transport}
-@item @tab @bullet{} @cite{Digital(R) UNIX (OSF/1.2)}
-@item @tab @bullet{} @cite{Solaris(R) 9/SunOS(R) 5.9}
-@item @tab @bullet{} @cite{UnixWare(R) 7.1.3}
+@item @tab @bullet{} @cite{AIX@registeredsymbol{} 5L Version 5.1 Portable STREAMS Environment}
+@item @tab @bullet{} @cite{HP-UX@registeredsymbol{} 11.0i v2 STREAMS/UX}
+@item @tab @bullet{} @cite{IRIX@registeredsymbol{} 6.5.17}
+@item @tab @bullet{} @cite{Mac@registeredsymbol{} OS 9 Open Transport}
+@item @tab @bullet{} @cite{Digital@registeredsymbol{} UNIX (OSF/1.2)}
+@item @tab @bullet{} @cite{Solaris@registeredsymbol{} 9/SunOS@registeredsymbol{} 5.9}
+@item @tab @bullet{} @cite{UnixWare@registeredsymbol{} 7.1.3}
 @end multitable
 
 These compatiblity module compile as kernel modules and will be demand loaded into the kernel when

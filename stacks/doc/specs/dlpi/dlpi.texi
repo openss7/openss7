@@ -283,7 +283,7 @@ Laboratories or UNIX International members.
 @subsubheading Trademarks:
 
 @noindent
-UNIX(R) is a registered trademark of UNIX System Laboratories in the United
+UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in the United
 States and other countries.
 X/Open(TM) is a trademark of the X/Open Company Ltd. in the UK and other
 countries.

@@ -273,7 +273,7 @@ Laboratories or UNIX International members.
 @subsubheading Trademarks:
 
 @noindent
-UNIX(R) is a registered trademark of UNIX System Laboratories in the United
+UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in the United
 States and other countries.
 X/Open(TM) is a trademark of the X/Open Company Ltd. in the UK and other
 countries.
@@ -3091,7 +3091,7 @@ The expedited data transfer service provides a further means of information
 exchange on an NC in both directions simultaneously.  The transfer of expedited
 network service data unit (ENSDU) is subject to separate flow control from that
 applying to NS user data (However, a separate STREAMS message type for expedited
-data is not available with UNIX(R) System V Release 3.1.  Until a new STREAMS
+data is not available with UNIX@registeredsymbol{} System V Release 3.1.  Until a new STREAMS
 message type is provided, expedited data will be implemented via queue
 manipulation).  The NS provider should guarantee that an expedited-NSDU will not
 be delivered after any subsequently issued NSDU or expedited-NSDU on that NC.
@@ -3303,7 +3303,7 @@ valid:
 The primitive was issued from an invalid state.
 
 @item NSYSERR
-A system error has occurred and the UNIX(R) system error is indicated with the
+A system error has occurred and the UNIX@registeredsymbol{} system error is indicated with the
 N_ERROR_ACK primitive.
 
 @end vtable

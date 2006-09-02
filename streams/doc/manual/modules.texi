@@ -178,11 +178,11 @@ int s_pipe(int fds[2])
 @command{pipemod} has no known bugs.
 
 @subheading Compatibility
-@command{pipemod} is compatible with @cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R) System V
+@command{pipemod} is compatible with @cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{} System V
 Release 4.2 Programmer's Manual, 1992, (Englewood Cliffs, New Jersey), AT&T UNIX System
 Laboratories, Inc., Prentice Hall.}} and implementations based on @cite{SVR 4.2}, including
-@cite{AIX(R)}, @cite{HP-UX(R)}, @cite{IRIX(R)}, @cite{LiS}, @cite{MacOT(R)}, @cite{OSF/1(R)},
-@cite{Solaris(R)}, @cite{SUPER-UX(R)}, @cite{UnixWare(R)}, @cite{UXP/V(R)}, with the following
+@cite{AIX@registeredsymbol{}}, @cite{HP-UX@registeredsymbol{}}, @cite{IRIX@registeredsymbol{}}, @cite{LiS}, @cite{MacOT@registeredsymbol{}}, @cite{OSF/1@registeredsymbol{}},
+@cite{Solaris@registeredsymbol{}}, @cite{SUPER-UX@registeredsymbol{}}, @cite{UnixWare@registeredsymbol{}}, @cite{UXP/V@registeredsymbol{}}, with the following
 compatibility considerations:
 
 @itemize --
@@ -195,7 +195,7 @@ See
 @manpage{STREAMS(9)} for additional compatibility information.
 
 @subheading Conformance
-@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual, 1992,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 @cite{SVID},@footnote{@cite{SVID, System V, Interface Definition, No. Fourth Edition.}}
 @cite{XID},@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open Group
@@ -207,7 +207,7 @@ UNIX Specification, Open Group, Open Group Publication.
 @manpage{test-pipemod(8)} verification test suite.
 
 @subheading History
-@command{pipemod} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4
+@command{pipemod} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4
 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
 Prentice Hall.}}
 
@@ -293,7 +293,7 @@ each connecting client.
 
 @subheading Examples
 A description and a client-server example for the @command{connld} module appears in @cite{Advanced
-Programming in the UNIX(R) Environment}.@footnote{@cite{Advanced Programming in the UNIX(R)
+Programming in the UNIX@registeredsymbol{} Environment}.@footnote{@cite{Advanced Programming in the UNIX@registeredsymbol{}
 Environment, No. 15th edition, December 1997, (Reading, Massachusetts), W. R. Stevens, Addison
 Wesley. [ISBN 0-201-56317-7] 498.}}
 
@@ -307,25 +307,25 @@ Wesley. [ISBN 0-201-56317-7] 498.}}
 @command{connld} has no known bugs.
 
 @subheading Compatibility
-@command{connld} is compatible with @cite{Solaris(R)}, @cite{UnixWare(R)}
-@cite{SVR4.2}@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+@command{connld} is compatible with @cite{Solaris@registeredsymbol{}}, @cite{UnixWare@registeredsymbol{}}
+@cite{SVR4.2}@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual, 1992,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} and
 @cite{LiS}.@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
 OpenSS7 Corporation. <@url{http://www.openss7.org/}>}}
 
 @subheading Conformance
-@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX(R) System V Release 4.2 Programmer's Manual, 1992,
+@cite{SVR 4.2},@footnote{@cite{SVR 4.2, UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual, 1992,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 @cite{SVID},@footnote{@cite{SVID, System V, Interface Definition, No. Fourth Edition.}}
 @cite{XID},@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open Group
 Publication. <@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv2},@footnote{@cite{SUS Version
 2, Single UNIX Specification, Open Group, Open Group Publication.
-<@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv3}.@footnote{@cite{SVR 4, UNIX(R) System V
+<@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv3}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V
 Release 4 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories,
 Inc., Prentice Hall.}} Conformance is verified using the test-connld(8) verification test suite.
 
 @subheading History
-@command{connld} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4
+@command{connld} first appeared in @cite{SVR 4}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4
 Programmer's Manual, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc.,
 Prentice Hall.}}
 
@@ -466,27 +466,27 @@ The @command{sc} module has no known bugs.
 
 @subheading Compatibility
 Many implementations of @dfn{STREAMS} have some mechanism for augmenting the functionality of the
-@manpage{sad(4)} driver. Some implementations, such as @cite{AIX(R)},@footnote{@cite{AIX(R) 5L
+@manpage{sad(4)} driver. Some implementations, such as @cite{AIX@registeredsymbol{}},@footnote{@cite{AIX@registeredsymbol{} 5L
 Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder, Colorado), Internatonal Business
 Machines Corp., IBM. <@url{http://publibn.boulder.ibm.com/}>}}
-@cite{HP-UX(R)},@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
+@cite{HP-UX@registeredsymbol{}},@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
 Alto, California), Hewlett-Packard Company, HP. <@url{http://docs.hp.com/}>}} provide an
 @command{sc} module for this purpose.
 
 @itemize --
 @item
-@cite{AIX(R)}@footnote{@cite{AIX(R) 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
+@cite{AIX@registeredsymbol{}}@footnote{@cite{AIX@registeredsymbol{} 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
 Colorado), Internatonal Business Machines Corp., IBM. <@url{http://publibn.boulder.ibm.com/}>}}
 provides an @command{sc} module for the purpose of allowing autopush(8) to use device names instead
 of major device numbers, and to support the scls(8) utility.
 
 @item
-@cite{AIX(R)}@footnote{@cite{AIX(R) 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
+@cite{AIX@registeredsymbol{}}@footnote{@cite{AIX@registeredsymbol{} 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
 Colorado), Internatonal Business Machines Corp., IBM. <@url{http://publibn.boulder.ibm.com/}>}}
 requires the use of the @command{sc} modules with the nuls(4) driver.
 
 @item
-@cite{HP-UX(R)}@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
+@cite{HP-UX@registeredsymbol{}}@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
 Alto, California), Hewlett-Packard Company, HP. <@url{http://docs.hp.com/}>}} describes the
 @command{sc} module as a core @dfn{STREAMS} module used by
 @manpage{autopush(8)} and provides
@@ -494,7 +494,7 @@ support for device names instead of device numbers, and providing supplemental f
 @manpage{sad(4)} driver.
 
 @item
-@command{sc} can be pushed over any @dfn{Stream}, unlike the @cite{AIX(R)} or @cite{HP-UX(R)}
+@command{sc} can be pushed over any @dfn{Stream}, unlike the @cite{AIX@registeredsymbol{}} or @cite{HP-UX@registeredsymbol{}}
 documentation. The user must have sufficient privilege to push the @command{sc} module.
 
 @item
@@ -512,9 +512,9 @@ suite.
 @subheading History
 An @command{sc} module for extending the capabilities of the
 @manpage{sad(4)} driver appear in
-@cite{AIX(R)}@footnote{@cite{AIX(R) 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
+@cite{AIX@registeredsymbol{}}@footnote{@cite{AIX@registeredsymbol{} 5L Version 5.1, AIX STREAMS Programmers Guide, 2001, (Boulder,
 Colorado), Internatonal Business Machines Corp., IBM. <@url{http://publibn.boulder.ibm.com/}>}} and
-@cite{HP-UX(R)}@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
+@cite{HP-UX@registeredsymbol{}}@footnote{@cite{STREAMS/UX, STREAMS/UX for the HP 9000 Reference Manual, 1995, (Palo
 Alto, California), Hewlett-Packard Company, HP. <@url{http://docs.hp.com/}>}} documentation.
 
 @c ============================================================================
@@ -574,7 +574,7 @@ module.
 
 @subheading Compatibility
 @command{bufmod} is compatible with the null module described in the @cite{SVR 4.0}, @cite{STREAMS
-Programmer's Guide},@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide,
+Programmer's Guide},@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide,
 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section
 6.1.1.1, "Null Module Example".}} with the following portability considerations:
 
@@ -589,7 +589,7 @@ also
 @dfn{STREAMS} modules, drivers and applications programs.
 
 @item
-The @cite{SVR 4.0 SPG}@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide,
+The @cite{SVR 4.0 SPG}@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide,
 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section
 6.1.1.1, "Null Module Example".}} does not name this module.  The name @command{bufmod} was chosen
 for @cite{@value{PACKAGE_TITLE}}.
@@ -607,7 +607,7 @@ See
 @manpage{STREAMS(9)} for additional compatibility information.
 
 @subheading Conformance
-@cite{SVR 4.0}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+@cite{SVR 4.0}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section
 6.1.1.1, "Null Module Example".}} Conformance is not verified.
 
@@ -616,7 +616,7 @@ See
 
 @ignore
 @subheading References
-@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
+@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood
 Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section 6.1.1.1, "Null
 Module Example".}}
 @end ignore
@@ -676,7 +676,7 @@ module.
 
 @subheading Compatibility
 @command{nullmod} is compatible with the null module described in the @cite{SVR 4.0, "STREAMS Programmer's
-Guide},@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+Guide},@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section
 6.1.1.1, "Null Module Example".}} with the following portability considerations:
 
@@ -702,7 +702,7 @@ See
 @manpage{STREAMS(9)} for additional compatibility information.
 
 @subheading Conformance
-SVR 4.0.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+SVR 4.0.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section 6.1.1.1,
 "Null Module Example".}} Conformance is verified using the test-nullmod(8) verification test suite.
 
@@ -712,7 +712,7 @@ SVR 4.0.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's G
 @ignore
 @subheading References
 [1]
-@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section 6.1.1.1, "Null Module Example".}}
+@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.  Section 6.1.1.1, "Null Module Example".}}
 @end ignore
 
 
@@ -820,7 +820,7 @@ The source code for @command{testmod} serves as an example for a @dfn{STREAMS} p
 
 @subheading Compatibility
 @command{testmod} is compatible with the null module described in the @cite{SVR 4.0, "STREAMS Programmer's
-Guide"},@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+Guide"},@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} with the
 following portability considerations:
 
@@ -846,7 +846,7 @@ See
 @manpage{STREAMS(9)} for additional compatiblity information.
 
 @subheading Conformance
-@cite{SVR 4.0}.@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990,
+@cite{SVR 4.0}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 
 @subheading History
@@ -855,7 +855,7 @@ See
 @ignore
 @subheading References
  [1]
-@footnote{@cite{SVR 4, UNIX(R) System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
+@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 @end ignore
 
 

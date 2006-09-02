@@ -501,7 +501,7 @@ developing @dfn{STREAMS} modules, drivers and application programs for @cite{@va
 This guide provides information to developers on the use of the @dfn{STREAMS} mechanism at user and
 kernel levels.
 
-@dfn{STREAMS} was incorporated in UNIX System V Release 3 to augment the character input/output
+@dfn{STREAMS} was incorporated in @cite{UNIX System V Release 3} to augment the character input/output
 (I/O) mechanism and to support development of communication services.
 
 @dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
@@ -10901,9 +10901,9 @@ when the client opens /tmp it will access what is in the server's /usr/control d
 @node Unique Connections
 @section Unique Connections
 
-With named pipes, client processes may communicate with a server process via a module called connld
-that enables a client process to gain a unique, non-multiplexed connection to a server.  The connld
-module can be pushed onto the named end of the pipe.  If connld is pushed on the named end of the
+With named pipes, client processes may communicate with a server process via a module called @manref{connld(4)}
+that enables a client process to gain a unique, non-multiplexed connection to a server.  The @manpage{connld(4)}
+module can be pushed onto the named end of the pipe.  If @manpage{connld(4)} is pushed on the named end of the
 pipe and that end is opened by a client, a new pipe will be created.  One file descriptor for the
 new pipe is passed back to a client (named @dfn{Stream}) as the file descriptor from the
 @manpage{open(2)} system call and the other file descriptor is passed to the server.  The server and
@@ -10912,7 +10912,7 @@ the client may now communicate through a new pipe.
 @figuresized{SPG_fig41,41,Server Sets Up a Pipe,4in}
 
 @figref{41} illustrates a server process that has created a pipe and
-pushed the connld module on the other end.  The server then invokes the @manpage{fattach(3)} routine
+pushed the @manpage{connld(4)} module on the other end.  The server then invokes the @manpage{fattach(3)} routine
 to name the other end @file{/usr/toserv}.
 
 @figuresized{SPG_fig42,42,Processes X and Y Open /usr/toserv,4in}
@@ -10922,17 +10922,17 @@ was at one end of the original @dfn{STREAMS}-based pipe.  When process Y (procy)
 also gains a unique connection to the server.  As shown in @figref{42}, the server process has
 access to three separate @dfn{STREAMS}-based pipes via three file descriptors.
 
-connld is a @dfn{STREAMS}-based module that has an open, close, and @command{put} procedure.  connld
+@manpage{connld(4)} is a @dfn{STREAMS}-based module that has an open, close, and @command{put} procedure.  @manpage{connld(4)}
 is opened when the module is pushed onto the pipe for the first time and whenever the named end of
-the pipe is opened.  The connld module distinguishes between these two opens by use of the q_ptr
+the pipe is opened.  The @manpage{connld(4)} module distinguishes between these two opens by use of the q_ptr
 field of its read queue.  On the first open, this field is set to 1 and the routine returns without
 further processing.  On subsequent opens, the field is checked for 1 or 0.  If the 1 is present, the
-connld module creates a pipe and sends the file descriptor to a client and a server.
+@manpage{connld(4)} module creates a pipe and sends the file descriptor to a client and a server.
 
-Making use of the q_ptr field eliminates the need to configure the connld module at boot time.  It
+Making use of the q_ptr field eliminates the need to configure the @manpage{connld(4)} module at boot time.  It
 also eliminates the need to manage the number of times the module is either pushed and/or popped.
 
-When the named @dfn{Stream} is opened, the open routine of connld is called.  The connld open will
+When the named @dfn{Stream} is opened, the open routine of @manpage{connld(4)} is called.  The @manpage{connld(4)} open will
 fail if:
 
 @itemize @bullet
@@ -10946,7 +10946,7 @@ The open is not complete until the server process has received the file descript
 @command{ioctl} @streamio{I_RECVFD}.  The setting of the @constant{O_NDELAY} or
 @constant{O_NONBLOCK} flag has no impact on the open.
 
-The connld module does not process messages.  All messages are passed to the next object in the
+The @manpage{connld(4)} module does not process messages.  All messages are passed to the next object in the
 @dfn{Stream}.  The read and write @command{put} routines call @manpage{putnext(9)} (see @dfn{STREAMS}
 Utilities) to send the message up or down the @dfn{Stream}.
 
@@ -17428,7 +17428,7 @@ autopush facility.
 
 @appendixsubsec Configuring STREAMS Modules and Drivers
 
-Each character device that is configured into a UNIX system results in an entry being placed in the
+Each character device that is configured into a @cite{UNIX} system results in an entry being placed in the
 kernel @code{cdevsw} table. Entries for @dfn{STREAMS} drivers are also placed in this table. However,
 because system calls to @dfn{STREAMS} drivers must be processed by the @dfn{STREAMS} routines, the
 configuration mechanism distinguishes between @dfn{STREAMS} drivers and character device drivers in
