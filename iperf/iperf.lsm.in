@@ -13,10 +13,10 @@ Keywords:		SCTP, Iperf
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			455K @PACKAGE@-@VERSION@.tar.gz
-			356K @PACKAGE@-@VERSION@.tar.bz2
+			1M @PACKAGE@-@VERSION@.tar.gz
+			1M @PACKAGE@-@VERSION@.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			385K @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			1M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4,
