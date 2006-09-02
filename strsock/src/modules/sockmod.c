@@ -1950,11 +1950,11 @@ static int sock_tpi_compat_getsockopt(struct socket *, int, int, char __user *, 
 #ifndef HAVE_KTYPE_STRUCT_KIOCB
 /* These are 2.6.17 socket operations: */
 static int sock_tpi_sendmsg(struct kiocb *iocb, struct socket *, struct msghdr *, size_t);
-static int sock_tpi_recvmsg(struct kiocb *iocb, struct scoket *, struct msghdr *, int);
+static int sock_tpi_recvmsg(struct kiocb *iocb, struct socket *, struct msghdr *, int);
 #else
 /* These are 2.4.20 socket operations: */
 static int sock_tpi_sendmsg(struct socket *, struct msghdr *, int, struct scm_cookie *);
-static int sock_tpi_recvmsg(struct scoket *, struct msghdr *, int, int, struct scm_cookie *);
+static int sock_tpi_recvmsg(struct socket *, struct msghdr *, int, int, struct scm_cookie *);
 #endif
 
 static int sock_tpi_mmap(struct file *, struct socket *, struct vm_area_struct *);
