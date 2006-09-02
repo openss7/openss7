@@ -1,3 +1,7 @@
+2006-09-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/news.texi: current release must be first in file
+
 2006-08-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/todo.texi: added todo file
