@@ -68,7 +68,7 @@ and the @cite{@uref{http://www.kernel.org/,, Linux Kernel Community}}.
 @end menu
 
 @node Sponsors
-@unnumberedsec Sponsors
+@unnumberedsubsec Sponsors
 @cindex sponsors
 
 Funding for completion of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package was
@@ -96,7 +96,7 @@ Additional funding for @uref{http://www.openss7.org/,, The OpenSS7 Project} was 
 @end multitable
 
 @node Contributors
-@unnumberedsec Contributors
+@unnumberedsubsec Contributors
 @cindex contributors
 
 The primary contributor to the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is
