@@ -93,7 +93,7 @@ copies.
 
 @ignore
 Permission is granted to process this file through Tex and print the results,
-provided the printed document carries copying permission notice identical to
+provided the printed manual carries copying permission notice identical to
 this one except for the removal of this paragraph (this paragraph not being
 relevant to the printed manual).
 
@@ -140,7 +140,7 @@ Canada @*
 
 @noindent
 This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
-documentation, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
+manual, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
 This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
 Project} and was funded in part by
 @uref{http://www.openss7.com/, OpenSS7 Corporation}.
@@ -212,7 +212,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
 
 @menu
-* Preface::			Preface to this document
+* Preface::			Preface to this manual
 
 * Quick Start Guide::		Quick Installation Instructions
 
@@ -224,9 +224,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Installation::		Installation of the package
 * Troubleshooting::		Troubleshooting of the package
 
-* GPL::				GNU General Public License
-* LGPL::			GNU Lesser General Public License
-* FDL::				GNU Free Documentation License
+* Licenses::			Copies of OpenSource Licenses
 
 * Indices::			Index of Indices
 
@@ -235,8 +233,8 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 Preface
 
 * Notice::			Notices for this package
-* Abstract::			Abstract for this document
-* Revisions::			Revisions of this document
+* Abstract::			Abstract for this manual
+* Revisions::			Revisions of this manual
 * Disclaimer::			IPR Disclaimers for this package
 * Acknowledgements::		Sponsors of and Contributors to the package
 * Authors::			Authors of the package
@@ -293,9 +291,11 @@ Troubleshooting
 
 Appendices
 
-* GPL::				GNU General Public License
-* LGPL::			GNU Lesser General Public License
-* FDL::				GNU Free Documentation License
+Licenses
+
+* GNU General Public License::		The GPL license
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
 
 Indices
 
@@ -317,8 +317,8 @@ Indices
 
 @menu
 * Notice::			Notices for this package
-* Abstract::			Abstract for this document
-* Revisions::			Revisions of this document
+* Abstract::			Abstract for this manual
+* Revisions::			Revisions of this manual
 * Disclaimer::			IPR Disclaimers for this package
 * Acknowledgements::		Sponsors of and Contributors to the package
 * Authors::			Authors of the package
@@ -328,35 +328,28 @@ Indices
 
 @node Notice
 @unnumberedsec Notice
-@cindex document notice
+@cindex manual notice
 @cindex licensing
 
-This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
-@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and modules previously
-part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS)
-Installation and Reference Manual}.}.  In stark contrast to many other software packages released by
-@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
-other parties.
+This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+License}).  Please note, however, that there are different licensing terms for the manual pages and
+some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
+publications and other sources).  Consult the permission notices contained in the documentation for
+more information.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
-Please note, however, that there are different licensing terms for the manual pages and some of the
-documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
-and other sources).  Consult the permission notices contained in the documentation for more
-information.
-
-This document, is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
 sections invariant.
 
 @node Abstract
 @unnumberedsec Abstract
-@cindex document abstract
+@cindex manual abstract
 
-This document provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
+This manual provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
 
 @unnumberedsubsec Objective
-@cindex document objective
+@cindex manual objective
 
-The objective of this document is to provide a guide for the @dfn{STREAMS} programmer when
+The objective of this manual is to provide a guide for the @dfn{STREAMS} programmer when
 developing @dfn{STREAMS} modules, drivers and application programs for @cite{@value{PACKAGE_TITLE}}.
 
 This guide provides information to developers on the use of the @dfn{STREAMS} mechanism at user and
@@ -369,9 +362,9 @@ kernel levels.
 that expedite software design and implementation.
 
 @unnumberedsubsec Intent
-@cindex document intent
+@cindex manual intent
 
-The intent of this document is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
+The intent of this manual is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
 is intended to be read alone and is not intended to replace or supplement the
 @cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing code, the manual pages
 (see @manref{STREAMS(9)}) provide a better reference to the programmer.
@@ -380,9 +373,9 @@ Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package
 system or feature listed herein.
 
 @unnumberedsubsec Audience
-@cindex document audience
+@cindex manual audience
 
-This document is intended for a highly technical audience.  The reader should already be familiar
+This manual is intended for a highly technical audience.  The reader should already be familiar
 with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
 and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
 locks, etc.
@@ -395,15 +388,15 @@ system, programming, networking, and data communication.
 
 @node Revisions
 @unnumberedsec Revisions
-@cindex document revisions
+@cindex manual revisions
 
-Take care that you are working with a current version of this document: you will not be notified of
+Take care that you are working with a current version of this manual: you will not be notified of
 updates.  To ensure that you are working with a current version, contact the
 @uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
 Project} website for a current version.
 
-A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
-package.
+A current version of this manual is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
 
 @unnumberedsubsec Version Control
 
@@ -441,23 +434,23 @@ file strbcm.texi was initially added on branch OpenSS7-0_9_2.
 
 @unnumberedsubsec ISO 9000 Compliance
 
-Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
-postscript or portable document format) version of this document is an @strong{UNCONTROLLED
+Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
+postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
 @unnumberedsec Disclaimer
-@cindex document disclaimer
+@cindex manual disclaimer
 
 @noindent
 @cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
 implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
-that the contents of the document are suitable for any purpose, or that the implementation of such
+that the contents of the manual are suitable for any purpose, or that the implementation of such
 contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
 no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
 consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
 in an action of contract, negligence or other tortious action, arising out of or in connection with
-any use of this document or the performance or implementation of the contents thereof.
+any use of this manual or the performance or implementation of the contents thereof.
 
 @noindent
 @cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
@@ -499,7 +492,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 @end multitable
 
 See @refman{Author Index}, for a complete listing and cross-index of authors to
-sections of this document.
+sections of this manual.
 
 @node Maintainer
 @unnumberedsec Maintainer
@@ -552,19 +545,13 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @cindex notice
 @cindex licensing
 
-This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
-@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and modules previously
-part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS)
-Installation and Reference Manual}.}.  In stark contrast to many other software packages released by
-@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
-other parties.
+This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+License}).  Please note, however, that there are different licensing terms for the manual pages and
+some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
+publications and other sources).  Consult the permission notices contained in the documentation for
+more information.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
-Please note, however, that there are different licensing terms for the manual pages and some of the
-documentation (derived from X/Open publications and other sources).  Consult the permission notices
-contained in the documentation for more information.
-
-This manual is released under the @cite{GNU Free Documentation License} (@pxrefman{FDL}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
 sections invariant.
 @end ignore
 
@@ -742,28 +729,21 @@ This manual uses @cite{texinfo} typographic conventions.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node GPL
-@appendix GPL
-@cindex license GPL
+@node Licenses
+@unnumbered Licenses
+@cindex licenses
 
-@c ----------------------------------------------------------------------------
-@c ----------------------------------------------------------------------------
+@menu
+* GNU General Public License::		The GPL license
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
+@end menu
+
+@page
 @include texi/gpl.texi
-
-@node LGPL
-@appendix LGPL
-@cindex license LGPL
-
-@c ----------------------------------------------------------------------------
-@c ----------------------------------------------------------------------------
+@page
 @include texi/lesser.texi
-
-@node FDL
-@appendix FDL
-@cindex license FDL
-
-@c ----------------------------------------------------------------------------
-@c ----------------------------------------------------------------------------
+@page
 @include texi/fdl.texi
 
 @c ----------------------------------------------------------------------------

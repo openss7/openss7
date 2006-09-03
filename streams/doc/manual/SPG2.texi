@@ -5526,8 +5526,10 @@ Including @header{sys/stream.h} also exposes the following constants for use wit
 * GNU Free Documentation License::	FDL
 @end menu
 
+@page
 @include texi/gpl.texi
 
+@page
 @include texi/fdl.texi
 
 @c ============================================================================

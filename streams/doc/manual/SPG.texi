@@ -18991,8 +18991,10 @@ file system).
 * GNU Free Documentation License::	FDL
 @end menu
 
+@page
 @include texi/gpl.texi
 
+@page
 @include texi/fdl.texi
 
 @node Glossary

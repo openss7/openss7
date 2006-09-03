@@ -103,6 +103,7 @@ EXTRA_info_TEXINFOS	= \
 			  texi/install.texi \
 			  texi/testsuite.texi \
 			  texi/lesser.texi \
+			  texi/hp.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \

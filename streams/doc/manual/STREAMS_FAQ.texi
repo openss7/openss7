@@ -1269,8 +1269,10 @@ user-space facilities and system calls are completely defined and described.
 * GNU Free Documentation License::	FDL
 @end menu
 
+@page
 @include texi/gpl.texi
 
+@page
 @include texi/fdl.texi
 
 @node Glossary
