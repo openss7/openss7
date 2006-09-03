@@ -1,0 +1,46 @@
+@c @setfilename hp.info
+
+@node Hewlett-Packard License
+@section Hewlett-Packard License
+@cindex license, HP
+@cindex license, Hewlett-Packard
+
+@sp 2
+@center HEWLETT-PACKARD LICENSE
+
+@center Copyright @copyright{} 1993, 1994, 1995  Hewlett-Packard Company
+@center @sc{All Rights Reserved}
+
+The enclosed software and documentation includes copyrighted works of @cite{Hewlett-Package Co.}
+For as long as you comply with the following limitations, you are hereby authorized to (i) use,
+reproduce, and modify the software and documentation, and to (ii) distribute the software and
+documentation, including modifications, for non-commercial purposes only.
+
+@enumerate
+@item
+The enclosed software and documentation is made available at no charge in order to advance the
+general development of high-performance networking products.
+
+@item
+You may not delete any copyright notices contained in the software or documentation.  All hard
+copies, and copies in source code or object code form, of the software or documentation (including
+modifications) must contain at least one of the copyright notices.
+
+@item
+The enclosed software and documentation has not been subjected to testing and quality control and is
+not a @cite{Hewlett-Packard @abbr{Co.}} product.  At a future time, @cite{Hewlett-Packard
+@abbr{Co.}} may or may not offer a version of the software and documentation as a product.
+
+@item
+@b{THE SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS".  HEWLETT-PACKARD COMPANY DOES NOT WARRANT
+THAT THE USE, REPRODUCTION, MODIFICATION OR DISTRIBUTION OF THE SOFTWARE OR DOCUMENTATION WILL NOT
+INFRINGE A THIRD PARTY'S INTELLECTUAL PROPERTY RIGHTS.  HP DOES NOT WARRANT THAT THE SOFTWARE OR
+DOCUMENTATION IS ERROR FREE.  HP DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, WITH REGARD TO THE
+SOFTWARE AND THE DOCUMENTATION.  HP SPECIFICALLY DISCLAIMS ALL WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.}
+
+@item
+@b{HEWLETT-PACKARD COMPANY WILL NOT IN ANY EVENT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL,
+INCIDENTAL OR CONSEQUENTIAL DAMAGES (INCLUDING LOST PROFITS) RELATED TO ANY USE, REPRODUCTION,
+MODIFICATION, OR DISTRIBUTION OF THE SOFTWARE OR DOCUMENATION.}
+@end enumerate
