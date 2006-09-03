@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Compatibility -- acknowledgements.  2006-08-26
+OpenSS7 STREAMS Compatibility -- acknowledgements.  2006-09-02
 $Id: THANKS,v 0.9.2.5 2006/08/27 12:26:41 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -12,7 +12,7 @@ possible without the valiant efforts and productive software of the
 `Free Software Foundation' and the `Linux Kernel Community'.
 
  Sponsors
-=========
+---------
 
 Funding for completion of the `OpenSS7 OpenSS7 STREAMS Compatibility'
 package was provided in part by:
@@ -34,7 +34,7 @@ Additional funding for The OpenSS7 Project was provided by:
      * Verisign
 
  Contributors
-=============
+-------------
 
 The primary contributor to the `OpenSS7 OpenSS7 STREAMS Compatibility'
 package is Brian F. G. Bidulock <bidulock@openss7.org>.  The following

@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Utilities -- authors.  2006-08-26
+OpenSS7 STREAMS Utilities -- authors.  2006-09-02
 $Id: AUTHORS,v 0.9.2.5 2006/09/01 09:28:35 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -12,7 +12,7 @@ The authors of the `OpenSS7 OpenSS7 STREAMS Utilities' package include:
      - Brian Bidulock <bidulock@openss7.org>
 
 See `Author Index', in the manual, for a complete listing and
-cross-index of authors to sections of this document.
+cross-index of authors to sections of this manual.
 
  Maintainer
 ===========
@@ -114,6 +114,14 @@ The mailing lists are as follows:
      in ongoing development details regarding the OpenSS7 Project
      "STREAMS" components.
 
+`linux-streams'
+     The `linux-streams' mailing list is for mail exchange related to
+     `Linux Fast-STREAMS' or `Linux STREAMS'.  This includes patches,
+     development requests, proposals, requests for comment or proposal.
+     Subscribe to this list if you are interested in ongoing
+     development details regarding the "STREAMS" for Linux components.
+     This is the the new (September 2006) home of the `linux-streams'
+     list formerly of <gsyc.escet.urjc.es>.
 
  Spam
 .....

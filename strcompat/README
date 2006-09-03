@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Compatibility -- read me first file.  2006-08-26
+OpenSS7 STREAMS Compatibility -- read me first file.  2006-09-02
 $Id: README,v 0.9.2.9 2006/09/01 09:28:26 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -41,7 +41,7 @@ and drivers from other Operating Systems to `Linux'.
  Release
 --------
 
-This is the `strcompat-0.9.2.4.rc3' package, released 2006-08-26.  This
+This is the `strcompat-0.9.2.4.rc3' package, released 2006-09-02.  This
 `0.9.2.4.rc3' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
