@@ -133,6 +133,12 @@ development requests, proposals, requests for comment or proposal.  Subscribe to
 are interested in ongoing development details regarding the @uref{http://www.openss7.org/,, OpenSS7
 Project} @dfn{STREAMS} components.
 
+@item @uref{http://www.openss7.org/mailman/listinfo/linux-streams,, linux-streams}
+The @file{linux-streams} mailing list is for mail exchange related to @cite{Linux Fast-STREAMS} or
+@cite{Linux STREAMS}.  This includes patches, development requests, proposals, requests for comment
+or proposal.  Subscribe to this list if you are interested in ongoing development details regarding
+the @dfn{STREAMS} for Linux components.  This is the the new (September 2006) home of the
+@file{linux-streams} list formerly of @indicateurl{gsyc.escet.urjc.es}.
 @end table
 
 @subsubheading Spam
