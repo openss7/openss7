@@ -128,18 +128,7 @@ AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h
-		  fcntl.h
-		  libintl.h
-		  locale.h
-		  stddef.h
-		  stdlib.h
-		  string.h
-		  sys/ioctl.h
-		  sys/socket.h
-		  sys/time.h
-		  unistd.h
-		  values.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h libintl.h locale.h stddef.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h values.h])
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -179,14 +168,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm
-		bzero
-		gettimeofday
-		inet_ntoa
-		memset
-		strerror
-		strtol
-		strtoul])
+AC_CHECK_FUNCS([alarm bzero gettimeofday inet_ntoa memset strerror strtol strtoul])
 
 AC_SOCK
 
