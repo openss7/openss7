@@ -1,3 +1,8 @@
+2006-09-03  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): New variable.
+	* configure.ac (AM_GNU_GETTEXT_VERSION): Bump to 0.14.5.
+
 2006-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: missing bugs.texi from release

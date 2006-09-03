@@ -99,7 +99,7 @@ AC_PROG_MAKE_SET
 AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION(0.14.5)
+AM_GNU_GETTEXT_VERSION([0.14.5])
 
 dnl
 dnl Checks for libraries.
@@ -166,7 +166,6 @@ AC_XNET
 
 AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
-		 intl/Makefile
 		 po/Makefile.in
 		 m4/Makefile
 		 src/include/Makefile
