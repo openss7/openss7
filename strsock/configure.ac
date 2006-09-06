@@ -174,6 +174,7 @@ AC_SOCK
 
 AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
+		 intl/Makefile
 		 po/Makefile.in
 		 m4/Makefile
 		 src/include/Makefile

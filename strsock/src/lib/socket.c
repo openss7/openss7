@@ -57,7 +57,8 @@
 
 #ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $"
 
-static char const ident[] = "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $";
+static char const ident[] =
+    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -199,6 +200,14 @@ static char const ident[] = "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1
  *
  * The above are the techniques used by glibc2 for the same purpose and is the
  * same technique that is used by the OpenSS7 Sockets Library.
+ *
+ * XNS 5.2 says that thread cancellation points shall occur when a thread is
+ * executing the following functions: accept(), connect(), recv(), recvfrom(),
+ * recvmsg(), send(), sendmsg(), sendto().
+ *
+ * XNS 5.2 says that thread cancellation points shall not occur in: bind(),
+ * getpeername(), getsockname(), getsockopt(), listen(), setsockopt(),
+ * shutdown(), socket(), socketpair().
  *
  * @{
  */
@@ -352,65 +361,19 @@ pthread_rwlock_destroy(pthread_rwlock_t * rwlock)
 	return (0);
 }
 
-int __sock_s_errno;
-
-extern int *__h_errno_location(void);
-
-#pragma weak __h_errno_location
-
-#pragma weak __s_errno_location
-
-int *
-__s_errno_location(void)
-{
-	if (__h_errno_location != 0)
-		return __h_errno_location();
-	return &__sock_s_errno;
-}
-
-int *
-_s_errno(void)
-{
-	return _s_errno_location();
-}
-
-struct _t_user {
+struct _s_user {
 	pthread_rwlock_t lock;		/* lock for this structure */
-	int refs;			/* number of references to this structure */
-	int event;			/* pending t_look() events */
-	int flags;			/* user flags */
-	int fflags;			/* file flags */
-	int gflags;			/* getmsg flags */
-	int state;			/* Socket state */
-	int statef;			/* TPI state flag */
-	int prim;			/* last received TPI primitive */
-	int qlen;			/* length of the listen queue */
-	int ocnt;			/* outstanding connection indications */
-	u_int8_t moredat;		/* more data in T_DATA_IND/T_OPTDATA_IND */
-	u_int8_t moresdu;		/* more tsdu */
-	u_int8_t moreexp;		/* more data in T_EXDATA_IND/T_OPTDATA_IND */
-	u_int8_t moreedu;		/* more etsdu */
-	u_int8_t moremsg;		/* more data with dis/con/rel message */
-	int ctlmax;			/* maximum size of ctlbuf */
-	char *ctlbuf;			/* ctrl part buffer */
-	int datmax;			/* maximum size of datbuf */
-	char *datbuf;			/* data part buffer */
-	uint token;			/* acceptor id */
-	struct strbuf ctrl;		/* ctrl part of received message */
-	struct strbuf data;		/* data part of received message */
 	struct si_udata info;		/* information structure */
 };
 
 static struct _s_user *_s_fds[OPEN_MAX] = { NULL, };
 
+static int __sock_control_fd = -1;
+
 /*
    Forward declarations 
  */
-static int __sock_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flagsp);
-static int __sock_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags);
-static int __sock_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int flags);
-static int __sock_ioctl(int fd, int cmd, void *arg);
-static int __sock_strioctl(int fd, int cmd, void *arg, size_t arglen);
+static int __sock_ioctl(struct socksysreq *args);
 
 int __sock_accept(int fd, struct sockaddr *addr, socklen_t * len);
 int __sock_bind(int fd, const struct sockaddr *addr, socklen_t len);
@@ -423,6 +386,7 @@ int __sock_setsockopt(int fd, int level, int name, const void *value, socklen_t 
 int __sock_shutdown(int fd, int how);
 int __sock_socket(int domain, int type, int protocol);
 int __sock_socketpair(int domain, int type, int protocol, int socket_vector[2]);
+int __sock_close(int fd);
 
 ssize_t __sock_recv(int fd, void *buf, size_t len, int flags);
 ssize_t __sock_recvmsg(int fd, struct msghdr *msg, int flags);
@@ -434,19 +398,123 @@ ssize_t __sock_sendmsg(int fd, const struct msghdr *msg, int flags);
 ssize_t __sock_sendto(int fd, const void *buf, size_t len, int flags, const struct sockaddr *addr,
 		      socklen_t alen);
 
+static pthread_rwlock_t __sock_fd_lock = PTHREAD_RWLOCK_INITIALIZER;
+
+inline int
+__sock_lock_rdlock(pthread_rwlock_t * rwlock)
+{
+	return pthread_rwlock_rdlock(rwlock);
+}
+inline int
+__sock_lock_wrlock(pthread_rwlock_t * rwlock)
+{
+	return pthread_rwlock_wrlock(rwlock);
+}
+inline void
+__sock_lock_unlock(void *rwlock)
+{
+	pthread_rwlock_unlock(rwlock);
+}
+inline int
+__sock_list_rdlock(void)
+{
+	return __sock_lock_rdlock(&__sock_fd_lock);
+}
+inline int
+__sock_list_wrlock(void)
+{
+	return __sock_lock_wrlock(&__sock_fd_lock);
+}
+static void
+__sock_list_unlock(void *ignore)
+{
+	return __sock_lock_unlock(&__sock_fd_lock);
+}
+inline int
+__sock_user_wrlock(struct _s_user *user)
+{
+	return __sock_lock_wrlock(&user->lock);
+}
+inline void
+__sock_user_unlock(struct _s_user *user)
+{
+	return __sock_lock_unlock(&user->lock);
+}
+static void
+__sock_putuser(void *arg)
+{
+	int fd = *(int *) arg;
+	struct _s_user *user = _s_fds[fd];
+
+	__sock_user_unlock(user);
+	__sock_list_unlock(NULL);
+}
+
+/**
+ * @internal
+ * @brief Get a locked socket user structure.
+ * @param fd the socket descriptor for which to get the associated user structure.
+ *
+ * This is a range-checked array lookup of the library user structure associated
+ * with the specific file descriptor.  Also, this function takes the necessary
+ * locks for thread-safe operation.
+ */
+static __hot struct _s_user *
+__sock_getuser(int fd)
+{
+	struct _s_user *user;
+	int err;
+
+	if (unlikely((err = __sock_list_rdlock())))
+		goto list_lock_error;
+	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
+		goto badf;
+	if (unlikely(!(user = _s_fds[fd])))
+		goto badf;
+	if (unlikely((err = __sock_user_wrlock(user))))
+		goto user_lock_error;
+	return (user);
+      user_lock_error:
+	errno = err;
+	__sock_list_unlock(NULL);
+	goto error;
+      badf:
+	errno = EBADF;
+	goto error;
+      list_lock_error:
+	errno = err;
+	goto error;
+      error:
+	return (NULL);
+}
 
 static long
-__sock_ioctl(int fd, const void *args, socklen_t arglen)
+__sock_ioctl(struct socksysreq *args)
 {
 	struct strioctl ioc;
 
+	if (__sock_control_fd == -1) {
+		if ((__sock_control_fd = open("/dev/socksys", O_RDWR)) == -1) {
+			fprintf(stderr, "Cannot open control socket\n");
+			return (-1);
+		}
+	}
 	ioc.ic_cmd = SIOCSOCKSYS;
 	ioc.ic_timout = SOCKMOD_TIMEOUT;
-	ioc.ic_len = arglen;
+	ioc.ic_len = sizeof(*args);
 	ioc.ic_dp = args;
-	return ioctl(fd, I_STR, &ioc);
+	return ioctl(__sock_control_fd, I_STR, &ioc);
 }
 
+/**
+ * @fn int accept(int fd, struct sockaddr *add, socklen_t *len)
+ * @brief Accept a socket connection.
+ * @param fd the socket from which to accept the connection.
+ * @param addr a pointer to a sockaddr structure to receive the connecting address.
+ * @param len the length of the sockaddr.
+ *
+ * This function is a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_accept(int fd, struct sockaddr *addr, socklen_t * len)
 {
@@ -459,28 +527,30 @@ __sock_accept_r(int fd, struct sockaddr *addr, socklen_t * len)
 
 	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
 	if (__sock_getuser(fd)) {
-		ret = __sock_accept(fd, addr, len);
+		if ((ret = __sock_accept(fd, addr, len)) == -1)
+			pthread_testcancel();
 		__sock_putuser(&fd);
-	} else
+		pthread_cleanup_pop_restore_np(0);
+	} else {
+		pthread_cleanup_pop_restore_np(0);
 		ret = __libc_accept(fd, addr, len);
-	pthread_cleanup_pop_restore_np(0);
+	}
 	return (ret);
 }
 
 int accept(int fd, struct sockaddr *addr, socklen_t * len)
     __attribute__ ((alias("__sock_accept_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_bind(int fd, const struct sockaddr *addr, socklen_t len)
 {
-	struct {
-		int cmd;
-		int fd;
-		struct sockaddr *addr;
-		socklen_t len;
-	} args = {
-	SO_BIND, fd, addr, len};
-	return __sock_ioctl(fd, &args, sizeof(args));
+	struct socksysreq args = {
+		{SO_BIND, fd, (long) addr, len,}
+	};
+	return __sock_ioctl(&args);
 }
 
 int
@@ -501,17 +571,16 @@ __sock_bind_r(int fd, const struct sockaddr *addr, socklen_t len)
 int bind(int fd, const struct sockaddr *addr, socklen_t len)
     __attribute__ ((alias("__sock_bind_r")));
 
+/*
+ * This function is a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_connect(int fd, const struct sockaddr *addr, socklen_t len)
 {
-	struct {
-		int cmd;
-		int fd;
-		struct sockaddr *addr;
-		socklen_t len;
-	} args = {
-	SO_CONNECT, fd, addr, len};
-	return __sock_ioctl(fd, &args, sizeof(args));
+	struct socksysreq args = {
+		{SO_CONNECT, fd, addr, len,}
+	};
+	return __sock_ioctl(&args);
 }
 
 int
@@ -521,28 +590,30 @@ __sock_connect_r(int fd, const struct sockaddr *addr, socklen_t len)
 
 	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
 	if (__sock_getuser(fd)) {
-		ret = __sock_connect(fd, addr, len);
+		if ((ret = __sock_connect(fd, addr, len)) == -1)
+			pthread_testcancel();
 		__sock_putuser(&fd);
-	} else
+		pthread_cleanup_pop_restore_np(0);
+	} else {
+		pthread_cleanup_pop_restore_np(0);
 		ret = __libc_connect(fd, addr, len);
-	pthread_cleanup_pop_restore_np(0);
+	}
 	return (ret);
 }
 
 int connect(int fd, const struct sockaddr *addr, socklen_t len)
     __attribute__ ((alias("__sock_connect_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_getpeername(int fd, struct sockaddr *addr, socklen_t * len)
 {
-	struct {
-		int cmd;
-		int fd;
-		struct sockaddr *addr;
-		socklen_t *len;
-	} args = {
-	SO_GETPEER, fd, addr, len};
-	return __sock_ioctl(fd, &args, sizeof(args));
+	struct socksysreq args = {
+		{SO_GETPEER, fd, (long) addr, len,}
+	};
+	return __sock_ioctl(&args);
 }
 
 int
@@ -563,17 +634,16 @@ __sock_getpeername_r(int fd, struct sockaddr *addr, socklen_t * len)
 int getpeername(int fd, struct sockaddr *addr, socklen_t * len)
     __attribute__ ((alias("__sock_getpeername_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_getsockname(int fd, struct sockaddr *addr, socklen_t * len)
 {
-	struct {
-		int cmd;
-		int fd;
-		struct sockaddr *addr;
-		socklen_t *len;
-	} args = {
-	SO_GETSOCK, fd, addr, len};
-	return __sock_ioctl(fd, &args, sizeof(args));
+	struct socksysreq args = {
+		{SO_GETSOCK, fd, (long) addr, (long) len,}
+	};
+	return __sock_ioctl(&args);
 }
 
 int
@@ -594,19 +664,16 @@ __sock_getsockname_r(int fd, struct sockaddr *addr, socklen_t * len)
 int getsockname(int fd, struct sockaddr *addr, socklen_t * len)
     __attribute__ ((alias("__sock_getsockname_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_getsockopt(int fd, int level, int name, void *value, socklen_t * len)
 {
-	struct {
-		int cmd;
-		int fd;
-		int level;
-		int name;
-		void *value;
-		socklen_t *len;
-	} args = {
-	SO_GETSOCKOPT, fd, level, name, value, len};
-	return __sock_ioctl(fd, &args, sizeof(args));
+	struct socksysreq args = {
+		{SO_GETSOCKOPT, fd, level, name, (long) value, (long) len,}
+	};
+	return __sock_ioctl(&args);
 }
 
 int
@@ -627,16 +694,16 @@ __sock_getsockopt_r(int fd, int level, int name, void *value, socklen_t * len)
 int getsockopt(int fd, int level, int name, void *value, socklen_t * len)
     __attribute__ ((alias("__sock_getsockopt_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_listen(int fd, int backlog)
 {
-	struct {
-		int cmd;
-		int fd;
-		int backlog;
-	} args = {
-	SO_LISTEN, fd, backlog};
-	return __sock_ioctl(fd, &args, sizeof(args));
+	struct socksysreq args = {
+		{SO_LISTEN, fd, backlog,}
+	};
+	return __sock_ioctl(&args);
 }
 
 int
@@ -657,19 +724,16 @@ __sock_listen_r(int fd, int backlog)
 int listen(int fd, int backlog)
     __attribute__ ((alias("__sock_listen_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_setsockopt(int fd, int level, int name, const void *value, socklen_t len)
 {
-	struct {
-		int cmd;
-		int fd;
-		int level;
-		int name;
-		void *value;
-		socklen_t len;
-	} args = {
-	SO_SETSOCKOPT, fd, level, name, value, len};
-	return __sock_ioctl(fd, &args, sizeof(args));
+	struct socksysreq args = {
+		{SO_SETSOCKOPT, fd, level, name, (long) value, len,}
+	};
+	return __sock_ioctl(&args);
 }
 
 int
@@ -690,16 +754,16 @@ __sock_setsockopt_r(int fd, int level, int name, const void *value, socklen_t le
 int setsockopt(int fd, int level, int name, const void *value, socklen_t len)
     __attribute__ ((alias("__sock_setsockopt_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_shutdown(int fd, int how)
 {
-	struct {
-		int cmd;
-		int fd;
-		int how;
-	} args = {
-	SO_SHUTDOWN, fd, how};
-	return __sock_ioctl(fd, &args, sizeof(args));
+	struct socksysreq args = {
+		{SO_SHUTDOWN, fd, how,}
+	};
+	return __sock_ioctl(&args);
 }
 
 int
@@ -720,31 +784,46 @@ __sock_shutdown_r(int fd, int how)
 int shutdown(int fd, int how)
     __attribute__ ((alias("__sock_shutdown_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_socket(int domain, int type, int protocol)
 {
-	struct {
-		int cmd;
-		int domain;
-		int type;
-		int protocol;
-	} args = {
-	SO_SOCKET, domain, type, protocol};
+	struct socksysreq args = {
+		{SO_SOCKET, domain, type, protocol,}
+	};
 	/* More to do here... */
-	return __sock_ioctl(fd, &args, sizeof(args));
+	return __sock_ioctl(&args);
 }
 
+/**
+ * @brief recursive socket function.
+ * @param domain protocol family.
+ * @param type socket type.
+ * @param protocol protocol within family.
+ *
+ * This is a little different than most of the _r wrappers: we take a write lock
+ * on the _s_fds list so that we are able to add the new file descriptor into
+ * the list.  This will block most other threads from performing functions on
+ * the list, also, we must wait fro a quiet period until all other functions
+ * that read lock the list are not being used.  If you are sure that the
+ * socket() will only be performed by one thread and that no other thread will
+ * act on the file descriptor until socket() returns, use the non-recursive
+ * version.
+ */
 int
 __sock_socket_r(int domain, int type, int protocol)
 {
-	int ret = -1;
+	int err, ret = -1;
 
-	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
-	if (__sock_getuser(fd)) {
+	pthread_cleanup_push_defer_np(__sock_list_unlock, NULL);
+	if ((err = __sock_list_wrlock()) == 0) {
 		ret = __sock_socket(domain, type, protocol);
-		__sock_putuser(&fd);
-	} else
-		ret = __libc_socket(domain, type, protocol);
+		__sock_list_unlock(NULL);
+	} else {
+		errno = err;
+	}
 	pthread_cleanup_pop_restore_np(0);
 	return (ret);
 }
@@ -752,32 +831,112 @@ __sock_socket_r(int domain, int type, int protocol)
 int socket(int domain, int type, int protocol)
     __attribute__ ((alias("__sock_socket_r")));
 
+/*
+ * This function cannot contain a thread cancellation point (according to XNS 5.2).
+ */
 int
 __sock_socketpair(int domain, int type, int protocol, int socket_vector[2])
 {
-	struct {
-		int cmd;
-		int domain;
-		int type;
-		int protocol;
-		int *vector;
-	} args = {
-	SO_SOCKPAIR, domain, type, protocol, socket_vector};
-	/* More to do here... */
-	return __sock_ioctl(fd, &args, sizeof(args));
+	int err, socks[2];
+	struct _s_user *user1, *user2;
+	struct socksysreq args = {
+		{SO_SOCKPAIR, domain, type, protocol, (long) socket_vector,}
+	};
+	if (!(user1 = (struct _s_user *) malloc(sizeof(user1))))
+		goto enomem1;
+	memset(user1, 0, sizeof(user1));
+	if (!(user2 = (struct _s_user *) malloc(sizeof(user2))))
+		goto enomem2;
+	memset(user2, 0, sizeof(user2));
+	if (__sock_ioctl(&args) == -1)
+		goto badpair;
+	/* try to convert them to sockets */
+	if (isastream(socks[0])) {
+		struct strioctl ioc;
+
+		if (ioctl(socks[0], I_PUSH, "sockmod") == -1)
+			goto badioctl;
+		ioc.ic_cmd = O_SI_GETUDATA;
+		ioc.ic_dp = &user1->info;
+		ioc.ic_len = sizeof(struct o_si_udata);
+		ioc.ic_timout = SOCKMOD_TIMEOUT;
+		if (ioctl(socks[0], I_STR, &ioc) == -1)
+			goto badgetuser;
+		user1->info.sockparams.sp_family = domain;
+		user1->info.sockparams.sp_type = type;
+		user1->info.sockparams.sp_protocol = protocol;
+		_s_fds[socks[0]] = user1;
+	} else
+		_s_fds[socks[0]] = NULL;
+	if (isastream(socks[1])) {
+		if (ioctl(socks[1], I_PUSH, "sockmod") == -1)
+			goto badioctl;
+		ioc.ic_cmd = O_SI_GETUDATA;
+		ioc.ic_dp = &user1->info;
+		ioc.ic_len = sizeof(struct o_si_udata);
+		ioc.ic_timout = SOCKMOD_TIMEOUT;
+		if (ioctl(socks[1], I_STR, &ioc) == -1)
+			goto badgetuser;
+		user2->info.sockparams.sp_family = domain;
+		user2->info.sockparams.sp_type = type;
+		user2->info.sockparams.sp_protocol = protocol;
+		_s_fds[socks[1]] = user2;
+	} else
+		_s_fds[socks[1]] = NULL;
+	return (0);
+      badgetuser:
+      badioctl:
+	err = errno;
+	_s_fds[socks[1]] = NULL;
+	_s_fds[socks[0]] = NULL;
+	close(sock[1]);
+	close(sock[0]);
+	free(user2);
+	free(user1);
+	errno = err;
+	return (-1);
+      badpair:
+	err = errno;
+	free(user2);
+	free(user1);
+	errno = err;
+	return (-1);
+      enomem2:
+	free(user1);
+      enomem1:
+	errno = ENOMEM;
+	return (-1);
+
 }
 
+/**
+ * @brief recursive socketpair function.
+ * @param domain protocol family.
+ * @param type socket type.
+ * @param protocol protocol within family.
+ * @param socket_vector 2 element array for returned file descriptors.
+ *
+ * This is a little different than most of the _r wrappers: we take a write lock
+ * on the _s_fds list so that we are able to add the new file descriptor into
+ * the list.  This will block most other threads from performing functions on
+ * the list, also, we must wait fro a quiet period until all other functions
+ * that read lock the list are not being used.  If you are sure that the
+ * socketpair() will only be performed by one thread and that no other thread
+ * will act on the file descriptor until socketpair() returns, use the
+ * non-recursive version.
+ */
 int
 __sock_socketpair_r(int domain, int type, int protocol, int socket_vector[2])
 {
-	int ret = -1;
+	int err, ret = -1;
 
-	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
-	if (__sock_getuser(fd)) {
+	pthread_cleanup_push_defer_np(__sock_list_unlock, NULL);
+	if ((err = __sock_list_wrlock()) == 0) {
 		ret = __sock_socketpair(domain, type, protocol, socket_vector);
-		__sock_putuser(&fd);
-	} else
-		ret = __libc_socketpair(domain, type, protocol, socket_vector);
+		__sock_list_unlock(NULL);
+	} else {
+		errno = err;
+	}
 	pthread_cleanup_pop_restore_np(0);
 	return (ret);
 }
@@ -785,14 +944,21 @@ __sock_socketpair_r(int domain, int type, int protocol, int socket_vector[2])
 int socketpair(int domain, int type, int protocol, int socket_vector[2])
     __attribute__ ((alias("__sock_socketpair_r")));
 
+/*
+ * This function is a thread cancellation point (according to XNS 5.2).
+ */
 ssize_t
 __sock_recv(int fd, void *buf, size_t len, int flags)
 {
 	/* MSG_PEEK, MSG_OOB, or MSG_WAITALL */
-	/* We should really just do a getpmsg here, with band setting
-	 * according to MSG_OOB, or we can do an I_PEEK if MSG_PEEK is set. */
-	/* XNS says if the MSG_WAITALL flag is not set, data will be returned
-	 * only up to the end of the first message. */
+	/* We should really just do a getpmsg here, with band setting according to MSG_OOB, or we
+	   can do an I_PEEK if MSG_PEEK is set. */
+	/* XNS says if the MSG_WAITALL flag is not set, data will be returned only up to the end of 
+	   the first message. */
+	struct socksysreq args = {
+		{SO_RECV, fd, (long) buf, len, flags,}
+	};
+	return __sock_ioctl(&args);
 }
 
 ssize_t
@@ -802,26 +968,36 @@ __sock_recv_r(int fd, void *buf, size_t len, int flags)
 
 	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
 	if (__sock_getuser(fd)) {
-		ret = __sock_recv(fd, buf, len, flags);
+		if ((ret = __sock_recv(fd, buf, len, flags)) == -1)
+			pthread_testcancel();
 		__sock_putuser(&fd);
-	} else
+		pthread_cleanup_pop_restore_np(0);
+	} else {
+		pthread_cleanup_pop_restore_np(0);
 		ret = __libc_recv(fd, buf, len, flags);
-	pthread_cleanup_pop_restore_np(0);
+	}
 	return (ret);
 }
 
 ssize_t recv(int fd, void *buf, size_t len, int flags)
     __attribute__ ((alias("__sock_recv_r")));
 
+/*
+ * This function is a thread cancellation point (according to XNS 5.2).
+ */
 ssize_t
 __sock_recvmsg(int fd, struct msghdr *msg, int flags)
 {
 	/* MSG_PEEK, MSG_OOB, or MSG_WAITALL */
-	/* We should really just do a getpmsg here, with band setting
-	 * according to MSG_OOB, or we can do an I_PEEK if MSG_PEEK is set. */
-	/* XNS says if the MSG_WAITALL flag is not set, data will be returned
-	 * only up to the end of the first message. */
+	/* We should really just do a getpmsg here, with band setting according to MSG_OOB, or we
+	   can do an I_PEEK if MSG_PEEK is set. */
+	/* XNS says if the MSG_WAITALL flag is not set, data will be returned only up to the end of 
+	   the first message. */
 	/* Upon return we can set MSG_EOR, MSG_OOB, MSG_TRUNC or MSG_CTRUNC. */
+	struct socksysreq args = {
+		{SO_RECVMSG, fd, (long) msg, flags,}
+	};
+	return __sock_ioctl(&args);
 }
 
 ssize_t
@@ -831,25 +1007,31 @@ __sock_recvmsg_r(int fd, struct msghdr *msg, int flags)
 
 	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
 	if (__sock_getuser(fd)) {
-		ret = __sock_recvmsg(fd, msg, flags);
+		if ((ret = __sock_recvmsg(fd, msg, flags)) == -1)
+			pthread_testcancel();
 		__sock_putuser(&fd);
-	} else
+		pthread_cleanup_pop_restore_np(0);
+	} else {
+		pthread_cleanup_pop_restore_np(0);
 		ret = __libc_recvmsg(fd, msg, flags);
-	pthread_cleanup_pop_restore_np(0);
+	}
 	return (ret);
 }
 
 ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
     __attribute__ ((alias("__sock_recvmsg_r")));
 
+/*
+ * This function is a thread cancellation point (according to XNS 5.2).
+ */
 ssize_t
 __sock_recvfrom(int fd, void *buf, size_t len, int flags, struct sockaddr *addr, socklen_t * alen)
 {
 	/* MSG_PEEK, MSG_OOB, or MSG_WAITALL */
-	/* We should really just do a getpmsg here, with band setting
-	 * according to MSG_OOB, or we can do an I_PEEK if MSG_PEEK is set. */
-	/* XNS says if the MSG_WAITALL flag is not set, data will be returned
-	 * only up to the end of the first message. */
+	/* We should really just do a getpmsg here, with band setting according to MSG_OOB, or we
+	   can do an I_PEEK if MSG_PEEK is set. */
+	/* XNS says if the MSG_WAITALL flag is not set, data will be returned only up to the end of 
+	   the first message. */
 }
 
 ssize_t
@@ -859,24 +1041,29 @@ __sock_recvfrom_r(int fd, void *buf, size_t len, int flags, struct sockaddr *add
 
 	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
 	if (__sock_getuser(fd)) {
-		ret = __sock_recvfrom(fd, buf, len, flags, addr, alen);
+		if ((ret = __sock_recvfrom(fd, buf, len, flags, addr, alen)) == -1)
+			pthread_testcancel();
 		__sock_putuser(&fd);
-	} else
+		pthread_cleanup_pop_restore_np(0);
+	} else {
+		pthread_cleanup_pop_restore_np(0);
 		ret = __libc_recvfrom(fd, buf, len, flags, addr, alen);
-	pthread_cleanup_pop_restore_np(0);
+	}
 	return (ret);
 }
 
 ssize_t recvfrom(int fd, void *buf, size_t len, int flags, struct sockaddr *addr, socklen_t * alen)
     __attribute__ ((alias("__sock_recvfrom_r")));
 
+/*
+ * This function is a thread cancellation point (according to XNS 5.2).
+ */
 ssize_t
 __sock_send(int fd, const void *buf, size_t len, int flags)
 {
 	/* flags can be MSG_EOR or MSG_OOB */
-	/* we really just want to put a T_DATA_REQ, T_EXDATA_REQ or
-	 * T_UNITDATA_REQ message here.  Note that the T_UNITDATA_REQ
-	 * requires an address from the user structure. */
+	/* we really just want to put a T_DATA_REQ, T_EXDATA_REQ or T_UNITDATA_REQ message here.
+	   Note that the T_UNITDATA_REQ requires an address from the user structure. */
 }
 
 ssize_t
@@ -886,24 +1073,29 @@ __sock_send_r(int fd, const void *buf, size_t len, int flags)
 
 	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
 	if (__sock_getuser(fd)) {
-		ret = __sock_recvfrom(fd, bug, len, flags, addr, alen);
+		if ((ret = __sock_recvfrom(fd, bug, len, flags, addr, alen)) == -1)
+			pthread_testcancel();
 		__sock_putuser(&fd);
-	} else
+		pthread_cleanup_pop_restore_np(0);
+	} else {
+		pthread_cleanup_pop_restore_np(0);
 		ret = __libc_recvfrom(fd, bug, len, flags, addr, alen);
-	pthread_cleanup_pop_restore_np(0);
+	}
 	return (ret);
 }
 
 ssize_t send(int fd, const void *buf, size_t len, int flags)
     __attribute__ ((alias("__sock_send_r")));
 
+/*
+ * This function is a thread cancellation point (according to XNS 5.2).
+ */
 ssize_t
 __sock_sendmsg(int fd, const struct msghdr *msg, int flags)
 {
 	/* flags can be MSG_EOR or MSG_OOB */
-	/* we really just want to put a T_OPTDATA_REQ or T_UNITDATA_REQ
-	 * message here.  Note that the T_UNITDATA_REQ requires an address
-	 * from the user structure. */
+	/* we really just want to put a T_OPTDATA_REQ or T_UNITDATA_REQ message here.  Note that
+	   the T_UNITDATA_REQ requires an address from the user structure. */
 }
 
 ssize_t
@@ -913,24 +1105,29 @@ __sock_sendmsg_r(int fd, const struct msghdr *msg, int flags)
 
 	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
 	if (__sock_getuser(fd)) {
-		ret = __sock_sendmsg(fd, msg, flags);
+		if ((ret = __sock_sendmsg(fd, msg, flags)) == -1)
+			pthread_testcancel();
 		__sock_putuser(&fd);
-	} else
+		pthread_cleanup_pop_restore_np(0);
+	} else {
+		pthread_cleanup_pop_restore_np(0);
 		ret = __libc_sendmsg(fd, msg, flags);
-	pthread_cleanup_pop_restore_np(0);
+	}
 	return (ret);
 }
 
 ssize_t sendmsg(int fd, const struct msghdr *msg, int flags)
     __attribute__ ((alias("__sock_sendmsg_r")));
 
+/*
+ * This function is a thread cancellation point (according to XNS 5.2).
+ */
 ssize_t
 __sock_sendto(int fd, const void *buf, size_t len, int flags, const struct sockaddr *addr,
 	      socklen_t alen)
 {
 	/* flags can be MSG_EOR or MSG_OOB */
-	/* we really just want to put a T_OPTDATA_REQ or T_UNITDATA_REQ
-	 * message here.  */
+	/* we really just want to put a T_OPTDATA_REQ or T_UNITDATA_REQ message here.  */
 }
 
 ssize_t
@@ -941,11 +1138,14 @@ __sock_sendto_r(int fd, const void *buf, size_t len, int flags, const struct soc
 
 	pthread_cleanup_push_defer_np(__sock_putuser, &fd);
 	if (__sock_getuser(fd)) {
-		ret = __sock_sendto(fd, buf, len, flags, addr, alen);
+		if ((ret = __sock_sendto(fd, buf, len, flags, addr, alen)) == -1)
+			pthread_testcancel();
 		__sock_putuser(&fd);
-	} else
+		pthread_cleanup_pop_restore_np(0);
+	} else {
+		pthread_cleanup_pop_restore_np(0);
 		ret = __libc_sendto(fd, buf, len, flags, addr, alen);
-	pthread_cleanup_pop_restore_np(0);
+	}
 	return (ret);
 }
 
