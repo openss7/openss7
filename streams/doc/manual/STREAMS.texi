@@ -249,6 +249,13 @@ Introduction
 
 Objective
 
+* Background::
+* What is STREAMS?::
+* Why STREAMS?::
+* Why STREAMS for Linux?::
+* History of STREAMS for Linux::
+* Why Fast?::
+
 Reference
 
 * Files::			Files included in the package
@@ -699,6 +706,216 @@ This manual uses @cite{texinfo} typographic conventions.
 @chapter Objective
 @cindex objective
 
+@menu
+* Background::
+* What is STREAMS?::
+* Why STREAMS?::
+* Why STREAMS for Linux?::
+* History of STREAMS for Linux::
+* Why Fast?::
+@end menu
+
+@node Background
+@section Background
+
+@acronym{STREAMS} derives from Dennis Ritchie's original paper,@footnote{xxx} was incorporated into the
+@cite{UNIX@registeredsymbol{} System V Release 3} operating system, replaced the terminal
+input-output subsystem, pipes and FIFOs in @cite{UNIX@registeredsymbol{} System V Release 4}, and
+was improved in the @acronym{USL} release of the @cite{UNIX@registeredsymbol{} System V Release 4.2}
+operating system.
+
+Today, @acronym{STREAMS} is a part of every major branded @cite{UNIX@registeredsymbol{}} variant,
+such as
+@cite{AIX@registeredsymbol{}},
+@cite{HP-UX@registeredsymbol{}},
+@cite{IRIX@registeredsymbol{}},
+@cite{MacOT@registeredsymbol{}},
+@cite{OSF/1@registeredsymbol{}},
+@cite{Solaris@registeredsymbol{}},
+@cite{SUPER-UX@registeredsymbol{}},
+@cite{UnixWare@registeredsymbol{}},
+@cite{UXP/V@registeredsymbol{}},
+and including many @cite{UNIX}-like operating systems and popular embedded @acronym{RTOS}, but with
+the notable exception of @cite{Berkeley System Distribution} releases, variants and offshoots, and
+@cite{Linux}.
+
+@node What is STREAMS?
+@section What is STREAMS?
+
+STREAMS is a flexible framework for communication between a user level process and a kernel resident
+driver.  It encompasses a set of kernel system calls providing a user-kernel interface that is
+backward compatible with the traditional character device driver interface, as well as a set of
+STREAMS driver and module entry points fomring a driver-kernel interface.  STREAMS also provides a
+rich set of kernel utility functions for the development and implementation of kernel-resident
+drivers and modules.  STREAMS prompted the specification of the DDI/DKI which is an architecture
+independent driver-kernel interface that provides a standardized set of kernel functions (beyond
+just STREAMS) for the development of device and software drivers.
+
+STREAMS provides a reconfigurable full-duplex communications path between nuser level process and
+kernel resident driver, termed a @dfn{Stream}.  Modules can be inserted in the path between the user
+and driver under user level control.  Streams can be linked across multiplexers under user control
+to form complex (yet reconfigurable) topologies of user level processes and drivers.
+
+Communication of control and data information along a Stream is accomplished by message passing.
+There is no direct function call interface between components of a Stream.  A Stream exists within
+the STREAMS framework inside the kernel and extend from the user-kernel interface to the kernel
+driver interface.  Each component of a Stream consists of a pair of queues used to pass messages in
+the upstream direction to the kernel-user interface; or downstream, the kernel-driver interface.
+
+At the kernel-user end of the Stream is a component called the @dfn{Stream head}.  As with all
+components of a Stream, the Stream head consists of a queue pair and a specialized set of
+procedures.  The Stream head procedures are responsible for converting between the system call
+interface preseted to users and the message passing mechanism within the Stream.
+
+At the kernel-driver end of the Stream is the @dfn{Stream end}.  The Stream end also contains a
+queue pair and a set of procedures.  The Stream end (or simply driver) procedures are responsible
+for converting between the message passing mechanism within the Stream and the actions and events of
+a hardware (or pseudo-) device.
+
+Intermediate components within the Stream are called @dfn{Modules}.  Modules consist of a queue pair
+for passing messages upstream and downstream, as well as a set of procedures for processing
+messages.  Modules can be pushed onto the module stack between the Stream head and Stream end using
+a set of standardized input-output control commands.
+
+In support of topologies more complex than these simple linear segments, STREAMS also provides a
+specialized Stream end (driver) called a @dfn{Multiplexing driver}.  A Multiplexing driver has the
+ability to open multiple Streams to its upper interface (multiplexer) as well as linking multiple
+Streams beneath its lower interface (multiplexer).  Again, a standardized set of input-output
+controls provide the user with the ability to configure a Multiplexing driver.
+
+@node Why STREAMS?
+@section Why STREAMS?
+
+With the ability to open multiple Streams to a driver, push and pop moudles to and from the module
+stack on a Stream, and to link any Stream under a multiplexing driver--all under user control using
+standardized input-output controls--allows STREAMS to configure complex topologies to form protocol
+stacks.
+
+Almost all specialized standard telecommunications software developed since 1990 was developed to
+run on STREAMS.  This is for several reasons:
+
+@itemize
+@item
+Since 1990, STREAMS and the associated DDI/DKI has been, and remains, the only way to incorporate
+OEM protocol stacks into mainstream @cite{UNIX@registeredsymbol{}} system kernels.
+
+@item
+The original @cite{UNIX System Laboratories} (later @cite{X/Open} then later the @cite{OpenGroup})
+support for @acronym{ITU-T} developed @acronym{OSI} protocols, makes STREAMS amenable to an open
+model for development for @acronym{ITU-T} protocols.  (@acronym{ITU-T}, formerly @acronym{CCITT}, is
+the @cite{International Telecommunications Union -- Telephone Sector} responsible for international
+telephone standards, and original developers of the @acronym{OSI} model.)
+@end itemize
+
+As a result, there is a significant body of commercial software implementing telecommunications
+protocol stacks that was developed, tested, validated, conformance tested, field verified, to run on
+STREAMS: and is still running on STREAMS.
+
+The cost of reimplementation, retesting, revalidation, redoing conformance testing, and field
+re-verification, would likely be prohibitive: after all, the point of @cite{Linux} is reducing cost,
+is it not?
+
+@node Why STREAMS for Linux?
+@section Why STREAMS for Linux?
+
+The @cite{Linux} kernel was not developed with STREAMS in mind.  For @acronym{TPI/IP} networking,
+@cite{Linux} originally followed in the footsteps of the @acronym{BSD NET2} release.  Currently, the
+implementation of @acronym{TCP/IP} in the @cite{Linux} kernel has long departed from the classical
+@acronym{BSD} organization and exhibits characteristics unique to the @cite{GNU/Linux} operating
+system.  For character device and terminal input-output, @cite{Linux} follows closely the
+@acronym{SVR 3} pre-STREAMS approach to pipes, FIFOs and temrinal subsystem.  The terminal subsystem
+implementation, too, has become unique to @cite{GNU/Linux}.
+
+Therefore, from the perspective of @acronym{TCP/IP} networking and @acronym{Terminal I/O}, there
+would be little reason to provide STREAMS for @cite{Linux}.  That is, if it were not for the body of
+software supporting @acronym{OSI} and telecommunications protoocls based solely on STREAMS, for
+which @cite{Linux} has little or no support.
+
+So, the answer to the questtion, "Why STREAMS for Linux?" is: so that a @cite{GNU/Linux} platform
+can enjoy the same wealth of telecommunications and @acronym{OSI} protocol stacks otherwise only
+available to big-iron @cite{UNIX@registeredsymbol{}}.  Without STREAMS, @cite{Linux} is probably
+just another @acronym{BSD}, and probably not a very good one.
+
+@node History of STREAMS for Linux
+@section History of STREAMS for Linux
+
+In the mid-90's, @uref{http://www.gcom.com/,,  GCOM, @abbr{Inc.}} embarked on development on an open
+source implementation of STREAMS called @cite{Linux STREAMS (LiS)}, likely driven by its use for
+porting existing @acronym{OSI} protocol stacks to @cite{Linux}.  In 2000,
+@uref{http://www.openss7.org/,, The OpenSS7 Project} abandonned using the @cite{Linux} networkig
+model for implementation of the @cite{Signalling System No. 7} protocol (primarly due to the lack of
+support for the full @acronym{BSD} networking model under @cite{Linux}) and switched to using
+STREAMS as the basis for all future development.  The @cite{GCOM LiS} release (2.2 at the time) was
+used as the STREAMS package.  Over the span of the next 5 years, (and not suprisingly given the body
+of software), almost all @cite{Signalling System No. 7} products released on @cite{Linux} used
+@cite{LiS} for STREAMS.  In 2005, Dave Grothe (the @dfn{G} in @cite{GCOM}) announced that he would
+no longer be maintaining or developing @cite{LiS} subsequent to the 2.18.0 release, stranding many
+users of the package.
+
+Later in 2005, after briefly maintaining two GPL'ed releases of @cite{LiS}, (2.18.1 and 2.18.2),
+@uref{http://wwww.openss7.org/,, The OpenSS7 Project} release (after two years of development) the
+@file{streams-0.7a.4} package: a reimplementation of @cite{SVR 4.2 STREAMS} with compatibility
+modules for all major @cite{UNIX@registeredsymbol{}} releases, called @cite{@value{PACKAGE_TITLE}}.
+@cite{@value{PACKAGE_TITLE}} was intended as a @cite{POSIX/SUSv3 XSR} conforming, high perofrmance,
+production grade, replacement for @cite{LiS}, suitable for mainline @cite{Linux} adoption, and a
+better foundation on which to base @acronym{SIGTRAN}, @acronym{VoIP}, @acronym{ISDN} and
+@acronym{SS7} protocol stakcs developed under the @uref{http://www.openss7.org/,, The OpenSS7
+Project}, as well as a better foundation for porting commercial @cite{UNIX@registeredsymbol{}}
+@acronym{OEM} implementations to @cite{Linux}.  It is the @file{@value{PACKAGE}-@value{VERSION}}
+package that contains the documentation you are reading now.
+
+@node Why Fast?
+@section Why Fast?
+
+After working with @cite{LiS} releases for over 3 years, in late 2003,
+@uref{http://www.openss7.org/,, The OpenSS7 Project} decided to begin implementation of a
+replacement for @cite{LiS}, because of a number of shortcomings of the @cite{LiS} releases:
+
+@enumerate a
+@item unsuitable for mainline kernel adoption due to coding style and organization;
+@item pooly adapted to distribution production kernels;
+@item is unsuitable for packaging and repeatability;
+@item protability objective unsuitable for mainline kernel adoption;
+@item ports form the same baseline obfuscate the code;
+@item performs poorly due to portability and coding style;
+@item code bloat and oversized memory footprint;
+@item redundant debug statements obscuring defects and obfuscating code;
+@item overuse of semaphores;
+@item contains serious races and not suitable for threaded applications;
+@item does not conform to mainstream @cite{UNIX@registeredsymbol{}} implementations;
+@item does not conform to @cite{POSIX} or any release of the @cite{Single UNIX Specification};
+@item limited set of standard drivers and modules;
+@item limited set of diagnostic and administrative utilities;
+@item limited test programs;
+@item poorly documented.
+@end enumerate
+
+The replacement, named @cite{@value{PACKAGE_TITLE}}, was to correct all of these difficulties, and,
+by the initial @samp{streams-0.7a.4} release, was:
+
+@enumerate a
+@item completely Lindented and follows kernel coding practises;
+@item automatically adapts to production kernels with autoconf;
+@item packages itself into @acronym{LSB} compliant @acronym{RPM}s and @acronym{DEB}s;
+@item designed and implemented specifically for @cite{GNU/Linux};
+@item no ports considered;
+@item over twice the performance;
+@item less than one-eigth of the memory footprint;
+@item proper programming by assertion;
+@item proper use of lightweight spinlocks;
+@item race free locking strategies and synchronization;
+@item compatible with all mainstream @cite{UNIX@registeredsymbol{}} implementations;
+@item conforms to @cite{POSIX/SUSv3 XSR};
+@item complete set of standard drivers and modules;
+@item complete set of diagnostic and administrative utilities;
+@item integrated set of conformance testsuites;
+@item fully documented.
+@end enumerate
+
+Many specific difficulties encountered with @cite{LiS} not repeated by @cite{@value{PACKAGE_TITLE}}
+are contained in the @dfn{COMPATIBILITY} section of most of the manual pages.
+
+@ignore
 @cite{@value{PACKAGE_TITLE}} is intended as a high-performance, production replacement for
 @cite{Linux STREAMS (LiS)}.  @cite{@value{PACKAGE_TITLE}} has the following features in contrast to
 @cite{Linux STREAMS}:
@@ -741,6 +958,7 @@ filesystem for support and debugging.
 @item Provides full named-streams device and device filesystem support.
 @tab Provides only character-based node support. @*
 @end multitable
+@end ignore
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
