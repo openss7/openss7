@@ -751,7 +751,7 @@ drivers and modules.  STREAMS prompted the specification of the DDI/DKI which is
 independent driver-kernel interface that provides a standardized set of kernel functions (beyond
 just STREAMS) for the development of device and software drivers.
 
-STREAMS provides a reconfigurable full-duplex communications path between nuser level process and
+STREAMS provides a reconfigurable full-duplex communications path between user level process and
 kernel resident driver, termed a @dfn{Stream}.  Modules can be inserted in the path between the user
 and driver under user level control.  Streams can be linked across multiplexers under user control
 to form complex (yet reconfigurable) topologies of user level processes and drivers.
