@@ -210,6 +210,22 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test ! -d "$srcdir/strutil" ; then
 	with_STRUTIL='no'
     fi
+    AC_ARG_WITH([STRBCM],
+		AS_HELP_STRING([--with-STRBCM],
+			       [include STRBCM in master pack @<:@detected@:>@]),
+		[with_STRBCM="$withval"],
+		[with_STRBCM="$with_ALL"])
+    if test ! -d "$srcdir/strbcm" ; then
+	with_STRBCM='no'
+    fi
+    AC_ARG_WITH([STRTTY],
+		AS_HELP_STRING([--with-STRTTY],
+			       [include STRTTY in master pack @<:@detected@:>@]),
+		[with_STRTTY="$withval"],
+		[with_STRTTY="$with_ALL"])
+    if test ! -d "$srcdir/strtty" ; then
+	with_STRTTY='no'
+    fi
     AC_ARG_WITH([STRXNS],
 		AS_HELP_STRING([--without-STRXNS],
 			       [do not include STRXNS in master pack @<:@included@:>@]),
@@ -250,6 +266,14 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test ! -d "$srcdir/strsctp" ; then
 	with_STRSCTP='no'
     fi
+    AC_ARG_WITH([STRISO],
+		AS_HELP_STRING([--with-STRISO],
+			       [include STRISO in master pack @<:@detected@:>@]),
+		[with_STRISO="$withval"],
+		[with_STRISO="$with_ALL"])
+    if test ! -d "$srcdir/striso" ; then
+	with_STRISO='no'
+    fi
     AC_ARG_WITH([NETPERF],
 		AS_HELP_STRING([--without-NETPERF],
 			       [do not include NETPERF in master pack @<:@included@:>@]),
@@ -265,30 +289,6 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		[with_STACKS='yes'])
     if test ! -d "$srcdir/stacks" ; then
 	with_STACKS='no'
-    fi
-    AC_ARG_WITH([STRBCM],
-		AS_HELP_STRING([--with-STRBCM],
-			       [include STRBCM in master pack @<:@detected@:>@]),
-		[with_STRBCM="$withval"],
-		[with_STRBCM="$with_ALL"])
-    if test ! -d "$srcdir/strbcm" ; then
-	with_STRBCM='no'
-    fi
-    AC_ARG_WITH([STRTTY],
-		AS_HELP_STRING([--with-STRTTY],
-			       [include STRTTY in master pack @<:@detected@:>@]),
-		[with_STRTTY="$withval"],
-		[with_STRTTY="$with_ALL"])
-    if test ! -d "$srcdir/strtty" ; then
-	with_STRTTY='no'
-    fi
-    AC_ARG_WITH([STRISO],
-		AS_HELP_STRING([--with-STRISO],
-			       [include STRISO in master pack @<:@detected@:>@]),
-		[with_STRISO="$withval"],
-		[with_STRISO="$with_ALL"])
-    if test ! -d "$srcdir/striso" ; then
-	with_STRISO='no'
     fi
 ])# _OS7_OPTIONS
 # =============================================================================
@@ -350,6 +350,20 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-util'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-util"
     fi
+    if test :"${with_STRBCM:-yes}" != :no ; then
+	:
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_bcm --without-bcm\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-bcm'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-bcm"
+    fi
+    if test :"${with_STRTTY:-yes}" != :no ; then
+	:
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_tty --without-tty\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-tty'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-tty"
+    fi
     if test :"${with_STRXNS:-yes}" != :no ; then
 	_XNS
     else
@@ -385,33 +399,19 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-sctp'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-sctp"
     fi
-    if test :"${with_STACKS:-yes}" != :no ; then
-	_SS7
-    else
-	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_ss7 --without-ss7\""
-	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-ss7'"
-	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-ss7"
-    fi
-    if test :"${with_STRBCM:-yes}" != :no ; then
-	:
-    else
-	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_bcm --without-bcm\""
-	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-bcm'"
-	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-bcm"
-    fi
-    if test :"${with_STRTTY:-yes}" != :no ; then
-	:
-    else
-	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_tty --without-tty\""
-	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-tty'"
-	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-tty"
-    fi
     if test :"${with_STRISO:-yes}" != :no ; then
 	:
     else
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_iso --without-iso\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-iso'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-iso"
+    fi
+    if test :"${with_STACKS:-yes}" != :no ; then
+	_SS7
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_ss7 --without-ss7\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-ss7'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-ss7"
     fi
 ])# _OS7_SETUP
 # =============================================================================
@@ -427,35 +427,35 @@ AC_DEFUN([_OS7_CONFIG_KERNEL], [dnl
 # _OS7_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_OUTPUT], [dnl
-    if test :${with_SCTP:-auto} = :auto ; then
-	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
-	    with_SCTP='no'
-	else
-	    with_SCTP='yes'
-	fi
-    fi
-    if test :${with_IPERF:-auto} = :auto ; then
-	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
-	    with_IPERF='no'
-	else
-	    with_IPERF='yes'
-	fi
-    fi
-    if test :${with_LIS:-auto} = :auto ; then
-	with_LIS='no'
-    fi
-    if test :${with_STRUTIL:-auto} = :auto ; then
-	with_STRUTIL='no'
-    fi
-    if test :${with_STRBCM:-auto} = :auto ; then
-	with_STRBCM='no'
-    fi
-    if test :${with_STRTTY:-auto} = :auto ; then
-	with_STRTTY='no'
-    fi
-    if test :${with_STRISO:-auto} = :auto ; then
-	with_STRISO='no'
-    fi
+dnl    if test :${with_SCTP:-auto} = :auto ; then
+dnl	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
+dnl	    with_SCTP='no'
+dnl	else
+dnl	    with_SCTP='yes'
+dnl	fi
+dnl    fi
+dnl    if test :${with_IPERF:-auto} = :auto ; then
+dnl	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
+dnl	    with_IPERF='no'
+dnl	else
+dnl	    with_IPERF='yes'
+dnl	fi
+dnl    fi
+dnl    if test :${with_LIS:-auto} = :auto ; then
+dnl	with_LIS='no'
+dnl    fi
+dnl    if test :${with_STRUTIL:-auto} = :auto ; then
+dnl	with_STRUTIL='no'
+dnl    fi
+dnl    if test :${with_STRBCM:-auto} = :auto ; then
+dnl	with_STRBCM='no'
+dnl    fi
+dnl    if test :${with_STRTTY:-auto} = :auto ; then
+dnl	with_STRTTY='no'
+dnl    fi
+dnl    if test :${with_STRISO:-auto} = :auto ; then
+dnl	with_STRISO='no'
+dnl    fi
     if test :${with_SCTP:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([sctp])
     fi
