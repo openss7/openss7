@@ -108,7 +108,11 @@ sort-adjacent-labels
 .HP
 .BI "struct devnode *cmin_get(const struct cdevsw *" cdev ", minor_t " minor );
 .HP
+.BI "int cmin_ini(struct devnode *" cmin ", struct cdevsw *" cdev ", minor_t " minor ");
+.HP
 .BI "struct devnode *cmin_find(const struct cdevsw *" cdev ", const char *" name );
+.HP
+.BI "void cmin_rel(struct devnode *" cmin ");
 .PD
 .\"
 .\"
@@ -300,6 +304,26 @@ for
 .BR cmin_find ()
 returns
 .BR NULL .
+.\" ------------------------
+.PP
+.BR cmin_ini ()
+initialize the minor
+.BR devnode (9)
+structure specified by
+.I cmin
+to the
+.I STREAMS
+driver specified by
+.IR cdev ,
+at minor device number
+.IR minor .
+.\" ------------------------
+.PP
+.BR cmin_rel ()
+release the inode from the minor
+.BR devnode (9)
+structure specified by
+.IR cmin .
 .\"
 .\"
 .SH USAGE

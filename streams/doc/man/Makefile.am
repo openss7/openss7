@@ -1121,6 +1121,8 @@ man_MANS = \
 	man9/cmin_del.9 \
 	man9/cmin_find.9 \
 	man9/cmin_get.9 \
+	man9/cmin_ini.9 \
+	man9/cmin_rel.9 \
 	man9/cmn_err.9 \
 	man9/copyb.9 \
 	man9/copyin.9 \
@@ -1263,12 +1265,15 @@ man_MANS = \
 	man9/sdev_add.9 \
 	man9/sdev_del.9 \
 	man9/sdev_get.9 \
+	man9/sdev_ini.9 \
 	man9/sdev_put.9 \
+	man9/sdev_rel.9 \
 	man9/sealloc.9 \
 	man9/sefree.9 \
 	man9/setq.9 \
 	man9/setsq.9 \
 	man9/setqsched.9 \
+	man9/skballoc.9 \
 	man9/spec_open.9 \
 	man9/spec_reparent.9 \
 	man9/specfs_mount.9 \
@@ -2230,6 +2235,8 @@ dist_noinst_MANS = \
 	man9/cmin_del.9.man \
 	man9/cmin_find.9.man \
 	man9/cmin_get.9.man \
+	man9/cmin_ini.9.man \
+	man9/cmin_rel.9.man \
 	man9/cmn_err.9.man \
 	man9/copyb.9.man \
 	man9/copyin.9.man \
@@ -2373,12 +2380,15 @@ dist_noinst_MANS = \
 	man9/sdev_add.9.man \
 	man9/sdev_del.9.man \
 	man9/sdev_get.9.man \
+	man9/sdev_ini.9.man \
 	man9/sdev_put.9.man \
+	man9/sdev_rel.9.man \
 	man9/sealloc.9.man \
 	man9/sefree.9.man \
 	man9/setq.9.man \
 	man9/setsq.9.man \
 	man9/setqsched.9.man \
+	man9/skballoc.9.man \
 	man9/spec_open.9.man \
 	man9/spec_reparent.9.man \
 	man9/specfs_mount.9.man \

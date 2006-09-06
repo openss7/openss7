@@ -81,7 +81,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B cdev_count, cdevsw_list, cdevsw_lock, sdev_add, sdev_del, sdev_get, sdev_put, cdev_find, cdev_match, cdev_minor, cdev_str, cdev_add, cdev_del, cdev_get, cdev_put
+.B cdev_count, cdevsw_list, cdevsw_lock, sdev_add, sdev_del, sdev_get, sdev_ini, sdev_put, sdev_rel, cdev_find, cdev_match, cdev_minor, cdev_str, cdev_add, cdev_del, cdev_get, cdev_put
 \- character device switch table helper functions
 .\"
 .\"
@@ -106,13 +106,17 @@ sort-adjacent-labels
 .HP
 .BI "struct cdevsw *sdev_get(major_t " major ");
 .HP
+.BI "int sdev_ini(struct cdevsw *" cdev ", modID_t " modid ");
+.HP
+.BI "void sdev_put(struct cdevsw *" cdev ");
+.HP
+.BI "void sdev_rel(struct cdevsw *" cdev ");
+.HP
 .BI "struct cdevsw *cdev_find(const char *" name ");
 .HP
 .BI "struct cdevsw *cdev_match(const char *" name ");
 .HP
 .BI "struct cdevsw *cdev_str(const struct streamtab *" str ");
-.HP
-.BI "void sdev_put(struct cdevsw *" cdev ");
 .HP
 .BI "minor_t cdev_minor(struct cdevsw *" cdev ", major_t " major ", minor_t " minor ");
 .PD
@@ -245,6 +249,30 @@ until the
 kernel defined a conflicting symbol.
 .\" ------------------------
 .PP
+.BR sdev_ini ()
+initializes the characeter device switch tabel entry
+.IR cdev ,
+and assigns it module identifier
+.IR modid .
+.\" ------------------------
+.PP
+.BR sdev_put ()
+releases a reference to the character device switch table entry
+.IR cdev .
+.PP
+.BR cdev_put ()
+was the old name for
+.BR sdev_put (),
+until the
+.B Linux
+kernel defined a conflicting symbol.
+.\" ------------------------
+.PP
+.BR sdev_rel ()
+releases the inode associated with the character device switch table entry
+.IR cdev .
+.\" ------------------------
+.PP
 .BR cdev_find ()
 locates the character device switch table entry that has the same name as
 .IR name .
@@ -275,18 +303,6 @@ structure pointer as
 This function also acquires and passes a reference to the entry to the caller that must be released
 with
 .BR sdev_put ().
-.\" ------------------------
-.PP
-.BR sdev_put ()
-releases a reference to the character device switch table entry
-.IR cdev .
-.PP
-.BR cdev_put ()
-was the old name for
-.BR sdev_put (),
-until the
-.B Linux
-kernel defined a conflicting symbol.
 .\" ------------------------
 .PP
 .BR cdev_minor ()
