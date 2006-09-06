@@ -167,8 +167,11 @@ AC_SS7
 
 AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
-		 src/Makefile
+		 intl/Makefile
+		 po/Makefile.in
+		 m4/Makefile
 		 src/include/Makefile
+		 src/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
@@ -179,8 +182,6 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/tci/Makefile
 		 doc/specs/mapi/Makefile
 		 doc/specs/cci/Makefile
-		 m4/Makefile
-		 po/Makefile.in
 		 src/modules/inet/lis.conf
 		 src/modules/sctp/lis.conf])
 
