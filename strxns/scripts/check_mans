@@ -369,8 +369,11 @@ do
 	fi
 	# can we format it?
 	: #echo_t "testing formatting of page $base"
-	echo_d "( man -M $manpath $page | sed -e 's/.[[:cntrl:]]//g' ) > ${me}_$$.out 2> ${me}_$$.err" $LINENO
-	if ( man -M $manpath $page | sed -e 's/.[[:cntrl:]]//g' ) > ${me}_$$.out 2> ${me}_$$.err \
+	# note that SuSE 10.0 cannot handle mixed paths and full path files
+	root=`echo $base | sed -e 's,\.[1-9][^\.]*,,'`
+	sect=`echo $base | sed -e 's,.*\.,,'`
+	echo_d "( man -M $manpath $sect $root | sed -e 's/.[[:cntrl:]]//g' ) > ${me}_$$.out 2> ${me}_$$.err" $LINENO
+	if ( man -M $manpath $sect $root | sed -e 's/.[[:cntrl:]]//g' ) > ${me}_$$.out 2> ${me}_$$.err \
 		&& test -n "`cat ${me}_$$.out`" \
 		&& test -z "`cat ${me}_$$.err | grep -v warning | grep -v 'character above first line discarded' | grep -v 'Reformatting.*please wait'`"
 	then
@@ -424,6 +427,11 @@ do
 			if test :"${MAINTAINER_MODE:-no}" != :no
 			then
 				echo_e "cannot find section $t in $base" $LINENO
+				echo_d "formatted manpage was:" $LINENO
+				while read line
+				do
+					echo_d "$line" $LINENO
+				done < ${me}_$$.out
 				continue
 			else
 				echo_w "cannot find section $t in $base" $LINENO
@@ -461,6 +469,11 @@ do
 			if test :"${MAINTAINER_MODE:-no}" != :no
 			then
 				echo_e "cannot find option $t in $base" $LINENO
+				echo_d "formatted manpage was:" $LINENO
+				while read line
+				do
+					echo_d "$line" $LINENO
+				done < ${me}_$$.out
 				continue
 			else
 				echo_w "cannot find option $t in $base" $LINENO
