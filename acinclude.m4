@@ -427,35 +427,23 @@ AC_DEFUN([_OS7_CONFIG_KERNEL], [dnl
 # _OS7_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_OUTPUT], [dnl
-dnl    if test :${with_SCTP:-auto} = :auto ; then
-dnl	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
-dnl	    with_SCTP='no'
-dnl	else
-dnl	    with_SCTP='yes'
-dnl	fi
-dnl    fi
-dnl    if test :${with_IPERF:-auto} = :auto ; then
-dnl	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
-dnl	    with_IPERF='no'
-dnl	else
-dnl	    with_IPERF='yes'
-dnl	fi
-dnl    fi
-dnl    if test :${with_LIS:-auto} = :auto ; then
-dnl	with_LIS='no'
-dnl    fi
-dnl    if test :${with_STRUTIL:-auto} = :auto ; then
-dnl	with_STRUTIL='no'
-dnl    fi
-dnl    if test :${with_STRBCM:-auto} = :auto ; then
-dnl	with_STRBCM='no'
-dnl    fi
-dnl    if test :${with_STRTTY:-auto} = :auto ; then
-dnl	with_STRTTY='no'
-dnl    fi
-dnl    if test :${with_STRISO:-auto} = :auto ; then
-dnl	with_STRISO='no'
-dnl    fi
+    if test :${with_SCTP:-auto} = :auto ; then
+	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
+	    with_SCTP='no'
+	else
+	    with_SCTP='yes'
+	fi
+    fi
+    if test :${with_IPERF:-auto} = :auto ; then
+	if test :${linux_cv_k_ko_modules:-yes} = :yes ; then
+	    with_IPERF='no'
+	else
+	    with_IPERF='yes'
+	fi
+    fi
+    if test :${with_LIS:-auto} = :auto ; then
+	with_LIS='no'
+    fi
     if test :${with_SCTP:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([sctp])
     fi
