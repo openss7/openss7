@@ -149,12 +149,14 @@ endif
 if WITH_XNET
 ## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
+test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
 test_xnet_LDFLAGS		= -static
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
+test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD) -lpthread
 test_xnet_thr_LDFLAGS		= -static
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
