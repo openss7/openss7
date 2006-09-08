@@ -95,7 +95,7 @@ including references in the manual pages.}
 
 @enumerate 1
 @item @cite{Linux} distribution, somewhat @cite{Linux Standards Base} compliant, with a 2.4 or 2.6
-kernel and the appropriate tool chain for compiling out-of-tree kenrel modules.  Most recent
+kernel and the appropriate tool chain for compiling out-of-tree kernel modules.  Most recent
 @cite{Linux} distributions are okay out of the box, but some development packages must be installed.
 For more information, see
 @refman{Compatibility}.

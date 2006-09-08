@@ -107,7 +107,7 @@ dist_sbin_SCRIPTS		=
 
 test_sock_SOURCES		= src/test/test-sock.c
 test_sock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_sock_LDADD			= $(STREAMS_LDADD)
+test_sock_LDADD			= libsocket.la $(STREAMS_LDADD)
 test_sock_LDFLAGS		= -static
 test_sock_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sock_CFLAGS		= $(USER_CFLAGS)
@@ -118,6 +118,14 @@ test_sock_CFLAGS		= $(USER_CFLAGS)
 #xxxxxx_LDFLAGS			= -static
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #xxxxxx_CFLAGS			= $(USER_CFLAGS)
+
+lib_LTLIBRARIES			+= libsocket.la
+
+libsocket_la_SOURCES		= src/lib/socket.c gettext.h
+libsocket_la_LDFLAGS		= -version-info 0:0:0
+libsocket_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
+libsocket_la_CFLAGS		= $(USER_CFLAGS)
+libsocket_la_LIBADD		=
 
 ## RPM_BUILD_USER
 endif

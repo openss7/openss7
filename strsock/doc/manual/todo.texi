@@ -86,7 +86,7 @@ into the @file{src} directory.
 
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
-a subpackage in the @cite{OpenSS7 Master Package}.
+a sub-package in the @cite{OpenSS7 Master Package}.
 
 @emph{*done*}
 

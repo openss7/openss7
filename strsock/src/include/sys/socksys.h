@@ -74,7 +74,7 @@ struct socknewproto32 {
 	int32_t family;			/* address family */
 	int32_t type;			/* socket type */
 	int32_t proto;			/* protocol */
-	dev32_t dev;			/* major/minor (must be clone) */
+	dev_t dev;			/* major/minor (must be clone) */
 	int32_t flags;			/* protosw flags */
 };
 

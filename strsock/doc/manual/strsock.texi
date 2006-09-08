@@ -641,7 +641,7 @@ This manual uses @cite{texinfo} typographic conventions.
 The objective of the @cite{@value{PACKAGE_TITLE}} package is to provide
 @dfn{Sockets} capability for @dfn{STREAMS} in a similar manner as provided by
 @cite{SVR 4.2} and later @cite{Solaris} implementations.  To accomplish this
-there are three (3) approaches that can be taked to implementing @dfn{Sockets}
+there are three (3) approaches that can be taken to implementing @dfn{Sockets}
 over @dfn{STREAMS}:
 
 @menu

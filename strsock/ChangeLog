@@ -1,3 +1,16 @@
+2006-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/descrip.texi: spelling corrections
+	* doc/manual/prerequisites.texi: spelling corrections
+	* doc/manual/releases.texi: spelling corrections
+	* doc/manual/strsock.texi: spelling corrections
+	* doc/manual/todo.texi: spelling corrections
+	* doc/manual/tree.texi: spelling corrections
+	* src/include/sys/sockmod.h: working up libsocket
+	* src/include/sys/socksys.h: working up libsocket
+	* src/lib/socket.c: working up libsocket
+	* Makefile.am: added libsocket
+
 2006-09-03  gettextize  <bug-gnu-gettext@gnu.org>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): New variable.

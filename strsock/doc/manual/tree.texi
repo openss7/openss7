@@ -84,8 +84,8 @@ directory @file{lib/modules/@value{_kversion}/@value{PACKAGE}/}:
 @table @file
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system libexec directory
-@file{usr/libexec/}:
+@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system @samp{libexec}
+directory @file{usr/libexec/}:
 
 @table @file
 @end table
@@ -95,7 +95,7 @@ directory @file{lib/modules/@value{_kversion}/@value{PACKAGE}/}:
 
 @table @file
 @item strsock_mknod
-This binary conatins a script for making device nodes for the @dfn{@value{PACKAGE_UCNAME}} package.
+This binary contains a script for making device nodes for the @dfn{@value{PACKAGE_UCNAME}} package.
 @end table
 
 @dfn{@value{PACKAGE_UCNAME}} places the following info files in the system info directory
@@ -110,8 +110,8 @@ This binary conatins a script for making device nodes for the @dfn{@value{PACKAG
 These files contain this manual in info format.
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following manpage macro and reference database files in the
-system man directory @file{usr/share/man/}:
+@dfn{@value{PACKAGE_UCNAME}} places the following manual page macro and reference database files in
+the system man directory @file{usr/share/man/}:
 
 @table @file
 @item @value{PACKAGE}.macros

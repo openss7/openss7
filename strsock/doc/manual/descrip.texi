@@ -57,12 +57,13 @@
 @c
 @c =========================================================================
 
-The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} mopdules and
-drivers, libraries, programs, init scripts, and daemons.
+The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and
+drivers, libraries, programs, initialization scripts, and daemons.
 
 The @cite{@value{PACKAGE_TITLE}} package contains header files and a number of
-modules and drivers and the associated documentation not cointains in the
-@cite{OpenSS7 Linux STREAMS (LiS)} releases.
+modules and drivers and the associated documentation originally contained in the
+@cite{Linux Fast-STREAMS} release, but not contained in the @cite{Linux STREAMS
+(LiS)} releases.
 
 The package uses the following standard @cite{Open Systems Interconnect (OSI)}
 conforming header files from the @file{strxnet} package:
@@ -91,7 +92,7 @@ It does so by recognizing input-output controls from three sets: @*
 controls, and even @manpage{socket(7)} system calls.
 
 @item @manref{socksys(4)}
-The @manpage{socksys(4)} driver, when opened, provies a @cite{TPI} @dfn{Stream}
+The @manpage{socksys(4)} driver, when opened, provides a @cite{TPI} @dfn{Stream}
 that attempts to provide as wide a range of support for traditional @cite{SVR
 4.2} socket module and socket system support.
 
@@ -123,7 +124,7 @@ daemons, and development environment for the development and execution of
 @cite{@value{PACKAGE_TITLE}} modules and drivers.
 
 This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6
-kernels and was targetted at @code{ix86}, @code{x86_64}, @code{ppc} and
+kernels and was targeted at @code{ix86}, @code{x86_64}, @code{ppc} and
 @code{ppc64} architectures, but should build and install for other
 architectures as well.
 

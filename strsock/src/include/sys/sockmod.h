@@ -56,22 +56,62 @@
 
 #define SOCKMOD_IOC_MAGIC	'I'
 
-#define O_SI_GETUDATA	((SOCKMOD_IOC_MAGIC<<8)|101)
-#define SI_SHUTDOWN	((SOCKMOD_IOC_MAGIC<<8)|102)
-#define SI_LISTEN	((SOCKMOD_IOC_MAGIC<<8)|103)
-#define SI_SETMYNAME	((SOCKMOD_IOC_MAGIC<<8)|104)
-#define SI_SETPEERNAME	((SOCKMOD_IOC_MAGIC<<8)|105)
-#define SI_GETINTRANSIT	((SOCKMOD_IOC_MAGIC<<8)|106)
-#define SI_TCL_LINK	((SOCKMOD_IOC_MAGIC<<8)|107)
-#define SI_TCL_UNLINK	((SOCKMOD_IOC_MAGIC<<8)|108)
-#define SI_SOCKPARAMS	((SOCKMOD_IOC_MAGIC<<8)|109)
-#define SI_GETUDATA	((SOCKMOD_IOC_MAGIC<<8)|110)
+#define SIMOD ('I'<<8)
+
+#define O_SI_GETUDATA	(SIMOD|101)
+#define SI_SHUTDOWN	(SIMOD|102)
+#define SI_LISTEN	(SIMOD|103)
+#define SI_SETMYNAME	(SIMOD|104)
+#define SI_SETPEERNAME	(SIMOD|105)
+#define SI_GETINTRANSIT	(SIMOD|106)
+#define SI_TCL_LINK	(SIMOD|107)
+#define SI_TCL_UNLINK	(SIMOD|108)
+#define SI_SOCKPARAMS	(SIMOD|109)
+#define SI_GETUDATA	(SIMOD|110)
+
+#define S_SIGIO		0x1
+#define S_SIGURG	0x2
+
+#define S_WINFO		0x01000 /* Waiting for T_INFO_ACK */
+#define S_WRDISABLE	0x02000 /* Write service queue disabled. */
+#define S_WUNBIND	0x04000 /* Waiting for T_OK_ACK (for T_UNBIND_REQ) */
+#define S_RBLOCKED	0x08000 /* Processing T_DISCON_IND draining messages */
+#define S_WBLOCKED	0x10000 /* Send T_UNBIND_REQ on receiving T_DISCON_IND */
+
+#define SC_WCLOSE	0x20000 /* Wait before closing */
+#define SC_NOENABLE	0x40000
+#define SC_KEEPOPEN	0x80000
+
+#define SOCKMOD_TIMEOUT	(-1)
+
+#if 0
+struct _si_user {
+	struct _si_user *next;
+	struct _si_user *prev;
+	int fd;
+	int ctlsize;
+	char *ctlbuf;
+	struct si_udata udata;
+	int flags;
+	int fflags;
+	pthread_rwlock_t lock;
+};
+
+extern struct _si_user *_s_checkfd(int fd);
+extern struct _si_user *_s_socreate(int domain, int type, int famiy);
+extern void _s_aligned_copy(char *, int, int, char *, int *);
+#endif
 
 struct si_sockparams {
 	int sp_family;
 	int sp_type;
 	int sp_protocol;
 };
+
+/*
+ *  In the old sockmod it appears that the domain, type and protocol where handled in the user-space
+ *  library, whereas in the later sockmod, the docmain, type and protocol are handled in the kernel.
+ */
 
 struct o_si_udata {
 	int tidusize;
