@@ -1,4 +1,4 @@
-OpenSS7 IPERF Utility -- beta release introduction.  2006-09-02
+OpenSS7 IPERF Utility -- beta release introduction.  2006-09-03
 $Id: README-alpha,v 0.9.2.4 2006/09/01 09:28:19 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 OpenSS7 IPERF Utility
 =====================
 
-Package iperf-2.0.5.rc3 Released 2006-09-02.
+Package iperf-2.0.5.rc3 Released 2006-09-03.
 
 This is beta release software.
 

@@ -1,4 +1,4 @@
-Linux STREAMS (LiS) -- read me first file.  2006-09-02
+Linux STREAMS (LiS) -- read me first file.  2006-09-03
 $Id: README,v 1.1.1.2.12.9 2006/09/01 09:28:17 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -51,7 +51,7 @@ it is:
  Release
 --------
 
-This is the `LiS-2.18.4.rc3' package, released 2006-09-02.  This
+This is the `LiS-2.18.4.rc3' package, released 2006-09-03.  This
 `2.18.4.rc3' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

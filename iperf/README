@@ -1,4 +1,4 @@
-OpenSS7 IPERF Utility -- read me first file.  2006-09-02
+OpenSS7 IPERF Utility -- read me first file.  2006-09-03
 $Id: README,v 1.1.1.2.2.10 2006/09/01 09:28:19 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -50,7 +50,7 @@ neither the original copyright holders nor OpenSS7 Corporation
  Release
 --------
 
-This is the `iperf-2.0.5.rc3' package, released 2006-09-02.  This
+This is the `iperf-2.0.5.rc3' package, released 2006-09-03.  This
 `2.0.5.rc3' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
