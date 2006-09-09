@@ -74,6 +74,7 @@ m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
+m4_include([m4/doxy.m4])
 
 # =============================================================================
 # AC_SOCK
@@ -149,6 +150,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     CFLAGS=
     _SOCK_OUTPUT
     _AUTOTEST
+    _DOXY
 ])# AC_SOCK
 # =============================================================================
 

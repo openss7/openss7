@@ -69,6 +69,7 @@ m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
 m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
+m4_include([m4/doxy.m4])
 
 # =============================================================================
 # AC_XNET
@@ -145,6 +146,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     CFLAGS=
     _XNET_OUTPUT
     _AUTOTEST
+    _DOXY
 ])# AC_XNET
 # =============================================================================
 
