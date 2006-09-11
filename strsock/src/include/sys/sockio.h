@@ -63,9 +63,18 @@
 #define SIOGHIWAT	(SOCKIO|1)	/* get hi watermark */
 #define SIOCLOWAT	(SOCKIO|2)	/* set lo watermark */
 #define SIOGLOWAT	(SOCKIO|3)	/* get lo watermark */
+
+/* Linux sometimes defines these three... */
+
+#ifndef SIOCATMARK
 #define SIOCATMARK	(SOCKIO|7)	/* at oob mark */
+#endif				/* SIOCATMARK */
+#ifndef SIOCSPGRP
 #define SIOCSPGRP	(SOCKIO|8)	/* set process group */
+#endif				/* SIOCSPGRP */
+#ifndef SIOCGPGRP
 #define SIOCGPGRP	(SOCKIO|9)	/* get process group */
+#endif				/* SIOCGPGRP */
 
 #define SIOCPROTO	(SOCKIO|51)	/* link proto */
 #define SIOCGETNAME	(SOCKIO|52)	/* getsockname */

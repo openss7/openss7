@@ -118,7 +118,7 @@ struct nd_mergearg {
 #define ND_SYSTEM		 9
 #define ND_NOCONVERT		10	/* AS400 only? */
 
-static const char *_nd_error_strings[] = {
+const char *_nd_error_strings[] = {
 	[5+ND_TRY_AGAIN]	= "try again later",
 	[5+ND_NO_RECOVERY]	= "recovery not possible",
 	[5+ND_NO_DATA]		= "incorrect amount of data",
