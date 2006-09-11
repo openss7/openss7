@@ -86,9 +86,12 @@ EXTRA_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod
 
 pkglibexec_PROGRAMS		= \
-				  test-sock
+				  test-socket \
+				  test-socklib
 
 sbin_PROGRAMS			= \
+				  initsock \
+				  soconfig \
 				  @PACKAGE_TARNAME@_mknod
 
 bin_PROGRAMS			= 
@@ -105,12 +108,33 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-test_sock_SOURCES		= src/test/test-sock.c
-test_sock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_sock_LDADD			= libsocket.la $(STREAMS_LDADD)
-test_sock_LDFLAGS		= -static
-test_sock_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_sock_CFLAGS		= $(USER_CFLAGS)
+test_socket_SOURCES		= src/test/test-sock.c
+test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socket_LDADD		= libsocket.la $(STREAMS_LDADD)
+test_socket_LDFLAGS		= -static
+test_socket_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_socket_CFLAGS		= $(USER_CFLAGS)
+
+test_socklib_SOURCES		= src/test/test-sock.c
+test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socklib_LDADD		= libsocklib.la $(STREAMS_LDADD)
+test_socklib_LDFLAGS		= -static
+test_socklib_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_socklib_CFLAGS		= $(USER_CFLAGS)
+
+initsock_SOURCES		= src/util/initsock.c
+initsock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+initsock_LDADD			= $(STREAMS_LDADD)
+initsock_LDFLAGS		= -static
+initsock_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+initsock_CFLAGS			= $(USER_CFLAGS)
+
+soconfig_SOURCES		= src/util/soconfig.c
+soconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+soconfig_LDADD			= $(STREAMS_LDADD)
+soconfig_LDFLAGS		= -static
+soconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+soconfig_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -126,6 +150,22 @@ libsocket_la_LDFLAGS		= -version-info 0:0:0
 libsocket_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsocket_la_CFLAGS		= $(USER_CFLAGS)
 libsocket_la_LIBADD		=
+
+lib_LTLIBRARIES			+= libsocklib.la
+
+libsocklib_la_SOURCES		= src/lib/socklib.c gettext.h
+libsocklib_la_LDFLAGS		= -version-info 0:0:0
+libsocklib_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
+libsocklib_la_CFLAGS		= $(USER_CFLAGS)
+libsocklib_la_LIBADD		=
+
+lib_LTLIBRARIES			+= libnsl2.la
+
+libnsl2_la_SOURCES		= src/lib/netconfig.c src/lib/netpath.c src/lib/netdir.c src/include/netconfig.h src/include/netpath.h src/include/netdir.h gettext.h
+libnsl2_la_LDFLAGS		= -version-info 0:0:0
+libnsl2_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
+libnsl2_la_CFLAGS		= $(USER_CFLAGS)
+libnsl2_la_LIBADD		=
 
 ## RPM_BUILD_USER
 endif
