@@ -62,12 +62,14 @@
 .de ]>
 .\".PD
 .ad b
+.hy 6
 .PP
 Trademarks mentioned are the property of their owners.
 ..
 .de ]-
 .\".PD 0.4v
 .ad l
+.hy 0
 .IP "\\fR[\\fB\\*([F\\fR]\\ \\fP" \\w'[00]00'u
 .\"\\fR[\\fB\\*([F\\fR]\\fP
 .\".IP \\*([F. \\w'(00.)'u
@@ -158,7 +160,7 @@ Trademarks mentioned are the property of their owners.
 .de CO
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -194,7 +196,7 @@ source, must acknowledge the copyright and authors of this work.
 .de C2
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1992 UNIX International, Inc.
+\f(HRCopyright\ \(co\ 1992\ UNIX International, Inc.
 .ie '\\*(.T'ps' \{\
 .PP
 .ce 1
@@ -220,7 +222,7 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .PP
 .\}
 .el .br
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -256,14 +258,14 @@ source, must acknowledge the copyright and authors of this work.
 .de C3
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
+\f(HRCopyright\ \(co\ 2000\ John A. Boyd Jr.  protologos, LLC
 .br
 .I (See roff source for permission notice.)
 ..
 .de C5
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1999, 2000, 2001, 2002, 2003, 2004  The Board of Trustees of the University of Illinois
+\f(HRCopyright\ \(co\ 1999,\ 2000,\ 2001,\ 2002,\ 2003,\ 2004\ The Board of Trustees of the University of Illinois
 .PP
 .ce 1
 \s-2\f(HRPERMISSION NOTICE\fR
@@ -310,7 +312,7 @@ The OpenSS7 Project http://www.openss7.org/
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -323,9 +325,9 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright \(co 1992 UNIX International, Inc.
+\f(HRCopyright\ \(co\ 1992\ UNIX International, Inc.
 .br
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -338,9 +340,9 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
+\f(HRCopyright\ \(co\ 2000\ John A. Boyd Jr.  protologos, LLC
 .br
-\f(HRCopyright \(co 2001-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 2001-2006\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -353,7 +355,7 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -365,11 +367,11 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.15 $); $Date: 2006/03/03 10:57:10 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.1 $); $Date: 2006/08/23 10:03:58 $.
 .PP
-\f(HRCopyright \(co 1997-2006 OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .br
-\f(HRCopyright \(co 1999-2004 The Board of Trustees of the University of Illinois
+\f(HRCopyright\ \(co\ 1999-2004\ The Board of Trustees of the University of Illinois
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -391,19 +393,21 @@ The OpenSS7 Project http://www.openss7.org/
 ..
 .de TM
 .SH "TRADEMARKS"
-.PP
-.BR OpenSS7 "\(tm\ "
+.TP \w'\fBOpenSS7\fR\(tm\(em'u
+.BR OpenSS7 \(tm
 is a trademark of OpenSS7 Corporation.
-.br
-.BR Linux "\(rg\ "
-is a registered trademark of Linus Torvalds
-.br
-.BR UNIX "\(rg\ "
-is a registered trademark of The Open Group.
-.br
-.BR Solaris "\(rg\ "
+.PD 0
+.TP
+.BR Linux \(rg
+is a registered trademark of Linus Torvalds.
+.TP
+.BR UNIX \(rg
+is a registered trademark of The Open Group in the United States and other countries.
+.TP
+.BR Solaris \(rg
 is a registered trademark of Sun Microsystems.
-.br
+.PD
+.PP
 Other trademarks are the property of their respective owners.
 ..
 .de TA
