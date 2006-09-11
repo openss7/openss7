@@ -29,6 +29,8 @@
 	* src/include/netdir.h: working up xnsl library
 	* src/include/sys/netconfig.h: working up xnsl library
 	* src/lib/xnsl.c: working up xnsl library
+	* doc/man/man3/xti.3.man: corrections
+	* src/include/sys/sockmod.h: corrections
 
 2006-09-08  Brian Bidulock  <bidulock@openss7.org>
 

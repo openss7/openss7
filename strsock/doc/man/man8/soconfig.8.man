@@ -382,7 +382,7 @@ $> soconfig 2 2 0 /dev/tcp
 .fi
 .RE
 .PP
-The folloing is a sample file used with the
+The following is a sample file used with the
 .B -f
 option.  Comment lines begin with an octothorpe (#):
 .sp
@@ -443,6 +443,34 @@ is compatible with
 .IR Solaris \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+Many
+.IR UNIX \(rg
+implementations moved away from using the
+.BR /etc/netconfig
+approach and the
+.BR sockmod (4)
+.IR STREAMS (9)
+module for providing mapping from the
+.BR socket (3)
+call to the appropriate underlying transport provider
+.IR STREAMS (9)
+device.  Mapping is now maintained in the kernel using the
+.B SIOCPROTO
+and
+.B SIOCXPROTO
+input-output controls.  It was, therefore, necessary to provide some utility to initialize the
+kernel mapping entries:
+.IR UnixWare \(rg
+provided the
+.BR initsock (8)
+command, whereas,
+.IR Solaris \(rg
+provided the
+.BR soconfig (8)
+command.  For compatibility,
+.B "@PACKAGE_TITLE@"
+provides both.
+.IP \(em
 .IR Solaris \(rg
 does not document long options.
 .IP \(em

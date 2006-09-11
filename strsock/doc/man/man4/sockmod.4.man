@@ -122,7 +122,8 @@ TPI Revision 2.0
 primitives.  These
 .B sockmod
 ioctls are intended to be used by a library level Sockets compatibility
-library.
+library,
+.BR libsocklib (3).
 .\"
 .\"
 .SH USAGE
@@ -225,10 +226,11 @@ input-output controls.  The
 .B sockmod
 module recognizes these input-output controls for backwards compatiblity.  The
 .BR libsocket (3)
-library does not use these input-output controls.  They are deprecated.  Avoid
-them.
+library does not use these input-output controls, but the older
+.BR libsocklib (3)
+library does.  They are deprecated.  Avoid them.
 .TP \w'\fBSI_GETINTRANSIT\fR\(em'u
-.B SI_GETUDATA
+.B O_SI_GETUDATA
 .\"('I' 101)
 get user data.
 .PD 0
@@ -236,34 +238,18 @@ get user data.
 .B SI_SHUTDOWN
 .\"('I' 102)
 suspend receive and send operations.
-.br
-Obsolete
-.BR shutdown (3)
-implementation.
 .TP
 .B SI_LISTEN
 .\"('I' 103)
 listen for a transport connection.
-.br
-Obsolete
-.BR listen (3)
-implementation.
 .TP
 .B SI_SETMYNAME
 .\"('I' 104)
 set the socket name.
-.br
-Obsolete
-.BR bind (3)
-implementation.
 .TP
 .B SI_SETPEERNAME
 .\"('I' 105)
 set the peer name.
-.br
-Obsolete
-.BR connect (3)
-implementation.
 .TP
 .B SI_GETINTRANSIT
 .\"('I' 106)
@@ -273,7 +259,409 @@ implementation.
 .TP
 .B SI_TCL_UNLINK
 .\"('I' 108)
+.TP
+.B SI_SOCKPARAMS
+get socket parameters.
+.\"('I' 109)
+.TP
+.B SI_GETUDATA
+.\"('I' 110)
+newer get user data.
 .PD
+.PP
+These input-output controls are described in more detail as follows:
+.TP
+.B O_SI_GETUDATA
+This is used by the older
+.BR libsocklib (3)
+implementation of the sockets compatibility library, and was formerly called
+.BR SI_GETUDATA .
+This input output control accepts as an argument a pointer to a user supplied
+buffer area to contain an
+.B o_si_udata
+structure formatted as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct o_si_udata {
+    int tidusize;
+    int addrsize;
+    int optsize;
+    int etsdusize;
+    int servtype;
+    int so_state;
+    int so_options;
+    int tsdusize;
+};
+\s+1\fP
+.fi
+.PP
+Where
+.TP \w'so_options\(em'u
+.I tidusize
+is the maximum transport interface data unit size as returned by the transport
+provider in the
+.I TIDU_size
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I addrsize
+is the maximum address size as returned by the transport provider in the
+.I ADDR_size
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I optsize
+is the maximum options size as returned by the transport provider in the
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I etsdusize
+is the maximum expedited transport service data unit size as returned by the
+transport provider in the
+.I ETSDU_size
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I servtype
+is the service type as returned by the transport provider in the
+.I SERV_type
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I so_state
+is the socket state;
+.TP
+.I so_options
+are the socket options; and,
+.TP
+.I tsdusize
+is the maximum transport service data unit size as returned by the transport
+provider in the
+.I TSDU_size
+member of the
+.BR T_info_ack (7)
+structure.
+.RE
+.IP ""
+When this input-output control is issued by
+.BR libsocklib (3),
+.B sockmod
+uses information about the state of the socket and options as well as
+information retrieved in a
+.BR T_INFO_ACK (7)
+primitive from the transport provider to populate the response.
+.TP
+.B SI_SHUTDOWN
+This input-output control is use by
+.BR libsocklib (3)
+to implement the
+.BR shutdown (3)
+socket call.
+It accepts as an argument an integer value specifying the
+.I how
+argument of the
+.BR shutdown (3)
+call.
+.IP ""
+When
+.B sockmod
+receives this intput-output control it takes actions depending on the
+.I how
+argument as follows:
+.sp
+.RS
+.TP \w'SHUT_RDWR\(em'u
+.B SHUT_RD
+Further received data messages will be discarded by
+.BR sockmod .
+.TP
+.B SHUT_WR
+A write error of
+.B EPIPE
+is set on the Stream head and a
+.BR T_ORDREL_REQ (7)
+primitive is sent to the transport provider if its service type supports
+orderly shutdown and the socket is in the appropriate state.
+.TP
+.B SHUT_RDWR
+Both of the above actions are performed.
+.RE
+.TP
+.B SI_LISTEN
+This input-output control is used by
+.BR libsocklib (3)
+to implement the
+.BR listen (3)
+socket call under
+.BR libsocklib (3).
+It accepts as an argument an integer value specifying
+the
+.I backlog
+argument of the
+.BR listen (3)
+call.
+.IP ""
+When
+.B sockmod
+receives this input-output control it unbinds the transport provider using the
+.B T_UNBIND_REQ
+primitive (if it was already bound) and then rebinds the transport provider to
+the same address as before (or no address if previously idle) with a
+.I CONIND_number
+equal to the
+.I backlog
+argument.
+.TP
+.B SI_SETMYNAME
+This input-output control is used by
+.BR libsocklib (3)
+to implement the
+.BR bind (3)
+socket call.
+It accepts as an argument a pointer to a
+.BR T_bind_req (7)
+structure containing the address to which to bind, or a
+.BR T_unbind_req (7)
+structure if the address family in the
+.BR bind (3)
+call was
+.BR AF_UNSPEC.
+.IP ""
+When
+.B sockmod
+receives this input-output control, it binds or unbinds the transport provider using the
+.BR T_BIND_REQ (7)
+or
+.BR T_UNBIND_REQ (7)
+primitive contained in the input-output control.
+Note that if the address family in the socket address provided to
+.BR bind (3)
+is
+.BR AF_UNSPEC ,
+then this may result in
+.B sockmod
+issuing a
+.BR T_UNBIND_REQ (7)
+primitive to the transport provider.
+.TP
+.B SI_SETPEERNAME
+This intput-output control is used by
+.BR libsocklib (3)
+to implement the
+.BR connect (3)
+and
+.BR accept (3)
+socket calls.
+It accepts as an argument a pointer to a
+.BR T_conn_req (7)
+or
+.BR T_conn_res (7)
+structure, or
+.BR T_discon_req (7)
+structure if the address in the
+.BR connect (3)
+call was
+.BR AF_UNSPEC .
+.IP ""
+When
+.BR sockmod
+receives this input-output control, it connects, accepts or disconnects the
+transport provider using the
+.BR T_CONN_REQ (7),
+.BR T_CONN_RES (7)
+or
+.BR T_DISCON_REQ (7)
+primitive contained in the input-output control.
+.IP ""
+Note that if the transport provider is a connectionless transport service
+provider, the address present in the 
+.BR T_CONN_REQ (7)
+will be remembered for later use.
+.TP
+.B SI_GETINTRANSIT
+Don't know what this does.
+.TP
+.B SI_TCL_LINK
+Don't know what this does.
+.TP
+.B SI_TCL_UNLINK
+Don't know what this does.
+.TP
+.B SI_SOCKPARAMS
+This input-output control is used by
+.BR libsocklib (3)
+to inform
+.B sockmod
+of the socket parameters associated with the socket.
+It accepts as an argument a pointer to a
+.B si_sockparams
+structure formatted as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct si_sockparams {
+    int sp_family;
+    int sp_type;
+    int sp_protocol;
+};
+\s+1\fP
+.fi
+.PP
+Where
+.TP \w'sp_protocol\(em'u
+.I sp_family
+is the address or protocol family (e.g,
+.BR AF_INET );
+.PD 0
+.TP
+.I sp_type
+is the socket type (e.g,
+.BR SOCK_STREAM "); and,
+.TP
+.I sp_protocol
+is the protocol within the protocol family (e.g,
+.BR IPPROTO_TCP ).
+.PD
+.RE
+.IP ""
+This input-output control is intended to save this information in
+.B sockmod
+so that
+.BR libsocklib (3)
+can restore this information across a
+.BR dup (2),
+.BR dup2 (2)
+or
+.BR exec (2)
+call.
+.TP
+.B SI_GETUDATA
+This is used by the newer
+.BR libsocket (3)
+implementation of the sockets compatibility library.  This input-output
+control accepts as an argument a pointer to a user supplied buffer area to
+contain a
+.B si_udata
+structure formatted as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct si_udata {
+    int tidusize;
+    int addrsize;
+    int optsize;
+    int etsdusize;
+    int servtype;
+    int so_state;
+    int so_options;
+    int tsdusize;
+    struct si_sockparams sockparams;
+};
+\s+1\fP
+.fi
+.PP
+Where
+.TP \w'so_options\(em'u
+.I tidusize
+is the maximum transport interface data unit size as returned by the transport
+provider in the
+.I TIDU_size
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I addrsize
+is the maximum address size as returned by the transport provider in the
+.I ADDR_size
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I optsize
+is the maximum options size as returned by the transport provider in the
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I etsdusize
+is the maximum expedited transport service data unit size as returned by the
+transport provider in the
+.I ETSDU_size
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I servtype
+is the service type as returned by the transport provider in the
+.I SERV_type
+member of the
+.BR T_info_ack (7)
+structure;
+.TP
+.I so_state
+is the socket state;
+.TP
+.I so_options
+are the socket options;
+.TP
+.I tsdusize
+is the maximum transport service data unit size as returned by the transport
+provider in the
+.I TSDU_size
+member of the
+.BR T_info_ack (7)
+structure; and,
+.TP
+.I sockparams
+is an
+.B si_sockparams
+structure formatted as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct si_sockparams {
+    int sp_family;
+    int sp_type;
+    int sp_protocol;
+};
+\s+1\fP
+.fi
+.PP
+Where
+.TP \w'sp_protocol\(em'u
+.I sp_family
+is the address or protocol family (e.g,
+.BR AF_INET " or " PF_INET );
+.PD 0
+.TP
+.I sp_type
+is the socket type (e.g,
+.BR SOCK_STREAM "); and,
+.TP
+.I sp_protocol
+is the protocol within the protocol family (e.g,
+.BR IPPROTO_TCP ).
+.PD
+.RE
+.RE
+.IP ""
+When this input-output control is issued by
+.BR libsocket (3),
+.B sockmod
+uses information about the state of the socket and options as well as
+information retrieved in a
+.BR T_INFO_ACK (7)
+primitive from the transport provider to populate the response.
 .\"
 .\"
 .SS IOCTLS (FILEIO)

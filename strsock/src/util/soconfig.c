@@ -56,6 +56,157 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#define _XOPEN_SOURCE 600
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
+#include <stropts.h>
+#include <sys/sc.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <sys/sockio.h>
+#include <sys/sockmod.h>
+#include <sys/socksys.h>
+
+static int debug = 0;			/* default no debug */
+static int output = 1;			/* default normal output */
+
+static void
+version(int argc, char *argv[])
+{
+	if (!output && !debug)
+		return;
+	fprintf(stdout, "\
+%2$s\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
+", argv[0], ident);
+}
+
+static void
+usage(int argc, char *argv[])
+{
+	if (!output && !debug)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options] [{-l|--list}]\n\
+    %1$s [options] [{-f|--file}] FILE\n\
+    %1$s [options] [{-c|--clear}] FAMILY TYPE PROTOCOL\n\
+    %1$s [options] [{-s|--set}] FAMILY TYPE PROTOCOL PATH\n\
+    %1$s [options] {-r|--reset}\n\
+    %1$s [options] {-f|--file} [FILENAME]\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
+", argv[0]);
+}
+
+static void
+help(int argc, char *argv[])
+{
+	if (!output && !debug)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options] [{-l|--list}]\n\
+    %1$s [options] [{-f|--file}] FILE\n\
+    %1$s [options] [{-c|--clear}] FAMILY TYPE PROTOCOL\n\
+    %1$s [options] [{-s|--set}] FAMILY TYPE PROTOCOL PATH\n\
+    %1$s [options] {-r|--reset}\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
+Options:\n\
+    [-l, --list]\n\
+	list the kernel socket to transport mapping\n\
+        this option is assumed when there are zero non-option arguments\n\
+    [-f, --file] FILE\n\
+	set the kernel socket to transport mapping from FILE\n\
+        this option is assumed when there is one non-option argument\n\
+    [-c, --clear] FAMILY TYPE PROTOCOL\n\
+        clear the specific kernel socket to transport mapping entry\n\
+        this option is assumed when there are three non-option arguments\n\
+    [-s, --set] FAMILY TYPE PROTOCOL PATH\n\
+        set the specific socket to transport mapping entry\n\
+        this option is assumed when there are four non-option arguments\n\
+    -r, --reset\n\
+        reset the entire kernel socket to transport mapping table\n\
+    -q, --quiet\n\
+        suppress output\n\
+    -d, --debug [LEVEL]\n\
+        increase or set debugging verbosity\n\
+    -v, --verbose [LEVEL]\n\
+        increase or set output verbosity\n\
+    -h, --help\n\
+        prints this usage information and exits\n\
+    -V, --version\n\
+        prints the version and exits\n\
+    -C, --copying\n\
+        prints copying permissions and exits\n\
+", argv[0]);
+}
+
+static void
+copying(int argc, char *argv[])
+{
+	if (!output && !debug)
+		return;
+	fprintf(stdout, "\
+--------------------------------------------------------------------------------\n\
+%1$s\n\
+--------------------------------------------------------------------------------\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+--------------------------------------------------------------------------------\n\
+This program is free software; you can  redistribute  it and/or modify  it under\n\
+the terms  of the GNU General Public License  as  published by the Free Software\n\
+Foundation; version  2  of  the  License.\n\
+\n\
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+\n\
+You should  have received a copy of the GNU  General  Public License  along with\n\
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
+Cambridge, MA 02139, USA.\n\
+--------------------------------------------------------------------------------\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
+the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
+as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the  license rights granted\n\
+herein (the license rights customarily provided to non-Government users). If the\n\
+Software is supplied to any unit or agency of the Government  other than DoD, it\n\
+is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
+Regulations (\"FAR\")  (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
+regulations).\n\
+--------------------------------------------------------------------------------\n\
+Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
+Corporation at a fee.  See http://www.openss7.com/\n\
+--------------------------------------------------------------------------------\n\
+", ident);
+}
+
 /**
  * cmn_list - list the sock2path mapping in sock2path file format
  */
@@ -85,30 +236,30 @@ cmn_clear(int family, int type, int protocol)
 void
 cmn_set(int family, int type, int protocol, const char *path)
 {
-	struct stat stat;
+	struct stat st;
 	struct socknewproto prot;
 	int fd;
 	struct strioctl ioc;
 
-	if (stat(path, &stat) == -1) {
-		fprintf(stderr, "%s: strerror(errno)", "soconfig", strerror(errno));
+	if (stat(path, &st) == -1) {
+		fprintf(stderr, "%s: %s", "soconfig", strerror(errno));
 		exit(1);
 	}
 	prot.family = family;
 	prot.type = type;
 	prot.proto = protocol;
-	prot.dev = stat.st_rdev;
+	prot.dev = st.st_rdev;
 	prot.flags = 0;
 	if ((fd = open("/dev/socksys", O_RDWR)) == -1) {
-		fprintf(stderr, "%s: strerror(errno)", "soconfig", strerror(errno));
+		fprintf(stderr, "%s: %s", "soconfig", strerror(errno));
 		exit(1);
 	}
-	ioc.cmd = SIOCPROTO;
-	ioc.len = sizeof(prot);
-	ioc.dp = (char *)&prot;
-	ioc.timout = -1;
+	ioc.ic_cmd = SIOCPROTO;
+	ioc.ic_len = sizeof(prot);
+	ioc.ic_dp = (char *)&prot;
+	ioc.ic_timout = -1;
 	if (ioctl(fd, I_STR, &ioc) == -1) {
-		fprintf(stderr, "%s: strerror(errno)", "soconfig", strerror(errno));
+		fprintf(stderr, "%s: %s", "soconfig", strerror(errno));
 		close(fd);
 		exit(1);
 	}
@@ -126,15 +277,15 @@ cmn_reset(void)
 	struct strioctl ioc;
 
 	if ((fd = open("/dev/socksys", O_RDWR)) == -1) {
-		fprintf(stderr, "%s: strerror(errno)", "soconfig", strerror(errno));
+		fprintf(stderr, "%s: %s", "soconfig", strerror(errno));
 		exit(1);
 	}
-	ioc.cmd = SIOCXPROTO;
-	ioc.dp = NULL;
-	ioc.len = 0;
-	ioc.timout = -1;
+	ioc.ic_cmd = SIOCXPROTO;
+	ioc.ic_dp = NULL;
+	ioc.ic_len = 0;
+	ioc.ic_timout = -1;
 	if (ioctl(fd, I_STR, &ioc) == -1) {
-		fprintf(stderr, "%s: strerror(errno)", "soconfig", strerror(errno));
+		fprintf(stderr, "%s: %s", "soconfig", strerror(errno));
 		close(fd);
 		exit(1);
 	}
@@ -152,6 +303,13 @@ cmn_file(const char *filename)
 }
 
 enum { CMN_NONE, CMN_LIST, CMN_CLEAR, CMN_SET, CMN_RESET, CMN_FILE, } command = CMN_NONE;
+int option_all = 0;
+
+int family = -1;
+int socktype = -1;
+int protocol = -1;
+char path[PATH_MAX] = "";
+char filename[PATH_MAX] = "/etc/sock2path";
 
 struct strmap {
 	const char *name;
@@ -288,8 +446,6 @@ strtoprotocol(const char *string)
 int
 main(int argc, char *argv[])
 {
-	int i, fd, count;
-
 	for (;;) {
 		int c, val;
 
@@ -516,4 +672,5 @@ main(int argc, char *argv[])
 		cmn_file(filename);
 		goto arguments_0;
 	}
+	return (0);
 }

@@ -174,8 +174,8 @@ sort-adjacent-labels
 is an
 .B OpenSS7
 implementation of the XNS 5.2 XTI/TLI Library for
-.B LiS
-(Linux STREAMS).
+.B LFS
+(Linux Fast-STREAMS).
 It implements the following XTI/TLI API library functions:
 .TP \w'\fBt_rcvreldata\fR(3)\ 'u
 .BR t_accept (3)

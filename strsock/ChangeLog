@@ -35,6 +35,14 @@
 	* src/lib/netpath.c: working up libraries
 	* src/lib/socklib.c: working up libraries
 	* src/util/initsock.c: working up libraries
+	* acinclude.m4: working up libraries and documentation
+	* doc/man/Makefile.am: working up libraries and documentation
+	* doc/man/man3/xxx.3.man: working up libraries and documentation
+	* doc/man/man4/sockmod.4.man: working up libraries and documentation
+	* doc/man/man5/sock2path.5.man: working up libraries and documentation
+	* doc/man/man8/soconfig.8.man: working up libraries and documentation
+	* src/include/sys/sockmod.h: working up libraries and documentation
+	* src/util/soconfig.c: working up libraries and documentation
 
 2006-09-08  Brian Bidulock  <bidulock@openss7.org>
 

@@ -144,16 +144,18 @@ driver.
 .SH "FILE FORMAT"
 .PP
 The file format consists of lines with 4 fields as follows:
+.sp
 .RS
 .RI < family "> <" type "> <" protocol "> <" path >
 .RE
+.PP
 All fields are mandatory.  Comments begin with an octothorpe (#) and continue
 to the end of a line.  Empty lines, or lines consisting of whitespace or
 containing only a comment are ignored.
 .PP
 The fields, separated by any arbitrary amount of leading or intervening
 whitespace are interpreted follows:
-.TP
+.TP \w'protocol\(em'u
 .I family
 Protocol family, as listed in
 .RB < sys/socket.h >,
