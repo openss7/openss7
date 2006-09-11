@@ -1,0 +1,598 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsock.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsock.macros
+.\"
+.\"
+.TH INITSOCK 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B initsock
+\- configure transport providers for use by sockets
+.\"
+.\"
+.SH SYNOPSIS
+.HP 12
+\fBinitsock\fP [\fIoptions\fP]
+[{\fB-f\fP,\fB--file\fP} [\fIfilename\fP]]
+.PD 0
+.HP 12
+\fBinitsock\fP [\fIoptions\fP]
+{\fB-d\fP,\fB--delete\fP}
+.HP 12
+\fBinitsock\fP [\fIoptions\fP]
+{{\fB-a\fP,\fB--add\fP}
+\fIfamily\fP
+\fItype\fP
+\fIproto\fP
+\fIdev\fP} ...
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B initsock
+utility configurs the transport provider driver for use with sockets.  It specifies how the
+.IR family ,
+.IR type ,
+and
+.I protocol
+parameters in the
+.BR socket (3)
+call are mapped to the name of a transport provider such as
+.BR /dev/tcp .
+This utility can be used to add an additional mapping or remove a previous mapping.
+.PP
+The
+.BR init (8)
+utility uses
+.B initsock
+with the
+.BR netconfig (5)
+file during the booting sequence.
+.\"
+.\"
+.SH OPTIONS
+.PP
+The following command options are supported:
+.TP
+[\fB-f\fP, \fB--file\fP [\fIfilename\fP]]
+Establish the socket configuration according to the information in
+.IR filename ;
+or, if
+.I filename
+is not specified,
+.BR /etc/netconfig .
+This is the default behaviour of
+.B initsock
+if no other command options are specified.
+.TP
+\fB-d\fP, \fB--delete\fP
+Delete all protocol mapping entries.
+.TP
+\fB-a\fP, \fB--add\fP \fIfamily\fP \fItype\fP \fIproto\fP \fIdev\fP
+Add a protocol mapping entry, where,
+.IR family ,
+.IR type " and "
+.IR proto
+correspond to the equivalent arguments to the
+.BR socket (3)
+or
+.BR socketpair (3)
+call, and
+.I dev
+is the full pathname to the trasnport service provider
+.BR clone (4)
+device that will be used to support the socket.
+This option may be specified multiple times.
+.PP
+One of
+.BR -f ", " -d ", or " -a
+must be specified.  If none of these options are provided on the command line,
+.B -f
+is assumed.
+.PP
+The following options are supported:
+.TP
+\fB-c\fP, \fB--check\fP
+Check what would be the result of the operation without making any changes to the kernel protocol
+mapping.  This options is useful for returning diagnostic messages and error codes without altering
+the current system behavior.
+.TP
+\fB-C\fP, \fB--chardev\fP \fIpath\fP
+Specifies the full path to a character device special file that will be opened for performing the
+.BR ioctl (2)
+operations necessary to accomplish the functions of this utility.  The character special file shoud
+be a
+.BR clone (4)
+.IR STREAMS (9)
+device.  The default device is
+.BR /dev/ticlts .
+.PP
+The following general options are supported:
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller is interested only in the return code and error diagnostics and that
+normal output should be suppressed.
+The default verbosity level if this option is not specified is
+.BR 1 .
+This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fR, \fB--verbose\fR[=][\fILEVEL\fR]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.
+The default verbosity level if this option is not specified is
+.BR 1 .
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+.TP
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+print usage information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+print version information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+print copying information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The following arguments are supported:
+.TP
+.I family
+The protocol family as listed in the
+.RB < sys/socket.h >
+file, expressed as an integer.
+Symbolic names may also be used in the
+.I family
+field.  Supported symbolic names are as follows:
+.sp
+.RS
+.TS
+tab(:);
+lll.
+AF_UNSPEC:AF_ATMPVC:AF_PACKET
+AF_LOCAL:AF_X25:AF_ASH
+AF_UNIX:AF_INET6:AF_ECONET
+AF_FILE:AF_ROSE:AF_ATMSVC
+AF_INET:AF_DECnet:AF_SNA
+AF_AX25:AF_NETBEUI:AF_IRDA
+AF_IPX:AF_SECURITY:AF_PPPOX
+AF_APPLETALK:AF_KEY:AF_WANPIPE
+AF_NETROM:AF_NETLINK:AF_BLUETOOTH
+AF_BRIDGE:AF_ROUTE:
+.TE
+.RE
+.TP
+.I type
+The socket types as listed in the
+.RB < sys/socket.h >
+file, expressed as an integer.
+Symbolic names may also be used in the
+.I type
+field.  Supported symbolic names are as follows:
+.sp
+.RS
+.TS
+tab(:);
+ln.
+SOCK_STREAM:1
+SOCK_DGRAM:2
+SOCK_RAW:3
+SOCK_RDM:4
+SOCK_SEQPACKET:5
+SOCK_PACKET:10
+.TE
+.RE
+.TP
+.I protocol
+The protocol number as specified in the family-specific include file,
+expressed as an integer.  For example, for
+.B AF_INET
+this number is specified in
+.RB < netinet/in.h >.
+An unspecified protocol number is denoted with the value zero.
+Symbolic names may also be used in the
+.I protocol
+field.  Supported symbolic names are as follows (e.g. for
+.BR AF_INET ):
+.sp
+.RS
+.TS
+tab(:);
+lll.
+IPPROTO_IP:IPPROTO_IDP:IPPROTO_ICMPV6
+IPPROTO_HOPOPTS:IPPROTO_TP:IPPROTO_NONE
+IPPROTO_ICMP:IPPROTO_IPV6:IPPROTO_DSTOPTS
+IPPROTO_IGMP:IPPROTO_ROUTING:IPPROTO_MTP
+IPPROTO_IPIP:IPPROTO_FRAGMENT:IPPROTO_ENCAP
+IPPROTO_TCP:IPPROTO_RSVP:IPPROTO_PIM
+IPPROTO_EGP:IPPROTO_GRE:IPPROTO_COMP
+IPPROTO_PUP:IPPROTO_ESP:IPPROTO_RAW
+IPPROTO_UDP:IPPROTO_AH:
+.TE
+.RE
+.IP ""
+Additional symbolic names are supported for other protocol families.  Use the
+.B --help
+and
+.B --versbose
+options to list all available symbolic names.
+.TP
+.I dev
+The string that specifies the full path name of the device that corresponds to the
+transport provider.  If this parameter is specified, the configuration will be
+added for the specified
+.IR family ", " type " and " protocol .
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+See
+.BR netconfig (5).
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.PP
+When
+.B initsock
+fails, it prints a diagnostic message to
+.I stderr
+and exits with a non-zero return code.  The following return codes are
+generated under the following conditions:
+.TP
+0
+Execution was successful.  All arguments or all lines of the specified
+.I FILE
+were processed successfully.
+.TP
+1
+Execution was unsuccessful.  Arguments were valid, however, processing of the
+specified path or processing of one of the paths contained in the specified
+.I FILE
+failed.
+A diagnostic message is normally printed on
+.IR stderr .
+This could result in the partial population of the kernel socket
+mapping if some lines were processed successfully and one failed.
+.TP
+2
+An invalid parameter was provided or the number or combination of arguments
+and options was invalid.
+A diagnostic message is normally printed on
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B initsock
+is normaly invoked from the
+.B @PACKAGE@
+or
+.B @PACKAGE@.sh
+init script and not directly by the user or adminstrator.
+.\"
+.\"
+.SH IMPLEMETNATION
+.PP
+.B initsock
+is more difficult to implement than the
+.IR Solaris \(rg
+equivalent,
+.BR soconfig (8).
+This is because the
+.BR netconfig (5)
+file does not contain sufficient information to specify the mapping from
+.IR family ", " type " and " proto
+to the
+.I STREAMS (9)
+devices without additional information.
+.PP
+It is,
+in fact,
+unable to handle most interesting configurations of protocols other than
+.BR inet " or " inet6 .
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following example sets up
+.B /dev/tcp
+for family
+.B inet
+and type
+.BR stream .
+.sp
+.RS
+.nf
+\fC\s-1\
+$> initsock 2 2 0 /dev/tcp
+\s+1\fP
+.fi
+.RE
+The following is a sample file used with the
+.B -f
+option.  Comment lines begin with an octothorpe (#).
+.sp
+.RS
+.nf
+\fC\s-1\
+#
+# Network configuration database file.
+#
+udp6       tpi_clts      v  inet6     udp  /dev/upd6       -
+tcp6       tpi_cots_ord  v  inet6     tcp  /dev/tcp6       -
+udp        tpi_clts      v  inet      udp  /dev/udp        -
+tcp        tpi_cots_ord  v  inet      tcp  /dev/tcp        -
+rawip      tpi_raw       -  inet      -    /dev/rawip      -
+ticlts     tpi_clts      v  loopback  -    /dev/ticlts     straddr.so
+ticots     tpi_cots      v  loopback  -    /dev/ticots     straddr.so
+ticotsord  tpi_cots_ord  v  loopback  -    /dev/ticotsord  straddr.so
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/ticlts
+The default device for peforming kernel mapping configuration.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+The network configuration database, see
+.BR netconfig (5).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR init (8),
+.BR netconfig (5),
+.BR soconfig (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B initsock
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B initsock
+is compatible with
+.IR UnixWare \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Many
+.IR UNIX \(rg
+implementations moved away from using the
+.BR /etc/netconfig
+approach and the
+.BR sockmod (4)
+.IR STREAMS (9)
+module for providing mapping from the
+.BR socket (3)
+call to the appropriate underlying transport provider
+.IR STREAMS (9)
+device.  Mapping is now maintained in the kernel using the
+.B SIOCPROTO
+and
+.B SIOCXPROTO
+input-output controls.  It was, therefore, necessary to provide some utility to initialize the
+kernel mapping entries:
+.IR UnixWare \(rg
+provided the
+.BR initsock (8)
+command, whereas,
+.IR Solaris \(rg
+provided the
+.BR soconfig (8)
+command.  For compatibility,
+.B "@PACKAGE_TITLE@"
+provides both.
+.IP \(em
+.IR UnixWare \(rg
+does not document long options.
+.IP \(em
+.IR UnixWare \(rg
+does not document the
+.BR -f ", " -q ", " -h " or " -V options.
+.IP \(em
+The
+.BR -v " and " -C
+options are incompatible.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibilty with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.IP \(em
+The format of the output from the
+.B initsock
+command may be different from that of
+.IR UnixWare \(rg.
+.IP \(em
+.B "@PACKAGE_TITLE@"
+ues the same format of argments and file as described here with one extension: it is possible to use
+symbolic names (e.g,
+.BR AF_INET )
+for the
+.IR family ", " type " and " proto
+fields.  However, not all symbolic names are populated in the
+.B initsock
+command.
+.IP \(em
+.IR UnixWare \(rg
+does not support symbolic names (e.g,
+.BR AF_INET )
+for the fields and expects only the fields specified in
+.BR netconfig (5).
+.IP \(em
+The mechanism that actually uses the kernel-populated socket mapping is different under
+.IR UnixWare \(rg
+and
+.BR "@PACKAGE_TITLE@" .
+.IP \(em
+At boot time, the kernel mapping is populated using the
+.B initsock
+or
+.BR soconfig (8)
+command and the
+.BR /etc/netconfig
+or
+.BR /etc/sock2path
+configuration file.  This is performend with the
+.B @PACKAGE@
+or
+.B @PACKAGE@.sh
+init script and not directly by the
+.BR init (8)
+process.
+.IP \(em
+The default device under
+.IR UnixWare \(rg
+is
+.BR /dev/ticlts ,
+whereas under
+.B "@PACKAGE_TITLE@"
+it is
+.BR /dev/socksys .
+.IP \(em
+The
+.B initsock
+utility is only compatible with
+.IR UnixWare \(rg
+for the purposes of populating the kernel mapping used by
+.BR libsocket (3)
+in the
+.B "@PACKAGE_TITLE@"
+package.
+Any other use of the
+.B initsock
+command is unsupported.
+.PP
+See
+.BR "@PACKAGE_UCNAME@" (8)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR UnixWare \(rg
+docmentation.
+.[
+uw7doc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B initsock
+utility first appeared in
+.IR UnixWare "\(rg " 7.1.3 .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

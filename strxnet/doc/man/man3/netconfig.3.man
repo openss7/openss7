@@ -1,0 +1,655 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.\"
+.\"
+.TH NETCONFIG 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B netconfig, setnetconfig, getnetconfig, endnetconfig, getnetconfigent, freenetconfigent, nc_perror, nc_sperror
+\- Network Configuration database subroutines.
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <netconfig.h>
+.HP
+.BI "void *setnetconfig(void);"
+.HP
+.BI "struct netconfig *getnetconfig(void *" handle );
+.HP
+.BI "int endnetconfig(void *" handle );
+.HP
+.BI "struct netconfig *getnetconfigent(const char *" netid );
+.HP
+.BI "void freenetconfigent(struct netconfig *" netconfig );
+.HP
+.BI "void nc_perror(const char *" msg );
+.HP
+.BI "char *nc_sperror(void);"
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'handle\(em'u
+.I handle
+an opaque pointer returned by
+.BR setnetconfig ()
+to be used as an argument to calls to
+.BR getnetconfig ().
+.TP
+.I netid
+A network identifier string.  This should match one of the network identifier
+strings from the
+.BR netconfig (5)
+file.
+.TP
+.I msg
+A short message string to prefix to the error message printed to standard
+error by the
+.BR nc_perror ()
+subroutine.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.IR UNIX \(rg
+has traditionally provided three components of the Network Services Library,
+.BR libnsl (3),
+that are associated with Transport Provider Interface,
+.BR tpi (7),
+.IR STREAMS (9)
+network pseudo-device drivers, and that are not currently part of the
+.B Linux
+Network Services Library.  These components are:
+.IP 1. \w'1.\(em'u
+Network Configuration database access, see
+.BR netconfig (3).
+.PD 0
+.IP 2.
+Network Directory and address mapping, see
+.BR netdir (3).
+.IP 3.
+Network Path access, see
+.BR netpath (3).
+.PD
+.PP
+These are often refered to as the Network Selection facility of the Network
+Services Library.
+.PP
+.BR setnetconfig (),
+.BR getnetconfig (),
+.BR endnetconfig (),
+.BR getnetconfigent (),
+.BR freenetconfigent (),
+.BR nc_perror "() and "
+.BR nc_sperror (),
+provide a set of Network Configuration database access subroutines for accessing
+the Network Configuration database contained in the
+.BR /etc/netconfig ,
+.BR netconfig (5),
+file.
+.PP
+.BR setnetconfig (),
+.BR getnetconfig "() and "
+.BR endnetconfig (),
+provide a mechanism to sequentially access each entry in the Network
+Configuration database.
+.TP
+.BR setnetconfig ()
+returns a pointer to an opaque datastructure used as a handle to the
+.BR getnetconfig ()
+subroutine.
+.BR setnetconfig ()
+is used to initialize client access to the database entries and set the access
+point to the first entry.
+.TP
+.BR getnetconfig (),
+when called successively with the
+.I handle
+returned by the call to
+.BR setnetconfig (),
+returns each Network Configuration database entry starting with the first.
+When no additional entries remain that have not already been retreived since
+the call to
+.BR setnetconfig (),
+.BR getnetconfig ()
+returns a NULL pointer to indicate that the end of the database has been
+reached.
+.TP
+.BR endnetconfig ()
+releases client access to the database and frees for reuse any resources that
+were held by
+.BR setnetconfig ()
+for use by
+.BR getnetconfig ().
+.BR endnetconfig ()
+must only be called with a
+.I handle
+returned from a previous and corresponding call to
+.BR setnetconfig ().
+.BR endnetconfig ()
+must be called for each call to
+.BR setnetconfig ()
+with the corresponding
+.I handle
+pointer as the argument.
+.PP
+.BR getnetconfigent ()
+and
+.BR freenetconfigent ()
+provide a mechanism to access Network Confifuration database entries by
+network identification name strings.
+.TP
+.BR getnetconfigent ()
+Returns a pointer to the
+.B netconfig
+structure corresponding to the network configuration entry with the same
+network identification name as that supplied in the
+.I netid
+argument.
+.TP
+.BR freenetconfigent ()
+frees the network configuration entry returned as a pointer to a
+.B netconfig
+structure, from a previous call to
+.BR getnetconfigent ().
+.BR freenetconfigent ()
+must be called for each call to
+.BR getnetconfigent ()
+with the corresponding
+.I netconfig
+pointer as the argument.
+.PP
+.BR nc_perror ()
+and
+.BR nc_sperror ()
+provide a mechanism for providing diagnostic messages upon failure.  These
+subroutines can be used both for these
+.B netconfig
+subroutines, as well as
+.BR netpath (3)
+subroutines.
+.TP
+.B nc_perror ()
+prints a diagnostic message to standard error with the string provided in the
+.I msg
+argument used as a prefix followed by a colon.  Diagnostic messages printed to
+standard error are followed with a NEWLINE.
+.TP
+.BR nc_sperror ()
+is similar to
+.BR nc_perror (),
+but, instead of printing the message to standard error, only a pointer to the
+diagnostic message string is returned.  The allows the caller to subsequently
+format and store a message according to the caller's specifications.
+.\"
+.\"
+.SS "FILE FORMAT"
+.PP
+The format of the
+.B /etc/netconfig
+Network Configuration database file is as described in
+.BR netconfig (5).
+.\"
+.\"
+.SS "DATABASE STRUCTURE"
+.PP
+The
+.B netconfig
+structure is defined in
+.RB < netconfig.h >
+as follows:
+.PP
+.nf
+\fC\s-1\
+struct netconfig {
+    char *nc_netid;      /* network id string */
+    ulong nc_semantics;  /* service interface semantics */
+    ulong nc_flag;       /* flags */
+    char *nc_protofmly;  /* protocol family string */
+    char *nc_proto;      /* protocol name string */
+    char *nc_device;     /* STREAMS device path */
+    ulong nc_nlookups;   /* num. of name-to-address libs */
+    char **nc_lookups;   /* name-to-address libraries */
+    ulong nc_unused[9];  /* reserved for future use */
+};
+\s+1\fP
+.fi
+.PP
+Where the members of the
+.B netconfig
+structure are as follows:
+.TP \w'nc_protofmly\(em'u
+.I nc_netid
+The network identifier string defined by the system administrator and unique
+to each entry in the network configuration database file.
+.TP
+.I nc_semantics
+The semantics describing the service interface of the associated
+.I STREAMS
+transport service provider.
+.I nc_semantics
+can take on one of the following values:
+.RS
+.TP \w'NC_TPI_COTS_ORD\(em'u
+.B NC_TPI_CLTS
+Transport Provider interface,
+.BR tpi (7),
+Connectionless Transport Service.
+.PD 0
+.TP
+.B NC_TPI_COTS
+Transport Provider interface,
+.BR tpi (7),
+Connection-Oriented Transport Service.
+.TP
+.B NC_TPI_COTS_ORD
+Transport Provider interface,
+.BR tpi (7),
+Connection-Oriented Transport Service with Orderly Release.
+.TP
+.B NC_TPI_RAW
+Transport Provider interface,
+.BR tpi (7),
+Raw Transport Service.
+.PD
+.RE
+.TP
+.I nc_flag
+Flags associated with the transport entry.
+.I nc_flag
+can take on one of the following values:
+.RS
+.TP \w'NC_TPI_COTS_ORD\(em'u
+.B NC_NOFLAG
+No option flag is indicated.
+.PD 0
+.TP
+.B NC_VISIBLE
+The visible option flag is indicated.  This means that the network transport
+provider is visible to
+.BR getpath (3)
+when the
+.B NETPATH
+environment variable is not set.
+.PD
+.RE
+.TP
+.I nc_protofmly
+The protocol family string assigned by the system adminstrator.
+.TP
+.I nc_proto
+The protocol string assigned by the system administrator.
+.TP
+.I nc_device
+The device path to a
+.I STREAMS
+.BR clone (4)
+device that provides access to the associated transport provider.
+.TP
+.I nc_nlookups
+The number of name to address translation libraries.
+.TP
+.I nc_lookups
+An array of address translation libraries.  The number of strings contained in
+this array is specified with the
+.I nc_nlookups
+field.
+.TP
+.I nc_unused
+Unused bytes reserved for future expansion.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR nc_perror ()
+and
+.BR nc_sperror ()
+must be called immediately after the failed network configuration subroutine
+fails.  Otherwise, the error condition may be lost.
+
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR setnetconfig ()
+returns an opaque pointer for use in the
+.BR getnetconfig ()
+call.  Otherwise,
+.B NULL
+is returned and
+.IR h_errno (3)
+is set to indicate the error.
+.PP
+Upon successful completion,
+.BR endnetconfig ()
+returns 0.  Otherwise, -1 is
+returned and
+.IR h_errno (3)
+is set to indicate the error.
+A diagnostic string can be printed to standard error or accesed using the
+.BR nc_perror ()
+or
+.BR nc_sperror ()
+subroutines.
+.PP
+Upon successful completion,
+.BR nc_sperror ()
+returns a pointer to a string describing the error condition.  (Note that this
+subroutine can also be used for
+.BR netpath (3)
+subroutines.)
+Otherwise,
+.B NULL
+is returned.
+.PP
+Upon successful completion,
+.BR getnetconfig ()
+and
+.BR getnetconfigent ()
+return a pointer to a
+.B netconfig
+structure.
+Otherwise, they return
+.B NULL
+to indicate failure.
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+When an error occurs, an error message can be printed to standard error or retrieved using
+.BR nc_perror ()
+or
+.BR nc_sperror ().
+.\"
+.\"
+.SH ERRORS
+.PP
+The
+.BR setnetconfig ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+.\".IP \- \w'\-\(em'u
+an error was encountered opening the Network Configuration database,
+.BR /etc/netconfig ,
+see
+.BR netconfig (5).
+.PP
+The
+.BR getnetconfig ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+.\".IP \- \w'\-\(em'u
+no entries exist in the Network Configuration database; or,
+.\".IP \-
+the last entry in the Network Configuration database has been read with a
+previous call to
+.BR getnetconfig ()
+and there are no more entries in the Network Configuration database.
+.PP
+The
+.BR endnetconfig ()
+subroutine will fail if:
+.\".IP \- \w'\-\(em'u
+the passed in
+.I handle
+argument is invalid; or,
+.\".IP \-
+.BR endnetconfig ()
+has already been called for the
+.I handle
+argument.
+.PP
+The passed in
+.I handle
+argument is only invalid when there is not a subsequent, corresponding call to
+.BR setnetconfig ().
+.PP
+The
+.BR getnetconfigent ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+.\".IP \- \w'\-\(em'u
+the Network Configuration database does not exist; or,
+.\".IP \-
+no entries exist in the Network Configuration database for the passed in
+.I netid
+string.
+.PP
+The
+.BR freenetconfigent ()
+subroutine will fail silently if:
+.\".IP \- \w'\-\(em'u
+passed a
+.B NULL
+or invalid pointer; or,
+.\".IP \-
+pass a pointer that was previously passed to
+.BR freenetconfigent ().
+.PP
+The
+.BR nc_perror ()
+subroutine will fail silently if:
+.\".IP \- \w'\-\(em'u
+standard error is closed; or,
+.\".IP \-
+.I msg
+is an invalid pointer.
+.PP
+The
+.BR nc_sperror ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+.\".IP \- \w'\-\(em'u
+no error exists.
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+The Network Configuration database file.  See
+.BR netconfig (5).
+.TP
+.B /usr/lib/libnsl2.so
+The Network Services Library 2 shared object library.
+.TP
+.B /usr/lib/libnsl2.a
+The Network Services Library 2 static library.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR netconfig (5),
+.BR netpath (3),
+.BR netdir (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR setnetconfig (),
+.BR getnetconfig (),
+.BR endnetconfig (),
+.BR getnetconfigent (),
+.BR freenetconfigent (),
+.BR nc_perror "() and "
+.BR nc_sperror (),
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These network configuraiton subroutines are compatible with
+.I SVR4
+.[
+svr4
+.]
+and systems based on
+.IR SVR4 ,
+.[
+svr4
+.]
+including
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+describe the
+.BR nc_sperror ()
+subroutine as returning a pointer to thread-specific data and that the buffer
+could change at any point.  While the error value is saved as thread-specific
+data, this implementation of
+.BR nc_sperror ()
+returns a pointer to a shared read-only string that is valid for the duration
+of the calling process.
+.IP \(em
+.B @PACKAGE_TITLE@
+stores the error condition in
+.IR h_errno (3).
+.IP \(em
+Diagnostic message strings are not documented and are incompatible.
+.IP \(em
+Binary compatibility would only be coincidental.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are normally part of the Network Services
+Library,
+.BR libnsl (3);
+however,
+.B Linux
+already has a library of that name (which unfortunately is missing these
+components), and, therefore,
+.B "@PACKAGE_TITLE@"
+renames the library to
+.BR libnsl2.so .
+.PP
+See
+.BR libnsl (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR SVR4 .
+.[
+svr4
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The network configuration subroutines first appeared in
+.IR "SVR 4" .
+.[
+svr4
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of network transport providers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

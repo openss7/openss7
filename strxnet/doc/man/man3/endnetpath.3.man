@@ -1,0 +1,1 @@
+.so man3/netpath.3.man
