@@ -292,6 +292,7 @@ xnsl_man_MANS 	= \
 	man3/taddr2uaddr.3 \
 	man3/uaddr2taddr.3 \
 	man3/xnsl.3 \
+	man5/netconfig.5 \
 	man5/netdir.5
 
 sock_man_MANS	= \
@@ -562,6 +563,7 @@ xnsl_dist_noinst_MANS 	= \
 	man3/taddr2uaddr.3.man \
 	man3/uaddr2taddr.3.man \
 	man3/xnsl.3.man \
+	man5/netconfig.5.man \
 	man5/netdir.5.man
 
 sock_dist_noinst_MANS	= \
