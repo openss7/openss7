@@ -84,6 +84,10 @@ The sections that follow provide information on OpenSS7 releases of the @*
 
 @itemize
 @item
+Added Network Services Library containing network selection facility as well
+as name-to-address mapping functions ala ONC RPC.
+
+@item
 Automated release file generation making for vastly improved and timely text
 documentation present in the release directory.
 
