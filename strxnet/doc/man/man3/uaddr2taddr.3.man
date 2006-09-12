@@ -1,1 +1,536 @@
-.so man3/netdir.3.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.\"
+.\"
+.TH UADDR2TADDR 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B uaddr2taddr
+\- convert a universal address to a transport address
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <netdir.h>
+.ad l
+.hy 0
+.HP 12
+.BI "struct netbuf *uaddr2taddr(struct netconfig *" config ", const char *" addr );
+.HP
+.BI "struct netbuf *_taddr2uaddr(struct netconfig *" config ", const char *" addr );
+.ad b
+.hy 6
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIconfig\fR\(em'u
+.I config
+A pointer to a
+.BR netconfig (5)
+structure describing the network transport provider returned by
+.BR getnetconfig (3),
+.BR getnetconfigent (3)
+or
+.BR getnetpath (3).
+.TP
+.I addr
+A pointer to a null-terminated character string
+describing the universal address.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.IR UNIX \(rg
+has traditionally provided three components of the Network Services Library,
+.BR libxnsl (3),
+that are associated with Transport Provider Interface,
+.BR tpi (7),
+.IR STREAMS (9)
+network pseudo-device drivers, and that are not currently part of the
+.B Linux
+Network Services Library.  These components are:
+.IP 1. \w'1.\(em'u
+Network Configuration database access, see
+.BR netconfig (3).
+.PD 0
+.IP 2.
+Network Configuration database Path access, see
+.BR netpath (3).
+.IP 3.
+Network Directory Name and Address Service, see
+.BR netdir (3).
+.PD
+.PP
+These are often refered to as the Network Selection facility of the Network
+Services Library.
+.PP
+.BR uaddr2taddr ()
+provides an address translation service for the network transport protocol specified with a pointer
+to a
+.BR netconfig (5)
+structure,
+.IR config .
+The
+.I config
+pointer is acquired using the
+.BR getnetconfig (3),
+.BR getnetconfigent (3)
+or
+.BR getnetpath (3)
+subroutines and describes a particular transport protocol from the
+.BR netconfig (5)
+network configuration database.
+The universal address to translate to a transport address is sepcified as a poitner to a
+null-terminated character string,
+.IR addr ,
+that contains the universal address as it is normally passed to and from the user (i.e, in
+numbers-and-dots notation).
+.BR uaddr2taddr ()
+returns a pointer to a
+.BR netbuf (3)
+structure representing the transport address that corresponds to the universal address.
+.PP
+Once the transport address in the
+.BR netbuf (3)
+structure is not long required, it is freed by passing its pointer to
+.BR netdir_free (3)
+with a
+.I struct_type
+argument of
+.BR ND_ADDR .
+.\"
+.\"
+.SH "STRUCTURE FORMAT"
+.PP
+The
+.B netconfig
+structure is defined in
+.RB < netconfig.h >
+and described in
+.BR netconfig (3)
+and
+.BR netconfig (5).
+.PP
+Upon successful return, the returned
+.BR netbuf (3)
+structure pointer points to an allocated
+.BR netbuf (3)
+structure containing the transport address.
+The
+.BR netbuf (3)
+structure is defined in
+.RB < xti.h >
+and described in
+.BR netbuf (3).
+.\"
+.\"
+.SH USAGE
+.PP
+Procedure for usage of the
+.BR uaddr2taddr ()
+subroutine is to first acquire a pointer to a
+.BR netconfig (3)
+structure representing an entry in the
+.BR netconfig (5)
+database using a function such as
+.BR getnetconfig (3),
+.BR getnetconfigent (3)
+or
+.BR getnetpath (3).
+Then a universal address is aquired as a pointer to a null-terminated character string
+(perhaps as specified by the user)
+and passed to the
+.BR uaddr2taddr ()
+function.  The returned
+.BR netbuf (3)
+structure pointer contains the transport address represented by the specified universal address.
+Once the
+.BR netbuf (3)
+structure is no longer required, it is freed by passing its pointer to
+.BR netdir_free (3)
+with a
+.I struct_type
+argument of
+.BR ND_ADDR .
+.PP
+For Internet Protocol transports, (that is when
+.I config
+points to a
+.BR netconfig (5)
+structure corresponding to an Internet Protocol Version 4 or Version 6 network),
+.BR taddr2uaddr ()
+is roughly equivalent to
+.BR inet_aton (3);
+however,
+.BR taddr2uaddr ()
+is more general and applies to networks other than
+.I inet
+or
+.IR inet6 .
+Also,
+.BR inet_aton (3)
+neither accepts nor translates a port number to a service component in the resulting
+transport address.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR uaddr2taddr ()
+returns a
+.RB non- NULL
+.BR netbuf (3)
+pointer to an allocated transport address.
+Otherwise,
+.B NULL
+is returned and
+.I _nderror
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR taddr2uaddr ()
+fails, it returns
+.B NULL
+and sets
+.I _nderror
+to one of the following error codes:
+.TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_ACCESS ]
+The user did not have sufficient privilege to use the specified address.
+.TP
+.RB [ ND_BADARG ]
+Invalid argument.
+.TP
+.RB [ ND_FAILCTRL ]
+Control operation failed.
+.TP
+.RB [ ND_NO_ADDRESS ]
+Invalid address format.
+.TP
+.RB [ ND_NOCONVERT ]
+Conversion error.
+.TP
+.RB [ ND_NOCTRL ]
+Function invoked out of sequence or incorrect option specified.
+.TP
+.RB [ ND_NO_DATA ]
+Incorrect amount of data.
+.TP
+.RB [ ND_NOHOST ]
+Host not found.
+.TP
+.RB [ ND_NOMEM ]
+Insufficient memory.
+.TP
+.RB [ ND_NO_RECOVERY ]
+Unrecoverable error.
+.TP
+.RB [ ND_OPEN ]
+File could not be opened.
+.TP
+.RB [ ND_SYSTEM ]
+Fault detected.
+.TP
+.RB [ ND_TRY_AGAIN ]
+Try again later.
+.TP
+.RB [ ND_NOSERV ]
+Service not found.
+.TP
+.RB [ ND_NOSYM ]
+Symbol not found.
+.TP
+.RB [ ND_UNKWN ]
+Unknown object.
+.TP
+.RB [ ND_OK ]
+Success.
+.PP
+When an error occurs, an error message can be printed to standard error or retrieved using
+.BR netdir_perror (3)
+or
+.BR netdir_sperror (3).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR netdir_perror (3)
+and
+.BR netdir_sperror (3)
+must be called immediately after the failed network configuration subroutine fails.  Otherwise, the
+error condition in
+.I _nderror
+may be lost.
+.PP
+The
+.BR netbuf (3)
+structure to which a pointer is returned must eventually be freed by passing it to
+.BR netdir_free (3)
+with a
+.I struct_type
+argument of
+.BR ND_ADDR .
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Name to address lookup libraries that will have their
+.BR _uaddr2taddr ()
+dynamic symbols called to perform the lookup will be searched in the order that they appear in the
+.I nc_lookups
+member of the specified
+.BR netconfig (5)
+structure,
+.IR config .
+If
+.I config
+specifies an
+.I inet
+or
+.I inet6
+network, and the number of lookup libraries,
+.IR nc_nlookups ,
+is zero, the standard BSD inet translation functions will be used.
+.PP
+.BR _uaddr2taddr ()
+is the symbol provided by shared object lookup libraries to implement
+.BR uaddr2taddr ().
+If the library does not implement
+.BR _uaddr2taddr (),
+.BR uaddr2taddr ()
+will fail, return
+.B NULL
+and set
+.I _nderror
+to
+.RB [ ND_NOSYM ].
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+The Network Configuration database file.  See
+.BR netconfig (5).
+.TP
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+.TP
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR netdir (3)
+for an example.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR netdir (3),
+.BR netconfig (5),
+.BR netconfig (3),
+.BR netpath (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR uaddr2taddr ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR uaddr2taddr ()
+is compatible with
+.I SVR4
+.[
+svr4
+.]
+and systems based on
+.IR SVR4 ,
+.[
+svr4
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR UnixWare \(rg
+documents
+.[
+uw7doc
+.]
+that
+.I _nderror
+contains the cause of failure and that
+.BR t_errno (3)
+may provide some additional insights into why a call failed.
+.IP ""
+.B @PACKAGE_TITLE@
+stores the error condition in
+.IR _nderror (3).
+.IP \(em
+.IR AIX \(rg
+also documents
+.[
+aixdoc
+.]
+the
+.RB [ ND_NOCONVERT ]
+error code.
+.IP \(em
+Diagnostic message strings are not documented and are incompatible.
+.IP \(em
+Binary compatibility would only be coincidental.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are normally part of the Network Services
+Library,
+.BR libnsl.so ;
+however,
+.B Linux
+already has a library of that name (which unfortunately is missing these
+components), and, therefore,
+.B "@PACKAGE_TITLE@"
+renames the library to
+.BR libxnsl.so .
+This means that both the
+.B -lnsl
+and
+.B -lxnsl
+flags must be provided on the
+.B cc
+command line.
+.PP
+See
+.BR libxnsl (3)
+for additional compatibility information.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+.IR SVR4 .
+.[
+svr4
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The network configuration subroutines first appeared in
+.IR "SVR 4" .
+.[
+svr4
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of network transport providers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -62,7 +62,7 @@
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database strsock.refs
+database strxnet.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -71,40 +71,33 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
-.so strsock.macros
+.so strxnet.macros
 .\"
 .\"
 .\"
 .\"
-.TH NETPATH 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.TH _NDERROR 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .\"
 .\"
 .SH NAME
-.B netpath, setnetpath, getnetpath, endnetpath
-\- Network Configuration path subroutines.
+.B _nderror
+\- network selection error number
 .\"
 .\"
 .SH SYNOPSIS
-.PP
-.B #include <netconfig.h>
+.HP 12
+.B #include <netdir.h>
 .HP
-.BI "void *setnetpath(void);"
-.HP
-.BI "struct netconfig *getnetpath(void *" handle );
-.HP
-.BI "int endnetpath(void *" handle );
+.BI "int " _nderror ;
 .\"
 .\"
 .SH ARGUMENTS
-.TP
-.I handle
-an opaque pointer returned by
-.BR setnetpath ()
-to be used as an argument to calls to
-.BR getnetpath ().
+.PP
+None.
 .\"
 .\"
 .SH DESCRIPTION
+.PP
 .PP
 .IR UNIX \(rg
 has traditionally provided three components of the Network Services Library,
@@ -130,187 +123,160 @@ Network Path access, see
 These are often refered to as the Network Selection facility of the Network
 Services Library.
 .PP
-.BR setnetpath "(), " getnetpath "() and " endnetpath ()
-provide a mechanism to sequentialy access entries in the Network Configuration database that
-correspond to entries in the
-.RB { NETPATH }
-environment variable.  That is, the
-.RB { NETPATH }
-environment variable acts as a filter specification that filters network identifiers.
-.TP
-.BR setnetpath ()
-returns a pointer to an opaque datastructure used as a handle to the
-.BR getnetpath ()
-subroutine.
-.BR setnetpath ()
-is used to initialize client access to the database entries and set the access point to the first
-valid entry in the
-.RB { NETPATH }
-environment variable.  If the
-.RB { NETPATH }
-environment variable is not set, all of the entries in the
-.BR netconfig (5)
-database that are marked
-.RI \(lq visible \(rq
-will be used instead.
-.TP
-.BR getnetpath (),
-when called successively with the
-.I handle
-returned by the call to
-.BR setnetpath (),
-returns each valid Network Configuration database entry that appears in the
-.RB { NETPATH }
-environment variable starting with the first.  If the
-.RB { NETPATH }
-environment variable is not set, all of the database entries that are marked
-.RI \(lq visible \(rq
-will be used instead.
-Once the last entry is returned,
-.BR getnetpath ()
-will subsequently return
-.BR NULL .
-.TP
-.BR endnetpath ()
-releases client access to the database and frees for reuse any resources that were held by
-.BR setnetpath ()
-for use by
-.BR getnetpath ().
-.BR endnetpath ()
-must only be called with a
-.I handle
-returned from a previous and corresponding call to
-.BR setnetpath ().
-.BR endnetpath ()
-must be called for each call to
-.BR setnetpath ()
-with the corresponding
-.I handle
-pointer as the argument.
+.B _nderror
+contains the last name-to-address mapping function,
+.BR netdir (3),
+error number.
+.\"
+.\"
+.SH USAGE
 .PP
-.BR nc_perror (3)
-and
-.BR nc_sperror (3)
-provide a mechanism for providing diagnostic messages upon failure.  These subroutines are used for
-both
-.BR netconfig (3)
-subroutines as well as the
-.B netpath
-subroutines described here.
-.\"
-.\"
-.SS "NETPATH FORMAT"
-.PP
-The format of the
-.RB { NETPATH }
-environment variable is a sequence of zero or more network identification strings as described in
-.BR netconfig (5),
-separated by colons.
-If the
-.RB { NETPATH }
-environment variable is not set, these subroutines act as though the
-.RB { NETPATH }
-environment variable consisted of each
-.RI \(lq visible \(rq
-network identification string entry in the
-.BR netconfig (5)
-database, in the order they occur in the database, separated by colons.
-.\"
-.\"
-.SS "DATABASE FORMAT"
-.PP
-The
-.BR netconfig
-structure is defined in
-.BR netconfig (3)
-and
-.BR netconfig (5).
+.B _nderror
+is provided primarily for use by name-to-address mapping function shared object libraries as
+described in
+.BR netdir (5).
+It is not intended to be used directly by the name-to-address mapping function library user.
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR nc_perror (3)
-and
-.BR nc_sperror (3)
-must be called immediately after the failed network configuration subroutine fails.  Otherwise, the
-error condition may be lost.
+.B _nderror
+is implemented as thread-specific data when linked with the
+.BR pthreads (3)
+library,
+.BR libpthreads.so .
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
-Upon successful completion,
-.BR setnetpath ()
-returns an opaque pointer for use in the
-.BR getnetpath ()
-call.  Otherwise,
-.B NULL
-is returned and
-.IR h_errno (3)
-is set to indicate the error.
-.PP
-Upon successful completion, 
-.BR getnetpath ()
-return a pointer to a
-.BR netconfig (3)
-structure.  Otherwise, it returns
-.B NULL
-to indicate failure.
-.PP
-Upon successful completion,
-.BR endnetpath ()
-returns 0.  Otherwise, -1 is
-returned and
-.IR h_errno (3)
-is set to indicate the error.
-.\"
-.\"
-.SH "ERROR HANDLING"
-.PP
-When an error occurs, an error message can be printed to standard error or retrieved using
-.BR nc_perror (3)
-or
-.BR nc_sperror (3).
+When a name-to-address mapping function returns an error, it places the name-to-address error number
+in
+.BR _nderror .
 .\"
 .\"
 .SH ERRORS
 .PP
-The
-.BR setnetpath ()
-subroutine will faile, and return a
-.B NULL
-pointer, if: an error was encountered opening the Network Configuration database,
-.BR /etc/netconfig ,
-see
-.BR netconfig (5).
+The error string associated with the current value of
+.B _nderror
+can be obtained using the
+.BR netdir_sperror (3)
+function.  The string prefixed by a caller supplied string, a colon and a space, can be printed to
+standard error using the
+.BR netdir_perror (3)
+function.
 .PP
-The
-.BR getnetpath ()
-subroutine will fail, and return a
-.B NULL
-pointer, if:
-no etnries exist in the Network Configuration database corresponding to the
-.RB { NETPATH }
-environment variable; or, the last entry in the Network Configuration database associated with the
-.RB { NETPATH }
-environment variable has already been read with a previous call to
-.BR getnetpath ()
-and there are no more entries in the Network Configuration database corresponding to the
-.RB { NETPATH }
-environment variable.
-.PP
-The
-.BR endnetpath ()
-subroutine will fail if: the passed in
-.I handle
-argument is invalid; or,
-.BR endnetpath ()
-has already been called for the
-.I handle
+.B _nderror
+can contain one of the following values:
+.TP \w'[\fBND_FAILCTRL\fR]\(em'u
+.RB [ ND_NOMEM ]
+.RI \(lq "n2a: memory allocation failed" \(rq
+.IP ""
+The last name-to-address translation function could not allocate memory necessary to complete the
+operation.
+.TP
+.RB [ ND_OK ]
+.RI \(lq "n2a: successful completion" \(rq
+.IP ""
+The last name-to-address translation function completed successfully, or there was no previous
+name-to-address translation function called.
+.TP
+.RB [ ND_NOHOST ]
+.RI \(lq "n2a: hostname not found" \(rq
+.IP ""
+The last name-to-address translation function,
+.BR netdir_getbyname (3),
+could not find, or does not support, the specified host name.
+.TP
+.RB [ ND_NOSERV ]
+.RI \(lq "n2a: service name not found" \(rq
+.IP ""
+The last name-to-address translation function,
+.BR netdir_getbyname (3),
+could not find, or does not support, the specified service name.
+.TP
+.RB [ ND_NOSYM ]
+.RI \(lq "n2a: symbol missing in shared object : %s" \(rq
+.IP ""
+One of the required symbols, see
+.BR netdir (5),
+was missing from a shared object specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
 argument.
-.\"
-.\"
-.\".SH DEVICES
-.\".PP
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
+.TP
+.RB [ ND_OPEN ]
+.RI \(lq "n2a: could not open shared object : %s" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
+.TP
+.RB [ ND_ACCESS ]
+.RI \(lq "n2a: access denied for shared object" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened due to access permission.
+.TP
+.RB [ ND_UKNWN ]
+.RI \(lq "n2a: attempt to free unknown object" \(rq
+.IP ""
+.BR netdir_free (3)
+was called with an unknown
+.I struct_type
+argument value.
+.TP
+.RB [ ND_BADARG ]
+.RI \(lq "n2a: bad arguments passed to routine" \(rq
+.IP ""
+The last name-to-address translation function was passed a bad argument.
+.TP
+.RB [ ND_NOCTRL ]
+.RI \(lq "n2a: unknown option passed" \(rq
+.IP ""
+.BR netdir_options (3)
+was passed an unknown
+.I option
+argument value.
+.TP
+.RB [ ND_FAILCTRL ]
+.RI \(lq "n2a: control operation failed" \(rq
+.IP ""
+The
+.BR netdir_options (3)
+control operation failed.
+.TP
+.RB [ ND_SYSTEM ]
+.RI \(lq "n2a: system error" \(rq
+.IP ""
+During the last name-to-address translation function, a system error occurred.  This could be
+because a segmentation fault occurred.
+.TP
+.RB [ ??? ]
+.RI \(lq "n2a: unknown error" \(rq
+.IP ""
+An internal error occured in the
+.BR libxnsl (3)
+library or a loaded shared object.
 .\"
 .\"
 .SH FILES
@@ -320,51 +286,50 @@ argument.
 The Network Configuration database file.  See
 .BR netconfig (5).
 .TP
-.B /usr/lib/libnsl2.so
-The Network Services Library 2 shared object library.
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
 .TP
-.B /usr/lib/libnsl2.a
-The Network Services Library 2 static library.
-.\"
-.\"
-.SH ENVIRONMENT
-.PP
-.TP
-.RB { NETPATH }
-This environment variable contains the network path.
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR environ (5),
-.BR netconfig (5),
 .BR netconfig (3),
-.BR nc_perror (3),
-.BR nc_sperror (3),
-.BR netdir (3).
+.BR netconfig (5),
+.BR netpath (3),
+.BR netdir (3),
+.BR netdir (5).
 .\"
 .\"
 .SH BUGS
 .PP
-.BR setnetpath (),
-.BR getnetpath "() and "
-.BR endnetpath ()
-had no known bugs.
+.B _nderror
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-These network configuraiton subroutines are compatible with
-.I SVR4
+.B _nderror
+is compatible with
+.I "SVR 4.2"
 .[
-svr4
+svr42
 .]
 and systems based on
-.IR SVR4 ,
+.IR "SVR 4.2" ,
 .[
-svr4
+svr42
 .]
 including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
 .IR Solaris \(rg
 .[
 soldoc
@@ -386,17 +351,17 @@ and
 uw7doc
 .]
 describe the
-.BR nc_sperror ()
+.BR netdir_sperror ()
 subroutine as returning a pointer to thread-specific data and that the buffer
 could change at any point.  While the error value is saved as thread-specific
 data, this implementation of
-.BR nc_sperror ()
+.BR netdir_sperror ()
 returns a pointer to a shared read-only string that is valid for the duration
 of the calling process.
 .IP \(em
 .B @PACKAGE_TITLE@
 stores the error condition in
-.IR h_errno (3).
+.IR _nderror (3).
 .IP \(em
 Diagnostic message strings are not documented and are incompatible.
 .IP \(em
@@ -413,7 +378,7 @@ already has a library of that name (which unfortunately is missing these
 components), and, therefore,
 .B "@PACKAGE_TITLE@"
 renames the library to
-.BR libnsl2.so .
+.BR libxnsl.so .
 .PP
 See
 .BR libnsl (3)
@@ -422,18 +387,18 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.IR SVR4 .
+.IR "SVR 4.2" .
 .[
-svr4
+svr42
 .]
 .\"
 .\"
 .SH HISTORY
 .PP
 The network configuration subroutines first appeared in
-.IR "SVR 4" .
+.IR "SVR 4.2" .
 .[
-svr4
+svr42
 .]
 These subroutines are related to the
 .IR UNIX \(rg
@@ -445,3 +410,4 @@ implementation of network transport providers.
 $LIST$
 .]
 .TI
+

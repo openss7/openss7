@@ -309,6 +309,8 @@ The OpenSS7 Project http://www.openss7.org/
 ..
 .de ID
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -319,9 +321,13 @@ The OpenSS7 Project http://www.openss7.org/
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I2
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -334,9 +340,13 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I3
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -349,9 +359,13 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I4
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -362,9 +376,13 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I5
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.1 $); $Date: 2006/08/23 10:03:58 $.
@@ -378,6 +396,8 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de VR
 .SH "VERSIONS"

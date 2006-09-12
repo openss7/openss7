@@ -263,6 +263,37 @@ xnet_man_MANS	= \
 	man8/test-xnet.8 \
 	man8/test-xnet_thr.8
 
+xnsl_man_MANS 	= \
+	man3/endnetconfig.3 \
+	man3/endnetpath.3 \
+	man3/freenetconfigent.3 \
+	man3/getnetconfig.3 \
+	man3/getnetconfigent.3 \
+	man3/getnetpath.3 \
+	man3/getpeername.3 \
+	man3/getsockname.3 \
+	man3/getsockopt.3 \
+	man3/libxnsl.3 \
+	man3/nc_perror.3 \
+	man3/nc_sperror.3 \
+	man3/_nderror.3 \
+	man3/netbuf.3 \
+	man3/netconfig.3 \
+	man3/netdir.3 \
+	man3/netdir_free.3 \
+	man3/netdir_getbyaddr.3 \
+	man3/netdir_getbyname.3 \
+	man3/netdir_options.3 \
+	man3/netdir_perror.3 \
+	man3/netdir_sperror.3 \
+	man3/netpath.3 \
+	man3/setnetconfig.3 \
+	man3/setnetpath.3 \
+	man3/taddr2uaddr.3 \
+	man3/uaddr2taddr.3 \
+	man3/xnsl.3 \
+	man5/netdir.5
+
 sock_man_MANS	= \
 	man3/accept.3 \
 	man3/bind.3 \
@@ -272,7 +303,6 @@ sock_man_MANS	= \
 	man3/getsockopt.3 \
 	man3/libsocket.3 \
 	man3/listen.3 \
-	man3/netbuf.3 \
 	man3/recv.3 \
 	man3/recvfrom.3 \
 	man3/recvmsg.3 \
@@ -288,6 +318,8 @@ sock_man_MANS	= \
 	man4/socksys.4
 
 man_MANS	= $(xnet_man_MANS)
+
+man_MANS	+= $(xnsl_man_MANS)
 
 if WITH_TLI
 ## WITH_TLI
@@ -501,6 +533,37 @@ xnet_dist_noinst_MANS	= \
 	man8/test-xnet.8.man \
 	man8/test-xnet_thr.8.man
 
+xnsl_dist_noinst_MANS 	= \
+	man3/endnetconfig.3.man \
+	man3/endnetpath.3.man \
+	man3/freenetconfigent.3.man \
+	man3/getnetconfig.3.man \
+	man3/getnetconfigent.3.man \
+	man3/getnetpath.3.man \
+	man3/getpeername.3.man \
+	man3/getsockname.3.man \
+	man3/getsockopt.3.man \
+	man3/libxnsl.3.man \
+	man3/nc_perror.3.man \
+	man3/nc_sperror.3.man \
+	man3/_nderror.3.man \
+	man3/netbuf.3.man \
+	man3/netconfig.3.man \
+	man3/netdir.3.man \
+	man3/netdir_free.3.man \
+	man3/netdir_getbyaddr.3.man \
+	man3/netdir_getbyname.3.man \
+	man3/netdir_options.3.man \
+	man3/netdir_perror.3.man \
+	man3/netdir_sperror.3.man \
+	man3/netpath.3.man \
+	man3/setnetconfig.3.man \
+	man3/setnetpath.3.man \
+	man3/taddr2uaddr.3.man \
+	man3/uaddr2taddr.3.man \
+	man3/xnsl.3.man \
+	man5/netdir.5.man
+
 sock_dist_noinst_MANS	= \
 	man3/accept.3.man \
 	man3/bind.3.man \
@@ -510,7 +573,6 @@ sock_dist_noinst_MANS	= \
 	man3/getsockopt.3.man \
 	man3/libsocket.3.man \
 	man3/listen.3.man \
-	man3/netbuf.3.man \
 	man3/recv.3.man \
 	man3/recvfrom.3.man \
 	man3/recvmsg.3.man \
@@ -528,6 +590,7 @@ sock_dist_noinst_MANS	= \
 dist_noinst_MANS	= \
 	$(tli_dist_noinst_MANS) \
 	$(xnet_dist_noinst_MANS) \
+	$(xnsl_dist_noinst_MANS) \
 	$(sock_dist_noinst_MANS)
 
 ## PKG_BUILD_INDEP

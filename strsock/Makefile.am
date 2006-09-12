@@ -159,14 +159,6 @@ libsocklib_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PK
 libsocklib_la_CFLAGS		= $(USER_CFLAGS)
 libsocklib_la_LIBADD		=
 
-lib_LTLIBRARIES			+= libnsl2.la
-
-libnsl2_la_SOURCES		= src/lib/netconfig.c src/lib/netpath.c src/lib/netdir.c src/include/netconfig.h src/include/netpath.h src/include/netdir.h gettext.h
-libnsl2_la_LDFLAGS		= -version-info 0:0:0
-libnsl2_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
-libnsl2_la_CFLAGS		= $(USER_CFLAGS)
-libnsl2_la_LIBADD		=
-
 ## RPM_BUILD_USER
 endif
 

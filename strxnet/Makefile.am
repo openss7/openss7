@@ -169,6 +169,14 @@ libxnet_la_LDFLAGS		= -version-info 0:0:0
 libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
+
+lib_LTLIBRARIES			+= libxnsl.la
+
+libxnsl_la_SOURCES		= src/lib/xnsl.c src/include/netconfig.h src/include/netdir.h src/include/sys/netconfig.h gettext.h
+libxnsl_la_LDFLAGS		= -version-info 0:0:0
+libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
+libxnsl_la_CFLAGS		= $(USER_CFLAGS)
+libxnsl_la_LIBADD		= 
 ## WITH_XNET
 endif
 
@@ -276,6 +284,14 @@ libxnet_la_LDFLAGS		= $(STREAMS_LDADD) -version-info 0:0:0
 libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
+
+lib_LTLIBRARIES			+= libxnsl.la
+
+libxnsl_la_SOURCES		= src/lib/xnsl.c src/include/netconfig.h src/include/netdir.h src/include/sys/netconfig.h gettext.h
+libxnsl_la_LDFLAGS		= -version-info 0:0:0
+libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
+libxnsl_la_CFLAGS		= $(USER_CFLAGS)
+libxnsl_la_LIBADD		= 
 ## WITH_XNET
 endif
 

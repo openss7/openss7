@@ -381,7 +381,6 @@ and
 .BR nc_sperror ()
 must be called immediately after the failed network configuration subroutine
 fails.  Otherwise, the error condition may be lost.
-
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -393,14 +392,14 @@ returns an opaque pointer for use in the
 call.  Otherwise,
 .B NULL
 is returned and
-.IR h_errno (3)
+.IR nc_error (3)
 is set to indicate the error.
 .PP
 Upon successful completion,
 .BR endnetconfig ()
 returns 0.  Otherwise, -1 is
 returned and
-.IR h_errno (3)
+.IR nc_error (3)
 is set to indicate the error.
 A diagnostic string can be printed to standard error or accesed using the
 .BR nc_perror ()
@@ -521,6 +520,79 @@ subroutine will fail, and return a
 pointer, if:
 .\".IP \- \w'\-\(em'u
 no error exists.
+.PP
+The following errors can be returned:
+.TP \w'[\fBNC_NOMOREENTRIES\fR]\(em'u
+.RB [ NC_NOERROR ]
+.RI \(lq "no error" \(rq
+.IP
+The last network selection function called was successful or no network selection function has yet
+been called.
+.TP
+.RB [ NC_NOMEM ]
+.RI \(lq "out of memory" \(rq
+.IP
+There was not sufficient memory for the last network selection function called to complete.
+.TP
+.RB [ NC_NOSET ]
+.RI \(lq "routine called before calling setnetpath() or setnetconfig()" \(rq
+.IP
+The last call to
+.BR endnetpath ()
+or
+.BR getnetpath (3)
+was called (incorrectly) before calling
+.BR setnetpath (3).
+.TP
+.RB [ NC_OPENFAIL ]
+.RI \(lq "cannot open /etc/netconfig" \(rq
+.IP
+The last call to a network selection function,
+.BR setnetpath (3),
+could not open the
+.B /etc/netconfig
+file.
+.TP
+.RB [ NC_BADLINE ]
+.RI \(lq "error in /etc/netconfig : field %d of line %d" \(rq
+.IP
+The last call to a network selection function detected a syntax error in the
+.B /etc/netconfig
+file at field
+.I %d
+of line
+.IR %d .
+.TP
+.RB [ NC_NOTFOUND ]
+.RI \(lq "netid not found in /etc/netconfig" \(rq
+.IP
+The
+.I netid
+argument to the last call to
+.BR getnetconfigent (3)
+was not found in
+.BR /etc/netconfig .
+.TP
+.RB [ NC_NOMOREENTRIES ]
+.RI \(lq "no more entries in /etc/netconfig" \(rq
+.IP
+The last call to network selection function
+.BR getnetpath (3)
+exhausted the entries in the
+.B /etc/netconfig
+file.
+.TP
+.RB [ ??? ]
+.RI \(lq "unknown error" \(rq
+.IP
+An internal error occured in the
+.BR libxnsl (3)
+library.
+.PP
+An error string associated with the error number can be obtained using
+.BR nc_sperror ()
+or printed to standard error with
+.BR nc_perror ().
 .\"
 .\"
 .\".SH DEVICES
@@ -534,11 +606,11 @@ no error exists.
 The Network Configuration database file.  See
 .BR netconfig (5).
 .TP
-.B /usr/lib/libnsl2.so
-The Network Services Library 2 shared object library.
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
 .TP
-.B /usr/lib/libnsl2.a
-The Network Services Library 2 static library.
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -563,16 +635,24 @@ have no known bugs.
 .SH COMPATIBILITY
 .PP
 These network configuraiton subroutines are compatible with
-.I SVR4
+.I "SVR 4.2"
 .[
-svr4
+svr42
 .]
 and systems based on
-.IR SVR4 ,
+.IR "SVR 4.2" ,
 .[
-svr4
+svr42
 .]
 including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
 .IR Solaris \(rg
 .[
 soldoc
@@ -604,7 +684,7 @@ of the calling process.
 .IP \(em
 .B @PACKAGE_TITLE@
 stores the error condition in
-.IR h_errno (3).
+.IR nc_error (3).
 .IP \(em
 Diagnostic message strings are not documented and are incompatible.
 .IP \(em
@@ -621,7 +701,7 @@ already has a library of that name (which unfortunately is missing these
 components), and, therefore,
 .B "@PACKAGE_TITLE@"
 renames the library to
-.BR libnsl2.so .
+.BR libxnsl.so .
 .PP
 See
 .BR libnsl (3)
@@ -630,18 +710,18 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.IR SVR4 .
+.IR "SVR 4.2" .
 .[
-svr4
+svr42
 .]
 .\"
 .\"
 .SH HISTORY
 .PP
-The network configuration subroutines first appeared in
-.IR "SVR 4" .
+The network selection subroutines first appeared in
+.IR "SVR 4.2" .
 .[
-svr4
+svr42
 .]
 These subroutines are related to the
 .IR UNIX \(rg

@@ -1,2 +1,573 @@
-.so man3/netdir.3.man
-
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.\"
+.\"
+.TH NETDIR_OPTIONS 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B netdir_options
+\- perform options management on a transport endpoint
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <netdir.h>
+.ad l
+.hy 0
+.HP 12
+.BI "int netdir_options(struct netconfig *" config ", int " option ", int " fd ", char *" point_to_arg );
+.ad b
+.hy 6
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIpoint_to_args\fR\(em'u
+.I config
+A pointer to a
+.BR netconfig (5)
+structure describing the network transport provider returned by
+.BR getnetconfig (3),
+.BR getnetconfigent (3)
+or
+.BR getnetpath (3).
+.TP
+.I option
+The name of the universal network option.  It can have values:
+.sp
+.RS
+.TP \w'\fBND_CHECK_RESERVEDPORT\fR\(em'u
+.B ND_SET_BROADCAST
+Set a broadcast address.
+.PD 0
+.TP
+.B ND_CLEAR_BROADCAST
+Clear broadcast capabilities.
+.TP
+.B ND_SET_REUSEADDR
+Set transport provider to allow reuse of local addresses.
+.TP
+.B ND_CLEAR_REUSEADDR
+Clear local address reuse capabilies.
+.TP
+.B ND_SET_RESERVEDPORT
+Set a reserved port.
+.TP
+.B ND_CHECK_RESERVEDPORT
+Check for a reserved port.
+.TP
+.B ND_MERGEADDR
+Merge server and client addresses.
+.PD
+.RE
+.TP
+.I fd
+A file descriptor associated with a transport endpoint of the type associated with the
+.I config
+.B netconfig
+structure.
+.TP
+.I point_to_args
+A pointer to the argument values associated with
+.IR option .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.IR UNIX \(rg
+has traditionally provided three components of the Network Services Library,
+.BR libxnsl (3),
+that are associated with Transport Provider Interface,
+.BR tpi (7),
+.IR STREAMS (9)
+network pseudo-device drivers, and that are not currently part of the
+.B Linux
+Network Services Library.  These components are:
+.IP 1. \w'1.\(em'u
+Network Configuration database access, see
+.BR netconfig (3).
+.PD 0
+.IP 2.
+Network Configuration database Path access, see
+.BR netpath (3).
+.IP 3.
+Network Directory Name and Address Service, see
+.BR netdir (3).
+.PD
+.PP
+These are often refered to as the Network Selection facility of the Network
+Services Library.
+.PP
+.BR netdir_options ()
+provides an options management service for the network transport protocol specified with a pointer
+to a
+.BR netconfig (5)
+structure,
+.IR config .
+The
+.I config
+pointer is acquired using the
+.BR getnetconfig (3),
+.BR getnetconfigent (3)
+or
+.BR getnetpath (3)
+subroutines and describes a particular transport protocol from the
+.BR netconfig (5)
+network configuration database.  The option to manage is specified in the
+.I option
+argument, as described under
+.RI \(lq "OPTIONS" \(rq,
+below.
+A file descriptor to an instance of the transport provider upon which to perform options management
+is passed in the file descriptor,
+.IR fd ,
+argument.
+A pointer to arguments and return values associated with the specific option are passed using the
+.I point_to_arg
+argument.
+.\"
+.\"
+.SS OPTIONS
+.PP
+.BR netdir_options ()
+supports the following options:
+.\"
+.TP
+.B ND_SET_BROADCAST
+Sets the ability to use broadcast addresses.
+If the transport protocol specified by
+.IR config ,
+and the transport endpoint specified by
+.IR fd ,
+support broadcast addresses, the
+.B ND_SET_BROADCAST
+options permits a broadcast address to be used on the transport endpoint associated with
+.IR fd .
+Otherwise, the option management fails.
+.I point_to_args
+is ignored and should be specified as
+.BR NULL .
+Additional privileges might be required to use this option.
+By default, transport endpoints supporting broadcast addresses have the ability to set broadcast
+addresses disabled.
+.\"
+.TP
+.B ND_CLEAR_BROADCAST
+Clears the ability to use broadcast addresses.
+If the transport protocol specified by
+.IR config ,
+and the transport endpoint specified by
+.IR fd ,
+support broadcast addresses, the
+.B ND_CLEAR_BROADCAST
+options restricts a broadcast address from being used on the transport endpoint associated with
+.IR fd .
+Otherwise, the option management fails.
+.I point_to_args
+is ignored and should be specified as
+.BR NULL .
+Additional privileges might be required to use this option.
+By default, transport endpoints supporting broadcast addresses have the ability to set broadcast
+addresses disabled.
+.\"
+.TP
+.B ND_SET_REUSEADDR
+Sets the ability to reuse local addresses.
+If the transport protocol specified by
+.IR config ,
+and the transport endpoint specified by
+.IR fd ,
+support reuse of local addresses, the
+.B ND_SET_REUSEADDR
+option premits a local address to be reused on the transport endpoint associated with
+.IR fd .
+Otherwise, the option management fails.
+.I point_to_args
+is ignored and should be specified as
+.BR NULL .
+Additional privileges might be required to use this option.
+By default, trasnport endpoints supporting local address reuse have the ability to reuse local
+addresses disabled.
+.\"
+.TP
+.B ND_CLEAR_REUSEADDR
+Clears the ability to reuse local addresses.
+If the transport protocol specified by
+.IR config ,
+and the transport endpoint specified by
+.IR fd ,
+support reuse of local addresses, the
+.B ND_SET_REUSEADDR
+option restricts a local address from reuse on the transport endpoint associated with
+.IR fd .
+Otherwise, the option management fails.
+.I point_to_args
+is ignored and should be specified as
+.BR NULL .
+Additional privileges might be required to use this option.
+By default, trasnport endpoints supporting local address reuse have the ability to reuse local
+addresses disabled.
+.\"
+.TP
+.B ND_SET_RESERVEDPORT
+.\"
+.TP
+.B ND_CHECK_RESERVEDPORT
+.\"
+.TP
+.B ND_MERGEADDR
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR netdir_options ()
+returns zero
+.RB ( 0 )
+and performs the requested options management.
+Otherwise, it returns minus one
+.RB ( -1 )
+and
+.I _nderror
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR netdir_options ()
+fails, it returns minus one
+.RB ( -1 )
+and sets
+.I _nderror
+to one of the following error codes:
+.TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_ACCESS ]
+The user did not have sufficient privilege to use the specified address.
+.TP
+.RB [ ND_BADARG ]
+Invalid argument.
+.TP
+.RB [ ND_FAILCTRL ]
+Control operation failed.
+.TP
+.RB [ ND_NO_ADDRESS ]
+Invalid address format.
+.TP
+.RB [ ND_NOCONVERT ]
+Conversion error.
+.TP
+.RB [ ND_NOCTRL ]
+Function invoked out of sequence or incorrect option specified.
+.TP
+.RB [ ND_NO_DATA ]
+Incorrect amount of data.
+.TP
+.RB [ ND_NOHOST ]
+Host not found.
+.TP
+.RB [ ND_NOMEM ]
+Insufficient memory.
+.TP
+.RB [ ND_NO_RECOVERY ]
+Unrecoverable error.
+.TP
+.RB [ ND_OPEN ]
+File could not be opened.
+.TP
+.RB [ ND_SYSTEM ]
+Fault detected.
+.TP
+.RB [ ND_TRY_AGAIN ]
+Try again later.
+.TP
+.RB [ ND_NOSERV ]
+Service not found.
+.TP
+.RB [ ND_NOSYM ]
+Symbol not found.
+.TP
+.RB [ ND_UNKWN ]
+Unknown object.
+.TP
+.RB [ ND_OK ]
+Success.
+.PP
+When an error occurs, an error message can be printed to standard error or retrieved using
+.BR netdir_perror (3)
+or
+.BR netdir_sperror (3).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR netdir_perror (3)
+and
+.BR netdir_sperror (3)
+must be called immediately after the failed network configuration subroutine fails.  Otherwise, the
+error condition in
+.I _nderror
+may be lost.
+.PP
+The character string to which a pointer is returned must eventually be freed by passing it to
+.BR free (3).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Name to address lookup libraries that will have their
+.BR _netdir_options ()
+dynamic symbols called to perform the lookup will be searched in the order that they appear in the
+.I nc_lookups
+member of the specified
+.BR netconfig (5)
+structure,
+.IR config .
+If
+.I config
+specifies an
+.I inet
+or
+.I inet6
+network, and the number of lookup libraries,
+.IR nc_nlookups ,
+is zero, the standard BSD inet management functions will be used.
+.PP
+.BR _netdir_options ()
+is the symbol provided by shared object lookup libraries to implement
+.BR netdir_options ().
+If the library does not implement
+.BR _netdir_options (),
+.BR netdir_options ()
+will fail, return minus one
+.RB ( -1 )
+and set
+.I _nderror
+to
+.RB [ ND_NOSYM ].
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+The Network Configuration database file.  See
+.BR netconfig (5).
+.TP
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+.TP
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR netdir (3)
+for an example.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR netdir (3),
+.BR netconfig (5),
+.BR netconfig (3),
+.BR netpath (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR netdir_options ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR netdir_options ()
+is compatible with
+.I "SVR 4.2"
+.[
+svr42
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR UnixWare \(rg
+documents
+.[
+uw7doc
+.]
+that
+.I _nderror
+contains the cause of failure and that
+.BR t_errno (3)
+may provide some additional insights into why a call failed.
+.IP ""
+.B @PACKAGE_TITLE@
+stores the error condition in
+.IR _nderror (3).
+.IP \(em
+.IR AIX \(rg
+also documents
+.[
+aixdoc
+.]
+the
+.RB [ ND_NOCONVERT ]
+error code.
+.IP \(em
+Diagnostic message strings are not documented and are incompatible.
+.IP \(em
+Binary compatibility would only be coincidental.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are normally part of the Network Services
+Library,
+.BR libnsl.so ;
+however,
+.B Linux
+already has a library of that name (which unfortunately is missing these
+components), and, therefore,
+.B "@PACKAGE_TITLE@"
+renames the library to
+.BR libxnsl.so .
+This means that both the
+.B -lnsl
+and
+.B -lxnsl
+flags must be provided on the
+.B cc
+command line.
+.PP
+See
+.BR libxnsl (3)
+for additional compatibility information.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The network configuration subroutines first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of network transport providers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

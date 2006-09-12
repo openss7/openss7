@@ -1,2 +1,619 @@
-.so man3/netdir.3.man
-
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.\"
+.\"
+.TH NETDIR_GETBYNAME 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B netdir_getbyaddr, _netdir_getbyaddr
+\- lookup host and service names in directory service by address
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <netdir.h>
+.ad l
+.hy 0
+.HP 12
+.BI "int netdir_getbyaddr(struct netconfig *" config ", struct nd_hostservlist **" services ", struct netbuf *" addr );
+.HP
+.BI "struct nd_hostservlist *_netdir_getbyaddr(struct netconfig *" config ", struct netbuf *" addr );
+.ad b
+.hy 6
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIservices\fR\(em'u
+.I config
+A pointer to a
+.BR netconfig (5)
+structure describing the network transport provider returned by
+.BR getnetconfig (3)
+or
+.BR getnetpath (3).
+.TP
+.I services
+A pointer to a
+.B nd_hostservlist
+structure pointer into which to return the name(s) of host services.
+.TP
+.I addr
+A pointer to a
+.B netbuf
+structure describing the transport address.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.PP
+.IR UNIX \(rg
+has traditionally provided three components of the Network Services Library,
+.BR libxnsl (3),
+that are associated with Transport Provider Interface,
+.BR tpi (7),
+.IR STREAMS (9)
+network pseudo-device drivers, and that are not currently part of the
+.B Linux
+Network Services Library.  These components are:
+.IP 1. \w'1.\(em'u
+Network Configuration database access, see
+.BR netconfig (3).
+.PD 0
+.IP 2.
+Network Configuration database Path access, see
+.BR netpath (3).
+.IP 3.
+Network Directory Name and Address Service, see
+.BR netdir (3).
+.PD
+.PP
+These are often refered to as the Network Selection facility of the Network
+Services Library.
+.PP
+.BR netdir_getbyaddr ()
+provides a reverse directory name service for the network transport protocol specified with a
+pointer to a
+.BR netconfig (5)
+structure,
+.IR config .
+The
+.I config
+pointer is acquired using the
+.BR getnetconfig (3),
+.BR getnetconfigent (3)
+or
+.BR getnetpath (3)
+subroutines and describes a particular transport protocol from the
+.BR netconfig (5)
+network configuration database.
+The address to reverse lookup is specified as a pointer to a
+.BR netbuf (3)
+structure,
+.IR addr ,
+that contains the transport address.
+.BR netdir_getbyaddr ()
+returns into the pointer referenced by
+.I services
+a pointer to a
+.B nd_hostservlist
+structure that contains the host and service name tuples associated with the address,
+.IR addr .
+.PP
+Once the
+.B nd_hostservlist
+structure and the
+.B nd_hostserv
+structures that it contains are no longer required, they are freed by passing a pointer to the
+structure to
+.BR netdir_free (3)
+with a
+.I struct_type
+argument of
+.BR ND_HOSTSERVLIST .
+.\"
+.\"
+.SH "STRUCTURE FORMAT"
+.PP
+The
+.B netbuf
+structure is defined in
+.RB < xti.h >
+and described in
+.BR netbuf (3).
+.\"
+.\"
+.PP
+The
+.BR netconfig
+structure is defined in
+.RB < netconfig.h >
+and described in
+.BR netconfig (3)
+and
+.BR netconfig (5).
+.\"
+.\"
+.PP
+Upon successful return, the pointer referenced by
+.I services
+pointer, points to an allocated
+.B nd_hostservlist
+structure containing the host and service name tuples associated with the specified address,
+.IR addr .
+The
+.B nd_hostservlist
+structure is defined in
+.RB < netconfig.h >
+and is structured as follows:
+.sp
+.RS 4
+.nf
+\fC\s-1\
+struct nd_hostservlist {
+    int *h_cnt;  /* number of hostservs found */
+    struct hostserv *h_hostservs;
+};
+\s+1\fP
+.fi
+.TP \w'\fIh_hostservs\fR\(em'u
+.I h_cnt
+the number of services in the list.
+.PD 0
+.TP
+.I h_hostservs
+a pointer to an array of
+.B nd_hostserv
+structures forming the service list.
+.PD
+.RE
+.PP
+Each host and service name tuple in the list pointed to by the
+.I h_hostservs
+member of the
+.B nd_hostservlist
+structure is formatted as a
+.B nd_hostserv
+structure.
+The
+.B nd_hostserv
+structure is defined in
+.RB < netconfig.h >
+and is structured as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct nd_hostserv {
+    char *h_name;  /* host name */
+    char *h_serv;  /* service name */
+};
+.fi
+.TP \w'\fIh_hostservs\fR\(em'u
+.I h_name
+the host (machine) name.
+.PD 0
+.TP
+.I h_serv
+the service name.
+.PD
+.RE
+.\"
+.\"
+.SH USAGE
+.PP
+Procedure for usage of the
+.BR netdir_getbyaddr ()
+subroutine is to first acquire a pointer to a
+.BR netconfig (3)
+structure representing an entry in the
+.BR netconfig (5)
+database using a function such as
+.BR getnetconfig (3),
+.BR getnetconfigent (3)
+or
+.BR getnetpath (3).
+Then an address string is placed in a
+.BR netbuf (3)
+structure and passed to the
+.BR netdir_getbyaddr ()
+function.  The returned
+.B nd_hostservlist
+structure pointer contains the host and service name tuples associated with the address.
+Once the
+.B nd_hostservlist
+structure is no longer required, it is freed with
+.BR netdir_free (3)
+with a
+.I struct_type
+argument of
+.BR ND_HOSTSERVLIST .
+.PP
+For Internet Protocol transports,
+(that is, when
+.I config
+points to a
+.BR netconfig (5)
+structure corresponding to an Internet Protocol Version 4 or Version 6 network),
+.BR netdir_getbyaddr ()
+is roughly equivalent to
+.BR gethostbyaddr (3)
+or
+.BR getipnodebyaddr (3);
+however,
+.BR netdir_getbyaddr ()
+is more general and applies to networks other than
+.I inet
+or
+.I inet6
+networks.
+Also,
+.BR gethostbyaddr (3)
+and
+.BR getipnodebyaddr (3)
+do not return the service name.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR netdir_getbyaddr ()
+returns zero
+.RB ( 0 )
+and places a pointer to an allocated
+.B nd_hostservlist
+structure in the pointer referenced by the
+.I services
+argument.
+Otherwise, minus one
+.RB ( -1 )
+is returned and
+.I _nderror
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR netdir_getbyaddr ()
+fails, it returns minus one
+.RB ( -1 )
+and sets
+.I _nderror
+to one of the following error codes:
+.TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_ACCESS ]
+The user did not have sufficient privilege to use the specified address.
+.TP
+.RB [ ND_BADARG ]
+Invalid argument.
+.TP
+.RB [ ND_FAILCTRL ]
+Control operation failed.
+.TP
+.RB [ ND_NO_ADDRESS ]
+Invalid address format.
+.TP
+.RB [ ND_NOCONVERT ]
+Conversion error.
+.TP
+.RB [ ND_NOCTRL ]
+Function invoked out of sequence or incorrect option specified.
+.TP
+.RB [ ND_NO_DATA ]
+Incorrect amount of data.
+.TP
+.RB [ ND_NOHOST ]
+Host not found.
+.TP
+.RB [ ND_NOMEM ]
+Insufficient memory.
+.TP
+.RB [ ND_NO_RECOVERY ]
+Unrecoverable error.
+.TP
+.RB [ ND_OPEN ]
+File could not be opened.
+.TP
+.RB [ ND_SYSTEM ]
+Fault detected.
+.TP
+.RB [ ND_TRY_AGAIN ]
+Try again later.
+.TP
+.RB [ ND_NOSERV ]
+Service not found.
+.TP
+.RB [ ND_NOSYM ]
+Symbol not found.
+.TP
+.RB [ ND_UNKWN ]
+Unknown object.
+.TP
+.RB [ ND_OK ]
+Success.
+.PP
+When an error occurs, an error message can be printed to standard error or retrieved using
+.BR netdir_perror (3)
+or
+.BR netdir_sperror (3).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR netdir_perror (3)
+and
+.BR netdir_sperror (3)
+must be called immediately after the failed network configuration subroutine fails.  Otherwise, the
+error condition in
+.I _nderror
+may be lost.
+.PP
+The pointer returned to the pointer referenced by the
+.I services
+argument must eventually be released by passing it to
+.BR netdir_free (3)
+with a
+.I struct_type
+argument of
+.BR ND_HOSTSERVLIST .
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Name to address lookup libraries that will be have their
+.B _netdir_getbyaddr ()
+dynamic symbols called to perform the lookup will be searched in the order that they appear in the
+.I nc_lookups
+member of the specified
+.BR netconfig (5)
+structure,
+.IR config .
+If
+.I config
+specifies an
+.I inet
+or
+.I inet6
+network, and the number of lookup libraries,
+.IR nc_nlookups ,
+is zero, the standard BSD inet lookup functions will be used.
+.PP
+.BR _netdir_getbyaddr ()
+is the symbol provided by shared object lookup libraries to implement
+.BR netdir_getbyaddr ().
+If the library does not implement
+.BR _netdir_getbyaddr (),
+.BR netdir_getbyaddr ()
+will fail, return minus one
+.RB ( -1 )
+and set
+.I _nderror
+to
+.RB [ ND_NOSYM ].
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+The Network Configuration database file.  See
+.BR netconfig (5).
+.TP
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+.TP
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR netdir (3)
+for an example.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR netdir (3),
+.BR netconfig (5),
+.BR netconfig (3),
+.BR netpath (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR netdir_getbyaddr ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR netdir_getbyaddr ()
+is compatible with
+.I "SVR 4.2"
+.[
+svr42
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR UnixWare \(rg
+documents
+.[
+uw7doc
+.]
+that
+.I _nderror
+contains the cause of failure and that
+.BR t_errno (3)
+may provide some additional insights into why a call failed.
+.IP ""
+.B @PACKAGE_TITLE@
+stores the error condition in
+.IR _nderror (3).
+.IP \(em
+.IR AIX \(rg
+also documents
+.[
+aixdoc
+.]
+the
+.RB [ ND_NOCONVERT ]
+error code.
+.IP \(em
+Diagnostic message strings are not documented and are incompatible.
+.IP \(em
+Binary compatibility would only be coincidental.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are normally part of the Network Services
+Library,
+.BR libnsl.so ;
+however,
+.B Linux
+already has a library of that name (which unfortunately is missing these
+components), and, therefore,
+.B "@PACKAGE_TITLE@"
+renames the library to
+.BR libxnsl.so .
+This means that both the
+.B -lnsl
+and
+.B -lxnsl
+flags must be provided on the
+.B cc
+command line.
+.PP
+See
+.BR libxnsl (3)
+for additional compatibility information.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The network configuration subroutines first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of network transport providers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

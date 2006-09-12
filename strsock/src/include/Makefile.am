@@ -65,8 +65,10 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
+	sockio.h \
 	sockmod.h \
 	socksys.h \
+	sys/sockio.h \
 	sys/sockmod.h \
 	sys/socksys.h
 

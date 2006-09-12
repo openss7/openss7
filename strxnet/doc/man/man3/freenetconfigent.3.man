@@ -1,2 +1,333 @@
-.so man3/netconfig.3.man
-
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.\"
+.\"
+.TH FREENETCONFIGENT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B freenetconfigent
+\- free a network selection database entry
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <netconfig.h>
+.HP
+.BI "void freenetconfigent(struct netconfig *" config );
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'handle\(em'u
+.I config
+A pointer to a network selection database entry,
+.BR netconfig (5),
+that was returned by a call to
+.BR getnetconfigent (3).
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.IR UNIX \(rg
+has traditionally provided three components of the Network Services Library,
+.BR libnsl (3),
+that are associated with Transport Provider Interface,
+.BR tpi (7),
+.IR STREAMS (9)
+network pseudo-device drivers, and that are not currently part of the
+.B Linux
+Network Services Library.  These components are:
+.IP 1. \w'1.\(em'u
+Network Configuration database access, see
+.BR netconfig (3).
+.PD 0
+.IP 2.
+Network Directory and address mapping, see
+.BR netdir (3).
+.IP 3.
+Network Path access, see
+.BR netpath (3).
+.PD
+.PP
+These are often refered to as the Network Selection facility of the Network
+Services Library.
+.PP
+.BR setnetconfig (3),
+.BR getnetconfig (3),
+.BR endnetconfig (3),
+.BR getnetconfigent (3),
+.BR freenetconfigent (),
+.BR nc_perror "(3) and "
+.BR nc_sperror (3),
+provide a set of Network Configuration database access subroutines for accessing
+the Network Configuration database contained in the
+.BR /etc/netconfig ,
+.BR netconfig (5),
+file.
+.PP
+.BR getnetconfigent (3)
+and
+.BR freenetconfigent ()
+provide a mechanism to access Network Confifuration database entries by
+network identification name strings.
+.TP
+.BR freenetconfigent ()
+frees the network configuration entry returned as a pointer to a
+.B netconfig
+structure, from a previous call to
+.BR getnetconfigent (3).
+.BR freenetconfigent ()
+must be called for each call to
+.BR getnetconfigent (3)
+with the corresponding
+.I netconfig
+pointer as the argument.
+.PP
+.BR nc_perror (3)
+and
+.BR nc_sperror (3)
+provide a mechanism for providing diagnostic messages upon failure.  These
+subroutines can be used for this
+.B netconfig
+subroutines, as well as
+.BR netpath (3)
+subroutines.
+.\"
+.\"
+.SS "FILE FORMAT"
+.PP
+The format of the
+.B /etc/netconfig
+Network Configuration database file is as described in
+.BR netconfig (5).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR nc_perror (3)
+and
+.BR nc_sperror (3)
+must be called immediately after the failed network configuration subroutine
+fails.  Otherwise, the error condition may be lost.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+.BR freenetconfigent ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR freenetconfigent ()
+is always successful.
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+The Network Configuration database file.  See
+.BR netconfig (5).
+.TP
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+.TP
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR netconfig (5),
+.BR netpath (3),
+.BR netdir (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR freenetconfigent ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR freenetconfigent ()
+is compatible with
+.I "SVR 4.2"
+.[
+svr42
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+describe the
+.BR nc_sperror (3)
+subroutine as returning a pointer to thread-specific data and that the buffer
+could change at any point.  While the error value is saved as thread-specific
+data, this implementation of
+.BR nc_sperror (3)
+returns a pointer to a shared read-only string that is valid for the duration
+of the calling process.
+.IP \(em
+.B @PACKAGE_TITLE@
+stores the error condition in
+.IR nc_error (3).
+.IP \(em
+Diagnostic message strings are not documented and are incompatible.
+.IP \(em
+Binary compatibility would only be coincidental.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are normally part of the Network Services
+Library,
+.BR libnsl (3);
+however,
+.B Linux
+already has a library of that name (which unfortunately is missing these
+components), and, therefore,
+.B "@PACKAGE_TITLE@"
+renames the library to
+.BR libxnsl.so .
+.PP
+See
+.BR libnsl (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The network selection subroutines first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of network transport providers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

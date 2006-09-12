@@ -106,9 +106,9 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define __P(__prototype) __prototype
 #endif
 
-#include <sys/sockmod.h>
-#include <sys/socksys.h>
-#include <sys/socket.h>
+//#include <sys/sockmod.h>
+//#include <sys/socksys.h>
+//#include <sys/socket.h>
 //#include <tihdr.h>
 //#include <timod.h>
 
