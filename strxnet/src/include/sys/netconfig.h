@@ -57,6 +57,9 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+#define NETCONFIG		"/etc/netconfig"
+#define NETPATH			"NETPATH"
+
 struct netconfig {
 	char *nc_netid;
 	ulong nc_semantics;
@@ -69,26 +72,94 @@ struct netconfig {
 	ulong nc_unused[9];
 };
 
+typedef struct {
+	struct netconfig **nc_head;
+	struct netconfig **nc_curr;
+} NCONF_HANDLE;
+
+#ifdef _REENTRANT
+extern int *__ncerror(void);
+#define nc_error (*(__ncerror()))
+#else
+extern int nc_error;
+#endif
+
+/* error codes */
+#define NC_NOERROR		0
+#define NC_NOMEM		1
+#define NC_NOSET		2
+#define NC_OPENFAIL		3
+#define NC_BADLINE		4
+#define NC_NOTFOUND		5
+#define NC_NOMOREENTRIES	6
+
 /* for use in nc_semanitcs field */
 #define NC_TPI_CLTS		1
 #define NC_TPI_COTS		2
 #define NC_TPI_COTS_ORD		3
+#define NC_TPI_RAW		4
 
 /* for use in nc_flag field */
 #define NC_NOFLAG		0
 #define NC_VISIBLE		1
+#define NC_BROADCAST		2
 
-extern struct netconfig *getnetconfig(void *handle);
+/* for use in nc_protofmly field */
+#define NC_NOPROTOFMLY		"-"
+#define NC_LOOPBACK		"loopback"
+#define NC_INET			"inet"
+#define NC_INET6		"inet6"
+#define NC_IMPLINK		"implink"
+#define NC_PUP			"pup"
+#define NC_CHAOS		"chaos"
+#define NC_NS			"ns"
+#define NC_NBS			"nbs"
+#define NC_ECMA			"ecma"
+#define NC_DATAKIT		"datakit"
+#define NC_CCITT		"ccitt"
+#define NC_SNA			"sna"
+#define NC_DECNET		"decnet"
+#define NC_DLI			"dli"
+#define NC_LAT			"lat"
+#define NC_HYLINK		"hylink"
+#define NC_APPLETALK		"appletalk"
+#define NC_NIT			"nit"
+#define NC_IEEE802		"ieee802"
+#define NC_OSI			"osi"
+#define NC_X25			"x25"
+#define NC_OSINET		"osinet"
+#define NC_GOSIP		"gosip"
+
+/* for use in nc_proto field */
+#define NC_NOPROTO		"-"
+#define NC_TCP			"tcp"
+#define NC_UDP			"udp"
+#define NC_ICMP			"icmp"
+#define NC_SCTP			"sctp"
+
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
+
 extern void *setnetconfig(void);
-extern int endnetconfig(void *handle);
+extern struct netconfig *getnetconfig(void *handle);
 extern struct netconfig *getnetconfigent(const char *netid);
 extern void freenetconfigent(struct netconfig *netconfig);
+extern int endnetconfig(void *handle);
+
+extern void *setnetpath(void);
+extern struct netconfig *getnetpath(void *handle);
+extern int endnetpath(void *handle);
+
 extern void nc_perror(const char *msg);
 extern char *nc_sperror(void);
 
-extern struct netconfig *getnetpath(void *handle);
-extern void *setnetpath(void);
-extern int endnetpath(void *handle);
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
 #endif				/* __SYS_NETCONFIG_H__ */
-

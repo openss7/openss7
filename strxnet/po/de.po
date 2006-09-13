@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: LiS 2.16.16\n"
+"Project-Id-Version: strxnet 0.9.2.9.rc3\n"
 "Report-Msgid-Bugs-To: bugs@openss7.org\n"
-"POT-Creation-Date: 2006-09-03 00:49-0600\n"
+"POT-Creation-Date: 2006-09-12 23:36-0600\n"
 "PO-Revision-Date: 2004-01-06 18:11-0700\n"
 "Last-Translator: Brian Bidulock <bidulock@openss7.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -301,3 +301,75 @@ msgstr ""
 #: src/lib/xnet.c:5869
 msgid "Unknown"
 msgstr ""
+
+#. TRANS Corresponds to the NC_NOERROR constant.  No error is indicated in the
+#. TRANS nc_error(3) variable.  The last netconfig(3) or netpath(3) operation was
+#. TRANS successful.
+#.
+#: src/lib/xnsl.c:555
+#, fuzzy
+msgid "no error"
+msgstr "Erfolgreich"
+
+#. TRANS Corresponds to the NC_NOMEM constant.  Out of memory.  Memory could not be
+#. TRANS allocated to complete the last netconfig(3) or netpath(3) operation.
+#.
+#: src/lib/xnsl.c:560
+msgid "out of memory"
+msgstr ""
+
+#. TRANS Corresponds to the NC_NOSET constant.  The getnetconfig(3), getnetpath(3),
+#. TRANS endnetconfig(3), or endnetpath(3) function was called out of order: that
+#. TRANS is, before setnetconfig(3) or setnetpath(3) was called.
+#.
+#: src/lib/xnsl.c:566
+msgid "routine called out of order"
+msgstr ""
+
+#. TRANS Corresponds to the NC_OPENFAIL constant.  The /etc/netconfig file could
+#. TRANS not be opened for reading.
+#.
+#: src/lib/xnsl.c:571
+msgid "could not open "
+msgstr ""
+
+#. TRANS Corresponds to the NC_BADLINE constant.  A syntax error exists in the
+#. TRANS /etc/netconfig file at the location shown.  The field number is the
+#. TRANS whitespace separated field within the line in the /etc/netconfig file at
+#. TRANS which the syntax error was detected.  The line number is the line number
+#. TRANS in the /etc/netconfig file at which the syntax error was detected.
+#.
+#: src/lib/xnsl.c:579
+msgid "syntax error in "
+msgstr ""
+
+#: src/lib/xnsl.c:579
+#, c-format
+msgid ": field %d of line %d"
+msgstr ""
+
+#. TRANS Corresponds to the NC_NOTFOUND constant.  The "netid" specified as an
+#. TRANS argument to the getnetconfigent(3) subroutine was not found in any entry
+#. TRANS in the /etc/netconfig file.
+#.
+#: src/lib/xnsl.c:585
+msgid "netid not found in "
+msgstr ""
+
+#. TRANS Corresponds to the NC_NOMOREENTRIES constant.  All entries in the
+#. TRANS /etc/netconfig file has been exhausted.  They have either already been
+#. TRANS retrieved with getnetconfig(3), getnetconfigent(3), getnetpath(3), or the
+#. TRANS /etc/netconfig file contains no entries.
+#.
+#: src/lib/xnsl.c:592
+msgid "no more entries in "
+msgstr ""
+
+#. TRANS Corresponds to any other constant.  An internal error in the libxnsl(3)
+#. TRANS library has occurred resulting in an undefined error number.  This
+#. TRANS situation should not occur and represents a bug in the library.
+#.
+#: src/lib/xnsl.c:598
+#, fuzzy
+msgid "unknown error"
+msgstr "Erfolgreich"

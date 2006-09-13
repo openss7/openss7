@@ -59,6 +59,14 @@
 
 #include <netconfig.h>
 
+#ifdef _REENTRANT
+extern int *__nderror(void);
+#define _nderror (*(__nderror()))
+#else
+#warn Compiled without _REENTRANT defined!
+extern int _nderror;
+#endif
+
 struct nd_addrlist {
 	int n_cnt;			/* number of addresses */
 	struct netbuf *n_addrs;		/* the addresses (array) */
@@ -74,6 +82,8 @@ struct nd_hostserv {
 #define HOST_BROADCAST		"\\3"	/* all addresses accessible by transport */
 #define HOST_SELF_CONNECT	"\\4"	/* address for connecting to the local host */
 #define HOST_SELF_BIND		HOST_SELF
+#define HOST_ALLNODES		"\\5"
+#define HOST_RPCNODES		"\\6"
 
 struct nd_hostservlist {
 	int *h_cnt;			/* number of hostservs found */
@@ -81,16 +91,25 @@ struct nd_hostservlist {
 };
 
 /* for use with netdir_free() */
-#define ND_ADDR		1		/* struct netbuf */
-#define ND_ADDRLIST	2		/* struct nd_addrlist */
-#define ND_HOSTSERV	3		/* struct nd_hostserv */
-#define ND_HOSTSERVLIST	4		/* struct nd_hostservlist */
+#define ND_ADDR			1	/* struct netbuf */
+#define ND_ADDRLIST		2	/* struct nd_addrlist */
+#define ND_HOSTSERV		3	/* struct nd_hostserv */
+#define ND_HOSTSERVLIST		4	/* struct nd_hostservlist */
+#if 0
+/* some other implemenations do this: why???? */
+#define ND_HOSTSERV		0
+#define ND_HOSTSERVLIST		1
+#define ND_ADDR			2
+#define ND_ADDRLIST		3
+#endif
 
 /* for use with netdir_options() */
 #define ND_SET_BROADCAST	1
 #define ND_SET_RESERVEDPORT	2
 #define ND_CHECK_RESERVEDPORT	3
 #define ND_MERGEADDR		4
+#define ND_JOIN_MULTICAST	5
+#define ND_LEAVE_MULTICAST	6
 
 struct nd_mergearg {
 	char *s_uaddr;			/* server universal address */
@@ -112,29 +131,29 @@ struct nd_mergearg {
 #define ND_NOSYM		 3
 #define ND_OPEN			 4
 #define ND_ACCESS		 5
-#define ND_UNKWN		 6
+#define ND_UKNWN		 6
 #define ND_NOCTRL		 7
 #define ND_FAILCTRL		 8
 #define ND_SYSTEM		 9
 #define ND_NOCONVERT		10	/* AS400 only? */
 
 const char *_nd_error_strings[] = {
-	[5+ND_TRY_AGAIN]	= "try again later",
-	[5+ND_NO_RECOVERY]	= "recovery not possible",
-	[5+ND_NO_DATA]		= "incorrect amount of data",
-	[5+ND_BADARG]		= "bad arguments passed to routine",
-	[5+ND_NOMEM]		= "memory allocation failed",
-	[5+ND_OK]		= "success",
-	[5+ND_NOHOST]		= "host name not found",
-	[5+ND_NOSERV]		= "service name not found",
-	[5+ND_NOSYM]		= "symbol missing in shared object",
-	[5+ND_OPEN]		= "could not open shared object",
-	[5+ND_ACCESS]		= "access denied for shared object",
-	[5+ND_UNKWN]		= "attempt to free unknown object",
-	[5+ND_NOCTRL]		= "unknown option passed",
-	[5+ND_FAILCTRL]		= "control operation failed",
-	[5+ND_SYSTEM]		= "system error",
-	[5+ND_NOCONVERT]	= "no conversion",
+	[5 + ND_TRY_AGAIN] = "try again later",
+	[5 + ND_NO_RECOVERY] = "recovery not possible",
+	[5 + ND_NO_DATA] = "incorrect amount of data",
+	[5 + ND_BADARG] = "bad arguments passed to routine",
+	[5 + ND_NOMEM] = "memory allocation failed",
+	[5 + ND_OK] = "success",
+	[5 + ND_NOHOST] = "host name not found",
+	[5 + ND_NOSERV] = "service name not found",
+	[5 + ND_NOSYM] = "symbol missing in shared object",
+	[5 + ND_OPEN] = "could not open shared object",
+	[5 + ND_ACCESS] = "access denied for shared object",
+	[5 + ND_UNKWN] = "attempt to free unknown object",
+	[5 + ND_NOCTRL] = "unknown option passed",
+	[5 + ND_FAILCTRL] = "control operation failed",
+	[5 + ND_SYSTEM] = "system error",
+	[5 + ND_NOCONVERT] = "no conversion",
 };
 
 #ifdef __BEGIN_DECLS
@@ -211,7 +230,7 @@ struct nd_hostservlist *_netdir_getbyaddr(struct netconfig *, struct netbuf *);
 int _netdir_options(struct netconfig *, int, int, char *);
 char *_taddr2uaddr(struct netconfig *, struct netbuf *);
 struct netbuf *_uaddr2taddr(struct netconfig *, struct netbuf *);
-char *_netdir_mergeaddr(struct netconfig *, char *uaddr, char *ruaddr); /* older one */
+char *_netdir_mergeaddr(struct netconfig *, char *uaddr, char *ruaddr);	/* older one */
 #endif
 
 #ifdef __END_DECLS

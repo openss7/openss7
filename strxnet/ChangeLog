@@ -69,6 +69,14 @@
 	* doc/man/man3/xnsl.3.man: updated documentation
 	* doc/man/man3/xti.3.man: updated documentation
 
+	* po/POTFILES.in: working up libxnsl
+	* po/de.po: working up libxnsl
+	* src/include/netconfig.h: working up libxnsl
+	* src/include/netdir.h: working up libxnsl
+	* src/include/sys/netconfig.h: working up libxnsl
+	* src/lib/xnet.c: working up libxnsl
+	* src/lib/xnsl.c: working up libxnsl
+
 2006-09-12  Brian Bidulock  <bidulock@openss7.org>
 
 	- moved libxnsl files here from strsock package

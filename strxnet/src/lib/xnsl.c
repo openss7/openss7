@@ -139,6 +139,298 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <netconfig.h>
 #include <netdir.h>
 
+extern void __pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *),
+				   void *arg);
+extern void __pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute);
+extern void __pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer,
+					 void (*routine) (void *), void *arg);
+extern void __pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute);
+extern void __pthread_testcancel(void);
+extern int __pthread_setcanceltype(int type, int *oldtype);
+
+extern int __pthread_rwlock_init(pthread_rwlock_t * rwlock, const pthread_rwlockattr_t * attr);
+extern int __pthread_rwlock_rdlock(pthread_rwlock_t * rwlock);
+extern int __pthread_rwlock_wrlock(pthread_rwlock_t * rwlock);
+extern int __pthread_rwlock_unlock(pthread_rwlock_t * rwlock);
+extern int __pthread_rwlock_destroy(pthread_rwlock_t * rwlock);
+
+extern int __pthread_once(pthread_once_t * once_control, void (*init_routine) (void));
+extern int __pthread_key_create(pthread_key_t * key, void (*destr_function) (void *));
+extern int __pthread_setspecific(pthread_key_t key, const void *pointer);
+extern void *__pthread_getspecific(pthread_key_t key);
+extern int __pthread_key_delete(pthread_key_t key);
+
+#pragma weak __pthread_cleanup_push
+#pragma weak __pthread_cleanup_pop
+#pragma weak __pthread_cleanup_push_defer
+#pragma weak __pthread_cleanup_pop_restore
+#pragma weak __pthread_testcancel
+#pragma weak __pthread_setcanceltype
+
+#pragma weak __pthread_rwlock_init
+#pragma weak __pthread_rwlock_rdlock
+#pragma weak __pthread_rwlock_wrlock
+#pragma weak __pthread_rwlock_unlock
+#pragma weak __pthread_rwlock_destroy
+
+#pragma weak _pthread_cleanup_push
+#pragma weak _pthread_cleanup_pop
+#pragma weak _pthread_cleanup_push_defer
+#pragma weak _pthread_cleanup_pop_restore
+#pragma weak pthread_testcancel
+#pragma weak pthread_setcanceltype
+
+#pragma weak pthread_rwlock_init
+#pragma weak pthread_rwlock_rdlock
+#pragma weak pthread_rwlock_wrlock
+#pragma weak pthread_rwlock_unlock
+#pragma weak pthread_rwlock_destroy
+
+#pragma weak __pthread_once
+#pragma weak __pthread_key_create
+#pragma weak __pthread_getspecific
+#pragma weak __pthread_setspecific
+#pragma weak __pthread_key_delete
+
+#pragma weak pthread_once
+#pragma weak pthread_key_create
+#pragma weak pthread_getspecific
+#pragma weak pthread_setspecific
+#pragma weak pthread_key_delete
+
+void
+_pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg)
+{
+	if (__pthread_cleanup_push)
+		return __pthread_cleanup_push(buffer, routine, arg);
+	buffer->__routine = routine;
+	buffer->__arg = arg;
+	buffer->__canceltype = 0;
+	buffer->__prev = NULL;
+}
+
+void
+_pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute)
+{
+	if (__pthread_cleanup_pop)
+		return __pthread_cleanup_pop(buffer, execute);
+	if (execute)
+		(*buffer->__routine) (buffer->__arg);
+}
+
+void
+_pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *),
+			    void *arg)
+{
+	if (__pthread_cleanup_push_defer)
+		return __pthread_cleanup_push_defer(buffer, routine, arg);
+	buffer->__routine = routine;
+	buffer->__arg = arg;
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &buffer->__canceltype);
+	buffer->__prev = NULL;
+}
+
+void
+_pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute)
+{
+	if (__pthread_cleanup_pop_restore)
+		return __pthread_cleanup_pop_restore(buffer, execute);
+	if (execute)
+		(*buffer->__routine) (buffer->__arg);
+	pthread_setcanceltype(buffer->__canceltype, NULL);
+}
+
+void
+pthread_testcancel(void)
+{
+	if (__pthread_testcancel)
+		return __pthread_testcancel();
+	return;
+}
+
+int
+pthread_setcanceltype(int type, int *oldtype)
+{
+	if (__pthread_setcanceltype)
+		return __pthread_setcanceltype(type, oldtype);
+	if (oldtype)
+		*oldtype = type;
+	return (0);
+}
+
+int
+pthread_rwlock_init(pthread_rwlock_t * rwlock, const pthread_rwlockattr_t * attr)
+{
+	if (__pthread_rwlock_init)
+		return __pthread_rwlock_init(rwlock, attr);
+	*(char *) rwlock = 0;
+	return (0);
+}
+
+int
+pthread_rwlock_rdlock(pthread_rwlock_t * rwlock)
+{
+	if (__pthread_rwlock_rdlock)
+		return __pthread_rwlock_rdlock(rwlock);
+	*(char *) rwlock = *(char *) rwlock + 1;
+	return (0);
+}
+
+int
+pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
+{
+	if (__pthread_rwlock_wrlock)
+		return __pthread_rwlock_wrlock(rwlock);
+	*(char *) rwlock = *(char *) rwlock - 1;
+	return (0);
+}
+
+int
+pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
+{
+	if (__pthread_rwlock_unlock)
+		return __pthread_rwlock_unlock(rwlock);
+	if (*(char *) rwlock > 0)
+		*(char *) rwlock = *(char *) rwlock - 1;
+	else
+		*(char *) rwlock = 0;
+	return (0);
+}
+
+int
+pthread_rwlock_destroy(pthread_rwlock_t * rwlock)
+{
+	if (__pthread_rwlock_destroy)
+		return __pthread_rwlock_destroy(rwlock);
+	*(char *) rwlock = 0xff;
+	return (0);
+}
+
+int
+pthread_once(pthread_once_t * once_control, void (*init_routine) (void))
+{
+	if (__pthread_once)
+		return __pthread_once(once_control, init_routine);
+	/* non-thread safe replacement */
+	if (*once_control == 0)
+		init_routine();
+	*once_control = 1;
+	return (0);
+}
+
+static pthread_key_t ___pthread_key_num = (pthread_key_t) (0);
+static void *___pthread_keys[PTHREAD_KEYS_MAX] = { NULL, };
+
+int
+pthread_key_create(pthread_key_t * key, void (*destr_function) (void *))
+{
+	if (__pthread_key_create)
+		return __pthread_key_create(key, destr_function);
+	/* non-thread safe replacement */
+	*key = ___pthread_key_num++;
+	return (0);
+}
+
+int
+pthread_setspecific(pthread_key_t key, const void *pointer)
+{
+	if (__pthread_setspecific)
+		return __pthread_setspecific(key, pointer);
+	/* non-thread safe replacement */
+	___pthread_keys[key] = (void *)pointer;
+	return (0);
+}
+
+void *
+pthread_getspecific(pthread_key_t key)
+{
+	if (__pthread_getspecific)
+		return __pthread_getspecific(key);
+	/* non-thread safe replacement */
+	return ___pthread_keys[key];
+}
+
+int
+pthread_key_delete(pthread_key_t key)
+{
+	if (__pthread_key_delete)
+		return __pthread_key_delete(key);
+	/* non-thread safe replacement */
+	if (key < ___pthread_key_num)
+		___pthread_key_num = key;
+	return (0);
+}
+
+/*
+ * Thread-specific data structure for the xnsl library.
+ */
+struct __nsl_tsd {
+	int nderror;			/* error for network directory functions */
+	int ncerror;			/* error for network configuration functions */
+};
+
+/*
+ *  Once condition for Thread-Specific Data key creation.
+ */
+static pthread_once_t __nsl_tsd_once = PTHREAD_ONCE_INIT;
+
+/*
+ *  XNSL library Thread-Specific Data key.
+ */
+static pthread_key_t __nsl_tsd_key = 0;
+
+static void
+__nsl_tsd_free(void *buf)
+{
+	pthread_setspecific(__nsl_tsd_key, NULL);
+	free(buf);
+}
+
+static void
+__nsl_tsd_alloc(void)
+{
+	int ret;
+	void *buf;
+
+	ret = pthread_key_create(&__nsl_tsd_key, __nsl_tsd_free);
+	buf = malloc(sizeof(struct __nsl_tsd));
+	bzero(buf, sizeof(*buf));
+	ret = pthread_setspecific(__nsl_tsd_key, buf);
+	return;
+}
+
+/**
+ * @internal
+ * @fn struct __nsl_tsd *__nsl_get_tsd(void);
+ * @brief Get thread specific data for the xnsl library.
+ *
+ * This function obtains (and allocates if necessary), thread specific data for the executing
+ * thread.
+ */
+static struct __nsl_tsd *
+__nsl_get_tsd(void)
+{
+	pthread_once(&__nsl_tsd_once, __nsl_tsd_alloc);
+	return (struct __nsl_tsd *) pthread_getspecific(__nsl_tsd_key);
+};
+
+int *
+__nderror(void)
+{
+	return &(__nsl_get_tsd()->nderror);
+}
+
+int *
+__ncerror(void)
+{
+	return &(__nsl_get_tsd()->ncerror);
+}
+
+/*
+ *  Network Selection Facility functions:
+ *  =====================================
+ */
+
 /**
  * @fn struct netconfig *getnetconfig(void *handle);
  * @brief Retrieve next entry in the netconfig database.
@@ -250,26 +542,59 @@ __nsl_freenetconfigent(struct netconfig *netconfig)
 void freenetconfigent(struct netconfig *netconfig)
     __attribute__ ((weak, alias("__nsl_freenetconfigent")));
 
-/**
- * @fn void nc_perror(const char *msg);
- * @brief Print an error message to standard output.
- * @param msg message to prefix to error message.
- *
- * This function prints and error message to standard error indicating why any of the above routines
- * failed.  The message is prepended with the string provided in the msg argument and a colon.  A
- * NEWLINE is appended to the end of the message.
- *
- * This function can also be used with the netpath access routines.
+/* *INDENT-OFF* */
+static const char *__nsl_nc_errlist[] = {
+/*
+TRANS Corresponds to the NC_NOERROR constant.  No error is indicated in the
+TRANS nc_error(3) variable.  The last netconfig(3) or netpath(3) operation was
+TRANS successful.
  */
-void
-__nsl_nc_perror(const char *msg)
-{
-	errno = EOPNOTSUPP;
-	return;
-}
-
-void nc_perror(const char *msg)
-    __attribute__ ((weak, alias("__nsl_nc_perror")));
+	gettext_noop("no error"),
+/*
+TRANS Corresponds to the NC_NOMEM constant.  Out of memory.  Memory could not be
+TRANS allocated to complete the last netconfig(3) or netpath(3) operation.
+ */
+	gettext_noop("out of memory"),
+/*
+TRANS Corresponds to the NC_NOSET constant.  The getnetconfig(3), getnetpath(3),
+TRANS endnetconfig(3), or endnetpath(3) function was called out of order: that
+TRANS is, before setnetconfig(3) or setnetpath(3) was called.
+ */
+	gettext_noop("routine called out of order"),
+/*
+TRANS Corresponds to the NC_OPENFAIL constant.  The /etc/netconfig file could
+TRANS not be opened for reading.
+ */
+	gettext_noop("could not open " NETCONFIG),
+/*
+TRANS Corresponds to the NC_BADLINE constant.  A syntax error exists in the
+TRANS /etc/netconfig file at the location shown.  The field number is the
+TRANS whitespace separated field within the line in the /etc/netconfig file at
+TRANS which the syntax error was detected.  The line number is the line number
+TRANS in the /etc/netconfig file at which the syntax error was detected.
+ */
+	gettext_noop("syntax error in " NETCONFIG ": field %d of line %d"),
+/*
+TRANS Corresponds to the NC_NOTFOUND constant.  The "netid" specified as an
+TRANS argument to the getnetconfigent(3) subroutine was not found in any entry
+TRANS in the /etc/netconfig file.
+ */
+	gettext_noop("netid not found in " NETCONFIG),
+/*
+TRANS Corresponds to the NC_NOMOREENTRIES constant.  All entries in the
+TRANS /etc/netconfig file has been exhausted.  They have either already been
+TRANS retrieved with getnetconfig(3), getnetconfigent(3), getnetpath(3), or the
+TRANS /etc/netconfig file contains no entries.
+ */
+	gettext_noop("no more entries in " NETCONFIG),
+/*
+TRANS Corresponds to any other constant.  An internal error in the libxnsl(3)
+TRANS library has occurred resulting in an undefined error number.  This
+TRANS situation should not occur and represents a bug in the library.
+ */
+	gettext_noop("unknown error"),
+};
+/* *INDENT-ON* */
 
 /**
  * @fn char *nc_sperror(void);
@@ -288,12 +613,49 @@ void nc_perror(const char *msg)
 char *
 __nsl_nc_sperror(void)
 {
+	int err;
+	switch ((err = nc_error)) {
+	default:
+		err = NC_NOMOREENTRIES+1;
+	case NC_NOERROR:
+	case NC_NOMEM:
+	case NC_NOSET:
+	case NC_OPENFAIL:
+	case NC_BADLINE:
+	case NC_NOTFOUND:
+	case NC_NOMOREENTRIES:
+		return (char *)(__nsl_nc_errlist[err]);
+	}
 	errno = EOPNOTSUPP;
 	return (NULL);
 }
 
 char *nc_sperror(void)
     __attribute__ ((weak, alias("__nsl_nc_sperror")));
+
+/**
+ * @fn void nc_perror(const char *msg);
+ * @brief Print an error message to standard output.
+ * @param msg message to prefix to error message.
+ *
+ * This function prints and error message to standard error indicating why any of the above routines
+ * failed.  The message is prepended with the string provided in the msg argument and a colon.  A
+ * NEWLINE is appended to the end of the message.
+ *
+ * This function can also be used with the netpath access routines.
+ */
+void
+__nsl_nc_perror(const char *msg)
+{
+	if (msg)
+		fprintf(stderr, "%s: %s\n", msg, __nsl_nc_sperror());
+	else
+		fprintf(stderr, "%s\n", __nsl_nc_sperror());
+	return;
+}
+
+void nc_perror(const char *msg)
+    __attribute__ ((weak, alias("__nsl_nc_perror")));
 
 /**
  * @fn struct netconfig *getnetpath(void *handle);
@@ -372,6 +734,12 @@ __nsl_endnetpath(void *handle)
 int endnetpath(void *handle)
     __attribute__ ((weak, alias("__nsl_endnetpath")));
 
+
+/*
+ *  Name-to-Address Translation Functions:
+ *  ======================================
+ */
+
 /**
  * @fn int netdir_getbyname(struct netconfig *config, struct nd_hostserv *service, struct nd_addrlist **addrs);
  * @brief Map machine and service name to transport addresses.
@@ -393,7 +761,7 @@ __nsl_netdir_getbyname(struct netconfig *config, struct nd_hostserv *service,
 
 int netdir_getbyname(struct netconfig *config, struct nd_hostserv *service,
 		     struct nd_addrlist **addrs)
-    __attribute__ ((alias("__nsl_netdir_getbyname")));
+    __attribute__ ((weak, alias("__nsl_netdir_getbyname")));
 
 /**
  * @fn int netdir_getbyaddr(struct netconfig *config, struct nd_hostservlist **service, struct netbuf *netaddr);
@@ -417,7 +785,7 @@ __nsl_netdir_getbyaddr(struct netconfig *config, struct nd_hostservlist **servic
 
 int netdir_getbyaddr(struct netconfig *config, struct nd_hostservlist **service,
 		     struct netbuf *netaddr)
-    __attribute__ ((alias("__nsl_netdir_getbyaddr")));
+    __attribute__ ((weak, alias("__nsl_netdir_getbyaddr")));
 
 /**
  * @fn void netdir_free(void *ptr, int struct_type);
@@ -438,7 +806,7 @@ __nsl_netdir_free(void *ptr, int struct_type)
 }
 
 void netdir_free(void *ptr, int struct_type)
-    __attribute__ ((alias("__nsl_netdir_free")));
+    __attribute__ ((weak, alias("__nsl_netdir_free")));
 
 /**
  * @fn int netdir_options(struct netconfig *config, int option, int fd, char *point_to_args);
@@ -461,7 +829,7 @@ __nsl_netdir_options(struct netconfig *config, int option, int fd, char *point_t
 }
 
 int netdir_options(struct netconfig *config, int option, int fd, char *point_to_args)
-    __attribute__ ((alias("__nsl_netdir_options")));
+    __attribute__ ((weak, alias("__nsl_netdir_options")));
 
 /**
  * @fn char *taddr2uaddr(struct netconfig *config, struct netbuf *addr);
@@ -483,7 +851,7 @@ __nsl_taddr2uaddr(struct netconfig *config, struct netbuf *addr)
 }
 
 char *taddr2uaddr(struct netconfig *config, struct netbuf *addr)
-    __attribute__ ((alias("__nsl_taddr2uaddr")));
+    __attribute__ ((weak, alias("__nsl_taddr2uaddr")));
 
 /**
  * @fn struct netbuf *uaddr2taddr(struct netconfig *config, struct netbuf *addr);
@@ -502,7 +870,125 @@ __nsl_uaddr2taddr(struct netconfig *config, struct netbuf *addr)
 }
 
 struct netbuf *uaddr2taddr(struct netconfig *config, struct netbuf *addr)
-    __attribute__ ((alias("__nsl_uaddr2taddr")));
+    __attribute__ ((weak, alias("__nsl_uaddr2taddr")));
+
+/* *INDENT-OFF* */
+static const char *__nsl_nd_errlist[] = {
+/*
+TRANS Corresponds to the ND_TRY_AGAIN constant.  This is a fatal error in the
+TRANS sense that name-to-address mapping translations will stop at this point.
+ */
+	gettext_noop("n2a: non-authoritative host not found"),
+/*
+TRANS Corresponds to the ND_NO_RECOVERY constant.  This is a fatal error in the
+TRANS sense that name-to-address mapping translations will stop at this point.
+ */
+	gettext_noop("n2a: non-recoverable error"),
+/*
+TRANS Corresponds to the ND_NO_DATA and ND_NO_ADDRESS constant.  This is a fatal
+TRANS error in the sense that name-to-address mapping translations will stop at
+TRANS this point.
+ */
+	gettext_noop("n2a: no data record of requested type"),
+/*
+TRANS Corresponds to the ND_BADARG constant.  This is a fatal error in the sense
+TRANS that name-to-address mapping translations will stop at this point.
+ */
+	gettext_noop("n2a: bad arguments passed to routine"),
+/*
+TRANS Corresponds to the ND_NOMEM constant.  This is a fatal error in the sense
+TRANS that name-to-address mapping translations will stop at this point.
+ */
+	gettext_noop("n2a: memory allocation failed"),
+/*
+TRANS Corresponds to the ND_OK constant.  This is not an error.
+ */
+	gettext_noop("n2a: successful completion"),
+/*
+TRANS Corresponds to the ND_NOHOST constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: hostname not found"),
+/*
+TRANS Corresponds to the ND_NOSERV constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: service name not found"),
+/*
+TRANS Corresponds to the ND_NOSYM constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: symbol missing in shared object: %s"),
+/*
+TRANS Corresponds to the ND_OPEN constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: could not open shared object: %s"),
+/*
+TRANS Corresponds to the ND_ACCESS constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: access denied for shared object"),
+/*
+TRANS Corresponds to the ND_UKNWN constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: attempt to free unknown object"),
+/*
+TRANS Corresponds to the ND_NOCTRL constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: unknown option passed"),
+/*
+TRANS Corresponds to the ND_FAILCTRL constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: control operation failed"),
+/*
+TRANS Corresponds to the ND_SYSTEM constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: system error"),
+/*
+TRANS Corresponds to the ND_NOCONVERT constant.  This is a non-fatal error in
+TRANS the sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: conversion not possible"),
+/*
+TRANS Corresponds to the any other constant.  This is a non-fatal error in the
+TRANS sense that name-to-address mapping translations will contrinue at this
+TRANS point.
+ */
+	gettext_noop("n2a: unknown error"),
+};
+/* *INDENT-ON* */
+
+/**
+ * @fn char *netdir_sperror(void);
+ * @brief Return a netdir function error string.
+ *
+ * This function returns a pointer to a buffer that contains the error message
+ * string.  The buffer is overwritten on each call.  In multhreaded
+ * applications, this buffers is implemented as thread-specific data.
+ */
+char *
+__nsl_netdir_sperror(void)
+{
+	errno = EOPNOTSUPP;
+	return (NULL);
+}
+char *netdir_sperror(void)
+    __attribute__ ((weak, alias("__nsl_netdir_sperror")));
 
 /**
  * @fn void netdir_perror(char *s);
@@ -520,21 +1006,8 @@ __nsl_netdir_perror(char *s)
 	errno = EOPNOTSUPP;
 }
 void netdir_perror(char *s)
-    __attribute__ ((alias("__nsl_netdir_perror")));
+    __attribute__ ((weak, alias("__nsl_netdir_perror")));
 
-/**
- * @fn char *netdir_sperror(void);
- * @brief Return a netdir function error string.
- *
- * This function returns a pointer to a buffer that contains the error message
- * string.  The buffer is overwritten on each call.  In multhreaded
- * applications, this buffers is implemented as thread-specific data.
+/*
+ * vim: comments+=b\:TRANS
  */
-char *
-__nsl_netdir_sperror(void)
-{
-	errno = EOPNOTSUPP;
-	return (NULL);
-}
-char *netdir_sperror(void)
-    __attribute__ ((alias("__nsl_netdir_sperror")));

@@ -6170,3 +6170,7 @@ int t_unbind(int fd)
  *
  * @}
  */
+
+/*
+ * vim: comments+=b\:TRANS
+ */

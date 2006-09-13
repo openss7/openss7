@@ -1,2 +1,3 @@
 # translatable sources
 src/lib/xnet.c
+src/lib/xnsl.c
