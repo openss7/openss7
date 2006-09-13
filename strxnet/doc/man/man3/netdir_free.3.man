@@ -323,19 +323,48 @@ When
 fails, it sets
 .BR _nderror (3)
 to one of the following errors:
-.TP \w'[\fBND_FAILCTRL\fR]\(em'u
+.TP \w'[\fBND_NO_RECOVERY\fR]\(em'u
+.\".RB [ ND_TRY_AGAIN ]
+.\".RI \(lq "n2a: non-authoritative host not found" \(rq
+.\".IP ""
+.\"The host was not found, however, a name-to-address mapping function suffered a temporary failure
+.\"(such as a timeout).
+.\".TP
+.\".RB [ ND_NO_RECOVERY ]
+.\".RI \(lq "n2a: non-recoverable error" \(rq
+.\".IP ""
+.\"The last name-to-address translation function suffered an unrecoverable error in one of its lookup
+.\"libraries.
+.\".TP
+.\".RB [ ND_NO_DATA ]
+.\".RI \(lq "n2a: no data record of requested type" \(rq
+.\".IP ""
+.\"The last name-to-address translation function could find no data of the requested type in one of its
+.\"lookup libraries.
+.\".TP
+.\".RB [ ND_NO_ADDRESS ]
+.\".RI \(lq "n2a: no data record of requested type" \(rq
+.\".IP ""
+.\"The last name-to-address translation function could find no address of the requested type in one of
+.\"its lookup libraries.
+.\".TP
+.RB [ ND_BADARG ]
+.RI \(lq "n2a: bad arguments passed to routine" \(rq
+.IP ""
+The last name-to-address translation function was passed a bad argument.
+.TP
 .\".RB [ ND_NOMEM ]
 .\".RI \(lq "n2a: memory allocation failed" \(rq
 .\".IP ""
 .\"The last name-to-address translation function could not allocate memory necessary to complete the
 .\"operation.
 .\".TP
-.RB [ ND_OK ]
-.RI \(lq "n2a: successful completion" \(rq
-.IP ""
-The last name-to-address translation function completed successfully, or there was no previous
-name-to-address translation function called.
-.TP
+.\".RB [ ND_OK ]
+.\".RI \(lq "n2a: successful completion" \(rq
+.\".IP ""
+.\"The last name-to-address translation function completed successfully, or there was no previous
+.\"name-to-address translation function called.
+.\".TP
 .\".RB [ ND_NOHOST ]
 .\".RI \(lq "n2a: hostname not found" \(rq
 .\".IP ""
@@ -401,11 +430,6 @@ was called with an unknown
 .I struct_type
 argument value.
 .TP
-.RB [ ND_BADARG ]
-.RI \(lq "n2a: bad arguments passed to routine" \(rq
-.IP ""
-The last name-to-address translation function was passed a bad argument.
-.TP
 .\".RB [ ND_NOCTRL ]
 .\".RI \(lq "n2a: unknown option passed" \(rq
 .\".IP ""
@@ -427,12 +451,21 @@ The last name-to-address translation function was passed a bad argument.
 During the last name-to-address translation function, a system error occurred.  This could be
 because a segmentation fault occurred.
 .TP
-.RB [ ??? ]
-.RI \(lq "n2a: unknown error" \(rq
+.\".RB [ ND_NOCONVERT ]
+.\".RI \(lq "n2a: conversion not possible" \(rq
+.\".IP ""
+.\"During the last name-to-address translation function it was discovered that character string
+.\"conversion was not possible.
+.\".TP
+.RI [ other ]
+.RI \(lq "n2a: unknown error %d" \(rq
 .IP ""
 An internal error occured in the
 .BR libxnsl (3)
 library or a loaded shared object.
+.I %d
+is the decimal number of the error number that was contained in
+.BR _nderror (3).
 .PP
 An error message corresponding to the
 .BR _nderror (3)
@@ -544,14 +577,14 @@ documents
 uw7doc
 .]
 that
-.B _nderror
+.BR _nderror (3)
 contains the cause of failure and that
 .BR t_errno (3)
 may provide some additional insights into why a call failed.
 .IP ""
 .B @PACKAGE_TITLE@
 stores the error condition in
-.IR _nderror (3).
+.BR _nderror (3).
 .IP \(em
 Diagnostic message strings are not documented and are incompatible.
 .IP \(em

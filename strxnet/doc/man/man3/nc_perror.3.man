@@ -314,7 +314,7 @@ of the calling process.
 .IP \(em
 .B @PACKAGE_TITLE@
 stores the error condition in
-.IR _nderror (3).
+.BR _nderror (3).
 .IP \(em
 Diagnostic message strings are not documented and are incompatible.
 .IP \(em

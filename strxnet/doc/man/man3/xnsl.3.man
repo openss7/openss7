@@ -276,7 +276,7 @@ svr4
 documentation.
 .IR UnixWare \(rg
 documentation mentions a
-.B _nderror
+.BR _nderror (3)
 global variable that holds the
 .BR netdir (3)
 function error numbers (but does not list what they are).  It also mentions that

@@ -132,6 +132,12 @@ Check for a reserved port.
 .TP
 .B ND_MERGEADDR
 Merge server and client addresses.
+.TP
+.B ND_JOIN_MULTICAST
+Join a multicast address.
+.TP
+.B ND_LEAVE_MULTICAST
+Leave a multicast address.
 .PD
 .RE
 .TP
@@ -291,6 +297,12 @@ addresses disabled.
 .TP
 .B ND_MERGEADDR
 .\"
+.TP
+.B ND_JOIN_MULTICAST
+.\"
+.TP
+.B ND_LEAVE_MULTICAST
+.\"
 .\"
 .SH "RETURN VALUE"
 .PP
@@ -302,7 +314,7 @@ and performs the requested options management.
 Otherwise, it returns minus one
 .RB ( -1 )
 and
-.I _nderror
+.BR _nderror (3)
 is set to indicate the error.
 .\"
 .\"
@@ -313,59 +325,151 @@ When
 fails, it returns minus one
 .RB ( -1 )
 and sets
-.I _nderror
+.BR _nderror (3)
 to one of the following error codes:
-.TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
-.RB [ ND_ACCESS ]
-The user did not have sufficient privilege to use the specified address.
-.TP
-.RB [ ND_BADARG ]
-Invalid argument.
-.TP
-.RB [ ND_FAILCTRL ]
-Control operation failed.
-.TP
-.RB [ ND_NO_ADDRESS ]
-Invalid address format.
-.TP
-.RB [ ND_NOCONVERT ]
-Conversion error.
-.TP
-.RB [ ND_NOCTRL ]
-Function invoked out of sequence or incorrect option specified.
-.TP
-.RB [ ND_NO_DATA ]
-Incorrect amount of data.
-.TP
-.RB [ ND_NOHOST ]
-Host not found.
-.TP
-.RB [ ND_NOMEM ]
-Insufficient memory.
+.TP \w'[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_TRY_AGAIN ]
+.RI \(lq "n2a: non-authoritative host not found" \(rq
+.IP ""
+The host was not found, however, a name-to-address mapping function suffered a temporary failure
+(such as a timeout).
 .TP
 .RB [ ND_NO_RECOVERY ]
-Unrecoverable error.
+.RI \(lq "n2a: non-recoverable error" \(rq
+.IP ""
+The last name-to-address translation function suffered an unrecoverable error in one of its lookup
+libraries.
+.TP
+.\".RB [ ND_NO_DATA ]
+.\".RI \(lq "n2a: no data record of requested type" \(rq
+.\".IP ""
+.\"The last name-to-address translation function could find no data of the requested type in one of its
+.\"lookup libraries.
+.\".TP
+.\".RB [ ND_NO_ADDRESS ]
+.\".RI \(lq "n2a: no data record of requested type" \(rq
+.\".IP ""
+.\"The last name-to-address translation function could find no address of the requested type in one of
+.\"its lookup libraries.
+.\".TP
+.RB [ ND_BADARG ]
+.RI \(lq "n2a: bad arguments passed to routine" \(rq
+.IP ""
+The last name-to-address translation function was passed a bad argument.
+.TP
+.RB [ ND_NOMEM ]
+.RI \(lq "n2a: memory allocation failed" \(rq
+.IP ""
+The last name-to-address translation function could not allocate memory necessary to complete the
+operation.
+.TP
+.\".RB [ ND_OK ]
+.\".RI \(lq "n2a: successful completion" \(rq
+.\".IP ""
+.\"The last name-to-address translation function completed successfully, or there was no previous
+.\"name-to-address translation function called.
+.\".TP
+.\".RB [ ND_NOHOST ]
+.\".RI \(lq "n2a: hostname not found" \(rq
+.\".IP ""
+.\"The last name-to-address translation function,
+.\".BR netdir_getbyname (3),
+.\"could not find, or does not support, the specified host name.
+.\".TP
+.\".RB [ ND_NOSERV ]
+.\".RI \(lq "n2a: service name not found" \(rq
+.\".IP ""
+.\"The last name-to-address translation function,
+.\".BR netdir_getbyname (3),
+.\"could not find, or does not support, the specified service name.
+.\".TP
+.RB [ ND_NOSYM ]
+.RI \(lq "n2a: symbol missing in shared object : %s" \(rq
+.IP ""
+One of the required symbols, see
+.BR netdir (5),
+was missing from a shared object specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
 .TP
 .RB [ ND_OPEN ]
-File could not be opened.
+.RI \(lq "n2a: could not open shared object : %s" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
+.TP
+.RB [ ND_ACCESS ]
+.RI \(lq "n2a: access denied for shared object" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened due to access permission.
+.TP
+.\".RB [ ND_UKNWN ]
+.\".RI \(lq "n2a: attempt to free unknown object" \(rq
+.\".IP ""
+.\".BR netdir_free (3)
+.\"was called with an unknown
+.\".I struct_type
+.\"argument value.
+.\".TP
+.RB [ ND_NOCTRL ]
+.RI \(lq "n2a: unknown option passed" \(rq
+.IP ""
+.BR netdir_options (3)
+was passed an unknown
+.I option
+argument value.
+.TP
+.RB [ ND_FAILCTRL ]
+.RI \(lq "n2a: control operation failed" \(rq
+.IP ""
+The
+.BR netdir_options (3)
+control operation failed.
 .TP
 .RB [ ND_SYSTEM ]
-Fault detected.
+.RI \(lq "n2a: system error" \(rq
+.IP ""
+During the last name-to-address translation function, a system error occurred.  This could be
+because a segmentation fault occurred.
 .TP
-.RB [ ND_TRY_AGAIN ]
-Try again later.
-.TP
-.RB [ ND_NOSERV ]
-Service not found.
-.TP
-.RB [ ND_NOSYM ]
-Symbol not found.
-.TP
-.RB [ ND_UNKWN ]
-Unknown object.
-.TP
-.RB [ ND_OK ]
-Success.
+.\".RB [ ND_NOCONVERT ]
+.\".RI \(lq "n2a: conversion not possible" \(rq
+.\".IP ""
+.\"During the last name-to-address translation function it was discovered that character string
+.\"conversion was not possible.
+.\".TP
+.RI [ other ]
+.RI \(lq "n2a: unknown error %d" \(rq
+.IP ""
+An internal error occured in the
+.BR libxnsl (3)
+library or a loaded shared object.
+.I %d
+is the decimal number of the error number that was contained in
+.BR _nderror (3).
 .PP
 When an error occurs, an error message can be printed to standard error or retrieved using
 .BR netdir_perror (3)
@@ -380,7 +484,7 @@ and
 .BR netdir_sperror (3)
 must be called immediately after the failed network configuration subroutine fails.  Otherwise, the
 error condition in
-.I _nderror
+.BR _nderror (3)
 may be lost.
 .PP
 The character string to which a pointer is returned must eventually be freed by passing it to
@@ -416,7 +520,7 @@ If the library does not implement
 will fail, return minus one
 .RB ( -1 )
 and set
-.I _nderror
+.BR _nderror (3)
 to
 .RB [ ND_NOSYM ].
 .\"
@@ -499,14 +603,14 @@ documents
 uw7doc
 .]
 that
-.I _nderror
+.BR _nderror (3)
 contains the cause of failure and that
 .BR t_errno (3)
 may provide some additional insights into why a call failed.
 .IP ""
 .B @PACKAGE_TITLE@
 stores the error condition in
-.IR _nderror (3).
+.BR _nderror (3).
 .IP \(em
 .IR AIX \(rg
 also documents

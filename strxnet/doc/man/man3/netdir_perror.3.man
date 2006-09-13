@@ -169,7 +169,36 @@ It prints the error string associated with the error value currently stored in
 .BR _nderror (3).
 .PP
 One of the following error messages will be printed:
-.TP \w'[\fBND_FAILCTRL\fR]\(em'u
+.TP \w'[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_TRY_AGAIN ]
+.RI \(lq "n2a: non-authoritative host not found" \(rq
+.IP ""
+The host was not found, however, a name-to-address mapping function suffered a temporary failure
+(such as a timeout).
+.TP
+.RB [ ND_NO_RECOVERY ]
+.RI \(lq "n2a: non-recoverable error" \(rq
+.IP ""
+The last name-to-address translation function suffered an unrecoverable error in one of its lookup
+libraries.
+.TP
+.RB [ ND_NO_DATA ]
+.RI \(lq "n2a: no data record of requested type" \(rq
+.IP ""
+The last name-to-address translation function could find no data of the requested type in one of its
+lookup libraries.
+.TP
+.RB [ ND_NO_ADDRESS ]
+.RI \(lq "n2a: no data record of requested type" \(rq
+.IP ""
+The last name-to-address translation function could find no address of the requested type in one of
+its lookup libraries.
+.TP
+.RB [ ND_BADARG ]
+.RI \(lq "n2a: bad arguments passed to routine" \(rq
+.IP ""
+The last name-to-address translation function was passed a bad argument.
+.TP
 .RB [ ND_NOMEM ]
 .RI \(lq "n2a: memory allocation failed" \(rq
 .IP ""
@@ -247,11 +276,6 @@ was called with an unknown
 .I struct_type
 argument value.
 .TP
-.RB [ ND_BADARG ]
-.RI \(lq "n2a: bad arguments passed to routine" \(rq
-.IP ""
-The last name-to-address translation function was passed a bad argument.
-.TP
 .RB [ ND_NOCTRL ]
 .RI \(lq "n2a: unknown option passed" \(rq
 .IP ""
@@ -273,12 +297,21 @@ control operation failed.
 During the last name-to-address translation function, a system error occurred.  This could be
 because a segmentation fault occurred.
 .TP
-.RB [ ??? ]
-.RI \(lq "n2a: unknown error" \(rq
+.RB [ ND_NOCONVERT ]
+.RI \(lq "n2a: conversion not possible" \(rq
+.IP ""
+During the last name-to-address translation function it was discovered that character string
+conversion was not possible.
+.TP
+.RI [ other ]
+.RI \(lq "n2a: unknown error %d" \(rq
 .IP ""
 An internal error occured in the
 .BR libxnsl (3)
 library or a loaded shared object.
+.I %d
+is the decimal number of the error number that was contained in
+.BR _nderror (3).
 .\"
 .\"
 .SH FILES
@@ -343,24 +376,6 @@ uw7doc
 .]
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
-.IR Solaris \(rg
-.[
-soldoc
-.]
-and
-.IR UnixWare \(rg
-.[
-uw7doc
-.]
-describe the
-.BR netdir_sperror ()
-subroutine as returning a pointer to thread-specific data and that the buffer
-could change at any point.  While the error value is saved as thread-specific
-data, this implementation of
-.BR netdir_sperror ()
-returns a pointer to a shared read-only string that is valid for the duration
-of the calling process.
-.IP \(em
 .B @PACKAGE_TITLE@
 stores the error condition in
 .IR _nderror (3).
