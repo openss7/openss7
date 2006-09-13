@@ -92,6 +92,7 @@ extern int nc_error;
 #define NC_BADLINE		4
 #define NC_NOTFOUND		5
 #define NC_NOMOREENTRIES	6
+#define NC_ERROR_MAX		7
 
 /* for use in nc_semanitcs field */
 #define NC_TPI_CLTS		1

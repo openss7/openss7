@@ -90,6 +90,10 @@
 	* doc/man/man3/uaddr2taddr.3.man: more doc updates
 	* doc/man/man3/xnsl.3.man: more doc updates
 
+	* src/include/netdir.h: working up xnsl library
+	* src/include/sys/netconfig.h: working up xnsl library
+	* src/lib/xnsl.c: working up xnsl library
+
 2006-09-12  Brian Bidulock  <bidulock@openss7.org>
 
 	- moved libxnsl files here from strsock package

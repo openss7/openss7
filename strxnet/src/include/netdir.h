@@ -86,8 +86,8 @@ struct nd_hostserv {
 #define HOST_RPCNODES		"\\6"
 
 struct nd_hostservlist {
-	int *h_cnt;			/* number of hostservs found */
-	struct hostserv *h_hostservs;
+	int h_cnt;			/* number of hostservs found */
+	struct nd_hostserv *h_hostservs;
 };
 
 /* for use with netdir_free() */
@@ -111,6 +111,10 @@ struct nd_hostservlist {
 #define ND_JOIN_MULTICAST	5
 #define ND_LEAVE_MULTICAST	6
 
+#define ND_CLEAR_BROADCAST	7	/* UnixWare - not binary compatible */
+#define ND_SET_REUSEADDR	8	/* UnixWare - not binary compatible */
+#define ND_CLEAR_REUSEADDR	9	/* UnixWare - not binary compatible */
+
 struct nd_mergearg {
 	char *s_uaddr;			/* server universal address */
 	char *c_uaddr;			/* client universal address */
@@ -119,6 +123,7 @@ struct nd_mergearg {
 
 /* Negative errors are fatal, positive errors are warnings. */
 
+#define ND_ERROR_OFS		-5
 #define ND_TRY_AGAIN		-5
 #define ND_NO_RECOVERY		-4
 #define ND_NO_DATA		-3
@@ -136,25 +141,7 @@ struct nd_mergearg {
 #define ND_FAILCTRL		 8
 #define ND_SYSTEM		 9
 #define ND_NOCONVERT		10	/* AS400 only? */
-
-const char *_nd_error_strings[] = {
-	[5 + ND_TRY_AGAIN] = "try again later",
-	[5 + ND_NO_RECOVERY] = "recovery not possible",
-	[5 + ND_NO_DATA] = "incorrect amount of data",
-	[5 + ND_BADARG] = "bad arguments passed to routine",
-	[5 + ND_NOMEM] = "memory allocation failed",
-	[5 + ND_OK] = "success",
-	[5 + ND_NOHOST] = "host name not found",
-	[5 + ND_NOSERV] = "service name not found",
-	[5 + ND_NOSYM] = "symbol missing in shared object",
-	[5 + ND_OPEN] = "could not open shared object",
-	[5 + ND_ACCESS] = "access denied for shared object",
-	[5 + ND_UNKWN] = "attempt to free unknown object",
-	[5 + ND_NOCTRL] = "unknown option passed",
-	[5 + ND_FAILCTRL] = "control operation failed",
-	[5 + ND_SYSTEM] = "system error",
-	[5 + ND_NOCONVERT] = "no conversion",
-};
+#define ND_ERROR_MAX		11
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
