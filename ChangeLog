@@ -1,3 +1,9 @@
+2006-09-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/texi/uslbsd.texi: updated license
+	* doc/manual/texi/bsd.texi: added license
+	* doc/manual/texi/sunrpc.texi: added license
+
 2006-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: missing bugs.texi from release

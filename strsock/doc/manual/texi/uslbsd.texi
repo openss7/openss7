@@ -1,4 +1,4 @@
-@c @setfilename bsd.info
+@c @setfilename uslbsd.info
 
 @node BSD/USL Combined License
 @section BSD/USL Combined License
