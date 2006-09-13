@@ -236,7 +236,7 @@ operation to complete.
 .BR socketpair (3),
 .BR <netinet/in.h> ,
 .BR <sys/socket.h> .
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 The Open Group XNS Issue 5.2.
 .[

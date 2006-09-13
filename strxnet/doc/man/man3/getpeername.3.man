@@ -179,7 +179,7 @@ operation to complete.
 .BR getsockname (3),
 .BR socket (3),
 .BR <sys/socket.h> .
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 The Open Group XNS Issue 5.2.
 .[

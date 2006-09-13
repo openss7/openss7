@@ -205,7 +205,7 @@ Insufficient resources are available in the system to complete the call.
 .BR connect (3),
 .BR socket (3),
 .BR <sys/socket.h> (5).
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 The Open Group XNS Issue 5.2.
 .[

@@ -237,7 +237,7 @@ There were insufficient STREAMS resources for the operation to complete.
 .BR listen (3),
 .BR socket (3),
 .BR <sys/socket.h> (5).
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 The Open Group XNS Issue 5.2.
 .[

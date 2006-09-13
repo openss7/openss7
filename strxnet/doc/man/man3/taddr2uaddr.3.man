@@ -493,7 +493,7 @@ See
 for additional compatibility information.
 .\"
 .\"
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 .IR SVR4 .
 .[

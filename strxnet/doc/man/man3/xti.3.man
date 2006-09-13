@@ -764,7 +764,7 @@ test case executables and the
 test suite.
 .\"
 .\"
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 .IR "The Open Group XNS Issue 5.2" ,
 .[

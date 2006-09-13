@@ -343,7 +343,7 @@ svr4
 .]
 .\"
 .\"
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 .IR "SVR 4" .
 .[

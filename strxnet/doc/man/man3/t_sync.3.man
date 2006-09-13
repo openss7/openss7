@@ -219,7 +219,7 @@ test case executables and the
 test suite.
 .\"
 .\"
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 XTI/TLI,
 .[

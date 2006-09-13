@@ -208,7 +208,7 @@ the call will fail with error
 .BR t_sndvudata (3),
 .BR test-xnet (8),
 .BR test-xnet_thr (8).
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 The Open Group XNS Issue 5.2.
 .[

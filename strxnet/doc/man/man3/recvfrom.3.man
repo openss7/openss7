@@ -295,7 +295,7 @@ complete.
 .BR socket (3),
 .BR write (2),
 .BR <sys/socket.h> (5).
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 The Open Group XNS Issue 5.2.
 .[
