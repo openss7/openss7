@@ -104,7 +104,7 @@ subroutine.
 .PP
 .IR UNIX \(rg
 has traditionally provided three components of the Network Services Library,
-.BR libnsl (3),
+.BR libnsl ,
 that are associated with Transport Provider Interface,
 .BR tpi (7),
 .IR STREAMS (9)
@@ -324,17 +324,17 @@ On
 .IR UNIX \(rg
 systems, these utility subroutines are normally part of the Network Services
 Library,
-.BR libnsl (3);
+.BR libnsl ;
 however,
 .B Linux
 already has a library of that name (which unfortunately is missing these
 components), and, therefore,
 .B "@PACKAGE_TITLE@"
 renames the library to
-.BR libxnsl.so .
+.BR libxnsl (3).
 .PP
 See
-.BR libnsl (3)
+.BR libxnsl (3)
 for additional compatibility information.
 .\"
 .\"

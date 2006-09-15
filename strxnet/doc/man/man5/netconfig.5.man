@@ -461,12 +461,12 @@ structure.
 The
 .B /etc/netconfig
 file is compatible with
-.I SVR4
+.I "SVR 4.2"
 .[
-svr4
+svr42
 .]
 and implementations based on
-.I SVR4
+.I "SVR 4.2"
 such as
 .IR UnixWare \(rg
 .[
@@ -483,7 +483,7 @@ with the following portability considerations:
 The
 .B /etc/netconfig
 file is only compatible with
-.I SVR4
+.I "SVR 4.2"
 for the purposes of populating the mapping for use by
 .BR libnsl.so
 in the
@@ -499,10 +499,10 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-.IR SVR4
+.IR "SVR 4.2"
 documentation.
 .[
-svr4
+svr42
 .]
 .\"
 .\"
@@ -511,9 +511,9 @@ svr4
 The
 .B /etc/netconfig
 file first appeared in
-.IR SVR4 .
+.IR "SVR 4.2" .
 .[
-svr4
+svr42
 .]
 .\"
 .\"

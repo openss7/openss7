@@ -263,56 +263,153 @@ lookup list.  The first success will cause the library function to return succes
 Fatal errors are as follows:
 .TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
 .RB [ ND_TRY_AGAIN ]
-Try again later.
+.RI \(lq "n2a: non-authoritative host not found" \(rq
+.IP ""
+The host was not found, however, a name-to-address mapping function suffered a temporary failure
+(such as a timeout).
 .TP
 .RB [ ND_NO_RECOVERY ]
-Unrecoverable error.
+.RI \(lq "n2a: non-recoverable error" \(rq
+.IP ""
+The last name-to-address translation function suffered an unrecoverable error in one of its lookup
+libraries.
 .TP
 .RB [ ND_NO_DATA ]
-Incorrect amount of data.
+.RI \(lq "n2a: no data record of requested type" \(rq
+.IP ""
+The last name-to-address translation function could find no data of the requested type in one of its
+lookup libraries.
 .TP
 .RB [ ND_NO_ADDRESS ]
-Invalid address format.
+.RI \(lq "n2a: no data record of requested type" \(rq
+.IP ""
+The last name-to-address translation function could find no address of the requested type in one of
+its lookup libraries.
 .TP
 .RB [ ND_BADARG ]
-Invalid argument.
+.RI \(lq "n2a: bad arguments passed to routine" \(rq
+.IP ""
+The last name-to-address translation function was passed a bad argument.
 .TP
 .RB [ ND_NOMEM ]
-Insufficient memory.
+.RI \(lq "n2a: memory allocation failed" \(rq
+.IP ""
+The last name-to-address translation function could not allocate memory necessary to complete the
+operation.
 .\"
 .\"
 .PP
 Non-fatal errors are as follows:
 .TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
 .RB [ ND_ACCESS ]
-The user did not have sufficient privilege to use the specified address.
+.RI \(lq "n2a: access denied for shared object" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened due to access permission.
 .TP
 .RB [ ND_FAILCTRL ]
-Control operation failed.
+.RI \(lq "n2a: control operation failed" \(rq
+.IP ""
+The
+.BR netdir_options (3)
+control operation failed.
 .TP
 .RB [ ND_NOCONVERT ]
-Conversion error.
+.RI \(lq "n2a: conversion not possible" \(rq
+.IP ""
+During the last name-to-address translation function it was discovered that character string
+conversion was not possible.
 .TP
 .RB [ ND_NOCTRL ]
-Function invoked out of sequence or incorrect option specified.
+.RI \(lq "n2a: unknown option passed" \(rq
+.IP ""
+.BR netdir_options (3)
+was passed an unknown
+.I option
+argument value.
 .TP
 .RB [ ND_NOHOST ]
-Host not found.
+.RI \(lq "n2a: hostname not found" \(rq
+.IP ""
+The last name-to-address translation function,
+.BR netdir_getbyname (3),
+could not find, or does not support, the specified host name.
 .TP
 .RB [ ND_OPEN ]
-File could not be opened.
+.RI \(lq "n2a: could not open shared object : %s" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
 .TP
 .RB [ ND_SYSTEM ]
-Fault detected.
+.RI \(lq "n2a: system error" \(rq
+.IP ""
+During the last name-to-address translation function, a system error occurred.
+The
+.B Linux
+system error is in
+.BR errno (3).
+The
+.BR xti (3)
+error in
+.BR t_errno (3)
+might also provide some insight into the error.
 .TP
 .RB [ ND_NOSERV ]
-Service not found.
+.RI \(lq "n2a: service name not found" \(rq
+.IP ""
+The last name-to-address translation function,
+.BR netdir_getbyname (3),
+could not find, or does not support, the specified service name.
 .TP
 .RB [ ND_NOSYM ]
-Symbol not found.
+.RI \(lq "n2a: symbol missing in shared object : %s" \(rq
+.IP ""
+One of the required symbols, see
+.BR netdir (5),
+was missing from a shared object specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
 .TP
-.RB [ ND_UNKWN ]
-Unknown object.
+.RB [ ND_UKNWN ]
+.RI \(lq "n2a: attempt to free unknown object" \(rq
+.IP ""
+.BR netdir_free (3)
+was called with an unknown
+.I struct_type
+argument value.
+.TP
+.RI [ other ]
+.RI \(lq "n2a: unknown error %d" \(rq
+.IP ""
+An internal error occured in the
+.BR libxnsl (3)
+library or a loaded shared object.
+.I %d
+is the decimal number of the error number that was contained in
+.BR _nderror .
 .PP
 See
 .BR _nderror (3)
@@ -323,15 +420,18 @@ for more information.
 Success is indicated as follows:
 .TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
 .RB [ ND_OK ]
-Success.
+.RI \(lq "n2a: successful completion" \(rq
+.IP ""
+The last name-to-address translation function completed successfully, or there was no previous
+name-to-address translation function called.
 .\"
 .\"
 .SH NOTICES
 .PP
 Although this mechanism appears similar to the
-.IR "SVR 4"
+.IR "SVR 4.2"
 .[
-svr4
+svr42
 .]
 mechanism, the implementation has significant differences and care should be taken when writing
 these libraries.
@@ -383,14 +483,14 @@ The X/Open Network Services Library static library.
 .SH COMPATIBILITY
 .PP
 Name-to-address translation libraries are compatible with
-.IR "SVR 4" ,
+.IR "SVR 4.2" ,
 .[
-svr4
+svr42
 .]
 and systems based on
-.IR "SVR 4" ,
+.IR "SVR 4.2" ,
 .[
-svr4
+svr42
 .]
 including
 .IR AIX \(rg,
@@ -442,7 +542,7 @@ contains the cause of cailure and that
 may provide some additional insights into why a call failed.
 .IP \(em
 Although the prototypes of the exported symbols follow the convention of
-.IR "SVR 4" ,
+.IR "SVR 4.2" ,
 implementation differs and binary compatibility would only be coincidental.
 .IP \(em
 Name-to-address translation library names typically present on
@@ -469,18 +569,18 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.IR "SVR 4" .
+.IR "SVR 4.2" .
 .[
-svr4
+svr42
 .]
 .\"
 .\"
 .SH HISTORY
 .PP
 Name-to-address shared libraries first appeared in
-.IR "SVR 4" .
+.IR "SVR 4.2" .
 .[
-svr4
+svr42
 .]
 .\"
 .\"
