@@ -2,6 +2,14 @@
 
 	* src/util/sysconfig/netconfig: added default netconfig file (will
 	  install)
+	* src/lib/netdir.c: added new files for libxnsl library
+	* src/lib/netdir_inet.c: added new files for libxnsl library
+	* src/lib/netselect.c: added new files for libxnsl library
+	* src/lib/netselect.h: added new files for libxnsl library
+	* src/lib/pthread.c: added new files for libxnsl library
+	* src/lib/xnet.VERSION: added new files for libxnsl library
+	* src/lib/xnsl.VERSION: added new files for libxnsl library
+	* src/test/test-xnsl.c: added new files for libxnsl library
 
 2006-09-13  Brian Bidulock  <bidulock@openss7.org>
 
