@@ -108,12 +108,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define __P(__prototype) __prototype
 #endif
 
-//#include <sys/sockmod.h>
-//#include <sys/socksys.h>
-//#include <sys/socket.h>
-//#include <tihdr.h>
-//#include <timod.h>
-
 #if defined __i386__ || defined __x86_64__ || defined __k8__
 #define fastcall __attribute__((__regparm__(3)))
 #else
@@ -138,65 +132,62 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define min(a, b) (a < b ? a : b)
 
 #include <xti.h>
+#include <xti_inet.h>
 #include <netconfig.h>
 #include <netdir.h>
 
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netdb.h>
+
 /**
- * @defgroup libxnsl OpenSS7 Network Sevices Library (NSL)
+ * @defgroup libxnsl OpenSS7 Network Services Library (NSL)
  * @brief OpenSS7 NSL Library Calls
  *
- * This manual contains documentation of the OpenSS7 Network Services Library
- * functions that are generated automatically from the source code with doxygen.
- * This documentation is not intended for users of the OpenSS7 Network Services
- * Library.  Users should consult the documentation found in the user manual
- * pages beginning with xnsl(3).
+ * This manual contains documentation of the OpenSS7 Network Services Library functions that are
+ * generated automatically from the source code with doxygen.  This documentation is intended to be
+ * used for maintainers of the OpenSS7 NSL library and is not intended for users of the OpenSS7 NSL
+ * library.  Users should consult the documentation found in the user manual pages beginning with
+ * xnsl(3).
  *
  * <h2>Thread Safety</h2>
- * The OpenSS7 NSL library is designed to be thread-safe.  This is accomplished
- * in a number of ways.  Thread-safety depends on the use of glibc2 and the
- * pthreads library.
+ * The OpenSS7 NSL library is designed to be thread-safe.  This is accomplished in a number of ways.
+ * Thread-safety depends on the use of glibc2 and the pthreads library.
  *
- * Glibc2 provides lightweight thread-specific data for errno and h_errno.
- * Because errno and h_errno do not use communications functions orthogonal to
- * the NSL library services, we cannot borrow h_errno or errno for _nderror or
- * nc_error.  Therefore, both _nderror and nc_error are contained in
- * thread-specific data.
+ * Glibc2 provides lightweight thread-specific data for errno and h_errno.  The OpenSS7 NSL library
+ * takes a similar approach but uses weak aliased pthread thread-specific functions instead.
  *
- * Glibc2 also provides some weak undefined aliases for POSIX thread functions
- * to perform its own thread-safety.  When the pthread library (libpthread) is
- * linked with glibc2, these functions call libpthread functions instead of
- * internal dummy routines.  The same approach is taken for the OpenSS7 NSL
- * library.  The library uses weak defined and undefined aliases that
- * automatically invoke libpthread functions when libpthread is (dynamically)
- * linked and uses dummy functions when it is not.  Thsi maintains maximum
- * efficiency when libpthread is not dynamically linked, but providers full
- * thread safety when it is.
+ * Glibc2 also provides some weak undefined aliases for POSIX thread functions to perform its own
+ * thread-safety.  When the pthread library (libpthread) is linked with glibc2, these functions call
+ * libpthread functions instead of internal dummy routines.  The same approach is taken for the
+ * OpenSS7 NSL library.  The library uses weak defined and undefined aliases that automatically
+ * invoke libpthread functions when libpthread is (dynamically) linked and uses dummy functions when
+ * it is not.  This maintains maximum efficiency when libpthread is not dynamically linked, but
+ * provides full thread safety when it is.
  *
- * Libpthread behaves in some strange ways with regards to thread cancellation.
- * Because libpthread uses Linux clone processes for threads, cancellation of a
- * thread is accomplished by sending a signal to the thread process.  This does
- * not directly result in cancellation, but will result in the failure of a
- * system call with the EINTR error code.  It is necessary to test for
- * cancellation upon error retrun from system calls to perform the actual
- * cancellation of a thread.
+ * Libpthread behaves in some strange ways with regards to thread cancellation.  Because libpthread
+ * uses Linux clone processes for threads, cancellation of a thread is accomplished by sending a
+ * signal to the thread process.  This does not directly result in cancellation, but will result in
+ * the failure of a system call with the EINTR error code.  It is necessary to test for cancellation
+ * upon error return from system calls to perform the actual cancellation of the thread.
  *
- * The XNS specification (OpenGroup XNS 5.2) lists no functions in this group as
- * containing thread cancellation points.  All NSL functions must not contain a
- * thread cancellation point.
+ * The XNS specification (OpenGroup XNS 5.2) lists no functions in this group as containing thread
+ * cancellation points.  Many of the netdb functions are, however, permitted to contain thread
+ * cancellation points.  All NSL functions are permitted to contain thread cancellation points and
+ * deferral is not required.
  *
  * Locks and asynchronous thread cancellation present challenges:
  *
- * Functions that act as thread cancellation points must push routines onto
- * the function stack executed at exit of the thread to release the locks held
- * by the function.  These are performed with weak definitions of POSIX thread
- * library functions.
+ * Functions that act as thread cancellation points must push routines onto the function stack
+ * executed at exit of the thread to release the locks held by the function.  These are performed
+ * with weak definitions of POSIX thread library functions.
  *
- * Functions that do not act as thread cancellation points must defer thread
- * cancellation before taking locks and then release locks before thread
- * canceallation is restored.
+ * Functions that do not act as thread cancellation points must defer thread cancellation before
+ * taking locks and then release locks before thread canceallation is restored.
  *
- * The above are the techniques used by glibc2 for the same purpose and is the
- * same technique that is used by the OpenSS7 NSL library.
+ * The above are the techniques used by glibc2 for the same purpose and is the same technique that
+ * is used by the OpenSS7 NSL library.
  *
  * @{
  */
@@ -424,11 +415,11 @@ pthread_key_delete(pthread_key_t key)
 }
 
 #ifndef NDERR_BUFSZ
-#define NDERR_BUFSZ 256
+#define NDERR_BUFSZ 512
 #endif
 
 #ifndef NCERR_BUFSZ
-#define NCERR_BUFSZ 256
+#define NCERR_BUFSZ 512
 #endif
 
 /*
@@ -517,26 +508,211 @@ __nderrbuf(void)
  *  =====================================
  */
 
-/**
- * @fn struct netconfig *getnetconfig(void *handle);
- * @brief Retrieve next entry in the netconfig database.
- * @param handle handle returned by setnetconfig().
- *
- * This function returns a pointer to the current entry in the netconfig
- * database, formatted as a struct netconfig.  Successive calls will return
- * successive netconfig entries in the netconfig database.  This function can be
- * used to search the entire netconfig file.  This function returns NULL at the
- * end of the file.  handle is a the handle obtained through setnetconfig().
- */
-struct netconfig *
-__nsl_getnetconfig(void *handle)
+struct netconf_handle {
+	struct netconfig **nh_head;
+	struct netconfig **nh_curr;
+	pthread_rwlock_t nh_lock;
+};
+
+#define nc_line(__nc) (char *)(__nc)->nc_unused[7]
+#define nc_next(__nc) (struct netconfig *)(__nc)->nc_unused[8]
+#define nc_nextp(__nc) (struct netconfig **)&(__nc)->nc_unused[8]
+
+/* This is to allow us to change the name of the network configuration
+ * database file primarily for testing with test scripts. */
+
+const char *__nsl_netconfig = NETCONFIG;
+
+#undef NETCONFIG
+#define NETCONFIG __nsl_netconfig
+
+static pthread_rwlock_t __nsl_nc_lock = PTHREAD_RWLOCK_INITIALIZER;
+static struct netconfig **__nsl_nc_list = NULL;
+
+static struct netconfig **
+__nsl_loadnetconfiglist(void)
 {
-	errno = EOPNOTSUPP;
+	char buffer[1024];
+	char *line;
+	int linenum, entries = 0;
+	FILE *file = NULL;
+	struct netconfig *nc = NULL, *nclist = NULL, **nclistp = &nclist;
+	struct __nsl_tsd *tsd = __nsl_get_tsd();
+
+	if ((file = fopen(NETCONFIG, "r")) == NULL)
+		goto openfail;
+
+	/* read file one line at a time */
+	for (linenum = 1; (line = fgets(buffer, sizeof(buffer), file)) != NULL; linenum++) {
+		char *str, *field, *tmp = NULL;
+		int fieldnum;
+
+		/* allocate one if we don't already have one */
+		if (nc == NULL) {
+			if ((nc = malloc(sizeof(*nc))) == NULL)
+				goto nomem;
+			memset(nc, 0, sizeof(*nc));
+		}
+		if ((nc_line(nc) = strdup(line)) == 0)
+			goto nomem;
+
+		for (str = nc_line(nc), fieldnum = 0; fieldnum <= 6
+		     && (field = strtok_r(str, " \t\f\n\r\v", &tmp)) != NULL;
+		     str = NULL, fieldnum++) {
+			switch (fieldnum) {
+			case 0:	/* network id field */
+				if (field[0] == '#')
+					break;
+				nc->nc_netid = field;
+				continue;
+			case 1:	/* semantics field */
+				if (strcmp(field, "tpi_clts") == 0) {
+					nc->nc_semantics = NC_TPI_CLTS;
+				} else if (strcmp(field, "tpi_cots") == 0) {
+					nc->nc_semantics = NC_TPI_COTS;
+				} else if (strcmp(field, "tpi_cots_ord") == 0) {
+					nc->nc_semantics = NC_TPI_COTS_ORD;
+				} else if (strcmp(field, "tpi_raw") == 0) {
+					nc->nc_semantics = NC_TPI_RAW;
+				} else {
+					tsd->ncerror = NC_BADLINE;
+					tsd->fieldnum = fieldnum;
+					tsd->linenum = linenum;
+					break;
+				}
+				continue;
+			case 2:	/* flag field */
+				nc->nc_flag = 0;
+				if (strcmp(field, "-") == 0)
+					continue;
+				if (strspn(field, "vb") != strlen(field)) {
+					tsd->ncerror = NC_BADLINE;
+					tsd->fieldnum = fieldnum;
+					tsd->linenum = linenum;
+					break;
+				}
+				if (strchr(field, 'v'))
+					nc->nc_flag |= NC_VISIBLE;
+				if (strchr(field, 'b'))
+					nc->nc_flag |= NC_BROADCAST;
+				continue;
+			case 3:	/* protofamily field */
+				if (strcmp(field, "-") == 0)
+					continue;
+				nc->nc_protofmly = field;
+				continue;
+			case 4:	/* protocol field */
+				if (strcmp(field, "-") == 0)
+					continue;
+				nc->nc_proto = field;
+				continue;
+			case 5:	/* device field */
+				nc->nc_device = field;
+				continue;
+			case 6:	/* nametoaddrlibs field */
+				if (strcmp(field, "-") == 0)
+					continue;
+				{
+					int i;
+					char *lib;
+					char *list;
+					char *tmp2 = NULL;
+
+					/* count them */
+					for (i = 1, lib = field; (lib = strpbrk(lib, ","));
+					     i++, lib++) ;
+					if ((nc->nc_lookups = calloc(i, sizeof(char *))) == NULL) {
+						tsd->ncerror = NC_NOMEM;
+						break;
+					}
+					nc->nc_nlookups = i;
+
+					for (list = field, i = 0; i < 16 &&
+					     (lib = strtok_r(list, ",", &tmp2)); list = NULL, i++)
+						nc->nc_lookups[i] = lib;
+				}
+				continue;
+			}
+			break;
+		}
+		if (fieldnum == 0) {
+			if (field == NULL || field[0] == '#') {
+				free(nc_line(nc));
+				nc_line(nc) = NULL;
+				continue;	/* skip blank or comment lines */
+			}
+		}
+		if (fieldnum != 6)
+			goto error;
+		/* good entry - add it to the list */
+		*nclistp = nc;
+		nclistp = nc_nextp(nc);
+		nc = NULL;
+		entries++;
+	}
+	{
+		struct netconfig **ncp;
+		int i;
+
+		/* create master array */
+		if ((ncp = calloc(entries + 1, sizeof(struct netconfig *))) == NULL) {
+			tsd->ncerror = NC_NOMEM;
+			goto error;
+		}
+		for (nc = nclist, i = 0; i < entries; i++) {
+			ncp[i] = nc;
+			nc = nc_next(nc);
+		}
+		ncp[entries] = NULL;
+
+		__nsl_nc_list = ncp;
+		return (ncp);
+	}
+      nomem:
+	tsd->ncerror = NC_NOMEM;
+	goto error;
+      openfail:
+	tsd->ncerror = NC_OPENFAIL;
+	goto error;
+      error:
+	if (nc != NULL) {
+		*nclistp = nc;
+		nclistp = nc_nextp(nc);
+		nc = NULL;
+	}
+	while ((nc = nclist)) {
+		nclist = nc_next(nc);
+		if (nc_line(nc) != NULL)
+			free(nc_line(nc));
+		if (nc->nc_lookups != NULL)
+			free(nc->nc_lookups);
+		free(nc);
+	}
+	if (file != NULL)
+		fclose(file);
 	return (NULL);
 }
 
-struct netconfig *getnetconfig(void *handle)
-    __attribute__ ((weak, alias("__nsl_getnetconfig")));
+static struct netconfig **
+__nsl_getnetconfiglist(void)
+{
+	struct netconfig **ncp;
+
+	pthread_rwlock_rdlock(&__nsl_nc_lock);
+	if ((ncp = __nsl_nc_list) != NULL) {
+		pthread_rwlock_unlock(&__nsl_nc_lock);
+		return (ncp);
+	}
+	pthread_rwlock_unlock(&__nsl_nc_lock);
+	pthread_rwlock_wrlock(&__nsl_nc_lock);
+	if ((ncp = __nsl_nc_list) != NULL) {
+		pthread_rwlock_unlock(&__nsl_nc_lock);
+		return (ncp);
+	}
+	ncp = __nsl_loadnetconfiglist();
+	pthread_rwlock_unlock(&__nsl_nc_lock);
+	return (ncp);
+}
 
 /**
  * @fn void *setnetconfig(void);
@@ -555,12 +731,63 @@ struct netconfig *getnetconfig(void *handle)
 void *
 __nsl_setnetconfig(void)
 {
-	errno = EOPNOTSUPP;
-	return (NULL);
+	struct netconfig **ncp;
+	struct netconf_handle *nh = NULL;
+
+	if ((ncp = __nsl_getnetconfiglist()) == NULL)
+		return (NULL);
+	if ((nh = malloc(sizeof(*nh))) == NULL) {
+		nc_error = NC_NOMEM;
+		return (NULL);
+	}
+	pthread_rwlock_init(&nh->nh_lock, NULL);
+	nh->nh_head = ncp;
+	nh->nh_curr = ncp;
+	nc_error = NC_NOERROR;
+	return ((void *) nh);
 }
 
 void *setnetconfig(void)
     __attribute__ ((weak, alias("__nsl_setnetconfig")));
+
+/**
+ * @fn struct netconfig *getnetconfig(void *handle);
+ * @brief Retrieve next entry in the netconfig database.
+ * @param handle handle returned by setnetconfig().
+ *
+ * This function returns a pointer to the current entry in the netconfig
+ * database, formatted as a struct netconfig.  Successive calls will return
+ * successive netconfig entries in the netconfig database.  This function can be
+ * used to search the entire netconfig file.  This function returns NULL at the
+ * end of the file.  handle is a the handle obtained through setnetconfig().
+ */
+struct netconfig *
+__nsl_getnetconfig(void *handle)
+{
+	struct netconf_handle *nh = (struct netconf_handle *) handle;
+	struct netconfig *nc;
+
+	pthread_rwlock_rdlock(&__nsl_nc_lock);
+	if (__nsl_nc_list == NULL || nh == NULL) {
+		nc_error = NC_NOSET;
+		pthread_rwlock_unlock(&__nsl_nc_lock);
+		return (NULL);
+	}
+	pthread_rwlock_unlock(&__nsl_nc_lock);
+	pthread_rwlock_wrlock(&nh->nh_lock);
+	if (!(nc = *(nh->nh_curr))) {
+		nc_error = NC_NOMOREENTRIES;
+		pthread_rwlock_unlock(&nh->nh_lock);
+		return (NULL);
+	}
+	nh->nh_curr++;
+	nc_error = NC_NOERROR;
+	pthread_rwlock_unlock(&nh->nh_lock);
+	return (nc);
+}
+
+struct netconfig *getnetconfig(void *handle)
+    __attribute__ ((weak, alias("__nsl_getnetconfig")));
 
 /**
  * @fn int endnetconfig(void *handle);
@@ -581,8 +808,20 @@ void *setnetconfig(void)
 int
 __nsl_endnetconfig(void *handle)
 {
-	errno = EOPNOTSUPP;
-	return (-1);
+	struct netconf_handle *nh = (struct netconf_handle *) handle;
+
+	pthread_rwlock_rdlock(&__nsl_nc_lock);
+	if (__nsl_nc_list == NULL || nh == NULL) {
+		nc_error = NC_NOSET;
+		pthread_rwlock_unlock(&__nsl_nc_lock);
+		return (-1);
+	}
+	pthread_rwlock_unlock(&__nsl_nc_lock);
+	/* strange thing to do, no? */
+	pthread_rwlock_wrlock(&nh->nh_lock);
+	free(nh);
+	nc_error = NC_NOERROR;
+	return (0);
 }
 
 int endnetconfig(void *handle)
@@ -603,28 +842,80 @@ int endnetconfig(void *handle)
 struct netconfig *
 __nsl_getnetconfigent(const char *netid)
 {
-	errno = EOPNOTSUPP;
-	return (NULL);
+	struct netconfig **ncp, *nc_new = NULL;
+
+	if ((ncp = __nsl_getnetconfiglist())) {
+		nc_error = NC_NOTFOUND;
+		for (; *ncp; ++ncp) {
+			if (strcmp((*ncp)->nc_netid, netid) == 0) {
+				if ((nc_new = malloc(sizeof(*nc_new))) == NULL) {
+					nc_error = NC_NOMEM;
+					break;
+				}
+				memset(nc_new, 0, sizeof(*nc_new));
+				if ((nc_line(nc_new) = strdup(nc_line(*ncp))) == NULL) {
+					free(nc_new);
+					nc_error = NC_NOMEM;
+					break;
+				}
+				if ((*ncp)->nc_nlookups > 0) {
+					int i;
+
+					nc_new->nc_nlookups = (*ncp)->nc_nlookups;
+					nc_new->nc_lookups =
+					    calloc((*ncp)->nc_nlookups, sizeof(char *));
+					if (nc_new->nc_lookups == NULL) {
+						free(nc_line(nc_new));
+						free(nc_new);
+						nc_error = NC_NOMEM;
+						break;
+					}
+					memcpy(nc_new->nc_lookups, (*ncp)->nc_lookups,
+					       (*ncp)->nc_nlookups * sizeof(char *));
+					/* reindex everything into the new line */
+					nc_new->nc_netid =
+					    (*ncp)->nc_netid - nc_line(*ncp) + nc_line(nc_new);
+					nc_new->nc_protofmly =
+					    (*ncp)->nc_protofmly - nc_line(*ncp) + nc_line(nc_new);
+					nc_new->nc_proto =
+					    (*ncp)->nc_proto - nc_line(*ncp) + nc_line(nc_new);
+					nc_new->nc_device =
+					    (*ncp)->nc_device - nc_line(*ncp) + nc_line(nc_new);
+					for (i = 0; i < (*ncp)->nc_nlookups; i++)
+						nc_new->nc_lookups[i] =
+						    (*ncp)->nc_lookups[i] - nc_line(*ncp) +
+						    nc_line(nc_new);
+				}
+				nc_error = NC_NOERROR;
+				break;
+			}
+		}
+	}
+	return (nc_new);
 }
 
 struct netconfig *getnetconfigent(const char *netid)
     __attribute__ ((weak, alias("__nsl_getnetconfigent")));
 
 /**
- * @fn void freenetconfigent(struct netconfig *netconfig);
+ * @fn void freenetconfigent(struct netconfig *nc);
  * @brief Free a netconfig database entry.
- * @param netconfig the database entry to free.
+ * @param nc the database entry to free.
  *
- * This function frees the netconfig structure pointed to by netconfig
- * (previously returned by getneconfigent()).
+ * This function frees the netconfig structure pointed to by nc (previously
+ * returned by getneconfigent()).
  *
  * Upon success, this function returns a pointer to the struct netconfig
  * structure corresponding to the netid; otherwise, it returns NULL.
  */
 void
-__nsl_freenetconfigent(struct netconfig *netconfig)
+__nsl_freenetconfigent(struct netconfig *nc)
 {
-	errno = EOPNOTSUPP;
+	if (nc_line(nc))
+		free(nc_line(nc));
+	if (nc->nc_lookups)
+		free(nc->nc_lookups);
+	free(nc);
 	return;
 }
 
@@ -765,6 +1056,91 @@ void nc_perror(const char *msg)
     __attribute__ ((weak, alias("__nsl_nc_perror")));
 
 /**
+ * @fn void *setnetpath(void);
+ * @brief Get a handle for network configuration database.
+ *
+ * A call to this function binds to or rewinds NETPATH.  This function must be
+ * called before the first call to getnetpath() and may be called at any other
+ * time.  It returns a handle that is used by getnetpath().
+ *
+ * This function returns a handle that is used by getnetpath().  In case of an
+ * error, this function returns NULL.  nc_perror() or nc_sperror() can be used
+ * to print out the reason for failure.  See getnetconfig().
+ */
+void *
+__nsl_setnetpath(void)
+{
+	struct netconfig **ncp, **ncplist, **ncpath = NULL, **ncpath_new;
+	struct netconf_handle *nh = NULL;
+	char *path;
+	int entries = 0;
+
+	if ((ncplist = __nsl_getnetconfiglist()) == NULL)
+		return (NULL);
+	if ((path = getenv(NETPATH)) == NULL) {
+		for (ncp = ncplist; *ncp; ncp++) {
+			if ((*ncp)->nc_flag & NC_VISIBLE) {
+				if (!
+				    (ncpath_new = realloc(ncpath, (entries + 1) * sizeof(*ncpath))))
+					goto nomem;
+				ncpath = ncpath_new;
+				ncpath[entries++] = *ncp;
+			}
+		}
+	} else {
+		char *str, *token, *tmp = NULL;
+
+		if ((path = strdup(path)) == NULL)
+			goto nomem;
+		for (str = path; (token = strtok_r(str, ":", &tmp)); str = NULL) {
+			for (ncp = ncplist; *ncp; ncp++) {
+				if (strcmp((*ncp)->nc_netid, token) == 0) {
+					if (!(ncpath_new =
+					      realloc(ncpath, (entries + 1) * sizeof(*ncpath))))
+						goto nomem;
+					ncpath = ncpath_new;
+					ncpath[entries++] = *ncp;
+					break;
+				}
+			}
+		}
+	}
+	if (entries == 0)
+		goto notfound;
+	if (!(ncpath_new = realloc(ncpath, (entries + 1) * sizeof(*ncpath))))
+		goto nomem;
+	ncpath = ncpath_new;
+	ncpath[entries++] = NULL;
+	if ((nh = malloc(sizeof(*nh))) == NULL)
+		goto nomem;
+	memset(nh, 0, sizeof(*nh));
+	pthread_rwlock_init(&nh->nh_lock, NULL);
+	nh->nh_head = ncpath;
+	nh->nh_curr = ncpath;
+	nc_error = NC_NOERROR;
+	return ((void *) nh);
+
+      notfound:
+	nc_error = NC_NOTFOUND;
+	goto error;
+      nomem:
+	nc_error = NC_NOMEM;
+	goto error;
+      error:
+	if (path)
+		free(path);
+	if (ncpath)
+		free(ncpath);
+	if (nh)
+		free(nh);
+	return (NULL);
+
+}
+
+void *setnetpath(void)
+    __attribute__ ((weak, alias("__nsl_setnetpath")));
+
+/**
  * @fn struct netconfig *getnetpath(void *handle);
  * @brief Get the next entry associated with handle.
  * @param handle a pointer to the handle returned by setnetpath().
@@ -792,34 +1168,11 @@ void nc_perror(const char *msg)
 struct netconfig *
 __nsl_getnetpath(void *handle)
 {
-	errno = EOPNOTSUPP;
-	return (NULL);
+	return __nsl_getnetconfig(handle);
 }
 
 struct netconfig *getnetpath(void *handle)
     __attribute__ ((weak, alias("__nsl_getnetpath")));
-
-/**
- * @fn void *setnetpath(void);
- * @brief Get a handle for network configuration database.
- *
- * A call to this function binds to or rewinds NETPATH.  This function must be
- * called before the first call to getnetpath() and may be called at any other
- * time.  It returns a handle that is used by getnetpath().
- *
- * This function returns a handle that is used by getnetpath().  In case of an
- * error, this function returns NULL.  nc_perror() or nc_sperror() can be used
- * to print out the reason for failure.  See getnetconfig().
- */
-void *
-__nsl_setnetpath(void)
-{
-	errno = EOPNOTSUPP;
-	return (NULL);
-}
-
-void *setnetpath(void)
-    __attribute__ ((weak, alias("__nsl_setnetpath")));
 
 /**
  * @fn int endnetpath(void *handle);
@@ -838,8 +1191,21 @@ void *setnetpath(void)
 int
 __nsl_endnetpath(void *handle)
 {
-	errno = EOPNOTSUPP;
-	return (-1);
+	struct netconf_handle *nh = (struct netconf_handle *) handle;
+
+	pthread_rwlock_rdlock(&__nsl_nc_lock);
+	if (__nsl_nc_list == NULL || nh == NULL) {
+		nc_error = NC_NOSET;
+		pthread_rwlock_unlock(&__nsl_nc_lock);
+		return (-1);
+	}
+	pthread_rwlock_unlock(&__nsl_nc_lock);
+	/* strange thing to do, no? */
+	pthread_rwlock_wrlock(&nh->nh_lock);
+	free(nh->nh_head);
+	free(nh);
+	nc_error = NC_NOERROR;
+	return (0);
 }
 
 int endnetpath(void *handle)
@@ -850,48 +1216,242 @@ int endnetpath(void *handle)
  *  ======================================
  */
 
-pthread_rwlock_t __nsl_xlate_lock = PTHREAD_RWLOCK_INITIALIZER;
+static pthread_rwlock_t __nsl_xlate_lock = PTHREAD_RWLOCK_INITIALIZER;
 
 struct __nsl_xlate {
-	struct __nsl_xlate *next;
-	char *path;
-	struct nd_addrlist *(*getbyname) (struct netconfig *, struct nd_hostserv *);
-	struct nd_hostservlist *(*getbyaddr) (struct netconfig *, struct netbuf *);
-	int (*options) (struct netconfig *, int, int, char *);
-	char *(*taddr2_uaddr) (struct netconfig *, struct netbuf *);
-	struct netbuf *(*uaddr2_taddr) (struct netconfig *, struct netbuf *);
-	void *lib;
+	struct __nsl_xlate *next;	/* next in list */
+	char *path;			/* full path to library */
+	nd_gbn_t gbn;			/* _netdir_getbyname */
+	nd_gba_t gba;			/* _netdir_getbyaddr */
+	nd_opt_t opt;			/* _netdir_options */
+	nd_t2u_t t2u;			/* _taddr2uaddr */
+	nd_u2t_t u2t;			/* _uaddr2taddr */
+	void *lib;			/* dlopen pointer */
 } *__nsl_xlate_list = NULL;
 
-extern struct __nsl_xlate *load_xlate(const char *name);
+/*
+ *  A little explanation is in order here.  SVR4 provides NSS defaults for inet
+ *  if name to address translation libraries are not specified.  The functions
+ *  below accomplish this.  However, they are here defined as weak undefined
+ *  symbols and they only come into effect if the libn2a_inet library is linked.
+ *  Also, as the libn2a_inet library also defines the netdir symbols, this
+ *  library can also be specified as a name-to-address translation library in
+ *  netconfig.  libn2a_inet is provided separately by the strinet package.
+ */
+extern struct nd_addrlist *__inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service);
+extern struct nd_hostservlist *__inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr);
+extern int __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta);
+extern char *__inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
+extern struct netbuf *__inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
+extern char *__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr);
+
+#pragma weak __inet_netdir_getbyname
+#pragma weak __inet_netdir_getbyaddr
+#pragma weak __inet_netdir_options
+#pragma weak __inet_taddr2uaddr
+#pragma weak __inet_uaddr2taddr
+#pragma weak __inet_netdir_mergeaddr
 
 /**
- * @fn int netdir_getbyname(struct netconfig *config, struct nd_hostserv *service, struct nd_addrlist **addrs);
+ * @fn static struct __nsl_xlate *__nsl_load_xlate(const char *name);
+ * @brief Load a name-to-address translation library.
+ * @param name the name of the library to load.
+ */
+static struct __nsl_xlate *
+__nsl_load_xlate(const char *name)
+{
+	struct __nsl_xlate *xl;
+
+	pthread_rwlock_wrlock(&__nsl_xlate_lock);
+	for (xl = __nsl_xlate_list; xl; xl = xl->next)
+		if (strcmp(name, xl->path) == 0)
+			goto found;
+	if ((xl = malloc(sizeof(*xl))) == NULL)
+		goto nomem;
+	memset(xl, 0, sizeof(*xl));
+	if ((xl->path = strdup(name)) == NULL)
+		goto nomem;
+	if ((xl->lib = dlopen(name, RTLD_LAZY)) == NULL)
+		goto open;
+	/* resolve all symbols from the n2a library */
+	if ((xl->gbn = (nd_gbn_t) dlsym(xl->lib, "_netdir_getbyname")) == NULL)
+		goto nosym;
+	if ((xl->gba = (nd_gba_t) dlsym(xl->lib, "_netdir_getbyaddr")) == NULL)
+		goto nosym;
+	if ((xl->opt = (nd_opt_t) dlsym(xl->lib, "_netdir_options")) == NULL)
+		goto nosym;
+	if ((xl->t2u = (nd_t2u_t) dlsym(xl->lib, "_netdir_taddr2uaddr")) == NULL)
+		goto nosym;
+	if ((xl->u2t = (nd_u2t_t) dlsym(xl->lib, "_netdir_uaddr2taddr")) == NULL)
+		goto nosym;
+	xl->next = __nsl_xlate_list;
+	__nsl_xlate_list = xl;
+	goto found;
+      nosym:
+	_nderror = ND_NOSYM;
+	goto error;
+      open:
+	_nderror = ND_OPEN;
+	goto error;
+      nomem:
+	_nderror = ND_NOMEM;
+	goto error;
+      error:
+	if (xl != NULL) {
+		if (xl->lib != NULL)
+			dlclose(xl->lib);
+		if (xl->path != NULL)
+			free(xl->path);
+		free(xl);
+		xl = NULL;
+	}
+      found:
+	pthread_rwlock_unlock(&__nsl_xlate_lock);
+	return (xl);
+}
+
+/**
+ * @internal Deep free a netbuf structure.
+ * @param b the netbuf structure to free.
+ */
+static void
+__freenetbuf(struct netbuf *b)
+{
+	if (b) {
+		if (b->buf)
+			free(b->buf);
+		free(b);
+	}
+}
+
+/**
+ * @internal Deep free an nd_addrlist structure.
+ * @param n the nd_addrlist structure to free.
+ */
+static void
+__freeaddrlist(struct nd_addrlist *n)
+{
+	if (n) {
+		int i;
+		struct netbuf *b;
+
+		if ((b = n->n_addrs)) {
+			for (i = 0; i < n->n_cnt; i++, b++) {
+				if (b->buf)
+					free(b->buf);
+			}
+			free(n->n_addrs);
+		}
+		free(n);
+	}
+}
+
+/**
+ * @internal Deep free an nd_hostserv structure.
+ * @param n the nd_hostserv structure to free.
+ */
+static void
+__freehostserv(struct nd_hostserv *h)
+{
+	if (h) {
+		if (h->h_name)
+			free(h->h_name);
+		if (h->h_serv)
+			free(h->h_serv);
+		free(h);
+	}
+}
+
+/**
+ * @internal Deep free an nd_hostservlist structure.
+ * @param n the nd_hostservlist structure to free.
+ */
+static void
+__freehostservlist(struct nd_hostservlist *hl)
+{
+	if (hl) {
+		int i;
+		struct nd_hostserv *h;
+
+		if ((h = hl->h_hostservs)) {
+			for (i = 0; i < hl->h_cnt; i++, h++) {
+				if (h->h_name)
+					free(h->h_name);
+				if (h->h_serv)
+					free(h->h_serv);
+			}
+			free(hl->h_hostservs);
+		}
+		free(hl);
+	}
+}
+
+/**
+ * @fn static struct __nsl_xlate * __nsl_lookup_xlate(const char *name);
+ * @brief Lookup a name-to-address translation library.
+ * @param name the name of the library to look up.
+ *
+ * This function looks up the name-to-address translation library under read
+ * lock.  Libraries, once loaded are never unloaded so this will work.
+ */
+static struct __nsl_xlate *
+__nsl_lookup_xlate(const char *name)
+{
+	struct __nsl_xlate *xl;
+
+	pthread_rwlock_rdlock(&__nsl_xlate_lock);
+	for (xl = __nsl_xlate_list; xl; xl = xl->next)
+		if (strcmp(name, xl->path) == 0)
+			break;
+	pthread_rwlock_unlock(&__nsl_xlate_lock);
+	if (xl != NULL)
+		return (xl);
+	return (__nsl_load_xlate(name));
+}
+
+/**
+ * @fn int netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service, struct nd_addrlist **addrs);
  * @brief Map machine and service name to transport addresses.
- * @param config pointer to transport configuration data structure.
+ * @param nc pointer to transport configuration data structure.
  * @param service pointer to nd_hostserv structure identifying machine and service name.
  * @param addrs returned pointer to allocated nd_addrlist representing the resulting transport addresses.
  *
- * This function converts the machine anem and service name in the nd_hostserv
+ * This function converts the machine name and service name in the nd_hostserv
  * structure to a collection of addresses of the type understood by the
  * transport identified in the netconfig structure.
  */
 int
-__nsl_netdir_getbyname(struct netconfig *config, struct nd_hostserv *service,
+__nsl_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service,
 		       struct nd_addrlist **addrs)
 {
-	errno = EOPNOTSUPP;
+	if (nc == NULL) {
+		_nderror = ND_BADARG;
+	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0 && __inet_netdir_getbyname) {
+		return ((*addrs = __inet_netdir_getbyname(nc, service)) ? 0 : -1);
+	} else {
+		struct __nsl_xlate *xl;
+		int i;
+
+		for (i = 0; i < nc->nc_nlookups; i++) {
+			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
+			    && (*addrs = (*xl->gbn) (nc, service)))
+				return (0);
+			if (_nderror < 0)
+				return (-1);
+		}
+		if (i == 1)
+			_nderror = ND_NO_RECOVERY;
+	}
 	return (-1);
 }
 
-int netdir_getbyname(struct netconfig *config, struct nd_hostserv *service,
-		     struct nd_addrlist **addrs)
+int netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service, struct nd_addrlist **addrs)
     __attribute__ ((weak, alias("__nsl_netdir_getbyname")));
 
 /**
- * @fn int netdir_getbyaddr(struct netconfig *config, struct nd_hostservlist **service, struct netbuf *netaddr);
+ * @fn int netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service, struct netbuf *netaddr);
  * @brief Map transport address to a collection of machine and service names.
- * @param config pointer to transport configuration data structure.
+ * @param nc pointer to transport configuration data structure.
  * @param service returned pointer to a nd_hostservlist structure identifying the machine and service names.
  * @param netaddr pointer to a netbuf structure describing the transport address.
  *
@@ -901,51 +1461,32 @@ int netdir_getbyname(struct netconfig *config, struct nd_hostserv *service,
  * contains the preferred host and service names.
  */
 int
-__nsl_netdir_getbyaddr(struct netconfig *config, struct nd_hostservlist **service,
+__nsl_netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service,
 		       struct netbuf *netaddr)
 {
-	if (config == NULL) {
+	if (nc == NULL) {
 		_nderror = ND_BADARG;
-	} else if (config->nc_lookups == 0
-		   && (strcmp(config->nc_protofmly, NC_INET) == 0
-		       || strcmp(config->nc_protofmly, NC_INET6) == 0)) {
+	} else if (nc->nc_lookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0
+		   && __inet_netdir_getbyaddr) {
+		return ((*service = __inet_netdir_getbyaddr(nc, netaddr)) ? 0 : -1);
 	} else {
-		struct __nsl_xlate *xl = NULL;
-		char *lib = NULL;
+		struct __nsl_xlate *xl;
 		int i;
 
-		_nderror = ND_SYSTEM;
-		for (i = 0; i < config->nc_nlookups; i++) {
-			lib = config->nc_lookups[i];
-			for (xl = __nsl_xlate_list; xl; xl = xl->next) {
-				if (strcmp(lib, xl->path) == 0) {
-					if ((*service = (*xl->getbyaddr) (config, netaddr)) != NULL)
-						return (ND_OK);
-					if (_nderror < 0)
-						return (_nderror);
-				}
-			}
-
+		for (i = 0; i < nc->nc_nlookups; i++) {
+			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
+			    && (*service = (*xl->gba) (nc, netaddr)) != NULL)
+				return (0);
+			if (_nderror < 0)
+				return (-1);
 		}
-		if (xl == NULL) {
-			/* could not find translation library */
-			if ((xl = load_xlate(lib)) != NULL) {
-				pthread_rwlock_wrlock(&__nsl_xlate_lock);
-				xl->next = __nsl_xlate_list;
-				__nsl_xlate_list = xl;
-				pthread_rwlock_unlock(&__nsl_xlate_lock);
-				if ((*service = (*xl->getbyaddr) (config, netaddr)) != NULL)
-					return (ND_OK);
-				if (_nderror < 0)
-					return (_nderror);
-			}
-		}
+		if (i == 1)
+			_nderror = ND_NO_RECOVERY;
 	}
-	return (_nderror);
+	return (-1);
 }
 
-int netdir_getbyaddr(struct netconfig *config, struct nd_hostservlist **service,
-		     struct netbuf *netaddr)
+int netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service, struct netbuf *netaddr)
     __attribute__ ((weak, alias("__nsl_netdir_getbyaddr")));
 
 /**
@@ -969,58 +1510,13 @@ __nsl_netdir_free(void *ptr, int struct_type)
 	}
 	switch (struct_type) {
 	case ND_ADDR:
-	{
-		struct netbuf *na;
-
-		na = (struct netbuf *) ptr;
-		if (na->buf)
-			free(na->buf);
-		free(na);
-		break;
-	}
+		return __freenetbuf((struct netbuf *)ptr);
 	case ND_ADDRLIST:
-	{
-		struct nd_addrlist *nal;
-		int i;
-
-		nal = (struct nd_addrlist *) ptr;
-		for (i = 0; i < nal->n_cnt; i++)
-			if (nal->n_addrs[i].buf)
-				free(nal->n_addrs[i].buf);
-		if (nal->n_addrs)
-			free(nal->n_addrs);
-		free(nal);
-		break;
-	}
+		return __freeaddrlist((struct nd_addrlist *)ptr);
 	case ND_HOSTSERV:
-	{
-		struct nd_hostserv *nhs;
-
-		nhs = (struct nd_hostserv *) ptr;
-		if (nhs->h_name)
-			free(nhs->h_name);
-		if (nhs->h_serv)
-			free(nhs->h_serv);
-		free(nhs);
-		break;
-	}
+		return __freehostserv((struct nd_hostserv *)ptr);
 	case ND_HOSTSERVLIST:
-	{
-		struct nd_hostservlist *nhsl;
-		int i;
-
-		nhsl = (struct nd_hostservlist *) ptr;
-		for (i = 0; i < nhsl->h_cnt; i++) {
-			if (nhsl->h_hostservs[i].h_name)
-				free(nhsl->h_hostservs[i].h_name);
-			if (nhsl->h_hostservs[i].h_serv)
-				free(nhsl->h_hostservs[i].h_serv);
-		}
-		if (nhsl->h_hostservs)
-			free(nhsl->h_hostservs);
-		free(nhsl);
-		break;
-	}
+		return __freehostservlist((struct nd_hostservlist *)ptr);
 	default:
 		_nderror = ND_UKNWN;
 		break;
@@ -1032,33 +1528,49 @@ void netdir_free(void *ptr, int struct_type)
     __attribute__ ((weak, alias("__nsl_netdir_free")));
 
 /**
- * @fn int netdir_options(struct netconfig *config, int option, int fd, char *point_to_args);
+ * @fn int netdir_options(struct netconfig *nc, int option, int fd, char *pta);
  * @brief manage universal transport options.
- * @param config pointer to transport configuration structure.
+ * @param nc pointer to transport configuration structure.
  * @param universal option option to manage.
  * @param fd transport endpoint file descriptor.
- * @param point_to_args arguments to set.
+ * @param pta arguments to set.
  *
  * This function is used to do all transport specific setups and option
  * management.  fd is the associated file descriptor.  option, fd, and
- * pointer_to_args are passed ot the netdir_options() function for the
- * transport specified in config.
+ * pointer_to_args are passed to the netdir_options() function for the
+ * transport specified in nc.
  */
 int
-__nsl_netdir_options(struct netconfig *config, int option, int fd, char *point_to_args)
+__nsl_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 {
-	errno = EOPNOTSUPP;
+	if (nc == NULL) {
+		_nderror = ND_BADARG;
+	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0 && __inet_netdir_options) {
+		return (__inet_netdir_options(nc, option, fd, pta));
+	} else {
+		struct __nsl_xlate *xl;
+		int i;
+
+		for (i = 0; i < nc->nc_nlookups; i++) {
+			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
+			    && (*xl->opt) (nc, option, fd, pta) == 0)
+				return (0);
+			if (_nderror < 0)
+				return (-1);
+		}
+		_nderror = ND_FAILCTRL;
+	}
 	return (-1);
 }
 
-int netdir_options(struct netconfig *config, int option, int fd, char *point_to_args)
+int netdir_options(struct netconfig *nc, int option, int fd, char *pta)
     __attribute__ ((weak, alias("__nsl_netdir_options")));
 
 /**
- * @fn char *taddr2uaddr(struct netconfig *config, struct netbuf *addr);
+ * @fn char *taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
  * @brief Converts a transport address to a universal address.
- * @param config a pointer to the transport configuration data structure.
- * @param addr the transport address to convert.
+ * @param nc a pointer to the transport configuration data structure.
+ * @param taddr the transport address to convert.
  *
  * This function supports transaltion between universal addresses and TLI type
  * netbufs.  The taddr2uaddr() function takes a struct netbuf data structure
@@ -1067,32 +1579,73 @@ int netdir_options(struct netconfig *config, int option, int fd, char *point_to_
  * condition as some transports do not support a universal address form.
  */
 char *
-__nsl_taddr2uaddr(struct netconfig *config, struct netbuf *addr)
+__nsl_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 {
-	errno = EOPNOTSUPP;
+	if (nc == NULL) {
+		_nderror = ND_BADARG;
+	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0
+		   && __inet_taddr2uaddr) {
+		return (__inet_taddr2uaddr(nc, taddr));
+	} else {
+		struct __nsl_xlate *xl;
+		char *uaddr;
+		int i;
+
+		for (i = 0; i < nc->nc_nlookups; i++) {
+			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
+			    && (uaddr = (*xl->t2u) (nc, taddr)))
+				return (uaddr);
+			if (_nderror < 0)
+				return (NULL);
+		}
+		if (i == 1)
+			_nderror = ND_NO_RECOVERY;
+	}
 	return (NULL);
 }
 
-char *taddr2uaddr(struct netconfig *config, struct netbuf *addr)
+char *taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
     __attribute__ ((weak, alias("__nsl_taddr2uaddr")));
 
 /**
- * @fn struct netbuf *uaddr2taddr(struct netconfig *config, struct netbuf *addr);
+ * @fn struct netbuf *uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
  * @brief Converts a universal address to a transport address.
- * @param config a pointer to the transport configuration data structure.
- * @param addr the universal address to convert.
+ * @param nc a pointer to the transport configuration data structure.
+ * @param uaddr the universal address to convert.
  *
  * This function is the reverse of the taddr2uaddr() function. It returns the
  * struct netbuf data structure for the given universal address.
+ *
+ * It is wierd that noone documents what happens if there are no
+ * name-to-address translation libraries and this function is called.
  */
 struct netbuf *
-__nsl_uaddr2taddr(struct netconfig *config, struct netbuf *addr)
+__nsl_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 {
-	errno = EOPNOTSUPP;
+	if (nc == NULL) {
+		_nderror = ND_BADARG;
+	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0
+		   && __inet_uaddr2taddr) {
+		return (__inet_uaddr2taddr(nc, uaddr));
+	} else {
+		struct __nsl_xlate *xl = NULL;
+		struct netbuf *taddr;
+		int i;
+
+		for (i = 0; i < nc->nc_nlookups; i++) {
+			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
+			    && (taddr = (*xl->u2t) (nc, uaddr)))
+				return (taddr);
+			if (_nderror < 0)
+				return (NULL);
+		}
+		if (i == 1)
+			_nderror = ND_NO_RECOVERY;
+	}
 	return (NULL);
 }
 
-struct netbuf *uaddr2taddr(struct netconfig *config, struct netbuf *addr)
+struct netbuf *uaddr2taddr(struct netconfig *nc, struct netbuf *addr)
     __attribute__ ((weak, alias("__nsl_uaddr2taddr")));
 
 /* *INDENT-OFF* */
@@ -1268,6 +1821,476 @@ __nsl_netdir_perror(char *msg)
 }
 void netdir_perror(char *s)
     __attribute__ ((weak, alias("__nsl_netdir_perror")));
+
+/*
+ *  Name-to-Address Translation Function defaults for inet:
+ *  =======================================================
+ */
+
+/**
+ * @brief Inet _netdir_getbyname lookup function.
+ * @param nc transport.
+ * @param h host and service name.
+ *
+ * Converts a host and service name into an address list.  This function uses
+ * the newer getaddrinfo(3) AF_INET lookup call.  It is fairly simplistic.
+ */
+struct nd_addrlist *
+__inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
+{
+	struct addrinfo hints, *res = NULL, *ai;
+	struct nd_addrlist *n = NULL;
+	struct netbuf *b;
+	int cnt;
+
+	hints.ai_flags = 0;
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = 0;
+	hints.ai_protocol = 0;
+	hints.ai_addrlen = 0;
+	hints.ai_addr = NULL;
+
+	if (getaddrinfo(h->h_name, h->h_serv, &hints, &res) == -1) {
+		_nderror = ND_SYSTEM;
+		return (NULL);
+	}
+	/* count them */
+	for (cnt = 0, ai = res; ai; cnt++, ai = ai->ai_next) ;
+	if (cnt == 0) {
+		_nderror = ND_NOHOST;
+		return (NULL);
+	}
+	if ((n = malloc(sizeof(*n))) == NULL)
+		goto nomem;
+	if ((n->n_addrs = calloc(cnt, sizeof(struct netbuf))) == NULL)
+		goto nomem;
+	memset(n->n_addrs, 0, cnt * sizeof(struct netbuf));
+	for (b = n->n_addrs, n->n_cnt = 0, ai = res; n->n_cnt < cnt; b++, n->n_cnt++, ai = ai->ai_next) {
+		if (ai->ai_addr && ai->ai_addrlen > 0) {
+			if ((b->buf = malloc(ai->ai_addrlen)) == NULL)
+				goto nomem;
+			memcpy(b->buf, ai->ai_addr, ai->ai_addrlen);
+			b->len = b->maxlen = ai->ai_addrlen;
+		}
+	}
+	freeaddrinfo(res);
+	return (n);
+      nomem:
+	_nderror = ND_NOMEM;
+	goto error;
+      error:
+	netdir_free(n, ND_ADDRLIST);
+	freeaddrinfo(res);
+	return (NULL);
+}
+
+/**
+ * @brief Inet _netdir_getbyaddr lookup function.
+ * @param nc transport.
+ * @param addr address to lookup.
+ */
+struct nd_hostservlist *
+__inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
+{
+	char hbuf[128];
+	char sbuf[128];
+	char *host = NULL;
+	char *serv = NULL;
+	char **aliasp, **aliases = NULL;
+	struct sockaddr_in *sin;
+	struct servent *s;
+	struct hostent *h;
+	struct nd_hostservlist *hl = NULL;
+	struct nd_hostserv *hs;
+	int cnt;
+
+	if (addr == NULL || addr->buf == NULL || addr->len == 0) {
+		_nderror = ND_BADARG;
+		return (NULL);
+	}
+	if (addr->len < sizeof(*sin)) {
+		_nderror = ND_NO_ADDRESS;
+		return (NULL);
+	}
+	sin = (struct sockaddr_in *) addr->buf;
+	if (sin->sin_family != AF_INET && sin->sin_family != 0) {
+		_nderror = ND_NO_ADDRESS;
+		return (NULL);
+	}
+	if ((s = getservbyport(sin->sin_port, nc->nc_proto)) == NULL) {
+		uint16_t in_port = ntohs(sin->sin_port);
+
+		sprintf(sbuf, "%hd", in_port);
+		serv = sbuf;
+	} else {
+		serv = s->s_name;
+	}
+	if ((h = gethostbyaddr((char *) &sin->sin_addr.s_addr, 4, AF_INET)) == NULL) {
+		uint32_t in_addr = ntohl(sin->sin_addr.s_addr);
+
+		sprintf(hbuf, "%d.%d.%d.%d", (in_addr >> 24) & 0xff, (in_addr >> 16) & 0xff,
+			(in_addr >> 8) & 0xff, (in_addr >> 0) & 0xff);
+		host = hbuf;
+	} else {
+		host = h->h_name;
+		aliases = h->h_aliases;
+	}
+	/* count 'em all */
+	for (cnt = 1, aliasp = h->h_aliases; *aliasp; cnt++, aliasp++) ;
+	if ((hl = malloc(sizeof(*hl))) == NULL)
+		goto nomem;
+	memset(hl, 0, sizeof(*hl));
+	if ((hs = hl->h_hostservs = calloc(cnt, sizeof(struct nd_hostserv))) == NULL)
+		goto nomem;
+	memset(hs, 0, cnt * sizeof(*hs));
+	hl->h_cnt = 1;
+	if ((hs->h_name = strdup(host)) == NULL)
+		goto nomem;
+	if ((hs->h_serv = strdup(serv)) == NULL)
+		goto nomem;
+	hs++;
+	hl->h_cnt++;
+	aliasp = h->h_aliases;
+	for (; *aliasp; aliasp++, hs++, hl->h_cnt++) {
+		if ((hs->h_name = strdup(*aliasp)) == NULL)
+			goto nomem;
+		if ((hs->h_serv = strdup(serv)) == NULL)
+			goto nomem;
+	}
+	return (hl);
+      nomem:
+	_nderror = ND_NOMEM;
+	goto error;
+      error:
+	netdir_free(hl, ND_HOSTSERVLIST);
+	return (NULL);
+}
+
+static int __setoption(int fd, t_scalar_t level, t_scalar_t name, t_scalar_t value);
+static int __setresvport(int fd, struct netbuf *addr);
+static int __checkresvport(struct netbuf *addr);
+static int __joinmulticast(int fd, struct netbuf *addr);
+static int __leavemulticast(int fd, struct netbuf *addr);
+
+int
+__inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
+{
+	switch (option) {
+	case ND_SET_BROADCAST:
+		return (__setoption(fd, T_INET_IP, T_IP_BROADCAST, T_YES));
+	case ND_CLEAR_BROADCAST:
+		return (__setoption(fd, T_INET_IP, T_IP_BROADCAST, T_NO));
+	case ND_SET_REUSEADDR:
+		return (__setoption(fd, T_INET_IP, T_IP_REUSEADDR, T_YES));
+	case ND_CLEAR_REUSEADDR:
+		return (__setoption(fd, T_INET_IP, T_IP_REUSEADDR, T_NO));
+	case ND_SET_RESERVEDPORT:
+		return (__setresvport(fd, (struct netbuf *) pta));
+	case ND_CHECK_RESERVEDPORT:
+		return (__checkresvport((struct netbuf *) pta));
+	case ND_MERGEADDR:
+	{
+		struct nd_mergearg *m = (typeof(m)) (pta);
+
+		if ((m->m_uaddr = __inet_netdir_mergeaddr(nc, m->c_uaddr, m->s_uaddr)))
+			return (0);
+		return (-1);
+	}
+	case ND_JOIN_MULTICAST:
+		return (__joinmulticast(fd, (struct netbuf *) pta));
+	case ND_LEAVE_MULTICAST:
+		return (__leavemulticast(fd, (struct netbuf *) pta));
+	default:
+		_nderror = ND_NOCTRL;
+		return (-1);
+	}
+}
+
+static int
+__setoption(int fd, t_scalar_t level, t_scalar_t name, t_scalar_t value)
+{
+	int state;
+	struct t_optmgmt req, ret;
+	struct {
+		struct t_opthdr hdr;
+		t_scalar_t value;
+	} optbuf;
+
+	_nderror = ND_SYSTEM;
+	if ((state = t_getstate(fd)) != T_UNBND) {
+		if (t_errno == TBADF)
+			errno = EBADF;
+		if (state != -1)
+			errno = EISCONN;
+		return (-1);
+	}
+	optbuf.hdr.len = sizeof(optbuf);
+	optbuf.hdr.level = level;
+	optbuf.hdr.name = name;
+	optbuf.hdr.status = 0;
+	optbuf.value = value;
+	req.opt.buf = (char *) &optbuf;
+	req.opt.len = sizeof(optbuf);
+	req.opt.maxlen = sizeof(optbuf);
+	req.flags = T_NEGOTIATE;
+	ret.opt.buf = NULL;
+	ret.opt.len = 0;
+	ret.opt.maxlen = -1;
+	ret.flags = T_FAILURE;
+	if (t_optmgmt(fd, &req, &ret) == -1) {
+		if (t_errno == TBADF)
+			errno = EBADF;
+		if (t_errno == TBADFLAG)
+			errno = EINVAL;
+		if (t_errno == TBADOPT)
+			errno = EINVAL;
+		if (t_errno == TBUFOVFLW)
+			errno = EINVAL;
+		if (t_errno == TNOTSUPPORT)
+			errno = EOPNOTSUPP;
+		if (t_errno == TOUTSTATE)
+			errno = EPROTO;
+		if (t_errno == TPROTO)
+			errno = EPROTO;
+		return (-1);
+	}
+	if (ret.flags != T_SUCCESS) {
+		_nderror = ND_FAILCTRL;
+		return (-1);
+	}
+	// _nderror = ND_OK;
+	return (0);
+}
+
+static int
+__setresvport(int fd, struct netbuf *addr)
+{
+	/* not implemented yet */
+	_nderror = ND_NOCTRL;
+	return (-1);
+}
+static int
+__checkresvport(struct netbuf *addr)
+{
+	struct sockaddr_in *sin;
+	unsigned short port;
+
+	if (addr == NULL || addr->buf == NULL || addr->len == 0) {
+		_nderror = ND_NO_ADDRESS;
+		return (-1);
+	}
+	if (addr->len < sizeof(*sin)) {
+		_nderror = ND_BADARG;
+		return (-1);
+	}
+	sin = (typeof(sin)) (addr->buf);
+	port = ntohs(sin->sin_port);
+	// _nderror = ND_OK;
+	if (port < IPPORT_RESERVED)
+		return (0);
+	return (1);
+}
+static int
+__joinmulticast(int fd, struct netbuf *addr)
+{
+	/* not implemented yet */
+	_nderror = ND_NOCTRL;
+	return (-1);
+}
+static int
+__leavemulticast(int fd, struct netbuf *addr)
+{
+	/* not implemented yet */
+	_nderror = ND_NOCTRL;
+	return (-1);
+}
+
+/**
+ * @brief Convert an inet transport address to a universal address.
+ * @param nc the transport.
+ * @param taddr the transport address.
+ *
+ * Convert from a trasnsport address to a universal address.  The universal
+ * address is formatted as %d.%d.%d.%d.%d.%d which represents the address and
+ * port number from most significant byte to lease significant byte.  Each
+ * number between the dots is a byte.
+ */
+char *
+__inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
+{
+	struct sockaddr_in *sin;
+	char buf[INET_ADDRSTRLEN + 16], *ret;
+	unsigned short port;
+	int len;
+
+	if (taddr == NULL || taddr->buf == NULL || taddr->len == 0) {
+		_nderror = ND_BADARG;
+		return (NULL);
+	}
+	if (taddr->len < sizeof(*sin)) {
+		_nderror = ND_NO_ADDRESS;
+		return (NULL);
+	}
+	sin = (typeof(sin)) (taddr->buf);
+	port = ntohs(sin->sin_port);
+
+	if (inet_ntop(AF_INET, &sin->sin_addr, buf, sizeof(buf)) == NULL) {
+		_nderror = ND_SYSTEM;
+		return (NULL);
+	}
+	len = strlen(buf);
+	(void) snprintf(buf + len, sizeof(buf) - len, ".%d.%d", port >> 8, port & 0xff);
+	ret = strdup(buf);
+	if (ret == NULL) {
+		_nderror = ND_NOMEM;
+		return (NULL);
+	}
+	return (ret);
+}
+
+/**
+ * @brief Convert a universal address to a transport address.
+ * @param nc the transport.
+ * @param uaddr the universal address.
+ *
+ * Convert from universal address format to one suitable for use with inet.
+ * The universal address is %d.%d.%d.%d.%d.%d which represent the address and
+ * port number from most significant byte to least significant byte.  Each
+ * number between the dots is a byte.
+ */
+struct netbuf *
+__inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
+{
+	struct netbuf *nb = NULL;
+	struct sockaddr_in *sin = NULL;
+	uint32_t addr = 0;
+	unsigned short port = 0;
+	char *beg, *end;
+	int field;
+
+	if (uaddr == NULL || uaddr->buf == NULL || uaddr->len == 0) {
+		_nderror = ND_BADARG;
+		return (NULL);
+	}
+	if (uaddr->len < sizeof(*sin)) {
+		_nderror = ND_NO_ADDRESS;
+		return (NULL);
+	}
+	if ((nb = (typeof(nb)) malloc(sizeof(*nb))) == NULL) {
+		_nderror = ND_NOMEM;
+		return (NULL);
+	}
+	if ((sin = (typeof(sin)) malloc(sizeof(*sin))) == NULL) {
+		free(nb);
+		_nderror = ND_NOMEM;
+		return (NULL);
+	}
+	nb->buf = (char *) sin;
+	nb->maxlen = sizeof(*sin);
+	nb->len = sizeof(*sin);
+
+	for (field = 0, beg = end = uaddr->buf;; field++, beg = end + 1) {
+		ulong value;
+
+		if (field > 5)
+			break;
+		value = strtoul(beg, &end, 10);
+		if (beg == end || (end[0] != '.' && end[0] != '\0')) {
+			field--;
+			break;
+		}
+		if (field <= 3)
+			addr |= (value & 0xff) << (24 - 8 * field);
+		if (field >= 4)
+			port |= (value & 0xff) << (8 - 8 * (field - 4));
+		if (end[0] == '\0')
+			break;
+	}
+	if (field != 5) {
+		free(nb);
+		free(sin);
+		_nderror = ND_NO_ADDRESS;
+		return (NULL);
+	}
+	sin->sin_family = AF_INET;
+	sin->sin_addr.s_addr = htonl(addr);
+	sin->sin_port = htons(port);
+	return (nb);
+}
+
+/**
+ * @brief Merge a server and client address into a merged address.
+ * @param nc the transport.
+ * @param caddr the client universal address.
+ * @param saddr the server universal address.
+ *
+ * When a server address is underspecified (such as 0.0.0.0.1.12) this
+ * function takes a client address (e.g. 192.168.0.5.1.12) and makes the
+ * merged address into a specific address at which the client can contact the
+ * server (possibly 192.168.0.1.1.12 in this case).
+ */
+char *
+__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
+{
+#if 0
+	/* working on it */
+	struct netbuf cbuf, sbuf, mbuf, *cadd = NULL, *sadd = NULL, *madd = NULL;
+	struct sockaddr_in *csin, *ssin, *msin;
+	char *maddr = NULL;
+
+	sbuf.buf = saddr;
+	sbuf.len = sbuf.maxlen = strlen(saddr);
+	if (!(sadd = __inet_uaddr2taddr(nc, &sbuf)))
+		goto error;
+	ssin = (typeof(ssin)) sadd->buf;
+	if (ssin->sin_addr.s_addr != INADDR_ANY) {
+		if ((maddr = strdup(saddr)) == NULL)
+			goto nomem;
+		goto done;
+	}
+
+	cbuf.buf = caddr;
+	cbuf.len = cbuf.maxlen = strlen(caddr);
+	if (!(cadd = __inet_uaddr2taddr(nc, &cbuf)))
+		goto error;
+	csin = (typeof(csin)) cadd->buf;
+	if (ssin->sin_addr.s_addr == INADDR_ANY) {
+		if ((maddr = strdup(saddr)) == NULL)
+			goto nomem;
+		goto done;
+	}
+
+	mbuf.buf = saddr;
+	mbuf.len = mbuf.maxlen = strlen(saddr);
+	if (!(madd = __inet_uaddr2taddr(nc, &mbuf)))
+		goto error;
+	msin = (typeof(msin)) madd->buf;
+
+	/* Need to find the local interface address that is closest to the client address and fill
+	   it out in msin->sin_addr.s_addr. */
+
+	if (!(maddr = __inet_taddr2uaddr(nc, madd)))
+		goto error;
+	goto done;
+
+      nomem:
+	_nderror = ND_NOMEM;
+	goto error;
+      error:
+	if (maddr != NULL) {
+		free(maddr);
+		maddr == NULL;
+	}
+      done:
+	netdir_free(cadd, ND_ADDR);
+	netdir_free(sadd, ND_ADDR);
+	netdir_free(madd, ND_ADDR);
+	return (maddr);
+#endif
+	/* not implemented yet */
+	_nderror = ND_NOCTRL;
+	return (NULL);
+}
 
 /**
  * @section Identification

@@ -61,11 +61,16 @@
 
 #ifdef _REENTRANT
 extern int *__nderror(void);
-#define _nderror (*(__nderror()))
+#define nd_error (*(__nderror()))
+extern char *__nderrbuf(void);
+#define nd_errbuf (__nderrbuf())
 #else
 #warn Compiled without _REENTRANT defined!
-extern int _nderror;
+extern int nd_error;
+extern char *nd_errbuf;
 #endif
+/* compatibility */
+#define _nderror nd_error
 
 struct nd_addrlist {
 	int n_cnt;			/* number of addresses */
@@ -210,15 +215,28 @@ extern void netdir_perror(char *s);
  */
 extern char *netdir_sperror(void);
 
+/* types of symbols from lookup shared objects */
+typedef struct nd_addrlist *(*nd_gbn_t) (struct netconfig *, struct nd_hostserv *);
+typedef struct nd_hostservlist *(*nd_gba_t) (struct netconfig *, struct netbuf *);
+typedef int (*nd_opt_t) (struct netconfig *, int, int, char *);
+typedef char *(*nd_t2u_t) (struct netconfig *, struct netbuf *);
+typedef struct netbuf *(*nd_u2t_t) (struct netconfig *, struct netbuf *);
+typedef char *(*nd_mga_t) (struct netconfig *, char *, char *);
+
 /* symbols from lookup shared objects */
-#if 0
 struct nd_addrlist *_netdir_getbyname(struct netconfig *, struct nd_hostserv *);
 struct nd_hostservlist *_netdir_getbyaddr(struct netconfig *, struct netbuf *);
 int _netdir_options(struct netconfig *, int, int, char *);
 char *_taddr2uaddr(struct netconfig *, struct netbuf *);
 struct netbuf *_uaddr2taddr(struct netconfig *, struct netbuf *);
-char *_netdir_mergeaddr(struct netconfig *, char *uaddr, char *ruaddr);	/* older one */
-#endif
+char *_netdir_mergeaddr(struct netconfig *, char *, char *);
+
+#pragma weak _netdir_getbyname
+#pragma weak _netdir_getbyaddr
+#pragma weak _netdir_options
+#pragma weak _taddr2uaddr
+#pragma weak _uaddr2taddr
+#pragma weak _netdir_mergeaddr
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

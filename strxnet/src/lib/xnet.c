@@ -236,176 +236,58 @@ static char const ident[] =
  *
  * @{
  */
+/*
+ * }
+ */
 
-extern void __pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *),
-				   void *arg);
-extern void __pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute);
-extern void __pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer,
-					 void (*routine) (void *), void *arg);
-extern void __pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute);
-extern void __pthread_testcancel(void);
-extern int __pthread_setcanceltype(int type, int *oldtype);
+struct __xnet_tsd {
+	int terrno;
+};
 
-extern int __pthread_rwlock_init(pthread_rwlock_t * rwlock, const pthread_rwlockattr_t * attr);
-extern int __pthread_rwlock_rdlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_wrlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_unlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_destroy(pthread_rwlock_t * rwlock);
+/*
+ *  Once condition for Thread-Specific Data key creation.
+ */
+static pthread_once_t __xnet_tsd_once = PTHREAD_ONCE_INIT;
 
-#pragma weak __pthread_cleanup_push
-#pragma weak __pthread_cleanup_pop
-#pragma weak __pthread_cleanup_push_defer
-#pragma weak __pthread_cleanup_pop_restore
-#pragma weak __pthread_testcancel
-#pragma weak __pthread_setcanceltype
+/*
+ *  XNET library Thread-Specific Data key.
+ */
+static pthread_key_t __xnet_tsd_key = 0;
 
-#pragma weak __pthread_rwlock_init
-#pragma weak __pthread_rwlock_rdlock
-#pragma weak __pthread_rwlock_wrlock
-#pragma weak __pthread_rwlock_unlock
-#pragma weak __pthread_rwlock_destroy
-
-#pragma weak _pthread_cleanup_push
-#pragma weak _pthread_cleanup_pop
-#pragma weak _pthread_cleanup_push_defer
-#pragma weak _pthread_cleanup_pop_restore
-#pragma weak pthread_testcancel
-#pragma weak pthread_setcanceltype
-
-#pragma weak pthread_rwlock_init
-#pragma weak pthread_rwlock_rdlock
-#pragma weak pthread_rwlock_wrlock
-#pragma weak pthread_rwlock_unlock
-#pragma weak pthread_rwlock_destroy
-
-void
-_pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg)
+static void
+__xnet_tsd_free(void *buf)
 {
-	if (__pthread_cleanup_push)
-		return __pthread_cleanup_push(buffer, routine, arg);
-	buffer->__routine = routine;
-	buffer->__arg = arg;
-	buffer->__canceltype = 0;
-	buffer->__prev = NULL;
+	pthread_setspecific(__xnet_tsd_key, NULL);
+	free(buf);
 }
 
-void
-_pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute)
+static void
+__xnet_tsd_alloc(void)
 {
-	if (__pthread_cleanup_pop)
-		return __pthread_cleanup_pop(buffer, execute);
-	if (execute)
-		(*buffer->__routine) (buffer->__arg);
-}
+	int ret;
+	void *buf;
 
-void
-_pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *),
-			    void *arg)
-{
-	if (__pthread_cleanup_push_defer)
-		return __pthread_cleanup_push_defer(buffer, routine, arg);
-	buffer->__routine = routine;
-	buffer->__arg = arg;
-	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &buffer->__canceltype);
-	buffer->__prev = NULL;
-}
-
-void
-_pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute)
-{
-	if (__pthread_cleanup_pop_restore)
-		return __pthread_cleanup_pop_restore(buffer, execute);
-	if (execute)
-		(*buffer->__routine) (buffer->__arg);
-	pthread_setcanceltype(buffer->__canceltype, NULL);
-}
-
-void
-pthread_testcancel(void)
-{
-	if (__pthread_testcancel)
-		return __pthread_testcancel();
+	ret = pthread_key_create(&__xnet_tsd_key, __xnet_tsd_free);
+	buf = malloc(sizeof(struct __xnet_tsd));
+	bzero(buf, sizeof(*buf));
+	ret = pthread_setspecific(__xnet_tsd_key, buf);
 	return;
 }
 
-int
-pthread_setcanceltype(int type, int *oldtype)
+static struct __xnet_tsd *
+__xnet_get_tsd(void)
 {
-	if (__pthread_setcanceltype)
-		return __pthread_setcanceltype(type, oldtype);
-	if (oldtype)
-		*oldtype = type;
-	return (0);
-}
-
-int
-pthread_rwlock_init(pthread_rwlock_t * rwlock, const pthread_rwlockattr_t * attr)
-{
-	if (__pthread_rwlock_init)
-		return __pthread_rwlock_init(rwlock, attr);
-	*(char *) rwlock = 0;
-	return (0);
-}
-
-int
-pthread_rwlock_rdlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_rdlock)
-		return __pthread_rwlock_rdlock(rwlock);
-	*(char *) rwlock = *(char *) rwlock + 1;
-	return (0);
-}
-
-int
-pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_wrlock)
-		return __pthread_rwlock_wrlock(rwlock);
-	*(char *) rwlock = *(char *) rwlock - 1;
-	return (0);
-}
-
-int
-pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_unlock)
-		return __pthread_rwlock_unlock(rwlock);
-	if (*(char *) rwlock > 0)
-		*(char *) rwlock = *(char *) rwlock - 1;
-	else
-		*(char *) rwlock = 0;
-	return (0);
-}
-
-int
-pthread_rwlock_destroy(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_destroy)
-		return __pthread_rwlock_destroy(rwlock);
-	*(char *) rwlock = 0xff;
-	return (0);
-}
-
-int __xnet_t_errno;
-
-extern int *__h_errno_location(void);
-
-#pragma weak __h_errno_location
-
-#pragma weak __t_errno_location
-int *
-__t_errno_location(void)
-{
-	if (__h_errno_location != 0)
-		return __h_errno_location();
-	return &__xnet_t_errno;
-}
+	pthread_once(&__xnet_tsd_once, __xnet_tsd_alloc);
+	return (struct __xnet_tsd *) pthread_getspecific(__xnet_tsd_key);
+};
 
 int *
-_t_errno(void)
+__xnet__t_errno(void)
 {
-	return __t_errno_location();
+	return &(__xnet_get_tsd()->terrno);
 }
+
+__asm__(".symver __xnet__t_errno,_t_errno@@XNET_1.0");
 
 struct _t_user {
 	pthread_rwlock_t lock;		/* lock for this structure */
@@ -991,7 +873,7 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 				udata->len = 0;
 			}
 		}
-	} else 
+	} else
 		goto tlook;
       done:
 	return (user->event);
@@ -1479,8 +1361,7 @@ __xnet_t_accept_r(int fd, int resfd, const struct t_call *call)
 	return (ret);
 }
 
-int t_accept(int fd, int resfd, const struct t_call *call)
-    __attribute__ ((alias("__xnet_t_accept_r")));
+__asm__(".symver __xnet_t_accept_r,t_accept@@XNET_1.0");
 
 /**
  * @fn int t_addleaf(int fd, int leafid, struct netbuf *addr)
@@ -1593,8 +1474,9 @@ __xnet_t_addleaf_r(int fd, int leafid, struct netbuf *addr)
 	return (ret);
 }
 
-int t_addleaf(int fd, int leafid, struct netbuf *addr)
-    __attribute__ ((weak, alias("__xnet_t_addleaf_r")));
+#pragma weak __xnet_t_addleaf_r
+
+__asm__(".symver __xnet_t_addleaf_r,t_addleaf@@XNET_1.0");
 
 /**
  * @fn char * t_alloc(int fd, int type, int fields)
@@ -1999,8 +1881,7 @@ __xnet_t_alloc_r(int fd, int type, int fields)
 	return (ret);
 }
 
-char *t_alloc(int fd, int type, int fields)
-    __attribute__ ((alias("__xnet_t_alloc_r")));
+__asm__(".symver __xnet_t_alloc_r,t_alloc@@XNET_1.0");
 
 /**
  * @fn int t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
@@ -2098,8 +1979,7 @@ __xnet_t_bind_r(int fd, const struct t_bind *req, struct t_bind *ret)
 	return (rtv);
 }
 
-int t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
-    __attribute__ ((alias("__xnet_t_bind_r")));
+__asm__(".symver __xnet_t_bind_r,t_bind@@XNET_1.0");
 
 /**
  * @fn int t_close(int fd)
@@ -2167,8 +2047,7 @@ __xnet_t_close_r(int fd)
 	return (ret);
 }
 
-int t_close(int fd)
-    __attribute__ ((alias("__xnet_t_close_r")));
+__asm__(".symver __xnet_t_close_r,t_close@@XNET_1.0");
 
 /**
  * @fn int t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
@@ -2281,8 +2160,7 @@ __xnet_t_connect_r(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 	return (ret);
 }
 
-int t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
-    __attribute__ ((alias("__xnet_t_connect_r")));
+__asm__(".symver __xnet_t_connect_r,t_connect@@XNET_1.0");
 
 /**
  * @fn int t_error(const char *errmsg)
@@ -2309,8 +2187,7 @@ __xnet_t_error_r(const char *errmsg)
 	return (ret);
 }
 
-int t_error(const char *errmsg)
-    __attribute__ ((alias("__xnet_t_error_r")));
+__asm__(".symver __xnet_t_error_r,t_error@@XNET_1.0");
 
 /**
  * @fn int t_free(void *ptr, int type)
@@ -2417,8 +2294,7 @@ __xnet_t_free(void *ptr, int type)
 	return (-1);
 }
 
-int t_free(void *ptr, int type)
-    __attribute__ ((alias("__xnet_t_free")));
+__asm__(".symver __xnet_t_free,t_free@@XNET_1.0");
 
 /**
  * @fn int t_getinfo(int fd, struct t_info *info)
@@ -2512,8 +2388,7 @@ __xnet_t_getinfo_r(int fd, struct t_info *info)
 	return (ret);
 }
 
-int t_getinfo(int fd, struct t_info *info)
-    __attribute__ ((alias("__xnet_t_getinfo_r")));
+__asm__(".symver __xnet_t_getinfo_r,t_getinfo@@XNET_1.0");
 
 /**
  * @fn int t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
@@ -2580,8 +2455,7 @@ __xnet_t_getprotaddr_r(int fd, struct t_bind *loc, struct t_bind *rem)
 	return (ret);
 }
 
-int t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
-    __attribute__ ((alias("__xnet_t_getprotaddr_r")));
+__asm__(".symver __xnet_t_getprotaddr_r,t_getprotaddr@@XNET_1.0");
 
 /**
  * @fn int t_getstate(int fd)
@@ -2631,8 +2505,7 @@ __xnet_t_getstate_r(int fd)
 	return (ret);
 }
 
-int t_getstate(int fd)
-    __attribute__ ((alias("__xnet_t_getstate_r")));
+__asm__(".symver __xnet_t_getstate_r,t_getstate@@XNET_1.0");
 
 /**
  * @fn int t_listen(int fd, struct t_call *call)
@@ -2728,8 +2601,7 @@ __xnet_t_listen_r(int fd, struct t_call *call)
 	return (ret);
 }
 
-int t_listen(int fd, struct t_call *call)
-    __attribute__ ((alias("__xnet_t_listen_r")));
+__asm__(".symver __xnet_t_listen_r,t_listen@@XNET_1.0");
 
 /**
  * @fn int t_look(int fd)
@@ -2955,8 +2827,7 @@ __xnet_t_look_r(int fd)
 	return (ret);
 }
 
-int t_look(int fd)
-    __attribute__ ((alias("__xnet_t_look_r")));
+__asm__(".symver __xnet_t_look_r,t_look@@XNET_1.0");
 
 /*
    look for an event, but do not block 
@@ -3155,8 +3026,7 @@ __xnet_t_open_r(const char *path, int oflag, struct t_info *info)
 	return (ret);
 }
 
-int t_open(const char *path, int oflag, struct t_info *info)
-    __attribute__ ((alias("__xnet_t_open_r")));
+__asm__(".symver __xnet_t_open_r,t_open@@XNET_1.0");
 
 /**
  * @fn int t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
@@ -3248,8 +3118,7 @@ __xnet_t_optmgmt_r(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 	return (rtv);
 }
 
-int t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
-    __attribute__ ((alias("__xnet_t_optmgmt_r")));
+__asm__(".symver __xnet_t_optmgmt_r,t_optmgmt@@XNET_1.0");
 
 /**
  * @fn int t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
@@ -3361,8 +3230,7 @@ __xnet_t_rcv_r(int fd, char *buf, unsigned int nbytes, int *flags)
 	return (ret);
 }
 
-int t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
-    __attribute__ ((alias("__xnet_t_rcv_r")));
+__asm__(".symver __xnet_t_rcv_r,t_rcv@@XNET_1.0");
 
 /**
  * @fn int t_rcvconnect(int fd, struct t_call *call)
@@ -3459,8 +3327,7 @@ __xnet_t_rcvconnect_r(int fd, struct t_call *call)
 	return (ret);
 }
 
-int t_rcvconnect(int fd, struct t_call *call)
-    __attribute__ ((alias("__xnet_t_rcvconnect_r")));
+__asm__(".symver __xnet_t_rcvconnect_r,t_rcvconnect@@XNET_1.0");
 
 /**
  * @fn int t_rcvdis(int fd, struct t_discon *discon)
@@ -3553,8 +3420,7 @@ __xnet_t_rcvdis_r(int fd, struct t_discon *discon)
 	return (ret);
 }
 
-int t_rcvdis(int fd, struct t_discon *discon)
-    __attribute__ ((alias("__xnet_t_rcvdis_r")));
+__asm__(".symver __xnet_t_rcvdis_r,t_rcvdis@@XNET_1.0");
 
 /**
  * @fn int t_rcvleafchange(int fd, struct t_leaf_status *change)
@@ -3663,8 +3529,9 @@ __xnet_t_rcvleafchange_r(int fd, struct t_leaf_status *change)
 	return (ret);
 }
 
-int t_rcvleafchange(int fd, struct t_leaf_status *change)
-    __attribute__ ((weak, alias("__xnet_t_rcvleafchange_r")));
+#pragma weak __xnet_t_recvleafchange_r
+
+__asm__(".symver __xnet_t_rcvleafchange_r,t_rcvleafchange@@XNET_1.0");
 
 /**
  * @fn int t_rcvrel(int fd)
@@ -3724,8 +3591,7 @@ __xnet_t_rcvrel_r(int fd)
 	return (ret);
 }
 
-int t_rcvrel(int fd)
-    __attribute__ ((alias("__xnet_t_rcvrel_r")));
+__asm__(".symver __xnet_t_rcvrel_r,t_rcvrel@@XNET_1.0");
 
 /**
  * @fn int t_rcvreldata(int fd, struct t_discon *discon)
@@ -3813,8 +3679,7 @@ __xnet_t_rcvreldata_r(int fd, struct t_discon *discon)
 	return (ret);
 }
 
-int t_rcvreldata(int fd, struct t_discon *discon)
-    __attribute__ ((alias("__xnet_t_rcvreldata_r")));
+__asm__(".symver __xnet_t_rcvreldata_r,t_rcvreldata@@XNET_1.0");
 
 /**
  * @fn int t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
@@ -3965,8 +3830,7 @@ __xnet_t_rcvopt_r(int fd, struct t_unitdata *optdata, int *flags)
 	return (ret);
 }
 
-int t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
-    __attribute__ ((alias("__xnet_t_rcvopt_r")));
+__asm__(".symver __xnet_t_rcvopt_r,t_rcvopt@@XNET_1.0");
 
 /**
  * @fn int t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
@@ -4097,8 +3961,7 @@ __xnet_t_rcvudata_r(int fd, struct t_unitdata *unitdata, int *flags)
 	return (ret);
 }
 
-int t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
-    __attribute__ ((alias("__xnet_t_rcvudata_r")));
+__asm__(".symver __xnet_t_rcvudata_r,t_rcvudata@@XNET_1.0");
 
 /**
  * @fn int t_rcvuderr(int fd, struct t_uderr *uderr)
@@ -4186,8 +4049,7 @@ __xnet_t_rcvuderr_r(int fd, struct t_uderr *uderr)
 	return (ret);
 }
 
-int t_rcvuderr(int fd, struct t_uderr *uderr)
-    __attribute__ ((alias("__xnet_t_rcvuderr_r")));
+__asm__(".symver __xnet_t_rcvuderr_r,t_rcvuderr@@XNET_1.0");
 
 /**
  * @fn int t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
@@ -4313,8 +4175,7 @@ __xnet_t_rcvv_r(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 	return (ret);
 }
 
-int t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
-    __attribute__ ((alias("__xnet_t_rcvv_r")));
+__asm__(".symver __xnet_t_rcvv_r,t_rcvv@@XNET_1.0");
 
 /**
  * @fn int t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags)
@@ -4468,9 +4329,7 @@ __xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
 	return (ret);
 }
 
-int t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount,
-		int *flags)
-    __attribute__ ((alias("__xnet_t_rcvvudata_r")));
+__asm__(".symver __xnet_t_rcvvudata_r,t_rcvvudata@@XNET_1.0");
 
 /**
  * @fn int t_removeleaf(int fd, int leafid, int reason)
@@ -4564,8 +4423,9 @@ __xnet_t_removeleaf_r(int fd, int leafid, int reason)
 	return (ret);
 }
 
-int t_removeleaf(int fd, int leafid, int reason)
-    __attribute__ ((weak, alias("__xnet_t_removeleaf_r")));
+#pragma weak __xnet_t_removeleaf_r
+
+__asm__(".symver __xnet_t_removeleaf_r,t_removeleaf@@XNET_1.0");
 
 /**
  * @fn int t_snd(int fd, char *buf, unsigned int nbytes, int flags)
@@ -4670,8 +4530,7 @@ __xnet_t_snd_r(int fd, char *buf, unsigned int nbytes, int flags)
 	return (ret);
 }
 
-int t_snd(int fd, char *buf, unsigned int nbytes, int flags)
-    __attribute__ ((alias("__xnet_t_snd_r")));
+__asm__(".symver __xnet_t_snd_r,t_snd@@XNET_1.0");
 
 /**
  * @fn int t_snddis(int fd, const struct t_call *call)
@@ -4774,8 +4633,7 @@ __xnet_t_snddis_r(int fd, const struct t_call *call)
 	return (ret);
 }
 
-int t_snddis(int fd, const struct t_call *call)
-    __attribute__ ((alias("__xnet_t_snddis_r")));
+__asm__(".symver __xnet_t_snddis_r,t_snddis@@XNET_1.0");
 
 /**
  * @fn int t_sndrel(int fd)
@@ -4842,8 +4700,7 @@ __xnet_t_sndrel_r(int fd)
 	return (ret);
 }
 
-int t_sndrel(int fd)
-    __attribute__ ((alias("__xnet_t_sndrel_r")));
+__asm__(".symver __xnet_t_sndrel_r,t_sndrel@@XNET_1.0");
 
 /**
  * @fn int t_sndreldata(int fd, struct t_discon *discon)
@@ -4937,8 +4794,7 @@ __xnet_t_sndreldata_r(int fd, struct t_discon *discon)
 	return (ret);
 }
 
-int t_sndreldata(int fd, struct t_discon *discon)
-    __attribute__ ((alias("__xnet_t_sndreldata_r")));
+__asm__(".symver __xnet_t_sndreldata_r,t_sndreldata@@XNET_1.0");
 
 /**
  * @fn int t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
@@ -5040,8 +4896,7 @@ __xnet_t_sndopt_r(int fd, const struct t_unitdata *optdata, int flags)
 	return (ret);
 }
 
-int t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
-    __attribute__ ((alias("__xnet_t_sndopt_r")));
+__asm__(".symver __xnet_t_sndopt_r,t_sndopt@@XNET_1.0");
 
 /**
  * @fn int t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags)
@@ -5148,9 +5003,7 @@ __xnet_t_sndvopt_r(int fd, const struct t_unitdata *optdata, const struct t_iove
 	return (ret);
 }
 
-int t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov,
-	      unsigned int iovcount, int flags)
-    __attribute__ ((alias("__xnet_t_sndvopt_r")));
+__asm__(".symver __xnet_t_sndvopt_r,t_sndvopt@@XNET_1.0");
 
 /**
  * @fn int t_sndudata(int fd, const struct t_unitdata *unitdata)
@@ -5282,8 +5135,7 @@ __xnet_t_sndudata_r(int fd, const struct t_unitdata *unitdata)
 	return (ret);
 }
 
-int t_sndudata(int fd, const struct t_unitdata *unitdata)
-    __attribute__ ((alias("__xnet_t_sndudata_r")));
+__asm__(".symver __xnet_t_sndudata_r,t_sndudata@@XNET_1.0");
 
 /**
  * @fn int t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags)
@@ -5389,8 +5241,7 @@ __xnet_t_sndv_r(int fd, const struct t_iovec *iov, unsigned int iovcount, int fl
 	return (ret);
 }
 
-int t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags)
-    __attribute__ ((alias("__xnet_t_sndv_r")));
+__asm__(".symver __xnet_t_sndv_r,t_sndv@@XNET_1.0");
 
 #if 0
 /**
@@ -5509,9 +5360,7 @@ __xnet_t_sndvopt_r(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
 	return (ret);
 }
 
-int t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount,
-	      int flags)
-    __attribute__ ((alias("__xnet_t_sndvopt_r")));
+__asm__(".symver __xnet_t_sndvopt_r,t_sndvopt@@XNET_1.0");
 #endif
 
 /**
@@ -5637,8 +5486,7 @@ __xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
 	return (ret);
 }
 
-int t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount)
-    __attribute__ ((alias("__xnet_t_sndvudata_r")));
+__asm__(".symver __xnet_t_sndvudata_r,t_sndvudata@@XNET_1.0");
 
 /* *INDENT-OFF* */
 const char *__xnet_t_errlist[] = {
@@ -5870,12 +5718,13 @@ TRANS error codes not known to the XTI library.
 };
 /* *INDENT-ON* */
 
-extern const char **t_errstr __attribute__ ((alias("__xnet_t_errlist")));
-extern const char **t_errlist __attribute__ ((alias("__xnet_t_errlist")));
+__asm__(".symver __xnet_t_errstr,t_errstr@@XNET_1.0");
+
+__asm__(".symver __xnet_t_errlist,t_errlist@@XNET_1.0");
 
 int __xnet_t_nerr = 31;
 
-extern int t_nerr __attribute__ ((alias("__xnet_t_nerr")));
+__asm__(".symver __xnet_t_nerr,t_nerr@@XNET_1.0");
 
 /**
  * @fn const char *t_strerror(int errnum)
@@ -5892,8 +5741,7 @@ __xnet_t_strerror(int errnum)
 	return gettext(__xnet_t_errlist[TPROTO + 1]);
 }
 
-const char *t_strerror(int errnum)
-    __attribute__ ((alias("__xnet_t_strerror")));
+__asm__(".symver __xnet_t_strerror,t_strerror@@XNET_1.0");
 
 /**
  * @fn int t_sync(int fd)
@@ -6057,8 +5905,8 @@ __xnet_t_sync_r(int fd)
 	pthread_cleanup_pop_restore_np(0);
 	return (ret);
 }
-int t_sync(int fd)
-    __attribute__ ((alias("__xnet_t_sync_r")));
+
+__asm__(".symver __xnet_t_sync_r,t_sync@@XNET_1.0");
 
 /**
  * @fn int t_sysconf(int name)
@@ -6088,8 +5936,7 @@ __xnet_t_sysconf(int name)
 	return (-1);
 }
 
-int t_sysconf(int name)
-    __attribute__ ((alias("__xnet_t_sysconf")));
+__asm__(".symver _xnet_t_sysconf,t_sysconf@@XNET_1.0");
 
 /**
  * @fn int t_unbind(int fd)
@@ -6158,8 +6005,7 @@ __xnet_t_unbind_r(int fd)
 	return (ret);
 }
 
-int t_unbind(int fd)
-    __attribute__ ((alias("__xnet_t_unbind_r")));
+__asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
  * @section Identification

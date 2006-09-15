@@ -57,6 +57,17 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+#ifdef _REENTRANT
+extern int *__ncerror(void);
+
+#define _ncerror (*(__ncerror()))
+#else
+#warn Compiled without _REENTRANT defined!
+extern int _ncerror;
+#endif
+/* AIX compatibility */
+#define nc_error _ncerror
+
 #define NETCONFIG		"/etc/netconfig"
 #define NETPATH			"NETPATH"
 
@@ -72,16 +83,15 @@ struct netconfig {
 	ulong nc_unused[9];
 };
 
-typedef struct {
-	struct netconfig **nc_head;
-	struct netconfig **nc_curr;
-} NCONF_HANDLE;
-
 #ifdef _REENTRANT
 extern int *__ncerror(void);
 #define nc_error (*(__ncerror()))
+extern char *__ncerrbuf(void);
+#define nc_errbuf (*(__ncerrbuf()))
 #else
+#warn Compiled without _REENTRANT defined!
 extern int nc_error;
+extern char *nc_errbuf;
 #endif
 
 /* error codes */

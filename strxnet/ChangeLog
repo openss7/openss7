@@ -10,6 +10,10 @@
 	* src/lib/xnet.VERSION: added new files for libxnsl library
 	* src/lib/xnsl.VERSION: added new files for libxnsl library
 	* src/test/test-xnsl.c: added new files for libxnsl library
+	* src/include/netdir.h: working up library
+	* src/include/sys/netconfig.h: working up library
+	* src/lib/xnet.c: working up library
+	* src/lib/xnsl.c: working up library
 
 2006-09-13  Brian Bidulock  <bidulock@openss7.org>
 
