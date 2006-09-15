@@ -1,3 +1,18 @@
+2006-09-15  Brian Bidulock  <bidulock@openss7.org>
+
+	- added symbol versioning to all libraries
+
+	* lib/libc/fattach.c: added symbol versioning
+	* lib/libc/fdetach.c: added symbol versioning
+	* lib/libc/getmsg.c: added symbol versioning
+	* lib/libc/getpmsg.c: added symbol versioning
+	* lib/libc/isastream.c: added symbol versioning
+	* lib/libc/pipe.c: added symbol versioning
+	* lib/libc/putmsg.c: added symbol versioning
+	* lib/libc/putpmsg.c: added symbol versioning
+	* lib/libc/streams.VERSION: added version file
+	* Makefile.am: include versioning
+
 2006-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: missing bugs.texi from release

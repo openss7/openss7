@@ -51,7 +51,8 @@
 
 #ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $"
 
-static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $";
+static char const ident[] =
+    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -70,7 +71,8 @@ static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.
 #define __unlikely __attribute__((section(".text.unlikely")))
 
 /**
- * @ingroup libLiS
+ * @fn int fattach(int fd, const char *path)
+ * @ingroup streams
  * @brief attach a stream to a path in a filesystem.
  * @param fd the file descriptor of the stream to attach.
  * @param path the path in the filesystem to which to attach the stream.
@@ -80,7 +82,9 @@ static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.
  * cancellation safe.
  */
 int __unlikely
-fattach(int fd, const char *path)
+__streams_fattach(int fd, const char *path)
 {
 	return (ioctl(fd, I_FATTACH, path));
 }
+
+__asm__(".symver __streams_fattach,fattach@@STREAMS_1.0");

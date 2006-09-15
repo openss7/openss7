@@ -533,7 +533,8 @@ libstreams_la_SOURCES		= \
 				lib/libc/pipe.c \
 				lib/libc/fattach.c \
 				lib/libc/fdetach.c
-libstreams_la_LDFLAGS		= -no-undefined
+libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
+libstreams_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
 

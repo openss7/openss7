@@ -143,224 +143,64 @@ static char const ident[] =
  * @defgroup libsocket OpenSS7 Sockets Library
  * @brief OpenSS7 Sockets Library Calls
  *
- * This manual contains documentation of the OpenSS7 Sockets Library functions
- * that are generated automatically from the source code with doxygen.  This
- * documentation is intended to be used for maintianers of the OpenSS7 Sockets
- * Library and is not intended for users of the OpenSS7 Sockets Library.
- * Users should consult the documentation found in the user manual pages
- * beginning with sockets(3).
+ * This manual contains documentation of the OpenSS7 Sockets Library functions that are generated
+ * automatically from the source code with doxygen.  This documentation is intended to be used for
+ * maintianers of the OpenSS7 Sockets Library and is not intended for users of the OpenSS7 Sockets
+ * Library.  Users should consult the documentation found in the user manual pages beginning with
+ * sockets(3).
  *
  * <h2>Thread Safety</h2>
- * The OpenSS7 Sockets Library is designed to be thread-safe.  This is
- * accomplished in a number of ways.  Thread-safety depends on the use of
- * glibc2 and the pthreads library.
+ * The OpenSS7 Sockets Library is designed to be thread-safe.  This is accomplished in a number of
+ * ways.  Thread-safety depends on the use of glibc2 and the pthreads library.
  *
- * Glibc2 provides lightweight thread-specific data for errno and h_errno.
- * Because h_errno uses communications functions orthoginal to the Sockets
- * Library services, we borrow h_errno and use it for s_errno.  This does not
- * cause a problem because neither h_errno nor s_errno need to maintain their
- * value across any other system call.
+ * Glibc2 provides lightweight thread-specific data for errno and h_errno.  Because h_errno uses
+ * communications functions orthoginal to the Sockets Library services, we borrow h_errno and use it
+ * for s_errno.  This does not cause a problem because neither h_errno nor s_errno need to maintain
+ * their value across any other system call.
  *
- * Glibc2 also provides some weak undefined aliases for POSIX thread functions
- * to perform its own thread-safety.  When the pthread library (libpthread) is
- * linked with glibc2, these functions call libpthread functions instead of
- * internal dummy routines.  The same approach is taken for the OpenSS7
- * Sockets Library.  The library uses weak defined and undefined aliases that
- * automatically invoke libpthread functions when libpthread is (dynamically)
- * linked and uses dummy functions when it is not.  This maintains maximum
- * efficiency when libpthread is not dynamically linked, but provides full
- * thrad safety when it is.
+ * Glibc2 also provides some weak undefined aliases for POSIX thread functions to perform its own
+ * thread-safety.  When the pthread library (libpthread) is linked with glibc2, these functions call
+ * libpthread functions instead of internal dummy routines.  The same approach is taken for the
+ * OpenSS7 Sockets Library.  The library uses weak defined and undefined aliases that automatically
+ * invoke libpthread functions when libpthread is (dynamically) linked and uses dummy functions when
+ * it is not.  This maintains maximum efficiency when libpthread is not dynamically linked, but
+ * provides full thrad safety when it is.
  *
- * Libpthread behaves in some strange ways with regards to thread
- * cancellation.  Because libpthread uses Linux clone processes for threads,
- * cancellation of a thread is accomplished by sending a signal to the thread
- * process.  This does not directly result in the cancellation, but will
- * result in the failure of a system call with the EINTR error code.  It is
- * necessary to test for cancellation upon error return from system calles to
- * perform the actual cancellation of the thread.
+ * Libpthread behaves in some strange ways with regards to thread cancellation.  Because libpthread
+ * uses Linux clone processes for threads, cancellation of a thread is accomplished by sending a
+ * signal to the thread process.  This does not directly result in the cancellation, but will result
+ * in the failure of a system call with the EINTR error code.  It is necessary to test for
+ * cancellation upon error return from system calles to perform the actual cancellation of the
+ * thread.
  *
- * The Sockets specification (OpenGroup XNS 5.2) lists the following functions
- * as being thread cancellation points:
+ * The Sockets specification (OpenGroup XNS 5.2) lists the following functions as being thread
+ * cancellation points:
  *
- * Other Sockets functions are not permitted by XNS 5.2 to be thread
- * cancellation points.  Any function that cannot be a thread cancellation
- * point needs to have its cancellation status deferred if it internally
- * invokes a function that permits thread cancellation.  Functions that do not
- * permit thread cancellation are:
+ * Other Sockets functions are not permitted by XNS 5.2 to be thread cancellation points.  Any
+ * function that cannot be a thread cancellation point needs to have its cancellation status
+ * deferred if it internally invokes a function that permits thread cancellation.  Functions that do
+ * not permit thread cancellation are:
  *
  * Locks an asynchronous thread cancellation present challenges:
  *
- * Functions that act as thread cancellation points must push routines onto
- * the function stack executed at exit of the thread to release the locks held
- * by the function.  These are performed with weak definitions of POSIX thread
- * library functions.
+ * Functions that act as thread cancellation points must push routines onto the function stack
+ * executed at exit of the thread to release the locks held by the function.  These are performed
+ * with weak definitions of POSIX thread library functions.
  *
- * Functions that do not act as a thread cancellation point must defer thread
- * cancellation before taking locks and then release locks before thread
- * cancellation is restored.
+ * Functions that do not act as a thread cancellation point must defer thread cancellation before
+ * taking locks and then release locks before thread cancellation is restored.
  *
- * The above are the techniques used by glibc2 for the same purpose and is the
- * same technique that is used by the OpenSS7 Sockets Library.
+ * The above are the techniques used by glibc2 for the same purpose and is the same technique that
+ * is used by the OpenSS7 Sockets Library.
  *
- * XNS 5.2 says that thread cancellation points shall occur when a thread is
- * executing the following functions: accept(), connect(), recv(), recvfrom(),
- * recvmsg(), send(), sendmsg(), sendto().
+ * XNS 5.2 says that thread cancellation points shall occur when a thread is executing the following
+ * functions: accept(), connect(), recv(), recvfrom(), recvmsg(), send(), sendmsg(), sendto().
  *
- * XNS 5.2 says that thread cancellation points shall not occur in: bind(),
- * getpeername(), getsockname(), getsockopt(), listen(), setsockopt(),
- * shutdown(), socket(), socketpair().
+ * XNS 5.2 says that thread cancellation points shall not occur in: bind(), getpeername(),
+ * getsockname(), getsockopt(), listen(), setsockopt(), shutdown(), socket(), socketpair().
  *
  * @{
  */
-
-extern void __pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *),
-				   void *arg);
-extern void __pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute);
-extern void __pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer,
-					 void (*routine) (void *), void *arg);
-extern void __pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute);
-extern void __pthread_testcancel(void);
-extern int __pthread_setcanceltype(int type, int *oldtype);
-
-extern int __pthread_rwlock_init(pthread_rwlock_t * rwlock, const pthread_rwlockattr_t * attr);
-extern int __pthread_rwlock_rdlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_wrlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_unlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_destroy(pthread_rwlock_t * rwlock);
-
-#pragma weak __pthread_cleanup_push
-#pragma weak __pthread_cleanup_pop
-#pragma weak __pthread_cleanup_push_defer
-#pragma weak __pthread_cleanup_pop_restore
-#pragma weak __pthread_testcancel
-#pragma weak __pthread_setcanceltype
-
-#pragma weak __pthread_rwlock_init
-#pragma weak __pthread_rwlock_rdlock
-#pragma weak __pthread_rwlock_wrlock
-#pragma weak __pthread_rwlock_unlock
-#pragma weak __pthread_rwlock_destroy
-
-#pragma weak _pthread_cleanup_push
-#pragma weak _pthread_cleanup_pop
-#pragma weak _pthread_cleanup_push_defer
-#pragma weak _pthread_cleanup_pop_restore
-#pragma weak pthread_testcancel
-#pragma weak pthread_setcanceltype
-
-#pragma weak pthread_rwlock_init
-#pragma weak pthread_rwlock_rdlock
-#pragma weak pthread_rwlock_wrlock
-#pragma weak pthread_rwlock_unlock
-#pragma weak pthread_rwlock_destroy
-
-void
-_pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg)
-{
-	if (__pthread_cleanup_push)
-		return __pthread_cleanup_push(buffer, routine, arg);
-	buffer->__routine = routine;
-	buffer->__arg = arg;
-	buffer->__canceltype = 0;
-	buffer->__prev = NULL;
-}
-
-void
-_pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute)
-{
-	if (__pthread_cleanup_pop)
-		return __pthread_cleanup_pop(buffer, execute);
-	if (execute)
-		(*buffer->__routine) (buffer->__arg);
-}
-
-void
-_pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *),
-			    void *arg)
-{
-	if (__pthread_cleanup_push_defer)
-		return __pthread_cleanup_push_defer(buffer, routine, arg);
-	buffer->__routine = routine;
-	buffer->__arg = arg;
-	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &buffer->__canceltype);
-	buffer->__prev = NULL;
-}
-
-void
-_pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute)
-{
-	if (__pthread_cleanup_pop_restore)
-		return __pthread_cleanup_pop_restore(buffer, execute);
-	if (execute)
-		(*buffer->__routine) (buffer->__arg);
-	pthread_setcanceltype(buffer->__canceltype, NULL);
-}
-
-void
-pthread_testcancel(void)
-{
-	if (__pthread_testcancel)
-		return __pthread_testcancel();
-	return;
-}
-
-int
-pthread_setcanceltype(int type, int *oldtype)
-{
-	if (__pthread_setcanceltype)
-		return __pthread_setcanceltype(type, oldtype);
-	if (oldtype)
-		*oldtype = type;
-	return (0);
-}
-
-int
-pthread_rwlock_init(pthread_rwlock_t * rwlock, const pthread_rwlockattr_t * attr)
-{
-	if (__pthread_rwlock_init)
-		return __pthread_rwlock_init(rwlock, attr);
-	*(char *) rwlock = 0;
-	return (0);
-}
-
-int
-pthread_rwlock_rdlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_rdlock)
-		return __pthread_rwlock_rdlock(rwlock);
-	*(char *) rwlock = *(char *) rwlock + 1;
-	return (0);
-}
-
-int
-pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_wrlock)
-		return __pthread_rwlock_wrlock(rwlock);
-	*(char *) rwlock = *(char *) rwlock - 1;
-	return (0);
-}
-
-int
-pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_unlock)
-		return __pthread_rwlock_unlock(rwlock);
-	if (*(char *) rwlock > 0)
-		*(char *) rwlock = *(char *) rwlock - 1;
-	else
-		*(char *) rwlock = 0;
-	return (0);
-}
-
-int
-pthread_rwlock_destroy(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_destroy)
-		return __pthread_rwlock_destroy(rwlock);
-	*(char *) rwlock = 0xff;
-	return (0);
-}
 
 struct _s_user {
 	pthread_rwlock_t lock;		/* lock for this structure */
@@ -655,8 +495,7 @@ __sock_accept_r(int fd, struct sockaddr *addr, socklen_t * len)
 	return (ret);
 }
 
-int accept(int fd, struct sockaddr *addr, socklen_t * len)
-    __attribute__ ((alias("__sock_accept_r")));
+__asm__(".symver __sock_accept_r,accept@@SOCKET_1.0");
 
 /**
  * @fn int bind(int fd, const struct sockaddr *addr, socklen_t len)
@@ -691,8 +530,7 @@ __sock_bind_r(int fd, const struct sockaddr *addr, socklen_t len)
 	return (ret);
 }
 
-int bind(int fd, const struct sockaddr *addr, socklen_t len)
-    __attribute__ ((alias("__sock_bind_r")));
+__asm__(".symver __sock_bind_r,bind@@SOCKET_1.0");
 
 /**
  * @fn int connect(int fd, const struct sockaddr *addr, socklen_t len)
@@ -730,8 +568,7 @@ __sock_connect_r(int fd, const struct sockaddr *addr, socklen_t len)
 	return (ret);
 }
 
-int connect(int fd, const struct sockaddr *addr, socklen_t len)
-    __attribute__ ((alias("__sock_connect_r")));
+__asm__(".symver __sock_connect_r,connect@@SOCKET_1.0");
 
 /**
  * @fn int getpeername(int fd, struct sockaddr *addr, socklen_t * len)
@@ -766,8 +603,7 @@ __sock_getpeername_r(int fd, struct sockaddr *addr, socklen_t * len)
 	return (ret);
 }
 
-int getpeername(int fd, struct sockaddr *addr, socklen_t * len)
-    __attribute__ ((alias("__sock_getpeername_r")));
+__asm__(".symver __sock_getpeername_r,getpeername@@SOCKET_1.0");
 
 /**
  * @fn int getsockname(int fd, struct sockaddr *addr, socklen_t * len)
@@ -802,8 +638,7 @@ __sock_getsockname_r(int fd, struct sockaddr *addr, socklen_t * len)
 	return (ret);
 }
 
-int getsockname(int fd, struct sockaddr *addr, socklen_t * len)
-    __attribute__ ((alias("__sock_getsockname_r")));
+__asm__(".symver __sock_getsockname_r,getsockname@@SOCKET_1.0");
 
 /**
  * @fn int getsockopt(int fd, int level, int name, void *value, socklen_t * len)
@@ -840,8 +675,7 @@ __sock_getsockopt_r(int fd, int level, int name, void *value, socklen_t * len)
 	return (ret);
 }
 
-int getsockopt(int fd, int level, int name, void *value, socklen_t * len)
-    __attribute__ ((alias("__sock_getsockopt_r")));
+__asm__(".symver __sock_getsockopt_r,getsockopt@@SOCKET_1.0");
 
 /**
  * @fn int listen(int fd, int backlog)
@@ -875,8 +709,7 @@ __sock_listen_r(int fd, int backlog)
 	return (ret);
 }
 
-int listen(int fd, int backlog)
-    __attribute__ ((alias("__sock_listen_r")));
+__asm__(".symver __sock_listen_r,listen@@SOCKET_1.0");
 
 /**
  * @fn int setsockopt(int fd, int level, int name, const void *value, socklen_t len)
@@ -913,8 +746,7 @@ __sock_setsockopt_r(int fd, int level, int name, const void *value, socklen_t le
 	return (ret);
 }
 
-int setsockopt(int fd, int level, int name, const void *value, socklen_t len)
-    __attribute__ ((alias("__sock_setsockopt_r")));
+__asm__(".symver __sock_setsockopt_r,setsockopt@@SOCKET_1.0");
 
 /**
  * @fn int shutdown(int fd, int how)
@@ -948,8 +780,7 @@ __sock_shutdown_r(int fd, int how)
 	return (ret);
 }
 
-int shutdown(int fd, int how)
-    __attribute__ ((alias("__sock_shutdown_r")));
+__asm__(".symver __sock_shutdown_r,shutdown@@SOCKET_1.0");
 
 /**
  * @fn int socket(int domain, int type, int protocol)
@@ -1041,8 +872,7 @@ __sock_socket_r(int domain, int type, int protocol)
 	return (ret);
 }
 
-int socket(int domain, int type, int protocol)
-    __attribute__ ((alias("__sock_socket_r")));
+__asm__(".symver __sock_socket_r,socket@@SOCKET_1.0");
 
 /**
  * @fn int socketpair(int domain, int type, int protocol, int socket_vector[2])
@@ -1163,8 +993,7 @@ __sock_socketpair_r(int domain, int type, int protocol, int socket_vector[2])
 	return (ret);
 }
 
-int socketpair(int domain, int type, int protocol, int socket_vector[2])
-    __attribute__ ((alias("__sock_socketpair_r")));
+__asm__(".symver __sock_socketpair_r,socketpair@@SOCKET_1.0");
 
 /**
  * @fn ssize_t recv(int fd, void *buf, size_t len, int flags)
@@ -1211,8 +1040,7 @@ __sock_recv_r(int fd, void *buf, size_t len, int flags)
 	return (ret);
 }
 
-ssize_t recv(int fd, void *buf, size_t len, int flags)
-    __attribute__ ((alias("__sock_recv_r")));
+__asm__(".symver __sock_recv_r,recv@@SOCKET_1.0");
 
 /**
  * @fn ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
@@ -1259,8 +1087,7 @@ __sock_recvmsg_r(int fd, struct msghdr *msg, int flags)
 	return (ret);
 }
 
-ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
-    __attribute__ ((alias("__sock_recvmsg_r")));
+__asm__(".symver __sock_recvmsg_r,recvmsg@@SOCKET_1.0");
 
 /**
  * @fn ssize_t recvfrom(int fd, void *buf, size_t len, int flags, struct sockaddr *addr, socklen_t * alen)
@@ -1308,8 +1135,7 @@ __sock_recvfrom_r(int fd, void *buf, size_t len, int flags, struct sockaddr *add
 	return (ret);
 }
 
-ssize_t recvfrom(int fd, void *buf, size_t len, int flags, struct sockaddr *addr, socklen_t * alen)
-    __attribute__ ((alias("__sock_recvfrom_r")));
+__asm__(".symver __sock_recvfrom_r,recvfrom@@SOCKET_1.0");
 
 /**
  * @fn ssize_t send(int fd, const void *buf, size_t len, int flags)
@@ -1354,8 +1180,7 @@ __sock_send_r(int fd, const void *buf, size_t len, int flags)
 	return (ret);
 }
 
-ssize_t send(int fd, const void *buf, size_t len, int flags)
-    __attribute__ ((alias("__sock_send_r")));
+__asm__(".symver __sock_send_r,send@@SOCKET_1.0");
 
 /**
  * @fn ssize_t sendmsg(int fd, const struct msghdr *msg, int flags)
@@ -1399,8 +1224,7 @@ __sock_sendmsg_r(int fd, const struct msghdr *msg, int flags)
 	return (ret);
 }
 
-ssize_t sendmsg(int fd, const struct msghdr *msg, int flags)
-    __attribute__ ((alias("__sock_sendmsg_r")));
+__asm__(".symver __sock_sendmsg_r,sendmsg@@SOCKET_1.0");
 
 /**
  * @fn ssize_t sendto(int fd, const void *buf, size_t len, int flags, const struct sockaddr *addr, socklen_t alen)
@@ -1448,6 +1272,4 @@ __sock_sendto_r(int fd, const void *buf, size_t len, int flags, const struct soc
 	return (ret);
 }
 
-ssize_t sendto(int fd, const void *buf, size_t len, int flags, const struct sockaddr *addr,
-	       socklen_t alen)
-    __attribute__ ((alias("__sock_sendto_r")));
+__asm__(".symver __sock_sendto_r,sendto@@SOCKET_1.0");

@@ -94,7 +94,7 @@ __getpmsg_error(int fd)
 
 /**
  * @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
- * @ingroup libLiS
+ * @ingroup libstreams
  * @brief get a message from a stream band.
  * @param fd a file descriptor representing the stream.
  * @param ctlptr a pointer to a strbuf structure returning the control part of the message.
@@ -143,14 +143,16 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 	return (err);
 }
 
-__hot int
-getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+int __hot
+__streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	return __getpmsg(fd, ctlptr, datptr, bandp, flagsp);
 }
+__asm__(".symver __streams_getpmsg,getpmsg@@STREAMS_1.0");
 
 /**
- * @ingroup libLiS
+ * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+ * @ingroup libstreams
  * @brief get a message from a STREAM.
  * @param fd a file descriptor for the stream.
  * @param ctlptr a pointer to a struct strbuf structure that returns the
@@ -165,10 +167,11 @@ getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *f
  * characteristics, no protection against asynchronous thread cancellation is
  * required.
  */
-__hot int
-getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+int __hot
+__streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	int band = -1;
 
 	return __getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
+__asm__(".symver __streams_getmsg,getmsg@@STREAMS_1.0");

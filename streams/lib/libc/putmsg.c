@@ -69,6 +69,7 @@ static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.8
 #define __unlikely __attribute__((section(".text.unlikely")))
 
 /**
+ * @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
  * @ingroup libLiS
  * @brief put a message to a stream band.
  * @param fd a file descriptor representing the stream.
@@ -79,7 +80,9 @@ static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.8
  * This function is a thread cancellation point.
  */
 int
-putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+__streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
 	return putpmsg(fd, ctlptr, datptr, -1, flags);
 }
+
+__asm__(".symver __streams_putmsg,putmsg@@STREAMS_1.0");

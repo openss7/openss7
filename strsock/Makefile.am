@@ -145,16 +145,22 @@ soconfig_CFLAGS			= $(USER_CFLAGS)
 
 lib_LTLIBRARIES			+= libsocket.la
 
-libsocket_la_SOURCES		= src/lib/socket.c gettext.h
-libsocket_la_LDFLAGS		= -version-info 0:0:0
+libsocket_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/socket.c \
+				  gettext.h
+libsocket_la_DEPENDENCIES	= src/lib/socket.VERSION
+libsocket_la_LDFLAGS		= $(STREAMS_LDADD) -version-info 0:0:0 -Wl,--version-script -Wl,$(top_srcdir)/src/lib/socket.VERSION
 libsocket_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsocket_la_CFLAGS		= $(USER_CFLAGS)
 libsocket_la_LIBADD		=
 
 lib_LTLIBRARIES			+= libsocklib.la
 
-libsocklib_la_SOURCES		= src/lib/socklib.c gettext.h
-libsocklib_la_LDFLAGS		= -version-info 0:0:0
+libsocklib_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/socklib.c \
+				  gettext.h
+libsocklib_la_DEPENDENCIES	= src/lib/socklib.VERSION
+libsocklib_la_LDFLAGS		= $(STREAMS_LDADD) -version-info 0:0:0 -Wl,--version-script -Wl,$(top_srcdir)/src/lib/socklib.VERSION
 libsocklib_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsocklib_la_CFLAGS		= $(USER_CFLAGS)
 libsocklib_la_LIBADD		=

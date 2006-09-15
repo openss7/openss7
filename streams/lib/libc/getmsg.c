@@ -74,7 +74,8 @@ static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.8
 #define __unlikely __attribute__((section(".text.unlikely")))
 
 /**
- * @ingroup libLiS
+ * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+ * @ingroup libstreams
  * @brief get a message from a STREAM.
  * @param fd a file descriptor for the stream.
  * @param ctlptr a pointer to a struct strbuf structure that returns the
@@ -90,9 +91,11 @@ static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.8
  * required.
  */
 int
-getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+__streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	int band = -1;
 
 	return getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
+
+__asm__(".symver __streams_getmsg,getmsg@@STREAMS_1.0")

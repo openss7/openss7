@@ -1,3 +1,14 @@
+2006-09-15  Brian Bidulock  <bidulock@openss7.org>
+
+	- added symbol versioning to all libraries
+
+	* Makefile.am: versioning and common thread safety
+	* src/lib/pthread.c: split out pthread replacements
+	* src/lib/socket.c: added symbol versioning
+	* src/lib/socket.VERSION: added version script
+	* src/lib/socklib.c: added symbol versioning
+	* src/lib/socklib.VERSION: added version script
+
 2006-09-12  Brian Bidulock  <bidulock@openss7.org>
 
 	- moved libxnsl files to strxnet package from here

@@ -104,8 +104,8 @@ __lis_pipe(int *fds)
 #endif
 
 /* I prefer not to use a dummy stream anyway. */
-static int
-__lfs_pipe(int *fds)
+int
+__streams_pipe(int *fds)
 {
 	int fd1, fd2;
 	int error;
@@ -132,6 +132,7 @@ __lfs_pipe(int *fds)
 }
 
 /**
+ * @fn pipe(int *fds)
  * @ingroup libLiS
  * @brief open a streams based pipe.
  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
@@ -141,7 +142,7 @@ __lfs_pipe(int *fds)
  * close() operations.
  */
 int
-pipe(int *fds)
+__streams_pipe_r(int *fds)
 {
 	int oldtype, ret;
 
@@ -149,8 +150,10 @@ pipe(int *fds)
 #if 0
 	ret = __lis_pipe(fds);
 #else
-	ret = __lfs_pipe(fds);
+	ret = __streams_pipe(fds);
 #endif
 	pthread_setcanceltype(oldtype, NULL);
 	return (ret);
 }
+
+__asm__(".symver __streams_pipe_r,pipe@@STREAMS_1.0");

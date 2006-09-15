@@ -51,7 +51,8 @@
 
 #ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/24 09:01:14 $"
 
-static char const ident[] = "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/24 09:01:14 $";
+static char const ident[] =
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/24 09:01:14 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -133,12 +134,17 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 }
 
 __hot int
-putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+__streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+		  int flags)
 {
 	return __putpmsg(fd, ctlptr, datptr, band, flags);
 }
 
+__asm__(".symver __streams_putpmsg,putpmsg@@STREAMS_1.0");
+
 /**
+ *
+ * @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
  * @ingroup libLiS
  * @brief put a message to a stream band.
  * @param fd a file descriptor representing the stream.
@@ -149,7 +155,9 @@ putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int ba
  * This function is a thread cancellation point.
  */
 __hot int
-putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+__streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
 	return __putpmsg(fd, ctlptr, datptr, -1, flags);
 }
+
+__asm__(".symver __streams_putmsg,putmsg@@STREAMS_1.0");

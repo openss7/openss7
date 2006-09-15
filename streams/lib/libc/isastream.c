@@ -75,7 +75,8 @@ static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.
 #define __unlikely __attribute__((section(".text.unlikely")))
 
 /**
- * @ingroup libLiS
+ * @fn int isastream(int fd)
+ * @ingroup libstreams
  * @brief test a stream.
  * @param fd a file descriptor to test.
  *
@@ -84,7 +85,7 @@ static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.
  * cancellation protection is not required.
  */
 __unlikely int
-isastream(int fd)
+__streams_isastream(int fd)
 {
 	if (ioctl(fd, I_ISASTREAM) == -1) {
 		if (errno == EBADF)
@@ -93,3 +94,5 @@ isastream(int fd)
 	}
 	return (1);
 }
+
+__asm__(".symver __streams_isastream,isastream@@STREAMS_1.0");

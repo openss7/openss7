@@ -57,19 +57,16 @@
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*
- *  "Our solution to this discrepancy relies on the ability to unbind an
- *   endpoint after it has first been bound.  When an application calls bind,
- *   socklib specifies a backlog of zero to the transport provider.  (A value
- *   of zero is normal for applications that do not wish to receive connect
- *   indications.)  If the application subsequently calls listen with a
- *   non-zero backlog value then the request translates to an ioctl that
- *   sockkmod services. [SI_LISTEN]  When sockmod receives the ioctl message,
- *   it first unbinds the endpoint, and then rebinds it to the same address,
- *   specifying the new backlog value.  The fact that in some cases the
- *   endpoint ahs to be unbind and then rebound introduces a window in which
- *   another application could request the same address.  HOwever, this window
- *   is small and we consider it acceptable." -- Implementing Berkeley Sockets
- *   in UNIX(R) System V Release 4.
+ *  "Our solution to this discrepancy relies on the ability to unbind an endpoint after it has first
+ *   been bound.  When an application calls bind, socklib specifies a backlog of zero to the
+ *   transport provider.  (A value of zero is normal for applications that do not wish to receive
+ *   connect indications.)  If the application subsequently calls listen with a non-zero backlog
+ *   value then the request translates to an ioctl that sockkmod services. [SI_LISTEN]  When sockmod
+ *   receives the ioctl message, it first unbinds the endpoint, and then rebinds it to the same
+ *   address, specifying the new backlog value.  The fact that in some cases the endpoint ahs to be
+ *   unbind and then rebound introduces a window in which another application could request the same
+ *   address.  HOwever, this window is small and we consider it acceptable." -- Implementing
+ *   Berkeley Sockets in UNIX(R) System V Release 4.
  */
 int _so_listen(int fd, int backlog) {
 	return (0);
