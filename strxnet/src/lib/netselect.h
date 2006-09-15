@@ -86,6 +86,6 @@ struct netconf_handle {
 #define nc_line(__nc) (char *)(__nc)->nc_unused[7]
 #define nc_next(__nc) (struct netconfig *)(__nc)->nc_unused[8]
 #define nc_nextp(__nc) (struct netconfig **)&(__nc)->nc_unused[8]
-#define nc_line_set(__nc,__line) (__nc)->nc_unused[7] = (unsigned long)(__line)
+#define nc_line_set(__nc,__line) (char *)((__nc)->nc_unused[7] = (unsigned long)(__line))
 
 #endif				/* __LOCAL_NETSELECT_H__ */

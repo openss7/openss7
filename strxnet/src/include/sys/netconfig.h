@@ -57,17 +57,6 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
-#ifdef _REENTRANT
-extern int *__ncerror(void);
-
-#define _ncerror (*(__ncerror()))
-#else
-#warn Compiled without _REENTRANT defined!
-extern int _ncerror;
-#endif
-/* AIX compatibility */
-#define nc_error _ncerror
-
 #define NETCONFIG		"/etc/netconfig"
 #define NETPATH			"NETPATH"
 
