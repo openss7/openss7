@@ -318,14 +318,23 @@ sock_man_MANS	= \
 	man4/sockmod.4 \
 	man4/socksys.4
 
-man_MANS	= $(xnet_man_MANS)
+man_MANS	=
 
-man_MANS	+= $(xnsl_man_MANS)
 
 if WITH_TLI
 ## WITH_TLI
 man_MANS	+= $(tli_man_MANS)
 ## WITH_TLI
+endif
+if WITH_XNET
+## WITH_XNET
+man_MANS	+= $(xnet_man_MANS)
+## WITH_XNET
+endif
+if WITH_XNSL
+## WITH_XNSL
+man_MANS	+= $(xnsl_man_MANS)
+## WITH_XNSL
 endif
 if WITH_SOCK
 ## WITH_SOCK

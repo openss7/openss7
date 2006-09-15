@@ -168,6 +168,8 @@ AC_DEFUN([_XNET_SETUP], [dnl
     _STRCOMP
     with_tli='yes'
     with_xnet='yes'
+    with_xnsl='yes'
+    with_sock='no'
     _XOPEN
     _XNS
 ])# _XNET_SETUP

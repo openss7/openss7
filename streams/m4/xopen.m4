@@ -74,6 +74,7 @@ AC_DEFUN([_XOPEN_OPTIONS], [dnl
     _XOPEN_CHECK_TLI
     _XOPEN_CHECK_INET
     _XOPEN_CHECK_XNET
+    _XOPEN_CHECK_XNSL
     _XOPEN_CHECK_SOCK
 ])# _XOPEN_OPTIONS
 # =============================================================================
@@ -144,6 +145,18 @@ AC_DEFUN([_XOPEN_CHECK_XNET], [dnl
 # =============================================================================
 
 # =============================================================================
+# _XOPEN_CHECK_XNSL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XOPEN_CHECK_XNSL], [dnl
+    AC_ARG_WITH([xnsl],
+	AS_HELP_STRING([--with-xnsl],
+	    [include xopen xnsl library in build.  @<:@default=yes@:>@]),
+	[with_xnsl="$withval"],
+	[with_xnsl='no'])
+])# _XOPEN_CHECK_XNSL
+# =============================================================================
+
+# =============================================================================
 # _XOPEN_CHECK_SOCK
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_CHECK_SOCK], [dnl
@@ -184,6 +197,11 @@ AC_DEFUN([_XOPEN_SETUP], [dnl
     fi
     AC_MSG_CHECKING([for xopen xnet library])
     AC_MSG_RESULT([$with_xnet])
+    if test :"$with_xnsl" = :yes ; then :;
+	_XOPEN_SETUP_XNSL
+    fi
+    AC_MSG_CHECKING([for xopen xnsl library])
+    AC_MSG_RESULT([$with_xnsl])
     if test :"$with_sock" = :yes ; then :;
 	_XOPEN_SETUP_SOCK
     fi
@@ -301,10 +319,16 @@ AC_DEFUN([_XOPEN_SETUP_XNET], [dnl
 # =============================================================================
 
 # =============================================================================
+# _XOPEN_SETUP_XNSL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XOPEN_SETUP_XNSL], [dnl
+])# _XOPEN_SETUP_XNSL
+# =============================================================================
+
+# =============================================================================
 # _XOPEN_SETUP_SOCK
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_SETUP_SOCK], [dnl
-    with_sock='no'
 ])# _XOPEN_SETUP_SOCK
 # =============================================================================
 
@@ -318,6 +342,7 @@ AC_DEFUN([_XOPEN_OUTPUT], [dnl
     AM_CONDITIONAL([WITH_TLI], [test :"$with_tli" = :yes])dnl
     AM_CONDITIONAL([WITH_INET], [test :"$with_inet" = :yes])dnl
     AM_CONDITIONAL([WITH_XNET], [test :"$with_xnet" = :yes])dnl
+    AM_CONDITIONAL([WITH_XNSL], [test :"$with_xnsl" = :yes])dnl
     AM_CONDITIONAL([WITH_SOCK], [test :"$with_sock" = :yes])dnl
 ])# _XOPEN_OUTPUT
 # =============================================================================
