@@ -41,6 +41,11 @@
 	* doc/man/man5/netconfig.5.man: updated manual pages
 	* doc/man/man5/netdir.5.man: updated manual pages
 
+	* acinclude.m4: added libxnsl to release
+	* configure.ac: added libxnsl to release
+	* doc/man/Makefile.am: added libxnsl to release
+	* m4/xopen.m4: added libxnsl to release
+
 2006-09-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man3/accept.3.man: updated documentation
