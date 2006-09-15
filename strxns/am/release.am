@@ -101,7 +101,7 @@ CLEANFILES			+= MANUAL
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
-$(srcdir)/AUTHORS: MANUAL
+$(top_srcdir)/AUTHORS: MANUAL
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- authors.  $(PACKAGE_DATE)" > $@ ; \
@@ -111,9 +111,9 @@ $(srcdir)/AUTHORS: MANUAL
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|^ Authors|,\|^ Quick|!d;\| Quick|,$$d' >> $@ ;\
-	 cat $(srcdir)/README | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/README | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/BUGS: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/BUGS: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- defects.  $(PACKAGE_DATE)" > $@ ; \
@@ -123,9 +123,9 @@ $(srcdir)/BUGS: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|^[0-9].[0-9] Bugs|,\|^[0-9].[0-9] Schedule|!d;\|^[0-9].[0-9] Schedule|,$$d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/PROBLEMS: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- problem reports.  $(PACKAGE_DATE)" > $@ ; \
@@ -135,9 +135,9 @@ $(srcdir)/PROBLEMS: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|[0-9].[0-9] Problem Reports|,\|^Appendix|!d;\|^Appendix|,$$d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/NEWS: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/NEWS: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- history of user visible changes.  $(PACKAGE_DATE)" > $@ ; \
@@ -147,9 +147,9 @@ $(srcdir)/NEWS: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|[0-9].[0-9] Release Notes|,\|[0-9].[0-9] Maturity|!d;\|[0-9].[0-9] Maturity|,$$d' | sed -e '1,3d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/THANKS: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/THANKS: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- acknowledgements.  $(PACKAGE_DATE)" > $@ ; \
@@ -159,9 +159,9 @@ $(srcdir)/THANKS: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|^ Acknowledgements|,\|^ Authors|!d;\| Authors|,$$d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/TODO: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/TODO: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- things to do.  $(PACKAGE_DATE)" > $@ ; \
@@ -171,9 +171,9 @@ $(srcdir)/TODO: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|[0-9].[0-9] Schedule|,\|[0-9].[0-9] History|!d;\|[0-9].[0-9] History|,$$d' | sed -e '1,3d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/README: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/README: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me first file.  $(PACKAGE_DATE)" > $@ ; \
@@ -183,9 +183,9 @@ $(srcdir)/README: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
 	 cat MANUAL | sed -e '\|Quick Start Guide|,\|Introduction|!d;\|Introduction|,$$d' | sed -e '1,3d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/README-cvs: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/README-cvs: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ;\
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me CVS file.  $(PACKAGE_DATE)" > $@ ;\
@@ -197,9 +197,9 @@ $(srcdir)/README-cvs: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "The following is an extract from the manual to assist CVS developers:" >> $@ ;\
 	 $(ECHO) "" >> $@ ;\
 	 cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Downloading from CVS|,\|^[0-9].[0-9] Configuration|!d;\|^[0-9].[0-9] Configuration|,$$d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/README-nexusware: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/README-nexusware: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ;\
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me CVS file.  $(PACKAGE_DATE)" > $@ ;\
@@ -211,9 +211,9 @@ $(srcdir)/README-nexusware: MANUAL $(srcdir)/AUTHORS
 	 $(ECHO) "The following is an extract from the manual to assist NexusWare developers:" >> $@ ;\
 	 $(ECHO) "" >> $@ ;\
 	 cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Building from the Tar Ball|,\|^[0-9].[0-9] Installing|!d;\|^[0-9].[0-9] Installing|,$$d' >> $@ ;\
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-$(srcdir)/README-alpha: MANUAL $(srcdir)/AUTHORS
+$(top_srcdir)/README-alpha: MANUAL $(top_srcdir)/AUTHORS
 	@$(ECHO) "Creating $@ from the MANUAL..." ;\
 	 reltype=`grep '^This software is' MANUAL | cut -f4 '-d '` ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
@@ -242,18 +242,18 @@ $(srcdir)/README-alpha: MANUAL $(srcdir)/AUTHORS
 		 (unstable)   cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Unstable Releases|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
 		 (*)          cat MANUAL | sed -e '\|^[0-9].[0-9] Maturity|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
 	 esac ; \
-	 cat $(srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
+	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
-ALL_LOCAL			+= $(srcdir)/AUTHORS \
-				   $(srcdir)/BUGS \
-				   $(srcdir)/PROBLEMS \
-				   $(srcdir)/NEWS \
-				   $(srcdir)/THANKS \
-				   $(srcdir)/TODO \
-				   $(srcdir)/README \
-				   $(srcdir)/README-alpha \
-				   $(srcdir)/README-cvs \
-				   $(srcdir)/README-nexusware
+RELEASE_FILES			+= $(top_srcdir)/AUTHORS \
+				   $(top_srcdir)/BUGS \
+				   $(top_srcdir)/PROBLEMS \
+				   $(top_srcdir)/NEWS \
+				   $(top_srcdir)/THANKS \
+				   $(top_srcdir)/TODO \
+				   $(top_srcdir)/README \
+				   $(top_srcdir)/README-alpha \
+				   $(top_srcdir)/README-cvs \
+				   $(top_srcdir)/README-nexusware
 
 ## MAINTAINER_MODE
 endif

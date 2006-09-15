@@ -74,7 +74,7 @@ include am/help.am
 ##
 include am/pr.am
 
-lib_LTLIBRARIES			=
+lib_LTLIBRARIES			= 
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -255,7 +255,7 @@ endif
 ##
 ## Rules for building libraries
 ##
-##include am/libraries.am
+include am/libraries.am
 ##
 AUTOCONFIG_H			= src/$(PKGINCL)/config.h
 ##
@@ -284,7 +284,7 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = src . tests
+SUBDIRS = src
 
 if PKG_BUILD_ARCH
 SUBDIRS += intl m4 po
@@ -362,10 +362,6 @@ include am/deb.am
 ## Rules for making release files
 ##
 MANUAL_FILE			= doc/manual/$(PACKAGE).txt
-RELEASE_FILES			= README \
-				  README-alpha \
-				  README-cvs \
-				  README-nexusware
 
 include am/release.am
 

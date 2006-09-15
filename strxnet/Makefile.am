@@ -460,9 +460,11 @@ KMODCONF_EXT			= $(PACKAGE_LCNAME)
 KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
 
 if WITH_KO_MODULES
+## WITH_KO_MODULES
 kpre				= streams_
 else
 kpre				= streams-
+## WITH_KO_MODULES
 endif
 
 include am/kernel.am
@@ -509,7 +511,7 @@ SUBDIRS = src
 
 if PKG_BUILD_ARCH
 SUBDIRS += intl m4 po
-CLEANFILES +=  po/stamp-po
+CLEANFILES += po/stamp-po
 endif
 
 SUBDIRS += . tests
@@ -583,10 +585,6 @@ include am/deb.am
 ## Rules for making release files
 ##
 MANUAL_FILE			= doc/manual/$(PACKAGE).txt
-RELEASE_FILES			= README \
-				  README-alpha \
-				  README-cvs \
-				  README-nexusware
 
 include am/release.am
 

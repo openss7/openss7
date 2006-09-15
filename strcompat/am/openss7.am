@@ -150,6 +150,7 @@ dist_noinst_SCRIPTS	=
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT =
 
 RELEASE			=
+RELEASE_FILES		=
 RELEASE_SIGN		=
 RELEASE_DIRECTORIES	=
 
@@ -167,6 +168,8 @@ $(RELEASE_DIRECTORIES)::
 release: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 release: $(RELEASE_DIRECTORIES) $(RELEASE)
 
+release-files-am: $(RELEASE_FILES)
+
 release-clean-local:
 	@$(ECHO) "Making $@ in `pwd`"
 	@targets="$(RELEASE_CLEAN_LOCAL)" ; for target in $$targets ; do \
@@ -182,6 +185,7 @@ release-clean-am: release-clean-local
 	fi
 
 MY_PHONY	+= release $(RELEASE)
+MY_PHONY	+= release-files-am release-files
 MY_PHONY	+= release-sign $(RELEASE_SIGN)
 MY_PHONY	+= release-clean-am release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
 FORCED_TARGETS	+= forced-release
@@ -195,7 +199,7 @@ endif
 ##
 ## Like automake recursive targets, but mine.
 ##
-MY_RECURSIVE_TARGETS =
+MY_RECURSIVE_TARGETS = release-files-recursive
 
 $(MY_RECURSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
@@ -533,6 +537,11 @@ MY_PHONY		+= remove remove-am
 #!     the package distribution directory.  This forced target will.
 #!
 release: $(RELEASE)
+
+#! release-files:
+#!	This target automagically updates release files when in maintainer mode.
+#!
+release-files: release-files-recursive
 
 #! release-sign:
 #!     You will be prompted for a password, unless to specify it to make with

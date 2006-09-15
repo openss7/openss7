@@ -950,12 +950,6 @@ include am/deb.am
 ## Rules for making release files
 ##
 MANUAL_FILE			= doc/manual/$(PACKAGE_UCNAME).txt
-RELEASE_FILES			= \
-				  README \
-				  README-alpha \
-				  README-cvs \
-				  README-LiS \
-				  README-nexusware
 
 include am/release.am
 
