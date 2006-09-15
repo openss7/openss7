@@ -1,3 +1,8 @@
+2006-09-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/sysconfig/netconfig: added default netconfig file (will
+	  install)
+
 2006-09-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man3/accept.3.man: updated documentation

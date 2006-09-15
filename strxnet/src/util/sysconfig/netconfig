@@ -1,0 +1,103 @@
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# Network Configuration Database
+# for the Network Selection Facility and the Name-to-Address Directory
+# Services.
+#
+# See netconfig(5) for more information.
+#
+# <netid> <semantics>   <flag> <family>  <proto> <device>       <n2alibs>
+# ------- ------------- ------ --------- ------- -------------- ----------------
+#udp6     tpi_clts      v      inet6     udp     /dev/upd6       -
+#tcp6     tpi_cots_ord  v      inet6     tcp     /dev/tcp6       -
+udp       tpi_clts      v      inet      udp     /dev/udp2       -
+tcp       tpi_cots_ord  v      inet      tcp     /dev/tcp        -
+rawip     tpi_raw       -      inet      -       /dev/rawip2     -
+ticlts    tpi_clts      v      loopback  -       /dev/ticlts     /lib/straddr.so
+ticots    tpi_cots      v      loopback  -       /dev/ticots     /lib/straddr.so
+ticotsord tpi_cots_ord  v      loopback  -       /dev/ticotsord  /lib/straddr.so
+# ------- ------------- ------ --------- ------- -------------- ----------------
+
+#
+# <netid>	A network identification string assigned by the local system
+# 		administrator.  Typical names are: udp6, tcp, rawip,
+# 		ticotsord, etc.
+#
+# <semantics>	The semantics of the trasnport provider service interface.
+# 		This field can be one of:
+#		
+#		tpi_clts	Trasnport provider interface, connectionless
+#				transport service.
+#
+#		tpi_cots	Transport provider interface, connection-
+#				oriented transport service with abortive
+#				release.
+#
+#		tpi_cots_ord	Transport provider interface, connection-
+#				oriented transport service with orderly
+#				release.
+#
+#		tpi_raw		Transport provider interface, raw transport
+#				service.
+#
+# <flag>	Either a "-" or a sequence of letters, "v" or "b" as follows:
+#		
+#		-   Indicates that no flags are specified.
+#
+#		v   Indicates that the visible flag is specified.  Visible
+#		    network transports are exposed to the getnetpath(3)
+#		    subroutine when the {NETPATH} environment variable is not
+#		    set.
+#
+#		b   Indicates that the broadcast flag is specified.  Network
+#		    transports with the broadcast flag set permit RPC
+#		    broadcast.
+#
+# <family>	The protocol family.  This can be one of the following:
+#
+#		-	    No protocol family applies (experimental).
+#		loopback    Loopback interface (to local host).
+#		inet	    Internet protocol version 4.
+#		inet6	    Internet protocol version 6.
+#		implink	    ARPANET imp addresses.
+#		pup	    PUP protocols.
+#		chaos	    MIT CHAOS protocols.
+#		ns	    XEROX NS protocols.
+#		nbs	    NBS protocols.
+#		ecma	    ECMA (European Computer Manufactuers Association)
+#			    protocols.
+#		datakit	    DATAKIT protocols.
+#		ccitt	    CCITT (IUT-T) protocols, X.25, etc.
+#		sna	    IBM SNA (Synchronous Network Architecture)
+#			    protocols.
+#		decnet	    DECNET protocols.
+#		dli	    Direct data link interface.
+#		lat	    LAT.
+#		hylink	    NSC Hyperchannel.
+#		appletalk   Apple Talk.
+#		nit	    Network Interface Tap.
+#		ieee802	    IEEE 802.2, also ISO 8802.
+#		osi	    Umbrella for all families used by OSI.
+#		x25	    CCITT (ITU-T) X.25.
+#		osinet	    AFI = 47, IDI = 4.
+#		gosip	    U.S. Government OSI.
+#
+# <proto>	The protocol name.  This can be one of the following:
+#
+#		-	No protocol name applies.
+#		sctp	Stream Control Transmission Protocol.
+#		tcp	Transmission Control Protocol.
+#		udp	User Datagram Protocol.
+#		icmp	Internet Control Message Protoocol.
+#		ipx	Internet Packet Exchange Protocol.
+#		spx	Sequenced Packet Exchange Protocol.
+#
+# <device>	The absolute filesystem path to the appropriate STREAMS
+#		device.  For example, /dev/inet/tcp.
+#
+# <n2alibs>	Comma separated list of full path names to the name to address
+#		dynamic libraries providing a directory service for this
+#		network transport, or as dash, "-", indicating that there are
+#		no name to address directory service libraries.
+
