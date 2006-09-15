@@ -256,7 +256,7 @@ __nsl_loadnetconfiglist(void)
 				goto nomem;
 			memset(nc, 0, sizeof(*nc));
 		}
-		if ((nc_line(nc) = strdup(line)) == 0)
+		if ((nc_line_set(nc, strdup(line))) == 0)
 			goto nomem;
 
 		for (str = nc_line(nc), fieldnum = 0; fieldnum <= 6
@@ -341,7 +341,7 @@ __nsl_loadnetconfiglist(void)
 		if (fieldnum == 0) {
 			if (field == NULL || field[0] == '#') {
 				free(nc_line(nc));
-				nc_line(nc) = NULL;
+				nc_line_set(nc, NULL);
 				continue;	/* skip blank or comment lines */
 			}
 		}
@@ -556,7 +556,7 @@ __nsl_getnetconfigent(const char *netid)
 					break;
 				}
 				memset(nc_new, 0, sizeof(*nc_new));
-				if ((nc_line(nc_new) = strdup(nc_line(*ncp))) == NULL) {
+				if ((nc_line_set(nc_new, strdup(nc_line(*ncp)))) == NULL) {
 					free(nc_new);
 					nc_error = NC_NOMEM;
 					break;
