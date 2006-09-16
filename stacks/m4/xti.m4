@@ -91,6 +91,7 @@ dnl
     AC_SUBST([XTI_CPPFLAGS])dnl
     AC_SUBST([XTI_MODFLAGS])dnl
     AC_SUBST([XTI_LDADD])dnl
+    AC_SUBST([NSL_LDADD])dnl
     AC_SUBST([XTI_MODMAP])dnl
     AC_SUBST([XTI_SYMVER])dnl
     AC_SUBST([XTI_MANPATH])dnl
@@ -179,6 +180,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_search_path"
 			xti_cv_ldadd="$master_builddir/strxnet/libxnet.la"
+			xti_cv_ldadd2="$master_builddir/strxnet/libxnsl.la"
 			xti_cv_modmap= # "$master_builddir/strxnet/Modules.map"
 			xti_cv_symver= # "$master_builddir/strxnet/Module.symvers"
 			xti_cv_manpath="$master_builddir/strxnet/doc/man"
@@ -208,6 +210,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_dir $xti_bld"
 			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_ldadd2=`echo "$xti_bld/../../libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_modmap= # `echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_symver= # `echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -283,6 +286,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_dir"
 			xti_cv_ldadd="-lxnet"
+			xti_cv_ldadd2="-lxnsl"
 			xti_cv_modmap=
 			xti_cv_symver=
 			xti_cv_manpath=
@@ -293,6 +297,17 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		fi
 	    done
 	    AC_MSG_CHECKING([for xti include directory])
+	fi
+    ])
+    AC_CACHE_CHECK([for xnsl ldadd],[xti_cv_ldadd2],[dnl
+	for xti_dir in $xti_cv_includes ; do
+	    if test -f "$xti_dir/../../libxnsl.la" ; then
+		xti_cv_ldadd2=`echo "$xti_dir/../../libxnsl.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$xti_cv_ldadd2" ; then
+	    xti_cv_ldadd2='-lxnsl'
 	fi
     ])
     AC_CACHE_CHECK([for xti ldadd],[xti_cv_ldadd],[dnl
@@ -466,6 +481,7 @@ AC_DEFUN([_XTI_DEFINES], [dnl
     fi
     XTI_CPPFLAGS="${XTI_CPPFLAGS:+ ${XTI_CPPFLAGS}}"
     XTI_LDADD="$xti_cv_ldadd"
+    NSL_LDADD="$xti_cv_ldadd2"
     XTI_MODMAP="$xti_cv_modmap"
     XTI_SYMVER="$xti_cv_symver"
     XTI_MANPATH="$xti_cv_manpath"

@@ -1,3 +1,8 @@
+2006-09-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/xti.m4: added NSL_LDADD calculation for including libxnsl library
+	  in other packages.
+
 2006-09-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/texi/uslbsd.texi: updated license
