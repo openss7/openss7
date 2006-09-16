@@ -78,7 +78,7 @@ extern int *__ncerror(void);
 extern char *__ncerrbuf(void);
 #define nc_errbuf (*(__ncerrbuf()))
 #else
-#warn Compiled without _REENTRANT defined!
+#warning Compiled without _REENTRANT defined!
 extern int nc_error;
 extern char *nc_errbuf;
 #endif
@@ -98,6 +98,7 @@ extern char *nc_errbuf;
 #define NC_TPI_COTS		2
 #define NC_TPI_COTS_ORD		3
 #define NC_TPI_RAW		4
+#define NC_TPI_COTS_PKT		5
 
 /* for use in nc_flag field */
 #define NC_NOFLAG		0
@@ -129,6 +130,21 @@ extern char *nc_errbuf;
 #define NC_X25			"x25"
 #define NC_OSINET		"osinet"
 #define NC_GOSIP		"gosip"
+/* nonstandard extensions */
+#define NC_AX25			"ax25"
+#define NC_IPX			"ipx"
+#define NC_NETROM		"netrom"
+#define NC_BRIDGE		"bridge"
+#define NC_ATMPVC		"atmpvc"
+#define NC_ROSE			"rose"
+#define NC_NETBEUI		"netbeui"
+#define NC_ASH			"ash"
+#define NC_ECONET		"econet"
+#define NC_ATMSVC		"atmsvc"
+#define NC_IRDA			"irda"
+#define NC_PPPOX		"pppox"
+#define NC_WANPIPE		"wanpipe"
+#define NC_BLUETOOTH		"bluetooth"
 
 /* for use in nc_proto field */
 #define NC_NOPROTO		"-"

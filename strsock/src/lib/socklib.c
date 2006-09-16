@@ -56,6 +56,21 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
+#define _REENTRANT
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+#include <stdio.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+#include <sys/stropts.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netconfig.h>
+
 /*
  *  Socket to Path mapping.
  *  =======================
@@ -66,78 +81,197 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  approach and then try the netconfig(3) approach.
  */
 
-/* netconfig(3) fallback approach */
-static char *
-__so_socket_path_netconfig(int domain, int type, int protocol)
-{
-	const char *semantics1, *semantics2;
-	const char *protocol1, *protocol2;
+/* mapping from protocol family to netconfig(5) protofmly */
+static const char *__so_family_protofmly[PF_MAX] = {
+	[PF_UNSPEC] = NULL,
+	[PF_LOCAL] = NC_LOOPBACK,
+	[PF_INET] = NC_INET,
+#ifdef NC_AX25
+	[PF_AX25] = NC_AX25,
+#endif
+#ifdef NC_IPX
+	[PF_IPX] = NC_IPX,
+#endif
+	[PF_APPLETALK] = NC_APPLETALK,
+#ifdef NC_NETROM
+	[PF_NETROM] = NC_NETROM,
+#endif
+#ifdef NC_BRIDGE
+	[PF_BRIDGE] = NC_BRIDGE,
+#endif
+#ifdef NC_ATMPVC
+	[PF_ATMPVC] = NC_ATMPVC,
+#endif
+	[PF_X25] = NC_X25,
+	[PF_INET6] = NC_INET6,
+#ifdef NC_ROSE
+	[PF_ROSE] = NC_ROSE,
+#endif
+	[PF_DECnet] = NC_DECNET,
+#ifdef NC_NETBEUI
+	[PF_NETBEUI] = NC_NETBEUI,
+#endif
+#if 0
+	[PF_SECURITY] = NULL,
+	[PF_KEY] = NULL,
+	[PF_NETLINK] = NULL,
+	[PF_ROUTE] = NULL,
+#endif
+	[PF_PACKET] = NC_NIT,
+#ifdef NC_ASH
+	[PF_ASH] = NC_ASH,
+#endif
+#ifdef NC_ECONET
+	[PF_ECONET] = NC_ECONET,
+#endif
+#ifdef NC_ATMSVC
+	[PF_ATMSVC] = NC_ATMSVC,
+#endif
+	[PF_SNA] = NC_SNA,
+#ifdef NC_IRDA
+	[PF_IRDA] = NC_IRDA,
+#endif
+#ifdef NC_PPPOX
+	[PF_PPPOX] = NC_PPPOX,
+#endif
+#ifdef NC_WANPIPE
+	[PF_WANPIPE] = NC_WANPIPE,
+#endif
+#ifdef NC_BLUETOOTH
+	[PF_BLUETOOTH] = NC_BLUETOOTH,
+#endif
+};
 
+static int
+__so_map_socket_to_netconfig(int domain, int type, int protocol,
+			     int *sem1, int *sem2, const char **family, const char **proto)
+{
 	switch (type) {
 #ifdef SOCK_STREAMS_ORD
 		/* Some implementations actually defined a SOCK_STREAM_ORD here. */
 	case SOCK_STREAMS_ORD:
-		semantics1 = NC_TPI_COTS_ORD;
-		semantics2 = NULL;
+		*sem1 = NC_TPI_COTS_ORD;
 		break;
 #endif				/* SOCK_STREAMS_ORD */
 	case SOCK_STREAM:
 #ifdef SOCK_STREAMS_ORD
-		semantics1 = NC_TPI_COTS;
-		semantics2 = NULL;
+		*sem1 = NC_TPI_COTS;
 #else				/* SOCK_STREAMS_ORD */
-		semantics1 = NC_TPI_COTS_ORD;
-		semantics2 = NC_TPI_COTS;
+		*sem1 = NC_TPI_COTS_ORD;
+		*sem2 = NC_TPI_COTS;
 #endif				/* SOCK_STREAMS_ORD */
 		break;
 	case SOCK_DGRAM:
-		semantics1 = NC_TPI_CLTS;
-		semantics2 = NULL;
+		*sem1 = NC_TPI_CLTS;
 		break;
 	case SOCK_RAW:
-		semantics1 = NC_TPI_RAW;
-		semantics2 = NULL;
+	case SOCK_PACKET:
+		*sem1 = NC_TPI_RAW;
 		break;
+#ifdef NC_TPI_COTS_PKT
+	case SOCK_SEQPACKET:
+		*sem1 = NC_TPI_COTS_PKT;
+		break;
+#endif
 	default:
 		/* cannot handle things like SOCK_SEQPACKET */
-		return (NULL);
+		return (-1);
 	}
+	if (domain < PF_MAX)
+		*family = __so_family_protofmly[domain];
+	if (*family == NULL && domain != PF_UNSPEC)
+		return (-1);
+	switch (domain) {
+	case PF_INET:
+	case PF_INET6:
+		switch (protocol) {
+		case IPPROTO_TCP:
+			*proto = NC_TCP;
+			break;
+		case IPPROTO_UDP:
+			*proto = NC_UDP;
+			break;
+		case IPPROTO_ICMP:
+			*proto = NC_ICMP;
+			break;
+#ifdef NC_SCTP
+		case IPPROTO_SCTP:
+			*proto = NC_SCTP;
+			break;
+#endif
+		}
+	}
+	return (0);
 }
 
-void *__so_setsock2path(void);
-struct sockent *__so_getsock2path(void *handle);
-int __so_endsock2path(void *handle);
-
-void *
-__so_setsock2path(void)
+/* netconfig(3) fallback approach */
+static char *
+__so_socket_path_netconfig(int domain, int type, int protocol)
 {
+	int semantics1 = 0, semantics2 = 0;
+	const char *proto = NULL;
+	const char *family = NULL;
+	struct netconfig *nc;
+	char *result = NULL;
+
+	if (__so_map_socket_to_netconfig(domain, type, protocol,
+					 &semantics1, &semantics2, &family, &proto) == -1)
+		return (NULL);
+
+	if ((nc = getnetconfigent(proto)) != NULL) {
+		if ((result = strdup(nc->nc_device)) == NULL)
+			nc_error = NC_NOMEM;
+		freenetconfigent(nc);
+	}
+	if (!result) {
+		nc_perror("socklib");
+	}
+	return (result);
 }
-
-__asm__(".symver __so_setsock2path,setsock2path@@SOCKLIB_1.0");
-
-struct sockent *
-__so_getsock2path(void *handle)
-{
-}
-
-__asm__(".symver __so_getsock2path,getsock2path@@SOCKLIB_1.0");
-
-int
-__so_endsock2path(void *handle)
-{
-}
-
-__asm__(".symver __so_endsock2path,endsock2path@@SOCKLIB_1.0");
 
 static char *
 __so_socket_path_sock2path(int domain, int type, int protocol)
 {
+	return (NULL);
 }
 
 static char *
 __so_socket_path(int domain, int type, int protocol)
 {
+	char *result;
+	if ((result = __so_socket_path_netconfig(domain, type, protocol)) != NULL)
+		return (result);
+	if ((result = __so_socket_path_sock2path(domain, type, protocol)) != NULL)
+		return (result);
+	return (NULL);
 }
+
+extern int __libc_socket(int, int, int);
+
+int
+__so_socket(int domain, int type, int protocol)
+{
+	char *device;
+	int socket;
+	int err;
+
+	if ((device = __so_socket_path(domain, type, protocol)) == NULL)
+		return (__libc_socket(domain, type, protocol));
+	if ((socket = open(device, O_RDWR)) == -1) {
+		perror("socklib");
+		return (-1);
+	}
+	if (ioctl(socket, I_PUSH, "sockmod") == -1) {
+		err = errno;
+		perror("socklib");
+		close(socket);
+		errno = err;
+		return (-1);
+	}
+	return (socket);
+}
+
+__asm__(".symver __so_socket,socket@@SOCKLIB_1.0");
 
 /*
  *  "Our solution to this discrepancy relies on the ability to unbind an endpoint after it has first

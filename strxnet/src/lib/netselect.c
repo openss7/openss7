@@ -164,12 +164,12 @@ static void
 __nsl_tsd_alloc(void)
 {
 	int ret;
-	void *buf;
+	char *buf;
 
 	ret = pthread_key_create(&__nsl_tsd_key, __nsl_tsd_free);
 	buf = malloc(sizeof(struct __nsl_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__nsl_tsd_key, buf);
+	memset(buf, 0, sizeof(*buf));
+	ret = pthread_setspecific(__nsl_tsd_key, (void *)buf);
 	return;
 }
 
