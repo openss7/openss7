@@ -125,3 +125,13 @@ __streams_fdetach_r(const char *path)
 }
 
 __asm__(".symver __streams_fdetach_r,fdetach@@STREAMS_1.0");
+
+int __lis_fdetach(const char *)
+	__attribute__((weak, alias("__streams_fdetach")));
+
+int __lis_fdetach_r(const char *)
+	__attribute__((weak, alias("__streams_fdetach_r")));
+
+__asm__(".symver __lis_fdetach_r,fdetach@LIS_1.0");
+
+

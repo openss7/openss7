@@ -1,3 +1,16 @@
+2006-09-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: builds LiS and pLiS replacement library too
+	* lib/libc/fattach.c: added LiS versions too
+	* lib/libc/fdetach.c: added LiS versions too
+	* lib/libc/getmsg.c: split new and old verisons
+	* lib/libc/getpmsg.c: split new and old verisons
+	* lib/libc/isastream.c: added LiS versions too
+	* lib/libc/pipe.c: added LiS versions too
+	* lib/libc/putmsg.c: split new and old verisons
+	* lib/libc/putpmsg.c: split new and old verisons
+	* lib/libc/streams.VERSION: added LiS versions too, split new and old
+
 2006-09-15  Brian Bidulock  <bidulock@openss7.org>
 
 	- added symbol versioning to all libraries

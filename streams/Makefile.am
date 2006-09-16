@@ -239,7 +239,9 @@ endif
 
 #LDADD				= libstreams.la
 
-lib_LTLIBRARIES			= libstreams.la
+lib_LTLIBRARIES			= libstreams.la \
+				  libLiS.la \
+				  libpLiS.la
 
 ## RPM_BUILD_USER
 endif
@@ -537,12 +539,46 @@ libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
-
-if USING_IOCTL_GETPMSG_PUTPMSG
+##if USING_IOCTL_GETPMSG_PUTPMSG
 libstreams_la_LDFLAGS		+= -version-info 0:1:0
-else
-libstreams_la_LDFLAGS		+= -version-info 0:0:0
-endif
+##else
+##libstreams_la_LDFLAGS		+= -version-info 0:0:0
+##endif
+
+libLiS_la_SOURCES		= \
+				lib/libc/testcancel.c \
+				lib/libc/putpmsg.c \
+				lib/libc/getpmsg.c \
+				lib/libc/isastream.c \
+				lib/libc/pipe.c \
+				lib/libc/fattach.c \
+				lib/libc/fdetach.c
+libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
+libLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
+libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libLiS_la_CFLAGS		= $(USER_CFLAGS)
+##if USING_IOCTL_GETPMSG_PUTPMSG
+libLiS_la_LDFLAGS		+= -version-info 0:1:0
+##else
+##libLiS_la_LDFLAGS		+= -version-info 0:0:0
+##endif
+
+libpLiS_la_SOURCES		= \
+				lib/libc/testcancel.c \
+				lib/libc/putpmsg.c \
+				lib/libc/getpmsg.c \
+				lib/libc/isastream.c \
+				lib/libc/fattach.c \
+				lib/libc/fdetach.c
+libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
+libpLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
+libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libpLiS_la_CFLAGS		= $(USER_CFLAGS)
+##if USING_IOCTL_GETPMSG_PUTPMSG
+libpLiS_la_LDFLAGS		+= -version-info 0:1:0
+##else
+##libpLiS_la_LDFLAGS		+= -version-info 0:0:0
+##endif
 
 EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 

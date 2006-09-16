@@ -1,2 +1,12 @@
-STREAMS_1.0 {
+STREAMS_0.0 {
+	__old_streams_*;
 };
+STREAMS_1.0 {
+	__streams_*;
+} STREAMS_0.0;
+LIS_0.0 {
+	__old_lis_*;
+} STREAMS_0.0;
+LIS_1.0 {
+	__lis_*;
+} STREAMS_0.0 STREAMS_1.0 LIS_0.0;

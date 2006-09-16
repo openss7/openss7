@@ -88,3 +88,8 @@ __streams_fattach(int fd, const char *path)
 }
 
 __asm__(".symver __streams_fattach,fattach@@STREAMS_1.0");
+
+int __lis_fattach(int, const char *)
+	__attribute__((weak, alias("__streams_fattach")));
+
+__asm__(".symver __lis_fattach,fattach@LIS_1.0");

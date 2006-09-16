@@ -68,6 +68,9 @@ static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.8
 #define __hot __attribute__((section(".text.hot")))
 #define __unlikely __attribute__((section(".text.unlikely")))
 
+int __streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
+int __old_streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
+
 /**
  * @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
  * @ingroup libLiS
@@ -82,7 +85,39 @@ static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.8
 int
 __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
-	return putpmsg(fd, ctlptr, datptr, -1, flags);
+	return __streams_putpmsg(fd, ctlptr, datptr, -1, flags);
 }
 
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __streams_putmsg,putmsg@@STREAMS_1.0");
+#else
+__asm__(".symver __streams_putmsg,putmsg@STREAMS_1.0");
+#endif
+
+int
+__old_streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+{
+	return __old_streams_putpmsg(fd, ctlptr, datptr, -1, flags);
+}
+
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
+__asm__(".symver __old_streams_putmsg,putmsg@STREAMS_0.0");
+#else
+__asm__(".symver __old_streams_putmsg,putmsg@@STREAMS_0.0");
+#endif
+
+int __lis_putmsg(int, const struct strbuf *, const struct strbuf *, int)
+	__attribute__((weak, alias("__streams_putmsg")));
+
+int __lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int)
+	__attribute__((weak, alias("__streams_putmsg")));
+
+__asm__(".symver __lis_putmsg_r,putmsg@LIS_1.0");
+
+int __old_lis_putmsg(int, const struct strbuf *, const struct strbuf *, int)
+	__attribute__((weak, alias("__old_streams_putmsg")));
+
+int __old_lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int)
+	__attribute__((weak, alias("__old_streams_putmsg")));
+
+__asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");

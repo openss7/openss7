@@ -157,3 +157,11 @@ __streams_pipe_r(int *fds)
 }
 
 __asm__(".symver __streams_pipe_r,pipe@@STREAMS_1.0");
+
+int __lis_pipe(int *)
+	__attribute__((weak, alias("__streams_pipe")));
+
+int __lis_pipe_r(int *)
+	__attribute__((weak, alias("__streams_pipe_r")));
+
+__asm__(".symver __lis_pipe_r,pipe@LIS_1.0");

@@ -123,11 +123,27 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 	args.flags = flags;
 
 	pthread_testcancel();
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 	if (likely((err = ioctl(fd, I_PUTPMSG, &args)) >= 0))
-#else
+		return (err);
+	__putpmsg_error(fd);
+	return (err);
+}
+
+static inline __hot int
+__old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+{
+	int err;
+	struct strpmsg args;
+
+	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) {
+					  -1, -1, NULL});
+	args.databuf = datptr ? *datptr : ((struct strbuf) {
+					   -1, -1, NULL});
+	args.band = band;
+	args.flags = flags;
+
+	pthread_testcancel();
 	if (likely((err = write(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0))
-#endif
 		return (err);
 	__putpmsg_error(fd);
 	return (err);
@@ -140,7 +156,41 @@ __streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datp
 	return __putpmsg(fd, ctlptr, datptr, band, flags);
 }
 
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __streams_putpmsg,putpmsg@@STREAMS_1.0");
+#else
+__asm__(".symver __streams_putpmsg,putpmsg@STREAMS_1.0");
+#endif
+
+__hot int
+__old_streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+		  int flags)
+{
+	return __old_putpmsg(fd, ctlptr, datptr, band, flags);
+}
+
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
+__asm__(".symver __old_streams_putpmsg,putpmsg@STREAMS_0.0");
+#else
+__asm__(".symver __old_streams_putpmsg,putpmsg@@STREAMS_0.0");
+#endif
+
+int __lis_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int)
+	__attribute__((weak, alias("__streams_putpmsg")));
+
+int __lis_putpmsg_r(int, const struct strbuf *, const struct strbuf *, int, int)
+	__attribute__((weak, alias("__streams_putpmsg")));
+
+__asm__(".symver __lis_putpmsg_r,putpmsg@LIS_1.0");
+
+int __old_lis_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int)
+	__attribute__((weak, alias("__old_streams_putpmsg")));
+
+int __old_lis_putpmsg_r(int, const struct strbuf *, const struct strbuf *, int, int)
+	__attribute__((weak, alias("__old_streams_putpmsg")));
+
+__asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");
+
 
 /**
  *
@@ -160,4 +210,36 @@ __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datpt
 	return __putpmsg(fd, ctlptr, datptr, -1, flags);
 }
 
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __streams_putmsg,putmsg@@STREAMS_1.0");
+#else
+__asm__(".symver __streams_putmsg,putmsg@STREAMS_1.0");
+#endif
+
+__hot int
+__old_streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+{
+	return __old_putpmsg(fd, ctlptr, datptr, -1, flags);
+}
+
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
+__asm__(".symver __old_streams_putmsg,putmsg@STREAMS_0.0");
+#else
+__asm__(".symver __old_streams_putmsg,putmsg@@STREAMS_0.0");
+#endif
+
+int __lis_putmsg(int, const struct strbuf *, const struct strbuf *, int, int)
+	__attribute__((weak, alias("__streams_putmsg")));
+
+int __lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int, int)
+	__attribute__((weak, alias("__streams_putmsg")));
+
+__asm__(".symver __lis_putmsg_r,putmsg@LIS_1.0");
+
+int __old_lis_putmsg(int, const struct strbuf *, const struct strbuf *, int, int)
+	__attribute__((weak, alias("__old_streams_putmsg")));
+
+int __old_lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int, int)
+	__attribute__((weak, alias("__old_streams_putmsg")));
+
+__asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");

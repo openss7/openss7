@@ -110,6 +110,36 @@ __getpmsg_error(int fd)
  * protection is not required.
  */
 static inline __hot int
+__old_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+{
+	int err;
+	struct strpmsg args;
+
+	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) {
+					  -1, -1, NULL});
+	args.databuf = datptr ? *datptr : ((struct strbuf) {
+					   -1, -1, NULL});
+	args.band = bandp ? *bandp : 0;
+	args.flags = flagsp ? *flagsp : 0;
+
+	pthread_testcancel();
+	if (likely((err = read(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0))
+	{
+		if (ctlptr)
+			ctlptr->len = args.ctlbuf.len;
+		if (datptr)
+			datptr->len = args.databuf.len;
+		if (bandp)
+			*bandp = args.band;
+		if (flagsp)
+			*flagsp = args.flags;
+		return (err);
+	}
+	__getpmsg_error(fd);
+	return (err);
+}
+
+static inline __hot int
 __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	int err;
@@ -123,11 +153,7 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 	args.flags = flagsp ? *flagsp : 0;
 
 	pthread_testcancel();
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 	if (likely((err = ioctl(fd, I_GETPMSG, &args)) >= 0))
-#else
-	if (likely((err = read(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0))
-#endif
 	{
 		if (ctlptr)
 			ctlptr->len = args.ctlbuf.len;
@@ -148,7 +174,40 @@ __streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *ban
 {
 	return __getpmsg(fd, ctlptr, datptr, bandp, flagsp);
 }
+
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __streams_getpmsg,getpmsg@@STREAMS_1.0");
+#else
+__asm__(".symver __streams_getpmsg,getpmsg@STREAMS_1.0");
+#endif
+
+int __hot
+__old_streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+{
+	return __old_getpmsg(fd, ctlptr, datptr, bandp, flagsp);
+}
+
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
+__asm__(".symver __old_streams_getpmsg,getpmsg@STREAMS_0.0");
+#else
+__asm__(".symver __old_streams_getpmsg,getpmsg@@STREAMS_0.0");
+#endif
+
+int __lis_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *)
+	__attribute__((weak, alias("__streams_getpmsg")));
+
+int __lis_getpmsg_r(int, struct strbuf *, struct strbuf *, int *, int *)
+	__attribute__((weak, alias("__streams_getpmsg")));
+
+__asm__(".symver __lis_getpmsg_r,getpmsg@LIS_1.0");
+
+int __old_lis_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *)
+	__attribute__((weak, alias("__old_streams_getpmsg")));
+
+int __old_lis_getpmsg_r(int, struct strbuf *, struct strbuf *, int *, int *)
+	__attribute__((weak, alias("__old_streams_getpmsg")));
+
+__asm__(".symver __old_lis_getpmsg_r,getpmsg@LIS_0.0");
 
 /**
  * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
@@ -174,4 +233,37 @@ __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flag
 
 	return __getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __streams_getmsg,getmsg@@STREAMS_1.0");
+#else
+__asm__(".symver __streams_getmsg,getmsg@STREAMS_1.0");
+#endif
+
+int __hot
+__old_streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+{
+	int band = -1;
+
+	return __old_getpmsg(fd, ctlptr, datptr, &band, flagsp);
+}
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
+__asm__(".symver __old_streams_getmsg,getmsg@STREAMS_0.0");
+#else
+__asm__(".symver __old_streams_getmsg,getmsg@@STREAMS_0.0");
+#endif
+
+int __lis_getmsg(int, struct strbuf *, struct strbuf *, int *)
+	__attribute__((weak, alias("__streams_getmsg")));
+
+int __lis_getmsg_r(int, struct strbuf *, struct strbuf *, int *)
+	__attribute__((weak, alias("__streams_getmsg")));
+
+__asm__(".symver __lis_getmsg_r,getmsg@LIS_1.0");
+
+int __old_lis_getmsg(int, struct strbuf *, struct strbuf *, int *)
+	__attribute__((weak, alias("__old_streams_getmsg")));
+
+int __old_lis_getmsg_r(int, struct strbuf *, struct strbuf *, int *)
+	__attribute__((weak, alias("__old_streams_getmsg")));
+
+__asm__(".symver __old_lis_getmsg_r,getmsg@LIS_0.0");

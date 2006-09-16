@@ -96,3 +96,9 @@ __streams_isastream(int fd)
 }
 
 __asm__(".symver __streams_isastream,isastream@@STREAMS_1.0");
+
+int __lis_isastream(int)
+	__attribute__((weak, alias("__streams_isastream")));
+
+__asm__(".symver __lis_isastream,isastream@LIS_1.0");
+

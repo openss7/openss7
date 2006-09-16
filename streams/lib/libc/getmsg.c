@@ -73,6 +73,9 @@ static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.8
 #define __hot __attribute__((section(".text.hot")))
 #define __unlikely __attribute__((section(".text.unlikely")))
 
+int __streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
+int __old_streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
+
 /**
  * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
  * @ingroup libstreams
@@ -95,7 +98,41 @@ __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flag
 {
 	int band = -1;
 
-	return getpmsg(fd, ctlptr, datptr, &band, flagsp);
+	return __streams_getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
 
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __streams_getmsg,getmsg@@STREAMS_1.0")
+#else
+__asm__(".symver __streams_getmsg,getmsg@STREAMS_1.0")
+#endif
+
+int
+__old_streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+{
+	int band = -1;
+
+	return __old_streams_getpmsg(fd, ctlptr, datptr, &band, flagsp);
+}
+
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
+__asm__(".symver __old_streams_getmsg,getmsg@STREAMS_0.0")
+#else
+__asm__(".symver __old_streams_getmsg,getmsg@@STREAMS_0.0")
+#endif
+
+int __lis_getmsg(int, struct strbuf *, struct strbuf *, int *)
+	__attribute__((weak, alias("__streams_getmsg")));
+
+int __lis_getmsg_r(int, struct strbuf *, struct strbuf *, int *)
+	__attribute__((weak, alias("__streams_getmsg")));
+
+__asm__(".symver __lis_getmsg_r,getmsg@LIS_1.0");
+
+int __old_lis_getmsg(int, struct strbuf *, struct strbuf *, int *)
+	__attribute__((weak, alias("__old_streams_getmsg")));
+
+int __old_lis_getmsg_r(int, struct strbuf *, struct strbuf *, int *)
+	__attribute__((weak, alias("__old_streams_getmsg")));
+
+__asm__(".symver __old_lis_getmsg_r,getmsg@LIS_0.0");
