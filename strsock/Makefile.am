@@ -86,6 +86,7 @@ EXTRA_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod
 
 pkglibexec_PROGRAMS		= \
+				  test-sockpath \
 				  test-socket \
 				  test-socklib
 
@@ -107,6 +108,13 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+test_sockpath_SOURCES		= src/test/test-sockpath.c
+test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_sockpath_LDADD		= libsockpath.la $(STREAMS_LDADD)
+test_sockpath_LDFLAGS		= -static
+test_sockpath_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sockpath_CFLAGS		= $(USER_CFLAGS)
 
 test_socket_SOURCES		= src/test/test-sock.c
 test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -143,6 +151,19 @@ soconfig_CFLAGS			= $(USER_CFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #xxxxxx_CFLAGS			= $(USER_CFLAGS)
 
+lib_LTLIBRARIES			+= libsockpath.la
+
+libsockpath_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/sockpath.c \
+				  src/lib/sockpath.h \
+				  src/include/sockdb.h \
+				  src/include/sys/sockpath.h
+libsockpath_la_DEPENDENCIES	= src/lib/sockpath.VERSION
+libsockpath_la_LDFLAGS		= -version-info 0:0:0 -Wl,--version-script -Wl,$(top_srcdir)/src/lib/sockpath.VERSION
+libsockpath_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
+libsockpath_la_CFLAGS		= $(USER_CFLAGS)
+libsockpath_la_LIBADD		=
+
 lib_LTLIBRARIES			+= libsocket.la
 
 libsocket_la_SOURCES		= src/lib/pthread.c \
@@ -160,10 +181,10 @@ libsocklib_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/socklib.c \
 				  gettext.h
 libsocklib_la_DEPENDENCIES	= src/lib/socklib.VERSION
-libsocklib_la_LDFLAGS		= $(STREAMS_LDADD) -version-info 0:0:0 -Wl,--version-script -Wl,$(top_srcdir)/src/lib/socklib.VERSION
+libsocklib_la_LDFLAGS		= $(STREAMS_LDADD) $(XTI_LDADD) $(NSL_LDADD) -version-info 0:0:0 -Wl,--version-script -Wl,$(top_srcdir)/src/lib/socklib.VERSION
 libsocklib_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsocklib_la_CFLAGS		= $(USER_CFLAGS)
-libsocklib_la_LIBADD		=
+libsocklib_la_LIBADD		= libsockpath.la
 
 ## RPM_BUILD_USER
 endif

@@ -1,3 +1,18 @@
+2006-09-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am:
+	  - added sockpath library (and test program)
+	  - added dependent library for socklib
+	* src/lib/socket.VERSION: automatically pull in symbols
+	* src/lib/socklib.VERSION: automatically pull in symbols
+	* src/lib/socklib.c: building up library
+	* src/lib/sockpath.c: building up library
+	* src/include/sockdb.h: new header for libsockpath
+	* src/include/sys/sockpath.h: new header for libsockpath
+	* src/lib/sockpath.VERSION: added new version file
+	* src/lib/sockpath.h: added local header file
+	* src/test/test-sockpath.c: added test program for sockpath library
+
 2006-09-15  Brian Bidulock  <bidulock@openss7.org>
 
 	- added symbol versioning to all libraries
