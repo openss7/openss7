@@ -88,8 +88,8 @@ pthread_setcanceltype(int type, int *oldtype)
 #define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
 
-static int
-__fdetach(const char *path)
+int
+__lis_fdetach(const char *path)
 {
 	int ffd, error = 0;
 
@@ -106,6 +106,7 @@ __fdetach(const char *path)
 }
 
 /**
+ * @fn int fdetach(const char *path)
  * @ingroup libLiS
  * @brief detach a path from a stream.
  * @param path the path in the filesystem from which to detach.
@@ -115,12 +116,14 @@ __fdetach(const char *path)
  * close() operations.
  */
 int
-fdetach(const char *path)
+__lis_fdetach_r(const char *path)
 {
 	int oldtype, ret;
 
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
-	ret = __fdetach(path);
+	ret = __lis_fdetach(path);
 	pthread_setcanceltype(oldtype, NULL);
 	return (ret);
 }
+
+__asm__(".symver __lis_fdetach_r,fdetach@@LIS_1.0");

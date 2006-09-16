@@ -115,8 +115,8 @@ pthread_testcancel(void)
 	return;
 }
 
-static int
-__getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+int
+__old_lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 #ifdef BLD32OVER64
 	strbuf6_t ctl6;
@@ -158,7 +158,6 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 
 	return (rc);
 #else
-#if 0
 	/* 
 	 *  This no longer works on FC4 2.6.11 kernel: validity checks are
 	 *  performed on the length before we get here.  We might as well patch
@@ -184,6 +183,51 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 	};
 
 	return (read(fd, &args, LIS_GETMSG_PUTMSG_ULEN));
+#endif
+}
+
+int
+__lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+{
+#ifdef BLD32OVER64
+	strbuf6_t ctl6;
+	strbuf6_t *ptrc6 = 0;
+	strbuf6_t dat6;
+	strbuf6_t *ptrd6 = 0;
+	getpmsg_args6_t args;
+	int rc;
+
+	if (ctlptr) {
+		ctl6.maxlen = ctlptr->maxlen;
+		ctl6.len = ctlptr->len;
+		ctl6.buf = (unsigned long long) (unsigned long) ctlptr->buf;
+		ptrc6 = &ctl6;
+	}
+
+	if (dataptr) {
+		dat6.maxlen = dataptr->maxlen;
+		dat6.len = dataptr->len;
+		dat6.buf = (unsigned long long) (unsigned long) dataptr->buf;
+		ptrd6 = &dat6;
+	}
+
+	memset((void *) &args, 0, sizeof(getpmsg_args6_t));
+	args.fd = fd;
+	args.ctl = (unsigned long long) (unsigned long) ptrc6;
+	args.dat = (unsigned long long) (unsigned long) ptrd6;
+	args.bandp = (unsigned long long) (unsigned long) bandp;
+	args.flagsp = (unsigned long long) (unsigned long) flagsp;
+
+	rc = read(fd, &args, LIS_GETMSG_PUTMSG_ULEN);
+
+	if (ctlptr) {
+		ctlptr->len = ctl6.len;
+	}
+	if (dataptr) {
+		dataptr->len = dat6.len;
+	}
+
+	return (rc);
 #else
 	struct strpmsg args = { {-1, -1, NULL}, {-1, -1, NULL}, -1, -1 };
 	int rc;
@@ -208,7 +252,6 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 	}
 	return (rc);
 #endif
-#endif
 }
 
 /**
@@ -229,13 +272,29 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
  * protection is not required.
  */
 int
-getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+__lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	int ret;
 
 	pthread_testcancel();
-	ret = __getpmsg(fd, ctlptr, datptr, bandp, flagsp);
+	ret = __lis_getpmsg(fd, ctlptr, datptr, bandp, flagsp);
 	if (ret == -1)
 		pthread_testcancel();
 	return (ret);
 }
+
+__asm__(".symver __lis_getpmsg_r,getpmsg@@LIS_1.0");
+
+int
+__old_lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+{
+	int ret;
+
+	pthread_testcancel();
+	ret = __old_lis_getpmsg(fd, ctlptr, datptr, bandp, flagsp);
+	if (ret == -1)
+		pthread_testcancel();
+	return (ret);
+}
+
+__asm__(".symver __old_lis_getpmsg_r,getpmsg@LIS_0.0");

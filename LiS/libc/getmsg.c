@@ -63,7 +63,11 @@ static char const ident[] =
 #include <stropts.h>
 #include <unistd.h>
 
+int __lis_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
+int __lis_getpmsg_r(int, struct strbuf *, struct strbuf *, int *, int *);
+
 /**
+ * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
  * @ingroup libLiS
  * @brief get a message from a STREAM.
  * @param fd a file descriptor for the stream.
@@ -80,7 +84,32 @@ static char const ident[] =
  * required.
  */
 int
-getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+__lis_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
-	return getpmsg(fd, ctlptr, datptr, NULL, flagsp);
+	return __lis_getpmsg(fd, ctlptr, datptr, NULL, flagsp);
 }
+
+int
+__lis_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+{
+	return __lis_getpmsg_r(fd, ctlptr, datptr, NULL, flagsp);
+}
+
+__asm__(".symver __lis_getmsg_r,getmsg@@LIS_1.0");
+
+int __old_lis_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
+int __old_lis_getpmsg_r(int, struct strbuf *, struct strbuf *, int *, int *);
+
+int
+__old_lis_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+{
+	return __old_lis_getpmsg(fd, ctlptr, datptr, NULL, flagsp);
+}
+
+int
+__old_lis_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+{
+	return __old_lis_getpmsg_r(fd, ctlptr, datptr, NULL, flagsp);
+}
+
+__asm__(".symver __old_lis_getmsg_r,getmsg@LIS_0.0");

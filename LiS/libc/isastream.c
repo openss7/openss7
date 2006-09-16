@@ -64,6 +64,7 @@ static char const ident[] =
 #include <stropts.h>
 
 /**
+ * @fn int isastream(int fd)
  * @ingroup libLiS
  * @brief test a stream.
  * @param fd a file descriptor to test.
@@ -73,7 +74,7 @@ static char const ident[] =
  * cancellation protection is not required.
  */
 int
-isastream(int fd)
+__lis_isastream(int fd)
 {
 #ifdef USER
 	return (user_ioctl(fd, I_CANPUT, 0) != -1);
@@ -81,3 +82,5 @@ isastream(int fd)
 	return (ioctl(fd, I_CANPUT, 0) != -1);
 #endif
 }
+
+__asm__(".symver __lis_isastream,isastream@@LIS_1.0");

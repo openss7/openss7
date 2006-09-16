@@ -60,6 +60,7 @@ static char const ident[] =
 #include <sys/ioctl.h>
 
 /**
+ * @fn int fattach(int fd, const char *path)
  * @ingroup libLiS
  * @brief attach a stream to a path in a filesystem.
  * @param fd the file descriptor of the stream to attach.
@@ -70,7 +71,9 @@ static char const ident[] =
  * cancellation safe.
  */
 int
-fattach(int fd, const char *path)
+__lis_fattach(int fd, const char *path)
 {
 	return (ioctl(fd, I_LIS_FATTACH, path));
 }
+
+__asm__(".symver __lis_fattach,fattach@@LIS_1.0");

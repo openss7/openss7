@@ -58,7 +58,11 @@ static char const ident[] =
 #include <sys/types.h>
 #include <stropts.h>
 
+int __lis_putpmsg(int, struct strbuf *, struct strbuf *, int, int);
+int __lis_putpmsg_r(int, struct strbuf *, struct strbuf *, int, int);
+
 /**
+ * @fn int putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
  * @ingroup libLiS
  * @brief put a message to a stream band.
  * @param fd a file descriptor representing the stream.
@@ -69,7 +73,32 @@ static char const ident[] =
  * This function is a thread cancellation point.
  */
 int
-putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
+__lis_putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
 {
-	return putpmsg(fd, ctlptr, datptr, -1, flags);
+	return __lis_putpmsg(fd, ctlptr, datptr, -1, flags);
 }
+
+int
+__lis_putmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
+{
+	return __lis_putpmsg_r(fd, ctlptr, datptr, -1, flags);
+}
+
+__asm__(".symver __lis_putmsg_r,putmsg@@LIS_1.0");
+
+int __old_lis_putpmsg(int, struct strbuf *, struct strbuf *, int, int);
+int __old_lis_putpmsg_r(int, struct strbuf *, struct strbuf *, int, int);
+
+int
+__old_lis_putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
+{
+	return __old_lis_putpmsg(fd, ctlptr, datptr, -1, flags);
+}
+
+int
+__old_lis_putmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
+{
+	return __old_lis_putpmsg_r(fd, ctlptr, datptr, -1, flags);
+}
+
+__asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");

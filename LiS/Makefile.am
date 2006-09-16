@@ -256,7 +256,8 @@ libLiS_la_SOURCES		= libc/fattach.c \
 				  libc/pipe.c \
 				  libc/putmsg.c \
 				  libc/putpmsg.c
-libLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0
+libLiS_la_DEPENDENCIES		= $(top_srcdir)/libc/LiS.VERSION
+libLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 -Wl,--version-script -Wl,$(top_srcdir)/libc/LiS.VERSION
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS)
 
@@ -268,7 +269,8 @@ libpLiS_la_SOURCES		= libc/fattach.c \
 				  libc/isastream.c \
 				  libc/putmsg.c \
 				  libc/putpmsg.c
-libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0
+libpLiS_la_DEPENDENCIES		= $(top_srcdir)/libc/LiS.VERSION
+libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 -Wl,--version-script -Wl,$(top_srcdir)/libc/LiS.VERSION
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS)
 

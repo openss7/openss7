@@ -113,8 +113,8 @@ typedef struct putpmsg_args6 {
 } putpmsg_args6_t;
 #endif
 
-static int
-__putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+int
+__old_lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
 {
 #ifdef BLD32OVER64
 	putpmsg_args6_t args;
@@ -146,7 +146,6 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
 
 	return (write(fd, &args, LIS_GETMSG_PUTMSG_ULEN));
 #else
-#if 0
 	/* 
 	 *  This no longer works on FC4 2.6.11 kernel: validity checks are
 	 *  performed on the length before we get here.  We might as well patch
@@ -172,6 +171,41 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
 	};
 
 	return (write(fd, &args, LIS_GETMSG_PUTMSG_ULEN));
+#endif
+}
+
+int
+__lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+{
+#ifdef BLD32OVER64
+	putpmsg_args6_t args;
+	strbuf6_t ctl6;
+	strbuf6_t *ptrc6 = 0;
+	strbuf6_t dat6;
+	strbuf6_t *ptrd6 = 0;
+
+	if (ctlptr) {
+		ctl6.maxlen = ctlptr->maxlen;
+		ctl6.len = ctlptr->len;
+		ctl6.buf = (unsigned long long) (unsigned long) ctlptr->buf;
+		ptrc6 = &ctl6;
+	}
+
+	if (dataptr) {
+		dat6.maxlen = dataptr->maxlen;
+		dat6.len = dataptr->len;
+		dat6.buf = (unsigned long long) (unsigned long) dataptr->buf;
+		ptrd6 = &dat6;
+	}
+
+	memset((void *) &args, 0, sizeof(putpmsg_args6_t));
+	args.fd = fd;
+	args.ctl = (unsigned long long) (unsigned long) ptrc6;
+	args.dat = (unsigned long long) (unsigned long) ptrd6;
+	args.band = band;
+	args.flags = flags;
+
+	return (write(fd, &args, LIS_GETMSG_PUTMSG_ULEN));
 #else
 	struct strpmsg args = { {-1, -1, NULL}, {-1, -1, NULL}, band, flags };
 	int rc;
@@ -187,7 +221,6 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
 			*datptr = args.databuf;
 	}
 	return (rc);
-#endif
 #endif
 }
 
@@ -209,13 +242,29 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
  * protection is not required.
  */
 int
-putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+__lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
 {
 	int ret;
 
 	pthread_testcancel();
-	ret = __putpmsg(fd, ctlptr, datptr, band, flags);
+	ret = __lis_putpmsg(fd, ctlptr, datptr, band, flags);
 	if (ret == -1)
 		pthread_testcancel();
 	return (ret);
 }
+
+__asm__(".symver __lis_putpmsg_r,putpmsg@@LIS_1.0");
+
+int
+__old_lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+{
+	int ret;
+
+	pthread_testcancel();
+	ret = __old_lis_putpmsg(fd, ctlptr, datptr, band, flags);
+	if (ret == -1)
+		pthread_testcancel();
+	return (ret);
+}
+
+__asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");

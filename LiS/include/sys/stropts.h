@@ -506,7 +506,7 @@ typedef struct {
  * interpreted as one of these structures.
  */
 
-#if 0
+#if 1
 /*
  *  This no longer works on FC4 2.6.11 kernel: validity checks are performed on
  *  the length before we get here.  We might as well patch this out for all

@@ -1,3 +1,18 @@
+2006-09-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added version script to compile
+	* head/head.c: turned on old putmsg/getmsg mechanism
+	* include/sys/stropts.h: turned on old putmsg/getmsg mechanism
+	* libc/fattach.c: added versions
+	* libc/fdetach.c: added versions
+	* libc/getmsg.c: added versions and old putmsg/getmsg
+	* libc/getpmsg.c: added versions and old putmsg/getmsg
+	* libc/isastream.c: added versions
+	* libc/pipe.c: added versions
+	* libc/putmsg.c: added versions and old putmsg/getmsg
+	* libc/putpmsg.c: added versions and old putmsg/getmsg
+	* libc/LiS.VERSION: added symbol versions file
+
 2006-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/Makefile.am: missing bugs.texi from release

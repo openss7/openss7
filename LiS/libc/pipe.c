@@ -87,7 +87,7 @@ pthread_setcanceltype(int type, int *oldtype)
 #define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
 
-static int
+int
 __lis_pipe(int *fds)
 {
 	int fd, error = 0;
@@ -105,6 +105,7 @@ __lis_pipe(int *fds)
 }
 
 /**
+ * @fn int pipe(int *fds)
  * @ingroup libLiS
  * @brief open a streams based pipe.
  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
@@ -114,7 +115,7 @@ __lis_pipe(int *fds)
  * close() operations.
  */
 int
-pipe(int *fds)
+__lis_pipe_r(int *fds)
 {
 	int oldtype, ret;
 
@@ -123,3 +124,5 @@ pipe(int *fds)
 	pthread_setcanceltype(oldtype, NULL);
 	return (ret);
 }
+
+__asm__(".symver __lis_pipe_r,pipe@@LIS_1.0");
