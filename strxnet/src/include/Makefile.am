@@ -103,6 +103,11 @@ atm_headers	= \
 sctp_headers	= \
 	sys/xti_sctp.h
 
+xnsl_headers	= \
+	netdir.h \
+	netconfig.h \
+	sys/netconfig.h
+
 sock_headers	= \
 	sys/sockmod.h
 
@@ -118,6 +123,11 @@ if WITH_XNET
 nobase_pkginclude_HEADERS += $(xnet_headers) $(inet_headers) $(sctp_headers) $(osi_headers) $(atm_headers)
 ## WITH_XNET
 endif
+if WITH_XNSL
+## WITH_XNSL
+nobase_pkginclude_HEADERS += $(xnsl_headers)
+## WITH_XNSL
+endif
 if WITH_SOCK
 ## WITH_SOCK
 nobase_pkginclude_HEADERS += $(sock_headers)
@@ -132,6 +142,7 @@ dist_noinst_HEADERS = \
 	$(osi_headers) \
 	$(atm_headers) \
 	$(sctp_headers) \
+	$(xnsl_headers) \
 	$(sock_headers)
 
 nobase_nodist_pkginclude_HEADERS = \
