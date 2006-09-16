@@ -109,16 +109,21 @@ struct nd_hostservlist {
 #endif
 
 /* for use with netdir_options() */
-#define ND_SET_BROADCAST	1
-#define ND_SET_RESERVEDPORT	2
-#define ND_CHECK_RESERVEDPORT	3
-#define ND_MERGEADDR		4
-#define ND_JOIN_MULTICAST	5
-#define ND_LEAVE_MULTICAST	6
+#define ND_SET_BROADCAST	 1
+#define ND_SET_RESERVEDPORT	 2
+#define ND_CHECK_RESERVEDPORT	 3
+#define ND_MERGEADDR		 4
+#define ND_JOIN_MULTICAST	 5
+#define ND_LEAVE_MULTICAST	 6
 
-#define ND_CLEAR_BROADCAST	7	/* UnixWare - not binary compatible */
-#define ND_SET_REUSEADDR	8	/* UnixWare - not binary compatible */
-#define ND_CLEAR_REUSEADDR	9	/* UnixWare - not binary compatible */
+#define ND_CLEAR_BROADCAST	 7	/* UnixWare - not binary compatible */
+#define ND_SET_REUSEADDR	 8	/* UnixWare - not binary compatible */
+#define ND_CLEAR_REUSEADDR	 9	/* UnixWare - not binary compatible */
+#define ND_SET_DONTROUTE	10	/* OpenSS7 specific */
+#define ND_CLEAR_DONTROUTE	11	/* OpenSS7 specific */
+#define ND_SET_KEEPALIVE	12	/* OpenSS7 specific */
+#define ND_CLEAR_KEEPALIVE	13	/* OpenSS7 specific */
+#define ND_SET_PRIORITY		14	/* OpenSS7 specific */
 
 struct nd_mergearg {
 	char *s_uaddr;			/* server universal address */

@@ -1,3 +1,13 @@
+2006-09-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: tweaks
+	* src/include/netdir.h: added options
+	* src/include/sys/xti_xti.h: added options
+	* src/lib/netdir_inet.c: better option handling for sockets
+	* src/lib/netselect.c: a few corrections
+	* src/lib/xnet.VERSION: wider versioning
+	* src/lib/xnsl.VERSION: wider versioning
+
 2006-09-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/sysconfig/netconfig: added default netconfig file (will

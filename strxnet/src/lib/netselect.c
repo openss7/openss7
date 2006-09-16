@@ -175,7 +175,7 @@ __nsl_tsd_alloc(void)
 
 /**
  * @internal
- * @fn struct __nsl_tsd *__nsl_get_tsd(void);
+ * @fn struct __nsl_tsd *__nsl_get_tsd(void)
  * @brief Get thread specific data for the xnsl library.
  *
  * This function obtains (and allocates if necessary), thread specific data for
@@ -418,7 +418,7 @@ __nsl_getnetconfiglist(void)
 }
 
 /**
- * @fn void *setnetconfig(void);
+ * @fn void *setnetconfig(void)
  * @brief Provide a handle to the netconfig database.
  *
  * This function hase the effect of binding to or rewinding the netconfig
@@ -454,7 +454,7 @@ __nsl_setnetconfig(void)
 __asm__(".symver __nsl_setnetconfig,setnetconfig@@XNSL_1.0");
 
 /**
- * @fn struct netconfig *getnetconfig(void *handle);
+ * @fn struct netconfig *getnetconfig(void *handle)
  * @brief Retrieve next entry in the netconfig database.
  * @param handle handle returned by setnetconfig().
  *
@@ -493,7 +493,7 @@ __nsl_getnetconfig(void *handle)
 __asm__(".symver __nsl_getnetconfig,getnetconfig@@XNSL_1.0");
 
 /**
- * @fn int endnetconfig(void *handle);
+ * @fn int endnetconfig(void *handle)
  * @brief Release network configuration database.
  * @param handle handle returned by setnetconfig().
  *
@@ -531,7 +531,7 @@ __nsl_endnetconfig(void *handle)
 __asm__(".symver __nsl_endnetconfig,endnetconfig@@XNSL_1.0");
 
 /**
- * @fn struct netconfig *getnetconfigent(const char *netid);
+ * @fn struct netconfig *getnetconfigent(const char *netid)
  * @brief Return a network configuration entry for a network id.
  * @param netid the network id.
  *
@@ -545,81 +545,79 @@ __asm__(".symver __nsl_endnetconfig,endnetconfig@@XNSL_1.0");
 struct netconfig *
 __nsl_getnetconfigent(const char *netid)
 {
-	struct netconfig **ncp, *nc_new = NULL;
+	struct netconfig **ncp, *nc = NULL;
 
 	if ((ncp = __nsl_getnetconfiglist())) {
 		nc_error = NC_NOTFOUND;
 		for (; *ncp; ++ncp) {
 			if (strcmp((*ncp)->nc_netid, netid) == 0) {
-				if ((nc_new = malloc(sizeof(*nc_new))) == NULL) {
+				if ((nc = malloc(sizeof(*nc))) == NULL) {
 					nc_error = NC_NOMEM;
 					break;
 				}
-				memset(nc_new, 0, sizeof(*nc_new));
-				if ((nc_line_set(nc_new, strdup(nc_line(*ncp)))) == NULL) {
-					free(nc_new);
+				memcpy(nc, (*ncp), sizeof(*nc));
+				if ((nc_line_set(nc, strdup(nc_line(*ncp)))) == NULL) {
+					free(nc);
 					nc_error = NC_NOMEM;
 					break;
 				}
 				if ((*ncp)->nc_nlookups > 0) {
 					int i;
 
-					nc_new->nc_nlookups = (*ncp)->nc_nlookups;
-					nc_new->nc_lookups =
+					nc->nc_nlookups = (*ncp)->nc_nlookups;
+					nc->nc_lookups =
 					    calloc((*ncp)->nc_nlookups, sizeof(char *));
-					if (nc_new->nc_lookups == NULL) {
-						free(nc_line(nc_new));
-						free(nc_new);
+					if (nc->nc_lookups == NULL) {
+						free(nc_line(nc));
+						free(nc);
 						nc_error = NC_NOMEM;
 						break;
 					}
-					memcpy(nc_new->nc_lookups, (*ncp)->nc_lookups,
+					memcpy(nc->nc_lookups, (*ncp)->nc_lookups,
 					       (*ncp)->nc_nlookups * sizeof(char *));
 					/* reindex everything into the new line */
-					nc_new->nc_netid =
-					    (*ncp)->nc_netid - nc_line(*ncp) + nc_line(nc_new);
-					nc_new->nc_protofmly =
-					    (*ncp)->nc_protofmly - nc_line(*ncp) + nc_line(nc_new);
-					nc_new->nc_proto =
-					    (*ncp)->nc_proto - nc_line(*ncp) + nc_line(nc_new);
-					nc_new->nc_device =
-					    (*ncp)->nc_device - nc_line(*ncp) + nc_line(nc_new);
+					nc->nc_netid =
+					    (*ncp)->nc_netid - nc_line(*ncp) + nc_line(nc);
+					nc->nc_protofmly =
+					    (*ncp)->nc_protofmly - nc_line(*ncp) + nc_line(nc);
+					nc->nc_proto =
+					    (*ncp)->nc_proto - nc_line(*ncp) + nc_line(nc);
+					nc->nc_device =
+					    (*ncp)->nc_device - nc_line(*ncp) + nc_line(nc);
 					for (i = 0; i < (*ncp)->nc_nlookups; i++)
-						nc_new->nc_lookups[i] =
+						nc->nc_lookups[i] =
 						    (*ncp)->nc_lookups[i] - nc_line(*ncp) +
-						    nc_line(nc_new);
+						    nc_line(nc);
 				}
 				nc_error = NC_NOERROR;
 				break;
 			}
 		}
 	}
-	return (nc_new);
+	return (nc);
 }
 
 #pragma weak getnetconfigent
 __asm__(".symver __nsl_getnetconfigent,getnetconfigent@@XNSL_1.0");
 
 /**
- * @fn void freenetconfigent(struct netconfig *nc);
+ * @fn void freenetconfigent(struct netconfig *nc)
  * @brief Free a netconfig database entry.
  * @param nc the database entry to free.
  *
  * This function frees the netconfig structure pointed to by nc (previously
  * returned by getneconfigent()).
- *
- * Upon success, this function returns a pointer to the struct netconfig
- * structure corresponding to the netid; otherwise, it returns NULL.
  */
 void
 __nsl_freenetconfigent(struct netconfig *nc)
 {
-	if (nc_line(nc))
-		free(nc_line(nc));
-	if (nc->nc_lookups)
-		free(nc->nc_lookups);
-	free(nc);
-	return;
+	if (nc) {
+		if (nc_line(nc))
+			free(nc_line(nc));
+		if (nc->nc_lookups)
+			free(nc->nc_lookups);
+		free(nc);
+	}
 }
 
 #pragma weak freenetconfigent
@@ -684,7 +682,7 @@ TRANS the decimal value of the unknown error number.
 /* *INDENT-ON* */
 
 /**
- * @fn char *nc_sperror(void);
+ * @fn char *nc_sperror(void)
  * @brief Return an error string.
  *
  * This function is similar to nc_perror() but instead of printing the message
@@ -734,8 +732,8 @@ __nsl_nc_sperror(void)
 __asm__(".symver __nsl_nc_sperror,nc_sperror@@XNSL_1.0");
 
 /**
- * @fn void nc_perror(const char *msg);
- * @brief Print an error message to standard output.
+ * @fn void nc_perror(const char *msg)
+ * @brief Print an error message to standard error.
  * @param msg message to prefix to error message.
  *
  * This function prints and error message to standard error indicating why any
@@ -759,7 +757,7 @@ __nsl_nc_perror(const char *msg)
 __asm__(".symver __nsl_nc_perror,nc_perror@@XNSL_1.0");
 
 /**
- * @fn void *setnetpath(void);
+ * @fn void *setnetpath(void)
  * @brief Get a handle for network configuration database.
  *
  * A call to this function binds to or rewinds NETPATH.  This function must be
@@ -844,7 +842,7 @@ __nsl_setnetpath(void)
 __asm__(".symver __nsl_setnetpath,setnetpath@@XNSL_1.0");
 
 /**
- * @fn struct netconfig *getnetpath(void *handle);
+ * @fn struct netconfig *getnetpath(void *handle)
  * @brief Get the next entry associated with handle.
  * @param handle a pointer to the handle returned by setnetpath().
  *
@@ -878,7 +876,7 @@ __nsl_getnetpath(void *handle)
 __asm__(".symver __nsl_getnetpath,getnetpath@@XNSL_1.0");
 
 /**
- * @fn int endnetpath(void *handle);
+ * @fn int endnetpath(void *handle)
  * @brief Free netpath resources associated with handle.
  * @param handle a pointer to the handle returned by setnetpath().
  *

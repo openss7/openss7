@@ -142,12 +142,14 @@ sbin_PROGRAMS			= \
 if WITH_TLI
 ## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
+test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
 test_tirdwr_LDFLAGS		= -static
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
+test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_timod_LDADD		= $(STREAMS_LDADD)
 test_timod_LDFLAGS		= -static
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -310,12 +312,14 @@ sbin_PROGRAMS			= \
 if WITH_TLI
 ## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
+test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
 test_tirdwr_LDFLAGS		= -static
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
+test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_timod_LDADD		= $(STREAMS_LDADD)
 test_timod_LDFLAGS		= -static
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -353,12 +357,14 @@ endif
 if WITH_XNSL
 ## WITH_XNSL
 test_xnsl_SOURCES		= src/test/test-xnsl.c
+test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_xnsl_LDADD			= libxnet.la libxnsl.la $(STREAMS_LDADD)
 test_xnsl_LDFLAGS		= 
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS)
 
 test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
+test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_xnsl_thr_LDADD		= libxnet.la libxnsl.la $(STREAMS_LDADD) -lpthread
 test_xnsl_thr_LDFLAGS		=
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT

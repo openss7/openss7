@@ -73,10 +73,19 @@ typedef int32_t t_scalar_t;
  */
 #define XTI_DEBUG	0x0001	/* enable debugging */
 #define XTI_LINGER	0x0080	/* linger on close if data present */
-#define XTI_RCVBUF	0x1002	/* receive buffer size */
-#define XTI_RCVLOWAT	0x1004	/* receive low-water mark */
 #define XTI_SNDBUF	0x1001	/* send buffer size */
+#define XTI_RCVBUF	0x1002	/* receive buffer size */
 #define XTI_SNDLOWAT	0x1003	/* send low-water mark */
+#define XTI_RCVLOWAT	0x1004	/* receive low-water mark */
+
+/*
+ * Additional extension XTI-level Options
+ */
+#define XTI_REUSEADDR	0x2001	/* reuse addresses */
+#define XTI_DONTROUTE	0x2002	/* do not route */
+#define XTI_BROADCAST	0x2003	/* permit broadcast */
+#define XTI_KEEPALIVE	0x2004	/* keep connections alive */
+#define XTI_PRIORITY	0x2005	/* set connection priority */
 
 /* 
  * Structure used with linger option.

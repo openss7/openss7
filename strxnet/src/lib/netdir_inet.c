@@ -185,13 +185,13 @@ __inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
 	hints.ai_addr = NULL;
 
 	if (getaddrinfo(h->h_name, h->h_serv, &hints, &res) == -1) {
-		_nderror = ND_SYSTEM;
+		nd_error = ND_SYSTEM;
 		return (NULL);
 	}
 	/* count them */
 	for (cnt = 0, ai = res; ai; cnt++, ai = ai->ai_next) ;
 	if (cnt == 0) {
-		_nderror = ND_NOHOST;
+		nd_error = ND_NOHOST;
 		return (NULL);
 	}
 	if ((n = malloc(sizeof(*n))) == NULL)
@@ -211,7 +211,7 @@ __inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
 	freeaddrinfo(res);
 	return (n);
       nomem:
-	_nderror = ND_NOMEM;
+	nd_error = ND_NOMEM;
 	goto error;
       error:
 	netdir_free(n, ND_ADDRLIST);
@@ -243,16 +243,16 @@ __inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
 	int cnt;
 
 	if (addr == NULL || addr->buf == NULL || addr->len == 0) {
-		_nderror = ND_BADARG;
+		nd_error = ND_BADARG;
 		return (NULL);
 	}
 	if (addr->len < sizeof(*sin)) {
-		_nderror = ND_NO_ADDRESS;
+		nd_error = ND_NO_ADDRESS;
 		return (NULL);
 	}
 	sin = (struct sockaddr_in *) addr->buf;
 	if (sin->sin_family != AF_INET && sin->sin_family != 0) {
-		_nderror = ND_NO_ADDRESS;
+		nd_error = ND_NO_ADDRESS;
 		return (NULL);
 	}
 	if ((s = getservbyport(sin->sin_port, nc->nc_proto)) == NULL) {
@@ -297,7 +297,7 @@ __inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
 	}
 	return (hl);
       nomem:
-	_nderror = ND_NOMEM;
+	nd_error = ND_NOMEM;
 	goto error;
       error:
 	netdir_free(hl, ND_HOSTSERVLIST);
@@ -321,12 +321,70 @@ __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 	switch (option) {
 	case ND_SET_BROADCAST:
 		return (__setoption(fd, T_INET_IP, T_IP_BROADCAST, T_YES));
+#ifdef ND_CLEAR_BROADCAST
 	case ND_CLEAR_BROADCAST:
 		return (__setoption(fd, T_INET_IP, T_IP_BROADCAST, T_NO));
+#endif
+#ifdef ND_SET_REUSEADDR
 	case ND_SET_REUSEADDR:
 		return (__setoption(fd, T_INET_IP, T_IP_REUSEADDR, T_YES));
+#endif
+#ifdef ND_CLEAR_REUSEADDR
 	case ND_CLEAR_REUSEADDR:
 		return (__setoption(fd, T_INET_IP, T_IP_REUSEADDR, T_NO));
+#endif
+#ifdef ND_SET_DONTROUTE
+	case ND_SET_DONTROUTE:
+		return (__setoption(fd, T_INET_IP, T_IP_DONTROUTE, T_YES));
+#endif
+#ifdef ND_CLEAR_DONTROUTE
+	case ND_CLEAR_DONTROUTE:
+		return (__setoption(fd, T_INET_IP, T_IP_DONTROUTE, T_NO));
+#endif
+#ifdef NS_SET_PRIORITY
+	case ND_SET_PRIORITY:
+		if (pta == NULL) {
+			nd_error = ND_BADARG;
+			return (-1);
+		}
+		return (__setoption(fd, T_INET_IP, T_IP_TOS, *(int *) pta));
+#endif
+#ifdef ND_SET_KEEPALIVE
+	case ND_SET_KEEPALIVE:
+		if (nc == NULL) {
+			nd_error = ND_BADARG;
+			return (-1);
+		}
+		if (nc->nc_proto) {
+			if (strcmp(nc->nc_proto, NC_TCP) == 0)
+				return (__setoption(fd, T_INET_TCP, T_TCP_KEEPALIVE, T_YES));
+#if defined N_SCTP && defined T_SCTP_KEEPALIVE
+			if (strcmp(nc->nc_proto, NC_SCTP) == 0)
+				return (__setoption(fd, T_INET_SCTP, T_SCTP_KEEPALIVE, T_YES));
+#endif				/* defined N_SCTP && defined T_SCTP_KEEPALIVE */
+		}
+		nd_error = ND_NOCTRL;
+		errno = ENOPROTOOPT;
+		return (-1);
+#endif
+#ifdef ND_CLEAR_KEEPALIVE
+	case ND_CLEAR_KEEPALIVE:
+		if (nc == NULL) {
+			nd_error = ND_BADARG;
+			return (-1);
+		}
+		if (nc->nc_proto) {
+			if (strcmp(nc->nc_proto, NC_TCP) == 0)
+				return (__setoption(fd, T_INET_TCP, T_TCP_KEEPALIVE, T_NO));
+#if defined N_SCTP && defined T_SCTP_KEEPALIVE
+			if (strcmp(nc->nc_proto, NC_SCTP) == 0)
+				return (__setoption(fd, T_INET_SCTP, T_SCTP_KEEPALIVE, T_NO));
+#endif				/* defined N_SCTP && defined T_SCTP_KEEPALIVE */
+		}
+		nd_error = ND_NOCTRL;
+		errno = ENOPROTOOPT;
+		return (-1);
+#endif
 	case ND_SET_RESERVEDPORT:
 		return (__setresvport(fd, (struct netbuf *) pta));
 	case ND_CHECK_RESERVEDPORT:
@@ -339,12 +397,17 @@ __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 			return (0);
 		return (-1);
 	}
+#ifdef ND_JOIN_MULTICAST
 	case ND_JOIN_MULTICAST:
 		return (__joinmulticast(fd, (struct netbuf *) pta));
+#endif
+#ifdef ND_LEAVE_MULTICAST
 	case ND_LEAVE_MULTICAST:
 		return (__leavemulticast(fd, (struct netbuf *) pta));
+#endif
 	default:
-		_nderror = ND_NOCTRL;
+		nd_error = ND_NOCTRL;
+		errno = ENOPROTOOPT;
 		return (-1);
 	}
 }
@@ -362,7 +425,7 @@ __setoption(int fd, t_scalar_t level, t_scalar_t name, t_scalar_t value)
 		t_scalar_t value;
 	} optbuf;
 
-	_nderror = ND_SYSTEM;
+	nd_error = ND_SYSTEM;
 	if ((state = t_getstate(fd)) != T_UNBND) {
 		if (t_errno == TBADF)
 			errno = EBADF;
@@ -384,6 +447,8 @@ __setoption(int fd, t_scalar_t level, t_scalar_t name, t_scalar_t value)
 	ret.opt.maxlen = -1;
 	ret.flags = T_FAILURE;
 	if (t_optmgmt(fd, &req, &ret) == -1) {
+		nd_error = ND_SYSTEM;
+		errno = EINVAL;
 		if (t_errno == TBADF)
 			errno = EBADF;
 		if (t_errno == TBADFLAG)
@@ -400,11 +465,27 @@ __setoption(int fd, t_scalar_t level, t_scalar_t name, t_scalar_t value)
 			errno = EPROTO;
 		return (-1);
 	}
-	if (ret.flags != T_SUCCESS) {
-		_nderror = ND_FAILCTRL;
-		return (-1);
+	if (ret.flags != T_SUCCESS && ret.flags != T_PARTSUCCESS) {
+		switch (ret.flags) {
+		case T_NOTSUPPORT:
+			/* This is normally an unsupported option (which we would not provide) or a
+			   privilege failure, which could happen. */
+			nd_error = ND_FAILCTRL;
+			t_errno = TACCES;
+			errno = EPERM;	/* EACCES? */
+			return (-1);
+		case T_READONLY:
+		case T_FAILURE:
+			nd_error = ND_FAILCTRL;
+			t_errno = TSYSERR;
+			errno = EINVAL;
+			return (-1);
+		default:
+			nd_error = ND_FAILCTRL;
+			return (-1);
+		}
 	}
-	// _nderror = ND_OK;
+	// nd_error = ND_OK;
 	return (0);
 }
 
@@ -412,7 +493,7 @@ static int
 __setresvport(int fd, struct netbuf *addr)
 {
 	/* not implemented yet */
-	_nderror = ND_NOCTRL;
+	nd_error = ND_NOCTRL;
 	return (-1);
 }
 static int
@@ -422,16 +503,16 @@ __checkresvport(struct netbuf *addr)
 	unsigned short port;
 
 	if (addr == NULL || addr->buf == NULL || addr->len == 0) {
-		_nderror = ND_NO_ADDRESS;
+		nd_error = ND_NO_ADDRESS;
 		return (-1);
 	}
 	if (addr->len < sizeof(*sin)) {
-		_nderror = ND_BADARG;
+		nd_error = ND_BADARG;
 		return (-1);
 	}
 	sin = (typeof(sin)) (addr->buf);
 	port = ntohs(sin->sin_port);
-	// _nderror = ND_OK;
+	// nd_error = ND_OK;
 	if (port < IPPORT_RESERVED)
 		return (0);
 	return (1);
@@ -440,14 +521,14 @@ static int
 __joinmulticast(int fd, struct netbuf *addr)
 {
 	/* not implemented yet */
-	_nderror = ND_NOCTRL;
+	nd_error = ND_NOCTRL;
 	return (-1);
 }
 static int
 __leavemulticast(int fd, struct netbuf *addr)
 {
 	/* not implemented yet */
-	_nderror = ND_NOCTRL;
+	nd_error = ND_NOCTRL;
 	return (-1);
 }
 
@@ -470,25 +551,25 @@ __inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 	int len;
 
 	if (taddr == NULL || taddr->buf == NULL || taddr->len == 0) {
-		_nderror = ND_BADARG;
+		nd_error = ND_BADARG;
 		return (NULL);
 	}
 	if (taddr->len < sizeof(*sin)) {
-		_nderror = ND_NO_ADDRESS;
+		nd_error = ND_NO_ADDRESS;
 		return (NULL);
 	}
 	sin = (typeof(sin)) (taddr->buf);
 	port = ntohs(sin->sin_port);
 
 	if (inet_ntop(AF_INET, &sin->sin_addr, buf, sizeof(buf)) == NULL) {
-		_nderror = ND_SYSTEM;
+		nd_error = ND_SYSTEM;
 		return (NULL);
 	}
 	len = strlen(buf);
 	(void) snprintf(buf + len, sizeof(buf) - len, ".%d.%d", port >> 8, port & 0xff);
 	ret = strdup(buf);
 	if (ret == NULL) {
-		_nderror = ND_NOMEM;
+		nd_error = ND_NOMEM;
 		return (NULL);
 	}
 	return (ret);
@@ -518,20 +599,20 @@ __inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 	int field;
 
 	if (uaddr == NULL || uaddr->buf == NULL || uaddr->len == 0) {
-		_nderror = ND_BADARG;
+		nd_error = ND_BADARG;
 		return (NULL);
 	}
 	if (uaddr->len < sizeof(*sin)) {
-		_nderror = ND_NO_ADDRESS;
+		nd_error = ND_NO_ADDRESS;
 		return (NULL);
 	}
 	if ((nb = (typeof(nb)) malloc(sizeof(*nb))) == NULL) {
-		_nderror = ND_NOMEM;
+		nd_error = ND_NOMEM;
 		return (NULL);
 	}
 	if ((sin = (typeof(sin)) malloc(sizeof(*sin))) == NULL) {
 		free(nb);
-		_nderror = ND_NOMEM;
+		nd_error = ND_NOMEM;
 		return (NULL);
 	}
 	nb->buf = (char *) sin;
@@ -558,7 +639,7 @@ __inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 	if (field != 5) {
 		free(nb);
 		free(sin);
-		_nderror = ND_NO_ADDRESS;
+		nd_error = ND_NO_ADDRESS;
 		return (NULL);
 	}
 	sin->sin_family = AF_INET;
@@ -626,7 +707,7 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 	goto done;
 
       nomem:
-	_nderror = ND_NOMEM;
+	nd_error = ND_NOMEM;
 	goto error;
       error:
 	if (maddr != NULL) {
@@ -640,7 +721,7 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 	return (maddr);
 #endif
 	/* not implemented yet */
-	_nderror = ND_NOCTRL;
+	nd_error = ND_NOCTRL;
 	return (NULL);
 }
 
