@@ -57,6 +57,89 @@
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*
+ *  Socket to Path mapping.
+ *  =======================
+ *  Here we take two approaches to mapping domain, type, and protocol arguments of the socket(3) or
+ *  socketpair(3) call into a path: one uses the older netconfig(3) approach (and we now have a
+ *  netconfig(3) library in the strxnet package), and the other uses the newer sock2path(5)
+ *  approach, but does not maintain the mapping in the kernel.  We first try the sock2path(5)
+ *  approach and then try the netconfig(3) approach.
+ */
+
+/* netconfig(3) fallback approach */
+static char *
+__so_socket_path_netconfig(int domain, int type, int protocol)
+{
+	const char *semantics1, *semantics2;
+	const char *protocol1, *protocol2;
+
+	switch (type) {
+#ifdef SOCK_STREAMS_ORD
+		/* Some implementations actually defined a SOCK_STREAM_ORD here. */
+	case SOCK_STREAMS_ORD:
+		semantics1 = NC_TPI_COTS_ORD;
+		semantics2 = NULL;
+		break;
+#endif				/* SOCK_STREAMS_ORD */
+	case SOCK_STREAM:
+#ifdef SOCK_STREAMS_ORD
+		semantics1 = NC_TPI_COTS;
+		semantics2 = NULL;
+#else				/* SOCK_STREAMS_ORD */
+		semantics1 = NC_TPI_COTS_ORD;
+		semantics2 = NC_TPI_COTS;
+#endif				/* SOCK_STREAMS_ORD */
+		break;
+	case SOCK_DGRAM:
+		semantics1 = NC_TPI_CLTS;
+		semantics2 = NULL;
+		break;
+	case SOCK_RAW:
+		semantics1 = NC_TPI_RAW;
+		semantics2 = NULL;
+		break;
+	default:
+		/* cannot handle things like SOCK_SEQPACKET */
+		return (NULL);
+	}
+}
+
+void *__so_setsock2path(void);
+struct sockent *__so_getsock2path(void *handle);
+int __so_endsock2path(void *handle);
+
+void *
+__so_setsock2path(void)
+{
+}
+
+__asm__(".symver __so_setsock2path,setsock2path@@SOCKLIB_1.0");
+
+struct sockent *
+__so_getsock2path(void *handle)
+{
+}
+
+__asm__(".symver __so_getsock2path,getsock2path@@SOCKLIB_1.0");
+
+int
+__so_endsock2path(void *handle)
+{
+}
+
+__asm__(".symver __so_endsock2path,endsock2path@@SOCKLIB_1.0");
+
+static char *
+__so_socket_path_sock2path(int domain, int type, int protocol)
+{
+}
+
+static char *
+__so_socket_path(int domain, int type, int protocol)
+{
+}
+
+/*
  *  "Our solution to this discrepancy relies on the ability to unbind an endpoint after it has first
  *   been bound.  When an application calls bind, socklib specifies a backlog of zero to the
  *   transport provider.  (A value of zero is normal for applications that do not wish to receive
@@ -68,6 +151,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *   address.  HOwever, this window is small and we consider it acceptable." -- Implementing
  *   Berkeley Sockets in UNIX(R) System V Release 4.
  */
-int _so_listen(int fd, int backlog) {
+int
+_so_listen(int fd, int backlog)
+{
 	return (0);
 }
