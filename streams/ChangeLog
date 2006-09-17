@@ -1,5 +1,24 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/atlocal.in: updated testsuite headers
+	* tests/kernel.at: updated testsuite headers
+	* tests/testsuite-admin.at: updated testsuite headers
+	* tests/testsuite.at: updated testsuite headers
+	* tests/testsuite-clone.at: updated testsuite headers
+	* tests/testsuite-connld.at: updated testsuite headers
+	* tests/testsuite-echo.at: updated testsuite headers
+	* tests/testsuite-fifo.at: updated testsuite headers
+	* tests/testsuite-log.at: updated testsuite headers
+	* tests/testsuite-loop.at: updated testsuite headers
+	* tests/testsuite-mux.at: updated testsuite headers
+	* tests/testsuite-nsdev.at: updated testsuite headers
+	* tests/testsuite-nuls.at: updated testsuite headers
+	* tests/testsuite-pipe.at: updated testsuite headers
+	* tests/testsuite-pipemod.at: updated testsuite headers
+	* tests/testsuite-sad.at: updated testsuite headers
+	* tests/testsuite-sc.at: updated testsuite headers
+	* tests/testsuite-streams.at: updated testsuite headers
+
 	* Makefile.am: added 32-bit compatibility libraries and binaries
 	* streams.spec.in: added 32-bit compatibility libraries and binaries
 

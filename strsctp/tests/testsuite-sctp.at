@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-sctp.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/08/16 07:39:39 $
@@ -721,3 +721,5 @@ AT_SETUP([SCTP RT I 11.3])
 AT_KEYWORDS([SCTP Retransmission Timer])
 AT_CHECK([test_sctp 11.3],[],[ignore],[],[],[])
 AT_CLEANUP
+
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

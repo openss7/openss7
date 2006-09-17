@@ -1,5 +1,13 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/atlocal.in: updated testsuite headers
+	* tests/kernel.at: updated testsuite headers
+	* tests/testsuite.at: updated testsuite headers
+	* tests/testsuite-timod.at: updated testsuite headers
+	* tests/testsuite-tirdwr.at: updated testsuite headers
+	* tests/testsuite-xnet.at: updated testsuite headers
+	* tests/testsuite-xnet_thr.at: updated testsuite headers
+
 	* Makefile.am: added 32-bit compatibility libraries and binaries
 	* strxnet.spec.in: added 32-bit compatibility libraries and binaries
 

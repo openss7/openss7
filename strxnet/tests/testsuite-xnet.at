@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-xnet.at,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/08/16 07:39:41 $
@@ -1394,3 +1394,4 @@ AT_KEYWORDS([xnet])
 AT_CHECK([test_xnet 8.8.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

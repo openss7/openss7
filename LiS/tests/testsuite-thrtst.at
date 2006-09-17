@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-thrtst.at,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/05 04:03:10 $
@@ -96,3 +96,4 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

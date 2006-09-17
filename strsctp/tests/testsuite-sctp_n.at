@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-sctp_n.at,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/16 07:39:39 $
@@ -248,3 +248,4 @@ AT_KEYWORDS([N_DATA_REQ])
 AT_CHECK([test_sctp_n 10.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

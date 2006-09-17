@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/08/16 07:39:33 $
@@ -3033,3 +3033,4 @@ dnl AT_KEYWORDS([streams poll POLLMSG])
 dnl AT_CHECK([test_streams 3.10.15], [], [ignore], [], [], [])
 dnl AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

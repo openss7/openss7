@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/08/16 07:39:34 $
@@ -370,3 +370,4 @@ AT_KEYWORDS([sad SAD_SAP])
 AT_CHECK([test_sad 2.3.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

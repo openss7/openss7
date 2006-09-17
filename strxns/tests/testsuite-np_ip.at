@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-np_ip.at,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:39:42 $
@@ -644,3 +644,4 @@ AT_KEYWORDS([N_UNITDATA_REQ NS_DATA_XFER EPROTO])
 AT_CHECK([test_np_ip 3.10.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

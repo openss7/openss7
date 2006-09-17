@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/07 22:01:34 $
@@ -65,7 +65,6 @@ dnl Last Modified $Date: 2006/04/07 22:01:34 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
-
 dnl AT_ARG_OPTION([dummy_option], AS_HELP_STRING([--dummy_option], [specify dummy option]))
 dnl AT_ARG_OPTION_ARG([dummy_optarg], AS_HELP_STRING([--dummy_optarg], [specify dummy optarg]))
 
@@ -86,4 +85,4 @@ dnl - initial addition of striso files
 dnl
 dnl
 dnl ==========================================================================
-dnl vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

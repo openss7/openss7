@@ -1,11 +1,11 @@
-dnl vim: ft=config
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-clone.at,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/08/16 07:39:34 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -33,9 +33,9 @@ dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl As an exception to the above, this software may be distributed under the
-dnl GNU General Public License (GPL) Version 2 or later, so long as the
-dnl software is distributed with, and only used for the testing of, OpenSS7
-dnl modules, drivers, and libraries.
+dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -155,3 +155,4 @@ AT_KEYWORDS([clone])
 AT_CHECK([test_clone 1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

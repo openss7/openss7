@@ -1,4 +1,4 @@
-dnl vim: ft=config
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.4.8 $) $Date: 2006/03/05 04:03:10 $
@@ -107,3 +107,4 @@ m4_include([testsuite-thrtst.at])
 #m4_include([dummy3.m4])
 #m4_include([dummy4.m4])
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

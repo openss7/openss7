@@ -1,5 +1,13 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/atlocal.in: updated testsuite headers
+	* tests/kernel.at: updated testsuite headers
+	* tests/testsuite.at: updated testsuite headers
+	* tests/testsuite-sctp.at: updated testsuite headers
+	* tests/testsuite-sctp_n2.at: updated testsuite headers
+	* tests/testsuite-sctp_n.at: updated testsuite headers
+	* tests/testsuite-sctp_t.at: updated testsuite headers
+
 	* Makefile.am: added 32-bit compatibility libraries and binaries
 	* strsctp.spec.in: added 32-bit compatibility libraries and binaries
 

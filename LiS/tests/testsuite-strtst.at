@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/05 04:03:09 $
@@ -194,3 +194,4 @@ AT_KEYWORDS([strtst mt_open])
 AT_CHECK([test_strtst mt_open], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

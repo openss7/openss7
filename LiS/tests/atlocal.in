@@ -1,11 +1,11 @@
-# vim: ft=sh sw=4 et
+# vim: ft=sh sw=4 et nosi nocin fo+=or tw=78
 # =============================================================================
 # 
 # @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 1.1.4.6 $) $Date: 2006/01/03 21:39:05 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -33,9 +33,9 @@
 # -----------------------------------------------------------------------------
 #
 # As an exception to the above, this software may be distributed under the
-# GNU General Public License (GPL) Version 2 or later, so long as the
-# software is distributed with, and only used for the testing of, OpenSS7
-# modules, drivers, and libraries.
+# GNU General Public License (GPL) Version 2, so long as the software is
+# distributed with, and only used for the testing of, OpenSS7 modules,
+# drivers, and libraries.
 #
 # -----------------------------------------------------------------------------
 #
@@ -200,4 +200,4 @@ at_sysconfdir="@sysconfdir@"
 #    at_library_tests='no'
 #fi
 
-# vim: ft=sh sw=4 et
+# vim: ft=sh sw=4 et nosi nocin fo+=or tw=78

@@ -1,4 +1,4 @@
-dnl vim: ft=config sw=4
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-inet_raw.at,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/08/16 07:39:35 $
@@ -3334,3 +3334,4 @@ AT_KEYWORDS([allowedstates T_UNITDATA_REQ TS_IDLE])
 AT_CHECK([test_inet_raw_root 14.14.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
