@@ -965,7 +965,13 @@ MANS_UNUSED = \
 	man9/Intro.9 \
 	man9/mp-streams.9 \
 	man9/SPG.9 \
+	man8/specfs.sh.8 \
+	man8/streams.sh.8 \
 	$(driver_unused_pages)
+
+MANS_EXEMPT = \
+	man8/specfs.8 \
+	man8/streams.8
 
 man_MANS = \
 	man2/fattach.2 \
@@ -1025,10 +1031,6 @@ man_MANS = \
 	man7/I_SWROPT.7 \
 	man7/I_UNLINK.7 \
 	man7/streamio.7 \
-	man8/specfs.8 \
-	man8/specfs.sh.8 \
-	man8/streams.8 \
-	man8/streams.sh.8 \
 	man8/streams_mknod.8 \
 	man8/test-streams.8 \
 	man8/perftest.8 \
@@ -1337,6 +1339,7 @@ man_MANS = \
 	man9/strsendpage.9 \
 	man9/strwrite.9 \
 	$(MANS_UNUSED) \
+	$(MANS_EXEMPT) \
 	$(driver_pages) \
 	$(module_pages) \
 	$(util_pages)

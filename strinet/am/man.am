@@ -610,6 +610,7 @@ dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_mans
 TESTS_ENVIRONMENT	+= MANS='$(MANS)' \
 			   MANS_UNUSED='$(MANS_UNUSED)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
+			   MANS_EXEMPT='$(MANS_EXEMPT) $(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT)' \
 		       	   mandir='$(mandir)'
 CLEANFILES		+= check_mans.log
 DISTCLEANFILES		+= *.err *.out

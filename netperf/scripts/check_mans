@@ -288,9 +288,14 @@ unusedpages=
 for page in $MANS_UNUSED ; do
 	unusedpages="${unusedpages:+$unusedpages }$page"
 done
+exemptpages=
+for page in $MANS_EXEMPT ; do
+	exemptpages="${exemptpages:+$exemptpages }$page"
+done
 
 echo_d "Used pages are: $usedpages" $LINENO
 echo_d "Unused pages are: $unusedpages" $LINENO
+echo_d "Exempt pages are: $exemptpages" $LINENO
 
 for page in $MANS
 do
@@ -465,6 +470,9 @@ do
 		then
 			echo_s "found in $base, option $target" $LINENO
 		else
+			case " $exemptpages " in
+				*" $page "*) continue ;;
+			esac
 			t=`echo $target | sed -e "s/\[\[:space:\]\]/ /g;s/|/ or /g;s/'//g"`
 			if test :"${MAINTAINER_MODE:-no}" != :no
 			then
