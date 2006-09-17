@@ -1,3 +1,7 @@
+2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* lib32/Makefile.am: added 32-bit compatibility makefile
+
 2006-09-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added version script to compile

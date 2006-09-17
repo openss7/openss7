@@ -1,3 +1,7 @@
+2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* lib32/Makefile.am: added 32-bit compatibility makefile
+
 2006-09-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/sockmod.h: corrections

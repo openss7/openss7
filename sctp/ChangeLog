@@ -1,3 +1,7 @@
+2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* lib32/Makefile.am: added 32-bit compatibility makefile
+
 2006-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: missing bugs.texi from release
