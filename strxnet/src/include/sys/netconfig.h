@@ -78,9 +78,9 @@ extern int *__ncerror(void);
 extern char *__ncerrbuf(void);
 #define nc_errbuf (*(__ncerrbuf()))
 #else
-#warning Compiled without _REENTRANT defined!
-extern int nc_error;
-extern char *nc_errbuf;
+#error Compiled without _REENTRANT defined!
+//extern int nc_error;
+//extern char *nc_errbuf;
 #endif
 
 /* error codes */

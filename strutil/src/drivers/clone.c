@@ -332,7 +332,7 @@ STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
 
 #ifdef LFS
 streams_fastcall int
-register_clone(struct cdevsw *cdev)
+_register_clone(struct cdevsw *cdev)
 {
 	int err;
 	struct devnode *cmin;
@@ -369,10 +369,10 @@ register_clone(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_NOVERS(register_clone);
+EXPORT_SYMBOL_NOVERS(_register_clone);
 
 streams_fastcall int
-unregister_clone(struct cdevsw *cdev)
+_unregister_clone(struct cdevsw *cdev)
 {
 	int err;
 	struct devnode *cmin;
@@ -387,28 +387,28 @@ unregister_clone(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_NOVERS(unregister_clone);
+EXPORT_SYMBOL_NOVERS(_unregister_clone);
 
 /**
- *  register_strdev: - register a STREAMS device against a device major number
+ *  _register_strdev: - register a STREAMS device against a device major number
  *  @cdev: STREAMS character device structure to register
  *  @major: requested major device number or 0 for automatic major selection
  *
- *  register_strdev() registers the device specified by the @cdev to the device major number
+ *  _register_strdev() registers the device specified by the @cdev to the device major number
  *  specified by @major.
  *
- *  register_strdev() will register the STREAMS character device specified by @cdev against the
+ *  _register_strdev() will register the STREAMS character device specified by @cdev against the
  *  major device number @major.  If the major device number is zero, then it requests that
- *  register_strdev() allocate an available major device number and assign it to @cdev.
+ *  _register_strdev() allocate an available major device number and assign it to @cdev.
  *
- *  CONTEXT: register_strdev() is intended to be called from kernel __init() or module_init()
+ *  CONTEXT: _register_strdev() is intended to be called from kernel __init() or module_init()
  *  routines only.  It cannot be called from in_irq() level.
  *
- *  Return Values: Upon success, register_strdev() will return the requested or assigned major
+ *  Return Values: Upon success, _register_strdev() will return the requested or assigned major
  *  device number as a positive integer value.  Upon failure, the registration is denied and a
  *  negative error number is returned.
  *
- *  Errors: Upon failure, register_strdev() returns on of the negative error numbers listed below.
+ *  Errors: Upon failure, _register_strdev() returns on of the negative error numbers listed below.
  *
  *  -[%ENOMEM]	insufficient memory was available to complete the request.
  *
@@ -424,7 +424,7 @@ EXPORT_SYMBOL_NOVERS(unregister_clone);
  *  cb_ops.
  */
 streams_fastcall int
-register_strdev(struct cdevsw *cdev, major_t major)
+_register_strdev(struct cdevsw *cdev, major_t major)
 {
 	int err;
 
@@ -434,33 +434,33 @@ register_strdev(struct cdevsw *cdev, major_t major)
 		cdev->d_mode = (cdev->d_mode & ~S_IFMT) | S_IFCHR;
 	if ((err = register_cmajor(cdev, major, &cdev_f_ops)) < 0)
 		return (err);
-	register_clone(cdev);
+	_register_clone(cdev);
 	return (err);
 }
 
-EXPORT_SYMBOL_NOVERS(register_strdev);
+EXPORT_SYMBOL_NOVERS(_register_strdev);
 
 /**
- *  unregister_strdev: - unregister previously registered STREAMS device
+ *  _unregister_strdev: - unregister previously registered STREAMS device
  *  @cdev: STREAMS character device structure to unregister
  *  @major: major device number to unregister or 0 for all majors
  *
- *  unregister_strdev() unregisters the device specified by the @cdev from the device major number
+ *  _unregister_strdev() unregisters the device specified by the @cdev from the device major number
  *  specified by @dev.  Only the getmajor(@dev) component of @dev is significant and the
  *  getminor(@dev) component must be coded zero (0).
  *
- *  unregister_strdev() will unregister the STREAMS character device specified by @cdev from the
+ *  _unregister_strdev() will unregister the STREAMS character device specified by @cdev from the
  *  major device number in getmajor(@dev).  If the major device number is zero, then it requests
- *  that unregister_strdev() unregister @cdev from any device majors with which it is currently
+ *  that _unregister_strdev() unregister @cdev from any device majors with which it is currently
  *  registered.
  *
- *  CONTEXT: unregister_strdev() is intended to be called from kernel __exit() or module_exit()
+ *  CONTEXT: _unregister_strdev() is intended to be called from kernel __exit() or module_exit()
  *  routines only.  It cannot be called from in_irq() level.
  *
- *  Return Values: Upon success, unregister_strdev() will return zero (0).  Upon failure, the
+ *  Return Values: Upon success, _unregister_strdev() will return zero (0).  Upon failure, the
  *  deregistration is denied and a negative error number is returned.
  *
- *  Errors: Upon failure, unregister_strdev() returns one of the negative error numbers listed
+ *  Errors: Upon failure, _unregister_strdev() returns one of the negative error numbers listed
  *  below.
  *
  *  -[%ENXIO]	The specified device does not exist in the registration tables.
@@ -472,13 +472,13 @@ EXPORT_SYMBOL_NOVERS(register_strdev);
  *		and permission is therefore denied.
  */
 streams_fastcall int
-unregister_strdev(struct cdevsw *cdev, major_t major)
+_unregister_strdev(struct cdevsw *cdev, major_t major)
 {
-	unregister_clone(cdev);
+	_unregister_clone(cdev);
 	return unregister_cmajor(cdev, major);
 }
 
-EXPORT_SYMBOL_NOVERS(unregister_strdev);
+EXPORT_SYMBOL_NOVERS(_unregister_strdev);
 #endif
 
 /* 

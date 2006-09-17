@@ -1,4 +1,9 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: try to pass make check
+	* doc/man/man8/strutil_mknod.8.man: try to pass make check
+	* src/drivers/clone.c: try to pass make check
+	* src/drivers/clone.h: try to pass make check
 	
 	* doc/manual/news.texi: major update notices
 	* configure.ac: added 32-bit binary directory lib32/Makefile.am

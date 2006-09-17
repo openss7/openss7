@@ -65,9 +65,9 @@ extern int *__nderror(void);
 extern char *__nderrbuf(void);
 #define nd_errbuf (__nderrbuf())
 #else
-#warn Compiled without _REENTRANT defined!
-extern int nd_error;
-extern char *nd_errbuf;
+#error Compiled without _REENTRANT defined!
+//extern int nd_error;
+//extern char *nd_errbuf;
 #endif
 /* compatibility */
 #define _nderror nd_error

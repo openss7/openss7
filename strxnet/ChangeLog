@@ -1,4 +1,11 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: try to pass make check
+	* doc/man/man3/inetaddr.3.man: try to pass make check
+	* doc/man/man8/test-xnsl.8.man: try to pass make check
+	* doc/man/man8/test-xnsl_thr.8.man: try to pass make check
+	* src/include/netdir.h: try to pass make check
+	* src/include/sys/netconfig.h: try to pass make check
 	
 	* doc/manual/news.texi: major update notices
 	* configure.ac: added 32-bit binary directory lib32/Makefile.am

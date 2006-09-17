@@ -261,7 +261,9 @@ xnet_man_MANS	= \
 	man8/test-timod.8 \
 	man8/test-tirdwr.8 \
 	man8/test-xnet.8 \
-	man8/test-xnet_thr.8
+	man8/test-xnet_thr.8 \
+	man8/test-xnsl.8 \
+	man8/test-xnsl_thr.8
 
 xnsl_man_MANS 	= \
 	man3/endnetconfig.3 \
@@ -292,6 +294,7 @@ xnsl_man_MANS 	= \
 	man3/taddr2uaddr.3 \
 	man3/uaddr2taddr.3 \
 	man3/xnsl.3 \
+	man3/inetaddr.3 \
 	man5/netconfig.5 \
 	man5/netdir.5
 
@@ -541,7 +544,9 @@ xnet_dist_noinst_MANS	= \
 	man8/test-timod.8.man \
 	man8/test-tirdwr.8.man \
 	man8/test-xnet.8.man \
-	man8/test-xnet_thr.8.man
+	man8/test-xnet_thr.8.man \
+	man8/test-xnsl.8.man \
+	man8/test-xnsl_thr.8.man
 
 xnsl_dist_noinst_MANS 	= \
 	man3/endnetconfig.3.man \
@@ -572,6 +577,7 @@ xnsl_dist_noinst_MANS 	= \
 	man3/taddr2uaddr.3.man \
 	man3/uaddr2taddr.3.man \
 	man3/xnsl.3.man \
+	man3/inetaddr.3.man \
 	man5/netconfig.5.man \
 	man5/netdir.5.man
 

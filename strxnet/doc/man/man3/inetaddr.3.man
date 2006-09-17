@@ -1,0 +1,591 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: xxx.5.man,v 0.9.2.4 2006/04/05 09:44:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/04/05 09:44:48 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: xxx.5.man,v $
+.\" Revision 0.9.2.4  2006/04/05 09:44:48  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.TH INETADDR 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B inetaddr
+\- Transport Name-to-Address translation shared object for INET
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <netconfig.h>
+.br
+.B #include <netdir.h>
+.ad l
+.hy 0
+.HP 12
+.RI "extern int " _nderror ;
+.HP
+.RI "struct nd_addrlist *\fB_netdir_getbyname\fP(struct netconfig *" tp ", struct nd_hostserv *" serv );
+.HP
+.RI "struct nd_hostservlist *\fB_netdir_getbyaddr\fP(struct netconfig *" tp ", struct netbuf *" addr);
+.HP
+.RI "int \fB_netdir_options\fP(struct netconfig *" tp ", int " opts ", int " fd ", void *" par );
+.HP
+.RI "char *\fB_taddr2uaddr\fP(struct netconfig *" tp ", struct netbuf *" addr );
+.HP
+.RI "struct netbuf *\fB_uaddr2taddr\fP(struct netconfig *" tp ", char *" addr );
+.hy 6
+.ad b
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Name-to-Address translation shared objects are those listed in the name-to-address libraries member,
+.IR nc_lookup ,
+of the
+.BR netconfig (5)
+structure.
+These n2a libraries are libraries that can be opened by the dynamic linker, see
+.BR dlopen (3),
+and which provide the following symbols (with the function prototypes listed under
+.RI \(lq SYNOPSIS \(rq,
+above, and declared in
+.RB < netdir.h >):
+.TP
+.B _netdir_getbyname
+Translate the supplied host and service name to a list of transport specific addresses.
+.IP ""
+When the transport supports transport-independent RPC, the service name
+.RI \(lq rpcbind \(rq
+should always be supported.
+If the service name member,
+.IR h_serv ,
+of the
+.B nd_hostserv
+structure is
+.BR NULL ,
+the host name member,
+.IR h_name ,
+of the
+.B nd_hostserv
+structure should still be used if present and a host name only derived list of addresses should be
+returned.
+.TP
+.B _netdir_getbyaddr
+Translate the transport specific address to a list of host and service name tuples.
+.TP
+.B _netdir_options
+Perform options management on the transport.
+.TP
+.B _taddr2uaddr
+Translate a transport specific address to a character string representation (universal address).
+.TP
+.B _uaddr2taddr
+Translate a universal address (character string) to a transport specific address.
+.PP
+The order in which the name-to-address translation libraries are accessed is dependent upon the
+order of the libraries in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure for the specific transport specified by
+.IR tp .
+The corresponding symbol in each name-to-address is invoked until a success has been achieved, a
+fatal error occurs (see
+.RI \(lq ERRORS \(rq,
+below), or the list is exhausted without success.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+General rules for implementation of the name-to-address translation procedures are as follows:
+.IP \(bu \w'\(bu\(em'u
+Shared object procedures are permitted to use
+.BR malloc (3),
+.BR xti (3),
+and low-level RPM routines.
+.BR malloc (3)
+is the only permitted way to allocate structures.
+.IP \(bu
+Procedures must not recurse on functions in the
+.BR libxnsl (3)
+library, but may call naming functions in the
+.B Linux
+.BR libnsl.so
+library.
+.IP \(bu
+The results passed back from procedures cannot be static.  Any structures passed back must by
+dynamically allocated using
+.BR malloc (3)
+(including universal address strings).
+The caller is ultimately responsible for freeing these data structures using
+.BR netdir_free (3),
+for
+.BR netbuf (3),
+.BR nd_addrlist ,
+.BR nd_hostserv ,
+and
+.BR nd_hostservlist
+structures.  Universal address strings must be freed with
+.BR free (3).
+.IP \(bu
+.BR _netdir_getbyname "(), " _netdir_getbyaddr "(), " _taddr2uaddr "() and " _uaddr2taddr ()
+return
+.B NULL
+on error.
+.BR _netdir_options ()
+returns non-zero
+on error.
+.IP \(bu
+Procedures must assign error values to the global
+.BR _nderror (3)
+thread-specific variable.  All fatal errors will cause lookup of subsequent shared object files to
+terminate.  Non-fatal errors will cause the next shared object file to be called.  Fatal errors are
+negative.  Non-fatal errors are positive.  Success is zero.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR _netdir_getbyname (),
+.BR _netdir_getbyaddr (),
+.BR _taddr2uaddr "() and "
+.BR _uaddr2taddr (),
+return a pointer to
+.BR malloc (3)'ed
+structure(s) or character string;
+.BR _netdir_options ()
+returns zero
+.RB ( 0 ).
+On failure,
+.BR _netdir_getbyname (),
+.BR _netdir_getbyaddr (),
+.BR _taddr2uaddr "() and "
+.BR _uaddr2taddr (),
+return
+.BR NULL ;
+.BR _netdir_options ()
+returns zero
+.RB ( 0 ),
+and all set
+.IR _nderror (3)
+to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.PP
+When a procedure fails, it returns
+.BR NULL ,
+or a non-zero value,
+and sets
+.BR _nderror (3)
+to an appropriate error number as described below.
+Negative error numbers are fatal.  Positive error numbers are considered warnings.
+When the
+.BR libxnsl (3)
+library function detects a fatal error, it will not try additional name-to-address shared libraries
+on the lookup list and will return an error to the caller; when it detects a non-fatal error, it
+continues attempting to invoke the function on subsequent name-to-address shared libraries in the
+lookup list.  The first success will cause the library function to return success to the caller.
+.\"
+.\"
+.PP
+Fatal errors are as follows:
+.TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_TRY_AGAIN ]
+.RI \(lq "n2a: non-authoritative host not found" \(rq
+.IP ""
+The host was not found, however, a name-to-address mapping function suffered a temporary failure
+(such as a timeout).
+.TP
+.RB [ ND_NO_RECOVERY ]
+.RI \(lq "n2a: non-recoverable error" \(rq
+.IP ""
+The last name-to-address translation function suffered an unrecoverable error in one of its lookup
+libraries.
+.TP
+.RB [ ND_NO_DATA ]
+.RI \(lq "n2a: no data record of requested type" \(rq
+.IP ""
+The last name-to-address translation function could find no data of the requested type in one of its
+lookup libraries.
+.TP
+.RB [ ND_NO_ADDRESS ]
+.RI \(lq "n2a: no data record of requested type" \(rq
+.IP ""
+The last name-to-address translation function could find no address of the requested type in one of
+its lookup libraries.
+.TP
+.RB [ ND_BADARG ]
+.RI \(lq "n2a: bad arguments passed to routine" \(rq
+.IP ""
+The last name-to-address translation function was passed a bad argument.
+.TP
+.RB [ ND_NOMEM ]
+.RI \(lq "n2a: memory allocation failed" \(rq
+.IP ""
+The last name-to-address translation function could not allocate memory necessary to complete the
+operation.
+.\"
+.\"
+.PP
+Non-fatal errors are as follows:
+.TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_ACCESS ]
+.RI \(lq "n2a: access denied for shared object" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened due to access permission.
+.TP
+.RB [ ND_FAILCTRL ]
+.RI \(lq "n2a: control operation failed" \(rq
+.IP ""
+The
+.BR netdir_options (3)
+control operation failed.
+.TP
+.RB [ ND_NOCONVERT ]
+.RI \(lq "n2a: conversion not possible" \(rq
+.IP ""
+During the last name-to-address translation function it was discovered that character string
+conversion was not possible.
+.TP
+.RB [ ND_NOCTRL ]
+.RI \(lq "n2a: unknown option passed" \(rq
+.IP ""
+.BR netdir_options (3)
+was passed an unknown
+.I option
+argument value.
+.TP
+.RB [ ND_NOHOST ]
+.RI \(lq "n2a: host name not found" \(rq
+.IP ""
+The last name-to-address translation function,
+.BR netdir_getbyname (3),
+could not find, or does not support, the specified host name.
+.TP
+.RB [ ND_OPEN ]
+.RI \(lq "n2a: could not open shared object : %s" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
+.TP
+.RB [ ND_SYSTEM ]
+.RI \(lq "n2a: system error" \(rq
+.IP ""
+During the last name-to-address translation function, a system error occurred.
+The
+.B Linux
+system error is in
+.BR errno (3).
+The
+.BR xti (3)
+error in
+.BR t_errno (3)
+might also provide some insight into the error.
+.TP
+.RB [ ND_NOSERV ]
+.RI \(lq "n2a: service name not found" \(rq
+.IP ""
+The last name-to-address translation function,
+.BR netdir_getbyname (3),
+could not find, or does not support, the specified service name.
+.TP
+.RB [ ND_NOSYM ]
+.RI \(lq "n2a: symbol missing in shared object : %s" \(rq
+.IP ""
+One of the required symbols, see
+.BR netdir (5),
+was missing from a shared object specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
+.TP
+.RB [ ND_UKNWN ]
+.RI \(lq "n2a: attempt to free unknown object" \(rq
+.IP ""
+.BR netdir_free (3)
+was called with an unknown
+.I struct_type
+argument value.
+.TP
+.RI [ other ]
+.RI \(lq "n2a: unknown error %d" \(rq
+.IP ""
+An internal error occurred in the
+.BR libxnsl (3)
+library or a loaded shared object.
+.I %d
+is the decimal number of the error number that was contained in
+.BR _nderror .
+.PP
+See
+.BR _nderror (3)
+for more information.
+.\"
+.\"
+.PP
+Success is indicated as follows:
+.TP \w'\fR[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_OK ]
+.RI \(lq "n2a: successful completion" \(rq
+.IP ""
+The last name-to-address translation function completed successfully, or there was no previous
+name-to-address translation function called.
+.\"
+.\"
+.SH NOTICES
+.PP
+Although this mechanism appears similar to the
+.IR "SVR 4.2"
+.[
+svr42
+.]
+mechanism, the implementation has significant differences and care should be taken when writing
+these libraries.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.BI /usr/lib/ inetaddr .so
+contains the
+.I inetaddr
+name-to-address shared object library.
+.TP
+.B /etc/netconfig
+The Network Configuration database file.  See
+.BR netconfig (5).
+.TP
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+.TP
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR netconfig (5),
+.BR netdir (5),
+.BR dlopen (3),
+.BR malloc (3),
+.BR xti (3),
+.BR libxnsl (3),
+.BR netdir_free (3),
+.BR netbuf (3),
+.BR free (3),
+.BR _nderror (3),
+.BR netdir_options (3),
+.BR t_errno (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Name-to-address translation libraries are compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+does not document
+.[
+soldoc
+.]
+the
+.BR ND_CLEAR_BROADCAST ,
+.BR ND_SET_REUSEADDR
+nor
+.BR ND_CLEAR_REUSEADDR
+options to
+.BR netdir_options (3).
+.IR UnixWare \(rg
+does.
+.[
+uw7doc
+.]
+.IP \(em
+.IR UnixWare \(rg
+documents
+.[
+uw7doc
+.]
+that
+.IR _nderror (3)
+contains the cause of failure and that
+.BR t_errno (3)
+may provide some additional insights into why a call failed.
+.IP \(em
+Although the prototypes of the exported symbols follow the convention of
+.IR "SVR 4.2" ,
+implementation differs and binary compatibility would only be coincidental.
+.IP \(em
+Name-to-address translation library names typically present on
+.IR UNIX \(rg
+systems are not necessarily provided.  Some libraries that provide similar translation services
+might have different names.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are normally part of the Network Services Library,
+.BR libnsl ;
+however,
+.B Linux
+already has a library of that name (which unfortunately is missing these components), and,
+therefore,
+.B "@PACKAGE_TITLE@"
+renames the library to
+.BR libxnsl (3).
+.IP \(em
+See
+.BR libxnsl (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Name-to-address shared libraries first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

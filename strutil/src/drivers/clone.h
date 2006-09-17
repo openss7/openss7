@@ -59,7 +59,7 @@
 #define __STREAMS_EXTERN __EXTERN streams_fastcall
 #endif
 
-__STREAMS_EXTERN int register_clone(struct cdevsw *cdev);
-__STREAMS_EXTERN int unregister_clone(struct cdevsw *cdev);
+__STREAMS_EXTERN int _register_clone(struct cdevsw *cdev);
+__STREAMS_EXTERN int _unregister_clone(struct cdevsw *cdev);
 
 #endif				/* __LOCAL_CLONE_H__ */

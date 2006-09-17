@@ -102,6 +102,7 @@ man_MANS = \
 	man8/strload.8 \
 	man8/strlogd.8 \
 	man8/strsetup.8 \
+	man8/strutil_mknod.8 \
 	man8/strvf.8
 
 dist_noinst_MANS = \
@@ -144,6 +145,7 @@ dist_noinst_MANS = \
 	man8/strload.8.man \
 	man8/strlogd.8.man \
 	man8/strsetup.8.man \
+	man8/strutil_mknod.8.man \
 	man8/strvf.8.man
 
 ## PKG_BUILD_INDEP
