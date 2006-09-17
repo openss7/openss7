@@ -418,7 +418,7 @@ sbin_PROGRAMS			= \
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= config.h strconf.h
-@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
@@ -1106,6 +1106,10 @@ if PKG_BUILD_ARCH
 SUBDIRS += intl m4 po
 CLEANFILES += po/stamp-po
 endif
+endif
+
+if WITH_32BIT_LIBS
+SUBDIRS += . lib32
 endif
 
 SUBDIRS += . tests

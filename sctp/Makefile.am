@@ -338,6 +338,10 @@ if DEVELOPMENT
 SUBDIRS += include
 endif
 
+if WITH_32BIT_LIBS
+SUBDIRS += . lib32
+endif
+
 SUBDIRS += . tests
 
 if DEVELOPMENT

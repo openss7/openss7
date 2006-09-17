@@ -75,6 +75,7 @@ include am/help.am
 include am/pr.am
 
 lib_LTLIBRARIES			= 
+lib32_LTLIBRARIES		= 
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -88,7 +89,9 @@ EXTRA_PROGRAMS			+= \
 pkglibexec_PROGRAMS		= \
 				  test-sockpath \
 				  test-socket \
-				  test-socklib
+				  test-socklib \
+				  test-sockmod \
+				  test-socksys
 
 sbin_PROGRAMS			= \
 				  initsock \
@@ -116,19 +119,33 @@ test_sockpath_LDFLAGS		= -static
 test_sockpath_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockpath_CFLAGS		= $(USER_CFLAGS)
 
-test_socket_SOURCES		= src/test/test-sock.c
+test_socket_SOURCES		= src/test/test-socket.c
 test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socket_LDADD		= libsocket.la $(STREAMS_LDADD)
 test_socket_LDFLAGS		= -static
 test_socket_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socket_CFLAGS		= $(USER_CFLAGS)
 
-test_socklib_SOURCES		= src/test/test-sock.c
+test_socklib_SOURCES		= src/test/test-socklib.c
 test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socklib_LDADD		= libsocklib.la $(STREAMS_LDADD)
 test_socklib_LDFLAGS		= -static
 test_socklib_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socklib_CFLAGS		= $(USER_CFLAGS)
+
+test_sockmod_SOURCES		= src/test/test-sockmod.c
+test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_sockmod_LDADD		= libsocklib.la $(STREAMS_LDADD)
+test_sockmod_LDFLAGS		= -static
+test_sockmod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sockmod_CFLAGS		= $(USER_CFLAGS)
+
+test_socksys_SOURCES		= src/test/test-socksys.c
+test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socksys_LDADD		= libsocket.la $(STREAMS_LDADD)
+test_socksys_LDFLAGS		= -static
+test_socksys_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_socksys_CFLAGS		= $(USER_CFLAGS)
 
 initsock_SOURCES		= src/util/initsock.c
 initsock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -307,6 +324,10 @@ if RPM_BUILD_USER
 
 SUBDIRS = src
 
+if WITH_32BIT_LIBS
+SUBDIRS += lib32
+endif
+
 if PKG_BUILD_ARCH
 SUBDIRS += intl m4 po
 CLEANFILES += po/stamp-po
@@ -392,7 +413,10 @@ EXTRA_DIST			+= \
 				  README-cvs \
 				  README-nexusware \
 				  debian/README.Debian \
-				  debian/TODO.Debian
+				  debian/TODO.Debian \
+				  src/lib/socket.VERSION \
+				  src/lib/sockpath.VERSION \
+				  src/lib/socklib.VERSION
 
 MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/aclocal.m4 \

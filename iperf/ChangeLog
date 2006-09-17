@@ -1,3 +1,8 @@
+2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added 32-bit compatibility libraries and binaries
+	* iperf.spec.in: added 32-bit compatibility libraries and binaries
+
 2006-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: missing bugs.texi from release

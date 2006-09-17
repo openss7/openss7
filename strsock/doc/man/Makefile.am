@@ -75,6 +75,9 @@ if PKG_BUILD_INDEP
 ## distribution.  Manual pages ending in '.man' are uncooked.  Manual pages
 ## ending in '.[1-9]' are cooked.
 ##
+
+
+
 man_MANS = \
 	man3/accept.3 \
 	man3/bind.3 \
@@ -99,7 +102,23 @@ man_MANS = \
 	man4/socksys.4 \
 	man5/sock2path.5 \
 	man8/initsock.8 \
-	man8/soconfig.8
+	man8/soconfig.8 \
+	man3/endsockpath.3 \
+	man3/freesockpathent.3 \
+	man3/getsockpath.3 \
+	man3/getsockpathent.3 \
+	man3/setsockpath.3 \
+	man3/sockpath.3 \
+	man3/sp_perror.3 \
+	man3/sp_sperror.3 \
+	man3/libsocklib.3 \
+	man3/socklib.3 \
+	man8/test-socket.8 \
+	man8/test-socklib.8 \
+	man8/test-sockmod.8 \
+	man8/test-sockpath.8 \
+	man8/test-socksys.8 \
+	man8/strsock_mknod.8
 
 dist_noinst_MANS = \
 	man3/accept.3.man \
@@ -125,7 +144,23 @@ dist_noinst_MANS = \
 	man4/socksys.4.man \
 	man5/sock2path.5.man \
 	man8/initsock.8.man \
-	man8/soconfig.8.man
+	man8/soconfig.8.man \
+	man3/endsockpath.3.man \
+	man3/freesockpathent.3.man \
+	man3/getsockpath.3.man \
+	man3/getsockpathent.3.man \
+	man3/setsockpath.3.man \
+	man3/sockpath.3.man \
+	man3/sp_perror.3.man \
+	man3/sp_sperror.3.man \
+	man3/libsocklib.3.man \
+	man3/socklib.3.man \
+	man8/test-socket.8.man \
+	man8/test-socklib.8.man \
+	man8/test-sockmod.8.man \
+	man8/test-sockpath.8.man \
+	man8/test-socksys.8.man \
+	man8/strsock_mknod.8.man
 
 ## PKG_BUILD_INDEP
 endif

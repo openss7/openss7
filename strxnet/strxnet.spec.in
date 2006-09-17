@@ -82,8 +82,8 @@
 %global kernel_source %(echo %{_kversion} | sed -r -e 's|BOOT$||;s|-?smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default$||')
 %global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
-%global kernel_fedora %(echo %{_kversion} | sed -e 's|.*FC4.*$|1|;s|[^1].*$|0|')
-%global kernel_others %(echo %{_kversion} | sed -e 's|.*FC4.*$|0|;s|[^0].*$|1|')
+%global kernel_fedora %(echo %{_kversion} | sed -e 's|.*FC[456].*$|1|;s|[^1].*$|0|')
+%global kernel_others %(echo %{_kversion} | sed -e 's|.*FC[456].*$|0|;s|[^0].*$|1|')
 %global core_name   core-%{_kversion}
 %global info_name   info-%{_kversion}
 %global majbase     @STRCONF_MAJBASE@
@@ -115,9 +115,16 @@
 %global NEED_init     0
 %endif
 
-%{!?_configdir:      %{expand: %%global _configdir    %%{_sysconfdir}/sysconfig}}
-%{!?_modutildir:     %{expand: %%global _modutildir   %%{_sysconfdir}/modutils}}
-%{!?_kmoduledir:     %{expand: %%global _kmoduledir   /lib/modules/%%{kernel_version}}}
+%{!?_lib32dir:        %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
+%{!?_pkglibexecdir:   %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
+%ifarch x86_64 ppc64 sparc64 ia64
+%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
+%else
+%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}}}
+%endif
+%{!?_configdir:       %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
+%{!?_modutildir:      %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
+%{!?_kmoduledir:      %{expand: %%global _kmoduledir      /lib/modules/%%{kernel_version}}}
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -918,6 +925,7 @@ This package applies to core kernel modules
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
+Prefix:         %{_lib32dir}
 Prefix:         %{_datadir}/locale
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
@@ -979,6 +987,8 @@ fi
 %defattr(-,root,root)
 %{_libdir}/*.so*
 %{_libdir}/*.la
+%{_lib32dir}/*.so*
+%{_lib32dir}/*.la
 %{_datadir}/locale/*
 %endif
 
@@ -988,6 +998,7 @@ fi
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
 Group:          Development/System
 Prefix:         %{_libdir}
+Prefix:         %{_lib32dir}
 Prefix:         %{_includedir}/%{name}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
@@ -1010,6 +1021,7 @@ files and static libraries required to compile OpenSS7
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_libdir}/*.a
+%{_lib32dir}/*.a
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*
 %endif
@@ -1029,7 +1041,8 @@ Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} admin utilities.
 Group:          System Environment/Base
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
-Prefix:         %{_libexecdir}
+Prefix:         %{_pkglibexecdir}
+Prefix:         %{_pkglibexec32dir}
 Prefix:         %{_sysconfdir}
 %if %{have_libraries}
 Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
@@ -1084,8 +1097,10 @@ fi
 %defattr(-,root,root)
 #%{_bindir}/*
 %{_sbindir}/*
-%{_libexecdir}/%{name}/*test*
-#%{_libexecdir}/%{name}/*tst
+%{_pkglibexecdir}/*test*
+#%{_pkglibexecdir}/*tst
+%{_pkglibexec32dir}/*test*
+#%{_pkglibexec32dir}/*tst
 %endif
 
 # ===========================================================================
@@ -1150,7 +1165,7 @@ fi
 
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
-Prefix:         %{_libexecdir}/%{name}
+Prefix:         %{_pkglibexecdir}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
 Autoreq:        true
@@ -1172,10 +1187,10 @@ submitting problem reports to @PACKAGE_BUGREPORT@.
 %files test
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_libexecdir}/%{name}/atlocal
-%{_libexecdir}/%{name}/testsuite*
-%{_libexecdir}/%{name}/send-pr
-%{_libexecdir}/%{name}/send-pr.config
+%{_pkglibexecdir}/atlocal
+%{_pkglibexecdir}/testsuite*
+%{_pkglibexecdir}/send-pr
+%{_pkglibexecdir}/send-pr.config
 %endif
 
 # ===========================================================================

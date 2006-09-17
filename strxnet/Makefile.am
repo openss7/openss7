@@ -520,6 +520,10 @@ SUBDIRS += intl m4 po
 CLEANFILES += po/stamp-po
 endif
 
+if WITH_32BIT_LIBS
+SUBDIRS += . lib32
+endif
+
 SUBDIRS += . tests
 
 if DEVELOPMENT
@@ -600,7 +604,9 @@ EXTRA_DIST			+= \
 				  README-cvs \
 				  README-nexusware \
 				  debian/README.Debian \
-				  debian/TODO.Debian
+				  debian/TODO.Debian \
+				  src/lib/xnet.VERSION \
+				  src/lib/xnsl.VERSION
 
 MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/aclocal.m4 \

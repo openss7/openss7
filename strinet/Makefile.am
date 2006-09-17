@@ -420,7 +420,13 @@ UNINSTALL_HOOK += uninstall-inet-devices
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = src . tests
+SUBDIRS = src
+
+if WITH_32BIT_LIBS
+SUBDIRS += . lib32
+endif
+
+SUBDIRS += . tests
 
 if DEVELOPMENT
 SUBDIRS += doc

@@ -349,115 +349,115 @@ dist_sbin_SCRIPTS		= strms_down strms_status strms_up
 
 streams_SOURCES			= util/streams.c
 streams_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-streams_LDFLAGS			= -static libLiS.la
+streams_LDFLAGS			= libLiS.la
 streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMEMPRINT
 streams_CFLAGS			= $(USER_CFLAGS)
 
 timetst_SOURCES			= util/timetst.c
 timetst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-timetst_LDFLAGS			= -static libLiS.la
+timetst_LDFLAGS			= libLiS.la
 timetst_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 timetst_CFLAGS			= $(USER_CFLAGS)
 
 strtst_SOURCES			= util/strtst.c
 strtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strtst_LDFLAGS			= -lpthread -static libLiS.la
+strtst_LDFLAGS			= -lpthread libLiS.la
 strtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strtst_CFLAGS			= $(USER_CFLAGS)
 
 test_streams_SOURCES		= util/test-streams.c
 test_streams_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_streams_LDFLAGS		= -lpthread -static libLiS.la
+test_streams_LDFLAGS		= -lpthread libLiS.la
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(USER_CFLAGS)
 
 test_fifo_SOURCES		= util/test-fifo.c
 test_fifo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_fifo_LDFLAGS		= -lpthread -static libLiS.la
+test_fifo_LDFLAGS		= -lpthread libLiS.la
 test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(USER_CFLAGS)
 
 test_pipe_SOURCES		= util/test-pipe.c
 test_pipe_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_pipe_LDFLAGS		= -lpthread -static libLiS.la
+test_pipe_LDFLAGS		= -lpthread libLiS.la
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(USER_CFLAGS)
 
 test_sad_SOURCES		= util/test-sad.c
 test_sad_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_sad_LDFLAGS		= -lpthread -static libLiS.la
+test_sad_LDFLAGS		= -lpthread libLiS.la
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(USER_CFLAGS)
 
 perftest_SOURCES		= util/perftest.c
 perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-perftest_LDFLAGS		= -static libLiS.la
+perftest_LDFLAGS		= libLiS.la
 perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 perftest_CFLAGS			= $(USER_CFLAGS)
 
 polltst_SOURCES			= util/polltst.c
 polltst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-polltst_LDFLAGS			= -static libLiS.la
+polltst_LDFLAGS			= libLiS.la
 polltst_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 polltst_CFLAGS			= $(USER_CFLAGS)
 
 fattach_SOURCES			= util/linux/fattach.c
 fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-fattach_LDFLAGS			= -static libLiS.la
+fattach_LDFLAGS			= libLiS.la
 fattach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fattach_CFLAGS			= $(USER_CFLAGS)
 
 fdetach_SOURCES			= util/linux/fdetach.c
 fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-fdetach_LDFLAGS			= -static libLiS.la
+fdetach_LDFLAGS			= libLiS.la
 fdetach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fdetach_CFLAGS			= $(USER_CFLAGS)
 
 mkfifo_SOURCES			= util/linux/mkfifo.c
 mkfifo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-mkfifo_LDFLAGS			= -static libLiS.la
+mkfifo_LDFLAGS			= libLiS.la
 mkfifo_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 mkfifo_CFLAGS			= $(USER_CFLAGS)
 
 oc_SOURCES			= util/linux/oc.c
 oc_DEPENDENCIES			= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-oc_LDFLAGS			= -static libLiS.la
+oc_LDFLAGS			= libLiS.la
 oc_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 oc_CFLAGS			= $(USER_CFLAGS)
 
 pafd_SOURCES			= util/linux/pafd.c
 pafd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-pafd_LDFLAGS			= -static libLiS.la
+pafd_LDFLAGS			= libLiS.la
 pafd_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 pafd_CFLAGS			= $(USER_CFLAGS)
 
 psfd_SOURCES			= util/linux/psfd.c
 psfd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-psfd_LDFLAGS			= -static libLiS.la
+psfd_LDFLAGS			= libLiS.la
 psfd_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 psfd_CFLAGS			= $(USER_CFLAGS)
 
 rwf_SOURCES			= util/linux/rwf.c
 rwf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-rwf_LDFLAGS			= -static libLiS.la
+rwf_LDFLAGS			= libLiS.la
 rwf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 rwf_CFLAGS			= $(USER_CFLAGS)
 
 lis_test_SOURCES		= util/linux/test.c
 lis_test_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-lis_test_LDFLAGS		= -static libLiS.la
+lis_test_LDFLAGS		= libLiS.la
 lis_test_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 lis_test_CFLAGS			= $(USER_CFLAGS)
 
 lis_test2_SOURCES		= util/linux/test2.c
 lis_test2_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-lis_test2_LDFLAGS		= -static libLiS.la
+lis_test2_LDFLAGS		= libLiS.la
 lis_test2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 lis_test2_CFLAGS		= $(USER_CFLAGS)
 
 thrtst_SOURCES			= util/linux/thrtst.c
 thrtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-thrtst_LDFLAGS			= -lpthread -static libLiS.la
+thrtst_LDFLAGS			= -lpthread libLiS.la
 thrtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 thrtst_CFLAGS			= $(USER_CFLAGS)
 
@@ -500,6 +500,10 @@ if DEVELOPMENT
 if PKG_BUILD_ARCH
 SUBDIRS += include
 endif
+endif
+
+if WITH_32BIT_LIBS
+SUBDIRS += . lib32
 endif
 
 SUBDIRS += tests
@@ -594,7 +598,8 @@ EXTRA_DIST			+= \
 				  README-alpha \
 				  README-nexusware \
 				  debian/README.Debian \
-				  debian/TODO.Debian
+				  debian/TODO.Debian \
+				  libc/LiS.VERSION
 
 MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/aclocal.m4 \

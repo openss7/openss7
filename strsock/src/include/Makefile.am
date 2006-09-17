@@ -65,12 +65,15 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
+	sockdb.h \
 	sockio.h \
 	sockmod.h \
 	socksys.h \
 	sys/sockio.h \
 	sys/sockmod.h \
-	sys/socksys.h
+	sys/sockpath.h \
+	sys/socksys.h \
+	sys/socklib.h
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/${PACKAGE}/version.h \

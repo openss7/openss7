@@ -1,5 +1,8 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: added 32-bit compatibility libraries and binaries
+	* openss7.spec.in: added 32-bit compatibility libraries and binaries
+
 	* m4/dist.m4: added location of 32-bit binaries to autoconf fragments
 	* m4/inet.m4: added location of 32-bit binaries to autoconf fragments
 	* m4/sctp.m4: added location of 32-bit binaries to autoconf fragments

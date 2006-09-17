@@ -879,6 +879,10 @@ if DEVELOPMENT
 SUBDIRS += include
 endif
 
+if WITH_32BIT_LIBS
+SUBDIRS += . lib32
+endif
+
 SUBDIRS += . tests
 
 if DEVELOPMENT
@@ -996,7 +1000,8 @@ EXTRA_DIST			+= \
 				  README-nexusware \
 				  README-LiS \
 				  debian/README.Debian \
-				  debian/TODO.Debian
+				  debian/TODO.Debian \
+				  lib/libc/streams.VERSION
 
 MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/aclocal.m4 \

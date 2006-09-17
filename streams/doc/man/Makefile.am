@@ -978,6 +978,8 @@ man_MANS = \
 	man3/fdetach.3 \
 	man3/isastream.3 \
 	man3/libstreams.3 \
+	man3/libLiS.3 \
+	man3/libpLiS.3 \
 	man3/pipe.3 \
 	man4/sth.4 \
 	man5/specfs.5 \
@@ -2088,6 +2090,8 @@ dist_noinst_MANS = \
 	man3/fdetach.3.man \
 	man3/isastream.3.man \
 	man3/libstreams.3.man \
+	man3/libLiS.3.man \
+	man3/libpLiS.3.man \
 	man3/pipe.3.man \
 	man3/s_pipe.3.man \
 	man4/sth.4.man \
