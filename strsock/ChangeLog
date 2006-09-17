@@ -1,4 +1,30 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man3/endsockpath.3.man: trying to pass make check
+	* doc/man/man3/freesockpathent.3.man: trying to pass make check
+	* doc/man/man3/getsockpath.3.man: trying to pass make check
+	* doc/man/man3/getsockpathent.3.man: trying to pass make check
+	* doc/man/man3/libsocklib.3.man: trying to pass make check
+	* doc/man/man3/setsockpath.3.man: trying to pass make check
+	* doc/man/man3/socklib.3.man: trying to pass make check
+	* doc/man/man3/sockpath.3.man: trying to pass make check
+	* doc/man/man3/sp_errbuf.3.man: trying to pass make check
+	* doc/man/man3/sp_error.3.man: trying to pass make check
+	* doc/man/man3/sp_perror.3.man: trying to pass make check
+	* doc/man/man3/sp_sperror.3.man: trying to pass make check
+	* doc/man/man8/strsock_mknod.8.man: trying to pass make check
+	* doc/man/man8/test-socket.8.man: trying to pass make check
+	* doc/man/man8/test-socklib.8.man: trying to pass make check
+	* doc/man/man8/test-sockmod.8.man: trying to pass make check
+	* doc/man/man8/test-sockpath.8.man: trying to pass make check
+	* doc/man/man8/test-socksys.8.man: trying to pass make check
+	* doc/man/man8/test-xxx.8.man: trying to pass make check
+	* src/include/sys/socklib.h: trying to pass make check
+	* src/include/sys/sockpath.h: trying to pass make check
+	* src/test/test-socket.c: trying to pass make check
+	* src/test/test-socklib.c: trying to pass make check
+	* src/test/test-sockmod.c: trying to pass make check
+	* src/test/test-socksys.c: trying to pass make check
 	
 	* doc/manual/news.texi: major update notices
 	* configure.ac: added 32-bit binary directory lib32/Makefile.am

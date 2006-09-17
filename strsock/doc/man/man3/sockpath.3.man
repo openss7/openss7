@@ -1,0 +1,665 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsock.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsock.macros
+.\"
+.\"
+.\"
+.\"
+.TH SOCKPATH 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.SH NAME
+.B sockpath, setsockpath, getsockpath, endsockpath, freesockpathent, getsockpathent, sp_perror, sp_sperror
+\- Socket Path database subroutines.
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <sockdb.h>
+.HP
+.BI "void *setsockpath(void);"
+.HP
+.BI "struct sockpath *getsockpath(void *" handle );
+.HP
+.BI "struct sockpath *getsockpathent(int " domain ", int " type ", int " protocol );
+.HP
+.BI "void freesockpathent(struct sockpath *" sockpath );
+.HP
+.BI "int endsockpath(void *" handle );
+.HP
+.BI "void sp_perror(const char *" msg );
+.HP
+.BI "char *sp_sperror(void);"
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIsockpath\fR\(em'u
+.I handle
+an opaque pointer returned by
+.BR setsockpath ()
+to be used as an argument to calls to
+.BR getsockpath ().
+.TP
+.I domain
+The domain of the socket for which to find a path.  This is the same as the
+.I domain
+argument to
+.BR socket (3).
+.TP
+.I type
+The type of the socket for which to find a path.  This is the same as the
+.I type
+argument to
+.BR socket (3).
+.TP
+.I protocol
+The protocol of the socket for which to find a path.  This is the same as the
+.I protocol
+argument to
+.BR socket (3).
+.TP
+.I sockpath
+A pointer to a
+.B sockpath
+structure returned from
+.BR getsockpathent ()
+to be freed by
+.BR freesockpathent ().
+.TP
+.I msg
+A short message string to prefix to the error message printed to standard
+error by the
+.BR sp_perror ()
+subroutine.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.IR UNIX \(rg
+.[
+svr42
+.]
+has traditional used the
+.BR netconfig (5)
+database for looking up
+.I STREAMS
+device paths for implementing sockets with the
+.BR socklib (3)
+library.
+Later versions, particularly of
+.IR Solaris \(rg
+.[
+soldoc
+.]
+have implemented a
+.BR sock2path (5)
+database that is used to populate kernel datastructures for use by the
+.BR socksys (4)
+driver.
+Using
+.BR netconfig (5)
+to look up socket paths is problematic in that it does not support the full
+range of socket types, and in particular
+.BR SOCK_SEQPACKET " and " SOCK_RDM .
+This set of database lookup functions provides access to the
+.BR sock2path (5)
+database from user space in a similar manner to that of
+.BR netconfig (3).
+.PP
+.BR setsockpath (),
+.BR getsockpath (),
+.BR endsockpath (),
+.BR getsockpathent (),
+.BR freesockpathent (),
+.BR sp_perror "() and "
+.BR sp_sperror (),
+provide a set of Socket Path database access subroutines for accessing the
+Socket Path database contained in the
+.BR /etc/sock2path ,
+.BR sock2path (5),
+file.
+.PP
+.BR setsockpath (),
+.BR getsockpath "() and "
+.BR endsockpath (),
+provide a mechanism to sequentially access each entry in the Socket Path
+database.
+.TP
+.BR setsockpath ()
+returns a pointer to an opaque datastructure used as a handle to the
+.BR getsockpath ()
+subroutine.
+.BR setsockpath ()
+is used to initialize the client access to the database entries and set the
+access point to the first entry.
+.TP
+.BR getsockpath ()
+when called successively with the
+.I handle
+returned by the call to
+.BR setsockpath (),
+returnes each Socket Path database entry starting with the first.  When no
+additional entries remain that have not already been retrieved since the call
+to
+.BR setsockpath (),
+.BR getsockpath ()
+returns a
+.B NULL
+pointer to indicate that the end of the database has been reached.
+.TP
+.BR endsockpath ()
+releases client access to the database and frees for reuse any resources that
+were held by
+.BR setsockpath ()
+for use by
+.BR getsockpath ().
+.BR endsockpath ()
+must only be called with a
+.I handle
+returned from a previous and corresponding call to
+.BR setsockpath ().
+.BR endsockpath ()
+must be called for each call to
+.BR setsockpath ()
+with the corresponding
+.I handle
+pointer as the argument.
+.PP
+.BR getsockpathent "() and "
+.BR freesockpathent (),
+provide a mechanism to access the Socket Path database entries by
+.BR socket (3)
+.IR domain ,
+.IR type " and "
+.IR protocol .
+.TP
+.BR getsockpathent ()
+Returns a pointer to the
+.B sockpath
+structure corresponding to the socket path entry with the same
+.IR domain ", " type " and " protocol
+as that supplied in the corresponding arguments.
+.TP
+.BR freesockpathent ()
+frees the socket path entry returned as a pointer to a
+.B sockpath
+structure, from a previous call to
+.BR getsockpathent ().
+.BR freesockpathent ()
+must be called for each call to
+.BR getsockpathent ()
+with the corresponding
+.I sockpath
+pointer as the argument.
+.PP
+.BR sp_perror "() and "
+.BR sp_sperror ()
+provide a mechanism for providing diagnostic messages upon failure.
+.TP
+.BR sp_perror ()
+prints a diagnostic message to standard error with the string provided in the
+.I msg
+argument used as a prefix followed by a colon.  Diagnostic messages printed to
+standard error are followed with a NEWLINE.
+.TP
+.BR sp_sperror ()
+is similar to
+.BR sp_perror (),
+but, instead of printing the message to standard error, only a pointer to the
+diagnostic message string is returned.  The allows the caller to subsequently
+format and store a message according to the caller's specifications.
+.\"
+.\"
+.SS "FILE FORMAT"
+.PP
+The format of the
+.B /etc/sock2path
+Socket Path database file is as described in
+.BR sock2path (5).
+.\"
+.\"
+.SS "DATABASE STRUCTURE"
+.PP
+The
+.B sockpath
+structure is defined in
+.RB < sockdb.h >
+as follows:
+.PP
+.nf
+\fC\s-1\
+struct sockpath {
+    int sp_domain;   /* domain ala socket(3) */
+    int sp_type;     /* type ala socket(3) */
+    int sp_protocol; /* protocol ala socket(3) */
+    char *sp_path;   /* STREAMS device path */
+    char *sp_netid;  /* netconfig(5) network id */
+};
+\s+1\fP
+.fi
+.PP
+Where the members of the
+.B sockpath
+structure are as follows:
+.TP \w'\fIsp_protocol\fR\(em'u
+.I sp_domain
+The socket domain (e.g,
+.BR PF_INET ).
+.TP
+.I sp_type
+The socket type (e.g,
+.BR SOCK_STREAM ).
+.TP
+.I sp_protocol
+The socket protocol within the domain (e.g,
+.BR IPPROTO_TCP ).
+.TP
+.I sp_path
+The full path to the
+.I STREAMS
+device (e.g,
+.BR /dev/tcp ).
+.TP
+.I sp_netid
+The network identifier of the corresponding entry in the
+.BR netconfig (5)
+database.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR sp_perror ()
+and
+.BR sp_sperror ()
+must be called immediately after the failed socket path subroutine
+fails.  Otherwise, the error condition may be lost.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR setsockpath ()
+returns an opaque pointer for use in the
+.BR getsockpath ()
+call.  Otherwise,
+.B NULL
+is returned and
+.IR sp_error (3)
+is set to indicate the error.
+.PP
+Upon successful completion,
+.BR endsockpath ()
+returns 0.  Otherwise, -1 is
+returned and
+.IR sp_error (3)
+is set to indicate the error.
+A diagnostic string can be printed to standard error or accesed using the
+.BR sp_perror ()
+or
+.BR sp_sperror ()
+subroutines.
+.PP
+Upon successful completion,
+.BR sp_sperror ()
+returns a pointer to a string describing the error condition.  (Note that this
+subroutine can also be used for
+.BR netpath (3)
+subroutines.)
+Otherwise,
+.B NULL
+is returned.
+.PP
+Upon successful completion,
+.BR getsockpath ()
+and
+.BR getsockpathent ()
+return a pointer to a
+.B sockpath
+structure.
+Otherwise, they return
+.B NULL
+to indicate failure.
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+When an error occurs, an error message can be printed to standard error or retrieved using
+.BR sp_perror ()
+or
+.BR sp_sperror ().
+.\"
+.\"
+.SH ERRORS
+.PP
+The
+.BR setsockpath ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+.\".IP \- \w'\-\(em'u
+an error was encountered opening the Socket Path database,
+.BR /etc/sock2path ,
+see
+.BR sock2path (5).
+.PP
+The
+.BR getsockpath ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+.\".IP \- \w'\-\(em'u
+no entries exist in the Socket Path database; or,
+.\".IP \-
+the last entry in the Socket Path database has been read with a
+previous call to
+.BR getsockpath ()
+and there are no more entries in the Socket Path database.
+.PP
+The
+.BR endsockpath ()
+subroutine will fail if:
+.\".IP \- \w'\-\(em'u
+the passed in
+.I handle
+argument is invalid; or,
+.\".IP \-
+.BR endsockpath ()
+has already been called for the
+.I handle
+argument.
+.PP
+The passed in
+.I handle
+argument is only invalid when there is not a subsequent, corresponding call to
+.BR setsockpath ().
+.PP
+The
+.BR getsockpathent ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+.\".IP \- \w'\-\(em'u
+the Socket Path database does not exist; or,
+.\".IP \-
+no entries exist in the Socket Path database for the passed in
+.I netid
+string.
+.PP
+The
+.BR freesockpathent ()
+subroutine will fail silently if:
+.\".IP \- \w'\-\(em'u
+passed a
+.B NULL
+or invalid pointer; or,
+.\".IP \-
+pass a pointer that was previously passed to
+.BR freesockpathent ().
+.PP
+The
+.BR sp_perror ()
+subroutine will fail silently if:
+.\".IP \- \w'\-\(em'u
+standard error is closed; or,
+.\".IP \-
+.I msg
+is an invalid pointer.
+.PP
+The
+.BR sp_sperror ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+.\".IP \- \w'\-\(em'u
+no error exists.
+.PP
+The following errors can be returned:
+.TP \w'[\fBNC_NOMOREENTRIES\fR]\(em'u
+.RB [ SP_NOERROR ]
+.RI \(lq "no error" \(rq
+.IP
+The last socket path function called was successful or no socket path function has yet
+been called.
+.TP
+.RB [ SP_NOMEM ]
+.RI \(lq "out of memory" \(rq
+.IP
+There was not sufficient memory for the last socket path function called to complete.
+.TP
+.RB [ SP_NOSET ]
+.RI \(lq "routine called before calling setsockpath()" \(rq
+.IP
+The last call to
+.BR endsockpath ()
+or
+.BR getsockpath ()
+was called (incorrectly) before calling
+.BR setsockpath ().
+.TP
+.RB [ SP_OPENFAIL ]
+.RI \(lq "cannot open /etc/sock2path" \(rq
+.IP
+The last call to a socket path function,
+.BR setsockpath (),
+could not open the
+.B /etc/sock2path
+file.
+.TP
+.RB [ SP_BADLINE ]
+.RI \(lq "error in /etc/sock2path : field %d of line %d" \(rq
+.IP
+The last call to a socket path function detected a syntax error in the
+.B /etc/sock2path
+file at field
+.I %d
+of line
+.IR %d .
+.TP
+.RB [ SP_NOTFOUND ]
+.RI \(lq "netid not found in /etc/sock2path" \(rq
+.IP
+The
+.I netid
+argument to the last call to
+.BR getsockpathent ()
+was not found in
+.BR /etc/sock2path .
+.TP
+.RB [ SP_NOMOREENTRIES ]
+.RI \(lq "no more entries in /etc/sock2path" \(rq
+.IP
+The last call to socket path function
+.BR getsockpath ()
+exhausted the entries in the
+.B /etc/sock2path
+file.
+.TP
+.RB [ ??? ]
+.RI \(lq "unknown error" \(rq
+.IP
+An internal error occured in the
+.BR libsockpath (3)
+library.
+.PP
+An error string associated with the error number can be obtained using
+.BR sp_sperror ()
+or printed to standard error with
+.BR sp_perror ().
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/sock2path
+The Network Configuration database file.  See
+.BR sock2path (5).
+.TP
+.B /usr/lib/libsockpath.so
+The X/Open Network Services Library shared object library.
+.TP
+.B /usr/lib/libsockpath.a
+The X/Open Network Services Library static library.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sock2path (5),
+.BR netconfig (5),
+.BR netconfig (3),
+.BR socket (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR setsockpath (),
+.BR getsockpath (),
+.BR endsockpath (),
+.BR getsockpathent (),
+.BR freesockpathent (),
+.BR sp_perror "() and "
+.BR sp_sperror (),
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These socket path subroutines are compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+These subroutines are
+.B @PACKAGE_TITLE@
+specific and will not be used directly by portable programs.
+.PP
+See
+.BR libsockpath (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "@PACKAGE_TITLE@" .
+.[
+lfs
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The network selection subroutines first appeared in
+.IR "@PACKAGE_TITLE@" .
+.[
+LFS
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+and
+.BR socket (7)
+implementation of network transport providers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

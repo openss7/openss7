@@ -52,61 +52,29 @@
  $Log$
  *****************************************************************************/
 
-#ifndef __SYS_SOCKPATH_H__
-#define __SYS_SOCKPATH_H__
+#ifndef __SYS_SOCKLIB_H__
+#define __SYS_SOCKLIB_H__
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
-#define SOCK2PATH		"/etc/sock2path"
-#define	SOCKPATH		"SOCKPATH"
+int accept(int fd, struct sockaddr *addr, socklen_t * len);
+int bind(int fd, const struct sockaddr *addr, socklen_t len);
+int connect(int fd, const struct sockaddr *addr, socklen_t len);
+int getpeername(int fd, struct sockaddr *addr, socklen_t * len);
+int getsockname(int fd, struct sockaddr *addr, socklen_t * len);
+int getsockopt(int fd, int level, int name, void *value, socklen_t * len);
+int listen(int fd, int backlog);
+int setsockopt(int fd, int level, int name, const void *value, socklen_t len);
+int shutdown(int fd, int how);
+int socket(int domain, int type, int protocol);
+int socketpair(int domain, int type, int protocol, int socket_vector[2]);
 
-struct sockpath {
-	int sp_domain;
-	int sp_type;
-	int sp_protocol;
-	char *sp_path;
-};
+ssize_t recv(int fd, void *buf, size_t len, int flags);
+ssize_t recvmsg(int fd, struct msghdr *msg, int flags);
+ssize_t recvfrom(int fd, void *buf, size_t len, int flags, struct sockaddr *addr, socklen_t * alen);
 
-#ifdef _REENTRANT
-extern int *__sperror(void);
-#define sp_error (*(__sperror()))
-extern char *__sperrbuf(void);
-#define sp_errbuf (*(__sperrbuf()))
-#else
-#error Compiled without _REENTRANT defined!
-//extern int sp_error;
-//extern char *sp_errbuf;
-#endif
+ssize_t send(int fd, const void *buf, size_t len, int flags);
+ssize_t sendmsg(int fd, const struct msghdr *msg, int flags);
+ssize_t sendto(int fd, const void *buf, size_t len, int flags, const struct sockaddr *addr, socklen_t alen);
 
-/* error codes */
-#define SP_NOERROR		0
-#define SP_NOMEM		1
-#define SP_NOSET		2
-#define SP_OPENFAIL		3
-#define SP_BADLINE		4
-#define SP_NOTFOUND		5
-#define SP_NOMOREENTRIES	6
-#define SP_ERROR_MAX		7
-
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
-
-extern void *setsockpath(void);
-extern struct sockpath *getsockpath(void *handle);
-extern struct sockpath *getsockpathent(int domain, int type, int protocol);
-extern void freesockpathent(struct sockpath *sockpath);
-extern int endsockpath(void *handle);
-
-extern void sp_perror(const char *msg);
-extern char *sp_sperror(void);
-
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
-
-#endif				/* __SYS_SOCKPATH_H__ */
+#endif				/* __SYS_SOCKLIB_H__ */
