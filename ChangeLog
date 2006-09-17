@@ -1,5 +1,6 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 	
+	* configure.ac: added 32-bit binary directory lib32/Makefile.am
 	* scripts/check_libs: strip library symbol version on check
 
 	* Makefile.am: added 32-bit compatibility libraries and binaries

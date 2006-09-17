@@ -160,6 +160,7 @@ AC_CONFIG_FILES([Makefile
 		 man/Makefile
 		 manual/Makefile
 		 manual/texi/args.texi
+		 lib32/Makefile
 		 drivers/str/Config
 		 scripts/texi/args.texi
 		 testsuite/Makefile

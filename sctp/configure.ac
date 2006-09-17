@@ -139,6 +139,7 @@ AC_CHECK_FUNCS([bzero gethostbyname gettimeofday inet_ntoa memset pow socket sqr
 AC_SCTP
 
 AC_CONFIG_FILES([Makefile
+		 lib32/Makefile
 		 scripts/texi/args.texi
 		 include/Makefile
 		 doc/Makefile
