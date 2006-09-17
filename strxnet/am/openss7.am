@@ -509,12 +509,9 @@ retest-am: $(RETEST_AM)
 MY_RECURSIVE_TARGETS	+= retest-recursive
 MY_PHONY		+= retest retest-am
 
-remove: remove-recursive
+remove: all-uninstall
 
-remove-am: uninstall-am
-
-MY_REVERSIVE_TARGETS	+= remove-recursive
-MY_PHONY		+= remove remove-am
+MY_PHONY		+= remove
 
 #!
 #! Release Targets:
