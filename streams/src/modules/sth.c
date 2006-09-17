@@ -8682,6 +8682,10 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  This is done a little different.  Open up one pipe device (/dev/sfx) another pipe device and
  *  then do ioctl(fd1, I_PIPE, fd2) to link them together into a bidirectional pipe.
+ *
+ *  A sneaky trick is used here to avoid deadlock. The lower address always gets locked first,
+ *  regardless of where two streams are locked so.  (If all the philosophers at dinner picked up
+ *  their left fork there would be no problem.)
  */
 streams_noinline streams_fastcall __unlikely int
 str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
@@ -8712,8 +8716,14 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 						    && sd2->sd_wq->q_next == sd2->sd_rq) {
 							unsigned long pl, pl2;
 
-							pwlock(sd, pl);
-							pwlock(sd2, pl2);
+							/* always lock 'em in the same order */
+							if (sd < sd2) {
+								pwlock(sd, pl);
+								pwlock(sd2, pl2);
+							} else {
+								pwlock(sd2, pl2);
+								pwlock(sd, pl);
+							}
 
 							/* weld 'em together */
 							sd->sd_other = sd_get(sd2);
@@ -8722,8 +8732,14 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 							sd->sd_wq->q_next = sd2->sd_rq;
 							sd2->sd_wq->q_next = sd->sd_rq;
 
-							pwunlock(sd2, pl2);
-							pwunlock(sd, pl);
+							/* always unlock 'em in the same order */
+							if (sd < sd2) {
+								pwunlock(sd2, pl2);
+								pwunlock(sd, pl);
+							} else {
+								pwunlock(sd, pl);
+								pwunlock(sd2, pl2);
+							}
 							err = 0;
 						}
 						srunlock(sd2);
@@ -9756,7 +9772,7 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		}
 		err = sd->sd_directio->ioctl(file, cmd, arg);
 		sd_put(&sd);
-	} else 
+	} else
 		err = -ENOSTR;
 	strsyscall_ioctl();	/* save context switch */
 	return (err);

@@ -94,13 +94,16 @@ MODULE_ALIAS("streams-spx");
 #endif
 
 #ifndef CONFIG_STREAMS_SPX_NAME
+//#define CONFIG_STREAMS_SPX_NAME "spx"
 #error CONFIG_STREAMS_SPX_NAME must be defined.
 #endif
-#ifndef CONFIG_STREAMS_SPX_MAJOR
-#error CONFIG_STREAMS_SPX_MAJOR must be defined.
-#endif
 #ifndef CONFIG_STREAMS_SPX_MODID
+//#define CONFIG_STREAMS_SPX_MODID 9
 #error CONFIG_STREAMS_SPX_MODID must be defined.
+#endif
+#ifndef CONFIG_STREAMS_SPX_MAJOR
+//#define CONFIG_STREAMS_SPX_MAJOR 0
+#error CONFIG_STREAMS_SPX_MAJOR must be defined.
 #endif
 
 modID_t modid = CONFIG_STREAMS_SPX_MODID;
@@ -110,7 +113,7 @@ MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif
-MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver.");
+MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver (0 for allocation).");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SPX_MODID));
@@ -124,7 +127,7 @@ MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0);
 #endif
-MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver.");
+MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver (0 for allocation).");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR) "-*");
@@ -145,8 +148,8 @@ static struct module_info spx_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat spx_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat spx_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat spx_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat spx_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 typedef struct spx {
 	struct spx *next;
@@ -227,7 +230,8 @@ spx_wput(queue_t *q, mblk_t *mp)
 				spin_unlock(&spx_lock);
 				/* FIXME: welding is probably not enough.  We probably have to link 
 				   the two stream heads together, pipe-style as well as setting
-				   some stream head characteristics */
+				   some stream head characteristics.  People would be better to use 
+				   the pipe(4) device anyway. */
 				break;
 			}
 			spin_unlock(&spx_lock);

@@ -295,6 +295,9 @@ magic
 Following is an example of how to open a
 .IR STREAMS -based
 pipe:
+(see
+.BR I_FDINSERT (7)
+for more information)
 .sp
 .nf
 \fC\s-1\
@@ -314,7 +317,7 @@ spipe(int *fd)
     fdi.ctlbuf.buf = (caddr_t) &ptr;
     fdi.databuf.maxlen = fdi.databuf.len = -1;
     fdi.databuf.buf = NULL;
-    fdi.filedes = fds[0];
+    fdi.filedes = fds[1];
     fdi.offset = 0;
     fdi.flags = RS_NORM;
     if (ioctl(fds[0], I_FDINSERT, &fdi) < 0) {
@@ -324,6 +327,161 @@ spipe(int *fd)
     }
     fd[0] = fds[0];
     fd[1] = fds[1];
+    return (0);
+}
+\s+1\fP
+.fi
+.PP
+The
+.BR pipe (3)
+library call from the
+.BR libstreams (3)
+library uses the
+.BR pipe
+device and a specialized
+.BR I_PIPE (7)
+input-output control more simply as follows:
+.sp
+.nf
+\fC\s-1\
+int
+pipe(int *fds)
+{
+    int fd1, fd2;
+
+    if ((fd1 = open("/dev/pipe", O_RDWR)) < 0) {
+        return (-1);
+    }
+    if ((fd2 = open("/dev/pipe", O_RDWR)) < 0) {
+        error = errno;
+        close(fd1);
+        errno = error;
+        return (-1);
+    }
+    if (ioctl(fd1, I_PIPE, fd2) < 0) {
+        error = errno;
+        close(fd2);
+        close(fd1);
+        errno = error;
+        return (-1);
+    }
+    fds[0] = fd1;
+    fds[1] = fd2;
+    return (0);
+}
+
+int
+pipe_r(int *fds)
+{
+    int oldtype, ret;
+
+    pthread_setcanceltype(PTHREAD_CANCEL_DISABLE,
+                          &oldtype);
+    ret = pipe(fds);
+    pthread_setcanceltype(oldtype, NULL);
+    return (ret);
+}
+\s+1\fP
+.fi
+.PP
+Following is an example of how to name a
+.IR STREAMS -based
+pipe:
+.sp
+.nf
+\fC\s-1\
+int
+nspipe(int *fd, char *path)
+{
+    struct stat st;
+    int old_umask;
+
+    if (spipe(fd) < 0)
+        return (-1);
+    if (fstat(fd[0], &st) < 0)
+        return (-1);
+    unlink(path);
+    old_umask = umask(0);
+    if (mknod(path, S_IFCHR | 0666, st.st_rdev) < 0) {
+        umask(old_umask);
+        return (-1);
+    }
+    umask(old_umask);
+    return (0);
+}
+\s+1\fP
+.fi
+.sp
+.PP
+Another option under
+.B @PACKAGE_TITLE@
+is to create a symbolic link from
+.I path
+into the
+.BR /dev/streams/spx/
+directory, like so:
+.sp
+.nf
+\fC\s-1\
+int
+nspipe(int *fd, char *newpath)
+{
+    struct stat st;
+    int old_umask;
+    char oldpath[PATH_MAX];
+
+    if (spipe(fd) < 0)
+        return (-1);
+    if (fstat(fd[0], &st) < 0)
+        return (-1);
+    snprintf(oldpath, PATH_MAX, "/dev/streams/spx/%d",
+             (st->st_ino & 0xffff));
+    unlink(newpath);
+    old_umask = umask(0);
+    if (symlink(oldpath, newpath) < 0) {
+        umask(old_umask);
+        return (-1);
+    }
+    umask(old_umask);
+    return (0);
+}
+\s+1\fP
+.fi
+.PP
+The following function will pass a file desriptor to the process at the other
+end of the pipe:
+(see
+.BR I_SENDFD (7)
+for more information)
+.sp
+.nf
+\fC\s-1\
+int
+sendfd(int fd, int sendfd)
+{
+    if (ioctl(fd, I_SENDFD, sendfd) < 0)
+        return (-1);
+    return (0);
+}
+\s+1\fP
+.fi
+.PP
+The following function will receive a file descriptor at the receiving end of
+the pipe:
+(see
+.BR I_RECVFD (7)
+for more information)
+.sp
+.nf
+\fC\s-1\
+int
+recvfd(int fd, int *recvfd)
+{
+    struct strrecvfd rfd;
+
+    if (ioctl(fd, I_RECVFD, (char *) &rfd) < 0)
+        return (-1);
+    *recvfd = rfd.fd;
     return (0);
 }
 \s+1\fP
@@ -378,9 +536,15 @@ lfs
 provides the
 .B spx
 device for compatibility with
-.IR UnixWare \(rg
-7 and
-.IR AIX \(rg.
+.IR AIX \(rg
+.[
+aixdoc
+.]
+and
+.IR Unixware \(rg.
+.[
+uw7doc
+.]
 .IR Solaris \(rg
 and
 .I LiS
@@ -395,6 +559,9 @@ driver.
 provides a
 .B spx
 driver.
+.[
+aixdoc
+.]
 The use of the
 .B spx
 driver under
@@ -405,28 +572,65 @@ is not well documented.
 provides a
 .B spx
 driver.
+.[
+uw7doc
+.]
 The use of the
 .B spx
 driver under
 .IR UnixWare \(rg
-is not well documented.
+is fairly well documented.
 .IP \(em
 .I LiS
+does not provide a compatible
+.B spx
+driver.
 .IP \(em
 .IR UnixWare \(rg
 documentation
 .[
 uw7doc
 .]
-describes naming an unnamed pipe by making a device node with the device
-number returned by a call to
+describes naming an unnamed pipe by making a device node,
+.BR mknod (2),
+with the device number returned by a call to
 .BR stat (2)
 on one end of the pipe.
-Although this technique also works with
+Also, a
+.BR symlink (2),
+approach is shown under
+.RI \(lq EXAMPLES ,\(rq
+above.
+Although these techniques work with
 .BR "Linux Fast-STREAMS" ,
 we recommend using
 .BR fattach (2)
+and
+.BR connld (4)
 instead.
+.IP \(em
+The
+.B spx
+driver is provided for compatibility with
+.IR AIX \(rg
+and
+.IR UnixWare \(rg
+only.  The
+.B spx
+driver should not be used by portable programs.  Portable programs should use
+the
+.BR pipe (3)
+call from the
+.BR libstreams (3)
+library to obtain a
+.IR STREAMS -based
+pipe instead.
+.IP \(em
+Binary compatibility would only be cooincidental.
+.PP
+See
+.BR pipe (3)
+for more information.
 .\"
 .\"
 .SH CONFORMANCE
