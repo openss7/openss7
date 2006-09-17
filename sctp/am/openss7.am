@@ -212,9 +212,9 @@ $(MY_RECURSIVE_TARGETS):
 	for subdir in $$list ; do \
 		case " m4 intl po " in *" $$subdir "*) continue ;; esac ; \
 		$(ECHO) "Making $$target in $$subdir" ; \
-		if test "$$subdir" = "." ; then target="$$target-am" ; fi ; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
+		if test "$$subdir" = "." ; then local="$$target-am" ; else local="$$target" ; fi ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
 	done ; \
 	test -z "$$fail"
@@ -238,9 +238,9 @@ $(MY_REVERSIVE_TARGETS):
 	if test "$$dot_seen" = "no" ; then list=". $$list" ; fi ; \
 	for subdir in $$list ; do \
 		echo "Making $$target in $$subdir" ; \
-		if test "$$subdir" = "." ; then target="$$target-am" ; fi ; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
+		if test "$$subdir" = "." ; then local="$$target-am" ; else local="$$target" ; fi ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
 	done ; \
 	test -z "$$fail"

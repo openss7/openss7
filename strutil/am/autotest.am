@@ -103,6 +103,9 @@ INSTALLCHECK_TESTS =
 ## my rule
 installcheck-test: $(TESTSUITE)
 	$(SHELL) $< DESTDIR='$(DESTDIR)' rootdir='$(rootdir)' AUTOTEST_PATH='.' $(TESTSUITE_OPTS)
+if WITH_32BIT_LIBS
+	$(SHELL) $< DESTDIR='$(DESTDIR)' rootdir='$(rootdir)' AUTOTEST_PATH='./lib32' $(TESTSUITE_OPTS)
+endif
 
 INSTALLCHECK_TESTS += installcheck-test
 

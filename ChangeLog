@@ -9,6 +9,11 @@
 	* m4/xns.m4: added location of 32-bit binaries to autoconf fragments
 	* m4/xti.m4: added location of 32-bit binaries to autoconf fragments
 
+	* am/autotest.am: added double run of testsuite
+	* am/libraries.am: don't delete compatibility libraries
+	* am/openss7.am: corrections
+	* am/release.am: corrections
+
 2006-09-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/xti.m4: added NSL_LDADD calculation for including libxnsl library

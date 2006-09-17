@@ -134,7 +134,7 @@ $(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|[0-9].[0-9] Problem Reports|,\|^Appendix|!d;\|^Appendix|,$$d' >> $@ ;\
+	 cat MANUAL | sed -e '\|[0-9].[0-9] Problem Reports|,\|^ Licenses|!d;\|^ Licenses|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/NEWS: MANUAL $(top_srcdir)/AUTHORS
