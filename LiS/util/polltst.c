@@ -69,7 +69,6 @@
 #include <sys/poll.h>
 #include <sys/stropts.h>
 #include <sys/ioctl.h>
-#include <sys/LiS/loop.h>	/* an odd place for this file */
 #include <signal.h>
 #include <string.h>
 #include <time.h>
@@ -79,6 +78,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <sys/LiS/loop.h>	/* an odd place for this file */
 
 /************************************************************************
 *                           Defines                                     *
@@ -255,26 +255,32 @@ do_poll(void)
 		}
 
 		if (fds[0].revents & POLLIN) {	/* loop.1 has data */
+			int dummy;
+
 			rslt = read(loop1, &c, 1);
 			if (rslt < 0) {
 				perror("loop.1: read:");
 				break;
 			}
 
-			write(loop1, &c, 1);	/* write back to loop.1 */
+			dummy = write(loop1, &c, 1);	/* write back to loop.1 */
 		}
 
 		if (fds[1].revents & POLLIN) {	/* loop.2 has data */
+			int dummy;
+
 			rslt = read(loop2, &c, 1);
 			if (rslt < 0) {
 				perror("loop.2: read:");
 				break;
 			}
 
-			write(STDOUT, &c, 1);	/* write to tty */
+			dummy = write(STDOUT, &c, 1);	/* write to tty */
 		}
 
 		if (fds[2].revents & POLLIN) {	/* stdin has data */
+			int dummy;
+
 			rslt = read(STDIN, &c, 1);
 			if (rslt < 0) {
 				perror("STDIN: read:");
@@ -284,7 +290,7 @@ do_poll(void)
 			if (rslt == 0)
 				break;
 
-			write(loop2, &c, 1);	/* write to loop.2 */
+			dummy = write(loop2, &c, 1);	/* write to loop.2 */
 		}
 	}
 
