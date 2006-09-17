@@ -104,7 +104,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH ARGUMENTS
-.TP \w'handle\(em'u
+.TP \w'\fInetconfig\fR\(em'u
 .I handle
 an opaque pointer returned by
 .BR setnetconfig ()
@@ -116,6 +116,14 @@ A network identifier string.  This should match one of the network identifier
 strings from the
 .BR netconfig (5)
 file.
+.TP
+.I netconfig
+A pointer to a
+.B netconfig
+structure returned from
+.BR getnetconfigent ()
+to be freed by
+.BR freenetconfigent ().
 .TP
 .I msg
 A short message string to prefix to the error message printed to standard
@@ -187,8 +195,9 @@ When no additional entries remain that have not already been retreived since
 the call to
 .BR setnetconfig (),
 .BR getnetconfig ()
-returns a NULL pointer to indicate that the end of the database has been
-reached.
+returns a
+.B NULL
+pointer to indicate that the end of the database has been reached.
 .TP
 .BR endnetconfig ()
 releases client access to the database and frees for reuse any resources that
@@ -211,7 +220,7 @@ pointer as the argument.
 .BR getnetconfigent ()
 and
 .BR freenetconfigent ()
-provide a mechanism to access Network Confifuration database entries by
+provide a mechanism to access Network Configuration database entries by
 network identification name strings.
 .TP
 .BR getnetconfigent ()
@@ -634,8 +643,8 @@ have no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
-These network configuraiton subroutines are compatible with
-.I "SVR 4.2"
+These network configuration subroutines are compatible with
+.IR "SVR 4.2" ,
 .[
 svr42
 .]
