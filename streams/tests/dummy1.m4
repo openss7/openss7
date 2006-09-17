@@ -1,3 +1,4 @@
+# vim: ft=config sw=4 comments+=b\:dnl
 # =============================================================================
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
@@ -33,10 +34,10 @@
 #
 # -----------------------------------------------------------------------------
 # 
-# As an exception to the above, this software may be distributed under the GNU
-# General Public License (GPL) Version 2 or later, so long as the software is
-# distributed with, and only used for the testing of, OpenSS7 modules, drivers,
-# and libraries.
+# As an exception to the above, this software may be distributed under the
+# GNU General Public License (GPL) Version 2, so long as the software is
+# distributed with, and only used for the testing of, OpenSS7 modules,
+# drivers, and libraries.
 #
 # -----------------------------------------------------------------------------
 #

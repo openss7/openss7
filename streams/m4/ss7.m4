@@ -92,6 +92,7 @@ dnl
     AC_SUBST([SS7_CPPFLAGS])dnl
     AC_SUBST([SS7_MODFLAGS])dnl
     AC_SUBST([SS7_LDADD])dnl
+    AC_SUBST([SS7_LDADD32])dnl
     AC_SUBST([SS7_MODMAP])dnl
     AC_SUBST([SS7_SYMVER])dnl
     AC_SUBST([SS7_MANPATH])dnl
@@ -180,6 +181,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    if test -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_search_path"
 			ss7_cv_ldadd= # "$master_builddir/stacks/libss7.la"
+			ss7_cv_ldadd32= # "$master_builddir/stacks/lib32/libss7.la"
 			ss7_cv_modmap= # "$master_builddir/stacks/Modules.map"
 			ss7_cv_symver= # "$master_builddir/stacks/Module.symvers"
 			ss7_cv_manpath="$master_builddir/stacks/doc/man"
@@ -213,6 +215,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    if test -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_dir $ss7_bld"
 			ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_modmap= # `echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_symver= # `echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -289,6 +292,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    if test -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_dir"
 			ss7_cv_ldadd= # '-lss7'
+			ss7_cv_ldadd32= # '-lss7'
 			ss7_cv_modmap=
 			ss7_cv_symver=
 			ss7_cv_manpath=
@@ -301,7 +305,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for ss7 include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for ss7 ldadd],[ss7_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for ss7 ldadd native],[ss7_cv_ldadd],[dnl
 	for ss7_dir in $ss7_cv_includes ; do
 	    if test -f "$ss7_dir/../../libss7.la" ; then
 		ss7_cv_ldadd=`echo "$ss7_dir/../../libss7.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -310,6 +314,17 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	done
 	if test -z "$ss7_cv_ldadd" ; then
 	    ss7_cv_ldadd= # '-lss7'
+	fi
+    ])
+    AC_CACHE_CHECK([for ss7 ldadd 32-bit],[ss7_cv_ldadd32],[dnl
+	for ss7_dir in $ss7_cv_includes ; do
+	    if test -f "$ss7_dir/../../libss7.la" ; then
+		ss7_cv_ldadd32=`echo "$ss7_dir/../../lib32/libss7.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$ss7_cv_ldadd32" ; then
+	    ss7_cv_ldadd32= # '-lss7'
 	fi
     ])
     AC_CACHE_CHECK([for ss7 modmap],[ss7_cv_modmap],[dnl
@@ -472,6 +487,7 @@ AC_DEFUN([_SS7_DEFINES], [dnl
     fi
     SS7_CPPFLAGS="${SS7_CPPFLAGS:+ ${SS7_CPPFLAGS}}"
     SS7_LDADD="$ss7_cv_ldadd"
+    SS7_LDADD32="$ss7_cv_ldadd32"
     SS7_MODMAP="$ss7_cv_modmap"
     SS7_SYMVER="$ss7_cv_symver"
     SS7_MANPATH="$ss7_cv_manpath"

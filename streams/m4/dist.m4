@@ -660,13 +660,22 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 # -----------------------------------------------------------------------------
 # adjust default lib directory for 64 bit
 AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
-    if test :"$libdir" = ':${exec_prefix}/lib' ; then 
-	case $host_cpu in
-	    (*64)
-		libdir='${exec_prefix}/lib64'
-		;;
-	esac
-    fi
+    lib32dir="$libdir"
+    pkglib32dir="$pkglibdir"
+    pkglibexec32dir="$pkglibexecdir"
+    case $host_cpu in
+	(*64)
+	    lib64dir=`echo $libdir | sed -r -e 's|\<lib\>|lib64|g'`
+	    lib32dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`
+	    libdir="$lib64dir"
+	    pkglib32dir='${lib32dir}/${PACKAGE}'
+	    pkglibexec32dir='${pkglibexecdir}/lib32'
+	    ;;
+    esac
+    AM_CONDITIONAL([WITH_32BIT_LIBS],[test ":${lib32dir:-no}" != :no])dnl
+    AC_SUBST([lib32dir])dnl
+    AC_SUBST([pkglib32dir])dnl
+    AC_SUBST([pkglibexec32dir])dnl
 ])# _DISTRO_ADJUST_64BIT_LIBDIR
 # =============================================================================
 

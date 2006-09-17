@@ -83,6 +83,7 @@ dnl
     AC_SUBST([STREAMS_CPPFLAGS])dnl
     AC_SUBST([STREAMS_MODFLAGS])dnl
     AC_SUBST([STREAMS_LDADD])dnl
+    AC_SUBST([STREAMS_LDADD32])dnl
     AC_SUBST([STREAMS_MODMAP])dnl
     AC_SUBST([STREAMS_SYMVER])dnl
     AC_SUBST([STREAMS_MANPATH])dnl
@@ -301,6 +302,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lis_includes="$streams_search_path"
 			streams_cv_lis_ldadd="$master_builddir/LiS/libLiS.la"
+			streams_cv_lis_ldadd32="$master_builddir/LiS/lib32/libLiS.la"
 			streams_cv_lis_modmap="$master_builddir/LiS/Modules.map"
 			streams_cv_lis_symver="$master_builddir/LiS/Module.symvers"
 			streams_cv_lis_manpath="$master_builddir/LiS/man"
@@ -329,6 +331,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lis_includes="$streams_dir $streams_bld"
 			streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lis_ldadd32=`echo "$streams_bld/../lib32/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_manpath=`echo "$streams_bld/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -361,6 +364,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lis_includes="$streams_dir"
 			streams_cv_lis_ldadd="-lLiS"
+			streams_cv_lis_ldadd32="-lLiS"
 			streams_cv_lis_modmap=
 			streams_cv_lis_symver=
 			streams_cv_lis_manpath=
@@ -382,6 +386,17 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	done
 	if test -z "$streams_cv_lis_ldadd" ; then
 	    streams_cv_lis_ldadd='-lLiS'
+	fi
+    ])
+    AC_CACHE_CHECK([for streams lis ldadd],[streams_cv_lis_ldadd32],[dnl
+	for streams_dir in $streams_cv_lis_includes ; do
+	    if test -f $streams_dir/../lib32/libLiS.la ; then
+		streams_cv_lis_ldadd32=`echo "$streams_dir/../lib32/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$streams_cv_lis_ldadd32" ; then
+	    streams_cv_lis_ldadd32='-lLiS'
 	fi
     ])
     AC_CACHE_CHECK([for streams lis modmap],[streams_cv_lis_modmap],[dnl
@@ -555,6 +570,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_includes="$streams_search_path"
 			streams_cv_lfs_ldadd="$master_builddir/streams/libstreams.la"
+			streams_cv_lfs_ldadd32="$master_builddir/streams/lib32/libstreams.la"
 			streams_cv_lfs_modmap="$master_builddir/streams/Modules.map"
 			streams_cv_lfs_symver="$master_builddir/streams/Module.symvers"
 			streams_cv_lfs_manpath="$master_builddir/streams/doc/man"
@@ -583,6 +599,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_includes="$streams_dir $streams_bld"
 			streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lfs_ldadd32=`echo "$streams_bld/../lib32/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_manpath=`echo "$streams_bld/../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -615,6 +632,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_includes="$streams_dir"
 			streams_cv_lfs_ldadd="-lstreams"
+			streams_cv_lfs_ldadd32="-lstreams"
 			streams_cv_lfs_modmap=
 			streams_cv_lfs_symver=
 			streams_cv_lfs_manpath=
@@ -627,15 +645,26 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for streams lfs include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for streams lfs ldadd],[streams_cv_lfs_ldadd],[dnl
+    AC_CACHE_CHECK([for streams lfs ldadd native],[streams_cv_lfs_ldadd],[dnl
 	for streams_dir in $streams_cv_lfs_includes ; do
-	    if test -f $streams_dir/../libLiS.la ; then
-		streams_cv_lfs_ldadd=`echo "$streams_dir/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f $streams_dir/../libstreams.la ; then
+		streams_cv_lfs_ldadd=`echo "$streams_dir/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
 	if test -z "$streams_cv_lfs_ldadd" ; then
-	    streams_cv_lfs_ldadd='-lLiS'
+	    streams_cv_lfs_ldadd='-lstreams'
+	fi
+    ])
+    AC_CACHE_CHECK([for streams lfs ldadd 32-bit],[streams_cv_lfs_ldadd32],[dnl
+	for streams_dir in $streams_cv_lfs_includes ; do
+	    if test -f $streams_dir/../lib32/libstreams.la ; then
+		streams_cv_lfs_ldadd32=`echo "$streams_dir/../lib32/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$streams_cv_lfs_ldadd32" ; then
+	    streams_cv_lfs_ldadd32='-lstreams'
 	fi
     ])
     AC_CACHE_CHECK([for streams lfs modmap],[streams_cv_lfs_modmap],[dnl
@@ -920,6 +949,7 @@ dnl
     esac
     STREAMS_CPPFLAGS="-DLIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD="$streams_cv_lis_ldadd"
+    STREAMS_LDADD32="$streams_cv_lis_ldadd32"
     STREAMS_MODMAP="$streams_cv_lis_modmap"
     STREAMS_SYMVER="$streams_cv_lis_symver"
     STREAMS_MANPATH="$streams_cv_lis_manpath"
@@ -939,6 +969,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
     fi
     STREAMS_CPPFLAGS="-DLFS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD="$streams_cv_lfs_ldadd"
+    STREAMS_LDADD32="$streams_cv_lfs_ldadd32"
     STREAMS_MODMAP="$streams_cv_lfs_modmap"
     STREAMS_SYMVER="$streams_cv_lfs_symver"
     STREAMS_MANPATH="$streams_cv_lfs_manpath"

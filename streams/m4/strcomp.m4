@@ -91,6 +91,7 @@ dnl
     AC_SUBST([STRCOMP_CPPFLAGS])dnl
     AC_SUBST([STRCOMP_MODFLAGS])dnl
     AC_SUBST([STRCOMP_LDADD])dnl
+    AC_SUBST([STRCOMP_LDADD32])dnl
     AC_SUBST([STRCOMP_MODMAP])dnl
     AC_SUBST([STRCOMP_SYMVER])dnl
     AC_SUBST([STRCOMP_MANPATH])dnl
@@ -179,6 +180,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    if test -r "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_includes="$strcomp_search_path"
 			strcomp_cv_ldadd= # "$master_builddir/strcompat/libcompat.la"
+			strcomp_cv_ldadd32= # "$master_builddir/strcompat/lib32/libcompat.la"
 			strcomp_cv_modmap="$master_builddir/strcompat/Modules.map"
 			strcomp_cv_symver="$master_builddir/strcompat/Module.symvers"
 			strcomp_cv_manpath="$master_builddir/strcompat/doc/man"
@@ -208,6 +210,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    if test -r "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_includes="$strcomp_dir $strcomp_bld"
 			strcomp_cv_ldadd= # `echo "$strcomp_bld/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_ldadd32= # `echo "$strcomp_bld/../../lib32/libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -276,6 +279,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    if test -r "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_includes="$strcomp_dir"
 			strcomp_cv_ldadd= # '-lcompat'
+			strcomp_cv_ldadd32= # '-lcompat'
 			strcomp_cv_modmap=
 			strcomp_cv_symver=
 			strcomp_cv_manpath=
@@ -288,7 +292,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for compat include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for compat ldadd],[strcomp_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for compat ldadd native],[strcomp_cv_ldadd],[dnl
 	for strcomp_dir in $strcomp_cv_includes ; do
 	    if test -f "$strcomp_dir/../../libcompat.la" ; then
 		strcomp_cv_ldadd=`echo "$strcomp_dir/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -297,6 +301,17 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	done
 	if test -z "$strcomp_cv_ldadd" ; then
 	    strcomp_cv_ldadd= # '-lcompat'
+	fi
+    ])
+    AC_CACHE_CHECK([for compat ldadd 32-bit],[strcomp_cv_ldadd32],[dnl
+	for strcomp_dir in $strcomp_cv_includes ; do
+	    if test -f "$strcomp_dir/../../lib32/libcompat.la" ; then
+		strcomp_cv_ldadd32=`echo "$strcomp_dir/../../lib32/libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$strcomp_cv_ldadd32" ; then
+	    strcomp_cv_ldadd32= # '-lcompat'
 	fi
     ])
     AC_CACHE_CHECK([for compat modmap],[strcomp_cv_modmap],[dnl
@@ -469,6 +484,7 @@ AC_DEFUN([_STRCOMP_DEFINES], [dnl
     fi
     STRCOMP_CPPFLAGS="${STRCOMP_CPPFLAGS:+ ${STRCOMP_CPPFLAGS}}"
     STRCOMP_LDADD="$strcomp_cv_ldadd"
+    STRCOMP_LDADD32="$strcomp_cv_ldadd32"
     STRCOMP_MODMAP="$strcomp_cv_modmap"
     STRCOMP_SYMVER="$strcomp_cv_symver"
     STRCOMP_MANPATH="$strcomp_cv_manpath"

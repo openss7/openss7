@@ -91,6 +91,7 @@ dnl
     AC_SUBST([SCTP_CPPFLAGS])dnl
     AC_SUBST([SCTP_MODFLAGS])dnl
     AC_SUBST([SCTP_LDADD])dnl
+    AC_SUBST([SCTP_LDADD32])dnl
     AC_SUBST([SCTP_MODMAP])dnl
     AC_SUBST([SCTP_SYMVER])dnl
     AC_SUBST([SCTP_MANPATH])dnl
@@ -179,6 +180,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 		    if test -r "$sctp_dir/$sctp_what" ; then
 			sctp_cv_includes="$sctp_search_path"
 			sctp_cv_ldadd= # "$master_builddir/strsctp/libsctp.la"
+			sctp_cv_ldadd32= # "$master_builddir/strsctp/lib32/libsctp.la"
 			sctp_cv_modmap= # "$master_builddir/strsctp/Modules.map"
 			sctp_cv_symver= # "$master_builddir/strsctp/Module.symvers"
 			sctp_cv_manpath="$master_builddir/strsctp/doc/man"
@@ -208,6 +210,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 		    if test -r "$sctp_dir/$sctp_what" ; then
 			sctp_cv_includes="$sctp_dir $sctp_bld"
 			sctp_cv_ldadd= # `echo "$sctp_bld/../../libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sctp_cv_ldadd32= # `echo "$sctp_bld/../../lib32/libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_modmap= # `echo "$sctp_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_symver= # `echo "$sctp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_manpath=`echo "$sctp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -312,6 +315,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 		    if test -r "$sctp_dir/$sctp_what" ; then
 			sctp_cv_includes="$sctp_dir"
 			sctp_cv_ldadd= # '-lsctp'
+			sctp_cv_ldadd32= # '-lsctp'
 			sctp_cv_modmap=
 			sctp_cv_symver=
 			sctp_cv_manpath=
@@ -324,7 +328,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for sctp include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for sctp ldadd],[sctp_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for sctp ldadd native],[sctp_cv_ldadd],[dnl
 	for sctp_dir in $sctp_cv_includes ; do
 	    if test -f "$sctp_dir/../../libsctp.la" ; then
 		sctp_cv_ldadd=`echo "$sctp_dir/../../libsctp.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -333,6 +337,17 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	done
 	if test -z "$sctp_cv_ldadd" ; then
 	    sctp_cv_ldadd= # '-lsctp'
+	fi
+    ])
+    AC_CACHE_CHECK([for sctp ldadd 32-bit],[sctp_cv_ldadd32],[dnl
+	for sctp_dir in $sctp_cv_includes ; do
+	    if test -f "$sctp_dir/../../lib32/libsctp.la" ; then
+		sctp_cv_ldadd32=`echo "$sctp_dir/../../lib32/libsctp.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$sctp_cv_ldadd32" ; then
+	    sctp_cv_ldadd32= # '-lsctp'
 	fi
     ])
     AC_CACHE_CHECK([for sctp modmap],[sctp_cv_modmap],[dnl
@@ -495,6 +510,7 @@ AC_DEFUN([_SCTP_DEFINES], [dnl
     fi
     SCTP_CPPFLAGS="${SCTP_CPPFLAGS:+ ${SCTP_CPPFLAGS}}"
     SCTP_LDADD="$sctp_cv_ldadd"
+    SCTP_LDADD32="$sctp_cv_ldadd32"
     SCTP_MODMAP="$sctp_cv_modmap"
     SCTP_SYMVER="$sctp_cv_symver"
     SCTP_MANPATH="$sctp_cv_manpath"

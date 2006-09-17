@@ -1,3 +1,14 @@
+2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/dist.m4: added location of 32-bit binaries to autoconf fragments
+	* m4/inet.m4: added location of 32-bit binaries to autoconf fragments
+	* m4/sctp.m4: added location of 32-bit binaries to autoconf fragments
+	* m4/ss7.m4: added location of 32-bit binaries to autoconf fragments
+	* m4/strcomp.m4: added location of 32-bit binaries to autoconf fragments
+	* m4/streams.m4: added location of 32-bit binaries to autoconf fragments
+	* m4/xns.m4: added location of 32-bit binaries to autoconf fragments
+	* m4/xti.m4: added location of 32-bit binaries to autoconf fragments
+
 2006-09-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/xti.m4: added NSL_LDADD calculation for including libxnsl library

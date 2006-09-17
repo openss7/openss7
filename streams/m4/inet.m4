@@ -91,6 +91,7 @@ dnl
     AC_SUBST([INET_CPPFLAGS])dnl
     AC_SUBST([INET_MODFLAGS])dnl
     AC_SUBST([INET_LDADD])dnl
+    AC_SUBST([INET_LDADD32])dnl
     AC_SUBST([INET_MODMAP])dnl
     AC_SUBST([INET_SYMVER])dnl
     AC_SUBST([INET_MANPATH])dnl
@@ -179,6 +180,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		    if test -r "$inet_dir/$inet_what" ; then
 			inet_cv_includes="$inet_search_path"
 			inet_cv_ldadd= # "$master_builddir/strinet/libinet.la"
+			inet_cv_ldadd32= # "$master_builddir/strinet/lib32/libinet.la"
 			inet_cv_modmap= # "$master_builddir/strinet/Modules.map"
 			inet_cv_symver= # "$master_builddir/strinet/Module.symvers"
 			inet_cv_manpath="$master_builddir/strinet/doc/man"
@@ -208,6 +210,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		    if test -r "$inet_dir/$inet_what" ; then
 			inet_cv_includes="$inet_dir $inet_bld"
 			inet_cv_ldadd= # `echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_ldadd32= # `echo "$inet_bld/../../lib32/libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_modmap= # `echo "$inet_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_symver= # `echo "$inet_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -306,7 +309,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for inet include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for inet ldadd],[inet_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for inet ldadd native],[inet_cv_ldadd],[dnl
 	for inet_dir in $inet_cv_includes ; do
 	    if test -f "$inet_dir/../../libinet.la" ; then
 		inet_cv_ldadd=`echo "$inet_dir/../../libinet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -315,6 +318,17 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	done
 	if test -z "$inet_cv_ldadd" ; then
 	    inet_cv_ldadd= # '-linet'
+	fi
+    ])
+    AC_CACHE_CHECK([for inet ldadd 32-bit],[inet_cv_ldadd32],[dnl
+	for inet_dir in $inet_cv_includes ; do
+	    if test -f "$inet_dir/../../lib32/libinet.la" ; then
+		inet_cv_ldadd32=`echo "$inet_dir/../../lib32/libinet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		break
+	    fi
+	done
+	if test -z "$inet_cv_ldadd32" ; then
+	    inet_cv_ldadd32= # '-linet'
 	fi
     ])
     AC_CACHE_CHECK([for inet modmap],[inet_cv_modmap],[dnl
@@ -477,6 +491,7 @@ AC_DEFUN([_INET_DEFINES], [dnl
     fi
     INET_CPPFLAGS="${INET_CPPFLAGS:+ ${INET_CPPFLAGS}}"
     INET_LDADD="$inet_cv_ldadd"
+    INET_LDADD32="$inet_cv_ldadd32"
     INET_MODMAP="$inet_cv_modmap"
     INET_SYMVER="$inet_cv_symver"
     INET_MANPATH="$inet_cv_manpath"
