@@ -192,8 +192,12 @@ then
 			continue
 		fi
 		echo_v "creating symbol map for $l"
-		echo_d "nm -s $l | egrep -- '\<B\>|\<D\>|\<T\>|\<W\>' >> Libraries.map" $LINENO
-		nm -s $l | egrep -- '\<B\>|\<D\>|\<T\>|\<W\>' | tee -a Libraries.map \
+		#
+		# Take care to strip off symbol versions; that is, everything
+		# starting with an @.
+		#
+		echo_d "nm -s $l | egrep -- '\<B\>|\<D\>|\<T\>|\<W\>' | sed -e s',@.*,,' >> Libraries.map" $LINENO
+		nm -s $l | egrep -- '\<B\>|\<D\>|\<T\>|\<W\>' | sed -e s',@.*,,' | tee -a Libraries.map \
 			| while read line ; do echo_d "$line" $LINENO ; done
 	done
 	if test -f ${top_builddir}/check_ctags.log

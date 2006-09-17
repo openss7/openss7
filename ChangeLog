@@ -1,4 +1,6 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+	
+	* scripts/check_libs: strip library symbol version on check
 
 	* Makefile.am: added 32-bit compatibility libraries and binaries
 	* openss7.spec.in: added 32-bit compatibility libraries and binaries
