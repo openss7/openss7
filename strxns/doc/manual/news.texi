@@ -80,6 +80,10 @@ The sections that follow provide information on OpenSS7 releases of the @*
 
 @itemize
 @item
+Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
+modules and drivers.
+
+@item
 Automated release file generation making for vastly improved and timely text
 documentation present in the release directory.
 

@@ -84,6 +84,13 @@ The sections that follow provide information on OpenSS7 releases of the @*
 
 @itemize
 @item
+Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
+modules and drivers.
+
+@item
+Added versioning of all library symbols.
+
+@item
 Added Network Services Library containing network selection facility as well
 as name-to-address mapping functions ala ONC RPC.
 

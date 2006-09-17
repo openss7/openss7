@@ -86,6 +86,10 @@ Third release candidate.
 
 @itemize
 @item
+Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
+modules and drivers.
+
+@item
 Added complete documentation and @cite{Installation and Reference Manual} for
 the @cite{@value{PACKAGE_TITLE}} (this manual).
 
