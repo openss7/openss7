@@ -324,16 +324,18 @@ if RPM_BUILD_USER
 
 SUBDIRS = src
 
-if WITH_32BIT_LIBS
-SUBDIRS += lib32
-endif
-
 if PKG_BUILD_ARCH
 SUBDIRS += intl m4 po
 CLEANFILES += po/stamp-po
 endif
 
-SUBDIRS += . tests
+SUBDIRS += .
+
+if WITH_32BIT_LIBS
+SUBDIRS += lib32
+endif
+
+SUBDIRS += tests
 
 if DEVELOPMENT
 SUBDIRS += doc

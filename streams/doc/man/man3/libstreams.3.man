@@ -261,10 +261,28 @@ verions.
 .\"
 .SH COMPATIBILITY
 .PP
+.B libstreams
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+with the following portability considerations:
+.IP \(em '\(em\(em'u
+.IP \(em
+See
+.BR STREAMS (9)
+for more information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2" .
+.[
+svr42
+.]
 .\"
 .\"
 .SH HISTORY

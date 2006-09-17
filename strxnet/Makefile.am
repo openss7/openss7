@@ -520,11 +520,13 @@ SUBDIRS += intl m4 po
 CLEANFILES += po/stamp-po
 endif
 
+SUBDIRS += .
+
 if WITH_32BIT_LIBS
-SUBDIRS += . lib32
+SUBDIRS += lib32
 endif
 
-SUBDIRS += . tests
+SUBDIRS += tests
 
 if DEVELOPMENT
 SUBDIRS += doc

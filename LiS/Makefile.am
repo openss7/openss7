@@ -502,14 +502,16 @@ SUBDIRS += include
 endif
 endif
 
+SUBDIRS += .
+
 if WITH_32BIT_LIBS
-SUBDIRS += . lib32
+SUBDIRS += lib32
 endif
 
 SUBDIRS += tests
 
 if PKG_BUILD_ARCH
-SUBDIRS += . testsuite
+SUBDIRS += testsuite
 endif
 
 if DEVELOPMENT

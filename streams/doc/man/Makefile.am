@@ -980,6 +980,9 @@ man_MANS = \
 	man3/libstreams.3 \
 	man3/libLiS.3 \
 	man3/libpLiS.3 \
+	man3/streams.3 \
+	man3/LiS.3 \
+	man3/pLiS.3 \
 	man3/pipe.3 \
 	man4/sth.4 \
 	man5/specfs.5 \
@@ -2092,6 +2095,9 @@ dist_noinst_MANS = \
 	man3/libstreams.3.man \
 	man3/libLiS.3.man \
 	man3/libpLiS.3.man \
+	man3/streams.3.man \
+	man3/LiS.3.man \
+	man3/pLiS.3.man \
 	man3/pipe.3.man \
 	man3/s_pipe.3.man \
 	man4/sth.4.man \

@@ -659,7 +659,14 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 # _DISTRO_ADJUST_64BIT_LIBDIR
 # -----------------------------------------------------------------------------
 # adjust default lib directory for 64 bit
+# Yes, this is a strange place to put this...
+# -----------------------------------------------------------------------------
 AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
+    AC_ARG_ENABLE([32bit-libs],
+	AS_HELP_STRING([--disable-32bit-libs],
+	    [disable 32bit compatibility libraries (and test binaries) on
+	     64-bit processors.  @<:@default=enabled@:>@]), [:], [:])
+    have_32bit_libs=no
     lib32dir="$libdir"
     pkglib32dir="$pkglibdir"
     pkglibexec32dir="$pkglibexecdir"
@@ -670,9 +677,18 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 	    libdir="$lib64dir"
 	    pkglib32dir='${lib32dir}/${PACKAGE}'
 	    pkglibexec32dir='${pkglibexecdir}/lib32'
+	    have_32bit_libs=yes
 	    ;;
     esac
-    AM_CONDITIONAL([WITH_32BIT_LIBS],[test ":${lib32dir:-no}" != :no])dnl
+    AC_CACHE_CHECK([for 32bit libs], [dist_cv_32bit_libs], [dnl
+	dist_cv_32bit_libs=no
+	if test :$have_32bit_libs = :yes ; then
+	    if test :${enable_32bit_libs:-yes} = :yes ; then
+		dist_cv_32bit_libs=yes
+	    fi
+	fi
+    ])
+    AM_CONDITIONAL([WITH_32BIT_LIBS],[test ":${dist_cv_32bit_libs:-no}" != :no])dnl
     AC_SUBST([lib32dir])dnl
     AC_SUBST([pkglib32dir])dnl
     AC_SUBST([pkglibexec32dir])dnl

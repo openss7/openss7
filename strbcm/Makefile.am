@@ -258,11 +258,13 @@ if RPM_BUILD_USER
 
 SUBDIRS = src
 
+SUBDIRS += .
+
 if WITH_32BIT_LIBS
-SUBDIRS += . lib32
+SUBDIRS += lib32
 endif
 
-SUBDIRS += . tests
+SUBDIRS += tests
 
 CLEANFILES += pkg/*_wrapper.c
 
