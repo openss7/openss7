@@ -1,4 +1,19 @@
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated release files
+	* BUGS: updated release files
+	* NEWS: updated release files
+	* PROBLEMS: updated release files
+	* README: updated release files
+	* README-alpha: updated release files
+	* README-cvs: updated release files
+	* README-nexusware: updated release files
+	* THANKS: updated release files
+	* TODO: updated release files
+
+	* doc/man/man3/libLiS.3.man: trying to pass make check
+	* doc/man/man3/libpLiS.3.man: trying to pass make check
+	* doc/man/man3/libstreams.3.man: trying to pass make check
 	
 	* doc/manual/news.texi: major update notices
 	* configure.ac: added 32-bit binary directory lib32/Makefile.am

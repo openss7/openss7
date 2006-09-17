@@ -81,17 +81,54 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B libstreams
+.B libstreams, libLiS, libpLiS
 \- \fISTREAMS\fR system call library
 .\"
 .\"
 .SH SYNOPSIS
-.PP
+.HP
 .B gcc -lstreams
+.PD 0
+.HP
+.B gcc -lLiS \fR# (deprecated)
+.HP
+.B gcc -lpLiS \fR# (deprecated)
+.PD
 .\"
 .\"
 .SH OVERVIEW
 .PP
+.B libstreams
+is the name of the
+.I STREAMS
+library for
+.BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE@
+.]
+.B "@PACKAGE_TITLE@"
+also provides two additional libraries for
+.I LiS
+compatibility,
+.[
+lis
+.]
+.BR libLiS " and " libpLiS .
+The contents of the
+.B libLiS
+library is identical to the
+.BR libstreams
+library.
+.B libpLiS
+contains the contents of
+.BR libLiS " or " libstreams
+without the
+.BR pipe (2)
+system call replacement.
+This makes the
+.B libpLiS
+library suitable as a preload library.  (The \(lqp\(rq stands for preload,
+not pipe.)
 .\"
 .\"
 .SH DESCRIPTION
@@ -187,19 +224,17 @@ T}
 .TE
 .\"
 .\"
-.SH "APPLICATION USAGE"
+.SH USAGE
 .PP
+The
+.BR libLiS " and " libpLiS
+libraries are not intended to be used or linked directly by new user programs.
+They are meant for backwards compatibility to older and current
+.I LiS
+verions.
 .\"
 .\"
 .SH NOTICES
-.PP
-.\"
-.\"
-.SH WARNINGS
-.PP
-.\"
-.\"
-.SH "FUTURE DIRECTIONS"
 .PP
 .\"
 .\"
