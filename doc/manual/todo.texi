@@ -107,6 +107,19 @@ something with that.  A start would be just providing the autoconf .m4 and
 automake .am fragments necessary to generate doxygen or kerneldoc
 documentation.
 
+@emph{*done*} (for doxygen)
+
+I added .m4 and .am files to search out doxygen source files.  It looks for
+source files in the package with the string 'doxygen(1)' in them.  What I
+really put in there was
+
+@smallexample
+/* This file can be processed with doxygen(1). */
+@end smallexample
+
+Then html documentation is automatically generated in the doc/html or html
+directory.  I still need to do the same for kerneldoc.
+
 @item Dynamic configuration.
 
 Automake files (Makefile.am) are too static.  The strbcm package needs the

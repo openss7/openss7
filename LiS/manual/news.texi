@@ -118,6 +118,11 @@ Third release candidiate.
 
 @itemize
 @item
+The package will now build doxygen(1) html documentation with the 'doxy' make
+target.  See 'make help' or README-make in the distribution for more
+information.
+
+@item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
 modules and drivers.
 
