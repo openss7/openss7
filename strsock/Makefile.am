@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 01:15:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/18 17:43:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:15:25 $ by $Author: brian $
+# Last Modified $Date: 2006/09/18 17:43:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/09/18 17:43:14  brian
+# - added doxy rules to makefile and release notes
+#
 # Revision 0.9.2.3  2006/09/18 01:15:25  brian
 # - add 32bit libs, release file changes, additional packages
 #

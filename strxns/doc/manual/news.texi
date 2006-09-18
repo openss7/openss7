@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.3 2006/09/18 01:07:28 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.4 2006/09/18 17:43:23 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/18 01:07:28 $ by $Author: brian $
+@c Last Modified $Date: 2006/09/18 17:43:23 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -79,6 +79,11 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @cindex release @value{PACKAGE}-@value{VERSION}
 
 @itemize
+@item
+The package will now build doxygen(1) html documentation with the 'doxy' make
+target.  See 'make help' or README-make in the distribution for more
+information.
+
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
 modules and drivers.

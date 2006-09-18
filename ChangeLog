@@ -1,5 +1,9 @@
 2006-09-18  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: added doxy rules
+	* doc/manual/todo.texi: marked doxygen todo item done
+	* doc/manual/news.texi: added release note
+
 	* am/doxy.am: added makefile fragment
 	* scripts/Doxyfile.in: added generic config file
 	* m4/doxy.m4: built up autoconf configuration for doxygen
