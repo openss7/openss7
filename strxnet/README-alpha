@@ -1,5 +1,5 @@
-OpenSS7 XTI/TLI Networking -- production release introduction.  2006-09-15
-$Id: README-alpha,v 0.9.2.4 2006/09/01 09:28:45 brian Exp $
+OpenSS7 XTI/TLI Networking -- production release introduction.  2006-09-17
+$Id: README-alpha,v 0.9.2.5 2006/09/18 01:51:24 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 OpenSS7 XTI/TLI Networking
 ==========================
 
-Package strxnet-0.9.2.9.rc3 Released 2006-09-15.
+Package strxnet-0.9.2.9.rc3 Released 2006-09-17.
 
 This is production release software.
 

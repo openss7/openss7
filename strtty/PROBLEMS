@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Terminals -- problem reports.  2006-09-09
-$Id: PROBLEMS,v 0.9.2.2 2006/09/01 09:28:34 brian Exp $
+OpenSS7 STREAMS Terminals -- problem reports.  2006-09-17
+$Id: PROBLEMS,v 0.9.2.3 2006/09/18 01:51:22 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -227,6 +227,20 @@ Unverified behaviour may contain unknown bugs.
 Please remember that there is *NO WARRANTY*.
 
 See also `Bugs', in the manual, or file `BUGS' in the release directory.
+
+Appendix A Possible BSD Sources
+*******************************
+
+It is possible that some of the software contained in the following
+files might be ultimately derived from the associated `BSD Net2'
+sources:
+
+_OpenSS7 File_                  _BSD Net2 File_
+
+The files on the right were listed in `Exhibit C' of `The 1994
+USL-Regents of UCal Settlement Agreement' and are therefore possibly
+subject to the `USL/BSD Combined License' of `Exhibit F' (see `BSD/USL
+Combined License', in the manual).
 
 -----
 

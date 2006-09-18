@@ -1,5 +1,5 @@
-OpenSS7 INET Networking -- history of user visible changes.  2006-09-09
-$Id: NEWS,v 0.9.2.22 2006/09/01 09:28:28 brian Exp $
+OpenSS7 INET Networking -- history of user visible changes.  2006-09-17
+$Id: NEWS,v 0.9.2.23 2006/09/18 01:51:17 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -12,6 +12,9 @@ OpenSS7 INET Networking package.
 
 This release is a maintenance release.  It provides the following
 enhancements and fixes:
+
+   * Now builds 32-bit compatibility libraries and tests them against
+     64-bit kernel modules and drivers.
 
    * Automated release file generation making for vastly improved and
      timely text documentation present in the release directory.
