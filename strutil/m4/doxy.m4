@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/17 23:47:36 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/18 13:20:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,15 +48,82 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/17 23:47:36 $ by $Author: brian $
+# Last Modified $Date: 2006/09/18 13:20:04 $ by $Author: brian $
 #
 # =============================================================================
 
 # =============================================================================
 # _DOXY_OPTIONS
 # -----------------------------------------------------------------------------
+# We use doxygen to document user files and kerneldoc to doucment kernel
+# files.  Therefore, USER_CPPFLAGS needs to already be defined at this point
+# so that we can strip out the include paths.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_OPTIONS], [dnl
+    _DOXY_CONFIG_STRIP_FROM_INC_PATH
+    _DOXY_CONFIG_INPUT
 ])# _DOXY_OPTIONS
+# =============================================================================
+
+# =============================================================================
+# _DOXY_CONFIG_STRIP_FROM_INC_PATH
+# -----------------------------------------------------------------------------
+# We use doxygen to document user files and kerneldoc to doucment kernel
+# files.  Therefore, USER_CPPFLAGS and PKG_INCLUDES needs to already be
+# defined at this point so that we can strip out the include paths.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DOXY_CONFIG_STRIP_FROM_INC_PATH], [dnl
+    top_builddir=`(cd . ; pwd)`
+    top_srcdir=`(cd $srcdir ; pwd)`
+    for doxy_tmp in $USER_CPPFLAGS $PKG_INCLUDES
+    do
+	doxy_incs=
+	case $doxy_tmp in
+	    -I*)
+	    doxy_tmp=`echo $doxy_tmp | sed -e 's|^-I||'`
+	    doxy_tmp=`eval "echo \"$doxy_tmp\""`
+	    AC_MSG_CHECKING([for doxy include $doxy_tmp])
+	    case $doxy_tmp in
+		/*) ;;
+		*)
+		    if test -d $doxy_tmp ; then
+			doxy_tmp=`(cd $doxy_tmp ; pwd)`
+		    else
+			AC_MSG_RESULT([no])
+			continue
+		    fi
+		    ;;
+	    esac
+	    doxy_incs="${doxy_incs:+$doxy_incs }${doxy_tmp}"
+	    AC_MSG_RESULT([yes])
+	    ;;
+	esac
+    done
+    DOXY_CONFIG_STRIP_FROM_INC_PATH="$doxy_incs"
+    AC_SUBST([DOXY_CONFIG_STRIP_FROM_INC_PATH])dnl
+    AC_SUBST([doxy_incs])dnl
+])# _DOXY_CONFIG_STRIP_FROM_INC_PATH
+# =============================================================================
+
+# =============================================================================
+# _DOXY_CONFIG_INPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DOXY_CONFIG_INPUT], [dnl
+    doxy_abs_builddir=`(cd . ; pwd)`
+    doxy_abs_srcdir=`(cd $srcdir ; pwd)`
+    doxy_tmp=`find $doxy_abs_builddir $doxy_abs_srcdir -name '*.h' -o -name '*.c' | xargs grep -l 'doxygen(1)' | sort | uniq`
+    doxy_inputs=
+    for doxy_file in $doxy_tmp ; do
+	AC_MSG_CHECKING([for doxy input $doxy_file])
+	doxy_inputs="${doxy_inputs:+$doxy_inputs }${doxy_file}"
+	AC_MSG_RESULT([yes])
+    done
+    DOXY_CONFIG_INPUT="$doxy_inputs"
+    AC_SUBST([DOXY_CONFIG_INPUT])dnl
+    AC_SUBST([doxy_abs_builddir])dnl
+    AC_SUBST([doxy_abs_srcdir])dnl
+    AC_SUBST([doxy_inputs])dnl
+])# _DOXY_CONFIG_INPUT
 # =============================================================================
 
 # =============================================================================
@@ -68,6 +135,7 @@ AC_DEFUN([_DOXY_SETUP], [dnl
     if test :"${DOXYGEN:-no}" = :no ; then
 	AC_MSG_WARN([Could not find doxygen program in PATH.])
     fi
+    AM_CONDITIONAL([HAVE_DOXYGEN], [test ":${DOXYGEN:-no}" != :no])dnl
 ])# _DOXY_SETUP
 # =============================================================================
 
@@ -75,7 +143,7 @@ AC_DEFUN([_DOXY_SETUP], [dnl
 # _DOXY_OUTPUT_CONFIG_COMMANDS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_OUTPUT_CONFIG_COMMANDS], [dnl
-    ${DOXYGEN:-doxygen} Doxyfile
+    ${DOXYGEN:-doxygen} scripts/Doxyfile
 ])# _DOXY_OUTPUT_CONFIG_COMMANDS
 # =============================================================================
 
@@ -83,14 +151,18 @@ AC_DEFUN([_DOXY_OUTPUT_CONFIG_COMMANDS], [dnl
 # _DOXY_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_OUTPUT], [dnl
-    AC_CONFIG_FILES([Doxyfile])
-    doxydir="doc"
+    AC_CONFIG_FILES([scripts/Doxyfile])
+    if test -d $srcdir/doc ; then
+	doxydir='./doc'
+    else
+	doxydir='.'
+    fi
     AC_SUBST([doxydir])
-    AC_CONFIG_COMMANDS([doxygen],
-	[_DOXY_OUTPUT_CONFIG_COMMANDS], [dnl
-doxydir="doc"
-DOXYGEN="$DOXYGEN"
-    ])
+dnl    AC_CONFIG_COMMANDS([doxygen],
+dnl	[_DOXY_OUTPUT_CONFIG_COMMANDS], [dnl
+dnldoxydir="doc"
+dnlDOXYGEN="$DOXYGEN"
+dnl    ])
 ])# _DOXY_OUTPUT
 # =============================================================================
 
