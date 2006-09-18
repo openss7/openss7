@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $
+ @(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/18 01:43:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:14 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 01:43:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $"
+#ident "@(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/18 01:43:44 $"
 
-static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/24 09:01:14 $";
+static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/18 01:43:44 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT

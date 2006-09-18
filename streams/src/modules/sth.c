@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2006/08/22 12:36:53 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2006/09/18 01:43:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/22 12:36:53 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 01:43:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.165  2006/09/18 01:43:46  brian
+ - struct lock ordering
+
  Revision 0.9.2.164  2006/08/22 12:36:53  brian
  - udpates to documentation, tweaks to Stream head
 
@@ -128,10 +131,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2006/08/22 12:36:53 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2006/09/18 01:43:46 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2006/08/22 12:36:53 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2006/09/18 01:43:46 $";
 
 //#define __NO_VERSION__
 
@@ -232,7 +235,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2006/08/22 12:36:53 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2006/09/18 01:43:46 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sockmod.h,v 0.9.2.3 2005/05/14 08:30:48 brian Exp $
+ @(#) $Id: sockmod.h,v 0.9.2.4 2006/09/18 01:43:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:48 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 01:43:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SOCKMOD_H__
 #define __SYS_SOCKMOD_H__
 
-#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define SOCKMOD_IOC_MAGIC	'I'
 

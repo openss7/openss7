@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $
+ @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/01 08:55:47 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 01:43:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socket.c,v $
+ Revision 0.9.2.2  2006/09/18 01:43:53  brian
+ - working up libsocket
+
  Revision 0.9.2.1  2006/09/01 08:55:47  brian
  - added headers and working up code
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $"
+#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:53 $"
 
 static char const ident[] =
-    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:47 $";
+    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:53 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
