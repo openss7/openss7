@@ -57,7 +57,9 @@
 #ifndef __SS7_ZAPATA_H__
 #define __SS7_ZAPATA_H__
 
-#ident "@(#) $RCSfile: zapata.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
 
 /* Per-span configuration values */
 #define ZT_CONFIG_TXLEVEL	7	/* bits 0-2 are tx level */

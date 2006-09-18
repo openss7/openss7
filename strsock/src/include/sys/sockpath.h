@@ -60,14 +60,28 @@
 
 #ident "@(#) $RCSfile: sockpath.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #define SOCK2PATH		"/etc/sock2path"
 #define	SOCKPATH		"SOCKPATH"
 
+/**
+ * @file
+ *
+ * This file contains definitions for use with the
+ * <a href="http://www.openss7.org/man2html?sockpath(5)">sockpath</a>(5)
+ * commands.
+ */
+
+/**
+ * @struct src/include/sys/sockpath.h <sockdb.h>
+ * @brief Primary sockpath(5) database entry structure representation.
+ */
 struct sockpath {
-	int sp_domain;
-	int sp_type;
-	int sp_protocol;
-	char *sp_path;
+	int sp_domain;	    /**< Socket domain as argument to socket(3) call. */
+	int sp_type;	    /**< Socket type as argument to socket(3) call. */
+	int sp_protocol;    /**< Socket protocol as argument to socket(3) call. */
+	char *sp_path;	    /**< Path to STREAMS(9) device. */
 };
 
 #ifdef _REENTRANT
@@ -81,15 +95,26 @@ extern char *__sperrbuf(void);
 //extern char *sp_errbuf;
 #endif
 
-/* error codes */
-#define SP_NOERROR		0
-#define SP_NOMEM		1
-#define SP_NOSET		2
-#define SP_OPENFAIL		3
-#define SP_BADLINE		4
-#define SP_NOTFOUND		5
-#define SP_NOMOREENTRIES	6
-#define SP_ERROR_MAX		7
+/** @brief Error codes returned by sockpath(5) functions. */
+enum {
+	SP_NOERROR,		/**< No error was returned. */
+	SP_NOMEM,		/**< Memory allocation failed. */
+	SP_NOSET,		/**< No setsockpath() before getsockpath(). */
+	SP_OPENFAIL,		/**< Open of the /etc/sock2path file failed. */
+	SP_BADLINE,		/**< Syntax error exists in /etc/sock2path file. */
+	SP_NOTFOUND,		/**< Entry specified to getsockpathent() not found. */
+	SP_NOMOREENTRIES,	/**< No more entries exist in /etc/sock2path. */
+	SP_ERROR_MAX		/**< The current maximum error number value. */
+};
+
+#define SP_NOERROR		SP_NOERROR
+#define SP_NOMEM		SP_NOMEM
+#define SP_NOSET		SP_NOSET
+#define SP_OPENFAIL		SP_OPENFAIL
+#define SP_BADLINE		SP_BADLINE
+#define SP_NOTFOUND		SP_NOTFOUND
+#define SP_NOMOREENTRIES	SP_NOMOREENTRIES
+#define SP_ERROR_MAX		SP_ERROR_MAX
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

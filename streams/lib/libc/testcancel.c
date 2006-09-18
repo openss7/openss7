@@ -53,6 +53,8 @@
 
 static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/24 09:01:14 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE

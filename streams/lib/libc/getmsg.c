@@ -78,7 +78,6 @@ int __old_streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
 
 /**
  * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
- * @ingroup libstreams
  * @brief get a message from a STREAM.
  * @param fd a file descriptor for the stream.
  * @param ctlptr a pointer to a struct strbuf structure that returns the

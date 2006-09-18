@@ -52,6 +52,10 @@
 #ifndef __PH_H__
 #define __PH_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 #define MPH_ACTIVATE_IND	3
 #define MPH_DEACTIVATE_REQ	0
 #define MPH_DEACTIVATE_IND	4

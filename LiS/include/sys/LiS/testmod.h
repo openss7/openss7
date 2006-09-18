@@ -75,6 +75,8 @@
 
 #ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #ifndef __SYS_TESTMOD_H__
 #warning "Do no include sys/streams/testmod.h directly, include sys/testmod.h instead."
 #endif

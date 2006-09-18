@@ -68,6 +68,8 @@
 
 #ident "@(#) $RCSfile: xti_xti.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #ifndef t_scalar_t
 typedef int32_t t_scalar_t;
 #define t_scalar_t t_scalar_t

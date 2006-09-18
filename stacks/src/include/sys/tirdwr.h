@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:30:48 $"
 
+/* This file can be processed with doxygen(1). */
+
 #if !defined _TIRDWR_H && !defined __KERNEL__
 #error ****
 #error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE

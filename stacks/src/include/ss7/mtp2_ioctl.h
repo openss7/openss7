@@ -52,4 +52,8 @@
 #ifndef __MTP2_IOCTL_H__
 #define __MTP2_IOCTL_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 #endif				/* __MTP2_IOCTL_H__ */

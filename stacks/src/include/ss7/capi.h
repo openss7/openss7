@@ -52,6 +52,10 @@
 #ifndef __CAPI_H__
 #define __CAPI_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 #define CAPI_ALERT_REQ			0x0180	/* initiates sending of ALERT */
 #define CAPI_ALERT_CON			0x0181	/* local confirmation of the request */
 #define CAPI_CONNECT_REQ		0x0280	/* initiates an outgoing phys connection */

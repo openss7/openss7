@@ -52,6 +52,10 @@
 #ifndef __SS7_ISDNI_H__
 #define __SS7_ISDNI_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 /*
  *  ISDN address
  */

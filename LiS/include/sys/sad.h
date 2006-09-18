@@ -58,6 +58,8 @@
 
 #ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:19 $"
 
+/* This file can be processed with doxygen(1). */
+
 #ifndef _SYS_STROPTS_H
 #include <sys/stropts.h>	/* for FMNAMESZ */
 #endif

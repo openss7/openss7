@@ -66,6 +66,8 @@
 
 #ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:30:47 $"
 
+/* This file can be processed with doxygen(1). */
+
 typedef int32_t np_long;
 typedef u_int32_t np_ulong;
 

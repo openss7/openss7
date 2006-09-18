@@ -74,6 +74,8 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
+/* This file can be processed with doxygen(1). */
+
 /*  -------------------------------------------------------------------  */
 
 #if defined(__linux__)

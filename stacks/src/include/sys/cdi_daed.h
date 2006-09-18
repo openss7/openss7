@@ -52,6 +52,10 @@
 #ifndef __CDI_DAED_H__
 #define __CDI_DAED_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 1997-2004 OpenSS7 Corporation."
+
+/* This file can be processed with doxygen(1). */
+
 #ifndef CD_DAED
 /*
  * CDI device classes

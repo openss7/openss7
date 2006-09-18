@@ -69,6 +69,8 @@
 #warning "Do no include sys/streams/sc.h directly, include sys/sc.h instead."
 #endif
 
+/* This file can be processed with doxygen(1). */
+
 #define SC_IOC_MAGIC 'C'
 #define SC_IOC_LIST	((SC_IOC_MAGIC << 8) | 0x01)
 #define SC_IOC_RESET	((SC_IOC_MAGIC << 8) | 0x02)

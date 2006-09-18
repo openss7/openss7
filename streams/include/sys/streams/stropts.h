@@ -65,6 +65,14 @@
 
 #ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.25 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
+/**
+ * @file
+ * This file defines the interface to a STREAMS(9) character device special
+ * file.
+ */
+
 #ifndef __SYS_STROPTS_H__
 //#warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
 #endif

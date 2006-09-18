@@ -60,9 +60,11 @@
 
 #ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #ifndef t_scalar_t
 /**
- * \ingroup libxti
+ * @ingroup libxti
  * XTI signed scalar type.
  *
  * Strangely enough, t_uscalar_t is defined in stropts.h for SUSv2 and SUSv3
@@ -76,7 +78,7 @@ typedef int32_t t_scalar_t;
 #if !defined _STROPTS_H || defined NEED_T_USCALAR_T
 #ifndef t_uscalar_t
 /**
- * \ingroup libxti
+ * @ingroup libxti
  * XTI unsigned scalar type.
  *
  * This type is not defined in the XTI Library as it is supposed to be defined
@@ -128,9 +130,9 @@ typedef u_int32_t t_uscalar_t;
  * option buffers are allocated by t_alloc() and hence aligned to start any
  * sized object (including option header) is guaranteed.
  *
- * \code
+ * @code
  * struct t_opthdr *T_OPT_FIRSTHDR(struct netbuf *nbp):
- * \endcode
+ * @endcode
  *
  */
 #define T_OPT_FIRSTHDR(nbp) \
@@ -216,7 +218,7 @@ struct netbuf {
 };
 
 /* 
- *  \struct t_info
+ *  @struct t_info
  *  Protocol-specific service limits.  Provides information on protocol
  *  service limits for the transport endpoint.
  */

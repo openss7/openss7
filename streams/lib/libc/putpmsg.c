@@ -54,6 +54,8 @@
 static char const ident[] =
     "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/09/18 01:43:44 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE
@@ -84,7 +86,7 @@ __putpmsg_error(int fd)
 {
 	int __olderrno;
 
-	/* If we get an EINVAL error back it is likely due to a bad ioctl, in which case this is
+	/*! If we get an EINVAL error back it is likely due to a bad ioctl, in which case this is
 	   not a Stream, so we need to check if it is a Stream and fix up the error code.  We get
 	   EINTR for a controlling terminal. */
 	if ((__olderrno = errno) == EINVAL || __olderrno == EINTR || __olderrno == ENOTTY)
@@ -93,8 +95,7 @@ __putpmsg_error(int fd)
 }
 
 /**
- * @fn int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
- * @ingroup libLiS
+ * @fn int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
  * @brief put a message to a stream band.
  * @param fd a file descriptor representing the stream.
  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
@@ -129,6 +130,17 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 	return (err);
 }
 
+/**
+ *
+ * @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+ * @brief put a message to a stream band.
+ * @param fd a file descriptor representing the stream.
+ * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+ * @param datptr a pointer to a strbuf structure describing the data part of the message.
+ * @param flags the priority of the message.
+ *
+ * This function is a thread cancellation point.
+ */
 static inline __hot int
 __old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
@@ -192,18 +204,6 @@ int __old_lis_putpmsg_r(int, const struct strbuf *, const struct strbuf *, int, 
 __asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");
 
 
-/**
- *
- * @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
- * @ingroup libLiS
- * @brief put a message to a stream band.
- * @param fd a file descriptor representing the stream.
- * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
- * @param datptr a pointer to a strbuf structure describing the data part of the message.
- * @param flags the priority of the message.
- *
- * This function is a thread cancellation point.
- */
 __hot int
 __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
@@ -243,3 +243,4 @@ int __old_lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int, i
 	__attribute__((weak, alias("__old_streams_putmsg")));
 
 __asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");
+

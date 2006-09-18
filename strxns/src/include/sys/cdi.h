@@ -3,6 +3,11 @@
 
 #ident "@(#) cdi.h 1.20 11/17/03"
 
+/* This file can be processed by doxygen(1). */
+
+/// @file
+/// @brief This header file provides the Communications Device Interface (CDI).
+
 /* 
    cdi.h header for Communications Device Interface
 

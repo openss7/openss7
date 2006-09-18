@@ -55,6 +55,8 @@
 
 #ident "@(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 /* 
  * UDP level
  */

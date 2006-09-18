@@ -56,6 +56,13 @@
 
 #ident "@(#) $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 1997-2005  Open SS7 Corporation"
 
+/* This file can be processed with doxygen(1). */
+
+/**
+ * @file
+ * @brief Primary user header file for STREAMS character device special files.
+ */
+
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS
@@ -68,57 +75,56 @@ __BEGIN_DECLS
 /* Perform the I/O control operation specified by REQUEST on FD.
    One argument may follow; its presence and type depend on REQUEST.
    Return value depends on REQUEST.  Usually -1 indicates error.  */
-extern int ioctl (int __fd, unsigned long int __request, ...) __THROW;
+extern int
+ioctl(int __fd, unsigned long int __request, ...)
+    __THROW;
 #endif
 
 #include <sys/ioctl.h>
 
 /* Test whether FILDES is associated with a STREAM-based file.  */
-extern int isastream (int __fildes) __THROW;
+extern int isastream(int fd);
 
 /* Receive next message from a STREAMS file.
 
    This function is a cancellation point and therefore not marked with
    __THROW.  */
-extern int getmsg (int __fildes, struct strbuf *__restrict __ctlptr,
-		   struct strbuf *__restrict __dataptr,
-		   int *__restrict __flagsp);
+extern int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
 
 /* Receive next message from a STREAMS file, with *FLAGSP allowing to
    control which message.
 
    This function is a cancellation point and therefore not marked with
    __THROW.  */
-extern int getpmsg (int __fildes, struct strbuf *__restrict __ctlptr,
-		    struct strbuf *__restrict __dataptr,
-		    int *__restrict __bandp, int *__restrict __flagsp);
+extern int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp,
+		   int *flagsp);
 
 /* Send a message on a STREAM.
 
    This function is a cancellation point and therefore not marked with
    __THROW.  */
-extern int putmsg (int __fildes, __const struct strbuf *__ctlptr,
-		   __const struct strbuf *__dataptr, int __flags);
+extern int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr,
+		  int flags);
 
 /* Send a message on a STREAM to the BAND.
 
    This function is a cancellation point and therefore not marked with
    __THROW.  */
-extern int putpmsg (int __fildes, __const struct strbuf *__ctlptr,
-		    __const struct strbuf *__dataptr, int __band, int __flags);
+extern int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr,
+		   int band, int flags);
 
 /* Attach a STREAMS-based file descriptor FILDES to a file PATH in the
    file system name space.  */
-extern int fattach (int __fildes, __const char *__path) __THROW;
+extern int fattach(int fd, const char *path);
 
 /* Detach a name PATH from a STREAMS-based file descriptor.  */
-extern int fdetach (__const char *__path) __THROW;
+extern int fdetach(const char *path);
 
 /* Create a one-way communication channel (pipe).
    If successful, two file descriptors are stored in PIPEDES;
    bytes written on PIPEDES[1] can be read from PIPEDES[0].
    Returns 0 if successful, -1 if not.  */
-extern int pipe (int __pipedes[2]) __THROW;
+extern int pipe(int fds[2]);
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

@@ -55,6 +55,8 @@
 
 #ident "@(#) $RCSfile: xti_atm.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS

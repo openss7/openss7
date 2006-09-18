@@ -211,7 +211,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 /**
- * cmn_list - list the sock2path mapping in sock2path file format
+ * @brief List the sock2path mapping in sock2path file format.
  */
 void
 cmn_list(void)
@@ -219,10 +219,10 @@ cmn_list(void)
 }
 
 /**
- * cmn_clear - clear the protocol entry
- * @family: protocol family
- * @type: socket type
- * @protocol: protocol within family
+ * @brief Clear the protocol entry.
+ * @param family protocol family
+ * @param type socket type
+ * @param protocol protocol within family
  */
 void
 cmn_clear(int family, int type, int protocol)
@@ -230,11 +230,11 @@ cmn_clear(int family, int type, int protocol)
 }
 
 /**
- * cmn_set - set the protocol entry
- * @family: protocol family
- * @type: socket type
- * @protocol: protocol within family
- * @path: path to device
+ * @brief Set the protocol entry.
+ * @param family protocol family
+ * @param type socket type
+ * @param protocol protocol within family
+ * @param path path to device
  */
 void
 cmn_set(int family, int type, int protocol, const char *path)
@@ -271,7 +271,7 @@ cmn_set(int family, int type, int protocol, const char *path)
 }
 
 /**
- * cmn_reset - reset the sock2path mapping
+ * @brief Reset the sock2path mapping.
  */
 void
 cmn_reset(void)
@@ -297,8 +297,8 @@ cmn_reset(void)
 }
 
 /**
- * cmn_file - set the sock2path mapping from a sock2path formatted file
- * @filename: file to use
+ * @brief Set the sock2path mapping from a sock2path formatted file.
+ * @param filename file to use
  */
 void
 cmn_file(const char *filename)

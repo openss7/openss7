@@ -59,6 +59,8 @@
 
 static char const ident[] = "$RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $";
 
+/* This file can be processed with doxygen(1). */
+
 #include <limits.h>
 #include <pthread.h>
 

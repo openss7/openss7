@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #define SOCKMOD_IOC_MAGIC	'I'
 
 #define SIMOD ('I'<<8)

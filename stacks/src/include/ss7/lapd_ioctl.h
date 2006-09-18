@@ -52,6 +52,10 @@
 #ifndef __LAPD_IOCTL_H__
 #define __LAPD_IOCTL_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 #define LAPD_IOC_MAGIC 'd'
 
 #define LAPD_OBJ_TYPE_DF		0	/* default */

@@ -57,6 +57,8 @@
 static char const ident[] =
     "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/18 11:51:27 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE
@@ -76,18 +78,27 @@ extern void __pthread_testcancel(void);
 #pragma weak pthread_testcancel
 
 #ifdef BLD32OVER64
-/* 2006-02-20 bidulock@openss7.org : This is really, really, the wrong way to do this.  I cannot
- * stress how wrong this is.  This does not provide 32/64 bit compatibility at all.  It simply
- * attempts to turn a 32 bit call into a 64 bit call an passes it to the kernel.  A big problem is
- * the pointer conversion (32->64), which is architecture specific.  (Some need (void
- * *)(long)(int32_t), some need (void *)(ulong)(uint32_t), others might need to supply an offset.)
- * For example of how wrong this is: applications built on s390 using static libraries will not run
- * on s390x.  The proper way to do this is as it is done under Linux Fast-STREAMS: leave the library
- * alone and handle the conversion in the kernel.  When performed by syscall, the syscall32
- * interface must perform the conversion.  When performed by read/write call, the "magic length"
- * must indicate whether conversion is necessary.  When performed by ioctl, the 32/64 bit ioctl
- * conversion functions must do the job.  I really have no desire to "fix" LiS in this regard.  It
- * is deprecated: don't use it.  Use Linux Fast-STREAMS instead. */
+/**
+ * @struct strbuf6
+ * @date 2006-02-20
+ * @author bidulock@openss7.org
+ *
+ * This is really, really, the wrong way to do this.  I cannot stress how wrong
+ * this is.  This does not provide 32/64 bit compatibility at all.  It simply
+ * attempts to turn a 32 bit call into a 64 bit call an passes it to the kernel.
+ * A big problem is the pointer conversion (32->64), which is architecture
+ * specific.  (Some need (void *)(long)(int32_t), some need (void
+ * *)(ulong)(uint32_t), others might need to supply an offset.) For example of
+ * how wrong this is: applications built on s390 using static libraries will not
+ * run on s390x.  The proper way to do this is as it is done under Linux
+ * Fast-STREAMS: leave the library alone and handle the conversion in the
+ * kernel.  When performed by syscall, the syscall32 interface must perform the
+ * conversion.  When performed by read/write call, the "magic length" must
+ * indicate whether conversion is necessary.  When performed by ioctl, the 32/64
+ * bit ioctl conversion functions must do the job.  I really have no desire to
+ * "fix" LiS in this regard.  It is deprecated: don't use it.  Use Linux
+ * Fast-STREAMS instead.
+ */
 #endif
 
 #ifdef BLD32OVER64
@@ -158,14 +169,14 @@ __old_lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *ban
 
 	return (rc);
 #else
-	/* 
-	 *  This no longer works on FC4 2.6.11 kernel: validity checks are
-	 *  performed on the length before we get here.  We might as well patch
-	 *  this out for all kernels and use the ioctl method instead.
-	 *  Emulating an system call in this fashion was foolish in the first
-	 *  place: the normal method for system call emulation under UNIX is
-	 *  with ioctl. -bb
-	 *  Wed Jun 22 20:56:59 MDT 2005
+	/**
+	 * @date Wed Jun 22 20:56:59 MDT 2005
+	 *
+	 * This no longer works on FC4 2.6.11 kernel: validity checks are
+	 * performed on the length before we get here.  We might as well patch
+	 * this out for all kernels and use the ioctl method instead.  Emulating
+	 * an system call in this fashion was foolish in the first place: the
+	 * normal method for system call emulation under UNIX is with ioctl. -bb
 	 */
 	struct __lis_getpmsg_args {
 		int fd;
@@ -264,12 +275,12 @@ __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, 
  * @param bandp a pointer to the band returned for the received message.
  * @param flagsp a pointer to the flags returned for the received message.
  *
- * getpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In
- * the Linux Threads approach, this function will return EINTR if interrupted
- * by a signal.  When the function returns EINTR, the Linux Threads user
- * should check for cancellation with pthread_testcancel().  Because this
- * function consists of a single system call, asynchronous thread cancellation
- * protection is not required.
+ * getpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In the
+ * Linux Threads approach, this function will return EINTR if interrupted by a
+ * signal.  When the function returns EINTR, the Linux Threads user should check
+ * for cancellation with pthread_testcancel().  Because this function consists
+ * of a single system call, asynchronous thread cancellation protection is not
+ * required.
  */
 int
 __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)

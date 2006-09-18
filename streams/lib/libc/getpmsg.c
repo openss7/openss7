@@ -53,6 +53,8 @@
 
 static char const ident[] = "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/09/18 01:43:44 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE
@@ -94,7 +96,6 @@ __getpmsg_error(int fd)
 
 /**
  * @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
- * @ingroup libstreams
  * @brief get a message from a stream band.
  * @param fd a file descriptor representing the stream.
  * @param ctlptr a pointer to a strbuf structure returning the control part of the message.
@@ -139,6 +140,22 @@ __old_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, 
 	return (err);
 }
 
+/**
+ * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+ * @brief get a message from a STREAM.
+ * @param fd a file descriptor for the stream.
+ * @param ctlptr a pointer to a struct strbuf structure that returns the
+ * control part of the retrieved message.
+ * @param datptr a pointer to a struct strbuf structuer that returns the data
+ * part of the retrieved message.
+ * @param flagsp a pointer to an integer flags word that returns the priority
+ * of the retrieved message.
+ *
+ * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
+ * Because getmsg consists of a single call to getpmsg() which has the same
+ * characteristics, no protection against asynchronous thread cancellation is
+ * required.
+ */
 static inline __hot int
 __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
@@ -169,7 +186,7 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 	return (err);
 }
 
-int __hot
+__hot int
 __streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	return __getpmsg(fd, ctlptr, datptr, bandp, flagsp);
@@ -181,7 +198,7 @@ __asm__(".symver __streams_getpmsg,getpmsg@@STREAMS_1.0");
 __asm__(".symver __streams_getpmsg,getpmsg@STREAMS_1.0");
 #endif
 
-int __hot
+__hot int
 __old_streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	return __old_getpmsg(fd, ctlptr, datptr, bandp, flagsp);
@@ -209,24 +226,7 @@ int __old_lis_getpmsg_r(int, struct strbuf *, struct strbuf *, int *, int *)
 
 __asm__(".symver __old_lis_getpmsg_r,getpmsg@LIS_0.0");
 
-/**
- * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
- * @ingroup libstreams
- * @brief get a message from a STREAM.
- * @param fd a file descriptor for the stream.
- * @param ctlptr a pointer to a struct strbuf structure that returns the
- * control part of the retrieved message.
- * @param datptr a pointer to a struct strbuf structuer that returns the data
- * part of the retrieved message.
- * @param flagsp a pointer to an integer flags word that returns the priority
- * of the retrieved message.
- *
- * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
- * Because getmsg consists of a single call to getpmsg() which has the same
- * characteristics, no protection against asynchronous thread cancellation is
- * required.
- */
-int __hot
+__hot int
 __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	int band = -1;
@@ -239,7 +239,7 @@ __asm__(".symver __streams_getmsg,getmsg@@STREAMS_1.0");
 __asm__(".symver __streams_getmsg,getmsg@STREAMS_1.0");
 #endif
 
-int __hot
+__hot int
 __old_streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	int band = -1;

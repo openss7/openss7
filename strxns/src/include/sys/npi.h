@@ -66,6 +66,11 @@
 
 #ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed by doxygen(1). */
+
+/// @file
+/// @brief This header file provides the Network Provider Interface (NPI).
+
 #ifdef __LP64__
 typedef int32_t np_long;
 typedef u_int32_t np_ulong;

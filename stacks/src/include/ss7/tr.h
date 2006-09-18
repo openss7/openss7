@@ -52,7 +52,9 @@
 #ifndef __SS7_TR_H__
 #define __SS7_TR_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
 
 #define TR_INFO_REQ		 0	/* Information request */
 #define TR_BIND_REQ		 1	/* Bind to network address */

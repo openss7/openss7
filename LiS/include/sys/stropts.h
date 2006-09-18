@@ -69,6 +69,8 @@
 
 #ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:21 $"
 
+/* This file can be processed with doxygen(1). */
+
 /*
  * There is now a GNU stropts.h in /usr/include and /usr/include/bits.
  * We are attempting to maintain compatibility of constant values among

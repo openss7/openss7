@@ -55,6 +55,8 @@
 static char const ident[] =
     "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/04/12 22:45:29 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE

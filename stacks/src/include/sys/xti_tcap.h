@@ -50,6 +50,8 @@
 
 #ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #define T_SS7_TCAP		0x13	/* TCAP level (same as SI value) */
 
 /*

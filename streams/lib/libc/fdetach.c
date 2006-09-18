@@ -54,6 +54,8 @@
 
 static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/18 01:43:44 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _GNU_SOURCE 1
 #define _REENTRANT
@@ -105,7 +107,6 @@ __streams_fdetach(const char *path)
 
 /**
  * @fn int fdetach(const char *path)
- * @ingroup streams
  * @brief detach a path from a stream.
  * @param path the path in the filesystem from which to detach.
  *

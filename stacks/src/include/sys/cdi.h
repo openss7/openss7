@@ -3,6 +3,8 @@
 
 #ident "@(#) cdi.h 1.20 11/17/03"
 
+/* This file can be processed with doxygen(1). */
+
 /*
  * cdi.h header for Communications Device Interface
  *

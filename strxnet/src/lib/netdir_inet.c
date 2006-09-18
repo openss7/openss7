@@ -59,6 +59,8 @@
 
 static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $";
 
+/* This file can be processed with doxygen(1). */
+
 /*
  *  This is not only a sample inet name-to-address shared object library, it
  *  is also linked into libxnsl to provide default inet name-to-address

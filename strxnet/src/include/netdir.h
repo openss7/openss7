@@ -60,6 +60,8 @@
 
 #ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #include <netconfig.h>
 
 #ifdef _REENTRANT

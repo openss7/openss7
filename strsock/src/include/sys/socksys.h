@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile: socksys.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 struct socksysreq {
 	long args[7];
 };

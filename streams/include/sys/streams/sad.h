@@ -66,6 +66,8 @@
 #warning "Do no include sys/streams/sad.h directly, include sys/sad.h instead."
 #endif
 
+/* This file can be processed with doxygen(1). */
+
 #define SAD_IOC_MAGIC	'D'	/* Note: OSF/1 1.2 uses 'A' instead instead of 'D' */
 
 #define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/* set autopush */

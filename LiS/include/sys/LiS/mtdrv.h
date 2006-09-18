@@ -52,6 +52,8 @@
 #ifndef __SYS_LIS_MTDRV_H__
 #define __SYS_LIS_MTDRV_H__
 
+/* This file can be processed with doxygen(1). */
+
 /*
  * IOCTL definitions for mtdrv
  */

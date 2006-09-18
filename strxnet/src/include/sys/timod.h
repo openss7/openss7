@@ -72,6 +72,8 @@
 
 #ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #define TIMOD			('T'<<8)
 #define O_TI_GETINFO		(TIMOD|100)	/* OSF 1 */
 #define O_TI_OPTMGMT		(TIMOD|101)	/* OSF 2 */

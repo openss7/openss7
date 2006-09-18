@@ -52,6 +52,10 @@
 #ifndef __DL_H__
 #define __DL_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 #define MDL_ASSIGN_REQ		0
 #define MDL_ERROR_RES		1
 #define MDL_REMOVE_REQ		2

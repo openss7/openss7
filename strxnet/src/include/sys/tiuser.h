@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #include <sys/tpi.h>		/* common definitions */
 
 /* 
@@ -75,7 +77,7 @@
 #define T_EVENTS	0x00ff	/* event mask */
 
 /* 
- *  \struct t_info
+ *  @struct t_info
  *  Protocol-specific service limits.  Provides information on protocol
  *  service limits for the transport endpoint.
  */

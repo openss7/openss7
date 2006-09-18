@@ -52,7 +52,9 @@
 #ifndef __SS7_TCAP_H__
 #define __SS7_TCAP_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
 
 #include <ss7/tr.h>
 #include <ss7/tc.h>

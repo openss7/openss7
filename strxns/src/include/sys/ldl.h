@@ -62,6 +62,11 @@
 
 #ident "@(#) $RCSfile: ldl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed by doxygen(1). */
+
+/// @file
+/// @brief This header file provides user interface to the Linux DLPI driver, ldl(4).
+
 /*
  *  Driver device numbering
  */

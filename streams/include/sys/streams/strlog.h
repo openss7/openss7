@@ -62,6 +62,8 @@
 
 #ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #ifndef __SYS_STRLOG_H__
 #warning "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
 #endif

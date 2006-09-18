@@ -59,6 +59,8 @@
 
 static char const ident[] = "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $";
 
+/* This file can be processed with doxygen(1). */
+
 /*
  *  This is a simple library for accessing the /etc/sock2path file in a manner similar to the
  *  netconfig(3) functions.  It is used both by the soconfig(8) utility as well as the libsocklib
@@ -542,7 +544,7 @@ TRANS the decimal value of the unknown error number.
 
 /**
  * @fn char *sp_sperror(void)
- * @breif Return and error string.
+ * @brief Return and error string.
  *
  * This function is similar to sp_perror() but instead of printing the message to standard error,
  * will return a pointer to a string that contains the error message.

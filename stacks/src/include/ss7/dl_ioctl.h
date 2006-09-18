@@ -52,6 +52,10 @@
 #ifndef __DL_IOCTL_H__
 #define __DL_IOCTL_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 #define DL_IOC_MAGIC 'd'
 
 typedef struct dl_iochdr {

@@ -63,6 +63,8 @@
 
 #ident "@(#) $Name:  $($Revision: 1.1.1.1.12.2 $) Copyright (c) 1997-2005  Open SS7 Corporation"
 
+/* This file can be processed with doxygen(1). */
+
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS

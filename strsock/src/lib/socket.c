@@ -63,6 +63,8 @@
 static char const ident[] =
     "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:53 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE
@@ -417,7 +419,7 @@ __sock_ioctl(struct socksysreq *args)
 }
 
 /**
- * @fn int accept(int fd, struct sockaddr *add, socklen_t *len)
+ * @fn int accept(int fd, struct sockaddr *addr, socklen_t *len)
  * @brief Accept a socket connection.
  * @param fd the socket from which to accept the connection.
  * @param addr a pointer to a sockaddr structure to receive the connecting address.
@@ -845,6 +847,7 @@ __sock_socket(int domain, int type, int protocol)
 }
 
 /**
+ * @fn int socket(int domain, int type, int protocol)
  * @brief recursive socket function.
  * @param domain protocol family.
  * @param type socket type.
@@ -1025,6 +1028,13 @@ __sock_recv(int fd, void *buf, size_t len, int flags)
 	return __sock_ioctl(&args);
 }
 
+/**
+ * @brief Recursive receive data from a socket.
+ * @param fd the socket from which to receive data.
+ * @param buf a pointer to a buffer into which to receive the data.
+ * @param len the length of the buffer.
+ * @param flags receive flags (e.g. MSG_WAITALL).
+ */
 ssize_t
 __sock_recv_r(int fd, void *buf, size_t len, int flags)
 {
@@ -1047,7 +1057,7 @@ __asm__(".symver __sock_recv_r,recv@@SOCKET_1.0");
 
 /**
  * @fn ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
- * @descrip Receive data from a socket.
+ * @brief Receive data from a socket.
  * @param fd the socket from which to receive data.
  * @param msg a pointer to a message header structure describing the data and ancilliary data buffers into which to receive information.
  * @param flags receive flags, such as MSG_WAITALL.
@@ -1098,6 +1108,7 @@ __asm__(".symver __sock_recvmsg_r,recvmsg@@SOCKET_1.0");
  * @param fd the socket from which to receive data.
  * @param buf a pointer to a user supplied buffer into which to receive data.
  * @param len the length of the user supplied buffer in bytes.
+ * @param flags receive flags (e.g. @c MSG_WAITALL).
  * @param addr a pointer to a sockaddr structure containing the address from which to receive data.
  * @param alen the length of the address in the sockaddr structure.
  *
@@ -1276,3 +1287,17 @@ __sock_sendto_r(int fd, const void *buf, size_t len, int flags, const struct soc
 }
 
 __asm__(".symver __sock_sendto_r,sendto@@SOCKET_1.0");
+
+/**
+ * @section Identification
+ * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.20 $).
+ * @author Brian F. G. Bidulock
+ * @version \$Name:  $(\$Revision: 0.9.2.20 $)
+ * @date \$Date: 2006/09/18 01:43:58 $
+ *
+ * @}
+ */
+
+/*
+ * vim: comments+=b\:TRANS
+ */

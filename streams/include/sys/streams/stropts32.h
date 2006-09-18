@@ -65,6 +65,8 @@
 
 #ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 struct bandinfo32 {
 	unsigned char bi_pri;
 	int32_t bi_flag;

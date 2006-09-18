@@ -53,6 +53,8 @@
 
 static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/18 01:43:44 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE
@@ -132,8 +134,7 @@ __streams_pipe(int *fds)
 }
 
 /**
- * @fn pipe(int *fds)
- * @ingroup libLiS
+ * @fn int pipe(int fds[2])
  * @brief open a streams based pipe.
  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
  *

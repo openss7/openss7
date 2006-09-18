@@ -52,6 +52,10 @@
 #ifndef _SYS_XTI_LOCAL_H
 #define _SYS_XTI_LOCAL_H
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 1997-2004 OpenSS7 Corporation."
+
+/* This file can be processed with doxygen(1). */
+
 #include <config.h>
 
 #ifdef __BEGIN_DECLS
@@ -61,8 +65,8 @@ __BEGIN_DECLS
 #endif
 
 /**
- * \defgroup libxti OpenSS7 XTI Library
- * \brief OpenSS7 XNS/XTI Library Calls
+ * @defgroup libxti OpenSS7 XTI Library
+ * @brief OpenSS7 XNS/XTI Library Calls
  *
  * This manpage contains documentation of OpenSS7 XTI Library functions that
  * are generated automatically from the source code with doxygen.  This
@@ -70,9 +74,9 @@ __BEGIN_DECLS
  * Library and is not intended for users of the OpenSS7 XTI Library.  Users
  * should consult the documentation found in xti(3).
  *
- * \author Brian F. G. Bidulock
- * \version \$Name:  $(\$Revision: 0.9.2.3 $)
- * \date \$Date: 2005/07/14 22:04:26 $
+ * @author Brian F. G. Bidulock
+ * @version \$Name:  $(\$Revision: 0.9.2.3 $)
+ * @date \$Date: 2005/07/14 22:04:26 $
  */
 
 #define _SC_T_IOV_MAX		0

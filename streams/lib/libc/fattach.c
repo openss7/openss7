@@ -54,6 +54,8 @@
 static char const ident[] =
     "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/18 01:43:44 $";
 
+/* This file can be processed with doxygen(1). */
+
 #include <sys/types.h>
 #include <stropts.h>
 #include <sys/ioctl.h>
@@ -72,7 +74,6 @@ static char const ident[] =
 
 /**
  * @fn int fattach(int fd, const char *path)
- * @ingroup streams
  * @brief attach a stream to a path in a filesystem.
  * @param fd the file descriptor of the stream to attach.
  * @param path the path in the filesystem to which to attach the stream.

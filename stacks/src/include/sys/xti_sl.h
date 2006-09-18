@@ -50,6 +50,8 @@
 
 #ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #define T_SS7_SL		1	/* MTP level (same as SI value) */
 
 #define T_SL_PVAR		1	/* protocol variant */

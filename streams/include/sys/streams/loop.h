@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile: loop.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $"
 
+/* This file can be processed with doxygen(1). */
+
 #ifndef __SYS_LOOP_H__
 #warning "Do no include sys/streams/loop.h directly, include sys/loop.h instead."
 #endif

@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/08/30 03:37:09 $"
 
+/* This file can be processed with doxygen(1). */
+
 #ifndef __SYS_LOG_H__
 #warning "Do no include sys/streams/log.h directly, include sys/log.h instead."
 #endif

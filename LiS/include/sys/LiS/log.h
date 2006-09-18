@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
+/* This file can be processed with doxygen(1). */
+
 #define LOG_INUSE 01
 #define LOG_WRITE 02
 #define LOG_READ  04

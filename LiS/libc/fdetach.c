@@ -55,6 +55,8 @@
 static char const ident[] =
     "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.3.12.3 $) $Date: 2005/07/13 12:01:21 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _GNU_SOURCE 1
 #define _REENTRANT

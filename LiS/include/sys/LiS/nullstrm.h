@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
+/* This file can be processed with doxygen(1). */
+
 #define	NULL_IOCTL(n)	(('n' << 8) | (n))
 #define NULL_READ_SIZE	NULL_IOCTL(1)
 #define NULL_GET_DEV	NULL_IOCTL(2)

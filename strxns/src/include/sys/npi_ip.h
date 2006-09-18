@@ -77,6 +77,11 @@
 
 #ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed by doxygen(1). */
+
+/// @file
+/// @brief This header file provides the Network Provider Interface (NPI) for Internet Protocols (IP).
+
 #include <sys/npi.h>
 
 #define IP_FLAG_DEFAULT_RC_SEL	(1<<0)

@@ -52,4 +52,8 @@
 #ifndef __IUA_IOCTL_H__
 #define __IUA_IOCTL_H__
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 #endif				/* __IUA_IOCTL_H__ */

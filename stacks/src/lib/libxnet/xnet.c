@@ -54,6 +54,8 @@
 
 static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/03 12:06:09 $";
 
+/* This file can be processed with doxygen(1). */
+
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE

@@ -55,6 +55,8 @@
 static char const ident[] =
     "$RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.3.12.2 $) $Date: 2005/04/12 22:45:28 $";
 
+/* This file can be processed with doxygen(1). */
+
 #include <sys/types.h>
 #include <stropts.h>
 #include <sys/ioctl.h>

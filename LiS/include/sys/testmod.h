@@ -63,6 +63,8 @@
 
 #ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS

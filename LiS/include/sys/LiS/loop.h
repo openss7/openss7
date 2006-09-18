@@ -54,6 +54,8 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
+/* This file can be processed with doxygen(1). */
+
 /*
  *    Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */

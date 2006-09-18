@@ -52,6 +52,10 @@
 #ifndef _SYS_CDI_H
 #define _SYS_CDI_H
 
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+
+/* This file can be processed by doxygen(1). */
+
 /*
  * cdi.h header for Communications Device Interface
  *

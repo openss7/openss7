@@ -60,6 +60,8 @@
 
 #ident "@(#) $RCSfile: sockio.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
 #define SOCKIO ('s'<<8)
 
 #define SIOCHIWAT	(SOCKIO|0)	/* set hi watermark */
