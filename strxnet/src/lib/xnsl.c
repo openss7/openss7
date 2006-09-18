@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:03:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xnsl.c,v $
+ Revision 0.9.2.1  2006/09/18 00:03:15  brian
+ - added libxnsl source files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -2294,10 +2297,10 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.19 $).
+ * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.1 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.19 $)
- * @date \$Date: 2006/07/24 09:01:54 $
+ * @version \$Name:  $(\$Revision: 0.9.2.1 $)
+ * @date \$Date: 2006/09/18 00:03:15 $
  *
  * @}
  */

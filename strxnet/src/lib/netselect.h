@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: netselect.h,v 0.9.2.1 2006/09/18 00:03:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:03:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: netselect.h,v $
+ Revision 0.9.2.1  2006/09/18 00:03:15  brian
+ - added libxnsl source files
+
  *****************************************************************************/
 
 #ifndef __LOCAL_NETSELECT_H__
 #define __LOCAL_NETSELECT_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netselect.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  Local definitions for the Network Selection Facility (netselect) within the OpenSS7 Network

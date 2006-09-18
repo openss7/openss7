@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:03:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: test-xnsl.c,v $
+ Revision 0.9.2.1  2006/09/18 00:03:16  brian
+ - added libxnsl source files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:16 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:16 $";
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:03:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: pthread.c,v $
+ Revision 0.9.2.1  2006/09/18 00:03:15  brian
+ - added libxnsl source files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $";
 
 #include <limits.h>
 #include <pthread.h>

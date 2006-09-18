@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:03:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: netdir_inet.c,v $
+ Revision 0.9.2.1  2006/09/18 00:03:15  brian
+ - added libxnsl source files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $";
 
 /*
  *  This is not only a sample inet name-to-address shared object library, it

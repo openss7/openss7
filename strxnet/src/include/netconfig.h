@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: netconfig.h,v 0.9.2.1 2006/09/18 00:03:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:03:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: netconfig.h,v $
+ Revision 0.9.2.1  2006/09/18 00:03:13  brian
+ - added libxnsl source files
+
  *****************************************************************************/
 
 #ifndef __NETCONFIG_H__
 #define __NETCONFIG_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netconfig.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/netconfig.h>
 
