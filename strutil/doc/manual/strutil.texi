@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strutil.texi,v 0.9.2.10 2006/08/28 10:47:11 brian Exp $
+% @(#) $Id: strutil.texi,v 0.9.2.11 2006/09/18 01:07:22 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/28 10:47:11 $ by $Author: brian $
+% Last Modified $Date: 2006/09/18 01:07:22 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strutil.texi,v $
+Revision 0.9.2.11  2006/09/18 01:07:22  brian
+- updated manuals and release texi docs
+
 Revision 0.9.2.10  2006/08/28 10:47:11  brian
 - correction
 
