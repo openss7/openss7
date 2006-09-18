@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: libsocklib.texi,v 0.9.2.1 2006/09/18 00:10:34 brian Exp $
 %
 % =========================================================================
 %
@@ -53,11 +53,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2006/09/18 00:10:34 $ by $Author: brian $
 %
 % =========================================================================
 %
-% $Log$
+% $Log: libsocklib.texi,v $
+% Revision 0.9.2.1  2006/09/18 00:10:34  brian
+% - added libsocket source files and manuals
+%
 % =========================================================================
 
 \input texinfo
@@ -322,7 +325,10 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @unnumberedsubsec Version Control
 
 @smallexample
-$Log$
+$Log: libsocklib.texi,v $
+Revision 0.9.2.1  2006/09/18 00:10:34  brian
+- added libsocket source files and manuals
+
 @end smallexample
 
 @unnumberedsubsec ISO 9000 Compliance

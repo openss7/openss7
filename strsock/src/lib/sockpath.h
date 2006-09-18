@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sockpath.h,v 0.9.2.1 2006/09/18 00:10:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:10:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sockpath.h,v $
+ Revision 0.9.2.1  2006/09/18 00:10:36  brian
+ - added libsocket source files and manuals
+
  *****************************************************************************/
 
 #ifndef __LOCAL_SOCKPATH_H__
 #define __LOCAL_SOCKPATH_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sockpath.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  Local definitions for the Socket Path Facility (sockpath) within the OpenSS7 Network

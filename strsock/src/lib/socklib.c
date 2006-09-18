@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:10:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: socklib.c,v $
+ Revision 0.9.2.1  2006/09/18 00:10:36  brian
+ - added libsocket source files and manuals
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT

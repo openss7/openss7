@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sockdb.h,v 0.9.2.1 2006/09/18 00:10:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:10:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sockdb.h,v $
+ Revision 0.9.2.1  2006/09/18 00:10:34  brian
+ - added libsocket source files and manuals
+
  *****************************************************************************/
 
 #ifndef __SOCKPATH_H__
 #define __SOCKPATH_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sockdb.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/sockpath.h>
 

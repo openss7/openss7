@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:10:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: pthread.c,v $
+ Revision 0.9.2.1  2006/09/18 00:10:36  brian
+ - added libsocket source files and manuals
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $";
 
 #include <limits.h>
 #include <pthread.h>

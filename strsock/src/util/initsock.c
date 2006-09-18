@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/18 00:10:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: initsock.c,v $
+ Revision 0.9.2.1  2006/09/18 00:10:38  brian
+ - added libsocket source files and manuals
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:38 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:38 $";
 
 #define _XOPEN_SOURCE 600
 

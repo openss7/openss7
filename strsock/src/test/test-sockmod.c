@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sock.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:04:10 $
+ @(#) $RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:37 $
 
  -----------------------------------------------------------------------------
 
@@ -59,20 +59,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/23 10:04:10 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 00:10:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: test-sock.c,v $
+ $Log: test-sockmod.c,v $
+ Revision 0.9.2.1  2006/09/18 00:10:37  brian
+ - added libsocket source files and manuals
+
  Revision 0.9.2.1  2006/08/23 10:04:10  brian
  - started STREAMS Sockets package
 
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sock.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:04:10 $"
+#ident "@(#) $RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:37 $"
 
-static char const ident[] = "$RCSfile: test-sock.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:04:10 $";
+static char const ident[] = "$RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:37 $";
 
 #include <sys/types.h>
 #include <stropts.h>
