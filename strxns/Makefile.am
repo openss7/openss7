@@ -492,6 +492,11 @@ MANUAL_FILE			= doc/manual/$(PACKAGE).txt
 
 include am/release.am
 
+##
+## Rules for doxygen documentation.
+##
+include am/doxy.am
+
 EXTRA_DIST			+= \
 				  TODO \
 				  MANUAL \

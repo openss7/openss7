@@ -134,6 +134,13 @@ MANUAL_FILE			= doc/manual/$(PACKAGE).txt
 
 include am/release.am
 
+##
+## Rules for making doxygen documentation.
+##
+ALL_RECURSIVE_TARGETS		+= all-doxy
+
+doxy: all-doxy
+
 EXTRA_DIST			+= \
 				  TODO \
 				  MANUAL \
