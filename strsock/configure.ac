@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:03:52 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:15:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/23 10:03:52 $ by $Author: brian $
+# Last Modified $Date: 2006/09/18 01:15:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.2  2006/09/18 01:15:25  brian
+# - add 32bit libs, release file changes, additional packages
+#
 # Revision 0.9.2.1  2006/08/23 10:03:52  brian
 # - started STREAMS Sockets package
 #
@@ -62,7 +65,7 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.1 2006/08/23 10:03:52 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.2 2006/09/18 01:15:25 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strsock],[0.9.2],[bugs@openss7.org])
 

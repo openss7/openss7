@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:03:52 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:15:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/23 10:03:52 $ by $Author: brian $
+# Last Modified $Date: 2006/09/18 01:15:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.2  2006/09/18 01:15:25  brian
+# - add 32bit libs, release file changes, additional packages
+#
 # Revision 0.9.2.1  2006/08/23 10:03:52  brian
 # - started STREAMS Sockets package
 #

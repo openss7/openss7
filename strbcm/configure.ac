@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/20 13:30:08 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/18 01:15:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/20 13:30:08 $ by $Author: brian $
+# Last Modified $Date: 2006/09/18 01:15:29 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.8  2006/09/18 01:15:29  brian
+# - add 32bit libs, release file changes, additional packages
+#
 # Revision 0.9.2.7  2006/03/20 13:30:08  brian
 # - updated and rationalized configure.ac
 #
@@ -79,7 +82,7 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.7 2006/03/20 13:30:08 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.8 2006/09/18 01:15:29 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strbcm],[0.9.2],[bugs@openss7.org])
 

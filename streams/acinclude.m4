@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2006/08/16 07:42:23 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2006/09/18 01:15:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:42:23 $ by $Author: brian $
+# Last Modified $Date: 2006/09/18 01:15:23 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.122  2006/09/18 01:15:23  brian
+# - add 32bit libs, release file changes, additional packages
+#
 # Revision 0.9.2.121  2006/08/16 07:42:23  brian
 # - added checks for non-exported kthread functions under SLES 9
 #
