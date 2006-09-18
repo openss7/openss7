@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2006/08/22 12:36:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2006/09/18 01:18:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/22 12:36:43 $ by $Author: brian $
+# Last Modified $Date: 2006/09/18 01:18:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.78  2006/09/18 01:18:37  brian
+# - updated documentation and include file makefiles
+#
 # Revision 0.9.2.77  2006/08/22 12:36:43  brian
 # - udpates to documentation, tweaks to Stream head
 #
