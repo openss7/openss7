@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: strsock.macros,v 0.9.2.1 2006/08/23 10:03:58 brian Exp $
+.\" @(#) $Id: strsock.macros,v 0.9.2.2 2006/09/18 01:25:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/08/23 10:03:58 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/18 01:25:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -367,7 +367,7 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.1 $); $Date: 2006/08/23 10:03:58 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.2 $); $Date: 2006/09/18 01:25:54 $.
 .PP
 \f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
 .br
