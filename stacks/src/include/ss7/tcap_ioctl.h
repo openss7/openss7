@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tcap_ioctl.h,v 0.9.2.3 2005/05/14 08:30:46 brian Exp $
+ @(#) $Id: tcap_ioctl.h,v 0.9.2.4 2006/09/18 13:52:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:46 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SSCP_IOCTL_H__
 #define __SSCP_IOCTL_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: tcap_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 

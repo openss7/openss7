@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi_lapd.h,v 0.9.2.2 2005/05/14 08:30:47 brian Exp $
+ @(#) $Id: dlpi_lapd.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:47 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __DLPI_LAPD_H__
 #define __DLPI_LAPD_H__
 
-#ident "@(#) $Name:  $ ($Revision: 0.9.2.2 $) Copyright (c) 1997-2003 OpenSS7 Corporation."
+#ident "@(#) $Name:  $ ($Revision: 0.9.2.3 $) Copyright (c) 1997-2003 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

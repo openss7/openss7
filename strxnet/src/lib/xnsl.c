@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $
+ @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 00:03:15 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnsl.c,v $
+ Revision 0.9.2.2  2006/09/18 13:52:56  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.1  2006/09/18 00:03:15  brian
  - added libxnsl source files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $"
+#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $"
 
-static char const ident[] = "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:15 $";
+static char const ident[] = "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -2299,10 +2302,10 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.1 $).
+ * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.2 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.1 $)
- * @date \$Date: 2006/09/18 00:03:15 $
+ * @version \$Name:  $(\$Revision: 0.9.2.2 $)
+ * @date \$Date: 2006/09/18 13:52:56 $
  *
  * @}
  */

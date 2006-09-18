@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.5 2006/02/23 12:00:10 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.6 2006/09/18 13:52:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 12:00:10 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.h,v $
+ Revision 0.9.2.6  2006/09/18 13:52:45  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.5  2006/02/23 12:00:10  brian
  - corrections for 64bit and 32/64bit compatibility
  - updated headers
@@ -70,7 +73,7 @@
 #ifndef _SYS_TIMOD_H
 #define _SYS_TIMOD_H
 
-#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

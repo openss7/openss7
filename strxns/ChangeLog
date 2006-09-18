@@ -1,3 +1,11 @@
+2006-09-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/cdi.h: added doxygen markers
+	* src/include/sys/dlpi.h: added doxygen markers
+	* src/include/sys/ldl.h: added doxygen markers
+	* src/include/sys/npi.h: added doxygen markers
+	* src/include/sys/npi_ip.h: added doxygen markers
+
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 	
 	* doc/manual/news.texi: major update notices

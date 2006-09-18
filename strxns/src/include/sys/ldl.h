@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ldl.h,v 0.9.2.5 2006/03/04 04:34:29 brian Exp $
+ @(#) $Id: ldl.h,v 0.9.2.6 2006/09/18 13:52:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 04:34:29 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.h,v $
+ Revision 0.9.2.6  2006/09/18 13:52:47  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.5  2006/03/04 04:34:29  brian
  - corrections for FC4 x86_64 build
 
@@ -60,7 +63,7 @@
 #ifndef SYS_LDL_H
 #define SYS_LDL_H
 
-#ident "@(#) $RCSfile: ldl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ldl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

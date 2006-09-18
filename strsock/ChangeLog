@@ -1,3 +1,16 @@
+2006-09-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/sockio.h: added doxygen markers
+	* src/include/sys/socklib.h: added doxygen markers
+	* src/include/sys/sockmod.h: added doxygen markers
+	* src/include/sys/sockpath.h: added doxygen markers
+	* src/include/sys/socksys.h: added doxygen markers
+	* src/lib/pthread.c: added doxygen markers
+	* src/lib/socket.c: added doxygen markers
+	* src/lib/socklib.c: added doxygen markers
+	* src/lib/sockpath.c: added doxygen markers
+	* src/util/soconfig.c: added doxygen markers
+
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man3/endsockpath.3.man: trying to pass make check

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/09/18 01:43:58 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/09/18 13:52:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 01:43:58 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/09/18 01:43:58 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/09/18 13:52:56 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/09/18 01:43:58 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/09/18 13:52:56 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -6011,10 +6011,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.20 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.21 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.20 $)
- * @date \$Date: 2006/09/18 01:43:58 $
+ * @version \$Name:  $(\$Revision: 0.9.2.21 $)
+ * @date \$Date: 2006/09/18 13:52:56 $
  *
  * @}
  */

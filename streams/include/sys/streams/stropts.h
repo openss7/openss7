@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.25 2006/07/13 12:55:48 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.26 2006/09/18 13:52:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/13 12:55:48 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 0.9.2.26  2006/09/18 13:52:41  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.25  2006/07/13 12:55:48  brian
  - updated documentation for sk_buffs
 
@@ -63,7 +66,7 @@
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.25 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.26 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

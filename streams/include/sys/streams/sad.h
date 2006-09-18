@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.14 2006/03/03 10:57:11 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.15 2006/09/18 13:52:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.h,v $
+ Revision 0.9.2.15  2006/09/18 13:52:41  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.14  2006/03/03 10:57:11  brian
  - 32-bit compatibility support, updates for release
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_STREAMS_SAD_H__
 #define __SYS_STREAMS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SAD_H__
 #warning "Do no include sys/streams/sad.h directly, include sys/sad.h instead."

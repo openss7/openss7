@@ -1,3 +1,25 @@
+2006-09-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/stropts.h: added doxygen markers
+	* include/sys/LiS/log.h: added doxygen markers
+	* include/sys/LiS/loop.h: added doxygen markers
+	* include/sys/LiS/minimux.h: added doxygen markers
+	* include/sys/LiS/mtdrv.h: added doxygen markers
+	* include/sys/LiS/nullstrm.h: added doxygen markers
+	* include/sys/LiS/testmod.h: added doxygen markers
+	* include/sys/poll.h: added doxygen markers
+	* include/sys/sad.h: added doxygen markers
+	* include/sys/stropts.h: added doxygen markers
+	* include/sys/testmod.h: added doxygen markers
+	* libc/fattach.c: added doxygen markers
+	* libc/fdetach.c: added doxygen markers
+	* libc/getmsg.c: added doxygen markers
+	* libc/getpmsg.c: added doxygen markers
+	* libc/isastream.c: added doxygen markers
+	* libc/pipe.c: added doxygen markers
+	* libc/putmsg.c: added doxygen markers
+	* libc/putpmsg.c: added doxygen markers
+
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 	
 	* manual/news.texi: major update notices

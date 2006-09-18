@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: socksys.h,v 0.9.2.2 2006/09/18 01:43:52 brian Exp $
+ @(#) $Id: socksys.h,v 0.9.2.3 2006/09/18 13:52:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 01:43:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SOCKSYS_H__
 #define __SYS_SOCKSYS_H__
 
-#ident "@(#) $RCSfile: socksys.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: socksys.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

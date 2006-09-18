@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts32.h,v 0.9.2.3 2006/03/03 10:57:11 brian Exp $
+ @(#) $Id: stropts32.h,v 0.9.2.4 2006/09/18 13:52:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 10:57:11 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts32.h,v $
+ Revision 0.9.2.4  2006/09/18 13:52:41  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.3  2006/03/03 10:57:11  brian
  - 32-bit compatibility support, updates for release
 
@@ -63,7 +66,7 @@
 #ifndef __SYS_STREAMS_STROPTS32_H__
 #define __SYS_STREAMS_STROPTS32_H__
 
-#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

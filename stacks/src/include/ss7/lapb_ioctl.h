@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lapb_ioctl.h,v 0.9.2.2 2005/05/14 08:30:45 brian Exp $
+ @(#) $Id: lapb_ioctl.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LAPB_IOCTL_H__
 #define __LAPB_IOCTL_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: lapb_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.14 2006/07/24 09:01:12 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.15 2006/09/18 13:52:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:12 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.h,v $
+ Revision 0.9.2.15  2006/09/18 13:52:41  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.14  2006/07/24 09:01:12  brian
  - results of udp2 optimizations
 
@@ -63,7 +66,7 @@
 #ifndef __SYS_STREAMS_SC_H__
 #define __SYS_STREAMS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SC_H__
 #warning "Do no include sys/streams/sc.h directly, include sys/sc.h instead."

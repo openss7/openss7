@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: socklib.h,v 0.9.2.1 2006/09/18 00:10:35 brian Exp $
+ @(#) $Id: socklib.h,v 0.9.2.2 2006/09/18 13:52:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 00:10:35 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socklib.h,v $
+ Revision 0.9.2.2  2006/09/18 13:52:42  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.1  2006/09/18 00:10:35  brian
  - added libsocket source files and manuals
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_SOCKLIB_H__
 #define __SYS_SOCKLIB_H__
 
-#ident "@(#) $RCSfile: socklib.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: socklib.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

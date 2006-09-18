@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:53 $
+ @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 01:43:53 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socket.c,v $
+ Revision 0.9.2.3  2006/09/18 13:52:53  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.2  2006/09/18 01:43:53  brian
  - working up libsocket
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:53 $"
+#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:53 $"
 
 static char const ident[] =
-    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:53 $";
+    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:53 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -1290,10 +1293,10 @@ __asm__(".symver __sock_sendto_r,sendto@@SOCKET_1.0");
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.20 $).
+ * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.3 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.20 $)
- * @date \$Date: 2006/09/18 01:43:58 $
+ * @version \$Name:  $(\$Revision: 0.9.2.3 $)
+ * @date \$Date: 2006/09/18 13:52:53 $
  *
  * @}
  */

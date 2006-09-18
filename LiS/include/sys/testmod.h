@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: testmod.h,v 0.9.2.1 2005/10/23 05:01:26 brian Exp $
+ @(#) $Id: testmod.h,v 0.9.2.2 2006/09/18 13:52:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/23 05:01:26 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.h,v $
+ Revision 0.9.2.2  2006/09/18 13:52:30  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.1  2005/10/23 05:01:26  brian
  - test programs and modules for POSIX testing
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_TESTMOD_H__
 #define __SYS_TESTMOD_H__
 
-#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

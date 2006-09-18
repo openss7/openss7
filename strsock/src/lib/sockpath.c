@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $
+ @(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 00:10:36 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockpath.c,v $
+ Revision 0.9.2.2  2006/09/18 13:52:53  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.1  2006/09/18 00:10:36  brian
  - added libsocket source files and manuals
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $"
+#ident "@(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $"
 
-static char const ident[] = "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:36 $";
+static char const ident[] = "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $";
 
 /* This file can be processed with doxygen(1). */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_local.h,v 0.9.2.2 2005/05/14 08:30:49 brian Exp $
+ @(#) $Id: xti_local.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:49 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_LOCAL_H
 #define _SYS_XTI_LOCAL_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_local.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -75,8 +75,8 @@ __BEGIN_DECLS
  * should consult the documentation found in xti(3).
  *
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.2 $)
- * @date \$Date: 2005/05/14 08:30:49 $
+ * @version \$Name:  $(\$Revision: 0.9.2.3 $)
+ * @date \$Date: 2006/09/18 13:52:37 $
  */
 
 #define _SC_T_IOV_MAX		0

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:39 $
+ @(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:55 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 00:10:39 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: soconfig.c,v $
+ Revision 0.9.2.2  2006/09/18 13:52:55  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.1  2006/09/18 00:10:39  brian
  - added libsocket source files and manuals
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:39 $"
+#ident "@(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:55 $"
 
-static char const ident[] = "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:10:39 $";
+static char const ident[] = "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:55 $";
 
 #define _XOPEN_SOURCE 600
 

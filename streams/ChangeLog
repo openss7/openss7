@@ -1,3 +1,24 @@
+2006-09-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/stropts.h: added doxygen markers
+	* include/sys/streams/log.h: added doxygen markers
+	* include/sys/streams/loop.h: added doxygen markers
+	* include/sys/streams/sad.h: added doxygen markers
+	* include/sys/streams/sc.h: added doxygen markers
+	* include/sys/streams/strlog.h: added doxygen markers
+	* include/sys/streams/stropts32.h: added doxygen markers
+	* include/sys/streams/stropts.h: added doxygen markers
+	* include/sys/streams/testmod.h: added doxygen markers
+	* lib/libc/fattach.c: added doxygen markers
+	* lib/libc/fdetach.c: added doxygen markers
+	* lib/libc/getmsg.c: added doxygen markers
+	* lib/libc/getpmsg.c: added doxygen markers
+	* lib/libc/isastream.c: added doxygen markers
+	* lib/libc/pipe.c: added doxygen markers
+	* lib/libc/putmsg.c: added doxygen markers
+	* lib/libc/putpmsg.c: added doxygen markers
+	* lib/libc/testcancel.c: added doxygen markers
+
 2006-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files

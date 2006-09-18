@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/18 01:43:44 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 01:43:44 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/18 01:43:44 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $"
 
-static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/18 01:43:44 $";
+static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $";
 
 /* This file can be processed with doxygen(1). */
 

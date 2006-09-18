@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: smi.h,v 0.9.2.2 2005/05/14 08:30:46 brian Exp $
+ @(#) $Id: smi.h,v 0.9.2.3 2006/09/18 13:52:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:46 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SMI_H__
 #define __SMI_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: smi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 

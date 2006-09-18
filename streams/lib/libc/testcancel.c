@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/24 09:01:14 $
+ @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:14 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/24 09:01:14 $"
+#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:52 $"
 
-static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/24 09:01:14 $";
+static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:52 $";
 
 /* This file can be processed with doxygen(1). */
 

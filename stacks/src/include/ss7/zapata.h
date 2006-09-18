@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: zapata.h,v 0.9.2.1 2006/03/20 12:23:29 brian Exp $
+ @(#) $Id: zapata.h,v 0.9.2.2 2006/09/18 13:52:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/20 12:23:29 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zapata.h,v $
+ Revision 0.9.2.2  2006/09/18 13:52:34  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.1  2006/03/20 12:23:29  brian
  - first cut of zaptel driver
 
@@ -57,7 +60,7 @@
 #ifndef __SS7_ZAPATA_H__
 #define __SS7_ZAPATA_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: zapata.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 

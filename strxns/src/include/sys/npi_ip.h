@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_ip.h,v 0.9.2.7 2006/05/06 10:22:34 brian Exp $
+ @(#) $Id: npi_ip.h,v 0.9.2.8 2006/09/18 13:52:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/06 10:22:34 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_ip.h,v $
+ Revision 0.9.2.8  2006/09/18 13:52:47  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.7  2006/05/06 10:22:34  brian
  - added test suite for NPI-IP driver
 
@@ -75,7 +78,7 @@
 #ifndef SYS_NPI_IP_H
 #define SYS_NPI_IP_H
 
-#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

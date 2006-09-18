@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tihdr.h,v 0.9.2.5 2005/07/18 12:45:03 brian Exp $
+ @(#) $Id: tihdr.h,v 0.9.2.6 2006/09/18 13:52:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:45:03 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
 
  $Log: tihdr.h,v $
+ Revision 0.9.2.6  2006/09/18 13:52:45  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.5  2005/07/18 12:45:03  brian
  - standard indentation
 
@@ -65,7 +68,7 @@
 #ifndef _SYS_TIHDR_H
 #define _SYS_TIHDR_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

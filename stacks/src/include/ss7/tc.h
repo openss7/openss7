@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tc.h,v 0.9.2.6 2005/05/14 08:30:46 brian Exp $
+ @(#) $Id: tc.h,v 0.9.2.7 2006/09/18 13:52:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:46 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TC_H__
 #define __SS7_TC_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: tc.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 

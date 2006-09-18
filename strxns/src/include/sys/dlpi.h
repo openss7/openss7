@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.5 2006/03/03 11:27:48 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.6 2006/09/18 13:52:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.h,v $
+ Revision 0.9.2.6  2006/09/18 13:52:47  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.5  2006/03/03 11:27:48  brian
  - 32/64-bit compatibility
 
@@ -57,7 +60,7 @@
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

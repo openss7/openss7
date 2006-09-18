@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.18 2006/02/22 11:35:46 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.19 2006/09/18 13:52:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/22 11:35:46 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.h,v $
+ Revision 0.9.2.19  2006/09/18 13:52:41  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.18  2006/02/22 11:35:46  brian
  - added __x86_64__ and __k8__ to regparms
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

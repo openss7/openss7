@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tihdr.h,v 0.9.2.2 2005/05/14 08:30:48 brian Exp $
+ @(#) $Id: tihdr.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:48 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
 
  $Log: tihdr.h,v $
+ Revision 0.9.2.3  2006/09/18 13:52:37  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.2  2005/05/14 08:30:48  brian
  - copyright header correction
 
@@ -59,7 +62,7 @@
 #ifndef _SYS_TIHDR_H
 #define _SYS_TIHDR_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

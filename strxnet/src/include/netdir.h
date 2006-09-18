@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netdir.h,v 0.9.2.1 2006/09/18 00:03:13 brian Exp $
+ @(#) $Id: netdir.h,v 0.9.2.2 2006/09/18 13:52:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 00:03:13 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir.h,v $
+ Revision 0.9.2.2  2006/09/18 13:52:44  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.1  2006/09/18 00:03:13  brian
  - added libxnsl source files
 
@@ -58,7 +61,7 @@
 #ifndef __NETDIR_H__
 #define __NETDIR_H__
 
-#ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

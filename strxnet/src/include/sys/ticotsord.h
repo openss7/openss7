@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticotsord.h,v 0.9.2.4 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: ticotsord.h,v 0.9.2.5 2006/09/18 13:52:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
 
  $Log: ticotsord.h,v $
+ Revision 0.9.2.5  2006/09/18 13:52:45  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.4  2005/05/14 08:28:29  brian
  - copyright header correction
 
@@ -71,7 +74,7 @@
 #ifndef _SYS_TICOTSORD_H
 #define _SYS_TICOTSORD_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

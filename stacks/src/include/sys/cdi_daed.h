@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cdi_daed.h,v 0.9.2.2 2005/05/14 08:30:46 brian Exp $
+ @(#) $Id: cdi_daed.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:46 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __CDI_DAED_H__
 #define __CDI_DAED_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cdi_daed.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

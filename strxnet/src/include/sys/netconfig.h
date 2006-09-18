@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netconfig.h,v 0.9.2.1 2006/09/18 00:03:14 brian Exp $
+ @(#) $Id: netconfig.h,v 0.9.2.2 2006/09/18 13:52:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 00:03:14 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netconfig.h,v $
+ Revision 0.9.2.2  2006/09/18 13:52:45  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.1  2006/09/18 00:03:14  brian
  - added libxnsl source files
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_NETCONFIG_H__
 #define __SYS_NETCONFIG_H__
 
-#ident "@(#) $RCSfile: netconfig.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netconfig.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

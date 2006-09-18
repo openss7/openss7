@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:48 $
+ @(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/18 13:52:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:48 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
 
  $Log: tpi.h,v $
+ Revision 0.9.2.5  2006/09/18 13:52:37  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.4  2005/05/14 08:30:48  brian
  - copyright header correction
 
@@ -69,7 +72,7 @@
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

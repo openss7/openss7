@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:30:47 $
+ @(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:47 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
 
  $Log: npi.h,v $
+ Revision 0.9.2.3  2006/09/18 13:52:37  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.2  2005/05/14 08:30:47  brian
  - copyright header correction
 
@@ -64,7 +67,7 @@
 #ifndef SYS_NPI_H
 #define SYS_NPI_H		/* mark file as included */
 
-#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:30:47 $"
+#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:37 $"
 
 /* This file can be processed with doxygen(1). */
 

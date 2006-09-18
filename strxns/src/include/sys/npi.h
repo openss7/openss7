@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi.h,v 0.9.2.5 2006/04/13 18:32:51 brian Exp $
+ @(#) $Id: npi.h,v 0.9.2.6 2006/09/18 13:52:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/13 18:32:51 $ by $Author: brian $
+ Last Modified $Date: 2006/09/18 13:52:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi.h,v $
+ Revision 0.9.2.6  2006/09/18 13:52:47  brian
+ - added doxygen markers to sources
+
  Revision 0.9.2.5  2006/04/13 18:32:51  brian
  - working up DL and NP drivers.
 
@@ -64,7 +67,7 @@
 #ifndef SYS_NPI_H
 #define SYS_NPI_H		/* mark file as included */
 
-#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
