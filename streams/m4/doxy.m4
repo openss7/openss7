@@ -118,6 +118,7 @@ AC_DEFUN([_DOXY_CONFIG_INPUT], [dnl
 	doxy_inputs="${doxy_inputs:+$doxy_inputs }${doxy_file}"
 	AC_MSG_RESULT([yes])
     done
+    doxy_inputs="AC_PACKAGE_NAME.dox${doxy_inputs:+ $doxy_inputs}"
     DOXY_CONFIG_INPUT="$doxy_inputs"
     AC_SUBST([DOXY_CONFIG_INPUT])dnl
     AC_SUBST([doxy_abs_builddir])dnl
@@ -151,7 +152,7 @@ AC_DEFUN([_DOXY_OUTPUT_CONFIG_COMMANDS], [dnl
 # _DOXY_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_OUTPUT], [dnl
-    AC_CONFIG_FILES([scripts/Doxyfile])
+    AC_CONFIG_FILES([scripts/Doxyfile] AC_PACKAGE_NAME.dox)
     if test -d $srcdir/doc ; then
 	doxydir='./doc'
     else

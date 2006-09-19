@@ -76,7 +76,7 @@
 ##
 
 if HAVE_DOXYGEN
-$(doxydir)/html/index.html: $(DOXY_CONFIG_INPUT) scripts/Doxyfile
+$(doxydir)/html/index.html: $(DOXY_CONFIG_INPUT) $(PACKAGE).dox scripts/Doxyfile $(srcdir)/scripts/check_version
 	rm -rf $(doxydir)/html
 	$(DOXYGEN) scripts/Doxyfile
 

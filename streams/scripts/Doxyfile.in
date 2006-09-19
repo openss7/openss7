@@ -138,7 +138,7 @@ SHORT_NAMES            = NO
 # comments will behave just like the Qt-style comments (thus requiring an 
 # explicit @brief command for a brief description.
 
-JAVADOC_AUTOBRIEF      = NO
+JAVADOC_AUTOBRIEF      = YES
 
 # The MULTILINE_CPP_IS_BRIEF tag can be set to YES to make Doxygen 
 # treat a multi-line C++ special comment block (i.e. a block of //! or /// 
@@ -219,7 +219,7 @@ SUBGROUPING            = YES
 # Private class members and static file members will be hidden unless 
 # the EXTRACT_PRIVATE and EXTRACT_STATIC tags are set to YES
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class 
 # will be included in the documentation.
@@ -229,13 +229,13 @@ EXTRACT_PRIVATE        = NO
 # If the EXTRACT_STATIC tag is set to YES all static members of a file 
 # will be included in the documentation.
 
-EXTRACT_STATIC         = YES
+EXTRACT_STATIC         = NO
 
 # If the EXTRACT_LOCAL_CLASSES tag is set to YES classes (and structs) 
 # defined locally in source files will be included in the documentation. 
 # If set to NO only classes defined in header files are included.
 
-EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_CLASSES  = NO
 
 # This flag is only useful for Objective-C code. When set to YES local 
 # methods, which are defined in the implementation section but not in 
@@ -292,7 +292,7 @@ CASE_SENSE_NAMES       = YES
 # will show members with their full class and namespace scopes in the 
 # documentation. If set to YES the scope will be hidden.
 
-HIDE_SCOPE_NAMES       = NO
+HIDE_SCOPE_NAMES       = YES
 
 # If the SHOW_INCLUDE_FILES tag is set to YES (the default) then Doxygen 
 # will put a list of the files that are included by a file in the documentation 
@@ -388,7 +388,7 @@ SHOW_DIRECTORIES       = YES
 # provided by doxygen. Whatever the progam writes to standard output 
 # is used as the file version. See the manual for examples.
 
-FILE_VERSION_FILTER    = 
+FILE_VERSION_FILTER    = "@doxy_abs_srcdir@/scripts/check_version"
 
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
@@ -996,14 +996,78 @@ INCLUDE_FILE_PATTERNS  =
 # undefined via #undef or recursively expanded use the := operator 
 # instead of the = operator.
 
-PREDEFINED             = __asm__(x):= __hot:=
+PREDEFINED             = \
+			 __initdata= \
+			 __exitdata= \
+			 EXPORT_SYMBOL(x)= \
+			 EXPORT_SYMBOL_NOVERS(x)= \
+			 EXPORT_SYMBOL_GPL(x)= \
+			 FASTCALL(x)=x \
+			 STREAMSCALL(x)=x \
+			 STREAMS_FASTCALL(x)=x \
+			 STREAMS_REGPARMS(x)=x \
+			 asmlinkage= \
+			 fastcall= \
+			 streamscall= \
+			 streams_fastcall= \
+			 streams_regparms= \
+			 __attribute__(x)= \
+			 attribute(x)= \
+			 __BEGIN_DECLS= \
+			 __END_DECLS= \
+			 __THROW= \
+			 __const=const \
+			 __static=static \
+			 __restrict= \
+			 STATIC=static \
+			 BIG_STATIC=static \
+			 BIG_STATIC_INLINE=inline \
+			 BIG_STATIC_STH=static \
+			 BIG_STATIC_INLINE_STH=inline \
+			 streams_inline=inline \
+			 INLINE=inline \
+			 streams_noinline= \
+			 noinline= \
+			 __always_inline=inline \
+			 _RP \
+			 __depr \
+			 HEAD_DECLARATION(x)= \
+			 STR_DECLARATION(x)= \
+			 __EXTERN_INLINE=inline \
+			 __STREAMS_EXTERN_INLINE=inline \
+			 __STRUTIL_EXTERN_INLINE=inline \
+			 __STRSCHD_EXTERN_INLINE=inline \
+			 __AIX_EXTERN_INLINE=inline \
+			 __HPUX_EXTERN_INLINE=inline \
+			 __IRIX_EXTERN_INLINE=inline \
+			 __LIS_EXTERN_INLINE=inline \
+			 __LFS_EXTERN_INLINE=inline \
+			 __MAC_EXTERN_INLINE=inline \
+			 __MPS_EXTERN_INLINE=inline \
+			 __OS7_EXTERN_INLINE=inline \
+			 __SUN_EXTERN_INLINE=inline \
+			 __SUX_EXTERN_INLINE=inline \
+			 __SVR3_EXTERN_INLINE=inline \
+			 __SVR4_EXTERN_INLINE=inline \
+			 __UW7_EXTERN_INLINE=inline \
+			 __UXP_EXTERN_INLINE=inline \
+			 __unlikely= \
+			 __hot= \
+			 __hot_in= \
+			 __hot_out= \
+			 __hot_put= \
+			 __hot_get= \
+			 __hot_read= \
+			 __hot_write= \
+			 __asm__(x)= \
+			 asm(x)=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
 # The macro definition that is found in the sources will be used. 
 # Use the PREDEFINED tag if you want to use a different macro definition.
 
-EXPAND_AS_DEFINED      =  __asm__ __hot
+EXPAND_AS_DEFINED      = 
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES (the default) then 
 # doxygen's preprocessor will remove all function-like macros that are alone 
