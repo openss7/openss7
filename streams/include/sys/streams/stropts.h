@@ -72,8 +72,8 @@
 
 /**
  * @file
- * This file defines the interface to a STREAMS(9) character device special
- * file.
+ * @brief Defines the interface to STREAMS(9) character device special files.
+ * @{
  */
 
 #ifndef __SYS_STROPTS_H__
@@ -102,34 +102,42 @@ typedef unsigned long int t_uscalar_t;
 
 #define __SID		('S' << 8)
 #define STR		('S'<<8)	/* for UnixWare/Solaris compatibility */
+
+/**
+ * @name STREAMS Input-Output Controls
+ * These are input-output control command definitions for STREAMS character
+ * device special files.
+ * @addtogroup streamio STREAMS Input-Output Controls
+ * @{
+ */
 #define I_NREAD		(__SID | 1)
 #define I_PUSH		(__SID | 2)
 #define I_POP		(__SID | 3)
 #define I_LOOK		(__SID | 4)
-#define I_FLUSH		(__SID | 5)
-#define I_SRDOPT	(__SID | 6)
-#define I_GRDOPT	(__SID | 7)
-#define I_STR		(__SID | 8)
-#define I_SETSIG	(__SID | 9)
-#define I_GETSIG	(__SID |10)
-#define I_FIND		(__SID |11)
-#define I_LINK		(__SID |12)
-#define I_UNLINK	(__SID |13)
-#define I_RECVFD	(__SID |14)	/* non-EFT definition */
+#define I_FLUSH		(__SID | 5)	/**< Flush a Stream. */
+#define I_SRDOPT	(__SID | 6)	/**< Set read options for a Stream. */
+#define I_GRDOPT	(__SID | 7)	/**< Get read options for a Stream. */
+#define I_STR		(__SID | 8)	/**< Formulate a STREAMS ioctl(). */
+#define I_SETSIG	(__SID | 9)	/**< Set signals for a Stream. */
+#define I_GETSIG	(__SID |10)	/**< Get signals for a Stream. */
+#define I_FIND		(__SID |11)	/**< Find a module in a Stream. */
+#define I_LINK		(__SID |12)	/**< Temporarily link a Stream under a mux. */
+#define I_UNLINK	(__SID |13)	/**< Temporarily unlink a Stream from a mux. */
+#define I_RECVFD	(__SID |14)	/**< Receive a file descriptor. Non-EFT definition. */
 #define I_PEEK		(__SID |15)
 #define I_FDINSERT	(__SID |16)
 #define I_SENDFD	(__SID |17)
-#define I_E_RECVFD	(__SID |18)	/* Unixware: EFT definition */
-#define I_SWROPT	(__SID |19)
-#define I_GWROPT	(__SID |20)
-#define I_LIST		(__SID |21)
-#define I_PLINK		(__SID |22)
-#define I_PUNLINK	(__SID |23)
+#define I_E_RECVFD	(__SID |18)	/**< Receive a file descriptor. Unixware: EFT definition. */
+#define I_SWROPT	(__SID |19)	/**< Set write options for a Stream. */
+#define I_GWROPT	(__SID |20)	/**< Get write options for a Stream. */
+#define I_LIST		(__SID |21)	/**< List modules on a Stream. */
+#define I_PLINK		(__SID |22)	/**< Permanently link a Stream under a mux. */
+#define I_PUNLINK	(__SID |23)	/**< Permanently unlink a Stream from a mux. */
 
-#define	I_SETEV		(__SID |24)	/* Solaris (obsolete) */
-#define	I_GETEV		(__SID |25)	/* Solaris (obsolete) */
-#define	I_STREV		(__SID |26)	/* Solaris (obsolete) */
-#define	I_UNSTREV	(__SID |27)	/* Solaris (obsolete) */
+#define	I_SETEV		(__SID |24)	/**< Set an event (Solaris, @e obsolete). */
+#define	I_GETEV		(__SID |25)	/**< Get an event (Solaris, @e obsolete). */
+#define	I_STREV		(__SID |26)	/**< Create Stream event (Solaris, @e obsolete). */
+#define	I_UNSTREV	(__SID |27)	/**< Destroy Stream event (Solaris, @e obsolete). */
 
 #define I_FLUSHBAND	(__SID |28)
 #define I_CKBAND	(__SID |29)
@@ -138,80 +146,114 @@ typedef unsigned long int t_uscalar_t;
 #define I_SETCLTIME	(__SID |32)
 #define I_GETCLTIME	(__SID |33)
 #define I_CANPUT	(__SID |34)
+/** @} */
 
-/* from here the numbering gets implementation specific */
+/**
+ * @name Non-Standard STREAMS Input-Output Controls
+ * The numbering of ioctl() above #I_CANPUT (34) is implementation specific.
+ * @addtogroup streamio STREAMS Input-Output Controls
+ * @{
+ *    @def I_SERROPT
+ *	   Set error options (Solaris).  This is a Solaris specific option.
+ *	   Argument values are #RERRNORM, #RERRNONPERSIST, #WERRNORM and
+ *	   #WERRNONPERSIST.
+ */
+#define I_SERROPT	(__SID |35)	/**< Set error options (Solaris). */
+#define I_GERROPT	(__SID |36)	/**< Get error options (Solaris). */
+#define I_ANCHOR	(__SID |37)	/**< Set an module anchor (Solaris). */
 
-#define I_SERROPT	(__SID |35)	/* Solaris */
-#define I_GERROPT	(__SID |36)	/* Solaris */
-#define I_ANCHOR	(__SID |37)	/* Solaris */
+#define I_S_RECVFD	(__SID |35)	/**< Secure receive file descriptor (UnixWare). */
+#define I_STATS		(__SID |36)	/**< Get statistics (UnixWare). */
+#define I_BIGPIPE	(__SID |37)	/**< Get large pipe (UnixWare). */
+#define I_GETTP		(__SID |38)	/**< Get transport provider (UnixWare). */
 
-#define I_S_RECVFD	(__SID |35)	/* UnixWare */
-#define I_STATS		(__SID |36)	/* UnixWare */
-#define I_BIGPIPE	(__SID |37)	/* UnixWare */
-#define I_GETTP		(__SID |38)	/* UnixWare */
+#define I_GETMSG	(__SID |40)	/**< getmsg() emulation (HP-UX, OSF). */
+#define I_PUTMSG	(__SID |41)	/**< putmsg() emulation (HP-UX, OSF). */
+#define I_GETPMSG	(__SID |42)	/**< getpmsg() emulation (HP-UX, OSF, LiS: @c 251, Mac OT: @c 40). */
+#define I_PUTPMSG	(__SID |43)	/**< putpmsg() emulation (HP-UX, OSF, LiS: @c 250, Mac OT: @c 41). */
+#define I_PIPE		(__SID |44)	/**< pipe() emulation (HP-UX, OSF, LiS: @c 254/243, Mac OT: @c 49). */
+#define I_FIFO		(__SID |45)	/**< FIFO emulation (HP-UX, OSF, Mac OT: @c 51). */
+#define I_ISASTREAM	(__SID |46)	/**< isastream() emulation */
 
-#define I_GETMSG	(__SID |40)	/* HP-UX, OSF */
-#define I_PUTMSG	(__SID |41)	/* HP-UX, OSF */
-#define I_GETPMSG	(__SID |42)	/* HP-UX, OSF, LiS 251, Mac OT 40 */
-#define I_PUTPMSG	(__SID |43)	/* HP-UX, OSF, LiS 250, Mac OT 41 */
-#define I_PIPE		(__SID |44)	/* HP-UX, OSF, LiS 254/243, Mac OT 49 */
-#define I_FIFO		(__SID |45)	/* HP-UX, OSF, Mac OT 51 */
-#define I_ISASTREAM	(__SID |46)
+#define I_AUTOPUSH	(__SID |48)	/**< sad(4) emulation (Mac OT). */
+#define I_HEAP_REPORT	(__SID |50)	/**< Heap debugging (Mac OT). */
 
-#define I_AUTOPUSH	(__SID |48)	/* Mac OT */
-#define I_HEAP_REPORT	(__SID |50)	/* Mac OT */
+#define I_FATTACH	(__SID |52)	/* fattach() emulation (LiS: @c 252 then @c 244). */
+#define I_FDETACH	(__SID |53)	/* fdefatch() emulation (LiS: @c 253 then @c 245). */
+/** @} */
 
-#define I_FATTACH	(__SID |52)	/* LiS (252 then 244) */
-#define I_FDETACH	(__SID |53)	/* LiS (253 then 245) */
+#define INFTIM		(-1UL)		/**< Default streamio(7) timeout. */
 
-#define INFTIM		(-1UL)
+#define FMNAMESZ	8	/**< Max module name size (compatible w/ UnixWare and Solaris). */
 
-#define FMNAMESZ	8	/* compatibility w/UnixWare/Solaris.  */
+#define FLUSHR		(1<<0)	/**< Flush read queues.  */
+#define FLUSHW		(1<<1)	/**< Flush write queues.  */
+#define FLUSHRW		(FLUSHR|FLUSHW)	/**< Flush read and write queues.  */
+#define FLUSHBAND	(1<<2)	/**< Flush only specified band.  */
 
-#define FLUSHR		(1<<0)	/* Flush read queues.  */
-#define FLUSHW		(1<<1)	/* Flush write queues.  */
-#define FLUSHRW		(FLUSHR|FLUSHW)	/* Flush read and write queues.  */
-#define FLUSHBAND	(1<<2)	/* Flush only specified band.  */
-
-#define MAPINOK		(1<<0)	/* map instead of copyin */
-#define NOMAPIN		(1<<1)	/* normal copyin */
-#define REMAPOK		(1<<2)	/* page flip instead of copyout */
-#define NOREMAP		(1<<3)	/* normal copyout */
+#define MAPINOK		(1<<0)	/**< mapin(9) instead of copyin(9). */
+#define NOMAPIN		(1<<1)	/**< Normal copyin(9). */
+#define REMAPOK		(1<<2)	/**< Page flip instead of copyout(9). */
+#define NOREMAP		(1<<3)	/**< Normal copyout(9). */
 
 #ifdef __KERNEL__
-#define S_INPUT_BIT	0
-#define S_HIPRI_BIT	1
-#define S_OUTPUT_BIT	2
-#define S_MSG_BIT	3
-#define S_ERROR_BIT	4
-#define S_HANGUP_BIT	5
-#define S_RDNORM_BIT	6
-#define S_WRNORM_BIT	S_OUTPUT_BIT
-#define S_RDBAND_BIT	7
-#define S_WRBAND_BIT	8
-#define S_BANDURG_BIT	9
+#define S_INPUT_BIT	0		/**< Signal on input bit. */
+#define S_HIPRI_BIT	1		/**< Signal on high priority input bit. */
+#define S_OUTPUT_BIT	2		/**< Signal on output bit. */
+#define S_MSG_BIT	3		/**< Signal on #M_SIG message bit. */
+#define S_ERROR_BIT	4		/**< Signal on #M_ERROR message bit. */
+#define S_HANGUP_BIT	5		/**< Signal on #M_HANGUP message bit. */
+#define S_RDNORM_BIT	6		/**< Signal on normal read bit. */
+#define S_WRNORM_BIT	S_OUTPUT_BIT	/**< Signal on normal write bit. */
+#define S_RDBAND_BIT	7		/**< Signal on banded read bit. */
+#define S_WRBAND_BIT	8		/**< Signal on banded write bit. */
+#define S_BANDURG_BIT	9		/**< Signal on band urgent (#ATMARK) bit. */
 #endif
 
+/**
+ * @name SIGPOLL Bits
+ * Bits for use with #I_GETSIG and #I_SETSIG.  These bits are used in the
+ * argument to #I_SETSIG and returned from #I_GETSIG input-output controls.
+ * They correspond to poll() bits.
+ * @addtogroup streamio STREAMS Input-Output Controls
+ * @{
+ */
 /* SIGPOLL bits */
-#define S_INPUT		(1<<0)
-#define S_HIPRI		(1<<1)
-#define S_OUTPUT	(1<<2)
-#define S_MSG		(1<<3)
-#define S_ERROR		(1<<4)
-#define S_HANGUP	(1<<5)
-#define S_RDNORM	(1<<6)
-#define S_WRNORM	S_OUTPUT
-#define S_RDBAND	(1<<7)
-#define S_WRBAND	(1<<8)
-#define S_BANDURG	(1<<9)
+#define S_INPUT		(1<<0)		/**< Signal on input. */
+#define S_HIPRI		(1<<1)		/**< Signal on high priority. */
+#define S_OUTPUT	(1<<2)		/**< Signal on output. */
+#define S_MSG		(1<<3)		/**< Signal on #M_SIG message. */
+#define S_ERROR		(1<<4)		/**< Signal on #M_ERROR message. */
+#define S_HANGUP	(1<<5)		/**< Signal on #M_HANGUP message. */
+#define S_RDNORM	(1<<6)		/**< Signal on normal read. */
+#define S_WRNORM	S_OUTPUT	/**< Signal on normal write. */
+#define S_RDBAND	(1<<7)		/**< Signal on banded read. */
+#define S_WRBAND	(1<<8)		/**< Signal on banded write. */
+#define S_BANDURG	(1<<9)		/**< Signal on band urgent (ATMARK). */
 #define S_ALL		(S_INPUT|S_HIPRI|S_OUTPUT|S_MSG|S_ERROR|S_HANGUP|S_RDNORM|S_WRNORM|S_RDBAND|S_WRBAND|S_BANDURG)
+/**< Bitmask of all signals */
+/** @} */
 
-#define RS_HIPRI	(1<<0)	/* only read hi priority messages */
-#define STRUIO_POSTPONE	(1<<3)	/* Solaris */
-#define STRUIO_MAPIN	(1<<4)	/* Solaris */
-#define RS_EXDATA	(1<<5)	/* Mac OT */
-#define RS_ALLOWAGAIN	(1<<6)	/* Mac OT */
-#define RS_DELIMITMSG	(1<<7)	/* Mac OT */
+/**
+ * @name Get Message Flags
+ * Flags for use with getmsg().
+ * @addtogroup stropts STREAMS Options
+ * @{
+ * @def RS_HIPRI
+ *	Only get high priority messages.  This is the standard flag to getmsg()
+ *	used to request retrieval of high priority messages only.
+ * @def RS_EXDATA
+ *	Only get expedited data messages (Mac OT).  This option is Mac
+ *	OpenTransport specific and non-standard.  It requests the retrieval of
+ *	expedited data messages only.
+ */
+#define RS_HIPRI	(1<<0)		/**< Only get high priority messages. */
+#define STRUIO_POSTPONE	(1<<3)		/**< (Solaris). */
+#define STRUIO_MAPIN	(1<<4)		/**< (Solaris). */
+#define RS_EXDATA	(1<<5)		/**< (Mac OT). */
+#define RS_ALLOWAGAIN	(1<<6)		/**< (Mac OT). */
+#define RS_DELIMITMSG	(1<<7)		/**< (Mac OT). */
+/** @} */
 
 /* Mac OT gets these wrong */
 #define RNORM		(0)	/* byte-stream mode */
@@ -228,10 +270,26 @@ typedef unsigned long int t_uscalar_t;
 #define SNDPIPE		(1<<1)
 #define SNDHOLD		(1<<2)
 
-#define RERRNORM	(0<<0)
-#define RERRNONPERSIST	(1<<0)
-#define WERRNORM	(0<<1)
-#define WERRNONPERSIST	(1<<1)
+/**
+ * @name Stream Error Options
+ * Error options for use with #I_GERROPT and #I_SERROPT.  This is @e Solaris
+ * specific behaviour.
+ * @addtogroup streamio STREAMS Input-Output Controls
+ * @{
+ *     @def RERRNORM
+ *	    Normal SVR4 error behaviour on read.
+ *     @def RERRNONPERSIST
+ *	    Non-persistent error behaviour on read.
+ *     @def WERRNORM
+ *	    Normal SVR4 error behaviour on write.
+ *     @def WERRNONPERSIST
+ *	    Non-persistent error behaviour on write.
+ */
+#define RERRNORM	(0<<0) /**< Normal SVR4 error behaviour on read. */
+#define RERRNONPERSIST	(1<<0) /**< Non-persistent error behaviour on read. */
+#define WERRNORM	(0<<1) /**< Normal SVR4 error behaviour on write. */
+#define WERRNONPERSIST	(1<<1) /**< Non-persistent error behaviour on write. */
+/** @} */
 
 #define ANYMARK		(1<<0)
 #define LASTMARK	(1<<1)
@@ -333,5 +391,7 @@ struct strputpmsg {
 //#define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678UL)
 #define LFS_GETMSG_PUTMSG_ULEN	(0xedbca988UL)
 #endif
+
+/** @} */
 
 #endif				/* __SYS_STREAMS_STROPTS_H__ */

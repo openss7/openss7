@@ -110,7 +110,7 @@ __lis_fdetach(const char *path)
 /**
  * @fn int fdetach(const char *path)
  * @ingroup libLiS
- * @brief detach a path from a stream.
+ * @brief Detach a path from a stream.
  * @param path the path in the filesystem from which to detach.
  *
  * fdetach() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We

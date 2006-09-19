@@ -292,46 +292,46 @@ __xnet__t_errno(void)
 __asm__(".symver __xnet__t_errno,_t_errno@@XNET_1.0");
 
 struct _t_user {
-	pthread_rwlock_t lock;		/* lock for this structure */
-	int refs;			/* number of references to this structure */
-	int event;			/* pending t_look() events */
-	int flags;			/* user flags */
-	int fflags;			/* file flags */
-	int gflags;			/* getmsg flags */
-	int state;			/* XTI state */
-	int statef;			/* TPI state flag */
-	int prim;			/* last received TLI primitive */
-	int qlen;			/* length of the listen queue */
-	int ocnt;			/* outstanding connection indications */
-	u_int8_t moredat;		/* more data in T_DATA_IND/T_OPTDATA_IND */
-	u_int8_t moresdu;		/* more tsdu */
-	u_int8_t moreexp;		/* more data in T_EXDATA_IND/T_OPTDATA_IND */
-	u_int8_t moreedu;		/* more etsdu */
-	u_int8_t moremsg;		/* more data with dis/con/rel message */
-	int ctlmax;			/* maximum size of ctlbuf */
-	char *ctlbuf;			/* ctrl part buffer */
-	int datmax;			/* maximum size of datbuf */
-	char *datbuf;			/* data part buffer */
-	uint token;			/* acceptor id */
-	struct strbuf ctrl;		/* ctrl part of received message */
-	struct strbuf data;		/* data part of received message */
-	struct t_info info;		/* information structure */
+	pthread_rwlock_t lock;		/**< lock for this structure */
+	int refs;			/**< number of references to this structure */
+	int event;			/**< pending t_look() events */
+	int flags;			/**< user flags */
+	int fflags;			/**< file flags */
+	int gflags;			/**< getmsg flags */
+	int state;			/**< XTI state */
+	int statef;			/**< TPI state flag */
+	int prim;			/**< last received TLI primitive */
+	int qlen;			/**< length of the listen queue */
+	int ocnt;			/**< outstanding connection indications */
+	u_int8_t moredat;		/**< more data in T_DATA_IND/T_OPTDATA_IND */
+	u_int8_t moresdu;		/**< more tsdu */
+	u_int8_t moreexp;		/**< more data in T_EXDATA_IND/T_OPTDATA_IND */
+	u_int8_t moreedu;		/**< more etsdu */
+	u_int8_t moremsg;		/**< more data with dis/con/rel message */
+	int ctlmax;			/**< maximum size of ctlbuf */
+	char *ctlbuf;			/**< ctrl part buffer */
+	int datmax;			/**< maximum size of datbuf */
+	char *datbuf;			/**< data part buffer */
+	uint token;			/**< acceptor id */
+	struct strbuf ctrl;		/**< ctrl part of received message */
+	struct strbuf data;		/**< data part of received message */
+	struct t_info info;		/**< information structure */
 };
 
-#define TUF_FLOW_NORM		01	/* was flow controlled for normal messages */
-#define TUF_FLOW_EXP		02	/* was flow controlled for expedited messages */
-#define TUF_SYNC_REQUIRED	04	/* t_sync() required */
-#define TUF_WACK_INFO		010	/* waiting for T_INFO_ACK */
-#define TUF_WACK_OPTMGMT	020	/* waiting for T_OPTMGMT_ACK */
-#define TUF_WACK_ADDR		040	/* waiting for T_ADDR_ACK */
-#define TUF_WACK_CAPABILITY	0100	/* waitinf for T_CAPABILITY_ACK */
-#define TUF_WACK_GETADDR	0200	/* waiting for T_GETADDR_ACK */
-#define TUF_WACK_OK		0400	/* waiting for T_OK_ACK */
-#define TUF_WACK_BIND		01000	/* waiting for T_BIND_ACK */
-#define TUF_MORE_DATA		02000	/* more data left on receive queue */
+#define TUF_FLOW_NORM		01	/**< was flow controlled for normal messages */
+#define TUF_FLOW_EXP		02	/**< was flow controlled for expedited messages */
+#define TUF_SYNC_REQUIRED	04	/**< t_sync() required */
+#define TUF_WACK_INFO		010	/**< waiting for T_INFO_ACK */
+#define TUF_WACK_OPTMGMT	020	/**< waiting for T_OPTMGMT_ACK */
+#define TUF_WACK_ADDR		040	/**< waiting for T_ADDR_ACK */
+#define TUF_WACK_CAPABILITY	0100	/**< waitinf for T_CAPABILITY_ACK */
+#define TUF_WACK_GETADDR	0200	/**< waiting for T_GETADDR_ACK */
+#define TUF_WACK_OK		0400	/**< waiting for T_OK_ACK */
+#define TUF_WACK_BIND		01000	/**< waiting for T_BIND_ACK */
+#define TUF_MORE_DATA		02000	/**< more data left on receive queue */
 
 #ifndef T_ACK
-#define T_ACK (-2)		/* for now */
+#define T_ACK (-2)		/**< for now */
 #endif
 
 static struct _t_user *_t_fds[OPEN_MAX] = { NULL, };
@@ -522,7 +522,7 @@ __xnet_u_reset_event(struct _t_user *user)
 		user->moreedu = 0;
 		user->moremsg = 0;
 	} else {
-		/* 
+		/**
 		   When we are clearing an expedited data event, we must revert to an outstanding
 		   data event. */
 		user->prim = 0;

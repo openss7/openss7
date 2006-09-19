@@ -65,18 +65,8 @@ __BEGIN_DECLS
 #endif
 
 /**
- * @defgroup libxti OpenSS7 XTI Library
- * @brief OpenSS7 XNS/XTI Library Calls
- *
- * This manpage contains documentation of OpenSS7 XTI Library functions that
- * are generated automatically from the source code with doxygen.  This
- * documentation is intended to be used for maintainers of the OpenSS7 XTI
- * Library and is not intended for users of the OpenSS7 XTI Library.  Users
- * should consult the documentation found in xti(3).
- *
- * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.4 $)
- * @date \$Date: 2006/09/18 13:52:45 $
+ * @ingroup libxnet
+ * @{
  */
 
 #define _SC_T_IOV_MAX		0
@@ -105,6 +95,8 @@ extern int _t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags
 extern int _t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flags);
 extern int _t_rcvconnect(int fd, struct t_call *call, struct t_info *info);
 extern int _t_getinfo(int fd, struct t_info *info);
+
+/** @} */
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

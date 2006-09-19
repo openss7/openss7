@@ -77,6 +77,7 @@ static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.
 #define __unlikely __attribute__((section(".text.unlikely")))
 
 /**
+ * @addtogroup strcalls
  * @fn int isastream(int fd)
  * @brief test a stream.
  * @param fd a file descriptor to test.

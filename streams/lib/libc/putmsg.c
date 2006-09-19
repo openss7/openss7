@@ -72,6 +72,7 @@ int __streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, in
 int __old_streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
 
 /**
+ * @addtogroup strcalls
  * @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
  * @brief put a message to a stream band.
  * @param fd a file descriptor representing the stream.

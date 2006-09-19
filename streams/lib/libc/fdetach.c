@@ -106,6 +106,7 @@ __streams_fdetach(const char *path)
 }
 
 /**
+ * @addtogroup strcalls
  * @fn int fdetach(const char *path)
  * @brief detach a path from a stream.
  * @param path the path in the filesystem from which to detach.

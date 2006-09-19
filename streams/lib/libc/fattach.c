@@ -73,6 +73,7 @@ static char const ident[] =
 #define __unlikely __attribute__((section(".text.unlikely")))
 
 /**
+ * @addtogroup strcalls
  * @fn int fattach(int fd, const char *path)
  * @brief attach a stream to a path in a filesystem.
  * @param fd the file descriptor of the stream to attach.

@@ -95,6 +95,7 @@ __getpmsg_error(int fd)
 }
 
 /**
+ * @addtogroup strcalls
  * @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
  * @brief get a message from a stream band.
  * @param fd a file descriptor representing the stream.
@@ -141,6 +142,7 @@ __old_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, 
 }
 
 /**
+ * @addtogroup strcalls
  * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
  * @brief get a message from a STREAM.
  * @param fd a file descriptor for the stream.

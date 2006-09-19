@@ -58,44 +58,50 @@
 
 #include <sys/tpi.h>		/* common definitions */
 
+/**
+ * @ingroup libxnet
+ * @{
+ */
+
 /* 
  * The following are the events returned from t_look().
  */
-#define T_LISTEN	0x0001	/* connection indication received */
-#define T_CONNECT	0x0002	/* connection confirmation received */
-#define T_DATA		0x0004	/* normal data received */
-#define T_EXDATA	0x0008	/* expedited data received */
-#define T_DISCONNECT	0x0010	/* disconnection received */
-#define T_ERROR		0x0020	/* fatal error */
-#define T_UDERR		0x0040	/* datagram error indication */
-#define T_ORDREL	0x0080	/* orderly release indication */
+#define T_LISTEN	0x0001	/**< connection indication received */
+#define T_CONNECT	0x0002	/**< connection confirmation received */
+#define T_DATA		0x0004	/**< normal data received */
+#define T_EXDATA	0x0008	/**< expedited data received */
+#define T_DISCONNECT	0x0010	/**< disconnection received */
+#define T_ERROR		0x0020	/**< fatal error */
+#define T_UDERR		0x0040	/**< datagram error indication */
+#define T_ORDREL	0x0080	/**< orderly release indication */
 /*
  * The following are added.
  */
-#define T_GODATA	0x0100	/* */
-#define T_GOEXDATA	0x0200	/* */
-#define T_EVENTS	0x00ff	/* event mask */
+#define T_GODATA	0x0100	/**< */
+#define T_GOEXDATA	0x0200	/**< */
+#define T_EVENTS	0x00ff	/**< event mask */
 
-/* 
+/**
  *  @struct t_info
- *  Protocol-specific service limits.  Provides information on protocol
+ *  @brief Protocol-specific service limits.  Provides information on protocol
  *  service limits for the transport endpoint.
  */
 struct t_info {
-	t_scalar_t addr;		/* max size of the transport protocol address */
-	t_scalar_t options;		/* max number of bytes of protocol-specific options */
-	t_scalar_t tsdu;		/* max size of a transport service data unit. */
-	t_scalar_t etsdu;		/* max size of expedited transport service data unit. */
-	t_scalar_t connect;		/* max amount of data allowed on connection establishment
+	t_scalar_t addr;		/**< max size of the transport protocol address */
+	t_scalar_t options;		/**< max number of bytes of protocol-specific options */
+	t_scalar_t tsdu;		/**< max size of a transport service data unit. */
+	t_scalar_t etsdu;		/**< max size of expedited transport service data unit. */
+	t_scalar_t connect;		/**< max amount of data allowed on connection establishment
 					   functions. */
-	t_scalar_t discon;		/* max data allowed on t_snddis(), t_rcvdis(),
+	t_scalar_t discon;		/**< max data allowed on t_snddis(), t_rcvdis(),
 					   t_sndreldata() and t_rcvreldata() functions. */
-	t_scalar_t servtype;		/* Service type supported by transport provider. */
-	t_scalar_t flags;		/* service flags */
+	t_scalar_t servtype;		/**< Service type supported by transport provider. */
+	t_scalar_t flags;		/**< service flags */
 };
 
-/* 
- * netbuf structure.
+/**
+ * @struct netbuf
+ * @brief netbuf structure.
  */
 struct netbuf {
 	unsigned int maxlen;
@@ -103,16 +109,17 @@ struct netbuf {
 	char *buf;
 };
 
-/* 
- *  Format of the address and options arguments of bind.
+/**
+ * @struct t_bind
+ * @brief Format of the address and options arguments of bind.
  */
 struct t_bind {
 	struct netbuf addr;
 	unsigned int qlen;
 };
 
-/* 
- * Options management structure.
+/**
+ * @brief Options management structure.
  */
 struct t_optmgmt {
 	struct netbuf opt;
@@ -123,44 +130,44 @@ struct t_optmgmt {
 #endif					/* __SVID */
 };
 
-/* 
- * Disconnection structure.
+/**
+ * @brief Disconnection structure.
  */
 struct t_discon {
-	struct netbuf udata;		/* user data */
-	int reason;			/* reason code */
-	int sequence;			/* sequence number */
+	struct netbuf udata;		/**< user data */
+	int reason;			/**< reason code */
+	int sequence;			/**< sequence number */
 };
 
-/* 
- * Call structure.
+/**
+ * @brief Call structure.
  */
 struct t_call {
-	struct netbuf addr;		/* address */
-	struct netbuf opt;		/* options */
-	struct netbuf udata;		/* user data */
-	int sequence;			/* sequence number */
+	struct netbuf addr;		/**< address */
+	struct netbuf opt;		/**< options */
+	struct netbuf udata;		/**< user data */
+	int sequence;			/**< sequence number */
 };
 
-/* 
- * Datagram structure.
+/**
+ * @brief Datagram structure.
  */
 struct t_unitdata {
-	struct netbuf addr;		/* address */
-	struct netbuf opt;		/* options */
-	struct netbuf udata;		/* user data */
+	struct netbuf addr;		/**< address */
+	struct netbuf opt;		/**< options */
+	struct netbuf udata;		/**< user data */
 };
 
-/* 
- * Unitdata error structure.
+/**
+ * @brief Unitdata error structure.
  */
 struct t_uderr {
-	struct netbuf addr;		/* address */
-	struct netbuf opt;		/* options */
+	struct netbuf addr;		/**< address */
+	struct netbuf opt;		/**< options */
 #if __SVID
-	long error;			/* error code */
+	long error;			/**< error code */
 #else					/* __SVID */
-	t_scalar_t error;		/* error code */
+	t_scalar_t error;		/**< error code */
 #endif					/* __SVID */
 };
 
@@ -168,42 +175,42 @@ struct t_uderr {
  * The following are structure types used when dynamically allocating the
  * above structures via t_alloc().
  */
-#define T_BIND		1	/* allocate t_bind structure */
-#define T_OPTMGMT	2	/* allocate t_optmgmt structure */
-#define T_CALL		3	/* allocate t_call structure */
-#define T_DIS		4	/* allocate t_discon structure */
-#define T_UNITDATA	5	/* allocate t_unitdata structure */
-#define T_UDERROR	6	/* allocate t_uderr structure */
-#define T_INFO		7	/* allocate t_info structure */
+#define T_BIND		1	/**< allocate t_bind structure */
+#define T_OPTMGMT	2	/**< allocate t_optmgmt structure */
+#define T_CALL		3	/**< allocate t_call structure */
+#define T_DIS		4	/**< allocate t_discon structure */
+#define T_UNITDATA	5	/**< allocate t_unitdata structure */
+#define T_UDERROR	6	/**< allocate t_uderr structure */
+#define T_INFO		7	/**< allocate t_info structure */
 
 /* 
  * The following bits specify which fields of the above structures should be
  * allocated by t_alloc().
  */
-#define T_ADDR		0x01	/* address */
-#define T_OPT		0x02	/* options */
-#define T_UDATA		0x04	/* user data */
+#define T_ADDR		0x01	/**< address */
+#define T_OPT		0x02	/**< options */
+#define T_UDATA		0x04	/**< user data */
 #if 0
-#define T_ALL		0x07	/* all the above fields */
+#define T_ALL		0x07	/**< all the above fields */
 #else
-#define T_ALL		0xffff	/* all the above fields */
+#define T_ALL		0xffff	/**< all the above fields */
 #endif
 
 /* 
  * The following are the states for the user.
  */
-#define T_UNINIT	0	/* unitialized state */
-#define T_UNBND		1	/* unbound */
-#define T_IDLE		2	/* idle */
-#define T_OUTCON	3	/* outgoing connection pending */
-#define T_INCON		4	/* incoming connection pending */
-#define T_DATAXFER	5	/* data transfer */
-#define T_OUTREL	6	/* outgoing release pending */
-#define T_INREL		7	/* incoming release pending */
+#define T_UNINIT	0	/**< unitialized state */
+#define T_UNBND		1	/**< unbound */
+#define T_IDLE		2	/**< idle */
+#define T_OUTCON	3	/**< outgoing connection pending */
+#define T_INCON		4	/**< incoming connection pending */
+#define T_DATAXFER	5	/**< data transfer */
+#define T_OUTREL	6	/**< outgoing release pending */
+#define T_INREL		7	/**< incoming release pending */
 #if 0
-#define T_BADSTATE	8	/* illegal state */
+#define T_BADSTATE	8	/**< illegal state */
 #endif
-#define T_FAKE		8	/* illegal state */
+#define T_FAKE		8	/**< illegal state */
 #define T_NOSTATES	9
 
 /*
@@ -341,5 +348,7 @@ extern char *t_errstr[];
 extern int t_nerr;
 
 #endif				/* __KERNEL__ */
+
+/** @} */
 
 #endif				/* _SYS_TIUSER_H */

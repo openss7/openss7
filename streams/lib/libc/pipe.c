@@ -134,6 +134,7 @@ __streams_pipe(int *fds)
 }
 
 /**
+ * @addtogroup strcalls
  * @fn int pipe(int fds[2])
  * @brief open a streams based pipe.
  * @param fds a pointer to the two file descriptors, one for each end of the pipe.

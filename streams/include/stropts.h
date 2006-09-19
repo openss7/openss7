@@ -60,7 +60,15 @@
 
 /**
  * @file
- * @brief Primary user header file for STREAMS character device special files.
+ * @brief Defines the interface to STREAMS(9) character device special files.
+ * @{
+ */
+
+/**
+ * @name STREAMS System Calls
+ * System calls for STREAMS character device special files.
+ * @addtogroup strcalls STREAMS System Calls
+ * @{
  */
 
 #ifdef __BEGIN_DECLS
@@ -131,5 +139,8 @@ extern int pipe(int fds[2]);
 __END_DECLS
 /* *INDENT-ON* */
 #endif
+
+/** @} */
+/** @} */
 
 #endif				/* _STROPTS_H */
