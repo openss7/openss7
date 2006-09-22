@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9.2.3 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.4 2006/09/22 20:59:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIRDWR_H
 #define _SYS_TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:45 $"
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/22 20:59:27 $"
 
 /* This file can be processed with doxygen(1). */
+
+/** @ingroup tirdwr
+  * @{
+  * @file
+  * Transport Interface Read/Write (tirdwr) Header File.
+  *
+  * This file contains no definitions.  Nevertheless, this header file should
+  * exist to indicate the existence of support for the tirdwr(4) module.
+  * */
 
 #if !defined _TIRDWR_H && !defined __KERNEL__
 #error ****
@@ -64,7 +73,15 @@
 #error ****
 #endif				/* !defined _TIRDWR_H && !defined __KERNEL__ */
 
-/* No definitions.  Nevertheless, this header file should exist to indicate the existence of
-   support for the tirdwr(4) module. */
+/*
+ * Header file for tirdwr module.
+ *
+ * This file contains no definitions.  Nevertheless, this header file should
+ * exist to indicate the existence of support for the tirdwr(4) module.
+ */
 
 #endif				/* _SYS_TIRDWR_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

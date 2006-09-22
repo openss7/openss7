@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tli.h,v 0.9.2.3 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: tli.h,v 0.9.2.4 2006/09/22 20:59:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TLI_H
 #define _SYS_TLI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @ingroup xnet
+  * @{
+  * @file
+  * Transport Layer Interface (TLI) header file.
+  *
+  * This file is included by sys/tiuser.h and sys/tihdr.h.
+  * */
 
 #if 0
 #if !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__
@@ -66,7 +74,11 @@
 #endif				/* !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__ */
 #endif
 
-/* This header file is included by <tiuser.h> and <tihdr.h>. */
+/*
+ * TLI Header File.
+ *
+ * This header file is included by <tiuser.h> and <tihdr.h>.
+ */
 
 #if (!defined _XPG4_2 && !defined _XOPEN_SOURCE) || defined __KERNEL__
 struct opthdr {
@@ -79,5 +91,8 @@ struct opthdr {
 #define OPTVAL(opt) ((caddr_t)((struct opthdr *)opt + 1))
 #endif				/* (!defined _XPG4_2 && !defined _XOPEN_SOURCE) || defined
 				   __KERNEL__ */
-
 #endif				/* _SYS_TLI_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

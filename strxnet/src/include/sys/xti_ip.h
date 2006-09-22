@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_ip.h,v 0.9.2.4 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: xti_ip.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,55 +46,79 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_IP_H
 #define _SYS_XTI_IP_H
 
-#ident "@(#) $RCSfile: xti_ip.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_ip.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @ingroup xnet
+  * @{
+  * @file
+  * XTI INET header file.
+  * 
+  * In accordance with OpenGroup Single UNIX Specifications, the symbols in this
+  * file are exposed by including the <xti.h> header file.
+  * */
+
+/*
+ * XTI INET Header File.
+ */
 
 /*
  * IP level
  */
-#define T_INET_IP		0	/* IP level (same as protocol number) */
+#define T_INET_IP		0	/**< IP level (same as protocol number). */
 
-/*
- * IP level Options
- */
-#define T_IP_OPTIONS		1	/* IP per-packet options */
-#define T_IP_TOS		2	/* IP per-packet type of service */
-#define T_IP_TTL		3	/* IP per-packet time to live */
-#define T_IP_REUSEADDR		4	/* allow local address reuse */
-#define T_IP_DONTROUTE		5	/* just use interface addresses */
-#define T_IP_BROADCAST		6	/* permit sending of broadcast msgs */
-#define T_IP_ADDR		7	/* dest/srce address of recv/sent packet */
+/**
+  * @name IP Level Options
+  *
+  * @{ */
+#define T_IP_OPTIONS		1	/**< IP per-packet options. */
+#define T_IP_TOS		2	/**< IP per-packet type of service. */
+#define T_IP_TTL		3	/**< IP per-packet time to live. */
+#define T_IP_REUSEADDR		4	/**< allow local address reuse. */
+#define T_IP_DONTROUTE		5	/**< just use interface addresses. */
+#define T_IP_BROADCAST		6	/**< permit sending of broadcast msgs. */
+#define T_IP_ADDR		7	/**< dest/srce address of recv/sent packet. */
+/** @} */
 
-/*
- *  IP_TOS precedence levels
- */
-#define T_ROUTINE		0
-#define T_PRIORITY		1
-#define T_IMMEDIATE		2
-#define T_FLASH			3
-#define T_OVERRIDEFLASH		4
-#define T_CRITIC_ECP		5
-#define T_INETCONTROL		6
-#define T_NETCONTROL		7
+/**
+  * @name IP_TOS Precedence Levels
+  *
+  * @{ */
+#define T_ROUTINE		0	/**< Routine. */
+#define T_PRIORITY		1	/**< Priority. */
+#define T_IMMEDIATE		2	/**< Immediate. */
+#define T_FLASH			3	/**< Flash. */
+#define T_OVERRIDEFLASH		4	/**< Override Flash. */
+#define T_CRITIC_ECP		5	/**< Critical. */
+#define T_INETCONTROL		6	/**< Internet Control. */
+#define T_NETCONTROL		7	/**< Network Control. */
+/** @} */
 
-/*
- *  IP_TOS type of service
- */
-#define T_NOTOS			0
-#define T_LDELAY		(1<<4)
-#define T_HITHRPT		(1<<3)
-#define T_HIREL			(1<<2)
-#define T_LOCOST		(1<<1)
+/**
+  * @name IP_TOS Type of Service
+  *
+  * @{ */
+#define T_NOTOS			0	/**< No Type of Service. */
+#define T_LDELAY		(1<<4)	/**< Low delay. */
+#define T_HITHRPT		(1<<3)	/**< High throughput. */
+#define T_HIREL			(1<<2)	/**< High reliability. */
+#define T_LOCOST		(1<<1)	/**< Low cost. */
+/** @} */
 
+/** Set TOS value. */
 #define SET_TOS(prec, tos) \
 	(((0x7 & (prec)) << 5) | ((T_NOTOS|T_LDELAY|T_HITHRPT|T_HIREL|T_LOCOST) & (tos)))
 
 #endif				/* _SYS_XTI_IP_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

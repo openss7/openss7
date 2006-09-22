@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_tcp.h,v 0.9.2.4 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: xti_tcp.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,49 +46,63 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_TCP_H
 #define _SYS_XTI_TCP_H
 
-#ident "@(#) $RCSfile: xti_tcp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_tcp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
-/*
- * TCP level
- */
-#define T_INET_TCP		6	/* TCP level (same as protocol number) */
+/** @ingroup xnet
+  * @{
+  * @file
+  * XTI TCP-Specific Header File.
+  *
+  * In accordance with OpenGroup Single UNIX Specifications, the symbols in this
+  * file are exposed by including the <xti.h> header file.
+  * */
 
 /*
- * TCP level Options
+ * XTI TCP-Specific Header File.
  */
-#define T_TCP_NODELAY		1	/* don't coalese packets */
-#define T_TCP_MAXSEG		2	/* get maximum segment size */
-#define T_TCP_KEEPALIVE		3	/* keep connections alive */
-#define T_TCP_CORK		4	/* control sending of partial frames */
-#define T_TCP_KEEPIDLE		5	/* start keepalives after this period */
-#define T_TCP_KEEPINTVL		6	/* invterval between keepalives */
-#define T_TCP_KEEPCNT		7	/* number of keepalives before death */
-#define T_TCP_SYNCNT		8	/* number of SYN retranmits */
-#define T_TCP_LINGER2		9	/* life time of orphaned FIN-WAIT-2 state */
-#define T_TCP_DEFER_ACCEPT	10	/* wake up listener only when data arrives */
-#define T_TCP_WINDOW_CLAMP	11	/* bound advertised window */
-#define T_TCP_INFO		12	/* information about this connection */
-#define T_TCP_QUICKACK		13	/* block/reneable quick acks */
+
+/**
+  * TCP Level.
+  */
+#define T_INET_TCP		6	/**< TCP level (same as protocol number). */
+
+/** @name TCP Level Options
+  * @{ */
+#define T_TCP_NODELAY		1	/**< Don't coalese packets. */
+#define T_TCP_MAXSEG		2	/**< Get maximum segment size. */
+#define T_TCP_KEEPALIVE		3	/**< Keep connections alive. */
+#define T_TCP_CORK		4	/**< Control sending of partial frames. */
+#define T_TCP_KEEPIDLE		5	/**< Start keepalives after this period. */
+#define T_TCP_KEEPINTVL		6	/**< Invterval between keepalives. */
+#define T_TCP_KEEPCNT		7	/**< Number of keepalives before death. */
+#define T_TCP_SYNCNT		8	/**< Number of SYN retranmits. */
+#define T_TCP_LINGER2		9	/**< Life time of orphaned FIN-WAIT-2 state. */
+#define T_TCP_DEFER_ACCEPT	10	/**< Wake up listener only when data arrives. */
+#define T_TCP_WINDOW_CLAMP	11	/**< Bound advertised window. */
+#define T_TCP_INFO		12	/**< Information about this connection. */
+#define T_TCP_QUICKACK		13	/**< Block/reneable quick acks. */
+/** @} */
 
 #define T_TCP_MSS		536
 #define T_TCP_MAXWIN		65525
 #define T_TCP_MAX_WINSHIFT	14
 
-/*
- * Structure used with TCP_KEEPALIVE option.
- */
+/**
+  * TCP_KEEPALIVE structure.
+  * Structure used with TCP_KEEPALIVE option.
+  */
 struct t_kpalive {
-	t_scalar_t kp_onoff;		/* option on/off */
-	t_scalar_t kp_timeout;		/* timeout in minutes */
+	t_scalar_t kp_onoff;		/**< Option on/off. */
+	t_scalar_t kp_timeout;		/**< Timeout in minutes. */
 };
 
 #define T_TCP_CA_Open		0
@@ -102,6 +116,9 @@ struct t_kpalive {
 #define T_TCPI_OPT_WSCALE	4
 #define T_TCPI_OPT_ECN		8
 
+/**
+  * T_TCP_INFO structure.
+  */
 struct t_tcp_info {
 	unsigned char tcpi_state;
 	unsigned char tcpi_ca_state;
@@ -136,3 +153,7 @@ struct t_tcp_info {
 };
 
 #endif				/* _SYS_XTI_TCP_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

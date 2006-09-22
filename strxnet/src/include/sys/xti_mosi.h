@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mosi.h,v 0.9.2.4 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: xti_mosi.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,23 +46,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_MOSI_H
 #define _SYS_XTI_MOSI_H
 
-#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $ ($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $ ($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation"
 
 /* This file can be processed with doxygen(1). */
 
-#define T_AP_MAX_ADDR	128
+/** @ingroup xnet
+  * @{
+  * @file
+  * XTI Minimal OSI header file.
+  * */
 
 /*
-   mosi address structure 
+ * Minimal OSI Header File.
  */
 
+#define T_AP_MAX_ADDR	128
+
+/**
+  * MOSI address structure.
+  */
 struct t_mosiaddr {
 	t_uscalar_t flags;
 	t_scalar_t osi_ap_inv_id;
@@ -80,54 +89,60 @@ struct t_mosiaddr {
 
 #define T_OPT_VALEN(opt) (opt->len - sizeof(struct t_opthder)).
 
-/*
-   presentation context definition and result list option 
- */
-
+/**
+  * Presentation Context structure.
+  * Presentation context definition and result list option.
+  */
 struct t_ap_pco_el {
 	t_scalar_t count;
 	t_scalar_t offset;
 };
 
-/*
-   presentation context item header 
- */
-
+/**
+  * Presentation Context item header.
+  */
 struct t_ap_pc_item {
-	t_scalar_t pci;			/* unique odd integer */
-	t_scalar_t res;			/* result of negotiation */
+	t_scalar_t pci;			/**< Unique odd integer. */
+	t_scalar_t res;			/**< Result of negotiation. */
 };
 
-/*
-   presentation context item element 
- */
-
+/**
+  * Presentation Context item element.
+  */
 struct t_app_syn_off {
-	t_scalar_t size;		/* length of syntax object identifier contents */
-	t_scalar_t offset;		/* offset of object identifier for the syntax */
+	t_scalar_t size;		/**< Length of syntax object identifier contents. */
+	t_scalar_t offset;		/**< Offset of object identifier for the syntax. */
 };
 
-/*
-   values for res of a presentation context item 
- */
+/**
+  * @name Presentation Context Results
+  * Values for res of a presentation context item.
+  *
+  * @{ */
+#define T_PCL_ACCEPT		    0x0000	/**< Pres context accepted. */
+#define T_PCL_USER_REJ		    0x0100	/**< Pres context rejected by perr application. */
+#define T_PCL_PREJ_RSN_NSPEC	    0x0200	/**< Prov reject: no reason specified. */
+#define T_PCL_PREJ_A_SYTX_NSUP	    0x0201	/**< Prov reject: abstract syntax not supported. */
+#define T_PCL_PREJ_T_SYTX_NSUP	    0x0202	/**< Prov reject: transfer syntax not supported. */
+#define T_PCL_PREJ_LMT_DCS_EXCEED   0x0203	/**< Prov reject: local limit on DCS exceeded. */
+/** @} */
 
-#define T_PCL_ACCEPT		    0x0000	/* pres. context accepted */
-#define T_PCL_USER_REJ		    0x0100	/* pres. context rejected by perr application */
-#define T_PCL_PREJ_RSN_NSPEC	    0x0200	/* prov. reject: no reason specified */
-#define T_PCL_PREJ_A_SYTX_NSUP	    0x0201	/* prov. reject: abstract syntax not supported */
-#define T_PCL_PREJ_T_SYTX_NSUP	    0x0202	/* prov. reject: transfer syntax not supported */
-#define T_PCL_PREJ_LMT_DCS_EXCEED   0x0203	/* prov. reject: local limit on DCS exceeded */
-
-/*
-   reason codes for disconnection 
- */
-
-#define T_AC_U_AARE_NONE	    0x0001	/* con rej by peer user: no reason given */
-#define T_AC_C_U_AARE_ACN	    0x0002	/* con rej: application context name not supported */
-#define T_AC_U_AARE_APT		    0x0003	/* con rej: AP title not recognized */
-#define T_AC_U_AARE_AEQ		    0x0005	/* con rej: AE qualifier not recognized */
-#define T_AC_U_AARE_PEER_AUTH	    0x000e	/* con rej: authentication required */
-#define T_AC_P_ABRT_NSPEC	    0x0011	/* aborted by peer: not reason given */
-#define T_AC_P_AARE_VERSION	    0x0012	/* con rej: no common version */
+/**
+  * @name Disconnect Reasons
+  * Reason codes for disconnection.
+  *
+  * @{ */
+#define T_AC_U_AARE_NONE	    0x0001	/**< Con rej by peer user: no reason given. */
+#define T_AC_C_U_AARE_ACN	    0x0002	/**< Con rej: application context name not supported. */
+#define T_AC_U_AARE_APT		    0x0003	/**< Con rej: AP title not recognized. */
+#define T_AC_U_AARE_AEQ		    0x0005	/**< Con rej: AE qualifier not recognized. */
+#define T_AC_U_AARE_PEER_AUTH	    0x000e	/**< Con rej: authentication required. */
+#define T_AC_P_ABRT_NSPEC	    0x0011	/**< Aborted by peer: not reason given. */
+#define T_AC_P_AARE_VERSION	    0x0012	/**< Con rej: no common version. */
+/** @} */
 
 #endif				/* _SYS_XTI_MOSI_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

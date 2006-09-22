@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_local.h,v 0.9.2.4 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: xti_local.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_LOCAL_H
 #define _SYS_XTI_LOCAL_H
 
-#ident "@(#) $RCSfile: xti_local.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_local.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @ingroup xnet
+  * @{
+  * @file
+  * XTI Local header file.
+  *
+  * This is private header file that contains definitions internal to the
+  * OpenSS7 XTI/TLI Library implementation.
+  * */
 
 #include <config.h>
 
@@ -64,30 +73,44 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-/**
- * @ingroup libxnet
- * @{
+/*
+ * XTI Local Header File.
  */
 
-#define _SC_T_IOV_MAX		0
-#define _SC_T_DEFAULT_ADDRLEN	1
-#define _SC_T_DEFAULT_CONNLEN	2
-#define _SC_T_DEFAULT_DISCLEN	3
-#define _SC_T_DEFAULT_OPTLEN	4
-#define _SC_T_DEFAULT_DATALEN	5
+/**
+  * @name System Configuration Names
+  * Definitions for t_sysconf().
+  * @{ */
+#if 0
+#define _SC_T_IOV_MAX		0	/**< IOV maximum. */
+#endif
+#define _SC_T_DEFAULT_ADDRLEN	1	/**< Default address length. */
+#define _SC_T_DEFAULT_CONNLEN	2	/**< Default connect data length. */
+#define _SC_T_DEFAULT_DISCLEN	3	/**< Default disconnect data length. */
+#define _SC_T_DEFAULT_OPTLEN	4	/**< Default options length. */
+#define _SC_T_DEFAULT_DATALEN	5	/**< Default data length. */
+/** @} */
 
-#define _T_DEFAULT_ADDRLEN	128
-#define _T_DEFAULT_CONNLEN	256
-#define _T_DEFAULT_DISCLEN	256
-#define _T_DEFAULT_OPTLEN	256
-#define _T_DEFAULT_DATALEN	1024
-#define _T_TIMEOUT		-1
-#define _T_IOV_MAX		16
+/**
+  * @name System Configuration Default Values
+  * Definitions for t_sysconf().
+  * @{ */
+#define _T_DEFAULT_ADDRLEN	128	/**< Default address length. */
+#define _T_DEFAULT_CONNLEN	256	/**< Default connect data length. */
+#define _T_DEFAULT_DISCLEN	256	/**< Default disconnect data length. */
+#define _T_DEFAULT_OPTLEN	256	/**< Default optoins length. */
+#define _T_DEFAULT_DATALEN	1024	/**< Default data length. */
+#define _T_TIMEOUT		-1	/**< Default timeout. */
+#define _T_IOV_MAX		16	/**< IOV maximum. */
+/** @} */
 
 #ifdef XNET_THREAD_SAFE
 extern pthread_mutex_t _t_fds_mutex;
 #endif
 
+/**
+  * @name Internal Functions
+  * @{ */
 extern int *_t_errno(void);
 extern int _t_ioctl(int fd, int cmd, void *arg);
 extern int _t_strioctl(int fd, int cmd, void *arg, size_t arglen);
@@ -95,7 +118,6 @@ extern int _t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags
 extern int _t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flags);
 extern int _t_rcvconnect(int fd, struct t_call *call, struct t_info *info);
 extern int _t_getinfo(int fd, struct t_info *info);
-
 /** @} */
 
 #ifdef __END_DECLS
@@ -105,3 +127,7 @@ __END_DECLS
 #endif
 
 #endif				/* _SYS_XTI_LOCAL_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

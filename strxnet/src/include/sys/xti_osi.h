@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_osi.h,v 0.9.2.4 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: xti_osi.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,119 +46,148 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_OSI_H
 #define _SYS_XTI_OSI_H
 
-#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
-/*
-   SPECIFIC ISO OPTION AND MANAGEMENT PARAMETERS 
- */
+/** @ingroup xnet
+  * @{
+  * @file
+  * XTI ISO-Specific header file.
+  *
+  * This file contains specific ISO option and management parameters.
+  * */
 
 /*
- * Definition of the ISO transport classes
+ * XTI ISO-Specific Header File.
+ *
+ * This file contains specific ISO option and management parameters.
  */
 
+/**
+  * @name ISO Transport Classes
+  * Definition of the ISO transport classes.
+  *
+  * @{ */
 #define T_CLASS0	0
 #define T_CLASS1	1
 #define T_CLASS2	2
 #define T_CLASS3	3
 #define T_CLASS4	4
+/** @} */
 
-/*
- * Definition of the priorities.
- */
-
+/**
+  * @name Priorities
+  * Definition of the priorities.
+  *
+  * @{ */
 #define T_PRITOP	0
 #define T_PRIHIGH	1
 #define T_PRIMID	2
 #define T_PRILOW	3
 #define T_PRIDFLT	4
+/** @} */
 
-/*
- * Definitions of the protection levels
- */
+/**
+  * @name Protection Levels
+  * Definitions of the protection levels.
+  *
+  * @{ */
 #define T_NOPROTECT		1
 #define T_PASSIVEPROTECT	2
 #define T_ACTIVEPROTECT		4
+/** @} */
 
-/*
- * rate structure.
- */
+/**
+  * Rate structure.
+  */
 struct rate {
-	t_scalar_t targetvalue;		/* target value */
-	t_scalar_t minacceptvalue;	/* value of minimum acceptable quality */
+	t_scalar_t targetvalue;		/**< Target value. */
+	t_scalar_t minacceptvalue;	/**< Value of minimum acceptable quality. */
 };
 
-/*
- * reqvalue structure.
- */
+/**
+  * Request value structure.
+  */
 struct reqvalue {
-	struct rate called;		/* called rate */
-	struct rate calling;		/* calling rate */
+	struct rate called;		/**< Called rate. */
+	struct rate calling;		/**< Calling rate. */
 };
 
-/*
- * thrpt structure.
- */
+/**
+  * Throughput structure.
+  */
 struct thrpt {
-	struct reqvalue maxthrpt;	/* maximum throughput */
-	struct reqvalue avgthrpt;	/* average throughput */
+	struct reqvalue maxthrpt;	/**< Maximum throughput. */
+	struct reqvalue avgthrpt;	/**< Average throughput. */
 };
 
-/*
- * transdel structure
- */
+/**
+  * Transit delay structure.
+  */
 struct transdel {
-	struct reqvalue maxdel;		/* maximum transit delay */
-	struct reqvalue avgdel;		/* average transit delay */
+	struct reqvalue maxdel;		/**< Maximum transit delay. */
+	struct reqvalue avgdel;		/**< Average transit delay. */
 };
 
+/**
+  * ISO Transport Option Level.
+  */
 #define T_ISO_TP	0x0100
 
-/*
- *  Options for Quality of Service and Expedited Data (ISO 8072:1994)
- */
-#define T_TCO_THROUGHPUT	0x0001 /* struct thrpt, octets per second */
-#define T_TCO_TRANSDEL		0x0002 /* struct transdel, milliseconds */
-#define T_TCO_RESERRORRATE	0x0003 /* struct rate, -log10(ratio) */
-#define T_TCO_TRANSFFAILPROB	0x0004 /* struct rate, -log10(ratio) */
-#define T_TCO_ESTFAILPROB	0x0005 /* struct rate, -log10(ratio) */
-#define T_TCO_RELFAILPROB	0x0006 /* struct rate, -log10(ratio) */
-#define T_TCO_ESTDELAY		0x0007 /* struct rate, milliseconds */
-#define T_TCO_RELDELAY		0x0008 /* struct rate, milliseconds */
-#define T_TCO_CONNRESIL		0x0009 /* struct rate, -log10(ratio) */
-#define T_TCO_PROTECTION	0x000a /* t_uscalar_t, values above */
-#define T_TCO_PRIORITY		0x000b /* t_uscalar_t, values above */
-#define T_TCO_EXPD		0x000c /* t_uscalar_t T_YES/T_NO */
+/**
+  * @name QOS Options
+  * Options for Quality of Service and Expedited Data (ISO 8072:1994).
+  *
+  * @{ */
+#define T_TCO_THROUGHPUT	0x0001	/**< struct thrpt, octets per second. */
+#define T_TCO_TRANSDEL		0x0002	/**< struct transdel, milliseconds. */
+#define T_TCO_RESERRORRATE	0x0003	/**< struct rate, -log10(ratio). */
+#define T_TCO_TRANSFFAILPROB	0x0004	/**< struct rate, -log10(ratio). */
+#define T_TCO_ESTFAILPROB	0x0005	/**< struct rate, -log10(ratio). */
+#define T_TCO_RELFAILPROB	0x0006	/**< struct rate, -log10(ratio). */
+#define T_TCO_ESTDELAY		0x0007	/**< struct rate, milliseconds. */
+#define T_TCO_RELDELAY		0x0008	/**< struct rate, milliseconds. */
+#define T_TCO_CONNRESIL		0x0009	/**< struct rate, -log10(ratio). */
+#define T_TCO_PROTECTION	0x000a	/**< t_uscalar_t, values above. */
+#define T_TCO_PRIORITY		0x000b	/**< t_uscalar_t, values above. */
+#define T_TCO_EXPD		0x000c	/**< t_uscalar_t T_YES/T_NO. */
+/** @} */
 
-/*
- *  Management Options
- */
-#define T_TCO_LTPDU		0x0100 /* t_uscalar_t, octets */
-#define T_TCO_ACKTIME		0x0200 /* t_uscalar_t, milliseconds */
-#define T_TCO_REASTIME		0x0300 /* t_uscalar_t, seconds */
-#define T_TCO_PREFCLASS		0x0900 /* t_uscalar_t, see above */
-#define T_TCO_ALTCLASS1		0x0a00 /* t_uscalar_t, see above */
-#define T_TCO_ALTCLASS2		0x0b00 /* t_uscalar_t, see above */
-#define T_TCO_ALTCLASS3		0x0c00 /* t_uscalar_t, see above */
-#define T_TCO_ALTCLASS4		0x0d00 /* t_uscalar_t, see above */
-#define T_TCO_EXTFORM		0x0400 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
-#define T_TCO_FLOWCTRL		0x0500 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
-#define T_TCO_CHECKSUM		0x0600 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
-#define T_TCO_NETEXP		0x0700 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
-#define T_TCO_NETRECPTCF	0x0800 /* t_uscalar_t, T_YES/T_NO/T_UNSPEC */
+/**
+  * @name Management Options
+  *
+  * @{ */
+#define T_TCO_LTPDU		0x0100	/**< t_uscalar_t, octets. */
+#define T_TCO_ACKTIME		0x0200	/**< t_uscalar_t, milliseconds. */
+#define T_TCO_REASTIME		0x0300	/**< t_uscalar_t, seconds. */
+#define T_TCO_PREFCLASS		0x0900	/**< t_uscalar_t, see above. */
+#define T_TCO_ALTCLASS1		0x0a00	/**< t_uscalar_t, see above. */
+#define T_TCO_ALTCLASS2		0x0b00	/**< t_uscalar_t, see above. */
+#define T_TCO_ALTCLASS3		0x0c00	/**< t_uscalar_t, see above. */
+#define T_TCO_ALTCLASS4		0x0d00	/**< t_uscalar_t, see above. */
+#define T_TCO_EXTFORM		0x0400	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_FLOWCTRL		0x0500	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_CHECKSUM		0x0600	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_NETEXP		0x0700	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_NETRECPTCF	0x0800	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
 
 #define T_TCL_TRANSDEL		0x000d
 #define T_TCL_RESERRORRATE	T_TCO_RESERRORRATE
 #define T_TCL_PROTECTION	T_TCO_PROTECTION
 #define T_TCL_PRIORITY		T_TCO_PRIORITY
 #define T_TCL_CHECKSUM		T_TCO_CHECKSUM
+/** @} */
 
 #endif				/* _SYS_XTI_OSI_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

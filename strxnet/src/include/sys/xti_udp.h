@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_udp.h,v 0.9.2.4 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: xti_udp.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,25 +46,43 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_UDP_H
 #define _SYS_XTI_UDP_H
 
-#ident "@(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
-/* 
- * UDP level
- */
-#define T_INET_UDP		17	/* UDP level (same as protocol number) */
+/** @ingroup xnet
+  * @{
+  * @file
+  * XTI UDP-Specific header file.
+  *
+  * In accordance with OpenGroup Single UNIX Specifications, the symbols in this
+  * file are exposed by including the <xti.h> header file.
+  * */
 
-/* 
- * UDP level Options
+/*
+ *  XTI UDP-Specific Header File
  */
-#define T_UDP_CHECKSUM		1	/* checksum computation (???) */
+
+/**
+  * UDP Level.
+  */
+#define T_INET_UDP		17	/**< UDP level (same as protocol number). */
+
+/**
+  * @name UDP Level Options
+  * @{ */
+#define T_UDP_CHECKSUM		1	/**< Checksum computation. */
+/** @} */
 
 #endif				/* _SYS_XTI_UDP_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
