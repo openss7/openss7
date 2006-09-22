@@ -1,3 +1,74 @@
+2006-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* strxnet.dox.in: added main page documentation
+	* doc/.cvsignore: skip doxygen created directories
+	* doc/man/strxnet.refs: added TI-RPC refs
+
+	- Mosty added references to the following:
+
+	* doc/man/man3/endnetconfig.3.man: referenced RFC 1833, updates
+	* doc/man/man3/endnetpath.3.man: referenced RFC 1833, updates
+	* doc/man/man3/freenetconfigent.3.man: referenced RFC 1833, updates
+	* doc/man/man3/getnetconfig.3.man: referenced RFC 1833, updates
+	* doc/man/man3/getnetconfigent.3.man: referenced RFC 1833, updates
+	* doc/man/man3/getnetpath.3.man: referenced RFC 1833, updates
+	* doc/man/man3/inetaddr.3.man: referenced RFC 1833, updates
+	* doc/man/man3/nc_perror.3.man: referenced RFC 1833, updates
+	* doc/man/man3/nc_sperror.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netconfig.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netdir.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netdir_free.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netdir_getbyaddr.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netdir_getbyname.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netdir_options.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netdir_perror.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netdir_sperror.3.man: referenced RFC 1833, updates
+	* doc/man/man3/netpath.3.man: referenced RFC 1833, updates
+	* doc/man/man3/setnetconfig.3.man: referenced RFC 1833, updates
+	* doc/man/man3/setnetpath.3.man: referenced RFC 1833, updates
+	* doc/man/man3/taddr2uaddr.3.man: referenced RFC 1833, updates
+	* doc/man/man3/xnsl.3.man: referenced RFC 1833, updates
+	* doc/man/man5/netconfig.5.man: referenced RFC 1833, updates
+	* doc/man/man5/netdir.5.man: referenced RFC 1833, updates
+
+	- Prepared the following for use with doxygen (unfortunately this
+	  required touching almost ever line in each header file):
+
+	* src/include/netconfig.h: prepared for use with doxygen
+	* src/include/netdir.h: prepared for use with doxygen
+	* src/include/sys/netconfig.h: prepared for use with doxygen
+	* src/include/sys/sockmod.h: prepared for use with doxygen
+	* src/include/sys/ticlts.h: prepared for use with doxygen
+	* src/include/sys/ticots.h: prepared for use with doxygen
+	* src/include/sys/ticotsord.h: prepared for use with doxygen
+	* src/include/sys/tihdr.h: prepared for use with doxygen
+	* src/include/sys/timod.h: prepared for use with doxygen
+	* src/include/sys/tirdwr.h: prepared for use with doxygen
+	* src/include/sys/tiuser.h: prepared for use with doxygen
+	* src/include/sys/tli.h: prepared for use with doxygen
+	* src/include/sys/tpi.h: prepared for use with doxygen
+	* src/include/sys/xti.h: prepared for use with doxygen
+	* src/include/sys/xti_atm.h: prepared for use with doxygen
+	* src/include/sys/xti_inet.h: prepared for use with doxygen
+	* src/include/sys/xti_ip.h: prepared for use with doxygen
+	* src/include/sys/xti_local.h: prepared for use with doxygen
+	* src/include/sys/xti_mosi.h: prepared for use with doxygen
+	* src/include/sys/xti_osi.h: prepared for use with doxygen
+	* src/include/sys/xti_sctp.h: prepared for use with doxygen
+	* src/include/sys/xti_tcp.h: prepared for use with doxygen
+	* src/include/sys/xti_udp.h: prepared for use with doxygen
+	* src/include/sys/xti_xti.h: prepared for use with doxygen
+
+	- Fortunately the following source files were already mostly
+	  prepared:
+
+	* src/lib/netdir.c: prepared for use with doxygen
+	* src/lib/netdir_inet.c: prepared for use with doxygen
+	* src/lib/netselect.c: prepared for use with doxygen
+	* src/lib/pthread.c: prepared for use with doxygen
+	* src/lib/xnet.c: prepared for use with doxygen
+	* src/lib/xnsl.c: prepared for use with doxygen
+
 2006-09-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added doxy rules

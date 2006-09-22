@@ -1,3 +1,9 @@
+2006-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS/libc/fdetach.c: prepared source files for use with doxygen
+	* .cvsignore: ignore doxygen generated paths
+	* LiS.dox.in: added main page documentation
+
 2006-09-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added doxy rules

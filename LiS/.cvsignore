@@ -24,3 +24,5 @@ INSTALL.*
 *.pr
 *.patch
 *.patch.gz
+html
+latex

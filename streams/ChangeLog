@@ -1,3 +1,29 @@
+2006-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/stropts.h: prepared header file for doxygen
+	* include/sys/stropts.h: prepared header file for doxygen
+	* include/sys/streams/log.h: prepared header file for doxygen
+	* include/sys/streams/loop.h: prepared header file for doxygen
+	* include/sys/streams/sad.h: prepared header file for doxygen
+	* include/sys/streams/sc.h: prepared header file for doxygen
+	* include/sys/streams/stropts.h: prepared header file for doxygen
+	* include/sys/streams/testmod.h: prepared header file for doxygen
+
+	* lib/libc/fattach.c: prepared source file for doxygen
+	* lib/libc/fdetach.c: prepared source file for doxygen
+	* lib/libc/getmsg.c: prepared source file for doxygen
+	* lib/libc/getpmsg.c: prepared source file for doxygen
+	* lib/libc/isastream.c: prepared source file for doxygen
+	* lib/libc/pipe.c: prepared source file for doxygen
+	* lib/libc/putmsg.c: prepared source file for doxygen
+	* lib/libc/putpmsg.c: prepared source file for doxygen
+	* lib/libc/testcancel.c: prepared source file for doxygen
+
+	* src/modules/sth.c: roughed in I_EGETSIG I_ESETSIG code
+
+	* doc/.cvsignore: ignore doxygen generated paths
+	* streams.dox.in: added main page documentation
+
 2006-09-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added doxy rules

@@ -1,3 +1,8 @@
+2006-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/.cvsignore: ignore doxygen generated paths
+	* strsock.dox.in: added main page documentation
+
 2006-09-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added doxy rules

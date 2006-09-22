@@ -2,3 +2,5 @@ Makefile.in
 *.log
 *.err
 *.out
+html
+latex
