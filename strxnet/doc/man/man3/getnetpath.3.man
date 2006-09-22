@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: getnetpath.3.man,v 0.9.2.1 2006/09/17 23:36:57 brian Exp $
+.\" @(#) $Id: getnetpath.3.man,v 0.9.2.2 2006/09/22 20:54:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/17 23:36:57 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/22 20:54:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: getnetpath.3.man,v $
+.\" Revision 0.9.2.2  2006/09/22 20:54:21  brian
+.\" - added TI-RPC references
+.\"
 .\" Revision 0.9.2.1  2006/09/17 23:36:57  brian
 .\" - added manual pages
 .\"
@@ -88,14 +91,14 @@ sort-adjacent-labels
 .\"
 .\"
 .SH SYNOPSIS
-.PP
+.HP
 .B #include <netconfig.h>
 .HP
 .BI "struct netconfig *getnetpath(void *" handle );
 .\"
 .\"
 .SH ARGUMENTS
-.TP
+.TP \w'handle\(em'u
 .I handle
 an opaque pointer returned by
 .BR setnetpath (3)
@@ -121,23 +124,29 @@ Network Configuration database access, see
 .BR netconfig (3).
 .PD 0
 .IP 2.
-Network Directory and address mapping, see
-.BR netdir (3).
-.IP 3.
 Network Path access, see
 .BR netpath (3).
+.IP 3.
+Name-to-Address Translation, see
+.BR netdir (3).
 .PD
 .PP
-These are often refered to as the Network Selection facility of the Network
-Services Library.
+The first two are often refered to as the Network Selection facility of the
+Network Services Library.
 .PP
-.BR setnetpath "(3), " getnetpath "() and " endnetpath (3)
-provide a mechanism to sequentialy access entries in the Network Configuration database that
+The
+.BR netpath (3)
+component (of which
+.BR getnetpath ()
+is a member)
+provides a mechanism to sequentialy access entries in the Network Configuration database that
 correspond to entries in the
 .RB { NETPATH }
 environment variable.  That is, the
 .RB { NETPATH }
 environment variable acts as a filter specification that filters network identifiers.
+Members of this component are:
+.BR setnetpath "(3), " getnetpath "(3) and " endnetpath ().
 .PP
 .BR getnetpath (),
 when called successively with the
@@ -167,9 +176,26 @@ subroutines as well as the
 subroutines described here.
 .\"
 .\"
+.SS "FILE FORMAT"
+.PP
+The format of the
+.B /etc/netconfig
+Network Configuration database file is as described in
+.BR netconfig (5).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR nc_perror (3)
+and
+.BR nc_sperror (3)
+must be called immediately after the failed network configuration subroutine
+fails.  Otherwise, the error condition may be lost.
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
-Upon successful completion, 
+Upon successful completion,
 .BR getnetpath ()
 return a pointer to a
 .BR netconfig (3)
@@ -192,18 +218,18 @@ to one of the following error numbers:
 .TP \w'[\fBNC_NOMOREENTRIES\fR]\(em'u
 .RB [ NC_NOERROR ]
 .RI \(lq "no error" \(rq
-.IP
+.br
 The last network selection function called was successful or no network selection function has yet
 been called.
 .TP
 .RB [ NC_NOMEM ]
 .RI \(lq "out of memory" \(rq
-.IP
+.br
 There was not sufficient memory for the last network selection function called to complete.
 .TP
 .RB [ NC_NOSET ]
 .RI \(lq "routine called before calling setnetpath() or setnetconfig()" \(rq
-.IP
+.br
 The last call to
 .BR endnetpath ()
 or
@@ -213,7 +239,7 @@ was called (incorrectly) before calling
 .TP
 .RB [ NC_OPENFAIL ]
 .RI \(lq "cannot open /etc/netconfig" \(rq
-.IP
+.br
 The last call to a network selection function,
 .BR setnetpath (3),
 could not open the
@@ -222,7 +248,7 @@ file.
 .TP
 .RB [ NC_BADLINE ]
 .RI \(lq "error in /etc/netconfig : field %d of line %d" \(rq
-.IP
+.br
 The last call to a network selection function detected a syntax error in the
 .B /etc/netconfig
 file at field
@@ -232,7 +258,7 @@ of line
 .TP
 .RB [ NC_NOTFOUND ]
 .RI \(lq "netid not found in /etc/netconfig" \(rq
-.IP
+.br
 The
 .I netid
 argument to the last call to
@@ -242,7 +268,7 @@ was not found in
 .TP
 .RB [ NC_NOMOREENTRIES ]
 .RI \(lq "no more entries in /etc/netconfig" \(rq
-.IP
+.br
 The last call to network selection function
 .BR getnetpath (3)
 exhausted the entries in the
@@ -251,7 +277,7 @@ file.
 .TP
 .RB [ ??? ]
 .RI \(lq "unknown error" \(rq
-.IP
+.br
 An internal error occured in the
 .BR libxnsl (3)
 library.
@@ -296,15 +322,17 @@ This environment variable contains the network path.
 .BR netconfig (3),
 .BR nc_perror (3),
 .BR nc_sperror (3),
-.BR netdir (3).
+.BR netdir (3),
+.IR "RFC 1833" .
+.[
+rfc1833
+.]
 .\"
 .\"
 .SH BUGS
 .PP
-.BR setnetpath (),
-.BR getnetpath "() and "
-.BR endnetpath ()
-had no known bugs.
+.BR getnetpath ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -385,8 +413,7 @@ svr42
 .\"
 .SH HISTORY
 .PP
-.BR getnetpath ()
-first appeared in
+The Network Selection subroutines first appeared in
 .IR "SVR 4.2" .
 .[
 svr42

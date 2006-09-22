@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: getnetconfigent.3.man,v 0.9.2.1 2006/09/17 23:36:57 brian Exp $
+.\" @(#) $Id: getnetconfigent.3.man,v 0.9.2.2 2006/09/22 20:54:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/17 23:36:57 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/22 20:54:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: getnetconfigent.3.man,v $
+.\" Revision 0.9.2.2  2006/09/22 20:54:21  brian
+.\" - added TI-RPC references
+.\"
 .\" Revision 0.9.2.1  2006/09/17 23:36:57  brian
 .\" - added manual pages
 .\"
@@ -119,29 +122,35 @@ Network Configuration database access, see
 .BR netconfig (3).
 .PD 0
 .IP 2.
-Network Directory and address mapping, see
-.BR netdir (3).
-.IP 3.
 Network Path access, see
 .BR netpath (3).
+.IP 3.
+Name-to-Address Translation, see
+.BR netdir (3).
 .PD
 .PP
-These are often refered to as the Network Selection facility of the Network
-Services Library.
+The first two are often refered to as the Network Selection facility of the
+Network Services Library.
 .PP
+The
+.BR netconfig (3)
+component (of which
+.BR getnetconfigent ()
+is a member) consists of an interface that provides a set of Network
+Configuration database access subroutines for accessing the Network
+Configuration database contained in the
+.BR /etc/netconfig ,
+.BR netconfig (5),
+file:
 .BR setnetconfig (3),
 .BR getnetconfig (3),
 .BR endnetconfig (3),
 .BR getnetconfigent (),
 .BR freenetconfigent (3),
 .BR nc_perror "(3) and "
-.BR nc_sperror (3),
-provide a set of Network Configuration database access subroutines for accessing
-the Network Configuration database contained in the
-.BR /etc/netconfig ,
-.BR netconfig (5),
-file.
+.BR nc_sperror (3).
 .PP
+Of these,
 .BR getnetconfigent ()
 and
 .BR freenetconfigent (3)
@@ -255,6 +264,22 @@ provider is visible to
 when the
 .B NETPATH
 environment variable is not set.
+.TP
+.B NC_BROADCAST
+The broadcast option flag is indicated.  This means that the network transport
+provider supports broadcast addresses, and in particular, the
+.B HOST_BROADCAST
+universal address described in
+.BR netdir_getbyname (3).
+.TP
+.B NC_MULTICAST
+The multicast option flag is indicated.  This means that the network transport
+provider supports multicast addresses, and in particular, the
+.B HOST_ALLNODES
+and
+.B HOST_RPCNODES
+universal addresses described in
+.BR netdir_getbyname (3).
 .PD
 .RE
 .TP
@@ -308,38 +333,38 @@ is set to indicate the error.
 .\"
 .SH ERRORS
 .PP
-When it fails,
+When
 .BR getnetconfigent ()
-will return
+fails, it returns
 .B NULL
-and set
+and sets
 .BR nc_error (3)
-to one of the following errors:
+to one of the following error numbers:
 .TP \w'[\fBNC_NOMOREENTRIES\fR]\(em'u
 .RB [ NC_NOERROR ]
 .RI \(lq "no error" \(rq
-.IP
+.br
 The last network selection function called was successful or no network selection function has yet
 been called.
 .TP
 .RB [ NC_NOMEM ]
 .RI \(lq "out of memory" \(rq
-.IP
+.br
 There was not sufficient memory for the last network selection function called to complete.
 .TP
 .RB [ NC_NOSET ]
 .RI \(lq "routine called before calling setnetpath() or setnetconfig()" \(rq
-.IP
+.br
 The last call to
-.BR endnetpath (3)
+.BR endnetconfig (3)
 or
-.BR getnetpath (3)
+.BR getnetconfig (3)
 was called (incorrectly) before calling
-.BR setnetpath (3).
+.BR setnetconfig (3).
 .TP
 .RB [ NC_OPENFAIL ]
 .RI \(lq "cannot open /etc/netconfig" \(rq
-.IP
+.br
 The last call to a network selection function,
 .BR setnetpath (3),
 could not open the
@@ -348,7 +373,7 @@ file.
 .TP
 .RB [ NC_BADLINE ]
 .RI \(lq "error in /etc/netconfig : field %d of line %d" \(rq
-.IP
+.br
 The last call to a network selection function detected a syntax error in the
 .B /etc/netconfig
 file at field
@@ -358,7 +383,7 @@ of line
 .TP
 .RB [ NC_NOTFOUND ]
 .RI \(lq "netid not found in /etc/netconfig" \(rq
-.IP
+.br
 The
 .I netid
 argument to the last call to
@@ -368,7 +393,7 @@ was not found in
 .TP
 .RB [ NC_NOMOREENTRIES ]
 .RI \(lq "no more entries in /etc/netconfig" \(rq
-.IP
+.br
 The last call to network selection function
 .BR getnetpath (3)
 exhausted the entries in the
@@ -377,7 +402,7 @@ file.
 .TP
 .RB [ ??? ]
 .RI \(lq "unknown error" \(rq
-.IP
+.br
 An internal error occured in the
 .BR libxnsl (3)
 library.
@@ -406,11 +431,26 @@ The X/Open Network Services Library shared object library.
 The X/Open Network Services Library static library.
 .\"
 .\"
+.SH ENVIRONMENT
+.PP
+.TP
+.RB { NETPATH }
+This environment variable contains the network path.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freenetconfigent (3),
 .BR netconfig (5),
 .BR netpath (3),
-.BR netdir (3).
+.BR nc_perror (3),
+.BR nc_sperror (3),
+.BR netdir (3),
+.BR netdir_getbyname (3),
+.IR "RFC 1833" .
+.[
+rfc1833
+.]
 .\"
 .\"
 .SH BUGS
@@ -452,23 +492,15 @@ uw7doc
 .]
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
+The
 .IR Solaris \(rg
-.[
-soldoc
-.]
-and
-.IR UnixWare \(rg
-.[
-uw7doc
-.]
-describe the
-.BR nc_sperror (3)
-subroutine as returning a pointer to thread-specific data and that the buffer
-could change at any point.  While the error value is saved as thread-specific
-data, this implementation of
-.BR nc_sperror (3)
-returns a pointer to a shared read-only string that is valid for the duration
-of the calling process.
+.I TIRPCSRC Version 2.8
+version of
+.BR getnetconfig ()
+is not thread-safe.
+This
+.B @PACKAGE_TITLE@
+implementation is thread-safe.
 .IP \(em
 .B @PACKAGE_TITLE@
 stores the error condition in
@@ -506,7 +538,7 @@ svr42
 .\"
 .SH HISTORY
 .PP
-The network selection subroutines first appeared in
+The Network Selection subroutines first appeared in
 .IR "SVR 4.2" .
 .[
 svr42

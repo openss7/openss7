@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: netdir_options.3.man,v 0.9.2.1 2006/09/17 23:36:58 brian Exp $
+.\" @(#) $Id: netdir_options.3.man,v 0.9.2.2 2006/09/22 20:54:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/17 23:36:58 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/22 20:54:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: netdir_options.3.man,v $
+.\" Revision 0.9.2.2  2006/09/22 20:54:21  brian
+.\" - added TI-RPC references
+.\"
 .\" Revision 0.9.2.1  2006/09/17 23:36:58  brian
 .\" - added manual pages
 .\"
@@ -99,7 +102,8 @@ sort-adjacent-labels
 .\"
 .\"
 .SH ARGUMENTS
-.TP \w'\fIpoint_to_args\fR\(em'u
+.\".TP \w'\fIpoint_to_arg\fR\(em'u
+.TP
 .I config
 A pointer to a
 .BR netconfig (5)
@@ -113,34 +117,71 @@ or
 The name of the universal network option.  It can have values:
 .sp
 .RS
+.PP
+The following are
+.IR Solaris \(rg
+.[
+soldoc
+.]
+TI-RPC 2.3 options:
 .TP \w'\fBND_CHECK_RESERVEDPORT\fR\(em'u
 .B ND_SET_BROADCAST
-Set a broadcast address.
+Permit use of broadcast address on transport endpoint.
 .PD 0
 .TP
-.B ND_CLEAR_BROADCAST
-Clear broadcast capabilities.
-.TP
-.B ND_SET_REUSEADDR
-Set transport provider to allow reuse of local addresses.
-.TP
-.B ND_CLEAR_REUSEADDR
-Clear local address reuse capabilies.
-.TP
 .B ND_SET_RESERVEDPORT
-Set a reserved port.
+Bind to a reserved port on transport endpoint.
 .TP
 .B ND_CHECK_RESERVEDPORT
-Check for a reserved port.
+Check if port in address is reserved.
 .TP
 .B ND_MERGEADDR
-Merge server and client addresses.
+Merge underspecified server address with client address.
 .TP
 .B ND_JOIN_MULTICAST
-Join a multicast address.
+Join a multicast group.
 .TP
 .B ND_LEAVE_MULTICAST
-Leave a multicast address.
+Leave a multicast group.
+.PD
+.PP
+The following are
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+extensions:
+.TP \w'\fBND_CHECK_RESERVEDPORT\fR\(em'u
+.B ND_CLEAR_BROADCAST
+Prohibit use of broadcast address on transport endpoint.
+.PD 0
+.TP
+.B ND_SET_REUSEADDR
+Permit reuse of local addresses for transport endpoint.
+.TP
+.B ND_CLEAR_REUSEADDR
+Prohibit reuse of local addresses for transport endpoint.
+.PD
+.PP
+The following are
+.IR OpenSS7 \(tm
+extensions:
+.TP \w'\fBND_CHECK_RESERVEDPORT\fR\(em'u
+.B ND_SET_DONTROUTE
+Do not route packets from transport endpoint.
+.PD 0
+.TP
+.B ND_CLEAR_DONTROUTE
+Route packets from transport endpoint.
+.TP
+.B ND_SET_KEEPALIVE
+Set keepalive on transport endpoint.
+.TP
+.B ND_CLEAR_KEEPALIVE
+Clear keepalive on transport endpoint.
+.TP
+.B ND_SET_PRIORITY
+Set priority of transport endpoint.
 .PD
 .RE
 .TP
@@ -150,7 +191,7 @@ A file descriptor associated with a transport endpoint of the type associated wi
 .B netconfig
 structure.
 .TP
-.I point_to_args
+.I point_to_arg
 A pointer to the argument values associated with
 .IR option .
 .\"
@@ -227,12 +268,128 @@ support broadcast addresses, the
 options permits a broadcast address to be used on the transport endpoint associated with
 .IR fd .
 Otherwise, the option management fails.
-.I point_to_args
+.IP ""
+.I point_to_arg
 is ignored and should be specified as
 .BR NULL .
+.IP ""
 Additional privileges might be required to use this option.
 By default, transport endpoints supporting broadcast addresses have the ability to set broadcast
 addresses disabled.
+.\"
+.TP
+.B ND_SET_RESERVEDPORT
+Requests that the name-to-address translation service allocate a reserved port,
+place it in the specified address, and bind the specified transport endpoint to
+the resulting address.
+.IP ""
+.I fd
+specifies the transport provider endpoint to bind to the reserved port.
+.I point_to_arg
+points to a
+.BR netbuf (5)
+structure that contains a transport specific address.
+.IP ""
+Additional privileges might be required to use this option.
+.\"
+.TP
+.B ND_CHECK_RESERVEDPORT
+Requests that the name-to-address translation service check the specified
+transport address for a reserved port.  If the port is reserved, the function
+will return one,
+.RB ( 1 );
+otherwise, zero
+.RB ( 0 )
+is returned to indicated that the port is not reserved.
+.IP ""
+.I fd
+is ignored and should be set to
+.BR RPC_ANYFD .
+.I point_to_arg
+points to a
+.BR netbuf (5)
+structure that contains a transport specific address.
+.\"
+.TP
+.B ND_MERGEADDR
+Requests that the name-to-address translation merge an underspecified service universal address with
+a client univeral address to form a fully specified merged universal address.  For example, when the
+server address is
+.IR 0.0.0.0.1.12 ,
+and the client address is
+.IR 192.168.9.55.0.0 ,
+the merged address could be:
+.IR 192.168.9.1.1.12 .
+.IP ""
+.I fd
+is ignored and should be set to
+.BR RPC_ANYFD .
+.I point_to_arg
+points to a
+.B nd_mergearg
+structure formatted as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct nd_mergearg {
+    char *s_uaddr;   /* Server universal address. */
+    char *c_uaddr;   /* Client universal address. */
+    char *m_uaddr;   /* Merged universal address. */
+};
+\s+1\fP
+.fi
+.PP
+Where,
+.TP \w'\fIm_addr\fR\(em'u
+.I s_uaddr
+points to the underspecified universal address of the server on call,
+.TP
+.I c_uaddr
+points to the complete universal address of the client on call, and
+.TP
+.I m_uaddr
+points to the merged address on successful completion.
+.RE
+.\"
+.PP
+The following are
+.IR Solaris \(rg
+TI-RPC 2.3 options:
+.\"
+.TP
+.B ND_JOIN_MULTICAST
+Requests that the transport endpoint associated with
+.I fd
+join the multicast group sepcified by the
+.I point_to_arg
+argument.
+.IP ""
+.I point_to_arg
+points to a
+.BR netbuf (5)
+structure that contains the transport specific multicast address to join.
+.IP ""
+Additional privileges might be required to use this option.
+.\"
+.TP
+.B ND_LEAVE_MULTICAST
+Requests that the transport endpoint associated with
+.I fd
+leave the multicast group sepcified by the
+.I point_to_arg
+argument.
+.I point_to_arg
+points to a
+.BR netbuf (5)
+structure that contains the transport specific multicast address to leave.
+.IP ""
+Additional privileges might be required to use this option.
+.\"
+.PP
+The following are
+.IR UnixWare \(rg
+specific:
 .\"
 .TP
 .B ND_CLEAR_BROADCAST
@@ -246,9 +403,11 @@ support broadcast addresses, the
 options restricts a broadcast address from being used on the transport endpoint associated with
 .IR fd .
 Otherwise, the option management fails.
-.I point_to_args
+.IP ""
+.I point_to_arg
 is ignored and should be specified as
 .BR NULL .
+.IP ""
 Additional privileges might be required to use this option.
 By default, transport endpoints supporting broadcast addresses have the ability to set broadcast
 addresses disabled.
@@ -265,9 +424,11 @@ support reuse of local addresses, the
 option premits a local address to be reused on the transport endpoint associated with
 .IR fd .
 Otherwise, the option management fails.
-.I point_to_args
+.IP ""
+.I point_to_arg
 is ignored and should be specified as
 .BR NULL .
+.IP ""
 Additional privileges might be required to use this option.
 By default, trasnport endpoints supporting local address reuse have the ability to reuse local
 addresses disabled.
@@ -284,27 +445,98 @@ support reuse of local addresses, the
 option restricts a local address from reuse on the transport endpoint associated with
 .IR fd .
 Otherwise, the option management fails.
-.I point_to_args
+.IP ""
+.I point_to_arg
 is ignored and should be specified as
 .BR NULL .
+.IP ""
 Additional privileges might be required to use this option.
 By default, trasnport endpoints supporting local address reuse have the ability to reuse local
 addresses disabled.
 .\"
-.TP
-.B ND_SET_RESERVEDPORT
+.PP
+The following are
+.IR OpenSS7 \(tm
+specific:
 .\"
 .TP
-.B ND_CHECK_RESERVEDPORT
+.B ND_SET_DONTROUTE
+Prohibits the ability to route packets on local interfaces.  If the
+transport protocol specified by
+.IR config ,
+and the transport endpoint specified by
+.IR fd ,
+support this option, the
+.B ND_SET_DONTROUTE
+option permits routing to be suppressed from local interfaces for the transport
+endpoint associated with
+.IR fd .
+Otherwise, the option management fails.
+.IP ""
+.I point_to_arg
+is ignored and should be specified as
+.BR NULL .
+.IP ""
+Additional privileges might be required to use this option.
 .\"
 .TP
-.B ND_MERGEADDR
+.B ND_CLEAR_DONTROUTE
+Permits routing packets on local interfaces.  If the
+transport protocol specified by
+.IR config ,
+and the transport endpoint specified by
+.IR fd ,
+support this option, the
+.B ND_CLEAR_DONTROUTE
+option prohibtis routing from being suppressed from local interfaces for the
+transport endpoint associated with
+.IR fd .
+Otherwise, the option management fails.
+.IP ""
+.I fd
+is the file descriptor of the transport endpoint upon which to clear the
+option.
+.I point_to_arg
+is ignored and should be specified as
+.BR NULL .
+.IP ""
+Additional privileges might be required to use this option.
 .\"
 .TP
-.B ND_JOIN_MULTICAST
+.B ND_SET_KEEPALIVE
+.IP ""
+.I fd
+is the file descriptor of the transport endpoint upon which to set the
+option.
+.I point_to_arg
+is ignored and should be specified as
+.BR NULL .
+.IP ""
+Additional privileges might be required to use this option.
 .\"
 .TP
-.B ND_LEAVE_MULTICAST
+.B ND_CLEAR_KEEPALIVE
+.IP ""
+.I fd
+is the file descriptor of the transport endpoint upon which to clear the
+option.
+.I point_to_arg
+is ignored and should be specified as
+.BR NULL .
+.IP ""
+Additional privileges might be required to use this option.
+.\"
+.TP
+.B ND_SET_PRIORITY
+.IP ""
+.I fd
+is the file descriptor of the transport endpoint upon which to set the
+option.
+.I point_to_arg
+is ignored and should be specified as
+.BR NULL .
+.IP ""
+Additional privileges might be required to use this option.
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -333,62 +565,62 @@ to one of the following error codes:
 .TP \w'[\fBND_NO_RECOVERY\fR]\(em'u
 .RB [ ND_TRY_AGAIN ]
 .RI \(lq "n2a: non-authoritative host not found" \(rq
-.IP ""
+.br
 The host was not found, however, a name-to-address mapping function suffered a temporary failure
 (such as a timeout).
 .TP
 .RB [ ND_NO_RECOVERY ]
 .RI \(lq "n2a: non-recoverable error" \(rq
-.IP ""
+.br
 The last name-to-address translation function suffered an unrecoverable error in one of its lookup
 libraries.
 .TP
 .\".RB [ ND_NO_DATA ]
 .\".RI \(lq "n2a: no data record of requested type" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function could find no data of the requested type in one of its
 .\"lookup libraries.
 .\".TP
 .\".RB [ ND_NO_ADDRESS ]
 .\".RI \(lq "n2a: no data record of requested type" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function could find no address of the requested type in one of
 .\"its lookup libraries.
 .\".TP
 .RB [ ND_BADARG ]
 .RI \(lq "n2a: bad arguments passed to routine" \(rq
-.IP ""
+.br
 The last name-to-address translation function was passed a bad argument.
 .TP
 .RB [ ND_NOMEM ]
 .RI \(lq "n2a: memory allocation failed" \(rq
-.IP ""
+.br
 The last name-to-address translation function could not allocate memory necessary to complete the
 operation.
 .TP
 .\".RB [ ND_OK ]
 .\".RI \(lq "n2a: successful completion" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function completed successfully, or there was no previous
 .\"name-to-address translation function called.
 .\".TP
 .\".RB [ ND_NOHOST ]
 .\".RI \(lq "n2a: hostname not found" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function,
 .\".BR netdir_getbyname (3),
 .\"could not find, or does not support, the specified host name.
 .\".TP
 .\".RB [ ND_NOSERV ]
 .\".RI \(lq "n2a: service name not found" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function,
 .\".BR netdir_getbyname (3),
 .\"could not find, or does not support, the specified service name.
 .\".TP
 .RB [ ND_NOSYM ]
 .RI \(lq "n2a: symbol missing in shared object : %s" \(rq
-.IP ""
+.br
 One of the required symbols, see
 .BR netdir (5),
 was missing from a shared object specified in the
@@ -405,7 +637,7 @@ string.
 .TP
 .RB [ ND_OPEN ]
 .RI \(lq "n2a: could not open shared object : %s" \(rq
-.IP ""
+.br
 One of the shared objects specified in the
 .I nc_lookup
 member of the
@@ -420,7 +652,7 @@ string.
 .TP
 .RB [ ND_ACCESS ]
 .RI \(lq "n2a: access denied for shared object" \(rq
-.IP ""
+.br
 One of the shared objects specified in the
 .I nc_lookup
 member of the
@@ -431,7 +663,7 @@ argument could not be opened due to access permission.
 .TP
 .\".RB [ ND_UKNWN ]
 .\".RI \(lq "n2a: attempt to free unknown object" \(rq
-.\".IP ""
+.\".br
 .\".BR netdir_free (3)
 .\"was called with an unknown
 .\".I struct_type
@@ -439,7 +671,7 @@ argument could not be opened due to access permission.
 .\".TP
 .RB [ ND_NOCTRL ]
 .RI \(lq "n2a: unknown option passed" \(rq
-.IP ""
+.br
 .BR netdir_options (3)
 was passed an unknown
 .I option
@@ -447,14 +679,14 @@ argument value.
 .TP
 .RB [ ND_FAILCTRL ]
 .RI \(lq "n2a: control operation failed" \(rq
-.IP ""
+.br
 The
 .BR netdir_options (3)
 control operation failed.
 .TP
 .RB [ ND_SYSTEM ]
 .RI \(lq "n2a: system error" \(rq
-.IP ""
+.br
 During the last name-to-address translation function, a system error occurred.
 The
 .B Linux
@@ -468,13 +700,13 @@ might also provide some insight into the error.
 .TP
 .\".RB [ ND_NOCONVERT ]
 .\".RI \(lq "n2a: conversion not possible" \(rq
-.\".IP ""
+.\".br
 .\"During the last name-to-address translation function it was discovered that character string
 .\"conversion was not possible.
 .\".TP
 .RI [ other ]
 .RI \(lq "n2a: unknown error %d" \(rq
-.IP ""
+.br
 An internal error occured in the
 .BR libxnsl (3)
 library or a loaded shared object.
@@ -566,7 +798,11 @@ for an example.
 .BR netdir (3),
 .BR netconfig (5),
 .BR netconfig (3),
-.BR netpath (3).
+.BR netpath (3),
+.IR "RFC 1833" .
+.[
+rfc1833
+.]
 .\"
 .\"
 .SH BUGS

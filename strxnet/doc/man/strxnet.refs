@@ -3548,11 +3548,131 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1278.txt
 
+%K rfc1831
+%L RFC 1831
+%R RFC 1831
+%A Raj Srinivasan
+%T RPC: Remote Procedure Call Protocol Specification Version 2
+%D August 1995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1831.txt
+
+%K rfc1832
+%L RFC 1832
+%R RFC 1832
+%A Raj Srinivasan
+%T XDR: External Data Representation Standard
+%D August 1995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1832.txt
+
+%K rfc1833
+%L RFC 1833
+%R RFC 1833
+%A Raj Srinivasan
+%T Binding Protocols for ONC RPC Version 2
+%D August 1995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1833.txt
+
+%K rfc1508
+%L RFC 1508
+%R RFC 1508
+%A John Linn
+%T Generic Security Service Application Program Interface
+%D September 1993
+%O (Obsoleted by RFC 2078)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1508.txt
+
+%K rfc1509
+%L RFC 1509
+%R RFC 1509
+%A John Wray
+%T Generic Security Service API : C-bindings
+%D September 1993
+%O (Obsoleted by RFC 2744)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1509.txt
+
+%K rfc2078
+%L RFC 2078
+%R RFC 2078
+%A John Linn
+%T Generic Security Service Application Program Interface, Version 2
+%D January 1997
+%O (Obsoletes RFC 1508) (Obsoleted by RFC 2743)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2078.txt
+
+%K GSS-API
+%K rfc2743
+%L RFC 2743
+%R RFC 2743
+%A John Linn
+%T Generic Security Service Application Program Interface Version 2, Update 1
+%D January 2000
+%O (Obsolets RFC 2078)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2743.txt
+
+%K rfc2744
+%L RFC 2744
+%R RFC 2744
+%A John Wray
+%T Generic Security Service API Version 2 : C-bindings
+%D January 2000
+%O (Obsoletes RFC 1509)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2744.txt
+
+%K rfc2853
+%L RFC 2853
+%R RFC 2853
+%A Jack Kabat
+%A Mayank Upadhyay
+%T Generic Security Service API Version 2 : Java Bindings
+%D June 2000
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2853.txt
+
+%K rfc2203
+%L RFC 2203
+%R RFC 2203
+%A Michael Eisler
+%A Alex Chiu
+%A Lin Ling
+%E Michael Eisler
+%T RPCSEC_GSS Protocol Specification
+%D September 1997
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2203.txt
+
+%K rfc2695
+%L RFC 2695
+%R RFC 2695
+%A Alex Chiu
+%T Authentication Mechanisms for ONC RPC
+%D September 1999
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2695.txt
+
 %K rfc1859
 %L RFC 1859
+%R RFC 1859
 %A Yanick Pouffary
 %T ISO Transport Class 2 Non-use of Explicit Flow Control over TCP RFC 1006 Extension
-%R RFC 1859
 %D October 1995
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society

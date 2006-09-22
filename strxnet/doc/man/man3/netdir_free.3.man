@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: netdir_free.3.man,v 0.9.2.1 2006/09/17 23:36:57 brian Exp $
+.\" @(#) $Id: netdir_free.3.man,v 0.9.2.2 2006/09/22 20:54:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/17 23:36:57 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/22 20:54:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: netdir_free.3.man,v $
+.\" Revision 0.9.2.2  2006/09/22 20:54:21  brian
+.\" - added TI-RPC references
+.\"
 .\" Revision 0.9.2.1  2006/09/17 23:36:57  brian
 .\" - added manual pages
 .\"
@@ -262,7 +265,34 @@ struct nd_hostserv {
 .TP \w'\fIh_hostservs\fR\(em'u
 .I h_name
 the host (machine) name.
+.RS
+.PP
+The following special host names are defined in
+.RB < netdir.h >:
+.TP \w'\fBHOST_SELF_CONNECT\fR\(em'u
+.B HOST_SELF
+Local host name.
 .PD 0
+.TP
+.B HOST_ANY
+Any host name.
+.TP
+.B HOST_BROADCAST
+All addresses accessible by transport.
+.TP
+.B HOST_SELF_CONNECT
+Address for connecting to the local host.
+.TP
+.B HOST_SELF_BIND
+Bind to one's self.
+.TP
+.B HOST_ALLNODES
+All nodes (broadcast or rpcbind broadcast).
+.TP
+.B HOST_RPCNODES
+All RPC nodes (multicast or rpcbind multicast).
+.PD
+.RE
 .TP
 .I h_serv
 the service name.
@@ -329,62 +359,62 @@ to one of the following errors:
 .TP \w'[\fBND_NO_RECOVERY\fR]\(em'u
 .\".RB [ ND_TRY_AGAIN ]
 .\".RI \(lq "n2a: non-authoritative host not found" \(rq
-.\".IP ""
+.\".br
 .\"The host was not found, however, a name-to-address mapping function suffered a temporary failure
 .\"(such as a timeout).
 .\".TP
 .\".RB [ ND_NO_RECOVERY ]
 .\".RI \(lq "n2a: non-recoverable error" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function suffered an unrecoverable error in one of its lookup
 .\"libraries.
 .\".TP
 .\".RB [ ND_NO_DATA ]
 .\".RI \(lq "n2a: no data record of requested type" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function could find no data of the requested type in one of its
 .\"lookup libraries.
 .\".TP
 .\".RB [ ND_NO_ADDRESS ]
 .\".RI \(lq "n2a: no data record of requested type" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function could find no address of the requested type in one of
 .\"its lookup libraries.
 .\".TP
 .RB [ ND_BADARG ]
 .RI \(lq "n2a: bad arguments passed to routine" \(rq
-.IP ""
+.br
 The last name-to-address translation function was passed a bad argument.
 .TP
 .\".RB [ ND_NOMEM ]
 .\".RI \(lq "n2a: memory allocation failed" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function could not allocate memory necessary to complete the
 .\"operation.
 .\".TP
 .\".RB [ ND_OK ]
 .\".RI \(lq "n2a: successful completion" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function completed successfully, or there was no previous
 .\"name-to-address translation function called.
 .\".TP
 .\".RB [ ND_NOHOST ]
 .\".RI \(lq "n2a: hostname not found" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function,
 .\".BR netdir_getbyname (3),
 .\"could not find, or does not support, the specified host name.
 .\".TP
 .\".RB [ ND_NOSERV ]
 .\".RI \(lq "n2a: service name not found" \(rq
-.\".IP ""
+.\".br
 .\"The last name-to-address translation function,
 .\".BR netdir_getbyname (3),
 .\"could not find, or does not support, the specified service name.
 .\".TP
 .\".RB [ ND_NOSYM ]
 .\".RI \(lq "n2a: symbol missing in shared object : %s" \(rq
-.\".IP ""
+.\".br
 .\"One of the required symbols, see
 .\".BR netdir (5),
 .\"was missing from a shared object specified in the
@@ -401,7 +431,7 @@ The last name-to-address translation function was passed a bad argument.
 .\".TP
 .\".RB [ ND_OPEN ]
 .\".RI \(lq "n2a: could not open shared object : %s" \(rq
-.\".IP ""
+.\".br
 .\"One of the shared objects specified in the
 .\".I nc_lookup
 .\"member of the
@@ -416,7 +446,7 @@ The last name-to-address translation function was passed a bad argument.
 .\".TP
 .\".RB [ ND_ACCESS ]
 .\".RI \(lq "n2a: access denied for shared object" \(rq
-.\".IP ""
+.\".br
 .\"One of the shared objects specified in the
 .\".I nc_lookup
 .\"member of the
@@ -427,7 +457,7 @@ The last name-to-address translation function was passed a bad argument.
 .\".TP
 .RB [ ND_UKNWN ]
 .RI \(lq "n2a: attempt to free unknown object" \(rq
-.IP ""
+.br
 .BR netdir_free (3)
 was called with an unknown
 .I struct_type
@@ -435,7 +465,7 @@ argument value.
 .TP
 .\".RB [ ND_NOCTRL ]
 .\".RI \(lq "n2a: unknown option passed" \(rq
-.\".IP ""
+.\".br
 .\".BR netdir_options (3)
 .\"was passed an unknown
 .\".I option
@@ -443,14 +473,14 @@ argument value.
 .\".TP
 .\".RB [ ND_FAILCTRL ]
 .\".RI \(lq "n2a: control operation failed" \(rq
-.\".IP ""
+.\".br
 .\"The
 .\".BR netdir_options (3)
 .\"control operation failed.
 .\".TP
 .RB [ ND_SYSTEM ]
 .RI \(lq "n2a: system error" \(rq
-.IP ""
+.br
 During the last name-to-address translation function, a system error occurred.
 The
 .B Linux
@@ -464,13 +494,13 @@ might also provide some insight into the error.
 .TP
 .\".RB [ ND_NOCONVERT ]
 .\".RI \(lq "n2a: conversion not possible" \(rq
-.\".IP ""
+.\".br
 .\"During the last name-to-address translation function it was discovered that character string
 .\"conversion was not possible.
 .\".TP
 .RI [ other ]
 .RI \(lq "n2a: unknown error %d" \(rq
-.IP ""
+.br
 An internal error occured in the
 .BR libxnsl (3)
 library or a loaded shared object.
@@ -508,7 +538,11 @@ The X/Open Network Services Library static library.
 .PP
 .BR netconfig (5),
 .BR netconfig (3),
-.BR netpath (3).
+.BR netpath (3),
+.IR "RFC 1833" .
+.[
+rfc1833
+.]
 .\"
 .\"
 .SH BUGS

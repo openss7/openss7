@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: nc_sperror.3.man,v 0.9.2.1 2006/09/17 23:36:57 brian Exp $
+.\" @(#) $Id: nc_sperror.3.man,v 0.9.2.2 2006/09/22 20:54:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/17 23:36:57 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/22 20:54:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: nc_sperror.3.man,v $
+.\" Revision 0.9.2.2  2006/09/22 20:54:21  brian
+.\" - added TI-RPC references
+.\"
 .\" Revision 0.9.2.1  2006/09/17 23:36:57  brian
 .\" - added manual pages
 .\"
@@ -115,15 +118,44 @@ Network Configuration database access, see
 .BR netconfig (3).
 .PD 0
 .IP 2.
-Network Directory and address mapping, see
-.BR netdir (3).
-.IP 3.
 Network Path access, see
 .BR netpath (3).
+.IP 3.
+Name-to-Address Translation, see
+.BR netdir (3).
 .PD
 .PP
-These are often refered to as the Network Selection facility of the Network
-Services Library.
+The first two are often refered to as the Network Selection facility of the
+Network Services Library.
+.PP
+The
+.BR netconfig (3)
+component (of which
+.BR nc_perror ()
+is a member) consists of an interface that provides a set of Network
+Configuration database access subroutines for accessing the Network
+Configuration database contained in the
+.BR /etc/netconfig ,
+.BR netconfig (5),
+file:
+.BR setnetconfig (3),
+.BR getnetconfig (3),
+.BR endnetconfig (3),
+.BR getnetconfigent (3),
+.BR freenetconfigent (3),
+.BR nc_perror "() and "
+.BR nc_sperror (3).
+.PP
+Of these,
+.BR nc_perror ()
+and
+.BR nc_sperror (3)
+provide a mechanism for providing diagnostic messages upon failure.  These
+subroutines can be used for this
+.B netconfig
+subroutines, as well as
+.BR netpath (3)
+subroutines.
 .PP
 .BR nc_sperror ()
 returns a diagnostic error string associated with the failure of the last called
@@ -157,22 +189,24 @@ One of the following error strings will be returned:
 .RB [ NC_NOERROR ]
 .RI \(lq "no error" \(rq
 .br
-The last
-.BR netconfig (3)
-operation was successful.
+The last network selection function called was successful or no network selection function has yet
+been called.
 .TP
 .RB [ NC_NOMEM ]
 .RI \(lq "out of memory" \(rq
 .br
-Memory could not be allocated to complete the operation.
+There was not sufficient memory for the last network selection function called to complete.
 .TP
 .RB [ NC_NOSET ]
 .RI \(lq "routine called before calling setnetpath() or setnetconfig()" \(rq
 .br
-.BR getnetconfig (3)
+The last call to
+.BR endnetconfig (3),
+.BR getnetconfig (3),
+.BR endnetpath (3),
 or
 .BR getnetpath (3)
-was called without first calling
+was called (incorrectly) before calling
 .BR setnetconfig (3)
 or
 .BR setnetpath (3).
@@ -180,33 +214,41 @@ or
 .RB [ NC_OPENFAIL ]
 .RI \(lq "cannot open /etc/netconfig" \(rq
 .br
-The
+The last call to a network selection function,
+.BR setnetconfig (3),
+.BR getnetconfigent "(3) or
+.BR setnetpath (3),
+could not open the
 .B /etc/netconfig
-file could not be opened for reading.
+file.
 .TP
 .RB [ NC_BADLINE ]
-.RI \(lq "error in /etc/netconfig: field %d of line %d" \(rq
+.RI \(lq "error in /etc/netconfig : field %d of line %d" \(rq
 .br
-A syntax error exists in the
+The last call to a network selection function detected a syntax error in the
 .B /etc/netconfig
-file at the location shown.
+file at field
+.I %d
+of line
+.IR %d .
 .TP
 .RB [ NC_NOTFOUND ]
 .RI \(lq "netid not found in /etc/netconfig" \(rq
 .br
 The
 .I netid
-specified to
+argument to the last call to
 .BR getnetconfigent (3)
-was not found in the
-.B /etc/netconfig
-file.
+was not found in
+.BR /etc/netconfig .
 .TP
 .RB [ NC_NOMOREENTRIES ]
 .RI \(lq "no more entries in /etc/netconfig" \(rq
 .br
-.BR getnetconfig (3)
-was called an nore more entries exist in the
+The last call to network selection function
+.BR getnetconfig "(3) or
+.BR getnetpath (3)
+exhausted the entries in the
 .B /etc/netconfig
 file.
 .TP
@@ -216,6 +258,10 @@ file.
 An internal error occured in the
 .BR libxnsl (3)
 library.
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH FILES
@@ -232,8 +278,20 @@ The X/Open Network Services Library shared object library.
 The X/Open Network Services Library static library.
 .\"
 .\"
+.SH ENVIRONMENT
+.PP
+.TP
+.RB { NETPATH }
+This environment variable contains the network path.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR setnetconfig (3),
+.BR getnetconfig (3),
+.BR endnetconfig (3),
+.BR getnetconfigent (3),
+.BR freenetconfigent (3),
 .BR netconfig (5),
 .BR netpath (3),
 .BR netdir (3).
@@ -278,27 +336,9 @@ uw7doc
 .]
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
-.IR Solaris \(rg
-.[
-soldoc
-.]
-and
-.IR UnixWare \(rg
-.[
-uw7doc
-.]
-describe the
-.BR nc_sperror ()
-subroutine as returning a pointer to thread-specific data and that the buffer
-could change at any point.  While the error value is saved as thread-specific
-data, this implementation of
-.BR nc_sperror ()
-returns a pointer to a shared read-only string that is valid for the duration
-of the calling process.
-.IP \(em
 .B @PACKAGE_TITLE@
 stores the error condition in
-.IR _nderror (3).
+.BR _ncerror (3).
 .IP \(em
 Diagnostic message strings are not documented and are incompatible.
 .IP \(em

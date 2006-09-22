@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: freenetconfigent.3.man,v 0.9.2.1 2006/09/17 23:36:57 brian Exp $
+.\" @(#) $Id: freenetconfigent.3.man,v 0.9.2.2 2006/09/22 20:54:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/17 23:36:57 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/22 20:54:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: freenetconfigent.3.man,v $
+.\" Revision 0.9.2.2  2006/09/22 20:54:21  brian
+.\" - added TI-RPC references
+.\"
 .\" Revision 0.9.2.1  2006/09/17 23:36:57  brian
 .\" - added manual pages
 .\"
@@ -91,12 +94,12 @@ sort-adjacent-labels
 .HP
 .B #include <netconfig.h>
 .HP
-.BI "void freenetconfigent(struct netconfig *" config );
+.BI "void freenetconfigent(struct netconfig *" nc );
 .\"
 .\"
 .SH ARGUMENTS
-.TP \w'handle\(em'u
-.I config
+.TP
+.I nc
 A pointer to a network selection database entry,
 .BR netconfig (5),
 that was returned by a call to
@@ -119,35 +122,41 @@ Network Configuration database access, see
 .BR netconfig (3).
 .PD 0
 .IP 2.
-Network Directory and address mapping, see
-.BR netdir (3).
-.IP 3.
 Network Path access, see
 .BR netpath (3).
+.IP 3.
+Name-to-Address Translation, see
+.BR netdir (3).
 .PD
 .PP
-These are often refered to as the Network Selection facility of the Network
-Services Library.
+The first two are often refered to as the Network Selection facility of the
+Network Services Library.
 .PP
+The
+.BR netconfig (3)
+component (of which
+.BR freenetconfigent ()
+is a member) consists of an interface that provides a set of Network
+Configuration database access subroutines for accessing the Network
+Configuration database contained in the
+.BR /etc/netconfig ,
+.BR netconfig (5),
+file:
 .BR setnetconfig (3),
 .BR getnetconfig (3),
 .BR endnetconfig (3),
 .BR getnetconfigent (3),
 .BR freenetconfigent (),
 .BR nc_perror "(3) and "
-.BR nc_sperror (3),
-provide a set of Network Configuration database access subroutines for accessing
-the Network Configuration database contained in the
-.BR /etc/netconfig ,
-.BR netconfig (5),
-file.
+.BR nc_sperror (3).
 .PP
+Of these,
 .BR getnetconfigent (3)
 and
 .BR freenetconfigent ()
-provide a mechanism to access Network Confifuration database entries by
+provide a mechanism to access Network Configuration database entries by
 network identification name strings.
-.TP
+.PP
 .BR freenetconfigent ()
 frees the network configuration entry returned as a pointer to a
 .B netconfig
@@ -157,7 +166,7 @@ structure, from a previous call to
 must be called for each call to
 .BR getnetconfigent (3)
 with the corresponding
-.I netconfig
+.I nc
 pointer as the argument.
 .PP
 .BR nc_perror (3)
@@ -221,9 +230,18 @@ The X/Open Network Services Library static library.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR getnetconfigent (3),
+.BR setnetconfig (3),
+.BR getnetconfig (3),
 .BR netconfig (5),
 .BR netpath (3),
-.BR netdir (3).
+.BR nc_perror (3),
+.BR nc_sperror (3),
+.BR netdir (3),
+.IR "RFC 1833" .
+.[
+rfc1833
+.]
 .\"
 .\"
 .SH BUGS
@@ -319,7 +337,7 @@ svr42
 .\"
 .SH HISTORY
 .PP
-The network selection subroutines first appeared in
+The Network Selection subroutines first appeared in
 .IR "SVR 4.2" .
 .[
 svr42

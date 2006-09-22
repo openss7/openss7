@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xnsl.3.man,v 0.9.2.1 2006/09/17 23:36:58 brian Exp $
+.\" @(#) $Id: xnsl.3.man,v 0.9.2.2 2006/09/22 20:54:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/17 23:36:58 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/22 20:54:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xnsl.3.man,v $
+.\" Revision 0.9.2.2  2006/09/22 20:54:21  brian
+.\" - added TI-RPC references
+.\"
 .\" Revision 0.9.2.1  2006/09/17 23:36:58  brian
 .\" - added manual pages
 .\"
@@ -146,28 +149,106 @@ sort-adjacent-labels
 .IR UNIX \(rg
 has traditionally provided three components of the Network Services Library,
 .BR libnsl ,
-that are associated with Transport Provider Interface,
+two of which are associated with the X/Open Transport Interface/Transport Layer
+Interface (XTI/TLI),
+.BR xti (3),
+the Transport Provider Interface,
 .BR tpi (7),
-.IR STREAMS (9)
-network pseudo-device drivers, and that are not currently part of the
+and
+.BR STREAMS (9)
+network pseudo-device drivers.
+Two components provide the TI (Transport Independent) interface, whereas the
+other provides the TS (Transport Sockets) interface.  The TI components
+provide the Transport Independent RPC services (TI-RPC) standardized by the
+IETF.
+.PP
+.TS
+center expand tab(:);
+c.
+T{
+.nf
+\fC\s-1\
++---------------------------------------+
+| Client or Service  TI-RPC Application |
++---------------------------------------+
+          ^        ^        ^ Transport  
+          |        |        | Independent
+          |        |        | Interface  
+  +-------|--------|--------|---------+  
+  |       v        |        v  TI-RPC |  
+  |  +---------+   |   +-----------+  |  
+  |  | Network |   |   |  Name-to- |  |  
+  |  |Selection|   |   |  Address  |  |  
+  |  +---------+   |   |Translation|  |  
+  |libnsl          |   +-----------+  |  
+  +----------------|------------------+  
+  |librpc          v                  |  
+  |    +-------------------------+    |  
+  |    |  RPC Interface Library  |    |  
+  |    +-------------------------+    |  
+  |                ^                  |  
+  +----------------|------------------+  
+                   |          Transport 
+                   |          Layer     
+                   v          Interface 
+  +-----------------------------------+  
+  |       XTI/STREAM Interface        |  
+  +-----------------------------------+  
+                   ^          Transport  
+                   |          Provider   
+                   v          Interface  
+  +-----------------------------------+  
+  |   Transport Pool (TCP,UDP,etc.)   |  
+  +-----------------------------------+  
+\s+1\fP
+.fi
+T}
+T{
+.IR "Figure 1 " \(em " Transport Independent RPC (TI-RPC)"
+T}
+.TE
+.PP
+.B GNU/Linux
+.I glibc
+provides (amoungst other things) the RPC Interface Library and the TS-RPC and
+BSD 4.3 sockets address translation facilities in
+.BR libc ,
+and provides NIS capabilies in
+.BR libnsl .
+.PP
+.BR STREAMS (9)-related
+components that are not currently
+part of the
 .B Linux
 Network Services Library
-.RB ( libnsl ).
-These components are:
+.RB ( libnsl )
+are:
 .IP 1. \w'1.\(em'u
+Network Selection, consisting of:
+.RS
+.IP \(bu \w'\(bu\(em'u
 Network Configuration database access, see
 .BR netconfig (3).
 .PD 0
-.IP 2.
+.IP \(bu
 Network Path access, see
 .BR netpath (3).
-.IP 3.
-Network Directory and address mapping, see
-.BR netdir (3).
 .PD
+.RE
+.IP 2.
+Name-to-Address Translation, see
+.BR netdir (3).
 .PP
 These are often refered to as the Network Selection facility of the Network
 Services Library.
+.PP
+The
+.B @PACKAGE_TITLE@
+provides a library, renamed
+.BR libxnsl ,
+that provides the missing Network Selection and Name-to-Address mapping
+facilities designed to work with
+.BR xti (3).
 .\"
 .\"
 .SH DESCRIPTION
@@ -292,22 +373,33 @@ are set.
 .\"
 .SH NOTICES
 .PP
-Normally the
+Although it would appear that the
 .BR netconfig (5)
 database would be handled using either local files
 .RB ( /etc/netconfig ),
-Berkeley databases, or NIS maps.  Unfortunately, it is not easy to add a
-database to the glibc
-.BR libnsl ,
-otherwise, it would be a simple matter.
+Berkeley databases, or NIS maps, under
+.IR UNIX \(rg,
+it has traditionally only been implemented using flat files.  Although NIS
+extensions would be nice;
+unfortunately, it is not easy to add a database to the
+.I glibc
+.BR libnsl .
 Functions in
 .B libxnsl
-have been declared as weak to allow future implementations in glibc to
-override.
-.\"
-.\"
-.SH IMPLEMENTATION
+have been declared as weak to allow future implementations in
+.I glibc
+to override.
 .PP
+Note that
+GNU
+.I glibc
+contains the
+.B tirpcsrc
+distribution of TI-RPC from Sun, but does not contain these two components,
+presumably because of the historical lack of a usable
+.BR STREAMS (9)
+implementation (or emulation) under
+.BR Linux .
 .\"
 .\"
 .SH "SEE ALSO"
@@ -344,6 +436,38 @@ The NSL library functions are compatible with
 .[
 svr4
 .]
+.PP
+In fact there is much confusion over what is contained in libraries named:
+.BR libtli ", " libxnet ", " libsocket ", " librpc ", " libnsl ", etc."
+Traditionally, it seems, the breakdown is as follows:
+.TP \w'libsocket\(em'u
+.B libtli
+Older AT&T TLI library.
+.PD 0
+.TP
+.B libxnet
+Newer XTI Library with X/Open Sockets interface.
+This library now contains everything
+.IR OpenGroup -ish.
+.TP
+.B libsocket
+BSD 4.3 or 4.4 Sockets interface, typically it seems as a compatibility
+library for
+.BR STREAMS (9).
+.TP
+.B libnsl
+BSD 4.3 or 4.4 sockets address and naming functions like
+.BR gethostbyname (3),
+but also, on
+.IR UNIX \(rg
+systems, the two facilities mentioned above,
+.BR netconfig "(3) and
+.BR netpath "(3); and
+.BR netdir (3).
+.TP
+.B librpc
+Sun RPC.
+.PD
 .\"
 .\"
 .SH CONFORMANCE
@@ -361,6 +485,8 @@ The NSL interface first appeared in
 .[
 svr4
 .]
+(Note that most of the statements about history are wild guesses and likely
+very wrong.  The history concerning these components is a confusing one.)
 .\"
 .\"
 .[
