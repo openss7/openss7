@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $
+ @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:56 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:54:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netselect.c,v $
+ Revision 0.9.2.3  2006/09/22 20:54:27  brian
+ - tweaked source file for use with doxygen
+
  Revision 0.9.2.2  2006/09/18 13:52:56  brian
  - added doxygen markers to sources
 
@@ -58,11 +61,18 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $"
+#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $"
 
-static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $";
+static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $";
 
 /* This file can be processed with doxygen(1). */
+
+/** @weakgroup nsf Network Selection Facility
+ *  @{
+ *  @file
+ *  Network selection facility implementation file.
+ */
+
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -151,6 +161,22 @@ static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.
 
 #include "netselect.h"
 
+/** @name Name Selection Facility API Functions
+  * These are the internal implementation of the functions.  The formal functions from
+  * <netconfig.h> are strong aliased to these.
+  * @{ */
+extern void *__nsl_setnetconfig(void);
+extern struct netconfig *__nsl_getnetconfig(void *handle);
+extern struct netconfig *__nsl_getnetconfigent(const char *netid);
+extern void __nsl_freenetconfigent(struct netconfig *netconfig);
+extern int __nsl_endnetconfig(void *handle);
+extern void *__nsl_setnetpath(void);
+extern struct netconfig *__nsl_getnetpath(void *handle);
+extern int __nsl_endnetpath(void *handle);
+extern void __nsl_nc_perror(const char *msg);
+extern char *__nsl_nc_sperror(void);
+/** @} */
+
 /*
  *  Once condition for Thread-Specific Data key creation.
  */
@@ -181,14 +207,11 @@ __nsl_tsd_alloc(void)
 	return;
 }
 
-/**
- * @internal
- * @fn struct __nsl_tsd *__nsl_get_tsd(void)
- * @brief Get thread specific data for the xnsl library.
+/** @brief Get thread specific data for the xnsl library.
+ *  @internal
  *
  * This function obtains (and allocates if necessary), thread specific data for
- * the executing thread.
- */
+ * the executing thread.  */
 static struct __nsl_tsd *
 __nsl_get_tsd(void)
 {
@@ -285,6 +308,8 @@ __nsl_loadnetconfiglist(void)
 					nc->nc_semantics = NC_TPI_COTS_ORD;
 				} else if (strcmp(field, "tpi_raw") == 0) {
 					nc->nc_semantics = NC_TPI_RAW;
+				} else if (strcmp(field, "tpi_cots_pkt") == 0) {
+					nc->nc_semantics = NC_TPI_COTS_PKT;
 				} else {
 					tsd->ncerror = NC_BADLINE;
 					tsd->fieldnum = fieldnum;
@@ -296,7 +321,7 @@ __nsl_loadnetconfiglist(void)
 				nc->nc_flag = 0;
 				if (strcmp(field, "-") == 0)
 					continue;
-				if (strspn(field, "vb") != strlen(field)) {
+				if (strspn(field, "vbm") != strlen(field)) {
 					tsd->ncerror = NC_BADLINE;
 					tsd->fieldnum = fieldnum;
 					tsd->linenum = linenum;
@@ -306,6 +331,8 @@ __nsl_loadnetconfiglist(void)
 					nc->nc_flag |= NC_VISIBLE;
 				if (strchr(field, 'b'))
 					nc->nc_flag |= NC_BROADCAST;
+				if (strchr(field, 'm'))
+					nc->nc_flag |= NC_MULTICAST;
 				continue;
 			case 3:	/* protofamily field */
 				if (strcmp(field, "-") == 0)
@@ -425,20 +452,17 @@ __nsl_getnetconfiglist(void)
 	return (ncp);
 }
 
-/**
- * @fn void *setnetconfig(void)
- * @brief Provide a handle to the netconfig database.
- *
- * This function hase the effect of binding to or rewinding the netconfig
- * database.  This function must be called before the first call to
- * getnetconfig() and may be called at any other time.  This function need not
- * be called before a call to getnetconfigent().  This function returns a unique
- * handle to be used by getnetconfig().
- *
- * This function returns a pointer to the current entry in the netconfig
- * database, formatted as a struct netconfig.  This function returns NULL at the
- * end of the file, or upon failure.
- */
+/** @brief Provide a handle to the netconfig database.
+  *
+  * This function hase the effect of binding to or rewinding the netconfig
+  * database.  This function must be called before the first call to
+  * getnetconfig() and may be called at any other time.  This function need not
+  * be called before a call to getnetconfigent().  This function returns a
+  * unique handle to be used by getnetconfig().
+  *
+  * This function returns a pointer to the current entry in the netconfig
+  * database, formatted as a struct netconfig.  This function returns NULL at
+  * the end of the file, or upon failure.  */
 void *
 __nsl_setnetconfig(void)
 {
@@ -461,16 +485,15 @@ __nsl_setnetconfig(void)
 #pragma weak setnetconfig
 __asm__(".symver __nsl_setnetconfig,setnetconfig@@XNSL_1.0");
 
-/**
- * @fn struct netconfig *getnetconfig(void *handle)
- * @brief Retrieve next entry in the netconfig database.
- * @param handle handle returned by setnetconfig().
+/** @brief Retrieve next entry in the netconfig database.
+ *  @param handle handle returned by setnetconfig().
  *
- * This function returns a pointer to the current entry in the netconfig
- * database, formatted as a struct netconfig.  Successive calls will return
- * successive netconfig entries in the netconfig database.  This function can be
- * used to search the entire netconfig file.  This function returns NULL at the
- * end of the file.  handle is a the handle obtained through setnetconfig().
+ *  This function returns a pointer to the current entry in the netconfig
+ *  database, formatted as a struct netconfig.  Successive calls will return
+ *  successive netconfig entries in the netconfig database.  This function can
+ *  be used to search the entire netconfig file.  This function returns NULL at
+ *  the end of the file.  handle is a the handle obtained through
+ *  setnetconfig().
  */
 struct netconfig *
 __nsl_getnetconfig(void *handle)
@@ -500,21 +523,19 @@ __nsl_getnetconfig(void *handle)
 #pragma weak getnetconfig
 __asm__(".symver __nsl_getnetconfig,getnetconfig@@XNSL_1.0");
 
-/**
- * @fn int endnetconfig(void *handle)
- * @brief Release network configuration database.
- * @param handle handle returned by setnetconfig().
+/** @brief Release network configuration database.
+ *  @param handle handle returned by setnetconfig().
  *
- * This function should be called when processing is complete to release
- * resources held for reuse.  handle is the handle obtained through
- * setnetconfig().  Programmers should be aware, however, that the last call to
- * endnetconfig() frees all memory alocated by getnetconfig() for the struct
- * netconfig data structure.  This function may not be called before
- * setnetconfig().
+ *  This function should be called when processing is complete to release
+ *  resources held for reuse.  handle is the handle obtained through
+ *  setnetconfig().  Programmers should be aware, however, that the last call to
+ *  endnetconfig() frees all memory alocated by getnetconfig() for the struct
+ *  netconfig data structure.  This function may not be called before
+ *  setnetconfig().
  *
- * This function returns a unique handle to be used by getnetconfig().  IN the
- * case of an error, this function returns NULL and nc_perror() or nc_sperror()
- * can be used to print the reason for failure.
+ *  This function returns a unique handle to be used by getnetconfig().  IN the
+ *  case of an error, this function returns NULL and nc_perror() or nc_sperror()
+ *  can be used to print the reason for failure.
  */
 int
 __nsl_endnetconfig(void *handle)
@@ -538,18 +559,15 @@ __nsl_endnetconfig(void *handle)
 #pragma weak endnetconfig
 __asm__(".symver __nsl_endnetconfig,endnetconfig@@XNSL_1.0");
 
-/**
- * @fn struct netconfig *getnetconfigent(const char *netid)
- * @brief Return a network configuration entry for a network id.
- * @param netid the network id.
+/** @brief Return a network configuration entry for a network id.
+ *  @param netid the network id.
  *
- * This function returns a pointer to the struct netconfig structure
- * corresponding to the argument netid.  It returns NULL if netid is invalid
- * (that is, does not name an entry in the netconfig database).
+ *  This function returns a pointer to the struct netconfig structure
+ *  corresponding to the argument netid.  It returns NULL if netid is invalid
+ *  (that is, does not name an entry in the netconfig database).
  *
- * This function returns 0 on success and -1 on failure (for example, if
- * setnetconfig() was not called previously).
- */
+ *  This function returns 0 on success and -1 on failure (for example, if
+ *  setnetconfig() was not called previously).  */
 struct netconfig *
 __nsl_getnetconfigent(const char *netid)
 {
@@ -608,14 +626,11 @@ __nsl_getnetconfigent(const char *netid)
 #pragma weak getnetconfigent
 __asm__(".symver __nsl_getnetconfigent,getnetconfigent@@XNSL_1.0");
 
-/**
- * @fn void freenetconfigent(struct netconfig *nc)
- * @brief Free a netconfig database entry.
- * @param nc the database entry to free.
+/** @brief Free a netconfig database entry.
+ *  @param nc the database entry to free.
  *
- * This function frees the netconfig structure pointed to by nc (previously
- * returned by getneconfigent()).
- */
+ *  This function frees the netconfig structure pointed to by nc (previously
+ *  returned by getneconfigent()).  */
 void
 __nsl_freenetconfigent(struct netconfig *nc)
 {
@@ -689,19 +704,17 @@ TRANS the decimal value of the unknown error number.
 };
 /* *INDENT-ON* */
 
-/**
- * @fn char *nc_sperror(void)
- * @brief Return an error string.
+/** @brief Return an error string.
  *
- * This function is similar to nc_perror() but instead of printing the message
- * to standard error, will return a pointer to a string that contains the error
- * message.
+ *  This function is similar to nc_perror() but instead of printing the message
+ *  to standard error, will return a pointer to a string that contains the error
+ *  message.
  *
- * This function can also be used with the netpath access routines.
+ *  This function can also be used with the netpath access routines.
  *
- * This function returns a pointer to a buffer that contains the error messages
- * tirng.  This buffer is overwritten on each call.  In multithreaded
- * applications, this buffer is implemented as thread-specific data.
+ *  This function returns a pointer to a buffer that contains the error messages
+ *  tirng.  This buffer is overwritten on each call.  In multithreaded
+ *  applications, this buffer is implemented as thread-specific data.
  *
  */
 char *
@@ -739,17 +752,15 @@ __nsl_nc_sperror(void)
 #pragma weak nc_sperror
 __asm__(".symver __nsl_nc_sperror,nc_sperror@@XNSL_1.0");
 
-/**
- * @fn void nc_perror(const char *msg)
- * @brief Print an error message to standard error.
- * @param msg message to prefix to error message.
+/** @brief Print an error message to standard error.
+ *  @param msg message to prefix to error message.
  *
- * This function prints and error message to standard error indicating why any
- * of the above routines failed.  The message is prepended with the string
- * provided in the msg argument and a colon.  A NEWLINE is appended to the end
- * of the message.
+ *  This function prints and error message to standard error indicating why any
+ *  of the above routines failed.  The message is prepended with the string
+ *  provided in the msg argument and a colon.  A NEWLINE is appended to the end
+ *  of the message.
  *
- * This function can also be used with the netpath access routines.
+ *  This function can also be used with the netpath access routines.
  */
 void
 __nsl_nc_perror(const char *msg)
@@ -764,17 +775,15 @@ __nsl_nc_perror(const char *msg)
 #pragma weak nc_perror
 __asm__(".symver __nsl_nc_perror,nc_perror@@XNSL_1.0");
 
-/**
- * @fn void *setnetpath(void)
- * @brief Get a handle for network configuration database.
+/** @brief Get a handle for network configuration database.
  *
- * A call to this function binds to or rewinds NETPATH.  This function must be
- * called before the first call to getnetpath() and may be called at any other
- * time.  It returns a handle that is used by getnetpath().
+ *  A call to this function binds to or rewinds NETPATH.  This function must be
+ *  called before the first call to getnetpath() and may be called at any other
+ *  time.  It returns a handle that is used by getnetpath().
  *
- * This function returns a handle that is used by getnetpath().  In case of an
- * error, this function returns NULL.  nc_perror() or nc_sperror() can be used
- * to print out the reason for failure.  See getnetconfig().
+ *  This function returns a handle that is used by getnetpath().  In case of an
+ *  error, this function returns NULL.  nc_perror() or nc_sperror() can be used
+ *  to print out the reason for failure.  See getnetconfig().
  */
 void *
 __nsl_setnetpath(void)
@@ -849,31 +858,28 @@ __nsl_setnetpath(void)
 #pragma weak setnetpath
 __asm__(".symver __nsl_setnetpath,setnetpath@@XNSL_1.0");
 
-/**
- * @fn struct netconfig *getnetpath(void *handle)
- * @brief Get the next entry associated with handle.
- * @param handle a pointer to the handle returned by setnetpath().
+/** @brief Get the next entry associated with handle.
+ *  @param handle a pointer to the handle returned by setnetpath().
  *
- * This function returns a pointer to the netconfig database entry corresponding
- * to the first valid NETPATH component.  The netconfig entry is formattted as a
- * struct netconfig.  On each subsequenc all, this function returns a pointer to
- * the netconfig entry that corresponds to the next valud NETPATH component.
- * This function can thus be used to search the netconfig database for all
- * networks included in the NETPATH variable.  When NETPATH has been exhausted,
- * this function returns NULL.
+ *  This function returns a pointer to the netconfig database entry
+ *  corresponding to the first valid #NETPATH component.  The netconfig entry is
+ *  formattted as a struct netconfig.  On each subsequenc all, this function
+ *  returns a pointer to the netconfig entry that corresponds to the next valud
+ *  #NETPATH component.  This function can thus be used to search the netconfig
+ *  database for all networks included in the #NETPATH variable.  When #NETPATH
+ *  has been exhausted, this function returns NULL.
  *
- * This function silently ignores invalid NETPATH components.  A NETPATH
- * component is invalid if there is no corresponding entry in the netconfig
- * database.
+ *  This function silently ignores invalid #NETPATH components.  A #NETPATH
+ *  component is invalid if there is no corresponding entry in the netconfig
+ *  database.
  *
- * If the NETPATH environment variable is unset, this function bethaves as if
- * NETPATH were set to the sequence of "default" or "visible" networks in the
- * netconfig database, in the order in which they are listed.
+ *  If the #NETPATH environment variable is unset, this function bethaves as if
+ *  #NETPATH were set to the sequence of "default" or "visible" networks in the
+ *  netconfig database, in the order in which they are listed.
  *
- * When first called, this function returns a pointer to the netconfig database
- * entry corresponding to the first valid NETPATH component.  When NETPATH has
- * been exhausted, it returns NULL.
- */
+ *  When first called, this function returns a pointer to the netconfig database
+ *  entry corresponding to the first valid #NETPATH component.  When #NETPATH
+ *  has been exhausted, it returns NULL.  */
 struct netconfig *
 __nsl_getnetpath(void *handle)
 {
@@ -883,18 +889,16 @@ __nsl_getnetpath(void *handle)
 #pragma weak getnetpath
 __asm__(".symver __nsl_getnetpath,getnetpath@@XNSL_1.0");
 
-/**
- * @fn int endnetpath(void *handle)
- * @brief Free netpath resources associated with handle.
- * @param handle a pointer to the handle returned by setnetpath().
+/** @brief Free netpath resources associated with handle.
+ *  @param handle a pointer to the handle returned by setnetpath().
  *
- * This function may be called to unbind from NETPATH when processing is
- * complete, releasing resources for reuse.  Programmers should be aware,
- * however, that this function frees all memory allocated by getnetpath() for
- * the struct netconfig data structure.
+ *  This function may be called to unbind from NETPATH when processing is
+ *  complete, releasing resources for reuse.  Programmers should be aware,
+ *  however, that this function frees all memory allocated by getnetpath() for
+ *  the struct netconfig data structure.
  *
- * This function returns 0 on success and -1 on failure (for example, if
- * setnetpath() was not called previously).
+ *  This function returns 0 on success and -1 on failure (for example, if
+ *  setnetpath() was not called previously).
  *
  */
 int
@@ -920,6 +924,6 @@ __nsl_endnetpath(void *handle)
 #pragma weak endnetpath
 __asm__(".symver __nsl_endnetpath,endnetpath@@XNSL_1.0");
 
-/*
- * vim: comments+=b\:TRANS
- */
+/** @} */
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

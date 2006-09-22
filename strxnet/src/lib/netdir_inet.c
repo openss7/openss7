@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $
+ @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:56 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:54:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir_inet.c,v $
+ Revision 0.9.2.3  2006/09/22 20:54:27  brian
+ - tweaked source file for use with doxygen
+
  Revision 0.9.2.2  2006/09/18 13:52:56  brian
  - added doxygen markers to sources
 
@@ -58,17 +61,21 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $"
+#ident "@(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $"
 
-static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $";
+static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $";
 
 /* This file can be processed with doxygen(1). */
 
-/*
- *  This is not only a sample inet name-to-address shared object library, it
- *  is also linked into libxnsl to provide default inet name-to-address
- *  mappings.
- */
+/**
+  * @weakgroup inetn2a INET Name-to-Address Translation
+  * @{
+  * @file
+  * INET Network Name-to-Address Translation implementation file.
+  *
+  * This is not only a sample inet name-to-address shared object library, it is
+  * also linked into libxnsl to provide default inet name-to-address mappings.
+  */
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -169,14 +176,13 @@ static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.
  *  =======================================================
  */
 
-/**
- * @brief Inet _netdir_getbyname lookup function.
- * @param nc transport.
- * @param h host and service name.
- *
- * Converts a host and service name into an address list.  This function uses
- * the newer getaddrinfo(3) AF_INET lookup call.  It is fairly simplistic.
- */
+/** Inet _netdir_getbyname lookup function.
+  * @param nc transport.
+  * @param h host and service name.
+  *
+  * Converts a host and service name into an address list.  This function uses
+  * the newer getaddrinfo(3) AF_INET lookup call.  It is fairly simplistic.
+  */
 struct nd_addrlist *
 __inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
 {
@@ -230,11 +236,10 @@ __inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
 struct nd_addrlist *_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
     __attribute__ ((alias("__inet_netdir_getbyname")));
 
-/**
- * @brief Inet _netdir_getbyaddr lookup function.
- * @param nc transport.
- * @param addr address to lookup.
- */
+/** Inet _netdir_getbyaddr lookup function.
+  * @param nc transport.
+  * @param addr address to lookup.
+  */
 struct nd_hostservlist *
 __inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
 {
@@ -540,16 +545,15 @@ __leavemulticast(int fd, struct netbuf *addr)
 	return (-1);
 }
 
-/**
- * @brief Convert an inet transport address to a universal address.
- * @param nc the transport.
- * @param taddr the transport address.
- *
- * Convert from a trasnsport address to a universal address.  The universal
- * address is formatted as %d.%d.%d.%d.%d.%d which represents the address and
- * port number from most significant byte to lease significant byte.  Each
- * number between the dots is a byte.
- */
+/** Convert an inet transport address to a universal address.
+  * @param nc the transport.
+  * @param taddr the transport address.
+  *
+  * Convert from a trasnsport address to a universal address.  The universal
+  * address is formatted as %d.%d.%d.%d.%d.%d which represents the address and
+  * port number from most significant byte to lease significant byte.  Each
+  * number between the dots is a byte.
+  */
 char *
 __inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 {
@@ -586,16 +590,15 @@ __inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 char *_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
     __attribute__ ((alias("__inet_taddr2uaddr")));
 
-/**
- * @brief Convert a universal address to a transport address.
- * @param nc the transport.
- * @param uaddr the universal address.
- *
- * Convert from universal address format to one suitable for use with inet.
- * The universal address is %d.%d.%d.%d.%d.%d which represent the address and
- * port number from most significant byte to least significant byte.  Each
- * number between the dots is a byte.
- */
+/** Convert a universal address to a transport address.
+  * @param nc the transport.
+  * @param uaddr the universal address.
+  *
+  * Convert from universal address format to one suitable for use with inet.
+  * The universal address is %d.%d.%d.%d.%d.%d which represent the address and
+  * port number from most significant byte to least significant byte.  Each
+  * number between the dots is a byte.
+  */
 struct netbuf *
 __inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 {
@@ -659,17 +662,16 @@ __inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 struct netbuf *_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
     __attribute__ ((alias("__inet_uaddr2taddr")));
 
-/**
- * @brief Merge a server and client address into a merged address.
- * @param nc the transport.
- * @param caddr the client universal address.
- * @param saddr the server universal address.
- *
- * When a server address is underspecified (such as 0.0.0.0.1.12) this
- * function takes a client address (e.g. 192.168.0.5.1.12) and makes the
- * merged address into a specific address at which the client can contact the
- * server (possibly 192.168.0.1.1.12 in this case).
- */
+/** Merge a server and client address into a merged address.
+  * @param nc the transport.
+  * @param caddr the client universal address.
+  * @param saddr the server universal address.
+  *
+  * When a server address is underspecified (such as 0.0.0.0.1.12) this function
+  * takes a client address (e.g. 192.168.0.5.1.12) and makes the merged address
+  * into a specific address at which the client can contact the server (possibly
+  * 192.168.0.1.1.12 in this case).
+  */
 char *
 __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 {
@@ -736,6 +738,6 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 char *_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
     __attribute__ ((alias("__inet_netdir_mergeaddr")));
 
-/*
- * vim: comments+=b\:TRANS
- */
+/** @} */
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

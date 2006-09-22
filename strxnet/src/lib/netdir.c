@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $
+ @(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:56 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:54:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir.c,v $
+ Revision 0.9.2.3  2006/09/22 20:54:27  brian
+ - tweaked source file for use with doxygen
+
  Revision 0.9.2.2  2006/09/18 13:52:56  brian
  - added doxygen markers to sources
 
@@ -58,11 +61,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $"
+#ident "@(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $"
 
-static char const ident[] = "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $";
+static char const ident[] =
+    "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $";
 
 /* This file can be processed with doxygen(1). */
+
+/** @addtogroup n2a Name-to-Address Translation
+ *  @{
+ *  @file
+ *  Name-to-Address Translation mapping implementation file.  */
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -156,20 +165,25 @@ static char const ident[] = "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.2
  *  ======================================
  */
 
+/** Global lock for static datastructures. */
 static pthread_rwlock_t __nsl_xlate_lock = PTHREAD_RWLOCK_INITIALIZER;
 
+/** Name-to-address translation shared object dlsym lookup. */
 struct __nsl_xlate {
-	struct __nsl_xlate *next;	/* next in list */
-	char *path;			/* full path to library */
-	nd_gbn_t gbn;			/* _netdir_getbyname */
-	nd_gba_t gba;			/* _netdir_getbyaddr */
-	nd_opt_t opt;			/* _netdir_options */
-	nd_t2u_t t2u;			/* _taddr2uaddr */
-	nd_u2t_t u2t;			/* _uaddr2taddr */
-	void *lib;			/* dlopen pointer */
+	struct __nsl_xlate *next;	/**< Next in list. */
+	char *path;			/**< Full path to library. */
+	nd_gbn_t gbn;			/**< _netdir_getbyname() */
+	nd_gba_t gba;			/**< _netdir_getbyaddr() */
+	nd_opt_t opt;			/**< _netdir_options() */
+	nd_t2u_t t2u;			/**< _taddr2uaddr() */
+	nd_u2t_t u2t;			/**< _uaddr2taddr() */
+	void *lib;			/**< dlopen() pointer. */
 } *__nsl_xlate_list = NULL;
 
-/*
+/** @weakgroup inetn2a INET Name-to-Address Translation
+  * @{ */
+/** @name INET Name-to_Address Translation
+ *  INET name-to-address translation functions.
  *  A little explanation is in order here.  SVR4 provides NSS defaults for inet
  *  if name to address translation libraries are not specified.  The functions
  *  below accomplish this.  However, they are here defined as weak undefined
@@ -177,25 +191,37 @@ struct __nsl_xlate {
  *  Also, as the libn2a_inet library also defines the netdir symbols, this
  *  library can also be specified as a name-to-address translation library in
  *  netconfig.  libn2a_inet is provided separately by the strinet package.
- */
-extern struct nd_addrlist *__inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service);
+ *  @{ */
+
+extern struct nd_addrlist *__inet_netdir_getbyname(struct netconfig *nc,
+						   struct nd_hostserv *service);
+#pragma weak __inet_netdir_getbyname
+
 extern struct nd_hostservlist *__inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr);
+
+#pragma weak __inet_netdir_getbyaddr
+
 extern int __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta);
+
+#pragma weak __inet_netdir_options
+
 extern char *__inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
+
+#pragma weak __inet_taddr2uaddr
+
 extern struct netbuf *__inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
+
+#pragma weak __inet_uaddr2taddr
+
 extern char *__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr);
 
-#pragma weak __inet_netdir_getbyname
-#pragma weak __inet_netdir_getbyaddr
-#pragma weak __inet_netdir_options
-#pragma weak __inet_taddr2uaddr
-#pragma weak __inet_uaddr2taddr
 #pragma weak __inet_netdir_mergeaddr
+/** @} */
 
-/**
- * @fn static struct __nsl_xlate *__nsl_load_xlate(const char *name);
- * @brief Load a name-to-address translation library.
- * @param name the name of the library to load.
+/** @} */
+
+/** @brief Load a name-to-address translation library.
+ *  @param name the name of the library to load.
  */
 static struct __nsl_xlate *
 __nsl_load_xlate(const char *name)
@@ -304,8 +330,7 @@ __freehostserv(struct nd_hostserv *h)
 
 /**
  * @internal Deep free an nd_hostservlist structure.
- * @param n the nd_hostservlist structure to free.
- */
+ * @param n the nd_hostservlist structure to free.  */
 static void
 __freehostservlist(struct nd_hostservlist *hl)
 {
@@ -326,14 +351,11 @@ __freehostservlist(struct nd_hostservlist *hl)
 	}
 }
 
-/**
- * @fn static struct __nsl_xlate * __nsl_lookup_xlate(const char *name);
- * @brief Lookup a name-to-address translation library.
- * @param name the name of the library to look up.
+/** @brief Lookup a name-to-address translation library.
+ *  @param name the name of the library to look up.
  *
- * This function looks up the name-to-address translation library under read
- * lock.  Libraries, once loaded are never unloaded so this will work.
- */
+ *  This function looks up the name-to-address translation library under read
+ *  lock.  Libraries, once loaded are never unloaded so this will work.  */
 static struct __nsl_xlate *
 __nsl_lookup_xlate(const char *name)
 {
@@ -349,24 +371,24 @@ __nsl_lookup_xlate(const char *name)
 	return (__nsl_load_xlate(name));
 }
 
-/**
- * @fn int netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service, struct nd_addrlist **addrs);
- * @brief Map machine and service name to transport addresses.
- * @param nc pointer to transport configuration data structure.
- * @param service pointer to nd_hostserv structure identifying machine and service name.
- * @param addrs returned pointer to allocated nd_addrlist representing the resulting transport addresses.
+/** @brief Map machine and service name to transport addresses.
+ *  @param nc pointer to transport configuration data structure.
+ *  @param service pointer to nd_hostserv structure identifying machine and service name.
+ *  @param addrs returned pointer to allocated nd_addrlist representing the resulting transport addresses.
  *
- * This function converts the machine name and service name in the nd_hostserv
- * structure to a collection of addresses of the type understood by the
- * transport identified in the netconfig structure.
- */
+ *  This function converts the machine name and service name in the
+ *  nd_hostserv structure to a collection of addresses of the type understood
+ *  by the transport identified in the netconfig structure.
+ *
+ *  @version XNSL_1.0 */
 int
 __nsl_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service,
 		       struct nd_addrlist **addrs)
 {
 	if (nc == NULL) {
 		_nderror = ND_BADARG;
-	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0 && __inet_netdir_getbyname) {
+	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0
+		   && __inet_netdir_getbyname) {
 		return ((*addrs = __inet_netdir_getbyname(nc, service)) ? 0 : -1);
 	} else {
 		struct __nsl_xlate *xl;
@@ -388,17 +410,17 @@ __nsl_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service,
 #pragma weak __nsl_netdir_getbyname
 __asm__(".symver __nsl_netdir_getbyname,netdir_getbyname@@XNSL_1.0");
 
-/**
- * @fn int netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service, struct netbuf *netaddr);
- * @brief Map transport address to a collection of machine and service names.
- * @param nc pointer to transport configuration data structure.
- * @param service returned pointer to a nd_hostservlist structure identifying the machine and service names.
- * @param netaddr pointer to a netbuf structure describing the transport address.
+/** @brief Map transport address to a collection of machine and service names.
+ *  @param nc pointer to transport configuration data structure.
+ *  @param service returned pointer to a nd_hostservlist structure identifying the machine and service names.
+ *  @param netaddr pointer to a netbuf structure describing the transport address.
  *
- * This function maps addresses to service names.  The function returns a
- * service, a list of host and service pairs that yeild these addresses.  If
- * more than one tuple of host and service name is returned, the first type
- * contains the preferred host and service names.
+ *  This function maps addresses to service names.  The function returns a
+ *  service, a list of host and service pairs that yeild these addresses.  If
+ *  more than one tuple of host and service name is returned, the first type
+ *  contains the preferred host and service names.
+ *
+ *  @version XNSL_1.0
  */
 int
 __nsl_netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service,
@@ -429,17 +451,17 @@ __nsl_netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service,
 #pragma weak __nsl_netdir_getbyaddr
 __asm__(".symver __nsl_netdir_getbyaddr,netdir_getbyaddr@@XNSL_1.0");
 
-/**
- * @fn void netdir_free(void *ptr, int struct_type);
- * @brief frees a structure returned by other netdir functions.
- * @param ptr pointer to the structure to free.
- * @param struct_type type of structure.
+/** @brief frees a structure returned by other netdir functions.
+ *  @param ptr pointer to the structure to free.
+ *  @param struct_type type of structure.
  *
- * This function is used to free the structures allocated by the name to
- * address translation functions.  The ptr parameter points to the structure
- * that has to be freed.  The parameter struct_type identifies the structure
- * and is one of ND_ADDR, ND_ADDRLIST, ND_HOSTSERV, ND_HOSTSERVLIST.  Note
- * that universal addresses are freed with free().
+ *  This function is used to free the structures allocated by the name to
+ *  address translation functions.  The ptr parameter points to the structure
+ *  that has to be freed.  The parameter struct_type identifies the structure
+ *  and is one of #ND_ADDR, #ND_ADDRLIST, #ND_HOSTSERV, #ND_HOSTSERVLIST.
+ *  Note that universal addresses are freed with free().
+ *
+ *  @version XNSL_1.0
  */
 void
 __nsl_netdir_free(void *ptr, int struct_type)
@@ -450,13 +472,13 @@ __nsl_netdir_free(void *ptr, int struct_type)
 	}
 	switch (struct_type) {
 	case ND_ADDR:
-		return __freenetbuf((struct netbuf *)ptr);
+		return __freenetbuf((struct netbuf *) ptr);
 	case ND_ADDRLIST:
-		return __freeaddrlist((struct nd_addrlist *)ptr);
+		return __freeaddrlist((struct nd_addrlist *) ptr);
 	case ND_HOSTSERV:
-		return __freehostserv((struct nd_hostserv *)ptr);
+		return __freehostserv((struct nd_hostserv *) ptr);
 	case ND_HOSTSERVLIST:
-		return __freehostservlist((struct nd_hostservlist *)ptr);
+		return __freehostservlist((struct nd_hostservlist *) ptr);
 	default:
 		_nderror = ND_UKNWN;
 		break;
@@ -467,25 +489,26 @@ __nsl_netdir_free(void *ptr, int struct_type)
 #pragma weak __nsl_netdir_free
 __asm__(".symver __nsl_netdir_free,netdir_free@@XNSL_1.0");
 
-/**
- * @fn int netdir_options(struct netconfig *nc, int option, int fd, char *pta);
- * @brief manage universal transport options.
- * @param nc pointer to transport configuration structure.
- * @param universal option option to manage.
- * @param fd transport endpoint file descriptor.
- * @param pta arguments to set.
+/** @brief manage universal transport options.
+ *  @param nc pointer to transport configuration structure.
+ *  @param option universal option option to manage.
+ *  @param fd transport endpoint file descriptor.
+ *  @param pta arguments to set.
  *
- * This function is used to do all transport specific setups and option
- * management.  fd is the associated file descriptor.  option, fd, and
- * pointer_to_args are passed to the netdir_options() function for the
- * transport specified in nc.
+ *  This function is used to do all transport specific setups and option
+ *  management.  fd is the associated file descriptor.  option, fd, and
+ *  pointer_to_args are passed to the netdir_options() function for the
+ *  transport specified in nc.
+ *
+ *  @version XNSL_1.0
  */
 int
 __nsl_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 {
 	if (nc == NULL) {
 		_nderror = ND_BADARG;
-	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0 && __inet_netdir_options) {
+	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0
+		   && __inet_netdir_options) {
 		return (__inet_netdir_options(nc, option, fd, pta));
 	} else {
 		struct __nsl_xlate *xl;
@@ -506,17 +529,17 @@ __nsl_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 #pragma weak __nsl_netdir_options
 __asm__(".symver __nsl_netdir_options,netdir_options@@XNSL_1.0");
 
-/**
- * @fn char *taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
- * @brief Converts a transport address to a universal address.
- * @param nc a pointer to the transport configuration data structure.
- * @param taddr the transport address to convert.
+/** @brief Converts a transport address to a universal address.
+ *  @param nc a pointer to the transport configuration data structure.
+ *  @param taddr the transport address to convert.
  *
  * This function supports transaltion between universal addresses and TLI type
  * netbufs.  The taddr2uaddr() function takes a struct netbuf data structure
  * and returns a pointer to a string that contains the universal address.  It
  * returns NULL if the conversion is not possible.  This is not a fatal
  * condition as some transports do not support a universal address form.
+ *
+ * @version XNSL_1.0
  */
 char *
 __nsl_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
@@ -547,17 +570,17 @@ __nsl_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 #pragma weak __nsl_taddr2uaddr
 __asm__(".symver __nsl_taddr2uaddr,taddr2uaddr@@XNSL_1.0");
 
-/**
- * @fn struct netbuf *uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
- * @brief Converts a universal address to a transport address.
- * @param nc a pointer to the transport configuration data structure.
- * @param uaddr the universal address to convert.
+/** @brief Converts a universal address to a transport address.
+ *  @param nc a pointer to the transport configuration data structure.
+ *  @param uaddr the universal address to convert.
  *
  * This function is the reverse of the taddr2uaddr() function. It returns the
  * struct netbuf data structure for the given universal address.
  *
  * It is wierd that noone documents what happens if there are no
  * name-to-address translation libraries and this function is called.
+ *
+ * @version XNSL_1.0
  */
 struct netbuf *
 __nsl_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
@@ -689,13 +712,13 @@ TRANS point. %1$d is the error number.
 };
 /* *INDENT-ON* */
 
-/**
- * @fn char *netdir_sperror(void);
- * @brief Return a netdir function error string.
+/** @brief Return a netdir function error string.
  *
  * This function returns a pointer to a buffer that contains the error message
  * string.  The buffer is overwritten on each call.  In multhreaded
  * applications, this buffers is implemented as thread-specific data.
+ *
+ * @version XNSL_1.0
  */
 char *
 __nsl_netdir_sperror(void)
@@ -738,14 +761,14 @@ __nsl_netdir_sperror(void)
 #pragma weak __nsl_netdir_sperror
 __asm__(".symver __nsl_netdir_sperror,netdir_sperror@@XNSL_1.0");
 
-/**
- * @fn void netdir_perror(char *msg);
- * @brief Print a netdir function error string to standard output.
- * @param msg prefix string.
+/** @brief Print a netdir function error string to standard output.
+ *  @param msg prefix string.
  *
- * This function prints an error message to standard output that states the
- * cause of a name-to-address mapping failure.  The error message is preceded by
- * the string given as an argument.
+ *  This function prints an error message to standard output that states the
+ *  cause of a name-to-address mapping failure.  The error message is preceded
+ *  by the string given as an argument.
+ *
+ *  @version XNSL_1.0
  *
  */
 void
@@ -757,9 +780,10 @@ __nsl_netdir_perror(char *msg)
 		fprintf(stderr, "%s\n", __nsl_netdir_sperror());
 	return;
 }
+
 #pragma weak __nsl_netdir_perror
 __asm__(".symver __nsl_netdir_perror,netdir_perror@@XNSL_1.0");
 
-/*
- * vim: comments+=b\:TRANS
- */
+/** @} */
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

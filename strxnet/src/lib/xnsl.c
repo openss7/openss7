@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $
+ @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:56 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:54:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnsl.c,v $
+ Revision 0.9.2.3  2006/09/22 20:54:28  brian
+ - tweaked source file for use with doxygen
+
  Revision 0.9.2.2  2006/09/18 13:52:56  brian
  - added doxygen markers to sources
 
@@ -58,11 +61,11 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $"
+#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:28 $"
 
-static char const ident[] = "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:56 $";
+static char const ident[] = "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:28 $";
 
-/* This file can be processed with doxygen(1). */
+/* This file cannot be processed with doxygen. */
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -474,7 +477,7 @@ __nsl_tsd_alloc(void)
 
 /**
  * @internal
- * @fn struct __nsl_tsd *__nsl_get_tsd(void);
+ * @fn struct __nsl_tsd *__nsl_get_tsd(void)
  * @brief Get thread specific data for the xnsl library.
  *
  * This function obtains (and allocates if necessary), thread specific data for
@@ -723,7 +726,7 @@ __nsl_getnetconfiglist(void)
 }
 
 /**
- * @fn void *setnetconfig(void);
+ * @fn void *setnetconfig(void)
  * @brief Provide a handle to the netconfig database.
  *
  * This function hase the effect of binding to or rewinding the netconfig
@@ -759,9 +762,9 @@ void *setnetconfig(void)
     __attribute__ ((weak, alias("__nsl_setnetconfig")));
 
 /**
- * @fn struct netconfig *getnetconfig(void *handle);
- * @brief Retrieve next entry in the netconfig database.
+ * @fn struct netconfig *getnetconfig(void *handle)
  * @param handle handle returned by setnetconfig().
+ * @brief Retrieve next entry in the netconfig database.
  *
  * This function returns a pointer to the current entry in the netconfig
  * database, formatted as a struct netconfig.  Successive calls will return
@@ -798,9 +801,9 @@ struct netconfig *getnetconfig(void *handle)
     __attribute__ ((weak, alias("__nsl_getnetconfig")));
 
 /**
- * @fn int endnetconfig(void *handle);
- * @brief Release network configuration database.
+ * @fn int endnetconfig(void *handle)
  * @param handle handle returned by setnetconfig().
+ * @brief Release network configuration database.
  *
  * This function should be called when processing is complete to release
  * resources held for reuse.  handle is the handle obtained through
@@ -836,9 +839,9 @@ int endnetconfig(void *handle)
     __attribute__ ((weak, alias("__nsl_endnetconfig")));
 
 /**
- * @fn struct netconfig *getnetconfigent(const char *netid);
- * @brief Return a network configuration entry for a network id.
+ * @fn struct netconfig *getnetconfigent(const char *netid)
  * @param netid the network id.
+ * @brief Return a network configuration entry for a network id.
  *
  * This function returns a pointer to the struct netconfig structure
  * corresponding to the argument netid.  It returns NULL if netid is invalid
@@ -906,9 +909,9 @@ struct netconfig *getnetconfigent(const char *netid)
     __attribute__ ((weak, alias("__nsl_getnetconfigent")));
 
 /**
- * @fn void freenetconfigent(struct netconfig *nc);
- * @brief Free a netconfig database entry.
+ * @fn void freenetconfigent(struct netconfig *nc)
  * @param nc the database entry to free.
+ * @brief Free a netconfig database entry.
  *
  * This function frees the netconfig structure pointed to by nc (previously
  * returned by getneconfigent()).
@@ -989,7 +992,7 @@ TRANS the decimal value of the unknown error number.
 /* *INDENT-ON* */
 
 /**
- * @fn char *nc_sperror(void);
+ * @fn char *nc_sperror(void)
  * @brief Return an error string.
  *
  * This function is similar to nc_perror() but instead of printing the message
@@ -1039,9 +1042,9 @@ char *nc_sperror(void)
     __attribute__ ((weak, alias("__nsl_nc_sperror")));
 
 /**
- * @fn void nc_perror(const char *msg);
- * @brief Print an error message to standard output.
+ * @fn void nc_perror(const char *msg)
  * @param msg message to prefix to error message.
+ * @brief Print an error message to standard output.
  *
  * This function prints and error message to standard error indicating why any
  * of the above routines failed.  The message is prepended with the string
@@ -1064,7 +1067,7 @@ void nc_perror(const char *msg)
     __attribute__ ((weak, alias("__nsl_nc_perror")));
 
 /**
- * @fn void *setnetpath(void);
+ * @fn void *setnetpath(void)
  * @brief Get a handle for network configuration database.
  *
  * A call to this function binds to or rewinds NETPATH.  This function must be
@@ -1149,9 +1152,9 @@ void *setnetpath(void)
     __attribute__ ((weak, alias("__nsl_setnetpath")));
 
 /**
- * @fn struct netconfig *getnetpath(void *handle);
- * @brief Get the next entry associated with handle.
+ * @fn struct netconfig *getnetpath(void *handle)
  * @param handle a pointer to the handle returned by setnetpath().
+ * @brief Get the next entry associated with handle.
  *
  * This function returns a pointer to the netconfig database entry corresponding
  * to the first valid NETPATH component.  The netconfig entry is formattted as a
@@ -1183,9 +1186,9 @@ struct netconfig *getnetpath(void *handle)
     __attribute__ ((weak, alias("__nsl_getnetpath")));
 
 /**
- * @fn int endnetpath(void *handle);
- * @brief Free netpath resources associated with handle.
+ * @fn int endnetpath(void *handle)
  * @param handle a pointer to the handle returned by setnetpath().
+ * @brief Free netpath resources associated with handle.
  *
  * This function may be called to unbind from NETPATH when processing is
  * complete, releasing resources for reuse.  Programmers should be aware,
@@ -1261,9 +1264,9 @@ extern char *__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *sa
 #pragma weak __inet_netdir_mergeaddr
 
 /**
- * @fn static struct __nsl_xlate *__nsl_load_xlate(const char *name);
- * @brief Load a name-to-address translation library.
+ * @fn static struct __nsl_xlate *__nsl_load_xlate(const char *name)
  * @param name the name of the library to load.
+ * @brief Load a name-to-address translation library.
  */
 static struct __nsl_xlate *
 __nsl_load_xlate(const char *name)
@@ -1395,9 +1398,9 @@ __freehostservlist(struct nd_hostservlist *hl)
 }
 
 /**
- * @fn static struct __nsl_xlate * __nsl_lookup_xlate(const char *name);
- * @brief Lookup a name-to-address translation library.
+ * @fn static struct __nsl_xlate * __nsl_lookup_xlate(const char *name)
  * @param name the name of the library to look up.
+ * @brief Lookup a name-to-address translation library.
  *
  * This function looks up the name-to-address translation library under read
  * lock.  Libraries, once loaded are never unloaded so this will work.
@@ -1418,11 +1421,11 @@ __nsl_lookup_xlate(const char *name)
 }
 
 /**
- * @fn int netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service, struct nd_addrlist **addrs);
- * @brief Map machine and service name to transport addresses.
+ * @fn int netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service, struct nd_addrlist **addrs)
  * @param nc pointer to transport configuration data structure.
  * @param service pointer to nd_hostserv structure identifying machine and service name.
  * @param addrs returned pointer to allocated nd_addrlist representing the resulting transport addresses.
+ * @brief Map machine and service name to transport addresses.
  *
  * This function converts the machine name and service name in the nd_hostserv
  * structure to a collection of addresses of the type understood by the
@@ -1457,11 +1460,11 @@ int netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service, struct n
     __attribute__ ((weak, alias("__nsl_netdir_getbyname")));
 
 /**
- * @fn int netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service, struct netbuf *netaddr);
- * @brief Map transport address to a collection of machine and service names.
+ * @fn int netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service, struct netbuf *netaddr)
  * @param nc pointer to transport configuration data structure.
  * @param service returned pointer to a nd_hostservlist structure identifying the machine and service names.
  * @param netaddr pointer to a netbuf structure describing the transport address.
+ * @brief Map transport address to a collection of machine and service names.
  *
  * This function maps addresses to service names.  The function returns a
  * service, a list of host and service pairs that yeild these addresses.  If
@@ -1498,10 +1501,10 @@ int netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service, str
     __attribute__ ((weak, alias("__nsl_netdir_getbyaddr")));
 
 /**
- * @fn void netdir_free(void *ptr, int struct_type);
- * @brief frees a structure returned by other netdir functions.
+ * @fn void netdir_free(void *ptr, int struct_type)
  * @param ptr pointer to the structure to free.
  * @param struct_type type of structure.
+ * @brief frees a structure returned by other netdir functions.
  *
  * This function is used to free the structures allocated by the name to
  * address translation functions.  The ptr parameter points to the structure
@@ -1536,12 +1539,12 @@ void netdir_free(void *ptr, int struct_type)
     __attribute__ ((weak, alias("__nsl_netdir_free")));
 
 /**
- * @fn int netdir_options(struct netconfig *nc, int option, int fd, char *pta);
- * @brief manage universal transport options.
+ * @fn int netdir_options(struct netconfig *nc, int option, int fd, char *pta)
  * @param nc pointer to transport configuration structure.
  * @param universal option option to manage.
  * @param fd transport endpoint file descriptor.
  * @param pta arguments to set.
+ * @brief manage universal transport options.
  *
  * This function is used to do all transport specific setups and option
  * management.  fd is the associated file descriptor.  option, fd, and
@@ -1575,10 +1578,10 @@ int netdir_options(struct netconfig *nc, int option, int fd, char *pta)
     __attribute__ ((weak, alias("__nsl_netdir_options")));
 
 /**
- * @fn char *taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
- * @brief Converts a transport address to a universal address.
+ * @fn char *taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
  * @param nc a pointer to the transport configuration data structure.
  * @param taddr the transport address to convert.
+ * @brief Converts a transport address to a universal address.
  *
  * This function supports transaltion between universal addresses and TLI type
  * netbufs.  The taddr2uaddr() function takes a struct netbuf data structure
@@ -1616,10 +1619,10 @@ char *taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
     __attribute__ ((weak, alias("__nsl_taddr2uaddr")));
 
 /**
- * @fn struct netbuf *uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
- * @brief Converts a universal address to a transport address.
+ * @fn struct netbuf *uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
  * @param nc a pointer to the transport configuration data structure.
  * @param uaddr the universal address to convert.
+ * @brief Converts a universal address to a transport address.
  *
  * This function is the reverse of the taddr2uaddr() function. It returns the
  * struct netbuf data structure for the given universal address.
@@ -1758,7 +1761,7 @@ TRANS point. %1$d is the error number.
 /* *INDENT-ON* */
 
 /**
- * @fn char *netdir_sperror(void);
+ * @fn char *netdir_sperror(void)
  * @brief Return a netdir function error string.
  *
  * This function returns a pointer to a buffer that contains the error message
@@ -1809,9 +1812,9 @@ char *netdir_sperror(void)
     __attribute__ ((weak, alias("__nsl_netdir_sperror")));
 
 /**
- * @fn void netdir_perror(char *msg);
- * @brief Print a netdir function error string to standard output.
+ * @fn void netdir_perror(char *msg)
  * @param msg prefix string.
+ * @brief Print a netdir function error string to standard output.
  *
  * This function prints an error message to standard output that states the
  * cause of a name-to-address mapping failure.  The error message is preceded by
@@ -1836,9 +1839,9 @@ void netdir_perror(char *s)
  */
 
 /**
- * @brief Inet _netdir_getbyname lookup function.
  * @param nc transport.
  * @param h host and service name.
+ * @brief Inet _netdir_getbyname lookup function.
  *
  * Converts a host and service name into an address list.  This function uses
  * the newer getaddrinfo(3) AF_INET lookup call.  It is fairly simplistic.
@@ -1893,9 +1896,9 @@ __inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
 }
 
 /**
- * @brief Inet _netdir_getbyaddr lookup function.
  * @param nc transport.
  * @param addr address to lookup.
+ * @brief Inet _netdir_getbyaddr lookup function.
  */
 struct nd_hostservlist *
 __inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
@@ -2114,9 +2117,9 @@ __leavemulticast(int fd, struct netbuf *addr)
 }
 
 /**
- * @brief Convert an inet transport address to a universal address.
  * @param nc the transport.
  * @param taddr the transport address.
+ * @brief Convert an inet transport address to a universal address.
  *
  * Convert from a trasnsport address to a universal address.  The universal
  * address is formatted as %d.%d.%d.%d.%d.%d which represents the address and
@@ -2157,9 +2160,9 @@ __inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 }
 
 /**
- * @brief Convert a universal address to a transport address.
  * @param nc the transport.
  * @param uaddr the universal address.
+ * @brief Convert a universal address to a transport address.
  *
  * Convert from universal address format to one suitable for use with inet.
  * The universal address is %d.%d.%d.%d.%d.%d which represent the address and
@@ -2227,10 +2230,10 @@ __inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 }
 
 /**
- * @brief Merge a server and client address into a merged address.
  * @param nc the transport.
  * @param caddr the client universal address.
  * @param saddr the server universal address.
+ * @brief Merge a server and client address into a merged address.
  *
  * When a server address is underspecified (such as 0.0.0.0.1.12) this
  * function takes a client address (e.g. 192.168.0.5.1.12) and makes the
@@ -2302,10 +2305,10 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.2 $).
+ * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.3 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.2 $)
- * @date \$Date: 2006/09/18 13:52:56 $
+ * @version \$Name:  $(\$Revision: 0.9.2.3 $)
+ * @date \$Date: 2006/09/22 20:54:28 $
  *
  * @}
  */
