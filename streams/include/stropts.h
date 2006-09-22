@@ -58,18 +58,9 @@
 
 /* This file can be processed with doxygen(1). */
 
-/**
- * @file
- * @brief Defines the interface to STREAMS(9) character device special files.
- * @{
- */
+#include <sys/stropts.h>
 
-/**
- * @name STREAMS System Calls
- * System calls for STREAMS character device special files.
- * @addtogroup strcalls STREAMS System Calls
- * @{
- */
+#include <sys/ioctl.h>
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -77,62 +68,60 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <sys/stropts.h>
+/**
+  * @ingroup strcalls STREAMS System Calls
+  * @{
+  * @file
+  * @brief Defines the interface to STREAMS(9) character device special files.
+  * @{ */
 
-#if 0
-/* Perform the I/O control operation specified by REQUEST on FD.
-   One argument may follow; its presence and type depend on REQUEST.
-   Return value depends on REQUEST.  Usually -1 indicates error.  */
-extern int
-ioctl(int __fd, unsigned long int __request, ...)
-    __THROW;
-#endif
+/** Perform the I/O control operation specified by request on fd.
+  * One argument may follow; its presence and type depend on request.  Return
+  * value depends on request.  Usually -1 indicates error.
+  */
+extern int ioctl(int fd, unsigned long int request, ...);
 
-#include <sys/ioctl.h>
-
-/* Test whether FILDES is associated with a STREAM-based file.  */
+/** Test whether fd is associated with a STREAM-based file. */
 extern int isastream(int fd);
 
-/* Receive next message from a STREAMS file.
-
-   This function is a cancellation point and therefore not marked with
-   __THROW.  */
+/** Receive next message from a STREAMS file. */
 extern int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
 
-/* Receive next message from a STREAMS file, with *FLAGSP allowing to
-   control which message.
+/** Receive next message from a STREAMS file, with flagsp controlling which message. */
+extern int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp);
 
-   This function is a cancellation point and therefore not marked with
-   __THROW.  */
-extern int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp,
-		   int *flagsp);
+/** Send a message on a STREAMS file. */
+extern int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags);
 
-/* Send a message on a STREAM.
-
-   This function is a cancellation point and therefore not marked with
-   __THROW.  */
-extern int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr,
-		  int flags);
-
-/* Send a message on a STREAM to the BAND.
-
-   This function is a cancellation point and therefore not marked with
-   __THROW.  */
+/** Send a message on a STREAMS file to the specified band. */
 extern int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr,
 		   int band, int flags);
 
-/* Attach a STREAMS-based file descriptor FILDES to a file PATH in the
-   file system name space.  */
+/** Attach a STREAMS-based file descriptor, fd, to a file, path, in the file system name space. */
 extern int fattach(int fd, const char *path);
 
-/* Detach a name PATH from a STREAMS-based file descriptor.  */
+/** Detach a name, path, from a STREAMS-based file descriptor. */
 extern int fdetach(const char *path);
 
-/* Create a one-way communication channel (pipe).
-   If successful, two file descriptors are stored in PIPEDES;
-   bytes written on PIPEDES[1] can be read from PIPEDES[0].
-   Returns 0 if successful, -1 if not.  */
+/** Create a one-way communication channel (pipe).
+  * If successful, two file descriptors are stored in fds; bytes written on
+  * fds[1] can be read from fds[0].  Returns 0 if successful, -1 if not.
+  */
 extern int pipe(int fds[2]);
+
+/** @} */
+
+extern int __streams_ioctl(int fd, unsigned long int request, ...);
+extern int __streams_isastream(int fd);
+extern int __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
+extern int __streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp);
+extern int __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags);
+extern int __streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags);
+extern int __streams_fattach(int fd, const char *path);
+extern int __streams_fdetach(const char *path);
+extern int __streams_pipe(int fds[2]);
+
+/** @} */
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -140,7 +129,6 @@ __END_DECLS
 /* *INDENT-ON* */
 #endif
 
-/** @} */
-/** @} */
-
 #endif				/* _STROPTS_H */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

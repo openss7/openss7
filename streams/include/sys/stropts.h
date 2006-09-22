@@ -54,18 +54,6 @@
 
 #ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 14:06:21 $"
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif				/* __BEGIN_DECLS */
-
 #include <sys/streams/stropts.h>
-
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif				/* __END_DECLS */
 
 #endif				/* __SYS_STROPTS_H__ */

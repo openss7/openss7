@@ -64,4 +64,20 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+/**
+  * @ingroup strlog STREAMS Log Driver strlog(4)
+  * @{ */
+/**
+  * @file
+  * @brief STREAMS Log Driver strlog(4).
+  *
+  * This file is empty.  One of the reasons for this is that the Linux/BSD log.h
+  * header files provide most of the definitions needed in this file.  See also,
+  * log(4).
+  * @{ */
+#define FOO
+#define BAR
+/** @} */
+/** @} */
+
 #endif				/* __SYS_STREAMS_LOG_H__ */

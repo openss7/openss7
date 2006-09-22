@@ -64,6 +64,13 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+/** @ingroup loop STREAMS Loop Driver loop(4)
+  * @{
+  * @file
+  * @brief STREAMS Loop Driver loop(4).
+  * @{ */
 #define LOOP_SET    (('1'<<8)|1)
+/** @} */
+/** @} */
 
 #endif				/* __SYS_STREAMS_LOOP_H__ */
