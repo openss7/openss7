@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/18 13:52:52 $
+ @(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/22 21:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/18 13:52:52 $"
+#ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/18 13:52:52 $";
+static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/22 21:21:19 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -76,16 +76,12 @@ static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.
 #define __hot __attribute__((section(".text.hot")))
 #define __unlikely __attribute__((section(".text.unlikely")))
 
-/**
- * @addtogroup strcalls
- * @fn int isastream(int fd)
- * @brief test a stream.
- * @param fd a file descriptor to test.
- *
- * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
- * Because isastream() consists of a single system call, asynchronous thread
- * cancellation protection is not required.
- */
+/** @brief Test a stream.
+  * @param fd a file descriptor to test.
+  *
+  * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Because isastream() consists of a single system call, asynchronous thread
+  * cancellation protection is not required.  */
 __unlikely int
 __streams_isastream(int fd)
 {
@@ -97,10 +93,11 @@ __streams_isastream(int fd)
 	return (1);
 }
 
-__asm__(".symver __streams_isastream,isastream@@STREAMS_1.0");
+__asm__(".symver __streams_isastream,isastream@@@STREAMS_1.0");
 
 int __lis_isastream(int)
 	__attribute__((weak, alias("__streams_isastream")));
 
 __asm__(".symver __lis_isastream,isastream@LIS_1.0");
 
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

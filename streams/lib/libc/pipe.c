@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/18 13:52:52 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/22 21:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/18 13:52:52 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/18 13:52:52 $";
+static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/22 21:21:19 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -106,6 +106,11 @@ __lis_pipe(int *fds)
 #endif
 
 /* I prefer not to use a dummy stream anyway. */
+
+/** @brief open a streams based pipe.
+  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  *
+  * This is the non-recursive version of __streams_pipe_r(). */
 int
 __streams_pipe(int *fds)
 {
@@ -133,16 +138,12 @@ __streams_pipe(int *fds)
 	return (0);
 }
 
-/**
- * @addtogroup strcalls
- * @fn int pipe(int fds[2])
- * @brief open a streams based pipe.
- * @param fds a pointer to the two file descriptors, one for each end of the pipe.
- *
- * pipe() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
- * must protect from asyncrhonous cancellation between the open(), ioctl() and
- * close() operations.
- */
+/** @brief open a streams based pipe.
+  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  *
+  * pipe() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
+  * must protect from asyncrhonous cancellation between the open(), ioctl() and
+  * close() operations.  */
 int
 __streams_pipe_r(int *fds)
 {
@@ -158,7 +159,7 @@ __streams_pipe_r(int *fds)
 	return (ret);
 }
 
-__asm__(".symver __streams_pipe_r,pipe@@STREAMS_1.0");
+__asm__(".symver __streams_pipe_r,pipe@@@STREAMS_1.0");
 
 int __lis_pipe(int *)
 	__attribute__((weak, alias("__streams_pipe")));
@@ -167,3 +168,5 @@ int __lis_pipe_r(int *)
 	__attribute__((weak, alias("__streams_pipe_r")));
 
 __asm__(".symver __lis_pipe_r,pipe@LIS_1.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

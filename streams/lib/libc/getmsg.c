@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $
+ @(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $"
+#ident "@(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $";
+static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -76,23 +76,19 @@ static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.1
 int __streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
 int __old_streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
 
-/**
- * @addtogroup strcalls
- * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
- * @brief get a message from a STREAM.
- * @param fd a file descriptor for the stream.
- * @param ctlptr a pointer to a struct strbuf structure that returns the
- * control part of the retrieved message.
- * @param datptr a pointer to a struct strbuf structuer that returns the data
- * part of the retrieved message.
- * @param flagsp a pointer to an integer flags word that returns the priority
- * of the retrieved message.
- *
- * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
- * Because getmsg consists of a single call to getpmsg() which has the same
- * characteristics, no protection against asynchronous thread cancellation is
- * required.
- */
+/** @brief Get a message from a Stream.
+  * @param fd a file descriptor for the stream.
+  * @param ctlptr a pointer to a struct strbuf structure that returns the
+  * control part of the retrieved message.
+  * @param datptr a pointer to a struct strbuf structuer that returns the data
+  * part of the retrieved message.
+  * @param flagsp a pointer to an integer flags word that returns the priority
+  * of the retrieved message.
+  *
+  * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Because getmsg consists of a single call to getpmsg() which has the same
+  * characteristics, no protection against asynchronous thread cancellation is
+  * required.  */
 int
 __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
@@ -100,13 +96,19 @@ __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flag
 
 	return __streams_getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
+__asm__(".symver __streams_getmsg,getmsg@@@STREAMS_1.0")
 
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
-__asm__(".symver __streams_getmsg,getmsg@@STREAMS_1.0")
-#else
-__asm__(".symver __streams_getmsg,getmsg@STREAMS_1.0")
-#endif
-
+/** @brief Get a message from a Stream.
+  * @param fd a file descriptor for the stream.
+  * @param ctlptr a pointer to a struct strbuf structure that returns the
+  * control part of the retrieved message.
+  * @param datptr a pointer to a struct strbuf structuer that returns the data
+  * part of the retrieved message.
+  * @param flagsp a pointer to an integer flags word that returns the priority
+  * of the retrieved message.
+  *
+  * This version is an old implementation that uses the read()/write() method
+  * instead of the ioctl() method for emulating getmsg() system calls. */
 int
 __old_streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
@@ -114,12 +116,7 @@ __old_streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *
 
 	return __old_streams_getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
-
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __old_streams_getmsg,getmsg@STREAMS_0.0")
-#else
-__asm__(".symver __old_streams_getmsg,getmsg@@STREAMS_0.0")
-#endif
 
 int __lis_getmsg(int, struct strbuf *, struct strbuf *, int *)
 	__attribute__((weak, alias("__streams_getmsg")));
@@ -136,3 +133,5 @@ int __old_lis_getmsg_r(int, struct strbuf *, struct strbuf *, int *)
 	__attribute__((weak, alias("__old_streams_getmsg")));
 
 __asm__(".symver __old_lis_getmsg_r,getmsg@LIS_0.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

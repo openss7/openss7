@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/18 13:52:52 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/09/22 21:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/18 13:52:52 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/09/22 21:21:19 $"
 
 static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/18 13:52:52 $";
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/09/22 21:21:19 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -79,6 +79,8 @@ static char const ident[] =
 #define __hot __attribute__((section(".text.hot")))
 #define __unlikely __attribute__((section(".text.unlikely")))
 
+/** @file */
+
 extern void pthread_testcancel(void);
 
 noinline __unlikely void
@@ -94,23 +96,18 @@ __putpmsg_error(int fd)
 	pthread_testcancel();
 }
 
-/**
- * @addtogroup strcalls
- * @fn int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
- * @brief put a message to a stream band.
- * @param fd a file descriptor representing the stream.
- * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
- * @param datptr a pointer to a strbuf structure describing the data part of the message.
- * @param band the band to which to put the message.
- * @param flags the priority of the message.
- *
- * putpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In
- * the Linux Threads approach, this function will return EINTR if interrupted
- * by a signal.  When the function returns EINTR, the Linux Threads user
- * should check for cancellation with pthread_testcancel().  Because this
- * function consists of a single system call, asynchronous thread cancellation
- * protection is not required.
- */
+/** @internal
+  * @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  *
+  * This is the newer kernel implemetnation that uses ioctl() to emulate a
+  * system call.  The newer kernels support ioctl_unlocked() and this is quite
+  * efficient.  This is the only way that works on newer kernels and the old
+  * method will fail.  */
 static inline __hot int
 __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
@@ -131,18 +128,18 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 	return (err);
 }
 
-/**
- *
- * @addtogroup strcalls
- * @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
- * @brief put a message to a stream band.
- * @param fd a file descriptor representing the stream.
- * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
- * @param datptr a pointer to a strbuf structure describing the data part of the message.
- * @param flags the priority of the message.
- *
- * This function is a thread cancellation point.
- */
+/** @internal
+  * @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  *
+  * This is the older kernel implementation that uses read()/write() to emulate
+  * a system call.  The older kernels do not support ioctl_unlocked() or
+  * ioctl_compat() and this was the best way to emulate system calls on older
+  * kernels.  */
 static inline __hot int
 __old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
@@ -163,18 +160,26 @@ __old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, 
 	return (err);
 }
 
-__hot int
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  *
+  * putpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In
+  * the Linux Threads approach, this function will return EINTR if interrupted
+  * by a signal.  When the function returns EINTR, the Linux Threads user should
+  * check for cancellation with pthread_testcancel().  Because this function
+  * consists of a single system call, asynchronous thread cancellation
+  * protection is not required.  */
+int __hot
 __streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
 		  int flags)
 {
 	return __putpmsg(fd, ctlptr, datptr, band, flags);
 }
-
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
-__asm__(".symver __streams_putpmsg,putpmsg@@STREAMS_1.0");
-#else
-__asm__(".symver __streams_putpmsg,putpmsg@STREAMS_1.0");
-#endif
+__asm__(".symver __streams_putpmsg,putpmsg@@@STREAMS_1.0");
 
 __hot int
 __old_streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
@@ -182,12 +187,7 @@ __old_streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *
 {
 	return __old_putpmsg(fd, ctlptr, datptr, band, flags);
 }
-
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __old_streams_putpmsg,putpmsg@STREAMS_0.0");
-#else
-__asm__(".symver __old_streams_putpmsg,putpmsg@@STREAMS_0.0");
-#endif
 
 int __lis_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int)
 	__attribute__((weak, alias("__streams_putpmsg")));
@@ -206,29 +206,27 @@ int __old_lis_putpmsg_r(int, const struct strbuf *, const struct strbuf *, int, 
 __asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");
 
 
-__hot int
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  *
+  * This function is a thread cancellation point.  For Linux Fast-STREAMS,
+  * putmsg can be simply emulated with a call to putpmsg(). */
+int __hot
 __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
 	return __putpmsg(fd, ctlptr, datptr, -1, flags);
 }
-
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
-__asm__(".symver __streams_putmsg,putmsg@@STREAMS_1.0");
-#else
-__asm__(".symver __streams_putmsg,putmsg@STREAMS_1.0");
-#endif
+__asm__(".symver __streams_putmsg,putmsg@@@STREAMS_1.0");
 
 __hot int
 __old_streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
 	return __old_putpmsg(fd, ctlptr, datptr, -1, flags);
 }
-
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __old_streams_putmsg,putmsg@STREAMS_0.0");
-#else
-__asm__(".symver __old_streams_putmsg,putmsg@@STREAMS_0.0");
-#endif
 
 int __lis_putmsg(int, const struct strbuf *, const struct strbuf *, int, int)
 	__attribute__((weak, alias("__streams_putmsg")));
@@ -246,3 +244,4 @@ int __old_lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int, i
 
 __asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");
 
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

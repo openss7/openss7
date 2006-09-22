@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:52 $
+ @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 21:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:52 $"
+#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:52 $";
+static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 21:21:19 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -107,3 +107,4 @@ pthread_setcanceltype(int type, int *oldtype)
 	return (0);
 }
 
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

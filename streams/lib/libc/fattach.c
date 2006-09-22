@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $
+ @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $"
+#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $"
 
 static char const ident[] =
-    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $";
+    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -73,25 +73,23 @@ static char const ident[] =
 #define __unlikely __attribute__((section(".text.unlikely")))
 
 /**
- * @addtogroup strcalls
- * @fn int fattach(int fd, const char *path)
- * @brief attach a stream to a path in a filesystem.
- * @param fd the file descriptor of the stream to attach.
- * @param path the path in the filesystem to which to attach the stream.
- *
- * fattach() cannot contain a thread cancellation point.  Because this
- * function contains a single system call, it is asyncrhonous thread
- * cancellation safe.
- */
+  * @brief Attach a stream to a path in a filesystem.
+  * @param fd the file descriptor of the stream to attach.
+  * @param path the path in the filesystem to which to attach the stream.
+  *
+  * fattach() cannot contain a thread cancellation point.  Because this function
+  * contains a single system call, it is asyncrhonous thread cancellation safe.  */
 int __unlikely
 __streams_fattach(int fd, const char *path)
 {
 	return (ioctl(fd, I_FATTACH, path));
 }
 
-__asm__(".symver __streams_fattach,fattach@@STREAMS_1.0");
+__asm__(".symver __streams_fattach,fattach@@@STREAMS_1.0");
 
 int __lis_fattach(int, const char *)
 	__attribute__((weak, alias("__streams_fattach")));
 
 __asm__(".symver __lis_fattach,fattach@LIS_1.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $";
+static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -105,16 +105,12 @@ __streams_fdetach(const char *path)
 	return 0;
 }
 
-/**
- * @addtogroup strcalls
- * @fn int fdetach(const char *path)
- * @brief detach a path from a stream.
- * @param path the path in the filesystem from which to detach.
- *
- * fdetach() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
- * must protect from asyncrhonous cancellation between the open(), ioctl() and
- * close() operations.
- */
+/** @brief detach a path from a stream.
+  * @param path the path in the filesystem from which to detach.
+  *
+  * fdetach() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
+  * must protect from asyncrhonous cancellation between the open(), ioctl() and
+  * close() operations.  */
 int __unlikely
 __streams_fdetach_r(const char *path)
 {
@@ -126,7 +122,7 @@ __streams_fdetach_r(const char *path)
 	return (ret);
 }
 
-__asm__(".symver __streams_fdetach_r,fdetach@@STREAMS_1.0");
+__asm__(".symver __streams_fdetach_r,fdetach@@@STREAMS_1.0");
 
 int __lis_fdetach(const char *)
 	__attribute__((weak, alias("__streams_fdetach")));
@@ -136,4 +132,4 @@ int __lis_fdetach_r(const char *)
 
 __asm__(".symver __lis_fdetach_r,fdetach@LIS_1.0");
 
-
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

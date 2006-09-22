@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $
+ @(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $"
+#ident "@(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 13:52:52 $";
+static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -71,40 +71,26 @@ static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.1
 int __streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
 int __old_streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
 
-/**
- * @addtogroup strcalls
- * @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
- * @brief put a message to a stream band.
- * @param fd a file descriptor representing the stream.
- * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
- * @param datptr a pointer to a strbuf structure describing the data part of the message.
- * @param flags the priority of the message.
- *
- * This function is a thread cancellation point.
- */
+/** @brief put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  *
+  * This function is a thread cancellation point.  */
 int
 __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
 	return __streams_putpmsg(fd, ctlptr, datptr, -1, flags);
 }
-
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
-__asm__(".symver __streams_putmsg,putmsg@@STREAMS_1.0");
-#else
-__asm__(".symver __streams_putmsg,putmsg@STREAMS_1.0");
-#endif
+__asm__(".symver __streams_putmsg,putmsg@@@STREAMS_1.0");
 
 int
 __old_streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
 	return __old_streams_putpmsg(fd, ctlptr, datptr, -1, flags);
 }
-
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
 __asm__(".symver __old_streams_putmsg,putmsg@STREAMS_0.0");
-#else
-__asm__(".symver __old_streams_putmsg,putmsg@@STREAMS_0.0");
-#endif
 
 int __lis_putmsg(int, const struct strbuf *, const struct strbuf *, int)
 	__attribute__((weak, alias("__streams_putmsg")));
@@ -121,3 +107,5 @@ int __old_lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int)
 	__attribute__((weak, alias("__old_streams_putmsg")));
 
 __asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
