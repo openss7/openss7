@@ -1,0 +1,256 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/09/22 20:45:28 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/09/22 20:45:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strxnet.dox.in,v $
+ Revision 1.1.2.1  2006/09/22 20:45:28  brian
+ - added main page documentation
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/09/22 20:45:28 $"
+
+static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/09/22 20:45:28 $";
+
+/* This file can be processed with doxygen(1). */
+
+/* The sole purpose of this file is to provide an initial outline and cursory
+ * and introductory information for doxygen and any other doxygen
+ * documentation that has no business cluttering up a head or source file. */
+
+/**
+ *  @defgroup xtitli OpenSS7 XTI/TLI Networking
+ *  OpenSS7 XTI/TLI Networking package.
+ *
+ *	@defgroup pthread OpenSS7 Library Thread Safety
+ *	@ingroup xtitli
+ *	OpenSS7 Library Thread Safety.
+ *
+ *	@defgroup tpi Transport Provider Interface
+ *	@ingroup xtitli
+ *	Transport Provider Interface.
+ *
+ *	    @defgroup loopback XTI Loopback Transport
+ *	    @ingroup tpi
+ *	    OpenSS7 XTI Loopback header files.
+ *
+ *	@defgroup xnet OpenSS7 XNET Library
+ *	@ingroup xtitli
+ *	OpenSS7 XNET Library.
+ *
+ *	@version XNET_1.0
+ *	    
+ *	    @defgroup timod XTI Cooperating STREAMS Module
+ *	    @ingroup xnet
+ *	    STREAMS XTI cooperating module.
+ *
+ *	    @defgroup tirdwr XTI Read/Write STREAMS Module
+ *	    @ingroup xnet
+ *	    STREAMS XTI Read/Write module.
+ *
+ *	@defgroup xnsl OpenSS7 NSL Library
+ *	@ingroup xtitli
+ *	OpenSS7 NSL Library.
+ *
+ *	This is the OpenSS7 Network Services Library for Linux Fast-STREAMS.  This library contains
+ *	not all of the components that are in the nsl (glibc provides some such as a stripped down
+ *	version of Sun's ONC RPC and the BSD getbyname, a different implementation of Sun's
+ *	nsswitch, and frields).
+ *
+ *	@version XNSL_1.0
+ *
+ *	    @defgroup nsf Network Selection Facility
+ *	    @ingroup xnsl
+ *	    OpenSS7 Network Selection Facility module.
+ *
+ *	    @defgroup n2a Name-to-Address Translation
+ *	    @ingroup xnsl
+ *	    OpenSS7 Name-to-Address Translation module.
+ *
+ *		@defgroup inetn2a INET Name-to-Address Translation
+ *		@ingroup n2a
+ *		INET Name-to-Address Translation module.
+ */
+
+/**
+  * @mainpage The STREAMS XTI/TLI and TI Libraries Package
+  * @version @PACKAGE@(@VERSION@)
+  * @author Brian Bidulock <bidulock@openss7.org>
+  *
+  * @section preface Preface
+  *
+  * @section intro Introduction
+  *
+  * This manual contains documentation taken directly from the source code using <tt><b>doxygen</b>(1)</tt>.
+  * All <a href="http://www.openss7.org/">OpenSS7 Project</a> user level source code, programs and
+  * libraries are documented using <b>doxygen</b>(1).
+  *
+  * @section overview Overview
+  *
+  * This manual provides developer and maintainer intensive information concerning two OpenSS7
+  * libraries contained in the @b "@PACKAGE_TITLE@" package, @b @PACKAGE@(@b @VERSION@).
+  *
+  * @li @ref xtitli
+  * @li @ref xnsl
+  *
+  * @subsection typeographical Typeographical Conventions
+  *
+  * The typographical conventions of <b>doxygen</b>(1) apply with the following additional conventions:
+  *
+  * @li Manual pages are typeset as "<b>manualpage</b>(section)," such as, for example, <b>doxygen</b>(1).
+  *
+  */
+
+/*
+ *  @ingroup loopback
+ *  @file src/include/sys/ticlts.h
+ *  TPI CLTS Loopback Header File.
+ *
+ *  @ingroup loopback
+ *  @file src/include/sys/ticots.h
+ *  TPI COTS Loopback Header File.
+ *
+ *  @ingroup loopback
+ *  @file src/include/sys/ticotsord.h
+ *  TPI COTS w/ Orderly Release Header File.
+ *
+ *  @ingroup timod
+ *  @file src/include/sys/timod.h
+ *  Transport Interface Module (timod) Header File.
+ *
+ *  @ingroup tirdwr
+ *  @file src/include/sys/tirdwr.h
+ *  Transport Interface Read/Write (tirdwr) Header File.
+ *  This file contains no definitions.  Nevertheless, this header file should exist to
+ *  indicate the existence of support for the tirdwr(4) module.
+ *
+ *  @ingroup nsf
+ *  @file src/include/netconfig.h
+ *  Non-system level network selection facility header file.
+ *  This header file simply includes sys/netconfig.h.
+ *
+ *  @ingroup nsf
+ *  @file src/include/sys/netconfig.h
+ *  Primary network selection facility header file.
+ *
+ *  @ingroup n2a
+ *  @file src/include/netdir.h
+ *  Network Name-to-Address Translation header file.
+ *
+ *  @ingroup tpi
+ *  @file src/include/sys/tpi.h
+ *  TPI Common Header File.
+ *  This file contains definitions that are common to XTI, TLI and TPI.  It is included by
+ *  <xti.h> and <tiuser.h> as well as <tihdr.h>. 
+ *
+ *  @ingroup tpi
+ *  @file src/include/sys/tihdr.h
+ *  Transport Interface Header File.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/tiuser.h
+ *  Transport Interface User header file.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/tli.h
+ *  Transport Layer Interface header file.
+ *  This file is included by sys/tiuser.h and sys/tihdr.h.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_local.h
+ *  XTI Local header file.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti.h
+ *  XTI header file.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_xti.h
+ *  XTI Generic options header file.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_atm.h
+ *  XTI ATM Transport Specific header file.
+ *  For the purposes of conformance testing, it may be assumed that any constant values
+ *  defined in these header files are mandatory, unless the constant:
+ *  @li defines an option or options level,
+ *  @li is accompanied by a comment that specifies the value is not mandatory.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_mosi.h
+ *  XTI Minimal OSI header file.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_iso.h
+ *  XTI ISO-Specific header file.
+ *  This file contains specific ISO option and management parameters.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_ip.h
+ *  XTI INET header file.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_udp.h
+ *  XTI UDP-Specific header file.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_tcp.h
+ *  XTI TCP-Specific Header File.
+ *
+ *  @ingroup xnet
+ *  @file src/include/sys/xti_sctp.h
+ *  XTI SCTP-Specific header file.
+ *
+ *
+ *
+ */
+
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
