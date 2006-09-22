@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2006/09/18 01:43:46 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2006/09/22 21:20:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 01:43:46 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 21:20:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.166  2006/09/22 21:20:20  brian
+ - roughed in I_EGETSIG I_ESETSIG code
+
  Revision 0.9.2.165  2006/09/18 01:43:46  brian
  - struct lock ordering
 
@@ -131,10 +134,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2006/09/18 01:43:46 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2006/09/22 21:20:20 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2006/09/18 01:43:46 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2006/09/22 21:20:20 $";
 
 //#define __NO_VERSION__
 
@@ -235,7 +238,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2006/09/18 01:43:46 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2006/09/22 21:20:20 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -8499,6 +8502,66 @@ str_i_anchor(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
+/**
+ *  str_i_esetsig: - set signals for a pid streamio(7) %I_ESETSIG ioctl
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to a &struct strsigset structure
+ */
+streams_noinline streams_fastcall int
+str_i_esetsig(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int err = EOPNOTSUPP;
+
+	return (err);
+}
+
+#ifdef WITH_32BIT_CONVERSION
+/**
+ *  str_i_esetsig32: - set signals for a pid streamio(7) %I_ESETSIG ioctl for 32 bit compatibility
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to a &struct strsigset structure
+ */
+streams_noinline streams_fastcall int
+str_i_esetsig32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int err = EOPNOTSUPP;
+
+	return (err);
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
+/**
+ *  str_i_egetsig: - get signals for a pid streamio(7) %I_ESETSIG ioctl
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to a &struct strsigset structure
+ */
+streams_noinline streams_fastcall int
+str_i_egetsig(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int err = EOPNOTSUPP;
+
+	return (err);
+}
+
+#ifdef WITH_32BIT_CONVERSION
+/**
+ *  str_i_egetsig32: - get signals for a pid streamio(7) %I_ESETSIG ioctl for 32 bit compatibility
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to a &struct strsigset structure
+ */
+streams_noinline streams_fastcall int
+str_i_egetsig32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int err = EOPNOTSUPP;
+
+	return (err);
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -8926,6 +8989,12 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(I_ANCHOR):
 			_printd(("%s: got I_ANCHOR\n", __FUNCTION__));
 			return str_i_anchor(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_ESETSIG):
+			_printd(("%s: got I_ESETSIG\n", __FUNCTION__));
+			return str_i_egetsig(file, sd, arg);
+		case _IOC_NR(I_EGETSIG):
+			_printd(("%s: got I_EGETSIG\n", __FUNCTION__));
+			return str_i_esetsig(file, sd, arg);
 			/* Linux Fast-STREAMS special ioctls */
 		case _IOC_NR(I_GETPMSG):	/* getpmsg syscall emulation */
 			_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
@@ -9398,6 +9467,12 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(I_ANCHOR):
 			_printd(("%s: got I_ANCHOR\n", __FUNCTION__));
 			return str_i_anchor(file, sd, arg);
+		case _IOC_NR(I_ESETSIG):
+			_printd(("%s: got I_ESETSIG\n", __FUNCTION__));
+			return str_i_esetsig(file, sd, arg);
+		case _IOC_NR(I_EGETSIG):
+			_printd(("%s: got I_EGETSIG\n", __FUNCTION__));
+			return str_i_egetsig(file, sd, arg);
 			/* Linux Fast-STREAMS special ioctls */
 		case _IOC_NR(I_GETPMSG):	/* getpmsg syscall emulation */
 			_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
@@ -9949,6 +10024,8 @@ STATIC struct ioctl_trans streams_translations[] = {
 	{.cmd = I_SERROPT,.handler = &streams_compat_ioctl,.next = NULL,},
 	{.cmd = I_GERROPT,.handler = &streams_compat_ioctl,.next = NULL,},
 	{.cmd = I_ANCHOR,.handler = &streams_compat_ioctl,.next = NULL,},
+	{.cmd = I_ESETSIG,.handler = &streams_compat_ioctl,.next = NULL,},
+	{.cmd = I_EGETSIG,.handler = &streams_compat_ioctl,.next = NULL,},
 //      {.cmd = I_S_RECVFD,.handler = &streams_compat_ioctl,.next = NULL,},
 //      {.cmd = I_STATS,.handler = &streams_compat_ioctl,.next = NULL,},
 //      {.cmd = I_BIGPIPE,.handler = &streams_compat_ioctl,.next = NULL,},
