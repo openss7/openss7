@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/22 20:45:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,113 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/09/22 20:45:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: streams.dox.in,v $
+ Revision 0.9.2.1  2006/09/22 20:45:25  brian
+ - added main page documentation
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/22 20:45:25 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/22 20:45:25 $";
 
 /* This file can be processed with doxygen(1). */
+
+/* The sole purpose of this file is to provide an initial outline and cursory
+ * and introductory information for doxygen and any other doxygen
+ * documentation that has no business cluttering up a head or source file. */
+
+/**
+ *  @defgroup streams STREAMS
+ *  @brief SVR 4.2 Compatible Linux Fast-STREAMS.
+ *
+ *	@defgroup strif STREAMS Interface
+ *	@ingroup streams
+ *	@brief Standard STTREAMS Interface.
+ *
+ *	@defgroup stropts STREAMS Options
+ *	@ingroup streams
+ *	@brief Standard STREAMS Stream Head Options.
+ *
+ *	@defgroup streamio STREAMS Input-Output Controls
+ *	@ingroup streams
+ *	@brief Standard STREAMS Input-Output Controls.
+ *
+ *	@defgroup strcalls STREAMS System Calls
+ *	@ingroup streams
+ *	@brief Standard STREAMS System Calls.
+ *
+ *	@defgroup strmods STREAMS Modules
+ *	@ingroup streams
+ *	@brief Standard STREAMS Modules
+ *
+ *	    @defgroup sc STREAMS Configuration Module sc(4)
+ *	    @ingroup strmods
+ *	    @brief STREAMS Configuration Module sc(4).
+ *
+ *	    @defgroup pipemod STREAMS Pipe Module pipemod(4)
+ *	    @ingroup strmods
+ *	    @brief STREAMS Pipe Module pipemod(4).
+ *
+ *	    @defgroup nullmod STREAMS Null Module nullmod(4)
+ *	    @ingroup strmods
+ *	    @brief STREAMS Null Module nullmod(4).
+ *
+ *	    @defgroup testmod STREAMS Test Module testmod(4)
+ *	    @ingroup strmods
+ *	    @brief STREAMS Test Module testmod(4).
+ *
+ *	    This module documents the user to STREAMS module interface between
+ *	    the user and the Test Module (testmod(4)) STREAMS module.  This
+ *	    module is primarily for testing in kernel specifics during
+ *	    conformance testsuite runs (see test-streams(8)).  It performs
+ *	    several rather highly specialized functions.
+ *
+ *	    @def TM_IOC_HANGUP
+ *	    @brief Generate an M_HANGUP message to the Stream Head.
+ *
+ *	    Requests that the test module pass an M_HANGUP message to the Stream
+ *	    Head.  The purpose is to test the Stream Head for proper actions
+ *	    (POSIX, SVR4) towards the user when an M_HANGUP message is recieved
+ *	    and proper responses to actions after the M_HANGUP message has
+ *	    already been received.
+ *
+ *	@defgroup strdrvs STREAMS Drivers
+ *	@ingroup streams
+ *	@brief Standard STREAMS Drivers
+ *
+ *	    @defgroup sad STREAMS Administrative Driver sad(4)
+ *	    @ingroup strdrvs
+ *	    @brief STREAMS Adminstrative Driver sad(4).
+ *
+ *	    This driver's primary purpose is to support the autopush(8) command.
+ *	    It provides an interface between user level programs and the
+ *	    underlying autopush(5) mechanism of STREAMS(9).
+ *
+ *	    @defgroup pipe STREAMS Pipe Driver pipe(4)
+ *	    @ingroup strdrvs
+ *	    @brief STREAMS Pipe Driver pipe(4).
+ *
+ *	    @defgroup spx STREAMS Pipe Driver spx(4)
+ *	    @ingroup strdrvs
+ *	    @brief STREAMS Pipe Driver spx(4).
+ *
+ *	    @defgroup echo STREAMS Echo Driver echo(4)
+ *	    @ingroup strdrvs
+ *	    @brief STREAMS Echo Driver echo(4).
+ *
+ *	    @defgroup loop STREAMS Loop Driver loop(4)
+ *	    @ingroup strdrvs
+ *	    @brief STREAMS Loop Driver echo(4).
+ *
+ *	    @defgroup strlog STREAMS Log Driver strlog(4)
+ *	    @ingroup strdrvs
+ *	    @brief STREAMS Log Driver strlog(4).
+ */
 
 /*
  * vim: ft=c

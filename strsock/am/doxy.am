@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: doxy.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/18 11:46:34 $
+# @(#) $RCSfile: doxy.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/19 10:50:57 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/09/18 11:46:34 $ by $Author: brian $
+## Last Modified $Date: 2006/09/19 10:50:57 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: doxy.am,v $
+## Revision 0.9.2.6  2006/09/19 10:50:57  brian
+## - updated doxygen approach
+##
 ## Revision 0.9.2.5  2006/09/18 11:46:34  brian
 ## - moved doxyfile to common area
 ##
@@ -76,7 +79,7 @@
 ##
 
 if HAVE_DOXYGEN
-$(doxydir)/html/index.html: $(DOXY_CONFIG_INPUT) scripts/Doxyfile
+$(doxydir)/html/index.html: $(DOXY_CONFIG_INPUT) $(PACKAGE).dox scripts/Doxyfile $(srcdir)/scripts/check_version
 	rm -rf $(doxydir)/html
 	$(DOXYGEN) scripts/Doxyfile
 

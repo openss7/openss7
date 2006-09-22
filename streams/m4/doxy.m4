@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/18 13:20:04 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/19 10:51:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 13:20:04 $ by $Author: brian $
+# Last Modified $Date: 2006/09/19 10:51:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -154,9 +154,9 @@ AC_DEFUN([_DOXY_OUTPUT_CONFIG_COMMANDS], [dnl
 AC_DEFUN([_DOXY_OUTPUT], [dnl
     AC_CONFIG_FILES([scripts/Doxyfile] AC_PACKAGE_NAME.dox)
     if test -d $srcdir/doc ; then
-	doxydir='./doc'
+	doxydir="$srcdir/doc"
     else
-	doxydir='.'
+	doxydir="$srcdir"
     fi
     AC_SUBST([doxydir])
 dnl    AC_CONFIG_COMMANDS([doxygen],
