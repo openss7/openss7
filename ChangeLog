@@ -1,3 +1,7 @@
+2006-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/kernel-doc: added kernel-doc script
+
 2006-09-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added doxy rules
