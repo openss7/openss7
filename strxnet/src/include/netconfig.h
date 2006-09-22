@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netconfig.h,v 0.9.2.1 2006/09/18 00:03:13 brian Exp $
+ @(#) $Id: netconfig.h,v 0.9.2.2 2006/09/22 20:54:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 00:03:13 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:54:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netconfig.h,v $
+ Revision 0.9.2.2  2006/09/22 20:54:24  brian
+ - prepared header file for use with doxygen, touching many lines
+
  Revision 0.9.2.1  2006/09/18 00:03:13  brian
  - added libxnsl source files
 
@@ -58,8 +61,20 @@
 #ifndef __NETCONFIG_H__
 #define __NETCONFIG_H__
 
-#ident "@(#) $RCSfile: netconfig.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netconfig.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+
+/* This file can be processed with doxygen(1). */
+
+/** @ingroup nsl
+  * @{
+  * @file
+  * Non-system level network selection facility header file.
+  *
+  * This header file simply includes sys/netconfig.h.
+  * */
 
 #include <sys/netconfig.h>
+
+/** @} */
 
 #endif				/* __NETCONFIG_H__ */

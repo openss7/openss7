@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticlts.h,v 0.9.2.5 2006/09/18 13:52:45 brian Exp $
+ @(#) $Id: ticlts.h,v 0.9.2.6 2006/09/22 20:54:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/09/22 20:54:26 $ by $Author: brian $
 
  $Log: ticlts.h,v $
+ Revision 0.9.2.6  2006/09/22 20:54:26  brian
+ - prepared header file for use with doxygen, touching many lines
+
  Revision 0.9.2.5  2006/09/18 13:52:45  brian
  - added doxygen markers to sources
 
@@ -74,9 +77,19 @@
 #ifndef _SYS_TICLTS_H
 #define _SYS_TICLTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @ingroup loopback
+  * @{
+  * @file
+  * TPI CLTS Loopback header file.
+  * */
+
+/*
+ * TPI CLTS Loopback Header File.
+ */
 
 #if 0
 #if !defined _TICLTS_H && !defined __KERNEL__
@@ -89,17 +102,21 @@
 #endif
 
 #if __SVID
-#define TCL_BADADDR	    1	/* bad address format or illegal address values */
-#define TCL_BADOPT	    2	/* bad options format or illegal options values */
-#define TCL_NOPEER	    3	/* destination address is not bound */
-#define TCL_PEERBADSTATE    4	/* transport peer in incorrect state */
+#define TCL_BADADDR	    1	/**< Bad address format or illegal address values. */
+#define TCL_BADOPT	    2	/**< Bad options format or illegal options values. */
+#define TCL_NOPEER	    3	/**< Destination address is not bound. */
+#define TCL_PEERBADSTATE    4	/**< Transport peer in incorrect state. */
 #define TCL_DEFAULTADDRSZ   4
 #else				/* __SVID */
-#define TCL_BADADDR	    EINVAL	/* bad address format or illegal address values */
-#define TCL_BADOPT	    EINVAL	/* bad options format or illegal options values */
-#define TCL_NOPEER	    EFAULT	/* destination address is not bound */
-#define TCL_PEERBADSTATE    EPROTO	/* transport peer in incorrect state */
+#define TCL_BADADDR	    EINVAL	/**< Bad address format or illegal address values. */
+#define TCL_BADOPT	    EINVAL	/**< Bad options format or illegal options values. */
+#define TCL_NOPEER	    EFAULT	/**< Destination address is not bound. */
+#define TCL_PEERBADSTATE    EPROTO	/**< Transport peer in incorrect state. */
 #define TCL_DEFAULTADDRSZ   4
 #endif				/* __SVID */
 
 #endif				/* _SYS_TICLTS_H */
+
+/** @} */
+
+// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
