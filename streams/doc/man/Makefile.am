@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2006/09/18 01:18:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2006/09/23 00:35:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:37 $ by $Author: brian $
+# Last Modified $Date: 2006/09/23 00:35:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.79  2006/09/23 00:35:57  brian
+# - added manpages
+#
 # Revision 0.9.2.78  2006/09/18 01:18:37  brian
 # - updated documentation and include file makefiles
 #
@@ -1010,6 +1013,7 @@ man_MANS = \
 	man7/I_GETCLTIME.7 \
 	man7/I_GETPMSG.7 \
 	man7/I_GETSIG.7 \
+	man7/I_EGETSIG.7 \
 	man7/I_GRDOPT.7 \
 	man7/I_GWROPT.7 \
 	man7/I_ISASTREAM.7 \
@@ -1029,6 +1033,7 @@ man_MANS = \
 	man7/I_SERROPT.7 \
 	man7/I_SETCLTIME.7 \
 	man7/I_SETSIG.7 \
+	man7/I_ESETSIG.7 \
 	man7/I_SRDOPT.7 \
 	man7/I_STR.7 \
 	man7/I_SWROPT.7 \
@@ -2123,6 +2128,7 @@ dist_noinst_MANS = \
 	man7/I_GETCLTIME.7.man \
 	man7/I_GETPMSG.7.man \
 	man7/I_GETSIG.7.man \
+	man7/I_EGETSIG.7.man \
 	man7/I_GRDOPT.7.man \
 	man7/I_GWROPT.7.man \
 	man7/I_ISASTREAM.7.man \
@@ -2142,6 +2148,7 @@ dist_noinst_MANS = \
 	man7/I_SERROPT.7.man \
 	man7/I_SETCLTIME.7.man \
 	man7/I_SETSIG.7.man \
+	man7/I_ESETSIG.7.man \
 	man7/I_SRDOPT.7.man \
 	man7/I_STR.7.man \
 	man7/I_SWROPT.7.man \

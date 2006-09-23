@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.20 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.21 2006/09/23 00:35:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/23 00:35:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: streamio.7.man,v $
+.\" Revision 0.9.2.21  2006/09/23 00:35:56  brian
+.\" - added manpages
+.\"
 .\" Revision 0.9.2.20  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -2188,6 +2191,55 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 .BR qattach (9),
 .BR qdetach (9).
 .PP
+.IR STREAMS (9)
+input-output control commands are also documented individually in the
+following manual pages:
+.BR I_ATMARK (7),
+.BR I_CANPUT (7),
+.BR I_CKBAND (7),
+.BR I_FATTACH (7),
+.BR I_FDETACH (7),
+.BR I_FDINSERT (7),
+.BR I_FIND (7),
+.BR I_FLUSH (7),
+.BR I_FLUSHBAND (7),
+.BR I_GETBAND (7),
+.BR I_GETCLTIME (7),
+.BR I_GETPMSG (7),
+.BR I_GETSIG (7),
+.BR I_GRDOPT (7),
+.BR I_GWROPT (7),
+.BR I_ISASTREAM (7),
+.BR I_LINK (7),
+.BR I_LIST (7),
+.BR I_LOOK (7),
+.BR I_NREAD (7),
+.BR I_PEEK (7),
+.BR I_PIPE (7),
+.BR I_PLINK (7),
+.BR I_POP (7),
+.BR I_PUNLINK (7),
+.BR I_PUSH (7),
+.BR I_PUTPMSG (7),
+.BR I_RECVFD (7),
+.BR I_SENDFD (7),
+.BR I_SETCLTIME (7),
+.BR I_SETSIG (7),
+.BR I_SRDOPT (7),
+.BR I_STR (7),
+.BR I_SWROPT (7),
+.BR I_UNLINK (7).
+.PP
+.B "@PACKAGE_TITLE@"
+also supports some
+.IR Solaris \(rg
+specific
+.BR STREAMS (9)
+input-output controls for compatibility with
+.IR Solaris \(rg.
+These are documented in separate manual pages as follows:
+.BR I_SERROPT "(7), " I_GERROPT "(7), " I_ANCHOR "(7), " I_ESETSIG "(7), " I_EGETSIG "(7).
+.PP
 If your
 .B GNU/Linux
 distribution is equipped with
@@ -2247,6 +2299,56 @@ and
 .IR LiS -specific
 IO control numbers for compatibility.
 .IP \(em
+The numbering of standard input-output control commands for
+.IR STREAMS (9)
+is split between
+.IR "SVR 4.2" -style
+.[
+svr42
+.]
+implementations and
+.IR "OSF/1.2" -style
+.[
+osfdoc
+.]
+style implementations.
+The
+.I OpenGroup SUS/POSIX
+specifications specify the input-output control names, but not the numbering.
+Specific intput-output control numbers that differ between
+.IR "SVR 4.2" " and " "OSF/1.2"
+are:
+.BR I_SWROPT (7),
+.BR I_GWROPT (7),
+.BR I_LIST (7),
+.BR I_FLUSHBAND (7),
+.BR I_CKBAND (7),
+.BR I_GETBAND (7),
+.BR I_ATMARK (7),
+.BR I_SETCLTIME (7),
+.BR I_GETCLTIME (7),
+.BR I_CANPUT (7).
+.IP ""
+(If we were smart, we would change the numbering in
+.RB < sys/stropts.h >
+depending upon the processor for which the package is compiled to match the
+particular
+.IR UNIX \(rg
+vendor's numbering scheme.)
+.IP \(em
+Two standard input-output control commands,\(em
+.BR I_PLINK "(7) and " I_PUNLINK (7),
+differ in numbering between
+.IR "SVR 3" ,
+.[
+svr3
+.]
+and
+.IR "SVR 4" .
+.[
+svr4
+.]
+.IP \(em
 .IR AIX \(rg
 .IR HP-UX \(rg,
 and
@@ -2279,6 +2381,13 @@ output to pass a pointer instead of a value.  This means that
 documentation is erroneous, and
 .I LiS
 implementation is wrong.
+.IP ""
+Portable
+.IR STREAMS (9)
+libraries and applications programs will use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .\"
 .\"
 .SH CONFORMANCE

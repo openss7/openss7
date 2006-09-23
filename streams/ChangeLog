@@ -1,5 +1,14 @@
 2006-09-22  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updated todo items
+	* TODO: updated todo items
+	* doc/manual/todo.texi: updated todo items
+
+	* doc/man/Makefile.am: added manual pages
+	* doc/man/man7/streamio.7.man: added manual pages
+	* doc/man/man7/I_EGETSIG.7.man: added manual pages
+	* doc/man/man7/I_ESETSIG.7.man: added manual pages
+
 	* include/stropts.h: prepared header file for doxygen
 	* include/sys/stropts.h: prepared header file for doxygen
 	* include/sys/streams/log.h: prepared header file for doxygen
