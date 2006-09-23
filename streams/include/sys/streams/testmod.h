@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: testmod.h,v 0.9.2.6 2006/09/18 13:52:41 brian Exp $
+ @(#) $Id: testmod.h,v 0.9.2.7 2006/09/23 00:35:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:41 $ by $Author: brian $
+ Last Modified $Date: 2006/09/23 00:35:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.h,v $
+ Revision 0.9.2.7  2006/09/23 00:35:53  brian
+ - prepared header file for doxygen
+
  Revision 0.9.2.6  2006/09/18 13:52:41  brian
  - added doxygen markers to sources
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_STREAMS_TESTMOD_H__
 #define __SYS_STREAMS_TESTMOD_H__
 
-#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.26 2006/09/18 13:52:41 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.27 2006/09/23 00:35:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:41 $ by $Author: brian $
+ Last Modified $Date: 2006/09/23 00:35:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 0.9.2.27  2006/09/23 00:35:53  brian
+ - prepared header file for doxygen
+
  Revision 0.9.2.26  2006/09/18 13:52:41  brian
  - added doxygen markers to sources
 
@@ -66,7 +69,7 @@
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.26 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.27 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -390,7 +393,7 @@ typedef unsigned long int t_uscalar_t;
   *
   * Bits for use with #I_GETSIG and #I_SETSIG.  These bits are used in the
   * argument to #I_SETSIG and returned from #I_GETSIG input-output controls.
-  * Also for use with the struct strsetsig#ss_events member in the argument to
+  * Also for use with the struct strsigset#ss_events member in the argument to
   * #I_ESETSIG and #I_EGETSIG.  They correspond to poll() bits.
   *
   * @{ */
