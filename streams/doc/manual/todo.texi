@@ -146,8 +146,9 @@ The combination of the above three items should provide some serious performance
 networking based stream heads.
 
 @table @emph
-@item TODO:
-Implement these three items.
+@item PARTIALLY DONE:
+Item (1) is done and complete.  The 2nd generation UDP and RAW drivers are already using it.  Item
+(2) and (3) remain.
 @end table
 
 @item
@@ -199,8 +200,10 @@ STREAMS facilities.
 Timers and Buffer callbacks:- Still haven't tested these.
 
 @table @emph
-@item TODO:
-Test.
+@item PARTIALLY DONE:
+Timers are working nicely for SCTP that was tested at the Vancouver interop.  Had no problems
+whatsoever.  Probably didn't run into a buffer callback, though, so those need to be more rigorously
+tested.
 @end table
 
 @item

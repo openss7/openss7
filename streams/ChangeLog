@@ -1,3 +1,11 @@
+2006-09-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated news and todo
+	* doc/manual/news.texi: updated news and todo
+	* doc/manual/todo.texi: updated news and todo
+	* NEWS: updated news and todo
+	* TODO: updated news and todo
+
 2006-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated todo items

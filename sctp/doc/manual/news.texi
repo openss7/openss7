@@ -85,6 +85,8 @@ includes the latest packaging improvements.
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
 modules and drivers.
+The @samp{make installcheck} target will now automagically test both 64-bit native and 32-bit
+compatibility versions, one after the other, on 64-bit platforms.
 
 @item
 Automated release file generation making for vastly improved and timely text

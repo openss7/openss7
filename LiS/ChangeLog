@@ -1,5 +1,9 @@
 2006-09-23  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updated news
+	* manual/news.texi: updated news
+	* NEWS: updated news
+
 	* include/stropts.h: prepared files for use with doxygen
 	* include/sys/LiS/log.h: prepared files for use with doxygen
 	* include/sys/LiS/loop.h: prepared files for use with doxygen

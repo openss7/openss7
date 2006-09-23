@@ -1,3 +1,9 @@
+2006-09-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated news
+	* doc/manual/news.texi: updated news
+	* NEWS: updated news
+
 2006-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/.cvsignore: ignore doxygen generated paths

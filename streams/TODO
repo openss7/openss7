@@ -1,4 +1,4 @@
-Linux Fast-STREAMS -- things to do.  2006-09-19
+Linux Fast-STREAMS -- things to do.  2006-09-22
 $Id: TODO,v 0.9.2.14 2006/09/23 00:35:54 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -81,8 +81,9 @@ Things to do:
      The combination of the above three items should provide some
      serious performance gains for Linux networking based stream heads.
 
-    _TODO:_
-          Implement these three items.
+    _PARTIALLY DONE:_
+          Item (1) is done and complete.  The 2nd generation UDP and
+          RAW drivers are already using it.  Item (2) and (3) remain.
 
    - Had another look at specfs, devfs and udev.  It looks like we can
      create minor device nodes within /dev (not just /dev/streams)
@@ -130,8 +131,11 @@ Things to do:
 
    - Timers and Buffer callbacks:- Still haven't tested these.
 
-    _TODO:_
-          Test.
+    _PARTIALLY DONE:_
+          Timers are working nicely for SCTP that was tested at the
+          Vancouver interop.  Had no problems whatsoever.  Probably
+          didn't run into a buffer callback, though, so those need to
+          be more rigorously tested.
 
    - More performance testing and profiling on SMP.  On the same kernel
      running non-SMP we get pipe performance of about 80-90% of a Linux
