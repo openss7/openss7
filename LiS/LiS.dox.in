@@ -65,6 +65,14 @@ static char const ident[] = "$RCSfile: LiS.dox.in,v $ $Name:  $($Revision: 0.9.2
  * and introductory information for doxygen and any other doxygen
  * documentation that has no business cluttering up a head or source file. */
 
-/*
- * vim: ft=c
- */
+/**
+  * @defgroup streams STREAMS
+  *
+  * @defgroup strmod STREAMS Modules
+  *
+  * @defgroup strdrv STREAMS Drivers
+  */
+
+
+
+// vim: ft=c com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

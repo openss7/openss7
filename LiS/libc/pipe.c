@@ -89,6 +89,9 @@ pthread_setcanceltype(int type, int *oldtype)
 #define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
 
+/** @brief open a streams based pipe.
+  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  */
 int
 __lis_pipe(int *fds)
 {
@@ -106,16 +109,13 @@ __lis_pipe(int *fds)
 	return 0;
 }
 
-/**
- * @fn int pipe(int fds[2])
- * @ingroup libLiS
- * @brief open a streams based pipe.
- * @param fds a pointer to the two file descriptors, one for each end of the pipe.
- *
- * pipe() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
- * must protect from asyncrhonous cancellation between the open(), ioctl() and
- * close() operations.
- */
+/** @brief open a streams based pipe.
+  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  *
+  * pipe() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
+  * must protect from asyncrhonous cancellation between the open(), ioctl() and
+  * close() operations.
+  */
 int
 __lis_pipe_r(int *fds)
 {
@@ -127,4 +127,10 @@ __lis_pipe_r(int *fds)
 	return (ret);
 }
 
+/** @fn int pipe(int fds[2])
+  * @brief open a streams based pipe.
+  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  */
 __asm__(".symver __lis_pipe_r,pipe@@LIS_1.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

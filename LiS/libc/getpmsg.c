@@ -197,6 +197,13 @@ __old_lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *ban
 #endif
 }
 
+/** @brief get a message from a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a strbuf structure returning the data part of the message.
+  * @param bandp a pointer to the band returned for the received message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  */
 int
 __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
@@ -265,23 +272,20 @@ __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, 
 #endif
 }
 
-/**
- * @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
- * @ingroup libLiS
- * @brief get a message from a stream band.
- * @param fd a file descriptor representing the stream.
- * @param ctlptr a pointer to a strbuf structure returning the control part of the message.
- * @param datptr a pointer to a strbuf structure returning the data part of the message.
- * @param bandp a pointer to the band returned for the received message.
- * @param flagsp a pointer to the flags returned for the received message.
- *
- * getpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In the
- * Linux Threads approach, this function will return EINTR if interrupted by a
- * signal.  When the function returns EINTR, the Linux Threads user should check
- * for cancellation with pthread_testcancel().  Because this function consists
- * of a single system call, asynchronous thread cancellation protection is not
- * required.
- */
+/** @brief get a message from a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a strbuf structure returning the data part of the message.
+  * @param bandp a pointer to the band returned for the received message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  *
+  * getpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In the
+  * Linux Threads approach, this function will return EINTR if interrupted by a
+  * signal.  When the function returns EINTR, the Linux Threads user should check
+  * for cancellation with pthread_testcancel().  Because this function consists
+  * of a single system call, asynchronous thread cancellation protection is not
+  * required.
+  */
 int
 __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
@@ -294,6 +298,14 @@ __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp
 	return (ret);
 }
 
+/** @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+  * @brief get a message from a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a strbuf structure returning the data part of the message.
+  * @param bandp a pointer to the band returned for the received message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  */
 __asm__(".symver __lis_getpmsg_r,getpmsg@@LIS_1.0");
 
 int
@@ -309,3 +321,5 @@ __old_lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *b
 }
 
 __asm__(".symver __old_lis_getpmsg_r,getpmsg@LIS_0.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

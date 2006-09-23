@@ -111,52 +111,61 @@
 #  endif
 #else				/* use LiS's poll.h */
 				/* include the rest of this file */
-#define USED_LIS_POLL_H	1
+#define USED_LIS_POLL_H	1	/**< Lis poll.h used indicator. */
 #ifndef _POLL_H
 #include <sys/LiS/poll.h>	/* streams module symbols & types */
 #endif
 
+/** @ingroup streams
+  * @{
+  * @file
+  * Poll header file.
+  * @{
+  */
+
 /*  -------------------------------------------------------------------  */
-/*
- * Structure of file descriptor/event pairs supplied in
- * the poll arrays.
- *
- * Magic Garden calls this "struct pollfd", AT&T STREAMS Programers Guide
- * calls it "struct poll".
- */
+
+/** Poll file descriptor/event structure.
+  * Structure of file descriptor/event pairs supplied in the poll arrays.
+  *
+  * Magic Garden calls this "struct pollfd", AT&T STREAMS Programers Guide calls
+  * it "struct poll".
+  */
 typedef struct poll {
-	int fd;				/* file desc to poll */
-	short events;			/* events of interest on fd */
-	short revents;			/* events that occurred on fd */
+	int fd;				/* File desc to poll. */
+	short events;			/* Events of interest on fd. */
+	short revents;			/* Events that occurred on fd. */
 } pollfd_t;
 
+/** Poll file descriptor/event structure. */
 struct pollfd {
-	int fd;				/* file desc to poll */
-	short events;			/* events of interest on fd */
-	short revents;			/* events that occurred on fd */
+	int fd;				/* File desc to poll. */
+	short events;			/* Events of interest on fd. */
+	short revents;			/* Events that occurred on fd. */
 };
 
-/*
- * Testable select events
- */
-#define	POLLIN		0x0001	/* fd is readable */
-#define	POLLPRI		0x0002	/* high priority info at fd */
-#define	POLLOUT		0x0004	/* fd is writeable (won't block) */
-#define	POLLRDNORM	0x0040	/* normal data is readable */
+/** @name Testable Select Events.
+  * @{ */
+#define	POLLIN		0x0001	/**< fd is readable. */
+#define	POLLPRI		0x0002	/**< High priority info at fd. */
+#define	POLLOUT		0x0004	/**< fd is writeable (won't block). */
+#define	POLLRDNORM	0x0040	/**< Normal data is readable. */
 #define	POLLWRNORM	POLLOUT
-#define	POLLRDBAND	0x0080	/* out-of-band data is readable */
-#define	POLLWRBAND	0x0100	/* out-of-band data is writeable */
-#define	POLLMSG		0x0200	/* M_SIG at head of queue */
+#define	POLLRDBAND	0x0080	/**< Out-of-band data is readable. */
+#define	POLLWRBAND	0x0100	/**< Out-of-band data is writeable. */
+#define	POLLMSG		0x0200	/**< M_SIG at head of queue. */
 
 #define	POLLNORM	POLLRDNORM
+/** @} */
 
-/*
- * Non-testable poll events (may not be specified in events field,
- * but may be returned in revents field).
- */
-#define	POLLERR		0x0008	/* fd has error condition */
-#define	POLLHUP		0x0010	/* fd has been hung up on */
-#define	POLLNVAL	0x0020	/* invalid pollfd entry */
+/** @name Non-testable Poll Events
+  * Non-testable poll events (may not be specified in events field,
+  * but may be returned in revents field).
+  * @{ */
+#define	POLLERR		0x0008	/**< fd has error condition. */
+#define	POLLHUP		0x0010	/**< fd has been hung up on. */
+#define	POLLNVAL	0x0020	/**< Invalid pollfd entry. */
+/** @} */
 
 #endif				/* defined(KERNEL_2_1) */
 
@@ -179,6 +188,11 @@ extern int poll(struct pollfd *fds, unsigned long nfds, int timeout);
 __END_DECLS
 /* *INDENT-ON* */
 #endif
+/** @}
+  * @}
+  */
 #endif
 /*  -------------------------------------------------------------------  */
 #endif				/* _SYS_POLL_H */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -90,6 +90,11 @@ pthread_setcanceltype(int type, int *oldtype)
 #define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
 
+/** @brief Detach a path from a stream.
+  * @param path the path in the filesystem from which to detach.
+  *
+  * This is the non-recursive version of the implementation function.
+  */
 int
 __lis_fdetach(const char *path)
 {
@@ -107,16 +112,15 @@ __lis_fdetach(const char *path)
 	return 0;
 }
 
-/**
- * @fn int fdetach(const char *path)
- * @ingroup libLiS
- * @brief Detach a path from a stream.
- * @param path the path in the filesystem from which to detach.
- *
- * fdetach() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
- * must protect from asyncrhonous cancellation between the open(), ioctl() and
- * close() operations.
- */
+/** @brief Detach a path from a stream.
+  * @param path the path in the filesystem from which to detach.
+  *
+  * This is the recursive version of the implementation function.
+  *
+  * fdetach() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
+  * must protect from asyncrhonous cancellation between the open(), ioctl() and
+  * close() operations.
+  */
 int
 __lis_fdetach_r(const char *path)
 {
@@ -128,4 +132,10 @@ __lis_fdetach_r(const char *path)
 	return (ret);
 }
 
+/** @fn int fdetach(const char *path)
+  * @brief Detach a path from a stream.
+  * @param path the path in the filesystem from which to detach.
+  */
 __asm__(".symver __lis_fdetach_r,fdetach@@LIS_1.0");
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

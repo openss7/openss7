@@ -68,35 +68,51 @@ static char const ident[] =
 int __lis_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
 int __lis_getpmsg_r(int, struct strbuf *, struct strbuf *, int *, int *);
 
-/**
- * @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
- * @ingroup libLiS
- * @brief get a message from a STREAM.
- * @param fd a file descriptor for the stream.
- * @param ctlptr a pointer to a struct strbuf structure that returns the
- * control part of the retrieved message.
- * @param datptr a pointer to a struct strbuf structuer that returns the data
- * part of the retrieved message.
- * @param flagsp a pointer to an integer flags word that returns the priority
- * of the retrieved message.
- *
- * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
- * Because getmsg consists of a single call to getpmsg() which has the same
- * characteristics, no protection against asynchronous thread cancellation is
- * required.
- */
+/** @brief get a message from a STREAM.
+  * @param fd a file descriptor for the stream.
+  * @param ctlptr a pointer to a struct strbuf structure that returns the
+  * control part of the retrieved message.
+  * @param datptr a pointer to a struct strbuf structuer that returns the data
+  * part of the retrieved message.
+  * @param flagsp a pointer to an integer flags word that returns the priority
+  * of the retrieved message.
+  */
 int
 __lis_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	return __lis_getpmsg(fd, ctlptr, datptr, NULL, flagsp);
 }
 
+/** @brief get a message from a STREAM.
+  * @param fd a file descriptor for the stream.
+  * @param ctlptr a pointer to a struct strbuf structure that returns the
+  * control part of the retrieved message.
+  * @param datptr a pointer to a struct strbuf structuer that returns the data
+  * part of the retrieved message.
+  * @param flagsp a pointer to an integer flags word that returns the priority
+  * of the retrieved message.
+  *
+  * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Because getmsg consists of a single call to getpmsg() which has the same
+  * characteristics, no protection against asynchronous thread cancellation is
+  * required.
+  */
 int
 __lis_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	return __lis_getpmsg_r(fd, ctlptr, datptr, NULL, flagsp);
 }
 
+/** @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+  * @brief get a message from a STREAM.
+  * @param fd a file descriptor for the stream.
+  * @param ctlptr a pointer to a struct strbuf structure that returns the
+  * control part of the retrieved message.
+  * @param datptr a pointer to a struct strbuf structuer that returns the data
+  * part of the retrieved message.
+  * @param flagsp a pointer to an integer flags word that returns the priority
+  * of the retrieved message.
+  */
 __asm__(".symver __lis_getmsg_r,getmsg@@LIS_1.0");
 
 int __old_lis_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
@@ -115,3 +131,5 @@ __old_lis_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *fl
 }
 
 __asm__(".symver __old_lis_getmsg_r,getmsg@LIS_0.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

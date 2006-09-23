@@ -56,8 +56,28 @@
 
 /* This file can be processed with doxygen(1). */
 
+/** @ingroup strdrv
+  * @{
+  * @file
+  * STREAMS Null Stream Driver nuls(4) header file.
+  * @{
+  */
+
+/** @name Null Stream Driver Magic Number
+  * @{ */
 #define	NULL_IOCTL(n)	(('n' << 8) | (n))
+/** @} */
+
+/** @name Null Stream Driver Input-Output Control Commands
+  * @{ */
 #define NULL_READ_SIZE	NULL_IOCTL(1)
 #define NULL_GET_DEV	NULL_IOCTL(2)
+/** @} */
+
+/** @}
+  * @}
+  */
 
 #endif				/* __SYS_LIS_NULLSTRM_H__ */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

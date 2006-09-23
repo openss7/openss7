@@ -1,3 +1,26 @@
+2006-09-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/stropts.h: prepared files for use with doxygen
+	* include/sys/LiS/log.h: prepared files for use with doxygen
+	* include/sys/LiS/loop.h: prepared files for use with doxygen
+	* include/sys/LiS/minimux.h: prepared files for use with doxygen
+	* include/sys/LiS/mtdrv.h: prepared files for use with doxygen
+	* include/sys/LiS/nullstrm.h: prepared files for use with doxygen
+	* include/sys/LiS/testmod.h: prepared files for use with doxygen
+	* include/sys/poll.h: prepared files for use with doxygen
+	* include/sys/sad.h: prepared files for use with doxygen
+	* include/sys/stropts.h: prepared files for use with doxygen
+	* include/sys/testmod.h: prepared files for use with doxygen
+	* libc/fattach.c: prepared files for use with doxygen
+	* libc/fdetach.c: prepared files for use with doxygen
+	* libc/getmsg.c: prepared files for use with doxygen
+	* libc/getpmsg.c: prepared files for use with doxygen
+	* libc/isastream.c: prepared files for use with doxygen
+	* libc/pipe.c: prepared files for use with doxygen
+	* libc/putmsg.c: prepared files for use with doxygen
+	* libc/putpmsg.c: prepared files for use with doxygen
+	* LiS.dox.in: prepared files for use with doxygen
+
 2006-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* LiS/libc/fdetach.c: prepared source files for use with doxygen

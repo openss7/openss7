@@ -60,8 +60,28 @@
  *    Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
 
+/** @ingroup strdrv
+  * @{
+  * @file
+  * STREAMS Minimux Driver header file.
+  * @{
+  */
+
+/** @name MiniMux Magic Number
+  * @{ */
 #define	MINIMUX_IOCTL(n)	(('m' << 8) | (n))
+/** @} */
+
+/** @name MiniMux Input-Output Control Commands
+  * @{ */
 #define MINIMUX_DOWN		MINIMUX_IOCTL(1)
 #define MINIMUX_UP		MINIMUX_IOCTL(2)
+/** @} */
+
+/** @}
+  * @}
+  */
 
 #endif				/* __SYS_LIS_MINIMUX_H__ */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

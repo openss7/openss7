@@ -124,6 +124,13 @@ typedef struct putpmsg_args6 {
 } putpmsg_args6_t;
 #endif
 
+/** @brief put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  */
 int
 __old_lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
 {
@@ -158,14 +165,14 @@ __old_lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band
 	return (write(fd, &args, LIS_GETMSG_PUTMSG_ULEN));
 #else
 	/**
-	 * @date Wed Jun 22 20:56:59 MDT 2005
-	 *
-	 * This no longer works on FC4 2.6.11 kernel: validity checks are
-	 * performed on the length before we get here.  We might as well patch
-	 * this out for all kernels and use the ioctl method instead.  Emulating
-	 * an system call in this fashion was foolish in the first place: the
-	 * normal method for system call emulation under UNIX is with ioctl. -bb
-	 */
+	  * @date Wed Jun 22 20:56:59 MDT 2005
+	  *
+	  * This no longer works on FC4 2.6.11 kernel: validity checks are
+	  * performed on the length before we get here.  We might as well patch
+	  * this out for all kernels and use the ioctl method instead.  Emulating
+	  * an system call in this fashion was foolish in the first place: the
+	  * normal method for system call emulation under UNIX is with ioctl. -bb
+	  */
 	struct __lis_putpmsg_args {
 		int fd;
 		struct strbuf *ctlptr;
@@ -185,6 +192,13 @@ __old_lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band
 #endif
 }
 
+/** @brief put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  */
 int
 __lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
 {
@@ -235,23 +249,20 @@ __lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, in
 #endif
 }
 
-/**
- * @fn int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
- * @ingroup libLiS
- * @brief put a message to a stream band.
- * @param fd a file descriptor representing the stream.
- * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
- * @param datptr a pointer to a strbuf structure describing the data part of the message.
- * @param band the band to which to put the message.
- * @param flags the priority of the message.
- *
- * putpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In the
- * Linux Threads approach, this function will return EINTR if interrupted by a
- * signal.  When the function returns EINTR, the Linux Threads user should check
- * for cancellation with pthread_testcancel().  Because this function consists
- * of a single system call, asynchronous thread cancellation protection is not
- * required.
- */
+/** @brief put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  *
+  * putpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In
+  * the Linux Threads approach, this function will return EINTR if interrupted
+  * by a signal.  When the function returns EINTR, the Linux Threads user should
+  * check for cancellation with pthread_testcancel().  Because this function
+  * consists of a single system call, asynchronous thread cancellation
+  * protection is not required.
+  */
 int
 __lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
 {
@@ -264,6 +275,14 @@ __lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, 
 	return (ret);
 }
 
+/** @fn int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+  * @brief put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  */
 __asm__(".symver __lis_putpmsg_r,putpmsg@@LIS_1.0");
 
 int
@@ -279,3 +298,5 @@ __old_lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int ba
 }
 
 __asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

@@ -83,3 +83,5 @@ __END_DECLS
 #endif				/* __END_DECLS */
 
 #endif				/* __SYS_TESTMOD_H__ */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -60,7 +60,20 @@
  *    Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
 
+/** @ingroup strdrv
+  * @{
+  * @file
+  * STREAMS Loop Driver loop(4) header file.
+  * @{
+  */
+
+/** @name Loop Driver Magic Number
+  * @{ */
 #define	LOOP_IOCTL(n)	(('l' << 8) | (n))
+/** @} */
+
+/** @name Loop Driver Input-Output Control Commands
+  * @{ */
 #define LOOP_SET	LOOP_IOCTL(1)
 #define LOOP_PUTNXT	LOOP_IOCTL(2)
 #define	LOOP_MSGLVL	LOOP_IOCTL(3)
@@ -70,21 +83,31 @@
 #define	LOOP_BUFCALL	LOOP_IOCTL(7)
 #define	LOOP_CONCAT	LOOP_IOCTL(8)
 #define	LOOP_COPY	LOOP_IOCTL(9)
-#define	LOOP_DENY_OPEN	LOOP_IOCTL(10)	/* deny 2nd open of device */
-#define	LOOP_BURST	LOOP_IOCTL(11)	/* fwd next msg as a burst */
-#define	LOOP_FLUSH	LOOP_IOCTL(12)	/* flush and send data */
+#define	LOOP_DENY_OPEN	LOOP_IOCTL(10)	/**< Deny 2nd open of device. */
+#define	LOOP_BURST	LOOP_IOCTL(11)	/**< Fwd next msg as a burst. */
+#define	LOOP_FLUSH	LOOP_IOCTL(12)	/**< Flush and send data. */
+/** @} */
 
-/*
- * The following structure is sent to loop via a TRANSPARENT ioctl.
- */
+/**
+  * Loop parent structure.
+  * The following structure is sent to loop via a TRANSPARENT ioctl.
+  */
 typedef struct {
-	int cmnd;			/* see defines below */
-	int i_arg;			/* integer argument for cmnd */
-	void *p_arg;			/* pointer argument for cmnd */
-
+	int cmnd;			/**< See defines below. */
+	int i_arg;			/**< Integer argument for cmnd. */
+	void *p_arg;			/**< Pointer argument for cmnd. */
 } loop_xparent_t;
 
-#define	LOOP_XPARENT_COPYIN	101	/* undefined ioctl values == xparent */
-#define	LOOP_XPARENT_COPYOUT	102	/* undefined ioctl values == xparent */
+/** @name Loop Parent Commands
+  * @{ */
+#define	LOOP_XPARENT_COPYIN	101	/**< Undefined ioctl values == xparent. */
+#define	LOOP_XPARENT_COPYOUT	102	/**< Undefined ioctl values == xparent. */
+/** @} */
+
+/** @}
+  * @}
+  */
 
 #endif				/* __SYS_LIS_LOOP_H__ */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

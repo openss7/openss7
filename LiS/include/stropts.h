@@ -71,7 +71,53 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
+/** @ingroup streams
+  * @{
+  * @file
+  * STREAMS Options user header file.
+  * @{
+  */
+
 #include <sys/stropts.h>
+
+/** @name STREAMS System Calls
+  * User level routines for getmsg/putmsg, etc.
+  * @{ */
+extern int fattach(int fd, const char *path);
+extern int fdetach(const char *path);
+extern int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp);
+extern int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp, int *flagsp);
+extern int isastream(int fd);
+extern int pipe(int fds[2]);
+extern int putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags);
+extern int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
+/** @} */
+
+/** @name STREAMS System Calls
+  * Non-recusive implementation.
+  * @{ */
+extern int __lis_fattach(int fd, const char *path);
+extern int __lis_fdetach(const char *path);
+extern int __lis_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp);
+extern int __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp, int *flagsp);
+extern int __lis_isastream(int fd);
+extern int __lis_pipe(int fds[2]);
+extern int __lis_putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags);
+extern int __lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
+/** @} */
+
+/** @name STREAMS System Calls
+  * Recursive implementation.
+  * @{ */
+extern int __lis_fdetach_r(const char *path);
+extern int __lis_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp);
+extern int __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp, int *flagsp);
+extern int __lis_putmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags);
+extern int __lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
+/** @} */
+
+/** @} */
+/** @} */
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -80,3 +126,5 @@ __END_DECLS
 #endif
 
 #endif				/* _STROPTS_H */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

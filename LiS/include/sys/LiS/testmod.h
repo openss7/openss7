@@ -84,8 +84,20 @@
 #warning "Do no include sys/streams/testmod.h directly, include sys/testmod.h instead."
 #endif
 
-#define TM_IOC_MAGIC 'V'
+/** @ingroup strmod
+  * @{
+  * @file
+  * STREAMS Test Module testmod(4) header file.
+  * @{
+  */
 
+/** @name Test Module Magic Number
+  * @{ */
+#define TM_IOC_MAGIC 'V'
+/** @} */
+
+/** @name Test Module Input-Output Controls
+  * @{ */
 #define TM_IOC_HANGUP		((TM_IOC_MAGIC << 8) | 0x01)
 #define TM_IOC_RDERR		((TM_IOC_MAGIC << 8) | 0x02)
 #define TM_IOC_WRERR		((TM_IOC_MAGIC << 8) | 0x03)
@@ -96,5 +108,12 @@
 #define TM_IOC_COPYIN		((TM_IOC_MAGIC << 8) | 0x08)
 #define TM_IOC_COPYOUT		((TM_IOC_MAGIC << 8) | 0x09)
 #define TM_IOC_COPYIO		((TM_IOC_MAGIC << 8) | 0x0a)
+/** @} */
+
+/** @}
+  * @}
+  */
 
 #endif				/* __SYS_STREAMS_TESTMOD_H__ */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

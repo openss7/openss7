@@ -65,16 +65,13 @@ static char const ident[] =
 #include <sys/ioctl.h>
 #include <stropts.h>
 
-/**
- * @fn int isastream(int fd)
- * @ingroup libLiS
- * @brief test a stream.
- * @param fd a file descriptor to test.
- *
- * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
- * Because isastream() consists of a single system call, asynchronous thread
- * cancellation protection is not required.
- */
+/** @brief test a stream.
+  * @param fd a file descriptor to test.
+  *
+  * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Because isastream() consists of a single system call, asynchronous thread
+  * cancellation protection is not required.
+  */
 int
 __lis_isastream(int fd)
 {
@@ -85,4 +82,14 @@ __lis_isastream(int fd)
 #endif
 }
 
+/** @fn int isastream(int fd)
+  * @brief test a stream.
+  * @param fd a file descriptor to test.
+  *
+  * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Because isastream() consists of a single system call, asynchronous thread
+  * cancellation protection is not required.
+  */
 __asm__(".symver __lis_isastream,isastream@@LIS_1.0");
+
+// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

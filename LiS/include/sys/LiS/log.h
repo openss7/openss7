@@ -56,8 +56,21 @@
 
 /* This file can be processed with doxygen(1). */
 
+/** @ingroup strdrv
+  * @{
+  * @file
+  * STREAMS Log Driver log(4) header file.
+  * @{
+  */
+
 #define LOG_INUSE 01
 #define LOG_WRITE 02
 #define LOG_READ  04
 
+/** @}
+  * @}
+  */
+
 #endif				/* __SYS_LIS_LOG_H__ */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

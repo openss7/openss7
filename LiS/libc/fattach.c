@@ -61,21 +61,25 @@ static char const ident[] =
 #include <stropts.h>
 #include <sys/ioctl.h>
 
-/**
- * @fn int fattach(int fd, const char *path)
- * @ingroup libLiS
- * @brief attach a stream to a path in a filesystem.
- * @param fd the file descriptor of the stream to attach.
- * @param path the path in the filesystem to which to attach the stream.
- *
- * fattach() cannot contain a thread cancellation point.  Because this
- * function contains a single system call, it is asyncrhonous thread
- * cancellation safe.
- */
+/** @brief attach a stream to a path in a filesystem.
+  * @param fd the file descriptor of the stream to attach.
+  * @param path the path in the filesystem to which to attach the stream.
+  *
+  * fattach() cannot contain a thread cancellation point.  Because this
+  * function contains a single system call, it is asyncrhonous thread
+  * cancellation safe.
+  */
 int
 __lis_fattach(int fd, const char *path)
 {
 	return (ioctl(fd, I_LIS_FATTACH, path));
 }
 
+/** @fn int fattach(int fd, const char *path)
+  * @brief attach a stream to a path in a filesystem.
+  * @param fd the file descriptor of the stream to attach.
+  * @param path the path in the filesystem to which to attach the stream.
+  */
 __asm__(".symver __lis_fattach,fattach@@LIS_1.0");
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

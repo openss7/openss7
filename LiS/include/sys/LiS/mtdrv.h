@@ -52,16 +52,33 @@
 #ifndef __SYS_LIS_MTDRV_H__
 #define __SYS_LIS_MTDRV_H__
 
-/* This file can be processed with doxygen(1). */
-
-/*
- * IOCTL definitions for mtdrv
- */
-
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
+/* This file can be processed with doxygen(1). */
+
+/** @ingroup strdrv
+  * @{
+  * @file
+  * STREAMS Muti Thread Driver mtdrv(4) header file.
+  * This file contains IOCTL definitions for mtdrv(4).
+  * @{
+  */
+
+/** @name MT Driver Magic Number
+  * @{ */
 #define	MTDRV_IOCTL(n)	(('M' << 8) | (n))
+/** @} */
+
+/** @name MT Driver Input-Output Control Commands
+  * @{ */
 #define MTDRV_SET_CLONE_DEV	MTDRV_IOCTL(1)
 #define MTDRV_SET_OPEN_SLEEP	MTDRV_IOCTL(2)
+/** @} */
+
+/** @}
+  * @}
+  */
 
 #endif				/* __SYS_LIS_MTDRV_H__ */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS
