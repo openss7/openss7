@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:59 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/09/23 00:35:55 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,13 +53,63 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:37:59 $ by $Author: brian $
+@c Last Modified $Date: 2006/09/23 00:35:55 $ by $Author: brian $
 @c
 @c =========================================================================
 
 Things to do:
 
 @itemize @minus
+@item
+Split @file{include/sys/streams/stropts.h} by architecture.  There is conflicting numbering on the
+standard @cite{STREAMS} input-output controls:
+
+@multitable {I_GETCLTIME(7)}{I_GETCLTIME(7)}{I_GETCLTIME(7)}
+@item @manref{I_SWROPT(7)}
+@tab @manref{I_GWROPT(7)}
+@tab @manref{I_LIST(7)}
+@item @manref{I_FLUSHBAND(7)}
+@tab @manref{I_CKBAND(7)}
+@tab @manref{I_GETBAND(7)}
+@item @manref{I_ATMARK(7)}
+@tab @manref{I_SETCLTIME(7)}
+@tab @manref{I_GETCLTIME(7)}
+@item @manref{I_CANPUT(7)}
+@end multitable
+
+@cite{System V Release 4} UNIX@registeredsymbol{} vendors use one set and @cite{OSF}
+UNIX@registeredsymbol{} vendors use another.  Namely @cite{HP-UX}, @cite{OSF/1.2}, @cite{AIX},
+@cite{Mac OpenTransport} use OSF numbering, whereas @cite{IRIX}, @cite{Solaris}, @cite{UnixWare} and
+others use SVR4 numbering.  So, for HPPA, Alpha, PowerPC, we should use the OSF numbering.
+
+@table @emph
+@item TODO:
+Split @file{include/sys/streams/stropts.h} by processor architecture.
+@end table
+
+@item
+A similar numbering mismatch occurs for many of the message block types.
+
+@table @emph
+@item TODO:
+Split @file{include/sys/streams/streams.h} by processor architecture.
+@end table
+
+@item
+Implement @manref{I_EGETSIG(7)} and @manref{I_ESETSIG(7)}.  These are @cite{Solaris} enhanced
+version of the @manref{I_GETSIG(7)} and @manref{I_SETSIG(7)} @cite{STREAMS} input-output controls.
+The difficulty with their implementation is that the entire signal handling setup inside the Stream
+head code is geared towards the calling process and needs to be adjusted to be general enough for
+any process or process group.  Until then, @cite{Linux} file asynchronous I/O is supported.
+
+@table @emph
+@item PARTLY DONE:
+Wrote the manual pages and added them to the build.  Placed function skeletons that return
+@errno{EOPNOTSUPP} for these functions in the Stream head.
+@item TODO:
+Implement @manpage{I_EGETSIG(7)} and @manpage{I_ESETSIG(7)}.
+@end table
+
 @item
 Add a tail padding amount to the stream head as a option to facilitate conversion of mblks to
 sk_bufs.
