@@ -1,8 +1,14 @@
+2006-09-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated release notes
+	* NEWS: updated release notes
+	* doc/manual/news.texi: updated release notes
+
 2006-09-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated news
-	* doc/manual/news.texi: updated news
 	* NEWS: updated news
+	* doc/manual/news.texi: updated news
 
 2006-09-22  Brian Bidulock  <bidulock@openss7.org>
 
