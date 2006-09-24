@@ -2,6 +2,34 @@
 
 	* lib/libc/streams.h: added
 
+	* AUTHORS: updated release notes
+	* BUGS: updated release notes
+	* NEWS: updated release notes
+	* README: updated release notes
+	* README-alpha: updated release notes
+	* README-cvs: updated release notes
+	* README-nexusware: updated release notes
+	* THANKS: updated release notes
+	* TODO: updated release notes
+	* doc/manual/bugs.texi: updated release notes
+	* doc/manual/news.texi: updated release notes
+	* doc/manual/todo.texi: updated release notes
+
+	* streams.dox.in: doxygen updates
+	* include/stropts.h: doxygen updates
+	* include/sys/streams/stropts.h: doxygen updates
+	* include/sys/streams/testmod.h: doxygen updates
+
+	* lib/libc/fattach.c: straightened out lib files
+	* lib/libc/fdetach.c: straightened out lib files
+	* lib/libc/getmsg.c: straightened out lib files
+	* lib/libc/getpmsg.c: straightened out lib files
+	* lib/libc/isastream.c: straightened out lib files
+	* lib/libc/pipe.c: straightened out lib files
+	* lib/libc/putmsg.c: straightened out lib files
+	* lib/libc/putpmsg.c: straightened out lib files
+	* lib/libc/testcancel.c: straightened out lib files
+
 2006-09-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated news and todo

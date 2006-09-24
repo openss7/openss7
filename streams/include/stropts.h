@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.13 2006/09/23 00:35:52 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.14 2006/09/24 21:57:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/23 00:35:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:00 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 1997-2005  Open SS7 Corporation"
+#ident "@(#) $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 1997-2005  Open SS7 Corporation"
 
 /* This file can be processed with doxygen(1). */
 

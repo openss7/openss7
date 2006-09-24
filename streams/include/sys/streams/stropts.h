@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.27 2006/09/23 00:35:53 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.28 2006/09/24 21:57:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/23 00:35:53 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 0.9.2.28  2006/09/24 21:57:01  brian
+ - documentation and library updates
+
  Revision 0.9.2.27  2006/09/23 00:35:53  brian
  - prepared header file for doxygen
 
@@ -69,7 +72,7 @@
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.27 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.28 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
