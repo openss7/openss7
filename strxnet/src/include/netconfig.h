@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netconfig.h,v 0.9.2.2 2006/09/22 20:54:24 brian Exp $
+ @(#) $Id: netconfig.h,v 0.9.2.3 2006/09/24 21:57:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:54:24 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netconfig.h,v $
+ Revision 0.9.2.3  2006/09/24 21:57:21  brian
+ - documentation and library updates
+
  Revision 0.9.2.2  2006/09/22 20:54:24  brian
  - prepared header file for use with doxygen, touching many lines
 
@@ -61,7 +64,7 @@
 #ifndef __NETCONFIG_H__
 #define __NETCONFIG_H__
 
-#ident "@(#) $RCSfile: netconfig.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netconfig.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

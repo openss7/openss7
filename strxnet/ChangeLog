@@ -1,3 +1,52 @@
+2006-09-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: updated release notes
+	* AUTHORS: updated release notes
+	* NEWS: updated release notes
+	* TODO: updated release notes
+	* doc/manual/news.texi: updated release notes
+	* doc/manual/todo.texi: updated release notes
+
+	* strxnet.dox.in: doxygen updates
+	* src/include/netconfig.h: doxygen updates
+	* src/include/netdir.h: doxygen updates
+	* src/include/ticlts.h: doxygen updates
+	* src/include/ticots.h: doxygen updates
+	* src/include/ticotsord.h: doxygen updates
+	* src/include/tihdr.h: doxygen updates
+	* src/include/timod.h: doxygen updates
+	* src/include/tirdwr.h: doxygen updates
+	* src/include/tiuser.h: doxygen updates
+	* src/include/xti.h: doxygen updates
+	* src/include/xti_inet.h: doxygen updates
+	* src/include/sys/netconfig.h: doxygen updates
+	* src/include/sys/sockmod.h: doxygen updates
+	* src/include/sys/ticlts.h: doxygen updates
+	* src/include/sys/ticots.h: doxygen updates
+	* src/include/sys/ticotsord.h: doxygen updates
+	* src/include/sys/tihdr.h: doxygen updates
+	* src/include/sys/timod.h: doxygen updates
+	* src/include/sys/tirdwr.h: doxygen updates
+	* src/include/sys/tiuser.h: doxygen updates
+	* src/include/sys/tli.h: doxygen updates
+	* src/include/sys/tpi.h: doxygen updates
+	* src/include/sys/xti.h: doxygen updates
+	* src/include/sys/xti_atm.h: doxygen updates
+	* src/include/sys/xti_ip.h: doxygen updates
+	* src/include/sys/xti_local.h: doxygen updates
+	* src/include/sys/xti_mosi.h: doxygen updates
+	* src/include/sys/xti_osi.h: doxygen updates
+	* src/include/sys/xti_sctp.h: doxygen updates
+	* src/include/sys/xti_tcp.h: doxygen updates
+	* src/include/sys/xti_udp.h: doxygen updates
+	* src/include/sys/xti_xti.h: doxygen updates
+
+	* src/lib/netdir.c: straigthened out lib files
+	* src/lib/netdir_inet.c: straigthened out lib files
+	* src/lib/netselect.c: straigthened out lib files
+	* src/lib/pthread.c: straigthened out lib files
+	* src/lib/xnet.c: straigthened out lib files
+
 2006-09-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated news

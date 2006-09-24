@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/22 20:45:28 $
+ @(#) $RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/24 21:57:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:45:28 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strxnet.dox.in,v $
+ Revision 0.9.2.2  2006/09/24 21:57:19  brian
+ - documentation and library updates
+
  Revision 0.9.2.1  2006/09/22 20:45:28  brian
  - added main page documentation
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/22 20:45:28 $"
+#ident "@(#) $RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/24 21:57:19 $"
 
-static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/22 20:45:28 $";
+static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/24 21:57:19 $";
 
 /* This file can be processed with doxygen(1). */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mosi.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
+ @(#) $Id: xti_mosi.h,v 0.9.2.6 2006/09/24 21:57:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:22 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_MOSI_H
 #define _SYS_XTI_MOSI_H
 
-#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $ ($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $ ($Revision: 0.9.2.6 $) Copyright (c) 1997-2004 OpenSS7 Corporation"
 
 /* This file can be processed with doxygen(1). */
 

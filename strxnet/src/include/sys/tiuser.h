@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.10 2006/09/22 20:59:27 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.11 2006/09/24 21:57:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:22 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIUSER_H
 #define _SYS_TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

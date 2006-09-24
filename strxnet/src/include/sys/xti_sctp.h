@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.6 2006/09/24 21:57:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:22 $ by $Author: brian $
 
  $Log: xti_sctp.h,v $
+ Revision 0.9.2.6  2006/09/24 21:57:22  brian
+ - documentation and library updates
+
  Revision 0.9.2.5  2006/09/22 20:59:27  brian
  - prepared header file for use with doxygen, touching many lines
 
@@ -74,7 +77,7 @@
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

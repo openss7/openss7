@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.7 2006/09/01 08:53:03 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.8 2006/09/24 21:57:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/01 08:53:03 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _XTI_H
 #define _XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

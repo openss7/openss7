@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_xti.h,v 0.9.2.6 2006/09/22 20:59:27 brian Exp $
+ @(#) $Id: xti_xti.h,v 0.9.2.7 2006/09/24 21:57:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_xti.h,v $
+ Revision 0.9.2.7  2006/09/24 21:57:22  brian
+ - documentation and library updates
+
  Revision 0.9.2.6  2006/09/22 20:59:27  brian
  - prepared header file for use with doxygen, touching many lines
 
@@ -58,7 +61,7 @@
 #ifndef _SYS_XTI_XTI_H
 #define _SYS_XTI_XTI_H
 
-#ident "@(#) $RCSfile: xti_xti.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_xti.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

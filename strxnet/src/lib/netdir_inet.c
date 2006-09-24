@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $
+ @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/24 21:57:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:54:27 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:57:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir_inet.c,v $
+ Revision 0.9.2.4  2006/09/24 21:57:23  brian
+ - documentation and library updates
+
  Revision 0.9.2.3  2006/09/22 20:54:27  brian
  - tweaked source file for use with doxygen
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $"
+#ident "@(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/24 21:57:23 $"
 
-static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:27 $";
+static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/24 21:57:23 $";
 
 /* This file can be processed with doxygen(1). */
 
