@@ -57,17 +57,17 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup xnet
-  * @{
-  * @file
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
   * XTI ATM Transport Specific header file.
   *
   * For the purposes of conformance testing, it may be assumed that any constant values defined in
   * these header files are mandatory, unless the constant:
   *
   * @li defines an option or options level,
-  * @li is accompanied by a comment that specifies the value is not mandatory.
-  * */
+  * @li is accompanied by a comment that specifies the value is not mandatory.  */
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

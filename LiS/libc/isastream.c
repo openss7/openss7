@@ -57,20 +57,19 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <stropts.h>
+/** @addtogroup strcalls STREAMS System Calls
+  * @{ */
 
-/** @brief test a stream.
+/** @file
+  * STREAMS System Call isastream() implementation file.  */
+
+/** @brief Test a stream.
   * @param fd a file descriptor to test.
+  * @version LIS_1.0
   *
-  * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
-  * Because isastream() consists of a single system call, asynchronous thread
-  * cancellation protection is not required.
+  * This is a non-thread-safe implementation of isastream().
   */
 int
 __lis_isastream(int fd)
@@ -82,14 +81,35 @@ __lis_isastream(int fd)
 #endif
 }
 
-/** @fn int isastream(int fd)
-  * @brief test a stream.
+/** @brief Test a stream.
   * @param fd a file descriptor to test.
+  * @version LIS_1.0 isastream()
+  *
+  * This is a thread-safe implementation of isastream().
   *
   * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
   * Because isastream() consists of a single system call, asynchronous thread
   * cancellation protection is not required.
   */
-__asm__(".symver __lis_isastream,isastream@@LIS_1.0");
+int
+__lis_isastream_r(int fd)
+{
+	int oldtype;
+	int retval;
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
+	retval = __lis_isastream(fd);
+	pthread_setcanceltype(oldtype, NULL);
+	return (retval);
+}
+
+/** @fn int isastream(int fd)
+  * @brief Test a stream.
+  * @param fd a file descriptor to test.
+  * @version LIS_1.0 __lis_isastream_r()
+  */
+__asm__(".symver __lis_isastream_r,isastream@@LIS_1.0");
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

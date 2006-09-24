@@ -64,12 +64,11 @@
 #include <sys/stropts.h>	/* for FMNAMESZ */
 #endif
 
-/** @ingroup strdrv
-  * @{
-  * @file
-  * STREAMS Adminisrative Device sad(4) header file.
-  * @{
-  */
+/** @addtogroup sad
+  * @{ */
+
+/** @file
+  * STREAMS Adminisrative Device sad(4) header file.  */
 
 /**
   * @name sad(4) Driver Devices
@@ -129,9 +128,7 @@ struct strapush {
 #define sap_npush	sap_common.apc_npush
 /** @} */
 
-/** @}
-  * @}
-  */
+/** @} */
 
 #endif
 

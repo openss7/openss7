@@ -56,14 +56,14 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup tirdwr
-  * @{
-  * @file
+/** @addtogroup tirdwr
+  * @{ */
+
+/** @file
   * Transport Interface Read/Write (tirdwr) Header File.
   *
   * This file contains no definitions.  Nevertheless, this header file should
-  * exist to indicate the existence of support for the tirdwr(4) module.
-  * */
+  * exist to indicate the existence of support for the tirdwr(4) module.  */
 
 #if !defined _TIRDWR_H && !defined __KERNEL__
 #error ****

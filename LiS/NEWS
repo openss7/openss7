@@ -1,4 +1,4 @@
-Linux STREAMS (LiS) -- history of user visible changes.  2006-09-22
+Linux STREAMS (LiS) -- history of user visible changes.  2006-09-19
 $Id: NEWS,v 1.1.6.24 2006/09/18 01:51:05 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -11,6 +11,16 @@ Linux STREAMS (LiS) package.
 -----------------------------------------
 
 Third release candidiate.
+
+LiS is really not supported any longer.  Use Linux Fast-STREAMS instead.
+The purpose of this release is to demonstrate the inability of the
+LiS package to properly support 32-bit compatibility on 64-bit
+architectures.
+
+   * Minor bug fixes to STREAMS library.  isastream(3) and fattach(3)
+     must not contain an asynchronous thread cancellation point, but
+     they could.  Added asynchronous thread cancellation protection to
+     these functions to remove any thread cancellation points.
 
    * The package will now build doxygen(1) html documentation with the
      'doxy' make target.  See 'make help' or README-make in the
@@ -70,8 +80,7 @@ Third release candidiate.
 
    * `Linux Fast-STREAMS' now supports expanded addressable minor device
      numbers, permitting 2^16 addressable minor devices per major
-     device number on 2.6 kernels: unfortunately, LiS cannot support
-     this change.
+     device number on 2.6 kernels: `LiS' cannot support this change.
 
 This was an internal alpha test release candidate and was not released
 publicly.  This release was only available to subscribers to and

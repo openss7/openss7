@@ -56,13 +56,13 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup xnet
-  * @{
-  * @file
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
   * Transport Layer Interface (TLI) header file.
   *
-  * This file is included by sys/tiuser.h and sys/tihdr.h.
-  * */
+  * This file is included by sys/tiuser.h and sys/tihdr.h.  */
 
 #if 0
 #if !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__

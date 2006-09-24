@@ -86,6 +86,16 @@ static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0
  *	OpenSS7 XNET Library.
  *
  *	@version XNET_1.0
+ *
+ *	The XTI/TLI Library has quite a history.  There was originally a TLI
+ *	Library (Transport Layer Interface) in SVR3 or SVR4.  This is one of
+ *	the interfaces that was placed under X/Open by Novell, the
+ *	specification of which is currently managed by the OpenGroup.  The
+ *	older TLI library had sys/tihdr.h, tihdr.h, sys/tiuser.h, tiuser.h
+ *	header files describing the interface.  The newer XTI library has
+ *	sys/tpi.h, sys/xti.h, xti.h header files describing the interface.
+ *	Extension files such as xti_inet.h, sys/xti_inet.h describe additional
+ *	protocol corrigendum for XTI.
  *	    
  *	    @defgroup timod XTI Cooperating STREAMS Module
  *	    @ingroup xnet
@@ -99,12 +109,13 @@ static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0
  *	@ingroup xtitli
  *	OpenSS7 NSL Library.
  *
- *	This is the OpenSS7 Network Services Library for Linux Fast-STREAMS.  This library contains
- *	not all of the components that are in the nsl (glibc provides some such as a stripped down
- *	version of Sun's ONC RPC and the BSD getbyname, a different implementation of Sun's
- *	nsswitch, and frields).
- *
  *	@version XNSL_1.0
+ *
+ *	This is the OpenSS7 Network Services Library for Linux Fast-STREAMS.
+ *	This library contains not all of the components that are in the nsl
+ *	(glibc provides some such as a stripped down version of Sun's ONC RPC
+ *	and the BSD getbyname, a different implementation of Sun's nsswitch,
+ *	and frields).
  *
  *	    @defgroup nsf Network Selection Facility
  *	    @ingroup xnsl
@@ -128,21 +139,24 @@ static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0
   *
   * @section intro Introduction
   *
-  * This manual contains documentation taken directly from the source code using <tt><b>doxygen</b>(1)</tt>.
-  * All <a href="http://www.openss7.org/">OpenSS7 Project</a> user level source code, programs and
-  * libraries are documented using <b>doxygen</b>(1).
+  * This manual contains documentation taken directly from the source code
+  * using <b>doxygen</b>(1).  All <a href="http://www.openss7.org/">OpenSS7
+  * Project</a> user level source code, programs and libraries are documented
+  * using <b>doxygen</b>(1).
   *
   * @section overview Overview
   *
-  * This manual provides developer and maintainer intensive information concerning two OpenSS7
-  * libraries contained in the @b "@PACKAGE_TITLE@" package, @b @PACKAGE@(@b @VERSION@).
+  * This manual provides developer and maintainer intensive information
+  * concerning two OpenSS7 libraries contained in the @b "@PACKAGE_TITLE@"
+  * package, @b @PACKAGE@(@b @VERSION@).
   *
   * @li @ref xtitli
   * @li @ref xnsl
   *
   * @subsection typeographical Typeographical Conventions
   *
-  * The typographical conventions of <b>doxygen</b>(1) apply with the following additional conventions:
+  * The typographical conventions of <b>doxygen</b>(1) apply with the
+  * following additional conventions:
   *
   * @li Manual pages are typeset as "<b>manualpage</b>(section)," such as, for example, <b>doxygen</b>(1).
   *
@@ -168,8 +182,8 @@ static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0
  *  @ingroup tirdwr
  *  @file src/include/sys/tirdwr.h
  *  Transport Interface Read/Write (tirdwr) Header File.
- *  This file contains no definitions.  Nevertheless, this header file should exist to
- *  indicate the existence of support for the tirdwr(4) module.
+ *  This file contains no definitions.  Nevertheless, this header file should
+ *  exist to indicate the existence of support for the tirdwr(4) module.
  *
  *  @ingroup nsf
  *  @file src/include/netconfig.h
@@ -187,8 +201,8 @@ static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0
  *  @ingroup tpi
  *  @file src/include/sys/tpi.h
  *  TPI Common Header File.
- *  This file contains definitions that are common to XTI, TLI and TPI.  It is included by
- *  <xti.h> and <tiuser.h> as well as <tihdr.h>. 
+ *  This file contains definitions that are common to XTI, TLI and TPI.  It is
+ *  included by <xti.h> and <tiuser.h> as well as <tihdr.h>. 
  *
  *  @ingroup tpi
  *  @file src/include/sys/tihdr.h
@@ -218,8 +232,9 @@ static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0
  *  @ingroup xnet
  *  @file src/include/sys/xti_atm.h
  *  XTI ATM Transport Specific header file.
- *  For the purposes of conformance testing, it may be assumed that any constant values
- *  defined in these header files are mandatory, unless the constant:
+ *  For the purposes of conformance testing, it may be assumed that any
+ *  constant values defined in these header files are mandatory, unless the
+ *  constant:
  *  @li defines an option or options level,
  *  @li is accompanied by a comment that specifies the value is not mandatory.
  *
@@ -253,4 +268,4 @@ static char const ident[] = "$RCSfile: strxnet.dox.in,v $ $Name:  $($Revision: 0
  */
 
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS

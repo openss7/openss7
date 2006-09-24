@@ -68,11 +68,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup n2a
-  * @{
-  * @file
-  * Network Name-to-Address Translation header file.
-  * */
+/** @addtogroup n2a
+  * @{ */
+
+/** @file
+  * Network Name-to-Address Translation header file.  */
 
 /*
  *  Network Name-to-Address Translation header file.
@@ -260,6 +260,21 @@ extern void netdir_perror(char *msg);
  *  applications, this buffers is implemented as thread-specific data.  */
 extern char *netdir_sperror(void);
 
+/** @} */
+
+/** @name Name-to-Address Translation Internal API Functions
+  * @brief These are the internal implementations of the corresponding functions.
+  * @{ */
+extern int __nsl_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service,
+				  struct nd_addrlist **addrs);
+extern int __nsl_netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service,
+				  struct netbuf *netaddr);
+extern void __nsl_netdir_free(void *ptr, int struct_type);
+extern int __nsl_netdir_options(struct netconfig *nc, int option, int fd, char *pta);
+extern char *__nsl_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
+extern struct netbuf *__nsl_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
+extern void __nsl_netdir_perror(char *msg);
+extern char *__nsl_netdir_sperror(void);
 /** @} */
 
 /** @name Symbol Types

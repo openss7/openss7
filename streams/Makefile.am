@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/09/18 17:43:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/09/24 21:36:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 17:43:11 $ by $Author: brian $
+# Last Modified $Date: 2006/09/24 21:36:49 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.137  2006/09/24 21:36:49  brian
+# - added lib files
+#
 # Revision 0.9.2.136  2006/09/18 17:43:11  brian
 # - added doxy rules to makefile and release notes
 #
@@ -536,11 +539,14 @@ if PKG_BUILD_ARCH
 libstreams_la_SOURCES		= \
 				lib/libc/testcancel.c \
 				lib/libc/putpmsg.c \
+				lib/libc/putmsg.c \
 				lib/libc/getpmsg.c \
+				lib/libc/getmsg.c \
 				lib/libc/isastream.c \
 				lib/libc/pipe.c \
 				lib/libc/fattach.c \
-				lib/libc/fdetach.c
+				lib/libc/fdetach.c \
+				lib/libc/streams.h
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -554,11 +560,14 @@ libstreams_la_LDFLAGS		+= -version-info 0:1:0
 libLiS_la_SOURCES		= \
 				lib/libc/testcancel.c \
 				lib/libc/putpmsg.c \
+				lib/libc/putmsg.c \
 				lib/libc/getpmsg.c \
+				lib/libc/getmsg.c \
 				lib/libc/isastream.c \
 				lib/libc/pipe.c \
 				lib/libc/fattach.c \
-				lib/libc/fdetach.c
+				lib/libc/fdetach.c \
+				lib/libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -572,10 +581,13 @@ libLiS_la_LDFLAGS		+= -version-info 0:1:0
 libpLiS_la_SOURCES		= \
 				lib/libc/testcancel.c \
 				lib/libc/putpmsg.c \
+				lib/libc/putmsg.c \
 				lib/libc/getpmsg.c \
+				lib/libc/getmsg.c \
 				lib/libc/isastream.c \
 				lib/libc/fattach.c \
-				lib/libc/fdetach.c
+				lib/libc/fdetach.c \
+				lib/libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libpLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)

@@ -80,11 +80,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup timod
-  * @{
-  * @file
-  * Transport Interface Module (timod) header file.
-  * */
+/** @addtogroup timod
+  * @{ */
+
+/** @file
+  * Transport Interface Module (timod) header file.  */
 
 /*
  * Transport Interface "timod" Header File.

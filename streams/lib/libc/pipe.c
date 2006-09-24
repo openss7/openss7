@@ -51,82 +51,52 @@
 
 #ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/22 21:21:19 $";
+static char const ident[] =
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/22 21:21:19 $";
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <stropts.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
+/** @weakgroup strcalls STREAMS System Calls
+  * @{ */
 
-#include <pthread.h>
-
-#if __GNUC__ < 3
-#define inline inline
-#define noinline extern
-#else
-#define inline __attribute__((always_inline))
-#define noinline static __attribute__((noinline))
-#endif
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define __hot __attribute__((section(".text.hot")))
-#define __unlikely __attribute__((section(".text.unlikely")))
-
-extern int pthread_setcanceltype(int type, int *oldtype);
-
-#if 0
-#define DUMMY_STREAM "/dev/nuls"	/* FIXME: /dev/stream,... */
-#define DUMMY_MODE   O_RDWR|O_NONBLOCK
-
-static int
-__lis_pipe(int *fds)
-{
-	int fd, error = 0;
-
-	if ((fd = open(DUMMY_STREAM, DUMMY_MODE)) < 0)
-		return -1;
-	if (ioctl(fd, I_PIPE, fds) < 0)
-		error = errno;
-	close(fd);
-	if (error) {
-		errno = error;
-		return -1;
-	}
-	return 0;
-}
-#endif
-
-/* I prefer not to use a dummy stream anyway. */
+/** @file
+  * STREAMS System Call pipe() implementation file. */
 
 /** @brief open a streams based pipe.
   * @param fds a pointer to the two file descriptors, one for each end of the pipe.
   *
-  * This is the non-recursive version of __streams_pipe_r(). */
+  * This is the non-thread-safe implementation of pipe().
+  *
+  * This implementation opens two pipe(4) devices to get two Stream heads and
+  * then welds them together using the #I_PIPE input-output control to on
+  * Stream head with the other Stream head's file descriptor as an argument.
+  *
+  * There exists a slightly different approach using the spx(4) device.  In
+  * that case, two spx(4) devices are opened and then one Stream's file
+  * descriptor is passed to the other using the #I_FDINSERT intput-output
+  * control.  That approach is illustrated in Stevens "Advanced Programming in
+  * the UNIX(R) Environment", but is is slower and more cumbersome than this
+  * approach.  This approach is Linux Fast-STREAMS specific.  The Stevens
+  * approach would probably work also on UnixWare, AIX and others.
+  */
 int
-__streams_pipe(int *fds)
+__streams_pipe(int fds[2])
 {
 	int fd1, fd2;
 	int error;
 
-	if ((fd1 = open("/dev/pipe", O_RDWR)) < 0) {
+	if (unlikely((fd1 = open("/dev/pipe", O_RDWR)) < 0)) {
 		return (-1);
 	}
-	if ((fd2 = open("/dev/pipe", O_RDWR)) < 0) {
+	if (unlikely((fd2 = open("/dev/pipe", O_RDWR)) < 0)) {
 		error = errno;
 		close(fd1);
 		errno = error;
 		return (-1);
 	}
-	if (ioctl(fd1, I_PIPE, fd2) < 0) {
+	if (unlikely(ioctl(fd1, I_PIPE, fd2) < 0)) {
 		error = errno;
 		close(fd2);
 		close(fd1);
@@ -140,33 +110,47 @@ __streams_pipe(int *fds)
 
 /** @brief open a streams based pipe.
   * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  * @version STREAMS_1.0 pipe()
+  *
+  * This is the thread-safe implementation of pipe().
   *
   * pipe() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
   * must protect from asyncrhonous cancellation between the open(), ioctl() and
-  * close() operations.  */
+  * close() operations in __streams_pipe().  */
 int
-__streams_pipe_r(int *fds)
+__streams_pipe_r(int fds[2])
 {
-	int oldtype, ret;
+	int oldtype = 0;
+	int retval;
 
-	pthread_setcanceltype(PTHREAD_CANCEL_DISABLE, &oldtype);
-#if 0
-	ret = __lis_pipe(fds);
-#else
-	ret = __streams_pipe(fds);
-#endif
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
+	retval = __streams_pipe(fds);
 	pthread_setcanceltype(oldtype, NULL);
-	return (ret);
+	return (retval);
 }
 
-__asm__(".symver __streams_pipe_r,pipe@@@STREAMS_1.0");
+/** @brief open a streams based pipe.
+  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  * @par Alias:
+  * This symbol is a weak alias of __streams_pipe().  */
+int __lis_pipe(int fds[2])
+    __attribute__ ((weak, alias("__streams_pipe")));
 
-int __lis_pipe(int *)
-	__attribute__((weak, alias("__streams_pipe")));
+/** @brief open a streams based pipe.
+  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  * @version LIS_1.0 pipe()
+  * @par Alias:
+  * This symbol is a weak alias of __streams_pipe_r().  */
+int __lis_pipe_r(int fds[2])
+    __attribute__ ((weak, alias("__streams_pipe_r")));
 
-int __lis_pipe_r(int *)
-	__attribute__((weak, alias("__streams_pipe_r")));
-
+/** @fn int pipe(int fds[2])
+  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  * @version STREAMS_1.0 __streams_pipe_r().
+  * @version LIS_1.0 __lis_pipe_r() */
+__asm__(".symver __streams_pipe_r,pipe@@STREAMS_1.0");
 __asm__(".symver __lis_pipe_r,pipe@LIS_1.0");
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

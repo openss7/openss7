@@ -75,11 +75,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup tpi
-  * @{
-  * @file
-  * Transport Interface header file.
-  * */
+/** @addtogroup tpi
+  * @{ */
+
+/** @file
+  * Transport Interface header file.  */
 
 /*
  * Transport Interface Header File.
@@ -649,4 +649,4 @@ union T_primitives {
 
 /** @} */
 
-// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

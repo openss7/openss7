@@ -57,17 +57,20 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#include <sys/types.h>
-#include <stropts.h>
-#include <sys/ioctl.h>
+#include "streams.h"
+
+/** @addtogroup strcalls STREAMS System Calls
+  * @{ */
+
+/** @file
+  * STREAMS System Call fattach() implementation file.  */
 
 /** @brief attach a stream to a path in a filesystem.
   * @param fd the file descriptor of the stream to attach.
   * @param path the path in the filesystem to which to attach the stream.
+  * @version LIS_1.0
   *
-  * fattach() cannot contain a thread cancellation point.  Because this
-  * function contains a single system call, it is asyncrhonous thread
-  * cancellation safe.
+  * This is the non-recursive version of the implementation function.
   */
 int
 __lis_fattach(int fd, const char *path)
@@ -75,11 +78,36 @@ __lis_fattach(int fd, const char *path)
 	return (ioctl(fd, I_LIS_FATTACH, path));
 }
 
+/** @brief attach a stream to a path in a filesystem.
+  * @param fd the file descriptor of the stream to attach.
+  * @param path the path in the filesystem to which to attach the stream.
+  * @version LIS_1.0 fattach()
+  *
+  * This is the recursive version of the implementation function.
+  *
+  * fattach() cannot contain a thread cancellation point.  Because this
+  * function contains a single system call, it is asyncrhonous thread
+  * cancellation safe.
+  */
+int
+__lis_fattach_r(int fd, const char *path)
+{
+	int oldtype, ret;
+
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
+	ret = __lis_fattach(fd, path);
+	pthread_setcanceltype(oldtype, NULL);
+	return (ret);
+}
+
 /** @fn int fattach(int fd, const char *path)
   * @brief attach a stream to a path in a filesystem.
   * @param fd the file descriptor of the stream to attach.
   * @param path the path in the filesystem to which to attach the stream.
+  * @version LIS_1.0 __lis_fattach_r()
   */
-__asm__(".symver __lis_fattach,fattach@@LIS_1.0");
+__asm__(".symver __lis_fattach_r,fattach@@LIS_1.0");
 
-// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

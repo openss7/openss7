@@ -57,8 +57,13 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#include <sys/types.h>
-#include <stropts.h>
+#include "streams.h"
+
+/** @addtogroup strcalls STREAMS System Calls
+  * @{ */
+
+/** @file
+  * STREAMS System Call putmsg() implementation file.  */
 
 int __lis_putpmsg(int, struct strbuf *, struct strbuf *, int, int);
 int __lis_putpmsg_r(int, struct strbuf *, struct strbuf *, int, int);
@@ -80,6 +85,7 @@ __lis_putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
   * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
   * @param datptr a pointer to a strbuf structure describing the data part of the message.
   * @param flags the priority of the message.
+  * @version LIS_1.0 putmsg()
   *
   * This function is a thread cancellation point.
   */
@@ -88,15 +94,6 @@ __lis_putmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
 {
 	return __lis_putpmsg_r(fd, ctlptr, datptr, -1, flags);
 }
-
-/** @fn int putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
-  * @brief put a message to a stream band.
-  * @param fd a file descriptor representing the stream.
-  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a strbuf structure describing the data part of the message.
-  * @param flags the priority of the message.
-  */
-__asm__(".symver __lis_putmsg_r,putmsg@@LIS_1.0");
 
 int __old_lis_putpmsg(int, struct strbuf *, struct strbuf *, int, int);
 int __old_lis_putpmsg_r(int, struct strbuf *, struct strbuf *, int, int);
@@ -107,12 +104,26 @@ __old_lis_putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags
 	return __old_lis_putpmsg(fd, ctlptr, datptr, -1, flags);
 }
 
+/** @version LIS_0.0 putmsg()
+  */
 int
 __old_lis_putmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
 {
 	return __old_lis_putpmsg_r(fd, ctlptr, datptr, -1, flags);
 }
 
+/** @fn int putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
+  * @brief put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version LIS_1.0 __lis_putmsg_r()
+  * @version LIS_0.0 __old_lis_putmsg_r()
+  */
+__asm__(".symver __lis_putmsg_r,putmsg@@LIS_1.0");
 __asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -78,14 +78,14 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup xnet
-  * @{
-  * @file
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
   * XTI SCTP-Specific header file.
   *
   * These definitions are specific to the OpenSS7 STREAMS implementation of SCTP
-  * and are not an OpenGroup specification.
-  * */
+  * and are not an OpenGroup specification.  */
 
 /*
  * XTI SCTP-Specific Header File

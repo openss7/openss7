@@ -68,11 +68,15 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-/**
-  * @ingroup strcalls STREAMS System Calls
-  * @{
-  * @file
+/** @addtogroup strcalls STREAMS System Calls
+  * @{ */
+
+/** @file
   * @brief Defines the interface to STREAMS(9) character device special files.
+  */
+
+/** @name STREAMS System Calls
+  * System calls that are defined for STREAMS.
   * @{ */
 
 /** Perform the I/O control operation specified by request on fd.
@@ -111,15 +115,37 @@ extern int pipe(int fds[2]);
 
 /** @} */
 
-extern int __streams_ioctl(int fd, unsigned long int request, ...);
-extern int __streams_isastream(int fd);
-extern int __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
-extern int __streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp);
-extern int __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags);
-extern int __streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags);
+/** @name STREAMS System Calls - Non-Thread-Safe
+  * Non-thread-safe versions of the system calls for STREAMS.
+  * @{ */
 extern int __streams_fattach(int fd, const char *path);
 extern int __streams_fdetach(const char *path);
+extern int __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
+extern int __streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp,
+			     int *flagsp);
+extern int __streams_isastream(int fd);
 extern int __streams_pipe(int fds[2]);
+extern int __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr,
+			    int flags);
+extern int __streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr,
+			     int band, int flags);
+/** @} */
+
+/** @name STREAMS System Calls - Thread-Safe
+  * Thread-safe versions of the system calls for STREAMS.
+  * @{ */
+extern int __streams_fattach_r(int fd, const char *path);
+extern int __streams_fdetach_r(const char *path);
+extern int __streams_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
+extern int __streams_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp,
+			       int *flagsp);
+extern int __streams_isastream_r(int fd);
+extern int __streams_pipe_r(int fds[2]);
+extern int __streams_putmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr,
+			      int flags);
+extern int __streams_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr,
+			       int band, int flags);
+/** @} */
 
 /** @} */
 

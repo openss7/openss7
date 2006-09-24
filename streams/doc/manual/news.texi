@@ -86,6 +86,12 @@ Third release candidate.
 
 @itemize
 @item
+Minor bug fixes to STREAMS library.  isastream(3) and fattach(3) must not
+contain an asynchronous thread cancellation point, but they could.  Added
+asynchronous thread cancellation protection to these functions to remove any
+thread cancellation points.
+
+@item
 The package will now build doxygen(1) html documentation with the 'doxy' make
 target.  See 'make help' or README-make in the distribution for more
 information.
@@ -104,8 +110,13 @@ Automated release file generation making for vastly improved and timely text
 documentation present in the release directory.
 
 @item
-Package will now support extended ranges of minor devices on 2.6 kernels.
-@cite{LiS} cannot support this feature but has been dropped with this release.
+Many documentation updates for all @uref{http://www.openss7.org/,, OpenSS7}
+packages.
+
+@item
+This release candidate includes the changes made to the strsctp drivers at the
+@cite{2006 SCTP Interop} at the @cite{University of British Columbia}.  This
+version was interoperability tested with all implementations present.
 
 @item
 This release candidate provides support for additional @cite{SuSE}
@@ -114,9 +125,46 @@ support includes @cite{SLES 9}, @cite{SLES 9 SP2}, @cite{SLES 9 SP3},
 @cite{SLES 10}, @cite{SuSE 10.1}.
 
 @item
-This release candidate includes the changes made to the strsctp drivers at the
-@cite{2006 SCTP Interop} at the @cite{University of British Columbia}.  This
-version was interoperability tested with all implementations present.
+Better detection of SUSE distributions, release numbers and SLES
+distributions.
+
+@item
+Optimized compilation is now available also for user level programs in
+addition to kernel programs.  Added new @option{--with-optimize} option to
+@command{configure} to accomplish this.
+
+@item
+Improved compiler flag generation and optimizations for recent @command{gcc}
+compilers and some idiosynchratic behaviour for some distributions (primarily
+SUSE):
+
+@multitable @columnfractions .01 .99
+@item @minus{} @tab Remove @option{-fno-reorder-blocks} and
+@option{-fno-reorder-functions} options added by some recent 2.6
+@file{Makefile}s for @samp{x86_64} architecture: it impedes performance
+optimizations.
+@item @minus{} @tab Remove @option{-ffunction-sections} option added by some
+rececent 2.6 @file{Makefile}s for @samp{x86_64} architecture: this is an
+insane option and should never have been used.
+@item @minus{} @tab Add @option{-ffreestanding} that some older 2.6
+@file{Makefile}s (such as that with @cite{SLES 9 2.6.5} kernel) neglect to add
+to the @command{gcc} command line.
+@item @minus{} @tab @cite{SLES 10} expands the directory before
+@file{autoconf.h} on the @command{gcc} command line for some reason.
+@command{configure} script watches out for this now.
+@end multitable
+
+@item
+Updated @command{init} scripts for proper addition and removal of modules.
+
+@item
+Start assigning majors at major device number 231 instead of major device
+number 230.  Assign major device number 230 explicitly to the clone device.
+
+@item
+@cite{@value{PACKAGE}} now supports expanded addressable minor device
+numbers, permitting 2^16 addressable minor devices per major device number on
+2.6 kernels: @cite{LiS} cannot support this change.
 @end itemize
 
 This release is an internal release candidate and was not publicly released.

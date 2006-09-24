@@ -54,13 +54,25 @@
 
 #ident "@(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+/* This file can be processed with doxygen(1). */
+
+#include <sys/tihdr.h>
+
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <sys/tihdr.h>
+/** @weakgroup tli STREAMS TLI Library
+  * @{ */
+
+/** @file
+  * Transport Interface header file. */
+
+/* This is where we could put the old TLI interface definitions. */
+
+/** @} */
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -69,3 +81,5 @@ __END_DECLS
 #endif
 
 #endif				/* _TIHDR_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

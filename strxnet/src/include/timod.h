@@ -54,13 +54,15 @@
 
 #ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+#include <sys/timod.h>
+
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <sys/timod.h>
+/* We might expose some internal library functions here. */
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

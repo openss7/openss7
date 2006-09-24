@@ -69,8 +69,9 @@ static char const ident[] =
 /* This file can be processed with doxygen(1). */
 
 /** @weakgroup pthread OpenSS7 Library Thread Safety
-  * @{
-  * @file
+  * @{ */
+
+/** @file
   * Thread-safety implementation file.
   * This file provide implementation of functions used for thread-safety as
   * well as for non-recursive versions of the library.  This file is shared by

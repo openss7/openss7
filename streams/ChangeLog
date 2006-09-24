@@ -1,3 +1,7 @@
+2006-09-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* lib/libc/streams.h: added
+
 2006-09-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated news and todo

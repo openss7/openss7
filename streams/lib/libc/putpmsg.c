@@ -56,90 +56,75 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <sys/types.h>
-#include <unistd.h>
-#include <stropts.h>
+/** @weakgroup strcalls STREAMS System Calls
+  * @{ */
 
-#include <pthread.h>
-#include <errno.h>
+/** @file
+  * STREAMS Library putmsg(), putpmsg() implementation file.  */
 
-#if __GNUC__ < 3
-#define inline inline
-#define noinline extern
-#else
-#define inline __attribute__((always_inline))
-#define noinline static __attribute__((noinline))
-#endif
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define __hot __attribute__((section(".text.hot")))
-#define __unlikely __attribute__((section(".text.unlikely")))
-
-/** @file */
-
-extern void pthread_testcancel(void);
-
+/** @brief Handle errors appropriately.
+  * @param fd the file descriptor associated with the error.
+  *
+  * Checks the error in errno, and if the error is a set of errors that indicate
+  * that fd might not be a STREAMS character device special file, test the file
+  * descriptor with #I_ISASTREAM.  If fd is not a Stream, all errors that would
+  * indicate such are converted to {ENOSTR}.  Otherwise, we test for
+  * cancellation and return with the original error in errno.
+  *
+  * putpmsg() @e must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, this function includes a call to pthread_testcancel() even though
+  * no asynchronous thread deferral has been performed.
+  */
 noinline __unlikely void
 __putpmsg_error(int fd)
 {
 	int __olderrno;
 
-	/*! If we get an EINVAL error back it is likely due to a bad ioctl, in which case this is
-	   not a Stream, so we need to check if it is a Stream and fix up the error code.  We get
-	   EINTR for a controlling terminal. */
+	/** If we get an EINVAL error back it is likely due to a bad ioctl, in
+	  * which case this is not a Stream, so we need to check if it is a
+	  * Stream and fix up the error code.  We get EINTR for a controlling
+	  * terminal. */
 	if ((__olderrno = errno) == EINVAL || __olderrno == EINTR || __olderrno == ENOTTY)
 		errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
-	pthread_testcancel();
 }
 
-/** @internal
-  * @brief Put a message to a stream band.
-  * @param fd a file descriptor representing the stream.
-  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+/** @brief Old putpmsg() approach.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
   * @param band the band to which to put the message.
   * @param flags the priority of the message.
   *
-  * This is the newer kernel implemetnation that uses ioctl() to emulate a
-  * system call.  The newer kernels support ioctl_unlocked() and this is quite
-  * efficient.  This is the only way that works on newer kernels and the old
-  * method will fail.  */
-static inline __hot int
-__putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
-{
-	int err;
-	struct strpmsg args;
-
-	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) {
-					  -1, -1, NULL});
-	args.databuf = datptr ? *datptr : ((struct strbuf) {
-					   -1, -1, NULL});
-	args.band = band;
-	args.flags = flags;
-
-	pthread_testcancel();
-	if (likely((err = ioctl(fd, I_PUTPMSG, &args)) >= 0))
-		return (err);
-	__putpmsg_error(fd);
-	return (err);
-}
-
-/** @internal
-  * @brief Put a message to a stream band.
-  * @param fd a file descriptor representing the stream.
-  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a strbuf structure describing the data part of the message.
-  * @param band the band to which to put the message.
-  * @param flags the priority of the message.
+  * This is the older kernel implementation that uses read()/write() to
+  * emulate a system call.  The older kernels do not support ioctl_unlocked()
+  * or ioctl_compat() and this was the best way to emulate system calls on
+  * older kernels.
   *
-  * This is the older kernel implementation that uses read()/write() to emulate
-  * a system call.  The older kernels do not support ioctl_unlocked() or
-  * ioctl_compat() and this was the best way to emulate system calls on older
-  * kernels.  */
+  * Under the old approach, a specialized length argument,
+  * %LFS_GETMSG_PUTMSG_ULEN was passed to the write(2) system call with a
+  * buffer pointer pointing to the argumnets of the putpmsg() call combined
+  * into a struct strpmsg structure.  When the Stream head read function
+  * recognizes the invalid length argument, it processes the call a putpmsg()
+  * instead of write(2).
+  *
+  * Around Linux kernel 2.6.14, the read()/write() length argument is checked
+  * by system code for validity before being passed to the character device
+  * driver.  This made this approach no longer workable.  The only advantage
+  * of the approach over ioctl() was that ioctl() took the big kernel lock
+  * whereas read()/write() did not.  On or about 2.6.14, ioctl_unlocked() was
+  * added to the kernel to permit unlocked input-output controls, destroying
+  * any advantage that the old approach may have had.
+  *
+  * One difficulty with the old approach was 32-bit compatibility for 64-bit
+  * kernels.  The magic length used by LiS-2.18 was only 32-bits long, whereas
+  * the size_t argument is 64-bit on 64-bit calls and 32-bit on 32-bit calls.
+  * Linux Fast-STREAMS used a 64-bit magic length which is truncated to 32-bit
+  * when a 32-bit call is made to a 64-bit kernel, allowing strread() in the
+  * Stream head to distriguish between 32-bit calls and 64-bit calls.  ioctl()
+  * is much easier, especially since ioctl_compat() was added to the kernel.
+  */
 static inline __hot int
 __old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
@@ -153,95 +138,221 @@ __old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, 
 	args.band = band;
 	args.flags = flags;
 
-	pthread_testcancel();
-	if (likely((err = write(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0))
+	if (likely((err = write(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0)) {
 		return (err);
-	__putpmsg_error(fd);
+	}
+	return (err);
+}
+
+/** @brief New putpmsg() approach.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure specifying the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure specifying the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  *
+  * This is the newer kernel implemetnation that uses ioctl() to emulate a
+  * system call.  The newer kernels support ioctl_unlocked() and this is quite
+  * efficient.  This is the only way that works on newer kernels and the old
+  * method will fail.
+  */
+static inline __hot int
+__putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+{
+	int err;
+	struct strpmsg args;
+
+	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) {
+					  -1, -1, NULL});
+	args.databuf = datptr ? *datptr : ((struct strbuf) {
+					   -1, -1, NULL});
+	args.band = band;
+	args.flags = flags;
+
+	if (likely((err = ioctl(fd, I_PUTPMSG, &args)) >= 0)) {
+		return (err);
+	}
 	return (err);
 }
 
 /** @brief Put a message to a stream band.
-  * @param fd a file descriptor representing the stream.
-  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
   * @param band the band to which to put the message.
   * @param flags the priority of the message.
+  * @version STREAMS_1.0
   *
-  * putpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In
-  * the Linux Threads approach, this function will return EINTR if interrupted
-  * by a signal.  When the function returns EINTR, the Linux Threads user should
-  * check for cancellation with pthread_testcancel().  Because this function
-  * consists of a single system call, asynchronous thread cancellation
-  * protection is not required.  */
-int __hot
+  * This function is a new-approach, non-thread-safe implementation of putpmsg().
+  */
+__hot int
 __streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
 		  int flags)
 {
-	return __putpmsg(fd, ctlptr, datptr, band, flags);
+	int err;
+
+	if (unlikely((err = __putpmsg(fd, ctlptr, datptr, band, flags)) == -1))
+		__putpmsg_error(fd);
+	return (err);
 }
-__asm__(".symver __streams_putpmsg,putpmsg@@@STREAMS_1.0");
-
-__hot int
-__old_streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
-		  int flags)
-{
-	return __old_putpmsg(fd, ctlptr, datptr, band, flags);
-}
-__asm__(".symver __old_streams_putpmsg,putpmsg@STREAMS_0.0");
-
-int __lis_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int)
-	__attribute__((weak, alias("__streams_putpmsg")));
-
-int __lis_putpmsg_r(int, const struct strbuf *, const struct strbuf *, int, int)
-	__attribute__((weak, alias("__streams_putpmsg")));
-
-__asm__(".symver __lis_putpmsg_r,putpmsg@LIS_1.0");
-
-int __old_lis_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int)
-	__attribute__((weak, alias("__old_streams_putpmsg")));
-
-int __old_lis_putpmsg_r(int, const struct strbuf *, const struct strbuf *, int, int)
-	__attribute__((weak, alias("__old_streams_putpmsg")));
-
-__asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");
-
 
 /** @brief Put a message to a stream band.
-  * @param fd a file descriptor representing the stream.
-  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
   * @param flags the priority of the message.
+  * @version STREAMS_1.0 putpmsg()
   *
-  * This function is a thread cancellation point.  For Linux Fast-STREAMS,
-  * putmsg can be simply emulated with a call to putpmsg(). */
-int __hot
-__streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
-{
-	return __putpmsg(fd, ctlptr, datptr, -1, flags);
-}
-__asm__(".symver __streams_putmsg,putmsg@@@STREAMS_1.0");
-
+  * This function is a new-approach, thread-safe implementation of putpmsg().
+  *
+  * putpmsg() @e must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, this function includes a call to pthread_testcancel() even though
+  * no asynchronous thread deferral has been performed.
+  *
+  * In the Linux Threads approach, this function will return EINTR if
+  * interrupted by a signal.  When the function returns EINTR, the Linux Threads
+  * user should check for cancellation with pthread_testcancel().  Because this
+  * function consists of a single system call, asynchronous thread cancellation
+  * protection is not required.
+  */
 __hot int
-__old_streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+__streams_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+		    int flags)
 {
-	return __old_putpmsg(fd, ctlptr, datptr, -1, flags);
+	int oldtype = 0;
+	int err;
+
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
+	if (unlikely((err = __putpmsg(fd, ctlptr, datptr, band, flags)) == -1)) {
+		pthread_testcancel();
+		__putpmsg_error(fd);
+		pthread_testcancel();
+	}
+	pthread_setcanceltype(oldtype, NULL);
+	return (err);
 }
-__asm__(".symver __old_streams_putmsg,putmsg@STREAMS_0.0");
 
-int __lis_putmsg(int, const struct strbuf *, const struct strbuf *, int, int)
-	__attribute__((weak, alias("__streams_putmsg")));
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  * @version STREAMS_0.0 putpmsg()
+  *
+  * This function is an old-approach, non-thread-safe implementation of putpmsg().
+  */
+__hot int
+__old_streams_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+		      int flags)
+{
+	int err;
 
-int __lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int, int)
-	__attribute__((weak, alias("__streams_putmsg")));
+	if (unlikely((err = __old_putpmsg(fd, ctlptr, datptr, band, flags)) == -1))
+		__putpmsg_error(fd);
+	return (err);
+}
 
-__asm__(".symver __lis_putmsg_r,putmsg@LIS_1.0");
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  * @version STREAMS_0.0 putpmsg()
+  *
+  * This function is an old-approach, thread-safe implementation of putpmsg().
+  *
+  * putpmsg() @e must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, this function includes a call to pthread_testcancel() even
+  * though no asynchronous thread deferral has been performed.
+  */
+__hot int
+__old_streams_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+			int flags)
+{
+	int oldtype = 0;
+	int err;
 
-int __old_lis_putmsg(int, const struct strbuf *, const struct strbuf *, int, int)
-	__attribute__((weak, alias("__old_streams_putmsg")));
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
+	if (unlikely((err = __old_putpmsg(fd, ctlptr, datptr, band, flags)) == -1)) {
+		pthread_testcancel();
+		__putpmsg_error(fd);
+		pthread_testcancel();
+	}
+	pthread_setcanceltype(oldtype, NULL);
+	return (err);
+}
 
-int __old_lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int, int)
-	__attribute__((weak, alias("__old_streams_putmsg")));
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  * @version LIS_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __streams_putpmsg().
+  */
+int __lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+    __attribute__ ((weak, alias("__streams_putpmsg")));
 
-__asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  * @version LIS_1.0 putpmsg()
+  * @par Alias:
+  * This symbol is a weak alias of __streams_putpmsg_r().
+  */
+int __lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+    __attribute__ ((weak, alias("__streams_putpmsg_r")));
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  * @version LIS_0.0
+  * @par Alias:
+  * This symbol is a weak alias of __old_streams_putpmsg().
+  */
+int __old_lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+    __attribute__ ((weak, alias("__old_streams_putpmsg")));
+
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  * @version LIS_0.0 putpmsg()
+  * @par Alias:
+  * This symbol is a weak alias of __old_streams_putpmsg_r().
+  */
+int __old_lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+    __attribute__ ((weak, alias("__old_streams_putpmsg_r")));
+
+/** @fn int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  * @version STREAMS_1.0 __streams_putpmsg_r()
+  * @version STREAMS_0.0 __old_streams_putpmsg_r()
+  * @version LIS_1.0 __lis_putpmsg_r()
+  * @version LIS_0.0 __old_lis_putpmsg_r()
+  */
+__asm__(".symver __streams_putpmsg_r,putpmsg@@STREAMS_1.0");
+__asm__(".symver __old_streams_putpmsg_r,putpmsg@STREAMS_0.0");
+__asm__(".symver __lis_putpmsg_r,putpmsg@LIS_1.0");
+__asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

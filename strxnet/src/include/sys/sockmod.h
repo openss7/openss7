@@ -56,11 +56,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup xnet
-  * @{
-  * @file
-  * Socket Module (sockmod) header file.
-  * */
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
+  * Socket Module (sockmod) header file.  */
 
 #define SOCKMOD_IOC_MAGIC	'I'
 

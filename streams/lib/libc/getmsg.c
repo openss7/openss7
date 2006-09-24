@@ -51,87 +51,181 @@
 
 #ident "@(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $";
+static char const ident[] =
+    "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $";
 
-#define _XOPEN_SOURCE 600
-#define _REENTRANT
-#define _THREAD_SAFE
+/* This file can be processed with doxygen(1). */
 
-#include <sys/types.h>
-#include <stropts.h>
-#include <unistd.h>
+#include "streams.h"
 
-#if __GNUC__ < 3
-#define inline inline
-#define noinline extern
-#else
-#define inline __attribute__((always_inline))
-#define noinline static __attribute__((noinline))
-#endif
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define __hot __attribute__((section(".text.hot")))
-#define __unlikely __attribute__((section(".text.unlikely")))
+extern int __streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
+extern int __streams_getpmsg_r(int, struct strbuf *, struct strbuf *, int *, int *);
+extern int __old_streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
+extern int __old_streams_getpmsg_r(int, struct strbuf *, struct strbuf *, int *, int *);
 
-int __streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
-int __old_streams_getpmsg(int, struct strbuf *, struct strbuf *, int *, int *);
+/** @weakgroup strcalls STREAMS System Calls
+  * @{ */
+
+/** @file
+  * STREAMS Library getmsg() implementation file.  */
 
 /** @brief Get a message from a Stream.
-  * @param fd a file descriptor for the stream.
-  * @param ctlptr a pointer to a struct strbuf structure that returns the
-  * control part of the retrieved message.
-  * @param datptr a pointer to a struct strbuf structuer that returns the data
-  * part of the retrieved message.
-  * @param flagsp a pointer to an integer flags word that returns the priority
-  * of the retrieved message.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version STREAMS_1.0
   *
-  * getmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).
-  * Because getmsg consists of a single call to getpmsg() which has the same
-  * characteristics, no protection against asynchronous thread cancellation is
-  * required.  */
-int
+  * This function is a non-thread-safe implementation of getmsg().
+  *
+  * getmsg()
+  * can be simply emulated with a call to
+  * getpmsg().
+  */
+__hot int
 __streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	int band = -1;
 
 	return __streams_getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
-__asm__(".symver __streams_getmsg,getmsg@@@STREAMS_1.0")
 
 /** @brief Get a message from a Stream.
-  * @param fd a file descriptor for the stream.
-  * @param ctlptr a pointer to a struct strbuf structure that returns the
-  * control part of the retrieved message.
-  * @param datptr a pointer to a struct strbuf structuer that returns the data
-  * part of the retrieved message.
-  * @param flagsp a pointer to an integer flags word that returns the priority
-  * of the retrieved message.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version STREAMS_1.0 getmsg()
   *
-  * This version is an old implementation that uses the read()/write() method
-  * instead of the ioctl() method for emulating getmsg() system calls. */
-int
+  * This function is a thread-safe implementation of getmsg().
+  *
+  * getmsg() @e must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, this function includes a call to pthread_testcancel() even though
+  * no asynchronous thread deferral has been performed.
+  *
+  * In the Linux Threads approach, this function will return EINTR if
+  * interrupted by a signal.  When the function returns EINTR, the Linux
+  * Threads user should check for cancellation with pthread_testcancel().
+  * Because this function consists of a single system call, asynchronous
+  * thread cancellation protection is not required.
+  *
+  * getmsg()
+  * can be simply emulated with a call to
+  * getpmsg().
+  */
+__hot int
+__streams_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+{
+	int band = -1;
+
+	return __streams_getpmsg_r(fd, ctlptr, datptr, &band, flagsp);
+}
+
+/** @brief Get a message from a Stream.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version STREAMS_0.0
+  *
+  * This function is an old-approach, non-thread-safe implementation of getmsg().
+  *
+  * getmsg()
+  * can be simply emulated with a call to
+  * getpmsg().
+  */
+__hot int
 __old_streams_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
 	int band = -1;
 
 	return __old_streams_getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }
-__asm__(".symver __old_streams_getmsg,getmsg@STREAMS_0.0")
 
-int __lis_getmsg(int, struct strbuf *, struct strbuf *, int *)
-	__attribute__((weak, alias("__streams_getmsg")));
+/** @brief Get a message from a Stream.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version STREAMS_0.0 getmsg()
+  *
+  * This function is an old-approach, thread-safe implementation of getmsg().
+  *
+  * getmsg() @e must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, this function includes a call to pthread_testcancel() even
+  * though no asynchronous thread deferral has been performed.
+  */
+__hot int
+__old_streams_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+{
+	int band = -1;
 
-int __lis_getmsg_r(int, struct strbuf *, struct strbuf *, int *)
-	__attribute__((weak, alias("__streams_getmsg")));
+	return __old_streams_getpmsg_r(fd, ctlptr, datptr, &band, flagsp);
+}
 
+/** @brief Get a message from a Stream.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version LIS_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __streams_getmsg().
+  */
+int __lis_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+    __attribute__ ((weak, alias("__streams_getmsg")));
+
+/** @brief Get a message from a Stream.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version LIS_1.0 getmsg()
+  * @par Alias:
+  * This symbol is a weak alias of __streams_getmsg_r().
+  */
+int __lis_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+    __attribute__ ((weak, alias("__streams_getmsg_r")));
+
+/** @brief Get a message from a Stream.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version LIS_0.0
+  * @par Alias:
+  * This symbol is a weak alias of __old_streams_getmsg().
+  */
+int __old_lis_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+    __attribute__ ((weak, alias("__old_streams_getmsg")));
+
+/** @brief Get a message from a Stream.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version LIS_0.0 getmsg()
+  * @par Alias:
+  * This symbol is a weak alias of __old_streams_getmsg_r().
+  */
+int __old_lis_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+    __attribute__ ((weak, alias("__old_streams_getmsg_r")));
+
+/** @fn int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version STREAMS_1.0 __streams_getmsg_r()
+  * @version STREAMS_0.0 __old_streams_getmsg_r()
+  * @version LIS_1.0 __lis_getmsg_r()
+  * @version LIS_0.0 __old_lis_getmsg_r()
+  */
+__asm__(".symver __streams_getmsg_r,getmsg@@STREAMS_1.0");
+__asm__(".symver __old_streams_getmsg_r,getmsg@STREAMS_0.0");
 __asm__(".symver __lis_getmsg_r,getmsg@LIS_1.0");
-
-int __old_lis_getmsg(int, struct strbuf *, struct strbuf *, int *)
-	__attribute__((weak, alias("__old_streams_getmsg")));
-
-int __old_lis_getmsg_r(int, struct strbuf *, struct strbuf *, int *)
-	__attribute__((weak, alias("__old_streams_getmsg")));
-
 __asm__(".symver __old_lis_getmsg_r,getmsg@LIS_0.0");
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

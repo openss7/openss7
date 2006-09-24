@@ -60,12 +60,11 @@
  *    Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
 
-/** @ingroup strdrv
-  * @{
-  * @file
-  * STREAMS Minimux Driver header file.
-  * @{
-  */
+/** @addtogroup minimux
+  * @{ */
+
+/** @file
+  * STREAMS Minimux Driver header file.  */
 
 /** @name MiniMux Magic Number
   * @{ */
@@ -78,9 +77,7 @@
 #define MINIMUX_UP		MINIMUX_IOCTL(2)
 /** @} */
 
-/** @}
-  * @}
-  */
+/** @} */
 
 #endif				/* __SYS_LIS_MINIMUX_H__ */
 

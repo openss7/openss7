@@ -51,37 +51,24 @@
 
 #ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/22 21:21:19 $";
+static char const ident[] =
+    "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/22 21:21:19 $";
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <errno.h>
-#include <stropts.h>
+/** @weakgroup strcalls STREAMS System Calls
+  * @{ */
 
-#if __GNUC__ < 3
-#define inline inline
-#define noinline extern
-#else
-#define inline __attribute__((always_inline))
-#define noinline static __attribute__((noinline))
-#endif
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define __hot __attribute__((section(".text.hot")))
-#define __unlikely __attribute__((section(".text.unlikely")))
+/** @file
+  * STREAMS Library isastream() implementation file. */
 
 /** @brief Test a stream.
   * @param fd a file descriptor to test.
   *
-  * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
-  * Because isastream() consists of a single system call, asynchronous thread
-  * cancellation protection is not required.  */
+  * This is a non-thread-safe implementation of isastream().
+  */
 __unlikely int
 __streams_isastream(int fd)
 {
@@ -93,11 +80,50 @@ __streams_isastream(int fd)
 	return (1);
 }
 
-__asm__(".symver __streams_isastream,isastream@@@STREAMS_1.0");
+/** @brief Test a stream.
+  * @param fd a file descriptor to test.
+  * @version STREAMS_1.0 isastream()
+  *
+  * This is a thread-safe implementation of isastream().
+  *
+  * isastream() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, asyncrhonous thread cancellation must be deferred across the
+  * call and restored without testing for thread cancellation.
+  */
+__unlikely int
+__streams_isastream_r(int fd)
+{
+	int oldtype = 0;
+	int retval;
 
-int __lis_isastream(int)
-	__attribute__((weak, alias("__streams_isastream")));
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
+	retval = __streams_isastream(fd);
+	pthread_setcanceltype(oldtype, NULL);
+	return (retval);
+}
 
-__asm__(".symver __lis_isastream,isastream@LIS_1.0");
+/** @param fd a file descriptor to test.
+  * @par Alias:
+  * This symbol is a strong alias of __streams_isastream().
+  */
+int __lis_isastream(int fd)
+    __attribute__ ((weak, alias("__streams_isastream")));
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @param fd a file descriptor to test.
+  * @par Alias:
+  * This symbol is a strong alias of __streams_isastream_r().
+  */
+int __lis_isastream_r(int fd)
+    __attribute__ ((weak, alias("__streams_isastream_r")));
+
+/** @fn int isastream(int fd)
+  * @param fd a file descriptor to test.
+  * @version STREAMS_1.0 __streams_isastream_r()
+  * @version LIS_1.0 __lis_isastream_r()
+  */
+__asm__(".symver __streams_isastream_r,isastream@@STREAMS_1.0");
+__asm__(".symver __lis_isastream_r,isastream@LIS_1.0");
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

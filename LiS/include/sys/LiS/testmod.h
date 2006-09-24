@@ -84,35 +84,40 @@
 #warning "Do no include sys/streams/testmod.h directly, include sys/testmod.h instead."
 #endif
 
-/** @ingroup strmod
-  * @{
-  * @file
-  * STREAMS Test Module testmod(4) header file.
-  * @{
-  */
-
-/** @name Test Module Magic Number
+/** @addtogroup testmod
   * @{ */
-#define TM_IOC_MAGIC 'V'
+
+/** @file
+  * STREAMS Test Module (testmod(4)) Header File.
+  *
+  * This file provides the user to STREAMS module interface between the user and
+  * the Test Module (testmod(4)) STREAMS module.  This module is primarily for
+  * testing in kernel specifics during conformance testsuite runs (see
+  * test-streams(8)).  It performs several rather highly specialized functions. */
+
+/**
+  * @name Test Module Magic Number
+  * STREAMS Test Module magic number for input-output controls.
+  * @{ */
+#define TM_IOC_MAGIC 'V' /**< The ioctl(2) magic number for testmod(4). */
 /** @} */
 
-/** @name Test Module Input-Output Controls
+/**
+  * @name Test Module Input-Output Controls
   * @{ */
-#define TM_IOC_HANGUP		((TM_IOC_MAGIC << 8) | 0x01)
-#define TM_IOC_RDERR		((TM_IOC_MAGIC << 8) | 0x02)
-#define TM_IOC_WRERR		((TM_IOC_MAGIC << 8) | 0x03)
-#define TM_IOC_RWERR		((TM_IOC_MAGIC << 8) | 0x04)
-#define TM_IOC_PSIGNAL		((TM_IOC_MAGIC << 8) | 0x05)
-#define TM_IOC_NSIGNAL		((TM_IOC_MAGIC << 8) | 0x06)
-#define TM_IOC_IOCTL		((TM_IOC_MAGIC << 8) | 0x07)
-#define TM_IOC_COPYIN		((TM_IOC_MAGIC << 8) | 0x08)
-#define TM_IOC_COPYOUT		((TM_IOC_MAGIC << 8) | 0x09)
-#define TM_IOC_COPYIO		((TM_IOC_MAGIC << 8) | 0x0a)
+#define TM_IOC_HANGUP	((TM_IOC_MAGIC << 8) | 0x01) /**< Generate M_HANGUP. */
+#define TM_IOC_RDERR	((TM_IOC_MAGIC << 8) | 0x02) /**< Generate M_ERROR (read error). */
+#define TM_IOC_WRERR	((TM_IOC_MAGIC << 8) | 0x03) /**< Generate M_ERROR (write error). */
+#define TM_IOC_RWERR	((TM_IOC_MAGIC << 8) | 0x04) /**< Generate M_ERROR (read/write error). */
+#define TM_IOC_PSIGNAL	((TM_IOC_MAGIC << 8) | 0x05) /**< Generate M_PCPROTO signal. */
+#define TM_IOC_NSIGNAL	((TM_IOC_MAGIC << 8) | 0x06) /**< Generate M_PROTO signal. */
+#define TM_IOC_IOCTL	((TM_IOC_MAGIC << 8) | 0x07) /**< Generate M_IOCTL. */
+#define TM_IOC_COPYIN	((TM_IOC_MAGIC << 8) | 0x08) /**< Try to copy in. */
+#define TM_IOC_COPYOUT	((TM_IOC_MAGIC << 8) | 0x09) /**< Try to copy out. */
+#define TM_IOC_COPYIO	((TM_IOC_MAGIC << 8) | 0x0a) /**< Try to copy in and out. */
 /** @} */
 
-/** @}
-  * @}
-  */
+/** @} */
 
 #endif				/* __SYS_STREAMS_TESTMOD_H__ */
 

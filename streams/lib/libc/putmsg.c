@@ -51,61 +51,181 @@
 
 #ident "@(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $"
 
-static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $";
+static char const ident[] =
+    "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/22 21:21:19 $";
 
-#include <sys/types.h>
-#include <stropts.h>
+/* This file can be processed with doxygen(1). */
 
-#if __GNUC__ < 3
-#define inline inline
-#define noinline extern
-#else
-#define inline __attribute__((always_inline))
-#define noinline static __attribute__((noinline))
-#endif
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define __hot __attribute__((section(".text.hot")))
-#define __unlikely __attribute__((section(".text.unlikely")))
+#include "streams.h"
 
-int __streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
-int __old_streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
+extern int __streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
+extern int __streams_putpmsg_r(int, const struct strbuf *, const struct strbuf *, int, int);
+extern int __old_streams_putpmsg(int, const struct strbuf *, const struct strbuf *, int, int);
+extern int __old_streams_putpmsg_r(int, const struct strbuf *, const struct strbuf *, int, int);
 
-/** @brief put a message to a stream band.
-  * @param fd a file descriptor representing the stream.
-  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+/** @weakgroup strcalls STREAMS System Calls
+  * @{ */
+
+/** @file
+  * STREAMS Library putmsg() implementation file.  */
+
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
   * @param flags the priority of the message.
+  * @version STREAMS_1.0
   *
-  * This function is a thread cancellation point.  */
-int
+  * This function is a non-thread-safe implementation of putmsg().
+  *
+  * putmsg()
+  * can be simply emulated with a call to
+  * putpmsg().
+  */
+__hot int
 __streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
-	return __streams_putpmsg(fd, ctlptr, datptr, -1, flags);
-}
-__asm__(".symver __streams_putmsg,putmsg@@@STREAMS_1.0");
+	int band = -1;
 
+	return __streams_putpmsg(fd, ctlptr, datptr, band, flags);
+}
+
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version STREAMS_1.0 putmsg()
+  *
+  * This function is a thread-safe implementation of putmsg().
+  *
+  * putmsg() @e must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, this function includes a call to pthread_testcancel() even though
+  * no asynchronous thread deferral has been performed.
+  *
+  * In the Linux Threads approach, this function will return EINTR if
+  * interrupted by a signal.  When the function returns EINTR, the Linux
+  * Threads user should check for cancellation with pthread_testcancel().
+  * Because this function consists of a single system call, asynchronous
+  * thread cancellation protection is not required.
+  *
+  * putmsg()
+  * can be simply emulated with a call to
+  * putpmsg().
+  */
+int
+__streams_putmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+{
+	int band = -1;
+
+	return __streams_putpmsg_r(fd, ctlptr, datptr, band, flags);
+}
+
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version STREAMS_0.0
+  *
+  * This function is an old-approach, non-thread-safe implementation of putmsg().
+  *
+  * putmsg()
+  * can be simply emulated with a call to
+  * putpmsg().
+  */
 int
 __old_streams_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
-	return __old_streams_putpmsg(fd, ctlptr, datptr, -1, flags);
+	int band = -1;
+
+	return __old_streams_putpmsg(fd, ctlptr, datptr, band, flags);
 }
-__asm__(".symver __old_streams_putmsg,putmsg@STREAMS_0.0");
 
-int __lis_putmsg(int, const struct strbuf *, const struct strbuf *, int)
-	__attribute__((weak, alias("__streams_putmsg")));
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version STREAMS_0.0 putmsg()
+  *
+  * This function is an old-approach, thread-safe implementation of putmsg().
+  *
+  * putmsg() @e must contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, this function includes a call to pthread_testcancel() even
+  * though no asynchronous thread deferral has been performed.
+  */
+int
+__old_streams_putmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+{
+	int band = -1;
 
-int __lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int)
-	__attribute__((weak, alias("__streams_putmsg")));
+	return __old_streams_putpmsg_r(fd, ctlptr, datptr, band, flags);
+}
 
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version LIS_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __streams_putmsg().
+  */
+int __lis_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+    __attribute__ ((weak, alias("__streams_putmsg")));
+
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version LIS_1.0 putmsg()
+  * @par Alias:
+  * This symbol is a weak alias of __streams_putmsg_r().
+  */
+int __lis_putmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+    __attribute__ ((weak, alias("__streams_putmsg_r")));
+
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version LIS_0.0
+  * @par Alias:
+  * This symbol is a weak alias of __old_streams_putmsg().
+  */
+int __old_lis_putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+    __attribute__ ((weak, alias("__old_streams_putmsg")));
+
+/** @brief Put a message to a stream band.
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version LIS_0.0 putmsg()
+  * @par Alias:
+  * This symbol is a weak alias of __old_streams_putmsg_r().
+  */
+int __old_lis_putmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+    __attribute__ ((weak, alias("__old_streams_putmsg_r")));
+
+/** @fn int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
+  * @param fd a file descriptor representing the Stream.
+  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
+  * @param flags the priority of the message.
+  * @version STREAMS_1.0 __streams_putmsg_r()
+  * @version STREAMS_0.0 __old_streams_putmsg_r()
+  * @version LIS_1.0 __lis_putmsg_r()
+  * @version LIS_0.0 __old_lis_putmsg_r()
+  */
+__asm__(".symver __streams_putmsg_r,putmsg@@STREAMS_1.0");
+__asm__(".symver __old_streams_putmsg_r,putmsg@STREAMS_0.0");
 __asm__(".symver __lis_putmsg_r,putmsg@LIS_1.0");
-
-int __old_lis_putmsg(int, const struct strbuf *, const struct strbuf *, int)
-	__attribute__((weak, alias("__old_streams_putmsg")));
-
-int __old_lis_putmsg_r(int, const struct strbuf *, const struct strbuf *, int)
-	__attribute__((weak, alias("__old_streams_putmsg")));
-
 __asm__(".symver __old_lis_putmsg_r,putmsg@LIS_0.0");
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -69,13 +69,13 @@ static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.
 
 /**
   * @weakgroup inetn2a INET Name-to-Address Translation
-  * @{
-  * @file
+  * @{ */
+
+/** @file
   * INET Network Name-to-Address Translation implementation file.
   *
   * This is not only a sample inet name-to-address shared object library, it is
-  * also linked into libxnsl to provide default inet name-to-address mappings.
-  */
+  * also linked into libxnsl to provide default inet name-to-address mappings.  */
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -176,9 +176,11 @@ static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.
  *  =======================================================
  */
 
-/** Inet _netdir_getbyname lookup function.
+/** @brief Inet _netdir_getbyname() lookup function.
   * @param nc transport.
   * @param h host and service name.
+  * @par Alias:
+  * This function is an implementation of _netdir_getbyname().
   *
   * Converts a host and service name into an address list.  This function uses
   * the newer getaddrinfo(3) AF_INET lookup call.  It is fairly simplistic.
@@ -233,12 +235,20 @@ __inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
 	return (NULL);
 }
 
+/*  @fn struct nd_addrlist *_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
+  * @param nc transport.
+  * @param h host and service name.
+  * @par Alias:
+  * This symbol is an strong alias of __inet_netdir_getbyname().
+  */
 struct nd_addrlist *_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
     __attribute__ ((alias("__inet_netdir_getbyname")));
 
-/** Inet _netdir_getbyaddr lookup function.
+/** @brief Inet _netdir_getbyaddr() lookup function.
   * @param nc transport.
   * @param addr address to lookup.
+  * @par Alias:
+  * This function is an implementation of _netdir_getbyaddr().
   */
 struct nd_hostservlist *
 __inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
@@ -317,6 +327,12 @@ __inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
 	return (NULL);
 }
 
+/*  @fn struct nd_hostservlist *_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
+  * @param nc transport.
+  * @param addr address to lookup.
+  * @par Alias:
+  * This symbol is a strong alias of __inet_netdir_getbyaddr().
+  */
 struct nd_hostservlist *_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
     __attribute__ ((alias("__inet_netdir_getbyaddr")));
 
@@ -328,6 +344,14 @@ static int __leavemulticast(int fd, struct netbuf *addr);
 
 char *__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr);
 
+/** @brief Inet _netdir_options() lookup function.
+  * @param nc transport.
+  * @param option option to effect.
+  * @param fd a file descriptor to set or RPC_ANYFD.
+  * @param pta pointer to arguments for the option.
+  * @par Alias:
+  * This function is an implementation of _netdir_getbyaddr().
+  */
 int
 __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 {
@@ -425,6 +449,14 @@ __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 	}
 }
 
+/*  @fn int _netdir_options(struct netconfig *nc, int option, int fd, char *pta)
+  * @param nc transport.
+  * @param option option to effect.
+  * @param fd a file descriptor to set or RPC_ANYFD.
+  * @param pta pointer to arguments for the option.
+  * @par Alias:
+  * This symbol is a strong alias of __inet_netdir_options().
+  */
 int _netdir_options(struct netconfig *nc, int option, int fd, char *pta)
     __attribute__ ((alias("__inet_netdir_options")));
 
@@ -545,9 +577,11 @@ __leavemulticast(int fd, struct netbuf *addr)
 	return (-1);
 }
 
-/** Convert an inet transport address to a universal address.
+/** @brief Convert an inet transport address to a universal address.
   * @param nc the transport.
   * @param taddr the transport address.
+  * @par Alias:
+  * THis function is an implementation of _taddr2uaddr().
   *
   * Convert from a trasnsport address to a universal address.  The universal
   * address is formatted as %d.%d.%d.%d.%d.%d which represents the address and
@@ -587,12 +621,20 @@ __inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 	return (ret);
 }
 
+/*  @fn char *_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
+  * @param nc transport.
+  * @param taddr transport address.
+  * @par Alias:
+  * This symbol is a strong alias of __inet_taddr2uaddr().
+  */
 char *_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
     __attribute__ ((alias("__inet_taddr2uaddr")));
 
-/** Convert a universal address to a transport address.
+/** @brief Convert a universal address to a transport address.
   * @param nc the transport.
   * @param uaddr the universal address.
+  * @par Alias:
+  * This function is an implementation of _uaddr2taddr().
   *
   * Convert from universal address format to one suitable for use with inet.
   * The universal address is %d.%d.%d.%d.%d.%d which represent the address and
@@ -659,13 +701,21 @@ __inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 	return (nb);
 }
 
+/*  @fn struct netbuf *_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
+  * @param nc transport.
+  * @param uaddr universal address.
+  * @par Alias:
+  * This symbol is a strong alias of __inet_uaddr2taddr().
+  */
 struct netbuf *_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
     __attribute__ ((alias("__inet_uaddr2taddr")));
 
-/** Merge a server and client address into a merged address.
+/** @brief Merge a server and client address into a merged address.
   * @param nc the transport.
   * @param caddr the client universal address.
   * @param saddr the server universal address.
+  * @par Alias:
+  * This function is an implementation of _netdir_mergeaddr().
   *
   * When a server address is underspecified (such as 0.0.0.0.1.12) this function
   * takes a client address (e.g. 192.168.0.5.1.12) and makes the merged address
@@ -735,9 +785,16 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 	return (NULL);
 }
 
+/*  @fn char *_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
+  * @param nc transport.
+  * @param caddr client address.
+  * @param saddr server address.
+  * @par Alias:
+  * This symbol is a strong alias of __inet_netdir_mergeaddr().
+  */
 char *_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
     __attribute__ ((alias("__inet_netdir_mergeaddr")));
 
 /** @} */
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

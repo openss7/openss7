@@ -56,40 +56,76 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#include <sys/types.h>
-#include <stropts.h>
-#include <sys/ioctl.h>
+#include "streams.h"
 
-#if __GNUC__ < 3
-#define inline inline
-#define noinline extern
-#else
-#define inline __attribute__((always_inline))
-#define noinline static __attribute__((noinline))
-#endif
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define __hot __attribute__((section(".text.hot")))
-#define __unlikely __attribute__((section(".text.unlikely")))
+/** @weakgroup strcalls STREAMS System Calls
+  * @{ */
 
-/**
-  * @brief Attach a stream to a path in a filesystem.
+/** @file
+  * STREAMS Library fattach() implementation file.  */
+
+/** @brief Attach a stream to a path in a filesystem.
   * @param fd the file descriptor of the stream to attach.
   * @param path the path in the filesystem to which to attach the stream.
   *
-  * fattach() cannot contain a thread cancellation point.  Because this function
-  * contains a single system call, it is asyncrhonous thread cancellation safe.  */
+  * This is a non-thread-safe implementation of fattach().
+  */
 int __unlikely
 __streams_fattach(int fd, const char *path)
 {
 	return (ioctl(fd, I_FATTACH, path));
 }
 
-__asm__(".symver __streams_fattach,fattach@@@STREAMS_1.0");
+/** @brief Attach a stream to a path in a filesystem.
+  * @param fd the file descriptor of the stream to attach.
+  * @param path the path in the filesystem to which to attach the stream.
+  * @version STREAMS_1.0 fattach()
+  *
+  * This is a thread-safe implementation of fattach().
+  *
+  * fattach() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).
+  * Therefore, asyncrhonous thread cancellation must be deferred across the
+  * call and restored without testing for thread cancellation.
+  */
+int __unlikely
+__streams_fattach_r(int fd, const char *path)
+{
+	int oldtype = 0;
+	int retval;
 
-int __lis_fattach(int, const char *)
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
+	retval = __streams_fattach(fd, path);
+	pthread_setcanceltype(oldtype, NULL);
+	return (retval);
+}
+
+/** @brief Attach a stream to a path in a filesystem.
+  * @param fd the file descriptor of the stream to attach.
+  * @param path the path in the filesystem to which to attach the stream.
+  * @par Alias:
+  * This symbol is a strong alias of __streams_fattach().
+  */
+int __lis_fattach(int fd, const char *path)
 	__attribute__((weak, alias("__streams_fattach")));
 
-__asm__(".symver __lis_fattach,fattach@LIS_1.0");
+/** @brief Attach a stream to a path in a filesystem.
+  * @param fd the file descriptor of the stream to attach.
+  * @param path the path in the filesystem to which to attach the stream.
+  * @par Alias:
+  * This symbol is a strong alias of __streams_fattach_r().
+  */
+int __lis_fattach_r(int fd, const char *path)
+	__attribute__((weak, alias("__streams_fattach_r")));
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @fn int fattach(int fd, const char *path)
+  * @param fd the file descriptor of the stream to attach.
+  * @param path the path in the filesystem to which to attach the stream.
+  * @version STREAMS_1.0 __streams_fattach_r()
+  * @version LIS_1.0 __lis_fattach_r()
+  */
+__asm__(".symver __streams_fattach_r,fattach@@STREAMS_1.0");
+__asm__(".symver __lis_fattach_r,fattach@LIS_1.0");
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -56,12 +56,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup strdrv
-  * @{
-  * @file
-  * STREAMS Null Stream Driver nuls(4) header file.
-  * @{
-  */
+/** @addtogroup nullstrm
+  * @{ */
+
+/** @file
+  * STREAMS Null Stream Driver nuls(4) header file.  */
 
 /** @name Null Stream Driver Magic Number
   * @{ */
@@ -74,9 +73,7 @@
 #define NULL_GET_DEV	NULL_IOCTL(2)
 /** @} */
 
-/** @}
-  * @}
-  */
+/** @} */
 
 #endif				/* __SYS_LIS_NULLSTRM_H__ */
 

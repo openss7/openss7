@@ -66,13 +66,81 @@ static char const ident[] = "$RCSfile: LiS.dox.in,v $ $Name:  $($Revision: 0.9.2
  * documentation that has no business cluttering up a head or source file. */
 
 /**
-  * @defgroup streams STREAMS
+  * @mainpage The Linux-STREAMS Package
+  * @version @PACKAGE@(@VERSION@)
+  * @author Brian Bidulock <bidulock@openss7.org>
   *
-  * @defgroup strmod STREAMS Modules
+  * @section preface Preface
   *
-  * @defgroup strdrv STREAMS Drivers
+  * @section intro Introduction
+  *
+  * This manual contains documentation taken directly from the source code using <b>doxygen</b>(1).
+  * All <a href="http://www.openss7.org/">OpenSS7 Project</a> user level source code, programs and
+  * libraries are documented using <b>doxygen</b>(1).
+  *
+  * @section overview Overview
+  *
+  * This manual provides developers and maintainers intensive informaiton concerning one OpenSS7
+  * library contained in the @b "@PACKAGE_TITLE@" package, @b @PACKAGE@(@VERSION@).
+  *
+  * @li @ref streams
+  *
+  * @subsection typeographical Typeographical Conventions
+  *
+  * The typographical conventions of <b>doxygen</b>(1) apply with the following additional
+  * conventions:
+  *
+  * @li Manual pages are typeset as `<b>manualpage</b>(section),' such as, for example, <b>doxygen</b>(1).
+  *
+  *	@defgroup stropts STREAMS Options and Input-Output Controls
+  *	@brief Standard STREAMS Stream Head Options and Input-Output Controls.
+  *
+  *	@defgroup strcalls STREAMS System Calls
+  *	@brief Standard STREAMS System Calls.
+  *
+  *	@defgroup strmods STREAMS Modules
+  *	@brief Standard STREAMS Modules
+  *
+  *	    @defgroup testmod STREAMS Test Module testmod(4)
+  *	    @ingroup strmods
+  *	    @brief STREAMS Test Module testmod(4).
+  *
+  *	    This module documents the user to STREAMS module interface between
+  *	    the user and the Test Module (testmod(4)) STREAMS module.  This
+  *	    module is primarily for testing in kernel specifics during
+  *	    conformance testsuite runs (see test-streams(8)).  It performs
+  *	    several rather highly specialized functions.
+  *
+  *	@defgroup strdrvs STREAMS Drivers
+  *	@brief Standard STREAMS Drivers
+  *
+  *	    @defgroup sad STREAMS Administrative Driver sad(4)
+  *	    @ingroup strdrvs
+  *	    @brief STREAMS Adminstrative Driver sad(4).
+  *
+  *	    This driver's primary purpose is to support the autopush(8) command.
+  *	    It provides an interface between user level programs and the
+  *	    underlying autopush(5) mechanism of STREAMS(9).
+  *
+  *	    @defgroup strlog STREAMS Log Driver strlog(4)
+  *	    @ingroup strdrvs
+  *	    @brief STREAMS Log Driver strlog(4).
+  *
+  *	    @defgroup loop STREAMS Loop Driver loop(4)
+  *	    @ingroup strdrvs
+  *	    @brief STREAMS Loop Driver loop(4).
+  *
+  *	    @defgroup minimux STREAMS Mini Multiplexer Driver minimux(4)
+  *	    @ingroup strdrvs
+  *	    @brief STREAMS Mini Multiplexer Driver minimux(4).
+  *
+  *	    @defgroup mtdrv STREAMS MT Driver mtdrv(4)
+  *	    @ingroup strdrvs
+  *	    @brief STREAMS MT Driver mtdrv(4).
+  *
+  *	    @defgroup nullstrm STREAMS Null Stream Driver nullstrm(4)
+  *	    @ingroup strdrvs
+  *	    @brief STREAMS Null Stream Driver nullstrm(4).
   */
-
-
 
 // vim: ft=c com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

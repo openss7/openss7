@@ -65,26 +65,23 @@
 
 #ifndef _SYS_STROPTS_H
 #define _SYS_STROPTS_H
-#define	_LIS_SYS_STROPTS_H	/* so you can tell which stropts.h you got */
+#define	_LIS_SYS_STROPTS_H	/**< So you can tell which stropts.h you got. */
 
 #ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:21 $"
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup streams
-  * @{
-  * @file
+/** @addtogroup stropts
+  * @{ */
+
+/** @file
   * STREAMS Options and Input-Output Controls header file.
   *
   * There is now a GNU stropts.h in /usr/include and /usr/include/bits.  We are
   * attempting to maintain compatibility of constant values among that file,
   * LiS, Solaris and UnixWare.  Nonetheless, LiS must be compiled with its own
   * stropts.h file due to special LiS-only STREAMS ioctls that are not defined
-  * in the other files.
-  *
-  * @{
-  */
-
+  * in the other files.  */
 
 /** @name LiS-2.6 Compatibility
   * If you want backward compatibility to LiS-2.6 and before, define the
@@ -117,11 +114,14 @@
 /*  *******************************************************************  */
 /*                                 Symbols                               */
 
+/** @name Timeouts
+  * @{ */
 /** Timeout for eternity. */
 #define INFTIM          -1
 /** Default timeout.
   * Streams Programmer's Guide hints that this is the value to use. */
 #define	LIS_DFLT_TIM	15
+/** @} */
 
 /*  *******************************************************************  */
 
@@ -210,8 +210,7 @@ typedef struct strbuf {
 
 /*  *******************************************************************  */
 
-#if 0
-/* @name STREAMS System Calls
+/** @name STREAMS System Calls
   * User level routines for getmsg/putmsg, etc.
   * @{ */
 extern int fattach(int fd, const char *path);
@@ -222,8 +221,7 @@ extern int isastream(int fd);
 extern int pipe(int fds[2]);
 extern int putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags);
 extern int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
-/* @} */
-#endif
+/** @} */
 
 #if 0
 #ifdef QNX
@@ -525,16 +523,16 @@ typedef struct {
  */
 
 #if 1
-/** Special read/write length.
-  *
+/** @name Special read/write length.
   * This no longer works on FC4 2.6.11 kernel: validity checks are
   * performed on the length before we get here.  We might as well patch
   * this out for all kernels and use the ioctl method instead.
   * Emulating an system call in this fashion was foolish in the first
   * place: the normal method for system call emulation under UNIX is
   * with ioctl. -bb Wed Jun 22 20:56:59 MDT 2005
-  */
-#define LIS_GETMSG_PUTMSG_ULEN 	(0x12345678)
+  * @{ */
+#define LIS_GETMSG_PUTMSG_ULEN 	(0x12345678)	/**< Special read/write length. */
+/** @} */
 
 /** getpmsg() argument structure.
   * Also, nobody does the argument passing this way.  See #strpmsg
@@ -577,9 +575,7 @@ struct strpmsg {
 
 /*  *******************************************************************  */
 
-/** @}
-  * @}
-  */
+/** @} */
 
 #endif				/* !_SYS_STROPTS_H */
 /*----------------------------------------------------------------------

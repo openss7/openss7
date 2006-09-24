@@ -1,10 +1,38 @@
-OpenSS7 XTI/TLI Networking -- things to do.  2006-09-17
+OpenSS7 XTI/TLI Networking -- things to do.  2006-09-23
 $Id: TODO,v 0.9.2.5 2006/09/18 01:51:24 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 Things to do:
+
+   * Need to remove the following functions:
+
+     `t_sndopt(3)',
+     `t_sndvopt(3)',
+     `t_rcvopt(3)' and
+     `t_rcvvopt(3)',
+
+     as they are non-standard and non-portable.  Instead use the
+     following functions:
+
+     `t_sndudata(3)',
+     `t_sndvudata(3)',
+     `t_rcvudata(3)' and
+     `t_rcvvudata(3)'.
+
+     because they have precisely the same argument templates as the
+     other.  These functions are described in the OpenGroup
+     documentation as inapplicable to connection-oriented transports,
+     however, we could releive that restriction for SCTP.  The
+     characterstics to check is if T_CLTS, okay, T_COTS or T_COTS_ORD,
+     only okay if the tsdu_size is not T_INVALID (as it is for TCP).
+     (It would be ok to be T_INFINITE as it is for SCTP.)
+
+     _*todo*_
+
+     They may have already been removed.  Verify this.  They certainly
+     have to be implemented this way yet.
 
    * The XTI/TLI library is now largely in maintenance mode.  Not much
      special development is planned.
@@ -13,14 +41,21 @@ Things to do:
      lacking.  When we provide full TPI ATM support under the strss7
      package, then this item will be investigated.
 
+     _*todo*_
+
    - Addition of a (unfortunately non-standard) send with options
      commands for SCTP.
 
      _*done*_
 
-     Actually this was already done a long time ago.  See manual pages
-     t_sndopt(3), t_sndvopt(3), t_rcvopt(3) and t_rcvvopt(3).  Perhaps
-     what needs to be done is to test them?
+     Actually this was already done a long time ago.  See manual pages:
+
+     `t_sndopt(3)',
+     `t_sndvopt(3)',
+     `t_rcvopt(3)' and
+     `t_rcvvopt(3)'.
+
+     Perhaps what needs to be done is to test them?
 
 -----
 

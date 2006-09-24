@@ -68,11 +68,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup nsf
-  * @{
-  * @file
-  * Primary network selection facility header file.
-  * */
+/** @addtogroup nsf
+  * @{ */
+
+/** @file src/include/sys/netconfig.h sys/netconfig.h
+  * Primary network selection facility header file.  */
 
 /*
  *  Primary network selection facility header file.
@@ -225,61 +225,8 @@ extern char *__ncerrbuf(void);
 #define NC_SCTP		"sctp"		/**< Protocol is SCTP (OpenSS7). */
 /** @} */
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
-
-/** @name Network Selection Facility API Functions
- *  API functions for the network selection facility.
- *  @{ */
-/* *INDENT-OFF* */
-/** Bind to and rewind network configuration database. */
-extern void *setnetconfig(void);
-/** Get an entry from the network configuration database. */
-extern struct netconfig *getnetconfig(void *handle);
-/** Get an entry by network identifier from the network configuration database*/
-extern struct netconfig *getnetconfigent(const char *netid);
-/** Free a struct netconfig entry returned by getnetconfig(). */
-extern void freenetconfigent(struct netconfig *netconfig);
-/** Release the network configuration database. */
-extern int endnetconfig(void *handle);
-/** Bind to and rewind the path filtered Network Selection databse. */
-extern void *setnetpath(void);
-/** Get an entry from the network configuration database. */
-extern struct netconfig *getnetpath(void *handle);
-/** Release the network configuration database. */
-extern int endnetpath(void *handle);
-/** Print a network selection function error message. */
-extern void nc_perror(const char *msg);
-/** Return a network selection function error message. */
-extern char *nc_sperror(void);
-/* *INDENT-ON* */
-/** @} */
-
-/*
- *  Internal library definitions of the same functions as above.
- */
-extern void *__nsl_setnetconfig(void);
-extern struct netconfig *__nsl_getnetconfig(void *handle);
-extern struct netconfig *__nsl_getnetconfigent(const char *netid);
-extern void __nsl_freenetconfigent(struct netconfig *netconfig);
-extern int __nsl_endnetconfig(void *handle);
-extern void *__nsl_setnetpath(void);
-extern struct netconfig *__nsl_getnetpath(void *handle);
-extern int __nsl_endnetpath(void *handle);
-extern void __nsl_nc_perror(const char *msg);
-extern char *__nsl_nc_sperror(void);
-
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
-
 #endif				/* __SYS_NETCONFIG_H__ */
 
 /** @} */
 
-// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -81,11 +81,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup loopback
-  * @{
-  * @file
-  * TPI COTS w/ Orderly Release header file.
-  * */
+/** @addtogroup loopback
+  * @{ */
+
+/** @file
+  * TPI COTS w/ Orderly Release header file.  */
 
 /*
  * TPI COTS w/ Orderly Release Header File.

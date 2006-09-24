@@ -81,11 +81,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup loopback
-  * @{
-  * @file
-  * TPI CLTS Loopback header file.
-  * */
+/** @addtogroup loopback
+  * @{ */
+
+/** @file
+  * TPI CLTS Loopback header file.  */
 
 /*
  * TPI CLTS Loopback Header File.

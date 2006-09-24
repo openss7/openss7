@@ -68,10 +68,10 @@ static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.
 /* This file can be processed with doxygen(1). */
 
 /** @weakgroup nsf Network Selection Facility
- *  @{
- *  @file
- *  Network selection facility implementation file.
- */
+  * @{ */
+
+/** @file
+  * Network selection facility implementation file.  */
 
 
 #define _XOPEN_SOURCE 600
@@ -161,22 +161,6 @@ static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.
 
 #include "netselect.h"
 
-/** @name Name Selection Facility API Functions
-  * These are the internal implementation of the functions.  The formal functions from
-  * <netconfig.h> are strong aliased to these.
-  * @{ */
-extern void *__nsl_setnetconfig(void);
-extern struct netconfig *__nsl_getnetconfig(void *handle);
-extern struct netconfig *__nsl_getnetconfigent(const char *netid);
-extern void __nsl_freenetconfigent(struct netconfig *netconfig);
-extern int __nsl_endnetconfig(void *handle);
-extern void *__nsl_setnetpath(void);
-extern struct netconfig *__nsl_getnetpath(void *handle);
-extern int __nsl_endnetpath(void *handle);
-extern void __nsl_nc_perror(const char *msg);
-extern char *__nsl_nc_sperror(void);
-/** @} */
-
 /*
  *  Once condition for Thread-Specific Data key creation.
  */
@@ -207,11 +191,11 @@ __nsl_tsd_alloc(void)
 	return;
 }
 
-/** @brief Get thread specific data for the xnsl library.
- *  @internal
- *
- * This function obtains (and allocates if necessary), thread specific data for
- * the executing thread.  */
+/** @internal
+  * @brief Get thread specific data for the xnsl library.
+  *
+  * This function obtains (and allocates if necessary), thread specific data for
+  * the executing thread.  */
 static struct __nsl_tsd *
 __nsl_get_tsd(void)
 {
@@ -453,6 +437,9 @@ __nsl_getnetconfiglist(void)
 }
 
 /** @brief Provide a handle to the netconfig database.
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of setnetconfig().
   *
   * This function hase the effect of binding to or rewinding the netconfig
   * database.  This function must be called before the first call to
@@ -462,7 +449,9 @@ __nsl_getnetconfiglist(void)
   *
   * This function returns a pointer to the current entry in the netconfig
   * database, formatted as a struct netconfig.  This function returns NULL at
-  * the end of the file, or upon failure.  */
+  * the end of the file, or upon failure.
+  *
+  */
 void *
 __nsl_setnetconfig(void)
 {
@@ -482,19 +471,26 @@ __nsl_setnetconfig(void)
 	return ((void *) nh);
 }
 
+/** @fn void *setnetconfig(void)
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_setnetconfig().  */
 #pragma weak setnetconfig
 __asm__(".symver __nsl_setnetconfig,setnetconfig@@XNSL_1.0");
 
 /** @brief Retrieve next entry in the netconfig database.
- *  @param handle handle returned by setnetconfig().
- *
- *  This function returns a pointer to the current entry in the netconfig
- *  database, formatted as a struct netconfig.  Successive calls will return
- *  successive netconfig entries in the netconfig database.  This function can
- *  be used to search the entire netconfig file.  This function returns NULL at
- *  the end of the file.  handle is a the handle obtained through
- *  setnetconfig().
- */
+  * @param handle handle returned by setnetconfig().
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of getnetconfig().
+  *
+  * This function returns a pointer to the current entry in the netconfig
+  * database, formatted as a struct netconfig.  Successive calls will return
+  * successive netconfig entries in the netconfig database.  This function can
+  * be used to search the entire netconfig file.  This function returns NULL at
+  * the end of the file.  handle is a the handle obtained through
+  * setnetconfig().
+  */
 struct netconfig *
 __nsl_getnetconfig(void *handle)
 {
@@ -520,23 +516,31 @@ __nsl_getnetconfig(void *handle)
 	return (nc);
 }
 
+/** @fn struct netconfig *getnetconfig(void *handle)
+  * @param handle handle returned by setnetconfig().
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_getnetconfig().  */
 #pragma weak getnetconfig
 __asm__(".symver __nsl_getnetconfig,getnetconfig@@XNSL_1.0");
 
 /** @brief Release network configuration database.
- *  @param handle handle returned by setnetconfig().
- *
- *  This function should be called when processing is complete to release
- *  resources held for reuse.  handle is the handle obtained through
- *  setnetconfig().  Programmers should be aware, however, that the last call to
- *  endnetconfig() frees all memory alocated by getnetconfig() for the struct
- *  netconfig data structure.  This function may not be called before
- *  setnetconfig().
- *
- *  This function returns a unique handle to be used by getnetconfig().  IN the
- *  case of an error, this function returns NULL and nc_perror() or nc_sperror()
- *  can be used to print the reason for failure.
- */
+  * @param handle handle returned by setnetconfig().
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of endnetconfig().
+  *
+  * This function should be called when processing is complete to release
+  * resources held for reuse.  handle is the handle obtained through
+  * setnetconfig().  Programmers should be aware, however, that the last call to
+  * endnetconfig() frees all memory alocated by getnetconfig() for the struct
+  * netconfig data structure.  This function may not be called before
+  * setnetconfig().
+  *
+  * This function returns a unique handle to be used by getnetconfig().  IN the
+  * case of an error, this function returns NULL and nc_perror() or nc_sperror()
+  * can be used to print the reason for failure.
+  */
 int
 __nsl_endnetconfig(void *handle)
 {
@@ -556,18 +560,26 @@ __nsl_endnetconfig(void *handle)
 	return (0);
 }
 
+/** @fn int endnetconfig(void *handle)
+  * @param handle handle returned by setnetconfig().
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_endnetconfig().  */
 #pragma weak endnetconfig
 __asm__(".symver __nsl_endnetconfig,endnetconfig@@XNSL_1.0");
 
 /** @brief Return a network configuration entry for a network id.
- *  @param netid the network id.
- *
- *  This function returns a pointer to the struct netconfig structure
- *  corresponding to the argument netid.  It returns NULL if netid is invalid
- *  (that is, does not name an entry in the netconfig database).
- *
- *  This function returns 0 on success and -1 on failure (for example, if
- *  setnetconfig() was not called previously).  */
+  * @param netid the network id.
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of getnetconfigent().
+  *
+  * This function returns a pointer to the struct netconfig structure
+  * corresponding to the argument netid.  It returns NULL if netid is invalid
+  * (that is, does not name an entry in the netconfig database).
+  *
+  * This function returns 0 on success and -1 on failure (for example, if
+  * setnetconfig() was not called previously).  */
 struct netconfig *
 __nsl_getnetconfigent(const char *netid)
 {
@@ -623,14 +635,22 @@ __nsl_getnetconfigent(const char *netid)
 	return (nc);
 }
 
+/** @fn struct netconfig *getnetconfigent(const char *netid)
+  * @param netid the network id.
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_getnetconfigent().  */
 #pragma weak getnetconfigent
 __asm__(".symver __nsl_getnetconfigent,getnetconfigent@@XNSL_1.0");
 
 /** @brief Free a netconfig database entry.
- *  @param nc the database entry to free.
- *
- *  This function frees the netconfig structure pointed to by nc (previously
- *  returned by getneconfigent()).  */
+  * @param nc the database entry to free.
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of freenetconfigent().
+  *
+  * This function frees the netconfig structure pointed to by nc (previously
+  * returned by getneconfigent()).  */
 void
 __nsl_freenetconfigent(struct netconfig *nc)
 {
@@ -643,6 +663,11 @@ __nsl_freenetconfigent(struct netconfig *nc)
 	}
 }
 
+/** @fn void freenetconfigent(struct netconfig *nc)
+  * @param nc the database entry to free.
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_freenetconfigent().  */
 #pragma weak freenetconfigent
 __asm__(".symver __nsl_freenetconfigent,freenetconfigent@@XNSL_1.0");
 
@@ -705,18 +730,21 @@ TRANS the decimal value of the unknown error number.
 /* *INDENT-ON* */
 
 /** @brief Return an error string.
- *
- *  This function is similar to nc_perror() but instead of printing the message
- *  to standard error, will return a pointer to a string that contains the error
- *  message.
- *
- *  This function can also be used with the netpath access routines.
- *
- *  This function returns a pointer to a buffer that contains the error messages
- *  tirng.  This buffer is overwritten on each call.  In multithreaded
- *  applications, this buffer is implemented as thread-specific data.
- *
- */
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of nc_sperror().
+  *
+  * This function is similar to nc_perror() but instead of printing the message
+  * to standard error, will return a pointer to a string that contains the error
+  * message.
+  *
+  * This function can also be used with the netpath access routines.
+  *
+  * This function returns a pointer to a buffer that contains the error messages
+  * tirng.  This buffer is overwritten on each call.  In multithreaded
+  * applications, this buffer is implemented as thread-specific data.
+  *
+  */
 char *
 __nsl_nc_sperror(void)
 {
@@ -749,19 +777,26 @@ __nsl_nc_sperror(void)
 	return (errbuf);
 }
 
+/** @fn char *nc_sperror(void)
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_nc_sperror().  */
 #pragma weak nc_sperror
 __asm__(".symver __nsl_nc_sperror,nc_sperror@@XNSL_1.0");
 
 /** @brief Print an error message to standard error.
- *  @param msg message to prefix to error message.
- *
- *  This function prints and error message to standard error indicating why any
- *  of the above routines failed.  The message is prepended with the string
- *  provided in the msg argument and a colon.  A NEWLINE is appended to the end
- *  of the message.
- *
- *  This function can also be used with the netpath access routines.
- */
+  * @param msg message to prefix to error message.
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of nc_perror().
+  *
+  * This function prints and error message to standard error indicating why any
+  * of the above routines failed.  The message is prepended with the string
+  * provided in the msg argument and a colon.  A NEWLINE is appended to the end
+  * of the message.
+  *
+  * This function can also be used with the netpath access routines.
+  */
 void
 __nsl_nc_perror(const char *msg)
 {
@@ -772,19 +807,27 @@ __nsl_nc_perror(const char *msg)
 	return;
 }
 
+/** @fn void nc_perror(const char *msg)
+  * @param msg message to prefix to error message.
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_nc_perror().  */
 #pragma weak nc_perror
 __asm__(".symver __nsl_nc_perror,nc_perror@@XNSL_1.0");
 
 /** @brief Get a handle for network configuration database.
- *
- *  A call to this function binds to or rewinds NETPATH.  This function must be
- *  called before the first call to getnetpath() and may be called at any other
- *  time.  It returns a handle that is used by getnetpath().
- *
- *  This function returns a handle that is used by getnetpath().  In case of an
- *  error, this function returns NULL.  nc_perror() or nc_sperror() can be used
- *  to print out the reason for failure.  See getnetconfig().
- */
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of setnetpath().
+  *
+  * A call to this function binds to or rewinds NETPATH.  This function must be
+  * called before the first call to getnetpath() and may be called at any other
+  * time.  It returns a handle that is used by getnetpath().
+  *
+  * This function returns a handle that is used by getnetpath().  In case of an
+  * error, this function returns NULL.  nc_perror() or nc_sperror() can be used
+  * to print out the reason for failure.  See getnetconfig().
+  */
 void *
 __nsl_setnetpath(void)
 {
@@ -855,52 +898,67 @@ __nsl_setnetpath(void)
 
 }
 
+/** @fn void *setnetpath(void)
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_setnetpath().  */
 #pragma weak setnetpath
 __asm__(".symver __nsl_setnetpath,setnetpath@@XNSL_1.0");
 
 /** @brief Get the next entry associated with handle.
- *  @param handle a pointer to the handle returned by setnetpath().
- *
- *  This function returns a pointer to the netconfig database entry
- *  corresponding to the first valid #NETPATH component.  The netconfig entry is
- *  formattted as a struct netconfig.  On each subsequenc all, this function
- *  returns a pointer to the netconfig entry that corresponds to the next valud
- *  #NETPATH component.  This function can thus be used to search the netconfig
- *  database for all networks included in the #NETPATH variable.  When #NETPATH
- *  has been exhausted, this function returns NULL.
- *
- *  This function silently ignores invalid #NETPATH components.  A #NETPATH
- *  component is invalid if there is no corresponding entry in the netconfig
- *  database.
- *
- *  If the #NETPATH environment variable is unset, this function bethaves as if
- *  #NETPATH were set to the sequence of "default" or "visible" networks in the
- *  netconfig database, in the order in which they are listed.
- *
- *  When first called, this function returns a pointer to the netconfig database
- *  entry corresponding to the first valid #NETPATH component.  When #NETPATH
- *  has been exhausted, it returns NULL.  */
+  * @param handle a pointer to the handle returned by setnetpath().
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of getnetpath().
+  *
+  * This function returns a pointer to the netconfig database entry
+  * corresponding to the first valid #NETPATH component.  The netconfig entry is
+  * formattted as a struct netconfig.  On each subsequenc all, this function
+  * returns a pointer to the netconfig entry that corresponds to the next valud
+  * #NETPATH component.  This function can thus be used to search the netconfig
+  * database for all networks included in the #NETPATH variable.  When #NETPATH
+  * has been exhausted, this function returns NULL.
+  *
+  * This function silently ignores invalid #NETPATH components.  A #NETPATH
+  * component is invalid if there is no corresponding entry in the netconfig
+  * database.
+  *
+  * If the #NETPATH environment variable is unset, this function bethaves as if
+  * #NETPATH were set to the sequence of "default" or "visible" networks in the
+  * netconfig database, in the order in which they are listed.
+  *
+  * When first called, this function returns a pointer to the netconfig database
+  * entry corresponding to the first valid #NETPATH component.  When #NETPATH
+  * has been exhausted, it returns NULL.  */
 struct netconfig *
 __nsl_getnetpath(void *handle)
 {
 	return __nsl_getnetconfig(handle);
 }
 
+/** @fn struct netconfig *getnetpath(void *handle)
+  * @param handle a pointer to the handle returned by setnetpath().
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_getnetpath().  */
 #pragma weak getnetpath
 __asm__(".symver __nsl_getnetpath,getnetpath@@XNSL_1.0");
 
 /** @brief Free netpath resources associated with handle.
- *  @param handle a pointer to the handle returned by setnetpath().
- *
- *  This function may be called to unbind from NETPATH when processing is
- *  complete, releasing resources for reuse.  Programmers should be aware,
- *  however, that this function frees all memory allocated by getnetpath() for
- *  the struct netconfig data structure.
- *
- *  This function returns 0 on success and -1 on failure (for example, if
- *  setnetpath() was not called previously).
- *
- */
+  * @param handle a pointer to the handle returned by setnetpath().
+  * @version XNSL_1.0
+  * @par Alias:
+  * This function is an implementation of endnetpath().
+  *
+  * This function may be called to unbind from NETPATH when processing is
+  * complete, releasing resources for reuse.  Programmers should be aware,
+  * however, that this function frees all memory allocated by getnetpath() for
+  * the struct netconfig data structure.
+  *
+  * This function returns 0 on success and -1 on failure (for example, if
+  * setnetpath() was not called previously).
+  *
+  */
 int
 __nsl_endnetpath(void *handle)
 {
@@ -921,9 +979,14 @@ __nsl_endnetpath(void *handle)
 	return (0);
 }
 
+/** @fn int endnetpath(void *handle)
+  * @param handle a pointer to the handle returned by setnetpath().
+  * @version XNSL_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __nsl_endnetpath().  */
 #pragma weak endnetpath
 __asm__(".symver __nsl_endnetpath,endnetpath@@XNSL_1.0");
 
 /** @} */
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

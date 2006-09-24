@@ -61,6 +61,37 @@ Things to do:
 
 @itemize @bullet
 @item
+Need to remove the following functions:
+
+@multitable {t_rcvopt(3) and}
+@item @manref{t_sndopt(3)},
+@item @manref{t_sndvopt(3)},
+@item @manref{t_rcvopt(3)} and
+@item @manref{t_rcvvopt(3)},
+@end multitable
+
+as they are non-standard and non-portable.  Instead use the following functions:
+
+@multitable {t_rcvudata(3) and}
+@item @manref{t_sndudata(3)},
+@item @manref{t_sndvudata(3)},
+@item @manref{t_rcvudata(3)} and
+@item @manref{t_rcvvudata(3)}.
+@end multitable
+
+because they have precisely the same argument templates as the other.  These functions are described
+in the OpenGroup documentation as inapplicable to connection-oriented transports, however, we could
+releive that restriction for SCTP.  The characterstics to check is if T_CLTS, okay, T_COTS or
+T_COTS_ORD, only okay if the tsdu_size is not T_INVALID (as it is for TCP).  (It would be ok to be
+T_INFINITE as it is for SCTP.)
+
+@emph{*todo*}
+
+They may have already been removed.
+Verify this.
+They certainly have to be implemented this way yet.
+
+@item
 The XTI/TLI library is now largely in maintenance mode.  Not much special development is planned.
 @end itemize
 
@@ -69,12 +100,22 @@ The XTI/TLI library is now largely in maintenance mode.  Not much special develo
 Full ATM Support.  This is an item where the XTI implementation is lacking.  When we provide full
 TPI ATM support under the strss7 package, then this item will be investigated.
 
+@emph{*todo*}
+
 @item
 Addition of a (unfortunately non-standard) send with options commands for SCTP.
 
 @emph{*done*}
 
-Actually this was already done a long time ago.  See manual pages t_sndopt(3), t_sndvopt(3),
-t_rcvopt(3) and t_rcvvopt(3).  Perhaps what needs to be done is to test them?
+Actually this was already done a long time ago.  See manual pages:
+
+@multitable {t_rcvopt(3) and}
+@item @manref{t_sndopt(3)},
+@item @manref{t_sndvopt(3)},
+@item @manref{t_rcvopt(3)} and
+@item @manref{t_rcvvopt(3)}.
+@end multitable
+
+Perhaps what needs to be done is to test them?
 @end itemize
 

@@ -93,20 +93,18 @@
   * This file provides the user to STREAMS module interface between the user and
   * the Test Module (testmod(4)) STREAMS module.  This module is primarily for
   * testing in kernel specifics during conformance testsuite runs (see
-  * test-streams(8)).  It performs several rather highly specialized functions.
-  * @{ */
+  * test-streams(8)).  It performs several rather highly specialized functions. */
 
 /**
- * @name Test Module IO Controls
- * STREAMS test module input-output controls.
- * @{ */
+  * @name Test Module Magic Number
+  * STREAMS Test Module magic number for input-output controls.
+  * @{ */
 #define TM_IOC_MAGIC 'V' /**< The ioctl(2) magic number for testmod(4). */
 /** @} */
 
 /**
- * @name Test Module IO Controls
- * Test Module Input-Output Controls
- * @{ */
+  * @name Test Module Input-Output Controls
+  * @{ */
 #define TM_IOC_HANGUP	((TM_IOC_MAGIC << 8) | 0x01) /**< Generate M_HANGUP. */
 #define TM_IOC_RDERR	((TM_IOC_MAGIC << 8) | 0x02) /**< Generate M_ERROR (read error). */
 #define TM_IOC_WRERR	((TM_IOC_MAGIC << 8) | 0x03) /**< Generate M_ERROR (write error). */
@@ -119,6 +117,9 @@
 #define TM_IOC_COPYIO	((TM_IOC_MAGIC << 8) | 0x0a) /**< Try to copy in and out. */
 /** @} */
 
-/** @} */
+/** @}
+  */
 
 #endif				/* __SYS_STREAMS_TESTMOD_H__ */
+
+// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

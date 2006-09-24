@@ -71,12 +71,11 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-/** @ingroup streams
-  * @{
-  * @file
-  * STREAMS Options user header file.
-  * @{
-  */
+/** @addtogroup strcalls
+  * @{ */
+
+/** @file
+  * STREAMS Options and System Calls (User Header File).  */
 
 #include <sys/stropts.h>
 
@@ -116,15 +115,14 @@ extern int __lis_putmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr,
 extern int __lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
 /** @} */
 
-/** @} */
-/** @} */
-
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
 __END_DECLS
 /* *INDENT-ON* */
 #endif
 
+/** @} */
+
 #endif				/* _STROPTS_H */
 
-// vim: ft=cpp com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

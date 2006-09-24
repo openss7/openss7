@@ -57,13 +57,13 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup xnet
-  * @{
-  * @file
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
   * XTI ISO-Specific header file.
   *
-  * This file contains specific ISO option and management parameters.
-  * */
+  * This file contains specific ISO option and management parameters.  */
 
 /*
  * XTI ISO-Specific Header File.

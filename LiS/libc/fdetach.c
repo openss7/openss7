@@ -57,38 +57,13 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _GNU_SOURCE 1
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <stropts.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
+/** @addtogroup strcalls STREAMS System Calls
+  * @{ */
 
-#include <pthread.h>
-
-extern int __pthread_setcanceltype(int type, int *oldtype);
-
-#pragma weak __pthread_setcanceltype
-#pragma weak pthread_setcanceltype
-
-int
-pthread_setcanceltype(int type, int *oldtype)
-{
-	if (__pthread_setcanceltype)
-		return __pthread_setcanceltype(type, oldtype);
-	if (oldtype)
-		*oldtype = type;
-	return (0);
-}
-
-#define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
-#define DUMMY_MODE   O_RDWR|O_NONBLOCK
+/** @file
+  * STREAMS System Call fdetach() implementation file.  */
 
 /** @brief Detach a path from a stream.
   * @param path the path in the filesystem from which to detach.
@@ -114,6 +89,7 @@ __lis_fdetach(const char *path)
 
 /** @brief Detach a path from a stream.
   * @param path the path in the filesystem from which to detach.
+  * @version LIS_1.0 fdetach()
   *
   * This is the recursive version of the implementation function.
   *
@@ -135,7 +111,10 @@ __lis_fdetach_r(const char *path)
 /** @fn int fdetach(const char *path)
   * @brief Detach a path from a stream.
   * @param path the path in the filesystem from which to detach.
+  * @version LIS_1.0 __lis_fdetach_r()
   */
 __asm__(".symver __lis_fdetach_r,fdetach@@LIS_1.0");
+
+/** @} */
 
 // vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

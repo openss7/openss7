@@ -1,4 +1,4 @@
-Linux STREAMS (LiS) -- unstable release introduction.  2006-09-17
+Linux STREAMS (LiS) -- unstable release introduction.  2006-09-19
 $Id: README-alpha,v 0.9.2.9 2006/09/18 01:51:05 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 Linux STREAMS (LiS)
 ===================
 
-Package LiS-2.18.4.rc3 Released 2006-09-17.
+Package LiS-2.18.4.rc3 Released 2006-09-19.
 
 This is unstable release software.
 
@@ -125,7 +125,21 @@ development and their resolutions.  This list serves two purposes:
  Bugs
 .....
 
-`(no items)'
+LiS contains way too many bugs to be useful.  This list only represents
+those bugs that were discovered in the development of `Linux
+Fast-STREAMS' that were easy enough to fix in LiS.
+
+Do not use LiS.  Use `Linux Fast-STREAMS' instead.
+
+`001. 2006-09-24T20:02:00+0000'
+     Discovered asynchronous thread cancellation inconsistencies in
+     libLiS libpLiS by inspection during documentation.  isastream(2),
+     fattach(2) were not performing proper asynchronous thread
+     cancellation suppression so that these function contained a
+     cancellation point when the should not.
+
+     _*fixed*_ in `LiS-2.18.4.rc3'
+
 
 5.4.6 Unstable Releases
 -----------------------

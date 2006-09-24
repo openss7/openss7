@@ -65,16 +65,91 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup nsl
-  * @{
-  * @file
-  * Non-system level network selection facility header file.
-  *
-  * This header file simply includes sys/netconfig.h.
-  * */
+/** @weakgroup nsf
+  * @{ */
+
+/** @file src/include/netconfig.h netconfig.h
+  * User level network selection facility header file.
+  * This file contains declarations for the network selection facility library
+  * subroutines, most of which utilize the struct netconfig structure. */
 
 #include <sys/netconfig.h>
+
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
+
+/** @name Network Selection Facility API Functions
+ *  API functions for the network selection facility.
+ *  @{ */
+/** Bind to and rewind network configuration database;
+  * a strong alias of __nsl_setnetconfig(). */
+extern void *setnetconfig(void);
+
+/** Get an entry from the network configuration database;
+  * a strong alias of __nsl_getnetconfig(). */
+extern struct netconfig *getnetconfig(void *handle);
+
+/** Get an entry by network identifier from the network configuration database
+  * a strong alias of __nsl_getnetconfigent(). */
+extern struct netconfig *getnetconfigent(const char *netid);
+
+/** Free a struct netconfig entry returned by getnetconfig();
+  * a strong alias of __nsl_freenetconfigent(). */
+extern void freenetconfigent(struct netconfig *netconfig);
+
+/** Release the network configuration database;
+  * a strong alias of __nsl_endnetconfig(). */
+extern int endnetconfig(void *handle);
+
+/** Bind to and rewind the path filtered Network Selection database;
+  * a strong alias of __nsl_setnetpath(). */
+extern void *setnetpath(void);
+
+/** Get an entry from the network configuration database;
+  * a strong alias of __nsl_getnetpath(). */
+extern struct netconfig *getnetpath(void *handle);
+
+/** Release the network configuration database;
+  * a strong alias of __nsl_endnetpath(). */
+extern int endnetpath(void *handle);
+
+/** Print a network selection function error message;
+  * a strong alias of __nsl_nc_perror(). */
+extern void nc_perror(const char *msg);
+
+/** Return a network selection function error message;
+  * a strong alias of __nsl_nc_sperror(). */
+extern char *nc_sperror(void);
+
+/** @} */
+
+/** @name Name Selection Facility API Functions
+  * These are the internal implementation of the functions.  The formal functions from
+  * <netconfig.h> are strong aliased to these.
+  * @{ */
+extern void *__nsl_setnetconfig(void);
+extern struct netconfig *__nsl_getnetconfig(void *handle);
+extern struct netconfig *__nsl_getnetconfigent(const char *netid);
+extern void __nsl_freenetconfigent(struct netconfig *netconfig);
+extern int __nsl_endnetconfig(void *handle);
+extern void *__nsl_setnetpath(void);
+extern struct netconfig *__nsl_getnetpath(void *handle);
+extern int __nsl_endnetpath(void *handle);
+extern void __nsl_nc_perror(const char *msg);
+extern char *__nsl_nc_sperror(void);
+/** @} */
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
 /** @} */
 
 #endif				/* __NETCONFIG_H__ */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

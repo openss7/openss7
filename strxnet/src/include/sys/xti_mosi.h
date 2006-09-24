@@ -57,11 +57,11 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup xnet
-  * @{
-  * @file
-  * XTI Minimal OSI header file.
-  * */
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
+  * XTI Minimal OSI header file.  */
 
 /*
  * Minimal OSI Header File.

@@ -60,12 +60,11 @@
  *    Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
 
-/** @ingroup strdrv
-  * @{
-  * @file
-  * STREAMS Loop Driver loop(4) header file.
-  * @{
-  */
+/** @addtogroup loop
+  * @{ */
+
+/** @file
+  * STREAMS Loop Driver loop(4) header file.  */
 
 /** @name Loop Driver Magic Number
   * @{ */
@@ -104,9 +103,7 @@ typedef struct {
 #define	LOOP_XPARENT_COPYOUT	102	/**< Undefined ioctl values == xparent. */
 /** @} */
 
-/** @}
-  * @}
-  */
+/** @} */
 
 #endif				/* __SYS_LIS_LOOP_H__ */
 

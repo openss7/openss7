@@ -59,23 +59,13 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <errno.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/ioctl.h>		/* bad: according to POSIX, stropts.h must expose ioctl()... */
-#include <stropts.h>
+/** @addtogroup strcalls STREAMS System Calls
+  * @{ */
 
-#include <pthread.h>
-
-extern void __pthread_testcancel(void);
-
-#pragma weak __pthread_testcancel
-#pragma weak pthread_testcancel
+/** @file
+  * STREAMS System Call getpmsg() implementation file.  */
 
 #ifdef BLD32OVER64
 /**
@@ -117,14 +107,6 @@ typedef struct getpmsg_args6 {
 
 } getpmsg_args6_t;
 #endif
-
-void
-pthread_testcancel(void)
-{
-	if (__pthread_testcancel)
-		__pthread_testcancel();
-	return;
-}
 
 int
 __old_lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
@@ -278,6 +260,7 @@ __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, 
   * @param datptr a pointer to a strbuf structure returning the data part of the message.
   * @param bandp a pointer to the band returned for the received message.
   * @param flagsp a pointer to the flags returned for the received message.
+  * @version LIS_1.0 getpmsg()
   *
   * getpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In the
   * Linux Threads approach, this function will return EINTR if interrupted by a
@@ -298,16 +281,14 @@ __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp
 	return (ret);
 }
 
-/** @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
-  * @brief get a message from a stream band.
+/** @brief get a message from a stream band.
   * @param fd a file descriptor representing the stream.
   * @param ctlptr a pointer to a strbuf structure returning the control part of the message.
   * @param datptr a pointer to a strbuf structure returning the data part of the message.
   * @param bandp a pointer to the band returned for the received message.
   * @param flagsp a pointer to the flags returned for the received message.
+  * @version LIS_0.0 getpmsg()
   */
-__asm__(".symver __lis_getpmsg_r,getpmsg@@LIS_1.0");
-
 int
 __old_lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
@@ -320,6 +301,19 @@ __old_lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *b
 	return (ret);
 }
 
+/** @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+  * @brief get a message from a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure returning the control part of the message.
+  * @param datptr a pointer to a strbuf structure returning the data part of the message.
+  * @param bandp a pointer to the band returned for the received message.
+  * @param flagsp a pointer to the flags returned for the received message.
+  * @version LIS_1.0 __lis_getpmsg_r()
+  * @version LIS_0.0 __old_lis_getpsmg_r()
+  */
+__asm__(".symver __lis_getpmsg_r,getpmsg@@LIS_1.0");
 __asm__(".symver __old_lis_getpmsg_r,getpmsg@LIS_0.0");
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

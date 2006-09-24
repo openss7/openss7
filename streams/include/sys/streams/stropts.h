@@ -260,10 +260,10 @@ typedef unsigned long int t_uscalar_t;
 #define I_SETDELAY		(__SID |43)	/* Mac OT   *//**< */
 #define I_GETDELAY		(__SID |44)	/* Mac OT   *//**< */
 #define I_RUN_QUEUES		(__SID |45)	/* Mac OT   *//**< */
+#endif				/* __NOT_IMPLEMENTED__ */
 
 #define I_AUTOPUSH		(__SID |48)	/* Mac OT   *//**< sad(4) syscall emulation. */
 #define I_HEAP_REPORT		(__SID |50)	/* Mac OT   *//**< Heap debugging. */
-#endif				/* __NOT_IMPLEMENTED__ */
 
 #define I_FATTACH		(__SID |52)	/* M,L(244) *//**< fattach() syscall emulation. */
 #define I_FDETACH		(__SID |53)	/* M,L(245) *//**< fdefatch() syscall emulation. */

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: ticots.h,v 0.9.2.5 2006/09/22 20:59:27 brian Exp $
+ @(#) $Id: streams.h,v 0.9.2.1 2006/09/24 21:36:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,68 +45,48 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:59:27 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:36:48 $ by $Author: brian $
 
- $Log: ticots.h,v $
- Revision 0.9.2.5  2006/09/22 20:59:27  brian
- - prepared header file for use with doxygen, touching many lines
+ -----------------------------------------------------------------------------
 
- Revision 0.9.2.4  2006/09/18 13:52:45  brian
- - added doxygen markers to sources
-
- Revision 0.9.2.3  2005/05/14 08:28:29  brian
- - copyright header correction
-
- Revision 0.9.2.2  2005/01/11 08:47:24  brian
- - Minor additions and corrections.
-
- Revision 0.9.2.1  2004/05/16 04:12:32  brian
- - Updating strxnet release.
-
- Revision 0.9  2004/05/14 08:00:02  brian
- - Updated xns, tli, inet, xnet and documentation.
-
- Revision 0.9.2.1  2004/04/13 12:12:52  brian
- - Rearranged header files.
+ $Log: streams.h,v $
+ Revision 0.9.2.1  2006/09/24 21:36:48  brian
+ - added lib files
 
  *****************************************************************************/
 
-#ifndef _SYS_TICOTS_H
-#define _SYS_TICOTS_H
+#ifndef __LOCAL_STREAMS_H__
+#define __LOCAL_STREAMS_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: streams.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
-/* This file can be processed with doxygen(1). */
+#define _XOPEN_SOURCE 600
+#define _GNU_SOURCE 1
+#define _REENTRANT
+#define _THREAD_SAFE
 
-/** @addtogroup loopback
-  * @{ */
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <errno.h>
+#include <stropts.h>
+#include <sys/stat.h>
 
-/** @file
-  * TPI COTS Loopback header file.  */
+#include <pthread.h>
 
-/*
- * TPI COTS Loopback Header File.
- */
-
-#if 0
-#if !defined _TICOTS_H && !defined __KERNEL__
-#error ****
-#error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
-#error **** PROGRAMS.  LIKELY YOU SHOULD HAVE INCLUDED <ticots.h>
-#error **** INSTEAD OF <sys/ticots.h>.
-#error ****
-#endif				/* !defined _TICOTS_H && !defined __KERNEL__ */
+#if __GNUC__ < 3
+#define inline inline
+#define noinline extern
+#else
+#define inline __attribute__((always_inline))
+#define noinline static __attribute__((noinline))
 #endif
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
 
-#define TCO_NOPEER		ECONNREFUSED	/**< Destination address is not listening. */
-#define TCO_PEERNOROMMONQ	ECONNREFUSED	/**< No room on connection indication queue. */
-#define TCO_PEERBADSTATE	ECONNREFUSED	/**< Transport peer in incorrect state. */
-#define TCO_PEERINITIATED	ECONNRESET	/**< Transport peer user-initiated disconnect. */
-#define TCO_PROVIDERINITIATED	ECONNABORTED	/**< Transport peer provider-initiated disconnect. */
-#define TCO_DEFAULTADDRSZ	4
+extern int pthread_setcanceltype(int type, int *oldtype);
 
-#endif				/* _SYS_TICOTS_H */
-
-/** @} */
-
-// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+#endif				/* __LOCAL_STREAMS_H__ */

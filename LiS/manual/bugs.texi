@@ -57,7 +57,21 @@
 @c
 @c =========================================================================
 
+@value{PACKAGE} contains way too many bugs to be useful.  This list only represents those bugs that
+were discovered in the development of @cite{Linux Fast-STREAMS} that were easy enough to fix in
+@value{PACKAGE}.
+
+Do not use @value{PACKAGE}.  Use @cite{Linux Fast-STREAMS} instead.
+
+
 @table @code
-@item (no items)
+@item 001. 2006-09-24T20:02:00+0000
+
+Discovered asynchronous thread cancellation inconsistencies in libLiS libpLiS by inspection during
+documentation.  isastream(2), fattach(2) were not performing proper asynchronous thread
+cancellation suppression so that these function contained a cancellation point when the should not.
+
+@emph{*fixed*} in @command{LiS-2.18.4.rc3}
+
 @end table
 

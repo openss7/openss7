@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.39 $) $Date: 2006/09/18 17:43:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.40 $) $Date: 2006/09/24 21:36:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 17:43:07 $ by $Author: brian $
+# Last Modified $Date: 2006/09/24 21:36:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.40  2006/09/24 21:36:47  brian
+# - added lib files
+#
 # Revision 1.1.6.39  2006/09/18 17:43:07  brian
 # - added doxy rules to makefile and release notes
 #
@@ -261,7 +264,9 @@ libLiS_la_SOURCES		= libc/fattach.c \
 				  libc/isastream.c \
 				  libc/pipe.c \
 				  libc/putmsg.c \
-				  libc/putpmsg.c
+				  libc/putpmsg.c \
+				  libc/testcancel.c \
+				  libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/libc/LiS.VERSION
 libLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 -Wl,--version-script -Wl,$(top_srcdir)/libc/LiS.VERSION
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -274,7 +279,9 @@ libpLiS_la_SOURCES		= libc/fattach.c \
 				  libc/getpmsg.c \
 				  libc/isastream.c \
 				  libc/putmsg.c \
-				  libc/putpmsg.c
+				  libc/putpmsg.c \
+				  libc/testcancel.c \
+				  libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/libc/LiS.VERSION
 libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 -Wl,--version-script -Wl,$(top_srcdir)/libc/LiS.VERSION
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)

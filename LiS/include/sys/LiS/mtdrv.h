@@ -56,13 +56,12 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup strdrv
-  * @{
-  * @file
+/** @addtogroup mtdrv
+  * @{ */
+
+/** @file
   * STREAMS Muti Thread Driver mtdrv(4) header file.
-  * This file contains IOCTL definitions for mtdrv(4).
-  * @{
-  */
+  * This file contains IOCTL definitions for mtdrv(4).  */
 
 /** @name MT Driver Magic Number
   * @{ */
@@ -75,9 +74,7 @@
 #define MTDRV_SET_OPEN_SLEEP	MTDRV_IOCTL(2)
 /** @} */
 
-/** @}
-  * @}
-  */
+/** @} */
 
 #endif				/* __SYS_LIS_MTDRV_H__ */
 

@@ -116,12 +116,11 @@
 #include <sys/LiS/poll.h>	/* streams module symbols & types */
 #endif
 
-/** @ingroup streams
-  * @{
-  * @file
-  * Poll header file.
-  * @{
-  */
+/** @addtogroup strcalls
+  * @{ */
+
+/** @file
+  * Poll header file.  */
 
 /*  -------------------------------------------------------------------  */
 
@@ -188,9 +187,9 @@ extern int poll(struct pollfd *fds, unsigned long nfds, int timeout);
 __END_DECLS
 /* *INDENT-ON* */
 #endif
-/** @}
-  * @}
-  */
+
+/** @} */
+
 #endif
 /*  -------------------------------------------------------------------  */
 #endif				/* _SYS_POLL_H */

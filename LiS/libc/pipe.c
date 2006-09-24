@@ -57,43 +57,19 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <stropts.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
+/** @addtogroup strcalls STREAMS System Calls
+  * @{ */
 
-#include <pthread.h>
-
-extern int __pthread_setcanceltype(int type, int *oldtype);
-
-#pragma weak __pthread_setcanceltype
-#pragma weak pthread_setcanceltype
-
-int
-pthread_setcanceltype(int type, int *oldtype)
-{
-	if (__pthread_setcanceltype)
-		return __pthread_setcanceltype(type, oldtype);
-	if (oldtype)
-		*oldtype = type;
-	return (0);
-}
-
-#define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
-#define DUMMY_MODE   O_RDWR|O_NONBLOCK
+/** @file
+  * STREAMS System Call pipe() implementation file.  */
 
 /** @brief open a streams based pipe.
   * @param fds a pointer to the two file descriptors, one for each end of the pipe.
   */
 int
-__lis_pipe(int *fds)
+__lis_pipe(int fds[2])
 {
 	int fd, error = 0;
 
@@ -111,13 +87,14 @@ __lis_pipe(int *fds)
 
 /** @brief open a streams based pipe.
   * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  * @version LIS_1.0 pipe()
   *
   * pipe() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
   * must protect from asyncrhonous cancellation between the open(), ioctl() and
   * close() operations.
   */
 int
-__lis_pipe_r(int *fds)
+__lis_pipe_r(int fds[2])
 {
 	int oldtype, ret;
 
@@ -130,7 +107,10 @@ __lis_pipe_r(int *fds)
 /** @fn int pipe(int fds[2])
   * @brief open a streams based pipe.
   * @param fds a pointer to the two file descriptors, one for each end of the pipe.
+  * @version LIS_1.0 __lis_pipe_r()
   */
 __asm__(".symver __lis_pipe_r,pipe@@LIS_1.0");
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

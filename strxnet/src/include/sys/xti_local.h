@@ -56,14 +56,14 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup xnet
-  * @{
-  * @file
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
   * XTI Local header file.
   *
   * This is private header file that contains definitions internal to the
-  * OpenSS7 XTI/TLI Library implementation.
-  * */
+  * OpenSS7 XTI/TLI Library implementation.  */
 
 #include <config.h>
 

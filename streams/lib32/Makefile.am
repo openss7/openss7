@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/17 23:09:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/24 21:36:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/17 23:09:09 $ by $Author: brian $
+# Last Modified $Date: 2006/09/24 21:36:51 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/24 21:36:51  brian
+# - added lib files
+#
 # Revision 0.9.2.1  2006/09/17 23:09:09  brian
 # - added lib32 compatibility directories
 #
@@ -244,11 +247,14 @@ lib32_LTLIBRARIES		+= libstreams.la
 
 libstreams_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/putpmsg.c \
+				  $(top_srcdir)/lib/libc/putmsg.c \
 				  $(top_srcdir)/lib/libc/getpmsg.c \
+				  $(top_srcdir)/lib/libc/getmsg.c \
 				  $(top_srcdir)/lib/libc/isastream.c \
 				  $(top_srcdir)/lib/libc/pipe.c \
 				  $(top_srcdir)/lib/libc/fattach.c \
-				  $(top_srcdir)/lib/libc/fdetach.c
+				  $(top_srcdir)/lib/libc/fdetach.c \
+				  $(top_srcdir)/lib/libc/streams.h
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION $(MACHINE_FLAGS)
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -259,11 +265,14 @@ lib32_LTLIBRARIES		+= libLiS.la
 
 libLiS_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/putpmsg.c \
+				  $(top_srcdir)/lib/libc/putmsg.c \
 				  $(top_srcdir)/lib/libc/getpmsg.c \
+				  $(top_srcdir)/lib/libc/getmsg.c \
 				  $(top_srcdir)/lib/libc/isastream.c \
 				  $(top_srcdir)/lib/libc/pipe.c \
 				  $(top_srcdir)/lib/libc/fattach.c \
-				  $(top_srcdir)/lib/libc/fdetach.c
+				  $(top_srcdir)/lib/libc/fdetach.c \
+				  $(top_srcdir)/lib/libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION $(MACHINE_FLAGS)
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -274,10 +283,13 @@ lib32_LTLIBRARIES		+= libpLiS.la
 
 libpLiS_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/putpmsg.c \
+				  $(top_srcdir)/lib/libc/putmsg.c \
 				  $(top_srcdir)/lib/libc/getpmsg.c \
+				  $(top_srcdir)/lib/libc/getmsg.c \
 				  $(top_srcdir)/lib/libc/isastream.c \
 				  $(top_srcdir)/lib/libc/fattach.c \
-				  $(top_srcdir)/lib/libc/fdetach.c
+				  $(top_srcdir)/lib/libc/fdetach.c \
+				  $(top_srcdir)/lib/libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libpLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION $(MACHINE_FLAGS)
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)

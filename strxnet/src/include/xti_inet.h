@@ -54,13 +54,13 @@
 
 #ident "@(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+#include <sys/xti_inet.h>
+
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
-
-#include <sys/xti_inet.h>
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

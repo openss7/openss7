@@ -56,12 +56,11 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-/**
-  * @weakgroup xnet OpenSS7 XNET Library
-  * @{
-  * @file
-  * OpenSS7 X/Open Networking Library (XNET) implementation file.
-  */
+/** @weakgroup xnet OpenSS7 XNET Library
+  * @{ */
+
+/** @file
+  * OpenSS7 X/Open Networking Library (XNET) implementation file.  */
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -287,12 +286,30 @@ __xnet_get_tsd(void)
 	return (struct __xnet_tsd *) pthread_getspecific(__xnet_tsd_key);
 };
 
+/** @brief #t_errno location function.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of _t_errno().
+  */
 int *
 __xnet__t_errno(void)
 {
 	return &(__xnet_get_tsd()->terrno);
 }
 
+/** @fn int *_t_errno(void)
+  * @version XNET_1.0
+  * @par Alias:
+  * This symbol is a strong alias of __xnet__t_errno().
+  *
+  * This function provides the location of the integer that contains the XTI/TLI
+  * error number returned by the last XTI function that failed.  This is
+  * normally used to provide #t_errno in a thread-safe way as follows:
+  *
+  * @code
+  * #define t_errno (*(_t_errno()))
+  * @endcode
+  */
 __asm__(".symver __xnet__t_errno,_t_errno@@XNET_1.0");
 
 struct _t_user {
@@ -594,13 +611,9 @@ static int __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int
 static int __xnet_t_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int flags);
 static int __xnet_t_ioctl(int fd, int cmd, void *arg);
 static int __xnet_t_strioctl(int fd, int cmd, void *arg, size_t arglen);
+int __xnet_t_peek(int fd);
 
-/** @name Non-Thread-Safe Library Functions
-  * These are the non-thread-safe versions of the XTI Library functions.  They
-  * can by called directly using these symbols if thread safety is not
-  * required and they may by just a little bit faster than the "t_" versions
-  * (which are the same as the "_r" thread-safe versions).
-  * @{ */
+#if 0
 int __xnet_t_accept(int fd, int resfd, const struct t_call *call);
 int __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr);
 char *__xnet_t_alloc(int fd, int type, int fields);
@@ -612,7 +625,6 @@ int __xnet_t_getinfo(int fd, struct t_info *info);
 int __xnet_t_getstate(int fd);
 int __xnet_t_listen(int fd, struct t_call *call);
 int __xnet_t_look(int fd);
-int __xnet_t_peek(int fd);
 int __xnet_t_open(const char *path, int oflag, struct t_info *info);
 int __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret);
 int __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags);
@@ -641,22 +653,9 @@ int __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
 int __xnet_t_sysconf(int name);
 int __xnet_t_unbind(int fd);
 const char *__xnet_t_strerror(int errnum);
-/** @} */
+#endif
 
-/** @name Thread-Safe Library Functions
-  * These are the thread-safe (reentrant), and asyncrhonous thread
-  * cancellation conforming versions of the XTI Library functions without the
-  * "_r" at the end.  Many of these functions contain asyncrhonous thread
-  * cancellation deferral because they cannot contain thread cancellation
-  * points and yet the implementation calls functions that contain thread
-  * cancellation points.
-  *
-  * Functions that do not appear on this list (with an "_r") do not require
-  * thread protection (normally because they can contain a thread cancellation
-  * point and they do not accept a file descriptor for which read lock
-  * protection in required.)
-  *
-  * @{ */
+#if 0
 int __xnet_t_accept_r(int fd, int resfd, const struct t_call *call);
 int __xnet_t_addleaf_r(int fd, int leafid, struct netbuf *addr);
 char *__xnet_t_alloc_r(int fd, int type, int fields);
@@ -693,7 +692,7 @@ int __xnet_t_sndv_r(int fd, const struct t_iovec *iov, unsigned int iovcount, in
 int __xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
 		       unsigned int iovcount);
 int __xnet_t_unbind_r(int fd);
-/** @} */
+#endif
 
 /** @internal
   * @brief A version of getmsg with XTI errors.
@@ -756,18 +755,18 @@ __xnet_t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flagsp)
 }
 
 /**
- * @internal
- * @brief A version of putmsg with XTI errors.
- * @param fd a file descriptor representing the transport endpoint.
- * @param ctrl a pointer to a strbuf structure describing the control part of
- * the message.
- * @param data a pointer to a strbuf structure describing the data part of the
- * message.
- * @param flags a flag integer describing the nature of the message.
- * 
- * This is the same as putmsg(2) with the exception that XTI errors are
- * returned.
- */
+  * @internal
+  * @brief A version of putmsg with XTI errors.
+  * @param fd a file descriptor representing the transport endpoint.
+  * @param ctrl a pointer to a strbuf structure describing the control part of
+  * the message.
+  * @param data a pointer to a strbuf structure describing the data part of the
+  * message.
+  * @param flags a flag integer describing the nature of the message.
+  * 
+  * This is the same as putmsg(2) with the exception that XTI errors are
+  * returned.
+  */
 static __hot int
 __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags)
 {
@@ -799,19 +798,19 @@ __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags)
 }
 
 /**
- * @internal
- * @brief A version of putpmsg with XTI errors.
- * @param fd a file descriptor representing the transport endpoint.
- * @param ctrl a pointer to a strbuf structure describing the control part of
- * the message.
- * @param data a pointer to a strbuf structure describing the data part of the
- * message.
- * @param band a band number describing the band for the message.
- * @param flags a flag integer describing the nature of the message.
- *
- * This is the same as putpmsg(2) with the exception that XTI errors are
- * returned.
- */
+  * @internal
+  * @brief A version of putpmsg with XTI errors.
+  * @param fd a file descriptor representing the transport endpoint.
+  * @param ctrl a pointer to a strbuf structure describing the control part of
+  * the message.
+  * @param data a pointer to a strbuf structure describing the data part of the
+  * message.
+  * @param band a band number describing the band for the message.
+  * @param flags a flag integer describing the nature of the message.
+  *
+  * This is the same as putpmsg(2) with the exception that XTI errors are
+  * returned.
+  */
 static int
 __xnet_t_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
@@ -952,16 +951,16 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 }
 
 /**
- * @internal
- * @brief Get the next event on the transport endpoint.
- * @param fd a file descriptor for the transport endpoint.
- *
- * Returns the current, or obtains the current, event for the transport
- * endpoing and completes elements in the user data structure representing the
- * transport endpoint.  The control and data parts of any retrieved messages
- * are cached in the user structure and information interpreted and
- * appropriate flags set.
- */
+  * @internal
+  * @brief Get the next event on the transport endpoint.
+  * @param fd a file descriptor for the transport endpoint.
+  *
+  * Returns the current, or obtains the current, event for the transport
+  * endpoing and completes elements in the user data structure representing the
+  * transport endpoint.  The control and data parts of any retrieved messages
+  * are cached in the user structure and information interpreted and
+  * appropriate flags set.
+  */
 static int
 __xnet_t_getevent(int fd)
 {
@@ -1101,14 +1100,14 @@ __xnet_t_putuser(void *arg)
 }
 
 /**
- * @internal
- * @brief Get a locked transport user endpoint structure.
- * @param fd the file descriptor for which to get the associated endpoint.
- *
- * This is a range-checked array lookup of the library user structure
- * associated with the specified file descriptor.  In addition, this function
- * takes the necessary locks for thread-safe operation.
- */
+  * @internal
+  * @brief Get a locked transport user endpoint structure.
+  * @param fd the file descriptor for which to get the associated endpoint.
+  *
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  In addition, this function
+  * takes the necessary locks for thread-safe operation.
+  */
 static __hot struct _t_user *
 __xnet_t_getuser(int fd)
 {
@@ -1141,31 +1140,31 @@ __xnet_t_getuser(int fd)
 }
 
 /**
- * @internal
- * @brief Test information about a transport endpoint.
- * @param fd the file descriptor for which to test the associated endpoint.
- * @param expect the event anticipated on the transport endpoint.
- * @param servtype the service type anticipated on the transport endpoint.
- * @param states the flag mask of the states anticipated for the transport endpoint.
- *
- * This is a range-checked array lookup of the library user structure
- * associated with the specified file descriptor.  In addition, this function
- * checks for expected events, service types and states as follows:
- *
- * When expect is not -1, if there is a current event on the transport
- * endpoint and that event is not the same as the expected event, then the
- * call will fail (return NULL) and set t_errno to @c T_LOOK.
- *
- * servtype is a bit mask of the service types expected for the transport
- * endpoint.  If the service type of the transport endpoint is not one of the
- * service types in the mask, then the call will fail (return NULL) and set
- * t_errno to @c TNOTSUPPORT.  To accept any service type, set servtype to -1.
- *
- * states is a bit mask of the (TPI) states expected for the transport
- * endpoint.  If the state of the transport endpoing is not one of the states
- * in the mask, then the call will fail (return NULL) and set t_errno to
- * @c TOUTSTATE.  To accept any state, set states to -1.
- */
+  * @internal
+  * @brief Test information about a transport endpoint.
+  * @param fd the file descriptor for which to test the associated endpoint.
+  * @param expect the event anticipated on the transport endpoint.
+  * @param servtype the service type anticipated on the transport endpoint.
+  * @param states the flag mask of the states anticipated for the transport endpoint.
+  *
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  In addition, this function
+  * checks for expected events, service types and states as follows:
+  *
+  * When expect is not -1, if there is a current event on the transport
+  * endpoint and that event is not the same as the expected event, then the
+  * call will fail (return NULL) and set t_errno to @c T_LOOK.
+  *
+  * servtype is a bit mask of the service types expected for the transport
+  * endpoint.  If the service type of the transport endpoint is not one of the
+  * service types in the mask, then the call will fail (return NULL) and set
+  * t_errno to @c TNOTSUPPORT.  To accept any service type, set servtype to -1.
+  *
+  * states is a bit mask of the (TPI) states expected for the transport
+  * endpoint.  If the state of the transport endpoing is not one of the states
+  * in the mask, then the call will fail (return NULL) and set t_errno to
+  * @c TOUTSTATE.  To accept any state, set states to -1.
+  */
 static __hot struct _t_user *
 __xnet_t_tstuser(int fd, const int expect, const int servtype, const int states)
 {
@@ -1204,17 +1203,17 @@ __xnet_t_tstuser(int fd, const int expect, const int servtype, const int states)
 }
 
 /**
- * @internal
- * @brief A version of ioctl(2) with XTI errors.
- * @param fd A file descriptor upon which to issue an IO control.
- * @param cmd The IO control command.
- * @param arg Argument to the IO control command.
- *
- * Our timod @c TI_ ioctls return the error codes (if any) in the return value
- * rather than errno.  If we get a non-zero return value, it indicates that we
- * need to unpack the ti and unix error codes and place them in the
- * appropriate error numbers.
- */
+  * @internal
+  * @brief A version of ioctl(2) with XTI errors.
+  * @param fd A file descriptor upon which to issue an IO control.
+  * @param cmd The IO control command.
+  * @param arg Argument to the IO control command.
+  *
+  * Our timod @c TI_ ioctls return the error codes (if any) in the return value
+  * rather than errno.  If we get a non-zero return value, it indicates that we
+  * need to unpack the ti and unix error codes and place them in the
+  * appropriate error numbers.
+  */
 static int
 __xnet_t_ioctl(int fd, int cmd, void *arg)
 {
@@ -1245,18 +1244,18 @@ __xnet_t_ioctl(int fd, int cmd, void *arg)
 }
 
 /**
- * @internal
- * @brief A version of ioctl(2) with XTI errors.
- * @param fd A file descriptor upon which to issue an IO control.
- * @param cmd The IO control command.
- * @param arg Argument to the IO control command.
- * @param arglen The length of the argument.
- *
- * This is a simple matter of packing an otherwise tranparent IO control into
- * a strioctl buffer and issuing an I_STR IO control instead.  This calls
- * __xnet_t_ioctl(), so it understands how to properly unpack timod XTI and UNIX
- * error codes.
- */
+  * @internal
+  * @brief A version of ioctl(2) with XTI errors.
+  * @param fd A file descriptor upon which to issue an IO control.
+  * @param cmd The IO control command.
+  * @param arg Argument to the IO control command.
+  * @param arglen The length of the argument.
+  *
+  * This is a simple matter of packing an otherwise tranparent IO control into
+  * a strioctl buffer and issuing an I_STR IO control instead.  This calls
+  * __xnet_t_ioctl(), so it understands how to properly unpack timod XTI and UNIX
+  * error codes.
+  */
 static int
 __xnet_t_strioctl(int fd, int cmd, void *arg, size_t arglen)
 {
@@ -1400,6 +1399,9 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
   * @param fd the file descriptor upon which the connection indication was received.
   * @param resfd the file descriptor upon which to accept the transport connection.
   * @param call a pointer to a t_call structure describing the responding transport endpoint.
+  * @version XNET_1.0
+  * @par Alias:
+  * This symbol is an implementation of t_accept().
   *
   * This function is NOT a thread cancellation point.  t_accept(3) is NOT a a
   * thread cancellation point; therefore, we disable cancellation for the
@@ -1418,12 +1420,21 @@ __xnet_t_accept_r(int fd, int resfd, const struct t_call *call)
 	return (ret);
 }
 
+/** @fn int t_accept(int fd, int resfd, const struct t_call *call)
+  * @param fd the file descriptor upon which the connection indication was received.
+  * @param resfd the file descriptor upon which to accept the transport connection.
+  * @param call a pointer to a t_call structure describing the responding transport endpoint.
+  * @version XNET_1.0
+  * @par Alias:
+  * This symbol is a strong alias of __xnet_t_accept_r().
+  */
 __asm__(".symver __xnet_t_accept_r,t_accept@@XNET_1.0");
 
 /** @brief Add a leaf to a point to multipoint connection.
   * @param fd A file descriptor for the transport user endpoint.
   * @param leafid The identifier for the leaf.
   * @param addr A netbuf(3) structure describing the address of the added leaf.
+  * @version XNET_1.0
   *
   * This XTI Liubrary function is only used for ATM.  It is used to add a leaf
   * to a point to multipoint connection.  This function does not translate to
@@ -1476,14 +1487,17 @@ __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
 			goto tproto;
 		if (opts.hdr.level != T_ATM_SIGNALLING || opts.hdr.name != T_ATM_ADD_LEAF)
 			goto tproto;
-		/** The t_addleaf function requires an operating-system specific blocking mechanism
-		   to know when to check for the leaf status indication.  The most obvious approach 
-		   is to have the ATM transport service provider send a signal to the stream head
-		   when an indication has arrived.  What signal (SIGPOLL, SIGIO, SIGUSR) is a
-		   question. Nevertheless, we can check our open flags here and either decide to
-		   block on a poll or not to check for the indication that the addition was
-		   successful.  We do not do this yet.  We just always return nodata.  It is the
-		   caller's responsibility to check with t_rcvleafchange(). 
+		/**
+		   The t_addleaf function requires an operating-system specific
+		   blocking mechanism to know when to check for the leaf status
+		   indication.  The most obvious approach is to have the ATM
+		   transport service provider send a signal to the stream head
+		   when an indication has arrived.  What signal (SIGPOLL, SIGIO,
+		   SIGUSR) is a question. Nevertheless, we can check our open
+		   flags here and either decide to block on a poll or not to
+		   check for the indication that the addition was successful.
+		   We do not do this yet.  We just always return nodata.  It is
+		   the caller's responsibility to check with t_rcvleafchange(). 
 		 */
 		goto tnodata;
 	}
@@ -1513,6 +1527,9 @@ __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
   * @param fd A file descriptor for the transport user endpoint.
   * @param leafid The identifier for the leaf.
   * @param addr A netbuf(3) structure describing the address of the added leaf.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of t_addleaf().
   *
   * This function is NOT a thread cancellation point.
   * t_addleaf() is NOT a thread cancellation point, but ioctl(2) is; therefore,
@@ -1536,8 +1553,15 @@ __xnet_t_addleaf_r(int fd, int leafid, struct netbuf *addr)
 	return (ret);
 }
 
+/** @fn int t_addleaf(int fd, int leafid, struct netbuf *addr)
+  * @param fd A file descriptor for the transport user endpoint.
+  * @param leafid The identifier for the leaf.
+  * @param addr A netbuf(3) structure describing the address of the added leaf.
+  * @version XNET_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __xnet_t_addleaf_r().
+  */
 #pragma weak __xnet_t_addleaf_r
-
 __asm__(".symver __xnet_t_addleaf_r,t_addleaf@@XNET_1.0");
 
 /**
@@ -1545,6 +1569,9 @@ __asm__(".symver __xnet_t_addleaf_r,t_addleaf@@XNET_1.0");
   * @param fd A file descriptor for the transport user endpoint.
   * @param type The type of structure to allocate.
   * @param fields The fields in the structure to initialize.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of t_alloc().
   *
   * This function is NOT a thread cancellation point.
   *
@@ -1949,6 +1976,9 @@ __asm__(".symver __xnet_t_alloc_r,t_alloc@@XNET_1.0");
   * @param fd A file descriptor indicating the transport endpoint to bind.
   * @param req A t_bind structure indicating the bind parameters.
   * @param ret A t_bind structure to return the bind result.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of t_bind().
   *
   * This function is NOT a thread cancellation point.
   * t_bind() is NOT a thread cancellation point; however, ioctl(2) might be;
@@ -2044,6 +2074,7 @@ __asm__(".symver __xnet_t_bind_r,t_bind@@XNET_1.0");
 
 /** @brief Close a transport endpoint.
   * @param fd A file descriptor for the transport endpoint to close.
+  * @version XNET_1.0
   *
   * This function is a thread cancellation point.  t_close() is a thread
   * cancellation point, and so it close(2); therefore, we defer cancellation
@@ -2077,18 +2108,21 @@ __xnet_t_close(int fd)
 }
 
 /**
- * @brief Recursive t_close function.
- * @param fd A file descriptor for the transport endpoint to close.
- *
- * This is again a little different that most of the _r wrappers: we take a
- * write lock on the _t_fds list so that we are able to delete the file
- * descriptor from the list.  This will block most other threads from
- * performing functions on the list, also, we must wait for a quiet period
- * until all other functions that read lock the list are not being used.  If
- * you are sure that the close will only be performed by one thread and that
- * no other thread will act on the file descriptor until close returns, use
- * the non-recursive version.
- */
+  * @brief Recursive t_close function.
+  * @param fd A file descriptor for the transport endpoint to close.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of t_close().
+  *
+  * This is again a little different that most of the _r wrappers: we take a
+  * write lock on the _t_fds list so that we are able to delete the file
+  * descriptor from the list.  This will block most other threads from
+  * performing functions on the list, also, we must wait for a quiet period
+  * until all other functions that read lock the list are not being used.  If
+  * you are sure that the close will only be performed by one thread and that
+  * no other thread will act on the file descriptor until close returns, use
+  * the non-recursive version.
+  */
 int
 __xnet_t_close_r(int fd)
 {
@@ -3042,21 +3076,21 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 }
 
 /**
- * @brief The reentrant version of __xnet_t_open().
- * @param path a character string specifying the pat to the device to open.
- * @param oflag open flags.
- * @param info a pointer to a t_info structure to contain returned information
- * about the transport endpoint.
- *
- * This is a little different than most of the _r wrappers: we take a write
- * lock on the _t_fds list so that we are able to add the new file descriptor
- * into the list.  This will block most other threads from performing
- * functions on the list, also, we must wait for a quiet period until all
- * other functions that read lock the list are not being used.  If you are
- * sure that the open will only be performed by one thread and that no other
- * thread will act on the file descriptor until open returns, use the
- * non-recursive version.
- */
+  * @brief The reentrant version of __xnet_t_open().
+  * @param path a character string specifying the pat to the device to open.
+  * @param oflag open flags.
+  * @param info a pointer to a t_info structure to contain returned information
+  * about the transport endpoint.
+  *
+  * This is a little different than most of the _r wrappers: we take a write
+  * lock on the _t_fds list so that we are able to add the new file descriptor
+  * into the list.  This will block most other threads from performing
+  * functions on the list, also, we must wait for a quiet period until all
+  * other functions that read lock the list are not being used.  If you are
+  * sure that the open will only be performed by one thread and that no other
+  * thread will act on the file descriptor until open returns, use the
+  * non-recursive version.
+  */
 int
 __xnet_t_open_r(const char *path, int oflag, struct t_info *info)
 {
@@ -4475,7 +4509,6 @@ __xnet_t_removeleaf_r(int fd, int leafid, int reason)
 }
 
 #pragma weak __xnet_t_removeleaf_r
-
 __asm__(".symver __xnet_t_removeleaf_r,t_removeleaf@@XNET_1.0");
 
 /** @brief Send data or expedited data over a connection.
@@ -5914,18 +5947,18 @@ __xnet_t_sync(int fd)
 }
 
 /**
- * @brief The reentrant version of __xnet_t_sndvudata().
- * @param fd the file descriptor to synchronize
- *
- * The reentrant version of t_sync() is like the reentrant version of t_open()
- * and t_close() in that it write locks the file descriptor list in
- * preparation for adding or removing a user structure to or from the list.
- * Because of this, all other threads holding read locks on the file
- * descriptor list must release them before this function will proceed.  While
- * this function is proceeding, all other threads attempting to execute XTI
- * library functions on file descriptors will be blocked until this function
- * exits.
- */
+  * @brief The reentrant version of __xnet_t_sndvudata().
+  * @param fd the file descriptor to synchronize
+  *
+  * The reentrant version of t_sync() is like the reentrant version of t_open()
+  * and t_close() in that it write locks the file descriptor list in
+  * preparation for adding or removing a user structure to or from the list.
+  * Because of this, all other threads holding read locks on the file
+  * descriptor list must release them before this function will proceed.  While
+  * this function is proceeding, all other threads attempting to execute XTI
+  * library functions on file descriptors will be blocked until this function
+  * exits.
+  */
 int
 __xnet_t_sync_r(int fd)
 {
@@ -6042,13 +6075,13 @@ __xnet_t_unbind_r(int fd)
 __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
- * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.22 $).
- * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.22 $)
- * @date \$Date: 2006/09/22 20:54:28 $
- */
+  * @section Identification
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.22 $).
+  * @author Brian F. G. Bidulock
+  * @version \$Name:  $(\$Revision: 0.9.2.22 $)
+  * @date \$Date: 2006/09/22 20:54:28 $
+  */
 
 /** @} */
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

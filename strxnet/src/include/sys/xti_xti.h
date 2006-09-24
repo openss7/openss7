@@ -62,14 +62,14 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup xnet
-  * @{
-  * @file
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
   * XTI Generic options header file.
   *
   * In accordance with OpenGroup Single UNIX Specifications, the symbols in this
-  * file are exposed by including the <xti.h> header file.
-  * */
+  * file are exposed by including the <xti.h> header file.  */
 
 /*
  *  XTI Generic options header file.

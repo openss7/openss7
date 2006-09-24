@@ -59,30 +59,13 @@ static char const ident[] =
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <sys/types.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/ioctl.h>		/* bad: according to POSIX, stropts.h must expose ioctl()... */
-#include <stropts.h>
+/** @addtogroup strcalls STREAMS System Calls
+  * @{ */
 
-#include <pthread.h>
-
-extern void __pthread_testcancel(void);
-
-#pragma weak __pthread_testcancel
-#pragma weak pthread_testcancel
-
-void
-pthread_testcancel(void)
-{
-	if (__pthread_testcancel)
-		__pthread_testcancel();
-	return;
-}
+/** @file
+  * STREAMS System Call putpmsg() implementation file.  */
 
 #ifdef BLD32OVER64
 /**
@@ -255,6 +238,7 @@ __lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, in
   * @param datptr a pointer to a strbuf structure describing the data part of the message.
   * @param band the band to which to put the message.
   * @param flags the priority of the message.
+  * @version LIS_1.0 putpmsg()
   *
   * putpmsg() must contain a thread cancellation point (SUS/XOPEN/POSIX).  In
   * the Linux Threads approach, this function will return EINTR if interrupted
@@ -275,16 +259,8 @@ __lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, 
 	return (ret);
 }
 
-/** @fn int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
-  * @brief put a message to a stream band.
-  * @param fd a file descriptor representing the stream.
-  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a strbuf structure describing the data part of the message.
-  * @param band the band to which to put the message.
-  * @param flags the priority of the message.
+/** @version LIS_0.0 putpmsg()
   */
-__asm__(".symver __lis_putpmsg_r,putpmsg@@LIS_1.0");
-
 int
 __old_lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
 {
@@ -297,6 +273,21 @@ __old_lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int ba
 	return (ret);
 }
 
+/** @fn int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+  * @brief put a message to a stream band.
+  * @param fd a file descriptor representing the stream.
+  * @param ctlptr a pointer to a strbuf structure describing the control part of the message.
+  * @param datptr a pointer to a strbuf structure describing the data part of the message.
+  * @param band the band to which to put the message.
+  * @param flags the priority of the message.
+  * @version LIS_1.0 __lis_putpmsg_r()
+  * @version LIS_0.0 __old_lis_putpmsg_r()
+  *
+  * This symbol is aliased to __lis_putpmsg_r().
+  */
+__asm__(".symver __lis_putpmsg_r,putpmsg@@LIS_1.0");
 __asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

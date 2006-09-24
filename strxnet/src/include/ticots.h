@@ -54,13 +54,13 @@
 
 #ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
+#include <sys/ticots.h>
+
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
-
-#include <sys/ticots.h>
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

@@ -58,6 +58,14 @@
 @c =========================================================================
 
 @table @code
+@item 002. 2006-09-24T20:02:00+0000
+
+Discovered asynchronous thread cancellation inconsistencies in libLiS libpLiS by inspection during
+documentation.  isastream(2), fattach(2) were not performing proper asynchronous thread
+cancellation suppression so that these function contained a cancellation point when the should not.
+
+@emph{*fixed*} in @command{streams-0.7a.6.rc3}
+
 @item 001. 2006-07-05T21:54:49+0000
 
 Fedora Core 5 reports a rwlock bug during udp module unloading as follows:

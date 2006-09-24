@@ -68,14 +68,14 @@
 
 /* This file can be processed with doxygen(1). */
 
-/** @ingroup tpi
-  * @{
-  * @file
+/** @addtogroup tpi
+  * @{ */
+
+/** @file
   * TPI Common Header File.
   *
   * This file contains definitions that are common to XTI, TLI and TPI.  It is
-  * included by <xti.h> and <tiuser.h> as well as <tihdr.h>.
-  * */
+  * included by <xti.h> and <tiuser.h> as well as <tihdr.h>.  */
 
 #if 0
 #if !defined _XTI_H && !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__

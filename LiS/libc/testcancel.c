@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 21:21:19 $
+ @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/24 21:36:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 21:21:19 $ by $Author: brian $
+ Last Modified $Date: 2006/09/24 21:36:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 21:21:19 $"
+#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/24 21:36:46 $"
 
-static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 21:21:19 $";
+static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/24 21:36:46 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -111,17 +111,12 @@ static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9
 #pragma weak __pthread_testcancel
 extern void __pthread_testcancel(void);
 
-#pragma weak __pthread_setcanceltype
 extern int __pthread_setcanceltype(int type, int *oldtype);
-
-#pragma weak pthread_testcancel
-extern void pthread_testcancel(void);
-
-#pragma weak pthread_setcanceltype
-extern int pthread_setcanceltype(int type, int *oldtype);
+#pragma weak __pthread_setcanceltype
 
 /** @} */
 
+#pragma weak pthread_testcancel
 /** @brief Test for asyncrhonous thread cancellation (while deferred).
   * @par Alias:
   * This function is a weak defined symbol.
@@ -147,6 +142,7 @@ pthread_testcancel(void)
   * (non-thread-safe operation).  */
 static int __pthread_canceltype = 0;
 
+#pragma weak pthread_setcanceltype
 /** @brief Set or defer thread asynchronous cancellation.
   * @param type cancellation type to set.
   * @param oldtype place to return current type.

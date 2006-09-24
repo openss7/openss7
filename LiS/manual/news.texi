@@ -116,7 +116,17 @@ longer distributed.
 
 Third release candidiate.
 
+@value{PACKAGE} is really not supported any longer.  Use Linux Fast-STREAMS instead.
+The purpose of this release is to demonstrate the inability of the @value{PACKAGE}
+package to properly support 32-bit compatibility on 64-bit architectures.
+
 @itemize
+@item
+Minor bug fixes to STREAMS library.  isastream(3) and fattach(3) must not
+contain an asynchronous thread cancellation point, but they could.  Added
+asynchronous thread cancellation protection to these functions to remove any
+thread cancellation points.
+
 @item
 The package will now build doxygen(1) html documentation with the 'doxy' make
 target.  See 'make help' or README-make in the distribution for more
@@ -190,7 +200,7 @@ number 230.  Assign major device number 230 explicitly to the clone device.
 @item
 @cite{Linux Fast-STREAMS} now supports expanded addressable minor device
 numbers, permitting 2^16 addressable minor devices per major device number on
-2.6 kernels: unfortunately, @value{PACKAGE} cannot support this change.
+2.6 kernels: @cite{@value{PACKAGE}} cannot support this change.
 @end itemize
 
 This was an internal alpha test release candidate and was not released publicly.

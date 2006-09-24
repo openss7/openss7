@@ -56,38 +56,21 @@ static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.
 
 /* This file can be processed with doxygen(1). */
 
-#define _XOPEN_SOURCE 600
-#define _GNU_SOURCE 1
-#define _REENTRANT
-#define _THREAD_SAFE
+#include "streams.h"
 
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <stropts.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
+/** @weakgroup strcalls STREAMS System Calls
+  * @{ */
 
-#include <pthread.h>
-
-#if __GNUC__ < 3
-#define inline inline
-#define noinline extern
-#else
-#define inline __attribute__((always_inline))
-#define noinline static __attribute__((noinline))
-#endif
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define __hot __attribute__((section(".text.hot")))
-#define __unlikely __attribute__((section(".text.unlikely")))
-
-extern int pthread_setcanceltype(int type, int *oldtype);
+/** @file
+  * STREAMS Library fdetach() implementation file. */
 
 #define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
 
+/** @brief Detach a path from a Stream.
+  * @param path the path in the filesystem from which to detach.
+  * @version STREAMS_1.0
+  */
 int __unlikely
 __streams_fdetach(const char *path)
 {
@@ -105,8 +88,9 @@ __streams_fdetach(const char *path)
 	return 0;
 }
 
-/** @brief detach a path from a stream.
+/** @brief Detach a path from a Stream.
   * @param path the path in the filesystem from which to detach.
+  * @version STREAMS_1.0 fdetach()
   *
   * fdetach() cannot contain a thread cancellation point (SUS/XOPEN/POSIX).  We
   * must protect from asyncrhonous cancellation between the open(), ioctl() and
@@ -122,14 +106,33 @@ __streams_fdetach_r(const char *path)
 	return (ret);
 }
 
-__asm__(".symver __streams_fdetach_r,fdetach@@@STREAMS_1.0");
-
-int __lis_fdetach(const char *)
+/** @brief Detach a path from a Stream.
+  * @param path the path in the filesystem from which to detach.
+  * @version LIS_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __streams_fdetach().
+  */
+int __lis_fdetach(const char *path)
 	__attribute__((weak, alias("__streams_fdetach")));
 
-int __lis_fdetach_r(const char *)
+/** @brief Detach a path from a Stream.
+  * @param path the path in the filesystem from which to detach.
+  * @version LIS_1.0 fdetach()
+  * @par Alias:
+  * This symbol is a weak alias of __streams_fdetach_r().
+  */
+int __lis_fdetach_r(const char *path)
 	__attribute__((weak, alias("__streams_fdetach_r")));
 
+/** @fn int fdetach(const char *path)
+  * @brief Detach a path from a Stream.
+  * @param path the path in the filesystem from which to detach.
+  * @version STREAMS_1.0 __streams_fdetach_r()
+  * @version LIS_1.0 __lis_fdetach_r()
+  */
+__asm__(".symver __streams_fdetach_r,fdetach@@STREAMS_1.0");
 __asm__(".symver __lis_fdetach_r,fdetach@LIS_1.0");
 
-// vim: ft=c com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/17 23:09:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/24 21:36:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/17 23:09:04 $ by $Author: brian $
+# Last Modified $Date: 2006/09/24 21:36:50 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/24 21:36:50  brian
+# - added lib files
+#
 # Revision 0.9.2.1  2006/09/17 23:09:04  brian
 # - added lib32 compatibility directories
 #
@@ -146,7 +149,9 @@ libLiS_la_SOURCES		= $(top_srcdir)/libc/fattach.c \
 				  $(top_srcdir)/libc/isastream.c \
 				  $(top_srcdir)/libc/pipe.c \
 				  $(top_srcdir)/libc/putmsg.c \
-				  $(top_srcdir)/libc/putpmsg.c
+				  $(top_srcdir)/libc/putpmsg.c \
+				  $(top_srcdir)/libc/testcancel.c \
+				  $(top_srcdir)/libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/libc/LiS.VERSION
 libLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 -Wl,--version-script -Wl,$(top_srcdir)/libc/LiS.VERSION $(MACHINE_FLAGS)
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -161,7 +166,9 @@ libpLiS_la_SOURCES		= $(top_srcdir)/libc/fattach.c \
 				  $(top_srcdir)/libc/getpmsg.c \
 				  $(top_srcdir)/libc/isastream.c \
 				  $(top_srcdir)/libc/putmsg.c \
-				  $(top_srcdir)/libc/putpmsg.c
+				  $(top_srcdir)/libc/putpmsg.c \
+				  $(top_srcdir)/libc/testcancel.c \
+				  $(top_srcdir)/libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/libc/LiS.VERSION
 libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 -Wl,--version-script -Wl,$(top_srcdir)/libc/LiS.VERSION $(MACHINE_FLAGS)
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
