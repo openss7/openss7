@@ -3,6 +3,40 @@
 	* libc/streams.h: added
 	* libc/testcancel.h: added
 
+	* AUTHORS: updated release notes
+	* BUGS: updated release notes
+	* NEWS: updated release notes
+	* README: updated release notes
+	* README-alpha: updated release notes
+	* README-cvs: updated release notes
+	* README-nexusware: updated release notes
+	* THANKS: updated release notes
+	* TODO: updated release notes
+	* manual/bugs.texi: updated release notes
+	* manual/news.texi: updated release notes
+
+	* LiS.dox.in: doxygen updates
+	* include/stropts.h: doxygen updates
+	* include/sys/poll.h: doxygen updates
+	* include/sys/sad.h: doxygen updates
+	* include/sys/stropts.h: doxygen updates
+	* include/sys/testmod.h: doxygen updates
+	* include/sys/LiS/log.h: doxygen updates
+	* include/sys/LiS/loop.h: doxygen updates
+	* include/sys/LiS/minimux.h: doxygen updates
+	* include/sys/LiS/mtdrv.h: doxygen updates
+	* include/sys/LiS/nullstrm.h: doxygen updates
+	* include/sys/LiS/testmod.h: doxygen updates
+
+	* libc/fattach.c: straighten out library files
+	* libc/fdetach.c: straighten out library files
+	* libc/getmsg.c: straighten out library files
+	* libc/getpmsg.c: straighten out library files
+	* libc/isastream.c: straighten out library files
+	* libc/pipe.c: straighten out library files
+	* libc/putmsg.c: straighten out library files
+	* libc/putpmsg.c: straighten out library files
+
 2006-09-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated news
