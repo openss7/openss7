@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $
+ @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/25 12:22:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:53 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:22:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socklib.c,v $
+ Revision 0.9.2.3  2006/09/25 12:22:38  brian
+ - working up library
+
  Revision 0.9.2.2  2006/09/18 13:52:53  brian
  - added doxygen markers to sources
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $"
+#ident "@(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/25 12:22:38 $"
 
 static char const ident[] =
-    "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $";
+    "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/25 12:22:38 $";
 
 /* This file can be processed with doxygen(1). */
 
