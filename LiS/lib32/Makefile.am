@@ -79,7 +79,7 @@ pkglibexec32_PROGRAMS		+= timetst
 
 timetst_SOURCES			= $(top_srcdir)/util/timetst.c
 timetst_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-timetst_LDFLAGS			= libLiS.la $(MACHINE_FLAGS)
+timetst_LDFLAGS			= -static libLiS.la $(MACHINE_FLAGS)
 timetst_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 timetst_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -87,7 +87,7 @@ pkglibexec32_PROGRAMS		+= strtst
 
 strtst_SOURCES			= $(top_srcdir)/util/strtst.c
 strtst_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strtst_LDFLAGS			= -lpthread libLiS.la $(MACHINE_FLAGS)
+strtst_LDFLAGS			= -lpthread -static libLiS.la $(MACHINE_FLAGS)
 strtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strtst_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -95,7 +95,7 @@ pkglibexec32_PROGRAMS		+= polltst
 
 polltst_SOURCES			= $(top_srcdir)/util/polltst.c
 polltst_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-polltst_LDFLAGS			= libLiS.la $(MACHINE_FLAGS)
+polltst_LDFLAGS			= -static libLiS.la $(MACHINE_FLAGS)
 polltst_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 polltst_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -103,7 +103,7 @@ pkglibexec32_PROGRAMS		+= perftest
 
 perftest_SOURCES		= $(top_srcdir)/util/perftest.c
 perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-perftest_LDFLAGS		= libLiS.la $(MACHINE_FLAGS)
+perftest_LDFLAGS		= -static libLiS.la $(MACHINE_FLAGS)
 perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 perftest_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -111,7 +111,7 @@ pkglibexec32_PROGRAMS		+= test-streams
 
 test_streams_SOURCES		= $(top_srcdir)/util/test-streams.c
 test_streams_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_streams_LDFLAGS		= -lpthread libLiS.la $(MACHINE_FLAGS)
+test_streams_LDFLAGS		= -lpthread -static libLiS.la $(MACHINE_FLAGS)
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -119,7 +119,7 @@ pkglibexec32_PROGRAMS		+= test-fifo
 
 test_fifo_SOURCES		= $(top_srcdir)/util/test-fifo.c
 test_fifo_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_fifo_LDFLAGS		= -lpthread libLiS.la $(MACHINE_FLAGS)
+test_fifo_LDFLAGS		= -lpthread -static libLiS.la $(MACHINE_FLAGS)
 test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -127,7 +127,7 @@ pkglibexec32_PROGRAMS		+= test-pipe
 
 test_pipe_SOURCES		= $(top_srcdir)/util/test-pipe.c
 test_pipe_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_pipe_LDFLAGS		= -lpthread libLiS.la $(MACHINE_FLAGS)
+test_pipe_LDFLAGS		= -lpthread -static libLiS.la $(MACHINE_FLAGS)
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -135,7 +135,7 @@ pkglibexec32_PROGRAMS		+= test-sad
 
 test_sad_SOURCES		= $(top_srcdir)/util/test-sad.c
 test_sad_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_sad_LDFLAGS		= -lpthread libLiS.la $(MACHINE_FLAGS)
+test_sad_LDFLAGS		= -lpthread -static libLiS.la $(MACHINE_FLAGS)
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
