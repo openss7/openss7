@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/07/29 07:43:12 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2006/09/25 20:15:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:43:12 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 20:15:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.77  2006/09/25 20:15:56  brian
+ - minor formatting changes
+
  Revision 0.9.2.76  2006/07/29 07:43:12  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -106,10 +109,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/07/29 07:43:12 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2006/09/25 20:15:56 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/07/29 07:43:12 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2006/09/25 20:15:56 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -521,6 +524,7 @@ tcp_current_mss(struct sock *sk, int large)
 #ifndef sysctl_ip_dynaddr
 #ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
 extern int sysctl_ip_dynaddr;
+
 #define sysctl_ip_dynaddr (*((typeof(sysctl_ip_dynaddr) *)HAVE_SYSCTL_IP_DYNADDR_ADDR))
 #endif
 #endif
@@ -528,6 +532,7 @@ extern int sysctl_ip_dynaddr;
 #ifndef sysctl_ip_nonlocal_bind
 #ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
 extern int sysctl_ip_nonlocal_bind;
+
 #define sysctl_ip_nonlocal_bind (*((typeof(sysctl_ip_nonlocal_bind) *)HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR))
 #endif
 #endif
@@ -535,10 +540,10 @@ extern int sysctl_ip_nonlocal_bind;
 #ifndef sysctl_ip_default_ttl
 #ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
 extern int sysctl_ip_default_ttl;
+
 #define sysctl_ip_default_ttl (*((typeof(sysctl_ip_default_ttl) *)HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR))
 #endif
 #endif
-
 
 #ifndef tcp_set_skb_tso_segs
 #ifdef HAVE_TCP_SET_SKB_TSO_SEGS_ADDR
@@ -594,8 +599,8 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/07/29 07:43:12 $"
+#define SS__COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2006/09/25 20:15:56 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -740,8 +745,8 @@ STATIC struct module_info ss_minfo = {
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC struct module_stat ss_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat ss_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat ss_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat ss_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 STATIC streamscall int ss_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int ss_close(queue_t *, int, cred_t *);
@@ -1914,6 +1919,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_NODELAY;
 				oh->status = T_SUCCESS;
@@ -1928,6 +1934,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_MAXSEG;
 				oh->status = T_SUCCESS;
@@ -1971,6 +1978,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_CORK;
 				oh->status = T_SUCCESS;
@@ -1985,6 +1993,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_KEEPIDLE;
 				oh->status = T_SUCCESS;
@@ -2001,6 +2010,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_KEEPINTVL;
 				oh->status = T_SUCCESS;
@@ -2017,6 +2027,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_KEEPCNT;
 				oh->status = T_SUCCESS;
@@ -2033,6 +2044,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_SYNCNT;
 				oh->status = T_SUCCESS;
@@ -2049,6 +2061,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_LINGER2;
 				oh->status = T_SUCCESS;
@@ -2065,6 +2078,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_DEFER_ACCEPT;
 				oh->status = T_SUCCESS;
@@ -2084,6 +2098,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_WINDOW_CLAMP;
 				oh->status = T_SUCCESS;
@@ -2103,6 +2118,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_QUICKACK;
 				oh->status = T_SUCCESS;
@@ -2120,6 +2136,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_NODELAY;
 				oh->status = T_SUCCESS;
@@ -2134,6 +2151,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_MAXSEG;
 				oh->status = T_SUCCESS;
@@ -2149,6 +2167,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_CORK;
 				oh->status = T_SUCCESS;
@@ -2159,6 +2178,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PPI;
 				oh->status = T_SUCCESS;
@@ -2170,6 +2190,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SID;
 				oh->status = T_SUCCESS;
@@ -2187,6 +2208,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RECVOPT;
 				oh->status = T_SUCCESS;
@@ -2198,6 +2220,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_COOKIE_LIFE;
 				oh->status = T_SUCCESS;
@@ -2213,6 +2236,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SACK_DELAY;
 				oh->status = T_SUCCESS;
@@ -2228,6 +2252,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PATH_MAX_RETRANS;
 				oh->status = T_SUCCESS;
@@ -2240,6 +2265,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 				oh->status = T_SUCCESS;
@@ -2252,6 +2278,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_MAX_INIT_RETRIES;
 				oh->status = T_SUCCESS;
@@ -2264,6 +2291,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_HEARTBEAT_ITVL;
 				oh->status = T_SUCCESS;
@@ -2280,6 +2308,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RTO_INITIAL;
 				oh->status = T_SUCCESS;
@@ -2295,6 +2324,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RTO_MIN;
 				oh->status = T_SUCCESS;
@@ -2310,6 +2340,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RTO_MAX;
 				oh->status = T_SUCCESS;
@@ -2328,6 +2359,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_OSTREAMS;
 				oh->status = T_SUCCESS;
@@ -2346,6 +2378,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ISTREAMS;
 				oh->status = T_SUCCESS;
@@ -2361,6 +2394,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_COOKIE_INC;
 				oh->status = T_SUCCESS;
@@ -2376,6 +2410,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_THROTTLE_ITVL;
 				oh->status = T_SUCCESS;
@@ -2392,6 +2427,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_MAC_TYPE;
 				oh->status = T_SUCCESS;
@@ -2402,6 +2438,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_CKSUM_TYPE;
 				oh->status = T_SUCCESS;
@@ -2443,6 +2480,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DEBUG;
 				oh->status = T_SUCCESS;
@@ -2454,6 +2492,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ECN;
 				oh->status = T_SUCCESS;
@@ -2466,6 +2505,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ALI;
 				oh->status = T_SUCCESS;
@@ -2479,6 +2519,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ADD;
 				oh->status = T_SUCCESS;
@@ -2490,6 +2531,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SET;
 				oh->status = T_SUCCESS;
@@ -2501,6 +2543,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ADD_IP;
 				oh->status = T_SUCCESS;
@@ -2512,6 +2555,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DEL_IP;
 				oh->status = T_SUCCESS;
@@ -2523,6 +2567,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SET_IP;
 				oh->status = T_SUCCESS;
@@ -2536,6 +2581,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PR;
 				oh->status = T_SUCCESS;
@@ -2549,6 +2595,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_LIFETIME;
 				oh->status = T_SUCCESS;
@@ -2567,6 +2614,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 					goto efault;
 				/* FIXME: this should probably be read-only */
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DISPOSITION;
 				oh->status = T_SUCCESS;
@@ -2578,6 +2626,7 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				if (oh == NULL)
 					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_MAX_BURST;
 				oh->status = T_SUCCESS;
@@ -4742,6 +4791,7 @@ ss_opts_size(const ss_t *ss, struct msghdr *msg)
 				case SCTP_PPI:
 				case SCTP_DISPOSITION:
 					size += _T_SPACE_SIZEOF(t_uscalar_t);
+
 					continue;
 				}
 			}
@@ -4861,6 +4911,7 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
 				printd(("%s: %p: processing option SCTP_PPI\n", DRV_NAME, ss));
 				printd(("%s: %p: building option T_SCTP_PPI\n", DRV_NAME, ss));
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PPI;
 				oh->status = T_SUCCESS;
@@ -4876,6 +4927,7 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
 				printd(("%s: %p: building option T_SCTP_DISPOSITION\n", DRV_NAME,
 					ss));
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DISPOSITION;
 				oh->status = T_SUCCESS;
@@ -14536,7 +14588,8 @@ t_bind_req(queue_t *q, mblk_t *mp)
 			add->sa_family = AF_INET;
 		} else {
 			if (add_len < sizeof(struct sockaddr_in)) {
-				ptrace(("%s: %p: add_len(%d) < sizeof(struct sockaddr_in)(%lu)\n", DRV_NAME, ss, add_len, (ulong) sizeof(struct sockaddr_in)));
+				ptrace(("%s: %p: add_len(%d) < sizeof(struct sockaddr_in)(%lu)\n",
+					DRV_NAME, ss, add_len, (ulong) sizeof(struct sockaddr_in)));
 				goto badaddr;
 			}
 			if (ss->p.prot.protocol != T_INET_SCTP) {
@@ -14576,7 +14629,8 @@ t_bind_req(queue_t *q, mblk_t *mp)
 			add->sa_family = AF_UNIX;
 		} else {
 			if (add_len < sizeof(struct sockaddr_un)) {
-				ptrace(("%s: %p: add_len(%d) < sizeof(struct sockaddr_un)(%lu)\n", DRV_NAME, ss, add_len, (ulong) sizeof(struct sockaddr_un)));
+				ptrace(("%s: %p: add_len(%d) < sizeof(struct sockaddr_un)(%lu)\n",
+					DRV_NAME, ss, add_len, (ulong) sizeof(struct sockaddr_un)));
 				goto badaddr;
 			}
 			if (add->sa_family != AF_UNIX && add->sa_family != 0) {
@@ -15850,7 +15904,7 @@ ss_rput(queue_t *q, mblk_t *mp)
 #else
 	if (unlikely(!putq(q, mp)))
 		freemsg(mp);
-	return(0);
+	return (0);
 #endif
 }
 
@@ -15951,7 +16005,8 @@ ss_free_priv(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 
-	printd(("%s: unlinking private structure, reference count = %lu\n", DRV_NAME, (ulong) ss->refcnt));
+	printd(("%s: unlinking private structure, reference count = %lu\n", DRV_NAME,
+		(ulong) ss->refcnt));
 	/* Unfortunately, ss_socket_put calls sock_release which can cause TCP to do a
 	   tcp_send_fin, and in tcp_send_fin an skbuff is allocated with GFP_KERNEL. */
 	if (ss->sock)
@@ -15961,7 +16016,8 @@ ss_free_priv(queue_t *q)
 	{
 		bufq_purge(&ss->conq);
 		__ss_unbufcall(q);
-		printd(("%s: removed bufcalls, reference count = %lu\n", DRV_NAME, (ulong) ss->refcnt));
+		printd(("%s: removed bufcalls, reference count = %lu\n", DRV_NAME,
+			(ulong) ss->refcnt));
 		spin_lock(&ss_lock);
 		if ((*ss->prev = ss->next))
 			ss->next->prev = ss->prev;
@@ -16124,6 +16180,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 #if defined LFS
 	{
 		unsigned long flags = freezestr(q);
+
 		/* Pre-allocate queue band structures on the read side. */
 		if ((err = strqset(q, QHIWAT, 1, STRHIGH))) {
 			ptrace(("%s: ERROR: could not allocate queue band 1 structure, err = %d\n",

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/09/18 01:15:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/09/25 20:15:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:15:31 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 20:15:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.63  2006/09/25 20:15:55  brian
+# - minor formatting changes
+#
 # Revision 0.9.2.62  2006/09/18 01:15:31  brian
 # - add 32bit libs, release file changes, additional packages
 #
@@ -114,13 +117,15 @@ if PUBLIC_RELEASE
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-EXTRA_PROGRAMS			+= test-inet_raw \
+EXTRA_PROGRAMS			+= \
+				  test-inet_raw \
 				  test-inet_udp \
 				  test-inet_tcp \
 				  test-inet_sctp \
 				  @PACKAGE_TARNAME@_mknod
 
-pkglibexec_PROGRAMS		= test-inet_raw \
+pkglibexec_PROGRAMS		= \
+				  test-inet_raw \
 				  test-inet_udp \
 				  test-inet_tcp
 
@@ -230,7 +235,7 @@ sbin_PROGRAMS			= \
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-@PACKAGE_TARNAME@_mknod_LDADD		= 
+@PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2006/09/18 13:20:11 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2006/09/25 20:15:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 13:20:11 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 20:15:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -344,7 +344,7 @@ AC_DEFUN([_INET_SETUP_MODULE], [dnl
 # =============================================================================
 # _INET_CONFIG_KERNEL
 # -----------------------------------------------------------------------------
-# These are a bunch of kernel configuraiton checks primarily in support of 2.5
+# These are a bunch of kernel configuration checks primarily in support of 2.5
 # and 2.6 kernels.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
