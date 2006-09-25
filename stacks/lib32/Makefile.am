@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/17 23:09:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/25 20:15:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/17 23:09:06 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 20:15:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/25 20:15:45  brian
+# - rationalized to strinet and strxnet
+#
 # Revision 0.9.2.1  2006/09/17 23:09:06  brian
 # - added lib32 compatibility directories
 #
@@ -129,7 +132,8 @@ if WITH_XNET
 
 lib32_LTLIBRARIES		+= libxnet.la
 
-libxnet_la_SOURCES		= $(top_srcdir)/src/lib/libxnet/xnet.c \
+libxnet_la_SOURCES		= $(top_srcdir)/src/lib/linxnet/pthread.c \
+				  $(top_srcdir)/src/lib/libxnet/xnet.c \
 				  $(top_srcdir)/gettext.h
 libxnet_la_LDFLAGS		= -no-undefined -version-info 0:0:0 $(MACHINE_FLAGS)
 libxnet_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(srcdir)/src/include/xti -I./src/include/xti

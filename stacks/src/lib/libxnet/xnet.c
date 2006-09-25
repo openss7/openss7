@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/18 13:52:50 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/25 20:15:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This library is free software; you can redistribute it and/or modify it under
  the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; either version 2.1 of the License, or (at your option)
- any later version.
+ Software Foundation; version 2.1 of the License.
 
  This library is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,15 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:50 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 20:15:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/18 13:52:50 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/25 20:15:46 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/18 13:52:50 $";
+static char const ident[] =
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/25 20:15:46 $";
 
 /* This file can be processed with doxygen(1). */
+
+/** @weakgroup xnet OpenSS7 XNET Library
+  * @{ */
+
+/** @file
+  * OpenSS7 X/Open Networking Library (XNET) implementation file.  */
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -66,26 +72,31 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #define __USE_GNU
 #endif
 
-/*
-   strangely unistd.h defines _SC_T_IOV_MAX as 1 
- */
-#if 0
-#define _SC_T_IOV_MAX		1
-#endif
+/** @name System Configuration Names
+  * These are system configuration names for use with t_sysconf().  Note that
+  * _SC_T_IOV_MAX is already set to 1 by glibc header files in <unistd.h>.
+  * Well, used to, not any more, it is some really big number.
+  * @{ */
+//#define _SC_T_IOV_MAX         1       /**< IOV maximum. */
+#define _SC_T_DEFAULT_ADDRLEN	2	/**< Default address length. */
+#define _SC_T_DEFAULT_CONNLEN	3	/**< Default connect data length. */
+#define _SC_T_DEFAULT_DISCLEN	4	/**< Default disconnect data length. */
+#define _SC_T_DEFAULT_OPTLEN	5	/**< Default option length. */
+#define _SC_T_DEFAULT_DATALEN	6	/**< Default data length. */
+/** @} */
 
-#define _SC_T_DEFAULT_ADDRLEN	2
-#define _SC_T_DEFAULT_CONNLEN	3
-#define _SC_T_DEFAULT_DISCLEN	4
-#define _SC_T_DEFAULT_OPTLEN	5
-#define _SC_T_DEFAULT_DATALEN	6
-
-#define _T_DEFAULT_ADDRLEN	128
-#define _T_DEFAULT_CONNLEN	256
-#define _T_DEFAULT_DISCLEN	256
-#define _T_DEFAULT_OPTLEN	256
-#define _T_DEFAULT_DATALEN	1024
-#define _T_TIMEOUT		-1
-#define _T_IOV_MAX		16
+/** @name System Configuration Values Defaults
+  * These are the default values for the corresponding system configuration names and are the default
+  * values returned by t_sysconf().
+  * @{ */
+#define _T_DEFAULT_ADDRLEN	128	/**< Default address length. */
+#define _T_DEFAULT_CONNLEN	256	/**< Default connect data length. */
+#define _T_DEFAULT_DISCLEN	256	/**< Default disconnect data length. */
+#define _T_DEFAULT_OPTLEN	256	/**< Default options length. */
+#define _T_DEFAULT_DATALEN	16384	/**< Default user data length. */
+#define _T_TIMEOUT		-1	/**< Default timeout value for library ioctl. */
+#define _T_IOV_MAX		16	/**< IOV maximum. */
+/** @} */
 
 #define NEED_T_USCALAR_T 1
 
@@ -94,6 +105,9 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #include "gettext.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
 #include <sys/stropts.h>
 #include <sys/poll.h>
 #include <fcntl.h>
@@ -109,9 +123,13 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #else
-# ifdef defined HAVE_STDINT_H
+# ifdef HAVE_STDINT_H
 #  include <stdint.h>
 # endif
+#endif
+
+#ifndef __EXCEPTIONS
+#define __EXCEPTIONS 1
 #endif
 
 #include <unistd.h>
@@ -132,328 +150,249 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #include <tihdr.h>
 #include <timod.h>
 
+#if defined __i386__ || defined __x86_64__ || defined __k8__
+#define fastcall __attribute__((__regparm__(3)))
+#else
+#define fastcall
+#endif
+
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
+
+#if __GNUC__ < 3
+#define inline inline fastcall __hot
+#define noinline extern fastcall __unlikely
+#else
+#define inline inline __attribute__((always_inline)) fastcall __hot
+#define noinline static __attribute__((noinline)) fastcall __unlikely
+#endif
+
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+
 #undef min
 #define min(a, b) (a < b ? a : b)
 
 /**
- * @defgroup libxnet OpenSS7 XNS/XTI Library
- * @brief OpenSS7 XNS/XTI Library Calls
- *
- * This manual contains documentation of the OpenSS7 XNS/XTI Library functions
- * that are generated automatically from the source code with doxygen.  This
- * documentation is intended to be used for maintainers of the OpenSS7 XNS/XTI
- * Library and is not intended for users of the OpenSS7 XNS/XTI Library.
- * Users should consult the documentation found in the user manual pages
- * beginning with xti(3).
- *
- * <h2>Thread Safety</h2>
- * The OpenSS7 XNS/XTI Library is design to be thread-safe.  This is
- * accomplished in a number of ways.  Thread-safety depends on the use of
- * glibc2 and the pthreads library.
- *
- * Glibc2 provides lightweight thread-specific data for errno and h_errno.
- * Because h_errno uses communications function orthoginal to the XTI Library
- * services, we borrow h_errno and use it for t_errno.  This does not cause a
- * problem because neither h_errno nor t_errno need to maintain their value
- * accross any other system call.
- *
- * Glibc2 also provides some weak undefined aliases for POSIX thread functions
- * to peform its own thread-safety.  When the pthread library (libpthread) is
- * linked with glibc2, these functions call libpthread functions instead
- * of internal dummy routines.  The same approach is taken for the OpenSS7
- * XNS/XTI Library.  The library uses weak defined and undefined aliases that
- * automatically invoke libpthread functions when libpthread is (dynamically)
- * linked and uses dummy functions when it is not.  This maintains maximum
- * efficiency when libpthread is not dynamically linked, but provides full
- * thread safety when it is.
- *
- * Libpthread behaves in some strange ways with regards to thread
- * cancellation.  Because libpthread uses Linux clone processes for threads,
- * cancellation of a thread is accomplished by sending a signal to the thread
- * process.  This does not directly result in cancellation, but will result in
- * the failure of a system call with the EINTR error code.  It is necessary to
- * test for cancellation upon error return from system calls to perform the
- * actual cancellation of the thread.
- *
- * The XTI sepcification (OpenGroup XNS 5.2) lists the following functions as
- * being thread cancellation points: t_close(), t_connect(), t_listen(),
- * t_rcv(), t_rcvconnect(), t_rcvrel(), t_rcvreldata(), t_rcvudata(), t_rcvv,
- * t_rcvvudata(), t_snd(), t_sndrel(), t_sndreldata(), t_sndudata(), t_sndv(),
- * t_sndvudata().
- *
- * The OpenSS7 XNS/XTI Library adds the following functions that operate on
- * data or expedited data with options that are not present in the XNS 5.2
- * specifications, that are also thread cancellation points: t_rcvopt(),
- * t_rcvvopt(), t_sndopt(), t_sndvopt().
- *
- * Other XTI functions are not permitted by XNS 5.2 to be thread cancellation
- * points.  Any function that cannot be a thread cancellation point needs to
- * have its cancellation status deferred if it internally invokes a function
- * that permits thread cancellation.  Functions that do not permit thread
- * cancellation are: t_accept(), t_addleaf(), t_alloc(), t_bind(), t_error(),
- * t_free(), t_getinfo(), t_getprotaddr(), t_getstate(), t_look(), t_open(),
- * t_optmgmt(), t_rcvdis(), t_rcvleafchange(), t_rcvuderr(), t_removeleaf(),
- * t_snddis(), t_strerror(), t_sync(), t_sysconf(), t_unbind().
- *
- * Locks and asynchronous thread cancellation present challenges:
- *
- * Functions that act as thread cancellation points must push routines onto
- * the function stack executed at exit of the thread to release the locks held
- * by the function.  These are performed with weak definitions of POSIX thread
- * library functions.
- *
- * Functions that do not act as thread cancellation points must defer thread
- * cancellation before taking locks and then release locks before thread
- * canceallation is restored.
- *
- * The above are the techniques used by glibc2 for the same purpose and is the
- * same technique that is used by the OpenSS7 XNS/XTI library.
- *
- * @{
+  * This manual contains documentation of the OpenSS7 XNS/XTI Library functions
+  * that are generated automatically from the source code with doxygen.  This
+  * documentation is intended to be used for maintainers of the OpenSS7 XNS/XTI
+  * Library and is not intended for users of the OpenSS7 XNS/XTI Library.
+  * Users should consult the documentation found in the user manual pages
+  * beginning with xti(3).
+  *
+  * <h2>Thread Safety</h2>
+  * The OpenSS7 XNS/XTI Library is design to be thread-safe.  This is
+  * accomplished in a number of ways.  Thread-safety depends on the use of
+  * glibc2 and the pthreads library.
+  *
+  * Glibc2 provides lightweight thread-specific data for errno and h_errno.
+  * Because h_errno uses communications function orthoginal to the XTI Library
+  * services, we borrow h_errno and use it for t_errno.  This does not cause a
+  * problem because neither h_errno nor t_errno need to maintain their value
+  * accross any other system call.
+  *
+  * Glibc2 also provides some weak undefined aliases for POSIX thread functions
+  * to peform its own thread-safety.  When the pthread library (libpthread) is
+  * linked with glibc2, these functions call libpthread functions instead
+  * of internal dummy routines.  The same approach is taken for the OpenSS7
+  * XNS/XTI Library.  The library uses weak defined and undefined aliases that
+  * automatically invoke libpthread functions when libpthread is (dynamically)
+  * linked and uses dummy functions when it is not.  This maintains maximum
+  * efficiency when libpthread is not dynamically linked, but provides full
+  * thread safety when it is.
+  *
+  * Libpthread behaves in some strange ways with regards to thread
+  * cancellation.  Because libpthread uses Linux clone processes for threads,
+  * cancellation of a thread is accomplished by sending a signal to the thread
+  * process.  This does not directly result in cancellation, but will result in
+  * the failure of a system call with the EINTR error code.  It is necessary to
+  * test for cancellation upon error return from system calls to perform the
+  * actual cancellation of the thread.
+  *
+  * The XTI sepcification (OpenGroup XNS 5.2) lists the following functions as
+  * being thread cancellation points: t_close(), t_connect(), t_listen(),
+  * t_rcv(), t_rcvconnect(), t_rcvrel(), t_rcvreldata(), t_rcvudata(), t_rcvv,
+  * t_rcvvudata(), t_snd(), t_sndrel(), t_sndreldata(), t_sndudata(), t_sndv(),
+  * t_sndvudata().
+  *
+  * The OpenSS7 XNS/XTI Library adds the following functions that operate on
+  * data or expedited data with options that are not present in the XNS 5.2
+  * specifications, that are also thread cancellation points: t_rcvopt(),
+  * t_rcvvopt(), t_sndopt(), t_sndvopt().
+  *
+  * Other XTI functions are not permitted by XNS 5.2 to be thread cancellation
+  * points.  Any function that cannot be a thread cancellation point needs to
+  * have its cancellation status deferred if it internally invokes a function
+  * that permits thread cancellation.  Functions that do not permit thread
+  * cancellation are: t_accept(), t_addleaf(), t_alloc(), t_bind(), t_error(),
+  * t_free(), t_getinfo(), t_getprotaddr(), t_getstate(), t_look(), t_open(),
+  * t_optmgmt(), t_rcvdis(), t_rcvleafchange(), t_rcvuderr(), t_removeleaf(),
+  * t_snddis(), t_strerror(), t_sync(), t_sysconf(), t_unbind().
+  *
+  * Locks and asynchronous thread cancellation present challenges:
+  *
+  * Functions that act as thread cancellation points must push routines onto
+  * the function stack executed at exit of the thread to release the locks held
+  * by the function.  These are performed with weak definitions of POSIX thread
+  * library functions.
+  *
+  * Functions that do not act as thread cancellation points must defer thread
+  * cancellation before taking locks and then release locks before thread
+  * canceallation is restored.
+  *
+  * The above are the techniques used by glibc2 for the same purpose and is the
+  * same technique that is used by the OpenSS7 XNS/XTI library.
+  */
+
+struct __xnet_tsd {
+	int terrno;
+};
+
+/*
+ *  Once condition for Thread-Specific Data key creation.
  */
+static pthread_once_t __xnet_tsd_once = PTHREAD_ONCE_INIT;
 
-extern void __pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg);
-extern void __pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute);
-extern void __pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg);
-extern void __pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute);
-extern void __pthread_testcancel(void);
-extern int __pthread_setcanceltype(int type, int *oldtype);
+/*
+ *  XNET library Thread-Specific Data key.
+ */
+static pthread_key_t __xnet_tsd_key = 0;
 
-extern int __pthread_rwlock_init(pthread_rwlock_t * rwlock, const pthread_rwlockattr_t * attr);
-extern int __pthread_rwlock_rdlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_wrlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_unlock(pthread_rwlock_t * rwlock);
-extern int __pthread_rwlock_destroy(pthread_rwlock_t * rwlock);
-
-#pragma weak __pthread_cleanup_push
-#pragma weak __pthread_cleanup_pop
-#pragma weak __pthread_cleanup_push_defer
-#pragma weak __pthread_cleanup_pop_restore
-#pragma weak __pthread_testcancel
-#pragma weak __pthread_setcanceltype
-
-#pragma weak __pthread_rwlock_init
-#pragma weak __pthread_rwlock_rdlock
-#pragma weak __pthread_rwlock_wrlock
-#pragma weak __pthread_rwlock_unlock
-#pragma weak __pthread_rwlock_destroy
-
-#pragma weak _pthread_cleanup_push
-#pragma weak _pthread_cleanup_pop
-#pragma weak _pthread_cleanup_push_defer
-#pragma weak _pthread_cleanup_pop_restore
-#pragma weak pthread_testcancel
-#pragma weak pthread_setcanceltype
-
-#pragma weak pthread_rwlock_init
-#pragma weak pthread_rwlock_rdlock
-#pragma weak pthread_rwlock_wrlock
-#pragma weak pthread_rwlock_unlock
-#pragma weak pthread_rwlock_destroy
-
-void
-_pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg)
+static void
+__xnet_tsd_free(void *buf)
 {
-	if (__pthread_cleanup_push)
-		return __pthread_cleanup_push(buffer, routine, arg);
-	buffer->__routine = routine;
-	buffer->__arg = arg;
-	buffer->__canceltype = 0;
-	buffer->__prev = NULL;
+	pthread_setspecific(__xnet_tsd_key, NULL);
+	free(buf);
 }
 
-void
-_pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute)
+static void
+__xnet_tsd_alloc(void)
 {
-	if (__pthread_cleanup_pop)
-		return __pthread_cleanup_pop(buffer, execute);
-	if (execute)
-		(*buffer->__routine) (buffer->__arg);
-}
+	int ret;
+	void *buf;
 
-void
-_pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg)
-{
-	if (__pthread_cleanup_push_defer)
-		return __pthread_cleanup_push_defer(buffer, routine, arg);
-	buffer->__routine = routine;
-	buffer->__arg = arg;
-	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &buffer->__canceltype);
-	buffer->__prev = NULL;
-}
-
-void
-_pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute)
-{
-	if (__pthread_cleanup_pop_restore)
-		return __pthread_cleanup_pop_restore(buffer, execute);
-	if (execute)
-		(*buffer->__routine) (buffer->__arg);
-	pthread_setcanceltype(buffer->__canceltype, NULL);
-}
-
-void
-pthread_testcancel(void)
-{
-	if (__pthread_testcancel)
-		return __pthread_testcancel();
+	ret = pthread_key_create(&__xnet_tsd_key, __xnet_tsd_free);
+	buf = malloc(sizeof(struct __xnet_tsd));
+	bzero(buf, sizeof(*buf));
+	ret = pthread_setspecific(__xnet_tsd_key, buf);
 	return;
 }
 
-int
-pthread_setcanceltype(int type, int *oldtype)
+static struct __xnet_tsd *
+__xnet_get_tsd(void)
 {
-	if (__pthread_setcanceltype)
-		return __pthread_setcanceltype(type, oldtype);
-	if (oldtype)
-		*oldtype = type;
-	return (0);
-}
-
-int
-pthread_rwlock_init(pthread_rwlock_t * rwlock, const pthread_rwlockattr_t * attr)
-{
-	if (__pthread_rwlock_init)
-		return __pthread_rwlock_init(rwlock, attr);
-	*(char *) rwlock = 0;
-	return (0);
-}
-
-int
-pthread_rwlock_rdlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_rdlock)
-		return __pthread_rwlock_rdlock(rwlock);
-	*(char *) rwlock = *(char *) rwlock + 1;
-	return (0);
-}
-
-int
-pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_wrlock)
-		return __pthread_rwlock_wrlock(rwlock);
-	*(char *) rwlock = *(char *) rwlock - 1;
-	return (0);
-}
-
-int
-pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_unlock)
-		return __pthread_rwlock_unlock(rwlock);
-	if (*(char *) rwlock > 0)
-		*(char *) rwlock = *(char *) rwlock - 1;
-	else
-		*(char *) rwlock = 0;
-	return (0);
-}
-
-int
-pthread_rwlock_destroy(pthread_rwlock_t * rwlock)
-{
-	if (__pthread_rwlock_destroy)
-		return __pthread_rwlock_destroy(rwlock);
-	*(char *) rwlock = 0xff;
-	return (0);
-}
-
-int __xnet_t_errno;
-
-extern int *__h_errno_location(void);
-#pragma weak __h_errno_location
-
-#pragma weak __t_errno_location
-int *
-__t_errno_location(void)
-{
-	if (__h_errno_location != 0)
-		return __h_errno_location();
-	return &__xnet_t_errno;
-}
-
-int *
-_t_errno(void)
-{
-	return __t_errno_location();
-}
-
-struct _t_user {
-	pthread_rwlock_t lock;		/* lock for this structure */
-	int refs;			/* number of references to this structure */
-	int event;			/* pending t_look() events */
-	int flags;			/* user flags */
-	int fflags;			/* file flags */
-	int gflags;			/* getmsg flags */
-	int state;			/* XTI state */
-	int statef;			/* TPI state flag */
-	int prim;			/* last received TLI primitive */
-	int qlen;			/* length of the listen queue */
-	int ocnt;			/* outstanding connection indications */
-	u_int8_t moredat;		/* more data in T_DATA_IND/T_OPTDATA_IND */
-	u_int8_t moresdu;		/* more tsdu */
-	u_int8_t moreexp;		/* more data in T_EXDATA_IND/T_OPTDATA_IND */
-	u_int8_t moreedu;		/* more etsdu */
-	u_int8_t moremsg;		/* more data with dis/con/rel message */
-	int ctlmax;			/* maximum size of ctlbuf */
-	char *ctlbuf;			/* ctrl part buffer */
-	int datmax;			/* maximum size of datbuf */
-	char *datbuf;			/* data part buffer */
-	uint token;			/* acceptor id */
-	struct strbuf ctrl;		/* ctrl part of received message */
-	struct strbuf data;		/* data part of received message */
-	struct t_info info;		/* information structure */
+	pthread_once(&__xnet_tsd_once, __xnet_tsd_alloc);
+	return (struct __xnet_tsd *) pthread_getspecific(__xnet_tsd_key);
 };
 
-#define TUF_FLOW_NORM		01	/* was flow controlled for normal messages */
-#define TUF_FLOW_EXP		02	/* was flow controlled for expedited messages */
-#define TUF_SYNC_REQUIRED	04	/* t_sync() required */
-#define TUF_WACK_INFO		010	/* waiting for T_INFO_ACK */
-#define TUF_WACK_OPTMGMT	020	/* waiting for T_OPTMGMT_ACK */
-#define TUF_WACK_ADDR		040	/* waiting for T_ADDR_ACK */
-#define TUF_WACK_CAPABILITY	0100	/* waitinf for T_CAPABILITY_ACK */
-#define TUF_WACK_GETADDR	0200	/* waiting for T_GETADDR_ACK */
-#define TUF_WACK_OK		0400	/* waiting for T_OK_ACK */
-#define TUF_WACK_BIND		01000	/* waiting for T_BIND_ACK */
-#define TUF_MORE_DATA		02000	/* more data left on receive queue */
+/** @brief #t_errno location function.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of _t_errno().
+  */
+int *
+__xnet__t_errno(void)
+{
+	return &(__xnet_get_tsd()->terrno);
+}
+
+/** @fn int *_t_errno(void)
+  * @version XNET_1.0
+  * @par Alias:
+  * This symbol is a strong alias of __xnet__t_errno().
+  *
+  * This function provides the location of the integer that contains the XTI/TLI
+  * error number returned by the last XTI function that failed.  This is
+  * normally used to provide #t_errno in a thread-safe way as follows:
+  *
+  * @code
+  * #define t_errno (*(_t_errno()))
+  * @endcode
+  */
+__asm__(".symver __xnet__t_errno,_t_errno@@XNET_1.0");
+
+struct _t_user {
+	pthread_rwlock_t lock;		/**< lock for this structure */
+	int refs;			/**< number of references to this structure */
+	int event;			/**< pending t_look() events */
+	int flags;			/**< user flags */
+	int fflags;			/**< file flags */
+	int gflags;			/**< getmsg flags */
+	int state;			/**< XTI state */
+	int statef;			/**< TPI state flag */
+	int prim;			/**< last received TLI primitive */
+	int qlen;			/**< length of the listen queue */
+	int ocnt;			/**< outstanding connection indications */
+	u_int8_t moredat;		/**< more data in T_DATA_IND/T_OPTDATA_IND */
+	u_int8_t moresdu;		/**< more tsdu */
+	u_int8_t moreexp;		/**< more data in T_EXDATA_IND/T_OPTDATA_IND */
+	u_int8_t moreedu;		/**< more etsdu */
+	u_int8_t moremsg;		/**< more data with dis/con/rel message */
+	int ctlmax;			/**< maximum size of ctlbuf */
+	char *ctlbuf;			/**< ctrl part buffer */
+	int datmax;			/**< maximum size of datbuf */
+	char *datbuf;			/**< data part buffer */
+	uint token;			/**< acceptor id */
+	struct strbuf ctrl;		/**< ctrl part of received message */
+	struct strbuf data;		/**< data part of received message */
+	struct t_info info;		/**< information structure */
+};
+
+/** @name Transport User Flags
+  * Flags for the _t_user::flags member of the struct _t_user structure.
+  * @{ */
+#define TUF_FLOW_NORM		01	/**< Was flow controlled for normal messages. */
+#define TUF_FLOW_EXP		02	/**< Was flow controlled for expedited messages. */
+#define TUF_SYNC_REQUIRED	04	/**< t_sync() required. */
+#define TUF_WACK_INFO		010	/**< Waiting for T_INFO_ACK. */
+#define TUF_WACK_OPTMGMT	020	/**< Waiting for T_OPTMGMT_ACK. */
+#define TUF_WACK_ADDR		040	/**< Waiting for T_ADDR_ACK. */
+#define TUF_WACK_CAPABILITY	0100	/**< Waitinf for T_CAPABILITY_ACK. */
+#define TUF_WACK_GETADDR	0200	/**< Waiting for T_GETADDR_ACK. */
+#define TUF_WACK_OK		0400	/**< Waiting for T_OK_ACK. */
+#define TUF_WACK_BIND		01000	/**< Waiting for T_BIND_ACK. */
+#define TUF_MORE_DATA		02000	/**< More data left on receive queue. */
+/** @} */
 
 #ifndef T_ACK
-#define T_ACK (-2)		/* for now */
+#define T_ACK (-2)		/**< for now */
 #endif
 
 static struct _t_user *_t_fds[OPEN_MAX] = { NULL, };
 
-/*
-   State flags 
- */
-#define TSF_UNBND	(1 << TS_UNBND		)
-#define TSF_WACK_BREQ	(1 << TS_WACK_BREQ	)
-#define TSF_WACK_UREQ	(1 << TS_WACK_UREQ	)
-#define TSF_IDLE	(1 << TS_IDLE		)
-#define TSF_WACK_OPTREQ	(1 << TS_WACK_OPTREQ	)
-#define TSF_WACK_CREQ	(1 << TS_WACK_CREQ	)
-#define TSF_WCON_CREQ	(1 << TS_WCON_CREQ	)
-#define TSF_WRES_CIND	(1 << TS_WRES_CIND	)
-#define TSF_WACK_CRES	(1 << TS_WACK_CRES	)
-#define TSF_DATA_XFER	(1 << TS_DATA_XFER	)
-#define TSF_WIND_ORDREL	(1 << TS_WIND_ORDREL	)
-#define TSF_WREQ_ORDREL	(1 << TS_WREQ_ORDREL	)
-#define TSF_WACK_DREQ6	(1 << TS_WACK_DREQ6	)
-#define TSF_WACK_DREQ7	(1 << TS_WACK_DREQ7	)
-#define TSF_WACK_DREQ9	(1 << TS_WACK_DREQ9	)
-#define TSF_WACK_DREQ10	(1 << TS_WACK_DREQ10	)
-#define TSF_WACK_DREQ11	(1 << TS_WACK_DREQ11	)
-/**
- * @internal
- * @brief set the state of the endpoint to a constant state
- * @param user a pointer to the _t_user structure for this endpoint.
- * @param state the constant state value to set.
- * 
- * This inline function sets the state of the the transport endpoint in the
- * user structure to the constate state specified.  This function is an inline
- * accepting a constant so that the compiler can inline just the appropriate
- * case value.
- */
+/** @name Transport State Flags
+  * Efficiency for avoiding case statements with two results for multiple
+  * states.
+  * @{ */
+#define TSF_UNBND	(1 << TS_UNBND		)   /**< Unbound state. */
+#define TSF_WACK_BREQ	(1 << TS_WACK_BREQ	)   /**< Waiting for a T_BIND_ACK. */
+#define TSF_WACK_UREQ	(1 << TS_WACK_UREQ	)   /**< Waiting for a T_OK_ACK. */
+#define TSF_IDLE	(1 << TS_IDLE		)   /**< Idle state. */
+#define TSF_WACK_OPTREQ	(1 << TS_WACK_OPTREQ	)   /**< Waiting to receive a T_OPTMGMT_ACK. */
+#define TSF_WACK_CREQ	(1 << TS_WACK_CREQ	)   /**< Waiting to receive a T_OK_ACK. */
+#define TSF_WCON_CREQ	(1 << TS_WCON_CREQ	)   /**< Waiting to receive a T_CONN_CON. */
+#define TSF_WRES_CIND	(1 << TS_WRES_CIND	)   /**< Waiting to send a T_CONN_RES. */
+#define TSF_WACK_CRES	(1 << TS_WACK_CRES	)   /**< Waiting to send a T_OK_ACK. */
+#define TSF_DATA_XFER	(1 << TS_DATA_XFER	)   /**< Data Transfer state. */
+#define TSF_WIND_ORDREL	(1 << TS_WIND_ORDREL	)   /**< Waiting to receive a T_ORDREL_IND. */
+#define TSF_WREQ_ORDREL	(1 << TS_WREQ_ORDREL	)   /**< Waiting to send a T_ORDREL_REQ. */
+#define TSF_WACK_DREQ6	(1 << TS_WACK_DREQ6	)   /**< Waiting to receive a T_OK_ACK. */
+#define TSF_WACK_DREQ7	(1 << TS_WACK_DREQ7	)   /**< Waiting to receive a T_OK_ACK. */
+#define TSF_WACK_DREQ9	(1 << TS_WACK_DREQ9	)   /**< Waiting to receive a T_OK_ACK. */
+#define TSF_WACK_DREQ10	(1 << TS_WACK_DREQ10	)   /**< Waiting to receive a T_OK_ACK. */
+#define TSF_WACK_DREQ11	(1 << TS_WACK_DREQ11	)   /**< Waiting to receive a T_OK_ACK. */
+/** @} */
+
+/** @internal
+  * @brief Set the state of the endpoint to a constant state.
+  * @param user a pointer to the _t_user structure for this endpoint.
+  * @param state the constant state value to set.
+  * 
+  * This inline function sets the state of the the transport endpoint in the
+  * user structure to the constate state specified.  This function is an inline
+  * accepting a constant so that the compiler can inline just the appropriate
+  * case value.  */
 static inline void
 __xnet_u_setstate_const(struct _t_user *user, const int state)
 {
@@ -494,16 +433,15 @@ __xnet_u_setstate_const(struct _t_user *user, const int state)
 	}
 }
 
-/**
- * @internal
- * @brief set the state of the endpoint to a variable state
- * @param user a pointer to the _t_user structure for this endpoint.
- * @param state the variable state value to set.
- *
- * Sets the state of the transport endpoint in the user structure to the
- * variable state specified.  This is in contrast to the inline version.  @see
- * __xnet_u_setstate_const.
- */
+/** @internal
+  * @brief Set the state of the endpoint to a variable state.
+  * @param user a pointer to the _t_user structure for this endpoint.
+  * @param state the variable state value to set.
+  *
+  * Sets the state of the transport endpoint in the user structure to the
+  * variable state specified.  This is in contrast to the inline version.  @see
+  * __xnet_u_setstate_const.
+  */
 static void
 __xnet_u_setstate(struct _t_user *user, int state)
 {
@@ -544,16 +482,14 @@ __xnet_u_setstate(struct _t_user *user, int state)
 	}
 }
 
-/**
- * @internal
- * @brief set the current event.
- * @param user a pointer to the _t_user structure for this endpoint.
- * @param prim the TPI primitive associated with the event.
- * @param flags the flags associated with a @c T_OPTDATA_IND primitive.
- * 
- * Sets the current event in the transport endpoint user structure according
- * to the current primitive.
- */
+/** @internal
+  * @brief Set the current event.
+  * @param user a pointer to the _t_user structure for this endpoint.
+  * @param prim the TPI primitive associated with the event.
+  * @param flags the flags associated with a @c T_OPTDATA_IND primitive.
+  * 
+  * Sets the current event in the transport endpoint user structure according
+  * to the current primitive.  */
 static inline int
 __xnet_u_setevent(struct _t_user *user, int prim, int flags)
 {
@@ -583,14 +519,12 @@ __xnet_u_setevent(struct _t_user *user, int prim, int flags)
 	}
 }
 
-/**
- * @internal
- * @brief reset (consume) the current event.
- * @param user a pointer to the _t_user structure for this endpoint.
- *
- * Resets (or consumes) the current event.  All event information within the
- * specified user structure is reset.
- */
+/** @internal
+  * @brief Reset (consume) the current event.
+  * @param user a pointer to the _t_user structure for this endpoint.
+  *
+  * Resets (or consumes) the current event.  All event information within the
+  * specified user structure is reset.  */
 static void
 __xnet_u_reset_event(struct _t_user *user)
 {
@@ -609,9 +543,8 @@ __xnet_u_reset_event(struct _t_user *user)
 		user->moreedu = 0;
 		user->moremsg = 0;
 	} else {
-		/*
-		   When we are clearing an expedited data event, we must revert to an outstanding data event. 
-		 */
+		/** When we are clearing an expedited data event, we must revert to an outstanding
+		   data event. */
 		user->prim = 0;
 		user->event = T_DATA;
 		user->ctrl.maxlen = user->ctlmax;
@@ -626,41 +559,47 @@ __xnet_u_reset_event(struct _t_user *user)
 	}
 }
 
-static int
+static inline int
 __xnet_u_max_addr(struct _t_user *user)
 {
-	return (user->info.addr == T_INFINITE ? MAXINT : (user->info.addr >= 0 ? user->info.addr : 0));
+	return (user->info.addr == T_INFINITE
+		? MAXINT : (user->info.addr >= 0 ? user->info.addr : 0));
 }
-static int
+static inline int
 __xnet_u_max_options(struct _t_user *user)
 {
-	return (user->info.options == T_INFINITE ? MAXINT : (user->info.options >= 0 ? user->info.options : 0));
+	return (user->info.options == T_INFINITE
+		? MAXINT : (user->info.options >= 0 ? user->info.options : 0));
 }
-static int
+static inline int
 __xnet_u_max_tsdu(struct _t_user *user)
 {
-	return ((user->info.tsdu == T_INFINITE
-		 || user->info.tsdu == T_INVALID) ? MAXINT : (user->info.tsdu >= 0 ? user->info.tsdu : 0));
+	return ((user->info.tsdu == T_INFINITE || user->info.tsdu == 0)
+		? MAXINT : (user->info.tsdu >= 0 ? user->info.tsdu : 0));
 }
-static int
+static inline int
 __xnet_u_max_etsdu(struct _t_user *user)
 {
-	return (user->info.etsdu == T_INFINITE ? MAXINT : (user->info.etsdu >= 0 ? user->info.etsdu : 0));
+	return ((user->info.etsdu == T_INFINITE || user->info.etsdu == 0)
+		? MAXINT : (user->info.etsdu >= 0 ? user->info.etsdu : 0));
 }
-static int
+static inline int
 __xnet_u_max_connect(struct _t_user *user)
 {
-	return (user->info.connect == T_INFINITE ? MAXINT : (user->info.connect >= 0 ? user->info.connect : 0));
+	return (user->info.connect == T_INFINITE
+		? MAXINT : (user->info.connect >= 0 ? user->info.connect : 0));
 }
-static int
+static inline int
 __xnet_u_max_discon(struct _t_user *user)
 {
-	return (user->info.discon == T_INFINITE ? MAXINT : (user->info.discon >= 0 ? user->info.discon : 0));
+	return (user->info.discon == T_INFINITE
+		? MAXINT : (user->info.discon >= 0 ? user->info.discon : 0));
 }
-static int
+static inline int
 __xnet_u_max_tidu(struct _t_user *user)
 {
-	return (user->info.tidu == T_INFINITE ? MAXINT : (user->info.tidu >= 0 ? user->info.tidu : 0));
+	return (user->info.tidu == T_INFINITE
+		? MAXINT : (user->info.tidu >= 0 ? user->info.tidu : 0));
 }
 
 /*
@@ -671,7 +610,9 @@ static int __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int
 static int __xnet_t_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int flags);
 static int __xnet_t_ioctl(int fd, int cmd, void *arg);
 static int __xnet_t_strioctl(int fd, int cmd, void *arg, size_t arglen);
+int __xnet_t_peek(int fd);
 
+#if 0
 int __xnet_t_accept(int fd, int resfd, const struct t_call *call);
 int __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr);
 char *__xnet_t_alloc(int fd, int type, int fields);
@@ -683,7 +624,6 @@ int __xnet_t_getinfo(int fd, struct t_info *info);
 int __xnet_t_getstate(int fd);
 int __xnet_t_listen(int fd, struct t_call *call);
 int __xnet_t_look(int fd);
-int __xnet_t_peek(int fd);
 int __xnet_t_open(const char *path, int oflag, struct t_info *info);
 int __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret);
 int __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags);
@@ -695,7 +635,8 @@ int __xnet_t_rcvreldata(int fd, struct t_discon *discon);
 int __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags);
 int __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags);
 int __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags);
-int __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags);
+int __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+		       unsigned int iovcount, int *flags);
 int __xnet_t_removeleaf(int fd, int leafid, int reason);
 int __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags);
 int __xnet_t_snddis(int fd, const struct t_call *call);
@@ -706,52 +647,87 @@ int __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_io
 		     unsigned int iovcount, int flags);
 int __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata);
 int __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags);
-#if 0
-int __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags);
-#endif
-int __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount);
+int __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+		       unsigned int iovcount);
 int __xnet_t_sysconf(int name);
 int __xnet_t_unbind(int fd);
 const char *__xnet_t_strerror(int errnum);
+#endif
 
-/**
- * @internal
- * @brief a version of getmsg with XTI errors
- * @param fd a file descriptor representing the transport endpoint.
- * @param ctrl a pointer to a strbuf structure returning the control part of
- * the message.
- * @param data a pointer to a strbuf structure returning the data part of the
- * message.
- * @param flagsp a pointer to an integer returning the flags associated with
- * the retrieved message.
- * 
- * This is the same as getmsg(2) with the exception that XTI errors are
- * returned.
- *
- * @since Sun Dec 21 19:23:52 MST 2003
- *
- * @return When __xnet_t_getmsg() succeeds, it returns zero (0); when it
- * fails, it returns -1.
- *
- * @par Errors
- *
- * __xnet_t_getmsg() can return the following XTI errors:
- *
- * <dl>
- * <dt>TBADF</dt>
- * <dd>fd is not associated with a file open for reading or is a directory
- * rather than a file.</dd>
- * <dt>TNODATA</dt>
- * <dd>O_NONBLOCK was set on open() or with fcntl() and no data is available
- * to be read.</dd>
- * <dt>TSYSERR</dt>
- * <dd>A Linux system error occured and the error number  is in errno.</dd>
- * </dl>
- */
+#if 0
+int __xnet_t_accept_r(int fd, int resfd, const struct t_call *call);
+int __xnet_t_addleaf_r(int fd, int leafid, struct netbuf *addr);
+char *__xnet_t_alloc_r(int fd, int type, int fields);
+int __xnet_t_bind_r(int fd, const struct t_bind *req, struct t_bind *ret);
+int __xnet_t_close_r(int fd);
+int __xnet_t_connect_r(int fd, const struct t_call *sndcall, struct t_call *rcvcall);
+int __xnet_t_getinfo_r(int fd, struct t_info *info);
+int __xnet_t_getstate_r(int fd);
+int __xnet_t_listen_r(int fd, struct t_call *call);
+int __xnet_t_look_r(int fd);
+int __xnet_t_open_r(const char *path, int oflag, struct t_info *info);
+int __xnet_t_optmgmt_r(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret);
+int __xnet_t_rcv_r(int fd, char *buf, unsigned int nbytes, int *flags);
+int __xnet_t_rcvconnect_r(int fd, struct t_call *call);
+int __xnet_t_rcvdis_r(int fd, struct t_discon *discon);
+int __xnet_t_rcvleafchange_r(int fd, struct t_leaf_status *change);
+int __xnet_t_rcvrel_r(int fd);
+int __xnet_t_rcvreldata_r(int fd, struct t_discon *discon);
+int __xnet_t_rcvopt_r(int fd, struct t_unitdata *optdata, int *flags);
+int __xnet_t_rcvudata_r(int fd, struct t_unitdata *unitdata, int *flags);
+int __xnet_t_rcvv_r(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags);
+int __xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+			 unsigned int iovcount, int *flags);
+int __xnet_t_removeleaf_r(int fd, int leafid, int reason);
+int __xnet_t_snd_r(int fd, char *buf, unsigned int nbytes, int flags);
+int __xnet_t_snddis_r(int fd, const struct t_call *call);
+int __xnet_t_sndrel_r(int fd);
+int __xnet_t_sndreldata_r(int fd, struct t_discon *discon);
+int __xnet_t_sndopt_r(int fd, const struct t_unitdata *optdata, int flags);
+int __xnet_t_sndvopt_r(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov,
+		       unsigned int iovcount, int flags);
+int __xnet_t_sndudata_r(int fd, const struct t_unitdata *unitdata);
+int __xnet_t_sndv_r(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags);
+int __xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+			 unsigned int iovcount);
+int __xnet_t_unbind_r(int fd);
+#endif
+
+/** @internal
+  * @brief A version of getmsg with XTI errors.
+  * @param fd a file descriptor representing the transport endpoint.
+  * @param ctrl a pointer to a strbuf structure returning the control part of
+  * the message.
+  * @param data a pointer to a strbuf structure returning the data part of the
+  * message.
+  * @param flagsp a pointer to an integer returning the flags associated with
+  * the retrieved message.
+  * 
+  * This is the same as getmsg(2) with the exception that XTI errors are
+  * returned.
+  *
+  * @since Sun Dec 21 19:23:52 MST 2003
+  *
+  * @return When __xnet_t_getmsg() succeeds, it returns zero (0); when it
+  * fails, it returns -1.
+  *
+  * @par Errors
+  * __xnet_t_getmsg() can return the following XTI errors:
+  *
+  * @retval TBADF
+  * #fd is not associated with a file open for reading or is a directory
+  * rather than a file.
+  * @retval TNODATA
+  * @c O_NONBLOCK was set on open(2) or with fcntl(2) and no data is available
+  * to be read.
+  * @retval TSYSERR
+  * A Linux system error occured and the error number  is in errno(3).
+  */
 static int
 __xnet_t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flagsp)
 {
 	int ret;
+
 	if ((ret = getmsg(fd, ctrl, data, flagsp)) >= 0)
 		return (ret);
 	t_errno = TSYSERR;
@@ -778,22 +754,23 @@ __xnet_t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flagsp)
 }
 
 /**
- * @internal
- * @brief a version of putmsg with XTI errors
- * @param fd a file descriptor representing the transport endpoint.
- * @param ctrl a pointer to a strbuf structure describing the control part of
- * the message.
- * @param data a pointer to a strbuf structure describing the data part of the
- * message.
- * @param flags a flag integer describing the nature of the message.
- * 
- * This is the same as putmsg(2) with the exception that XTI errors are
- * returned.
- */
-static int
+  * @internal
+  * @brief A version of putmsg with XTI errors.
+  * @param fd a file descriptor representing the transport endpoint.
+  * @param ctrl a pointer to a strbuf structure describing the control part of
+  * the message.
+  * @param data a pointer to a strbuf structure describing the data part of the
+  * message.
+  * @param flags a flag integer describing the nature of the message.
+  * 
+  * This is the same as putmsg(2) with the exception that XTI errors are
+  * returned.
+  */
+static __hot int
 __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags)
 {
 	int ret;
+
 	if ((ret = putmsg(fd, ctrl, data, flags)) >= 0)
 		return (ret);
 	t_errno = TSYSERR;
@@ -820,23 +797,24 @@ __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags)
 }
 
 /**
- * @internal
- * @brief a version of putpmsg with XTI errors
- * @param fd a file descriptor representing the transport endpoint.
- * @param ctrl a pointer to a strbuf structure describing the control part of
- * the message.
- * @param data a pointer to a strbuf structure describing the data part of the
- * message.
- * @param band a band number describing the band for the message.
- * @param flags a flag integer describing the nature of the message.
- *
- * This is the same as putpmsg(2) with the exception that XTI errors are
- * returned.
- */
+  * @internal
+  * @brief A version of putpmsg with XTI errors.
+  * @param fd a file descriptor representing the transport endpoint.
+  * @param ctrl a pointer to a strbuf structure describing the control part of
+  * the message.
+  * @param data a pointer to a strbuf structure describing the data part of the
+  * message.
+  * @param band a band number describing the band for the message.
+  * @param flags a flag integer describing the nature of the message.
+  *
+  * This is the same as putpmsg(2) with the exception that XTI errors are
+  * returned.
+  */
 static int
 __xnet_t_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	int ret;
+
 	if ((ret = putpmsg(fd, ctrl, data, band, flags)) != -1)
 		return (ret);
 	t_errno = TSYSERR;
@@ -862,25 +840,23 @@ __xnet_t_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int
 	return (-1);
 }
 
-static int
+static __hot int
 __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 {
 	struct _t_user *user = _t_fds[fd];
 	int ret, flag = 0;
 	union T_primitives *p = (typeof(p)) user->ctlbuf;
-	switch (user->event) {
-	case T_DATA:
-	case T_EXDATA:
-		if (!(user->event & expect))
-			break;
-		if (user->data.len < 1)
+
+	if (likely(user->event == T_DATA) || likely(user->event == T_EXDATA)) {
+		if (unlikely(!(user->event & expect)))
+			goto done;
+		if (unlikely(user->data.len < 1))
 			goto getmoredata;
 		udata->len = min(udata->maxlen, user->data.len);
 		memcpy(udata->buf, user->data.buf, udata->len);
 		user->data.buf += udata->len;
 		user->data.len -= udata->len;
-		break;
-	case 0:
+	} else if (user->event == 0) {
 		__xnet_u_reset_event(user);
 	      getmoredata:
 		user->data.maxlen = min(udata->maxlen, user->datmax);
@@ -900,9 +876,8 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 		if (user->ctrl.len || user->data.len) {
 			if (user->event == 0 || user->ctrl.len > 0)
 				__xnet_u_setevent(user, user->ctrl.len ? p->type : -1, 0);
-			/*
-			   There is a little extra handling for data indications 
-			 */
+			/* 
+			   There is a little extra handling for data indications */
 			switch (user->prim) {
 			case -1:	/* just data */
 				user->moredat = ((ret & MOREDATA) != 0);
@@ -917,10 +892,12 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 				break;
 			case T_OPTDATA_IND:
 				if (p->optdata_ind.DATA_flag & T_ODF_EX) {
-					user->moreedu = ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
+					user->moreedu =
+					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moreexp = ((ret & MOREDATA) != 0);
 				} else {
-					user->moresdu = ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
+					user->moresdu =
+					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moredat = ((ret & MOREDATA) != 0);
 				}
 				break;
@@ -941,20 +918,18 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 			if ((user->event & expect))
 				user->data.len = 0;	/* consumed */
 			else {
-				/*
-				   didn't get what we were expecting, so we need to move any data from the user buffer
-				   back to the look buffer 
-				 */
+				/* 
+				   didn't get what we were expecting, so we need to move any data
+				   from the user buffer back to the look buffer */
 				if (user->data.len > 0)
 					memcpy(user->datbuf, user->data.buf, user->data.len);
 				user->data.buf = user->datbuf;
 				udata->len = 0;
 			}
 		}
-		break;
-	default:
+	} else
 		goto tlook;
-	}
+      done:
 	return (user->event);
       cleanup:
 	while (ret != -1 && (ret & (MORECTL | MOREDATA)))
@@ -975,22 +950,23 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 }
 
 /**
- * @internal
- * @brief get the next event on the transport endpoint.
- * @param fd a file descriptor for the transport endpoint.
- *
- * Returns the current, or obtains the current, event for the transport
- * endpoing and completes elements in the user data structure representing the
- * transport endpoint.  The control and data parts of any retrieved messages
- * are cached in the user structure and information interpreted and
- * appropriate flags set.
- */
+  * @internal
+  * @brief Get the next event on the transport endpoint.
+  * @param fd a file descriptor for the transport endpoint.
+  *
+  * Returns the current, or obtains the current, event for the transport
+  * endpoing and completes elements in the user data structure representing the
+  * transport endpoint.  The control and data parts of any retrieved messages
+  * are cached in the user structure and information interpreted and
+  * appropriate flags set.
+  */
 static int
 __xnet_t_getevent(int fd)
 {
 	struct _t_user *user = _t_fds[fd];
 	int ret, flag = 0;
 	union T_primitives *p = (typeof(p)) user->ctlbuf;
+
 	switch (user->event) {
 	case 0:
 		__xnet_u_reset_event(user);
@@ -1002,9 +978,8 @@ __xnet_t_getevent(int fd)
 			goto tsync;
 		if (user->ctrl.len || user->data.len) {
 			__xnet_u_setevent(user, user->ctrl.len ? p->type : -1, 0);
-			/*
-			   There is a little extra handling for data indications 
-			 */
+			/* 
+			   There is a little extra handling for data indications */
 			switch (user->prim) {
 			case -1:	/* just data */
 				user->moredat = ((ret & MOREDATA) != 0);
@@ -1019,10 +994,12 @@ __xnet_t_getevent(int fd)
 				break;
 			case T_OPTDATA_IND:
 				if (p->optdata_ind.DATA_flag & T_ODF_EX) {
-					user->moreedu = ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
+					user->moreedu =
+					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moreexp = ((ret & MOREDATA) != 0);
 				} else {
-					user->moresdu = ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
+					user->moresdu =
+					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moredat = ((ret & MOREDATA) != 0);
 				}
 				break;
@@ -1060,23 +1037,23 @@ __xnet_t_getevent(int fd)
 
 static pthread_rwlock_t __xnet_fd_lock = PTHREAD_RWLOCK_INITIALIZER;
 
-static int
+static inline int
 __xnet_lock_rdlock(pthread_rwlock_t * rwlock)
 {
 	return pthread_rwlock_rdlock(rwlock);
 }
-static int
+static inline int
 __xnet_lock_wrlock(pthread_rwlock_t * rwlock)
 {
 	return pthread_rwlock_wrlock(rwlock);
 }
-static void
+static inline void
 __xnet_lock_unlock(void *rwlock)
 {
 	pthread_rwlock_unlock(rwlock);
 }
 
-static int
+static inline int
 __xnet_list_rdlock(void)
 {
 	return __xnet_lock_rdlock(&__xnet_fd_lock);
@@ -1099,12 +1076,12 @@ __xnet_user_rdlock(struct _t_user *user)
 	return __xnet_lock_rdlock(&user->lock);
 }
 #endif
-static int
+static inline int
 __xnet_user_wrlock(struct _t_user *user)
 {
 	return __xnet_lock_wrlock(&user->lock);
 }
-static void
+static inline void
 __xnet_user_unlock(struct _t_user *user)
 {
 	return __xnet_lock_unlock(&user->lock);
@@ -1115,30 +1092,34 @@ __xnet_t_putuser(void *arg)
 {
 	int fd = *(int *) arg;
 	struct _t_user *user = _t_fds[fd];
+
 	__xnet_user_unlock(user);
 	__xnet_list_unlock(NULL);
 	return;
 }
 
 /**
- * @internal
- * @brief Get a locked transport user endpoint structure.
- * @param fd the file descriptor for which to get the associated endpoint.
- *
- * This is a range-checked array lookup of the library user structure
- * associated with the specified file descriptor.  In addition, this function
- * takes the necessary locks for thread-safe operation.
- */
-static struct _t_user *
+  * @internal
+  * @brief Get a locked transport user endpoint structure.
+  * @param fd the file descriptor for which to get the associated endpoint.
+  *
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  In addition, this function
+  * takes the necessary locks for thread-safe operation.
+  */
+static __hot struct _t_user *
 __xnet_t_getuser(int fd)
 {
 	struct _t_user *user;
 	int err;
-	if ((err = __xnet_list_rdlock()))
+
+	if (unlikely((err = __xnet_list_rdlock())))
 		goto list_lock_error;
-	if (0 > fd || fd >= OPEN_MAX || !(user = _t_fds[fd]))
+	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
 		goto tbadf;
-	if ((err = __xnet_user_wrlock(user)))
+	if (unlikely(!(user = _t_fds[fd])))
+		goto tbadf;
+	if (unlikely((err = __xnet_user_wrlock(user))))
 		goto user_lock_error;
 	return (user);
       user_lock_error:
@@ -1158,44 +1139,47 @@ __xnet_t_getuser(int fd)
 }
 
 /**
- * @internal
- * @brief Test information about a transport endpoint.
- * @param fd the file descriptor for which to test the associated endpoint.
- * @param expect the event anticipated on the transport endpoint.
- * @param servtype the service type anticipated on the transport endpoint.
- * @param states the flag mask of the states anticipated for the transport endpoint.
- *
- * This is a range-checked array lookup of the library user structure
- * associated with the specified file descriptor.  In addition, this function
- * checks for expected events, service types and states as follows:
- *
- * When expect is not -1, if there is a current event on the transport
- * endpoint and that event is not the same as the expected event, then the
- * call will fail (return NULL) and set t_errno to @c T_LOOK.
- *
- * servtype is a bit mask of the service types expected for the transport
- * endpoint.  If the service type of the transport endpoint is not one of the
- * service types in the mask, then the call will fail (return NULL) and set
- * t_errno to @c TNOTSUPPORT.  To accept any service type, set servtype to -1.
- *
- * states is a bit mask of the (TPI) states expected for the transport
- * endpoint.  If the state of the transport endpoing is not one of the states
- * in the mask, then the call will fail (return NULL) and set t_errno to
- * @c TOUTSTATE.  To accept any state, set states to -1.
- */
-static struct _t_user *
+  * @internal
+  * @brief Test information about a transport endpoint.
+  * @param fd the file descriptor for which to test the associated endpoint.
+  * @param expect the event anticipated on the transport endpoint.
+  * @param servtype the service type anticipated on the transport endpoint.
+  * @param states the flag mask of the states anticipated for the transport endpoint.
+  *
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  In addition, this function
+  * checks for expected events, service types and states as follows:
+  *
+  * When expect is not -1, if there is a current event on the transport
+  * endpoint and that event is not the same as the expected event, then the
+  * call will fail (return NULL) and set t_errno to @c T_LOOK.
+  *
+  * servtype is a bit mask of the service types expected for the transport
+  * endpoint.  If the service type of the transport endpoint is not one of the
+  * service types in the mask, then the call will fail (return NULL) and set
+  * t_errno to @c TNOTSUPPORT.  To accept any service type, set servtype to -1.
+  *
+  * states is a bit mask of the (TPI) states expected for the transport
+  * endpoint.  If the state of the transport endpoing is not one of the states
+  * in the mask, then the call will fail (return NULL) and set t_errno to
+  * @c TOUTSTATE.  To accept any state, set states to -1.
+  */
+static __hot struct _t_user *
 __xnet_t_tstuser(int fd, const int expect, const int servtype, const int states)
 {
 	struct _t_user *user;
-	if (0 > fd || fd >= OPEN_MAX || !(user = _t_fds[fd]))
+
+	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
 		goto tbadf;
-	if (user->flags & TUF_SYNC_REQUIRED)
+	if (unlikely(!(user = _t_fds[fd])))
+		goto tbadf;
+	if (unlikely(user->flags & TUF_SYNC_REQUIRED))
 		goto tproto;
-	if (user->event && user->event != expect && expect != -1)
+	if (unlikely(user->event && user->event != expect && expect != -1))
 		goto tlook;
-	if (!((1 << user->info.servtype) & servtype))
+	if (unlikely(!((1 << user->info.servtype) & servtype)))
 		goto tnotsupport;
-	if (!(user->statef & states))
+	if (unlikely(!(user->statef & states)))
 		goto toutstate;
 	return (user);
       toutstate:
@@ -1218,21 +1202,22 @@ __xnet_t_tstuser(int fd, const int expect, const int servtype, const int states)
 }
 
 /**
- * @internal
- * @brief A version of ioctl(2) with XTI errors.
- * @param fd A file descriptor upon which to issue an IO control.
- * @param cmd The IO control command.
- * @param arg Argument to the IO control command.
- *
- * Our timod @c TI_ ioctls return the error codes (if any) in the return value
- * rather than errno.  If we get a non-zero return value, it indicates that we
- * need to unpack the ti and unix error codes and place them in the
- * appropriate error numbers.
- */
+  * @internal
+  * @brief A version of ioctl(2) with XTI errors.
+  * @param fd A file descriptor upon which to issue an IO control.
+  * @param cmd The IO control command.
+  * @param arg Argument to the IO control command.
+  *
+  * Our timod @c TI_ ioctls return the error codes (if any) in the return value
+  * rather than errno.  If we get a non-zero return value, it indicates that we
+  * need to unpack the ti and unix error codes and place them in the
+  * appropriate error numbers.
+  */
 static int
 __xnet_t_ioctl(int fd, int cmd, void *arg)
 {
 	int ret;
+
 	switch ((ret = ioctl(fd, cmd, arg))) {
 	case 0:
 		return (0);
@@ -1258,22 +1243,23 @@ __xnet_t_ioctl(int fd, int cmd, void *arg)
 }
 
 /**
- * @internal
- * @brief A version of ioctl(2) with XTI errors.
- * @param fd A file descriptor upon which to issue an IO control.
- * @param cmd The IO control command.
- * @param arg Argument to the IO control command.
- * @param arglen The length of the argument.
- *
- * This is a simple matter of packing an otherwise tranparent IO control into
- * a strioctl buffer and issuing an I_STR IO control instead.  This calls
- * __xnet_t_ioctl(), so it understands how to properly unpack timod XTI and UNIX
- * error codes.
- */
+  * @internal
+  * @brief A version of ioctl(2) with XTI errors.
+  * @param fd A file descriptor upon which to issue an IO control.
+  * @param cmd The IO control command.
+  * @param arg Argument to the IO control command.
+  * @param arglen The length of the argument.
+  *
+  * This is a simple matter of packing an otherwise tranparent IO control into
+  * a strioctl buffer and issuing an I_STR IO control instead.  This calls
+  * __xnet_t_ioctl(), so it understands how to properly unpack timod XTI and UNIX
+  * error codes.
+  */
 static int
 __xnet_t_strioctl(int fd, int cmd, void *arg, size_t arglen)
 {
 	struct strioctl ioc;
+
 	ioc.ic_cmd = cmd;
 	ioc.ic_timout = _T_TIMEOUT;
 	ioc.ic_len = arglen;
@@ -1281,21 +1267,15 @@ __xnet_t_strioctl(int fd, int cmd, void *arg, size_t arglen)
 	return __xnet_t_ioctl(fd, I_STR, &ioc);
 }
 
-/**
- * @fn t_accept(int fd, int resfd, const struct t_call *call)
- * @brief accept a connection indication
- * @param fd the file descriptor upon which the connection indication was received.
- * @param resfd the file descriptor upon which to accept the transport connection.
- * @param call a pointer to a t_call structure describing the responding transport endpoint.
- *
- * This function is NOT a thread cancellation point.  t_accept() is NOT a a
- * thread cancellation point; therefore, we disable cancellation for the
- * duration of the call.
- */
+/** @brief Accept a connection indication.
+  * @param fd the file descriptor upon which the connection indication was received.
+  * @param resfd the file descriptor upon which to accept the transport connection.
+  * @param call a pointer to a t_call structure describing the responding transport endpoint.  */
 int
 __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 {
 	struct _t_user *user, *resuser;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WRES_CIND)))
 		goto error;
 	if (fd == resfd) {
@@ -1304,7 +1284,9 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			goto tindout;
 		if (user->ocnt < 1)
 			goto tproto;
-	} else if (!(resuser = __xnet_t_tstuser(resfd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_UNBND | TSF_IDLE)))
+	} else
+	    if (!(resuser = __xnet_t_tstuser(resfd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+					     TSF_UNBND | TSF_IDLE)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -1326,21 +1308,22 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 		goto tbadopt;
 	if (call && call->udata.len > __xnet_u_max_connect(user))
 		goto tbaddata;
-	/*
-	   Check if we need to bind the responding stream to the responding address.  This also rules out the case
-	   where the listening stream and the responding stream are the same address. 
-	 */
+	/* 
+	   Check if we need to bind the responding stream to the responding address.  This also
+	   rules out the case where the listening stream and the responding stream are the same
+	   address. */
 	if (resuser->statef & TSF_UNBND) {
 		size_t add_len = (call && call->addr.len > 0) ? call->addr.len : 0;
 		struct {
 			struct T_bind_req prim;
 			unsigned char addr[add_len];
 		} req;
-		/*
-		   There is no way to pass the responding address to the stream as there is in the NPI, therefore, we
-		   must bind the stream to the proper responding address before accepting the connection indication.
-		   This sets the local name associated with the accepting stream. 
-		 */
+
+		/* 
+		   There is no way to pass the responding address to the stream as there is in the
+		   NPI, therefore, we must bind the stream to the proper responding address before
+		   accepting the connection indication. This sets the local name associated with
+		   the accepting stream. */
 		req.prim.PRIM_type = T_BIND_REQ;
 		req.prim.ADDR_length = add_len;
 		req.prim.ADDR_offset = add_len ? sizeof(req.prim) : 0;
@@ -1351,10 +1334,9 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			goto error;
 		__xnet_u_setstate_const(resuser, TS_IDLE);
 	}
-	/*
-	   XNS 5.2 says that if the responding stream is already bound that it must be bound to the same address a
-	   specified in call->addr, so we don't check 
-	 */
+	/* 
+	   XNS 5.2 says that if the responding stream is already bound that it must be bound to the 
+	   same address a specified in call->addr, so we don't check */
 	{
 		size_t opt_len = (call && call->opt.len > 0) ? call->opt.len : 0;
 		size_t dat_len = (call && call->udata.len > 0) ? call->udata.len : 0;
@@ -1363,6 +1345,7 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			unsigned char opt[opt_len];
 			unsigned char udata[dat_len];
 		} req;
+
 		req.prim.PRIM_type = T_CONN_RES;
 		req.prim.ACCEPTOR_id = resuser->token;
 		req.prim.OPT_length = opt_len;
@@ -1411,10 +1394,22 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 	return (-1);
 }
 
+/** @brief The reentrant version of __xnet_t_accept().
+  * @param fd the file descriptor upon which the connection indication was received.
+  * @param resfd the file descriptor upon which to accept the transport connection.
+  * @param call a pointer to a t_call structure describing the responding transport endpoint.
+  * @version XNET_1.0
+  * @par Alias:
+  * This symbol is an implementation of t_accept().
+  *
+  * This function is NOT a thread cancellation point.  t_accept(3) is NOT a a
+  * thread cancellation point; therefore, we disable cancellation for the
+  * duration of the call.  */
 int
 __xnet_t_accept_r(int fd, int resfd, const struct t_call *call)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_accept(fd, resfd, call);
@@ -1424,31 +1419,32 @@ __xnet_t_accept_r(int fd, int resfd, const struct t_call *call)
 	return (ret);
 }
 
-int t_accept(int fd, int resfd, const struct t_call *call)
-    __attribute__ ((alias("__xnet_t_accept_r")));
+/** @fn int t_accept(int fd, int resfd, const struct t_call *call)
+  * @param fd the file descriptor upon which the connection indication was received.
+  * @param resfd the file descriptor upon which to accept the transport connection.
+  * @param call a pointer to a t_call structure describing the responding transport endpoint.
+  * @version XNET_1.0
+  * @par Alias:
+  * This symbol is a strong alias of __xnet_t_accept_r().
+  */
+__asm__(".symver __xnet_t_accept_r,t_accept@@XNET_1.0");
 
-/**
- * @fn int t_addleaf(int fd, int leafid, struct netbuf *addr)
- * @brief Add a leaf to a point to multipoint connection.
- * @param fd A file descriptor for the transport user endpoint.
- * @param leafid The identifier for the leaf.
- * @param addr A netbuf(3) structure describing the address of the added leaf.
- *
- * This function is NOT a thread cancellation point.
- *
- * This XTI Liubrary function is only used for ATM.  It is used to add a leaf
- * to a point to multipoint connection.  This function does not translate to
- * an TPI message exchange, but invokes a t_optmgmt call on an existing ATM
- * connection.
- *
- * t_addleaf() is NOT a thread cancellation point, but ioctl(2) is; therefore,
- * we disable cancellation for the duration of the call.
- */
+/** @brief Add a leaf to a point to multipoint connection.
+  * @param fd A file descriptor for the transport user endpoint.
+  * @param leafid The identifier for the leaf.
+  * @param addr A netbuf(3) structure describing the address of the added leaf.
+  * @version XNET_1.0
+  *
+  * This XTI Liubrary function is only used for ATM.  It is used to add a leaf
+  * to a point to multipoint connection.  This function does not translate to
+  * a TPI message exchange, but invokes a t_optmgmt call on an existing ATM
+  * connection.  */
 int
 __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
 {
 #if defined HAVE_XTI_ATM_H
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER)))
 		goto error;
 #ifdef DEBUG
@@ -1465,6 +1461,7 @@ __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
 			struct t_atm_add_leaf leaf;
 		} opts;
 		struct t_optmgmt req, ret;
+
 		req.opt.maxlen = 0;
 		req.opt.len = sizeof(opts);
 		req.opt.buf = (char *) &opts;
@@ -1489,14 +1486,17 @@ __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
 			goto tproto;
 		if (opts.hdr.level != T_ATM_SIGNALLING || opts.hdr.name != T_ATM_ADD_LEAF)
 			goto tproto;
-		/** The t_addleaf function requires an operating-system specific blocking mechanism
-		   to know when to check for the leaf status indication.  The most obvious approach 
-		   is to have the ATM transport service provider send a signal to the stream head
-		   when an indication has arrived.  What signal (SIGPOLL, SIGIO, SIGUSR) is a
-		   question. Nevertheless, we can check our open flags here and either decide to
-		   block on a poll or not to check for the indication that the addition was
-		   successful.  We do not do this yet.  We just always return nodata.  It is the
-		   caller's responsibility to check with t_rcvleafchange(). 
+		/**
+		   The t_addleaf function requires an operating-system specific
+		   blocking mechanism to know when to check for the leaf status
+		   indication.  The most obvious approach is to have the ATM
+		   transport service provider send a signal to the stream head
+		   when an indication has arrived.  What signal (SIGPOLL, SIGIO,
+		   SIGUSR) is a question. Nevertheless, we can check our open
+		   flags here and either decide to block on a poll or not to
+		   check for the indication that the addition was successful.
+		   We do not do this yet.  We just always return nodata.  It is
+		   the caller's responsibility to check with t_rcvleafchange(). 
 		 */
 		goto tnodata;
 	}
@@ -1522,10 +1522,27 @@ __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
 #endif				/* defined HAVE_XTI_ATM_H */
 }
 
+/** @brief The reentrant version of __xnet_t_addleaf().
+  * @param fd A file descriptor for the transport user endpoint.
+  * @param leafid The identifier for the leaf.
+  * @param addr A netbuf(3) structure describing the address of the added leaf.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of t_addleaf().
+  *
+  * This function is NOT a thread cancellation point.
+  * t_addleaf() is NOT a thread cancellation point, but ioctl(2) is; therefore,
+  * we disable cancellation for the duration of the call.
+  *
+  * This XTI Liubrary function is only used for ATM.  It is used to add a leaf
+  * to a point to multipoint connection.  This function does not translate to
+  * a TPI message exchange, but invokes a t_optmgmt call on an existing ATM
+  * connection.  */
 int
 __xnet_t_addleaf_r(int fd, int leafid, struct netbuf *addr)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_addleaf(fd, leafid, addr);
@@ -1535,47 +1552,60 @@ __xnet_t_addleaf_r(int fd, int leafid, struct netbuf *addr)
 	return (ret);
 }
 
-int t_addleaf(int fd, int leafid, struct netbuf *addr)
-    __attribute__ ((weak, alias("__xnet_t_addleaf_r")));
+/** @fn int t_addleaf(int fd, int leafid, struct netbuf *addr)
+  * @param fd A file descriptor for the transport user endpoint.
+  * @param leafid The identifier for the leaf.
+  * @param addr A netbuf(3) structure describing the address of the added leaf.
+  * @version XNET_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __xnet_t_addleaf_r().
+  */
+#pragma weak __xnet_t_addleaf_r
+__asm__(".symver __xnet_t_addleaf_r,t_addleaf@@XNET_1.0");
 
 /**
- * @fn char * t_alloc(int fd, int type, int fields)
- * @brief Allocate an XTI structure and initialize fields.
- * @param fd A file descriptor for the transport user endpoint.
- * @param type The type of structure to allocate.
- * @param fields The fields in the structure to initialize.
- *
- * This function is NOT a thread cancellation point.
- *
- * Allocate the requested library structure and initialize the requested
- * fields.  This consists of allocating the structure itself and allocating
- * buffers for any of the requested fields.
- *
- * It would be more efficient if we allocated the structure and the buffers
- * together in a single allocation.  We would probably get better memory
- * performance if all of the pieces were kept contiguous.  However, the user
- * has the possibility of separately freeing the buffers and the t_free()
- * function does exactly that.
- * 
- * t_alloc() is NOT a thread cancellation point; therefore, we defer
- * cancellation for the duration of the call.  Note that there are no inherent
- * cancellation points within __xnet_t_alloc().
- */
+  * @brief Allocate an XTI structure and initialize fields.
+  * @param fd A file descriptor for the transport user endpoint.
+  * @param type The type of structure to allocate.
+  * @param fields The fields in the structure to initialize.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of t_alloc().
+  *
+  * This function is NOT a thread cancellation point.
+  *
+  * Allocate the requested library structure and initialize the requested
+  * fields.  This consists of allocating the structure itself and allocating
+  * buffers for any of the requested fields.
+  *
+  * It would be more efficient if we allocated the structure and the buffers
+  * together in a single allocation.  We would probably get better memory
+  * performance if all of the pieces were kept contiguous.  However, the user
+  * has the possibility of separately freeing the buffers and the t_free()
+  * function does exactly that.
+  * 
+  * t_alloc() is NOT a thread cancellation point; therefore, we defer
+  * cancellation for the duration of the call.  Note that there are no inherent
+  * cancellation points within __xnet_t_alloc().
+  */
 char *
 __xnet_t_alloc(int fd, int type, int fields)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
 		goto error;
 	switch (type) {
 	case T_BIND:
 	{
 		struct t_bind *bind;
+
 		if (!(bind = (struct t_bind *) malloc(sizeof(*bind))))
 			goto badalloc;
 		memset(bind, 0, sizeof(*bind));
 		if (fields & T_ADDR) {
 			int len;
+
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
@@ -1600,11 +1630,13 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_OPTMGMT:
 	{
 		struct t_optmgmt *opts;
+
 		if (!(opts = (struct t_optmgmt *) malloc(sizeof(*opts))))
 			goto badalloc;
 		memset(opts, 0, sizeof(*opts));
 		if (fields & T_OPT) {
 			int len;
+
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
@@ -1629,6 +1661,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_CALL:
 	{
 		struct t_call *call;
+
 		if (user->info.servtype == T_CLTS)
 			goto tnostructype;
 		if (!(call = (struct t_call *) malloc(sizeof(*call))))
@@ -1636,6 +1669,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		memset(call, 0, sizeof(*call));
 		if (fields & T_ADDR) {
 			int len;
+
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
@@ -1657,6 +1691,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_OPT) {
 			int len;
+
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
@@ -1682,6 +1717,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_UDATA) {
 			int len;
+
 			switch ((len = user->info.connect)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_CONNLEN;
@@ -1714,6 +1750,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_DIS:
 	{
 		struct t_discon *discon;
+
 		if (user->info.servtype == T_CLTS)
 			goto tnostructype;
 		if (!(discon = (struct t_discon *) malloc(sizeof(*discon))))
@@ -1721,6 +1758,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		memset(discon, 0, sizeof(*discon));
 		if (fields & T_UDATA) {
 			int len;
+
 			switch ((len = user->info.discon)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_DISCLEN;;
@@ -1745,6 +1783,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_UNITDATA:
 	{
 		struct t_unitdata *udata;
+
 		if (user->info.servtype != T_CLTS)
 			goto tnostructype;
 		if (!(udata = (struct t_unitdata *) malloc(sizeof(*udata))))
@@ -1752,6 +1791,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		memset(udata, 0, sizeof(*udata));
 		if (fields & T_ADDR) {
 			int len;
+
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
@@ -1773,6 +1813,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_OPT) {
 			int len;
+
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
@@ -1798,8 +1839,10 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_UDATA) {
 			int len;
+
 			switch ((len = user->info.tsdu)) {
 			case T_INFINITE:
+			case 0:
 				len = _T_DEFAULT_DATALEN;
 			default:
 				if (!(udata->udata.buf = (char *) malloc(len))) {
@@ -1811,7 +1854,6 @@ __xnet_t_alloc(int fd, int type, int fields)
 					goto badalloc;
 				}
 				udata->udata.maxlen = len;
-			case 0:
 				break;
 			case T_INVALID:
 				if (fields != T_ALL) {
@@ -1830,6 +1872,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_UDERROR:
 	{
 		struct t_uderr *uderr;
+
 		if (user->info.servtype != T_CLTS)
 			goto tnostructype;
 		if (!(uderr = (struct t_uderr *) malloc(sizeof(*uderr))))
@@ -1837,6 +1880,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		memset(uderr, 0, sizeof(*uderr));
 		if (fields & T_ADDR) {
 			int len;
+
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
@@ -1858,6 +1902,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_OPT) {
 			int len;
+
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
@@ -1886,6 +1931,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_INFO:
 	{
 		struct t_info *inf;
+
 		if (!(inf = (struct t_info *) malloc(sizeof(*inf))))
 			goto badalloc;
 		memset(inf, 0, sizeof(*inf));
@@ -1908,10 +1954,12 @@ __xnet_t_alloc(int fd, int type, int fields)
 	return ((char *) NULL);
 }
 
+/** The reentrant version of __xnet_t_alloc(). */
 char *
 __xnet_t_alloc_r(int fd, int type, int fields)
 {
 	char *ret = NULL;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_alloc(fd, type, fields);
@@ -1921,24 +1969,25 @@ __xnet_t_alloc_r(int fd, int type, int fields)
 	return (ret);
 }
 
-char *t_alloc(int fd, int type, int fields)
-    __attribute__ ((alias("__xnet_t_alloc_r")));
+__asm__(".symver __xnet_t_alloc_r,t_alloc@@XNET_1.0");
 
-/**
- * @fn int t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
- * @brief Bind an address to a transport endpoint.
- * @param fd A file descriptor indicating the transport endpoint to bind.
- * @param req A t_bind structure indicating the bind parameters.
- * @param ret A t_bind structure to return the bind result.
- *
- * This function is NOT a thread cancellation point.
- * t_bind() is NOT a thread cancellation point; however, ioctl(2) might be;
- * therefore, we disable cancellation for the duration of the call.
- */
+/** @brief Bind an address to a transport endpoint.
+  * @param fd A file descriptor indicating the transport endpoint to bind.
+  * @param req A t_bind structure indicating the bind parameters.
+  * @param ret A t_bind structure to return the bind result.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of t_bind().
+  *
+  * This function is NOT a thread cancellation point.
+  * t_bind() is NOT a thread cancellation point; however, ioctl(2) might be;
+  * therefore, we disable cancellation for the duration of the call.
+  */
 int
 __xnet_t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, TSF_UNBND)))
 		goto error;
 #ifdef DEBUG
@@ -1963,6 +2012,7 @@ __xnet_t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
 				unsigned char addr[add_max];
 			} ack;
 		} buf;
+
 		buf.req.prim.PRIM_type = T_BIND_REQ;
 		buf.req.prim.ADDR_length = add_len;
 		buf.req.prim.ADDR_offset = add_len ? sizeof(buf.req.prim) : 0;
@@ -1979,7 +2029,8 @@ __xnet_t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
 					goto tbufovflw;
 				if ((ret->addr.len = buf.ack.prim.ADDR_length))
 					memcpy(ret->addr.buf,
-					       ((char *) &buf) + buf.ack.prim.ADDR_offset, ret->addr.len);
+					       ((char *) &buf) + buf.ack.prim.ADDR_offset,
+					       ret->addr.len);
 			}
 			ret->qlen = buf.ack.prim.CONIND_number;
 		}
@@ -2003,10 +2054,12 @@ __xnet_t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_bind(). */
 int
 __xnet_t_bind_r(int fd, const struct t_bind *req, struct t_bind *ret)
 {
 	int rtv = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		rtv = __xnet_t_bind(fd, req, ret);
@@ -2016,23 +2069,22 @@ __xnet_t_bind_r(int fd, const struct t_bind *req, struct t_bind *ret)
 	return (rtv);
 }
 
-int t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
-    __attribute__ ((alias("__xnet_t_bind_r")));
+__asm__(".symver __xnet_t_bind_r,t_bind@@XNET_1.0");
 
-/**
- * @fn int t_close(int fd)
- * @brief Close a transport endpoint.
- * @param fd A file descriptor for the transport endpoint to close.
- *
- * This function is a thread cancellation point.  t_close() is a thread
- * cancellation point, and so it close(2); therefore, we defer cancellation
- * until the call completes.
- */
+/** @brief Close a transport endpoint.
+  * @param fd A file descriptor for the transport endpoint to close.
+  * @version XNET_1.0
+  *
+  * This function is a thread cancellation point.  t_close() is a thread
+  * cancellation point, and so it close(2); therefore, we defer cancellation
+  * until the call completes.
+  */
 int
 __xnet_t_close(int fd)
 {
 	struct _t_user *user;
 	int ret;
+
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if ((ret = close(fd)) == 0 || errno != EINTR) {
@@ -2055,22 +2107,26 @@ __xnet_t_close(int fd)
 }
 
 /**
- * @brief recursive t_close function.
- * @param fd A file descriptor for the transport endpoint to close.
- *
- * This is again a little different that most of the _r wrappers: we take a
- * write lock on the _t_fds list so that we are able to delete the file
- * descriptor from the list.  This will block most other threads from
- * performing functions on the list, also, we must wait for a quiet period
- * until all other functions that read lock the list are not being used.  If
- * you are sure that the close will only be performed by one thread and that
- * no other thread will act on the file descriptor until close returns, use
- * the non-recursive version.
- */
+  * @brief Recursive t_close function.
+  * @param fd A file descriptor for the transport endpoint to close.
+  * @version XNET_1.0
+  * @par Alias:
+  * This function is an implementation of t_close().
+  *
+  * This is again a little different that most of the _r wrappers: we take a
+  * write lock on the _t_fds list so that we are able to delete the file
+  * descriptor from the list.  This will block most other threads from
+  * performing functions on the list, also, we must wait for a quiet period
+  * until all other functions that read lock the list are not being used.  If
+  * you are sure that the close will only be performed by one thread and that
+  * no other thread will act on the file descriptor until close returns, use
+  * the non-recursive version.
+  */
 int
 __xnet_t_close_r(int fd)
 {
 	int err, ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_list_unlock, NULL);
 	if ((err = __xnet_list_wrlock()) == 0) {
 		ret = __xnet_t_close(fd);
@@ -2083,22 +2139,20 @@ __xnet_t_close_r(int fd)
 	return (ret);
 }
 
-int t_close(int fd)
-    __attribute__ ((alias("__xnet_t_close_r")));
+__asm__(".symver __xnet_t_close_r,t_close@@XNET_1.0");
 
-/**
- * @fn int t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
- * @brief Establish a transport connection.
- * @param fd the transport endpoint to connect.
- * @param sndcall a pointer to a t_call structure specifying the peer addres, options and data.
- * @param rcvcall a pointer to a t_call structure returning the responding address, options and data.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Establish a transport connection.
+  * @param fd the transport endpoint to connect.
+  * @param sndcall a pointer to a t_call structure specifying the peer addres, options and data.
+  * @param rcvcall a pointer to a t_call structure returning the responding address, options and data.
+  *
+  * This function is a thread cancellation point.
+  */
 int
 __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_IDLE)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
@@ -2112,11 +2166,13 @@ __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 		goto einval;
 	if (sndcall->udata.len < 0 || (sndcall->udata.len > 0 && !sndcall->udata.buf))
 		goto einval;
-	if (rcvcall && (rcvcall->addr.maxlen < 0 || (rcvcall->addr.maxlen > 0 && !rcvcall->addr.buf)))
+	if (rcvcall
+	    && (rcvcall->addr.maxlen < 0 || (rcvcall->addr.maxlen > 0 && !rcvcall->addr.buf)))
 		goto einval;
 	if (rcvcall && (rcvcall->opt.maxlen < 0 || (rcvcall->opt.maxlen > 0 && !rcvcall->opt.buf)))
 		goto einval;
-	if (rcvcall && (rcvcall->udata.maxlen < 0 || (rcvcall->udata.maxlen > 0 && !rcvcall->udata.buf)))
+	if (rcvcall
+	    && (rcvcall->udata.maxlen < 0 || (rcvcall->udata.maxlen > 0 && !rcvcall->udata.buf)))
 		goto einval;
 #endif
 	if (sndcall && sndcall->addr.len > __xnet_u_max_addr(user))
@@ -2135,6 +2191,7 @@ __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 			unsigned char opt[opt_len];
 			unsigned char udata[dat_len];
 		} req;
+
 		req.prim.PRIM_type = T_CONN_REQ;
 		req.prim.DEST_length = add_len;
 		req.prim.DEST_offset = add_len ? sizeof(req.prim) : 0;
@@ -2177,10 +2234,12 @@ __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_connect(). */
 int
 __xnet_t_connect_r(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_connect(fd, sndcall, rcvcall)) == -1)
@@ -2192,16 +2251,13 @@ __xnet_t_connect_r(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 	return (ret);
 }
 
-int t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
-    __attribute__ ((alias("__xnet_t_connect_r")));
+__asm__(".symver __xnet_t_connect_r,t_connect@@XNET_1.0");
 
-/**
- * @fn int t_error(const char *errmsg)
- * @brief Print an error message.
- * @param errmsg the error message to print.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Print an error message.
+  * @param errmsg the error message to print.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_error(const char *errmsg)
 {
@@ -2209,32 +2265,31 @@ __xnet_t_error(const char *errmsg)
 	return (0);
 }
 
+/** The reentrant version of __xnet_t_error(). */
 int
 __xnet_t_error_r(const char *errmsg)
 {
 	int oldtype, ret;
+
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
 	ret = __xnet_t_error(errmsg);
 	pthread_setcanceltype(oldtype, NULL);
 	return (ret);
 }
 
-int t_error(const char *errmsg)
-    __attribute__ ((alias("__xnet_t_error_r")));
+__asm__(".symver __xnet_t_error_r,t_error@@XNET_1.0");
 
-/**
- * @fn int t_free(void *ptr, int type)
- * @brief free an XTI library structure.
- * @param ptr a pointer to the structure to free.
- * @param type the type of the structure pointed to.
- *
- * This function is NOT a thread cancellation point.
- *
- * Frees the specified datastructure.  Any buffers remaining in the
- * datastructure (with non-NULL netbuf buf elements) will be freed using
- * free(2) as well.  This can be used to free a structure allocated with
- * malloc(2) and not necessarily allocated with t_alloc(3).
- */
+/** @brief Free an XTI library structure.
+  * @param ptr a pointer to the structure to free.
+  * @param type the type of the structure pointed to.
+  *
+  * This function is NOT a thread cancellation point.
+  *
+  * Frees the specified datastructure.  Any buffers remaining in the
+  * datastructure (with non-NULL netbuf buf elements) will be freed using
+  * free(2) as well.  This can be used to free a structure allocated with
+  * malloc(2) and not necessarily allocated with t_alloc(3).
+  */
 int
 __xnet_t_free(void *ptr, int type)
 {
@@ -2244,6 +2299,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_BIND:
 	{
 		struct t_bind *bind = (struct t_bind *) ptr;
+
 		if (bind->addr.buf)
 			free(bind->addr.buf);
 		free(bind);
@@ -2252,6 +2308,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_OPTMGMT:
 	{
 		struct t_optmgmt *opts = (struct t_optmgmt *) ptr;
+
 		if (opts->opt.buf)
 			free(opts->opt.buf);
 		free(opts);
@@ -2260,6 +2317,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_CALL:
 	{
 		struct t_call *call = (struct t_call *) ptr;
+
 		if (call->addr.buf)
 			free(call->addr.buf);
 		if (call->opt.buf)
@@ -2272,6 +2330,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_DIS:
 	{
 		struct t_discon *discon = (struct t_discon *) ptr;
+
 		if (discon->udata.buf)
 			free(discon->udata.buf);
 		free(discon);
@@ -2280,6 +2339,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_UNITDATA:
 	{
 		struct t_unitdata *unitdata = (struct t_unitdata *) ptr;
+
 		if (unitdata->addr.buf)
 			free(unitdata->addr.buf);
 		if (unitdata->opt.buf)
@@ -2291,6 +2351,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_UDERROR:
 	{
 		struct t_uderr *uderr = (struct t_uderr *) ptr;
+
 		if (uderr->addr.buf)
 			free(uderr->addr.buf);
 		if (uderr->opt.buf)
@@ -2301,6 +2362,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_INFO:
 	{
 		struct t_info *info = (struct t_info *) ptr;
+
 		free(info);
 		return (0);
 	}
@@ -2320,42 +2382,40 @@ __xnet_t_free(void *ptr, int type)
 	return (-1);
 }
 
-int t_free(void *ptr, int type)
-    __attribute__ ((alias("__xnet_t_free")));
+__asm__(".symver __xnet_t_free,t_free@@XNET_1.0");
 
-/**
- * @fn int t_getinfo(int fd, struct t_info *info)
- * @brief get protocol information.
- * @param fd the transport endpoint for which to get information.
- * @param info a pointer into a t_info structure to contain the returned information.
- *
- * This function is NOT a thread cancellation point.
- *
- * There is a bit of a question whether we should go all the way to the
- * transport provider with a @c TI_GETINFO in response to this call.  We could
- * return just the local datastructure, or we could go to the transport
- * service provider and do a little bit of a sync with the underlying
- * transport provider.  For now we are just retrieving the local copy.
- *
- * One excuse for doing this is that the state of the transport service
- * provider can be different than the state of the enxpoint as far as XTI is
- * concerned.  This is because there can be events stacked up in our receive
- * buffer and stacked up in our send buffer from and to the transport
- * provider.  Setting the XTI state to the transport provider state without
- * flushing buffers could cause a mis-sychronization.  That is, we could make
- * matters worse.
- *
- * So, we can't do anything with retreived state.  But, we could recollect the
- * protocol limits.  Protocol limits could change.  For example, the transport
- * interface data unit size could change depending on the characteristics of
- * the network path for a specific connection or as a result of negotiation
- * during connection establishment or mid-connection.  Therefore, we go to the
- * transport service provider to recollect these items.
- */
+/** @brief Get protocol information.
+  * @param fd the transport endpoint for which to get information.
+  * @param info a pointer into a t_info structure to contain the returned information.
+  *
+  * This function is NOT a thread cancellation point.
+  *
+  * There is a bit of a question whether we should go all the way to the
+  * transport provider with a @c TI_GETINFO in response to this call.  We could
+  * return just the local datastructure, or we could go to the transport
+  * service provider and do a little bit of a sync with the underlying
+  * transport provider.  For now we are just retrieving the local copy.
+  *
+  * One excuse for doing this is that the state of the transport service
+  * provider can be different than the state of the enxpoint as far as XTI is
+  * concerned.  This is because there can be events stacked up in our receive
+  * buffer and stacked up in our send buffer from and to the transport
+  * provider.  Setting the XTI state to the transport provider state without
+  * flushing buffers could cause a mis-sychronization.  That is, we could make
+  * matters worse.
+  *
+  * So, we can't do anything with retreived state.  But, we could recollect the
+  * protocol limits.  Protocol limits could change.  For example, the transport
+  * interface data unit size could change depending on the characteristics of
+  * the network path for a specific connection or as a result of negotiation
+  * during connection establishment or mid-connection.  Therefore, we go to the
+  * transport service provider to recollect these items.
+  */
 int
 __xnet_t_getinfo(int fd, struct t_info *info)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
 		goto error;
 #ifdef DEBUG
@@ -2367,6 +2427,7 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 			struct T_info_req req;
 			struct T_info_ack ack;
 		} buf;
+
 		buf.req.PRIM_type = T_INFO_REQ;
 		if (__xnet_t_strioctl(fd, TI_GETINFO, &buf, sizeof(buf)) != 0)
 			goto error;
@@ -2378,13 +2439,11 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 		user->info.discon = buf.ack.DDATA_size;
 		user->info.servtype = buf.ack.SERV_type;
 		user->info.flags = buf.ack.PROVIDER_flag;
-		/*
-		   need a define around this one 'cause it doesn't exist in XNS 5.2 
-		 */
+		/* 
+		   need a define around this one 'cause it doesn't exist in XNS 5.2 */
 		user->info.tidu = buf.ack.TIDU_size;
-		/*
-		   ignore CURRENT_state 
-		 */
+		/* 
+		   ignore CURRENT_state */
 		if (info)
 			*info = user->info;
 		return (0);
@@ -2401,10 +2460,12 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_getinfo(). */
 int
 __xnet_t_getinfo_r(int fd, struct t_info *info)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_getinfo(fd, info);
@@ -2414,22 +2475,20 @@ __xnet_t_getinfo_r(int fd, struct t_info *info)
 	return (ret);
 }
 
-int t_getinfo(int fd, struct t_info *info)
-    __attribute__ ((alias("__xnet_t_getinfo_r")));
+__asm__(".symver __xnet_t_getinfo_r,t_getinfo@@XNET_1.0");
 
-/**
- * @fn int t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
- * @brief get protocol addresses.
- * @param fd specifies the local transport endpoint for which to receive address information.
- * @param loc is a pointer to a t_bind structure that returns the local transport endpoint address bound to fd.
- * @param rem is a pointer to a t_bind structure that returns the remote transport endpoint address connected to fd, if fd is in a connected state.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Get protocol addresses.
+  * @param fd specifies the local transport endpoint for which to receive address information.
+  * @param loc is a pointer to a t_bind structure that returns the local transport endpoint address bound to fd.
+  * @param rem is a pointer to a t_bind structure that returns the remote transport endpoint address connected to fd, if fd is in a connected state.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
 		goto error;
 	{
@@ -2444,6 +2503,7 @@ __xnet_t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
 				unsigned char rem[add_max];
 			} ack;
 		} buf;
+
 		buf.req.prim.PRIM_type = T_ADDR_REQ;
 		if (__xnet_t_strioctl(fd, TI_GETADDRS, &buf, sizeof(buf)) != 0)
 			goto error;
@@ -2452,9 +2512,11 @@ __xnet_t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
 		if (rem && rem->addr.maxlen < buf.ack.prim.REMADDR_length)
 			goto tbufovflw;
 		if (loc && (loc->addr.len = buf.ack.prim.LOCADDR_length))
-			memcpy(loc->addr.buf, (char *) &buf + buf.ack.prim.LOCADDR_offset, loc->addr.len);
+			memcpy(loc->addr.buf, (char *) &buf + buf.ack.prim.LOCADDR_offset,
+			       loc->addr.len);
 		if (rem && (rem->addr.len = buf.ack.prim.REMADDR_length))
-			memcpy(rem->addr.buf, (char *) &buf + buf.ack.prim.REMADDR_offset, rem->addr.len);
+			memcpy(rem->addr.buf, (char *) &buf + buf.ack.prim.REMADDR_offset,
+			       rem->addr.len);
 		return (0);
 	}
       tbufovflw:
@@ -2464,10 +2526,12 @@ __xnet_t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_getprotaddr(). */
 int
 __xnet_t_getprotaddr_r(int fd, struct t_bind *loc, struct t_bind *rem)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_getprotaddr(fd, loc, rem);
@@ -2477,20 +2541,18 @@ __xnet_t_getprotaddr_r(int fd, struct t_bind *loc, struct t_bind *rem)
 	return (ret);
 }
 
-int t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
-    __attribute__ ((alias("__xnet_t_getprotaddr_r")));
+__asm__(".symver __xnet_t_getprotaddr_r,t_getprotaddr@@XNET_1.0");
 
-/**
- * @fn int t_getstate(int fd)
- * @brief get interface state.
- * @param fd the transport endpoint for which to return the transport endpoint state.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Get interface state.
+  * @param fd the transport endpoint for which to return the transport endpoint state.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_getstate(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if (user->statef & (TSF_UNBND | TSF_IDLE | TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER |
@@ -2498,7 +2560,8 @@ __xnet_t_getstate(int fd)
 		return (user->state);
 	}
 	if (user->statef & (TSF_WACK_DREQ6 | TSF_WACK_DREQ7 | TSF_WACK_DREQ9 | TSF_WACK_DREQ10 |
-			    TSF_WACK_DREQ11 | TSF_WACK_BREQ | TSF_WACK_UREQ | TSF_WACK_CREQ | TSF_WACK_CRES))
+			    TSF_WACK_DREQ11 | TSF_WACK_BREQ | TSF_WACK_UREQ | TSF_WACK_CREQ |
+			    TSF_WACK_CRES))
 		goto tstatechng;
 	goto tproto;
       tstatechng:
@@ -2512,10 +2575,12 @@ __xnet_t_getstate(int fd)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_getstate(). */
 int
 __xnet_t_getstate_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_getstate(fd);
@@ -2525,23 +2590,23 @@ __xnet_t_getstate_r(int fd)
 	return (ret);
 }
 
-int t_getstate(int fd)
-    __attribute__ ((alias("__xnet_t_getstate_r")));
+__asm__(".symver __xnet_t_getstate_r,t_getstate@@XNET_1.0");
 
-/**
- * @fn int t_listen(int fd, struct t_call *call)
- * @brief listen for a transport connection request.
- * @param fd the transport endpoint upon which to listen.
- * @param call a pointer to a t_call structure to contain returned information about a connection indication.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Listen for a transport connection request.
+  * @param fd the transport endpoint upon which to listen.
+  * @param call a pointer to a t_call structure to contain returned information about a connection indication.
+  *
+  * This function is a thread cancellation point.
+  */
 int
 __xnet_t_listen(int fd, struct t_call *call)
 {
 	struct _t_user *user;
-	union T_primitives *p = (typeof(p)) user->ctlbuf;
-	if (!(user = __xnet_t_tstuser(fd, T_LISTEN, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WRES_CIND | TSF_IDLE)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, T_LISTEN, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_WRES_CIND | TSF_IDLE)))
 		goto error;
 	if ((user->statef & TSF_IDLE) && user->qlen <= 0)
 		goto tbadqlen;
@@ -2551,6 +2616,7 @@ __xnet_t_listen(int fd, struct t_call *call)
 	case T_LISTEN:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		__xnet_u_setstate_const(user, TS_WRES_CIND);
 		user->ocnt++;
 		if (call) {
@@ -2562,9 +2628,11 @@ __xnet_t_listen(int fd, struct t_call *call)
 			if (call->udata.maxlen && call->udata.maxlen < user->data.len)
 				goto tbufovflw;
 			if (call->addr.maxlen && (call->addr.len = p->conn_ind.SRC_length))
-				memcpy(call->addr.buf, (char *) p + p->conn_ind.SRC_offset, call->addr.len);
+				memcpy(call->addr.buf, (char *) p + p->conn_ind.SRC_offset,
+				       call->addr.len);
 			if (call->opt.maxlen && (call->opt.len = p->conn_ind.OPT_length))
-				memcpy(call->opt.buf, (char *) p + p->conn_ind.OPT_offset, call->opt.len);
+				memcpy(call->opt.buf, (char *) p + p->conn_ind.OPT_offset,
+				       call->opt.len);
 			if (call->udata.maxlen && (call->udata.len = user->data.len))
 				memcpy(call->udata.buf, user->data.buf, call->udata.len);
 		}
@@ -2600,10 +2668,12 @@ __xnet_t_listen(int fd, struct t_call *call)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_listen(). */
 int
 __xnet_t_listen_r(int fd, struct t_call *call)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_listen(fd, call)) == -1)
@@ -2615,28 +2685,26 @@ __xnet_t_listen_r(int fd, struct t_call *call)
 	return (ret);
 }
 
-int t_listen(int fd, struct t_call *call)
-    __attribute__ ((alias("__xnet_t_listen_r")));
+__asm__(".symver __xnet_t_listen_r,t_listen@@XNET_1.0");
 
-/**
- * @fn int t_look(int fd)
- * @brief look for a transport event.
- * @param fd the transport endpoint upon which to look for events.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Look for a transport event.
+  * @param fd the transport endpoint upon which to look for events.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_look(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if (user->event == 0) {
-		/*
-		   we are after normal messages only. 
-		 */
+		/* 
+		   we are after normal messages only. */
 		int ret, flag = 0;
 		union T_primitives *p = (typeof(p)) user->ctlbuf;
+
 		user->ctrl.maxlen = user->ctlmax;
 		user->ctrl.len = 0;
 		user->ctrl.buf = user->ctlbuf;
@@ -2666,14 +2734,12 @@ __xnet_t_look(int fd)
 			goto tsync;
 		switch (user->state) {
 		case T_UNINIT:
-			/*
-			   cannot have any events - should have never gotten here 
-			 */
+			/* 
+			   cannot have any events - should have never gotten here */
 			goto tsync;
 		case T_UNBND:
-			/*
-			   cannot have any events - should have never gotten here 
-			 */
+			/* 
+			   cannot have any events - should have never gotten here */
 			goto tsync;
 		case T_IDLE:
 			switch (user->info.servtype) {
@@ -2681,14 +2747,12 @@ __xnet_t_look(int fd)
 			case T_COTS_ORD:
 				if (user->qlen > 0)
 					goto tincon;
-				/*
-				   cannot have any events - should have never gotten here 
-				 */
+				/* 
+				   cannot have any events - should have never gotten here */
 				goto tsync;
 			case T_CLTS:
-				/*
-				   T_UNITDATA_IND, T_UDERROR_IND 
-				 */
+				/* 
+				   T_UNITDATA_IND, T_UDERROR_IND */
 				if (user->ctrl.len == 0) {
 					if ((user->gflags = (ret & MOREDATA))) {
 						user->event = T_DATA;
@@ -2712,9 +2776,8 @@ __xnet_t_look(int fd)
 				goto tsync;
 			}
 		case T_OUTCON:
-			/*
-			   T_CONN_CON or T_DISCON_IND 
-			 */
+			/* 
+			   T_CONN_CON or T_DISCON_IND */
 			switch ((user->prim = p->type)) {
 			case T_CONN_CON:
 				user->event = T_CONNECT;
@@ -2728,9 +2791,8 @@ __xnet_t_look(int fd)
 			user->gflags = 0;
 			return (user->event);
 		case T_INCON:
-			/*
-			   T_CONN_IND or T_DISCON_IND 
-			 */
+			/* 
+			   T_CONN_IND or T_DISCON_IND */
 		      tincon:
 			switch ((user->prim = p->type)) {
 			case T_CONN_IND:
@@ -2745,13 +2807,11 @@ __xnet_t_look(int fd)
 			user->gflags = 0;
 			return (user->event);
 		case T_DATAXFER:
-			/*
-			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND 
-			 */
+			/* 
+			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND */
 		case T_OUTREL:
-			/*
-			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND 
-			 */
+			/* 
+			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND */
 			if (user->ctrl.len == 0) {
 				if ((user->gflags = (ret & MOREDATA))) {
 					user->event = T_DATA;
@@ -2767,7 +2827,8 @@ __xnet_t_look(int fd)
 				user->event = T_EXDATA;
 				break;
 			case T_OPTDATA_IND:
-				user->event = (p->optdata_ind.DATA_flag & T_ODF_EX) ? T_EXDATA : T_DATA;
+				user->event =
+				    (p->optdata_ind.DATA_flag & T_ODF_EX) ? T_EXDATA : T_DATA;
 				break;
 			case T_ORDREL_IND:
 				if (ret & MOREDATA) {
@@ -2805,9 +2866,8 @@ __xnet_t_look(int fd)
 			user->gflags = (ret & MOREDATA);
 			return (user->event);
 		case T_INREL:
-			/*
-			   T_DISCON_IND 
-			 */
+			/* 
+			   T_DISCON_IND */
 			switch ((user->prim = p->type)) {
 			case T_DISCON_IND:
 				user->event = T_DISCONNECT;
@@ -2835,10 +2895,12 @@ __xnet_t_look(int fd)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_look(). */
 int
 __xnet_t_look_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_look(fd);
@@ -2848,22 +2910,24 @@ __xnet_t_look_r(int fd)
 	return (ret);
 }
 
-int t_look(int fd)
-    __attribute__ ((alias("__xnet_t_look_r")));
+__asm__(".symver __xnet_t_look_r,t_look@@XNET_1.0");
 
 /*
    look for an event, but do not block 
  */
-int
+__hot int
 __xnet_t_peek(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if (user->event == 0) {
 		struct pollfd pfd;
+
 		pfd.fd = fd;
-		pfd.events = (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
+		pfd.events =
+		    (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
 		pfd.revents = 0;
 		switch (poll(&pfd, 1, 0)) {
 		case 1:
@@ -2893,25 +2957,26 @@ __xnet_t_peek(int fd)
 	return (-1);
 }
 
-/**
- * @fn int t_open(const char *path, int oflag, struct t_info *info)
- * @brief open a transport endpoint
- * @param path a character string specifying the pat to the device to open.
- * @param oflag open flags.
- * @param info a pointer to a t_info structure to contain returned information about the transport endpoint.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Open a transport endpoint.
+  * @param path a character string specifying the pat to the device to open.
+  * @param oflag open flags.
+  * @param info a pointer to a t_info structure to contain returned information about the transport endpoint.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_open(const char *path, int oflag, struct t_info *info)
 {
 	struct _t_user *user;
 	int err, fd;
+
 	t_errno = TSYSERR;
 	if (!(user = (struct _t_user *) malloc(sizeof(*user))))
 		goto enomem;
 	memset(user, 0, sizeof(*user));
-	user->ctlmax = sizeof(union T_primitives) + _T_DEFAULT_ADDRLEN + _T_DEFAULT_ADDRLEN + _T_DEFAULT_OPTLEN;
+	user->ctlmax =
+	    sizeof(union T_primitives) + _T_DEFAULT_ADDRLEN + _T_DEFAULT_ADDRLEN +
+	    _T_DEFAULT_OPTLEN;
 	user->datmax = _T_DEFAULT_DATALEN;
 	if (!(user->ctlbuf = (char *) malloc(user->ctlmax)))
 		goto enobufs;
@@ -2921,15 +2986,15 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 		goto badopen;
 	if (ioctl(fd, I_PUSH, "timod") != 0)
 		goto badioctl;
-	/*
-	   need to pick up all the capabilities from the stream 
-	 */
+	/* 
+	   need to pick up all the capabilities from the stream */
 	{
 		int i;
 		union {
 			struct T_capability_req req;
 			struct T_capability_ack ack;
 		} buf;
+
 		buf.req.PRIM_type = T_CAPABILITY_REQ;
 		buf.req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
 		if (__xnet_t_strioctl(fd, TI_CAPABILITY, &buf, sizeof(buf)) != 0)
@@ -2941,7 +3006,8 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 		   generate an acceptor id and also has the ability to complete the info structure
 		   from a @c T_INFO_REQ. 
 		 */
-		if ((buf.ack.CAP_bits1 & (TC1_INFO | TC1_ACCEPTOR_ID)) != (TC1_INFO | TC1_ACCEPTOR_ID))
+		if ((buf.ack.CAP_bits1 & (TC1_INFO | TC1_ACCEPTOR_ID)) !=
+		    (TC1_INFO | TC1_ACCEPTOR_ID))
 			goto badbits;
 		/**
 		   Although we have done a brand new open, we may have opened the same transport
@@ -3009,25 +3075,26 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 }
 
 /**
- * @brief recursive t_open function.
- * @param path a character string specifying the pat to the device to open.
- * @param oflag open flags.
- * @param info a pointer to a t_info structure to contain returned information
- * about the transport endpoint.
- *
- * This is a little different than most of the _r wrappers: we take a write
- * lock on the _t_fds list so that we are able to add the new file descriptor
- * into the list.  This will block most other threads from performing
- * functions on the list, also, we must wait for a quiet period until all
- * other functions that read lock the list are not being used.  If you are
- * sure that the open will only be performed by one thread and that no other
- * thread will act on the file descriptor until open returns, use the
- * non-recursive version.
- */
+  * @brief The reentrant version of __xnet_t_open().
+  * @param path a character string specifying the pat to the device to open.
+  * @param oflag open flags.
+  * @param info a pointer to a t_info structure to contain returned information
+  * about the transport endpoint.
+  *
+  * This is a little different than most of the _r wrappers: we take a write
+  * lock on the _t_fds list so that we are able to add the new file descriptor
+  * into the list.  This will block most other threads from performing
+  * functions on the list, also, we must wait for a quiet period until all
+  * other functions that read lock the list are not being used.  If you are
+  * sure that the open will only be performed by one thread and that no other
+  * thread will act on the file descriptor until open returns, use the
+  * non-recursive version.
+  */
 int
 __xnet_t_open_r(const char *path, int oflag, struct t_info *info)
 {
 	int err, ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_list_unlock, NULL);
 	if ((err = __xnet_list_wrlock()) == 0) {
 		ret = __xnet_t_open(path, oflag, info);
@@ -3040,22 +3107,20 @@ __xnet_t_open_r(const char *path, int oflag, struct t_info *info)
 	return (ret);
 }
 
-int t_open(const char *path, int oflag, struct t_info *info)
-    __attribute__ ((alias("__xnet_t_open_r")));
+__asm__(".symver __xnet_t_open_r,t_open@@XNET_1.0");
 
-/**
- * @fn int t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
- * @brief manage transport options.
- * @param fd the transport endpoint for which to manage options.
- * @param req a pointer to a t_optmgmt structure containing the requested options.
- * @param ret a pointer to a t_optmgmt structure to contain the returned options.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Manage transport options.
+  * @param fd the transport endpoint for which to manage options.
+  * @param req a pointer to a t_optmgmt structure containing the requested options.
+  * @param ret a pointer to a t_optmgmt structure to contain the returned options.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
 		goto error;
 #ifdef DEBUG
@@ -3081,6 +3146,7 @@ __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 				unsigned char opts[opt_max];
 			} ack;
 		} buf;
+
 		buf.req.prim.PRIM_type = T_OPTMGMT_REQ;
 		buf.req.prim.OPT_length = opt_len;
 		buf.req.prim.OPT_offset = opt_len ? sizeof(buf.req.prim) : 0;
@@ -3094,7 +3160,8 @@ __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 			if (ret->opt.maxlen < buf.ack.prim.OPT_length)
 				goto tbufovflw;
 			if ((ret->opt.len = buf.ack.prim.OPT_length))
-				memcpy(ret->opt.buf, (char *) &buf + buf.ack.prim.OPT_offset, ret->opt.len);
+				memcpy(ret->opt.buf, (char *) &buf + buf.ack.prim.OPT_offset,
+				       ret->opt.len);
 		}
 		return (0);
 	}
@@ -3116,10 +3183,12 @@ __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_optmgmt(). */
 int
 __xnet_t_optmgmt_r(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 {
 	int rtv = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		rtv = __xnet_t_optmgmt(fd, req, ret);
@@ -3129,25 +3198,26 @@ __xnet_t_optmgmt_r(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 	return (rtv);
 }
 
-int t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
-    __attribute__ ((alias("__xnet_t_optmgmt_r")));
+__asm__(".symver __xnet_t_optmgmt_r,t_optmgmt@@XNET_1.0");
 
-/**
- * @fn int t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
- * @brief receive transport data
- * @param fd the transport endpoint upon which to received data.
- * @param buf a pointer to a buffer to contain the received data.
- * @param nbytes the maximum number of bytes in the caller supplied buffer.
- * @param flags a pointer to an int to contain the returned data flags.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Receive transport data.
+  * @param fd the transport endpoint upon which to received data.
+  * @param buf a pointer to a buffer to contain the received data.
+  * @param nbytes the maximum number of bytes in the caller supplied buffer.
+  * @param flags a pointer to an int to contain the returned data flags.
+  *
+  * This function is a thread cancellation point.
+  */
 int
 __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, event = 0, flag = 0, result;
-	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 	if (nbytes == 0)
 		return (0);
@@ -3157,10 +3227,12 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 #endif
 	{
 		struct strbuf data;
+
 		data.maxlen = nbytes;
 		data.len = 0;
 		data.buf = buf ? buf : NULL;
-		if ((result = __xnet_t_getdata(fd, &data, (T_DATA | T_EXDATA))) & (T_DATA | T_EXDATA))
+		if ((result =
+		     __xnet_t_getdata(fd, &data, (T_DATA | T_EXDATA))) & (T_DATA | T_EXDATA))
 			event = result;
 		for (;;) {
 			switch (result) {
@@ -3172,7 +3244,8 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 			case T_EXDATA:
 				if (event != T_EXDATA)
 					goto tlook;
-				flag = ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
+				flag =
+				    ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
 				break;
 			case 0:
 				goto tnodata;
@@ -3219,10 +3292,12 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_rcv(). */
 int
 __xnet_t_rcv_r(int fd, char *buf, unsigned int nbytes, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcv(fd, buf, nbytes, flags)) == -1)
@@ -3234,23 +3309,23 @@ __xnet_t_rcv_r(int fd, char *buf, unsigned int nbytes, int *flags)
 	return (ret);
 }
 
-int t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
-    __attribute__ ((alias("__xnet_t_rcv_r")));
+__asm__(".symver __xnet_t_rcv_r,t_rcv@@XNET_1.0");
 
-/**
- * @fn int t_rcvconnect(int fd, struct t_call *call)
- * @brief receive the configuration from a connection request
- * @param fd a file descriptor for the transport endpoint.
- * @param call a pointer to a struct t_call structure.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Receive the configuration from a connection request.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param call a pointer to a struct t_call structure.
+  *
+  * This function is a thread cancellation point.
+  */
 int
 __xnet_t_rcvconnect(int fd, struct t_call *call)
 {
 	struct _t_user *user;
 	union T_primitives *p;
-	if (!(user = __xnet_t_tstuser(fd, T_CONNECT, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WCON_CREQ)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, T_CONNECT, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WCON_CREQ)))
 		goto error;
 #ifdef DEBUG
 	if (call && (call->addr.maxlen < 0 || (call->addr.maxlen > 0 && !call->addr.buf)))
@@ -3273,9 +3348,11 @@ __xnet_t_rcvconnect(int fd, struct t_call *call)
 			if (call->udata.maxlen && call->udata.maxlen < user->data.len)
 				goto tbufovflw;
 			if (call->addr.maxlen && (call->addr.len = p->conn_con.RES_length))
-				memcpy(call->addr.buf, (char *) p + p->conn_con.RES_offset, call->addr.len);
+				memcpy(call->addr.buf, (char *) p + p->conn_con.RES_offset,
+				       call->addr.len);
 			if (call->opt.maxlen && (call->opt.len = p->conn_con.OPT_length))
-				memcpy(call->opt.buf, (char *) p + p->conn_con.OPT_offset, call->opt.len);
+				memcpy(call->opt.buf, (char *) p + p->conn_con.OPT_offset,
+				       call->opt.len);
 			if (call->udata.maxlen && (call->udata.len = user->data.len))
 				memcpy(call->udata.buf, user->data.buf, call->udata.len);
 		}
@@ -3311,10 +3388,12 @@ __xnet_t_rcvconnect(int fd, struct t_call *call)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_rcvconnect(). */
 int
 __xnet_t_rcvconnect_r(int fd, struct t_call *call)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvconnect(fd, call)) == -1)
@@ -3326,22 +3405,20 @@ __xnet_t_rcvconnect_r(int fd, struct t_call *call)
 	return (ret);
 }
 
-int t_rcvconnect(int fd, struct t_call *call)
-    __attribute__ ((alias("__xnet_t_rcvconnect_r")));
+__asm__(".symver __xnet_t_rcvconnect_r,t_rcvconnect@@XNET_1.0");
 
-/**
- * @fn int t_rcvdis(int fd, struct t_discon *discon)
- * @brief retrieve information from disconnection
- * @param fd a file descriptor for the transport endpoint.
- * @param discon a pointer to a struct t_discon structure returning the
- * disconnection reason and data.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Retrieve information from disconnection.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param discon a pointer to a struct t_discon structure returning the
+  * disconnection reason and data.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_rcvdis(int fd, struct t_discon *discon)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, T_DISCONNECT, (1 << T_COTS) | (1 << T_COTS_ORD),
 				      TSF_DATA_XFER | TSF_WCON_CREQ | TSF_WIND_ORDREL |
 				      TSF_WREQ_ORDREL | TSF_WRES_CIND)))
@@ -3349,13 +3426,15 @@ __xnet_t_rcvdis(int fd, struct t_discon *discon)
 	if (user->state == T_INCON && user->ocnt < 1)
 		goto toutstate;
 #ifdef DEBUG
-	if (discon && (discon->udata.maxlen < 0 || (discon->udata.maxlen > 0 && !discon->udata.buf)))
+	if (discon
+	    && (discon->udata.maxlen < 0 || (discon->udata.maxlen > 0 && !discon->udata.buf)))
 		goto einval;
 #endif
 	switch (__xnet_t_getevent(fd)) {
 	case T_DISCONNECT:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		if (user->ocnt && --user->ocnt)
 			__xnet_u_setstate_const(user, TS_WRES_CIND);
 		else
@@ -3403,10 +3482,12 @@ __xnet_t_rcvdis(int fd, struct t_discon *discon)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_rcvdis(). */
 int
 __xnet_t_rcvdis_r(int fd, struct t_discon *discon)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_rcvdis(fd, discon);
@@ -3416,35 +3497,33 @@ __xnet_t_rcvdis_r(int fd, struct t_discon *discon)
 	return (ret);
 }
 
-int t_rcvdis(int fd, struct t_discon *discon)
-    __attribute__ ((alias("__xnet_t_rcvdis_r")));
+__asm__(".symver __xnet_t_rcvdis_r,t_rcvdis@@XNET_1.0");
 
-/**
- * @fn int t_rcvleafchange(int fd, struct t_leaf_status *change)
- * @brief receive an indication about a leaf in a point-to-multipoint connection
- * @param fd a file descriptor for the transport endpoint.
- * @param change a pointer to a t_leaf_status structure.
- *
- * This function is NOT a thread cancellation point.
- *
- * This function is used to determine the statuc of a leaf on a
- * point-to-multipoint connection.  This function can only be used in the
- * @c T_DATAXFER state.  The parameter fd identifies the local connection
- * endpoint that serves as the root of the point-to-multipoint connection, and
- * parameter change points to a t_leaf_status structure.
- *
- * The field leafid identifier the leaf whose status has changed, and field
- * status specifies the change (either @c T_CONNECT or @c T_DISCONNECT).  When
- * status has a value of @c T_CONNECT, field reason is meaningless.  When status
- * has a value of @c T_DISCONNECT, field reason specifies the reason why the leaf
- * was removed from the point-to-multipoint connection or why a pending
- * addleaf failed, through a protocol-dependent reason code.
- */
+/** @brief Receive an indication about a leaf in a point-to-multipoint connection.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param change a pointer to a t_leaf_status structure.
+  *
+  * This function is NOT a thread cancellation point.
+  *
+  * This function is used to determine the statuc of a leaf on a
+  * point-to-multipoint connection.  This function can only be used in the
+  * @c T_DATAXFER state.  The parameter fd identifies the local connection
+  * endpoint that serves as the root of the point-to-multipoint connection, and
+  * parameter change points to a t_leaf_status structure.
+  *
+  * The field leafid identifier the leaf whose status has changed, and field
+  * status specifies the change (either @c T_CONNECT or @c T_DISCONNECT).  When
+  * status has a value of @c T_CONNECT, field reason is meaningless.  When status
+  * has a value of @c T_DISCONNECT, field reason specifies the reason why the leaf
+  * was removed from the point-to-multipoint connection or why a pending
+  * addleaf failed, through a protocol-dependent reason code.
+  */
 int
 __xnet_t_rcvleafchange(int fd, struct t_leaf_status *change)
 {
 #if defined HAVE_XTI_ATM_H
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER)))
 		goto error;
 #ifdef DEBUG
@@ -3457,6 +3536,7 @@ __xnet_t_rcvleafchange(int fd, struct t_leaf_status *change)
 			struct t_atm_leaf_ind leaf;
 		} opts;
 		struct t_optmgmt req, ret;
+
 		req.opt.maxlen = 0;
 		req.opt.len = sizeof(opts);
 		req.opt.buf = (char *) &opts;
@@ -3510,10 +3590,12 @@ __xnet_t_rcvleafchange(int fd, struct t_leaf_status *change)
 #endif				/* defined HAVE_XTI_ATM_H */
 }
 
+/** The reentrant version of __xnet_t_rcvleafchange(). */
 int
 __xnet_t_rcvleafchange_r(int fd, struct t_leaf_status *change)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_rcvleafchange(fd, change);
@@ -3523,21 +3605,22 @@ __xnet_t_rcvleafchange_r(int fd, struct t_leaf_status *change)
 	return (ret);
 }
 
-int t_rcvleafchange(int fd, struct t_leaf_status *change)
-    __attribute__ ((weak, alias("__xnet_t_rcvleafchange_r")));
+#pragma weak __xnet_t_recvleafchange_r
 
-/**
- * @fn int t_rcvrel(int fd)
- * @brief acknolwedge receipt of an orderly release indication
- * @param fd the transport endpoint upon which to acknowledge the release indication.
- *
- * This function is a thread cancellation point.
- */
+__asm__(".symver __xnet_t_rcvleafchange_r,t_rcvleafchange@@XNET_1.0");
+
+/** @brief Acknolwedge receipt of an orderly release indication.
+  * @param fd the transport endpoint upon which to acknowledge the release indication.
+  *
+  * This function is a thread cancellation point.
+  */
 int
 __xnet_t_rcvrel(int fd)
 {
 	struct _t_user *user;
-	if (!(user = __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 	switch (__xnet_t_getevent(fd)) {
 	case T_ORDREL:
@@ -3566,10 +3649,12 @@ __xnet_t_rcvrel(int fd)
 	return (-1);
 }
 
-static int
+/** The reentrant version of __xnet_t_rcvrel(). */
+int
 __xnet_t_rcvrel_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvrel(fd)) == -1)
@@ -3581,31 +3666,32 @@ __xnet_t_rcvrel_r(int fd)
 	return (ret);
 }
 
-int t_rcvrel(int fd)
-    __attribute__ ((alias("__xnet_t_rcvrel_r")));
+__asm__(".symver __xnet_t_rcvrel_r,t_rcvrel@@XNET_1.0");
 
-/**
- * @fn int t_rcvreldata(int fd, struct t_discon *discon)
- * @brief acknolwedge receipt of an orderly release indication
- * @param fd the transport endpoint upon which to acknowledge the release indication.
- * @param discon
- *
- * This function is a thread cancellation point.
- */
+/** @brief Acknolwedge receipt of an orderly release indication.
+  * @param fd the transport endpoint upon which to acknowledge the release indication.
+  * @param discon
+  *
+  * This function is a thread cancellation point.
+  */
 int
 __xnet_t_rcvreldata(int fd, struct t_discon *discon)
 {
 	struct _t_user *user;
-	if (!(user = __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
-	if (discon && (discon->udata.maxlen < 0 || (discon->udata.maxlen > 0 && !discon->udata.buf)))
+	if (discon
+	    && (discon->udata.maxlen < 0 || (discon->udata.maxlen > 0 && !discon->udata.buf)))
 		goto einval;
 #endif
 	switch (__xnet_t_getevent(fd)) {
 	case T_ORDREL:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		if (user->state == T_DATAXFER)
 			__xnet_u_setstate(user, TS_WREQ_ORDREL);
 		if (user->state == T_OUTREL)
@@ -3650,10 +3736,12 @@ __xnet_t_rcvreldata(int fd, struct t_discon *discon)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_rcvreldata(). */
 int
 __xnet_t_rcvreldata_r(int fd, struct t_discon *discon)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvreldata(fd, discon)) == -1)
@@ -3665,30 +3753,33 @@ __xnet_t_rcvreldata_r(int fd, struct t_discon *discon)
 	return (ret);
 }
 
-int t_rcvreldata(int fd, struct t_discon *discon)
-    __attribute__ ((alias("__xnet_t_rcvreldata_r")));
+__asm__(".symver __xnet_t_rcvreldata_r,t_rcvreldata@@XNET_1.0");
 
-/**
- * @fn int t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
- * @brief receive data or expedited data with options
- * @param fd a file descriptor for the transport endpoing.
- * @param optdata a pointer to a struct t_unitdata structure returning the
- * address, options and data associated with the data unit.
- * @param flags a pointer to an integer flags word returning flags associated
- * with the receive.
- *
- * This function is a thread cancellation point.
- *
- * @bug This function has to be converted to not place data in the look buffer
- * but into the user-supplied data area.  Only if the wrong event occurs,
- * should the data be moved to the look data area. 
- */
+/** @brief Receive data or expedited data with options.
+  * @param fd a file descriptor for the transport endpoing.
+  * @param optdata a pointer to a struct t_unitdata structure returning the
+  * address, options and data associated with the data unit.
+  * @param flags a pointer to an integer flags word returning flags associated
+  * with the receive.
+  *
+  * @bug This function has to be converted to not place data in the look buffer
+  * but into the user-supplied data area.  Only if the wrong event occurs,
+  * should the data be moved to the look data area. 
+  *
+  * @remark There is no such function as t_rcvopt() under XTI.  The purpose
+  * here is to try to support SCTP (which has many packet-specific options)
+  * as well as passing of credentials on connection-oriented loopback and UNIX
+  * domain sockets.  Note, however, that t_rcvudata() has the same prototype
+  * and could be overloaded to support T_COTS and T_COTS_ORD as well.
+  */
 int
 __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0;
-	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!optdata)
@@ -3703,6 +3794,7 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 	case T_EXDATA:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		switch (user->prim) {
 		case T_DATA_IND:
 			if (optdata->addr.maxlen >= 0)
@@ -3710,27 +3802,31 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 			if (optdata->opt.maxlen >= 0)
 				optdata->opt.len = 0;
 			if (optdata->udata.maxlen
-			    && (optdata->udata.maxlen = min(optdata->udata.maxlen, user->data.len))) {
+			    && (optdata->udata.maxlen =
+				min(optdata->udata.maxlen, user->data.len))) {
 				memcpy(optdata->udata.buf, user->data.buf, optdata->udata.len);
 				user->data.len -= optdata->udata.len;
 				user->data.buf += optdata->udata.len;
 			}
 			if (flags)
-				*flags |= (user->moresdu || user->moredat || user->data.len > 0) ? T_MORE : 0;
+				*flags |= (user->moresdu || user->moredat
+					   || user->data.len > 0) ? T_MORE : 0;
 			break;
 		case T_EXDATA_IND:
 			if (optdata->addr.maxlen >= 0)
 				optdata->addr.len = 0;
 			if (optdata->opt.maxlen >= 0)
 				optdata->opt.len = 0;
-			if (optdata->udata.maxlen && (optdata->udata.len = min(optdata->udata.maxlen, user->data.len))) {
+			if (optdata->udata.maxlen
+			    && (optdata->udata.len = min(optdata->udata.maxlen, user->data.len))) {
 				memcpy(optdata->udata.buf, user->data.buf, optdata->udata.len);
 				user->data.len -= optdata->udata.len;
 				user->data.buf += optdata->udata.len;
 			}
 			if (flags)
 				*flags |= (user->moreedu || user->moreexp
-					   || user->data.len > 0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
+					   || user->data.len >
+					   0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
 			break;
 		case T_OPTDATA_IND:
 			if (optdata->addr.maxlen >= 0)
@@ -3738,8 +3834,10 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 			if (optdata->opt.maxlen && optdata->opt.maxlen < p->optdata_ind.OPT_length)
 				goto tbufovflw;
 			if (optdata->opt.maxlen && (optdata->opt.len = p->optdata_ind.OPT_length))
-				memcpy(optdata->opt.buf, (char *) p + p->optdata_ind.OPT_offset, optdata->opt.len);
-			if (optdata->udata.maxlen && (optdata->udata.len = min(optdata->udata.maxlen, user->data.len))) {
+				memcpy(optdata->opt.buf, (char *) p + p->optdata_ind.OPT_offset,
+				       optdata->opt.len);
+			if (optdata->udata.maxlen
+			    && (optdata->udata.len = min(optdata->udata.maxlen, user->data.len))) {
 				memcpy(optdata->udata.buf, user->data.buf, optdata->udata.len);
 				user->data.len -= optdata->udata.len;
 				user->data.buf += optdata->udata.len;
@@ -3747,10 +3845,12 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 			if (p->optdata_ind.DATA_flag & T_ODF_EX) {
 				if (flags)
 					*flags |= (user->moreedu || user->moreexp
-						   || user->data.len > 0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
+						   || user->data.len >
+						   0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
 			} else {
 				if (flags)
-					*flags |= (user->moresdu || user->moredat || user->data.len > 0) ? T_MORE : 0;
+					*flags |= (user->moresdu || user->moredat
+						   || user->data.len > 0) ? T_MORE : 0;
 			}
 			break;
 		default:
@@ -3790,10 +3890,24 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 	return (copied);
 }
 
+/** The reentrant version of __xnet_t_rcvopt().
+  * @param fd a file descriptor for the transport endpoing.
+  * @param optdata a pointer to a struct t_unitdata structure returning the
+  * address, options and data associated with the data unit.
+  * @param flags a pointer to an integer flags word returning flags associated
+  * with the receive.
+  *
+  * This function is a thread cancellation point.
+  *
+  * @note Although ioctl(2) is also a thread cancellation point, care must be
+  * taken to release the locks held by the thread before asynchronous
+  * cancellation occurs, or at least that a cleanup function is provided.
+  */
 int
 __xnet_t_rcvopt_r(int fd, struct t_unitdata *optdata, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvopt(fd, optdata, flags)) == -1)
@@ -3805,28 +3919,26 @@ __xnet_t_rcvopt_r(int fd, struct t_unitdata *optdata, int *flags)
 	return (ret);
 }
 
-int t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
-    __attribute__ ((alias("__xnet_t_rcvopt_r")));
+__asm__(".symver __xnet_t_rcvopt_r,t_rcvopt@@XNET_1.0");
 
-/**
- * @fn int t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
- * @brief receive a data unit
- * @param fd a file descriptor for the transport endpoint.
- * @param unitdata a pointer to a t_unitdata structure describing the address, options and data of the data unit.
- * @param flags a pointer to integer flags returned.
- *
- * This function is a thread cancellation point.
- *
- * @bug This function has to be converted to not place data in the look buffer
- * but into the user-supplied data area.  Only if the wrong event occurs,
- * should the data be moved to the look data area. 
- */
-int
+/** @brief Receive a data unit.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param unitdata a pointer to a t_unitdata structure describing the address, options and data of the data unit.
+  * @param flags a pointer to integer flags returned.
+  *
+  * This function is a thread cancellation point.
+  *
+  * @bug This function has to be converted to not place data in the look buffer
+  * but into the user-supplied data area.  Only if the wrong event occurs,
+  * should the data be moved to the look data area. 
+  */
+__hot int
 __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, flag = 0, result;
-	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
+
+	if (unlikely(!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE))))
 		goto error;
 #ifdef DEBUG
 	if (!unitdata)
@@ -3834,49 +3946,53 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 	if (!flags)
 		goto einval;
 #endif
-	if (!unitdata)
-		return (0);
+	if (unlikely(!unitdata))
+		goto done;
 	{
 		struct strbuf data;
-		data.maxlen = unitdata->udata.maxlen > 0 ? unitdata->udata.maxlen : 0;
+
+		data.maxlen = likely(unitdata->udata.maxlen > 0)
+		    ? unitdata->udata.maxlen : 0;
 		data.len = 0;
 		data.buf = unitdata->udata.buf;
-		if ((result = __xnet_t_getdata(fd, &data, T_DATA)) == T_DATA) {
+		if (likely((result = __xnet_t_getdata(fd, &data, T_DATA)) == T_DATA)) {
 			union T_primitives *p = (typeof(p)) user->ctrl.buf;
-			switch (user->prim) {
-			case T_UNITDATA_IND:
-				if (unitdata->addr.maxlen && unitdata->addr.maxlen < p->unitdata_ind.SRC_length)
+
+			if (likely(user->prim == T_UNITDATA_IND)) {
+				if (unlikely(unitdata->addr.maxlen)
+				    && unlikely(unitdata->addr.maxlen < p->unitdata_ind.SRC_length))
 					goto tbufovflw;
-				if (unitdata->opt.maxlen && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
+				if (unlikely(unitdata->opt.maxlen)
+				    && unlikely(unitdata->opt.maxlen < p->unitdata_ind.OPT_length))
 					goto tbufovflw;
-				if (unitdata->addr.maxlen && (unitdata->addr.len = p->unitdata_ind.SRC_length))
+				if (unlikely(unitdata->addr.maxlen)
+				    && (unitdata->addr.len = p->unitdata_ind.SRC_length))
 					memcpy(unitdata->addr.buf,
-					       (char *) p + p->unitdata_ind.SRC_offset, unitdata->addr.len);
-				if (unitdata->opt.maxlen && (unitdata->opt.len = p->unitdata_ind.OPT_length))
+					       (char *) p + p->unitdata_ind.SRC_offset,
+					       unitdata->addr.len);
+				if (unlikely(unitdata->opt.maxlen)
+				    && (unitdata->opt.len = p->unitdata_ind.OPT_length))
 					memcpy(unitdata->opt.buf,
-					       (char *) p + p->unitdata_ind.OPT_offset, unitdata->opt.len);
-				break;
-			default:
+					       (char *) p + p->unitdata_ind.OPT_offset,
+					       unitdata->opt.len);
+			} else {
 				unitdata->addr.len = 0;
 				unitdata->opt.len = 0;
-				break;
 			}
 		}
 		for (;;) {
-			switch (result) {
-			case T_DATA:
+			if (likely(result == T_DATA))
 				flag = (user->moresdu || user->moredat) ? T_MORE : 0;
-				break;
-			case 0:
+			else if (result == 0)
 				goto tnodata;
-			case -1:
+			else if (result == -1)
 				goto error;
-			default:
+			else
 				goto tlook;
-			}
-			if ((copied += data.len) >= unitdata->udata.maxlen)
+
+			if (likely((copied += data.len) >= unitdata->udata.maxlen))
 				break;
-			if (!(flag & T_MORE)) {
+			if (likely(!(flag & T_MORE))) {
 				__xnet_u_reset_event(user);
 				break;
 			}
@@ -3889,6 +4005,7 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 	if (flags)
 		*flags = flag;
 	unitdata->udata.len = copied;
+      done:
 	return (0);
 #ifdef DEBUG
       einval:
@@ -3915,10 +4032,12 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 	return (-1);
 }
 
-int
+/** The reentrant version of __xnet_t_rcvudata(). */
+__hot int
 __xnet_t_rcvudata_r(int fd, struct t_unitdata *unitdata, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvudata(fd, unitdata, flags)) == -1)
@@ -3930,22 +4049,20 @@ __xnet_t_rcvudata_r(int fd, struct t_unitdata *unitdata, int *flags)
 	return (ret);
 }
 
-int t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
-    __attribute__ ((alias("__xnet_t_rcvudata_r")));
+__asm__(".symver __xnet_t_rcvudata_r,t_rcvudata@@XNET_1.0");
 
-/**
- * @fn int t_rcvuderr(int fd, struct t_uderr *uderr)
- * @brief receive a unit data error indication
- * @param fd a file descriptor for the transport endpoint.
- * @param uderr a pointer to a struct t_uderr structure returning the address,
- * options and error code.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Receive a unit data error indication.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param uderr a pointer to a struct t_uderr structure returning the address,
+  * options and error code.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_rcvuderr(int fd, struct t_uderr *uderr)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, T_UDERR, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 #ifdef DEBUG
@@ -3958,6 +4075,7 @@ __xnet_t_rcvuderr(int fd, struct t_uderr *uderr)
 	case T_UDERR:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		if (uderr) {
 			uderr->error = p->uderror_ind.ERROR_type;
 			if (uderr->addr.maxlen && uderr->addr.maxlen < p->uderror_ind.DEST_length)
@@ -3965,9 +4083,11 @@ __xnet_t_rcvuderr(int fd, struct t_uderr *uderr)
 			if (uderr->opt.maxlen && uderr->opt.maxlen < p->uderror_ind.OPT_length)
 				goto tbufovflw;
 			if (uderr->addr.maxlen && (uderr->addr.len = p->uderror_ind.DEST_length))
-				memcpy(uderr->addr.buf, (char *) p + p->uderror_ind.DEST_offset, uderr->addr.len);
+				memcpy(uderr->addr.buf, (char *) p + p->uderror_ind.DEST_offset,
+				       uderr->addr.len);
 			if (uderr->opt.maxlen && (uderr->opt.len = p->uderror_ind.OPT_length))
-				memcpy(uderr->opt.buf, (char *) p + p->uderror_ind.OPT_offset, uderr->opt.len);
+				memcpy(uderr->opt.buf, (char *) p + p->uderror_ind.OPT_offset,
+				       uderr->opt.len);
 		}
 		__xnet_u_reset_event(user);
 		return (0);
@@ -4001,10 +4121,12 @@ __xnet_t_rcvuderr(int fd, struct t_uderr *uderr)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_rcvuderr(). */
 int
 __xnet_t_rcvuderr_r(int fd, struct t_uderr *uderr)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_rcvuderr(fd, uderr);
@@ -4014,26 +4136,25 @@ __xnet_t_rcvuderr_r(int fd, struct t_uderr *uderr)
 	return (ret);
 }
 
-int t_rcvuderr(int fd, struct t_uderr *uderr)
-    __attribute__ ((alias("__xnet_t_rcvuderr_r")));
+__asm__(".symver __xnet_t_rcvuderr_r,t_rcvuderr@@XNET_1.0");
 
-/**
- * @fn int t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
- * @brief read data or expedited data and scatter
- * @param fd a file descriptor for the transport endpoint.
- * @param iov a pointer to an array of struct t_iovec io vectors.
- * @param iovcount the count of the elements in the t_iovec array.
- * @param flags a pointer to an integer flags word to contain the returned
- * message flags.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Read data or expedited data and scatter.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param iov a pointer to an array of struct t_iovec io vectors.
+  * @param iovcount the count of the elements in the t_iovec array.
+  * @param flags a pointer to an integer flags word to contain the returned
+  * message flags.
+  *
+  * This function is a thread cancellation point.
+  */
 int
 __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, nbytes, n = 0, event = 0, flag = 0, result;
-	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!flags)
@@ -4048,10 +4169,12 @@ __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 		goto tbaddata;
 	{
 		struct strbuf data;
+
 		data.maxlen = iov[0].iov_len;
 		data.len = 0;
 		data.buf = iov[0].iov_base;
-		if ((result = __xnet_t_getdata(fd, &data, (T_DATA | T_EXDATA))) & (T_DATA | T_EXDATA))
+		if ((result =
+		     __xnet_t_getdata(fd, &data, (T_DATA | T_EXDATA))) & (T_DATA | T_EXDATA))
 			event = result;
 		for (n = 0;;) {
 			switch (result) {
@@ -4063,7 +4186,8 @@ __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 			case T_EXDATA:
 				if (event != T_EXDATA)
 					goto tlook;
-				flag = ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
+				flag =
+				    ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
 				break;
 			case 0:
 				goto tnodata;
@@ -4120,10 +4244,12 @@ __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 	return (copied);
 }
 
+/** The reentrant version of __xnet_t_rcvv(). */
 int
 __xnet_t_rcvv_r(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvv(fd, iov, iovcount, flags)) == -1)
@@ -4135,27 +4261,26 @@ __xnet_t_rcvv_r(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 	return (ret);
 }
 
-int t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
-    __attribute__ ((alias("__xnet_t_rcvv_r")));
+__asm__(".symver __xnet_t_rcvv_r,t_rcvv@@XNET_1.0");
 
-/**
- * @fn int t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags)
- * @brief receive data unit with scatter.
- * @param fd a file descriptor for the transport endpoint.
- * @param unitdata a pointer to a struct t_unitdata structure to contain the
- * received address, options and data unit.
- * @param iov a pointer to an array of struct t_iovec io vectors.
- * @param iovcount the count of the elements in the t_iovec array.
- * @param flags a pointer to an integer flags word to contain the returned
- * message flags.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Receive data unit with scatter.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param unitdata a pointer to a struct t_unitdata structure to contain the
+  * received address, options and data unit.
+  * @param iov a pointer to an array of struct t_iovec io vectors.
+  * @param iovcount the count of the elements in the t_iovec array.
+  * @param flags a pointer to an integer flags word to contain the returned
+  * message flags.
+  *
+  * This function is a thread cancellation point.
+  */
 int
-__xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags)
+__xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount,
+		   int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, nbytes, n = 0, flag = 0, result;
+
 	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 	for (nbytes = 0, n = 0; n < iovcount; nbytes += iov[n].iov_len, n++) ;
@@ -4169,24 +4294,32 @@ __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 #endif
 	{
 		struct strbuf data;
+
 		data.maxlen = iov[0].iov_len;
 		data.len = 0;
 		data.buf = iov[0].iov_base;
 		if ((result = __xnet_t_getdata(fd, &data, T_DATA)) == T_DATA) {
 			union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 			switch (user->prim) {
 			case T_UNITDATA_IND:
 				if (unitdata) {
-					if (unitdata->addr.maxlen && unitdata->addr.maxlen < p->unitdata_ind.SRC_length)
+					if (unitdata->addr.maxlen
+					    && unitdata->addr.maxlen < p->unitdata_ind.SRC_length)
 						goto tbufovflw;
-					if (unitdata->opt.maxlen && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
+					if (unitdata->opt.maxlen
+					    && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
 						goto tbufovflw;
-					if (unitdata->addr.maxlen && (unitdata->addr.len = p->unitdata_ind.OPT_length))
+					if (unitdata->addr.maxlen
+					    && (unitdata->addr.len = p->unitdata_ind.OPT_length))
 						memcpy(unitdata->addr.buf,
-						       (char *) p + p->unitdata_ind.SRC_offset, unitdata->addr.len);
-					if (unitdata->opt.maxlen && (unitdata->opt.len = p->unitdata_ind.OPT_length))
+						       (char *) p + p->unitdata_ind.SRC_offset,
+						       unitdata->addr.len);
+					if (unitdata->opt.maxlen
+					    && (unitdata->opt.len = p->unitdata_ind.OPT_length))
 						memcpy(unitdata->opt.buf,
-						       (char *) p + p->unitdata_ind.OPT_offset, unitdata->opt.len);
+						       (char *) p + p->unitdata_ind.OPT_offset,
+						       unitdata->opt.len);
 				}
 				break;
 			default:
@@ -4263,10 +4396,13 @@ __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_rcvvudata(). */
 int
-__xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags)
+__xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+		     unsigned int iovcount, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvvudata(fd, unitdata, iov, iovcount, flags)) == -1)
@@ -4278,31 +4414,29 @@ __xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, u
 	return (ret);
 }
 
-int t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags)
-    __attribute__ ((alias("__xnet_t_rcvvudata_r")));
+__asm__(".symver __xnet_t_rcvvudata_r,t_rcvvudata@@XNET_1.0");
 
-/**
- * @fn int t_removeleaf(int fd, int leafid, int reason)
- * @brief drop a leaf from a point-to-multipoint connection
- * @param fd a file descriptor for the transport user endpoint.
- * @param leafid the identifier of the leaf to be removed.
- * @param reason the reason for removal.
- *
- * t_removeleaf() is NOT a thread cancellation point, but it calls
- * __xnet_t_optmgmt() which contains ioctl() which may be a cancellation
- * point; so, thread cancellation is disabled across calling this function.
- *
- * This XTI Library function is only used with ATM.  It is used to remove a
- * leaf from a point to multipoint connection.  TPI needs ATM extensions to be
- * able to perform this function.
- *
- * Note that leafid and reason are protocol specific values.
- */
+/** @brief Drop a leaf from a point-to-multipoint connection.
+  * @param fd a file descriptor for the transport user endpoint.
+  * @param leafid the identifier of the leaf to be removed.
+  * @param reason the reason for removal.
+  *
+  * t_removeleaf() is NOT a thread cancellation point, but it calls
+  * __xnet_t_optmgmt() which contains ioctl() which may be a cancellation
+  * point; so, thread cancellation is disabled across calling this function.
+  *
+  * This XTI Library function is only used with ATM.  It is used to remove a
+  * leaf from a point to multipoint connection.  TPI needs ATM extensions to be
+  * able to perform this function.
+  *
+  * Note that leafid and reason are protocol specific values.
+  */
 int
 __xnet_t_removeleaf(int fd, int leafid, int reason)
 {
 #if defined HAVE_XTI_ATM_H
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER)))
 		goto error;
 	{
@@ -4311,6 +4445,7 @@ __xnet_t_removeleaf(int fd, int leafid, int reason)
 			struct t_atm_drop_leaf leaf;
 		} opts;
 		struct t_optmgmt req, ret;
+
 		req.opt.maxlen = 0;
 		req.opt.len = sizeof(opts);
 		req.opt.buf = (char *) &opts;
@@ -4357,10 +4492,12 @@ __xnet_t_removeleaf(int fd, int leafid, int reason)
 #endif				/* defined HAVE_XTI_ATM_H */
 }
 
+/** The reentrant version of __xnet_t_removeleaf(). */
 int
 __xnet_t_removeleaf_r(int fd, int leafid, int reason)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_removeleaf(fd, leafid, reason);
@@ -4370,36 +4507,36 @@ __xnet_t_removeleaf_r(int fd, int leafid, int reason)
 	return (ret);
 }
 
-int t_removeleaf(int fd, int leafid, int reason)
-    __attribute__ ((weak, alias("__xnet_t_removeleaf_r")));
+#pragma weak __xnet_t_removeleaf_r
+__asm__(".symver __xnet_t_removeleaf_r,t_removeleaf@@XNET_1.0");
 
-/**
- * @fn int t_snd(int fd, char *buf, unsigned int nbytes, int flags)
- * @brief send data or expedited data over a connection
- * @param fd a file descriptor for the transport endpoint.
- * @param buf a pointer to a character buffer containing the information to
- * send.
- * @param nbytes the number of bytes in the character buffer.
- * @param flags flags to specify the nature of the transmission.
- *
- * This function is a thread cancellation point.
- *
- * void *buf or char *buf is the big question here...
- *
- * User of the @c T_PUSH flag: we ignore it because we don't accumulate any data.
- * Also, there is no way to communicate it using TPI.
- *
- * Also, note that if the sending is interrupted or asynchronous and flow
- * controlled yet returns a positive non-zero number less than nbytes (partial
- * write), then we will properly set errno and t_errno anyway and the can be
- * examined by the caller to determine which action cause the partial write.
- */
+/** @brief Send data or expedited data over a connection.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param buf a pointer to a character buffer containing the information to
+  * send.
+  * @param nbytes the number of bytes in the character buffer.
+  * @param flags flags to specify the nature of the transmission.
+  *
+  * This function is a thread cancellation point.
+  *
+  * void *buf or char *buf is the big question here...
+  *
+  * User of the @c T_PUSH flag: we ignore it because we don't accumulate any data.
+  * Also, there is no way to communicate it using TPI.
+  *
+  * Also, note that if the sending is interrupted or asynchronous and flow
+  * controlled yet returns a positive non-zero number less than nbytes (partial
+  * write), then we will properly set errno and t_errno anyway and the can be
+  * examined by the caller to determine which action cause the partial write.
+  */
 int
 __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 {
 	struct _t_user *user;
 	int written = 0;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -4417,6 +4554,7 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 		int band = (flags & T_EXPEDITED) ? 1 : 0;
 		struct T_exdata_req prim;	/* same as T_data_req */
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(prim);
 		ctrl.buf = (char *) &prim;
@@ -4457,10 +4595,12 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 	return (written);
 }
 
+/** The reentrant version of __xnet_t_snd(). */
 int
 __xnet_t_snd_r(int fd, char *buf, unsigned int nbytes, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_snd(fd, buf, nbytes, flags)) == -1)
@@ -4472,22 +4612,20 @@ __xnet_t_snd_r(int fd, char *buf, unsigned int nbytes, int flags)
 	return (ret);
 }
 
-int t_snd(int fd, char *buf, unsigned int nbytes, int flags)
-    __attribute__ ((alias("__xnet_t_snd_r")));
+__asm__(".symver __xnet_t_snd_r,t_snd@@XNET_1.0");
 
-/**
- * @fn int t_snddis(int fd, const struct t_call *call)
- * @brief initiate disconnect
- * @param fd a file descriptor for the transport endpoing.
- * @param call a pointer to a struct t_call structure describing the
- * disconnection reason and data.
- *
- * This function is NOT a thread cancellation point.
- */
+/** @brief Initiate disconnect.
+  * @param fd a file descriptor for the transport endpoing.
+  * @param call a pointer to a struct t_call structure describing the
+  * disconnection reason and data.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_snddis(int fd, const struct t_call *call)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
 				      TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER |
 				      TSF_WIND_ORDREL | TSF_WREQ_ORDREL)))
@@ -4508,6 +4646,7 @@ __xnet_t_snddis(int fd, const struct t_call *call)
 			struct T_discon_req prim;
 			unsigned char udata[dat_len];
 		} req;
+
 		req.prim.PRIM_type = T_DISCON_REQ;
 		req.prim.SEQ_number = call ? call->sequence : 0;
 		if (dat_len)
@@ -4559,10 +4698,12 @@ __xnet_t_snddis(int fd, const struct t_call *call)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_snddis(). */
 int
 __xnet_t_snddis_r(int fd, const struct t_call *call)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_snddis(fd, call);
@@ -4573,24 +4714,22 @@ __xnet_t_snddis_r(int fd, const struct t_call *call)
 	return (ret);
 }
 
-int t_snddis(int fd, const struct t_call *call)
-    __attribute__ ((alias("__xnet_t_snddis_r")));
+__asm__(".symver __xnet_t_snddis_r,t_snddis@@XNET_1.0");
 
-/**
- * @fn int t_sndrel(int fd)
- * @brief initiate an orderly release
- * @param fd a file descriptor for the transport endpoint
- *
- * This function is a thread cancellation point.
- *
- * Although XNS 5.2 describes the discon->reason as being a protocol dependent
- * reason code, there is no way in TPI to send a reason code, so it is
- * ignored.
- */
+/** @brief Initiate an orderly release.
+  * @param fd a file descriptor for the transport endpoint
+  *
+  * This function is a thread cancellation point.
+  *
+  * Although XNS 5.2 describes the discon->reason as being a protocol dependent
+  * reason code, there is no way in TPI to send a reason code, so it is
+  * ignored.
+  */
 int
 __xnet_t_sndrel(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
@@ -4598,6 +4737,7 @@ __xnet_t_sndrel(int fd)
 	{
 		struct T_ordrel_req prim;
 		struct strbuf ctrl;
+
 		prim.PRIM_type = T_ORDREL_REQ;
 		ctrl.maxlen = sizeof(prim);
 		ctrl.len = sizeof(prim);
@@ -4623,10 +4763,12 @@ __xnet_t_sndrel(int fd)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_sndrel(). */
 int
 __xnet_t_sndrel_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndrel(fd)) == -1)
@@ -4638,26 +4780,24 @@ __xnet_t_sndrel_r(int fd)
 	return (ret);
 }
 
-int t_sndrel(int fd)
-    __attribute__ ((alias("__xnet_t_sndrel_r")));
+__asm__(".symver __xnet_t_sndrel_r,t_sndrel@@XNET_1.0");
 
-/**
- * @fn int t_sndreldata(int fd, struct t_discon *discon)
- * @brief initiate an orderly release with data
- * @param fd a file descriptor for the transport endpoint.
- * @param discon a pointer to a struct t_discon structure containing the
- * release reason and data.
- *
- * This function is a thread cancellation point.
- *
- * Although XNS 5.2 describes the discon->reason as being a protocol dependent
- * reason code, there is no way in TPI to send a reason code, so it is
- * ignored.
- */
+/** @brief Initiate an orderly release with data.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param discon a pointer to a struct t_discon structure containing the
+  * release reason and data.
+  *
+  * This function is a thread cancellation point.
+  *
+  * Although XNS 5.2 describes the discon->reason as being a protocol dependent
+  * reason code, there is no way in TPI to send a reason code, so it is
+  * ignored.
+  */
 int
 __xnet_t_sndreldata(int fd, struct t_discon *discon)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
@@ -4673,6 +4813,7 @@ __xnet_t_sndreldata(int fd, struct t_discon *discon)
 	{
 		struct T_ordrel_req prim;
 		struct strbuf ctrl, data;
+
 		prim.PRIM_type = T_ORDREL_REQ;
 		ctrl.maxlen = sizeof(prim);
 		ctrl.len = sizeof(prim);
@@ -4715,10 +4856,12 @@ __xnet_t_sndreldata(int fd, struct t_discon *discon)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_sndreldata(). */
 int
 __xnet_t_sndreldata_r(int fd, struct t_discon *discon)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndreldata(fd, discon)) == -1)
@@ -4730,25 +4873,24 @@ __xnet_t_sndreldata_r(int fd, struct t_discon *discon)
 	return (ret);
 }
 
-int t_sndreldata(int fd, struct t_discon *discon)
-    __attribute__ ((alias("__xnet_t_sndreldata_r")));
+__asm__(".symver __xnet_t_sndreldata_r,t_sndreldata@@XNET_1.0");
 
-/**
- * @fn int t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
- * @brief send data or expedited data with options
- * @param fd a file descriptor for the transport endpoint.
- * @param optdata a pointer to a struct t_unitdata structure containing the
- * options for the send.
- * @param flags flags to control the send.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Send data or expedited data with options.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param optdata a pointer to a struct t_unitdata structure containing the
+  * options for the send.
+  * @param flags flags to control the send.
+  *
+  * This function is a thread cancellation point.
+  */
 int
 __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 {
 	struct _t_user *user;
 	int written = 0;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!optdata)
@@ -4769,6 +4911,7 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -4776,7 +4919,8 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 		data.len = dat_len;
 		data.buf = optdata ? optdata->udata.buf : NULL;
 		req.prim.PRIM_type = T_OPTDATA_REQ;
-		req.prim.DATA_flag = ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
+		req.prim.DATA_flag =
+		    ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
 		req.prim.OPT_length = opt_len;
 		req.prim.OPT_offset = opt_len ? sizeof(req.prim) : 0;
 		if (opt_len)
@@ -4785,7 +4929,8 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 			data.len = min(__xnet_u_max_tidu(user), dat_len - written);
 			data.buf = optdata->udata.buf + written;
 			req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0)
-			    | (((flags & T_MORE) || (written + data.len < dat_len)) ? T_ODF_MORE : 0);
+			    | (((flags & T_MORE) || (written + data.len < dat_len)) ? T_ODF_MORE :
+			       0);
 			if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND))
 				goto error;
 			written += data.len;
@@ -4812,10 +4957,12 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 	return (written);
 }
 
+/** The reentrant version of __xnet_t_sndopt(). */
 int
 __xnet_t_sndopt_r(int fd, const struct t_unitdata *optdata, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndopt(fd, optdata, flags)) == -1)
@@ -4827,29 +4974,29 @@ __xnet_t_sndopt_r(int fd, const struct t_unitdata *optdata, int flags)
 	return (ret);
 }
 
-int t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
-    __attribute__ ((alias("__xnet_t_sndopt_r")));
+__asm__(".symver __xnet_t_sndopt_r,t_sndopt@@XNET_1.0");
 
-/**
- * @fn int t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags)
- * @brief gather and send data or expedited data with options
- * @param fd a file descriptor for the transport endpoint.
- * @param optdata a pointer to a struct t_unitdata structure containing the
- * options for the send.
- * @param iov a pointer to a struct t_iovec array containing the io vectors
- * for the send.
- * @param iovcount the count of the number of elements in the struct t_iovec
- * array.
- * @param flags flags to control the send.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Gather and send data or expedited data with options.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param optdata a pointer to a struct t_unitdata structure containing the
+  * options for the send.
+  * @param iov a pointer to a struct t_iovec array containing the io vectors
+  * for the send.
+  * @param iovcount the count of the number of elements in the struct t_iovec
+  * array.
+  * @param flags flags to control the send.
+  *
+  * This function is a thread cancellation point.
+  */
 int
-__xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags)
+__xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov,
+		 unsigned int iovcount, int flags)
 {
 	struct _t_user *user;
 	int written = 0, nbytes, i;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!iov)
@@ -4869,6 +5016,7 @@ __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec 
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -4885,7 +5033,8 @@ __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec 
 				data.len = min(__xnet_u_max_tidu(user), iov[n].iov_len - partial);
 				data.buf = iov[n].iov_base + partial;
 				req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0) |
-				    (((flags & T_MORE) || (written + data.len < nbytes)) ? T_ODF_MORE : 0);
+				    (((flags & T_MORE)
+				      || (written + data.len < nbytes)) ? T_ODF_MORE : 0);
 				if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND) == -1)
 					goto error;
 				partial += data.len;
@@ -4913,11 +5062,13 @@ __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec 
 	return (written);
 }
 
+/** The reentrant version of __xnet_t_sndvopt(). */
 int
 __xnet_t_sndvopt_r(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov,
 		   unsigned int iovcount, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndvopt(fd, optdata, iov, iovcount, flags)) == -1)
@@ -4929,77 +5080,91 @@ __xnet_t_sndvopt_r(int fd, const struct t_unitdata *optdata, const struct t_iove
 	return (ret);
 }
 
-int t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags)
-    __attribute__ ((alias("__xnet_t_sndvopt_r")));
+__asm__(".symver __xnet_t_sndvopt_r,t_sndvopt@@XNET_1.0");
 
-/**
- * @fn int t_sndudata(int fd, const struct t_unitdata *unitdata)
- * @brief send a data unit
- * @param fd a file descriptor for the transport endpoint.
- * @param unitdata a pointer to a struct t_unitdata structure containing the
- * address, options and data unit for the send.
- *
- * This function is a thread cancellation point.
- *
- * This XTI call is normally only used for connection-less mode services.
- * However, we permit the call to be used for connection-oriented services
- * where we want to provide option data with the send (i.e. invoke a
- * @c T_OPTDATA_REQ).  There is no other way in XTI of generating option data
- * with a transmission.
- */
-int
+/** @brief Send a data unit.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param unitdata a pointer to a struct t_unitdata structure containing the
+  * address, options and data unit for the send.
+  *
+  * This function is a thread cancellation point.
+  *
+  * This XTI call is normally only used for connection-less mode services.
+  * However, we permit the call to be used for connection-oriented services
+  * where we want to provide option data with the send (i.e. invoke a
+  * @c T_OPTDATA_REQ).  There is no other way in XTI of generating option data
+  * with a transmission.
+  */
+__hot int
 __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 {
 	struct _t_user *user;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_CLTS), TSF_IDLE)))
+
+	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+#if 1
+	if ((__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
+#endif
 #ifdef DEBUG
-	if (!unitdata)
+	if (unlikely(!unitdata))
 		goto einval;
-	if (unitdata && (unitdata->addr.len < 0 || (unitdata->addr.len > 0 && !unitdata->addr.buf)))
+	if (unlikely(unitdata->addr.len < 0 || (unitdata->addr.len > 0 && !unitdata->addr.buf)))
 		goto einval;
-	if (unitdata && (unitdata->opt.len < 0 || (unitdata->opt.len > 0 && !unitdata->opt.buf)))
+	if (unlikely(unitdata->opt.len < 0 || (unitdata->opt.len > 0 && !unitdata->opt.buf)))
 		goto einval;
-	if (unitdata && (unitdata->udata.len < 0 || (unitdata->udata.len > 0 && !unitdata->udata.buf)))
+	if (unlikely(unitdata->udata.len < 0 || (unitdata->udata.len > 0 && !unitdata->udata.buf)))
 		goto einval;
 #endif
-	if (unitdata && unitdata->addr.len > __xnet_u_max_addr(user))
-		goto tbadaddr;
-	if (unitdata && unitdata->opt.len > __xnet_u_max_options(user))
-		goto tbadopt;
-	if (unitdata && unitdata->udata.len > __xnet_u_max_tsdu(user))
-		goto tbaddata;
-	if (unitdata && unitdata->udata.len > __xnet_u_max_tidu(user))
-		goto tbaddata;
-	if ((!unitdata || unitdata->udata.len == 0) && !(user->info.flags & T_SNDZERO))
-		goto tbaddata;
+	if (likely(unitdata)) {
+		if (unlikely(unitdata->addr.len > __xnet_u_max_addr(user)))
+			goto tbadaddr;
+		if (unlikely(unitdata->opt.len > __xnet_u_max_options(user)))
+			goto tbadopt;
+		if (unlikely(unitdata->udata.len > __xnet_u_max_tsdu(user)))
+			goto tbaddata;
+		if (unlikely(unitdata->udata.len > __xnet_u_max_tidu(user)))
+			goto tbaddata;
+		if (unlikely(unitdata->udata.len == 0 && !(user->info.flags & T_SNDZERO)))
+			goto tbaddata;
+	} else {
+		if (unlikely(!(user->info.flags & T_SNDZERO)))
+			goto tbaddata;
+	}
 	{
-		size_t add_len = (unitdata && unitdata->addr.len > 0) ? unitdata->addr.len : 0;
-		size_t opt_len = (unitdata && unitdata->opt.len > 0) ? unitdata->opt.len : 0;
+		size_t add_len = (likely(unitdata)
+				  && likely(unitdata->addr.len > 0)) ? unitdata->addr.len : 0;
+		size_t opt_len = (likely(unitdata)
+				  && unlikely(unitdata->opt.len > 0)) ? unitdata->opt.len : 0;
 		struct {
 			struct T_unitdata_req prim;
 			unsigned char addr[add_len];
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = sizeof(req);
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
-		data.maxlen = unitdata ? unitdata->udata.maxlen : 0;
-		data.len = unitdata ? unitdata->udata.len : 0;
-		data.buf = unitdata ? unitdata->udata.buf : NULL;
+		if (likely(unitdata)) {
+			data.maxlen = unitdata->udata.maxlen;
+			data.len = unitdata->udata.len;
+			data.buf = unitdata->udata.buf;
+		} else {
+			data.maxlen = 0;
+			data.len = 0;
+			data.buf = NULL;
+		}
 		req.prim.PRIM_type = T_UNITDATA_REQ;
 		req.prim.DEST_length = add_len;
-		req.prim.DEST_offset = add_len ? sizeof(req.prim) : 0;
+		req.prim.DEST_offset = likely(add_len) ? sizeof(req.prim) : 0;
 		req.prim.OPT_length = opt_len;
-		req.prim.OPT_offset = opt_len ? sizeof(req.prim) + add_len : 0;
-		if (add_len)
+		req.prim.OPT_offset = unlikely(opt_len) ? sizeof(req.prim) + add_len : 0;
+		if (likely(add_len))
 			memcpy(req.addr, unitdata->addr.buf, add_len);
-		if (opt_len)
+		if (unlikely(opt_len))
 			memcpy(req.addr + add_len, unitdata->opt.buf, opt_len);
-		if (__xnet_t_putmsg(fd, &ctrl, &data, 0))
+		if (unlikely(__xnet_t_putmsg(fd, &ctrl, &data, 0)))
 			goto error;
 		return (0);
 	}
@@ -5024,15 +5189,17 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && (__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
 	return (-1);
 }
 
-int
+/** The reentrant version of __xnet_t_sndudata(). */
+__hot int
 __xnet_t_sndudata_r(int fd, const struct t_unitdata *unitdata)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndudata(fd, unitdata)) == -1)
@@ -5044,30 +5211,29 @@ __xnet_t_sndudata_r(int fd, const struct t_unitdata *unitdata)
 	return (ret);
 }
 
-int t_sndudata(int fd, const struct t_unitdata *unitdata)
-    __attribute__ ((alias("__xnet_t_sndudata_r")));
+__asm__(".symver __xnet_t_sndudata_r,t_sndudata@@XNET_1.0");
 
-/**
- * @fn int t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags)
- * @brief send data or expedited data from gather buffers
- * @param fd a file descriptor for the transport endpoint.
- * @param iov a pointer to a struct t_iovec structure containing the io
- * vectors for the send.
- * @param iovcount the count of the number of io vectors in the struct t_iovec
- * structure array.
- * @param flags flags to control the send.
- *
- * This function is a thread cancellation point.
- *
- * putpmsg() is a thread cancellation point, however, t_sndv is also a thread
- * cancellation point.  Therefore, all we need to do is defer cancellation.
- */
+/** @brief Send data or expedited data from gather buffers.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param iov a pointer to a struct t_iovec structure containing the io
+  * vectors for the send.
+  * @param iovcount the count of the number of io vectors in the struct t_iovec
+  * structure array.
+  * @param flags flags to control the send.
+  *
+  * This function is a thread cancellation point.
+  *
+  * putpmsg() is a thread cancellation point, however, t_sndv is also a thread
+  * cancellation point.  Therefore, all we need to do is defer cancellation.
+  */
 int
 __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags)
 {
 	struct _t_user *user;
 	int written = 0, nbytes, i;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -5087,6 +5253,7 @@ __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flag
 		int n = 0, partial = 0;
 		struct T_exdata_req prim;	/* same as T_data_req */
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(prim);
 		ctrl.buf = (char *) &prim;
@@ -5132,10 +5299,12 @@ __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flag
 	return (written);
 }
 
+/** The reentrant version of __xnet_t_sndv(). */
 int
 __xnet_t_sndv_r(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndv(fd, iov, iovcount, flags)) == -1)
@@ -5147,30 +5316,30 @@ __xnet_t_sndv_r(int fd, const struct t_iovec *iov, unsigned int iovcount, int fl
 	return (ret);
 }
 
-int t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags)
-    __attribute__ ((alias("__xnet_t_sndv_r")));
+__asm__(".symver __xnet_t_sndv_r,t_sndv@@XNET_1.0");
 
 #if 0
-/**
- * @fn int t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags)
- * @brief send data or expedited data from gather buffers
- * @param fd a file descriptor for the transport endpoint.
- * @param options a pointer to a struct t_optmgmt structure containing the
- * options for the send.
- * @param iov a pointer to a struct t_iovec structure array containing the io
- * verctors for the send.
- * @param iovcount the count of the number of elements in the struct t_iovec
- * structure array.
- * @param flags flags to control the send.
- *
- * This function is a thread cancellation point.
- */
+/** @brief Send data or expedited data from gather buffers.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param options a pointer to a struct t_optmgmt structure containing the
+  * options for the send.
+  * @param iov a pointer to a struct t_iovec structure array containing the io
+  * verctors for the send.
+  * @param iovcount the count of the number of elements in the struct t_iovec
+  * structure array.
+  * @param flags flags to control the send.
+  *
+  * This function is a thread cancellation point.
+  */
 int
-__xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags)
+__xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
+		 unsigned int iovcount, int flags)
 {
 	struct _t_user *user;
 	int written = 0, nbytes, i;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+
+	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!iov)
@@ -5196,6 +5365,7 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, u
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -5203,7 +5373,8 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, u
 		data.len = nbytes;
 		data.buf = NULL;
 		req.prim.PRIM_type = T_OPTDATA_REQ;
-		req.prim.DATA_flag = ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
+		req.prim.DATA_flag =
+		    ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
 		req.prim.OPT_length = opt_len;
 		req.prim.OPT_offset = opt_len ? sizeof(req.prim) : 0;
 		if (opt_len)
@@ -5213,7 +5384,8 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, u
 				data.len = min(__xnet_u_max_tidu(user), iov[n].iov_len - partial);
 				data.buf = iov[n].iov_base + partial;
 				req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0)
-				    | (((flags & T_MORE) || (written + data.len < nbytes)) ? T_ODF_MORE : 0);
+				    | (((flags & T_MORE) || (written + data.len < nbytes)) ?
+				       T_ODF_MORE : 0);
 				if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND) == -1)
 					goto error;
 				partial += data.len;
@@ -5244,10 +5416,13 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, u
 	return (written);
 }
 
+/** The reentrant version of __xnet_t_sndvopt(). */
 int
-__xnet_t_sndvopt_r(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags)
+__xnet_t_sndvopt_r(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
+		   unsigned int iovcount, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndvopt(fd, options, iov, iovcount, flags)) == -1)
@@ -5259,34 +5434,32 @@ __xnet_t_sndvopt_r(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
 	return (ret);
 }
 
-int t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags)
-    __attribute__ ((alias("__xnet_t_sndvopt_r")));
+__asm__(".symver __xnet_t_sndvopt_r,t_sndvopt@@XNET_1.0");
 #endif
 
-/**
- * @fn int t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount)
- * @brief send data unit from gather buffers
- * @param fd a file descriptor for the transport endpoint.
- * @param unitdata a pointer to a t_unitdata structure describing the address and options for the send.
- * @param iov a pointer to a t_iovec io vector structure array.
- * @param iovcount the count of the vectors in the t_iovec structure array.
- *
- * This function is a thread cancellation point.  This function is
- * asynchronous thread cancellation safe.
- * 
- * This is a rather peculiar function.  We have little choice but to buffer
- * the entire gather array internally and then send the data in one big
- * @c T_UNITDATA_REQ.  TPI does not help us and the operating system does not
- * help us either.
- */
+/** @brief Send data unit from gather buffers.
+  * @param fd a file descriptor for the transport endpoint.
+  * @param unitdata a pointer to a t_unitdata structure describing the address and options for the send.
+  * @param iov a pointer to a t_iovec io vector structure array.
+  * @param iovcount the count of the vectors in the t_iovec structure array.
+  *
+  * This function is a thread cancellation point.  This function is
+  * asynchronous thread cancellation safe.
+  * 
+  * This is a rather peculiar function.  We have little choice but to buffer
+  * the entire gather array internally and then send the data in one big
+  * @c T_UNITDATA_REQ.  TPI does not help us and the operating system does not
+  * help us either.
+  */
 int
 __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount)
 {
 	struct _t_user *user;
 	int nbytes, i;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_CLTS), TSF_IDLE)))
+
+	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if ((__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
 #ifdef DEBUG
 	if (!unitdata || !iov)
@@ -5315,6 +5488,7 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -5362,15 +5536,18 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && (__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_sndvudata(). */
 int
-__xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount)
+__xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+		     unsigned int iovcount)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndvudata(fd, unitdata, iov, iovcount)) == -1)
@@ -5382,11 +5559,10 @@ __xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, u
 	return (ret);
 }
 
-int t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount)
-    __attribute__ ((alias("__xnet_t_sndvudata_r")));
+__asm__(".symver __xnet_t_sndvudata_r,t_sndvudata@@XNET_1.0");
 
 /* *INDENT-OFF* */
-const char *_t_errstr[] = {
+const char *__xnet_t_errlist[] = {
 /*
 TRANS No error is indicated in the t_errno variable.  The last operation was a
 TRANS success.  t_errno will not be set to this value (zero) by the library,
@@ -5615,48 +5791,52 @@ TRANS error codes not known to the XTI library.
 };
 /* *INDENT-ON* */
 
-/**
- * @fn const char *t_strerror(int errnum)
- * @brief produce an error message string.
- * @param errnum the error number for which to return a string.
- *
- * This function is NOT a thread cancellation point.
- */
+__asm__(".symver __xnet_t_errstr,t_errstr@@XNET_1.0");
+
+__asm__(".symver __xnet_t_errlist,t_errlist@@XNET_1.0");
+
+int __xnet_t_nerr = 31;
+
+__asm__(".symver __xnet_t_nerr,t_nerr@@XNET_1.0");
+
+/** @brief Produce an error message string.
+  * @param errnum the error number for which to return a string.
+  *
+  * This function is NOT a thread cancellation point.
+  */
 const char *
 __xnet_t_strerror(int errnum)
 {
 	if (0 <= errnum && errnum <= TPROTO)
-		return gettext(_t_errstr[errnum]);
-	return gettext(_t_errstr[TPROTO + 1]);
+		return gettext(__xnet_t_errlist[errnum]);
+	return gettext(__xnet_t_errlist[TPROTO + 1]);
 }
 
-const char *t_strerror(int errnum)
-    __attribute__ ((alias("__xnet_t_strerror")));
+__asm__(".symver __xnet_t_strerror,t_strerror@@XNET_1.0");
 
-/**
- * @fn int t_sync(int fd)
- * @brief synchronize XTI library with TLI provider
- * @param fd the file descriptor to synchronize
- *
- * t_sync() should be called whenever a new file descriptor is generated from
- * an old one (e.g. using dup() or dup2()) or when TPROTO was returned as an
- * error in t_errno for a previous XTI library call.
- *
- * @return Unpon success, t_sync() returns a positive integer reflecting the
- * state of the transport interface.  Upon failure, t_sync() returns -1 and
- * sets t_errno to one of the following values:
- *
- * @arg TBADF	    fd is invalid.
- * @arg TPROTO	    a protocol error occured between the XTI library and the
- *		    underlying transport provider.
- * @arg TSTATECHNG  the interface is in a transient state.
- * @arg TSYSERR	    a Linux system error occurred and the Linux error number
- *		    is set in errno.
- */
+/** @brief Synchronize XTI library with TLI provider.
+  * @param fd the file descriptor to synchronize
+  *
+  * t_sync() should be called whenever a new file descriptor is generated from
+  * an old one (e.g. using dup() or dup2()) or when TPROTO was returned as an
+  * error in t_errno for a previous XTI library call.
+  *
+  * @return Unpon success, t_sync() returns a positive integer reflecting the
+  * state of the transport interface.  Upon failure, t_sync() returns -1 and
+  * sets t_errno to one of the following values:
+  *
+  * @arg TBADF	    fd is invalid.
+  * @arg TPROTO	    a protocol error occured between the XTI library and the
+  *		    underlying transport provider.
+  * @arg TSTATECHNG  the interface is in a transient state.
+  * @arg TSYSERR	    a Linux system error occurred and the Linux error number
+  *		    is set in errno.
+  */
 int
 __xnet_t_sync(int fd)
 {
 	struct _t_user *user;
+
 	if (0 > fd || fd >= OPEN_MAX)
 		goto tbadf;
 	if ((user = _t_fds[fd])) {
@@ -5681,11 +5861,14 @@ __xnet_t_sync(int fd)
 			struct T_capability_req req;
 			struct T_capability_ack ack;
 		} buf;
+
 		t_errno = TSYSERR;
 		if (!(user = (struct _t_user *) malloc(sizeof(*user))))
 			goto enomem;
 		memset(user, 0, sizeof(*user));
-		user->ctlmax = sizeof(union T_primitives) + _T_DEFAULT_ADDRLEN + _T_DEFAULT_ADDRLEN + _T_DEFAULT_OPTLEN;
+		user->ctlmax =
+		    sizeof(union T_primitives) + _T_DEFAULT_ADDRLEN + _T_DEFAULT_ADDRLEN +
+		    _T_DEFAULT_OPTLEN;
 		user->datmax = _T_DEFAULT_DATALEN;
 		if (!(user->ctlbuf = (char *) malloc(user->ctlmax)))
 			goto enobufs;
@@ -5702,7 +5885,8 @@ __xnet_t_sync(int fd)
 		   generate an acceptor id and also has the ability to complete the info structure
 		   from a @c T_INFO_REQ. 
 		 */
-		if ((buf.ack.CAP_bits1 & (TC1_INFO | TC1_ACCEPTOR_ID)) != (TC1_INFO | TC1_ACCEPTOR_ID))
+		if ((buf.ack.CAP_bits1 & (TC1_INFO | TC1_ACCEPTOR_ID)) !=
+		    (TC1_INFO | TC1_ACCEPTOR_ID))
 			goto tproto;
 		user->flags |= TUF_SYNC_REQUIRED;
 		for (i = 0; i < OPEN_MAX; i++)
@@ -5713,9 +5897,8 @@ __xnet_t_sync(int fd)
 				break;
 			}
 #if 0
-		/*
-		   FIXME: get these with fcntl 
-		 */
+		/* 
+		   FIXME: get these with fcntl */
 		user->fflags = oflag;
 #endif
 		user->info.addr = buf.ack.INFO_ack.ADDR_size;
@@ -5732,9 +5915,8 @@ __xnet_t_sync(int fd)
 		if (user->flags & TUF_SYNC_REQUIRED)
 			__xnet_u_setstate(user, buf.ack.INFO_ack.CURRENT_state);
 		pthread_rwlock_init(&user->lock, NULL);	/* destroyed for existing structure */
-		/*
-		   FIXME: need to install pthread_atfork handlert o re-initialize read-write locks 
-		 */
+		/* 
+		   FIXME: need to install pthread_atfork handlert o re-initialize read-write locks */
 		_t_fds[fd] = user;
 		user->flags &= ~TUF_SYNC_REQUIRED;
 		return __xnet_t_getstate(fd);
@@ -5764,22 +5946,23 @@ __xnet_t_sync(int fd)
 }
 
 /**
- * @brief the reentrant version of t_sync.
- * @param fd the file descriptor to synchronize
- *
- * The reentrant version of t_sync() is like the reentrant version of t_open()
- * and t_close() in that it write locks the file descriptor list in
- * preparation for adding or removing a user structure to or from the list.
- * Because of this, all other threads holding read locks on the file
- * descriptor list must release them before this function will proceed.  While
- * this function is proceeding, all other threads attempting to execute XTI
- * library functions on file descriptors will be blocked until this function
- * exits.
- */
+  * @brief The reentrant version of __xnet_t_sndvudata().
+  * @param fd the file descriptor to synchronize
+  *
+  * The reentrant version of t_sync() is like the reentrant version of t_open()
+  * and t_close() in that it write locks the file descriptor list in
+  * preparation for adding or removing a user structure to or from the list.
+  * Because of this, all other threads holding read locks on the file
+  * descriptor list must release them before this function will proceed.  While
+  * this function is proceeding, all other threads attempting to execute XTI
+  * library functions on file descriptors will be blocked until this function
+  * exits.
+  */
 int
 __xnet_t_sync_r(int fd)
 {
 	int err, ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_list_unlock, NULL);
 	if ((err = __xnet_list_wrlock()) == 0) {
 		ret = __xnet_t_sync(fd);
@@ -5791,16 +5974,14 @@ __xnet_t_sync_r(int fd)
 	pthread_cleanup_pop_restore_np(0);
 	return (ret);
 }
-int t_sync(int fd)
-    __attribute__ ((alias("__xnet_t_sync_r")));
 
-/**
- * @fn int t_sysconf(int name)
- * @brief Get configurable XTI variables.
- * @param name
- *
- * This function is NOT a thread cancellation point.
- */
+__asm__(".symver __xnet_t_sync_r,t_sync@@XNET_1.0");
+
+/** @brief Get configurable XTI variables.
+  * @param name
+  *
+  * This function is NOT a thread cancellation point.
+  */
 int
 __xnet_t_sysconf(int name)
 {
@@ -5822,34 +6003,32 @@ __xnet_t_sysconf(int name)
 	return (-1);
 }
 
-int t_sysconf(int name)
-    __attribute__ ((alias("__xnet_t_sysconf")));
+__asm__(".symver _xnet_t_sysconf,t_sysconf@@XNET_1.0");
 
-/**
- * @fn int t_unbind(int fd)
- * @brief Remove an address from a transport endpoint.
- * @param fd a file descriptor indicating the transport endpoint to unbind.
- *
- * This function is NOT a thread cancellation point.
- *
- * t_unbind() can return a TLOOK error for T_CLTS when a unitdata or unitdata
- * error has arrived at the transport endpoint since the last library call.
- * Therefore, we call t_look() for transport service providers of service type
- * T_CLTS.
- *
- * t_unbind() can also return a TLOOK error for T_COTS or T_COTS_ORD on a
- * listening stream (qlen > 0) when a connection indication and possibly
- * disconnect indications for outstanding unprocessed connection indications
- * have arrived prior to the call.  The service provide cannot detect this, so
- * we call t_look() for listening streams as well.
- *
- * For other stream types, an asynchronous event is not possible and we only
- * check for outstanding events.
- */
+/** @brief Remove an address from a transport endpoint.
+  * @param fd a file descriptor indicating the transport endpoint to unbind.
+  *
+  * This function is NOT a thread cancellation point.
+  *
+  * t_unbind() can return a TLOOK error for T_CLTS when a unitdata or unitdata
+  * error has arrived at the transport endpoint since the last library call.
+  * Therefore, we call t_look() for transport service providers of service type
+  * T_CLTS.
+  *
+  * t_unbind() can also return a TLOOK error for T_COTS or T_COTS_ORD on a
+  * listening stream (qlen > 0) when a connection indication and possibly
+  * disconnect indications for outstanding unprocessed connection indications
+  * have arrived prior to the call.  The service provide cannot detect this, so
+  * we call t_look() for listening streams as well.
+  *
+  * For other stream types, an asynchronous event is not possible and we only
+  * check for outstanding events.
+  */
 int
 __xnet_t_unbind(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, TSF_IDLE)))
 		goto error;
 	if (user->info.servtype == T_CLTS || user->qlen > 0)
@@ -5861,6 +6040,7 @@ __xnet_t_unbind(int fd)
 			struct T_ok_ack ack;
 			struct T_error_ack err;
 		} buf;
+
 		buf.req.PRIM_type = T_UNBIND_REQ;
 		if (__xnet_t_strioctl(fd, TI_UNBIND, &buf, sizeof(buf)) != 0)
 			goto error;
@@ -5876,10 +6056,12 @@ __xnet_t_unbind(int fd)
 	return (-1);
 }
 
+/** The reentrant version of __xnet_t_unbind(). */
 int
 __xnet_t_unbind_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_unbind(fd);
@@ -5889,15 +6071,16 @@ __xnet_t_unbind_r(int fd)
 	return (ret);
 }
 
-int t_unbind(int fd)
-    __attribute__ ((alias("__xnet_t_unbind_r")));
+__asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
- * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.7 $).
- * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.7 $)
- * @date \$Date: 2006/09/18 13:52:50 $
- *
- * @}
- */
+  * @section Identification
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.8 $).
+  * @author Brian F. G. Bidulock
+  * @version \$Name:  $(\$Revision: 0.9.2.8 $)
+  * @date \$Date: 2006/09/25 20:15:46 $
+  */
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

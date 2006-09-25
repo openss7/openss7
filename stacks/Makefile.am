@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/09/18 17:43:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/09/25 20:15:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 17:43:10 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 20:15:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.73  2006/09/25 20:15:43  brian
+# - rationalized to strinet and strxnet
+#
 # Revision 0.9.2.72  2006/09/18 17:43:10  brian
 # - added doxy rules to makefile and release notes
 #
@@ -97,6 +100,8 @@ include am/help.am
 ##
 include am/pr.am
 
+lib_LTLIBRARIES			=
+
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
@@ -106,18 +111,9 @@ if PUBLIC_RELEASE
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-pkglibexec_PROGRAMS		= \
-				  test-m2pa \
-				  test-q781 \
-				  test-tcpc \
-				  test-tcps \
-				  test-udpc \
-				  test-udps \
-				  test-x100p \
-				  test-x400p
-
 EXTRA_PROGRAMS			+= \
 				  test-inet_raw \
+				  test-inet_udp \
 				  test-inet_tcp \
 				  test-inet_udp \
 				  test-m2pa \
@@ -143,11 +139,21 @@ EXTRA_PROGRAMS			+= \
 				  test-xnet \
 				  test-xnet_thr
 
+pkglibexec_PROGRAMS		= \
+				  test-m2pa \
+				  test-q781 \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps \
+				  test-x100p \
+				  test-x400p
+
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= config.h strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
@@ -372,30 +378,11 @@ else
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-pkglibexec_PROGRAMS		= \
-				  test-m2pa \
-				  test-q781 \
-				  test-q781-pipe \
-				  test-q784 \
-				  test-tcpc \
-				  test-tcps \
-				  test-udpc \
-				  test-udps \
-				  test-x100p \
-				  test-x400p \
-				  test-x400p-cap \
-				  test-x400p-cap2 \
-				  test-x400p-hsl \
-				  test-x400p-perf \
-				  test-x400p-sdl \
-				  test-x400p-sdt \
-				  test-x400p-sdt2 \
-				  test-x400p-sl
-
 EXTRA_PROGRAMS			+= \
 				  test-inet_raw \
-				  test-inet_tcp \
 				  test-inet_udp \
+				  test-inet_tcp \
+				  test-inet_sctp \
 				  test-m2pa \
 				  test-q781 \
 				  test-q781-pipe \
@@ -419,11 +406,36 @@ EXTRA_PROGRAMS			+= \
 				  test-xnet \
 				  test-xnet_thr
 
+pkglibexec_PROGRAMS		= \
+				  test-m2pa \
+				  test-q781 \
+				  test-q781-pipe \
+				  test-q784 \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps \
+				  test-x100p \
+				  test-x400p \
+				  test-x400p-cap \
+				  test-x400p-cap2 \
+				  test-x400p-hsl \
+				  test-x400p-perf \
+				  test-x400p-sdl \
+				  test-x400p-sdt \
+				  test-x400p-sdt2 \
+				  test-x400p-sl
+
+if WITH_OPENSS7_SCTP
+pkglibexec_PROGRAMS		+= \
+				  test-inet_sctp
+endif
+
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= config.h strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
@@ -905,7 +917,11 @@ endif
 if WITH_INET
 ## WITH_INET
 nodist_libSS7mods_a_SOURCES	+= \
-				  src/modules/inet/inet.c
+				  src/modules/inet/inet.c \
+				  src/modules/inet/udp.c \
+				  src/modules/inet/rawip.c \
+				  src/modules/inet/tcp.c \
+				  src/moduels/inet/udp_hooks.h
 ## WITH_INET
 endif
 
@@ -988,9 +1004,11 @@ KMODCONF_EXT			= $(PACKAGE_LCNAME)
 KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
 
 if WITH_KO_MODULES
+## WITH_KO_MODULES
 kpre				= streams_
 else
 kpre				= streams-
+## WITH_KO_MODULES
 endif
 
 include am/kernel.am
@@ -1018,11 +1036,13 @@ if RPM_BUILD_USER
 
 if WITH_XNET
 ## WITH_XNET
-lib_LTLIBRARIES			= libxnet.la
+lib_LTLIBRARIES			+= libxnet.la
 pkglibexec_PROGRAMS		+= \
 				  test-xnet \
 				  test-xnet_thr
-libxnet_la_SOURCES		= src/lib/libxnet/xnet.c gettext.h
+libxnet_la_SOURCES		= src/lib/libxnet/pthread.c \
+				  src/lib/libxnet/xnet.c \
+				  gettext.h
 libxnet_la_LDFLAGS		= -no-undefined -version-info 0:0:0
 libxnet_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(srcdir)/src/include/xti -I./src/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)

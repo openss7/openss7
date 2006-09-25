@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-#@WITH_INET_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/07 01:09:14 $
+#@WITH_INET_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/25 20:15:49 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/07 01:09:14 $ by $Author: brian $
+## Last Modified $Date: 2006/09/25 20:15:49 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: lis.conf.in,v $
+## Revision 0.9.2.2  2006/09/25 20:15:49  brian
+## - rationalized to strinet and strxnet
+##
 ## Revision 0.9.2.1  2006/03/07 01:09:14  brian
 ## - made an autoconf configuration file
 ##
@@ -59,17 +62,26 @@
 ## Driver specifications
 ## -----------------------------------------------------------
 ##	name	    prefix	major	n-minors    n-majors
-@WITH_INET_TRUE@@WITH_INET_TRUE@driver	inet	    ss_		30
+@WITH_INET_TRUE@@WITH_INET_TRUE@driver	inet		ss_	30
+@WITH_INET_TRUE@@WITH_INET_TRUE@driver	udp2		udp	*
+@WITH_INET_TRUE@@WITH_INET_TRUE@driver	rawip2		raw	*
+@WITH_INET_TRUE@@WITH_INET_TRUE@driver	tcp2		tcp	*
 
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-@WITH_INET_TRUE@@WITH_INET_TRUE@objname	driver	inet	    inet
+@WITH_INET_TRUE@@WITH_INET_TRUE@objname	driver	inet		inet
+@WITH_INET_TRUE@@WITH_INET_TRUE@objname	driver	udp2		udp
+@WITH_INET_TRUE@@WITH_INET_TRUE@objname	driver	rawip2		rawip
+@WITH_INET_TRUE@@WITH_INET_TRUE@objname	driver	tcp2		tcp
 
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##		name
 @WITH_INET_TRUE@@WITH_INET_TRUE@loadable	inet
+@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	udp2
+@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	rawip2
+@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	tcp2
 
 ## Node specifications
 ## -----------------------------------------------------------
@@ -77,34 +89,38 @@
 ##
 #@WITH_INET_TRUE@ These are iBCS devices that should already be installed on a
 #@WITH_INET_TRUE@ system that supports the iBCS.  The /dev entries are supposed
-#@WITH_INET_TRUE@ to by symbolic links to the /dev/inet entries.  arp and rip
-#@WITH_INET_TRUE@ are supposed to be symbolic links to udp
+#@WITH_INET_TRUE@ to be symbolic links to the /dev/inet entries.  arp and rip
+#@WITH_INET_TRUE@ are supposed to be symbolic links to udp.
 #@WITH_INET_TRUE@
-#@WITH_INET_TRUE@node	/dev/ip		    c	0666	inet		32
-#@WITH_INET_TRUE@node	/dev/icmp	    c	0666	inet		33
-#@WITH_INET_TRUE@node	/dev/ggp	    c	0666	inet		34
-#@WITH_INET_TRUE@node	/dev/ipip	    c	0666	inet		35
-#@WITH_INET_TRUE@node	/dev/tcp	    c	0666	inet		36
-#@WITH_INET_TRUE@node	/dev/egp	    c	0666	inet		37
-#@WITH_INET_TRUE@node	/dev/pup	    c	0666	inet		38
-#@WITH_INET_TRUE@node	/dev/udp	    c	0666	inet		39
-#@WITH_INET_TRUE@node	/dev/idp	    c	0666	inet		40
-#@WITH_INET_TRUE@node	/dev/rawip	    c	0666	inet		41
-#@WITH_INET_TRUE@node	/dev/arp	    c	0666	inet		39
-#@WITH_INET_TRUE@node	/dev/rip	    c	0666	inet		39
-#@WITH_INET_TRUE@node	/dev/inet/ip	    c	0666	inet		32
-#@WITH_INET_TRUE@node	/dev/inet/icmp	    c	0666	inet		33
-#@WITH_INET_TRUE@node	/dev/inet/ggp	    c	0666	inet		34
-#@WITH_INET_TRUE@node	/dev/inet/ipip	    c	0666	inet		35
-#@WITH_INET_TRUE@node	/dev/inet/tcp	    c	0666	inet		36
-#@WITH_INET_TRUE@node	/dev/inet/egp	    c	0666	inet		37
-#@WITH_INET_TRUE@node	/dev/inet/pup	    c	0666	inet		38
-#@WITH_INET_TRUE@node	/dev/inet/udp	    c	0666	inet		39
-#@WITH_INET_TRUE@node	/dev/inet/idp	    c	0666	inet		40
-#@WITH_INET_TRUE@node	/dev/inet/rawip	    c	0666	inet		41
-#@WITH_INET_TRUE@node	/dev/inet/arp	    c	0666	inet		39
-#@WITH_INET_TRUE@node	/dev/inet/rip	    c	0666	inet		39
+#@WITH_INET_TRUE@node	/dev/ip		     c	0666	inet		32
+#@WITH_INET_TRUE@node	/dev/icmp	     c	0666	inet		33
+#@WITH_INET_TRUE@node	/dev/ggp	     c	0666	inet		34
+#@WITH_INET_TRUE@node	/dev/ipip	     c	0666	inet		35
+#@WITH_INET_TRUE@node	/dev/tcp	     c	0666	inet		36
+#@WITH_INET_TRUE@node	/dev/egp	     c	0666	inet		37
+#@WITH_INET_TRUE@node	/dev/pup	     c	0666	inet		38
+#@WITH_INET_TRUE@node	/dev/udp	     c	0666	inet		39
+#@WITH_INET_TRUE@node	/dev/idp	     c	0666	inet		40
+#@WITH_INET_TRUE@node	/dev/rawip	     c	0666	inet		41
+#@WITH_INET_TRUE@node	/dev/arp	     c	0666	inet		39
+#@WITH_INET_TRUE@node	/dev/rip	     c	0666	inet		39
+#@WITH_INET_TRUE@node	/dev/inet/ip	     c	0666	inet		32
+#@WITH_INET_TRUE@node	/dev/inet/icmp	     c	0666	inet		33
+#@WITH_INET_TRUE@node	/dev/inet/ggp	     c	0666	inet		34
+#@WITH_INET_TRUE@node	/dev/inet/ipip	     c	0666	inet		35
+#@WITH_INET_TRUE@node	/dev/inet/tcp	     c	0666	inet		36
+#@WITH_INET_TRUE@node	/dev/inet/egp	     c	0666	inet		37
+#@WITH_INET_TRUE@node	/dev/inet/pup	     c	0666	inet		38
+#@WITH_INET_TRUE@node	/dev/inet/udp	     c	0666	inet		39
+#@WITH_INET_TRUE@node	/dev/inet/idp	     c	0666	inet		40
+#@WITH_INET_TRUE@node	/dev/inet/rawip	     c	0666	inet		41
+#@WITH_INET_TRUE@node	/dev/inet/arp	     c	0666	inet		39
+#@WITH_INET_TRUE@node	/dev/inet/rip	     c	0666	inet		39
 @WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/ticots_ord	     c	0666	inet		42
 @WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/ticots	     c	0666	inet		43
 @WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/ticlts	     c	0666	inet		44
+@WITH_INET_TRUE@@WITH_INET_TRUE@@WITH_OPENSS7_SCTP_TRUE@node	/dev/sctp	     c	0666	inet		45
+@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/udp2	     c	0666	230		udp2
+@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/rawip2	     c	0666	230		rawip2
+@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/tcp2	     c	0666	230		tcp2
 

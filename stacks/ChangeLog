@@ -1,5 +1,17 @@
 2006-09-25  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: added new files
+	* acinclude.m4: added checks from strinet
+	* lib32/Makefile.am: added new files
+	* src/lib/libxnet/pthread.c: split off thread safety
+	* src/lib/libxnet/xnet.c: rationalized to strxnet package changes
+	* src/modules/inet/inet.c: rationalized to strinet package changes
+	* src/modules/inet/lis.conf.in: new configuration for 2nd gen drivers
+	* src/modules/inet/rawip.c: added 2nd gen rawip driver
+	* src/modules/inet/tcp.c: added 2nd gen tcp driver
+	* src/modules/inet/udp.c: added 2nd gen udp driver
+	* src/modules/inet/udp_hooks.h.in: hooks file for 2nd gen drivers
+
 	* src/include/xti.h: updated and doxygenified headers
 	* src/include/xti_inet.h: updated and doxygenified headers
 	* src/include/sys/xti.h: updated and doxygenified headers
