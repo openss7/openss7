@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/09/18 13:20:04 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/09/25 12:24:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 13:20:04 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 12:24:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,7 @@ m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
+m4_include([m4/nsl.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
 m4_include([m4/ss7.m4])
@@ -115,6 +116,7 @@ dnl		     src/include/sys/openss7/version.h])
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${NSL_CPPFLAGS:+ }}${NSL_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/src/include -I${top_srcdir}/src/include'
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
@@ -144,6 +146,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${NSL_MANPATH:+${NSL_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -241,6 +244,14 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		[with_STRXNET='yes'])
     if test ! -d "$srcdir/strxnet" ; then
 	with_STRXNET='no'
+    fi
+    AC_ARG_WITH([STRNSL],
+		AS_HELP_STRING([--without-STRNSL],
+			       [do not include STRNSL in master pack @<:@included@:>@]),
+		[with_STRNSL="$withval"],
+		[with_STRNSL='yes'])
+    if test ! -d "$srcdir/strnsl" ; then
+	with_STRNSL='no'
     fi
     AC_ARG_WITH([STRSOCK],
 		AS_HELP_STRING([--without-STRSOCK],
@@ -378,6 +389,13 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xti'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-xti"
     fi
+    if test :"${with_STRNSL:-yes}" != :no ; then
+	_NSL
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_nsl --without-nsl\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-nsl'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-nsl"
+    fi
     if test :"${with_STRSOCK:-yes}" != :no ; then
 	:
     else
@@ -473,6 +491,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     fi
     if test :${with_STRXNET:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strxnet])
+    fi
+    if test :${with_STRNSL:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strnsl])
     fi
     if test :${with_STRSOCK:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strsock])

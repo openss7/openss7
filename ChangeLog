@@ -8,6 +8,8 @@
 	* m4/xns.m4: corrections by inspection
 	* m4/xti.m4: corrections by inspection
 
+	* acinclude.m4: added strnsl package to build
+
 2006-09-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release notes
