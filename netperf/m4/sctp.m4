@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/09/18 00:33:51 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/09/25 08:56:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 00:33:51 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 08:56:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.27  2006/09/25 08:56:35  brian
+# - corrections by inspection
+#
 # Revision 0.9.2.25  2006/09/18 00:33:51  brian
 # - added checks for 32bit compatibility libraries
 #

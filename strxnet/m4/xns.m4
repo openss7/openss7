@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/18 00:33:52 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/09/25 08:56:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 00:33:52 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 08:56:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.33  2006/09/25 08:56:35  brian
+# - corrections by inspection
+#
 # Revision 0.9.2.31  2006/09/18 00:33:52  brian
 # - added checks for 32bit compatibility libraries
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/07/25 06:38:52 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/25 08:56:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/25 06:38:52 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 08:56:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.37  2006/09/25 08:56:35  brian
+# - corrections by inspection
+#
 # Revision 0.9.2.35  2006/07/25 06:38:52  brian
 # - expanded minor device numbers and optimization and locking corrections
 #
