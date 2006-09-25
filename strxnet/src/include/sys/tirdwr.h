@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9.2.5 2006/09/24 21:57:22 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.6 2006/09/25 12:04:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:22 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:43 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tirdwr.h,v $
+ Revision 0.9.2.6  2006/09/25 12:04:43  brian
+ - updated headers, moved xnsl
 
  *****************************************************************************/
 
 #ifndef _SYS_TIRDWR_H
 #define _SYS_TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/24 21:57:22 $"
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -84,4 +90,4 @@
 
 /** @} */
 
-// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.8 2006/09/24 21:57:21 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.9 2006/09/25 12:04:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:42 $ by $Author: brian $
+
+ $Log: xti.h,v $
+ Revision 0.9.2.9  2006/09/25 12:04:42  brian
+ - updated headers, moved xnsl
 
  *****************************************************************************/
 
 #ifndef _XTI_H
 #define _XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -64,6 +68,10 @@
   * XTI (User) Header File. */
 
 #include <sys/xti.h>
+#include <sys/xti_inet.h>
+#include <sys/xti_atm.h>
+#include <sys/xti_osi.h>
+#include <sys/xti_mosi.h>
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

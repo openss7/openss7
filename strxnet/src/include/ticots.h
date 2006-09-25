@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticots.h,v 0.9.2.4 2006/09/24 21:57:21 brian Exp $
+ @(#) $Id: ticots.h,v 0.9.2.5 2006/09/25 12:04:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _TICOTS_H
 #define _TICOTS_H
 
-#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/ticots.h>
 
@@ -69,3 +69,5 @@ __END_DECLS
 #endif
 
 #endif				/* _TICOTS_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/09/25 04:01:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/09/25 12:04:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 04:01:52 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 12:04:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.21  2006/09/25 12:04:41  brian
+# - updated headers, moved xnsl
+#
 # Revision 0.9.2.20  2006/09/25 04:01:52  brian
 # - added missing manpage
 #
@@ -273,9 +276,7 @@ xnet_man_MANS	= \
 	man8/test-timod.8 \
 	man8/test-tirdwr.8 \
 	man8/test-xnet.8 \
-	man8/test-xnet_thr.8 \
-	man8/test-xnsl.8 \
-	man8/test-xnsl_thr.8
+	man8/test-xnet_thr.8
 
 xnsl_man_MANS 	= \
 	man3/endnetconfig.3 \
@@ -305,7 +306,9 @@ xnsl_man_MANS 	= \
 	man3/xnsl.3 \
 	man3/inetaddr.3 \
 	man5/netconfig.5 \
-	man5/netdir.5
+	man5/netdir.5 \
+	man8/test-xnsl.8 \
+	man8/test-xnsl_thr.8
 
 sock_man_MANS	= \
 	man3/accept.3 \
@@ -556,9 +559,7 @@ xnet_dist_noinst_MANS	= \
 	man8/test-timod.8.man \
 	man8/test-tirdwr.8.man \
 	man8/test-xnet.8.man \
-	man8/test-xnet_thr.8.man \
-	man8/test-xnsl.8.man \
-	man8/test-xnsl_thr.8.man
+	man8/test-xnet_thr.8.man
 
 xnsl_dist_noinst_MANS 	= \
 	man3/endnetconfig.3.man \
@@ -588,7 +589,9 @@ xnsl_dist_noinst_MANS 	= \
 	man3/xnsl.3.man \
 	man3/inetaddr.3.man \
 	man5/netconfig.5.man \
-	man5/netdir.5.man
+	man5/netdir.5.man \
+	man8/test-xnsl.8.man \
+	man8/test-xnsl_thr.8.man
 
 sock_dist_noinst_MANS	= \
 	man3/accept.3.man \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netdir.h,v 0.9.2.4 2006/09/24 21:57:21 brian Exp $
+ @(#) $Id: netdir.h,v 0.9.2.5 2006/09/25 12:04:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir.h,v $
+ Revision 0.9.2.5  2006/09/25 12:04:42  brian
+ - updated headers, moved xnsl
+
  Revision 0.9.2.4  2006/09/24 21:57:21  brian
  - documentation and library updates
 
@@ -67,7 +70,7 @@
 #ifndef __NETDIR_H__
 #define __NETDIR_H__
 
-#ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -342,4 +345,4 @@ __END_DECLS
 
 /** @} */
 
-// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

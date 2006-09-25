@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9.2.5 2006/09/24 21:57:21 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.6 2006/09/25 12:04:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _TIRDWR_H
 #define _TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/tirdwr.h>
 
@@ -71,3 +71,5 @@ __END_DECLS
 #endif
 
 #endif				/* _TIRDWR_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

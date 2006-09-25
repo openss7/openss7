@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.5 2006/09/24 21:57:21 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.6 2006/09/25 12:04:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _TIMOD_H
 #define _TIMOD_H
 
-#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/timod.h>
 
@@ -71,3 +71,5 @@ __END_DECLS
 #endif
 
 #endif				/* _TIMOD_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

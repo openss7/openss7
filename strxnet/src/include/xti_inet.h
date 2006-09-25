@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_inet.h,v 0.9.2.5 2006/09/24 21:57:21 brian Exp $
+ @(#) $Id: xti_inet.h,v 0.9.2.6 2006/09/25 12:04:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:42 $ by $Author: brian $
+
+ $Log: xti_inet.h,v $
+ Revision 0.9.2.6  2006/09/25 12:04:42  brian
+ - updated headers, moved xnsl
 
  *****************************************************************************/
 
 #ifndef _XTI_INET_H
 #define _XTI_INET_H
 
-#ident "@(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/xti_inet.h>
 
@@ -69,3 +73,5 @@ __END_DECLS
 #endif
 
 #endif				/* _XTI_INET_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

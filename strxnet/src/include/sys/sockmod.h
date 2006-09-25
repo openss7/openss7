@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sockmod.h,v 0.9.2.6 2006/09/24 21:57:22 brian Exp $
+ @(#) $Id: sockmod.h,v 0.9.2.7 2006/09/25 12:04:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:22 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SOCKMOD_H__
 #define __SYS_SOCKMOD_H__
 
-#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -228,4 +228,4 @@ struct so_so {
 
 #endif				/* __SYS_SOCKMOD_H__ */
 
-// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

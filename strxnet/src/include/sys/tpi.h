@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: tpi.h,v 0.9.2.8 2006/09/24 21:57:22 brian Exp $
+ @(#) $Id: tpi.h,v 0.9.2.9 2006/09/25 12:04:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:22 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:04:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpi.h,v $
+ Revision 0.9.2.9  2006/09/25 12:04:43  brian
+ - updated headers, moved xnsl
+
  Revision 0.9.2.8  2006/09/24 21:57:22  brian
  - documentation and library updates
 
@@ -67,7 +71,7 @@
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -302,4 +306,4 @@ struct t_opthdr {
 
 /** @} */
 
-// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS
