@@ -60,7 +60,8 @@
 
 #ident "@(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $"
 
-static char const ident[] = "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $";
+static char const ident[] =
+    "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -107,6 +108,11 @@ static char const ident[] = "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.
 #include <linux/limits.h>
 #include <values.h>
 
+#include <xti.h>
+#include <sys/xti.h>
+#include <sys/xti_ip.h>
+#include <sys/xti_tcp.h>
+
 #ifndef __P
 #define __P(__prototype) __prototype
 #endif
@@ -145,11 +151,11 @@ static char const ident[] = "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/sockmod.h>
 
 struct _so_user {
-	pthread_rwlock_t lock; /* lock for this structure */
-	int refs; /* number of references to this structure */
-	int flags; /* user flags */
-	struct netconfig *nc; /* netconfig pointer */
-	struct si_udata info; /* information structure */
+	pthread_rwlock_t lock;		/* lock for this structure */
+	int refs;			/* number of references to this structure */
+	int flags;			/* user flags */
+	struct netconfig *nc;		/* netconfig pointer */
+	struct si_udata info;		/* information structure */
 };
 
 static struct _so_user *_so_fds[OPEN_MAX] = { NULL, };
@@ -166,7 +172,7 @@ __so_list_unlock(void *ignore)
 static void
 __so_putuser(void *arg)
 {
-	int fd = *(int *)arg;
+	int fd = *(int *) arg;
 	struct _so_user *user = _so_fds[fd];
 
 	pthread_rwlock_unlock(&user->lock);
@@ -443,6 +449,48 @@ __so_sockatmark(int fd)
 
 int __libc_setsockopt(int, int, int, const void *, socklen_t);
 
+static int
+__so_setoption(int s, t_scalar_t level, t_scalar_t name, const void *optptr, size_t optlen)
+{
+	struct {
+		struct t_opthdr hdr;
+		char optval[64];
+	} opt;
+	struct t_optmgmt opts = {
+		{
+		 .maxlen = sizeof(opt),
+		 .len = optlen,
+		 .buf = opt.optval,
+		 }
+		, T_NEGOTIATE,
+	};
+	int retval;
+
+	retval = t_optmgmt(s, &opts, &opts);
+	if (retval == -1) {
+		switch (t_errno) {
+		case TBADF:
+			errno = EBADF;
+			break;
+		default:
+		case TBADFLAG:
+		case TBADOPT:
+		case TBUFOVFLW:
+		case TNOTSUPPORT:
+		case TOUTSTATE:
+			errno = EINVAL;
+			break;
+		case TPROTO:
+			errno = EPROTO;
+			break;
+		case TSYSERR:
+			break;
+		}
+		return (-1);
+	}
+	return (retval);
+}
+
 int
 __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t optlen)
 {
@@ -474,19 +522,22 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 #if defined ND_SET_REUSEADDR && defined ND_CLEAR_REUSEADDR
 			if (so->nc) {
 				option = val ? ND_SET_REUSEADDR : ND_CLEAR_REUSEADDR;
-				if ((rval = netdir_options(so->nc, option, s, NULL)) == ND_OK
-				    || nd_error != ND_NOCTRL)
+				rval = netdir_options(so->nc, option, s, NULL);
+				if (rval == ND_OK || nd_error != ND_NOCTRL)
 					return (rval);
 			}
 #endif				/* defined ND_SET_REUSEADDR && defined ND_CLEAR_REUSEADDR */
 #if defined XTI_GENERIC && defined XTI_REUSEADDR
 			option = val ? T_YES : T_NO;
-			if ((rval = __so_setoption(s, XTI_GENERIC, XTI_REUSEADDR, option)) == 0
-			    || errno != EPERM)
+			optval = &option;
+			optlen = sizeof(t_scalar_t);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_REUSEADDR, optval, optlen);
+			if (rval == 0 || errno != EPERM)
 				return (rval);
 #endif				/* defined XTI_GENERIC && defined XTI_REUSEADDR */
 #if defined SIOCREUSEADDR
-			if ((rval = ioctl(s, SIOCREUSEADDR, val)) == 0 || errno != EINVAL)
+			rval = ioctl(s, SIOCREUSEADDR, val);
+			if (rval == 0 || errno != EINVAL)
 				return (rval);
 #endif				/* defined SIOCREUSEADDR */
 			errno = ENOPROTOOPT;
@@ -509,22 +560,36 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 				return (-1);
 			}
 			val = (*(int *) optval);
+			/** AF_INET and AF_INET6 is handled directly, which is what the purpose of
+			  * the SO_DONTROUTE option was in the first place. */
+			if (so->info.sockparams.sp_family == AF_INET
+			    || so->info.sockparams.sp_family == AF_INET6) {
+				option = val ? T_YES : T_NO;
+				optval = &option;
+				optlen = sizeof(t_scalar_t);
+				rval = __so_setoption(s, T_INET_IP, T_IP_DONTROUTE, optval, optlen);
+				if (rval == 0 || errno != EPERM)
+					return (rval);
+			}
 #if defined ND_SET_DONTROUTE && defined ND_CLEAR_DONTROUTE
 			if (so->nc) {
 				option = val ? ND_SET_DONTROUTE : ND_CLEAR_DONTROUTE;
-				if ((rval = netdir_options(so->nc, option, s, NULL)) == ND_OK
-				    || nd_error != ND_NOCTRL)
+				rval = netdir_options(so->nc, option, s, NULL);
+				if (rval == ND_OK || nd_error != ND_NOCTRL)
 					return (rval);
 			}
 #endif				/* defined ND_SET_DONTROUTE && defined ND_CLEAR_DONTROUTE */
 #if defined XTI_GENERIC && defined XTI_DONTROUTE
 			option = val ? T_YES : T_NO;
-			if ((rval = __so_setoption(s, XTI_GENERIC, XTI_DONTROUTE, option)) == 0
-			    || errno != EPERM)
+			optval = &option;
+			optlen = sizeof(t_scalar_t);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_DONTROUTE, optval, optlen);
+			if (rval == 0 || errno != EPERM)
 				return (rval);
 #endif				/* defined XTI_GENERIC && defined XTI_DONTROUTE */
 #if defined SIOCDONTROUTE
-			if ((rval = ioctl(s, SIOCDONTROUTE, val)) == 0 || errno != EINVAL)
+			rval = ioctl(s, SIOCDONTROUTE, val);
+			if (rval == 0 || errno != EINVAL)
 				return (rval);
 #endif				/* defined SIOCDONTROUTE */
 			errno = ENOPROTOOPT;
@@ -541,63 +606,115 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 				return (-1);
 			}
 			val = (*(int *) optval);
+			/** AF_INET and AF_INET6 is handled directly, which is what the purpose of
+			  * the SO_BROADCAST option was in the first place. */
+			if (so->info.sockparams.sp_family == AF_INET
+			    || so->info.sockparams.sp_family == AF_INET6) {
+				option = val ? T_YES : T_NO;
+				optval = &option;
+				optlen = sizeof(t_scalar_t);
+				rval = __so_setoption(s, T_INET_IP, T_IP_BROADCAST, optval, optlen);
+				if (rval == 0 || errno != EPERM)
+					return (rval);
+			}
 #if defined ND_SET_BROADCAST && defined ND_CLEAR_BROADCAST
 			if (so->nc) {
 				option = val ? ND_SET_BROADCAST : ND_CLEAR_BROADCAST;
-				if ((rval = netdir_options(so->nc, option, s, NULL)) == ND_OK
-				    || nd_error != ND_NOCTRL)
+				rval = netdir_options(so->nc, option, s, NULL);
+				if (rval == ND_OK || nd_error != ND_NOCTRL)
 					return (rval);
 			}
 #endif				/* defined ND_SET_BROADCAST && defined ND_CLEAR_BROADCAST */
 #if defined XTI_GENERIC && defined XTI_BROADCAST
 			option = val ? T_YES : T_NO;
-			if ((rval = __so_setoption(s, XTI_GENERIC, XTI_BROADCAST, option)) == 0
-			    || errno != EPERM)
+			optval = &option;
+			optlen = sizeof(t_scalar_t);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_BROADCAST, optval, optlen);
+			if (rval == 0 || errno != EPERM)
 				return (rval);
 #endif				/* defined XTI_GENERIC && defined XTI_BROADCAST */
 #if defined SIOCBROADCAST
-			if ((rval = ioctl(s, SIOCBROADCAST, val)) == 0 || errno != EINVAL)
+			rval = ioctl(s, SIOCBROADCAST, val);
+			if (rval == 0 || errno != EINVAL)
 				return (rval);
 #endif				/* defined SIOCBROADCAST */
 			errno = ENOPROTOOPT;
 			return (-1);
 		case SO_SNDBUF:	/* POSIX */
-			/* Handle with XTI_GENERIC/XTI_SNDBUF. */
+#if defined XTI_GENERIC && defined XTI_SNDBUF
+			/** @def SO_SNDBUF
+			  * Handle with XTI_GENERIC/XTI_SNDBUF. */
+			option = val;
+			optval = &option;
+			optlen = sizeof(t_scalar_t);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_SNDBUF, optval, optlen);
+			if (rval == 0 || errno != EPERM)
+				return (rval);
+#endif				/* defined XTI_GENERIC && defined XTI_SNDBUF */
 			errno = ENOPROTOOPT;
 			return (-1);
 		case SO_RCVBUF:	/* POSIX */
-			/* Handle with XTI_GENERIC/XTI_RCVBUF. */
+#if defined XTI_GENERIC && defined XTI_RCVBUF
+			/** @def SO_RCVBUF
+			  * Handle with XTI_GENERIC/XTI_RCVBUF. */
+			option = val;
+			optval = &option;
+			optlen = sizeof(t_scalar_t);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_RCVBUF, optval, optlen);
+			if (rval == 0 || errno != EPERM)
+				return (rval);
+#endif				/* defined XTI_GENERIC && defined XTI_RCVBUF */
 			errno = ENOPROTOOPT;
 			return (-1);
 		case SO_KEEPALIVE:	/* POSIX */
-			/* The problem here is that this must be converted into a transport
-			   specific option, such as T_TCP_KEEPALIVE for tcp protocol.  We might be
-			   able to use netdir_options(3) for this (but, it doe not really have a
-			   keepalive option, but we could add one).  The other way would be to
-			   create a generic XTI option such as XTI_KEEPALIVE. A third way is to
-			   create a sockio input-output control. All but the first way requires the 
-			   cooperation of the transport provider.  */
+			/** @def SO_KEEPALIVE
+			  *   The problem here is that this must be converted into a transport
+			  *   specific option, such as T_TCP_KEEPALIVE for tcp protocol.  We might
+			  *   be able to use netdir_options(3) for this (but, it doe not really have
+			  *   a keepalive option, but we could add one).  The other way would be to
+			  *   create a generic XTI option such as XTI_KEEPALIVE. A third way is to
+			  *   create a sockio input-output control. All but the first way requires
+			  *   the cooperation of the transport provider.  */
 			if (optval == NULL) {
 				errno = EINVAL;
 				return (-1);
 			}
 			val = (*(int *) optval);
+#if defined NC_INET && defined NC_INET6
+			/** @def SO_KEEPALIVE
+			  *   AF_INET and AF_INET6 and handled directly for IPPROTO_TCP or default
+			  *   protocol (0) for SOCK_STREAM.  These are converted directly into a
+			  *   T_INET_TCP, T_TCP_KEEPALIVE setting. */
+			if ((so->info.sockparams.sp_family == AF_INET
+			     || so->info.sockparams.sp_family == AF_INET6)
+			    && (so->info.sockparams.sp_protocol == IPPROTO_TCP
+				|| (so->info.sockparams.sp_protocol == 0
+				    && so->info.sockparams.sp_type == SOCK_STREAM))) {
+				optval = &option;
+				optlen = sizeof(struct t_kpalive);
+				rval = __so_setoption(s, T_INET_TCP, T_TCP_KEEPALIVE, optval, optlen);
+				if (rval == 0 || errno != EPERM)
+					return (rval);
+			}
+#endif				/* defined NC_INET && defined NC_INET6 */
 #if defined ND_SET_KEEPALIVE && defined ND_CLEAR_KEEPALIVE
 			if (so->nc) {
 				option = val ? ND_SET_KEEPALIVE : ND_CLEAR_KEEPALIVE;
-				if ((rval = netdir_options(so->nc, option, s, NULL)) == ND_OK
-				    || nd_error != ND_NOCTRL)
+				rval = netdir_options(so->nc, option, s, NULL);
+				if (rval == ND_OK || nd_error != ND_NOCTRL)
 					return (rval);
 			}
 #endif				/* defined ND_SET_KEEPALIVE && defined ND_CLEAR_KEEPALIVE */
 #if defined XTI_GENERIC && defined XTI_KEEPALIVE
-			option = val ? T_YES : T_NO;
-			if ((rval = __so_setoption(s, XTI_GENERIC, XTI_KEEPALIVE, option)) == 0
-			    || errno != EPERM)
+			optval = &option;
+			optlen = sizeof(struct t_kpalive);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_KEEPALIVE, optval, optlen);
+			if (rval == 0 || errno != EPERM)
 				return (rval);
 #endif				/* defined XTI_GENERIC && defined XTI_KEEPALIVE */
 #if defined SIOCKEEPALIVE
-			if ((rval = ioctl(s, SIOCKEEPALIVE, val)) == 0 || errno != EINVAL)
+			rval = ioctl(s, SIOCKEEPALIVE, val);
+			if (rval == 0 || errno != EINVAL)
 				return (rval);
 #endif				/* defined SIOCKEEPALIVE */
 			errno = ENOPROTOOPT;
@@ -609,28 +726,31 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 #if 0
 		case SO_NO_CHECK:
 #endif
-		case SO_PRIORITY: /* Linux Specific? */
+		case SO_PRIORITY:	/* Linux Specific? */
 			/* The problem here is that this must be converted into a transport
-			   specific option, such as T_IP_TOS inet protocol.  We might be able to use
-			   netdir_options(3) for this (but, it doe not really have a priority
+			   specific option, such as T_IP_TOS inet protocol.  We might be able to
+			   use netdir_options(3) for this (but, it doe not really have a priority
 			   option, but we could add one).  The other way would be to create a
 			   generic XTI option such as XTI_PRIORITY. A third way is to create a
-			   sockio input-output control. All but the first way requires the 
+			   sockio input-output control. All but the first way requires the
 			   cooperation of the transport provider.  */
 #if defined ND_SET_PRIORITY
 			if (so->nc) {
-				if ((rval = netdir_options(so->nc, ND_SET_PRIORITY, s, (char *)&val)) == ND_OK
-				    || nd_error != ND_NOCTRL)
+				rval = netdir_options(so->nc, ND_SET_PRIORITY, s, (char *) &val);
+				if (rval == ND_OK || nd_error != ND_NOCTRL)
 					return (rval);
 			}
 #endif				/* defined ND_SET_PRIORITY */
 #if defined XTI_GENERIC && defined XTI_PRIORITY
-			if ((rval = __so_setoption(s, XTI_GENERIC, XTI_PRIORITY, val)) == 0
-			    || errno != EPERM)
+			optval = &option;
+			optlen = sizeof(t_scalar_t);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_PRIORITY, optval, optlen);
+			if (rval == 0 || errno != EPERM)
 				return (rval);
 #endif				/* defined XTI_GENERIC && defined XTI_PRIORITY */
 #if defined SIOCPRIORITY
-			if ((rval = ioctl(s, SIOCPRIORITY, val)) == 0 || errno != EINVAL)
+			rval = ioctl(s, SIOCPRIORITY, val);
+			if (rval == 0 || errno != EINVAL)
 				return (rval);
 #endif				/* defined SIOCPRIORITY */
 			errno = ENOPROTOOPT;
@@ -645,11 +765,27 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 		case SO_PEERCRED:
 #endif
 		case SO_RCVLOWAT:	/* POSIX */
-			/* Handle with XTI_GENERIC/XTI_RCVLOWAT. */
+			/** @def SO_RCVLOWAT
+			  * Handle with XTI_GENERIC/XTI_RCVLOWAT. */
+#if defined XTI_GENERIC && defined XTI_RCVLOWAT
+			optval = &option;
+			optlen = sizeof(t_scalar_t);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_RCVLOWAT, optval, optlen);
+			if (rval == 0 || errno != EPERM)
+				return (rval);
+#endif				/* defined XTI_GENERIC && defined XTI_RCVLOWAT */
 			errno = ENOPROTOOPT;
 			return (-1);
 		case SO_SNDLOWAT:	/* POSIX */
-			/* Handle with XTI_GENERIC/XTI_SNDLOWAT. */
+			/** @def SO_SNDLOWAT
+			  * Handle with XTI_GENERIC/XTI_SNDLOWAT. */
+#if defined XTI_GENERIC && defined XTI_SNDLOWAT
+			optval = &option;
+			optlen = sizeof(t_scalar_t);
+			rval = __so_setoption(s, XTI_GENERIC, XTI_SNDLOWAT, optval, optlen);
+			if (rval == 0 || errno != EPERM)
+				return (rval);
+#endif				/* defined XTI_GENERIC && defined XTI_SNDLOWAT */
 			errno = ENOPROTOOPT;
 			return (-1);
 		case SO_RCVTIMEO:	/* POSIX */
@@ -681,3 +817,5 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 }
 
 __asm__(".symver __so_setsockopt,setsockopt@@SOCKLIB_1.0");
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

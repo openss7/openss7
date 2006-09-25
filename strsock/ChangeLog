@@ -4,6 +4,8 @@
 	* NEWS: updated release notes
 	* doc/manual/news.texi: updated release notes
 
+	* src/lib/socklib.c: working up library
+
 2006-09-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated news
