@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2006/06/22 01:17:03 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2006/09/25 12:27:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 01:17:03 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:27:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2006/06/22 01:17:03 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2006/09/25 12:27:58 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2006/06/22 01:17:03 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2006/09/25 12:27:58 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -175,6 +175,7 @@ char	nettest_xti_id[]="\
  /* conflicts!( Silly standards people... raj 2/95 fortuenately, the */
  /* confilcts are on IP_TOP and IP_TTL, whcih netperf does not yet use */
 #include <xti.h>
+#include <sys/xti_sctp.h>
 
 #include "netlib.h"
 #include "netsh.h"
