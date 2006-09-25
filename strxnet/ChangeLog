@@ -1,5 +1,7 @@
 2006-09-24  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man3/t_optmgmt.3.man: typo
+
 	* ChangeLog: updated release notes
 	* AUTHORS: updated release notes
 	* NEWS: updated release notes
