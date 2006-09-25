@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/25 21:56:20 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 21:56:22 $
 
  -----------------------------------------------------------------------------
 
@@ -59,42 +59,139 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 21:56:20 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 21:56:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: test-inet_raw.c,v $
- Revision 0.9.2.10  2006/09/25 21:56:20  brian
+ $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.1  2006/09/25 21:56:22  brian
  - rationalized test programs
 
- Revision 0.9.2.9  2006/03/03 12:06:11  brian
- - 32/64-bit compatibility
+ Revision 0.9.2.25  2006/07/29 07:43:28  brian
+ - CVS checkin of changes before leaving for SCTP interop
 
- Revision 0.9.2.8  2005/12/28 09:58:31  brian
+ Revision 0.9.2.24  2006/07/08 07:25:56  brian
+ - removed trigraphs
+
+ Revision 0.9.2.23  2006/05/19 12:29:17  brian
+ - results of testing, almost full pass
+
+ Revision 0.9.2.22  2006/05/19 08:49:58  brian
+ - working up RAWIP and UDP drivers and testing
+
+ Revision 0.9.2.21  2006/03/24 16:03:48  brian
+ - rationalized to strsctp package
+
+ Revision 0.9.2.20  2006/02/23 11:10:11  brian
+ - 64bit changes for x86_64
+ - suppress lockf because it doesn't work too well on SMP
+
+ Revision 0.9.2.19  2005/12/28 10:00:37  brian
  - remove warnings on FC4 compile
 
- Revision 0.9.2.7  2005/05/14 08:31:25  brian
+ Revision 0.9.2.18  2005/07/18 12:47:53  brian
+ - standard indentation
+
+ Revision 0.9.2.17  2005/06/28 03:18:49  brian
+ - upgrading test suites
+
+ Revision 0.9.2.16  2005/06/23 22:06:04  brian
+ - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
+
+ Revision 0.9.2.15  2005/06/16 04:33:33  brian
+ - modifications for test-inet_sctp
+
+ Revision 0.9.2.14  2005/06/15 23:00:19  brian
+ - final allowed state test cases
+
+ Revision 0.9.2.13  2005/06/15 12:36:36  brian
+ - added negative test cases
+
+ Revision 0.9.2.12  2005/06/15 00:38:38  brian
+ - fixed introduced typo
+
+ Revision 0.9.2.11  2005/06/14 23:16:14  brian
+ - corrected standards reference
+
+ Revision 0.9.2.10  2005/06/14 23:02:26  brian
+ - additional test cases for flushing and capabilities request
+
+ Revision 0.9.2.9  2005/06/14 06:30:02  brian
+ - a few more test cases
+
+ Revision 0.9.2.8  2005/06/13 11:20:52  brian
+ - added bug test case, a few timing corrections
+
+ Revision 0.9.2.7  2005/06/13 09:51:07  brian
+ - added more tests for connect request/response options
+
+ Revision 0.9.2.6  2005/06/12 12:52:55  brian
+ - added more tests, bad primitive corrections
+
+ Revision 0.9.2.5  2005/06/11 02:21:20  brian
+ - added more test cases
+
+ Revision 0.9.2.4  2005/06/10 04:03:12  brian
+ - more options corrections
+
+ Revision 0.9.2.3  2005/06/08 09:01:19  brian
+ - corrected options processing
+
+ Revision 0.9.2.2  2005/06/08 06:08:25  brian
+ - more options testing
+
+ Revision 0.9.2.1  2005/06/07 00:52:06  brian
+ - upgrading test suites
+
+ Revision 0.9.2.10  2005/06/04 13:38:47  brian
+ - final workup of test suites
+
+ Revision 0.9.2.9  2005/06/04 09:13:55  brian
+ - test suite corrections
+
+ Revision 0.9.2.8  2005/06/04 05:01:42  brian
+ - working up test suite upgrade
+
+ Revision 0.9.2.7  2005/06/04 03:02:18  brian
+ - upgraded test suites
+
+ Revision 0.9.2.6  2005/05/14 08:28:53  brian
  - copyright header correction
 
- Revision 0.9.2.6  2005/05/13 11:15:49  brian
- - added copying option for check compilance
+ Revision 0.9.2.5  2005/04/04 16:43:17  brian
+ - removed references to HZ
 
- Revision 0.9.2.5  2005/01/25 16:13:10  brian
+ Revision 0.9.2.4  2005/01/25 16:09:59  brian
  - Add check for <sys/wait.h>.
 
- Revision 0.9.2.4  2005/01/24 07:49:01  brian
- - Removed compiler warnings.
+ Revision 0.9.2.3  2005/01/22 16:38:22  brian
+ - Fixed compiler warnings.
 
- Revision 0.9.2.3  2004/09/02 09:31:20  brian
- - Synchronization with other packages.
+ Revision 0.9.2.2  2004/09/02 10:07:37  brian
+ - Updates for LFS compile.
 
- Revision 0.9.2.2  2004/04/14 10:33:19  brian
- - Some configuration rearrangement and a few changes for full compile.
+ Revision 0.9.2.1  2004/06/27 10:08:37  brian
+ - Built up separate inet release.
 
- Revision 0.9.2.1  2004/02/22 08:49:19  brian
- - Added --help and --version options to all executables.
+ Revision 0.9.2.1  2004/05/16 04:12:36  brian
+ - Updating strxnet release.
 
- Revision 1.1.4.1  2004/01/12 23:33:17  brian
+ Revision 1.1.4.6  2004/04/13 12:12:55  brian
+ - Rearranged header files.
+
+ Revision 1.1.4.5  2004/04/13 06:04:04  brian
+ - INET driver works pretty good now.
+
+ Revision 1.1.4.4  2004/04/12 20:18:00  brian
+ - Test cases pass.
+
+ Revision 1.1.4.3  2004/03/31 09:00:50  brian
+ - Working up new inet driver and documentation.
+
+ Revision 1.1.4.2  2004/03/28 17:30:20  brian
+ - First clean compile of inet updates.
+
+ Revision 1.1.4.1  2004/01/12 23:33:18  brian
  - Updated LiS-2.16.18 gcom release to autoconf.
 
  Revision 1.1.2.3  2004/01/07 11:34:53  brian
@@ -108,9 +205,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/25 21:56:20 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 21:56:22 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/25 21:56:20 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 21:56:22 $";
 
 /*
  *  Simple test program for INET streams.
@@ -161,7 +258,7 @@ static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 
 #include <xti_inet.h>
 #include <sys/xti_sctp.h>
 
-#if 0
+#if 1
 #define SCTP_VERSION_2 1
 
 #ifndef SCTP_VERSION_2
@@ -184,15 +281,15 @@ typedef struct sctp_addr {
  *  -------------------------------------------------------------------------
  */
 
-static const char *lpkgname = "OpenSS7 INET Driver - RAW";
+static const char *lpkgname = "OpenSS7 INET Driver - SCTP";
 
 /* static const char *spkgname = "INET"; */
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
-static const char *shortname = "INET/RAW";
-static char devname[256] = "/dev/rawip";
+static const char *shortname = "INET/SCTP";
+static char devname[256] = "/dev/sctp";
 
-static const int test_level = T_INET_IP;
+static const int test_level = T_INET_SCTP;
 
 static int exit_on_failure = 0;
 
@@ -274,7 +371,7 @@ int flags = 0;
 
 int dummy = 0;
 
-#if 0
+#if 1
 #ifndef SCTP_VERSION_2
 typedef struct addr {
 	uint16_t port __attribute__ ((packed));
@@ -563,7 +660,7 @@ stop_tt(void)
 /*
  *  Addresses
  */
-#if 0
+#if 1
 #ifndef SCTP_VERSION_2
 addr_t addrs[4];
 #else				/* SCTP_VERSION_2 */
@@ -572,7 +669,7 @@ struct sockaddr_in addrs[4][3];
 #else
 struct sockaddr_in addrs[4];
 #endif
-unsigned short ports[4] = { 140, 140, 140, 140 };
+unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -601,7 +698,7 @@ struct {
 	struct t_opthdr csm_hdr;
 	t_scalar_t csm_val;
 #endif
-#if 0
+#if 1
 	struct t_opthdr ppi_hdr;
 	t_uscalar_t ppi_val;
 	struct t_opthdr sid_hdr;
@@ -623,9 +720,9 @@ struct {
 	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}
 	, T_NO
 #endif
-#if 0
+#if 1
 	    , {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}
 	, 10, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}
 	, 0
@@ -664,7 +761,7 @@ struct {
 	t_scalar_t bca_val;
 	struct t_opthdr reu_hdr;
 	t_scalar_t reu_val;
-#if 0
+#if 1
 	struct t_opthdr ist_hdr;
 	t_scalar_t ist_val;
 	struct t_opthdr ost_hdr;
@@ -695,7 +792,7 @@ struct {
 	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO, {
 	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}
 	, T_NO
-#if 0
+#if 1
 	    , {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}
 	, 1, {
@@ -708,7 +805,7 @@ struct {
  * management options
  */
 struct {
-#if 0
+#if 1
 	struct t_opthdr xdb_hdr;
 	t_uscalar_t xdb_val;
 #else
@@ -755,7 +852,7 @@ struct {
 	struct t_opthdr kpa_hdr;
 	struct t_kpalive kpa_val;
 #endif
-#if 0
+#if 1
 	struct t_opthdr nod_hdr;
 	t_scalar_t nod_val;
 	struct t_opthdr crk_hdr;
@@ -838,7 +935,7 @@ struct {
 	sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, {
 	T_NO, 0}
 #endif
-#if 0
+#if 1
 	, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}
 	, T_YES, {
@@ -1724,7 +1821,7 @@ state_string(t_uscalar_t state)
 	}
 }
 
-#if 0
+#ifndef SCTP_VERSION_2
 void
 print_addr(char *add_ptr, size_t add_len)
 {
@@ -1776,17 +1873,25 @@ print_addrs(int fd, char *add_ptr, size_t add_len)
 {
 	fprintf(stdout, "Stupid!\n");
 }
-#else
+#else				/* SCTP_VERSION_2 */
 void
 print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	size_t anum = add_len / sizeof(*a);
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	if (add_len) {
-		if (add_len != sizeof(*a))
-			fprintf(stdout, "Aaarrg! add_len = %lu, ", (ulong) add_len);
-		fprintf(stdout, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+	if (add_len > 0) {
+		int i;
+
+		if (add_len != anum * sizeof(*a))
+			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
+		fprintf(stdout, "[%d]", ntohs(a[0].sin_port));
+		for (i = 0; i < anum; i++) {
+			uint32_t addr = a[i].sin_addr.s_addr;
+
+			fprintf(stdout, "%s%d.%d.%d.%d.", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+		}
 	} else
 		fprintf(stdout, "(no address)");
 	fprintf(stdout, "\n");
@@ -1800,11 +1905,19 @@ addr_string(char *add_ptr, size_t add_len)
 	static char buf[128];
 	size_t len = 0;
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	size_t anum = add_len / sizeof(*a);
 
-	if (add_len) {
-		if (add_len != sizeof(*a))
-			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, ", (ulong) add_len);
-		len += snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+	if (add_len > 0) {
+		int i;
+
+		if (add_len != anum * sizeof(*a))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a[0].sin_port));
+		for (i = 0; i < anum; i++) {
+			uint32_t addr = a[i].sin_addr.s_addr;
+
+			snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d.", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+		}
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
 	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
@@ -1825,7 +1938,7 @@ print_addrs(int child, char *add_ptr, size_t add_len)
 		print_string(child, buf);
 	}
 }
-#endif
+#endif				/* SCTP_VERSION_2 */
 
 char *
 status_string(struct t_opthdr *oh)
@@ -2168,7 +2281,7 @@ value_string(int child, struct t_opthdr *oh)
 		case T_SCTP_PPI:
 			return number_string(oh);;
 		case T_SCTP_SID:
-#if 0
+#if 1
 			sid[child] = *((t_uscalar_t *) T_OPT_DATA(oh));
 #endif
 			return number_string(oh);;
@@ -2228,7 +2341,7 @@ value_string(int child, struct t_opthdr *oh)
 	return ("(unknown value)");
 }
 
-#if 0
+#if 1
 void
 parse_options(int fd, char *opt_ptr, size_t opt_len)
 {
@@ -3608,16 +3721,33 @@ test_close(int child)
 static int
 stream_start(int child, int index)
 {
-	addrs[3].sin_family = AF_INET;
-	addrs[3].sin_port = htons(ports[3]);
-	inet_aton(addr_strings[3], &addrs[3].sin_addr);
+	int offset = 3 * index;
+	int i;
+
+	for (i = 0; i < 3; i++) {
+#ifndef SCTP_VERSION_2
+		addrs[3].port = htons(ports[3] + offset);
+		inet_aton(addr_strings[i], &addrs[child].addr[i]);
+#else				/* SCTP_VERSION_2 */
+		addrs[3][i].sin_family = AF_INET;
+		addrs[3][i].sin_port = htons(ports[3] + offset);
+		inet_aton(addr_strings[i], &addrs[3][i].sin_addr);
+#endif				/* SCTP_VERSION_2 */
+	}
 	switch (child) {
 	case 1:
 	case 2:
 	case 0:
-		addrs[child].sin_family = AF_INET;
-		addrs[child].sin_port = htons(ports[child]);
-		inet_aton(addr_strings[child], &addrs[child].sin_addr);
+		for (i = 0; i < 3; i++) {
+#ifndef SCTP_VERSION_2
+			addrs[child].port = htons(ports[child] + offset);
+			inet_aton(addr_strings[i], &addrs[child].addr[i]);
+#else				/* SCTP_VERSION_2 */
+			addrs[child][i].sin_family = AF_INET;
+			addrs[child][i].sin_port = htons(ports[child] + offset);
+			inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
+#endif				/* SCTP_VERSION_2 */
+		}
 		if (test_open(child, devname) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
@@ -3770,7 +3900,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 		print_string(child, addr_string(cbuf + p->conn_req.DEST_offset, p->conn_req.DEST_length));
 #else
 		print_addrs(child, cbuf + p->conn_req.DEST_offset, p->conn_req.DEST_length);
@@ -3944,7 +4074,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 		print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
 #else
 		print_addrs(child, cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length);
@@ -3960,7 +4090,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 		print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
 #else
 		print_addrs(child, cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length);
@@ -4015,7 +4145,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 		print_string(child, addr_string(cbuf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length));
 #else
 		print_addrs(child, cbuf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
@@ -4036,7 +4166,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 		print_string(child, addr_string(cbuf + p->unitdata_ind.SRC_offset, p->unitdata_ind.SRC_length));
 #else
 		print_addrs(child, cbuf + p->unitdata_ind.SRC_offset, p->unitdata_ind.SRC_length);
@@ -4187,7 +4317,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 		print_string(child, addr_string(cbuf + p->addr_ack.LOCADDR_offset, p->addr_ack.LOCADDR_length));
 		print_string(child, addr_string(cbuf + p->addr_ack.REMADDR_offset, p->addr_ack.REMADDR_length));
 #else
@@ -4525,7 +4655,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 		case T_UNITDATA_REQ:
 			event = __TEST_UNITDATA_REQ;
 			print_rx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 			print_string(child, addr_string(cbuf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length));
 #else
 			print_addrs(child, cbuf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
@@ -4569,7 +4699,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_CONN_IND;
 			last_sequence = p->conn_ind.SEQ_number;
 			print_rx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 			print_string(child, addr_string(cbuf + p->conn_ind.SRC_offset, p->conn_ind.SRC_length));
 #else
 			print_addrs(child, cbuf + p->conn_ind.SRC_offset, p->conn_ind.SRC_length);
@@ -4603,7 +4733,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_BIND_ACK;
 			last_qlen = p->bind_ack.CONIND_number;
 			print_ack_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 			print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
 #else
 			print_addrs(child, cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length);
@@ -4623,7 +4753,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 		case T_UNITDATA_IND:
 			event = __TEST_UNITDATA_IND;
 			print_rx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 			print_string(child, addr_string(cbuf + p->unitdata_ind.SRC_offset, p->unitdata_ind.SRC_length));
 #else
 			print_addrs(child, cbuf + p->unitdata_ind.SRC_offset, p->unitdata_ind.SRC_length);
@@ -4633,7 +4763,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 		case T_UDERROR_IND:
 			event = __TEST_UDERROR_IND;
 			print_rx_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 			print_string(child, addr_string(cbuf + p->uderror_ind.DEST_offset, p->uderror_ind.DEST_length));
 #else
 			print_addrs(child, cbuf + p->uderror_ind.DEST_offset, p->uderror_ind.DEST_length);
@@ -4670,7 +4800,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 		case T_ADDR_ACK:
 			event = __TEST_ADDR_ACK;
 			print_ack_prim(child, prim_string(p->type));
-#if 1
+#ifndef SCTP_VERSION_2
 			print_string(child, addr_string(cbuf + p->addr_ack.LOCADDR_offset, p->addr_ack.LOCADDR_length));
 			print_string(child, addr_string(cbuf + p->addr_ack.REMADDR_offset, p->addr_ack.REMADDR_length));
 #else
@@ -5052,7 +5182,7 @@ preamble_1(int child)
 		goto failure;
 	state++;
 #endif
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -5174,7 +5304,7 @@ preamble_2_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -5364,7 +5494,7 @@ postamble_2_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-#if 0
+#if 1
 static int
 preamble_2b_conn(int child)
 {
@@ -5374,7 +5504,7 @@ preamble_2b_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[1];
+	test_addr = addrs[1];
 	test_alen = sizeof(addrs[1]);
 	test_data = "Hello World";
 	test_opts = &opt_conn;
@@ -8775,11 +8905,12 @@ test_case_1_5_5_34(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, 0}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
@@ -8810,11 +8941,12 @@ test_case_1_5_5_35(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
@@ -11078,11 +11210,12 @@ test_case_1_6_5_34(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, 0}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
@@ -11113,11 +11246,12 @@ test_case_1_6_5_35(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
@@ -13381,11 +13515,12 @@ test_case_1_7_5_34(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, 0}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
@@ -13416,11 +13551,12 @@ test_case_1_7_5_35(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
@@ -15684,11 +15820,12 @@ test_case_1_8_5_34(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, 0}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
@@ -15719,11 +15856,12 @@ test_case_1_8_5_35(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
@@ -16432,7 +16570,7 @@ test_case_1_9_2(int child)
 #if 0
 		struct t_opthdr opt_hdr3;
 #endif
-#if 0
+#if 1
 		struct t_opthdr opt_hdr4;
 #endif
 #if 0
@@ -16451,7 +16589,7 @@ test_case_1_9_2(int child)
 		, {
 		sizeof(struct t_opthdr), T_INET_TCP, T_ALLOPT, T_SUCCESS}
 #endif
-#if 0
+#if 1
 		, {
 		sizeof(struct t_opthdr), T_INET_SCTP, T_ALLOPT, T_SUCCESS}
 #endif
@@ -17237,7 +17375,7 @@ test_case_1_10_1(int child, struct sockaddr_in *addr, socklen_t len)
 int
 test_case_1_10_1_conn(int child)
 {
-	return test_case_1_10_1(child, &addrs[0], sizeof(addrs[0]));
+	return test_case_1_10_1(child, addrs[0], sizeof(addrs[0]));
 }
 
 int
@@ -17283,8 +17421,8 @@ test_case_1_10_1_resp(int child)
 int
 test_case_1_10_1_list(int child)
 {
-	addrs[3].sin_addr.s_addr = INADDR_ANY;
-	return test_case_1_10_1(child, &addrs[3], sizeof(addrs[3]));
+	addrs[3][0].sin_addr.s_addr = INADDR_ANY;
+	return test_case_1_10_1(child, addrs[3], sizeof(addrs[3][0]));
 }
 
 #define preamble_1_10_1_conn	preamble_0
@@ -17311,7 +17449,7 @@ not care about reuse, so all streams will succeed for rawip."
 int
 test_case_1_10_2_conn(int child)
 {
-	test_addr = &addrs[0];
+	test_addr = addrs[0];
 	test_alen = sizeof(addrs[0]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17347,7 +17485,7 @@ test_case_1_10_2_resp(int child)
 	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[0];
+	test_addr = addrs[0];
 	test_alen = sizeof(addrs[0]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17378,7 +17516,7 @@ test_case_1_10_2_list(int child)
 	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[0];
+	test_addr = addrs[0];
 	test_alen = sizeof(addrs[0]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17435,7 +17573,7 @@ test_case_1_10_3(int child)
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}
 	, T_YES};
 	if (test_level == T_INET_IP) {
-		test_addr = &addrs[0];
+		test_addr = addrs[0];
 		test_alen = sizeof(addrs[0]);
 		last_qlen = 0;
 		if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17457,7 +17595,7 @@ test_case_1_10_3(int child)
 		goto failure;
 	state++;
 	if (test_level != T_INET_IP) {
-		test_addr = &addrs[0];
+		test_addr = addrs[0];
 		test_alen = sizeof(addrs[0]);
 		last_qlen = 0;
 		if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17526,7 +17664,7 @@ failure.  This is a simple test of a common interface state violation."
 int
 test_case_1_10_4(int child)
 {
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17573,7 +17711,7 @@ test_case_1_10_5(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17700,7 +17838,7 @@ size because that is acceptable to SCTP."
 int
 test_case_1_10_8(int child)
 {
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]) >> 1;
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17744,7 +17882,7 @@ size because that is acceptable to SCTP."
 int
 test_case_1_10_9(int child)
 {
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]) + 1;
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -17870,7 +18008,9 @@ while it is successful for T_CLTS service."
 int
 test_case_1_10_11(int child)
 {
-	struct sockaddr_in addr = { AF_INET, addrs[child].sin_port, {child == 0 ? 0 : addrs[child].sin_addr.s_addr} };
+	struct sockaddr_in addr = { AF_INET, addrs[child][0].sin_port,
+		{child == 0 ? 0 : addrs[child][0].sin_addr.s_addr}
+	};
 
 	test_addr = &addr;
 	test_alen = sizeof(addr);
@@ -17966,19 +18106,19 @@ test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 int
 test_case_2_2_conn(int child)
 {
-	return test_case_2_2(child, &addrs[1], sizeof(addrs[1]));
+	return test_case_2_2(child, addrs[1], sizeof(addrs[1]));
 }
 
 int
 test_case_2_2_resp(int child)
 {
-	return test_case_2_2(child, &addrs[2], sizeof(addrs[2]));
+	return test_case_2_2(child, addrs[2], sizeof(addrs[2]));
 }
 
 int
 test_case_2_2_list(int child)
 {
-	return test_case_2_2(child, &addrs[0], sizeof(addrs[0]));
+	return test_case_2_2(child, addrs[0], sizeof(addrs[0]));
 }
 
 int
@@ -21768,11 +21908,12 @@ test_case_2_2_5_34_conn(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, 0}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_conn(child);
@@ -21783,11 +21924,12 @@ test_case_2_2_5_34_resp(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, 0}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_resp(child);
@@ -21798,11 +21940,12 @@ test_case_2_2_5_34_list(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, 0}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_list(child);
@@ -21832,11 +21975,12 @@ test_case_2_2_5_35_conn(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_conn(child);
@@ -21847,11 +21991,12 @@ test_case_2_2_5_35_resp(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_resp(child);
@@ -21862,11 +22007,12 @@ test_case_2_2_5_35_list(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_uscalar_t opt_val;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_list(child);
@@ -22142,19 +22288,19 @@ test_case_2_2_6(int child, struct sockaddr_in *addr, socklen_t len)
 int
 test_case_2_2_6_conn(int child)
 {
-	return test_case_2_2_6(child, &addrs[1], sizeof(addrs[1]));
+	return test_case_2_2_6(child, addrs[1], sizeof(addrs[1]));
 }
 
 int
 test_case_2_2_6_resp(int child)
 {
-	return test_case_2_2_6(child, &addrs[2], sizeof(addrs[2]));
+	return test_case_2_2_6(child, addrs[2], sizeof(addrs[2]));
 }
 
 int
 test_case_2_2_6_list(int child)
 {
-	return test_case_2_2_6(child, &addrs[0], sizeof(addrs[0]));
+	return test_case_2_2_6(child, addrs[0], sizeof(addrs[0]));
 }
 
 #define preamble_2_2_6_conn	preamble_1
@@ -22193,7 +22339,7 @@ test_case_3_1_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -22287,7 +22433,7 @@ test_case_3_2_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -22413,7 +22559,7 @@ test_case_3_3_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -22551,7 +22697,7 @@ test_case_3_4_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -22693,7 +22839,7 @@ test_case_3_5_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -22844,7 +22990,7 @@ test_case_3_6_conn(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -22866,7 +23012,7 @@ test_case_3_6_conn(int child)
 		goto failure;
 	}
 	state++;
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -22883,7 +23029,7 @@ test_case_3_6_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23020,7 +23166,7 @@ test_case_4_1_1_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23113,7 +23259,7 @@ test_case_4_1_2_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23207,7 +23353,7 @@ test_case_4_1_3_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23248,7 +23394,7 @@ test_case_4_1_3_resp(int child)
 	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23376,7 +23522,7 @@ test_case_4_1_4_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23428,18 +23574,18 @@ test_case_4_1_4_resp(int child)
 		goto failure;
 	state++;
 	sin = (typeof(sin)) (cbuf + p->addr_ack.LOCADDR_offset);
-	if (sin->sin_family != addrs[2].sin_family) {
+	if (sin->sin_family != addrs[2][0].sin_family) {
 		failure_string = "LOCADDR sin_family unexpected";
 		goto failure;
 	}
 	state++;
-	if (sin->sin_port != addrs[2].sin_port) {
+	if (sin->sin_port != addrs[2][0].sin_port) {
 		failure_string = "LOCADDR sin_port unexpected";
 		goto failure;
 	}
-#if 1
+#if 0
 	state++;
-	if (sin->sin_addr.s_addr != addrs[2].sin_addr.s_addr) {
+	if (sin->sin_addr.s_addr != addrs[2][0].sin_addr.s_addr) {
 		failure_string = "LOCADDR sin_addr.s_addr unexpected";
 		goto failure;
 	}
@@ -23508,7 +23654,7 @@ test_case_4_1_5_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23607,7 +23753,7 @@ test_case_4_1_6_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23644,7 +23790,7 @@ test_case_4_1_6_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -23799,7 +23945,7 @@ preamble_4_1_7(int child)
 	state++;
 	test_msleep(child, SHORT_WAIT);
 	state++;
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -23886,7 +24032,7 @@ test_case_4_1_7_conn_part(int child)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -24085,7 +24231,7 @@ test_case_4_1_8_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -24189,7 +24335,7 @@ test_case_4_1_9_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -24292,7 +24438,7 @@ test_case_4_2_1_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = "Connection Data!";
 	test_opts = &opt_conn;
@@ -24414,7 +24560,7 @@ failure:
 #define preamble_4_2_1_resp	preamble_1s
 #define preamble_4_2_1_list	preamble_1s
 
-#if 1
+#if 0
 #define postamble_4_2_1_conn	postamble_1
 #define postamble_4_2_1_resp	postamble_1
 #define postamble_4_2_1_list	postamble_1
@@ -24444,7 +24590,7 @@ time a bug report.  This test case is for regression on the bug fix."
 int
 test_case_4_2_2_conn(int child)
 {
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -24547,7 +24693,7 @@ test_case_4_3_conn(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -24668,7 +24814,7 @@ test_case_4_3_conn_readonly(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -24739,7 +24885,7 @@ postamble_4_3_list(int child)
 	return postamble_2_list(child);
 }
 
-#if 1
+#if 0
 #define postamble_4_3_conn_readonly postamble_4_3_conn
 #define postamble_4_3_resp_readonly postamble_4_3_resp
 #define postamble_4_3_list_readonly postamble_4_3_list
@@ -27150,7 +27296,7 @@ test_case_4_3_5_21_conn(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS}
-	, T_NO};
+	, T_SCTP_HMAC_NONE};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_conn(child);
@@ -27171,7 +27317,7 @@ test_case_4_3_5_21_list(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS}
-	, T_NO};
+	, T_SCTP_HMAC_NONE};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_list(child);
@@ -27202,7 +27348,7 @@ test_case_4_3_5_22_conn(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CKSUM_TYPE, T_SUCCESS}
-	, T_NO};
+	, T_SCTP_CSUM_CRC32C};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_conn(child);
@@ -27223,7 +27369,7 @@ test_case_4_3_5_22_list(int child)
 	} options = {
 		{
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CKSUM_TYPE, T_SUCCESS}
-	, T_NO};
+	, T_SCTP_CSUM_CRC32C};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_list(child);
@@ -27822,11 +27968,12 @@ test_case_4_3_5_34_conn(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_scalar_t optval;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, T_UNSPEC}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_conn(child);
@@ -27843,11 +27990,12 @@ test_case_4_3_5_34_list(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_scalar_t optval;
+		struct t_sctp_hb opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_hb), T_INET_SCTP, T_SCTP_HB, T_SUCCESS}, {
+		0, T_NO, T_UNSPEC}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_list(child);
@@ -27874,11 +28022,12 @@ test_case_4_3_5_35_conn(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_scalar_t optval;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_conn(child);
@@ -27895,11 +28044,12 @@ test_case_4_3_5_35_list(int child)
 {
 	struct {
 		struct t_opthdr opt_hdr;
-		t_scalar_t optval;
+		struct t_sctp_rto opt_val;
 	} options = {
 		{
-		sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}
-	, T_NO};
+		sizeof(struct t_opthdr) + sizeof(struct t_sctp_rto), T_INET_SCTP, T_SCTP_RTO, T_SUCCESS}, {
+		0, 1000, 200, 5000, 5}
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_4_3_list(child);
@@ -28607,7 +28757,7 @@ struct test_stream test_5_4_conn = { &preamble_5_4_conn, &test_case_5_4_conn, &p
 struct test_stream test_5_4_resp = { &preamble_5_4_resp, &test_case_5_4_resp, &postamble_5_4_resp };
 struct test_stream test_5_4_list = { &preamble_5_4_list, &test_case_5_4_list, &postamble_5_4_list };
 
-#if 0
+#if 1
 /*
  *  Accept a connection.
  */
@@ -28874,7 +29024,7 @@ struct test_stream test_5_5_3_resp = { &preamble_5_5_3_resp, &test_case_5_5_3_re
 struct test_stream test_5_5_3_list = { &preamble_5_5_3_list, &test_case_5_5_3_list, &postamble_5_5_3_list };
 #endif
 
-#if 0
+#if 1
 /*
  *  Connect with data.
  */
@@ -29230,7 +29380,7 @@ struct test_stream test_6_3_resp = { &preamble_6_3_resp, &test_case_6_3_resp, &p
 struct test_stream test_6_3_list = { &preamble_6_3_list, &test_case_6_3_list, &postamble_6_3_list };
 #endif
 
-#if 0
+#if 1
 /*
  *  Test fragmentation by sending very large packets.
  */
@@ -29452,7 +29602,7 @@ struct test_stream test_7_2_resp = { &preamble_7_2_resp, &test_case_7_2_resp, &p
 struct test_stream test_7_2_list = { &preamble_7_2_list, &test_case_7_2_list, &postamble_7_2_list };
 #endif
 
-#if 0
+#if 1
 /*
  *  Connect with transfer data and orderly release.
  */
@@ -29920,7 +30070,7 @@ struct test_stream test_8_4_resp = { &preamble_8_4_resp, &test_case_8_4_resp, &p
 struct test_stream test_8_4_list = { &preamble_8_4_list, &test_case_8_4_list, &postamble_8_4_list };
 #endif
 
-#if 0
+#if 1
 /*
  *  Delivering ordered data under noise.
  */
@@ -30493,7 +30643,7 @@ struct test_stream test_9_4_resp = { &preamble_9_4_resp, &test_case_9_4_resp, &p
 struct test_stream test_9_4_list = { &preamble_9_4_list, &test_case_9_4_list, &postamble_9_4_list };
 #endif
 
-#if 0
+#if 1
 /*
  *  Data for destination failure testing.
  */
@@ -31799,7 +31949,7 @@ test_case_11_3(int child, long prim)
 		case T_CAPABILITY_REQ:
 			break;
 		case T_CONN_REQ:
-			test_addr = &addrs[2];
+			test_addr = addrs[2];
 			test_alen = sizeof(addrs[2]);
 			test_data = "Hello World";
 			test_opts = &opt_conn;
@@ -31899,7 +32049,7 @@ test_case_11_3(int child, long prim)
 		case T_UNBIND_REQ:
 			break;
 		case T_UNITDATA_REQ:
-			test_addr = &addrs[(child + 1) % 3];
+			test_addr = addrs[(child + 1) % 3];
 			test_alen = sizeof(addrs[(child + 1) % 3]);
 			test_data = "Unit test data.";
 			if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
@@ -31942,7 +32092,7 @@ test_case_11_3(int child, long prim)
 		case T_UNBIND_REQ:
 			break;
 		case T_UNITDATA_REQ:
-			test_addr = &addrs[(child + 1) % 3];
+			test_addr = addrs[(child + 1) % 3];
 			test_alen = sizeof(addrs[(child + 1) % 3]);
 			test_data = "Unit test data.";
 			if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
@@ -32347,7 +32497,7 @@ test_case_12_1_conn(int child)
 		test_data = "Some unit data test message.";
 		test_opts = NULL;
 		test_olen = 0;
-		test_addr = &addrs[2];
+		test_addr = addrs[2];
 		test_alen = sizeof(addrs[2]);
 		if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 			goto failure;
@@ -33144,7 +33294,7 @@ preamble_ts_wcon_creq_conn(int child)
 		goto abort;
 	state++;
 	test_data = NULL;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_opts = NULL;
 	test_olen = 0;
@@ -33238,7 +33388,7 @@ preamble_ts_wres_cind_conn(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
 	test_opts = &opt_conn;
@@ -33614,10 +33764,10 @@ test_case_13_2_2(int child)
 		goto failure;
 	state++;
 	/* broadcast addresses require privilege - this might not work for TCP or SCTP */
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
-	addrs[child].sin_addr.s_addr = 0x0000007f;	/* 127.0.0.255 is a broadcast address */
+	addrs[child][0].sin_addr.s_addr = 0x0000007f;	/* 127.0.0.255 is a broadcast address */
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -33670,7 +33820,7 @@ test_case_13_2_3(int child)
 	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	last_qlen = 5;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -33699,7 +33849,7 @@ test_case_13_2_3_list(int child)
 	if (test_level == T_INET_IP)
 		goto notapplicable;
 	state++;
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -33750,7 +33900,7 @@ for the T_BIND_REQ primitive."
 int
 test_case_13_2_4(int child)
 {
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]) - 1;
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -33813,10 +33963,10 @@ test_case_13_2_5(int child)
 	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
-	addrs[child].sin_addr.s_addr = 0x3f00003f;	/* pick some non-local address */
+	addrs[child][0].sin_addr.s_addr = 0x3f00003f;	/* pick some non-local address */
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -33864,7 +34014,7 @@ for the T_BIND_REQ primitive."
 int
 test_case_13_2_6(int child)
 {
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -34395,7 +34545,7 @@ int
 test_case_13_4_4_conn(int child)
 {
 	test_data = NULL;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]) - 1;
 	test_opts = NULL;
 	test_olen = 0;
@@ -34451,7 +34601,7 @@ int
 test_case_13_4_5_conn(int child)
 {
 	test_data = "";
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_opts = NULL;
 	test_olen = 0;
@@ -34514,7 +34664,7 @@ test_case_13_4_6_conn(int child)
 		sizeof(struct t_opthdr) + sizeof(t_scalar_t) + 1, T_INET_IP, T_IP_TOS, T_SUCCESS}
 	, 0x0};
 	test_data = NULL;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -34579,7 +34729,7 @@ test_case_13_4_7_conn(int child)
 		goto notapplicable;
 	state++;
 	test_data = NULL;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_opts = NULL;
 	test_olen = 0;
@@ -34637,7 +34787,7 @@ int
 test_case_13_4_8(int child)
 {
 	test_data = NULL;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_opts = NULL;
 	test_olen = 0;
@@ -38096,7 +38246,7 @@ int
 test_case_13_14_1(int child)
 {
 	test_data = "Some data.";
-	test_addr = &addrs[(child + 1) % 3];
+	test_addr = addrs[(child + 1) % 3];
 	test_alen = sizeof(addrs[(child + 1) % 3]);
 	test_opts = NULL;
 	test_olen = 0;
@@ -38158,7 +38308,7 @@ int
 test_case_13_14_2(int child)
 {
 	test_data = "";
-	test_addr = &addrs[(child + 1) % 3];
+	test_addr = addrs[(child + 1) % 3];
 	test_alen = sizeof(addrs[(child + 1) % 3]);
 	test_opts = NULL;
 	test_olen = 0;
@@ -38466,7 +38616,7 @@ can be issued.  This test case tests the T_BIND_REQ primitive in the TS_UNBND st
 int
 test_case_14_2(int child)
 {
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -38769,7 +38919,7 @@ int
 test_case_14_4_1_conn(int child)
 {
 	test_data = NULL;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_opts = NULL;
 	test_olen = 0;
@@ -40052,6 +40202,12 @@ struct test_stream test_14_11_7_list = { &preamble_14_11_7_list, &test_case_14_1
 #define tgrp_case_14_12_1 test_group_14
 #define numb_case_14_12_1 "14.12.1"
 #define name_case_14_12_1 "Allowable states -- T_ORDREL_REQ -- TS_DATA_XFER"
+#define sref_case_14_12_1 sref_case_14
+#define desc_case_14_12_1 "\
+Checks that the T_ORDREL_REQ primitive can be successfully issued in the allowed state\n\
+TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
+can be issued.  This test case tests the T_ORDREL_REQ primitive in the TS_DATA_XFER state."
+
 int
 test_case_14_12_1_conn(int child)
 {
@@ -40211,7 +40367,7 @@ test_case_14_14(int child)
 	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Some data.";
-	test_addr = &addrs[(child + 1) % 3];
+	test_addr = addrs[(child + 1) % 3];
 	test_alen = sizeof(addrs[(child + 1) % 3]);
 	test_opts = NULL;
 	test_olen = 0;
@@ -41128,302 +41284,302 @@ struct test_case {
 		numb_case_1_10_11, tgrp_case_1_10_11, name_case_1_10_11, desc_case_1_10_11, sref_case_1_10_11, {
 	&test_1_10_11_conn, &test_1_10_11_resp, &test_1_10_11_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_2_1_1, tgrp_case_2_2_1_1, name_case_2_2_1_1, desc_case_2_2_1_1, sref_case_2_2_1_1, {
-	&test_2_2_1_1_conn, &test_2_2_1_1_resp, &test_2_2_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_1_1_conn, &test_2_2_1_1_resp, &test_2_2_1_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_1_2, tgrp_case_2_2_1_2, name_case_2_2_1_2, desc_case_2_2_1_2, sref_case_2_2_1_2, {
-	&test_2_2_1_2_conn, &test_2_2_1_2_resp, &test_2_2_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_1_2_conn, &test_2_2_1_2_resp, &test_2_2_1_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_1_3, tgrp_case_2_2_1_3, name_case_2_2_1_3, desc_case_2_2_1_3, sref_case_2_2_1_3, {
-	&test_2_2_1_3_conn, &test_2_2_1_3_resp, &test_2_2_1_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_1_3_conn, &test_2_2_1_3_resp, &test_2_2_1_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_1_4, tgrp_case_2_2_1_4, name_case_2_2_1_4, desc_case_2_2_1_4, sref_case_2_2_1_4, {
-	&test_2_2_1_4_conn, &test_2_2_1_4_resp, &test_2_2_1_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_1_4_conn, &test_2_2_1_4_resp, &test_2_2_1_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_1_5, tgrp_case_2_2_1_5, name_case_2_2_1_5, desc_case_2_2_1_5, sref_case_2_2_1_5, {
-	&test_2_2_1_5_conn, &test_2_2_1_5_resp, &test_2_2_1_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_1_5_conn, &test_2_2_1_5_resp, &test_2_2_1_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_1_6, tgrp_case_2_2_1_6, name_case_2_2_1_6, desc_case_2_2_1_6, sref_case_2_2_1_6, {
-	&test_2_2_1_6_conn, &test_2_2_1_6_resp, &test_2_2_1_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_1_6_conn, &test_2_2_1_6_resp, &test_2_2_1_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_2_1, tgrp_case_2_2_2_1, name_case_2_2_2_1, desc_case_2_2_2_1, sref_case_2_2_2_1, {
-	&test_2_2_2_1_conn, &test_2_2_2_1_resp, &test_2_2_2_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_2_1_conn, &test_2_2_2_1_resp, &test_2_2_2_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_2_2, tgrp_case_2_2_2_2, name_case_2_2_2_2, desc_case_2_2_2_2, sref_case_2_2_2_2, {
-	&test_2_2_2_2_conn, &test_2_2_2_2_resp, &test_2_2_2_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_2_2_conn, &test_2_2_2_2_resp, &test_2_2_2_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_2_3, tgrp_case_2_2_2_3, name_case_2_2_2_3, desc_case_2_2_2_3, sref_case_2_2_2_3, {
-	&test_2_2_2_3_conn, &test_2_2_2_3_resp, &test_2_2_2_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_2_3_conn, &test_2_2_2_3_resp, &test_2_2_2_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_2_4, tgrp_case_2_2_2_4, name_case_2_2_2_4, desc_case_2_2_2_4, sref_case_2_2_2_4, {
-	&test_2_2_2_4_conn, &test_2_2_2_4_resp, &test_2_2_2_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_2_4_conn, &test_2_2_2_4_resp, &test_2_2_2_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_2_5, tgrp_case_2_2_2_5, name_case_2_2_2_5, desc_case_2_2_2_5, sref_case_2_2_2_5, {
-	&test_2_2_2_5_conn, &test_2_2_2_5_resp, &test_2_2_2_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_2_5_conn, &test_2_2_2_5_resp, &test_2_2_2_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_3_1, tgrp_case_2_2_3_1, name_case_2_2_3_1, desc_case_2_2_3_1, sref_case_2_2_3_1, {
-	&test_2_2_3_1_conn, &test_2_2_3_1_resp, &test_2_2_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_3_1_conn, &test_2_2_3_1_resp, &test_2_2_3_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_1, tgrp_case_2_2_4_1, name_case_2_2_4_1, desc_case_2_2_4_1, sref_case_2_2_4_1, {
-	&test_2_2_4_1_conn, &test_2_2_4_1_resp, &test_2_2_4_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_1_conn, &test_2_2_4_1_resp, &test_2_2_4_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_2, tgrp_case_2_2_4_2, name_case_2_2_4_2, desc_case_2_2_4_2, sref_case_2_2_4_2, {
-	&test_2_2_4_2_conn, &test_2_2_4_2_resp, &test_2_2_4_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_2_conn, &test_2_2_4_2_resp, &test_2_2_4_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_3, tgrp_case_2_2_4_3, name_case_2_2_4_3, desc_case_2_2_4_3, sref_case_2_2_4_3, {
-	&test_2_2_4_3_conn, &test_2_2_4_3_resp, &test_2_2_4_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_3_conn, &test_2_2_4_3_resp, &test_2_2_4_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_4, tgrp_case_2_2_4_4, name_case_2_2_4_4, desc_case_2_2_4_4, sref_case_2_2_4_4, {
-	&test_2_2_4_4_conn, &test_2_2_4_4_resp, &test_2_2_4_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_4_conn, &test_2_2_4_4_resp, &test_2_2_4_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_5, tgrp_case_2_2_4_5, name_case_2_2_4_5, desc_case_2_2_4_5, sref_case_2_2_4_5, {
-	&test_2_2_4_5_conn, &test_2_2_4_5_resp, &test_2_2_4_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_5_conn, &test_2_2_4_5_resp, &test_2_2_4_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_6, tgrp_case_2_2_4_6, name_case_2_2_4_6, desc_case_2_2_4_6, sref_case_2_2_4_6, {
-	&test_2_2_4_6_conn, &test_2_2_4_6_resp, &test_2_2_4_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_6_conn, &test_2_2_4_6_resp, &test_2_2_4_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_7, tgrp_case_2_2_4_7, name_case_2_2_4_7, desc_case_2_2_4_7, sref_case_2_2_4_7, {
-	&test_2_2_4_7_conn, &test_2_2_4_7_resp, &test_2_2_4_7_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_7_conn, &test_2_2_4_7_resp, &test_2_2_4_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_8, tgrp_case_2_2_4_8, name_case_2_2_4_8, desc_case_2_2_4_8, sref_case_2_2_4_8, {
-	&test_2_2_4_8_conn, &test_2_2_4_8_resp, &test_2_2_4_8_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_8_conn, &test_2_2_4_8_resp, &test_2_2_4_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_9, tgrp_case_2_2_4_9, name_case_2_2_4_9, desc_case_2_2_4_9, sref_case_2_2_4_9, {
-	&test_2_2_4_9_conn, &test_2_2_4_9_resp, &test_2_2_4_9_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_9_conn, &test_2_2_4_9_resp, &test_2_2_4_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_10, tgrp_case_2_2_4_10, name_case_2_2_4_10, desc_case_2_2_4_10, sref_case_2_2_4_10, {
-	&test_2_2_4_10_conn, &test_2_2_4_10_resp, &test_2_2_4_10_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_10_conn, &test_2_2_4_10_resp, &test_2_2_4_10_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_11, tgrp_case_2_2_4_11, name_case_2_2_4_11, desc_case_2_2_4_11, sref_case_2_2_4_11, {
-	&test_2_2_4_11_conn, &test_2_2_4_11_resp, &test_2_2_4_11_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_11_conn, &test_2_2_4_11_resp, &test_2_2_4_11_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_12, tgrp_case_2_2_4_12, name_case_2_2_4_12, desc_case_2_2_4_12, sref_case_2_2_4_12, {
-	&test_2_2_4_12_conn, &test_2_2_4_12_resp, &test_2_2_4_12_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_12_conn, &test_2_2_4_12_resp, &test_2_2_4_12_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_4_13, tgrp_case_2_2_4_13, name_case_2_2_4_13, desc_case_2_2_4_13, sref_case_2_2_4_13, {
-	&test_2_2_4_13_conn, &test_2_2_4_13_resp, &test_2_2_4_13_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_4_13_conn, &test_2_2_4_13_resp, &test_2_2_4_13_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_1, tgrp_case_2_2_5_1, name_case_2_2_5_1, desc_case_2_2_5_1, sref_case_2_2_5_1, {
-	&test_2_2_5_1_conn, &test_2_2_5_1_resp, &test_2_2_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_1_conn, &test_2_2_5_1_resp, &test_2_2_5_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_2, tgrp_case_2_2_5_2, name_case_2_2_5_2, desc_case_2_2_5_2, sref_case_2_2_5_2, {
-	&test_2_2_5_2_conn, &test_2_2_5_2_resp, &test_2_2_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_2_conn, &test_2_2_5_2_resp, &test_2_2_5_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_3, tgrp_case_2_2_5_3, name_case_2_2_5_3, desc_case_2_2_5_3, sref_case_2_2_5_3, {
-	&test_2_2_5_3_conn, &test_2_2_5_3_resp, &test_2_2_5_3_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_3_conn, &test_2_2_5_3_resp, &test_2_2_5_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_4, tgrp_case_2_2_5_4, name_case_2_2_5_4, desc_case_2_2_5_4, sref_case_2_2_5_4, {
-	&test_2_2_5_4_conn, &test_2_2_5_4_resp, &test_2_2_5_4_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_4_conn, &test_2_2_5_4_resp, &test_2_2_5_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_5, tgrp_case_2_2_5_5, name_case_2_2_5_5, desc_case_2_2_5_5, sref_case_2_2_5_5, {
-	&test_2_2_5_5_conn, &test_2_2_5_5_resp, &test_2_2_5_5_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_5_conn, &test_2_2_5_5_resp, &test_2_2_5_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_6, tgrp_case_2_2_5_6, name_case_2_2_5_6, desc_case_2_2_5_6, sref_case_2_2_5_6, {
-	&test_2_2_5_6_conn, &test_2_2_5_6_resp, &test_2_2_5_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_6_conn, &test_2_2_5_6_resp, &test_2_2_5_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_7, tgrp_case_2_2_5_7, name_case_2_2_5_7, desc_case_2_2_5_7, sref_case_2_2_5_7, {
-	&test_2_2_5_7_conn, &test_2_2_5_7_resp, &test_2_2_5_7_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_7_conn, &test_2_2_5_7_resp, &test_2_2_5_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_8, tgrp_case_2_2_5_8, name_case_2_2_5_8, desc_case_2_2_5_8, sref_case_2_2_5_8, {
-	&test_2_2_5_8_conn, &test_2_2_5_8_resp, &test_2_2_5_8_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_8_conn, &test_2_2_5_8_resp, &test_2_2_5_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_9, tgrp_case_2_2_5_9, name_case_2_2_5_9, desc_case_2_2_5_9, sref_case_2_2_5_9, {
-	&test_2_2_5_9_conn, &test_2_2_5_9_resp, &test_2_2_5_9_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_9_conn, &test_2_2_5_9_resp, &test_2_2_5_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_10, tgrp_case_2_2_5_10, name_case_2_2_5_10, desc_case_2_2_5_10, sref_case_2_2_5_10, {
-	&test_2_2_5_10_conn, &test_2_2_5_10_resp, &test_2_2_5_10_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_10_conn, &test_2_2_5_10_resp, &test_2_2_5_10_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_11, tgrp_case_2_2_5_11, name_case_2_2_5_11, desc_case_2_2_5_11, sref_case_2_2_5_11, {
-	&test_2_2_5_11_conn, &test_2_2_5_11_resp, &test_2_2_5_11_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_11_conn, &test_2_2_5_11_resp, &test_2_2_5_11_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_12, tgrp_case_2_2_5_12, name_case_2_2_5_12, desc_case_2_2_5_12, sref_case_2_2_5_12, {
-	&test_2_2_5_12_conn, &test_2_2_5_12_resp, &test_2_2_5_12_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_12_conn, &test_2_2_5_12_resp, &test_2_2_5_12_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_13, tgrp_case_2_2_5_13, name_case_2_2_5_13, desc_case_2_2_5_13, sref_case_2_2_5_13, {
-	&test_2_2_5_13_conn, &test_2_2_5_13_resp, &test_2_2_5_13_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_13_conn, &test_2_2_5_13_resp, &test_2_2_5_13_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_14, tgrp_case_2_2_5_14, name_case_2_2_5_14, desc_case_2_2_5_14, sref_case_2_2_5_14, {
-	&test_2_2_5_14_conn, &test_2_2_5_14_resp, &test_2_2_5_14_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_14_conn, &test_2_2_5_14_resp, &test_2_2_5_14_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_15, tgrp_case_2_2_5_15, name_case_2_2_5_15, desc_case_2_2_5_15, sref_case_2_2_5_15, {
-	&test_2_2_5_15_conn, &test_2_2_5_15_resp, &test_2_2_5_15_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_15_conn, &test_2_2_5_15_resp, &test_2_2_5_15_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_16, tgrp_case_2_2_5_16, name_case_2_2_5_16, desc_case_2_2_5_16, sref_case_2_2_5_16, {
-	&test_2_2_5_16_conn, &test_2_2_5_16_resp, &test_2_2_5_16_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_16_conn, &test_2_2_5_16_resp, &test_2_2_5_16_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_17, tgrp_case_2_2_5_17, name_case_2_2_5_17, desc_case_2_2_5_17, sref_case_2_2_5_17, {
-	&test_2_2_5_17_conn, &test_2_2_5_17_resp, &test_2_2_5_17_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_17_conn, &test_2_2_5_17_resp, &test_2_2_5_17_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_18, tgrp_case_2_2_5_18, name_case_2_2_5_18, desc_case_2_2_5_18, sref_case_2_2_5_18, {
-	&test_2_2_5_18_conn, &test_2_2_5_18_resp, &test_2_2_5_18_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_18_conn, &test_2_2_5_18_resp, &test_2_2_5_18_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_19, tgrp_case_2_2_5_19, name_case_2_2_5_19, desc_case_2_2_5_19, sref_case_2_2_5_19, {
-	&test_2_2_5_19_conn, &test_2_2_5_19_resp, &test_2_2_5_19_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_19_conn, &test_2_2_5_19_resp, &test_2_2_5_19_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_20, tgrp_case_2_2_5_20, name_case_2_2_5_20, desc_case_2_2_5_20, sref_case_2_2_5_20, {
-	&test_2_2_5_20_conn, &test_2_2_5_20_resp, &test_2_2_5_20_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_20_conn, &test_2_2_5_20_resp, &test_2_2_5_20_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_21, tgrp_case_2_2_5_21, name_case_2_2_5_21, desc_case_2_2_5_21, sref_case_2_2_5_21, {
-	&test_2_2_5_21_conn, &test_2_2_5_21_resp, &test_2_2_5_21_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_21_conn, &test_2_2_5_21_resp, &test_2_2_5_21_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_22, tgrp_case_2_2_5_22, name_case_2_2_5_22, desc_case_2_2_5_22, sref_case_2_2_5_22, {
-	&test_2_2_5_22_conn, &test_2_2_5_22_resp, &test_2_2_5_22_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_22_conn, &test_2_2_5_22_resp, &test_2_2_5_22_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_23, tgrp_case_2_2_5_23, name_case_2_2_5_23, desc_case_2_2_5_23, sref_case_2_2_5_23, {
-	&test_2_2_5_23_conn, &test_2_2_5_23_resp, &test_2_2_5_23_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_23_conn, &test_2_2_5_23_resp, &test_2_2_5_23_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_24, tgrp_case_2_2_5_24, name_case_2_2_5_24, desc_case_2_2_5_24, sref_case_2_2_5_24, {
-	&test_2_2_5_24_conn, &test_2_2_5_24_resp, &test_2_2_5_24_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_24_conn, &test_2_2_5_24_resp, &test_2_2_5_24_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_25, tgrp_case_2_2_5_25, name_case_2_2_5_25, desc_case_2_2_5_25, sref_case_2_2_5_25, {
-	&test_2_2_5_25_conn, &test_2_2_5_25_resp, &test_2_2_5_25_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_25_conn, &test_2_2_5_25_resp, &test_2_2_5_25_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_26, tgrp_case_2_2_5_26, name_case_2_2_5_26, desc_case_2_2_5_26, sref_case_2_2_5_26, {
-	&test_2_2_5_26_conn, &test_2_2_5_26_resp, &test_2_2_5_26_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_26_conn, &test_2_2_5_26_resp, &test_2_2_5_26_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_27, tgrp_case_2_2_5_27, name_case_2_2_5_27, desc_case_2_2_5_27, sref_case_2_2_5_27, {
-	&test_2_2_5_27_conn, &test_2_2_5_27_resp, &test_2_2_5_27_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_27_conn, &test_2_2_5_27_resp, &test_2_2_5_27_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_28, tgrp_case_2_2_5_28, name_case_2_2_5_28, desc_case_2_2_5_28, sref_case_2_2_5_28, {
-	&test_2_2_5_28_conn, &test_2_2_5_28_resp, &test_2_2_5_28_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_28_conn, &test_2_2_5_28_resp, &test_2_2_5_28_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_29, tgrp_case_2_2_5_29, name_case_2_2_5_29, desc_case_2_2_5_29, sref_case_2_2_5_29, {
-	&test_2_2_5_29_conn, &test_2_2_5_29_resp, &test_2_2_5_29_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_29_conn, &test_2_2_5_29_resp, &test_2_2_5_29_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_30, tgrp_case_2_2_5_30, name_case_2_2_5_30, desc_case_2_2_5_30, sref_case_2_2_5_30, {
-	&test_2_2_5_30_conn, &test_2_2_5_30_resp, &test_2_2_5_30_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_30_conn, &test_2_2_5_30_resp, &test_2_2_5_30_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_31, tgrp_case_2_2_5_31, name_case_2_2_5_31, desc_case_2_2_5_31, sref_case_2_2_5_31, {
-	&test_2_2_5_31_conn, &test_2_2_5_31_resp, &test_2_2_5_31_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_31_conn, &test_2_2_5_31_resp, &test_2_2_5_31_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_32, tgrp_case_2_2_5_32, name_case_2_2_5_32, desc_case_2_2_5_32, sref_case_2_2_5_32, {
-	&test_2_2_5_32_conn, &test_2_2_5_32_resp, &test_2_2_5_32_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_32_conn, &test_2_2_5_32_resp, &test_2_2_5_32_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_33, tgrp_case_2_2_5_33, name_case_2_2_5_33, desc_case_2_2_5_33, sref_case_2_2_5_33, {
-	&test_2_2_5_33_conn, &test_2_2_5_33_resp, &test_2_2_5_33_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_33_conn, &test_2_2_5_33_resp, &test_2_2_5_33_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_34, tgrp_case_2_2_5_34, name_case_2_2_5_34, desc_case_2_2_5_34, sref_case_2_2_5_34, {
-	&test_2_2_5_34_conn, &test_2_2_5_34_resp, &test_2_2_5_34_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_34_conn, &test_2_2_5_34_resp, &test_2_2_5_34_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_35, tgrp_case_2_2_5_35, name_case_2_2_5_35, desc_case_2_2_5_35, sref_case_2_2_5_35, {
-	&test_2_2_5_35_conn, &test_2_2_5_35_resp, &test_2_2_5_35_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_35_conn, &test_2_2_5_35_resp, &test_2_2_5_35_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_36, tgrp_case_2_2_5_36, name_case_2_2_5_36, desc_case_2_2_5_36, sref_case_2_2_5_36, {
-	&test_2_2_5_36_conn, &test_2_2_5_36_resp, &test_2_2_5_36_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_36_conn, &test_2_2_5_36_resp, &test_2_2_5_36_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_37, tgrp_case_2_2_5_37, name_case_2_2_5_37, desc_case_2_2_5_37, sref_case_2_2_5_37, {
-	&test_2_2_5_37_conn, &test_2_2_5_37_resp, &test_2_2_5_37_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_37_conn, &test_2_2_5_37_resp, &test_2_2_5_37_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_5_38, tgrp_case_2_2_5_38, name_case_2_2_5_38, desc_case_2_2_5_38, sref_case_2_2_5_38, {
-	&test_2_2_5_38_conn, &test_2_2_5_38_resp, &test_2_2_5_38_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_5_38_conn, &test_2_2_5_38_resp, &test_2_2_5_38_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_2_2_6, tgrp_case_2_2_6, name_case_2_2_6, desc_case_2_2_6, sref_case_2_2_6, {
-	&test_2_2_6_conn, &test_2_2_6_resp, &test_2_2_6_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_2_2_6_conn, &test_2_2_6_resp, &test_2_2_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
 		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, {
-	&test_3_1_conn, &test_3_1_resp, &test_3_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_1_conn, &test_3_1_resp, &test_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, {
-	&test_3_2_conn, &test_3_2_resp, &test_3_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_2_conn, &test_3_2_resp, &test_3_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, {
-	&test_3_3_conn, &test_3_3_resp, &test_3_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_3_conn, &test_3_3_resp, &test_3_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_4, tgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, {
-	&test_3_4_conn, &test_3_4_resp, &test_3_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_4_conn, &test_3_4_resp, &test_3_4_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_5, tgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, {
-	&test_3_5_conn, &test_3_5_resp, &test_3_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_5_conn, &test_3_5_resp, &test_3_5_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_6, tgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, {
-	&test_3_6_conn, &test_3_6_resp, &test_3_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_6_conn, &test_3_6_resp, &test_3_6_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, sref_case_4_1_1, {
-	&test_4_1_1_conn, &test_4_1_1_resp, &test_4_1_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_1_conn, &test_4_1_1_resp, &test_4_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, sref_case_4_1_2, {
-	&test_4_1_2_conn, &test_4_1_2_resp, &test_4_1_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_2_conn, &test_4_1_2_resp, &test_4_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_3, tgrp_case_4_1_3, name_case_4_1_3, desc_case_4_1_3, sref_case_4_1_3, {
-	&test_4_1_3_conn, &test_4_1_3_resp, &test_4_1_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_3_conn, &test_4_1_3_resp, &test_4_1_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_4, tgrp_case_4_1_4, name_case_4_1_4, desc_case_4_1_4, sref_case_4_1_4, {
-	&test_4_1_4_conn, &test_4_1_4_resp, &test_4_1_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_4_conn, &test_4_1_4_resp, &test_4_1_4_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_5, tgrp_case_4_1_5, name_case_4_1_5, desc_case_4_1_5, sref_case_4_1_5, {
-	&test_4_1_5_conn, &test_4_1_5_resp, &test_4_1_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_5_conn, &test_4_1_5_resp, &test_4_1_5_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_6, tgrp_case_4_1_6, name_case_4_1_6, desc_case_4_1_6, sref_case_4_1_6, {
-	&test_4_1_6_conn, &test_4_1_6_resp, &test_4_1_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_6_conn, &test_4_1_6_resp, &test_4_1_6_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_7, tgrp_case_4_1_7, name_case_4_1_7, desc_case_4_1_7, sref_case_4_1_7, {
-	&test_4_1_7_conn, &test_4_1_7_resp, &test_4_1_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_7_conn, &test_4_1_7_resp, &test_4_1_7_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_8, tgrp_case_4_1_8, name_case_4_1_8, desc_case_4_1_8, sref_case_4_1_8, {
-	&test_4_1_8_conn, &test_4_1_8_resp, &test_4_1_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_8_conn, &test_4_1_8_resp, &test_4_1_8_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_1_9, tgrp_case_4_1_9, name_case_4_1_9, desc_case_4_1_9, sref_case_4_1_9, {
-	&test_4_1_9_conn, &test_4_1_9_resp, &test_4_1_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_9_conn, &test_4_1_9_resp, &test_4_1_9_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, sref_case_4_2_1, {
-	&test_4_2_1_conn, &test_4_2_1_resp, &test_4_2_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_2_1_conn, &test_4_2_1_resp, &test_4_2_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, sref_case_4_2_2, {
-	&test_4_2_2_conn, &test_4_2_2_resp, &test_4_2_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_2_2_conn, &test_4_2_2_resp, &test_4_2_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_1_1, tgrp_case_4_3_1_1, name_case_4_3_1_1, desc_case_4_3_1_1, sref_case_4_3_1_1, {
-	&test_4_3_1_1_conn, &test_4_3_1_1_resp, &test_4_3_1_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_1_conn, &test_4_3_1_1_resp, &test_4_3_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_1_2, tgrp_case_4_3_1_2, name_case_4_3_1_2, desc_case_4_3_1_2, sref_case_4_3_1_2, {
-	&test_4_3_1_2_conn, &test_4_3_1_2_resp, &test_4_3_1_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_2_conn, &test_4_3_1_2_resp, &test_4_3_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_1_3, tgrp_case_4_3_1_3, name_case_4_3_1_3, desc_case_4_3_1_3, sref_case_4_3_1_3, {
-	&test_4_3_1_3_conn, &test_4_3_1_3_resp, &test_4_3_1_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_3_conn, &test_4_3_1_3_resp, &test_4_3_1_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_1_4, tgrp_case_4_3_1_4, name_case_4_3_1_4, desc_case_4_3_1_4, sref_case_4_3_1_4, {
-	&test_4_3_1_4_conn, &test_4_3_1_4_resp, &test_4_3_1_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_4_conn, &test_4_3_1_4_resp, &test_4_3_1_4_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_1_5, tgrp_case_4_3_1_5, name_case_4_3_1_5, desc_case_4_3_1_5, sref_case_4_3_1_5, {
-	&test_4_3_1_5_conn, &test_4_3_1_5_resp, &test_4_3_1_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_5_conn, &test_4_3_1_5_resp, &test_4_3_1_5_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_1_6, tgrp_case_4_3_1_6, name_case_4_3_1_6, desc_case_4_3_1_6, sref_case_4_3_1_6, {
-	&test_4_3_1_6_conn, &test_4_3_1_6_resp, &test_4_3_1_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_6_conn, &test_4_3_1_6_resp, &test_4_3_1_6_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_2_1, tgrp_case_4_3_2_1, name_case_4_3_2_1, desc_case_4_3_2_1, sref_case_4_3_2_1, {
-	&test_4_3_2_1_conn, &test_4_3_2_1_resp, &test_4_3_2_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_1_conn, &test_4_3_2_1_resp, &test_4_3_2_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_2_2, tgrp_case_4_3_2_2, name_case_4_3_2_2, desc_case_4_3_2_2, sref_case_4_3_2_2, {
-	&test_4_3_2_2_conn, &test_4_3_2_2_resp, &test_4_3_2_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_2_conn, &test_4_3_2_2_resp, &test_4_3_2_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_2_3, tgrp_case_4_3_2_3, name_case_4_3_2_3, desc_case_4_3_2_3, sref_case_4_3_2_3, {
-	&test_4_3_2_3_conn, &test_4_3_2_3_resp, &test_4_3_2_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_3_conn, &test_4_3_2_3_resp, &test_4_3_2_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_2_4, tgrp_case_4_3_2_4, name_case_4_3_2_4, desc_case_4_3_2_4, sref_case_4_3_2_4, {
-	&test_4_3_2_4_conn, &test_4_3_2_4_resp, &test_4_3_2_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_4_conn, &test_4_3_2_4_resp, &test_4_3_2_4_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_2_5, tgrp_case_4_3_2_5, name_case_4_3_2_5, desc_case_4_3_2_5, sref_case_4_3_2_5, {
-	&test_4_3_2_5_conn, &test_4_3_2_5_resp, &test_4_3_2_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_5_conn, &test_4_3_2_5_resp, &test_4_3_2_5_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_3_1, tgrp_case_4_3_3_1, name_case_4_3_3_1, desc_case_4_3_3_1, sref_case_4_3_3_1, {
-	&test_4_3_3_1_conn, &test_4_3_3_1_resp, &test_4_3_3_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_3_1_conn, &test_4_3_3_1_resp, &test_4_3_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_1, tgrp_case_4_3_4_1, name_case_4_3_4_1, desc_case_4_3_4_1, sref_case_4_3_4_1, {
-	&test_4_3_4_1_conn, &test_4_3_4_1_resp, &test_4_3_4_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_1_conn, &test_4_3_4_1_resp, &test_4_3_4_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_2, tgrp_case_4_3_4_2, name_case_4_3_4_2, desc_case_4_3_4_2, sref_case_4_3_4_2, {
-	&test_4_3_4_2_conn, &test_4_3_4_2_resp, &test_4_3_4_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_2_conn, &test_4_3_4_2_resp, &test_4_3_4_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_3, tgrp_case_4_3_4_3, name_case_4_3_4_3, desc_case_4_3_4_3, sref_case_4_3_4_3, {
-	&test_4_3_4_3_conn, &test_4_3_4_3_resp, &test_4_3_4_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_3_conn, &test_4_3_4_3_resp, &test_4_3_4_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_4, tgrp_case_4_3_4_4, name_case_4_3_4_4, desc_case_4_3_4_4, sref_case_4_3_4_4, {
-	&test_4_3_4_4_conn, &test_4_3_4_4_resp, &test_4_3_4_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_4_conn, &test_4_3_4_4_resp, &test_4_3_4_4_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_5, tgrp_case_4_3_4_5, name_case_4_3_4_5, desc_case_4_3_4_5, sref_case_4_3_4_5, {
-	&test_4_3_4_5_conn, &test_4_3_4_5_resp, &test_4_3_4_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_5_conn, &test_4_3_4_5_resp, &test_4_3_4_5_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_6, tgrp_case_4_3_4_6, name_case_4_3_4_6, desc_case_4_3_4_6, sref_case_4_3_4_6, {
-	&test_4_3_4_6_conn, &test_4_3_4_6_resp, &test_4_3_4_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_6_conn, &test_4_3_4_6_resp, &test_4_3_4_6_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_7, tgrp_case_4_3_4_7, name_case_4_3_4_7, desc_case_4_3_4_7, sref_case_4_3_4_7, {
-	&test_4_3_4_7_conn, &test_4_3_4_7_resp, &test_4_3_4_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_7_conn, &test_4_3_4_7_resp, &test_4_3_4_7_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_8, tgrp_case_4_3_4_8, name_case_4_3_4_8, desc_case_4_3_4_8, sref_case_4_3_4_8, {
-	&test_4_3_4_8_conn, &test_4_3_4_8_resp, &test_4_3_4_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_8_conn, &test_4_3_4_8_resp, &test_4_3_4_8_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_9, tgrp_case_4_3_4_9, name_case_4_3_4_9, desc_case_4_3_4_9, sref_case_4_3_4_9, {
-	&test_4_3_4_9_conn, &test_4_3_4_9_resp, &test_4_3_4_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_9_conn, &test_4_3_4_9_resp, &test_4_3_4_9_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_10, tgrp_case_4_3_4_10, name_case_4_3_4_10, desc_case_4_3_4_10, sref_case_4_3_4_10, {
-	&test_4_3_4_10_conn, &test_4_3_4_10_resp, &test_4_3_4_10_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_10_conn, &test_4_3_4_10_resp, &test_4_3_4_10_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_11, tgrp_case_4_3_4_11, name_case_4_3_4_11, desc_case_4_3_4_11, sref_case_4_3_4_11, {
-	&test_4_3_4_11_conn, &test_4_3_4_11_resp, &test_4_3_4_11_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_11_conn, &test_4_3_4_11_resp, &test_4_3_4_11_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_12, tgrp_case_4_3_4_12, name_case_4_3_4_12, desc_case_4_3_4_12, sref_case_4_3_4_12, {
-	&test_4_3_4_12_conn, &test_4_3_4_12_resp, &test_4_3_4_12_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_12_conn, &test_4_3_4_12_resp, &test_4_3_4_12_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_4_13, tgrp_case_4_3_4_13, name_case_4_3_4_13, desc_case_4_3_4_13, sref_case_4_3_4_13, {
-	&test_4_3_4_13_conn, &test_4_3_4_13_resp, &test_4_3_4_13_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_13_conn, &test_4_3_4_13_resp, &test_4_3_4_13_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_1, tgrp_case_4_3_5_1, name_case_4_3_5_1, desc_case_4_3_5_1, sref_case_4_3_5_1, {
-	&test_4_3_5_1_conn, &test_4_3_5_1_resp, &test_4_3_5_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_1_conn, &test_4_3_5_1_resp, &test_4_3_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_2, tgrp_case_4_3_5_2, name_case_4_3_5_2, desc_case_4_3_5_2, sref_case_4_3_5_2, {
-	&test_4_3_5_2_conn, &test_4_3_5_2_resp, &test_4_3_5_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_2_conn, &test_4_3_5_2_resp, &test_4_3_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_3, tgrp_case_4_3_5_3, name_case_4_3_5_3, desc_case_4_3_5_3, sref_case_4_3_5_3, {
-	&test_4_3_5_3_conn, &test_4_3_5_3_resp, &test_4_3_5_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_3_conn, &test_4_3_5_3_resp, &test_4_3_5_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_4, tgrp_case_4_3_5_4, name_case_4_3_5_4, desc_case_4_3_5_4, sref_case_4_3_5_4, {
-	&test_4_3_5_4_conn, &test_4_3_5_4_resp, &test_4_3_5_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_4_conn, &test_4_3_5_4_resp, &test_4_3_5_4_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_5, tgrp_case_4_3_5_5, name_case_4_3_5_5, desc_case_4_3_5_5, sref_case_4_3_5_5, {
-	&test_4_3_5_5_conn, &test_4_3_5_5_resp, &test_4_3_5_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_5_conn, &test_4_3_5_5_resp, &test_4_3_5_5_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_6, tgrp_case_4_3_5_6, name_case_4_3_5_6, desc_case_4_3_5_6, sref_case_4_3_5_6, {
-	&test_4_3_5_6_conn, &test_4_3_5_6_resp, &test_4_3_5_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_6_conn, &test_4_3_5_6_resp, &test_4_3_5_6_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_7, tgrp_case_4_3_5_7, name_case_4_3_5_7, desc_case_4_3_5_7, sref_case_4_3_5_7, {
-	&test_4_3_5_7_conn, &test_4_3_5_7_resp, &test_4_3_5_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_7_conn, &test_4_3_5_7_resp, &test_4_3_5_7_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_8, tgrp_case_4_3_5_8, name_case_4_3_5_8, desc_case_4_3_5_8, sref_case_4_3_5_8, {
-	&test_4_3_5_8_conn, &test_4_3_5_8_resp, &test_4_3_5_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_8_conn, &test_4_3_5_8_resp, &test_4_3_5_8_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_9, tgrp_case_4_3_5_9, name_case_4_3_5_9, desc_case_4_3_5_9, sref_case_4_3_5_9, {
-	&test_4_3_5_9_conn, &test_4_3_5_9_resp, &test_4_3_5_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_9_conn, &test_4_3_5_9_resp, &test_4_3_5_9_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_10, tgrp_case_4_3_5_10, name_case_4_3_5_10, desc_case_4_3_5_10, sref_case_4_3_5_10, {
-	&test_4_3_5_10_conn, &test_4_3_5_10_resp, &test_4_3_5_10_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_10_conn, &test_4_3_5_10_resp, &test_4_3_5_10_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_11, tgrp_case_4_3_5_11, name_case_4_3_5_11, desc_case_4_3_5_11, sref_case_4_3_5_11, {
-	&test_4_3_5_11_conn, &test_4_3_5_11_resp, &test_4_3_5_11_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_11_conn, &test_4_3_5_11_resp, &test_4_3_5_11_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_12, tgrp_case_4_3_5_12, name_case_4_3_5_12, desc_case_4_3_5_12, sref_case_4_3_5_12, {
-	&test_4_3_5_12_conn, &test_4_3_5_12_resp, &test_4_3_5_12_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_12_conn, &test_4_3_5_12_resp, &test_4_3_5_12_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_13, tgrp_case_4_3_5_13, name_case_4_3_5_13, desc_case_4_3_5_13, sref_case_4_3_5_13, {
-	&test_4_3_5_13_conn, &test_4_3_5_13_resp, &test_4_3_5_13_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_13_conn, &test_4_3_5_13_resp, &test_4_3_5_13_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_14, tgrp_case_4_3_5_14, name_case_4_3_5_14, desc_case_4_3_5_14, sref_case_4_3_5_14, {
-	&test_4_3_5_14_conn, &test_4_3_5_14_resp, &test_4_3_5_14_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_14_conn, &test_4_3_5_14_resp, &test_4_3_5_14_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_15, tgrp_case_4_3_5_15, name_case_4_3_5_15, desc_case_4_3_5_15, sref_case_4_3_5_15, {
-	&test_4_3_5_15_conn, &test_4_3_5_15_resp, &test_4_3_5_15_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_15_conn, &test_4_3_5_15_resp, &test_4_3_5_15_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_16, tgrp_case_4_3_5_16, name_case_4_3_5_16, desc_case_4_3_5_16, sref_case_4_3_5_16, {
-	&test_4_3_5_16_conn, &test_4_3_5_16_resp, &test_4_3_5_16_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_16_conn, &test_4_3_5_16_resp, &test_4_3_5_16_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_17, tgrp_case_4_3_5_17, name_case_4_3_5_17, desc_case_4_3_5_17, sref_case_4_3_5_17, {
-	&test_4_3_5_17_conn, &test_4_3_5_17_resp, &test_4_3_5_17_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_17_conn, &test_4_3_5_17_resp, &test_4_3_5_17_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_18, tgrp_case_4_3_5_18, name_case_4_3_5_18, desc_case_4_3_5_18, sref_case_4_3_5_18, {
-	&test_4_3_5_18_conn, &test_4_3_5_18_resp, &test_4_3_5_18_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_18_conn, &test_4_3_5_18_resp, &test_4_3_5_18_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_19, tgrp_case_4_3_5_19, name_case_4_3_5_19, desc_case_4_3_5_19, sref_case_4_3_5_19, {
-	&test_4_3_5_19_conn, &test_4_3_5_19_resp, &test_4_3_5_19_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_19_conn, &test_4_3_5_19_resp, &test_4_3_5_19_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_20, tgrp_case_4_3_5_20, name_case_4_3_5_20, desc_case_4_3_5_20, sref_case_4_3_5_20, {
-	&test_4_3_5_20_conn, &test_4_3_5_20_resp, &test_4_3_5_20_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_20_conn, &test_4_3_5_20_resp, &test_4_3_5_20_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_21, tgrp_case_4_3_5_21, name_case_4_3_5_21, desc_case_4_3_5_21, sref_case_4_3_5_21, {
-	&test_4_3_5_21_conn, &test_4_3_5_21_resp, &test_4_3_5_21_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_21_conn, &test_4_3_5_21_resp, &test_4_3_5_21_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_22, tgrp_case_4_3_5_22, name_case_4_3_5_22, desc_case_4_3_5_22, sref_case_4_3_5_22, {
-	&test_4_3_5_22_conn, &test_4_3_5_22_resp, &test_4_3_5_22_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_22_conn, &test_4_3_5_22_resp, &test_4_3_5_22_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_23, tgrp_case_4_3_5_23, name_case_4_3_5_23, desc_case_4_3_5_23, sref_case_4_3_5_23, {
-	&test_4_3_5_23_conn, &test_4_3_5_23_resp, &test_4_3_5_23_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_23_conn, &test_4_3_5_23_resp, &test_4_3_5_23_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_24, tgrp_case_4_3_5_24, name_case_4_3_5_24, desc_case_4_3_5_24, sref_case_4_3_5_24, {
-	&test_4_3_5_24_conn, &test_4_3_5_24_resp, &test_4_3_5_24_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_24_conn, &test_4_3_5_24_resp, &test_4_3_5_24_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_25, tgrp_case_4_3_5_25, name_case_4_3_5_25, desc_case_4_3_5_25, sref_case_4_3_5_25, {
-	&test_4_3_5_25_conn, &test_4_3_5_25_resp, &test_4_3_5_25_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_25_conn, &test_4_3_5_25_resp, &test_4_3_5_25_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_26, tgrp_case_4_3_5_26, name_case_4_3_5_26, desc_case_4_3_5_26, sref_case_4_3_5_26, {
-	&test_4_3_5_26_conn, &test_4_3_5_26_resp, &test_4_3_5_26_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_26_conn, &test_4_3_5_26_resp, &test_4_3_5_26_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_27, tgrp_case_4_3_5_27, name_case_4_3_5_27, desc_case_4_3_5_27, sref_case_4_3_5_27, {
-	&test_4_3_5_27_conn, &test_4_3_5_27_resp, &test_4_3_5_27_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_27_conn, &test_4_3_5_27_resp, &test_4_3_5_27_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_28, tgrp_case_4_3_5_28, name_case_4_3_5_28, desc_case_4_3_5_28, sref_case_4_3_5_28, {
-	&test_4_3_5_28_conn, &test_4_3_5_28_resp, &test_4_3_5_28_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_28_conn, &test_4_3_5_28_resp, &test_4_3_5_28_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_29, tgrp_case_4_3_5_29, name_case_4_3_5_29, desc_case_4_3_5_29, sref_case_4_3_5_29, {
-	&test_4_3_5_29_conn, &test_4_3_5_29_resp, &test_4_3_5_29_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_29_conn, &test_4_3_5_29_resp, &test_4_3_5_29_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_30, tgrp_case_4_3_5_30, name_case_4_3_5_30, desc_case_4_3_5_30, sref_case_4_3_5_30, {
-	&test_4_3_5_30_conn, &test_4_3_5_30_resp, &test_4_3_5_30_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_30_conn, &test_4_3_5_30_resp, &test_4_3_5_30_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_31, tgrp_case_4_3_5_31, name_case_4_3_5_31, desc_case_4_3_5_31, sref_case_4_3_5_31, {
-	&test_4_3_5_31_conn, &test_4_3_5_31_resp, &test_4_3_5_31_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_31_conn, &test_4_3_5_31_resp, &test_4_3_5_31_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_32, tgrp_case_4_3_5_32, name_case_4_3_5_32, desc_case_4_3_5_32, sref_case_4_3_5_32, {
-	&test_4_3_5_32_conn, &test_4_3_5_32_resp, &test_4_3_5_32_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_32_conn, &test_4_3_5_32_resp, &test_4_3_5_32_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_33, tgrp_case_4_3_5_33, name_case_4_3_5_33, desc_case_4_3_5_33, sref_case_4_3_5_33, {
-	&test_4_3_5_33_conn, &test_4_3_5_33_resp, &test_4_3_5_33_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_33_conn, &test_4_3_5_33_resp, &test_4_3_5_33_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_34, tgrp_case_4_3_5_34, name_case_4_3_5_34, desc_case_4_3_5_34, sref_case_4_3_5_34, {
-	&test_4_3_5_34_conn, &test_4_3_5_34_resp, &test_4_3_5_34_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_34_conn, &test_4_3_5_34_resp, &test_4_3_5_34_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_35, tgrp_case_4_3_5_35, name_case_4_3_5_35, desc_case_4_3_5_35, sref_case_4_3_5_35, {
-	&test_4_3_5_35_conn, &test_4_3_5_35_resp, &test_4_3_5_35_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_35_conn, &test_4_3_5_35_resp, &test_4_3_5_35_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_36, tgrp_case_4_3_5_36, name_case_4_3_5_36, desc_case_4_3_5_36, sref_case_4_3_5_36, {
-	&test_4_3_5_36_conn, &test_4_3_5_36_resp, &test_4_3_5_36_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_36_conn, &test_4_3_5_36_resp, &test_4_3_5_36_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_37, tgrp_case_4_3_5_37, name_case_4_3_5_37, desc_case_4_3_5_37, sref_case_4_3_5_37, {
-	&test_4_3_5_37_conn, &test_4_3_5_37_resp, &test_4_3_5_37_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_37_conn, &test_4_3_5_37_resp, &test_4_3_5_37_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_4_3_5_38, tgrp_case_4_3_5_38, name_case_4_3_5_38, desc_case_4_3_5_38, sref_case_4_3_5_38, {
-	&test_4_3_5_38_conn, &test_4_3_5_38_resp, &test_4_3_5_38_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_38_conn, &test_4_3_5_38_resp, &test_4_3_5_38_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_1, tgrp_case_5_1, name_case_5_1, desc_case_5_1, sref_case_5_1, {
-	&test_5_1_conn, &test_5_1_resp, &test_5_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_5_1_conn, &test_5_1_resp, &test_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_2, tgrp_case_5_2, name_case_5_2, desc_case_5_2, sref_case_5_2, {
-	&test_5_2_conn, &test_5_2_resp, &test_5_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_5_2_conn, &test_5_2_resp, &test_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_3, tgrp_case_5_3, name_case_5_3, desc_case_5_3, sref_case_5_3, {
-	&test_5_3_conn, &test_5_3_resp, &test_5_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_5_3_conn, &test_5_3_resp, &test_5_3_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_4, tgrp_case_5_4, name_case_5_4, desc_case_5_4, sref_case_5_4, {
-	&test_5_4_conn, &test_5_4_resp, &test_5_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
-#if 0
+	&test_5_4_conn, &test_5_4_resp, &test_5_4_list}, &begin_tests, &end_tests, 0, 0}, {
+#if 1
 		numb_case_5_5_1, tgrp_case_5_5_1, name_case_5_5_1, desc_case_5_5_1, sref_case_5_5_1, {
 	&test_5_5_1_conn, &test_5_5_1_resp, &test_5_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_5_5_2, tgrp_case_5_5_2, name_case_5_5_2, desc_case_5_5_2, sref_case_5_5_2, {
@@ -41431,7 +41587,7 @@ struct test_case {
 		numb_case_5_5_3, tgrp_case_5_5_3, name_case_5_5_3, desc_case_5_5_3, sref_case_5_5_3, {
 	&test_5_5_3_conn, &test_5_5_3_resp, &test_5_5_3_list}, &begin_tests, &end_tests, 0, 0}, {
 #endif
-#if 0
+#if 1
 		numb_case_6_1, tgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, {
 	&test_6_1_conn, &test_6_1_resp, &test_6_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_6_2, tgrp_case_6_2, name_case_6_2, desc_case_6_2, sref_case_6_2, {
@@ -41439,13 +41595,13 @@ struct test_case {
 		numb_case_6_3, tgrp_case_6_3, name_case_6_3, desc_case_6_3, sref_case_6_3, {
 	&test_6_3_conn, &test_6_3_resp, &test_6_3_list}, &begin_tests, &end_tests, 0, 0}, {
 #endif
-#if 0
+#if 1
 		numb_case_7_1, tgrp_case_7_1, name_case_7_1, desc_case_7_1, sref_case_7_1, {
 	&test_7_1_conn, &test_7_1_resp, &test_7_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_7_2, tgrp_case_7_2, name_case_7_2, desc_case_7_2, sref_case_7_2, {
 	&test_7_2_conn, &test_7_2_resp, &test_7_2_list}, &begin_tests, &end_tests, 0, 0}, {
 #endif
-#if 0
+#if 1
 		numb_case_8_1, tgrp_case_8_1, name_case_8_1, desc_case_8_1, sref_case_8_1, {
 	&test_8_1_conn, &test_8_1_resp, &test_8_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_8_2, tgrp_case_8_2, name_case_8_2, desc_case_8_2, sref_case_8_2, {
@@ -41455,7 +41611,7 @@ struct test_case {
 		numb_case_8_4, tgrp_case_8_4, name_case_8_4, desc_case_8_4, sref_case_8_4, {
 	&test_8_4_conn, &test_8_4_resp, &test_8_4_list}, &begin_tests, &end_tests, 0, 0}, {
 #endif
-#if 0
+#if 1
 		numb_case_9_1, tgrp_case_9_1, name_case_9_1, desc_case_9_1, sref_case_9_1, {
 	&test_9_1_conn, &test_9_1_resp, &test_9_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_9_2, tgrp_case_9_2, name_case_9_2, desc_case_9_2, sref_case_9_2, {
@@ -41465,7 +41621,7 @@ struct test_case {
 		numb_case_9_4, tgrp_case_9_4, name_case_9_4, desc_case_9_4, sref_case_9_4, {
 	&test_9_4_conn, &test_9_4_resp, &test_9_4_list}, &begin_tests, &end_tests, 0, 0}, {
 #endif
-#if 0
+#if 1
 		numb_case_10_1, tgrp_case_10_1, name_case_10_1, desc_case_10_1, sref_case_10_1, {
 	&test_10_1_conn, &test_10_1_resp, &test_10_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_10_2, tgrp_case_10_2, name_case_10_2, desc_case_10_2, sref_case_10_2, {
@@ -42470,3 +42626,4 @@ main(int argc, char *argv[])
 	}
 	exit(do_tests(tests_to_run));
 }
+
