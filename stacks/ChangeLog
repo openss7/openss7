@@ -1,5 +1,20 @@
 2006-09-25  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: testsuite.at is config file now
+	* tests/Makefile.am: added testsuites
+	* tests/testsuite-inet_raw.at: added testsuite
+	* tests/testsuite-inet_raw2.at: added testsuite
+	* tests/testsuite-inet_sctp.at: added testsuite
+	* tests/testsuite-inet_tcp.at: added testsuite
+	* tests/testsuite-inet_udp.at: added testsuite
+	* tests/testsuite-inet_udp2.at: added testsuite
+	* tests/testsuite-timod.at: added testsuite
+	* tests/testsuite-tirdwr.at: added testsuite
+	* tests/testsuite-xnet.at: added testsuite
+	* tests/testsuite-xnet_thr.at: added testsuite
+	* tests/testsuite.at: removed, built by configure now
+	* tests/testsuite.at.in: added config file
+
 	* src/test/inet/test-inet_raw.c: rationalized to strinet
 	* src/test/inet/test-inet_sctp.c: added from strinet
 	* src/test/inet/test-inet_tcp.c: rationalized to strinet

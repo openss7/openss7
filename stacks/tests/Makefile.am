@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/06 11:38:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/25 22:21:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:26 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 22:21:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/09/25 22:21:59  brian
+# - added testsuites for optional components
+#
 # Revision 0.9.2.12  2006/03/06 11:38:26  brian
 # - updated headers
 #
@@ -84,5 +87,38 @@ TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
 			$(TESTSUITE).at
+
+if WITH_TLI
+## WITH_TLI
+TESTSUITE_DEPS		+= \
+			$(TESTSUITE)-timod.at \
+			$(TESTSUITE)-tirdwr.at
+## WITH_TLI
+endif
+
+if WITH_XNET
+## WITH_XNET
+TESTSUITE_DEPS		+= \
+			$(TESTSUITE)-xnet.at \
+			$(TESTSUITE)-xnet_thr.at
+## WITH_XNET
+endif
+
+if WITH_INET
+## WITH_INET
+TESTSUITE_DEPS		+= \
+			$(TESTUITE)-inet_udp.at \
+			$(TESTUITE)-inet_raw.at \
+			$(TESTUITE)-inet_tcp.at \
+			$(TESTUITE)-inet_udp2.at \
+			$(TESTUITE)-inet_raw2.at
+if WITH_OPENSS7_SCTP
+## WITH_OPENSS7_SCTP
+TESTSUITE_DEPS		+= \
+			$(TESTSUITE)-inet_sctp.at
+## WITH_OPENSS7_SCTP
+endif
+## WITH_INET
+endif
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

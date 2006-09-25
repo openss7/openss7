@@ -1,0 +1,1403 @@
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
+dnl ==========================================================================
+dnl 
+dnl @(#) $RCSfile: testsuite-xnet_thr.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 22:21:59 $
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl
+dnl All Rights Reserved.
+dnl
+dnl Unauthorized distribution or duplication is prohibited.
+dnl
+dnl This software and related documentation is protected by copyright and
+dnl distributed under licenses restricting its use, copying, distribution
+dnl and decompilation.  No part of this software or related documentation
+dnl may be reproduced in any form by any means without the prior written
+dnl authorization of the copyright holder, and licensors, if any.
+dnl
+dnl The recipient of this document, by its retention and use, warrants that
+dnl the recipient will protect this information and keep it confidential,
+dnl and will not disclose the information contained in this document
+dnl without the written permission of its owner.
+dnl
+dnl The author reserves the right to revise this software and documentation
+dnl for any reason, including but not limited to, conformity with standards
+dnl promulgated by various agencies, utilization of advances in the state
+dnl of the technical arts, or the reflection of changes in the design of any
+dnl techniques, or procedures embodied, described, or referred to herein.
+dnl The author is under no obligation to provide any feature listed herein.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl As an exception to the above, this software may be distributed under the
+dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+dnl behalf of the U.S. Government ("Government"), the following provisions
+dnl apply to you.  If the Software is supplied by the Department of Defense
+dnl ("DoD"), it is classified as "Commercial Computer Software" under
+dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+dnl Regulations ("DFARS") (or any successor regulations) and the Government is
+dnl acquiring only the license rights granted herein (the license rights
+dnl customarily provided to non-Government users).  If the Software is
+dnl supplied to any unit or agency of the Government other than DoD, it is
+dnl classified as "Restricted Computer Software" and the Government's rights
+dnl in the Software are defined in paragraph 52.227-19 of the Federal
+dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+dnl (or any successor regulations).
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Commercial licensing and support of this software is available from OpenSS7
+dnl Corporation at a fee.  See http://www.openss7.com/
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Last Modified $Date: 2006/09/25 22:21:59 $ by $Author: brian $
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl $Log: testsuite-xnet_thr.at,v $
+dnl Revision 0.9.2.1  2006/09/25 22:21:59  brian
+dnl - added testsuites for optional components
+dnl
+dnl Revision 0.9.2.12  2006/09/18 00:49:06  brian
+dnl - updated testsuite headers
+dnl
+dnl Revision 0.9.2.11  2006/08/16 07:39:40  brian
+dnl - add brief sleep to buffer leak check
+dnl
+dnl Revision 0.9.2.10  2006/05/14 06:51:43  brian
+dnl - added buffer leak checks to testsuites
+dnl
+dnl Revision 0.9.2.9  2006/02/23 11:54:59  brian
+dnl - updated headers
+dnl
+dnl Revision 0.9.2.8  2006/02/23 11:51:45  brian
+dnl - changed verbosity for bug reports
+dnl
+dnl Revision 0.9.2.7  2005/11/04 03:40:25  brian
+dnl - started strxnet testing
+dnl
+dnl Revision 0.9.2.6  2005/06/24 16:59:09  brian
+dnl - testsuite as always verbose internally
+dnl
+dnl Revision 0.9.2.5  2005/06/07 00:52:35  brian
+dnl - upgrading test suites
+dnl
+dnl Revision 0.9.2.4  2005/06/04 13:40:35  brian
+dnl - exit early to get proper return code
+dnl
+dnl Revision 0.9.2.3  2005/06/04 07:07:24  brian
+dnl - improving test suites
+dnl
+dnl Revision 0.9.2.2  2005/05/30 14:25:57  brian
+dnl - packaged standalong test suites
+dnl
+dnl Revision 0.9.2.1  2005/05/19 20:49:35  brian
+dnl - upgrading test suites
+dnl
+dnl Revision 0.9.2.1  2005/05/16 10:22:11  brian
+dnl - updating tests
+dnl
+dnl ==========================================================================
+
+m4_divert_push([DEFAULTS])
+function test_xnet_thr() {
+    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--verbose=3' ; fi
+    if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    if test-xnet_thr $options -e -o $1
+    then
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
+	then
+	    # check for leaks
+	    if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
+	    then
+		sleep 1
+		if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
+		then
+		    return 1
+		else
+		    return 0
+		fi
+	    else
+		return 0
+	    fi
+	else
+	    return 0
+	fi
+    else
+	return $?
+    fi
+}
+function test_xnet_thr_root() {
+    if test `id -u` -ne 0 ; then return 77 ; fi
+    test_xnet_thr $1
+    return $?
+}
+m4_divert_pop([DEFAULTS])
+
+AT_TESTED([test-xnet_thr])
+AT_BANNER([XNET library tests (threaded)])
+
+AT_SETUP([xnet_thr test 1.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 1.2.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 1.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 1.2.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 1.2.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 1.2.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 1.2.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.1.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.1.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.1.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.1.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.1.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.1.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.1.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.1.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.1.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.1.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.1.7])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.1.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.1.8])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.1.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.7])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.8])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.3.9])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.3.9], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.4.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.4.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 2.5.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 2.5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.1.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.2.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.3.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.4.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.4.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.4.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.4.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.5.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.5.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.5.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.6.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.6.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 3.7.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 3.7.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.1.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.1.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.2.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.2.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.2.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.3.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.4.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.4.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.4.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.4.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.4.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.4.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.4.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.4.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.4.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.4.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.4.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.4.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.4.7])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.4.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.4.8])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.4.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.5.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.6.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.6.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.6.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.6.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.6.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.6.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.6.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.6.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.7.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.7.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.7.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.7.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.7.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.7.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.7.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.7.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.8.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.8.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.8.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.8.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.8.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.8.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 4.9.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 4.9.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.7])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.8])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.9])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.9], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.10])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.10], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.11])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.11], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.12])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.12], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.13])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.13], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.14])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.14], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.15])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.15], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.16])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.16], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.17])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.17], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.18])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.18], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.19])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.19], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.20])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.20], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.21])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.21], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.22])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.22], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.23])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.23], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.24])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.24], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.25])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.25], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.26])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.26], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.27])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.27], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.1.28])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.1.28], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.7])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.8])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.9])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.9], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.10])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.10], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.11])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.11], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.12])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.12], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.13])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.13], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.14])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.14], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.15])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.15], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.16])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.16], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.17])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.17], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.18])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.18], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.19])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.19], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.20])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.20], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.21])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.21], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.22])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.22], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.23])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.23], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.24])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.24], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.25])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.25], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.26])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.26], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.27])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.27], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.2.28])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.2.28], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.7])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.8])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.9])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.9], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.10])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.10], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.11])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.11], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.12])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.12], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.13])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.13], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.14])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.14], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.15])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.15], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.16])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.16], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.17])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.17], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.18])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.18], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.19])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.19], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.20])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.20], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.21])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.21], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.22])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.22], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.23])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.23], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.24])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.24], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.25])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.25], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.26])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.26], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.27])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.27], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 5.3.28])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 5.3.28], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.7])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.8])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.9])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.9], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.10])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.10], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.11])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.11], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.1.12])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.1.12], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.2.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.2.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.2.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.2.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.2.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.2.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.2.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.2.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.2.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.2.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.2.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.3.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.3.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.3.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.3.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.3.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.3.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.3.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.3.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.3.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.3.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.3.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.3.7])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.3.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.3.8])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.3.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.4.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.4.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.4.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.4.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.4.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.4.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.4.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.4.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.4.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.4.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.4.6])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.4.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.5.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.5.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.5.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.5.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.5.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.5.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.5.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.5.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.5.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.6.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.6.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 6.6.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 6.6.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.1.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.1.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.1.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.1.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.2.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.3.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.3.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.3.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.3.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.3.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.3.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.3.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.3.5])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.3.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.4.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.4.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.4.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.4.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.4.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.4.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.5.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.5.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.5.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.5.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.5.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.6.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.6.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.6.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.6.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.6.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.6.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.7.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.7.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.7.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.7.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.7.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.7.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.8.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.8.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.8.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.8.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.8.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.8.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.9.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.9.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.9.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.9.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.9.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.9.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.10.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.10.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.10.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.10.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.10.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.10.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.11.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.11.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.11.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.11.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.11.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.11.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.12.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.12.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.12.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.12.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.12.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.12.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.13.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.13.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.13.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.13.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.13.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.13.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.14.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.14.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.14.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.14.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.14.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.14.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.15.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.15.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.15.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.15.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.15.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.15.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.16.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.16.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.16.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.16.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.16.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.16.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 7.17.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 7.17.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.1.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.1.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.1.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.1.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.1.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.1.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.2.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.2.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.2.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.2.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.2.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.3.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.3.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.3.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.4.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.4.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.5.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.5.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.5.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.5.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.5.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.5.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.5.4])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.5.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.6.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.6.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.6.2])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.6.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.6.3])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.6.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.7.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.7.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([xnet_thr test 8.8.1])
+AT_KEYWORDS([xnet_thr])
+AT_CHECK([test_xnet_thr 8.8.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
