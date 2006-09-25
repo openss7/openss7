@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/09/18 01:18:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/09/25 03:54:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:46 $ by $Author: brian $
+# Last Modified $Date: 2006/09/25 03:54:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.19  2006/09/25 03:54:21  brian
+# - get rid of conflicting pages with strsock
+#
 # Revision 0.9.2.18  2006/09/18 01:18:46  brian
 # - updated documentation and include file makefiles
 #
@@ -275,9 +278,6 @@ xnsl_man_MANS 	= \
 	man3/getnetconfig.3 \
 	man3/getnetconfigent.3 \
 	man3/getnetpath.3 \
-	man3/getpeername.3 \
-	man3/getsockname.3 \
-	man3/getsockopt.3 \
 	man3/libxnsl.3 \
 	man3/nc_perror.3 \
 	man3/nc_sperror.3 \
@@ -558,9 +558,6 @@ xnsl_dist_noinst_MANS 	= \
 	man3/getnetconfig.3.man \
 	man3/getnetconfigent.3.man \
 	man3/getnetpath.3.man \
-	man3/getpeername.3.man \
-	man3/getsockname.3.man \
-	man3/getsockopt.3.man \
 	man3/libxnsl.3.man \
 	man3/nc_perror.3.man \
 	man3/nc_sperror.3.man \
