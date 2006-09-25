@@ -1,5 +1,7 @@
 2006-09-24  Brian Bidulock  <bidulock@openss7.org>
 
+	* scripts/check_man: handles 2s and 4s manpages on FC5
+
 	* AUTHORS: changes from distcheck
 	* NEWS: changes from distcheck
 	* README: changes from distcheck
