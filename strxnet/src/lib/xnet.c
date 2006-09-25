@@ -77,7 +77,7 @@ static char const ident[] =
   * _SC_T_IOV_MAX is already set to 1 by glibc header files in <unistd.h>.
   * Well, used to, not any more, it is some really big number.
   * @{ */
-//#define _SC_T_IOV_MAX		1	/**< IOV maximum. */
+//#define _SC_T_IOV_MAX         1       /**< IOV maximum. */
 #define _SC_T_DEFAULT_ADDRLEN	2	/**< Default address length. */
 #define _SC_T_DEFAULT_CONNLEN	3	/**< Default connect data length. */
 #define _SC_T_DEFAULT_DISCLEN	4	/**< Default disconnect data length. */
@@ -543,8 +543,7 @@ __xnet_u_reset_event(struct _t_user *user)
 		user->moreedu = 0;
 		user->moremsg = 0;
 	} else {
-		/**
-		   When we are clearing an expedited data event, we must revert to an outstanding
+		/** When we are clearing an expedited data event, we must revert to an outstanding
 		   data event. */
 		user->prim = 0;
 		user->event = T_DATA;
@@ -678,7 +677,7 @@ int __xnet_t_rcvopt_r(int fd, struct t_unitdata *optdata, int *flags);
 int __xnet_t_rcvudata_r(int fd, struct t_unitdata *unitdata, int *flags);
 int __xnet_t_rcvv_r(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags);
 int __xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
-		       unsigned int iovcount, int *flags);
+			 unsigned int iovcount, int *flags);
 int __xnet_t_removeleaf_r(int fd, int leafid, int reason);
 int __xnet_t_snd_r(int fd, char *buf, unsigned int nbytes, int flags);
 int __xnet_t_snddis_r(int fd, const struct t_call *call);
@@ -686,11 +685,11 @@ int __xnet_t_sndrel_r(int fd);
 int __xnet_t_sndreldata_r(int fd, struct t_discon *discon);
 int __xnet_t_sndopt_r(int fd, const struct t_unitdata *optdata, int flags);
 int __xnet_t_sndvopt_r(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov,
-		     unsigned int iovcount, int flags);
+		       unsigned int iovcount, int flags);
 int __xnet_t_sndudata_r(int fd, const struct t_unitdata *unitdata);
 int __xnet_t_sndv_r(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags);
 int __xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
-		       unsigned int iovcount);
+			 unsigned int iovcount);
 int __xnet_t_unbind_r(int fd);
 #endif
 
