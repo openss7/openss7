@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $Id: xti_ss7.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: xti_ss7.h,v 0.9.2.4 2006/09/25 12:10:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
-                                  PUBLIC LICENSE
+ All Rights Reserved.
 
-     This license is provided without fee, provided that the above copy-
-     right notice and this public license must be retained on all copies,
-     extracts, compilations and derivative works.  Use or distribution of
-     this work in a manner that restricts its use except as provided here
-     will render this license void.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
-     The author(s) hereby waive any and all other restrictions in respect
-     of their copyright in this software and its associated documentation.
-     The authors(s) of this software place in the public domain any novel
-     methods or processes which are embodied in this software.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
-     The author(s) undertook to write it for the sake of the advancement
-     of the Arts and Sciences, but it is provided as is, and the author(s)
-     will not take any responsibility in it.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -41,56 +40,83 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/09/25 12:10:09 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: xti_ss7.h,v $
+ Revision 0.9.2.4  2006/09/25 12:10:09  brian
+ - updated and doxygenified headers
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_SS7_H
 #define _SYS_XTI_SS7_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_ss7.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
-#define T_SS7_SS7		0	/* Common to all SS7 Levels */
+/** @addtogroup xnet
+  * @{ */
 
-#define T_SS7_PVAR		1	/* protocol variant */
-#define T_SS7_MPLEV		2	/* protocol option */
-#define T_SS7_DEBUG		3	/* debug */
-#define T_SS7_PCR		4	/* protocol option */
-#define T_SS7_HSL		5	/* protocol option */
-#define T_SS7_XSN		6	/* protocol option */
-#define T_SS7_CLUSTER		7	/* protocol options */
-#define T_SS7_SEQ_CTRL		8	/* sequence control parameter */
-#define T_SS7_PRIORITY		9	/* message priority */
-#define T_SS7_PCLASS		10	/* protocol class */
-#define T_SS7_IMPORTANCE	11	/* importance */
-#define T_SS7_RET_ERROR		12	/* return on error */
+/** @file
+  * XTI SS7-Specific header file. */
 
-/*
- *  PROTOCOL VARIANTS
- *
- *  Note: these values must be aligned with <ss7/lmi_ioctl.h>
- */
-#define T_SS7_PVAR_ITUT88	0x0100
-#define T_SS7_PVAR_ITUT93	0x0101
-#define T_SS7_PVAR_ITUT96	0x0102
-#define T_SS7_PVAR_ITUT00	0x0103
-#define T_SS7_PVAR_ETSI88	0x0200
-#define T_SS7_PVAR_ETSI93	0x0201
-#define T_SS7_PVAR_ETSI96	0x0202
-#define T_SS7_PVAR_ETSI00	0x0203
-#define T_SS7_PVAR_ANSI88	0x0300
-#define T_SS7_PVAR_ANSI92	0x0301
-#define T_SS7_PVAR_ANSI96	0x0302
-#define T_SS7_PVAR_ANSI00	0x0303
-#define T_SS7_PVAR_JTTC94	0x0400
+/** XTI SS7 Option level. */
+#define T_SS7_SS7		0	/**< Common to all SS7 Levels. */
 
-#define T_SS7_POPT_MPLEV	0x0001	/* multiple priority levels */
-#define T_SS7_POPT_PCR		0x0002	/* preventative cyclic retransmission */
-#define T_SS7_POPT_HSL		0x0004	/* high speed links */
-#define T_SS7_POPT_XSN		0x0008	/* extended sequence numbers */
-#define T_SS7_POPT_CLUSTER	0x0010	/* cluster routing */
-#define T_SS7_POPT_DEBUG	0x0020	/* debug */
+/** @name XTI SS7 Options
+  * @{ */
+#define T_SS7_PVAR		1	/**< Protocol variant. */
+#define T_SS7_MPLEV		2	/**< Multiple priorities. */
+#define T_SS7_DEBUG		3	/**< Debug. */
+#define T_SS7_PCR		4	/**< Preventative cyclic retransmission. */
+#define T_SS7_HSL		5	/**< High-speed links. */
+#define T_SS7_XSN		6	/**< Extended sequence number. */
+#define T_SS7_CLUSTER		7	/**< Cluster routing. */
+#define T_SS7_SEQ_CTRL		8	/**< Sequence control parameter. */
+#define T_SS7_PRIORITY		9	/**< Message priority. */
+#define T_SS7_PCLASS		10	/**< Protocol class. */
+#define T_SS7_IMPORTANCE	11	/**< Importance. */
+#define T_SS7_RET_ERROR		12	/**< Return on error. */
+/** @} */
+
+/** @name Protocol Variants
+  * Note: these values must be aligned with <ss7/lmi_ioctl.h>
+  * @{ */
+#define T_SS7_PVAR_ITUT88	0x0100	/**< ITU-T 1988 */
+#define T_SS7_PVAR_ITUT93	0x0101	/**< ITU-T 1993 */
+#define T_SS7_PVAR_ITUT96	0x0102	/**< ITU-T 1996 */
+#define T_SS7_PVAR_ITUT00	0x0103	/**< ITU-T 2000 */
+#define T_SS7_PVAR_ETSI88	0x0200	/**< ETSI 1988 */
+#define T_SS7_PVAR_ETSI93	0x0201	/**< ETSI 1993 */
+#define T_SS7_PVAR_ETSI96	0x0202	/**< ETSI 1996 */
+#define T_SS7_PVAR_ETSI00	0x0203	/**< ETSI 2000 */
+#define T_SS7_PVAR_ANSI88	0x0300	/**< ANSI 1988 */
+#define T_SS7_PVAR_ANSI92	0x0301	/**< ANSI 1992 */
+#define T_SS7_PVAR_ANSI96	0x0302	/**< ANSI 1996 */
+#define T_SS7_PVAR_ANSI00	0x0303	/**< ANSI 2000 */
+#define T_SS7_PVAR_JTTC94	0x0400	/**< JTTC 1994 */
+/** @} */
+
+/** @name Protocol Options
+  * @{ */
+#define T_SS7_POPT_MPLEV	0x0001	/**< Multiple priority levels. */
+#define T_SS7_POPT_PCR		0x0002	/**< Preventative cyclic retransmission. */
+#define T_SS7_POPT_HSL		0x0004	/**< High speed links. */
+#define T_SS7_POPT_XSN		0x0008	/**< Extended sequence numbers. */
+#define T_SS7_POPT_CLUSTER	0x0010	/**< Cluster routing. */
+#define T_SS7_POPT_DEBUG	0x0020	/**< Debug. */
+/** @} */
+
+/** @} */
 
 #endif				/* _SYS_XTI_SS7_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

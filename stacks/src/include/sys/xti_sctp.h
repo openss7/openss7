@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9.2.4 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.5 2006/09/25 12:10:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,9 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:10:09 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
 
  $Log: xti_sctp.h,v $
+ Revision 0.9.2.5  2006/09/25 12:10:09  brian
+ - updated and doxygenified headers
+
  Revision 0.9.2.4  2006/09/18 13:52:37  brian
  - added doxygen markers to sources
 
@@ -65,15 +70,29 @@
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
-#define T_INET_SCTP	132	/* SCTP level (same as protocol number) */
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
+  * XTI SCTP-Specific header file.
+  *
+  * These definitions are specific to the OpenSS7 STREAMS implementation of SCTP
+  * and are not an OpenGroup specification.  */
 
 /*
- *  SCTP Transport Provider Options
+ * XTI SCTP-Specific Header File
  */
+
+/** SCTP Options Level */
+#define T_INET_SCTP	132	/* SCTP level (same as protocol number). */
+
+/**
+  * @name SCTP Transport Provider Options
+  * @{ */
 #define T_SCTP_NODELAY			 1
 #define T_SCTP_CORK			 2
 #define T_SCTP_PPI			 3
@@ -95,16 +114,7 @@
 #define T_SCTP_COOKIE_INC		19
 #define T_SCTP_THROTTLE_ITVL		20
 #define T_SCTP_MAC_TYPE			21
-
-#define T_SCTP_HMAC_NONE	0
-#define T_SCTP_HMAC_SHA1	1
-#define T_SCTP_HMAC_MD5		2
-
 #define T_SCTP_CKSUM_TYPE		22
-
-#define T_SCTP_CSUM_ADLER32	0
-#define T_SCTP_CSUM_CRC32C	1
-
 #define T_SCTP_ECN			23
 #define T_SCTP_ALI			24
 #define T_SCTP_ADD			25
@@ -114,63 +124,96 @@
 #define T_SCTP_SET_IP			29
 #define T_SCTP_PR			30
 #define T_SCTP_LIFETIME			31
-
 #define T_SCTP_DISPOSITION		32
-
-#define T_SCTP_DISPOSITION_NONE		0
-#define T_SCTP_DISPOSITION_UNSENT	1
-#define T_SCTP_DISPOSITION_SENT		2
-#define T_SCTP_DISPOSITION_GAP_ACKED	3
-#define T_SCTP_DISPOSITION_ACKED	4
-
 #define T_SCTP_MAX_BURST		33
-
 #define T_SCTP_HB			34
-typedef struct t_sctp_hb {
-	t_uscalar_t hb_dest;		/* destination address */
-	t_uscalar_t hb_onoff;		/* activation flag */
-	t_uscalar_t hb_itvl;		/* interval in milliseconds */
-} t_sctp_hb_t;
-
 #define T_SCTP_RTO			35
-typedef struct t_sctp_rto {
-	t_uscalar_t rto_dest;		/* destination address */
-	t_uscalar_t rto_initial;	/* RTO.Initial (milliseconds) */
-	t_uscalar_t rto_min;		/* RTO.Min (milliseconds) */
-	t_uscalar_t rto_max;		/* RTO.Max (milliseconds) */
-	t_uscalar_t max_retrans;	/* Path.Max.Retrans (retries) */
-} t_sctp_rto_t;
-
 /*
  *  Read-only options...
  */
 #define T_SCTP_MAXSEG			36
 #define T_SCTP_STATUS			37
+#define T_SCTP_DEBUG			38
+/** @} */
+
+/** @name T_SCTP_MAC_TYPE Values
+  * @{ */
+#define T_SCTP_HMAC_NONE	0
+#define T_SCTP_HMAC_SHA1	1
+#define T_SCTP_HMAC_MD5		2
+/** @} */
+
+/** @name T_SCTP_CKSUM_TYPE Values
+  * @{ */
+#define T_SCTP_CSUM_ADLER32	0
+#define T_SCTP_CSUM_CRC32C	1
+/** @} */
+
+/** @name T_SCTP_DISPOSITION Values
+  * @{ */
+#define T_SCTP_DISPOSITION_NONE		0
+#define T_SCTP_DISPOSITION_UNSENT	1
+#define T_SCTP_DISPOSITION_SENT		2
+#define T_SCTP_DISPOSITION_GAP_ACKED	3
+#define T_SCTP_DISPOSITION_ACKED	4
+/** @} */
+
+/**
+  * T_SCTP_HB structure.
+  */
+typedef struct t_sctp_hb {
+	t_uscalar_t hb_dest;		/**< Destination address. */
+	t_uscalar_t hb_onoff;		/**< Activation flag. */
+	t_uscalar_t hb_itvl;		/**< Interval in milliseconds. */
+} t_sctp_hb_t;
+
+/**
+  * T_SCTP_RTO structure.
+  */
+typedef struct t_sctp_rto {
+	t_uscalar_t rto_dest;		/**< Destination address. */
+	t_uscalar_t rto_initial;	/**< RTO.Initial (milliseconds). */
+	t_uscalar_t rto_min;		/**< RTO.Min (milliseconds). */
+	t_uscalar_t rto_max;		/**< RTO.Max (milliseconds). */
+	t_uscalar_t max_retrans;	/**< Path.Max.Retrans (retries). */
+} t_sctp_rto_t;
+
+/**
+  * T_SCTP_STATUS Structure.
+  */
 typedef struct t_sctp_dest_status {
-	t_uscalar_t dest_addr;		/* dest address */
-	t_uscalar_t dest_cwnd;		/* dest congestion window */
-	t_uscalar_t dest_unack;		/* dest unacknowledged chunks */
-	t_uscalar_t dest_srtt;		/* dest smooth round trip time */
-	t_uscalar_t dest_rvar;		/* dest rtt variance */
-	t_uscalar_t dest_rto;		/* dest current rto */
-	t_uscalar_t dest_sst;		/* dest slow start threshold */
+	t_uscalar_t dest_addr;		/**< Dest address. */
+	t_uscalar_t dest_cwnd;		/**< Dest congestion window. */
+	t_uscalar_t dest_unack;		/**< Dest unacknowledged chunks. */
+	t_uscalar_t dest_srtt;		/**< Dest smooth round trip time. */
+	t_uscalar_t dest_rvar;		/**< Dest rtt variance. */
+	t_uscalar_t dest_rto;		/**< Dest current rto. */
+	t_uscalar_t dest_sst;		/**< Dest slow start threshold. */
 } t_sctp_dest_status_t;
 
+/**
+  * T_SCTP_STATUS Element.
+  */
 typedef struct t_sctp_status {
-	t_uscalar_t curr_rwnd;		/* current receive window */
-	t_uscalar_t curr_rbuf;		/* current receive buffer */
-	t_uscalar_t curr_nrep;		/* current dests reported */
-	t_sctp_dest_status_t curr_dest[0];	/* current primary dest */
+	t_uscalar_t curr_rwnd;		/**< Current receive window. */
+	t_uscalar_t curr_rbuf;		/**< Current receive buffer. */
+	t_uscalar_t curr_nrep;		/**< Current dests reported. */
+	t_sctp_dest_status_t curr_dest[0];	/**< Current primary dest. */
 } t_sctp_status_t;
 
-#define T_SCTP_DEBUG			38
-
 #ifndef SCTP_OPTION_DROPPING
-#define SCTP_OPTION_DROPPING	0x01	/* stream will drop packets */
-#define SCTP_OPTION_BREAK	0x02	/* stream will break dest #1 */
-#define SCTP_OPTION_DBREAK	0x04	/* stream will break dest both ways */
-#define SCTP_OPTION_RANDOM	0x08	/* stream will drop packets at random */
+/**
+  * @name T_SCTP_DEBUG Values
+  * @{ */
+#define SCTP_OPTION_DROPPING	0x01	/**< Stream will drop packets. */
+#define SCTP_OPTION_BREAK	0x02	/**< Stream will break dest #1. */
+#define SCTP_OPTION_DBREAK	0x04	/**< Stream will break dest both ways. */
+#define SCTP_OPTION_RANDOM	0x08	/**< Stream will drop packets at random. */
+/** @} */
 #endif
 
 #endif				/* _SYS_XTI_SCTP_H */
 
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

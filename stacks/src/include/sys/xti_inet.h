@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:30:49 $
+ @(#) $Id: xti_inet.h,v 0.9.2.4 2006/09/25 12:10:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,9 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:49 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:10:09 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
 
  $Log: xti_inet.h,v $
+ Revision 0.9.2.4  2006/09/25 12:10:09  brian
+ - updated and doxygenified headers
+
  Revision 0.9.2.3  2005/05/14 08:30:49  brian
  - copyright header correction
 
@@ -66,12 +70,12 @@
 #ifndef _SYS_XTI_INET_H
 #define _SYS_XTI_INET_H
 
-#ident "@(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/xti_ip.h>
 #include <sys/xti_udp.h>
 #include <sys/xti_tcp.h>
-#include <sys/xti_sctp.h>
 
 #endif				/* _SYS_XTI_INET_H */
 
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

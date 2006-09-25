@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: xti_local.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: xti_local.h,v 0.9.2.4 2006/09/25 12:10:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,16 +45,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:10:09 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: xti_local.h,v $
+ Revision 0.9.2.4  2006/09/25 12:10:09  brian
+ - updated and doxygenified headers
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_LOCAL_H
 #define _SYS_XTI_LOCAL_H
 
-#ident "@(#) $RCSfile: xti_local.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_local.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
+  * XTI Local header file.
+  *
+  * This is private header file that contains definitions internal to the
+  * OpenSS7 XTI/TLI Library implementation.  */
 
 #include <config.h>
 
@@ -64,43 +79,44 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-/**
- * @defgroup libxti OpenSS7 XTI Library
- * @brief OpenSS7 XNS/XTI Library Calls
- *
- * This manpage contains documentation of OpenSS7 XTI Library functions that
- * are generated automatically from the source code with doxygen.  This
- * documentation is intended to be used for maintainers of the OpenSS7 XTI
- * Library and is not intended for users of the OpenSS7 XTI Library.  Users
- * should consult the documentation found in xti(3).
- *
- * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.3 $)
- * @date \$Date: 2006/09/18 13:52:37 $
+/*
+ * XTI Local Header File.
  */
 
-#define _SC_T_IOV_MAX		0
-#define _SC_T_DEFAULT_ADDRLEN	1
-#define _SC_T_DEFAULT_CONNLEN	2
-#define _SC_T_DEFAULT_DISCLEN	3
-#define _SC_T_DEFAULT_OPTLEN	4
-#define _SC_T_DEFAULT_DATALEN	5
+/**
+  * @name System Configuration Names
+  * Definitions for t_sysconf().
+  * @{ */
+#if 0
+#define _SC_T_IOV_MAX		0	/**< IOV maximum. */
+#endif
+#define _SC_T_DEFAULT_ADDRLEN	1	/**< Default address length. */
+#define _SC_T_DEFAULT_CONNLEN	2	/**< Default connect data length. */
+#define _SC_T_DEFAULT_DISCLEN	3	/**< Default disconnect data length. */
+#define _SC_T_DEFAULT_OPTLEN	4	/**< Default options length. */
+#define _SC_T_DEFAULT_DATALEN	5	/**< Default data length. */
+/** @} */
 
-#define _T_DEFAULT_ADDRLEN	128
-#define _T_DEFAULT_CONNLEN	256
-#define _T_DEFAULT_DISCLEN	256
-#define _T_DEFAULT_OPTLEN	256
-#define _T_DEFAULT_DATALEN	1024
-#define _T_TIMEOUT		-1
-#define _T_IOV_MAX		16
+/**
+  * @name System Configuration Default Values
+  * Definitions for t_sysconf().
+  * @{ */
+#define _T_DEFAULT_ADDRLEN	128	/**< Default address length. */
+#define _T_DEFAULT_CONNLEN	256	/**< Default connect data length. */
+#define _T_DEFAULT_DISCLEN	256	/**< Default disconnect data length. */
+#define _T_DEFAULT_OPTLEN	256	/**< Default optoins length. */
+#define _T_DEFAULT_DATALEN	1024	/**< Default data length. */
+#define _T_TIMEOUT		-1	/**< Default timeout. */
+#define _T_IOV_MAX		16	/**< IOV maximum. */
+/** @} */
 
 #ifdef XNET_THREAD_SAFE
 extern pthread_mutex_t _t_fds_mutex;
 #endif
 
-extern struct t_info *fds[];
-
-extern int t_errno;
+/**
+  * @name Internal Functions
+  * @{ */
 extern int *_t_errno(void);
 extern int _t_ioctl(int fd, int cmd, void *arg);
 extern int _t_strioctl(int fd, int cmd, void *arg, size_t arglen);
@@ -108,6 +124,7 @@ extern int _t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags
 extern int _t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flags);
 extern int _t_rcvconnect(int fd, struct t_call *call, struct t_info *info);
 extern int _t_getinfo(int fd, struct t_info *info);
+/** @} */
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -116,3 +133,7 @@ __END_DECLS
 #endif
 
 #endif				/* _SYS_XTI_LOCAL_H */
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

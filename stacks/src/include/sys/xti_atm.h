@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti_atm.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/18 13:52:37 $
+ @(#) $Id: xti_atm.h,v 0.9.2.5 2006/09/25 12:10:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Last Modified $Date: 2006/09/25 12:10:09 $ by $Author: brian $
 
  $Log: xti_atm.h,v $
+ Revision 0.9.2.5  2006/09/25 12:10:09  brian
+ - updated and doxygenified headers
+
  Revision 0.9.2.4  2006/09/18 13:52:37  brian
  - added doxygen markers to sources
 
@@ -72,9 +74,21 @@
 #ifndef _SYS_XTI_ATM_H
 #define _SYS_XTI_ATM_H
 
-#ident "@(#) $RCSfile: xti_atm.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_atm.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
+  * XTI ATM Transport Specific header file.
+  *
+  * For the purposes of conformance testing, it may be assumed that any constant values defined in
+  * these header files are mandatory, unless the constant:
+  *
+  * @li defines an option or options level,
+  * @li is accompanied by a comment that specifies the value is not mandatory.  */
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -82,41 +96,46 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-/*
- * For the purposes of conformance testing, it may be assumed that any
- * constant values defined in these header files are mandatory, unless
- * the constant:
- *   1.  defines an option or options level
- *   2.  is accompanied by a comment that specifies the value is
- *       not mandatory.
+/* 
+ * XTI ATM Transport Specific Header File.
+ *
+ * For the purposes of conformance testing, it may be assumed that any constant
+ * values defined in these header files are mandatory, unless the constant:
+ *
+ *   1. defines an option or options level,
+ *   2. is accompanied by a comment that specifies the value is not mandatory.
  */
 
 #ifndef t_leaf_status
-/*
- * Leaf status structure.
- */
+/**
+  * Leaf status structure.
+  */
 struct t_leaf_status {
-	int32_t leafid;			/* leaf identifier */
-	int32_t status;			/* current status */
-	int32_t reason;			/* reason for leaf removal */
+	int leafid;		/**< Leaf identifier. */
+	int status;		/**< Current status. */
+	int reason;		/**< Reason for leaf removal. */
 };
+
 #define t_leaf_status t_leaf_status
 
-#define T_LEAF_NOCHANGE		0
-#define T_LEAF_CONNECTED	1
-#define T_LEAF_DISCONNECTED	2
+/** @name Leaf Status
+  * @{ */
+#define T_LEAF_NOCHANGE		0	/**< No change in leaf status. */
+#define T_LEAF_CONNECTED	1	/**< Leaf has connected. */
+#define T_LEAF_DISCONNECTED	2	/**< Leaf has disconnected. */
+/** @} */
 #endif				/* t_leaf_status */
 
-/*
- * ATM commonly used constants
- */
+/**
+  * @name ATM Constants
+  * ATM commonly used constants.
+  * In the first 3 constants, #T_ATM_ABSENT, #T_ATM_PRESENT and #T_ATM_ANY, the
+  * specific value is not mandatory, but any conforming value must be negative.
+  * @{ */
 #define T_ATM_ABSENT		(-1)
 #define T_ATM_PRESENT		(-2)
 #define T_ATM_ANY		(-3)
- /*
-  * In the 3 constants defined immediately above, the specific value
-  * is not mandatory, but any conformin g value must be negative.
-  */
+
 #define T_ATM_NULL		0
 #define T_ATM_ENDSYS_ADDR	1	/* value is not mandatory */
 #define T_ATM_NSAP_ADDR		2	/* value is not mandatory */
@@ -124,14 +143,16 @@ struct t_leaf_status {
 
 #define T_ATM_ITU_CODING	0
 #define T_ATM_NETWORK_CODING	3
+/** @} */
 
-/*
-   ATM-SPECIFIC ADDRESSES 
- */
+/**
+  * @name ATM-Specific Addresses
+  * @{
+  */
 
-/*
- * ATM protocol address structure
- */
+/**
+  * ATM protocol address structure
+  */
 struct t_atm_sap {
 	struct t_atm_sap_addr {
 		int8_t SVE_tag_addr;
@@ -174,47 +195,50 @@ struct t_atm_sap {
 		} ID;
 	} t_atm_sap_appl;
 };
+/** @} */
 
 /*
    ATM-SPECIFIC OPTIONS 
  */
 
-/*
- * ATM signalling-level options
- */
-#define T_ATM_AAL5		0x1	/* ATM adaptation layer 5 */
-#define T_ATM_TRAFFIC		0x2	/* data traffic descriptor */
-#define T_ATM_BEARER_CAP	0x3	/* ATM service capabilities */
-#define T_ATM_BHLI		0x4	/* higher-layer protocol */
-#define T_ATM_BLLI		0x5	/* lower-layer protocol */
-#define T_ATM_DEST_ADDR		0x6	/* call responder's address */
-#define T_ATM_DEST_SUB		0x7	/* call responder's subaddress */
-#define T_ATM_ORIG_ADDR		0x8	/* call initiator's address */
-#define T_ATM_ORIG_SUB		0x9	/* call initiator's subaddress */
-#define T_ATM_CALLER_ID		0xa	/* caller's ID attributes */
-#define T_ATM_CAUSE		0xb	/* cause of disconnection */
-#define T_ATM_QOS		0xc	/* desired quality of service */
-#define T_ATM_TRANSIT		0xd	/* choice of public carrier */
+/**
+  * @name ATM Signalling-Level Options
+  * @{ */
+#define T_ATM_AAL5		0x1	/* ATM adaptation layer 5. */
+#define T_ATM_TRAFFIC		0x2	/* Data traffic descriptor. */
+#define T_ATM_BEARER_CAP	0x3	/* ATM service capabilities. */
+#define T_ATM_BHLI		0x4	/* Higher-layer protocol. */
+#define T_ATM_BLLI		0x5	/* Lower-layer protocol. */
+#define T_ATM_DEST_ADDR		0x6	/* Call responder's address. */
+#define T_ATM_DEST_SUB		0x7	/* Call responder's subaddress. */
+#define T_ATM_ORIG_ADDR		0x8	/* Call initiator's address. */
+#define T_ATM_ORIG_SUB		0x9	/* Call initiator's subaddress. */
+#define T_ATM_CALLER_ID		0xa	/* Caller's ID attributes. */
+#define T_ATM_CAUSE		0xb	/* Cause of disconnection. */
+#define T_ATM_QOS		0xc	/* Desired quality of service. */
+#define T_ATM_TRANSIT		0xd	/* Choice of public carrier. */
+/** @} */
 
-/*
- * T_ATM_AAL5 structure
- */
+/**
+  * T_ATM_AAL5 structure.
+  */
 struct t_atm_aal5 {
 	int32_t forward_max_SDU_size;
 	int32_t backward_max_SDU_size;
 	int32_t SSCS_type;
 };
 
-/*
- * T_ATM_AAL5 values
- */
+/**
+  * @name T_ATM_AAL5 Values
+  * @{ */
 #define T_ATM_SSCS_SSCOP_REL	1
 #define T_ATM_SSCS_SSCOP_UNREL	2
 #define T_ATM_SSCS_FR		4
+/** @} */
 
-/*
- * T_ATM_TRAFFIC structure
- */
+/**
+  * T_ATM_TRAFFIC structure.
+  */
 struct t_atm_traffic_substruct {
 	int32_t PCR_high_priority;
 	int32_t PCR_all_traffic;
@@ -230,9 +254,9 @@ struct t_atm_traffic {
 	uint8_t best_effort;
 };
 
-/*
- * T_ATM_BEARER_CAP structure
- */
+/**
+  * T_ATM_BEARER_CAP structure.
+  */
 struct t_atm_bearer {
 	uint8_t bearer_class;
 	uint8_t traffic_type;
@@ -241,25 +265,27 @@ struct t_atm_bearer {
 	uint8_t connection_configuration;
 };
 
-/*
- * T_ATM_BEARER_CAP values
- */
-#define T_ATM_CLASS_A		0x01	/* bearer class A */
-#define T_ATM_CLASS_C		0x03	/* bearer class C */
-#define T_ATM_CLASS_X		0x10	/* bearer class X */
+/**
+  * @name T_ATM_BEARER_CAP Values
+  * @{
+  */
+#define T_ATM_CLASS_A		0x01	/**< Bearer class A. */
+#define T_ATM_CLASS_C		0x03	/**< Bearer class C. */
+#define T_ATM_CLASS_X		0x10	/**< Bearer class X. */
 
-#define T_ATM_CBR		0x01	/* constant bit rate */
-#define T_ATM_VBR		0x02	/* variable bit rate */
+#define T_ATM_CBR		0x01	/**< Constant bit rate. */
+#define T_ATM_VBR		0x02	/**< Variable bit rate. */
 
-#define T_ATM_END_TO_END	0x01	/* end-to-end timing required */
-#define T_ATM_NO_END_TO_END	0x02	/* end-to-end timing not required */
+#define T_ATM_END_TO_END	0x01	/**< End-to-end timing required. */
+#define T_ATM_NO_END_TO_END	0x02	/**< End-to-end timing not required. */
 
-#define T_ATM_1_TO_1		0x00	/* point-to-point connection */
-#define T_ATM_1_TO_MANY		0x01	/* point-to-multipoint connection */
+#define T_ATM_1_TO_1		0x00	/**< Point-to-point connection. */
+#define T_ATM_1_TO_MANY		0x01	/**< Point-to-multipoint connection. */
+/** @} */
 
-/*
- * T_ATM_BHLI structure
- */
+/**
+  * T_ATM_BHLI structure.
+  */
 struct t_atm_bhli {
 	int32_t ID_type;
 	union {
@@ -272,16 +298,17 @@ struct t_atm_bhli {
 	} ID;
 };
 
-/*
- * T_ATM_BHLI values
- */
-#define T_ATM_ISO_APP_ID	0	/* ISO codepoint */
-#define T_ATM_VENDOR_APP_ID	3	/* vendor-specific codepoint */
-#define T_ATM_USER_APP_ID	1	/* user-specific codepoint */
+/**
+  * @name T_ATM_BHLI Values
+  * @{ */
+#define T_ATM_ISO_APP_ID	0	/**< ISO codepoint. */
+#define T_ATM_VENDOR_APP_ID	3	/**< Vendor-specific codepoint. */
+#define T_ATM_USER_APP_ID	1	/**< User-specific codepoint. */
+/** @} */
 
-/*
- * T_ATM_BLLI structure
- */
+/**
+  * T_ATM_BLLI structure.
+  */
 struct t_atm_blli {
 	struct {
 		int8_t ID_type;
@@ -309,39 +336,38 @@ struct t_atm_blli {
 	} layer_3_protocol;
 };
 
-/*
- * T_ATM_BLLI values
- */
-#define T_ATM_SIMPLE_ID		1	/* ID via ITU encoding */
-#define T_ATM_IPI_ID		2	/* ID via ISO/IEC TR 9577 */
-#define T_ATM_SNAP_ID		3	/* ID via SNAP */
-#define T_ATM_USER_ID		4	/* ID via user codepoints */
- /*
-    Constant values in the above 4 definitions are not mandatory 
-  */
+/**
+  * @name T_ATM_BLLI Values
+  * Constant values in 4 definitions are not mandatory: #T_ATM_SIMPLE_ID,
+  * #T_ATM_IPI_ID, #T_ATM_SNAP_ID and #T_ATM_USER_ID.
+  * @{ */
+#define T_ATM_SIMPLE_ID		1	/**< ID via ITU encoding. */
+#define T_ATM_IPI_ID		2	/**< ID via ISO/IEC TR 9577. */
+#define T_ATM_SNAP_ID		3	/**< ID via SNAP. */
+#define T_ATM_USER_ID		4	/**< ID via user codepoints. */
 
 #define T_ATM_BLLI_NORMAL_MODE		 1
 #define T_ATM_BLLI_EXTENDED_MODE	 2
 
-#define T_ATM_BLLI2_I1745		 1	/* I.1745 */
-#define T_ATM_BLLI2_Q921		 2	/* Q.921 */
-#define T_ATM_BLLI2_X25_LINK		 6	/* X.25, link layer */
-#define T_ATM_BLLI2_X25_MLINK		 7	/* X.25, multilink */
-#define T_ATM_BLLI2_LAPB		 8	/* Extended LAPB */
-#define T_ATM_BLLI2_HDLC_ARM		 9	/* I.4335, ARM */
-#define T_ATM_BLLI2_HDLC_NRM		10	/* I.4335, NRM */
-#define T_ATM_BLLI2_HDLC_ABM		11	/* I.4335, ABM */
-#define T_ATM_BLLI2_I8802		12	/* I.8802 */
-#define T_ATM_BLLI2_X75			13	/* X.75 */
-#define T_ATM_BLLI2_Q922		14	/* Q.922 */
-#define T_ATM_BLLI2_I7776		17	/* I.7776 */
+#define T_ATM_BLLI2_I1745		 1	/**< I.1745 */
+#define T_ATM_BLLI2_Q921		 2	/**< Q.921 */
+#define T_ATM_BLLI2_X25_LINK		 6	/**< X.25, link layer. */
+#define T_ATM_BLLI2_X25_MLINK		 7	/**< X.25, multilink. */
+#define T_ATM_BLLI2_LAPB		 8	/**< Extended LAPB */
+#define T_ATM_BLLI2_HDLC_ARM		 9	/**< I.4335, ARM */
+#define T_ATM_BLLI2_HDLC_NRM		10	/**< I.4335, NRM */
+#define T_ATM_BLLI2_HDLC_ABM		11	/**< I.4335, ABM */
+#define T_ATM_BLLI2_I8802		12	/**< I.8802 */
+#define T_ATM_BLLI2_X75			13	/**< X.75 */
+#define T_ATM_BLLI2_Q922		14	/**< Q.922 */
+#define T_ATM_BLLI2_I7776		17	/**< I.7776 */
 
-#define T_ATM_BLLI3_X25			 6	/* X.25 */
-#define T_ATM_BLLI3_I8208		 7	/* I.8208 */
-#define T_ATM_BLLI3_X223		 8	/* X.223 */
-#define T_ATM_BLLI3_I8473		 9	/* I.8473 */
-#define T_ATM_BLLI3_T70			10	/* T.70 */
-#define T_ATM_BLLI3_I9577		11	/* I.9577 */
+#define T_ATM_BLLI3_X25			 6	/**< X.25 */
+#define T_ATM_BLLI3_I8208		 7	/**< I.8208 */
+#define T_ATM_BLLI3_X223		 8	/**< X.223 */
+#define T_ATM_BLLI3_I8473		 9	/**< I.8473 */
+#define T_ATM_BLLI3_T70			10	/**< T.70 */
+#define T_ATM_BLLI3_I9577		11	/**< I.9577 */
 
 #define T_ATM_PACKET_SIZE_16		 4
 #define T_ATM_PACKET_SIZE_32		 5
@@ -352,27 +378,28 @@ struct t_atm_blli {
 #define T_ATM_PACKET_SIZE_1024		10
 #define T_ATM_PACKET_SIZE_2048		11
 #define T_ATM_PACKET_SIZE_4096		12
+/** @} */
 
-/*
- * ATM network address structure
- */
+/**
+  * ATM network address structure.
+  */
 struct t_atm_addr {
 	int8_t address_format;
 	uint8_t address_length;
 	uint8_t address[20];
 };
 
-/*
- * T_ATM_CALLER_ID structure
- */
+/**
+  * T_ATM_CALLER_ID structure.
+  */
 struct t_atm_caller_id {
 	int8_t presentation;
 	uint8_t screening;
 };
 
-/*
- * T_ATM_CALLER_ID values
- */
+/**
+  * @name T_ATM_CALLER_ID Values
+  * @{ */
 #define T_ATM_PRES_ALLOWED		0
 #define T_ATM_PRES_RESTRICTED		1
 #define T_ATM_PRES_UNAVAILABLE		2
@@ -382,10 +409,11 @@ struct t_atm_caller_id {
 #define T_ATM_USER_ID_FAILED_SCREEN	2
 
 #define T_ATM_NETWORK_PROVIDED_ID	3
+/** @} */
 
-/*
- * T_ATM_CAUSE structure
- */
+/**
+  * T_ATM_CAUSE structure.
+  */
 struct t_atm_cause {
 	int8_t coding_standard;
 	uint8_t location;
@@ -393,9 +421,9 @@ struct t_atm_cause {
 	uint8_t diagnostics[4];
 };
 
-/*
- * T_ATM_CAUSE values
- */
+/**
+  * @name T_ATM_CAUSE Location Values
+  * @{ */
 #define T_ATM_LOC_USER			 0
 #define T_ATM_LOC_LOCAL_PRIVATE_NET	 1
 #define T_ATM_LOC_LOCAL_PUBLIC_NET	 2
@@ -404,7 +432,11 @@ struct t_atm_cause {
 #define T_ATM_LOC_REMOTE_PRIVATE_NET	 5
 #define T_ATM_LOC_INTERNATIONAL_NET	 7
 #define T_ATM_LOC_BEYOND_INTERWORKING	10
+/** @} */
 
+/**
+  * @name T_ATM_CAUSE Cause Values
+  * @{ */
 #define T_ATM_CAUSE_UNALLOCATED_NUMBER				  1
 #define T_ATM_CAUSE_NO_ROUTE_TO_TRANSIT_NETWORK			  2
 #define T_ATM_CAUSE_NO_ROUTE_TO_DESTINATION			  3
@@ -447,10 +479,11 @@ struct t_atm_cause {
 #define T_ATM_CAUSE_RECOVERY ON_TIMER_EXPIRY			102
 #define T_ATM_CAUSE_INCORRECT_MESSAGE_LENGTH			104
 #define T_ATM_CAUSE_UNSPECIFIED_PROTOCOL_ERROR			111
+/** @} */
 
-/*
- * T_ATM_QOS structure
- */
+/**
+  * T_ATM_QOS structure.
+  */
 struct t_atm_qos_substruct {
 	int32_t coding_standard;
 };
@@ -460,21 +493,22 @@ struct t_atm_qos {
 	struct t_atm_qos_substruct backward;
 };
 
-/*
- * T_ATM_QOS values
- */
+/**
+  * @name T_ATM_QOS Values
+  * @{ */
 #define T_ATM_QOS_CLASS_0	0
 #define T_ATM_QOS_CLASS_1	1
 #define T_ATM_QOS_CLASS_2	2
 #define T_ATM_QOS_CLASS_3	3
 #define T_ATM_QOS_CLASS_4	4
+/** @} */
 
-/*
- * T_ATM_TRANSIT structure
- */
+/**
+  * T_ATM_TRANSIT structure.
+  */
 struct t_atm_transit {
 	uint8_t length;
-	uint8_t network_id[0];		/* variable-sized array */
+	uint8_t network_id[0];		/**< Variable-sized array. */
 };
 
 #ifdef __END_DECLS
@@ -484,3 +518,7 @@ __END_DECLS
 #endif
 
 #endif				/* _SYS_XTI_ATM_H */
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS
