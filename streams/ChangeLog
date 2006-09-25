@@ -1,5 +1,15 @@
 2006-09-24  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: changes from distcheck
+	* NEWS: changes from distcheck
+	* README: changes from distcheck
+	* README-alpha: changes from distcheck
+	* README-cvs: changes from distcheck
+	* README-nexusware: changes from distcheck
+	* THANKS: changes from distcheck
+	* TODO: changes from distcheck
+	* lib32/Makefile.am: static linkage for distcheck
+
 	* lib/libc/streams.h: added
 
 	* AUTHORS: updated release notes

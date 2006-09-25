@@ -83,7 +83,7 @@ pkglibexec32_PROGRAMS		+= test-streams
 endif
 
 test_streams_SOURCES		= $(top_srcdir)/src/test/test-streams.c
-test_streams_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_streams_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -95,7 +95,7 @@ pkglibexec32_PROGRAMS		+= test-clone
 endif
 
 test_clone_SOURCES		= $(top_srcdir)/src/test/test-clone.c
-test_clone_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_clone_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_clone_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_clone_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -107,7 +107,7 @@ pkglibexec32_PROGRAMS		+= test-connld
 endif
 
 test_connld_SOURCES		= $(top_srcdir)/src/test/test-connld.c
-test_connld_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_connld_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_connld_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_connld_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -119,7 +119,7 @@ pkglibexec32_PROGRAMS		+= test-echo
 endif
 
 test_echo_SOURCES		= $(top_srcdir)/src/test/test-echo.c
-test_echo_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_echo_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_echo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_echo_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -131,7 +131,7 @@ pkglibexec32_PROGRAMS		+= test-fifo
 endif
 
 test_fifo_SOURCES		= $(top_srcdir)/src/test/test-fifo.c
-test_fifo_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_fifo_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -143,7 +143,7 @@ pkglibexec32_PROGRAMS		+= test-log
 endif
 
 test_log_SOURCES		= $(top_srcdir)/src/test/test-log.c
-test_log_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_log_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_log_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_log_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -155,7 +155,7 @@ pkglibexec32_PROGRAMS		+= test-loop
 endif
 
 test_loop_SOURCES		= $(top_srcdir)/src/test/test-loop.c
-test_loop_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_loop_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_loop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_loop_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -167,7 +167,7 @@ pkglibexec32_PROGRAMS		+= test-nsdev
 endif
 
 test_nsdev_SOURCES		= $(top_srcdir)/src/test/test-nsdev.c
-test_nsdev_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_nsdev_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_nsdev_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nsdev_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -179,7 +179,7 @@ pkglibexec32_PROGRAMS		+= test-mux
 endif
 
 test_mux_SOURCES		= $(top_srcdir)/src/test/test-mux.c
-test_mux_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_mux_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_mux_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_mux_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -191,7 +191,7 @@ pkglibexec32_PROGRAMS		+= test-nuls
 endif
 
 test_nuls_SOURCES		= $(top_srcdir)/src/test/test-nuls.c
-test_nuls_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_nuls_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_nuls_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nuls_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -203,7 +203,7 @@ pkglibexec32_PROGRAMS		+= test-pipe
 endif
 
 test_pipe_SOURCES		= $(top_srcdir)/src/test/test-pipe.c
-test_pipe_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_pipe_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -215,7 +215,7 @@ pkglibexec32_PROGRAMS		+= test-pipemod
 endif
 
 test_pipemod_SOURCES		= $(top_srcdir)/src/test/test-pipemod.c
-test_pipemod_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_pipemod_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipemod_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -227,7 +227,7 @@ pkglibexec32_PROGRAMS		+= test-sad
 endif
 
 test_sad_SOURCES		= $(top_srcdir)/src/test/test-sad.c
-test_sad_LDFLAGS		= libstreams.la $(MACHINE_FLAGS)
+test_sad_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -239,7 +239,7 @@ pkglibexec32_PROGRAMS		+= test-sc
 endif
 
 test_sc_SOURCES			= $(top_srcdir)/src/test/test-sc.c
-test_sc_LDFLAGS			= libstreams.la $(MACHINE_FLAGS)
+test_sc_LDFLAGS			= -static libstreams.la $(MACHINE_FLAGS)
 test_sc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sc_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
