@@ -1,0 +1,447 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: _nderror.3.man,v 0.9.2.1 2006/09/25 12:30:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/09/25 12:30:48 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: _nderror.3.man,v $
+.\" Revision 0.9.2.1  2006/09/25 12:30:48  brian
+.\" - added files for new strnsl package
+.\"
+.\" Revision 0.9.2.1  2006/09/17 23:36:57  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.\"
+.\"
+.TH _NDERROR 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B _nderror
+\- network selection error number
+.\"
+.\"
+.SH SYNOPSIS
+.HP 12
+.B #include <netdir.h>
+.HP
+.BI "int " _nderror ;
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+None.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.PP
+.IR UNIX \(rg
+has traditionally provided three components of the Network Services Library,
+.BR libnsl ,
+that are associated with Transport Provider Interface,
+.BR tpi (7),
+.IR STREAMS (9)
+network pseudo-device drivers, and that are not currently part of the
+.B Linux
+Network Services Library.  These components are:
+.IP 1. \w'1.\(em'u
+Network Configuration database access, see
+.BR netconfig (3).
+.PD 0
+.IP 2.
+Network Directory and address mapping, see
+.BR netdir (3).
+.IP 3.
+Network Path access, see
+.BR netpath (3).
+.PD
+.PP
+These are often refered to as the Network Selection facility of the Network
+Services Library.
+.PP
+.B _nderror
+contains the last name-to-address mapping function,
+.BR netdir (3),
+error number.
+.\"
+.\"
+.SH USAGE
+.PP
+.B _nderror
+is provided primarily for use by name-to-address mapping function shared object libraries as
+described in
+.BR netdir (5).
+It is not intended to be used directly by the name-to-address mapping function library user.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B _nderror
+is implemented as thread-specific data when linked with the
+.BR pthreads (3)
+library,
+.BR libpthreads.so .
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+When a name-to-address mapping function returns an error, it places the name-to-address error number
+in
+.BR _nderror .
+.\"
+.\"
+.SH ERRORS
+.PP
+The error string associated with the current value of
+.B _nderror
+can be obtained using the
+.BR netdir_sperror (3)
+function.  The string prefixed by a caller supplied string, a colon and a space, can be printed to
+standard error using the
+.BR netdir_perror (3)
+function.
+.PP
+.B _nderror
+can contain one of the following values:
+.TP \w'[\fBND_NO_RECOVERY\fR]\(em'u
+.RB [ ND_TRY_AGAIN ]
+.RI \(lq "n2a: non-authoritative host not found" \(rq
+.IP ""
+The host was not found, however, a name-to-address mapping function suffered a temporary failure
+(such as a timeout).
+.TP
+.RB [ ND_NO_RECOVERY ]
+.RI \(lq "n2a: non-recoverable error" \(rq
+.IP ""
+The last name-to-address translation function suffered an unrecoverable error in one of its lookup
+libraries.
+.TP
+.RB [ ND_NO_DATA ]
+.RI \(lq "n2a: no data record of requested type" \(rq
+.IP ""
+The last name-to-address translation function could find no data of the requested type in one of its
+lookup libraries.
+.TP
+.RB [ ND_NO_ADDRESS ]
+.RI \(lq "n2a: no data record of requested type" \(rq
+.IP ""
+The last name-to-address translation function could find no address of the requested type in one of
+its lookup libraries.
+.TP
+.RB [ ND_BADARG ]
+.RI \(lq "n2a: bad arguments passed to routine" \(rq
+.IP ""
+The last name-to-address translation function was passed a bad argument.
+.TP
+.RB [ ND_NOMEM ]
+.RI \(lq "n2a: memory allocation failed" \(rq
+.IP ""
+The last name-to-address translation function could not allocate memory necessary to complete the
+operation.
+.TP
+.RB [ ND_OK ]
+.RI \(lq "n2a: successful completion" \(rq
+.IP ""
+The last name-to-address translation function completed successfully, or there was no previous
+name-to-address translation function called.
+.TP
+.RB [ ND_NOHOST ]
+.RI \(lq "n2a: hostname not found" \(rq
+.IP ""
+The last name-to-address translation function,
+.BR netdir_getbyname (3),
+could not find, or does not support, the specified host name.
+.TP
+.RB [ ND_NOSERV ]
+.RI \(lq "n2a: service name not found" \(rq
+.IP ""
+The last name-to-address translation function,
+.BR netdir_getbyname (3),
+could not find, or does not support, the specified service name.
+.TP
+.RB [ ND_NOSYM ]
+.RI \(lq "n2a: symbol missing in shared object : %s" \(rq
+.IP ""
+One of the required symbols, see
+.BR netdir (5),
+was missing from a shared object specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
+.TP
+.RB [ ND_OPEN ]
+.RI \(lq "n2a: could not open shared object : %s" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened.
+.I %s
+is replaced with the last
+.BR dlerror (3)
+string.
+.TP
+.RB [ ND_ACCESS ]
+.RI \(lq "n2a: access denied for shared object" \(rq
+.IP ""
+One of the shared objects specified in the
+.I nc_lookup
+member of the
+.BR netconfig (5)
+structure referenced by a
+.I config
+argument could not be opened due to access permission.
+.TP
+.RB [ ND_UKNWN ]
+.RI \(lq "n2a: attempt to free unknown object" \(rq
+.IP ""
+.BR netdir_free (3)
+was called with an unknown
+.I struct_type
+argument value.
+.TP
+.RB [ ND_NOCTRL ]
+.RI \(lq "n2a: unknown option passed" \(rq
+.IP ""
+.BR netdir_options (3)
+was passed an unknown
+.I option
+argument value.
+.TP
+.RB [ ND_FAILCTRL ]
+.RI \(lq "n2a: control operation failed" \(rq
+.IP ""
+The
+.BR netdir_options (3)
+control operation failed.
+.TP
+.RB [ ND_SYSTEM ]
+.RI \(lq "n2a: system error" \(rq
+.IP ""
+During the last name-to-address translation function, a system error occurred.
+The
+.B Linux
+system error is in
+.BR errno (3).
+The
+.BR xti (3)
+error in
+.BR t_errno (3)
+might also provide some insight into the error.
+.TP
+.RB [ ND_NOCONVERT ]
+.RI \(lq "n2a: conversion not possible" \(rq
+.IP ""
+During the last name-to-address translation function it was discovered that character string
+conversion was not possible.
+.TP
+.RI [ other ]
+.RI \(lq "n2a: unknown error %d" \(rq
+.IP ""
+An internal error occured in the
+.BR libxnsl (3)
+library or a loaded shared object.
+.I %d
+is the decimal number of the error number that was contained in
+.BR _nderror (3).
+.PP
+When an error occurs, an error message can be printed to standard error or retrieved using
+.BR netdir_perror (3)
+or
+.BR netdir_sperror (3).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+The Network Configuration database file.  See
+.BR netconfig (5).
+.TP
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+.TP
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR netconfig (3),
+.BR netconfig (5),
+.BR netpath (3),
+.BR netdir (3),
+.BR netdir (5).
+.\"
+.\"
+.SH BUGS
+.PP
+.B _nderror
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B _nderror
+is compatible with
+.I "SVR 4.2"
+.[
+svr42
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+stores the error condition in
+.BR _nderror .
+.IP \(em
+Diagnostic message strings are not documented and are incompatible.
+.IP \(em
+Binary compatibility would only be coincidental.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are normally part of the Network Services
+Library,
+.BR libnsl ;
+however,
+.B Linux
+already has a library of that name (which unfortunately is missing these
+components), and, therefore,
+.B "@PACKAGE_TITLE@"
+renames the library to
+.BR libxnsl (3).
+.PP
+See
+.BR libxnsl (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The network configuration subroutines first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of network transport providers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

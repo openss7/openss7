@@ -1,0 +1,146 @@
+Source: @PACKAGE_LCNAME@
+Section: devel
+Priority: optional
+Maintainer: Brian F. G. Bidulock <bidulock@openss7.org>
+Standards-Version: 3.5.6.1
+Build-Depends: @kernel_source@-@kmajor@.@kminor@ | @kernel_headers@-@kmajor@.@kminor@,
+ gcc (>= 2.95.3), groff (>= 1.17.2), groff-base (>= 1.17.2),
+ gzip (>= 1.3.2), texinfo (>= 4.0), tetex-base (>=1.0),
+ tetex-bin (>=1.0), tetex-extra (>=1.0), gs (>= 6.51)
+
+Package: @PACKAGE_LCNAME@-lis-core-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-core-@VERSION@
+Conflicts: @PACKAGE_LCNAME@-core-@VERSION@
+Replaces: @PACKAGE_LCNAME@-core-@VERSION@
+Depends: @kernel_image@-@kversion@ (= @krelease@), lis-core-@STREAMS_VERSION@ (= @krelease@),
+ @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
+Pre-Depends: @kernel_image@-@kversion@ (= @krelease@), lis-core-@STREAMS_VERSION@ (= @krelease@)
+Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
+ Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for Linux
+ Fast-STREAMS.  Includes assorted Linux Fast-STREAMS drivers and
+ modules for @PACKAGE_TITLE@.  These binaries are heavily
+ tied to the kernel for which they were compiled: applies to kernel
+ version @kversion@ and requires an Linux Fast-STREAMS package
+ compiled for the same kernel.
+
+Package: @PACKAGE_LCNAME@-streams-core-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-core-@VERSION@
+Conflicts: @PACKAGE_LCNAME@-core-@VERSION@
+Replaces: @PACKAGE_LCNAME@-core-@VERSION@
+Depends: @kernel_image@-@kversion@ (= @krelease@), streams-core-@STREAMS_VERSION@ (= @krelease@),
+ @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
+Pre-Depends: @kernel_image@-@kversion@ (= @krelease@), streams-core-@STREAMS_VERSION@ (= @krelease@)
+Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
+ Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for STREAMS.
+ Includes assorted STREAMS drivers and modules for
+ @PACKAGE_TITLE@.  These binaries are heavily tied to the
+ kernel for which they were compiled: applies to kernel version
+ @kversion@ and requires an STREAMS package compiled for the same
+ kernel.
+
+Package: @PACKAGE_LCNAME@-lis-lib
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-lib
+Conflicts: @PACKAGE_LCNAME@-lib
+Replaces: @PACKAGE_LCNAME@-lib
+Depends: ${shlibs:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
+Description: Shared libraries for @PACKAGE_TITLE@ for
+ Linux Fast-STREAMS Run-time shared libraries necessary to run
+ applications programs and utilities developed for @PACKAGE_TITLE@
+ for Linux Fast-STREAMS.
+
+Package: @PACKAGE_LCNAME@-streams-lib
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-lib
+Conflicts: @PACKAGE_LCNAME@-lib
+Replaces: @PACKAGE_LCNAME@-lib
+Depends: ${shlibs:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
+Description: Shared libraries for @PACKAGE_TITLE@ for STREAMS
+ Run-time shared libraries necessary to run applications programs
+ and utilities developed for @PACKAGE_TITLE@ for STREAMS.
+
+Package: @PACKAGE_LCNAME@-lis-util
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-util
+Conflicts: @PACKAGE_LCNAME@-util
+Replaces: @PACKAGE_LCNAME@-util
+Depends: lis-lib (>= 2.18.1-0), ${shlibs:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
+Description: Utitlity and test programs for @PACKAGE_TITLE@ and
+ Linux Fast-STREAMS Adminstration and configuration test utilities
+ and commands for @PACKAGE_TITLE@ for Linux Fast-STREAMS.
+
+Package: @PACKAGE_LCNAME@-streams-util
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-util
+Conflicts: @PACKAGE_LCNAME@-util
+Replaces: @PACKAGE_LCNAME@-util
+Depends: streams-lib (>= 0.7a.3-0), ${shlibs:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
+Description: Utitlity and test programs for @PACKAGE_TITLE@ and STREAMS
+ Adminstration and configuration test utilities and commands for
+ @PACKAGE_TITLE@ for STREAMS.
+
+Package: @PACKAGE_LCNAME@-devel
+Architecture: any
+Section: devel
+Priority: optional
+Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-@PACKAGE_DEBRELEASE@)
+Description: C headers and static libraries for @PACKAGE_TITLE@
+ Static libraries and kernel headers to develop @PACKAGE_TITLE@
+ modules and drivers; user-space headers and static libraries
+ required to compile @PACKAGE_TITLE@ applications
+ programs.
+
+Package: @PACKAGE_LCNAME@-init
+Architecture: all
+Section: base
+Priority: optional
+Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
+Description: Init scripts and config files for @PACKAGE_TITLE@
+ SysV init scripts and configuration files for
+ @PACKAGE_TITLE@ for Linux Fast-STREAMS.
+
+Package: @PACKAGE_LCNAME@-dev
+Architecture: all
+Section: base
+Priority: optional
+Description: Character devices for @PACKAGE_TITLE@
+ Character special device definitions necessary to run applications
+ programs and utilities developed for @PACKAGE_TITLE@.
+
+Package: @PACKAGE_LCNAME@-doc
+Architecture: all
+Section: doc
+Priority: optional
+Description: Documentation and man pages for @PACKAGE_TITLE@
+ Pdf and html documentation for installation and the development of
+ @PACKAGE_TITLE@ applications, modules and drivers; and all
+ @PACKAGE_TITLE@ manual pages and info files for both kernel and
+ user-space functions.
+
+Package: @PACKAGE_LCNAME@-source
+Architecture: all
+Section: devel
+Priority: optional
+Description: Source code for @PACKAGE_TITLE@
+ Source code for building the @PACKAGE_TITLE@ release:
+ autoconf configuration utilities necessary to create and distribute
+ this dpkg -- required for recompiling against recompiled kernel.
+

@@ -1,0 +1,536 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: netpath.3.man,v 0.9.2.1 2006/09/25 12:30:49 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/09/25 12:30:49 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: netpath.3.man,v $
+.\" Revision 0.9.2.1  2006/09/25 12:30:49  brian
+.\" - added files for new strnsl package
+.\"
+.\" Revision 0.9.2.2  2006/09/22 20:54:21  brian
+.\" - added TI-RPC references
+.\"
+.\" Revision 0.9.2.1  2006/09/17 23:36:58  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.\"
+.\"
+.TH NETPATH 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B netpath, setnetpath, getnetpath, endnetpath
+\- Network Configuration path subroutines.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <netconfig.h>
+.HP
+.BI "void *setnetpath(void);"
+.HP
+.BI "struct netconfig *getnetpath(void *" handle );
+.HP
+.BI "int endnetpath(void *" handle );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I handle
+an opaque pointer returned by
+.BR setnetpath ()
+to be used as an argument to calls to
+.BR getnetpath ().
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.IR UNIX \(rg
+has traditionally provided three components of the Network Services Library,
+.BR libnsl ,
+that are associated with Transport Provider Interface,
+.BR tpi (7),
+.IR STREAMS (9)
+network pseudo-device drivers, and that are not currently part of the
+.B Linux
+Network Services Library.  These components are:
+.IP 1. \w'1.\(em'u
+Network Configuration database access, see
+.BR netconfig (3).
+.PD 0
+.IP 2.
+Network Directory and address mapping, see
+.BR netdir (3).
+.IP 3.
+Network Path access, see
+.BR netpath (3).
+.PD
+.PP
+These are often refered to as the Network Selection facility of the Network
+Services Library.
+.PP
+.BR setnetpath "(), " getnetpath "() and " endnetpath ()
+provide a mechanism to sequentialy access entries in the Network Configuration database that
+correspond to entries in the
+.RB { NETPATH }
+environment variable.  That is, the
+.RB { NETPATH }
+environment variable acts as a filter specification that filters network identifiers.
+.TP
+.BR setnetpath ()
+returns a pointer to an opaque datastructure used as a handle to the
+.BR getnetpath ()
+subroutine.
+.BR setnetpath ()
+is used to initialize client access to the database entries and set the access point to the first
+valid entry in the
+.RB { NETPATH }
+environment variable.  If the
+.RB { NETPATH }
+environment variable is not set, all of the entries in the
+.BR netconfig (5)
+database that are marked
+.RI \(lq visible \(rq
+will be used instead.
+.TP
+.BR getnetpath (),
+when called successively with the
+.I handle
+returned by the call to
+.BR setnetpath (),
+returns each valid Network Configuration database entry that appears in the
+.RB { NETPATH }
+environment variable starting with the first.  If the
+.RB { NETPATH }
+environment variable is not set, all of the database entries that are marked
+.RI \(lq visible \(rq
+will be used instead.
+Once the last entry is returned,
+.BR getnetpath ()
+will subsequently return
+.BR NULL .
+.TP
+.BR endnetpath ()
+releases client access to the database and frees for reuse any resources that were held by
+.BR setnetpath ()
+for use by
+.BR getnetpath ().
+.BR endnetpath ()
+must only be called with a
+.I handle
+returned from a previous and corresponding call to
+.BR setnetpath ().
+.BR endnetpath ()
+must be called for each call to
+.BR setnetpath ()
+with the corresponding
+.I handle
+pointer as the argument.
+.PP
+.BR nc_perror (3)
+and
+.BR nc_sperror (3)
+provide a mechanism for providing diagnostic messages upon failure.  These subroutines are used for
+both
+.BR netconfig (3)
+subroutines as well as the
+.B netpath
+subroutines described here.
+.\"
+.\"
+.SS "NETPATH FORMAT"
+.PP
+The format of the
+.RB { NETPATH }
+environment variable is a sequence of zero or more network identification strings as described in
+.BR netconfig (5),
+separated by colons.
+If the
+.RB { NETPATH }
+environment variable is not set, these subroutines act as though the
+.RB { NETPATH }
+environment variable consisted of each
+.RI \(lq visible \(rq
+network identification string entry in the
+.BR netconfig (5)
+database, in the order they occur in the database, separated by colons.
+.\"
+.\"
+.SS "DATABASE FORMAT"
+.PP
+The
+.BR netconfig
+structure is defined in
+.BR netconfig (3)
+and
+.BR netconfig (5).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR nc_perror (3)
+and
+.BR nc_sperror (3)
+must be called immediately after the failed network configuration subroutine fails.  Otherwise, the
+error condition may be lost.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR setnetpath ()
+returns an opaque pointer for use in the
+.BR getnetpath ()
+call.  Otherwise,
+.B NULL
+is returned and
+.IR nc_error (3)
+is set to indicate the error.
+.PP
+Upon successful completion, 
+.BR getnetpath ()
+return a pointer to a
+.BR netconfig (3)
+structure.  Otherwise, it returns
+.B NULL
+to indicate failure.
+.PP
+Upon successful completion,
+.BR endnetpath ()
+returns 0.  Otherwise, -1 is
+returned and
+.IR nc_error (3)
+is set to indicate the error.
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+When an error occurs, an error message can be printed to standard error or retrieved using
+.BR nc_perror (3)
+or
+.BR nc_sperror (3).
+.\"
+.\"
+.SH ERRORS
+.PP
+The
+.BR setnetpath ()
+subroutine will faile, and return a
+.B NULL
+pointer, if: an error was encountered opening the Network Configuration database,
+.BR /etc/netconfig ,
+see
+.BR netconfig (5).
+.PP
+The
+.BR getnetpath ()
+subroutine will fail, and return a
+.B NULL
+pointer, if:
+no etnries exist in the Network Configuration database corresponding to the
+.RB { NETPATH }
+environment variable; or, the last entry in the Network Configuration database associated with the
+.RB { NETPATH }
+environment variable has already been read with a previous call to
+.BR getnetpath ()
+and there are no more entries in the Network Configuration database corresponding to the
+.RB { NETPATH }
+environment variable.
+.PP
+The
+.BR endnetpath ()
+subroutine will fail if: the passed in
+.I handle
+argument is invalid; or,
+.BR endnetpath ()
+has already been called for the
+.I handle
+argument.
+.PP
+The following errors can be returned:
+.TP \w'[\fBNC_NOMOREENTRIES\fR]\(em'u
+.RB [ NC_NOERROR ]
+.RI \(lq "no error" \(rq
+.IP
+The last network selection function called was successful or no network selection function has yet
+been called.
+.TP
+.RB [ NC_NOMEM ]
+.RI \(lq "out of memory" \(rq
+.IP
+There was not sufficient memory for the last network selection function called to complete.
+.TP
+.RB [ NC_NOSET ]
+.RI \(lq "routine called before calling setnetpath() or setnetconfig()" \(rq
+.IP
+The last call to
+.BR endnetpath ()
+or
+.BR getnetpath (3)
+was called (incorrectly) before calling
+.BR setnetpath (3).
+.TP
+.RB [ NC_OPENFAIL ]
+.RI \(lq "cannot open /etc/netconfig" \(rq
+.IP
+The last call to a network selection function,
+.BR setnetpath (3),
+could not open the
+.B /etc/netconfig
+file.
+.TP
+.RB [ NC_BADLINE ]
+.RI \(lq "error in /etc/netconfig : field %d of line %d" \(rq
+.IP
+The last call to a network selection function detected a syntax error in the
+.B /etc/netconfig
+file at field
+.I %d
+of line
+.IR %d .
+.TP
+.RB [ NC_NOTFOUND ]
+.RI \(lq "netid not found in /etc/netconfig" \(rq
+.IP
+The
+.I netid
+argument to the last call to
+.BR getnetconfigent (3)
+was not found in
+.BR /etc/netconfig .
+.TP
+.RB [ NC_NOMOREENTRIES ]
+.RI \(lq "no more entries in /etc/netconfig" \(rq
+.IP
+The last call to network selection function
+.BR getnetpath (3)
+exhausted the entries in the
+.B /etc/netconfig
+file.
+.TP
+.RB [ ??? ]
+.RI \(lq "unknown error" \(rq
+.IP
+An internal error occured in the
+.BR libxnsl (3)
+library.
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+The Network Configuration database file.  See
+.BR netconfig (5).
+.TP
+.B /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+.TP
+.B /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+.TP
+.RB { NETPATH }
+This environment variable contains the network path.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR environ (5),
+.BR netconfig (5),
+.BR netconfig (3),
+.BR nc_perror (3),
+.BR nc_sperror (3),
+.BR netdir (3),
+.IR "RFC 1833" .
+.[
+rfc1833
+.]
+.\"
+.\"
+.SH BUGS
+.PP
+.BR setnetpath (),
+.BR getnetpath "() and "
+.BR endnetpath ()
+had no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These network configuraiton subroutines are compatible with
+.I "SVR 4.2"
+.[
+svr42
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+describe the
+.BR nc_sperror ()
+subroutine as returning a pointer to thread-specific data and that the buffer
+could change at any point.  While the error value is saved as thread-specific
+data, this implementation of
+.BR nc_sperror ()
+returns a pointer to a shared read-only string that is valid for the duration
+of the calling process.
+.IP \(em
+.B @PACKAGE_TITLE@
+stores the error condition in
+.IR nc_error (3).
+.IP \(em
+Diagnostic message strings are not documented and are incompatible.
+.IP \(em
+Binary compatibility would only be coincidental.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are normally part of the Network Services
+Library,
+.BR libnsl ;
+however,
+.B Linux
+already has a library of that name (which unfortunately is missing these
+components), and, therefore,
+.B "@PACKAGE_TITLE@"
+renames the library to
+.BR libxnsl (3).
+.PP
+See
+.BR libxnsl (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The network configuration subroutines first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of network transport providers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

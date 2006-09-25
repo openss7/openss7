@@ -1,0 +1,735 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: netconfig.5.man,v 0.9.2.1 2006/09/25 12:30:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/09/25 12:30:50 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: netconfig.5.man,v $
+.\" Revision 0.9.2.1  2006/09/25 12:30:50  brian
+.\" - added files for new strnsl package
+.\"
+.\" Revision 0.9.2.2  2006/09/22 20:54:23  brian
+.\" - added TI-RPC references
+.\"
+.\" Revision 0.9.2.1  2006/09/17 23:36:59  brian
+.\" - added manual pages
+.\"
+.\" Revision 0.9.2.1  2006/08/29 11:41:03  brian
+.\" - added manual pages
+.\"
+.\" Revision 0.9.2.4  2006/04/05 09:44:48  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.TH NETCONFIG 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B netconfig
+\- network configuration database.
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B /etc/netconfig
+.HP
+.BR #include " <" netconfig.h >
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The network configuration database file,
+.BR /etc/netconfig ,
+is a system file that contains configuration information for network services
+and, specifically, the Network Selection component of the Network Services Library,
+.BR libnsl (3).
+.PP
+Each entry in the network configuration database file can be represented by a
+.B netconfig
+structure, formatted as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct netconfig {
+    char *nc_netid;      /* network id string */
+    ulong nc_semantics;  /* service interface semantics */
+    ulong nc_flag;       /* flags */
+    char *nc_protofmly;  /* protocol family string */
+    char *nc_proto;      /* protocol name string */
+    char *nc_device;     /* STREAMS device path */
+    ulong nc_nlookups;   /* num. of name-to-address libs */
+    char **nc_lookups;   /* name-to-address libraries */
+    ulong nc_unused[9];  /* reserved for future use */
+};
+\s+1\fP
+.fi
+.PP
+Where
+.\".TP \w'\fInc_protofmly\fR\(em'u
+.TP
+.I nc_netid
+The network identifier string defined by the system administrator and unique
+to each entry in the network configuration database file.
+.TP
+.I nc_semantics
+The semantics describing the Transport Provider Interface,
+.BR tpi (7),
+transport service of the associated
+.I STREAMS
+device.
+.I nc_semantics
+can take on one of the
+following values (as described in
+.I RFC 1833
+.[\fR[\fB
+rfc1833
+.]\fR]),
+and contained in the
+.RB < sys/netconfig.h >
+header file:
+.RS
+.TP \w'NC_TPI_COTS_ORD\(em'u
+.B NC_TPI_CLTS
+Connectionless Transport Service.
+.PD 0
+.TP
+.B NC_TPI_COTS
+Connection-Oriented Transport Service.
+.TP
+.B NC_TPI_COTS_ORD
+Connection-Oriented Transport Service with Orderly Release.
+.TP
+.B NC_TPI_RAW
+Raw (Connectionless) Transport Service.
+.PD
+.RE
+.TP
+.I nc_flag
+Flags associated with the transport entry.
+.I nc_flag
+can take on one of the
+following values:
+.RS
+.TP \w'\fBNC_MULTICAST\fR\(em'u
+.B NC_NOFLAG
+No option flag is indicated.
+.PD
+.TP
+.B NC_VISIBLE
+The visible option flag is indicated.  This means that the network transport
+provider is visible to
+.BR getpath (3)
+when the
+.B NETPATH
+environment variable is not set.
+.TP
+.B NC_BROADCAST
+The broadcast option flag is indicated.  This means that the network transport
+provider supports broadcast addresses, and in particular, the
+.B HOST_BROADCAST
+universal address described in
+.BR netdir_getbyname (3).
+.TP
+.B NC_MULTICAST
+The multicast option flag is indicated.  This means that the network transport
+provider supports multicast addresses, and in particular, the
+.B HOST_ALLNODES
+and
+.B HOST_RPCNODES
+universal addresses described in
+.BR netdir_getbyname (3).
+.PD
+.RE
+.TP
+.I nc_protofmly
+The protocol family string assigned by the system adminstrator,
+but can be one of the following values (as described in
+.I RFC 1833
+.[\fR[\fB
+rfc1833
+.]\fR]),
+and contained in the
+.RB < sys/netconfig.h >
+header file:
+.RS
+.PP
+The following are RFC 1833 compliant:
+.TP \w'\fBNC_NOPROTOFMLY\fR\(em'u
+.B NC_NOPROTOFMLY
+.RI \(lq - \(rq,
+No protocol family specified.
+.PD 0
+.TP
+.B NC_LOOPBACK
+.RI \(lq loopback \(rq
+.TP
+.B NC_INET
+.RI \(lq inet \(rq
+.TP
+.B NC_INET6
+.RI \(lq inet6 \(rq
+.TP
+.B NC_IMPLINK
+.RI \(lq implink \(rq
+.TP
+.B NC_PUP
+.RI \(lq pup \(rq
+.TP
+.B NC_CHAOS
+.RI \(lq chaos \(rq
+.TP
+.B NC_NS
+.RI \(lq ns \(rq
+.TP
+.B NC_NBS
+.RI \(lq nbs \(rq
+.TP
+.B NC_ECMA
+.RI \(lq ecma \(rq
+.TP
+.B NC_DATAKIT
+.RI \(lq datakit \(rq
+.TP
+.B NC_CCITT
+.RI \(lq ccitt \(rq
+.TP
+.B NC_SNA
+.RI \(lq sna \(rq
+.TP
+.B NC_DECNET
+.RI \(lq decnet \(rq
+.TP
+.B NC_DLI
+.RI \(lq dli \(rq
+.TP
+.B NC_LAT
+.RI \(lq lat \(rq
+.TP
+.B NC_HYLINK
+.RI \(lq hylink \(rq
+.TP
+.B NC_APPLETALK
+.RI \(lq appletalk \(rq
+.TP
+.B NC_NIT
+.RI \(lq nit \(rq
+.TP
+.B NC_IEEE802
+.RI \(lq ieee802 \(rq
+.TP
+.B NC_OSI
+.RI \(lq osi \(rq
+.TP
+.B NC_X25
+.RI \(lq x25 \(rq
+.TP
+.B NC_OSINET
+.RI \(lq osinet \(rq
+.TP
+.B NC_GOSIP
+.RI \(lq gosip \(rq
+.PD
+.PP
+The following are Linux extensions:
+.TP \w'\fBNC_NOPROTOFMLY\fR\(em'u
+.B NC_AX25
+.RI \(lq ax25 \(rq
+.PD 0
+.TP
+.B NC_IPX
+.RI \(lq ipx \(rq
+.TP
+.B NC_NETROM
+.RI \(lq netrom \(rq
+.TP
+.B NC_BRIDGE
+.RI \(lq bridge \(rq
+.TP
+.B NC_ATMPVC
+.RI \(lq atmpvc \(rq
+.TP
+.B NC_ROSE
+.RI \(lq rose \(rq
+.TP
+.B NC_NETBEUI
+.RI \(lq netbeui \(rq
+.TP
+.B NC_ASH
+.RI \(lq ash \(rq
+.TP
+.B NC_ECONET
+.RI \(lq econet \(rq
+.TP
+.B NC_ATMSVC
+.RI \(lq atmsvc \(rq
+.TP
+.B NC_IRDA
+.RI \(lq irda \(rq
+.TP
+.B NC_PPPOX
+.RI \(lq pppox \(rq
+.TP
+.B NC_WANPIPE
+.RI \(lq wanpipe \(rq
+.TP
+.B NC_BLUETOOTH
+.RI \(lq bluetooth \(rq
+.PD
+.RE
+.TP
+.I nc_proto
+The protocol string assigned by the system administrator,
+but can be one of the following values (as described in
+.I RFC 1833
+.[\fR[\fB
+rfc1833
+.]\fR]),
+and contained in the
+.RB < sys/netconfig.h >
+header file:
+.RS
+.PP
+The following are RFC 1833 compliant:
+.TP \w'\fBNC_NOPROTOFMLY\fR\(em'u
+.B NC_NOPROTO
+.RI \(lq - \(rq,
+No protocol specified.
+.PD 0
+.TP
+.B NC_TCP
+.RI \(lq tcp \(rq,
+Protocol is TCP.
+.TP
+.B NC_UDP
+.RI \(lq udp \(rq,
+Protocol is UDP.
+.TP
+.B NC_ICMP
+.RI \(lq icmp \(rq,
+Protocol is ICMP.
+.PD
+.PP
+The following are Linux extensions:
+.TP \w'\fBNC_NOPROTOFMLY\fR\(em'u
+.B NC_SCTP
+.RI \(lq sctp \(rq,
+Protocol is SCTP.
+.PD
+.RE
+.TP
+.I nc_device
+The device path to a
+.I STREAMS
+.BR clone (4)
+device that provides access to the associated transport provider.
+.TP
+.I nc_nlookups
+The number of name to address translation libraries.
+.TP
+.I nc_lookups
+An array of address translation libraries.  The number of strings contained in
+this array is specified with the
+.I nc_nlookups
+field.
+.TP
+.I nc_unused
+Unused bytes reserved for future expansion.
+.RE
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+Entries consist of a number fo fields separated by newlines.  Fields are
+separated by wthiespace and occur in the order in chiwch they are described
+below.  Whitespace can be embedded as blanks or tabs.  Backslashes may be
+embedded as backslashes.  Lines that begin with a # (octothorpe) in column 1
+are treated as comments.  Each valid line in the file describe an available
+transport provider and service.  Each entry contains the following fields:
+.sp
+.RS
+.RI < networkid "> <" semanitcs "> <" flag "> <" protofamily "> <" protoname "> <" device "> <" nametoaddrlibs >
+.RE
+Where
+.\".TP \w'nametoaddrlibs\(em'u
+.TP
+.I networkid
+A network identification string assigned by the local system adminstrator.
+Typical names are:
+.BR udp6 ", " tcp ", " rawip ", " ticotsord ", etc.
+.TP
+.I semantics
+The semantics of the transport provider service interface.  This field can be
+one of the following Transport Provider Interface,
+.BR tpi (7),
+transport services:
+.sp
+.RS
+.TP \w'tpi_cots_ord\(em'u
+.B tpi_clts
+Connectionless transport service.
+.PD 0
+.TP
+.B tpi_cots
+Connection-oriented transport service.
+.TP
+.B tpi_cots_ord
+Connection-oriented (orderly release) transport service.
+.TP
+.B tpi_raw
+Raw (connectionless) transport service.
+.PD
+.RE
+.TP
+.I flag
+Either a
+.RB \(lq - \(rq
+or a sequence of letters,
+.RB \(lq v ,\(rq
+.RB \(lq b ,\(rq
+or
+.RB \(lq m \(rq
+as follows:
+.sp
+.RS
+.TP \w'\fBm\fR\(em'u
+.B -
+Indicates that no flags are specified.
+.PD
+.TP
+.B v
+Indicates that the visible flag is specified.  Visible network transports are
+exposed to the
+.BR getnetpath (3)
+subroutine when the
+.B NETPATH
+environment variable is not set.
+.TP
+.B b
+Indicates that the broadcast flag is specified.  Network transports with the broadcast flag set
+permit broadcast addresses, and in particular, support the
+.BR HOST_BROADCAST
+universal address described in
+.BR netdir_getbyname (3).
+.TP
+.B m
+Indicates that the multicast flag is specified.  Network transports with the multicast flags set
+permit multicast, and in particular, support the
+.BR HOST_ALLNODES
+and
+.BR HOST_RPCNODES
+universal addresses described in
+.BR netdir_getbyname (3).
+.PD
+.RE
+.TP
+.I protofamily
+The protocol family.  This can be one of the following:
+.sp
+.RS
+.TP \w'appletalk\(em'u
+.B -
+No protocol family applies (experimental).
+.PD 0
+.TP
+.B loopback
+Loopback interface (to local host).
+.TP
+.B inet
+Internet protocol version 4.
+.TP
+.B inet6
+Internet protocol version 6.
+.TP
+.B implink
+ARPANET imp addresses.
+.TP
+.B pup
+PUP protocols.
+.TP
+.B chaos
+MIT CHAOS protocols.
+.TP
+.B ns
+XEROX NS protocols.
+.TP
+.B nbs
+NBS protocols.
+.TP
+.B ecma
+ECMA (European Computer Manufactuers Association) protocols.
+.TP
+.B datakit
+DATAKIT protocols.
+.TP
+.B ccitt
+CCITT (IUT-T) protocols, X.25, etc.
+.TP
+.B sna
+IBM SNA (Synchronous Network Architecture) protocols.
+.TP
+.B decnet
+DECNET protocols.
+.TP
+.B dli
+Direct data link interface.
+.TP
+.B lat
+LAT.
+.TP
+.B hylink
+NSC Hyperchannel.
+.TP
+.B appletalk
+Apple Talk.
+.TP
+.B nit
+Network Interface Tap.
+.TP
+.B ieee802
+IEEE 802.2, also ISO 8802.
+.TP
+.B osi
+Umbrella for all families used by OSI.
+.TP
+.B x25
+CCITT (ITU-T) X.25.
+.TP
+.B osinet
+AFI = 47, IDI = 4.
+.TP
+.B gosip
+U.S. Government OSI.
+.PD
+.RE
+.TP
+.I protoname
+The protocol name.  This can be one of the following:
+.sp
+.RS
+.TP \w'icmp\(em'u
+.B -
+No protocol name applies.
+.PD 0
+.TP
+.B sctp
+Stream Control Transmission Protocol.
+.TP
+.B tcp
+Transmission Control Protocol.
+.TP
+.B udp
+User Datagram Protocol.
+.TP
+.B icmp
+Internet Control Message Protoocol.
+.TP
+.B ipx
+Internet Packet Exchange Protocol.
+.TP
+.B spx
+Sequenced Packet Exchange Protocol.
+.PD
+.RE
+.TP
+.I device
+The absolute filesystem path to the appropriate
+.I STREAMS
+device.  For example,
+.BR /dev/inet/tcp .
+.TP
+.I nametoaddrlibs
+Comma separated list of full path names to the name to address dynamic libraries providing a
+directory service for this network transport, or as dash,
+.RB \(lq - \(rq,
+indicating that there are no name to address directory service libraries.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is a sample network configuration database file:
+.sp
+.RS
+.nf
+\fC\s-1\
+#
+# Network configuration database file.
+#
+udp6       tpi_clts      v  inet6     udp  /dev/upd6       -
+tcp6       tpi_cots_ord  v  inet6     tcp  /dev/tcp6       -
+udp        tpi_clts      v  inet      udp  /dev/udp        -
+tcp        tpi_cots_ord  v  inet      tcp  /dev/tcp        -
+rawip      tpi_raw       -  inet      -    /dev/rawip      -
+ticlts     tpi_clts      v  loopback  -    /dev/ticlts     straddr.so
+ticots     tpi_cots      v  loopback  -    /dev/ticots     straddr.so
+ticotsord  tpi_cots_ord  v  loopback  -    /dev/ticotsord  straddr.so
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/netconfig
+contains the network configuration database.
+.TP
+.RB < netconfig.h >
+system header file describing the
+.B netconfig
+structure.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR getnetconfig (3),
+.BR getnetpath (3),
+.BR getnetdir (3),
+.BR netdir_getbyname (3),
+.IR "RFC 1833" .
+.[
+rfc1833
+.]
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B /etc/netconfig
+file is compatible with
+.I "SVR 4.2"
+.[
+svr42
+.]
+and implementations based on
+.I "SVR 4.2"
+such as
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+and
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+The
+.B /etc/netconfig
+file is only compatible with
+.I "SVR 4.2"
+for the purposes of populating the mapping for use by
+.BR libnsl.so
+in the
+.B "@PACKAGE_TITLE@"
+package.  Any other use fo the
+.B /etc/netconfig
+file is unsupported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2"
+documentation.
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B /etc/netconfig
+file first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

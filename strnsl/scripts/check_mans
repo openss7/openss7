@@ -1,0 +1,550 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_mans,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/09/25 03:36:57 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/09/25 03:36:57 $ by $Author: brian $
+#
+# =============================================================================
+
+me=`basename $0`
+errors=0
+warnings=0
+
+exec 5>>$top_builddir/$me.log
+
+export -p >&5
+
+function echo_v()
+{
+	echo "$me:  : $1"
+}
+function echo_t()
+{
+	echo "$me: T: $1"
+}
+function echo_s()
+{
+	case :"${MAINTAINER_MODE:-no}" in
+	(:verbose|:continue) echo "$me: S: $1" ;;
+	esac
+	echo "$me:$2: S: $1" >&5
+}
+function echo_d()
+{
+	echo "$me:$2: D: $1" >&5
+}
+function echo_e()
+{
+	echo "$me: E: --- $1" >&2
+	echo "$me:$2: E: $1" >&5
+	((errors++))
+}
+function echo_w()
+{
+#	if test :"${MAINTAINER_MODE:-no}" != :no ; then
+		echo "$me: W: --- $1" >&2
+#	fi
+	echo "$me:$2: W: $1" >&5
+	((warnings++))
+}
+function echo_fls()
+{
+	echo_s "$3" "$4"
+}
+function echo_flw()
+{
+	echo "$1:$2: warning: $3" >&2
+	echo "$me:$4: W: $3" >&5
+	((warnings++))
+}
+function echo_fle()
+{
+	echo "$1:$2: error: $3" >&2
+	echo "$me:$4: E: $3" >&5
+	((errors++))
+}
+
+export -p | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+if test :"${MAINTAINER_MODE:-no}" = :no
+then
+	echo_d "skipping test" $LINENO
+	exit 77
+fi
+
+man1_required_sections="
+NAME
+SYNOPSIS
+DESCRIPTION
+OPTIONS
+ERRORS|DIAGNOSTICS|ERROR[[:space:]]HANDLING
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man1_recommended_sections="
+SEE[[:space:]]ALSO|REFERENCES
+BUGS|CAVEATS
+COMPATIBILITY
+CONFORMANCE|CONFORMING[[:space:]]TO
+HISTORY|VERSIONS
+"
+man1_required_options="
+--help
+--version
+--copying
+"
+man2_required_sections="
+NAME
+SYNOPSIS
+DESCRIPTION
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man2_recommended_sections="
+ARGUMENTS|MEMBERS
+RETURN|RETURN[[:space:]]VALUE|MEMBERS
+ERRORS|ERROR[[:space:]]HANDLING|MEMBERS
+SEE[[:space:]]ALSO|REFERENCES
+CONFORMANCE|CONFORMING[[:space:]]TO
+HISTORY|VERSIONS
+"
+man2_required_options="
+"
+man3_required_sections="
+NAME
+SYNOPSIS|OVERVIEW
+DESCRIPTION
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man3_recommended_sections="
+ARGUMENTS|MEMBERS|OVERVIEW
+RETURN|RETURN[[:space:]]VALUE|MEMBERS|OVERVIEW
+ERRORS|ERROR[[:space:]]HANDLING|MEMBERS|OVERVIEW
+SEE[[:space:]]ALSO|REFERENCES
+COMPATIBILITY
+CONFORMANCE|CONFORMING[[:space:]]TO
+HISTORY|VERSIONS
+"
+man3_required_options="
+"
+man4_required_sections="
+NAME
+DESCRIPTION
+FILES|DEVICES|MODULES|IOCTLS
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man4_recommended_sections="
+"
+man4_required_options="
+"
+man5_required_sections="
+NAME
+DESCRIPTION
+FILES|DEVICES
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man5_recommended_sections="
+"
+man5_required_options="
+"
+man6_required_sections="
+NAME
+DESCRIPTION
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man6_recommended_sections="
+"
+man6_required_options="
+"
+man7_required_sections="
+NAME
+SYNOPSIS
+DESCRIPTION
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man7_recommended_sections="
+"
+man7_required_options="
+"
+man8_required_sections="
+NAME
+SYNOPSIS
+DESCRIPTION
+OPTIONS
+ERRORS|DIAGNOSTICS|ERROR[[:space:]]HANDLING
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man8_recommended_sections="
+SEE[[:space:]]ALSO|REFERENCES
+BUGS|CAVEATS
+COMPATIBILITY
+CONFORMANCE|CONFORMING[[:space:]]TO
+HISTORY|VERSIONS
+"
+man8_required_options="
+--help
+--version
+--copying
+"
+man9_required_sections="
+NAME
+SYNOPSIS|OVERVIEW|FORMAT
+DESCRIPTION
+IDENTIFICATION|AUTHOR|COPYRIGHT
+"
+man9_recommended_sections="
+ARGUMENTS|MEMBERS|OVERVIEW|FORMAT
+RETURN|RETURN[[:space:]]VALUE|MEMBERS|OVERVIEW|FORMAT
+ERRORS|ERROR[[:space:]]HANDLING|MEMBERS|OVERVIEW|FORMAT
+SEE[[:space:]]ALSO|REFERENCES
+CONTEXT|MEMBERS|FORMAT
+MP-STREAMS|MEMBERS|FORMAT
+COMPATIBILITY
+CONFORMANCE|CONFORMING[[:space:]]TO
+HISTORY|VERSIONS
+"
+man9_required_options="
+"
+if test -n "$PKG_MANPATH" ; then
+	manpath="$PKG_MANPATH"
+else
+	manpath="${top_builddir}/doc/man:${top_builddir}/man:${top_builddir}:./doc/man:./man:.${mandir:+:${mandir}}"
+fi
+
+searchpath=`echo "$manpath" | sed -e 's|:| |g'`
+
+for page in $MANS
+do
+	base=`basename $page`
+	# check for cross reference
+	echo_d "head -1 $page | grep -x -q '\.so.*'"
+	if ( head -1 $page | grep -x -q '\.so.*' >/dev/null 2>&1 ) ; then
+		xpage=`head -1 $page | sed -e 's|^\.so[[:space:]]*||'`
+		xbase=`basename $xpage`
+		if test "$xbase" != "$base"
+		then
+			echo_s "manual page $base refers to $xbase" $LINENO
+			echo "$xpage" >> ${top_builddir}/check_used.log
+		fi
+	fi
+done
+
+if test -f ${top_builddir}/check_used.log ; then
+	pagelist=`cat ${top_builddir}/check_used.log | sort | uniq`
+else
+	pagelist=
+fi
+
+usedpages=
+for page in $pagelist ; do
+	usedpages="${usedpages:+$usedpages }$page"
+done
+unusedpages=
+for page in $MANS_UNUSED ; do
+	unusedpages="${unusedpages:+$unusedpages }$page"
+done
+exemptpages=
+for page in $MANS_EXEMPT ; do
+	exemptpages="${exemptpages:+$exemptpages }$page"
+done
+
+echo_d "Used pages are: $usedpages" $LINENO
+echo_d "Unused pages are: $unusedpages" $LINENO
+echo_d "Exempt pages are: $exemptpages" $LINENO
+
+for page in $MANS
+do
+	base=`basename $page`
+	echo_t "testing manual page $base"
+	#
+	# check for conflicts that would freak rpm out
+	#
+	#echo_v "testing manual page $base for conflicts"
+	for dir in $searchpath ; do
+		: #echo_t "testing for conflicts to manual page in $dir"
+		test -d $dir || continue
+		conflict=
+		if test -f $dir/$page ; then
+			test $dir/$page -ef $page && continue
+			conflict="$dir/$page"
+		elif test -f $dir/$page.gz ; then
+			conflict="$dir/$page.gz"
+		elif test -f $dir/$page.bz2 ; then
+			conflict="$dir/$page.bz2"
+		else
+			continue
+		fi
+		echo_e "manual page $base conflicts with $conflict" $LINENO
+	done
+	#
+	# check if the page was used
+	#
+	#echo_v "testing manual page $base for use"
+	case " $usedpages " in
+	*" $page "*)
+		echo_s "manual page $page is used" $LINENO ;;
+	*)
+		if ( echo $page | egrep '\.(5|7)' >/dev/null 2>&1 ) ; then
+			echo_s "manual page $page is unused" $LINENO
+		else
+			case " $unusedpages " in
+			*" $page "*)
+				echo_w "manual page $page is unused" $LINENO ;;
+			*)	echo_e "manual page $page is unused" $LINENO ;;
+			esac
+		fi ;;
+	esac
+	# check for cross reference
+	xref='no'
+	echo_d "head -1 $page | grep -x -q '\.so.*'"
+	if ( head -1 $page | grep -x -q '\.so.*' >/dev/null 2>&1 ) ; then
+		xpage=`head -1 $page | sed -e 's|^\.so[[:space:]]*||'`
+		xbase=`basename $xpage`
+		if test "$xbase" != "$base"
+		then
+			echo_s "manual page $base refers to $xbase" $LINENO
+			xref='yes'
+		fi
+	fi
+        # if we have a cross-reference to another manual page from another package
+	# we won't be able to format it, so check if it exists elsewhere first
+	format=yes
+	if test :$xref = :yes ; then
+		for dir in $searchpath ; do
+			test -d $dir || continue
+			if test -f $dir/$xpage -a $dir/$xpage -ef $xpage ; then
+				# referenced page is local, test format
+				format=yes
+				break
+			fi
+			if test -f $dir/$xpage -o -f $dir/$xpage.gz -o -f $dir/$xpage.bz2 ; then
+				echo_s "manual page $base refers to $dir/$xpage" $LINENO
+				format=no
+				break
+			fi
+		done
+	fi
+	if test :"$format" = :no ; then
+		continue
+	fi
+	# can we format it?
+	: #echo_t "testing formatting of page $base"
+#	echo_d "( man -M $manpath $page | sed -e 's/.[[:cntrl:]]//g' ) > ${me}_$$.out 2> ${me}_$$.err" $LINENO
+#	if ( man -M $manpath $page | sed -e 's/.[[:cntrl:]]//g' ) > ${me}_$$.out 2> ${me}_$$.err \
+	# note that SuSE 10.0 cannot handle mixed paths and full path files as above
+	# only thing is this causes problems for FC5
+	# I wish the distros would get together on 'man' program behavior
+	root=`echo $base | sed -e 's,\.[1-9][^\.]*,,'`
+	# Solution for FC5 is to strip any 's's from the end of the section.
+	# It looks them up all right, just not under section name 2s or 4s.
+	sect=`echo $base | sed -e 's,.*\.,,;s,s$,,'`
+	echo_d "( man -M $manpath $sect $root | sed -e 's/.[[:cntrl:]]//g' ) > ${me}_$$.out 2> ${me}_$$.err" $LINENO
+	if ( man -M $manpath $sect $root | sed -e 's/.[[:cntrl:]]//g' ) > ${me}_$$.out 2> ${me}_$$.err \
+		&& test -n "`cat ${me}_$$.out`" \
+		&& test -z "`cat ${me}_$$.err | grep -v warning | grep -v 'character above first line discarded' | grep -v 'Reformatting.*please wait'`"
+	then
+		echo_s "manual page $base formats correctly" $LINENO
+	else
+		echo_e "error formatting manual page $page" $LINENO
+		echo_d "stderr was:" $LINENO
+		while read line
+		do 
+			echo_d "$line" $LINENO
+		done < ${me}_$$.err
+		echo_d "stdout was:" $LINENO
+		while read line
+		do 
+			echo_d "$line" $LINENO
+		done < ${me}_$$.out
+		echo_d "rm -f ${me}_$$.out ${me}_$$.err" $LINENO
+		rm -f ${me}_$$.out ${me}_$$.err
+		continue
+	fi
+	if test :"$xref" = :yes ; then
+		continue
+	fi
+	# check for sections and options
+	case $base in
+		*.1*) section=man1 ;;
+		*.2*) section=man2 ;;
+		*.3*) section=man3 ;;
+		*.4*) section=man4 ;;
+		*.5*) section=man5 ;;
+		*.6*) section=man6 ;;
+		*.7*) section=man7 ;;
+		*.8*) section=man8 ;;
+		*.9*) section=man9 ;;
+		*) echo_w "cannot find base for $base" $LINENO
+			continue ;;
+	esac
+	eval "required_sections=\"\$${section}_required_sections\""
+	eval "recommended_sections=\"\$${section}_recommended_sections\""
+	eval "required_options=\"\$${section}_required_options\""
+	: #echo_t "testing $base for required sections"
+	for target in $required_sections
+	do
+		: #echo_t "testing $base for required section $target"
+		echo_d "egrep -- \"$target\" ${me}_$$.out >/dev/null 2>&1" $LINENO
+		if (egrep -- "$target" ${me}_$$.out >/dev/null 2>&1)
+		then
+			echo_s "found in $base, section $target" $LINENO
+		else
+			t=`echo $target | sed -e "s/\[\[:space:\]\]/ /g;s/|/ or /g;s/'//g"`
+			if test :"${MAINTAINER_MODE:-no}" != :no
+			then
+				echo_e "cannot find section $t in $base" $LINENO
+				echo_d "formatted manpage was:" $LINENO
+				while read line
+				do
+					echo_d "$line" $LINENO
+				done < ${me}_$$.out
+				continue
+			else
+				echo_w "cannot find section $t in $base" $LINENO
+			fi
+		fi
+	done
+	: #echo_t "testing $base for recommended sections"
+	for target in $recommended_sections
+	do
+		: #echo_t "testing $base for recommended section $target"
+		echo_d "egrep -- \"$target\" ${me}_$$.out >/dev/null 2>&1" $LINENO
+		if (egrep -- "$target" ${me}_$$.out >/dev/null 2>&1)
+		then
+			echo_s "found in $base, section $target" $LINENO
+		else
+			t=`echo $target | sed -e "s/\[\[:space:\]\]/ /g;s/|/ or /g;s/'//g"`
+			if test :"${MAINTAINER_MODE:-no}" != :no
+			then
+				echo_w "cannot find section $t in $base" $LINENO
+			else
+				echo_s "cannot find section $t in $base" $LINENO
+			fi
+		fi
+	done
+	: #echo_t "testing $base for required options"
+	for target in $required_options
+	do
+		: #echo_t "testing $base for required option $target"
+		echo_d "egrep -- \"$target\" ${me}_$$.out >/dev/null 2>&1" $LINENO
+		if (egrep -- "$target" ${me}_$$.out >/dev/null 2>&1)
+		then
+			echo_s "found in $base, option $target" $LINENO
+		else
+			case " $exemptpages " in
+				*" $page "*) continue ;;
+			esac
+			t=`echo $target | sed -e "s/\[\[:space:\]\]/ /g;s/|/ or /g;s/'//g"`
+			if test :"${MAINTAINER_MODE:-no}" != :no
+			then
+				echo_e "cannot find option $t in $base" $LINENO
+				echo_d "formatted manpage was:" $LINENO
+				while read line
+				do
+					echo_d "$line" $LINENO
+				done < ${me}_$$.out
+				continue
+			else
+				echo_w "cannot find option $t in $base" $LINENO
+			fi
+		fi
+	done
+	echo_d "rm -f ${me}_$$.out ${me}_$$.err" $LINENO
+	rm -f ${me}_$$.out ${me}_$$.err
+done
+
+#
+# Another check: check manpages that exist in the source directory that are not
+# included in the build directory.  These are manpages that have been struck
+# from the install lists but have not been struck from CVS or the distribution.
+# Warn about these.
+#
+srcdir=`(cd $srcdir; pwd)`
+srcmask=`echo "$srcdir" | sed -e 's|.|.|g'`
+for spage in `find ${srcdir} -name "*.man" -type f -size +0`
+do
+	echo_t "testing source page $spage"
+	page=`echo "$spage" | sed -e 's|^'$srcmask'/||;s|\.man$||'`
+	sect=`echo "$page" | sed -e 's|^man||;s|/.*$||'`
+	case $page in
+		*."$sect"*) ;;
+		*) page="$page.$sect" ;;
+	esac
+	if test -f ./$page
+	then echo_s "target page $page exists" $LINENO
+	else echo_flw $spage 1 "target page $page does not exist for source file" $LINENO
+	fi
+done
+
+
+retval=0
+if test $warnings -gt 0
+then
+	echo_v "--------------"
+	echo_v "Warning summary:"
+	echo_v "--------------"
+	egrep -- '\<W:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	retval=77
+fi
+if test $errors -gt 0
+then
+	echo_v "--------------"
+	echo_v "Error summary:"
+	echo_v "--------------"
+	egrep -- '\<E:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	if test :"${MAINTAINER_MODE:-no}" = :continue
+	then
+		retval=77
+	else
+		retval=1
+	fi
+fi
+
+exit $retval
