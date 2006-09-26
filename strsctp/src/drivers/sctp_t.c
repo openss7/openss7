@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/14 06:58:24 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 01:03:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/14 06:58:24 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 01:03:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/14 06:58:24 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 01:03:40 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/14 06:58:24 $";
+    "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 01:03:40 $";
 
 #define __NO_VERSION__
 
@@ -452,8 +452,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->status = T_SUCCESS;
 		*((t_scalar_t *) * p)++ = sctp_default_sid;
 	}
-	/* 
-	   note ssn and tsn are per-packet */
+	/* note ssn and tsn are per-packet */
 
 	if (!ops || ops->ropt) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -800,8 +799,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->status = T_SUCCESS;
 		*((t_scalar_t *) * p)++ = sp->sid;
 	}
-	/* 
-	   note ssn and tsn are per-packet */
+	/* note ssn and tsn are per-packet */
 
 	if (!ops || ops->ropt) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1615,12 +1613,10 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 		}
 	}
 	if (ops->opts) {
-		/* 
-		   not supported yet */
+		/* not supported yet */
 	}
 	if (ops->reuse) {
-		/* 
-		   not supported yet */
+		/* not supported yet */
 	}
 	if (ops->tos) {
 		if (ops->tos->len >= olen) {
@@ -1692,12 +1688,10 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 		}
 	}
 	if (ops->ssn) {
-		/* 
-		   not writeable */
+		/* not writeable */
 	}
 	if (ops->tsn) {
-		/* 
-		   not writeable */
+		/* not writeable */
 	}
 	if (ops->ropt) {
 		if (ops->ropt->len >= olen) {
@@ -1844,8 +1838,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 		}
 	}
 	if (ops->mseg) {
-		/* 
-		   not writeable */
+		/* not writeable */
 	}
 	if (ops->debug) {
 		if (ops->debug->len >= olen) {
@@ -1857,16 +1850,13 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 		}
 	}
 	if (ops->hb) {
-		/* 
-		   not support yet */
+		/* not support yet */
 	}
 	if (ops->rto) {
-		/* 
-		   not support yet */
+		/* not support yet */
 	}
 	if (ops->status) {
-		/* 
-		   not writeable */
+		/* not writeable */
 	}
 	return;
 }
@@ -1881,7 +1871,7 @@ sctp_check_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (!ops)
 		return;
 	ops->flags = TF_SCTP_ALLOPS;
-	/* 
+	/*
 	 *  FIXME: actually check some options.
 	 */
 	fixme(("Actually check some options.\n"));
@@ -1928,8 +1918,7 @@ t_conn_ind(sctp_t * sp, mblk_t *cp)
 				p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
 				p->SEQ_number = (ulong) cp;
 
-				/* 
-				   place address information from cookie */
+				/* place address information from cookie */
 				if (danum)
 					*((uint16_t *) mp->b_wptr)++ = ck->dport;
 				if (danum--)
@@ -1937,8 +1926,7 @@ t_conn_ind(sctp_t * sp, mblk_t *cp)
 				while (danum--)
 					*((uint32_t *) mp->b_wptr)++ = *daptr++;
 
-				/* 
-				   indicate options */
+				/* indicate options */
 				oh = ((struct t_opthdr *) mp->b_wptr)++;
 				oh->len = str_len;
 				oh->level = T_INET_SCTP;
@@ -1946,8 +1934,7 @@ t_conn_ind(sctp_t * sp, mblk_t *cp)
 				oh->status = T_SUCCESS;
 				*((t_scalar_t *) mp->b_wptr)++ = ck->n_istr;
 
-				/* 
-				   indicate options */
+				/* indicate options */
 				oh = ((struct t_opthdr *) mp->b_wptr)++;
 				oh->len = str_len;
 				oh->level = T_INET_SCTP;
@@ -2000,15 +1987,13 @@ t_conn_con(sctp_t * sp)
 			p->OPT_length = opt_len;
 			p->OPT_offset = opt_len ? sizeof(*p) + res_len : 0;
 
-			/* 
-			   place destination (responding) address */
+			/* place destination (responding) address */
 			if (sd)
 				*((uint16_t *) mp->b_wptr)++ = sp->dport;
 			for (; sd; sd = sd->next)
 				*((uint32_t *) mp->b_wptr)++ = sd->daddr;
 
-			/* 
-			   indicate options */
+			/* indicate options */
 			oh = ((struct t_opthdr *) mp->b_wptr)++;
 			oh->len = str_len;
 			oh->level = T_INET_SCTP;
@@ -2016,8 +2001,7 @@ t_conn_con(sctp_t * sp)
 			oh->status = T_SUCCESS;
 			*((t_scalar_t *) mp->b_wptr)++ = sp->n_istr;
 
-			/* 
-			   indicate options */
+			/* indicate options */
 			oh = ((struct t_opthdr *) mp->b_wptr)++;
 			oh->len = str_len;
 			oh->level = T_INET_SCTP;
@@ -2266,7 +2250,7 @@ t_error_ack(sctp_t * sp, ulong prim, long err)
 		case TS_WACK_DREQ11:
 			sp->i_state = TS_WREQ_ORDREL;
 			break;
-			/* 
+			/*
 			 *  Note: if we are not in a WACK state we simply do
 			 *  not change state.  This occurs normally when we
 			 *  send TOUTSTATE or TNOTSUPPORT or are responding to
@@ -2338,7 +2322,7 @@ t_ok_ack(sctp_t * sp, ulong prim, ulong seq, ulong tok)
 			else
 				sp->i_state = TS_IDLE;
 			break;
-			/* 
+			/*
 			 *  Note: if we are not in a WACK state we simply do
 			 *  not change state.  This occurs normally when we
 			 *  are responding to a T_OPTMGMT_REQ in other than
@@ -2444,8 +2428,7 @@ t_optdata_ind(sctp_t * sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t ts
 			p->OPT_length = opt_len;
 			p->OPT_offset = opt_len ? sizeof(*p) : 0;
 
-			/* 
-			   indicate options */
+			/* indicate options */
 			if (sp->i_flags & TF_SCTP_RECVOPT) {
 				oh = ((struct t_opthdr *) mp->b_wptr)++;
 				oh->len = str_len;
@@ -2701,8 +2684,7 @@ t_conn_req(sctp_t * sp, mblk_t *mp)
 		struct t_opthdr *rto = NULL;
 		struct t_opthdr *hb = NULL;
 
-		/* 
-		   address per-association options */
+		/* address per-association options */
 		if (p->OPT_length) {
 			unsigned char *op = mp->b_rptr + p->OPT_offset;
 			unsigned char *oe = op + p->OPT_length;
@@ -2776,12 +2758,10 @@ t_conn_req(sctp_t * sp, mblk_t *mp)
 				goto error;
 		}
 #if 0
-		/* 
-		   allocate addresses now */
+		/* allocate addresses now */
 		if ((err = sctp_alloc_daddrs(sp, a->port, a->addr, anum)))
 			goto error;
-		/* 
-		   address per-destination options */
+		/* address per-destination options */
 		if (rto) {
 			struct sctp_daddr
 			*sd;
@@ -2910,8 +2890,7 @@ t_conn_res(sctp_t * sp, mblk_t *mp)
 		goto badf;
 	if (ap->i_state == TS_IDLE && ap->conind)
 		goto resqlen;
-	/* 
-	   protect at least r00t streams from users */
+	/* protect at least r00t streams from users */
 	if (sp->cred.cr_uid != 0 && ap->cred.cr_uid != sp->cred.cr_uid)
 		goto access;
 	{
@@ -2919,8 +2898,7 @@ t_conn_res(sctp_t * sp, mblk_t *mp)
 		struct t_opthdr *rto = NULL;
 		struct t_opthdr *hb = NULL;
 
-		/* 
-		   address per-association options */
+		/* address per-association options */
 		if (p->OPT_length) {
 			unsigned char *op = mp->b_rptr + p->OPT_offset;
 			unsigned char *oe = op + p->OPT_length;
@@ -2986,8 +2964,7 @@ t_conn_res(sctp_t * sp, mblk_t *mp)
 				goto error;
 		}
 #if 0
-		/* 
-		   address per-destination options */
+		/* address per-destination options */
 		if (rto) {
 			struct sctp_daddr
 			*sd;
@@ -3368,8 +3345,7 @@ t_bind_req(sctp_t * sp, mblk_t *mp)
 		if ((mlen < p->ADDR_offset + p->ADDR_length) ||
 		    (p->ADDR_length != sizeof(*a) + anum * sizeof(a->addr[0])))
 			goto badaddr;
-		/* 
-		   we don't allow wildcards just yet */
+		/* we don't allow wildcards just yet */
 		if (!anum || (!a->port && !(a->port = sctp_get_port())))
 			goto noaddr;
 		if (sp->cred.cr_uid != 0 && a->port < 1024)
@@ -3495,8 +3471,7 @@ t_optmgmt_req(sctp_t * sp, mblk_t *mp)
 			sctp_negotiate_opts(sp, opsp);
 			return t_optmgmt_ack(sp, flags, opsp);
 		case T_DEFAULT:
-			/* 
-			   return defaults for the specified options */
+			/* return defaults for the specified options */
 		case T_CURRENT:
 			return t_optmgmt_ack(sp, flags, opsp);
 		default:
