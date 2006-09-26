@@ -2,7 +2,7 @@
 # vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # 
-# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/14 00:10:02 $
+# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/26 06:13:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/14 00:10:02 $ by $Author: brian $
+# Last Modified $Date: 2006/09/26 06:13:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: send-pr,v $
+# Revision 0.9.2.8  2006/09/26 06:13:59  brian
+# - add a few things, correct a few things
+#
 # Revision 0.9.2.7  2006/07/14 00:10:02  brian
 # - added more files to output
 #
@@ -108,14 +111,14 @@ dir=`dirname $0`
 path=`(cd $dir ; pwd)`
 errors=0
 warnings=0
-revision='$Revision: 0.9.2.7 $'
+revision='$Revision: 0.9.2.8 $'
 
 exec 5>${top_builddir}${top_builddir+/}$me.log
 
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.7 $) $Date: 2006/07/14 00:10:02 $'
+ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.8 $) $Date: 2006/09/26 06:13:59 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1325,6 +1328,11 @@ EOF
     fi
 }
 
+# always dump the base procs
+hardware_procs="/proc/cpuinfo /proc/pci /proc/devices /proc/ioports"
+software_procs="/proc/module /proc/meminfo /proc/slabinfo"
+stsubsys_procs="/proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw"
+
 function targetpr()
 {
     target=$1
@@ -1335,7 +1343,7 @@ function targetpr()
 	class=install
 	severity=serious
 	files="configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/streams/strinfo $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     (compile.log)
 #	filename=compile.pr
@@ -1343,7 +1351,7 @@ function targetpr()
 	class=software
 	severity=serious
 	files="compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/streams/strinfo $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     (check.log)
 #	filename=check.pr
@@ -1351,7 +1359,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/streams/strinfo $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     (install.log)
 #	filename=install.pr
@@ -1359,7 +1367,7 @@ function targetpr()
 	class=install
 	severity=serious
 	files="install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     (installcheck.log)
 #	filename=installcheck.pr
@@ -1367,7 +1375,7 @@ function targetpr()
 	class=software
 	severity=critical
 	files="*/tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     (uninstall.log)
 #	filename=uninstall.pr
@@ -1375,7 +1383,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="uninstall.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     (remove.log)
 #	filename=remove.pr
@@ -1383,7 +1391,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="remove.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     (dist.log|distcheck.log|rpms.log|sign.log|rebuild.log|resign.log|release.log|release-sign.log|srpm.log)
 #	filename=`echo "$target" | sed -e 's|\.log$|.pr|'`
@@ -1391,7 +1399,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="$1 remove.log uninstall.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     (none|*)
 #	filename=problem.pr
@@ -1399,7 +1407,7 @@ function targetpr()
 	class=software
 	severity=serious
 	files="config.log */config.log */tests/testsuite.log tests/testsuite.log ${targets[*]} $ap_cache_file $ap_CONFIG_SITE"
-	envfiles="/proc/cpuinfo /proc/meminfo /proc/slabinfo /proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw $$ap_ksyms $ap_kallsyms ap_kconfig $ap_ksysmap"
+	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_ksyms $ap_kallsyms $ap_kconfig $ap_ksysmap"
 	;;
     esac
     filename='problem.pr'
