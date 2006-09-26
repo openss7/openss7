@@ -1,3 +1,17 @@
+2006-09-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: reordered includes
+	* src/drivers/sctp_cache.c: rationalized to stacks package
+	* src/drivers/sctp_hash.c: rationalized to stacks package
+	* src/drivers/sctp_input.c: rationalized to stacks package
+	* src/drivers/sctp_msg.c: rationalized to stacks package
+	* src/drivers/sctp_output.c: rationalized to stacks package
+	* src/drivers/sctp_route.c: rationalized to stacks package
+	* src/drivers/sctp_t.c: rationalized to stacks package
+	* src/test/test-sctp.c: rationalized to stacks package
+	* src/test/test-sctp_nc.c: rationalized to stacks package
+	* src/test/test-sctp_ns.c: rationalized to stacks package
+
 2006-09-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release notes

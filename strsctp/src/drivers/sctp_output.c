@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:26:23 $
+ @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 00:54:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/02 12:26:23 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:54:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:26:23 $"
+#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 00:54:52 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:26:23 $";
+    "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 00:54:52 $";
 
 #define __NO_VERSION__
 
@@ -288,8 +288,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 			rare();
 	} else
 		rare();
-	/* 
-	   sending OOTB reponses are one time events, if we can't send the message we just drop it, 
+	/* sending OOTB reponses are one time events, if we can't send the message we just drop it, 
 	   the peer will probably come back again later */
 	freemsg(mp);
 	return;
@@ -370,8 +369,7 @@ sctp_xmit_msg(daddr, mp, sp)
 			rare();
 	} else
 		rare();
-	/* 
-	   sending INIT ACKs are one time events, if we can't get the response off, we just drop
+	/* sending INIT ACKs are one time events, if we can't get the response off, we just drop
 	   the INIT ACK: the peer should send us another INIT * in a short while... */
 	freemsg(mp);
 	return;
@@ -498,8 +496,7 @@ sctp_send_msg(sp, sd, mp)
 						}
 					}
 					{
-						/* 
-						   pad each chunk if not padded already */
+						/* pad each chunk if not padded already */
 						size_t pad = PADC(clen) - clen;
 
 						ensure(head + plen >= data + pad, kfree_skb(skb);
@@ -520,7 +517,7 @@ sctp_send_msg(sp, sd, mp)
 				sh->check = htonl(crc32c(~0UL, (unsigned char *) sh, plen));
 
 				NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
-				/* 
+				/*
 				 *  Whenever we transmit something, we expect a reply to our v_tag, so
 				 *  we put ourselves in the 1st level vtag caches expecting a quick
 				 *  reply.

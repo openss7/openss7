@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/16 12:46:49 $
+ @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/26 00:54:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/16 12:46:49 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:54:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/16 12:46:49 $"
+#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/26 00:54:51 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/16 12:46:49 $";
+    "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/26 00:54:51 $";
 
 #define __NO_VERSION__
 
@@ -212,8 +212,7 @@ sctp_rcv_ootb(mblk_t *mp)
 	seldom();
 	ensure(mp, return (-EFAULT));
 	if (sat != RTN_UNICAST && sat != RTN_LOCAL) {
-		/* 
-		   RFC 2960 8.4(1). */
+		/* RFC 2960 8.4(1). */
 		freemsg(mp);
 		return (0);
 	}
@@ -334,8 +333,7 @@ sctp_rcv(struct sk_buff *skb)
 	frtn_t fr = { &sctp_free, (char *) skb };
 
 	if (skb->pkt_type == PACKET_HOST) {
-		/* 
-		   For now...  We should actually place non-linear fragments into seperate mblks
+		/* For now...  We should actually place non-linear fragments into seperate mblks
 		   and pass them up as a chain. */
 #ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
 		if (!skb_is_nonlinear(skb) || skb_linearize(skb) == 0)
@@ -343,12 +341,11 @@ sctp_rcv(struct sk_buff *skb)
 		if (!skb_is_nonlinear(skb) || skb_linearize(skb, GFP_ATOMIC) == 0)
 #endif			/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 		{
-			/* 
-			   pull up the ip header */
+			/* pull up the ip header */
 			__skb_pull(skb, skb->h.raw - skb->data);
 			sh = (struct sctphdr *) skb->h.raw;
 			len = skb->len;
-			/* 
+			/*
 			 *  perform the crc-32c checksum per RFC 2960 Appendix B.
 			 */
 			csum0 = sh->check;
@@ -357,15 +354,13 @@ sctp_rcv(struct sk_buff *skb)
 			csum2 = crc32c(~0UL, sh, len);
 			sh->check = csum0;
 			if (csum1 == csum2) {
-				/* 
-				   pull to the ip header */
+				/* pull to the ip header */
 				__skb_push(skb, skb->data - skb->nh.raw);
 				if ((mp = esballoc(skb->data, skb->len, BPRI_MED, &fr))) {
 					ptrace(("Allocated mblk %p\n", mp));
 					mp->b_datap->db_type = M_DATA;
 					mp->b_wptr = mp->b_rptr + skb->len;
-					/* 
-					   trim the ip header */
+					/* trim the ip header */
 					mp->b_rptr += skb->h.raw - skb->nh.raw;
 					mp->b_rptr += sizeof(struct sctphdr);
 					SCTPHASH_BH_RLOCK();
