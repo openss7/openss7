@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:37 $
+ @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,116 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:37 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:37 $"
+#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:31 $"
 
-static char const ident[] = "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:37 $";
+static char const ident[] = "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:31 $";
 
 #define __NO_VERSION__
 
-#include <sys/os7/compat.h>
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
+#endif
+
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#   error ****
+#   error **** One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error **** to compile the sctp driver.
+#   error ****
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	include <linux/module.h>
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
+#	undef HAVE_OPENSS7_SCTP
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_dup __sctp_dup
+#   define sctp_strm __sctp_strm
+#   define sctp_saddr __sctp_saddr
+#   define sctp_daddr __sctp_daddr
+#   define sctp_protolist __sctp_protolist
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   if !defined CONFIG_IP_SCTP && !defined CONFIG_IP_SCTP_MODULE
+#	undef HAVE_LKSCTP_SCTP
+#   endif
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_mib	    __sctp_mib
+#   define sctphdr	    __sctphdr
+#   define sctp_cookie	    __sctp_cookie
+#   define sctp_chunk	    __sctp_chunk
+#endif
+
+#if !defined HAVE_OPENSS7_SCTP
+#   undef sctp_addr
+#   define sctp_addr stupid_sctp_addr_in_the_wrong_place
+#endif
+
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+
+#if defined HAVE_OPENSS7_SCTP
+#   undef STATIC
+#   undef INLINE
+#   include <net/sctp.h>
+#endif
+
+#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
+#define _SS_MAXSIZE     128
+#define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
+#endif
+
+#include <sys/kmem.h>
+#include <sys/cmn_err.h>
+#include <sys/stream.h>
+#include <sys/dki.h>
+
+#ifdef LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
+#endif
+#include <sys/ddi.h>
+
+#ifndef LFS
+#include <os7/debug.h>
+#endif
+#include <os7/bufq.h>
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -193,6 +292,7 @@ __sctp_daddr_alloc(sp, daddr, errp)
 	int *errp;
 {
 	sctp_daddr_t *sd;
+
 	assert(errp);
 	ensure(sp, *errp = -EFAULT;
 	       return (NULL));
@@ -220,9 +320,7 @@ __sctp_daddr_alloc(sp, daddr, errp)
 		sd->mtu = 576;	/* fix up after routing */
 		sd->ssthresh = 2 * sd->mtu;	/* fix up after routing */
 		sd->cwnd = sd->mtu;	/* fix up after routing */
-		/*
-		   per destination defaults 
-		 */
+		/* per destination defaults */
 		sd->hb_itvl = sp->hb_itvl;	/* heartbeat interval */
 		sd->rto_max = sp->rto_max;	/* maximum RTO */
 		sd->rto_min = sp->rto_min;	/* minimum RTO */
@@ -246,6 +344,7 @@ sctp_daddr_include(sp, daddr, errp)
 	int *errp;
 {
 	sctp_daddr_t *sd;
+
 	assert(errp);
 	ensure(sp, *errp = -EFAULT;
 	       return (NULL));
@@ -300,6 +399,7 @@ STATIC void
 __sctp_free_daddrs(sctp_t * sp)
 {
 	sctp_daddr_t *sd, *sd_next;
+
 	ensure(sp, return);
 	sd_next = sp->daddr;
 	usual(sd_next);
@@ -319,9 +419,10 @@ __sctp_free_daddrs(sctp_t * sp)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
 int
-sctp_alloc_daddrs(sctp_t * sp, uint16_t dport, uint32_t * daddrs, size_t dnum)
+sctp_alloc_daddrs(sctp_t * sp, uint16_t dport, uint32_t *daddrs, size_t dnum)
 {
 	int err = 0;
+
 	ensure(sp, return (-EFAULT));
 	ensure(daddrs || !dnum, return (-EFAULT));
 	SCTPHASH_WLOCK();
@@ -367,6 +468,7 @@ __sctp_saddr_alloc(sp, saddr, errp)
 	int *errp;
 {
 	sctp_saddr_t *ss;
+
 	assert(errp);
 	ensure(sp, *errp = -EFAULT;
 	       return (NULL));
@@ -401,6 +503,7 @@ sctp_saddr_include(sp, saddr, errp)
 	int *errp;
 {
 	sctp_saddr_t *ss;
+
 	assert(errp);
 	ensure(sp, *errp = -EFAULT;
 	       return (NULL));
@@ -436,6 +539,7 @@ STATIC void
 __sctp_free_saddrs(sctp_t * sp)
 {
 	sctp_saddr_t *ss, *ss_next;
+
 	assert(sp);
 	ss_next = sp->saddr;
 	usual(ss_next);
@@ -459,6 +563,7 @@ sctp_alloc_saddrs(sp, sport, saddrs, snum)
 	size_t snum;
 {
 	int err = 0;
+
 	ensure(sp, return (-EFAULT));
 	ensure(saddrs || !snum, return (-EFAULT));
 	SCTPHASH_WLOCK();
@@ -500,6 +605,7 @@ sctp_strm_alloc(stp, sid, errp)
 	int *errp;
 {
 	sctp_strm_t *st;
+
 	if ((st = kmem_cache_alloc(sctp_strm_cachep, SLAB_ATOMIC))) {
 		bzero(st, sizeof(*st));
 		if ((st->next = (*stp)))
@@ -537,6 +643,7 @@ sctp_free_strms(sp)
 	sctp_t *sp;
 {
 	sctp_strm_t *st, *st_next;
+
 	assert(sp);
 	st_next = sp->ostrm;
 	usual(st_next);
@@ -577,9 +684,7 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 	assert(q);
 	assert(spp);
 
-	/*
-	   must have these 4 
-	 */
+	/* must have these 4 */
 	ensure(ops->sctp_conn_ind, return (NULL));
 	ensure(ops->sctp_conn_con, return (NULL));
 	ensure(ops->sctp_data_ind, return (NULL));
@@ -592,9 +697,7 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 		MOD_INC_USE_COUNT;
 		bzero(sp, sizeof(*sp));
 
-		/*
-		   link into master list 
-		 */
+		/* link into master list */
 		if ((sp->next = *spp))
 			sp->next->prev = &sp->next;
 		sp->prev = spp;
@@ -609,9 +712,7 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 		sp->i_state = 0;
 		sp->s_state = SCTP_CLOSED;
 
-		/*
-		   ip defaults 
-		 */
+		/* ip defaults */
 		sp->ip_tos = sctp_default_ip_tos;
 		sp->ip_ttl = sctp_default_ip_ttl;
 		sp->ip_proto = sctp_default_ip_proto;
@@ -619,9 +720,7 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 		sp->ip_broadcast = sctp_default_ip_broadcast;
 		sp->ip_priority = sctp_default_ip_priority;
 
-		/*
-		   per association defaults 
-		 */
+		/* per association defaults */
 		sp->max_istr = sctp_default_max_istreams;
 		sp->req_ostr = sctp_default_req_ostreams;
 		sp->max_inits = sctp_default_max_init_retries;
@@ -635,9 +734,7 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 		sp->ppi = sctp_default_ppi;
 		sp->max_sack = sctp_default_max_sack_delay;
 
-		/*
-		   per destination association defaults 
-		 */
+		/* per destination association defaults */
 		sp->rto_ini = sctp_default_rto_initial;
 		sp->rto_min = sctp_default_rto_min;
 		sp->rto_max = sctp_default_rto_max;
@@ -747,8 +844,10 @@ sctp_free_priv(q)
 #ifdef _DEBUG
 	if (sp->oooq.q_msgs && sp->oooq.q_head) {
 		mblk_t *mp;
+
 		for (mp = sp->oooq.q_head; mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
+
 			printk("oooq tsn = %u\n", cb->tsn);
 		}
 	}
@@ -765,8 +864,10 @@ sctp_free_priv(q)
 #ifdef _DEBUG
 	if (sp->rtxq.q_msgs && sp->rtxq.q_head) {
 		mblk_t *mp;
+
 		for (mp = sp->rtxq.q_head; mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
+
 			printk("rtxq tsn = %u\n", cb->tsn);
 		}
 	}
@@ -778,9 +879,7 @@ sctp_free_priv(q)
 	unusual(sp->ackq.q_msgs);
 	bufq_purge(&sp->ackq);
 
-	/*
-	   do we really need to keep this stuff hanging around for retrieval? 
-	 */
+	/* do we really need to keep this stuff hanging around for retrieval? */
 	if (sp->ostrm || sp->istrm) {
 		sctp_free_strms(sp);
 	}
@@ -821,16 +920,13 @@ sctp_disconnect(sp)
 	SCTPHASH_WLOCK();
 	{
 		sctp_daddr_t *sd;
+
 		sp->s_state = sp->conind ? SCTP_LISTEN : SCTP_CLOSED;
 
-		/*
-		   remove from connected hashes 
-		 */
+		/* remove from connected hashes */
 		__sctp_conn_unhash(sp);
 
-		/*
-		   stop timers 
-		 */
+		/* stop timers */
 		if (sp->timer_init) {
 			untimeout(xchg(&sp->timer_init, 0));
 		}
@@ -891,14 +987,10 @@ __sctp_disconnect(sp)
 	{
 		sp->s_state = sp->conind ? SCTP_LISTEN : SCTP_CLOSED;
 
-		/*
-		   remove from connected hashes 
-		 */
+		/* remove from connected hashes */
 		__sctp_conn_unhash(sp);
 
-		/*
-		   stop timers 
-		 */
+		/* stop timers */
 		if (sp->timer_init) {
 			seldom();
 			untimeout(xchg(&sp->timer_init, 0));
@@ -996,9 +1088,7 @@ sctp_reset(sp)
 
 	sp->pmtu = 576;
 
-	/*
-	   purge queues 
-	 */
+	/* purge queues */
 	unusual(sp->rcvq.q_msgs);
 	bufq_purge(&sp->rcvq);
 	unusual(sp->sndq.q_msgs);

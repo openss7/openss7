@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_output.h,v 0.9.2.3 2006/09/26 00:52:32 brian Exp $
+ @(#) $Id: sctp_adler32.h,v 0.9.2.1 2006/09/26 00:52:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,24 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:52:32 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SCTP_OUTPUT_H__
-#define __SCTP_OUTPUT_H__
+#ifndef __SCTP_ADLER32_H__
+#define __SCTP_ADLER32_H__
 
-#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/26 00:52:32 $"
+#define BASE 65521L		/* largest prime smaller than 65536 */
+#define NMAX 5552		/* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <=
+				   2^32-1 */
 
-extern void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp);
-extern void sctp_xmit_msg(uint32_t daddr, mblk_t *mp, sctp_t * sp);
-extern void sctp_send_msg(sctp_t * sp, sctp_daddr_t * sd, mblk_t *mp);
+extern uint32_t adler32(uint32_t adler, void *buf, size_t len);
 
-#define SCTP_CONFIG_ERROR_GENERATOR
+#endif				/* __SCTP_ADLER32_H__ */
 
-#define SCTP_CONFIG_ERROR_GENERATOR_LEVEL  8
-#define SCTP_CONFIG_ERROR_GENERATOR_LIMIT 13
-#define SCTP_CONFIG_BREAK_GENERATOR_LEVEL 50
-#define SCTP_CONFIG_BREAK_GENERATOR_LIMIT 200
-
-#endif				/* __SCTP_OUTPUT_H__ */

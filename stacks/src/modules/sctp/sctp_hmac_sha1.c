@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_output.h,v 0.9.2.3 2006/09/26 00:52:32 brian Exp $
+ @(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:31 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,24 +46,67 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:52:32 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SCTP_OUTPUT_H__
-#define __SCTP_OUTPUT_H__
+#ident "@(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:31 $"
 
-#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/26 00:52:32 $"
+static char const ident[] =
+    "$RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:31 $";
 
-extern void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp);
-extern void sctp_xmit_msg(uint32_t daddr, mblk_t *mp, sctp_t * sp);
-extern void sctp_send_msg(sctp_t * sp, sctp_daddr_t * sd, mblk_t *mp);
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/compiler.h>
+#include <linux/types.h>
 
-#define SCTP_CONFIG_ERROR_GENERATOR
+#include "sctp_sha1.h"
+#include "sctp_hmac_sha1.h"
 
-#define SCTP_CONFIG_ERROR_GENERATOR_LEVEL  8
-#define SCTP_CONFIG_ERROR_GENERATOR_LIMIT 13
-#define SCTP_CONFIG_BREAK_GENERATOR_LEVEL 50
-#define SCTP_CONFIG_BREAK_GENERATOR_LIMIT 200
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  HMAC-SHA-1
+ *
+ *  -------------------------------------------------------------------------
+ *
+ *  Code adapted directly from RFC 2104.
+ */
+void
+hmac_sha1(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest)
+{
+	SHA_CTX context;
+	uint8_t k_ipad[64];
+	uint8_t k_opad[64];
+	uint8_t tk[16];
+	int i;
 
-#endif				/* __SCTP_OUTPUT_H__ */
+	if (klen > 64) {
+		SHA_CTX ctx;
+
+		SHAInit(&ctx);
+		SHAUpdate(&ctx, key, klen);
+		SHAFinal(tk, &ctx);
+		key = tk;
+		klen = 16;
+	}
+	memset(k_ipad, 0, sizeof(k_ipad));
+	memset(k_opad, 0, sizeof(k_opad));
+	memcpy(k_ipad, key, klen);
+	memcpy(k_opad, key, klen);
+	for (i = 0; i < 64; i++) {
+		k_ipad[i] ^= 0x36;
+		k_opad[i] ^= 0x5c;
+	}
+	/* inner */
+	SHAInit(&context);
+	SHAUpdate(&context, k_ipad, 64);
+	SHAUpdate(&context, text, tlen);
+	SHAFinal(digest, &context);
+	/* outer */
+	SHAInit(&context);
+	SHAUpdate(&context, k_opad, 64);
+	SHAUpdate(&context, digest, 20);
+	SHAFinal(digest, &context);
+}
+

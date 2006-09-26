@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:37 $
+ @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,116 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:37 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:37 $"
+#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:32 $"
 
-static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:37 $";
+static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:32 $";
 
 #define __NO_VERSION__
 
-#include <sys/os7/compat.h>
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
+#endif
+
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#   error ****
+#   error **** One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error **** to compile the sctp driver.
+#   error ****
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	include <linux/module.h>
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
+#	undef HAVE_OPENSS7_SCTP
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_dup __sctp_dup
+#   define sctp_strm __sctp_strm
+#   define sctp_saddr __sctp_saddr
+#   define sctp_daddr __sctp_daddr
+#   define sctp_protolist __sctp_protolist
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   if !defined CONFIG_IP_SCTP && !defined CONFIG_IP_SCTP_MODULE
+#	undef HAVE_LKSCTP_SCTP
+#   endif
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_mib	    __sctp_mib
+#   define sctphdr	    __sctphdr
+#   define sctp_cookie	    __sctp_cookie
+#   define sctp_chunk	    __sctp_chunk
+#endif
+
+#if !defined HAVE_OPENSS7_SCTP
+#   undef sctp_addr
+#   define sctp_addr stupid_sctp_addr_in_the_wrong_place
+#endif
+
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+
+#if defined HAVE_OPENSS7_SCTP
+#   undef STATIC
+#   undef INLINE
+#   include <net/sctp.h>
+#endif
+
+#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
+#define _SS_MAXSIZE     128
+#define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
+#endif
+
+#include <sys/kmem.h>
+#include <sys/cmn_err.h>
+#include <sys/stream.h>
+#include <sys/dki.h>
+
+#ifdef LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
+#endif
+#include <sys/ddi.h>
+
+#ifndef LFS
+#include <os7/debug.h>
+#endif
+#include <os7/bufq.h>
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -105,6 +204,7 @@ sctp_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
+
 	if (skb->len > rt->u.dst.pmtu) {
 		rare();
 		return ip_fragment(skb, skb->dst->output);
@@ -125,23 +225,6 @@ sctp_queue_xmit(struct sk_buff *skb)
  *  destination address and a message block.  The only time that we use this
  *  is for responding to OOTB packets with ABORT or SHUTDOWN COMPLETE.
  */
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif
-#ifndef HAVE_IP_ROUTE_OUTPUT
-static inline int
-ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
-{
-	struct flowi fl = {.oif = oif,
-		.nl_u = {.ip4_u = {.daddr = daddr,
-				   .saddr = saddr,
-				   .tos = tos}},
-		.proto = IPPROTO_SCTP,
-		.uli_u = {.ports = {.sport = 0,.dport = 0}}
-	};
-	return ip_route_output_key(rp, &fl);
-}
-#endif
 void
 sctp_xmit_ootb(daddr, saddr, mp)
 	uint32_t daddr;
@@ -149,6 +232,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 	mblk_t *mp;
 {
 	struct rtable *rt = NULL;
+
 	ensure(mp, return);
 	if (!ip_route_output(&rt, daddr, 0, 0, 0)) {
 		struct sk_buff *skb;
@@ -188,6 +272,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 
 			for (bp = mp; bp; bp = bp->b_cont) {
 				int blen = bp->b_wptr - bp->b_rptr;
+
 				if (blen > 0) {
 					bcopy(bp->b_rptr, data, blen);
 					data += blen;
@@ -202,10 +287,8 @@ sctp_xmit_ootb(daddr, saddr, mp)
 			rare();
 	} else
 		rare();
-	/*
-	   sending OOTB reponses are one time events, if we can't send the message we just drop it, 
-	   the peer will probably come back again later 
-	 */
+	/* sending OOTB reponses are one time events, if we can't send the message we just drop it, 
+	   the peer will probably come back again later */
 	freemsg(mp);
 	return;
 }
@@ -228,6 +311,7 @@ sctp_xmit_msg(daddr, mp, sp)
 	sctp_t *sp;
 {
 	struct rtable *rt = NULL;
+
 	ensure(mp, return);
 	if (!ip_route_output(&rt, daddr, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, 0)) {
 		struct sk_buff *skb;
@@ -268,6 +352,7 @@ sctp_xmit_msg(daddr, mp, sp)
 
 			for (bp = mp; bp; bp = bp->b_cont) {
 				int blen = bp->b_wptr - bp->b_rptr;
+
 				if (blen > 0) {
 					bcopy(bp->b_rptr, data, blen);
 					data += blen;
@@ -283,10 +368,8 @@ sctp_xmit_msg(daddr, mp, sp)
 			rare();
 	} else
 		rare();
-	/*
-	   sending INIT ACKs are one time events, if we can't get the response off, we just drop
-	   the INIT ACK: the peer should send us another INIT * in a short while... 
-	 */
+	/* sending INIT ACKs are one time events, if we can't get the response off, we just drop
+	   the INIT ACK: the peer should send us another INIT * in a short while... */
 	freemsg(mp);
 	return;
 }
@@ -326,26 +409,27 @@ sctp_send_msg(sp, sd, mp)
 			struct net_device *dev;
 			size_t hlen, plen, tlen;
 
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 			if ((sp->options & SCTP_OPTION_DBREAK)
-			    && sd->daddr == 0x010000ff && ++break_packets > BREAK_GENERATOR_LEVEL) {
-				if (break_packets > BREAK_GENERATOR_LIMIT)
+			    && sd->daddr == 0x010000ff
+			    && ++break_packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
+				if (break_packets > SCTP_CONFIG_BREAK_GENERATOR_LIMIT)
 					break_packets = 0;
 				return;
 			}
 			if ((sp->options & SCTP_OPTION_BREAK)
 			    && (sd == sp->daddr || sd == sp->daddr->next)
-			    && ++sd->packets > BREAK_GENERATOR_LEVEL) {
+			    && ++sd->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 				return;
 			}
 			if ((sp->options & SCTP_OPTION_DROPPING)
-			    && ++sd->packets > ERROR_GENERATOR_LEVEL) {
-				if (sd->packets > ERROR_GENERATOR_LIMIT)
+			    && ++sd->packets > SCTP_CONFIG_ERROR_GENERATOR_LEVEL) {
+				if (sd->packets > SCTP_CONFIG_ERROR_GENERATOR_LIMIT)
 					sd->packets = 0;
 				return;
 			}
 			if ((sp->options & SCTP_OPTION_RANDOM)
-			    && ++sd->packets > 2 * ERROR_GENERATOR_LEVEL) {
+			    && ++sd->packets > 2 * SCTP_CONFIG_ERROR_GENERATOR_LEVEL) {
 				if (!(random() & 0x03))
 					return;
 			}
@@ -397,6 +481,7 @@ sctp_send_msg(sp, sd, mp)
 
 					for (db = bp; db; db = db->b_cont) {
 						int blen = db->b_wptr - db->b_rptr;
+
 						normal(db->b_datap->db_type == M_DATA);
 						if (db->b_datap->db_type == M_DATA) {
 							normal(blen > 0);
@@ -410,10 +495,9 @@ sctp_send_msg(sp, sd, mp)
 						}
 					}
 					{
-						/*
-						   pad each chunk if not padded already 
-						 */
+						/* pad each chunk if not padded already */
 						size_t pad = PADC(clen) - clen;
+
 						ensure(head + plen >= data + pad, kfree_skb(skb);
 						       return);
 						bzero(data, pad);

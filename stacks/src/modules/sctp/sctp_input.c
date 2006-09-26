@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/16 12:46:31 $
+ @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/26 00:52:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,116 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/16 12:46:31 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/16 12:46:31 $"
+#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/26 00:52:31 $"
 
-static char const ident[] = "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/07/16 12:46:31 $";
+static char const ident[] = "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/26 00:52:31 $";
 
 #define __NO_VERSION__
 
-#include <sys/os7/compat.h>
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
+#endif
+
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#   error ****
+#   error **** One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error **** to compile the sctp driver.
+#   error ****
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	include <linux/module.h>
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
+#	undef HAVE_OPENSS7_SCTP
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_dup __sctp_dup
+#   define sctp_strm __sctp_strm
+#   define sctp_saddr __sctp_saddr
+#   define sctp_daddr __sctp_daddr
+#   define sctp_protolist __sctp_protolist
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   if !defined CONFIG_IP_SCTP && !defined CONFIG_IP_SCTP_MODULE
+#	undef HAVE_LKSCTP_SCTP
+#   endif
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_mib	    __sctp_mib
+#   define sctphdr	    __sctphdr
+#   define sctp_cookie	    __sctp_cookie
+#   define sctp_chunk	    __sctp_chunk
+#endif
+
+#if !defined HAVE_OPENSS7_SCTP
+#   undef sctp_addr
+#   define sctp_addr stupid_sctp_addr_in_the_wrong_place
+#endif
+
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+
+#if defined HAVE_OPENSS7_SCTP
+#   undef STATIC
+#   undef INLINE
+#   include <net/sctp.h>
+#endif
+
+#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
+#define _SS_MAXSIZE     128
+#define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
+#endif
+
+#include <sys/kmem.h>
+#include <sys/cmn_err.h>
+#include <sys/stream.h>
+#include <sys/dki.h>
+
+#ifdef LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
+#endif
+#include <sys/ddi.h>
+
+#ifndef LFS
+#include <os7/debug.h>
+#endif
+#include <os7/bufq.h>
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -108,12 +207,11 @@ sctp_rcv_ootb(mblk_t *mp)
 	struct sctphdr *sh = (struct sctphdr *) (mp->b_datap->db_base + (iph->ihl << 2));
 	struct sctpchdr *ch = (struct sctpchdr *) mp->b_rptr;
 	int sat = inet_addr_type(iph->saddr);
+
 	seldom();
 	ensure(mp, return (-EFAULT));
 	if (sat != RTN_UNICAST && sat != RTN_LOCAL) {
-		/*
-		   RFC 2960 8.4(1). 
-		 */
+		/* RFC 2960 8.4(1). */
 		freemsg(mp);
 		return (0);
 	}
@@ -165,6 +263,7 @@ sctp_err(struct sk_buff *skb, u32 info)
 	struct sctphdr *sh;
 	struct iphdr *iph = (struct iphdr *) skb->data;
 	size_t ihl;
+
 	ensure(skb, return);
 #define ICMP_MIN_LENGTH 8
 	if (skb->len < (ihl = iph->ihl << 2) + ICMP_MIN_LENGTH) {
@@ -187,7 +286,8 @@ sctp_err(struct sk_buff *skb, u32 info)
 			*((uint32_t *) mp->b_wptr)++ = iph->daddr;
 			*((struct icmphdr *) mp->b_wptr)++ = *(skb->h.icmph);
 			if (canput(sp->rq)) {
-				putq(sp->rq, mp);
+				if (!putq(sp->rq, mp))
+					__ctrace(freemsg(mp));	/* FIXME */
 				return;
 			}
 			freemsg(mp);
@@ -230,20 +330,17 @@ sctp_rcv(struct sk_buff *skb)
 	struct sctphdr *sh;
 	unsigned short len;
 	frtn_t fr = { &sctp_free, (char *) skb };
+
 	if (skb->pkt_type == PACKET_HOST) {
-		/*
-		   For now...  We should actually place non-linear fragments into seperate mblks
-		   and pass them up as a chain. 
-		 */
+		/* For now...  We should actually place non-linear fragments into seperate mblks
+		   and pass them up as a chain. */
 #ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
 		if (!skb_is_nonlinear(skb) || skb_linearize(skb) == 0)
-#else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+#else			/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 		if (!skb_is_nonlinear(skb) || skb_linearize(skb, GFP_ATOMIC) == 0)
-#endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+#endif			/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 		{
-			/*
-			   pull up the ip header 
-			 */
+			/* pull up the ip header */
 			__skb_pull(skb, skb->h.raw - skb->data);
 			sh = (struct sctphdr *) skb->h.raw;
 			len = skb->len;
@@ -256,17 +353,13 @@ sctp_rcv(struct sk_buff *skb)
 			csum2 = crc32c(~0UL, sh, len);
 			sh->check = csum0;
 			if (csum1 == csum2) {
-				/*
-				   pull to the ip header 
-				 */
+				/* pull to the ip header */
 				__skb_push(skb, skb->data - skb->nh.raw);
 				if ((mp = esballoc(skb->data, skb->len, BPRI_MED, &fr))) {
 					ptrace(("Allocated mblk %p\n", mp));
 					mp->b_datap->db_type = M_DATA;
 					mp->b_wptr = mp->b_rptr + skb->len;
-					/*
-					   trim the ip header 
-					 */
+					/* trim the ip header */
 					mp->b_rptr += skb->h.raw - skb->nh.raw;
 					mp->b_rptr += sizeof(struct sctphdr);
 					SCTPHASH_BH_RLOCK();
@@ -276,7 +369,8 @@ sctp_rcv(struct sk_buff *skb)
 					if (sp) {
 						if (canput(sp->rq)) {
 							skb->dev = NULL;
-							putq(sp->rq, mp);
+							if (!putq(sp->rq, mp))
+								__ctrace(freemsg(mp));	/* FIXME */
 							return (0);
 						}
 						freemsg(mp);

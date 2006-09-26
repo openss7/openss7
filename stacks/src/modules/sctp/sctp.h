@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.4 2005/07/15 23:07:52 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.5 2006/09/26 00:52:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:07:52 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_H__
 #define __SCTP_H__
 
-#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/15 23:07:52 $"
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 00:52:25 $"
 
 /*
  *  =========================================================================
@@ -209,6 +209,7 @@ struct sctp_daddr {
 
 	size_t packets;			/* packet count */
 };
+
 /*
  *  Some destination flags.
  */
@@ -234,22 +235,24 @@ struct sctp {
 	struct sctp *next;		/* linkage for master list */
 	struct sctp **prev;		/* linkage for master list */
 
-	major_t cmajor;			/* major device number */
-	minor_t cminor;			/* minor device number */
+	ushort cmajor;			/* major device number */
+	ushort cminor;			/* minor device number */
 
 	queue_t *rq;			/* read queue */
 	queue_t *wq;			/* write queue */
 	cred_t cred;			/* credentials of opener */
+
+	spinlock_t qlock;		/* queue lock */
+	queue_t *rwait;			/* RD queue waiting on lock */
+	queue_t *wwait;			/* WR queue waiting on lock */
+	int users;			/* lock holders */
+
 	struct sctp_ifops *ops;		/* interface operations */
 	uint i_flags;			/* Interface flags */
 	uint i_state;			/* Interface state */
 	uint s_state;			/* SCTP state */
 	uint options;			/* options flags */
 	size_t conind;			/* max number outstanding conn_inds */
-
-	lis_spin_lock_t lock;		/* stream lock */
-	void *userq;			/* queue holding this lock */
-	queue_t *waitq;			/* queue waiting on locks */
 
 	struct sctp *bnext;		/* linkage for bind hash */
 	struct sctp **bprev;		/* linkage for bind hash */
@@ -352,6 +355,7 @@ struct sctp {
 	toid_t timer_shutdown;		/* shutdown timer */
 	toid_t timer_sack;		/* sack timer */
 };
+
 /*
  *  Some flags.
  */

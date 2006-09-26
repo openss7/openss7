@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/25 20:15:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/26 00:52:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 20:15:45 $ by $Author: brian $
+# Last Modified $Date: 2006/09/26 00:52:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/09/26 00:52:24  brian
+# - rationalized to embedded packages
+#
 # Revision 0.9.2.2  2006/09/25 20:15:45  brian
 # - rationalized to strinet and strxnet
 #
@@ -75,18 +78,11 @@ if PKG_BUILD_ARCH
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-if WITH_TLI
-## WITH_TLI
-
-pkglibexec32_PROGRAMS		+= test-timod
-
 test_timod_SOURCES		= $(top_srcdir)/src/test/tli/test-timod.c
 test_timod_LDADD		= $(STREAMS_LDADD32) libxnet.la
 test_timod_LDFLAGS		= $(MACHINE_FLAGS)
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-tirdwr
 
 test_tirdwr_SOURCES		= $(top_srcdir)/src/test/tli/test-tirdwr.c
 test_tirdwr_LDADD		= $(STREAMS_LDADD32) libxnet.la
@@ -94,43 +90,12 @@ test_tirdwr_LDFLAGS		= $(MACHINE_FLAGS)
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+if WITH_TLI
+## WITH_TLI
+pkglibexec32_PROGRAMS		+= test-timod
+pkglibexec32_PROGRAMS		+= test-tirdwr
 ## WITH_TLI
 endif
-
-if WITH_INET
-## WITH_INET
-
-pkglibexec32_PROGRAMS		+= test-inet_raw
-
-test_inet_raw_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_raw.c
-test_inet_raw_LDADD		= $(STREAMS_LDADD32)
-test_inet_raw_LDFLAGS		= $(MACHINE_FLAGS)
-test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_inet_raw_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-inet_tcp
-
-test_inet_tcp_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_tcp.c
-test_inet_tcp_LDADD		= $(STREAMS_LDADD32)
-test_inet_tcp_LDFLAGS		= $(MACHINE_FLAGS)
-test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_inet_tcp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-inet_udp
-
-test_inet_udp_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_udp.c
-test_inet_udp_LDADD		= $(STREAMS_LDADD32)
-test_inet_udp_LDFLAGS		= $(MACHINE_FLAGS)
-test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_inet_udp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-## WITH_INET
-endif
-
-if WITH_XNET
-## WITH_XNET
-
-lib32_LTLIBRARIES		+= libxnet.la
 
 libxnet_la_SOURCES		= $(top_srcdir)/src/lib/linxnet/pthread.c \
 				  $(top_srcdir)/src/lib/libxnet/xnet.c \
@@ -140,15 +105,11 @@ libxnet_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(srcdir)/src/include/
 libxnet_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libxnet_la_LIBADD		= $(STREAMS_LDADD32)
 
-pkglibexec32_PROGRAMS		+= test-xnet
-
 test_xnet_SOURCES		= $(top_srcdir)/src/test/xnet/test-xnet.c
 test_xnet_LDADD			= $(STREAMS_LDADD32) libxnet.la
 test_xnet_LDFLAGS		= $(MACHINE_FLAGS)
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-xnet_thr
 
 test_xnet_thr_SOURCES		= $(top_srcdir)/src/test/xnet/test-xnet.c
 test_xnet_thr_LDADD		= $(STREAMS_LDADD32) -lpthread libxnet.la
@@ -156,7 +117,72 @@ test_xnet_thr_LDFLAGS		= $(MACHINE_FLAGS)
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+if WITH_XNET
 ## WITH_XNET
+lib32_LTLIBRARIES		+= libxnet.la
+pkglibexec32_PROGRAMS		+= test-xnet
+pkglibexec32_PROGRAMS		+= test-xnet_thr
+## WITH_XNET
+endif
+
+test_inet_raw_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_raw.c
+test_inet_raw_LDADD		= $(STREAMS_LDADD32)
+test_inet_raw_LDFLAGS		= $(MACHINE_FLAGS)
+test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_raw_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+test_inet_tcp_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_tcp.c
+test_inet_tcp_LDADD		= $(STREAMS_LDADD32)
+test_inet_tcp_LDFLAGS		= $(MACHINE_FLAGS)
+test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_tcp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+test_inet_udp_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_udp.c
+test_inet_udp_LDADD		= $(STREAMS_LDADD32)
+test_inet_udp_LDFLAGS		= $(MACHINE_FLAGS)
+test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+if WITH_INET
+## WITH_INET
+pkglibexec32_PROGRAMS		+= test-inet_raw
+pkglibexec32_PROGRAMS		+= test-inet_tcp
+pkglibexec32_PROGRAMS		+= test-inet_udp
+## WITH_INET
+endif
+
+test_sctp_n_SOURCES		= $(top_srcdir)/src/test/sctp/test-sctp_n.c
+test_sctp_n_LDADD		= $(STREAMS_LDADD32)
+test_sctp_n_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_n_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+test_sctp_n2_SOURCES		= $(top_srcdir)/src/test/sctp/test-sctp_n2.c
+test_sctp_n2_LDADD		= $(STREAMS_LDADD32)
+test_sctp_n2_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_n2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_n2_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+test_sctp_t_SOURCES		= $(top_srcdir)/src/test/sctp/test-sctp_t.c
+test_sctp_t_LDADD		= $(STREAMS_LDADD32)
+test_sctp_t_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_t_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+if WITH_SCTP
+## WITH_SCTP
+pkglibexec32_PROGRAMS		+= test-sctp_n
+pkglibexec32_PROGRAMS		+= test-sctp_n2
+pkglibexec32_PROGRAMS		+= test-sctp_t
+## WITH_SCTP
+endif
+
+if WITH_SCTP2
+## WITH_SCTP2
+pkglibexec32_PROGRAMS		+= test-sctp_n
+pkglibexec32_PROGRAMS		+= test-sctp_n2
+pkglibexec32_PROGRAMS		+= test-sctp_t
+## WITH_SCTP2
 endif
 
 pkglibexec32_PROGRAMS		+= test-m2pa

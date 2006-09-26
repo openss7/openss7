@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:28 $
+ @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/26 00:52:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,115 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:58:28 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:28 $"
+#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/26 00:52:32 $"
 
-static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:28 $";
+static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/26 00:52:32 $";
 
 #define __NO_VERSION__
 
-#include <sys/os7/compat.h>
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
+#endif
+
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#   error ****
+#   error **** One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error **** to compile the sctp driver.
+#   error ****
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	include <linux/module.h>
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
+#	undef HAVE_OPENSS7_SCTP
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_dup __sctp_dup
+#   define sctp_strm __sctp_strm
+#   define sctp_saddr __sctp_saddr
+#   define sctp_daddr __sctp_daddr
+#   define sctp_protolist __sctp_protolist
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   if !defined CONFIG_IP_SCTP && !defined CONFIG_IP_SCTP_MODULE
+#	undef HAVE_LKSCTP_SCTP
+#   endif
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_mib	    __sctp_mib
+#   define sctphdr	    __sctphdr
+#   define sctp_cookie	    __sctp_cookie
+#   define sctp_chunk	    __sctp_chunk
+#endif
+#if !defined HAVE_OPENSS7_SCTP
+#   undef sctp_addr
+#   define sctp_addr stupid_sctp_addr_in_the_wrong_place
+#endif
+
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+
+#if defined HAVE_OPENSS7_SCTP
+#   undef STATIC
+#   undef INLINE
+#   include <net/sctp.h>
+#endif
+
+#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
+#define _SS_MAXSIZE     128
+#define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
+#endif
+
+#include <sys/kmem.h>
+#include <sys/cmn_err.h>
+#include <sys/stream.h>
+#include <sys/dki.h>
+
+#ifdef LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
+#endif
+#include <sys/ddi.h>
+
+#ifndef LFS
+#include <os7/debug.h>
+#endif
+#include <os7/bufq.h>
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -117,74 +215,54 @@ sctp_choose_best(sp, not)
 
 	if ((best = sp->daddr))
 		for (sd = best->next; sd; sd = sd->next) {
-			/*
-			   choose usable over unusable 
-			 */
+			/* choose usable over unusable */
 			if (!best->dst_cache && sd->dst_cache) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose active routes 
-			 */
+			/* choose active routes */
 			if (best->retransmits > best->max_retrans
 			    && sd->retransmits <= sd->max_retrans) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose routes without timeouts 
-			 */
+			/* choose routes without timeouts */
 			if (best->retransmits && !(sd->retransmits)) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose routes without dups 
-			 */
+			/* choose routes without dups */
 			if (best->dups && !(sd->dups)) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose usable alternate if possible 
-			 */
+			/* choose usable alternate if possible */
 			if (best == not && sd != not) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose routes with least excessive timeouts 
-			 */
+			/* choose routes with least excessive timeouts */
 			if (best->retransmits + sd->max_retrans >
 			    sd->retransmits + best->max_retrans) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose routes with the least duplicates 
-			 */
+			/* choose routes with the least duplicates */
 			if (best->dups > sd->dups) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose lowest rto 
-			 */
+			/* choose lowest rto */
 			if (best->rto > sd->rto) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose not to slow start 
-			 */
+			/* choose not to slow start */
 			if (best->cwnd <= best->ssthresh && sd->cwnd > sd->ssthresh) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose largest available window 
-			 */
+			/* choose largest available window */
 			if (best->cwnd + best->mtu - 1 - best->in_flight <
 			    sd->cwnd + sd->mtu - 1 - sd->in_flight) {
 				best = sd;
@@ -301,9 +379,7 @@ sctp_update_routes(sp, force_reselect)
 				}
 				sd->saddr = sp->saddr->saddr;
 			}
-			/*
-			   always revert to initial settings when rerouting 
-			 */
+			/* always revert to initial settings when rerouting */
 			sd->rto = sp->rto_ini;
 			sd->rttvar = 0;
 			sd->srtt = 0;
@@ -314,14 +390,11 @@ sctp_update_routes(sp, force_reselect)
 
 			route_changed = 1;
 		}
-		/*
-		   You're welcome diald! 
-		 */
+		/* You're welcome diald! */
 		if (sysctl_ip_dynaddr && sp->s_state == SCTP_COOKIE_WAIT && sd == sp->daddr) {
-			/*
-			   see if route changed on primary as result of INIT that was discarded 
-			 */
+			/* see if route changed on primary as result of INIT that was discarded */
 			struct rtable *rt2 = NULL;
+
 #ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 			if (!ip_route_connect
 			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif))
@@ -354,9 +427,7 @@ sctp_update_routes(sp, force_reselect)
 		}
 		viable_route = 1;
 
-		/*
-		   always update MTU if we have a viable route 
-		 */
+		/* always update MTU if we have a viable route */
 
 		if (sd->mtu != dst_pmtu(&rt->u.dst)) {
 			sd->mtu = dst_pmtu(&rt->u.dst);
@@ -369,9 +440,7 @@ sctp_update_routes(sp, force_reselect)
 	if (!viable_route) {
 		rare();
 
-		/*
-		   set defaults 
-		 */
+		/* set defaults */
 		sp->taddr = sp->daddr;
 		sp->raddr = sp->daddr->next ? sp->daddr->next : sp->daddr;
 
@@ -379,13 +448,11 @@ sctp_update_routes(sp, force_reselect)
 
 		return (err);
 	}
-	/*
-	   if we have made or need changes then we want to reanalyze routes 
-	 */
+	/* if we have made or need changes then we want to reanalyze routes */
 	if (force_reselect || route_changed || mtu_changed || sp->pmtu != old_pmtu || !sp->taddr
 	    || !sp->raddr) {
 #ifdef _DEBUG
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 		int bad_choice = 0;
 #endif
 #endif
@@ -393,10 +460,10 @@ sctp_update_routes(sp, force_reselect)
 		usual(sp->taddr);
 
 #ifdef _DEBUG
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 		if ((sp->options & SCTP_OPTION_BREAK)
 		    && (sp->taddr == sp->daddr || sp->taddr == sp->daddr->next)
-		    && sp->taddr->packets > BREAK_GENERATOR_LEVEL) {
+		    && sp->taddr->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 			ptrace(("Primary sp->taddr %03d.%03d.%03d.%03d chosen poorly on %x\n",
 				(sp->taddr->daddr >> 0) & 0xff, (sp->taddr->daddr >> 8) & 0xff,
 				(sp->taddr->daddr >> 16) & 0xff, (sp->taddr->daddr >> 24) & 0xff,
@@ -417,10 +484,10 @@ sctp_update_routes(sp, force_reselect)
 		usual(sp->raddr);
 
 #ifdef _DEBUG
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 		if ((sp->options & SCTP_OPTION_BREAK)
 		    && (sp->raddr == sp->daddr || sp->raddr == sp->daddr->next)
-		    && sp->raddr->packets > BREAK_GENERATOR_LEVEL) {
+		    && sp->raddr->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 			ptrace(("Secondary sp->raddr %03d.%03d.%03d.%03d chosen poorly on %x\n",
 				(sp->raddr->daddr >> 0) & 0xff, (sp->raddr->daddr >> 8) & 0xff,
 				(sp->raddr->daddr >> 16) & 0xff, (sp->raddr->daddr >> 24) & 0xff,

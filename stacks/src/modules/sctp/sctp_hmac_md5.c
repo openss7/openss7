@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_output.h,v 0.9.2.3 2006/09/26 00:52:32 brian Exp $
+ @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:31 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,24 +46,71 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:52:32 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SCTP_OUTPUT_H__
-#define __SCTP_OUTPUT_H__
+#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:31 $"
 
-#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/26 00:52:32 $"
+static char const ident[] =
+    "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:31 $";
 
-extern void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp);
-extern void sctp_xmit_msg(uint32_t daddr, mblk_t *mp, sctp_t * sp);
-extern void sctp_send_msg(sctp_t * sp, sctp_daddr_t * sd, mblk_t *mp);
+#undef _DEBUG
+#undef SCTP_CONFIG_DEBUG
 
-#define SCTP_CONFIG_ERROR_GENERATOR
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/compiler.h>
+#include <linux/types.h>
+#include <linux/string.h>
 
-#define SCTP_CONFIG_ERROR_GENERATOR_LEVEL  8
-#define SCTP_CONFIG_ERROR_GENERATOR_LIMIT 13
-#define SCTP_CONFIG_BREAK_GENERATOR_LEVEL 50
-#define SCTP_CONFIG_BREAK_GENERATOR_LIMIT 200
+#include "sctp_md5.h"
+#include "sctp_hmac_md5.h"
 
-#endif				/* __SCTP_OUTPUT_H__ */
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  HMAC-MD5
+ *
+ *  -------------------------------------------------------------------------
+ *
+ *  Code adapted directly from RFC 2104.
+ */
+void
+hmac_md5(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest)
+{
+	MD5_CTX context;
+	uint8_t k_ipad[65];
+	uint8_t k_opad[65];
+	uint8_t tk[16];
+	int i;
+
+	if (klen > 64) {
+		MD5_CTX ctx;
+
+		MD5Init(&ctx);
+		MD5Update(&ctx, key, klen);
+		MD5Final(tk, &ctx);
+		key = tk;
+		klen = 16;
+	}
+	memset(k_ipad, 0, sizeof(k_ipad));
+	memset(k_opad, 0, sizeof(k_opad));
+	memcpy(k_ipad, key, klen);
+	memcpy(k_opad, key, klen);
+	for (i = 0; i < 64; i++) {
+		k_ipad[i] ^= 0x36;
+		k_opad[i] ^= 0x5c;
+	}
+	/* inner */
+	MD5Init(&context);
+	MD5Update(&context, k_ipad, 64);
+	MD5Update(&context, text, tlen);
+	MD5Final(digest, &context);
+	/* outer */
+	MD5Init(&context);
+	MD5Update(&context, k_opad, 64);
+	MD5Update(&context, digest, 16);
+	MD5Final(digest, &context);
+}
+

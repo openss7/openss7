@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/25 22:21:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 22:21:59 $ by $Author: brian $
+# Last Modified $Date: 2006/09/26 00:52:44 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2006/09/26 00:52:44  brian
+# - rationalized to embedded packages
+#
 # Revision 0.9.2.13  2006/09/25 22:21:59  brian
 # - added testsuites for optional components
 #
@@ -119,6 +122,24 @@ TESTSUITE_DEPS		+= \
 ## WITH_OPENSS7_SCTP
 endif
 ## WITH_INET
+endif
+
+if WITH_SCTP
+## WITH_SCTP
+TESTSUITE_DEPS		+= \
+			$(TESTSUITE)-sctp_t.at \
+			$(TESTSUITE)-sctp_n.at \
+			$(TESTSUITE)-sctp_n2.at
+## WITH_SCTP
+endif
+
+if WITH_SCTP2
+## WITH_SCTP2
+TESTSUITE_DEPS		+= \
+			$(TESTSUITE)-sctp_t.at \
+			$(TESTSUITE)-sctp_n.at \
+			$(TESTSUITE)-sctp_n2.at
+## WITH_SCTP2
 endif
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

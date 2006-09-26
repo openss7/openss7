@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:44 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/26 00:52:35 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:44 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:35 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tirdwr.c,v $
+ Revision 0.9.2.13  2006/09/26 00:52:35  brian
+ - rationalized to embedded packages
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:44 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/26 00:52:35 $"
 
-static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:44 $";
+static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/26 00:52:35 $";
 
 #include <sys/os7/compat.h>
 
@@ -70,19 +74,17 @@ static char const ident[] =
 // #define TIRDWR_TPI_PEDANTIC
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIRDWR_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:44 $"
-#define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/26 00:52:35 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
 #define TIRDWR_BANNER		TIRDWR_DESCRIP		"\n" \
-				TIRDWR_EXTRA		"\n" \
-				TIRDWR_REVISION		"\n" \
 				TIRDWR_COPYRIGHT	"\n" \
+				TIRDWR_REVISION		"\n" \
 				TIRDWR_DEVICE		"\n" \
 				TIRDWR_CONTACT
-#define TIRDWR_SPLASH		TIRDWR_DEVICE		"\n" \
+#define TIRDWR_SPLASH		TIRDWR_DEVICE		" - " \
 				TIRDWR_REVISION
 
 #ifdef LINUX
@@ -122,35 +124,40 @@ MODULE_ALIAS("streams-tirdwr");
 #endif				/* MODULE */
 
 static struct module_info tirdwr_minfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
-static int tirdwr_close(queue_t *, int, cred_t *);
+static struct module_stat tirdwr_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tirdwr_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
-static int tirdwr_rput(queue_t *q, mblk_t *mp);
-static int tirdwr_wput(queue_t *q, mblk_t *mp);
+static streamscall int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
+static streamscall int tirdwr_close(queue_t *, int, cred_t *);
+
+static streamscall int tirdwr_rput(queue_t *q, mblk_t *mp);
+static streamscall int tirdwr_wput(queue_t *q, mblk_t *mp);
 
 static struct qinit tirdwr_rinit = {
-	qi_putp:tirdwr_rput,		/* Read put (message from below) */
-	qi_qopen:tirdwr_open,		/* Each open */
-	qi_qclose:tirdwr_close,		/* Last close */
-	qi_minfo:&tirdwr_minfo,		/* Information */
+	.qi_putp = tirdwr_rput,		/* Read put (message from below) */
+	.qi_qopen = tirdwr_open,	/* Each open */
+	.qi_qclose = tirdwr_close,	/* Last close */
+	.qi_minfo = &tirdwr_minfo,	/* Information */
+	.qi_mstat = &tirdwr_rstat,	/* Statistics */
 };
 
 static struct qinit tirdwr_winit = {
-	qi_putp:tirdwr_wput,		/* Write put (message from above) */
-	qi_minfo:&tirdwr_minfo,		/* Information */
+	.qi_putp = tirdwr_wput,		/* Write put (message from above) */
+	.qi_minfo = &tirdwr_minfo,	/* Information */
+	.qi_mstat = &tirdwr_wstat,	/* Statistics */
 };
 
 static struct streamtab tirdwrinfo = {
-	st_rdinit:&tirdwr_rinit,	/* Upper read queue */
-	st_wrinit:&tirdwr_winit,	/* Upper write queue */
+	.st_rdinit = &tirdwr_rinit,	/* Upper read queue */
+	.st_wrinit = &tirdwr_winit,	/* Upper write queue */
 };
 
 /*
@@ -160,16 +167,6 @@ static struct streamtab tirdwrinfo = {
  *
  *  =========================================================================
  */
-/*
-   LiS does not define these... 
- */
-#if !defined(HAVE_BCID_T)
-typedef int bcid_t;
-#endif
-#if !defined(HAVE_BUFCALL_ID_T)
-typedef int bufcall_id_t;
-#endif
-
 typedef struct tirdwr {
 	queue_t *rq;			/* module read queue */
 	queue_t *wq;			/* module write queue */
@@ -214,6 +211,7 @@ static tirdwr_t *
 tirdwr_alloc_priv(queue_t *q)
 {
 	tirdwr_t *priv;
+
 	if ((priv = kmem_cache_alloc(tirdwr_priv_cachep, SLAB_ATOMIC))) {
 		priv->rq = q;
 		priv->wq = WR(q);
@@ -223,8 +221,7 @@ tirdwr_alloc_priv(queue_t *q)
 		priv->rdzero_bcid = 0;
 		priv->hangup_bcid = 0;
 		priv->eproto_bcid = 0;
-		/* 
-		   we are a module with no service routine so our hiwat, lowat shouldn't matter;
+		/* we are a module with no service routine so our hiwat, lowat shouldn't matter;
 		   however, our minpsz, maxpsz do because we are the first queue under the stream
 		   head.  We do not want to alter the characteristics of the transport packet sizes
 		   so we copy them here. This will allow the stream head to exhibit the same
@@ -240,6 +237,7 @@ static void
 tirdwr_free_priv(queue_t *q)
 {
 	tirdwr_t *priv;
+
 	if ((priv = (typeof(priv)) q->q_ptr)) {
 		if (priv->rdzero_bcid)
 			unbufcall(xchg(&priv->rdzero_bcid, 0));
@@ -265,9 +263,9 @@ tirdwr_free_priv(queue_t *q)
  *
  *  =========================================================================
  */
-static void tirdwr_rdzero_bc(long arg);
-static void tirdwr_hangup_bc(long arg);
-static void tirdwr_eproto_bc(long arg);
+static void streamscall tirdwr_rdzero_bc(long arg);
+static void streamscall tirdwr_hangup_bc(long arg);
+static void streamscall tirdwr_eproto_bc(long arg);
 
 #define TIRDWR_HANGUP	01
 #define TIRDWR_EPROTO	02
@@ -301,12 +299,10 @@ tirdwr_hangup(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 	if (!(priv->flags & (TIRDWR_HANGUP | TIRDWR_EPROTO))) {
 		if (priv->hangup_bcid != 0)
 			unbufcall(xchg(&priv->hangup_bcid, 0));
-		/* 
-		   LiS does not have a reliable putnextctl() */
+		/* LiS does not have a reliable putnextctl() */
 		if ((mp = allocb(0, BPRI_HI))) {
 			mp->b_datap->db_type = M_HANGUP;
-			/* 
-			   LiS doesn't have a reliable putnext() either :/ */
+			/* LiS doesn't have a reliable putnext() either :/ */
 			putnext(priv->rq, mp);
 			priv->flags |= TIRDWR_HANGUP;
 			return;
@@ -338,24 +334,27 @@ tirdwr_eproto(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 	}
 }
 
-static void
+static void streamscall
 tirdwr_rdzero_bc(long arg)
 {
 	tirdwr_t *priv = (typeof(priv)) arg;
+
 	if (xchg(&priv->rdzero_bcid, 0) != 0)
 		tirdwr_hangup((tirdwr_t *) arg, NULL, NULL);
 }
-static void
+static void streamscall
 tirdwr_hangup_bc(long arg)
 {
 	tirdwr_t *priv = (typeof(priv)) arg;
+
 	if (xchg(&priv->hangup_bcid, 0) != 0)
 		tirdwr_hangup((tirdwr_t *) arg, NULL, NULL);
 }
-static void
+static void streamscall
 tirdwr_eproto_bc(long arg)
 {
 	tirdwr_t *priv = (typeof(priv)) arg;
+
 	if (xchg(&priv->eproto_bcid, 0) != 0)
 		tirdwr_eproto((tirdwr_t *) arg, NULL, NULL);
 }
@@ -372,8 +371,7 @@ static inline void
 tirdwr_restore_delim(t_uscalar_t flag, mblk_t *mp)
 {
 #if !defined TIRDWR_PEDANTIC
-	/* 
-	   Although SVR 4 documentation says that we ignore message delimitors, we restore message
+	/* Although SVR 4 documentation says that we ignore message delimitors, we restore message
 	   delimitors in case the RMSGN or RMSGD read options are set at the stream head. Otherwise
 	   they are ignored anyway. */
 	if (flag)
@@ -384,11 +382,12 @@ tirdwr_restore_delim(t_uscalar_t flag, mblk_t *mp)
 	return;
 }
 
-static int
+static streamscall int
 tirdwr_rput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *bp = NULL;
+
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
@@ -399,8 +398,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 #endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
-		/* 
-		   There is a problem here right off the bat.  Although a TPI compliant provider
+		/* There is a problem here right off the bat.  Although a TPI compliant provider
 		   must accept M_DATA written (instead of T_DATA_REQ), it should not generate
 		   M_DATA on read.  These should only be T_DATA_IND.  tirdwr can be pushed over
 		   other modules, however, and an underlying module (e.g. timod) might be stripping 
@@ -410,8 +408,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 			if (msgdsize(mp) > 0) {
 				putnext(q, mp);
 			} else {
-				/* 
-				   Silently discard zero length normal data. */
+				/* Silently discard zero length normal data. */
 				freemsg(mp);
 			}
 		} else
@@ -420,8 +417,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 		break;
 	case M_PCPROTO:
 #	    if defined TIRDWR_TPI_PEDANTIC
-		/* 
-		   We could be forgiving and accept M_PCPROTO mesages that should actually be sent
+		/* We could be forgiving and accept M_PCPROTO mesages that should actually be sent
 		   as M_PROTO messages; however, a transport service provider that sends M_PCPROTO
 		   for data or disconnect messages is in violation of the TPI specifications. */
 		tirdwr_eproto(priv, mp, bp);
@@ -430,6 +426,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 	case M_PROTO:
 	{
 		union T_primitives *p = (typeof(p)) mp->b_rptr;
+
 		if (mp->b_wptr < mp->b_rptr + sizeof(p->type)) {
 			tirdwr_eproto(priv, mp, bp);
 			break;
@@ -442,8 +439,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 					freeb(mp);
 					putnext(q, bp);
 				} else {
-					/* 
-					   Silently discard zero length normal data. */
+					/* Silently discard zero length normal data. */
 					freeb(mp);
 					freemsg(bp);
 				}
@@ -452,8 +448,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 			break;
 #	    if defined T_OPTDATA_IND
 		case T_OPTDATA_IND:
-			/* 
-			   T_OPTDATA is not always provided by the tihdr and is a more recent TPI
+			/* T_OPTDATA is not always provided by the tihdr and is a more recent TPI
 			   (Version 5 Release 2) addition.  The purpose of T_OPTDATA is to support
 			   sockmod rather than timod or bare TI streams.  If we are pedantic about
 			   the TPI spec, we should not accept them even if we have them. */
@@ -466,8 +461,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 					freeb(mp);
 					putnext(q, bp);
 				} else {
-					/* 
-					   Silently discard zero length normal data. */
+					/* Silently discard zero length normal data. */
 					freeb(mp);
 					freemsg(bp);
 				}
@@ -477,12 +471,27 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 			break;
 #	    endif		/* defined T_OPTDATA_IND */
 		case T_DISCON_IND:
+			/* need to pass up any data belonging to the disconnect indication first. */
+			if ((bp = unlinkb(mp)) && bp->b_datap->db_type == M_DATA && bp->b_band == 0) {
+				if (msgdsize(bp) > 0) {
+					putnext(q, bp);
+					bp = NULL;
+				}
+			}
 			tirdwr_hangup(priv, mp, bp);
 			priv->state = TS_IDLE;
 			break;
 		case T_ORDREL_IND:
+			/* need to pass up any data belonging to the orderly release first. */
 			switch (priv->state) {
 			case TS_DATA_XFER:
+				if ((bp = unlinkb(mp)) && bp->b_datap->db_type == M_DATA
+				    && bp->b_band == 0) {
+					if (msgdsize(bp) > 0) {
+						putnext(q, bp);
+						bp = NULL;
+					}
+				}
 				tirdwr_rdzero(priv, mp, bp);
 				priv->state = TS_WREQ_ORDREL;
 				break;
@@ -513,8 +522,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 		putnext(q, mp);
 		break;
 	default:
-		/* 
-		   If we are pedantic about the TPI spec and TIRDWR operation, we should not permit 
+		/* If we are pedantic about the TPI spec and TIRDWR operation, we should not permit 
 		   any other STREAMS messages from being transported upstream.  To be a little more 
 		   forgiving we could just pass what we don't recognize. */
 #	    if defined TIRDWR_TPI_PEDANTIC || defined TIRDWR_PEDANTIC
@@ -527,11 +535,12 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int
+static streamscall int
 tirdwr_wput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
+
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
@@ -547,13 +556,11 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 				if (msgdsize(mp) > 0) {
 					putnext(q, mp);
 				} else {
-					/* 
-					   Silently discard zero-length data */
+					/* Silently discard zero-length data */
 					freemsg(mp);
 				}
 			} else {
-				/* 
-				   error on banded (expedited) data */
+				/* error on banded (expedited) data */
 				tirdwr_eproto(priv, mp, NULL);
 			}
 		} else
@@ -561,8 +568,7 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 		break;
 	case M_PROTO:
 	case M_PCPROTO:
-		/* 
-		   The major reason for denying these messages is that the normal use of tirdwr is
+		/* The major reason for denying these messages is that the normal use of tirdwr is
 		   to dup2 standard in or standard out or both with a connected XTI device with
 		   tirdwr pushed. Because the parent can still access the stream with XTI commands, 
 		   these need to generate EPROTO to signal both parent and child that something is
@@ -600,15 +606,14 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 			break;
 		}
 #	    endif		/* !defined TIRDWR_PEDANTIC */
-		/* 
-		   Documentation states that XTI/TLI library commands should fail with EPROTO.
+		/* Documentation states that XTI/TLI library commands should fail with EPROTO.
 		   Also, there is never any reason why the user should be accessing lower layer
 		   IOCTLs with tirdwr installed.  This acheives that effect. */
-		tirdwr_eproto(priv, NULL, NULL);
 		mp->b_datap->db_type = M_IOCNAK;
 		iocp->ioc_error = EPROTO;
 		iocp->ioc_rval = -1;
 		qreply(q, mp);
+		tirdwr_eproto(priv, NULL, NULL);	/* XXX */
 		break;
 	default:
 		tirdwr_eproto(priv, mp, NULL);
@@ -631,8 +636,8 @@ tirdwr_push(queue_t *q)
 {
 	queue_t *hq;
 	int err = 0;
-	/* 
-	   Need to check for bad messages on stream head read queue. LiS does not have a freezestr
+
+	/* Need to check for bad messages on stream head read queue. LiS does not have a freezestr
 	   or much of a qprocsoff, but the stream should be effectively frozen, so we can
 	   dereference the q->q_next pointer.  If anything, the q->q_next pointer should remain
 	   valid until we return from the open procedure. */
@@ -640,10 +645,11 @@ tirdwr_push(queue_t *q)
 		err = EFAULT;
 	else if (qsize(hq) > 0) {
 		mblk_t *mp;
+
 #ifdef LIS
 		lis_flags_t psw;
-		/* 
-		   Under LiS we can't freeze the stream but we can lock the queue.  This is not a
+
+		/* Under LiS we can't freeze the stream but we can lock the queue.  This is not a
 		   completely satisfactory solution for SMP because another processor could be in
 		   the middle of performing putq to the queue from before the push while we lock
 		   the queue.  Unless LiS provides assurances that the qopen procedure of the
@@ -687,22 +693,26 @@ tirdwr_pop(queue_t *q)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *mp;
+
 	switch (priv->state) {
 	case TS_WREQ_ORDREL:
 		if (!(priv->flags & TIRDWR_EPROTO)) {
 			if ((mp = allocb(sizeof(struct T_ordrel_req), BPRI_WAITOK))) {
-				struct T_ordrel_req *prim = ((typeof(prim)) mp->b_wptr)++;
+				struct T_ordrel_req *prim = (typeof(prim)) mp->b_wptr;
+
+				mp->b_wptr = (unsigned char *) (prim + 1);
 				mp->b_datap->db_type = M_PROTO;
 				prim->PRIM_type = T_ORDREL_REQ;
 				putnext(priv->wq, mp);
 			}
 			break;
 		}
-		/* 
-		   fall through */
+		/* fall through */
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
-			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
+			struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+
+			mp->b_wptr = (unsigned char *) (prim + 1);
 			mp->b_datap->db_type = M_PROTO;
 			prim->PRIM_type = T_DISCON_REQ;
 			prim->SEQ_number = 0;
@@ -737,12 +747,11 @@ tirdwr_pop(queue_t *q)
 #   endif			/* defined M_UNHANGUP */
 }
 
-static int
+static streamscall int
 tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int err;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
-	err = 0;
+	int err = 0;
+
 	if (q->q_ptr != NULL)
 		goto quit;	/* already open */
 	err = ENXIO;
@@ -756,18 +765,20 @@ tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	qprocson(q);
 	return (0);
       quit:
-	MOD_DEC_USE_COUNT;
 	return (err);
 }
 
-static int
+static streamscall int
 tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 {
+	queue_t *rq, *wq;
+
 	(void) oflag;
 	(void) crp;
+	(void) rq;
+	(void) wq;
 #if defined LIS
-	/* 
-	   protect against some LiS bugs */
+	/* protect against some LiS bugs */
 	if (q->q_ptr == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
 		goto quit;
@@ -778,12 +789,15 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 		goto skip_pop;
 	}
 #endif				/* defined LIS */
+	rq = RD(q);
+	wq = WR(q);
+	__ensure(rq->q_next != NULL, goto skip_pop);
+	__ensure(wq->q_next != NULL, goto skip_pop);
 	tirdwr_pop(q);
 	goto skip_pop;
       skip_pop:
 	qprocsoff(q);
 	tirdwr_free_priv(q);
-	MOD_DEC_USE_COUNT;
 	goto quit;
       quit:
 	return (0);
@@ -803,6 +817,7 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -827,6 +842,7 @@ STATIC int
 tirdwr_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&tirdwr_fmod)) < 0)
 		return (err);
 	return (0);
@@ -836,6 +852,7 @@ STATIC int
 tirdwr_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&tirdwr_fmod)) < 0)
 		return (err);
 	return (0);
@@ -853,6 +870,7 @@ STATIC int
 tirdwr_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&tirdwrinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	return (0);
@@ -862,6 +880,7 @@ STATIC int
 tirdwr_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&tirdwrinfo)) < 0)
 		return (err);
 	return (0);
@@ -873,6 +892,7 @@ MODULE_STATIC int __init
 tirdwrinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = tirdwr_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -892,6 +912,7 @@ MODULE_STATIC void __exit
 tirdwrterminate(void)
 {
 	int err;
+
 	if ((err = tirdwr_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = tirdwr_term_caches()))

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:32 $
+ @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 00:52:38 $
 
  -----------------------------------------------------------------------------
 
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:32 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp.c,v $
+ Revision 0.9.2.5  2006/09/26 00:52:38  brian
+ - rationalized to embedded packages
+
  Revision 0.9.2.4  2005/05/14 08:31:32  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:32 $"
+#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 00:52:38 $"
 
-static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:32 $";
+static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 00:52:38 $";
 
 /* 
  *  This file is for testing the sctp_n driver.
@@ -297,12 +300,10 @@ print_addr(char *add_ptr, size_t add_len)
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
 	int i;
 	size_t anum = (add_len - sizeof(a->port)) / sizeof(*a->addr);
+
 	printf("[%d]", ntohs(a->port));
 	for (i = 0; i < anum; i++) {
-		printf(" %d.%d.%d.%d",
-		       (a->addr[i] >> 0) & 0xff,
-		       (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff,
-		       (a->addr[i] >> 24) & 0xff);
+		printf(" %d.%d.%d.%d", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
 	}
 	printf("\n");
 }
@@ -311,6 +312,7 @@ void
 print_qos(char *qos_ptr, size_t add_len)
 {
 	N_qos_sctp_t *qos = (N_qos_sctp_t *) qos_ptr;
+
 	switch (qos->n_qos_type) {
 	case N_QOS_SEL_CONN_SCTP:
 		printf("CONN:");
@@ -352,27 +354,24 @@ print_msg(int fd)
 
 		case N_INFO_ACK:
 			printf("%d-N_INFO_ACK:\n", fd);
-			printf("  NSDU_size      = %lu\n", cmd.npi.info_ack.NSDU_size);
-			printf("  ENSDU_size     = %lu\n", cmd.npi.info_ack.ENSDU_size);
-			printf("  CDATA_size     = %lu\n", cmd.npi.info_ack.CDATA_size);
-			printf("  DDATA_size     = %lu\n", cmd.npi.info_ack.DDATA_size);
-			printf("  ADDR_size      = %lu\n", cmd.npi.info_ack.ADDR_size);
+			printf("  NSDU_size      = %lu\n", (ulong) cmd.npi.info_ack.NSDU_size);
+			printf("  ENSDU_size     = %lu\n", (ulong) cmd.npi.info_ack.ENSDU_size);
+			printf("  CDATA_size     = %lu\n", (ulong) cmd.npi.info_ack.CDATA_size);
+			printf("  DDATA_size     = %lu\n", (ulong) cmd.npi.info_ack.DDATA_size);
+			printf("  ADDR_size      = %lu\n", (ulong) cmd.npi.info_ack.ADDR_size);
 			printf("  ADDR           = ");
-			print_addr(cmd.cbuf + cmd.npi.info_ack.ADDR_offset,
-				   cmd.npi.info_ack.ADDR_length);
+			print_addr(cmd.cbuf + cmd.npi.info_ack.ADDR_offset, cmd.npi.info_ack.ADDR_length);
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + cmd.npi.info_ack.QOS_offset,
-				  cmd.npi.info_ack.QOS_length);
+			print_qos(cmd.cbuf + cmd.npi.info_ack.QOS_offset, cmd.npi.info_ack.QOS_length);
 			printf("  QOR            = ");
-			print_qos(cmd.cbuf + cmd.npi.info_ack.QOS_range_offset,
-				  cmd.npi.info_ack.QOS_range_length);
+			print_qos(cmd.cbuf + cmd.npi.info_ack.QOS_range_offset, cmd.npi.info_ack.QOS_range_length);
 			printf("  OPTIONS_flags  =");
 			if (cmd.npi.info_ack.OPTIONS_flags & REC_CONF_OPT)
 				printf(" REC_CONF_OPT");
 			if (cmd.npi.info_ack.OPTIONS_flags & EX_DATA_OPT)
 				printf(" EX_DATA_OPT");
 			printf("\n");
-			printf("  NIDU_size      = %lu\n", cmd.npi.info_ack.NIDU_size);
+			printf("  NIDU_size      = %lu\n", (ulong) cmd.npi.info_ack.NIDU_size);
 			printf("  SERV_type      =");
 			if (cmd.npi.info_ack.SERV_type & N_CONS)
 				printf(" N_CONS");
@@ -390,21 +389,20 @@ print_msg(int fd)
 				printf("N_SUBNET\n");
 				break;
 			default:
-				printf("(unknown %lu)\n", cmd.npi.info_ack.PROVIDER_type);
+				printf("(unknown %lu)\n", (ulong) cmd.npi.info_ack.PROVIDER_type);
 				break;
 			}
-			printf("  NODU_size      = %lu\n", cmd.npi.info_ack.NODU_size);
-			printf("  PROTOID_length = %lu\n", cmd.npi.info_ack.PROTOID_length);
-			printf("  PROTOID_offset = %lu\n", cmd.npi.info_ack.PROTOID_offset);
-			printf("  NPI_version    = %lu\n", cmd.npi.info_ack.NPI_version);
+			printf("  NODU_size      = %lu\n", (ulong) cmd.npi.info_ack.NODU_size);
+			printf("  PROTOID_length = %lu\n", (ulong) cmd.npi.info_ack.PROTOID_length);
+			printf("  PROTOID_offset = %lu\n", (ulong) cmd.npi.info_ack.PROTOID_offset);
+			printf("  NPI_version    = %lu\n", (ulong) cmd.npi.info_ack.NPI_version);
 			break;
 
 		case N_BIND_REQ:
 			printf("%d-N_BIND_REQ:\n", fd);
 			printf("  ADDR           = ");
-			print_addr(cmd.cbuf + cmd.npi.bind_req.ADDR_offset,
-				   cmd.npi.bind_req.ADDR_length);
-			printf("  CONIND_number  = %lu\n", cmd.npi.bind_req.CONIND_number);
+			print_addr(cmd.cbuf + cmd.npi.bind_req.ADDR_offset, cmd.npi.bind_req.ADDR_length);
+			printf("  CONIND_number  = %lu\n", (ulong) cmd.npi.bind_req.CONIND_number);
 			printf("  BIND_flags     =");
 			if (cmd.npi.bind_req.BIND_flags & DEFAULT_LISTENER)
 				printf(" DEFAULT_LISTENER");
@@ -413,19 +411,18 @@ print_msg(int fd)
 			if (cmd.npi.bind_req.BIND_flags & DEFAULT_DEST)
 				printf(" DEFAULT_DEST");
 			printf("\n");
-			printf("  PROTOID_length = %lu\n", cmd.npi.bind_req.PROTOID_length);
-			printf("  PROTOID_offset = %lu\n", cmd.npi.bind_req.PROTOID_offset);
+			printf("  PROTOID_length = %lu\n", (ulong) cmd.npi.bind_req.PROTOID_length);
+			printf("  PROTOID_offset = %lu\n", (ulong) cmd.npi.bind_req.PROTOID_offset);
 			break;
 
 		case N_BIND_ACK:
 			printf("%d-N_BIND_ACK:\n", fd);
 			printf("  ADDR           = ");
-			print_addr(cmd.cbuf + cmd.npi.bind_ack.ADDR_offset,
-				   cmd.npi.bind_ack.ADDR_length);
-			printf("  CONIND_number  = %lu\n", cmd.npi.bind_ack.CONIND_number);
-			printf("  TOKEN_value    = %lu\n", cmd.npi.bind_ack.TOKEN_value);
-			printf("  PROTOID_length = %lu\n", cmd.npi.bind_ack.PROTOID_length);
-			printf("  PROTOID_offset = %lu\n", cmd.npi.bind_ack.PROTOID_offset);
+			print_addr(cmd.cbuf + cmd.npi.bind_ack.ADDR_offset, cmd.npi.bind_ack.ADDR_length);
+			printf("  CONIND_number  = %lu\n", (ulong) cmd.npi.bind_ack.CONIND_number);
+			printf("  TOKEN_value    = %lu\n", (ulong) cmd.npi.bind_ack.TOKEN_value);
+			printf("  PROTOID_length = %lu\n", (ulong) cmd.npi.bind_ack.PROTOID_length);
+			printf("  PROTOID_offset = %lu\n", (ulong) cmd.npi.bind_ack.PROTOID_offset);
 			break;
 
 		case N_ERROR_ACK:
@@ -434,9 +431,7 @@ print_msg(int fd)
 			print_prim(cmd.npi.error_ack.ERROR_prim);
 			printf("  NPI_error      = ");
 			print_error(cmd.npi.error_ack.NPI_error);
-			printf("  UNIX_error     = %lu (%s)\n",
-			       cmd.npi.error_ack.UNIX_error,
-			       strerror(cmd.npi.error_ack.UNIX_error));
+			printf("  UNIX_error     = %lu (%s)\n", (ulong) cmd.npi.error_ack.UNIX_error, strerror(cmd.npi.error_ack.UNIX_error));
 			break;
 
 		case N_OK_ACK:
@@ -448,8 +443,7 @@ print_msg(int fd)
 		case N_CONN_REQ:
 			printf("%d-N_CONN_REQ:\n", fd);
 			printf("  DEST           = ");
-			print_addr(cmd.cbuf + cmd.npi.conn_req.DEST_offset,
-				   cmd.npi.conn_req.DEST_length);
+			print_addr(cmd.cbuf + cmd.npi.conn_req.DEST_offset, cmd.npi.conn_req.DEST_length);
 			printf("  CONN_flags     =");
 			if (cmd.npi.conn_req.CONN_flags & REC_CONF_OPT)
 				printf(" REC_CONF_OPT");
@@ -457,19 +451,16 @@ print_msg(int fd)
 				printf(" EX_DATA_OPT");
 			printf("\n");
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + cmd.npi.conn_req.QOS_offset,
-				  cmd.npi.conn_req.QOS_length);
+			print_qos(cmd.cbuf + cmd.npi.conn_req.QOS_offset, cmd.npi.conn_req.QOS_length);
 			break;
 
 		case N_CONN_IND:
 			printf("%d-N_CONN_IND:\n", fd);
 			printf("  DEST           = ");
-			print_addr(cmd.cbuf + cmd.npi.conn_ind.DEST_offset,
-				   cmd.npi.conn_ind.DEST_length);
+			print_addr(cmd.cbuf + cmd.npi.conn_ind.DEST_offset, cmd.npi.conn_ind.DEST_length);
 			printf("  SRC            = ");
-			print_addr(cmd.cbuf + cmd.npi.conn_ind.SRC_offset,
-				   cmd.npi.conn_ind.SRC_length);
-			printf("  SEQ_number     = %lu\n", cmd.npi.conn_ind.SEQ_number);
+			print_addr(cmd.cbuf + cmd.npi.conn_ind.SRC_offset, cmd.npi.conn_ind.SRC_length);
+			printf("  SEQ_number     = %lu\n", (ulong) cmd.npi.conn_ind.SEQ_number);
 			printf("  CONN_flags     =");
 			if (cmd.npi.conn_ind.CONN_flags & REC_CONF_OPT)
 				printf(" REC_CONF_OPT");
@@ -477,17 +468,15 @@ print_msg(int fd)
 				printf(" EX_DATA_OPT");
 			printf("\n");
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + cmd.npi.conn_ind.QOS_offset,
-				  cmd.npi.conn_ind.QOS_length);
+			print_qos(cmd.cbuf + cmd.npi.conn_ind.QOS_offset, cmd.npi.conn_ind.QOS_length);
 			break;
 
 		case N_CONN_RES:
 			printf("%d-N_CONN_RES:\n", fd);
-			printf("  TOKEN_value    = %lu\n", cmd.npi.conn_res.TOKEN_value);
+			printf("  TOKEN_value    = %lu\n", (ulong) cmd.npi.conn_res.TOKEN_value);
 			printf("  RES            = ");
-			print_addr(cmd.cbuf + cmd.npi.conn_res.RES_offset,
-				   cmd.npi.conn_res.RES_length);
-			printf("  SEQ_number     = %lu\n", cmd.npi.conn_res.SEQ_number);
+			print_addr(cmd.cbuf + cmd.npi.conn_res.RES_offset, cmd.npi.conn_res.RES_length);
+			printf("  SEQ_number     = %lu\n", (ulong) cmd.npi.conn_res.SEQ_number);
 			printf("  CONN_flags     =");
 			if (cmd.npi.conn_res.CONN_flags & REC_CONF_OPT)
 				printf(" REC_CONF_OPT");
@@ -495,15 +484,13 @@ print_msg(int fd)
 				printf(" EX_DATA_OPT");
 			printf("\n");
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + cmd.npi.conn_res.QOS_offset,
-				  cmd.npi.conn_res.QOS_length);
+			print_qos(cmd.cbuf + cmd.npi.conn_res.QOS_offset, cmd.npi.conn_res.QOS_length);
 			break;
 
 		case N_CONN_CON:
 			printf("%d-N_CONN_CON:\n", fd);
 			printf("  RES            = ");
-			print_addr(cmd.cbuf + cmd.npi.conn_con.RES_offset,
-				   cmd.npi.conn_con.RES_length);
+			print_addr(cmd.cbuf + cmd.npi.conn_con.RES_offset, cmd.npi.conn_con.RES_length);
 			printf("  CONN_flags     =");
 			if (cmd.npi.conn_con.CONN_flags & REC_CONF_OPT)
 				printf(" REC_CONF_OPT");
@@ -511,8 +498,7 @@ print_msg(int fd)
 				printf(" EX_DATA_OPT");
 			printf("\n");
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + cmd.npi.conn_con.QOS_offset,
-				  cmd.npi.conn_res.QOS_length);
+			print_qos(cmd.cbuf + cmd.npi.conn_con.QOS_offset, cmd.npi.conn_res.QOS_length);
 
 			break;
 
@@ -525,8 +511,7 @@ print_msg(int fd)
 				printf(" N_RC_FLAG");
 			printf("\n");
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + sizeof(cmd.npi.data_req),
-				  ctrl.len - sizeof(cmd.npi.data_req));
+			print_qos(cmd.cbuf + sizeof(cmd.npi.data_req), ctrl.len - sizeof(cmd.npi.data_req));
 			break;
 
 		case N_DATA_IND:
@@ -538,47 +523,42 @@ print_msg(int fd)
 				printf(" N_RC_FLAG");
 			printf("\n");
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + sizeof(cmd.npi.data_ind),
-				  ctrl.len - sizeof(cmd.npi.data_ind));
+			print_qos(cmd.cbuf + sizeof(cmd.npi.data_ind), ctrl.len - sizeof(cmd.npi.data_ind));
 			break;
 
 		case N_EXDATA_REQ:
 			printf("%d-N_EXDATA_REQ:\n", fd);
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + sizeof(cmd.npi.exdata_req),
-				  ctrl.len - sizeof(cmd.npi.exdata_req));
+			print_qos(cmd.cbuf + sizeof(cmd.npi.exdata_req), ctrl.len - sizeof(cmd.npi.exdata_req));
 			break;
 
 		case N_EXDATA_IND:
 			printf("%d-N_EXDATA_IND:\n", fd);
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + sizeof(cmd.npi.exdata_ind),
-				  ctrl.len - sizeof(cmd.npi.exdata_ind));
+			print_qos(cmd.cbuf + sizeof(cmd.npi.exdata_ind), ctrl.len - sizeof(cmd.npi.exdata_ind));
 			break;
 
 		case N_DATACK_REQ:
 			printf("%d-N_DATACK_REQ:\n", fd);
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + sizeof(cmd.npi.datack_req),
-				  ctrl.len - sizeof(cmd.npi.datack_req));
+			print_qos(cmd.cbuf + sizeof(cmd.npi.datack_req), ctrl.len - sizeof(cmd.npi.datack_req));
 			break;
 
 		case N_DATACK_IND:
 			printf("%d-N_DATACK_IND:\n", fd);
 			printf("  QOS            = ");
-			print_qos(cmd.cbuf + sizeof(cmd.npi.datack_ind),
-				  ctrl.len - sizeof(cmd.npi.datack_ind));
+			print_qos(cmd.cbuf + sizeof(cmd.npi.datack_ind), ctrl.len - sizeof(cmd.npi.datack_ind));
 			break;
 
 		case N_RESET_REQ:
 			printf("%d-N_RESET_REQ:\n", fd);
-			printf("  RESET_reason   = %lu\n", cmd.npi.reset_req.RESET_reason);
+			printf("  RESET_reason   = %lu\n", (ulong) cmd.npi.reset_req.RESET_reason);
 			break;
 
 		case N_RESET_IND:
 			printf("%d-N_RESET_IND:\n", fd);
-			printf("  RESET_orig     = %lu\n", cmd.npi.reset_ind.RESET_orig);
-			printf("  RESET_reason   = %lu\n", cmd.npi.reset_ind.RESET_reason);
+			printf("  RESET_orig     = %lu\n", (ulong) cmd.npi.reset_ind.RESET_orig);
+			printf("  RESET_reason   = %lu\n", (ulong) cmd.npi.reset_ind.RESET_reason);
 			break;
 
 		case N_RESET_RES:
@@ -591,25 +571,23 @@ print_msg(int fd)
 
 		case N_DISCON_REQ:
 			printf("%d-N_DISCON_REQ:\n", fd);
-			printf("  DISCON_reason  = %lu\n", cmd.npi.discon_req.DISCON_reason);
+			printf("  DISCON_reason  = %lu\n", (ulong) cmd.npi.discon_req.DISCON_reason);
 			printf("  RES            = ");
-			print_addr(cmd.cbuf + cmd.npi.discon_req.RES_offset,
-				   cmd.npi.discon_req.RES_length);
-			printf("  SEQ_number     = %lu\n", cmd.npi.discon_req.SEQ_number);
+			print_addr(cmd.cbuf + cmd.npi.discon_req.RES_offset, cmd.npi.discon_req.RES_length);
+			printf("  SEQ_number     = %lu\n", (ulong) cmd.npi.discon_req.SEQ_number);
 			break;
 
 		case N_DISCON_IND:
 			printf("%d-N_DISCON_IND:\n", fd);
-			printf("  DISCON_orig    = %lu\n", cmd.npi.discon_ind.DISCON_orig);
-			printf("  DISCON_reason  = %lu\n", cmd.npi.discon_ind.DISCON_reason);
+			printf("  DISCON_orig    = %lu\n", (ulong) cmd.npi.discon_ind.DISCON_orig);
+			printf("  DISCON_reason  = %lu\n", (ulong) cmd.npi.discon_ind.DISCON_reason);
 			printf("  RES            = ");
-			print_addr(cmd.cbuf + cmd.npi.discon_ind.RES_offset,
-				   cmd.npi.discon_ind.RES_length);
-			printf("  SEQ_number     = %lu\n", cmd.npi.discon_ind.SEQ_number);
+			print_addr(cmd.cbuf + cmd.npi.discon_ind.RES_offset, cmd.npi.discon_ind.RES_length);
+			printf("  SEQ_number     = %lu\n", (ulong) cmd.npi.discon_ind.SEQ_number);
 			break;
 
 		default:
-			printf("Unrecognized primitive %lu!\n", cmd.prim);
+			printf("Unrecognized primitive %lu!\n", (ulong) cmd.prim);
 			break;
 		}
 		FFLUSH(stdout);
@@ -620,15 +598,18 @@ int
 get_only(int fd, int wait)
 {
 	int ret;
+
 	do {
 		struct pollfd pfd[] = {
 			{fd, POLLIN | POLLPRI, 0}
 		};
+
 		if (!(ret = poll(pfd, 1, wait)))
 			return (-1);
 		if (ret == 1 || ret == 2) {
 			if (pfd[0].revents & (POLLIN | POLLPRI)) {
 				int flags = 0;
+
 				if (getmsg(fd, &ctrl, &data, &flags) == 0) {
 					print_msg(fd);
 					return (cmd.prim);
@@ -662,6 +643,7 @@ int
 sctp_n_open(void)
 {
 	int fd;
+
 	printf("\nOPEN: sctp_n\n");
 	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
 		printf("ERROR: open: [%d] %s\n", errno, strerror(errno));
@@ -714,6 +696,7 @@ void
 sctp_conn_req(int fd, addr_t * addr)
 {
 	N_qos_sel_conn_sctp_t qos = { 0, };
+
 	qos.n_qos_type = N_QOS_SEL_CONN_SCTP;
 	qos.i_streams = 1;
 	qos.o_streams = 1;
@@ -745,6 +728,7 @@ void
 sctp_data(int fd, int fd2, const char *data)
 {
 	N_qos_sel_data_sctp_t qos;
+
 	qos.n_qos_type = N_QOS_SEL_DATA_SCTP;
 	qos.ppi = 3;
 	qos.sid = 0;
@@ -817,14 +801,14 @@ do_tests(void)
 }
 
 void
-copying(int argc, char *argv[])
+splash(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -864,7 +848,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
+Regulations (\"FAR\") (or any successor regulations) or, in the  cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");
@@ -878,7 +862,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -914,16 +898,16 @@ Arguments:\n\
     (none)\n\
 Options:\n\
     -q, --quiet\n\
-        suppress normal output (equivalent to --verbose=0)\n\
+        Suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        increase verbosity or set to LEVEL [default: 1]\n\
-        this option may be repeated.\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+	This option may be repeated.\n\
     -h, --help, -?, --?\n\
-        print this usage message and exit\n\
+        Prints this usage message and exits\n\
     -V, --version\n\
-        print the version and exit\n\
+        Prints the version and exits\n\
     -C, --copying\n\
-        print copying permissions and exit\n\
+        Prints copyright and permission and exits\n\
 ", argv[0]);
 }
 
@@ -932,6 +916,7 @@ main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -942,9 +927,10 @@ main(int argc, char *argv[])
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{ 0, }
+			{NULL, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "qvhVC?");
@@ -969,7 +955,7 @@ main(int argc, char *argv[])
 			version(argc, argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			splash(argc, argv);
 			exit(0);
 		case '?':
 		default:
@@ -983,7 +969,6 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
@@ -993,7 +978,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+	splash(argc, argv);
 	do_tests();
 	exit(0);
 }

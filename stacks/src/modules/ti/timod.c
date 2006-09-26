@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:44 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:35 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:44 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:35 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: timod.c,v $
+ Revision 0.9.2.14  2006/09/26 00:52:35  brian
+ - rationalized to embedded packages
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:44 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:35 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:44 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:35 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -82,8 +87,8 @@ static char const ident[] =
 #endif
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:44 $"
+#define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:35 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -91,9 +96,9 @@ static char const ident[] =
 			TIMOD_COPYRIGHT	"\n" \
 			TIMOD_REVISION	"\n" \
 			TIMOD_DEVICE	"\n" \
-			TIMOD_CONTACT	"\n"
+			TIMOD_CONTACT
 #define TIMOD_SPLASH	TIMOD_DEVICE	" - " \
-			TIMOD_REVISION	"\n"
+			TIMOD_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(TIMOD_CONTACT);
@@ -107,10 +112,13 @@ MODULE_ALIAS("streams-timod");
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
-#define TIMOD_MOD_ID		CONFIG_STREAMS_TIMOD_MODID
-#define TIMOD_MOD_NAME		CONFIG_STREAMS_TIMOD_NAME
-#endif				/* LFS */
+#ifndef TIMOD_MOD_NAME
+#define TIMOD_MOD_NAME		"timod"
+#endif
+
+#ifndef TIMOD_MOD_ID
+#define TIMOD_MOD_ID		0
+#endif
 
 /*
  *  =========================================================================
@@ -129,35 +137,40 @@ MODULE_ALIAS("streams-timod");
 #endif				/* MODULE */
 
 static struct module_info timod_minfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static int timod_open(queue_t *, dev_t *, int, int, cred_t *);
-static int timod_close(queue_t *, int, cred_t *);
+static struct module_stat timod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat timod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
-static int timod_rput(queue_t *, mblk_t *);
-static int timod_wput(queue_t *, mblk_t *);
+static streamscall int timod_open(queue_t *, dev_t *, int, int, cred_t *);
+static streamscall int timod_close(queue_t *, int, cred_t *);
+
+static streamscall int timod_rput(queue_t *, mblk_t *);
+static streamscall int timod_wput(queue_t *, mblk_t *);
 
 static struct qinit timod_rinit = {
-	qi_putp:timod_rput,		/* Read put (message from below) */
-	qi_qopen:timod_open,		/* Each open */
-	qi_qclose:timod_close,		/* Last close */
-	qi_minfo:&timod_minfo,		/* Information */
+	.qi_putp = timod_rput,		/* Read put (message from below) */
+	.qi_qopen = timod_open,		/* Each open */
+	.qi_qclose = timod_close,	/* Last close */
+	.qi_minfo = &timod_minfo,	/* Information */
+	.qi_mstat = &timod_rstat,	/* Statistics */
 };
 
 static struct qinit timod_winit = {
-	qi_putp:timod_wput,		/* Write put (message from above) */
-	qi_minfo:&timod_minfo,		/* Information */
+	.qi_putp = timod_wput,		/* Write put (message from above) */
+	.qi_minfo = &timod_minfo,	/* Information */
+	.qi_mstat = &timod_wstat,	/* Statistics */
 };
 
 MODULE_STATIC struct streamtab timodinfo = {
-	st_rdinit:&timod_rinit,		/* Upper read queue */
-	st_wrinit:&timod_winit,		/* Upper write queue */
+	.st_rdinit = &timod_rinit,	/* Upper read queue */
+	.st_wrinit = &timod_winit,	/* Upper write queue */
 };
 
 /*
@@ -181,7 +194,7 @@ struct timod {
 
 static kmem_cache_t *timod_priv_cachep = NULL;
 
-static int
+static __unlikely int
 timod_init_caches(void)
 {
 	if (!timod_priv_cachep
@@ -195,7 +208,7 @@ timod_init_caches(void)
 	return (0);
 }
 
-static int
+static __unlikely int
 timod_term_caches(void)
 {
 	if (timod_priv_cachep) {
@@ -212,6 +225,7 @@ static struct timod *
 timod_alloc_priv(queue_t *q)
 {
 	struct timod *priv;
+
 	if ((priv = kmem_cache_alloc(timod_priv_cachep, SLAB_ATOMIC))) {
 		bzero(priv, sizeof(*priv));
 		priv->rq = q;
@@ -238,6 +252,7 @@ static void
 timod_free_priv(queue_t *q)
 {
 	struct timod *priv;
+
 	if ((priv = (typeof(priv)) q->q_ptr)) {
 		q->q_ptr = WR(q)->q_ptr = NULL;
 		priv->rq = NULL;
@@ -255,14 +270,16 @@ timod_free_priv(queue_t *q)
 	return;
 }
 
-static int
+static __hot_put int
 split_buffer(mblk_t *mp, int offset)
 {
 	unsigned char *ptr = mp->b_rptr + offset;
+
 	if (ptr > mp->b_wptr)
 		return (-EINVAL);
 	if (ptr < mp->b_wptr) {
 		mblk_t *dp;
+
 		if ((dp = copyb(mp))) {
 			dp->b_datap->db_type = M_DATA;
 			dp->b_rptr += offset;
@@ -284,10 +301,11 @@ split_buffer(mblk_t *mp, int offset)
  *  
  *  -------------------------------------------------------------------------
  */
-static int
-timod_rput(queue_t *q, mblk_t *mp)
+static noinline streams_fastcall __unlikely int
+timod_rput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
+
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
@@ -300,6 +318,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 		union T_primitives *p;
 		struct iocblk *ioc;
 		mblk_t *dp;
+
 	case M_PCPROTO:
 	case M_PROTO:
 		p = (typeof(p)) mp->b_rptr;
@@ -528,11 +547,42 @@ timod_rput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
+static streamscall __hot_in int
+timod_rput(queue_t *q, mblk_t *mp)
+{
+	union T_primitives *p;
 
-static int
-timod_wput(queue_t *q, mblk_t *mp)
+#if defined LIS
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			MOD_NAME, __FUNCTION__);
+		freemsg(mp);
+		return (0);
+	}
+#endif				/* defined LIS */
+	/* fast path for data */
+	if (unlikely(mp->b_datap->db_type != M_PROTO))
+		goto go_slow;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->type)))
+		goto go_slow;
+	p = (typeof(p)) mp->b_rptr;
+	/* conveniently none of these are > 31 */
+	if (unlikely(!((1 << p->type)
+		       & ((1 << T_UNITDATA_IND) | (1 << T_UDERROR_IND) |
+			  (1 << T_EXDATA_IND) | (1 << T_DATA_IND)))))
+		goto go_slow;
+	putnext(q, mp);
+	return (0);
+
+      go_slow:
+	return timod_rput_slow(q, mp);
+}
+
+static noinline streams_fastcall __unlikely int
+timod_wput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
+
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
@@ -546,6 +596,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		struct iocblk *ioc;
 		mblk_t *dp;
 		int err;
+
 	case M_IOCTL:
 		/* Most of the ioctls provided here are to acheive atomic and thread-safe
 		   operations on the stream for use by the XTI/TLI library.  Each ioctl takes a TPI 
@@ -614,6 +665,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		case TI_SETMYNAME:
 			if (p->type == T_CONN_RES && ioc->ioc_count >= sizeof(p->conn_res)) {
 				int doff = sizeof(p->conn_res);
+
 				if (p->conn_res.OPT_length
 				    && doff < p->conn_res.OPT_offset + p->conn_res.OPT_length)
 					doff = p->conn_res.OPT_offset + p->conn_res.OPT_length;
@@ -639,6 +691,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		case TI_SETPEERNAME:
 			if (p->type == T_CONN_REQ && ioc->ioc_count >= sizeof(p->conn_req)) {
 				int doff = sizeof(p->conn_req);
+
 				if (p->conn_req.OPT_length
 				    && doff < p->conn_req.OPT_offset + p->conn_req.OPT_length)
 					doff = p->conn_req.OPT_offset + p->conn_req.OPT_length;
@@ -700,6 +753,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		case TI_SYNC:
 			if (ioc->ioc_count >= sizeof(struct ti_sync_ack)) {
 				int flags = ((struct ti_sync_req *) p)->tsr_flags;
+
 				if (flags & TSRF_INFO_REQ) {
 					dp->b_datap->db_type = M_PCPROTO;
 					p->type = T_INFO_REQ;
@@ -864,6 +918,35 @@ timod_wput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
+static streamscall __hot_out int
+timod_wput(queue_t *q, mblk_t *mp)
+{
+	union T_primitives *p;
+
+#if defined LIS
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			MOD_NAME, __FUNCTION__);
+		freemsg(mp);
+		return (0);
+	}
+#endif				/* defined LIS */
+	/* fast path for data */
+	if (unlikely(mp->b_datap->db_type != M_PROTO))
+		goto go_slow;
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(p->type)))
+		goto go_slow;
+	p = (typeof(p)) mp->b_rptr;
+	/* conveniently none of these are > 31 */
+	if (unlikely(!((1 << p->type)
+		       & ((1 << T_UNITDATA_REQ) | (1 << T_EXDATA_REQ) | (1 << T_DATA_REQ)))))
+		goto go_slow;
+	putnext(q, mp);
+	return (0);
+
+      go_slow:
+	return timod_wput_slow(q, mp);
+}
 
 #define TIMOD_HANGUP	01
 #define TIMOD_EPROTO	02
@@ -892,11 +975,14 @@ timod_pop(queue_t *q)
 {
 	struct timod *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *mp;
+
 	switch (priv->state) {
 	case TS_WREQ_ORDREL:
 		if (!(priv->flags & TIMOD_EPROTO)) {
-			if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
-				struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
+			if ((mp = allocb(sizeof(struct T_ordrel_req), BPRI_WAITOK))) {
+				struct T_ordrel_req *prim = (typeof(prim)) mp->b_wptr;
+
+				mp->b_wptr = (unsigned char *) (prim + 1);
 				mp->b_datap->db_type = M_PROTO;
 				prim->PRIM_type = T_ORDREL_REQ;
 				qreply(q, mp);
@@ -905,7 +991,9 @@ timod_pop(queue_t *q)
 		/* fall through */
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
-			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
+			struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+
+			mp->b_wptr = (unsigned char *) (prim + 1);
 			mp->b_datap->db_type = M_PROTO;
 			prim->PRIM_type = T_DISCON_REQ;
 			prim->SEQ_number = 0;
@@ -941,12 +1029,11 @@ timod_pop(queue_t *q)
 #   endif			/* defined M_UNHANGUP */
 }
 
-static int
+static streamscall int
 timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int err;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
-	err = 0;
+	int err = 0;
+
 	if (q->q_ptr != NULL)
 		goto quit;	/* already open */
 	err = ENXIO;
@@ -958,11 +1045,10 @@ timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	qprocson(q);
 	return (0);
       quit:
-	MOD_DEC_USE_COUNT;
 	return (err);
 }
 
-static int
+static streamscall int
 timod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
@@ -984,7 +1070,6 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
       skip_pop:
 	qprocsoff(q);
 	timod_free_priv(q);
-	MOD_DEC_USE_COUNT;
 	goto quit;
       quit:
 	return (0);
@@ -1004,6 +1089,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -1024,23 +1110,89 @@ STATIC struct fmodsw timod_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-STATIC int
+STATIC __unlikely int
 timod_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&timod_fmod)) < 0)
 		return (err);
 	return (0);
 }
 
-STATIC int
+STATIC __unlikely int
 timod_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&timod_fmod)) < 0)
 		return (err);
 	return (0);
 }
+
+#if defined WITH_32BIT_CONVERSION
+struct timod_trans {
+	unsigned int cmd;
+	void *opaque;
+};
+
+STATIC timod_trans timod_trans_map[] = {
+	{.cmd = _O_TI_GETINFO,}
+	, {.cmd = _O_TI_OPTMGMT,}
+	, {.cmd = _O_TI_BIND,}
+	, {.cmd = _O_TI_UNBIND,}
+	, {.cmd = _O_TI_GETMYNAME,}
+	, {.cmd = _O_TI_GETPEERNAME,}
+	, {.cmd = _O_TI_XTI_HELLO,}
+	, {.cmd = _O_TI_XTI_GET_STATE,}
+	, {.cmd = _O_TI_XTI_CLEAR_EVENT,}
+	, {.cmd = _O_TI_XTI_MODE,}
+	, {.cmd = _O_TI_TLI_MODE,}
+	, {.cmd = O_TI_GETINFO,}
+	, {.cmd = O_TI_OPTMGMT,}
+	, {.cmd = O_TI_BIND,}
+	, {.cmd = O_TI_UNBIND,}
+	, {.cmd = TI_GETINFO,}
+	, {.cmd = TI_OPTMGMT,}
+	, {.cmd = TI_BIND,}
+	, {.cmd = TI_UNBIND,}
+	, {.cmd = TI_GETMYNAME,}
+	, {.cmd = TI_GETPEERNAME,}
+	, {.cmd = TI_SETMYNAME,}
+	, {.cmd = TI_SETPEERNAME,}
+	, {.cmd = TI_SYNC,}
+	, {.cmd = TI_GETADDRS,}
+	, {.cmd = TI_CAPABILITY,}
+	, {.cmd = 0,}
+};
+
+STATIC __unlikely void
+timod_ioctl32_unregister(void)
+{
+	struct timod_trans *t;
+
+	for (t = timod_trans_map; t->cmd != 0; t++) {
+		streams_unregister_ioctl32(t->opaque);
+		t->opaque = NULL;
+	}
+	return;
+}
+
+STATIC __unlikely int
+timod_ioctl32_register(void)
+{
+	struct timod_trans *t;
+
+	for (t = timod_trans_map; t->cmd != 0; t++) {
+		if ((t->opaque = streams_register_ioctl32(t->cmd)) == NULL) {
+			timod_ioctl32_unregister();
+			return (-ENOMEM);
+		}
+	}
+	return (0);
+}
+
+#endif				/* defined WITH_32BIT_CONVERSION */
 
 #endif				/* LFS */
 
@@ -1050,19 +1202,21 @@ timod_unregister_strmod(void)
  */
 #ifdef LIS
 
-STATIC int
+STATIC __unlikely int
 timod_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&timodinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	return (0);
 }
 
-STATIC int
+STATIC __unlikely int
 timod_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&timodinfo)) < 0)
 		return (err);
 	return (0);
@@ -1074,13 +1228,24 @@ MODULE_STATIC int __init
 timodinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = timod_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);
 	}
+#if defined WITH_32BIT_CONVERSION
+	if ((err = timod_ioctl32_register())) {
+		cmn_err(CE_WARN, "%s: could not register 32bit ioctls, err = %d", MOD_NAME, err);
+		timod_term_caches();
+		return (err);
+	}
+#endif				/* defined WITH_32BIT_CONVERSION */
 	if ((err = timod_register_strmod())) {
 		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+#if defined WITH_32BIT_CONVERSION
+		timod_ioctl32_unregister();
+#endif				/* defined WITH_32BIT_CONVERSION */
 		timod_term_caches();
 		return (err);
 	}
@@ -1093,8 +1258,12 @@ MODULE_STATIC void __exit
 timodterminate(void)
 {
 	int err;
+
 	if ((err = timod_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+#if defined WITH_32BIT_CONVERSION
+	timod_ioctl32_unregister();
+#endif				/* defined WITH_32BIT_CONVERSION */
 	if ((err = timod_term_caches()))
 		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;

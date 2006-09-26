@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/15 23:08:08 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/26 00:52:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,116 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:08 $ by $Author: brian $
+ Last Modified $Date: 2006/09/26 00:52:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/15 23:08:08 $"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/26 00:52:31 $"
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/15 23:08:08 $";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/26 00:52:31 $";
 
 #define __NO_VERSION__
 
-#include <sys/os7/compat.h>
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
+#endif
+
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#   error ****
+#   error **** One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error **** to compile the sctp driver.
+#   error ****
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	include <linux/module.h>
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
+#	undef HAVE_OPENSS7_SCTP
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_dup __sctp_dup
+#   define sctp_strm __sctp_strm
+#   define sctp_saddr __sctp_saddr
+#   define sctp_daddr __sctp_daddr
+#   define sctp_protolist __sctp_protolist
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   if !defined CONFIG_IP_SCTP && !defined CONFIG_IP_SCTP_MODULE
+#	undef HAVE_LKSCTP_SCTP
+#   endif
+#endif
+
+#if defined HAVE_LKSCTP_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_mib	    __sctp_mib
+#   define sctphdr	    __sctphdr
+#   define sctp_cookie	    __sctp_cookie
+#   define sctp_chunk	    __sctp_chunk
+#endif
+
+#if !defined HAVE_OPENSS7_SCTP
+#   undef sctp_addr
+#   define sctp_addr stupid_sctp_addr_in_the_wrong_place
+#endif
+
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+
+#if defined HAVE_OPENSS7_SCTP
+#   undef STATIC
+#   undef INLINE
+#   include <net/sctp.h>
+#endif
+
+#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
+#define _SS_MAXSIZE     128
+#define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
+#endif
+
+#include <sys/kmem.h>
+#include <sys/cmn_err.h>
+#include <sys/stream.h>
+#include <sys/dki.h>
+
+#ifdef LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
+#endif
+#include <sys/ddi.h>
+
+#ifndef LFS
+#include <os7/debug.h>
+#endif
+#include <os7/bufq.h>
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -65,9 +164,6 @@ static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2
 #include "sctp_route.h"
 #include "sctp_cookie.h"
 #include "sctp_output.h"
-
-#undef min			/* LiS should not have defined these */
-#undef max			/* LiS should not have defined these */
 
 #define sctp_daddr sctp_daddr__
 #define sctp_saddr sctp_saddr__
@@ -93,15 +189,11 @@ static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2
 
 #include <linux/random.h>
 
-#undef min
-#define min lis_min
-#undef max
-#define max lis_min
-
 STATIC uint32_t
 sctp_get_vtag(uint32_t daddr, uint32_t saddr, uint16_t dport, uint16_t sport)
 {
 	uint32_t ret;
+
 	ret = secure_tcp_sequence_number(daddr, saddr, dport, sport);
 	usual(ret);
 	return (ret);
@@ -110,10 +202,9 @@ sctp_get_vtag(uint32_t daddr, uint32_t saddr, uint16_t dport, uint16_t sport)
 static inline void
 set_timeout(sctp_t * sp, int *tidp, timo_fcn_t *fnc, void *data, long ticks)
 {
-	psw_t flags;
 	assert(tidp);
 	assert(data);
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_bh(&sp->qlock);
 	{
 		if (*tidp) {
 			abnormal(*tidp);
@@ -121,23 +212,22 @@ set_timeout(sctp_t * sp, int *tidp, timo_fcn_t *fnc, void *data, long ticks)
 		}
 		*tidp = timeout(fnc, data, ticks ? ticks : 1);
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_bh(&sp->qlock);
 }
 
 static inline void
 mod_timeout(sctp_t * sp, int *tidp, timo_fcn_t *fnc, void *data, long ticks)
 {
-	psw_t flags;
 	assert(tidp);
 	assert(data);
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_bh(&sp->qlock);
 	{
 		if (*tidp) {
 			untimeout(xchg(tidp, 0));
 		}
 		*tidp = timeout(fnc, data, ticks ? ticks : 1);
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_bh(&sp->qlock);
 }
 
 /*
@@ -178,12 +268,14 @@ sctp_bundle_sack(sp, sd, dmps, amps, dpp, mrem, mlen)
 
 	if (clen > dmps) {
 		size_t too_many_dups;
+
 		rare();		/* trim down sack */
 		too_many_dups = (clen - *mrem + 3) / sizeof(uint32_t);
 		ndups = ndups > too_many_dups ? ndups - too_many_dups : 0;
 		clen = sizeof(*m) + glen + ndups * sizeof(uint32_t);
 		if (*mrem < clen) {
 			size_t too_many_gaps;
+
 			rare();	/* trim some more */
 			too_many_gaps = (clen - *mrem + 3) / sizeof(uint32_t);
 			ngaps = ngaps > too_many_gaps ? ngaps - too_many_gaps : 0;
@@ -202,12 +294,10 @@ sctp_bundle_sack(sp, sd, dmps, amps, dpp, mrem, mlen)
 
 		arwnd = count < arwnd ? arwnd - count : 0;
 
-		/*
-		   __ptrace(("oooq = %u:%u, dupq = %u:%u, rcvq = %u:%u\n",
+		/* __ptrace(("oooq = %u:%u, dupq = %u:%u, rcvq = %u:%u\n",
 		   bufq_size(&sp->oooq),bufq_length(&sp->oooq),
 		   bufq_size(&sp->dupq),bufq_length(&sp->dupq),
-		   bufq_size(&sp->rcvq),bufq_length(&sp->rcvq))); 
-		 */
+		   bufq_size(&sp->rcvq),bufq_length(&sp->rcvq))); */
 
 		// if ( !canputnext(sp->rq) ) arwnd = 0;
 
@@ -309,6 +399,7 @@ trimhead(mblk_t *mp, int len)
 	for (; len && mp; mp = mp->b_cont) {
 		if (mp->b_datap->db_type == M_DATA) {
 			int size = mp->b_wptr - mp->b_rptr;
+
 			if (size > len) {
 				mp->b_rptr += len;
 				len = 0;
@@ -327,6 +418,7 @@ trimtail(mblk_t *mp, int len)
 	for (; len && mp; mp = mp->b_cont) {
 		if (mp->b_datap->db_type == M_DATA) {
 			int size = mp->b_wptr - mp->b_rptr;
+
 			if (size > len) {
 				mp->b_wptr = mp->b_rptr + len;
 				len = 0;
@@ -375,21 +467,16 @@ sctp_frag_chunk(bq, mp, mps)
 	 */
 	{
 		mblk_t *bp;
-		/*
-		   copy the transmission control block and data header 
-		 */
+
+		/* copy the transmission control block and data header */
 		if (!(dp = copyb(mp))) {
 			rare();
 			return;
 		}
-		/*
-		   copyb does not copy the hiddle control block 
-		 */
+		/* copyb does not copy the hiddle control block */
 		bcopy(mp->b_datap->db_base, dp->b_datap->db_base,
 		      mp->b_datap->db_lim - mp->b_datap->db_base);
-		/*
-		   duplicate the message blocks which form the data 
-		 */
+		/* duplicate the message blocks which form the data */
 		if (!(bp = dupmsg(mp->b_cont))) {
 			rare();
 			freeb(dp);
@@ -417,6 +504,7 @@ sctp_frag_chunk(bq, mp, mps)
 #if 1
 		{
 			int ret;
+
 			ret = trimhead(mp, dlen);	/* trim originai */
 			ensure(ret, freemsg(dp);
 			       return;
@@ -432,9 +520,7 @@ sctp_frag_chunk(bq, mp, mps)
 		dp->b_cont->b_rptr = dp->b_cont->b_rptr + dlen;	/* trim fragment */
 #endif
 	}
-	/*
-	   insert the fresh copy after the existing copy in the bufq 
-	 */
+	/* insert the fresh copy after the existing copy in the bufq */
 	__ctrace(bufq_append(bq, mp, dp));
 }
 #endif
@@ -563,9 +649,7 @@ sctp_bundle_data_urgent(sp, sd, dmps, amps, dpp, mrem, mlen)
 		ensure(cb->st, continue);
 
 #if defined(_DEBUG)||defined(_SAFE)
-		/*
-		   this should only occur if the pmtu is falling 
-		 */
+		/* this should only occur if the pmtu is falling */
 		if (amps <= *mrem && plen > amps) {
 			rare();
 			sctp_frag_chunk(&sp->urgq, mp, amps);
@@ -634,9 +718,7 @@ sctp_bundle_data_normal(sp, sd, dmps, amps, dpp, mrem, mlen)
 	mblk_t *mp;
 	size_t swnd;
 
-	/*
-	   don't bundle normal data without more to send (like a SACK) 
-	 */
+	/* don't bundle normal data without more to send (like a SACK) */
 	if (sp->options & SCTP_OPTION_CORK
 	    || (sp->options & SCTP_OPTION_NAGLE && sp->in_flight && *mlen == sizeof(struct sctphdr)
 		&& bufq_size(&sp->sndq) < *mrem >> 1))
@@ -652,9 +734,7 @@ sctp_bundle_data_normal(sp, sd, dmps, amps, dpp, mrem, mlen)
 		ensure(cb->st, continue);
 
 #if defined(_DEBUG)||defined(_SAFE)
-		/*
-		   this should only occur if the pmtu is falling 
-		 */
+		/* this should only occur if the pmtu is falling */
 		if (amps <= *mrem && plen > amps) {
 			rare();
 			sctp_frag_chunk(&sp->sndq, mp, amps);
@@ -860,12 +940,11 @@ sctp_route_normal(sp)
 	sctp_t *sp;
 {
 	sctp_daddr_t *sd;
+
 	assert(sp);
 	if (sctp_update_routes(sp, 1)) {
 		rare();
-		/*
-		   we have no viable route 
-		 */
+		/* we have no viable route */
 		if ((1 << sp->s_state) & (SCTPF_HAVEUSER)) {
 			sp->ops->sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, -EHOSTUNREACH, NULL);
 		} else
@@ -898,6 +977,7 @@ sctp_route_response(sp)
 	sctp_t *sp;
 {
 	sctp_daddr_t *sd;
+
 	assert(sp);
 	sd = sp->caddr;
 	if (!sd || !sd->dst_cache || sd->retransmits)
@@ -922,9 +1002,7 @@ sctp_transmit_wakeup(sp)
 	assert(sp);
 	if ((1 << sp->s_state) & SCTPF_SENDING) {
 		for (i = 0; i < loop_max; i++) {
-			/*
-			   placed in order of probability 
-			 */
+			/* placed in order of probability */
 			if (bufq_head(&sp->sndq)
 			    || (sp->sackf & SCTP_SACKF_NOW)
 			    || sp->nrtxs || bufq_head(&sp->urgq)
@@ -958,15 +1036,18 @@ sctp_transmit_wakeup(sp)
 #ifdef _DEBUG
 				for (mp = bufq_head(&sp->sndq); mp; mp = mp->b_next) {
 					sctp_tcb_t *cb = SCTP_TCB(mp);
+
 					printk("sndq: mp = %08x, dlen = %u\n", (uint) mp, cb->dlen);
 				}
 				for (mp = bufq_head(&sp->urgq); mp; mp = mp->b_next) {
 					sctp_tcb_t *cb = SCTP_TCB(mp);
+
 					printk("urgq: mp = %08x, dlen = %u\n", (uint) mp, cb->dlen);
 				}
 				if (sp->nrtxs)
 					for (mp = bufq_head(&sp->rtxq); mp; mp = mp->b_next) {
 						sctp_tcb_t *cb = SCTP_TCB(mp);
+
 						printk("rtxq: mp = %08x, dlen = %u, tsn = %u\n",
 						       (uint) mp, cb->dlen, cb->tsn);
 					}
@@ -988,6 +1069,7 @@ sctp_transmit_wakeup(sp)
  */
 STATIC void sctp_send_heartbeat(sctp_t * sp, sctp_daddr_t * sd);
 STATIC void sctp_reset_idle(sctp_daddr_t * sd);
+
 /*
  *  ASSOCIATION TIMEOUT FUNCTION
  *  -------------------------------------------------------------------------
@@ -1001,18 +1083,14 @@ sctp_assoc_timedout(sp, sd, rmax)
 	assert(sp);
 	assert(sd);
 
-	/*
-	   RFC 2960 6.3.3 E1 and 7.2.3, E2, E3 and 8.3 
-	 */
+	/* RFC 2960 6.3.3 E1 and 7.2.3, E2, E3 and 8.3 */
 	sd->ssthresh = sd->cwnd >> 1 > sd->mtu << 1 ? sd->cwnd >> 1 : sd->mtu << 1;
 	sd->cwnd = sd->mtu;
 	sd->rto = sd->rto ? sd->rto << 1 : 1;
 	sd->rto = sd->rto_min > sd->rto ? sd->rto_min : sd->rto;
 	sd->rto = sd->rto_max < sd->rto ? sd->rto_max : sd->rto;
 
-	/*
-	   See RFC 2960 Section 8.3 
-	 */
+	/* See RFC 2960 Section 8.3 */
 	if (sd->retransmits++ >= sd->max_retrans) {
 		if (sd->dst_cache)
 			dst_negative_advice(&sd->dst_cache);
@@ -1035,9 +1113,7 @@ sctp_assoc_timedout(sp, sd, rmax)
 				return (0);
 		}
 	}
-	/*
-	   See RFC 2960 Section 8.2 
-	 */
+	/* See RFC 2960 Section 8.2 */
 	if (rmax && sp->retransmits++ >= rmax) {
 		seldom();
 		if ((1 << sp->s_state) & (SCTPF_HAVEUSER)) {
@@ -1143,9 +1219,7 @@ sctp_cookie_timeout(data)
 			seldom();
 			break;
 		}
-		/*
-		   See RFC 2960 6.3.3 E3 
-		 */
+		/* See RFC 2960 6.3.3 E3 */
 		for (mp = bufq_head(&sp->rtxq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
@@ -1209,9 +1283,7 @@ sctp_retrans_timeout(data)
 			seldom();
 			break;
 		}
-		/*
-		   See RFC 2960 6.3.3 E3 
-		 */
+		/* See RFC 2960 6.3.3 E3 */
 		for (mp = bufq_head(&sp->rtxq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 			size_t dlen = cb->dlen;
@@ -1495,6 +1567,7 @@ sctp_send_data(sp, st, flags, dp)
 #if 1
 						{
 							int ret;
+
 							ret = trimhead(dp, dlen);	/* trim
 											   original 
 											 */
@@ -1820,9 +1893,7 @@ sctp_send_init_ack(sp, daddr, sh, ck)
 		mp->b_wptr += sizeof(*cp);
 
 #if 0
-		/*
-		   copy in IP reply options 
-		 */
+		/* copy in IP reply options */
 		if (ck->opt_len) {
 			assure(opt);
 			bcopy(opt, mp->b_wptr, optlength(opt));
@@ -1843,9 +1914,7 @@ sctp_send_init_ack(sp, daddr, sh, ck)
 				return;
 			}
 			if (ap->ph.type == SCTP_PTYPE_IPV4_ADDR) {
-				/*
-				   skip primary 
-				 */
+				/* skip primary */
 				if (ap->addr != ck->daddr) {
 					*((uint32_t *) mp->b_wptr)++ = ap->addr;
 					anum--;
@@ -1944,9 +2013,7 @@ sctp_send_cookie_ack(sp)
 			freechunks(mp);
 		}
 		sp->s_state = SCTP_ESTABLISHED;
-		/*
-		   start idle timers 
-		 */
+		/* start idle timers */
 		for (sd = sp->daddr; sd; sd = sd->next)
 			sctp_reset_idle(sd);
 	}
@@ -2149,9 +2216,7 @@ sctp_send_shutdown(sp)
 			m->c_tsn = htonl(sp->r_ack);
 			mp->b_wptr += plen;
 
-			/*
-			   shutdown acks everything but dups and gaps 
-			 */
+			/* shutdown acks everything but dups and gaps */
 			sp->sackf &= (SCTP_SACKF_DUP | SCTP_SACKF_GAP);
 
 			sctp_bundle_more(sp, sd, mp);	/* not DATA */
@@ -2436,9 +2501,7 @@ sctp_conn_req(sp, dport, dptr, dnum, dp)
 		rare();
 		return (err);
 	}
-	/*
-	   XXX 
-	 */
+	/* XXX */
 	if ((err = sctp_update_routes(sp, 1))) {
 		rare();
 		return (err);
@@ -2451,9 +2514,7 @@ sctp_conn_req(sp, dport, dptr, dnum, dp)
 	sp->t_ack = sp->v_tag - 1;
 	sp->r_ack = 0;
 
-	/*
-	   fake a data request if data in conn req 
-	 */
+	/* fake a data request if data in conn req */
 	if (dp) {
 		seldom();
 		if ((err = sctp_data_req(sp, sp->ppi, sp->sid, 0, 0, 0, dp))) {
@@ -2529,9 +2590,7 @@ sctp_conn_res(sp, cp, ap, dp)
 		rare();
 		return (err);
 	}
-	/*
-	   XXX 
-	 */
+	/* XXX */
 	if ((err = sctp_update_routes(ap, 1))) {
 		rare();
 		return (err);
@@ -2547,15 +2606,11 @@ sctp_conn_res(sp, cp, ap, dp)
 	ap->p_rwnd = ck->p_rwnd;
 
 	ap->s_state = SCTP_ESTABLISHED;
-	/*
-	   process any chunks bundled with cookie echo on accepting stream 
-	 */
+	/* process any chunks bundled with cookie echo on accepting stream */
 	if (sctp_return_more(cp) > 0)
 		sctp_recv_msg(ap, cp);
 
-	/*
-	   fake a data request if data in conn res 
-	 */
+	/* fake a data request if data in conn res */
 	if (dp) {
 		if ((err = sctp_data_req(ap, ap->ppi, ap->sid, 0, 0, 0, dp))) {
 			rare();
@@ -2564,9 +2619,7 @@ sctp_conn_res(sp, cp, ap, dp)
 	}
 	sctp_send_cookie_ack(ap);
 
-	/*
-	   caller will unlink connect indication 
-	 */
+	/* caller will unlink connect indication */
 	return (0);
 }
 
@@ -2589,9 +2642,7 @@ sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp)
 
 	ensure(mp, return (-EFAULT));
 
-	/*
-	   don't allow zero-length data through 
-	 */
+	/* don't allow zero-length data through */
 	if (!msgdsize(mp)) {
 		freemsg(mp);
 		return (0);
@@ -2602,9 +2653,7 @@ sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp)
 		return (err);
 	}
 
-	/*
-	   we probably want to data ack out of order as well 
-	 */
+	/* we probably want to data ack out of order as well */
 #if 0
 	if (rcpt || (ord && (sp->flags & SCTP_FLAG_DEFAULT_RC_SEL)))
 #else
@@ -2644,9 +2693,8 @@ sctp_reset_req(sp)
 	sctp_t *sp;
 {
 	int err;
-	/*
-	   do nothing 
-	 */
+
+	/* do nothing */
 	if (sp->ops->sctp_reset_con && (err = sp->ops->sctp_reset_con(sp))) {
 		rare();
 		return (err);
@@ -2689,9 +2737,7 @@ sctp_discon_req(sp, cp)
 		struct sctphdr *sh = (struct sctphdr *) (cp->b_datap->db_base + (iph->ihl << 2));
 
 		sctp_send_abort_ootb(iph->saddr, iph->daddr, sh);
-		/*
-		   conn ind will be unlinked by caller 
-		 */
+		/* conn ind will be unlinked by caller */
 		return (0);
 	}
 	if ((1 << sp->s_state) & (SCTPF_NEEDABORT)) {
@@ -2739,9 +2785,7 @@ sctp_unbind_req(sp)
 {
 	switch (sp->s_state) {
 	case SCTP_SHUTDOWN_ACK_SENT:
-		/*
-		   can't wait for SHUTDOWN COMPLETE any longer 
-		 */
+		/* can't wait for SHUTDOWN COMPLETE any longer */
 		sctp_disconnect(sp);
 	case SCTP_CLOSED:
 	case SCTP_LISTEN:
@@ -2772,6 +2816,7 @@ sctp_return_more(mp)
 {
 	int ret;
 	struct sctpchdr *ch;
+
 	assert(mp);
 	ch = (struct sctpchdr *) mp->b_rptr;
 	mp->b_rptr += PADC(ntohs(ch->len));
@@ -2790,6 +2835,7 @@ sctp_return_stop(mp)
 	mblk_t *mp;
 {
 	int ret = sctp_return_more(mp) ? -EPROTO : 0;
+
 	unusual(ret < 0);
 	return (ret);
 }
@@ -2805,6 +2851,7 @@ sctp_return_check(mp, ctype)
 	uint ctype;
 {
 	int ret = sctp_return_more(mp);
+
 	ret = (ret > 0 && ((struct sctpchdr *) mp->b_rptr)->type != ctype) ? -EPROTO : ret;
 	unusual(ret < 0);
 	return (ret);
@@ -2829,6 +2876,7 @@ sctp_reset_idle(sd)
 	sctp_daddr_t *sd;
 {
 	unsigned long rtt;
+
 	assert(sd);
 	if (sd->timer_heartbeat)
 		untimeout(xchg(&sd->timer_heartbeat, 0));
@@ -2858,22 +2906,16 @@ sctp_rtt_calc(sd, time)
 	assert(sd);
 	ensure(jiffies >= time, return);
 
-	/*
-	   RFC 2960 6.3.1 
-	 */
+	/* RFC 2960 6.3.1 */
 	rtt = jiffies - time;
 	if (sd->srtt) {
-		/*
-		   RFC 2960 6.3.1 (C3) 
-		 */
+		/* RFC 2960 6.3.1 (C3) */
 		rttvar = sd->srtt > rtt ? sd->srtt - rtt : rtt - sd->srtt;
 		sd->rttvar += (rttvar - sd->rttvar) >> 2;
 		sd->srtt += (rtt - sd->srtt) >> 3;
 		sd->rto = rtt + (sd->rttvar << 2);
 	} else {
-		/*
-		   RFC 2960 6.3.1 (C2) 
-		 */
+		/* RFC 2960 6.3.1 (C2) */
 		sd->rttvar = rtt >> 1;
 		sd->srtt = rtt;
 		sd->rto = rtt + (rtt << 1);
@@ -2883,26 +2925,20 @@ sctp_rtt_calc(sd, time)
 	sd->rto = sd->rto_max < sd->rto ? sd->rto_max : sd->rto;	/* RFC 2960 6.3.1 (C7) */
 
 #ifdef _DEBUG
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 	if (sd->retransmits && (sd->sp->options & SCTP_OPTION_BREAK)
-	    && (sd->packets > BREAK_GENERATOR_LEVEL))
+	    && (sd->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL))
 		ptrace(("Aaaarg! Reseting counts for address %d.%d.%d.%d\n",
 			(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
 			(sd->daddr >> 24) & 0xff));
 #endif
 #endif
 	sd->dups = 0;
-	/*
-	   RFC 2960 8.2 
-	 */
+	/* RFC 2960 8.2 */
 	sd->retransmits = 0;
-	/*
-	   RFC 2960 8.1 
-	 */
+	/* RFC 2960 8.1 */
 	sd->sp->retransmits = 0;
-	/*
-	   reset idle timer 
-	 */
+	/* reset idle timer */
 	sctp_reset_idle(sd);
 }
 
@@ -2931,9 +2967,7 @@ sctp_dest_calc(sp)
 		size_t accum;
 
 		if (sd->when) {
-			/*
-			   calculate RTT based on latest sent acked TSN 
-			 */
+			/* calculate RTT based on latest sent acked TSN */
 			sctp_rtt_calc(sd, sd->when);
 			sd->when = 0;
 		}
@@ -2945,43 +2979,31 @@ sctp_dest_calc(sp)
 		 */
 		if ((accum = sd->ack_accum)) {
 			if (sd->cwnd <= sd->ssthresh) {
-				/*
-				   RFC 2960 7.2.1 
-				 */
+				/* RFC 2960 7.2.1 */
 				if (sd->in_flight > sd->cwnd)
 					sd->cwnd += accum < sd->mtu ? accum : sd->mtu;
 			} else {
-				/*
-				   RFC 2960 7.2.2 
-				 */
+				/* RFC 2960 7.2.2 */
 				if (sd->in_flight > sd->cwnd)
 					sd->cwnd += sd->mtu;
 			}
-			/*
-			   credit of destination (accum) 
-			 */
+			/* credit of destination (accum) */
 			normal(sd->in_flight >= accum);
 			sd->in_flight = sd->in_flight > accum ? sd->in_flight - accum : 0;
 
-			/*
-			   RFC 2960 6.3.2 (R3) 
-			 */
+			/* RFC 2960 6.3.2 (R3) */
 			if (sd->timer_retrans)
 				untimeout(xchg(&sd->timer_retrans, 0));
 
 			sd->ack_accum = 0;
 		}
 		if (sd->flags & SCTP_DESTF_DROP) {
-			/*
-			   RFC 2960 7.2.4 (2), 7.2.3 
-			 */
+			/* RFC 2960 7.2.4 (2), 7.2.3 */
 			sd->ssthresh = sd->cwnd >> 1 > sd->mtu << 1 ? sd->cwnd >> 1 : sd->mtu << 1;
 			sd->cwnd = sd->ssthresh;
 			sd->flags &= ~SCTP_DESTF_DROP;
 		}
-		/*
-		   RFC 2960 6.3.2 (R2) 
-		 */
+		/* RFC 2960 6.3.2 (R2) */
 		if (!sd->in_flight && sd->timer_retrans)
 			untimeout(xchg(&sd->timer_retrans, 0));
 		if (sd->in_flight && !sd->timer_retrans)
@@ -3020,11 +3042,10 @@ sctp_cumm_ack(sp, ack)
 {
 	assert(sp);
 
-	/*
-	   make sure we actually move the ack point 
-	 */
+	/* make sure we actually move the ack point */
 	if (after(ack, sp->t_ack)) {
 		mblk_t *mp;
+
 		sp->t_ack = ack;
 
 		while ((mp = bufq_head(&sp->rtxq)) && !after(SCTP_TCB(mp)->tsn, ack)) {
@@ -3032,13 +3053,10 @@ sctp_cumm_ack(sp, ack)
 
 			if (!(cb->flags & SCTPCB_FLAG_SACKED)) {
 				sctp_daddr_t *sd = cb->daddr;
-				/*
-				   RFC 2960 6.3.1 (C5) 
-				 */
+
+				/* RFC 2960 6.3.1 (C5) */
 				if (cb->trans < 2) {
-					/*
-					   remember latest transmitted packet acked for rtt calc 
-					 */
+					/* remember latest transmitted packet acked for rtt calc */
 					sd->when = sd->when > cb->when ? sd->when : cb->when;
 				}
 				if (cb->flags & SCTPCB_FLAG_RETRANS) {
@@ -3046,17 +3064,14 @@ sctp_cumm_ack(sp, ack)
 					sp->nrtxs--;
 				} else {
 					size_t dlen = cb->dlen;
-					/*
-					   credit destination (later) 
-					 */
+
+					/* credit destination (later) */
 					normal(sd->in_flight >= sd->ack_accum + dlen);
 					sd->ack_accum =
 					    sd->in_flight >
 					    sd->ack_accum + dlen ? sd->ack_accum +
 					    dlen : sd->in_flight;
-					/*
-					   credit association (now) 
-					 */
+					/* credit association (now) */
 					normal(sp->in_flight >= dlen);
 					sp->in_flight =
 					    sp->in_flight > dlen ? sp->in_flight - dlen : 0;
@@ -3127,6 +3142,7 @@ sctp_recv_data(sp, mp)
 	int blen;
 	size_t plen;
 	uint newd;
+
 	assert(sp);
 	assert(mp);
 	if (!((1 << sp->s_state) & (SCTPF_RECEIVING)))
@@ -3147,6 +3163,7 @@ sctp_recv_data(sp, mp)
 		int ord = !(flags & SCTPCB_FLAG_URG);
 		int more = !(flags & SCTPCB_FLAG_LAST_FRAG);
 		sctp_tcb_t **gap;
+
 		err = 0;
 		plen = PADC(clen);
 		if (blen <= 0 || blen < sizeof(*m) || clen < sizeof(*m) || blen < plen)
@@ -3164,18 +3181,12 @@ sctp_recv_data(sp, mp)
 			goto enomem;
 		if (!(dp = dupb(mp)))
 			goto enobufs;
-		/*
-		   trim copy to data only 
-		 */
+		/* trim copy to data only */
 		dp->b_wptr = dp->b_rptr + clen;
 		dp->b_rptr += sizeof(*m);
-		/*
-		   fast path, nothing backed up 
-		 */
+		/* fast path, nothing backed up */
 		if (tsn == sp->r_ack + 1 && !bufq_head(&sp->rcvq) && !bufq_head(&sp->oooq)) {
-			/*
-			   we have next expected TSN, just process it 
-			 */
+			/* we have next expected TSN, just process it */
 			if ((err = sp->ops->sctp_data_ind(sp, ppi, sid, ssn, tsn, ord, more, dp)))
 				goto free_error;
 			if (ord) {
@@ -3213,17 +3224,13 @@ sctp_recv_data(sp, mp)
 				if (between(tsn, (*gap)->tsn, (*gap)->tail->tsn))
 					goto sctp_recv_data_duplicate;
 				if (before(tsn, (*gap)->tsn)) {
-					/*
-					   insert in front of gap 
-					 */
+					/* insert in front of gap */
 					bufq_insert(&sp->oooq, (*gap)->mp, db);
 					cb->next = (*gap);
 					(*gap) = cb;
 					sp->ngaps++;
 				} else if (tsn == (*gap)->tail->tsn + 1) {
-					/*
-					   expand at end of gap 
-					 */
+					/* expand at end of gap */
 					bufq_queue(&sp->oooq, db);
 					cb->next = (*gap)->tail->next;
 					(*gap)->tail->next = cb;
@@ -3232,9 +3239,7 @@ sctp_recv_data(sp, mp)
 				} else
 					continue;
 				if (cb->next && cb->next->tsn == tsn + 1) {
-					/*
-					   join two gaps 
-					 */
+					/* join two gaps */
 					cb->next->tail->head = (*gap);
 					(*gap)->tail = cb->next->tail;
 					usual(sp->ngaps);
@@ -3243,9 +3248,7 @@ sctp_recv_data(sp, mp)
 				break;
 			}
 			if (!(*gap)) {
-				/*
-				   append to list 
-				 */
+				/* append to list */
 				bufq_queue(&sp->oooq, db);
 				cb->next = (*gap);
 				(*gap) = cb;
@@ -3255,9 +3258,7 @@ sctp_recv_data(sp, mp)
 			newd++;
 		} else {
 		      sctp_recv_data_duplicate:
-			/*
-			   message is a duplicate tsn 
-			 */
+			/* message is a duplicate tsn */
 			bufq_queue(&sp->dupq, db);
 			cb->next = sp->dups;
 			sp->dups = cb;
@@ -3291,9 +3292,7 @@ sctp_recv_data(sp, mp)
 		continue;	/* just skip that DATA chunk */
 	      baddata:
 		rare();
-		/*
-		   RFC 2960 6.2: ...no user data... 
-		 */
+		/* RFC 2960 6.2: ...no user data... */
 		if ((1 << sp->s_state) & (SCTPF_HAVEUSER)) {
 			if ((err =
 			     sp->ops->sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, SCTP_CAUSE_NO_DATA,
@@ -3319,9 +3318,8 @@ sctp_recv_data(sp, mp)
 	}
 	if (newd) {		/* we have underlivered data and new data */
 		sctp_tcb_t *cb, *cb_next = sp->gaps;
-		/*
-		   try to deliver undelivered data now 
-		 */
+
+		/* try to deliver undelivered data now */
 		while ((cb = cb_next)) {
 			cb_next = cb->next;
 			if (!(cb->flags & SCTPCB_FLAG_DELIV)) {
@@ -3331,10 +3329,9 @@ sctp_recv_data(sp, mp)
 				int ord = !(flags & SCTPCB_FLAG_URG);
 				int more = !(flags & SCTPCB_FLAG_LAST_FRAG);
 				int frag = !(flags & SCTPCB_FLAG_FIRST_FRAG);
+
 				if (after(cb->tsn, sp->r_ack + 1)) {
-					/*
-					   after gap 
-					 */
+					/* after gap */
 					if (frag)
 						continue;
 					if (ord) {
@@ -3386,9 +3383,7 @@ sctp_recv_data(sp, mp)
 			}
 		}
 	}
-	/*
-	   RFC 2960 6.2 
-	 */
+	/* RFC 2960 6.2 */
 	if (sp->ndups) {
 		/*
 		 *  IMPLEMENTATION NOTE:- If we are receiving duplicates the
@@ -3407,6 +3402,7 @@ sctp_recv_data(sp, mp)
 		 *  sent.
 		 */
 		sctp_daddr_t *sd = sp->taddr;
+
 		sp->sackf |= SCTP_SACKF_DUP;
 		if (sd && !(sp->sackf & SCTP_SACKF_NEW)) {
 			sd->dups += sp->ndups;
@@ -3417,15 +3413,11 @@ sctp_recv_data(sp, mp)
 			}
 		}
 	}
-	/*
-	   RFC 2960 7.2.4 
-	 */
+	/* RFC 2960 7.2.4 */
 	if (sp->ngaps) {
 		sp->sackf |= SCTP_SACKF_GAP;
 	}
-	/*
-	   RFC 2960 6.2 
-	 */
+	/* RFC 2960 6.2 */
 	if (newd) {
 		sp->sackf += ((sp->sackf & 0x3) < 3) ? SCTP_SACKF_NEW : 0;
 		/*
@@ -3462,9 +3454,7 @@ sctp_recv_data(sp, mp)
 	case -EAGAIN:
 	case -ENOMEM:
 	case -EBUSY:
-		/*
-		   SCTP Implementor's Guide Section 2.15.1 
-		 */
+		/* SCTP Implementor's Guide Section 2.15.1 */
 		sp->sackf |= SCTP_SACKF_NOD;
 		err = 0;
 	}
@@ -3502,6 +3492,7 @@ sctp_cleanup_read(sp)
 	sctp_t *sp;
 {
 	mblk_t *mp;
+
 	assert(sp);
 
 	while ((mp = bufq_head(&sp->ackq))) {
@@ -3519,6 +3510,7 @@ sctp_cleanup_read(sp)
 		int need_sack = (sp->a_rwnd <= bufq_size(&sp->oooq)
 				 + bufq_size(&sp->dupq)
 				 + bufq_size(&sp->rcvq));
+
 		while ((mp = bufq_head(&sp->rcvq))) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 			sctp_strm_t *st = cb->st;
@@ -3575,9 +3567,7 @@ sctp_recv_sack(sp, mp)
 		size_t ndups = htons(m->ndups);
 		uint16_t *gap = m->gaps;
 
-		/*
-		   RFC 2960 6.2.1 (D) i) 
-		 */
+		/* RFC 2960 6.2.1 (D) i) */
 		if (before(ack, sp->t_ack)) {
 			rare();
 			return 0;
@@ -3589,9 +3579,7 @@ sctp_recv_sack(sp, mp)
 		if (rwnd > sp->p_rwnd && sp->wq->q_count)
 			qenable(sp->wq);
 
-		/*
-		   RFC 2960 6.2.1 (D) ii) 
-		 */
+		/* RFC 2960 6.2.1 (D) ii) */
 		sp->p_rwnd = rwnd;	/* we keep in_flight separate from a_rwnd */
 
 		/*
@@ -3611,51 +3599,36 @@ sctp_recv_sack(sp, mp)
 			 *  possible.  But that's how this SACK go here...
 			 */
 		}
-		/*
-		   process gap acks 
-		 */
+		/* process gap acks */
 		if (!ngaps) {
-			/*
-			   perform fast retransmission algorithm on missing TSNs 
-			 */
+			/* perform fast retransmission algorithm on missing TSNs */
 			for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
 				sctp_tcb_t *cb = SCTP_TCB(dp);
-				/*
-				   RFC 2960 7.2.4 
-				 */
+
+				/* RFC 2960 7.2.4 */
 				if (!(cb->flags & SCTPCB_FLAG_RETRANS) && ++(cb->sacks) >= 4) {
 					size_t dlen = cb->dlen;
 					sctp_daddr_t *sd = cb->daddr;
-					/*
-					   RFC 2960 7.2.4 (1) 
-					 */
+
+					/* RFC 2960 7.2.4 (1) */
 					cb->flags |= SCTPCB_FLAG_RETRANS;
 					sp->nrtxs++;
 					cb->sacks = 0;
-					/*
-					   RFC 2960 7.2.4 (2) 
-					 */
+					/* RFC 2960 7.2.4 (2) */
 					sd->flags |= SCTP_DESTF_DROP;
-					/*
-					   credit destination (now) 
-					 */
+					/* credit destination (now) */
 					normal(sd->in_flight >= dlen);
 					sd->in_flight =
 					    sd->in_flight > dlen ? sd->in_flight - dlen : 0;
-					/*
-					   credit association (now) 
-					 */
+					/* credit association (now) */
 					normal(sp->in_flight >= dlen);
 					sp->in_flight =
 					    sp->in_flight > dlen ? sp->in_flight - dlen : 0;
 				}
-				/*
-				   RFC 2960 6.3.2 (R4) 
- *//*
-   reneg 
- */
+				/* RFC 2960 6.3.2 (R4) *//* reneg */
 				if (cb->flags & SCTPCB_FLAG_SACKED) {
 					sctp_daddr_t *sd = cb->daddr;
+
 					cb->flags &= ~SCTPCB_FLAG_SACKED;
 					if (!sd->timer_retrans) {
 						set_timeout(sp, &sd->timer_retrans,
@@ -3665,50 +3638,39 @@ sctp_recv_sack(sp, mp)
 				}
 			}
 		} else {
-			/*
-			   perform fast retransmission algorithm on gaps 
-			 */
+			/* perform fast retransmission algorithm on gaps */
 			while (ngaps--) {
 				uint32_t beg = ack + ntohs(*gap++);
 				uint32_t end = ack + ntohs(*gap++);
+
 				if (before(end, beg)) {
 					rare();
 					continue;
 				}
-				/*
-				   move to the acks 
-				 */
+				/* move to the acks */
 				dp = bufq_head(&sp->rtxq);
 				for (; dp && before(SCTP_TCB(dp)->tsn, beg); dp = dp->b_next)
 					SCTP_TCB(dp)->flags |= SCTPCB_FLAG_NACK;
-				/*
-				   sack the acks 
-				 */
+				/* sack the acks */
 				for (; dp && !after(SCTP_TCB(dp)->tsn, end); dp = dp->b_next)
 					SCTP_TCB(dp)->flags |= SCTPCB_FLAG_ACK;
 			}
-			/*
-			   walk the whole retrans buffer looking for holes and renegs 
-			 */
+			/* walk the whole retrans buffer looking for holes and renegs */
 			for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
 				sctp_tcb_t *cb = SCTP_TCB(dp);
-				/*
-				   msg is inside gapack block 
-				 */
+
+				/* msg is inside gapack block */
 				if (cb->flags & SCTPCB_FLAG_ACK) {
 					cb->flags &= ~SCTPCB_FLAG_ACK;
 					cb->flags &= ~SCTPCB_FLAG_NACK;
 					if (!(cb->flags & SCTPCB_FLAG_SACKED)) {
 						sctp_daddr_t *sd = cb->daddr;
+
 						cb->flags |= SCTPCB_FLAG_SACKED;
-						/*
-						   RFC 2960 6.3.1 (C5) 
-						 */
+						/* RFC 2960 6.3.1 (C5) */
 						if (cb->trans < 2) {
-							/*
-							   remember latest transmitted packet acked 
-							   for rtt calc 
-							 */
+							/* remember latest transmitted packet acked 
+							   for rtt calc */
 							sd->when =
 							    sd->when >
 							    cb->when ? sd->when : cb->when;
@@ -3718,16 +3680,13 @@ sctp_recv_sack(sp, mp)
 							sp->nrtxs--;
 						} else {
 							size_t dlen = cb->dlen;
-							/*
-							   credit destination 
-							 */
+
+							/* credit destination */
 							normal(sd->in_flight >= dlen);
 							sd->in_flight =
 							    sd->in_flight >
 							    dlen ? sd->in_flight - dlen : 0;
-							/*
-							   credit association 
-							 */
+							/* credit association */
 							normal(sp->in_flight >= dlen);
 							sp->in_flight =
 							    sp->in_flight >
@@ -3736,48 +3695,34 @@ sctp_recv_sack(sp, mp)
 					}
 					continue;
 				}
-				/*
-				   msg is between gapack blocks 
-				 */
+				/* msg is between gapack blocks */
 				if (cb->flags & SCTPCB_FLAG_NACK) {
 					cb->flags &= ~SCTPCB_FLAG_NACK;
-					/*
-					   RFC 2960 7.2.4 
-					 */
+					/* RFC 2960 7.2.4 */
 					if (!(cb->flags & SCTPCB_FLAG_RETRANS)
 					    && ++(cb->sacks) >= 4) {
 						size_t dlen = cb->dlen;
 						sctp_daddr_t *sd = cb->daddr;
-						/*
-						   RFC 2960 7.2.4 (1) 
-						 */
+
+						/* RFC 2960 7.2.4 (1) */
 						cb->flags |= SCTPCB_FLAG_RETRANS;
 						sp->nrtxs++;
 						cb->sacks = 0;
-						/*
-						   RFC 2960 7.2.4 (2) 
-						 */
+						/* RFC 2960 7.2.4 (2) */
 						sd->flags |= SCTP_DESTF_DROP;
-						/*
-						   credit destination (now) 
-						 */
+						/* credit destination (now) */
 						normal(sd->in_flight >= dlen);
 						sd->in_flight =
 						    sd->in_flight > dlen ? sd->in_flight - dlen : 0;
-						/*
-						   credit association (now) 
-						 */
+						/* credit association (now) */
 						normal(sp->in_flight >= dlen);
 						sp->in_flight =
 						    sp->in_flight > dlen ? sp->in_flight - dlen : 0;
 					}
-					/*
-					   RFC 2960 6.3.2 (R4) 
- *//*
-   reneg 
- */
+					/* RFC 2960 6.3.2 (R4) *//* reneg */
 					if (cb->flags & SCTPCB_FLAG_SACKED) {
 						sctp_daddr_t *sd = cb->daddr;
+
 						cb->flags &= ~SCTPCB_FLAG_SACKED;
 						if (!sd->timer_retrans) {
 							set_timeout(sp, &sd->timer_retrans,
@@ -3788,9 +3733,7 @@ sctp_recv_sack(sp, mp)
 					}
 					continue;
 				}
-				/*
-				   msg is after all gapack blocks 
-				 */
+				/* msg is after all gapack blocks */
 				break;
 			}
 		}
@@ -3809,22 +3752,16 @@ sctp_recv_sack(sp, mp)
 			 */
 			switch (sp->s_state) {
 			case SCTP_SHUTDOWN_PENDING:
-				/*
-				   Send the SHUTDOWN I didn't send before. 
-				 */
+				/* Send the SHUTDOWN I didn't send before. */
 				sctp_send_shutdown(sp);
 				break;
 			case SCTP_SHUTDOWN_RECEIVED:
-				/*
-				   Send the SHUTDOWN-ACK I didn't send before 
-				 */
+				/* Send the SHUTDOWN-ACK I didn't send before */
 				if (!sp->ops->sctp_ordrel_ind)
 					sctp_send_shutdown_ack(sp);
 				break;
 			case SCTP_SHUTDOWN_RECVWAIT:
-				/*
-				   Send the SHUTDOWN-ACK I didn't send before 
-				 */
+				/* Send the SHUTDOWN-ACK I didn't send before */
 				sctp_send_shutdown_ack(sp);
 				break;
 			default:
@@ -3843,20 +3780,16 @@ sctp_recv_sack(sp, mp)
 	}
 	{
 		int ret;
+
 		if ((ret = sctp_return_more(mp)) > 0) {
 			struct sctpchdr *ch = (struct sctpchdr *) mp->b_rptr;
+
 			switch (ch->type) {
-				/*
-				   RFC 2960 6 
-				 */
+				/* RFC 2960 6 */
 			case SCTP_CTYPE_DATA:
-				/*
-				   RFC 2960 6.5 
-				 */
+				/* RFC 2960 6.5 */
 			case SCTP_CTYPE_ERROR:
-				/*
-				   RFC 2960 3.3.7 
-				 */
+				/* RFC 2960 3.3.7 */
 			case SCTP_CTYPE_ABORT:
 				break;
 			default:
@@ -3913,6 +3846,7 @@ sctp_recv_error(sp, mp)
 			 */
 			if (!sp->ck_inc) {
 				int err;
+
 				rare();
 				sp->ck_inc = sp->ck_inc + (sd->rto >> 1);
 				sctp_ack_calc(sp, &sp->timer_init);
@@ -3922,23 +3856,17 @@ sctp_recv_error(sp, mp)
 				}
 				return sctp_return_stop(mp);
 			}
-			/*
-			   RFC 2960 5.2.6 (1) 
-			 */
+			/* RFC 2960 5.2.6 (1) */
 			if (cb->trans < sp->max_inits) {
 				untimeout(xchg(&sp->timer_init, 0));
-				/*
-				   RFC 2960 5.2.6 (3) 
-				 */
+				/* RFC 2960 5.2.6 (3) */
 				if (cb->trans < 2)
 					sctp_rtt_calc(sd, cb->when);
 				usual(sp->retry);
 				sctp_send_msg(sp, sd, sp->retry);
 				return sctp_return_stop(mp);
 			}
-			/*
-			   RFC 2960 5.2.6 (2) 
-			 */
+			/* RFC 2960 5.2.6 (2) */
 			goto recv_error_error;
 		}
 		break;
@@ -4096,9 +4024,7 @@ sctp_recv_init(sp, mp)
 		rare();
 		return (-EFAULT);
 	}
-	/*
-	   RFC 2960 p.26 initiate tag zero 
-	 */
+	/* RFC 2960 p.26 initiate tag zero */
 	if (!m->i_tag) {
 		err = -SCTP_CAUSE_INVALID_PARM;
 		seldom();
@@ -4109,6 +4035,7 @@ sctp_recv_init(sp, mp)
 	     pptr + sizeof(ph->ph) <= pend && pptr + (plen = ntohs(ph->ph.len)) <= pend;
 	     pptr += PADC(plen), ph = (union sctp_parm *) pptr) {
 		uint type;
+
 		switch ((type = ph->ph.type)) {
 		case SCTP_PTYPE_IPV6_ADDR:
 		case SCTP_PTYPE_HOST_NAME:
@@ -4125,9 +4052,7 @@ sctp_recv_init(sp, mp)
 			goto init_bad_parm;
 		case SCTP_PTYPE_IPV4_ADDR:
 			if (plen == sizeof(ph->ipv4_addr)) {
-				/*
-				   skip primary 
-				 */
+				/* skip primary */
 				if (ph->ipv4_addr.addr != iph->saddr)
 					anum++;
 				break;
@@ -4153,13 +4078,9 @@ sctp_recv_init(sp, mp)
 			goto init_error;
 		}
 	}
-	/*
-	   put together cookie 
-	 */
+	/* put together cookie */
 	{
-		/*
-		   negotiate inbound and outbound streams 
-		 */
+		/* negotiate inbound and outbound streams */
 
 		size_t istrs = sp->n_istr;
 		size_t ostrs = sp->n_ostr;
@@ -4180,9 +4101,7 @@ sctp_recv_init(sp, mp)
 			goto init_error;
 		}
 
-		/*
-		   RFC 2969 5.2.6 
-		 */
+		/* RFC 2969 5.2.6 */
 		if (ck_inc) {
 			seldom();
 			ck_inc = (ck_inc * HZ + 999) / 1000;
@@ -4208,9 +4127,7 @@ sctp_recv_init(sp, mp)
 		ck.danum = anum;
 	}
 
-	/*
-	   RFC 2960 5.2.2 Note 
-	 */
+	/* RFC 2960 5.2.2 Note */
 	SCTPHASH_RLOCK();
 	oldsp = sctp_lookup_tcb(sh->dest, sh->srce, iph->daddr, iph->saddr);
 	SCTPHASH_RUNLOCK();
@@ -4286,6 +4203,7 @@ sctp_recv_init_ack(sp, mp)
 			     pptr + sizeof(*ph) <= pend && pptr + (plen = ntohs(ph->len)) <= pend;
 			     pptr += PADC(plen), ph = (struct sctpphdr *) pptr) {
 				uint type;
+
 				switch ((type = ph->type)) {
 				case SCTP_PTYPE_IPV4_ADDR:
 					if (!sctp_daddr_include(sp, *((uint32_t *) (ph + 1)), &err)) {
@@ -4384,9 +4302,7 @@ sctp_recv_cookie_echo(sp, mp)
 	m = (struct sctp_cookie_echo *) mp->b_rptr;
 	ck = (struct sctp_cookie *) m->cookie;
 
-	/*
-	   RFC 2960 5.2.4 (1) & (2) 
-	 */
+	/* RFC 2960 5.2.4 (1) & (2) */
 	if ((err = sctp_verify_cookie(sp, ck))) {
 		rare();
 		return (err);
@@ -4395,43 +4311,29 @@ sctp_recv_cookie_echo(sp, mp)
 		if (ck->v_tag != sp->v_tag) {
 			if (ck->p_tag != sp->p_tag) {
 				if (ck->l_ttag == sp->v_tag && ck->p_ttag == sp->p_tag)
-					/*
-					   RFC 2960 5.2.4. Action (A) 
-					 */
+					/* RFC 2960 5.2.4. Action (A) */
 					goto recv_cookie_echo_action_a;
 			} else if (ck->l_ttag == 0 && ck->p_ttag == 0)
-				/*
-				   RFC 2960 5.2.4. Action (C). 
-				 */
+				/* RFC 2960 5.2.4. Action (C). */
 				goto recv_cookie_echo_action_c;
 		} else {
 			if (!sp->p_tag
 			    || ((1 << sp->s_state) & (SCTPF_COOKIE_WAIT | SCTPF_COOKIE_ECHOED)))
-				/*
-				   RFC 2960 5.2.4 Action (B). 
-				 */
+				/* RFC 2960 5.2.4 Action (B). */
 				goto recv_cookie_echo_action_b;
 			else if (ck->p_tag != sp->p_tag)
-				/*
-				   RFC 2960 5.2.4 Action (B) 
-				 */
+				/* RFC 2960 5.2.4 Action (B) */
 				goto recv_cookie_echo_action_b;
 			else
-				/*
-				   RFC 2960 5.2.4 Action (D). 
-				 */
+				/* RFC 2960 5.2.4 Action (D). */
 				goto recv_cookie_echo_action_d;
 		}
 	} else
-		/*
-		   RFC 2960 5.2.4 Action (D). 
-		 */
+		/* RFC 2960 5.2.4 Action (D). */
 		goto recv_cookie_echo_action_d;
 
 	rare();
-	/*
-	   RFC 2960 5.2.4 ...silently discarded 
-	 */
+	/* RFC 2960 5.2.4 ...silently discarded */
 	return (0);
 
       recv_cookie_echo_action_a:
@@ -4455,9 +4357,7 @@ sctp_recv_cookie_echo(sp, mp)
 	switch (sp->s_state) {
 	case SCTP_SHUTDOWN_ACK_SENT:
 		rare();
-		/*
-		   RFC 2960 5.2.4 (A) 
-		 */
+		/* RFC 2960 5.2.4 (A) */
 		sctp_send_abort_error(sp, SCTP_CAUSE_SHUTDOWN, NULL, 0);
 		sctp_send_shutdown_ack(sp);
 		return sctp_return_stop(mp);
@@ -4571,11 +4471,10 @@ sctp_recv_cookie_echo(sp, mp)
 	 *  discarded.  The endpoint SHOULD NOT change states and should leave
 	 *  any timers running.
 	 */
-	/*
-	   RFC 2960 5.2.4 (3) 
-	 */
+	/* RFC 2960 5.2.4 (3) */
 	if (jiffies - ck->timestamp > ck->lifespan) {
 		uint32_t staleness;
+
 		rare();
 		staleness = htonl((jiffies - ck->timestamp - ck->lifespan) * HZ / 1000000);
 		sctp_send_abort_error_ootb(iph->saddr, iph->daddr, sh, SCTP_CAUSE_STALE_COOKIE,
@@ -4593,11 +4492,10 @@ sctp_recv_cookie_echo(sp, mp)
 	 *  should stop any init or cookie timers that may be running and send
 	 *  a COOKIE ACK.
 	 */
-	/*
-	   RFC 2960 5.2.4 (3) 
-	 */
+	/* RFC 2960 5.2.4 (3) */
 	if (jiffies - ck->timestamp > ck->lifespan) {
 		uint32_t staleness;
+
 		rare();
 		staleness = htonl((jiffies - ck->timestamp - ck->lifespan) * HZ / 1000000);
 		sctp_send_abort_error_ootb(iph->saddr, iph->daddr, sh, SCTP_CAUSE_STALE_COOKIE,
@@ -4607,6 +4505,7 @@ sctp_recv_cookie_echo(sp, mp)
       recv_cookie_echo_conn_ind:
 	if (sp->conind) {
 		mblk_t *cp;		/* check for existing conn ind */
+
 		for (cp = bufq_head(&sp->conq); cp; cp = cp->b_next) {
 			struct sctp_cookie_echo *ce = (struct sctp_cookie_echo *) cp->b_rptr;
 			struct sctp_cookie *co = (struct sctp_cookie *) ce->cookie;
@@ -4622,9 +4521,7 @@ sctp_recv_cookie_echo(sp, mp)
 				return (0);
 			}
 		}
-		/*
-		   RFC 2960 5.2.4 (4) 
-		 */
+		/* RFC 2960 5.2.4 (4) */
 		if (bufq_length(&sp->conq) >= sp->conind) {
 			seldom();
 			sctp_send_abort_error_ootb(iph->saddr, iph->daddr, sh,
@@ -4667,9 +4564,7 @@ sctp_recv_cookie_ack(sp, mp)
 
 	switch (sp->s_state) {
 	case SCTP_COOKIE_ECHOED:
-		/*
-		   RFC 2960 5.1 (E) 
-		 */
+		/* RFC 2960 5.1 (E) */
 		ensure(sp->ops->sctp_conn_con, return (-EFAULT));
 		if ((err = sp->ops->sctp_conn_con(sp))) {
 			rare();
@@ -4677,17 +4572,13 @@ sctp_recv_cookie_ack(sp, mp)
 		}
 		sctp_ack_calc(sp, &sp->timer_cookie);
 		sp->s_state = SCTP_ESTABLISHED;
-		/*
-		   start idle timers 
-		 */
+		/* start idle timers */
 		usual(sp->daddr);
 		for (sd = sp->daddr; sd; sd = sd->next)
 			sctp_reset_idle(sd);
 		return sctp_return_more(mp);
 	default:
-		/*
-		   RFC 2960 5.2.5 
-		 */
+		/* RFC 2960 5.2.5 */
 		rare();
 		break;
 	}
@@ -4727,6 +4618,7 @@ sctp_recv_heartbeat(sp, mp)
 			{
 				caddr_t hptr = (caddr_t) ph;
 				size_t hlen = min(plen, PADC(ntohs(ph->len)));
+
 				sctp_send_heartbeat_ack(sp, hptr, hlen);
 				return sctp_return_stop(mp);
 			}
@@ -4845,9 +4737,7 @@ sctp_recv_shutdown(sp, mp)
 				return (err);
 		}
 		sp->s_state = SCTP_SHUTDOWN_RECEIVED;
-		/*
-		   fall thru 
-		 */
+		/* fall thru */
 	case SCTP_SHUTDOWN_RECEIVED:
 		sctp_cumm_ack(sp, ack);
 		sctp_dest_calc(sp);
@@ -4860,9 +4750,7 @@ sctp_recv_shutdown(sp, mp)
 		if ((err = sp->ops->sctp_ordrel_ind(sp)))
 			return (err);
 		sp->s_state = SCTP_SHUTDOWN_RECVWAIT;
-		/*
-		   fall thru 
-		 */
+		/* fall thru */
 	case SCTP_SHUTDOWN_RECVWAIT:
 		sctp_cumm_ack(sp, ack);
 		sctp_dest_calc(sp);
@@ -4875,17 +4763,13 @@ sctp_recv_shutdown(sp, mp)
 			return (err);
 		sctp_cumm_ack(sp, ack);
 		sctp_dest_calc(sp);
-		/*
-		   faill thru 
-		 */
+		/* faill thru */
 	case SCTP_SHUTDOWN_ACK_SENT:
 		sctp_send_shutdown_ack(sp);	/* We do this */
 		break;
 
 	default:
-		/*
-		   ignore the SHUTDOWN chunk 
-		 */
+		/* ignore the SHUTDOWN chunk */
 		rare();
 		break;
 	}
@@ -4905,26 +4789,21 @@ sctp_recv_shutdown_ack(sp, mp)
 	mblk_t *mp;
 {
 	int err;
+
 	switch (sp->s_state) {
 	case SCTP_SHUTDOWN_SENT:
-		/*
-		   send up orderly release indication to ULP 
-		 */
+		/* send up orderly release indication to ULP */
 		if (sp->ops->sctp_ordrel_ind)
 			if ((err = sp->ops->sctp_ordrel_ind(sp)))
 				return (err);
-		/*
-		   fall thru 
-		 */
+		/* fall thru */
 	case SCTP_SHUTDOWN_ACK_SENT:
 		// sctp_ack_calc(sp, &sp->timer_shutdown); /* WHY? */
 		sctp_send_shutdown_complete(sp);
 		sctp_disconnect(sp);
 		break;
 	default:
-		/*
-		   ignore unexpected SHUTDOWN ACK 
-		 */
+		/* ignore unexpected SHUTDOWN ACK */
 		rare();
 		break;
 	}
@@ -4956,9 +4835,7 @@ sctp_recv_shutdown_complete(sp, mp)
 		sctp_disconnect(sp);
 		break;
 	default:
-		/*
-		   ignore unexpected SHUTDOWN COMPLETE 
-		 */
+		/* ignore unexpected SHUTDOWN COMPLETE */
 		rare();
 		break;
 	}
@@ -5002,9 +4879,7 @@ sctp_recv_msg(sp, mp)
 	int err = -EMSGSIZE;
 
 	if (mp) {
-		/*
-		   set the address for reply chunks 
-		 */
+		/* set the address for reply chunks */
 		if (sp->daddr) {
 			sp->caddr =
 			    sctp_find_daddr(sp, ((struct iphdr *) mp->b_datap->db_base)->saddr);
@@ -5092,6 +4967,7 @@ void
 ip_rt_update_pmtu(struct dst_entry *dst, u32 mtu)
 {
 	void (*func) (struct dst_entry *, u32) = (typeof(func)) HAVE_IP_RT_UPDATE_PMTU_ADDR;
+
 	return func(dst, mtu);
 }
 #endif
@@ -5129,6 +5005,7 @@ sctp_recv_err(sp, mp)
 			if (sd->dst_cache) {
 				if (code == ICMP_FRAG_NEEDED) {
 					size_t mtu = ntohs(icmph->un.frag.mtu);
+
 					rare();
 					ip_rt_update_pmtu(sd->dst_cache, mtu);
 				} else
