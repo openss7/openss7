@@ -1,3 +1,41 @@
+2006-09-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: reordered includes
+	* doc/man/Makefile.am: corrections
+	* doc/man/man3/_nderror.3.man: corrected macro file name
+	* doc/man/man3/endnetconfig.3.man: corrected macro file name
+	* doc/man/man3/endnetpath.3.man: corrected macro file name
+	* doc/man/man3/freenetconfigent.3.man: corrected macro file name
+	* doc/man/man3/getnetconfig.3.man: corrected macro file name
+	* doc/man/man3/getnetconfigent.3.man: corrected macro file name
+	* doc/man/man3/getnetpath.3.man: corrected macro file name
+	* doc/man/man3/inetaddr.3.man: corrected macro file name
+	* doc/man/man3/nc_perror.3.man: corrected macro file name
+	* doc/man/man3/nc_sperror.3.man: corrected macro file name
+	* doc/man/man3/netbuf.3.man: corrected macro file name
+	* doc/man/man3/netconfig.3.man: corrected macro file name
+	* doc/man/man3/netdir.3.man: corrected macro file name
+	* doc/man/man3/netdir_free.3.man: corrected macro file name
+	* doc/man/man3/netdir_getbyaddr.3.man: corrected macro file name
+	* doc/man/man3/netdir_getbyname.3.man: corrected macro file name
+	* doc/man/man3/netdir_options.3.man: corrected macro file name
+	* doc/man/man3/netdir_perror.3.man: corrected macro file name
+	* doc/man/man3/netdir_sperror.3.man: corrected macro file name
+	* doc/man/man3/netpath.3.man: corrected macro file name
+	* doc/man/man3/setnetconfig.3.man: corrected macro file name
+	* doc/man/man3/setnetpath.3.man: corrected macro file name
+	* doc/man/man3/taddr2uaddr.3.man: corrected macro file name
+	* doc/man/man3/uaddr2taddr.3.man: corrected macro file name
+	* doc/man/man3/xnsl.3.man: corrected macro file name
+	* doc/man/man5/netconfig.5.man: corrected macro file name
+	* doc/man/man5/netdir.5.man: corrected macro file name
+	* doc/man/man5/soon.5.man: corrected macro file name
+	* doc/man/man5/xxx.5.man: corrected macro file name
+	* doc/man/man8/soon.8.man: corrected macro file name
+	* doc/man/man8/test-xnsl.8.man: corrected macro file name
+	* doc/man/man8/test-xnsl_thr.8.man: corrected macro file name
+	* doc/man/man8/xxx.8.man: corrected macro file name
+
 2006-09-24  Brian Bidulock  <bidulock@openss7.org>
 
 	- added files to start package off

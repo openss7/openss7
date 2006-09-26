@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: netdir_sperror.3.man,v 0.9.2.1 2006/09/25 12:30:49 brian Exp $
+.\" @(#) $Id: netdir_sperror.3.man,v 0.9.2.2 2006/09/26 00:51:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/25 12:30:49 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/26 00:51:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: netdir_sperror.3.man,v $
+.\" Revision 0.9.2.2  2006/09/26 00:51:20  brian
+.\" - corrected macro file name, reordered includes
+.\"
 .\" Revision 0.9.2.1  2006/09/25 12:30:49  brian
 .\" - added files for new strnsl package
 .\"
@@ -71,7 +74,7 @@
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database strxnet.refs
+database strnsl.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -80,7 +83,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
-.so strxnet.macros
+.so strnsl.macros
 .\"
 .\"
 .\"

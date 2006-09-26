@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/26 00:51:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 12:30:48 $ by $Author: brian $
+# Last Modified $Date: 2006/09/26 00:51:19 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/26 00:51:19  brian
+# - corrected macro file name, reordered includes
+#
 # Revision 0.9.2.1  2006/09/25 12:30:48  brian
 # - added files for new strnsl package
 #
@@ -95,6 +98,10 @@ xnsl_man_MANS 	= \
 	man8/test-xnsl_thr.8
 
 man_MANS		= $(xnsl_man_MANS)
+
+MANS_UNUSED = \
+	man3/netbuf.3 \
+	man3/netpath.3
 
 xnsl_dist_noinst_MANS 	= \
 	man3/endnetconfig.3.man \
