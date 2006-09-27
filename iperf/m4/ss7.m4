@@ -4,7 +4,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/25 08:56:35 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/27 05:08:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,11 +49,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 08:56:35 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:08:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.6  2006/09/27 05:08:41  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.5  2006/09/25 08:56:35  brian
 # - corrections by inspection
 #
@@ -99,6 +102,7 @@ dnl
     AC_SUBST([SS7_MODFLAGS])dnl
     AC_SUBST([SS7_LDADD])dnl
     AC_SUBST([SS7_LDADD32])dnl
+    AC_SUBST([SS7_LDFLAGS])dnl
     AC_SUBST([SS7_MODMAP])dnl
     AC_SUBST([SS7_SYMVER])dnl
     AC_SUBST([SS7_MANPATH])dnl
@@ -188,6 +192,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 			ss7_cv_includes="$ss7_search_path"
 			ss7_cv_ldadd= # "$master_builddir/stacks/libss7.la"
 			ss7_cv_ldadd32= # "$master_builddir/stacks/lib32/libss7.la"
+			ss7_cv_ldflags=
 			ss7_cv_modmap= # "$master_builddir/stacks/Modules.map"
 			ss7_cv_symver= # "$master_builddir/stacks/Module.symvers"
 			ss7_cv_manpath="$master_builddir/stacks/doc/man"
@@ -222,6 +227,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 			ss7_cv_includes="$ss7_dir $ss7_bld"
 			ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_ldflags=
 			ss7_cv_modmap= # `echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_symver= # `echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -297,8 +303,9 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir])
 		    if test -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_dir"
-			ss7_cv_ldadd= # '-lss7'
-			ss7_cv_ldadd32= # '-lss7'
+			ss7_cv_ldadd=
+			ss7_cv_ldadd32=
+			ss7_cv_ldflags= # '-lss7'
 			ss7_cv_modmap=
 			ss7_cv_symver=
 			ss7_cv_manpath=
@@ -319,7 +326,8 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$ss7_cv_ldadd" ; then
-	    ss7_cv_ldadd= # '-lss7'
+	    ss7_cv_ldadd=
+	    ss7_cv_ldflags= # '-lss7'
 	fi
     ])
     AC_CACHE_CHECK([for ss7 ldadd 32-bit],[ss7_cv_ldadd32],[dnl
@@ -330,7 +338,14 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$ss7_cv_ldadd32" ; then
-	    ss7_cv_ldadd32= # '-lss7'
+	    ss7_cv_ldadd32=
+	fi
+    ])
+    AC_CACHE_CHECK([for ss7 ldflags],[ss7_cv_ldflags],[dnl
+	if test -z "$ss7_cv_ldadd$ss7_cv_ldadd32" ; then
+	    ss7_cv_ldflags= # '-lss7'
+	else
+	    ss7_cv_ldflags=
 	fi
     ])
     AC_CACHE_CHECK([for ss7 modmap],[ss7_cv_modmap],[dnl
@@ -494,6 +509,7 @@ AC_DEFUN([_SS7_DEFINES], [dnl
     SS7_CPPFLAGS="${SS7_CPPFLAGS:+ ${SS7_CPPFLAGS}}"
     SS7_LDADD="$ss7_cv_ldadd"
     SS7_LDADD32="$ss7_cv_ldadd32"
+    SS7_LDFLAGS="$ss7_cv_ldflags"
     SS7_MODMAP="$ss7_cv_modmap"
     SS7_SYMVER="$ss7_cv_symver"
     SS7_MANPATH="$ss7_cv_manpath"

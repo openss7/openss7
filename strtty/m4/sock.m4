@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 08:38:20 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/27 05:08:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 08:38:20 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:08:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.2  2006/09/27 05:08:41  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.1  2006/09/25 08:38:20  brian
 # - added m4 files for locating NSL and SOCK
 #
@@ -89,6 +92,7 @@ dnl
     AC_SUBST([SOCK_MODFLAGS])dnl
     AC_SUBST([SOCK_LDADD])dnl
     AC_SUBST([SOCK_LDADD32])dnl
+    AC_SUBST([SOCK_LDFLAGS])dnl
     AC_SUBST([SOCK_MODMAP])dnl
     AC_SUBST([SOCK_SYMVER])dnl
     AC_SUBST([SOCK_MANPATH])dnl
@@ -178,6 +182,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 			sock_cv_includes="$sock_search_path"
 			sock_cv_ldadd="$master_builddir/strsock/libsocket.la"
 			sock_cv_ldadd32="$master_builddir/strsock/lib32/libsocket.la"
+			sock_cv_ldflags=
 			sock_cv_modmap= # "$master_builddir/strsock/Modules.map"
 			sock_cv_symver= # "$master_builddir/strsock/Module.symvers"
 			sock_cv_manpath="$master_builddir/strsock/doc/man"
@@ -208,6 +213,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 			sock_cv_includes="$sock_dir $sock_bld"
 			sock_cv_ldadd=`echo "$sock_bld/../../libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_ldadd32=`echo "$sock_bld/../../lib32/libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sock_cv_ldflags=
 			sock_cv_modmap= # `echo "$sock_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_symver= # `echo "$sock_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_manpath=`echo "$sock_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -282,8 +288,9 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for sock include directory... $sock_dir])
 		    if test -r "$sock_dir/$sock_what" ; then
 			sock_cv_includes="$sock_dir"
-			sock_cv_ldadd="-lsocket"
-			sock_cv_ldadd32="-lsocket"
+			sock_cv_ldadd=
+			sock_cv_ldadd32=
+			sock_cv_ldflags="-lsocket"
 			sock_cv_modmap=
 			sock_cv_symver=
 			sock_cv_manpath=
@@ -304,7 +311,8 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$sock_cv_ldadd" ; then
-	    sock_cv_ldadd='-lsocket'
+	    sock_cv_ldadd=
+	    sock_cv_ldflags="-lsocket"
 	fi
     ])
     AC_CACHE_CHECK([for sock ldadd 32-bit],[sock_cv_ldadd32],[dnl
@@ -315,7 +323,14 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$sock_cv_ldadd32" ; then
-	    sock_cv_ldadd32='-lsocket'
+	    sock_cv_ldadd32=
+	fi
+    ])
+    AC_CACHE_CHECK([for sock ldflags],[sock_cv_ldflags],[dnl
+	if test -z "$sock_cv_ldadd$sock_cv_ldadd32" ; then
+	    sock_cv_ldflags="-lsocket"
+	else
+	    sock_cv_ldflags=
 	fi
     ])
     AC_CACHE_CHECK([for sock modmap],[sock_cv_modmap],[dnl
@@ -479,6 +494,7 @@ AC_DEFUN([_SOCK_DEFINES], [dnl
     SOCK_CPPFLAGS="${SOCK_CPPFLAGS:+ ${SOCK_CPPFLAGS}}"
     SOCK_LDADD="$sock_cv_ldadd"
     SOCK_LDADD32="$sock_cv_ldadd32"
+    SOCK_LDFLAGS="$sock_cv_ldflags"
     SOCK_MODMAP="$sock_cv_modmap"
     SOCK_SYMVER="$sock_cv_symver"
     SOCK_MANPATH="$sock_cv_manpath"

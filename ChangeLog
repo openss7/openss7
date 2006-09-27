@@ -1,3 +1,17 @@
+2006-09-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/inet.m4: distinguish LDADD from LDFLAGS
+	* m4/nsl.m4: distinguish LDADD from LDFLAGS
+	* m4/sctp.m4: distinguish LDADD from LDFLAGS
+	* m4/sock.m4: distinguish LDADD from LDFLAGS
+	* m4/ss7.m4: distinguish LDADD from LDFLAGS
+	* m4/strcomp.m4: distinguish LDADD from LDFLAGS
+	* m4/streams.m4: distinguish LDADD from LDFLAGS
+	* m4/xns.m4: distinguish LDADD from LDFLAGS
+	* m4/xti.m4: distinguish LDADD from LDFLAGS
+
+	* m4/libraries.m4: libtool command line needs absolute directories
+
 2006-09-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/nsl.m4: m4 file to find strnsl package

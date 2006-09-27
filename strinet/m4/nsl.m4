@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 08:38:20 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/27 05:08:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 08:38:20 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:08:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.2  2006/09/27 05:08:41  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.1  2006/09/25 08:38:20  brian
 # - added m4 files for locating NSL and SOCK
 #
@@ -98,6 +101,7 @@ dnl
     AC_SUBST([NSL_MODFLAGS])dnl
     AC_SUBST([NSL_LDADD])dnl
     AC_SUBST([NSL_LDADD32])dnl
+    AC_SUBST([NSL_LDFLAGS])dnl
     AC_SUBST([NSL_MODMAP])dnl
     AC_SUBST([NSL_SYMVER])dnl
     AC_SUBST([NSL_MANPATH])dnl
@@ -187,6 +191,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			nsl_cv_includes="$nsl_search_path"
 			nsl_cv_ldadd="$master_builddir/strnsl/libxnsl.la"
 			nsl_cv_ldadd32="$master_builddir/strnsl/lib32/libxnsl.la"
+			nsl_cv_ldflags=
 			nsl_cv_modmap= # "$master_builddir/strnsl/Modules.map"
 			nsl_cv_symver= # "$master_builddir/strnsl/Module.symvers"
 			nsl_cv_manpath="$master_builddir/strnsl/doc/man"
@@ -217,6 +222,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			nsl_cv_includes="$nsl_dir $nsl_bld"
 			nsl_cv_ldadd=`echo "$nsl_bld/../../libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_ldadd32=`echo "$nsl_bld/../../lib32/libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			nsl_cv_ldflags=
 			nsl_cv_modmap= # `echo "$nsl_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_symver= # `echo "$nsl_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_manpath=`echo "$nsl_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -291,8 +297,9 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for nsl include directory... $nsl_dir])
 		    if test -r "$nsl_dir/$nsl_what" ; then
 			nsl_cv_includes="$nsl_dir"
-			nsl_cv_ldadd="-lxnsl"
-			nsl_cv_ldadd32="-lxnsl"
+			nsl_cv_ldadd=
+			nsl_cv_ldadd32=
+			nsl_cv_ldflags="-lxnsl"
 			nsl_cv_modmap=
 			nsl_cv_symver=
 			nsl_cv_manpath=
@@ -313,7 +320,8 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$nsl_cv_ldadd" ; then
-	    nsl_cv_ldadd='-lxnsl'
+	    nsl_cv_ldadd=
+	    nsl_cv_ldflags="-lxnsl"
 	fi
     ])
     AC_CACHE_CHECK([for nsl ldadd 32-bit],[nsl_cv_ldadd32],[dnl
@@ -324,7 +332,14 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$nsl_cv_ldadd32" ; then
-	    nsl_cv_ldadd32='-lxnsl'
+	    nsl_cv_ldadd32=
+	fi
+    ])
+    AC_CACHE_CHECK([for nsl ldflags],[nsl_cv_ldflags],[dnl
+	if test -z "$nsl_cv_ldadd$nsl_cv_ldadd32" ; then
+	    nsl_cv_ldflags="-lxnsl"
+	else
+	    nsl_cv_ldflags=
 	fi
     ])
     AC_CACHE_CHECK([for nsl modmap],[nsl_cv_modmap],[dnl
@@ -488,6 +503,7 @@ AC_DEFUN([_NSL_DEFINES], [dnl
     NSL_CPPFLAGS="${NSL_CPPFLAGS:+ ${NSL_CPPFLAGS}}"
     NSL_LDADD="$nsl_cv_ldadd"
     NSL_LDADD32="$nsl_cv_ldadd32"
+    NSL_LDFLAGS="$nsl_cv_ldflags"
     NSL_MODMAP="$nsl_cv_modmap"
     NSL_SYMVER="$nsl_cv_symver"
     NSL_MANPATH="$nsl_cv_manpath"
