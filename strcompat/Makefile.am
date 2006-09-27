@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/09/18 01:15:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/09/27 05:15:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:15:30 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:15:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.19  2006/09/27 05:15:15  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.18  2006/09/18 01:15:30  brian
 # - add 32bit libs, release file changes, additional packages
 #
@@ -112,7 +115,7 @@ sbin_PROGRAMS			= \
 
 ## xxx_SOURCES			=
 ## xxx_LDADD			= $(STREAMS_LDADD)
-## xxx_LDFLAGS			= -static
+## xxx_LDFLAGS			= -static $(STREAMS_LDFLAGS)
 ## xxx_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ## xxx_CFLAGS			= $(USER_CFLAGS)
 

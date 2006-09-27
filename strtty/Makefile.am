@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 01:15:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/27 05:15:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:15:34 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:15:30 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/09/27 05:15:30  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.3  2006/09/18 01:15:34  brian
 # - add 32bit libs, release file changes, additional packages
 #
@@ -111,14 +114,14 @@ dist_sbin_SCRIPTS		=
 test_tty_SOURCES		= src/test/test-tty.c
 test_tty_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_tty_LDADD			= $(STREAMS_LDADD)
-test_tty_LDFLAGS		= -static
+test_tty_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_tty_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tty_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
-#xxxxxx_LDFLAGS			= -static
+#xxxxxx_LDFLAGS			= -static $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #xxxxxx_CFLAGS			= $(USER_CFLAGS)
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.41 $) $Date: 2006/09/25 12:17:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.42 $) $Date: 2006/09/27 05:15:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 12:17:24 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:15:12 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.42  2006/09/27 05:15:12  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 1.1.6.41  2006/09/25 12:17:24  brian
 # - updates for distcheck
 #
@@ -270,8 +273,9 @@ libLiS_la_SOURCES		= libc/fattach.c \
 				  libc/putpmsg.c \
 				  libc/testcancel.c \
 				  libc/streams.h
-libLiS_la_DEPENDENCIES		= $(top_srcdir)/libc/LiS.VERSION
-libLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 -Wl,--version-script -Wl,$(top_srcdir)/libc/LiS.VERSION
+libLiS_la_DEPENDENCIES		= $(lib_abs_srcdir)/libc/LiS.VERSION
+libLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/libc/LiS.VERSION
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS)
 
@@ -285,8 +289,9 @@ libpLiS_la_SOURCES		= libc/fattach.c \
 				  libc/putpmsg.c \
 				  libc/testcancel.c \
 				  libc/streams.h
-libpLiS_la_DEPENDENCIES		= $(top_srcdir)/libc/LiS.VERSION
-libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 -Wl,--version-script -Wl,$(top_srcdir)/libc/LiS.VERSION
+libpLiS_la_DEPENDENCIES		= $(lib_abs_srcdir)/libc/LiS.VERSION
+libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:2:0 \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/libc/LiS.VERSION
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS)
 

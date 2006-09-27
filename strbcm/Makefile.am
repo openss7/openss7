@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/18 01:15:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/27 05:15:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:15:29 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:15:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2006/09/27 05:15:14  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.8  2006/09/18 01:15:29  brian
 # - add 32bit libs, release file changes, additional packages
 #
@@ -125,14 +128,14 @@ dist_sbin_SCRIPTS		=
 test_bcm_SOURCES		= src/test/test-bcm.c
 test_bcm_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_bcm_LDADD			= $(STREAMS_LDADD)
-test_bcm_LDFLAGS		= -static
+test_bcm_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_bcm_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_bcm_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
-#xxxxxx_LDFLAGS			= -static
+#xxxxxx_LDFLAGS			= -static $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #xxxxxx_CFLAGS			= $(USER_CFLAGS)
 

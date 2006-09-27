@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/18 17:43:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/27 05:15:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 17:43:14 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:15:29 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/09/27 05:15:29  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.4  2006/09/18 17:43:14  brian
 # - added doxy rules to makefile and release notes
 #
@@ -121,56 +124,56 @@ dist_sbin_SCRIPTS		=
 test_sockpath_SOURCES		= src/test/test-sockpath.c
 test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_sockpath_LDADD		= libsockpath.la $(STREAMS_LDADD)
-test_sockpath_LDFLAGS		= -static
+test_sockpath_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sockpath_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockpath_CFLAGS		= $(USER_CFLAGS)
 
 test_socket_SOURCES		= src/test/test-socket.c
 test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socket_LDADD		= libsocket.la $(STREAMS_LDADD)
-test_socket_LDFLAGS		= -static
+test_socket_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_socket_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socket_CFLAGS		= $(USER_CFLAGS)
 
 test_socklib_SOURCES		= src/test/test-socklib.c
 test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socklib_LDADD		= libsocklib.la $(STREAMS_LDADD)
-test_socklib_LDFLAGS		= -static
+test_socklib_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_socklib_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socklib_CFLAGS		= $(USER_CFLAGS)
 
 test_sockmod_SOURCES		= src/test/test-sockmod.c
 test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_sockmod_LDADD		= libsocklib.la $(STREAMS_LDADD)
-test_sockmod_LDFLAGS		= -static
+test_sockmod_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sockmod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockmod_CFLAGS		= $(USER_CFLAGS)
 
 test_socksys_SOURCES		= src/test/test-socksys.c
 test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socksys_LDADD		= libsocket.la $(STREAMS_LDADD)
-test_socksys_LDFLAGS		= -static
+test_socksys_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_socksys_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socksys_CFLAGS		= $(USER_CFLAGS)
 
 initsock_SOURCES		= src/util/initsock.c
 initsock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 initsock_LDADD			= $(STREAMS_LDADD)
-initsock_LDFLAGS		= -static
+initsock_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 initsock_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 initsock_CFLAGS			= $(USER_CFLAGS)
 
 soconfig_SOURCES		= src/util/soconfig.c
 soconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 soconfig_LDADD			= $(STREAMS_LDADD)
-soconfig_LDFLAGS		= -static
+soconfig_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 soconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 soconfig_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
-#xxxxxx_LDFLAGS			= -static
+#xxxxxx_LDFLAGS			= -static $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #xxxxxx_CFLAGS			= $(USER_CFLAGS)
 
@@ -182,7 +185,8 @@ libsockpath_la_SOURCES		= src/lib/pthread.c \
 				  src/include/sockdb.h \
 				  src/include/sys/sockpath.h
 libsockpath_la_DEPENDENCIES	= src/lib/sockpath.VERSION
-libsockpath_la_LDFLAGS		= -version-info 0:0:0 -Wl,--version-script -Wl,$(top_srcdir)/src/lib/sockpath.VERSION
+libsockpath_la_LDFLAGS		= -no-undefined -version-info 0:0:0 \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sockpath.VERSION
 libsockpath_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsockpath_la_CFLAGS		= $(USER_CFLAGS)
 libsockpath_la_LIBADD		=
@@ -193,10 +197,12 @@ libsocket_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/socket.c \
 				  gettext.h
 libsocket_la_DEPENDENCIES	= src/lib/socket.VERSION
-libsocket_la_LDFLAGS		= $(STREAMS_LDADD) -version-info 0:0:0 -Wl,--version-script -Wl,$(top_srcdir)/src/lib/socket.VERSION
+libsocket_la_LDFLAGS		= -no-undefined -version-info 0:0:0 \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socket.VERSION \
+				  $(STREAMS_LDFLAGS)
 libsocket_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsocket_la_CFLAGS		= $(USER_CFLAGS)
-libsocket_la_LIBADD		=
+libsocket_la_LIBADD		= $(STREAMS_LDADD)
 
 lib_LTLIBRARIES			+= libsocklib.la
 
@@ -204,10 +210,12 @@ libsocklib_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/socklib.c \
 				  gettext.h
 libsocklib_la_DEPENDENCIES	= src/lib/socklib.VERSION
-libsocklib_la_LDFLAGS		= $(STREAMS_LDADD) $(XTI_LDADD) $(NSL_LDADD) -version-info 0:0:0 -Wl,--version-script -Wl,$(top_srcdir)/src/lib/socklib.VERSION
+libsocklib_la_LDFLAGS		= -no-undefined -version-info 0:0:0 \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socklib.VERSION \
+				  $(STREAMS_LDFLAGS) $(XTI_LDFLAGS) $(NSL_LDFLAGS)
 libsocklib_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsocklib_la_CFLAGS		= $(USER_CFLAGS)
-libsocklib_la_LIBADD		= libsockpath.la
+libsocklib_la_LIBADD		= $(STREAMS_LDADD) $(XTI_LDADD) $(NSL_LDADD) libsockpath.la
 
 ## RPM_BUILD_USER
 endif
@@ -367,7 +375,8 @@ dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf
+dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf \
+				  src/util/sysconfig/sock2path
 
 dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 

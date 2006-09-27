@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/09/18 01:15:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/09/27 05:15:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:15:33 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:15:28 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.51  2006/09/27 05:15:28  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.50  2006/09/18 01:15:33  brian
 # - add 32bit libs, release file changes, additional packages
 #
@@ -141,55 +144,55 @@ sbin_PROGRAMS			= \
 
 test_sctp_SOURCES		= src/test/test-sctp.c
 test_sctp_LDADD			= $(STREAMS_LDADD)
-test_sctp_LDFLAGS		= -static
+test_sctp_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_n_SOURCES		= src/test/test-sctp_n.c
 test_sctp_n_LDADD		= $(STREAMS_LDADD)
-test_sctp_n_LDFLAGS		= -static
+test_sctp_n_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_n2_SOURCES		= src/test/test-sctp_n2.c
 test_sctp_n2_LDADD		= $(STREAMS_LDADD)
-test_sctp_n2_LDFLAGS		= -static
+test_sctp_n2_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_n2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n2_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
 test_sctp_nc_LDADD		= $(STREAMS_LDADD)
-test_sctp_nc_LDFLAGS		= -static
+test_sctp_nc_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_nc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
 test_sctp_ns_LDADD		= $(STREAMS_LDADD)
-test_sctp_ns_LDFLAGS		= -static
+test_sctp_ns_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_ns_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_t_SOURCES		= src/test/test-sctp_t.c
 test_sctp_t_LDADD		= $(STREAMS_LDADD)
-test_sctp_t_LDFLAGS		= -static
+test_sctp_t_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
 test_etsi_n_SOURCES		= src/test/test-etsi_n.c
 test_etsi_n_LDADD		= $(STREAMS_LDADD)
-test_etsi_n_LDFLAGS		= -static
+test_etsi_n_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_etsi_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_etsi_n_CFLAGS		= $(USER_CFLAGS)
 
 test_etsi_t_SOURCES		= src/test/test-etsi_t.c
 test_etsi_t_LDADD		= $(STREAMS_LDADD)
-test_etsi_t_LDFLAGS		= -static
+test_etsi_t_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_etsi_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_etsi_t_CFLAGS		= $(USER_CFLAGS)
 
 test_interop_SOURCES		= src/test/test-interop.c
 test_interop_LDADD		= $(STREAMS_LDADD)
-test_interop_LDFLAGS		= -static
+test_interop_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_interop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_interop_CFLAGS		= $(USER_CFLAGS)
 
@@ -358,55 +361,55 @@ sbin_PROGRAMS			= \
 
 test_sctp_SOURCES		= src/test/test-sctp.c
 test_sctp_LDADD			= $(STREAMS_LDADD)
-test_sctp_LDFLAGS		= -static
+test_sctp_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_n_SOURCES		= src/test/test-sctp_n.c
 test_sctp_n_LDADD		= $(STREAMS_LDADD)
-test_sctp_n_LDFLAGS		= -static
+test_sctp_n_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_n2_SOURCES		= src/test/test-sctp_n2.c
 test_sctp_n2_LDADD		= $(STREAMS_LDADD)
-test_sctp_n2_LDFLAGS		= -static
+test_sctp_n2_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_n2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n2_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
 test_sctp_nc_LDADD		= $(STREAMS_LDADD)
-test_sctp_nc_LDFLAGS		= -static
+test_sctp_nc_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_nc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
 test_sctp_ns_LDADD		= $(STREAMS_LDADD)
-test_sctp_ns_LDFLAGS		= -static
+test_sctp_ns_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_ns_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_t_SOURCES		= src/test/test-sctp_t.c
 test_sctp_t_LDADD		= $(STREAMS_LDADD)
-test_sctp_t_LDFLAGS		= -static
+test_sctp_t_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
 test_etsi_n_SOURCES		= src/test/test-etsi_n.c
 test_etsi_n_LDADD		= $(STREAMS_LDADD)
-test_etsi_n_LDFLAGS		= -static
+test_etsi_n_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_etsi_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_etsi_n_CFLAGS		= $(USER_CFLAGS)
 
 test_etsi_t_SOURCES		= src/test/test-etsi_t.c
 test_etsi_t_LDADD		= $(STREAMS_LDADD)
-test_etsi_t_LDFLAGS		= -static
+test_etsi_t_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_etsi_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_etsi_t_CFLAGS		= $(USER_CFLAGS)
 
 test_interop_SOURCES		= src/test/test-interop.c
 test_interop_LDADD		= $(STREAMS_LDADD)
-test_interop_LDFLAGS		= -static
+test_interop_LDFLAGS		= -static $(STREAMS_LDFLAGS)
 test_interop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_interop_CFLAGS		= $(USER_CFLAGS)
 

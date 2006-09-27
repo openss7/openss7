@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/09/24 21:36:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/09/27 05:15:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/24 21:36:49 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 05:15:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.138  2006/09/27 05:15:16  brian
+# - distinguish LDADD from LDFLAGS
+#
 # Revision 0.9.2.137  2006/09/24 21:36:49  brian
 # - added lib files
 #
@@ -548,7 +551,8 @@ libstreams_la_SOURCES		= \
 				lib/libc/fdetach.c \
 				lib/libc/streams.h
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
-libstreams_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
+libstreams_la_LDFLAGS		= -no-undefined \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
 ##if USING_IOCTL_GETPMSG_PUTPMSG
@@ -569,7 +573,8 @@ libLiS_la_SOURCES		= \
 				lib/libc/fdetach.c \
 				lib/libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
-libLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
+libLiS_la_LDFLAGS		= -no-undefined \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS)
 ##if USING_IOCTL_GETPMSG_PUTPMSG
@@ -589,7 +594,8 @@ libpLiS_la_SOURCES		= \
 				lib/libc/fdetach.c \
 				lib/libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
-libpLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION
+libpLiS_la_LDFLAGS		= -no-undefined \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS)
 ##if USING_IOCTL_GETPMSG_PUTPMSG

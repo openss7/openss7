@@ -1,3 +1,7 @@
+2006-09-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: distinguish LDADD and LDFLAGS
+
 2006-09-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: changes from distcheck
