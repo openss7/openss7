@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/11 09:49:51 $
+# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/27 02:56:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:51 $ by $Author: brian $
+# Last Modified $Date: 2006/09/27 02:56:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -87,6 +87,10 @@ AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
 # _LDCONFIG_SPEC_OUTPUT
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [dnl
+    lib_abs_builddir=`(cd . ; pwd)`
+    lib_abs_srcdir=`(cd $srcdir ; pwd)`
+    AC_SUBST([lib_asb_builddir])dnl
+    AC_SUBST([lib_asb_srcdir])dnl
 ])# _LDCONFIG_SPEC_OUTPUT
 # =========================================================================
 
