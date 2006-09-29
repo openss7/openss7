@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/27 05:08:41 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/29 10:57:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,23 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:08:41 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.6  2006/09/29 10:57:46  brian
+# - autoconf does not like multiline cache variables
+#
+# Revision 0.9.2.5  2006/09/29 03:56:53  brian
+# - typos
+#
+# Revision 0.9.2.4  2006/09/29 03:46:16  brian
+# - substitute LDFLAGS32
+#
+# Revision 0.9.2.3  2006/09/29 03:22:38  brian
+# - handle flags better
+#
 # Revision 0.9.2.2  2006/09/27 05:08:41  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -102,6 +114,7 @@ dnl
     AC_SUBST([NSL_LDADD])dnl
     AC_SUBST([NSL_LDADD32])dnl
     AC_SUBST([NSL_LDFLAGS])dnl
+    AC_SUBST([NSL_LDFLAGS32])dnl
     AC_SUBST([NSL_MODMAP])dnl
     AC_SUBST([NSL_SYMVER])dnl
     AC_SUBST([NSL_MANPATH])dnl
@@ -181,9 +194,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    nsl_search_path="
-		${master_srcdir:+$master_srcdir/strnsl/src/include}
-		${master_builddir:+$master_builddir/strnsl/src/include}"
+	    nsl_search_path="${master_srcdir:+$master_srcdir/strnsl/src/include} ${master_builddir:+$master_builddir/strnsl/src/include}"
 	    for nsl_dir in $nsl_search_path ; do
 		if test -d "$nsl_dir" ; then
 		    AC_MSG_CHECKING([for nsl include directory... $nsl_dir])
@@ -191,7 +202,6 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			nsl_cv_includes="$nsl_search_path"
 			nsl_cv_ldadd="$master_builddir/strnsl/libxnsl.la"
 			nsl_cv_ldadd32="$master_builddir/strnsl/lib32/libxnsl.la"
-			nsl_cv_ldflags=
 			nsl_cv_modmap= # "$master_builddir/strnsl/Modules.map"
 			nsl_cv_symver= # "$master_builddir/strnsl/Module.symvers"
 			nsl_cv_manpath="$master_builddir/strnsl/doc/man"
@@ -222,7 +232,6 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			nsl_cv_includes="$nsl_dir $nsl_bld"
 			nsl_cv_ldadd=`echo "$nsl_bld/../../libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_ldadd32=`echo "$nsl_bld/../../lib32/libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			nsl_cv_ldflags=
 			nsl_cv_modmap= # `echo "$nsl_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_symver= # `echo "$nsl_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_manpath=`echo "$nsl_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -236,7 +245,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	fi
 	if test :"${nsl_cv_includes:-no}" = :no ; then
 	    # NSL header files are normally found in the strnsl package now.
-	    # They used to be part of the NSL add-on package and even older
+	    # They used to be part of the XNET add-on package and even older
 	    # versions are part of the LiS release packages.
 	    case "$streams_cv_package" in
 		(LiS)
@@ -246,26 +255,28 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/strnsl
 			${DESTDIR}${rootdir}/usr/local/include/strnsl
 			${DESTDIR}${rootdir}/usr/src/strnsl/src/include
-			${DESTDIR}${includedir}/LiS/nsl
-			${DESTDIR}${rootdir}${oldincludedir}/LiS/nsl
-			${DESTDIR}${rootdir}/usr/include/LiS/nsl
-			${DESTDIR}${rootdir}/usr/local/include/LiS/nsl
-			${DESTDIR}${rootdir}/usr/src/LiS/include/nsl
-			${DESTDIR}${includedir}/nsl
-			${DESTDIR}${rootdir}${oldincludedir}/nsl
-			${DESTDIR}${rootdir}/usr/include/nsl
-			${DESTDIR}${rootdir}/usr/local/include/nsl
+			${DESTDIR}${includedir}/strxnet
+			${DESTDIR}${rootdir}${oldincludedir}/strxnet
+			${DESTDIR}${rootdir}/usr/include/strxnet
+			${DESTDIR}${rootdir}/usr/local/include/strxnet
+			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
+			${DESTDIR}${includedir}/strxnet
+			${DESTDIR}${rootdir}${oldincludedir}/strxnet
+			${DESTDIR}${rootdir}/usr/include/strxnet
+			${DESTDIR}${rootdir}/usr/local/include/strxnet
+			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
 			${DESTDIR}${oldincludedir}/strnsl
 			${DESTDIR}/usr/include/strnsl
 			${DESTDIR}/usr/local/include/strnsl
 			${DESTDIR}/usr/src/strnsl/src/include
-			${DESTDIR}${oldincludedir}/LiS/nsl
-			${DESTDIR}/usr/include/LiS/nsl
-			${DESTDIR}/usr/local/include/LiS/nsl
-			${DESTDIR}/usr/src/LiS/include/nsl
-			${DESTDIR}${oldincludedir}/nsl
-			${DESTDIR}/usr/include/nsl
-			${DESTDIR}/usr/local/include/nsl\""
+			${DESTDIR}${oldincludedir}/strxnet
+			${DESTDIR}/usr/include/strxnet
+			${DESTDIR}/usr/local/include/strxnet
+			${DESTDIR}/usr/src/strxnet/src/include
+			${DESTDIR}${oldincludedir}/strxnet
+			${DESTDIR}/usr/include/strxnet
+			${DESTDIR}/usr/local/include/strxnet
+			${DESTDIR}/usr/src/strxnet/src/include\""
 		    ;;
 		LfS)
 		    eval "nsl_search_path=\"
@@ -274,6 +285,11 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/strnsl
 			${DESTDIR}${rootdir}/usr/local/include/strnsl
 			${DESTDIR}${rootdir}/usr/src/strnsl/src/include
+			${DESTDIR}${includedir}/strxnet
+			${DESTDIR}${rootdir}${oldincludedir}/strxnet
+			${DESTDIR}${rootdir}/usr/include/strxnet
+			${DESTDIR}${rootdir}/usr/local/include/strxnet
+			${DESTDIR}${rootdir}/usr/src/strxnet/include
 			${DESTDIR}${includedir}/streams
 			${DESTDIR}${rootdir}${oldincludedir}/streams
 			${DESTDIR}${rootdir}/usr/include/streams
@@ -283,6 +299,10 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/include/strnsl
 			${DESTDIR}/usr/local/include/strnsl
 			${DESTDIR}/usr/src/strnsl/src/include
+			${DESTDIR}${oldincludedir}/strxnet
+			${DESTDIR}/usr/include/strxnet
+			${DESTDIR}/usr/local/include/strxnet
+			${DESTDIR}/usr/src/strxnet/include
 			${DESTDIR}${oldincludedir}/streams
 			${DESTDIR}/usr/include/streams
 			${DESTDIR}/usr/local/include/streams
@@ -297,9 +317,6 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for nsl include directory... $nsl_dir])
 		    if test -r "$nsl_dir/$nsl_what" ; then
 			nsl_cv_includes="$nsl_dir"
-			nsl_cv_ldadd=
-			nsl_cv_ldadd32=
-			nsl_cv_ldflags="-lxnsl"
 			nsl_cv_modmap=
 			nsl_cv_symver=
 			nsl_cv_manpath=
@@ -319,9 +336,12 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
+    ])
+    AC_CACHE_CHECK([for nsl ldflags],[nsl_cv_ldflags],[dnl
 	if test -z "$nsl_cv_ldadd" ; then
-	    nsl_cv_ldadd=
 	    nsl_cv_ldflags="-lxnsl"
+	else
+	    nsl_cv_ldflags="-L$(dirname $nsl_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for nsl ldadd 32-bit],[nsl_cv_ldadd32],[dnl
@@ -331,15 +351,12 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
-	if test -z "$nsl_cv_ldadd32" ; then
-	    nsl_cv_ldadd32=
-	fi
     ])
-    AC_CACHE_CHECK([for nsl ldflags],[nsl_cv_ldflags],[dnl
-	if test -z "$nsl_cv_ldadd$nsl_cv_ldadd32" ; then
-	    nsl_cv_ldflags="-lxnsl"
+    AC_CACHE_CHECK([for nsl ldflags 32-bit],[nsl_cv_ldflags32],[dnl
+	if test -z "$nsl_cv_ldadd32" ; then
+	    nsl_cv_ldflags32="-lxnsl"
 	else
-	    nsl_cv_ldflags=
+	    nsl_cv_ldflags32="-L$(dirname $nsl_cv_ldadd32)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for nsl modmap],[nsl_cv_modmap],[dnl
@@ -504,6 +521,7 @@ AC_DEFUN([_NSL_DEFINES], [dnl
     NSL_LDADD="$nsl_cv_ldadd"
     NSL_LDADD32="$nsl_cv_ldadd32"
     NSL_LDFLAGS="$nsl_cv_ldflags"
+    NSL_LDFLAGS32="$nsl_cv_ldflags32"
     NSL_MODMAP="$nsl_cv_modmap"
     NSL_SYMVER="$nsl_cv_symver"
     NSL_MANPATH="$nsl_cv_manpath"

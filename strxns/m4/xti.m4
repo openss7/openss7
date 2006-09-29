@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/09/27 05:08:42 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/09/29 10:57:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:08:42 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.41  2006/09/29 10:57:46  brian
+# - autoconf does not like multiline cache variables
+#
+# Revision 0.9.2.40  2006/09/29 03:46:17  brian
+# - substitute LDFLAGS32
+#
+# Revision 0.9.2.39  2006/09/29 03:22:39  brian
+# - handle flags better
+#
 # Revision 0.9.2.38  2006/09/27 05:08:42  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -102,9 +111,7 @@ dnl
     AC_SUBST([XTI_LDADD])dnl
     AC_SUBST([XTI_LDADD32])dnl
     AC_SUBST([XTI_LDFLAGS])dnl
-    AC_SUBST([NSL_LDADD])dnl
-    AC_SUBST([NSL_LDADD32])dnl
-    AC_SUBST([NSL_LDFLAGS])dnl
+    AC_SUBST([XTI_LDFLAGS32])dnl
     AC_SUBST([XTI_MODMAP])dnl
     AC_SUBST([XTI_SYMVER])dnl
     AC_SUBST([XTI_MANPATH])dnl
@@ -184,20 +191,14 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    xti_search_path="
-		${master_srcdir:+$master_srcdir/strxnet/src/include}
-		${master_builddir:+$master_builddir/strxnet/src/include}"
+	    xti_search_path="${master_srcdir:+$master_srcdir/strxnet/src/include} ${master_builddir:+$master_builddir/strxnet/src/include}"
 	    for xti_dir in $xti_search_path ; do
 		if test -d "$xti_dir" ; then
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_search_path"
-			xti_cv_xnet_ldadd="$master_builddir/strxnet/libxnet.la"
-			xti_cv_xnsl_ldadd="$master_builddir/strxnet/libxnsl.la"
-			xti_cv_xnet_ldadd32="$master_builddir/strxnet/lib32/libxnet.la"
-			xti_cv_xnsl_ldadd32="$master_builddir/strxnet/lib32/libxnsl.la"
-			xti_cv_xnet_ldflags=
-			xti_cv_xnsl_ldflags=
+			xti_cv_ldadd="$master_builddir/strxnet/libxnet.la"
+			xti_cv_ldadd32="$master_builddir/strxnet/lib32/libxnet.la"
 			xti_cv_modmap= # "$master_builddir/strxnet/Modules.map"
 			xti_cv_symver= # "$master_builddir/strxnet/Module.symvers"
 			xti_cv_manpath="$master_builddir/strxnet/doc/man"
@@ -226,12 +227,8 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_dir $xti_bld"
-			xti_cv_xnet_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_xnsl_ldadd=`echo "$xti_bld/../../libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_xnet_ldadd32=`echo "$xti_bld/../../lib32/libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_xnsl_ldadd32=`echo "$xti_bld/../../lib32/libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_xnet_ldflags=
-			xti_cv_xnsl_ldflags=
+			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_ldadd32=`echo "$xti_bld/../../lib32/libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_modmap= # `echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_symver= # `echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -306,12 +303,6 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_dir"
-			xti_cv_xnet_ldadd=
-			xti_cv_xnsl_ldadd=
-			xti_cv_xnet_ldadd32=
-			xti_cv_xnsl_ldadd32=
-			xti_cv_xnet_ldflags="-lxnet"
-			xti_cv_xnsl_ldflags="-lxnsl"
 			xti_cv_modmap=
 			xti_cv_symver=
 			xti_cv_manpath=
@@ -324,64 +315,34 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for xti include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for xti xnet ldadd native],[xti_cv_xnet_ldadd],[dnl
+    AC_CACHE_CHECK([for xti xnet ldadd native],[xti_cv_ldadd],[dnl
 	for xti_dir in $xti_cv_includes ; do
 	    if test -f "$xti_dir/../../libxnet.la" ; then
-		xti_cv_xnet_ldadd=`echo "$xti_dir/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		xti_cv_ldadd=`echo "$xti_dir/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
-	if test -z "$xti_cv_xnet_ldadd" ; then
-	    xti_cv_xnet_ldadd=
-	    xti_cv_xnet_ldflags="-lxnet"
+    ])
+    AC_CACHE_CHECK([for xti xnet ldflags],[xti_cv_ldflags],[dnl
+	if test -z "$xti_cv_ldadd" ; then
+	    xti_cv_ldflags="-lxnet"
+	else
+	    xti_cv_ldflags="-L$(dirname $xti_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for xti xnet ldadd 32-bit],[xti_cv_xnet_ldadd32],[dnl
+    AC_CACHE_CHECK([for xti xnet ldadd 32-bit],[xti_cv_ldadd32],[dnl
 	for xti_dir in $xti_cv_includes ; do
 	    if test -f "$xti_dir/../../lib32/libxnet.la" ; then
-		xti_cv_xnet_ldadd32=`echo "$xti_dir/../../lib32/libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		xti_cv_ldadd32=`echo "$xti_dir/../../lib32/libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
-	if test -z "$xti_cv_xnet_ldadd32" ; then
-	    xti_cv_xnet_ldadd32=
-	fi
     ])
-    AC_CACHE_CHECK([for xti xnet ldflags],[xti_cv_xnet_ldflags],[dnl
-	if test -z "$xti_cv_xnet_ldadd$xti_cv_xnet_ldadd32" ; then
-	    xti_cv_xnet_ldflags="-lxnet"
+    AC_CACHE_CHECK([for xti xnet ldflags 32-bit],[xti_cv_ldflags32],[dnl
+	if test -z "$xti_cv_ldadd32" ; then
+	    xti_cv_ldflags32="-lxnet"
 	else
-	    xti_cv_xnet_ldflags=
-	fi
-    ])
-    AC_CACHE_CHECK([for xti xnsl ldadd native],[xti_cv_xnsl_ldadd],[dnl
-	for xti_dir in $xti_cv_includes ; do
-	    if test -f "$xti_dir/../../libxnsl.la" ; then
-		xti_cv_xnsl_ldadd=`echo "$xti_dir/../../libxnsl.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-		break
-	    fi
-	done
-	if test -z "$xti_cv_xnsl_ldadd" ; then
-	    xti_cv_xnsl_ldadd=
-	    xti_cv_xnsl_ldflags="-lxnsl"
-	fi
-    ])
-    AC_CACHE_CHECK([for xti xnsl ldadd 32-bit],[xti_cv_xnsl_ldadd32],[dnl
-	for xti_dir in $xti_cv_includes ; do
-	    if test -f "$xti_dir/../../lib32/libxnsl.la" ; then
-		xti_cv_xnsl_ldadd32=`echo "$xti_dir/../../lib32/libxnsl.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-		break
-	    fi
-	done
-	if test -z "$xti_cv_xnsl_ldadd32" ; then
-	    xti_cv_xnsl_ldadd32=
-	fi
-    ])
-    AC_CACHE_CHECK([for xti xnsl ldflags],[xti_cv_xnsl_ldflags],[dnl
-	if test -z "$xti_cv_xnsl_ldadd$xti_cv_xnsl_ldadd32" ; then
-	    xti_cv_xnsl_ldflags="-lxnsl"
-	else
-	    xti_cv_xnsl_ldflags=
+	    xti_cv_ldflags32="-L$(dirname $xti_cv_ldadd32)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for xti modmap],[xti_cv_modmap],[dnl
@@ -543,12 +504,10 @@ AC_DEFUN([_XTI_DEFINES], [dnl
 	    the OpenSS7 autoconf releases.])
     fi
     XTI_CPPFLAGS="${XTI_CPPFLAGS:+ ${XTI_CPPFLAGS}}"
-    XTI_LDADD="$xti_cv_xnet_ldadd"
-    XTI_LDADD32="$xti_cv_xnet_ldadd32"
-    XTI_LDFLAGS="$xti_cv_xnet_ldflags"
-    NSL_LDADD="$xti_cv_xnsl_ldadd"
-    NSL_LDADD32="$xti_cv_xnsl_ldadd32"
-    NSL_LDFLAGS="$xti_cv_xnsl_ldflags"
+    XTI_LDADD="$xti_cv_ldadd"
+    XTI_LDADD32="$xti_cv_ldadd32"
+    XTI_LDFLAGS="$xti_cv_ldflags"
+    XTI_LDFLAGS32="$xti_cv_ldflags32"
     XTI_MODMAP="$xti_cv_modmap"
     XTI_SYMVER="$xti_cv_symver"
     XTI_MANPATH="$xti_cv_manpath"

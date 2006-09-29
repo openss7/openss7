@@ -4,7 +4,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/27 05:08:41 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/29 10:57:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,11 +49,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:08:41 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.8  2006/09/29 10:57:46  brian
+# - autoconf does not like multiline cache variables
+#
+# Revision 0.9.2.7  2006/09/29 03:22:38  brian
+# - handle flags better
+#
 # Revision 0.9.2.6  2006/09/27 05:08:41  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -182,9 +188,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    ss7_search_path="
-		${master_srcdir:+$master_srcdir/stacks/src/include}
-		${master_builddir:+$master_builddir/stacks/src/include}"
+	    ss7_search_path="${master_srcdir:+$master_srcdir/stacks/src/include} ${master_builddir:+$master_builddir/stacks/src/include}"
 	    for ss7_dir in $ss7_search_path ; do
 		if test -d "$ss7_dir" ; then
 		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir])
@@ -192,7 +196,6 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 			ss7_cv_includes="$ss7_search_path"
 			ss7_cv_ldadd= # "$master_builddir/stacks/libss7.la"
 			ss7_cv_ldadd32= # "$master_builddir/stacks/lib32/libss7.la"
-			ss7_cv_ldflags=
 			ss7_cv_modmap= # "$master_builddir/stacks/Modules.map"
 			ss7_cv_symver= # "$master_builddir/stacks/Module.symvers"
 			ss7_cv_manpath="$master_builddir/stacks/doc/man"
@@ -227,7 +230,6 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 			ss7_cv_includes="$ss7_dir $ss7_bld"
 			ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			ss7_cv_ldflags=
 			ss7_cv_modmap= # `echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_symver= # `echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -303,9 +305,6 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir])
 		    if test -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_dir"
-			ss7_cv_ldadd=
-			ss7_cv_ldadd32=
-			ss7_cv_ldflags= # '-lss7'
 			ss7_cv_modmap=
 			ss7_cv_symver=
 			ss7_cv_manpath=
@@ -325,9 +324,12 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
+    ])
+    AC_CACHE_CHECK([for ss7 ldflags],[ss7_cv_ldflags],[dnl
 	if test -z "$ss7_cv_ldadd" ; then
-	    ss7_cv_ldadd=
 	    ss7_cv_ldflags= # '-lss7'
+	else
+	    ss7_cv_ldflags= # "-L$(dirname $ss7_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for ss7 ldadd 32-bit],[ss7_cv_ldadd32],[dnl
@@ -337,15 +339,12 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
-	if test -z "$ss7_cv_ldadd32" ; then
-	    ss7_cv_ldadd32=
-	fi
     ])
-    AC_CACHE_CHECK([for ss7 ldflags],[ss7_cv_ldflags],[dnl
-	if test -z "$ss7_cv_ldadd$ss7_cv_ldadd32" ; then
-	    ss7_cv_ldflags= # '-lss7'
+    AC_CACHE_CHECK([for ss7 ldflags 32-bit],[ss7_cv_ldflags32],[dnl
+	if test -z "$ss7_cv_ldadd32" ; then
+	    ss7_cv_ldflags32= # '-lss7'
 	else
-	    ss7_cv_ldflags=
+	    ss7_cv_ldflags32= # "-L$(dirname $ss7_cv_ldadd32)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for ss7 modmap],[ss7_cv_modmap],[dnl

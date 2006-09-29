@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/09/27 05:08:41 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/09/29 10:57:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:08:41 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.19  2006/09/29 10:57:46  brian
+# - autoconf does not like multiline cache variables
+#
+# Revision 0.9.2.18  2006/09/29 03:46:16  brian
+# - substitute LDFLAGS32
+#
+# Revision 0.9.2.17  2006/09/29 03:22:38  brian
+# - handle flags better
+#
 # Revision 0.9.2.16  2006/09/27 05:08:41  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -99,6 +108,7 @@ dnl
     AC_SUBST([STRCOMP_LDADD])dnl
     AC_SUBST([STRCOMP_LDADD32])dnl
     AC_SUBST([STRCOMP_LDFLAGS])dnl
+    AC_SUBST([STRCOMP_LDFLAGS32])dnl
     AC_SUBST([STRCOMP_MODMAP])dnl
     AC_SUBST([STRCOMP_SYMVER])dnl
     AC_SUBST([STRCOMP_MANPATH])dnl
@@ -178,9 +188,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    strcomp_search_path="
-		${master_srcdir:+$master_srcdir/strcompat/src/include}
-		${master_builddir:+$master_builddir/strcompat/src/include}"
+	    strcomp_search_path="${master_srcdir:+$master_srcdir/strcompat/src/include} ${master_builddir:+$master_builddir/strcompat/src/include}"
 	    for strcomp_dir in $strcomp_search_path ; do
 		if test -d "$strcomp_dir" ; then
 		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
@@ -188,7 +196,6 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 			strcomp_cv_includes="$strcomp_search_path"
 			strcomp_cv_ldadd= # "$master_builddir/strcompat/libcompat.la"
 			strcomp_cv_ldadd32= # "$master_builddir/strcompat/lib32/libcompat.la"
-			strcomp_cv_ldflags=
 			strcomp_cv_modmap="$master_builddir/strcompat/Modules.map"
 			strcomp_cv_symver="$master_builddir/strcompat/Module.symvers"
 			strcomp_cv_manpath="$master_builddir/strcompat/doc/man"
@@ -219,7 +226,6 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 			strcomp_cv_includes="$strcomp_dir $strcomp_bld"
 			strcomp_cv_ldadd= # `echo "$strcomp_bld/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_ldadd32= # `echo "$strcomp_bld/../../lib32/libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			strcomp_cv_ldflags=
 			strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -287,9 +293,6 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
 		    if test -r "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_includes="$strcomp_dir"
-			strcomp_cv_ldadd=
-			strcomp_cv_ldadd32=
-			strcomp_cv_ldflags= # '-lcompat'
 			strcomp_cv_modmap=
 			strcomp_cv_symver=
 			strcomp_cv_manpath=
@@ -309,9 +312,12 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
+    ])
+    AC_CACHE_CHECK([for compat ldflags],[strcomp_cv_ldflags],[dnl
 	if test -z "$strcomp_cv_ldadd" ; then
-	    strcomp_cv_ldadd=
 	    strcomp_cv_ldflags= # '-lcompat'
+	else
+	    strcomp_cv_ldflags= # "-L$(dirname $strcomp_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for compat ldadd 32-bit],[strcomp_cv_ldadd32],[dnl
@@ -321,15 +327,12 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
-	if test -z "$strcomp_cv_ldadd32" ; then
-	    strcomp_cv_ldadd32=
-	fi
     ])
-    AC_CACHE_CHECK([for compat ldadd 32-bit],[strcomp_cv_ldadd32],[dnl
-	if test -z "$strcomp_cv_ldadd$strcomp_cv_ldadd32" ; then
-	    strcomp_cv_ldflags= # '-lcompat'
+    AC_CACHE_CHECK([for compat ldflags 32-bit],[strcomp_cv_ldflags32],[dnl
+	if test -z "$strcomp_cv_ldadd32" ; then
+	    strcomp_cv_ldflags32= # '-lcompat'
 	else
-	    strcomp_cv_ldflags=
+	    strcomp_cv_ldflags32= # "-L$(dirname $strcomp_cv_ldadd32)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for compat modmap],[strcomp_cv_modmap],[dnl
@@ -504,6 +507,7 @@ AC_DEFUN([_STRCOMP_DEFINES], [dnl
     STRCOMP_LDADD="$strcomp_cv_ldadd"
     STRCOMP_LDADD32="$strcomp_cv_ldadd32"
     STRCOMP_LDFLAGS="$strcomp_cv_ldflags"
+    STRCOMP_LDFLAGS32="$strcomp_cv_ldflags32"
     STRCOMP_MODMAP="$strcomp_cv_modmap"
     STRCOMP_SYMVER="$strcomp_cv_symver"
     STRCOMP_MANPATH="$strcomp_cv_manpath"

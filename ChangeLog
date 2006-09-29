@@ -4,6 +4,17 @@
 	* configure.ac: add AC_LIBTOOL_DLOPEN
 	* openss7.spec.in: better spec file handling
 
+	* m4/inet.m4: better search handling an libtool library paths
+	* m4/libraries.m4: better search handling an libtool library paths
+	* m4/nsl.m4: better search handling an libtool library paths
+	* m4/sctp.m4: better search handling an libtool library paths
+	* m4/sock.m4: better search handling an libtool library paths
+	* m4/ss7.m4: better search handling an libtool library paths
+	* m4/strcomp.m4: better search handling an libtool library paths
+	* m4/streams.m4: better search handling an libtool library paths
+	* m4/xns.m4: better search handling an libtool library paths
+	* m4/xti.m4: better search handling an libtool library paths
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/inet.m4: distinguish LDADD from LDFLAGS

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/09/27 05:08:42 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 10:57:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:08:42 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.37  2006/09/29 10:57:46  brian
+# - autoconf does not like multiline cache variables
+#
+# Revision 0.9.2.36  2006/09/29 03:46:17  brian
+# - substitute LDFLAGS32
+#
+# Revision 0.9.2.35  2006/09/29 03:22:39  brian
+# - handle flags better
+#
 # Revision 0.9.2.34  2006/09/27 05:08:42  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -102,6 +111,7 @@ dnl
     AC_SUBST([XNS_LDADD])dnl
     AC_SUBST([XNS_LDADD32])dnl
     AC_SUBST([XNS_LDFLAGS])dnl
+    AC_SUBST([XNS_LDFLAGS32])dnl
     AC_SUBST([XNS_MODMAP])dnl
     AC_SUBST([XNS_SYMVER])dnl
     AC_SUBST([XNS_MANPATH])dnl
@@ -181,9 +191,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    xns_search_path="
-		${master_srcdir:+$master_srcdir/strxns/src/include}
-		${master_builddir:+$master_builddir/strxns/src/include}"
+	    xns_search_path="${master_srcdir:+$master_srcdir/strxns/src/include} ${master_builddir:+$master_builddir/strxns/src/include}"
 	    for xns_dir in $xns_search_path ; do
 		if test -d "$xns_dir" ; then
 		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
@@ -191,7 +199,6 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 			xns_cv_includes="$xns_search_path"
 			xns_cv_ldadd= # "$master_builddir/strxns/libxns.la"
 			xns_cv_ldadd32= # "$master_builddir/strxns/lib32/libxns.la"
-			xns_cv_ldflags=
 			xns_cv_modmap= # "$master_builddir/strxns/Modules.map"
 			xns_cv_symver= # "$master_builddir/strxns/Module.symvers"
 			xns_cv_manpath="$master_builddir/strxns/doc/man"
@@ -222,7 +229,6 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 			xns_cv_includes="$xns_dir $xns_bld"
 			xns_cv_ldadd= # `echo "$xns_bld/../../libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_ldadd32= # `echo "$xns_bld/../../lib32/libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xns_cv_ldflags=
 			xns_cv_modmap= # `echo "$xns_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_symver= # `echo "$xns_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -344,7 +350,6 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 			xns_cv_includes="$xns_dir"
 			xns_cv_ldadd=
 			xns_cv_ldadd32=
-			xns_cv_ldflags= # '-lxns'
 			xns_cv_modmap=
 			xns_cv_symver=
 			xns_cv_manpath=
@@ -364,9 +369,12 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
+    ])
+    AC_CACHE_CHECK([for xns ldflags],[xns_cv_ldflags],[dnl
 	if test -z "$xns_cv_ldadd" ; then
-	    xns_cv_ldadd=
 	    xns_cv_ldflags= # '-lxns'
+	else
+	    xns_cv_ldflags= # "-L$(dirname $xns_cv_ldflags)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for xns ldadd 32-bit],[xns_cv_ldadd32],[dnl
@@ -376,15 +384,12 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
-	if test -z "$xns_cv_ldadd32" ; then
-	    xns_cv_ldadd32=
-	fi
     ])
-    AC_CACHE_CHECK([for xns ldflags],[xns_cv_ldflags],[dnl
-	if test -z "$xns_cv_ldadd$xns_cv_ldadd32" ; then
-	    xns_cv_ldflags= # '-lxns'
+    AC_CACHE_CHECK([for xns ldflags 32-bit],[xns_cv_ldflags32],[dnl
+	if test -z "$xns_cv_ldadd32" ; then
+	    xns_cv_ldflags32= # '-lxns'
 	else
-	    xns_cv_ldflags=
+	    xns_cv_ldflags32= # "-L$(dirname $xns_cv_ldflags32)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for xns modmap],[xns_cv_modmap],[dnl
@@ -549,6 +554,7 @@ AC_DEFUN([_XNS_DEFINES], [dnl
     XNS_LDADD="$xns_cv_ldadd"
     XNS_LDADD32="$xns_cv_ldadd32"
     XNS_LDFLAGS="$xns_cv_ldflags"
+    XNS_LDFLAGS32="$xns_cv_ldflags32"
     XNS_MODMAP="$xns_cv_modmap"
     XNS_SYMVER="$xns_cv_symver"
     XNS_MANPATH="$xns_cv_manpath"
