@@ -1,0 +1,382 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: grantpt.3.man,v 0.9.2.1 2006/09/29 11:40:03 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/09/29 11:40:03 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: grantpt.3.man,v $
+.\" Revision 0.9.2.1  2006/09/29 11:40:03  brian
+.\" - new files for strtty package and manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strtty.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strtty.macros
+.\"
+.\"
+.TH GRANTPT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B grantpt
+\- grant access to a slave psuedo-terminal device
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.\".B #include <sys/ptms.h>
+.\".br
+.B #include <stdlib.h>
+.HP
+.BI "int grantpt(int " fd );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+The file descriptor of a master pseudo-terminal device successfully acquired
+by opening the
+.B /dev/ptmx
+device.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR grantpt ()
+subroutine changes the mode and ownership of the slave pseudo-terminal device
+associated with its matser pseudo-terminal counter part.  The
+.I fd
+argument is a file descriptor that refers to a master pseudo-terminal device.
+The user ID of the slave is set to the real UID of the calling process and the
+group ID is set to an unspecified group ID.  The permission mode of the slave
+pseudo-terminal is set to readable and writable by the owner, and writable by
+the group.
+.PP
+.BR grantpt ()
+does the following:
+.IP a) \w'm)\(em'u
+Changes the ownership of the slave pseudo-terminal device to the effective
+user ID of the process calling
+.RB grantpt ();
+.IP b)
+Changes the group ownership of the slave pseudo-terminal device to the group
+.BR tty ;
+and
+.IP c)
+changes the permissions to allow only user-read, user-write, and group-write.
+.PP
+The reason for setting the group ownership to
+.B tty
+and enabling group-write permission is that the programs
+.BR wall (1)
+and
+.BR write (1)
+are setgid
+.B tty
+programs.
+.PP
+Calling the
+.BR grantpt ()
+subroutine on
+.IR "SVR 4"
+.[
+svr4
+.]
+invokes the
+.B /usr/lib/pt_chmod
+program that is setuid
+.BR root .
+.\"
+.\"
+.SH USAGE
+.PP
+When a master pseudo-terminal device,
+.BR ptmx (4),
+is opened with a call to
+.BR open (2s),
+it returns an available master pseudo-terminal device.  As part of the
+.BR open (2s),
+call processing, the master pseudo-terminal driver,
+.BR ptm (4),
+automatically locks out both the master and the slave pseudo-terminal driver from subsequent
+.BR open (2s)
+calls.
+.PP
+The process then calls
+.BR fork (2)
+and
+.BR setuid (2)
+to establish the controlling process on the slave side of the pseudo-terminal
+device.  This process calls
+.BR granpt (3)
+on the open file descriptor associated with the master side.  This establishes
+appropriate permission for the slave device to be opened by the slave-side
+process before the slave-side is unlocked.
+.PP
+The slave side of the pseudo-terminal is then unlocked with a call to
+.BR unlockpt (3).
+The child process then calls
+.BR ptsname (3)
+to determine the device node name of the slave side and opens it with
+.BR open (2s).
+The child process pushes any necessary modules (e.g.
+.BR ptem (4),
+.BR ldterm (4),
+on the slave side to establish a controlling terminal.
+The master is closed with
+.BR close (2)
+and the slave side program executed with
+.BR exec (2).
+An
+.BR open (2s)
+call attempted on the master or slave while locked will return
+.RB [ ENXIO ].
+After the call to
+.BR unlockpt (3),
+the master pseudo-terminal device remains locked.  That is, no other process can open the
+master pseudo-terminal device,
+.IR "including the process holding the device open" ,
+once it has already been opened.
+.BR unlockpt (3)
+only unlocks the slave pseudo-terminal device.
+.PP
+Finally,
+.BR ptsname (3)
+can be used to determine the name of the associated slave pseudo-terminal
+device node to pass to
+.BR open (2s)
+to open the slave side of the pseudo-terminal.
+.PP
+As can be deduced from this procedure, the primary intention of the procedure is one of security.
+Other processes are not even afforded a narrow window within which to open the slave pseudo-device
+terminal.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR grantpt (3)
+is implemented using the
+.BR ZONEPT
+intput-output control for master pseudo-terminal devices,
+.BR pty (4).
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR grantpt ()
+establishes the appropriate access privileges to the slave pseudo-terminal
+device node and returns zero
+.RB ( 0 );
+upon failure, it returns minus one
+.RB ( -1 )
+and the slave pseudo-terminal access is unaffected.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR grantpt ()
+fails, it returns minus one
+.BR ( -1 )
+and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP \w'[\fBEINVAL\fR]\(em'u
+.RB [ EBADF ]
+The
+.I fd
+argument is not a valid open file descriptor.
+.TP
+.RB [ EINVAL ]
+The
+.I fd
+argument is not associated with a master pseudo-terminal device.
+.TP
+.RB [ EACCES ]
+The corresponding slave pseudo-terminal device could not be accessed.
+.PP
+In addition, any other error number returned by
+.BR ioctl (2s)
+could be returned by
+.BR grantpt ().
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/ptmx ", " /dev/streams/ptmx ", " /dev/streams/clone/ptm
+The master pseudo-device terminal clone device node.
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ptsname (3),
+.BR unlockpt (3),
+.BR pty (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR grantpt ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR grantpt ()
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR OSF/1 \(rg,
+.[
+osfdoc
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR libtty (3)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2,
+.[
+svr42
+.]
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR grantpt ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of pseudo-terminal devices.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,418 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: pty.4.man,v 0.9.2.1 2006/09/29 11:40:04 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/09/29 11:40:04 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: pty.4.man,v $
+.\" Revision 0.9.2.1  2006/09/29 11:40:04  brian
+.\" - new files for strtty package and manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strtty.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strtty.macros
+.\"
+.\"
+.TH PTY 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B pty, ptm, pts
+\- \fISTREAMS\fR Pseudo-Terminal Master and Slave Drivers
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+To use the pseudo-terminal subsystem, a node for the master side driver,
+.BR /dev/ptmx ,
+and
+.I N
+number of slave drivers
+.RI ( N
+is determined at installation time)
+must be installed.  The names of the slave devices are
+.BI /dev/pts/M
+where
+.I M
+has the values zero
+.RB ( 0 )
+through
+.IB N -1\fR.
+A user accesses the pseudo-terminal device throug the master device (called
+.BR ptm )
+that in turm is access through the clone driver, see
+.BR clone (4).
+The master device is set up as a clone device where it major device number is the major for the
+clone device and its minor device number is the major for the
+.B ptm
+driver.
+.PP
+The master is opened using the
+.BR open (2s)
+system call with
+.B /dev/ptmx
+as the device to be opened.  The clone open finds the next available minor device for that major
+device; a master device is available only if it and its corresponding slave device are not already
+open.  There are no nodes in the file system for master devices.
+
+When the master device is opened, the corresponding slave device is automatically locked out.  No
+user may open the slave device until it is unlocked.  A user may invoke a function,
+.BR grantpt (3),
+that will change the owner of the slave device to that of the user who is running this process.
+Once the permissions have been changed, the device may be unlocked by the user.  Only the owner or
+superuser can access the slave device.  The user must then invoke the
+.BR unlockpt (3)
+function to unlock the slave device.  Before opening the slave device, the user must call the
+.BR ptsname (3)
+function to obtain the name of the slave device.  The functions
+.BR grantpt (3),
+.BR unlockpt (3),
+and
+.BR ptsname (3)
+are called with the file descriptor of the master device.  The user may then invoke the open system
+call with the name that was returned by the
+.BR ptsname (3)
+function to open the slave device.
+.PP
+See
+.RI \(lq EXAMPLES \(rq,
+below.
+.PP
+Unrelated processes may open the pseudo-terminal devices.  The intitial user may pass the master
+file descriptor using a
+.IR STREAMS -based
+pipe or a slave name to another process to enable it to open the slave.  After the slave device is
+open, the owner is free to change the permissions.
+
+Certain programs such as
+.BR write (1)
+and
+.BR wall (1)
+are setgid to
+.RB \(lq tty \(rq
+and are also able to access the slave device (for write).
+.PP
+After both the master and slave have been opened,  the user has two file descriptors which provide
+full duplex communication using two Streams.  The two Streams are automatically connected.  The user
+may then push modules onto either side of the Stream.  The user also needs to push
+.BR ptem (4)
+and
+.BR ldterm (4)
+modules onto the slave side of the pseudo-terminal subsystem to get terminal semantics.  The master
+may push the
+.BR pckt (4)
+module onto the master side of the pseudo-terminal subsystem to place the master Stream into packet
+mode.
+.PP
+The master and slave drivers pass all
+.I STREAMS
+messagse to their adjacent queues.  Only the
+.BR M_FLUSH (9)
+needs some processing.  Because the read queue of one side is connected ot the write queue of the
+other, the
+.BR FLUSHR
+flag is changed to
+.BR FLUSHW ,
+and visa versa.
+.PP
+When the master device is closed, a
+.BR M_HANGUP (9)
+message is sent to the slave device which will render the device unusable.  The process on the slave
+side get the
+.IR errno (3)
+.RB [ ENXIO ]
+when attempting to write on that Stream but it will be able to read any data remaining on the Stream
+head read queue.  When all the data has been read,
+.BR read (2s)
+returns zero
+.RB ( 0 )
+indicating that the Stream can no longer be used.
+.PP
+On the last close of the slave device, a zero-length message is sent to the master device.  When the
+application on the master side issues a
+.BR read (2s)
+or
+.BR getmsg (2)
+call, and zero
+.RB ( 0 )
+is returned, the user of the master device decides whether to issue a close that dismantles the
+pseudo-terminal subsystem.  If the master device is not closed, the pseudo-terminal subsystem will
+be available to another user to open the slave device.
+.PP
+Since zero-length messages are used to indicate that the process on the slave side has closed and
+should be interpreted that way by the process on the master side, applications on the slave side
+should not write zero-length messages.  If that occurs, the write returns zero
+.RB ( 0 ),
+and the zero-length message is discarded by the
+.BR ptem (4)
+module.
+.PP
+The standard
+.I STREAMS
+system calls can access the pseudo-terminal devices.  The slave devices support the
+.BR O_NDELAY " and " O_NONBLOCK
+flags.  Since the master side does not act like a termnal, if
+.BR O_NONBLOCK " or " O_NDELAY
+is set, read on the master side returns with the
+.IR errno (3)
+set to
+.RB [ EAGAIN ]
+if no data are available, and write returns minus one
+.RB ( -1 )
+with
+.IR errno (3)
+set to
+.RB [ EAGAIN ]
+if there is internal flow control.
+.PP
+The master driver supports the
+.BR ISPTM " and " UNLKPT
+input-output controls that are used by the functions
+.BR grantpt (3),
+.BR unlockpt (3),
+and
+.BR ptsname (3).
+The input-output control
+.B ISPTM
+determines whether the file descriptor is that of an open master device.  On success, it returns the
+major/minor number (type
+.BR dev_t )
+of the master deivce which can be used to determine the name of the corresponding slave device.  The
+input-output control
+.B UNLKPT
+unlocks the master and slave devices.  It returns zero
+.RB ( 0 )
+on success.  On failure, the
+.IR errno (3)
+is set to
+.RB [ EINVAL ]
+indicating that the master device is not open.
+The command,
+.IR command ,
+to the
+.BR ioctl (2s)
+call is either
+.BR ISPTM " or " UNLKPT
+and the
+argument, .IR arg ,
+to the
+.BR ioctl (2s)
+call is zero
+.RB ( 0 ).
+On failure, minus one
+.RB ( -1 )
+is returned.
+.PP
+When data are written to the master side, the entire block of data written is treated as a single
+line.  The slave side process reading the terminal receives the entire block of data.  Data are not
+input edited by the
+.BR ldterm (4)
+module regardless of the terminal mode.  The master side application is responsible for detecting an
+interrupt character and sending an interrupt signal,
+.RI { SIGINT }
+to the process on the slave side.  This can be done using the
+.B TIOCSIGNAL
+input-output control.  When a process on the master side issues a
+.B TIOCSIGNAL
+input-output control, the argument is the number of the signal that should be sent.  The specified
+signal is then sent to the process group on the slave side.
+.PP
+The master driver and slave driver have the following characteristics:
+.IP \(bu \w'\(bu\(em'u
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.RS
+.nf
+\fC\s-1\
+int fdm, fds;
+char *slavename;
+extern char *ptsname();
+
+fdm = open("/dev/ptmx", O_RDWR); /* open master */
+grantpt(fdm);                    /* change permission of slave */
+unlockpt(fdm);                   /* unlock slave */
+slavename = ptsname(fdm);        /* get name of slave */
+fds = open(slavename, O_RDWR);   /* open slave */
+ioctl(fds, I_PUSH, "ptem");      /* push ptem */
+ioctl(fds, I_PUSH, "ldterm");    /* push ldterm */
+ioctl(fdm, I_PUSH, "pckt");      /* push pckt */
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH MODULES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.B pty
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B pty
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+such as
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+.IR OSF/1 \(rg,
+.[
+osfdoc
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2,
+.[
+svr42
+.]
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B pckt
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

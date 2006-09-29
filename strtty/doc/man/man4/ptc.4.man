@@ -1,0 +1,1 @@
+.so man4/pty.4.man
