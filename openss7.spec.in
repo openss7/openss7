@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/09/18 01:23:00 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/09/29 11:49:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:23:00 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:49:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,11 +60,15 @@
 %global BUILD_noarch  1
 %global BUILD_arch    1
 %global BUILD_source  1
-%global BUILD_test    0
+%global BUILD_test    1
 %global BUILD_devs    1
 %global MAKE_devs     0
 %global BUILD_lis     0
 %global BUILD_lfs     0
+
+%ifnarch noarch
+%global BUILD_lfs     1
+%endif
 
 # there are three ways to pass kernel version to the build process:
 #    global _kversion in /usr/lib/rpm/macros, /etc/rpm/macros or ~/.rpmmacros
@@ -96,11 +100,16 @@
 %global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes strxnet_mknod test-xnet test-xnet_thr
 %global infofiles   %{name} %{virtual} SPG2 porting libxnet
 #global initfiles
+#global conffiles
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
-%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
 %{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
+%{expand: %%global have_modules     %{?modules:  1}%{!?modules:  0}}
+%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
+%{expand: %%global have_tools       %{?tools:    1}%{!?tools:    0}}
+%{expand: %%global have_infofiles   %{?infofiles:1}%{!?infofiles:0}}
 %{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
+%{expand: %%global have_configfiles %{?conffiles:1}%{!?conffiles:0}}
 
 %if %{without_ko_modules}
 # assume devs for older kernels
@@ -186,12 +195,29 @@
 %global _streams streams
 %global _ksubdir streams
 %global _kmodext streams
+%global _conflict LiS
+%global _strvers @LFS_VERSION@%{?extrarelease2}
+%{expand: %%global _with_lfs --with-lfs}
 %endif
 %if %{BUILD_lis}
 %global _STREAMS LiS
 %global _streams LiS
 %global _ksubdir lis
 %global _kmodext lis
+%global _conflict streams
+%global _strvers @LIS_VERSION@%{?extrarelease2}
+%{expand: %%global _with_lis --with-lis}
+%endif
+
+%if %{have_modules}
+%else
+%global BUILD_modules       0
+%global BUILD_devs          0
+%endif
+
+%if %{have_libraries}
+%else
+%global BUILD_libs          0
 %endif
 
 %if %{BUILD_modules}
@@ -305,6 +331,15 @@
 %global FILES_init          0
 %endif
 
+%if %{have_configfiles}
+%else
+%global FILES_ko_noinit     0
+%endif
+
+%if %{have_libraries}
+%else
+%global FILES_libs          0
+%endif
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
@@ -1155,13 +1190,14 @@ Release:        %{fullrelease}
 # ---------------------------------------------------------------------------
 %description %{info_name}
 %{descripline}
-The %{name}-%{info_name} binary package contains the kernel
-modules symbol information for development of additional
-%{virtual} kernel modules against the core kernel modules
-included in the %{name}-core binary package.  This package is
-heavily tied to the core kernel modules and kernel for which it
-was compiled.  This package applies to core kernel modules
-%{name}-%{core_name} for kernel version %{_kversion}.
+The %{name}-%{info_name} package contains the kernel
+modules symbol information for development of additional %{virtual}
+kernel modules against the core kernel modules included in the
+%{name}-core binary package.  This package is heavily tied to
+the core kernel modules and kernel for which it was compiled.
+This package applies to core kernel modules
+%{name}-%{core_name} for kernel version
+%{_kversion}.
 
 %if %{FILES_modules}
 %files %{info_name}
@@ -1194,12 +1230,11 @@ Release:        %{fullrelease}
 # ---------------------------------------------------------------------------
 %description lib
 %{descripline}
-The %{name}-lib binary package contains the run-time (shared
-object) libraries necessary to run applications programs and
-utilities developed for %{title}.  Also included are the libtool
-.la files describing the shared object libraries.
+The %{name}-lib binary package contains the run-time
+(shared object) libraries necessary to run applications programs
+and utilities developed for %{title}.  Also included are the
+libtool .la files describing the shared object libraries.
 
-%if %{have_libraries}
 %pre lib
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
@@ -1214,7 +1249,6 @@ if [ $1 = 1 ] ; then : # fresh install
         fi
     done
 fi
-%endif
 
 %post lib
 # ---------------------------------------------------------------------------
@@ -1260,11 +1294,11 @@ Release:        %{fullrelease}
 # ---------------------------------------------------------------------------
 %description devel
 %{descripline}
-The %{name}-devel binary package contains library archives for
-static compilation, and headers files to develop %{title}
-modules and drivers.  This also includes the header files and
-static libraries required to compile %{title} applications
-programs.
+The %{name}-devel package contains library archives for static
+compilation, and headers files to develop
+%{title} applications.  This also includes the header
+files and static libraries required to compile
+%{title} applications programs.
 
 %if %{FILES_devlibs}
 %files devel
@@ -1293,8 +1327,9 @@ Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_pkglibexecdir}
 Prefix:         %{_pkglibexec32dir}
-Prefix:         %{_sysconfdir}
+%if %{have_libraries}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
+%endif
 Obsoletes:      %{name}-utils
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
@@ -1313,6 +1348,7 @@ configuration test utilities and commands associated with the
 running the validation test suites contained in the %{name}-test
 binary package.
 
+%if %{have_tools}
 %pre util
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ]; then : # fresh install
@@ -1344,6 +1380,7 @@ if [ $1 = 1 ]; then : # fresh install
         rmdir -p /usr/man 2>/dev/null || :
     fi
 fi
+%endif
 
 %if %{FILES_tools}
 %files util
@@ -1355,7 +1392,6 @@ fi
 #{_pkglibexecdir}/*tst
 %{_pkglibexec32dir}/*test*
 #{_pkglibexec32dir}/*tst
-%config %{_sysconfdir}/*
 %endif
 
 # ===========================================================================
@@ -1383,8 +1419,9 @@ The %{name}-dev binary package contains the device definitions
 necessary to run applications programs and utilities developed
 for %{title}.  On older systems, this binary creates the devices
 themselvs.  On newer systems, this binary package includes the
-executable for creating devices from init scripts.  The package
-is not required for devfs based systems.
+executable for creating devices from init scripts.
+
+The package is not required for devfs based systems.
 
 %if %{MAKE_devs}
 %post dev
@@ -1437,7 +1474,8 @@ Release:        %{fullrelease}
 %{descripline}
 The %{name}-test binary package provides the autotest validation
 testsuites used for validating and troubleshooting the %{title}
-package.
+package.  It also includes the send-pr script for generating and
+submitting problem reports to @PACKAGE_BUGREPORT@.
 
 %if %{FILES_test}
 %files test
@@ -1482,6 +1520,7 @@ functions.
 %post doc
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
+%if %{have_infofiles}
     if [ -x /sbin/install-info ] ; then
         # Older rpm versions do not compress info files.
         for n in %{infofiles} ; do
@@ -1494,6 +1533,7 @@ if [ $1 = 1 ] ; then : # fresh install
             fi
         done
     fi
+%endif
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
@@ -1506,6 +1546,7 @@ fi
 %preun doc
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+%if %{have_infofiles}
     if [ -x /sbin/install-info ] ; then
         # Older rpm versions do not compress info files.
         for n in %{infofiles} ; do
@@ -1518,6 +1559,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
             fi
         done
     fi
+%endif
 @COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.macros
 fi
@@ -1536,6 +1578,7 @@ fi
 %defattr(-,root,root)
 %doc ABOUT-NLS
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+#doc doc/specs doc/projects doc/drafts
 %doc LSM %{name}-%{version}.lsm
 %doc README-make
 %{_infodir}/*
@@ -1549,6 +1592,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+#doc doc/specs doc/projects doc/drafts
 %doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
@@ -1592,13 +1636,16 @@ better to use the tarball or source rpm release.
 # ===========================================================================
 %package init
 
-Summary:        %{title} init scripts and config files
+Summary:        %{title} init scripts and config files.
 Group:          System Environment/Base
 Prefix:         %{_configdir}
 Prefix:         %{_initrddir}
+Prefix:         %{_sysconfdir}
 %if %{without_ko_modules}
 Prefix:         %{_modutildir}
 %endif
+Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease2}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-inits
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
@@ -1955,44 +2002,56 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_sysconfdir}/streams.conf
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%config(noreplace) %{_configdir}/*
+%config(noreplace) %{_modutildir}/*
 %{_initrddir}/../*
-%{_configdir}/*
-%{_modutildir}/*
 %endif
 
 %if %{FILES_ko_init}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_sysconfdir}/streams.conf
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%config(noreplace) %{_configdir}/*
 %{_initrddir}/../*
-%{_configdir}/*
 %endif
 
 %if %{FILES_noinit}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_modutildir}/*
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?modules:%config(noreplace) %{_modutildir}/*}
 %endif
 
 %if %{FILES_ko_noinit}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.65  2006/09/18 01:23:00  brian
-# - added FC5 and lib32 compatibility files
+# Revision 0.9.2.66  2006/09/29 11:49:56  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
 #
-# Revision 0.9.2.64  2006/08/16 07:38:05  brian
-# - get kernel_source right for SuSE -smp kernel
-#
+
+* Mon Sep 18 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.65  2006/09/18 01:23:00  brian
+- added FC5 and lib32 compatibility files
+
+* Wed Aug 16 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.64  2006/08/16 07:38:05  brian
+- get kernel_source right for SuSE -smp kernel
 
 * Fri Jul  7 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.63  2006/07/07 21:08:44  brian

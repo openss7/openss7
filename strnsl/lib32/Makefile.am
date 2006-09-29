@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 12:30:53 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/29 11:50:40  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.1  2006/09/25 12:30:53  brian
 # - added files for new strnsl package
 #
@@ -76,8 +84,8 @@ pkglibexec32_PROGRAMS		+= test-xnsl
 
 test_xnsl_SOURCES		= $(top_srcdir)/src/test/test-xnsl.c
 test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_xnsl_LDADD			= $(STREAMS_LDADD32) $(XTI_LDADD32) libxnsl.la
-test_xnsl_LDFLAGS		= $(MACHINE_FLAGS)
+test_xnsl_LDADD			= libxnsl.la
+test_xnsl_LDFLAGS		= $(XTI_LDFLAGS32) $(MACHINE_FLAGS)
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -85,8 +93,8 @@ pkglibexec32_PROGRAMS		+= test-xnsl_thr
 
 test_xnsl_thr_SOURCES		= $(top_srcdir)/src/test/test-xnsl.c
 test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_xnsl_thr_LDADD		= -lpthread $(STREAMS_LDADD32) $(XTI_LDADD32) libxnsl.la
-test_xnsl_thr_LDFLAGS		= $(MACHINE_FLAGS)
+test_xnsl_thr_LDADD		= libxnsl.la
+test_xnsl_thr_LDFLAGS		= $(XTI_LDFLAGS32) -lpthread $(MACHINE_FLAGS)
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnsl_thr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -101,8 +109,10 @@ libxnsl_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
 				  $(top_srcdir)/src/include/netdir.h \
 				  $(top_srcdir)/src/include/sys/netconfig.h \
 				  $(top_srcdir)/gettext.h
-libxnsl_la_DEPENDENCIES		= $(top_srcdir)/src/lib/xnsl.VERSION $(XTI_LDADD32)
-libxnsl_la_LDFLAGS		= -ldl -version-info 0:0:0 -export-dynamic -Wl,--version-script -Wl,$(top_srcdir)/src/lib/xnsl.VERSION $(MACHINE_FLAGS)
+libxnsl_la_DEPENDENCIES		= $(top_srcdir)/src/lib/xnsl.VERSION
+libxnsl_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/xnsl.VERSION \
+				  $(XTI_LDFLAGS32) -ldl $(MACHINE_FLAGS)
 libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libxnsl_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libxnsl_la_LIBADD		= $(XTI_LDADD32)
@@ -113,12 +123,12 @@ inetaddr_la_SOURCES		= $(top_srcdir)/src/lib/netdir_inet.c \
 				  $(top_srcdir)/src/include/netdir.h \
 				  $(top_srcdir)/src/include/netconfig.h \
 				  $(top_srcdir)/src/include/sys/netconfig.h
-inetaddr_la_DEPENDENCIES	= $(XTI_LDADD32) libxnsl.la
+inetaddr_la_DEPENDENCIES	= libxnsl.la
 inetaddr_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS)
-inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS)
+inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) \
 				  -DNETDIR_STRONG_DEFS
 inetaddr_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-inetaddr_la_LIBADD		= $(XTI_LDADD32) libxnsl.la
+inetaddr_la_LIBADD		= libxnsl.la
 
 ## RPM_BUILD_USER
 endif

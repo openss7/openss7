@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/17 23:09:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/17 23:09:12 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/29 11:50:47  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.1  2006/09/17 23:09:12  brian
 # - added lib32 compatibility directories
 #
@@ -74,7 +82,7 @@ pkglibexec32_PROGRAMS		+= test-sockpath
 test_sockpath_SOURCES		= $(top_srcdir)/src/test/test-sockpath.c
 test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_sockpath_LDADD		= libsockpath.la $(STREAMS_LDADD32)
-test_sockpath_LDFLAGS		= $(MACHINE_FLAGS)
+test_sockpath_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sockpath_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockpath_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -83,7 +91,7 @@ pkglibexec32_PROGRAMS		+= test-socket
 test_socket_SOURCES		= $(top_srcdir)/src/test/test-socket.c
 test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socket_LDADD		= libsocket.la $(STREAMS_LDADD32)
-test_socket_LDFLAGS		= -static $(MACHINE_FLAGS)
+test_socket_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_socket_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socket_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -92,7 +100,7 @@ pkglibexec32_PROGRAMS		+= test-socklib
 test_socklib_SOURCES		= $(top_srcdir)/src/test/test-socklib.c
 test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socklib_LDADD		= libsocklib.la $(STREAMS_LDADD32)
-test_socklib_LDFLAGS		= -static $(MACHINE_FLAGS)
+test_socklib_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_socklib_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socklib_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -101,7 +109,7 @@ pkglibexec32_PROGRAMS		+= test-sockmod
 test_sockmod_SOURCES		= $(top_srcdir)/src/test/test-sockmod.c
 test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_sockmod_LDADD		= libsocklib.la $(STREAMS_LDADD32)
-test_sockmod_LDFLAGS		= -static $(MACHINE_FLAGS)
+test_sockmod_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sockmod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockmod_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -110,7 +118,7 @@ pkglibexec32_PROGRAMS		+= test-socksys
 test_socksys_SOURCES		= $(top_srcdir)/src/test/test-socksys.c
 test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socksys_LDADD		= libsocket.la $(STREAMS_LDADD32)
-test_socksys_LDFLAGS		= -static $(MACHINE_FLAGS)
+test_socksys_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_socksys_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socksys_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -122,8 +130,9 @@ libsockpath_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
 				  $(top_srcdir)/src/include/sockdb.h \
 				  $(top_srcdir)/src/include/sys/sockpath.h
 libsockpath_la_DEPENDENCIES	= $(top_srcdir)/src/lib/sockpath.VERSION
-libsockpath_la_LDFLAGS		= -version-info 0:0:0 $(MACHINE_FLAGS) \
-				  -Wl,--version-script -Wl,$(top_srcdir)/src/lib/sockpath.VERSION
+libsockpath_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sockpath.VERSION \
+				  $(MACHINE_FLAGS)
 libsockpath_la_CPPFLAGS		= $(LIB_INCLUDES) $(USER_CPPFLAGS)
 libsockpath_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libsockpath_la_LIBADD		=
@@ -133,22 +142,24 @@ lib32_LTLIBRARIES		+= libsocket.la
 libsocket_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
 				  $(top_srcdir)/src/lib/socket.c
 libsocket_la_DEPENDENCIES	= $(top_srcdir)/src/lib/socket.VERSION
-libsocket_la_LDFLAGS		= -version-info 0:0:0 $(MACHINE_FLAGS) \
-				  -Wl,--version-script -Wl,$(top_srcdir)/src/lib/socket.VERSION
+libsocket_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socket.VERSION \
+				  $(STREAMS_LDFLAGS32) -static -lc -shared $(MACHINE_FLAGS)
 libsocket_la_CPPFLAGS		= $(LIB_INCLUDES) $(USER_CPPFLAGS)
 libsocket_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-libsocket_la_LIBADD		=
+libsocket_la_LIBADD		= $(STREAMS_LDADD32)
 
 lib32_LTLIBRARIES		+= libsocklib.la
 
 libsocklib_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
 				  $(top_srcdir)/src/lib/socklib.c
 libsocklib_la_DEPENDENCIES	= $(top_srcdir)/src/lib/socklib.VERSION
-libsocklib_la_LDFLAGS		= -version-info 0:0:0 $(MACHINE_FLAGS) \
-				  -Wl,--version-script -Wl,$(top_srcdir)/src/lib/socklib.VERSION
+libsocklib_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socklib.VERSION \
+				  $(NSL_LDFLAGS32) -static -lc -shared $(MACHINE_FLAGS)
 libsocklib_la_CPPFLAGS		= $(LIB_INCLUDES) $(USER_CPPFLAGS)
 libsocklib_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-libsocklib_la_LIBADD		= libsockpath.la
+libsocklib_la_LIBADD		= $(NSL_LDADD32) libsockpath.la
 
 ## RPM_BUILD_USER
 endif

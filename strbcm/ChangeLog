@@ -1,3 +1,12 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: libtool library tweaks
+	* configure.ac: added AC_LIBTOOL_DLOPEN
+	* strbcm.spec.in: better spec file handling
+	* doc/man/Makefile.am: added manual page
+	* doc/man/man5/strbcm.5.man: added manual page
+	* lib32/Makefile.am: libtool library tweaks
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distinguish LDADD and LDFLAGS

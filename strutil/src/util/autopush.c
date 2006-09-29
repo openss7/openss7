@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/10 07:24:20 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/09/29 11:51:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:20 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:16 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: autopush.c,v $
+ Revision 0.9.2.15  2006/09/29 11:51:16  brian
+ - libtool library tweaks in Makefile.am
+ - better rpm spec handling in *.spec.in
+ - added AC_LIBTOOL_DLOPEN to configure.ac
+ - updated some copyright headers
+ - rationalized item in two packages
+ - added manual pages, drivers and modules to new strtty package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/10 07:24:20 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/09/29 11:51:16 $"
 
 static char const ident[] =
-    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/03/10 07:24:20 $";
+    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/09/29 11:51:16 $";
 
 /* 
  *  autopush(8)

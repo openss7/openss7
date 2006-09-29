@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/10 07:24:20 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/29 11:51:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:20 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:16 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strace.c,v $
+ Revision 0.9.2.17  2006/09/29 11:51:16  brian
+ - libtool library tweaks in Makefile.am
+ - better rpm spec handling in *.spec.in
+ - added AC_LIBTOOL_DLOPEN to configure.ac
+ - updated some copyright headers
+ - rationalized item in two packages
+ - added manual pages, drivers and modules to new strtty package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/10 07:24:20 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/29 11:51:16 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/03/10 07:24:20 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/29 11:51:16 $";
 
 /*
  *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.

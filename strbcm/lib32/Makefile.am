@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/17 23:09:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/17 23:09:07 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:17 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/29 11:50:17  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.1  2006/09/17 23:09:07  brian
 # - added lib32 compatibility directories
 #
@@ -77,7 +85,7 @@ pkglibexec32_PROGRAMS		+= test-bcm
 test_bcm_SOURCES		= $(top_srcdir)/src/test/test-bcm.c
 test_bcm_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_bcm_LDADD			= $(STREAMS_LDADD32)
-test_bcm_LDFLAGS		= -static $(MACHINE_FLAGS)
+test_bcm_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_bcm_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_bcm_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 

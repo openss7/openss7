@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.12 2006/03/10 07:24:14 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.13 2006/09/29 11:51:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:12 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strlog.h,v $
+ Revision 0.9.2.13  2006/09/29 11:51:12  brian
+ - libtool library tweaks in Makefile.am
+ - better rpm spec handling in *.spec.in
+ - added AC_LIBTOOL_DLOPEN to configure.ac
+ - updated some copyright headers
+ - rationalized item in two packages
+ - added manual pages, drivers and modules to new strtty package
+
 
  *****************************************************************************/
 
 #ifndef __SYS_STRUTIL_STRLOG_H__
 #define __SYS_STRUTIL_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:24:14 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+
+/* This file can be processed with doxygen(1). */
 
 #ifndef __SYS_STRLOG_H__
 #warning "Do no include sys/strutil/strlog.h directly, include sys/strlog.h instead."

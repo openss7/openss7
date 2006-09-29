@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/10 07:24:12 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/09/29 11:51:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/10 07:24:12 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/09/29 11:51:10 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/10 07:24:12 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/09/29 11:51:10 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/03/10 07:24:12 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/09/29 11:51:10 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -159,6 +159,8 @@ static struct module_info sad_minfo = {
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
+
+static struct module_stat sad_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 #if defined __LP64__ && defined LFS
 #  undef WITH_32BIT_CONVERSION
@@ -532,6 +534,7 @@ static struct qinit sad_qinit = {
 	.qi_qopen = sad_open,
 	.qi_qclose = sad_close,
 	.qi_minfo = &sad_minfo,
+	.qi_mstat = &sad_mstat,
 };
 
 static struct streamtab sad_info = {

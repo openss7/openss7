@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_PUSH.7.man,v 0.9.2.5 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_PUSH.7.man,v 0.9.2.6 2006/09/29 11:50:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,19 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/09/29 11:50:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_PUSH.7.man,v $
+.\" Revision 0.9.2.6  2006/09/29 11:50:22  brian
+.\" - libtool library tweaks in Makefile.am
+.\" - better rpm spec handling in *.spec.in
+.\" - added AC_LIBTOOL_DLOPEN to configure.ac
+.\" - updated some copyright headers
+.\" - rationalized item in two packages
+.\" - added manual pages, drivers and modules to new strtty package
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -109,10 +117,62 @@ always
 .BR I_PUSH .
 .TP
 .I arg
+a pointer to a character string providing the name of the module to push.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B I_PUSH
+input-output control command pushes a 
+.I STREAMS
+module by name onto the Stream specified by
+.IR fd .
+.I arg
+is a pointer to a string that contains the name of the module to push.
+.PP
+Modules are pushed an popped in the form of a push down stack between the
+Stream head and the Stream end (or driver).
+Modules pushed onto the stack can be popped back off starting with the
+topmost module using the
+.BR I_POP (7)
+.BR ioctl (2s).
+The
+.BR I_ANCHOR (7)
+.BR ioctl (2s)
+can be used to lock a set of modules that have been pushed onto a stack and
+keeps them from being subsequently popped with the
+.BR I_POP (7)
+.BR ioctl (2s)
+without sufficient privilege.
+.PP
+When a module is pushed onto a Stream, the module's
+.BR qopen (9)
+routine is called.  If the module's
+.BR qopen (9)
+routine is unsuccessful, the
+.B I_PUSH
+input-output control command will return
+.RB [ ENXIO ].
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B I_PUSH
+.BR ioctl (2s)
+command is used to push modules onto a Stream.  Pushing modules onto a Stream
+typically changes or augments the service interface presented to the user
+process reading, writing or controlling the Stream.
+.PP
+For example, pushsing the
+.BR ttcompat (4)
+module onto a terminal device Stream augments the service interface of the
+terminal device Stream to permit compatibile use of
+.I UNIX Version 7
+or
+.I 4BSD
+terminal input-output control commands .
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -120,14 +180,13 @@ always
 Upon success, the
 .B I_PUSH
 .BR ioctl (2s)
-command returns zero
-.RB ( 0 )
-or a positive integer.
+command pushes the named module and returns zero
+.RB ( 0 ).
 Upon failure, the
 .B I_PUSH
 .BR ioctl (2s)
-command returns
-.B -1
+command returns minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to an appropriate error number.
@@ -151,11 +210,14 @@ is too short (zero length), too long (greater than
 .BR FMNAMESZ ),
 does not refer to a
 .I STREAMS
-module on the system, and could not be demand loaded,
-or the module push count
+module on the system, and could not be demand loaded.
+.TP
+.RB [ ENOSR ]
+The module push count
 .B NSTRPUSH
 has been exceeded for the Stream associated with
 .IR fd .
+No more modules can be pushed onto the Stream.
 .TP
 .RB [ EFAULT ]
 .I arg

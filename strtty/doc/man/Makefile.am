@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 09:53:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:51:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/23 09:53:13 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:51:00 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/29 11:51:00  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.1  2006/08/23 09:53:13  brian
 # - started STREAMS Terminals package
 #
@@ -63,18 +71,14 @@ MANMACRO_PFX			= @PACKAGE_TARNAME@
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-##
-## What we need to do here is to get the list of manual pages from the pages
-## that have been dumped into any of the directories.  The configure script
-## needs to find them, move them to the appropriate subdirectory, and then add
-## them to these lists at configuration time.  If they are gzipped or bzipped
-## we need to unzip them.  Then any external manual pages will be added to the
-## distribution.  Manual pages ending in '.man' are uncooked.  Manual pages
-## ending in '.[1-9]' are cooked.
-##
-man_MANS = 
+man_MANS = \
+	man5/strtty.5
 
-dist_noinst_MANS =
+dist_noinst_MANS = \
+	man5/strtty.5.man
+
+MANS_UNUSED = \
+	man5/strtty.5
 
 ## PKG_BUILD_INDEP
 endif

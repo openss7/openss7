@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/27 05:15:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/29 11:50:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:15:30 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/09/29 11:50:58  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.4  2006/09/27 05:15:30  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -114,14 +122,14 @@ dist_sbin_SCRIPTS		=
 test_tty_SOURCES		= src/test/test-tty.c
 test_tty_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_tty_LDADD			= $(STREAMS_LDADD)
-test_tty_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+test_tty_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_tty_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tty_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
-#xxxxxx_LDFLAGS			= -static $(STREAMS_LDFLAGS)
+#xxxxxx_LDFLAGS			= $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #xxxxxx_CFLAGS			= $(USER_CFLAGS)
 

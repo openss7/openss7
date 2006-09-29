@@ -1,3 +1,9 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: move master directory checks earlier
+	* configure.ac: add AC_LIBTOOL_DLOPEN
+	* openss7.spec.in: better spec file handling
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/inet.m4: distinguish LDADD from LDFLAGS

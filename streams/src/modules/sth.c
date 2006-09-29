@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2006/09/22 21:20:20 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2006/09/29 11:50:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 21:20:20 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:50:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.167  2006/09/29 11:50:28  brian
+ - libtool library tweaks in Makefile.am
+ - better rpm spec handling in *.spec.in
+ - added AC_LIBTOOL_DLOPEN to configure.ac
+ - updated some copyright headers
+ - rationalized item in two packages
+ - added manual pages, drivers and modules to new strtty package
+
  Revision 0.9.2.166  2006/09/22 21:20:20  brian
  - roughed in I_EGETSIG I_ESETSIG code
 
@@ -134,10 +142,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2006/09/22 21:20:20 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2006/09/29 11:50:28 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2006/09/22 21:20:20 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2006/09/29 11:50:28 $";
 
 //#define __NO_VERSION__
 
@@ -238,7 +246,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2006/09/22 21:20:20 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2006/09/29 11:50:28 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -7998,6 +8006,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 streams_noinline streams_fastcall int
 str_i_push32(struct file *file, struct stdata *sd, unsigned long arg)
 {
+	file->f_flags |= FILP32;
 	return str_i_push(file, sd, (unsigned long) compat_ptr(arg));
 }
 #endif				/* WITH_32BIT_CONVERSION */

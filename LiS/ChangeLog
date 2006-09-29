@@ -1,3 +1,11 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in: better spec file handling
+	* Makefile.am: library build tweaks
+	* configure.ac: add AC_LIBTOOL_DLOPEN
+	* lib32/Makefile.am: library build tweaks
+	* testsuite/wrapper/Makefile.am: spacing
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distinguish LDADD and LDFLAGS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.12 2006/03/10 07:24:14 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.13 2006/09/29 11:51:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,35 +44,76 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:12 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sad.h,v $
+ Revision 0.9.2.13  2006/09/29 11:51:12  brian
+ - libtool library tweaks in Makefile.am
+ - better rpm spec handling in *.spec.in
+ - added AC_LIBTOOL_DLOPEN to configure.ac
+ - updated some copyright headers
+ - rationalized item in two packages
+ - added manual pages, drivers and modules to new strtty package
+
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_SAD_H__
 #define __SYS_STREAMS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:24:14 $"
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SAD_H__
 #warning "Do no include sys/streams/sad.h directly, include sys/sad.h instead."
 #endif
 
-#define SAD_IOC_MAGIC	'D'	/* Note: OSF/1 1.2 uses 'A' instead instead of 'D' */
+/* This file can be processed with doxygen(1). */
 
-#define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/* set autopush */
-#define SAD_GAP		((SAD_IOC_MAGIC << 8) | 0x02)	/* get autopush */
-#define SAD_VML		((SAD_IOC_MAGIC << 8) | 0x03)	/* validate modules */
+/**
+ * @ingroup sad STREAMS Administrative Driver sad(4)
+ * @{
+ * @file
+ * STREAMS Administrative Driver, sad(4), header file.
+ * Provides the interface between a user program and the kernel for the adminstration of STREAMS
+ * modules and drivers.  The sad(4) driver can verify a module list and attempt to load modules,
+ * and configure or clear an autopush list.  All references to modules are perofrmed using the name
+ * of the module (as a character string), however, communication with drivers requires knowledge of
+ * a major device number associated with the driver.  Although this cat be obtained from
+ * /proc/devices, it is classically obtained using the STREAMS Configuration Module, sc(4), that can
+ * be pushed over either a Null Stream, nuls(4), or this sad(4) driver.
+ * @{ */
 
-#define SAD_SAP_SOL	((SAD_IOC_MAGIC << 8) | 0x17)	/* set autopush (anchor) */
-#define SAD_GAP_SOL	((SAD_IOC_MAGIC << 8) | 0x18)	/* get autopush (anchor) */
+/**
+ * @name SAD IO Control Magic Number
+ * @{ */
+#define SAD_IOC_MAGIC	'D'	/**< Note: OSF/1 1.2 uses 'A' instead instead of 'D'. */
+/** @} */
+
+/**
+ * @name SAD IO Control Commands
+ * @{ */
+#define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/**< Set autopush. */
+#define SAD_GAP		((SAD_IOC_MAGIC << 8) | 0x02)	/**< Get autopush. */
+#define SAD_VML		((SAD_IOC_MAGIC << 8) | 0x03)	/**< Validate modules. */
+
+#define SAD_SAP_SOL	((SAD_IOC_MAGIC << 8) | 0x17)	/**< Set autopush (anchor). */
+#define SAD_GAP_SOL	((SAD_IOC_MAGIC << 8) | 0x18)	/**< Get autopush (anchor). */
+/** @} */
 
 #ifndef MAX_APUSH
-#define MAX_APUSH 8
+#define MAX_APUSH 8	/**< Maximum number of modules to autopush. */
 #endif
 
-#define MAXAPUSH MAX_APUSH
+#define MAXAPUSH MAX_APUSH /**< For compat w/ some imp's mis-spelling of the constant.  */
 
 #ifdef __LP64__
+#ifdef __KERNEL__
+/*
+ * This structure is only useful within the kernel for performing conversion
+ * from 32-bit users to the 64-bit kernel.
+ */
 struct strapush32 {
 	int32_t sap_cmd;
 	int32_t sap_major;
@@ -80,29 +121,60 @@ struct strapush32 {
 	int32_t sap_lastminor;
 	u_int32_t sap_npush;
 	char sap_list[MAXAPUSH][FMNAMESZ + 1];
-	/* Solaris adds sap_anchor which is the integer anchor position */
+	/* Solaris adds sap_anchor which is the integer anchor position. */
 	int32_t sap_anchor;
-	/* This one is Linux Fast-STREAMS specific */
+	/* This one is Linux Fast-STREAMS specific. */
 	char sap_module[FMNAMESZ + 1];	/* This is mine. */
 };
+#endif				/* __KERNEL__ */
 #endif				/* __LP64__ */
+
+/**
+ * @struct strapush include/sys/streams/sad.h <sys/sad.h>
+ * @brief STREAMS Administrative Driver Autopush structure.
+ * The STREAMS autopush structure is used to issue a STREAMS autopush command to
+ * the STREAMS Adminstrative Driver, sad(4).
+ */
 struct strapush {
-	int sap_cmd;
-	long sap_major;
-	long sap_minor;
-	long sap_lastminor;
-	uint sap_npush;
-	char sap_list[MAXAPUSH][FMNAMESZ + 1];
-	/* Solaris adds sap_anchor which is the integer anchor position */
-	int sap_anchor;
-	/* This one is Linux Fast-STREAMS specific */
-	char sap_module[FMNAMESZ + 1];	/* This is mine. */
+	int sap_cmd;			/**< Command. #SAP_CLEAR, #SAP_ONE, #SAP_RANGE,
+					     #SAP_ALL, #SAP_CLONE. */
+	long sap_major;			/**< Major device number of driver. */
+	long sap_minor;			/**< Minor device number of driver. */
+	long sap_lastminor;		/**< Last minor device number in a range (#SAP_RANGE). */
+	uint sap_npush;			/**< Number of modules in list. */
+	char sap_list[MAXAPUSH][FMNAMESZ + 1];	/**< Module list. */
+	int sap_anchor;			/**< Anchor position (Solaris). */
+	char sap_module[FMNAMESZ + 1];	/**< Module name (Linux Fast-STREAMS). */
 };
 
-#define SAP_CLEAR	0x00	/* clear entry */
-#define SAP_ONE		0x01	/* add entry for one minor */
-#define SAP_RANGE	0x02	/* add entry for range of minors */
-#define SAP_ALL		0x03	/* add etnry for all minors */
-#define SAP_CLONE	0x04	/* mark clonable minor device */
+/**
+ * @name SAP Commands
+ * @{
+ * @def SAP_CLEAR
+ *	Clear an autopush entry.
+ * @def SAP_ONE
+ *	Add an autopush entry for a single minor device number.
+ * @def SAP_RANGE
+ *	Add an autopush entry for a range of minor device numbers.
+ * @def SAP_ALL
+ *	Add an autopush entry fo all minor device numbers belonging to a major
+ *	device number.
+ * @def SAP_CLONE
+ *	Mark the minor device number as a clonable minor device.  This permits a
+ *	driver to treat one or more minor device numbers associated with a major
+ *	deivce number as a clone minor.  This is not possible using the clone(4)
+ *	driver for any minor device number other than zero (0).  This value is
+ *	not standard SVR4 behaviour; however, the value is provided by a number
+ *	of STREAMS implementations: it is provided here and supported by Linux
+ *	Fast-STREAMS for compatibility when porting drivers and modules.
+ */
+#define SAP_CLEAR	0x00	/**< Clear entry. */
+#define SAP_ONE		0x01	/**< Add entry for one minor. */
+#define SAP_RANGE	0x02	/**< Add entry for range of minors. */
+#define SAP_ALL		0x03	/**< Add entry for all minors. */
+#define SAP_CLONE	0x04	/**< Mark clonable minor device. */
+/** @} */
+
+/** @} */
 
 #endif				/* __SYS_STREAMS_SAD_H__ */

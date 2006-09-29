@@ -1,3 +1,22 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: libtool library tweaks
+	* configure.ac: added AC_LIBTOOL_DLOPEN
+	* streams.spec.in: better spec file handling
+	* doc/man/man7/I_PUSH.7.man: completed manual page
+	* include/sys/streams/log.h: header update
+	* include/sys/streams/sc.h: header update
+	* lib32/Makefile.am: libtool library tweaks
+	* src/drivers/echo.c: copyright header update
+	* src/drivers/nsdev.c: copyright header update
+	* src/drivers/nuls.c: copyright header update
+	* src/drivers/pipe.c: copyright header update
+	* src/drivers/spx.c: copyright header update
+	* src/modules/connld.c: copyright header update
+	* src/modules/pipemod.c: copyright header update
+	* src/modules/sth.c: added FILP32 flag on qopen(9)
+	* src/util/strload: copyright header update
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distinguish LDADD and LDFLAGS

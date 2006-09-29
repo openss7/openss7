@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/09/27 05:15:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/09/29 11:50:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:15:16 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.139  2006/09/29 11:50:20  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.138  2006/09/27 05:15:16  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -551,14 +559,13 @@ libstreams_la_SOURCES		= \
 				lib/libc/fdetach.c \
 				lib/libc/streams.h
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
-libstreams_la_LDFLAGS		= -no-undefined \
-				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
+libstreams_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
 ##if USING_IOCTL_GETPMSG_PUTPMSG
-libstreams_la_LDFLAGS		+= -version-info 0:1:0
+libstreams_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 ##else
-##libstreams_la_LDFLAGS		+= -version-info 0:0:0
+##libstreams_la_LDFLAGS		+= -version-info 0:0:0 -export-dynamic
 ##endif
 
 libLiS_la_SOURCES		= \
@@ -573,14 +580,13 @@ libLiS_la_SOURCES		= \
 				lib/libc/fdetach.c \
 				lib/libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
-libLiS_la_LDFLAGS		= -no-undefined \
-				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
+libLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS)
 ##if USING_IOCTL_GETPMSG_PUTPMSG
-libLiS_la_LDFLAGS		+= -version-info 0:1:0
+libLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 ##else
-##libLiS_la_LDFLAGS		+= -version-info 0:0:0
+##libLiS_la_LDFLAGS		+= -version-info 0:0:0 -export-dynamic
 ##endif
 
 libpLiS_la_SOURCES		= \
@@ -594,14 +600,13 @@ libpLiS_la_SOURCES		= \
 				lib/libc/fdetach.c \
 				lib/libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
-libpLiS_la_LDFLAGS		= -no-undefined \
-				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
+libpLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS)
 ##if USING_IOCTL_GETPMSG_PUTPMSG
-libpLiS_la_LDFLAGS		+= -version-info 0:1:0
+libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 ##else
-##libpLiS_la_LDFLAGS		+= -version-info 0:0:0
+##libpLiS_la_LDFLAGS		+= -version-info 0:0:0 -export-dynamic
 ##endif
 
 EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
@@ -611,61 +616,71 @@ EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 
 strchg_SOURCES			= src/util/strchg.c
 strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strchg_LDFLAGS			= -static libstreams.la
+strchg_LDFLAGS			=
+strchg_LDADD			= libstreams.la
 strchg_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strchg_CFLAGS			= $(USER_CFLAGS)
 
 strconf_SOURCES			= src/util/strconf.c
 strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strconf_LDFLAGS			= -static libstreams.la
+strconf_LDFLAGS			=
+strconf_LDADD			= libstreams.la
 strconf_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strconf_CFLAGS			= $(USER_CFLAGS)
 
 strreset_SOURCES		= src/util/strreset.c
 strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strreset_LDFLAGS		= -static libstreams.la
+strreset_LDFLAGS		=
+strreset_LDADD			= libstreams.la
 strreset_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strreset_CFLAGS			= $(USER_CFLAGS)
 
 autopush_SOURCES		= src/util/autopush.c
 autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-autopush_LDFLAGS		= -static libstreams.la
+autopush_LDFLAGS		=
+autopush_LDADD			= libstreams.la
 autopush_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 autopush_CFLAGS			= $(USER_CFLAGS)
 
 fattach_SOURCES			= src/util/fattach.c
 fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-fattach_LDFLAGS			= -static libstreams.la
+fattach_LDFLAGS			=
+fattach_LDADD			= libstreams.la
 fattach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fattach_CFLAGS			= $(USER_CFLAGS)
 
 fdetach_SOURCES			= src/util/fdetach.c 
 fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-fdetach_LDFLAGS			= -static libstreams.la
+fdetach_LDFLAGS			=
+fdetach_LDADD			= libstreams.la
 fdetach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fdetach_CFLAGS			= $(USER_CFLAGS)
 
 insf_SOURCES			= src/util/insf.c
 insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-insf_LDFLAGS			= -static libstreams.la
+insf_LDFLAGS			=
+insf_LDADD			= libstreams.la
 insf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 insf_CFLAGS			= $(USER_CFLAGS)
 
 scls_SOURCES			= src/util/scls.c
 scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-scls_LDFLAGS			= -static libstreams.la
+scls_LDFLAGS			=
+scls_LDADD			= libstreams.la
 scls_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 scls_CFLAGS			= $(USER_CFLAGS)
 
 strace_SOURCES			= src/util/strace.c
 strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strace_LDFLAGS			= -static libstreams.la
+strace_LDFLAGS			=
+strace_LDADD			= libstreams.la
 strace_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strace_CFLAGS			= $(USER_CFLAGS)
 
 ##strclean_SOURCES		= src/util/strclean.c
 ##strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-##strclean_LDFLAGS		= -static libstreams.la
+##strclean_LDFLAGS		=
+##strclean_LDADD		= libstreams.la
 ##strclean_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ##strclean_CFLAGS		= $(USER_CFLAGS)
 
@@ -677,21 +692,24 @@ strace_CFLAGS			= $(USER_CFLAGS)
 
 strerr_SOURCES			= src/util/strerr.c
 strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strerr_LDFLAGS			= -static libstreams.la
+strerr_LDFLAGS			=
+strerr_LDADD			= libstreams.la
 strerr_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strerr_CFLAGS			= $(USER_CFLAGS)
 
 strinfo_SOURCES			= src/util/strinfo.c
 strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strinfo_LDFLAGS			= -static libstreams.la
+strinfo_LDFLAGS			=
+strinfo_LDADD			= libstreams.la
 strinfo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strinfo_CFLAGS			= $(USER_CFLAGS)
 
 ##strload_SOURCES		= src/util/strload.c
 ##strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-##strload_LDFLAGS		= -static libstreams.la
+##strload_LDFLAGS		=
+##strload_LDADD			= libstreams.la
 ##strload_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-##strload_CFLAGS			= $(USER_CFLAGS)
+##strload_CFLAGS		= $(USER_CFLAGS)
 
 ##@srcdir@/src/util/strload.c:
 ##	touch $@
@@ -701,7 +719,8 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 
 ##strsetup_SOURCES		= src/util/strsetup.c
 ##strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-##strsetup_LDFLAGS		= -static libstreams.la
+##strsetup_LDFLAGS		=
+##strsetup_LDADD		= libstreams.la
 ##strsetup_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ##strsetup_CFLAGS		= $(USER_CFLAGS)
 
@@ -713,7 +732,8 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 
 strvf_SOURCES			= src/util/strvf.c
 strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strvf_LDFLAGS			= -static libstreams.la
+strvf_LDFLAGS			=
+strvf_LDADD			= libstreams.la
 strvf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strvf_CFLAGS			= $(USER_CFLAGS)
 
@@ -724,57 +744,68 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_clone_SOURCES		= src/test/test-clone.c
-test_clone_LDFLAGS		= -static libstreams.la
+test_clone_LDFLAGS		=
+test_clone_LDADD		= libstreams.la
 test_clone_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_clone_CFLAGS		= $(LFS_CFLAGS)
 
 test_connld_SOURCES		= src/test/test-connld.c
-test_connld_LDFLAGS		= -static libstreams.la
+test_connld_LDFLAGS		=
+test_connld_LDADD		= libstreams.la
 test_connld_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_connld_CFLAGS		= $(LFS_CFLAGS)
 
 test_echo_SOURCES		= src/test/test-echo.c
-test_echo_LDFLAGS		= -static libstreams.la
+test_echo_LDFLAGS		=
+test_echo_LDADD			= libstreams.la
 test_echo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_echo_CFLAGS		= $(LFS_CFLAGS)
 
 test_fifo_SOURCES		= src/test/test-fifo.c
-test_fifo_LDFLAGS		= -static libstreams.la
+test_fifo_LDFLAGS		=
+test_fifo_LDADD			= libstreams.la
 test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(LFS_CFLAGS)
 
 test_log_SOURCES		= src/test/test-log.c
-test_log_LDFLAGS		= -static libstreams.la
+test_log_LDFLAGS		=
+test_log_LDADD			= libstreams.la
 test_log_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_log_CFLAGS			= $(LFS_CFLAGS)
 
 test_loop_SOURCES		= src/test/test-loop.c
-test_loop_LDFLAGS		= -static libstreams.la
+test_loop_LDFLAGS		=
+test_loop_LDADD			= libstreams.la
 test_loop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_loop_CFLAGS		= $(LFS_CFLAGS)
 
 test_nsdev_SOURCES		= src/test/test-nsdev.c
-test_nsdev_LDFLAGS		= -static libstreams.la
+test_nsdev_LDFLAGS		=
+test_nsdev_LDADD		= libstreams.la
 test_nsdev_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nsdev_CFLAGS		= $(LFS_CFLAGS)
 
 test_mux_SOURCES		= src/test/test-mux.c
-test_mux_LDFLAGS		= -static libstreams.la
+test_mux_LDFLAGS		=
+test_mux_LDADD			= libstreams.la
 test_mux_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_mux_CFLAGS			= $(LFS_CFLAGS)
 
 test_nuls_SOURCES		= src/test/test-nuls.c
-test_nuls_LDFLAGS		= -static libstreams.la
+test_nuls_LDFLAGS		=
+test_nuls_LDADD			= libstreams.la
 test_nuls_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nuls_CFLAGS		= $(LFS_CFLAGS)
 
 test_pipe_SOURCES		= src/test/test-pipe.c
-test_pipe_LDFLAGS		= -static libstreams.la
+test_pipe_LDFLAGS		=
+test_pipe_LDADD			= libstreams.la
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS)
 
 perftest_SOURCES		= src/test/perftest.c
-perftest_LDFLAGS		= -static libstreams.la
+perftest_LDFLAGS		=
+perftest_LDADD			= libstreams.la
 perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 perftest_CFLAGS			= $(LFS_CFLAGS)
 
@@ -784,22 +815,26 @@ perftestn_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNATIVE_PIPES
 perftestn_CFLAGS		= $(LFS_CFLAGS)
 
 test_pipemod_SOURCES		= src/test/test-pipemod.c
-test_pipemod_LDFLAGS		= -static libstreams.la
+test_pipemod_LDFLAGS		=
+test_pipemod_LDADD		= libstreams.la
 test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipemod_CFLAGS		= $(LFS_CFLAGS)
 
 test_sad_SOURCES		= src/test/test-sad.c
-test_sad_LDFLAGS		= -static libstreams.la
+test_sad_LDFLAGS		=
+test_sad_LDADD			= libstreams.la
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(LFS_CFLAGS)
 
 test_sc_SOURCES			= src/test/test-sc.c
-test_sc_LDFLAGS			= -static libstreams.la
+test_sc_LDFLAGS			=
+test_sc_LDADD			= libstreams.la
 test_sc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sc_CFLAGS			= $(LFS_CFLAGS)
 
 test_streams_SOURCES		= src/test/test-streams.c
-test_streams_LDFLAGS		= -static libstreams.la
+test_streams_LDFLAGS		=
+test_streams_LDADD		= libstreams.la
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS)
 

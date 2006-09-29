@@ -1,3 +1,13 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: libtool library tweaks
+	* configure.ac: added AC_LIBTOOL_DLOPEN
+	* strsock.spec.in: better spec file handling
+	* lib32/Makefile.am: libtool library tweaks
+	* src/drivers/socksys.c: corrections by inspection
+	* src/util/sysconfig/README: added sock2path config file
+	* src/util/sysconfig/sock2path: added sock2path config file
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distinguish LDADD and LDFLAGS

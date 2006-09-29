@@ -1,3 +1,7 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: add AC_LIBTOOL_DLOPEN
+
 2006-09-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release notes

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/27 05:15:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/29 11:50:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:15:27 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/09/29 11:50:38  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.2  2006/09/27 05:15:27  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -96,15 +104,15 @@ sbin_PROGRAMS			=
 
 test_xnsl_SOURCES		= src/test/test-xnsl.c
 test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_xnsl_LDADD			= $(STREAMS_LDADD) $(XTI_LDADD) libxnsl.la
-test_xnsl_LDFLAGS		= -static $(STREAMS_LDFLAGS) $(XTI_LDFLAGS)
+test_xnsl_LDADD			= libxnsl.la
+test_xnsl_LDFLAGS		= 
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS)
 
 test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
 test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_xnsl_thr_LDADD		= $(STREAMS_LDADD) $(XTI_LDADD) libxnsl.la
-test_xnsl_thr_LDFLAGS		= -static $(STREAMS_LDFLAGS) $(XTI_LDFLAGS) -lpthread
+test_xnsl_thr_LDADD		= libxnsl.la
+test_xnsl_thr_LDFLAGS		= -lpthread
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnsl_thr_CFLAGS		= $(USER_CFLAGS)
 
@@ -120,9 +128,9 @@ libxnsl_la_SOURCES		= src/lib/pthread.c \
 				  src/include/sys/netconfig.h \
 				  gettext.h
 libxnsl_la_DEPENDENCIES		= $(top_srcdir)/src/lib/xnsl.VERSION
-libxnsl_la_LDFLAGS		= -ldl -no-undefined -version-info 0:0:0 -export-dynamic \
+libxnsl_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/xnsl.VERSION \
-				  $(XTI_LDFLAGS)
+				  $(XTI_LDFLAGS) -ldl
 libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libxnsl_la_CFLAGS		= $(USER_CFLAGS)
 libxnsl_la_LIBADD		= $(XTI_LDADD)
@@ -134,11 +142,12 @@ inetaddr_la_SOURCES		= src/lib/netdir_inet.c \
 				  src/include/netconfig.h \
 				  src/include/sys/netconfig.h
 inetaddr_la_DEPENDENCIES	= libxnsl.la
-inetaddr_la_LDFLAGS		= -module -avoid-version $(XTI_LDFLAGS)
+inetaddr_la_LDFLAGS		= -module -avoid-version \
+				  -shared $(XTI_LDFLAGS)
 inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) \
 				  -DNETDIR_STRONG_DEFS
 inetaddr_la_CFLAGS		= $(USER_CFLAGS)
-inetaddr_la_LIBADD		= $(XTI_LDADD) libxnsl.la
+inetaddr_la_LIBADD		= $(XTI_LDADD)
 
 ## RPM_BUILD_USER
 endif
@@ -162,15 +171,15 @@ sbin_PROGRAMS			=
 
 test_xnsl_SOURCES		= src/test/test-xnsl.c
 test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_xnsl_LDADD			= $(STREAMS_LDADD) $(XTI_LDADD) libxnsl.la
-test_xnsl_LDFLAGS		= -static $(STREAMS_LDFLAGS) $(XTI_LDFLAGS)
+test_xnsl_LDADD			= libxnsl.la
+test_xnsl_LDFLAGS		= $(XTI_LDFLAGS)
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS)
 
 test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
 test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-test_xnsl_thr_LDADD		= $(STREAMS_LDADD) $(XTI_LDADD) libxnsl.la
-test_xnsl_thr_LDFLAGS		= -static $(STREAMS_LDFLAGS) $(XTI_LDFLAGS) -lpthread
+test_xnsl_thr_LDADD		= libxnsl.la
+test_xnsl_thr_LDFLAGS		= $(XTI_LDFLAGS) -lpthread
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnsl_thr_CFLAGS		= $(USER_CFLAGS)
 
@@ -186,9 +195,9 @@ libxnsl_la_SOURCES		= src/lib/pthread.c \
 				  src/include/sys/netconfig.h \
 				  gettext.h
 libxnsl_la_DEPENDENCIES		= $(top_srcdir)/src/lib/xnsl.VERSION
-libxnsl_la_LDFLAGS		= -ldl -no-undefined -version-info 0:0:0 -export-dynamic \
+libxnsl_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/xnsl.VERSION \
-				  $(XTI_LDFLAGS)
+				  $(XTI_LDFLAGS) -ldl
 libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libxnsl_la_CFLAGS		= $(USER_CFLAGS)
 libxnsl_la_LIBADD		= $(XTI_LDADD)
@@ -199,12 +208,13 @@ inetaddr_la_SOURCES		= src/lib/netdir_inet.c \
 				  src/include/netdir.h \
 				  src/include/netconfig.h \
 				  src/include/sys/netconfig.h
-inetaddr_la_DEPENDENCIES	= libxnsl.la
-inetaddr_la_LDFLAGS		= -module -avoid-version $(XTI_LDFLAGS)
+inetaddr_la_DEPENDENCIES	= 
+inetaddr_la_LDFLAGS		= -module -avoid-version \
+				  -shared $(XTI_LDFLAGS)
 inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) \
 				  -DNETDIR_STRONG_DEFS
 inetaddr_la_CFLAGS		= $(USER_CFLAGS)
-inetaddr_la_LIBADD		= $(XTI_LDADD) libxnsl.la
+inetaddr_la_LIBADD		= $(XTI_LDADD)
 
 ## RPM_BUILD_USER
 endif
@@ -232,6 +242,27 @@ dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+= configure.nexusware
 
 ##
+## Rules for building kernel objects
+##
+KERNEL_OBJECTS			= $(libBCMlink_a_OBJECTS) $(libBCMmods_a_OBJECTS) $(libBCMdrvs_a_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libBCMmods_a_OBJECTS) $(libBCMdrvs_a_OBJECTS) $(ADDON_MODS)
+KERNEL_PRELOADS			=
+KERNEL_MODCONF			= $(STRCONF_CONFMOD)
+KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
+KMODCONF_EXT			= $(PACKAGE_LCNAME)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
+
+if WITH_KO_MODULES
+## WITH_KO_MODULES
+kpre				= streams_
+else
+kpre				= streams-
+## WITH_KO_MODULES
+endif
+
+include am/kernel.am
+
+##
 ## Rules for building libraries
 ##
 include am/libraries.am
@@ -240,6 +271,25 @@ include am/libraries.am
 ##
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 ##
+EXPORT_SRCFILES			=
+
+EXPORT_VERFILES			=
+
+GENKSYMS_CPPFLAGS		= \
+				  -I./pkg -I$(srcdir)/pkg \
+				  -I./src/drivers -I$(srcdir)/src/drivers \
+				  -I./src/modules -I$(srcdir)/src/modules \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+
+##
+## Rules for generating versioned kernel symbols
+##
+include am/genksyms.am
+
+##
+## Rules for generating STREAMS configuration
+##
+include am/strconf.am
 
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
@@ -295,6 +345,11 @@ endif
 
 ## RPM_BUILD_USER
 endif
+
+##
+## Rules for init scripts
+##
+include am/init.am
 
 ##
 ## Rules for lsms

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/27 05:15:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/29 11:50:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:15:14 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.10  2006/09/29 11:50:14  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.9  2006/09/27 05:15:14  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -128,14 +136,14 @@ dist_sbin_SCRIPTS		=
 test_bcm_SOURCES		= src/test/test-bcm.c
 test_bcm_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_bcm_LDADD			= $(STREAMS_LDADD)
-test_bcm_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+test_bcm_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_bcm_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_bcm_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
-#xxxxxx_LDFLAGS			= -static $(STREAMS_LDFLAGS)
+#xxxxxx_LDFLAGS			= $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #xxxxxx_CFLAGS			= $(USER_CFLAGS)
 

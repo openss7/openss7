@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:12 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:12 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:10 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:12 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:10 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:12 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:10 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -88,13 +88,16 @@ MODULE_ALIAS("streams-spx");
 #endif
 
 #ifndef CONFIG_STREAMS_SPX_NAME
+//#define CONFIG_STREAMS_SPX_NAME "spx"
 #error CONFIG_STREAMS_SPX_NAME must be defined.
 #endif
-#ifndef CONFIG_STREAMS_SPX_MAJOR
-#error CONFIG_STREAMS_SPX_MAJOR must be defined.
-#endif
 #ifndef CONFIG_STREAMS_SPX_MODID
+//#define CONFIG_STREAMS_SPX_MODID 9
 #error CONFIG_STREAMS_SPX_MODID must be defined.
+#endif
+#ifndef CONFIG_STREAMS_SPX_MAJOR
+//#define CONFIG_STREAMS_SPX_MAJOR 0
+#error CONFIG_STREAMS_SPX_MAJOR must be defined.
 #endif
 
 modID_t modid = CONFIG_STREAMS_SPX_MODID;
@@ -104,7 +107,7 @@ MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif
-MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver.");
+MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver (0 for allocation).");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SPX_MODID));
@@ -118,7 +121,7 @@ MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0);
 #endif
-MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver.");
+MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver (0 for allocation).");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR) "-*");
@@ -138,6 +141,9 @@ static struct module_info spx_minfo = {
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
+
+static struct module_stat spx_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat spx_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 typedef struct spx {
 	struct spx *next;
@@ -221,7 +227,8 @@ spx_wput(queue_t *q, mblk_t *mp)
 				spin_unlock(&spx_lock);
 				/* FIXME: welding is probably not enough.  We probably have to link 
 				   the two stream heads together, pipe-style as well as setting
-				   some stream head characteristics */
+				   some stream head characteristics.  People would be better to use 
+				   the pipe(4) device anyway. */
 				break;
 			}
 			spin_unlock(&spx_lock);
@@ -349,12 +356,14 @@ static struct qinit spx_rqinit = {
 	.qi_qopen = spx_open,
 	.qi_qclose = spx_close,
 	.qi_minfo = &spx_minfo,
+	.qi_mstat = &spx_rstat,
 };
 
 static struct qinit spx_wqinit = {
 	.qi_putp = spx_wput,
 	.qi_srvp = NULL,
 	.qi_minfo = &spx_minfo,
+	.qi_mstat = &spx_wstat,
 };
 
 static struct streamtab spx_info = {

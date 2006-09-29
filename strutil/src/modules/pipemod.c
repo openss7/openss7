@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -129,6 +129,8 @@ static struct module_info pipemod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat pipemod_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -140,7 +142,7 @@ static struct module_info pipemod_minfo = {
 static streamscall int
 pipemod_put(queue_t *q, mblk_t *mp)
 {
-	if (mp->b_datap->db_type == M_FLUSH) {
+	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		switch (mp->b_rptr[0] & (FLUSHR | FLUSHW)) {
 		case FLUSHR:
 			mp->b_rptr[0] &= ~FLUSHR;
@@ -206,6 +208,7 @@ static struct qinit pipemod_qinit = {
 	.qi_qopen = pipemod_open,
 	.qi_qclose = pipemod_close,
 	.qi_minfo = &pipemod_minfo,
+	.qi_mstat = &pipemod_mstat,
 };
 
 static struct streamtab pipemod_info = {

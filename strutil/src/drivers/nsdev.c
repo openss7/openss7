@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/10 07:24:12 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/09/29 11:51:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/10 07:24:12 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/09/29 11:51:10 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/10 07:24:12 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/09/29 11:51:10 $";
 
 #define _LFS_SOURCE
 
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/03/10 07:24:12 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/09/29 11:51:10 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -147,14 +147,18 @@ LFSSTATIC struct module_info nsdev_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat nsdev_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 LFSSTATIC struct qinit nsdev_rinit = {
 	// qi_putp:putq,
 	qi_minfo:&nsdev_minfo,
+	qi_mstat:&nsdev_mstat,
 };
 
 LFSSTATIC struct qinit nsdev_winit = {
 	// qi_putp:putq,
 	qi_minfo:&nsdev_minfo,
+	qi_mstat:&nsdev_mstat,
 };
 
 LFSSTATIC struct streamtab nsdev_info = {
@@ -192,10 +196,10 @@ nsdevopen(struct inode *inode, struct file *file)
 		dev_t dev = makedevice(major, minor);
 		int sflag = (file->f_flags & O_CLONE) ? CLONEOPEN : DRVOPEN;
 
-		printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
+		_printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 		err = spec_open(file, cdev, dev, sflag);
-		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		ctrace(sdev_put(cdev));
+		_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+		_ctrace(sdev_put(cdev));
 	} else
 		err = -ENOENT;
 	return (err);
@@ -274,7 +278,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	err = -ENXIO;
 	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
 		goto exit;
-	printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
+	_printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 	err = -ENXIO;
 	if (cdev == &nsdev_cdev)
 		goto cdev_put_exit;	/* would loop */
@@ -282,8 +286,8 @@ nsdev_open(struct inode *inode, struct file *file)
 	dev = makedevice(modid, instance);
 	err = spec_open(file, cdev, dev, CLONEOPEN);
       cdev_put_exit:
-	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	ctrace(sdev_put(cdev));
+	_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+	_ctrace(sdev_put(cdev));
       exit:
 	return (err);
 #endif

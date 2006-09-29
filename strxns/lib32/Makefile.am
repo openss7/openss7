@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/17 23:09:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:51:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/17 23:09:16 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:51:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/29 11:51:26  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.1  2006/09/17 23:09:16  brian
 # - added lib32 compatibility directories
 #
@@ -76,7 +84,7 @@ pkglibexec32_PROGRAMS		+= ldltest
 
 ldltest_SOURCES			= $(top_srcdir)/src/test/ldltest.c
 ldltest_LDADD			= $(STREAMS_LDADD32) $(STRCOMP_LDADD32)
-ldltest_LDFLAGS			= $(MACHINE_FLAGS)
+ldltest_LDFLAGS			= $(STREAMS_LDFLAGS32) $(STRCOMP_LDFLAGS32) $(MACHINE_FLAGS)
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -84,7 +92,7 @@ pkglibexec32_PROGRAMS		+= test-np_ip
 
 test_np_ip_SOURCES		= $(top_srcdir)/src/test/test-np_ip.c
 test_np_ip_LDADD		= $(STREAMS_LDADD32) $(STRCOMP_LDADD32)
-test_np_ip_LDFLAGS		= $(MACHINE_FLAGS)
+test_np_ip_LDFLAGS		= $(STREAMS_LDFLAGS32) $(STRCOMP_LDFLAGS32) $(MACHINE_FLAGS)
 test_np_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_np_ip_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -92,7 +100,7 @@ test_np_ip_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 #test_ip_SOURCES		= $(top_srcdir)/src/test/test-ip.c
 #test_ip_LDADD			= $(STREAMS_LDADD32) $(STRCOMP_LDADD32)
-#test_ip_LDFLAGS		= $(MACHINE_FLAGS)
+#test_ip_LDFLAGS		= $(STREAMS_LDFLAGS32) $(STRCOMP_LDFLAGS32) $(MACHINE_FLAGS)
 #test_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_ip_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 

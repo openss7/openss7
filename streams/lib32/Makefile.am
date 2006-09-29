@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/25 12:14:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/29 11:50:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 12:14:19 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/09/29 11:50:25  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.3  2006/09/25 12:14:19  brian
 # - added -static back for distcheck
 #
@@ -86,7 +94,8 @@ pkglibexec32_PROGRAMS		+= test-streams
 endif
 
 test_streams_SOURCES		= $(top_srcdir)/src/test/test-streams.c
-test_streams_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_streams_LDFLAGS		= $(MACHINE_FLAGS)
+test_streams_LDADD		= libstreams.la
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -98,7 +107,8 @@ pkglibexec32_PROGRAMS		+= test-clone
 endif
 
 test_clone_SOURCES		= $(top_srcdir)/src/test/test-clone.c
-test_clone_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_clone_LDFLAGS		= $(MACHINE_FLAGS)
+test_clone_LDADD		= libstreams.la
 test_clone_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_clone_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -110,7 +120,8 @@ pkglibexec32_PROGRAMS		+= test-connld
 endif
 
 test_connld_SOURCES		= $(top_srcdir)/src/test/test-connld.c
-test_connld_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_connld_LDFLAGS		= $(MACHINE_FLAGS)
+test_connld_LDADD		= libstreams.la
 test_connld_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_connld_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -122,7 +133,8 @@ pkglibexec32_PROGRAMS		+= test-echo
 endif
 
 test_echo_SOURCES		= $(top_srcdir)/src/test/test-echo.c
-test_echo_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_echo_LDFLAGS		= $(MACHINE_FLAGS)
+test_echo_LDADD			= libstreams.la
 test_echo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_echo_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -134,7 +146,8 @@ pkglibexec32_PROGRAMS		+= test-fifo
 endif
 
 test_fifo_SOURCES		= $(top_srcdir)/src/test/test-fifo.c
-test_fifo_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_fifo_LDFLAGS		= $(MACHINE_FLAGS)
+test_fifo_LDADD			= libstreams.la
 test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -146,7 +159,8 @@ pkglibexec32_PROGRAMS		+= test-log
 endif
 
 test_log_SOURCES		= $(top_srcdir)/src/test/test-log.c
-test_log_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_log_LDFLAGS		= $(MACHINE_FLAGS)
+test_log_LDADD			= libstreams.la
 test_log_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_log_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -158,7 +172,8 @@ pkglibexec32_PROGRAMS		+= test-loop
 endif
 
 test_loop_SOURCES		= $(top_srcdir)/src/test/test-loop.c
-test_loop_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_loop_LDFLAGS		= $(MACHINE_FLAGS)
+test_loop_LDADD			= libstreams.la
 test_loop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_loop_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -170,7 +185,8 @@ pkglibexec32_PROGRAMS		+= test-nsdev
 endif
 
 test_nsdev_SOURCES		= $(top_srcdir)/src/test/test-nsdev.c
-test_nsdev_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_nsdev_LDFLAGS		= $(MACHINE_FLAGS)
+test_nsdev_LDADD		= libstreams.la
 test_nsdev_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nsdev_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -182,7 +198,8 @@ pkglibexec32_PROGRAMS		+= test-mux
 endif
 
 test_mux_SOURCES		= $(top_srcdir)/src/test/test-mux.c
-test_mux_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_mux_LDFLAGS		= $(MACHINE_FLAGS)
+test_mux_LDADD			= libstreams.la
 test_mux_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_mux_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -194,7 +211,8 @@ pkglibexec32_PROGRAMS		+= test-nuls
 endif
 
 test_nuls_SOURCES		= $(top_srcdir)/src/test/test-nuls.c
-test_nuls_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_nuls_LDFLAGS		= $(MACHINE_FLAGS)
+test_nuls_LDADD			= libstreams.la
 test_nuls_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nuls_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -206,7 +224,8 @@ pkglibexec32_PROGRAMS		+= test-pipe
 endif
 
 test_pipe_SOURCES		= $(top_srcdir)/src/test/test-pipe.c
-test_pipe_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_pipe_LDFLAGS		= $(MACHINE_FLAGS)
+test_pipe_LDADD			= libstreams.la
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -218,7 +237,8 @@ pkglibexec32_PROGRAMS		+= test-pipemod
 endif
 
 test_pipemod_SOURCES		= $(top_srcdir)/src/test/test-pipemod.c
-test_pipemod_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_pipemod_LDFLAGS		= $(MACHINE_FLAGS)
+test_pipemod_LDADD		= libstreams.la
 test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipemod_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -230,7 +250,8 @@ pkglibexec32_PROGRAMS		+= test-sad
 endif
 
 test_sad_SOURCES		= $(top_srcdir)/src/test/test-sad.c
-test_sad_LDFLAGS		= -static libstreams.la $(MACHINE_FLAGS)
+test_sad_LDFLAGS		= $(MACHINE_FLAGS)
+test_sad_LDADD			= libstreams.la
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -242,7 +263,8 @@ pkglibexec32_PROGRAMS		+= test-sc
 endif
 
 test_sc_SOURCES			= $(top_srcdir)/src/test/test-sc.c
-test_sc_LDFLAGS			= -static libstreams.la $(MACHINE_FLAGS)
+test_sc_LDFLAGS			= $(MACHINE_FLAGS)
+test_sc_LDADD			= libstreams.la
 test_sc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sc_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
@@ -259,10 +281,11 @@ libstreams_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/fdetach.c \
 				  $(top_srcdir)/lib/libc/streams.h
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
-libstreams_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION $(MACHINE_FLAGS)
+libstreams_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \
+				  $(MACHINE_FLAGS)
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-libstreams_la_LDFLAGS		+= -version-info 0:1:0
+libstreams_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 
 lib32_LTLIBRARIES		+= libLiS.la
 
@@ -277,10 +300,11 @@ libLiS_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/fdetach.c \
 				  $(top_srcdir)/lib/libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
-libLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION $(MACHINE_FLAGS)
+libLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \
+				  $(MACHINE_FLAGS)
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-libLiS_la_LDFLAGS		+= -version-info 0:1:0
+libLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 
 lib32_LTLIBRARIES		+= libpLiS.la
 
@@ -294,10 +318,11 @@ libpLiS_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/fdetach.c \
 				  $(top_srcdir)/lib/libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
-libpLiS_la_LDFLAGS		= -no-undefined -Wl,--version-script -Wl,$(top_srcdir)/lib/libc/streams.VERSION $(MACHINE_FLAGS)
+libpLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \
+				  $(MACHINE_FLAGS)
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-libpLiS_la_LDFLAGS		+= -version-info 0:1:0
+libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 
 ## RPM_BUILD_USER
 endif

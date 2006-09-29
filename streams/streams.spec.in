@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/09/18 01:23:07 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/09/29 11:50:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:23:07 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,6 +63,12 @@
 %global BUILD_test    1
 %global BUILD_devs    1
 %global MAKE_devs     0
+#global BUILD_lis     0
+#global BUILD_lfs     0
+
+#ifnarch noarch
+#global BUILD_lfs     1
+#endif
 
 # there are three ways to pass kernel version to the build process:
 #    global _kversion in /usr/lib/rpm/macros, /etc/rpm/macros or ~/.rpmmacros
@@ -92,13 +98,18 @@
 %global preloads    specfs streams
 %global libraries   streams LiS pLiS
 %global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2
-%global infofiles   %{name} %{virtual} SPG2 porting
-%global initfiles   specfs streams strerr strace
+%global infofiles   %{base} %{virtual} SPG2 porting
+%global initfiles   %{base} specfs streams strerr strace
+%global conffiles   *.conf
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
-%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
 %{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
+%{expand: %%global have_modules     %{?modules:  1}%{!?modules:  0}}
+%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
+%{expand: %%global have_tools       %{?tools:    1}%{!?tools:    0}}
+%{expand: %%global have_infofiles   %{?infofiles:1}%{!?infofiles:0}}
 %{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
+%{expand: %%global have_configfiles %{?conffiles:1}%{!?conffiles:0}}
 
 %if %{without_ko_modules}
 # assume devs for older kernels
@@ -110,16 +121,14 @@
 %global NEED_init     0
 %endif
 
-%{!?_lib32dir:        %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
-%{!?_pkglibexecdir:   %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
-%ifarch x86_64 ppc64 sparc64 ia64
-%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
-%else
-%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}}}
-%endif
 %{!?_configdir:       %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
 %{!?_modutildir:      %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
 %{!?_kmoduledir:      %{expand: %%global _kmoduledir      /lib/modules/%%{kernel_version}}}
+%{!?_pkglibexecdir:   %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
+%ifarch x86_64 ppc64 sparc64 ia64
+%{!?_lib32dir:        %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
+%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
+%endif
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -130,6 +139,11 @@
 %{?_without_indep:   %{expand: %%global BUILD_noarch  0}}
 %{?_without_arch:    %{expand: %%global BUILD_arch    0}}
 %{?_without_public:  %{expand: %%global BUILD_source  0}}
+#{?_without_lis:     %{expand: %%global BUILD_lis     0}}
+#{?_without_lis:     %{expand: %%global BUILD_lfs     1}}
+#{?_without_lfs:     %{expand: %%global BUILD_lfs     0}}
+#{?_without_lfs:     %{expand: %%global BUILD_lis     1}}
+
 %{?_with_devfs:      %{expand: %%global NEED_devs     0}}
 %{?_with_modules:    %{expand: %%global BUILD_modules 1}}
 %{?_with_devel:      %{expand: %%global BUILD_devel   1}}
@@ -137,6 +151,10 @@
 %{?_with_indep:      %{expand: %%global BUILD_noarch  1}}
 %{?_with_arch:       %{expand: %%global BUILD_arch    1}}
 %{?_with_public:     %{expand: %%global BUILD_source  1}}
+#{?_with_lis:        %{expand: %%global BUILD_lis     1}}
+#{?_with_lis:        %{expand: %%global BUILD_lfs     0}}
+#{?_with_lfs:        %{expand: %%global BUILD_lfs     1}}
+#{?_with_lfs:        %{expand: %%global BUILD_lis     0}}
 
 %define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
@@ -166,9 +184,39 @@
 %global BUILD_source  0
 %endif
 
+#global _STREAMS SVR 4.2
+#global _streams STREAMS
+#global _ksubdir streams
+#global _kmodext streams
+#if %{BUILD_lfs}
+#global _STREAMS LfS
+#global _streams streams
 %global _ksubdir streams
 %global _kmodext streams
 %global _conflict LiS
+#global _strvers @LFS_VERSION@%{?extrarelease2}
+#{expand: %%global _with_lfs --with-lfs}
+#endif
+#if %{BUILD_lis}
+#global _STREAMS LiS
+#global _streams LiS
+#global _ksubdir lis
+#global _kmodext lis
+#global _conflict streams
+#global _strvers @LIS_VERSION@%{?extrarelease2}
+#{expand: %%global _with_lis --with-lis}
+#endif
+
+%if %{have_modules}
+%else
+%global BUILD_modules       0
+%global BUILD_devs          0
+%endif
+
+%if %{have_libraries}
+%else
+%global BUILD_libs          0
+%endif
 
 %if %{BUILD_modules}
 %global FILES_modules       1
@@ -182,9 +230,12 @@
 
 %if %{BUILD_tools}
 %global FILES_libs          1
+%global FILES_libs32        1
 %global FILES_dev           1
 %global FILES_devlibs       1
+%global FILES_devlibs32     1
 %global FILES_tools         1
+%global FILES_tools32       1
 %global FILES_makedev       1
 %global FILES_builddev      1
 %global FILES_test          %{BUILD_test}
@@ -197,9 +248,12 @@
 %global FILES_ko_noinit     1
 %else
 %global FILES_libs          0
+%global FILES_libs32        0
 %global FILES_dev           0
 %global FILES_devlibs       0
+%global FILES_devlibs32     0
 %global FILES_tools         0
+%global FILES_tools32       0
 %global FILES_makedev       0
 %global FILES_builddev      0
 %global FILES_test          0
@@ -218,6 +272,7 @@
 %global FILES_doclibs       0
 %global FILES_dev           0
 %global FILES_devlibs       0
+%global FILES_devlibs32     0
 %global FILES_source        0
 %endif
 
@@ -226,9 +281,12 @@
 %global FILES_modules       0
 %global FILES_ko_modules    0
 %global FILES_libs          0
+%global FILES_libs32        0
 %global FILES_dev           0
 %global FILES_devlibs       0
+%global FILES_devlibs32     0
 %global FILES_tools         0
+%global FILES_tools32       0
 %endif
 
 %if %{BUILD_noarch}
@@ -250,7 +308,9 @@
 %global FILES_doc           0
 %else
 %global FILES_libs          0
+%global FILES_libs32        0
 %global FILES_devlibs       0
+%global FILES_devlibs32     0
 %global FILES_doclibs       0
 %endif
 
@@ -281,9 +341,24 @@
 %global FILES_init          0
 %endif
 
+%if %{have_configfiles}
+%else
+%global FILES_ko_noinit     0
+%endif
+
+%ifnarch x86_64 s390x sparc64 ppc64 ia64
+%global FILES_libs32        0
+%global FILES_devlibs32     0
+%global FILES_tools32       0
+%else
+%global FILES_libs          0
+%global FILES_devlibs       0
+%global FILES_tools         0
+%endif
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
+%global rpmrelease @PACKAGE_RPMRELEASE@
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
 %{?extrarelease2:  %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@%%{extrarelease2}}}
@@ -296,7 +371,7 @@
 
 %global descripline %{title} is an implementation of SVR 4.2 MP %{virtual} for Linux.
 
-Summary:        %{title} (SVR 4.2 MP %{virtual})
+Summary:        %{title} (SVR 4.2 MP %{virtual}).
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
@@ -578,7 +653,7 @@ function package_source() {
 # clean out binaries and auxilliary files
     ( cd %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease} ; make mostlyclean )
 # create symbolic link
-    ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
+    ( cd %{buildroot}%{_usrsrc} ; ln -sf %{name}-%{version}-%{fullrelease} %{name} )
 }
 
 %if %{BUILD_source}
@@ -619,6 +694,10 @@ Prereq:         lsof
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-core = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-core = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
@@ -889,7 +968,10 @@ Prefix:         %{_includedir}/%{name}/%{kernel_version}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
-Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-info = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-info = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-info = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
@@ -898,6 +980,7 @@ Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{virtual}-info = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease2}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -927,13 +1010,17 @@ was compiled.  This package applies to core kernel modules
 Summary:        %{title} run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
+%if %{FILES_libs32}
 Prefix:         %{_lib32dir}
+%endif
 Prefix:         %{_datadir}/locale
 Obsoletes:      %{name}-libs
 Prereq:         /sbin/ldconfig
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
@@ -948,7 +1035,6 @@ object) libraries necessary to run applications programs and
 utilities developed for %{title}.  Also included are the libtool
 .la files describing the shared object libraries.
 
-%if %{have_libraries}
 %pre lib
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
@@ -963,7 +1049,6 @@ if [ $1 = 1 ] ; then : # fresh install
         fi
     done
 fi
-%endif
 
 %post lib
 # ---------------------------------------------------------------------------
@@ -979,7 +1064,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then
     /sbin/ldconfig
 fi
 
-%if %{FILES_libs}
+%if %{FILES_libs32}
 %files lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
@@ -987,7 +1072,16 @@ fi
 %{_libdir}/*.la
 %{_lib32dir}/*.so*
 %{_lib32dir}/*.la
-#%{_datadir}/locale/*
+#{_datadir}/locale/*
+%endif
+
+%if %{FILES_libs}
+%files lib
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.so*
+%{_libdir}/*.la
+#{_datadir}/locale/*
 %endif
 
 # ===========================================================================
@@ -996,11 +1090,15 @@ fi
 Summary:        %{title} headers, libs and docs.
 Group:          Development/System
 Prefix:         %{_libdir}
+%if %{FILES_devlibs32}
 Prefix:         %{_lib32dir}
+%endif
 Prefix:         %{_includedir}/%{name}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-devel = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}
@@ -1016,12 +1114,21 @@ modules and drivers.  This also includes the header files and
 static libraries required to compile %{title} applications
 programs.
 
-%if %{FILES_devlibs}
+%if %{FILES_devlibs32}
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_libdir}/*.a
 %{_lib32dir}/*.a
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
+%endif
+
+%if %{FILES_devlibs}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.a
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*
 %endif
@@ -1042,8 +1149,9 @@ Group:          System Environment/Base
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_pkglibexecdir}
+%if %{FILES_tools32}
 Prefix:         %{_pkglibexec32dir}
-#Prefix:         %{_sysconfdir}
+%endif
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-utils
 Conflicts:      %{_conflict}-util
@@ -1051,6 +1159,8 @@ Conflicts:      %{_conflict}-utils
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-util = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease2}
@@ -1066,6 +1176,7 @@ configuration test utilities and commands associated with the
 running the validation test suites contained in the %{name}-test
 binary package.
 
+%if %{have_tools}
 %pre util
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ]; then : # fresh install
@@ -1097,6 +1208,19 @@ if [ $1 = 1 ]; then : # fresh install
         rmdir -p /usr/man 2>/dev/null || :
     fi
 fi
+%endif
+
+%if %{FILES_tools32}
+%files util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_bindir}/*
+%{_sbindir}/*
+%{_pkglibexecdir}/*test*
+#{_pkglibexecdir}/*tst
+%{_pkglibexec32dir}/*test*
+#{_pkglibexec32dir}/*tst
+%endif
 
 %if %{FILES_tools}
 %files util
@@ -1105,11 +1229,7 @@ fi
 %{_bindir}/*
 %{_sbindir}/*
 %{_pkglibexecdir}/*test*
-#%{_pkglibexecdir}/*tst
-%{_pkglibexec32dir}/*test*
-#%{_pkglibexec32dir}/*tst
-#%{_sysconfdir}/strload.conf
-#%{_sysconfdir}/strsetup.conf
+#{_pkglibexecdir}/*tst
 %endif
 
 # ===========================================================================
@@ -1127,6 +1247,8 @@ Obsoletes:      %{name}-devs
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-dev = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease2}
@@ -1187,6 +1309,8 @@ Conflicts:      %{_conflict}-tests
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-test = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease2}
@@ -1227,6 +1351,8 @@ Obsoletes:      %{name}-docs
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-doc = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease2}
@@ -1247,6 +1373,7 @@ functions.
 %post doc
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
+%if %{have_infofiles}
     if [ -x /sbin/install-info ] ; then
         # Older rpm versions do not compress info files.
         for n in %{infofiles} ; do
@@ -1259,6 +1386,7 @@ if [ $1 = 1 ] ; then : # fresh install
             fi
         done
     fi
+%endif
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
@@ -1271,6 +1399,7 @@ fi
 %preun doc
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+%if %{have_infofiles}
     if [ -x /sbin/install-info ] ; then
         # Older rpm versions do not compress info files.
         for n in %{infofiles} ; do
@@ -1283,6 +1412,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
             fi
         done
     fi
+%endif
 @COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.macros
 fi
@@ -1301,6 +1431,7 @@ fi
 %defattr(-,root,root)
 #doc ABOUT-NLS
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+#doc doc/specs doc/projects doc/drafts
 %doc LSM %{name}-%{version}.lsm
 %doc README-make
 %{_infodir}/*
@@ -1314,6 +1445,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+#doc doc/specs doc/projects doc/drafts
 %doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
@@ -1330,6 +1462,8 @@ Prefix:         %{_usrsrc}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-source = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease2}
@@ -1372,6 +1506,8 @@ Conflicts:      %{_conflict}-init
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{virtual}-init = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease2}
@@ -1725,45 +1861,52 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_sysconfdir}/%{name}.conf
-%{_sysconfdir}/strload.conf
-%{_sysconfdir}/strsetup.conf
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%config(noreplace) %{_configdir}/*
+%config(noreplace) %{_modutildir}/*
 %{_initrddir}/../*
-%{_configdir}/*
-%{_modutildir}/*
 %endif
 
 %if %{FILES_ko_init}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_sysconfdir}/%{name}.conf
-%{_sysconfdir}/strload.conf
-%{_sysconfdir}/strsetup.conf
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%config(noreplace) %{_configdir}/*
 %{_initrddir}/../*
-%{_configdir}/*
 %endif
 
 %if %{FILES_noinit}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_modutildir}/*
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%config(noreplace) %{_modutildir}/*
 %endif
 
 %if %{FILES_ko_noinit}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.145  2006/09/18 01:23:07  brian
-# - added FC5 and lib32 compatibility files
+# Revision 0.9.2.146  2006/09/29 11:50:20  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
 #
+
+* Mon Sep 18 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.145  2006/09/18 01:23:07  brian
+- added FC5 and lib32 compatibility files
 
 * Wed Aug 16 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.144  2006/08/16 07:37:58  brian

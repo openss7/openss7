@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:44 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 12:30:44 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.2  2006/09/29 11:50:38  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.1  2006/09/25 12:30:44  brian
 # - added files for new strnsl package
 #
@@ -68,7 +76,7 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.1 2006/09/25 12:30:44 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.2 2006/09/29 11:50:38 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strnsl],[0.9.2],[bugs@openss7.org])
 
@@ -111,6 +119,7 @@ AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_YACC
+AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 AM_GNU_GETTEXT_VERSION([0.14.5])

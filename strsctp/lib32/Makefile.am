@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/17 23:09:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/17 23:09:12 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:44 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/29 11:50:44  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.1  2006/09/17 23:09:12  brian
 # - added lib32 compatibility directories
 #
@@ -76,7 +84,7 @@ pkglibexec32_PROGRAMS		+= test-sctp
 
 test_sctp_SOURCES		= $(top_srcdir)/src/test/test-sctp.c
 test_sctp_LDADD			= $(STREAMS_LDADD32)
-test_sctp_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -84,7 +92,7 @@ pkglibexec32_PROGRAMS		+= test-sctp_n
 
 test_sctp_n_SOURCES		= $(top_srcdir)/src/test/test-sctp_n.c
 test_sctp_n_LDADD		= $(STREAMS_LDADD32)
-test_sctp_n_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_n_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -92,7 +100,7 @@ pkglibexec32_PROGRAMS		+= test-sctp_n2
 
 test_sctp_n2_SOURCES		= $(top_srcdir)/src/test/test-sctp_n2.c
 test_sctp_n2_LDADD		= $(STREAMS_LDADD32)
-test_sctp_n2_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_n2_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sctp_n2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n2_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -100,7 +108,7 @@ pkglibexec32_PROGRAMS		+= test-sctp_nc
 
 test_sctp_nc_SOURCES		= $(top_srcdir)/src/test/test-sctp_nc.c
 test_sctp_nc_LDADD		= $(STREAMS_LDADD32)
-test_sctp_nc_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_nc_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sctp_nc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -108,7 +116,7 @@ pkglibexec32_PROGRAMS		+= test-sctp_ns
 
 test_sctp_ns_SOURCES		= $(top_srcdir)/src/test/test-sctp_ns.c
 test_sctp_ns_LDADD		= $(STREAMS_LDADD32)
-test_sctp_ns_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_ns_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sctp_ns_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -116,7 +124,7 @@ pkglibexec32_PROGRAMS		+= test-sctp_t
 
 test_sctp_t_SOURCES		= $(top_srcdir)/src/test/test-sctp_t.c
 test_sctp_t_LDADD		= $(STREAMS_LDADD32)
-test_sctp_t_LDFLAGS		= $(MACHINE_FLAGS)
+test_sctp_t_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -124,7 +132,7 @@ pkglibexec32_PROGRAMS		+= test-etsi_n
 
 test_etsi_n_SOURCES		= $(top_srcdir)/src/test/test-etsi_n.c
 test_etsi_n_LDADD		= $(STREAMS_LDADD32)
-test_etsi_n_LDFLAGS		= $(MACHINE_FLAGS)
+test_etsi_n_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_etsi_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_etsi_n_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -132,7 +140,7 @@ pkglibexec32_PROGRAMS		+= test-etsi_t
 
 test_etsi_t_SOURCES		= $(top_srcdir)/src/test/test-etsi_t.c
 test_etsi_t_LDADD		= $(STREAMS_LDADD32)
-test_etsi_t_LDFLAGS		= $(MACHINE_FLAGS)
+test_etsi_t_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_etsi_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_etsi_t_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
@@ -140,7 +148,7 @@ pkglibexec32_PROGRAMS		+= test-interop
 
 test_interop_SOURCES		= $(top_srcdir)/src/test/test-interop.c
 test_interop_LDADD		= $(STREAMS_LDADD32)
-test_interop_LDFLAGS		= $(MACHINE_FLAGS)
+test_interop_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_interop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_interop_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 

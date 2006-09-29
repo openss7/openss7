@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/10 07:24:12 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 11:51:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:12 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/10 07:24:12 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 11:51:09 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/10 07:24:12 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 11:51:09 $";
 
 #define _LFS_SOURCE
 
@@ -75,7 +75,7 @@ extern struct file_operations strm_f_ops;
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/03/10 07:24:12 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 11:51:09 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -152,18 +152,22 @@ LFSSTATIC struct module_info fifo_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat fifo_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat fifo_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 LFSSTATIC struct qinit fifo_rinit = {
 	.qi_putp = strrput,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 	.qi_minfo = &fifo_minfo,
+	.qi_mstat = &fifo_rstat,
 };
 
 LFSSTATIC struct qinit fifo_winit = {
 	.qi_putp = strwput,
 	.qi_srvp = strwsrv,
 	.qi_minfo = &fifo_minfo,
+	.qi_mstat = &fifo_wstat,
 };
 
 LFSSTATIC struct streamtab fifo_info = {
@@ -212,14 +216,14 @@ fifo_open(struct inode *inode, struct file *file)
 	int err;
 	dev_t dev = makedevice(fifo_cdev.d_modid, 0);
 
-	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
-	printd(("%s: %s: getting file operations\n", __FUNCTION__, fifo_cdev.d_name));
+	_printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
+	_printd(("%s: %s: getting file operations\n", __FUNCTION__, fifo_cdev.d_name));
 	{
 		struct file_operations *f_op;
 
 		err = -ENXIO;
 		if (!(f_op = fops_get(fifo_cdev.d_fop))) {
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			goto error;
 		}
 #ifdef CONFIG_STREAMS_DEBUG

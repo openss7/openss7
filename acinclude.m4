@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/09/25 12:24:25 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/09/29 11:49:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 12:24:25 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:49:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -312,6 +312,22 @@ AC_DEFUN([_OS7_SETUP], [dnl
     _LINUX_DEVFS
 dnl _GENKSYMS
     _OS7_CONFIG_KERNEL
+dnl
+dnl Must have these directories defined before the locator functions are called.
+dnl
+    AC_CACHE_CHECK([for master srcdir],[os7_cv_master_srcdir],[dnl
+	os7_cv_master_srcdir=`(cd $srcdir; pwd)`
+    ])
+    AC_CACHE_CHECK([for master builddir],[os7_cv_master_builddir],[dnl
+	os7_cv_master_builddir=`pwd`
+    ])
+    master_srcdir="$os7_cv_master_srcdir"
+    master_builddir="$os7_cv_master_builddir"
+    AC_SUBST([master_srcdir])
+    AC_SUBST([master_builddir])
+dnl
+dnl LiS or LFS.
+dnl
     with_lis='yes'
     with_lfs='yes'
     if test :"${with_LIS:-no}" = :no ; then
@@ -513,16 +529,6 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STACKS:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([stacks])
     fi
-    AC_CACHE_CHECK([for master srcdir],[os7_cv_master_srcdir],[dnl
-	os7_cv_master_srcdir=`(cd $srcdir; pwd)`
-    ])
-    AC_CACHE_CHECK([for master builddir],[os7_cv_master_builddir],[dnl
-	os7_cv_master_builddir=`pwd`
-    ])
-    master_srcdir="$os7_cv_master_srcdir"
-    master_builddir="$os7_cv_master_builddir"
-    AC_SUBST([master_srcdir])
-    AC_SUBST([master_builddir])
 ])# _OS7_OUTPUT
 # =============================================================================
 

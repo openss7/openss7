@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: log.h,v 0.9.2.8 2006/03/10 07:24:14 brian Exp $
+ @(#) $Id: log.h,v 0.9.2.9 2006/09/29 11:51:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_LOG_H__
 #define __SYS_STREAMS_LOG_H__
 
-#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/10 07:24:14 $"
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/29 11:51:12 $"
+
+/* This file can be processed with doxygen(1). */
 
 #ifndef __SYS_LOG_H__
 #warning "Do no include sys/streams/log.h directly, include sys/log.h instead."
@@ -60,5 +62,21 @@
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
+
+/**
+  * @ingroup strlog STREAMS Log Driver strlog(4)
+  * @{ */
+/**
+  * @file
+  * @brief STREAMS Log Driver strlog(4).
+  *
+  * This file is empty.  One of the reasons for this is that the Linux/BSD log.h
+  * header files provide most of the definitions needed in this file.  See also,
+  * log(4).
+  * @{ */
+#define FOO
+#define BAR
+/** @} */
+/** @} */
 
 #endif				/* __SYS_STREAMS_LOG_H__ */

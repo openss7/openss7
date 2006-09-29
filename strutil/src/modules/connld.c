@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:14 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/03/10 07:24:14 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -126,6 +126,8 @@ static struct module_info connld_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat connld_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -162,6 +164,7 @@ static struct qinit connld_qinit = {
 	.qi_qopen = connld_open,
 	.qi_qclose = connld_close,
 	.qi_minfo = &connld_minfo,
+	.qi_mstat = &connld_mstat,
 };
 
 static struct streamtab connld_info = {

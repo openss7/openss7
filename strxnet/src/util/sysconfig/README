@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Sockets -- system configuration readme file.  2006-09-26
-$Id: README,v 0.9.2.2 2006/09/29 11:50:57 brian Exp $
+OpenSS7 XTI/TLI Library -- system configuration readme file.  2006-09-26
+$Id: README,v 0.9.2.2 2006/09/29 11:51:23 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,9 +7,7 @@ See the end for copying conditions (for this file).
 This directory contains configuration files for use with init scripts as
 follows:
 
-  strsock	- init script configuration for the STREAMS SOCK modules
-  strsock.conf	- system controls for the STREAMS SOCK modules
-  sock2path	- default /etc/sock2path file
+  netconfig	- default network configuration database
 
 
 =========================================================================

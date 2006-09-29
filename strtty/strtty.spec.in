@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strtty.spec.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:23:14 $
+# @(#) $RCSfile: strtty.spec.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/29 11:50:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:23:14 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,7 @@
 %global BUILD_modules 1
 %global BUILD_devel   1
 %global BUILD_tools   1
-%global BUILD_libs    0
+%global BUILD_libs    1
 %global BUILD_noarch  1
 %global BUILD_arch    1
 %global BUILD_source  1
@@ -92,18 +92,24 @@
 %global base        @PACKAGE_LCNAME@
 %global title       @PACKAGE_TITLE@
 %global stitle      @PACKAGE_SHORTTITLE@
+%global virtual     STREAMS
 
-%global modules     streams-sad streams-echos steams-nuls streams-log
+#global modules     
 #global preloads    
 #global libraries   
 %global tools       %{base}_mknod
 %global infofiles   %{base}
-#global initfiles
+%global initfiles   %{base}
+%global conffiles   %{name}.conf
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
-%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
 %{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
+%{expand: %%global have_modules     %{?modules:  1}%{!?modules:  0}}
+%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
+%{expand: %%global have_tools       %{?tools:    1}%{!?tools:    0}}
+%{expand: %%global have_infofiles   %{?infofiles:1}%{!?infofiles:0}}
 %{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
+%{expand: %%global have_configfiles %{?conffiles:1}%{!?conffiles:0}}
 
 %if %{without_ko_modules}
 # assume devs for older kernels
@@ -115,16 +121,14 @@
 %global NEED_init     0
 %endif
 
-%{!?_lib32dir:        %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
-%{!?_pkglibexecdir:   %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
-%ifarch x86_64 ppc64 sparc64 ia64
-%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
-%else
-%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}}}
-%endif
 %{!?_configdir:       %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
 %{!?_modutildir:      %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
 %{!?_kmoduledir:      %{expand: %%global _kmoduledir      /lib/modules/%%{kernel_version}}}
+%{!?_pkglibexecdir:   %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
+%ifarch x86_64 ppc64 sparc64 ia64
+%{!?_lib32dir:        %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
+%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
+%endif
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -190,7 +194,7 @@
 %global _ksubdir streams
 %global _kmodext streams
 %global _conflict LiS
-%global _strvers @LFS_VERSION@%{?extrarelease}
+%global _strvers @LFS_VERSION@%{?extrarelease2}
 %{expand: %%global _with_lfs --with-lfs}
 %endif
 %if %{BUILD_lis}
@@ -199,8 +203,19 @@
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
-%global _strvers @LIS_VERSION@%{?extrarelease}
+%global _strvers @LIS_VERSION@%{?extrarelease2}
 %{expand: %%global _with_lis --with-lis}
+%endif
+
+%if %{have_modules}
+%else
+%global BUILD_modules       0
+%global BUILD_devs          0
+%endif
+
+%if %{have_libraries}
+%else
+%global BUILD_libs          0
 %endif
 
 %if %{BUILD_modules}
@@ -215,9 +230,12 @@
 
 %if %{BUILD_tools}
 %global FILES_libs          1
+%global FILES_libs32        1
 %global FILES_dev           1
 %global FILES_devlibs       1
+%global FILES_devlibs32     1
 %global FILES_tools         1
+%global FILES_tools32       1
 %global FILES_makedev       1
 %global FILES_builddev      1
 %global FILES_test          %{BUILD_test}
@@ -230,9 +248,12 @@
 %global FILES_ko_noinit     1
 %else
 %global FILES_libs          0
+%global FILES_libs32        0
 %global FILES_dev           0
 %global FILES_devlibs       0
+%global FILES_devlibs32     0
 %global FILES_tools         0
+%global FILES_tools32       0
 %global FILES_makedev       0
 %global FILES_builddev      0
 %global FILES_test          0
@@ -251,6 +272,7 @@
 %global FILES_doclibs       0
 %global FILES_dev           0
 %global FILES_devlibs       0
+%global FILES_devlibs32     0
 %global FILES_source        0
 %endif
 
@@ -259,9 +281,12 @@
 %global FILES_modules       0
 %global FILES_ko_modules    0
 %global FILES_libs          0
+%global FILES_libs32        0
 %global FILES_dev           0
 %global FILES_devlibs       0
+%global FILES_devlibs32     0
 %global FILES_tools         0
+%global FILES_tools32       0
 %endif
 
 %if %{BUILD_noarch}
@@ -283,7 +308,9 @@
 %global FILES_doc           0
 %else
 %global FILES_libs          0
+%global FILES_libs32        0
 %global FILES_devlibs       0
+%global FILES_devlibs32     0
 %global FILES_doclibs       0
 %endif
 
@@ -314,6 +341,28 @@
 %global FILES_init          0
 %endif
 
+%if %{have_configfiles}
+%else
+%global FILES_ko_noinit     0
+%endif
+
+%ifnarch x86_64 s390x sparc64 ppc64 ia64
+%global FILES_libs32        0
+%global FILES_devlibs32     0
+%global FILES_tools32       0
+%else
+%global FILES_libs          0
+%global FILES_devlibs       0
+%global FILES_tools         0
+%endif
+
+%if %{have_libraries}
+%else
+%global FILES_libs          0
+%global FILES_libs32        0
+%global FILES_devlibs       0
+%global FILES_devlibs32     0
+%endif
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
@@ -330,7 +379,7 @@
 
 %global descripline %{title} provides %{_STREAMS} STREAMS Terminals.
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux.
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
@@ -377,11 +426,11 @@ BuildRequires:  gcc >= 2.96
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
-BuildRequires: strcompat-devel >= @STRCOMP_VERSION@%{?extrarelease}
+BuildRequires: strcompat-devel = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %if %{without_ko_modules}
-BuildRequires: strcompat-%{info_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease}
+BuildRequires: strcompat-%{info_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %else
-BuildRequires: strcompat-%{core_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease}
+BuildRequires: strcompat-%{core_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %endif
 
 # these are some needs of the configure script
@@ -572,7 +621,7 @@ function package_source() {
 # clean out binaries and auxilliary files
     ( cd %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease} ; make mostlyclean )
 # create symbolic link
-    ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
+    ( cd %{buildroot}%{_usrsrc} ; ln -sf %{name}-%{version}-%{fullrelease} %{name} )
 }
 
 %if %{BUILD_source}
@@ -596,14 +645,15 @@ package_source
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
 Prefix:         %{_kmoduledir}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
-Requires:       strcompat-%{core_name} = %version_of_or strcompat-%{core_name} @STRCOMP_VERSION@%{?extrarelease}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+Requires:       strcompat-%{core_name} = %version_of_or strcompat-%{core_name} @STRCOMP_VERSION@%{?extrarelease2}
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %if %{NEED_devs}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 %endif
+%{?_conflict:Conflicts:      %{name}-%{_conflict}-%{core_name}}
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
@@ -615,14 +665,19 @@ Autoreq:        true
 %{?_gif:Icon: %_gif}
 Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-core = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-core = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-core = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-core = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
@@ -890,14 +945,17 @@ Autoreq:        true
 %{?_gif:Icon: %_gif}
 Provides:       %{name}-%{_streams}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-info = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-info = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-info = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-info = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-info = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-info = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-info = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
@@ -930,7 +988,9 @@ This package applies to core kernel modules
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
+%if %{FILES_libs32}
 Prefix:         %{_lib32dir}
+%endif
 Prefix:         %{_datadir}/locale
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
@@ -940,13 +1000,13 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-STREAMS-lib = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-STREAMS-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-STREAMS-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
@@ -958,7 +1018,6 @@ The %{name}-%{_streams}-lib package contains the run-time
 and utilities developed for %{title}.  Also included are the
 libtool .la files describing the shared object libraries.
 
-%if %{have_libraries}
 %pre %{_streams}-lib
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
@@ -973,7 +1032,6 @@ if [ $1 = 1 ] ; then : # fresh install
         fi
     done
 fi
-%endif
 
 %post %{_streams}-lib
 # ---------------------------------------------------------------------------
@@ -989,7 +1047,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then
     /sbin/ldconfig
 fi
 
-%if %{FILES_libs}
+%if %{FILES_libs32}
 %files %{_streams}-lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
@@ -997,7 +1055,16 @@ fi
 %{_libdir}/*.la
 %{_lib32dir}/*.so*
 %{_lib32dir}/*.la
-%{_datadir}/locale/*
+#{_datadir}/locale/*
+%endif
+
+%if %{FILES_libs}
+%files %{_streams}-lib
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.so*
+%{_libdir}/*.la
+#{_datadir}/locale/*
 %endif
 
 # ===========================================================================
@@ -1006,7 +1073,9 @@ fi
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
 Group:          Development/System
 Prefix:         %{_libdir}
+%if %{FILES_devlibs32}
 Prefix:         %{_lib32dir}
+%endif
 Prefix:         %{_includedir}/%{name}
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
@@ -1025,12 +1094,21 @@ STREAMS %{stitle} applications.  This also includes the header
 files and static libraries required to compile OpenSS7
 %{_STREAMS} STREAMS %{stitle} applications programs.
 
-%if %{FILES_devlibs}
+%if %{FILES_devlibs32}
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_libdir}/*.a
 %{_lib32dir}/*.a
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
+%endif
+
+%if %{FILES_devlibs}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.a
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*
 %endif
@@ -1048,11 +1126,12 @@ files and static libraries required to compile OpenSS7
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} admin utilities.
 Group:          System Environment/Base
-Prefix:         %{_bindir}
+#Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_pkglibexecdir}
+%if %{FILES_tools32}
 Prefix:         %{_pkglibexec32dir}
-Prefix:         %{_sysconfdir}
+%endif
 %if %{have_libraries}
 Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
 %endif
@@ -1066,13 +1145,13 @@ Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-STREAMS-util = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-STREAMS-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-STREAMS-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
@@ -1086,6 +1165,7 @@ package.  Note that these utilities are needed for running the
 validation test suites contained in the %{name}-test binary
 package.
 
+%if %{have_tools}
 %pre %{_streams}-util
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ]; then : # fresh install
@@ -1102,17 +1182,28 @@ if [ $1 = 1 ]; then : # fresh install
         done
     done
 fi
+%endif
+
+%if %{FILES_tools32}
+%files %{_streams}-util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+#{_bindir}/*
+%{_sbindir}/*
+%{_pkglibexecdir}/*test*
+#{_pkglibexecdir}/*tst
+%{_pkglibexec32dir}/*test*
+#{_pkglibexec32dir}/*tst
+%endif
 
 %if %{FILES_tools}
 %files %{_streams}-util
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#%{_bindir}/*
+#{_bindir}/*
 %{_sbindir}/*
 %{_pkglibexecdir}/*test*
-#%{_pkglibexecdir}/*tst
-%{_pkglibexec32dir}/*test*
-#%{_pkglibexec32dir}/*tst
+#{_pkglibexecdir}/*tst
 %endif
 
 # ===========================================================================
@@ -1140,8 +1231,9 @@ The %{name}-dev binary package contains the device definitions
 necessary to run applications programs and utilities developed
 for %{title}.  On older systems, this binary creates the devices
 themselvs.  On newer systems, this binary package includes the
-executable for creating devices from init scripts.  The package
-is not required for devfs based systems.
+executable for creating devices from init scripts.
+
+The package is not required for devfs based systems.
 
 %if %{MAKE_devs}
 %post dev
@@ -1194,7 +1286,8 @@ Release:        %{fullrelease}
 %{descripline}
 The %{name}-test binary package provides the autotest validation
 testsuites used for validating and troubleshooting the %{title}
-package.
+package.  It also includes the send-pr script for generating and
+submitting problem reports to @PACKAGE_BUGREPORT@.
 
 %if %{FILES_test}
 %files test
@@ -1239,6 +1332,7 @@ functions.
 %post doc
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
+%if %{have_infofiles}
     if [ -x /sbin/install-info ] ; then
         # Older rpm versions do not compress info files.
         for n in %{infofiles} ; do
@@ -1251,6 +1345,7 @@ if [ $1 = 1 ] ; then : # fresh install
             fi
         done
     fi
+%endif
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
@@ -1263,6 +1358,7 @@ fi
 %preun doc
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+%if %{have_infofiles}
     if [ -x /sbin/install-info ] ; then
         # Older rpm versions do not compress info files.
         for n in %{infofiles} ; do
@@ -1275,6 +1371,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
             fi
         done
     fi
+%endif
 @COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.macros
 fi
@@ -1293,7 +1390,7 @@ fi
 %defattr(-,root,root)
 %doc ABOUT-NLS
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
-#%doc doc/specs
+#doc doc/specs doc/projects doc/drafts
 %doc LSM %{name}-%{version}.lsm
 %doc README-make
 %{_infodir}/*
@@ -1307,7 +1404,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
-#%doc doc/specs
+#doc doc/specs doc/projects doc/drafts
 %doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
@@ -1351,7 +1448,7 @@ better to use the tarball or source rpm release.
 # ===========================================================================
 %package init
 
-Summary:        %{title} init scripts and config files
+Summary:        %{title} init scripts and config files.
 Group:          System Environment/Base
 Prefix:         %{_configdir}
 Prefix:         %{_initrddir}
@@ -1359,7 +1456,7 @@ Prefix:         %{_sysconfdir}
 %if %{without_ko_modules}
 Prefix:         %{_modutildir}
 %endif
-Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease}
+Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease2}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-inits
 Autoreq:        true
@@ -1717,43 +1814,55 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{_sysconfdir}/%{name}.conf
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%config(noreplace) %{_configdir}/*
+%config(noreplace) %{_modutildir}/*
 %{_initrddir}/../*
-%{_configdir}/*
-%{_modutildir}/*
 %endif
 
 %if %{FILES_ko_init}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{_sysconfdir}/%{name}.conf
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%config(noreplace) %{_configdir}/*
 %{_initrddir}/../*
-%{_configdir}/*
 %endif
 
 %if %{FILES_noinit}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_modutildir}/*
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?modules:%config(noreplace) %{_modutildir}/*}
 %endif
 
 %if %{FILES_ko_noinit}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strtty.spec.in,v $
-# Revision 0.9.2.2  2006/09/18 01:23:14  brian
-# - added FC5 and lib32 compatibility files
+# Revision 0.9.2.3  2006/09/29 11:50:58  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
 #
-# Revision 0.9.2.1  2006/08/23 09:53:07  brian
-# - started STREAMS Terminals package
-#
+
+* Mon Sep 18 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.2  2006/09/18 01:23:14  brian
+- added FC5 and lib32 compatibility files
+
+* Wed Aug 23 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.1  2006/08/23 09:53:07  brian
+- started STREAMS Terminals package
 
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi

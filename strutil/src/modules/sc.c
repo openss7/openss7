@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/08/23 11:06:42 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/09/29 11:51:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/23 11:06:42 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.33  2006/09/29 11:51:14  brian
+ - libtool library tweaks in Makefile.am
+ - better rpm spec handling in *.spec.in
+ - added AC_LIBTOOL_DLOPEN to configure.ac
+ - updated some copyright headers
+ - rationalized item in two packages
+ - added manual pages, drivers and modules to new strtty package
+
  Revision 0.9.2.32  2006/08/23 11:06:42  brian
  - corrections for compile
 
@@ -58,10 +66,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/08/23 11:06:42 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/09/29 11:51:14 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/08/23 11:06:42 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/09/29 11:51:14 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -82,7 +90,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/08/23 11:06:42 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/09/29 11:51:14 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -649,7 +657,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 						_trace();
 						/* list all devices */
 						for (i = 0; i < MAX_STRDEV; i++) {
-							struct cdevsw *cdev;
+							struct fmodsw *cdev;
 							struct streamtab *st;
 
 							cdev = &lis_fstr_sw[i];
@@ -740,6 +748,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 						    sc_mlist_copy(-1, NULL, mlist, reset, flag);
 					}
 				}
+#endif
 				_trace();
 				mp->b_datap->db_type = M_COPYOUT;
 				ioc->copyreq.cq_addr = uaddr;
@@ -754,7 +763,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 				rval = (int) (long) ioc->copyresp.cp_private;
 				goto ack;
 			}
-#endif
 		}
 	      nak:
 		mp->b_datap->db_type = M_IOCNAK;
@@ -855,20 +863,26 @@ static struct fmodsw sc_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
+#ifdef LFS
 static void *sc_opaque;
+#endif
 
 static void
 sc_unregister_ioctl32(void)
 {
+#ifdef LFS
 	if (sc_opaque != NULL)
 		unregister_ioctl32(sc_opaque);
+#endif
 }
 
 static int
 sc_register_ioctl32(void)
 {
+#ifdef LFS
 	if ((sc_opaque = register_ioctl32(SC_IOC_LIST)) == NULL)
 		return (-ENOMEM);
+#endif
 	return (0);
 }
 

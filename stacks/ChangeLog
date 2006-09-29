@@ -1,3 +1,11 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: libtool library tweaks
+	* configure.ac: add AC_LIBTOOL_DLOPEN
+	* strss7.spec.in: better spec file handling
+	* lib32/Makefile.am: libtool library tweaks
+	* po/de.po: logs in headers is changing the darn line numbers
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distinguish LDADD and LDFLAGS

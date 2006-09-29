@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.4 $) $Date: 2006/03/06 11:37:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.5 $) $Date: 2006/09/29 11:50:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:37:46 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.4.5  2006/09/29 11:50:03  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 1.1.4.4  2006/03/06 11:37:46  brian
 # - updated headers
 #
@@ -71,7 +79,8 @@ check_PROGRAMS		= wrapper
 wrapper_SOURCES		= wrapper.c
 wrapper_DEPENDENCIES	= $(top_builddir)/$(STRCONF_CONFIG) \
 			  $(top_builddir)/libLiS.la
-wrapper_LDFLAGS		= $(top_builddir)/libLiS.la
+wrapper_LDFLAGS		=
+wrapper_LDADD		= $(top_builddir)/libLiS.la
 wrapper_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 wrapper_CFLAGS		= $(USER_CFLAGS)
 

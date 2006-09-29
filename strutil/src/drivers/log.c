@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/07/25 06:39:21 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 11:51:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:21 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:51:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/07/25 06:39:21 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 11:51:10 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/07/25 06:39:21 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 11:51:10 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -87,7 +87,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/07/25 06:39:21 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 11:51:10 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -165,6 +165,30 @@ static struct module_info log_minfo = {
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
+
+static struct module_stat log_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat log_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
+#if 0
+/*
+ *  Locking
+ */
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+
+#endif
+#endif
 
 queue_t *log_conq = NULL;
 queue_t *log_errq = NULL;
@@ -479,6 +503,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct log *p, **pp = &log_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
+	unsigned long flags;
 
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
@@ -498,7 +523,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		if (cminor < 1)
 			return (ENXIO);
-		spin_lock_bh(&log_lock);
+		spin_lock_str(&log_lock, flags);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
@@ -509,14 +534,14 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					spin_unlock_bh(&log_lock);
+					spin_unlock_str(&log_lock, flags);
 					kmem_free(p, sizeof(*p));
 					return (EIO);	/* bad error */
 				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
-			spin_unlock_bh(&log_lock);
+			spin_unlock_str(&log_lock, flags);
 			kmem_free(p, sizeof(*p));
 			return (EBUSY);	/* no minors left */
 		}
@@ -526,7 +551,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		p->prev = pp;
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
-		spin_unlock_bh(&log_lock);
+		spin_unlock_str(&log_lock, flags);
 		qprocson(q);
 		return (0);
 	}
@@ -538,17 +563,18 @@ static streamscall int
 log_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct log *p;
+	unsigned long flags;
 
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	qprocsoff(q);
-	spin_lock_bh(&log_lock);
+	spin_lock_str(&log_lock, flags);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-	spin_unlock_bh(&log_lock);
+	spin_unlock_str(&log_lock, flags);
 	return (0);
 }
 
@@ -558,11 +584,13 @@ static struct qinit log_rqinit = {
 	.qi_qopen = log_open,
 	.qi_qclose = log_close,
 	.qi_minfo = &log_minfo,
+	.qi_mstat = &log_rstat,
 };
 
 static struct qinit log_wqinit = {
 	.qi_putp = log_wput,
 	.qi_minfo = &log_minfo,
+	.qi_mstat = &log_wstat,
 };
 
 static struct streamtab log_info = {

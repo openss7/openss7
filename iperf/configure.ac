@@ -55,7 +55,7 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_REVISION([$Id])
-AC_PREREQ(2.59)
+AC_PREREQ([2.59])
 AC_INIT([Iperf],[2.0],[bugs@openss7.org],[iperf])
 
 _OPENSS7_DIRCHANGE
@@ -81,23 +81,23 @@ fi
 
 AC_GNU_SOURCE
 
-AC_ARG_ENABLE(ipv6, AS_HELP_STRING([--disable-ipv6],
+AC_ARG_ENABLE([ipv6], AS_HELP_STRING([--disable-ipv6],
 	    [disable ipv6 support (default is autodetect)]), 
 	ac_cv_have_ipv6=$enable_ipv6,)
 
-AC_ARG_ENABLE(multicast, AS_HELP_STRING([--disable-multicast],
+AC_ARG_ENABLE([multicast], AS_HELP_STRING([--disable-multicast],
 	    [disable multicast support (default is autodetect)]),
 	ac_cv_multicast=$enable_multicast,)
 
-AC_ARG_ENABLE(threads, AS_HELP_STRING([--disable-threads],
+AC_ARG_ENABLE([threads], AS_HELP_STRING([--disable-threads],
 	    [disable thread support (default is autodetect)]))
 
-AC_ARG_ENABLE(debuginfo, AS_HELP_STRING([--enable-debuginfo],
+AC_ARG_ENABLE([debuginfo], AS_HELP_STRING([--enable-debuginfo],
 	    [enable debugging info for sockets (default is no)]),
 	enable_debuginfo=$enableval,
 	enable_debuginfo=no)
 
-AC_ARG_ENABLE(web100, AS_HELP_STRING([--disable-web100],
+AC_ARG_ENABLE([web100], AS_HELP_STRING([--disable-web100],
 	    [disable web100 support (default is autodetect)]))
 
 
@@ -112,7 +112,7 @@ dnl AC_ISC_POSIX
 dnl AC_PROG_INSTALL
 dnl AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-AC_LANG(C)
+AC_LANG([C])
 dnl AC_CANONICAL_HOST
 
 dnl
@@ -129,8 +129,8 @@ if test "$enable_threads" != no; then
 fi
 
 dnl check for -lnsl, -lsocket
-AC_CHECK_FUNC(gethostbyname,,AC_CHECK_LIB(nsl, gethostbyname))
-AC_CHECK_FUNC(socket,,AC_CHECK_LIB(socket, socket))
+AC_CHECK_FUNC([gethostbyname],,AC_CHECK_LIB([nsl], [gethostbyname]))
+AC_CHECK_FUNC([socket],,AC_CHECK_LIB([socket], [socket]))
 
 dnl
 dnl Checks for header files.
@@ -143,52 +143,52 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 dnl
 AC_C_CONST
 AC_TYPE_SIZE_T
-AC_CHECK_TYPES(ssize_t,,AC_DEFINE_UNQUOTED(ssize_t, int, [Define ssize_t type.]))
+AC_CHECK_TYPES([ssize_t],,AC_DEFINE_UNQUOTED([ssize_t], [int], [Define ssize_t type.]))
 AC_HEADER_TIME
 AC_STRUCT_TM
 
 dnl these intXX_t and u_intXX_t need to be defined to be the right size.
 
-AC_CHECK_SIZEOF(short)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long)
-AC_CHECK_SIZEOF(long long)
+AC_CHECK_SIZEOF([short])
+AC_CHECK_SIZEOF([int])
+AC_CHECK_SIZEOF([long])
+AC_CHECK_SIZEOF([long long])
 
-AC_CHECK_SIZEOF(unsigned short)
-AC_CHECK_SIZEOF(unsigned int)
-AC_CHECK_SIZEOF(unsigned long)
-AC_CHECK_SIZEOF(unsigned long long)
+AC_CHECK_SIZEOF([unsigned short])
+AC_CHECK_SIZEOF([unsigned int])
+AC_CHECK_SIZEOF([unsigned long])
+AC_CHECK_SIZEOF([unsigned long long])
 
-AH_TEMPLATE(int16_t)
-AH_TEMPLATE(int32_t)
-AH_TEMPLATE(int64_t)
-AH_TEMPLATE(u_int16_t)
-AH_TEMPLATE(u_int32_t)
-AH_TEMPLATE(u_int64_t)
+AH_TEMPLATE([int16_t])
+AH_TEMPLATE([int32_t])
+AH_TEMPLATE([int64_t])
+AH_TEMPLATE([u_int16_t])
+AH_TEMPLATE([u_int32_t])
+AH_TEMPLATE([u_int64_t])
 
-DAST_REPLACE_TYPE(int16_t, 2)
-DAST_REPLACE_TYPE(int32_t, 4)
-DAST_REPLACE_TYPE(int64_t, 8)
+DAST_REPLACE_TYPE([int16_t], [2])
+DAST_REPLACE_TYPE([int32_t], [4])
+DAST_REPLACE_TYPE([int64_t], [8])
 
-DAST_REPLACE_TYPE_UNSIGNED(u_int16_t, 2)
-DAST_REPLACE_TYPE_UNSIGNED(u_int32_t, 4)
-DAST_REPLACE_TYPE_UNSIGNED(u_int64_t, 8)
+DAST_REPLACE_TYPE_UNSIGNED([u_int16_t], [2])
+DAST_REPLACE_TYPE_UNSIGNED([u_int32_t], [4])
+DAST_REPLACE_TYPE_UNSIGNED([u_int64_t], [8])
 
-AC_CACHE_CHECK(3rd argument of accept, ac_cv_accept_arg, [
+AC_CACHE_CHECK([3rd argument of accept], [ac_cv_accept_arg], [
   dnl Try socklen_t (POSIX)
-  DAST_ACCEPT_ARG(socklen_t)
+  DAST_ACCEPT_ARG([socklen_t])
 
   dnl Try int (original BSD)
-  DAST_ACCEPT_ARG(int)
+  DAST_ACCEPT_ARG([int])
 
   dnl Try size_t (older standard; AIX)
-  DAST_ACCEPT_ARG(size_t)
+  DAST_ACCEPT_ARG([size_t])
 
   dnl Try short (shouldn't be)
-  DAST_ACCEPT_ARG(short)
+  DAST_ACCEPT_ARG([short])
 
   dnl Try long (shouldn't be)
-  DAST_ACCEPT_ARG(long)
+  DAST_ACCEPT_ARG([long])
 ])
 
 if test -z "$ac_cv_accept_arg" ; then
@@ -208,17 +208,17 @@ AC_TYPE_SIGNAL
 AC_FUNC_STRFTIME
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([atexit gettimeofday memset pthread_cancel select strchr strerror strtol usleep])
-AC_REPLACE_FUNCS(snprintf inet_pton inet_ntop gettimeofday)
+AC_REPLACE_FUNCS([snprintf inet_pton inet_ntop gettimeofday])
 
 dnl             Gotten from some NetBSD configure.in
 dnl		We assume that if sprintf() supports %lld or %qd,
 dnl		then all of *printf() does. If not, disable long long
 dnl		support because we don't know how to display it.
 
-AH_TEMPLATE(HAVE_QUAD_SUPPORT)
-AH_TEMPLATE(HAVE_PRINTF_QD)
+AH_TEMPLATE([HAVE_QUAD_SUPPORT])
+AH_TEMPLATE([HAVE_PRINTF_QD])
 
-AC_MSG_CHECKING(*printf() support for %lld)
+AC_MSG_CHECKING([*printf() support for %lld])
 can_printf_longlong=no
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 	#include <stdio.h>
@@ -228,14 +228,14 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 		return (strcmp(buf, "21726587590"));
 	}
 	]])],[
-	AC_MSG_RESULT(yes)
+	AC_MSG_RESULT([yes])
 	can_printf_longlong=yes
 	],[
-	AC_MSG_RESULT(no)
+	AC_MSG_RESULT([no])
 	],[ : ])
 
 if test $can_printf_longlong != yes; then
-	AC_MSG_CHECKING(*printf() support for %qd)
+	AC_MSG_CHECKING([*printf() support for %qd])
 	AC_RUN_IFELSE([AC_LANG_SOURCE([[
 		#include <stdio.h>
 		int main() {
@@ -244,16 +244,16 @@ if test $can_printf_longlong != yes; then
 			return (strcmp(buf, "21726587590"));
 		}
 		]])],[
-		AC_MSG_RESULT(yes)
+		AC_MSG_RESULT([yes])
 		can_printf_longlong=yes
-		AC_DEFINE(HAVE_PRINTF_QD, 1)
+		AC_DEFINE([HAVE_PRINTF_QD], [1])
 		],[
-		AC_MSG_RESULT(no)
+		AC_MSG_RESULT([no])
 		],[ : ])
 fi
 
 if test $can_printf_longlong = yes; then
-	AC_DEFINE(HAVE_QUAD_SUPPORT, 1)
+	AC_DEFINE([HAVE_QUAD_SUPPORT], [1])
 fi
 
 dnl ===================================================================
@@ -268,16 +268,16 @@ dnl Check for system services
 
 dnl check for multicast
 if test "$ac_cv_multicast" != no; then
-  AC_CHECK_TYPES(struct ip_mreq,,,[#include "include/headers_slim.h"])
-  AC_CHECK_DECLS(IP_ADD_MEMBERSHIP,,,[#include "include/headers_slim.h"])
-  AC_MSG_CHECKING(for multicast support)
+  AC_CHECK_TYPES([struct ip_mreq],,,[#include "include/headers_slim.h"])
+  AC_CHECK_DECLS([IP_ADD_MEMBERSHIP],,,[#include "include/headers_slim.h"])
+  AC_MSG_CHECKING([for multicast support])
   ac_cv_multicast=no
   if test "$ac_cv_have_decl_IP_ADD_MEMBERSHIP" = yes; then
     if test "$ac_cv_type_struct_ip_mreq" = yes; then
       ac_cv_multicast=yes
     fi
   fi
-  AC_MSG_RESULT($ac_cv_multicast)
+  AC_MSG_RESULT([$ac_cv_multicast])
   if test "$ac_cv_multicast" = yes; then
     AC_DEFINE([HAVE_MULTICAST], 1, [Define to enable multicast support])
   fi
@@ -285,10 +285,10 @@ fi
 
 dnl check for IPv6
 if test "$ac_cv_have_ipv6" != no; then
-  AC_CHECK_TYPES(struct sockaddr_storage,,,[#include "include/headers_slim.h"])
-  AC_CHECK_TYPES(struct sockaddr_in6,,,[#include "include/headers_slim.h"])
-  AC_CHECK_DECLS(AF_INET6,,,[#include "include/headers_slim.h"])
-  AC_MSG_CHECKING(for IPv6 headers and structures)
+  AC_CHECK_TYPES([struct sockaddr_storage],,,[#include "include/headers_slim.h"])
+  AC_CHECK_TYPES([struct sockaddr_in6],,,[#include "include/headers_slim.h"])
+  AC_CHECK_DECLS([AF_INET6],,,[#include "include/headers_slim.h"])
+  AC_MSG_CHECKING([for IPv6 headers and structures])
   ac_cv_have_ipv6=no
   if test "$ac_cv_type_struct_sockaddr_storage" = yes; then
     if test "$ac_cv_type_struct_sockaddr_in6" = yes; then
@@ -298,15 +298,15 @@ if test "$ac_cv_have_ipv6" != no; then
       fi
     fi
   fi
-  AC_MSG_RESULT($ac_cv_have_ipv6)
+  AC_MSG_RESULT([$ac_cv_have_ipv6])
 fi
 
 if test "$ac_cv_have_ipv6" = yes; then
   if test "$ac_cv_multicast" = yes; then
-    AC_CHECK_TYPES(struct ipv6_mreq,,,[#include "include/headers_slim.h"])
-    AC_CHECK_DECLS(IPV6_ADD_MEMBERSHIP,,,[#include "include/headers_slim.h"])
-    AC_CHECK_DECLS(IPV6_MULTICAST_HOPS,,,[#include "include/headers_slim.h"])
-    AC_MSG_CHECKING(for IPv6 multicast support)
+    AC_CHECK_TYPES([struct ipv6_mreq],,,[#include "include/headers_slim.h"])
+    AC_CHECK_DECLS([IPV6_ADD_MEMBERSHIP],,,[#include "include/headers_slim.h"])
+    AC_CHECK_DECLS([IPV6_MULTICAST_HOPS],,,[#include "include/headers_slim.h"])
+    AC_MSG_CHECKING([for IPv6 multicast support])
     ac_cv_have_ipv6_multicast=no
     if test "$ac_cv_type_struct_ipv6_mreq" = yes; then
       if test "$ac_cv_have_decl_IPV6_ADD_MEMBERSHIP" = yes; then
@@ -316,7 +316,7 @@ if test "$ac_cv_have_ipv6" = yes; then
 	fi
       fi
     fi
-    AC_MSG_RESULT($ac_cv_have_ipv6_multicast)
+    AC_MSG_RESULT([$ac_cv_have_ipv6_multicast])
   fi
 fi
 
@@ -338,22 +338,22 @@ fi
 
 dnl GNU make allows us to use the $(strip ...) builtin which eliminates a
 dnl large amount of extra whitespace in compile lines.
-AC_MSG_CHECKING(whether make is GNU make)
+AC_MSG_CHECKING([whether make is GNU make])
 STRIP_BEGIN=
 STRIP_END=
 if $ac_make --version 2> /dev/null | grep '^GNU Make ' > /dev/null ; then
     STRIP_BEGIN='$(strip $(STRIP_DUMMY)'
     STRIP_END=')'
-    AC_MSG_RESULT(yes)
+    AC_MSG_RESULT([yes])
 else
-    AC_MSG_RESULT(no)
+    AC_MSG_RESULT([no])
 fi
 
 dnl some Make 3.79 $(strip ) versions are broken and require an empty arg
 STRIP_DUMMY=
-AC_SUBST(STRIP_DUMMY)
-AC_SUBST(STRIP_BEGIN)
-AC_SUBST(STRIP_END)
+AC_SUBST([STRIP_DUMMY])
+AC_SUBST([STRIP_BEGIN])
+AC_SUBST([STRIP_END])
 
 _OPENSS7_PACKAGE([IPERF], [OpenSS7 IPERF Utility])
 _AUTOPR
@@ -361,8 +361,8 @@ _MAN_CONVERSION
 _PUBLIC_RELEASE
 _RPM_SPEC
 _DEB_DPKG
-AM_CONDITIONAL(WITH_LFS, false)dnl
-AM_CONDITIONAL(WITH_LIS, false)dnl
+AM_CONDITIONAL([WITH_LFS], [false])dnl
+AM_CONDITIONAL([WITH_LIS], [false])dnl
 
 AC_CONFIG_FILES([Makefile
 		scripts/texi/args.texi

@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: log.h,v 0.9.2.9 2006/09/23 00:35:53 brian Exp $
+ @(#) $Id: log.h,v 0.9.2.10 2006/09/29 11:50:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/23 00:35:53 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:50:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_LOG_H__
 #define __SYS_STREAMS_LOG_H__
 
-#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/23 00:35:53 $"
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/29 11:50:24 $"
 
 /* This file can be processed with doxygen(1). */
 

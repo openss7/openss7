@@ -1,3 +1,11 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: libtoo library tweaks
+	* configure.ac: added AC_LIBTOOL_DLOPEN
+	* strnsl.spec.in: better spec file handling
+	* lib32/Makefile.am: libtoo library tweaks
+	* src/util/sysconfig/netconfig: added description and copyright
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distinguish LDADD and LDFLAGS

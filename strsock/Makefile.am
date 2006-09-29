@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/27 05:15:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/29 11:50:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/27 05:15:29 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2006/09/29 11:50:46  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.5  2006/09/27 05:15:29  brian
 # - distinguish LDADD from LDFLAGS
 #
@@ -124,56 +132,56 @@ dist_sbin_SCRIPTS		=
 test_sockpath_SOURCES		= src/test/test-sockpath.c
 test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_sockpath_LDADD		= libsockpath.la $(STREAMS_LDADD)
-test_sockpath_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+test_sockpath_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_sockpath_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockpath_CFLAGS		= $(USER_CFLAGS)
 
 test_socket_SOURCES		= src/test/test-socket.c
 test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socket_LDADD		= libsocket.la $(STREAMS_LDADD)
-test_socket_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+test_socket_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_socket_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socket_CFLAGS		= $(USER_CFLAGS)
 
 test_socklib_SOURCES		= src/test/test-socklib.c
 test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socklib_LDADD		= libsocklib.la $(STREAMS_LDADD)
-test_socklib_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+test_socklib_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_socklib_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socklib_CFLAGS		= $(USER_CFLAGS)
 
 test_sockmod_SOURCES		= src/test/test-sockmod.c
 test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_sockmod_LDADD		= libsocklib.la $(STREAMS_LDADD)
-test_sockmod_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+test_sockmod_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_sockmod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockmod_CFLAGS		= $(USER_CFLAGS)
 
 test_socksys_SOURCES		= src/test/test-socksys.c
 test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_socksys_LDADD		= libsocket.la $(STREAMS_LDADD)
-test_socksys_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+test_socksys_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_socksys_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socksys_CFLAGS		= $(USER_CFLAGS)
 
 initsock_SOURCES		= src/util/initsock.c
 initsock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 initsock_LDADD			= $(STREAMS_LDADD)
-initsock_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+initsock_LDFLAGS		= $(STREAMS_LDFLAGS)
 initsock_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 initsock_CFLAGS			= $(USER_CFLAGS)
 
 soconfig_SOURCES		= src/util/soconfig.c
 soconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 soconfig_LDADD			= $(STREAMS_LDADD)
-soconfig_LDFLAGS		= -static $(STREAMS_LDFLAGS)
+soconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 soconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 soconfig_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
-#xxxxxx_LDFLAGS			= -static $(STREAMS_LDFLAGS)
+#xxxxxx_LDFLAGS			= $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #xxxxxx_CFLAGS			= $(USER_CFLAGS)
 
@@ -185,7 +193,7 @@ libsockpath_la_SOURCES		= src/lib/pthread.c \
 				  src/include/sockdb.h \
 				  src/include/sys/sockpath.h
 libsockpath_la_DEPENDENCIES	= src/lib/sockpath.VERSION
-libsockpath_la_LDFLAGS		= -no-undefined -version-info 0:0:0 \
+libsockpath_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sockpath.VERSION
 libsockpath_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsockpath_la_CFLAGS		= $(USER_CFLAGS)
@@ -197,9 +205,9 @@ libsocket_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/socket.c \
 				  gettext.h
 libsocket_la_DEPENDENCIES	= src/lib/socket.VERSION
-libsocket_la_LDFLAGS		= -no-undefined -version-info 0:0:0 \
+libsocket_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socket.VERSION \
-				  $(STREAMS_LDFLAGS)
+				  $(STREAMS_LDFLAGS) -static -lc -shared
 libsocket_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsocket_la_CFLAGS		= $(USER_CFLAGS)
 libsocket_la_LIBADD		= $(STREAMS_LDADD)
@@ -210,12 +218,12 @@ libsocklib_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/socklib.c \
 				  gettext.h
 libsocklib_la_DEPENDENCIES	= src/lib/socklib.VERSION
-libsocklib_la_LDFLAGS		= -no-undefined -version-info 0:0:0 \
+libsocklib_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socklib.VERSION \
-				  $(STREAMS_LDFLAGS) $(XTI_LDFLAGS) $(NSL_LDFLAGS)
+				  $(NSL_LDFLAGS) -static -lc -shared
 libsocklib_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
 libsocklib_la_CFLAGS		= $(USER_CFLAGS)
-libsocklib_la_LIBADD		= $(STREAMS_LDADD) $(XTI_LDADD) $(NSL_LDADD) libsockpath.la
+libsocklib_la_LIBADD		= $(NSL_LDADD) libsockpath.la
 
 ## RPM_BUILD_USER
 endif

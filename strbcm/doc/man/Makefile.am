@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 08:20:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/08 08:20:08 $ by $Author: brian $
+# Last Modified $Date: 2006/09/29 11:50:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/09/29 11:50:15  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
 # Revision 0.9.2.1  2006/03/08 08:20:08  brian
 # - starting off strbcm package
 #
@@ -71,9 +79,14 @@ if PKG_BUILD_INDEP
 ## distribution.  Manual pages ending in '.man' are uncooked.  Manual pages
 ## ending in '.[1-9]' are cooked.
 ##
-man_MANS = 
+man_MANS = \
+	man5/strbcm.5
 
-dist_noinst_MANS =
+dist_noinst_MANS = \
+	man5/strbcm.5.man
+
+MANS_UNUSED = \
+	man5/strbcm.5
 
 ## PKG_BUILD_INDEP
 endif

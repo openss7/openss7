@@ -1,3 +1,12 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: libtool library tweaks
+	* strxnet.spec.in: better spec file handling
+	* lib32/Makefile.am: libtool library tweaks
+	* po/de.po: logs in headers are changing line numbers
+	* src/util/sysconfig/README: corrected to nsl package
+	* src/util/sysconfig/netconfig: corrected to nsl package
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distinguish LDADD and LDFLAGS

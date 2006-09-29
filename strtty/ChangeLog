@@ -1,3 +1,32 @@
+2006-09-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: libtool library tweaks
+	* lib32/Makefile.am: libtool library tweaks
+	* configure.ac: added AC_LIBTOOL_DLOPEN
+	* strtty.spec.in: better spec file handling
+	* src/drivers/Config.in: updated for new driver
+	* src/modules/Config.in: updated for new modules
+	* doc/man/Makefile.am: added manual pages
+	* doc/man/man3/grantpt.3.man: added manual pages
+	* doc/man/man3/ptsname.3.man: added manual pages
+	* doc/man/man3/unlockpt.3.man: added manual pages
+	* doc/man/man3/xxx.3.man: added manual pages
+	* doc/man/man4/ldterm.4.man: added manual pages
+	* doc/man/man4/pckt.4.man: added manual pages
+	* doc/man/man4/ptc.4.man: added manual pages
+	* doc/man/man4/ptem.4.man: added manual pages
+	* doc/man/man4/ptm.4.man: added manual pages
+	* doc/man/man4/ptmx.4.man: added manual pages
+	* doc/man/man4/pts.4.man: added manual pages
+	* doc/man/man4/pty.4.man: added manual pages
+	* doc/man/man4/ttcompat.4.man: added manual pages
+	* doc/man/man5/strtty.5.man: added manual pages
+	* src/drivers/pty.c: added STREAMS driver
+	* src/modules/ldterm.c: added STREAMS module
+	* src/modules/pckt.c: added STREAMS module
+	* src/modules/ptem.c: added STREAMS module
+	* src/modules/ttcompat.c: added STREAMS module
+
 2006-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distinguish LDADD and LDFLAGS

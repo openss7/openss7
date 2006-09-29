@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:42 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/01 08:55:42 $ by $Author: brian $
+ Last Modified $Date: 2006/09/29 11:50:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.2  2006/09/29 11:50:56  brian
+ - libtool library tweaks in Makefile.am
+ - better rpm spec handling in *.spec.in
+ - added AC_LIBTOOL_DLOPEN to configure.ac
+ - updated some copyright headers
+ - rationalized item in two packages
+ - added manual pages, drivers and modules to new strtty package
+
  Revision 0.9.2.1  2006/09/01 08:55:42  brian
  - added headers and working up code
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:42 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:56 $"
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:42 $";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:56 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -102,7 +110,7 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/01 08:55:42 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:56 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -763,7 +771,7 @@ socksys_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	int type = 0;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
-	struct ssys *s, **sp, = &master.ssys.list;
+	struct ssys *s, **sp = &master.ssys.list;
 	unsigned long flags;
 
 	if (q->q_ptr != NULL) {
@@ -786,7 +794,7 @@ socksys_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		return (ENXIO);
 #endif
 	/* sorry, you cannot open by minor device */
-	if (cmajor > LAST_CMINOR) {
+	if (cminor > LAST_CMINOR) {
 		return (ENXIO);
 	}
 	type = cminor;
