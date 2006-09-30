@@ -701,6 +701,8 @@ striso/src/Makefile.in
 striso/tests/Makefile.in
 striso/TODO
 strnsl/ABOUT-NLS
+strnsl/doc/html
+strnsl/doc/latex
 strnsl/doc/manual/libxnsl.info
 strnsl/doc/manual/strnsl.info
 strnsl/doc/manual/strnsl.info-1
