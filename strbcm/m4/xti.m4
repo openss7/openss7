@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/09/29 10:57:46 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/09/30 07:29:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
+# Last Modified $Date: 2006/09/30 07:29:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.42  2006/09/30 07:29:06  brian
+# - corrected warning message
+# - corrected variable name in xti.m4
+# - added iso.m4 to locate striso package
+#
 # Revision 0.9.2.41  2006/09/29 10:57:46  brian
 # - autoconf does not like multiline cache variables
 #
@@ -165,7 +170,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    for xti_dir in $with_xti ; do
 		if test -d "$xti_dir" ; then
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
-		    if test -r "$xns_dir/$xns_what" ; then
+		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$with_xti"
 			AC_MSG_RESULT([yes])
 			break
@@ -378,8 +383,8 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 *** the --with-xti=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
 *** ./configure and try again.
 ***
-*** Perhaps you just forgot to load the STREAMS XNS package?  The
-*** STREAMS strxns package is available from The OpenSS7 Project
+*** Perhaps you just forgot to load the STREAMS XNET package?  The
+*** STREAMS strxnet package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
 *** named something like "strxnet-0.9.2.8.tar.gz".
 *** ])

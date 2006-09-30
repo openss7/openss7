@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/29 10:57:46 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/30 07:29:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
+# Last Modified $Date: 2006/09/30 07:29:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.7  2006/09/30 07:29:06  brian
+# - corrected warning message
+# - corrected variable name in xti.m4
+# - added iso.m4 to locate striso package
+#
 # Revision 0.9.2.6  2006/09/29 10:57:46  brian
 # - autoconf does not like multiline cache variables
 #
@@ -392,8 +397,8 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 *** the --with-nsl=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
 *** ./configure and try again.
 ***
-*** Perhaps you just forgot to load the STREAMS XNS package?  The
-*** STREAMS strxns package is available from The OpenSS7 Project
+*** Perhaps you just forgot to load the STREAMS NSL package?  The
+*** STREAMS strnsl package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
 *** named something like "strnsl-0.9.2.1.tar.gz".
 *** ])
