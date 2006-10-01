@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2006/09/29 11:50:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/10/01 21:30:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:09 $ by $Author: brian $
+# Last Modified $Date: 2006/10/01 21:30:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.76  2006/10/01 21:30:15  brian
+# - distribute release and library version files
+#
 # Revision 0.9.2.75  2006/09/29 11:50:09  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -1085,6 +1088,9 @@ endif
 ##
 ## Rules for building libraries
 ##
+LIBRARY_VERSION_FILES		= \
+				src/lib/libxnet/xnet.VERSION
+
 include am/libraries.am
 
 if PKG_BUILD_ARCH
@@ -1281,10 +1287,6 @@ include am/release.am
 include am/doxy.am
 
 EXTRA_DIST			+= \
-				  TODO \
-				  MANUAL \
-				  README-cvs \
-				  README-nexusware \
 				  debian/README.Debian \
 				  debian/TODO.Debian
 

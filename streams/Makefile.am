@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2006/09/29 11:50:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/10/01 21:30:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:20 $ by $Author: brian $
+# Last Modified $Date: 2006/10/01 21:30:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.140  2006/10/01 21:30:18  brian
+# - distribute release and library version files
+#
 # Revision 0.9.2.139  2006/09/29 11:50:20  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -539,6 +542,8 @@ endif
 ##
 ## Rules for building libraries
 ##
+LIBRARY_VERSION_FILES		= \
+				  lib/libc/streams.VERSION
 include am/libraries.am
 
 if RPM_BUILD_USER
@@ -1060,14 +1065,9 @@ include am/release.am
 include am/doxy.am
 
 EXTRA_DIST			+= \
-				  TODO \
-				  MANUAL \
-				  README-cvs \
-				  README-nexusware \
 				  README-LiS \
 				  debian/README.Debian \
-				  debian/TODO.Debian \
-				  lib/libc/streams.VERSION
+				  debian/TODO.Debian
 
 MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/aclocal.m4 \

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/09/18 17:43:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/10/01 21:30:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 17:43:05 $ by $Author: brian $
+# Last Modified $Date: 2006/10/01 21:30:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.26  2006/10/01 21:30:10  brian
+# - distribute release and library version files
+#
 # Revision 0.9.2.25  2006/09/18 17:43:05  brian
 # - added doxy rules to makefile and release notes
 #
@@ -145,10 +148,6 @@ ALL_RECURSIVE_TARGETS		+= all-doxy
 doxy: all-doxy
 
 EXTRA_DIST			+= \
-				  TODO \
-				  MANUAL \
-				  README-cvs \
-				  README-nexusware \
 				  README-LiS \
 				  debian/README.Debian \
 				  debian/TODO.Debian

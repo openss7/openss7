@@ -62,7 +62,7 @@ endif
 
 SUBDIRS += src
 
-if DEVELOPMENT
+if PKG_BUILD_INDEP
 SUBDIRS += doc
 endif
 
@@ -129,10 +129,6 @@ MANUAL_FILE			= doc/manual/$(PACKAGE).txt
 include am/release.am
 
 EXTRA_DIST			+= \
-				  TODO \
-				  MANUAL \
-				  README-cvs \
-				  README-nexusware \
 				  debian/README.Debian \
 				  debian/TODO.Debian
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/09/29 11:51:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/01 21:30:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:51:24 $ by $Author: brian $
+# Last Modified $Date: 2006/10/01 21:30:27 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.55  2006/10/01 21:30:27  brian
+# - distribute release and library version files
+#
 # Revision 0.9.2.54  2006/09/29 11:51:24  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -398,6 +401,8 @@ endif
 ##
 ## Rules for building libraries
 ##
+##LIBRARY_VERSION_FILES		=
+##
 ##include am/libraries.am
 ##
 ##AUTOCONFIG_H			= $(PKGINCL)/config.h
@@ -512,11 +517,7 @@ include am/release.am
 include am/doxy.am
 
 EXTRA_DIST			+= \
-				  TODO \
-				  MANUAL \
-				  README-cvs \
 				  README-LiS \
-				  README-nexusware \
 				  debian/README.Debian \
 				  debian/TODO.Debian
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/09/18 01:15:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/10/01 21:30:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:15:28 $ by $Author: brian $
+# Last Modified $Date: 2006/10/01 21:30:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.51  2006/10/01 21:30:14  brian
+# - distribute release and library version files
+#
 # Revision 0.9.2.50  2006/09/18 01:15:28  brian
 # - add 32bit libs, release file changes, additional packages
 #
@@ -310,6 +313,8 @@ include am/kernel.am
 ##
 ## Rules for building libraries
 ##
+##LIBRARY_VERSION_FILES		=
+##
 ##include am/libraries.am
 ##
 ##AUTOCONFIG_H			= $(PKGINCL)/config.h
@@ -426,10 +431,6 @@ MANUAL_FILE			= doc/manual/$(PACKAGE).txt
 include am/release.am
 
 EXTRA_DIST			+= \
-				  TODO \
-				  MANUAL \
-				  README-cvs \
-				  README-nexusware \
 				  debian/README.Debian \
 				  debian/TODO.Debian
 

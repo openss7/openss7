@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/09/18 01:15:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/10/01 21:30:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:15:27 $ by $Author: brian $
+# Last Modified $Date: 2006/10/01 21:30:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.45  2006/10/01 21:30:14  brian
+# - distribute release and library version files
+#
 # Revision 0.9.2.44  2006/09/18 01:15:27  brian
 # - add 32bit libs, release file changes, additional packages
 #
@@ -299,11 +302,7 @@ MANUAL_FILE			= manual/$(PACKAGE).txt
 include am/release.am
 
 EXTRA_DIST			+= \
-				  TODO \
-				  MANUAL \
 				  LICENSE \
-				  README-cvs \
-				  README-nexusware \
 				  debian/README.Debian \
 				  debian/TODO.Debian
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/29 11:50:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/01 21:30:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:46 $ by $Author: brian $
+# Last Modified $Date: 2006/10/01 21:30:23 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2006/10/01 21:30:23  brian
+# - distribute release and library version files
+#
 # Revision 0.9.2.6  2006/09/29 11:50:46  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -315,6 +318,11 @@ endif
 ##
 ## Rules for building libraries
 ##
+LIBRARY_VERSION_FILES		= \
+				  src/lib/socket.VERSION \
+				  src/lib/sockpath.VERSION \
+				  src/lib/socklib.VERSION
+
 include am/libraries.am
 ##
 AUTOCONFIG_H			= src/$(PKGINCL)/config.h
@@ -438,15 +446,8 @@ include am/release.am
 include am/doxy.am
 
 EXTRA_DIST			+= \
-				  TODO \
-				  MANUAL \
-				  README-cvs \
-				  README-nexusware \
 				  debian/README.Debian \
-				  debian/TODO.Debian \
-				  src/lib/socket.VERSION \
-				  src/lib/sockpath.VERSION \
-				  src/lib/socklib.VERSION
+				  debian/TODO.Debian
 
 MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/aclocal.m4 \
