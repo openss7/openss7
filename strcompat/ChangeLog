@@ -1,5 +1,11 @@
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
+	* debian/strcompat-dev.postinst.in: add and remove devices
+	* debian/strcompat-dev.preinst.in: add and remove devices
+	* debian/strcompat-dev.prerm.in: add and remove devices
+
+	* debian/rules.in: get debian rules working better
+
 	* am/release.am: distribute release files
 	* am/libraries.am: distribute library version files
 	* Makefile.am: distribute release and library version files
