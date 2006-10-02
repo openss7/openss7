@@ -2,7 +2,7 @@
 # vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # 
-# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/09/26 08:28:46 $
+# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/30 20:26:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 08:28:46 $ by $Author: brian $
+# Last Modified $Date: 2006/09/30 20:26:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: send-pr,v $
+# Revision 0.9.2.10  2006/09/30 20:26:37  brian
+# - add debian targets to send-pr
+#
 # Revision 0.9.2.9  2006/09/26 08:28:46  brian
 # - more (better) environment output
 #
@@ -114,14 +117,14 @@ dir=`dirname $0`
 path=`(cd $dir ; pwd)`
 errors=0
 warnings=0
-revision='$Revision: 0.9.2.9 $'
+revision='$Revision: 0.9.2.10 $'
 
 exec 5>${top_builddir}${top_builddir+/}$me.log
 
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.9 $) $Date: 2006/09/26 08:28:46 $'
+ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.10 $) $Date: 2006/09/30 20:26:37 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -204,13 +207,17 @@ targets=( \
     "dist.log" \
     "distcheck.log" \
     "rpms.log" \
+    "debs.log" \
     "sign.log" \
+    "csig.log" \
     "rebuild.log" \
     "resign.log" \
+    "sigs.log" \
     "uninstall.log" \
     "release.log" \
     "release-sign.log" \
     "srpm.log" \
+    "dsc.log" \
     "remove.log" \
     )
 
@@ -1315,13 +1322,13 @@ EOF
 	cat>&6<<EOF
 	make dist.log
 	make distcheck.log
-	make rpms.log
-	make sign.log
+	make rpms.log [debs.log]
+	make sign.log [csig.log]
 	make rebuild.log
-	make resign.log
+	make resign.log [sigs.log]
 	make release.log
 	make release-sign.log
-	make srpm.log
+	make srpm.log [dsc.log]
 EOF
 	;;
     (external)
@@ -1413,7 +1420,7 @@ function targetpr()
 	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
 	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
-    (dist.log|distcheck.log|rpms.log|sign.log|rebuild.log|resign.log|release.log|release-sign.log|srpm.log)
+    (dist.log|distcheck.log|rpms.log|debs.log|sign.log|csig.log|rebuild.log|resign.log|sigs.log|release.log|release-sign.log|srpm.log|dsc.log)
 #	filename=`echo "$target" | sed -e 's|\.log$|.pr|'`
 	stage=maintenance
 	class=install

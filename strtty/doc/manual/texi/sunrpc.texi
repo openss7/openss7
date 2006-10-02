@@ -4,7 +4,12 @@
 @section Sun RPC License
 @cindex license, Sun RPC
 
-@sp 2
+This license is taken from the @cite{DISCLAIMER} file of the
+@file{tirpcsrc2.3.tar.Z} package released by @cite{Sun Microsystems,
+@abbr{Inc.}} and is also referenced by the @file{tirpcsrc_99.tar.Z} package
+release from @cite{Sun Microsystems, @abbr{Inc.}}.
+
+@sp 1
 @center SUN RPC LICENSE
 
 Copyright @copyright{} 1984, Sun Microsystems, Inc.
@@ -28,3 +33,7 @@ In no event will @cite{Sun Microsystems, @abbr{Inc.}} be liable for any lost rev
 other special, indirect and consequential damages, even if @cite{Sun} has been advised of the
 possibility of such damages.
 
+@noindent
+Sun Microsystems, Inc. @*
+2550 Garcia Avenue @*
+Mountain View, California  94043

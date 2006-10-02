@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mosi.h,v 1.1.2.1 2006/10/02 11:31:50 brian Exp $
+ @(#) $Id: xti_mosi.h,v 0.9.2.1 2006/10/02 11:31:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
  -----------------------------------------------------------------------------
 
  $Log: xti_mosi.h,v $
- Revision 1.1.2.1  2006/10/02 11:31:50  brian
+ Revision 0.9.2.1  2006/10/02 11:31:50  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
  - added LICENSE automated release file
@@ -79,7 +79,7 @@
 #ifndef _SYS_XTI_MOSI_H
 #define _SYS_XTI_MOSI_H
 
-#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 1.1.2.1 2006/10/02 11:31:49 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.1 2006/10/02 11:31:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@
  Last Modified $Date: 2006/10/02 11:31:49 $ by $Author: brian $
 
  $Log: xti.h,v $
- Revision 1.1.2.1  2006/10/02 11:31:49  brian
+ Revision 0.9.2.1  2006/10/02 11:31:49  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
  - added LICENSE automated release file
@@ -77,7 +77,7 @@
 #ifndef _XTI_H
 #define _XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

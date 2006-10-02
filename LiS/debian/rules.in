@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.15 $) $Date: 2006/07/08 07:23:05 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.16 $) $Date: 2006/10/01 21:56:25 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/07/08 07:23:05 $ by $Author: brian $
+## Last Modified $Date: 2006/10/01 21:56:25 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -137,7 +137,7 @@ debian/$(PACKAGE_LCNAME)-core.postrm \
 debian/$(PACKAGE_LCNAME)-lib.preinst:
 	$(MAKE) $@
 
-#debian/$(PACKAGE_LCNAME)-lib.preinst #
+debian/$(PACKAGE_LCNAME)-lib.preinst \
 debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
 debian/$(PACKAGE_LCNAME)-$(core_name).postinst \
 debian/$(PACKAGE_LCNAME)-$(core_name).prerm \
@@ -200,7 +200,10 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "INSTALL-$(PACKAGE)" ; \
 	  [ ! -f LICENSE ] || echo "LICENSE" ; \
 	  echo "LSM" ; \
+	  echo "MANUAL" ; \
 	  echo "NEWS" ; \
+	  [ ! -f NOTES ] || echo "NOTES" ; \
+	  echo "PROBLEMS" ; \
 	  echo "README" ; \
 	  [ ! -f README-LiS ] || echo "README-LiS" ; \
 	  [ ! -f README-alpha ] || echo "README-alpha" ; \
@@ -210,8 +213,15 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  [ ! -f RELEASE-NOTES ] || echo "RELEASE-NOTES" ; \
 	  echo "THANKS" ; \
 	  echo "TODO" ; \
-	  [ ! -d doc/manual ] || echo "doc/manual" ; \
 	  [ ! -d manual ] || echo "manual" ; \
+	  [ ! -d doc/manual ] || echo "doc/manual" ; \
+	  [ ! -d doc/projects ] || echo "doc/projects" ; \
+	  [ ! -d doc/drafts ] || echo "doc/drafts" ; \
+	  [ ! -d doc/specs ] || echo "doc/specs" ; \
+	  [ ! -f ACKNWLDGMNTS ] || echo "ACKNWLDGMNTS" ; \
+	  [ ! -f COPYRIGHT ] || echo "COPYRIGHT" ; \
+	  [ ! -f README.ovms ] || echo "README.ovms" ; \
+	  [ ! -f Release_Notes ] || echo "Release_Notes" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
 control	+= debian/$(PACKAGE_LCNAME)-doc.manpages
@@ -269,8 +279,6 @@ debian/$(PACKAGE_LCNAME)-init.modules:
 	  echo 'endif' ) > $@
 
 @INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.streams.sh
-#@INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.strace.sh
-#@INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.strerr.sh
 
 debian/$(PACKAGE_LCNAME)-init.%.sh:
 	[ ! -f util/init/$*.sh ] || cp -f -- util/init/$*.sh $@
@@ -360,8 +368,6 @@ binary-common:
 	dh_installdocs -v debian/README.Debian debian/TODO.Debian
 	dh_installdebconf -v
 	dh_installinit -v --init-script=streams.sh -- start 33 S . stop 33 0 6 .
-#	dh_installinit -v --init-script=strace.sh -- stop 20 0 1 6 .
-#	dh_installinit -v --init-script=strerr.sh -- stop 20 0 1 6 .
 	dh_installman -v
 	dh_installinfo -v
 	dh_strip -v
@@ -440,6 +446,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.16  2006/10/01 21:56:25  brian
+# - get debian rules working better
+#
 # Revision 1.1.4.15  2006/07/08 07:23:05  brian
 # - clean master deb package build
 #

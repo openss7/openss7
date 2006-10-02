@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/30 07:30:57 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/30 08:12:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/30 07:30:57 $ by $Author: brian $
+# Last Modified $Date: 2006/09/30 08:12:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.3  2006/09/30 08:12:45  brian
+# - corrected search start for includes
+#
 # Revision 0.9.2.2  2006/09/30 07:30:57  brian
 # - turn on lib in iso.m4
 #
@@ -142,7 +145,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS ISO header files.  The
     # package normally requires ISO header files to compile.
     AC_CACHE_CHECK([for iso include directory], [iso_cv_includes], [dnl
-	iso_what="netconfig.h"
+	iso_what="sys/xti_osi.h"
 	if test :"${with_iso:-no}" != :no -a :"${with_iso:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    AC_MSG_RESULT([(searching $with_iso)])

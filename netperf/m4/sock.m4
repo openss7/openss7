@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/30 07:29:06 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/30 08:12:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/30 07:29:06 $ by $Author: brian $
+# Last Modified $Date: 2006/09/30 08:12:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.8  2006/09/30 08:12:45  brian
+# - corrected search start for includes
+#
 # Revision 0.9.2.7  2006/09/30 07:29:06  brian
 # - corrected warning message
 # - corrected variable name in xti.m4
@@ -157,7 +160,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS SOCK header files.  The
     # package normally requires SOCK header files to compile.
     AC_CACHE_CHECK([for sock include directory], [sock_cv_includes], [dnl
-	sock_what="netconfig.h"
+	sock_what="sockmod.h"
 	if test :"${with_sock:-no}" != :no -a :"${with_sock:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    AC_MSG_RESULT([(searching $with_sock)])

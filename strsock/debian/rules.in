@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:03:55 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/01 21:56:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/08/23 10:03:55 $ by $Author: brian $
+## Last Modified $Date: 2006/10/01 21:56:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -114,9 +114,9 @@ info_name = info-$(VERSION)
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
 
-modules = streams-sad streams-echos streams-nuls streams-log
+modules = streams-sockmod streams-socksys
 preloads =
-libraries =
+libraries = socket socklib
 tools = @PACKAGE@_mknod
 infofiles = $(name)
 initfiles = 
@@ -137,7 +137,7 @@ debian/$(PACKAGE_LCNAME)-core.postrm \
 debian/$(PACKAGE_LCNAME)-lib.preinst:
 	$(MAKE) $@
 
-#debian/$(PACKAGE_LCNAME)-%-lib.preinst #
+debian/$(PACKAGE_LCNAME)-%-lib.preinst \
 debian/$(PACKAGE_LCNAME)-%-$(core_name).preinst \
 debian/$(PACKAGE_LCNAME)-%-$(core_name).postinst \
 debian/$(PACKAGE_LCNAME)-%-$(core_name).prerm \
@@ -181,11 +181,11 @@ debian/$(PACKAGE_LCNAME)-%-$(info_name).install:
 #   Libraries:
 #
 
-#control	+= debian/$(PACKAGE_LCNAME)-streams-lib.preinst
-#control	+= debian/$(PACKAGE_LCNAME)-lis-lib.preinst
+control	+= debian/$(PACKAGE_LCNAME)-streams-lib.preinst
+control	+= debian/$(PACKAGE_LCNAME)-lis-lib.preinst
 
-#control	+= debian/$(PACKAGE_LCNAME)-streams-lib.install
-#control	+= debian/$(PACKAGE_LCNAME)-lis-lib.install
+control	+= debian/$(PACKAGE_LCNAME)-streams-lib.install
+control	+= debian/$(PACKAGE_LCNAME)-lis-lib.install
 
 debian/$(PACKAGE_LCNAME)-%-lib.install:
 	( [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
@@ -205,7 +205,10 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "INSTALL-$(PACKAGE)" ; \
 	  [ ! -f LICENSE ] || echo "LICENSE" ; \
 	  echo "LSM" ; \
+	  echo "MANUAL" ; \
 	  echo "NEWS" ; \
+	  [ ! -f NOTES ] || echo "NOTES" ; \
+	  echo "PROBLEMS" ; \
 	  echo "README" ; \
 	  [ ! -f README-LiS ] || echo "README-LiS" ; \
 	  [ ! -f README-alpha ] || echo "README-alpha" ; \
@@ -220,6 +223,10 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  [ ! -d doc/projects ] || echo "doc/projects" ; \
 	  [ ! -d doc/drafts ] || echo "doc/drafts" ; \
 	  [ ! -d doc/specs ] || echo "doc/specs" ; \
+	  [ ! -f ACKNWLDGMNTS ] || echo "ACKNWLDGMNTS" ; \
+	  [ ! -f COPYRIGHT ] || echo "COPYRIGHT" ; \
+	  [ ! -f README.ovms ] || echo "README.ovms" ; \
+	  [ ! -f Release_Notes ] || echo "Release_Notes" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
 control	+= debian/$(PACKAGE_LCNAME)-doc.manpages
@@ -371,7 +378,7 @@ binary-common:
 	dh_fixperms -v
 	dh_makeshlibs -v
 	dh_installdeb -v
-	dh_shlibdeps -v -X.ko -X.o
+	dh_shlibdeps -v -X.ko -X.o -L strsock-lib -l debian/strsock-lib/usr/lib
 	dh_gencontrol -v $(dversion)
 	dh_md5sums -v
 	dh_builddeb -v
@@ -381,14 +388,19 @@ binary-lis:
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(core_name) dversion='-- -v$(krelease)' binary-common
 @WITH_KO_MODULES_FALSE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(info_name) dversion='-- -v$(krelease)' binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-util binary-common
-#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-lib binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-lib binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
 
 binary-lfs:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(core_name) dversion='-- -v$(krelease)' binary-common
 @WITH_KO_MODULES_FALSE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(info_name) dversion='-- -v$(krelease)' binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-util binary-common
-#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-lib binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-lib binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
+
+binary-nos:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 
 #
 #  dkpg-buildpackage invoke this makefile in one of two ways: with the -b flag,
@@ -409,12 +421,10 @@ binary-arch: install
 	@case " $(BUILD_CFGOPTIONS) " in \
 		(*" --with-lfs "*)  targ=binary-lfs ;; \
 		(*" --with-lis "*)  targ=binary-lis ;; \
+		(*)		    targ=binary-nos ;; \
 	esac ; \
-	if [ -n "$$targ" ] ; then \
-		echo "$(MAKE) -f debian/rules $$targ" ; \
-		$(MAKE) -f debian/rules $$targ ; \
-	fi
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
+	echo "$(MAKE) -f debian/rules $$targ" ; \
+	$(MAKE) -f debian/rules $$targ
 
 binary: DH_OPTIONS = -i -s
 binary:
@@ -444,6 +454,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.2  2006/10/01 21:56:35  brian
+# - get debian rules working better
+#
 # Revision 0.9.2.1  2006/08/23 10:03:55  brian
 # - started STREAMS Sockets package
 #

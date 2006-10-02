@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_osi.h,v 1.1.2.1 2006/10/02 11:31:49 brian Exp $
+ @(#) $Id: xti_osi.h,v 0.9.2.1 2006/10/02 11:31:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@
  Last Modified $Date: 2006/10/02 11:31:49 $ by $Author: brian $
 
  $Log: xti_osi.h,v $
- Revision 1.1.2.1  2006/10/02 11:31:49  brian
+ Revision 0.9.2.1  2006/10/02 11:31:49  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
  - added LICENSE automated release file
@@ -77,7 +77,7 @@
 #ifndef _XTI_INET_H
 #define _XTI_INET_H
 
-#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/xti_osi.h>
 
