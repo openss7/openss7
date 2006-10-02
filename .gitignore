@@ -26,8 +26,10 @@ iperf/doc/man/Makefile.in
 iperf/doc/manual/*.info*
 iperf/include/Makefile.in
 iperf/INSTALL
+iperf/LICENSES
 iperf/m4/Makefile.in
 iperf/Makefile.in
+iperf/MANUAL
 iperf/NEWS
 iperf/PROBLEMS
 iperf/README
@@ -41,6 +43,7 @@ iperf/scripts/install-sh
 iperf/scripts/missing
 iperf/src/Makefile.in
 iperf/TODO
+LICENSES
 LiS/aclocal.m4
 LiS/AUTHORS
 LiS/autom4te.cache
@@ -58,12 +61,14 @@ LiS/include/Makefile.in
 LiS/INSTALL
 LiS/kernel.m4.patch
 LiS/latex
+LiS/LICENSES
 LiS/LiS-2.18.0-A.patch.gz
 LiS/LiS-2.18.0-B.patch.gz
 LiS/LiS-2.18.0-C.patch.gz
 LiS/m4/Makefile.in
 LiS/Makefile.in
 LiS/man/Makefile.in
+LiS/MANUAL
 LiS/manual/LiS.info
 LiS/manual/LiS.info-1
 LiS/manual/LiS.info-2
@@ -91,6 +96,7 @@ LiS/util/strtst.c.orig
 *.log
 m4/Makefile.in
 Makefile.in
+MANUAL
 netperf/aclocal.m4
 netperf/AUTHORS
 netperf/autom4te.cache
@@ -99,8 +105,10 @@ netperf/config.h.in
 netperf/configure
 netperf/COPYING
 netperf/INSTALL
+netperf/LICENSES
 netperf/m4/Makefile.in
 netperf/Makefile.in
+netperf/MANUAL
 netperf/manual/.am4903
 netperf/manual/Makefile.in
 netperf/manual/netperf.info
@@ -122,6 +130,7 @@ netperf/scripts/texinfo.tex
 netperf/tags
 netperf/TODO
 NEWS
+NOTES
 PROBLEMS
 README
 README-alpha
@@ -148,9 +157,11 @@ sctp/doc/manual/sctp.info-2
 sctp/doc/specs/Makefile.in
 sctp/include/Makefile.in
 sctp/INSTALL
+sctp/LICENSES
 sctp/m4/Makefile.in
 sctp/#Makefile.am#
 sctp/Makefile.in
+sctp/MANUAL
 sctp/PROBLEMS
 sctp/README
 sctp/README-alpha
@@ -456,6 +467,7 @@ stacks/doc/specs/tri/Makefile.in
 stacks/doc/specs/tri/tri.info
 stacks/INSTALL
 stacks/intl
+stacks/LICENSES
 stacks/m4/codeset.m4
 stacks/m4/gettext.m4
 stacks/m4/glibc21.m4
@@ -487,6 +499,7 @@ stacks/m4/wchar_t.m4
 stacks/m4/wint_t.m4
 stacks/m4/xsize.m4
 stacks/Makefile.in
+stacks/MANUAL
 stacks/NEWS
 stacks/po/boldquot.sed
 stacks/po/de.gmo
@@ -533,8 +546,10 @@ strbcm/doc/manual/strbcm.info
 strbcm/doc/manual/strbcm.info-1
 strbcm/doc/manual/strbcm.info-2
 strbcm/INSTALL
+strbcm/LICENSES
 strbcm/m4/Makefile.in
 strbcm/Makefile.in
+strbcm/MANUAL
 strbcm/NEWS
 strbcm/PROBLEMS
 strbcm/README
@@ -567,8 +582,10 @@ strcompat/doc/manual/strcompat.info
 strcompat/doc/manual/strcompat.info-1
 strcompat/doc/manual/strcompat.info-2
 strcompat/INSTALL
+strcompat/LICENSES
 strcompat/m4/Makefile.in
 strcompat/Makefile.in
+strcompat/MANUAL
 strcompat/NEWS
 strcompat/PROBLEMS
 strcompat/README
@@ -613,6 +630,7 @@ streams/doc/manual/SPG.info-2
 streams/doc/manual/SPG.info-3
 streams/doc/manual/SPG.info-4
 streams/doc/manual/SPG.info-5
+streams/doc/manual/SPG.txt
 streams/doc/manual/STREAMS_FAQ.info
 streams/doc/manual/STREAMS_FAQ.info-2
 streams/doc/manual/STREAMS.info
@@ -621,8 +639,10 @@ streams/doc/manual/STREAMS.info-2
 streams/include/Makefile.in
 streams/INSTALL
 streams/INSTALL.streams
+streams/LICENSES
 streams/m4/Makefile.in
 streams/Makefile.in
+streams/MANUAL
 streams/NEWS
 streams/PROBLEMS
 streams/README
@@ -656,8 +676,10 @@ strinet/doc/manual/strinet.info
 strinet/doc/manual/strinet.info-1
 strinet/doc/manual/strinet.info-2
 strinet/INSTALL
+strinet/LICENSES
 strinet/m4/Makefile.in
 strinet/Makefile.in
+strinet/MANUAL
 strinet/NEWS
 strinet/PROBLEMS
 strinet/README
@@ -691,8 +713,10 @@ striso/doc/manual/striso.info
 striso/doc/manual/striso.info-1
 striso/doc/manual/striso.info-2
 striso/INSTALL
+striso/LICENSES
 striso/m4/Makefile.in
 striso/Makefile.in
+striso/MANUAL
 striso/NEWS
 striso/PROBLEMS
 striso/README
@@ -720,6 +744,7 @@ strnsl/doc/manual/strnsl.info
 strnsl/doc/manual/strnsl.info-1
 strnsl/doc/manual/strnsl.info-2
 strnsl/intl
+strnsl/LICENSES
 strnsl/m4/codeset.m4
 strnsl/m4/gettext.m4
 strnsl/m4/glibc21.m4
@@ -749,6 +774,7 @@ strnsl/m4/ulonglong.m4
 strnsl/m4/wchar_t.m4
 strnsl/m4/wint_t.m4
 strnsl/m4/xsize.m4
+strnsl/MANUAL
 strnsl/po/boldquot.sed
 strnsl/po/en@boldquot.header
 strnsl/po/en@quot.header
@@ -788,8 +814,10 @@ strsctp/doc/manual/strsctp.info
 strsctp/doc/manual/strsctp.info-1
 strsctp/doc/manual/strsctp.info-2
 strsctp/INSTALL
+strsctp/LICENSES
 strsctp/m4/Makefile.in
 strsctp/Makefile.in
+strsctp/MANUAL
 strsctp/NEWS
 strsctp/PROBLEMS
 strsctp/README
@@ -829,6 +857,7 @@ strsock/doc/manual/strsock.info-1
 strsock/doc/manual/strsock.info-2
 strsock/INSTALL
 strsock/intl
+strsock/LICENSES
 strsock/m4/codeset.m4
 strsock/m4/gettext.m4
 strsock/m4/glibc21.m4
@@ -860,6 +889,7 @@ strsock/m4/wchar_t.m4
 strsock/m4/wint_t.m4
 strsock/m4/xsize.m4
 strsock/Makefile.in
+strsock/MANUAL
 strsock/NEWS
 strsock/po/boldquot.sed
 strsock/po/en@boldquot.header
@@ -904,8 +934,10 @@ strtty/doc/manual/strtty.info
 strtty/doc/manual/strtty.info-1
 strtty/doc/manual/strtty.info-2
 strtty/INSTALL
+strtty/LICENSES
 strtty/m4/Makefile.in
 strtty/Makefile.in
+strtty/MANUAL
 strtty/NEWS
 strtty/PROBLEMS
 strtty/README
@@ -938,8 +970,10 @@ strutil/doc/manual/strutil.info
 strutil/doc/manual/strutil.info-1
 strutil/doc/manual/strutil.info-2
 strutil/INSTALL
+strutil/LICENSES
 strutil/m4/Makefile.in
 strutil/Makefile.in
+strutil/MANUAL
 strutil/NEWS
 strutil/PROBLEMS
 strutil/README
@@ -987,6 +1021,7 @@ strxnet/doc/specs/tpi/tpi_tcap.info-1
 strxnet/doc/specs/tpi/tpi_tcap.info-2
 strxnet/INSTALL
 strxnet/intl
+strxnet/LICENSES
 strxnet/m4/codeset.m4
 strxnet/m4/gettext.m4
 strxnet/m4/glibc21.m4
@@ -1018,6 +1053,7 @@ strxnet/m4/wchar_t.m4
 strxnet/m4/wint_t.m4
 strxnet/m4/xsize.m4
 strxnet/Makefile.in
+strxnet/MANUAL
 strxnet/NEWS
 strxnet/po/boldquot.sed
 strxnet/po/de.gmo
@@ -1080,8 +1116,10 @@ strxns/doc/specs/tpi/Makefile.in
 strxns/doc/specs/tpi/tpi.info
 strxns/doc/specs/tpi/tpi_tcap.info
 strxns/INSTALL
+strxns/LICENSES
 strxns/m4/Makefile.in
 strxns/Makefile.in
+strxns/MANUAL
 strxns/NEWS
 strxns/PROBLEMS
 strxns/README
