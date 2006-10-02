@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/09/29 11:49:56 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/10/02 11:31:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:49:56 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 11:31:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,8 +70,10 @@ m4_include([m4/strcomp.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
 m4_include([m4/nsl.m4])
+m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
+m4_include([m4/iso.m4])
 m4_include([m4/ss7.m4])
 
 # =============================================================================
@@ -413,7 +415,7 @@ dnl
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-nsl"
     fi
     if test :"${with_STRSOCK:-yes}" != :no ; then
-	:
+	_SOCK
     else
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_sock --without-sock\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-sock'"
@@ -434,7 +436,7 @@ dnl
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-sctp"
     fi
     if test :"${with_STRISO:-yes}" != :no ; then
-	:
+	_ISO
     else
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_iso --without-iso\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-iso'"

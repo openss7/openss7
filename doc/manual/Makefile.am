@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/18 01:18:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/02 11:31:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:31 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 11:31:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,6 +75,10 @@ EXTRA_info_TEXINFOS	= \
 			  texi/ui.texi \
 			  texi/hp.texi \
 			  texi/uslbsd.texi \
+			  texi/sunrpc.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/uitpi.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \

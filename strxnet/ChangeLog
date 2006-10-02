@@ -1,3 +1,24 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* strxnet.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/control.in: mostly text description formatting
+	* debian/copyright: added licenses
+	* debian/strxnet-core.postinst.in: copyright header updates
+	* debian/strxnet-core.postrm.in: copyright header updates
+	* debian/strxnet-core.preinst.in: copyright header updates
+	* debian/strxnet-core.prerm.in: copyright header updates
+	* debian/strxnet-devel.preinst.in: copyright header updates
+	* debian/strxnet-doc.postinst.in: copyright header updates
+	* doc/manual/Makefile.am: add uitpi license
+	* doc/manual/descrip.texi: paramter title
+	* doc/manual/strxnet.texi: add uitpi license
+	* src/include/netdir.h: move pragma weak ahead of declaration
+	* src/include/sys/tpi.h: LiS doesn't define t_uscalar_t when it should <stropts.h>
+	* src/lib/netdir.c: move pragma weak ahead of declaration
+	* src/lib/xnet.c: move pragma weak ahead of declaration
+	* src/lib/xnsl.c: move pragma weak ahead of declaration
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strxnet-dev.postinst.in: add and remove devices

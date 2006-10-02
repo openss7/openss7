@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/09/29 11:51:09 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/02 11:32:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:09 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/09/29 11:51:09 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/02 11:32:17 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/09/29 11:51:09 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/02 11:32:17 $";
 
 #define _LFS_SOURCE
 
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/09/29 11:51:09 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/02 11:32:17 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -78,7 +78,7 @@ static char const ident[] =
 #define ECHO_SPLASH	ECHO_DEVICE	" - " \
 			ECHO_REVISION	"\n"
 
-#if defined LIS && defined MODULE
+#if defined LIS && defined MODULE && !defined CONFIG_STREAMS_ECHO_MODULE
 #define CONFIG_STREAMS_ECHO_MODULE MODULE
 #endif
 
@@ -151,10 +151,12 @@ MODULE_ALIAS("/dev/streams/echo/*");
 #endif
 
 #ifdef LIS
+#ifndef STRMINPSZ
 #define STRMINPSZ   0
 #define STRMAXPSZ   4096
 #define STRHIGH	    5120
 #define STRLOW	    1024
+#endif
 #endif
 
 static struct module_info echo_minfo = {
@@ -170,6 +172,7 @@ static struct module_stat echo_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)
 static struct module_stat echo_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 #ifdef LIS
+#ifndef _trace
 #define _trace() while (0) { }
 #define _ptrace(__x) while (0) { }
 #define _printd(__x) while (0) { }
@@ -183,6 +186,7 @@ union ioctypes {
 	struct copyreq copyreq;
 	struct copyresp copyresp;
 };
+#endif
 #endif
 
 #ifdef LiS

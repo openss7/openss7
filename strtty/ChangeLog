@@ -1,3 +1,20 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* strtty.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/control.in: mostly text description formatting
+	* debian/copyright: added licenses
+	* debian/strtty-core.postrm.in: copyright header updates
+	* debian/strtty-core.preinst.in: copyright header updates
+	* debian/strtty-core.prerm.in: copyright header updates
+	* debian/strtty-devel.preinst.in: copyright header updates
+	* debian/strtty-doc.postinst.in: copyright header updates
+	* doc/man/man4/ldterm.4.man: working up manual page
+	* doc/man/man4/ptem.4.man: working up manual page
+	* doc/manual/descrip.texi: add description
+	* src/modules/pckt.c: working up module
+	* src/modules/ptem.c: working up module
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strtty-dev.postinst.in: add and remove devices

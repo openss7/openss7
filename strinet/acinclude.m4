@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2006/09/26 00:50:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/10/02 11:31:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 00:50:53 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 11:31:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,9 @@ m4_include([m4/strcomp.m4])
 dnl m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
+m4_include([m4/nsl.m4])
+m4_include([m4/sock.m4])
+m4_include([m4/sctp.m4])
 
 # =============================================================================
 # AC_INET
@@ -110,6 +113,10 @@ AC_DEFUN([AC_INET], [dnl
     _INET_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SCTP_CPPFLAGS:+ }}${SCTP_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SOCK_CPPFLAGS:+ }}${SOCK_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${NSL_CPPFLAGS:+ }}${NSL_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
@@ -142,6 +149,9 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${NSL_MANPATH:+${NSL_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SOCK_MANPATH:+${SOCK_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SCTP_MANPATH:+${SCTP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -218,6 +228,7 @@ AC_DEFUN([_INET_CHECK_INET], [dnl
 # _INET_SETUP_DEBUG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_SETUP_DEBUG], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     case "$linux_cv_debug" in
     _DEBUG)
 	AC_DEFINE_UNQUOTED([INET_CONFIG_DEBUG], [], [Define to perform
@@ -316,6 +327,9 @@ dnl with_inet='yes'
 dnl _XOPEN
     _XNS
     _XTI
+    _NSL
+    _SOCK
+    _SCTP
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _INET_OTHER_SCTP
@@ -329,6 +343,7 @@ dnl _XOPEN
 # _INET_SETUP_MODULE
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_SETUP_MODULE], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
 	AC_DEFINE_UNQUOTED([INET_CONFIG_MODULE], [], [When defined, INET is
 			    being compiled as a loadable kernel module.])
@@ -454,7 +469,7 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <linux/time.h>		/* for struct timespec */
 #include <net/sock.h>
 #include <net/protocol.h>
-])
+    ])
     _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
 #include <linux/compiler.h>
 #include <linux/config.h>

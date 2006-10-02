@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/09/29 11:51:10 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/02 11:32:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:10 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/09/29 11:51:10 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/02 11:32:18 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/09/29 11:51:10 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/02 11:32:18 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/09/29 11:51:10 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/02 11:32:18 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -206,7 +206,7 @@ static streamscall int
 sad_put(queue_t *q, mblk_t *mp)
 {
 	struct sad *sad = q->q_ptr;
-	union ioctypes *ioc;
+	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	int err = 0, rval = 0, count = 0;
 	mblk_t *dp = mp->b_cont;
 	caddr_t sa_addr, sl_addr;
@@ -576,24 +576,30 @@ static struct sad_ioctl sad_map[] = {
 	{.cmd = SAD_SAP,}
 	, {.cmd = SAD_GAP,}
 	, {.cmd = SAD_VML,}
+#ifdef LFS
 	, {.cmd = SAD_SAP_SOL,}
 	, {.cmd = SAD_GAP_SOL,}
+#endif
 	, {.cmd = 0,}
 };
 
 void
 sad_unregister_ioctl32(void)
 {
+#ifdef LFS
 	struct sad_ioctl *i;
 
 	for (i = sad_map; i->cmd != 0; i++)
 		if (i->opaque != NULL)
 			unregister_ioctl32(i->opaque);
+#endif
+	(void) sad_map;
 }
 
 int
 sad_register_ioctl32(void)
 {
+#ifdef LFS
 	struct sad_ioctl *i;
 
 	for (i = sad_map; i->cmd != 0; i++) {
@@ -602,6 +608,8 @@ sad_register_ioctl32(void)
 			return (-ENOMEM);
 		}
 	}
+#endif
+	(void) sad_map;
 	return (0);
 }
 

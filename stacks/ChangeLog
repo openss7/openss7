@@ -1,3 +1,13 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: add includes for new packages
+	* strss7.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/control.in: mostly text description formatting
+	* doc/manual/strss7.texi: rationalize to other manual formats
+	* src/lib/libxnet/xnet.VERSION: added missing version file
+	* src/lib/libxnet/xnet.c: move pragma weaks ahead of declarations
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strss7-dev.postinst.in: add and remove devices

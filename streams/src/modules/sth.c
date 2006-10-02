@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2006/09/29 11:50:28 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2006/10/02 11:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:50:28 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:31:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.168  2006/10/02 11:31:37  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.167  2006/09/29 11:50:28  brian
  - libtool library tweaks in Makefile.am
  - better rpm spec handling in *.spec.in
@@ -142,10 +163,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2006/09/29 11:50:28 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2006/10/02 11:31:37 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2006/09/29 11:50:28 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2006/10/02 11:31:37 $";
 
 //#define __NO_VERSION__
 
@@ -246,7 +267,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.167 $) $Date: 2006/09/29 11:50:28 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2006/10/02 11:31:37 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -7944,7 +7965,6 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 
 				dev_t dev = sd->sd_dev;
 				int oflag = make_oflag(file);
-
 #ifdef CONFIG_STREAMS_LIS_BCM
 				cred_t creds = {.cr_uid = current->euid,.cr_gid =
 					    current->egid,.cr_ruid = current->uid,.cr_rgid =
@@ -7953,12 +7973,11 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 #else
 				cred_t *crp = current_creds;
 #endif
+				bool wasctty = (test_bit(STRISTTY_BIT, &sd->sd_flag) != 0);
 
 				sd->sd_file = file;	/* always before open */
 
 				if (!(err = qattach(sd, fmod, &dev, oflag, MODOPEN, crp))) {
-					bool wasctty = (test_bit(STRISTTY_BIT, &sd->sd_flag) != 0);
-
 					/* Modules not supposed to change dev! connld(4) maybe on
 					   open(), never on %I_PUSH. */
 					assure(dev == sd->sd_dev);
@@ -7969,8 +7988,8 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 						/* TODO: MG says that if the %STRISTTY flag is set
 						   at this point (that is, STRISTTY was set by the
 						   module using M_SETOPTS) to make the stream a
-						   controlling terminal (i.e.  redirect standard
-						   input, output and error here). */
+						   controlling terminal. However, do not do that
+						   if O_NOCTTY was set in oflag on open. */
 						/* This is also where sd_session and sd_pgrp
 						   members are initialized to appropriate values */
 						sd->sd_session = task_session(current);
@@ -8842,8 +8861,10 @@ streams_noinline streams_fastcall int
 str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg,
 	      size_t len, int access, const uint model)
 {
+	/* FIXME: This is a little bit off: the ic_len of the strioctl structure is the amount of
+	   data to copy in.  The amount of data to copy out is determined by the driver. */
 	if (len == TRANSPARENT && _IOC_SIZE(cmd) != 0)
-		len = _IOC_SIZE(cmd);
+		len = (_IOC_DIR(cmd) & _IOC_WRITE) ? _IOC_SIZE(cmd) : 0;
 	if (len == TRANSPARENT)
 		return strdoioctl_trans(sd, cmd, arg, access, 1, model);
 
@@ -9030,6 +9051,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		switch (_IOC_NR(cmd)) {
 #endif
 #if 0				/* let these go tranparent */
+			/* FIXME: These gets need to have an ic_len of zero.  */
 		case _IOC_NR(TCGETX):	/* SVID */
 		case _IOC_NR(TCSETX):	/* SVID */
 		case _IOC_NR(TCSETXF):	/* SVID */
@@ -9042,6 +9064,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TCSETSF):	/* const struct termios * *//* SVID *//* XXX */
 		case _IOC_NR(TIOCSLCKTRMIOS):	/* const struct termios * *//* XXX */
 			access |= FEXCL;
+			/* FIXME: These gets need to have an ic_len of zero.  */
 		case _IOC_NR(TCGETS):	/* struct termios * *//* SVID *//* XXX */
 		case _IOC_NR(TIOCGLCKTRMIOS):	/* struct termios * *//* XXX */
 			length = sizeof(struct termios);
@@ -9050,6 +9073,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TCSETAW):	/* const struct termio * *//* SVID *//* XXX */
 		case _IOC_NR(TCSETAF):	/* const struct termio * *//* SVID *//* XXX */
 			access |= FEXCL;
+			/* FIXME: These gets need to have an ic_len of zero.  */
 		case _IOC_NR(TCGETA):	/* struct termio * *//* SVID *//* XXX */
 			length = sizeof(struct termio);
 			break;

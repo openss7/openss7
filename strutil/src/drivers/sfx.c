@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/09/29 11:51:10 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:10 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/09/29 11:51:10 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:18 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/09/29 11:51:10 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:18 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -69,7 +69,7 @@ extern struct file_operations strm_f_ops;
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/09/29 11:51:10 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:18 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -150,16 +150,20 @@ static struct module_stat sfx_rstat __attribute__((__aligned__(SMP_CACHE_BYTES))
 static struct module_stat sfx_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 static struct qinit sfx_rqinit = {
+#ifdef LFS
 	.qi_putp = strrput,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
+#endif
 	.qi_minfo = &sfx_minfo,
 	.qi_mstat = &sfx_rstat,
 };
 
 static struct qinit sfx_wqinit = {
+#ifdef LFS
 	.qi_putp = strwput,
 	.qi_srvp = strwsrv,
+#endif
 	.qi_minfo = &sfx_minfo,
 	.qi_mstat = &sfx_wstat,
 };

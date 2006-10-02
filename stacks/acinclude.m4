@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/09/26 00:52:22 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/02 11:31:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 00:52:22 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 11:31:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,8 @@ m4_include([m4/strcomp.m4])
 m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
+m4_include([m4/nsl.m4])
+m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
 m4_include([m4/doxy.m4])
@@ -115,6 +117,11 @@ AC_DEFUN([AC_SS7], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${ISO_CPPFLAGS:+ }}${ISO_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SCTP_CPPFLAGS:+ }}${SCTP_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${INET_CPPFLAGS:+ }}${INET_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SOCK_CPPFLAGS:+ }}${SOCK_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${NSL_CPPFLAGS:+ }}${NSL_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
@@ -147,6 +154,11 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${NSL_MANPATH:+${NSL_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SOCK_MANPATH:+${SOCK_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${INET_MANPATH:+${INET_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SCTP_MANPATH:+${SCTP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${ISO_MANPATH:+${ISO_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -257,6 +269,7 @@ AC_DEFUN([_SS7_CHECK_SCTP], [dnl
 # _SS7_SETUP_DEBUG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7_SETUP_DEBUG], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     case "$linux_cv_debug" in
     _DEBUG)
 	AC_DEFINE_UNQUOTED([SS7_CONFIG_DEBUG], [], [Define to perform
@@ -355,6 +368,8 @@ AC_DEFUN([_SS7_SETUP], [dnl
     _XOPEN
     _XNS
     _XTI
+    _NSL
+    _SOCK
     _INET
     _SCTP
     # here we have our flags set and can perform preprocessor and compiler

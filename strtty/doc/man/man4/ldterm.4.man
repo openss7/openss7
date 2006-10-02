@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ldterm.4.man,v 0.9.2.1 2006/09/29 11:40:04 brian Exp $
+.\" @(#) $Id: ldterm.4.man,v 0.9.2.2 2006/10/02 11:32:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,32 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/29 11:40:04 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/02 11:32:13 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ldterm.4.man,v $
+.\" Revision 0.9.2.2  2006/10/02 11:32:13  brian
+.\" - changes to get master builds working for RPM and DEB
+.\" - added outside licenses to package documentation
+.\" - added LICENSE automated release file
+.\" - copy MANUAL to source directory
+.\" - add and remove devices in -dev debian subpackages
+.\" - get debian rules working better
+.\" - release library version files
+.\" - added notes to debian changelog
+.\" - corrections for cooked manual pages in spec files
+.\" - added release documentation to spec and rules files
+.\" - copyright header updates
+.\" - moved controlling tty checks in stream head
+.\" - missing some defines for LiS build in various source files
+.\" - added OSI headers to striso package
+.\" - added includes and manual page paths to acincludes for various packages
+.\" - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+.\"   files
+.\" - moved pragma weak statements ahead of declarations
+.\" - changes for master build of RPMS and DEBS with LiS
+.\"
 .\" Revision 0.9.2.1  2006/09/29 11:40:04  brian
 .\" - new files for strtty package and manual pages
 .\"
@@ -229,6 +250,638 @@ driver to queue the messages on its queue until flow control is lifted.
 .PP
 .\"
 .\"
+.SH DESCRIPTION
+.PP
+A
+.I STREAMS
+line discipline module called
+.BR ldterm
+is a key part of the
+.IR STREAMS -based
+terminal subsystem.  The terms
+.I line discipline
+and
+.B ldterm
+are used interchangeably and refer to the
+.I STREAMS
+version of the standard line discipline and not the traditional character
+version.
+.B ldterm
+performs the standard terminal I/O processing which was traditionally done
+through the
+.B linesw
+mechanism.
+
+The
+.BR termio (7)
+and
+.BR termios (7)
+specifications describe four flags which are used to control the terminal:
+.I c_iflag
+(defines input modes),
+.I c_oflag
+(defines output modes),
+.I c_cflag
+(defines hardware control modes), and
+.I c_lflag
+(defines terminal functions used by
+.BR ldterm ).
+To process these flags elsewhere (for example, in the firmware or in another
+process), a mechanism is in place to turn on and off the processing of these
+flags.  When the
+.B ldterm
+module is pushed, it sends
+an
+.BR M_CTL (9)
+message downstream which asks the driver which flags the driver will process.
+The driver sends back that message in response if it needs to change
+.BR ldterm 's
+default processing.  By default,
+.B ldterm
+assumes that it must process all flags except
+.IR c_cflag ,
+unless it receives a message telling otherwise.
+.\"
+.SS "Default Settings"
+.PP
+When
+.B ldterm
+is pushed on the Stream, the open routine initializes the settings of the
+.BR termio (7)
+flags.  The default settings are:
+.TP \w'\fBC_OFLAG\fR\(em'u
+.B C_IFLAG
+.RB "= " BRKINT | ICRNL | IXON | ISTRIP | IXANY | ICRNL | IXON | ISTRIP | IXANY
+.PD 0
+.TP
+.B C_OFLAG
+.RB "= " OPOST | ONLCR | TAB3 | ONLCR | TAB3
+.TP
+.B C_CFLAG
+.RB "= " 0
+.TP
+.B C_LFLAG
+.RB "= " ISIG | ICANON | ECHO | ECHOK | ICANON | ECHO | ECHOK
+.PD
+.PP
+In canonical mode
+.RB ( ICANON
+flag in
+.I c_lflag
+is turned on), read from the terminal file descriptor is in message
+non-discard
+.RB ( RMSGN )
+mode, described in
+.BR streamio (7).
+This implies that in canonical mode, read on the terminal file descriptor
+always returns at most one line regardless how many characters have been
+requested.  In non-canonical
+mode, read is in byte-stream
+.RB ( RNORM )
+mode.
+.\"
+.SS "Data Structure"
+.PP
+The
+.B ldterm
+module uses the following structure to maintain state information:
+.PP
+.RS 0
+.nf
+\fC\s-1\
+struct ldterm_mod {
+    mblk_t *t_savbp;         /* saved mblk that holds ld structure */
+    struct termios t_modes;  /* effective modes set by the provider */
+    struct termios t_amodes; /* apparent modes for user programs */
+    struct termios t_dmodes; /* modes that driver wishes to process */
+    unsigned long t_state;   /* internal state of tty module */
+    int t_line;              /* output line of tty */
+    int t_col;               /* output column of tty */
+    int t_rocount;           /* number of characters echoed since last
+                                output */
+    int t_rocol;             /* column in which first such character
+                                appeared */
+    mblk_t *t_message;       /* pointer to 1st mblk in message being built */
+    mblk_t *t_endmsg;        /* pointer to last mblk in that message */
+    int t_msglen;            /* number of characters in that message */
+    mblk_t *t_echomp;        /* echoed output being assembled */
+    int t_rd_request;        /* number of bytes requested by M_READ during
+                                vmin/vtime read */
+    int t_tid;               /* vtime timer id */
+
+    /* 
+     * The following are for EUC processing.
+     */
+
+    unchar t_codeset;        /* current code set indicator - read-side */
+    unchar t_eucleft;        /* bytes left to get in current character */
+    unchar t_eucign;         /* bytes left to ignore - output post proc */
+    unchar t_eucpad;         /* padding for eucwioc */
+    eucioc_t eucwioc;        /* eucioc structure (have to use bcopy) */
+    unchar *t_eucp;          /* pointer to parallel array of column widths */
+    mblk_t *t_eucp_mp;       /* message block that holds parallel array */
+    unchar t_maxeuc;         /* maximum length in memory bytes of an EUC */
+    int t_eucwarn;           /* bad EUC counter */
+};
+\s+1\fP
+.fi
+.RE
+.\"
+.SS "Read-Side Processing"
+.PP
+The
+.B ldterm
+module's read-side processing has
+.IR put ,
+.BR qi_putp (9),
+and
+.IR service ,
+.BR qi_srvp (9),
+procedures.
+High and low water marks for the read queue are
+.B 512
+and
+.B 200
+respectively.
+.PP
+.B ldterm
+can send the following messages upstream:
+.PP
+.B ldterm
+messages
+.BR M_DATA (9),
+.BR M_BREAK (9),
+.BR M_PCSIG (9),
+.BR M_SIG (9),
+.BR M_FLUSH (9),
+.BR M_ERROR (9),
+.BR M_IOCACK (9),
+.BR M_IOCNAK (9),
+.BR M_HANGUP (9),
+.BR M_CTL (9),
+.BR M_SETOPTS (9),
+.BR M_COPYOUT (9),
+and
+.BR M_COPYIN (9).
+.PP
+The
+.B ldterm
+module's read-side processes
+.BR M_BREAK (9),
+.BR M_DATA (9),
+.BR M_CTL (9),
+.BR M_FLUSH (9),
+.BR M_HANGUP (9),
+and
+.BR M_IOCACK (9)
+messages.  All other messages are sent upstream unchanged.
+.PP
+The put procedure,
+.BR qi_putp (9),
+scans the message for flow control characters
+.RB ( IXON ),
+signal generating characters, and after (possible) transformation of the
+message, queues the message for the
+service procedure,
+.BR qi_srvp (9).
+Echoing is handled completely by the service procedure.
+.PP
+In canonical mode if the
+.B ICANON
+flag is on in
+.IR c_lflag ,
+canonical processing is performed.  If the
+.B ICANON
+flag is off, non-canonical processing is
+performed (see
+.BR termio (7),
+for more details).
+Handling of
+.BR VMIN / VTIME
+in the
+.I STREAMS
+environment is somewhat complicated, because read needs to activate a timer in
+the
+.B ldterm
+module in
+some cases; hence, read notification becomes necessary.  When a user issues an
+.BR ioctl (2s)
+to put
+.B ldterm
+in non-canonical mode, the
+.B ldterm
+module sends an
+.BR M_SETOPTS (9)
+message to the Stream head to register read notification.  Further reads on
+the terminal file descriptor will cause the Stream head to issue an
+.BR M_READ (9)
+message downstream and data will be sent upstream in response to the
+.BR M_READ (9)
+message.  With read notification, buffering of raw data is performed by
+.BR ldterm .
+It is possible to canonize the raw data, when the user has switched from raw
+to canonical mode.  However, the reverse is not possible.
+.PP
+To summarize, in non-canonical mode, the
+.B ldterm
+module buffers all data until a request for the data arrives in the form of an
+.BR M_READ (9)
+message.  The number of bytes sent upstream will be the argument of the
+.BR M_READ (9)
+message.
+.PP
+The service procedure,
+.BR qi_srvp (9),
+of
+.B ldterm
+handles
+.I STREAMS
+related flow control.  Since the read-side high and low water marks are
+.B 512
+and
+.B 200
+respectively,
+placing more thanr
+.B 512
+characters on the
+.BR ldterm 's
+read queue will cause the
+.B QFULL
+flag be turned on indicating that the module below should not send more data
+upstream.
+.PP
+Input flow control is regulated by the line discipline module by generating
+.BR M_STARTI (9)
+and
+.BR M_STOPI (9)
+high priority messages.  When sent downstream, receiving drivers or modules
+take appropriate action to regulate the sending of data upstream.
+Output flow control is activated when
+.B ldterm
+receives flow control characters
+in its data stream.  The
+.B ldterm
+module then sets an internal flag indicating
+that output processing is to be restarted/stopped and sends an
+.BR M_START (9)/ M_STOP (9)
+message downstream.
+.\"
+.SS "Write-Side Processing"
+.PP
+Write-side processing of the
+.B ldterm
+module is performed by the write-side put
+procedures,
+.BR qi_putp (9).
+.PP
+The
+.B ldterm
+module supports the following ioctls:
+.BR TCSETA ,
+.BR TCSETAW ,
+.BR TCSETAF ,
+.BR TCSETS ,
+.BR TCSETSW ,
+.BR TCSETSF ,
+.BR TCGETA ,
+.BR TCGETS ,
+.BR TCXONC ,
+.BR TCFLSH ,
+.BR TCSBRK ,
+.BR TIOCSWINSZ ,
+.BR TIOCGWINSZ ,
+and
+.BR JWINSIZE .
+.PP
+All ioctls not recognized by the
+.B ldterm
+module are passed downstream to the
+neighboring module or driver.
+.I BSD
+functionality is turned off by
+.B IEXTEN
+(see
+.BR termio (7),
+for more details).
+.PP
+The following messages can be received on the write-side:
+.BR M_DATA (9),
+.BR M_DELAY (9),
+.BR M_BREAK (9),
+.BR M_FLUSH (9),
+.BR M_STOP (9),
+.BR M_START (9),
+.BR M_STOPI (9),
+.BR M_STARTI (9),
+.BR M_READ (9),
+.BR M_IOCDATA (9),
+.BR M_CTL (9),
+and
+.BR M_IOCTL (9).
+.PP
+On the write-side, the
+.B ldterm
+module processes
+.BR M_FLUSH (9),
+.BR M_DATA (9),
+.BR M_IOCTL (9),
+and
+.BR M_READ (9)
+messages, and all other message are passed downstream unchanged.
+.PP
+An
+.BR M_CTL (9)
+message is generated by
+.B ldterm
+as a query to the driver for an intelligent peripheral and to decide on the
+functional split for
+.BR termio (7)
+processing.  If all or part of
+.BR termio (7)
+processing is done by the intelligent peripheral,
+.B ldterm
+can turn off this processing to avoid computational overhead.  This is done by
+sending an appropriate response to the
+.BR M_CTL (9)
+message, as follows:
+.IP \(bu \w'\(bu\(em'u
+If all of the
+.BR termio (7)
+processing is done by the peripheral hardware, the driver sends an
+.BR M_CTL (9)
+message back to
+.B ldterm
+with
+.I ioc_cmd
+of the structure
+.BR iocblk (9)
+set to
+.BR MC_NO_CANON .
+If
+.B ldterm
+is to handle all
+.BR termio (7)
+processing, the driver sends an
+.BR M_CTL (9)
+message with
+.I ioc_cmd set
+to
+.B MC_DO_CANON .
+Default is
+.BR MC_DO_CANON .
+.IP \(bu
+If the peripheral hardware handles only part of the
+.BR termio (7)
+processing, it informs
+.B ldterm
+in the following way: The driver for the peripheral device
+allocates an
+.BR M_DATA (9)
+message large enough to hold a
+.BR termios (7)
+structure.  The driver then turns on those
+.IR c_iflag ,
+.IR c_oflag ", and
+.I c_lflag
+fields of the
+.BR termios (7)
+structure that are processed on the peripheral device by ORing the flag
+values.  The
+.BR M_DATA (9)
+message is then attached to the
+.I b_cont
+field of the
+.BR M_CTL (9)
+message it received.  The message is sent back to
+.B ldterm
+with
+.I ioc_cmd
+in the data buffer of the
+.BR M_CTL (9)
+message set to
+.BR MC_PART_CANON .
+.PP
+The line discipline module does not check if write-side flow control is in
+effect before forwarding data downstream.  It expects the downstream module or
+driver to queue the messages on its queue until flow control is lifted.
+.\"
+.SS "EUC Handling in ldterm"
+.PP
+The idea of letting post-processing (the
+.IR o_flags )
+happen off the host processor is not recommended unless the board software is
+prepared to deal with international
+.RB ( EUC )
+character sets properly.  The reason for this is that
+post-processing must take the
+.I EUC
+information into account.
+.B ldterm
+knows about the screen width of characters (that is, how many columns are
+taken by characters from each given code set on the current physical display)
+and it takes this width into account when calculating tab expansions.  When
+using multi-byte characters or multi-column characters
+.B ldterm
+automatically handles tab expansion (when
+.B TAB3
+is set) and does not leave this handling to a lower module or driver.
+.PP
+As an example, consider the
+.I 3B2 PORTS
+board that has a processor and runs firmware on the board that can handle
+output post-processing.  However, the firmware on the
+.I PORTS
+board has no knowledge of EUC unless one can change the firmware.  Therefore,
+with some EUC code sets, particularly those where number of bytes in a
+character is not equivalent to the width of the character on the screen (for
+example, 3 byte codes that take only 2 screen columns), the
+.I PORTS
+board's firmware miscalculates the number of spaces required to expand the
+tab.  Hence, if the board is allowed to handle tab expansion, it may get the
+expansion wrong in some cases.
+.PP
+By default multi-byte handling by
+.B ldterm
+is turned off.  When
+.B ldterm
+receives
+an
+.B EUC_WSET
+.BR ioctl (2s)
+call, it turns multi-byte processing on, if it is essential to properly handle
+the indicated code set.  Thus, if one is using single byte 8-bit codes and has
+no special multi-column requirements, the special multi-column processing is
+not used at all.  This means that multi-byte processing does not reduce the
+processing speed or efficiency of
+.B ldterm
+unless it is actually used.
+.PP
+The following describes how the EUC handling in
+.B ldterm
+works:
+.PP
+First, the multi-byte and multi-column character handling is only enabled when
+the
+.B EUC_WSET
+.BR ioctl (2s)
+indicates that one of the following conditions is met:
+.IP \(bu \w'\(bu\(em'u
+Code set consists of more than one byte (including the
+.B SS2
+and/or
+.BR SS3 )
+ofcharacters, or
+.IP \(bu
+Code set requires more than one column to display on the current device, as
+indicated in the
+.B EUC_WSET
+structure.
+.PP
+Assuming that one or more of the above conditions, EUC handling is enabled.
+At this point, a parallel array (see
+.B ldterm_mod
+structure) used for other information, is allocated and a pointer to it is
+stored in
+.IR t_eucp_mp .
+The parallel array which it holds is pointed to by
+.IR t_eucp .
+The
+.I t_codeset
+field holds the flag that indicates which of the code sets is currently being
+processed on the read-side.  When a byte with the high bit arrives, it is
+checked to see if it is
+.BR SS2 " or "SS3 .
+If so, it belongs to code set 2 or 3.  Otherwise, it is a byte that comes from
+code set 1.  Once the extended code set flag has been set, the input processor
+retrieves the subsequent bytes, as they arrive, to build one multi-byte
+character.  The counter field
+.I t_eucleft
+tells the input processor how many bytes remain to be read for the current
+character.  The parallel array
+.I t_eucp
+holds for each logical character in the canonical buffer its display width.
+During erase processing, positions in the parallel array are consulted to
+figure out how many backspaces need to be sent to erase each logical
+character.  (In canonical mode, one backspace of input erases one logical
+character, no matter how many bytes or columns that character consumes.) This
+greatly simplifies erase processing for EUC.
+.PP
+The
+.I t_maxeuc
+field holds the maximum length, in memory bytes, of the EUC character mapping
+currently in use.  The
+.I eucwioc
+field is a sub-structure that holds information about each extended code set.
+.PP
+The
+.I t_eucign
+field aids in output post-processing (tab expansion).  When characters are
+output,
+.B ldterm
+keeps a column to indicate what the current cursor column is supposed to be.
+When it sends the first byte of an extended character, it adds the number of
+columns required for that character to the output column.  It then subtracts
+one from the total width in memory bytes of that character and stores the
+result in
+.IR t_eucign .
+This field tells
+.B ldterm
+how many subsequent bytes to ignore for the purposes of column calculation.
+.RB ( ldterm
+calculates the appropriate number of columns when it sees the first byte of
+the character.)
+.PP
+The field
+.I t_eucwarn
+is a counter for occurrences of bad extended characters.  It is mostly useful
+for debugging.
+.PP
+There are two relevant files for handling multi-byte characters:
+.BR euc.h " and " eucioctl.h .
+The
+.B eucioctl.h
+contains the structure that is passed with
+.BR EUC_WSET " and " EUC_WGET
+calls.  The normal way to use this structure is to get
+.B CSWIDTH
+(see note below) from the locale via a mechanism such as
+.BR getwidth (3)
+or
+.BR setlocale (3)
+and then copy the values into the structure in
+.BR eucioctl.h ,
+and send the structure
+via an
+.BR I_STR (7)
+.BR ioctl (2s)
+call.  The
+.B EUC_WSET call informs the
+.B ldterm
+module about the number of bytes in extended characters and how many columns
+the extended characters from each set consume on the screen.  This allows
+.B ldterm
+to treat multi-byte characters as single entities for the purpose of erase
+processing and to correctly calculate tab expansions for multi-byte
+characters.
+.PP
+The file
+.B euc.h
+has the structure with fields for EUC width, screen width, and wide character
+width.  The following functions are used to set and get EUC widths (these
+functions assume the environment where the
+.I eucwidth_t
+structure is needed and available):
+.PP
+.RS 0
+.nf
+\fC\s-1\
+#include <sys/eucioctl.h>       /* need some other things too, like
+                                   stropts.h */
+
+struct eucioc eucw;          /* for EUC_WSET/EUC_WGET to line discipline */
+eucwidth_t width;            /* return struct from_getwidth() */
+
+/* 
+ * set_euc Send EUC code widths to line discipline.
+ */
+set_euc(e)
+        struct eucioc *e;
+{
+    struct strioctl sb;
+
+    sb.ic_cmd = EUC_WSET;
+    sb.ic_timout = 15;
+    sb.ic_len = sizeof(struct eucioc);
+    sb.ic_dp = (char *) e;
+
+    if (ioctl(0, I_STR, &sb) < 0)
+        fail();
+}
+
+/* 
+ * euclook Get current EUC code widths from line discipline.
+ */
+euclook(e)
+        struct eucioc *e;
+{
+    struct strioctl sb;
+
+    sb.ic_cmd = EUC_WGET;
+    sb.ic_timout = 15;
+    sb.ic_len = sizeof(struct eucioc);
+    sb.ic_dp = (char *) e;
+    if (ioctl(0, I_STR, &sb) < 0)
+        fail();
+
+    printf("CSWIDTH=%d:%d, %d:%d, %d:%d0",
+           e->eucw[1], e->scrw[1], e->eucw[2],
+           e->scrw[2], e->eucw[3], e->scrw[3]);
+}
+\s-1\fP
+.fi
+.RE
+.\"
+.\"
 .SH USAGE
 .PP
 .\"
@@ -265,12 +918,12 @@ has no known bugs.
 is compatible with
 .IR "SVR 4.2" ,
 .[
-svr42
+svr42spg
 .]
 and implementations based on
 .IR "SVR 4.2" ,
 .[
-svr42
+svr42spg
 .]
 such as
 .IR Solaris \(rg,
@@ -298,6 +951,9 @@ for more compatibility information.
 .SH CONFORMANCE
 .PP
 SVR 4.2,
+.[
+svr42spg
+.]
 .[
 svr42
 .]

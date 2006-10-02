@@ -1,6 +1,8 @@
 strss7 (0.9a.5.rc3-0) experimental; urgency=low
 
   * Third release candidate.
+    - better build tested on Ubuntu 6.06
+    - added device creation and removal scripts
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Sun, 16 Jul 2006 02:35:55 -0600
 

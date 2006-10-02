@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.7 2006/09/18 01:06:16 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.8 2006/10/02 11:31:16 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:06:16 $ by $Author: brian $
+% Last Modified $Date: 2006/10/02 11:31:16 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -402,6 +402,27 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.8  2006/10/02 11:31:16  brian
+- changes to get master builds working for RPM and DEB
+- added outside licenses to package documentation
+- added LICENSE automated release file
+- copy MANUAL to source directory
+- add and remove devices in -dev debian subpackages
+- get debian rules working better
+- release library version files
+- added notes to debian changelog
+- corrections for cooked manual pages in spec files
+- added release documentation to spec and rules files
+- copyright header updates
+- moved controlling tty checks in stream head
+- missing some defines for LiS build in various source files
+- added OSI headers to striso package
+- added includes and manual page paths to acincludes for various packages
+- added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+  files
+- moved pragma weak statements ahead of declarations
+- changes for master build of RPMS and DEBS with LiS
+
 Revision 0.9.2.7  2006/09/18 01:06:16  brian
 - updated manuals and release texi docs
 
@@ -2494,6 +2515,10 @@ For additional details,
 * University of Illinois License::	The UI license
 * Hewlett-Packard License::		The HP license
 * BSD/USL Combined License::		The BSD license
+* Sun RPC License::			The TIRPCSRC license
+* UNIX International DLPI License::	The DLPI license
+* UNIX International NPI License::	The NPI license
+* UNIX International TPI License::	The TPI license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -2505,6 +2530,14 @@ For additional details,
 @include texi/hp.texi
 @page
 @include texi/uslbsd.texi
+@page
+@include texi/sunrpc.texi
+@page
+@include texi/uidlpi.texi
+@page
+@include texi/uinpi.texi
+@page
+@include texi/uitpi.texi
 @page
 @include texi/gpl.texi
 @page

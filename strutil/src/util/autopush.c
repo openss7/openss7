@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/09/29 11:51:16 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/02 11:32:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:16 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: autopush.c,v $
+ Revision 0.9.2.16  2006/10/02 11:32:20  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.15  2006/09/29 11:51:16  brian
  - libtool library tweaks in Makefile.am
  - better rpm spec handling in *.spec.in
@@ -60,10 +81,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/09/29 11:51:16 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/02 11:32:20 $"
 
 static char const ident[] =
-    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/09/29 11:51:16 $";
+    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/02 11:32:20 $";
 
 /* 
  *  autopush(8)
@@ -366,7 +387,9 @@ autopush_set(char *argv[], char *devname, int major, int minor, int lastminor, i
 			fprintf(stderr, "%s: copied module name %s\n", __FUNCTION__,
 				sap.sap_list[i]);
 	}
+#ifdef LFS
 	strncpy(sap.sap_module, devname, FMNAMESZ);
+#endif
 	if (debug)
 		fprintf(stderr, "%s: performing SAD_SAP\n", __FUNCTION__);
 	if (ioctl(fd, SAD_SAP, &sap) < 0) {
@@ -447,7 +470,9 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 		sap.sap_minor = minor;
 		sap.sap_lastminor = 0;
 		sap.sap_npush = MAXAPUSH;
+#ifdef LFS
 		strncpy(sap.sap_module, devname, FMNAMESZ);
+#endif
 		if (debug)
 			fprintf(stderr, "%s: performing SAD_GAP\n", __FUNCTION__);
 		if (ioctl(fd, SAD_GAP, &sap) < 0) {
@@ -459,8 +484,10 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 			int j;
 
 			printf("DeviceName Major Minor Lastminor Modules\n");
+#ifdef LFS
 			printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
 			       (long) sap.sap_minor);
+#endif
 			if (sap.sap_minor == sap.sap_lastminor)
 				printf("%5s ", "-");
 			else
@@ -491,12 +518,14 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 			sap.sap_minor = minor;
 			sap.sap_lastminor = 0;
 			sap.sap_npush = MAXAPUSH;
+#ifdef LFS
 			strncpy(sap.sap_module, mlist->name, FMNAMESZ);
 			if (debug)
 				fprintf(stderr,
 					"%s: performing SAD_GAP major = %d, minor = %d, name = %s\n",
 					__FUNCTION__, (int) sap.sap_major, (int) sap.sap_minor,
 					sap.sap_module);
+#endif
 			errno = 0;
 			if (ioctl(fd, SAD_GAP, &sap) < 0) {
 				if (debug)
@@ -529,8 +558,10 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 			if (output || debug) {
 				int j;
 
+#ifdef LFS
 				printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
 				       (long) sap.sap_minor);
+#endif
 				if (sap.sap_minor == sap.sap_lastminor)
 					printf("%5s ", "-");
 				else
@@ -571,7 +602,9 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 		sap.sap_minor = minor;
 		sap.sap_lastminor = 0;
 		sap.sap_npush = MAXAPUSH;
+#ifdef LFS
 		strncpy(sap.sap_module, devname, FMNAMESZ);
+#endif
 		if (debug)
 			fprintf(stderr, "%s: performing SAD_SAP\n", __FUNCTION__);
 		if (ioctl(fd, SAD_SAP, &sap) < 0) {
@@ -583,8 +616,10 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 			int j;
 
 			printf("DeviceName Major Minor Lastminor Modules\n");
+#ifdef LFS
 			printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
 			       (long) sap.sap_minor);
+#endif
 			if (sap.sap_minor == sap.sap_lastminor)
 				printf("%5s ", "-");
 			else
@@ -615,10 +650,12 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 			sap.sap_minor = 0;
 			sap.sap_lastminor = 0;
 			sap.sap_npush = MAXAPUSH;
+#ifdef LFS
 			strncpy(sap.sap_module, mlist->name, FMNAMESZ);
 			if (debug)
 				fprintf(stderr, "%s: performing SAD_SAP major = %d, name = %s\n",
 					__FUNCTION__, (int) major, sap.sap_module);
+#endif
 			if (ioctl(fd, SAD_SAP, &sap) < 0) {
 				switch (errno) {
 				case ENOSTR:	/* skip that device */
@@ -643,8 +680,10 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 			if (output || debug) {
 				int j;
 
+#ifdef LFS
 				printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
 				       (long) sap.sap_minor);
+#endif
 				if (sap.sap_minor == sap.sap_lastminor)
 					printf("%5s ", "-");
 				else
@@ -731,15 +770,19 @@ autopush_fil(char *argv[], char *filename)
 		if (tokenind < 3)
 			goto error;
 		sap.sap_major = major;
+#ifdef LFS
 		strncpy(sap.sap_module, devname, FMNAMESZ);
+#endif
 		if (minor == -1) {
 			sap.sap_cmd = SAP_ALL;
 			sap.sap_minor = 0;
 			sap.sap_lastminor = 0;
+#ifdef LFS
 		} else if (lastminor == -1) {
 			sap.sap_cmd = SAP_CLONE;
 			sap.sap_minor = minor;
 			sap.sap_lastminor = 0;
+#endif
 		} else if (lastminor == 0) {
 			sap.sap_cmd = SAP_ONE;
 			sap.sap_minor = minor;
@@ -753,8 +796,10 @@ autopush_fil(char *argv[], char *filename)
 			sap.sap_minor = minor;
 			sap.sap_lastminor = 0;
 		}
+#ifdef LFS
 		if (tokenind == 3 && sap.sap_cmd != SAP_CLONE)
 			goto error;
+#endif
 		if ((fd = open(SAD_ADMIN_FILENAME, O_RDWR | O_NONBLOCK)) < 0) {
 			if (output || debug)
 				perror(argv[0]);

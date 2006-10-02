@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/09/18 01:18:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,32 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:47 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 11:32:23 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.28  2006/10/02 11:32:23  brian
+# - changes to get master builds working for RPM and DEB
+# - added outside licenses to package documentation
+# - added LICENSE automated release file
+# - copy MANUAL to source directory
+# - add and remove devices in -dev debian subpackages
+# - get debian rules working better
+# - release library version files
+# - added notes to debian changelog
+# - corrections for cooked manual pages in spec files
+# - added release documentation to spec and rules files
+# - copyright header updates
+# - moved controlling tty checks in stream head
+# - missing some defines for LiS build in various source files
+# - added OSI headers to striso package
+# - added includes and manual page paths to acincludes for various packages
+# - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+#   files
+# - moved pragma weak statements ahead of declarations
+# - changes for master build of RPMS and DEBS with LiS
+#
 # Revision 0.9.2.27  2006/09/18 01:18:47  brian
 # - updated documentation and include file makefiles
 #
@@ -98,6 +119,7 @@ EXTRA_info_TEXINFOS	= \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
+			  texi/uitpi.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
 			  texi/testsuite.texi \

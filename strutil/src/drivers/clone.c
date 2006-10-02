@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/09/29 11:51:09 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/02 11:32:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:09 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/09/29 11:51:09 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/02 11:32:17 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/09/29 11:51:09 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/02 11:32:17 $";
 
 #define _LFS_SOURCE
 
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/09/29 11:51:09 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/02 11:32:17 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -156,16 +156,20 @@ static struct module_stat clone_rstat __attribute__((__aligned__(SMP_CACHE_BYTES
 static struct module_stat clone_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 LFSSTATIC struct qinit clone_rinit = {
+#ifdef LFS
 	.qi_putp = strrput,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
+#endif
 	.qi_minfo = &clone_minfo,
 	.qi_mstat = &clone_rstat,
 };
 
 LFSSTATIC struct qinit clone_winit = {
+#ifdef LFS
 	.qi_putp = strwput,
 	.qi_srvp = strwsrv,
+#endif
 	.qi_minfo = &clone_minfo,
 	.qi_mstat = &clone_wstat,
 };

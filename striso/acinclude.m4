@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/26 00:51:15 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/02 11:31:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 00:51:15 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 11:31:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,9 +67,11 @@ m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
-m4_include([m4/xopen.m4])
+dnl m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
+m4_include([m4/nsl.m4])
+m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
 
@@ -112,6 +114,11 @@ AC_DEFUN([AC_ISO], [dnl
     _ISO_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SCTP_CPPFLAGS:+ }}${SCTP_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${INET_CPPFLAGS:+ }}${INET_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SOCK_CPPFLAGS:+ }}${SOCK_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${NSL_CPPFLAGS:+ }}${NSL_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
@@ -144,6 +151,10 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${NSL_MANPATH:+${NSL_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SOCK_MANPATH:+${SOCK_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${INET_MANPATH:+${INET_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SCTP_MANPATH:+${SCTP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -157,13 +168,30 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
 # _ISO_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_OPTIONS], [dnl
+    _ISO_CHECK_ISO
+    _ISO_CHECK_SCTP
 ])# _ISO_OPTIONS
+# =============================================================================
+
+# =============================================================================
+# _ISO_CHECK_ISO
+# -----------------------------------------------------------------------------
+AC_DEFUN([_ISO_CHECK_ISO], [dnl
+])# _ISO_CHECK_ISO
+# =============================================================================
+
+# =============================================================================
+# _ISO_CHECK_SCTP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_ISO_CHECK_SCTP], [dnl
+])# _ISO_CHECK_SCTP
 # =============================================================================
 
 # =============================================================================
 # _ISO_SETUP_DEBUG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_SETUP_DEBUG], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     case "$linux_cv_debug" in
     _DEBUG)
 	AC_DEFINE_UNQUOTED([ISO_CONFIG_DEBUG], [], [Define to perform
@@ -193,6 +221,13 @@ AC_DEFUN([_ISO_SETUP_DEBUG], [dnl
 # =============================================================================
 
 # =============================================================================
+# _ISO_OTHER_SCTP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_ISO_OTHER_SCTP], [dnl
+])# _ISO_OTHER_SCTP
+# =============================================================================
+
+# =============================================================================
 # _ISO_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_SETUP], [dnl
@@ -201,13 +236,17 @@ AC_DEFUN([_ISO_SETUP], [dnl
     _GENKSYMS
     _LINUX_STREAMS
     _STRCOMP
-    _XOPEN
+dnl with_iso='yes'
+dnl _XOPEN
     _XNS
     _XTI
+    _NSL
+    _SOCK
     _INET
     _SCTP
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
+    _ISO_OTHER_SCTP
     _ISO_SETUP_MODULE
     _ISO_CONFIG_KERNEL
     _ISO_SETUP_DEBUG
@@ -218,6 +257,7 @@ AC_DEFUN([_ISO_SETUP], [dnl
 # _ISO_SETUP_MODULE
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_SETUP_MODULE], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
 	AC_DEFINE_UNQUOTED([ISO_CONFIG_MODULE], [], [When defined, ISO is
 			    being compiled as a loadable kernel module.])
@@ -227,13 +267,13 @@ AC_DEFUN([_ISO_SETUP_MODULE], [dnl
     fi
     AM_CONDITIONAL([ISO_CONFIG_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
     AM_CONDITIONAL([ISO_CONFIG], [test :${linux_cv_k_linkage:-loadable} = :linkable])
-])
+])# _ISO_SETUP_MODULE
 # =============================================================================
 
 # =============================================================================
 # _INET_CONFIG_KERNEL
 # -----------------------------------------------------------------------------
-# These are a bunch of kernel configuraiton checks primarily in support of 2.5
+# These are a bunch of kernel configuration checks primarily in support of 2.5
 # and 2.6 kernels.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_CONFIG_KERNEL], [dnl
@@ -308,8 +348,16 @@ AC_DEFUN([_ISO_CONFIG_KERNEL], [dnl
 # _ISO_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_OUTPUT], [dnl
+    _ISO_CONFIG
     _ISO_STRCONF dnl
 ])# _ISO_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _ISO_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_ISO_CONFIG], [dnl
+])# _ISO_CONFIG
 # =============================================================================
 
 # =============================================================================

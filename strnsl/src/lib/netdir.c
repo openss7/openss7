@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $
+ @(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:30:57 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:31:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir.c,v $
+ Revision 0.9.2.2  2006/10/02 11:31:54  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.1  2006/09/25 12:30:57  brian
  - added files for new strnsl package
 
@@ -67,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $"
+#ident "@(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:54 $"
 
 static char const ident[] =
-    "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $";
+    "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:54 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -200,29 +221,23 @@ struct __nsl_xlate {
   * netconfig.  libn2a_inet is provided separately by the strinet package.
   * @{ */
 
-extern struct nd_addrlist *__inet_netdir_getbyname(struct netconfig *nc,
-						   struct nd_hostserv *service);
 #pragma weak __inet_netdir_getbyname
-
-extern struct nd_hostservlist *__inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr);
+extern struct nd_addrlist *__inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service);
 
 #pragma weak __inet_netdir_getbyaddr
-
-extern int __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta);
+extern struct nd_hostservlist *__inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr);
 
 #pragma weak __inet_netdir_options
-
-extern char *__inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
+extern int __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta);
 
 #pragma weak __inet_taddr2uaddr
-
-extern struct netbuf *__inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
+extern char *__inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
 
 #pragma weak __inet_uaddr2taddr
-
-extern char *__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr);
+extern struct netbuf *__inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
 
 #pragma weak __inet_netdir_mergeaddr
+extern char *__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr);
 /** @} */
 
 /** @} */

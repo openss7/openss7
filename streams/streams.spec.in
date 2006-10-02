@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/09/29 11:50:20 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/10/02 11:31:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:20 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 11:31:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -155,6 +155,12 @@
 #{?_with_lis:        %{expand: %%global BUILD_lfs     0}}
 #{?_with_lfs:        %{expand: %%global BUILD_lfs     1}}
 #{?_with_lfs:        %{expand: %%global BUILD_lis     0}}
+
+# need manpage references unless otherwise specified
+%global NEED_manrefs  1
+
+%{?_without_cooked_manpages: %{expand: %%global NEED_manrefs 0}}
+%{?_with_cooked_manpages:    %{expand: %%global NEED_manrefs 1}}
 
 %define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
@@ -354,6 +360,14 @@
 %global FILES_libs          0
 %global FILES_devlibs       0
 %global FILES_tools         0
+%endif
+
+%if %{have_libraries}
+%else
+%global FILES_libs          0
+%global FILES_libs32        0
+%global FILES_devlibs       0
+%global FILES_devlibs32     0
 %endif
 
 # we have some more options that control configure for the build
@@ -660,8 +674,10 @@ function package_source() {
 package_source
 %endif
 
+%if %{NEED_manrefs}
 # stupid mandrake spec-helper will compress our macros files otherwise
-#@COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
+#export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
+%endif
 
 # stupid suse check compresses everything (including our macro files)
 #{?suse_check: %{expand: %%define suse_check echo "SuSE Check skipped"}}
@@ -1390,10 +1406,12 @@ if [ $1 = 1 ] ; then : # fresh install
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
-@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
-@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
-@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
-@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
+%if %{NEED_manrefs}
+    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
+    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
+    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
+    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
+%endif
 fi
 
 %preun doc
@@ -1413,8 +1431,10 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         done
     fi
 %endif
-@COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.refs
-@COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.macros
+%if %{NEED_manrefs}
+    rm -f -- %{_mandir}/%{base}.refs
+    rm -f -- %{_mandir}/%{base}.macros
+%endif
 fi
 
 %postun doc
@@ -1430,13 +1450,16 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #doc ABOUT-NLS
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
+%doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
+%doc %{name}-%{version}.lsm
+%doc doc/manual
 #doc doc/specs doc/projects doc/drafts
-%doc LSM %{name}-%{version}.lsm
-%doc README-make
 %{_infodir}/*
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros*
+%if %{NEED_manrefs}
+%{_mandir}/%{base}.refs*
+%{_mandir}/%{base}.macros*
+%endif
 %{_mandir}/man*/*
 %endif
 
@@ -1444,12 +1467,16 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
+%doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
+%doc %{name}-%{version}.lsm
+%doc doc/manual
 #doc doc/specs doc/projects doc/drafts
-%doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros*
+%if %{NEED_manrefs}
+%{_mandir}/%{base}.refs*
+%{_mandir}/%{base}.macros*
+%endif
 %{_mandir}/man*/*
 %endif
 
@@ -1881,7 +1908,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%config(noreplace) %{_modutildir}/*
+%{?modules:%config(noreplace) %{_modutildir}/*}
 %endif
 
 %if %{FILES_ko_noinit}
@@ -1895,14 +1922,36 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.146  2006/09/29 11:50:20  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
+# Revision 0.9.2.147  2006/10/02 11:31:35  brian
+# - changes to get master builds working for RPM and DEB
+# - added outside licenses to package documentation
+# - added LICENSE automated release file
+# - copy MANUAL to source directory
+# - add and remove devices in -dev debian subpackages
+# - get debian rules working better
+# - release library version files
+# - added notes to debian changelog
+# - corrections for cooked manual pages in spec files
+# - added release documentation to spec and rules files
+# - copyright header updates
+# - moved controlling tty checks in stream head
+# - missing some defines for LiS build in various source files
+# - added OSI headers to striso package
+# - added includes and manual page paths to acincludes for various packages
+# - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+#   files
+# - moved pragma weak statements ahead of declarations
+# - changes for master build of RPMS and DEBS with LiS
 #
+
+* Fri Sep 29 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.146  2006/09/29 11:50:20  brian
+- libtool library tweaks in Makefile.am
+- better rpm spec handling in *.spec.in
+- added AC_LIBTOOL_DLOPEN to configure.ac
+- updated some copyright headers
+- rationalized item in two packages
+- added manual pages, drivers and modules to new strtty package
 
 * Mon Sep 18 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.145  2006/09/18 01:23:07  brian

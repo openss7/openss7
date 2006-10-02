@@ -21,8 +21,8 @@ Pre-Depends: @kernel_image@-@kversion@ (= @krelease@), lis-core-@STREAMS_VERSION
 Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for Linux
  Fast-STREAMS.  Includes assorted Linux Fast-STREAMS drivers and
- modules for @PACKAGE_TITLE@.  These binaries are heavily tied
- to the kernel for which they were compiled: applies to kernel
+ modules for @PACKAGE_TITLE@.  These binaries are heavily
+ tied to the kernel for which they were compiled: applies to kernel
  version @kversion@ and requires an Linux Fast-STREAMS package
  compiled for the same kernel.
 
@@ -38,10 +38,11 @@ Depends: @kernel_image@-@kversion@ (= @krelease@), streams-core-@STREAMS_VERSION
 Pre-Depends: @kernel_image@-@kversion@ (= @krelease@), streams-core-@STREAMS_VERSION@ (= @krelease@)
 Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for STREAMS.
- Includes assorted STREAMS drivers and modules for @PACKAGE_TITLE@.
- These binaries are heavily tied to the kernel for which they were
- compiled: applies to kernel version @kversion@ and requires a
- STREAMS package compiled for the same kernel.
+ Includes assorted STREAMS drivers and modules for
+ @PACKAGE_TITLE@.  These binaries are heavily tied to the
+ kernel for which they were compiled: applies to kernel version
+ @kversion@ and requires an STREAMS package compiled for the same
+ kernel.
 
 Package: @PACKAGE_LCNAME@-lis-util
 Architecture: any
@@ -75,9 +76,10 @@ Section: devel
 Priority: optional
 Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: C headers and static libraries for @PACKAGE_TITLE@
- Static libraries and kernel headers to develop @PACKAGE_TITLE@
- modules and drivers; user-space headers and static libraries
- required to compile @PACKAGE_TITLE@ applications programs.
+ Static libraries and kernel headers to develop
+ @PACKAGE_TITLE@ modules and drivers; user-space headers and
+ static libraries required to compile @PACKAGE_TITLE@
+ applications programs.
 
 Package: @PACKAGE_LCNAME@-init
 Architecture: all
@@ -85,8 +87,8 @@ Section: base
 Priority: optional
 Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
 Description: Init scripts and config files for @PACKAGE_TITLE@
- SysV init scripts and configuration files for @PACKAGE_TITLE@
- for Linux Fast-STREAMS.
+ SysV init scripts and configuration files for
+ @PACKAGE_TITLE@ for Linux Fast-STREAMS.
 
 Package: @PACKAGE_LCNAME@-dev
 Architecture: all
@@ -111,7 +113,7 @@ Architecture: all
 Section: devel
 Priority: optional
 Description: Source code for @PACKAGE_TITLE@
- Source code for building the @PACKAGE_TITLE@ release: autoconf
- configuration utilities necessary to create and distribute this
- dpkg -- required for recompiling against recompiled kernel.
+ Source code for building the @PACKAGE_TITLE@ release:
+ autoconf configuration utilities necessary to create and distribute
+ this dpkg -- required for recompiling against recompiled kernel.
 

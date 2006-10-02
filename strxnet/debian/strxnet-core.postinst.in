@@ -2,19 +2,18 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet-core.postinst.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/26 22:21:29 $
+# @(#) $RCSfile: strxnet-core.postinst.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/02 11:32:22 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 22:21:29 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 11:32:22 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -169,6 +168,27 @@ subpkg=core
 # =============================================================================
 #
 # $Log: strxnet-core.postinst.in,v $
+# Revision 0.9.2.4  2006/10/02 11:32:22  brian
+# - changes to get master builds working for RPM and DEB
+# - added outside licenses to package documentation
+# - added LICENSE automated release file
+# - copy MANUAL to source directory
+# - add and remove devices in -dev debian subpackages
+# - get debian rules working better
+# - release library version files
+# - added notes to debian changelog
+# - corrections for cooked manual pages in spec files
+# - added release documentation to spec and rules files
+# - copyright header updates
+# - moved controlling tty checks in stream head
+# - missing some defines for LiS build in various source files
+# - added OSI headers to striso package
+# - added includes and manual page paths to acincludes for various packages
+# - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+#   files
+# - moved pragma weak statements ahead of declarations
+# - changes for master build of RPMS and DEBS with LiS
+#
 # Revision 0.9.2.3  2005/03/26 22:21:29  brian
 # - working up debian maint scripts
 #

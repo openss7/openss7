@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.1 2006/08/26 09:15:26 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.2 2006/10/02 11:32:13 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,16 +53,41 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 09:15:26 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/02 11:32:13 $ by $Author: brian $
 @c
 @c =========================================================================
 
-The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} mopdules and drivers, libraries,
+The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and drivers, libraries,
 programs, init scripts, and daemons.
+
+The package builds and installs the following @dfn{STREAMS} kernel modules and
+drivers:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{streams_sockmod.ko} module @dfn{sockmod}
+@item @tab @minus{} @file{streams_socksys.ko} driver @dfn{/dev/socksys}
+@end multitable
+
+@table @manref
+@item sockmod(4)
+
+@item socksys(4)
+
+@end table
+
+The package builds and installs the following shared object libraries:
+
+@table @manref
+@item libsocklib(3)
+
+@item libsocket(3)
+
+@end table
 
 The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
 drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
-development and execution of @cite{@value{PACKAGE_TITLE}} modules and drivers.
+development and execution of @cite{@value{PACKAGE_TITLE}} protocol stack components and
+applications for the @cite{SVR 4.2} @dfn{STREAMS} environment.
 
 This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targetted
 at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but should build and

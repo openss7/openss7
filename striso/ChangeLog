@@ -1,3 +1,17 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: add includes and manpaths for new packages
+	* striso.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/control.in: mostly text description formatting
+	* src/drivers/clns.c: lis is missing some compatibility defines
+	* src/include/Makefile.am: add OSI XTI headers
+	* src/include/xti.h: add OSI XTI headers
+	* src/include/xti_mosi.h: add OSI XTI headers
+	* src/include/xti_osi.h: add OSI XTI headers
+	* src/include/sys/xti_mosi.h: add OSI XTI headers
+	* src/include/sys/xti_osi.h: add OSI XTI headers
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/striso-dev.postinst.in: add and remove devices

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:55 $
+ @(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/02 11:32:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:55 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: soconfig.c,v $
+ Revision 0.9.2.3  2006/10/02 11:32:09  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.2  2006/09/18 13:52:55  brian
  - added doxygen markers to sources
 
@@ -58,9 +79,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:55 $"
+#ident "@(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/02 11:32:09 $"
 
-static char const ident[] = "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:55 $";
+static char const ident[] = "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/02 11:32:09 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -79,7 +100,10 @@ static char const ident[] = "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2
 #endif
 
 #include <stropts.h>
+#if 0
+/* later */
 #include <sys/sc.h>
+#endif
 #include <sys/socket.h>
 #include <netinet/in.h>
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:38 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/02 11:31:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:38 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:31:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.49  2006/10/02 11:31:44  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.48  2006/08/16 07:47:38  brian
  - removed locking macro pollution
 
@@ -197,10 +218,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:38 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/02 11:31:44 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:38 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/02 11:31:44 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -279,7 +300,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/16 07:47:38 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/02 11:31:44 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -703,6 +724,18 @@ tp_alloc(void)
 #define local_restore_str2(__flags) \
 	local_irq_restore(__flags)
 
+#endif
+
+#ifdef LIS
+#ifndef noinline
+#define noinline
+#endif
+#ifndef fastcall
+#define fastcall
+#endif
+#ifndef __unlikely
+#define __unlikely
+#endif
 #endif
 
 /*

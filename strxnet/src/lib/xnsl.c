@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:28 $
+ @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/02 11:32:26 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/22 20:54:28 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnsl.c,v $
+ Revision 0.9.2.4  2006/10/02 11:32:26  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.3  2006/09/22 20:54:28  brian
  - tweaked source file for use with doxygen
 
@@ -61,9 +82,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:28 $"
+#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/02 11:32:26 $"
 
-static char const ident[] = "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/22 20:54:28 $";
+static char const ident[] = "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/02 11:32:26 $";
 
 /* This file cannot be processed with doxygen. */
 
@@ -1240,6 +1261,13 @@ struct __nsl_xlate {
 	void *lib;			/* dlopen pointer */
 } *__nsl_xlate_list = NULL;
 
+#pragma weak __inet_netdir_getbyname
+#pragma weak __inet_netdir_getbyaddr
+#pragma weak __inet_netdir_options
+#pragma weak __inet_taddr2uaddr
+#pragma weak __inet_uaddr2taddr
+#pragma weak __inet_netdir_mergeaddr
+
 /*
  *  A little explanation is in order here.  SVR4 provides NSS defaults for inet
  *  if name to address translation libraries are not specified.  The functions
@@ -1255,13 +1283,6 @@ extern int __inet_netdir_options(struct netconfig *nc, int option, int fd, char 
 extern char *__inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
 extern struct netbuf *__inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr);
 extern char *__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr);
-
-#pragma weak __inet_netdir_getbyname
-#pragma weak __inet_netdir_getbyaddr
-#pragma weak __inet_netdir_options
-#pragma weak __inet_taddr2uaddr
-#pragma weak __inet_uaddr2taddr
-#pragma weak __inet_netdir_mergeaddr
 
 /**
  * @fn static struct __nsl_xlate *__nsl_load_xlate(const char *name)
@@ -2305,10 +2326,10 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.3 $).
+ * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.4 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.3 $)
- * @date \$Date: 2006/09/22 20:54:28 $
+ * @version \$Name:  $(\$Revision: 0.9.2.4 $)
+ * @date \$Date: 2006/10/02 11:32:26 $
  *
  * @}
  */

@@ -1,3 +1,18 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: add includes and manpaths for new packages
+	* strinet.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/control.in: mostly text description formatting
+	* debian/strinet-core.postinst.in: copyright header updates
+	* debian/strinet-core.postrm.in: copyright header updates
+	* debian/strinet-core.preinst.in: copyright header updates
+	* debian/strinet-core.prerm.in: copyright header updates
+	* debian/strinet-devel.preinst.in: copyright header updates
+	* debian/strinet-doc.postinst.in: copyright header updates
+	* src/drivers/rawip.c: lis is missing some compatibility defines
+	* src/drivers/udp.c: lis is missing some compatibility defines
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strinet-dev.postinst.in: add and remove devices

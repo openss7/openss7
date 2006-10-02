@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 11:51:10 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/02 11:32:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:10 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 11:51:10 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/02 11:32:18 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 11:51:10 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/02 11:32:18 $";
 
 #define _LFS_SOURCE
 
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 11:51:10 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/02 11:32:18 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -150,13 +150,6 @@ MODULE_ALIAS("/dev/streams/nuls/*");
 #endif
 #endif
 
-#ifdef LIS
-#define STRMINPSZ   0
-#define STRMAXPSZ   4096
-#define STRHIGH	    5120
-#define STRLOW	    1024
-#endif
-
 static struct module_info nuls_minfo = {
 	.mi_idnum = CONFIG_STREAMS_NULS_MODID,
 	.mi_idname = CONFIG_STREAMS_NULS_NAME,
@@ -168,22 +161,6 @@ static struct module_info nuls_minfo = {
 
 static struct module_stat nuls_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat nuls_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-
-#ifdef LIS
-#define _trace() while (0) { }
-#define _ptrace(__x) while (0) { }
-#define _printd(__x) while (0) { }
-#define pswerr(__x) while (0) { }
-
-union ioctypes {
-	struct iocblk iocblk;
-	struct copyreq copyreq;
-	struct copyresp copyresp;
-};
-
-#define streamscall _RP
-
-#endif
 
 static streamscall int
 nuls_put(queue_t *q, mblk_t *mp)

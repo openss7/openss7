@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/26 09:19:05 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/02 11:31:48 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/26 09:19:05 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:31:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.8  2006/10/02 11:31:48  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.7  2006/08/26 09:19:05  brian
  - better release file generation
 
@@ -73,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/26 09:19:05 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/02 11:31:48 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/26 09:19:05 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/02 11:31:48 $";
 
 /*
  *  This is an X.233 CLNS driver.  This is an NPI driver that can be pushed over or link a DLPI
@@ -129,7 +150,7 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2006/08/26 09:19:05 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/10/02 11:31:48 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL"
@@ -894,6 +915,15 @@ n_reset_res(queue_t *q, mblk_t *mp)
 {
 	return (-EFAULT);
 }
+
+#ifdef LIS
+#ifndef fastcall
+#define fastcall
+#endif
+#ifndef __hot_put
+#define __hot_put
+#endif
+#endif
 
 STATIC INLINE fastcall __hot_put int
 np_w_proto(queue_t *q, mblk_t *mp)
@@ -1678,7 +1708,7 @@ module_exit(np_exit);
 #endif				/* LFS */
 
 #ifdef LIS
-STATIC int np_initalized = 0;
+STATIC int np_initialized = 0;
 STATIC void
 np_init(void)
 {
@@ -1699,7 +1729,7 @@ np_init(void)
 		return;
 	}
 	np_initialized = 1;
-	if (major = 0 && err > 0) {
+	if (major == 0 && err > 0) {
 		major = err;
 		np_initialized = 2;
 	}

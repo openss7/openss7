@@ -1,3 +1,19 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* strxns.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/copyright: added licenses
+	* debian/strxns-core.postinst.in: copyright header updates
+	* debian/strxns-core.postrm.in: copyright header updates
+	* debian/strxns-core.preinst.in: copyright header updates
+	* debian/strxns-core.prerm.in: copyright header updates
+	* debian/strxns-devel.preinst.in: copyright header updates
+	* debian/strxns-doc.postinst.in: copyright header updates
+	* doc/manual/Makefile.am: add uidlpi and uinpi license
+	* doc/manual/strxns.texi: add uidlpi and uinpi license
+	* doc/specs/dlpi/dlpi.texi: fix dates
+	* src/drivers/np_ip.c: LiS is missing some comppatibility defines
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strnxs-dev.postinst.in: add and remove devices

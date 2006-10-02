@@ -1,3 +1,16 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4:
+	* strsctp.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/control.in: mostly text description formatting
+	* debian/strsctp-core.postinst.in: copyright header updates
+	* debian/strsctp-core.postrm.in: copyright header updates
+	* debian/strsctp-core.preinst.in: copyright header updates
+	* debian/strsctp-core.prerm.in: copyright header updates
+	* debian/strsctp-devel.preinst.in: copyright header updates
+	* debian/strsctp-doc.postinst.in: copyright header updates
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strsctp-dev.postinst.in: add and remove devices

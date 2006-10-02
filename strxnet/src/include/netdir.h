@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netdir.h,v 0.9.2.5 2006/09/25 12:04:42 brian Exp $
+ @(#) $Id: netdir.h,v 0.9.2.6 2006/10/02 11:32:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:04:42 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir.h,v $
+ Revision 0.9.2.6  2006/10/02 11:32:24  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.5  2006/09/25 12:04:42  brian
  - updated headers, moved xnsl
 
@@ -70,7 +91,7 @@
 #ifndef __NETDIR_H__
 #define __NETDIR_H__
 
-#ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -309,6 +330,13 @@ typedef char *(*nd_mga_t) (struct netconfig *, char *, char *);
 /** @name Symbol Names
  *  Symbols from lookup shared objects.
  *  @{ */
+#pragma weak _netdir_getbyname
+#pragma weak _netdir_getbyaddr
+#pragma weak _netdir_options
+#pragma weak _taddr2uaddr
+#pragma weak _uaddr2taddr
+#pragma weak _netdir_mergeaddr
+
 /** netdir_getbyname() internal function. */
 struct nd_addrlist *_netdir_getbyname(struct netconfig *, struct nd_hostserv *);
 
@@ -326,13 +354,6 @@ struct netbuf *_uaddr2taddr(struct netconfig *, struct netbuf *);
 
 /** netdir_mergeaddr() internal function. */
 char *_netdir_mergeaddr(struct netconfig *, char *, char *);
-
-#pragma weak _netdir_getbyname
-#pragma weak _netdir_getbyaddr
-#pragma weak _netdir_options
-#pragma weak _taddr2uaddr
-#pragma weak _uaddr2taddr
-#pragma weak _netdir_mergeaddr
 /** @} */
 
 #ifdef __END_DECLS

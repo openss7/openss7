@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:24:17 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/02 11:32:19 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:17 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.13  2006/10/02 11:32:19  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.12  2006/03/10 07:24:17  brian
  - rationalized streams and strutil package sources
 
@@ -107,9 +128,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:24:17 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/02 11:32:19 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:24:17 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/02 11:32:19 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2454,7 +2475,7 @@ test_case_2_2_4(int child)
 	struct strapush sap = { 0, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { 0, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap = { { 0, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 
 	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap) == __RESULT_SUCCESS)
@@ -2485,7 +2506,7 @@ preamble_test_case_2_2_5(int child)
 	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { SAP_ALL, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap = { { SAP_ALL, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 
 	if (getuid() != 0 && geteuid() != 0)
@@ -2505,7 +2526,7 @@ test_case_2_2_5(int child)
 	struct strapush sap2 = { 0, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap2 = { { 0, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap2 = { { 0, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 
 	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap2) != __RESULT_SUCCESS)
@@ -2520,7 +2541,7 @@ postamble_test_case_2_2_5(int child)
 	struct strapush sap = { SAP_CLEAR, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { SAP_CLEAR, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap = { { SAP_CLEAR, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 	int result = __RESULT_SUCCESS;
 
@@ -2591,11 +2612,11 @@ test_case_2_3_2(int child)
 #endif
 #endif
 #ifdef LIS
-	struct strapush sap = { { 5, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap = { { 5, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 	struct strapush sap1 = { { SAP_CLEAR, 0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
-	struct strapush sap2 = { { SAP_CLEAR, SAD__CMAJOR_0, -1, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap2 = { { SAP_CLEAR, SAD_CMAJOR_0, -1, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #if 0
-	struct strapush sap3 = { { SAP_CLEAR, SAD__CMAJOR_0, 4, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap3 = { { SAP_CLEAR, SAD_CMAJOR_0, 4, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 #endif
 
@@ -2651,8 +2672,8 @@ test_case_2_3_3(int child)
 	struct strapush sap2 = { SAP_ALL, -1, 0, 1, MAXAPUSH + 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap1 = { { SAP_ALL, SAD__CMAJOR_0, 0, 1, 0, }, { CONFIG_STREAMS_SC_NAME, }, };
-	struct strapush sap2 = { { SAP_ALL, SAD__CMAJOR_0, 0, 1, MAXAPUSH + 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap1 = { { SAP_ALL, SAD_CMAJOR_0, 0, 1, 0, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap2 = { { SAP_ALL, SAD_CMAJOR_0, 0, 1, MAXAPUSH + 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 
 	if (getuid() != 0 && geteuid() != 0)
@@ -2699,7 +2720,7 @@ test_case_2_3_4(int child)
 	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, { "", }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { SAP_ALL, SAD__CMAJOR_0, 0, 1, 1, }, { "", }, };
+	struct strapush sap = { { SAP_ALL, SAD_CMAJOR_0, 0, 1, 1, }, { "", }, };
 #endif
 
 	if (getuid() != 0 && geteuid() != 0)
@@ -2771,7 +2792,7 @@ preamble_test_case_2_3_6(int child)
 	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { SAP_ALL, SAD__CMAJOR_0, 0, 1, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
+	struct strapush sap = { { SAP_ALL, SAD_CMAJOR_0, 0, 1, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
 #endif
 
 	if (getuid() != 0 && geteuid() != 0)
@@ -2794,9 +2815,9 @@ test_case_2_3_6(int child)
 	struct strapush sap3 = { SAP_ALL, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap1 = { { SAP_ONE, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
-	struct strapush sap2 = { { SAP_RANGE, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
-	struct strapush sap3 = { { SAP_ALL, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap1 = { { SAP_ONE, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap2 = { { SAP_RANGE, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap3 = { { SAP_ALL, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 
 	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap1) == __RESULT_SUCCESS)
@@ -2826,7 +2847,7 @@ postamble_test_case_2_3_6(int child)
 	struct strapush sap = { SAP_CLEAR, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { SAP_CLEAR, SAD__CMAJOR_0, 0, 1, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
+	struct strapush sap = { { SAP_CLEAR, SAD_CMAJOR_0, 0, 1, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
 #endif
 	int result = __RESULT_SUCCESS;
 
@@ -2860,7 +2881,7 @@ preamble_test_case_2_3_7(int child)
 	struct strapush sap = { SAP_RANGE, -1, 0, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { SAP_RANGE, SAD__CMAJOR_0, 0, 2, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
+	struct strapush sap = { { SAP_RANGE, SAD_CMAJOR_0, 0, 2, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
 #endif
 
 	if (getuid() != 0 && geteuid() != 0)
@@ -2882,7 +2903,7 @@ test_case_2_3_7(int child)
 	struct strapush sap = { SAP_CLEAR, -1, 1, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { SAP_CLEAR, SAD__CMAJOR_0, 1, 2, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
+	struct strapush sap = { { SAP_CLEAR, SAD_CMAJOR_0, 1, 2, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
 #endif
 
 	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) == __RESULT_SUCCESS)
@@ -2901,7 +2922,7 @@ postamble_test_case_2_3_7(int child)
 	struct strapush sap = { SAP_CLEAR, -1, 0, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap = { { SAP_CLEAR, SAD__CMAJOR_0, 0, 2, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
+	struct strapush sap = { { SAP_CLEAR, SAD_CMAJOR_0, 0, 2, 1, }, {CONFIG_STREAMS_SC_NAME,}, };
 #endif
 	int result = __RESULT_SUCCESS;
 
@@ -2936,8 +2957,8 @@ test_case_2_3_8(int child)
 	struct strapush sap2 = { SAP_RANGE, -1, 1, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap1 = { { SAP_RANGE, SAD__CMAJOR_0, 1, 0, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
-	struct strapush sap2 = { { SAP_RANGE, SAD__CMAJOR_0, 1, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap1 = { { SAP_RANGE, SAD_CMAJOR_0, 1, 0, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap2 = { { SAP_RANGE, SAD_CMAJOR_0, 1, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 
 	if (getuid() != 0 && geteuid() != 0)
@@ -2978,7 +2999,7 @@ test_case_2_3_9(int child)
 	struct strapush sap1 = { SAP_CLEAR, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
 #endif
 #ifdef LIS
-	struct strapush sap1 = { { SAP_CLEAR, SAD__CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
+	struct strapush sap1 = { { SAP_CLEAR, SAD_CMAJOR_0, 0, 1, 1, }, { CONFIG_STREAMS_SC_NAME, }, };
 #endif
 
 	if (getuid() != 0 && geteuid() != 0)

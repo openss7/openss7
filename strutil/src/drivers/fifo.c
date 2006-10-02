@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 11:51:09 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:09 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 11:51:09 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:17 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 11:51:09 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:17 $";
 
 #define _LFS_SOURCE
 
@@ -75,7 +75,7 @@ extern struct file_operations strm_f_ops;
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 11:51:09 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:17 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -156,16 +156,20 @@ static struct module_stat fifo_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)
 static struct module_stat fifo_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 LFSSTATIC struct qinit fifo_rinit = {
+#ifdef LFS
 	.qi_putp = strrput,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
+#endif
 	.qi_minfo = &fifo_minfo,
 	.qi_mstat = &fifo_rstat,
 };
 
 LFSSTATIC struct qinit fifo_winit = {
+#ifdef LFS
 	.qi_putp = strwput,
 	.qi_srvp = strwsrv,
+#endif
 	.qi_minfo = &fifo_minfo,
 	.qi_mstat = &fifo_wstat,
 };
@@ -244,7 +248,9 @@ fifo_open(struct inode *inode, struct file *file)
 		file->f_op = f_op;
 	}
 	file->private_data = &dev;	/* use this device number instead of inode number */
+#ifdef LFS
 	file->f_flags &= ~O_CLONE;	/* FIFOs never clone */
+#endif
 	err = file->f_op->open(inode, file);
       error:
 	return (err);

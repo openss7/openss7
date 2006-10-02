@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/24 21:36:46 $
+ @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:36:46 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:31:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/24 21:36:46 $"
+#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:20 $"
 
-static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/24 21:36:46 $";
+static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:20 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -111,8 +111,8 @@ static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9
 #pragma weak __pthread_testcancel
 extern void __pthread_testcancel(void);
 
-extern int __pthread_setcanceltype(int type, int *oldtype);
 #pragma weak __pthread_setcanceltype
+extern int __pthread_setcanceltype(int type, int *oldtype);
 
 /** @} */
 

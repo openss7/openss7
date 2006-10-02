@@ -1,3 +1,17 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* strsock.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/control.in: mostly text description formatting
+	* debian/copyright: added licenses
+	* debian/strsock-core.postrm.in: copyright header updates
+	* debian/strsock-core.preinst.in: copyright header updates
+	* debian/strsock-core.prerm.in: copyright header updates
+	* debian/strsock-devel.preinst.in: copyright header updates
+	* debian/strsock-doc.postinst.in: copyright header updates
+	* src/util/initsock.c: remove sc.h include from skeleton
+	* src/util/soconfig.c: remove sc.h include from skeleton
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strsock-dev.postinst.in: add and remove devices

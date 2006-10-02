@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/09/26 00:51:28 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/02 11:32:26 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:51:28 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/09/26 00:51:28 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/02 11:32:26 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/09/26 00:51:28 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/02 11:32:26 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -1522,6 +1522,7 @@ __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
 #endif				/* defined HAVE_XTI_ATM_H */
 }
 
+#pragma weak __xnet_t_addleaf_r
 /** @brief The reentrant version of __xnet_t_addleaf().
   * @param fd A file descriptor for the transport user endpoint.
   * @param leafid The identifier for the leaf.
@@ -1560,7 +1561,6 @@ __xnet_t_addleaf_r(int fd, int leafid, struct netbuf *addr)
   * @par Alias:
   * This symbol is a weak alias of __xnet_t_addleaf_r().
   */
-#pragma weak __xnet_t_addleaf_r
 __asm__(".symver __xnet_t_addleaf_r,t_addleaf@@XNET_1.0");
 
 /**
@@ -3590,6 +3590,7 @@ __xnet_t_rcvleafchange(int fd, struct t_leaf_status *change)
 #endif				/* defined HAVE_XTI_ATM_H */
 }
 
+#pragma weak __xnet_t_rcvleafchange_r
 /** The reentrant version of __xnet_t_rcvleafchange(). */
 int
 __xnet_t_rcvleafchange_r(int fd, struct t_leaf_status *change)
@@ -3605,7 +3606,6 @@ __xnet_t_rcvleafchange_r(int fd, struct t_leaf_status *change)
 	return (ret);
 }
 
-#pragma weak __xnet_t_recvleafchange_r
 
 __asm__(".symver __xnet_t_rcvleafchange_r,t_rcvleafchange@@XNET_1.0");
 
@@ -4492,6 +4492,7 @@ __xnet_t_removeleaf(int fd, int leafid, int reason)
 #endif				/* defined HAVE_XTI_ATM_H */
 }
 
+#pragma weak __xnet_t_removeleaf_r
 /** The reentrant version of __xnet_t_removeleaf(). */
 int
 __xnet_t_removeleaf_r(int fd, int leafid, int reason)
@@ -4507,7 +4508,6 @@ __xnet_t_removeleaf_r(int fd, int leafid, int reason)
 	return (ret);
 }
 
-#pragma weak __xnet_t_removeleaf_r
 __asm__(".symver __xnet_t_removeleaf_r,t_removeleaf@@XNET_1.0");
 
 /** @brief Send data or expedited data over a connection.
@@ -6075,10 +6075,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.24 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.25 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.24 $)
-  * @date \$Date: 2006/09/26 00:51:28 $
+  * @version \$Name:  $(\$Revision: 0.9.2.25 $)
+  * @date \$Date: 2006/10/02 11:32:26 $
   */
 
 /** @} */

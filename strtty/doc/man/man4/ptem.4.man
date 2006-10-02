@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ptem.4.man,v 0.9.2.1 2006/09/29 11:40:04 brian Exp $
+.\" @(#) $Id: ptem.4.man,v 0.9.2.2 2006/10/02 11:32:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,32 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/29 11:40:04 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/02 11:32:13 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ptem.4.man,v $
+.\" Revision 0.9.2.2  2006/10/02 11:32:13  brian
+.\" - changes to get master builds working for RPM and DEB
+.\" - added outside licenses to package documentation
+.\" - added LICENSE automated release file
+.\" - copy MANUAL to source directory
+.\" - add and remove devices in -dev debian subpackages
+.\" - get debian rules working better
+.\" - release library version files
+.\" - added notes to debian changelog
+.\" - corrections for cooked manual pages in spec files
+.\" - added release documentation to spec and rules files
+.\" - copyright header updates
+.\" - moved controlling tty checks in stream head
+.\" - missing some defines for LiS build in various source files
+.\" - added OSI headers to striso package
+.\" - added includes and manual page paths to acincludes for various packages
+.\" - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+.\"   files
+.\" - moved pragma weak statements ahead of declarations
+.\" - changes for master build of RPMS and DEBS with LiS
+.\"
 .\" Revision 0.9.2.1  2006/09/29 11:40:04  brian
 .\" - new files for strtty package and manual pages
 .\"
@@ -244,12 +265,13 @@ that control the processing of parity errors have any effect.  The delays specif
 field are also not supported.
 .PP
 The
-.B ptem module does the following:
+.B ptem
+module does the following:
 .IP \(bu \w'\(bu\(em'u
 Processes, if appropriate, and acknowledges receipt of the following input-output controls on its
 write-side queue by sending an
 .BR M_IOCACK (9)
- message upstream:
+message upstream:
 .BR TCSETA ,
 .BR TCSETAW ,
 .BR TCSETAF ,
@@ -322,7 +344,7 @@ message upstream and a zero-length message downstream.
 When
 .B ptem
 receives an
-.B M_IOCTL (9)
+.BR M_IOCTL (9)
 message of type
 .B TIOCSIGNAL
 on its read queue, it sends an
@@ -387,7 +409,7 @@ messag upstream.  It also saves the information passed to it in the
 structure and sends a
 .IR STREAMS (9)
 signal message for signal
-.RB { SIGWINCH }
+.RI { SIGWINCH }
 upstream to the slave process if the size changed.
 .IP \(bu
 When
@@ -408,7 +430,7 @@ messag downstream  It also saves the information passed to it in the
 structure and sends a
 .IR STREAMS (9)
 signal message for signal
-.RB { SIGWINCH }
+.RI { SIGWINCH }
 upstream to the slave process if the size changed.
 .IP \(bu
 All other messages are passed to the next module or driver.
@@ -430,10 +452,113 @@ All other messages are passed to the next module or driver.
 .\"
 .SH USAGE
 .PP
+.B ptem
+forms part of the
+.IR "SVR4 Terminal Subsystem" .
+As such, it is normally the first module of two modules pushed on the slave
+side of a pseudo-terminal,
+.BR pts (4).
+It is intended to work with
+.BR ldterm (4)
+pushed above it, and
+.BR pckt (4)
+pushed on the master side of a pseduo-terminal to form a completely functional
+pseudo-terminal device.
 .\"
 .\"
 .SH IOCTLS
 .PP
+Input-output controls are processed upon the reception of a
+.BR M_IOCTL (9)
+message.  Any
+.BR M_IOCNAK (9)
+messages received from downstream are discarded (caused by lack of a
+.BR pckt (4)
+module pushed on the master side of the pseudo-terminal).
+.PP
+The following are processed on the write queue.
+.TP \w'\fBTIOCGWINSZ\fR\(em'u
+.B TCSETA
+Processed and acknowledged on write queue.
+Also echoed downstream for use by
+.BR pckt (4).
+.TP
+.B TCSETAW
+Processed and acknowledged on write queue.
+Also echoed downstream for use by
+.BR pckt (4).
+If the baud rate is set to zero
+.RI ( CBAUD
+set to
+.BR BO ),
+a zero-length message is sent downstream.
+.TP
+.B TCSETAF
+Processed and acknowledged on write queue.
+Also echoed downstream for use by
+.BR pckt (4).
+.TP
+.B TCSETS
+Processed and acknowledged on write queue.
+Also echoed downstream for use by
+.BR pckt (4).
+.TP
+.B TCSETSW
+Processed and acknowledged on write queue.
+Also echoed downstream for use by
+.BR pckt (4).
+.TP
+.B TCSETSF
+Processed and acknowledged on write queue.
+Also echoed downstream for use by
+.BR pckt (4).
+.TP
+.B TCGETA
+Processed and acknowledged on write queue.
+.TP
+.B TCGETS
+Processed and acknowledged on write queue.
+.TP
+.B TIOCSWINSZ
+Also echoed downstream for use by
+.BR pckt (4).
+.TP
+.B JWINSIZE
+Processed and acknowledged on write queue.
+Negatively acknowledged if values are zero.
+Saves information in structure.
+.PP
+The following are processed on the read queue.
+.TP \w'\fBTIOCGWINSZ\fR\(em'u
+.B TCSBRK
+Processed and acknowledged on read queue.
+Also echoed downstream for use by
+.BR pckt (4).
+.TP
+.B TIOCSIGNAL
+Processed and acknowledged on read queue.
+Also, an
+.BR M_PCSIG (9)
+message is sent upstream with the signal number contained in the message.
+.TP
+.B TIOCREMOTE
+Processed and acknowledged on read queue.
+Also, an
+.BR M_CTL (9)
+message is sent upstream to
+.BR ldterm (4)
+to enable or disable canonical processing.
+.PP
+The following are processed on the read or write queue.
+.TP \w'\fBTIOCGWINSZ\fR\(em'u
+.B TIOCGWINSZ
+Processed and acknowledged on write queue.
+Negatively acknowledged if values are zero.
+Saves information in structure.
+If different, sends
+.BR M_PCSIG (9)
+with signal
+.RI { SIGWINCH }.
 .\"
 .\"
 .SH NOTICES

@@ -1,6 +1,7 @@
 sctp (0.2.24.rc3-0) experimental; urgency=low
 
   * Third release candidate.
+    - better build tested on Ubuntu 6.06
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Sun, 16 Jul 2006 02:35:55 -0600
 

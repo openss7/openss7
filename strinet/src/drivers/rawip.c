@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/08/16 07:47:36 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/02 11:31:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:36 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:31:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.38  2006/10/02 11:31:43  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.37  2006/08/16 07:47:36  brian
  - removed locking macro pollution
 
@@ -164,10 +185,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/08/16 07:47:36 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/02 11:31:43 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/08/16 07:47:36 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/02 11:31:43 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -245,7 +266,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/08/16 07:47:36 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/02 11:31:43 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -667,6 +688,17 @@ tp_alloc(void)
 
 #endif
 
+#ifdef LIS
+#ifndef noinline
+#define noinline
+#endif
+#ifndef fastcall
+#define fastcall
+#endif
+#ifndef __unlikely
+#define __unlikely
+#endif
+#endif
 /*
  *  Buffer allocation
  */

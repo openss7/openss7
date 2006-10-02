@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:07 $
+ @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,40 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:40:07 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pckt.c,v $
+ Revision 0.9.2.2  2006/10/02 11:32:14  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.1  2006/09/29 11:40:07  brian
  - new files for strtty package and manual pages
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:07 $"
+#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $"
 
-static char const ident[] = "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:07 $";
+static char const ident[] = "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $";
 
 /*
  * This is the pckt(4) STREAMS module, a Packet Mode module to be pushed on the
@@ -217,10 +238,11 @@ static char const ident[] = "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.1 $
  *	Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.
  */
 
-#include <sys/os8/compat.h>
+#include <sys/os7/compat.h>
+
 #define PCKT_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PCKT_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:07 $"
+#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $"
 #define PCKT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PCKT_LICENSE		"GPL"
@@ -295,11 +317,7 @@ struct pckt {
 #define PCKT_PRIV(__q) ((struct pckt *)((__q)->q_ptr))
 
 /* 
- *  -------------------------------------------------------------------------
- *
- *  PUT and SRV routines
- *  
- *  -------------------------------------------------------------------------
+ *  PUTP and SRVP routines
  */
 static void
 pckt_enable(long arg)
@@ -491,7 +509,7 @@ pckt_rput(queue_t *q, mblk_t *mp)
 }
 
 /**
- * pck_wput - write-side put procedure
+ * pckt_wput - write-side put procedure
  * @q: write queue
  * @mp: message to put
  *

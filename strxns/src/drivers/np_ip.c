@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/08/16 07:47:40 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:40 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.32  2006/10/02 11:32:32  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.31  2006/08/16 07:47:40  brian
  - removed locking macro pollution
 
@@ -145,10 +166,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/08/16 07:47:40 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:32 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/08/16 07:47:40 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:32 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -207,7 +228,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.31 $) $Date: 2006/08/16 07:47:40 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:32 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -275,6 +296,16 @@ MODULE_ALIAS("/dev/np_ip");
 #else				/* MODULE */
 #define DRV_BANNER	NP_SPLASH
 #endif				/* MODULE */
+
+#ifndef noinline
+#define noinline
+#endif
+#ifndef fastcall
+#define fastcall
+#endif
+#ifndef __unlikely
+#define __unlikely
+#endif
 
 STATIC struct module_info np_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */

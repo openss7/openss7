@@ -1,16 +1,17 @@
-iperf (2.0.4.rc3-0) experimental; urgency=low
+iperf (2.0.5.rc3-0) experimental; urgency=low
 
   * Third release candidate.
+    - better build tested on Ubuntu 6.06
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Sun, 16 Jul 2006 02:35:55 -0600
 
-iperf (2.0.4.rc2-0) experimental; urgency=low
+iperf (2.0.5.rc2-0) experimental; urgency=low
 
   * Second release candidate.
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Fri,  7 Jul 2006 19:14:29 -0600
 
-iperf (2.0.4rc1-0) experimental; urgency=low
+iperf (2.0.5rc1-0) experimental; urgency=low
 
   * Release candidate for Mark.
 

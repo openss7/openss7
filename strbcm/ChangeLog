@@ -1,3 +1,14 @@
+2006-10-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* strbcm.spec.in: corrections, cooked manpages and documentation
+	* debian/changelog: notes
+	* debian/control.in: mostly text description formatting
+	* debian/strbcm-core.postrm.in: copyright header updates
+	* debian/strbcm-core.preinst.in: copyright header updates
+	* debian/strbcm-core.prerm.in: copyright header updates
+	* debian/strbcm-devel.preinst.in: copyright header updates
+	* debian/strbcm-doc.postinst.in: copyright header updates
+
 2006-10-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strbcm-dev.postinst.in: add and remove devices

@@ -103,10 +103,10 @@ Section: devel
 Priority: optional
 Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: C headers and static libraries for @PACKAGE_TITLE@
- Static libraries and kernel headers to develop @PACKAGE_TITLE@
- modules and drivers; user-space headers and static libraries
- required to compile @PACKAGE_TITLE@ applications
- programs.
+ Static libraries and kernel headers to develop
+ @PACKAGE_TITLE@ modules and drivers; user-space headers and
+ static libraries required to compile @PACKAGE_TITLE@
+ applications programs.
 
 Package: @PACKAGE_LCNAME@-init
 Architecture: all

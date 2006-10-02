@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tpi.h,v 0.9.2.9 2006/09/25 12:04:43 brian Exp $
+ @(#) $Id: tpi.h,v 0.9.2.10 2006/10/02 11:32:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:04:43 $ by $Author: brian $
+ Last Modified $Date: 2006/10/02 11:32:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpi.h,v $
+ Revision 0.9.2.10  2006/10/02 11:32:25  brian
+ - changes to get master builds working for RPM and DEB
+ - added outside licenses to package documentation
+ - added LICENSE automated release file
+ - copy MANUAL to source directory
+ - add and remove devices in -dev debian subpackages
+ - get debian rules working better
+ - release library version files
+ - added notes to debian changelog
+ - corrections for cooked manual pages in spec files
+ - added release documentation to spec and rules files
+ - copyright header updates
+ - moved controlling tty checks in stream head
+ - missing some defines for LiS build in various source files
+ - added OSI headers to striso package
+ - added includes and manual page paths to acincludes for various packages
+ - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+   files
+ - moved pragma weak statements ahead of declarations
+ - changes for master build of RPMS and DEBS with LiS
+
  Revision 0.9.2.9  2006/09/25 12:04:43  brian
  - updated headers, moved xnsl
 
@@ -71,7 +92,7 @@
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -210,6 +231,10 @@
 #define T_ABSREQ	0x8000	/**< Can be used to determine whether an option
 				     name is an absolute requirement. */
 /** @} */
+
+#ifndef t_uscalar_t
+#define t_uscalar_t uint32_t
+#endif
 
 #if !(defined _XPG4_2 || defined _XOPEN_SOURCE) || defined __KERNEL__
 /**
