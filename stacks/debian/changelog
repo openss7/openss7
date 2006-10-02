@@ -1,3 +1,9 @@
+strss7 (0.9a.5-0) experimental; urgency=low
+
+  * Fifth public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon,  2 Oct 2006 07:26:16 -0600
+
 strss7 (0.9a.5.rc3-0) experimental; urgency=low
 
   * Third release candidate.

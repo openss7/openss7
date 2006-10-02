@@ -1,3 +1,9 @@
+openss7 (0.9.2.D-0) experimental; urgency=low
+
+  * Public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon,  2 Oct 2006 07:24:19 -0600
+
 openss7 (0.9.2.D.rc3-0) experimental; urgency=low
 
   * Third release candidate.

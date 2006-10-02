@@ -1,3 +1,9 @@
+iperf (2.0.5-0) experimental; urgency=low
+
+  * Fifth public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon,  2 Oct 2006 07:24:43 -0600
+
 iperf (2.0.5.rc3-0) experimental; urgency=low
 
   * Third release candidate.

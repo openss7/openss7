@@ -1,5 +1,11 @@
 streams (0.7a.6.rc3-0) experimental; urgency=low
 
+  * Sixth public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon,  2 Oct 2006 07:27:20 -0600
+
+streams (0.7a.6.rc3-0) experimental; urgency=low
+
   * Third release candidate.
     - better build tested on Ubuntu 6.06
     - added device creation and removal scripts
