@@ -136,6 +136,7 @@ scripts/texinfo.tex
 sctp/aclocal.m4
 sctp/AUTHORS
 sctp/autom4te.cache
+sctp/BUGS
 sctp/config.h.in
 sctp/configure
 sctp/doc/Makefile.in
@@ -150,7 +151,11 @@ sctp/INSTALL
 sctp/m4/Makefile.in
 sctp/#Makefile.am#
 sctp/Makefile.in
+sctp/PROBLEMS
 sctp/README
+sctp/README-alpha
+sctp/README-cvs
+sctp/README-nexusware
 sctp/scripts/compile
 sctp/scripts/config.guess
 sctp/scripts/config.sub
@@ -161,6 +166,7 @@ sctp/scripts/missing
 sctp/scripts/texinfo.tex
 sctp/src/sctp.c.old
 sctp/tests/Makefile.in
+sctp/TODO
 stacks/ABOUT-NLS
 stacks/aclocal.m4
 stacks/AUTHORS
@@ -512,6 +518,7 @@ stacks/src/include/Makefile.in
 stacks/src/Makefile.in
 stacks/tags
 stacks/tests/Makefile.in
+stacks/TODO
 strbcm/aclocal.m4
 strbcm/AUTHORS
 strbcm/autom4te.cache
@@ -545,6 +552,7 @@ strbcm/scripts/texinfo.tex
 strbcm/src/include/Makefile.in
 strbcm/src/Makefile.in
 strbcm/tests/Makefile.in
+strbcm/TODO
 strcompat/aclocal.m4
 strcompat/AUTHORS
 strcompat/autom4te.cache
@@ -579,6 +587,7 @@ strcompat/src/include/Makefile.in
 strcompat/src/Makefile.in
 strcompat/tags
 strcompat/tests/Makefile.in
+strcompat/TODO
 streams/aclocal.m4
 streams/AUTHORS
 streams/autom4te.cache
@@ -632,6 +641,7 @@ streams/src/kernel/tags
 streams/src/modules/sth.c.old
 streams/tags
 streams/tests/Makefile.in
+streams/TODO
 strinet/aclocal.m4
 strinet/AUTHORS
 strinet/autom4te.cache
@@ -666,6 +676,7 @@ strinet/src/include/Makefile.in
 strinet/src/Makefile.in
 strinet/tags
 strinet/tests/Makefile.in
+strinet/TODO
 striso/aclocal.m4
 striso/AUTHORS
 striso/autom4te.cache
@@ -701,6 +712,7 @@ striso/src/Makefile.in
 striso/tests/Makefile.in
 striso/TODO
 strnsl/ABOUT-NLS
+strnsl/BUGS
 strnsl/doc/html
 strnsl/doc/latex
 strnsl/doc/manual/libxnsl.info
@@ -747,6 +759,10 @@ strnsl/po/quot.sed
 strnsl/po/remove-potcdate.sin
 strnsl/po/Rules-quot
 strnsl/po/strnsl.pot
+strnsl/PROBLEMS
+strnsl/README-alpha
+strnsl/README-cvs
+strnsl/README-nexusware
 strnsl/scripts/compile
 strnsl/scripts/config.guess
 strnsl/scripts/config.rpath
@@ -757,6 +773,7 @@ strnsl/scripts/ltmain.sh
 strnsl/scripts/missing
 strnsl/scripts/mkinstalldirs
 strnsl/scripts/texinfo.tex
+strnsl/TODO
 strsctp/aclocal.m4
 strsctp/AUTHORS
 strsctp/autom4te.cache
@@ -792,6 +809,7 @@ strsctp/src/include/Makefile.in
 strsctp/src/Makefile.in
 strsctp/tags
 strsctp/tests/Makefile.in
+strsctp/TODO
 strsctp/#TODO#
 strsock/ABOUT-NLS
 strsock/aclocal.m4
@@ -939,6 +957,7 @@ strutil/scripts/texinfo.tex
 strutil/src/include/Makefile.in
 strutil/src/Makefile.in
 strutil/tests/Makefile.in
+strutil/TODO
 strxnet/ABOUT-NLS
 strxnet/aclocal.m4
 strxnet/AUTHORS
@@ -1031,6 +1050,7 @@ strxnet/src/Makefile.in
 strxnet/src/test/test-xnet.c.old
 strxnet/tags
 strxnet/tests/Makefile.in
+strxnet/TODO
 strxns/aclocal.m4
 strxns/AUTHORS
 strxns/autom4te.cache
@@ -1080,6 +1100,7 @@ strxns/src/include/Makefile.in
 strxns/src/Makefile.in
 strxns/tags
 strxns/tests/Makefile.in
+strxns/TODO
 .*.swo
 .*.swp
 tags
