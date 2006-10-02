@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/18 01:18:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/02 12:08:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:45 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 12:08:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2006/10/02 12:08:26  brian
+# - changes to pass check target
+#
 # Revision 0.9.2.7  2006/09/18 01:18:45  brian
 # - updated documentation and include file makefiles
 #
@@ -66,9 +69,17 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 man_MANS = \
+	man1/strlog.1 \
+	man4/fifo.4 \
+	man8/strconf.8 \
+	man8/strlogd.8 \
+	man8/strutil_mknod.8
+
+if WITH_LIS
+## WITH_LIS
+man_MANS += \
 	man1/strchg.1 \
 	man1/strconf.1 \
-	man1/strlog.1 \
 	man1/strreset.1 \
 	man3/pipe.3 \
 	man3/s_pipe.3 \
@@ -76,7 +87,6 @@ man_MANS = \
 	man4/connld.4 \
 	man4/conslog.4 \
 	man4/echo.4 \
-	man4/fifo.4 \
 	man4/fifo.4s \
 	man4/log.4 \
 	man4/nsdev.4 \
@@ -99,14 +109,20 @@ man_MANS = \
 	man8/soon.8 \
 	man8/strace.8 \
 	man8/strclean.8 \
-	man8/strconf.8 \
 	man8/strerr.8 \
 	man8/strinfo.8 \
 	man8/strload.8 \
-	man8/strlogd.8 \
 	man8/strsetup.8 \
-	man8/strutil_mknod.8 \
 	man8/strvf.8
+## WITH_LIS
+endif
+
+MANS_UNUSED = \
+	man3/pipe.3 \
+	man3/s_pipe.3 \
+	man4/s_fifo.4 \
+	man8/soon.8 \
+	man8/strconf.8
 
 dist_noinst_MANS = \
 	man1/strchg.1.man \

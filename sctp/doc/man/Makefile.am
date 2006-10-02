@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/06 11:37:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/02 12:08:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:37:57 $ by $Author: brian $
+# Last Modified $Date: 2006/10/02 12:08:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2006/10/02 12:08:25  brian
+# - changes to pass check target
+#
 # Revision 0.9.2.8  2006/03/06 11:37:57  brian
 # - updated headers
 #
@@ -99,6 +102,10 @@ dist_noinst_MANS = \
 	man8/test-tcp-ts.8.man \
 	man8/test-udpc.8.man \
 	man8/test-udps.8.man
+
+if WITH_KO_MODULES
+MANS_UNUSED	= $(man_MANS)
+endif
 
 ## PKG_BUILD_INDEP
 endif
