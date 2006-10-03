@@ -1,5 +1,26 @@
 2006-10-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.ac: added config file
+	* doc/man/Makefile.am: updated manpages
+	* doc/man/man4/cmot.4.man: updated manpage
+	* doc/man/man4/ISO.4.man: updated manpage
+	* doc/man/man4/iso-ip.4.man: updated manpage
+	* doc/man/man4/iso-lan.4.man: updated manpage
+	* doc/man/man4/isos.4.man: updated manpage
+	* doc/man/man4/isot.4.man: updated manpage
+	* doc/man/man4/lpp.4.man: updated manpage
+	* doc/man/man4/ns-tcp.4.man: updated manpage
+	* doc/man/man4/xol.4.man: updated manpage
+	* doc/man/man4/xot.4.man: updated manpage
+	* doc/manual/news.texi: updated release notes
+	* Makefile.am: remove AUTOCONFIG_H
+	* src/drivers/clns.c: changes for compile
+	* src/drivers/lis.conf: added modules and drivers
+	* src/drivers/tp.c: changes for compile
+	* src/include/Makefile.am: parameterized
+	* src/include/sys/striso/version.h.in: added comments
+	* src/modules/lis.conf: added modules and drivers
+
 	* doc/man/man4/clns.4.man: added missing manpage
 	* doc/man/man4/itot.4.man: added missing manpage
 	* doc/man/man4/lapb.4.man: added missing manpage

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/10/01 21:30:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/10/03 13:52:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:20 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:09 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.67  2006/10/03 13:52:09  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.66  2006/10/01 21:30:20  brian
 # - distribute release and library version files
 #
@@ -309,7 +319,7 @@ mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
 nodist_libINETmods_a_SOURCES	= $(mods_source_FILES)
 
-libINETmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H) src/drivers/udp_hooks.h
+libINETmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/udp_hooks.h
 libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -375,11 +385,7 @@ endif
 ##LIBRARY_VERSION_FILES		=
 ##
 ##include am/libraries.am
-##
-##AUTOCONFIG_H			= $(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=

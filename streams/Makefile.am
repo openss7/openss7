@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2006/10/01 21:30:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/10/03 13:52:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:18 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:02 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.141  2006/10/03 13:52:02  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.140  2006/10/01 21:30:18  brian
 # - distribute release and library version files
 #
@@ -296,7 +306,7 @@ libLfS_specfs_a_SOURCES		+= \
 				src/kernel/specfs.c
 endif
 
-libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H) \
+libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) \
 				  src/kernel/strspecfs.c \
 				  src/kernel/strlookup.c \
 				  src/kernel/strattach.c \
@@ -388,7 +398,7 @@ if CONFIG_STREAMS_SPX
 libLfS_streams_a_SOURCES	+= src/drivers/spx.c
 endif
 
-libLfS_streams_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H) \
+libLfS_streams_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) \
 				  src/kernel/strmain.c \
 				  src/kernel/strreg.c \
 				  src/kernel/strprocfs.c \
@@ -444,7 +454,7 @@ if CONFIG_STREAMS_SPX_MODULE
 libLfS_drivers_a_SOURCES	+= src/drivers/spx.c
 endif
 
-libLfS_drivers_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_drivers_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libLfS_drivers_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libLfS_drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -474,7 +484,7 @@ if CONFIG_STREAMS_TESTMOD_MODULE
 libLfS_modules_a_SOURCES	+= src/modules/testmod.c include/sys/testmod.h
 endif
 
-libLfS_modules_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_modules_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libLfS_modules_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libLfS_modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -620,70 +630,70 @@ EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 #sbin_PROGRAMS			= streams $(LFS_EXTRA_TOOLS)
 
 strchg_SOURCES			= src/util/strchg.c
-strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strchg_LDFLAGS			=
 strchg_LDADD			= libstreams.la
 strchg_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strchg_CFLAGS			= $(USER_CFLAGS)
 
 strconf_SOURCES			= src/util/strconf.c
-strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strconf_LDFLAGS			=
 strconf_LDADD			= libstreams.la
 strconf_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strconf_CFLAGS			= $(USER_CFLAGS)
 
 strreset_SOURCES		= src/util/strreset.c
-strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strreset_LDFLAGS		=
 strreset_LDADD			= libstreams.la
 strreset_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strreset_CFLAGS			= $(USER_CFLAGS)
 
 autopush_SOURCES		= src/util/autopush.c
-autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 autopush_LDFLAGS		=
 autopush_LDADD			= libstreams.la
 autopush_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 autopush_CFLAGS			= $(USER_CFLAGS)
 
 fattach_SOURCES			= src/util/fattach.c
-fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 fattach_LDFLAGS			=
 fattach_LDADD			= libstreams.la
 fattach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fattach_CFLAGS			= $(USER_CFLAGS)
 
 fdetach_SOURCES			= src/util/fdetach.c 
-fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 fdetach_LDFLAGS			=
 fdetach_LDADD			= libstreams.la
 fdetach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fdetach_CFLAGS			= $(USER_CFLAGS)
 
 insf_SOURCES			= src/util/insf.c
-insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 insf_LDFLAGS			=
 insf_LDADD			= libstreams.la
 insf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 insf_CFLAGS			= $(USER_CFLAGS)
 
 scls_SOURCES			= src/util/scls.c
-scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 scls_LDFLAGS			=
 scls_LDADD			= libstreams.la
 scls_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 scls_CFLAGS			= $(USER_CFLAGS)
 
 strace_SOURCES			= src/util/strace.c
-strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strace_LDFLAGS			=
 strace_LDADD			= libstreams.la
 strace_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strace_CFLAGS			= $(USER_CFLAGS)
 
 ##strclean_SOURCES		= src/util/strclean.c
-##strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+##strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 ##strclean_LDFLAGS		=
 ##strclean_LDADD		= libstreams.la
 ##strclean_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -696,21 +706,21 @@ strace_CFLAGS			= $(USER_CFLAGS)
 ##	touch $@
 
 strerr_SOURCES			= src/util/strerr.c
-strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strerr_LDFLAGS			=
 strerr_LDADD			= libstreams.la
 strerr_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strerr_CFLAGS			= $(USER_CFLAGS)
 
 strinfo_SOURCES			= src/util/strinfo.c
-strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strinfo_LDFLAGS			=
 strinfo_LDADD			= libstreams.la
 strinfo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strinfo_CFLAGS			= $(USER_CFLAGS)
 
 ##strload_SOURCES		= src/util/strload.c
-##strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+##strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 ##strload_LDFLAGS		=
 ##strload_LDADD			= libstreams.la
 ##strload_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -723,7 +733,7 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 ##	touch $@
 
 ##strsetup_SOURCES		= src/util/strsetup.c
-##strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+##strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 ##strsetup_LDFLAGS		=
 ##strsetup_LDADD		= libstreams.la
 ##strsetup_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -736,14 +746,14 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 ##	touch $@
 
 strvf_SOURCES			= src/util/strvf.c
-strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strvf_LDFLAGS			=
 strvf_LDADD			= libstreams.la
 strvf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strvf_CFLAGS			= $(USER_CFLAGS)
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= src/util/@PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
@@ -847,10 +857,6 @@ test_streams_CFLAGS		= $(LFS_CFLAGS)
 endif
 ## RPM_BUILD_USER
 endif
-
-AUTOCONFIG_H			= include/sys/config.h
-
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
 if CONFIG_STREAMS_SEPARATE_COMPILE
 EXPORT_SRCFILES			= \

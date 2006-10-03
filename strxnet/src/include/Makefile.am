@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/09/18 01:18:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/03 13:53:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:48 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.16  2006/10/03 13:53:41  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.15  2006/09/18 01:18:48  brian
 # - updated documentation and include file makefiles
 #
@@ -149,8 +159,9 @@ dist_noinst_HEADERS = \
 	$(sock_headers)
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/strxnet/version.h
-#	sys/strxnet/modversions.h
+	sys/$(PACKAGE)/config.h \
+	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/modversions.h
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

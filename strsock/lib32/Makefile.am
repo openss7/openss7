@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:47 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:07 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/10/03 13:53:07  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.2  2006/09/29 11:50:47  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -80,7 +90,7 @@ LIB_INCLUDES			= -I$(top_builddir)/src/lib -I$(top_srcdir)/src/lib $(PKG_INCLUDE
 pkglibexec32_PROGRAMS		+= test-sockpath
 
 test_sockpath_SOURCES		= $(top_srcdir)/src/test/test-sockpath.c
-test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_sockpath_LDADD		= libsockpath.la $(STREAMS_LDADD32)
 test_sockpath_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sockpath_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -89,7 +99,7 @@ test_sockpath_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 pkglibexec32_PROGRAMS		+= test-socket
 
 test_socket_SOURCES		= $(top_srcdir)/src/test/test-socket.c
-test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_socket_LDADD		= libsocket.la $(STREAMS_LDADD32)
 test_socket_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_socket_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -98,7 +108,7 @@ test_socket_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 pkglibexec32_PROGRAMS		+= test-socklib
 
 test_socklib_SOURCES		= $(top_srcdir)/src/test/test-socklib.c
-test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_socklib_LDADD		= libsocklib.la $(STREAMS_LDADD32)
 test_socklib_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_socklib_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -107,7 +117,7 @@ test_socklib_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 pkglibexec32_PROGRAMS		+= test-sockmod
 
 test_sockmod_SOURCES		= $(top_srcdir)/src/test/test-sockmod.c
-test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_sockmod_LDADD		= libsocklib.la $(STREAMS_LDADD32)
 test_sockmod_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sockmod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -116,7 +126,7 @@ test_sockmod_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 pkglibexec32_PROGRAMS		+= test-socksys
 
 test_socksys_SOURCES		= $(top_srcdir)/src/test/test-socksys.c
-test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_socksys_LDADD		= libsocket.la $(STREAMS_LDADD32)
 test_socksys_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_socksys_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)

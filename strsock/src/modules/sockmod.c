@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:54 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:18 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -35,7 +34,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 01:43:54 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:53:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:54 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:18 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:54 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:18 $";
 
 /*
  *  SOCKMOD - A socket module for Linux Fast-STREAMS.
@@ -86,7 +85,7 @@ static char const ident[] =
  *     Linux, is a true socket, at least down to the struct socket.  An ioctl(2) on the freshly
  *     created socket informs.  All other socket API calls use the system call interface.
  *
- *     If the sockmod(4) module is ever popped, the smod_qclose() transforms the socket back into a
+ *     If the sockmod(4) module is ever popped, the smod_close() transforms the socket back into a
  *     Stream before the module is popped.
  *
  *  3. Provide a library (libsocket(3)) and cooperating socksys(4) driver.
@@ -102,12 +101,25 @@ static char const ident[] =
  *     interface.
  */
 #include <sys/os7/compat.h>
+#include <linux/socket.h>
 
-#include <sys/sockmod.h>
+/*
+   These are for TPI definitions 
+ */
+#if defined HAVE_TIHDR_H
+#   include <tihdr.h>
+#else
+#   include <sys/tihdr.h>
+#endif
+#if defined HAVE_SOCKMOD_H
+#   include <sockmod.h>
+#else
+#   include <sys/sockmod.h>
+#endif
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 01:43:54 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:18 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"
@@ -115,7 +127,7 @@ static char const ident[] =
 			SMOD_COPYRIGHT	"\n" \
 			SMOD_REVISION	"\n" \
 			SMOD_DEVICE	"\n" \
-			SMOD_CONTACT	"\n"
+			SMOD_CONTACT
 #define SMOD_SPLASH	SMOD_DEVICE	" - " \
 			SMOD_REVISION
 
@@ -128,7 +140,7 @@ MODULE_LICENSE(SMOD_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sockmod");
-#endif				/* MODULE_ALIAS */
+#endif
 #endif				/* LINUX */
 
 #ifndef SMOD_MOD_NAME
@@ -146,82 +158,72 @@ MODULE_ALIAS("streams-sockmod");
  *
  *  =========================================================================
  */
+
 #define MOD_ID		SMOD_MOD_ID
 #define MOD_NAME	SMOD_MOD_NAME
 #ifdef MODULE
 #define MOD_BANNER	SMOD_BANNER
-#else
+#else				/* MODULE */
 #define MOD_BANNER	SMOD_SPLASH
-#endif
+#endif				/* MODULE */
 
 static struct module_info smod_minfo = {
-	.mi_idnum = SMOD_MOD_ID,	/* Module ID number */
-	.mi_idname = SMOD_MOD_NAME,	/* Module name */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 15),		/* Hi water mark */
-	.mi_lowat = (1 << 10),		/* Lo water mark */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static struct module_stat smod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat smod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat smod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat smod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
-static streamscall int smod_qopen(queue_t *, dev_t *, int, int, cred_t *);
-static streamscall int smod_qclose(queue_t *, int, cred_t *);
+static streamscall int smod_open(queue_t *, dev_t *, int, int, cred_t *);
+static streamscall int smod_close(queue_t *, int, cred_t *);
 
 static streamscall int smod_rput(queue_t *, mblk_t *);
 static streamscall int smod_wput(queue_t *, mblk_t *);
 
 static struct qinit smod_rinit = {
-	.qi_putp = smod_rput,		/* Read put (msg from below) */
-	.qi_qopen = smod_qopen,		/* Each open */
-	.qi_qclose = smod_qclose,	/* Last close */
+	.qi_putp = smod_rput,		/* Read put (message from below) */
+	.qi_qopen = smod_open,		/* Each open */
+	.qi_qclose = smod_close,	/* Last close */
 	.qi_minfo = &smod_minfo,	/* Information */
 	.qi_mstat = &smod_rstat,	/* Statistics */
 };
 
 static struct qinit smod_winit = {
-	.qi_putp = smod_wput,		/* Write put (msg from above) */
+	.qi_putp = smod_wput,		/* Write put (message from above) */
 	.qi_minfo = &smod_minfo,	/* Information */
-};
-
-static struct streamtab smod_info = {
-	.st_rdinit = &smod_rinit,	/* Upper read queue */
-	.st_wrinit = &smod_winit,	/* Upper write queue */
 	.qi_mstat = &smod_wstat,	/* Statistics */
 };
 
+MODULE_STATIC struct streamtab sockmodinfo = {
+	.st_rdinit = &smod_rinit,	/* Upper read queue */
+	.st_wrinit = &smod_winit,	/* Upper write queue */
+};
+
 /*
- *  =========================================================================
+ *  -------------------------------------------------------------------------
  *
- *  Private Structure
- *
- *  =========================================================================
+ *  Private Datastructure ctors and dtors
+ *  
+ *  -------------------------------------------------------------------------
  */
-typedef struct smod {
+struct smod {
 	queue_t *rq;			/* module read queue */
 	queue_t *wq;			/* module write queue */
 	queue_t *hq;			/* stream head read queue */
 	ulong state;			/* module state */
 	ulong oldstate;			/* module state */
-	ulong flags;			/* modules flags */
+	ulong flags;			/* module flags */
 	mblk_t *iocblk;			/* ioctl being processed */
 	ulong qlen;			/* bind ack queue length */
 	ulong cons;			/* outstanding connection indications */
-#if 0
-	STR_DECLARATION (struct smod);	/* stream declarations */
-#endif
-	smod_addr_t src;		/* src address */
-	smod_size_t src_len;		/* src address length */
-	smod_addr_t dst;		/* src address */
-	smod_size_t dst_len;		/* dst address length */
-#if 0
-	bufq_t conq;			/* connection indication queue */
-	uint conind;			/* number of connection indications */
-#endif
-} smod_t;
+};
 
-#define SMOD_PRIV(q) ((struct smod *)((__q)->q_ptr))
+#define SMOD_PRIV(__q) ((struct smod *)((__q)->q_ptr))
 
 /*
  *  -------------------------------------------------------------------------
@@ -230,1347 +232,112 @@ typedef struct smod {
  *
  *  -------------------------------------------------------------------------
  */
-STATIC kmem_cache_t *smod_priv_cachep = NULL;
-STATIC int
+static kmem_cache_t *smod_priv_cachep = NULL;
+static __unlikely int
 smod_init_caches(void)
 {
-	if (!smod_priv_cachep &&
-	    !(smod_priv_cachep = kmem_cache_create
-	      ("smod_priv_cachep", sizeof(struct smod), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate smod_priv_cachep", __FUNCTION__);
+	if (!smod_priv_cachep
+	    && !(smod_priv_cachep =
+		 kmem_cache_create(MOD_NAME, sizeof(struct smod), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_WARN, "%s: %s: Cannot allocate smod_priv_cachep", MOD_NAME,
+			__FUNCTION__);
 		return (-ENOMEM);
-	} else
-		printd(("%s: initialized smod private cache\n", SMOD_MOD_NAME));
+	}
 	return (0);
 }
-STATIC void
+
+static __unlikely int
 smod_term_caches(void)
 {
 	if (smod_priv_cachep) {
-		if (kmem_cache_destroy(smod_priv_cachep))
-			cmn_err(CE_WARN, "%s: ERROR: could not destroy smod_priv_cachep",
+		if (kmem_cache_destroy(smod_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: %s: did not destroy smod_priv_cachep", MOD_NAME,
 				__FUNCTION__);
-		else
-			printd(("%s: destroyed smod_priv_cachep\n", SMOD_MOD_NAME));
+			return (-EBUSY);
+		}
 	}
-	return;
+	return (0);
 }
 
-/*
- *  SOCKMOD allocation and deallocation
- *  -------------------------------------------------------------------------
- */
-STATIC struct smod *
-smod_alloc_priv(queue_t *q, struct smod **smodp, dev_t *devp, cred_t *crp)
+static struct smod *
+smod_alloc_priv(queue_t *q)
 {
-	struct smod *smod;
+	struct smod *priv;
 
-	if ((smod = kmem_cache_alloc(smod_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated smod private structure\n", SMOD_MOD_NAME, smod));
-		bzero(smod, sizeof(*smod));
-		smod->u.dev.cmajor = getmajor(*devp);
-		smod->u.dev.cminor = getminor(*devp);
-		smod->cred = *crp;
-		lis_spin_lock_init(&smod->qlock, "smod-queue-lock");
-		(smod->oq = RD(q))->q_ptr = smod_get(smod);
-		(smod->iq = WR(q))->q_ptr = smod_get(smod);
-		smod->o_prim = &smod_r_prim;
-		smod->i_prim = &smod_w_prim;
-		smod->o_wakeup = NULL;
-		smod->i_wakeup = NULL;
-		smod->state = 0;	/* unintialized */
-		lis_spin_lock_init(&smod->lock, "smod-lock");
-		if ((smod->next = *smodp))
-			smod->next->prev = &smod->next;
-		smod->prev = smodp;
-		*smodp = smod_get(smod);
-		printd(("%s: %p: linked sockmod private structure\n", SMOD_MOD_NAME));
-	} else
-		ptrace(("%s: ERROR: could not allocate smod private structure\n", SMOD_MOD_NAME));
-	return (smod);
+	if ((priv = kmem_cache_alloc(smod_priv_cachep, SLAB_ATOMIC))) {
+		bzero(priv, sizeof(*priv));
+		priv->rq = q;
+		priv->wq = WR(q);
+		priv->hq = q->q_next;
+		priv->state = TS_UNBND;	/* assume we are in the correct initial state */
+		priv->oldstate = -1UL;
+		priv->flags = 0;
+		priv->qlen = 0;
+		priv->cons = 0;
+		/* we are a module with no service routine so our hiwat, lowat shouldn't matter;
+		   however, our minpsz, maxpsz do because we are the first queue under the stream
+		   head.  We do not want to alter the characteristics of the transport packet sizes
+		   so we copy them here. This will allow the stream head to exhibit the same
+		   behaviour as before we were pushed. */
+		priv->wq->q_minpsz = priv->wq->q_next->q_minpsz;
+		priv->wq->q_maxpsz = priv->wq->q_next->q_maxpsz;
+		q->q_ptr = WR(q)->q_ptr = priv;
+	}
+	return (priv);
 }
-STATIC void
+
+static void
 smod_free_priv(queue_t *q)
 {
-	struct smod *smod = SMOD_PRIV(q);
-	int flags = 0;
+	struct smod *priv;
 
-	ensure(smod, return);
-	lis_spin_lock_irqsave(&smod->lock, &flags);
-	{
-		ss7_unbufcall((str_t *) smod);
-		if ((*smod->prev = smod->next))
-			smod->next->prev = smod->prev;
-		smod->next = NULL;
-		smod->prev = &smod->next;
-		smod_put(smod);
-		smod->oq->q_ptr = NULL;
-		flushq(smod->oq, FLUSHALL);
-		smod->oq = NULL;
-		smod_put(smod);
-		smod->iq->q_ptr = NULL;
-		flushq(smod->iq, FLUSHALL);
-		smod->iq = NULL;
+	if ((priv = (typeof(priv)) q->q_ptr)) {
+		q->q_ptr = WR(q)->q_ptr = NULL;
+		priv->rq = NULL;
+		priv->wq = NULL;
+		priv->hq = NULL;
+		priv->state = -1UL;
+		priv->oldstate = -1UL;
+		priv->flags = 0;
+		priv->qlen = 0;
+		priv->cons = 0;
+		if (priv->iocblk)
+			freemsg(xchg(&priv->iocblk, NULL));
+		kmem_cache_free(smod_priv_cachep, priv);
 	}
-	lis_spin_lock_irqrestore(&smod->lock, &flags);
-	smod_put(smod);		/* final put */
 	return;
 }
-STATIC struct smod *
-smod_get(struct smod *smod)
+
+static __hot_put int
+split_buffer(mblk_t *mp, int offset)
 {
-	atomic_inc(&smod->refcnt);
-	return (smod);
-}
-STATIC void
-smod_put(struct smod *smod)
-{
-	if (atomic_dec_and_test(&smod->refcnt)) {
-		kmem_cache_free(smod_priv_cachep);
-		printd(("%s: %p: freed smod private structure\n", SMOD_MOD_NAME, smod));
-	}
-}
+	unsigned char *ptr = mp->b_rptr + offset;
 
-/*
- *  =========================================================================
- *
- *  PROTOCOL PRIMITIVES
- *
- *  =========================================================================
- */
-
-/*
- *  -------------------------------------------------------------------------
- *
- *  Primitives from above
- *
- *  -------------------------------------------------------------------------
- */
-/*
- *  T_CONN_REQ
- *  -----------------------------------
- */
-STATIC int
-t_conn_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_CONN_RES
- *  -----------------------------------
- */
-STATIC int
-t_conn_res(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_DISCON_REQ
- *  -----------------------------------
- */
-STATIC int
-t_discon_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_DATA_REQ
- *  -----------------------------------
- */
-STATIC int
-t_data_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_EXDATA_REQ
- *  -----------------------------------
- */
-STATIC int
-t_exdata_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_INFO_REQ
- *  -----------------------------------
- */
-STATIC int
-t_info_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_BIND_REQ
- *  -----------------------------------
- */
-STATIC int
-t_bind_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_UNBIND_REQ
- *  -----------------------------------
- */
-STATIC int
-t_unbind_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_UNITDATA_REQ
- *  -----------------------------------
- */
-STATIC int
-t_unitdata_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_OPTMGMT_REQ
- *  -----------------------------------
- */
-STATIC int
-t_optmgmt_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_ORDREL_REQ
- *  -----------------------------------
- */
-STATIC int
-t_ordrel_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_OPTDATA_REQ
- *  -----------------------------------
- */
-STATIC int
-t_optdata_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_ADDR_REQ
- *  -----------------------------------
- */
-STATIC int
-t_addr_req(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  -------------------------------------------------------------------------
- *
- *  Primitives from below
- *
- *  -------------------------------------------------------------------------
- */
-
-/*
- *  T_CONN_IND
- *  -----------------------------------
- */
-STATIC int
-t_conn_ind(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_CONN_CON
- *  -----------------------------------
- */
-STATIC int
-t_conn_con(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_DISCON_IND
- *  -----------------------------------
- */
-STATIC int
-t_discon_ind(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_DATA_IND
- *  -----------------------------------
- */
-STATIC int
-t_data_ind(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_EXDATA_IND
- *  -----------------------------------
- */
-STATIC int
-t_exdata_ind(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_INFO_ACK
- *  -----------------------------------
- */
-STATIC int
-t_info_ack(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_BIND_ACK
- *  -----------------------------------
- */
-STATIC int
-t_bind_ack(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_ERROR_ACK
- *  -----------------------------------
- */
-STATIC int
-t_error_ack(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_OK_ACK
- *  -----------------------------------
- */
-STATIC int
-t_ok_ack(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_UNITDATA_IND
- *  -----------------------------------
- */
-STATIC int
-t_unitdata_ind(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_UDERROR_IND
- *  -----------------------------------
- */
-STATIC int
-t_uderror_ind(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_OPTMGMT_ACK
- *  -----------------------------------
- */
-STATIC int
-t_optmgmt_ack(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_ORDREL_IND
- *  -----------------------------------
- */
-STATIC int
-t_ordrel_ind(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_OPTDATA_IND
- *  -----------------------------------
- */
-STATIC int
-t_optdata_ind(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  T_ADDR_ACK
- *  -----------------------------------
- */
-STATIC int
-t_addr_ack(queue_t *q, mblk_t *mp)
-{
-}
-
-/*
- *  =========================================================================
- *
- *  I/O Controls
- *
- *  =========================================================================
- */
-/*
- *  O_SI_GETUDATA
- *  -----------------------------------
- */
-STATIC int
-smod_o_si_getudata(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
+	if (ptr > mp->b_wptr)
 		return (-EINVAL);
+	if (ptr < mp->b_wptr) {
+		mblk_t *dp;
+
+		if ((dp = copyb(mp))) {
+			dp->b_datap->db_type = M_DATA;
+			dp->b_rptr += offset;
+			mp->b_datap->db_type = M_PROTO;
+			mp->b_wptr = ptr;
+			linkb(mp, dp);
+			return (0);
+		}
+		return (-ENOSR);
 	}
+	mp->b_datap->db_type = M_PROTO;
+	return (0);
 }
 
-/*
- *  SI_SHUTDOWN
- *  -----------------------------------
- */
-STATIC int
-smod_si_shutdown(queue_t *q, mblk_t *mp, int *rvp)
+static streamscall __hot_get int
+smod_rput(queue_t *q, mblk_t *mp)
 {
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  SI_LISTEN
- *  -----------------------------------
- */
-STATIC int
-smod_si_listen(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  SI_SETMYNAME
- *  -----------------------------------
- */
-STATIC int
-smod_si_setmyname(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  SI_SETPEERNAME
- *  -----------------------------------
- */
-STATIC int
-smod_si_setpeername(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  SI_GETINTRANSIT
- *  -----------------------------------
- */
-STATIC int
-smod_si_getintransit(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  SI_TCL_LINK
- *  -----------------------------------
- */
-STATIC int
-smod_si_tcl_link(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  SI_TCL_UNLINK
- *  -----------------------------------
- */
-STATIC int
-smod_si_tcl_unlink(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  SI_SOCKPARAMS
- *  -----------------------------------
- */
-STATIC int
-smod_si_sockparams(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  SI_GETUDATA
- *  -----------------------------------
- */
-STATIC int
-smod_si_getudata(queue_t *q, mblk_t *mp, int *rvp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-		break;
-	case M_IOCDATA:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCACK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	case M_IOCNAK:
-		switch (smod->ioc_state) {
-		case SMOD_IOCS_NULL:
-			*rvp = -1;
-			return (-EINVAL);
-		}
-		break;
-	default:
-		*rvp = -1;
-		return (-EINVAL);
-	}
-}
-
-/*
- *  =========================================================================
- *
- *  STREAMS Message Handling
- *
- *  =========================================================================
- *
- *  M_IOCTL Handling
- *
- *  -------------------------------------------------------------------------
- */
-STATIC int
-smod_w_ioctl(queue_t *q, mblk_t *mp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
-	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
-	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
-	int err = -EOPNOTSUPP, ret = -1;
-
-	switch (type) {
-	case SMOD_IOC_MAGIC:
-	{
-		/* These are SOCKMOD IOCTLs */
-		switch (nr) {
-		case _IOC_NR(O_SI_GETUDATA):
-			printd(("%s: %p: -> O_SI_GETUDATA\n", SMOD_MOD_NAME, smod));
-			err = smod_o_si_getudata(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SHUTDOWN):
-			printd(("%s: %p: -> SI_SHUTDOWN\n", SMOD_MOD_NAME, smod));
-			err = smod_si_shutdown(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_LISTEN):
-			printd(("%s: %p: -> SI_LISTEN\n", SMOD_MOD_NAME, smod));
-			err = smod_si_listen(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SETMYNAME):
-			printd(("%s: %p: -> SI_SETMYNAME\n", SMOD_MOD_NAME, smod));
-			err = smod_si_setmyname(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SETPEERNAME):
-			printd(("%s: %p: -> SI_SETPEERNAME\n", SMOD_MOD_NAME, smod));
-			err = smod_si_setpeername(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_GETINTRANSIT):
-			printd(("%s: %p: -> SI_GETINTRANSIT\n", SMOD_MOD_NAME, smod));
-			err = smod_si_getintransit(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_TCL_LINK):
-			printd(("%s: %p: -> SI_TCL_LINK\n", SMOD_MOD_NAME, smod));
-			err = smod_si_tcl_link(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_TCL_UNLINK):
-			printd(("%s: %p: -> SI_TCL_UNLINK\n", SMOD_MOD_NAME, smod));
-			err = smod_si_tcl_unlink(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SOCKPARAMS):
-			printd(("%s: %p: -> SI_SOCKPARAMS\n", SMOD_MOD_NAME, smod));
-			err = smod_si_sockparams(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_GETUDATA):
-			printd(("%s: %p: -> SI_GETUDATA\n", SMOD_MOD_NAME, smod));
-			err = smod_si_getudata(q, mp, &ret);
-			break;
-		default:
-			ptrace(("%s: %p: ERROR: Unsupported SOCKMOD ioctl %c, %d\n", SOCK_MOD_NAME,
-				smod(char) type, nr));
-			break;
-		}
-		break;
-	}
-	default:
-		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", SOCK_MOD_NAME, smod,
-			(char) type, nr));
-		break;
-	}
-	if (err > 0)
-		return (err);
-	else if (err == 0)
-		mp->b_datap->db_type = M_IOCACK;
-	else
-		mp->b_datap->db_type = M_IOCNAK;
-	iocp->ioc_error = -err;
-	iocp->ioc_rval = ret;
-	qreply(q, mp);
-	return (QR_ABSORBED);
-}
-
-/*
- *  -------------------------------------------------------------------------
- *
- *  M_IOCDATA Handling
- *
- *  -------------------------------------------------------------------------
- */
-STATIC int
-smod_w_iocdata(queue_t *q, mblk_t *mp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
-	mblk_t *dp = mp->b_cont;
-	void *arg = dp ? dp->b_rptr : NULL;
-	int cmd = resp->cp_cmd, count = dp ? dp->b_wptr - dp->b_rptr : 0;
-	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
-	int err = -EOPNOTSUPP, ret = -1;
-
-	if (resp->cp_rval != 0)
-		goto efault;
-	if (smod->ioc_state == IOC_STATE_NULL)
-		goto einval;
-	switch (type) {
-	case SMOD_IOC_MAGIC:
-	{
-		/* These are SOCKMOD IOCTLs */
-		switch (nr) {
-		case _IOC_NR(O_SI_GETUDATA):
-			printd(("%s: %p: -> O_SI_GETUDATA\n", SMOD_MOD_NAME, smod));
-			err = smod_o_si_getudata(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SHUTDOWN):
-			printd(("%s: %p: -> SI_SHUTDOWN\n", SMOD_MOD_NAME, smod));
-			err = smod_si_shutdown(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_LISTEN):
-			printd(("%s: %p: -> SI_LISTEN\n", SMOD_MOD_NAME, smod));
-			err = smod_si_listen(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SETMYNAME):
-			printd(("%s: %p: -> SI_SETMYNAME\n", SMOD_MOD_NAME, smod));
-			err = smod_si_setmyname(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SETPEERNAME):
-			printd(("%s: %p: -> SI_SETPEERNAME\n", SMOD_MOD_NAME, smod));
-			err = smod_si_setpeername(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_GETINTRANSIT):
-			printd(("%s: %p: -> SI_GETINTRANSIT\n", SMOD_MOD_NAME, smod));
-			err = smod_si_getintransit(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_TCL_LINK):
-			printd(("%s: %p: -> SI_TCL_LINK\n", SMOD_MOD_NAME, smod));
-			err = smod_si_tcl_link(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_TCL_UNLINK):
-			printd(("%s: %p: -> SI_TCL_UNLINK\n", SMOD_MOD_NAME, smod));
-			err = smod_si_tcl_unlink(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SOCKPARAMS):
-			printd(("%s: %p: -> SI_SOCKPARAMS\n", SMOD_MOD_NAME, smod));
-			err = smod_si_sockparams(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_GETUDATA):
-			printd(("%s: %p: -> SI_GETUDATA\n", SMOD_MOD_NAME, smod));
-			err = smod_si_getudata(q, mp, &ret);
-			break;
-		default:
-			ptrace(("%s: %p: ERROR: Unsupported SOCKMOD ioctl %c, %d\n", SOCK_MOD_NAME,
-				smod(char) type, nr));
-			break;
-		}
-		break;
-	}
-	default:
-		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", SOCK_MOD_NAME, smod,
-			(char) type, nr));
-		break;
-	}
-      done:
-	if (err > 0)
-		return (err);
-	else if (err == 0)
-		mp->b_datap->db_type = M_IOCACK;
-	else
-		mp->b_datap->db_type = M_IOCNAK;
-	iocp->ioc_error = -err;
-	iocp->ioc_rval = ret;
-	qreply(q, mp);
-	return (QR_ABSORBED);
-      efault:
-	err = -EFAULT;
-	ret = -1;
-	goto done;
-      einval:
-	err = -EINVAL;
-	ret = -1;
-	goto done;
-}
-
-/*
- *  -------------------------------------------------------------------------
- *
- *  M_IOCACK, M_IOCNAK Handling
- *
- *  -------------------------------------------------------------------------
- */
-STATIC int
-smod_r_iocack(queue_t *q, mblk_t *mp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
-	mblk_t *bp = mp->b_cont;
-	void *arg = bp ? bp->b_rptr : NULL;
-	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
-	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
-	int err = QR_PASSALONG, ret = -1;
-
-	if (iocp->ioc_id != ss->ioc_id)
-		goto passalong;
-	switch (type) {
-	case SMOD_IOC_MAGIC:
-	{
-		/* These are SOCKMOD IOCTLs */
-		switch (nr) {
-		case _IOC_NR(O_SI_GETUDATA):
-			printd(("%s: %p: -> O_SI_GETUDATA\n", SMOD_MOD_NAME, smod));
-			err = smod_o_si_getudata(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SHUTDOWN):
-			printd(("%s: %p: -> SI_SHUTDOWN\n", SMOD_MOD_NAME, smod));
-			err = smod_si_shutdown(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_LISTEN):
-			printd(("%s: %p: -> SI_LISTEN\n", SMOD_MOD_NAME, smod));
-			err = smod_si_listen(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SETMYNAME):
-			printd(("%s: %p: -> SI_SETMYNAME\n", SMOD_MOD_NAME, smod));
-			err = smod_si_setmyname(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SETPEERNAME):
-			printd(("%s: %p: -> SI_SETPEERNAME\n", SMOD_MOD_NAME, smod));
-			err = smod_si_setpeername(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_GETINTRANSIT):
-			printd(("%s: %p: -> SI_GETINTRANSIT\n", SMOD_MOD_NAME, smod));
-			err = smod_si_getintransit(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_TCL_LINK):
-			printd(("%s: %p: -> SI_TCL_LINK\n", SMOD_MOD_NAME, smod));
-			err = smod_si_tcl_link(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_TCL_UNLINK):
-			printd(("%s: %p: -> SI_TCL_UNLINK\n", SMOD_MOD_NAME, smod));
-			err = smod_si_tcl_unlink(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_SOCKPARAMS):
-			printd(("%s: %p: -> SI_SOCKPARAMS\n", SMOD_MOD_NAME, smod));
-			err = smod_si_sockparams(q, mp, &ret);
-			break;
-		case _IOC_NR(SI_GETUDATA):
-			printd(("%s: %p: -> SI_GETUDATA\n", SMOD_MOD_NAME, smod));
-			err = smod_si_getudata(q, mp, &ret);
-			break;
-		default:
-			ptrace(("%s: %p: ERROR: Unsupported SOCKMOD ioctl %c, %d\n", SOCK_MOD_NAME,
-				smod(char) type, nr));
-			break;
-		}
-		break;
-	}
-	}
-      done:
-	if (err > 0)
-		return (err);
-	else if (err == 0)
-		mp->b_datap->db_type = M_IOCACK;
-	else
-		mp->b_datap->db_type = M_IOCNAK;
-	iocp->ioc_error = -err;
-	iocp->ioc_rval = ret;
 	putnext(q, mp);
-	return (QR_ABSORBED);
-      efault:
-	err = -EFAULT;
-	ret = -1;
-	goto done;
-      passalong:
-	err = QR_PASSALONG;
-	ret = 0;
-	goto done;
-}
-
-/*
- *  -------------------------------------------------------------------------
- *
- *  M_PROTO, M_PCPROTO Handling
- *
- *  -------------------------------------------------------------------------
- */
-/*
- *  Primitives from SOCKMOD user to SOCKMOD
- *  -----------------------------------------------------------
- */
-STATIC int
-smod_w_proto(queue_t *q, mblk_t *mp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	int rtn;
-	ulong prim;
-
-	(void) smod;
-	switch ((prim = *(ulong *) mp->b_rptr)) {
-	case T_CONN_REQ:
-		printd(("%s: %p: -> T_CONN_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_conn_req(q, mp);
-		break;
-	case T_CONN_RES:
-		printd(("%s: %p: -> T_CONN_RES\n", SMOD_MOD_NAME, smod));
-		rtn = t_conn_res(q, mp);
-		break;
-	case T_DISCON_REQ:
-		printd(("%s: %p: -> T_DISCON_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_discon_req(q, mp);
-		break;
-	case T_DATA_REQ:
-		printd(("%s: %p: -> T_DATA_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_data_req(q, mp);
-		break;
-	case T_EXDATA_REQ:
-		printd(("%s: %p: -> T_EXDATA_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_exdata_req(q, mp);
-		break;
-	case T_INFO_REQ:
-		printd(("%s: %p: -> T_INFO_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_info_req(q, mp);
-		break;
-	case T_BIND_REQ:
-		printd(("%s: %p: -> T_BIND_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_bind_req(q, mp);
-		break;
-	case T_UNBIND_REQ:
-		printd(("%s: %p: -> T_UNBIND_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_unbind_req(q, mp);
-		break;
-	case T_UNITDATA_REQ:
-		printd(("%s: %p: -> T_UNITDATA_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_unitdata_req(q, mp);
-		break;
-	case T_OPTMGMT_REQ:
-		printd(("%s: %p: -> T_OPTMGMT_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_optmgmt_req(q, mp);
-		break;
-	case T_ORDREL_REQ:
-		printd(("%s: %p: -> T_ORDREL_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_ordrel_req(q, mp);
-		break;
-	case T_OPTDATA_REQ:
-		printd(("%s: %p: -> T_OPTDATA_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_optdata_req(q, mp);
-		break;
-	case T_ADDR_REQ:
-		printd(("%s: %p: -> T_ADDR_REQ\n", SMOD_MOD_NAME, smod));
-		rtn = t_addr_req(q, mp);
-		break;
-	default:
-		printd(("%s: %p: -> T_????\n", SMOD_MOD_NAME, smod));
-		rtn = QR_PASSALONG;
-		break;
-	}
-	return (rtn);
-}
-
-/*
- *  Primitives from TPI provider to SOCKMOD
- *  -----------------------------------------------------------
- */
-STATIC int
-smod_r_proto(queue_t *q, mblk_t *mp)
-{
-	struct smod *smod = SMOD_PRIV(q);
-	int rtn;
-	ulong prim;
-
-	(void) smod;
-	switch ((prim = *(ulong *) mp->b_rptr)) {
-	case T_CONN_IND:
-		printd(("%s: %p: T_CONN_IND <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_conn_ind(q, mp);
-		break;
-	case T_CONN_CON:
-		printd(("%s: %p: T_CONN_CON <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_conn_con(q, mp);
-		break;
-	case T_DISCON_IND:
-		printd(("%s: %p: T_DISCON_IND <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_discon_ind(q, mp);
-		break;
-	case T_DATA_IND:
-		printd(("%s: %p: T_DATA_IND <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_data_ind(q, mp);
-		break;
-	case T_EXDATA_IND:
-		printd(("%s: %p: T_EXDATA_IND <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_exdata_ind(q, mp);
-		break;
-	case T_INFO_ACK:
-		printd(("%s: %p: T_INFO_ACK <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_info_ack(q, mp);
-		break;
-	case T_BIND_ACK:
-		printd(("%s: %p: T_BIND_ACK <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_bind_ack(q, mp);
-		break;
-	case T_ERROR_ACK:
-		printd(("%s: %p: T_ERROR_ACK <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_error_ack(q, mp);
-		break;
-	case T_OK_ACK:
-		printd(("%s: %p: T_OK_ACK <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_ok_ack(q, mp);
-		break;
-	case T_UNITDATA_IND:
-		printd(("%s: %p: T_UNITDATA_IND <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_unitdata_ind(q, mp);
-		break;
-	case T_UDERROR_IND:
-		printd(("%s: %p: T_UDERROR_IND <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_uderror_ind(q, mp);
-		break;
-	case T_OPTMGMT_ACK:
-		printd(("%s: %p: T_OPTMGMT_ACK <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_optmgmt_ack(q, mp);
-		break;
-	case T_ORDREL_IND:
-		printd(("%s: %p: T_ORDREL_IND <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_ordrel_ind(q, mp);
-		break;
-	case T_OPTDATA_IND:
-		printd(("%s: %p: T_OPTDATA_IND <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_optdata_ind(q, mp);
-		break;
-	case T_ADDR_ACK:
-		printd(("%s: %p: T_ADDR_ACK <-\n", SMOD_MOD_NAME, smod));
-		rtn = t_addr_ack(q, mp);
-		break;
-	default:
-		printd(("%s: %p: T_???? <-\n", SMOD_MOD_NAME, smod));
-		rtn = QR_PASSALONG;
-		break;
-	}
-	return (rtn);
-}
-
-/*
- *  M_DATA Handling
- *  -------------------------------------------------------------------------
- */
-STATIC INLINE int
-smod_w_data(queue_t *q, mblk_t *mp)
-{
-	/* data from above */
-	printd(("%s: %p: -> M_DATA\n", SMOD_MOD_NAME, SMOD_PRIV(q)));
-	return (QR_PASSFLOW);
-}
-STATIC INLINE int
-smod_r_data(queue_t *q, mblk_t *mp)
-{
-	/* data from below */
-	printd(("%s: %p: M_DATA <-\n", SMOD_MOD_NAME, SMOD_PRIV(q)));
-	return (QR_PASSFLOW);
-}
-
-/*
- *  M_FLUSH Handling
- *  -------------------------------------------------------------------------
- */
-
-/*
- *  M_ERROR, M_HANGUP Handling
- *  -------------------------------------------------------------------------
- */
-STATIC int
-smod_r_error(queue_t *q, mblk_t *mp)
-{
-	printd(("%s: %p: M_ERROR <-\n", SMOD_MOD_NAME, SMOD_PRIV(q)));
-	smod->state = SMODS_UNUSABLE;
-	return (QR_PASSALONG);
-}
-STATIC int
-smod_r_hangup(queue_t *q, mblk_t *mp)
-{
-	printd(("%s: %p: M_HANGUP <-\n", SMOD_MOD_NAME, SMOD_PRIV(q)));
-	smod->state = SMODS_UNUSABLE;
-	return (QR_PASSALONG);
-}
-
-/*
- *  =========================================================================
- *
- *  PUT and SRV
- *
- *  =========================================================================
- */
-STATIC INLINE int
-smod_w_prim(queue_t *q, mblk_t *mp)
-{
-	ulong type;
-
-	/* Fast Path */
-	if ((type = mp->b_datap->db_type) == M_DATA)
-		return smod_w_data(q, mp);
-	switch (type) {
-	case M_DATA:
-		return smod_w_data(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return smod_w_proto(q, mp);
-	case M_FLUSH:
-		return smod_w_flush(q, mp);
-	case M_IOCTL:
-		return smod_w_ioctl(q, mp);
-	case M_IOCDATA:
-		return smod_w_iocdata(q, mp);
-	}
-	return (QR_PASSALONG);
-}
-STATIC INLINE int
-smod_r_prim(queue_t *q, mblk_t *mp)
-{
-	ulong type;
-
-	/* Fast Path */
-	if ((type = mp->b_datap->db_type) == M_DATA)
-		return smod_r_data(q, mp);
-	switch (type) {
-	case M_DATA:
-		return smod_r_data(q, mp);
-	case M_PROTO:
-	case M_PCPROTO:
-		return smod_r_proto(q, mp);
-	case M_FLUSH:
-		return smod_r_flush(q, mp);
-	case M_IOCACK:
-	case M_IOCNAK:
-		return smod_r_iocack(q, mp);
-	case M_ERROR:
-		return smod_r_error(q, mp);
-	case M_HANGUP:
-		return smod_r_hangup(q, mp);
-	}
-	return (QR_PASSALONG);
-}
-
-static noinline streams_fastcall __unlikely int
-smod_ioctl_slow(queue_t *q, mblk_t *mp)
-{
+	return (0);
 }
 
 /**
@@ -1602,11 +369,12 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 		int err;
 
 	case M_IOCTL:
-		/* Most of the ioctls prvided here are to achieve atomic and thread-safe operations 
-		   on the stream for use by the Sockets library.  Each ioctl takes a TPI message in 
-		   the buffer and results in sending the TPI message downstream.  We strip off and
-		   keep the io control block for latter response correlation.  We also track the
-		   state of the stream and the number of outstanding connection indications. */
+		/* Most of the ioctls provided here are to acheive atomic and thread-safe
+		   operations on the stream for use by the Sockets library.  Each ioctl takes a TPI
+		   message in the buffer and results in sending the TPI message downstream.  We
+		   strip off and keep the io control block for latter response correlation.  We also 
+		   track the state of the stream and the number of outstanding connection
+		   indications. */
 		ioc = (typeof(ioc)) mp->b_rptr;
 		err = -EFAULT;
 		if (!(dp = unlinkb(mp)))
@@ -1627,37 +395,53 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 			goto error;
 #endif				/* defined LIS */
 		switch (ioc->ioc_cmd) {
-		case O_SI_GETUDATA:
+#ifdef O_SI_OPTMGMT
+		case O_SI_OPTMGMT:
 			err = TNOTSUPPORT;
 			goto error;
-		case SI_GETUDATA:
-			if (p->type = T_INFO_REQ && ioc->ioc_count >= sizeof(p->info_ack)) {
+#endif				/* O_SI_OPTMGMT */
+#ifdef SI_OPTMGMT
+		case SI_OPTMGMT:
+			if (p->type == T_OPTMGMT_REQ && ioc->ioc_count >= sizeof(p->optmgmt_ack)) {
 				dp->b_datap->db_type = M_PROTO;
 				priv->oldstate = priv->state;
+#ifdef TS_WACK_OPTREQ
+				priv->state = TS_WACK_OPTREQ;
+#endif
 				break;
 			}
 			goto error;
-		case SI_SETMYNAME:
-		case SI_LISTEN:
+#endif				/* SI_OPTMGMT */
+#ifdef O_SI_BIND
+		case O_SI_BIND:
+			err = TNOTSUPPORT;
+			goto error;
+#endif				/* O_SI_BIND */
 #if defined SI_BIND
 		case SI_BIND:
 #endif				/* defined SI_BIND */
+		case SI_LISTEN:
 			if (p->type == T_BIND_REQ && ioc->ioc_count >= sizeof(p->bind_ack)) {
 				dp->b_datap->db_type = M_PROTO;
 				priv->oldstate = priv->state;
 				priv->state = TS_WACK_BREQ;
 				break;
 			}
-			if (p->type == T_UNBIND_REQ && ioc->ioc_count >= sizeof(p->ok_ack)) {
+			goto error;
+		case O_SI_GETUDATA:
+			err = TNOTSUPPORT;
+			goto error;
+		case SI_GETUDATA:
+			if (p->type == T_INFO_REQ && ioc->ioc_count >= sizeof(p->info_ack)) {
 				dp->b_datap->db_type = M_PROTO;
 				priv->oldstate = priv->state;
-				priv->state = TS_WACK_UREQ;
 				break;
 			}
+			goto error;
 #if defined SI_ACCEPT
-			break;
 		case SI_ACCEPT:
-#endif				/* defined SI_ACCEPT */
+#endif
+		case SI_SETMYNAME:
 			if (p->type == T_CONN_RES && ioc->ioc_count >= sizeof(p->conn_res)) {
 				int doff = sizeof(p->conn_res);
 
@@ -1680,10 +464,10 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 				break;
 			}
 			goto error;
-		case SI_SETPEERNAME:
 #if defined SI_CONNECT
 		case SI_CONNECT:
-#endif				/* defined SI_CONNECT */
+#endif
+		case SI_SETPEERNAME:
 			if (p->type == T_CONN_REQ && ioc->ioc_count >= sizeof(p->conn_req)) {
 				int doff = sizeof(p->conn_req);
 
@@ -1709,20 +493,19 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 				break;
 			}
 			goto error;
-		case O_SI_GETUDATA:
 		case SI_SHUTDOWN:
 		case SI_GETINTRANSIT:
-		case SI_SI_TCL_LINK:
-		case SI_SI_TCL_UNLINK:
+		case SI_TCL_LINK:
+		case SI_TCL_UNLINK:
 		case SI_SOCKPARAMS:
-		case SI_GETUDATA:
+		case SIOCATMARK:
+		case SIOCSPGRP:
+		case SIOCGPGRP:
+#if 0
 		case SIOCHIWAT:
 		case SIOGHIWAT:
 		case SIOCLOWAT:
 		case SIOGLOWAT:
-		case SIOCATMARK:
-		case SIOCSPGRP:
-		case SIOCGPGRP:
 		case SIOCPROTO:
 		case SIOCGETNAME:
 		case SIOCGETPEER:
@@ -1740,11 +523,18 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 		case FIONBIO:
 		case TIOCINQ:
 		case TIOOUTQ:
+#endif
 		default:
 			break;
+		      error:
+			return (err);
 		}
 		break;
+#if 0
 	case M_IOCDATA:
+	{
+		struct copyresp *cp = (typeof(cp)) mp->b_rptr;
+
 		switch (cp->cp_cmd) {
 		case SIOCSOCKSYS:
 			if (cp->cp_priv == NULL) {
@@ -1791,6 +581,8 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 			}
 		}
 		break;
+	}
+#endif
 	default:
 		/* Unrecongnized STREAMS messages are simply passed along. Because we have no
 		   service procedure, flow control is never performed by the module when passing
@@ -1830,6 +622,7 @@ smod_wput(queue_t *q, mblk_t *mp)
 		goto go_slow;
 	putnext(q, mp);
 	return (0);
+
       go_slow:
 	return smod_wput_slow(q, mp);
 }
@@ -1846,8 +639,7 @@ smod_wput(queue_t *q, mblk_t *mp)
  */
 
 /*
- *  LiS does not offer us a way to wait for an allocation.  Solaris, OSF and
- *  Linux-Fast STREAMS do.
+   LiS does not offer us a way to wait for an allocation.  Solaris, OSF and Linux Fast-STREAMS do. 
  */
 #if !defined BPRI_WAITOK
 #   if defined BPRI_FT
@@ -1898,13 +690,13 @@ smod_pop(queue_t *q)
 			*(mp->b_wptr)++ = 0;
 			qreply(q, mp);
 		}
-#if defined M_ERROR_UNDOES_M_HANGUP
+#	    if defined M_ERROR_UNDOES_M_HANGUP
 		priv->flags &= ~(SOCKMOD_EPROTO | SOCKMOD_HANGUP);
-#else
+#	    else		/* defined M_ERROR_UNDOES_M_HANGUP */
 		priv->flags &= ~(SOCKMOD_EPROTO);
-#endif				/* defined M_ERROR_UNDOES_M_HANGUP */
+#	    endif		/* defined M_ERROR_UNDOES_M_HANGUP */
 	}
-#if defined M_UNHANGUP
+#   if defined M_UNHANGUP
 	if ((priv->flags & SOCKMOD_HANGUP)) {
 		if ((mp = allocb(0, BPRI_WAITOK))) {
 			mp->b_datap->db_type = M_UNHANGUP;
@@ -1912,7 +704,7 @@ smod_pop(queue_t *q)
 		}
 		priv->flags &= ~SOCKMOD_HANGUP;
 	}
-#endif				/* defined M_UNHANGUP */
+#   endif			/* defined M_UNHANGUP */
 }
 
 /* Approaches: how about creating a new socket in the sockfs(5) for hacked address family AF_STREAMS
@@ -1920,6 +712,7 @@ smod_pop(queue_t *q)
  * version of that which creates only the sockfs inode and then uses the stream head instead of a
  * struct sock? */
 
+#if 0
 static int sock_tpi_release(struct socket *);
 static int sock_tpi_bind(struct socket *, struct sockaddr *, int);
 static int sock_tpi_connect(struct socket *, struct sockaddr *, int, int);
@@ -1960,13 +753,11 @@ static int sock_tpi_recvmsg(struct socket *, struct msghdr *, int, int, struct s
 static int sock_tpi_mmap(struct file *, struct socket *, struct vm_area_struct *);
 static int sock_tpi_sendpage(struct socket *, struct page *, int, size_t, int);
 
-
-
 struct proto_ops tpi_socket_ops = {
-	.family = 0,			/* huh? what a bad place to put this */
+	.family = 0,		/* huh? what a bad place to put this */
 #ifdef HAVE_KMEMB_STRUCT_PROTO_OPS_OWNER
 	.owner = THIS_MODULE,
-#endif					/* HAVE_KMEMB_STRUCT_PROTO_OPS_OWNER */
+#endif				/* HAVE_KMEMB_STRUCT_PROTO_OPS_OWNER */
 	.release = &sock_tpi_release,
 	.bind = &sock_tpi_bind,
 	.connect = &sock_tpi_connect,
@@ -1977,30 +768,37 @@ struct proto_ops tpi_socket_ops = {
 	.ioctl = &sock_tpi_ioctl,
 #ifdef HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_IOCTL
 	.compat_ioctl = &sock_tpi_compat_ioctl,
-#endif					/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_IOCTL */
+#endif				/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_IOCTL */
 	.listen = &sock_tpi_listen,
 	.shutdown = &sock_tpi_shutdown,
 	.setsockopt = &sock_tpi_setsockopt,
 	.getsockopt = &sock_tpi_getsockopt,
 #ifdef HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_GETSOCKOPT
 	.compat_setsockopt = &sock_tpi_compat_setsockopt,
-#endif					/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_GETSOCKOPT */
+#endif				/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_GETSOCKOPT */
 #ifdef HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_SETSOCKOPT
 	.compat_getsockopt = &sock_tpi_compat_getsockopt,
-#endif					/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_SETSOCKOPT */
+#endif				/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_SETSOCKOPT */
 	.sendmsg = &sock_tpi_sendmsg,
 	.recvmsg = &sock_tpi_recvmsg,
 	.mmap = &sock_tpi_mmap,
 	.sendpage = &sock_tpi_sendpage,
 };
+#endif
 
 /**
- * smod_qopen - open the sockmod module
+ * smod_open - open the sockmod module
  * @q: read queue
  * @devp: device to open
  * @flag: flags to open call
  * @sflag: should be just MODOPEN
  * @crp: pointer to opening process' credentials
+ *
+ * Some applications programs that are too knowledgable about the internal organization of STREAMS
+ * have the habit of popping the timod module and pushing the sockmod module and then popping
+ * sockmod and pushing timod.  Therefore, it cannot be assumed that timod is being pushed onto a
+ * freshly opened Stream as is the case when the XTI library is pushing the module.  Therefore, we
+ * should immediately issue a capability request to determine the state of the TPI Stream.
  *
  * It is possible under Linux-Fast STREAMS that we can just transform the Stream into a socket.
  * This can be accomplished most easily by setting the inode to look like a socket (place a struct
@@ -2014,8 +812,8 @@ struct proto_ops tpi_socket_ops = {
  * the sockfs.  The stream head can be referenced with the f_private data pointer.  The sockmod
  * instance can reference the new inode with the q->q_ptr.
  */
-STATIC streamscall int
-smod_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+static streamscall int
+smod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err = 0;
 
@@ -2027,21 +825,23 @@ smod_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	err = ENOMEM;
 	if (!(smod_alloc_priv(q)))
 		goto quit;
+#if 0
 	/* generate immediate information request */
-	qprocson(q);
 	if ((err = t_info_req(q)) < 0) {
 		smod_free_priv(q);
 		return (-err);
 	}
+#endif
+	qprocson(q);
 	return (0);
       quit:
 	return (err);
 }
 
-STATIC streamscall int
-smod_qclose(queue_t *q, int flag, cred_t *crp)
+static streamscall int
+smod_close(queue_t *q, int oflag, cred_t *crp)
 {
-	(void) flag;
+	(void) oflag;
 	(void) crp;
 #if defined LIS
 	/* protect against LiS bugs */
@@ -2081,6 +881,7 @@ smod_qclose(queue_t *q, int flag, cred_t *crp)
  *  Linux Registration
  *  -------------------------------------------------------------------------
  */
+
 unsigned short modid = MOD_ID;
 
 #ifndef module_param
@@ -2088,7 +889,7 @@ MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif
-MODULE_PARM_DESC(modid, "Module ID for SOCKMOD module. (0 for allocation.)");
+MODULE_PARM_DESC(modid, "Module ID for the SOCKMOD module. (0 for allocation.)");
 
 /*
  *  Linux Fast-STREAMS Registration
@@ -2096,7 +897,7 @@ MODULE_PARM_DESC(modid, "Module ID for SOCKMOD module. (0 for allocation.)");
  */
 #ifdef LFS
 
-STATIC struct fmodw sockmod_fmod = {
+STATIC struct fmodsw sockmod_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sockmodinfo,
 	.f_flag = D_MP,
@@ -2112,6 +913,7 @@ smod_register_strmod(void)
 		return (err);
 	return (0);
 }
+
 STATIC __unlikely int
 smod_unregister_strmod(void)
 {
@@ -2185,6 +987,7 @@ smod_ioctl32_register(void)
 	}
 	return (0);
 }
+
 #endif				/* defined WITH_32BIT_CONVERSION */
 
 #endif				/* LFS */
@@ -2247,7 +1050,7 @@ sockmodinit(void)
 	return (0);
 }
 
-MODUL_STATIC void __exit
+MODULE_STATIC void __exit
 sockmodterminate(void)
 {
 	int err;
@@ -2264,7 +1067,7 @@ sockmodterminate(void)
 
 /*
  *  Linux Kernel Module Initialization
- *  --------------------------------------------------------------------------
+ *  -------------------------------------------------------------------------
  */
 module_init(sockmodinit);
 module_exit(sockmodterminate);

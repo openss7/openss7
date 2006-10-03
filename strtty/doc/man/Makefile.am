@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:51:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:51:00 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/10/03 13:53:22  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.2  2006/09/29 11:51:00  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -72,12 +82,46 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 man_MANS = \
-	man5/strtty.5
+	man3/grantpt.3tty \
+	man3/ptsname.3tty \
+	man3/unlockpt.3tty \
+	man4/ldterm.4 \
+	man4/pckt.4 \
+	man4/ptc.4 \
+	man4/ptem.4 \
+	man4/ptm.4 \
+	man4/ptmx.4tty \
+	man4/pts.4tty \
+	man4/pty.4 \
+	man4/ttcompat.4 \
+	man5/strtty.5 \
+	man8/strtty_mknod.8 \
+	man8/test-tty.8
 
 dist_noinst_MANS = \
-	man5/strtty.5.man
+	man3/grantpt.3tty.man \
+	man3/ptsname.3tty.man \
+	man3/unlockpt.3tty.man \
+	man4/ldterm.4.man \
+	man4/pckt.4.man \
+	man4/ptc.4.man \
+	man4/ptem.4.man \
+	man4/ptm.4.man \
+	man4/ptmx.4tty.man \
+	man4/pts.4tty.man \
+	man4/pty.4.man \
+	man4/ttcompat.4.man \
+	man5/strtty.5.man \
+	man8/strtty_mknod.8.man \
+	man8/test-tty.8.man
 
 MANS_UNUSED = \
+	man3/grantpt.3tty \
+	man3/ptsname.3tty \
+	man3/unlockpt.3tty \
+	man4/ptc.4 \
+	man4/ptm.4 \
+	man4/pts.4tty \
 	man5/strtty.5
 
 ## PKG_BUILD_INDEP

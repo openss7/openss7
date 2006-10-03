@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/03/06 11:38:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/03 13:52:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:38 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.37  2006/10/03 13:52:06  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.36  2006/03/06 11:38:38  brian
 # - updated headers
 #
@@ -75,72 +85,73 @@ nobase_pkginclude_HEADERS = \
 	sys/stropts.h \
 	sys/stropts32.h \
 	sys/strsubr.h \
-	sys/streams/cmn_err.h \
-	sys/streams/ddi.h \
-	sys/streams/debug.h \
-	sys/streams/dki.h \
-	sys/streams/kmem.h \
-	sys/streams/strconf.h \
-	sys/streams/strdebug.h \
-	sys/streams/stream.h \
-	sys/streams/strlog.h \
-	sys/streams/stropts.h \
-	sys/streams/stropts32.h \
-	sys/streams/strsubr.h
+	sys/$(PACKAGE)/cmn_err.h \
+	sys/$(PACKAGE)/ddi.h \
+	sys/$(PACKAGE)/debug.h \
+	sys/$(PACKAGE)/dki.h \
+	sys/$(PACKAGE)/kmem.h \
+	sys/$(PACKAGE)/strconf.h \
+	sys/$(PACKAGE)/strdebug.h \
+	sys/$(PACKAGE)/stream.h \
+	sys/$(PACKAGE)/strlog.h \
+	sys/$(PACKAGE)/stropts.h \
+	sys/$(PACKAGE)/stropts32.h \
+	sys/$(PACKAGE)/strsubr.h
 
 if CONFIG_STREAMS_LOG
 nobase_pkginclude_HEADERS += log.h
 nobase_pkginclude_HEADERS += sys/log.h
-nobase_pkginclude_HEADERS += sys/streams/log.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/log.h
 endif
 if CONFIG_STREAMS_LOG_MODULE
 nobase_pkginclude_HEADERS += log.h
 nobase_pkginclude_HEADERS += sys/log.h
-nobase_pkginclude_HEADERS += sys/streams/log.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/log.h
 endif
 if CONFIG_STREAMS_LOOP
 nobase_pkginclude_HEADERS += loop.h
 nobase_pkginclude_HEADERS += sys/loop.h
-nobase_pkginclude_HEADERS += sys/streams/loop.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/loop.h
 endif
 if CONFIG_STREAMS_LOOP_MODULE
 nobase_pkginclude_HEADERS += loop.h
 nobase_pkginclude_HEADERS += sys/loop.h
-nobase_pkginclude_HEADERS += sys/streams/loop.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/loop.h
 endif
 if CONFIG_STREAMS_SAD
 nobase_pkginclude_HEADERS += sad.h
 nobase_pkginclude_HEADERS += sys/sad.h
-nobase_pkginclude_HEADERS += sys/streams/sad.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/sad.h
 endif
 if CONFIG_STREAMS_SAD_MODULE
 nobase_pkginclude_HEADERS += sad.h
 nobase_pkginclude_HEADERS += sys/sad.h
-nobase_pkginclude_HEADERS += sys/streams/sad.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/sad.h
 endif
 if CONFIG_STREAMS_SC
 nobase_pkginclude_HEADERS += sys/sc.h
-nobase_pkginclude_HEADERS += sys/streams/sc.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/sc.h
 endif
 if CONFIG_STREAMS_SC_MODULE
 nobase_pkginclude_HEADERS += sys/sc.h
-nobase_pkginclude_HEADERS += sys/streams/sc.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/sc.h
 endif
 if CONFIG_STREAMS_TESTMOD
 nobase_pkginclude_HEADERS += sys/testmod.h
-nobase_pkginclude_HEADERS += sys/streams/testmod.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/testmod.h
 endif
 if CONFIG_STREAMS_TESTMOD_MODULE
 nobase_pkginclude_HEADERS += sys/testmod.h
-nobase_pkginclude_HEADERS += sys/streams/testmod.h
+nobase_pkginclude_HEADERS += sys/$(PACKAGE)/testmod.h
 endif
 
 ##nobase_pkginclude_HEADERS += \
 ##	sys/spec_fs_i.h \
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/streams/config.h \
-	sys/streams/version.h
+	sys/$(PACKAGE)/config.h \
+	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/modversions.h
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

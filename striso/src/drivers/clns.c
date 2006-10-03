@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/02 11:31:48 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/03 13:52:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:31:48 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:52:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.9  2006/10/03 13:52:22  brian
+ - changes to pass make check target
+ - added some package config.h files
+ - removed AUTOCONFIG_H from Makefile.am's
+ - source code changes for compile
+ - added missing manual pages
+ - renamed conflicting manual pages
+ - parameterized include Makefile.am
+ - updated release notes
+
  Revision 0.9.2.8  2006/10/02 11:31:48  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -94,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/02 11:31:48 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/03 13:52:22 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/02 11:31:48 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/03 13:52:22 $";
 
 /*
  *  This is an X.233 CLNS driver.  This is an NPI driver that can be pushed over or link a DLPI
@@ -150,7 +160,7 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/10/02 11:31:48 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2006/10/03 13:52:22 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL"
@@ -175,19 +185,19 @@ MODULE_ALIAS("streams-dl");
 #endif				/* LINUX */
 
 #ifdef LFS
-#define CLNS__DRV_ID	CONFIG_STREAMS_CLNS__MODID
-#define CLNS__DRV_NAME	CONFIG_STREAMS_CLNS__NAME
-#define CLNS__CMAJORS	CONFIG_STREAMS_CLNS__NMAJORS
-#define CLNS__CMAJOR_0	CONFIG_STREAMS_CLNS__MAJOR
-#define CLNS__UNITS	CONFIG_STREAMS_CLNS__NMINORS
+#define CLNS_DRV_ID	CONFIG_STREAMS_CLNS_MODID
+#define CLNS_DRV_NAME	CONFIG_STREAMS_CLNS_NAME
+#define CLNS_CMAJORS	CONFIG_STREAMS_CLNS_NMAJORS
+#define CLNS_CMAJOR_0	CONFIG_STREAMS_CLNS_MAJOR
+#define CLNS_UNITS	CONFIG_STREAMS_CLNS_NMINORS
 #endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLNS__MODID));
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLNS_MODID));
 MODULE_ALIAS("streams-driver-dl");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLNS__MAJOR));
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLNS_MAJOR));
 MODULE_ALIAS("/dev/streams/clnl");
 MODULE_ALIAS("/dev/streams/clnl/*");
 MODULE_ALIAS("/dev/streams/clnl/clnl");
@@ -196,10 +206,10 @@ MODULE_ALIAS("/dev/streams/clnl/esis");
 MODULE_ALIAS("/dev/streams/clnl/isis");
 MODULE_ALIAS("/dev/streams/clone/clnl");
 #endif				/* LFS */
-MODULE_ALIAS("char-major-" __stringify(CLNS__CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(CLNS__CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(CLNS__CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(CLNS__CMAJOR_0) "-" __stringify(CLNS__CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-" __stringify(CLNS_CMINOR));
 MODULE_ALIAS("/dev/clnl");
 MODULE_ALIAS("/dev/clns");
 MODULE_ALIAS("/dev/esis");
@@ -212,11 +222,11 @@ MODULE_ALIAS("/dev/isis");
  *  ===================
  */
 
-#define DRV_ID		CLNS__DRV_ID
-#define DRV_NAME	CLNS__DRV_NAME
-#define CMAJORS		CLNS__CMAJORS
-#define CMAJOR_0	CLNS__CMAJOR_0
-#define UNITS		CLNS__UNITS
+#define DRV_ID		CLNS_DRV_ID
+#define DRV_NAME	CLNS_DRV_NAME
+#define CMAJORS		CLNS_CMAJORS
+#define CMAJOR_0	CLNS_CMAJOR_0
+#define UNITS		CLNS_UNITS
 #ifdef MODULE
 #define DRV_BANNER	CLNS_BANNER
 #else				/* MODULE */

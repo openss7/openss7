@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.5 2006/09/24 21:56:35 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.6 2006/10/03 13:51:17 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/24 21:56:35 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/03 13:51:17 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -66,8 +66,9 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
-* Release @value{PACKAGE}-0.9.2.D.rc2::		Release D.rc2
-* Release @value{PACKAGE}-0.9.2.Drc1::		Release Drc1
+* Release @value{PACKAGE}-0.9.2.D.rc3::		Release D Candidate 3
+* Release @value{PACKAGE}-0.9.2.D.rc2::		Release D Candidate 2
+* Release @value{PACKAGE}-0.9.2.Drc1::		Release D Candidate 1
 * Release @value{PACKAGE}-0.9.2.C::		Release C
 * Release @value{PACKAGE}-0.9.2.B::		Release B
 * Release @value{PACKAGE}-0.9.2.A::		Release A
@@ -82,26 +83,32 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+@itemize
+@item Added @file{strnsl-@value{VERSION_STRNSL}} package.
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2.D.rc3
+@unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.D.rc3
+@cindex release @value{PACKAGE}-0.9.2.D.rc3
+
 Third release candidate.
 
 @itemize
-@item
-The package will now build doxygen(1) html documentation with the 'doxy' make
-target.  See 'make help' or README-make in the distribution for more
+@item The package will now build doxygen(1) html documentation with the 'doxy'
+make target.  See 'make help' or README-make in the distribution for more
 information.
 
-@item
-Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
-modules and drivers.
-The @samp{make installcheck} target will now automagically test both 64-bit native and 32-bit
-compatibility versions, one after the other, on 64-bit platforms.
+@item Now builds 32-bit compatibility libraries and tests them against 64-bit
+kernel modules and drivers.  The @samp{make installcheck} target will now
+automagically test both 64-bit native and 32-bit compatibility versions, one
+after the other, on 64-bit platforms.
 
-@item
-Added complete documentation and @cite{Installation and Reference Manual} for
-the @cite{@value{PACKAGE_TITLE}} (this manual).
+@item Added complete documentation and @cite{Installation and Reference
+Manual} for the @cite{@value{PACKAGE_TITLE}} (this manual).
 
-@item
-Added the following subpackages to the master build (and release):
+@item Added the following subpackages to the master build (and release):
 
 @multitable @columnfractions .05 .95
 @item @tab -- @file{strbcm-@value{VERSION_STRBCM}}
@@ -115,22 +122,18 @@ Added the following subpackages to the master build (and release):
 Automated release file generation making for vastly improved and timely text
 documentation present in the release directory.
 
-@item
-Dropped support for @cite{LiS}.
+@item Dropped support for @cite{LiS}.
 
-@item
-Subpackages will now support extended ranges of minor devices on 2.6 kernels
-under @cite{Linux Fast-STREAMS} only.
+@item Subpackages will now support extended ranges of minor devices on 2.6
+kernels under @cite{Linux Fast-STREAMS} only.
 
-@item
-This release candidate provides support for additional SuSE distributions on
-ix86 as well as x86_64.  Added distribution support includes SLES 9, SLES 9
-SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+@item This release candidate provides support for additional SuSE
+distributions on ix86 as well as x86_64.  Added distribution support includes
+SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
 
-@item
-This release candidate includes the changes made to the strsctp drivers at the
-2006 SCTP Interop at the University of British Columbia.  This version was
-interoperability tested with all implementations present.
+@item This release candidate includes the changes made to the strsctp drivers
+at the 2006 SCTP Interop at the University of British Columbia.  This version
+was interoperability tested with all implementations present.
 @end itemize
 
 This was an subscriber release.

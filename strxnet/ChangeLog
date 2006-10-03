@@ -1,5 +1,16 @@
 2006-10-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.ac: added config file
+	* doc/manual/news.texi: updated release notes
+	* lib32/Makefile.am: removed AUTOCONFIG_H
+	* Makefile.am: removed AUTOCONFIG_H
+	* po/de.po: automatic updates
+	* src/include/Makefile.am: parameterized
+	* src/include/sys/strxnet/version.h.in: added comments
+	* src/include/xti.h: changes for compile
+	* src/lib/xnet.c: changes for compile
+	* src/modules/timod.c: changes for compile
+
 	* src/include/sys/strxnet/config.h.in: added config.h file
 
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>

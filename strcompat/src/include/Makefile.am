@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/06 11:38:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/03 13:51:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:31 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:51:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2006/10/03 13:51:58  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.11  2006/03/06 11:38:31  brian
 # - updated headers
 #
@@ -155,9 +165,9 @@ nobase_pkginclude_HEADERS	+= sys/uw7/ddi.h sys/uw7/strconf.h sys/uw7/stream.h
 endif
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/strcompat/config.h \
-	sys/strcompat/version.h
-#	sys/strcompat/modversions.h
+	sys/$(PACKAGE)/config.h \
+	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/modversions.h
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

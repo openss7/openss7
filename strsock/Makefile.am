@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/01 21:30:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/03 13:53:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:23 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2006/10/03 13:53:03  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.7  2006/10/01 21:30:23  brian
 # - distribute release and library version files
 #
@@ -94,8 +104,7 @@ include am/help.am
 ##
 include am/pr.am
 
-lib_LTLIBRARIES			= 
-lib32_LTLIBRARIES		= 
+lib_LTLIBRARIES			=
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -133,56 +142,56 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_sockpath_SOURCES		= src/test/test-sockpath.c
-test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_sockpath_LDADD		= libsockpath.la $(STREAMS_LDADD)
 test_sockpath_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_sockpath_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockpath_CFLAGS		= $(USER_CFLAGS)
 
 test_socket_SOURCES		= src/test/test-socket.c
-test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_socket_LDADD		= libsocket.la $(STREAMS_LDADD)
 test_socket_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_socket_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socket_CFLAGS		= $(USER_CFLAGS)
 
 test_socklib_SOURCES		= src/test/test-socklib.c
-test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_socklib_LDADD		= libsocklib.la $(STREAMS_LDADD)
 test_socklib_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_socklib_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socklib_CFLAGS		= $(USER_CFLAGS)
 
 test_sockmod_SOURCES		= src/test/test-sockmod.c
-test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_sockmod_LDADD		= libsocklib.la $(STREAMS_LDADD)
 test_sockmod_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_sockmod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sockmod_CFLAGS		= $(USER_CFLAGS)
 
 test_socksys_SOURCES		= src/test/test-socksys.c
-test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_socksys_LDADD		= libsocket.la $(STREAMS_LDADD)
 test_socksys_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_socksys_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_socksys_CFLAGS		= $(USER_CFLAGS)
 
 initsock_SOURCES		= src/util/initsock.c
-initsock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+initsock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 initsock_LDADD			= $(STREAMS_LDADD)
 initsock_LDFLAGS		= $(STREAMS_LDFLAGS)
 initsock_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 initsock_CFLAGS			= $(USER_CFLAGS)
 
 soconfig_SOURCES		= src/util/soconfig.c
-soconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+soconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 soconfig_LDADD			= $(STREAMS_LDADD)
 soconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 soconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 soconfig_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
-#xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+#xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
 #xxxxxx_LDFLAGS			= $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -241,25 +250,26 @@ ADDON_OBJS			=
 noinst_LIBRARIES		= libSOCKlink.a libSOCKmods.a libSOCKdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
-EXTRA_libSOCKlink_a_SOURCES	= 
+EXTRA_libSOCKlink_a_SOURCES	= src/modules/sockmod.c \
+				  src/drivers/socksys.c
 libSOCKlink_a_SOURCES		= 
-libSOCKlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libSOCKlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libSOCKlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libSOCKlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libSOCKlink_a_OBJECTS):	$(libSOCKlink_a_SOURCES) $(libSOCKlink_a_DEPENDENCIES)
 
-EXTRA_libSOCKmods_a_SOURCES	= 
-libSOCKmods_a_SOURCES		= 
-libSOCKmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+EXTRA_libSOCKmods_a_SOURCES	= src/modules/sockmod.c
+libSOCKmods_a_SOURCES		= src/modules/sockmod.c
+libSOCKmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libSOCKmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libSOCKmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libSOCKmods_a_OBJECTS):	$(libSOCKmods_a_DEPENDENCIES)
 
-EXTRA_libSOCKdrvs_a_SOURCES	= 
-libSOCKdrvs_a_SOURCES		= 
-libSOCKdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+EXTRA_libSOCKdrvs_a_SOURCES	= src/drivers/socksys.c
+libSOCKdrvs_a_SOURCES		= src/drivers/socksys.c
+libSOCKdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libSOCKdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libSOCKdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -324,17 +334,12 @@ LIBRARY_VERSION_FILES		= \
 				  src/lib/socklib.VERSION
 
 include am/libraries.am
-##
-AUTOCONFIG_H			= src/$(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
 GENKSYMS_CPPFLAGS		= \
-				  -I./pkg -I$(srcdir)/pkg \
 				  -I./src/drivers -I$(srcdir)/src/drivers \
 				  -I./src/modules -I$(srcdir)/src/modules \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:52:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 12:30:55 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/10/03 13:52:41  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.1  2006/09/25 12:30:55  brian
 # - added files for new strnsl package
 #
@@ -73,8 +83,9 @@ dist_noinst_HEADERS = \
 	$(xnsl_headers)
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/strnsl/version.h
-#	sys/strnsl/modversions.h
+	sys/$(PACKAGE)/config.h \
+	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/modversions.h
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

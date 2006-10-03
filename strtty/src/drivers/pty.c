@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:06 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:26 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:40:06 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:53:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.2  2006/10/03 13:53:26  brian
+ - changes to pass make check target
+ - added some package config.h files
+ - removed AUTOCONFIG_H from Makefile.am's
+ - source code changes for compile
+ - added missing manual pages
+ - renamed conflicting manual pages
+ - parameterized include Makefile.am
+ - updated release notes
+
  Revision 0.9.2.1  2006/09/29 11:40:06  brian
  - new files for strtty package and manual pages
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:06 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:26 $"
 
-static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:06 $";
+static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:26 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -82,7 +92,7 @@ static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:06 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:26 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
@@ -648,7 +658,7 @@ STATIC int pts_majors[PTS_CMAJORS] = { PTS_CMAJOR_0, };
 
 STATIC struct ptc *ptc_opens = NULL;
 
-STATIC rwlock_t pty_lock = RWLOCK_UNLOCKED;
+STATIC rwlock_t pty_lock = RW_LOCK_UNLOCKED;
 
 /**
  * ptm_open - PTM driver STREAMS open routine

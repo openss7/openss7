@@ -1,5 +1,11 @@
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: updated release notes
+	* include/Makefile.am: paramterized
+	* include/sys/streams/config.h.in: added comments
+	* include/sys/streams/version.h.in: added comments
+	* Makefile.am: removed AUTOCONFIG_H
+
 	* streams.spec.in: corrections, cooked manpages and documentation
 	* debian/changelog: notes
 	* debian/streams-core.prerm.in: copyright header updates

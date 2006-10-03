@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:38 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:52:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:38 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.3  2006/10/03 13:52:33  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.2  2006/09/29 11:50:38  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -76,14 +86,14 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.2 2006/09/29 11:50:38 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.3 2006/10/03 13:52:33 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strnsl],[0.9.2],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
 AC_CONFIG_SRCDIR([strnsl.lsm.in])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h src/include/sys/strnsl/config.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

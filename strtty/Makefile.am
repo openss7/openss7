@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/01 21:30:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/03 13:53:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:24 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2006/10/03 13:53:20  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.6  2006/10/01 21:30:24  brian
 # - distribute release and library version files
 #
@@ -123,14 +133,14 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_tty_SOURCES		= src/test/test-tty.c
-test_tty_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_tty_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_tty_LDADD			= $(STREAMS_LDADD)
 test_tty_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_tty_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tty_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
-#xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+#xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
 #xxxxxx_LDFLAGS			= $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -151,7 +161,7 @@ EXTRA_LIBRARIES			+=
 
 EXTRA_libTTYlink_a_SOURCES	= 
 libTTYlink_a_SOURCES		= 
-libTTYlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libTTYlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libTTYlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libTTYlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -159,7 +169,7 @@ $(libTTYlink_a_OBJECTS):	$(libTTYlink_a_SOURCES) $(libTTYlink_a_DEPENDENCIES)
 
 EXTRA_libTTYmods_a_SOURCES	= 
 libTTYmods_a_SOURCES		= 
-libTTYmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libTTYmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libTTYmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libTTYmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -167,7 +177,7 @@ $(libTTYmods_a_OBJECTS):	$(libTTYmods_a_DEPENDENCIES)
 
 EXTRA_libTTYdrvs_a_SOURCES	= 
 libTTYdrvs_a_SOURCES		= 
-libTTYdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libTTYdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libTTYdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libTTYdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -229,11 +239,7 @@ endif
 ##LIBRARY_VERSION_FILES		=
 ##
 ##include am/libraries.am
-##
-AUTOCONFIG_H			= src/$(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=

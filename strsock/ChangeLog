@@ -1,5 +1,35 @@
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: correct define values
+	* doc/man/man3/accept.3.man: updated manpage
+	* doc/man/man3/bind.3.man: updated manpage
+	* doc/man/man3/connect.3.man: updated manpage
+	* doc/man/man3/getpeername.3.man: updated manpage
+	* doc/man/man3/getsockname.3.man: updated manpage
+	* doc/man/man3/getsockopt.3.man: updated manpage
+	* doc/man/man3/listen.3.man: updated manpage
+	* doc/man/man3/recv.3.man: updated manpage
+	* doc/man/man3/recvfrom.3.man: updated manpage
+	* doc/man/man3/recvmsg.3.man: updated manpage
+	* doc/man/man3/send.3.man: updated manpage
+	* doc/man/man3/sendmsg.3.man: updated manpage
+	* doc/man/man3/sendto.3.man: updated manpage
+	* doc/man/man3/setsockopt.3.man: updated manpage
+	* doc/man/man3/shutdown.3.man: updated manpage
+	* doc/man/man3/socket.3.man: updated manpage
+	* doc/man/man3/socketpair.3.man: updated manpage
+	* doc/man/man3/socklib.3.man: updated manpage
+	* doc/manual/news.texi: updated release notes
+	* lib32/Makefile.am: removed AUTOCONFIG_H
+	* Makefile.am: removed AUTOCONFIG_H
+	* src/drivers/Config.in: updated config file
+	* src/drivers/socksys.c: changes for compile
+	* src/include/Makefile.am: paramterized
+	* src/include/sys/strsock/config.h.in: added comments
+	* src/include/sys/strsock/version.h.in: added comments
+	* src/modules/Config.in: updated config file
+	* src/modules/sockmod.c: changes for compile
+
 	* strsock.spec.in: corrections, cooked manpages and documentation
 	* debian/changelog: notes
 	* debian/control.in: mostly text description formatting

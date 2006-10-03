@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/05/07 07:24:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/10/03 13:52:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/07 07:24:56 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2006/10/03 13:52:54  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.13  2006/05/07 07:24:56  brian
 # - updates for testing
 #
@@ -69,8 +79,10 @@ man_MANS = \
 	man7/npi_sctp.7 \
 	man7/strsctp_soon.7 \
 	man8/strsctp_mknod.8 \
+	man8/test-interop.8 \
 	man8/test-sctp.8 \
 	man8/test-sctp_n.8 \
+	man8/test-sctp_n2.8 \
 	man8/test-sctp_nc.8 \
 	man8/test-sctp_ns.8 \
 	man8/test-sctp_t.8 \
@@ -87,6 +99,7 @@ man_MANS += \
 	man4/sctp.4 \
 	man4/sctp_n.4 \
 	man4/sctp_t.4 \
+	man4/tpiperf.4 \
 	man7/tpi_sctp.7
 ## ! WITH_OPENSS7_SCTP
 endif
@@ -96,12 +109,15 @@ dist_noinst_MANS = \
 	man4/sctp.4.man \
 	man4/sctp_n.4.man \
 	man4/sctp_t.4.man \
+	man4/tpiperf.4.man \
 	man7/npi_sctp.7.man \
 	man7/tpi_sctp.7.man \
 	man7/strsctp_soon.7.man \
 	man8/strsctp_mknod.8.man \
+	man8/test-interop.8.man \
 	man8/test-sctp.8.man \
 	man8/test-sctp_n.8.man \
+	man8/test-sctp_n2.8.man \
 	man8/test-sctp_nc.8.man \
 	man8/test-sctp_ns.8.man \
 	man8/test-sctp_t.8.man \

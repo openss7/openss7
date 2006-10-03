@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/01 21:30:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/10/03 13:53:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:25 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:30 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.22  2006/10/03 13:53:30  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.21  2006/10/01 21:30:25  brian
 # - distribute release and library version files
 #
@@ -163,77 +173,77 @@ dist_sbin_SCRIPTS		= \
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 strchg_SOURCES			= src/util/strchg.c
-strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strchg_LDADD			= $(STREAMS_LDADD)
 strchg_LDFLAGS			= $(STREAMS_LDFLAGS)
 strchg_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strchg_CFLAGS			= $(USER_CFLAGS)
 
 strconf_SOURCES			= src/util/strconf.c
-strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strconf_LDADD			= $(STREAMS_LDADD)
 strconf_LDFLAGS			= $(STREAMS_LDFLAGS)
 strconf_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strconf_CFLAGS			= $(USER_CFLAGS)
 
 strlog_SOURCES			= src/util/strlog.c
-strlog_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strlog_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strlog_LDADD			= $(STREAMS_LDADD)
 strlog_LDFLAGS			= $(STREAMS_LDFLAGS) -lrt
 strlog_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strlog_CFLAGS			= $(USER_CFLAGS)
 
 strreset_SOURCES		= src/util/strreset.c
-strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strreset_LDADD			= $(STREAMS_LDADD)
 strreset_LDFLAGS		= $(STREAMS_LDFLAGS)
 strreset_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strreset_CFLAGS			= $(USER_CFLAGS)
 
 autopush_SOURCES		= src/util/autopush.c
-autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 autopush_LDADD			= $(STREAMS_LDADD)
 autopush_LDFLAGS		= $(STREAMS_LDFLAGS)
 autopush_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 autopush_CFLAGS			= $(USER_CFLAGS)
 
 fattach_SOURCES			= src/util/fattach.c
-fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 fattach_LDADD			= $(STREAMS_LDADD)
 fattach_LDFLAGS			= $(STREAMS_LDFLAGS)
 fattach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fattach_CFLAGS			= $(USER_CFLAGS)
 
 fdetach_SOURCES			= src/util/fdetach.c 
-fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 fdetach_LDADD			= $(STREAMS_LDADD)
 fdetach_LDFLAGS			= $(STREAMS_LDFLAGS)
 fdetach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fdetach_CFLAGS			= $(USER_CFLAGS)
 
 insf_SOURCES			= src/util/insf.c
-insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 insf_LDADD			= $(STREAMS_LDADD)
 insf_LDFLAGS			= $(STREAMS_LDFLAGS)
 insf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 insf_CFLAGS			= $(USER_CFLAGS)
 
 scls_SOURCES			= src/util/scls.c
-scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 scls_LDADD			= $(STREAMS_LDADD)
 scls_LDFLAGS			= $(STREAMS_LDFLAGS)
 scls_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 scls_CFLAGS			= $(USER_CFLAGS)
 
 strace_SOURCES			= src/util/strace.c
-strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strace_LDADD			= $(STREAMS_LDADD)
 strace_LDFLAGS			= $(STREAMS_LDFLAGS)
 strace_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strace_CFLAGS			= $(USER_CFLAGS)
 
 #strclean_SOURCES		= src/util/strclean.c
-#strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+#strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 #strclean_LDADD			= $(STREAMS_LDADD)
 #strclean_LDFLAGS		= $(STREAMS_LDFLAGS)
 #strclean_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -246,21 +256,21 @@ strace_CFLAGS			= $(USER_CFLAGS)
 #	touch $@
 
 strerr_SOURCES			= src/util/strerr.c
-strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strerr_LDADD			= $(STREAMS_LDADD)
 strerr_LDFLAGS			= $(STREAMS_LDFLAGS)
 strerr_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strerr_CFLAGS			= $(USER_CFLAGS)
 
 strinfo_SOURCES			= src/util/strinfo.c
-strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strinfo_LDADD			= $(STREAMS_LDADD)
 strinfo_LDFLAGS			= $(STREAMS_LDFLAGS)
 strinfo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strinfo_CFLAGS			= $(USER_CFLAGS)
 
 #strload_SOURCES		= src/util/strload.c
-#strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+#strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 #strload_LDADD			= $(STREAMS_LDADD)
 #strload_LDFLAGS		= $(STREAMS_LDFLAGS)
 #strload_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -273,14 +283,14 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 #	touch $@
 
 strlogd_SOURCES			= src/util/strlogd.c
-strlogd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strlogd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strlogd_LDADD			= $(STREAMS_LDADD)
 strlogd_LDFLAGS			= $(STREAMS_LDFLAGS)
 strlogd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strlogd_CFLAGS			= $(USER_CFLAGS)
 
 #strsetup_SOURCES		= src/util/strsetup.c
-#strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+#strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 #strsetup_LDADD			= $(STREAMS_LDADD)
 #strsetup_LDFLAGS		= $(STREAMS_LDFLAGS)
 #strsetup_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -293,7 +303,7 @@ strlogd_CFLAGS			= $(USER_CFLAGS)
 #	touch $@
 
 strvf_SOURCES			= src/util/strvf.c
-strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strvf_LDADD			= $(STREAMS_LDADD)
 strvf_LDFLAGS			= $(STREAMS_LDFLAGS)
 strvf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -413,7 +423,7 @@ libUTILlink_a_SOURCES		= \
 				  src/include/sys/strutil/sc.h \
 				  src/include/sys/strutil/strlog.h
 
-libUTILlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libUTILlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
 if CONFIG_STREAMS_CLONE
 libUTILlink_a_SOURCES		+= src/drivers/clone.c
@@ -482,7 +492,7 @@ libUTILmods_a_SOURCES		= \
 				  src/include/sys/sc.h \
 				  src/include/sys/strutil/sc.h
 
-libUTILmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libUTILmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
 if CONFIG_STREAMS_PIPEMOD_MODULE
 libUTILmods_a_SOURCES		+= src/modules/pipemod.c
@@ -526,7 +536,7 @@ libUTILdrvs_a_SOURCES		= \
 				  src/include/sys/strutil/sad.h \
 				  src/include/sys/strutil/strlog.h
 
-libUTILdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libUTILdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
 if CONFIG_STREAMS_CLONE_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/clone.c
@@ -630,11 +640,7 @@ endif
 ##LIBRARY_VERSION_FILES		=
 ##
 ##include am/libraries.am
-##
-AUTOCONFIG_H			= src/$(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 if CONFIG_STREAMS_CLONE
 EXPORT_SRCFILES			+= src/drivers/clone.c

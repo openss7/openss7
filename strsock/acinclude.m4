@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 00:51:25 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/03 13:53:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 00:51:25 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.6  2006/10/03 13:53:03  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.5  2006/09/26 00:51:25  brian
 # - reordered includes
 #
@@ -189,24 +199,24 @@ AC_DEFUN([_SOCK_OPTIONS], [dnl
 AC_DEFUN([_SOCK_SETUP_DEBUG], [dnl
     case "$linux_cv_debug" in
 	_DEBUG)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [], [Define to perform
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [1], [Define to perform
 		    internal structure tracking within the STREAMS executive
 		    as well as to provide additional /proc filesystem files
 		    for examining internal structures.])
 	    ;;
 	_TEST)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TEST], [], [Define to perform
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TEST], [1], [Define to perform
 		    performance testing with debugging.  This mode does not
 		    dump massive amounts of information into system logs, but
 		    peforms all assertion checks.])
 	    ;;
 	_SAFE)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAFE], [], [Define to perform
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAFE], [1], [Define to perform
 		    fundamental assertion checks.  This is a safer mode of
 		    operation.])
 	    ;;
 	_NONE | *)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NONE], [], [Define to perform
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NONE], [1], [Define to perform
 		    no assertion checks but report software errors.  This is
 		    the smallest footprint, highest performance mode of
 		    operation.])

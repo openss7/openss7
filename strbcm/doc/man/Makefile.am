@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:51:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:15 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:51:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/10/03 13:51:40  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.2  2006/09/29 11:50:15  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -80,10 +90,18 @@ if PKG_BUILD_INDEP
 ## ending in '.[1-9]' are cooked.
 ##
 man_MANS = \
-	man5/strbcm.5
+	man4/tstdrv.4 \
+	man4/tstmod.4 \
+	man5/strbcm.5 \
+	man8/strbcm_mknod.8 \
+	man8/test-bcm.8
 
 dist_noinst_MANS = \
-	man5/strbcm.5.man
+	man4/tstdrv.4.man \
+	man4/tstmod.4.man \
+	man5/strbcm.5.man \
+	man8/strbcm_mknod.8.man \
+	man8/test-bcm.8.man
 
 MANS_UNUSED = \
 	man5/strbcm.5

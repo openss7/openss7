@@ -1,3 +1,11 @@
+2006-10-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/news.texi: updated release notes
+	* Makefile.am: removed AUTOCONFIG_H
+	* src/include/Makefile.am: paramterized
+	* src/include/sys/strcompat/config.h.in: added comments
+	* src/include/sys/strcompat/version.h.in: added comments
+
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* strcompat.spec.in: corrections, cooked manpages and documentation

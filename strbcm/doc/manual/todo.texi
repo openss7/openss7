@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:38:10 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/03 13:51:42 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:38:10 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/03 13:51:42 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -70,4 +70,7 @@ compatibility module capabilities outside of the STREAMS release package so as t
 used with both LiS and Linux Fast-STREAMS.  As Linux Fast-STREAMS has already shown superior to LiS
 in terms of both performance and conformance, it is no longer necessary to keep these packages
 separate and they can be combined once again (or still) with Linux Fast-STREAMS.
+
+This package; however, might has some use still outside of Linux Fast-STREAMS if only because it
+provides a separable way of incorporating 3rd party binary modules.
 @end itemize

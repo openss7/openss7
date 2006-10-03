@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:56 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:50:56 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:53:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.3  2006/10/03 13:53:09  brian
+ - changes to pass make check target
+ - added some package config.h files
+ - removed AUTOCONFIG_H from Makefile.am's
+ - source code changes for compile
+ - added missing manual pages
+ - renamed conflicting manual pages
+ - parameterized include Makefile.am
+ - updated release notes
+
  Revision 0.9.2.2  2006/09/29 11:50:56  brian
  - libtool library tweaks in Makefile.am
  - better rpm spec handling in *.spec.in
@@ -63,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:56 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:09 $"
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:56 $";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:09 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -105,12 +115,14 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.
 
 #include <linux/bitops.h>
 #include <linux/interrupt.h>
+#include <linux/socket.h>
+#endif				/* LINUX */
 
 #include <sys/socksys.h>
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:50:56 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:09 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -130,11 +142,11 @@ MODULE_LICENSE(SOCKSYS_LICENSE);
 #endif				/* CONFIG_STREAMS_SOCKSYS_MODULE */
 
 #ifdef LFS
-#define SOCKSYS_DRV_ID	CONFIG_STREAMS_SOCKSYS_MODID
+#define SOCKSYS_DRV_ID		CONFIG_STREAMS_SOCKSYS_MODID
 #define SOCKSYS_DRV_NAME	CONFIG_STREAMS_SOCKSYS_NAME
-#define SOCKSYS_CMAJORS	CONFIG_STREAMS_SOCKSYS_NMAJORS
+#define SOCKSYS_CMAJORS		CONFIG_STREAMS_SOCKSYS_NMAJORS
 #define SOCKSYS_CMAJOR_0	CONFIG_STREAMS_SOCKSYS_MAJOR
-#define SOCKSYS_UNITS	CONFIG_STREAMS_SOCKSYS_NMINORS
+#define SOCKSYS_UNITS		CONFIG_STREAMS_SOCKSYS_NMINORS
 #endif				/* LFS */
 
 #ifdef LINUX
@@ -184,11 +196,10 @@ STATIC struct module_stat socksys_mstat __attribute__ ((__aligned__(SMP_CACHE_BY
 STATIC streamscall int socksys_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int socksys_qclose(queue_t *, int, cred_t *);
 
-STATIC streamscall int socksys_rput(queue_t *, mblk_t *);
-STATIC streamscall int socksys_wput(queue_t *, mblk_t *);
+STATIC streamscall int socksys_put(queue_t *, mblk_t *);
 
 STATIC struct qinit socksys_qinit = {
-	.qi_putp = socksys_rput,	/* Put procedure (messgae from above or below) */
+	.qi_putp = socksys_put,	/* Put procedure (messgae from above or below) */
 	.qi_qopen = socksys_qopen,	/* Each open */
 	.qi_qclose = socksys_qclose,	/* Last close */
 	.qi_minfo = &socksys_minfo,	/* Module information */
@@ -201,6 +212,55 @@ MODULE_STATIC struct streamtab socksys_info = {
 };
 
 /*
+ *  Locking
+ */
+
+/* Must always be bottom-half versions to avoid lock badness.  But give these
+ * different names to avoid conflict with generic definitions.  */
+
+//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if 1
+
+#define spin_lock_str2(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str2(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+#define write_lock_str2(__lkp, __flags) \
+	do { (void)__flags; write_lock_bh(__lkp); } while (0)
+#define write_unlock_str2(__lkp, __flags) \
+	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
+#define read_lock_str2(__lkp, __flags) \
+	do { (void)__flags; read_lock_bh(__lkp); } while (0)
+#define read_unlock_str2(__lkp, __flags) \
+	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
+#define local_save_str2(__flags) \
+	do { (void)__flags; local_bh_disable(); } while (0)
+#define local_restore_str2(__flags) \
+	do { (void)__flags; local_bh_enable(); } while (0)
+
+#else
+
+#define spin_lock_str2(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str2(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+#define write_lock_str2(__lkp, __flags) \
+	write_lock_irqsave(__lkp, __flags)
+#define write_unlock_str2(__lkp, __flags) \
+	write_unlock_irqrestore(__lkp, __flags)
+#define read_lock_str2(__lkp, __flags) \
+	read_lock_irqsave(__lkp, __flags)
+#define read_unlock_str2(__lkp, __flags) \
+	read_unlock_irqrestore(__lkp, __flags)
+#define local_save_str2(__flags) \
+	local_irq_save(__flags)
+#define local_restore_str2(__flags) \
+	local_irq_restore(__flags)
+
+#endif
+
+
+/*
  *  Primary data structures.
  */
 
@@ -210,11 +270,40 @@ MODULE_STATIC struct streamtab socksys_info = {
 #endif
 
 /* private structures */
-struct socksys {
+struct ssys {
+	struct ssys *next;
+	struct ssys **prev;
+	struct {
+		major_t cmajor;
+		minor_t cminor;
+	} dev;
 	int assigned;
 	int iocstate;
 	int transparent;
 };
+
+#define SOCKSYS_PRIV(__q) ((struct ssys *)((__q)->q_ptr))
+
+static kmem_cache_t *ssys_priv_cachep = NULL;
+
+static __unlikely int
+ssys_alloc_priv(queue_t *q, struct ssys **sp, int type, dev_t *devp, cred_t *crp)
+{
+	struct ssys *ss;
+
+	if ((ss = kmem_cache_alloc(ssys_priv_cachep, SLAB_ATOMIC))) {
+		bzero(ss, sizeof(*ss));
+		ss->dev.cmajor = getmajor(*devp);
+		ss->dev.cminor = getminor(*devp);
+		ss->assigned = 0;
+		ss->iocstate = 0;
+		ss->transparent = 0;
+		if ((ss->next = *sp))
+			ss->next->prev = &ss->next;
+		ss->prev = sp;
+	}
+	return (ss != NULL);
+}
 
 #if 0
 /*
@@ -329,6 +418,7 @@ so_socksys(struct socksysreq *req)
 			  (1 << SO_RECVMSG) | (1 << SO_SENDMSG))) {
 		int fd = req->args[1];
 
+		(void) fd;
 		/* These are all socket related and accept a file (socket) descriptor as their
 		   first argument.  In situations where we are incapable of providing back a real
 		   socket, we must here first distinguish if the file descriptor corresponds to a
@@ -339,6 +429,7 @@ so_socksys(struct socksysreq *req)
 			/* In this case, we have a real socket from the operating system's
 			   perspective and we can simply pass the arguments to the appropriate
 			   system call. */
+#if 0
 			switch (cmd) {
 			case SO_ACCEPT:
 				/* FIXME: 32/64 conversion */
@@ -413,6 +504,7 @@ so_socksys(struct socksysreq *req)
 				err = sys_sendmsg(fd, (struct msghdr *) req->args[2], req->args[3]);
 				break;
 			}
+#endif
 #if 0
 		} else {
 			/* In this case, we do not have a real socket, but have a TPI stream from
@@ -502,6 +594,7 @@ so_socksys(struct socksysreq *req)
 		/* These are BSD compatibiltiy functions and are how we create sockets in the first
 		   place.  The BSD compatibility functions all have system calls in Linux, but we
 		   provide them for backward compatibility (to what!?). */
+#if 0
 		switch (cmd) {
 		case SO_SOCKET:
 			/* FIXME: 32/64 conversion */
@@ -563,6 +656,7 @@ so_socksys(struct socksysreq *req)
 					  (struct itimerval *) req->args[3]);
 			break;
 		}
+#endif
 	}
 
 	return (err);
@@ -574,13 +668,15 @@ so_socksys(struct socksysreq *req)
 STATIC streamscall int
 socksys_put(queue_t *q, mblk_t *mp)
 {
-	struct socksys *ss = q->q_ptr;
+	struct ssys *ss = q->q_ptr;
 	union ioctypes *ioc;
 	int err = 0, rval = 0, count = 0;
 	mblk_t *dp = mp->b_cont;
 	caddr_t req_addr, prot_addr;
 	size_t req_size, prot_size;
 
+	(void) prot_size;
+	(void) prot_addr;
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		mp->b_rptr[0] &= ~FLUSHW;
@@ -604,25 +700,27 @@ socksys_put(queue_t *q, mblk_t *mp)
 			req_size = sizeof(struct socksysreq);
 		}
 		switch (ioc->iocblk.ioc_cmd) {
+		case SIOCATMARK:
+		case SIOCGPGRP:
+		case SIOCSPGRP:
+#if 0
 		case SIOCHIWAT:
 		case SIOGHIWAT:
 		case SIOCLOWAT:
 		case SIOGLOWAT:
-		case SIOCATMARK:
-		case SIOCGPGRP:
-		case SIOCSPGRP:
 		case SIOCPROTO:
 		case SIOCGETNAME:
 		case SIOCGETPEER:
 		case SIOXPROTO:
 		case SIOCSOCKSYS:
+#endif
 			err = -EFAULT;
-			if (!dp || dp->b_wptr < dp->b_rptr + cmd_size)
+			if (!dp || dp->b_wptr < dp->b_rptr + req_size)
 				goto nak;
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
-				mp->b_datap->dbtype = M_COPYIN;
-				ioc->copyreq.cq_addr = cmd_addr;
-				ioc->copyreq.cq_size = cmd_size;
+				mp->b_datap->db_type = M_COPYIN;
+				ioc->copyreq.cq_addr = req_addr;
+				ioc->copyreq.cq_size = req_size;
 				ioc->copyreq.cq_flag = 0;
 				ioc->copyreq.cq_private = (mblk_t *) ioc->copyreq.cq_addr;
 				ss->transparent = 1;
@@ -643,18 +741,20 @@ socksys_put(queue_t *q, mblk_t *mp)
 			goto abort;
 		}
 		switch (ioc->copyresp.cp_cmd) {
+		case SIOCATMARK:
+		case SIOCGPGRP:
+		case SIOCSPGRP:
+#if 0
 		case SIOCHIWAT:
 		case SIOGHIWAT:
 		case SIOCLOWAT:
 		case SIOGLOWAT:
-		case SIOCATMARK:
-		case SIOCGPGRP:
-		case SIOCSPGRP:
 		case SIOCPROTO:
 		case SIOCGETNAME:
 		case SIOCGETPEER:
 		case SIOXPROTO:
 		case SIOCSOCKSYS:
+#endif
 		{
 			struct socksysreq sr, *req = &sr;
 
@@ -734,7 +834,7 @@ ssys_free_priv(queue_t *q)
 	s = SOCKSYS_PRIV(q);
 	ensure(q, return);
 #if 0
-	strlog(DRV_ID, s->u.dev.cminor, 0, SL_TRACE,
+	strlog(DRV_ID, s->dev.cminor, 0, SL_TRACE,
 	       "unlinking private structure: reference count = %d", atomic_read(&s->refcnt));
 #else
 	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME,
@@ -755,6 +855,8 @@ ssys_free_priv(queue_t *q)
 #define  FREE_CMINOR	1
 
 STATIC int ssys_majors[CMAJORS] = { CMAJOR_0, };
+STATIC struct ssys *socksys_opens = NULL;
+STATIC rwlock_t socksys_lock = RW_LOCK_UNLOCKED;
 
 /**
  * socksys_qopen - SOCKSYS driver STREAMS open routine
@@ -771,7 +873,7 @@ socksys_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	int type = 0;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
-	struct ssys *s, **sp = &master.ssys.list;
+	struct ssys **sp = &socksys_opens;
 	unsigned long flags;
 
 	if (q->q_ptr != NULL) {
@@ -802,14 +904,14 @@ socksys_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
-	write_lock_str2(&master.lock, flags);
-	for (; *sp, sp = &(*sp)->next) {
-		if (cmajor != (*sp)->u.dev.cmajor)
+	write_lock_str2(&socksys_lock, flags);
+	for (; *sp; sp = &(*sp)->next) {
+		if (cmajor != (*sp)->dev.cmajor)
 			break;
-		if (cmajor == (*sp)->u.dev.cmajor) {
-			if (cminor < (*sp)->u.dev.cminor)
+		if (cmajor == (*sp)->dev.cmajor) {
+			if (cminor < (*sp)->dev.cminor)
 				break;
-			if (cminor == (*sp)->u.dev.cminor) {
+			if (cminor == (*sp)->dev.cminor) {
 				if (++cminor >= NMINORS) {
 					if (++mindex >= CMAJORS || !(cmajor = ssys_majors[mindex]))
 						break;
@@ -821,17 +923,17 @@ socksys_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		write_unlock_str2(&master.lock, flags);
+		write_unlock_str2(&socksys_lock, flags);
 		return (ENXIO);
 	}
 	_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
-	if (!(sp = ssys_alloc_priv(q, sp, type, devp, crp))) {
+	if (!ssys_alloc_priv(q, sp, type, devp, crp)) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
-		write_unlock_str2(&master.lock, flags);
+		write_unlock_str2(&socksys_lock, flags);
 		return (ENOMEM);
 	}
-	write_unlock_str2(&master.lock, flags);
+	write_unlock_str2(&socksys_lock, flags);
 	qprocson(q);
 	return (0);
 }
@@ -850,8 +952,8 @@ socksys_qclose(queue_t *q, int oflag, cred_t *crp)
 	(void) oflag;
 	(void) crp;
 	(void) s;
-	_printd(("%s: closing character device %d:%d\n", DRV_NAME, s->u.dev.cmajor,
-		 s->u.dev.cminor));
+	_printd(("%s: closing character device %d:%d\n", DRV_NAME, s->dev.cmajor,
+		 s->dev.cminor));
 #if defined LIS
 	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
@@ -925,9 +1027,10 @@ MODULE_PARM_DESC(modid, "Module ID for the SOCKSYS driver. (0 for allocation.)")
 
 major_t major = CMAJOR_0;
 
+#ifndef module_param
 MODULE_PARM(major, "h");
 #else
-MODULE_PARM(major, uint, 0);
+module_param(major, uint, 0);
 #endif
 MODULE_PARM_DESC(major, "Device number for the SOCKSYS driver. (0 for allocation.)");
 

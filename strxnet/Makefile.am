@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/10/01 21:30:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/10/03 13:53:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:26 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.67  2006/10/03 13:53:35  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.66  2006/10/01 21:30:26  brian
 # - distribute release and library version files
 #
@@ -163,14 +173,14 @@ sbin_PROGRAMS			= \
 if WITH_TLI
 ## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
-test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_tirdwr_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_tirdwr_LDADD		= $(STREAMS_LDADD) libxnet.la
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
-test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_timod_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_timod_LDADD		= $(STREAMS_LDADD) libxnet.la
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -181,14 +191,14 @@ endif
 if WITH_XNET
 ## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnet_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_xnet_LDADD			= $(STREAMS_LDADD) libxnet.la
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnet_thr_LDADD		= $(STREAMS_LDADD) libxnet.la
 test_xnet_thr_LDFLAGS		= $(STREAMS_LDFLAGS) -lpthread
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
@@ -210,14 +220,14 @@ endif
 if WITH_XNSL
 ## WITH_XNSL
 test_xnsl_SOURCES		= src/test/test-xnsl.c
-test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_LDADD			= $(STREAMS_LDADD) libxnet.la libxnsl.la
 test_xnsl_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS)
 
 test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
-test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_thr_LDADD		= $(STREAMS_LDADD) libxnet.la libxnsl.la
 test_xnsl_thr_LDFLAGS		= $(STREAMS_LDFLAGS) -lpthread
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
@@ -338,14 +348,14 @@ sbin_PROGRAMS			= \
 if WITH_TLI
 ## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
-test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
 test_tirdwr_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
-test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_timod_LDADD		= $(STREAMS_LDADD)
 test_timod_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -356,14 +366,14 @@ endif
 if WITH_XNET
 ## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
 test_xnet_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD)
 test_xnet_thr_LDFLAGS		= $(STREAMS_LDFLAGS) -lpthread
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
@@ -385,14 +395,14 @@ endif
 if WITH_XNSL
 ## WITH_XNSL
 test_xnsl_SOURCES		= src/test/test-xnsl.c
-test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_LDADD			= libxnet.la libxnsl.la $(STREAMS_LDADD)
 test_xnsl_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS)
 
 test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
-test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_thr_LDADD		= libxnet.la libxnsl.la $(STREAMS_LDADD)
 test_xnsl_thr_LDFLAGS		= $(STREAMS_LDFLAGS) -lpthread
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
@@ -523,16 +533,15 @@ LIBRARY_VERSION_FILES		= \
 				  src/lib/xnsl.VERSION
 
 include am/libraries.am
-##
-##AUTOCONFIG_H			= $(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= \
+				  -I./src/drivers -I$(srcdir)/src/drivers \
+				  -I./src/modules -I$(srcdir)/src/modules \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

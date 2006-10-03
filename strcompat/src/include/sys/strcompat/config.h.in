@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.1 2005/07/12 13:54:44 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.2 2006/10/03 13:52:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,21 +45,50 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:52:00 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: config.h.in,v $
+ Revision 0.9.2.2  2006/10/03 13:52:00  brian
+ - changes to pass make check target
+ - added some package config.h files
+ - removed AUTOCONFIG_H from Makefile.am's
+ - source code changes for compile
+ - added missing manual pages
+ - renamed conflicting manual pages
+ - parameterized include Makefile.am
+ - updated release notes
 
  *****************************************************************************/
 
+#ifndef __SYS_STRCOMPAT_CONFIG_H__
+#define __SYS_STRCOMPAT_CONFIG_H__
+
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+
+/*
+ * @configure_input@
+ *
+ * This file needs to include any autoconf definitions that are used by
+ * installed header files.  This file will be installed in
+ * /usr/include/strcompat/sys/strcompat/config.h to be included by header files
+ * installed in /usr/include/strcompat/ with an include line something like:
+ *
+ * #include "sys/strcompat/config.h".
+ */
+
 #undef CONFIG_STREAMS_COMPAT_AIX
 
-#undef CONFIG_STREAMS_COMPAT_AIX_MODULE 
+#undef CONFIG_STREAMS_COMPAT_AIX_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_HPUX
 
-#undef CONFIG_STREAMS_COMPAT_HPUX_MODULE 
+#undef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_IRIX
 
-#undef CONFIG_STREAMS_COMPAT_IRIX_MODULE 
+#undef CONFIG_STREAMS_COMPAT_IRIX_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_LFS
 
@@ -67,37 +96,38 @@
 
 #undef CONFIG_STREAMS_COMPAT_LIS
 
-#undef CONFIG_STREAMS_COMPAT_LIS_MODULE 
+#undef CONFIG_STREAMS_COMPAT_LIS_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_MAC
 
-#undef CONFIG_STREAMS_COMPAT_MAC_MODULE 
+#undef CONFIG_STREAMS_COMPAT_MAC_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_MPS
 
-#undef CONFIG_STREAMS_COMPAT_MPS_MODULE 
+#undef CONFIG_STREAMS_COMPAT_MPS_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_OS7
 
-#undef CONFIG_STREAMS_COMPAT_OS7_MODULE 
+#undef CONFIG_STREAMS_COMPAT_OS7_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_OSF
 
-#undef CONFIG_STREAMS_COMPAT_OSF_MODULE 
+#undef CONFIG_STREAMS_COMPAT_OSF_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_SUN
 
-#undef CONFIG_STREAMS_COMPAT_SUN_MODULE 
+#undef CONFIG_STREAMS_COMPAT_SUN_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_SVR3
 
-#undef CONFIG_STREAMS_COMPAT_SVR3_MODULE 
+#undef CONFIG_STREAMS_COMPAT_SVR3_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_SVR4
 
-#undef CONFIG_STREAMS_COMPAT_SVR4_MODULE 
+#undef CONFIG_STREAMS_COMPAT_SVR4_MODULE
 
 #undef CONFIG_STREAMS_COMPAT_UW7
 
-#undef CONFIG_STREAMS_COMPAT_UW7_MODULE 
+#undef CONFIG_STREAMS_COMPAT_UW7_MODULE
 
+#endif				/* __SYS_STRCOMPAT_CONFIG_H__ */

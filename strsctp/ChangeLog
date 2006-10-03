@@ -1,5 +1,12 @@
 2006-10-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.ac: added config file
+	* doc/man/Makefile.am: added missing manpages
+	* doc/manual/news.texi: updated release notes
+	* Makefile.am: removed AUTOCONFIG_H
+	* src/include/Makefile.am: added config file, parameterized
+	* src/include/sys/strsctp/version.h.in: added comments
+
 	* doc/man/man4/tpiperf.4.man: added missing manpage
 	* doc/man/man8/test-interop.8.man: added missing manpage
 	* doc/man/man8/test-sctp_n2.8.man: added missing manpage

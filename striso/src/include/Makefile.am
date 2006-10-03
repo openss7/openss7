@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:52:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:49 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -62,8 +62,9 @@ nobase_pkginclude_HEADERS = \
 	sys/xti_mosi.h
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/striso/version.h
-#	sys/striso/modversions.h
+	sys/$(PACKAGE)/config.h \
+	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/modversions.h
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
@@ -83,6 +84,16 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/10/03 13:52:25  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.2  2006/10/02 11:31:49  brian
 # - changes to get master builds working for RPM and DEB
 # - added outside licenses to package documentation

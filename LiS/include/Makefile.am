@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.13 $) $Date: 2006/03/06 11:37:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.14 $) $Date: 2006/10/03 13:51:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:37:42 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:51:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.14  2006/10/03 13:51:22  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 1.1.6.13  2006/03/06 11:37:42  brian
 # - updated headers
 #
@@ -84,39 +94,40 @@ nobase_pkginclude_HEADERS = \
 	sys/stropts.h \
 	sys/strport.h \
 	sys/testmod.h \
-	sys/LiS/buffcall.h \
-	sys/LiS/config.h \
-	sys/LiS/ddi.h \
-	sys/LiS/errmsg.h \
-	sys/LiS/events.h \
-	sys/LiS/fifo.h \
-	sys/LiS/head.h \
-	sys/LiS/linuxio.h \
-	sys/LiS/linux-mdep.h \
-	sys/LiS/log.h \
-	sys/LiS/loop.h \
-	sys/LiS/minimux.h \
-	sys/LiS/modcnt.h \
-	sys/LiS/mod.h \
-	sys/LiS/module.h \
-	sys/LiS/msg.h \
-	sys/LiS/msgutl.h \
-	sys/LiS/mtdrv.h \
-	sys/LiS/nullstrm.h \
-	sys/LiS/poll.h \
-	sys/LiS/queue.h \
-	sys/LiS/share.h \
-	sys/LiS/stats.h \
-	sys/LiS/strconf.h \
-	sys/LiS/stream.h \
-	sys/LiS/strlog.h \
-	sys/LiS/strmdbg.h \
-	sys/LiS/testmod.h \
-	sys/LiS/wait.h
+	sys/$(PACKAGE)/buffcall.h \
+	sys/$(PACKAGE)/config.h \
+	sys/$(PACKAGE)/ddi.h \
+	sys/$(PACKAGE)/errmsg.h \
+	sys/$(PACKAGE)/events.h \
+	sys/$(PACKAGE)/fifo.h \
+	sys/$(PACKAGE)/head.h \
+	sys/$(PACKAGE)/linuxio.h \
+	sys/$(PACKAGE)/linux-mdep.h \
+	sys/$(PACKAGE)/log.h \
+	sys/$(PACKAGE)/loop.h \
+	sys/$(PACKAGE)/minimux.h \
+	sys/$(PACKAGE)/modcnt.h \
+	sys/$(PACKAGE)/mod.h \
+	sys/$(PACKAGE)/module.h \
+	sys/$(PACKAGE)/msg.h \
+	sys/$(PACKAGE)/msgutl.h \
+	sys/$(PACKAGE)/mtdrv.h \
+	sys/$(PACKAGE)/nullstrm.h \
+	sys/$(PACKAGE)/poll.h \
+	sys/$(PACKAGE)/queue.h \
+	sys/$(PACKAGE)/share.h \
+	sys/$(PACKAGE)/stats.h \
+	sys/$(PACKAGE)/strconf.h \
+	sys/$(PACKAGE)/stream.h \
+	sys/$(PACKAGE)/strlog.h \
+	sys/$(PACKAGE)/strmdbg.h \
+	sys/$(PACKAGE)/testmod.h \
+	sys/$(PACKAGE)/wait.h
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/LiS/genconf.h \
-	sys/LiS/version.h
+	sys/$(PACKAGE)/genconf.h \
+	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/modversions.h
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.9 2006/09/25 12:04:42 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.10 2006/10/03 13:53:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:04:42 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:53:41 $ by $Author: brian $
 
  $Log: xti.h,v $
+ Revision 0.9.2.10  2006/10/03 13:53:41  brian
+ - changes to pass make check target
+ - added some package config.h files
+ - removed AUTOCONFIG_H from Makefile.am's
+ - source code changes for compile
+ - added missing manual pages
+ - renamed conflicting manual pages
+ - parameterized include Makefile.am
+ - updated release notes
+
  Revision 0.9.2.9  2006/09/25 12:04:42  brian
  - updated headers, moved xnsl
 
@@ -56,7 +66,7 @@
 #ifndef _XTI_H
 #define _XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -222,8 +232,8 @@ extern int __xnet_t_rcvreldata(int, struct t_discon *);
 extern int __xnet_t_rcvudata(int, struct t_unitdata *, int *);
 extern int __xnet_t_rcvuderr(int, struct t_uderr *);
 extern int __xnet_t_rcvv(int, struct t_iovec *, unsigned int, int *);
-extern int __xnet_t_rcvvopt(int fd, const struct t_unitdata *optdata, const
-			    struct t_iovec *iov, unsigned int iovcount, int flags);
+// extern int __xnet_t_rcvvopt(int fd, const struct t_unitdata *optdata, const
+// 			    struct t_iovec *iov, unsigned int iovcount, int flags);
 extern int __xnet_t_rcvvudata(int, struct t_unitdata *, struct t_iovec *, unsigned int, int *);
 extern int __xnet_t_removeleaf(int, int, int);
 extern int __xnet_t_snd(int, char *, unsigned int, int);

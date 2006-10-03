@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/01 21:30:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/10/03 13:51:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:17 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:51:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.22  2006/10/03 13:51:56  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.21  2006/10/01 21:30:17  brian
 # - distribute release and library version files
 #
@@ -169,7 +179,7 @@ libCOMPATlink_a_SOURCES		= \
 				  src/include/sys/os7/queue.h \
 				  src/include/sys/os7/timer.h
 
-libCOMPATlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libCOMPATlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
 if CONFIG_STREAMS_COMPAT_OS7
 libCOMPATlink_a_SOURCES		+= src/kernel/os7compat.c
@@ -255,7 +265,7 @@ libCOMPATmods_a_SOURCES		= \
 				  src/include/sys/os7/queue.h \
 				  src/include/sys/os7/timer.h
 
-libCOMPATmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libCOMPATmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
 if CONFIG_STREAMS_COMPAT_OS7_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/os7compat.c
@@ -372,11 +382,7 @@ endif
 ##LIBRARY_VERSION_FILES		=
 ##
 ##include am/libraries.am
-##
-##AUTOCONFIG_H			= $(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 if CONFIG_STREAMS_COMPAT_AIX

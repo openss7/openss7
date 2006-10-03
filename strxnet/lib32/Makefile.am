@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:51:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:51:20 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/10/03 13:53:38  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.2  2006/09/29 11:51:20  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -86,7 +96,7 @@ if WITH_TLI
 pkglibexec32_PROGRAMS		+= test-tirdwr
 
 test_tirdwr_SOURCES		= $(top_srcdir)/src/test/test-tirdwr.c
-test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_tirdwr_LDADD		= $(STREAMS_LDADD32)
 test_tirdwr_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -95,7 +105,7 @@ test_tirdwr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 pkglibexec32_PROGRAMS		+= test-timod
 
 test_timod_SOURCES		= $(top_srcdir)/src/test/test-timod.c
-test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_timod_LDADD		= $(STREAMS_LDADD32)
 test_timod_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -110,7 +120,7 @@ if WITH_XNET
 pkglibexec32_PROGRAMS		+= test-xnet
 
 test_xnet_SOURCES		= $(top_srcdir)/src/test/test-xnet.c
-test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD32)
 test_xnet_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -119,7 +129,7 @@ test_xnet_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 pkglibexec32_PROGRAMS		+= test-xnet_thr
 
 test_xnet_thr_SOURCES		= $(top_srcdir)/src/test/test-xnet.c
-test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD32)
 test_xnet_thr_LDFLAGS		= $(STREAMS_LDFLAGS32) -lpthread $(MACHINE_FLAGS)
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
@@ -147,7 +157,7 @@ if WITH_XNSL
 pkglibexec32_PROGRAMS		+= test-xnsl
 
 test_xnsl_SOURCES		= $(top_srcdir)/src/test/test-xnsl.c
-test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_xnsl_LDADD			= libxnsl.la
 test_xnsl_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -156,7 +166,7 @@ test_xnsl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 pkglibexec32_PROGRAMS		+= test-xnsl_thr
 
 test_xnsl_thr_SOURCES		= $(top_srcdir)/src/test/test-xnsl.c
-test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_xnsl_thr_LDADD		= libxnsl.la -lpthread
 test_xnsl_thr_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT

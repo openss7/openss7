@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/01 21:30:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/03 13:52:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:22 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/10/03 13:52:33  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.4  2006/10/01 21:30:22  brian
 # - distribute release and library version files
 #
@@ -106,14 +116,14 @@ pkglibexec_PROGRAMS		= \
 sbin_PROGRAMS			= 
 
 test_xnsl_SOURCES		= src/test/test-xnsl.c
-test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_LDADD			= libxnsl.la
 test_xnsl_LDFLAGS		= 
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS)
 
 test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
-test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_thr_LDADD		= libxnsl.la
 test_xnsl_thr_LDFLAGS		= -lpthread
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
@@ -173,14 +183,14 @@ pkglibexec_PROGRAMS		= \
 sbin_PROGRAMS			= 
 
 test_xnsl_SOURCES		= src/test/test-xnsl.c
-test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_LDADD			= libxnsl.la
 test_xnsl_LDFLAGS		= $(XTI_LDFLAGS)
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS)
 
 test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
-test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_thr_LDADD		= libxnsl.la
 test_xnsl_thr_LDFLAGS		= $(XTI_LDFLAGS) -lpthread
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
@@ -272,11 +282,7 @@ LIBRARY_VERSION_FILES		= \
 				  src/lib/xnsl.VERSION
 
 include am/libraries.am
-##
-##AUTOCONFIG_H			= src/$(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=

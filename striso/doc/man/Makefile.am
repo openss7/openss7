@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/07/11 12:32:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:52:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/11 12:32:03 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,9 +57,14 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 MANS_UNUSED = \
-	man4/ISO.4
+	man4/ISO.4 \
+	man4/iso-ip.4 \
+	man4/iso-udp.4 \
+	man4/isos.4 \
+	man4/xol.4
 
 man_MANS = \
+	man4/clns.4 \
 	man4/cmot.4 \
 	man4/ISO.4 \
 	man4/iso-ip.4 \
@@ -67,19 +72,29 @@ man_MANS = \
 	man4/isos.4 \
 	man4/isot.4 \
 	man4/iso-udp.4 \
+	man4/itot.4 \
+	man4/lapb.4 \
 	man4/lpp.4 \
 	man4/ns-tcp.4 \
+	man4/plp.4 \
+	man4/tcpns.4 \
 	man4/tp0.4 \
 	man4/tp1.4 \
 	man4/tp2.4 \
 	man4/tp3.4 \
 	man4/tp4.4 \
 	man4/tp.4 \
+	man4/x25-lapb.4 \
+	man4/x25-plp.4 \
+	man4/x25_lapb.4 \
+	man4/x25_plp.4 \
 	man4/xol.4 \
 	man4/xot.4 \
-	man7/npi_osi.7
+	man7/npi_osi.7 \
+	man8/striso_mknod.8
 
 dist_noinst_MANS = \
+	man4/clns.4.man \
 	man4/cmot.4.man \
 	man4/ISO.4.man \
 	man4/iso-ip.4.man \
@@ -87,17 +102,26 @@ dist_noinst_MANS = \
 	man4/isos.4.man \
 	man4/isot.4.man \
 	man4/iso-udp.4.man \
+	man4/itot.4.man \
+	man4/lapb.4.man \
 	man4/lpp.4.man \
 	man4/ns-tcp.4.man \
+	man4/plp.4.man \
+	man4/tcpns.4.man \
 	man4/tp0.4.man \
 	man4/tp1.4.man \
 	man4/tp2.4.man \
 	man4/tp3.4.man \
 	man4/tp4.4.man \
 	man4/tp.4.man \
+	man4/x25-lapb.4.man \
+	man4/x25-plp.4.man \
+	man4/x25_lapb.4.man \
+	man4/x25_plp.4.man \
 	man4/xol.4.man \
 	man4/xot.4.man \
-	man7/npi_osi.7.man
+	man7/npi_osi.7.man \
+	man8/striso_mknod.8.man
 
 ## PKG_BUILD_INDEP
 endif
@@ -106,6 +130,16 @@ include ../../am/man.am
 
 # =============================================================================
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/10/03 13:52:16  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.2  2006/07/11 12:32:03  brian
 # - added ISO and other implementations to distribution
 #

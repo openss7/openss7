@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/01 21:30:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/03 13:52:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:21 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -103,9 +103,15 @@ noinst_LIBRARIES		= libISOmods.a libISOdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libISOmods_a_SOURCES = \
-				  src/modules/cmot.c
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
 
 dist_EXTRA_libISOmods_a_SOURCES = \
+				  src/modules/cmot.c \
 				  src/modules/isot.c \
 				  src/modules/itot.c \
 				  src/modules/lpp.c \
@@ -121,9 +127,12 @@ libISOmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $
 libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libISOdrvs_a_SOURCES = \
-				  src/drivers/clns.c
+				  src/drivers/clns.c \
+				  src/drivers/x25-lapb.c \
+				  src/drivers/x25-plp.c
 
 dist_EXTRA_libISOdrvs_a_SOURCES = \
+				  src/drivers/clns.c \
 				  src/drivers/tp.c \
 				  src/drivers/x25-lapb.c \
 				  src/drivers/x25-plp.c
@@ -177,9 +186,15 @@ noinst_LIBRARIES		= libISOmods.a libISOdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libISOmods_a_SOURCES = \
-				  src/modules/cmot.c
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
 
 dist_EXTRA_libISOmods_a_SOURCES = \
+				  src/modules/cmot.c \
 				  src/modules/isot.c \
 				  src/modules/itot.c \
 				  src/modules/lpp.c \
@@ -195,9 +210,12 @@ libISOmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $
 libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libISOdrvs_a_SOURCES = \
-				  src/drivers/clns.c
+				  src/drivers/clns.c \
+				  src/drivers/x25-lapb.c \
+				  src/drivers/x25-plp.c
 
 dist_EXTRA_libISOdrvs_a_SOURCES = \
+				  src/drivers/clns.c \
 				  src/drivers/tp.c \
 				  src/drivers/x25-lapb.c \
 				  src/drivers/x25-plp.c
@@ -273,11 +291,7 @@ endif
 ##LIBRARY_VERSION_FILES		=
 ##
 ##include am/libraries.am
-##
-##AUTOCONFIG_H			= $(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
@@ -403,6 +417,16 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2006/10/03 13:52:14  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.7  2006/10/01 21:30:21  brian
 # - distribute release and library version files
 #

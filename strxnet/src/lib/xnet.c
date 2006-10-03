@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/02 11:32:26 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/10/03 13:53:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:26 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:53:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/02 11:32:26 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/10/03 13:53:43 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/02 11:32:26 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/10/03 13:53:43 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -4396,6 +4396,11 @@ __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 	return (-1);
 }
 
+int __xnet_t_rcvvopt(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int
+		iovcount, int *flags)
+__attribute__((alias("__xnet_t_rcvvudata")));
+
+
 /** The reentrant version of __xnet_t_rcvvudata(). */
 int
 __xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
@@ -4414,7 +4419,12 @@ __xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
 	return (ret);
 }
 
+int __xnet_t_rcvvopt_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int
+		iovcount, int *flags)
+__attribute__((alias("__xnet_t_rcvvudata_r")));
+
 __asm__(".symver __xnet_t_rcvvudata_r,t_rcvvudata@@XNET_1.0");
+__asm__(".symver __xnet_t_rcvvopt_r,t_rcvvopt@@XNET_1.0");
 
 /** @brief Drop a leaf from a point-to-multipoint connection.
   * @param fd a file descriptor for the transport user endpoint.
@@ -5791,6 +5801,8 @@ TRANS error codes not known to the XTI library.
 };
 /* *INDENT-ON* */
 
+const char **__xnet_t_errstr = __xnet_t_errlist;
+
 __asm__(".symver __xnet_t_errstr,t_errstr@@XNET_1.0");
 
 __asm__(".symver __xnet_t_errlist,t_errlist@@XNET_1.0");
@@ -6003,7 +6015,7 @@ __xnet_t_sysconf(int name)
 	return (-1);
 }
 
-__asm__(".symver _xnet_t_sysconf,t_sysconf@@XNET_1.0");
+__asm__(".symver __xnet_t_sysconf,t_sysconf@@XNET_1.0");
 
 /** @brief Remove an address from a transport endpoint.
   * @param fd a file descriptor indicating the transport endpoint to unbind.
@@ -6075,10 +6087,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.25 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.26 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.25 $)
-  * @date \$Date: 2006/10/02 11:32:26 $
+  * @version \$Name:  $(\$Revision: 0.9.2.26 $)
+  * @date \$Date: 2006/10/03 13:53:43 $
   */
 
 /** @} */

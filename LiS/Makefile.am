@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.44 $) $Date: 2006/10/01 21:30:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.45 $) $Date: 2006/10/03 13:51:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:13 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:51:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.45  2006/10/03 13:51:21  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 1.1.6.44  2006/10/01 21:30:13  brian
 # - distribute release and library version files
 #
@@ -216,7 +226,7 @@ libLiShead_a_SOURCES		= head/head.c \
 				  head/linux/lislocks.c \
 				  head/linux/lismem.c \
 				  head/linux/lispci.c
-libLiShead_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLiShead_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libLiShead_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
@@ -231,7 +241,7 @@ libLiSdrvr_a_SOURCES		= drivers/str/clone.c \
 				  drivers/str/sad.c \
 				  drivers/str/linux/connld.c \
 				  drivers/str/relay.c
-libLiSdrvr_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLiSdrvr_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libLiSdrvr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) \
 				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
@@ -255,7 +265,7 @@ libLiSload_a_SOURCES		= drivers/str/pipemod.c \
 				  drivers/str/echo.c \
 				  drivers/str/mux.c
 
-libLiSload_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLiSload_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libLiSload_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
 libLiSload_a_CFLAGS		= $(KERNEL_CFLAGS)
@@ -383,140 +393,140 @@ EXTRA_PROGRAMS			+= \
 dist_sbin_SCRIPTS		= strms_down strms_status strms_up
 
 streams_SOURCES			= util/streams.c
-streams_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+streams_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 streams_LDFLAGS			=
 streams_LDADD			= libLiS.la
 streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMEMPRINT
 streams_CFLAGS			= $(USER_CFLAGS)
 
 timetst_SOURCES			= util/timetst.c
-timetst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+timetst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 timetst_LDFLAGS			=
 timetst_LDADD			= libLiS.la
 timetst_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 timetst_CFLAGS			= $(USER_CFLAGS)
 
 strtst_SOURCES			= util/strtst.c
-strtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strtst_LDFLAGS			= -lpthread
 strtst_LDADD			= libLiS.la
 strtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strtst_CFLAGS			= $(USER_CFLAGS)
 
 test_streams_SOURCES		= util/test-streams.c
-test_streams_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_streams_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_streams_LDFLAGS		= -lpthread
 test_streams_LDADD		= libLiS.la
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(USER_CFLAGS)
 
 test_fifo_SOURCES		= util/test-fifo.c
-test_fifo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_fifo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_fifo_LDFLAGS		= -lpthread
 test_fifo_LDADD			= libLiS.la
 test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(USER_CFLAGS)
 
 test_pipe_SOURCES		= util/test-pipe.c
-test_pipe_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_pipe_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_pipe_LDFLAGS		= -lpthread
 test_pipe_LDADD			= libLiS.la
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(USER_CFLAGS)
 
 test_sad_SOURCES		= util/test-sad.c
-test_sad_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_sad_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_sad_LDFLAGS		= -lpthread
 test_sad_LDADD			= libLiS.la
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(USER_CFLAGS)
 
 perftest_SOURCES		= util/perftest.c
-perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 perftest_LDFLAGS		=
 perftest_LDADD			= libLiS.la
 perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 perftest_CFLAGS			= $(USER_CFLAGS)
 
 polltst_SOURCES			= util/polltst.c
-polltst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+polltst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 polltst_LDFLAGS			=
 polltst_LDADD			= libLiS.la
 polltst_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 polltst_CFLAGS			= $(USER_CFLAGS)
 
 fattach_SOURCES			= util/linux/fattach.c
-fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 fattach_LDFLAGS			=
 fattach_LDADD			= libLiS.la
 fattach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fattach_CFLAGS			= $(USER_CFLAGS)
 
 fdetach_SOURCES			= util/linux/fdetach.c
-fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 fdetach_LDFLAGS			=
 fdetach_LDADD			= libLiS.la
 fdetach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fdetach_CFLAGS			= $(USER_CFLAGS)
 
 mkfifo_SOURCES			= util/linux/mkfifo.c
-mkfifo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+mkfifo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 mkfifo_LDFLAGS			=
 mkfifo_LDADD			= libLiS.la
 mkfifo_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 mkfifo_CFLAGS			= $(USER_CFLAGS)
 
 oc_SOURCES			= util/linux/oc.c
-oc_DEPENDENCIES			= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+oc_DEPENDENCIES			= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 oc_LDFLAGS			=
 oc_LDADD    			= libLiS.la
 oc_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 oc_CFLAGS			= $(USER_CFLAGS)
 
 pafd_SOURCES			= util/linux/pafd.c
-pafd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+pafd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 pafd_LDFLAGS			=
 pafd_LDADD  			= libLiS.la
 pafd_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 pafd_CFLAGS			= $(USER_CFLAGS)
 
 psfd_SOURCES			= util/linux/psfd.c
-psfd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+psfd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 psfd_LDFLAGS			=
 psfd_LDADD  			= libLiS.la
 psfd_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 psfd_CFLAGS			= $(USER_CFLAGS)
 
 rwf_SOURCES			= util/linux/rwf.c
-rwf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+rwf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 rwf_LDFLAGS			=
 rwf_LDADD   			= libLiS.la
 rwf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 rwf_CFLAGS			= $(USER_CFLAGS)
 
 lis_test_SOURCES		= util/linux/test.c
-lis_test_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+lis_test_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 lis_test_LDFLAGS		=
 lis_test_LDADD			= libLiS.la
 lis_test_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 lis_test_CFLAGS			= $(USER_CFLAGS)
 
 lis_test2_SOURCES		= util/linux/test2.c
-lis_test2_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+lis_test2_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 lis_test2_LDFLAGS		=
 lis_test2_LDADD			= libLiS.la
 lis_test2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 lis_test2_CFLAGS		= $(USER_CFLAGS)
 
 thrtst_SOURCES			= util/linux/thrtst.c
-thrtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+thrtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 thrtst_LDFLAGS			= -lpthread
 thrtst_LDADD			= libLiS.la
 thrtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 thrtst_CFLAGS			= $(USER_CFLAGS)
 
 strmakenodes_SOURCES		= util/linux/strmakenodes.c
-strmakenodes_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strmakenodes_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strmakenodes_LDFLAGS		=
 strmakenodes_LDADD		=
 strmakenodes_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -526,10 +536,6 @@ strmakenodes_CFLAGS		= $(USER_CFLAGS)
 endif
 ## RPM_BUILD_USER
 endif
-
-AUTOCONFIG_H			= $(PKGINCL)/config.h
-
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
 EXPORT_SRCFILES			= \
 				head/linux/exports.c

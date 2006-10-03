@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/10/01 21:30:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2006/10/03 13:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:15 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:51:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.77  2006/10/03 13:51:33  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.76  2006/10/01 21:30:15  brian
 # - distribute release and library version files
 #
@@ -1161,10 +1171,6 @@ UNINSTALL_HOOK += uninstall-inet-devices
 
 .PHONY: install-inet-devices uninstall-inet-devices
 
-##AUTOCONFIG_H			= $(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
 EXPORT_SRCFILES			=
 if PUBLIC_RELEASE
 else

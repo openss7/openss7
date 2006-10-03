@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/01 21:30:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/03 13:51:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:17 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:51:39 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2006/10/03 13:51:39  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.11  2006/10/01 21:30:17  brian
 # - distribute release and library version files
 #
@@ -132,19 +142,19 @@ dist_sbin_SCRIPTS		=
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-@PACKAGE_TARNAME@_mknod_LDADD		=
+@PACKAGE_TARNAME@_mknod_LDADD		= 
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_bcm_SOURCES		= src/test/test-bcm.c
-test_bcm_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_bcm_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_bcm_LDADD			= $(STREAMS_LDADD)
 test_bcm_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_bcm_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_bcm_CFLAGS			= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
-#xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+#xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 #xxxxxx_LDADD			= $(STREAMS_LDADD)
 #xxxxxx_LDFLAGS			= $(STREAMS_LDFLAGS)
 #xxxxxx_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -165,7 +175,7 @@ EXTRA_LIBRARIES			+=
 
 EXTRA_libBCMlink_a_SOURCES	= 
 libBCMlink_a_SOURCES		= 
-libBCMlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libBCMlink_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libBCMlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libBCMlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -173,9 +183,9 @@ $(libBCMlink_a_OBJECTS):	$(libBCMlink_a_SOURCES) $(libBCMlink_a_DEPENDENCIES)
 
 EXTRA_libBCMmods_a_SOURCES	= 
 libBCMmods_a_SOURCES		= \
-				  src/modules/testmod.h \
-				  src/modules/testmod.c
-libBCMmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+				  src/modules/tstmod.h \
+				  src/modules/tstmod.c
+libBCMmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libBCMmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libBCMmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -183,9 +193,9 @@ $(libBCMmods_a_OBJECTS):	$(libBCMmods_a_DEPENDENCIES)
 
 EXTRA_libBCMdrvs_a_SOURCES	= 
 libBCMdrvs_a_SOURCES		= \
-				  src/drivers/testdrv.h \
-				  src/drivers/testdrv.c
-libBCMdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+				  src/drivers/tstdrv.h \
+				  src/drivers/tstdrv.c
+libBCMdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libBCMdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libBCMdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -248,10 +258,7 @@ endif
 ##
 ##include am/libraries.am
 ##
-AUTOCONFIG_H			= src/$(PKGINCL)/config.h
-##
-##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-##
+
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=

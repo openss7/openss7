@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.5 2006/09/24 21:56:47 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.6 2006/10/03 13:51:26 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/24 21:56:47 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/03 13:51:26 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,6 +64,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::	Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-2.18.4.rc3::	Release 4 Candidate 3
 * Release @value{PACKAGE}-2.18.4.rc2::	Release 4 Candidate 2
 * Release @value{PACKAGE}-2.18.4rc1::	Release 4 Candidate 1
 * Release @value{PACKAGE}-2.18.3::		Release 3
@@ -99,20 +100,79 @@ The sections that follow provide information on OpenSS7 releases of the @*
 
 @c ----------------------------------------------------------------------------
 
-@ignore
-@node Release @value{PACKAGE}-2.18.4
-@unnumberedsubsec Major changes for release @value{PACKAGE}-2.18.4
-@cindex release @value{PACKAGE}-2.18.4
-
-This would have been a maintenance release; however, @value{PACKAGE} is no
-longer distributed.
-@end ignore
-
-@c ----------------------------------------------------------------------------
-
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the final release of LiS.  There are too many packages now that cannot
+build against LiS because it is lacking fundamentail capabilities in the
+Stream head.
+
+This release builds both 32-bit compatibility and 64-bit native libraries and
+functions on 64-bit architectures.  One of the major reasons for doing this
+for LiS was to demonstrate its sad lack of ability to sustain any form of
+32-bit compatibility on most 64-bit architectures.  Test suites now run first
+64-bit native and then 32-bit compatibility tests to demonstrate LiS' dismal
+failure in this regard.
+
+Major features since the last public release are as follows:
+
+@itemize
+@item
+Added @command{send-pr} scripts for automatic problem report generation.
+(Please do not report bugs on LiS.)
+
+@item
+Added @command{--disable-devel} @command{configure} option to suppress
+building and installing development environment.  This feature is for embedded
+or pure runtime targets that do not need the development enivironment (static
+libraries, manual pages, documentation).
+
+@item
+Corrected start of assignment of major devices numbers (back to 230).
+
+@item
+Improved compiler flag generation and optimizations for recent @command{gcc}
+compilers and some idiosynchratic behaviour for some distributions (primarily
+SUSE).
+
+@item
+Optimized compilation is now available also for user level programs in
+addition to kernel programs.  Added new @option{--with-optimize} option to
+@command{configure} to accomplish this.
+
+@item
+Better detection of SUSE distributions, release numbers and SLES
+distributions: support for additional @cite{SuSE} distributions on @code{ix86}
+as well as @code{x86_64}.  Added distribution support includes @cite{SLES 9},
+@cite{SLES 9 SP2}, @cite{SLES 9 SP3}, @cite{SLES 10}, @cite{SuSE 10.1}.
+
+@item
+Many documentation updates for all @uref{http://www.openss7.org/,, OpenSS7}
+packages.  Automated release file generation making for vastly improved and
+timely text documentation present in the release directory.
+
+@item
+Bug fixes to STREAMS library for proper asynchronous thread cancellation
+handling.  Verisioning of all library symbols.
+
+@item
+Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
+modules and drivers.  The @samp{make installcheck} target will now
+automagically test both 64-bit native and 32-bit compatibility versions, one
+after the other, on 64-bit platforms.
+
+@item
+The package will now build doxygen(1) html documentation with the 'doxy' make
+target.  See 'make help' or README-make in the distribution for more
+information.
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-2.18.4.rc3
+@unnumberedsubsec Major changes for release @value{PACKAGE}-2.18.4.rc3
+@cindex release @value{PACKAGE}-2.18.4.rc3
 
 Third release candidiate.
 
@@ -134,9 +194,9 @@ information.
 
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
-modules and drivers.
-The @samp{make installcheck} target will now automagically test both 64-bit native and 32-bit
-compatibility versions, one after the other, on 64-bit platforms.
+modules and drivers.  The @samp{make installcheck} target will now
+automagically test both 64-bit native and 32-bit compatibility versions, one
+after the other, on 64-bit platforms.
 
 @item
 Added versioning of all library symbols.

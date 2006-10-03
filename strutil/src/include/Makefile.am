@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/06 11:39:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/03 13:53:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:05 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:53:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2006/10/03 13:53:32  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
 # Revision 0.9.2.7  2006/03/06 11:39:05  brian
 # - updated headers
 #
@@ -65,16 +75,16 @@ nobase_pkginclude_HEADERS =  \
 	sys/sad.h \
 	sys/sc.h \
 	sys/strlog.h \
-	sys/strutil/log.h \
-	sys/strutil/sad.h \
-	sys/strutil/sc.h \
-	sys/strutil/strlog.h
+	sys/$(PACKAGE)/log.h \
+	sys/$(PACKAGE)/sad.h \
+	sys/$(PACKAGE)/sc.h \
+	sys/$(PACKAGE)/strlog.h
 
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/strutil/version.h \
-	sys/strutil/config.h
-#	sys/strutil/modversions.h
+	sys/$(PACKAGE)/config.h \
+	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/modversions.h
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

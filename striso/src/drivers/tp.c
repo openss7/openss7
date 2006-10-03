@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/25 06:39:18 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/03 13:52:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:18 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:52:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.10  2006/10/03 13:52:22  brian
+ - changes to pass make check target
+ - added some package config.h files
+ - removed AUTOCONFIG_H from Makefile.am's
+ - source code changes for compile
+ - added missing manual pages
+ - renamed conflicting manual pages
+ - parameterized include Makefile.am
+ - updated release notes
+
  Revision 0.9.2.9  2006/07/25 06:39:18  brian
  - expanded minor device numbers and optimization and locking corrections
 
@@ -79,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/25 06:39:18 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/03 13:52:22 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/25 06:39:18 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/03 13:52:22 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -134,7 +144,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2006/07/25 06:39:18 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2006/10/03 13:52:22 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"
@@ -159,30 +169,30 @@ MODULE_ALIAS("streams-tp");
 #endif
 
 #ifdef LFS
-#define TP__DRV_ID	CONFIG_STREAMS_TP__MODID
-#define TP__MOD_ID	CONFIG_STREAMS_TP__MODID
-#define TP__DRV_NAME	CONFIG_STREAMS_TP__NAME
-#define TP__MOD_NAME	CONFIG_STREAMS_TP__NAME
-#define TP__CMAJORS	CONFIG_STREAMS_TP__NMAJOR
-#define TP__CMAJOR_0	CONFIG_STREAMS_TP__MAJOR
-#define TP__UNITS	CONFIG_STREAMS_TP__NMINORS
+#define TP_DRV_ID	CONFIG_STREAMS_TP_MODID
+#define TP_MOD_ID	CONFIG_STREAMS_TP_MODID
+#define TP_DRV_NAME	CONFIG_STREAMS_TP_NAME
+#define TP_MOD_NAME	CONFIG_STREAMS_TP_NAME
+#define TP_CMAJORS	CONFIG_STREAMS_TP_NMAJOR
+#define TP_CMAJOR_0	CONFIG_STREAMS_TP_MAJOR
+#define TP_UNITS	CONFIG_STREAMS_TP_NMINORS
 #endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TP__MODID));
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TP_MODID));
 MODULE_ALIAS("streams-driver-tp");
 MODULE_ALIAS("streams-module-tp");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_TP__MAJOR));
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_TP_MAJOR));
 MODULE_ALIAS("/dev/streams/tp");
 MODULE_ALIAS("/dev/streams/tp/*");
 MODULE_ALIAS("/dev/streams/clone/tp");
 #endif				/* LFS */
-MODULE_ALIAS("char-major-" __stringify(TP__CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(TP__CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(TP__CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(TP__CMAJOR_0) "-" __stringify(TP__CMINOR));
+MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-" __stringify(TP_CMINOR));
 MODULE_ALIAS("/dev/tp0");
 MODULE_ALIAS("/dev/tp1");
 MODULE_ALIAS("/dev/tp2");
@@ -196,12 +206,12 @@ MODULE_ALIAS("/dev/tp4_clns");
  *  ===================
  */
 
-#define DRV_ID		TP__DRV_ID
-#define DRV_NAME	TP__DRV_NAME
-#define MOD_ID		TP__MOD_ID
-#define CMAJORS		TP__CMAJORS
-#define CMAJOR_0	TP__CMAJOR_0
-#define UNITS		TP__UNITS
+#define DRV_ID		TP_DRV_ID
+#define DRV_NAME	TP_DRV_NAME
+#define MOD_ID		TP_MOD_ID
+#define CMAJORS		TP_CMAJORS
+#define CMAJOR_0	TP_CMAJOR_0
+#define UNITS		TP_UNITS
 #ifdef MODULE
 #define DRV_BANNER	TP_BANNER
 #else				/* MODULE */

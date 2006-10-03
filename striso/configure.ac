@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/29 11:50:37 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/03 13:52:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,21 +47,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:37 $ by $Author: brian $
+# Last Modified $Date: 2006/10/03 13:52:14 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.5 2006/09/29 11:50:37 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.6 2006/10/03 13:52:14 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([striso],[0.9.2],[bugs@openss7.org])
 
 _OPENSS7_DIRCHANGE
 
 AC_CONFIG_SRCDIR([striso.lsm.in])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h src/include/sys/striso/config.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
@@ -173,8 +173,8 @@ AC_CONFIG_FILES([Makefile
 		 lib32/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
-		 doc/manual/Makefile
-		 doc/manual/texi/args.texi])
+		 doc/manual/texi/args.texi
+		 doc/manual/Makefile])
 
 AC_OUTPUT
 

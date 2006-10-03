@@ -1,5 +1,11 @@
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: updated release notes
+	* Makefile.am: removed AUTOCONFIG_H
+	* src/include/Makefile.am: parameterized
+	* src/include/sys/strutil/config.h.in: added comments
+	* src/include/sys/strutil/version.h.in: added comments
+
 	* strutil.spec.in: corrections, cooked manpages and documentation
 	* debian/changelog: notes
 	* debian/control.in: mostly text description formatting

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/09/01 08:53:05 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/03 13:53:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/01 08:53:05 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:53:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.27  2006/10/03 13:53:46  brian
+ - changes to pass make check target
+ - added some package config.h files
+ - removed AUTOCONFIG_H from Makefile.am's
+ - source code changes for compile
+ - added missing manual pages
+ - renamed conflicting manual pages
+ - parameterized include Makefile.am
+ - updated release notes
+
  Revision 0.9.2.26  2006/09/01 08:53:05  brian
  - minor corrections to headers and code
 
@@ -70,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/09/01 08:53:05 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/03 13:53:46 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/09/01 08:53:05 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/03 13:53:46 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -103,7 +113,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/09/01 08:53:05 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/03 13:53:46 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -207,8 +217,16 @@ struct timod {
 	ulong cons;			/* outstanding connection indications */
 };
 
-static kmem_cache_t *timod_priv_cachep = NULL;
+#define TIMOD_PRIV(__q) ((struct timod *)((__q)->q_ptr))
 
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Private Structure allocation, deallocation and cache
+ *
+ *  -------------------------------------------------------------------------
+ */
+static kmem_cache_t *timod_priv_cachep = NULL;
 static __unlikely int
 timod_init_caches(void)
 {
@@ -593,12 +611,21 @@ timod_rput(queue_t *q, mblk_t *mp)
 	return timod_rput_slow(q, mp);
 }
 
+/**
+ *  timod_wput_slow - slow write put procedure
+ *  @q: the write queue
+ *  @mp: the message to put
+ */
 static noinline streams_fastcall __unlikely int
 timod_wput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
 
 #if defined LIS
+	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
+	   modules and, of course, does not properly suppress queue procedures while closing.  We
+	   can check this as many times as we would like on SMP and the q->q_next pointer could be
+	   invalidate immediately after we check it.  Never use LiS. */
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			MOD_NAME, __FUNCTION__);
@@ -933,12 +960,17 @@ timod_wput_slow(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
+
 static streamscall __hot_out int
 timod_wput(queue_t *q, mblk_t *mp)
 {
 	union T_primitives *p;
 
 #if defined LIS
+	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
+	   modules and, of course, does not properly suppress queue procedures while closing.  We
+	   can check this as many times as we would like on SMP and the q->q_next pointer could be
+	   invalidate immediately after we check it.  Never use LiS. */
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			MOD_NAME, __FUNCTION__);
@@ -985,7 +1017,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 #   endif
 #endif
 
-static void
+static __unlikely void
 timod_pop(queue_t *q)
 {
 	struct timod *priv = (typeof(priv)) q->q_ptr;
@@ -1015,7 +1047,6 @@ timod_pop(queue_t *q)
 			qreply(q, mp);
 		}
 		break;
-		break;
 	case TS_IDLE:
 	default:
 		break;
@@ -1044,6 +1075,20 @@ timod_pop(queue_t *q)
 #   endif			/* defined M_UNHANGUP */
 }
 
+/**
+ * timod_open = open the timod module
+ * @q: read queue
+ * @devp: device to open
+ * @flag: flags to open call
+ * @sflag: should be just MODOPEN
+ * @crp: pointer to opening process' credentials
+ *
+ * Some applications programs that are too knowledgable about the internal organization of STREAMS
+ * have the habit of popping the timod module and pushing the sockmod module and then popping
+ * sockmod and pushing timod.  Therefore, it cannot be assumed that timod is being pushed onto a
+ * freshly opened Stream as is the case when the XTI library is pushing the module.  Therefore, we
+ * should immediately issue a capability request to determine the state of the TPI Stream.
+ */
 static streamscall int
 timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
@@ -1053,7 +1098,7 @@ timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		goto quit;	/* already open */
 	err = ENXIO;
 	if (sflag != MODOPEN || WR(q)->q_next == NULL)
-		goto quit;
+		goto quit;	/* can't be opened as driver */
 	err = ENOMEM;
 	if (!(timod_alloc_priv(q)))
 		goto quit;
@@ -1074,6 +1119,10 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
 		goto quit;
 	}
+	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
+	   modules and, of course, does not properly suppress queue procedures while closing.  We
+	   can check this as many times as we would like on SMP and the q->q_next pointer could be
+	   invalidate immediately after we check it.  Never use LiS. */
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			MOD_NAME, __FUNCTION__);
@@ -1121,7 +1170,7 @@ MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
 STATIC struct fmodsw timod_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &timodinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

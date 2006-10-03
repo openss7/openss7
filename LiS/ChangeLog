@@ -1,5 +1,11 @@
 2006-10-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/Makefile.am: parameterize
+	* include/sys/LiS/version.h.in: added comments
+	* lib32/Makefile.am: removed AUTOCONFIG_H
+	* Makefile.am: removed AUTOCONFIG_H
+	* manual/news.texi: updated release notes
+
 	* include/sys/LiS/config.h.in: added config.h file
 
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
