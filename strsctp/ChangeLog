@@ -1,3 +1,11 @@
+2006-10-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/tpiperf.4.man: added missing manpage
+	* doc/man/man8/test-interop.8.man: added missing manpage
+	* doc/man/man8/test-sctp_n2.8.man: added missing manpage
+	* doc/man/man8/test-xxx.8.man: added missing manpage
+	* src/include/sys/strsctp/config.h.in: added config.h file
+
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4:

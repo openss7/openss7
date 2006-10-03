@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: testdrv.h,v 0.9.2.1 2006/03/08 11:17:59 brian Exp $
+ @(#) $Id: tstdrv.h,v 0.9.2.1 2006/10/03 13:24:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/08 11:17:59 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:24:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: testdrv.h,v $
+ $Log: tstdrv.h,v $
+ Revision 0.9.2.1  2006/10/03 13:24:17  brian
+ - file additions and removals for make check target
+
  Revision 0.9.2.1  2006/03/08 11:17:59  brian
  - completing package
 
@@ -57,6 +60,6 @@
 #ifndef __LOCAL_TESTDRV_H__
 #define __LOCAL_TESTDRV_H__
 
-#ident "@(#) $RCSfile: testdrv.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tstdrv.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #endif				/* __LOCAL_TESTDRV_H__ */

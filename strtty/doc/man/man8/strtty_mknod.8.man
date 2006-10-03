@@ -1,0 +1,308 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: strtty_mknod.8.man,v 0.9.2.1 2006/10/03 13:24:31 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/03 13:24:31 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strtty_mknod.8.man,v $
+.\" Revision 0.9.2.1  2006/10/03 13:24:31  brian
+.\" - file additions and removals for make check target
+.\"
+.\" Revision 0.9.2.1  2006/10/02 15:04:45  brian
+.\" - added missing manpage
+.\"
+.\" Revision 0.9.2.1  2006/09/29 11:40:00  brian
+.\" - new files for strtty package and manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strtty.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strtty.macros
+.\"
+.\"
+.TH STRTTY_MKNOD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Adminstrative Commands"
+.\"
+.\"
+.SH NAME
+.B strtty_mknod
+\- create or remove \fISTREAMS\fR Terminal device nodes
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBstrtty_mknod\fR [\fIoptions\fR]
+.PD 0
+.HP 12
+\fBstrtty_mknod\fR [\fIoptions\fR] {\fB-r\fR|\fB--remove\fR}
+.HP 12
+\fBstrtty_mknod\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrtty_mknod\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrtty_mknod\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B strtty_mknod
+is a small utility program that can be used to create or remove primary
+.I STREAMS
+device nodes.
+
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+.BR -r ", " --remove
+Remove
+.I STREAMS
+device nodes instead of creating them.
+.TP
+.BR -h ", " --help
+When this option is encountered,
+print
+usage
+information to
+.I stdout
+and exit.
+.TP
+.BR -V ", " --version
+When this option is encountered,
+print
+version
+information to
+.I stdout
+and exit.
+.TP
+.BR -C ", " --copying
+When this option is encountered,
+print
+copyright and copying
+information to
+.I stdout
+and exit.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occurred and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.BR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.BR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B strtty_mknod
+is created when the
+.I STREAMS
+package is configured.  A version of
+.B strtty_mknod
+from one version of the
+.I STREAMS
+package release might be incompatible with that of another version.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following example will create all necessary
+.I STREAMS
+primary device nodes:
+.PP
+.RS
+.nf
+\fC\s-1\
+#> strtty_mknod
+\s+1\fP
+.fi
+.RE
+.PP
+The following example will remove all
+.I STREAMS
+primary device nodes:
+.PP
+.RS
+.nf
+\fC\s-1\
+#> strtty_mknod -r
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.PP
+.B strtty_mknod
+creates or removes the following devices:
+.TP
+.B /dev/ptmx
+the master pseudo-terminal,
+.BR ptmx (4),
+device.
+.TP
+.BI /dev/pts/ NNN
+slave pseudo-terminal device
+.IR NNN .
+.TP
+.B /dev/streams/clone/ptm
+another equivalent of the
+.B /dev/ptmx
+device.
+.TP
+.B /dev/streams/ptm/0
+another equivalent of the
+.B /dev/ptmx
+device.
+.TP
+.B /dev/streams/ptm/ptmx
+another equivalent of the
+.B /dev/ptmx
+device.
+.TP
+.BI /dev/streams/pts/ NNN
+another equivalent of the
+.BI /dev/pts/ NNN
+device.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strtty_mknod
+contains the
+.B strtty_mknod
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mknod (2),
+.BR MAKEDEV (8),
+.BR makedev (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B strtty_mknod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B strtty_mknod
+is an
+.IR LiS -specific
+command.
+.B strtty_mknod
+is provided for compatibility with
+.I LiS
+with the following portability considerations:
+.IP \(em
+.I LiS
+does not document long options.
+Portable programs should avoid the use of long options.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I LiS
+documentation.
+.[
+LiS
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strtty_mknod
+first appeared in
+.IR LiS .
+.[
+LiS
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

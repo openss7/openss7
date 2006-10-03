@@ -1,3 +1,18 @@
+2006-10-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man3/grantpt.3.man: renamed, removed (conflict)
+	* doc/man/man3/grantpt.3tty.man: renamed, added
+	* doc/man/man3/ptsname.3.man: renamed, removed (conflict)
+	* doc/man/man3/ptsname.3tty.man: renamed, added
+	* doc/man/man3/unlockpt.3.man: renamed, removed (conflict)
+	* doc/man/man3/unlockpt.3tty.man: renamed, added
+	* doc/man/man4/ptmx.4.man: renamed, removed (conflict)
+	* doc/man/man4/ptmx.4tty.man: renamed, added
+	* doc/man/man4/pts.4.man: renamed, removed (conflict)
+	* doc/man/man4/pts.4tty.man: renamed, added
+	* doc/man/man8/strtty_mknod.8.man: added missing manpage
+	* doc/man/man8/test-tty.8.man: added missing manpage
+
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* strtty.spec.in: corrections, cooked manpages and documentation

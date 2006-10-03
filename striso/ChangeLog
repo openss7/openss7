@@ -1,3 +1,17 @@
+2006-10-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/clns.4.man: added missing manpage
+	* doc/man/man4/itot.4.man: added missing manpage
+	* doc/man/man4/lapb.4.man: added missing manpage
+	* doc/man/man4/plp.4.man: added missing manpage
+	* doc/man/man4/tcpns.4.man: added missing manpage
+	* doc/man/man4/x25_lapb.4.man: added missing manpage
+	* doc/man/man4/x25-lapb.4.man: added missing manpage
+	* doc/man/man4/x25_plp.4.man: added missing manpage
+	* doc/man/man4/x25-plp.4.man: added missing manpage
+	* doc/man/man8/striso_mknod.8.man: added missing manpage
+	* src/include/sys/striso/config.h.in: added config file
+
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: add includes and manpaths for new packages

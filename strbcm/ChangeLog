@@ -1,3 +1,17 @@
+2006-10-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/tstdrv.4.man: added missing manpage
+	* doc/man/man4/tstmod.4.man: added missing manpage
+	* doc/man/man8/test-bcm.8.man: added missing manpage
+	* src/drivers/tstdrv.c: added: renamed
+	* src/drivers/tstdrv.h: added: renamed
+	* src/modules/tstmod.c: added: renamed
+	* src/modules/tstmod.h: added: renamed
+	* src/drivers/testdrv.c: removed: renamed
+	* src/drivers/testdrv.h: removed: renamed
+	* src/modules/testmod.c: removed: renamed
+	* src/modules/testmod.h: removed: renamed
+
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* strbcm.spec.in: corrections, cooked manpages and documentation

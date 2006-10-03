@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ptsname.3.man,v 0.9.2.1 2006/09/29 11:40:03 brian Exp $
+.\" @(#) $Id: unlockpt.3tty.man,v 0.9.2.1 2006/10/03 13:24:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/29 11:40:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/03 13:24:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: ptsname.3.man,v $
+.\" $Log: unlockpt.3tty.man,v $
+.\" Revision 0.9.2.1  2006/10/03 13:24:30  brian
+.\" - file additions and removals for make check target
+.\"
 .\" Revision 0.9.2.1  2006/09/29 11:40:03  brian
 .\" - new files for strtty package and manual pages
 .\"
@@ -77,12 +80,12 @@ sort-adjacent-labels
 .so strtty.macros
 .\"
 .\"
-.TH PTSNAME 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.TH UNLOCKPT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .\"
 .\"
 .SH NAME
-.B ptsname
-\-  get name of the slave pseudo-terminal device
+.B unlockpt
+\- unlock a slave pseudo-terminal device
 .\"
 .\"
 .SH SYNOPSIS
@@ -91,7 +94,7 @@ sort-adjacent-labels
 .\".br
 .B #include <stdlib.h>
 .HP
-.BI "char *ptsname(int " fd );
+.BI "int unlockpt(int " fd );
 .\"
 .\"
 .SH ARGUMENTS
@@ -107,15 +110,13 @@ device.
 .SH DESCRIPTION
 .PP
 The
-.BR ptsname ()
-subroutine returns the name of the slave pseudo-terminal device associated
-with a master pseudo-terminal device.  The
-.I fd
-argument is a file descriptor that refers to the master pseudo-terminal
-device.  The
-.BR ptsname ()
-subroutine returns a pointer to a string containing the pathname of the
-corresponding slave device.
+.BR unlockpt ()
+subroutine unlocks the slave pseudo-terminal device of the corresponding master pseudo-terminal
+device specified by
+.IR fd .
+Portable applications must call
+.BR unlockpt ()
+before opening the slave side of a pseudo-terminal device.
 .\"
 .\"
 .SH USAGE
@@ -153,10 +154,10 @@ terminal.
 .\"
 .SH IMPLEMENTATION
 .PP
-.BR ptsname ()
+.BR unlockpt (3)
 is implemented using the
-.B ISPTM
-input-output control for master pseudo-terminal devices,
+.BR UNLKPT
+intput-output control for master pseudo-terminal devices,
 .BR pty (4).
 .\"
 .\"
@@ -167,38 +168,21 @@ input-output control for master pseudo-terminal devices,
 .SH "RETURN VALUE"
 .PP
 Upon success,
-.BR ptsname ()
-returns a pointer to a string which contains the name of the slave
-pseudo-terminal device.; upon failure, it returns
-.BR NULL .
-.PP
-The character pointer returned on success may point to a static data area
-overritten by each subsequent call to
-.BR ptsname ().
-The
-.B @PACKAGE_TITLE@
-.BR libtty (3)
-library implements this data area as thread specific data when the library is
-linked with the POSIX threads library,
-.BR libpthread .
+.BR unlockpt ()
+returns zero
+.RB ( 0 );
+upon failure,
+minus one
+.RB ( -1 ).
 .\"
 .\"
 .SH ERRORS
 .PP
 When
-.BR ptsname ()
-fails, it returns
-.BR NULL .
-.PP
-.B POSIX
-.[
-susv3
-.]
-does not define any errors for
-.BR ptsname ();
-however,
-.B @PACKAGE_TITLE@
-sets
+.BR unlockpt ()
+fails, it returns minus one
+.BR ( -1 )
+and sets
 .IR errno (3)
 to an appropriate error number as follows:
 .TP \w'[\fBEINVAL\fR]\(em'u
@@ -218,7 +202,7 @@ The corresponding slave pseudo-terminal device could not be accessed.
 In addition, any other error number returned by
 .BR ioctl (2s)
 could be returned by
-.BR ptsname ().
+.BR grantpt ().
 .\"
 .\"
 .SH EXAMPLES
@@ -238,20 +222,20 @@ The master pseudo-device terminal clone device node.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR ptsname (3),
 .BR grantpt (3),
-.BR unlockpt (3),
 .BR pty (4).
 .\"
 .\"
 .SH BUGS
 .PP
-.BR ptsname ()
+.BR unlockpt ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR ptsname ()
+.BR unlockpt ()
 is compatible with
 .IR "SVR 4.2" ,
 .[
@@ -315,7 +299,7 @@ susv3
 .\"
 .SH HISTORY
 .PP
-.BR ptsname ()
+.BR unlockpt ()
 first appeared in SVR 3.
 .[
 svr3

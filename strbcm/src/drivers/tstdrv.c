@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: testmod.h,v 0.9.2.1 2006/03/08 11:18:03 brian Exp $
+ @(#) $RCSfile: tstdrv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/03 13:24:17 $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,19 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/08 11:18:03 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:24:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: testmod.h,v $
- Revision 0.9.2.1  2006/03/08 11:18:03  brian
+ $Log: tstdrv.c,v $
+ Revision 0.9.2.1  2006/10/03 13:24:17  brian
+ - file additions and removals for make check target
+
+ Revision 0.9.2.1  2006/03/08 11:17:59  brian
  - completing package
 
  *****************************************************************************/
 
-#ifndef __LOCAL_TESTMOD_H__
-#define __LOCAL_TESTMOD_H__
+#ident "@(#) $RCSfile: tstdrv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/03 13:24:17 $"
 
-#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
-
-#endif				/* __LOCAL_TESTMOD_H__ */
+static char const ident[] = "$RCSfile: tstdrv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/03 13:24:17 $";

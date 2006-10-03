@@ -1,3 +1,7 @@
+2006-10-03  Brian Bidulock  <bidulock@openss7.org>
+
+	 * src/include/sys/strnsl/config.h.in: added config.h file
+
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* strnsl.spec.in: corrections, cooked manpages and documentation

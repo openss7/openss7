@@ -1,11 +1,11 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testdrv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:17:59 $
+ @(#) $Id: config.h.in,v 0.9.2.1 2006/10/03 13:24:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,16 +45,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/08 11:17:59 $ by $Author: brian $
+ Last Modified $Date: 2006/10/03 13:24:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: testdrv.c,v $
- Revision 0.9.2.1  2006/03/08 11:17:59  brian
- - completing package
+ $Log: config.h.in,v $
+ Revision 0.9.2.1  2006/10/03 13:24:14  brian
+ - file additions and removals for make check target
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testdrv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:17:59 $"
+#ifndef __SYS_STRSS7_CONFIG_H__
+#define __SYS_STRSS7_CONFIG_H__
 
-static char const ident[] = "$RCSfile: testdrv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/08 11:17:59 $";
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+
+/*
+ * @configure_input@
+ *
+ * This file needs to include any autoconf definitions that are used by
+ * installed header files.  This file will be installed in
+ * /usr/include/strss7/sys/strss7/config.h to be included by header files
+ * installed in /usr/include/strss7/ with an include line something like:
+ *
+ * #include "sys/strss7/config.h".
+ */
+
+#endif				/* __SYS_STRSS7_CONFIG_H__ */
+
