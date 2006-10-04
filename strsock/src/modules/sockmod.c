@@ -388,8 +388,10 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 		   legacy character device, file, terminal and socket intput-output controls to
 		   I_STR input-output controls.  When the Stream head works correctly (as it does
 		   for Linux Fast-STREAMS) we will never receive a TRANPARENT ioctl here. */
+#if 0
 		if (ioc->ioc_count == TRANSPARENT)
 			return smod_ioctl_slow(q, mp);
+#endif
 #else				/* defined LIS */
 		if (ioc->ioc_count == TRANSPARENT)
 			goto error;

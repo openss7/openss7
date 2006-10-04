@@ -108,6 +108,8 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.
  *  library to push "sockmod" to transform them into sockets.
  */
 
+#define _LFS_SOURCE
+
 #include <sys/os7/compat.h>
 
 #ifdef LINUX
@@ -264,9 +266,11 @@ MODULE_STATIC struct streamtab socksys_info = {
  *  Primary data structures.
  */
 
+#ifdef LFS
 #ifdef __LP64__
 #  undef  WITH_32BIT_CONVERSION
 #  define WITH_32BIT_CONVERSION 1
+#endif
 #endif
 
 /* private structures */
