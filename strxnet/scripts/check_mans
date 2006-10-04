@@ -472,7 +472,7 @@ do
 		if (egrep -- "$target" ${me}_$$.out >/dev/null 2>&1)
 		then
 			echo_s "found in $base, section $target" $LINENO
-			if (cat -s ${me}_$$.out | sed -r -e "s,.[[:cntrl:]],,g;1,/$target/d" | sed -e 1q | grep -v '^[^[:space:]]' >/dev/null 2>&1)
+			if (cat -s ${me}_$$.out | sed -r -e "1,/$target/d" | sed 1q | grep '^[^[:space:]]' >/dev/null 2>&1)
 			then
 				t=`echo $target | sed -e "s/\[\[:space:\]\]/ /g;s/|/ or /g;s/'//g"`
 				if test :"${MAINTAINER_MODE:-no}" != :no
@@ -513,7 +513,7 @@ do
 		if (egrep -- "$target" ${me}_$$.out >/dev/null 2>&1)
 		then
 			echo_s "found in $base, section $target" $LINENO
-			if (cat -s ${me}_$$.out | sed -r -e "s,.[[:cntrl:]],,g;1,/$target/d" | sed -e 1q | grep -v '^[^[:space:]]' >/dev/null 2>&1)
+			if (cat -s ${me}_$$.out | sed -r -e "1,/$target/d" | sed 1q | grep '^[^[:space:]]' >/dev/null 2>&1)
 			then
 				t=`echo $target | sed -e "s/\[\[:space:\]\]/ /g;s/|/ or /g;s/'//g"`
 				echo_w "empty recommended section $t in $base"
