@@ -1,3 +1,12 @@
+2006-10-04  Brian Bidulock  <bidulock@openss7.org>
+
+	- changes to pass distcheck target
+	* Makefile.am: leave SOURCES outside conditionals
+	* lib32/Makefile.am: leave SOURCES outside conditionals
+	* po/POTFILES.in: corrections
+	* po/de.po: updates
+
+
 2006-10-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: added config file

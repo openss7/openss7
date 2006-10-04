@@ -1,3 +1,5 @@
 # translatable sources
 src/lib/xnet.c
-src/lib/xnsl.c
+src/lib/netselect.c
+src/lib/netdir.c
+src/lib/netdir_inet.c

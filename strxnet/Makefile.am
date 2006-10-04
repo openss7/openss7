@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2006/10/03 13:53:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/10/04 04:41:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:53:35 $ by $Author: brian $
+# Last Modified $Date: 2006/10/04 04:41:23 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.68  2006/10/04 04:41:23  brian
+# - changes to pass distcheck target
+#
 # Revision 0.9.2.67  2006/10/03 13:53:35  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -188,8 +191,6 @@ test_timod_CFLAGS		= $(USER_CFLAGS)
 ## WITH_TLI
 endif
 
-if WITH_XNET
-## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnet_LDFLAGS		= $(STREAMS_LDFLAGS)
@@ -204,8 +205,6 @@ test_xnet_thr_LDFLAGS		= $(STREAMS_LDFLAGS) -lpthread
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
-lib_LTLIBRARIES			+= libxnet.la
-
 libxnet_la_SOURCES		= src/lib/pthread.c src/lib/xnet.c gettext.h
 libxnet_la_DEPENDENCIES		= $(top_srcdir)/src/lib/xnsl.VERSION
 libxnet_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
@@ -214,11 +213,13 @@ libxnet_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= $(STREAMS_LDADD)
+
+if WITH_XNET
+## WITH_XNET
+lib_LTLIBRARIES			+= libxnet.la
 ## WITH_XNET
 endif
 
-if WITH_XNSL
-## WITH_XNSL
 test_xnsl_SOURCES		= src/test/test-xnsl.c
 test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_LDADD			= $(STREAMS_LDADD) libxnet.la libxnsl.la
@@ -232,8 +233,6 @@ test_xnsl_thr_LDADD		= $(STREAMS_LDADD) libxnet.la libxnsl.la
 test_xnsl_thr_LDFLAGS		= $(STREAMS_LDFLAGS) -lpthread
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnsl_thr_CFLAGS		= $(USER_CFLAGS)
-
-lib_LTLIBRARIES			+= libxnsl.la
 
 libxnsl_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/netselect.c \
@@ -252,8 +251,6 @@ libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_I
 libxnsl_la_CFLAGS		= $(USER_CFLAGS)
 libxnsl_la_LIBADD		=
 
-lib_LTLIBRARIES			+= inetaddr.la
-
 inetaddr_la_SOURCES		= src/lib/netdir_inet.c \
 				  src/include/netdir.h \
 				  src/include/netconfig.h \
@@ -265,6 +262,11 @@ inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_
 				  -DNETDIR_STRONG_DEFS
 inetaddr_la_CFLAGS		= $(USER_CFLAGS)
 inetaddr_la_LIBADD		=
+
+if WITH_XNSL
+## WITH_XNSL
+lib_LTLIBRARIES			+= libxnsl.la
+lib_LTLIBRARIES			+= inetaddr.la
 ## WITH_XNSL
 endif
 
@@ -345,8 +347,6 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-if WITH_TLI
-## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
@@ -360,11 +360,12 @@ test_timod_LDADD		= $(STREAMS_LDADD)
 test_timod_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
+
+if WITH_TLI
+## WITH_TLI
 ## WITH_TLI
 endif
 
-if WITH_XNET
-## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
@@ -379,8 +380,6 @@ test_xnet_thr_LDFLAGS		= $(STREAMS_LDFLAGS) -lpthread
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
-lib_LTLIBRARIES			+= libxnet.la
-
 libxnet_la_SOURCES		= src/lib/pthread.c src/lib/xnet.c gettext.h
 libxnet_la_DEPENDENCIES		= $(top_srcdir)/src/lib/xnsl.VERSION
 libxnet_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
@@ -389,11 +388,13 @@ libxnet_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= $(STREAMS_LDADD)
+
+if WITH_XNET
+## WITH_XNET
+lib_LTLIBRARIES			+= libxnet.la
 ## WITH_XNET
 endif
 
-if WITH_XNSL
-## WITH_XNSL
 test_xnsl_SOURCES		= src/test/test-xnsl.c
 test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 test_xnsl_LDADD			= libxnet.la libxnsl.la $(STREAMS_LDADD)
@@ -407,8 +408,6 @@ test_xnsl_thr_LDADD		= libxnet.la libxnsl.la $(STREAMS_LDADD)
 test_xnsl_thr_LDFLAGS		= $(STREAMS_LDFLAGS) -lpthread
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnsl_thr_CFLAGS		= $(USER_CFLAGS)
-
-lib_LTLIBRARIES			+= libxnsl.la
 
 libxnsl_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/netselect.c \
@@ -427,8 +426,6 @@ libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_I
 libxnsl_la_CFLAGS		= $(USER_CFLAGS)
 libxnsl_la_LIBADD		= $(STREAMS_LDADD) libxnet.la
 
-lib_LTLIBRARIES			+= inetaddr.la
-
 inetaddr_la_SOURCES		= src/lib/netdir_inet.c \
 				  src/include/netdir.h \
 				  src/include/netconfig.h \
@@ -439,6 +436,11 @@ inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_
 				  -DNETDIR_STRONG_DEFS
 inetaddr_la_CFLAGS		= $(USER_CFLAGS)
 inetaddr_la_LIBADD		= 
+
+if WITH_XNSL
+## WITH_XNSL
+lib_LTLIBRARIES			+= libxnsl.la
+lib_LTLIBRARIES			+= inetaddr.la
 ## WITH_XNSL
 endif
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/04 04:41:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:53:38 $ by $Author: brian $
+# Last Modified $Date: 2006/10/04 04:41:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/10/04 04:41:24  brian
+# - changes to pass distcheck target
+#
 # Revision 0.9.2.3  2006/10/03 13:53:38  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -78,7 +81,15 @@
 ##
 include ../am/openss7.am
 
+
 lib32_LTLIBRARIES		=
+
+EXTRA_PROGRAMS			= test-tirdwr \
+				  test-timod \
+				  test-xnet \
+				  test-xnet_thr \
+				  test-xnsl \
+				  test-xnsl_thr
 
 pkglibexec32_PROGRAMS		=
 
@@ -90,19 +101,12 @@ if PKG_BUILD_ARCH
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-if WITH_TLI
-## WITH_TLI
-
-pkglibexec32_PROGRAMS		+= test-tirdwr
-
 test_tirdwr_SOURCES		= $(top_srcdir)/src/test/test-tirdwr.c
 test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_tirdwr_LDADD		= $(STREAMS_LDADD32)
 test_tirdwr_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-timod
 
 test_timod_SOURCES		= $(top_srcdir)/src/test/test-timod.c
 test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
@@ -111,13 +115,12 @@ test_timod_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+if WITH_TLI
+## WITH_TLI
+pkglibexec32_PROGRAMS		+= test-tirdwr
+pkglibexec32_PROGRAMS		+= test-timod
 ## WITH_TLI
 endif
-
-if WITH_XNET
-## WITH_XNET
-
-pkglibexec32_PROGRAMS		+= test-xnet
 
 test_xnet_SOURCES		= $(top_srcdir)/src/test/test-xnet.c
 test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
@@ -126,16 +129,12 @@ test_xnet_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
-pkglibexec32_PROGRAMS		+= test-xnet_thr
-
 test_xnet_thr_SOURCES		= $(top_srcdir)/src/test/test-xnet.c
 test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD32)
 test_xnet_thr_LDFLAGS		= $(STREAMS_LDFLAGS32) -lpthread $(MACHINE_FLAGS)
 test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-lib32_LTLIBRARIES		+= libxnet.la
 
 libxnet_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
 				  $(top_srcdir)/src/lib/xnet.c \
@@ -148,13 +147,13 @@ libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_I
 libxnet_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libxnet_la_LIBADD		=
 
+if WITH_XNET
+## WITH_XNET
+pkglibexec32_PROGRAMS		+= test-xnet
+pkglibexec32_PROGRAMS		+= test-xnet_thr
+lib32_LTLIBRARIES		+= libxnet.la
 ## WITH_XNET
 endif
-
-if WITH_XNSL
-## WITH_XNSL
-
-pkglibexec32_PROGRAMS		+= test-xnsl
 
 test_xnsl_SOURCES		= $(top_srcdir)/src/test/test-xnsl.c
 test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
@@ -163,16 +162,12 @@ test_xnsl_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_xnsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnsl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
-pkglibexec32_PROGRAMS		+= test-xnsl_thr
-
 test_xnsl_thr_SOURCES		= $(top_srcdir)/src/test/test-xnsl.c
 test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 test_xnsl_thr_LDADD		= libxnsl.la -lpthread
 test_xnsl_thr_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_xnsl_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnsl_thr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-lib32_LTLIBRARIES		+= libxnsl.la
 
 libxnsl_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
 				  $(top_srcdir)/src/lib/netselect.c \
@@ -191,8 +186,6 @@ libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_I
 libxnsl_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libxnsl_la_LIBADD		=
 
-lib32_LTLIBRARIES		+= inetaddr.la
-
 inetaddr_la_SOURCES		= $(top_srcdir)/src/lib/netdir_inet.c \
 				  $(top_srcdir)/src/include/netdir.h \
 				  $(top_srcdir)/src/include/netconfig.h \
@@ -205,6 +198,12 @@ inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_
 inetaddr_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 inetaddr_la_LIBADD		=
 
+if WITH_XNSL
+## WITH_XNSL
+pkglibexec32_PROGRAMS		+= test-xnsl
+pkglibexec32_PROGRAMS		+= test-xnsl_thr
+lib32_LTLIBRARIES		+= libxnsl.la
+lib32_LTLIBRARIES		+= inetaddr.la
 ## WITH_XNSL
 endif
 
