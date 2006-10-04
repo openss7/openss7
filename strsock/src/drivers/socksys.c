@@ -760,7 +760,7 @@ socksys_put(queue_t *q, mblk_t *mp)
 		case SIOCSOCKSYS:
 #endif
 		{
-			struct socksysreq sr, *req = &sr;
+			struct socksysreq sr = { { 0, } };
 
 #ifdef WITH_32BIT_CONVERSION
 			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
@@ -769,20 +769,20 @@ socksys_put(queue_t *q, mblk_t *mp)
 				err = -EFAULT;
 				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(*req32))
 					goto nak;
-				req->args[0] = (unsigned long) (uint32_t) req32->args[0];
-				req->args[1] = (unsigned long) (uint32_t) req32->args[1];
-				req->args[2] = (unsigned long) (uint32_t) req32->args[2];
-				req->args[3] = (unsigned long) (uint32_t) req32->args[3];
-				req->args[4] = (unsigned long) (uint32_t) req32->args[4];
-				req->args[5] = (unsigned long) (uint32_t) req32->args[5];
-				req->args[6] = (unsigned long) (uint32_t) req32->args[6];
+				sr.args[0] = (unsigned long) (uint32_t) req32->args[0];
+				sr.args[1] = (unsigned long) (uint32_t) req32->args[1];
+				sr.args[2] = (unsigned long) (uint32_t) req32->args[2];
+				sr.args[3] = (unsigned long) (uint32_t) req32->args[3];
+				sr.args[4] = (unsigned long) (uint32_t) req32->args[4];
+				sr.args[5] = (unsigned long) (uint32_t) req32->args[5];
+				sr.args[6] = (unsigned long) (uint32_t) req32->args[6];
 			} else
 #endif				/* WITH_32BIT_CONVERSION */
 			{
 				err = -EFAULT;
-				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(*req))
+				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(sr))
 					goto nak;
-				bcopy(dp->b_rptr, req, sizeof(*req));
+				bcopy(dp->b_rptr, &sr, sizeof(sr));
 			}
 			switch (ss->iocstate) {
 			case 1:
@@ -790,7 +790,7 @@ socksys_put(queue_t *q, mblk_t *mp)
 				err = -EINVAL;
 				if (sr.args[0] < SO_ACCEPT || sr.args[0] > SO_SOCKPAIR)
 					goto nak;
-				rval = err = so_socksys(req);
+				rval = err = so_socksys(&sr);
 				if (err < 0)
 					goto nak;
 				count = 0;
