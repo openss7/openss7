@@ -74,7 +74,7 @@
 
 extern int mi_sprintf(caddr_t buf, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
 
-typedef void (*mpnotify_func_t)(caddr_t);
+typedef void streamscall (*mpnotify_func_t)(caddr_t);
 extern int mpnotify(mblk_t *mp, mpnotify_func_t func, caddr_t arg);
 
 #else

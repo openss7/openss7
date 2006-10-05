@@ -293,7 +293,7 @@ db_to_buf(register dblk_t *db)
 	return (&mb_to_mdb(db_to_mb(db))->databuf[0]);
 }
 
-static void
+static void streamscall
 mpnotify_func(caddr_t arg)
 {
 	dblk_t *db = (dblk_t *) arg;
@@ -302,7 +302,7 @@ mpnotify_func(caddr_t arg)
 	(*db->db_frtnp[1].free_func) (db->db_frtnp[1].free_arg);
 	/* restore pointer */
 	if (db->db_base != db_to_buf(db)) {
-		db->db_frtnp = (struct free_rtn *) (db + 1);
+		db->db_frtnp = (frtn_t *) (db + 1);
 		/* call free function */
 		(*db->db_frtnp[0].free_func) (db->db_frtnp[0].free_arg);
 	} else
@@ -313,9 +313,9 @@ mpnotify_func(caddr_t arg)
 int
 mpnotify(mblk_t *mp, mpnotify_func_t func, caddr_t arg)
 {
-	struct free_rtn *frtnp;
+	frtn_t *frtnp;
 
-	if ((frtnp = kmem_alloc(2 * sizeof(struct free_rtn), KM_NOSLEEP))) {
+	if ((frtnp = kmem_alloc(2 * sizeof(frtn_t), KM_NOSLEEP))) {
 		frtnp[0].free_func = &mpnotify_func;
 		frtnp[0].free_arg = (void *) mp->b_datap;
 		frtnp[1].free_func = func;
