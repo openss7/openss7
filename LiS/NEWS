@@ -1,11 +1,67 @@
-Linux STREAMS (LiS) -- history of user visible changes.  2006-09-22
-$Id: NEWS,v 1.1.6.26 2006/09/25 12:17:25 brian Exp $
+Linux STREAMS (LiS) -- history of user visible changes.  2006-10-02
+$Id: NEWS,v 1.1.6.27 2006/10/05 12:12:40 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 Linux STREAMS (LiS) package.
+
+ Major changes for release LiS-2.18.4
+-------------------------------------
+
+This is the final release of LiS.  There are too many packages now that
+cannot build against LiS because it is lacking fundamentail
+capabilities in the Stream head.
+
+This release builds both 32-bit compatibility and 64-bit native
+libraries and functions on 64-bit architectures.  One of the major
+reasons for doing this for LiS was to demonstrate its sad lack of
+ability to sustain any form of 32-bit compatibility on most 64-bit
+architectures.  Test suites now run first 64-bit native and then 32-bit
+compatibility tests to demonstrate LiS' dismal failure in this regard.
+
+Major features since the last public release are as follows:
+
+   * Added `send-pr' scripts for automatic problem report generation.
+     (Please do not report bugs on LiS.)
+
+   * Added `--disable-devel' `configure' option to suppress building
+     and installing development environment.  This feature is for
+     embedded or pure runtime targets that do not need the development
+     enivironment (static libraries, manual pages, documentation).
+
+   * Corrected start of assignment of major devices numbers (back to
+     230).
+
+   * Improved compiler flag generation and optimizations for recent
+     `gcc' compilers and some idiosynchratic behaviour for some
+     distributions (primarily SUSE).
+
+   * Optimized compilation is now available also for user level
+     programs in addition to kernel programs.  Added new
+     `--with-optimize' option to `configure' to accomplish this.
+
+   * Better detection of SUSE distributions, release numbers and SLES
+     distributions: support for additional `SuSE' distributions on
+     `ix86' as well as `x86_64'.  Added distribution support includes
+     `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
+
+   * Many documentation updates for all OpenSS7 packages.  Automated
+     release file generation making for vastly improved and timely text
+     documentation present in the release directory.
+
+   * Bug fixes to STREAMS library for proper asynchronous thread
+     cancellation handling.  Verisioning of all library symbols.
+
+   * Now builds 32-bit compatibility libraries and tests them against
+     64-bit kernel modules and drivers.  The `make installcheck' target
+     will now automagically test both 64-bit native and 32-bit
+     compatibility versions, one after the other, on 64-bit platforms.
+
+   * The package will now build doxygen(1) html documentation with the
+     'doxy' make target.  See 'make help' or README-make in the
+     distribution for more information.
 
  Major changes for release LiS-2.18.4.rc3
 -----------------------------------------
@@ -611,4 +667,3 @@ replaced in entirety.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

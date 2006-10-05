@@ -1,3 +1,54 @@
+2006-10-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* manual/descrip.texi: updates for release
+	* manual/news.texi: updates for release
+	* manual/todo.texi: updates for release
+
+	* man/man7/I_ANCHOR.7.man: added
+	* man/man7/I_ATMARK.7.man: added
+	* man/man7/I_CANPUT.7.man: added
+	* man/man7/I_CKBAND.7.man: added
+	* man/man7/I_EGETSIG.7.man: added
+	* man/man7/I_ESETSIG.7.man: added
+	* man/man7/I_FATTACH.7.man: added
+	* man/man7/I_FDETACH.7.man: added
+	* man/man7/I_FDINSERT.7.man: added
+	* man/man7/I_FIND.7.man: added
+	* man/man7/I_FLUSH.7.man: added
+	* man/man7/I_FLUSHBAND.7.man: added
+	* man/man7/I_GERROPT.7.man: added
+	* man/man7/I_GETBAND.7.man: added
+	* man/man7/I_GETCLTIME.7.man: added
+	* man/man7/I_GETPMSG.7.man: added
+	* man/man7/I_GETSIG.7.man: added
+	* man/man7/I_GRDOPT.7.man: added
+	* man/man7/I_GWROPT.7.man: added
+	* man/man7/I_ISASTREAM.7.man: added
+	* man/man7/I_LINK.7.man: added
+	* man/man7/I_LIST.7.man: added
+	* man/man7/I_LOOK.7.man: added
+	* man/man7/I_NREAD.7.man: added
+	* man/man7/I_PEEK.7.man: added
+	* man/man7/I_PIPE.7.man: added
+	* man/man7/I_PLINK.7.man: added
+	* man/man7/I_POP.7.man: added
+	* man/man7/I_PUNLINK.7.man: added
+	* man/man7/I_PUSH.7.man: added
+	* man/man7/I_PUTPMSG.7.man: added
+	* man/man7/I_RECVFD.7.man: added
+	* man/man7/I_SENDFD.7.man: added
+	* man/man7/I_SERROPT.7.man: added
+	* man/man7/I_SETCLTIME.7.man: added
+	* man/man7/I_SETSIG.7.man: added
+	* man/man7/I_SRDOPT.7.man: added
+	* man/man7/I_STR.7.man: added
+	* man/man7/I_SWROPT.7.man: added
+	* man/man7/I_UNLINK.7.man: added
+
 2006-10-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/Makefile.am: parameterize

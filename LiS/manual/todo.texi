@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2006/08/29 11:48:48 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2006/10/05 12:12:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,14 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/29 11:48:48 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:12:43 $ by $Author: brian $
 @c
 @c =========================================================================
 
 The @uref{http://www.openss7.org/,, OpenSS7} release of @value{PACKAGE_TITLE}
 was in maintenance mode for over a year and the latest @samp{2.18} releases
 are quite stable.  However, @value{PACKAGE} is fraught with bugs and suffers
-from a aging design approach making it unsuitable for production use.  It
+from a poor design approach making it unsuitable for production use.  It
 fails many of the conformance test cases in the test suite and even locks the
 kernel on a number of cases on @samp{SMP} kernels regardless of their being
 run on a @samp{UP} machine.
@@ -69,7 +69,7 @@ run on a @samp{UP} machine.
 package for Linux called @cite{Linux Fast-STREAMS}.  @cite{Linux Fast-STREAMS}
 is now far more stable than @value{PACKAGE}, and
 @uref{http://www.openss7.org/,, The OpenSS7 Project} will no longer perform
-develoment on the @value{PACKAGE} package, unless at the bequest of a project
+development on the @value{PACKAGE} package, unless at the bequest of a project
 sponsor.  As such, @value{PACKAGE} is deprecated.  Use the latest
 @command{streams-@value{VERSION_STREAMS}} package from the
 @uref{http://www.openss7.org/download.html, OpenSS7 download site} instead.

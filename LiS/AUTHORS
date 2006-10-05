@@ -1,5 +1,5 @@
-Linux STREAMS (LiS) -- authors.  2006-09-22
-$Id: AUTHORS,v 1.1.6.8 2006/09/25 12:17:24 brian Exp $
+Linux STREAMS (LiS) -- authors.  2006-10-02
+$Id: AUTHORS,v 1.1.6.9 2006/10/05 12:12:40 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -238,4 +238,3 @@ administrator will place them in the mail archives.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

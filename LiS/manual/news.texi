@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.6 2006/10/03 13:51:26 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.7 2006/10/05 12:12:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/03 13:51:26 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:12:43 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -105,7 +105,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @cindex release @value{PACKAGE}-@value{VERSION}
 
 This is the final release of LiS.  There are too many packages now that cannot
-build against LiS because it is lacking fundamentail capabilities in the
+build against LiS because it is lacking fundamental capabilities in the
 Stream head.
 
 This release builds both 32-bit compatibility and 64-bit native libraries and
@@ -125,7 +125,7 @@ Added @command{send-pr} scripts for automatic problem report generation.
 @item
 Added @command{--disable-devel} @command{configure} option to suppress
 building and installing development environment.  This feature is for embedded
-or pure runtime targets that do not need the development enivironment (static
+or pure runtime targets that do not need the development environment (static
 libraries, manual pages, documentation).
 
 @item
@@ -133,7 +133,7 @@ Corrected start of assignment of major devices numbers (back to 230).
 
 @item
 Improved compiler flag generation and optimizations for recent @command{gcc}
-compilers and some idiosynchratic behaviour for some distributions (primarily
+compilers and some idiosyncratic behaviour for some distributions (primarily
 SUSE).
 
 @item
@@ -154,12 +154,12 @@ timely text documentation present in the release directory.
 
 @item
 Bug fixes to STREAMS library for proper asynchronous thread cancellation
-handling.  Verisioning of all library symbols.
+handling.  Versioning of all library symbols.
 
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
 modules and drivers.  The @samp{make installcheck} target will now
-automagically test both 64-bit native and 32-bit compatibility versions, one
+automatically test both 64-bit native and 32-bit compatibility versions, one
 after the other, on 64-bit platforms.
 
 @item
@@ -195,7 +195,7 @@ information.
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
 modules and drivers.  The @samp{make installcheck} target will now
-automagically test both 64-bit native and 32-bit compatibility versions, one
+automatically test both 64-bit native and 32-bit compatibility versions, one
 after the other, on 64-bit platforms.
 
 @item
@@ -231,7 +231,7 @@ addition to kernel programs.  Added new @option{--with-optimize} option to
 
 @item
 Improved compiler flag generation and optimizations for recent @command{gcc}
-compilers and some idiosynchratic behaviour for some distributions (primarily
+compilers and some idiosyncratic behaviour for some distributions (primarily
 SUSE):
 
 @multitable @columnfractions .01 .99
@@ -240,7 +240,7 @@ SUSE):
 @file{Makefile}s for @samp{x86_64} architecture: it impedes performance
 optimizations.
 @item @minus{} @tab Remove @option{-ffunction-sections} option added by some
-rececent 2.6 @file{Makefile}s for @samp{x86_64} architecture: this is an
+recent 2.6 @file{Makefile}s for @samp{x86_64} architecture: this is an
 insane option and should never have been used.
 @item @minus{} @tab Add @option{-ffreestanding} that some older 2.6
 @file{Makefile}s (such as that with @cite{SLES 9 2.6.5} kernel) neglect to add
@@ -273,7 +273,7 @@ This release was only available to subscribers to and sponsors of the
 @unnumberedsubsec Major changes for release @value{PACKAGE}-2.18.4.rc2
 @cindex release @value{PACKAGE}-2.18.4.rc2
 
-Second release candidiate.
+Second release candidate.
 
 @itemize
 @item
@@ -293,7 +293,7 @@ This release was only available to subscribers to and sponsors of the
 @unnumberedsubsec Major changes for release @value{PACKAGE}-2.18.4rc1
 @cindex release @value{PACKAGE}-2.18.4rc1
 
-First release candidiate.
+First release candidate.
 
 @itemize
 @end itemize
@@ -332,13 +332,13 @@ Cross-build support for newer @cite{Nex@-us@-Ware} releases.  Build support
 for (recent FC4) 2.6.14 kernel.  Corrected installation support (init scripts)
 for SuSE 9.2.
 
-Binary compatibility backwards compatible to GCOM 2.18.0 included.  This
-includes exported symbols changed to not generate versioned symbols on 2.4
+Binary compatibility backward compatible to GCOM 2.18.0 included.  This
+includes exported symbols changed to not generate version symbols on 2.4
 kernels.  Also, exported symbols are always compiled
 @code{attribute((regparm(0)))} on regparm capable architectures, regardless of
 the kernel version or compile options.@footnote{Regparm capable architectures
 are really just @code{__i386__} and similar such as @code{__x86_64__} and
-@code{k8}.} For actual binary compatibilty packaging, see the @file{strcompat}
+@code{k8}.} For actual binary compatibility packaging, see the @file{strcompat}
 package.
 
 A major change for 2.18.2 is the port-back of POSIX/SUSv3 XSR/XSI conformance
@@ -353,7 +353,7 @@ Some bug corrections and fixes for glaring SMP errors reported by Kutluck.
 
 This might be the last OpenSS7 release of @dfn{@value{PACKAGE_TITLE}}.  You
 should seriously consider using the Linux Fast-STREAMS package (streams-0.7a.4
-or later) instead.  If you need comptibility to LiS (or other STREAMS
+or later) instead.  If you need compatibility to LiS (or other STREAMS
 implementation), investigate the strcompat package, which provides some binary
 compatibility to LiS under Linux Fast STREAMS.
 
@@ -377,7 +377,7 @@ system, manual pages and texi/pdf manual for LiS that were applied on the
 2.16.19 release.  This includes a number of 64 bit, HPPA, PARISC, printf,
 atomic stats, HZ calculations for 64bit machines, DMA patch for mblk buffer
 alignment, flush handling patch, panic patch, smp patch, parisc syscall patch,
-appq patch, and multithreaded test program patches, POSIX threads compilant
+appq patch, and multi-threaded test program patches, POSIX threads compliant
 library functions.
 
 Additional changes made to support later 2.6 kernels and distributions.
@@ -455,7 +455,7 @@ putpmsg manual pages.
 Correction to symbolic linking and system map file location during non-rpm
 autoconf installation.
 
-Correction to zero @code{maxlen} behavior in @code{t_rcvconnect()}.
+Correction to zero @code{maxlen} behaviour in @code{t_rcvconnect()}.
 
 @c ----------------------------------------------------------------------------
 
@@ -488,7 +488,7 @@ strip module parameter symbols.
 Added @code{lis_check_mem_region()}, @code{lis_release_mem_region()} and
 @code{lis_request_mem_region()} for memory mapped io instead of just io.
 
-Added @code{printk} patches discussed on linux-stream mailling list.  Added
+Added @code{printk} patches discussed on linux-stream mailing list.  Added
 gcc @code{printf} checking and corrected errors in LiS debugging @code{printk}
 statements.
 
@@ -514,8 +514,8 @@ Added HP @code{ldl} patches.
 
 Made modifications to @code{putq()}, @code{putbq()}, @code{insq()} and
 @code{appq()} discussed on linux-streams mailing list.  These do not free
-messages on failure.  Modified all ocurrences internal to LiS to free the
-message on error to ensure old behavior.
+messages on failure.  Modified all occurences internal to LiS to free the
+message on error to ensure old behaviour.
 
 Added HP dejagnu patches to @code{strtst} and added dejagnu testsuite
 directory and file.  Added the @code{make check} target.  Use @code{DEJATOOLS}
@@ -643,7 +643,7 @@ file subdirectory.
 
 A series of bug fixes to xnet.c (libxnet) that resulted from discussions with
 Gurol Akman on openss7-develop mailing list.  Mostly surrounding t_alloc and
-t_getinfo behaviour and the behavior when NULL pointers are passed to various
+t_getinfo behaviour and the behaviour when NULL pointers are passed to various
 XTI/TLI library calls.  Updated xti documentation as well.
 
 Many changes to the inet.c INET driver.  Wildcard IP addresses can now be
@@ -653,9 +653,9 @@ returned.)  Option management has been extensively rewritten to be more
 conformant to XNS documentation.  Test programs test-inet_raw, test-inet_udp,
 test-inet_tcp have been upgraded and converted to multiple child processes.  A
 number of fixes to SMP lock behavior and M_FLUSH have beend added as reported
-by Dave Grothe.  Corrected all level and TBADOPT behavior on negotiation.
+by Dave Grothe.  Corrected all level and TBADOPT behaviour on negotiation.
 
-Although this driver is now closer to expected behavior, it has not been
+Although this driver is now closer to expected behaviour, it has not been
 tested for XNS 5.2 compliance, nor will it be until someone has the time to
 extend the test programs to handle all test cases in a similar manner as was
 done for the library.  Your mileage many vary.  Remember, there is no
@@ -705,7 +705,7 @@ bug patched.
 @unnumberedsubsec Major changes for release @value{PACKAGE}-2.16.18-5
 @cindex release @value{PACKAGE}-2.16.18-5
 
-Fixes a t_open and t_bind problem in libxnet.  Fixes alignemnt of data portion
+Fixes a t_open and t_bind problem in libxnet.  Fixes alignment of data portion
 of mblks.  Adds (untested) ticots_ord, ticots and ticlts devices over UNIX
 domain sockets.
 
@@ -740,7 +740,7 @@ Not publicly released.
 @cindex release @value{PACKAGE}-2.16.18-1
 
 This OpenSS7 release of @value{PACKAGE}-2.16.18 updates the previous
-@value{PACKAGE}-2.16.16 rpm release to the lastest @value{PACKAGE}-2.16
+@value{PACKAGE}-2.16.16 rpm release to the latest @value{PACKAGE}-2.16
 release level.
 
 @c ----------------------------------------------------------------------------
@@ -787,7 +787,7 @@ adds long options to all LiS utilities.
 This change was necessitated because we use GNITS (the strictest level) of
 configuration with autoconf that requires for distribution checking that all
 utility programs support the @samp{--help} and @samp{--version} long options
-wtihout side-effects.
+without side-effects.
 
 @item
 provides a source and binary release mechanism using both autoconf
