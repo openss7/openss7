@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Utilities -- history of user visible changes.  2006-09-18
-$Id: NEWS,v 0.9.2.17 2006/09/24 21:57:16 brian Exp $
+OpenSS7 STREAMS Utilities -- history of user visible changes.  2006-10-03
+$Id: NEWS,v 0.9.2.18 2006/10/05 12:21:33 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,12 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 STREAMS Utilities package.
 
- Major changes for release strutil-0.9.2.4.rc3
+ Major changes for release strutil-0.9.2.4
+------------------------------------------
+
+This is an internal alpha release of the package.
+
+ Major changes for release strutil-0.9.2.3.rc3
 ----------------------------------------------
 
    * Now builds 32-bit compatibility libraries and tests them against
@@ -17,25 +22,46 @@ OpenSS7 STREAMS Utilities package.
 
    * Added versioning of all library symbols.
 
-   * Automated release file generation making for vastly improved and
-     timely text documentation present in the release directory.
+   * Many documentation updates for all OpenSS7 packages.  Automated
+     release file generation making for vastly improved and timely text
+     documentation present in the release directory.
 
    * Dropped support for `LiS'.
 
-   * Package will now support extended ranges of minor devices on 2.6
-     kernels under `Linux Fast-STREAMS' only.
+   * Updated `init' scripts for proper addition and removal of modules.
 
-   * This release candidate provides support for additional SuSE
-     distributions on ix86 as well as x86_64.  Added distribution
-     support includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE
-     10.1.
+   * Start assigning majors at major device number 231 instead of major
+     device number 230.  Assign major device number 230 explicitly to
+     the clone device.  Package will now support extended ranges of
+     minor devices on 2.6 kernels under `Linux Fast-STREAMS' only.
+     `strutil' now supports expanded addressable minor device numbers,
+     permitting 2^16 addressable minor devices per major device number
+     on 2.6 kernels: `LiS' cannot support this change.
 
-   * Added `--enable-devel' `configure' option for embedded targets.
+   * Better detection of SUSE distributions, release numbers and SLES
+     distributions: support for additional `SuSE' distributions on
+     `ix86' as well as `x86_64'.  Added distribution support includes
+     `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
+
+   * Improved compiler flag generation and optimizations for recent
+     `gcc' compilers and some idiosynchratic behaviour for some
+     distributions (primarily SUSE).
+
+   * Optimized compilation is now available also for user level
+     programs in addition to kernel programs.  Added new
+     `--with-optimize' option to `configure' to accomplish this.
+
+   * Added `--disable-devel' `configure' option to suppress building
+     and installing development environment.  This feature is for
+     embedded or pure runtime targets that do not need the development
+     enivironment (static libraries, manual pages, documentation).
 
    * Added `send-pr' script for automatic problem report generation.
 
- Major changes for release strutil-0.9.2.3
-------------------------------------------
+This was an internal alpha release.
+
+ Major changes for release strutil-0.9.2.3.rc2
+----------------------------------------------
 
 Corrections for and testing of 64-bit clean compile and test runs on
 x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
@@ -44,7 +70,7 @@ compiler warnings.
 Corrected build flags for Gentoo and 2.6.15 kernels as reported on
 mailing list.
 
-This is an internal alpha release.
+This was an internal alpha release.
 
  Major changes for release strutil-0.9.2.2
 ------------------------------------------
@@ -120,4 +146,3 @@ package as `LiS' becomes deprecated.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
