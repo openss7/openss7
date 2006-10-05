@@ -78,12 +78,18 @@ sort-adjacent-labels
 .\"
 .\"
 .TH DL_XID_CON 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.\"
+.\"
 .SH NAME
+.PP
 .B DL_XID_CON (dl_xid_con_t)
 \- conveys an XID DLSDU from the DLS Provider to the DLS User in response
 to a
 .BR DL_XID_REQ (7).
+.\"
+.\"
 .SH SYNOPSIS
+.PP
 The message consists of one
 .B M_PROTO
 message block, followed by zero or more
@@ -103,12 +109,18 @@ typedef struct {
 } dl_xid_con_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
+.PP
 .B DL_XID_CON
 conveys an XID DLSDU from the DLS Provider to the DLS User in response
 to a
 .BR DL_XID_REQ (7).
+.\"
+.\"
 .SH PARAMETERS
+.PP
 .TP
 .I dl_primitive
 conveys
@@ -116,6 +128,8 @@ conveys
 .TP
 .I dl_flag
 conveys the flag values associated with the received XID frame.
+.sp
+.RS
 .TP
 .B DL_POLL_FINAL
 indicates if the poll/final bit is set.
@@ -143,19 +157,29 @@ conveys the offset from the beginning of the
 .B M_PROTO
 message block where
 the source DLSAP address begins.
+.\"
+.\"
 .SH STATE
+.PP
 The message is valid in states
 .B DL_IDLE
 and
 .BR DL_DATAXFER .
+.\"
+.\"
 .SH "NEW STATE"
+.PP
 The resulting state is unchanged.
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
+.\"
+.\"
 .SH CONFORMANCE
 .PP
 This interface conforms to DLPI Revision 2.
