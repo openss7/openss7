@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2006/09/24 21:57:20 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2006/10/05 12:22:03 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/24 21:57:20 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:22:03 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -81,8 +81,8 @@ as they are non-standard and non-portable.  Instead use the following functions:
 
 because they have precisely the same argument templates as the other.  These functions are described
 in the OpenGroup documentation as inapplicable to connection-oriented transports, however, we could
-releive that restriction for SCTP.  The characterstics to check is if T_CLTS, okay, T_COTS or
-T_COTS_ORD, only okay if the tsdu_size is not T_INVALID (as it is for TCP).  (It would be ok to be
+relieve that restriction for SCTP.  The characteristics to check is if T_CLTS, okay, T_COTS or
+T_COTS_ORD, only okay if the tsdu_size is not T_INVALID (as it is for TCP).  (It would be okay to be
 T_INFINITE as it is for SCTP.)
 
 @emph{*todo*}
