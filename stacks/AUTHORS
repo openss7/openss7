@@ -1,5 +1,5 @@
-OpenSS7 SS7 Stack -- authors.  2006-09-22
-$Id: AUTHORS,v 0.9.2.7 2006/09/24 21:56:51 brian Exp $
+OpenSS7 SS7 Stack -- authors.  2006-10-03
+$Id: AUTHORS,v 0.9.2.8 2006/10/05 12:14:42 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -12,7 +12,7 @@ The authors of the `OpenSS7 OpenSS7 SS7 Stack' package include:
      - Brian Bidulock <bidulock@openss7.org>
 
 See `Author Index', in the manual, for a complete listing and
-cross-index of authors to sections of this document.
+cross-index of authors to sections of this manual.
 
  Maintainer
 ===========

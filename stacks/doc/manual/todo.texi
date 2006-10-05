@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:57 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/05 12:14:45 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:37:57 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:14:45 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -75,10 +75,10 @@ Start retesting SIGTRAN components against SCTP and Linux Fast-STREAMS starting 
 Start retesting SS7 Device Drivers under Linux Fast-STREAMS starting with X400P.
 
 @item
-Start retesting SS7 Stack compontents (MTP2, MTP3, SCCP, ISUP, TCAP) under Linux Fast-STREAMS.
+Start retesting SS7 Stack components (MTP2, MTP3, SCCP, ISUP, TCAP) under Linux Fast-STREAMS.
 
 @item
-Package a public release.  It has been wayyy tooo looong since a public release of this package.
+Package a public release.  It has been way too long since a public release of this package.
 The package has almost a million lines of code in it, most of which the public has never seen!
 @end itemize
 
