@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:38:05 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/05 12:22:30 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:38:05 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:22:30 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -79,7 +79,7 @@ Fast-STREAMS.
 
 @itemize @minus
 @item
-Test.  Almost none of the modules or drivers in this package have been tested throuroughly against
+Test.  Almost none of the modules or drivers in this package have been tested throroughly against
 either LiS or Linux Fast-STREAMS.  One of the primary reasons for this is that The OpenSS7 Project
 does not really use any of these modules or drivers.
 
@@ -99,7 +99,7 @@ to be opened but which communicates on many RTP channels.
 @item
 The OpenSS7 Project has a need for direct interface and interception (drop and insert) capabilities
 at the IP level for the purposes of testing both RTP and SCTP.  This later purpose is less critical
-because Ferry-Clip testing can be rigged to RTP and SCTP to acheive the same effect.
+because Ferry-Clip testing can be rigged to RTP and SCTP to achieve the same effect.
 
 @item
 Although the STREAMS SCTP driver directly interfaces with the IP subsystem at the driver-kernel
@@ -113,7 +113,7 @@ might be possible to make many of The OpenSS7 Project drivers, such as RTP and S
 portable to other operating systems with STREAMS such as Solaris, pSOS, VxWorks, LynxOS, etc.
 (Errr... no.  After examining OpenSolaris IP code, it is so messed up that there is no good way to
 interface to it except at the kernel level.  However, the approach might still be valid for
-portability because the Operating System dependent procedures could be encapsultated in the NPI IP
+portability because the Operating System dependent procedures could be encapsulated in the NPI IP
 driver and then only the NPI IP driver needs to be ported, and not the other upper-layer protocols.
 Yes, the approach still has some validity.)
 @end enumerate

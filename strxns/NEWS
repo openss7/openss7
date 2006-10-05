@@ -1,5 +1,5 @@
-OpenSS7 XNS Networking -- history of user visible changes.  2006-09-22
-$Id: NEWS,v 0.9.2.22 2006/09/24 21:57:26 brian Exp $
+OpenSS7 XNS Networking -- history of user visible changes.  2006-10-03
+$Id: NEWS,v 0.9.2.23 2006/10/05 12:22:27 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,57 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 XNS Networking package.
 
- Major changes for release strxns-0.9.2.4.rc3
+ Major changes for release strxns-0.9.2.4
+-----------------------------------------
+
+   * Now builds 32-bit compatibility libraries and tests them against
+     64-bit kernel modules and drivers.  The `make installcheck' target
+     will now automagically test both 64-bit native and 32-bit
+     compatibility versions, one after the other, on 64-bit platforms.
+
+   * Added versioning of all library symbols.
+
+   * Many documentation updates for all OpenSS7 packages.  Automated
+     release file generation making for vastly improved and timely text
+     documentation present in the release directory.
+
+   * Dropped support for `LiS'.
+
+   * Updated `init' scripts for proper addition and removal of modules.
+
+   * Start assigning majors at major device number 231 instead of major
+     device number 230.  Assign major device number 230 explicitly to
+     the clone device.  Package will now support extended ranges of
+     minor devices on 2.6 kernels under `Linux Fast-STREAMS' only.
+     `strxns' now supports expanded addressable minor device numbers,
+     permitting 2^16 addressable minor devices per major device number
+     on 2.6 kernels: `LiS' cannot support this change.
+
+   * Better detection of SUSE distributions, release numbers and SLES
+     distributions: support for additional `SuSE' distributions on
+     `ix86' as well as `x86_64'.  Added distribution support includes
+     `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
+
+   * Improved compiler flag generation and optimizations for recent
+     `gcc' compilers and some idiosynchratic behaviour for some
+     distributions (primarily SUSE).
+
+   * Optimized compilation is now available also for user level
+     programs in addition to kernel programs.  Added new
+     `--with-optimize' option to `configure' to accomplish this.
+
+   * Added `--disable-devel' `configure' option to suppress building
+     and installing development environment.  This feature is for
+     embedded or pure runtime targets that do not need the development
+     enivironment (static libraries, manual pages, documentation).
+
+   * Added `send-pr' script for automatic problem report generation.
+
+   * The package will now build doxygen(1) html documentation with the
+     'doxy' make target.  See 'make help' or README-make in the
+     distribution for more information.
+
+ Major changes for release strxns-0.9.2.3.rc3
 ---------------------------------------------
 
    * The package will now build doxygen(1) html documentation with the
@@ -35,6 +85,8 @@ OpenSS7 XNS Networking package.
    * Added `--enable-devel' `configure' option for embedded targets.
 
    * Added `send-pr' script for automatic problem report generation.
+
+This was an internal alpha release.
 
  Major changes for release strxns-0.9.2.3
 -----------------------------------------
@@ -153,4 +205,3 @@ This was an internal alpha test release and was not released publicly.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
