@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mexchange.9.man,v 0.9.2.4 2006/04/05 09:43:33 brian Exp $
+.\" @(#) $Id: mexchange.9.man,v 0.9.2.5 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:33 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mexchange.9.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:33  brian
 .\" - moved .so line and updated headers
 .\"
@@ -100,7 +103,11 @@ mblk_t *\fBmexchange\fR(queue_t *\fIq\fR, mblk_t *\fImp\fR, size_t \fIsize\fR, i
 .PP
 .TP \w'primtype\ \ 'u
 .I q
-the write-side queue pointer passed to the write-side queue put or service procedure from which
+the write-side queue pointer passed to the write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure from which
 .BR mexchange ()
 is called.
 .TP
@@ -213,7 +220,7 @@ In general, buffer calls using
 should be used instead of the rather dubious practice of attempting to reuse message blocks.
 This practice may permit a
 .I STREAMS
-module or driver to continue in the face of a system buffer leak that has exhausted the buffer pool;
+driver or module to continue in the face of a system buffer leak that has exhausted the buffer pool;
 however, it is still dubious.
 .PP
 .BR mexchange ()
@@ -262,7 +269,11 @@ is unusable, and a new message block could not be allocated.
 .BR mexchange ()
 can be called from any non-interrupt context, but is normally called from a
 .I STREAMS
-module or driver write-side put or service procedure.
+driver or module write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
 .\"
 .\"
 .SH MP-STREAMS
@@ -273,7 +284,11 @@ message block.  This is normally the case when
 .BR mexchange ()
 is called from a
 .I STREAMS
-module or driver write-side put or service procedure and the passed in message pointer is that which
+driver or module write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure and the passed in message pointer is that which
 was passed into the procedure.
 .\"
 .\"

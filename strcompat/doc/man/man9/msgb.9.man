@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: msgb.9.man,v 0.9.2.9 2006/04/05 10:05:04 brian Exp $
+.\" @(#) $Id: msgb.9.man,v 0.9.2.10 2006/10/05 12:15:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 10:05:04 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: msgb.9.man,v $
+.\" Revision 0.9.2.10  2006/10/05 12:15:45  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.9  2006/04/05 10:05:04  brian
 .\" - get references in right place
 .\"
@@ -90,24 +93,22 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <sys/stream.h>
 .nf
 \fC\s-1
+.B #include <sys/stream.h>
+
 typedef struct msgb {
-    struct msgb *b_next;        /* next msgb on queue */
-    struct msgb *b_prev;        /* prev msgb on queue */
-    struct msgb *b_cont;        /* next msgb in message */
-    unsigned char *b_rptr;      /* rd pointer into datab */
-    unsigned char *b_wptr;      /* wr pointer into datab */
-    struct datab *b_datap;      /* pointer to datab */
-    unsigned char b_band;       /* band of this message */
-    unsigned char b_pad1;       /* padding */
-    unsigned short b_flag;      /* message flags */
-    long b_pad2;                /* padding */
-    /* private Linux Fast-STREAMS specific members */
-    struct queue *b_queue;      /* queue for this message */
-    struct qband *b_bandp;      /* band for this message */
-    size_t b_size;              /* size of this message on queue */
+    struct msgb *b_next;   /* next msgb on queue */
+    struct msgb *b_prev;   /* prev msgb on queue */
+    struct msgb *b_cont;   /* next msgb in message */
+    unsigned char *b_rptr; /* rd pointer into datab */
+    unsigned char *b_wptr; /* wr pointer into datab */
+    struct datab *b_datap; /* pointer to datab */
+    unsigned char b_band;  /* band of this message */
+    unsigned char b_pad1;  /* padding */
+    unsigned short b_flag; /* message flags */
+    unsigned char b_pad2[sizeof(ulong) - 4]; /* padding */
+    long b_csum;           /* checksum */
 } mblk_t;
 \s+1\fP
 .fi
@@ -123,78 +124,129 @@ members:
 the next
 .B msgb
 structure on a
-.BR queue (9)
+.BR queue (9);
+.PD 0
 .TP
 .I b_prev
 the previous
 .B msgb
 structure on a
-.BR queue (9)
+.BR queue (9);
 .TP
 .I b_cont
 next
 .B msgb
-structure in the chain representing a single message
+structure in the chain representing a single message;
 .TP
 .I b_rptr
-a pointer into the data from which to read
+a pointer into the data from which to read;
 .TP
 .I b_wptr
-a pointer into the data to which to write
+a pointer into the data to which to write;
 .TP
 .I b_datap
-a pointtner to the
+a pointer to the
 .B datab
-structure representing the actual data
+structure representing the actual data;
 .TP
 .I b_band
 the
 .BR qband (9)
-to which this message belongs
+to which this message belongs;
 .TP
 .I b_pad1
-padding
+padding;
 .TP
 .I b_flag
 message flags:
+.PD
 .RS
 .TP \w'\ MSGNOTMARKNEXT\ 'u
 .B MSGMARK
-last byte of message is marked
+last byte of message is marked;
 .PD 0
 .TP
 .B MSGNOLOOP
-done't loop message at stream head
+don't loop message at stream head;
 .TP
 .B MSGDELIM
-message is delimited
+message is delimited;
 .TP
 .B MSGNOGET
-UnixWare/Solaris/Mac OT/ UXP/V
-getq does not return message
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR MacOT \(rg,
+.[
+macspg
+.]
+.IR UXP/V \(rg:
+.[
+uxpspg
+.]
+getq does not return message;
 .TP
 .B MSGATTEN
-UXP/V attention to on read side */
+.IR UXP/V \(rg:
+.[
+uxpspg
+.]
+attention to on read side;
 .TP
 .B MSGMARKNEXT
-Solaris */
+.IR Solaris \(rg:
+.[
+solspg
+.]
+next message is marked;
 .TP
 .B MSGLOG
-UnixWare */
+.IR UnixWare \(rg:
+.[
+uw7spg
+.]
+log on arrival of this message;
 .TP
 .B MSGNOTMARKNEXT
-Solaris */
+.IR Solaris \(rg:
+.[
+solspg
+.]
+next message is not marked;
 .TP
 .B MSGCOMPRESS
-OSF/1: compress like messages as space allows */
+.IR OSF/1 \(rg:
+.[
+osfspg
+.]
+compress like messages as space allows;
 .TP
 .B MSGNOTIFY
-OSF/1: notify when message consumed */
+.IR OSF/1 \(rg:
+.[
+osfspg
+.]
+notify when message consumed;
+.TP
+.B MSGCSUM
+.IR "@PACKAGE_TITLE@" :
+.I b_csum
+contains TCP/UDP partial checksum;
+.TP
+.B MSGCRC32C
+.IR "@PACKAGE_TITLE@" :
+.I b_csum
+conatains SCTP partial checksum;
 .PD
 .RE
 .TP
 .I b_pad2
-padding
+padding.
 .PP
 The following members are
 .B Linux Fast-STREAMS
@@ -202,30 +254,34 @@ The following members are
 lfs
 .]
 specific members:
-.TP \w'\ b_bandp\ 'u
-.I b_queue
-the
-.BR queue (9)
-upon which this message is queued,
-.B NULL
-otherwise
-.TP
-.I b_bandp
-the
-.BR qband (9)
-upon which this message is queued,
-.BR NULL
-otherwise
-.TP
-.I b_size
-the size of the message (in bytes) when it was placed on the
-.BR queue (9)
-indicated by
-.I b_queue
+.TP \w'\ b_datap\ 'u
+.I b_csum
+checksum.
+.PD 0
+.PD
+.\".TP \w'\ b_bandp\ 'u
+.\".I b_queue
+.\"the
+.\".BR queue (9)
+.\"upon which this message is queued,
+.\".B NULL
+.\"otherwise
+.\".TP
+.\".I b_bandp
+.\"the
+.\".BR qband (9)
+.\"upon which this message is queued,
+.\".BR NULL
+.\"otherwise
+.\".TP
+.\".I b_size
+.\"the size of the message (in bytes) when it was placed on the
+.\".BR queue (9)
+.\"indicated by
+.\".I b_queue
 .\"
 .\"
-.SH DESCRIPTION
-.SS "Macros"
+.SH MACROS
 The following macros are available in
 .B <sys/strsun.h>
 and are
@@ -262,125 +318,640 @@ Returns the offset of pointer,
 .IR  p ,
 from the base pointer,
 .IR base .
-.SS "Utility Functions"
+.SH FUNCTIONS
 .PP
-The following message block utility functions are provided:
+The following message block utility functions are provided,
+(each of these functions accept a message block pointer as an argument, or are otherwise useful in
+manipulating the data buffer):
 .TP \w'\ msgpullup_physreq(9)\ \-\ 'u
-.BR adjmsg (9)\ \-
+.BR adjmsg "(9)\ \-\ 
+trim bytes from the front or back of a message
 .PD 0
 .TP
-.BR allocb (9)\ \-
+.BR allocb "(9)\ \-\ 
+allocate a message and data block
 .TP
-.BR allocb_physreq (9)\ \-
+.BR allocb_physreq "(9)\ \-\ 
+allocate a message and data block
 .TP
-.BR alloc_proto (9)\ \-
+.BR alloc_proto "(9)\ \-\ 
+allocate a PROTO message
 .TP
-.BR appq (9)\ \-
+.BR appq "(9)\ \-\ 
+append a message after another
 .TP
-.BR bcopy (9)\ \-
+.BR bcopy "(9)\ \-\ 
+copy byte strings
 .TP
-.BR bufcall (9)\ \-
+.BR bufcall "(9)\ \-\ 
+install a buffer callback
 .TP
-.BR bzero (9)\ \-
+.BR bzero "(9)\ \-\ 
+zero a byte string
 .TP
-.BR copyb (9)\ \-
+.BR copyb "(9)\ \-\ 
+copy a message block
 .TP
-.BR copyin (9)\ \-
+.BR copyin "(9)\ \-\ 
+copy bytes from user to kernel
 .TP
-.BR copymsg (9)\ \-
+.BR copymsg "(9)\ \-\ 
+copy a message
 .TP
-.BR copyout (9)\ \-
+.BR copyout "(9)\ \-\ 
+copy bytes from kernel to user
 .TP
-.BR datamsg (9)\ \-
+.BR datamsg "(9)\ \-\ 
+tests a message type for data
 .TP
-.BR dupb (9)\ \-
+.BR dupb "(9)\ \-\ 
+duplicate a message block
 .TP
-.BR dupmsg (9)\ \-
+.BR dupmsg "(9)\ \-\ 
+duplicate a message
 .TP
-.BR esballoc (9)\ \-
+.BR esballoc "(9)\ \-\ 
+allocate a message and data block with a caller supplied data buffer
 .TP
-.BR esbbcall (9)\ \-
+.BR esbbcall "(9)\ \-\ 
+installs a buffer callback for an extended message block
 .TP
-.BR freeb (9)\ \-
+.BR freeb "(9)\ \-\ 
+frees a message block
 .TP
-.BR freemsg (9)\ \-
+.BR freemsg "(9)\ \-\ 
+frees a message
 .TP
-.BR getq (9)\ \-
+.BR getq "(9)\ \-\ 
+gets a message from a message queue
 .TP
-.BR insq (9)\ \-
+.BR insq "(9)\ \-\ 
+inserts a message into a message queue
 .TP
-.BR isdatablk (9)\ \-
+.BR isdatablk "(9)\ \-\ 
+tests a data block for data type
 .TP
-.BR isdatamsg (9)\ \-
+.BR isdatamsg "(9)\ \-\ 
+tests a data block for data type
 .TP
-.BR linkb (9)\ \-
+.BR linkb "(9)\ \-\ 
+link a message block to a message
 .TP
-.BR linkmsg (9)\ \-
+.BR linkmsg "(9)\ \-\ 
+link a message block to a message
 .TP
-.BR mi_bufcall (9)\ \-
+.BR mi_bufcall "(9)\ \-\ 
+reliable alternative to \fBbufcall\fP(9)
 .TP
-.BR msgdsize (9)\ \-
+.BR msgdsize "(9)\ \-\ 
+calculate the size of the data in a message
 .TP
-.BR msgphysreq (9)\ \-
+.BR msgphysreq "(9)\ \-\ 
+physical alignement request structure
 .TP
-.BR msgpullup (9)\ \-
+.BR msgpullup "(9)\ \-\ 
+pull up bytes in a message
 .TP
-.BR msgpullup_physreq (9)\ \-
+.BR msgpullup_physreq "(9)\ \-\ 
+pull up bytes in a message with physical requirements
 .TP
-.BR msgscgth (9)\ \-
+.BR msgscgth "(9)\ \-\ 
+message scatter-gather structure
 .TP
-.BR msgsize (9)\ \-
+.BR msgsize "(9)\ \-\ 
+calculate the size of the message blocks in a message
 .TP
-.BR pcmsg (9)\ \-
+.BR pcmsg "(9)\ \-\ 
+determine priority of a message
 .TP
-.BR pullupmsg (9)\ \-
+.BR pullupmsg "(9)\ \-\ 
+pull up the bytes in a message
 .TP
-.BR put (9)\ \-
+.BR put "(9)\ \-\ 
+invokes a message queue put procedure
 .TP
-.BR putbq (9)\ \-
+.BR putbq "(9)\ \-\ 
+puts a message back on a message queue
 .TP
-.BR putctl1 (9)\ \-
+.BR putctl1 "(9)\ \-\ 
+puts a 1 byte control message on a message queue
 .TP
-.BR putctl2 (9)\ \-
+.BR putctl2 "(9)\ \-\ 
+puts a 2 byte control message on a message queue
 .TP
-.BR putctl (9)\ \-
+.BR putctl "(9)\ \-\ 
+puts a control message on a message queue
 .TP
-.BR puthere (9)\ \-
+.BR puthere (9)\ \-\ 
+invokes a message queue put procedure
 .TP
-.BR putnext (9)\ \-
+.BR putnext "(9)\ \-\ 
+puts a message on the next message queue
 .TP
-.BR putnextctl1 (9)\ \-
+.BR putnextctl1 "(9)\ \-\ 
+puts a 1 byte control message on the next message queue
 .TP
-.BR putnextctl2 (9)\ \-
+.BR putnextctl2 "(9)\ \-\ 
+puts a 2 byte control message on the next message queue
 .TP
-.BR putnextctl (9)\ \-
+.BR putnextctl "(9)\ \-\ 
+puts a control message on the next message queue
 .TP
-.BR putq (9)\ \-
+.BR putq "(9)\ \-\ 
+puts a message on a message queue
 .TP
-.BR qbufcall (9)\ \-
+.BR qbufcall "(9)\ \-\ 
+install a synchronous buffer callback
 .TP
-.BR queclass (9)\ \-
+.BR queclass "(9)\ \-\ 
+return the class of a message
 .TP
-.BR qunbufcall (9)\ \-
+.BR qunbufcall "(9)\ \-\ 
+cancel a synchronous buffer callback
 .TP
-.BR rmvb (9)\ \-
+.BR rmvb "(9)\ \-\ 
+remove a message block from a message
 .TP
-.BR rmvq (9)\ \-
+.BR rmvq "(9)\ \-\ 
+remove a message from a message queue
 .TP
-.BR testb (9)\ \-
+.BR testb "(9)\ \-\ 
+test is a message can be allocated
 .TP
-.BR unbufcall (9)\ \-
+.BR unbufcall "(9)\ \-\ 
+removes a buffer callback
 .TP
-.BR unlinkb (9)\ \-
+.BR unlinkb "(9)\ \-\ 
+unlink a message block from a message
 .TP
-.BR wantmsg (9)\ \-
+.BR wantmsg "(9)\ \-\ 
+provide a filter of wanted messages for a module
 .TP
-.BR xmsgsize (9)\ \-
+.BR xmsgsize "(9)\ \-\ 
+calculate the size of message blocks in a message
 .PD
-
-
-
-.PD
+.PP
+See the corresponding manual page for each utility for more information.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.I STREAMS
+messages are composed of a 3-type consisting of message block
+.RB ( msgb
+structure), data block
+.RB ( datab (9)
+structure) and an associated internal, external, or extended, data buffer.
+Message blocks
+.RB ( msgb
+structures) form an instance of a reference to a data block,
+.BR datab (9),
+and associated data buffer.
+As such, the
+.B msgb
+structure contains information pertaining to the reference instance.
+.PP
+The
+.IR b_datap ,
+.IR b_rptr ,
+.IR b_wptr ,
+and
+.IR b_cont ,
+members are significant in each message block in a message block chain.
+.PP
+.I b_datap
+points to the
+.BR datab (9)
+data block structure which has an associated data buffer.
+See
+.BR datab (9)
+for more information on data blocks.
+.PP
+.I b_rptr
+and
+.I b_wptr
+point into the data buffer to delimit the bytes of the buffer pertinent to the reference.
+.I b_rptr
+is the read-pointer and points where bytes are to be read from the buffer.
+.I b_wptr
+is the write-pointer and points where bytes are to be written to the buffer.
+.PP
+.I b_cont
+is used to link message blocks together to form a message block chain representing a
+.I STREAMS
+message.
+.PP
+Typically, the
+.IR b_next ,
+.IR b_prev ,
+.IR b_band ,
+and
+.IR b_flag ,
+members are only significant in the first message block of a message block chain, and are considered
+to apply to the entire chain of message blocks along the
+.I b_cont
+member.
+.PP
+.I b_next
+and
+.I b_prev
+are used to link the (initial) message block (of a message block chain) onto a message
+.BR queue (9).
+.I b_next
+points to the next message on the message queue, or
+.B NULL
+if the message is at the tail of the message queue.
+.I b_prev
+points to the previous message on the message queue, or
+.B NULL
+if the message is at the head of the message queue.
+.PP
+.I b_band
+indicates the queuing priority when the message is placed on a message queue.
+.PP
+.I b_flag
+contains some flags that can be used to mark a set of binary conditions on a message block or
+message.
+See the description of these flags under
+.RI \(lq Flags \(rq,
+below.
+.SS Flags
+Message flags are significant in the first message block of a message, and are contained in the
+.I b_flag
+member of the
+.B msgb
+structure forming the first message block.  The available flags are as follows:
+.\".TP \w'MSGNOTMARKNEXT\(em'u
+.TP
+.B MSGMARK
+.B MSGMARK
+is recognized by the Stream head.
+.B MSGMARK
+indicates that the last bye of the message is marked.  Marked mesages identify out-of-band data to
+the Stream head.  Marked messages terminate the
+.BR read (2s)
+of unmarked messages, generating a short read, as an indication to the reader that an out-of-band
+condition has occurred.  The
+.BR I_ATMARK (7)
+input-output control command can be used to determine whether the data stream is positioned at a
+marked message, and whether there are further marked messages in the receive buffer.  When
+positioned at a marked message, subsequent reads will consume marked messages.
+.IP ""
+The
+.B MSGMARK
+flag is set by drivers and modules and is recognized by the Stream head.  The flag is only useful
+for messages sent upstream to the Stream head.
+For details, see
+.BR I_ATMARK (7)
+and
+.BR read (2s).
+.TP
+.B MSGNOLOOP
+The
+.B MSGNOLOOP
+flag is set by the Stream head and recognized by the Stream head.  The
+Stream head sets the
+.B MSGNOLOOP
+flag on received
+.BR M_FLUSH (9)
+messages looped back downstream from the Stream head.  If an
+.BR M_FLUSH (9)
+message marked with
+.B MSGNOLOOP
+arrives at the Stream head, the Stream head will not loop the message back downstream, but will
+discard (ignore and free) it.
+The Stream head ignores the
+.B MSGNOLOOP
+flag on messages of type other than
+.BR M_FLUSH (9).
+.IP ""
+This flag should not be modified by drivers and modules.
+For details, see
+.BR M_FLUSH (9).
+.TP
+.B MSGDELIM
+The
+.B MSGDELIM
+flag is both placed on messages in the data stream generated by the Stream head, as well as
+recognized by the Stream head in received messages in the data stream.  When the
+.B SO_DELIM
+option is set on the Stream head using
+.BR M_SETOPTS (9),
+the Stream head will mark the last data message of a complete
+.BR write (2s)
+operation with
+.B MSGDELIM
+as an indication to downstream drivers and modules of record delineation.
+When the Stream head receives a data message with the
+.B MSGDELIM
+flag, the message will terminate a
+.BR read (2s)
+operation, with a short read.  Zero-length messages received with the
+.B MSGDELIM
+flag set will terminate a read and be removed from the receive queue.  (Normally, zero-length
+messages are left on the receive queue for a subsequent read.)
+.IP ""
+Modules and drivers may also generate or recognize messages marked with
+.BR MSGDELIM .
+For details, see
+.BR M_SETOPTS (9),
+.BR write (2s),
+and
+.BR read (2s).
+.TP
+.B MSGNOGET
+The
+.B MSGNOGET
+flag is defined in early header files for
+.IR MacOT \(rg,
+.[
+macspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR UXP/V \(rg,
+.[
+uxpspg
+.]
+and it is commented that this flag tells
+.BR getq (9)
+not to return the message.  However, this flag is poorly documented, and does not appear to be
+implemented.  It may have orignally been used to pin a message on the Stream head receive queue for
+.BR read (2s)
+processing with multiple readers, but has fallen out of use.
+.BR getq (9)
+does not recognize this flag.
+.PP
+The remaining flags are implementation specific and not defined by
+.IR "SVR 4.2 MP" .
+.[
+svr42spg
+.]
+.TP
+.B MSGATTEN
+.IR UXP/V \(rg
+.[
+uxpspg
+.]
+defines this flag and it is described as
+indicating attention to the read side (whatever that means).
+The flag is poorly documented.
+It might be intended to terminate a
+.BR read (2s)
+early, without having to generate an
+.BR M_SIG (9)
+message upstream, and without actually generating a signal and causing
+.BR read (2s)
+to fail.
+Although
+.B @PACKAGE_TITLE@
+defines the flag, the Stream head does not recognize it.
+.TP
+.B MSGMARKNEXT
+.IR Solaris \(rg
+.[
+solspg
+.]
+defines this flag and uses it during Stream head processing of messages marked with
+.BR MSGMARK .
+The flag is poorly documented.
+Its use appears to be private to the Stream head read queue, and this flag should not be set by
+drivers and modules.
+Although
+.B @PACKAGE_TITLE@
+defines the flag, the Stream head does not recognize it.
+.TP
+.B MSGLOG
+.IR UnixWare \(rg:
+.[
+uw7spg
+.]
+defines this flag and it is commented that the message is to be logged on arrival (whatever that
+means).
+The flag is poorly documented.
+It might be intended to request that the Stream head log the message when it arrives in some
+fashion.
+.IP ""
+The flag would then be generated by a driver or module and recognized by the Stream head.
+Although
+.B @PACKAGE_TITLE@
+defines the flag, the Stream head does not recognize it.
+.TP
+.B MSGNOTMARKNEXT
+.IR Solaris \(rg
+.[
+solspg
+.]
+defines this flags and uses it during Stream head processing of messages marked with
+.BR MSGMARK .
+The flag is poorly documented.
+Its use appears to be private to the Stream head read queue, and this flag should not be set by
+drivers and modules.
+Although
+.B @PACKAGE_TITLE@
+defines the flag, the Stream head does not recognize it.
+.TP
+.B MSGCOMPRESS
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+defines this flag and it is commented that this flag request that like messages be compressed as
+space allows (whatever that means).
+The flag is poorly documented.
+It is possible that this flag is sent to the Stream head or intermediate module when a steady stream
+of identical messages is the norm (e.g., this is often the case for Level 2 processing in
+.IR "Signalling System No. 7" ).
+Any like messages queued could simply have a repeat count incremeneted and the copy discarded.
+.IP ""
+This flag could be generated and recognized by Stream head, drivers or modules.
+Although
+.B @PACKAGE_TITLE@
+defines the flag, the Stream head does not recognize it.
+.TP
+.B MSGNOTIFY
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+and
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+define this flag and, in those implementations, it is recognized by the Stream head.
+The flag is poorly documented, however, when a message marked with the
+.B MSGNOTIFY
+flag is received, the Stream head generates an
+.BR M_NOTIFY (9)
+message downstream to notify the driver or module that the message marked with
+.B MSGNOTIFY
+has been read by a user level process.
+.IP ""
+Modules and drivers can set this flag on messages sent to the Stream head.
+Although
+.B @PACKAGE_TITLE@
+defines the flag, the Stream head does not recognize it.
+For details, see
+.BR M_NOTIFY (9).
+.TP
+.B MSGCSUM
+.I @PACKAGE_TITLE@
+.[
+lfs
+.]
+defines this flag.  When checksumming is set on the Stream head with the
+.B SO_CSUM
+option flag set in a
+.BR M_SETOPTS (9)
+message, the Stream head performs TCP/UDP partial checksum while copying in the data portion of a
+.BR write (2s)-like
+operation and places the partial checsum result in the
+.I b_csum
+member of the
+.BR M_DATA (9)
+message block and sets this
+.B MSGCSUM
+flag in the
+.I b_flag
+member of the message block to indicate the validity of the partial checksum.
+.TP
+.B MSGCRC32C
+.I @PACKAGE_TITLE@
+.[
+lfs
+.]
+defines this flag.  When checksumming is set on the Stream head with the
+.B SO_CRC32C
+option flag set in a
+.BR M_SETOPTS (9)
+message, the Stream head performs SCTP partial checksum while copying in the data portion of a
+.BR write (2s)-like
+operation and places the partial checsum result in the
+.I b_csum
+member of the
+.BR M_DATA (9)
+message block and sets this
+.B MSGCRC32C
+flag in the
+.I b_flag
+member of the message block to indicate the validity of the partial checksum.
+.\"
+.\"
+.SH USAGE
+.PP
+Ever modifying the
+.IR b_datap
+pointer, can have dire consequences.  Modifying the
+.IR b_next ,
+.IR b_prev ,
+.IR b_cont ,
+.IR b_rptr ,
+.IR b_wptr ,
+.IR b_band ,
+or
+.IR b_flag ,
+members of a message block while the message exists on a message queue, can have dire consequences.
+These members must be treated as read-only by drivers and modules whenever the message is on a
+message queue.  To modify these members, the message must first be removed from any message queue.
+.PP
+The
+.I b_next
+and
+.I b_prev
+pointers can be modified while the message exists stand-alone; however, any values the module or
+driver may have assigned to these pointers in the first message block of a message will be
+overwritten when the message is placed on a message queue.
+The
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+utility functions place a message on a message queue.
+.PP
+The
+.I b_wptr
+and
+.I b_rptr
+pointers can be modified on stand-alone messages.
+The
+.BR pullupmsg (9),
+.BR msgpullup (9),
+.BR msgsize (9),
+.BR msgdsize (9),
+.BR xmsgsize (9),
+message utility functions are useful for manipulating or examining these pointers.
+.PP
+THe
+.I b_cont
+pointer can be modified on stand-alone messages to link message chains.
+The
+.BR rmvb (9),
+.BR linkb (9),
+.BR unlinkb (9),
+.BR linkmsg (9),
+and
+.BR unlinkmsg (9),
+message utilities are useful for manipulating the
+.I b_cont
+pointer.
+.PP
+.I b_band
+may be modified while the message exists stand-alone; however, when a high priority message is
+placed on a message queue, this member will always be overwritten with zero
+.RB ( 0 ).
+.SS "Macros"
+The following macros are available in
+.RB < sys/strsun.h >
+and are
+.IR Solaris \(rg
+macros that are used to perform some simple operations on message blocks:
+.TP
+.BI MBLKL( mp )
+Returns the length of the message block as a difference between the
+.IR b_wptr " and " b_rptr
+pointers.  This value could be negative.
+.TP
+.BI MBLKSIZE( mp )
+Returns the available length from the data block as a difference between the
+.IR db_lim " and " db_base
+pointers.  This value could be negative.  See also
+.BR datab (9).
+.TP
+.BI MBLKHEAD( mp )
+Returns the available headroom in the data block as a difference between the
+.IR b_rptr " and " db_base
+pointers.  This value could be negative, but should not normally be less than zero.
+.TP
+.BI MBLKTAIL( mp )
+Returns the available headroom in the data block as a difference between the
+.IR db_lim " and " b_wptr
+pointers.  This value could be negative, but should not normally be less than zero.
+.TP
+.BI MBLKIN( mp ", " off ", " len )
+Tests and returns a boolean indicating whether the offset and length provided defines a region that
+is contained within the message block.
+.TP
+.BI OFFSET( base ", " p )
+Returns the offset of pointer,
+.IR  p ,
+from the base pointer,
+.IR base .
 .\"
 .\"
 .SH CONTEXT
@@ -392,6 +963,18 @@ calling thread has exclusive access to the message block.
 .\"
 .SH MP-STREAMS
 .PP
+All
+.I STREAMS
+utility functions that operate on or manipulate
+.B msgb
+message blocks, assume that the caller has exclusive access to the passed in message block pointer.
+When a message is placed to a queue, or the reference is otherwise passed to the called function,
+it is the obligation of the caller to relinquish any references invalidated by the call.
+.PP
+Most of the issues associated with messages impinge of the data block.
+See
+.BR datab (9)
+for more information.
 .\"
 .\"
 .SH NOTICES
@@ -400,9 +983,9 @@ Members of the
 .B msgb
 structure should not be accessed directly by
 .I STREAMS
-modules or drivers.  Portable
+drivers or modules.  Portable
 .I STREAMS
-modules and drivers should, where possible, use the facilities provided for
+drivers and modules should, where possible, use the facilities provided for
 implementation and architectural independence.
 .\"
 .\"
@@ -481,6 +1064,25 @@ svr42
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.IR "SVR 4.2"
+.[
+svr42spg
+.]
+has a
+.B long
+.I b_pad2
+member at the end of the structure.  So do many implementations based on
+.IR "SVR 4.2" .
+Some implementations use this padding for its own purposes.
+.B @PACKAGE_TITLE@
+has removed the added padding so that the resulting 3-tuple can be cache-aligned on both 32-bit and
+64-bit architectures, also so that the internal buffer can be a minimum of 64-bytes on 32-bit
+architectures, and 128-bytes on 64-bit architectures.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not rely on the overall size of a message block, nor access fields intended
+as padding.
 .IP \(em
 The flags defined for the
 .I b_flag

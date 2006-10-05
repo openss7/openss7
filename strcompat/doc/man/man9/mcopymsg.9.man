@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mcopymsg.9.man,v 0.9.2.4 2006/04/05 09:43:32 brian Exp $
+.\" @(#) $Id: mcopymsg.9.man,v 0.9.2.5 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:32 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mcopymsg.9.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:32  brian
 .\" - moved .so line and updated headers
 .\"
@@ -120,7 +123,7 @@ into the caller supplied buffer,
 .BR mcopymsg ()
 can be used in
 .I STREAMS
-.BR ioctl (2)
+.BR ioctl (2s)
 handling code to copy data from a
 .BR M_IOCTL (9)
 or
@@ -151,7 +154,11 @@ could destabilize the kernel or result in a kernel panic.
 .BR mcopymsg ()
 can be called from any non-interrupt context, but is normally called from a
 .I STREAMS
-module or driver write-side put or service procedure.
+driver or module write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
 .\"
 .\"
 .SH MP-STREAMS
@@ -162,7 +169,11 @@ message block.  This is normally the case when
 .BR mcopymsg ()
 is called from a
 .I STREAMS
-module or driver write-side put or service procedure and the passed in message pointer is that which
+driver or module write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure and the passed in message pointer is that which
 was passed into the procedure.
 .\"
 .\"

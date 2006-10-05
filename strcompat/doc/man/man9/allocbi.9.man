@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: allocbi.9.man,v 0.9.2.5 2006/04/05 09:43:30 brian Exp $
+.\" @(#) $Id: allocbi.9.man,v 0.9.2.6 2006/10/05 12:15:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:30 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:41 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: allocbi.9.man,v $
+.\" Revision 0.9.2.6  2006/10/05 12:15:41  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:30  brian
 .\" - moved .so line and updated headers
 .\"
@@ -95,57 +98,204 @@ sort-adjacent-labels
 .HP
 .BI "typedef void (*" allocbi_fcn_t ")(caddr_t);
 .HP
-.BI "int allocbi(size_t " size ", int " pri ", allocbi_fcn_t " func ", caddr_t " arg ", unsigned char *" base );
-int \fBallocbi\fR(int \fIyyy\fR);
+.BI "mblk_t *allocbi(size_t " size ", int " pri ", allocbi_fcn_t " func ", caddr_t " arg ", unsigned char *" base );
+.\"
+.\"
+.SH INTERFACE
+.PP
+.I STREAMS
+.RI ( MacOT \(rg
+.[
+macspg
+.]
+compatibility).
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
 .I size
+the size of the user supplied message buffer.
+.PD 0
 .TP
 .I pri
+the priority of the request.
 .TP
 .I func
+the callback function to call when the buffer is freed.
 .TP
 .I arg
+an argument to pass to the callback function,
+.IR func ,
+when the buffer is freed.
 .TP
 .I base
+the base of the user supplied message buffer.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .BR allocbi ()
+is used where the
+.I STREAMS
+driver needs control over the location, allocation and deallocation of data
+buffers.  This may be because the data buffers are subject to some physical
+constratins (e.g. must be allocated in DMA-able memory, or must exist in
+dual-ported RAM or in a descriptor ring).  This may also be because some other
+mechanism outside of
+.I STREAMS
+has already allocated and passed the data buffer to a
+.I STREAMS
+driver.
+.PP
+.BR allocbi ()
+allocates a message block and a data block using the caller supplied data
+buffer at base,
+.IR base ,
+of the specified size
+.IR size ,
+and priority,
+.IR pri .
+The priority,
+.IR pri ,
+value can be one of the following values:
+.TP \w'\fBBPRI_WAITOK\fP\(em'u
+.B BPRI_LO
+The caller requests a low priority message buffer.
+.PD 0
+.TP
+.B BPRI_MED
+The caller requests a medium priority message buffer.
+.TP
+.B BPRI_HI
+The caller requests a high priority message buffer.
+.TP
+.B BPRI_WAITOK
+The caller requests a low priority message buffer and can block.
+.PD
+.PP
+If
+.BR allocbi ()
+is called with a
+.I pri
+value other than
+.BR BPRI_LOW ", " BPRI_MED ", " BPRI_HI " or " BPRI_WAITOK ,
+the request will be treated as
+.BR BPRI_LO .
+.PP
+The
+.I pri
+argument is ignored by
+.IR "SVR 4"
+.[
+svr4
+.]
+and later implementations.
+.PP
+The data buffer of length
+.I size
+and with the necesssary physical memory type has already been allocated by the
+caller and is pointed to by the argument
+.IR base .
+Also,
+.BR allocbi ()
+accepts a pointer to a callback function,
+.IR func ,
+and an argument for that function,
+.IR arg .
+.PP
+The callback function,
+.IR func ,
+is a
+.B allocbi_fnc_t
+function that returns
+.B void
+and accepts a single
+.B caddr_t
+argument.  This function should performw whatever actionsa are necessary to
+free the buffer pointed to by
+.I base
+passed in the call to
+.BR allocbi ().
+.PP
+The callback function argument,
+.IR arg ,
+is a
+.B caddr_t
+argument that will be passed to a call to
+.I func
+when the message block returned by
+.BR allocbi ()
+is freed directly or indirectly with
+.BR freeb (9)
+or
+.BR freemsg (9).
+.PP
+The allocated message block will have a data block type of
+.BR M_DATA (9).
 .\"
 .\"
 .SH USAGE
 .PP
+Priority
+.BR BPRI_WAITOK
+is added for
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+compatibility and should not be used by portable
+.I STREAMS
+drivers and modules.
+
 .\"
 .\"
 .SH RETURN
 .PP
 When
 .BR allocbi ()
-succeeds, it returns 
-.BR true  " (1);
+succeeds, it returns a
+.RB non- NULL
+pointer to the allocated message block;
 when it fails, it returns
-.BR false " (0).
+.BR NULL .
 .\"
 .\"
 .SH ERRORS
 .PP
 .BR allocbi ()
-fails when 
+fails when a message or data block cannot be allocated.
+.BR allocbi ()
+will always fail to allocate a message block when the number of outstanding
+combind message data block allocated by the
+.I STREAMS
+system exceeds the system control
+.BR sysctl_str_nstrmsgs .
+.BR allocbi ()
+will also fail if
+.I size
+is greater than the system control
+.BR sysctl_str_strmsgsz ,
+the maximum
+.I STREAMS
+message size.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR allocbi ()
-can be called from
+can be called from any context, including usr context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and
+interrupt service routines.  The priority
+.B BPRI_WAITOK
+must only be used from a blocking context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR allocbi ()
+is MP-safe.  The caller has exclusive access to the returned message.
 .\"
 .\"
 .SH NOTICES
@@ -166,10 +316,19 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR allocbi ()
+is implemented with a simple call to
+.BR esballoc (9)
+with argumentss adjusted slightly.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR allocb (9),
+.BR esballoc (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR M_DATA (9),
 .BR maccompat (9),
 .BR STREAMS (9).
 .\"
@@ -187,15 +346,13 @@ is compatible with
 .IR MacOT \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 .BR allocbi ()
 is an
 .IR MacOT \(rg-specific
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
-The more common
+The more portable
 .BR allocb (9)
 or
 .BR esballoc (9)

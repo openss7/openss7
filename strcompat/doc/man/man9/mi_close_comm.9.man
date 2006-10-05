@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_close_comm.9.man,v 0.9.2.9 2006/04/05 09:43:33 brian Exp $
+.\" @(#) $Id: mi_close_comm.9.man,v 0.9.2.10 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:33 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_close_comm.9.man,v $
+.\" Revision 0.9.2.10  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.9  2006/04/05 09:43:33  brian
 .\" - moved .so line and updated headers
 .\"
@@ -87,13 +90,13 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #define _AIX_SOURCE
-.br
-.B #define _MAC_SOURCE
+.B #define _MPS_SOURCE
 .br
 .B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
 .HP
 int \fBmi_close_comm\fR(caddr_t *\fIstatep\fR, queue_t *\fIq\fR);
 .\"
@@ -107,9 +110,15 @@ Specifies the address of a static pointer which will be used internally by
 to store the address of the module's list of open streams.
 .TP
 .I q
-A pointer to the module or driver's read queue,
+A pointer to the driver or module's read queue,
 obtained directly from
-.BR qclose (9).
+.IR qi_qclose (9).
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
 .\"
 .\"
 .SH DESCRIPTION
@@ -120,7 +129,7 @@ performs housekeeping during
 driver or module close operations.
 .BR mi_close_comm ()
 is intended to be called by the driver or module
-.BR qclose (9)
+.IR qi_qclose (9)
 procedure.  It releases memory allocated by a previous
 .BR mi_open_comm (9)
 call, and frees the minor number for reuse.
@@ -164,7 +173,7 @@ can be called from User Context.
 is normally called from within a
 .I STREAMS
 module's
-.BR qclose (9)
+.IR qi_qclose (9)
 procedure (User Context).
 .\"
 .\"
@@ -177,20 +186,21 @@ is MP-safe.
 .SH NOTICES
 .PP
 .BR mi_close_comm ()
-is a
-.IR AIX \(rg-specific
-and
-.IR MacOT \(rg-specific
+is an
+.IR MPS \(rg-specific
 function:
+.BR _MPS_SOURCE ,
 .B _AIX_SOURCE
 or
 .B _MAC_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.BR "@PACKAGE_TITLE@"
 must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
 .BR CONFIG_STREAMS_COMPAT_AIX ,
 .BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
-.B CONFIG_STREAMS_COMPAT_MAC
+.BR CONFIG_STREAMS_COMPAT_MAC
 or
 .B CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
@@ -199,7 +209,7 @@ defined.
 .SH EXAMPLES
 .PP
 Following is an example of a module
-.BR qclose (9)
+.IR qi_qclose (9)
 procedure using
 .BR mi_close_comm ():
 (See also the example for
@@ -221,7 +231,7 @@ xxx_qclose(queue_t *q, int oflag, cred_t *crp)
 .\"
 .SH "SEE ALSO"
 .PP
-.BR qclose (9),
+.IR qi_qclose (9),
 .BR mi_open_comm (9),
 .BR mi_next_ptr (9),
 .BR ddi_soft_state_free (9),
@@ -237,18 +247,19 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR mi_close_comm ()
-is compatible with
-.IR AIX \(rg
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
 and
-.IR MacOT \(rg
+.IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR mi_close_comm ()
 is an
-.IR AIX \(rg-specific
-and
-.IR MacOT \(rg-specific
-function and it should not be used by portable
+.IR MPS \(rg-specific
+function and should not be used by portable
 .I STREAMS
 drivers and modules.
 .IP \(em
@@ -282,21 +293,17 @@ and
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.BR "@PACKAGE_TITLE@"
 .[
 lfs
 .]
 differ from that of
-.IR AIX \(rg
-and
-.IR MacOT \(rg,
+.IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
 .BR mi_close_comm ()
 only provides functionality comparable to
-.IR AIX \(rg
-and
-.IR MacOT \(rg
+.IR MPS \(rg
 for use by
 .I STREAMS
 drivers and modules.
@@ -307,42 +314,59 @@ in support of
 devices are not supported.
 .PP
 See
+.BR mpscompat (9),
 .BR aixcompat (9),
-.BR maccompat (9)
+.BR maccompat (9),
 and
 .BR STREAMS (9)
-for additional compatibility information.
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR AIX \(rg
-.[
-aixdoc
-.]
-.[
-aixspg
-.]
-and
+.IR MPS \(rg
+DDI documentation,
 .IR MacOT \(rg
+DDI documentation,
 .[
-macdoc
+macotr
 .]
 .[
 macspg
 .]
-DDI documentation.
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR mi_close_comm ()
 first appeared in
-.IR AIX \(rg
+.IR MPS \(rg.
+.BR mi_close_comm ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_close_comm ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
 and
-.IR MacOT \(rg.
-This is probably a Mentat, Inc. function (thus the
-.IR mi_ ).
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_close_comm ()
+appears in
+.IR Solaris \(rg.
 .\"
 .\"
 .[

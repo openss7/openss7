@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: streams_put.9.man,v 0.9.2.6 2006/04/05 09:43:35 brian Exp $
+.\" @(#) $Id: streams_put.9.man,v 0.9.2.7 2006/10/05 12:15:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:35 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: streams_put.9.man,v $
+.\" Revision 0.9.2.7  2006/10/05 12:15:46  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:35  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B streams_put
-\- invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+\- invoke the put procedure for a \fISTREAMS\fP driver or module with a \fISTREAMS\fP message
 .\"
 .\"
 .SH SYNOPSIS
@@ -102,15 +105,53 @@ sort-adjacent-labels
 .PP
 .TP
 .I func
+a function that will be called when write access has been acheived.
 .TP
 .I q
+a pointer to the queue for which to upgrade to writer.
 .TP
 .I mp
+a
+.I STREAMS
+message to pass to the call-out function.
 .TP
 .I private
+a private pointer to pass to the call-out function.
 .\"
 .\"
 .SH DESCRIPTION
+.PP
+.BR streams_put ()
+schedules the call-out function,
+.IR func ,
+to be executed with the private pointer,
+.IR private ,
+and the passed in message,
+.IR mp ,
+once the driver or module queue can be entered exclusively.
+.PP
+If there is no synchronization in effect for the queue,
+.IR q ,
+then this function has the same effect as calling
+.I proc
+directly with
+.IR private " and " mp
+as arguments.
+.PP
+It is typical to pass
+.IR q
+also in the
+.I private
+argument.
+The call
+.BI streams_put( &put ", " q ", " mp ", " q )
+effectives calls the
+.BR put (9)
+function from outside of
+.IR STREAMS .
+.\"
+.\"
+.SH USAGE
 .PP
 .BR streams_put ()
 allows
@@ -125,10 +166,10 @@ passing it a function and a queue pointer,
 .IR q .
 .B Linux Fast-STREAMS
 runs the function as if it were the queue's
-.BR put (9)
+.IR qi_putp (9)
 procedure.  The function can safely manipulate the queue and access the same data structures as the
 queue's
-.BR put (9)
+.IR qi_putp (9)
 procedure.
 .BR streams_put ()
 passes
@@ -149,34 +190,52 @@ uses fields in the message block not visible to the
 programmer.
 .\"
 .\"
-.SH USAGE
-.PP
-.\"
-.\"
 .SH RETURN
 .PP
-When
 .BR streams_put ()
-succeeds, it returns 
-.BR DDI_SUCCESS ;
-when it fails, it returns
-.BR DDI_FAILURE .
+returns
+.BR void .
 .\"
 .\"
 .SH ERRORS
 .PP
+When
 .BR streams_put ()
-fails when 
+fails, it fails silently.
+.BR streams_put ()
+fails when
+.IR q
+is invalid.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR streams_put ()
-can be called from
+can be called from any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR streams_put ()
+is MP-safe and was intended to support MP-safe operation in the SMP
+environment.
+.PP
+Considerations should be given when writing the call-out function that the
+function may execute in parallel with asynchronous entry points, callbacks,
+call-outs and interrupt service procedures.
+.PP
+However, in
+.BR "Linux Fast-STREAMS" ,
+the call-out function is scheduled on the same CPU and the CPU which called
+.BR streams_put ().
+This means that
+.BR streams_put ()
+will return before the call-out function executes when called on the ICS.
+Also, when called on the ICS, the call-out function will not execute before
+the calling function returns or the next preemption point is encountered.
+.PP
+When called from any other context, the call-out function will execute before
+the call returns.
 .\"
 .\"
 .SH NOTICES
@@ -197,11 +256,36 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.B @PACKAGE_TITLE@
+uses
+a single mechanism,
+.BR __strwrit (),
+for supporting all queue writer functions such as
+.BR qwriter (9)
+and
+.BR mps_become_writer (9),
+and a single mechanism,
+.BR __strfunc (),
+for supporting all queue put function such as
+.BR streams_put ().
+.PP
+When called on the ICS, execution of the call-out function is deferrred until
+the next run of the
+.I STREAMS
+scheduler,
+.BR strqsched (9),
+and the function simply returns.
+When called from any other context, synchronization is performed and the call-out function is executed immediately thereafter
+and before returning.  See
+.BR mp-streams (9)
+for more information.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
 .BR put (9),
+.BR qwriter (9),
+.BR mps_become_writer (9),
 .BR hpuxcompat (9),
 .BR STREAMS (9).
 .\"
@@ -219,17 +303,17 @@ is compatible with
 .IR HP-UX \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 .BR streams_put ()
 is an
 .IR HP-UX \(rg-specific
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
-The more common
+The standard
+.BR freezestr (9)
+and
 .BR put (9)
-function should be used in its stead.
+functions should be used in its stead.
 .IP \(em
 .BR streams_put ()
 is provided for source level compatibility with

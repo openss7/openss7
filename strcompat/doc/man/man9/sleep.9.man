@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sleep.9.man,v 0.9.2.8 2006/04/05 09:43:35 brian Exp $
+.\" @(#) $Id: sleep.9.man,v 0.9.2.9 2006/10/05 12:15:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:35 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sleep.9.man,v $
+.\" Revision 0.9.2.9  2006/10/05 12:15:46  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:35  brian
 .\" - moved .so line and updated headers
 .\"
@@ -194,7 +197,7 @@ is provided for source level compatibility with
 .IR HP-UX \(rg
 for the purpose of porting
 .IR HP-UX \(rg
-modules and drivers to
+drivers and modules to
 .BR Linux .
 Because internal structures and definitions for
 .B Linux Fast-STREAMS

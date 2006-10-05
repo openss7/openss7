@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/24 09:01:06 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/10/05 12:15:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:06 $ by $Author: brian $
+ Last Modified $Date: 2006/10/05 12:15:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/24 09:01:06 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/10/05 12:15:55 $"
 
 static char const ident[] =
-    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/24 09:01:06 $";
+    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/10/05 12:15:55 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/07/24 09:01:06 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/10/05 12:15:55 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"
@@ -273,6 +273,60 @@ extern mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t le
  *  MPS_INTR_ENABLE
  *  -------------------------------------------------------------------------
  */
+/*
+ *  MPNOTIFY
+ *  -------------------------------------------------------------------------
+ */
+STATIC streams_inline streams_fastcall __hot_out struct mdbblock *
+mb_to_mdb(register mblk_t *mb)
+{
+	return ((struct mdbblock *) mb);
+}
+STATIC streams_inline streams_fastcall __hot_in mblk_t *
+db_to_mb(register dblk_t *db)
+{
+	return ((mblk_t *) ((struct mbinfo *) db - 1));
+}
+STATIC streams_inline streams_fastcall __hot_in unsigned char *
+db_to_buf(register dblk_t *db)
+{
+	return (&mb_to_mdb(db_to_mb(db))->databuf[0]);
+}
+
+static void
+mpnotify_func(caddr_t arg)
+{
+	dblk_t *db = (dblk_t *) arg;
+
+	/* first call notification function */
+	(*db->db_frtnp[1].free_func) (db->db_frtnp[1].free_arg);
+	/* restore pointer */
+	if (db->db_base != db_to_buf(db)) {
+		db->db_frtnp = (struct free_rtn *) (db + 1);
+		/* call free function */
+		(*db->db_frtnp[0].free_func) (db->db_frtnp[0].free_arg);
+	} else
+		db->db_frtnp = NULL;
+	return;
+}
+
+int
+mpnotify(mblk_t *mp, mpnotify_func_t func, caddr_t arg)
+{
+	struct free_rtn *frtnp;
+
+	if ((frtnp = kmem_alloc(2 * sizeof(struct free_rtn), KM_NOSLEEP))) {
+		frtnp[0].free_func = &mpnotify_func;
+		frtnp[0].free_arg = (void *) mp->b_datap;
+		frtnp[1].free_func = func;
+		frtnp[1].free_arg = arg;
+		mp->b_datap->db_frtnp = frtnp;
+		return (1);
+	}
+	return (0);
+}
+
+EXPORT_SYMBOL_NOVERS(mpnotify);
 
 #ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
 static

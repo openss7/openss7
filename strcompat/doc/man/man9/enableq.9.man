@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: enableq.9.man,v 0.9.2.8 2006/04/05 10:05:03 brian Exp $
+.\" @(#) $Id: enableq.9.man,v 0.9.2.9 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 10:05:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: enableq.9.man,v $
+.\" Revision 0.9.2.9  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.8  2006/04/05 10:05:03  brian
 .\" - get references in right place
 .\"
@@ -85,7 +88,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B enableq
-\- schedules a \fISTREAMS\fR message queue service routine
+\- schedules a \fISTREAMS\fR message queue service procedure
 .\"
 .\"
 .SH SYNOPSIS
@@ -101,16 +104,25 @@ sort-adjacent-labels
 the queue to enable.
 .\"
 .\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR enableq ()
-schedules the service procedure of the queue pointed to by
+schedules the
+.IR qi_srvp (9)
+procedure of the queue pointed to by
 .I q
 to be run by
 .BR runqueues (9).
 If the queue pointed to by
 .I q
-does not have a service proceedure (i.e.
+does not have a
+.IR qi_srvp (9)
+proceedure (i.e.
 .I q->q_info->qi_srvp
 is
 .BR NULL )
@@ -118,7 +130,9 @@ or has been disabled with a call to
 .BR noenable (9),
 then
 .BR enableq ()
-will fail to schedule the service procedure.
+will fail to schedule the
+.IR qi_srvp (9)
+procedure.
 Whether the queue can be scheduled with
 .BR enableq ()
 can be determined to some degree with a call to
@@ -130,30 +144,38 @@ can be determined to some degree with a call to
 .BR enableq ()
 is normally called to indirectly invoke the execution of
 .IR q 's
-service procedure.
+.IR qi_srvp (9)
+procedure.
 .\"
 .\"
 .SH RETURN
 .PP
 When
 .BR enableq ()
-successfully schedules the queue service procedure with
+successfully schedules the queue
+.IR qi_srvp (9)
+procedure with
 .BR qschedule (9),
 it returns true (1).  When
 .BR enableq ()
-fails to schedule the queue service procedure, it returns false (0).
+fails to schedule the queue
+.IR qi_srvp (9)
+procedure, it returns false (0).
 .\"
 .\"
 .SH ERRORS
 .PP
 .BR enableq ()
-silently if the
+fails and returns false (0)
+if the
 .B QNOENB
 flag was set by
 .BR noenable (9)
 for the queue,
 .IR q ,
-or fi the queue has no service procedure
+or if the queue has no
+.IR qi_srvp (9)
+procedure
 .RI ( q->q_info->qi_srvp
 is
 .BR NULL ).
@@ -163,7 +185,7 @@ is
 .PP
 .BR enableq ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -172,12 +194,16 @@ callouts, callbacks, soft interrupts and interrupt service routines.
 is MP-safe.
 .PP
 If the queue was not already enabled
-.RB ( srv (9)
+.RI ( qi_srvp (9)
 procedure already scheduled to run) on a different CPU,
 .BR enableq ()
-schedules the service procedure of
+schedules the
+.IR qi_srvp (9)
+procedure of
 .I q
-on the current CPU.  In this case, the queue service procedure for
+on the current CPU.  In this case, the queue
+.IR qi_srvp (9)
+procedure for
 .I q
 will not execute until after
 .BR enableq ()
@@ -186,8 +212,12 @@ returns and the function that called
 returns or encounters a preemption point.
 However, if the queue is already scheduled by another processor  and
 .BR enableq ()
-was not called from a context synchronous with the service procedure, another
-processor may run the service procedure before
+was not called from a context synchronous with the
+.IR qi_srvp (9)
+procedure, another
+processor may run the
+.IR qi_srvp (9)
+procedure before
 .BR enableq ()
 returns.
 .PP
@@ -200,7 +230,9 @@ call to
 .BR enableq (),
 if it is ncessary to synchronize the call to
 .BR enableq ()
-with execution of the service procedure.
+with execution of the
+.IR qi_srvp (9)
+procedure.
 .\"
 .\"
 .SH NOTICES
@@ -219,7 +251,7 @@ that has not yet completed service,
 will have no effect.
 .PP
 Enabling a queue from within its own service procedure,
-.BR srv (9),
+.IR qi_srvp (9),
 will not reschedule the service procedure.
 .\"
 .\"

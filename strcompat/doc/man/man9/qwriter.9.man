@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: qwriter.9.man,v 0.9.2.8 2006/04/05 09:43:34 brian Exp $
+.\" @(#) $Id: qwriter.9.man,v 0.9.2.9 2006/10/05 12:15:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:34 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: qwriter.9.man,v $
+.\" Revision 0.9.2.9  2006/10/05 12:15:45  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:34  brian
 .\" - moved .so line and updated headers
 .\"
@@ -171,6 +174,38 @@ although
 is a different mechanism.)
 .\"
 .\"
+.SH USAGE
+.PP
+.BR qwriter ()
+allows
+.RI non- STREAMS
+software to safely call
+.I STREAMS
+utilities.
+.RI Non- STREAMS
+code can call
+.BR qwriter (),
+passing it a function and a queue pointer,
+.IR q .
+.B @PACKAGE_TITLE@
+runs the function as it it were the queue's
+.BR qi_putp (9)
+procedure.  The function can safely manipulate the queue and access the same
+data structure as the queue's
+.BR qi_putp (9)
+procedure.
+.BR qwriter ()
+passes
+.IR q " and " mp " to " proc .
+The caller must pass a valid message block pointer,
+.IR mp ,
+because
+.B @PACKAGE_TITLE@
+uses fields in the message block not visible to the
+.I STREAMS
+programmer.
+.\"
+.\"
 .SH RETURN
 .PP
 .BR qwriter ()
@@ -187,9 +222,9 @@ always succeeds.
 .PP
 .BR qwriter ()
 can only be called by a 
-.BR put (9)
+.IR qi_putp (9)
 or 
-.BR srv (9)
+.IR qi_srvp (9)
 procedure or from a queue callback function (see
 .BR qtimeout (9)
 or
@@ -199,6 +234,7 @@ or
 .SH MP-STREAMS
 .PP
 .BR qwriter ()
+is MP-safe and was intended to support MP-safe operation in the SMP
 is MP-safe.
 .PP
 Considerations should be given when writing the call-out function that the
@@ -211,6 +247,9 @@ the call-out function is scheduled on the same CPU and the CPU which called
 .BR qwriter ().
 This means that
 .BR qwriter ()
+will return before the call-out function executes when called on the ICS.
+Also, when called on the ICS, the call-out function will not execute before
+the calling function returns or the next preemption point is encountered.
 will return before the call-out function executes.  In addition, the call-out
 function will not execute before the calling function returns or the next
 preemption point is encountered.
@@ -220,9 +259,9 @@ preemption point is encountered.
 .PP
 .BR qwriter ()
 must only be called from a queue
-.BR put (9)
+.IR qi_putp (9)
 or
-.BR srv (9)
+.IR qi_srvp (9)
 procedure.
 .PP
 .BR qwriter ()
@@ -233,6 +272,33 @@ executes, or the call-out function,
 may be executed on the calling thread before
 .BR qwriter ()
 returns.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B @PACKAGE_TITLE@
+uses
+a single mechanism,
+.BR __strwrit (),
+for supporting all queue writer functions such as
+.BR qwriter ()
+and
+.BR mps_become_writer (9),
+and a single mechanism,
+.BR __strfunc (),
+for supporting all queue put function such as
+.BR streams_put (9).
+.PP
+When called on the ICS, execution of the call-out function is deferrred until
+the next run of the
+.I STREAMS
+scheduler,
+.BR strqsched (9),
+and the function simply returns.
+When called from any other context, synchronization is performed and the call-out function is executed immediately thereafter
+and before returning.  See
+.BR mp-streams (9)
+for more information.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -279,7 +345,45 @@ and
 .IR LiS ,
 do not provide this function.
 .IP \(em
-Binary compatibility is not guaranteed.
+.BR qwriter ()
+is a
+.IR Solaris \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The standard
+.BR freezestr (9)
+and
+.BR put (9)
+functions should be used in its stead.
+.IP \(em
+.BR qwriter ()
+is provided for source level compatibility with
+.IR Solaris \(rg
+for the purpose of porting
+.IR Solaris \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR Solaris \(rg,
+binaries are incompatible.
+.ip \(em
+.BR qwriter ()
+only provides functionality comparable to
+.IR Solaris \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR qwriter ()
+in support of
+.RI non- STREAMS
+devices are not supported.
 .PP
 See
 .BR STREAMS (9)

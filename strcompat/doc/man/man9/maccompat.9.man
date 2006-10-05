@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: maccompat.9.man,v 0.9.2.5 2006/04/05 09:43:32 brian Exp $
+.\" @(#) $Id: maccompat.9.man,v 0.9.2.6 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:32 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: maccompat.9.man,v $
+.\" Revision 0.9.2.6  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:32  brian
 .\" - moved .so line and updated headers
 .\"
@@ -221,7 +224,7 @@ pull up bytes in a \fISTREAMS\fR message
 pull up the bytes in a \fISTREAMS\fP message
 .HP
 .BR put (9)\ \-\ \c
-invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+invoke the put procedure for a \fISTREAMS\fP driver or module with a \fISTREAMS\fP message
 .HP
 .BR putbq (9)\ \-\ \c
 put a message back on a \fISTREAMS\fP message queue
@@ -409,13 +412,16 @@ are as follows:
 assign notification callback to a \fISTREAMS\fR message
 .HP
 .BR puthere (9)\ \-\ \c
-invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+invoke the put procedure for a \fISTREAMS\fP driver or module with a \fISTREAMS\fP message
 .HP
 .BR mps_become_writer (9)\ \-\ \c
+invoke a put procedure like call-out with exclusive access to a Stream
 .HP
 .BR mps_intr_disable (9)\ \-\ \c
+disable interrupts
 .HP
 .BR mps_intr_enable (9)\ \-\ \c
+enable interrupts
 .PD
 .\"
 .SS "\fIMPS\fP\fR\(rg\fP Transport Functions"
@@ -473,22 +479,26 @@ package:
 .\"
 .SH USAGE
 .PP
+For usage an example of the various functions, see the individual manual pages.
 .\"
 .\"
-.SH RETURN
-.PP
+.\".SH RETURN
+.\".PP
 .\"
 .\"
-.SH ERRORS
-.PP
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
 .SH CONTEXT
 .PP
+These functions can be executed from various contexts as described in each separate manual page.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Most of these functions are MP-safe; however,
+see the manual page for the individual function for detailed information.
 .\"
 .\"
 .SH NOTICES
@@ -529,14 +539,19 @@ functions loads.
 .\"
 .SH IMPLEMENTATION
 .PP
+Core functions are implemented within the
+.B @PACKAGE_TITLE@
+framework.
+.IR MacOT \(rg-specific
+functions are implemented as described in the separate manual pages describing each facility.
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
-.SH SYSCTLS
-.PP
+.\".SH SYSCTLS
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -667,6 +682,9 @@ General:
 .\"
 .SH BUGS
 .PP
+The
+.IR MacOT \(rg
+compatibility suite has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY

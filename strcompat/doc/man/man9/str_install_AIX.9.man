@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: str_install_AIX.9.man,v 0.9.2.8 2006/04/05 09:43:35 brian Exp $
+.\" @(#) $Id: str_install_AIX.9.man,v 0.9.2.9 2006/10/05 12:15:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:35 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: str_install_AIX.9.man,v $
+.\" Revision 0.9.2.9  2006/10/05 12:15:46  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:35  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B str_install
-\- install or uninstall a \fISTREAMS\fP module or driver
+\- install or uninstall a \fISTREAMS\fP driver or module
 .\"
 .\"
 .SH SYNOPSIS
@@ -125,7 +128,7 @@ unload a module
 .I conf
 a pointer to a
 .BR strconf_t (9)
-structure specifying the characteristics of the module or driver upon which to
+structure specifying the characteristics of the driver or module upon which to
 perform the action.
 .\"
 .\"
@@ -173,18 +176,20 @@ structure.
 .TP
 .I sc_open_stylesc_flags
 Gosh does that ever look like a typo!
-Specifies the style of the driver or module open routine and characteristics
-of the module or driver.  Possible values are:
+Specifies the style of the driver or module
+.IR qi_qopen (9)
+procedure and characteristics
+of the driver or module.  Possible values are:
 .RS
 .PP
 One of the following two flags must be set to indicate the style of
 the module's
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure:
 .TP
 .B STR_NEW_OPEN
 The
-.BR qopen (9)
+.IR qi_qopen (9)
 syntax and semantics as used in
 .IR "SVR 4" .
 .[
@@ -193,7 +198,7 @@ svr4
 .TP
 .B STR_OLD_OPEN
 The
-.BR qopen (9)
+.IR qi_qopen (9)
 syntax and semantics as used in
 .IR "SVR 3"
 .[
@@ -231,25 +236,27 @@ if the module is not multiprocesor-safe.
 Specifies that the module accepts to run at per-stream synchronization level.
 .TP
 .B STR_Q_NOTTOSPEC
-Specifies that the module is designed to run it's service procedure
-.RB ( srvp (9))
-under process context.
+Specifies that the module is designed to run it's
+.IR qi_srvp (9)
+procedure under process context.
 By default
 .I STREAMS
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure run at interrupt context (softIRQ).  If the
 .I STREAMS
 module wants to execute its
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure under process context, it needs to set this flag.
 .TP
 .B STR_64BIT
 Specifies that the module is capable of supporting 64-bit data types.
 .TP
 .B STR_NEWCLONING
-Specifies that the driver open uses new-style cloning.  Under this style, the
+Specifies that the driver
+.IR qi_qopen (9)
+uses new-style cloning.  Under this style, the
 driver
-.BR qopen (9)
+.IR qi_qopen (9)
 does not check for
 .B CLONEOPEN
 and yet returns a new device number.
@@ -267,14 +274,14 @@ for the module.  There are seven levels of synchronization as follows:
 .BR SQLVL_NOP "\- No synchronization"
 Specifies that each queue can be accessed by more than one thread at the same
 time.  The protection of internal data and of
-.BR putp (9)
+.IR qi_putp (9)
 and
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure against
 .BR timeout (9)
 or
 .BR bufcall (9)
-is done by the module or driver itself.  This synchronization level should be
+is done by the driver or module itself.  This synchronization level should be
 used essentially for multiprocessor-efficient modules.
 .TP
 .BR SQLVL_QUEUE "\- Queue level"
@@ -407,7 +414,7 @@ Under
 .IR AIX \(rg
 to support dynamic loading and unloading of kernel modules, each
 .I STREAMS
-module or driver provides a configuration procedure.  This procedure is called
+driver or module provides a configuration procedure.  This procedure is called
 each time the extension is referenced in a load or unload operation.  The
 system provides a name and a device number when the module loads.
 .IP ""

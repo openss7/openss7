@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_strtol.9.man,v 0.9.2.3 2006/04/05 09:43:33 brian Exp $
+.\" @(#) $Id: mi_strtol.9.man,v 0.9.2.4 2006/10/05 12:15:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:33 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_strtol.9.man,v $
+.\" Revision 0.9.2.4  2006/10/05 12:15:44  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.3  2006/04/05 09:43:33  brian
 .\" - moved .so line and updated headers
 .\"
@@ -89,6 +92,8 @@ sort-adjacent-labels
 .PP
 .B #define _MPS_SOURCE
 .br
+.B #include <sys/stream.h>
+.br
 .B #include <sys/ddi.h>
 .br
 .B #include <sys/mpsddi.h>
@@ -100,6 +105,12 @@ int \fBxxx\fR(int \fIyyy\fR);
 .PP
 .TP
 .I yyy
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
 .\"
 .\"
 .SH DESCRIPTION
@@ -140,16 +151,23 @@ can be called from
 .SH NOTICES
 .PP
 .BR xxx ()
-is a
+is an
 .IR MPS \(rg-specific
 function:
-.B _MPS_SOURCE
-must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
-must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_MPS
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
 or
-.B CONFIG_STREAMS_COMPAT_MPS_MODULE
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
 .\"
 .\"
@@ -160,6 +178,8 @@ defined.
 .SH "SEE ALSO"
 .PP
 .BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
 .BR STREAMS (9).
 .\"
 .\"
@@ -172,12 +192,15 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR xxx ()
-is compatible with
-.IR MPS \(rg
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 .BR xxx ()
 is an
 .IR MPS \(rg-specific
@@ -196,7 +219,7 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.BR "@PACKAGE_TITLE@"
 .[
 lfs
 .]
@@ -217,7 +240,9 @@ in support of
 devices are not supported.
 .PP
 See
-.BR mpscompat (9)
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
 and
 .BR STREAMS (9)
 for additional compatibility considerations.
@@ -226,7 +251,20 @@ for additional compatibility considerations.
 .SH CONFORMANCE
 .PP
 .IR MPS \(rg
-DDI documentation.
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
 .\"
 .\"
 .SH HISTORY
@@ -235,10 +273,26 @@ DDI documentation.
 first appeared in
 .IR MPS \(rg.
 .BR xxx ()
-is a Mentat, Inc. function that goes all the way back to the
+is a
+Mentat, Inc. function that goes all the way back to the
 .RI pre- OSF/1
 .I Mentat
 implementations.
+.BR xxx ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR xxx ()
+appears in
+.IR Solaris \(rg.
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lfscompat.9.man,v 0.9.2.3 2006/04/05 09:43:32 brian Exp $
+.\" @(#) $Id: lfscompat.9.man,v 0.9.2.4 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:32 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lfscompat.9.man,v $
+.\" Revision 0.9.2.4  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.3  2006/04/05 09:43:32  brian
 .\" - moved .so line and updated headers
 .\"
@@ -87,11 +90,22 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B insmod lfscompat.o
+.B #define _LFS_SOURCE
+.br
+.B #include <sys/ddi.h>
 .\"
 .\"
 .SH OVERVIEW
 .PP
+.B @PACKAGE_TITLE@
+provides a compatibility module,
+.I streams-lfscompat
+that provides compatibility functions that smooth porting of drivers from the
+.I LiS-2.18.x
+.I STREAMS
+environment to
+.BR "@PACKAGE_TITLE@" .
+The functions provided by this compatibility module are described here.
 .\"
 .\"
 .SH DESCRIPTION
@@ -177,44 +191,155 @@ may fail to operate with the
 .IR "LfS Compatibility Module" .
 .\"
 .\"
-.SH RETURN
+.SH USAGE
 .PP
+For usage an example of the various functions, see the individual manual pages.
 .\"
 .\"
-.SH "ERROR HANDLING"
-.PP
+.\".SH RETURN
+.\".PP
+.\"
+.\"
+.\".SH "ERROR HANDLING"
+.\".PP
 .\"
 .\"
 .SH CONTEXT
 .PP
+These functions can be executed from various contexts as described in each separate manual page.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Most of these functions are MP-safe; however, see the separate manual pages.
 .\"
 .\"
 .SH NOTICES
 .PP
+.B _LFS_SOURCE
+must be defined before including DDI/DKI include files to expose
+.IR LFS \(rg-specific
+symbols.
+To use
+.IR LFS \(rg-specific
+functions,
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_LFS
+or
+.B CONFIG_STREAMS_COMPAT_LFS_MODULE
+defined.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_LFS
+defined,
+.IR LFS \(rg
+compatibility will become part of the
+.B @PACKAGE_TITLE@
+.I streams
+kernel module.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_LFS_MODULE
+defined,
+.IR LFS \(rg
+compatibility will be placed in a separate
+.I streams-lfscompat
+kernel module that will demand load when any
+.I STREAMS
+driver or module that uses the
+.IR LFS \(rg-specific
+functions loads.
+.PP
+The
+.I streams-lfscompat
+module is only built when building the
+.B @PACKAGE_TITLE@
+package with
+.IR LiS ;
+otherwise, these functions are provided by the core
+.B Linux Fast-STREAMS
+.I streams
+module.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
+The
+.IR LFS \(rg
+compatibility suite has no known bugs.
+.I LiS
+has many known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+These functions are compatible with
+.IR LFS \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+These functions are
+.IR LFS \(rg-specific
+and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.I SVR 4.2 MP
+functions should be used in their stead.
+.IP \(em
+.IR LFS \(rg-specific
+functions are provided for source level compatibility with
+.IR LFS \(rg
+for the purpose of porting
+.IR LFS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+differ from that of
+.IR LFS \(rg,
+binaries are incompatible.
+.IP \(em
+.IR LFS \(rg-specific
+functions only provide functionality comparable to
+.IR LFS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.IR LFS \(rg-specific
+functions in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH "CONFORMING TO"
 .PP
+.IR LFS \(rg
+DDI documentation.
+.[
+LfS
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+These functions
+first appeared in
+.IR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
 .\"
 .\"
 .[

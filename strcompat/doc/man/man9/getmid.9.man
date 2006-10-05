@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: getmid.9.man,v 0.9.2.9 2006/04/05 09:43:32 brian Exp $
+.\" @(#) $Id: getmid.9.man,v 0.9.2.10 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:32 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: getmid.9.man,v $
+.\" Revision 0.9.2.10  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.9  2006/04/05 09:43:32  brian
 .\" - moved .so line and updated headers
 .\"
@@ -81,13 +84,13 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B getmid
+.B getmid, modiD_t
 \- get the \fISTREAMS\fR module id for a name
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-modID_t \fBgetmid\fR(const char *\fIname\fR);
+.BI "modID_t getmid(const char *" name ");
 .\"
 .\"
 .SH ARGUMENTS
@@ -95,6 +98,11 @@ modID_t \fBgetmid\fR(const char *\fIname\fR);
 .TP
 .I name
 The name of the module.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION
@@ -129,7 +137,7 @@ does not correspond to a module.
 .PP
 .BR getmid ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 When called from a blocking context,
 .BR getmid ()
 has the side-effect that the named module may be loaded by module name.  The
@@ -172,7 +180,7 @@ member of the
 structure pointed to by the
 .I qi_minfo
 of the
-.B qinit (9)
+.BR qinit (9)
 structure, which is usually hard coded for each driver or module.  The module
 name should be unique across drivers and modules.
 .\"

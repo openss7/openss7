@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.3 2006/04/05 09:43:33 brian Exp $
+.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.4 2006/10/05 12:15:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:33 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copyin_n.9.man,v $
+.\" Revision 0.9.2.4  2006/10/05 12:15:43  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.3  2006/04/05 09:43:33  brian
 .\" - moved .so line and updated headers
 .\"
@@ -87,11 +90,13 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #define _MAC_SOURCE
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
 .br
-.B #include <sys/macddi.h>
+.B #include <sys/mpsddi.h>
 .HP
 .BI "void mi_copyin_n(queue_t *" q ", mblk_t *" mp ", size_t " offset ", size_t " len );
 .\"
@@ -100,14 +105,21 @@ sort-adjacent-labels
 .PP
 .TP \w'offset\ \ 'u
 .I q
-the current write-side queue whose put or service procedure within which
+the current write-side queue whose
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure within which
 .BR mi_copyin_n ()
 is being called.
 .TP
 .I mp
 a pointer to the message block that contains the
 .BR M_IOCDATA (9)
-message being processed.  This is the message that was passed to the write-side put or service
+message being processed.  This is the message that was passed to the write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
 procedure within which
 .BR mi_copyin_n ()
 is invoked.
@@ -122,11 +134,17 @@ message.
 the number of bytes to copy in from user space.
 .\"
 .\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR mi_copyin_n ()
 is one of a set of helper functions that support transparent input-output controls (see
-.BR ioctl (2)
+.BR ioctl (2s)
 and
 .BR streamio (9))
 that includes
@@ -140,7 +158,10 @@ and
 .BR mi_copy_state (9).
 .PP
 .BR mi_copyin_n ()
-is used to copy data from a user-space to the kernel.  When a module or driver put or service
+is used to copy data from a user-space to the kernel.  When a driver or module
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
 procedure first receives a
 .BR M_IOCTL (9)
 message, the
@@ -194,18 +215,6 @@ returns
 fails when passed invalid pointers.  When
 .BR mi_copyin_n ()
 fails, it panics the kernel.
-If
-.BR mi_copyin_n ()
-fails due to an recoverable error, it issues a
-.BR M_IOCNAK (9)
-message upstream to terminate the
-.BR ioctl (2)
-operation with the appropriate error code.
-The error code returned can be one of the follolwing values:
-.TP
-.B ENOMEM
-.TP
-.B ENOSTR
 .\"
 .\"
 .SH EXAMPLE
@@ -213,7 +222,7 @@ The error code returned can be one of the follolwing values:
 The following example illustrates the use of
 .BR mi_copyin_n ().
 In the example, the user passes a variable length data structure to the
-.BR ioctl (2)
+.BR ioctl (2s)
 call as either a
 .B TRANSPARENT
 or
@@ -252,7 +261,11 @@ input output control, regardless of the number of significant elements in the ar
 the purpose of this example, we assume that this restriction is relaxed and the caller can provide
 a structure sized to only the significant number of elements.
 .PP
-Following is a write-side queue put and service procedure fragment that will perform the necessary
+Following is a write-side queue
+.IR qi_putp (9)
+and
+.IR qi_srvp (9)
+procedure fragment that will perform the necessary
 actions using
 .BR mi_copyin_n ()
 to copy in the variable sized structure:
@@ -324,21 +337,32 @@ can be called from any context.  Internal operations use non-blocking allocation
 .PP
 .BR mi_copyin_n ()
 is MP-safe.  The caller is responsible for ensuring that it has exclusive access to the passed in
-message pointer.  When properly invoked from within the write-side queue put or service procedure,
+message pointer.  When properly invoked from within the write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure,
 this is normally the case.
 .\"
 .\"
 .SH NOTICES
 .PP
 .BR mi_copyin_n ()
-is a
-.IR MacOT \(rg-specific
+is an
+.IR MPS \(rg-specific
 function:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
 .B _MAC_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.BR "@PACKAGE_TITLE@"
 must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_MAC
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
 or
 .B CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
@@ -346,6 +370,25 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.B mi_copyin_n ()
+is implemented by directly manipulating the
+.BR iocblk (9),
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures contained in the message block.  Private state information and accumulated data is
+chained off of the
+.IR cq_private " and " cp_private
+members of the
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures.
+Because of this, it is important that once one of these helper functions is used to begin an
+.BR M_IOCTL (9)
+sequence, that the remaining help functions be used also, instead of directly manipulating the
+structures.  Messages and their contained structures should be passed to the helper functions
+without being manipulated in any way by the caller.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -356,6 +399,8 @@ defined.
 .BR mi_copy_set_rval (9),
 .BR mi_copy_state (9),
 .BR MI_COPY_CASE (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
 .BR maccompat (9),
 .BR STREAMS (9).
 .\"
@@ -369,15 +414,18 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR mi_copyin_n ()
-is compatible with
-.IR MacOT \(rg
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 .BR mi_copyin_n ()
 is an
-.IR MacOT \(rg-specific
+.IR MPS \(rg-specific
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
@@ -386,23 +434,23 @@ should be used in its stead.
 .IP \(em
 .BR mi_copyin_n ()
 is provided for source level compatibility with
-.IR MacOT \(rg
+.IR MPS \(rg
 for the purpose of porting
-.IR MacOT \(rg
+.IR MPS \(rg
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.BR "@PACKAGE_TITLE@"
 .[
 lfs
 .]
 differ from that of
-.IR MacOT \(rg,
+.IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
 .BR mi_copyin_n ()
 only provides functionality comparable to
-.IR MacOT \(rg
+.IR MPS \(rg
 for use by
 .I STREAMS
 drivers and modules.
@@ -413,7 +461,9 @@ in support of
 devices are not supported.
 .PP
 See
-.BR maccompat (9)
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
 and
 .BR STREAMS (9)
 for additional compatibility considerations.
@@ -421,13 +471,20 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
+.IR MPS \(rg
+DDI documentation,
 .IR MacOT \(rg
-DDI documentation.
+DDI documentation,
 .[
 macotr
 .]
 .[
 macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
 .]
 .\"
 .\"
@@ -435,7 +492,28 @@ macspg
 .PP
 .BR mi_copyin_n ()
 first appeared in
-.IR MacOT \(rg.
+.IR MPS \(rg.
+.BR mi_copyin_n ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_copyin_n ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_copyin_n ()
+appears in
+.IR Solaris \(rg.
 .\"
 .\"
 .[

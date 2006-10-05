@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: qtimeout.9.man,v 0.9.2.9 2006/04/05 09:43:34 brian Exp $
+.\" @(#) $Id: qtimeout.9.man,v 0.9.2.10 2006/10/05 12:15:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:34 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: qtimeout.9.man,v $
+.\" Revision 0.9.2.10  2006/10/05 12:15:45  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.9  2006/04/05 09:43:34  brian
 .\" - moved .so line and updated headers
 .\"
@@ -196,8 +199,12 @@ callback function will not be executed while any synchronous procedure, call-out
 or callback functions are executing.
 In addition, the
 .BR qtimeout ()
-callback function will not be executed on a stream frozen by
-.BR freezestr (9).
+callback function will not be entered on a stream frozen by
+.BR freezestr (9),
+but will spin the processor until the
+Stream
+is thawed with
+.BR unfreezestr(9).
 .PP
 Considerations should be given when writing the callback function that a
 .BR qtimeout ()
@@ -300,7 +307,8 @@ on all architectures.
 .BR drv_usectohz (9),
 .BR drv_msectohz (9),
 .BR untimeout (9),
-.BR freezestr (9).
+.BR freezestr (9),
+.BR unfreezestr (9).
 .\"
 .\"
 .SH BUGS

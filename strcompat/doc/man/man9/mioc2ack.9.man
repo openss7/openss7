@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mioc2ack.9.man,v 0.9.2.3 2006/04/05 09:43:33 brian Exp $
+.\" @(#) $Id: mioc2ack.9.man,v 0.9.2.4 2006/10/05 12:15:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:33 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mioc2ack.9.man,v $
+.\" Revision 0.9.2.4  2006/10/05 12:15:44  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.3  2006/04/05 09:43:33  brian
 .\" - moved .so line and updated headers
 .\"
@@ -105,7 +108,11 @@ a pointer to a
 or
 .BR M_IOCDATA (9)
 message block from the input output control operation to be processed, normally passed into the
-write-side queue put or service procedure.
+write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
 .TP
 .I db
 a pointer to a message block containing
@@ -120,7 +127,7 @@ the count of the number of bytes of data contained in the attached or passed in 
 .TP
 .I rval
 the return value to return from the
-.BR ioctl (2)
+.BR ioctl (2s)
 call.
 .\"
 .\"
@@ -160,12 +167,16 @@ is used in processing of
 and
 .BR M_IOCDATA (9)
 messages when performing
-.BR ioctl (2)
+.BR ioctl (2s)
 processing in a
 .I STREAMS
-module or driver write-side queue put or service procedures.  It is used to acknolwedge the
+driver or module write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedures.  It is used to acknolwedge the
 completion of a
-.BR ioctl (2)
+.BR ioctl (2s)
 operation and return a value with data attached to the
 .BR M_IOCACK (9)
 message block.
@@ -199,7 +210,11 @@ has indeterminate results and could destabilize the kernel or cause immediate or
 .BR mioc2ack ()
 can be called from any context; however, it is normally called from a
 .I STREAMS
-module or driver write-side put or service procedure.
+driver or module write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
 .\"
 .\"
 .SH MP-STREAMS
@@ -210,7 +225,11 @@ in message blocks.  This is normally the case when
 .BR mioc2ack ()
 is called from a
 .I STREAMS
-module or driver write-side put or service procedure with a message block that was passed to those
+driver or module write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure with a message block that was passed to those
 procedures.
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: getadmin.9.man,v 0.9.2.9 2006/04/05 09:43:32 brian Exp $
+.\" @(#) $Id: getadmin.9.man,v 0.9.2.10 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:32 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: getadmin.9.man,v $
+.\" Revision 0.9.2.10  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.9  2006/04/05 09:43:32  brian
 .\" - moved .so line and updated headers
 .\"
@@ -91,7 +94,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/stream.h>
 .HP
-int (*\fBgetadmin\fR(modID_t \fImid\fR))();
+.BI "int (*getadmin(modID_t " mid "))();
 .\"
 .\"
 .SH ARGUMENTS
@@ -99,6 +102,11 @@ int (*\fBgetadmin\fR(modID_t \fImid\fR))();
 .TP
 .I mid
 Module ID.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION
@@ -125,14 +133,14 @@ When
 fails it returns
 .BR NULL .
 .BR getadmin ()
-fails when there is no module or driver for the given module Id.
+fails when there is no driver or module for the given module Id.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR getadmin ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 When called from a blocking context,
 .BR getadmin ()
 has the side-effect that the identified module may be loaded by module
@@ -150,7 +158,7 @@ module.
 .PP
 .BR getadmin ()
 is MP-save; however, it is the caller's responsibility to ensure that the
-module or driver has not unloaded before dereferencing the resulting function
+driver or module has not unloaded before dereferencing the resulting function
 pointer.
 .\"
 .\"

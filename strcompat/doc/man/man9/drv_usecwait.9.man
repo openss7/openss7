@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: drv_usecwait.9.man,v 0.9.2.11 2006/04/05 10:05:03 brian Exp $
+.\" @(#) $Id: drv_usecwait.9.man,v 0.9.2.12 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 10:05:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: drv_usecwait.9.man,v $
+.\" Revision 0.9.2.12  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.11  2006/04/05 10:05:03  brian
 .\" - get references in right place
 .\"
@@ -90,11 +93,11 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <sys/stream.h>
+.B #include <sys/types.h>
 .br
 .B #include <sys/dki.h>
 .HP
-.BI "void drv_usecwait(clock_t " usec );
+.BI "void drv_usecwait(clock_t " usec ");
 .\"
 .\"
 .SH ARGUMENTS
@@ -104,6 +107,11 @@ sort-adjacent-labels
 the number of microseconds to wait.
 .\"
 .\"
+.SH INTERFACE
+.PP
+.IR DDI/DKI .
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR drv_usecwait ()
@@ -111,7 +119,8 @@ spins the calling processor until the specified number of microseconds,
 .IR usec ,
 elapses.
 .BR drv_usecwait ()
-is an SVR 4.2
+is an
+.I SVR 4.2
 .[
 svr42
 .]
@@ -226,7 +235,8 @@ usldk
 .SH HISTORY
 .PP
 .BR drv_usecwait ()
-first appeared in SVR 4.
+first appeared in
+.IR "SVR 4" .
 .[
 svr4
 .]

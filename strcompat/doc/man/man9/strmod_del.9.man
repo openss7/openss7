@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strmod_del.9.man,v 0.9.2.2 2006/04/05 09:43:35 brian Exp $
+.\" @(#) $Id: strmod_del.9.man,v 0.9.2.3 2006/10/05 12:15:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:35 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strmod_del.9.man,v $
+.\" Revision 0.9.2.3  2006/10/05 12:15:46  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.2  2006/04/05 09:43:35  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B strmod_del
-\- delete a \fISTREAMS\fR module or driver from the kernel
+\- delete a \fISTREAMS\fR driver or module from the kernel
 .\"
 .\"
 .SH SYNOPSIS
@@ -112,7 +115,7 @@ int \fBstrmod_del\fR(dev_t \fIdev\fR, struct streamtab *\fIstr\fR, struct stream
 is an
 .IR OSF/1 \(rg-specific
 .I STREAMS
-module and driver unregistration facility.
+driver and module unregistration facility.
 .PP
 .RS
 .nf

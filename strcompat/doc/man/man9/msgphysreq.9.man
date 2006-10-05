@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: msgphysreq.9.man,v 0.9.2.11 2006/04/05 09:43:34 brian Exp $
+.\" @(#) $Id: msgphysreq.9.man,v 0.9.2.12 2006/10/05 12:15:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:34 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: msgphysreq.9.man,v $
+.\" Revision 0.9.2.12  2006/10/05 12:15:45  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.11  2006/04/05 09:43:34  brian
 .\" - moved .so line and updated headers
 .\"
@@ -216,7 +219,7 @@ a message block to the requested physical requirements cannot be created.
 .PP
 .BR msgphysreq ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS

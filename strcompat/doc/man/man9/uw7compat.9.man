@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: uw7compat.9.man,v 0.9.2.8 2006/04/05 09:43:35 brian Exp $
+.\" @(#) $Id: uw7compat.9.man,v 0.9.2.9 2006/10/05 12:15:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:35 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: uw7compat.9.man,v $
+.\" Revision 0.9.2.9  2006/10/05 12:15:46  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:35  brian
 .\" - moved .so line and updated headers
 .\"
@@ -1341,20 +1344,23 @@ specific DDI8 functions in addition to
 .PD
 .\"
 .\"
-.SH RETURN
-.PP
+.\".SH RETURN
+.\".PP
 .\"
 .\"
-.SH ERRORS
-.PP
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
 .SH CONTEXT
 .PP
+These functions can be executed from various contexts as described in each separate manual page.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Most of these functions are MP-safe; however,
+see the manual page for the individual function for detailed information.
 .\"
 .\"
 .SH NOTICES
@@ -1395,14 +1401,19 @@ functions loads.
 .\"
 .SH IMPLEMENTATION
 .PP
+Core functions are implemented within the
+.B @PACKAGE_TITLE@
+framework.
+.IR UnixWare \(rg-specific
+functions are implemented as described in the separate manual pages describing each facility.
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
-.SH SYSCTLS
-.PP
+.\".SH SYSCTLS
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -1451,6 +1462,9 @@ General:
 .\"
 .SH BUGS
 .PP
+The
+.IR UnixWare \(rg
+compatibility suite has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY

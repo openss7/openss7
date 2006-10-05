@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_alloc.9.man,v 0.9.2.4 2006/04/05 09:43:33 brian Exp $
+.\" @(#) $Id: mi_alloc.9.man,v 0.9.2.5 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:33 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_alloc.9.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:33  brian
 .\" - moved .so line and updated headers
 .\"
@@ -83,11 +86,13 @@ sort-adjacent-labels
 .SH NAME
 .B mi_alloc, mi_alloc_sleep, mi_zalloc, mi_zalloc_sleep, mi_free
 \- allocate and free kernel memory without later regard to size
-.\" 
+.\"
 .\"
 .SH SYNOPSIS
 .PP
 .B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
 .br
@@ -126,6 +131,12 @@ pointer to memory previously allocated with
 or
 .BR mi_zalloc_sleep ().
 .PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
 .\"
 .\"
 .SH DESCRIPTION
@@ -231,11 +242,11 @@ q = mi_alloc(sizeof(*q), BPRI_HI);
 This is because sizes of fundamental system data structures may change and yet binary compatibility
 of
 .I STREAMS
-modules and drivers can be maintained.  Also, the implementation of a fundamental structure might be
+drivers and modules can be maintained.  Also, the implementation of a fundamental structure might be
 larger than the public declaration of that structure: that is, there are additional members hidden
 from the system programmer.  Portable
 .I STREAMS
-modules and drivers will not allocate fundamental system data structures using
+drivers and modules will not allocate fundamental system data structures using
 .BR mi_alloc (),
 .BR mi_alloc_sleep (),
 .BR mi_zalloc ()
@@ -324,13 +335,20 @@ and
 are
 .IR MPS \(rg-specific
 functions:
-.B _MPS_SOURCE
-must be defined before including DDI/DKI include files to expose these symbols.
-.B Linux Fast-STREAMS
-must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_MI
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
 or
-.B CONFIG_STREAMS_COMPAT_MI_MODULE
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
 .PP
 Because
@@ -432,7 +450,9 @@ area of the allocated memory extent.
 .BR kmem_alloc (9),
 .BR kmem_zalloc (9),
 .BR kmem_free (9),
-.BR micompat (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
 .BR STREAMS (9).
 .\"
 .\"
@@ -455,8 +475,13 @@ have no known bugs.
 .BR mi_zalloc_sleep ()
 and
 .BR mi_free ()
-are compatible with
-.IR MPS \(rg
+are
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR mi_alloc (),
@@ -490,7 +515,7 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.BR "@PACKAGE_TITLE@"
 .[
 lfs
 .]
@@ -521,7 +546,9 @@ in support of
 devices are not supported.
 .PP
 See
-.BR micompat (9)
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
 and
 .BR STREAMS (9)
 for additional compatibility considerations.
@@ -530,7 +557,20 @@ for additional compatibility considerations.
 .SH CONFORMANCE
 .PP
 .IR MPS \(rg
-DDI documentation.
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
 .\"
 .\"
 .SH HISTORY
@@ -549,10 +589,36 @@ first appeared in
 .BR mi_zalloc_sleep ()
 and
 .BR mi_free ()
-are Mentat, Inc. functions that go all the way back to the
+are
+Mentat, Inc. functions that go all the way back to the
 .RI pre- OSF/1
 .I Mentat
-implementation.
+implementations.
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+appear in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_alloc (),
+.BR mi_alloc_sleep (),
+.BR mi_zalloc (),
+.BR mi_zalloc_sleep ()
+and
+.BR mi_free ()
+appear in
+.IR Solaris \(rg.
 .\"
 .\"
 .[

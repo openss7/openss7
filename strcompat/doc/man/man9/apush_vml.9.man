@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: apush_vml.9.man,v 0.9.2.11 2006/04/05 09:43:30 brian Exp $
+.\" @(#) $Id: apush_vml.9.man,v 0.9.2.12 2006/10/05 12:15:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:30 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:41 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: apush_vml.9.man,v $
+.\" Revision 0.9.2.12  2006/10/05 12:15:41  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.11  2006/04/05 09:43:30  brian
 .\" - moved .so line and updated headers
 .\"
@@ -109,13 +112,19 @@ structure containing the list and number of module names.
 .\"
 .SH INTERFACE
 .PP
-.IR STREAMS .
+.IR STREAMS ,
+internal,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .BR apush_vml ()
-.HP
+verifies the module list in the passed in with the
+.BR str_list (5)
+structure pointer,
+.IR slp .
+.PP
 .I slp
 is a pointer to a
 .B str_list
@@ -130,8 +139,18 @@ struct str_list {
 .fi
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH USAGE
+.PP
+.BR apush_vml ()
+is functionally equivalent to the
+.BR SAD_VML
+input-output control to the
+.BR sad (4)
+driver.
+The
+.BR apush_vml ()
+function is a useful way for a driver or module to manipulate the autopush
+list associated with a \fISTREAMS\fP driver.
 .\"
 .\"
 .SH RETURN
@@ -141,7 +160,7 @@ Upon success,
 returns the list of module names and number of names in the
 .B str_list
 structure.
-.HP
+.PP
 Upon failure, 
 .BR apush_vml ()
 returns
@@ -156,21 +175,70 @@ fails
 .SH CONTEXT
 .PP
 .BR apush_vml ()
-can be called from any context, including user context, module procedures, call outs, callbacks, soft interrupts and interrupt service routines.
+can be called from any blocking context, including user context and queue
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9)
+routines.
+.\"can be called from any context, including user context, module procedures, callouts, callbacks, soft
+.\"interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR apush_vml ()
-is MP-safe.  The caller is responsible for ensuring exclusive access to the passed in module list.
+is MP-safe.
+The caller must ensure exclusive access to the passed in
+.B str_list
+structure.
 .\"
 .\"
 .SH NOTICES
 .PP
 .BR apush_vml ()
-is an internal function, and is not recommended for usage by
+is an
+.IR LiS -specific
+function.
+This symbol is exported primarily in support of the
+.I STREAMS Compatibiltiy Modules
+package,
+.BR strcompat (5).
+.\"The macro definition
+.\".B _LIS_SOURCE
+.\"must be defined before including
+.\".I STREAMS
+.\"header files to expose the prototype for this function.
+.\"Also,
+.\".B "@PACKAGE_TITLE@"
+.\".[
+.\"@PACKAGE_TITLE@
+.\".]
+.\"must have been compiled with
+.\"kernel configuration parameter
+.\".BR CONFIG_STREAMS_LIS_COMPAT
+.\"defined.
+.\".PP
+.\".BR apush_vml ()
+.\"should not be used by portable
+.\".I STREAMS
+.\"drivers and modules.
+.PP
+.BR apush_vml ()
+is an internal implementation specific function, and will not be used directly by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
+.PP
+Calling
+.BR apush_vml ()
+has the kernel module side-effect that if a \fISTREAMS\fP driver or module associated
+with
+.I slp
+does not currently exists in the system, an attempt will be made to load the
+driver or module associated with the driver or module name in
+.I slp
+before return.
+No attempt, however, is made to load any kernel modules associated with the
+autopush modules in the list.
 .\"
 .\"
 .\".SH IMPLEMENTATION
@@ -179,8 +247,17 @@ modules and drivers.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR sad (4),
+.BR str_list (5),
+.BR apush_set (9),
+.BR apush_get (9),
+.BR autopush (9),
+.BR autopush_add (9),
+.BR autopush_del (9),
+.BR autopush_find (9),
+.BR autopush_search (9),
 .BR autopush_vml (9),
-.BR STEAMS (9)
+.IR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -191,6 +268,32 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
+.BR apush_vml ()
+is compatible with
+.IR LiS ,
+.[
+lis
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.\"Symbol
+.\".BR lis_apush_vml ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_apush_vml ()
+.\"simply calls
+.\".BR apush_vml ()
+.\"directly.
+.\".IP \(em
+.I SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+and systems based on
+.I SVR 4
+do not export this function.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -199,22 +302,37 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-.BR apush_vml ()
-is specific to
-.B Linux Fast-STREAMS
+.IR "SVR 4.2"
 .[
-lfs
+svr42
 .]
+.I SAD
+.RI ( STREAMS
+Administrative Driver).  See
+.BR sad (4).
+.BR apush_vml ()
+is provided only for compatibility with
+.IR LiS ,
 and is not subject to standardization.
+For the
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+specific function, see
+.BR autopush_vml (9).
 .\"
 .\"
 .SH HISTORY
+.\".PP
+.\".BR lis_apush_vml ()
+.\"is an LiS-specific function.
 .PP
 .BR apush_vml ()
 is specific to
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 .[
-lfs
+@PACKAGE_TITLE@
 .]
 .\"
 .\"

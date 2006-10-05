@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:58 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/05 12:15:50 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:37:58 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:15:50 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -82,12 +82,12 @@ binary modules.
 @item
 Linking of binary modules is not yet supported.  This is the place (strcompat) where binary modules
 should be permitted to be loaded against either Linux STREAMS or Linux Fast-STREAMS, because the
-binary compatibility interface modules are defined here.  There is the begginnings of an strconf
+binary compatibility interface modules are defined here.  There is the beginnings of an strconf
 script output to generate a C-language wrapper file that will link with a binary object file to
 generate a loadable module that could load under Linux STREAMS or Linux Fast-STREAMS.  Note that
 there are a bunch of binary compatibility issues with Linux STREAMS in the first place (it cannot
 even be binary compatible with user programs written for 32bit architectures running on 64bit
-architectures).  For farily retricted use modules and drivers, a single binary object could run on
+architectures).  For fairly restricted use modules and drivers, a single binary object could run on
 both LiS and LfS.
 
 @item

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: irixcompat.9.man,v 0.9.2.5 2006/04/05 09:43:32 brian Exp $
+.\" @(#) $Id: irixcompat.9.man,v 0.9.2.6 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:32 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: irixcompat.9.man,v $
+.\" Revision 0.9.2.6  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:32  brian
 .\" - moved .so line and updated headers
 .\"
@@ -77,7 +80,7 @@ sort-adjacent-labels
 .so strcompat.macros
 .\"
 .\"
-.TH UXPCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH IRIXCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -87,7 +90,7 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #define _UXP_SOURCE
+.B #define _IRIX_SOURCE
 .br
 .B #include <sys/ddi.h>
 .\"
@@ -1685,25 +1688,24 @@ kernel functions are not implemented in
 .HP
 .BR vtop (9)\ \-\ \c
 .PD
-
-
-
 .\"
 .\"
-.SH RETURN
-.PP
+.\".SH RETURN
+.\".PP
 .\"
 .\"
-.SH ERRORS
-.PP
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
 .SH CONTEXT
 .PP
+These functions can be executed from various contexts as described in each separate manual page.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Most of these functions are MP-safe; however, see each separate manual page.
 .\"
 .\"
 .SH NOTICES
@@ -1711,26 +1713,50 @@ kernel functions are not implemented in
 These are
 .IR IRIX \(rg-specific
 functions:
-.B _UXP_SOURCE
+.B _IRIX_SOURCE
 must be defined before including DDI/DKI include files to expose these symbols.
 .B Linux Fast-STREAMS
 must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_UXP
+.B CONFIG_STREAMS_COMPAT_IRIX
 or
-.B CONFIG_STREAMS_COMPAT_UXP_MODULE
+.B CONFIG_STREAMS_COMPAT_IRIX_MODULE
 defined.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_IRIX
+defined,
+.IR IRIX \(rg
+compatibility will become part of the
+.B @PACKAGE_TITLE@
+.I streams
+kernel module.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_IRIX_MODULE
+defined,
+.IR IRIX \(rg
+compatibility will be placed in a separate
+.I streams-aixcompat
+kernel module that will demand load when any
+.I STREAMS
+driver or module that uses the
+.IR IRIX \(rg-specific
+functions loads.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+Core functions are implemented within the
+.B @PACKAGE_TITLE@
+framework.
+.IR IRIX \(rg-specific
+functions are implemented as described in the separate manual pages describing each facility.
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
-.SH SYSCTLS
-.PP
+.\".SH SYSCTLS
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -1747,6 +1773,9 @@ General:
 .\"
 .SH BUGS
 .PP
+The
+.IR IRIX \(rg
+compatibility suite has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -1755,8 +1784,6 @@ These functions are compatible with
 .IR IRIX \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 These are
 .IR IRIX \(rg-specific
 functions and should not be used by portable

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: datab.9.man,v 0.9.2.10 2006/04/05 09:43:31 brian Exp $
+.\" @(#) $Id: datab.9.man,v 0.9.2.11 2006/10/05 12:15:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:31 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:41 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: datab.9.man,v $
+.\" Revision 0.9.2.11  2006/10/05 12:15:41  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.10  2006/04/05 09:43:31  brian
 .\" - moved .so line and updated headers
 .\"
@@ -91,7 +94,7 @@ sort-adjacent-labels
 .nf
 \fC\s-1
 typedef struct free_rtn {
-    void (*free_func) (caddr_t);
+    void streamscall (*free_func) (caddr_t);
     caddr_t free_arg;
 } frtn_t;
 
@@ -104,22 +107,29 @@ typedef struct datab {
 #define         db_frtnp db_f.frtnp
     unsigned char *db_base;
     unsigned char *db_lim;
-    unsigned char db_ref;       /* shadow reference count */
+    unsigned char db_ref;
     unsigned char db_type;
-    unsigned char db_iswhat;    /* Mac OT */
-    unsigned char db_filler2;   /* Mac OT */
-    uint db_size;               /* Mac OT */
-    unsigned char *db_msgaddr;  /* Mac OT */
-    long db_filler;             /* Mac OT */
-    /* Linux Fast-STREAMS specific members */
-    atomic_t db_users;          /* actual reference count */
+    union {
+        struct {
+            union {
+                unsigned char db_class;   /* SVR3.1 */
+                unsigned char db_iswhat;  /* Mac OT, OSF/1, DGUX */
+            };
+            union {
+                unsigned char db_pad;     /* SVR3.1 */
+                unsigned char db_filler2; /* Mac OT, OSF/1, DGUX */
+            };
+        };
+        unsigned short db_flag;           /* UnixWare */
+    };
+    unsigned int db_size;                 /* SVR3.1 */
 } dblk_t;
-/* 18 bytes on 32 bit, 30 on 64 bit */
 
 #define DBLK_REFMIN     0x01    /* Solaris */
 
 #define DB_WASDUPED     0x01    /* UnixWare */
 #define DB_2PIECE       0x02    /* UnixWare */
+#define DB_SKBUFF       0x04    /* LfS */
 \s+1\fP
 .fi
 .\"
@@ -303,10 +313,10 @@ start input message
 priority control message
 .TP
 .BR M_PCSETOPTS (9)
-prioirity stream head set options message
+priority stream head set options message
 .TP
 .BR M_PCEVENT (9)
-prioirity event
+priority event
 .TP
 .BR M_UNHANGUP (9)
 undo hangup message
@@ -334,11 +344,73 @@ See
 .PD
 .RE
 .TP
+.I db_class
+Indicates whether the message is a normal or priority message.  Note that this
+member is not used by
+.BR "@PACKAGE_NAME@" :
+rather, the
+.I db_flag
+member is used instead.
+.TP
 .I db_iswhat
-Indicates whether the message is a normal or priority message.
+.IR OSF/1 \(rg
+name for
+.I db_class
+member.  See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.TP
+.I db_pad
+Padding.  Note that this member is not used by
+.BR "@PACKAGE_NAME@" :
+rather, the
+.I db_flag
+member is used instead.
 .TP
 .I db_filler2
-Padding.
+.IR OSF/1 \(rg
+name for
+.I db_pad
+member.
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.TP
+.I db_flag
+.IR UnixWare \(rg
+name for the
+.I db_class
+and
+.I db_pad
+members.
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+The
+.I db_flag
+field can contain a logical OR of zero or more of the following flags:
+.RS
+.TP \w'DB_WASDUPED\(em'u
+.B DB_WASDUPED
+the data block was duped.
+This flag is neither set nor examined by
+.BR "@PACKAGE_NAME@" .
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.PD 0
+.TP
+.B DB_2PIECE
+the data block is a two-piece data block.
+This flag is neither set nor examined by
+.BR "@PACKAGE_NAME@" .
+See
+.RB \(lq COMPATIBILITY \(rq,
+below.
+.TP
+.B DB_SKBUFF
+.PD
+.RE
 .TP
 .I db_size
 The size of the data buffer.  This should be the same as the difference
@@ -346,35 +418,80 @@ between the
 .I db_lim
 and
 .I db_base
-members.
-.TP
-.I db_msgaddr
-.TP
-.I db_filler
-Padding.
+members, but is not always the case under
+.IR "SVR 3"
+.[
+svr3spg
+.]
+that defined the field.
+.\".PP
+.\"The following members are
+.\".B Linux Fast-STREAMS
+.\"specific members:
+.\".TP \w'\ db_msgaddr\ 'u
+.\".I db_users
+.\"Because
+.\".B Linux
+.\"does not have character sized atomic types, this is an integer atomic type
+.\"count equivalent to the
+.\".I db_ref
+.\"member.  This private member is used for atomic operations on the reference
+.\"count, and then it is copied from here to
+.\".IR db_ref .
+.\"
+.\"
+.SH INTERFACE
 .PP
-The following members are
-.B Linux Fast-STREAMS
-specific members:
-.TP \w'\ db_msgaddr\ 'u
-.I db_users
-Because
-.B Linux
-does not have character sized atomic types, this is an integer atomic type
-count equivalent to the
-.I db_ref
-member.  This private member is used for atomic operations on the reference
-count, and then it is copied from here to
-.IR db_ref .
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.I STREAMS
+messages are composed of a chain of message blocks.  Each message block in the chain corresponds to
+a 3-tuple of a
+.BR msgb (9)
+structure, a
+.B datab
+structure, and an associated data buffer.  Although there is a 1:1 relationship between a
+.B datab
+data block and a data buffer, there can be an N:1 relationship between
+.BR msgb (9)
+message blocks and
+.B datab
+data blocks.  A
+.BR msgb (9)
+structure is an instance of a reference to a
+.B datab
+data block.
+.PP
+There is a 1:1 relationship between a
+.B datab
+data block and a data buffer.  The
+.B datab
+structure holds information about the data buffer that cannot be contained in the data buffer
+itself.  Characteristics of the data buffer, such as its size,
+.IR db_size ,
+its starting address,
+.IR db_base ,
+its ending address,
+.IR db_lim ,
+the number of
+.B msgb
+message blocks referring to it,
+.IR db_ref ,
+the type of the block,
+.IR db_type ,
+and a destructor for deallocating the buffer,
+.IR db_frtnp ,
+are contained in the
+.B datab
+structure.
 .\"
 .SS Macros
 .PP
 Following are some
-.I Solaris \(rg
+.IR Solaris \(rg
 implementation specific helper macros that are defined in the
 .B <sys/strsun.h>
 header file:
@@ -401,18 +518,107 @@ Return the data buffer type from a message block pointer.  The type returned is 
 values listed above.
 .\"
 .\"
+.SH USAGE
+.PP
+.B datab
+structured data blocks are allocated as a 3-tuple with message block allocators such as
+.BR allocb (9)
+or
+.BR esballoc (9).
+Within the
+.I STREAMS
+framework, messages are processed by the queue procedures,
+.IR qi_putp (9)
+and
+.IR qi_srvp (9).
+A queue procedure does not normally manipulate data blocks, except to change their type
+.RI ( db_type ).
+Fields that may be examined
+include
+.IR db_type ,
+.IR db_base ,
+.IR db_lim ,
+.IR db_ref .
+Of these, only
+.I db_type
+should be altered by a queue procedure.
+.PP
+When a driver or module
+.IR qi_putp (9)
+put procedure is passed a message, or
+.IR qi_srvp (9)
+service procedure takes a message off of the message queue, before processing the message, the
+.I db_type
+field is examined to determine the type of the message.  Queue procedures are required to process
+messages of a given type in accordance with the rules for processing the specific type of message.
+Rules for processing the various message types available in
+.I STREAMS
+are discussed in separate manual pages for each message type, such as
+.BR M_FLUSH (9).
+.PP
+When a driver or module
+.IR qi_putp (9)
+put or
+.IR qi_srvp (9)
+service procedure intends to modify the data in the data buffer associated with a
+.B datab
+data block, it should first check the
+.I db_ref
+member to see if more than one message block has a reference to the data buffer.  If
+.I db_ref
+is one
+.RB ( 1 ),
+then the procedure has a private reference to the data in the data buffer.  If
+.I db_ref
+is greater than one
+.RB ( >1 ),
+then the procedure does not have a private reference to the data in the data buffer, so if it
+intends to modify the data, it should copy the data with a utility such as
+.BR copyb (9)
+or
+.BR copymsg (9)
+to obtain a private reference to the data buffer, and only modify the copied data.
+.PP
+Specialized utilities that allocate or reallocate data blocks and data buffers access the
+.I db_base
+and
+.I db_lim
+fields.  In some cases, these fields might be used by a queue procedure or private utility to reset
+the message block pointers,
+.IR b_rptr
+or
+.IR b_wptr ,
+into the data buffer.  The difference between the
+.I db_lim
+and
+.I db_base
+pointers, represents the maximum size of the data buffer.
+.\"
+.\"
 .SH CONTEXT
 .PP
-Functions that operate on a message or data block can be called from any
-context.  However, it is the caller's responsibility to ensure that the
-calling thread has exclusive access to the message block.  When the message
-block and associated data block have just been removed from a
+Functions that operate on a message or data block can be called from any context.  However, it is
+the caller's responsibility to ensure that the calling thread has exclusive access to the message
+block.  When the message block and associated data block have just been removed from a
 .BR queue (9)
 in a
-.BR put (9)
+.IR qi_putp (9)
 or
-.BR srv (9)
-procedure of the queue, message exclusivity is normally guaranteed.
+.IR qi_srvp (9)
+procedure of the queue, message block exclusivity is normally guaranteed.  If the
+.I db_ref
+argument of the data block is then one
+.RB ( 1 ),
+data block and data buffer exclusivity is also normally guaranteed.  Message block, data block and
+data buffer exclusivity is guaranteed for a message block freshly allocated with
+.BR allocb (9),
+or freshly copied with
+.BR copyb (9)
+or
+.BR copymsg (9).
+.BR esballoc (9)
+guarantees message block and data block exclusivity, but the caller is responsible for data buffer
+exclusivity.
 .\"
 .\"
 .SH MP-STREAMS
@@ -420,7 +626,8 @@ procedure of the queue, message exclusivity is normally guaranteed.
 Functions that access the
 .B datab
 structure are MP-safe.  However, it is the caller's responsibility to ensure exclusive access to the
-structure before altering any of the members of the structure.
+structure and associated data buffer before altering any of the members of the structure or contents
+of the data buffer.
 .PP
 Data blocks allocated with
 .BR esballoc (9)
@@ -432,11 +639,68 @@ Duplication of message blocks without copying the data block with functions such
 .BR dupb (9)
 or
 .BR dupmsg (9),
-may result in multiple threads of execution holding a reference to the same data block.  To ensure
-that this condition does not exist, the
+may result in multiple threads of execution holding a reference to the same data block and buffer.
+To ensure that this condition does not exist, the
 .I db_ref
-member can be examined to determine whether the reference count is one (1) indicating that no
-duplication has occurred, or greater, indicating that duplication has occurred.
+member can be examined to determine whether the reference count is one
+.RB ( 1 )
+indicating that no duplication has occurred, or greater, indicating that duplication has occurred.
+A private copy of the data block and buffer can always be obtained by copying them using
+.BR copyb (9)
+or
+.BR copymsg (9)
+(but at performance cost).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+As the message block 3-tuples allocated in a running system largely consists of an equal number of
+.BR msgb (9)
+message blocks,
+.BR datab (9)
+data blocks,
+and small buffers,
+it is efficient to allocate 3-tuples as a block.
+.BR "@PACKAGE_TITLE@" ,
+following the mechanism described for
+.IR "SVR 4"
+in
+.RI \(lq "The Magic Garden Explained" \(rq,
+.[
+magic
+.]
+defines an
+.BR mdbblock
+structure that contains an
+.BR mbinfo
+structure containing an
+.BR msgb (9)
+structure, a
+.BR dbinfo
+structure containing an
+.BR datab
+structure, and a
+.B FASTBUF
+sized, aligned data buffer.
+Allocations made by
+.BR allocb (9)
+or
+.BR esballoc (9)
+allocate a
+.BR mdbblock .
+This approach permits one memory cache allocation to occur, where three would otherwise be
+necessary, speeding the allocation of message blocks, data blocks and data buffers for the normal
+case.
+.PP
+For implementation details, see the
+.BR mdbblock_alloc ()
+and
+.BR mdbblock_free ()
+functions in the
+.I src/kernel/strsched.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution directory.
 .\"
 .\"
 .SH NOTICES
@@ -445,27 +709,90 @@ Members of the
 .B datab
 structure should not be accessed directly by
 .I STREAMS
-modules or drivers.  Portable
+drivers or modules.  Portable
 .I STREAMS
-modules and drivers should, where possible, use the facilities provided for
+drivers and modules should, where possible, use the facilities provided for
 implementation and architectural independence.
+See under
+.RI \(lq Macros \(rq,
+above.
+.\".PP
+.\"The
+.\".I db_ref
+.\"member is unreliable and should not be read or written by portable
+.\".I STREAMS
+.\"drivers or modules.
+.\"It is better to use the
+.\".BR DB_REF ()
+.\"macro, described above, because under
+.\".B "@PACKAGE_TITLE@"
+.\"this macro accesses the implementation specific atomic
+.\".I db_users
+.\"member within the structure.
 .PP
-The
-.I db_ref
-member is unreliable and should not be read or written by portable
-.I STREAMS
-modules or drivers.
 The
 .IR db_base ", " db_lim " and " db_size
 fields should be treated as read-only, and should not be read or written by
 portable
 .I STREAMS
-modules or drivers.
+drivers or modules.
+.PP
+.I db_type
+is the only field that should be referenced or altered by portable
+.I STREAMS
+drivers or modules.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR msgb (9).
+.BR msgb (9),
+.BR allocb (9),
+.BR esballoc (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR queue (9),
+.IR qi_putp (9),
+.IR qi_srvp (9),
+.BR M_DATA (9),
+.BR M_PROTO (9),
+.BR M_BREAK (9),
+.BR M_PASSFP (9),
+.BR M_EVENT (9),
+.BR M_SIG (9),
+.BR M_DELAY (9),
+.BR M_CTL (9),
+.BR M_IOCTL (9),
+.BR M_SETOPTS (9),
+.BR M_RSE (9),
+.BR M_TRAIL (9),
+.BR M_BACKWASH (9),
+.BR M_IOCACK (9),
+.BR M_IOCNAK (9),
+.BR M_PCPROTO (9),
+.BR M_PCSIG (9),
+.BR M_READ (9),
+.BR M_FLUSH (9),
+.BR M_STOP (9),
+.BR M_START (9),
+.BR M_HANGUP (9),
+.BR M_ERROR (9),
+.BR M_COPYIN (9),
+.BR M_COPYOUT (9),
+.BR M_IOCDATA (9),
+.BR M_PCRSE (9),
+.BR M_STOPI (9),
+.BR M_STARTI (9),
+.BR M_PCCTL (9),
+.BR M_PCSETOPTS (9),
+.BR M_PCEVENT (9),
+.BR M_UNHANGUP (9),
+.BR M_NOTIFY (9),
+.BR M_HPDATA (9),
+.BR M_LETSPLAY (9),
+.BR M_DONTPLAY (9),
+.BR M_BACKDONE (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -484,6 +811,93 @@ svr42
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR MacOT \(rg
+.[
+macspg
+.]
+call the
+.I db_class
+member,
+.IR db_iswhat ;
+the
+.I db_pad
+member,
+.IR db_filler2 .
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+defines these as an
+.B unsigned short
+.I db_flag
+field.
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+also defines the two flags
+.B DB_WASDUPED
+and
+.B DB_2PIECE
+for use in the
+.I db_flag
+field.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not access any of these fields.
+.IP \(em
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR MacOT \(rg
+.[
+macspg
+.]
+also define
+.I db_msgaddr
+and
+.I db_filler
+members that follow
+.IR db_size .
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not access any of these fields.
+.IP \(em
+.IR "SVR 3.1"
+placed the internal data buffer inside the
+.B datab
+structure.  It was declared as a
+.I db_cache
+.B unsigned char
+array member containing a maximum of
+.B DB_CACHESIZE
+bytes.
+The internal data buffer has since moved out of the
+.B datab
+structure, mostly for alignment purposes.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will be written to at least
+.IR "SVR 4"
+.[
+svr4spg
+.]
+specifications and will not attempt to access a
+.I db_cache
+member of the
+.B datab
+structure.
+.IP \(em
 Only
 .IR Solaris \(rg
 .[
@@ -500,7 +914,7 @@ soldoc
 .]
 and should not be used by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 It might be necessary to define
 .B _SUN_SOURCE
 before including
@@ -509,7 +923,7 @@ to expose these symbols.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .BR M_EVENT "(9) and " M_PCEVENT (9)
 data block types.
 .IP \(em
@@ -529,7 +943,7 @@ uw7doc
 .]
 and should not be used by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 It might be necessary to defined
 .B _UW7_SOURCE
 before including
@@ -538,7 +952,7 @@ to expose these symbols.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .BR M_TRAIL "(9), " M_PCCTL "(9) or " M_PCSETOPTS (9)
 data block types.
 .IP \(em
@@ -558,7 +972,7 @@ aixdoc
 .]
 and should not be used by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 It might be necessary to define
 .B _AIX_SOURCE
 before including
@@ -567,7 +981,7 @@ to expose these symbols.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .BR M_BACKWASH "(9), " M_LETSPLAY "(9), " M_DONTPLAY "(9) or " M_BACKDONE (9)
 data block types.
 .IP \(em
@@ -597,7 +1011,7 @@ hpuxdoc
 .]
 and should not be used by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 It might be necessary to define
 .B _OSF_SOURCE
 or
@@ -608,11 +1022,12 @@ to expose this symbol.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .BR M_NOTIFY (9)
 data block type.
 .IP \(em
 Only
+.IR OSF/1 \(rg,
 .IR HP-UX \(rg
 and
 .IR "Mac OT" \(rg
@@ -626,7 +1041,7 @@ and
 .IR "Mac OT" \(rg,
 and should not be used by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 It might be necessary to define
 .B _HPUX_SOURCE
 before including
@@ -635,7 +1050,7 @@ to expose this symbol.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .BR M_HPDATA (9)
 data block type.
 .IP \(em
@@ -653,7 +1068,7 @@ and
 .IR Solaris \(rg,
 and should not be used by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 It might be necessary to define
 .B _OSF_SOURCE
 or
@@ -664,9 +1079,178 @@ to expose this symbol.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .BR M_UNHANGUP (9)
 data block type.
+.IP \(em
+The numbering of the following message types is consistent across
+.IR "SVR 3" ,
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR IRIX \(rg,
+.[
+irixdoc
+.]
+.IR OSF/1 \(rg,
+.[
+osfdoc
+.]
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+.IR SUPER-UX  \(rg,
+.[
+suxdoc
+.]
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+.IR MacOT \(rg,
+.[
+macdoc
+.]
+.IR UXP/V \(rg,
+.[
+uxpdoc
+.]
+and current versions of
+.IR LiS ,
+.[
+lis
+.]
+(but not older versions of
+.I LiS
+that had broken message type numbering):
+.BR QNORM ,
+.BR M_DATA (9),
+.BR M_PROTO (9),
+.BR QPCTL ,
+.BR M_IOCACK (9),
+.BR M_IOCNAK (9),
+.BR M_PCPROTO (9),
+.BR M_PCSIG (9),
+.BR M_FLUSH (9),
+.BR M_STOP (9),
+.BR M_START (9),
+.BR M_HANGUP (9),
+and
+.BR M_ERROR (9).
+.IP ""
+The following are consistent across all but
+.IR OSF/1 \(rg,
+.[
+osfdoc
+.]
+which appears to have transliterated octal numbers to hexadecimal:
+.BR M_BREAK (9),
+.BR M_PASSFP (9),
+.BR M_SIG (9),
+.BR M_DELAY (9),
+.BR M_CTL (9),
+.BR M_IOCTL (9),
+.BR M_SETOPTS (9),
+and
+.BR M_RSE (9).
+.IP ""
+The following are numbered differently only for
+.IR OSF/1 \(rg,
+.IR HP-UX \(rg,
+and
+.IR MacOT \(rg,
+and, thus, have binary compatibility issues with those implementations only:
+.BR M_READ (9),
+.BR M_COPYIN (9),
+.BR M_COPYOUT (9),
+.BR M_IOCDATA (9),
+.BR M_PCRSE (9),
+.BR M_STOPI (9),
+.BR M_STARTI (9).
+.IP ""
+.IR "SVR 3"
+numbered
+.BR M_STOPI (9)
+and
+.BR M_STARTI (9)
+differently as well.
+.IP ""
+Of the implementation specific message types,
+.B @PACKAGE_TITLE@
+retains the same number on
+.BR M_EVENT (9),
+.BR M_TRAIL (9),
+.BR M_BACKWASH (9),
+.BR M_PCCTL (9),
+.BR M_PCSETOPTS (9),
+.BR M_LETSPLAY (9),
+.BR M_DONTPLAY (9),
+.BR M_BACKDONE (9),
+.BR M_PCTTY (9).
+So, even though these are implementation-specific, there are no binary compatibility issues
+associated with these message types.
+.IP ""
+Some implementation-specific messages have been renumbered so as not to overlap with others.  Thus,
+these have binary compatibility issues with their original implementations:
+.BR M_PCEVENT (9),
+.BR M_UNHANGUP (9),
+.BR M_NOTIFY (9),
+.BR M_HPDATA (9).
+Of these,
+.BR M_PCEVENT (9)
+is obsolete,
+.BR M_HPDATA (9)
+is private to the
+.IR OSF/1 \(rg
+Stream head,
+and
+.BR M_NOTIFY (9)
+is not supported.  The only real issue here is
+.BR M_UNHANGUP (9)
+that is a
+.IR Solaris \(rg
+message that conflicts in numbering with the
+.IR UnixWare \(rg
+.BR M_PCSETOPTS (9)
+message, both of which are supported at the
+Stream head by
+.BR "@PACKAGE_TITLE@" .
+.IP ""
+All in all the numbering selected by
+.B @PACKAGE_TITLE@
+is fairly consistent and provides the best fit with the least binary compatibility issues across
+this wide range of implementations.
+Portable
+.I STREAMS
+drivers and modules can use the core message types with disregard, however, caution should be
+exercised with binary implementations (i.e., firmware) intended to operate with
+.IR OSF/1 \(rg,
+and
+.IR HP-UX \(rg,
+on
+.BR M_READ (9),
+.BR M_COPYIN (9),
+.BR M_COPYOUT (9),
+.BR M_IOCDATA (9),
+.BR M_PCRSE (9),
+.BR M_STOPI (9),
+and
+.BR M_STARTI (9)
+messages, and with
+.IR Solaris \(rg,
+on the
+.BR M_UNHANGUP (9)
+message.
 .PP
 See
 .BR STREAMS (9)

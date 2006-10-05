@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.5 2006/10/03 13:51:57 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.6 2006/10/05 12:15:50 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/03 13:51:57 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:15:50 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -79,43 +79,47 @@ The sections that follow provide information on OpenSS7 releases of the @*
 
 @itemize
 @item
-Now builds 32-bit compatibility libraries and tests them against 64-bit kernel modules and drivers.
-The @samp{make installcheck} target will now automagically test both 64-bit native and 32-bit
-compatibility versions, one after the other, on 64-bit platforms.
+Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
+modules and drivers.  The @samp{make installcheck} target will now automatically
+test both 64-bit native and 32-bit compatibility versions, one after the other,
+on 64-bit platforms.
 
 @item
 Added versioning of all library symbols.
 
 @item
-Many documentation updates for all @uref{http://www.openss7.org/,, OpenSS7} packages.  Automated
-release file generation making for vastly improved and timely text documentation present in the
-release directory.
+Many documentation updates for all @uref{http://www.openss7.org/,, OpenSS7}
+packages.  Automated release file generation making for vastly improved and
+timely text documentation present in the release directory.
 
 @item
 Dropped support for @cite{LiS}.
 
 @item
-Package will now support extended ranges of minor devices on 2.6 kernels under @cite{Linux
-Fast-STREAMS} only.
+Package will now support extended ranges of minor devices on 2.6 kernels under
+@cite{Linux Fast-STREAMS} only.
 
 @item
-Better detection of SUSE distributions, release numbers and SLES distributions: support for
-additional @cite{SuSE} distributions on @code{ix86} as well as @code{x86_64}.  Added distribution
-support includes @cite{SLES 9}, @cite{SLES 9 SP2}, @cite{SLES 9 SP3}, @cite{SLES 10}, @cite{SuSE
-10.1}.
+Better detection of SUSE distributions, release numbers and SLES distributions:
+support for additional @cite{SuSE} distributions on @code{ix86} as well as
+@code{x86_64}.  Added distribution support includes @cite{SLES 9}, @cite{SLES 9
+SP2}, @cite{SLES 9 SP3}, @cite{SLES 10}, @cite{SuSE 10.1}.
 
 @item
-Improved compiler flag generation and optimizations for recent @command{gcc} compilers and some
-idiosynchratic behaviour for some distributions (primarily SUSE).
+Improved compiler flag generation and optimizations for recent @command{gcc}
+compilers and some idiosyncratic behaviour for some distributions (primarily
+SUSE).
 
 @item
-Optimized compilation is now available also for user level programs in addition to kernel programs.
-Added new @option{--with-optimize} option to @command{configure} to accomplish this.
+Optimized compilation is now available also for user level programs in addition
+to kernel programs.  Added new @option{--with-optimize} option to
+@command{configure} to accomplish this.
 
 @item
-Added @command{--disable-devel} @command{configure} option to suppress building and installing
-development environment.  This feature is for embedded or pure runtime targets that do not need the
-development enivironment (static libraries, manual pages, documentation).
+Added @command{--disable-devel} @command{configure} option to suppress building
+and installing development environment.  This feature is for embedded or pure
+runtime targets that do not need the development environment (static libraries,
+manual pages, documentation).
 
 @item
 Added @command{send-pr} script for automatic problem report generation.
@@ -155,7 +159,7 @@ Hyper-Threaded SMP on x86_64.  This package should now run well on N-way Xeons
 even with Hyper-Threading enabled.
 
 @item
-Corrections and validation of 32-bit compatibilty over 64-bit on x86_64.
+Corrections and validation of 32-bit compatibility over 64-bit on x86_64.
 Should apply well to other 64-bit architectures as well.
 @end itemize
 

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mcopyin.9.man,v 0.9.2.3 2006/04/05 09:43:32 brian Exp $
+.\" @(#) $Id: mcopyin.9.man,v 0.9.2.4 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:32 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mcopyin.9.man,v $
+.\" Revision 0.9.2.4  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.3  2006/04/05 09:43:32  brian
 .\" - moved .so line and updated headers
 .\"
@@ -104,14 +107,18 @@ a pointer to the
 .BR M_IOCTL (9)
 or
 .BR M_IOCDATA (9)
-message block that was passed into the write-side put or service procedure from which
+message block that was passed into the write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure from which
 .BR mcopyin ()
 is being called.
 .TP
 .I private
 private data that the
 .I STREAMS
-module or driver wants associated with the
+driver or module wants associated with the
 .BR copyreq (9)
 structure.
 .TP
@@ -124,7 +131,7 @@ initial
 .BR M_IOCTL (9)
 of a
 .I TRANSPARENT
-.BR ioctl (2),
+.BR ioctl (2s),
 this argument must be
 .BR NULL ;
 in which case, the user address will be acquired from the passed in
@@ -144,7 +151,7 @@ message from a
 or
 .RI non- TRANSPARENT
 .RB ( I_STR )
-.BR ioctl (2)
+.BR ioctl (2s)
 received as a
 .BR M_IOCTL (9)
 or
@@ -163,7 +170,11 @@ message or a pointer to a
 message.  This message block should not be manipulated in any way by the caller and should be used
 as passed to the
 .I STREAMS
-module or driver's write-side put or service procedure.
+driver or module's write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
 .PP
 The passed in
 .I private
@@ -199,8 +210,12 @@ message block.
 .BR mcopyin ()
 is used to generate a properly formed
 .BR M_COPYIN (9)
-message upstream from a module or drivers
-write-side put or service procedure.
+message upstream from a driver or modules
+write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
 .\"
 .\"
 .SH RETURN
@@ -228,17 +243,24 @@ is passed invalid pointers or arguments, kernel instability or a panic may resul
 .BR mcopyin ()
 should be called from a
 .I STREAMS
-module or driver write-side put or service procedure.
+driver or module write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR mcopyin ()
 is MP-safe; however, the caller is responsible for ensuring exclusive access to the passed in
-message.  This is normally the case when the message pointer is that passed to the write-side put or
-service procedure of the
+message.  This is normally the case when the message pointer is that passed to the write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure of the
 .I STREAMS
-module or driver.
+driver or module.
 .\"
 .\"
 .SH NOTICES

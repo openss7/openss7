@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_copy_state.9.man,v 0.9.2.6 2006/04/05 09:43:33 brian Exp $
+.\" @(#) $Id: mi_copy_state.9.man,v 0.9.2.7 2006/10/05 12:15:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:33 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copy_state.9.man,v $
+.\" Revision 0.9.2.7  2006/10/05 12:15:43  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:33  brian
 .\" - moved .so line and updated headers
 .\"
@@ -87,11 +90,13 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #define _MAC_SOURCE
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
 .br
-.B #include <sys/macddi.h>
+.B #include <sys/mpsddi.h>
 .HP
 .BI "int mi_copy_state(queue_t *" q ", mblk_t *" mp ", mblk_t **" mpp );
 .\"
@@ -100,7 +105,11 @@ sort-adjacent-labels
 .PP
 .TP
 .I q
-the current write-side queue whose put or service procedure within which
+the current write-side queue whose
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure within which
 .BR mi_copy_state ()
 is being called.
 .TP
@@ -109,7 +118,10 @@ a pointer to the message block that contains the
 .BR M_IOCTL (9)
 or
 .BR M_IOCDATA (9)
-message being processed.  This is the message that was passed to the write-side put or service
+message being processed.  This is the message that was passed to the write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
 procedure within which
 .BR mi_copy_state ()
 is invoked.
@@ -120,11 +132,17 @@ a pointer to a
 into which the pointer to the just copied in data (if applicable) is placed.
 .\"
 .\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR mi_copy_state ()
 is one of a set of helper functions that support transparent input-output controls (see
-.BR ioctl (2)
+.BR ioctl (2s)
 and
 .BR streamio (9))
 that includes
@@ -195,7 +213,7 @@ it returns minus one
 .SH ERRORS
 .PP
 .BR mi_copy_state ()
-failes when passed invalid pointers.  When
+fails when passed invalid pointers.  When
 .BR mi_copy_state ()
 fails, it panics the kernel.
 .PP
@@ -209,7 +227,7 @@ returns minus one
 .RB ( -1 ).
 The error codes returned by
 to the
-.BR ioctl (2)
+.BR ioctl (2s)
 operation in
 .BR errno (3),
 are as follows:
@@ -245,7 +263,7 @@ Also, any error returned by the stream head in a
 response
 .RI ( cp->cp_rval )
 can also be returned to the
-.BR ioctl (2)
+.BR ioctl (2s)
 system call.
 .\"
 .\"
@@ -315,19 +333,35 @@ can be called from
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_copy_state ()
+is MP-safe; however, it is the responsibility of the caller to ensure exclusive access to the passed
+in message blocks.  This is normally the case when the function is called from the
+.I STREAMS
+driver or module write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
 .\"
 .\"
 .SH NOTICES
 .PP
 .BR mi_copy_state ()
-is a
-.IR MacOT \(rg-specific
+is an
+.IR MPS \(rg-specific
 function:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
 .B _MAC_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.BR "@PACKAGE_TITLE@"
 must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_MAC
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
 or
 .B CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
@@ -335,6 +369,25 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.B mi_copy_state ()
+is implemented by directly manipulating the
+.BR iocblk (9),
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures contained in the message block.  Private state information and accumulated data is
+chained off of the
+.IR cq_private " and " cp_private
+members of the
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures.
+Because of this, it is important that once one of these helper functions is used to begin an
+.BR M_IOCTL (9)
+sequence, that the remaining help functions be used also, instead of directly manipulating the
+structures.  Messages and their contained structures should be passed to the helper functions
+without being manipulated in any way by the caller.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -345,6 +398,8 @@ defined.
 .BR mi_copyout_alloc (9),
 .BR mi_copy_set_rval (9),
 .BR MI_COPY_CASE (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
 .BR maccompat (9),
 .BR STREAMS (9).
 .\"
@@ -358,17 +413,18 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR mi_copy_state ()
-is compatible with
-.IR MacOT \(rg
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
 and
-.IR OpenSolaris \(rg
+.IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 .BR mi_copy_state ()
 is an
-.IR MacOT \(rg-specific
+.IR MPS \(rg-specific
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
@@ -377,23 +433,23 @@ should be used in its stead.
 .IP \(em
 .BR mi_copy_state ()
 is provided for source level compatibility with
-.IR MacOT \(rg
+.IR MPS \(rg
 for the purpose of porting
-.IR MacOT \(rg
+.IR MPS \(rg
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.BR "@PACKAGE_TITLE@"
 .[
 lfs
 .]
 differ from that of
-.IR MacOT \(rg,
+.IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
 .BR mi_copy_state ()
 only provides functionality comparable to
-.IR MacOT \(rg
+.IR MPS \(rg
 for use by
 .I STREAMS
 drivers and modules.
@@ -404,7 +460,9 @@ in support of
 devices are not supported.
 .PP
 See
-.BR maccompat (9)
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
 and
 .BR STREAMS (9)
 for additional compatibility considerations.
@@ -412,13 +470,20 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
+.IR MPS \(rg
+DDI documentation,
 .IR MacOT \(rg
-DDI documentation.
+DDI documentation,
 .[
 macotr
 .]
 .[
 macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
 .]
 .\"
 .\"
@@ -426,7 +491,28 @@ macspg
 .PP
 .BR mi_copy_state ()
 first appeared in
-.IR MacOT \(rg.
+.IR MPS \(rg.
+.BR mi_copy_state ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_copy_state ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_copy_state ()
+appears in
+.IR Solaris \(rg.
 .\"
 .\"
 .[

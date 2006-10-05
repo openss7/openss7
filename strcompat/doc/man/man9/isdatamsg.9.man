@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: isdatamsg.9.man,v 0.9.2.10 2006/04/05 09:43:32 brian Exp $
+.\" @(#) $Id: isdatamsg.9.man,v 0.9.2.11 2006/10/05 12:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:32 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: isdatamsg.9.man,v $
+.\" Revision 0.9.2.11  2006/10/05 12:15:42  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.10  2006/04/05 09:43:32  brian
 .\" - moved .so line and updated headers
 .\"
@@ -89,13 +92,18 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "int isdatamsg(mblk_t *" mp );
+.BI "int isdatamsg(mblk_t *" mp ");
 .\"
 .\"
 .SH ARGUMENTS
 .TP
 .I mp
 the message block to test for data type.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION
@@ -130,15 +138,14 @@ is always successful.
 .SH CONTEXT
 .PP
 .BR isdatamsg ()
-can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR isdatamsg ()
-is MP-safe.  The caller is responsible for protecting the integrity of the
-message block.
+is MP-safe.  The caller is responsible for protecting the integrity of the passed in message block.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -156,15 +163,31 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR isdatamsg ()
-is source-level compatible with
-SVR 4.2 MP DDI/DKI,
-.IR Solaris \(rg
-and LiS.
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
 .BR isdatamsg ()
-is binary compatible with LiS.
+is implemented as an
+.BR "extern inline" .
+Some implementations, such as
+.IR LiS ,
+implement
+.BR isdatamsg ()
+as a macro.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not attempt to take a function pointer reference to
+.BR isdatamsg ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -175,7 +198,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
@@ -186,7 +209,8 @@ documentation.
 .SH HISTORY
 .PP
 .BR isdatamsg ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3
 .]
