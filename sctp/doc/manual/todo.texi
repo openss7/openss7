@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:37:56 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/05 12:14:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:37:56 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:14:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -97,7 +97,7 @@ place: it should be in netinet/sctp.h for user programs.  That is where we insta
 @quotation
 @emph{*done*}
 
-Our header installs in netinet/sctp.h and has namespace polution protection.
+Our header installs in netinet/sctp.h and has namespace pollution protection.
 @end quotation
 
 @item
@@ -120,7 +120,7 @@ using a compiler trick to compare sizes of complex data structures.
 
 @item
 We need to define SOL_SCTP that should be in linux/socket.h for the socket layer.  Some lksctp
-kernels already have it defined.  It needs to be the protoco number of 132 so there is no conflict
+kernels already have it defined.  It needs to be the protocol number of 132 so there is no conflict
 there.
 
 @quotation
@@ -263,13 +263,14 @@ Reporting snmp statistics.  lksctp doesn't do this right (i.e. netstat broken.) 
 generate our own sctp_get_info, we need to wrapper snmp_get_info and afinet_get_info.  We can do
 this by ripping these symbols, indexing into the proc directory structures and then stabbing them.
 Or we could destroy them and recreate them with the wrapper.  All we have to do is print our SCTP
-info first and then call the wrappered function for both snmp_get_info and afinet_get_info.
+info first and then call the wrapper function for both snmp_get_info and afinet_get_info.
 
 @quotation
 @emph{*done*}
 
-I wrappered both snmp_get_info and afinet_get_info and reload the new version in the right place on
-module load and unload them afterward.  sctp_get_info is defined and loaded under /proc/net/sctp.
+I wrote wrappers for both snmp_get_info and afinet_get_info and reload the new version in the right
+place on module load and unload them later.  sctp_get_info is defined and loaded under
+/proc/net/sctp.
 @end quotation
 
 @item

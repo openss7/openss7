@@ -1,3 +1,12 @@
+2006-10-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* doc/manual/news.texi: updates for release
+	* doc/manual/todo.texi: updates for release
+
 2006-10-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: update release notes

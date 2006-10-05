@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.5 2006/10/03 13:51:32 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.6 2006/10/05 12:14:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/03 13:51:32 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:14:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -87,13 +87,13 @@ Added @command{send-pr} scripts for automatic problem report generation.
 
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
-modules and drivers.  The @samp{make installcheck} target will now automagically
+modules and drivers.  The @samp{make installcheck} target will now automatically
 test both 64-bit native and 32-bit compatibility versions, one after the other,
 on 64-bit platforms.
 
 @item
 Improved compiler flag generation and optimizations for recent @command{gcc}
-compilers and some idiosynchratic behaviour for some distributions (primarily
+compilers and some idiosyncratic behaviour for some distributions (primarily
 SUSE).
 
 @item
@@ -115,7 +115,7 @@ timely text documentation present in the release directory.
 @item
 Added @command{--disable-devel} @command{configure} option to suppress
 building and installing development environment.  This feature is for embedded
-or pure runtime targets that do not need the development enivironment (static
+or pure runtime targets that do not need the development environment (static
 libraries, manual pages, documentation).
 
 
@@ -162,7 +162,7 @@ This is a major bug fix release.  The previous release was largely untested.
 With this release version numbers were changed to reflect an upstream version
 only to be consistent with other OpenSS7 package releases.  All @cite{RPM}
 release numbers will be @samp{-1$(PACKAGE_RPMEXTRA)} and all @cite{Debian}
-release numbers will be @samp{_0}.  If you wish to apply patches and relelease
+release numbers will be @samp{_0}.  If you wish to apply patches and release
 the package, please bump up the release number and apply a suitable release
 suffix for your organization.  We leave @cite{Debian} release number @samp{_1}
 reserved for your use, so you can still bundle the source in the @file{.dsc}
