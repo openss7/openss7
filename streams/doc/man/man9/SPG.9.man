@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: SPG.9.man,v 0.9.2.20 2006/04/13 18:32:45 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 0.9.2.21 2006/10/05 12:17:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/13 18:32:45 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: SPG.9.man,v $
+.\" Revision 0.9.2.21  2006/10/05 12:17:05  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.20  2006/04/13 18:32:45  brian
 .\" - working up DL and NP drivers.
 .\"
@@ -2089,32 +2092,33 @@ necessary symbolic links on device name and instance number without concern
 for major device numbers.
 .\"
 .\"
-.SH RETURN
-.PP
+.\".SH RETURN
+.\".PP
 .\"
 .\"
-.SH ERRORS
-.PP
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
-.SH CONTEXT
-.PP
+.\".SH CONTEXT
+.\".PP
 .\"
 .\"
-.SH MP-STREAMS
-.PP
+.\".SH MP-STREAMS
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR STREAMS (9).
 .\"
 .\"
-.SH BUGS
-.PP
+.\".SH BUGS
+.\".PP
 .\"
 .\"
 .SH COMPATIBILITY
@@ -2232,12 +2236,12 @@ for major device numbers.
 .PP
 .\"
 .\"
-.SH CONFORMANCE
-.PP
+.\".SH CONFORMANCE
+.\".PP
 .\"
 .\"
-.SH HISTORY
-.PP
+.\".SH HISTORY
+.\".PP
 .\"
 .\"
 .[

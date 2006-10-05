@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_PIPE.7.man,v 0.9.2.4 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_PIPE.7.man,v 0.9.2.5 2006/10/05 12:17:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_PIPE.7.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:00  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B I_PIPE
-\- \fISTREAMS\fP input-output control
+\- obtain a \fISTREAMS\fP-based pipe
 .\"
 .\"
 .SH SYNOPSIS   
@@ -109,10 +112,23 @@ always
 .BR I_PIPE .
 .TP
 .I arg
+is a pointer to an array of two integers
+.RB ( int )
+into which to receive the integer file descriptors for each end of the pipe.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B I_PIPE
+provides an
+.BR ioctl (2s)
+emulation of the
+.BR pipe (2s)
+system call.
+.I arg
+is a pointer to an array of two
+.B int
+file descriptors into which to receive the file descrptors for each end of the pipe.
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -122,12 +138,10 @@ Upon success, the
 .BR ioctl (2s)
 command returns zero
 .RB ( 0 )
-or a positive integer.
-Upon failure, the
-.B I_PIPE
-.BR ioctl (2s)
-command returns
-.B -1
+and the file descriptors for the pipe ends into the array pointed to by
+.IR arg ;
+upon failure, minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to an appropriate error number.
@@ -143,6 +157,27 @@ command fails, it returns
 and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EMFILE ]
+More than
+.RB { OPEN_MAX }
+minus two file descriptors are already in use by the calling process.
+.TP
+.RB [ ENFILE ]
+The system-wide maximum number of simultaneous open file descriptors would be
+exceeded.
+.TP
+.RB [ ENOMEM ]
+Memory could not be allocated for kernel datastructures required to represent
+the pipe.
+.TP
+.RB [ ENODEV ]
+The
+.BR specfs (5)
+file system is not available on the system.
+.TP
+.RB [ ENXIO ]
+A suitable pipe device is not available on the system.
 .\"
 .PP
 In general, any

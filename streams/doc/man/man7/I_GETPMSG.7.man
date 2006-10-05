@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_GETPMSG.7.man,v 0.9.2.5 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_GETPMSG.7.man,v 0.9.2.6 2006/10/05 12:17:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_GETPMSG.7.man,v $
+.\" Revision 0.9.2.6  2006/10/05 12:17:00  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B I_GETPMSG
-\- \fISTREAMS\fP input-output control
+\- \fISTREAMS\fP getpmsg system call emulation
 .\"
 .\"
 .SH SYNOPSIS   
@@ -162,15 +165,15 @@ a pointer to the user buffer.
 .RE
 .TP
 .I band
-an integer band number specifying the band of the message to retreive on call, and returning the
-band of the retreived message on return.
+an integer band number specifying the band of the message to retrieve on call, and returning the
+band of the retrieved message on return.
 .TP
 .I flags
-integer flags specifying which messaes to retreive on call, and returning the priority of the
-retreived message on return.
+integer flags specifying which messages to retrieve on call, and returning the priority of the
+retrieved message on return.
 .I flags
 can be one of the following for
-.BR getmsg (2s)
+.BR getmsg (2)
 emulation:
 .RS
 .TP \w'\fBMSG_HIPRI\fR\(em'u
@@ -201,7 +204,6 @@ retrieve only high priority messages (retrieved message was high priority).
 .PD
 .RE
 .RE
-
 .\"
 .\"
 .SH DESCRIPTION
@@ -210,7 +212,7 @@ retrieve only high priority messages (retrieved message was high priority).
 provides an
 .BR ioctl (2s)
 emulation of the
-.BR getmsg (2s)
+.BR getmsg (2)
 and
 .BR getpmsg (2s)
 system calls.
@@ -224,12 +226,12 @@ Under the emulation,
 is the same as the
 .I fd
 argument to
-.BR getmsg (2s)
+.BR getmsg (2)
 or
 .BR getpmsg (2s);
 .I arg
 points to a structure containing the remaining arguments for
-.BR getmsg (2s)
+.BR getmsg (2)
 and
 .BR getpmsg (2s).
 .I cmd
@@ -237,7 +239,7 @@ is always
 .BR I_GETPMSG .
 .PP
 See
-.BR getmsg (2s)
+.BR getmsg (2)
 and
 .BR getpmsg (2s)
 for the purpose and function of the arguments.
@@ -250,13 +252,13 @@ The
 input-output control is not intended to be invoked directly with the
 .BR ioctl (2s)
 interface, but rather via the
-.BR getmsg (2s)
+.BR getmsg (2)
 and
 .BR getpmsg (2s)
 library calls.
 .PP
 See
-.BR getmsg (2s)
+.BR getmsg (2)
 and
 .BR getpmsg (2s)
 for details on the operation of the system call this
@@ -274,7 +276,7 @@ will return a non-negative value with any of the following flags set:
 .B MORECTL
 indicates that more control information belonging to the same message is
 waiting to be retrieved from the stream head read queue with a subsequent
-.BR getmsg (2s)
+.BR getmsg (2)
 operation.
 .TP
 .B MOREDATA
@@ -308,7 +310,7 @@ and sets
 to one of the following errors:
 .PP
 The following errors are returned for the
-.BR getmsg (2s)
+.BR getmsg (2)
 emulation:
 .TP \w'[\fBEWOULDBLOCK\fR]\(em'u
 .RB [ EISDIR ]
@@ -333,7 +335,7 @@ structure pointed to by
 .RB [ ENODEV ]
 .I fd
 refers to a device that does not support the
-.BR getmsg (2s)
+.BR getmsg (2)
 system call.
 .TP
 .RB [ ENOSTR ]
@@ -355,15 +357,15 @@ refers to a stream that is open but is in the process of closing.
 .RB [ EINVAL ]
 .I fd
 is linked under a multiplexing driver; or,
-.BR getmsg (2s)
+.BR getmsg (2)
 is not supported; or, the flags pointed to by
 .I flagsp
 were invalid for
-.BR getmsg (2s).
+.BR getmsg (2).
 .TP
 .RB [ EAGAIN ]
 The stream head is set for non-blocking operation and
-.BR getmsg (2s)
+.BR getmsg (2)
 would block: that is, no message of the requested type and priority band is
 available to be read.
 .TP
@@ -382,7 +384,7 @@ have the same value.)
 A signal was caught, or an
 .BR M_SIG (9)
 message processed, before the call to
-.BR getmsg (2s)
+.BR getmsg (2)
 could return any data.
 .TP
 .RB [ ENOSTR ]
@@ -398,14 +400,14 @@ as specified by
 .IR flagsp .
 .PP
 Other errors may be returned by
-.BR getmsg (2s).
+.BR getmsg (2).
 If the
 .I STREAMS
 module sends a
 .BR M_ERROR (9)
 message to the stream head, the error returned on all subsequent read
 operations, including
-.BR getmsg (2s),
+.BR getmsg (2),
 is specified in the
 .BR M_ERROR (9)
 message by the
@@ -730,7 +732,7 @@ conforms as closely as possible to the
 specifications.
 Where a specific
 .IR "SVR 4.2" -based
-implemntation differs from
+implementation differs from
 .IR POSIX/SUSv3 ,
 there will be differences with this
 .I @PACKAGE_TITLE@
@@ -741,7 +743,7 @@ Portable
 applications programs will expect conformance to
 .IR POSIX/SUSv3 .
 .IP \(em
-It is fairly common practice to emulate system calls with
+It is fairly common practise to emulate system calls with
 .BR ioctl (2s)
 commands.
 .IP \(em

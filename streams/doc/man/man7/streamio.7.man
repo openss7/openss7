@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.21 2006/09/23 00:35:56 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.22 2006/10/05 12:17:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/23 00:35:56 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: streamio.7.man,v $
+.\" Revision 0.9.2.22  2006/10/05 12:17:01  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.21  2006/09/23 00:35:56  brian
 .\" - added manpages
 .\"
@@ -1220,14 +1223,14 @@ will success, but will return only the number of names in the space provided.
 Upon success,
 .B I_LIST
 returns zero (0) and the module and driver names in the passed in
-.B str_list " and " str_mlist
+.BR str_list " and " str_mlist
 structures, or, when
 .I arg
 is
 .BR NULL ,
 returns a positive integer indicating the number of modules plus the driver on
 the stream
-.IR fd.
+.IR fd .
 Upon failure,
 .B I_LIST
 returns -1 and sets

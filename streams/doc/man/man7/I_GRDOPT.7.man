@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_GRDOPT.7.man,v 0.9.2.4 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_GRDOPT.7.man,v 0.9.2.5 2006/10/05 12:17:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_GRDOPT.7.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:00  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B I_GRDOPT
-\- \fISTREAMS\fP input-output control
+\- get \fISTREAMS\fP read options
 .\"
 .\"
 .SH SYNOPSIS   
@@ -109,10 +112,46 @@ always
 .BR I_GRDOPT .
 .TP
 .I arg
+a pointer to an
+.B int
+into which to received the read options.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+Gets the read options flags for the stream head.
+.I arg
+is a pointer to an integer to receive the stream head read options.
+The integer pointed to by
+.I arg
+will return one flag from the following mode flags:
+.TP \w'\fBRPROTNORM\fR\(em'u
+.B RNORM
+byte-stream mode.  This is the default read mode.
+.PD 0
+.TP
+.B RMSGN
+message non-discard mode.
+.TP
+.B RMSGD
+message discard mode.
+.TP
+.B RFILL
+message fill mode.
+.PD
+.PP
+bitwise OR'ed with one flag from the following protocol flags:
+.TP \w'\fBRPROTNORM\fR\(em'u
+.B RPROTNORM
+fail read when control part present.
+.PD 0
+.TP
+.B RPROTDAT
+deliver control part of a message as data.
+.TP
+.B RPROTDIS
+discard control part of message, delivering any data part.
+.PD
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -122,12 +161,13 @@ Upon success, the
 .BR ioctl (2s)
 command returns zero
 .RB ( 0 )
-or a positive integer.
+and the read options flags in the integer pointed to by
+.IR arg .
 Upon failure, the
 .B I_GRDOPT
 .BR ioctl (2s)
-command returns
-.B -1
+command returns minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to an appropriate error number.
@@ -138,11 +178,15 @@ to an appropriate error number.
 When the
 .B I_GRDOPT
 .BR ioctl (2s)
-command fails, it returns
-.B -1
+command fails, it returns minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EFAULT ]
+.I arg
+points outside the caller's valid address space.
 .\"
 .PP
 In general, any

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mps_become_writer.9.man,v 0.9.2.4 2006/04/05 09:44:14 brian Exp $
+.\" @(#) $Id: mps_become_writer.9.man,v 0.9.2.5 2006/10/05 12:17:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:14 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:07 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mps_become_writer.9.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:07  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:14  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B mps_become_writer
-\-
+\- \fISTREAMS\fR mutex upgrade
 .\"
 .\"
 .SH SYNOPSIS
@@ -101,16 +104,68 @@ sort-adjacent-labels
 .SH ARGUMENTS
 .PP
 .TP
-.I yyy
+.I q
+a pointer to the queue for which to upgrade to writer.
+.TP
+.I mp
+a
+.I STREAMS
+message to pass to the call-out function.
+.TP
+.I proc
+a function that will be called when write access has been acheived.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .BR mps_become_writer ()
+schedules the call-out function,
+.IR proc ,
+to be executed with the specified queue pair,
+.IR q ,
+and the passed in message,
+.IR mp ,
+once the driver or module queue can be entered exclusively.
+.PP
+If there is no synchronization in effect for the queue,
+.IR q ,
+then this function has the same effect as calling
+.I proc
+directly with
+.IR q " and " mp
+as arguments.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mps_become_writer ()
+allows
+.RI non- STREAMS
+software to safely call
+.I STREAMS
+utilities.
+.RI Non- STREAMS
+code can call
+.BR mps_become_writer (),
+passing it a function and a queue pointer,
+.IR q .
+.B @PACKAGE_TITLE@
+runs the function as it it were the queue's
+.BR qi_putp (9)
+procedure.  The function can safely manipulate the queue and access the same
+data structure as the queue's
+.BR qi_putp (9)
+procedure.
+.BR mps_become_writer ()
+passes
+.IR q " and " mp " to " proc .
+The caller must pass a valid message block pointer,
+.IR mp ,
+because
+.B @PACKAGE_TITLE@
+uses fields in the message block not visible to the
+.I STREAMS
+programmer.
 .\"
 .\"
 .SH RETURN
@@ -127,16 +182,40 @@ when it fails, it returns
 .PP
 .BR mps_become_writer ()
 fails when 
+.I q
+or
+.I mp
+are invalid.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR mps_become_writer ()
-can be called from
+can be called from any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR msp_become_writer ()
+is MP-safe and was intended to support MP-safe operation in the SMP
+environment.
+.PP
+Considerations should be given when writing the call-out function that the
+function may execute in parallel with asynchronous entry points, callbacks,
+call-outs and interrupt service procedures.
+.PP
+However, in
+.BR "Linux Fast-STREAMS" ,
+the call-out function is scheduled on the same CPU and the CPU which called
+.BR mps_become_writer ().
+This means that
+.BR mps_become_writer ()
+will return before the call-out function executes when called on the ICS.
+Also, when called on the ICS, the call-out function will not execute before
+the calling function returns or the next preemption point is encountered.
+.PP
+When called from any other context, the call-out function will execute before
+the call returns.
 .\"
 .\"
 .SH NOTICES
@@ -157,10 +236,35 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.B @PACKAGE_TITLE@
+uses
+a single mechanism,
+.BR __strwrit (),
+for supporting all queue writer functions such as
+.BR qwriter (9)
+and
+.BR mps_become_writer (),
+and a single mechanism,
+.BR __strfunc (),
+for supporting all queue put function such as
+.BR streams_put (9).
+.PP
+When called on the ICS, execution of the call-out function is deferrred until
+the next run of the
+.I STREAMS
+scheduler,
+.BR strqsched (9),
+and the function simply returns.
+When called from any other context, synchronization is performed and the call-out function is executed immediately thereafter
+and before returning.  See
+.BR mp-streams (9)
+for more information.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR qwriter (9),
+.BR streams_put (9),
 .BR maccompat (9),
 .BR STREAMS (9).
 .\"
@@ -178,17 +282,17 @@ is compatible with
 .IR MacOT \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 .BR mps_become_writer ()
 is an
 .IR MacOT \(rg-specific
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
-The more common
-.BR qwriter (9)
-function should be used in its stead.
+The standard
+.BR freezestr (9)
+and
+.BR put (9)
+functions should be used in its stead.
 .IP \(em
 .BR mps_become_writer ()
 is provided for source level compatibility with

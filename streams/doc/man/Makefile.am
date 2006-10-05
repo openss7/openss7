@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2006/09/23 00:35:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2006/10/05 12:16:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/23 00:35:57 $ by $Author: brian $
+# Last Modified $Date: 2006/10/05 12:16:49 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.80  2006/10/05 12:16:49  brian
+# - updates for release
+#
 # Revision 0.9.2.79  2006/09/23 00:35:57  brian
 # - added manpages
 #
@@ -960,7 +963,6 @@ util_pages += \
 endif
 
 MANS_UNUSED = \
-	man2/fcntl.2s \
 	man2/poll.2s \
 	man2/read.2s \
 	man2/readv.2s \
@@ -981,8 +983,10 @@ MANS_EXEMPT = \
 
 man_MANS = \
 	man2/fattach.2 \
+	man2/fdetach.2 \
 	man2/getmsg.2 \
 	man2/getpmsg.2s \
+	man2/isastream.2 \
 	man2/pipe.2s \
 	man2/putmsg.2 \
 	man2/putpmsg.2s \
@@ -2089,7 +2093,8 @@ dist_noinst_util_pages = \
 
 dist_noinst_MANS = \
 	man2/fattach.2.man \
-	man2/fcntl.2s.man \
+	man2/fdetach.2.man \
+	man2/isastream.2.man \
 	man2/getmsg.2.man \
 	man2/getpmsg.2s.man \
 	man2/pipe.2s.man \

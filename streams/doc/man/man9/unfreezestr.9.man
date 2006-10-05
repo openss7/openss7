@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: unfreezestr.9.man,v 0.9.2.25 2006/04/05 09:44:19 brian Exp $
+.\" @(#) $Id: unfreezestr.9.man,v 0.9.2.26 2006/10/05 12:17:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: unfreezestr.9.man,v $
+.\" Revision 0.9.2.26  2006/10/05 12:17:20  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.25  2006/04/05 09:44:19  brian
 .\" - moved .so line and updated headers
 .\"
@@ -263,6 +266,12 @@ can be called instead of
 called with with an invalid
 .I q
 pointer will have undefined results.
+.PP
+.BR unfreezestr ()
+called with a private queue pair allocated with
+.BR allocq (9)
+will only unlock the queue.  It is the caller's responsibility to unlock any
+private queue linkage protection.
 .PP
 If
 .BR unfreezestr ()

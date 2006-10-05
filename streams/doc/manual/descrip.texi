@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.4 2006/09/18 01:07:00 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.5 2006/10/05 12:17:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/18 01:07:00 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:17:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -162,7 +162,7 @@ Promotes mainstream kernel adoption.
 @tab
 Places portability concerns before mainstream kernel adoption.
 @item
-Lindented and follows normal kernel formatting and coding practises.
+Linux indented and follows normal kernel formatting and coding practises.
 @tab
 Non-lindented, does not follow normal kernel formatting and coding practise.
 @item

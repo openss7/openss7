@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strthread.9.man,v 0.9.2.7 2006/04/05 09:44:19 brian Exp $
+.\" @(#) $Id: strthread.9.man,v 0.9.2.8 2006/10/05 12:17:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:19 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strthread.9.man,v $
+.\" Revision 0.9.2.8  2006/10/05 12:17:19  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:44:19  brian
 .\" - moved .so line and updated headers
 .\"
@@ -257,10 +260,20 @@ implementation specific.
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B strthread
+structure is an structure used internal to the
+.I STREAMS
+scheduler that is used to store information about a cpu-bound kernel thread
+within the
+.I STREAMS
+executive.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.I STREAMS
+kernel threads run at process context within the kernel.
 .\"
 .\"
 .SH MP-STREAMS
@@ -273,14 +286,42 @@ This is an internal scheduler structure and should not be manipulated directly.
 .\"
 .SH NOTICES
 .PP
+.B strthread
+structures are not intended to be used directly by portable
+.I STREAMS
+drivers or modules.  It is only intended to be used directly by inlined
+.I STREAMS
+utilities.
+.PP
+Manipulating
+.B strthread
+structures without using
+.I STREAMS
+utility functions intended to do so, will likely cause panics and crash the
+system.  Use proper
+.I STREAMS
+utility functions instead.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR setqsched (9),
+.BR runqueues (9).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B strthread
+contains information that was allocated statically within the kernel in
+accordance with the descriptions for
+.IR "SVR 4"
+.[
+svr4spg
+.]
+in the MG.
+.[
+magic
+.]
 .PP
 See
 .BR STREAMS (9)
@@ -289,10 +330,31 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
+The
+.B strthread
+structure is consistent with the description of the internal static variables
+associated with the
+.I STREAMS
+scheduler function of
+.IR "SVR 4" .
+.[
+magic
+.]
+.[
+svr4spg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.B strthread
+first appears in
+.BR "@PACKAGE_TITLE@" .
+Some of the members appeared as static variables in
+.IR "SVR 4" .
+.[
+svr4spg
+.]
 .\"
 .\"
 .[

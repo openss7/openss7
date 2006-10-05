@@ -1,7 +1,8 @@
+.so man2/fattach.2.man
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: fattach.3.man,v 0.9.2.14 2006/04/05 09:43:43 brian Exp $
+.\" @(#) $Id: fattach.3.man,v 0.9.2.15 2006/10/05 12:16:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:16:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: fattach.3.man,v $
+.\" Revision 0.9.2.15  2006/10/05 12:16:53  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.14  2006/04/05 09:43:43  brian
 .\" - moved .so line and updated headers
 .\"

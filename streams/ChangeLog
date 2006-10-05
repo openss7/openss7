@@ -1,3 +1,92 @@
+2006-10-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* doc/manual/descrip.texi: updates for release
+	* doc/manual/news.texi: updates for release
+	* doc/manual/todo.texi: updates for release
+
+	* doc/man/Makefile.am: updated manpage for release
+	* doc/man/man2/fattach.2.man: updated manpage for release
+	* doc/man/man2/pipe.2s.man: updated manpage for release
+	* doc/man/man2/poll.2s.man: updated manpage for release
+	* doc/man/man2/putpmsg.2s.man: updated manpage for release
+	* doc/man/man2/read.2s.man: updated manpage for release
+	* doc/man/man2/fdetach.2.man: added manual page
+	* doc/man/man2/isastream.2.man: added manual page
+	* doc/man/man3/fattach.3.man: updated manpage for release
+	* doc/man/man3/fdetach.3.man: updated manpage for release
+	* doc/man/man3/isastream.3.man: updated manpage for release
+	* doc/man/man3/libstreams.3.man: updated manpage for release
+	* doc/man/man3/pipe.3.man: updated manpage for release
+	* doc/man/man3/s_pipe.3.man: updated manpage for release
+	* doc/man/man4/loop.4.man: updated manpage for release
+	* doc/man/man4/mux.4.man: updated manpage for release
+	* doc/man/man4/s_fifo.4.man: updated manpage for release
+	* doc/man/man4/s_pipe.4.man: added manual page
+	* doc/man/man5/strsetup.conf.5.man: updated manpage for release
+	* doc/man/man7/I_GETPMSG.7.man: updated manpage for release
+	* doc/man/man7/I_GETSIG.7.man: updated manpage for release
+	* doc/man/man7/I_GRDOPT.7.man: updated manpage for release
+	* doc/man/man7/I_GWROPT.7.man: updated manpage for release
+	* doc/man/man7/I_ISASTREAM.7.man: updated manpage for release
+	* doc/man/man7/I_LIST.7.man: updated manpage for release
+	* doc/man/man7/I_LOOK.7.man: updated manpage for release
+	* doc/man/man7/I_NREAD.7.man: updated manpage for release
+	* doc/man/man7/I_PEEK.7.man: updated manpage for release
+	* doc/man/man7/I_PIPE.7.man: updated manpage for release
+	* doc/man/man7/I_POP.7.man: updated manpage for release
+	* doc/man/man7/I_PUNLINK.7.man: updated manpage for release
+	* doc/man/man7/I_PUTPMSG.7.man: updated manpage for release
+	* doc/man/man7/I_RECVFD.7.man: updated manpage for release
+	* doc/man/man7/I_SENDFD.7.man: updated manpage for release
+	* doc/man/man7/I_SETCLTIME.7.man: updated manpage for release
+	* doc/man/man7/I_SETSIG.7.man: updated manpage for release
+	* doc/man/man7/I_SRDOPT.7.man: updated manpage for release
+	* doc/man/man7/I_STR.7.man: updated manpage for release
+	* doc/man/man7/I_SWROPT.7.man: updated manpage for release
+	* doc/man/man7/streamio.7.man: updated manpage for release
+	* doc/man/man8/perftest.8.man: updated manpage for release
+	* doc/man/man8/strvf.8.man: updated manpage for release
+	* doc/man/man9/DDI.9.man: updated manpage for release
+	* doc/man/man9/LfS.9.man: updated manpage for release
+	* doc/man/man9/SPG.9.man: updated manpage for release
+	* doc/man/man9/STREAMS.9.man: updated manpage for release
+	* doc/man/man9/SV_SIGNAL.9.man: updated manpage for release
+	* doc/man/man9/aixcompat.9.man: updated manpage for release
+	* doc/man/man9/allocbi.9.man: updated manpage for release
+	* doc/man/man9/allocq.9.man: updated manpage for release
+	* doc/man/man9/cred_t.9.man: updated manpage for release
+	* doc/man/man9/irixcompat.9.man: updated manpage for release
+	* doc/man/man9/liscompat.9.man: updated manpage for release
+	* doc/man/man9/maccompat.9.man: updated manpage for release
+	* doc/man/man9/mi_attach.9.man: updated manpage for release
+	* doc/man/man9/mi_close_detached.9.man: updated manpage for release
+	* doc/man/man9/mi_copy_done.9.man: updated manpage for release
+	* doc/man/man9/mi_timer.9.man: updated manpage for release
+	* doc/man/man9/mi_timer_alloc.9.man: updated manpage for release
+	* doc/man/man9/mp-streams.9.man: updated manpage for release
+	* doc/man/man9/mpnotify.9.man: updated manpage for release
+	* doc/man/man9/mps_become_writer.9.man: updated manpage for release
+	* doc/man/man9/mpscompat.9.man: updated manpage for release
+	* doc/man/man9/msgb.9.man: updated manpage for release
+	* doc/man/man9/osfcompat.9.man: updated manpage for release
+	* doc/man/man9/putq.9.man: updated manpage for release
+	* doc/man/man9/qwriter.9.man: updated manpage for release
+	* doc/man/man9/register_strdev.9.man: updated manpage for release
+	* doc/man/man9/register_strnod.9.man: updated manpage for release
+	* doc/man/man9/streams_put.9.man: updated manpage for release
+	* doc/man/man9/strlog.9.man: updated manpage for release
+	* doc/man/man9/stroptions.9.man: updated manpage for release
+	* doc/man/man9/strthread.9.man: updated manpage for release
+	* doc/man/man9/suncompat.9.man: updated manpage for release
+	* doc/man/man9/svr4compat.9.man: updated manpage for release
+	* doc/man/man9/unfreezestr.9.man: updated manpage for release
+	* doc/man/man9/unregister_strnod.9.man: updated manpage for release
+	* doc/man/man9/uw7compat.9.man: updated manpage for release
+
 2006-10-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: updated release notes

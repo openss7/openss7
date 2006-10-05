@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.3 2006/09/24 21:56:59 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.4 2006/10/05 12:17:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/24 21:56:59 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:17:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -99,7 +99,7 @@ Split @file{include/sys/streams/streams.h} by processor architecture.
 Implement @manref{I_EGETSIG(7)} and @manref{I_ESETSIG(7)}.  These are @cite{Solaris} enhanced
 version of the @manref{I_GETSIG(7)} and @manref{I_SETSIG(7)} @cite{STREAMS} input-output controls.
 The difficulty with their implementation is that the entire signal handling setup inside the Stream
-head code is geared towards the calling process and needs to be adjusted to be general enough for
+head code is geared toward the calling process and needs to be adjusted to be general enough for
 any process or process group.  Until then, @cite{Linux} file asynchronous I/O is supported.
 
 @table @emph
@@ -165,7 +165,7 @@ stream class matching the rules.d and permissions.d entry when creating a minor 
 the specfs.
 
 On a devfs system, register_strdev and register_strnod should perform devfs calls instead of calling
-register_chrdev.  That way minor device nodes will automagically appear at least once the module is
+register_chrdev.  That way minor device nodes will automatically appear at least once the module is
 loaded.
 
 @table @emph
@@ -250,7 +250,7 @@ when running the test suites.  Initial debugging is done (everything runs and do
 just that some multiple writers and readers are getting stuck in wait queues.  What we need to do is
 to split the wait queues into open, close, read, write and ioctl from the big wait queue that it is,
 and largely get rid of the RSLEEP, WSLEEP, IOCWAIT type bits (we could still set them for
-compatibilty with SVR4 but not examine them).
+compatibility with SVR4 but not examine them).
 
 @table @emph
 @item DONE:
@@ -267,7 +267,7 @@ Tested on x86_64.
 @end table
 
 @item
-LiS Binary Compatibiility:-  Pretty much messed up right now.  I have the regparm(0) stuff on the
+LiS Binary Compatibility:-  Pretty much messed up right now.  I have the regparm(0) stuff on the
 callout and callback functions, and the STREAMS Compatibility Modules does regparm(0) on all the
 lis_ functions.  Primary STREAMS data structures align on the first portion of the data structure.
 Sizes vary, so don't do q+1.  Flags are a little different.  There are however several problematic
@@ -331,27 +331,27 @@ The following one situation could use udev instead of devfs or specfs.
 @item 2.6 kernel with udev
 @end enumerate
 
-To get this to work requires that there be an independent layer between the filesystem providing
+To get this to work requires that there be an independent layer between the file system providing
 device access for STREAMS and the STREAMS subsystem.  A set of registration functions need to be
-provided and a common set of callouts from the filesystem made to the STREAMS executive.
+provided and a common set of callouts from the file system made to the STREAMS executive.
 
-The registration functions need to be called when a STREAMS driver loads and the filesystem needs to
+The registration functions need to be called when a STREAMS driver loads and the file system needs to
 do the right thing.  This also needs to include the registration of major and minor devices,
 including clone devices.
 
-The callout functions from the filesystem need to invoke the STREAMS device file operations in a
+The callout functions from the file system need to invoke the STREAMS device file operations in a
 predictable manner, and the STREAMS subsystem requires the ability to chain open calls, or even open
 STREAMS devices from within the kernel (e.g. for pipes and connld and such).
 
-It is difficult to get the filesystem (specfs, devfs, udev) to hold data structures in a manner that
-is also usable by the STREAMS subsystem, so the filesystem adaptation layer needs to maintain data
+It is difficult to get the file system (specfs, devfs, udev) to hold data structures in a manner that
+is also usable by the STREAMS subsystem, so the file system adaptation layer needs to maintain data
 structures in the same manner for all filesystems.
 
 Well,...  After a little investigation, it is all messed up.  udev doesn't do what we need when
 demand loading pseudo devices, and devfs is probably not used anymore (I found most production
 kernels disabled for devfs) so it looks like spefs is the way to go.  I might use udev for "real"
 device drivers, but that's just for SS7.  So it looks like we are stuck with mounting the specfs.  I
-notice that ptys still use their own filesystem too...
+notice that ptys still use their own file system too...
 
 So, what we need now is to rework data structures and the specfs to be a little more stable.
 
@@ -362,11 +362,11 @@ Tested.
 
 @item
 Kernel objects are another thing.  For 2.6 kernels, we need to hold our data structures in the
-kobject manner so that the /sys filesystem is usable.  This requires another adaptation layer
-because 2.4 kernels do this in a completely different way.  Much of our /proc filesystem stuff needs
+kobject manner so that the /sys file system is usable.  This requires another adaptation layer
+because 2.4 kernels do this in a completely different way.  Much of our /proc file system stuff needs
 to move into /sys for 2.6 kernels by stay the same for 2.4 kernels.
 
-The /sys filesystem does not really do much for STREAMS.  The /dev/streams specfs filesystem does
+The /sys file system does not really do much for STREAMS.  The /dev/streams specfs file system does
 more for us.
 
 @table @emph

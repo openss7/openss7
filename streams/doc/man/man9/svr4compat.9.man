@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: svr4compat.9.man,v 0.9.2.8 2006/04/05 10:05:05 brian Exp $
+.\" @(#) $Id: svr4compat.9.man,v 0.9.2.9 2006/10/05 12:17:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 10:05:05 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:19 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: svr4compat.9.man,v $
+.\" Revision 0.9.2.9  2006/10/05 12:17:19  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.8  2006/04/05 10:05:05  brian
 .\" - get references in right place
 .\"
@@ -275,8 +278,10 @@ deallocate a message
 deallocate all the messages in a message block
 .HP
 .BR getadmin (9)\ \-\ \c
+get the administrative function associated with a module identifier.
 .HP
 .BR getmid (9)\ \-\ \c
+get the module identifier associated with a module.
 .HP
 .BR getq (9)\ \-\ \c
 retrieve message at the head of a queue
@@ -360,11 +365,14 @@ functions added in
 .IR "System V Release 4.0 MP" :
 .HP
 .BR bcanputnext (9)\ \-\ \c
+test for downstream flow control within a band.
 .PD 0
 .HP
 .BR canputnext (9)\ \-\ \c
+test for downstream flow control.
 .HP
 .BR freezestr (9)\ \-\ \c
+freeze a Stream.
 .HP
 .BR MPSTR_QLOCK (9)\ \-\ \c
 lock a \fISTREAMS\fP queue for mutual exclusion
@@ -379,20 +387,28 @@ lock \fISTREAMS\fP stream head in multithreaded code
 release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR msgpullup (9)\ \-\ \c
+pull up message blocks.
 .HP
 .BR pcmsg (9)\ \-\ \c
+test for priority control message.
 .HP
 .BR put (9)\ \-\ \c
+invoke a queue's put procedure.
 .HP
 .BR putnextctl1 (9)\ \-\ \c
+put a single byte control message downstream.
 .HP
 .BR putnextctl (9)\ \-\ \c
+put a control message downstream.
 .HP
 .BR qprocsoff (9)\ \-\ \c
+turn of queue procedures.
 .HP
 .BR qprocson (9)\ \-\ \c
+turn on queue procedures.
 .HP
 .BR unfreezestr (9)\ \-\ \c
+thaw a previously frozen Stream.
 .PD
 .\"
 .\"
@@ -447,28 +463,40 @@ kernel to user-space copy
 sleep for specified time
 .HP
 .BR dma_disable (9)\ \-\ \c
+disable direct memory access.
 .HP
 .BR dma_enable (9)\ \-\ \c
+enable direct memory access.
 .HP
 .BR dma_free_buf (9)\ \-\ \c
+free a direct memory access buffer.
 .HP
 .BR dma_free_cb (9)\ \-\ \c
+free a direct memory access control block.
 .HP
 .BR dma_get_best_mode (9)\ \-\ \c
+get the best direct memory access mode.
 .HP
 .BR dma_get_buf (9)\ \-\ \c
+get a direct memory access buffer.
 .HP
 .BR dma_get_cb (9)\ \-\ \c
+get a direct memory access control cblock.
 .HP
 .BR dma_pageio (9)\ \-\ \c
+peform page-based direct memory access input-output.
 .HP
 .BR dma_prog (9)\ \-\ \c
+program a direct memory access operation.
 .HP
 .BR dma_stop (9)\ \-\ \c
+stop a direct memory access operation.
 .HP
 .BR dma_swsetup (9)\ \-\ \c
+set up a directory memory access switch.
 .HP
 .BR dma_swstart (9)\ \-\ \c
+start a directory memory access switch.
 .HP
 .BR drv_getparm (9)\ \-\ \c
 read kernel variables
@@ -489,6 +517,7 @@ convert microseconds to HZ
 busy-wait for a short interval
 .HP
 .BR etoimajor (9)\ \-\ \c
+convert an external major device number to internal.
 .HP
 .BR freerbuf (9)\ \-\ \c
 deallocate buffer header for raw I/O
@@ -496,8 +525,10 @@ deallocate buffer header for raw I/O
 .BR geteblk (9)\ \-\ \c
 .HP
 .BR getemajor (9)\ \-\ \c
+get an external/extended major device number from a device number.
 .HP
 .BR geteminor (9)\ \-\ \c
+get an external/extended minor device number from a device number.
 .HP
 .BR geterror (9)\ \-\ \c
 extract error number from I/O buffer
@@ -516,12 +547,16 @@ allocate buffer header for raw I/O
 .BR hat_getppfnum (9)\ \-\ \c
 .HP
 .BR inb (9)\ \-\ \c
+input a byte.
 .HP
 .BR inl (9)\ \-\ \c
+input a long.
 .HP
 .BR inw (9)\ \-\ \c
+input a word.
 .HP
 .BR itoemajor (9)\ \-\ \c
+convert internal to external major device number.
 .HP
 .BR kmem_alloc (9)\ \-\ \c
 kernel memory allocator
@@ -544,10 +579,13 @@ determine the minimum of two numbers
 .BR ngeteblk (9)\ \-\ \c
 .HP
 .BR outb (9)\ \-\ \c
+output a byte.
 .HP
 .BR outl (9)\ \-\ \c
+output a long.
 .HP
 .BR outw (9)\ \-\ \c
+output a word.
 .HP
 .BR page_numtopp ()\ \-\ \c
 get page pointer for given page number
@@ -597,7 +635,7 @@ initialize private memory allocator
 set wake up flag in memory pool
 .HP
 .BR sleep (9)\ \-\ \c
-sleep
+sleep for a specified interval
 .HP
 .BR spl (9)\ \-\ \c
 shut-out interrupts
@@ -621,6 +659,7 @@ find out if user is allowed to access memory
 get a character from a \fBuio\fP structure
 .HP
 .BR vtop (9)\ \-\ \c
+convert virtual memory address to physical
 .HP
 .BR wakeup (9)\ \-\ \c
 wake a process up
@@ -655,12 +694,16 @@ functions were as follows:
 .BR proc_unref (9)\ \-\ \c
 .HP
 .BR rmallocmap (9)\ \-\ \c
+allocate a resource map
 .HP
 .BR rmalloc_wait (9)\ \-\ \c
+allocate a resource map (and sleep if necessary)
 .HP
 .BR rmfreemap (9)\ \-\ \c
+free a resource map
 .HP
 .BR SV_WAIT (9)\ \-\ \c
+wait on a synchronization variable (uninterruptible)
 .PD
 
 .PP
@@ -734,12 +777,16 @@ functions added are as follows:
 .BR KS_HOLD0LOCKS (9)\ \-\ \c
 .HP
 .BR LOCK (9)\ \-\ \c
+lock a basic lock
 .HP
 .BR LOCK_ALLOC (9)\ \-\ \c
+allocate a basic lock
 .HP
 .BR LOCK_DEALLOC (9)\ \-\ \c
+deallocate a basic lock
 .HP
 .BR LOCK_OWNED (9)\ \-\ \c
+test is a basic lock is held by another
 .HP
 .BR met_ds_alloc_stats (9)\ \-\ \c
 .HP
@@ -756,87 +803,133 @@ functions added are as follows:
 .BR ovbcopy (9)\ \-\ \c
 .HP
 .BR physreq_alloc (9)\ \-\ \c
+allocate memory satisfying a physical constraint
 .HP
 .BR physreq_free (9)\ \-\ \c
+free memory satisfying a physical constraint
 .HP
 .BR physreq_prep (9)\ \-\ \c
+prepare memory satisfying a phsyical constraint
 .HP
 .BR proc_valid (9)\ \-\ \c
 .HP
 .BR RW_ALLOC (9)\ \-\ \c
+allocate a reader-writer lock
 .HP
 .BR RW_DEALLOC (9)\ \-\ \c
+deallocate a reader-writer lock
 .HP
 .BR RW_RDLOCK (9)\ \-\ \c
+read lock a reader-writer lock
 .HP
 .BR RW_TRYRDLOCK (9)\ \-\ \c
+try to read lock a reader-writer lock
 .HP
 .BR RW_TRYWRLOCK (9)\ \-\ \c
+try to write lock a reader-writer lock
 .HP
 .BR RW_UNLOCK (9)\ \-\ \c
+unlock a reader-writer lock
 .HP
 .BR RW_WRLOCK (9)\ \-\ \c
+write lock a reader-writer lock
 .HP
 .BR SLEEP_ALLOC (9)\ \-\ \c
+allocate a sleep lock
 .HP
 .BR SLEEP_DEALLOC (9)\ \-\ \c
+deallocate a sleep lock
 .HP
 .BR SLEEP_LOCK (9)\ \-\ \c
+lock a sleep lock
 .HP
 .BR SLEEP_LOCKAVAIL (9)\ \-\ \c
+test if a sleep lock is available
 .HP
 .BR SLEEP_LOCKOWNED (9)\ \-\ \c
+test if a sleep lock is owned
 .HP
 .BR SLEEP_LOCK_SIG (9)\ \-\ \c
+lock a sleep lock (interruptible)
 .HP
 .BR SLEEP_TRYLOCK (9)\ \-\ \c
+try to lock a sleep lock
 .HP
 .BR SLEEP_UNLOCK (9)\ \-\ \c
+unlock a sleep lock
 .HP
 .BR strcat (9)\ \-\ \c
+concatenate strings
 .HP
 .BR strcmp (9)\ \-\ \c
+compare strings
 .HP
 .BR strcpy (9)\ \-\ \c
+copy strings
 .HP
 .BR strlen (9)\ \-\ \c
+determine the length of a string
 .HP
 .BR strncat (9)\ \-\ \c
+concatenate length limited strings
 .HP
 .BR strncmp (9)\ \-\ \c
+compare length limited strings
 .HP
 .BR strncpy (9)\ \-\ \c
+copy length limited strings
 .HP
 .BR SV_ALLOC (9)\ \-\ \c
+allocate a synchronization variable
 .HP
 .BR SV_BROADCAST (9)\ \-\ \c
+broadcast to a synchronization variable
 .HP
 .BR SV_DEALLOC (9)\ \-\ \c
+deallocate a synchroniation variable
 .HP
 .BR SV_SIGNAL (9)\ \-\ \c
+signal a synchronization variable
 .HP
 .BR SV_WAIT_SIG (9)\ \-\ \c
+wait on a synchronization variable (interruptible)
 .HP
 .BR TRYLOCK (9)\ \-\ \c
+try to lock a basic lock
 .HP
 .BR UNLOCK (9)\ \-\ \c
+unlock a basic lock
 .PD
 .\"
 .\"
 .SH RETURN
 .PP
+Many of these functions return zero
+.RB ( 0 )
+on success and non-zero or a negative error number on failure.
+See the manual page for the specific function for more details.
 .\"
 .\"
 .SH ERRORS
 .PP
+When a function returns a negative error number, it returns one of the error
+numbers from
+.BR errno (3),
+negated.
+See the manual page for the specific function for applicable error numbers. 
 .\"
 .\"
 .SH CONTEXT
 .PP
+Many of these functions can be called from any context.
+See the manual page for the specific function for more details.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Many of these functions are MP-safe regardless of the context in which they
+are called.  Some require special treatment.
+See the manual page for the specific function for more details.
 .\"
 .\"
 .SH NOTICES
@@ -854,16 +947,16 @@ or
 defined.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
-.SH SYSCTLS
-.PP
+.\".SH SYSCTLS
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -898,6 +991,9 @@ General:
 .\"
 .SH BUGS
 .PP
+These compatibility functions have no known bugs.
+Behaviour is not explicitly validated.  Behaviour is implicitly validated when
+modules and drivers using these functions are validated.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -906,8 +1002,6 @@ These functions are compatible with
 .IR SVR\ 4.2\ MP \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 These are
 .IR SVR\ 4.2\ MP \(rg-specific
 functions and should not be used by portable
@@ -960,6 +1054,9 @@ svr4dk
 .[
 svr4spg
 .]
+.PP
+Conformance is not explicitly verified.  Conformance is implicitly verified
+when modules and driver using these functions are verified.
 .\"
 .\"
 .SH HISTORY

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pipe.2s.man,v 0.9.2.14 2006/04/05 09:43:42 brian Exp $
+.\" @(#) $Id: pipe.2s.man,v 0.9.2.15 2006/10/05 12:16:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:16:51 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pipe.2s.man,v $
+.\" Revision 0.9.2.15  2006/10/05 12:16:51  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.14  2006/04/05 09:43:42  brian
 .\" - moved .so line and updated headers
 .\"
@@ -75,33 +78,13 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so streams.macros
-.\" =========================================================================
-.\"
-.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
-.\"
-.\" This library is free software; you can redistribute it and/or
-.\" modify it under the terms of the GNU Library General Public
-.\" License as published by the Free Software Foundation; either
-.\" version 2 of the License, or (at your option) any later version.
-.\"
-.\" This library is distributed in the hope that it will be useful,
-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-.\" Library General Public License for more details.
-.\"
-.\" You should have received a copy of the GNU Library General Public
-.\" License along with this library; if not, write to the
-.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
-.\" MA 02139, USA.
-.\"
-.\" =========================================================================
 .\"
 .\"
 .TH PIPE 2 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
 .\"
 .\"
 .SH NAME
-.B pipe
+.B pipe, s_pipe
 \- create a \fISTREAMS\fR \fIpipe\fR
 .\"
 .\"
@@ -109,7 +92,7 @@ sort-adjacent-labels
 .PP
 .B #include <unistd.h>
 .HP
-.BI int pipe( int " filedes "[2] );
+.BI "int pipe(int " filedes "[2]);
 .\"
 .\"
 .SH ARGUMENTS
@@ -123,183 +106,373 @@ descriptor for each end of the pipe.
 .SH DESCRIPTION
 .PP
 .BR pipe ()
-creates a
-.I STREAMS
-.B pipe
-(see
-.BR fifo (4)
 and
-.IR STREAMS (4)),
-and provides access to its ends as a pair of file descriptors
-returned in the
-.I filedes
-argument.
-.sp
-The file descriptors returned allow both read and write access
-to the pipe.  Data written to one end is readable at the other,
-independently in each direction;  i.e.,
-.I STREAMS
-pipes are not just
-.IR bidirectional ,
-but
-.IR full-duplex .
-.sp
-Structurally, a
-.I STREAMS
-.B pipe
-consists of a pair of
-.IR "stream heads" ,
-each comprising a read/write queue pair, with the write queue of each
-end directed to the read queue of the other end.
-The point at which this occurs is referred to as the
-.I midpoint
-of the pipe.
-.sp
-Generally otherwise, a
-.I STREAMS
-.B pipe
-behaves as a pair of
-.I STREAMS
-files; e.g.,
-.I STREAMS
-.I modules
-may be pushed onto either end, etc..
-.sp
-A notable exception is that
-.I STREAMS
-.I pipes
-provide the (only) means for passing open file descriptors via the
-.I STREAMS
-.B I_SENDFD
+.BR s_pipe ()
+opens a
+.IR STREAMS -based
+pipe.
+All the way through the
+.B Linux
+kernel series including 2.6, the
+.BR pipe ()
+system call provided by glibc will return a
+.RB non- STREAMS -based
+pipe.
+.RB Non- STREAMS -based
+pipes are
+.I SVR 3
+.[
+svr3
+.]
+style unidirectional pipes that are not implemented using
+.IR STREAMS .
+Many commercial
+.IR UNIX \(rg
+offerings also do not necessarily directly provide
+.IR STREAMS -based
+pipes in response to the
+.BR pipe ()
+system call.
+.PP
+The
+.BR libstreams "(3) and " libLiS (3)
+libraries provide a
+.BR pipe ()
 and
-.B I_RECVFD
-.I ioctl
-mechanisms.  Specifically, a file descriptor can (and must) be sent
-on one end of a pipe via
-.B I_SENDFD
-to the other end, where it may be received via
-.BR I_RECVFD .
+.BR s_pipe ()
+library call that always provide
+.IR STREAMS -based
+pipes in contrast to glibc that always provides
+.IR "SVR 3" -style
+.[
+svr3
+.]
+pipes.
+.PP
+The characteristics of bi-directional
+.IR STREAMS -based
+pipes, by comparison to
+.IR "SVR 3" -style
+.[
+svr3
+.]
+pipes are as follows:
+.IP \(bu \w'\(bu\(em'u
+.IR STREAMS -based
+pipes are bi-directional.  Both sides are opened for both read and write.
+Data written to one end of the pipe can be read by the other.  Both ends of
+the pipe can have data written and read.
+.IP \(bu
+.IR STREAMS -based
+pipes can have modules pushed and popped from either side of the pipe.
+However, before pushing a
+.I STREAMS
+module on either side of the
+.IR STREAMS -based
+pipe, the
+.BR pipemod (4)
+module should be pushed on one end of the
+.IR STREAMS -based
+pipe to reverse the sens of the
+.BR M_FLUSH (9)
+bits for proper flushing of the pipe.  (Pushing
+.BR pipemod (4)
+is not necessary if no other modules are to be pushed over either end of the
+pipe.)
+.IP \(bu
+.IR STREAMS -based
+pipes can have the
+.BR connld (4)
+module pushed onto one end of the pipe.
+.IP \(bu
+.IR STREAMS -based
+pipes can be attached to an object in a filesystem using
+.BR fattach (2).
+.IP \(bu
+.IR STREAMS -based
+pipes have controllable flow control and minimum and maximum packet size
+characteristics.
+.IP \(bu
+.IR STREAMS -based
+pipes permit the use of
+.BR getmsg "(2), " getpmsg "(2s), " putmsg "(2) and " putpmsg (2s)
+system calls on the pipe ends.  This permits control information as well as
+data to be passed across the pipe.
+.IP \(bu
+.IR STREAMS -based
+pipes can pass file descriptors and credentials from one end to the other using
+.BR I_SENDFD (7)
+and
+.BR I_RECVFD (7).
+.IP \(bu
+.IR STREAMS -based
+pipes permit the use of
+.BR streamio (7)
+.I STREAMS
+input-output controls on either pipe end.
+.\"
+.\"
+.SH USAGE
+.PP
+.IR STREAMS -based
+pipes should be used in the following situations:
+.IP \(bu \w'\(bu\(em'u
+Bi-directional data transfer is desired.
+.IP \(bu
+Additional capabilities, such as the ability to preserve record boundardies
+across the pipe, transfer zero-length messages, pass ancilliary control
+information, or pass file descriptors, are desired.
+.IP \(bu
+The ability to link a pipe end beneath a multiplexing driver,
+.BR I_LINK (7),
+or attaching one end to a path in the file system,
+.BR fattach (2),
+is desired.
+.IP \(bu
+Servers based on pipes using
+.BR connld (4)
+and
+.BR fattach (2)
+is to be supported.
+.IP \(bu
+Other
+.I STREAMS
+facilities are desired in association with a pipe end.
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
 Upon successful completion,
 .BR pipe ()
-returns 0.
+returns zero
+.RB ( 0 );
+on failure, it returns
+minus one
+.RB ( -1 )
+and sets
+.IR errno (3)
+to an appropriate error number.
 .\"
 .\"
 .SH ERRORS
 .PP
-Upon failure,
+When it fails,
 .BR pipe ()
-returns -1, and
-.BR errno (3)
-is set to indicate the error causing the failure.
+returns minus one
+.RB ( -1 ),
+and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP \w'[\fBENOMEM\fR]\(em'u
+.RB [ EMFILE ]
+More than
+.RB { OPEN_MAX }
+minus two file descriptors are already in use by the calling process.
+.TP
+.RB [ ENFILE ]
+The system-wide maximum number of simultaneous open file descriptors would be
+exceeded.
+.TP
+.RB [ ENOMEM ]
+Memory could not be allocated for kernel datastructures required to represent
+the pipe.
+.TP
+.RB [ ENODEV ]
+The
+.BR specfs (5)
+file system is not available on the system.
+.TP
+.RB [ ENXIO ]
+A suitable pipe device is not available on the system.
 .\"
 .\"
-.SH "APPLICATION USAGE"
-.PP
-The Linux kernel provides an independent implementation of
-.IR pipes ,
-corresponding to that provided before SVR4
-.[
-svr4
-.]
-used
-.I STREAMS
-to implement them (see 
-.BR pipe (2s)).
-Although the interface is identical, the two are quite different
-otherwise.
-.I STREAMS
-provide significant additional capability, but possibly at a lower
-level of performance.
-Notably,
-.I STREAMS
-pipes are full duplex (i.e., both ends support both read and write
-access independently), and allow the use of
-.I STREAMS
-.I modules
-to augment the processing of data.  Moreover, such processing may
-be
-.IR message \- oriented :
-message boundaries may be established and respected by using the
-.BR getmsg (2)/ getpmsg (2s)
-and
-.BR putmsg (2)/ putpmsg (2s)
-primitives instead of
-.BR read (2s)
-and
-.BR write (2s).
 .SH NOTICES
 .PP
-Applications wishing to use the
-.I STREAMS
-version of the
-.BR pipe ()
-function must link with the
-.B LiS
-.[
-LiS
-.]
-library which provides it; otherwise,
-the Linux kernel version will be used via the Linux/GNU C library.
+.B @PACKAGE_TITLE@
+.IR STREAMS -based
+pipe have been shown to match or even outperform
+.B Linux
+.IR "SVR 3" -style
+pipes, therefore, no performance loss is realized by using a
+.IR STREAMS -based
+pipe over a
+.B Linux
+native pipe.
 .\"
 .\"
-.SH "FUTURE DIRECTIONS"
+.SH IMPLEMENTATION
 .PP
-Under Linux,
-.BR pipe ()
-is implemented as an
-.I ioctl
-operation on an anonymous
-.I STREAMS
-file.
-An alternative system call implementation may be used in the future,
-and is fact already supported within
-.B LiS\c
-.
-.[
-LiS
-.]
-.sp
-It should be noted that no attention has yet been given to the issue
-of atomic reads and writes in
-.I STREAMS
-pipes and fifos, common to most
-implementations of these mechanisms.  This issue will be addressed
-hopefully in the near future.
+There are several ways of implementing 
+.IR STREAMS -based
+pipes.
+.B @PACKAGE_TITLE@
+provides two or three approaches.  See
+.BR pipe (4)
+for additional information.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR connld (4)
+for an example.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR pipemod (4),
-.BR connld (4),
-.BR errno (3),
+.BR pipe (4),
 .BR fifo (4),
-.BR STREAMS (4)
+.BR connld (4),
+.BR pipemod (4),
+.BR libstreams "(3), " libLiS (3),
+.BR M_FLUSH (9),
+.BR getmsg "(2), " getpmsg "(2s), " putmsg "(2), " putpmsg (2s),
+.BR fcntl (2),
+.BR fattach (2),
+.IR errno (3),
+.BR specfs (5),
+.BR I_SENDFD (7),
+.BR I_RECVFD (7),
+.BR I_LINK (7),
+.BR streamio (7),
+.BR test-pipe (8),
+.BR STREAMS (9).
 .\"
 .\"
-.SH COMPATAIBILITY
+.SH BUGS
 .PP
+.BR pipe "() and " s_pipe ()
+have no known bugs.
+.PP
+Validated behaviour is provided by the
+.BR test-pipe (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR pipe "() and " s_pipe ()
+are compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+permits each end of a
+.IR STREAMS -based
+pipe to be linked under a multiplexing driver using the
+.BR I_LINK "(7) or " I_PLINK (7)
+.I STREAMS
+input-output controls described in
+.BR streamio (7).
+This is a
+.B @PACKAGE_TITLE@
+specific feature provided for special test scenarios: many other
+implementations will not permit any pipe end or FIFO to be linked under a
+multiplexing driver.
+.IP ""
+Portable applications will not attempt to link a pipe end under a multiplexing
+driver.
+.IP \(em
+It is normally possible to determine whether a pipe obtained from the
+.BR pipe ()
+call is a
+.IR STREAMS -based
+pipe or a
+.IR "SVR 3" -style
+pipe by testing the file flags with
+.BR fcntl (2).
+If the file flags indicate that both end are open for read and write, then the
+pipe is bi-directional and is a
+.IR STREAMS -based
+pipe.  If the file flags indicates the one end is open for read and the other
+for write, then the pipe is uni-directional and is a
+.IR "SVR 3" -style
+pipe.
+.IP ""
+Portable applications will not assume that a
+.IR STREAMS -based
+pipe has been returned from the
+.BR pipe ()
+call.  A portable application may assume that
+.BR s_pipe (),
+or one of the other methods described in
+.BR pipe (4),
+returns a
+.IR STREAMS -based
+pipe.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR SVID ,
+.[
+svid
+.]
+.BR XID ,
+.[
+xbd5
+.]
+.BR SUSv2 ,
+.[
+susv2
+.]
+.BR SUSv3 ,
+.[
+susv3
+.]
+.BR "POSIX 1003.1/2003" ;
+.[
+susv3
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+documentation.
+.PP
+Conformance is tested using the
+.BR test-pipe (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH HISTORY
 .PP
-UNIX\(rg\ System V Release 4 (SVR4)
+.BR pipe ()
+first appeared in
+.IR "UNIX\(rg\ System V Release 3 (SVR3)"
+.[
+svr3
+.]
+and was later replaced with a
+.IR STREAMS -based
+implementation in
+.IR "UNIX\(rg\ System V Release 4 (SVR4)" .
 .[
 svr4
 .]
 .\"
 .\"
-.SH AUTHOR
-.PP
-John Boyd, protologos LLC.
 .[
 $LIST$
 .]
-.T3
+.TI

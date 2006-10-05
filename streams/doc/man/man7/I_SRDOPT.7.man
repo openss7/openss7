@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_SRDOPT.7.man,v 0.9.2.4 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_SRDOPT.7.man,v 0.9.2.5 2006/10/05 12:17:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_SRDOPT.7.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:01  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B I_SRDOPT
-\- \fISTREAMS\fP input-output control
+\- set \fISTREAMS\fP read options
 .\"
 .\"
 .SH SYNOPSIS   
@@ -109,10 +112,112 @@ always
 .BR I_SRDOPT .
 .TP
 .I arg
+an integer value containing the read options to set.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+Sets the
+.BR read (2s)
+options flags for the stream head.
+These flags alter the behaviour of the
+.BR read (2s)
+call when called for
+.IR fd .
+.I arg
+is an integer value containing the read options flags which may be one flag
+from the mode group as follows:
+.TP
+.B RNORM
+byte-stream mode.  This is the default read mode.
+This is the normal byte-stream mode where message boundaries are ignored.
+.BR read (2s)
+and
+.BR readv (2s)
+returns data until the read count has been satisfied or a zero length message
+is received.
+.TP
+.B RMSGN
+message non-discard mode.
+The
+.BR read (2s)
+or
+.BR readv (2s)
+will return when either the count is satisfied, a zero length message is
+received, or a message boundary is encountered.  If there is any data left in
+a message after the read count has been satisfied, the message is placed back
+on the stream head read queue.  The data will be read on a subsequent
+.BR read (2s)
+or
+.BR readv (2s)
+call.
+.TP
+.B RMSGD
+message discard mode.
+Similar to
+.B RMSGN
+mode, above, but data that remains in a message after the read count has been
+satisfied is discarded.
+.TP
+.B RFILL
+message fill mode.
+Similar to
+.B RNORM
+but requests that the stream head fill a buffer completely before returning to
+the application.  This is used in conjunction with a cooperating module and
+.BR M_READ (9)
+messages.
+.PP
+bitwise OR'ed with one flag from the protocol group as follows:
+.TP
+.B RPROTNORM
+fail read when control part present.
+Fail
+.BR read (2s)
+with
+.RB [ EBADMSG ]
+if a message containing a control part is at the front of the stream head
+read queue.
+Otherwise, the message is read as normal.  This is the default setting for new
+stream heads.  This setting is used with the
+.BR timod (4)
+module requiring the use of the
+.BR tirdwr (4)
+module for use with the
+.BR xti (3)
+library.
+.[
+magic
+%P 525
+.]
+.TP
+.B RPROTDAT
+deliver control part of a message as data.
+The control part of the message is prepended to the data part.
+This may be useful for specialized libraries or at the user's option with
+.BR timod (4)
+or
+.BR sockmod (4)
+modules.
+.TP
+.B RPROTDIS
+discard control part of message, delivering any data part.
+The control part of the message is discarded and the data part is processed.
+This setting is used with the
+.BR sockmod (4)
+module, or at the user's option with other modules or drivers.
+.PP
+.BR Note :
+Although all modes terminate the read on a zero-length message, POSIX requires
+that zero only be returned from read when the requested length is zero or an
+end of file
+.RB ( M_HANGUP (9))
+has occurred.  Therefore,
+.B LfS
+.[
+LfS
+.]
+only returns on a zero-length message if some data has been read already.
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -121,13 +226,9 @@ Upon success, the
 .B I_SRDOPT
 .BR ioctl (2s)
 command returns zero
-.RB ( 0 )
-or a positive integer.
-Upon failure, the
-.B I_SRDOPT
-.BR ioctl (2s)
-command returns
-.B -1
+.RB ( 0 );
+upon failure, minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to an appropriate error number.
@@ -138,11 +239,16 @@ to an appropriate error number.
 When the
 .B I_SRDOPT
 .BR ioctl (2s)
-command fails, it returns
-.B -1
+command fails, it returns minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.TP
+.RB [ EINVAL ]
+.IR fd ", " cmd ", " arg " or a member of " arg " or a member of a structure pointed to by " arg
+is invalid.
 .\"
 .PP
 In general, any
@@ -317,6 +423,7 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR read (2s),
 .BR ioctl (3p),
 .BR streamio (7),
 .BR ioctl (2s),

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: fattach.2.man,v 0.9.2.16 2006/10/05 12:16:51 brian Exp $
+.\" @(#) $Id: fdetach.2.man,v 0.9.2.1 2006/10/05 12:02:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,13 +53,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:16:51 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:02:23 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: fattach.2.man,v $
-.\" Revision 0.9.2.16  2006/10/05 12:16:51  brian
-.\" - updates for release
+.\" $Log: fdetach.2.man,v $
+.\" Revision 0.9.2.1  2006/10/05 12:02:23  brian
+.\" - added manual pages
 .\"
 .\" Revision 0.9.2.15  2006/04/05 09:43:41  brian
 .\" - moved .so line and updated headers
@@ -80,65 +80,64 @@ sort-adjacent-labels
 .so streams.macros
 .\"
 .\"
-.TH FATTACH 2 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
+.TH FDETACH 2 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
 .\"
 .\"
 .SH NAME
-.B fattach
-\- name a \fISTREAMS\fR special file
+.B fdetach
+\- unname a \fISTREAMS\fR special file
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .B #include <stropts.h>
 .HP
-.BI "int fattach(int " fd ", const char *" path );
+.BI "int fdetach(const char *" path );
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I fd
-the file descriptor to attach to a path.
-.TP
 .I path
-the filesystem path to which to attach the file descriptor.
+the filesystem path from which to detach the
+.I STREAMS
+special file.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.BR fattach ()
-attaches the open
+.BR fdetach ()
+detaches the open
 .I STREAMS
-special device file described by the file descriptor
-.I fd
-to the filesystem path specified by
-.IR path .
+special device file that was previously attached to path,
+.IR path ,
+in the filesystem with
+.BR fattach (2).
 All file operations on file descriptors subsequently opened on
 .IR path
-will operate on the attached
-.I STREAMS
-special device file instead of the file or directory that origianally corresponded to
+will operate on the file or directory that originally corresponded to
 .IR path .
 This continues until the
 .I STREAMS
-special device file is detached from
+special file is attached again to
 .I path
 using the
-.BR fdetach (3)
+.BR fattach (2)
 utility.
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
 Upon success,
-.BR fattach ()
+.BR fdetach ()
 will return zero
 .RB ( 0 ).
 .PP
 Upon failure,
-.BR fattach ()
-will return -1 and set
+.BR fdetach ()
+will return minus one
+.RB ( -1 )
+and set
 .IR errno (3)
 as described under
 .RB \(lq ERRORS \(rq,
@@ -155,20 +154,19 @@ is not allowed, or one of the directories in
 .I path
 did not allow search (execute) permission.
 .TP
-.RB [ EBADF ]
-The file descriptor,
-.IR fd ,
-is invalid.
-.TP
-.RB [ EBUSY ]
-The file specified by
+.RB [ EINVAL ]
+The
 .I path
-is currently a mount point or already has a
-.I STREAMS
-special file attached to it.
+argument names a file that is not currently attached (has not had
+.BR fattach (2)
+called for it).
 .TP
 .RB [ ELOOP ]
-Too many symbolic links were encountered resolving
+Symbolic links encountered resolving
+.I path
+form a loop, or too many (greater than
+.RB { SYMLOOP_MAX })
+symbolic links were encountered resolving
 .IR path .
 .TP
 .RB [ ENAMETOOLONG ]
@@ -190,41 +188,35 @@ is not a directory.
 The effective user ID of the process is not the owner of the file specified by
 .I path
 and the process does not have appropriate privileges.
-.TP
-.RB [ EINVAL ]
-.I fd
-does not refer to a
-.I STREAMS
-special file.
 .\"
 .\"
 .SH NOTICES
 .PP
 .SS Multi-Threading
 .PP
-.BR fattach ()
+.BR fdetach ()
 is thread-safe; however, performing
-.BR fattach ()
+.BR fdetach ()
 on a filesystem path will affect other processes or thread using that path.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR fattach (3p),
-.BR fattach (8),
-.BR fdetach (3),
+.BR fdetach (3p),
+.BR fdetach (8),
+.BR fattach (3),
 .BR fdetach (8).
 .\"
 .\"
 .SH BUGS
 .PP
-.BR fattach ()
+.BR fdetach ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR fattach ()
+.BR fdetach ()
 is compatible with
 .IR "SVR 4.2" ,
 .[
@@ -243,10 +235,10 @@ and
 .IR UXP/V \(rg,
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
-.BR fattach ()
+.BR fdetach ()
 can be performed on any file to which the caller has ownership, write
 permission and sufficient privilege to execute
-.BR fattach ().
+.BR fdetach ().
 .IP \(em
 Under
 .BR LiS ,
@@ -256,14 +248,14 @@ is required.
 .B @PACKAGE_TITLE@
 does not have this restriction.
 .IP \(em
-.BR fattach ()
+.BR fdetach ()
 makes no additional limitation on the number of
 .I STREAMS
 files that are attached.
 .IP \(em
 Under
 .BR LiS ,
-.BR fattach ()
+.BR fdetach ()
 limits number of
 .I STREAMS
 files attached to less than 256, because that is the maximum number of unnamed
@@ -279,7 +271,7 @@ that is used to implement this system call.  (glibc has prototypes for this syst
 In addition,
 .B @PACKAGE_TITLE@
 recognizes the
-.B I_LIS_FATTACH
+.B I_LIS_FDETACH
 .BR streamio (7)
 input-output control used by
 .I LiS
@@ -327,8 +319,9 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.BR fattach ()
-first appeared in SVR 4.
+.BR fdetach ()
+first appeared in
+.IR "SVR 4" .
 .[
 svr4
 .]

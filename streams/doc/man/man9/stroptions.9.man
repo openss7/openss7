@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: stroptions.9.man,v 0.9.2.5 2006/04/05 09:44:18 brian Exp $
+.\" @(#) $Id: stroptions.9.man,v 0.9.2.6 2006/10/05 12:17:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:18 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:19 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: stroptions.9.man,v $
+.\" Revision 0.9.2.6  2006/10/05 12:17:19  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:18  brian
 .\" - moved .so line and updated headers
 .\"
@@ -104,6 +107,7 @@ struct stroptions {
     ushort so_erropt;           /* Solaris */
     ssize_t so_maxblk;          /* Solaris */
     ushort so_copyopt;          /* Solaris */
+    ushort so_wrpad;            /* write (tail) padding */
 };
 \s+2\fP
 .fi
@@ -116,6 +120,9 @@ The following members correspond to
 members:
 .TP \w'\fIso_readopt\fR\(em'u
 .I so_flags
+A flags filed indicating the interpretation of the other members in the
+structure as well a providing some boolean flags.  Flags that are set in this
+member can be a logical OR of zero or more of the following flags:
 .RS
 .TP \w'SO_MREADOFF\(em'u
 .B SO_ALL
@@ -227,6 +234,40 @@ Set the
 maximum block size for this Stream to the value contained in the
 .I so_maxblk
 member.
+.TP
+.B SO_COWENABLE
+Copy on write enable.
+.TP
+.B SO_COWDISABLE
+Copy on write disable.
+.TP
+.B SO_WRPAD
+Set the write padding applied to the tail of
+.BR M_DATA (9)
+message blocks allocated by the Stream head to the value contained in the
+.I so_wrpad
+member.
+.TP
+.B SO_NOCSUM
+Disable checksum on copy.
+.TP
+.B SO_CSUM
+UDP/TCP checksum on copy.
+.TP
+.B SO_CRC32C
+CRC32-C checksum on copy.
+.TP
+.B SO_SKBUFF
+Also allocate an
+.B sk_buff
+for each
+.BR M_DATA (9)
+message block.
+.TP
+.B SO_NOSKBUFF
+Do not allocate
+.B sk_buff
+for data blocks.
 .PD
 .RE
 .TP
@@ -245,50 +286,186 @@ member contains two sets of mutually exclusive flags as follows:
 Mutually exclusive flags indicating the read mode:
 .TP
 .B RNORM
+Normal read handling.
 .PD 0
 .TP
 .B RMSGD
+Message discard read handling.
 .TP
 .B RMSGN
+Message normal read handling.
 .PD
 .PP
 Mutually exclusive flags indicating the control mode:
 .TP
 .B RPROTNORM
+Read
+.BR M_PROTO (9)/ M_PCPROTO (9)
+normal.
 .PD 0
 .TP
 .B RPROTDAT
+Read
+.BR M_PROTO (9)/ M_PCPROTO (9)
+as data.
 .TP
 .B RPROTDIS
+Read
+.BR M_PROTO (9)/ M_PCPROTO (9)
+discard.
 .PD
 .RE
 .TP
 .I so_wroff
-.PD 0
+When
+.B SO_WROFF
+is set in
+.IR so_flags ,
+the
+.I so_wroff
+member contains the write offset in bytes.
 .TP
 .I so_minpsz
+When
+.B SO_MINPSZ
+is set in
+.IR so_flags ,
+the
+.I so_minpsz
+member contains the minimum packet size in bytes.
 .TP
 .I so_maxpsz
+When
+.B SO_MAXPSZ
+is set in
+.IR so_flags ,
+the
+.I so_maxpsz
+member contains the maximum packet size in bytes.
 .TP
 .I so_hiwat
+When
+.B SO_HIWAT
+is set in
+.IR so_flags ,
+.I so_hiwat
+contains the high water mark in bytes.
 .TP
 .I so_lowat
+When
+.B SO_LOWAT
+is set in
+.IR so_flags ,
+.I so_lowat
+contains the low water mark in bytes.
 .TP
 .I so_band
+When
+.B SO_BAND
+is set in
+.IR so_flags ,
+.I so_band
+contains the band number to which the queue options apply.
 .TP
 .I so_filler
+Unused structure padding.
 .PD
 .PP
 The following members are
 .B @PACKAGE_TITLE@
 specific members:
-.TP
+.TP \w'\fIso_readopt\fR\(em'u
 .I so_erropt
+When
+.B SO_ERROPT
+is set in
+.IR so_flags ,
+the
+.I so_erropt
+member contains two sets of mutually exclusive flags as follows:
+.RS
+.PP
+Mutually exclusive flags indicating read error options.
+.TP \w'\fBWERRNONSPERSIST\fR\(em'u
+.B RERRNORM
+Normal error handling on the read side.
 .PD 0
 .TP
+.B RERRNONPERSIST
+Non-persistent error handling on the read side.
+.PD
+.PP
+Mutually exclusive flags indicating write error options.
+.TP \w'\fBWERRNONSPERSIST\fR\(em'u
+.B WERRNORM
+Normal error handling on the write side.
+.PD 0
+.TP
+.B WERRNONPERSIST
+Non-persistent error handling on the write side.
+.PD
+.RE
+.TP
 .I so_maxblk
+When
+.B SO_MAXBLK
+is set in
+.IR so_flags ,
+the
+.I so_maxblk
+member contains the maximum message block size that will be allocated by the
+Stream head.
 .TP
 .I so_copyopt
+When
+.B SO_COPYOPTT
+is set in
+.IR so_flags ,
+the
+.I so_copyopt
+member contains two sets of mutually exclusive flags as follows:
+.RS
+.PP
+.TP \w'\fBREMAPOK\fR\(em'u
+.B MAPINOK
+Use
+.BR mapin (9)
+instead of
+.BR copyin (9)
+for user write data.
+.PD 0
+.TP
+.B NOMAPIN
+Use
+.BR copyin (9)
+for user write data as normal.
+.PD
+.PP
+.TP \w'\fBREMAPOK\fR\(em'u
+.B REMAPOK
+Use
+.BR remap (9)
+instead of
+.BR copyout (9)
+to page flip read data into user space.
+.PD 0
+.TP
+.B NOREMAP
+Use
+.BR copyout (9)
+for user read data as normal.
+.PD
+.RE
+.TP
+.I so_wrpad
+When
+.B SO_WRPAD
+is set in
+.IR so_flags ,
+the
+.I so_wrpad
+member contains the number of bytes to pad each allocated messages block at
+the tail.
 .PD
 .\"
 .\"
@@ -299,6 +476,19 @@ specific members:
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B stroptions
+structure is normally contains in a
+.BR M_SETOPTS (9)
+.I STREAMS
+message that is passed upstream to the Stream head to set specific options.
+.PP
+See the
+.BR M_SETOPTS (9)
+manual page for a more detailed description of the flags and fields used in
+association with the
+.BR stroptions
+structure.
 .\"
 .\"
 .SH CONTEXT
@@ -349,6 +539,15 @@ structure.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR strqset (9),
+.BR strqget (9),
+.BR M_SETOPTS (9),
+.BR stdata (9),
+.BR strwrite (9),
+.BR M_DATA (9),
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY

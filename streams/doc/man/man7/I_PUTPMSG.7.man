@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_PUTPMSG.7.man,v 0.9.2.4 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_PUTPMSG.7.man,v 0.9.2.5 2006/10/05 12:17:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_PUTPMSG.7.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:00  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B I_PUTPMSG
-\- \fISTREAMS\fP input-output control
+\- \fISTREAMS\fP putpmsg system call emulation
 .\"
 .\"
 .SH SYNOPSIS   
@@ -109,10 +112,158 @@ always
 .BR I_PUTPMSG .
 .TP
 .I arg
+is a pointer to a
+.B strpmsg
+structure formatted as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+struct strpmsg {
+    struct strbuf ctlbuf;
+    struct strbuf databuf;
+    int band;
+    int flags;          /* actually long for Mac OT */
+};
+\s+1\fP
+.fi
+.TP
+.I ctlbuf
+a
+.B strbuf
+structure representing the control part, containing the following members:
+.RS
+.TP \w'\fImaxlen\fR\(em'u
+.I maxlen
+the size of the user buffer;
+.PD 0
+.TP
+.I len
+on return, the number of bytes copied into the user buffer; and,
+.TP
+.I buf
+a pointer to the user buffer.
+.PD
+.RE
+.TP
+.I databuf
+a
+.B strbuf
+structure representing the data part, containing the following members:
+.RS
+.TP \w'\fImaxlen\fR\(em'u
+.I maxlen
+the size of the user buffer;
+.PD 0
+.TP
+.I len
+on return, the number of bytes copied into the user buffer; and,
+.TP
+.I buf
+a pointer to the user buffer.
+.PD
+.RE
+.TP
+.I band
+an integer band number specifying the band of the message to send on call, and returning the
+band of the sent message on return.
+.TP
+.I flags
+integer flags specifying which messages to send on call, and returning the priority of the
+sent message on return.
+.I flags
+can be one of the following for
+.BR putmsg (2)
+emulation:
+.RS
+.TP \w'\fBMSG_HIPRI\fR\(em'u
+.B 0
+.PD 0
+send a normal message (sent message was normal priority); or,
+.TP
+.B RS_HIPRI
+send a high priority messages (sent message was high priority).
+.PD
+.PP
+or one of the following for
+.BR putpmsg (2s)
+emulation:
+.TP \w'\fBMSG_HIPRI\fR\(em'u
+.\".B MSG_ANY
+.\".PD 0
+.\"retrieve any message (not set on return);
+.\".TP
+.B MSG_BAND
+send a normal priority messages with the priority band equal to
+.I band
+(sent message was a normal priority message with priority band
+.IR band );
+.TP
+.B MSG_HIPRI
+send a high priority message (sent message was high priority).
+.PD
+.RE
+.RE
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B I_PUTPMSG
+provides an
+.BR ioctl (2s)
+emulation of the
+.BR putmsg (2)
+and
+.BR putpmsg (2s)
+system calls.
+.B I_PUTPMSG
+is emulated in this way due to the
+.B Linux
+kernel's failure to provide any means to implement standard system calls.
+.PP
+Under the emulation,
+.I fd
+is the same as the
+.I fd
+argument to
+.BR putmsg (2)
+or
+.BR putpmsg 92s);
+.I arg
+points to a structure containing the remaining arguments for
+.BR putmsg (2)
+and
+.BR putpmsg (2s).
+.I cmd
+is always
+.BR I_PUTPMSG .
+.PP
+See
+.BR putmsg (2)
+and
+.BR putpmsg (2s)
+for the purpose and function of the arguments.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B I_PUTPMSG
+input-ouput control is not intended to be invoked directly with the
+.BR ioctl (2s)
+interface by the user, but rather via the
+.BR putmsg (2)
+and
+.BR putpmsg (2s)
+library calls.
+.PP
+See
+.BR putmsg (2)
+and
+.BR putpmsg (2s)
+for details ont he operation of the the system call this
+.BR ioctl (2s)
+emulates, and usage information.
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -121,13 +272,9 @@ Upon success, the
 .B I_PUTPMSG
 .BR ioctl (2s)
 command returns zero
-.RB ( 0 )
-or a positive integer.
-Upon failure, the
-.B I_PUTPMSG
-.BR ioctl (2s)
-command returns
-.B -1
+.RB ( 0 );
+upon failure, minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to an appropriate error number.
@@ -138,11 +285,147 @@ to an appropriate error number.
 When the
 .B I_PUTPMSG
 .BR ioctl (2s)
-command fails, it returns
-.B -1
+command fails, it returns minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EAGAIN ]
+The stream head is set for non-blocking operation and
+.BR putpmsg ()
+would block: that is, the message is being sent with
+.I flags
+set to
+.B MSG_BAND
+and the corresponding
+.I band
+is flow controlled.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid file descriptor, or
+refers to a stream that is not open for writing.
+.TP
+.RB [ ENOSTR ]
+.i fd
+does not refer to a stream.
+.TP
+.RB [ EINVAL ]
+.i fd
+refers to a stream that is currently linked underneath a
+.I STREAMS
+multiplexing driver.  All read or write systems calls will fail with error
+number
+.RB [ EINVAL ]
+for such a stream.
+.TP
+.RB [ EFAULT ]
+.IR ctlptr ", " datptr ", " ctlptr->buf " or " datptr->buf
+point outside the caller's address space.
+.TP
+.RB [ ERESTARTSYS ]
+A signal arrived before the operation could begin.
+.TP
+.RB [ EINTR ]
+A signal arrived before the operation could complete.
+.TP
+.RB [ EINVAL ]
+The values of
+.IR band " or " flags ,
+or the combination of
+.IR ctlptr ", " datptr ", and the values of " band " and " flags
+were invalid,
+such as when
+.I flags
+is specified as
+.B MSG_HIPRI
+and
+.I band
+is non-zero.
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a stream that is linked under a
+.I STREAMS
+multiplexing driver.
+.TP
+.RB [ EIO ]
+I/O error, or,
+.I fd
+refers to a stream that is open but is in the process of closing.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a pipe and the other end of the pipe is closed.
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a
+.I STREAMS
+based pipe and there are no readers at the other end of
+the pipe.
+.TP
+.RB [ EISDIR ]
+.I fd
+refers to a directory.
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a device that does not support the
+.BR putpmsg ()
+system call.
+.TP
+.RB [ ENOSR ]
+.I STREAMS
+resources were insufficient to complete the operation.
+.TP
+.RB [ ENOSTR ]
+.I fd
+refers to a device that has no stream associated with it.
+.TP
+.RB [ ENXIO ]
+A
+.B M_HANGUP
+message arrived at the stream head for the specified
+.IR fd .
+.TP
+.RB [ ERANGE ]
+The
+.I len
+of the data part of the message is outside the range
+.I q_minpsz
+to
+.I q_maxpsz
+inclusive for the topmost
+.I STREAMS
+module or driver under the stream head, or,
+the
+.I len
+of the control or data part is larger than the maximum sized control or data
+message for the
+.I STREAMS
+subsystem.
+.TP
+.RB [ ENOSYS ]
+The
+.BR putpmsg ()
+system call is not supported on your system.  The occurs when
+.I STREAMS
+is not
+loaded or you have linked the wrong library.
+.PP
+Other errors may be returned by
+.BR putpmsg ().
+If the protocol module sends an
+.BR M_ERROR (9)
+message to the stream head, the error returned on all subsequent write
+operations, including
+.BR putpmsg (),
+is specified in the
+.BR M_ERROR (9)
+message by the protocol module.  Which errors are returned under what
+conditions form part of the necessary documentation of the protocol module.
 .\"
 .PP
 In general, any

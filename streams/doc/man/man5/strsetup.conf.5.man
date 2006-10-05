@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strsetup.conf.5.man,v 0.9.2.10 2006/04/05 09:43:46 brian Exp $
+.\" @(#) $Id: strsetup.conf.5.man,v 0.9.2.11 2006/10/05 12:16:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:46 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:16:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strsetup.conf.5.man,v $
+.\" Revision 0.9.2.11  2006/10/05 12:16:57  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.10  2006/04/05 09:43:46  brian
 .\" - moved .so line and updated headers
 .\"
@@ -206,8 +209,8 @@ unique.
 .RE
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH EXAMPLES

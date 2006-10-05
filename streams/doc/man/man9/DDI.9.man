@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DDI.9.man,v 0.9.2.14 2006/04/05 09:44:01 brian Exp $
+.\" @(#) $Id: DDI.9.man,v 0.9.2.15 2006/10/05 12:17:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:01 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DDI.9.man,v $
+.\" Revision 0.9.2.15  2006/10/05 12:17:05  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.14  2006/04/05 09:44:01  brian
 .\" - moved .so line and updated headers
 .\"
@@ -112,6 +115,8 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
+The DDI is the Device Driver Interface.  It provides a set of utility
+functions that can be used by device drivers.
 .\"
 .\"
 .SH DESCRIPTION
@@ -370,24 +375,25 @@ sort-adjacent-labels
 .PD
 .\"
 .\"
-.SH "RETURN VALUES"
-.PP
+.\".SH "RETURN VALUES"
+.\".PP
 .\"
 .\"
-.SH "ERROR HANDLING"
-.PP
+.\".SH "ERROR HANDLING"
+.\".PP
 .\"
 .\"
-.SH CONTEXT
-.PP
+.\".SH CONTEXT
+.\".PP
 .\"
 .\"
-.SH MP-STREAMS
-.PP
+.\".SH MP-STREAMS
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -2228,12 +2234,41 @@ See
 for additional compatibility information.
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+Where possible,
+.B @PACKAGE_TITLE@
+provides the DDI/DKI functions of
+.IR "SVR 4.2" ,
+.[
+svr42spg
+.]
+and the
+.IR "USL DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2" ,
+.[
+svr42spg
+.]
+.IR "USL DDI/DKI" .
+.[
+usldk
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The DDI/DKI functions first appear in
+.IR "SVR 4" .
+.[
+svr4
+.]
 .\"
 .\"
 .[

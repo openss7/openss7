@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: aixcompat.9.man,v 0.9.2.10 2006/04/05 09:44:05 brian Exp $
+.\" @(#) $Id: aixcompat.9.man,v 0.9.2.11 2006/10/05 12:17:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:05 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: aixcompat.9.man,v $
+.\" Revision 0.9.2.11  2006/10/05 12:17:06  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.10  2006/04/05 09:44:05  brian
 .\" - moved .so line and updated headers
 .\"
@@ -445,7 +448,15 @@ install or uninstall a \fISTREAMS\fP driver or module
 .\"
 .SH USAGE
 .PP
-For usage an example on the various functions, see the individual manual pages.
+For usage an example of the various functions, see the individual manual pages.
+.\"
+.\"
+.\".SH RETURN
+.\".PP
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
 .SH CONTEXT

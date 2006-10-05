@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: unregister_strnod.9.man,v 0.9.2.6 2006/04/05 09:44:19 brian Exp $
+.\" @(#) $Id: unregister_strnod.9.man,v 0.9.2.7 2006/10/05 12:17:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: unregister_strnod.9.man,v $
+.\" Revision 0.9.2.7  2006/10/05 12:17:20  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:19  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,77 +85,245 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B unregister_strnod
-\- unregister a \fISTREAMS\fR device node
-.\"
-.\"
-.SH SYNOPSIS
-.PP
-.\"
-.\"
-.SH ARGUMENTS
-.PP
+\- unregister a \fISTREAMS\fR minor device node
 .\"
 .\"
 .SH INTERFACE
 .PP
-.IR STREAMS ,
+.IR "STREAMS" ,
 implementation specific.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "int unregister_strnod(struct cdevsw *" cdev ", minor_t " minor);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I cdev
+a pointer to the
+.BR cdevsw (9)
+.I STREAMS
+character device switch table entry representing the
+.I STREAMS
+driver from which to unregister the minor device node.
+.TP
+.I minor
+the minor device number from which to unregister the device node;
+when specified as minus one
+.RB ( -1 ),
+.I STREAMS
+is to instead unregister all registered minor device nodes.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.BR unregister_strnod ()
+unregisters the minor device node associated with minor device number,
+.IR minor ,
+from the
+.I STREAMS
+driver defined by
+.IR cdev .
+The minor device number must have previously been successfully registered to
+.I cdev
+under minor device number
+.I minor
+with a successful call to
+.BR register_strnod (9).
 .\"
 .\"
 .SH USAGE
 .PP
+.BR unregister_strnod ()
+is use to unregister a specialized device minor node previously created and
+registered with a successful call to
+.BR register_strnod (9).
+For each successful call to
+.BR register_strnod (9),
+a corresponding call to
+.BR unregister_strnod ()
+with the same
+.I cdev
+and
+.I minor
+arguments must be performed before a
+.I STREAMS
+driver is unloaded.
+Instead of performing individual corresponding calls to
+.BR unregister_strnod (),
+.I minor
+can be specified as minus one
+.RB ( -1 )
+to request deregistration of all minor device nodes associated with
+.IR cdev .
 .\"
 .\"
 .SH RETURN
 .PP
+When
+.BR unregister_strnod ()
+is successful, it returns zero
+.RB ( 0 );
+on failure, it returns a negative error number.
 .\"
 .\"
 .SH ERRORS
 .PP
+When
+.BR unregister_strnod ()
+fails, it returns a negative error number as follows:
+.TP \w'[\fBEINVAL\fR]\(em'u
+.RB [ EINVAL ]
+.I cdev
+or
+.I cdev->d_name
+is
+.BR NULL ;
+or
+.I cdev->d_name
+is a zero-length string.
+.TP
+.RB [ EINVAL ]
+.I cdev
+is not properly registered.
+.TP
+.RB [ ENXIO ]
+The
+.I minor
+argument specifies a single minor device number, but no minor device node is
+associated with that minor device number.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR unregister_strnod ()
+can be called at blockable process context.  It is intended to be called in the kernel module
+initialization sequence or in a kernel initialization routine.
+.BR unregister_strnod ()
+may also be called from within a
+.I STREAMS
+driver or module
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routine.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR register_strnod ()
+is MP-safe when called from the correct context.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+\".SH IMPLEMENTATION
+\".PP
 .\"
 .\"
 .SH NOTICES
 .PP
+Loadable kernel modules that call
+.BR register_strnod (9)
+when loading
+must call
+.BR unregister_strnod ()
+before unloading.
+.BR unregister_strnod ()
+must be called with the same value of
+.I cdev
+and
+.I minor
+with which
+.BR register_strnod (9)
+was called (or returned in the case of
+.IR minor ).
+.PP
+Drivers unregistered with
+.BR unregister_strnod ()
+will also disappear as a device node under
+.BR /dev/streams ,
+when the
+.BR specfs (5)
+filesystem has been mounted on
+.BR /dev/streams .
 .\"
 .\"
 .SH EXAMPLES
 .PP
+See
+.BR register_strnod (9)
+for examples.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR register_strnod (9),
+.BR cdevsw (9),
+.BR devnode (9),
+.BR register_strdev (9),
+.BR streamtab (9),
+.BR stat (2),
+.BR specfs (5),
+.BR mknod (8),
+.BR clone (4),
+.BR sad (4),
+.BR qi_qopen (9),
+.BR qi_qclose (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR unregister_strnod ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR unregister_strnod ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific function.
+Registration of
+.I STREAMS
+drivers and modules in inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
+See
+.BR STREAMS (9)
+for mechanisms compatible with other implementations
+and additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+Registration and de-registration of \fISTREAMS\fR drivers is implementation
+specific and not subject to standardization.
+.BR unregister_strnod ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific function.
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR unregister_strnod ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE_TITLE@
+.]
 .\"
 .\"
 .[

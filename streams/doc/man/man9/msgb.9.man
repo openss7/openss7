@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: msgb.9.man,v 0.9.2.20 2006/07/13 12:55:46 brian Exp $
+.\" @(#) $Id: msgb.9.man,v 0.9.2.21 2006/10/05 12:17:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/07/13 12:55:46 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:07 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: msgb.9.man,v $
+.\" Revision 0.9.2.21  2006/10/05 12:17:07  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.20  2006/07/13 12:55:46  brian
 .\" - updated documentation for sk_buffs
 .\"
@@ -278,6 +281,43 @@ checksum.
 .\".I b_queue
 .\"
 .\"
+.SH MACROS
+The following macros are available in
+.B <sys/strsun.h>
+and are
+.IR Solaris \(rg
+macros that are used to perform some simple operations on message blocks:
+.TP
+.BI MBLKL( mp )
+Returns the length of the message block as a difference between the
+.IR b_wptr " and " b_rptr
+pointers.  This value could be negative.
+.TP
+.BI MBLKSIZE( mp )
+Returns the available length from the data block as a difference between the
+.IR db_lim " and " db_base
+pointers.  This value could be negative.  See also
+.BR datab (9).
+.TP
+.BI MBLKHEAD( mp )
+Returns the available headroom in the data block as a difference between the
+.IR b_rptr " and " db_base
+pointers.  This value could be negative, but should not normally be less than zero.
+.TP
+.BI MBLKTAIL( mp )
+Returns the available headroom in the data block as a difference between the
+.IR db_lim " and " b_wptr
+pointers.  This value could be negative, but should not normally be less than zero.
+.TP
+.BI MBLKIN( mp ", " off ", " len )
+Tests and returns a boolean indicating whether the offset and length provided defines a region that
+is contained within the message block.
+.TP
+.BI OFFSET( base ", " p )
+Returns the offset of pointer,
+.IR  p ,
+from the base pointer,
+.IR base .
 .SH FUNCTIONS
 .PP
 The following message block utility functions are provided,

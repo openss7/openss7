@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: suncompat.9.man,v 0.9.2.7 2006/04/05 09:44:19 brian Exp $
+.\" @(#) $Id: suncompat.9.man,v 0.9.2.8 2006/10/05 12:17:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:19 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: suncompat.9.man,v $
+.\" Revision 0.9.2.8  2006/10/05 12:17:19  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:44:19  brian
 .\" - moved .so line and updated headers
 .\"
@@ -385,22 +388,26 @@ are as follows:
 .\"
 .SH USAGE
 .PP
+For usage an example of the various functions, see the individual manual pages.
 .\"
 .\"
-.SH RETURN
-.PP
+.\".SH RETURN
+.\".PP
 .\"
 .\"
-.SH ERRORS
-.PP
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
 .SH CONTEXT
 .PP
+These functions can be executed from various contexts as described in each separate manual page.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Most of these functions are MP-safe; however,
+see the manual page for the individual function for detailed information.
 .\"
 .\"
 .SH NOTICES
@@ -416,18 +423,42 @@ must also have been compiled with
 or
 .B CONFIG_STREAMS_COMPAT_SUN_MODULE
 defined.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_SUN
+defined,
+.IR Solaris \(rg
+compatibility will become part of the
+.B @PACKAGE_TITLE@
+.I streams
+kernel module.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_SUN_MODULE
+defined,
+.IR Solaris \(rg
+compatibility will be placed in a separate
+.I streams-suncompat
+kernel module that will demand load when any
+.I STREAMS
+driver or module that uses the
+.IR Solaris \(rg-specific
+functions loads.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+Core functions are implemented within the
+.B @PACKAGE_TITLE@
+framework.
+.IR Solaris \(rg-specific
+functions are implemented as described in the separate manual pages describing each facility.
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
-.SH SYSCTLS
-.PP
+.\".SH SYSCTLS
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -444,6 +475,9 @@ General:
 .\"
 .SH BUGS
 .PP
+The
+.IR Solaris \(rg
+compatibility suite has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -452,8 +486,6 @@ These functions are compatible with
 .IR Solaris \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 These are
 .IR Solaris \(rg-specific
 functions and should not be used by portable
@@ -501,10 +533,10 @@ for additional compatibility considerations.
 .IR Solaris \(rg
 DDI documentation.
 .[
-sundoc
+soldoc
 .]
 .[
-sunspg
+solspg
 .]
 .\"
 .\"

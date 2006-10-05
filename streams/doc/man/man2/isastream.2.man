@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer_alloc.9.man,v 0.9.2.6 2006/10/05 12:17:06 brian Exp $
+.\" @(#) $Id: isastream.2.man,v 0.9.2.1 2006/10/05 12:02:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,15 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:17:06 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:02:23 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: mi_timer_alloc.9.man,v $
-.\" Revision 0.9.2.6  2006/10/05 12:17:06  brian
-.\" - updates for release
+.\" $Log: isastream.2.man,v $
+.\" Revision 0.9.2.1  2006/10/05 12:02:23  brian
+.\" - added manual pages
 .\"
-.\" Revision 0.9.2.5  2006/04/05 09:44:14  brian
+.\" Revision 0.9.2.15  2006/04/05 09:43:41  brian
 .\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
@@ -80,210 +80,255 @@ sort-adjacent-labels
 .so streams.macros
 .\"
 .\"
-.TH MI_TIMER_ALLOC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH ISASTREAM 2 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
 .\"
 .\"
 .SH NAME
-.B mi_timer_alloc
-\- allocate and target a \fISTREAMS\fR timer message block
+.B isastream
+\- test for a \fISTREAMS\fR special file
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #define _MAC_SOURCE
-.br
-.B #include <sys/ddi.h>
-.br
-.B #include <sys/macddi.h>
+.B #include <stropts.h>
 .HP
-.BI "mblk_t *mi_timer_alloc(queue_t *" q ", size_t " size );
-.PP
-.B #define _SUN_SOURCE
-.br
-.B #include <sys/ddi.h>
-.br
-.B #include <sys/sunddi.h>
-.HP
-.BI "mblk_t *mi_timer_alloc(size_t " size );
+.BI "int isastream(int " fd );
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I q
-the queue upon which to ultimately place the timer message.
-.TP
-.I size
-the size of the user portion of the timer message.
+.I fd
+the file descriptor to test.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.IR MacOT \(rg
-supplies robust timer services that are synchronized with the
+.BR isastream ()
+tests whether the open file associated with the file descriptor,
+.IR fd ,
+is a
 .I STREAMS
-environment.  Timer services are supported by using special
-.I STREAMS
-messages.  The function
-.BR mi_timer_alloc ()
-is used to create one of these special
-.I STREAMS
-messages.
-.PP
-Calling
-.BR mi_timer_alloc ()
-will create a
-.I STREAMS
-timer message of the requested size, that is targeted to the specified
-.I STREAMS
-queue.
+special file.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR isastream ()
+is normally used by an applications program to determine whether
+.I STREAMS
+input-output controls,
+.BR streamio (7),
+are possible on a specific special file,
+.IR fd .
+For example,
+.BR isastream ()
+can be used to determine whether the pipe returned by a call to
+.BR pipe (2s)
+is a
+.IR STREAMS -based
+pipe or a
+.IR "SVR 3" -style
+pipe.
+Also,
+.BR isastream ()
+can be used to determine whether the pseudo-terminal returned by a call to
+.BR openpt (3tty)
+is a
+.IR STREAMS -based
+master pseudo-terminal or an
+.IR "SVR 3" -style
+pseudo-terminal.
 .\"
 .\"
-.SH RETURN
+.SH "RETURN VALUE"
 .PP
-When
-.BR mi_timer_alloc ()
-succeeds, it returns 
-.BR true  " (1);
-when it fails, it returns
-.BR false " (0).
+.BR isastream ()
+returns true,
+.RB ( 1 ),
+if the file associated with
+.IR fd
+is a
+.I STREAMS
+special file; it return false,
+.RB ( 0 ),
+if it is not, and returns
+minus one
+.RB ( -1 ),
+on failure and sets
+.IR errno (3)
+to an appropriate error number.
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR mi_timer_alloc ()
-fails when 
-.\"
-.\"
-.SH CONTEXT
-.PP
-.BR mi_timer_alloc ()
-can be called from
-.\"
-.\"
-.SH MP-STREAMS
-.PP
+When
+.BR isastream ()
+fails, it returns minus one
+.RB ( -1 )
+and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP \w'[\fBEBADF\fR]\(em'u
+.RB [ EBADF ]
+The argument,
+.IR fd ,
+is not associted with an open file.
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR mi_timer_alloc ()
-is a
-.IR MacOT \(rg-specific
-function:
-.B _MAC_SOURCE
-must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
-must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_MAC
-or
-.B CONFIG_STREAMS_COMPAT_MAC_MODULE
-defined.
+.SS Multi-Threading
+.PP
+.BR isastream ()
+is thread-safe.
+.BR isastream ()
+does not contain an asynchrnous thread cancellation point, in accordance with
+POSIX.
+.[
+susv3
+.]
+Asynchronous thread cancellation is deferred across the call.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
-The
+.B isastream ()
+is system call emulated by the
+.BR libstreams (3)
+library by calling the
+.BR I_ISASTREAM (7)
 .I STREAMS
-message allocated has type
-.BR M_PCSIG (9).
+input-output control on
+.IR fd ,
+and adjusting the return value appropriately.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR mi_timer (9),
-.BR mi_timer_cancel (9),
-.BR mi_timer_free (9),
-.BR mi_timer_valid (9),
-.BR maccompat (9),
+.BR libstreams (3),
+.BR isastream (3p),
+.BR I_ISASTREAM (7),
+.BR streamio (7),
+.IR errno (3),
+.BR pipe (2s),
+.BR openpt (3tty),
+.BR test-streams (8),
 .BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
-.BR mi_timer_alloc ()
+.BR isastream ()
 has no known bugs.
+Behaviour is validated using the
+.BR test-streams (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+conformance test suite.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR mi_timer_alloc ()
+.BR isastream ()
 is compatible with
-.IR MacOT \(rg
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
-.BR mi_timer_alloc ()
-is an
-.IR MacOT \(rg-specific
-function and should not be used by portable
+.BR isastream ()
+is implemented as a
 .I STREAMS
-drivers and modules.
-The more common memory allocation functions
-should be used in its stead.
+input-output control instead of a system call.  This should not affect
+portablility.
 .IP \(em
-.BR mi_timer_alloc ()
-is provided for source level compatibility with
-.IR MacOT \(rg
-for the purpose of porting
-.IR MacOT \(rg
-drivers to
-.BR Linux .
-Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.BR isastream ()
+conforms as closely as possible to the
+.I POSIX/SUSv3
 .[
-lfs
+susv3
 .]
-differ from that of
-.IR MacOT \(rg,
-binaries are incompatible.
-.IP \(em
-.BR mi_timer_alloc ()
-only provides functionality comparable to
-.IR MacOT \(rg
-for use by
+specifications.  Where a specific
+.IR "SVR 4.2" -based
+implementation differs from
+.IR POSIX/SUSv3 ,
+there will be differences with this
+.I @PACKAGE_TITLE@
+implementation.
+.IP ""
+Portable
 .I STREAMS
-drivers and modules.
-Any and all functionality provided by
-.BR mi_timer_alloc ()
-in support of
-.RI non- STREAMS
-devices are not supported.
+application programs will expect conformance to
+.IR POSIX/SUSv3 .
 .PP
-See
-.BR maccompat (9)
-and
-.BR STREAMS (9)
-for additional compatibility considerations.
+If your
+.B Linux
+system is equipped with
+.I OpenGroup
+manual pages, see
+.BR isastream (3p)
+for the equivalent
+.IR POSIX/SUSv3
+reference page.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR MacOT \(rg
-DDI documentation.
+.BR SVID ,
 .[
-macotr
+svid
 .]
+.BR XID ,
 .[
-macspg
+xbd5
 .]
+.BR SUSv2 ,
+.[
+susv2
+.]
+.BR SUSv3 ,
+.[
+susv3
+.]
+.BR "POSIX 1003.1/2003" ;
+.[
+susv3
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+documentation.
+.PP
+Conformance is testsed using the
+.BR test-streams (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+conformance test suite.
 .\"
 .\"
 .SH HISTORY
 .PP
-.BR mi_timer_alloc ()
-first appeared in
-.IR MacOT \(rg.
-.BR mi_timer_alloc ()
-is probably a Mentat, Inc. function that goes all the way back to the
-.RI pre- OSF/1
-.I Mentat
-implementations.
+.BR isastream ()
+first appeared in SVR 4.
+.[
+svr4
+.]
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_STR.7.man,v 0.9.2.4 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_STR.7.man,v 0.9.2.5 2006/10/05 12:17:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_STR.7.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:01  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -109,25 +112,68 @@ always
 .BR I_STR .
 .TP
 .I arg
+is the argument to the input-output control command.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+Generates an internal
+.I STREAMS
+ioctl message and places it on the stream head's
+write queue for processing by the module or driver and returns the response.
+.I arg
+is a pointer to a
+.B strioctl
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct strioctl {
+    int ic_cmd;
+    int ic_timout;
+    int ic_len;
+    char *ic_dp;
+};
+\s+1\fR
+.fi
+.TP
+.I ic_cmd
+is the command to issue.  The command can by any of the commands listed here
+that are handled by the module or driver (e.g.
+.BR I_LINK )
+or any other ioctl command understood by a module or driver on the stream
+.IR fd .
+.TP
+.I ic_timout
+is the period of time to wait for an acknowledgement in milliseconds, or
+-1 indicating that there is no timeout.
+.TP
+.I ic_len
+is the length of the argument data pointed to by
+.IR ic_dp .
+.TP
+.I ic_dp
+is a pointer to the argument data of length
+.I ic_len
+bytes.
+.PP
+.B I_STR
+generates an
+.BR M_IOCTL (9)
+message an passes it downstream to the module or driver and blocks until a
+positive or negative acknowledgement is received, the command times out, an
+hangup or error message is received by the stream head, or a signal is
+received.
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
-Upon success, the
+Upon success,
 .B I_STR
-.BR ioctl (2s)
-command returns zero
-.RB ( 0 )
-or a positive integer.
-Upon failure, the
-.B I_STR
-.BR ioctl (2s)
-command returns
-.B -1
+returns the return value specified in the positive or negative acknowledgement
+message;
+upon failure, minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to an appropriate error number.
@@ -138,11 +184,57 @@ to an appropriate error number.
 When the
 .B I_STR
 .BR ioctl (2s)
-command fails, it returns
-.B -1
+command fails, it returns minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EFAULT ]
+.IR arg " or " ic_dp
+point outside the caller's valid address space.
+.TP
+.RB [ EINVAL ]
+.I ic_len
+is less than 0.
+.TP
+.RB [ EINVAL ]
+.I ic_len
+is greater than the maximum size of the data part of a message.
+.TP
+.RB [ EINVAL ]
+.I ic_timout
+is less than -1.
+.TP
+.RB [ ETIME "], [" EAGAIN ]
+the operation timed out waiting for an acknowledgement.
+.TP
+.RB [ ERESTARTSYS ]
+a signal arrived before the operation could begin.
+.TP
+.RB [ EINTR ]
+a signal arrived before the operation could complete.
+.TP
+.RB [ EIO ]
+the stream specified by
+.I fd
+is closing.
+.TP
+.RB [ ENXIO ]
+the stream specified by
+.I fd
+received a hangup.
+.TP
+.RB [ ENOSR ]
+a buffer for the ioctl message could not be allocated.
+.PP
+In addition,
+.B I_STR
+can return any
+.IR errno (3)
+placed in an error message received by the stream head, or
+placed in the positive or negative acknowledgement message by the module or
+driver.
 .\"
 .PP
 In general, any

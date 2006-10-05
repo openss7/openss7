@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer.9.man,v 0.9.2.4 2006/04/05 09:44:14 brian Exp $
+.\" @(#) $Id: mi_timer.9.man,v 0.9.2.5 2006/10/05 12:17:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:14 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_timer.9.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:06  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:14  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B mi_timer
-\-
+\- schedule a \fBM_PCSIG\fR(9) \fISTREAMS\fR message for a future time
 .\"
 .\"
 .SH SYNOPSIS
@@ -94,14 +97,65 @@ sort-adjacent-labels
 .B #include <sys/macddi.h>
 .HP
 .BI "void mi_timer(mblk_t *" mp ", ulong " msec );
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/sunddi.h>
+.HP
+.BI "void mi_timer(queue_t *" q ", mblk_t *' mp ", ulong " msec ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
+.I q
+a pointer to the
+.I STREAMS
+queue onto which to place the
+.BR M_PCSIG (9)
+message when the timer expires.
+This pointer will be used as the argument to a
+.BR put (9)
+command when the timer expires.
+In the
+.IR MacOT \(rg
+form of the function, this argument is provided in the previous call to
+.BR mi_timer_alloc (9).  In the
+.IR OpenSolaris \(rg
+form of the function, this argument is present here, but not in the call to
+.BR mi_timer_alloc (9).
+.TP
 .I mp
+a pointer to the
+.BR M_PCSIG (9)
+message block that was allocated with
+.BR mi_timer_alloc (9).
 .TP
 .I msec
+the duration in milliseconds before timer expiry.
+This message block can also contain additional user data.
+The
+.IR OpenSolaris \(rg
+form of
+.BR mi_timer ()
+accept two special values of
+.I msec
+as follows:
+.RS
+.TP \w'(clock_t)(-1)00'u
+.B (clock_t)(-1)
+the special value (minus one) requests that the timer be cancelled instead of scheduled.
+This is equivalent to calling
+.BR mi_timer_stop (9).
+.TP
+.B (clock_t)(-2)
+the special value (minus two) requests that the timer be moved to a new target queue instead of
+rescheduled.
+This is equivalent to calling
+.BR mi_timer_move (9).
+.RE
 .\"
 .\"
 .SH DESCRIPTION
@@ -114,6 +168,37 @@ message pointer (which must be created using
 to be placed on the target
 .I STREAMS
 queue at the specified future time.
+.BR mi_timer_valid (9)
+must be used in the target queue put or service procedure whenever a
+.BR M_PCSIG (9)
+message is dequeued.
+.PP
+If the
+.BR M_PCSIG (9)
+message block is freshly allocated with
+.BR mi_timer_alloc (9)
+then
+.BR mi_timer ()
+schedules a
+.BR timeout (9)
+that, upon expiry, will place the message block on the target queue.
+.PP
+If the message block already has a running timer associated with it,
+.BR mi_timer ()
+will cancel the previous
+.RB timeout (9)
+and reschedure the timer.
+This occurs even if the
+.BR timeout (9)
+has just expired and the message block has already been placed on the target queue.
+In this case
+.BR mi_timer (9)
+marks the message block for rescheduling that will be performed when the mesage is dequeued and
+examined with
+.BR mi_timer_valid (9)
+the
+.BR timeout (9)
+will be rescheduled.
 .\"
 .\"
 .SH USAGE
@@ -136,27 +221,187 @@ when it fails, it returns
 fails when 
 .\"
 .\"
+.SH EXAMPLE
+.PP
+Following is an example using the
+.IR MacOT \(rg
+variants of
+.BR mi_timer ():
+.PP
+.nf
+\fC\s-1
+#define NTIMERS 5
+static caddr_t xxx_list = NULL;
+typedef struct xxx_priv {
+     ulong some_data;
+     mblk_t *timers[NTIMERS];
+} xxx_priv_t;
+#define PRIVSZ (sizeof(xxx_priv_t))
+int
+xxx_open(queue_t *q, dev_t *devp, int flag, int sflag,
+         cred_t *crp)
+{
+     int err;
+     err = mi_open_comm(&xxx_list, PRIVSZ, devp,
+                        flag, sflag, crp);
+     if (err == 0) {
+          xxx_priv_t *p = (typeof(p)) q->q_ptr;
+          int i;
+          for (i = 0; i < NTIMER; i++) {
+               p->timers[i] =
+                   mi_timer_alloc(q, sizeof(int));
+               *(int *) (p->timers[i]->b_rptr) = i;
+          }
+          qprocson(q);
+     }
+     return (err);
+}
+
+int
+xxx_close(queue_t *q, int oflag, cred_t *crp)
+{
+     xxx_priv_t *p = (xxx_priv_t *) q->q_ptr;
+     int i;
+     qprocsoff(q);
+     mi_detach(q, (caddr_t) p);
+     for (i = 0; i < NTIMER; i++)
+          if (p->timers[i])
+               mi_timer_free(p->timers[i]);
+     mi_close_detached(&xxx_list, (caddr_t) p);
+     return (0);
+
+}
+
+int
+xxx_rput(queue_t *q, mblk_t *mp)
+{
+     xxx_priv_t *p = (xxx_priv_t *) q->q_ptr;
+     switch (mp->b_datap->db_type) {
+     case M_DATA:
+          /* ... */
+     case M_PROTO:
+          /* ... */
+     case M_PCSIG:
+          if (mi_timer_valid(mp)) {
+               int i = *(int *) (mp->b_rptr);
+               switch (i) {
+               case 0:
+                    /* timeout action 1 */
+                    mi_timer_cancel(p->timers[4]);
+                    mi_timer(p->timers[3], 2000);
+                    break;
+               case 1:
+                    /* timeout action 2 */
+               case 2:
+                    /* timeout action 3 */
+               case 3:
+                    /* timeout action 4 */
+               case 4:
+                    /* timeout action 5 */
+               }
+          }
+          return (0);
+          /* ... */
+     case M_FLUSH:
+          /* ... */
+     }
+}
+\s+1\fC
+.fi
+.PP
+Following is an example using the
+.IR OpenSolaris \(rg
+variants of
+.BR mi_timer ():
+.PP
+For
+.IR OpenSolaris \(rg,
+in the open procedure we use: (Notice the lack of a
+.I q
+argument to
+.BR mi_timer_alloc (9).)
+.sp
+.nf
+\fC\s-1
+          for (i = 0; i < NTIMER; i++) {
+               p->timers[i] =
+                   mi_timer_alloc(sizeof(int));
+               *(int *) (p->timers[i]->b_rptr) = i;
+          }
+\s+1\fC
+.fi
+.PP
+and in the put procedure we use: (Notice the addition of a
+.I q
+argument to
+.BR mi_timer ().)
+.sp
+.nf
+\fC\s-1
+     case M_PCSIG:
+          if (mi_timer_valid(mp)) {
+               int i = *(int *) (mp->b_rptr);
+               switch (i) {
+               case 0:
+                    /* timeout action 1 */
+                    mi_timer_cancel(p->timers[4]);
+                    mi_timer(q, p->timers[3], 2000);
+                    break;
+               case 1:
+                    /* ... */
+               }
+          }
+\s+1\fC
+.fi
+.\"
+.\"
 .SH CONTEXT
 .PP
 .BR mi_timer ()
-can be called from
+must not be called from a priority level higher than a timeout.  On
+.B Linux
+this means that
+.BR mi_timer ()
+must not be called from an interrupt service routine.  To place the call at the same priority level,
+schedule a tasklet to make the call.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_timer ()
+is MP-safe when called from the correct context.  When using the functions in the proscribed
+fashion, the called need not guarnatee exclusive access to the passed in message block or queue.
+The
+.IR MacOT \(rg
+flavor of the functions use a double race-breaking state machine to provide MP safety.  The
+.IR OpenSolaris \(rg
+flavor of the functions have a race condition only in
+.BR mi_timer_move (9),
+and this a call to
+.BR mi_timer ()
+with the special
+.I msec
+value of minus two
+.RB ( -2 ).
 .\"
 .\"
 .SH NOTICES
 .PP
 .BR mi_timer ()
 is a
-.IR MacOT \(rg-specific
-function:
-.B _MAC_SOURCE
+.IR MPS \(rg-specific
+function with
+.IR MacOT \(rg
+and
+.IR OpenSolaris \(rg
+variants:
+.BR _MAC_SOURCE " or " _SUN_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_MAC
+.BR CONFIG_STREAMS_COMPAT_MAC ,
+.BR CONFIG_STREAMS_COMPAT_MAC_MODULE ,
+.B CONFIG_STREAMS_COMPAT_SUN
 or
 .B CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
@@ -164,6 +409,19 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+Some versions of
+.BR mi_timer ()
+place the message block onto the target queue, bypassing the queue's put procedure.  These variants
+only work for queues that have service procedures.
+The
+.B @PACKAGE_TITLE@
+implementation of
+.BR mi_timer ()
+uses
+.BR put (9)
+to place the message block on the taret queue, thus invoking the target queue's put procedure.  (All
+.I STREAMS
+queues require put procedures, but not all require service procedures.)
 .\"
 .\"
 .SH "SEE ALSO"

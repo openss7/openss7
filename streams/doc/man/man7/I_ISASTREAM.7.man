@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_ISASTREAM.7.man,v 0.9.2.2 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_ISASTREAM.7.man,v 0.9.2.3 2006/10/05 12:17:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_ISASTREAM.7.man,v $
+.\" Revision 0.9.2.3  2006/10/05 12:17:00  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.2  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -114,24 +117,23 @@ Ignored.
 .\"
 .SH DESCRIPTION
 .PP
+.B I_ISASTREAM
+is used to iplement the
+.BR isastream (2)
+system call as a library call,
+.BR isastream (3).
+.B I_ISASTREAM
+ignores the  argument,
+.IR arg .
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
-Upon success, the
+The
 .B I_ISASTREAM
 .BR ioctl (2s)
-command returns zero
-.RB ( 0 )
-or a positive integer.
-Upon failure, the
-.B I_ISASTREAM
-.BR ioctl (2s)
-command returns
-.B -1
-and sets
-.IR errno (3)
-to an appropriate error number.
+command always returns one
+.RB ( 1 ).
 .\"
 .\"
 .SH ERRORS
@@ -139,11 +141,14 @@ to an appropriate error number.
 When the
 .B I_ISASTREAM
 .BR ioctl (2s)
-command fails, it returns
-.B -1
+command fails, it returns minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to one of the following errors:
+.B I_ISASTREAM
+always returne one
+.RB ( 1 ).
 .\"
 .PP
 In general, any

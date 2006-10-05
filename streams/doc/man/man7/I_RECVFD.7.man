@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_RECVFD.7.man,v 0.9.2.4 2006/04/05 09:43:48 brian Exp $
+.\" @(#) $Id: I_RECVFD.7.man,v 0.9.2.5 2006/10/05 12:17:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_RECVFD.7.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:00  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:43:48  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B I_RECVFD
-\- \fISTREAMS\fP input-output control
+\- receive a file descriptor on a Stream
 .\"
 .\"
 .SH SYNOPSIS   
@@ -109,25 +112,49 @@ always
 .BR I_RECVFD .
 .TP
 .I arg
+is a pointer to a
+.B strrecvfd
+structure into which to retrun the received file descriptor.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.I arg
+is a pointer to a
+.B strrecvfd
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct strrecvfd {
+    int fd;
+    uid_t uid;
+    gid_t gid;
+    ...
+};
+\fR\s+1
+.fi
+.PP
+In the
+.B strrecfd
+structure,
+.I fd
+is the file descriptor received, and
+.IR uid " and " gid
+are the credentials associated with the file descriptor.
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
-Upon success, the
+Upon success,
 .B I_RECVFD
-.BR ioctl (2s)
-command returns zero
+returns zero
 .RB ( 0 )
-or a positive integer.
-Upon failure, the
-.B I_RECVFD
-.BR ioctl (2s)
-command returns
-.B -1
+and the completed
+.B strrecvfd
+structure;
+upon failure, minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to an appropriate error number.
@@ -138,11 +165,45 @@ to an appropriate error number.
 When the
 .B I_RECVFD
 .BR ioctl (2s)
-command fails, it returns
-.B -1
+command fails, it returns minus one
+.RB ( -1 )
 and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EFAULT ]
+.I arg
+points outside the caller's valid address space.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a pipe and the other end of the pipe is closed.
+.TP
+.RB [ EIO ]
+.I fd
+is a valid, open, file descriptor, but the stream is closing.
+.TP
+.RB [ ENXIO ]
+.I fd
+refers to a stream that has received a hangup.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a stream.
+.TP
+.RB [ EAGAIN ]
+no file descriptor message
+.RB ( M_PASSFP (9))
+is waiting.
+.TP
+.RB [ ENFILE ]
+no remaining file descriptors could be allocated for the receiving process.
+.TP
+.RB [ EBADMSG ]
+the message on the top of the stream head read queue is not a passed file
+descriptor
+.RB ( M_PASSFD (9))
+message.
 .\"
 .PP
 In general, any

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mpnotify.9.man,v 0.9.2.4 2006/04/05 09:44:14 brian Exp $
+.\" @(#) $Id: mpnotify.9.man,v 0.9.2.5 2006/10/05 12:17:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:14 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/05 12:17:07 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mpnotify.9.man,v $
+.\" Revision 0.9.2.5  2006/10/05 12:17:07  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:14  brian
 .\" - moved .so line and updated headers
 .\"
@@ -124,8 +127,8 @@ will be called with the supplied argument,
 .IR arg .
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH RETURN
@@ -141,17 +144,25 @@ when it fails, it returns
 .SH ERRORS
 .PP
 .BR mpnotify ()
-fails when 
+fails when it cannot allocate memory necessary to complete the call.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR mpnotify ()
-can be called from
+can be called from any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mpnotify ()
+is MP-safe.
+As with
+.BR esballoc (),
+a loadable
+.I STREAMS
+driver or module must ensure that all notifications have occurred before any
+data structures or code text upon which the callback depends are deallocated.
 .\"
 .\"
 .SH NOTICES
@@ -202,16 +213,14 @@ is compatible with
 .IR MacOT \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 .BR mpnotify ()
 is an
 .IR MacOT \(rg-specific
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
-The more common
-.BR zzz ()
+The standard
+.BR esballoc ()
 function should be used in its stead.
 .IP \(em
 .BR mpnotify ()
