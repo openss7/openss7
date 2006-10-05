@@ -1,5 +1,5 @@
-OpenSS7 IPERF Utility -- read me first file.  2006-09-17
-$Id: README,v 1.1.1.2.2.11 2006/09/18 01:51:06 brian Exp $
+OpenSS7 IPERF Utility -- read me first file.  2006-10-03
+$Id: README,v 1.1.1.2.2.12 2006/10/05 12:13:08 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -50,12 +50,12 @@ neither the original copyright holders nor OpenSS7 Corporation
  Release
 --------
 
-This is the `iperf-2.0.5.rc3' package, released 2006-09-17.  This
-`2.0.5.rc3' release, and the latest version, can be obtained from the
-download area (http://www.openss7.org/download.html) of The OpenSS7
-Project website using a command such as:
+This is the `iperf-2.0.5' package, released 2006-10-03.  This `2.0.5'
+release, and the latest version, can be obtained from the download area
+(http://www.openss7.org/download.html) of The OpenSS7 Project website
+using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/iperf-2.0.5.rc3.tar.bz2
+     $> wget http://www.openss7.org/tarballs/iperf-2.0.5.tar.bz2
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', or as a set of binary `rpm's or `deb's.  See the download page
@@ -79,7 +79,7 @@ installation procedure that works for most applications appears below.
 This release of the package is published strictly under Version 2 of
 the `GNU Public License' which can be found in the file `COPYING'.
 Package specific licensing terms (if any) can be found in the file
-`LICENSING'.  Please respect these licensing arrangements.  If you are
+`LICENSES'.  Please respect these licensing arrangements.  If you are
 interested in different licensing terms, please contact the copyright
 holder, or OpenSS7 Corporation <sales@openss7.com>.
 
@@ -90,7 +90,7 @@ See `README-alpha' (if it exists) for alpha release information.
 
 The quickest and easiest way to ensure that all prerequisites are met
 is to download and install this package from within the `OpenSS7 Master
-Package', `openss7-0.9.2.D.rc3', instead of separately.
+Package', `openss7-0.9.2.D', instead of separately.
 
 Prerequisites for the OpenSS7 IPERF Utility package are as follows:
 
@@ -115,8 +115,8 @@ modified version only currently builds and installs on Linux.)
 then the dependencies listed below will already have been met by
 unpacking the master package.)
 
-  2. `OpenSS7 Sockets SCTP', sctp-0.2.24.rc3
-     (http://www.openss7.org/tarballs/sctp-0.2.24.rc3.tar.bz2).
+  2. `OpenSS7 Sockets SCTP', sctp-0.2.24
+     (http://www.openss7.org/tarballs/sctp-0.2.24.tar.bz2).
 
 When configuring and building multiple `OpenSS7 Project' release
 packages, place all of the source packages (unpacked tarballs) at the
@@ -135,7 +135,7 @@ You also need the same version of `gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add `CC=kgcc' on the line
 after `./configure', for example:
 
-     $> ../iperf-2.0.5.rc3/configure CC='gcc-3.4'
+     $> ../iperf-2.0.5/configure CC='gcc-3.4'
 
  Installation
 -------------
@@ -143,11 +143,11 @@ after `./configure', for example:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/iperf-2.0.5.rc3.tar.bz2
-     $> tar -xjvf iperf-2.0.5.rc3.tar.bz2
+     $> wget http://www.openss7.org/tarballs/iperf-2.0.5.tar.bz2
+     $> tar -xjvf iperf-2.0.5.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../iperf-2.0.5.rc3/configure --enable-autotest
+     $> ../iperf-2.0.5/configure --enable-autotest
      $> make
      $> make check
      $> sudo make install
@@ -155,8 +155,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf iperf-2.0.5.rc3
-     $> rm -f iperf-2.0.5.rc3.tar.bz2
+     $> rm -rf iperf-2.0.5
+     $> rm -f iperf-2.0.5.tar.bz2
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
@@ -164,11 +164,11 @@ be generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(3) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/iperf-2.0.5.rc3.tar.bz2
-     $> tar -xjvf iperf-2.0.5.rc3.tar.bz2
+     $> wget http://www.openss7.org/tarballs/iperf-2.0.5.tar.bz2
+     $> tar -xjvf iperf-2.0.5.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../iperf-2.0.5.rc3/configure --enable-autotest
+     $> ../iperf-2.0.5/configure --enable-autotest
      $> make compile.log
      $> make check.log
      $> sudo make install.log
@@ -176,8 +176,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf iperf-2.0.5.rc3
-     $> rm -f iperf-2.0.5.rc3.tar.bz2
+     $> rm -rf iperf-2.0.5
+     $> rm -f iperf-2.0.5.tar.bz2
 
 See `README-make' for additional specialized make targets.
 
@@ -193,14 +193,14 @@ The OpenSS7 IPERF Utility package is available from the downloads area
 of The OpenSS7 Project website (http://www.openss7.org/download.html)
 using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/iperf-2.0.5.rc3.tar.bz2
+     $> wget http://www.openss7.org/tarballs/iperf-2.0.5.tar.bz2
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf iperf-2.0.5.rc3.tar.bz2
+     $> tar -xjvf iperf-2.0.5.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: iperf-2.0.5.rc3.
+package name: iperf-2.0.5.
 
 The package builds using the GNU `autoconf' utilities and the
 `configure' script.  To build the package, we recommend using a
@@ -208,19 +208,19 @@ separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../iperf-2.0.5.rc3/configure
+     $> ../iperf-2.0.5/configure
 
 In general, the package configures and builds without adding any
 special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
-     $> less ../iperf-2.0.5.rc3/INSTALL
+     $> less ../iperf-2.0.5/INSTALL
 
 For specific options to the `configure' script, see the `INSTALL-iperf'
 file in the distribution, or simply execute the configure script with
 the `--help' option like so:
 
-     $> ../iperf-2.0.5.rc3/configure --help
+     $> ../iperf-2.0.5/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -260,8 +260,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf iperf-2.0.5.rc3
-     $> rm -f iperf-2.0.5.rc3.tar.bz2
+     $> rm -rf iperf-2.0.5
+     $> rm -f iperf-2.0.5.tar.bz2
 
  Detailed Installation Instructions
 -----------------------------------
@@ -270,7 +270,7 @@ More detailed installation instructions can be found in the
 `Installation', in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
-     $> cd ../iperf-2.0.5.rc3
+     $> cd ../iperf-2.0.5
      $> less doc/manual/iperf.txt
      $> lynx doc/manual/iperf.html
      $> info doc/manual/iperf.info
@@ -349,4 +349,3 @@ in the release directory for more information on filing a proper
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
-vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
