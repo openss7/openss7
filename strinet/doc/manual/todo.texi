@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/08/26 14:38:00 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/05 12:18:00 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/26 14:38:00 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/05 12:18:00 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -83,7 +83,7 @@ modify netperf to use (pseudo-)connection-oriented UDP for better comparison.
 
 
 @item
-32bit compatibiltiy testing.
+32bit compatibility testing.
 
 @table @emph
 @item *done*
