@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: msgb.9.man,v 0.9.2.10 2006/10/05 12:15:45 brian Exp $
+.\" @(#) $Id: msgb.9.man,v 0.9.2.11 2006/10/06 12:13:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:45 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: msgb.9.man,v $
+.\" Revision 0.9.2.11  2006/10/06 12:13:05  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.10  2006/10/05 12:15:45  brian
 .\" - updates for release
 .\"
@@ -249,9 +254,9 @@ conatains SCTP partial checksum;
 padding.
 .PP
 The following members are
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 specific members:
 .TP \w'\ b_datap\ 'u
@@ -813,7 +818,7 @@ For details, see
 .B MSGCSUM
 .I @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 defines this flag.  When checksumming is set on the Stream head with the
 .B SO_CSUM
@@ -834,7 +839,7 @@ member of the message block to indicate the validity of the partial checksum.
 .B MSGCRC32C
 .I @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 defines this flag.  When checksumming is set on the Stream head with the
 .B SO_CRC32C

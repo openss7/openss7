@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: LOCK_ALLOC.9.man,v 0.9.2.8 2006/04/05 09:43:29 brian Exp $
+.\" @(#) $Id: LOCK_ALLOC.9.man,v 0.9.2.9 2006/10/06 12:12:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:29 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:12:58 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: LOCK_ALLOC.9.man,v $
+.\" Revision 0.9.2.9  2006/10/06 12:12:58  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:29  brian
 .\" - moved .so line and updated headers
 .\"
@@ -246,7 +251,7 @@ is a
 function:
 .B _SVR4_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SVR4
 or
@@ -322,7 +327,7 @@ documentation.
 ignores the
 .I lkinfop
 argument.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 doe snot support basic, sleep, synchronization or read/write lock statistics
 or debugging in the manner of
 .IR "SVR 4.2 MP" .
@@ -335,9 +340,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR "SVR 4.2"

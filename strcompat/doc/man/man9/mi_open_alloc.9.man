@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_open_alloc.9.man,v 0.9.2.4 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_open_alloc.9.man,v 0.9.2.5 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_open_alloc.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -80,12 +85,12 @@ sort-adjacent-labels
 .so strcompat.macros
 .\"
 .\"
-.TH XXX 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH MI_OPEN_ALLOC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B xxx
-\-
+.B mi_open_alloc, mi_open_alloc_sleep
+\- \fISTREAMS\fR driver or module instance allocation for open
 .\"
 .\"
 .SH SYNOPSIS
@@ -98,13 +103,16 @@ sort-adjacent-labels
 .br
 .B #include <sys/mpsddi.h>
 .HP
-int \fBxxx\fR(int \fIyyy\fR);
+.BI "caddr_t mi_open_alloc(size_t " size ");
+.HP
+.BI "caddr_t mi_open_alloc_sleep(size_t " size ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I yyy
+.I size
+the size of the per-instance data structure to allocate.
 .\"
 .\"
 .SH INTERFACE
@@ -115,45 +123,109 @@ DDI.
 .\"
 .SH DESCRIPTION
 .PP
-.BR xxx ()
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+can be used to perform
+.I STREAMS
+.IR qi_qopen (9)
+housekeeping functions.  Both functions can be used to allocate a
+.I STREAMS
+driver or module private instance datastructure of size,
+.IR size .
+.BR mi_open_alloc ()
+returns
+.B NULL
+if the appropriate amount of memory cannot be immediately allocated.
+.BR mi_open_alloc_sleep ()
+sleeps until memory becomse available in the same situation.
+.PP
+Both
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+return a pointer to the module private part of the instance datastructure.
+Those portions of the data structure that are used for further housekeeping by
+functions such as
+.BR mi_open_link (9)
+are hidden before the head of the structure.
+.PP
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+are not normally called directly by
+.I STREAMS
+driver and module writers.  The higher level housekeeping function,
+.BR mi_open_comm (9),
+is normally used instead.
+.PP
+Each call to
+.BR mi_open_alloc ()
+or
+.BR mi_open_alloc_sleep ()
+in the
+.I STREAMS
+driver or module
+.IR qi_qopen (9)
+routine should have a corresponding call to
+.BR mi_close_free (9)
+in the
+.IR qi_qclose (9)
+routine.
 .\"
 .\"
 .SH RETURN
 .PP
 When
-.BR xxx ()
-succeeds, it returns 
-.BR true  " (1);
-when it fails, it returns
-.BR false " (0).
+.BR mi_open_alloc ()
+or
+.BR mi_open_alloc_sleep ()
+succeed, they return a pointer to an instance structure;
+when they fail, they return
+.RB NULL .
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR xxx ()
-fails when 
+.BR mi_open_alloc ()
+fails when it cannot immediately allocate memory to satisfy the request.
+.BR mi_open_alloc_sleep ()
+does not fail.
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR xxx ()
-can be called from
+.BR mi_open_alloc ()
+can be called from any context.
+.BR mi_open_alloc_sleep ()
+can be called only from a blocking context.
+Nevertheless, both functions are intended to be called from within the
+.I STREAMS
+driver or module
+.IR qi_qopen (9)
+routine.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+are MP-safe.  The caller has exclusive access to the returned data structures.
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR xxx ()
-is an
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+are
 .IR MPS \(rg-specific
-function:
+functions:
 .BR _MPS_SOURCE ,
 .B _AIX_SOURCE
 or
@@ -173,10 +245,17 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_open_alloc ()
+simply allocate memory to contain the private structure and hidden
+headers but does not sleep.
+.BR mi_open_alloc_sleep ()
+sleeps until memory is available.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR mi_open_comm (9),
+.BR mi_close_free (9),
 .BR mpscompat (9),
 .BR aixcompat (9),
 .BR maccompat (9),
@@ -185,14 +264,18 @@ defined.
 .\"
 .SH BUGS
 .PP
-.BR xxx ()
-has no known bugs.
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR xxx ()
-is
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+are
 compatible with
 .IR MPS \(rg,
 .IR AIX \(rg,
@@ -201,18 +284,22 @@ and
 .IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR xxx ()
-is an
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+are
 .IR MPS \(rg-specific
-function and should not be used by portable
+functions and should not be used by portable
 .I STREAMS
 drivers and modules.
 The more common
 .BR zzz ()
 function should be used in its stead.
 .IP \(em
-.BR xxx ()
-is provided for source level compatibility with
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+are provided for source level compatibility with
 .IR MPS \(rg
 for the purpose of porting
 .IR MPS \(rg
@@ -221,20 +308,24 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
-.BR xxx ()
-only provides functionality comparable to
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+only provide functionality comparable to
 .IR MPS \(rg
 for use by
 .I STREAMS
 drivers and modules.
 Any and all functionality provided by
-.BR xxx ()
+.BR mi_open_alloc ()
+or
+.BR mi_open_alloc_sleep ()
 in support of
 .RI non- STREAMS
 devices are not supported.
@@ -269,17 +360,23 @@ aixcpc
 .\"
 .SH HISTORY
 .PP
-.BR xxx ()
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
 first appeared in
 .IR MPS \(rg.
-.BR xxx ()
-is a
-Mentat, Inc. function that goes all the way back to the
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+are
+Mentat, Inc. functions that goes all the way back to the
 .RI pre- OSF/1
 .I Mentat
 implementations.
-.BR xxx ()
-appears in
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+appear in
 .IR MacOT \(rg
 .[
 macspg
@@ -290,8 +387,10 @@ and
 aixcpc
 .]
 An undocumented version of
-.BR xxx ()
-appears in
+.BR mi_open_alloc ()
+and
+.BR mi_open_alloc_sleep ()
+appear in
 .IR Solaris \(rg.
 .\"
 .\"

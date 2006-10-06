@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_close_unlink.9.man,v 0.9.2.4 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_close_unlink.9.man,v 0.9.2.5 2006/10/06 12:13:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_close_unlink.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:02  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -105,8 +110,10 @@ void \fBmi_close_unlink\fR(caddr_t *\fIhead\fR, caddr_t \fIptr\fR);
 .PP
 .TP
 .I head
+an opaque pointer to the head of the open list.
 .TP
 .I ptr
+a pointer to the private structure to unlink from the list.
 .\"
 .\"
 .SH INTERFACE
@@ -290,6 +297,8 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_close_unlink ()
+simply removes the private structure from the list while holding a global list lock.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -327,7 +336,7 @@ with the following portability considerations:
 The functions performed by
 .BR mi_close_unlink ()
 are poorly documented in the available literature.  The
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 implementation may differ largely from existing implementations.
 .IP \(em
 .BR mi_close_unlink ()
@@ -350,7 +359,7 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

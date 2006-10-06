@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lfscompat.9.man,v 0.9.2.4 2006/10/05 12:15:42 brian Exp $
+.\" @(#) $Id: lfscompat.9.man,v 0.9.2.5 2006/10/06 12:13:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lfscompat.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:01  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:42  brian
 .\" - updates for release
 .\"
@@ -85,7 +90,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B lfscompat
-\- \fBLinux Fast-STREAMS\fP LfS Compatibility Module
+\- \fB@PACKAGE_TITLE@\fP LfS Compatibility Module
 .\"
 .\"
 .SH SYNOPSIS
@@ -113,7 +118,7 @@ The functions provided by this compatibility module are described here.
 The
 .I LfS Compatibility Module
 is a
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
 LfS
 .]
@@ -135,7 +140,7 @@ kernel functions.
 New
 .I STREAMS
 drivers and modules should always be compiled against
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 and
 .I Linux
 symbols for performance and efficiency.
@@ -256,7 +261,7 @@ module is only built when building the
 package with
 .IR LiS ;
 otherwise, these functions are provided by the core
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .I streams
 module.
 .\"
@@ -300,7 +305,7 @@ drivers to
 Because internal structures and definitions for
 .B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR LFS \(rg,
@@ -336,7 +341,7 @@ LfS
 .PP
 These functions
 first appeared in
-.IR "Linux Fast-STREAMS" .
+.IR "@PACKAGE_TITLE@" .
 .[
 LfS
 .]

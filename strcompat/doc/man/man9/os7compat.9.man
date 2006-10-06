@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: os7compat.9.man,v 0.9.2.3 2006/10/05 12:15:45 brian Exp $
+.\" @(#) $Id: os7compat.9.man,v 0.9.2.4 2006/10/06 12:13:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:45 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: os7compat.9.man,v $
+.\" Revision 0.9.2.4  2006/10/06 12:13:05  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.3  2006/10/05 12:15:45  brian
 .\" - updates for release
 .\"
@@ -97,14 +102,14 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 provides a compatibility module,
 .BR streams-os7compat.o ,
 that provides compatibility functions that smooth porting of drivers from the
 .I OpenSS7
 .I STREAMS
 environment to
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 The functions provided by this compatibility module are described here.
 .\"
 .\"
@@ -115,7 +120,7 @@ None of the functions that are provided by
 are also provided by the core
 .B streams.o
 kernel module of
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 Other
 .I OpenSS7
 functions are provided by the
@@ -123,16 +128,16 @@ functions are provided by the
 compatibility kernel module.
 .\"
 .\"
-.SS "Core Functions"
-.PP
-Functions that are already available in
-.B Linux Fast STREAMS
-are as follows:
+.\".SS "Core Functions"
+.\".PP
+.\"Functions that are already available in
+.\".B Linux Fast STREAMS
+.\"are as follows:
 .\"
 .SS "Specific Functions"
 .PP
 Functions that are available in the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .I OpenSS7
 compatibility module,
 .BR streams-os7compat.o ,
@@ -198,6 +203,9 @@ remove a specific buffer from a queue.
 .HP
 .BR bufq_unlock (9)\ \-\ \c
 unlock a buffer queue.
+.HP
+.BR freechunks (9)\ \-\ \c
+free message chunks chained together
 .HP
 .BR ss7_allocb (9)\ \-\ \c
 allocate a buffer with bufcall fallback.
@@ -306,10 +314,10 @@ process
 on the write side.
 .PD
 .\"
-.SS "Transport Functions"
-.PP
-.PD 0
-.PD
+.\".SS "Transport Functions"
+.\".PP
+.\".PD 0
+.\".PD
 .\"
 .\"
 .SH USAGE
@@ -373,7 +381,7 @@ These are
 functions:
 .B _OS7_SOURCE
 must be defined before including DDI/DKI include files to expose these symbols.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_OS7
 or
@@ -394,8 +402,8 @@ defined.
 .\"
 .\"
 .SH "SEE ALSO"
-.PP
-Core functions:
+.\".PP
+.\"Core functions:
 .PP
 Compatibility functions:
 .BR bufq_append (9),
@@ -418,6 +426,7 @@ Compatibility functions:
 .BR bufq_tail (9),
 .BR bufq_unlink (9),
 .BR bufq_unlock (9),
+.BR freechunks (9),
 .BR ss7_allocb (9),
 .BR ss7_bufcall (9),
 .BR ss7_bufpool_init (9),
@@ -452,8 +461,8 @@ Compatibility functions:
 .BR ss7_unbufcall (9),
 .BR ss7_unlockq (9),
 .BR ss7_w_flush (9).
-.PP
-Transport functions:
+.\".PP
+.\"Transport functions:
 .PP
 General:
 .BR STREAMS (9).

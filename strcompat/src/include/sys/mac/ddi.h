@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.10 2006/10/05 12:15:51 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.11 2006/10/06 12:13:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/05 12:15:51 $ by $Author: brian $
+ Last Modified $Date: 2006/10/06 12:13:10 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_MAC_DDI_H__
 #define __SYS_MAC_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

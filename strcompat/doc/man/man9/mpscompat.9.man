@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mpscompat.9.man,v 0.9.2.4 2006/10/05 12:15:45 brian Exp $
+.\" @(#) $Id: mpscompat.9.man,v 0.9.2.5 2006/10/06 12:13:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:45 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mpscompat.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:05  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:45  brian
 .\" - updates for release
 .\"
@@ -97,13 +102,37 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 provides a compatibility module,
 .BR streams-mpscompat.o ,
 that provides compatibility functions that smooth porting of drivers from the
 .I Mentat Portable STREAMS
 environment to
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
+.PP
+Version of the
+.I Mentat Portable STREAMS
+environment, or at least
+the MPS API for use by Mentat TCP/IP implementation,
+appears in
+.IR AIX \(rg,
+.IR MacOT \(rg,
+.IR Solaris \(rg,
+.IR VxWorks \(rg,
+and other
+.I STREAMS
+implementations containing
+.I Mentat
+TCP/IP implementation, either historically or currently.
+Versions of these function can also likely be found in
+.IR OSF/1 \(rg,
+and
+.IR HP-UX \(rg.
+Any
+.I STREAMS
+implementation still using
+.I Lachman
+TCP/IP implementation will likely not have these functions.
 .\"
 .\"
 .SH DESCRIPTION
@@ -113,7 +142,7 @@ Many of the functions that are provided by
 are also provided by the core
 .BR streams.o " and " streams-svr4compat.o
 kernel modules of
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 Other
 .IR MPS \(rg-specific
 functions are provided by the
@@ -124,7 +153,7 @@ compatibility kernel module.
 .SS "Core Functions"
 .PP
 Functions that are already available in
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 are as follows:
 .PD 0
 .PD
@@ -132,7 +161,7 @@ are as follows:
 .SS "Specific Functions"
 .PP
 Functions that are available in the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .IR MPS \(rg
 compatibility module,
 .BR streams-mpscompat.o ,
@@ -143,16 +172,18 @@ allocate and free kernel memory without later regard to size
 .PD 0
 .HP
 .BR mi_allocq (9)\ \-\ \c
-
+.BR allocq (9)
+replacement
 .HP
 .BR mi_alloc_sleep (9)\ \-\ \c
-
+.BR kmem_alloc (9)
+replacement
 .HP
 .BR mi_attach (9)\ \-\ \c
 associate instance data with a \fISTREAMS\fR queue
 .HP
 .BR mi_bcmp (9)\ \-\ \c
-
+compate two binary memory extents
 .HP
 .BR mi_bufcall (9)\ \-\ \c
 reliable alternative to \fBbufcall\fP(9)
@@ -162,6 +193,12 @@ reliable alternative to \fBbufcall\fP(9)
 .HP
 .BR mi_close_detached (9)\ \-\ \c
 release instance data from the \fISTREAMS\fR queue and perform close cleanup
+.HP
+.BR mi_close_free (9)\ \-\ \c
+free a \fISTREAMS\fR driver or module instance on close
+.HP
+.BR mi_close_unlink (9)\ \-\ \c
+unlink a \fISTREAMS\fR driver or module instance from a Stream
 .HP
 .BR mi_copy_done (9)\ \-\ \c
 \fBioctl\fR(2) complete
@@ -187,26 +224,52 @@ current state of the input-output control process
 .BR mi_detach (9)\ \-\ \c
 disassociate instance data from the \fISTREAMS\fR queue
 .HP
+.BR mi_first_dev_ptr (9)\ \-\ \c
+obtain first device instance pointer
+.HP
+.BR mi_first_ptr (9)\ \-\ \c
+obtain first instance pointer
+.HP
 .BR mi_free (9)\ \-\ \c
-
+.BR kmem_free (9)
+replacement
 .HP
 .BR mi_freeq (9)\ \-\ \c
-
+.BR freeq (9)
+replacement
+.HP
+.BR mi_mpprintf (9)\ \-\ \c
+print a formatted string to a message buffer
+.HP
+.BR mi_mpprintf_nr (9)\ \-\ \c
+continue to print a formatted string to a message buffer
+.HP
+.BR mi_next_dev_ptr (9)\ \-\ \c
+obtain next device instance pointer
 .HP
 .BR mi_next_ptr (9)\ \-\ \c
 \fISTREAMS\fP minor device list traversal
 .HP
 .BR mi_offset_param (9)\ \-\ \c
-
+obtain parameter location within \fISTREAMS\fR message block
 .HP
 .BR mi_offset_paramc (9)\ \-\ \c
-
+obtain parameter location within \fISTREAMS\fR message block chain
+.HP
+.BR mi_open_alloc (9)\ \-\ \c
+allocate a \fISTREAMS\fR driver or module instance
+.HP
+.BR mi_open_alloc_sleep (9)\ \-\ \c
+allocate a \fISTREAMS\fR driver or module instance (may sleep)
 .HP
 .BR mi_open_comm (9)\ \-\ \c
 \fISTREAMS\fP common minor device open utility
 .HP
 .BR mi_open_detached (9)\ \-\ \c
 \fISTREAMS\fP create detached instance data
+.HP
+.BR mi_open_link (9)\ \-\ \c
+link a \fISTREAMS\fR driver or modules instance on open
 .HP
 .BR mi_prev_ptr (9)\ \-\ \c
 \fISTREAMS\fP minor device list traversal
@@ -215,49 +278,170 @@ disassociate instance data from the \fISTREAMS\fR queue
 switch \fISTREAMS\fR queues for a timer message
 .HP
 .BR mi_reallocb (9)\ \-\ \c
-
+reallocate a \fISTREAMS\fR message block
 .HP
 .BR mi_reuse_proto (9)\ \-\ \c
-
+reuse a \fISTREAMS\fR protocol message block 
+.HP
+.BR mi_set_sth_copyopt (9)\ \-\ \c
+set the \fISTREAMS\fR stream head copy options
 .HP
 .BR mi_set_sth_hiwat (9)\ \-\ \c
-
+set the \fISTREAMS\fR stream head high water mark
 .HP
 .BR mi_set_sth_lowat (9)\ \-\ \c
-
+set the \fISTREAMS\fR stream head low water mark
 .HP
 .BR mi_set_sth_maxblk (9)\ \-\ \c
-
+set the \fISTREAMS\fR stream head maximum block size
 .HP
 .BR mi_set_sth_wroff (9)\ \-\ \c
-
+set the \fISTREAMS\fR stream head write offset
 .HP
 .BR mi_sprintf (9)\ \-\ \c
-
+.BR sprintf (3)
+replacement.
+.HP
+.BR mi_sprintf_putc (9)\ \-\ \c
+put a character in an sprintf buffer
+.HP
+.BR mi_strcmp (9)\ \-\ \c
+.BR strcmp (3)
+replacement
+.HP
+.BR mi_strlen (9)\ \-\ \c
+.BR strlen (3)
+replacement
+.HP
+.BR mi_strlog (9)\ \-\ \c
+.BR strlog (9)
+replacement
+.HP
+.BR mi_strtol (9)\ \-\ \c
+.BR strtol (3)
+replacement
 .HP
 .BR mi_timer (9)\ \-\ \c
-
+process a \fISTREAMS\fR timer
 .HP
 .BR mi_timer_alloc (9)\ \-\ \c
-
+allocate a \fISTREAMS\fR timer
 .HP
 .BR mi_timer_cancel (9)\ \-\ \c
-
+cancel a \fISTREAMS\fR timer
 .HP
 .BR mi_timer_free (9)\ \-\ \c
-
+free a \fISTREAMS\fR timer
+.HP
+.BR mi_timer_move (9)\ \-\ \c
+move a \fISTREAMS\fR timer
 .HP
 .BR mi_timer_q_switch (9)\ \-\ \c
-
+switch queues for \fISTREAMS\fR timer
+.HP
+.BR mi_timer_stop (9)\ \-\ \c
+stop a \fISTREAMS\fR timer
 .HP
 .BR mi_timer_valid (9)\ \-\ \c
-
+check a \fISTREAMS\fR timer
 .HP
 .BR mi_zalloc (9)\ \-\ \c
-
+.BR kmem_zalloc (9)
+replacement
 .HP
 .BR mi_zalloc_sleep (9)\ \-\ \c
-
+.BR kmem_zalloc (9)
+replacement
+.PD
+.\"
+.SS "\fIMPS\fP\fR\(rg\fP Transport Functions"
+.PP
+.IR MPS \(rg
+exposes a number of symbols from the underlying Mentat
+.IR MPS \(rg
+TCP/IP implementation that are also documented in the
+.IR MPS \(rg
+documentation.
+These transport functions are
+.B not
+part of the
+.B @PACKAGE_TITLE@
+package:
+.HP
+.BR mi_tpi_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_OK_ACK (7)
+or
+.BR T_ERROR_ACK (7)
+.PD 0
+.HP
+.BR mi_tpi_conn_con (9)\ \-\ \c
+generate a
+.BR T_CONN_CON (7)
+.HP
+.BR mi_tpi_conn_ind (9)\ \-\ \c
+generate a
+.BR T_CONN_IND (7)
+.HP
+.BR mi_tpi_conn_req (9)\ \-\ \c
+generate a
+.BR T_CONN_REQ (7)
+.HP
+.BR mi_tpi_data_ind (9)\ \-\ \c
+generate a
+.BR T_DATA_IND (7)
+.HP
+.BR mi_tpi_data_req (9)\ \-\ \c
+generate a
+.BR T_DATA_REQ (7)
+.HP
+.BR mi_tpi_discon_ind (9)\ \-\ \c
+generate a
+.BR T_DISCON_IND (7)
+.HP
+.BR mi_tpi_discon_req (9)\ \-\ \c
+generate a
+.BR T_DISCON_REQ (7)
+.HP
+.BR mi_tpi_err_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_ERROR_ACK (7)
+.HP
+.BR mi_tpi_exdata_ind (9)\ \-\ \c
+generate a
+.BR T_EXDATA_IND (7)
+.HP
+.BR mi_tpi_exdata_req (9)\ \-\ \c
+generate a
+.BR T_EXDATA_REQ (7)
+.HP
+.BR mi_tpi_info_req (9)\ \-\ \c
+generate a
+.BR T_INFO_REQ (7)
+.HP
+.BR mi_tpi_ok_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_OK_ACK (7)
+.HP
+.BR mi_tpi_ordrel_ind (9)\ \-\ \c
+generate a
+.BR T_ORDREL_IND (7)
+.HP
+.BR mi_tpi_ordrel_req (9)\ \-\ \c
+generate a
+.BR T_ORDREL_REQ (7)
+.HP
+.BR mi_tpi_uderror_ind (9)\ \-\ \c
+generate a
+.BR T_UDERROR_IND (7)
+.HP
+.BR mi_tpi_unitdata_ind (9)\ \-\ \c
+generate a
+.BR T_UNITDATA_IND (7)
+.HP
+.BR mi_tpi_unitdata_req (9)\ \-\ \c
+generate a
+.BR T_UNITDATA_REQ (7)
 .PD
 .\"
 .\"
@@ -292,7 +476,7 @@ These are
 functions:
 .B _MPS_SOURCE
 must be defined before including DDI/DKI include files to expose these symbols.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_MPS
 or
@@ -326,6 +510,30 @@ Core functions are implemented within the
 framework.
 .IR MPS \(rg-specific
 functions are implemented as described in the separate manual pages describing each facility.
+.PP
+All
+.IR MPS \(rg-specific
+functions are implemented with the exception of the
+.IR MPS \(rg
+Transport Functions:
+.BR mi_tpi_ack_alloc (9),
+.BR mi_tpi_conn_con (9),
+.BR mi_tpi_conn_ind (9),
+.BR mi_tpi_conn_req (9),
+.BR mi_tpi_data_ind (9),
+.BR mi_tpi_data_req (9),
+.BR mi_tpi_discon_ind (9),
+.BR mi_tpi_discon_req (9),
+.BR mi_tpi_err_ack_alloc (9),
+.BR mi_tpi_exdata_ind (9),
+.BR mi_tpi_exdata_req (9),
+.BR mi_tpi_info_req (9),
+.BR mi_tpi_ok_ack_alloc (9),
+.BR mi_tpi_ordrel_ind (9),
+.BR mi_tpi_ordrel_req (9),
+.BR mi_tpi_uderror_ind (9),
+.BR mi_tpi_unitdata_ind (9),
+.BR mi_tpi_unitdata_req (9).
 .\"
 .\"
 .\".SH IOCTLS
@@ -341,6 +549,83 @@ functions are implemented as described in the separate manual pages describing e
 Core functions:
 .PP
 Compatibility functions:
+.BR mi_alloc (9),
+.BR mi_allocq (9),
+.BR mi_alloc_sleep (9),
+.BR mi_attach (9),
+.BR mi_bcmp (9),
+.BR mi_bufcall (9),
+.BR mi_close_comm (9),
+.BR mi_close_detached (9),
+.BR mi_close_free (9),
+.BR mi_close_unlink (9),
+.BR mi_copy_done (9),
+.BR mi_copyin (9),
+.BR mi_copyin_n (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_set_rval (9),
+.BR mi_copy_state (9),
+.BR mi_detach (9),
+.BR mi_first_dev_ptr (9),
+.BR mi_first_ptr (9),
+.BR mi_free (9),
+.BR mi_freeq (9),
+.BR mi_mpprintf (9),
+.BR mi_mpprintf_nr (9),
+.BR mi_next_dev_ptr (9),
+.BR mi_next_ptr (9),
+.BR mi_offset_param (9),
+.BR mi_offset_paramc (9),
+.BR mi_open_alloc (9),
+.BR mi_open_alloc_sleep (9),
+.BR mi_open_comm (9),
+.BR mi_open_detached (9),
+.BR mi_open_link (9),
+.BR mi_prev_ptr (9),
+.BR mi_timer_q_switch (9),
+.BR mi_reallocb (9),
+.BR mi_reuse_proto (9),
+.BR mi_set_sth_copyopt (9),
+.BR mi_set_sth_hiwat (9),
+.BR mi_set_sth_lowat (9),
+.BR mi_set_sth_maxblk (9),
+.BR mi_set_sth_wroff (9),
+.BR mi_sprintf (9),
+.BR mi_sprintf_putc (9),
+.BR mi_strcmp (9),
+.BR mi_strlen (9),
+.BR mi_strlog (9),
+.BR mi_strtol (9),
+.BR mi_timer (9),
+.BR mi_timer_alloc (9),
+.BR mi_timer_cancel (9),
+.BR mi_timer_free (9),
+.BR mi_timer_move (9),
+.BR mi_timer_stop (9),
+.BR mi_timer_valid (9),
+.BR mi_zalloc (9),
+.BR mi_zalloc_sleep (9).
+.PP
+Transport Functions:
+.BR mi_tpi_ack_alloc (9),
+.BR mi_tpi_conn_con (9),
+.BR mi_tpi_conn_ind (9),
+.BR mi_tpi_conn_req (9),
+.BR mi_tpi_data_ind (9),
+.BR mi_tpi_data_req (9),
+.BR mi_tpi_discon_ind (9),
+.BR mi_tpi_discon_req (9),
+.BR mi_tpi_err_ack_alloc (9),
+.BR mi_tpi_exdata_ind (9),
+.BR mi_tpi_exdata_req (9),
+.BR mi_tpi_info_req (9),
+.BR mi_tpi_ok_ack_alloc (9),
+.BR mi_tpi_ordrel_ind (9),
+.BR mi_tpi_ordrel_req (9),
+.BR mi_tpi_uderror_ind (9),
+.BR mi_tpi_unitdata_ind (9),
+.BR mi_tpi_unitdata_req (9).
 .PP
 General:
 .BR STREAMS (9).
@@ -376,9 +661,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

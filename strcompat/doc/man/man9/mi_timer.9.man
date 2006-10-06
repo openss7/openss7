@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer.9.man,v 0.9.2.7 2006/10/05 12:15:44 brian Exp $
+.\" @(#) $Id: mi_timer.9.man,v 0.9.2.8 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:44 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_timer.9.man,v $
+.\" Revision 0.9.2.8  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.7  2006/10/05 12:15:44  brian
 .\" - updates for release
 .\"
@@ -106,7 +111,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/sunddi.h>
 .HP
-.BI "void mi_timer(queue_t *" q ", mblk_t *' mp ", ulong " msec ");
+.BI "void mi_timer(queue_t *" q ", mblk_t *" mp ", ulong " msec ");
 .\"
 .\"
 .SH ARGUMENTS
@@ -124,8 +129,9 @@ command when the timer expires.
 In the
 .IR MacOT \(rg
 form of the function, this argument is provided in the previous call to
-.BR mi_timer_alloc (9).  In the
-.IR OpenSolaris \(rg
+.BR mi_timer_alloc (9).
+In the
+.IR Solaris \(rg
 form of the function, this argument is present here, but not in the call to
 .BR mi_timer_alloc (9).
 .TP
@@ -139,7 +145,7 @@ message block that was allocated with
 the duration in milliseconds before timer expiry.
 This message block can also contain additional user data.
 The
-.IR OpenSolaris \(rg
+.IR Solaris \(rg
 form of
 .BR mi_timer ()
 accept two special values of
@@ -194,14 +200,14 @@ that, upon expiry, will place the message block on the target queue.
 If the message block already has a running timer associated with it,
 .BR mi_timer ()
 will cancel the previous
-.RB timeout (9)
-and reschedure the timer.
+.BR timeout (9)
+and reschedule the timer.
 This occurs even if the
 .BR timeout (9)
 has just expired and the message block has already been placed on the target queue.
 In this case
 .BR mi_timer (9)
-marks the message block for rescheduling that will be performed when the mesage is dequeued and
+marks the message block for rescheduling that will be performed when the message is dequeued and
 examined with
 .BR mi_timer_valid (9)
 the
@@ -211,22 +217,93 @@ will be rescheduled.
 .\"
 .SH USAGE
 .PP
+.BR mi_timer ()
+is one of a set of timer functions including
+.BR mi_timer (),
+.BR mi_timer_alloc (9),
+.BR mi_timer_cancel (9),
+.BR mi_timer_free (9),
+.BR mi_timer_move (9),
+.BR mi_timer_q_switch (9),
+.BR mi_timer_stop (9),
+.BR mi_timer_valid (9),
+that are used to abstract the kernel timer functions and provide
+synchronization with
+.I STREAMS
+message queues.
+.PP
+Timers are abstracted in the following way:
+.PP
+When a timer is first created, a message block is allocated and associated
+with the timer.  In general, a large amount of information can be associated
+with a timer by placing the information in the message block, see
+.BR mi_timer_alloc (9).
+When the timer is set, see
+.BR mi_timer (),
+normal kernel timeout functions are called.  When the timeout occurs, the
+message block associated with the timer is placed on a specified queue with
+.BR put (9)
+as a
+.BR M_PCSIG (9)
+message type.
+When the timer is processed by the queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure,
+.BR mi_timer_valid (9)
+is called to ensure that the timer is still valid and the timeout action is
+otherwise performed.
+Timers fan be freed,
+.BR mi_timer_free (9),
+moved between target queues,
+.BR mi_timer_move (9),
+.BR mi_timer_q_switch (9),
+reset,
+.BR mi_timer (),
+or
+stopped,
+.BR mi_timer_cancel (9),
+.BR mi_timer_stop (9).
+.PP
+One possible reason for this convoluted approach to timers could be that some
+.I STREAMS
+implementations place heavy restrictions upon which
+.I STREAMS
+utilities can be called from without a
+.BR timeout (9)
+callback function.
+.B "@PACKAGE_TITLE@"
+has no such restriction, and
+.I STREAMS
+.BR timeout (9)
+callbacks can even be syncrhonized with queue procedures.
+See
+.BR mp-streams (9)
+for more information.
+.PP
+Therefore, the
+.BR mi_timer ()
+functions are of limited utility on
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .SH RETURN
 .PP
-When
 .BR mi_timer ()
-succeeds, it returns 
-.BR true  " (1);
-when it fails, it returns
-.BR false " (0).
+returns
+.BR void .
 .\"
 .\"
 .SH ERRORS
 .PP
 .BR mi_timer ()
-fails when 
+always succeeds.  If
+.BR mi_timer ()
+is passed a
+.B NULL
+or invalid message pointer, or a pointer that points to an invalid structure,
+the kernel may destablize and a kernel panic may ensue.
 .\"
 .\"
 .SH EXAMPLE
@@ -318,12 +395,12 @@ xxx_rput(queue_t *q, mblk_t *mp)
 .fi
 .PP
 Following is an example using the
-.IR OpenSolaris \(rg
+.IR Solaris \(rg
 variants of
 .BR mi_timer ():
 .PP
 For
-.IR OpenSolaris \(rg,
+.IR Solaris \(rg,
 in the open procedure we use: (Notice the lack of a
 .I q
 argument to
@@ -378,11 +455,11 @@ schedule a tasklet to make the call.
 .PP
 .BR mi_timer ()
 is MP-safe when called from the correct context.  When using the functions in the proscribed
-fashion, the called need not guarnatee exclusive access to the passed in message block or queue.
+fashion, the called need not guarantee exclusive access to the passed in message block or queue.
 The
 .IR MacOT \(rg
 flavor of the functions use a double race-breaking state machine to provide MP safety.  The
-.IR OpenSolaris \(rg
+.IR Solaris \(rg
 flavor of the functions have a race condition only in
 .BR mi_timer_move (9),
 and this a call to
@@ -401,7 +478,7 @@ is an
 function with
 .IR MacOT \(rg
 and
-.IR OpenSolaris \(rg
+.IR Solaris \(rg
 variants:
 .BR _MPS_SOURCE ,
 .B _SUN_SOURCE
@@ -432,7 +509,7 @@ implementation of
 .BR mi_timer ()
 uses
 .BR put (9)
-to place the message block on the taret queue, thus invoking the target queue's put procedure.  (All
+to place the message block on the target queue, thus invoking the target queue's put procedure.  (All
 .I STREAMS
 queues require put procedures, but not all require service procedures.)
 .\"
@@ -486,7 +563,7 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

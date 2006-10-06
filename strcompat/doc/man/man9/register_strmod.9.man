@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: register_strmod.9.man,v 0.9.2.10 2006/10/05 12:15:45 brian Exp $
+.\" @(#) $Id: register_strmod.9.man,v 0.9.2.11 2006/10/06 12:13:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:45 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: register_strmod.9.man,v $
+.\" Revision 0.9.2.11  2006/10/06 12:13:06  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.10  2006/10/05 12:15:45  brian
 .\" - updates for release
 .\"
@@ -313,7 +318,7 @@ has no known bugs.
 is a
 .B "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 implementation specific function, with the following compatibility
 considerations:
@@ -373,7 +378,7 @@ modules is implementation specific and not subject to standardization.
 is a
 .B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 implementation specific function.
 .\"
@@ -384,7 +389,7 @@ implementation specific function.
 first appeared in
 .BR "@PACKAGE_TITLE@" .
 .[
-lfs
+@PACKAGE@
 .]
 .\"
 .\"

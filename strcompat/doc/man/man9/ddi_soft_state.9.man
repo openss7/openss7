@@ -1,7 +1,8 @@
+.so man9/suncompat.9.man
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ddi_soft_state.9.man,v 0.9.2.2 2006/04/05 09:43:31 brian Exp $
+.\" @(#) $Id: ddi_soft_state.9.man,v 0.9.2.3 2006/10/06 12:13:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +54,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:31 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ddi_soft_state.9.man,v $
+.\" Revision 0.9.2.3  2006/10/06 12:13:00  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.2  2006/04/05 09:43:31  brian
 .\" - moved .so line and updated headers
 .\"
@@ -141,7 +147,7 @@ is a
 function:
 .B _SUN_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SUN
 or
@@ -178,9 +184,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR Solaris \(rg,

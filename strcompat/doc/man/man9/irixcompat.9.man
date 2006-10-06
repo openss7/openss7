@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: irixcompat.9.man,v 0.9.2.6 2006/10/05 12:15:42 brian Exp $
+.\" @(#) $Id: irixcompat.9.man,v 0.9.2.7 2006/10/06 12:13:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: irixcompat.9.man,v $
+.\" Revision 0.9.2.7  2006/10/06 12:13:01  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:15:42  brian
 .\" - updates for release
 .\"
@@ -97,14 +102,14 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 provides a compatibility module,
 .BR streams-irixcompat.o ,
 that provides compatibility functions that smooth porting of drivers from the
 .I Mac OpenTransport 1.5r2
 .I STREAMS
 environment to
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 The functions provided by this compatibility module are described here.
 .\"
 .\"
@@ -115,7 +120,7 @@ Many of the functions that are provided by
 are also provided by the core
 .B streams.o
 kernel module of
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 Other
 .IR IRIX \(rg-specific
 functions are provided by the
@@ -134,12 +139,18 @@ are as follows:
 .SS "Specific Functions"
 .PP
 Functions that are available in the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .IR IRIX \(rg
 compatibility module,
 .BR streams-irixcompat.o ,
 are as follows:
+.HP
+.BR cmn_err_tag  (9)\ \- \c
+print a tagged kernel command error.
 .PD 0
+.HP
+.BR icmn_err (9)\ \- \c
+print a kernel command error.
 .PD
 .\"
 .SS "Transport Functions"
@@ -1598,9 +1609,6 @@ SV, 5.3
 Get a pointer to the write queue.
 SV, 5.3
 .PD 0
-
-
-
 .PP
 The following
 .I SVR 4
@@ -1715,7 +1723,7 @@ These are
 functions:
 .B _IRIX_SOURCE
 must be defined before including DDI/DKI include files to expose these symbols.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_IRIX
 or
@@ -1749,6 +1757,10 @@ Core functions are implemented within the
 framework.
 .IR IRIX \(rg-specific
 functions are implemented as described in the separate manual pages describing each facility.
+.PP
+All
+.IR IRIX \(rg-specific
+functions are implemented.
 .\"
 .\"
 .\".SH IOCTLS
@@ -1801,9 +1813,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR IRIX \(rg,

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strlog.9.man,v 0.9.2.14 2006/10/05 12:15:46 brian Exp $
+.\" @(#) $Id: strlog.9.man,v 0.9.2.15 2006/10/06 12:13:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:46 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:07 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strlog.9.man,v $
+.\" Revision 0.9.2.15  2006/10/06 12:13:07  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.14  2006/10/05 12:15:46  brian
 .\" - updates for release
 .\"
@@ -445,7 +450,7 @@ and always returns failure (and never delivers) when
 does not contain
 .BR SL_CONSOLE .
 .PP
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 has an implementation of a full
 .I STREAMS
 logger, the
@@ -561,7 +566,6 @@ support the following
 .BR printf (3)
 conversion specifiers in the format string:
 .IR %e ", " %E ", " %f ", " %F ", " %g ", " %G ", " %a ", " %A ", " %n .
-.IR %
 .IR AIX \(rg
 states that conversion specifiers
 .IR %s ", " %f ", " %e ", " %E ", " %g " and " %G
@@ -801,9 +805,9 @@ logger.
 Portable
 .I STREAMS
 drivers and modules will use
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 instead of
 .IR LiS .

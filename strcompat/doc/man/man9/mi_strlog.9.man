@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_strlog.9.man,v 0.9.2.4 2006/10/05 12:15:44 brian Exp $
+.\" @(#) $Id: mi_strlog.9.man,v 0.9.2.5 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:44 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_strlog.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:44  brian
 .\" - updates for release
 .\"
@@ -80,12 +85,12 @@ sort-adjacent-labels
 .so strcompat.macros
 .\"
 .\"
-.TH XXX 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH MI_STRLOG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B xxx
-\-
+.B mi_strlog
+\- generate a \fISTREAMS\fR log message
 .\"
 .\"
 .SH SYNOPSIS
@@ -98,13 +103,49 @@ sort-adjacent-labels
 .br
 .B #include <sys/mpsddi.h>
 .HP
-int \fBxxx\fR(int \fIyyy\fR);
+.BI "int mi_strlog(queue_t *" q ", char " level ", ushort " flags ", char *" fmt ", " ... ");
+.HP
+.BI "int mi_vstrlog(queue_t *" q ", char " level ", ushort " flags ", char *" fmt ", va_list " args ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I yyy
+.I q
+specifies the read queue associated with the driver or module instance.
+.PD 0
+.TP
+.I level
+specifies the priority level.
+.TP
+.I flags
+log flags specifying the severity and options associated with the
+.I STREAMS
+log.
+.TP
+.I fmt
+provides the
+.BR printf (3)-style
+format string.
+.TP
+.I ...
+provides the arguments for the
+.BR printf (3)-style
+format string for
+.BR mi_strlog ().
+.TP
+.I args
+provides the arguments for the
+.BR printf (3)-style
+format string for
+.BR mi_vstrlog ().
+.PD
+.PP
+.BR mi_vstrlog ()
+is a
+.B va_list
+version of
+.BR mi_strlog ().
 .\"
 .\"
 .SH INTERFACE
@@ -115,17 +156,59 @@ DDI.
 .\"
 .SH DESCRIPTION
 .PP
-.BR xxx ()
+.BR mi_strlog ()
+is an
+.IR MPS \(rg-specific
+interface to the
+.I STREAMS
+.BR log (4)
+error and trace logger,
+see
+.BR strlog (9).
+The
+.I q
+argument, when
+.RB non- NULL ,
+is used to look up the module identifier which is passed to
+.BR vstrlog (9)
+in the
+.I mid
+argument.
+The
+.I sid
+argument passed to
+.BR vstrlog (9)
+is always zero
+.RB ( 0 ).
+The remaining arguments,
+.IR level ,
+.IR flags ,
+.IR fmt ,
+and
+.IR args ,
+are passed without modification to
+.BR vstrlog (9).
 .\"
 .\"
 .SH USAGE
 .PP
+Although on some platforms
+.BR mi_strlog ()
+might support more format strings than are supported by
+.BR strlog (9),
+this is not the case for
+.BR "@PACKAGE_TITLE@" .
+Therefore,
+.BR mi_strlog ()
+is equivalent to
+.BI strlog( q->q_qinfo->qi_minfo->mi_idnum ", 0, " level ", " flags ", " fmt ", " ... ").
+In fact, a macro defintiion to that effect would be better.
 .\"
 .\"
 .SH RETURN
 .PP
 When
-.BR xxx ()
+.BR mi_strlog ()
 succeeds, it returns 
 .BR true  " (1);
 when it fails, it returns
@@ -134,23 +217,30 @@ when it fails, it returns
 .\"
 .SH ERRORS
 .PP
-.BR xxx ()
-fails when 
+.BR mi_strlog ()
+fails under the same circumstances as
+.BR strlog (9)
+(when the message has not been seen by all the readers).
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR xxx ()
-can be called from
+.BR mi_strlog ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and
+interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_strlog ()
+is MP-safe, however, see
+.BR strlog (9).
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR xxx ()
+.BR mi_strlog ()
 is an
 .IR MPS \(rg-specific
 function:
@@ -173,6 +263,25 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+Some implementation of
+.BR mi_strlog (9)
+perform complete formatting of the buffer and then pass the formatted output
+buffer to
+.BR strlog (9).
+The purpose of this, I suppose, is that
+.BR mi_iprintf ()
+supports some
+.BR printf (9)
+format strings that are not supported traditionally by
+.BR strlog (9).
+.BR "@PACKAGE_TITLE@" ,
+however, supports all format strings and neither needs to have the buffer
+preformatted, nor would it be very efficient.
+.BR mi_strlog (9)
+on
+.BR "@PACKAGE_TITLE@" ,
+therefore, passes the format string and arguments to
+.BR vstrlog (9).
 .\"
 .\"
 .SH "SEE ALSO"
@@ -185,13 +294,13 @@ defined.
 .\"
 .SH BUGS
 .PP
-.BR xxx ()
+.BR mi_strlog ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR xxx ()
+.BR mi_strlog ()
 is
 compatible with
 .IR MPS \(rg,
@@ -201,17 +310,21 @@ and
 .IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR xxx ()
+See
+.BR strlog (9)
+for a detailed discussion on supported conversion specifiers.
+.IP \(em
+.BR mi_strlog ()
 is an
 .IR MPS \(rg-specific
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
 The more common
-.BR zzz ()
+.BR strlog (9)
 function should be used in its stead.
 .IP \(em
-.BR xxx ()
+.BR mi_strlog ()
 is provided for source level compatibility with
 .IR MPS \(rg
 for the purpose of porting
@@ -221,20 +334,20 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
-.BR xxx ()
+.BR mi_strlog ()
 only provides functionality comparable to
 .IR MPS \(rg
 for use by
 .I STREAMS
 drivers and modules.
 Any and all functionality provided by
-.BR xxx ()
+.BR mi_strlog ()
 in support of
 .RI non- STREAMS
 devices are not supported.
@@ -269,16 +382,16 @@ aixcpc
 .\"
 .SH HISTORY
 .PP
-.BR xxx ()
+.BR mi_strlog ()
 first appeared in
 .IR MPS \(rg.
-.BR xxx ()
+.BR mi_strlog ()
 is a
 Mentat, Inc. function that goes all the way back to the
 .RI pre- OSF/1
 .I Mentat
 implementations.
-.BR xxx ()
+.BR mi_strlog ()
 appears in
 .IR MacOT \(rg
 .[
@@ -290,7 +403,7 @@ and
 aixcpc
 .]
 An undocumented version of
-.BR xxx ()
+.BR mi_strlog ()
 appears in
 .IR Solaris \(rg.
 .\"

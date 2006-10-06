@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_next_dev_ptr.9.man,v 0.9.2.4 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_next_dev_ptr.9.man,v 0.9.2.5 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_next_dev_ptr.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -80,12 +85,12 @@ sort-adjacent-labels
 .so strcompat.macros
 .\"
 .\"
-.TH XXX 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH MI_NEXT_DEV_PTR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B xxx
-\-
+.B mi_next_dev_ptr
+\- return the next device instance in open list
 .\"
 .\"
 .SH SYNOPSIS
@@ -98,13 +103,22 @@ sort-adjacent-labels
 .br
 .B #include <sys/mpsddi.h>
 .HP
-int \fBxxx\fR(int \fIyyy\fR);
+.BI "int mi_next_dev_ptr(caddr_t *" mi_head ", caddr_t " ptr ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+.TP \w'\fImi_head\fR\(em'u
+.I mi_head
+an opaque pointer representing the head of an open list.
+.PD 0
 .TP
-.I yyy
+.I ptr
+an instance pointer returned by either
+.BR mi_first_dev_ptr (9)
+or a previous call to
+.BR mi_next_dev_ptr ().
+.PD
 .\"
 .\"
 .SH INTERFACE
@@ -115,42 +129,164 @@ DDI.
 .\"
 .SH DESCRIPTION
 .PP
-.BR xxx ()
+.BR mi_next_dev_ptr ()
+is an
+.IR MPS \(rg-specific
+convenience function that assists with housekeeping during
+.I STREAMS
+driver or module
+.IR qi_qopen (9),
+.BR I_LINK (7),
+.BR I_PLINK (7),
+or
+.IR qi_qclose (9),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7),
+operations.
+The
+.IR MPS \(rg
+convenience functions, including
+.BR mi_open_comm (9)
+and
+.BR mi_close_comm (9),
+maintain a list of
+.I STREAMS
+driver or module instances in a list global to the driver or module.  Both
+pushable module instances as well as device driver instances can be maintained
+in the same list.
+.PP
+Pushable module instances are those instances that were added to the list with
+.I sflag
+equal to
+.B MODOPEN
+on a call to
+.BR mi_open_comm (9).
+Device driver instances are those instances that were added to the list with
+.I sflag
+equal to
+.BR CLONEOPEN " or " DRVOPEN
+on the call to
+.BR mi_open_comm (9).
+.PP
+When both pushable module instances and device driver instances are maintained
+by the
+.I STREAMS
+driver in the same list,
+.BR mi_first_dev_ptr (9)
+and
+.BR mi_next_dev_ptr ()
+can be used to find the first device driver instance in the list and to
+iterate over the remaining device driver instances in the list.
+.PP
+.BR mi_next_dev_ptr ()
+is used to traverse a driver's list open streams.
+The
+.I ptr
+argument specifies the address of per-instance list item, and the return value
+indicates the address of the next iterm.  The first time
+.BR mi_next_dev_ptr ()
+is called, the
+.I ptr
+argument shouuld be initialized with the value returned by
+.BR mi_first_dev_ptr (9).
+.I mi_head
+must always be a pointer to the static pointer that was passed to the
+.BR mi_open_comm (9)
+utility when the list was formed.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mi_next_dev_ptr ()
+is used in conjunction with
+.BR mi_first_dev_ptr (9)
+in the same manner as
+.BR mi_next_ptr (9)
+and
+.BR mi_first_ptr (9)
+with the exception that
+.BR mi_next_dev_ptr ()
+will only return a device instance.
+.PP
+.BR mi_next_dev_ptr ()
+is used when the caller wishes to iterate through only the device driver instances on a
+.I STREAMS
+driver or module global instance list.
+.BR mi_next_dev_ptr ()
+is passed the same statically allocated
+.I head
+pointer that was passed to functions such as
+.BR mi_open_comm (9)
+that added instances to the list.
+.BR mi_next_dev_ptr ()
+returns
+.B NULL
+if there is no device driver instance remaining on the list, or returns a
+pointer to the private structure of the next device instance on the list.
+It is then possible to iterate throught the device instances on the list by
+passing the pointer returned by
+.BR mi_first_dev_ptr (9)
+to
+.BR mi_next_dev_ptr ()
+to obtain the next device driver instance on the list, or
+.B NULL
+if there is no subsequent device driver instance, and so on.
 .\"
 .\"
 .SH RETURN
 .PP
 When
-.BR xxx ()
-succeeds, it returns 
-.BR true  " (1);
-when it fails, it returns
-.BR false " (0).
+.BR mi_next_dev_ptr ()
+succeeds, it returns  a pointer to the private instance data
+.RI ( q->q_ptr )
+associated with the next device driver instance on the global list; when it
+hits the end of the list, it returns
+.BR NULL .
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR xxx ()
-fails when 
+.BR mi_next_dev_ptr ()
+alway succeeds.  However, when passed an invalid pointer or a pointer to an
+invalid structure,
+.BR mi_next_dev_ptr ()
+might destabilize the kernel or cause an immediate or delayed kernel panic.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR mi_first_dev_ptr (9)
+for an example.
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR xxx ()
-can be called from
+.BR mi_next_dev_ptr ()
+can be called from any context, but is normally called from within a
+.I STREAMS
+driver
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+procedure.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_next_dev_ptr ()
+is not MP-safe; no protection is afforded to the list entry.  An iterator taken in this fashion can
+be invalidated without the caller's knowledge.  It is the responsibility of the caller to protect
+the validity of the instance while it is in use.  While there are some utilities in
+.B @PACKAGE_TITLE@
+that can provide assistance; there is little mention of their use in the
+.IR MPS \(rg
+documentation.
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 is an
 .IR MPS \(rg-specific
 function:
@@ -173,6 +309,9 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_next_dev_ptr ()
+simply returns the next instance in the list with a non-zero major device
+number.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -185,13 +324,13 @@ defined.
 .\"
 .SH BUGS
 .PP
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 is
 compatible with
 .IR MPS \(rg,
@@ -201,7 +340,7 @@ and
 .IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 is an
 .IR MPS \(rg-specific
 function and should not be used by portable
@@ -211,7 +350,7 @@ The more common
 .BR zzz ()
 function should be used in its stead.
 .IP \(em
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 is provided for source level compatibility with
 .IR MPS \(rg
 for the purpose of porting
@@ -221,20 +360,20 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 only provides functionality comparable to
 .IR MPS \(rg
 for use by
 .I STREAMS
 drivers and modules.
 Any and all functionality provided by
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 in support of
 .RI non- STREAMS
 devices are not supported.
@@ -269,16 +408,16 @@ aixcpc
 .\"
 .SH HISTORY
 .PP
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 first appeared in
 .IR MPS \(rg.
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 is a
 Mentat, Inc. function that goes all the way back to the
 .RI pre- OSF/1
 .I Mentat
 implementations.
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 appears in
 .IR MacOT \(rg
 .[
@@ -290,7 +429,7 @@ and
 aixcpc
 .]
 An undocumented version of
-.BR xxx ()
+.BR mi_next_dev_ptr ()
 appears in
 .IR Solaris \(rg.
 .\"

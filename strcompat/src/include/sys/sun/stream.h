@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.9 2006/07/24 09:01:00 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.10 2006/10/06 12:13:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:00 $ by $Author: brian $
+ Last Modified $Date: 2006/10/06 12:13:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.10  2006/10/06 12:13:16  brian
+ - updated manual pages to pass make check and for release
+ - updated release files for release
+ - added missing MacOT OSF/1 and MPS compatibility functions
+
  Revision 0.9.2.9  2006/07/24 09:01:00  brian
  - results of udp2 optimizations
 
@@ -82,7 +87,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -165,6 +170,15 @@ mkiocb(unsigned int command)
 {
 	mblk_t *mp;
 	union ioctypes *iocp;
+
+#ifdef CONFIG_STREAMS_LIS_BCM
+	/* FIXME: this goes away when we leave! */
+	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
+		    current->uid,.cr_rgid = current->gid,
+	}, *crp = &creds;
+#else
+	cred_t *crp = current_creds;
+#endif
 	static atomic_t ioc_id = ATOMIC_INIT(0);
 
 	if ((mp = allocb(sizeof(*iocp), BPRI_MED))) {
@@ -174,12 +188,12 @@ mkiocb(unsigned int command)
 		iocp = (typeof(iocp)) mp->b_rptr;
 		iocp->iocblk.ioc_cmd = command;
 		atomic_inc(&ioc_id);
-		iocp->iocblk.ioc_id = atomic_read(&ioc_id);	/* FIXME: need better unique id */
-		iocp->iocblk.ioc_cr = NULL;	/* FIXME: need maximum credentials pointer */
+		iocp->iocblk.ioc_id = atomic_read(&ioc_id);
+		iocp->iocblk.ioc_cr = crp;
 		iocp->iocblk.ioc_count = 0;
 		iocp->iocblk.ioc_rval = 0;
 		iocp->iocblk.ioc_error = 0;
-#if 0
+#ifdef LFS
 		iocp->iocblk.ioc_flag = IOC_NATIVE;
 #endif
 	}

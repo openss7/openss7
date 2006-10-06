@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/07 21:19:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/06 12:12:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/07/07 21:19:36 $ by $Author: brian $
+# Last Modified $Date: 2006/10/06 12:12:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.21  2006/10/06 12:12:56  brian
+# - updated manual pages to pass make check and for release
+# - updated release files for release
+# - added missing MacOT OSF/1 and MPS compatibility functions
+#
 # Revision 0.9.2.20  2006/07/07 21:19:36  brian
 # - pass "make check" on LiS-only build
 #
@@ -129,7 +134,25 @@ svr4_compat_pages = \
 	man9/wakeup.9
 
 mps_unimpl_pages = \
-	man9/mi_sprintf_putc.9
+	man9/mi_sprintf_putc.9 \
+	man9/mi_tpi_ack_alloc.9 \
+	man9/mi_tpi_conn_con.9 \
+	man9/mi_tpi_conn_ind.9 \
+	man9/mi_tpi_conn_req.9 \
+	man9/mi_tpi_data_ind.9 \
+	man9/mi_tpi_data_req.9 \
+	man9/mi_tpi_discon_ind.9 \
+	man9/mi_tpi_discon_req.9 \
+	man9/mi_tpi_err_ack_alloc.9 \
+	man9/mi_tpi_exdata_ind.9 \
+	man9/mi_tpi_exdata_req.9 \
+	man9/mi_tpi_info_req.9 \
+	man9/mi_tpi_ok_ack_alloc.9 \
+	man9/mi_tpi_ordrel_ind.9 \
+	man9/mi_tpi_ordrel_req.9 \
+	man9/mi_tpi_uderror_ind.9 \
+	man9/mi_tpi_unitdata_ind.9 \
+	man9/mi_tpi_unitdata_req.9
 
 mps_compat_pages = \
 	man9/mpscompat.9 \
@@ -199,18 +222,260 @@ mps_compat_pages = \
 	$(mps_unimpl_pages)
 
 sun_unimpl_pages = \
+	man9/ddi_add_intr.9 \
+	man9/ddi_add_softintr.9 \
+	man9/ddi_binding_name.9 \
+	man9/ddi_btop.9 \
+	man9/ddi_btopr.9 \
+	man9/ddi_check_acc_handle.9 \
+	man9/ddi_check_dma_handle.9 \
+	man9/ddi_copyin.9 \
+	man9/ddi_copyout.9 \
 	man9/ddi_create_minor_node.9 \
+	man9/ddi_device_copy.9 \
+	man9/ddi_device_zero.9 \
+	man9/ddi_devid_compare.9 \
+	man9/ddi_devid_free.9 \
+	man9/ddi_devid_init.9 \
+	man9/ddi_devid_register.9 \
+	man9/ddi_devid_sizeof.9 \
+	man9/ddi_devid_str_decode.9 \
+	man9/ddi_devid_str_encode.9 \
+	man9/ddi_devid_str_free.9 \
+	man9/ddi_devid_unregister.9 \
+	man9/ddi_devid_valid.9 \
+	man9/ddi_dev_is_needed.9 \
+	man9/ddi_dev_is_sid.9 \
+	man9/ddi_devmap_segmap.9 \
+	man9/ddi_dev_nintrs.9 \
+	man9/ddi_dev_nregs.9 \
+	man9/ddi_dev_regsize.9 \
+	man9/ddi_dev_report_fault.9 \
+	man9/ddi_dma_addr_bind_handle.9 \
+	man9/ddi_dma_addr_setup.9 \
+	man9/ddi_dma_alloc_handle.9 \
+	man9/ddi_dma_buf_bind_handle.9 \
+	man9/ddi_dma_buf_setup.9 \
+	man9/ddi_dma_burstsizes.9 \
+	man9/ddi_dma_coff.9 \
+	man9/ddi_dma_curwin.9 \
+	man9/ddi_dma_devalign.9 \
+	man9/ddi_dmae_1stparty.9 \
+	man9/ddi_dmae.9 \
+	man9/ddi_dmae_alloc.9 \
+	man9/ddi_dmae_disable.9 \
+	man9/ddi_dmae_enable.9 \
+	man9/ddi_dmae_getattr.9 \
+	man9/ddi_dmae_getcnt.9 \
+	man9/ddi_dmae_getlim.9 \
+	man9/ddi_dmae_prog.9 \
+	man9/ddi_dmae_release.9 \
+	man9/ddi_dmae_stop.9 \
+	man9/ddi_dma_free.9 \
+	man9/ddi_dma_free_handle.9 \
+	man9/ddi_dma_get_attr.9 \
+	man9/ddi_dma_getwin.9 \
+	man9/ddi_dma_htoc.9 \
+	man9/ddi_dma_mem_alloc.9 \
+	man9/ddi_dma_mem_free.9 \
+	man9/ddi_dma_movwin.9 \
+	man9/ddi_dma_nextcookie.9 \
+	man9/ddi_dma_nextseg.9 \
+	man9/ddi_dma_nextwin.9 \
+	man9/ddi_dma_numwin.9 \
+	man9/ddi_dma_segtocookie.9 \
+	man9/ddi_dma_set_sbus64.9 \
+	man9/ddi_dma_setup.9 \
+	man9/ddi_dma_sync.9 \
+	man9/ddi_dma_unbind_handle.9 \
 	man9/ddi_driver_major.9 \
 	man9/ddi_driver_name.9 \
+	man9/ddi_enter_critical.9 \
+	man9/ddi_exit_critical.9 \
+	man9/ddi_ffs.9 \
+	man9/ddi_fls.9 \
+	man9/ddi_get16.9 \
+	man9/ddi_get32.9 \
+	man9/ddi_get64.9 \
+	man9/ddi_get8.9 \
+	man9/ddi_getb.9 \
+	man9/ddi_get_devstate.9 \
+	man9/ddi_get_driver_private.9 \
+	man9/ddi_get_iblock_cookie.9 \
 	man9/ddi_get_instance.9 \
+	man9/ddi_get_kt_did.9 \
+	man9/ddi_getl.9 \
+	man9/ddi_getll.9 \
+	man9/ddi_getlongprop.9 \
+	man9/ddi_getlongprop_buf.9 \
+	man9/ddi_get_name.9 \
+	man9/ddi_get_parent.9 \
+	man9/ddi_getprop.9 \
+	man9/ddi_getproplen.9 \
+	man9/ddi_get_soft_iblock_cookie.9 \
 	man9/ddi_get_soft_state.9 \
+	man9/ddi_getw.9 \
+	man9/ddi_in_panic.9 \
+	man9/ddi_intr_hilevel.9 \
+	man9/ddi_io_get16.9 \
+	man9/ddi_io_get32.9 \
+	man9/ddi_io_get64.9 \
+	man9/ddi_io_get8.9 \
+	man9/ddi_io_getb.9 \
+	man9/ddi_io_getl.9 \
+	man9/ddi_io_getw.9 \
+	man9/ddi_iomin.9 \
+	man9/ddi_iopb_alloc.9 \
+	man9/ddi_iopb_free.9 \
+	man9/ddi_io_put16.9 \
+	man9/ddi_io_put32.9 \
+	man9/ddi_io_put64.9 \
+	man9/ddi_io_put8.9 \
+	man9/ddi_io_putb.9 \
+	man9/ddi_io_putl.9 \
+	man9/ddi_io_putw.9 \
+	man9/ddi_io_rep_get16.9 \
+	man9/ddi_io_rep_get32.9 \
+	man9/ddi_io_rep_get64.9 \
+	man9/ddi_io_rep_get8.9 \
+	man9/ddi_io_rep_getb.9 \
+	man9/ddi_io_rep_getl.9 \
+	man9/ddi_io_rep_getw.9 \
+	man9/ddi_io_rep_put16.9 \
+	man9/ddi_io_rep_put32.9 \
+	man9/ddi_io_rep_put64.9 \
+	man9/ddi_io_rep_put8.9 \
+	man9/ddi_io_rep_putb.9 \
+	man9/ddi_io_rep_putl.9 \
+	man9/ddi_io_rep_putw.9 \
+	man9/ddi_log_sysevent.9 \
+	man9/ddi_mapdev.9 \
+	man9/ddi_mapdev_intercept.9 \
+	man9/ddi_mapdev_nointercept.9 \
+	man9/ddi_map_regs.9 \
+	man9/ddi_mem_alloc.9 \
+	man9/ddi_mem_free.9 \
+	man9/ddi_mem_get16.9 \
+	man9/ddi_mem_get32.9 \
+	man9/ddi_mem_get64.9 \
+	man9/ddi_mem_get8.9 \
+	man9/ddi_mem_getb.9 \
+	man9/ddi_mem_getl.9 \
+	man9/ddi_mem_getll.9 \
+	man9/ddi_mem_getw.9 \
+	man9/ddi_mem_put16.9 \
+	man9/ddi_mem_put32.9 \
+	man9/ddi_mem_put64.9 \
+	man9/ddi_mem_put8.9 \
+	man9/ddi_mem_putb.9 \
+	man9/ddi_mem_putl.9 \
+	man9/ddi_mem_putll.9 \
+	man9/ddi_mem_putw.9 \
+	man9/ddi_mem_rep_get16.9 \
+	man9/ddi_mem_rep_get32.9 \
+	man9/ddi_mem_rep_get64.9 \
+	man9/ddi_mem_rep_get8.9 \
+	man9/ddi_mem_rep_getb.9 \
+	man9/ddi_mem_rep_getl.9 \
+	man9/ddi_mem_rep_getll.9 \
+	man9/ddi_mem_rep_getw.9 \
+	man9/ddi_mem_rep_put16.9 \
+	man9/ddi_mem_rep_put32.9 \
+	man9/ddi_mem_rep_put64.9 \
+	man9/ddi_mem_rep_put8.9 \
+	man9/ddi_mem_rep_putb.9 \
+	man9/ddi_mem_rep_putl.9 \
+	man9/ddi_mem_rep_putll.9 \
+	man9/ddi_mem_rep_putw.9 \
+	man9/ddi_mmap_get_model.9 \
+	man9/ddi_model_convert_from.9 \
+	man9/ddi_node_name.9 \
+	man9/ddi_peek16.9 \
+	man9/ddi_peek32.9 \
+	man9/ddi_peek64.9 \
+	man9/ddi_peek8.9 \
+	man9/ddi_peek.9 \
+	man9/ddi_peekc.9 \
+	man9/ddi_peekd.9 \
+	man9/ddi_peekl.9 \
+	man9/ddi_peeks.9 \
+	man9/ddi_poke16.9 \
+	man9/ddi_poke32.9 \
+	man9/ddi_poke64.9 \
+	man9/ddi_poke8.9 \
+	man9/ddi_poke.9 \
+	man9/ddi_pokec.9 \
+	man9/ddi_poked.9 \
+	man9/ddi_pokel.9 \
+	man9/ddi_pokes.9 \
+	man9/ddi_prop_create.9 \
+	man9/ddi_prop_exists.9 \
+	man9/ddi_prop_free.9 \
+	man9/ddi_prop_get_int64.9 \
+	man9/ddi_prop_get_int.9 \
+	man9/ddi_prop_lookup.9 \
+	man9/ddi_prop_lookup_byte_array.9 \
+	man9/ddi_prop_lookup_int64_array.9 \
+	man9/ddi_prop_lookup_int_array.9 \
+	man9/ddi_prop_lookup_string.9 \
+	man9/ddi_prop_lookup_string_array.9 \
+	man9/ddi_prop_modify.9 \
+	man9/ddi_prop_remove.9 \
+	man9/ddi_prop_remove_all.9 \
+	man9/ddi_prop_undefine.9 \
+	man9/ddi_prop_update.9 \
+	man9/ddi_prop_update_byte_array.9 \
+	man9/ddi_prop_update_int64.9 \
+	man9/ddi_prop_update_int64_array.9 \
+	man9/ddi_prop_update_int.9 \
+	man9/ddi_prop_update_string.9 \
+	man9/ddi_prop_update_string_array.9 \
+	man9/ddi_ptob.9 \
+	man9/ddi_put16.9 \
+	man9/ddi_put32.9 \
+	man9/ddi_put64.9 \
+	man9/ddi_put8.9 \
+	man9/ddi_putb.9 \
+	man9/ddi_putl.9 \
+	man9/ddi_putll.9 \
+	man9/ddi_putw.9 \
+	man9/ddi_regs_map_free.9 \
+	man9/ddi_regs_map_setup.9 \
+	man9/ddi_remove_intr.9 \
 	man9/ddi_remove_minor_node.9 \
+	man9/ddi_remove_softintr.9 \
 	man9/ddi_removing_power.9 \
+	man9/ddi_rep_get16.9 \
+	man9/ddi_rep_get32.9 \
+	man9/ddi_rep_get64.9 \
+	man9/ddi_rep_get8.9 \
+	man9/ddi_rep_getb.9 \
+	man9/ddi_rep_getl.9 \
+	man9/ddi_rep_getll.9 \
+	man9/ddi_rep_getw.9 \
+	man9/ddi_report_dev.9 \
+	man9/ddi_rep_put16.9 \
+	man9/ddi_rep_put32.9 \
+	man9/ddi_rep_put64.9 \
+	man9/ddi_rep_put8.9 \
+	man9/ddi_rep_putb.9 \
+	man9/ddi_rep_putl.9 \
+	man9/ddi_rep_putll.9 \
+	man9/ddi_rep_putw.9 \
+	man9/ddi_root_node.9 \
+	man9/ddi_segmap.9 \
+	man9/ddi_segmap_setup.9 \
+	man9/ddi_set_driver_private.9 \
+	man9/ddi_slaveonly.9 \
 	man9/ddi_soft_state.9 \
 	man9/ddi_soft_state_fini.9 \
 	man9/ddi_soft_state_free.9 \
 	man9/ddi_soft_state_init.9 \
-	man9/ddi_soft_state_zalloc.9
+	man9/ddi_soft_state_zalloc.9 \
+	man9/ddi_trigger_softintr.9 \
+	man9/ddi_umem_lock.9 \
+	man9/ddi_umem_unlock.9 \
+	man9/ddi_unmap_regs.9
 
 sun_compat_pages = \
 	man9/suncompat.9 \
@@ -284,6 +549,7 @@ uw7_compat_pages = \
 
 osf_compat_pages = \
 	man9/osfcompat.9 \
+	man9/DELAY.9 \
 	man9/lbolt.9 \
 	man9/puthere.9 \
 	man9/streams_close_comm.9 \
@@ -291,7 +557,8 @@ osf_compat_pages = \
 	man9/streams_open_ocomm.9 \
 	man9/strmod_add.9 \
 	man9/strmod_del.9 \
-	man9/time.9
+	man9/time.9 \
+	man9/uprintf.9
 
 aix_compat_pages = \
 	man9/aixcompat.9 \
@@ -307,6 +574,7 @@ hpux_compat_pages = \
 	man9/hpuxcompat.9 \
 	man9/get_sleep_lock.9 \
 	man9/str_install_HPUX.9 \
+	man9/str_uninstall.9 \
 	man9/streams_get_sleep_lock.9 \
 	man9/streams_put.9 \
 	$(hpux_unimpl_pages)
@@ -781,9 +1049,7 @@ os7_compat_pages = \
 man_MANS = \
 	man8/strcompat_mknod.8 \
 	man9/alloc_proto.9 \
-	man9/compat_undoc.9 \
-	man9/mkiocb.9 \
-	man9/str_uninstall.9
+	man9/mkiocb.9
 
 if CONFIG_STREAMS_COMPAT_OS7
 man_MANS		    += $(os7_compat_pages)
@@ -930,6 +1196,27 @@ dist_noinst_svr4_compat_pages = \
 	man9/UNLOCK.9.man \
 	man9/wakeup.9.man
 
+dist_noinst_mps_unimpl_pages = \
+	man9/mi_sprintf_putc.9.man \
+	man9/mi_tpi_ack_alloc.9.man \
+	man9/mi_tpi_conn_con.9.man \
+	man9/mi_tpi_conn_ind.9.man \
+	man9/mi_tpi_conn_req.9.man \
+	man9/mi_tpi_data_ind.9.man \
+	man9/mi_tpi_data_req.9.man \
+	man9/mi_tpi_discon_ind.9.man \
+	man9/mi_tpi_discon_req.9.man \
+	man9/mi_tpi_err_ack_alloc.9.man \
+	man9/mi_tpi_exdata_ind.9.man \
+	man9/mi_tpi_exdata_req.9.man \
+	man9/mi_tpi_info_req.9.man \
+	man9/mi_tpi_ok_ack_alloc.9.man \
+	man9/mi_tpi_ordrel_ind.9.man \
+	man9/mi_tpi_ordrel_req.9.man \
+	man9/mi_tpi_uderror_ind.9.man \
+	man9/mi_tpi_unitdata_ind.9.man \
+	man9/mi_tpi_unitdata_req.9.man
+
 dist_noinst_mps_compat_pages = \
 	man9/mpscompat.9.man \
 	man9/mi_alloc.9.man \
@@ -974,7 +1261,6 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_set_sth_maxblk.9.man \
 	man9/mi_set_sth_wroff.9.man \
 	man9/mi_sprintf.9.man \
-	man9/mi_sprintf_putc.9.man \
 	man9/mi_strcmp.9.man \
 	man9/mi_strlen.9.man \
 	man9/mi_strlog.9.man \
@@ -995,21 +1281,264 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_zalloc_sleep.9.man \
 	man9/mps_become_writer.9.man \
 	man9/mps_intr_disable.9.man \
-	man9/mps_intr_enable.9.man
+	man9/mps_intr_enable.9.man \
+	$(dist_noinst_mps_unimpl_pages)
 
 dist_noinst_sun_unimpl_pages = \
+	man9/ddi_add_intr.9.man \
+	man9/ddi_add_softintr.9.man \
+	man9/ddi_binding_name.9.man \
+	man9/ddi_btop.9.man \
+	man9/ddi_btopr.9.man \
+	man9/ddi_check_acc_handle.9.man \
+	man9/ddi_check_dma_handle.9.man \
+	man9/ddi_copyin.9.man \
+	man9/ddi_copyout.9.man \
 	man9/ddi_create_minor_node.9.man \
+	man9/ddi_device_copy.9.man \
+	man9/ddi_device_zero.9.man \
+	man9/ddi_devid_compare.9.man \
+	man9/ddi_devid_free.9.man \
+	man9/ddi_devid_init.9.man \
+	man9/ddi_devid_register.9.man \
+	man9/ddi_devid_sizeof.9.man \
+	man9/ddi_devid_str_decode.9.man \
+	man9/ddi_devid_str_encode.9.man \
+	man9/ddi_devid_str_free.9.man \
+	man9/ddi_devid_unregister.9.man \
+	man9/ddi_devid_valid.9.man \
+	man9/ddi_dev_is_needed.9.man \
+	man9/ddi_dev_is_sid.9.man \
+	man9/ddi_devmap_segmap.9.man \
+	man9/ddi_dev_nintrs.9.man \
+	man9/ddi_dev_nregs.9.man \
+	man9/ddi_dev_regsize.9.man \
+	man9/ddi_dev_report_fault.9.man \
+	man9/ddi_dma_addr_bind_handle.9.man \
+	man9/ddi_dma_addr_setup.9.man \
+	man9/ddi_dma_alloc_handle.9.man \
+	man9/ddi_dma_buf_bind_handle.9.man \
+	man9/ddi_dma_buf_setup.9.man \
+	man9/ddi_dma_burstsizes.9.man \
+	man9/ddi_dma_coff.9.man \
+	man9/ddi_dma_curwin.9.man \
+	man9/ddi_dma_devalign.9.man \
+	man9/ddi_dmae_1stparty.9.man \
+	man9/ddi_dmae.9.man \
+	man9/ddi_dmae_alloc.9.man \
+	man9/ddi_dmae_disable.9.man \
+	man9/ddi_dmae_enable.9.man \
+	man9/ddi_dmae_getattr.9.man \
+	man9/ddi_dmae_getcnt.9.man \
+	man9/ddi_dmae_getlim.9.man \
+	man9/ddi_dmae_prog.9.man \
+	man9/ddi_dmae_release.9.man \
+	man9/ddi_dmae_stop.9.man \
+	man9/ddi_dma_free.9.man \
+	man9/ddi_dma_free_handle.9.man \
+	man9/ddi_dma_get_attr.9.man \
+	man9/ddi_dma_getwin.9.man \
+	man9/ddi_dma_htoc.9.man \
+	man9/ddi_dma_mem_alloc.9.man \
+	man9/ddi_dma_mem_free.9.man \
+	man9/ddi_dma_movwin.9.man \
+	man9/ddi_dma_nextcookie.9.man \
+	man9/ddi_dma_nextseg.9.man \
+	man9/ddi_dma_nextwin.9.man \
+	man9/ddi_dma_numwin.9.man \
+	man9/ddi_dma_segtocookie.9.man \
+	man9/ddi_dma_set_sbus64.9.man \
+	man9/ddi_dma_setup.9.man \
+	man9/ddi_dma_sync.9.man \
+	man9/ddi_dma_unbind_handle.9.man \
 	man9/ddi_driver_major.9.man \
 	man9/ddi_driver_name.9.man \
+	man9/ddi_enter_critical.9.man \
+	man9/ddi_exit_critical.9.man \
+	man9/ddi_ffs.9.man \
+	man9/ddi_fls.9.man \
+	man9/ddi_get16.9.man \
+	man9/ddi_get32.9.man \
+	man9/ddi_get64.9.man \
+	man9/ddi_get8.9.man \
+	man9/ddi_getb.9.man \
+	man9/ddi_get_devstate.9.man \
+	man9/ddi_get_driver_private.9.man \
+	man9/ddi_get_iblock_cookie.9.man \
 	man9/ddi_get_instance.9.man \
+	man9/ddi_get_kt_did.9.man \
+	man9/ddi_getl.9.man \
+	man9/ddi_getll.9.man \
+	man9/ddi_getlongprop.9.man \
+	man9/ddi_getlongprop_buf.9.man \
+	man9/ddi_get_name.9.man \
+	man9/ddi_get_parent.9.man \
+	man9/ddi_getprop.9.man \
+	man9/ddi_getproplen.9.man \
+	man9/ddi_get_soft_iblock_cookie.9.man \
 	man9/ddi_get_soft_state.9.man \
+	man9/ddi_getw.9.man \
+	man9/ddi_in_panic.9.man \
+	man9/ddi_intr_hilevel.9.man \
+	man9/ddi_io_get16.9.man \
+	man9/ddi_io_get32.9.man \
+	man9/ddi_io_get64.9.man \
+	man9/ddi_io_get8.9.man \
+	man9/ddi_io_getb.9.man \
+	man9/ddi_io_getl.9.man \
+	man9/ddi_io_getw.9.man \
+	man9/ddi_iomin.9.man \
+	man9/ddi_iopb_alloc.9.man \
+	man9/ddi_iopb_free.9.man \
+	man9/ddi_io_put16.9.man \
+	man9/ddi_io_put32.9.man \
+	man9/ddi_io_put64.9.man \
+	man9/ddi_io_put8.9.man \
+	man9/ddi_io_putb.9.man \
+	man9/ddi_io_putl.9.man \
+	man9/ddi_io_putw.9.man \
+	man9/ddi_io_rep_get16.9.man \
+	man9/ddi_io_rep_get32.9.man \
+	man9/ddi_io_rep_get64.9.man \
+	man9/ddi_io_rep_get8.9.man \
+	man9/ddi_io_rep_getb.9.man \
+	man9/ddi_io_rep_getl.9.man \
+	man9/ddi_io_rep_getw.9.man \
+	man9/ddi_io_rep_put16.9.man \
+	man9/ddi_io_rep_put32.9.man \
+	man9/ddi_io_rep_put64.9.man \
+	man9/ddi_io_rep_put8.9.man \
+	man9/ddi_io_rep_putb.9.man \
+	man9/ddi_io_rep_putl.9.man \
+	man9/ddi_io_rep_putw.9.man \
+	man9/ddi_log_sysevent.9.man \
+	man9/ddi_mapdev.9.man \
+	man9/ddi_mapdev_intercept.9.man \
+	man9/ddi_mapdev_nointercept.9.man \
+	man9/ddi_map_regs.9.man \
+	man9/ddi_mem_alloc.9.man \
+	man9/ddi_mem_free.9.man \
+	man9/ddi_mem_get16.9.man \
+	man9/ddi_mem_get32.9.man \
+	man9/ddi_mem_get64.9.man \
+	man9/ddi_mem_get8.9.man \
+	man9/ddi_mem_getb.9.man \
+	man9/ddi_mem_getl.9.man \
+	man9/ddi_mem_getll.9.man \
+	man9/ddi_mem_getw.9.man \
+	man9/ddi_mem_put16.9.man \
+	man9/ddi_mem_put32.9.man \
+	man9/ddi_mem_put64.9.man \
+	man9/ddi_mem_put8.9.man \
+	man9/ddi_mem_putb.9.man \
+	man9/ddi_mem_putl.9.man \
+	man9/ddi_mem_putll.9.man \
+	man9/ddi_mem_putw.9.man \
+	man9/ddi_mem_rep_get16.9.man \
+	man9/ddi_mem_rep_get32.9.man \
+	man9/ddi_mem_rep_get64.9.man \
+	man9/ddi_mem_rep_get8.9.man \
+	man9/ddi_mem_rep_getb.9.man \
+	man9/ddi_mem_rep_getl.9.man \
+	man9/ddi_mem_rep_getll.9.man \
+	man9/ddi_mem_rep_getw.9.man \
+	man9/ddi_mem_rep_put16.9.man \
+	man9/ddi_mem_rep_put32.9.man \
+	man9/ddi_mem_rep_put64.9.man \
+	man9/ddi_mem_rep_put8.9.man \
+	man9/ddi_mem_rep_putb.9.man \
+	man9/ddi_mem_rep_putl.9.man \
+	man9/ddi_mem_rep_putll.9.man \
+	man9/ddi_mem_rep_putw.9.man \
+	man9/ddi_mmap_get_model.9.man \
+	man9/ddi_model_convert_from.9.man \
+	man9/ddi_node_name.9.man \
+	man9/ddi_peek16.9.man \
+	man9/ddi_peek32.9.man \
+	man9/ddi_peek64.9.man \
+	man9/ddi_peek8.9.man \
+	man9/ddi_peek.9.man \
+	man9/ddi_peekc.9.man \
+	man9/ddi_peekd.9.man \
+	man9/ddi_peekl.9.man \
+	man9/ddi_peeks.9.man \
+	man9/ddi_poke16.9.man \
+	man9/ddi_poke32.9.man \
+	man9/ddi_poke64.9.man \
+	man9/ddi_poke8.9.man \
+	man9/ddi_poke.9.man \
+	man9/ddi_pokec.9.man \
+	man9/ddi_poked.9.man \
+	man9/ddi_pokel.9.man \
+	man9/ddi_pokes.9.man \
+	man9/ddi_prop_create.9.man \
+	man9/ddi_prop_exists.9.man \
+	man9/ddi_prop_free.9.man \
+	man9/ddi_prop_get_int64.9.man \
+	man9/ddi_prop_get_int.9.man \
+	man9/ddi_prop_lookup.9.man \
+	man9/ddi_prop_lookup_byte_array.9.man \
+	man9/ddi_prop_lookup_int64_array.9.man \
+	man9/ddi_prop_lookup_int_array.9.man \
+	man9/ddi_prop_lookup_string.9.man \
+	man9/ddi_prop_lookup_string_array.9.man \
+	man9/ddi_prop_modify.9.man \
+	man9/ddi_prop_remove.9.man \
+	man9/ddi_prop_remove_all.9.man \
+	man9/ddi_prop_undefine.9.man \
+	man9/ddi_prop_update.9.man \
+	man9/ddi_prop_update_byte_array.9.man \
+	man9/ddi_prop_update_int64.9.man \
+	man9/ddi_prop_update_int64_array.9.man \
+	man9/ddi_prop_update_int.9.man \
+	man9/ddi_prop_update_string.9.man \
+	man9/ddi_prop_update_string_array.9.man \
+	man9/ddi_ptob.9.man \
+	man9/ddi_put16.9.man \
+	man9/ddi_put32.9.man \
+	man9/ddi_put64.9.man \
+	man9/ddi_put8.9.man \
+	man9/ddi_putb.9.man \
+	man9/ddi_putl.9.man \
+	man9/ddi_putll.9.man \
+	man9/ddi_putw.9.man \
+	man9/ddi_regs_map_free.9.man \
+	man9/ddi_regs_map_setup.9.man \
+	man9/ddi_remove_intr.9.man \
 	man9/ddi_remove_minor_node.9.man \
+	man9/ddi_remove_softintr.9.man \
 	man9/ddi_removing_power.9.man \
+	man9/ddi_rep_get16.9.man \
+	man9/ddi_rep_get32.9.man \
+	man9/ddi_rep_get64.9.man \
+	man9/ddi_rep_get8.9.man \
+	man9/ddi_rep_getb.9.man \
+	man9/ddi_rep_getl.9.man \
+	man9/ddi_rep_getll.9.man \
+	man9/ddi_rep_getw.9.man \
+	man9/ddi_report_dev.9.man \
+	man9/ddi_rep_put16.9.man \
+	man9/ddi_rep_put32.9.man \
+	man9/ddi_rep_put64.9.man \
+	man9/ddi_rep_put8.9.man \
+	man9/ddi_rep_putb.9.man \
+	man9/ddi_rep_putl.9.man \
+	man9/ddi_rep_putll.9.man \
+	man9/ddi_rep_putw.9.man \
+	man9/ddi_root_node.9.man \
+	man9/ddi_segmap.9.man \
+	man9/ddi_segmap_setup.9.man \
+	man9/ddi_set_driver_private.9.man \
+	man9/ddi_slaveonly.9.man \
 	man9/ddi_soft_state.9.man \
 	man9/ddi_soft_state_fini.9.man \
 	man9/ddi_soft_state_free.9.man \
 	man9/ddi_soft_state_init.9.man \
-	man9/ddi_soft_state_zalloc.9.man
+	man9/ddi_soft_state_zalloc.9.man \
+	man9/ddi_trigger_softintr.9.man \
+	man9/ddi_umem_lock.9.man \
+	man9/ddi_umem_unlock.9.man \
+	man9/ddi_unmap_regs.9.man
 
 dist_noinst_sun_compat_pages = \
 	man9/suncompat.9.man \
@@ -1080,6 +1609,7 @@ dist_noinst_uw7_compat_pages = \
 
 dist_noinst_osf_compat_pages = \
 	man9/osfcompat.9.man \
+	man9/DELAY.9.man \
 	man9/lbolt.9.man \
 	man9/puthere.9.man \
 	man9/streams_close_comm.9.man \
@@ -1087,7 +1617,8 @@ dist_noinst_osf_compat_pages = \
 	man9/streams_open_ocomm.9.man \
 	man9/strmod_add.9.man \
 	man9/strmod_del.9.man \
-	man9/time.9.man
+	man9/time.9.man \
+	man9/uprintf.9.man
 
 dist_noinst_aix_compat_pages = \
 	man9/aixcompat.9.man \
@@ -1103,6 +1634,7 @@ dist_noinst_hpux_compat_pages = \
 	man9/hpuxcompat.9.man \
 	man9/get_sleep_lock.9.man \
 	man9/str_install_HPUX.9.man \
+	man9/str_uninstall.9.man \
 	man9/streams_get_sleep_lock.9.man \
 	man9/streams_put.9.man \
 	$(dist_noinst_hpux_unimpl_pages)
@@ -1577,9 +2109,7 @@ dist_noinst_os7_compat_pages = \
 dist_noinst_MANS = \
 	man8/strcompat_mknod.8.man \
 	man9/alloc_proto.9.man \
-	man9/compat_undoc.9.man \
 	man9/mkiocb.9.man \
-	man9/str_uninstall.9.man \
 	$(dist_noinst_os7_compat_pages) \
 	$(dist_noinst_svr3_compat_pages) \
 	$(dist_noinst_svr4_compat_pages) \

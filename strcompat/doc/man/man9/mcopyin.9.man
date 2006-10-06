@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mcopyin.9.man,v 0.9.2.4 2006/10/05 12:15:42 brian Exp $
+.\" @(#) $Id: mcopyin.9.man,v 0.9.2.5 2006/10/06 12:13:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mcopyin.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:01  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:42  brian
 .\" - updates for release
 .\"
@@ -85,7 +90,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B mcopyin
-\- generate a properly formed STREAMS M_COPYIN message
+\- generate a properly formed \fISTREAMS\fP \fBM_COPYIN\fP message
 .\"
 .\"
 .SH SYNOPSIS
@@ -96,12 +101,12 @@ sort-adjacent-labels
 .br
 .B #include <sys/sunddi.h>
 .HP
-void \fBmcopyin\fR(mblk_t *\fImp\fR, void *\fIprivate\fR, size_t \fIsize\fR, void *\fIuaddr\fR);
+.BI "void mcopyin(mblk_t *" mp ", void *" private ", size_t " size ", void *" uaddr ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
-.TP \w'private\ \ 'u
+.TP \w'\fIprivate\fR\(em'u
 .I mp
 a pointer to the
 .BR M_IOCTL (9)
@@ -137,6 +142,13 @@ this argument must be
 in which case, the user address will be acquired from the passed in
 .BR M_IOCTL (9)
 message.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.I STREAMS
+.IR Solaris \(rg-specific
+DDI.
 .\"
 .\"
 .SH DESCRIPTION
@@ -271,7 +283,7 @@ is a
 function:
 .B _SUN_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SUN
 or
@@ -281,6 +293,10 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mcopyin ()
+simply places the appropriate arguments into the
+.BR copyreq (9)
+structure contained in the passed in message.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -320,9 +336,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR Solaris \(rg,

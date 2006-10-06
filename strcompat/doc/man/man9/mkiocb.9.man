@@ -1,1 +1,319 @@
-.so man9/compat_undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: mkiocb.9.man,v 0.9.2.2 2006/10/06 12:13:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/06 12:13:05 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mkiocb.9.man,v $
+.\" Revision 0.9.2.2  2006/10/06 12:13:05  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
+.\" Revision 0.9.2.5  2006/10/05 12:15:44  brian
+.\" - updates for release
+.\"
+.\" Revision 0.9.2.4  2006/04/05 09:43:33  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strcompat.macros
+.\"
+.\"
+.TH MKIOCB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mkiocb
+\- generate a \fISTREAMS\fR \fBM_IOCTL\fR(9)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/strsun.h>
+.HP
+.BI "mblk_t *mkiocb(unsigned int " command ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.PP
+.TP \w'command\ \ 'u
+.I command
+the input-output control command to place in the
+.I ioc_cmd
+member of the
+.BR iocblk (9)
+structure.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mkiocb ()
+create an
+.BR M_IOCTL (9)
+message to be used internal to the kernel and simulate a input-output control command,
+.I command ,
+downstream.
+.BR mkiocb ()
+allocates and formats an
+.BR M_IOCTL (9)
+message block and populates the contained
+.BR iocblk (9)
+structure with appropriate values.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mkiocb ()
+can be used by a
+.I STREAMS
+driver or module to simulate a input-output control command operation downstream.  This is often
+doen by the
+.BR ldterm (4)
+module.
+The allocated block does not have any data blocks attached and it is the responsiblity of the caller
+to allocate and attach any necessary data blocks representing the arguments of the input-output
+control command.
+.\"
+.\"
+.SH RETURN
+.PP
+When successful,
+.BR mkiocb ()
+returns a pointer to the allocated message block.
+Upon failure, it returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR mkiocb ()
+fails, it returns
+.BR NULL .
+.BR mkiocb ()
+fails when it is unable to immediately allocated the necessary message block.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mkiocb ()
+can be called from any context; however, it is normally called from a
+.I STREAMS
+driver or module
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mkiocb ()
+is MP-safe.  The caller has exclusive access to the returned message block.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mkiocb ()
+is a
+.IR Solaris \(rg-specific
+function:
+.B _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SUN
+or
+.B CONFIG_STREAMS_COMPAT_SUN_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR mkiocb ()
+is implemented allocating and completing the necessary message block.  The
+.I ioc_cmd
+member will be populated with the
+.I command
+argument.  The
+.I ioc_id
+will be taken from an internal variable that is incremented with each call to
+.BR mkiocb ().
+When executed from process context, the
+.I ioc_cr
+member will be populated with a pointer to the credentials associated with the
+current process.  When executed from a
+.I STREAMS
+procedure, the
+.I ioc_cr
+member will be populated with a pointer to the credentials associated with the
+.I STREAMS
+scheduler kernel thread (one with
+.BR init ).
+The
+.IR ioc_count ", " ioc_rval " and " ioc_error
+members will be set to zero.
+The
+.I ioc_flag
+field will have the
+.BR IOC_NATIVE
+flag set indicating that the data model is from within the kernel.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR suncompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mkiocb ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mkiocb ()
+is compatible with
+.IR Solaris \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mkiocb ()
+is a
+.IR Solaris \(rg-specific
+function that should not be used by portable
+.I STREAMS
+drivers and modules.
+For maximum portability, the message blocks and structures should be manipulated directly using
+standard
+.I STREAMS
+utilities in its stead.
+.IP \(em
+.BR mkiocb ()
+is provided for source level compatibility with
+.IR Solaris \(rg
+for the purpose of porting
+.IR Solaris \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR Solaris \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mkiocb ()
+only provides functionality comparable to
+.IR Solaris \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mkiocb ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR suncompat (9)
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR Solaris \(rg
+SUNDDI documentation.
+.[
+soldoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mkiocb ()
+first appeared in
+.IR Solaris \(rg
+2.5.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

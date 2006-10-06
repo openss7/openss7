@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: maccompat.9.man,v 0.9.2.6 2006/10/05 12:15:42 brian Exp $
+.\" @(#) $Id: maccompat.9.man,v 0.9.2.7 2006/10/06 12:13:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: maccompat.9.man,v $
+.\" Revision 0.9.2.7  2006/10/06 12:13:01  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:15:42  brian
 .\" - updates for release
 .\"
@@ -368,30 +373,43 @@ deallocate a \fISTREAMS\fR queue pair
 \fISTREAMS\fP minor device list traversal
 .HP
 .BR mi_reallocb (9)\ \-\ \c
+reallocate a \fISTREAMS\fR message block
 .HP
 .BR mi_reuse_proto (9)\ \-\ \c
+reuse a \fISTREAMS\fR protocol message block
 .HP
 .BR mi_set_sth_hiwat (9)\ \-\ \c
+set the Stream head high water mark
 .HP
 .BR mi_set_sth_lowat (9)\ \-\ \c
+set the Stream head low water mark
 .HP
 .BR mi_set_sth_maxblk (9)\ \-\ \c
+set the Stream head maximum block size
 .HP
 .BR mi_set_sth_wroff (9)\ \-\ \c
+set the Stream head write offset
 .HP
 .BR mi_sprintf (9)\ \-\ \c
+print a formatted message to a buffer
 .HP
 .BR mi_timer (9)\ \-\ \c
+start a \fISTREAMS\fR timer message
 .HP
 .BR mi_timer_alloc (9)\ \-\ \c
+allocate a \fISTREAMS\fR timer message
 .HP
 .BR mi_timer_cancel (9)\ \-\ \c
+cancel a \fISTREAMS\fR timer message
 .HP
 .BR mi_timer_free (9)\ \-\ \c
+free a \fISTREAMS\fR timer message
 .HP
 .BR mi_timer_q_switch (9)\ \-\ \c
+switch queues for a \fISTREAMS\fR timer message
 .HP
 .BR mi_timer_valid (9)\ \-\ \c
+validate and dispose of a \fISTREAMS\fR timer message
 .PD
 .\"
 .SS "Specific Functions"
@@ -404,9 +422,13 @@ compatibility module,
 are as follows:
 .HP
 .BR allocbi (9)\ \-\ \c
+specialised
+.BR allocb (9)
 .PD 0
 .HP
 .BR esballoca (9)\ \-\ \c
+specialised
+.BR esballoc (9)
 .HP
 .BR mpnotify (9)\ \-\ \c
 assign notification callback to a \fISTREAMS\fR message
@@ -439,41 +461,79 @@ part of the
 package:
 .HP
 .BR mi_tpi_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_OK_ACK (7)
+or
+.BR T_ERROR_ACK (7)
 .PD 0
 .HP
 .BR mi_tpi_conn_con (9)\ \-\ \c
+generate a
+.BR T_CONN_CON (7)
 .HP
 .BR mi_tpi_conn_ind (9)\ \-\ \c
+generate a
+.BR T_CONN_IND (7)
 .HP
 .BR mi_tpi_conn_req (9)\ \-\ \c
+generate a
+.BR T_CONN_REQ (7)
 .HP
 .BR mi_tpi_data_ind (9)\ \-\ \c
+generate a
+.BR T_DATA_IND (7)
 .HP
 .BR mi_tpi_data_req (9)\ \-\ \c
+generate a
+.BR T_DATA_REQ (7)
 .HP
 .BR mi_tpi_discon_ind (9)\ \-\ \c
+generate a
+.BR T_DISCON_IND (7)
 .HP
 .BR mi_tpi_discon_req (9)\ \-\ \c
+generate a
+.BR T_DISCON_REQ (7)
 .HP
 .BR mi_tpi_err_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_ERROR_ACK (7)
 .HP
 .BR mi_tpi_exdata_ind (9)\ \-\ \c
+generate a
+.BR T_EXDATA_IND (7)
 .HP
 .BR mi_tpi_exdata_req (9)\ \-\ \c
+generate a
+.BR T_EXDATA_REQ (7)
 .HP
 .BR mi_tpi_info_req (9)\ \-\ \c
+generate a
+.BR T_INFO_REQ (7)
 .HP
 .BR mi_tpi_ok_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_OK_ACK (7)
 .HP
 .BR mi_tpi_ordrel_ind (9)\ \-\ \c
+generate a
+.BR T_ORDREL_IND (7)
 .HP
 .BR mi_tpi_ordrel_req (9)\ \-\ \c
+generate a
+.BR T_ORDREL_REQ (7)
 .HP
 .BR mi_tpi_uderror_ind (9)\ \-\ \c
+generate a
+.BR T_UDERROR_IND (7)
 .HP
 .BR mi_tpi_unitdata_ind (9)\ \-\ \c
+generate a
+.BR T_UNITDATA_IND (7)
 .HP
 .BR mi_tpi_unitdata_req (9)\ \-\ \c
+generate a
+.BR T_UNITDATA_REQ (7)
 .PD
 .\"
 .\"
@@ -544,6 +604,13 @@ Core functions are implemented within the
 framework.
 .IR MacOT \(rg-specific
 functions are implemented as described in the separate manual pages describing each facility.
+.PP
+All
+.IR MacOT \(rg-specific
+functions are implemented with the exception of
+.BR allocbi (9)
+and
+.BR esballoca (9).
 .\"
 .\"
 .\".SH IOCTLS
@@ -714,7 +781,7 @@ drivers to
 Because internal structures and definitions for
 .B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MacOT \(rg,

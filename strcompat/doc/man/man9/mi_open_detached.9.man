@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_open_detached.9.man,v 0.9.2.7 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_open_detached.9.man,v 0.9.2.8 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_open_detached.9.man,v $
+.\" Revision 0.9.2.8  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.7  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -98,17 +103,22 @@ sort-adjacent-labels
 .br
 .B #include <sys/mpsddi.h>
 .HP
-.BI "caddr_t mi_open_detached(caddr_t *" mi_list ", size_t " size ", dev_t *" devp ");
+.BI "caddr_t mi_open_detached(caddr_t *" mi_head ", size_t " size ", dev_t *" devp ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
-.TP
-.I mi_list
+.TP \w'\fImi_head\fR\(em'u
+.I mi_head
+an opaque pointer to the head of the private structure list.
+.PD 0
 .TP
 .I size
+the size of the private structure to allocate.
 .TP
 .I devp
+a pointer to the device number associated with the Stream.
+.PD
 .\"
 .\"
 .SH INTERFACE
@@ -137,6 +147,12 @@ before the stream is created.  When the driver or module's
 procedure is later called, this instance can be used as the new queue's instance data by associating
 it with the queue using
 .BR mi_attach (9).
+.PP
+Typically, however,
+.BR mi_open_detached ()
+is not used, and the higher level
+.BR mi_open_comm (9)
+housekeeping function is used in its stead.
 .\"
 .\"
 .SH RETURN
@@ -155,17 +171,26 @@ When
 fails, it returns
 .BR NULL .
 .BR mi_open_detached ()
-fails when it cannot allocate memory for driver or module instance data.
+fails when it cannot allocate memory for driver or module instance data, or
+the device number is already allocated to another instance.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR mi_open_detached ()
-can be called from
+can be called from any blocking context, however, it is intended to be called
+from a
+.I STREAMS
+driver's
+.RI qi_qopen (9)
+routine.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_open_detached ()
+is MP-safe.  The caller, however, is responsible for acquiring the necessary
+locks before attempting to access the contents of the private instance data.
 .\"
 .\"
 .SH NOTICES
@@ -193,10 +218,30 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_open_detached ()
+simply calls
+.BR mi_open_alloc_sleep (9)
+to allocate a private structure of size,
+.IR size ,
+and calls
+.BR mi_open_link (9)
+with the device pointer.
+.BR mi_open_link (9)
+is called with zero
+.I oflag
+argument and a
+.B NULL
+.I crp
+argument.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR mi_open_comm (9),
+.IR qi_qopen (9),
+.BR mi_attach (9),
+.BR mi_open_alloc_sleep (9),
+.BR mi_open_link (9),
 .BR mpscompat (9),
 .BR aixcompat (9),
 .BR maccompat (9),
@@ -240,7 +285,7 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

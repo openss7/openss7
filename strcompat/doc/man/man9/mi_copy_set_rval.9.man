@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_copy_set_rval.9.man,v 0.9.2.6 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_copy_set_rval.9.man,v 0.9.2.7 2006/10/06 12:13:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copy_set_rval.9.man,v $
+.\" Revision 0.9.2.7  2006/10/06 12:13:02  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -251,6 +256,13 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_copy_set_rval (9)
+simply sets the return value,
+.I ioc_rval
+member, in the
+.BR iocblk (9)
+structure contained in the message block referenced by
+.IR mp .
 .\"
 .\"
 .SH "SEE ALSO"
@@ -304,7 +316,7 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

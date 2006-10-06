@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: liscompat.9.man,v 0.9.2.8 2006/10/05 12:15:42 brian Exp $
+.\" @(#) $Id: liscompat.9.man,v 0.9.2.9 2006/10/06 12:13:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: liscompat.9.man,v $
+.\" Revision 0.9.2.9  2006/10/06 12:13:01  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.8  2006/10/05 12:15:42  brian
 .\" - updates for release
 .\"
@@ -97,14 +102,14 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 provides a compatibility module,
 .BR streams-liscompat.o ,
 that provides compatibility functions that smooth porting of drivers from the
 .I LiS 2.18
 .I STREAMS
 environment to
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 The functions provided by this compatibility module are described here.
 .\"
 .\"
@@ -113,7 +118,7 @@ The functions provided by this compatibility module are described here.
 The
 .I LiS Compatibility Module
 is a
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
 LfS
 .]
@@ -133,7 +138,7 @@ kernel modules.
 When compiled with kernel configuration flag
 .B CONFIG_STREAMS_DEBUG
 set,
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 will issue warnings whenever
 .I LiS CM
 symbols are invoked.
@@ -151,7 +156,7 @@ kernel functions.
 New
 .I STREAMS
 drivers and modules should always be compiled against
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 and
 .I Linux
 symbols for performance and efficiency.
@@ -191,7 +196,7 @@ can permit erroneous
 .I STREAMS
 functions to appear to run correctly.
 The equivalent
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .I LiS CM
 functions are unforgiving of being passed
 .B NULL
@@ -2468,9 +2473,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR LiS ,

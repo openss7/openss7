@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.8 2006/10/05 12:15:42 brian Exp $
+.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.9 2006/10/06 12:13:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: hpuxcompat.9.man,v $
+.\" Revision 0.9.2.9  2006/10/06 12:13:01  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.8  2006/10/05 12:15:42  brian
 .\" - updates for release
 .\"
@@ -97,14 +102,14 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 provides a compatibility module,
 .BR streams-hpuxcompat.o ,
 that provides compatibility functions that smooth porting of drivers from the
 .I HP-UX 11i v2
 .I STREAMS/UX
 environment to
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 The functions provided by this compatibility module are described here.
 .\"
 .\"
@@ -115,7 +120,7 @@ Many of the functions that are provided by
 are also provided by the core
 .B streams.o
 kernel module of
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 Other
 .IR HP-UX \(rg-specific
 functions are provided by the
@@ -149,7 +154,7 @@ determine the minimum of two integers
 Kernel functions available in
 .IR HP-UX \(rg
 that are available in
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 (in the core
 .I streams
 kernel module) are as folllows:
@@ -188,7 +193,7 @@ create a device from major and minor device numbers
 Kernel functions available in
 .IR HP-UX \(rg
 that are available in
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 (in the
 .I "SVR 4.2 MP"
 compatibility kernel module,
@@ -482,7 +487,7 @@ return the write queue of a \fISTREAMS\fR queue pair
 .SS "Specific \fISTREAMS\fP Functions"
 .PP
 Functions that are available in the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .IR HP-UX \(rg
 compatibility module,
 .BR streams-hpuxcompat.o ,
@@ -507,7 +512,7 @@ procedure for a \fISTREAMS\fP driver or module with a \fISTREAMS\fP message
 .\".SS "\fISTREAMS\fP Configuration and Registration Functions"
 .PP
 Module and driver configuration functions that are available in the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .IR HP-UX \(rg
 compatibility module,
 .IR streams-hpuxcompat ,
@@ -559,7 +564,7 @@ expects that the apporpriate level of synchronization be used instead.
 Because of this, it is recommended that
 .IR HP-UX \(rg
 drivers and modules port directly to the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 environment, not be run at synchronization level
 .BR SQLVL_NOP .
 See
@@ -575,7 +580,7 @@ symbols.
 To use
 .IR HP-UX \(rg-specific
 functions,
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_HPUX
 or
@@ -586,7 +591,7 @@ When compiled with
 defined,
 .IR HP-UX \(rg
 compatibility will become part of the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .B streams.o
 kernel module.
 When compiled with
@@ -606,10 +611,16 @@ functions loads.
 .PP
 .PP
 Core functions are implemented within the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 framework.
-.IR AIX \(rg-specific
+.IR HP-UX \(rg-specific
 functions are implemented as described in the separate manual pages describing each facility.
+.PP
+The following
+.IR HP-UX \(rg-specific
+function are unimplemented:
+.BR mpsleep (9),
+.BR streams_mpsleep (9).
 .\"
 .\"
 .SH "SEE ALSO"
@@ -751,9 +762,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR HP-UX \(rg,

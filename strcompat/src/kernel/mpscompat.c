@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/24 09:01:06 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/06 12:13:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:06 $ by $Author: brian $
+ Last Modified $Date: 2006/10/06 12:13:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.27  2006/10/06 12:13:18  brian
+ - updated manual pages to pass make check and for release
+ - updated release files for release
+ - added missing MacOT OSF/1 and MPS compatibility functions
+
  Revision 0.9.2.26  2006/07/24 09:01:06  brian
  - results of udp2 optimizations
 
@@ -132,10 +137,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/24 09:01:06 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/06 12:13:18 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/24 09:01:06 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/06 12:13:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -163,7 +168,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/24 09:01:06 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/06 12:13:18 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -563,6 +568,7 @@ mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
 		/* can't reuse this message block (or no message block to begin with) */
 		if (mp && !keep_on_error)
 			freemsg(xchg(&mp, NULL));
+		mp = NULL;
 	} else
 		/* simply resize it - leave everything else intact */
 		mp->b_wptr = mp->b_rptr + size;
@@ -1339,7 +1345,7 @@ mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 
 	if (vstrlog != NULL) {
 		va_list args;
-		modID_t mid = q->q_qinfo->qi_minfo->mi_idnum;
+		modID_t mid = q ? q->q_qinfo->qi_minfo->mi_idnum : 0;
 		minor_t sid = 0;	/* FIXME - should be minor devce number */
 
 		va_start(args, fmt);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/24 09:01:06 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/06 12:13:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:06 $ by $Author: brian $
+ Last Modified $Date: 2006/10/06 12:13:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/24 09:01:06 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/06 12:13:18 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/24 09:01:06 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/06 12:13:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/07/24 09:01:06 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/06 12:13:18 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -105,6 +105,9 @@ EXPORT_SYMBOL_NOVERS(lbolt);
 __OSF_EXTERN_INLINE time_t time(void);
 
 EXPORT_SYMBOL_NOVERS(time);
+__OSF_EXTERN_INLINE void DELAY(time_t);
+
+EXPORT_SYMBOL_NOVERS(DELAY);
 
 struct str_comm {
 	struct str_comm **prev;		/* must be first */
@@ -437,6 +440,23 @@ strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 }
 
 EXPORT_SYMBOL_NOVERS(strmod_del);
+
+int uprintf(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+int
+uprintf(const char *fmt, ...)
+{
+	va_list args;
+	int n;
+	char printf_buf[1024];
+
+	va_start(args, fmt);
+	n = vsnprintf(printf_buf, sizeof(printf_buf), fmt, args);
+	va_end(args);
+	printk("%s", printf_buf);
+	return (n);
+}
+
+EXPORT_SYMBOL_NOVERS(uprintf);
 
 #ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 static

@@ -1,7 +1,8 @@
+.so man9/maccompat.9.man
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: allocbi.9.man,v 0.9.2.6 2006/10/05 12:15:41 brian Exp $
+.\" @(#) $Id: allocbi.9.man,v 0.9.2.7 2006/10/06 12:12:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +54,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:41 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:12:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: allocbi.9.man,v $
+.\" Revision 0.9.2.7  2006/10/06 12:12:59  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:15:41  brian
 .\" - updates for release
 .\"
@@ -306,7 +312,7 @@ is a
 function:
 .B _MAC_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_MAC
 or
@@ -366,9 +372,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MacOT \(rg,

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer_cancel.9.man,v 0.9.2.6 2006/10/05 12:15:44 brian Exp $
+.\" @(#) $Id: mi_timer_cancel.9.man,v 0.9.2.7 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:44 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_timer_cancel.9.man,v $
+.\" Revision 0.9.2.7  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:15:44  brian
 .\" - updates for release
 .\"
@@ -84,8 +89,8 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B mi_timer_cancel
-\-
+.B mi_timer_cancel, mi_timer_stop
+\- cancel a \fISTREAMS\fR timer message block
 .\"
 .\"
 .SH SYNOPSIS
@@ -99,12 +104,15 @@ sort-adjacent-labels
 .B #include <sys/mpsddi.h>
 .HP
 .BI "void mi_timer_cancel(mblk_t *" mp );
+.HP
+.BI "void mi_timer_stop(mblk_t *" mp );
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
+a pointer to the message block associated with the timer.
 .\"
 .\"
 .SH INTERFACE
@@ -116,48 +124,112 @@ DDI.
 .SH DESCRIPTION
 .PP
 .BR mi_timer_cancel ()
-will cancel an outstanding timer message.  The
+and
+.BR mi_timer_stop ()
+will cancel an outstanding timer message,
+.IR mp ;
+which must be a pointer to a timer message previously allocated by a call to
+.BR mi_timer_alloc (9).
+The
 .I mp
 message pointer will not be destroyed, but will no longer be delivered to the target queue.  It may
 be rescheduled by using
 .BR mi_timer (9)
 at a later time.
+.PP
+.BR mi_timer_stop ()
+is simply another name for
+.BR mi_timer_cancel ().
+Otherwise, the function are identical.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mi_timer_cancel ()
+and
+.BR mi_timer_stop ()
+are two of a set of timer functions including
+.BR mi_timer (9),
+.BR mi_timer_alloc (9),
+.BR mi_timer_cancel (),
+.BR mi_timer_free (9),
+.BR mi_timer_move (9),
+.BR mi_timer_q_switch (9),
+.BR mi_timer_stop (),
+.BR mi_timer_valid (9),
+that are used to abstract the kernel timer functions and provide
+synchronization with
+.I STREAMS
+message queues.
+.PP
+.BR mi_timer_cancel ()
+and
+.BR mi_timer_stop ()
+are responsible for cancelling a running timer.  If the timer is cancelled
+before it was queued, it will not be queued should the timer expire.  If the
+timer was cancelled after it was queued,
+.BR mi_timer_valid (9)
+will indicate that the timeout is invalid.
+.BR mi_timer_cancel ()
+or
+.BR mi_timer_stop ()
+can be effected by passing
+.BR mi_timer (9)
+special time values.
+See
+.BR mi_timer (9)
+for more detailed usage information.
 .\"
 .\"
 .SH RETURN
 .PP
-When
 .BR mi_timer_cancel ()
-succeeds, it returns 
-.BR true  " (1);
-when it fails, it returns
-.BR false " (0).
+and
+.BR mi_timer_stop ()
+return
+.BR void .
 .\"
 .\"
 .SH ERRORS
 .PP
 .BR mi_timer_cancel ()
-fails when 
+and
+.BR mi_timer_stop ()
+are always successful.  However, if passed a
+.B NULL
+or invalid pointer, or a pointer to an invalid structure, the kernel may
+become unstable and a kernel panic may ensue.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR mi_timer_cancel ()
-can be called from
+and
+.BR mi_timer_stop ()
+can be called from any context; however, they are intended to be called from a
+.I STREAMS
+driver or module
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure or routine.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_timer_cancel ()
+and
+.BR mi_timer_stop ()
+are MP-safe.  Use of atomic exchanges is made within the data structures
+contained within the timer message block.
 .\"
 .\"
 .SH NOTICES
 .PP
 .BR mi_timer_cancel ()
-is an
+and
+.BR mi_timer_stop ()
+are
 .IR MPS \(rg-specific
 function:
 .BR _MPS_SOURCE ,
@@ -179,6 +251,16 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_timer_cancel ()
+simply sets the state to
+.B TB_CANCELLED
+if the timer has timed out (is queued) or
+.B TB_IDLE
+if the timer has been cancelled before it was queued.
+.PP
+.BR mi_timer_stop ()
+simply calls
+.BR mi_timer_cancel ().
 .\"
 .\"
 .SH "SEE ALSO"
@@ -196,13 +278,17 @@ defined.
 .SH BUGS
 .PP
 .BR mi_timer_cancel ()
-has no known bugs.
+and
+.BR mi_timer_stop ()
+have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
 .BR mi_timer_cancel ()
-is
+and
+.BR mi_timer_stop ()
+are
 compatible with
 .IR MPS \(rg,
 .IR AIX \(rg,
@@ -212,7 +298,9 @@ and
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR mi_timer_cancel ()
-is an
+and
+.BR mi_timer_stop ()
+are
 .IR MPS \(rg-specific
 function and should not be used by portable
 .I STREAMS
@@ -222,7 +310,9 @@ The more common
 function should be used in its stead.
 .IP \(em
 .BR mi_timer_cancel ()
-is provided for source level compatibility with
+and
+.BR mi_timer_stop ()
+are provided for source level compatibility with
 .IR MPS \(rg
 for the purpose of porting
 .IR MPS \(rg
@@ -231,13 +321,15 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
 .BR mi_timer_cancel ()
+and
+.BR mi_timer_stop ()
 only provides functionality comparable to
 .IR MPS \(rg
 for use by
@@ -245,6 +337,8 @@ for use by
 drivers and modules.
 Any and all functionality provided by
 .BR mi_timer_cancel ()
+and
+.BR mi_timer_stop ()
 in support of
 .RI non- STREAMS
 devices are not supported.
@@ -280,16 +374,22 @@ aixcpc
 .SH HISTORY
 .PP
 .BR mi_timer_cancel ()
+and
+.BR mi_timer_stop ()
 first appeared in
 .IR MPS \(rg.
 .BR mi_timer_cancel ()
-is a
-Mentat, Inc. function that goes all the way back to the
+and
+.BR mi_timer_stop ()
+are
+Mentat, Inc. functions that goes all the way back to the
 .RI pre- OSF/1
 .I Mentat
 implementations.
-.BR xxx ()
-appears in
+.BR mi_timer_cancel ()
+and
+.BR mi_timer_stop ()
+appear in
 .IR MacOT \(rg
 .[
 macspg
@@ -300,8 +400,10 @@ and
 aixcpc
 .]
 An undocumented version of
-.BR xxx ()
-appears in
+.BR mi_timer_cancel ()
+and
+.BR mi_timer_stop ()
+appear in
 .IR Solaris \(rg.
 .\"
 .\"

@@ -1,1 +1,1 @@
-.so man9/compat_undoc.9.man
+.so man9/str_install_HPUX.9.man

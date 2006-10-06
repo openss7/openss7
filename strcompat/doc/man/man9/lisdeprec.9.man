@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lisdeprec.9.man,v 0.9.2.4 2006/10/05 12:15:42 brian Exp $
+.\" @(#) $Id: lisdeprec.9.man,v 0.9.2.5 2006/10/06 12:13:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lisdeprec.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:01  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:42  brian
 .\" - updates for release
 .\"
@@ -85,7 +90,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B lis_deprec
-\- \fBLinux Fast-STREAMS\fP LiS Deprecated Symbols
+\- \fB@PACKAGE_TITLE@\fP LiS Deprecated Symbols
 .\"
 .\"
 .SH SYNOPSIS
@@ -95,10 +100,19 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
+This manual page documents deprecated
+.I LiS
+.[
+lis
+.]
+functions that are no longer supported under the
+.I LiS
+source compatibility module.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+Following are the deprecated functions:
 .\"
 .\"
 .SS lis__kfree
@@ -1032,44 +1046,128 @@ was deprecated in
 is no longer an exported symbol, and has been removed from the compatibility module.
 .\"
 .\"
-.SH RETURN
-.PP
+.\".SH RETURN
+.\".PP
 .\"
 .\"
-.SH "ERROR HANDLING"
-.PP
+.\".SH "ERROR HANDLING"
+.\".PP
 .\"
 .\"
-.SH CONTEXT
-.PP
+.\".SH CONTEXT
+.\".PP
 .\"
 .\"
-.SH MP-STREAMS
-.PP
+.\".SH MP-STREAMS
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR lis_add_timer (9),
+.BR lis_apushm (9),
+.BR lis_basename (9),
+.BR lis_can_unload (9),
+.BR lis_check_guard (9),
+.BR lis_check_mem (9),
+.BR lis_check_mem_region (9),
+.BR lis_check_q_magic (9),
+.BR lis_check_region (9),
+.BR lis_check_umem (9),
+.BR lis_copyin (9),
+.BR lis_copyout (9),
+.BR lis_dec_mod_cnt_fcn (9),
+.BR lis_del_timer (9),
+.BR lis_dobufcall (9),
+.BR lis_doclose (9),
+.BR lis_enable_intr (9),
+.BR lis_fattach (9),
+.BR lis_fdetach (9),
+.BR lis_fdetach_all (9),
+.BR lis_fdetach_stream (9),
+.BR lis_fifo_close_sync (9),
+.BR lis_fifo_open_sync (9),
+.BR lis_fifo_write_sync (9),
+.BR lis_file_inode (9),
+.BR lis_file_str (9),
+.BR lis_find_strdev (9),
+.BR lis_flush_print_buffer (9),
+.BR lis_fmod_sw (9),
+.BR lis_freedb (9),
+.BR lis_get_passfp (9),
+.BR lis_get_pipe (9),
+.BR lis_inc_mod_cnt_fcn (9),
+.BR lis_init_bufcall (9),
+.BR lis_in_syscall (9),
+.BR lis_ioc_fattach (9),
+.BR lis_ioc_fdetach (9),
+.BR lis_ioc_pipe (9),
+.BR lis__kfree (9),
+.BR lis_kill_pg (9),
+.BR lis_kill_proc (9),
+.BR lis__kmalloc (9),
+.BR lis_loadable_load (9),
+.BR lis_maj_min_name (9),
+.BR lis_mark_mem (9),
+.BR lis_max_mem (9),
+.BR lis_old_inode (9),
+.BR lis_open_cnt (9),
+.BR lis_pci_cleanup (9),
+.BR lis_pipe (9),
+.BR lis_poll_2_1 (9),
+.BR lis_poll_bits (9),
+.BR lis_poll_events (9),
+.BR lis_poll_file (9),
+.BR lis_print_queues (9),
+.BR lis_print_spl_track (9),
+.BR lis_print_stream (9),
+.BR lis_qattach (9),
+.BR lis_qdetach (9),
+.BR lis_queuerun_cnts (9),
+.BR lis_queues_running (9),
+.BR lis_recvfd (9),
+.BR lis_release_mem_region (9),
+.BR lis_request_mem_region (9),
+.BR lis_runq_cnts (9),
+.BR lis_runq_req_cnt (9),
+.BR lis_sendfd (9),
+.BR lis_set_file_str (9),
+.BR lis_setq (9),
+.BR lis_setqsched (9),
+.BR lis_setqsched_cnts (9),
+.BR lis_setqsched_isr_cnts (9),
+.BR lis_stdata_cnt (9),
+.BR lis_strclose (9),
+.BR lis_strcount (9),
+.BR lis_strgetpmsg (9),
+.BR lis_strioctl (9),
+.BR lis_stropen (9),
+.BR lis_strputpmsg (9),
+.BR lis_strread (9),
+.BR lis_strstats (9),
+.BR lis_strwrite (9),
+.BR lis_umount2 (9),
+.BR lis_valid_mod_list (9).
 .\"
 .\"
-.SH BUGS
-.PP
+.\".SH BUGS
+.\".PP
 .\"
 .\"
-.SH COMPATIBILITY
-.PP
+.\".SH COMPATIBILITY
+.\".PP
 .\"
 .\"
-.SH "CONFORMING TO"
-.PP
+.\".SH "CONFORMING TO"
+.\".PP
 .\"
 .\"
-.SH HISTORY
-.PP
+.\".SH HISTORY
+.\".PP
 .\"
 .\"
 .[

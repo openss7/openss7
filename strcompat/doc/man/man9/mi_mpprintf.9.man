@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_mpprintf.9.man,v 0.9.2.4 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_mpprintf.9.man,v 0.9.2.5 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_mpprintf.9.man,v $
+.\" Revision 0.9.2.5  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.4  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -80,11 +85,11 @@ sort-adjacent-labels
 .so strcompat.macros
 .\"
 .\"
-.TH XXX 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH MI_MPPRINTF 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B xxx
+.B mi_mpprintf, mi_mpprintf_nr
 \-
 .\"
 .\"
@@ -98,13 +103,28 @@ sort-adjacent-labels
 .br
 .B #include <sys/mpsddi.h>
 .HP
-int \fBxxx\fR(int \fIyyy\fR);
+.BI "int mi_mpprintf(mblk_t *" mp ", char *" fmt ", " ... ");
+.HP
+.BI "int mi_mpprintf_nr(mblk_t *" mp ", char *" fmt ", " ... ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I yyy
+.I mp
+a pointer to a message block into which to print the message.
+.PD 0
+.TP
+.I fmt
+a
+.BR printf (3)
+style format string.
+.TP
+.I ...
+the arguments of the
+.I fmt
+format string.
+.PD
 .\"
 .\"
 .SH INTERFACE
@@ -115,45 +135,100 @@ DDI.
 .\"
 .SH DESCRIPTION
 .PP
-.BR xxx ()
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+are variants of
+.BR sprintf (3),
+that print according to a
+.BR printf (3)
+formatted format string into a buffer pointed to by
+.IR mp .
+.PP
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+begin printing characters at the
+.I b_wptr
+member of the last data block in the message pointed to by
+.IR mp ;
+however,
+.BR mi_mpprintf_nr (),
+trims one character from the end of the message,
+.IR mp ,
+before printing characters beings.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mi_mpprintf ()
+would normally be used on a freshly allocated buffer,
+.IR mp ,
+that is to contain a formatted string.
+.BR mi_mpprintf_nr ()
+would normally be used on a previously printed message buffer, 
+where the trailing newline is to be stripped before printing is continued.
+.PP
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+can be used to implement
+.BR cmn_err (9)-like
+functions or
+.BR strlog (9)-like
+functions.  However, asside from these two situations, there is very little
+use for printing formatted strings to message blocks.
 .\"
 .\"
 .SH RETURN
 .PP
 When
-.BR xxx ()
-succeeds, it returns 
-.BR true  " (1);
-when it fails, it returns
-.BR false " (0).
+.BR mi_mpprintf ()
+or
+.BR mi_mpprintf_nr ()
+succeed, they returns
+the number of bytes written to the buffer;
+when they fail, they return minus one
+.RB ( -1 ).
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR xxx ()
-fails when 
+.BR mi_mpprintf ()
+or
+.BR mi_mpprintf_nr ()
+fail when the format string,
+.I fmt
+cannot be parsed correctly or there is not sufficient room in the passed in
+message blocks and additional message blocks could not be allocated.
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR xxx ()
-can be called from
+.BR mi_mpprintf ()
+or
+.BR mi_mpprintf_nr ()
+can be called from any context, including interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+are MP -safe.
+The caller, however, is responsible for ensuring exclusive access to the
+passed in message buffers.
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR xxx ()
-is an
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+are
 .IR MPS \(rg-specific
-function:
+functions:
 .BR _MPS_SOURCE ,
 .B _AIX_SOURCE
 or
@@ -173,10 +248,25 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_mpprintf ()
+is implemented by providing a message block
+.BR mi_putc ()
+and
+.BR mi_number ()
+function and then using a fairly standard
+.BR sprintf (3)
+style implementation.
+.BR mi_mpprintf_nr ()
+simply calls
+.BI adjmsg( mp ",-1)
+before calling
+.BR mi_mpprintf ().
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR cmn_err (9),
+.BR strlog (9),
 .BR mpscompat (9),
 .BR aixcompat (9),
 .BR maccompat (9),
@@ -185,14 +275,18 @@ defined.
 .\"
 .SH BUGS
 .PP
-.BR xxx ()
-has no known bugs.
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR xxx ()
-is
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+are
 compatible with
 .IR MPS \(rg,
 .IR AIX \(rg,
@@ -201,8 +295,10 @@ and
 .IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR xxx ()
-is an
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+are
 .IR MPS \(rg-specific
 function and should not be used by portable
 .I STREAMS
@@ -211,8 +307,10 @@ The more common
 .BR zzz ()
 function should be used in its stead.
 .IP \(em
-.BR xxx ()
-is provided for source level compatibility with
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+are provided for source level compatibility with
 .IR MPS \(rg
 for the purpose of porting
 .IR MPS \(rg
@@ -221,20 +319,24 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
-.BR xxx ()
-only provides functionality comparable to
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+only provide functionality comparable to
 .IR MPS \(rg
 for use by
 .I STREAMS
 drivers and modules.
 Any and all functionality provided by
-.BR xxx ()
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
 in support of
 .RI non- STREAMS
 devices are not supported.
@@ -269,17 +371,23 @@ aixcpc
 .\"
 .SH HISTORY
 .PP
-.BR xxx ()
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
 first appeared in
 .IR MPS \(rg.
-.BR xxx ()
-is a
-Mentat, Inc. function that goes all the way back to the
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+are
+Mentat, Inc. functions that go all the way back to the
 .RI pre- OSF/1
 .I Mentat
 implementations.
-.BR xxx ()
-appears in
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+appear in
 .IR MacOT \(rg
 .[
 macspg
@@ -290,8 +398,10 @@ and
 aixcpc
 .]
 An undocumented version of
-.BR xxx ()
-appears in
+.BR mi_mpprintf ()
+and
+.BR mi_mpprintf_nr ()
+appear in
 .IR Solaris \(rg.
 .\"
 .\"

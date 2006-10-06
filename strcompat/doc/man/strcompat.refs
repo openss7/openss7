@@ -2970,6 +2970,16 @@ Part 1: Protocol Specification
 %I OpenSS7 Corporation
 %U http://www.openss7.org/
 
+%K strcompat
+%L strcompat-0.9.2
+%R strcompat-0.9.2
+%A OpenSS7
+%Q OpenSS7
+%T OpenSS7 STREAMS Compatibility Modules (strcompat) 0.9.2 Source Code
+%E Brian Bidulock
+%I OpenSS7 Corporation
+%U http://www.openss7.org/
+
 %K dpnss1
 %L DPNSS1
 %A British Telecom

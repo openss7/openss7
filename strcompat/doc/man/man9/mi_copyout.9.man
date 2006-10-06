@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_copyout.9.man,v 0.9.2.7 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_copyout.9.man,v 0.9.2.8 2006/10/06 12:13:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:03 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copyout.9.man,v $
+.\" Revision 0.9.2.8  2006/10/06 12:13:03  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.7  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -186,6 +191,21 @@ was called like:
 .\"
 .SH USAGE
 .PP
+.BR mi_copyout ()
+is used in conjunction with
+.BR mi_copyout_alloc (9)
+to copy data out to the user in the last stage of an input-output control
+operation.
+.I mp
+can either represent a
+.BR M_IOCTL (9)
+.BR I_STR (7)-based
+input-output control, or a
+.B TRANSPARENT
+input-output control that did not require any data to be copied in,
+or an
+.BR M_IOCDATA (9)
+message from a previous copyin or copyout operation.
 .\"
 .\"
 .SH RETURN
@@ -212,25 +232,25 @@ to the
 operation in
 .BR errno (3),
 are as follows:
-.TP \w'ENOBUFS\ \ 'u
-.B EPROTO
+.TP \w'[\fBENOBUFS\fR]\ \ 'u
+.RB [ EPROTO ]
 .BR mi_copyout ()
 was passed an invalid argument, or the passed in message block was of an invalid format.
 .TP
-.B ENOSR
+.RB [ ENOSR ]
 .BR mi_copyout (),
 or the stream head, could not allocate a
 .I STREAMS
 resource
 to complete the operation.
 .TP
-.B ENOMEM
+.RB [ ENOMEM ]
 .BR mi_copyout (),
 or the stream head, could not allocate 
 memory to
 complete the operation.
 .TP
-.B ENOBUFS
+.RB [ ENOBUFS ]
 .BR mi_copyout (),
 or the stream head, could not allocate 
 a buffer
@@ -297,6 +317,16 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+If
+.B mi_copyout ()
+is called incorrectly, it will abort the input-output control operation and
+send an
+.BR M_IOCNAK (9)
+message in response with error number
+.RB [ EPROTO ].
+Otherwise, an
+.BR M_COPYOUT (9)
+message is formulated and sent upstream.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -350,7 +380,7 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

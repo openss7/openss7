@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_reuse_proto.9.man,v 0.9.2.6 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_reuse_proto.9.man,v 0.9.2.7 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_reuse_proto.9.man,v $
+.\" Revision 0.9.2.7  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -85,7 +90,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B mi_reuse_proto
-\-
+\- reuse a protocol message block
 .\"
 .\"
 .SH SYNOPSIS
@@ -101,50 +106,128 @@ sort-adjacent-labels
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'\fIkeep_on_error\fR\(em'u
 .I mp
 a pointer to the message to reuse.
+.PD 0
 .TP
 .I size
 the size required by the proto message block.
 .TP
 .I keep_on_error
 do not discard message to reuse on error.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .BR mi_reuse_proto ()
+is similar to
+.BR mi_reallocb (9).
+.BR mi_reuse_proto ()
+attempts to resize the passed in message block,
+.IR mp ,
+for use a message block of size,
+.IR size .
+If
+.I mp
+is
+.BR NULL <
+or it
+.I mp
+cannot be resized, the message block is freed
+using
+.BR freemsg (9),
+unless
+.I keep_on_error
+indicates that it is to be kept.
+.PP
+The message block,
+.IR mp ,
+is deemed unresizable under the following conditions:
+.IP \(bu \w'\(bu\(em'u
+.I mp
+is
+.BR NULL .
+.IP \(bu
+.I size
+is bigger than a
+.BR FASTBUF ,
+and the real size of the data block attached to
+.IR mp ,
+beginning at the
+.IR b_rptr ,
+is smaller than
+.IR size .
+.IP \(bu
+If the number of references to the data block
+.RI ( mp->b_datap->db_ref )
+is greater than one.
+.IP \(bu
+If the data block is an external data buffer (\fImp->b_datap->db_frtnp\fR != \fBNULL\fP).
+.PP
+An unresizable message is freed unless
+.I keep_on_error
+is
+.BR true .
+.PP
+When the message can be resized, its
+.I b_wptr
+and
+.I b_rptr
+members are adjusted and
+.IR mp
+is returned.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mi_reuse_proto ()
+can be used in many situations where an acknowledgement of typically smaller
+size than a request is to be returned.  These situations occur often in
+processing
+.BR tpi (7)
+primitives.  For example, generation of a
+.BR T_BIND_ACK (7)
+protocol message from a
+.BR T_BIND_REQ (7)
+message is straigthforward using
+.BR mi_reuse_proto ().
 .\"
 .\"
 .SH RETURN
 .PP
 When
 .BR mi_reuse_proto ()
-succeeds, it returns 
-.BR true  " (1);
+succeeds, it returns a pointer to the resized message block,
+.IR mp ;
 when it fails, it returns
-.BR false " (0).
+.BR NULL .
 .\"
 .\"
 .SH ERRORS
 .PP
 .BR mi_reuse_proto ()
-fails when 
+fails when the passed in message is unresizable.  The passed in message,
+.IR mp ,
+is only freed on error if
+.I keep_on_error
+is
+.BR false .
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR mi_reuse_proto ()
-can be called from
+can be called from any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+is MP-safe.  The caller is responsible for ensuring exclusive access to the
+passed in message pointer (with the exception that if
+.I db_ref
+is greater than one, the passed in message will not be used).
 .\"
 .\"
 .SH NOTICES
@@ -172,10 +255,22 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_reuse_proto ()
+simply checks the conditions listed, frees the passed in message block if it
+is unusable and
+.I keep_on_error
+is
+.BR false ,
+or returns a resized initial passed in message block.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR mi_reallocb (9),
+.BR freemsg (9),
+.BR tpi (7),
+.BR T_BIND_ACK (7),
+.BR T_BIND_REQ (7),
 .BR mpscompat (9),
 .BR aixcompat (9),
 .BR maccompat (9),
@@ -206,8 +301,8 @@ is an
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
-The more common
-.BR zzz ()
+The more portable
+.BR allocb ()
 function should be used in its stead.
 .IP \(em
 .BR mi_reuse_proto ()
@@ -220,7 +315,7 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

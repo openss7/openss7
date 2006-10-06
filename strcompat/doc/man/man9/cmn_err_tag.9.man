@@ -1,1 +1,465 @@
-.so man9/irixcompat.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: cmn_err_tag.9.man,v 0.9.2.3 2006/10/06 12:13:00 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/06 12:13:00 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: cmn_err_tag.9.man,v $
+.\" Revision 0.9.2.3  2006/10/06 12:13:00  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
+.\" Revision 0.9.2.21  2006/04/05 09:44:09  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strcompat.macros
+.\"
+.\"
+.TH CMN_ERR_TAG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B cmn_err_tag
+\- print a tagged kernel command error
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _IRIX_SOURCE
+.br
+.B #include <sys/streams.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "void cmn_err_tag(int " sequence ", int " err_lvl ", const char *" fmt ", " ... ");
+.\"
+.\"
+.TP \w'\ sequence\ 'u
+.I sequence
+the sequence number associated with the log.
+.PD 0
+.TP
+.I err_lvl
+the error level associated with the log.
+.TP
+.I fmt
+the
+.B printf
+format for the log.
+.TP
+.I ...
+the arguments of the
+.B printf
+format.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR IRIX \(rg-specific
+.IR DDI/DKI .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR cmn_err_tag ()
+prints a command error message to kernel log files
+with sequence number
+.IR sequence ,
+at the level specified by
+.I err_lev
+and with the
+.BR printf (3)
+formatted format string
+.I fmt
+and associated variable arguments.
+.PP
+.I err_lvl
+may be one of the following values:
+.TP \w'\ CE_PANIC\ 'u
+.B CE_CONT
+This level indicates to continue printing.
+.TP
+.B CE_DEBUG
+This error level is for debugging messages.  Debugging messages are of use only during debugging.
+This equates to a
+.B KERN_DEBUG
+level in
+.BR Linux .
+.TP
+.B CE_NOTE
+This error level is for notices.  Notices are important events which should be logged.
+This equates to a
+.B KERN_NOTICE
+level in
+.BR Linux .
+.TP
+.B CE_NOTE
+This error level is for notices.  Notices are important events which should be logged.
+This equates to a
+.B KERN_NOTICE
+level in
+.BR Linux .
+.TP
+.B CE_WARN
+This error level is for warnings.  These are critical conditions, however, these errors do not halt
+the kernel.  This equates to a
+.B KERN_WARNING
+level in
+.BR Linux .
+.TP
+.B CE_ALERT
+This error level is for alert messages.  Alert messages indicate that action must be taken
+immediately.
+This equates to a
+.B KERN_ALERT
+level in
+.BR Linux.
+.TP
+.B CE_PANIC
+This error level is a panic error level.  This is for highly critical errors where the kernel has
+destabilized and it is necessary to halt the kernel.
+This equates to a
+.B KERN_EMERG
+level in
+.BR Linux.
+.RS
+.PP
+When the
+.I err_lvl
+is specified as
+.BR CE_PANIC ,
+.BR cmn_err_tag ()
+will generate a
+.B Linux
+kernel panic with the resulting message.
+.RE
+.\"
+.\"
+.SH RETURN
+.PP
+Unlike
+.BR printk (9),
+.BR cmn_err_tag ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR cmn_err_tag ()
+fails silently when the
+.I err_lvl
+is invalid or formatting of the message
+per
+.I fmt
+and the variable arguments fails.
+(These function have proper declarations to allow the GNU C Compiler Collection to warn of
+incorrect format strings and arguments at compile time.)
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR cmn_err_tag ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR cmn_err_tag ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.I SVR 4.2 MP
+specifies that a
+.RB \(lq ^ \(rq
+character passed as the first character of the format string,
+.IR fmt ,
+will print the message to the console only;
+and that a
+.RB \(lq ! \(rq
+character,
+to the print buffer (system logs) only.
+.B @PACKAGE_TITLE@
+does not exhibit this behavior because whether things are printed to the console or not are
+controlled by
+.BR syslog (8)
+under
+.BR Linux .
+.BR cmn_err_tag ()
+will, however, strip these characters from the printed message if they occur.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR cmn_err_tag ()
+simply calls
+.BR vcmn_err ().
+.BR vcmn_err ()
+calls
+.BR printk (9)
+with the equivalent kernel level as follows:
+.PP
+.TS
+tab(:);
+lblb.
+CE_CONT:\-
+CE_DEBUG:KERN_DEBUG
+CE_NOTE:KERN_INFO
+CE_WARN:KERN_WARNING
+CE_ALERT:KERN_ALERT
+CE_PANIC:KERN_EMERG
+.TE
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR icmn_err (9),
+.BR printk (9),
+.BR strlog (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR cmn_err_tag ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR cmn_err_tag ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.I "SVR 4"
+systems normally print a newline at before the information provided to
+.BR cmn_err ()
+unless the
+.B CE_CONT
+flag is specified, and do not normally print a newline after the information provided to
+.BR cmn_err ().
+This is the opposite of BSD and Linux behavior, which print a newline at the end of the sequence
+rather than the beginning.
+.I LiS
+can be compiled with flags providing either behavior.
+.B @PACKAGE_TITLE@
+can be compiled with flags providing either behavior, however, the
+.B Linux
+and 
+.B BSD
+approach is the default.
+Both
+.IR IRIX \(rg
+and
+.IR Solaris \(rg
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+provide the
+.B Linux/BSD
+behavior.
+.IP \(em
+.IR IRIX \(rg
+.[
+irixdoc
+.]
+add levels
+.B CE_DEBUG
+and
+.BR CE_ALERT .
+These two levels are not documented by any other implementation.
+.IP \(em
+.IR IRIX \(rg
+.[
+irixdoc
+.]
+documents
+.BR icmn_err ().
+No other implementation documents
+.BR icmn_err (),
+but some document
+.BR vcmn_err ().
+Neither 
+.BR icmn_err ()
+nor
+.BR vcmn_err ()
+will be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.IR IRIX \(rg
+.[
+irixdoc
+.]
+documents
+that locks cannot be held accross a call to this function with a level of
+.BR CE_PANIC .
+.B Linux
+breaks locks under panic, so this is not the case for
+.BR "@PACKAGE_TITLE@" .
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR cmn_err ()
+with a level of
+.B CE_PANIC
+while holding driver-defined locks.
+.IP \(em
+.IR IRIX \(rg
+.[
+irixdoc
+.]
+documents a limited set of format specifiers for the format string.  These are:
+.BR %s ", " %u ", " %d ", " %o ",  and " %x .
+.IR IRIX \(rg
+also documents that length specifiers are not permitted on these format specifiers.
+Portable
+.I STREAMS
+drivers and modules will not use format specifiers that include length specifications and will
+restrict the format string to use only the format specifiers
+.BR %s ", " %u ", " %d ", " %o ",  and " %x .
+.IP \(em
+Symbol
+.BR cmn_err_tag ()
+is provided for compatibility with
+.IR IRIX .
+.BR cmn_err_tag ()
+calls
+.BR vcmn_err ()
+directly, and ignores the
+.I sequence
+argument.
+.IP \(em
+.I LiS
+.[
+LiS
+.]
+uses
+.BR printk (9)
+to print the messages.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_cmn_err ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\".BR lis_cmn_err ()
+.\"calls
+.\".BR cmn_err ()
+.\"directly.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR cmn_err ()
+is a System V function that first appeared in
+.IR "SVR 2" .
+.[
+svr2
+.]
+.PP
+.BR cmn_err_tag ()
+is an
+.IR IRIX \(rg
+function.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

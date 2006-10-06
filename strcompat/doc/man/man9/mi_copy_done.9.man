@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_copy_done.9.man,v 0.9.2.6 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_copy_done.9.man,v 0.9.2.7 2006/10/06 12:13:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copy_done.9.man,v $
+.\" Revision 0.9.2.7  2006/10/06 12:13:02  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -263,6 +268,46 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_copy_done ()
+frees the internal private message block allocated and attached to the
+.I cp_private
+member of the
+.RB copyresp (9)
+structure and then positively or negatively acknowledges the message depending
+upon whether the
+.I err
+argument is zero
+(positive acknowledgement with
+.BR M_IOCACK (9))
+or non-zero
+(negative acknowledgement with
+.BR M_IOCNAK (9)).
+.I err
+can be a positive or negative error number.
+If the message,
+.IR mp ,
+is an
+.BR M_IOCDATA (9)
+message block indicating a
+.BR copyin (9)
+or
+.RB copyout (9)
+error, then the message block is simply freed and no positive or negative
+acknowledgement is returned.
+.PP
+.I LiS
+has a longstanding bug in its implementation of
+.BR M_IOCDATA (9)
+whereby it expects a negative acknowledgement,
+.BR M_IOCNAK (9),
+from the driver instead of abandonning the input-output control request as
+specified in the
+.IR "SVR 4 SPG" .
+.[
+svr4spg
+.]
+This is accommodated by the routine when it compiles for
+.IR LiS .
 .\"
 .\"
 .SH "SEE ALSO"
@@ -316,7 +361,7 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

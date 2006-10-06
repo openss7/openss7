@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: miocnak.9.man,v 0.9.2.5 2006/10/05 12:15:44 brian Exp $
+.\" @(#) $Id: miocnak.9.man,v 0.9.2.6 2006/10/06 12:13:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:44 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: miocnak.9.man,v $
+.\" Revision 0.9.2.6  2006/10/06 12:13:05  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.5  2006/10/05 12:15:44  brian
 .\" - updates for release
 .\"
@@ -229,7 +234,7 @@ is a
 function:
 .B _SUN_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SUN
 or
@@ -288,9 +293,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR Solaris \(rg,

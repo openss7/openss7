@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sleep.9.man,v 0.9.2.9 2006/10/05 12:15:46 brian Exp $
+.\" @(#) $Id: sleep.9.man,v 0.9.2.10 2006/10/06 12:13:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:46 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sleep.9.man,v $
+.\" Revision 0.9.2.10  2006/10/06 12:13:06  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.9  2006/10/05 12:15:46  brian
 .\" - updates for release
 .\"
@@ -84,7 +89,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B sleep, streams_mpsleep
+.B sleep, mpsleep, streams_mpsleep
 \- put a process to sleep
 .\"
 .\"
@@ -96,38 +101,123 @@ sort-adjacent-labels
 .br
 .B #include <sys/svr4ddi.h>
 .HP
-int \fBsleep\fR(caddr_t \fIevent\fR, pl_t \fIpriority\fR);
+.BI "int sleep(caddr_t " event ", pl_t " priority ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'\fIpriority\fR\(em'u
 .I event
+The event (kernel address) on which to sleep.
+.PD 0
 .TP
 .I priority
+The priority at which to run when awoken.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .BR sleep ()
+suspends execution of a process to await certain events such as reaching a
+known system state in hardware or software.  For instance, when a process
+wants to read a device a no data are available, the driver may need to call
+.BR sleep ()
+to wait for data to become available before returning.  This causes the kernel
+to suspend execution of the currently running process and schedule another
+process.  The process that called sleep can be resumed by a call to the
+.BR wakeup (9)
+function with the same
+.I event
+as specified in the call to
+.BR sleep ().
 .\"
 .\"
 .SH USAGE
 .PP
+The
+.I event
+argument address has no significance except that the same address must be
+passed to
+.BR wakeup (9)
+to resume the sleeping process.  The address used should be the address of a
+kernel data structure associated with the caller, or one of the caller's own
+data structures.  Use of an arbitrary address not associated with a private
+data structure can result in a conflict with another, unrelated sleep and
+wakeup operations in the kernel.
+.PP
+The
+.I priority
+argument can have valid values from zero
+.RB ( 0 )
+through thirty-nine
+.RB ( 39 )
+inclusive.  In general, a lower value will result in more favorable scheduling
+although the exact semantic of the priority argument is specific to the
+scheduling class of the caller, and some scheduling classes may choose to
+ignore the argument altogether for the purpose of assigning a scheduling
+priority.
+.PP
+Also, the value of the
+.I priority 
+argument determines whether the sleep may be interrupted by signals.  If the
+value of
+.I priority
+is less than or equal to the value of the constant
+.BR PZERO ,
+the sleeping process will not be awakened by a signal.  If the value of
+.I priority
+is greater than
+.B PZERO
+and the
+.B PCATCH
+bit flag is ORed into the
+.I priority
+argument, the process will wake up prematurely (without a call to
+.BR wakeup (9))
+upon receipt of a non-ignored, non-held signal and will normally return
+one
+.RB ( 1 )
+to the calling code.  If
+.I priority
+is greater than
+.B PZERO
+and
+.B PCATCH
+is not set, the sleeping process will exit upon receipt of a signal and will
+never return to the caller.
+.PP
+Calls to
+.BR sleep ()
+must be able to tolerate premature wakeups.  After it is awakened, the code
+must reexamine the condition on which it was sleeping.
 .\"
 .\"
 .SH RETURN
 .PP
-When
 .BR sleep ()
-succeeds, it returns zero (0);
-when it fails, it returns one (1).
+returns zero
+.RB ( 0 )
+if the caller woke due to a
+.BR wakeup ()
+or was stopped and restarted due to job control.  If the sleep is interrupted
+by a signal and
+.B PCATCH
+was set in
+.IR priority ,
+the call returns one
+.RB ( 1 ).
+If the calling process catches a signal an
+.B PCATCH
+is not set, the call never returns.
 .\"
 .\"
 .SH ERRORS
 .PP
 .BR sleep ()
-fails when the sleep is interrupted by a signal and
+always succeeds.
+.BR sleep ()
+exits when the sleep is interrupted by a signal and
 .B PCATCH
 was set in the
 .I priority
@@ -137,7 +227,8 @@ argument.
 .SH CONTEXT
 .PP
 .BR sleep ()
-can be called from
+can be called from any blocking context.  Private locks cannot be held across
+the call.
 .\"
 .\"
 .SH MP-STREAMS
@@ -154,7 +245,7 @@ is a
 function:
 .B _SVR4_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SVR4
 or
@@ -164,6 +255,14 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+This
+.IR "SVR 4"
+.[
+svr4
+.]
+version of
+.BR sleep ()
+has not yet been implemented.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -174,7 +273,7 @@ defined.
 .SH BUGS
 .PP
 .BR sleep ()
-has no known bugs.
+is not yet implemented.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -189,8 +288,6 @@ and systems based on
 .IR "SVR 4.2 MP" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
 Symbol
 .BR streams_mpsleep ()
 is provided for source level compatibility with
@@ -200,9 +297,9 @@ for the purpose of porting
 drivers and modules to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR HP-UX \(rg
@@ -216,9 +313,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR "SVR 4.2"

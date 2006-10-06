@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_reallocb.9.man,v 0.9.2.6 2006/10/05 12:15:43 brian Exp $
+.\" @(#) $Id: mi_reallocb.9.man,v 0.9.2.7 2006/10/06 12:13:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_reallocb.9.man,v $
+.\" Revision 0.9.2.7  2006/10/06 12:13:04  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:15:43  brian
 .\" - updates for release
 .\"
@@ -85,7 +90,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B mi_reallocb
-\-
+\- reallocate a \fISTREAMS\fP message block
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,9 +111,11 @@ sort-adjacent-labels
 .TP
 .I mp
 a pointer to the message block to reallocate from.
+.PD 0
 .TP
 .I size
 the new size of the message block to reallocate.
+.PD
 .\"
 .\"
 .SH INTERFACE
@@ -120,36 +127,102 @@ DDI.
 .SH DESCRIPTION
 .PP
 .BR mi_reallocb ()
+attempts to reallocate the passed in message block,
+.IR mp ,
+for use as a message block of size,
+.IR size .
+If
+.I mp
+is
+.BR NULL ,
+or if
+.I mp
+cannot be reallocated, a new block is allocated using
+.BR allocb (9)
+and then
+.BR freemsg (9)
+is called on
+.IR mp .
+.PP
+The message block,
+.IR mp ,
+is deemed unusable under the following conditions:
+.IP \(bu \w'\(bu\(em'u
+.I mp
+is
+.BR NULL .
+.IP \(bu
+.I size
+is bigger than a
+.BR FASTBUF ,
+and the real size of the data block attached to
+.I mp
+is smaller than
+.IR size .
+.IP \(bu
+If the number of references to the data block
+.RI ( mp->b_datap->db_ref )
+is greater than one.
+.IP \(bu
+If the data block is an external data buffer (\fImp->b_datap->db_frtnp\fR != \fBNULL\fP).
+.PP
+Otherwise, the message block is placed into a form as though it was freshly
+allocated with
+.BR allocb (9).
+.PP
+All unused or unsuitable message blocks are always freed.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mi_reallocb ()
+can be used in a half-hearted attempt to increase the probability of acquiring
+a buffer and reducing the probability of the necessity of generating a buffer
+callback under memory pressure.  This is a highly questionable practise and it
+impairs performance for the most part.  It is preferable to simply use
+.BR allocb (9)
+and
+.BR bufcall (9)
+if necessary.
+.BR allocb (9)
+in particular is highly optimized.
 .\"
 .\"
 .SH RETURN
 .PP
 When
 .BR mi_reallocb ()
-succeeds, it returns 
-.BR true  " (1);
+succeeds, it returns a pointer to the reallocated buffer that may or may not
+be the same as the value passed in as
+.IR mp ;
 when it fails, it returns
-.BR false " (0).
+.BR NULL .
+The message associated with the passed in message pointer,
+.IR mp ,
+is always freed with
+.BR freemsg (9).
 .\"
 .\"
 .SH ERRORS
 .PP
 .BR mi_reallocb ()
-fails when 
+fails when the passed in message is unusable and allocation of a new message
+block fails.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR mi_reallocb ()
-can be called from
+can be called from any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_reallocb ()
+is MP-safe.  The caller is responsible for ensuring exclusive access to the
+passed in message pointer (with the exception that if
+.I db_ref
+is greater than one, the passed in message will not be used).
 .\"
 .\"
 .SH NOTICES
@@ -177,10 +250,18 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_reallocb ()
+simply checks the conditions listed, frees the passed in message block if it
+is unusable and allocates another, or returns a clean copy of the initial
+passed in message block as though it were freshly allocated by
+.BR allocb (9).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR allocb (9),
+.BR freemsg (9),
+.BR bufcall (9),
 .BR mpscompat (9),
 .BR aixcompat (9),
 .BR maccompat (9),
@@ -212,8 +293,10 @@ function and should not be used by portable
 .I STREAMS
 drivers and modules.
 The more common
-.BR zzz ()
-function should be used in its stead.
+.BR allocb (9)
+and
+.BR bufcall (9)
+functions should be used in its stead.
 .IP \(em
 .BR mi_reallocb ()
 is provided for source level compatibility with
@@ -225,7 +308,7 @@ drivers to
 Because internal structures and definitions for
 .BR "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR MPS \(rg,

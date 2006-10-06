@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ATOMIC_INT_INIT.9.man,v 0.9.2.12 2006/10/05 12:15:40 brian Exp $
+.\" @(#) $Id: ATOMIC_INT_INIT.9.man,v 0.9.2.13 2006/10/06 12:12:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:40 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:12:58 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ATOMIC_INT_INIT.9.man,v $
+.\" Revision 0.9.2.13  2006/10/06 12:12:58  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
 .\" Revision 0.9.2.12  2006/10/05 12:15:40  brian
 .\" - updates for release
 .\"
@@ -169,7 +174,7 @@ is a
 function:
 .B _SVR4_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SVR4
 or
@@ -226,9 +231,9 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
-lfs
+@PACKAGE@
 .]
 differ from that of
 .IR "SVR 4.2"

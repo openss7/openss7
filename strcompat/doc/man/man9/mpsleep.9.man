@@ -1,1 +1,1 @@
-.so man9/streams_mpsleep.9.man
+.so man9/sleep.9.man
