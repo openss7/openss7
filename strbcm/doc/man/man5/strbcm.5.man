@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strbcm.5.man,v 0.9.2.1 2006/09/29 11:40:00 brian Exp $
+.\" @(#) $Id: strbcm.5.man,v 0.9.2.2 2006/10/06 12:18:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/29 11:40:00 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:18:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strbcm.5.man,v $
+.\" Revision 0.9.2.2  2006/10/06 12:18:46  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\"
 .\" Revision 0.9.2.1  2006/09/29 11:40:00  brian
 .\" - new files for strtty package and manual pages
 .\"
@@ -81,23 +85,82 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B strbcm
-\- \fISTREAMS\fR Binary Compatibility Module package
+.B @PACKAGE@
+\- @PACKAGE_TITLE@ package
 .\"
 .\"
-.SH SYNOPSIS
-.HP
-.B cd /usr/src/strbcm
-.br
-.B ./configure
+.\".SH SYNOPSIS
+.\".HP
+.\".B cd /usr/src/strbcm
+.\".br
+.\".B ./configure
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.B "Linux Fast-STREAMS" .
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.I @PACKAGE_TITLE@
+package provides
+.I STREAMS
+modules and drivers, programs and daemons for the compilation
+of externally supplied source and binary
+.I STREAMS
+modules.
+.PP
+The
+.I @PACKAGE_TITLE@
+package includes
+kernel modules,
+.I "SVR 4.2"
+.I STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and
+development environment for the development and execution of
+.I STREAMS
+modules and drivers.  This package contains primarily a framework for the
+compilation and linkage of externally supplied source and binary modules.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targetted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.PP
+This package is currently incomplete.  It is being released as a
+reference point for the community.  If you are interested in completion
+of this package, contact
+.RB < info@openss7.com >.
 .\"
 .\"
 .SH "PACKAGE CONTENTS"
 .PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package contains the following manual pages:
+.HP
+.BR tstdrv (4)\ \-\ \c
+test driver.
+.PD 0
+.HP
+.BR tstmod (4)\ \-\ \c
+test module.
+.HP
+.BR strbcm (5)\ \-\ \c
+@PACKAGE@-@VERSION@ package.
+.HP
+.BR strbcm_mknod (8)\ \-\ \c
+create @PACKAGE@ devices.
+.HP
+.BR test-bcm (8)\ \-\ \c
+test case executable.
+.PD
 .\"
 .\"
 .\".SH NOTICES
@@ -110,26 +173,47 @@ sort-adjacent-labels
 .\"
 .SH DEVICES
 .PP
+The
+.BR testdrv (4)
+driver.
 .\"
 .\"
-.SH FILES
+.SH MODULES
 .PP
+The
+.BR testmod (4)
+module.
+.\"
+.\"
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR tstdrv (4),
+.BR tstmod (4),
+.BR strbcm_mknod (8),
+.BR test-bcm (8).
 .\"
 .\"
-.SH COMPATIBILITY
-.PP
+.\".SH COMPATIBILITY
+.\".PP
 .\"
 .\"
-.SH CONFORMANCE
-.PP
+.\".SH CONFORMANCE
+.\".PP
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B @PACKAGE@
+package is part of OpenSS7
+.B "Linux Fast-STREAMS" .
+.[
+LfS
+.]
 .\"
 .\"
 .[

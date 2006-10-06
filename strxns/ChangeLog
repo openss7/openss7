@@ -1,3 +1,7 @@
+2006-10-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man7/DL_XID_CON.7.man: corrected for make check
+
 2006-10-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

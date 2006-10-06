@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ldterm.4.man,v 0.9.2.2 2006/10/02 11:32:13 brian Exp $
+.\" @(#) $Id: ldterm.4.man,v 0.9.2.3 2006/10/06 12:18:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/02 11:32:13 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:18:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ldterm.4.man,v $
+.\" Revision 0.9.2.3  2006/10/06 12:18:59  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\"
 .\" Revision 0.9.2.2  2006/10/02 11:32:13  brian
 .\" - changes to get master builds working for RPM and DEB
 .\" - added outside licenses to package documentation
@@ -882,28 +886,37 @@ euclook(e)
 .RE
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
-.SH MODULES
-.PP
+.\".SH MODULES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR pckt (4),
+.BR ptc (4),
+.BR ptem (4),
+.BR ptm (4),
+.BR ptmx (4tty),
+.BR pts (4tty),
+.BR pty (4),
+.BR ttcompat (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pty.4.man,v 0.9.2.1 2006/09/29 11:40:04 brian Exp $
+.\" @(#) $Id: pty.4.man,v 0.9.2.2 2006/10/06 12:18:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/29 11:40:04 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:18:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pty.4.man,v $
+.\" Revision 0.9.2.2  2006/10/06 12:18:59  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\"
 .\" Revision 0.9.2.1  2006/09/29 11:40:04  brian
 .\" - new files for strtty package and manual pages
 .\"
@@ -87,6 +91,7 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .HP
+.BI "int fd = open(" \fR\(lq/dev/ptmx\(rq\fP ", " \fRO_RDWR\fP );
 .\"
 .\"
 .SH DESCRIPTION
@@ -233,44 +238,6 @@ set to
 .RB [ EAGAIN ]
 if there is internal flow control.
 .PP
-The master driver supports the
-.BR ISPTM " and " UNLKPT
-input-output controls that are used by the functions
-.BR grantpt (3),
-.BR unlockpt (3),
-and
-.BR ptsname (3).
-The input-output control
-.B ISPTM
-determines whether the file descriptor is that of an open master device.  On success, it returns the
-major/minor number (type
-.BR dev_t )
-of the master deivce which can be used to determine the name of the corresponding slave device.  The
-input-output control
-.B UNLKPT
-unlocks the master and slave devices.  It returns zero
-.RB ( 0 )
-on success.  On failure, the
-.IR errno (3)
-is set to
-.RB [ EINVAL ]
-indicating that the master device is not open.
-The command,
-.IR command ,
-to the
-.BR ioctl (2s)
-call is either
-.BR ISPTM " or " UNLKPT
-and the
-argument, .IR arg ,
-to the
-.BR ioctl (2s)
-call is zero
-.RB ( 0 ).
-On failure, minus one
-.RB ( -1 )
-is returned.
-.PP
 When data are written to the master side, the entire block of data written is treated as a single
 line.  The slave side process reading the terminal receives the entire block of data.  Data are not
 input edited by the
@@ -292,19 +259,62 @@ The master driver and slave driver have the following characteristics:
 .IP \(bu
 .IP \(bu
 .IP \(bu
-
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH IOCTLS
 .PP
+The master driver supports the
+.BR ISPTM " and " UNLKPT
+input-output controls that are used by the functions
+.BR grantpt (3),
+.BR unlockpt (3),
+and
+.BR ptsname (3).
+The command,
+.IR command ,
+to the
+.BR ioctl (2s)
+call is either
+.BR ISPTM " or " UNLKPT
+and the
+argument,
+.IR arg ,
+to the
+.BR ioctl (2s)
+call is zero
+.RB ( 0 ).
+On failure, minus one
+.RB ( -1 )
+is returned.
 .\"
-.\"
-.SH NOTICES
+.SS ISPTM
 .PP
+The input-output control
+.B ISPTM
+determines whether the file descriptor is that of an open master device.  On success, it returns the
+major/minor number (type
+.BR dev_t )
+of the master deivce which can be used to determine the name of the corresponding slave device.
+.\"
+.SS UNLKPT
+.PP
+The input-output control
+.B UNLKPT
+unlocks the master and slave devices.  It returns zero
+.RB ( 0 )
+on success.  On failure, the
+.IR errno (3)
+is set to
+.RB [ EINVAL ]
+indicating that the master device is not open.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH EXAMPLES
@@ -329,12 +339,24 @@ ioctl(fdm, I_PUSH, "pckt");      /* push pckt */
 .RE
 .\"
 .\"
-.SH MODULES
-.PP
+.\".SH MODULES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR grantpt (3tty),
+.BR ptsname (3tty),
+.BR unlockpt (3tty),
+.BR ldterm (4),
+.BR pckt (4),
+.BR ptc (4),
+.BR ptem (4),
+.BR ptm (4),
+.BR ptmx (4tty),
+.BR pts (4tty),
+.BR ttcompat (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strconf.8.man,v 0.9.2.14 2006/04/05 09:43:51 brian Exp $
+.\" @(#) $Id: strconf.8.man,v 0.9.2.15 2006/10/06 12:18:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:51 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:18:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strconf.8.man,v $
+.\" Revision 0.9.2.15  2006/10/06 12:18:50  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\"
 .\" Revision 0.9.2.14  2006/04/05 09:43:51  brian
 .\" - moved .so line and updated headers
 .\"
@@ -86,12 +90,6 @@ sort-adjacent-labels
 .\"
 .\"
 .SH SYNOPSIS
-.\"
-.\"
-.SH DESCRIPTION
-.\"
-.\"
-.SH OPTIONS
 .HP 12
 \fBstrconf\fR [\fIoptions\fR] [\fICONFIGFILE\fR \fI...\fR]
 .PD 0
@@ -102,6 +100,20 @@ sort-adjacent-labels
 .HP 12
 \fBstrconf\fR {\fB-C\fR|\fB--copying\fR}
 .PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B strconf
+is a
+.I STREAMS
+configuration utility that is used with all
+.B OpenSS7
+.I STREAMS
+packages.
+.\"
+.\"
+.SH OPTIONS
 .TP
 \fB-b\fR, \fB--basemajor\fR \fIMAJOR\fR
 Set the base major number for automatic assignment of major device numbers.

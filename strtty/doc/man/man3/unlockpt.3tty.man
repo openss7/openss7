@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: unlockpt.3tty.man,v 0.9.2.1 2006/10/03 13:24:30 brian Exp $
+.\" @(#) $Id: unlockpt.3tty.man,v 0.9.2.2 2006/10/06 12:18:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,15 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:24:30 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/06 12:18:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: unlockpt.3tty.man,v $
+.\" Revision 0.9.2.2  2006/10/06 12:18:57  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\"
 .\" Revision 0.9.2.1  2006/10/03 13:24:30  brian
 .\" - file additions and removals for make check target
 .\"
@@ -161,8 +165,8 @@ intput-output control for master pseudo-terminal devices,
 .BR pty (4).
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -205,8 +209,8 @@ could be returned by
 .BR grantpt ().
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
@@ -216,8 +220,8 @@ could be returned by
 The master pseudo-device terminal clone device node.
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"

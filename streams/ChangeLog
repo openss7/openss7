@@ -1,3 +1,13 @@
+2006-10-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated for release
+	* NEWS: updated for release
+	* README: updated for release
+	* THANKS: updated for release
+	* doc/man/man8/strconf.8.man: updates for make check
+	* doc/man/man9/cmn_err.9.man: updates for make check
+	* doc/man/man9/strlog.9.man: updates for make check
+
 2006-10-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
