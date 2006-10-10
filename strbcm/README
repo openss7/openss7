@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Binary Compatibility Modules -- read me first file.  2006-10-03
-$Id: README,v 0.9.2.11 2006/10/05 12:15:09 brian Exp $
+OpenSS7 STREAMS Binary Compatibility Modules -- read me first file.  2006-10-04
+$Id: README,v 0.9.2.12 2006/10/10 10:39:43 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -11,6 +11,21 @@ The `OpenSS7 STREAMS Binary Compatibility Modules' package provides
 "STREAMS" modules and drivers, programs and daemons for the compilation
 of externally supplied source and binary "STREAMS" modules.
 
+The package currently includes the following "STREAMS" kernel modules
+and drivers:
+
+     - `streams_tstdrv.ko' `/dev/tst'
+     - `streams_tstmod.ko' `module'
+
+`tstdrv(4)'
+     The `tstdrv(4)' provides a test driver for testing the packaging
+     system.
+
+`tstmod(4)'
+     The `tstmod(4)' provides a test module for testing the packaging
+     system.
+
+
 The `OpenSS7 STREAMS Binary Compatibility Modules' package includes
 kernel modules, `SVR 4.2' "STREAMS" drivers, modules, libraries,
 utilities, test programs, daemons, and development environment for the
@@ -19,7 +34,7 @@ package contains primarily a framework for the compilation and linkage
 of externally supplied source and binary modules.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
-kernels and was targetted at `ix86', `x86_64', `ppc' and `ppc64'
+kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
 architectures, but should build and install for other architectures as
 well.
 
@@ -30,7 +45,7 @@ of this package, contact <info@openss7.com>.
  Release
 --------
 
-This is the `strbcm-0.9.2.2' package, released 2006-10-03.  This
+This is the `strbcm-0.9.2.2' package, released 2006-10-04.  This
 `0.9.2.2' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

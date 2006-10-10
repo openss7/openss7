@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Binary Compatibility Modules -- history of user visible changes.  2006-10-03
-$Id: NEWS,v 0.9.2.16 2006/10/05 12:15:09 brian Exp $
+OpenSS7 STREAMS Binary Compatibility Modules -- history of user visible changes.  2006-10-04
+$Id: NEWS,v 0.9.2.17 2006/10/10 10:39:43 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -12,7 +12,7 @@ OpenSS7 STREAMS Binary Compatibility Modules package.
 
    * Now builds 32-bit compatibility libraries and tests them against
      64-bit kernel modules and drivers.  The `make installcheck' target
-     will now automagically test both 64-bit native and 32-bit
+     will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
    * Added versioning of all library symbols.
@@ -32,7 +32,7 @@ OpenSS7 STREAMS Binary Compatibility Modules package.
      `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
 
    * Improved compiler flag generation and optimizations for recent
-     `gcc' compilers and some idiosynchratic behaviour for some
+     `gcc' compilers and some idiosyncratic behaviour for some
      distributions (primarily SUSE).
 
    * Optimized compilation is now available also for user level
@@ -42,7 +42,7 @@ OpenSS7 STREAMS Binary Compatibility Modules package.
    * Added `--disable-devel' `configure' option to suppress building
      and installing development environment.  This feature is for
      embedded or pure runtime targets that do not need the development
-     enivironment (static libraries, manual pages, documentation).
+     environment (static libraries, manual pages, documentation).
 
    * Added `send-pr' script for automatic problem report generation.
 
@@ -53,11 +53,12 @@ Initial autoconf/RPM packaging of the `strbcm' release.
 
 This is the initial release of the `OpenSS7 STREAMS Binary
 Compatibility Modules' package for `Linux Fast-STREAMS'.  The ability
-to include precompiled STREAMS binaries was formerly part of the `Linux
-STREAMS' package, however, as the ability is also applicable to `Linux
-Fast-STREAMS', it was removed into a separate package.  Once `Linux
-Fast-STREAMS' is production grade, this binary compatibility suite will
-be rolled back into the streams package as `LiS' is deprecated.
+to include pre-compiled STREAMS binaries was formerly part of the
+`Linux STREAMS' package, however, as the ability is also applicable to
+`Linux Fast-STREAMS', it was removed into a separate package.  Once
+`Linux Fast-STREAMS' is production grade, this binary compatibility
+suite will be rolled back into the streams package as `LiS' is
+deprecated.
 
 -----
 
