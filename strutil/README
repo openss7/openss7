@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Utilities -- read me first file.  2006-10-03
-$Id: README,v 0.9.2.12 2006/10/05 12:21:33 brian Exp $
+OpenSS7 STREAMS Utilities -- read me first file.  2006-10-04
+$Id: README,v 0.9.2.13 2006/10/10 10:48:19 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
 ==========================
 
 The `OpenSS7 STREAMS Utilities' package provides "STREAMS" modules and
-drivers, programs and daemons for adminstration and handling of the
+drivers, programs and daemons for administration and handling of the
 "STREAMS" subsystem.
 
      The `strutil' package is currently incomplete.  The purpose of the
@@ -27,14 +27,14 @@ of "STREAMS" modules and drivers.  This package contains primarily
 user-space utilities and test programs.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
-kernels and was targetted at `ix86', `x86_64', `ppc' and `ppc64'
+kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
 architectures, but should build and install for other architectures as
 well.
 
  Release
 --------
 
-This is the `strutil-0.9.2.4' package, released 2006-10-03.  This
+This is the `strutil-0.9.2.4' package, released 2006-10-04.  This
 `0.9.2.4' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
