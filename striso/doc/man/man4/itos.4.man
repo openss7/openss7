@@ -1,0 +1,388 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: itos.4.man,v 0.9.2.1 2006/10/10 10:12:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/10 10:12:38 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: itos.4.man,v $
+.\" Revision 0.9.2.1  2006/10/10 10:12:38  brian
+.\" - added losts of striso files
+.\"
+.\" Revision 0.9.2.2  2006/10/03 13:52:18  brian
+.\" - changes to pass make check target
+.\" - added some package config.h files
+.\" - removed AUTOCONFIG_H from Makefile.am's
+.\" - source code changes for compile
+.\" - added missing manual pages
+.\" - renamed conflicting manual pages
+.\" - parameterized include Makefile.am
+.\" - updated release notes
+.\"
+.\" Revision 0.9.2.1  2006/04/11 18:22:13  brian
+.\" - added manual pages and references
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH ITOS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B isos, itos
+\- ISO Transport over SCTP (ISOS/ITOS)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ISOS
+is an implementation of ISO Transport over SCTP (ISOS) similar to that
+described for TCP in RFC 983,
+.[
+rfc983
+.]
+and superseded by RFC 1006.
+.[
+rfc1006
+.]
+.B ITOS 
+is an implementation of ISO Transport over SCTP (ITOS) similar to that
+described for TCP in RFC 2126.
+.[
+rfc2126
+.]
+In accordance with the naming convention for the TCP versions of the
+protocols, the SCTP version
+.I ISOS
+refers to the RFC 1006
+.[
+rfc1006
+.]
+flavor for carrying TP0 only, and the
+.I ITOS
+refers to the RFC 2126
+.[
+rfc2126
+.]
+flavor for carrying TP2 as well.
+.PP
+Regardless of the naming differences, these RFCs describe the use of IS 8073
+.[
+ISO/IEC 8073
+.]
+ISO Transport Class 0 over TCP/IP (ISOT/ITOT) by using TCP/IP as a
+Connection-oriented Network service Provider instead of ISO CONS.
+.[
+x213
+.]
+They describe the adaptation of TCP to an ISO CONS
+.[
+x213
+.]
+network service provider through the use of a 4 byte header used to delimit
+NPDUs inside of the TCP stream.
+RFC 983
+.[
+rfc983
+.]
+and RFC 1006
+.[
+rfc1006
+.]
+provided for ISO Transport Class 0 over TCP (or UDP under
+protest) (ISOT) on port number 102.
+RFC 1006
+is a standard (STD 35).
+.PP
+RFC 2126
+.[
+rfc2126
+.]
+also provides for ISO Transport Class 0 over TCP (or UDP under protest) (ISOT)
+on port number 102.  But, in addition to these services provided by RFC
+1006/STD 35, RFC 2126 also provides for ISO Transport Class 2 over TCP (or UDP
+under protest) (ITOT), using independent TCP/IP connections to port number
+399, and also supports both IPv4 and IPv6.
+.PP
+In a similar way
+.BR ISOS / ITOT
+provide a mechanism for SCTP (Stream Control Transmission Protocol, RFC 2960
+.[[
+rfc2960
+.]]).
+Under SCTP, however, the use of the 4-byte header to delimit NPDUs is no
+longer necesary, as SCTP preserves record boundaries.  Also, the TCP flavor
+must open a separate TCP stream for each ISO CONS VC, whereas SCTP can support
+multiple VCs on a single association.
+Also, there is no reason why SCTP cannot suport the other transport protocol
+classes such as TP1 TP3 and TP4.
+.\"
+.\"
+.SH USAGE
+.PP
+Not impelmented, but here is a stab at explaining the design:
+.PP
+The following steps will be taken:
+.IP 1. \w'0.\(em'u
+A TP connection manager opens a connection management Stream on the TP
+multiplexing driver and listens for requests for the establishment of network
+connections.
+.IP 2.
+A TP user opens an upper Stream for ISO Transport Class 0 or ISO Transport
+Class 2.  The TP user then attempts t listen on the transport endpoint or
+connect the transport endpoint.  If a suitable (determined by address format,
+TSAP, and ownership) network connection is not available, it requests a
+network connection from the connection manager. (TP2 performs multiplexing, so
+it is possible that many TP2 Streams could be opened and served by the same
+network connection.)
+.IP 3.
+When the connection manager receives the request, it uses the address format,
+TSAP and qos parameters to determin if an ISOS or ITOS network connection is
+requested.
+.IP 4.
+If an ISOS or ITOS network connection is requested, the connection manager
+opens an
+.BR sctp (4),
+.BR tcp (4),
+or
+.BR udp (4)
+Stream to the requested address and connects the Stream to the appropriate
+port number (102 for ISOS TP0 and 399 for ITOS TP2).
+.IP 5.
+The connection manager then pushes the ISOS or ITOS moudl on the Stream.  This
+transforms the Stream into an ISO CONS
+.[
+x213
+.]
+provider and presents the
+.BR npi (7)
+service interface at the upper boundary.
+.IP 6.
+The connection manager then links the ISOS or ITOS Stream under the TP
+multiplexing driver and configures the Stream with the TP driver in response
+to the network connection request.
+.IP 7.
+TP then proceeds as normal, unaware that SCTP is providing the ISO CONS
+.[
+x213
+.]
+service.
+.\"
+.\"
+.SH INTERFACE
+.PP
+The service interface for the ISOS and ITOS modules at the upper boundary
+(write queue) is the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+The service interace for the ISOS and ITOS modules at the lower boundary (read
+queue) is the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.\"
+.\"
+.SH ADDRESSES
+.PP
+Generic string addresses for ISOS and ITOS are described in RFC 1278.
+.[
+rfc1278
+.]
+.PP
+OSI NSAP addresses for ISOS and ITOS are described for IPv4 in RFC 1277,
+.[
+rfc1277
+.]
+for IPv6 in RFC 1888
+.[
+rfc1888
+.]
+superseded by IPv4 and IPv6 in RFC 4548.
+.[
+rfc4548
+.]
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B ISOS
+and
+.B ITOS
+modules support the ISO CONS
+options described in X.213
+.[
+x213
+.]
+and X.223.
+.[
+x223
+.]
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+The
+ISOS and ITOS modules interwork
+.BR npi (7)
+primitives from its upper interface (write queue) to 
+.BR tpi (7)
+primitives at its lower interface (read queue).
+This section describes only the upper interface.  For a description of the
+lower interface, see
+.BR sctp (4).
+.SS N_BIND_REQ\fR(7), \fPN_BIND_ACK\fR(7)
+.\"
+.\"
+.SH IOCTLS
+.PP
+ISOS and ITOS do not support any input-output controls of their own.
+.\"
+.\"
+.SH NOTICES
+.PP
+These modules are not implemented.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+These modules are not implemented.
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.B isos
+the ISOS module is a
+.I STREAMS
+module named
+.RI \(lq isos \(rq.
+.TP
+.B itos
+the ITOS module is a
+.I STREAMS
+module named
+.RI \(lq itos \(rq.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/sctp_t
+The
+.B sctp (4)
+device opened onto which ISOS or ITOS is pushed.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.IR ISO (4).
+.\"
+.\"
+.SH BUGS
+.PP
+These modules are not implemented and so cannot have any bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation of ISOS and ITOS is specific to
+.BR "@PACKAGE_TITLE@" ,
+but is compatible with the comparable
+.BR isot (4)
+and
+.BR itot (4)
+implementations for TCP/IP.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+ISOS and ITOS have not yet been subsjected to standardization.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ISOS " and " ITOS
+are new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

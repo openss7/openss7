@@ -1,0 +1,372 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: xos.4.man,v 0.9.2.1 2006/10/10 10:12:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/10 10:12:38 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: xos.4.man,v $
+.\" Revision 0.9.2.1  2006/10/10 10:12:38  brian
+.\" - added losts of striso files
+.\"
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH XOS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B xos
+\- X.25 over SCTP (XOS)
+.\"
+.\"
+.SH DESCRIPTION
+.B XOS
+is an implementation of X.25 PLP over SCTP (XOS) simular to that which is
+described in RFC 1613
+.[
+rfc1613
+.]
+for TCP.
+RFC 1613
+.[
+rfc1613
+.]
+describes use of ISO 8881
+.[
+ISO/IEC 8881:1989
+.]
+X.25
+.[
+x25
+.]
+Packet Layer Protocol over TCP (XOT) using independent TCP connections
+to Registered TCP Port Number 1998 as VCs.
+.PP
+A similar approach using SCTP (XOS) on the same IANA registered port number
+1998, could prove more viable.  SCTP supports multiple independent Streams each
+of which can be paired to support multiple VCs on the same SCTP association.
+This would obviate the need as in TCP to esablish a new transport connection
+for each VC.  X.25 normally only supports about 4096 VCs.  An SCTP association
+can allocate up to 16384 independent streams and could easily allocate a stream
+per VC in each direction.  This would permit forming an SCTP association per
+interface pairing instead an alleviate the need to generate pseudo-interface
+identifiers for each TCP connection.  One local and remote interface identifier
+could be assigned to the SCTP association and and VCs assigned to streams
+according to their natural numbering.
+.\"
+.\"
+.SH USAGE
+.PP
+Not yet implemented, but here is a stab at explaining the design:
+.PP
+The following steps would be taken:
+.IP 1. \w'0.\(em'u
+A user application or configuration daemon would open
+.BR sctp (4)
+Streams and connect them to hosts that provide X.25 interface connectivity.
+.IP 2.
+One
+.BR sctp (4)
+Stream would be opened for each remote interface.
+Connections would be made to IANA regsitered port number 1998.
+.IP 3.
+The configuration program pushes the
+.B XOS
+pushable
+.I STREAMS
+module on the
+.BR sctp (4)
+Stream and configures it with a remote interface identifier using either
+.BR dlpi (7)
+primitives or an input-output control.
+This results in the negotiation of the remote interface identifier with the
+remote host using SCTP stream 0.
+.IP 4.
+The resulting
+.BR dlpi (7)
+Stream can be linked beneath an X.25 PLP,
+.BR plp (4),
+multiplexing driver to provide data link services to the X.25 PLP.
+.IP 5.
+The
+.BR plp (4)
+routing tables can be updated to provide access to X.25 PLP upper multiplex
+Streams to the DLPI driver beneath using configurtion commands normal to the
+X.25 PLP multiplexing driver.
+.IP 6.
+X.25 routing functions can be performed using the DLPI Stream from within the
+X.25 PLP driver without the user having to further open an NPI Stream.
+.IP 7.
+When (and if) it comes time to establish an X.25 SVC, the user opens an X.25
+PLP Stream (presenting the
+.BR npi (7)
+interface) and binds and listens, or connects, the X.25 PLP or X.75 NPI Stream
+as normal.
+.IP 8.
+The
+.B XOS
+module intercepts information from the X.25 PLP packets and performs the
+actions necessary to map packets to SCTP Streams and adjust packet headers as
+required to perform the convergence functions in a manner similar to that
+described for TCP in RFC 1613.
+.[
+rfc1613
+.]
+.\"
+.\"
+.SH INTERFACE
+.PP
+The service interface to the
+.B xos
+module is the
+.I Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+Type II interface.
+.\"
+.\"
+.SH ADDRESSES
+.PP
+The
+.B xos
+address format is a DLSAP.  In the case of
+.BR xos ,
+the DLSAP is an interface identifier or an IP address and port number.
+.\"
+.\"
+.SH OPTIONS
+.PP
+All OSI DLPI options apply but perhaps not all can be supported by SCTP.  For
+SCTP it would be easier to translate QOS parameters into SCTP protocol
+parameters than it is for TCP.
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+.BR dlpi (7)
+connection-oriented primitives.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.BR dlpi (7)
+defined input-output controls.
+.\"
+.\"
+.SH NOTICES
+.PP
+This module is yet to be implemented.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Implementing
+.B xos
+should be less cumbersome than
+.BR xot (4).
+.B XOS
+could be implemented as multiplexing driver under
+.IR STREAMS .
+An
+.BR sctp (4)
+Stream would be opened and then linked under the
+.B XOS
+driver, either permanently or temporarily.
+Once linked, the application would be able to open the
+.B /dev/xos
+driver, presenting an
+.BR npi (7)
+interface, and bind the Stream to an interface identifier or IP address and a
+virtual call or other NSAP.
+.PP
+Another approach would be to link the
+.BR sctp (4)
+Stream under a multiplexing driver presenting a
+.BR dlpi (7)
+interface on the upper side of the multiplex.  Then
+.BR dlpi (7)
+streams could be opened and connected in much the same fashion as an X.25 LAPB
+DLPI Stream would.  These Streams could then be linked under a standard X.25
+PLP multiplex presenting an
+.BR npi (7)
+interface at its upper boundary (for X.75 Multi-Link Protocol), or could have
+an X.25 PLP module pushed over it (for X.25 Single-Link Protocol).
+.\"
+.\"
+.SH FILES
+.TP
+.BI /lib/modules/ "`uname -r`" /striso/streams_xos.ko
+the kernel module for the
+.B xos
+.I STREAMS
+module and multiplexing driver.
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.BR xosmod
+is a
+.I STREAMS
+pushable module name
+.IR \(lq xosmod \(rq
+that can be pushed over an
+.BR sctp (4)
+Stream to form an ISO CODLS for use with X.25 SLP or X.75 MLP.
+.TP
+.BR plpmod (4)
+is a
+.I STREAMS
+pushable module named
+.RI \(lq plpmod \(rq.
+This module can be pushed over an
+.B XOS
+Stream presenting the
+.BR dlpi (7)
+type 2 for X.25 SLP.
+.\"
+.\"
+.SH DEVICES
+.TP
+.B /dev/sctp
+The SCTP device over which
+.B xos
+is pushed.
+.TP
+.B /dev/xos
+is a multiplexing driver that can have
+.BR sctp (4)
+Streams linked beneath it to provide an ISO CODLS
+.BR dlpi (7)
+interface that can then be used with X.25 PLP.
+.TP
+.B /dev/plp
+is a multiplexing driver that can have
+.BR dlpi (7)
+streams providing ISO CODLS beneath it to provide either X.25 SLP or X.75 MLP.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR XOL (7),
+.BR ISOT (7),
+.BR ITOT (7),
+.BR ISO-IP (7),
+.BR ISO-TP4 (7).
+.\"
+.\"
+.SH BUGS
+.PP
+This manpage and the implementation is incomplete.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None.  I know of no other
+.I STREAMS
+or
+.I Sockets
+implementations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+RFC 1613,
+.[
+rfc1613
+.]
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+X.25,
+.[
+x25
+.]
+X.25 PLP.
+.[
+ISO/IEC 8881:1989
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B xot
+module is new to
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,221 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: getnamebynsap.3.man,v 0.9.2.1 2006/10/10 10:12:33 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/10 10:12:33 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: getnamebynsap.3.man,v $
+.\" Revision 0.9.2.1  2006/10/10 10:12:33  brian
+.\" - added losts of striso files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH GETNAMEBYNSAP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B getnamebynsap
+\- get the host name corresponding to an NSAP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <tiuser.h>
+.br
+.B #include <osi.h>
+.HP
+.BI "int getnamebynsap(int " hostname_maxlen ", char *" hostname ", char *" nsap ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I hostname_maxlen
+the maximum length of the host name buffer pointed to by
+.IR hostname .
+.TP
+.I hostname
+a pointer to a buffer into which to receive the (null terminate) hostname string.
+.TP
+.I nsap
+a pointer to a buffer containing the NSAP to convert.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR getnamebynsap ()
+uses the NSAP address pointed to by the
+.I nsap
+argument to retrieve the host name into the buffer located at
+.I hostname
+of maximum length
+.IR hostname_maxlen .
+.\"
+.\"
+.SH RETURN
+.PP
+When successful,
+.BR getnamebynsap ()
+returns the positive length of the returned host name in octets;
+when unsuccessful, minus one
+.RB ( -1 ).
+.\"
+.\"
+.SH ERRORS
+.PP
+When unsuccessful,
+.BR getnamebynsap ()
+returns minus one,
+.RB ( -1 )
+and sets
+.IR errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following example demonstrates placing the local NSAP in a netbuf and using
+it to get the host name of the local host:
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/net/oclt/host
+configuration file for host name to NSAP conversion.
+.TP
+.B /etc/net/oclt/services
+configuration file for Service Name to TSEL conversion.
+.TP
+.BR /usr/lib/libosi.a ", " /usr/lib/libosi.so
+the OSI library containing the
+.BR getnamebynsap ()
+function.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR libosi (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR getnamebynsap ()
+is compatible with
+.I SunLink OSI
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is a
+.IR Solaris \(rg-specific
+function that is implemented by
+.B @PACKAGE_TITLE@
+to assist with porting
+.I SunLink OSI
+applications programs to
+.BR "@PACKAGE_TITLE@" .
+.IP ""
+.BR getnamebynsap ()
+will not be used by portable programs.
+.IP \(em
+Although not POSIX, the Sun TI-RPC function
+.BR netdir_getbyaddr (3)
+is probably more portable.
+.IP ""
+.BR getnamebynsap ()
+will not be used by portable programs.
+.PP
+See
+.BR libosi (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I SunLink OSI
+documentation.
+.[
+sunlink
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR getnamebynsap ()
+first appeared in
+.IR "SunLink OSI" .
+.[
+sunlink
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

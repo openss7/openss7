@@ -1,0 +1,666 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: cons.4.man,v 0.9.2.1 2006/10/10 10:12:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/10 10:12:38 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: cons.4.man,v $
+.\" Revision 0.9.2.1  2006/10/10 10:12:38  brian
+.\" - added losts of striso files
+.\"
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH CONS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B cons
+\- ISO Connection-Oriented Network Service (CONS)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <unistd.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/cons.h>
+.PP
+.IB cons_stream " = open(" \(lq/dev/cons\(rq ", O_RDWR);
+.PP
+.IB cons_stream " = open(" \(lq/dev/cons_cm\(rq ", O_RDWR);
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B CONS
+is an implementation of X.213
+.[
+x213
+.]
+Connection-oriented Network Service (CONS).
+.PP
+There are several ways of providing the ISO CONS as follows:
+.IP 1. \w'0.\(em'u
+The classical way is using
+X.25 as described in X.223.
+.[
+x223
+.]
+This is suitable both for X.25/LAPB as described in X.223
+.[
+x223
+.]
+as well as X.25/LLC2 as described in ISO/IEC 8881.
+.[
+ISO/IEC 8881
+.]
+.IP 2.
+Another way is providing CONS over X.25, but providing X.25 using an X.25
+over TCP protocol such as
+.BR xot (4)
+as described in RFC 1613,
+.[
+rfc1613
+.]
+or a similar SCTP protocol,
+.BR xos (4).
+.IP 3.
+Another way of providing ISO CONS is to use a CONS over TCP/IP protocol,
+.BR isot (4),
+as described in RFC 1006,
+.[
+rfc1006
+.]
+or a similar SCTP protocol,
+.BR isos (4).
+This is only suitable for use by TP0.
+.IP 4.
+Another CONS over TCP/IP protocol,
+.BR itot (4),
+is described in RFC 2126,
+.[
+rfc2126
+.]
+or a similar SCTP protocol,
+.BR itos (4).
+This approach is suitable for use by TP0 or TP2 (and TP4 for SCTP).
+.\"
+.\"
+.SH USAGE
+.PP
+A user of the CONS service opens the pseudo-device driver by opening a the
+clone device
+.RB /dev/cons .
+This yields a CONS Stream.  When the user binds the Stream to a local NSAP,
+the form of the NSAP determines which of the underlying protocols are used to
+provide service to the CONS Stream.
+.PP
+A CONS Stream is associated with an underlying provider in the following
+fashion:
+.IP \(bu \w'\(bu\(em'u
+When the CONS Stream is bound, using the
+.BR N_BIND_REQ (7)
+primitive, the driver uses the NSAP to determine whether an existing provider
+exists, and if it does, the Stream is associated with the provider.  If a
+suitable provider does not yet exist, a request is issued to a connection
+manager daemon listening on the connection management Stream.
+.IP \(bu
+The connection manager satisfies requests by examining the NSAP contained in
+the
+.BR N_BIND_REQ (7),
+primitive.  The NSAP can be one of 2 forms:
+.sp
+.RS
+.IP 1. \w'0.\(em'u
+An X.121 address.
+.IP ""
+In this case the connection manager opens an X.25 PLP
+stream on the X.25 PLP device, binds the Stream appropriately according to the
+information in the
+.BR N_BIND_REQ (7)
+primitive, and then links the bound Stream under the CONS multiplexing driver.
+It responds to the request indicating the multiplexer index of the linked
+Stream.
+.IP ""
+If binding the X.25 PLP Stream failes, the connection manager responds on the
+connection management Stream with a negative acknowledgement that the CONS
+driver translates into an
+.BR N_ERROR_ACK (7)
+primitive to the CONS user.
+.IP 2.
+An RFC 1277,
+.[
+1277
+.]
+RFC 1888,
+.[
+rfc1888
+.]
+or
+RFC 4548
+.[
+rfc4548
+.]
+address.
+.IP ""
+In this case the connection manager opens an SCTP, TCP or UDP Stream and pushes
+the appropriate
+.BR isot "(4), " itot "(4), " isos "(4) or " isot (4)
+module on the Stream.
+The Stream is then bound in the same fashion as an X.25 PLP Stream using an
+.BR N_BIND_REQ (7)
+primitive.  If the Stream is bound successfully, the Stream is linked under
+the CONS multiplexing driver and the connection manager responds on the
+connection management Stream indicating the multiplexer index of the linked
+Stream.
+.IP ""
+If binding the IXOX Stream fails, the connection manager response on the
+connection managment Stream with a negative acknowledgement that the CONS
+driver translates into an
+.BR N_ERROR_ACK (7)
+primitive to the CONS user.
+.RE
+.IP \(bu \w'\(bu\(em'u
+Provider Streams may also be linked under the CONS multiplexing driver at
+configuration time using static configuration information obtained from
+configuration files.
+.IP \(bu
+Provider Streams may also be linked under the CONS multiplexing driver using
+route discovery protocols.
+.PP
+Note that the CONS driver does not perform X.25 nor IP routing.  It only
+matches CONS user Stream from the upper multiplex to provider Streams on the
+lower multiplex.  X.25 routing is performed within the X.25 PLP driver.  IXOX
+routing is performed by the TCP/IP subsystem.
+.PP
+Note also, that when the CONS connection manager opens an X.25 PLP Stream and
+binds it, that it may subsequently invoke an X.25 connection manager to
+satisfy the request in a similar fashion, but for the X.25 PLP multiplexing
+driver.
+.\"
+.\"
+.SH INTERFACE
+.PP
+The CONS user interface is the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+supporting the CONS service interface.
+.[
+x213
+.]
+.PP
+The CONS connection manager interface is a specialized interface specific to
+the CONS driver.
+.\"
+.\"
+.SH ADDRESSES
+.PP
+CONS supports X.25 addresses as defined in X.121,
+.[
+x121
+.]
+CONS NSAPs as defined in X.213,
+.[
+x213
+.]
+and Internet NSAPs as defined in RFC 1277,
+.[
+rfc1277
+.]
+RFC 1888,
+.[
+rfc1888
+.]
+and RFC 4548.
+.[
+rfc4548
+.]
+.\"
+.\"
+.SH OPTIONS
+.PP
+CONS user Stream support the full set of Quality of Service parameters as
+described in X.213;
+.[
+x213
+.]
+however, negotiation of the Qualitfy of Service parameters is performed
+between the CONS user and the underlying CONS provider.  Therefore, QOS
+parameters supported to the CONS user is dependent upon the QOS support of the
+underlying provider.
+.PP
+For example, QOS parameters included in a
+.BR N_CONN_REQ "(7), " N_CONN_RES "(7) or " N_OPTMGMT_REQ (7)
+primitive are passed to the equivalent primitives to the underlying
+provider.  Negotiation responses come directly from the underlying provider.
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+Primitives supported by CONS user Streams are the fully set of OSI conforming
+Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+primitives for Connection-oriented Network Service.
+.PP
+CONS connection management Streams support a specialized set of primitives,
+based on the NPI primitives, that provide the ability for the connection
+manager to receive requests for new connections as well as the ability to
+indicate the result of those requests.
+.PP
+CONS CM requests and responses are formatted as follows:
+.PP
+.nf
+\fC\s-1\
+struct cons_mgmt {
+    np_ulong cm_user;           /* User index */
+    np_ulong cm_prov;           /* Provider index */
+    union N_primitives cm_prim; /* Primitive */
+};
+\s+1\fP
+.fi
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+is the user index.
+.TP
+.I cm_prov
+is the provider index.
+.TP
+.I cm_prim
+is the primitive.  The exact format of the primitive and the size of the
+remainder of the structure can be determined by the
+.I cm_prim.type
+field of the
+.B N_primitives
+union.  The
+.B N_primitives
+union is defined in the
+.RB < sys/npi.h >
+header file.
+.PP
+The
+.B cons_mgmt
+structure is contained in the control part
+.RB ( M_PROTO "(9) or " M_PCPROTO (9)
+message block) of the request or response.
+Any data is contained in the data part
+.RB ( M_DATA (9)
+message blocks) of the request or response.  The type of the command is
+determined from the
+.I cm_prim.type
+field in the
+.B cons_mgmt
+structure.
+The
+.B cons_mgmt
+structure is defined in the
+.RB < sys/cons.h >
+header file.
+.PP
+Overloaded primitives are as follows:
+.TP
+.B Bind Request
+The bind request is issued to the CONS CM on the connection management Stream
+when a suitable provider could not be found to satisfy a CONS User bind
+request,
+.BR N_BIND_REQ (7).
+This primitive requires an acknowledgement by the connection manager with
+either a bind acknowledgement or an error acknowledgement.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Indicates the index within the CONS driver of the CONS User at which the
+request originated.  This is an opaque identifier that the CONS CM uses in the
+bind or error acknowledgement to identify the transaction.  The user index is
+most easily implemented as the device number of the CONS User Stream.
+.TP
+.I cm_prov
+Ignored in the bind request.
+.TP
+.I cm_prim
+Contains the
+.BR N_BIND_REQ (7)
+primitive as it was issued by the CONS User.
+.RE
+.TP
+.B Bind Acknowledgement
+The bind acknowledgement is issued by the CONS CM on the connection management
+Stream when a suitable provider has been bound and linked beneath the CONS
+multiplexing driver.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding bind request.  The user index
+is most easily implemented as the device number of the CONS User Stream.
+.TP
+.I cm_prov
+Specifies the multiplexer identifier (returned by the
+.BR I_LINK "(7) or " I_PLINK (7)
+operation) that identifies the provider Stream to which the bind ocurred.
+.TP
+.I cm_prim
+Contains the
+.BR N_BIND_ACK (7)
+primitive as it should be issued to the CONS User.
+.RE
+.TP
+.B Connection Request
+The connection request is issued to the CONS CM on the connection mangement
+Stream when a suitable provider could not be found to satify a CONS User
+connection request,
+.BR N_CONN_REQ (7).
+This primitive requires an acknowledgement by the connection manager with
+either a connection confirmation, disconnect indication, or error
+acknowledgement.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Indicates the user index from the corresponding connection request.  The user
+index is most easily implemented as the device number of the CONS User Stream.
+.TP
+.I cm_prov
+Indicates the provider index from the corresponding connection request.  The
+provider index is implemented as the multiplexer identifier of the CONS
+provider Stream.  This is the provider that was associated with the CONS user
+during the bind request.
+.TP
+.I cm_prim
+Contains the
+.BR N_CONN_REQ (7)
+primitive as it was issued by the CONS User.  Any data associated with the
+connection request is provided in
+.BR M_DATA (9)
+message blocks attached to the primitive.
+.RE
+.TP
+.B Connection Confirmation
+The connection confirmation is issued by the CONS CM on the connection
+management Stream when a suitable provider has been connected and linked
+beneath the CONS multiplexing driver.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding connection request.
+.TP
+.I cm_prov
+Specifies the multiplexer identifier (returned by the
+.BR I_LINK "(7) or " I_PLINK (7)
+operation) that identifies the provider Stream on which the connection
+ocurred.
+.TP
+.I cm_prim
+Contains the
+.BR N_CONN_CON (7)
+primitive as it should be issued ot the CONS User.  Any data associated with
+the connection request is provided in the
+.BR M_DATA (9)
+message blocks attached to the primitive.
+.RE
+.TP
+.B Disconnect Indication
+The disconnect indication is issued by the CONS CM on the connection
+management Stream when a connection to the CONS provider was not possible and
+resulted in a disconnect.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding connection request.
+.TP
+.I cm_prov
+Specifies the provider index from the corresponding connection request.
+.TP
+.I cm_prim
+Contains the
+.BR N_DISCON_IND (7)
+primitive as it should be issued to the CONS User.
+.RE
+.TP
+.B Error Acknowledgement
+The error acknowledgement is issued by the CONS CM on the connection
+management Stream when the bind or connection to the CONS provider was not
+possible and resulted in an error.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding bind or connection request.
+.TP
+.I cm_prov
+Specifies the provider index from the corresponding bind or connection
+request.
+.TP
+.I cm_prim
+Contains the
+.B N_ERROR_ACK (7)
+primitive as it should be issued to the CONS User.
+.RE
+.\"
+.\"
+.SH IOCTLS
+.PP
+CONS Streams do not support any CONS-specific input-output controls.  The CONS
+connection management Stream supports the
+.BR I_LINK "(7), " I_PLINK "(7), " I_UNLINK "(7), " I_PUNLINK (7)
+.I STREAMS
+input-output controls described under
+.BR streamio (7).
+When a CONS CM links a provider Stream under the mulitiplexing driver using
+.BR I_LINK "(7) or " I_PLINK (7),
+the CONS driver determines the characteristics of the provider by issuing a
+.BR N_INFO_REQ (7)
+primitive on the provider Stream and processing the
+.BR N_INFO_ACK (7)
+response.
+.\"
+.\"
+.SH NOTICES
+.PP
+One of the primary purposes of the CONS driver was so that the ISO Transport
+driver,
+.BR tp (4),
+does not have to perform specialized connection management.  Unfortunately
+this is not the case.
+.BR isot "(4), " itot "(4), " isos "(4) and " isot (4)
+cannot be used as general purpose CONS replacements.  They can only be used
+for specific ISO Transport Protocol Classes and can only be used to support
+ISO Transport.  Therefore, this CONS driver is not implemented as described
+here.  This information is historical.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Not implemented.
+.\"
+.\"
+.SH FILES
+.PP
+.RB < sys/cons.h >
+The connection manager header file containing the definition of the
+.B cons_mgmt
+structure.
+.PP
+The following
+.BR /etc/netconfig
+entries and Name-to-Address translation libraries are used with the CONS driver
+in support of TI-RPC:
+.sp
+.RS
+.nf
+\fC\s-1\
+clnp    tpi_clts    v   osi     datagram_v  /dev/clnp   osiaddr.so
+\s+1\fP
+.fi
+.RE
+.TP
+.B /usr/lib/osiaddr.so
+Provides the Name-to-Address translation library for OSI.  See
+.BR osiaddr (5).
+.PP
+The following
+.B /etc/sock2path
+entries are used with the CONS driver in support of the Sockets API:
+.sp
+.RS
+.nf
+\fC\s-1\
+PF_OSI  SOCK_DGRAM      0               /dev/clnp
+PF_OSI  SOCK_DGRAM      OSIPROTO_CLNS   /dev/clnp
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH MODULES
+.PP
+Modules most often used with the CONS driver are as follows:
+.TP
+.RI \(lq isot \(rq
+This is the
+.BR isot (4)
+module that transforms a
+.BR tcp "(4) or " udp (4)
+Stream into a CONS provider Stream supporting ISO Transport Protocol Class 0
+(TP0).
+.TP
+.RI \(lq itot \(rq
+This is the
+.BR itot (4)
+module that transforms a
+.BR tcp "(4) or " udp (4)
+Stream into a CONS provider Stream supporting ISO Transport Protocol Class 0
+(TP0) or Class 2 (TP2).
+.TP
+.RI \(lq isos \(rq
+This is the
+.BR isos (4)
+module that transforms a
+.BR sctp (4)
+Stream into a CONS provider Stream supporting ISO Transport Protocol Class 0
+(TP0).
+.TP
+.RI \(lq itos \(rq
+This is the
+.BR itos (4)
+module that transforms a
+.BR sctp (4)
+Stream into a CONS provider Stream supporting ISO Transport Protocol Class 0
+(TP0), Class 2 (TP2) or Class 4 (TP4).
+.\"
+.\"
+.SH DEVICES
+.PP
+The CONS driver provides two devices:
+.TP
+.B /dev/cons
+This is a clone device that provides user CONS Streams.  Each open of this
+device provides a new CONS user Stream that begins life in the unbound state.
+.TP
+.B /dev/cons_cm
+This is a clone device that provides connection management Streams.  Each open
+of this device provides a new Connection Management Stream.  Multiple
+connection management streams can be opened.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.IR ISO (4).
+.\"
+.\"
+.SH BUGS
+.PP
+Because the CONS driver is not implemented, it has no bugs.  Or, all the bugs
+were in the design.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+None.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

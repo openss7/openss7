@@ -1,0 +1,179 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: libosi.3.man,v 0.9.2.1 2006/10/10 10:12:33 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/10 10:12:33 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: libosi.3.man,v $
+.\" Revision 0.9.2.1  2006/10/10 10:12:33  brian
+.\" - added losts of striso files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH LIBOSI 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B libosi, osi
+\- OSI library address handling functions
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.br
+.B #include <osi.h>
+.ad l
+.HP
+.BI "int getmyclnsnsap(int " nsap_maxlen ", char *" nsap );
+.PD 0
+.HP
+.BI "int getmyconsnsap(int " nsap_maxlen ", char *" nsap );
+.HP
+.BI "int getnamebynsap(int " hostname_maxlen ", char *" hostname ", char *" nsap ");
+.HP
+.BI "int getnsapbynam(int " nsap_maxlen ", char *" hostname ", char *" nsap ");
+.HP
+.BI "int gettselbyname(int " tsel_maxlen ", char *" name ", char *" tsel ");
+.HP
+.BI "int nsap2net(int " net_len ", char *" net ", char *" nsap ");
+.HP
+.BI "int tsap2net(int " net_len ", char *" net ", char *" nsap ", char *" tsel ");
+.PD
+.ad b
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.HP
+.BR getmyclnsnsap (3)\ \-\ \c
+get the local CLNS NSAP
+.PD 0
+.HP
+.BR getmyconsnsap (3)\ \-\ \c
+get the local CONS NSAP
+.HP
+.BR getnamebynsap (3)\ \-\ \c
+get the host name corresponding to an NSAP
+.HP
+.BR getnsapbyname (3)\ \-\ \c
+get the NSAP that corresponds to a host name
+.HP
+.BR gettselbyname (3)\ \-\ \c
+get a transport selector by service name
+.HP
+.BR nsap2net (3)\ \-\ \c
+write an NSAP into a \fBnetbuf\fP(3) structure
+.HP
+.BR tsap2net (3)\ \-\ \c
+write a TSAP into a \fBnetbuf\fP(3) structure
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B libosi
+user library provides a mechanism for setting local and remote addresses using
+the host name of the machine.  This avoids the need for users of applications
+to deal with NSAPs and TSAPs.  The library usese the file
+.B /etc/net/oclt/host
+for host name to NSAP conversion, and the fie
+.B /etc/net/oclt/services
+for hostname to TSEL conversion.
+.\"
+.\"
+.SH USAGE
+.PP
+To use this library you must add
+.B -I/usr/include/@PACKAGE@
+to the
+.BR gcc (1)
+command line.
+When using the shared library
+.BR /usr/lib/libosi.so ,
+you must also add the
+.B -losi
+to the
+.BR gcc (1)
+command line.
+When using the static library
+.BR /usr/lib/libosi.a ,
+you must add
+.B -losi -static
+to the
+.BR gcc (1)
+command line, or explicitly link with the static library by adding
+.B /usr/lib/libosi.a
+to the linker stage (i.e,
+.BR gcc (1)
+or
+.BR ld (1)).
+
