@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ip_to_dlpi.4.man,v 0.9.2.4 2006/04/05 09:44:52 brian Exp $
+.\" @(#) $Id: ip_to_dlpi.4.man,v 0.9.2.5 2006/10/10 10:50:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:52 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:50:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ip_to_dlpi.4.man,v $
+.\" Revision 0.9.2.5  2006/10/10 10:50:28  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:52  brian
 .\" - moved .so line and updated headers
 .\"
@@ -113,16 +116,16 @@ and
 to the Linux TCP/IP system.
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -141,29 +144,45 @@ multiplexing pseudo-device driver might not be capable of all the features of
 DLPI, but, rather, is tailored to a specific X.25 implementation.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.B /dev/ip2xinet
+the
+.B ip_to_dlpi
+device
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR dlpi (7)
+.BR dlpi (7).
 .\"
 .\"
 .SH BUGS
 .PP
+.B ip_to_dlpi
+has no known bugs.  As this driver is largely untested, it may have unknown
+bugs.  Report bugs to
+.RB < bugs@openss7.org >.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B ip_to_dlpi
+is compatible with the module of the same name from the GCOM
+.I LiS-2.18.0
+release.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+Interworking modules between
+.BR dlpi (7)
+and Linux IP subsystem is not subject to standardization.
 .\"
 .\"
 .SH HISTORY

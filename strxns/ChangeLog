@@ -1,3 +1,24 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* doc/man/strxns.refs: updates for release
+	* doc/man/man4/ip_strm_mod.4.man: updates for release
+	* doc/man/man4/ip_to_dlpi.4.man: updates for release
+	* doc/man/man4/ldl.4.man: updates for release
+	* doc/man/man7/CD_READ_REQ.7.man: updates for release
+	* doc/man/man7/CD_WRITE_READ_REQ.7.man: updates for release
+	* doc/man/man7/DL_ATTACH_REQ.7.man: updates for release
+	* doc/man/man7/DL_BIND_ACK.7.man: updates for release
+	* doc/man/man7/DL_CONNECT_CON.7.man: updates for release
+	* doc/man/man7/DL_CONNECT_IND.7.man: updates for release
+	* doc/man/man7/DL_CONNECT_REQ.7.man: updates for release
+	* doc/man/man8/ldlconfig.8.man: updates for release
+	* doc/man/man8/ldltest.8.man: updates for release
+	* doc/manual/descrip.texi: updates for release
+
 2006-10-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man7/DL_XID_CON.7.man: corrected for make check

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: CD_READ_REQ.7.man,v 0.9.2.5 2006/04/05 09:44:53 brian Exp $
+.\" @(#) $Id: CD_READ_REQ.7.man,v 0.9.2.6 2006/10/10 10:50:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:53 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:50:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: CD_READ_REQ.7.man,v $
+.\" Revision 0.9.2.6  2006/10/10 10:50:29  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:53  brian
 .\" - moved .so line and updated headers
 .\"
@@ -100,7 +103,22 @@ typedef struct {
 \fR\s+1
 .fi
 .SH DESCRIPTION
-This user originated primitive requests that
+This user originated primitive requests that an enabled communications device
+temporarily allow the input section.
+.PP
+When a stream is enabled with
+.BR CD_ENABLE_REQ (7),
+it can be used for transmission.  If the stream returns
+.B CD_AUTOALLOW
+in the
+.I cd_features
+field of the
+.BR CD_INFO_ACK (7),
+the device automatically allows input and there is no need to call the
+.BR CD_READ_REQ
+primitive for the device, unless
+.BR CD_HALT_INPUT_REQ (7)
+has been successfuly called beforehand.
 .SS Parameters
 This primitive contains the following parameters:
 .TP
@@ -108,14 +126,33 @@ This primitive contains the following parameters:
 Specifies the primitives type.
 .TP
 .I cd_msec
+Specifies the interval of time for which to allow the input section, in units
+of millisecnds.
 .SS State
+This primitive is valid in the
+.BR CD_ENABLED
+state.
+When successful, the new state is
+.BR CD_INPUT_ALLOWED .
+After the interval
+.I cd_msec
+has expired, the state will revert to
+.BR CD_ENABLED .
 .SH RESPONSE
+This primitive requires that the provider acknowledge receipt of the primitive
+as follows:
 .PP
 .B "Successful:"
+When successful, the provider acknowledges the receipt of this primitivew ith
+the
+.BR CD_OK_ACK (7)
+primitive.  The new state is
+.BR CD_INPUT_ALLOWED .
 .PP
 .B "Unsuccessful (non-fatal errors):"
 .SH ERRORS
 .B "Non-Fatal Errors:"
+applicable non-fatal errors are as follows:"
 .\".TP
 .\".RB [ CD_BADADDRESS ]
 .\"Address was invalid.
@@ -173,6 +210,10 @@ UNIX system error.
 .SH FILES
 <sys/cdi.h>
 .SH "SEE ALSO"
+.BR CD_ENABLE_REQ (7),
+.BR CD_ERROR_ACK (7),
+.BR CD_HALT_INPUT_REQ (7),
+.BR CD_OK_ACK (7).
 .SH HISTORY
 .PP
 The Communications Device Interface first appeared in SVR 4.

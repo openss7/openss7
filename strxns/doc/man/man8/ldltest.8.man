@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ldltest.8.man,v 0.9.2.5 2006/04/05 09:44:56 brian Exp $
+.\" @(#) $Id: ldltest.8.man,v 0.9.2.6 2006/10/10 10:50:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:56 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:50:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ldltest.8.man,v $
+.\" Revision 0.9.2.6  2006/10/10 10:50:31  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:56  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B ldltest
-\-
+\- Linux data link test program
 .\"
 .\"
 .SH SYNOPSIS
@@ -278,8 +281,8 @@ driver, other failure of the
 command.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH EXAMPLES
@@ -366,22 +369,36 @@ command.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR ldl (4),
+.BR ldlconfig (8),
+.BR dlpi (7).
 .\"
 .\"
 .SH BUGS
 .PP
+.B ldltest
+has no known bugs.  Report bugs to <bugs@openss7.org>.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B ldltest
+is compatible with the original
+.I LiS-2.18.0
+release from GCOM.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR dl (4)
+test programs are not subject to standardization.
 .\"
 .\"
 .SH HISTORY
 .PP
+.B ldltest
+first appeared in
+.IR LiS .
 .\"
 .\"
 .[

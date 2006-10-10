@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ip_strm_mod.4.man,v 0.9.2.5 2006/04/05 09:44:52 brian Exp $
+.\" @(#) $Id: ip_strm_mod.4.man,v 0.9.2.6 2006/10/10 10:50:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:52 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:50:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ip_strm_mod.4.man,v $
+.\" Revision 0.9.2.6  2006/10/10 10:50:28  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:52  brian
 .\" - moved .so line and updated headers
 .\"
@@ -87,6 +90,13 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <unistd.h>
+.br
+.B #include <stropts.h>
+.HP 12
+.IB dlpi_stream "= open(\(lq" path "\(rq, O_RDWR);"
+.HP
+.BI ioctl(" dlpi_stream ", I_PUSH, \(lq" ip_strms "\(rq);"
 .\"
 .\"
 .SH DESCRIPTION
@@ -149,35 +159,35 @@ detach from IP.
 .PP
 The application level program which manages the connection between a DLPI
 driver and TCP/IP should be coded to implement the following steps:
-.IP \(bu 4
+.IP 1. \w'0.\(em'u
 Open a stream to the DLPI driver.  This can be a clone open.
-.IP \(bu
+.IP 2.
 Execute an
 .B I_PUSH
 ioctl on
 .RB \(lq ip_strms .\(rq
 See
 .BR streamio (7).
-.IP \(bu
+.IP 3.
 Send the DLPI attach and bind primitives downstream.
 See
 .BR DL_ATTACH_REQ (7)
 and
 .BR DL_BIND_REQ (7).
-.IP \(bu
+.IP 4.
 Execute an
 .B SIOCSIFNAME
 ioctl with the desired interface name.  After this succeeds the DLPI driver
 will be connected to TCP/IP as a network driver via the
 .B ip_strms
 module.
-.IP \(bu
+.IP 5.
 Perform any needed
 .BR ifconfig (8)
 or
 .BR route (8)
 commands for the interface.
-.IP \(bu
+.IP 6.
 Sleep indefinitely keeping the stream open.  Killing the process will cause
 the stream to be detached from IP.
 .\"
@@ -199,36 +209,63 @@ particular,
 would allow the establishing process to terminate.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH MODULES
 .PP
+The
+.B ip_strms
+module is a
+.I STREAMS
+pushable module named
+.RI \(lq ip_strms \(rq.
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR dlpi (7),
+.BR M_DATA (9),
+.BR DL_UNITDATA_IND (7),
+.BR DL_UNITDATA_REQ (7),
+.BR netstat (8),
+.BR ifconfig (8),
+.BR streamio (7),
+.BR DL_ATTACH_REQ (7),
+.BR DL_BIND_REQ (7),
+.BR route (8).
 .\"
 .\"
 .SH BUGS
 .PP
+.B ip_strms
+has no known bugs.  As this module is largely untested, it may have unknown
+bugs.  Report bugs to
+.RB < bugs@openss7.org >.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B ip_strms
+is compatible with the module of the same name from the GCOM
+.I LiS-2.18.0
+release.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+Interworking modules between
+.BR dlpi (7)
+and Linux IP subsystem is not subject to standardization.
 .\"
 .\"
 .SH HISTORY

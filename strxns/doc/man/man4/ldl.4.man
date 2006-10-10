@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ldl.4.man,v 0.9.2.4 2006/04/05 09:44:52 brian Exp $
+.\" @(#) $Id: ldl.4.man,v 0.9.2.5 2006/10/10 10:50:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:52 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:50:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ldl.4.man,v $
+.\" Revision 0.9.2.5  2006/10/10 10:50:28  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.4  2006/04/05 09:44:52  brian
 .\" - moved .so line and updated headers
 .\"
@@ -407,36 +410,85 @@ client.  The address of the sender is retained in the address field of the
 primitive.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.B /dev/ldl
+the
+.B ldl
+device
+.TP
+.B /dev/streams/ldl
+the
+.B ldl
+device
+.TP
+.B /dev/streams/clone/ldl
+the clone
+.B ldl
+device
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR ldlconfig (8),
+.BR ldltest (8),
+.BR dlpi (7),
+.BR streamio (7),
+.BR DL_ATTACH_REQ (7),
+.BR DL_INFO_REQ (7),
+.BR DL_PHYS_ADDR_REQ (7),
+.BR DL_PHYS_ADDR_ACK (7),
+.BR DL_ERROR_ACK (7),
+.BR DL_ATTACH_REQ (7),
+.BR DL_OK_ACK (7),
+.BR DL_DETACH_REQ (7),
+.BR DL_BIND_REQ (7),
+.BR DL_UNBIND_REQ (7),
+.BR DL_SUBS_BIND_REQ (7),
+.BR DL_PROMISCON_REQ (7),
+.BR DL_PROMISCOFF_REQ (7),
+.BR DL_UNITDATA_REQ (7),
+.BR DL_UDERROR_IND (7),
+.BR DL_UNITDATA_IND (7),
+.BR M_DATA (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.B ldl
+has no known bugs.  As this driver is largely untested, there may be unknown
+bugs.  Report bugs to
+.RB < bugs@openss7.org >.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B ldl
+is compatible with the driver of the same name from the
+GCOM
+.I LiS-2.18.0
+release.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+DLPI.
+.[
+dlpi
+.]
 .\"
 .\"
 .SH HISTORY
