@@ -1922,6 +1922,38 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %O (Previously "CCITT Recommendation")
 
+%K iso8208
+%L ISO/IEC 8208
+%A ISO
+%R ISO/IEC 8208 : 1995
+%T Information Technology \- Data Communications \- X.25 Packet Layer Protocol For Data Terminal Equipment
+%D 1995
+%I International Organization for Standardization
+
+%K iso9542
+%L ISO/IEC 9542
+%A ISO
+%R ISO/IEC 9542 : 1988
+%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System to Intermediate System Routeing Exchange Protocol for use in Conjunction with the Protocol Routeing for Providing the Connectionless-Mode Network Service (ISO 8473)
+%D 1988
+%I International Organization for Standardization
+
+%K iso10589
+%L ISO/IEC 10589
+%A ISO
+%R ISO/IEC 10589 : 1992
+%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Intermediate System to Intermediate System Intra-Domain Routeing Routine Information Exchange Protocol for use in conjunction wht the Protocol for Providing the Connectionless-Mode Network Service (ISO 8473)
+%D 1992
+%I International Organization for Standardization
+
+%K iso10747
+%L ISO/IEC 10747
+%A ISO
+%R ISO/IEC 10747 : 1992
+%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Protocol for Exchange of Inter-Domain Routeing Information Amoung Intermediate Systems to Support Forwarding of ISO 8473 PDUs
+%D 1992
+%I International Organization for Standardization
+
 %K x680
 %L X.680
 %A ITU
@@ -2086,7 +2118,7 @@ Part 1: Protocol Specification
 %L X.224
 %A ITU
 %R ITU-T Recommendation X.224 (ISO/IEC 8073)
-%T Transport Protocol Speciication for Open System Interconnection (OSI) for ITU-T Applications
+%T Transport Protocol Specification for Open System Interconnection (OSI) for ITU-T Applications
 %D November 1993
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
@@ -2146,7 +2178,7 @@ Part 1: Protocol Specification
 %L X.234
 %A ITU
 %R ITU-T Recommendation X.234 [ISO/IEC 8602 : 1994]
-%T Data Communication Networks \(em Information Technology \(em Protocol for Providing the Connectionless-mode Network Service: Protocol Specification
+%T Data Communication Networks \(em Information Technology \(em Protocol for Providing the Connectionless-mode Transport Service: Protocol Specification
 %D July 1994
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
@@ -2975,7 +3007,7 @@ Part 1: Protocol Specification
 %R strcompat-0.9.2
 %A OpenSS7
 %Q OpenSS7
-%T OpenSS7 STREAMS Compatibility Modules (strcompat) 0.9.2 Source Code
+%T STREAMS Compatibility Modules (strcompat) 0.9.2 Source Code
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/
@@ -3221,10 +3253,11 @@ Part 1: Protocol Specification
 
 %K rfc995
 %L RFC 995
+%R RFC 995
 %A International Organization for Standardization
 %T End System to Intermediate System Routing Exchange Protocol for Standardization with ISO 8473
 %D April 1, 1986
-%R RFC 995
+%O (Reprint of ISO/IEC 9542)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0995.txt
@@ -3259,6 +3292,17 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1008.txt
+
+%K rfc1142
+%L RFC 1142
+%R RFC 1142
+%E D. Oran
+%T OSI IS-IS Intra-domain Routing Protocol
+%D February 1990
+%Q Internet Engineering Task Force \(em Network Working Group
+%O (Reprint of ISO/IEC 10589)
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1142.txt
 
 %K rfc1162
 %L RFC 1162
@@ -3558,6 +3602,126 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1278.txt
 
+%K rfc1831
+%L RFC 1831
+%R RFC 1831
+%A Raj Srinivasan
+%T RPC: Remote Procedure Call Protocol Specification Version 2
+%D August 1995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1831.txt
+
+%K rfc1832
+%L RFC 1832
+%R RFC 1832
+%A Raj Srinivasan
+%T XDR: External Data Representation Standard
+%D August 1995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1832.txt
+
+%K rfc1833
+%L RFC 1833
+%R RFC 1833
+%A Raj Srinivasan
+%T Binding Protocols for ONC RPC Version 2
+%D August 1995
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1833.txt
+
+%K rfc1508
+%L RFC 1508
+%R RFC 1508
+%A John Linn
+%T Generic Security Service Application Program Interface
+%D September 1993
+%O (Obsoleted by RFC 2078)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1508.txt
+
+%K rfc1509
+%L RFC 1509
+%R RFC 1509
+%A John Wray
+%T Generic Security Service API : C-bindings
+%D September 1993
+%O (Obsoleted by RFC 2744)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1509.txt
+
+%K rfc2078
+%L RFC 2078
+%R RFC 2078
+%A John Linn
+%T Generic Security Service Application Program Interface, Version 2
+%D January 1997
+%O (Obsoletes RFC 1508) (Obsoleted by RFC 2743)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2078.txt
+
+%K GSS-API
+%K rfc2743
+%L RFC 2743
+%R RFC 2743
+%A John Linn
+%T Generic Security Service Application Program Interface Version 2, Update 1
+%D January 2000
+%O (Obsolets RFC 2078)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2743.txt
+
+%K rfc2744
+%L RFC 2744
+%R RFC 2744
+%A John Wray
+%T Generic Security Service API Version 2 : C-bindings
+%D January 2000
+%O (Obsoletes RFC 1509)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2744.txt
+
+%K rfc2853
+%L RFC 2853
+%R RFC 2853
+%A Jack Kabat
+%A Mayank Upadhyay
+%T Generic Security Service API Version 2 : Java Bindings
+%D June 2000
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2853.txt
+
+%K rfc2203
+%L RFC 2203
+%R RFC 2203
+%A Michael Eisler
+%A Alex Chiu
+%A Lin Ling
+%E Michael Eisler
+%T RPCSEC_GSS Protocol Specification
+%D September 1997
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2203.txt
+
+%K rfc2695
+%L RFC 2695
+%R RFC 2695
+%A Alex Chiu
+%T Authentication Mechanisms for ONC RPC
+%D September 1999
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2695.txt
+
 %K rfc1859
 %L RFC 1859
 %A Yanick Pouffary
@@ -3738,6 +3902,17 @@ Part 1: Protocol Specification
 %I The Internet Society
 %O (Obsoletes RFC 1095)
 %U http://www.ietf.org/rfc/rfc1189.txt
+
+%K rfc1195
+%L RFC 1195
+%A R. W. Callon
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Use of OSI IS-IS for Routing in TCP/IP and Dual Environments
+%R RFC 1195
+%D December 1990
+%I The Internet Society
+%O (Updated by RFC 1349)
+%U http://www.ietf.org/rfc/rfc1195.txt
 
 %K rfc1212
 %L RFC 1212

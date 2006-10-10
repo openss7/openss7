@@ -2,7 +2,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ddi_soft_state_zalloc.9.man,v 0.9.2.3 2006/10/06 12:13:00 brian Exp $
+.\" @(#) $Id: ddi_soft_state_zalloc.9.man,v 0.9.2.4 2006/10/10 10:40:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:00 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:40:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ddi_soft_state_zalloc.9.man,v $
+.\" Revision 0.9.2.4  2006/10/10 10:40:50  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.3  2006/10/06 12:13:00  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -88,7 +91,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B ddi_soft_state_zalloc
-\-
+\- allocate and zero software state
 .\"
 .\"
 .SH SYNOPSIS

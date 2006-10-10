@@ -1,3 +1,23 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updates for release
+	* doc/man/strcompat.refs: updates for release
+	* doc/man/man9/allocbi.9.man: updates for release
+	* doc/man/man9/apush_vml.9.man: updates for release
+	* doc/man/man9/ddi_get_soft_state.9.man: updates for release
+	* doc/man/man9/ddi_removing_power.9.man: updates for release
+	* doc/man/man9/ddi_soft_state.9.man: updates for release
+	* doc/man/man9/ddi_soft_state_fini.9.man: updates for release
+	* doc/man/man9/ddi_soft_state_free.9.man: updates for release
+	* doc/man/man9/ddi_soft_state_init.9.man: updates for release
+	* doc/man/man9/ddi_soft_state_zalloc.9.man: updates for release
+	* doc/man/man9/ddi_umem_free.9.man: updates for release
+	* doc/man/man9/mi_mpprintf.9.man: updates for release
+	* doc/man/man9/mi_offset_param.9.man: updates for release
+	* doc/man/man9/mps_intr_disable.9.man: updates for release
+	* doc/man/man9/mps_intr_enable.9.man: updates for release
+	* doc/manual/descrip.texi: updates for release
+
 2006-10-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/mac/ddi.h: added missing compatibility functions
