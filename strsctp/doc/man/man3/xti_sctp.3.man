@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_sctp.3.man,v 0.9.2.7 2006/04/26 10:45:16 brian Exp $
+.\" @(#) $Id: xti_sctp.3.man,v 0.9.2.8 2006/10/10 10:46:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/26 10:45:16 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:46:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_sctp.3.man,v $
+.\" Revision 0.9.2.8  2006/10/10 10:46:15  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.7  2006/04/26 10:45:16  brian
 .\" - updated manual pages and references
 .\"
@@ -98,7 +101,30 @@ sort-adjacent-labels
 .br
 .B #include <xti_sctp.h>
 .HP
+.BI "int " sctp_xtistr " = t_open(" \fR\*(lq/dev/sctp\*(rq\fI ", " flags );
+.PD 0
+.HP
 .BI "int " sctp_xtistr " = t_open(" \fR\*(lq/dev/sctp_t\*(rq\fI ", " flags );
+.PD
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This manual page describes the XTI interface for SCTP in accordance with XNS 5.2.
+.[
+xns
+.]
+.PP
+The X/Open Transport Interface
+.[
+xns
+.]
+specifies addressing and options for Stream Control Transmission Protocol (SCTP).  Although this
+interface is always exposed by including the
+.RB < xti.h >
+header file, it is provided by the
+.RB < xti_sctp.h >
+header file included by the former.
 .\"
 .\"
 .SH DESCRIPTION
@@ -110,24 +136,58 @@ over an IP network using SCTP.
 .PP
 This section also defines the data structures and constants required for SCTP
 transport providers that are exposed through the
-.B <xti_sctp.h>
+.RB < xti_sctp.h >
 header file.
 .\"
 .\"
 .SH "ADDRESS FORMAT"
 .PP
-The SCTP address format is structured as follows:
+For convenience and traditionally, the transport interface address used by XTI
+for protocols in the TCP/IP protocol family use
+.IR BSD -style
+socket addresses (also described in XNS 5.2
+.[[
+xns
+.]])
+for addresses.
 .PP
+The socket address, defined in
+.RB < sys/socket.h >,
+is structured as follows:
+.sp
+.RS
 .nf
 \fC\s-1\
+struct sockaddr {
+    uint16_t sa_family;
+    char sa_data[14];
+};
+\s+1\fP
+.fi
+.RE
+.PP
+The Internet Protocol family socket address, defined in
+.RB < netinet/in.h >,
+is structured as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+typedef unsigned int in_addr_t;
+
+struct in_addr {
+    in_addr_t  s_addr;
+};
+
 struct sockaddr_in {
     sa_family_t         sin_family;  /* Address family */
     unsigned short int  sin_port;    /* Port number */
-    struct in_addr      sin_addr;    /* Interned address */
+    struct in_addr      sin_addr;    /* Internet address */
     /* padding */
 };
 \s+1\fP
 .fi
+.RE
 .PP
 The
 .B sockaddr_in
@@ -168,6 +228,39 @@ or any subset of the options defined here.  An implementation may restrict the
 use of any of these options by offering them only in a privileged read-only
 mode.
 .PP
+Options can be
+.I absolute requirements
+and can also be of
+.IR "end-to-end significance" ,
+as follows:
+.TP
+.I Absolute Requirements
+Options that are
+.IR "absolute requirements" ,
+mean the when the option is negotiated with the transport service provider,
+the transport service provider is not permitted to negotiate the option to a
+value with differing quality of service.  Either the proposed value is
+accepted or it is rejected.  Options that are not
+.IR "absolute requirements" ,
+can be negotiated by the transport provider to a different quality of service
+level and it is the responsibility of the transport service user to determine
+whether the negotitated value is sufficient.
+.TP
+.I End-to-End Significance
+Options that are of
+.IR "end-to-end significance"
+are options that require negotiation with, or are communicated to, the peer
+transport provider or user.  For example, options that are requested in a
+connection request,
+.BR T_CONN_REQ (7),
+primitive will be indicated at the peer in a connection indication,
+.BR T_CONN_IND (7),
+primitive.
+Options that are not of
+.IR "end-to-end significance"
+are of local significance only and can be negotiated directly between the
+local transport service user and the local transport service provider.
+.PP
 An SCTP transport provider supports three levels of options.  These three levels
 are described below.
 .\"
@@ -175,6 +268,9 @@ are described below.
 .SS "XTI_GENERIC"
 .PP
 Options with this level are specific to the X/Open Transport Interface (XTI/TLI)
+.[
+xti
+.]
 and are common to all transport providers.  For more information see
 .BR xti (3).
 .PP
@@ -263,7 +359,8 @@ For more information, see
 .SS "T_INET_IP"
 .PP
 Options within this level are specific to the Internet Protocol (IP) and are
-common to all the protocol levels in IP.  For more information, see
+common to all the protocol levels in the TCP/IP suite.
+For more information, see
 .BR xti_ip (3).
 .PP
 The options defined with the option level
@@ -1701,12 +1798,17 @@ purposes.
 .\"
 .SH FUNCTIONS
 .PP
+.B XTI-SCTP
+supports the XTI/TLI library functions as described in this section.  All
+connection-oriented XTI/TLI library calls are supported for SCTP; however, some
+features of the connection-oriented XTI/TLI library calls are supported by the
+underlying transport service provider and some are not.
 .\"
 .\"
 .SS t_accept\fR(3)
 .PP
-.PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_accept (3),
 with the additional considerations described here.
 .PP
@@ -1781,15 +1883,14 @@ they are transmitted with subsequent IP datagrams sent out in the
 .B T_DATAXFER
 state.
 .PP
-SCTP provides a number of options, described in
-.IR \(lqOPTIONS\(rq ,
-above, that may be included in this XTI/TLI call
-in the
+.B XTI-SCTP
+provides a number of options, described in
+.RI \*(lq OPTIONS \*(rq,
+above, that may be included in this XTI/TLI call in the
 .I call->opt
 parameter to change local and end-to-end characteristics of the transport
-endpoint accepting the connection.
-The options of end-to-end significance that can be included in this XTI/TLI
-library call are:
+endpoint accepting the connection.  The options of end-to-end significance
+that can be included in this XTI/TLI library call are:
 .TP
 .I T_IP_OPTIONS
 .TP
@@ -1820,10 +1921,6 @@ capabilities that are available on the transport connection.
 .PP
 The association-related options that can be included in this XTI/TLI call include
 (other association-related options may also be included):
-.TP
-.I XTI_RCVBUF
-.TP
-.I T_IP_TTL
 .PP
 The options of local significance that can be included in this XTI/TLI call
 include (other options of local significance may also be included):
@@ -1832,11 +1929,15 @@ include (other options of local significance may also be included):
 .TP
 .I XTI_LINGER
 .TP
+.I XTI_RCVBUF
+.TP
 .I XTI_RCVLOWAT
 .TP
 .I XTI_SNDBUF
 .TP
 .I XTI_SNDLOWAT
+.TP
+.I T_IP_TTL
 .TP
 .I T_IP_REUSEADDR
 .TP
@@ -1910,7 +2011,8 @@ parameter.
 .\"
 .SS t_bind\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_bind (3),
 with the additional considerations described here.
 .PP
@@ -1938,7 +2040,7 @@ and
 fields.
 .PP
 The
-.BR INET (4)
+.BR sctp (4)
 implementation treats port number zero (0) as a request to bind to any
 unused port.  Other than that value, the
 .I req->addr.sin_port
@@ -1950,7 +2052,7 @@ host
 .RB ( INADDR_ANY ).
 .PP
 Under recent versions of
-.BR INET (4),
+.BR sctp (4),
 .BR t_bind (3)
 called with a
 .B NULL
@@ -1959,7 +2061,7 @@ argument is equivalent to binding to a wildcard port number with a wildcard IP
 address.
 .PP
 Under
-.BR INET (4),
+.BR sctp (4),
 when bound to a wildcard port or IP address, assignment of a specific port
 number and IP address can be deferred until an incoming or outgoing connection
 is initiated.  Under these situations, any address returned in the
@@ -1979,9 +2081,10 @@ be assured to be an assigned address list rather than a wildcard address.
 .\"
 .SS t_close\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_close (3)
-without modifications.
+without modification.
 .PP
 The
 .BR t_close (3)
@@ -2017,7 +2120,8 @@ data.
 .\"
 .SS t_connect\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_connect (3),
 with the additional considerations described here.
 .PP
@@ -2039,15 +2143,14 @@ Only one address is necessary to successfully form a multi-homed transport
 connection; however, if additional addresses are provided, the transport
 connection is initialized in a more secure and reliable fashion.
 .PP
-SCTP provides a number of options, described in
-.IR \(lqOPTIONS\(rq ,
-above, that may be included in this XTI/TLI call
-in the
+.B XTI-SCTP
+provides a number of options, described in
+.RI \*(lq OPTIONS \*(rq,
+above, that may be included in this XTI/TLI call in the
 .I sndcall->opt
-parameter to change local ad end-to-end characteristics of the transport
-endpoint accepting the connection.
-The options of end-to-end significance that can be included in this XTI/TLI library
-call are:
+parameter to change local and end-to-end characteristics of the transport
+endpoint accepting the connection.  The options of end-to-end significance that
+can be included in this XTI/TLI library call are:
 .TP
 .I T_SCTP_CKSUM_TYPE
 set the type of checksum to be performed on all packets for the connection.
@@ -2161,7 +2264,8 @@ XTI/TLI library call, below.
 .\"
 .SS t_getinfo\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_connect (3)
 with the additional considerations described here.
 .PP
@@ -2173,7 +2277,10 @@ library,
 .B SCTP
 uses a
 .B sockaddr_in
-structured address.  However, a number of XTI/TLI library calls support multiple
+structured address (see
+.RI \*(lq "ADDRESS FORMAT" \*(rq,
+above).
+However, a number of XTI/TLI library calls support multiple
 .B sockaddr_in
 address to be specified in a single call.  This size will be an integer multiple of the
 size of the
@@ -2183,18 +2290,17 @@ structure size, indicating how many
 structures can be included in a single address specification.
 .TP
 .I options
-The maximum size of options is provider specific.  The
+The maximum size of options is provider specific.
+The
 .B OpenSS7
 SCTP implementation
 .RB ( sctp (4))
-returns the maximum size of an options structure containing all SCTP options.
+returns the maximum size of an option structure containing all SCTP options.
 .TP
 .I tsdu
 The maximum size of a transport service data unit.  For SCTP this is the
-maximum size of a message, considering that it may be fragmented and sent in
-multiple DATA chunks.  For
-.BR sctp (4)
-this value could be
+maximum size of a message, considering that it may be segmented and sent in
+multiple DATA chunks.  For SCTP this value could be
 .BR T_INFINITE .
 SCTP
 .[
@@ -2219,7 +2325,8 @@ rfc2960
 .]
 .TP
 .I connect
-SCTP supports the concept of connection data.  Although SCTP also supports
+.B XTI-SCTP
+supports the concept of connection data.  Although SCTP also supports
 sending the first fragments of a TSDU or ETSDU with the COOKIE-ECHO or
 COOKIE-ACK chunks, and subsequent fragements later, this value represents the
 maximum size of a TSDU that can be completely contained in the COOKIE-ECHO or
@@ -2247,7 +2354,8 @@ disconnection data.  SCTP conforming transport providers will always return
 in this field.
 .TP
 .I servtype
-SCTP supports only connection-oriented modes with orderly release.  SCTP
+.B XTI-SCTP
+supports only connection-oriented modes with orderly release.  SCTP
 conforming transport service providers will return
 .B T_COTS_ORD
 whenever the SCTP implementation supports orderly release (i.e. SHUTDOWN and
@@ -2259,19 +2367,20 @@ SCTP conforming transport service providers will not return
 .BR T_CLTS .
 .TP
 .I flags
-SCTP support orderly release but does not support orderly release data and
-does not support sending null data.  SCTP conforming transport providers will
-not return
+.B XTI-SCTP
+supports orderly release but does not support orderly release data and
+does not support sending null data.  SCTP conforming transport service
+providers will not return
 .BR T_ORDRELDATA " or " T_SNDZERO
-flags.
-SCTP conforming transport service providers may return the
+flags.  SCTP conforming transport service providers may return the
 .B XPG4_1
 flag.
 .\"
 .\"
 .SS t_listen\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_listen (3)
 with the additional considerations described here.
 .PP
@@ -2419,9 +2528,25 @@ data will be indicated in the
 parameter.
 .\"
 .\"
+.SS t_look\fR(3)
+.PP
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
+.BR t_open (3)
+with the additional considerations described here.
+.PP
+As soon as an unordered DATA CHUNK enters the SCTP receive buffer, the event
+.B T_EXDATA
+in indicated.
+.B T_EXDATA
+remains set until all data in the unordered DATA CHUNK
+has been received.
+.\"
+.\"
 .SS t_open\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_open (3)
 with the additional considerations described here.
 .PP
@@ -2438,7 +2563,7 @@ with the SCTP transport provider.
 .PP
 .TS
 center tab(:);
-lcc.
+l|c|c.
 _
 Parameters:Before call:After call
 _
@@ -2466,18 +2591,21 @@ described above.
 .\"
 .SS t_optmgmt\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_optmgmt (3)
 with the additional considerations described here.
+.PP
 The options that may be set, retrieved or negotiated using this XTI/TLI library
 call are described under
-.IR \(lqOPTIONS\(rq ,
+.RI \*(lq OPTIONS \*(rq,
 above.
 .\"
 .\"
 .SS t_rcvconnect\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_rcvconnect (3)
 with the additional considerations described here.
 .PP
@@ -2510,7 +2638,8 @@ Multiple addresses.
 .\"
 .SS t_rcvdis\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_rcvdis (3)
 with the additional considerations described here.
 .PP
@@ -2518,13 +2647,15 @@ Since data cannot be sent with a disconnect,
 .I call->udata.len
 must be set to zero (0).
 .PP
-SCTP does not support disconnection data and the
+.B XTI-SCTP
+does not support disconnection data and the
 .I dis->udata
-parameter will always be empty.
+parameter must always be empty.
 .PP
 .I dis->reason
-will either be a negative UNIX\(rg error code, or an SCTP protocol-specific error code
-as follows:
+will either be a negative
+.BR UNIX \(rg
+error code, or an SCTP protocol-specific error code as follows:
 .TP
 .I T_SCTP_CAUSE_INVALID_STR
 a DATA chunk was received that contained an invalid stream identifier.
@@ -2596,7 +2727,7 @@ software related connection abort.
 connection was reset by peer.
 .TP
 .RB [ ECONNREFUSED ]
-connection was refued by the peer.
+connection was refused by the peer.
 .TP
 .RB [ ETIMEDOUT ]
 connection timed out.
@@ -2620,27 +2751,28 @@ the destination host is down.
 no route to destination host.
 .TP
 .RB [ ESHUTDOWN ]
-cookie received while shutting down.
+COOKIE received while shutting down.
 .PD
 .\"
 .\"
 .SS t_rcv\fR(3), \fBt_rcvv\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports these XTI/TLI library calls as described in
 .BR t_rcv "(3) and " t_rcvv (3),
 with the additional considerations described here.
 .PP
 When data is received using these XTI/TLI library calls, the
 .I flags
 parameter will have the
-.I T_MORE
+.B T_MORE
 bit set if a subsequent
 .BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2)
 operation will read additional data belonging to the same [E]TSDU.
 The
 .I flags
 parameter will have the
-.I T_EXPEDITED
+.B T_EXPEDITED
 bit set if the data was sent unordered.
 Because of this, reads using
 .BR read "(2) or " readv (2)
@@ -2662,7 +2794,8 @@ before reading more data belonging to another [E]TSDU.
 .\"
 .SS t_rcvreldata\fR(3)
 .PP
-SCTP does not support orderly release with data and this XTI/TLI library call will
+.B XTI-SCTP
+does not support orderly release with data and this XTI/TLI library call will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
@@ -2671,34 +2804,46 @@ to a value of
 .\"
 .SS t_rcvrel\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_rcvrel (3)
 without modification.
+.BR t_rcvrel (3)
+is preferred over
+.BR t_snddis (3)
+for disconnecting an established connection (i.e. a connection in the
+.B T_DATAXFER
+state.
 .\"
 .\"
 .SS t_rcvudata\fR(3), \fBt_rcvvudata\fR(3)
 .PP
-.B SCTP
+.B XTI-SCTP
 does not support a connection-less mode and these XTI/TLI library calls will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
 .RB [ TNOTSUPPORT ].
+For a connection-less mode service, see
+.BR xti_udp (3).
 .\"
 .\"
 .SS t_rcvuderr\fR(3)
 .PP
-.B SCTP
+.B XTI-SCTP
 does not support a connection-less mode and these XTI/TLI library calls will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
 .RB [ TNOTSUPPORT ].
+For a connection-less mode service, see
+.BR xti_udp (3).
 .\"
 .\"
 .SS t_snddis\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_snddis (3)
 with the additional considerations described here.
 .PP
@@ -2706,35 +2851,38 @@ Since data may not be sent with a disconnect,
 .I call->udata.len
 must be set to zero (0).
 .PP
-SCTP does not support disconnection from specified responding addresses.
+.B XTI-SCTP
+does not support disconnection from specified responding addresses.
 Therefore, the
 .I call->addr
-parameter must always be empty.
-SCTP does not support disconnect data or disconnect options.  The parameters
+parameter should be empty and will always be ignored.  SCTP does not support
+disconnect data or disconnect options.  The parameters
 .IR call->udata " and " call->opt
 must always be empty.
-SCTP does support refusal of connection indications, and the
-.IR call->sequence
+.B XTI-SCTP
+does support refusal of connection indications, and the
+.I call->sequence
 parameter is populated as described in
 .BR t_snddis (3).
 .\"
 .\"
 .SS t_snd\fR(3), \fBt_sndv\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_snd "(3) and " t_sndv (3),
 with the additional considerations described here.
 .PP
 When data is sent using these XTI/TLI library calls, the
 .I flags
 parameter will have the
-.I T_MORE
+.B T_MORE
 bit set if a subsequent
 .BR t_snd "(3), " t_sndv "(3), " write "(2) or " writev (2)
 operation will write additional data belonging to the same [E]TSDU.  The
 .I flags
 parameter will have the
-.I T_EXPEDITED
+.B T_EXPEDITED
 bit set if the data is to be sent unordered.
 Because of this, writes using
 .BR write "(2) or " writev (2)
@@ -2754,7 +2902,8 @@ before writing more data belonging to another [E]TSDU.
 .\"
 .SS t_sndreldata\fR(3)
 .PP
-SCTP does not support orderly release with data and this XTI/TLI library call will
+.B XTI-SCTP
+does not support orderly release with data and this XTI/TLI library call will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
@@ -2763,7 +2912,8 @@ to a value of
 .\"
 .SS t_sndrel\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_sndrel (3)
 without modification.
 .\"
@@ -2776,11 +2926,14 @@ fail, return -1 and set
 .IR t_errno (3)
 to a value of
 .RB [ TNOTSUPPORT ].
+For a connection-less mode service, see
+.BR xti_udp (3).
 .\"
 .\"
 .SS t_unbind\fR(3)
 .PP
-SCTP supports this XTI/TLI library call as described in
+.B XTI-SCTP
+supports this XTI/TLI library call as described in
 .BR t_unbind (3)
 with the additional considerations described here.
 .PP
@@ -2791,111 +2944,210 @@ network interface, will also be unbound from the local transport endpoint with
 this XTI/TLI library call.
 .\"
 .\"
-.SH CAVEATS
+.SH BUGS
+.PP
+.BR XTI-SCTP
+has no known bugs.
+The
+.BR sctp_t (4)
+implementation of
+.B XTI-SCTP
+has been conformance tested and validated using the
+.BR test-sctp_t (8)
+test case executable and the
+.B @PACKAGE@ autotest
+conformance and validation test suite.
+.\"
+.\"
+.SH NOTICES
 .PP
 In support of the
 .BR sockets (3)
 library for
 .BR tpi (7)
-transport providers, the options described here have been made compatible
-with the socket options described in
+transport providers, the options described here have been made compatible with
+the socket options described in
 .BR sctp (7).
-As a result, depending on the release of streams SCTP, the XTI/TLI options
-described might not be compatible with the options described here.
+As a result, depending on the release of
+.BR sctp (4),
+the XTI/TLI options described might not be compatible with the options described
+here.
 .PP
 The
 .B OpenSS7
 socket version of SCTP described in
 .BR sctp (7),
 accessed using the TPI interface of the
-.B strinet
+.B @PACKAGE@
 package described in
-.BR INET (4),
+.BR sctp (4),
 supports all of the options described here.
 .PP
-The
-.B OpenSS7
-.B strsctp
-package described in
+Earlier version of the
 .BR sctp (4)
-in the current release
-.RB ( 0.8.4 )
-does not support the following options:
-.IR T_SCTP_RECVSID ,
-.IR T_SCTP_RECVPPI ,
-.IR T_SCTP_RECVPPI ,
-.IR T_SCTP_CKSUM_TYPE ,
-.IR T_SCTP_ECN ,
-.IR T_SCTP_ALI ,
-.IR T_SCTP_PR ,
-.IR T_SCTP_MAX_BURST ,
-.IR T_SCTP_DISCPOSITION ,
-.IR T_SCTP_LIFETIME ,
-.IR T_SCTP_ADD ,
-.IR T_SCTP_ADD_IP ,
-.IR T_SCTP_DLE_IP
-or
-.IR T_SCTP_SET .
-Also, the operation of
-.IR T_SCTP_SID ,
-.IR T_SCTP_PPI ,
-.IR T_SCTP_SSN
+driver did not support wildcard binds.  If an attempt was made to bind to a
+wildcard address or port number, the bind would fail with
+.RB [ TNOADDR ].
+While this is correct behavior, it was not consistent with other
+.B XTI-TCP
+implemetnations.  Recent versions of the
+.BR sctp (4)
+driver include the ability to bind to wildcards or to request that the
+transport service provider asign a suitable address.
+.PP
+.\"The
+.\".B OpenSS7
+.\".B strsctp
+.\"package described in
+.\".BR sctp (4)
+.\"in the current release
+.\".RB ( 0.8.4 )
+.\"does not support the following options:
+.\".IR T_SCTP_RECVSID ,
+.\".IR T_SCTP_RECVPPI ,
+.\".IR T_SCTP_RECVPPI ,
+.\".IR T_SCTP_CKSUM_TYPE ,
+.\".IR T_SCTP_ECN ,
+.\".IR T_SCTP_ALI ,
+.\".IR T_SCTP_PR ,
+.\".IR T_SCTP_MAX_BURST ,
+.\".IR T_SCTP_DISCPOSITION ,
+.\".IR T_SCTP_LIFETIME ,
+.\".IR T_SCTP_ADD ,
+.\".IR T_SCTP_ADD_IP ,
+.\".IR T_SCTP_DLE_IP
+.\"or
+.\".IR T_SCTP_SET .
+.\"Also, the operation of
+.\".IR T_SCTP_SID ,
+.\".IR T_SCTP_PPI ,
+.\".IR T_SCTP_SSN
+.\"and
+.\".IR T_SCTP_TSN
+.\"are not as described here.
+.PP
+Including the
+.RB < xti.h >
+header file may include the
+.RB < xti_inet.h >
+header file.
+Including the
+.RB < xti_inet.h >
+header file may include the
+.RB < xti_ip.h >
 and
-.IR T_SCTP_TSN
-are not as described here.
+.RB < xti_sctp.h >
+header file.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.\"
-.\"
-.BR INET (4),
+.BR sctp (4),
 .BR read (2),
 .BR readv (2),
-.BR sctp (4),
+.BR sctp_t (4),
 .BR sctp (7),
 .BR sockets (3),
 .BR t_accept (3),
 .BR t_connect (3),
-.BR T_CONNECT_REQ (7),
-.BR tcp (7),
+.BR T_CONN_REQ (7),
 .BR t_errno (3),
 .BR t_getinfo (3),
 .BR timod (4),
+.BR tirdwr (4),
 .BR t_listen (3),
 .BR T_OPTDATA_IND (7),
 .BR t_optmgmt (3),
-.BR t_rcvconenct (3),
+.BR t_rcvconnect (3),
 .BR t_snddis (3),
 .BR write (2),
 .BR writev (2),
 .BR xnet (3),
 .BR xti (3),
 .BR xti_ip (3),
-.BR xti_tcp (3).
+.BR xti_udp (3),
+.BR xti_tcp (3),
+.BR xti_sctp (3),
+.BR test-sctp_t (8).
 .\"
 .\"
 .SH DEVICES
 .PP
-There is one SCTP device providing the Transport Provider Interface that
-provide SCTP conforming TPI devices as follows:
-.\"
-.\"
+There are a number of SCTP devices providing the Transport Provider Interface
+that provide SCTP conforming TPI devices as follows:
 .TP
-.I /dev/sctp_t
+.IR /dev/sctp_t ", " /dev/streams/sctp/sctp_t
+.PP
+These devices are provided by the
+.BR @PACKAGE_TITLE@ ( @PACKAGE@-@VERSION@ )
+package.
 For more information on the TPI SCTP device, see
 .BR sctp (4).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.SH "CONFORMING TO"
-.PP
-The Open Group XNS Issue 5.2.
+This interface is compatible with
+.IR "XNS 5.2" ,
 .[
 xns
 .]
+and implementations based on
+.IR "XNS 5.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Internet Protocol (IP) options were not standardized until XPG4.
+.[
+xpg
+.]
+.IP \(em
+The format of options for the Transport Provider Interface (TPI) differ from
+those for the AT&T Transport Layer Interface (TLI).  This interface follows
+the TPI.
+.IP \(em
+The precise values of some options and formats of primitives may differ from
+implementation to implementation.  Binary compatibility is not guaranteed.
+.PP
+See
+.BR xti (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The OpenGroup XNS Issue 5.2.
+.[
+xns
+.]
+Conformance is validated using the
+.BR test-sctp_t (8)
+test case executable and the
+.B @PACKAGE@ autotest
+validation test suite.
+.\"
+.\"
 .SH HISTORY
+.PP
+The
+.I Transport Provider Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+was first created by AT&T as the
+.I Transport Layer Interface (TLI)
+and was subsequently standardized by
+.B UNIX International
+and later
+by
+.B The OpenGroup
+in XPG4
+.[
+xpg
+.]
+and XNS 5.2.
+.[
+xns
+.]
 .PP
 The
 .B SCTP-TPI

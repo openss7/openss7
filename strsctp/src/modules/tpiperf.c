@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:14 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:46:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/07 22:17:14 $ by $Author: brian $
+ Last Modified $Date: 2006/10/10 10:46:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.2  2006/10/10 10:46:20  brian
+ - updates for release
+
  Revision 0.9.2.1  2006/08/07 22:17:14  brian
  - changes from SCTP Interop
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:14 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:46:20 $"
 
-static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:14 $";
+static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:46:20 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -77,7 +80,7 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:14 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:46:20 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"
@@ -485,6 +488,7 @@ tpiperf_wsrv(queue_t *q)
 			}
 			break;
 		case 4:	/* generator multiple streams */
+			/* FIXME: this is broken: mp is NULL! */
 			if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t))) {
 				switch (*((t_scalar_t *) mp->b_rptr)) {
 				case T_OPTDATA_IND:

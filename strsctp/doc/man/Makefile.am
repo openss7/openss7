@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/10/03 13:52:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/10/10 10:46:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:52:54 $ by $Author: brian $
+# Last Modified $Date: 2006/10/10 10:46:13 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.15  2006/10/10 10:46:13  brian
+# - updates for release
+#
 # Revision 0.9.2.14  2006/10/03 13:52:54  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -77,7 +80,6 @@ if PKG_BUILD_INDEP
 
 man_MANS = \
 	man7/npi_sctp.7 \
-	man7/strsctp_soon.7 \
 	man8/strsctp_mknod.8 \
 	man8/test-interop.8 \
 	man8/test-sctp.8 \
@@ -112,7 +114,6 @@ dist_noinst_MANS = \
 	man4/tpiperf.4.man \
 	man7/npi_sctp.7.man \
 	man7/tpi_sctp.7.man \
-	man7/strsctp_soon.7.man \
 	man8/strsctp_mknod.8.man \
 	man8/test-interop.8.man \
 	man8/test-sctp.8.man \

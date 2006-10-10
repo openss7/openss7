@@ -1,3 +1,21 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* doc/man/Makefile.am: updates for release
+	* doc/man/strsctp.refs: updates for release
+	* doc/man/man3/xti_sctp.3.man: updates for release
+	* doc/man/man4/tpiperf.4.man: updates for release
+	* doc/man/man7/npi_sctp.7.man: updates for release
+	* doc/man/man7/tpi_sctp.7.man: updates for release
+	* doc/man/man8/test-sctp.8.man: updates for release
+	* doc/man/man8/test-sctp_nc.8.man: updates for release
+	* doc/man/man8/test-sctp_ns.8.man: updates for release
+	* doc/manual/todo.texi: updates for release
+	* src/modules/tpiperf.c: correction and notes
+
 2006-10-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

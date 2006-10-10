@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-sctp_ns.8.man,v 0.9.2.2 2006/04/05 09:44:34 brian Exp $
+.\" @(#) $Id: test-sctp_ns.8.man,v 0.9.2.3 2006/10/10 10:46:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:34 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:46:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-sctp_ns.8.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:46:18  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.2  2006/04/05 09:44:34  brian
 .\" - moved .so line and updated headers
 .\"
@@ -81,130 +84,370 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B test-inet_raw
-\- a test suite executable for the SCTP(4) STREAMS module
+.B test-sctp_ns
+\- a simple server test program for the sctp(4) STREAMS driver
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBtest-inet_raw\fR [\fIoptions\fR]
+\fBtest-sctp_ns\fR [\fIoptions\fR]
 .PD 0
 .HP 12
-\fBtest-inet_raw\fR {\fB-l\fR|\fB--list\fR}
+\fBtest-sctp_ns\fR {\fB-h\fR|\fB--help\fR}
 .HP 12
-\fBtest-inet_raw\fR {\fB-h\fR|\fB--help\fR}
+\fBtest-sctp_ns\fR {\fB-V\fR|\fB--version\fR}
 .HP 12
-\fBtest-inet_raw\fR {\fB-V\fR|\fB--version\fR}
-.HP 12
-\fBtest-inet_raw\fR {\fB-C\fR|\fB--copying\fR}
+\fBtest-sctp_ns\fR {\fB-C\fR|\fB--copying\fR}
 .PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.B test-inet_raw
-is a test suite executable for the
-.BR SCTP (4)
+.B test-sctp_ns
+is a simple server test program for the
+.BR sctp (4)
 .I STREAMS
-module.
+driver.  It is intended to be used with the
+.BR test-sctp_nc (8)
+client program.
+.PP
+When
+.B test-sctp_ns
+executes, it opens an NPI Stream on device
+.B /dev/sctp_n
+and binds it to the
+.I LOCAL-HOST
+address and
+.I PORT
+port number.  It then listens for a connection
+from the
+.I REMOTE-HOST
+address and
+.I PORT
+port number,
+where it is expected that the corresponding
+.BR test-sctp_nc (8)
+program is running.
+.PP
+Once connected, the program enters a
+.BR poll (2)
+loop and begins reading and writing message of length
+.I LENGTH
+continuously.
+Every
+.I REPORT-TIME
+seconds, the program will print a report line that shows the throughput that
+was acheived on both read and write sides.
+The program runs indefinitely (until interrupted from the controlling
+terminal).
+.PP
+The report output is formatted as described under
+.RI \(lq "OUTPUT FORMAT" \(rq,
+below.
 .\"
 .\"
 .SH OPTIONS
 .PP
+.B test-sctp_ns
+options fall into several categories as detailed in the subsections below.  If
+.B test-sctp_ns
+is executed without any options, it will execute the test and report progress.
+.\"
+.SS Command Options
+.PP
+These command options determine whether the program is run or whether an informative function is
+performed instead.  If none of these command options are specified, then it is assumed that the test
+test program is to be executed.  Options
+.BR --help ", " --version " and " --copying
+will override the program execution.
 .TP
-\fB-d\fR, \fB--device\fR \fIDEVICE\fR
-.TP
-\fB-e\fR, \fB--exit\fR
-.TP
-\fB-l\fR, \fB--list\fR [\fIRANGE\fR]
-When this option is encountered,
-print a list of test cases to
-.I stdout
-and exit.
-When a
-.I RANGE
-of test cases are specified, only the specified range of tests will be listed.
-When used in combination with
-.B --verbose
-this option will print more or less information.
-.TP
-\fB-f\fR, \fB--fast\fR [\fISCALE\fR]
-.TP
-\fB-s\fR, \fB--summary\fR
-.TP
-\fB-o\fR, \fB--onetest\fR [\fITESTCASE\fR]
-.TP
-\fB-t\fR, \fB--tests\fR [\fIRANGE\fR]
-.TP
-\fB-m\fR, \fB--messages\fR
-.TP
-\fB-q\fR, \fB--quiet\fR
-.TP
-\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
-.TP
-\fB-h\fR, \fB--help\fR
+\fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
 When this option is encountered,
 print usage information to
 .I stdout
 and exit.
+Note that all options specified following this option are ignored.
 .TP
-\fB-V\fR, \fB--version\fR
+\fB-V\fP, \fB--version\fP
 When this option is encountered,
 print version information to
 .I stdout
 and exit.
+Note that all options specified following this option are ignored.
 .TP
-\fB-C\fR, \fB--copying\fR
+\fB-C\fP, \fB--copying\fP
 When this option is encountered,
 print copying information to
 .I stdout
 and exit.
+Note that all options specified following this option are ignored.
+.\"
+.SS General Options
+.PP
+The following options are applicable to all command options.  For other than test case command
+options, these general options must appear ahead of the command option.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Specifies that the caller is interested only in the return code and error diagnostics and that
+normal output should be suppressed.
+The default verbosity level if this option is not specified is
+.BR 1 .
+This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fP, \fB--verbose\fP [\fILEVEL\fP]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.
+The default verbosity level if this option is not specified is
+.BR 1 .
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+.\"
+.SS Test Program Options
+.PP
+The following options are only applicable if test program execution is in
+effect.  That is, these options are only effective if the test program is
+being executed and are used to modify the manner in which the test program is
+executed or results reported.
+.TP
+\fB-p\fP, \fB--port\fP \fIPORT\fP
+Specifies both the local and remote port number to use,
+.IR PORT .
+The default port number if this option is not specified is port
+.B 10000
+for the local port and
+.B 10001
+for the remote port.
+.TP
+\fB-l\fP, \fB--loc_host\fP \fILOCAL-HOST\fP
+Specifies the
+.I LOCAL-HOST
+to which to bind.
+.I LOCAL-HOST
+is of the format
+.IR host [: port ],
+where
+.I host
+can be either a host name or a numbers and dots IP address.  By default, the
+local host to which to bind is
+.B 127.0.0.1
+and the port number is port
+.BR 10000 ,
+or the port number specified by the
+.B -p
+option.
+.TP
+\fB-r\fP, \fB--rem_host\fP \fIREMOTE-HOST\fP
+Specifies the
+.I REMOTE-HOST
+to which to connect.
+.I REMOTE-HOST
+is of the format
+.IR host [: port ],
+where
+.I host
+can be either a host name or a numbers and dots IP address.  By default, the
+remote host to which to connect is
+.B 127.0.0.1
+and the port number is port
+.BR 10001 ,
+or the port number specified by the
+.B -p
+option.
+.TP
+\fB-t\fP, \fB--rep_time\fP \fIREPORT-TIME\fP
+Specifies the
+.I REPORT-TIME
+in seconds between reports.  A report line will be generated each
+.I REPORT-TIME
+seconds until the test program terminates.  The default is one
+.RB ( 1 )
+second.
+.TP
+\fB-w\fP, \fB--length\fP \fILENGTH\fP
+Specifies the
+.I LENGTH
+of the message that are transmitted in bytes.  The default is
+.B 64
+bytes.
+.\"
+.\"
+.SH "OUTPUT FORMAT"
+.PP
+While
+.B test-sctp_ns
+is running, it generates an output report line once every
+.I REPORT-TIME
+interval.  Each output line is of the format:
+.sp
+.RS
+.nf
+\fC\s-1\
+Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld
+\s+1\fP
+.fi
+.RE
+.PP
+The fields of the output report line are interpreted as follows:
+.TP \w'\fIsent\fP\(em'u
+.I sent
+provides a simple count of the number of messages sent during the interval.
+.TP
+.I recv
+provides a simple count of the number of messages received during the
+interval.
+.TP
+.I tot
+provides the total of the number of messages sent and received during the
+interval.
+.TP
+.I dif
+provides the difference between the number of message sent and the number of
+messages received.
+.TP
+.I tput
+provides a throughput calculation which is the number of bytes sent and
+received during the interval, and is the simple product of the message length
+and the total number of message sent and received.
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occurred and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.BR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.BR stderr .
 .\"
 .\"
 .SH NOTICES
 .PP
+.B test-sctp_ns
+is a very simplistic test program.  You probably do not want to use this
+program.  It would be better to use the OpenSS7 Modified Netperf package
+.RB ( netperf )
+to perform any performance testing.  The only disadvantage of the
+.BR netperf (1)
+program is that its invokes the Transport Provider Interface,
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+instead of the Network Provider Interface,
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
 .\"
 .\"
 .SH EXAMPLES
 .PP
+The following is a simple example on the use of
+.B test-sctp_ns
+and
+.BR test-sctp_nc (8).
+.PP
+On one terminal of a host supporting STREAMS
+.BR sctp_n (4),
+execute the following:
+.sp
+.RS
+.nf
+\fC\s-1\
+$> test-sctp_ns --length=256
+\s+1\fP
+.fi
+.RE
+.PP
+On another terminal of the same host
+execute the following:
+.sp
+.RS
+.nf
+\fC\s-1\
+$> test-sctp_nc --length=256
+\s+1\fP
+.fi
+.RE
+.PP
+Note that the server program should be executed first.
+.PP
+Both programs will continue to run and output a report line until they are
+interrupted from the keyboard.
 .\"
 .\"
 .SH DEVICES
 .PP
+The
+.B test-sctp_ns
+program opens the
+.B /dev/sctp_n
+device that provides a Network Provider Interface.
+.[
+npi revision 2.0.0
+.]
+See
+.BR sctp_n (4).
 .\"
 .\"
 .SH FILES
 .PP
 .TP
-.B /usr/libexec/@PACKAGE@/test-inet_raw
+.B /usr/libexec/@PACKAGE@/test-sctp_ns
 contains the
-.B test-inet_raw
+.B test-sctp_ns
 command.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR sctp (4),
+.BR sctp_n (4),
+.BR test-sctp_nc (8),
+.BR poll (2),
+.BR netperf (1),
+.BR npi (7),
+.BR tpi (7).
 .\"
 .\"
 .SH BUGS
 .PP
+.B test-sctp_ns
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B test-sctp_ns
+is compatible with
+.BR test-sctp_nc (8).
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.B test-sctp_ns
+is a simple test program and is not subject to standardization.
 .\"
 .\"
 .SH HISTORY
 .PP
+.B test-sctp_ns
+is one of the original test programs provided with the
+.I @PACKAGE_TITLE@
+package.
 .\"
 .\"
 .[
