@@ -70,7 +70,7 @@ static char const ident[] =
  *  ISO Transport over TCP (ITOT)
  */
 
-#include <ss7/os7/compat.h>
+#include <sys/os7/compat.h>
 
 /*
  *  These are for TPI definitions.
@@ -104,7 +104,7 @@ MODULE_AUTHOR(ITOT_CONTACT);
 MODULE_DESCRIPTION(ITOT_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ITOT_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(ITOT_LICESNE);
+MODULE_LICENSE(ITOT_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-itot");
@@ -139,8 +139,8 @@ static struct module_info itot_minfo = {
 	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
-static struct module_stat itot_rstat = { 0, } __attribute__ ((aligned(SMP_CACHE_BYTES)));
-static struct module_stat itot_wstat = { 0, } __attribute__ ((aligned(SMP_CACHE_BYTES)));
+static struct module_stat itot_rstat __attribute__ ((aligned(SMP_CACHE_BYTES)));
+static struct module_stat itot_wstat __attribute__ ((aligned(SMP_CACHE_BYTES)));
 
 static streamscall int itot_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int itot_close(queue_t *, int, cred_t *);
@@ -160,6 +160,11 @@ static struct qinit itot_winit = {
 	.qi_putp = itot_wput,		/* Write put (message from above) */
 	.qi_minfo = &itot_minfo,	/* Module information */
 	.qi_mstat = &itot_wstat,	/* Module statistics */
+};
+
+struct streamtab itot_info = {
+	.st_rdinit = &itot_rinit,
+	.st_wrinit = &itot_winit,
 };
 
 /*
@@ -190,11 +195,12 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 	case T_CONN_IND:
 	{
 		/* Transform into N_CONN_IND. */
-		struct n { N_conn_ind_t prim; unsigned short family; char address[20]; } = { { N_CONN_IND, }, };
+		struct prim { N_conn_ind_t prim; unsigned short family; char address[20]; } n = { { N_CONN_IND, }, };
 		struct T_conn_ind *t = (typeof(t)) mp->b_rptr;
 		struct sockaddr_in *sin = (struct sockaddr_in *)((unsigned char *)t + t->SRC_offset);
 		int length = 0;
 
+		(void) sin;
 		n.prim.PRIM_type = N_CONN_IND;
 		n.prim.DEST_length = 0;
 		n.prim.DEST_offset = 0;
@@ -228,73 +234,91 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		/* Transform into N_CONN_CON. */
 		N_conn_con_t n = { N_CONN_CON, };
 		struct T_conn_con *t = (typeof(t)) mp->b_rptr;
+		(void) n;
+		(void) t;
 	}
 	case T_DISCON_IND:
 	{
 		/* Transform into N_DISCON_IND. */
 		N_discon_ind_t n = { N_DISCON_IND, };
 		struct T_discon_ind *t = (typeof(t)) mp->b_rptr;
+		(void) n;
+		(void) t;
 	}
 	case T_DATA_IND:
 	{
 		/* Transform into N_DATA_IND. */
 		N_data_ind_t n = { N_DATA_IND, };
+		(void) n;
 	}
 	case T_EXDATA_IND:
 	{
 		/* Transform into N_EXDATA_IND. */
 		N_exdata_ind_t n = { N_EXDATA_IND, };
+		(void) n;
 	}
 	case T_INFO_ACK:
 	{
 		/* Transform into N_INFO_ACK. */
 		N_info_ack_t n = { N_INFO_ACK, };
+		(void) n;
 	}
 	case T_BIND_ACK:
 	{
 		/* Transform into N_BIND_ACK. */
 		N_bind_ack_t n = { N_BIND_ACK, };
+		(void) n;
 	}
 	case T_ERROR_ACK:
 	{
 		/* Transform into N_ERROR_ACK. */
 		N_error_ack_t n = { N_ERROR_ACK, };
+		(void) n;
 	}
 	case T_OK_ACK:
 	{
 		/* Transform into N_OK_ACK. */
 		N_ok_ack_t n = { N_OK_ACK, };
+		(void) n;
 	}
 	case T_UNITDATA_IND:
 	{
 		/* Transform into N_UNITDATA_IND. */
 		N_unitdata_ind_t n = { N_UNITDATA_IND, };
+		(void) n;
 	}
 	case T_UDERROR_IND:
 	{
 		/* Transform into N_UDERROR_IND. */
 		N_uderror_ind_t n = { N_UDERROR_IND, };
+		(void) n;
 	}
 	case T_OPTMGMT_ACK:
 	{
 		/* Transform into N_OK_ACK. */
 		N_ok_ack_t n = { N_OK_ACK, };
+		(void) n;
 	}
 	case T_ORDREL_IND:
 	{
 		/* Transform into N_DISCON_IND. */
 		N_discon_ind_t n = { N_DISCON_IND, };
+		(void) n;
 	}
 	case T_OPTDATA_IND:
 	{
 		/* Transform into N_QOSDATA_IND, N_DATA_IND or N_EXDATA_IND. */
 #ifdef N_QOSDATA_IND
 		N_qosdata_ind_t n = { N_QOSDATA_IND, };
+		(void) n;
 #else
+		int isnotexpedited = 0;
 		if (isnotexpedited) {
 			N_data_ind_t n = { N_DATA_IND, };
+			(void) n;
 		} else {
 			N_exdata_ind_t n = { N_EXDATA_IND, };
+			(void) n;
 		}
 #endif
 
@@ -308,6 +332,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 	{
 		/* Transform into N_INFO_ACK. */
 		N_info_ack_t n = { N_INFO_ACK, };
+		(void) n;
 	}
 
 /*
@@ -348,6 +373,13 @@ itot_r_flush(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+static streamscall int
+itot_r_data(queue_t *q, mblk_t *mp)
+{
+	__swerr();
+	return (EFAULT);
+}
+
 static streams_fastcall streams_noinline int
 itot_r_msg(queue_t *q, mblk_t *mp)
 {
@@ -360,6 +392,8 @@ itot_r_msg(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		return itot_r_flush(q, mp);
 	}
+	putnext(q, mp);
+	return (0);
 }
 
 static streamscall __hot_get int
@@ -428,6 +462,13 @@ itot_w_flush(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+static streamscall int
+itot_w_data(queue_t *q, mblk_t *mp)
+{
+	__swerr();
+	return (EFAULT);
+}
+
 static streams_fastcall streams_noinline int
 itot_w_msg(queue_t *q, mblk_t *mp)
 {
@@ -440,6 +481,8 @@ itot_w_msg(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		return itot_w_flush(q, mp);
 	}
+	putnext(q, mp);
+	return (0);
 }
 
 /**
@@ -460,4 +503,16 @@ itot_wput(queue_t *q, mblk_t *mp)
 	if (type == M_PROTO)
 		return itot_w_proto(q, mp);
 	return itot_w_msg(q, mp);
+}
+
+static streamscall int
+itot_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
+{
+	return (ENXIO);
+}
+
+static streamscall int
+itot_close(queue_t *q, int oflags, cred_t *crp)
+{
+	return (ENXIO);
 }
