@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: itot.4.man,v 0.9.2.1 2006/10/03 13:24:21 brian Exp $
+.\" @(#) $Id: itot.4.man,v 0.9.2.2 2006/10/10 10:44:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,13 +53,23 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:24:21 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:44:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: itot.4.man,v $
-.\" Revision 0.9.2.1  2006/10/03 13:24:21  brian
-.\" - file additions and removals for make check target
+.\" Revision 0.9.2.2  2006/10/10 10:44:02  brian
+.\" - updates for release, lots of additions and workup
+.\"
+.\" Revision 0.9.2.2  2006/10/03 13:52:18  brian
+.\" - changes to pass make check target
+.\" - added some package config.h files
+.\" - removed AUTOCONFIG_H from Makefile.am's
+.\" - source code changes for compile
+.\" - added missing manual pages
+.\" - renamed conflicting manual pages
+.\" - parameterized include Makefile.am
+.\" - updated release notes
 .\"
 .\" Revision 0.9.2.1  2006/04/11 18:22:13  brian
 .\" - added manual pages and references
@@ -84,8 +94,8 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B itot
-\- ISO Transport over TCP
+.B isot, itot
+\- ISO Transport over TCP (ISOT/ITOT)
 .\"
 .\"
 .SH SYNOPSIS
@@ -93,39 +103,197 @@ sort-adjacent-labels
 .\"
 .\"
 .SH DESCRIPTION
+.B ISOT
+is an implementation of ISO Transport over TCP (ISOT) as described in RFC 983,
+.[
+rfc983
+.]
+superseded by RFC 1006.
+.[
+rfc1006
+.]
+.B ITOT
+is an implementation of ISO Transport over TCP (ITOT) as described in RFC
+2126.
+.[
+rfc2126
+.]
+Note that the former (RFC 1006) names the service
+.BR ISOT ;
+whereas the latter (RFC 2125) names the service
+.BR ITOT .
 .PP
+Regardless of the naming differences, these RFCs describe the use of IS 8073
+.[
+ISO/IEC 8073
+.]
+ISO Transport Class 0 over TCP/IP (ISOT/ITOT) by using TCP/IP as a
+Connection-oriented Network Service Provider instead of ISO CONS.
+.[
+ISO/IEC 8878
+.]
+.PP
+They describe adaptation of TCP to an ISO CONS
+.[
+x223
+.]
+network service provider through the use of a 4 byte header used to delimit
+NPDUs inside of the TCP stream.
+.PP
+RFC 983
+.[
+rfc983
+.]
+and RFC 1006
+.[
+rfc1006
+.]
+provided for ISO Transport Class 0 over TCP (or UDP under
+protest) (ISOT) on port number 102.
+RFC 1006
+is a standard (STD 35).
+.PP
+RFC 2126
+.[
+rfc2126
+.]
+also provides for ISO Transport Class 0 over TCP (or UDP under protest) (ISOT)
+on port number 102.  But, in addition to these services provided by RFC
+1006/STD 35, RFC 2126 also provides for ISO Transport Class 2 over TCP (or UDP
+under protest) (ITOT), using independent TCP/IP connections to port number
+399, and also supports both IPv4 and IPv6.
 .\"
 .\"
 .SH USAGE
 .PP
+Not yet implemented, but here is a stab at explaining the design:
+.PP
+The following steps will be taken:
+.IP 1. \w'0.\(em'u
+A TP connection manager opens a connection management Stream on the TP
+multiplexing driver and listens for requests for the establishment of
+network connections.
+.IP 2.
+A TP user opens an upper Stream for ISO Transport Class 0 or ISO Trasnport
+Class 2.  The TP user then attempts to listen on the transport endpoint or
+connect the transport endpoint.  If a suitable (determined by address format,
+TSAP, and ownership) network connection is not available, it requests a
+network connection from the connection manager.  (TP2 performs multiplexing,
+so it is possible that many TP2 Streams could be opened and served by the same
+network connection.)
+.IP 3.
+When the connection manager receives the request, it uses the address format,
+TSAP and qos parameters to determine if an ISOT or ITOT network connection is
+requested.
+.IP 4.
+If an ISOT or ITOT network connection is requested, the connection manager
+opens a
+.BR tcp (4)
+or
+.BR udp (4)
+Stream to the requested address and connects the Stream to the appropriate
+port number (102 for ISOT TP0 and 399 for ITOT TP2).
+.IP 5.
+The connection manager then pushes the
+.B isot
+or
+.B itot
+module on the Stream.  This transforms the Stream into an ISO CONS provider
+and presents the
+.B npi (7)
+service interface at the upper boundary.
+.IP 6.
+The connection manager then links the ISOT or ITOT Stream under the TP
+multiplexing driver and configures the Stream within the TP driver in response
+to the network connection request.
+.IP 7.
+TP then proceeds as normal, unaware that TCP/IP is providing the ISO CONS
+service.
 .\"
 .\"
 .SH INTERFACE
 .PP
+The service interface for the ISOT and ITOT modules at the upper boundary is
+the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+The service interface for the ISOT and ITOT modules at the lower boundary is
+the Trasnsport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
 .\"
 .\"
 .SH ADDRESSES
 .PP
+Generic string addresses for ISOS and ITOS are described in RFC 1278.
+.[
+rfc1278
+.]
+.PP
+OSI NSAP addresses for ISOS and ITOS are described for IPv4 in RFC 1277,
+.[
+rfc1277
+.]
+for IPv6 in RFC 1888
+.[
+rfc1888
+.]
+superseded by IPv4 and IPv6 in RFC 4548.
+.[
+rfc4548
+.]
 .\"
 .\"
 .SH OPTIONS
 .PP
+.PP
+.B ISOT
+and
+.B ITOT
+modules support the ISO CONS
+options described in X.213
+.[
+x213
+.]
+and X.223.
+.[
+x223
+.]
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+The
+ISOT and ITOT modules interwork
+.BR npi (7)
+primitives from its upper interface (write queue) to 
+.BR tpi (7)
+primitives at its lower interface (read queue).
+This section describes only the upper interface.  For a description of the
+lower interface, see
+.BR tcp (4)
+and
+.BR upd (4).
+.SS N_BIND_REQ\fR(7), \fPN_BIND_ACK\fR(7)
 .\"
 .\"
 .SH IOCTLS
 .PP
+ISOT and ITOT do not support any input-output controls of their own.
 .\"
 .\"
 .SH NOTICES
 .PP
+These modules are not implemented.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+These modules are not implemented.
 .\"
 .\"
 .SH FILES
@@ -134,38 +302,67 @@ sort-adjacent-labels
 .\"
 .SH MODULES
 .PP
+.TP
+.B isos
+the ISOS module is a
+.I STREAMS
+module named
+.RI \(lq isos \(rq.
+.TP
+.B itos
+the ITOS module is a
+.I STREAMS
+module named
+.RI \(lq itos \(rq.
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.B /dev/tcp
+The
+.B tcp (4)
+device opened onto which ISOS or ITOS is pushed.
+.TP
+.B /dev/udp
+The
+.B udp (4)
+device opened onto which ISOS or ITOS is pushed.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR ns-tcp (4),
-.BR xol (4),
-.BR xot (4),
-.BR isot (4),
-.BR itot (4),
-.BR iso-ip (4),
-.BR iso-tp4 (4),
 .IR ISO (4).
 .\"
 .\"
 .SH BUGS
 .PP
+These modules are not implemented and so cannot have any bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+This implementation of ISOT and ITOT is specific to
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+ISOT conforms to RFC 1006.
+.[
+rfc1006
+.]
+ITOT confirms to RFC 2126.
+.[
+rfc2126
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR ISOT " and " ITOT
+are new for
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

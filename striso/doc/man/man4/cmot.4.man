@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: cmot.4.man,v 0.9.2.2 2006/10/03 13:52:18 brian Exp $
+.\" @(#) $Id: cmot.4.man,v 0.9.2.3 2006/10/10 10:44:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:52:18 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:44:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: cmot.4.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:44:02  brian
+.\" - updates for release, lots of additions and workup
+.\"
 .\" Revision 0.9.2.2  2006/10/03 13:52:18  brian
 .\" - changes to pass make check target
 .\" - added some package config.h files
@@ -97,54 +100,208 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.HP
+.IB cmip_stream " = open(" \(lq/dev/cmot\(rq ", O_RDWR);
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B CMOT
+is an implementation of CMIP over TCP as described in
+.IR "ISO Management over IP (CMOT)" ,
+RFC 1095,
+.[
+rfc1095
+.]
+superseded by
+RFC 1189,
+.[
+rfc1189
+.]
+with assigned IANA port number 163 (cmip-man).
 .\"
 .\"
 .SH USAGE
 .PP
+.B CMOT
+is used for communicating with a CMIP agent or client over a TCP/IP network.
+On the client side, a
+.B /dev/cmot
+device is opened and connected to the CMIP server using the presentation
+address as described in RFC 1069.
+.[
+rfc1069
+.]
+Then operations and components are exchanged using the XTI-mOSI interface.
+.PP
+On the server side, the
+.B /dev/cmot
+device is opened and listens on the presentation service access point as
+described in RFC 1069.
+.[
+rfc1069
+.]
+When a call indication comes in, the CMIP server opens another
+.B /dev/cmot
+Stream and accepts the connection using the XTI-mOSI interface and begins
+servicing requests.
 .\"
 .\"
 .SH INTERFACE
 .PP
+The interface presented is the Transport Provider Interface Revision 2.0.0,
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+with the minimal OSI extensions described in XNS 5.2.
+.[
+xns
+.]
 .\"
 .\"
 .SH ADDRESSES
 .PP
+Addresses are formatted as presentation addresses as described in RFC 986
+.[
+rfc986
+.]
+and superseded by RFC 1069.
+.[
+rfc1069
+.]
 .\"
 .\"
 .SH OPTIONS
 .PP
+Quality of Service paramters are as described in RFC 986
+.[
+rfc986
+.]
+and superseded by RFC 1069.
+.[
+rfc1069
+.]
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+The primitives of the connection-oriented transport service provider.
+.HP
+\fBT_BIND_REQ\fR(7)
+.PD 0
+.HP
+\fBT_BIND_ACK\fR(7)
+.HP
+\fBT_INFO_REQ\fR(7)
+.HP
+\fBT_INFO_ACK\fR(7)
+.HP
+\fBT_CAPABILITY_REQ\fR(7)
+.HP
+\fBT_CAPABILITY_ACK\fR(7)
+.HP
+\fBT_CONN_REQ\fR(7)
+.HP
+\fBT_CONN_IND\fR(7)
+.HP
+\fBT_CONN_RES\fR(7)
+.HP
+\fBT_CONN_CON\fR(7)
+.HP
+\fBT_OPTDATA_REQ\fR(7)
+.HP
+\fBT_OPTDATA_IND\fR(7)
+.HP
+\fBT_DATA_REQ\fR(7)
+.HP
+\fBT_DATA_IND\fR(7)
+.HP
+\fBT_EXDATA_REQ\fR(7)
+.HP
+\fBT_EXDATA_IND\fR(7)
+.HP
+\fBT_DISCON_REQ\fR(7)
+.HP
+\fBT_DISCON_IND\fR(7)
+.HP
+\fBT_ORDREL_REQ\fR(7)
+.HP
+\fBT_ORDREL_IND\fR(7)
+.HP
+\fBT_UNBIND_REQ\fR(7)
+.HP
+\fBT_OK_ACK\fR(7)
+.HP
+\fBT_ERROR_ACK\fR(7)
+.PD
 .\"
 .\"
 .SH IOCTLS
 .PP
+None.
 .\"
 .\"
 .SH NOTICES
 .PP
+None of this has been implemented yet.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+.B CMOT
+requires the services of the LPP (Lightweight Presentation Protocol),
+RFC 1085,
+.[
+rfc1085
+.]
+.BR lpp (4),
+which can be implemented as a
+.I STREAMS
+pushable module that is pushed over a TCP (tpi) Stream to form a TPI-mOSI
+Stream.
+.PP
+.B CMOT
+can be implemented, also, as a
+.I STREAMS
+pushable module that is then pushed over the LPP (tpi-mosi) Stream, or it can be
+implemented as a user-space library that simply uses the LPP (tpi-mosi)
+Stream.
+Note that CMISE
+.[
+cmip
+.]
+uses ACSE and could easily be represented using the TPI-mOSI
+in the same fashion as is done for SS7 TCAP.
 .\"
 .\"
 .SH FILES
 .PP
+Obviously there are some GDMO files somewhere.
 .\"
 .\"
 .SH MODULES
 .PP
+.TP
+.B cmot
+the CMOT pushable module.
+.TP
+.B lpp
+the LPP pushable module.
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.B /dev/cmot
+the CMOT device, which is an
+.BR lpp (4)
+device with the CMOT module autopushed.
+.TP
+.B /dev/lpp
+the
+.BR lpp (4)
+deivce which is a TCP device with the LPP module autopushed.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -161,18 +318,23 @@ sort-adjacent-labels
 .\"
 .SH BUGS
 .PP
+None of this is implemented yet, so it cannot have any bugs yet.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+None.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+Too many to mention just now.
 .\"
 .\"
 .SH HISTORY
 .PP
+The modules and drivers listed here are new for
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

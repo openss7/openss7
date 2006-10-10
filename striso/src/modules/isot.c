@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $
+ @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/11 12:32:05 $ by $Author: brian $
+ Last Modified $Date: 2006/10/10 10:44:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isot.c,v $
+ Revision 0.9.2.2  2006/10/10 10:44:15  brian
+ - updates for release, lots of additions and workup
+
  Revision 0.9.2.1  2006/07/11 12:32:05  brian
  - added ISO and other implementations to distribution
 
@@ -58,19 +61,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $"
+#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:15 $"
 
-static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/11 12:32:05 $";
+static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:15 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
  *
  *  ISOT implements ISO Transport Protocol Class 0 (TP0) over TCP/IP in
  *  accordance with RFC 1006.  This module implements the upper layer protocol
- *  module that constitutes a specialized ISO TS-Provider that implements the
- *  ISOT protocol to TCP acting as an NS-Provider.  This module presents an
- *  ISO TPI interface to the TS-User above it.
- *
- *  This module is meant to be pushed over a TCP Transport Provider Interface
- *  (TPI) stream that already has a "tcpns" module pushed over it.
+ *  module that constitutes a specialized ISO NS-Provider that implements the
+ *  ISOT protocol to TCP.  This module presents an ISO NPI interface to the
+ *  NS-User above it.  The NS-User above is expected to be a ISO Transport
+ *  Protocol Class 0 (TP0).
  */

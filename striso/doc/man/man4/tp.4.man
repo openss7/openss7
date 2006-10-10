@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tp.4.man,v 0.9.2.1 2006/04/11 18:22:13 brian Exp $
+.\" @(#) $Id: tp.4.man,v 0.9.2.2 2006/10/10 10:44:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/11 18:22:13 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:44:03 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tp.4.man,v $
+.\" Revision 0.9.2.2  2006/10/10 10:44:03  brian
+.\" - updates for release, lots of additions and workup
+.\"
 .\" Revision 0.9.2.1  2006/04/11 18:22:13  brian
 .\" - added manual pages and references
 .\"
@@ -106,78 +109,847 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+.B TP
+is an implementation of X.214,
+.[
+x214
+.]
+and X.224.
+.[
+x224
+.]
+.PP
+There are several ways of providing the ISO TP as follows:
+.IP 1. \w'0.\(em'u
+The classical way is using ISO CONS,
+.BR cons (4),
+as described in X.213,
+.[
+x213
+.]
+implemented using X.25 PLP,
+.BR plp (4),
+as described in X.223,
+.[
+x223
+.]
+or an equivalent such as ISO/IEC 8881,
+.[
+iso/iec 8881
+.]
+or XOT,
+.[
+rfc1613
+.]
+.BR xot (4).
+.IP 2.
+Another way of providing the ISO CONS
+.[
+x213
+.]
+services needed by TP is by providing CONS over TCP/IP (ISOT),
+.BR isot (4),
+as described in RFC 1006,
+.[
+rfc1006
+.]
+to provide TP0 (ISO Transport Protocol Class 0) support.
+.IP 3.
+CONS over TCP/IP (ITOT),
+.BR itot (4),
+as described in RFC 2126,
+.[
+rfc2126
+.]
+to provide TP0 (ISO Transport Protocol Class 0) and TP2 support.
+.IP 4.
+CONS over SCTP (ISOS),
+.BR isos (4),
+for TP0 support.
+.IP 5.
+CONS over SCTP (ITOS),
+.BR itos (4),
+for TP0, TP2, TP4/CONS support.
+.IP 6.
+Another wasy is to provide ISO CLNS,
+.BR clns (4),
+as described in X.213,
+.[
+x213
+.]
+implemented using CLNP as described in X.233,
+.[
+x233
+.]
+in support of TP4/CLNS.
+ISO CLNS can also, however, be provided in support of TP4 (or other CLNS
+users) using ISO-IP,
+.BR iso-ip (4),
+as defined in RFC 1070,
+.[
+rfc1070
+.]
+or ISO-UDP,
+.BR iso-udp (4),
+as defined in RFC 1070,
+.[
+rfc1070
+.]
+or directly over LLC1 on ISO/IEC 8802
+.[
+iso/iec 8802
+.]
+based LANs.
+See
+.BR clns (4),
+for more information.
 .\"
 .\"
 .SH USAGE
 .PP
+A user of the TP service opens the pseudo-device driver by opening the clone
+device
+.BR /dev/tp ,
+or one of the ISO Transport Protocol Class specific clone devices
+.BR /dev/tp0 ", " /dev/tp1 ", " /dev/tp2 ", " /dev/tp3 " or " /dev/tp4 .
+This yields a TP Stream.  When the user binds the Stream to a local TSAP
+(which includes a local NSAP), the form of the NSAP determines which of the
+underlying CONS protocols are used to provide service to the TP Stream.
+.PP
+A TP Stream is associated with an underlying provider in the following
+fashion:
+.IP \(bu \w'\(bu\(em'u
+When the TP Stream is bound, using the
+.BR T_BIND_REQ (7)
+primitive, and when the TP Stream is connected, using the
+.BR T_CONN_REQ (7)
+primitive, the TP driver determines whether suitable network provider exists.
+If a suitable provider exists, the TP User Stream is associated with the
+network provider Stream(s).  If a suitable provider does not exist, a request
+is issued to a connection manager daemon (TP CM) listening on the connection
+management (CM) Stream.
+.IP \(bu
+The TP CM can satisfy requests by opening, binding and possibly connecting an
+NP Stream that provides the X.213 service interface, such as the NP driver,
+.BR np (4).
+The TP CM then links the bound and possibly connected NP Stream beneath the TP
+multiplexing driver and responds to the request on the CM Stream indicating
+the multiplexer identifier of the linked Stream returned from the
+.BR I_LINK "(7) or " I_PLINK (7)
+operation.
+The TP driver then associates the TP User Stream with the appropriate NS
+Provider Stream and responds appropriately to the user.
+.IP ""
+If binding the Stream fails, the TP CM responds on the CM Stream with a
+negative acknowledgement that the TP driver translates into an appropriate
+.BR T_ERROR_ACK (7)
+primitive to the TP user.
+.IP \(bu
+The TP CM can choose to distinguish between CONS and CLNS services when it
+satisfies a CM request.  In the case of CONS, it can open a CONS Stream,
+.BR cons (4),
+and use it to satsify the request.  In the case of CLNS, a CLNS Stream,
+.BR clns (4).
+.IP \(bu
+The TP CM can also choose to distinguish between forms of the CONS and CLNS
+provider.  The TP CM then satisfies requests by examining the NSAP and TSAP
+contained in the
+.BR T_BIND_REQ "(7) or " T_CONN_REQ (7)
+primitive.  The NSAP can be in one several forms as follows:
+.IP ""
+.RS
+.IP 1. \w'0.\(em'u
+An X.121
+.[
+x121
+.]
+or similar X.25 address (e.g. ISDN).
+If the request was for CONS, the TP CM opens a suitable CONS
+Stream (e.g. X.25 PLP,
+.BR plp (4)).
+If the request is for CLNS, the TP CM opens a suitable CLNS Stream,
+.BR clns (4).
+.IP 2.
+An Internet NSAP as described in RFC 1277,
+.[
+rfc1277
+.]
+or RFC 4548;
+.[
+rfc4548
+.]
+not containing a TCP/IP port number.
+If the request is for CONS, the CM opens an
+.BR sctp "(4), " tcp "(4) or " udp (4)
+Stream and pushes the appropriate
+.BR itos "(4), " isos "(4), " itot "(4) or " isot (4)
+module on the Stream.
+If the request is for CLNS, the TP CM opens a
+.BR rawip (4)
+Stream and pushes the
+.BR iso-ip (4)
+module onto the Stream.
+.IP 3.
+An Internet NSAP as described in RFC 1069;
+.[
+rfc1069
+.]
+containing a TCP/IP port number.
+If the request is for CONS, the TP CM performs the same actions as in (2)
+above.  The difference from (2) is that the SCTP, TCP or UDP Stream will
+connect to the port number specified in a subsequent
+.BR N_CONN_REQ (7)
+primitive rather than the IANA registered port number (102 or 399).
+If the request is for CLNS, the TP CM opens a
+.BR udp (4)
+Stream and pushes the
+.BR iso-udp (4)
+module onto the Stream.
+.RE
+.IP \(bu
+The TP CM can distinguish further between requested NS providers using
+information from the
+.BR T_BIND_REQ "(7) or " T_CONN_REQ (7)
+primtive, so long as the linked Stream used to satisfy the request provides
+the ISO Network Service of the appropriate service type (CONS or CLNS) defined
+by X.213
+.[
+x213
+.]
+using the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+.IP \(bu
+Provider Stream may also be linked under the TP multiplexing driver at
+configuration time using static configuration information obtained from
+configuration files.  For example, a CLNS Stream, from the
+.BR clns (4)
+driver, could normally be linked under the TP multiplexing driver at boot
+time.
+.IP \(bu
+Provider Streams may also be linked under the TP multiplexing driver as the
+result of routing discovery protocols or interface changes.
+.IP \(bu
+The TP User may explicitly identify NS provider Streams for private
+use by either linking them under the TP driver using the
+.BR I_LINK (7)
+.I STREAMS
+input-output control described in
+.BR streamio (7),
+or by pushing TP as a module over an NS provider Stream.  In this
+case, when the TP User issues a TP bind or connect request, the private NS
+provider Streams will be used (i.e. a suitable provider will be found).
 .\"
 .\"
 .SH INTERFACE
 .PP
+The TP User interface on the upper multiplex is the Transport Provider
+Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+supporting the ISO Transport Service Interface, X.214.
+.[
+x214
+.]
+.PP
+The NS Provider interface on the lower multiplex is the Network Provider
+Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+supporting the ISO Network Service Interface, X.213.
+.[
+x213
+.]
+.PP
+The TP CM (Connection Mangement) interface on the connection mangement Stream
+is a specialized interface specific to the TP driver, but is based on the
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+supporting the ISO Transport Service Interface, X.214.
+.[
+x214
+.]
+Details of this interface are described under
+.RI \(lq PRIMITIVE \(rq,
+below.
 .\"
 .\"
 .SH ADDRESSES
 .PP
+TP supports the addresses and TSAPs identified in X.214.
+.[
+x214
+.]
+NSAP contained in Transport addresses can take on several forms including the
+Internet NSAP form as described in RFC 1069,
+.[
+rfc1069
+.]
+RFC 1277,
+.[
+rfc1277
+.]
+or RFC 4548.
+.[
+rfc4548
+.]
+This later form of the NSAP is used to distinguish the need for a ISO
+Transport supported over TCP/IP (ITOS/ITOT/ISOS/ISOT) or an ISO Transport
+supported over IP (ISO-IP/ISO-UDP).
 .\"
 .\"
 .SH OPTIONS
 .PP
+TP User Streams support the full set of Quality of Service parameters as
+described in X.214;
+.[
+x214
+.]
+however, negotiation of Quality of Service parameters is performed between the
+TP user and the underlying CONS or CLNS provider.  Therefore, QOS parameters
+supported to the TP User is dependent upon the QOS support of the underlying
+provider.
+.PP
+For example, QOS parameters included in the
+.BR T_CONN_REQ "(7) or " T_OPTMGMT_REQ (7)
+primitives are passed in the
+.BR N_CONN_REQ "(7) or " N_OPTMGMT_REQ (7)
+primitives to the underlying provider.  Negotiation responses come directly
+from the underlying provider.
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+Primitives supported by the TP User Streams are the full set of OSI conforming
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+primitive for both Connection-oriented Transport Service (COTS) and
+Connectionless Transport Serivce (CLTS).
+.PP
+TP CM Streams support a specialized set of primitives, based on the TPI
+primitives, that provide the ability for the TP CM to receive requests for new
+connections as well as the ablity to indicate the result of those requests.
+.PP
+TP CM requests and responses are formatted as follows:
+.PP
+.nf
+\fC\s-1\
+struct tp_mgmt {
+    t_uscalar_t cm_user;        /* User index */
+    t_uscalar_t cm_prov;        /* Provider index */
+    union T_primitives cm_prim; /* Primitive */
+};
+\s+1\fP
+.fi
+.TP \w'\fIcm_user\fP\(em'u
+.I cm_user
+is the user index.  The user index identifies the TP User that originated the
+request.  The easiest way to implement the user index is to derive it from the
+device number of the TP User Stream.  A portion of the user index (the high
+order 8 bits) can be used to identify the Transport Protocol Class.  These
+bits are interpreted as follows:
+.IP ""
+.RS
+.TP \w'\fBTP_MGMT_CLASS_4\fP\(em'u
+.B TP_MGMT_CLASS
+a bit mask used to mask the
+.I cm_user
+field to test against the values that follow.
+.PD 0
+.TP
+.B TP_MGMT_CLASS_0
+transport protocol class 0.
+.TP
+.B TP_MGMT_CLASS_1
+transport protocol class 1.
+.TP
+.B TP_MGMT_CLASS_2
+transport protocol class 2.
+.TP
+.B TP_MGMT_CLASS_3
+transport protocol class 3.
+.TP
+.B TP_MGMT_CLASS_4
+transport protocol class 4.
+.PD
+.RE
+.IP ""
+These transport management protocol class definitions are provided in the
+.RB < sys/tp.h >
+header file.
+.TP
+.I cm_prov
+is the provider index.  The provider index identifies a CONS or CLNS provider
+that will satisfy a request.  The easiest way to implement the provider index
+is to derive it from the multiplexer identifier that was returned from an
+.BR I_LINK "(7) or " I_PLINK (7)
+operation that was used to link the Stream under the TP multiplexing driver.
+.TP
+.I cm_prim
+is the primitive.  The exact format of the primitive and the size of the
+remainder of the structure can be determined by the
+.I cm_prim.type
+field of the
+.B T_primitives
+union.  The
+.B T_primitives
+union is defined in the
+.RB < sys/tihdr.h >
+header file.
+.PP
+The
+.B tp_mgmt
+structure is contained in the control part
+.RB ( M_PROTO "(9) or " M_PCPROTO (9)
+message block) of the request or response.
+Any data is contained in the data part
+.RB ( M_DATA (9)
+message blocks) of the request or response.  The type of the command is
+determined from the
+.I cm_prim.type
+field in the
+.B cons_mgmt
+structure.
+The
+.B cons_mgmt
+structure is defined in the
+.RB < sys/tp.h >
+header file.
+.PP
+Overloaded primitives are as follows:
+.TP
+.B Bind Request
+The bind request is issued to the TP CM on the connection management Stream
+when a suitable provider could not be found to satisfy a TP User bind
+request,
+.BR T_BIND_REQ (7).
+This primitive requires an acknowledgement by the connection manager with
+either a bind acknowledgement or an error acknowledgement.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Indicates the index within the TP driver of the TP User at which the
+request originated (and the transport protocol class).
+.TP
+.I cm_prov
+Ignored in the bind request.
+.TP
+.I cm_prim
+Contains the
+.BR T_BIND_REQ (7)
+primitive as it was issued by the TP User.
+.RE
+.TP
+.B Bind Acknowledgement
+The bind acknowledgement is issued by the TP CM on the CM Stream when a
+suitable provider has been bound and linked beneath the TP multiplexing
+driver.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding bind request (and the
+transport management protocol class).
+.TP
+.I cm_prov
+Specifies the multiplexer identifier (returned by the
+.BR I_LINK "(7) or " I_PLINK (7)
+operation) that identifies the provider Stream to which the bind ocurred.
+.TP
+.I cm_prim
+Contains the
+.BR T_BIND_ACK (7)
+primitive as it should be issued to the TP User.
+.RE
+.TP
+.B Connection Request
+The connection request is issued to the TP CM on the CM Stream when a suitable
+provider could not be found to satify a TP User connection request,
+.BR T_CONN_REQ (7).
+This primitive requires an acknowledgement by the connection manager with
+either a connection confirmation, disconnect indication, or error
+acknowledgement.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Indicates the user index from the corresponding connection request (and the
+transport protocol class).
+.TP
+.I cm_prov
+Indicates the provider index from the corresponding connection request.  This
+is the provider that was associated with the TP User during the bind
+request.
+.TP
+.I cm_prim
+Contains the
+.BR T_CONN_REQ (7)
+primitive as it was issued by the TP User.  Any data associated with the
+connection request is provided in
+.BR M_DATA (9)
+message blocks attached to the primitive.
+.RE
+.TP
+.B Connection Confirmation
+The connection confirmation is issued by the TP CM on the CM Stream when a
+suitable provider has been connected and linked beneath the TP multiplexing
+driver.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding connection request.
+.TP
+.I cm_prov
+Specifies the multiplexer identifier (returned by the
+.BR I_LINK "(7) or " I_PLINK (7)
+operation) that identifies the provider Stream on which the connection
+ocurred.
+.TP
+.I cm_prim
+Contains the
+.BR T_CONN_CON (7)
+primitive as it should be issued to the TP User.  Any data associated with
+the connection request is provided in the
+.BR M_DATA (9)
+message blocks attached to the primitive.
+.RE
+.TP
+.B Disconnect Indication
+The disconnect indication is issued by the TP CM on the CM Stream when a
+connection to the provider was not possible and resulted in a disconnect.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding connection request.
+.TP
+.I cm_prov
+Specifies the provider index from the corresponding connection request.
+.TP
+.I cm_prim
+Contains the
+.BR T_DISCON_IND (7)
+primitive as it should be issued to the TP User.
+.RE
+.TP
+.B Error Acknowledgement
+The error acknowledgement is issued by the TP CM on the CM Stream when the
+bind or connection to the provider was not possible and resulted in an error.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding bind or connection request.
+.TP
+.I cm_prov
+Specifies the provider index from the corresponding bind or connection
+request.
+.TP
+.I cm_prim
+Contains the
+.B T_ERROR_ACK (7)
+primitive as it should be issued to the TP User.
+.RE
 .\"
 .\"
 .SH IOCTLS
 .PP
+TP Streams do not support any TP-specific input-output controls.  The TP CM
+Stream supports the
+.BR I_LINK "(7), " I_PLINK "(7), " I_UNLINK "(7), " I_PUNLINK (7)
+.I STREAMS
+input-output controls described under
+.BR streamio (7).
+When a TP CM links a provider Stream under the mulitiplexing driver using
+.BR I_LINK "(7) or " I_PLINK (7),
+the TP driver determines the characteristics of the provider by issuing a
+.BR N_INFO_REQ (7)
+primitive on the provider Stream and processing the
+.BR N_INFO_ACK (7)
+response.
 .\"
 .\"
 .SH NOTICES
 .PP
+Note that the TP driver does not perform CONS or CLNS routing.  It only
+matches TP User Streams from the upper multiplex to NS provider Streams on the
+lower multiplex.  CONS and CLNS routing is performed within the respective
+providers.
+.PP
+Note that when the TP CM opens an NP Stream and binds it using the
+.BR N_BIND_REQ "(7) or " N_CONN_REQ (7)
+primitive, that this may invoke a connection manager for the NS provider to
+open other Streams for use by the NS provider.  For example, binding or
+connecting an X.25
+.BR plp (4)
+Stream may result in the formation of a
+.BR tcp (4)
+connection using the
+.BR xot (4)
+protocol to provide the VC required for the provider.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+Not implemented.
+.PP
+X.224 says:
+.RS
+.ll -\n[an-prevailing-indent]u
+.PP
+"Each transport connection shall be assigned to a network connection.  The
+initiator may assign the transport connection to an existing network
+connection of which it is the owner or to a new network connection (see Note
+1) which it creates for this purpose.
+.RS
+.PP
+NOTE 1 \(em When a new network connection is created, the quality of service
+requested is a local matter, although it will normally be related to the
+requirements of transport connection(s) expected to be assigned to it.
+.RE
+.PP
+The initiator shall not assign or reassing the transport connection to an
+existing network connection if the protocol class(es) proposed for the class
+in use for the transport connection, (is)(are) incompatible with the current
+usage of the network connection with respect to multiplexing (see Note 2).
+.RS
+.PP
+NOTE 2 \(em An existing network connection may also not be suitable if, for
+example, the quality of service requested for the transport connection cannot
+be attained by using or enhancing the network connection.
+.RE
+.PP
+During the resynchronization (see 6.14) and reassignment after failure (see
+6.12) procedure, the transport entity may reassign a transport connection to
+another network connection joining the same NSAPs, provided that it is the
+owner of the network connection and that the transport connection is assigned
+to only one network connection at any given time.
+.PP
+During the splitting procedure (see 6.23), a transport entity may assign a
+transport connection to any addition network connection joining the same
+NSAPs, provided that it is the owner of the network connection and that either
+the network connection does not have another transport connection assigned to
+it or multiplexing is possible on the network connection.
+.PP
+The responder becomes aware of the assignment when it receives:
+.RS
+.IP a) \w'm)\(em'u
+a CR-TPDU during the connection establishment procedure (see 6.5); or
+.IP b)
+an RJ-TPDU or a retransmitted CR or DR TPDU during the resynchronization (see
+6.14) and reassigned after failure (see 6.12) procedures; or
+.IP c)
+any TPDU when splitting (see 6.23) is used."
+.RE
+.ll +\n[an-prevailing-indent]u
+.RE
+.PP
+This essentially means that, as multiplexing with non-explicit use of flow
+control is counter-recommended for Class 2 and not supported by RFC 2126,
+.[
+rfc2126
+.]
+that a new TCP or UDP connection is required for each Transport Connection,
+and that the TP provider can wait until a
+.BR T_CONN_REQ "(7) or " T_CONN_RES (7)
+is issued to create a Transport Connection (permitting binding to the NULL
+NSAP).  The Protocol Class, NSAP and QOS parameters from the
+.BR T_CONN_REQ (7)
+primitive can be used by the TP CM to choose the appropriate port number for
+an RFC 2126
+.[
+rfc2126
+.]
+connection (102 for Class 0, 399 for Class 2).
 .\"
 .\"
 .SH FILES
 .PP
+.RB < sys/tp.h >
+The connection manager header file containing the definition of the
+.B tp_mgmt
+structure.
+.PP
+The following
+.B /etc/netconfig
+entries and Name-to-Address translation libraries are used with the TP driver
+in support of TI-RPC:
+.sp
+.RS
+.nf
+\fC\s-1\
+oclt    tpi_clts    v   osi     datagram_v  /dev/oclt   osiaddr.so
+otpi    tpi_cots    v   osi     seqpacket_v /dev/otpi   osiaddr.so
+otk6    tpi_cots    v   osi     seqpacket_v /dev/otk6   osiaddr.so
+\s+1\fP
+.fi
+.RE
+.TP
+.B /usr/lib/osiaddr.so
+Provides the Name-to-Address translation library for OSI.  See
+.BR osiaddr (5).
+.PP
+The following
+.B /etc/sock2path
+entries are used with the TP driver in support of the Sockets API:
+.sp
+.RS
+.nf
+\fC\s-1\
+PF_OSI  SOCK_SEQPACKET  0               /dev/tp0
+PF_OSI  SOCK_SEQPACKET  OSIPROTO_TP0    /dev/tp0
+PF_OSI  SOCK_SEQPACKET  OSIPROTO_TP2    /dev/tp2
+PF_OSI  SOCK_SEQPACKET  OSIPROTO_TP4    /dev/tp4
+PF_OSI  SOCK_DGRAM      0               /dev/oclt
+PF_OSI  SOCK_DGRAM      OSIPROTO_CLTS   /dev/oclt
+\s+1\fP
+.fi
+.RE
 .\"
 .\"
 .SH MODULES
 .PP
+Modules most often used with the TP driver by the TP CM are as follows:
+.TP \w'\(lq\fIiso-udp\fP\(rq\(em'u
+.RI \(lq isot \(rq
+This is the
+.BR isot (4)
+module that transforms a
+.BR tcp "(4) or " udp (4)
+Stream into a CONS provider Stream supporting ISO Transport Protocol Class 0
+(TP0).
+.TP
+.RI \(lq itot \(rq
+This is the
+.BR itot (4)
+module that transforms a
+.BR tcp "(4) or " udp (4)
+Stream into a CONS provider Stream supporting ISO Transport Protocol Class 0
+(TP0) or Class 2 (TP2).
+.TP
+.RI \(lq isos \(rq
+This is the
+.BR isos (4)
+module that transforms a
+.BR sctp (4)
+Stream into a CONS provider Stream supporting ISO Transport Protocol Class 0
+(TP0).
+.TP
+.RI \(lq itos \(rq
+This is the
+.BR itos (4)
+module that transforms a
+.BR sctp (4)
+Stream into a CONS provider Stream supporting ISO Transport Protocol Class 0
+(TP0), Class 2 (TP2) or Class 4 (TP4).
+.TP
+.RI \(lq iso-ip \(rq
+This is the
+.BR iso-ip (4)
+module that transforms a
+.BR rawip (4)
+Stream into a CLNS provider Stream supporting ISO Transport Protocol Class 4
+(TP4).
+.TP
+.RI \(lq iso-udp \(rq
+This is the
+.BR iso-udp (4)
+module that transforms a
+.BR udp (4)
+Stream into a CLNS provider Stream supporting ISO Transport Protocol Class 4
+(TP4).
 .\"
 .\"
 .SH DEVICES
 .PP
+The TP driver provide several devices as follows:
+.TP
+.B /dev/tp
+This is a clone device that provides user TP Streams.  Each open of this
+device provides a new TP User Stream that begins life in the unbound state.
+.TP
+.B /dev/tp0
+This is a clone device that provides user TP0 Streams.  Each open of this
+device provides a new TP0 User Stream that beings life in the unbound state.
+.TP
+.B /dev/tp1
+This is a clone device that provides user TP1 Streams.  Each open of this
+device provides a new TP1 User Stream that beings life in the unbound state.
+.TP
+.B /dev/tp2
+This is a clone device that provides user TP2 Streams.  Each open of this
+device provides a new TP2 User Stream that beings life in the unbound state.
+.TP
+.B /dev/tp3
+This is a clone device that provides user TP3 Streams.  Each open of this
+device provides a new TP3 User Stream that beings life in the unbound state.
+.TP
+.B /dev/tp4
+This is a clone device that provides user TP4 Streams.  Each open of this
+device provides a new TP4 User Stream that beings life in the unbound state.
+.TP
+.B /dev/tp_cm
+This is a clone device that provides the TP CM Stream.  Each open of this
+device provides a new CM Stream.  Multiple CM Streams can be opened.  The TP
+driver will attempt to fullfill a request from each CM Stream in the order in
+which they were opened until one that satisfies a request is found or the
+Streams have been exhausted.
+.TP
+.B /dev/otpi
+This is a clone device that provides a TP COTS Stream.  Each open of this
+device provides a new TP COTS Stream that begins life in the unbound state.
+This device is compatible with the
+.I SunLink OSI
+device of the same name.
+.TP
+.B /dev/oclt
+This is a clone device that provides a TP CLTS Stream.  Each open of this
+device provides a new TP CLTS Stream that begins life in the unbound state.
+This device is compatible with the
+.I SunLink OS
+device of the same name.
+.TP
+.B /dev/otk6
+This is a clone device that provides a TP COTS RFC 1006 Stream.  Each open of
+this device provides a new TP0 COTS Stream over TCP/IP that begins life in the
+unbound state.
+This device is compatibile with the
+.I SunLink OSI
+device of the same name.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR ns-tcp (4),
-.BR xol (4),
-.BR xot (4),
-.BR isot (4),
-.BR itot (4),
-.BR iso-ip (4),
-.BR iso-tp4 (4),
 .IR ISO (4).
 .\"
 .\"
 .SH BUGS
 .PP
+Because the TP driver is not implemented, it has no bugs.  Or, all of the bugs
+were in the design.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+None.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+None.
 .\"
 .\"
 .SH HISTORY
 .PP
+None.
 .\"
 .\"
 .[

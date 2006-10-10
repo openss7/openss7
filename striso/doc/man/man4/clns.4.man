@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: clns.4.man,v 0.9.2.1 2006/10/03 13:24:21 brian Exp $
+.\" @(#) $Id: clns.4.man,v 0.9.2.2 2006/10/10 10:44:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:24:21 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:44:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: clns.4.man,v $
+.\" Revision 0.9.2.2  2006/10/10 10:44:02  brian
+.\" - updates for release, lots of additions and workup
+.\"
 .\" Revision 0.9.2.1  2006/10/03 13:24:21  brian
 .\" - file additions and removals for make check target
 .\"
@@ -88,140 +91,574 @@ sort-adjacent-labels
 \- ISO Connectionless Network Service (CLNS)
 .\"
 .\"
-.SH DESCRIPTION
-.B clns
-is an implementation of an ISO CLNP
-.[
-ISO/IEC 8473
-.]
-Subnetwork Convergence Function Protocol directly over the services of X.25.
-.\"
-.\"
-.SH USAGE
+.SH SYNOPSIS
 .PP
-For a Connectionless-mode Network Service Provider
+.B #include <unistd.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/np.h>
+.PP
+.IB clns_stream " = open(" \(lq/dev/clns\(rq ", O_RDWR);
+.PP
+.IB clns_stream " = open(" \(lq/dev/clns_cm\(rq ", O_RDWR);
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B CLNS
+is an implementation of X.213
 .[
 x213
 .]
-using X.25 and
-providing the Network Provider Interface (NPI),
-.BR npi (7),
+Connectionless Network Service (CLNS).
+.PP
+There are several ways of providing the ISO CLNS as follows:
+.IP 1. \w'0.\(em'u
+The classical way is using
+X.25 as described in X.622.
 .[
-NPI Revision 2.0.0
+x622
 .]
-the
-.I STREAMS
-pseudo-device driver
-.B /dev/clns
-can be opened.
-.PP
-The Stream can be used directly, or bound and linked underneath the
-.BR tp4 (4)
-driver to provide Connectionless-mode Network Services for Transport Protocol
-Class 4 operation.
-.\"
-.\"
-.SH "NETWORK PROVIDER INTERFACE"
-.PP
-This Network Service Provider provides the
-.IR STREAMS -based
-Service Interface specified in the Network Provider Interface.
+.IP 2.
+Another way is providing CLNS over X.25, but providing X.25 using an X.25 over
+TCP protocol such as
+.BR xot (4)
+as described in RFC 1613,
 .[
-NPI Revision 2.0.0
+rfc1613
 .]
-.\"
-.SS "Address Format"
-.PP
-Address format is as described in RFC 1069.
+or a similar SCTP protocol.
+.IP 3.
+Also, CLNS can be provided directly over IP,
+.BR iso-ip (4),
+as described in RFC 1070.
 .[
-rfc1069
+rfc1070
 .]
-.\"
-.SS "Quality of Service Parameters"
-.PP
-Quality of service parameters are as described in RFC 1070.
+.IP 4.
+CLNS can be provided over UDP,
+.BR iso-udp (4),
+as also described in RFC 1070.
 .[
 rfc1070
 .]
 .\"
-.SS "Network Service Primitives"
+.\"
+.SH USAGE
 .PP
-.TP
-.BR N_INFO_REQ "(7), " N_INFO_ACK (7)
-.TP
-.BR N_BIND_REQ "(7), " N_BIND_ACK "(7), " N_ERROR_ACK (7)
-.TP
-.BR N_OPTMGMT_REQ "(7), " N_OK_ACK "(7), " N_ERROR_ACK (7)
-.TP
-.BR N_UNITDATA_REQ "(7), " N_UNITDATA_IND "(7), " N_UDERROR_IND (7)
-.TP
-.BR N_UNBIND_REQ "(7), " N_OK_ACK "(7), " N_ERROR_ACK (7)
+A user of the CLNS service opens a pseudo-device driver by opening the clone
+device
+.BR /dev/clns .
+This yields a CLNS Stream.  When the user binds the Stream to a local NSAP,
+the form of the NSAP determines which of the underlying protocols are used to
+provide service to the CLNS Stream.
+.PP
+A CLNS Stream is associated with an underlying provider in the following
+fashion:
+.IP \(bu \w'\(bu\(em'u
+When the CLNS Stream is bound, using the
+.BR N_BIND_REQ (7)
+primitive, the driver uses the NSAP to determine whether a suitable provider
+exists, and if it does, the Stream is associated with the provider.  If a
+suitable provider does not yet exist, a request is issued to a connection
+manager daemon (CLNS CM) listening on the connection managemnt (CM) Stream.
+.IP \(bu
+The CLNS CM satisfies a request by opening a provider Stream of the
+appropriate type, binding it and linking it under the CLNS multiplexing
+driver.  It responds to the request with the multiplexer identifier that was
+returned from the
+.BR I_LINK "(7) or " I_PLINK (7)
+operation to identify the provider Stream to the CLNS driver.
+.IP ""
+If an error occurs while attempting to open and bind the provider Stream, the
+CLNS CM will respond with a negative acknowledgement on the CM Stream and the
+CLNS driver will transform the negative acknowledgement into an appropriate
+.BR N_ERROR_ACK (7)
+primitive that is issued to the CLNS User.
+.IP \(bu
+The connection manager satisfies specific requests by examining the NSAP
+contained in the
+.BR N_BIND_REQ (7)
+primitive, and using information concerning routing and the reachability of
+addresses.  The NSAP can be one of 3 forms:
+.IP ""
+.RS
+.IP 1. \w'0.\(em'u
+An X.121
+.[
+x121
+.]
+or other X.25 address (e.g. ISDN).
+The CLNS CM opens the appropriate X.25 PLP,
+.BR plp (4),
+or other connection oriented Stream (e.g, ISDN) binds and connects the Stream
+and then links it under the CLNS multiplexing driver.
+.IP 2.
+A Internet NSAP per RFC 1069
+.[
+rfc1069
+.]
+without a TCP/IP port number.
+The CLNS CM opens a
+.BR rawip (4)
+driver, pushes the
+.BR iso-ip (4)
+module onto the Stream (or opens a rawip device that autopushes iso-ip), and
+binds the Stream appropriately and links it under the CLNS multiplexing
+driver.
+.IP 3.
+A Internet NSAP per RFC 1069
+.[
+rfc1069
+.]
+including a TCP/IP port number.
+The CLNS CM opens a
+.BR udp (4)
+driver, pushes the
+.BR iso-udp (4)
+module onto the Stream (or opens a udp device that autopushes iso-udp), and
+binds the Stream appropriately and links it under the CLNS multiplexing
+driver.
+.RE
+.IP \(bu
+The CLNS CM can distinguish further between requested provider using
+information from the
+.BR N_BIND_REQ (7)
+primitive, so long as the linked Stream used to satisfy the request provides
+the ISO Connectionless Network Service defined by X.213
+.[
+x213
+.]
+using the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+(Examples are ISO DL SNCF
+.[
+x623
+.]
+and ISDN
+.[[\fB
+x625
+.]\fR].)
+.IP \(bu
+Provider Streams may also be linked under the CLNS multiplexing driver at
+configuration time using static configuration information obtained from
+configuration files.  (For example the
+.BR /etc/eno_es
+and
+.BR /etc/eno_is
+files.)
+.IP \(bu
+Provider Streams may also be linked under the CLNS multiplexing driver as the
+result of routing discovery protocols or interface changes.  (An example of
+routing discovery protocols are the ES-IS,
+.[
+iso/iec 9542 : 1988
+.]
+.[
+rfc995
+.]
+IS-IS,
+.[
+iso/iec 10589 : 1992
+.]
+.[
+rfc1142
+.]
+and IRDP
+.[
+iso/iec 10747 : 1992
+.]
+protocols.)
 .\"
 .\"
 .SH INTERFACE
 .PP
+The CLNS User interface on the upper multiplex is the Network Provider
+Interace (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+supporting the Connectionless Service (CLNS) of the ISO Network Service
+Interface, X.213.
+.[
+x213
+.]
+.PP
+The CLNS Provider interface on the lower multiplex is the Network
+Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+supporting either the Connectionless Service (CLNS) or Connection-Oriented
+Service (CONS) of the ISO Network Service Interface, X.213.
+.[
+x213
+.]
+.PP
+The CLNS CM (Connection Management) interface on the connection management
+(CM) Stream is a specialised interface specific to the CLNS driver, but is
+based on the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+supporting the ISO Network Service Interface, X.213.
+.[
+x213
+.]
+Details of this interface are described under
+.RI \(lq PRIMITIVES \(rq,
+below.
 .\"
 .\"
 .SH ADDRESSES
 .PP
+CLNS supports the addresses and NSAPs identified in X.213,
+.[
+x213
+.]
+as discussed in X.233.
+.[
+x233
+.]
+This address can take multiple forms including the Internet NSAP form as
+described in RFC 1069,
+.[
+rfc1069
+.]
+RFC 1277
+.[
+rfc1277
+.]
+or RFC 4548.
+.[
+rfc4548
+.]
+The later form of the NSAP is used to distinguish the need for an ISO Network
+Service supported over IP,
+.BR iso-ip (4),
+UDP,
+.BR iso-udp (4)
+or SCTP,
+.BR iso-sctp (4).
+Addresses are NSAP addresses (initial octet and 20-byte address) used on
+public X.25 networks or a null NSAP for the null network service for private
+networks (then only the SNAP address is used).  See the CLNS specification.
+.[
+x233
+.]
 .\"
 .\"
 .SH OPTIONS
 .PP
+CLNS User Streams support the full set of Quality of Service parameters are
+specified in the CLNS specification X.213;
+.[
+x213
+.]
+however, negotiation of Quality of Service paramters is performed between the
+CLNS User and the underlying NS provider.  Therfore, QOS parameters supported
+to the CLNS User is dependent upon the QOS support of the underlying provider.
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+Primitives supported by the CLNS User Streams are the full set of OSI
+conforming Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+primitives supporting Connectionless Network Service (CLNS).
+.PP
+CLNS CM Streams support a specialised set of primitives, based on NPI
+primitives, that provide the ability for the CLNS CM to receive requests for
+new providers as well as the ability to indicate the result of those
+requests.
+.PP
+CLNS CM requests and responses are formatted as follows:
+.PP
+.nf
+\fC\s-1\
+struct clns_mgmt {
+    np_ulong cm_user;           /* User index */
+    np_ulong cm_prov;           /* Provider index */
+    union N_primitives cm_prim; /* Primitive */
+};
+\s+1\fP
+.fi
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+is the user index.  The user index identifies the CLNS User that originated
+the request.
+.TP
+.I cm_prov
+is the provider index.  The provider index identifies a CONS or CLNS provider
+that will satisfy the request.
+an
+.BR I_LINK "(7) or " I_PLINK (7)
+operation that was used to link the Stream under the CLNS multiplexing driver.
+.TP
+.I cm_prim
+is the primitive.  The exact format of the primitive and the size of the
+remainder of the structure can be determined by the
+.I cm_prim.type
+field of the
+.B N_primitives
+union.  The
+.B N_primitives
+union is defined in the
+.RB < sys/npi.h >
+header file.
+.PP
+The
+.B clns_mgmt
+structure is contained in the control part
+.RB ( M_PROTO "(9) or " M_PCPROTO (9)
+message block) of the request or response.
+Any data is contained in the data part
+.RB ( M_DATA (9)
+message blocks) of the request or response.  The type of the command is
+determined from the
+.I cm_prim.type
+field in the
+.B clns_mgmt
+structure.
+The
+.B clns_mgmt
+structure is defined in the
+.RB < sys/clns.h >
+header file.
+.PP
+Overloaded primitives are as follows:
+.TP
+.B Bind Request
+The bind request is issued to the CLNS CM on the CM Stream when a suitable
+provider could not be found to satisfy a CLNS User bind request,
+.BR N_BIND_REQ (7).
+This primitive requires an acknowledgement by the CLNS CM with
+either a bind acknowledgement or an error acknowledgement.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Indicates the index within the CLNS driver of the CLNS User at which the
+request originated.  This is an opaque identifier that the CLNS CM uses in the
+bind or error acknowledgement to identify the transaction.
+.TP
+.I cm_prov
+Ignored in the bind request.
+.TP
+.I cm_prim
+Contains the
+.BR N_BIND_REQ (7)
+primitive as it was issued by the CLNS User.
+.RE
+.TP
+.B Bind Acknowledgement
+The bind acknowledgement is issued by the CLNS CM on the CM
+Stream when a suitable provider has been bound and linked beneath the CLNS
+multiplexing driver.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding bind request.
+.TP
+.I cm_prov
+Specifies the multiplexer identifier (returned by the
+.BR I_LINK "(7) or " I_PLINK (7)
+operation) that identifies the provider Stream to which the bind ocurred.
+.TP
+.I cm_prim
+Contains the
+.BR N_BIND_ACK (7)
+primitive as it should be issued to the CLNS User.
+.RE
+.TP
+.B Error Acknowledgement
+The error acknowledgement is issued by the CLNS CM on the CM Stream when the
+bind to the provider was not possible and resulted in an error.
+.RS
+.TP \w'\fIcm_user\fR\(em'u
+.I cm_user
+Specifies the user index from the corresponding bind request.
+.TP
+.I cm_prov
+Specifies the provider index from the corresponding bind request.
+.TP
+.I cm_prim
+Contains the
+.B N_ERROR_ACK (7)
+primitive as it should be issued to the CLNS User.
+.RE
 .\"
 .\"
 .SH IOCTLS
 .PP
+CLNS Streams do not support any CLNS-specific input-output controls.  The CLNS
+CM Stream supports the
+.BR I_LINK "(7), " I_PLINK "(7), " I_UNLINK "(7) and " I_PUNLINK (7)
+.I STREAMS
+input-output controls described under
+.BR streamio (7).
+When a CLNS CM links a provider Stream under the multiplexing driver using
+.BR I_LINK "(7) or " I_PLINK (7),
+the CLNS driver determines the characteristics of the provider by issuing a
+.BR N_INFO_REQ (7)
+primitive on the provider Stream and processing the
+.BR N_INFO_ACK (7)
+response.
 .\"
 .\"
 .SH NOTICES
 .PP
+Note that the CLNS driver does not perform ES-IS, IS-IS or IDRP routing.  It
+only matches CLNS User Stream from the upper multiplex to provider Streams on
+the lower multiplex.  An external program must open ES-IS, IS-IS or IDRP
+Streams and establish routing within the CLNS driver using routing Stream
+input-output control commands.
+.PP
+Note that wehn the CLNS CM opens a CONS Stream and binds or connects it using
+the
+.BR N_BIND_REQ "(7) or " N_CONN_REQ (7)
+primitive, that this may invoke a connection manager for the provider Stream
+to open other Streams for use by the provider.  For example, binding or
+connecting an X.25
+.BR plp (4)
+Stream may result in the formation of a
+.BR tcp (4)
+connection using the
+.BR xot (4)
+protocol to provide the VS required for the provider.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+CLNS can be implemented over LLC1 or over X.25 LAPB.  For Ethernet, LLC1 is
+used (SNAP header) for sending CLNS datagrams directory over Ethernet or IEEE
+802 LANs.  For X.25 LAPB, an X.25 SVC can be set up and used for transporting
+CLNS encapsulated in X.25 Layer 3 messages.  An ES-IS, RFC 995
+.[
+rfc995
+.]
+and IS-IS, RFC 1142
+.[
+rfc1142
+.]
+routing mechanism is required.  For LLC the SNAP address is the MAC address
+and the ES-IS or IS-IS protocol can be encapsulated and broadcast.  For
+X.25 LAPB either the ES-IS or IS-IS protocol can be encapsulated and sent to
+the adjacent node.
+.PP
+A mechanism is required for an ES-IS daemon and an IS-IS daemon and network
+configuration to configure subnetworks and point-to-point connections under
+the domain of the ES-IS and IS-IS daemon.
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.B /etc/iso_is
+a list of first hop ISO Intermediate Systems.
+.TP
+.B /etc/iso_es
+a list of first hop ISO End Systems.
+.TP
+.RB < sys/clns.h >
+The connection manager header file containing the definition of the
+.B clns_mgmt
+structure.
 .\"
 .\"
 .SH MODULES
 .PP
+Modules most often used with the CLNS driver by the CLNS CM are as follows:
+.TP \w'\(lq\fIiso-udp\fR\(rq\(em'u
+.RI \(lq iso-ip \(rq
+This is the
+.BR iso-ip (4)
+module that transforms a
+.BR rawip (4)
+Stream into a CLNS provider Stream.
+.TP
+.RI \(lq iso-udp \(rq
+This is the
+.BR iso-udp (4)
+module that transforms a
+.BR udp (4)
+Stream into a CLNS provider Stream.
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.B /dev/clns
+This is a clone device that provide user CLNS Streams.  Each open of this
+device provides a new CLNS User Stream that begins life in the unbound state.
+.TP
+.B /dev/clns_cm
+This is a clone device that provides the CLNS CM Stream.  Each open of this
+device provides a new CM Stream.  Multiple CM Streams can be opened.  The CLNS
+driver will attempt to fullfill a request from each CM Stream in the order in
+which they were opened until one that satisfies a reqeust is found or the
+Streams have been exhausted.
+.TP
+.B /dev/clnp
+This is a clone device that provides a user CLNS Stream (with a TLI interface).
+Each open of this device provides a new CLNS User Stream that begins life in
+the unbound state.
+This device may be implemented as a
+.B /dev/clns
+Stream that has a NPI to TPI coversion module,
+.RI \(lq clnp \(rq,
+autopushed over it; see
+.BR autopush (8).
+The conversion module provides a TPI interface suitable for
+use by the
+.BR XTI (3)
+library, but provides direct access to the network protocol instead of
+providing a transport protocol.
+This device is compatible with the
+.I SunLink OSI
+device of the same name.
+.\".TP
+.\".B /dev/dl_llc
+.\"LLC data link streams for linking under the ISO routing multiplexer.
+.\".TP
+.\".B /dev/dl_x25
+.\"LAPB data link streams for linking under the ISO routing multiplexer.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR XOL (7),
-.BR XOT (7),
-.BR ISOT (7),
-.BR ITOT (7),
-.BR ISO-IP (7),
-.BR ISO-TP4 (7).
+.IR ISO (4).
 .\"
 .\"
 .SH BUGS
 .PP
+Because the CLNS driver is not implemented, it has no bugs.  Or, all the bugs
+were in the design.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+None.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+None.
 .\"
 .\"
 .SH HISTORY
 .PP
+These modules and drivers are new for
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

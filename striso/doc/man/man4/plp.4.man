@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: plp.4.man,v 0.9.2.1 2006/10/03 13:24:21 brian Exp $
+.\" @(#) $Id: plp.4.man,v 0.9.2.2 2006/10/10 10:44:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:24:21 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:44:03 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: plp.4.man,v $
+.\" Revision 0.9.2.2  2006/10/10 10:44:03  brian
+.\" - updates for release, lots of additions and workup
+.\"
 .\" Revision 0.9.2.1  2006/10/03 13:24:21  brian
 .\" - file additions and removals for make check target
 .\"
@@ -84,8 +87,8 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B plp, x25-plp
-\- X.25 Packet Layer Procotocl
+.B plp, x25-plp, x25_plp
+\- X.25 Packet Layer Protocol
 .\"
 .\"
 .SH SYNOPSIS
@@ -102,10 +105,30 @@ sort-adjacent-labels
 .\"
 .SH INTERFACE
 .PP
+The interface for the X.25 PLP is the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.RB npi (7),
+the CONS subset.
 .\"
 .\"
 .SH ADDRESSES
 .PP
+The address format is a socket address of structure type
+.BR sockaddr_x25 .
+Allocation of addresses in the Internet is described in RFC 982,
+.[
+rfc982
+.]
+RFC 1237,
+.[
+rfc1237
+.]
+RFC 1629.
+.[
+rfc1629
+.]
 .\"
 .\"
 .SH OPTIONS
@@ -122,6 +145,75 @@ sort-adjacent-labels
 .\"
 .SH NOTICES
 .PP
+The X.25 PLP would typically be implemented according to X.25 standards over
+the LAPB data link protocol described in X.25,
+.[
+x25
+.]
+and implementing the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+The X.25 PLP can be used to provide the ISO CONS as described in X.223.
+.[
+x223
+.]
+.PP
+X.25 PLP is not very useful on its own except for WAN encapsulation over X.25
+links using RFC 877,
+.[
+rfc877
+.]
+superseded by RFC 1356.
+.[
+rfc1356
+.]
+.PP
+Alternatives include:
+.IP \(em \w'\(em\(em'u
+X.25 PLP adapted for LANs, as described in ISO/IEC 8881,
+.[
+iso/iec 8881
+.]
+that implements the
+.BR dlpi (7)
+using LLC2 instead of LAPB.
+This is described in more detail under
+.BR iso-lan (4).
+.IP \(em
+X.25 PLP implemented directly over TCP ala RFC 1613,
+.[
+rfc1613
+.]
+termed
+.BR xot (4).
+Under this scheme, TCP replaces the lower layers of X.25 PLP.
+.[
+rfc1613
+.]
+This mechanism appears most useful for tunnelling X.25 SVC and PVCs over a
+TCP/IP internetwork.
+.IP ""
+Perhaps a better way of tunneling X.25 SVCs and PVCs over a TCP/IP internetwork
+nowadays would be to implement X.25 over SCTP (Stream Control Transmission
+Protocol) as described here under
+.BR xos (4).
+.IP \(em
+Another way of providing X.25 CONS
+.[
+x223
+.]
+for use by TP is utilizing TCP/IP as an
+X.25 CONS replacement as described in RFC 983,
+.[
+rfc983
+.]
+RFC 1006,
+.[
+rfc1006
+.]
+This mechanism is described as providing the ISO TP0 and TP2 transport classes.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -130,6 +222,38 @@ sort-adjacent-labels
 .\"
 .SH FILES
 .PP
+
+.nf
+\fC\
+-rw-r--r--    1 brian    users        6888 Oct  7 14:10 clns.4.man
+-rw-r--r--    1 brian    users        7601 Oct  7 14:21 cmot.4.man
+-rw-r--r--    1 brian    users        4686 Oct  8 00:55 ISO.4.man
+-rw-r--r--    1 brian    users        9424 Oct  7 14:00 iso-ip.4.man
+-rw-r--r--    1 brian    users        5878 Oct  7 22:15 iso-lan.4.man
+-rw-r--r--    1 brian    users        4495 Oct  7 10:12 isos.4.man
+-rw-r--r--    1 brian    users        4980 Oct  3 07:52 isot.4.man
+-rw-r--r--    1 brian    users          22 Jul 11 03:21 iso-udp.4.man
+-rw-r--r--    1 brian    users        4638 Oct  7 12:12 itot.4.man
+-rw-r--r--    1 brian    users        4280 Oct  3 07:27 lapb.4.man
+-rw-r--r--    1 brian    users        5179 Oct  7 21:30 lpp.4.man
+-rw-r--r--    1 brian    users        4556 Oct  3 07:52 ns-tcp.4.man
+-rw-r--r--    1 brian    users        5263 Oct  8 01:10 plp.4.man
+-rw-r--r--    1 brian    users          22 Oct  3 07:27 tcpns.4.man
+-rw-r--r--    1 brian    users          18 Jul 11 03:21 tp0.4.man
+-rw-r--r--    1 brian    users          18 Jul 11 03:21 tp1.4.man
+-rw-r--r--    1 brian    users          18 Jul 11 03:21 tp2.4.man
+-rw-r--r--    1 brian    users          18 Jul 11 03:21 tp3.4.man
+-rw-r--r--    1 brian    users          18 Jul 11 03:21 tp4.4.man
+-rw-r--r--    1 brian    users        4547 Jul 11 03:21 tp.4.man
+-rw-r--r--    1 brian    users          20 Oct  3 07:27 x25_lapb.4.man
+-rw-r--r--    1 brian    users          20 Oct  3 07:27 x25-lapb.4.man
+-rw-r--r--    1 brian    users          19 Oct  3 07:27 x25_plp.4.man
+-rw-r--r--    1 brian    users          19 Oct  3 07:27 x25-plp.4.man
+-rw-r--r--    1 brian    users          23 Oct  3 06:25 xol.4.man
+-rw-r--r--    1 brian    users        6671 Oct  7 10:03 xot.4.man
+\fP
+.fi
+
 .\"
 .\"
 .SH MODULES

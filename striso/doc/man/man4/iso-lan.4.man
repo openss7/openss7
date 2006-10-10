@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: iso-lan.4.man,v 0.9.2.2 2006/10/03 13:52:18 brian Exp $
+.\" @(#) $Id: iso-lan.4.man,v 0.9.2.3 2006/10/10 10:44:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:52:18 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:44:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: iso-lan.4.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:44:02  brian
+.\" - updates for release, lots of additions and workup
+.\"
 .\" Revision 0.9.2.2  2006/10/03 13:52:18  brian
 .\" - changes to pass make check target
 .\" - added some package config.h files
@@ -166,6 +169,49 @@ to X.25 Level 3.
 .\"
 .SH IMPLEMENTATION
 .PP
+X.25 over LANs can be accomplished by providing an LLC DLPI provider that
+forms LLC2 SVCs across a 8802
+.[
+ISO/IEC 8802
+.]
+based local area network.
+.PP
+Stations on the LAN can advertise their presence with broadcast using ES-IS, RFC 995,
+.[
+rfc995
+.]
+and IS-IS, RFC 1142,
+.[
+rfc1142
+.]
+or by static configuration.
+.PP
+One of the problems with implementing
+ISO-LAN is finding a copy of this ISO/IEC 8881
+.[
+ISO/IEC 8881
+.]
+specification that seems to have never been release by ITU-T nor IETF.
+.PP
+For some of the issues of implementing ES-IS, RFC 995,
+.[
+rfc995
+.]
+and IS-IS, RFC 1142,
+.[
+rfc1142
+.]
+on Local Area Networks (LANs), see the disscussion of IS-IS and IDRP in RFC
+1237
+.[
+rfc1237
+.]
+and later RFC 1629.
+.[
+rfc1629
+.]
+The later, in particular, discusses the used of a pseudo-node represented by a
+designated router on a LAN.
 .\"
 .\"
 .SH FILES

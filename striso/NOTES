@@ -48,8 +48,9 @@ Well Known Port Numbers:
 
 - TCP/UDP/SCTP port number 102 'iso-tsap' is assigned by IANA for
   ISO-TSAP Class 0 (Marshall T. Rose)  (Linux /etc/services notes that
-  this port is used for ISODE.)  (I think that this is TP0 over TCP as
-  described by Marshall in RFC 1006 (ISOT).)
+  this port is used for ISODE.)  (I think that this is TP0 over TCP as 
+  described by Marshall in RFC 1006 (ISOT).) (RFC 983, RFC 1006, RFC
+  2126.)
 
 - TCP/UDP/SCTP port number 146 'iso-tp0' is assigned by IANA for ISO-IP0
   (Marshall T. Rose) (not listed in /etc/services)  (Mentioned directly

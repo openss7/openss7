@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/03 13:52:22 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/10 10:44:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/03 13:52:22 $ by $Author: brian $
+ Last Modified $Date: 2006/10/10 10:44:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.11  2006/10/10 10:44:10  brian
+ - updates for release, lots of additions and workup
+
  Revision 0.9.2.10  2006/10/03 13:52:22  brian
  - changes to pass make check target
  - added some package config.h files
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/03 13:52:22 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/10 10:44:10 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/03 13:52:22 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/10 10:44:10 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -144,7 +147,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2006/10/03 13:52:22 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2006/10/10 10:44:10 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"
@@ -1954,172 +1957,193 @@ tp_add_checksum(mblk_t *mp)
  * reassignment time
  * user data
  *
- * A transport connection is established by means of one transport entity (the initiator)
- * transmitting a CR-TPDU to the other transport entity (the responder), which replies with a
- * CC-TPDU.
+ * A transport connection is established by means of one transport entity (the
+ * initiator) transmitting a CR-TPDU to the other transport entity (the
+ * responder), which replies with a CC-TPDU.
  *
- * Before sneding the CR-TPDU, the intiator assigns the transport connection being created to one
- * (or more if the splitting procedure is being used) network connection(s).  It is this set of
- * network connections over which the TPDUs are sent.
+ * Before sneding the CR-TPDU, the intiator assigns the transport connection
+ * being created to one (or more if the splitting procedure is being used)
+ * network connection(s).  It is this set of network connections over which the
+ * TPDUs are sent.
  *
- *   NOTE 1 - Even if the initiator assings the transport connection to more than one network
- *   connection, all CR-TPDUs (if repeated) or DR-TPDUs with DST-REF set to zero which are sent
- *   prior to the receipt of the CC-TPDU shall be sent on the same network connection, unless an
- *   N-DISCONNECT indication is received.  (This is necessary because the remote entity may not
- *   support class 4 and therefore may not recognize splitting.)  If the initiator has made other
- *   assignments, it will use them only after receive of a class 4 CC-TPDU (see also the splitting
- *   procedure 6.23).
+ *   NOTE 1 - Even if the initiator assigns the transport connection to more
+ *   than one network connection, all CR-TPDUs (if repeated) or DR-TPDUs with
+ *   DST-REF set to zero which are sent prior to the receipt of the CC-TPDU
+ *   shall be sent on the same network connection, unless an N-DISCONNECT
+ *   indication is received.  (This is necessary because the remote entity may
+ *   not support class 4 and therefore may not recognize splitting.)  If the
+ *   initiator has made other assignments, it will use them only after receive
+ *   of a class 4 CC-TPDU (see also the splitting procedure 6.23).
  *
- * During this exchange, all information and parameters need for the transport entities to operate
- * shall be exchanged or negotiated.
+ * During this exchange, all information and parameters need for the transport
+ * entities to operate shall be exchanged or negotiated.
  *
- *   NOTE 2 - Except in class 4, it is recommended that the initiator start an optional timer TS1 at
- *   the time the CR-TPDU is sent.  This timer should be stopped when the connection is considered
- *   as accepted or refused or unsuccessful.  If the timer expires, the intiator should reset or
- *   disconnect the network connection, and in classes 1 and 3, freeze the reference (see 6.18).
- *   For all other transport connection(s) multiplexed on the same network connection, the
- *   procedures for reset or disconnect as appropriate should be followed.
+ *   NOTE 2 - Except in class 4, it is recommended that the initiator start an
+ *   optional timer TS1 at the time the CR-TPDU is sent.  This timer should be
+ *   stopped when the connection is considered as accepted or refused or
+ *   unsuccessful.  If the timer expires, the intiator should reset or
+ *   disconnect the network connection, and in classes 1 and 3, freeze the
+ *   reference (see 6.18).  For all other transport connection(s) multiplexed
+ *   on the same network connection, the procedures for reset or disconnect as
+ *   appropriate should be followed.
  *
  * ...
  *
  * The following information is exchanged:
  *
- * a) References - Each transport entity chooses a reference to be used by the peer entity which is
- *    16-bits long and which is arbitrary under the following restrictions:
+ * a) References - Each transport entity chooses a reference to be used by the
+ *    peer entity which is 16-bits long and which is arbitrary under the
+ *    following restrictions:
  *
  *    1) it shall not already be in use nor frozen (see 6.18);
  *    2) it shall not be zero.
  *
- *    This mechanism is symmetrical and provide identification of the transport connection
- *    independent of the network connection.  The range of references used for transport
- *    connections, in a given transport entity, is a local matter.
+ *    This mechanism is symmetrical and provide identification of the transport
+ *    connection independent of the network connection.  The range of
+ *    references used for transport connections, in a given transport entity,
+ *    is a local matter.
  *
- * b) Calling, Called and Responding Transport-Selectors (optional) - When either network address
- *    unambiguously defines the transport address, this information may be omitted.
+ * b) Calling, Called and Responding Transport-Selectors (optional) - When
+ *    either network address unambiguously defines the transport address, this
+ *    information may be omitted.
  *
- * c) Initial credit - Only relevant for classes which include the explicit flow control function.
+ * c) Initial credit - Only relevant for classes which include the explicit
+ *    flow control function.
  *
- * d) User data - Not available if class 0 is the preferred class (see Note 3).  Up to 32 octets in
- *    other classes.
+ * d) User data - Not available if class 0 is the preferred class (see Note 3).
+ *    Up to 32 octets in other classes.
  *
- *    NOTE 3 - If class 0 is a valid response according to Table 3, inclusing of user data in the
- *    CR-TPDU may cause the responding entity to refuse the connection (for example, if it only
- *    supports class 0).
+ *    NOTE 3 - If class 0 is a valid response according to Table 3, inclusing
+ *    of user data in the CR-TPDU may cause the responding entity to refuse the
+ *    connection (for example, if it only supports class 0).
  *
- * e) Acknoledgement time - Only in class 4.
+ * e) Acknowledgement time - Only in class 4.
  *
  * f) Checksum paraemter - Only in class 4.
  *
  * g) Protection parameter - This parameter and its semantics are user defined.
  *
- * h) Inactivity time - Only in class 4.  The inactivity time parameter shall not be included in a
- *    CC-TPDU if it was not present in the corresponding CR-TPDU.
+ * h) Inactivity time - Only in class 4.  The inactivity time parameter shall
+ *    not be included in a CC-TPDU if it was not present in the corresponding
+ *    CR-TPDU.
  *
  * The following negotiations take place:
  *
- * i) The initiator shall propose a preferred class and may propose any number of alternative
- *    classes which permit a valid response as defined in Table 3.  The initiator should assume when
- *    it sends the CR-TPDU that its preferred class will be agreed to, and commence the procedures
- *    associated with that class, except that if class 0 or class 1 is an alternative class,
- *    multiplexing shall not commence until a CC-TPDU selecting the use of classes 2, 3 or 4 has
- *    been received.
+ * i) The initiator shall propose a preferred class and may propose any number
+ *    of alternative classes which permit a valid response as defined in Table
+ *    3.  The initiator should assume when it sends the CR-TPDU that its
+ *    preferred class will be agreed to, and commence the procedures associated
+ *    with that class, except that if class 0 or class 1 is an alternative
+ *    class, multiplexing shall not commence until a CC-TPDU selecting the use
+ *    of classes 2, 3 or 4 has been received.
  *
- *    NOTE 4 - This means, for example, that when the preferred class includes resynchronization
- *    (see 6.14) the resynchronization will occur if a reset is signalled during connection
- *    establishment.
+ *    NOTE 4 - This means, for example, that when the preferred class includes
+ *    resynchronization (see 6.14) the resynchronization will occur if a reset
+ *    is signalled during connection establishment.
  *
- *    The responder shall select one class defined in Table 3 as a valid response corresponding to
- *    the preferred class and to the class(es), if any, contained in the alternative class parameter
- *    of the CR-TPDU.  It shall indicate the selected class in the CC-TPDU and shall follow the
+ *    The responder shall select one class defined in Table 3 as a valid
+ *    response corresponding to the preferred class and to the class(es), if
+ *    any, contained in the alternative class parameter of the CR-TPDU.  It
+ *    shall indicate the selected class in the CC-TPDU and shall follow the
  *    procedures for the selected class.
  *
- *    If the preferred class is not selected, then on receipt of the CC-TPDU, the initiator shall
- *    adjust its operation according to the procedures of the selected class.
+ *    If the preferred class is not selected, then on receipt of the CC-TPDU,
+ *    the initiator shall adjust its operation according to the procedures of
+ *    the selected class.
  *
- *    NOTE 5 - The valid responses indicated in Table 3 result from both explicit negotiation,
- *    whereby each of the classes proposed is a valid response, and implement negotiation whereby:
+ *    NOTE 5 - The valid responses indicated in Table 3 result from both
+ *    explicit negotiation, whereby each of the classes proposed is a valid
+ *    response, and implement negotiation whereby:
  *    - if class 3 or 4 is proposed, then class 2 is a valid response.
  *    - if class 1 is proposed, then class 0 is a valid response.
  *
- *    NOTE 6 - Negotiation from class 2 to class 1 and from any class to a higher-numbered class is
- *    not valid.
+ *    NOTE 6 - Negotiation from class 2 to class 1 and from any class to a
+ *    higher-numbered class is not valid.
  *
  *    NOTE 7 - Redundant combinations are not a protocol error.
  *
- * j) TPDU size - The initiator may propose a maimum size for TPDUs, and the responder may accept
- *    this value or respond with any valud between 128 and the proposed valud in the set of values
- *    available [see 13.3.4 b)].
+ * j) TPDU size - The initiator may propose a maimum size for TPDUs, and the
+ *    responder may accept this value or respond with any value between 128 and
+ *    the proposed value in the set of values available [see 13.3.4 b)].
  *
  *    NOTE 8 - The length of the CR-TPDU does not exceed 128 octets (see 13.3).
- *    NOTE 9 - The transport entities may have knowledge, by some local means, of the maximum
- *    available NSDU size.
+ *    NOTE 9 - The transport entities may have knowledge, by some local means,
+ *    of the maximum available NSDU size.
  *
- * k) Preferred maximum TPDU size - The value of this parameter, multiplied by 128, yields the
- *    proposed or accepted maximum TPDU size in octets.  The initiator may propose a preferred
- *    maximum size fo TPDUs and the responder may accept this valud or repsond with a smaller value.
+ * k) Preferred maximum TPDU size - The value of this parameter, multiplied by
+ *    128, yields the proposed or accepted maximum TPDU size in octets.  The
+ *    initiator may propose a preferred maximum size fo TPDUs and the responder
+ *    may accept this value or repsond with a smaller value.
  *
- *    NOTE 10 - If this parameter is used in a CR-TPDU without also including the TPDU size
- *    parameter, this will result in a maximum TPDU size of 128 octets being selected if the remote
- *    entity does not recognize the preferred TPDU size parameter.  Therefore, it is reocmmended
- *    that both parameters be included in the CR-TPDU.
+ *    NOTE 10 - If this parameter is used in a CR-TPDU without also including
+ *    the TPDU size parameter, this will result in a maximum TPDU size of 128
+ *    octets being selected if the remote entity does not recognize the
+ *    preferred TPDU size parameter.  Therefore, it is reocmmended that both
+ *    parameters be included in the CR-TPDU.
  *
- *    If the preferred maximum TPDU size parameter is present in a CR-TPDU the responder shall
- *    either:
+ *    If the preferred maximum TPDU size parameter is present in a CR-TPDU the
+ *    responder shall either:
  *
- *    - ignore the preferred maximum TPDU size parameter and follow TPDU size negotiation as defined
- *      in 6.5.4 j); or
+ *    - ignore the preferred maximum TPDU size parameter and follow TPDU size
+ *      negotiation as defined in 6.5.4 j); or
  *
- *    - use the preferrend maximum TPDU size parameter to determine the maximum TPDU size requested
- *      by the initiator and ignore the TPDU size parameter.  In this case the responder shall use
- *      the preferred maximum TPDU size parameter in the CC-TPDU and shall not include the TPDU size
+ *    - use the preferrend maximum TPDU size parameter to determine the maximum
+ *      TPDU size requested by the initiator and ignore the TPDU size
+ *      parameter.  In this case the responder shall use the preferred maximum
+ *      TPDU size parameter in the CC-TPDU and shall not include the TPDU size
  *      parameter in the CC-TPDU.
  *
- *    If the preferred maximum TPDU size parameter is not present in the CR-TPDU it shall not be
- *    included in the corresponding CC-TPDU.  In this case TPDU size negotiation is as defined in
- *    6.5.4 j).
+ *    If the preferred maximum TPDU size parameter is not present in the
+ *    CR-TPDU it shall not be included in the corresponding CC-TPDU.  In this
+ *    case TPDU size negotiation is as defined in 6.5.4 j).
  *
- * l) Normal or extended format - Either normal or extended format is available.  When extended is
- *    used, this applies to CDT, TPDU-NR, ED-TPDU-NR, YR-TU-NR and YR-EDTU-NR parameters.
+ * l) Normal or extended format - Either normal or extended format is
+ *    available.  When extended is used, this applies to CDT, TPDU-NR,
+ *    ED-TPDU-NR, YR-TU-NR and YR-EDTU-NR parameters.
  *
- * m) Checksum selection - This defines whether or not TPDUs of the connection are to include a
- *    checksum.
+ * m) Checksum selection - This defines whether or not TPDUs of the connection
+ *    are to include a checksum.
  *
- * n) Quality of service parameters - This defines the throughput, transit delay, priority and
- *    residual error rate.
+ * n) Quality of service parameters - This defines the throughput, transit
+ *    delay, priority and residual error rate.
  *
- *    NOTE 11 - The transport service defines transit delay as requiring a previously stated average
- *    TSDU size as a basis for any specification.  This protocol as speciied in 13.3.4 m), uses a
- *    value at 128 octets.  Conversion to and from specifications based upon some other value is a
+ *    NOTE 11 - The transport service defines transit delay as requiring a
+ *    previously stated average TSDU size as a basis for any specification.
+ *    This protocol as speciied in 13.3.4 m), uses a value at 128 octets.
+ *    Conversion to and from specifications based upon some other value is a
  *    local matter.
  *
  * o) The non-use of explicit flow control in class 2.
  *
- * p) The use of network receipt confirmation and network expedited when class 1 is to be used.
+ * p) The use of network receipt confirmation and network expedited when class
+ *    1 is to be used.
  *
- * q) Use of expedited data transfer service - This allows both TS-users to negotiate the use or
- *    non-use of the expedite data transport service as defined in the transport service (see ITU-T
- *    Rec. X.214 | ISO/IEC 8072).
+ * q) Use of expedited data transfer service - This allows both TS-users to
+ *    negotiate the use or non-use of the expedite data transport service as
+ *    defined in the transport service (see ITU-T Rec. X.214 | ISO/IEC 8072).
  *
- * r) The use of selective acknowledgement - This allows the transport entities to decide whether to
- *    use procedures that allow acknowledgement of DT-TPDUs that are received out-of-sequence (only
- *    in class 4).
+ * r) The use of selective acknowledgement - This allows the transport entities
+ *    to decide whether to use procedures that allow acknowledgement of
+ *    DT-TPDUs that are received out-of-sequence (only in class 4).
  *
- * s) The use of request acknowledgement - This allows both transport entities to negotiate the use
- *    or non-use of the request acknowledgement facility specified in 6.13.4.2 (only in classes 1,
- *    3, 4).
+ * s) The use of request acknowledgement - This allows both transport entities
+ *    to negotiate the use or non-use of the request acknowledgement facility
+ *    specified in 6.13.4.2 (only in classes 1, 3, 4).
  *
- * t) The use of non-blocking expedite data transfer service - This allows both transport entities
- *    to negotiate the use or non-use of the non-blocking expedited data transfer service (only in
- *    class 4).  This option will only be valid when the option of "use of expedited data transfer
- *    service" is negotiated.
+ * t) The use of non-blocking expedite data transfer service - This allows both
+ *    transport entities to negotiate the use or non-use of the non-blocking
+ *    expedited data transfer service (only in class 4).  This option will only
+ *    be valid when the option of "use of expedited data transfer service" is
+ *    negotiated.
  *
  * The following information is sent only in the CR-TPDU:
  *
- * u) Version number - This defines the version of the transport protocol standard used for this
- *    connection.
+ * u) Version number - This defines the version of the transport protocol
+ *    standard used for this connection.
  *
- * v) Reassignment time parameter - This indicates the time for which the intiiator will persist
- *    in following the reassignment after failure procedure.
+ * v) Reassignment time parameter - This indicates the time for which the
+ *    intiiator will persist in following the reassignment after failure
+ *    procedure.
  *     
  */
 STATIC mblk_t *

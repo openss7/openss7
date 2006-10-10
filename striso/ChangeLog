@@ -1,3 +1,58 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* doc/man/man4/clns.4.man: updates for release
+	* doc/man/man4/cmot.4.man: updates for release
+	* doc/man/man4/ISO.4.man: updates for release
+	* doc/man/man4/iso-ip.4.man: updates for release
+	* doc/man/man4/iso-lan.4.man: updates for release
+	* doc/man/man4/isos.4.man: updates for release
+	* doc/man/man4/isot.4.man: updates for release
+	* doc/man/man4/itot.4.man: updates for release
+	* doc/man/man4/lpp.4.man: updates for release
+	* doc/man/man4/plp.4.man: updates for release
+	* doc/man/man4/tp.4.man: updates for release
+	* doc/man/man4/xot.4.man: updates for release
+	* doc/man/striso.refs: updates for release
+	* doc/manual/descrip.texi: updates for release
+	* NEWS: updates for release
+	* NOTES: updates for release
+	* README: updates for release
+	* src/drivers/tp.c: updates for release
+	* src/modules/isot.c: updates for release
+	* src/modules/itot.c: updates for release
+	* src/modules/tcpns.c: updates for release
+	* THANKS: updates for release
+
+	* doc/man/man3/getmyclnsnsap.3.man: added new file, working up modules, drivers and docs
+	* doc/man/man3/getmyconsnsap.3.man: added new file, working up modules, drivers and docs
+	* doc/man/man3/getnamebynsap.3.man: added new file, working up modules, drivers and docs
+	* doc/man/man3/getnsapbyname.3.man: added new file, working up modules, drivers and docs
+	* doc/man/man3/gettselbyname.3.man: added new file, working up modules, drivers and docs
+	* doc/man/man3/libosi.3.man: added new file, working up modules, drivers and docs
+	* doc/man/man3/nsap2net.3.man: added new file, working up modules, drivers and docs
+	* doc/man/man3/tsap2net.3.man: added new file, working up modules, drivers and docs
+	* doc/man/man4/clnp.4.man: added new file, working up modules, drivers and docs
+	* doc/man/man4/cons.4.man: added new file, working up modules, drivers and docs
+	* doc/man/man4/itos.4.man: added new file, working up modules, drivers and docs
+	* doc/man/man4/oclt.4.man: added new file, working up modules, drivers and docs
+	* doc/man/man4/otk6.4.man: added new file, working up modules, drivers and docs
+	* doc/man/man4/otpi.4.man: added new file, working up modules, drivers and docs
+	* doc/man/man4/xos.4.man: added new file, working up modules, drivers and docs
+	* src/drivers/cons.c: added new file, working up modules, drivers and docs
+	* src/include/osi.h: added new file, working up modules, drivers and docs
+	* src/include/sys/clns.h: added new file, working up modules, drivers and docs
+	* src/include/sys/cons.h: added new file, working up modules, drivers and docs
+	* src/include/sys/np.h: added new file, working up modules, drivers and docs
+	* src/include/sys/osi.h: added new file, working up modules, drivers and docs
+	* src/include/sys/tp.h: added new file, working up modules, drivers and docs
+	* src/lib/osi.c: added new file, working up modules, drivers and docs
+	* src/lib/osilib.h: added new file, working up modules, drivers and docs
+	* src/lib/osi.VERSION: added new file, working up modules, drivers and docs
+	* src/lib/pthread.c: added new file, working up modules, drivers and docs
+	* src/modules/isos.c: added new file, working up modules, drivers and docs
+	* src/modules/itos.c: added new file, working up modules, drivers and docs
+
 2006-10-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lpp.4.man,v 0.9.2.2 2006/10/03 13:52:18 brian Exp $
+.\" @(#) $Id: lpp.4.man,v 0.9.2.3 2006/10/10 10:44:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:52:18 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:44:03 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lpp.4.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:44:03  brian
+.\" - updates for release, lots of additions and workup
+.\"
 .\" Revision 0.9.2.2  2006/10/03 13:52:18  brian
 .\" - changes to pass make check target
 .\" - added some package config.h files
@@ -92,7 +95,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B lpp
-\- 
+\- Lightweight Presentation Protocol (LPP)
 .\"
 .\"
 .SH SYNOPSIS
@@ -101,6 +104,40 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+.B LPP
+is an implementation of the
+.IR "Lightweight Presentation Protocol (LPP)" ,
+as described in
+RFC 1085.
+.[
+rfc1085
+.]
+.B LPP
+is used primarily by CMOT,
+.BR cmot (4),
+as described in
+RFC 1095
+.[
+rfc1095
+.]
+and then
+RFC 1189.
+.[
+rfc1189
+.]
+.B LPP
+provides a mechanism for transporting presentation layer PDUs over TCP or UDP
+(with serious cautions about using UDP for such things).
+.PP
+.B LPP
+can be implemented as a
+.I STREAMS
+pushable module that is pushed over a TCP (tpi) stream.  The resulting Stream
+can still present a TPI interface, just a TPI-mOSI interface as described in
+XNS 5.2.
+.[
+xns
+.]
 .\"
 .\"
 .SH USAGE
@@ -113,6 +150,10 @@ sort-adjacent-labels
 .\"
 .SH ADDRESSES
 .PP
+Address encoding is according to RFC 1278.
+.[
+rfc1278
+.]
 .\"
 .\"
 .SH OPTIONS

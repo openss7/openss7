@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xot.4.man,v 0.9.2.2 2006/10/03 13:52:18 brian Exp $
+.\" @(#) $Id: xot.4.man,v 0.9.2.3 2006/10/10 10:44:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:52:18 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:44:03 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xot.4.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:44:03  brian
+.\" - updates for release, lots of additions and workup
+.\"
 .\" Revision 0.9.2.2  2006/10/03 13:52:18  brian
 .\" - changes to pass make check target
 .\" - added some package config.h files
@@ -105,7 +108,11 @@ The RFC describes use of ISO 8881
 .[
 ISO/IEC 8881:1989
 .]
-X.25 Packet Layer Protocol over TCP (XOT) using independent TCP connections
+X.25
+.[
+x25
+.]
+Packet Layer Protocol over TCP (XOT) using independent TCP connections
 to Registered TCP Port Number 1998 as VCs.
 .PP
 Although RFC 1613
@@ -120,46 +127,164 @@ Compaq/DEC and IBM.
 .\"
 .SH USAGE
 .PP
+Not yet implemented, but here is a stab at explaining the design:
+.PP
+The following steps would be taken:
+.IP 1. \w'0.\(em'u
+An X.25 PLP connection manager opens a connection management Stream on the
+X.25 PLP multiplexing driver, configures routing tables to indicate that the
+remote interface available to
+.B XOT
+are available for demand connections.
+.IP 2.
+When the X.25 PLP driver wishes to form an SVC to route a call or the user
+opens an
+.BR npi (7)
+Stream on the X.25 PLP driver and attempts to listen on or connect a VC, the
+X.25 PLP driver informs the connection manager that a DLPI Stream is required.
+.IP 3.
+The connection manager takes the information about the request,
+opens a
+.BR tcp (4)
+Stream to the host providing the remote interface on IANA registered port
+number 1998.
+.IP 4.
+The connection manager then pushes the
+.B XOT
+module onto the
+.BR tcp (4)
+Stream.i
+.IP 5.
+Using information in the X.25 PLP connection request, the connection
+manager then configures the
+.B XOT
+Stream using input-output controls or DLPI primitives.
+.IP 6.
+The connection manager links the resulting
+.BR dlpi (7)
+stream beneath the X.25 PLP multiplexing driver, configures the link as
+normal, and response to the configuration request on the connection management
+Stream.
+.IP 7.
+The X.25 PLP multiplexing driver starts using the DLPI stream just as though
+it was a local X.25 LAPB or X.25 LLC2 data link.
+The
+.B XOT
+module intercepts information from the X.25 PLP to affet the convergence
+functions described in RFC 1613.
+.[
+rfc1613
+.]
+.PP
+Another approach would be to move the connection manager Stream one level down
+to a
+.B XOT
+multiplexing driver.  In this case, the first step is to open
+.B XOT
+streams and to link and configure them beneath the X.25 PLP driver. When
+network connections are attempted on the Stream, the XOT driver intercepts the
+X.25 PLP packets and peforms VC requests to the connection manager.  The
+connection manager then opens and configures
+.BR tcp (4)
+Streams and links them beneath the XOT multiplexing driver on demand.  That
+would probably work better.  Also, this is not too much different than what
+would need to be done when providing X.25 PLP using ISDN LAPB in the circuit
+switched mode.
 .\"
 .\"
 .SH INTERFACE
 .PP
+The service interface to the
+.B xot
+module is the
+.I Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
 .\"
 .\"
 .SH ADDRESSES
 .PP
+The
+.B xot
+address format is a
+DLPI interface id.
 .\"
 .\"
 .SH OPTIONS
 .PP
+All OSI DLPI options apply but perhaps not all can be supported by TCP.
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+.BR dlpi (7)
+connection-oriented primitives.
 .\"
 .\"
 .SH IOCTLS
 .PP
+.BR dlpi (7)
+defined input-output controls.
 .\"
 .\"
 .SH NOTICES
 .PP
+This module is yet to be implemented.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+Implementing
+.B xot
+may be somewhat cumbersome.  A problem is that RFC 1613
+.[
+rfc1613
+.]
+specifies that each X.25 SVC or PVC must use a different TCP connection to
+port 1998.
+With
+.B xot
+implemented as a pushable module that can be pushed over a
+.BR tcp (4)
+Stream (which might also be implemented as a tcp module pushed over an tpi-tcp
+Stream), one new Stream must be opened for each SVC.
+Now, this might also be the case for CONS over LAN as well as X.25 DLPI
+implementations, where the DLPI type II Stream is bound to an interface and
+used to create a new SVC with DL_CONNECT_REQ.
+.PP
+A problem with such an approach is that some sort of connection manager
+(daemon) needs to sit listening for requests from the network layer for an SVC
+and then open a XOT Stream and link it under a multiplexing driver, or the
+user of the network connection must do so themselves.
 .\"
 .\"
 .SH FILES
-.PP
+.TP
+.BI /lib/modules/ "`uname -r`" /striso/streams_xot.ko
+the kernel module for the
+.B xot
+.I STREAMS
+module
 .\"
 .\"
 .SH MODULES
 .PP
+.TP
+.B xot
+is a
+.I STREAMS
+pushable module named
+.RI \(lq xot \(rq.
 .\"
 .\"
 .SH DEVICES
-.PP
+.TP
+.B /dev/tcp
+The TCP device over which
+.B xot
+is pushed.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -173,18 +298,44 @@ Compaq/DEC and IBM.
 .\"
 .SH BUGS
 .PP
+This manpage and the implementation is incomplete.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+None.  I know of no other
+.I STREAMS
+or
+.I Sockets
+implementations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+RFC 1613,
+.[
+rfc1613
+.]
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+X.25,
+.[
+x25
+.]
+X.25 PLP.
+.[
+ISO/IEC 8881:1989
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B xot
+module is new to
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[
