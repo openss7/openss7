@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: _info.9.man,v 0.9.2.12 2006/04/05 09:44:05 brian Exp $
+.\" @(#) $Id: _info.9.man,v 0.9.2.13 2006/10/10 10:41:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:05 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:41:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: _info.9.man,v $
+.\" Revision 0.9.2.13  2006/10/10 10:41:45  brian
+.\" - updates for release, rationalized documentation to strcompat
+.\"
 .\" Revision 0.9.2.12  2006/04/05 09:44:05  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B _info
-\-
+\- get information about a kernel module
 .\"
 .\"
 .SH SYNOPSIS

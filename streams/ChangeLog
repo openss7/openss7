@@ -1,3 +1,68 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* README: updates for release
+	* doc/man/streams.refs: updates for release
+	* doc/man/man9/_fini.9.man: updates for release
+	* doc/man/man9/_info.9.man: updates for release
+	* doc/man/man9/_init.9.man: updates for release
+	* doc/man/man9/allocbi.9.man: updates for release
+	* doc/man/man9/apush_vml.9.man: updates for release
+	* doc/man/man9/ddi_get_soft_state.9.man: updates for release
+	* doc/man/man9/ddi_removing_power.9.man: updates for release
+	* doc/man/man9/ddi_soft_state.9.man: updates for release
+	* doc/man/man9/ddi_soft_state_fini.9.man: updates for release
+	* doc/man/man9/ddi_soft_state_free.9.man: updates for release
+	* doc/man/man9/ddi_soft_state_init.9.man: updates for release
+	* doc/man/man9/ddi_soft_state_zalloc.9.man: updates for release
+	* doc/man/man9/ddi_umem_free.9.man: updates for release
+	* doc/man/man9/getinfo.9.man: updates for release
+	* doc/man/man9/kmem_zalloc_node.9.man: updates for release
+	* doc/man/man9/mcopyout.9.man: updates for release
+	* doc/man/man9/mi_first_ptr.9.man: updates for release
+	* doc/man/man9/mi_mpprintf.9.man: updates for release
+	* doc/man/man9/mi_mpprintf_nr.9.man: updates for release
+	* doc/man/man9/mi_next_dev_ptr.9.man: updates for release
+	* doc/man/man9/mi_offset_param.9.man: updates for release
+	* doc/man/man9/mi_offset_paramc.9.man: updates for release
+	* doc/man/man9/mi_open_alloc.9.man: updates for release
+	* doc/man/man9/mi_open_alloc_sleep.9.man: updates for release
+	* doc/man/man9/mi_open_link.9.man: updates for release
+	* doc/man/man9/mi_reallocb.9.man: updates for release
+	* doc/man/man9/mi_reuse_proto.9.man: updates for release
+	* doc/man/man9/mi_set_sth_copyopt.9.man: updates for release
+	* doc/man/man9/mi_set_sth_hiwat.9.man: updates for release
+	* doc/man/man9/mi_set_sth_lowat.9.man: updates for release
+	* doc/man/man9/mi_set_sth_maxblk.9.man: updates for release
+	* doc/man/man9/mi_set_sth_wroff.9.man: updates for release
+	* doc/man/man9/mi_sprintf_putc.9.man: updates for release
+	* doc/man/man9/mi_strcmp.9.man: updates for release
+	* doc/man/man9/mi_strlen.9.man: updates for release
+	* doc/man/man9/mi_strlog.9.man: updates for release
+	* doc/man/man9/mi_strol.9.man: updates for release
+	* doc/man/man9/mi_timer_cancel.9.man: updates for release
+	* doc/man/man9/mi_timer_free.9.man: updates for release
+	* doc/man/man9/mi_timer_move.9.man: updates for release
+	* doc/man/man9/mi_timer_stop.9.man: updates for release
+	* doc/man/man9/mi_timer_valid.9.man: updates for release
+	* doc/man/man9/mps_intr_disable.9.man: updates for release
+	* doc/man/man9/mps_intr_enable.9.man: updates for release
+	* doc/man/man9/probe.9.man: updates for release
+	* doc/man/man9/xxxaix.9.man: updates for release
+	* doc/man/man9/xxxhpux.9.man: updates for release
+	* doc/man/man9/xxxirix.9.man: updates for release
+	* doc/man/man9/xxxlis.9.man: updates for release
+	* doc/man/man9/xxxmac.9.man: updates for release
+	* doc/man/man9/xxxmi.9.man: updates for release
+	* doc/man/man9/xxxmps.9.man: updates for release
+	* doc/man/man9/xxxosf.9.man: updates for release
+	* doc/man/man9/xxxsun.9.man: updates for release
+	* doc/man/man9/xxxsux.9.man: updates for release
+	* doc/man/man9/xxxsvr.9.man: updates for release
+	* doc/man/man9/xxxsvr3.9.man: updates for release
+	* doc/man/man9/xxxuw7.9.man: updates for release
+	* doc/man/man9/xxxuxp.9.man: updates for release
+	* doc/manual/descrip.texi: updates for release
+
 2006-10-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated for release
