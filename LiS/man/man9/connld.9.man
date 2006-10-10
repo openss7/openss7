@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: connld.9.man,v 1.1.4.4 2006/04/05 09:42:43 brian Exp $
+.\" @(#) $Id: connld.9.man,v 1.1.4.5 2006/10/10 10:34:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:34:52 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: connld.9.man,v $
+.\" Revision 1.1.4.5  2006/10/10 10:34:52  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.4.4  2006/04/05 09:42:43  brian
 .\" - moved .so line and updated headers
 .\"
@@ -85,7 +88,7 @@
 .\" =========================================================================
 .SH NAME
 .B connld
-\- 
+\- connection line discipline module
 .B STREAMS
 module supporting the generation of unique new
 .BR STREAMS "\-based"

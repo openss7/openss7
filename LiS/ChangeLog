@@ -1,3 +1,10 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: updates for release
+	* man/lis.refs: updates for release
+	* man/man9/connld.9.man: updates for release
+	* man/man9/pipemod.9.man: updates for release
+
 2006-10-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

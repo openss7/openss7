@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pipemod.9.man,v 1.1.4.4 2006/04/05 09:42:44 brian Exp $
+.\" @(#) $Id: pipemod.9.man,v 1.1.4.5 2006/10/10 10:34:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:44 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:34:52 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pipemod.9.man,v $
+.\" Revision 1.1.4.5  2006/10/10 10:34:52  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.4.4  2006/04/05 09:42:44  brian
 .\" - moved .so line and updated headers
 .\"
@@ -85,7 +88,7 @@
 .\" =========================================================================
 .SH NAME
 .B pipemod
-\- 
+\- pipe module
 .B STREAMS
 module supporting flush handling in
 .BR STREAMS "\-based"
