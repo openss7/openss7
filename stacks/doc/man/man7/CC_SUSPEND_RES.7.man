@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: CC_SUSPEND_RES.7.man,v 0.9.2.5 2006/04/05 09:43:12 brian Exp $
+.\" @(#) $Id: CC_SUSPEND_RES.7.man,v 0.9.2.6 2006/10/10 10:38:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:12 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:38:43 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: CC_SUSPEND_RES.7.man,v $
+.\" Revision 0.9.2.6  2006/10/10 10:38:43  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:12  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B CC_SUSPEND_RES
-\- 
+\- call control suspend response
 The format of this message is one
 .B M_PROTO
 message block.  The structure of the
