@@ -1,5 +1,5 @@
-OpenSS7 IPERF Utility -- read me first file.  2006-10-03
-$Id: README,v 1.1.1.2.2.12 2006/10/05 12:13:08 brian Exp $
+OpenSS7 IPERF Utility -- read me first file.  2006-10-04
+$Id: README,v 1.1.1.2.2.13 2006/10/10 10:35:44 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -15,12 +15,12 @@ to run with `OpenSS7 Linux Native Stream Control Transmission Protocol
 (SCTP)'.
 
 The `OpenSS7 IPERF Utility' package provides primarily the `iperf(1)',
-C++ Lanaguage program that acts as either an `Iperf' server or client
+C++ Language program that acts as either an `Iperf' server or client
 for testing connections and networking.  The `iperf(1)' program is
 executed on one host in server mode and then executed on another host
-in client mode.  Characteritics of the connection or association can be
-altered when formed.  Reporting formats and sample intervals can also
-be altered when the connection or association is formed.
+in client mode.  Characteristics of the connection or association can
+be altered when formed.  Reporting formats and sample intervals can
+also be altered when the connection or association is formed.
 
 This is a fork of the "Iperf" package released by the `University of
 Illinois' modified by the OpenSS7 Project (http://www.openss7.org/) for
@@ -31,7 +31,7 @@ from the `University of Illinois'.
 Modifications to the package are derived from the `OpenSS7 SCTP'
 implementation and are released under the `GNU General Public License
 (GPL) Version 2'.  The "Iperf" tool itself is licensed under specific
-terms by the `University of Illinois'.  Please see `LICENSE' for the
+terms by the `University of Illinois'.  Please see `LICENSES' for the
 `University of Illinois' "Iperf" copyright notices and licensing
 restrictions.  The "Iperf" tool is:
 
@@ -39,8 +39,8 @@ restrictions.  The "Iperf" tool is:
      The Board of Trustees of the University of Illinois
      All rights reserved
 
-See `University of Illinois' License in the `LICENSE' file for complete
-details.
+See `University of Illinois' License in the `LICENSES' file for
+complete details.
 
 Please note that this modified version of the "Iperf" package is not
 endorsed by the `University of Illinois' or `DAST' in any way and that
@@ -50,7 +50,7 @@ neither the original copyright holders nor OpenSS7 Corporation
  Release
 --------
 
-This is the `iperf-2.0.5' package, released 2006-10-03.  This `2.0.5'
+This is the `iperf-2.0.5' package, released 2006-10-04.  This `2.0.5'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
