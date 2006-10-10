@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_sctp.7.man,v 0.9.2.5 2006/04/26 10:45:12 brian Exp $
+.\" @(#) $Id: tpi_sctp.7.man,v 0.9.2.6 2006/10/10 10:42:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/26 10:45:12 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:42:54 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_sctp.7.man,v $
+.\" Revision 0.9.2.6  2006/10/10 10:42:54  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/26 10:45:12  brian
 .\" - updated manual pages and references
 .\"
@@ -81,9 +84,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH TPI-SCTP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"
+.\"
+.\"
 .SH NAME
 .B tpi_sctp
 \- Transport Provider Interface (TPI) \- Stream Control Transmission Protocol (SCTP) Corrigendum
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/tihdr.h>
@@ -93,6 +100,8 @@ sort-adjacent-labels
 .B #include <sys/tpi_sctp.h>
 .HP
 .BI "int " sctp_stream " = open(" \fR\*(lq/dev/sctp_t\*(rq\fI ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .PP
@@ -126,81 +135,271 @@ and
 library.
 .SS "ADDRESS FORMATS"
 .PP
+The SCTP address format is structured as follows:
+.sp
+.nf
+\fC\s-1\
+struct sockaddr_in {
+    sa_family_t         sin_family;  /* Address family */
+    unsigned short int  sin_port;    /* Port number */
+    struct in_addr      sin_addr;    /* Internet address */
+    /* padding */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B sockaddr_in
+structure contains the following members:
+.TP \w'sin_family\(em'u
+.I sin_family
+The address family.  Always set to
+.BR AF_INET " or " AF_UNSPEC .
+.PD 0
+.TP
+.I sin_port
+The port number of the transport endpoint in network byte order.
+.TP
+.I sin_addr
+The IP address of the transport endpoint in network byte order.
+.TP
+.I (padding)
+Padding to pad the size of the
+.B sockaddr_in
+structure to the size of a
+.B sockaddr
+structure.
+.PD
+.PP
+The structure is padded to the size of a
+.B sockaddr
+structure.
+.PP
+SCTP adresses can also be formed as an array of
+.B sockaddr_in
+structure to represent multiple addresses for multi-homed hosts.
+.\"
+.\"
 .SH "OPTIONS"
 .PP
+Options are formatted according to the
+.B t_opthdr
+structure described in
+.BR xti (3).
+A SCTP transport provider compliant to this specification supports none, all or
+any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in a privileged or read-only
+mode.
 .PP
 .B TPI-SCTP
 provides options at the
-.B T_INET_SCTP
-option level as described in the section that follow.  Of the
+.BR XTI_GENERIC ", " T_INET_IP " and " T_INET_SCTP
+option levels as described in the subsections that follow.  Of the
 .B T_INET_SCTP
 level protocol options, none of the options are of end-to-end significance.
-.SS T_SCTP_NODELAY
+.\"
+.\"
+.SS XTI_GENERIC
 .PP
+Options at this level are specific to the X/Open Transport Interface (XTI/TLI)
+and are common to all transport providers.  For more information, see
+.BR xti (3).
 .PP
-.SS T_SCTP_CORK
+The options defined with the option level
+.B XTI_GENERIC
+are as follows:
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the Stream.  This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_LINGER
+Sets whether, and the amount of time if, the Stream will linger waiting for
+unsent data to be delivered.  This option is formatted as a
+.B t_linger
+structure as follows:
+.RS
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;   /* option on/off */
+    t_scalar_t l_linger;  /* linger time */
+};
+\s+1\fP
+.fi
+.TP \w'l_linger\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES ") or not (" T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.PD 0
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.  Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.PD
+.RE
+.IP ""
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the receive buffer.  This option is formatted
+as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.  This option is formatted as
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.  This option is
+formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.  This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.  For more information, see
+.BR xti (3).
+.\"
+.\"
+.SS T_INET_IP
 .PP
+Options with this level are specific to the Internet Protocol (IP)
+.[
+rfc791
+.]
+and are common to all the protocol levels in IP.  For more information, see
+.BR tpi_ip (7).
 .PP
-.SS T_SCTP_PPI
+The options defined with the option level
+.B T_INET_IP
+are as follows:
+.TP
+.B T_IP_OPTIONS
+Provides control for the T_IP OPTIONS field.  Used for debugging.  This option
+is formatted as an array of
+.BR "unsigned char" ,
+up to 40 elements.  For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_TOS
+Provides control of the type-of-service byte present in each transmited T_IP
+packet.  This option is formated as an
+.BR "unsigned char" .
+Legal values can be generated with the
+.BR SET_TOS ()
+macro described in
+.BR tpi_ip (7).
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_TTL
+Provides control of the time-to-live byte present in each transmitted T_IP
+packet.  This option is formatted as an
+.BR "unsigned char" .
+Legal values are from 0 to 255.  For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_REUSEADDR
+Allows multiple non-listening binds to the same address.  This option is
+formatted as an
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_DONTROUTE
+Bypasses routing tables and routes directly to an interface.  Used for
+debugging.  This option is formatted as an
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.TP
+.B T_IP_BROADCAST
+Allows broadcast addresses to be used.  This option is not applicable to SCTP
+and is always set to
+.BR T_NO .
+This options is formatted as an
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR tpi_ip (7).
+.\"
+.\"
+.SS T_INET_SCTP
 .PP
+Options within this level are specific to the Stream Control Transmission Protocol
+(SCTP)
+.[
+rfc2960
+.]
+yet are used by protocol levels using SCTP transport.
 .PP
-.SS T_SCTP_SID
-.PP
-.PP
-.SS T_SCTP_SSN
-.PP
-.PP
-.SS T_SCTP_TSN
-.PP
-.PP
-.SS T_SCTP_RECVOPT
-.PP
-.PP
-.SS T_SCTP_COOKIE_LIFE
-.PP
-.PP
-.SS T_SCTP_SACK_DELAY
-.PP
-.PP
-.SS T_SCTP_PATH_MAX_RETRANS
-.PP
-.PP
-.SS T_SCTP_ASSOC_MAX_RESTRANS
-.PP
-.PP
-.SS T_SCTP_MAX_INIT_RETRIES
-.PP
-.PP
-.SS T_SCTP_HEARTBEAT_ITVL
-.PP
-.PP
-.SS T_SCTP_RTO_INITIAL
-.PP
-.PP
-.SS T_SCTP_RTO_MIN
-.PP
-.PP
-.SS T_SCTP_RTO_MAX
-.PP
-.PP
-.SS T_SCTP_OSTREAMS
-.PP
-.PP
-.SS T_SCTP_ISTREAMS
-.PP
-.PP
-.SS T_SCTP_COOKIE_INC
-.PP
-.PP
-.SS T_SCTP_THROTTLE_ITVL
-.PP
-.PP
-.SS T_SCTP_MAC_TYPE
-.PP
-.PP
-.SS T_SCTP_HB
-.PP
-.PP
+The options defined with the option level
+.B T_INET_SCTP
+are as follows:
+.TP
+.B T_SCTP_NODELAY
+.TP
+.B T_SCTP_CORK
+.TP
+.B T_SCTP_PPI
+.TP
+.B T_SCTP_SID
+.TP
+.B T_SCTP_SSN
+.TP
+.B T_SCTP_TSN
+.TP
+.B T_SCTP_RECVOPT
+.TP
+.B T_SCTP_COOKIE_LIFE
+.TP
+.B T_SCTP_SACK_DELAY
+.TP
+.B T_SCTP_PATH_MAX_RETRANS
+.TP
+.B T_SCTP_ASSOC_MAX_RESTRANS
+.TP
+.B T_SCTP_MAX_INIT_RETRIES
+.TP
+.B T_SCTP_HEARTBEAT_ITVL
+.TP
+.B T_SCTP_RTO_INITIAL
+.TP
+.B T_SCTP_RTO_MIN
+.TP
+.B T_SCTP_RTO_MAX
+.TP
+.B T_SCTP_OSTREAMS
+.TP
+.B T_SCTP_ISTREAMS
+.TP
+.B T_SCTP_COOKIE_INC
+.TP
+.B T_SCTP_THROTTLE_ITVL
+.TP
+.B T_SCTP_MAC_TYPE
+.TP
+.B T_SCTP_HB
 .sp
 .nf
 \fC\s-1\
@@ -211,9 +410,8 @@ typedef struct t_sctp_hb {
 } t_sctp_hb_t;
 \s+1\fR
 .fi
-.SS T_SCTP_RTO
-.PP
-.PP
+.TP
+.B T_SCTP_RTO
 .sp
 .nf
 \fC\s-1\
@@ -226,13 +424,12 @@ typedef struct t_sctp_rto {
 } t_sctp_rto_t;
 \s+1\fR
 .fi
-.SS T_SCTP_MAXSEG
+.TP
+.B T_SCTP_MAXSEG
+.TP
+.B T_SCTP_STATUS
+.RS
 .PP
-.PP
-.SS T_SCTP_STATUS
-.PP
-.PP
-.sp
 .nf
 \fC\s-1\
 typedef struct t_sctp_dest_status {
@@ -246,7 +443,7 @@ typedef struct t_sctp_dest_status {
 } t_sctp_dest_status_t;
 \s+1\fR
 .fi
-.sp
+.PP
 .nf
 \fC\s-1\
 typedef struct t_sctp_status {
@@ -257,9 +454,8 @@ typedef struct t_sctp_status {
 } t_sctp_status_t;
 \s+1\fR
 .fi
-.SS T_SCTP_DEBUG
-.PP
-.PP
+.TP
+.B T_SCTP_DEBUG
 .TP
 .B SCTP_OPTION_DROPPING
 causes the stream to drop packets.
@@ -272,36 +468,48 @@ causes the stream to break destinations in both directions.
 .TP
 .B SCTP_OPTION_RANDOM
 causes the stream to drop packets at random.
+.RE
+.\"
+.\"
 .SH "LOCAL MANAGEMENT INTERFACE"
 .PP
-.PP
-.SS T_INFO_REQ
-.PP
+.\"
+.SS T_INFO_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.SS T_INFO_ACK
+.\"
+.SS T_INFO_ACK\fR(7)
 .PP
-.TP
+This primitive is interpreted as in
+.BR tpi (7).
+.TP \w'\fIPROVIDER_flag\fP\(em'u
 .I TSDU_size
+The
+.B TPI-SCTP
+provider has an unlimited TSDU and returns \fBT_INFINITE\fR in this field in accordance with
+.BR tpi (7).
 .TP
 .I ETSDU_size
-.B SCTP
-supports the concept of expedited data.  Expedited data is data that is sent
+The
+.B TPI-SCTP
+provider supports the concept of expedited data.  Expedited data is data that is sent
 unordered.  This field should always return the same value as the
 .I TSDU_size
 above.
 .TP
 .I CDATA_size
-.B SCTP
-supports the concept of connection data.  This field will be the maximum
+The
+.B TPI-SCTP
+provider supports the concept of connection data.  This field will be the maximum
 amount of data that will fit in a COOKIE-ECHO or COOKIE-ACK message.
 .TP
 .I DDATA_size
-.B SCTP
-does not support the concept of disconnection data and this field will always
-return
-.BR T_INVALID .
+The
+.B TPI-SCTP
+provider does not support the concept of disconnection data and, therefore, returns
+.B T_INVALID
+in this field.
 .TP
 .I ADDR_size
 The maximum size of the
@@ -309,13 +517,15 @@ The maximum size of the
 address.  This field will always return an integer multiple of the
 .B sockaddr_in
 structure size as described under
-.IR \*(lqADDRESS FORMAT\*(rq ,
+.RI \*(lq "ADDRESS FORMAT" \*(rq ,
 above.
 .TP
 .I OPT_size
-This is the maximum size of the
-.I OPT_length
-field in T-primitives which support options.
+The
+.B TPI-SCTP
+provider can support any number of options and returns
+.B T_INFINITE
+in this field.
 .TP
 .I TIDU_size
 This is the maximum size of the interface data unit, which is the maximum size
@@ -331,21 +541,21 @@ The service type is one of the following:
 .TP
 .B T_CLTS
 Connectionless service.
-.B SCTP
+.B TPI-SCTP
 does not support connectionless service.
 This value will never be returned by
-.BR SCTP .
+.BR TPI-SCTP .
 .TP
 .B T_COTS
 Connection-oriented service.
-.B SCTP
+.B TPI-SCTP
 does not support connection-oriented service without orderly release.
 This value will never be returned by
-.BR SCTP .
+.BR TPI-SCTP .
 .TP
 .B T_COTS_ORD
 Connection-oriented service with orderly release.
-.B SCTP
+.B TPI-SCTP
 supports connection-oriented service with orderly release.
 .RE
 .TP
@@ -360,7 +570,7 @@ Provider flags are a bitwise OR of the following:
 .B T_SNDZERO
 Indicates that the transport user is permitted to send data with a message
 length of zero.
-.B SCTP
+.B TPI-SCTP
 does not support the transmission of zero-length TSDUs.  This flag must be
 clear.
 .TP
@@ -370,22 +580,23 @@ new primitives
 .BR T_ADDR_REQ "(7) and " T_ADDR_ACK (7).
 This flag is normally set.
 .RE
-.SS T_ADDR_REQ
+.\"
+.SS T_ADDR_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
+.\"
+.SS T_ADDR_ACK\fR(7)
 .PP
-.SS T_ADDR_ACK
-.PP
-.PP
+This primitive is interpreted as in
+.BR tpi (7).
 .TP
 .IR LOCADDR_length ", " LOCADDR_offset
 Indicates the length and offset from the beginning of the message block of the
 .B sockaddr_in
 structures that describes the
-.B SCTP
-addresses to which the stream is bound.
-If the stream is not in a bound state, then
+.B TPI-SCTP
+addresses to which the Stream is bound.  If the Stream is not in a bound state, then
 .IR LOCADDR_length " and " LOCADDR_offset
 return zero (0).
 .TP
@@ -393,45 +604,57 @@ return zero (0).
 Indicates the length and offset from the beginning of the message block of the
 .B sockaddr_in
 structures that describes the
-.B SCTP
-addresses to which the stream is connected.
-If the stream is not in a connected or connecting state, then
+.B TPI-SCTP
+addresses to which the Stream is connected.  If the Stream is not in a connected or connecting state,
 .IR REMADDR_length " and " REMADDR_offset
 return zero (0).
-.SS T_CAPABILITY_REQ
-.PP
+.\"
+.SS T_CAPABILITY_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.SS T_CAPABILITY_ACK
+.\"
+.SS T_CAPABILITY_ACK\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
 .PP
 This primitive returns the
 .BR T_info_ack (7)
-structure interpreted as described in
-.IR \*(lqT_INFO_ACK\*(rq ,
+structure interpreted as described under
+.RI \(lq T_INFO_ACK ,\(rq
 above.
-.SS T_BIND_REQ
-.PP
+.\"
+.SS T_BIND_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
 .TP
 .IR ADDR_length ", " ADDR_offset
-The length and offset from the beginning of the message block of the
+Specifies the length and offset from the beginning of the message block of the
 .B sockaddr_in
 structures that contain the
-.B SCTP
+.B TPI-SCTP
 addresses to bind.
-.B SCTP
-supports wildcard addresses and the address
+The
+.B TPI-SCTP
+provider supports wildcard addresses and the address
 .BR INADDR_ANY .
 This field can contain an integer number of addresses.
 .TP
-.I CONNIND_number
-Specifies the number of connection indications.
-.SS T_BIND_ACK
-.PP
+.I CONIND_number
+Specifies the number of connection indications.  Specifying a non-zero number of connection
+indications will place the Stream in listening mode.  Any COOKIE-ECHO packet received from a unique source
+address will generate a connection indication.  Connection indications can be accepted or refused
+(without data).  This number specifies the maximum number of outstanding connection indications
+(those that have neither been accepted nor refused) that the provider will deliver.  Because this
+limit is reached does not mean that the provider discards additional connection indications, but may
+queue them internally until the number of outstanding connection indications drops beneath the
+number specified.  See
+.BR tpi (7)
+for more information.
+.\"
+.SS T_BIND_ACK\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
@@ -440,90 +663,111 @@ This primitive is interpreted as in
 Indicates the length and offset from the beginning of the message block of the
 .B sockaddr_in
 structures that contain the
-.B SCTP
-addresses that were bound.
-This field can contain an integer number of addresses.
+.B TPI-SCTP
+addresses that were bound.  This field can contain an integer number of addresses.
+.IP ""
+The bound address,
+.IR sin_addr ,
+returned in this field may be
+.B INADDR_ANY
+if
+.B INADDR_ANY
+was requested, or no address was provided to the bind.  However, the
+.I sin_port
+component of the address will be allocated dynamically and set to a non-zero port number if zero
+(indicating any port) was specified on bind, or no address was provided to the bind.  If a non-zero
+port number could not be dynamically allocated,
+.RB [ TNOADDR ]
+is returned in accordacne with
+.BR tpi (7).
 .TP
-.I CONNIND_number
-Indicates the number of connection indications.
-.SS T_UNBIND_REQ
-.PP
-.PP
-This primitive is interpreted as in
-.BR tpi (7).
-.SS T_OK_ACK
-.PP
+.I CONIND_number
+Indicates the negotiated number of connection indications.  This is normally the same value as was
+requested; however, if the user requests a number that is considered too large, this number might be
+a more conservative value.
+.\"
+.SS T_UNBIND_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.SS T_ERROR_ACK
-.PP
+.\"
+.SS T_OK_ACK\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.SS T_OPTMGMT_REQ
+.\"
+.SS T_ERROR_ACK\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+.\"
+.SS T_OPTMGMT_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7),
 with the options described under
-.IR \*(lqOPTIONS\*(rq ,
+.RI \(lq OPTIONS ,\(rq
 above.
-.SS T_OPTMGMT_ACK
-.PP
+.\"
+.SS T_OPTMGMT_ACK\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7),
 with the options described under
-.IR \*(lqOPTIONS\*(rq ,
+.RI \(lq OPTIONS ,\(rq
 above.
+.\"
+.\"
 .SH "PROTOCOL SERVICE INTERFACE"
 .PP
+The
+.I /dev/sctp_t
+driver provides a single interface type: connection-oriented mode with orderly release.
+.\"
+.SS T_UNITDATA_REQ\fR(7)
 .PP
-.SS T_UNITDATA_REQ
-.PP
-.PP
-.B SCTP
-does not support connectionless service.  The
-.B SCTP
-transport service provider will return
-.RB [ TNOTSUPP ]
-in the
-.I TLI_error
-field of the
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-SCTP
+provider does not support connectionless mode service and any attempt to issue this primitive will
+result in a
 .BR T_ERROR_ACK (7)
-primitive.
-.SS T_UNITDATA_IND
+primitive with the error number
+.RB [ TNOTSUPPORT ].
+.\"
+.SS T_UNITDATA_IND\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-SCTP
+provide does not support connectionless mode service and will not issue this primitive.
+.\"
+.SS T_UDERROR_IND\fR(7)
 .PP
-.B SCTP
-does not support connectionless service.  The
-.B SCTP
-transport service provider will never issue this primitive.
-.SS T_UDERROR_IND
-.PP
-.PP
-.B SCTP
-does not support connectionless service.  The
-.B SCTP
-transport service provider will never issue this primitive.
-.SS T_CONN_REQ
-.PP
+This primitive is interpreted as in
+.BR tpi (7).
+The
+.B TPI-SCTP
+provide does not support connectionless mode service and will not issue this primitive.
+.\"
+.SS T_CONN_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7),
 with the options described under
-.IR \*(lqOPTIONS\*(rq ,
+.RI \*(lq OPTIONS \*(rq ,
 above and the following considerations:
 .TP
 .IR DEST_length ", " DEST_offset
 Specifies the length and offset from the beginning of the message block of the
 .B sockaddr_in
 structures that contains the
-.B SCTP
-addresses to which to connect the stream.
+.B TPI-SCTP
+IP addresses to which to connect the stream.
 For connection to multi-homed
-.B SCTP
+.B TPI-SCTP
 hosts, this address may contain multiple
 .B sockaddr_in
 structures.
@@ -549,44 +793,49 @@ Options that have significance at connection are:
 .BR T_SCTP_RTO_INITIAL ,
 .BR T_SCTP_RTO_MIN " and "
 .BR T_SCTP_RTO_MAX .
-.SS T_CONN_CON
-.PP
+.\"
+.SS T_CONN_CON\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7),
 with the options described under
-.IR \*(lqOPTIONS\*(rq ,
+.RI \*(lq OPTIONS \*(rq ,
 above and the following considerations:
 .TP
 .IR RES_length ", " RES_offset
 Indicates the length and offset from the beginning of the message block of the
 .B sockaddr_in
 structures that contains the
-.B SCTP
+.B TPI-SCTP
 addresses to which the stream is confirmed connected.
 For responding multi-homed
-.B SCTP
+.B TPI-SCTP
 hosts, this address may contain multiple
 .B sockaddr_in
 structures.
 .TP
 .IR OPT_length ", " OPT_offset
-.SS T_CONN_IND
-.PP
+Indicates the length and offset from the beginning of the message block of the options present in
+the connection request and options that are negotiated end-to-end.  See
+.RI \(lq OPTIONS ,\(rq
+above.  The option values represent the negotiation with the local provider as well as end-to-end
+negotiation with the SCTP peer.
+.\"
+.SS T_CONN_IND\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7),
 with the options described under
-.IR \*(lqOPTIONS\*(rq ,
+.RI \*(lq OPTIONS \*(rq ,
 above and the following considerations:
 .TP
 .IR SRC_length ", " SRC_offset
 Indicates the length and offset from the beginning of the message block of the
 .B sockaddr_in
 structures that contains the
-.B SCTP
-addresses from which the remote
-.B SCTP
+.B TPI-SCTP
+IP addresses from which the remote
+.B TPI-SCTP
 is connecting.
 For connecting multi-homed
 .B SCTP
@@ -595,35 +844,75 @@ hosts, this address may contain multiple
 structures.
 .TP
 .IR OPT_length ", " OPT_offset
-.SS T_CONN_RES
-.PP
+Indicates the length and offset from the beginning of the message block of the options of end-to-end
+significance that were present in the connection request.  See
+.RI \(lq OPTIONS ,\(rq
+above.  The only options indicated are those that are of end-to-end significance and which do not
+have default values.
+.TP
+.I SEQ_number
+Indicates the sequence number that can be used to accept or reject this
+connection indication.
+.\"
+.SS T_CONN_RES\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7),
 with the options described under
-.IR \*(lqOPTIONS\*(rq ,
+.RI \*(lq OPTIONS \*(rq ,
 above and the following considerations:
 .TP
+.I ACCEPTOR_id
+Specifies the acceptor identifier of the Stream onto which the connection is to be accepted.  If the
+connection is to be accepted on the same Stream upon which the corresponding
+.BR T_CONN_IND (7)
+was received, this field should be zero (0).  It is an error to accept a connection on the listening
+Stream if there is more than one connection indication outstanding.
+.TP
 .IR OPT_length ", " OPT_offset
-.SS T_DATA_REQ
+Specifies the length and offset from the beginning of the message block of the options requested for
+the connection.  See
+.RI \(lq OPTIONS ,\(rq
+above.  Options of local significance are negotiated locally.  Options of end-to-end significance
+are negotiated with the peer.
+.TP
+.I SEQ_number
+Specifies the sequence number in the corresponding
+.BR T_CONN_IND (7)
+primitive to which this primitive is responding.
+.\"
+.SS T_DATA_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
 .PP
 Data will be sent ordered on the stream.
-.SS T_DATA_IND
+.\"
+.SS T_DATA_IND\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
 .PP
 Data was sent ordered on the stream.
-.SS T_EXDATA_REQ
+.\"
+.SS T_EXDATA_REQ\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
 .PP
 Data will be sent unordered on the stream.
-.SS T_EXDATA_IND
+.\"
+.SS T_EXDATA_IND\fR(7)
 .PP
+This primitive is interpreted as in
+.BR tpi (7).
 .PP
 Data was sent unordered on the stream.
-.SS T_OPTDATA_REQ
+.\"
+.SS T_OPTDATA_REQ\fR(7)
 .PP
-.PP
+This primitive is interpreted as in
+.BR tpi (7).
 .TP
 .I DATA_flag
 This field can contain a bitwise OR of the following flags:
@@ -636,7 +925,7 @@ primitive contains data belonging to the same TSDU.
 .TP
 .B T_ODF_EX
 Specifies that the data is expedited.
-.B SCTP
+.B TPI-SCTP
 does not support true expedited data.  Data will be sent unordered within the
 association.
 .RE
@@ -655,11 +944,13 @@ sent.
 specifies the Protocol Payload Identifier to associate with the data.
 .B T_SCTP_SID
 specifies the
-.B SCTP
+.B TPI-SCTP
 stream within the association upon which to send the data.
-.SS T_OPTDATA_IND
+.\"
+.SS T_OPTDATA_IND\fR(7)
 .PP
-.PP
+This primitive is interpreted as in
+.BR tpi (7).
 .TP
 .I DATA_flag
 This field can contain a bitwise OR of the following flags:
@@ -672,7 +963,7 @@ primitive contains data belonging to the same TSDU.
 .TP
 .B T_ODF_EX
 Indicates that the data is expedited.
-.B SCTP
+.B TPI-SCTP
 does not support true expedited data.  Data was received unordered within the
 association.
 .RE
@@ -687,80 +978,236 @@ Options that are significant are:
 indicates the Protocol Payload Identifier associated with the data.
 .B T_SCTP_SID
 indicates the stream identifier of the
-.B SCTP
+.B TPI-SCTP
 stream within the association upon which the data was received.
 .B T_SCTP_SSN
 indicates the stream sequence number for the current data chunk.
 .B T_SCTP_TSN
 indicates the transmission sequence number for the current data chunk.
-.SS T_DISCON_REQ
+.\"
+.SS T_DISCON_REQ\fR(7)
 .PP
 .PP
-This primitive is interpreted as specified in
+This primitive is interpreted as in
 .BR tpi (7).
 This will result in the refusal of an outstanding
-.B SCTP
+.B TPI-SCTP
 connection indication or an abortive release of an existing
-.B SCTP 
+.B TPI-SCTP 
 association.
-.SS T_DISCON_IND
+.\"
+.SS T_DISCON_IND\fR(7)
 .PP
-.PP
-This primitive is interpreted as specified in
+This primitive is interpreted as in
 .BR tpi (7).
 It indicates the refusal of an outstanding
-.B SCTP
+.B TPI-SCTP
 outgoing connection request, or the abortive release of an existing
-.B SCTP
+.B TPI-SCTP
 association.
 .TP
 .I DISCON_reason
 The disconnect reason may be one of the following values:
 .RS
 .RE
-.SS T_ORDREL_REQ
+.TP
+.I SEQ_number
+The sequence number of a currently outstanding connection indication to which the disconnect
+corresponds.  This value is non-zero only on a listening Stream for which an outstanding
+.BR T_CONN_IND (7)
+primtiive has been issued with no
+.BR T_DISCON_REQ (7)
+or
+.BR T_CONN_RES (7)
+primitive having been issued by the TS user with the same sequence number.
+.\"
+.SS T_ORDREL_REQ\fR(7)
 .PP
-.PP
-This primitive is interpreted as specified in
+This primitive is interpreted as in
 .BR tpi (7).
-This primitive initiates or responds to an
-.B SCTP
-orderly release.
-.SS T_ORDREL_IND
+This primitive requests or responds to the
+.B TPI-SCTP
+provider orderly release function.
+.\"
+.SS T_ORDREL_IND\fR(7)
 .PP
-.PP
-This primitive is interpreted as specified in
+This primitive is interpreted as in
 .BR tpi (7).
-This primitive indicates or confirms an
-.B SCTP
-orderly release.
+This primitive indicates or confirms the
+.B TPI-SCTP
+provider orderly release function.
+.\"
+.\"
 .SH "IOCTLS"
 .PP
-.PP
+The
+.B TPI-SCTP
+provider does not support input-output controls.  For a standard set of
+input-output controls supporting the
+.BR xti (3)
+library functions, push the
+.BR timod (4)
+module.
+.\"
+.\"
 .SH "ERROR HANDLING"
 .PP
-.PP
+Error handling is in accordance with
+.BR tpi (7).
+.\"
+.\"
 .SH "ERRORS"
 .PP
+Errors are in accordance with
+.BR tpi (7).
+They are repeated here as follows:
+.\"
+.SS "Error Acknowledgement Codes"
 .PP
-.SH "CAVEATS"
+The following error codes can be present in the
+.I TLI_error
+field of the
+.BR T_ERROR_ACK (7)
+message.
+.TP \w'[\fBTPROVMISMATCH\fP]\(em'u
+.RB [ TBADADDR ]
+A specified address was improperly formatted or contained invalid information.
+.TP
+.RB [ TBADOPT ]
+The specified options were improperly formatted or contained invalid information.
+.TP
+.RB [ TACCES ]
+The user did not have permission to a requested address or option.
+.TP
+.RB [ TBADF ]
+The
+.I ACCEPTOR_id
+does not identify a valid open Stream.
+.TP
+.RB [ TNOADDR ]
+The user did not specify an address and one could not be allocated by the TS provider.
+.TP
+.RB [ TOUTSTATE ]
+The primitive would place the interface out of state.
+.TP
+.RB [ TBADSEQ ]
+The sequence number provided did not correspond to an outstanding connection indication.
+.TP
+.RB [ TSYSERR ]
+A system error occured and the UNIX error code is present in the
+.I UNIX_error
+field of the primitive.
+.TP
+.RB [ TBADDATA ]
+The user specified an amount of data that exceeds the corresponding limit as reported in the
+.BR T_INFO_ACK (7)
+primitive.
+.TP
+.RB [ TBADFLAG ]
+The flags specified were invalid or not supported.
+.TP
+.RB [ TNOTSUPPORT ]
+The primitive is not support by the service provider, or not supported in the current mode of
+operation.
+.TP
+.RB [ TADDRBUSY ]
+The user specified an address that is already bound to another Stream.
+.TP
+.RB [ TPROVMISMATCH ]
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that belongs to another provider.
+.TP
+.RB [ TRESQLEN ]
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that is bound in the listening mode.
+.TP
+.RB [ TRESADDR ]
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that is bound to a different address than that of the listening Stream
+(and the provider does not support this).
+.\"
+.SS "Disconnect Codes"
 .PP
+The following error codes can be present in the
+.I DISCON_reason
+field of a
+.BR T_DISCON_IND (7)
+primitive:
+.\"
+.\"
+.SH NOTICES
 .PP
+.B SCTP
+has several imlementations.  This manpage is for the
+.BR sctp_t (4)
+implementation that provides
+.BR tpi (7)
+access to the \fBLinux Fast-STREAMS\fR version of
+.BR TCP .
+For more information on the
+Linux NET4
+version, see
+.BR sctp (7).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR sctp (7),
+.BR sctp (4),
+.BR sctp_t (4),
 .BR tpi (7),
+.BR tpi_ip (7),
 .BR xti (3),
+.BR xti_ip (3),
+.BR xti_sctp (3),
 .BR sockets (3).
-.SH "VERSIONS"
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
+The
+.B @PACKAGE_TITLE@
+implementation of
+.B SCTP
+for
+.I STREAMS
+is largely compatible with
+.IR STREAMS -based
+implementations such as
+Lachman or Mentat TCP/IP stacks and
+.IR Solaris \(rg
+documentation.
+.[
+soldoc
+.]
+.\"
+.\"
+.SH CONFORMANCE
 .PP
-This manpage describes Version 5.2 of the
-.B TPI-SCTP
-interface.
-.XX
+This interface conforms to TPI Version 2, Draft 2,
 .[
 TPI Revision 2.0.0
+.]
+except where indicated.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Transport Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+advprog
 .]
 .[
 rfc2960
@@ -783,4 +1230,4 @@ rfc4460
 .[
 $LIST$
 .]
-.TA
+.TI

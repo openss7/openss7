@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/05 12:18:00 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2006/10/10 10:42:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,13 +53,39 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/05 12:18:00 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/10 10:42:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
 Things to do:
 
 @itemize @minus
+@item
+Implement pseudo-connection oriented modes in INET(4) driver as well as udp2(4) and rawip2(4)
+drivers.  Document use of pseudo-connection oriented modes for UDP and RAWIP.  Pseudo-connection
+oriented modes permit a connectionless (T_CLTS) provider such as udp to provide the apprearance of
+connection oriented service.  This makes conversion from the Sockets API to XTI API easier.
+
+Note that this is also very applicable to MTP (quasi-associated signalling such as ISUP) and
+SCCP protocol class 0 and 1 and TCAP.
+
+@item
+It might be worth retrying the netperf(1) performance test on the second generation UDP driver with
+this pseudo-connection oriented mode in place.  You see, the netperf tests for UDP sockets performs
+a connect(3).
+
+@item
+Implement pseudo-connectionless modes in INET(4) driver as well as sctp(4) drivers.  Document use of
+pseudo-connectionless modes for SCTP (not really applicable to TCP).  Pseudo-connectionless modes
+permit a connection-oriented (T_COTS) provider such as sctp to provide the appearance of
+connectionless service.  This makes support for the SCTP one-to-many model easier.  Also, it
+provides a way (t_sndudata(3), t_sndvudata(3), t_rcvudata(3), t_rcvvudata(3)) of passing options
+associated with the packet to the provider either in a T_OPTDATA or in a T_UNITDATA.  This would
+make support of SCTP's many per-packet options  more workable for XTI as well as providing a easier
+translation between the sockets API and XTI API for sctp.
+
+Note that this is also very applicable to SCCP protocol classes 2 and 3 and BSSAP.
+
 @item
 Convert inet driver to use os7 common functions.
 
@@ -89,6 +115,10 @@ modify netperf to use (pseudo-)connection-oriented UDP for better comparison.
 @item *done*
 
 Ran ix86 test suite binaries on x86_64.
+
+(Note that 32bit over 64bit compatibility builds and conformance and validation testing is now a
+constituent part of all packages.  32-bit libraries and test programs are built automatically and
+multiple test runs of the test suite performed: once for native and once for compatibility.)
 @end table
 
 
@@ -99,5 +129,7 @@ SMP Testing.
 @item *done*
   
 What I did was to perform SMP testing for Intel Pentium IV 630 HT at least.
+
+(Note that SMP testing on Pentium IV 630 HT is not a constituent part of the release cycle.)
 @end table
 @end itemize

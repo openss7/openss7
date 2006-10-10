@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_udp.7.man,v 0.9.2.7 2006/04/22 08:39:09 brian Exp $
+.\" @(#) $Id: tpi_udp.7.man,v 0.9.2.8 2006/10/10 10:42:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/22 08:39:09 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:42:54 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_udp.7.man,v $
+.\" Revision 0.9.2.8  2006/10/10 10:42:54  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.7  2006/04/22 08:39:09  brian
 .\" - updated manual pages
 .\"
@@ -144,10 +147,11 @@ The difference between the
 .I /dev/udp
 and
 .I /dev/udp2
-devices is that the later is the second generation STREAMS UDP driver fully implemented in
+devices is that the later is the second generation STREAMS UDP driver fully
+implemented in
 .IR STREAMS (4),
-where the former opens a socket internal to the kernel and simply provides a TPI service interface
-to that socket.
+where the former opens a socket internal to the kernel and simply provides a
+TPI service interface to that socket.
 Also, the
 .I /dev/udp2
 driver supports pseudo-connection-oriented modes whereas the
@@ -180,10 +184,10 @@ The address family.  Always set to
 .PD 0
 .TP
 .I sin_port
-The port number of the transport endpoint.
+The port number of the transport endpoint in network byte order.
 .TP
 .I sin_addr
-The IP address of the transport endpoint.
+The IP address of the transport endpoint in network byte order.
 .TP
 .I (padding)
 Padding to pad the size of the
@@ -217,7 +221,7 @@ option levels as described in the subsections that follow.  Of the
 level protocol options, none of the options are of end-to-end significance.
 .\"
 .\"
-.SS "XTI_GENERIC"
+.SS XTI_GENERIC
 .PP
 Options at this level are specific to the X/Open Transport Interface (XTI/TLI)
 and are common to all transport providers.  For more information, see
@@ -238,29 +242,28 @@ Sets whether, and the amount of time if, the Stream will linger waiting for
 unsent data to be delivered.  This option is formatted as a
 .B t_linger
 structure as follows:
-.sp
+.RS
 .nf
 \fC\s-1\
 struct t_linger {
-    t_scalar_t l_onoff;    /* option on/off */
-    t_scalar_t l_linger;   /* linger time */
+    t_scalar_t l_onoff;   /* option on/off */
+    t_scalar_t l_linger;  /* linger time */
 };
-\s-1\fP
+\s+1\fP
 .fi
-.RS
 .TP \w'l_linger\(em'u
 .I l_onoff
 Specifies whether to linger
-.RB ( T_YES )
-or not
-.RB ( T_NO ).
+.RB ( T_YES ") or not (" T_NO ).
 Legal values are
 .BR T_YES " and " T_NO .
+.PD 0
 .TP
 .I l_linger
 Specifies the amount of time (in seconds) to linger.  Legal values are
 .BR T_INFINITE ", " T_UNSPEC
 and all positive numbers including zero.
+.PD
 .RE
 .IP ""
 For more information, see
@@ -277,31 +280,31 @@ Legal values are all positive, non-zero numbers.  For more information, see
 Specifies the low water mark above which received data will be indicated and
 delivered to the user.  This option is formatted as
 .BR t_uscalar_t .
-Legal values are all positive, non-zero numbers.
-For more information see
+Legal values are all positive, non-zero numbers.  For more information, see
 .BR xti (3).
 .TP
 .B XTI_SNDBUF
 Specifies the size, in bytes, of the transmit buffer.  This option is
 formatted as a
 .BR t_uscalar_t .
-Legal values are all positive, non-zero numbers.
-For more information see
+Legal values are all positive, non-zero numbers.  For more information, see
 .BR xti (3).
 .TP
 .B XTI_SNDLOWAT
 Specifies the low water mark above which queued data will be transmitted to
 the peer.  This option is formatted as a
 .BR t_uscalar_t .
-Legal values are all positive, non-zero numbers.
-For more information see
+Legal values are all positive, non-zero numbers.  For more information, see
 .BR xti (3).
 .\"
 .\"
-.SS "T_INET_IP"
+.SS T_INET_IP
 .PP
-Options within this level are specific to the Internet Protocol (IP) and are
-common to all the protocol levels in IP.  For more information, see
+Options with this level are specific to the Internet Protocol (IP)
+.[
+rfc791
+.]
+and are common to all the protocol levels in IP.  For more information, see
 .BR tpi_ip (7).
 .PP
 The options defined with the option level
@@ -309,17 +312,15 @@ The options defined with the option level
 are as follows:
 .TP
 .B T_IP_OPTIONS
-Provides control for the T_IP OPTIONS field.  Used for debugging.
-This option is formatted as an array of
+Provides control for the T_IP OPTIONS field.  Used for debugging.  This option
+is formatted as an array of
 .BR "unsigned char" ,
-up to 40 elements.
-For more information, see
+up to 40 elements.  For more information, see
 .BR tpi_ip (7).
 .TP
 .B T_IP_TOS
 Provides control of the type-of-service byte present in each transmited T_IP
-packet.
-This option is formated as an
+packet.  This option is formated as an
 .BR "unsigned char" .
 Legal values can be generated with the
 .BR SET_TOS ()
@@ -330,16 +331,14 @@ For more information, see
 .TP
 .B T_IP_TTL
 Provides control of the time-to-live byte present in each transmitted T_IP
-packet.
-This option is formatted as an
+packet.  This option is formatted as an
 .BR "unsigned char" .
-Legal values are from 0 to 255.
-For more information, see
+Legal values are from 0 to 255.  For more information, see
 .BR tpi_ip (7).
 .TP
 .B T_IP_REUSEADDR
-Allows multiple non-listening binds to the same address.
-This option is format as a
+Allows multiple non-listening binds to the same address.  This option is
+formatted as an
 .BR "unsigned int" .
 Legal values are
 .BR T_YES " and " T_NO .
@@ -348,8 +347,7 @@ For more information, see
 .TP
 .B T_IP_DONTROUTE
 Bypasses routing tables and routes directly to an interface.  Used for
-debugging.
-This option is format as a
+debugging.  This option is formatted as an
 .BR "unsigned int" .
 Legal values are
 .BR T_YES " and " T_NO .
@@ -360,7 +358,7 @@ For more information, see
 Allows broadcast addresses to be used.  This option is not applicable to TCP
 and is always set to
 .BR T_NO .
-This option is format as a
+This options is formatted as an
 .BR "unsigned int" .
 Legal values are
 .BR T_YES " and " T_NO .
@@ -368,10 +366,11 @@ For more information, see
 .BR tpi_ip (7).
 .\"
 .\"
-.SS "T_INET_UDP"
+.SS T_INET_UDP
 .PP
-Options within this level are specific to the User Datagram
-Protocol (UDP) yet are used by protocol levels using UDP transport.
+Options within this level are specific to the User Datagram Protocol
+(UDP)
+yet are used by protocol levels using UDP transport.
 .PP
 The options defined with the option level
 .B T_INET_UDP
@@ -404,16 +403,13 @@ This option is an
 This option is of
 .IR "end-to-end significance" .
 .\"
-.\"
 .SH "LOCAL MANAGEMENT INTERFACE"
 .PP
-.\"
 .\"
 .SS T_INFO_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.\"
 .\"
 .SS T_INFO_ACK\fR(7)
 .PP
@@ -523,12 +519,10 @@ and
 This flag is normally set.
 .RE
 .\"
-.\"
 .SS T_ADDR_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.\"
 .\"
 .SS T_ADDR_ACK\fR(7)
 .PP
@@ -558,12 +552,10 @@ Note that the
 provider is only in a connected or connecting state when operating in the
 pseudo-connection-oriented mode.
 .\"
-.\"
 .SS T_CAPABILITY_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.\"
 .\"
 .SS T_CAPABILITY_ACK\fR(7)
 .PP
@@ -572,7 +564,6 @@ This primitive returns the
 structure interpreted as described in
 .RI \(lq T_INFO_ACK \(rq,
 above.
-.\"
 .\"
 .SS T_BIND_REQ\fR(7)
 .PP
@@ -598,7 +589,6 @@ address will generate a connection indication accompanied by data.  Connection
 indications can be accepted with or without data or refused with or without data.
 This number specifies the maximum number of outstanding connection indications
 (those that are neither accepted nor refused) that the provider will deliver.
-.\"
 .\"
 .SS T_BIND_ACK\fR(7)
 .PP
@@ -637,24 +627,20 @@ considered too large, this number might be a more conservative value.
 Note that a non-zero number is returned in this field only if the provider is
 in the pseudo-connection-oriented mode.
 .\"
-.\"
 .SS T_UNBIND_REQ\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.\"
 .\"
 .SS T_OK_ACK\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
 .\"
-.\"
 .SS T_ERROR_ACK\fR(7)
 .PP
 This primitive is interpreted as in
 .BR tpi (7).
-.\"
 .\"
 .SS T_OPTMGMT_REQ\fR(7)
 .PP
@@ -663,7 +649,6 @@ This primitive is interpreted as in
 with the options described under
 .RI \(lq OPTIONS \(rq,
 above.
-.\"
 .\"
 .SS T_OPTMGMT_ACK\fR(7)
 .PP
@@ -682,7 +667,6 @@ driver provides a single service interface type: the connectionless mode.  The
 .I /dev/udp2
 driver provides both a connectionless mode service interface type, as well as a
 pseudo-connection-oriented mode service interface type.
-.\"
 .\"
 .SS T_UNITDATA_REQ\fR(7)
 .PP
@@ -734,7 +718,6 @@ the default for the Stream.
 .IP ""
 Other option values specified with the primitive will be ignored.
 .\"
-.\"
 .SS T_UNITDATA_IND\fR(7)
 .PP
 This primitive is interpreted as in
@@ -779,7 +762,6 @@ for outgoing packets.
 .RE
 .IP ""
 No other option values will be indicated.
-.\"
 .\"
 .SS T_UDERROR_IND\fR(7)
 .PP
@@ -833,7 +815,6 @@ ICMP_TIME_EXCEEDED:ICMP_EXC_TTL:0x0b00
 :ICMP_EXC_FRAGTIME:0x0b01
 _
 .TE
-.\"
 .\"
 .SS T_CONN_REQ\fR(7)
 .PP
@@ -938,7 +919,6 @@ primitive.  The value specified will become the default for the Stream.
 .IP ""
 Other option values specified with the primitive will be ignored.
 .\"
-.\"
 .SS T_CONN_CON\fR(7)
 .PP
 The
@@ -998,7 +978,6 @@ for outgoing packets.
 .RE
 .IP ""
 No other option values will be indicated.
-.\"
 .\"
 .SS T_CONN_IND\fR(7)
 .PP
@@ -1062,7 +1041,6 @@ subsequent
 or
 .BR T_CONN_RES (7)
 primitive.
-.\"
 .\"
 .SS T_CONN_RES\fR(7)
 .PP
@@ -1138,7 +1116,6 @@ Specifies the sequence number in the corresponding
 .BR T_CONN_IND (7)
 primitive to which this primitive is responding.
 .\"
-.\"
 .SS T_DATA_REQ\fR(7)
 .PP
 The
@@ -1155,7 +1132,6 @@ provider does not support segmentation.  If this flag is non-zero, an
 .RB [ EPROTO ]
 fatal error will be issued.
 .\"
-.\"
 .SS T_DATA_IND\fR(7)
 .PP
 This primitive is interpreted as in
@@ -1169,7 +1145,6 @@ The
 provider does not support segmentation.  If this flag is non-zero, an
 .RB [ EPROTO ]
 fatal error will be issued.
-.\"
 .\"
 .SS T_EXDATA_REQ\fR(7)
 .PP
@@ -1193,7 +1168,6 @@ provider does not support segmentation.  If this flag is non-zero, an
 .RB [ EPROTO ]
 fatal error will be issued.
 .\"
-.\"
 .SS T_EXDATA_IND\fR(7)
 .PP
 The
@@ -1205,7 +1179,6 @@ driver, this primitive is interpreted as in
 The
 .B TPI-UDP
 provider does not support expedited data and will not issue this primitive.
-.\"
 .\"
 .SS T_OPTDATA_REQ\fR(7)
 .PP
@@ -1264,7 +1237,6 @@ the default for the Stream.
 .IP ""
 Other option values specified with the primitive will be ignored.
 .\"
-.\"
 .SS T_OPTDATA_IND\fR(7)
 .PP
 The
@@ -1311,7 +1283,6 @@ Indicates whether the received packet was checksummed.
 .IP ""
 No other option values will be indicated.
 .\"
-.\"
 .SS T_DISCON_REQ\fR(7)
 .PP
 The
@@ -1320,7 +1291,6 @@ driver does not support psuedo-connection-oriented service modes.  For the
 .I /dev/udp2
 driver, this primitive is interpreted as in
 .BR tpi (7).
-.\"
 .\"
 .SS T_DISCON_IND\fR(7)
 .PP
@@ -1377,7 +1347,6 @@ or
 .BR T_CONN_RES (8)
 having been issued by the TS user with the same sequence number.
 .\"
-.\"
 .SS T_ORDREL_REQ\fR(7)
 .PP
 This primitive is interpreted as in
@@ -1388,7 +1357,6 @@ provider does not support orderly release.  If the TS user issues this
 primitive, the provider will negatively acknowledge the primitive with a fatal
 .RB [ EPROTO ]
 error.
-.\"
 .\"
 .SS T_ORDREL_IND\fR(7)
 .PP
@@ -1423,67 +1391,77 @@ Error handling is in accordance with
 Errors are in accordance with
 .BR tpi (7).
 They are repeated here as follows:
-.SS Error Acknowledgement Codes
+.\"
+.SS "Error Acknowledgement Codes"
 .PP
 The following error codes can be present in the
 .I TLI_error
 field of the
 .BR T_ERROR_ACK (7)
 message.
-.TP \w'[TPROVMISMATCH]\(em'u
+.TP \w'[\fBTPROVMISMATCH\fP]\(em'u
 .RB [ TBADADDR ]
-Bad address format.
-.PD 0
+A specified address was improperly formatted or contained invalid information.
 .TP
 .RB [ TBADOPT ]
-Bad options format.
+The specified options were improperly formatted or contained invalid information.
 .TP
 .RB [ TACCES ]
-Bad permissions.
+The user did not have permission to a requested address or option.
 .TP
 .RB [ TBADF ]
-Bad file descriptor.
+The
+.I ACCEPTOR_id
+does not identify a valid open Stream.
 .TP
 .RB [ TNOADDR ]
-Unable to allocate an address.
+The user did not specify an address and one could not be allocated by the TS provider.
 .TP
 .RB [ TOUTSTATE ]
-Would place interface out of state.
+The primitive would place the interface out of state.
 .TP
 .RB [ TBADSEQ ]
-Bad call sequence number.
+The sequence number provided did not correspond to an outstanding connection indication.
 .TP
 .RB [ TSYSERR ]
-A system error occured.  The UNIX error code is present in the
+A system error occured and the UNIX error code is present in the
 .I UNIX_error
 field of the primitive.
 .TP
 .RB [ TBADDATA ]
-Bad amount of data.
+The user specified an amount of data that exceeds the corresponding limit as reported in the
+.BR T_INFO_ACK (7)
+primitive.
 .TP
 .RB [ TBADFLAG ]
-Bad flags.
+The flags specified were invalid or not supported.
 .TP
 .RB [ TNOTSUPPORT ]
-Not supported.
+The primitive is not support by the service provider, or not supported in the current mode of
+operation.
 .TP
 .RB [ TADDRBUSY ]
-Address already in use.
+The user specified an address that is already bound to another Stream.
 .TP
 .RB [ TPROVMISMATCH ]
-Not same transport provider.
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that belongs to another provider.
 .TP
 .RB [ TRESQLEN ]
-Connection acceptor has qlen > 0.
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that is bound in the listening mode.
 .TP
 .RB [ TRESADDR ]
-Conn. acceptor bound to different address.
-.PD
-.\"
+The user specified an
+.I ACCEPTOR_id
+that corresponds to a Stream that is bound to a different address than that of the listening Stream
+(and the provider does not support this).
 .\"
 .SS Unitdata Error and Disconnect Codes
 .PP
-THe following error codes can be present in the
+The following error codes can be present in the
 .I ERROR_type
 field of a
 .BR T_UDERROR_IND (7)
@@ -1560,7 +1538,9 @@ implementation that provides
 .BR tpi (7)
 access to the Linux NET4 version of
 .BR UDP.
-For more information on the Linux NET4 version, see
+For more information on the
+Linux NET4
+version, see
 .BR udp (7).
 .\"
 .\"
@@ -1570,21 +1550,25 @@ For more information on the Linux NET4 version, see
 .BR udp (4),
 .BR udp2 (4),
 .BR tpi (7),
+.BR tpi_ip (7),
 .BR xti (3),
+.BR xti_ip (3),
+.BR xti_udp (3),
 .BR sockets (3).
 .\"
 .\"
-.SH COMPATIBILTY
+.SH COMPATIBILITY
 .PP
 The
 .B @PACKAGE_TITLE@
 implementation of
-.BR UDP
+.B UDP
 for
 .I STREAMS
 is largely compatible with
 .IR STREAMS -based
-implementations such as Lachman or Mentat TCP/IP stacks and
+implementations such as
+Lachman or Mentat TCP/IP stacks and
 .IR Solaris \(rg
 documentation.
 .[

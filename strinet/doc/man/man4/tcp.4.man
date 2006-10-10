@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tcp.4.man,v 0.9.2.5 2006/04/05 09:44:26 brian Exp $
+.\" @(#) $Id: tcp.4.man,v 0.9.2.6 2006/10/10 10:42:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:26 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:42:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tcp.4.man,v $
+.\" Revision 0.9.2.6  2006/10/10 10:42:53  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:26  brian
 .\" - moved .so line and updated headers
 .\"
@@ -111,15 +114,15 @@ is an implementation of the Transmission Control Protocol
 .RB ( TCP )
 defined in RFC 793,
 .[
-RFC 793
+rfc793
 .]
 RFC 1122
 .[
-RFC 1122
+rfc1122
 .]
 and RFC 2001
 .[
-RFC2001
+rfc2001
 .]
 with the NewReno and SACK extensions.
 It provides a reliable, stream oriented, full duplex connection between two

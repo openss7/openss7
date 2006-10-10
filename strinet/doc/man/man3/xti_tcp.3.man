@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_tcp.3.man,v 0.9.2.6 2006/04/25 01:34:41 brian Exp $
+.\" @(#) $Id: xti_tcp.3.man,v 0.9.2.7 2006/10/10 10:42:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/25 01:34:41 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:42:51 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_tcp.3.man,v $
+.\" Revision 0.9.2.7  2006/10/10 10:42:51  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.6  2006/04/25 01:34:41  brian
 .\" - updated manual pages
 .\"
@@ -85,7 +88,7 @@ sort-adjacent-labels
 .TH XTI-TCP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "X/Open Transport Interface (XTI)"
 .\"
 .\"
-.SH "NAME"
+.SH NAME
 .B xti_tcp
 \- X/Open Transport Interface \- Corrigendum for Transmission Control Protocol (TCP) Conformance
 .\"
@@ -107,6 +110,21 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
+This manual page describes the XTI interface for TCP in accordance with XNS 5.2.
+.[
+xns
+.]
+.PP
+The X/Open Transport Interface
+.[
+xns
+.]
+specifies addressing and options for Transmission Control Protocol (TCP).  Although this
+interface is always exposed by including the
+.RB < xti.h >
+header file, it is provided by the
+.RB < xti_tcp.h >
+header file included by the former.
 .\"
 .\"
 .SH DESCRIPTION
@@ -118,24 +136,58 @@ over an IP network using TCP.
 .PP
 This section also defines the data structures and constants required for TCP
 transport providers that are exposed through the
-.B <xti_tcp.h>
+.RB < xti.h >
 header file.
 .\"
 .\"
 .SH "ADDRESS FORMAT"
 .PP
-The TCP address format is structured as follows:
+For convenience and traditionally, the transport interface address used by XTI
+for protocols in the TCP/IP protocol family use
+.IR BSD -style
+socket addresses (also described in XNS 5.2
+.[[
+xns
+.]])
+for addresses.
 .PP
+The socket address, defined in
+.RB < sys/socket.h >,
+is structured as follows:
+.sp
+.RS
 .nf
 \fC\s-1\
+struct sockaddr {
+    uint16_t sa_family;
+    char sa_data[14];
+};
+\s+1\fP
+.fi
+.RE
+.PP
+The Internet Protocol family socket address, defined in
+.RB < netinet/in.h >,
+is structured as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+typedef unsigned int in_addr_t;
+
+struct in_addr {
+    in_addr_t  s_addr;
+};
+
 struct sockaddr_in {
     sa_family_t         sin_family;  /* Address family */
     unsigned short int  sin_port;    /* Port number */
-    struct in_addr      sin_addr;    /* Interned address */
+    struct in_addr      sin_addr;    /* Internet address */
     /* padding */
 };
 \s+1\fP
 .fi
+.RE
 .PP
 The
 .B sockaddr_in
@@ -162,7 +214,7 @@ structure.
 .PP
 The structure is padded to the size of a
 .BR sockaddr
-structure.
+structure (16 bytes).
 .\"
 .\"
 .SH OPTIONS
@@ -173,8 +225,41 @@ structure as described in
 .BR xti (3).
 An TCP transport provider compliant to this specification supports none, all
 or any subset of the options defined here.  An implementation may restrict the
-use of any of these options by offering them only in a priviledged read-only
+use of any of these options by offering them only in a privileged read-only
 mode.
+.PP
+Options can be
+.I absolute requirements
+and can also be of
+.IR "end-to-end significance" ,
+as follows:
+.TP
+.I Absolute Requirements
+Options that are
+.IR "absolute requirements" ,
+mean the when the option is negotiated with the transport service provider,
+the transport service provider is not permitted to negotiate the option to a
+value with differing quality of service.  Either the proposed value is
+accepted or it is rejected.  Options that are not
+.IR "absolute requirements" ,
+can be negotiated by the transport provider to a different quality of service
+level and it is the responsibility of the transport service user to determine
+whether the negotitated value is sufficient.
+.TP
+.I End-to-End Significance
+Options that are of
+.IR "end-to-end significance"
+are options that require negotiation with, or are communicated to, the peer
+transport provider or user.  For example, options that are requested in a
+connection request,
+.BR T_CONN_REQ (7),
+primitive will be indicated at the peer in a connection indication,
+.BR T_CONN_IND (7),
+primitive.
+Options that are not of
+.IR "end-to-end significance"
+are of local significance only and can be negotiated directly between the
+local transport service user and the local transport service provider.
 .PP
 An TCP transport provider supports three levels of options.  These three levels
 are described below.
@@ -274,7 +359,8 @@ For more information, see
 .SS "T_INET_IP"
 .PP
 Options within this level are specific to the Internet Protocol (IP) and are
-common to all the protocol levels in IP.  For more information, see
+common to all the protocol levels in the TCP/IP suite.
+For more information, see
 .BR xti_ip (3).
 .PP
 The options defined with the option level
@@ -1022,7 +1108,7 @@ data.
 .SS t_connect\fR(3)
 .PP
 .B XTI-TCP
-supports this XTI/TLI library call as describe din
+supports this XTI/TLI library call as described in
 .BR t_connect (3),
 with the additional considerations described here.
 .PP
@@ -1044,14 +1130,14 @@ provides a number of options, described in
 above, that may be included in this XTI/TLI call in the
 .I sndcall->opt
 parameter to change local and end-to-end characteristics of the transport
-endpoint accepting the connection.  The option of end-to-end significance that
+endpoint accepting the connection.  The options of end-to-end significance that
 can be included in this XTI/TLI library call are:
 .TP
 .I T_IP_OPTIONS
 .TP
 .I T_IP_TOS
 .PP
-The options of local significance that cne be included in this XTI/TLI call
+The options of local significance that can be included in this XTI/TLI call
 include (other options of local significance may also be included):
 .TP
 .I XTI_DEBUG
@@ -1090,9 +1176,10 @@ include (other options of local significance may also be included):
 .SS t_getinfo\fR(3)
 .PP
 .B XTI-TCP
-supports this XTI/TLI library call as describe din
+supports this XTI/TLI library call as described in
 .BR t_connect (3)
 with the additional considerations described here.
+.PP
 .TP \w'servtype\(em'u
 .I addr
 For compatibility with the
@@ -1100,10 +1187,11 @@ For compatibility with the
 library,
 .B TCP
 uses a
-.BR sockaddr_in
+.B sockaddr_in
 structured address (see
 .RI \*(lq "ADDRESS FORMAT" \*(rq,
-above).  This size will be the size of a
+above).
+This size will be the size of a
 .B sockaddr_in
 structure.
 .TP
@@ -1122,7 +1210,8 @@ multiple packets.  For TCP this value could be
 .BR T_INFINITE .
 .TP
 .I etsdu
-TCB supports the concept of sending expedited data as out-of-band data.  TCP
+.B TCP
+supports the concept of sending expedited data as out-of-band data.  TCP
 conforming transport providers will not return
 .B T_INVALID
 for this field.  The maximum ETSDU size is a single character or 1 octet.
@@ -1152,9 +1241,7 @@ conforming transport service providers will return
 supports orderly release but does not support orderly release data and
 does not support sending null data.  TCP conforming transport service
 providers will not return
-.B T_ORDRELDATA
-or
-.B T_SNDZERO
+.BR T_ORDRELDATA " or " T_SNDZERO
 flags.  TCP conforming transport service providers may return the
 .B XPG4_1
 flag.
@@ -1198,10 +1285,10 @@ xns 5.2
 .]
 .PP
 Some TCP options of end-to-end significance should be set before a call to
-.BR t_listen (3)
+.BR t_listen (3),
 using
-.BR t_optmgmt (3)
-as follows:
+.BR t_optmgmt (3),
+are as follows:
 .PP
 In addition, any of the options described under
 .BR t_accept (3),
@@ -1224,7 +1311,7 @@ buffer, the event
 in indicated.
 .B T_EXDATA
 remains set until all data up to the byte pointed to by the TCP urgent pointer
-has been received.  If the urgent pointer si updated, and the user has not yet
+has been received.  If the urgent pointer is updated, and the user has not yet
 received the byte previously pointed to by the urgent pointer, the update is
 invisible to the user.
 .\"
@@ -1282,7 +1369,7 @@ supports this XTI/TLI library call as described in
 .BR t_optmgmt (3)
 with the additional considerations described here.
 .PP
-The options that may be set, retrieved or negotiated using the XTI/TLI library
+The options that may be set, retrieved or negotiated using this XTI/TLI library
 call are described under
 .RI \*(lq OPTIONS \*(rq,
 above.
@@ -1332,11 +1419,11 @@ must be set to zero (0).
 does not support disconnection data and the
 .I dis->udata
 parameter must always be empty.
-.PP\
+.PP
 .I dis->reason
 will either be a negative
 .BR UNIX \(rg
-error code, or a  TCP protocol-specific error code as follows:
+error code, or a TCP protocol-specific error code as follows:
 .PP
 For TCP, a disconnect indication may be received associated with a connection
 indication before the connection indication is accepted or refused.  In this
@@ -1355,7 +1442,7 @@ software related connection abort.
 connection was reset by peer.
 .TP
 .RB [ ECONNREFUSED ]
-connection was refused by peer.
+connection was refused by the peer.
 .TP
 .RB [ ETIMEDOUT ]
 connection timed out.
@@ -1387,7 +1474,7 @@ SYN received while shutting down.
 .PP
 .B XTI-TCP
 supports these XTI/TLI library calls as described in
-.BR t_rcv "(3) and " t_rcvv
+.BR t_rcv "(3) and " t_rcvv (3),
 with the additional considerations described here.
 .PP
 The
@@ -1444,10 +1531,10 @@ pushable module.
 .SS t_rcvreldata\fR(3)
 .PP
 .B XTI-TCP
-does not support a orderly release with data and this XTI/TLI library call will
-return a
-.I t_errno
-value of
+does not support orderly release with data and this XTI/TLI library call will
+fail, return -1 and set
+.IR t_errno (3)
+to a value of
 .RB [ TNOTSUPPORT ].
 .\"
 .\"
@@ -1469,9 +1556,9 @@ state.
 .PP
 .B XTI-TCP
 does not support a connection-less mode and these XTI/TLI library calls will
-return a
-.I t_errno
-value of
+fail, return -1 and set
+.IR t_errno (3)
+to a value of
 .RB [ TNOTSUPPORT ].
 For a connection-less mode service, see
 .BR xti_udp (3).
@@ -1481,9 +1568,9 @@ For a connection-less mode service, see
 .PP
 .B XTI-TCP
 does not support a connection-less mode and these XTI/TLI library calls will
-return a
-.I t_errno
-value of
+fail, return -1 and set
+.IR t_errno (3)
+to a value of
 .RB [ TNOTSUPPORT ].
 For a connection-less mode service, see
 .BR xti_udp (3).
@@ -1506,9 +1593,7 @@ Therefore, the
 .I call->addr
 parameter should be empty and will always be ignored.  TCP does not support
 disconnect data or disconnect options.  The parameters
-.I call->udata
-and
-.I call->opt
+.IR call->udata " and " call->opt
 must always be empty.
 .B XTI-TCP
 does not support refusal of connection indications, and the
@@ -1521,10 +1606,10 @@ parameter is populated as described in
 .PP
 .B XTI-TCP
 supports this XTI/TLI library call as described in
-.BR t_snd "(3) and " t_sndv (3)
+.BR t_snd "(3) and " t_sndv (3),
 with the additional considerations described here.
 .PP
-When data is send using these XTI/TLI library calls, the
+When data is sent using these XTI/TLI library calls, the
 .B T_MORE
 flag bit in the
 .I flags
@@ -1554,10 +1639,10 @@ pushable module.
 .SS t_sndreldata\fR(3)
 .PP
 .B XTI-TCP
-does not support a orderly release with data and this XTI/TLI library call will
-return a
-.I t_errno
-value of
+does not support orderly release with data and this XTI/TLI library call will
+fail, return -1 and set
+.IR t_errno (3)
+to a value of
 .RB [ TNOTSUPPORT ].
 .\"
 .\"
@@ -1573,9 +1658,9 @@ without modification.
 .PP
 .B XTI-TCP
 does not support a connection-less mode and these XTI/TLI library calls will
-return a
-.I t_errno
-value of
+fail, return -1 and set
+.IR t_errno (3)
+to a value of
 .RB [ TNOTSUPPORT ].
 For a connection-less mode service, see
 .BR xti_udp (3).
@@ -1585,22 +1670,26 @@ For a connection-less mode service, see
 .PP
 .B XTI-TCP
 supports this XTI/TLI library call as described in
-.BR t_rcvrel (3)
+.BR t_unbind (3)
 with the additional considerations described here.
 .\"
 .\"
-.SH "BUGS"
+.SH BUGS
 .PP
-Although
 .BR XTI-TCP
-has no known bugs, the
+has no known bugs.
+The
 .BR INET (4)
 implementation of
 .B XTI-TCP
-has not been conformance tested.
+has been conformance tested and validated using the
+.BR test-inet_tcp (8)
+test case executable and the
+.B @PACKAGE@ autotest
+conformance and validation test suite.
 .\"
 .\"
-.SH "CAVEATS"
+.SH NOTICES
 .PP
 In support of the
 .BR sockets (3)
@@ -1609,7 +1698,7 @@ library for
 transport providers, the options described here have been made compatible with
 the socket options described in
 .BR tcp (7).
-As a result, depending on the release of 
+As a result, depending on the release of
 .BR INET (4),
 the XTI/TLI options described might not be compatible with the options described
 here.
@@ -1619,7 +1708,7 @@ The
 socket version of TCP described in
 .BR tcp (7),
 accessed using the TPI interface of the
-.B strinet
+.B @PACKAGE@
 package described in
 .BR INET (4),
 supports all of the options described here.
@@ -1635,6 +1724,19 @@ implemetnations.  Recent versions of the
 .BR INET (4)
 driver include the ability to bind to wildcards or to request that the
 transport service provider asign a suitable address.
+.PP
+Including the
+.RB < xti.h >
+header file may include the
+.RB < xti_inet.h >
+header file.
+Including the
+.RB < xti_inet.h >
+header file may include the
+.RB < xti_ip.h >
+and
+.RB < xti_tcp.h >
+header file.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -1648,7 +1750,6 @@ transport service provider asign a suitable address.
 .BR t_accept (3),
 .BR t_connect (3),
 .BR T_CONN_REQ (7),
-.BR tcp (7),
 .BR t_errno (3),
 .BR t_getinfo (3),
 .BR timod (4),
@@ -1663,30 +1764,89 @@ transport service provider asign a suitable address.
 .BR xnet (3),
 .BR xti (3),
 .BR xti_ip (3),
-.BR xti_tcp (3).
+.BR xti_udp (3),
+.BR xti_tcp (3),
+.BR xti_sctp (3),
+.BR test-inet_tcp (8).
 .\"
 .\"
-.SH "DEVICES"
+.SH DEVICES
 .PP
-There is one TCP device providing the Transport Provider Interface that
-provide TCP conforming TPI devices as follows:
-.\"
-.\"
+There are a number of TCP devices providing the Transport Provider Interface
+that provide TCP conforming TPI devices as follows:
 .TP
 .IR /dev/tcp ", " /dev/inet/tcp
+.PP
+These devices are provided by the
+.BR @PACKAGE_TITLE@ ( @PACKAGE@-@VERSION@ )
+package.
 For more information on the TPI TCP device, see
 .BR tcp (4).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.SH "CONFORMING TO"
-.PP
-The Open Group XNS Issue 5.2.
+This interface is compatible with
+.IR "XNS 5.2" ,
 .[
 xns
 .]
+and implementations based on
+.IR "XNS 5.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Internet Protocol (IP) options were not standardized until XPG4.
+.[
+xpg
+.]
+.IP \(em
+The format of options for the Transport Provider Interface (TPI) differ from
+those for the AT&T Transport Layer Interface (TLI).  This interface follows
+the TPI.
+.IP \(em
+The precise values of some options and formats of primitives may differ from
+implementation to implementation.  Binary compatibility is not guaranteed.
+.PP
+See
+.BR xti (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The OpenGroup XNS Issue 5.2.
+.[
+xns
+.]
+Conformance is validated using the
+.BR test-inet_tcp (8)
+test case executable and the
+.B @PACKAGE@ autotest
+validation test suite.
+.\"
+.\"
 .SH HISTORY
+.PP
+The
+.I Transport Provider Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+was first created by AT&T as the
+.I Transport Layer Interface (TLI)
+and was subsequently standardized by
+.B UNIX International
+and later
+by
+.B The OpenGroup
+in XPG4
+.[
+xpg
+.]
+and XNS 5.2.
+.[
+xns
+.]
 .PP
 The
 .B TCP-TPI

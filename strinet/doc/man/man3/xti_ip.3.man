@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_ip.3.man,v 0.9.2.5 2006/04/05 09:44:24 brian Exp $
+.\" @(#) $Id: xti_ip.3.man,v 0.9.2.6 2006/10/10 10:42:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:24 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:42:51 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_ip.3.man,v $
+.\" Revision 0.9.2.6  2006/10/10 10:42:51  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:24  brian
 .\" - moved .so line and updated headers
 .\"
@@ -80,9 +83,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH XTI-IP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "X/Open Transport Interface (XTI)"
+.\"
+.\"
 .SH "NAME"
 .B xti_ip
 \- X/Open Transport Interface \- Corrigendum for Internet Protocol (IP) Conformance
+.\"
+.\"
 .SH "SYNOPSIS"
 .PP
 .B #include <xti.h>
@@ -91,19 +98,272 @@ sort-adjacent-labels
 .br
 .B #include <xti_inet.h>
 .HP
-.BI "int " ip_stream " = t_open(" ip_device ", " flags );
-.SH "OVERVIEW"
+.BI "int " ip_stream " = t_open(" \fR\*(lq/dev/rawip\*(rq\fI ", " flags );
+.PD 0
+.HP
+.BI "int " ip_stream " = t_open(" \fR\*(lq/dev/rawip2\*(rq\fI ", " flags );
+.PD
+.\"
+.\"
+.SH OVERVIEW
 .PP
-.SH "DESCRIPTION"
+This manual page describes the XTI interface for IP in accordance with XNS 5.2.
+.[
+xns
+.]
 .PP
-.SH "OPTIONS"
+The X/Open Transport Interface
+.[
+xns
+.]
+specifies addressing and options for Internet Protocol (IP).  Although this
+interface is always exposed by including the
+.RB < xti.h >
+header file, it is provided by the
+.RB < xti_ip.h >
+header file included by the former.
+.\"
+.\"
+.SH DESCRIPTION
 .PP
+This manual section describes the protocol-specific information that is
+relevant for IP transport providers.  This section also describes the
+protocol-specific information that is relevant when IP services are provided
+over an IP network using IP.
+.PP
+This section also defines the data structures and constants required for IP
+transport providers that are exposed through the
+.RB < xti.h >
+header file.
+.\"
+.\"
+.SH "ADDRESS FORMAT"
+.PP
+For convenience and traditionally, the transport interface address used by XTI
+for protocols in the TCP/IP protocol family use
+.IR BSD -style
+socket addresses (also described in XNS 5.2
+.[[
+xns
+.]])
+for addresses.
+.PP
+The socket address, defined in
+.RB < sys/socket.h >,
+is structured as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct sockaddr {
+    uint16_t sa_family;
+    char sa_data[14];
+};
+\s+1\fP
+.fi
+.RE
+.PP
+The Internet Protocol family socket address, defined in
+.RB < netinet/in.h >,
+is structured as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+typedef unsigned int in_addr_t;
+
+struct in_addr {
+    in_addr_t  s_addr;
+};
+
+struct sockaddr_in {
+    sa_family_t         sin_family;  /* Address family */
+    unsigned short int  sin_port;    /* Port number */
+    struct in_addr      sin_addr;    /* Internet address */
+    /* padding */
+};
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.B sockaddr_in
+structure contains the following members:
+.TP \w'sin_family\(em'u
+.I sin_family
+The address family.  Always set to
+.BR AF_INET " or " AF_UNSPEC .
+.PD 0
+.TP
+.I sin_port
+The port number of the transport endpoint.
+.TP
+.I sin_addr
+The IP address of the transport endpoint.
+.TP
+.I (padding)
+Padding to pad the size of the
+.B sockaddr_in
+structure to the size of a
+.B sockaddr
+structure.
+.PD
+.PP
+The structure is padded to the size of a
+.BR sockaddr
+structure (16 bytes).
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+An IP transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in a priviledged read-only
+mode.
+.PP
+Options can be
+.I absolute requirements
+and can also be of
+.IR "end-to-end significance" ,
+as follows:
+.TP
+.I Absolute Requirements
+Options that are
+.IR "absolute requirements" ,
+mean the when the option is negotiated with the transport service provider,
+the transport service provider is not permitted to negotiate the option to a
+value with differing quality of service.  Either the proposed value is
+accepted or it is rejected.  Options that are not
+.IR "absolute requirements" ,
+can be negotiated by the transport provider to a different quality of service
+level and it is the responsibility of the transport service user to determine
+whether the negotitated value is sufficient.
+.TP
+.I End-to-End Significance
+Options that are of
+.IR "end-to-end significance"
+are options that require negotiation with, or are communicated to, the peer
+transport provider or user.  For example, options that are requested in a
+connection request,
+.BR T_CONN_REQ (7),
+primitive will be indicated at the peer in a connection indication,
+.BR T_CONN_IND (7),
+primitive.
+Options that are not of
+.IR "end-to-end significance"
+are of local significance only and can be negotiated directly between the
+local transport service user and the local transport service provider.
+.PP
+An IP transport provider supports two levels of options.  These two levels
+are described below.
+.\"
+.\"
+.SS "XTI_GENERIC"
+.PP
+Options with this level are specific to the X/Open Transport Interface (XTI/TLI)
+.[
+xti
+.]
+and are common to all transport providers.  For more information see
+.BR xti (3).
+.PP
+The options defined with the option level
+.B XTI_GENERIC
+are as follows:
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the stream.
+This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_LINGER
+Sets whether, and the amount of time if, the stream will linger waiting for
+unsent data to be delivered.
+This option is formatted as a
+.B t_linger
+structure as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;   /* option on/off */
+    t_scalar_t l_linger;  /* linger time */
+};
+\s+1\fP
+.fi
+.TP \w'l_linger\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES )
+or not
+.RB ( T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.
+Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.PP
+For more information, see
+.BR xti (3).
+.RE
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the receive buffer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.\"
+.\"
 .SS "T_INET_IP"
 .PP
+Options within this level are specific to the Internet Protocol (IP) and are
+common to all the protocol levels in the TCP/IP suite.
+All options controlling the basic IP networking occur at this level.
+.PP
+The options defined with the option level
+.B T_INET_IP
+are as follows:
 .TP
 .B T_IP_OPTIONS
-.\"IP per-packet options.
-.\".sp
 This option is used to set (retreive) the OPTIONS field of each outgoing
 (incoming) IP datagram.  It value is a string of octets composed of a number
 of T_IP options, whose format matches those defined in the IP specification
@@ -111,10 +371,10 @@ with one exception: the linst of addresses for the souce routing option must
 include the first-hop gateway at the beginning of the list of gateways.  The
 first-hop gateway address will be extracted from the option list and the size
 adjusted accordingly before use.
-.sp
+.IP ""
 The option is disabled if it is specified with \*(lqno value\*(rq; that is,
 with an option header only.
-.sp
+.IP ""
 The functions
 .BR t_connect (3)
 (in synchronous mode),
@@ -130,10 +390,10 @@ with
 set retrieves the currently effective
 .B T_IP_OPTIONS
 that is sent with outgoing datagrams.
-.sp
+.IP ""
 Common application never need this option.  It is mainly used for network
 debugging and control purposes.
-.sp
+.IP ""
 This option is formated as an array (maximum 40 elements) of
 .BR "unsigned char" .
 This option is an
@@ -142,8 +402,6 @@ This option has
 .IR "end-to-end significance" .
 .TP
 .B T_IP_TOS
-.\"IP per-packet type of service.
-.\".sp
 This option is used to set (retrieve) the type-of-service filed of an
 outgoing (incoming)
 .B T_IP
@@ -237,18 +495,15 @@ This option is an
 .IR "absolute requirement" .
 This option has
 .IR "end-to-end significance" .
-
 .RE
 .TP
 .B T_IP_TTL
-.\"IP per-packet time to live.
-.\".sp
 This option is used to set the time-to-live field in an outgoing IP
 datagram.  It specifies how long, in seconds, the datagram is allowed to
 remain in the Internet.  The time-to-live field of an incoming datagram is
 not returned by any function (since it is not an option with
 .IR "end-to-end significance" ).
-.sp
+.IP ""
 This option is formatted as an
 .BR "unsigned char" .
 It can take on values between
@@ -259,8 +514,6 @@ This option has
 .IR "local significance" .
 .TP
 .B T_IP_REUSEADDR
-.\"Allow local address reuse.
-.\".sp
 Many TCP implementations do not allow the user to bind more than one
 transport endpoint address with identical port numbers.  If
 .B T_IP_REUSEADDR
@@ -282,8 +535,6 @@ This option has
 .IR "local significance" .
 .TP
 .B T_IP_DONTROUTE
-.\"Just use interface address.
-.\".sp
 This option indicates that outgoing messages should bypass the standard
 routing facilities.  It is mainly used for testing and development.
 .sp
@@ -297,8 +548,6 @@ This option has
 .IR "local significance" .
 .TP
 .B T_IP_BROADCAST
-.\"Permit sending of broadcast messages.
-.\".sp
 This option requests permission to send broadcast datagrams.  It was
 defined to make sure that broadcasts are not generated by mistake.  The
 use of this option is often restricted to privileged users.
@@ -311,16 +560,105 @@ This option is an
 .IR "absolute requirement" .
 This option has
 .IR "local significance" .
-.SH "NOTES"
+.\"
+.\"
+.SH BUGS
 .PP
-Including the
-.B <xti_inet.h>
+.BR XTI-IP
+has no known bugs.
+The
+.BR INET (4)
+implementation of
+.B XTI-IP
+has been conformance tested and validated using the
+.BR test-inet_rawip (8)
+test case executable and the
+.B @PACKAGE@ autotest
+conformance and validation test suite.
+.\"
+.\"
+.SH NOTICES
+.PP
+In support of the
+.BR sockets (3)
+library for
+.BR tpi (7)
+transport providers, the options described here have been made compatible with
+the socket options described in
+.BR raw (7).
+As a result, depending on the release of 
+.BR INET (4),
+the XTI/TLI options described might not be compatible with the options described
+here.
+.PP
+The
+.B Linux
+socket version of IP described in
+.BR raw (7),
+accessed using the TPI interface of the
+.B @PACKAGE@
+package described in
+.BR INET (4),
+supports all of the options described here.
+.PP
+Earlier version of the
+.BR INET (4)
+driver did not support wildcard binds.  If an attempt was made to bind to a
+wildcard address or port number, the bind would fail with
+.RB [ TNOADDR ].
+While this is correct behavior, it was not consistent with other
+.B XTI-IP
+implemetnations.  Recent versions of the
+.BR INET (4)
+driver include the ability to bind to wildcards or to request that the
+transport service provider asign a suitable address.
+.PP
+UDPIncluding the
+.RB < xti.h >
 header file may include the
-.B <xti_ip.h>
+.RB < xti_inet.h >
 header file.
+Including the
+.RB < xti_inet.h >
+header file may include the
+.RB < xti_ip.h >
+header file.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR INET (4),
+.BR read (2),
+.BR readv (2),
+.BR rawip (4),
+.BR rawip (7),
+.BR sockets (3),
+.BR t_accept (3),
+.BR t_connect (3),
+.BR T_CONN_REQ (7),
+.BR t_errno (3),
+.BR t_getinfo (3),
+.BR timod (4),
+.BR tirdwr (4),
+.BR t_listen (3),
+.BR T_OPTDATA_IND (7),
+.BR t_optmgmt (3),
+.BR t_rcvconnect (3),
+.BR t_snddis (3),
+.BR write (2),
+.BR writev (2),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ip (3),
+.BR xti_udp (3),
+.BR xti_tcp (3),
+.BR xti_sctp (3),
+.BR test-inet_rawip (8).
+.\"
+.\"
 .SH "DEVICES"
 .PP
-There are a number of IP devices providng the Transport Provider Interface
+There are a number of IP devices providing the Transport Provider Interface
 that provide IP conforming TPI devices as follows:
 .TP
 .IR /dev/ip ", " /dev/inet/ip
@@ -342,18 +680,85 @@ that provide IP conforming TPI devices as follows:
 .PD
 .PP
 These devices are provided by the
-.B strinet
+.BR @PACKAGE_TITLE@ ( @PACKAGE@-@VERSION@ )
 package.
+For more information on the TPI IP device, see
+.BR rawip (4).
+.\"
+.\"
 .SH COMPATIBILITY
 .PP
-.SH "CONFORMING TO"
-.PP
-The Open Group XNS Issue 5.2.
+This interface is compatible with
+.IR "XNS 5.2" ,
 .[
 xns
 .]
+and implementations based on
+.IR "XNS 5.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Internet Protocol (IP) options were not standardized until XPG4.
+.[
+xpg
+.]
+.IP \(em
+The format of options for the Transport Provider Interface (TPI) differ from
+those for the AT&T Transport Layer Interface (TLI).  This interface follows
+the TPI.
+.IP \(em
+The precise values of some options and formats of primitives may differ from
+implementation to implementation.  Binary compatibility is not guaranteed.
+.PP
+See
+.BR xti (3),
+for additional compatibility information.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+The OpenGroup XNS Issue 5.2.
+.[
+xns
+.]
+Conformance is validated using the
+.BR test-inet_rawip (8)
+test case executable and the
+.B @PACKAGE@ autotest
+validation test suite.
+.\"
+.\"
 .SH HISTORY
 .PP
+The
+.I Transport Provider Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+was first created by AT&T as the
+.I Transport Layer Interface (TLI)
+and was subsequently standardized by
+.B UNIX International
+and later
+by
+.B The OpenGroup
+in XPG4
+.[
+xpg
+.]
+and XNS 5.2.
+.[
+xns
+.]
+.PP
+The
+.B IP-TPI
+driver is specific to the
+.B OpenSS7
+stack.
+This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.[
+xns
+.]
 .\"
 .\"
 .[

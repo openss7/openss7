@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_tcp.7.man,v 0.9.2.6 2006/04/25 01:34:42 brian Exp $
+.\" @(#) $Id: tpi_tcp.7.man,v 0.9.2.7 2006/10/10 10:42:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/25 01:34:42 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:42:54 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_tcp.7.man,v $
+.\" Revision 0.9.2.7  2006/10/10 10:42:54  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.6  2006/04/25 01:34:42  brian
 .\" - updated manual pages
 .\"
@@ -84,9 +87,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH TPI-TCP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"
+.\"
+.\"
 .SH NAME
 .B tpi_tcp
 \- Transport Provider Interface (TPI) \- Transmission Control Protocol (TCP) Corrigendum
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/tihdr.h>
@@ -96,6 +103,8 @@ sort-adjacent-labels
 .B #include <sys/tpi_tcp.h>
 .HP
 .BI "int " tcp_stream " = open(" \fR\*(lq/dev/tcp\*(rq\fI ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .PP
@@ -186,20 +195,22 @@ structure.
 The structure is padded to the size of a
 .B sockaddr
 structure.
+.\"
+.\"
 .SH "OPTIONS"
 .PP
 Options are formatted according to the
 .B t_opthdr
 structure described in
 .BR xti (3).
-A TCP transport provider compliant to this specification supports non, all or
-any subset of the options defined here.  An implementation may restrict the use
-of any of these options by offering them only in a privileged or read-only
+A TCP transport provider compliant to this specification supports none, all or
+any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in a privileged or read-only
 mode.
 .PP
 .B TPI-TCP
 provides options at the
-.BR XTI_GENERIC ", " T_INET_TCP " and " T_INET_IP
+.BR XTI_GENERIC ", " T_INET_IP " and " T_INET_TCP
 option levels as described in the subsections that follow.  Of the
 .B T_INET_TCP
 level protocol options, none of the options are of end-to-end significance.
@@ -249,6 +260,9 @@ Specifies the amount of time (in seconds) to linger.  Legal values are
 and all positive numbers including zero.
 .PD
 .RE
+.IP ""
+For more information, see
+.BR xti (3).
 .TP
 .B XTI_RCVBUF
 Specifies the size, in bytes, of the receive buffer.  This option is formatted
@@ -293,17 +307,21 @@ The options defined with the option level
 are as follows:
 .TP
 .B T_IP_OPTIONS
-Provides control fro the T_IP OPTIONS field.  Used for debugging.  This option
-if formatted as an array of
+Provides control for the T_IP OPTIONS field.  Used for debugging.  This option
+is formatted as an array of
 .BR "unsigned char" ,
 up to 40 elements.  For more information, see
 .BR tpi_ip (7).
 .TP
 .B T_IP_TOS
-Provides control of the type-of-service byte present in each transmitted T_IP
-packet.  This option is formatted as an
+Provides control of the type-of-service byte present in each transmited T_IP
+packet.  This option is formated as an
 .BR "unsigned char" .
-Legal values are from 0 to 255.  For more information, see
+Legal values can be generated with the
+.BR SET_TOS ()
+macro described in
+.BR tpi_ip (7).
+For more information, see
 .BR tpi_ip (7).
 .TP
 .B T_IP_TTL
@@ -323,8 +341,8 @@ For more information, see
 .BR tpi_ip (7).
 .TP
 .B T_IP_DONTROUTE
-Bypasses routing tables and routes directly to an interface.  Use for
-debugging.  This option is formated as an
+Bypasses routing tables and routes directly to an interface.  Used for
+debugging.  This option is formatted as an
 .BR "unsigned int" .
 Legal values are
 .BR T_YES " and " T_NO .
@@ -899,7 +917,7 @@ This primitive is interpreted as in
 This primitive is interpreted as in
 .BR tpi (7).
 .PP
-This primitive returns
+This primitive returns the
 .BR T_info_ack (7)
 structure interpreted as described under
 .RI \(lq T_INFO_ACK ,\(rq
@@ -924,7 +942,7 @@ This field can currently only contain a single address.
 .TP
 .I CONIND_number
 Specifies the number of connection indications.  Specifying a non-zero number of connection
-indications will palce the Stream in listening mode.  Any SYN packet received from a unique source
+indications will place the Stream in listening mode.  Any SYN packet received from a unique source
 address will generate a connection indication.  Connection indications can be accepted or refused
 (without data).  This number specifies the maximum number of outstanding connection indications
 (those that have neither been accepted nor refused) that the provider will deliver.  Because this
@@ -946,7 +964,7 @@ structure that contains the
 .B TPI-TCP
 address that was bound.  This field can currently only contain one address.
 .IP ""
-The boudn address,
+The bound address,
 .IR sin_addr ,
 returned in this field may be
 .B INADDR_ANY
@@ -1012,7 +1030,7 @@ This primitive is interpreted as in
 .BR tpi (7).
 The
 .B TPI-TCP
-provide does not support connectionless mode service and any attempt to issue this primitive will
+provider does not support connectionless mode service and any attempt to issue this primitive will
 result in a
 .BR T_ERROR_ACK (7)
 primitive with the error number
@@ -1037,7 +1055,10 @@ provide does not support connectionless mode service and will not issue this pri
 .SS T_CONN_REQ\fR(7)
 .PP
 This primitive is interpreted as in
-.BR tpi (7).
+.BR tpi (7),
+with the options described under
+.IR \*(lq OPTIONS \*(rq ,
+above and the following considerations:
 .TP
 .IR DEST_length ", " DEST_offset
 Specifies the length and offset from the beginning of the message block of the
@@ -1058,7 +1079,10 @@ above.
 .SS T_CONN_CON\fR(7)
 .PP
 This primitive is interpreted as in
-.BR tpi (7).
+.BR tpi (7),
+with the options described under
+.IR \*(lq OPTIONS \*(rq ,
+above and the following considerations:
 .TP
 .IR RES_length ", " RES_offset
 Indicates the length and offset from the beginning of the message block of the
@@ -1075,7 +1099,10 @@ negotiation with the TCP peer.
 .SS T_CONN_IND\fR(7)
 .PP
 This primitive is interpreted as in
-.BR tpi (7).
+.BR tpi (7),
+with the options described under
+.IR \*(lq OPTIONS \*(rq ,
+above and the following considerations:
 .TP
 .IR SRC_length ", " SRC_offset
 Indicates the length and offset from the beginning of the message block of the
@@ -1091,11 +1118,16 @@ above.  The only options indicated are those that are of end-to-end significance
 have default values.
 .TP
 .I SEQ_number
+Indicates the sequence number that can be used to accept or reject this
+connection indication.
 .\"
 .SS T_CONN_RES\fR(7)
 .PP
 This primitive is interpreted as in
-.BR tpi (7).
+.BR tpi (7),
+with the options described under
+.IR \*(lq OPTIONS \*(rq ,
+above and the following considerations:
 .TP
 .I ACCEPTOR_id
 Specifies the acceptor identifier of the Stream onto which the connection is to be accepted.  If the
@@ -1197,6 +1229,9 @@ This primitive is interpreted as in
 .BR tpi (7).
 .TP
 .I DISCON_reason
+The disconnect reason may be one of the following values:
+.RS
+.RE
 .TP
 .I SEQ_number
 The sequence number of a currently outstanding connection indication to which the disconnect
@@ -1325,7 +1360,7 @@ field of a
 primitive:
 .\"
 .\"
-.SH "CAVEATS"
+.SH NOTICES
 .PP
 .B TCP
 has several imlementations.  This manpage is for the
@@ -1374,10 +1409,11 @@ soldoc
 .\"
 .SH CONFORMANCE
 .PP
-This interface conforms to TPI Version 2, Draft 2.
+This interface conforms to TPI Version 2, Draft 2,
 .[
 TPI Revision 2.0.0
 .]
+except where indicated.
 .\"
 .\"
 .SH HISTORY

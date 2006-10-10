@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.7 2006/10/05 12:18:00 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.8 2006/10/10 10:42:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/05 12:18:00 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/10 10:42:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -82,7 +82,7 @@ This release is a maintenance release.  It provides the following enhancements a
 
 @itemize
 @item
-Fixed buffer lead in @samp{ss_sock_sendmsg} reported by John Wenker.
+Fixed buffer leak in @samp{ss_sock_sendmsg} reported by John Wenker.
 Significant rewrite of the ss_sock_sendmsg function.  Loader optimizations for
 streams-inet driver.
 

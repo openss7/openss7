@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: INET.4.man,v 0.9.2.6 2006/05/24 10:50:37 brian Exp $
+.\" @(#) $Id: INET.4.man,v 0.9.2.7 2006/10/10 10:42:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/05/24 10:50:37 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:42:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: INET.4.man,v $
+.\" Revision 0.9.2.7  2006/10/10 10:42:53  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.6  2006/05/24 10:50:37  brian
 .\" - optimizations
 .\"
@@ -80,15 +83,23 @@ sort-adjacent-labels
 .so strinet.macros
 .\"
 .\"
+.\"
+.\"
 .TH INET 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B INET
 \- OpenSS7 INET Devices
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP
 .BI "int " inet_stream " = open(" inet_device ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .PP
@@ -96,19 +107,29 @@ The
 .B INET
 related collection of drivers and modules provide INET capabilities in a
 number of related forms, including TCP, UDP and IP variants.
+.\"
 .SS "Drivers"
-.PP
 .PP
 .B INET
 provides the following
 .I STREAMS
 pseudo-device drivers:
-.TP
-.BR socksys (4)
+.\".TP
+.\".BR socksys (4)
+.\".TP
+.\".BR sscop (4)
 .TP
 .BR sctp (4)
-.TP
-.BR sscop (4)
+is a STREAMS SCTP driver providing a TPI
+.[
+TPI Revision 2.0.0
+.]
+interface that uses the XOS (XTI over Sockets) approach.
+This device is only provided if the system is equipped with the OpenSS7
+Linux Native Sockets version of SCTP.  The OpenSS7 STREAMS SCTP is a direct
+STREAMS implementation that is available in the
+.B strsctp
+package.
 .TP
 .BR tcp (4)
 is a STREAMS TCP driver providing a TPI
@@ -124,8 +145,8 @@ TPI Revision 2.0.0
 .]
 interface that uses the XOS (XTI over Sockets) approach.
 .TP
-.BR ip (4)
-is a STREAMS IP driver providing a TPI
+.BR rawip (4)
+is a STREAMS RAWIP driver providing a TPI
 .[
 TPI Revision 2.0.0
 .]
@@ -151,43 +172,80 @@ is a STREAMS connection-oriented orderly release UNIX domain driver providing a 
 TPI Revision 2.0.0
 .]
 interface that uses the XOS (XTI over Sockets) approach.
-.TP
-.BR tcp2 (4)
-.TP
-.BR udp2 (4)
-.TP
-.BR ip2 (4)
+.\".TP
+.\".BR udp2 (4)
+.\"is a STREAMS UDP driver providing a TPI
+.\".[
+.\"TPI Revision 2.0.0
+.\".]
+.\"interface that is directly implemented in STREAMS.
+.\".TP
+.\".BR rawip2 (4)
+.\"is a STREAMS RAWIP driver providing a TPI
+.\".[
+.\"TPI Revision 2.0.0
+.\".]
+.\"interface that is directly implemented in STREAMS.
+.\".TP
+.\".BR tcp2 (4)
+.\"is a STREAMS TCP driver providing a TPI
+.\".[
+.\"TPI Revision 2.0.0
+.\".]
+.\"interface that is directly implemented in STREAMS.
+.\"(Right...  This driver is incomplete.)
+.\"
+.\"
 .SH DEVICES
-.TP
-.B /dev/socksys
-.PD 0
-.TP
-.B /dev/sctp
-.TP
-.B /dev/sscop
+.\".TP
+.\".B /dev/socksys
+.\".TP
+.\".B /dev/sscop
 .TP
 .B /dev/tcp
+The Transmission Control Protocol device,
+.BR tcp (4).
 .TP
 .B /dev/udp
+The User Datagram Protocol device,
+.BR udp (4).
 .TP
 .B /dev/rawip
+The Raw Internet Protocol device,
+.BR rawip (4).
 .TP
-.B /dev/tcp2
-.TP
-.B /dev/udp2
-.TP
-.B /dev/rawip2
+.B /dev/sctp
+The Stream Control Transmission Protocol device,
+.BR sctp (4).
+.\".TP
+.\".B /dev/tcp2
+.\".TP
+.\".B /dev/udp2
+.\".TP
+.\".B /dev/rawip2
 .PD
+.PP
+Additional devices that are provided are symbolic links to one of the
+foregoing devices.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.SH VERSIONS
+.BR sctp (4),
+.BR tcp (4),
+.BR udp (4),
+.BR rawip (4),
+.BR ticlts (4),
+.BR ticots (4),
+.BR ticots_ord (4).
+.\"
+.\"
+.SH HISTORY
 .PP
-This manpage was updated $Date: 2006/05/24 10:50:37 $ for
-.B strinet
-release $Name:  $($Revision: 0.9.2.6 $).
-.PP
-Most of the devices and modules listed here do not appear until
+Most of the devices and modules listed here did not appear until
 .BR strss7-0.8.4 .
+.\"
+.\"
 .[
 $LIST$
 .]
