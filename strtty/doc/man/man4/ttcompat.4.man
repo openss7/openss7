@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ttcompat.4.man,v 0.9.2.2 2006/10/06 12:18:59 brian Exp $
+.\" @(#) $Id: ttcompat.4.man,v 0.9.2.3 2006/10/10 10:47:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:18:59 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:47:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ttcompat.4.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:47:16  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.2  2006/10/06 12:18:59  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -90,47 +93,127 @@ sort-adjacent-labels
 .\"
 .\"
 .SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/ttold.h>
 .HP
 .BI "int ioctl(" fd ", " \fRI_PUSH\fP ", " \fR\(lqttcompat\(rq\fP );
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B ttcompat
+module is a
+.I STREAMS
+module that translates the
+.BR ioctl (2s)
+calls supported by the older
+.I Version 7
+and
+.I 4BSD
+terminal drivers into the
+.BR ioctl (2s)
+calls supported by  the 
+.BR termio (7)
+interface. All other messages pass through this module unchanged; the behavior
+of read and write calls is unchanged, as is the behavior of
+.BR ioctl (2s)
+calls other than the ones supported by
+.BR ttcompat .
+
+This module can be automatically pushed onto a stream with the
+.BR autopush (8)
+mechanism when a terminal device is opened; it does not have to be explicitly
+pushed onto a Stream. This module requires that the
+.BR termios (7)
+interface be supported by the modules and the application can push the driver
+downstream. The
+.BR TCGETS ", " TCSETS ", and " TCSETSF
+.BR ioctl (2s)
+calls must be supported; if any information set or fetched by those
+.BR ioctl (2s)
+calls is not supported by the modules and driver downstream, some of the
+.I V7/4BSD
+functions may not be supported.  For example, if the
+.B CBAUD
+bits in the
+.I c_cflag
+field are not supported, the functions provided by the
+.IR sg_ispeed " and " sg_ospeed
+fields of the
+.B sgttyb
+structure (see below) will not be supported. If the
+.B TCFLSH
+.BR ioctl (2s)
+is not supported, the function provided by the
+.B TIOCFLUSH
+.BR ioctl (2s)
+will not be supported. If the
+.B TCXONC
+.BR ioctl (2s)
+is not supported, the functions provided by the
+.BR TIOCSTOP " and " TIOCSTART
+.BR ioctl (2s)
+calls will not be supported. If the
+.BR TIOCMBIS " and " TIOCMBIC
+.BR ioctl (2s)
+calls are not supported, the functions provided by the
+.BR TIOCSDTR " and " TIOCCDTR
+.BR ioctl (2s)
+calls will not be supported.
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH MODULES
 .PP
+.B ttcompat
+is a
+.I STREAMS
+pushable module named
+.RI \(lq ttcompat \(rq.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR ldterm (4),
+.BR pckt (4),
+.BR ptc (4),
+.BR ptem (4),
+.BR ptm (4),
+.BR ptmx (4tty),
+.BR pts (4tty),
+.BR pty (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
-.B xxx
+.B ldterm
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B xxx
+.B ldterm
 is compatible with
 .IR "SVR 4.2" ,
 .[

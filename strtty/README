@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Terminals -- read me first file.  2006-10-03
-$Id: README,v 0.9.2.7 2006/10/05 12:21:01 brian Exp $
+OpenSS7 STREAMS Terminals -- read me first file.  2006-10-04
+$Id: README,v 0.9.2.8 2006/10/10 10:47:13 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,23 +8,72 @@ See the end for copying conditions (for this file).
 ==========================
 
 The `OpenSS7 STREAMS Terminals' package provides "STREAMS" modules and
-drivers, libraries, programs, init scripts, and daemons.
+drivers, libraries, programs, init scripts, and daemons that implement
+the classical `SVR 4' Terminal Subsystem.
 
 The package builds and installs the following "STREAMS" kernel modules
 and drivers:
 
-     - `streams_sockmod.ko' module "sockmod"
-     - `streams_socksys.ko' driver "/dev/socksys"
+     - `streams_pty.ko' driver "/dev/ptmx" "/dev/pts/0"
+     - `streams_ptem.ko' module "ptem"
+     - `streams_pckt.ko' module "pckt"
+     - `streams_ldterm.ko' module "ldterm"
+     - `streams_ttcompat.ko' module "ttcompat"
 
-`sockmod(4)'
+`pty(4)'
+     The `pty(4)' driver is a Pseudo-Terminal Driver that provides the
+     classical `UNIX(R)' master and slave pseudo-terminals.
 
-`socksys(4)'
+     This driver is complete but untested.
+
+`ptem(4)'
+     The `ptem(4)' module is a Pseudo-Terminal Emulation Module that
+     provide hardware terminal emulation for the slave side of a
+     Pseudo-Terminal provided by the `pty(4)' driver.  This module is
+     pushed over the slave side of a pseudo-terminal before pusing `ldterm(4)'.
+
+     This module is complete but untested.
+
+`pckt(4)'
+     The `pckt(4)' module is a Packet Module.  This is the classical
+     `UNIX(R)' packetization module that is pushed over the master side
+     of a pseudo-terminal to allow the master to view the detailed
+     state of the pseudo-terminal.
+
+     This module is complete but untested.
+
+`ldterm(4)'
+     The `ldterm(4)' module is a Line Discipline Terminal Module.  This
+     is the classical `UNIX(R)' line discipline module for terminals.
+     This module is pushed last on the slave side of a psuedo-terminal,
+     after `ptem(4)' and provides the `POSIX' terminal interface to the
+     user.
+
+     This module is incomplete.
+
+`ttcompat(4)'
+     The `ttcompat(4)' module is a TTY Compatibility Module.  This is a
+     module that provides `UNIX(R) Version 7' and `4BSD' compatible
+     terminal interfaces.  These interfaces are no longer in use and
+     this module has only marginal value.
+
+     This module is incomplete.
+
 
 The package builds and installs the following shared object libraries:
 
-`libsocklib(3)'
+`libtty(3)'
+     The `libtty(3)' library provides replacements for `POSIX' terminal
+     handling functions that are not properly implemented in `glibc'.
+     These functions are:
 
-`libsocket(3)'
+     `openpt(3tty)'    - open a master pseudo-terminal
+     `ptsname(3tty)'   - obtain name for slave device
+     `grantpt(3tty)'   - grant access to the slave device
+     `unlockpt(3tty)'  - unlock the pseudo-terminal
+
+     This library is incomplete.
+
 
 The `OpenSS7 STREAMS Terminals' package includes kernel modules, `SVR
 4.2' "STREAMS" drivers, modules, libraries, utilities, test programs,
@@ -33,14 +82,18 @@ of `OpenSS7 STREAMS Terminals' protocol stack components and
 applications for the `SVR 4.2' "STREAMS" environment.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
-kernels and was targetted at `ix86', `x86_64', `ppc' and `ppc64'
+kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
 architectures, but should build and install for other architectures as
 well.
+
+This package is currently incomplete.  It is being released as a
+reference point for the community.  If you are interested in completion
+of this package, contact <info@openss7.com>.
 
  Release
 --------
 
-This is the `strtty-0.9.2.1' package, released 2006-10-03.  This
+This is the `strtty-0.9.2.1' package, released 2006-10-04.  This
 `0.9.2.1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strtty.5.man,v 0.9.2.2 2006/10/06 12:19:01 brian Exp $
+.\" @(#) $Id: strtty.5.man,v 0.9.2.3 2006/10/10 10:47:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:19:01 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:47:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strtty.5.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:47:16  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.2  2006/10/06 12:19:01  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -81,24 +84,235 @@ sort-adjacent-labels
 .so strtty.macros
 .\"
 .\"
-.TH STRBCM 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.TH STRTTY 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
 .\"
 .\"
 .SH NAME
-.B strtty
-\- \fISTREAMS\fR Terminals Package
+.B @PACKAGE@
+\- @PACKAGE_TITLE@ package
 .\"
 .\"
 .SH OVERVIEW
 .PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.B "Linux Fast-STREAMS" .
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B @PACKAGE_TITLE@
+package provides
+.I STREAMS
+modules and drivers, libraries, programs, init scripts, and daemons that
+implement the classical
+.IR "SVR 4 Terminal Subsystem" .
+.[
+svr4spg
+.]
+.PP
+The package builds and installs the following
+.I STREAMS
+kernel modules and drivers:
+.IP \(en \w'\(en\(em'u
+.B streams_pty.ko
+driver
+.RI \(lq /dev/ptmx \(rq,
+.RI \(lq /dev/pts/0 \(rq.
+.PD 0
+.IP \(en
+.B streams_ptem.ko
+module
+.RI \(lq ptem \(rq.
+.IP \(en
+.B streams_pckt.ko
+module
+.RI \(lq pckt \(rq.
+.IP \(en
+.B streams_ldterm.ko
+module
+.RI \(lq ldterm \(rq.
+.IP \(en
+.B streams_ttcompat.ko
+module
+.RI \(lq ttcompat \(rq.
+.PD
+.TP
+.BR pty (4)
+The
+.BR pty (4)
+driver is a Pseudo-Terminal Driver that provides the classical
+.IR UNIX \(rg
+master and slave pseudo-terminals.
+.IP ""
+This driver is complete but untested.
+.TP
+.BR ptem (4)
+The
+.BR ptem (4)
+module is a Pseudo-Terminal Emulation Module that provide
+hardware terminal emulation for the slave side of a Pseudo-Terminal provided
+by the
+.BR pty (4)
+driver.  This module is pushed over the slave side of a
+pseudo-terminal before pusing
+.BR ldterm (4).
+.IP ""
+This module is complete but untested.
+.TP
+.BR pckt (4)
+The
+.BR pckt (4)
+module is a Packet Module.  This is the classical
+.IR UNIX \(rg
+packetization module that is pushed over the master side of a pseudo-terminal
+to allow the master to view the detailed state of the pseudo-terminal.
+.IP ""
+This module is complete but untested.
+.TP
+.BR ldterm (4)
+The
+.BR ldterm (4)
+module is a Line Discipline Terminal Module.  This
+is the classical
+.IR UNIX \(rg
+line discipline module for terminals.  This module
+is pushed last on the slave side of a psuedo-terminal, after
+.BR ptem (4)
+and
+provides the
+.I POSIX
+.[
+susv3
+.]
+terminal interface to the user.
+.IP ""
+This module is incomplete.
+.TP
+.BR ttcompat (4)
+The
+.BR ttcompat (4)
+module is a TTY Compatibility Module.  This is a module that
+provides
+.IR UNIX \(rg " Version 7"
+and
+.I 4BSD
+compatible terminal interfaces.  These
+interfaces are no longer in use and this module has only marginal value.
+.IP ""
+This module is incomplete.
+.PP
+The package builds and installs the following shared object libraries:
+.TP
+.BR libtty (3)
+The
+.BR libtty (3)
+library provides replacements for
+.I POSIX
+.[
+susv3
+.]
+terminal handling
+functions that are not properly implemented in
+`glibc'.  These functions are:
+.RS
+.TP \w'\fBunlockpt\fR(3tty)\(em'u
+.BR openpt (3tty)
+\-\ open a master pseudo-terminal
+.PD 0
+.TP
+.BR ptsname (3tty)
+\-\ obtain name for slave device
+.TP
+.BR grantpt (3tty)
+\-\ grant access to the slave device
+.TP
+.BR unlockpt (3tty)
+\-\ unlock the pseudo-terminal
+.PD
+.RE
+.PP
+This library is incomplete.
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel modules,
+.I "SVR 4.2"
+.I STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and
+development environment for the development and execution of
+.B @PACKAGE_TITLE@
+protocol stack components and applications for the
+.I "SVR 4.2"
+.I STREAMS
+environment.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.PP
+This package is currently incomplete.  It is being released as a reference
+point for the community.  If you are interested in completion of this package,
+contact
+.RB < info@openss7.com >.
 .\"
 .\"
 .SH "PACKAGE CONTENTS"
 .PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package contains the following manual pages:
+.HP
+.BR grantpt (3tty)\ \-\ \c
+
+.PD 0
+.HP
+.BR ptsname (3tty)\ \-\ \c
+
+.HP
+.BR unlockpt (3tty)\ \-\ \c
+
+.HP
+.BR ldterm (4)\ \-\ \c
+
+.HP
+.BR pckt (4)\ \-\ \c
+
+.HP
+.BR ptc (4)\ \-\ \c
+
+.HP
+.BR ptem (4)\ \-\ \c
+
+.HP
+.BR ptm (4)\ \-\ \c
+
+.HP
+.BR ptmx (4tty)\ \-\ \c
+
+.HP
+.BR pts (4tty)\ \-\ \c
+
+.HP
+.BR pty (4)\ \-\ \c
+
+.HP
+.BR ttcompat (4)\ \-\ \c
+
+.HP
+.BR strtty (5)\ \-\ \c
+
+.HP
+.BR strtty_mknod (8)\ \-\ \c
+
+.HP
+.BR test-tty (8)\ \-\ \c
+
+.PD
 .\"
 .\"
 .\".SH NOTICES
@@ -116,18 +330,20 @@ The
 package provides the following
 .I STREAMS
 modules:
-.TP
-.BR pckt (4)
+.HP
+.BR pckt (4)\ \-\ \c
 Packet Mode module.
-.TP
-.BR ptem (4)
+.PD 0
+.HP
+.BR ptem (4)\ \-\ \c
 Pseudo-terminal Emulation modules.
-.TP
-.BR ldterm (4)
+.HP
+.BR ldterm (4)\ \-\ \c
 Line Discipline for Terminals module.
-.TP
-.BR ttcompat (4)
+.HP
+.BR ttcompat (4)\ \-\ \c
 Teletypewriter compatibiltiy module.
+.PD
 .\"
 .\"
 .SH DEVICES
@@ -137,8 +353,8 @@ The
 package provides the following
 .I STREAMS
 drivers:
-.TP
-.BR pty (4)
+.HP
+.BR pty (4)\ \-\ \c
 Pseudo-terminal device driver.
 .\"
 .\"
@@ -148,6 +364,21 @@ Pseudo-terminal device driver.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR grantpt (3tty),
+.BR ptsname (3tty),
+.BR unlockpt (3tty),
+.BR ldterm (4),
+.BR pckt (4),
+.BR ptc (4),
+.BR ptem (4),
+.BR ptm (4),
+.BR ptmx (4tty),
+.BR pts (4tty),
+.BR pty (4),
+.BR ttcompat (4),
+.BR strtty (5),
+.BR strtty_mknod (8),
+.BR test-tty (8).
 .\"
 .\"
 .\".SH COMPATIBILITY

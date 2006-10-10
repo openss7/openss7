@@ -1,3 +1,16 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* doc/man/strtty.refs: updates for release
+	* doc/man/man3/xxx.3.man: updates for release
+	* doc/man/man4/ldterm.4.man: updates for release
+	* doc/man/man4/ttcompat.4.man: updates for release
+	* doc/man/man5/strtty.5.man: updates for release
+	* doc/manual/descrip.texi: updates for release
+
 2006-10-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man3/grantpt.3tty.man: updated for make check

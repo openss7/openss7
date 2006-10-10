@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.3 2006/10/05 12:21:03 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.4 2006/10/10 10:47:17 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,34 +53,83 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/05 12:21:03 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/10 10:47:17 $ by $Author: brian $
 @c
 @c =========================================================================
 
-The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and drivers, libraries,
-programs, init scripts, and daemons.
+The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and
+drivers, libraries, programs, init scripts, and daemons that implement the
+classical @cite{SVR 4} Terminal Subsystem.
 
 The package builds and installs the following @dfn{STREAMS} kernel modules and
 drivers:
 
 @multitable @columnfractions .05 .95
-@item @tab @minus{} @file{streams_sockmod.ko} module @dfn{sockmod}
-@item @tab @minus{} @file{streams_socksys.ko} driver @dfn{/dev/socksys}
+@item @tab @minus{} @file{streams_pty.ko} driver @dfn{/dev/ptmx} @dfn{/dev/pts/0}
+@item @tab @minus{} @file{streams_ptem.ko} module @dfn{ptem}
+@item @tab @minus{} @file{streams_pckt.ko} module @dfn{pckt}
+@item @tab @minus{} @file{streams_ldterm.ko} module @dfn{ldterm}
+@item @tab @minus{} @file{streams_ttcompat.ko} module @dfn{ttcompat}
 @end multitable
 
 @table @manref
-@item sockmod(4)
+@item pty(4)
+The @manpage{pty(4)} driver is a Pseudo-Terminal Driver that provides the
+classical @cite{UNIX@registeredsymbol{}} master and slave pseudo-terminals.
 
-@item socksys(4)
+This driver is complete but untested.
+
+@item ptem(4)
+The @manpage{ptem(4)} module is a Pseudo-Terminal Emulation Module that
+provide hardware terminal emulation for the slave side of a Pseudo-Terminal
+provided by the @manpage{pty(4)} driver.  This module is pushed over the slave
+side of a pseudo-terminal before pusing @manpage{ldterm(4)}.
+
+This module is complete but untested.
+
+@item pckt(4)
+The @manpage{pckt(4)} module is a Packet Module.  This is the classical
+@cite{UNIX@registeredsymbol{}} packetization module that is pushed over the
+master side of a pseudo-terminal to allow the master to view the detailed
+state of the pseudo-terminal.
+
+This module is complete but untested.
+
+@item ldterm(4)
+The @manpage{ldterm(4)} module is a Line Discipline Terminal Module.  This is
+the classical @cite{UNIX@registeredsymbol{}} line discipline module for
+terminals.  This module is pushed last on the slave side of a psuedo-terminal,
+after @manpage{ptem(4)} and provides the @cite{POSIX} terminal interface to
+the user.
+
+This module is incomplete.
+
+@item ttcompat(4)
+The @manpage{ttcompat(4)} module is a TTY Compatibility Module.  This is a
+module that provides @cite{UNIX@registeredsymbol{} Version 7} and @cite{4BSD}
+compatible terminal interfaces.  These interfaces are no longer in use and
+this module has only marginal value.
+
+This module is incomplete.
 
 @end table
 
 The package builds and installs the following shared object libraries:
 
 @table @manref
-@item libsocklib(3)
+@item libtty(3)
+The @manpage{libtty(3)} library provides replacements for @cite{POSIX}
+terminal handling functions that are not properly implemented in @file{glibc}.
+These functions are:
 
-@item libsocket(3)
+@multitable @columnfractions .25 .70
+@item @manref{openpt(3tty)} @tab -- open a master pseudo-terminal
+@item @manref{ptsname(3tty)} @tab -- obtain name for slave device
+@item @manref{grantpt(3tty)} @tab -- grant access to the slave device
+@item @manref{unlockpt(3tty)} @tab -- unlock the pseudo-terminal
+@end multitable
+
+This library is incomplete.
 
 @end table
 
@@ -92,4 +141,7 @@ applications for the @cite{SVR 4.2} @dfn{STREAMS} environment.
 This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
 at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but should build and
 install for other architectures as well.
+
+This package is currently incomplete.  It is being released as a reference point for the community.
+If you are interested in completion of this package, contact @email{info@@openss7.com}.
 
