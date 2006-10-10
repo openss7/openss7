@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 01:18:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/10 10:47:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:42 $ by $Author: brian $
+# Last Modified $Date: 2006/10/10 10:47:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/10/10 10:47:08  brian
+# - updates for release
+#
 # Revision 0.9.2.3  2006/09/18 01:18:42  brian
 # - updated documentation and include file makefiles
 #
@@ -116,6 +119,7 @@ man_MANS = \
 	man3/sp_sperror.3 \
 	man3/libsocklib.3 \
 	man3/socklib.3 \
+	man5/strsock.5 \
 	man8/test-socket.8 \
 	man8/test-socklib.8 \
 	man8/test-sockmod.8 \
@@ -158,12 +162,16 @@ dist_noinst_MANS = \
 	man3/sp_sperror.3.man \
 	man3/libsocklib.3.man \
 	man3/socklib.3.man \
+	man5/strsock.5.man \
 	man8/test-socket.8.man \
 	man8/test-socklib.8.man \
 	man8/test-sockmod.8.man \
 	man8/test-sockpath.8.man \
 	man8/test-socksys.8.man \
 	man8/strsock_mknod.8.man
+
+MANS_UNUSED = \
+	man5/strsock.5
 
 ## PKG_BUILD_INDEP
 endif

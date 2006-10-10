@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xxx.3.man,v 0.9.2.2 2006/09/18 01:25:56 brian Exp $
+.\" @(#) $Id: xxx.3.man,v 0.9.2.3 2006/10/10 10:47:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/18 01:25:56 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:47:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xxx.3.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:47:09  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.2  2006/09/18 01:25:56  brian
 .\" - updated manpages and macros
 .\"
@@ -84,7 +87,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B xxx
-\- 
+\- dddd
 .\"
 .\"
 .SH SYNOPSIS

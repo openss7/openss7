@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: socklib.3.man,v 0.9.2.2 2006/10/03 13:53:04 brian Exp $
+.\" @(#) $Id: socklib.3.man,v 0.9.2.3 2006/10/10 10:47:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:53:04 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:47:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: socklib.3.man,v $
+.\" Revision 0.9.2.3  2006/10/10 10:47:09  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.2  2006/10/03 13:53:04  brian
 .\" - changes to pass make check target
 .\" - added some package config.h files
@@ -89,52 +92,385 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XXX 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.TH SOCKLIB 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .\"
 .\"
 .SH NAME
-.B xxx
-\- 
+.B libsocklib, socklib
+\- BSD Sockets Compatibility Library
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <netconfig.h>
+.B #include <sys/socket.h>
+.ad l
+.HP 12
+.BI "int accept(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.PD 0
+.HP
+.BI "int bind(int " socket ", const struct sockaddr *" address ", socklen_t " address_len );
+.HP
+.BI "int connect(int " socket ", const struct sockaddr *" address ", socklen_t " address_len );
+.HP
+.BI "int getpeername(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "int getsockname(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "int getsockopt(int " socket ", int " level ", int " option_name ", void *" option_value ", socklen_t *" option_len );
+.HP
+.BI "int listen(int " socket ", int " backlog );
+.HP
+.BI "ssize_t recv(int " socket ", void *" buffer ", size_t " length ", int " flags );
+.HP
+.BI "ssize_t recvfrom(int " socket ", void *" buffer ", size_t " length ", int " flags ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "ssize_t recvmsg(int " socket ", struct msghdr *" message ", int " flags );
+.HP
+.BI "ssize_t send(int " socket ", const void *" buffer ", size_t " length ", int " flags );
+.HP
+.BI "ssize_t sendmsg(int " socket ", const struct msghdr *" message ", int " flags );
+.HP
+.BI "ssize_t sendto(int " socket ", const void *" message ", size_t " length ", int " flags ", const struct sockaddr *" dest_addr ", socklen_t " dest_len );
+.HP
+.BI "int setsockopt(int " socket ", int " level ", int " option_name ", const void *" option_value ", socklen_t " option_len );
 .HP
 .BI "int shutdown(int " socket ", int " how );
+.HP
+.BI "int socket(int " domain ", int " type ", int " protocol );
+.HP
+.BI "int socketpair(int " domain ", int " type ", int " protocol ", int " socket_vector[2] );
+.HP
+.BI "int shutdown(int " socket ", int " how );
+.PD
+.ad b
 .\"
 .\"
 .SH ARGUMENTS
-.TP
+.TP \w'\fIoption_value\fR\(em'u
 .I socket
 Specifies the file descriptor of the socket.
+.PD 0
+.TP
+.IR address
+A pointer to a socket address.
+.TP
+.IR address_len
+The length of the socket address.
+.TP
+.IR dest_addr
+A pointer to a socket address.
+.TP
+.IR dest_len
+The length of the socket address.
+.TP
+.I level
+The protocol level of the option.
+.TP
+.I option_name
+The name of the option.
+.TP
+.I option_value
+A pointer to a memory extent containing the option value.
+.TP
+.I option_len
+The length of the option.
+.TP
+.I buffer
+A user data buffer.
+.TP
+.I length
+The length of the data buffer.
+.TP
+.I flags
+Option flags.
+.TP
+.I message
+A message header describing the message.
+.TP
+.I how
+How to shutdown the socket.
+.TP
+.I domain
+The protocol family.
+.TP
+.I type
+The socket type.
+.TP
+.I protocol
+The protocol within the protocol family.
+.TP
+.I socket_vector
+Array to receive 2 file descriptors.
+.PD
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B libsocklib
+is an
+.B OpenSS7
+implementation of the
+.I BSD Sockets Compatibility Library
+for
+.BR "Linux Fast-STREAMS" .
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B libsocklib
+implements the following Sockets API library functions:
+.sp
+.TS
+llsss.
+\fBaccept\fP(3)	\-\ accept a connection.
+\fBbind\fP(3)	\-\ bind a socket.
+\fBconnect\fP(3)	\-\ establish a connection.
+\fBgetpeername\fP(3)	\-\ get remote socket name.
+\fBgetsockname\fP(3)	\-\ get local socket name.
+\fBgetsockopt\fP(3)	\-\ get a socket option.
+\fBlisten\fP(3)	\-\ listen for connections.
+\fBrecv\fP(3)	\-\ receive data on a connection.
+\fBrecvfrom\fP(3)	\-\ receive data from a socket.
+\fBrecvmsg\fP(3)	\-\ receive a message on a socket.
+\fBsend\fP(3)	\-\ send data on a connection.
+\fBsendmsg\fP(3)	\-\ send a message on a socket.
+\fBsendto\fP(3)	\-\ send data to a socket.
+\fBsetsockopt\fP(3)	\-\ set a socket option.
+\fBshutdown\fP(3)	\-\ shutdown a socket.
+\fBsockatmark\fP(3)	\-\ test if socket at mark.
+\fBsocket\fP(3)	\-\ create a socket.
+\fBsocketpair\fP(3)	\-\ create a pair of connected sockets.
+.TE
 .\"
 .\"
-.SH CAVEATS
+.SH OPTIONS
 .PP
-.\"
-.\"
-.SH "RETURN VALUE"
+.SS "Socket Level Options"
 .PP
-Upon successful completion,
-.BR xxx ()
-returns 0.  Otherwise, -1 is
-returned and errno is set to indicate the error.
-.\"
-.\"
-.SH ERRORS
+Several options are independent of the transport service provider.  These
+options are specified at option level
+.BR SOL_SOCKET ,
+and are defined as follows:
+.TP
+.B SO_DEBUG
+Turns on recording of debugging information.  This option enables or disables
+debugging in the underlying protocol modules.  This option takes an
+.B int
+value.  This is a Boolean option.
+.TP
+.B SO_BROADCAST
+Permits sending of broadcast messages, if this is supported by the protocol
+This option takes an
+.B int
+value.  This is a Boolean option.
+.TP
+.B SO_REUSEADDR
+Specifies that the rules used in validating addresses supplied to
+.BR bind (3)
+should allow reused of local addresses, if this is supported by the protocol.
+This option takes an
+.B int
+value.  This is a Boolean option.
+.TP
+.B SO_KEEPALIVE
+Keeps connections active by enabling the periodic transmission of messages, if
+this is supported by the protocol.  This option takes an
+.B int
+value.
+.IP ""
+If the connected socket failes ot respond to these messages, the connection is
+broken and thread writing to that socket are notified with a
+.RI { SIGPIPE }
+signal.
+This is a Boolean option.
+.TP
+.B SO_LINGER
+Lingers on a
+.BR close (2)
+if data is present.  This option controls the action taken when unsent
+messages qeuue on a socket and
+.BR close (2)
+is performed.  If
+.B SO_LINGER
+is set, the system shall block the process during
+.BR close (2)
+until it can transmit the data or until the time expires.  If
+.B SO_LINGER
+is not specified, and
+.BR close (2)
+is issued, the system handle the call in a way that allows the process to
+continue as quicly as possible.  This option takes a
+.B linger
+structure, as defined in the
+.RB < sys/socket.h >
+header, to specify the state of the option and linger interval.
+.TP
+.B SO_OOBINLINE
+Lesaves received out-of-band data (data marked urgent) inline.  This option
+takes an
+.B int
+value.  This is a Boolean option.
+.TP
+.B SO_SNDBUF
+Sets send buffer size.  This option takes an
+.B int
+value.
+.TP
+.B SO_RCVBUF
+Sets receive buffer size.  This option taks an
+.B int
+value.
+.TP
+.B SO_DONTROUTE
+Requests that outgoing message bypass the standard routing facilities.  The
+destination shall be on a directly-connected network, and messages are
+directed to the appropriate network interface according to the destination
+address.  The effect, if any, of this option depends on what protocol is in
+use.  This option takes an
+.B int
+value.  This is a Boolen option.
+.TP
+.B SO_RCVLOWAT
+Sets the minimum number of bytes to process fo socket input operations.  The
+default value for
+.B SO_RCVLOWAT
+is one
+.RB ( 1 ).
+If
+.B SO_RCVLOWAT
+is set to a larger value, blocking receive calls normally wait until they have
+received the smaller of the low water mark value or the requested amount.
+(They may return less than the low water mark if an error occurs, a signal is
+caught, or the type of data next in the receive queue is different from that
+returned; for example, out-of-band data.)  This option takes an
+.B int
+value.  Note that not all implementations allow this option to be set.
+.TP
+.B SO_RCVTIMEO
+Sets the timeout value that specifies the maximum amount fo time an input
+function waits until it completes.  It accpets a
+.B timeval
+structure with the number of seconds and microseconds specifying the limit on
+how long to wait for an input operation to complete.  If a receive operation
+has blocked for this much time without receiving additional data, it shall
+return with a partial count or
+.IR errno (3)
+set to
+.RB [ EAGAIN ]
+or
+.RB [ EWOULDBLOCK ]
+if no data is received.  The default for this option is zero, which indicates
+that a receive operation shall not time out.  This option takes a
+.B timeval
+structure.  Note that not all implementations allow this option to be set.
+.TP
+.B SO_SNDLOWAT
+Sets the minimum number of bytes to process for socket output operations.
+Non-blocking output operations shall process no data if flow control does not
+allow the smaller of the send low water mark value or the entire request to be
+processed.  This option takes an
+.B int
+value.  Note that not all implementations allow this option to be set.
+.TP
+.B SO_SNDTIMEO
+Sets the timeout valud specifying the amount of time that an output function
+blocks because flow control prevents the data from being sent.  If a send
+operation has blocked for this time, it shall return with a partial count or
+with
+.IR errno (3)
+set to
+.RB [ EAGAIN ]
+or
+.RB [ EWOULDBLOCK ]
+if no dta is sent.  The default for this option is zero, which indicates that
+a send operation shall not time out.  This option stores a
+.B timeval
+structure.  Note that not all implementations allow this option to be set.
 .PP
-The
-.BR xxx ()
-function will fail if:
+The following options are read-only:
+.TP
+.B SO_ACCEPTCONN
+Reports whether the socket is listening.  This option shall store an
+.B int
+value.  This is a Boolean option.
+.TP
+.B SO_ERROR
+Reports information about error status and clears it.  This option shall store
+an
+.B int
+value.
+.TP
+.B SO_TYPE
+Reports the socket type.  This option shall store an
+.B int
+value.
+.PP
+For Boolean options,
+.IR false ,
+zero
+.RB ( 0 )
+indicates that the option is disabled and
+.IR true ,
+one
+.RB ( 1 )
+indicates that the option is enabled.
+.\"
+.\"
+.\".TP
+.\".B SO_BSDCOMPAT
+.\".TP
+.\".B SO_PASSCRED
+.\".TP
+.\".B SO_PEERCRED
+.\".TP
+.\".B SO_BINDTODEVICE
+.\".TP
+.\".B SO_PRIORITY
+.\"
+.\"
+.\".SH FUNCTIONS
+.\".PP
+.\"
+.\"
+.\".SH CAVEATS
+.\".PP
+.\"
+.\"
+.\".SH "RETURN VALUE"
+.\".PP
+.\"Upon successful completion,
+.\".BR xxx ()
+.\"returns 0.  Otherwise, -1 is
+.\"returned and errno is set to indicate the error.
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
+.\"The
+.\".BR xxx ()
+.\"function will fail if:
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR accept (3),
+.BR bind (3),
+.BR connect (3),
+.BR getpeername (3),
+.BR getsockname (3),
+.BR getsockopt (3),
+.BR listen (3),
+.BR recv (3),
+.BR recvfrom (3),
+.BR recvmsg (3),
+.BR send (3),
+.BR sendmsg (3),
+.BR sendto (3),
+.BR setsockopt (3),
+.BR shutdown (3),
+.BR sockatmark (3),
+.BR socket (3),
+.BR socketpair (3).
 .\"
 .\"
 .SH COMPATIBILITY

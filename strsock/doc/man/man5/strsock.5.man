@@ -1,0 +1,529 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: strsock.5.man,v 1.1.2.1 2006/10/10 10:47:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/10 10:47:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strsock.5.man,v $
+.\" Revision 1.1.2.1  2006/10/10 10:47:10  brian
+.\" - updates for release
+.\"
+.\" Revision 0.9.2.2  2006/09/18 01:25:57  brian
+.\" - updated manpages and macros
+.\"
+.\" Revision 0.9.2.1  2006/08/29 11:41:03  brian
+.\" - added manual pages
+.\"
+.\" Revision 0.9.2.4  2006/04/05 09:44:48  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsock.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsock.macros
+.\"
+.\"
+.TH STRSOCK 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B @PACKAGE@
+\- @PACKAGE_TITLE@
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.B "Linux Fast-STREAMS" .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package provides
+provides
+.I STREAMS
+modules and drivers, libraries, programs, initialization scripts, and daemons.
+.PP
+The
+.B @PACKAGE_TITLE@
+package contains header files and a number of modules and drivers and the
+associated documentation originally contained in the
+.B Linux Fast-STREAMS
+release, but not contained in the
+.B Linux STREAMS (LiS)
+releases.
+.PP
+The package uses the following standard
+.I Open Systems Interconnect (OSI)
+.[
+x200
+.]
+conforming header files from the
+.B strxnet
+package:
+.IP \- \w'\-\(em'u
+.RB < sys/tiuser.h >
+Transport Provider Interface (TPI),
+.[
+TPI Revision 2.0.0
+.]
+.BR tpi (7)
+.PD 0
+.IP \-
+.RB < sys/tihdr.h >
+Transport Provider Interface (TPI),
+.[
+TPI Revision 2.0.0
+.]
+.BR tpi (7)
+.PD
+.PP
+The package currently provides the following
+.I STREAMS
+modules and drivers:
+.IP \- \w'\-\(em'u
+.B streams_sockmod.ko
+.I module
+.PD 0
+.IP \-
+.B streams_socksys.ko
+.B /dev/socksys
+.PD
+.TP
+.BR sockmod (4)
+The
+.BR sockmod (4)
+module, when pushed on a TPI Stream, attempts to provide as wide a range of
+support for traditional
+.I "SVR 4.2"
+.[
+svr42
+.]
+socket module and socket system support.
+.IP ""
+It does so by recognizing input-output controls from three sets:
+.BR sockmod (4)
+input-output controls;
+.BR socksys (4)
+input-output controls, and even
+.BR socke t(7)
+system calls.
+.IP ""
+This module is incomplete.
+.TP
+.BR socksys (4)
+The
+.BR socksys (4)
+driver, when opened, provides a TPI Stream that attempts to provide as
+wide a range of support for traditional
+.I "SVR 4.2"
+.[
+svr42
+.]
+socket module and socket system support.
+.IP ""
+It does so by recognizing input-output controls from three sets:
+.BR sockmod (4)
+input-output controls;
+.BR socksys (4)
+input-output controls, and even
+.BR socket (7)
+system calls.
+.IP ""
+This module is incomplete.
+.PP
+The package currently provides the following "STREAMS" libraries:
+.IP \- \w'\-\(em'u
+.B libsocket.so
+.B libsocket.a
+.PD 0
+.IP \-
+.B libsocklib.so
+.B libsocklib.a
+.PD
+.PP
+The
+.BR libsocket (3)
+library implements the following library calls:
+.sp
+.RS
+.TS
+lll.
+\fBsocket\fP(3)
+.TE
+.RE
+.PP
+The
+.BR libsocket (3)
+library only needs to implement the single library call because file
+descriptors that are returned from the
+.BR socket (3)
+call have been transformed into real sockets (from the viewpoint of the system
+call interface) and standard `glibc' calls for the remaining functions are
+used.
+.PP
+The
+.BR libsocklib (3)
+library implements the following library calls:
+.sp
+.RS
+.TS
+lll.
+\fBaccept\fP(3)	\fBlisten\fP(3)	\fBsendto\fP(3)
+\fBbind\fP(3)	\fBrecv\fP(3)	\fBsetsockopt\fP(3)
+\fBconnect\fP(3)	\fBrecvfrom\fP(3)	\fBshutdown\fP(3)
+\fBgetpeername\fP(3)	\fBrecvmsg\fP(3)	\fBsocket\fP(3)
+\fBgetsockname\fP(3)	\fBsend\fP(3)	\fBsocketpair\fP(3)
+\fBgetsockopt\fP(3)	\fBsendmsg\fP(3)
+.TE
+.RE
+.PP
+The
+.BR libsocklib (3)
+library is the older compatiblity library approach to providing sockets for
+.I STREAMS
+and implements the system calls as library calls for
+.I STREAMS
+devices, while calling the `glibc' versions for true sockets.
+.PP
+The
+.BR libsockpath (3)
+library implements the following library calls:
+.sp
+.RS
+.TS
+lll.
+\fB\)setsockpath\fP(3)
+\fB\)getsockpath\fP(3)
+\fB\)endsockpath\fP(3)
+\fB\)getsockpathent\fP(3)
+\fB\)freesockpathent\fP(3)
+.TE
+.RE
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel modules,
+.I "SVR 4.2"
+.[
+svr42
+.]
+.I STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and
+development environment for the development and execution of
+.B @PACKAGE_TITLE@
+modules and drivers.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package contains the following manual pages:
+.\"
+.SS "Sockets API Libraries:"
+.HP
+.BR accept (3)\ \-\ \c
+accept a transport connection.
+.PD 0
+.HP
+.BR bind (3)\ \-\ \c
+bind a transport endpoint.
+.HP
+.BR connect (3)\ \-\ \c
+establish a transport connection.
+.HP
+.BR getpeername (3)\ \-\ \c
+get name of remote transport endpoint.
+.HP
+.BR getsockname (3)\ \-\ \c
+get name of local transport endpoint.
+.HP
+.BR getsockopt (3)\ \-\ \c
+get a socket option.
+.HP
+.BR libsocket (3)\ \-\ \c
+socket library for use with
+.BR socksys (4)
+.HP
+.BR libsocklib (3)\ \-\ \c
+socket library for use with
+.BR sockmod (4)
+.HP
+.BR listen (3)\ \-\ \c
+listen for connections on a transport enpoint
+.HP
+.BR recv (3)\ \-\ \c
+receive data on a transport endpoint
+.HP
+.BR recvfrom (3)\ \-\ \c
+receive data from a transport endpoint
+.HP
+.BR recvmsg (3)\ \-\ \c
+receive a message on a transport endpoint
+.HP
+.BR send (3)\ \-\ \c
+send data on a transport endpoint
+.HP
+.BR sendmsg (3)\ \-\ \c
+send a message on a transport endpoint
+.HP
+.BR sendto (3)\ \-\ \c
+send data to a transport endpoint
+.HP
+.BR setsockopt (3)\ \-\ \c
+set a socket option
+.HP
+.BR shutdown (3)\ \-\ \c
+shut down a transport connection
+.HP
+.BR socket (3)\ \-\ \c
+create a socket
+.HP
+.BR socketpair (3)\ \-\ \c
+create a connected pair of sockets
+.HP
+.BR sockets (3)\ \-\ \c
+the
+.BR libsocket (3)
+library
+.HP
+.BR socklib (3)\ \-\ \c
+the
+.BR libsocklib (3)
+library
+.HP
+.BR sockmod (4)\ \-\ \c
+socket module
+.HP
+.BR socksys (4)\ \-\ \c
+socket system driver
+.PD
+.\"
+.SS "Socket to Path Library:"
+.HP
+.BR sockpath (3)\ \-\ \c
+the
+.BR libsockpath (3)
+library
+.PD 0
+.HP
+.BR setsockpath (3)\ \-\ \c
+access the
+.BR sock2path (5)
+database
+.HP
+.BR getsockpath (3)\ \-\ \c
+get next
+.BR sock2path (5)
+database entry
+.HP
+.BR endsockpath (3)\ \-\ \c
+close
+.BR sock2path (5)
+database
+.HP
+.BR getsockpathent (3)\ \-\ \c
+get a
+.BR sock2path (5)
+database entry
+.HP
+.BR freesockpathent (3)\ \-\ \c
+free
+.BR sock2path (5)
+database entry
+.HP
+.BR sp_errbuf (3)\ \-\ \c
+sockpath error buffer
+.HP
+.BR sp_error (3)\ \-\ \c
+sockpath error
+.HP
+.BR sp_perror (3)\ \-\ \c
+print sockpath error
+.HP
+.BR sp_sperror (3)\ \-\ \c
+sockpath error string
+.HP
+.BR sock2path (5)\ \-\ \c
+sock2path database
+.HP
+.BR initsock (8)\ \-\ \c
+initialize kernel sock2path database
+.HP
+.BR soconfig (8)\ \-\ \c
+manage the kernel sock2path database
+.PD
+.\"
+.SS Miscellaneous
+.HP
+.BR strsock (5)\ \-\ \c
+the @PACKAGE_TITLE@ package
+.PD 0
+.HP
+.BR strsock_mknod (8)\ \-\ \c
+create socket system devices
+.HP
+.BR test-socket (8)\ \-\ \c
+test the socket library
+.HP
+.BR test-socklib (8)\ \-\ \c
+test the socklib library
+.HP
+.BR test-sockmod (8)\ \-\ \c
+test the sockmod module
+.HP
+.BR test-sockpath (8)\ \-\ \c
+test the sockpath library
+.PD
+.\"
+.\"
+.SH MODULES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+modules:
+.HP
+.BR sockmod (4)\ \-\ \c
+Socket Module.
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+drivers:
+.HP
+.BR socksys (4)\ \-\ \c
+Socket System driver.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR accept (3),
+.BR bind (3),
+.BR connect (3),
+.BR endsockpath (3),
+.BR freesockpathent (3),
+.BR getpeername (3),
+.BR getsockname (3),
+.BR getsockopt (3),
+.BR getsockpath (3),
+.BR getsockpathent (3),
+.BR libsocket (3),
+.BR libsocklib (3),
+.BR listen (3),
+.BR recv (3),
+.BR recvfrom (3),
+.BR recvmsg (3),
+.BR send (3),
+.BR sendmsg (3),
+.BR sendto (3),
+.BR setsockopt (3),
+.BR setsockpath (3),
+.BR shutdown (3),
+.BR socket (3),
+.BR socketpair (3),
+.BR sockets (3),
+.BR socklib (3),
+.BR sockpath (3),
+.BR sp_errbuf (3),
+.BR sp_error (3),
+.BR sp_perror (3),
+.BR sp_sperror (3),
+.BR sockmod (4),
+.BR socksys (4),
+.BR sock2path (5),
+.BR strsock (5),
+.BR initsock (8),
+.BR soconfig (8),
+.BR strsock_mknod (8),
+.BR test-socket (8),
+.BR test-socklib (8),
+.BR test-sockmod (8),
+.BR test-sockpath (8).
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

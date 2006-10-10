@@ -1,3 +1,17 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* doc/man/Makefile.am: updates for release
+	* doc/man/strsock.refs: updates for release
+	* doc/man/man3/sockets.3.man: updates for release
+	* doc/man/man3/socklib.3.man: updates for release
+	* doc/man/man3/xxx.3.man: updates for release
+	* doc/man/man5/strsock.5.man: updates for release
+	* doc/manual/descrip.texi: updates for release
+
 2006-10-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

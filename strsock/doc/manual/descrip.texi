@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.3 2006/09/18 01:07:12 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.4 2006/10/10 10:47:11 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/18 01:07:12 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/10 10:47:11 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -104,10 +104,23 @@ controls, and even @manpage{socket(7)} system calls.
 The package currently provides the following @dfn{STREAMS} libraries:
 
 @multitable @columnfractions .05 .95
-@item @tab @minus{} @file{libsocket.so}
+@item @tab @minus{} @file{libsocket.so} @file{libsocket.a}
+@item @tab @minus{} @file{libsocklib.so} @file{libsocklib.a}
 @end multitable
 
-The @file{libsocket.so} library implements the following library calls:
+The @file{libsocket} library implements the following library calls:
+
+@multitable @columnfractions .05 .32 .32 .31
+@item @tab @manref{socket(3)} @tab @tab
+@end multitable
+
+The @file{libsocket} library only needs to implement the single library call
+because file descriptors that are returned from the @manpage{socket(3)} call
+have been transformed into real sockets (from the viewpoint of the system call
+interface) and standard @file{glibc} calls for the remaining functions are
+used.
+
+The @file{libsocklib} library implements the following library calls:
 
 @multitable @columnfractions .05 .32 .32 .31
 @item @tab @manref{accept(3)}		@tab @manref{listen(3)}		@tab @manref{sendto(3)}
@@ -117,6 +130,11 @@ The @file{libsocket.so} library implements the following library calls:
 @item @tab @manref{getsockname(3)}	@tab @manref{send(3)}		@tab @manref{socketpair(3)}
 @item @tab @manref{getsockopt(3)}	@tab @manref{sendmsg(3)}	@tab
 @end multitable
+
+The @file{libsocklib} library is the older compatiblity library approach to
+providing sockets for @dfn{STREAMS} and implements the system calls as library
+calls for @dfn{STREAMS} devices, while calling the @file{glibc} versions for
+true sockets.
 
 The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR
 4.2} @dfn{STREAMS} drivers, modules, libraries, utilities, test programs,
