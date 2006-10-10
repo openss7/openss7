@@ -1,5 +1,5 @@
-OpenSS7 NETPERF Utility -- read me first file.  2006-10-02
-$Id: README,v 1.1.1.13 2006/10/05 12:13:34 brian Exp $
+OpenSS7 NETPERF Utility -- read me first file.  2006-10-04
+$Id: README,v 1.1.1.14 2006/10/10 10:36:47 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -16,7 +16,7 @@ Control Transmission Protocol)' and the `OpenSS7 STREAMS XNS, XTI/TLI'
 and `INET' packages.
 
 The `OpenSS7 NETPERF Utility' package provide primarily the `netperf(1)'
-and `netserver(8)', C Lanuage programs that ace as `Netperf' client or
+and `netserver(8)', C Language programs that act as `Netperf' client or
 server for testing connections and networking.  The `netserver(8)'
 program is executed on one host acting as a server, and then `netperf(1)'
 is executed on another host acting in client mode.  Characteristics of
@@ -35,13 +35,13 @@ Modifications to the package are derived from the `OpenSS7 STREAMS
 XNS', `XTI/TLI', `INET' and `SCTP' implementations and are release
 under the `GNU General Public License (GPL) Version 2'.  The "Netperf"
 tool itself is licensed under specific terms by `Hewlett-Packard'.
-Please see file `LICENSE' for the `Hewlett-Packard' "Netperf" copyright
-notices and licensing restrictions.  The "Netperf" tool is
+Please see file `LICENSES' for the `Hewlett-Packard' "Netperf"
+copyright notices and licensing restrictions.  The "Netperf" tool is
 
      Copyright (C) 1993, 1994, 1995  Hewlett-Packard Company
       All Rights Reserved
 
-See the `Hewlett-Packard' License in the `LICENSE' file for complete
+See the `Hewlett-Packard' License in the `LICENSES' file for complete
 details.
 
 Please note that this modified version of the "Netperf" package is not
@@ -52,7 +52,7 @@ responsibility in it.
  Release
 --------
 
-This is the `netperf-2.3.4' package, released 2006-10-02.  This `2.3.4'
+This is the `netperf-2.3.4' package, released 2006-10-04.  This `2.3.4'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
