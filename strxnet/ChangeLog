@@ -1,3 +1,15 @@
+2006-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* doc/man/strxnet.refs: updates for release
+	* doc/man/man3/t_free.3.man: updates for release
+	* doc/man/man3/t_sndrel.3.man: updates for release
+	* doc/man/man3/xti.3.man: updates for release
+	* doc/man/man7/T_DISCON_IND.7.man: updates for release
+
 2006-10-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

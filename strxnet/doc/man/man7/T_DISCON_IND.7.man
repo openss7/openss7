@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: T_DISCON_IND.7.man,v 0.9.2.6 2006/04/05 09:44:49 brian Exp $
+.\" @(#) $Id: T_DISCON_IND.7.man,v 0.9.2.7 2006/10/10 10:49:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:49 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/10 10:49:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: T_DISCON_IND.7.man,v $
+.\" Revision 0.9.2.7  2006/10/10 10:49:21  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:49  brian
 .\" - moved .so line and updated headers
 .\"
@@ -127,10 +130,10 @@ Only connection-mode.
 .SH ORIGINATOR
 Transport provider.
 .SH "SEE ALSO"
-.SH T_CONN_REQ (7),
-.SH T_DISCON_REQ (7),
-.SH T_ORDREL_REQ (7),
-.SH T_ORDREL_IND (7).
+.BR T_CONN_REQ (7),
+.BR T_DISCON_REQ (7),
+.BR T_ORDREL_REQ (7),
+.BR T_ORDREL_IND (7).
 .SH HISTORY
 .PP
 The Transport Provider Interface first appeared in SVR 4.
