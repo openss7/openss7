@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: genconf.h.in,v 1.1.6.9 2006/03/05 04:03:04 brian Exp $
+ @(#) $Id: genconf.h.in,v 1.1.6.10 2006/10/12 10:17:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/05 04:03:04 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:17:34 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -160,5 +160,29 @@
 
 /* Define to 1 if kernel function sleep_on_timeout() exists. */
 #undef HAVE_KFUNC_SLEEP_ON_TIMEOUT
+
+/* Define if an autoconf.h file was generated. LISAUTOCONF is used by
+   "include/sys/LiS/linux-mdep.h" to know when to include "LiS/sys/autoconf.h"
+   and to prevent linux from including its own. In autoconf we do this by
+   setting the appropriate include directory order in the makefile. Our local
+   "include/linux/autoconf.h" will be included in preference to the kernel
+   one. I don't know about LiS's practice of mucking around with include file
+   wrapper macros. A renaming of some macros would kil portability. We never
+   define this macro even when we build our own autoconf but we do mark it in
+   gcom's old config.in file when we build it. */
+#undef LISAUTOCONF
+
+/* Define if a modversions.h file needs to be included. */
+#undef LISMODVERS
+
+/* Define this macro when your <sys/types.h> has major_t already defined and
+   you are building for a user target to keen LiS source files from redefining
+   major_t. */
+#undef LIS_HAVE_MAJOR_T
+
+/* Define this macro when your <sys/types.h> has o_uid_t and o_gid_t already
+   defined and you are building for a user target to keep LiS source files
+   from redefining o_uid_t and o_gid_t. */
+#undef LIS_HAVE_O_UID_T
 
 #endif				/* __SYS_LIS_GENCONF_H__ */
