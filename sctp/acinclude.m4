@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/09/18 13:20:06 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/12 10:18:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 13:20:06 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 10:18:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -141,39 +141,6 @@ AC_DEFUN([_SCTP_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
-# _SCTP_SETUP_DEBUG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_SCTP_SETUP_DEBUG], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
-    case "$linux_cv_debug" in
-    _DEBUG)
-	AC_DEFINE([SCTP_CONFIG_DEBUG], [1], [Define to perform
-			    internal structure tracking within SCTP as well as
-			    to provide additional /proc filesystem files for
-			    examining internal structures.])
-	;;
-    _TEST)
-	AC_DEFINE([SCTP_CONFIG_TEST], [1], [Define to perform
-			    performance testing with debugging.  This mode
-			    does not dump massive amounts of information into
-			    system logs, but peforms all assertion checks.])
-	;;
-    _SAFE)
-	AC_DEFINE([SCTP_CONFIG_SAFE], [1], [Define to perform
-			    fundamental assertion checks.  This is a safer
-			    mode of operation.])
-	;;
-    _NONE | *)
-	AC_DEFINE([SCTP_CONFIG_NONE], [1], [Define to perform no
-			    assertion checks but report software errors.  This
-			    is the smallest footprint, highest performance
-			    mode of operation.])
-	;;
-    esac
-])# _SCTP_SETUP_DEBUG
-# =============================================================================
-
-# =============================================================================
 # _SCTP_OTHER_SCTP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_OTHER_SCTP], [dnl
@@ -241,7 +208,6 @@ AC_DEFUN([_SCTP_SETUP], [dnl
     _SCTP_OTHER_SCTP
     _SCTP_SETUP_MODULE
     _SCTP_CHECK_KERNEL
-    _SCTP_SETUP_DEBUG
 ])# _SCTP_SETUP
 # =============================================================================
 
