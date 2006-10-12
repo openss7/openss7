@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/07/25 06:39:02 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:21:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:02 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:21:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/07/25 06:39:02 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:21:44 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/07/25 06:39:02 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:21:44 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/07/25 06:39:02 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:21:44 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -117,7 +117,7 @@ dont_use_this_function(void)
 	return "(DON'T USE THIS FUNCTION!)";
 }
 
-#ifdef CONFIG_STREAMS_DEBUG
+#ifdef _DEBUG
 #ifdef LIS_DEPRECARTED_FUNCTIONS
 static void
 warn_kern_violation(char *func, char *file, int line)
@@ -143,7 +143,7 @@ warnf_kern_wrapper(const char *func, const char *repl, const char *f, const int 
 #define WARNF(__exp, __f, __l) \
 	({ warnf_kern_wrapper(__FUNCTION__,#__exp, __f, __l); __exp; })
 
-#else				/* CONFIG_STREAMS_DEBUG */
+#else				/* _DEBUG */
 
 #define WARN(__exp) \
 	({ __exp; })
@@ -151,7 +151,7 @@ warnf_kern_wrapper(const char *func, const char *repl, const char *f, const int 
 #define WARNF(__exp, __f, __l) \
 	({ __exp; })
 
-#endif				/* CONFIG_STREAMS_DEBUG */
+#endif				/* _DEBUG */
 
 /* 
  *  Here are the lis definitions...
@@ -616,7 +616,7 @@ lis_own_spl(void)
 
 EXPORT_SYMBOL_NOVERS(lis_own_spl);
 
-#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

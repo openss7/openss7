@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 0.9.2.10 2006/07/25 06:39:00 brian Exp $
+ @(#) $Id: bufpool.h,v 0.9.2.11 2006/10/12 10:21:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:00 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:21:34 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_BUFPOOL_H__
 #define __OS7_BUFPOOL_H__
 
-#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  -------------------------------------------------------------------------
@@ -319,7 +319,7 @@ ss7_bufpool_release(struct ss7_bufpool *pool, int n)
 	atomic_sub(n, &pool->reserve);
 }
 
-#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

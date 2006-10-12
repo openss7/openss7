@@ -1,3 +1,13 @@
+2006-10-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/os7/bufpool.h: removed redundant debug flags
+	* src/include/sys/os7/debug.h: removed redundant debug flags
+	* src/include/sys/strcompat/config.h.in: removed redundant debug flags
+	* src/kernel/lfscompat.c: removed redundant debug flags
+	* src/kernel/liscompat.c: removed redundant debug flags
+	* src/kernel/os7compat.c: removed redundant debug flags
+	* src/kernel/svr4compat.c: removed redundant debug flags
+
 2006-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updates for release
