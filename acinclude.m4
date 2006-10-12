@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/10/02 11:31:14 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/12 20:24:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:14 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 20:24:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -171,7 +171,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-SCTP],
 			       [do not include SCTP in master pack @<:@detected@:>@]),
 		[with_SCTP="$withval"],
-		[with_SCTP="$with_ALL"])
+		[with_SCTP="${with_ALL:-no}"])
     if test ! -d "$srcdir/sctp" ; then
 	with_SCTP='no'
     fi
@@ -179,7 +179,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-IPERF],
 			       [do not include IPERF in master pack @<:@detected@:>@]),
 		[with_IPERF="$withval"],
-		[with_IPERF="$with_ALL"])
+		[with_IPERF="${with_ALL:-no}"])
     if test ! -d "$srcdir/iperf" ; then
 	with_IPERF='no'
     fi
@@ -187,7 +187,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-LIS],
 			       [include LIS in master pack @<:@detected@:>@]),
 		[with_LIS="$withval"],
-		[with_LIS="$with_ALL"])
+		[with_LIS="${with_ALL:-no}"])
     if test ! -d "$srcdir/LiS" ; then
 	with_LIS='no'
     fi
@@ -211,7 +211,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
 		[with_STRUTIL="$withval"],
-		[with_STRUTIL="$with_ALL"])
+		[with_STRUTIL="${with_ALL:-no}"])
     if test ! -d "$srcdir/strutil" ; then
 	with_STRUTIL='no'
     fi
@@ -219,7 +219,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRBCM],
 			       [include STRBCM in master pack @<:@detected@:>@]),
 		[with_STRBCM="$withval"],
-		[with_STRBCM="$with_ALL"])
+		[with_STRBCM="${with_ALL:-no}"])
     if test ! -d "$srcdir/strbcm" ; then
 	with_STRBCM='no'
     fi
@@ -227,7 +227,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRTTY],
 			       [include STRTTY in master pack @<:@detected@:>@]),
 		[with_STRTTY="$withval"],
-		[with_STRTTY="$with_ALL"])
+		[with_STRTTY="${with_ALL:-no}"])
     if test ! -d "$srcdir/strtty" ; then
 	with_STRTTY='no'
     fi
@@ -251,7 +251,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-STRNSL],
 			       [do not include STRNSL in master pack @<:@included@:>@]),
 		[with_STRNSL="$withval"],
-		[with_STRNSL='yes'])
+		[with_STRNSL="${with_ALL:-no}"])
     if test ! -d "$srcdir/strnsl" ; then
 	with_STRNSL='no'
     fi
@@ -259,7 +259,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-STRSOCK],
 			       [do not include STRSOCK in master pack @<:@included@:>@]),
 		[with_STRSOCK="$withval"],
-		[with_STRSOCK="$with_ALL"])
+		[with_STRSOCK="${with_ALL:-no}"])
     if test ! -d "$srcdir/strsock" ; then
 	with_STRSOCK='no'
     fi
@@ -283,7 +283,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRISO],
 			       [include STRISO in master pack @<:@detected@:>@]),
 		[with_STRISO="$withval"],
-		[with_STRISO="$with_ALL"])
+		[with_STRISO="${with_ALL:-no}"])
     if test ! -d "$srcdir/striso" ; then
 	with_STRISO='no'
     fi

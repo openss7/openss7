@@ -1,3 +1,7 @@
+2006-10-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: do not build incomplete packages by default
+
 2006-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
