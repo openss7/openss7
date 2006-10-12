@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/09/18 13:20:15 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/10/12 10:27:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 13:20:15 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 10:27:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -149,38 +149,6 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_UTIL_OPTIONS], [dnl
 ])# _UTIL_OPTIONS
-# =============================================================================
-
-# =============================================================================
-# _UTIL_SETUP_DEBUG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_UTIL_SETUP_DEBUG], [dnl
-    case "$linux_cv_debug" in
-	_DEBUG)
-	    AC_DEFINE([CONFIG_STREAMS_DEBUG], [1], [Define to perform
-		    internal structure tracking within the STREAMS executive
-		    as well as to provide additional /proc filesystem files
-		    for examining internal structures.])
-	    ;;
-	_TEST)
-	    AC_DEFINE([CONFIG_STREAMS_TEST], [1], [Define to perform
-		    performance testing with debugging.  This mode does not
-		    dump massive amounts of information into system logs, but
-		    peforms all assertion checks.])
-	    ;;
-	_SAFE)
-	    AC_DEFINE([CONFIG_STREAMS_SAFE], [1], [Define to perform
-		    fundamental assertion checks.  This is a safer mode of
-		    operation.])
-	    ;;
-	_NONE | *)
-	    AC_DEFINE([CONFIG_STREAMS_NONE], [1], [Define to perform
-		    no assertion checks but report software errors.  This is
-		    the smallest footprint, highest performance mode of
-		    operation.])
-	    ;;
-    esac
-])# _UTIL_SETUP_DEBUG
 # =============================================================================
 
 # =============================================================================
@@ -594,7 +562,6 @@ AC_DEFUN([_UTIL_SETUP], [dnl
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _UTIL_CHECK_KERNEL
-    _UTIL_SETUP_DEBUG
     _LINUX_STREAMS
     _UTIL_SETUP_MODULES
     _UTIL_SETUP_DRIVERS

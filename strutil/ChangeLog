@@ -1,3 +1,10 @@
+2006-10-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: removed redundant debug flags
+	* src/drivers/fifo.c: removed redundant debug flags
+	* src/drivers/log.c: removed redundant debug flags
+	* src/include/sys/strutil/config.h.in: removed redundant debug flags
+
 2006-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
