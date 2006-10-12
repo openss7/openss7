@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:52:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/12 20:25:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:52:16 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 20:25:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,21 +57,21 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 MANS_UNUSED = \
-	man4/ISO.4 \
 	man4/iso-ip.4 \
 	man4/iso-udp.4 \
 	man4/isos.4 \
-	man4/xol.4
+	man4/xol.4 \
+	man5/striso.5
 
 man_MANS = \
 	man4/clns.4 \
 	man4/cmot.4 \
-	man4/ISO.4 \
 	man4/iso-ip.4 \
-	man4/iso-lan.4 \
 	man4/isos.4 \
 	man4/isot.4 \
+	man4/iso-lan.4 \
 	man4/iso-udp.4 \
+	man4/itos.4 \
 	man4/itot.4 \
 	man4/lapb.4 \
 	man4/lpp.4 \
@@ -90,18 +90,19 @@ man_MANS = \
 	man4/x25_plp.4 \
 	man4/xol.4 \
 	man4/xot.4 \
+	man5/striso.5 \
 	man7/npi_osi.7 \
 	man8/striso_mknod.8
 
 dist_noinst_MANS = \
 	man4/clns.4.man \
 	man4/cmot.4.man \
-	man4/ISO.4.man \
 	man4/iso-ip.4.man \
-	man4/iso-lan.4.man \
 	man4/isos.4.man \
 	man4/isot.4.man \
+	man4/iso-lan.4.man \
 	man4/iso-udp.4.man \
+	man4/itos.4.man \
 	man4/itot.4.man \
 	man4/lapb.4.man \
 	man4/lpp.4.man \
@@ -120,6 +121,7 @@ dist_noinst_MANS = \
 	man4/x25_plp.4.man \
 	man4/xol.4.man \
 	man4/xot.4.man \
+	man5/strios.5.man \
 	man7/npi_osi.7.man \
 	man8/striso_mknod.8.man
 
@@ -130,6 +132,9 @@ include ../../am/man.am
 
 # =============================================================================
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/10/12 20:25:14  brian
+# - manual page fixups for release
+#
 # Revision 0.9.2.3  2006/10/03 13:52:16  brian
 # - changes to pass make check target
 # - added some package config.h files

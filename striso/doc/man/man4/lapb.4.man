@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lapb.4.man,v 0.9.2.1 2006/10/03 13:24:21 brian Exp $
+.\" @(#) $Id: lapb.4.man,v 0.9.2.2 2006/10/12 20:25:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:24:21 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/12 20:25:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lapb.4.man,v $
+.\" Revision 0.9.2.2  2006/10/12 20:25:15  brian
+.\" - manual page fixups for release
+.\"
 .\" Revision 0.9.2.1  2006/10/03 13:24:21  brian
 .\" - file additions and removals for make check target
 .\"
@@ -90,54 +93,69 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <unistd.h>
+.HP
+.IB lapb_stream " = open(" /dev/lapb ", O_RDWR);
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH USAGE
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH INTERFACE
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH ADDRESSES
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH OPTIONS
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH IOCTLS
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH NOTICES
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH FILES
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH MODULES
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH DEVICES
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -154,18 +172,22 @@ sort-adjacent-labels
 .\"
 .SH BUGS
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .SH HISTORY
 .PP
+This driver has not been implemented.
 .\"
 .\"
 .[

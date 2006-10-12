@@ -1,5 +1,15 @@
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/Makefile.am: manpage fixups for release
+	* doc/man/man4/iso-lan.4.man: manpage fixups for release
+	* doc/man/man4/itos.4.man: manpage fixups for release
+	* doc/man/man4/itot.4.man: manpage fixups for release
+	* doc/man/man4/lapb.4.man: manpage fixups for release
+	* doc/man/man4/lpp.4.man: manpage fixups for release
+	* doc/man/man4/ns-tcp.4.man: manpage fixups for release
+	* doc/man/man4/plp.4.man: manpage fixups for release
+	* doc/man/striso.refs: manpage fixups for release
+
 	* acinclude.m4: removed redundant debug flags
 	* src/drivers/tp.c: removed redundant debug flags
 	* src/modules/itot.c: got this module compiling

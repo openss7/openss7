@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: iso-lan.4.man,v 0.9.2.3 2006/10/10 10:44:02 brian Exp $
+.\" @(#) $Id: iso-lan.4.man,v 0.9.2.4 2006/10/12 20:25:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:44:02 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/12 20:25:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: iso-lan.4.man,v $
+.\" Revision 0.9.2.4  2006/10/12 20:25:15  brian
+.\" - manual page fixups for release
+.\"
 .\" Revision 0.9.2.3  2006/10/10 10:44:02  brian
 .\" - updates for release, lots of additions and workup
 .\"
@@ -96,6 +99,13 @@ sort-adjacent-labels
 .SH NAME
 .B iso-lan, xol
 \- X.25 over LANs
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <unistd.h>
+.HP
+.IB xol_stream " = open(" /dev/xol ", O_RDWR);
 .\"
 .\"
 .SH DESCRIPTION
@@ -141,30 +151,56 @@ to X.25 Level 3.
 .\"
 .SH USAGE
 .PP
+This driver is not implemented.
 .\"
 .\"
 .SH INTERFACE
 .PP
+The interface presented by the driver at the upper multiplex is the
+Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+.PP
+The
+.B XOL
+driver can link Streams providing the same interface.
 .\"
 .\"
 .SH ADDRESSES
 .PP
+The address format is a MAC address.
 .\"
 .\"
 .SH OPTIONS
 .PP
+Quality of service options are the same as described in the Data Link Provide
+Interface (DLPI) specification.
+.[
+dlpi revision 2.0.0
+.]
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+Primitives at both the upper and lower multiplex are the DL_ primitives of the
+Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
 .\"
 .\"
 .SH IOCTLS
 .PP
+.B XOL
+has no input-output controls of its own.
 .\"
 .\"
 .SH NOTICES
 .PP
+This driver has not yet been implemented.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -216,14 +252,17 @@ designated router on a LAN.
 .\"
 .SH FILES
 .PP
+This driver has not yet been implemented.
 .\"
 .\"
 .SH MODULES
 .PP
+This driver has not yet been implemented.
 .\"
 .\"
 .SH DEVICES
 .PP
+This driver has not yet been implemented.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -240,18 +279,22 @@ designated router on a LAN.
 .\"
 .SH BUGS
 .PP
+This driver has not yet been implemented, so all bugs are in the design stage.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+This driver has not yet been implemented.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+This driver has not yet been implemented.
 .\"
 .\"
 .SH HISTORY
 .PP
+This driver has not yet been implemented.
 .\"
 .\"
 .[

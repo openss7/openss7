@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: plp.4.man,v 0.9.2.2 2006/10/10 10:44:03 brian Exp $
+.\" @(#) $Id: plp.4.man,v 0.9.2.3 2006/10/12 20:25:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:44:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/12 20:25:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: plp.4.man,v $
+.\" Revision 0.9.2.3  2006/10/12 20:25:15  brian
+.\" - manual page fixups for release
+.\"
 .\" Revision 0.9.2.2  2006/10/10 10:44:03  brian
 .\" - updates for release, lots of additions and workup
 .\"
@@ -93,13 +96,103 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <xti.h>
+.br
+.B #include <xti_osi.h>
+.HP
+.IB plp_stream " = open( /dev/plp ", O_RDWR);
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B PLP
+multiplexing pseudo-device driver is an implementation of X.25 PLP.
+.[
+x25
+.]
 .\"
 .\"
 .SH USAGE
+.PP
+Streams providing LAPB or LLC2 data links conforming to the Data Link Provider
+Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+can be linked beneath this multiplexing driver to provide data link service to
+the driver.
+.PP
+Streams opened on the upper multiplex, present the Network Provider Interface
+(NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+OSI conforming service interface.
+.PP
+A user of the PLP network service opens the pseudo-device driver by opening
+the clone device
+.BR /dev/plp .
+This yeilds a PLP Stream.
+When the user bind and connects the Stream from a local NSAP to a remote NSAP,
+the user Stream is associated with one or more data links at the lower
+multiplex.  The user Stream is associated with data link streams in the
+following fashion:
+.IP \(bu \w'\(bu\(em'u
+When the PLP Stream is connected, using the
+.BR N_CONN_REQ (7)
+primitive, the driver usese the NSAPs to determine whether an existing data
+link exists, and if it does, the Stream is associated with that data link.  if
+a suitable data link does not exist, a request is issued to a connection
+manager daemon listening on the connection management Stream.
+.IP \(bu
+The connection manager satisfies requests by examining the NSAP contained in
+the
+.BR N_CONN_REQ (7)
+primitive.  The NSAP can be one of several forms:
+.RS
+.IP 1. \w'0.\(em'u
+An X.121 address.
+.sp
+In this case the connection manager opens an X.25 LAPB stream on the X.25 LAPB
+device, binds and connects the Stream appropriately according to the
+information in the
+.BR N_CONN_REQ (7)
+primitive and then links the connected Stream under the PLP multiplexing
+driver.  It responds to the request indicating the multiplexer index of the
+linked Stream.
+.sp
+If binding or connecting the X.25 LAPB Stream fails, the connection manager response on the
+connection management Stream with a negative acknowledgement that the X.25 PLP
+driver tanslates into an
+.BR N_ERROR_ACK (7)
+primitive to the PLP user.
+.IP 2.
+An LSAP address.
+.sp
+In this case the connection manager opens an X.25 LLC2 stream on the X.25 LLC2
+device, binds and connects the Stream appropriately according to the
+information in the
+.BR N_CONN_REQ (7)
+primitive and then links the connected Stream under the PLP multiplexing
+driver.  It responds to the request indicating the multiplexer index of the
+linked Stream.
+.sp
+If binding or connecting the X.25 LLC2 Stream fails, the connection manager response on the
+connection management Stream with a negative acknowledgement that the X.25 PLP
+driver tanslates into an
+.BR N_ERROR_ACK (7)
+primitive to the PLP user.
+.RE
+.IP \(bu
+Data link Streams may also be linked under the PLP multiplexing driver at
+configuration time using static configuration information obtained from
+configuration files.
+.IP \(bu
+Data link Streams may also be linked under the PLP multiplexing driver using
+route discovery protocols.
 .PP
 .\"
 .\"
@@ -133,14 +226,48 @@ rfc1629
 .\"
 .SH OPTIONS
 .PP
+Quality of service options provided by the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+for OSI conforming implementations
+.BR npi_osi (7).
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+Primitives used are the primitives of the Network Provider Interface (NPI)
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+for OSI conforming implementations
+.BR npi_osi (7).
 .\"
 .\"
 .SH IOCTLS
 .PP
+.BR PLP
+does not provide any input-output controls of its own.  The
+.BR I_LINK "(7), " I_PLINK "(7), " I_UNLINK "(7) and " I_PUNLINK (7)
+input-output commands  can be used to link Streams beneath this multiplexing
+driver that conform to the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+providing either X.25 LAPB,
+.[
+x25
+.]
+.BR lapb (4),
+or ISO 8802 LLC2,
+.[
+iso/iec 8802
+.]
+.BR xol (4),
+data links.
 .\"
 .\"
 .SH NOTICES
@@ -218,50 +345,23 @@ This mechanism is described as providing the ISO TP0 and TP2 transport classes.
 .\"
 .SH IMPLEMENTATION
 .PP
+This driver is incomplete.
 .\"
 .\"
-.SH FILES
-.PP
-
-.nf
-\fC\
--rw-r--r--    1 brian    users        6888 Oct  7 14:10 clns.4.man
--rw-r--r--    1 brian    users        7601 Oct  7 14:21 cmot.4.man
--rw-r--r--    1 brian    users        4686 Oct  8 00:55 ISO.4.man
--rw-r--r--    1 brian    users        9424 Oct  7 14:00 iso-ip.4.man
--rw-r--r--    1 brian    users        5878 Oct  7 22:15 iso-lan.4.man
--rw-r--r--    1 brian    users        4495 Oct  7 10:12 isos.4.man
--rw-r--r--    1 brian    users        4980 Oct  3 07:52 isot.4.man
--rw-r--r--    1 brian    users          22 Jul 11 03:21 iso-udp.4.man
--rw-r--r--    1 brian    users        4638 Oct  7 12:12 itot.4.man
--rw-r--r--    1 brian    users        4280 Oct  3 07:27 lapb.4.man
--rw-r--r--    1 brian    users        5179 Oct  7 21:30 lpp.4.man
--rw-r--r--    1 brian    users        4556 Oct  3 07:52 ns-tcp.4.man
--rw-r--r--    1 brian    users        5263 Oct  8 01:10 plp.4.man
--rw-r--r--    1 brian    users          22 Oct  3 07:27 tcpns.4.man
--rw-r--r--    1 brian    users          18 Jul 11 03:21 tp0.4.man
--rw-r--r--    1 brian    users          18 Jul 11 03:21 tp1.4.man
--rw-r--r--    1 brian    users          18 Jul 11 03:21 tp2.4.man
--rw-r--r--    1 brian    users          18 Jul 11 03:21 tp3.4.man
--rw-r--r--    1 brian    users          18 Jul 11 03:21 tp4.4.man
--rw-r--r--    1 brian    users        4547 Jul 11 03:21 tp.4.man
--rw-r--r--    1 brian    users          20 Oct  3 07:27 x25_lapb.4.man
--rw-r--r--    1 brian    users          20 Oct  3 07:27 x25-lapb.4.man
--rw-r--r--    1 brian    users          19 Oct  3 07:27 x25_plp.4.man
--rw-r--r--    1 brian    users          19 Oct  3 07:27 x25-plp.4.man
--rw-r--r--    1 brian    users          23 Oct  3 06:25 xol.4.man
--rw-r--r--    1 brian    users        6671 Oct  7 10:03 xot.4.man
-\fP
-.fi
-
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH MODULES
-.PP
+.\".SH MODULES
+.\".PP
 .\"
 .\"
 .SH DEVICES
-.PP
+.TP
+.BR /dev/plp
+The X.25 Packet Layer Protocol device.  This is a
+.BR clone (4)
+device that opens user Streams.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -278,18 +378,43 @@ This mechanism is described as providing the ISO TP0 and TP2 transport classes.
 .\"
 .SH BUGS
 .PP
+As this driver is incomplete, the bug are being developed.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+NPI,
+.[
+npi revision 2.0.0
+.]
+DLPI.
+.[
+dlpi revision 2.0.0
+.]
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+X.25,
+.[
+x25
+.]
+NPI,
+.[
+npi revision 2.0.0
+.]
+DLPI.
+.[
+dlpi revision 2.0.0
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B PLP
+device is new for
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

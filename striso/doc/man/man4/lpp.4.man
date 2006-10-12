@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lpp.4.man,v 0.9.2.3 2006/10/10 10:44:03 brian Exp $
+.\" @(#) $Id: lpp.4.man,v 0.9.2.4 2006/10/12 20:25:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:44:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/12 20:25:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lpp.4.man,v $
+.\" Revision 0.9.2.4  2006/10/12 20:25:15  brian
+.\" - manual page fixups for release
+.\"
 .\" Revision 0.9.2.3  2006/10/10 10:44:03  brian
 .\" - updates for release, lots of additions and workup
 .\"
@@ -100,6 +103,11 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <stropts.h>
+.HP
+.IB lpp_stream " = open(" /dev/tp4 ", O_RDWR);
+.HP
+.BI ioctl( lpp_stream ", I_PUSH, " \(lqlpp\(rq );
 .\"
 .\"
 .SH DESCRIPTION
@@ -142,10 +150,39 @@ xns
 .\"
 .SH USAGE
 .PP
+.B LPP
+can be pushed over an OSI Transport Stream conforming to the Transport
+Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+to transform it into a Lightweight Presentation Protocol Stream.  Once pushed,
+the Stream presents the minimal-OSI interface (mOSI) described in XNS 5.2.
+.[
+xns
+.]
 .\"
 .\"
 .SH INTERFACE
 .PP
+The interface presented by the
+.B LPP
+is the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+This interface conforms to the XTI mOSI (minimal-OSI) interface using the
+X/Open Transport Interface (XTI),
+.[
+xti
+.]
+.BR xti (3),
+as described in the XNS 5.2.
+.[
+xns
+.]
 .\"
 .\"
 .SH ADDRESSES
@@ -158,34 +195,47 @@ rfc1278
 .\"
 .SH OPTIONS
 .PP
+Options are as provided in the XTI mOSI interface as described in XNS 5.2.
+.[
+xns
+.]
 .\"
 .\"
-.SH PRIMITIVES
-.PP
+.\".SH PRIMITIVES
+.\".PP
 .\"
 .\"
 .SH IOCTLS
 .PP
+.B LPP
+does not provide any input-output controls of its own.
 .\"
 .\"
 .SH NOTICES
 .PP
+This module is incomplete.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+This module is currently incomplete.
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH MODULES
 .PP
+.B LPP
+is a pushable
+.IR STREAMS (9)
+module named
+.RI \(lq lpp \(rq.
 .\"
 .\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -202,18 +252,35 @@ rfc1278
 .\"
 .SH BUGS
 .PP
+As the
+.B LPP
+module is currently incomplete, bugs are currently being designed.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B LPP
+module is compatible with the XTI mOSI specification of XNS 5.2.
+.[
+xns
+.]
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+RFC 1189.
+.[
+rfc1189
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B LPP
+module is new for
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

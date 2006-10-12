@@ -3756,20 +3756,6 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1278.txt
 
-%K rfc1629
-%L RFC 1629
-%R RFC 1629
-%A R. Colella
-%A R. Callon
-%A E. Gardner
-%A Y. Rekhter
-%T Guidelines for OSI NSAP Allocation in the Internet
-%D May 1994
-%O (Obsoletes RFC 1237) (Status: DRAFT STANDARD)
-%Q Internet Engineering Task Force \(em Network Working Group
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc1628.txt
-
 %K rfc1831
 %L RFC 1831
 %R RFC 1831
