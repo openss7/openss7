@@ -1,0 +1,771 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: striso.5.man,v 0.9.2.1 2006/10/12 13:06:23 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/12 13:06:23 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: striso.5.man,v $
+.\" Revision 0.9.2.1  2006/10/12 13:06:23  brian
+.\" - added package manual page
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH STRISO 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B @PACKAGE@
+\- @PACKAGE_TITLE@ package
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package provides
+.I STREAMS
+modules and drivers, libraries, programs, init scripts, and daemons that
+implement
+.IR "Open Systems Interconnect"
+.[
+x200
+.]
+data links, networks, transport and applications.
+.PP
+This package builds and installs the following
+.I STREAMS
+kernel modules and drivers:
+.ad l
+.IP \- \w'\-\(em'u
+.BR streams_clns.ko " multiplexing driver
+.IR /dev/clns ", " /dev/clnp ", " /dev/clns_cm
+.PD 0
+.IP \-
+.BR streams_cons.ko " multiplexing driver
+.IR /dev/cons ", " /dev/cons_cm
+.IP \-
+.BR streams_tp.ko " multiplexing driver
+.IR /dev/otpi ", " /dev/otk6 ", " /dev/tp0 ", " /dev/tp1 ", " /dev/tp2 ", " /dev/tp3 ", " /dev/tp4
+.IP \-
+.BR streams_lapb.ko " driver
+.IR /dev/lapb
+.IP \-
+.BR streams_xol.ko " driver
+.IR /dev/xol
+.IP \-
+.BR streams_plp.ko " multiplexing driver
+.IR /dev/plp ", " /dev/plp_cm
+.IP \-
+.BR streams_iso_ip.ko " module
+.IP \-
+.BR streams_iso_udp.ko " module
+.IP \-
+.BR streams_cmot.ko " module
+.IP \-
+.BR streams_isos.ko " module
+.IP \-
+.BR streams_itos.ko " module
+.IP \-
+.BR streams_itot.ko " module
+.IP \-
+.BR streams_isot.ko " module
+.IP \-
+.BR streams_lpp.ko " module
+.IP \-
+.BR streams_xos.ko " module
+.IP \-
+.BR streams_xot.ko " module
+.ad b
+.PD
+.TP
+.BR clns (4)
+This is a multiplexing pseudo-device driver that provides X.213
+.[
+x213
+.]
+Connectionless Network service (CLNS).
+It is able to link Streams that provider the Network Provider Interface (NPI)
+.[
+npi revision 2.0.0
+.]
+for connectionless network service.
+It also provides the NPI for CLNS.
+.TP
+.BR cons (4)
+This is a multiplexing pseudo-device driver that provides X.213
+.[
+x213
+.]
+Connection-oriented Network Service (CONS).
+It is able to link Streams that provider the Network Provider Interface (NPI)
+.[
+npi revision 2.0.0
+.]
+for connection-oriented network service.
+It also provides the NPI for CONS.
+.TP
+.BR tp (4)
+This is a multiplexing pseudo-device driver that provides X.214
+.[
+x214
+.]
+Connection-oriented Transport Serivce (COTS).
+It is able to link Streams that provider the Network Provider Interface (NPI)
+.[
+npi revision 2.0.0
+.]
+for connection-oriented network service.
+It provides the Transport Provider Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+interface for connection-oriented transport service.
+.TP
+.BR lapb (4)
+This is a device driver that provides X.25
+.[
+x25
+.]
+Link Access Protocol (Balanced) data links.
+It provides the Data Link Provider Interface (DLPI).
+.[
+dlpi revision 2.0.0
+.]
+.TP
+.BR xol (4)
+This is a device driver that provides ISO 8802
+.[
+iso/iec 8802
+.]
+Logical Link Control type 2 (LLC2) data links.
+It provides the Data Link Provider Interface (DLPI).
+.[
+dlpi revision 2.0.0
+.]
+.TP
+.BR plp (4)
+This is a multiplexing pseudo-device driver that provides X.25
+.[
+x25
+.]
+Packet Layer Protocol (PLP).
+It is able to link Stream that provide the Data Link Provider Interface (DLPI)
+.[
+dlpi revision 2.0.0
+.]
+for LAPB and LLC2.
+It provides the Network Provider Interface (NPI)
+.[
+npi revision 2.0.0
+.]
+for connection-oriented network service.
+.TP
+.BR iso-ip (4)
+This is a pushable module that can be pushed over a
+.BR rawip (4)
+Stream to implement RFC 1070
+.[
+rfc1070
+.]
+and provides a Network Provider Interface (NPI) suitable for linking beneath
+the
+.BR clns (4)
+driver.
+.TP
+.BR iso-udp (4)
+This is a pushable module that can be pushed over a
+.BR udp (4)
+STream to implement RFC 1070
+.[
+rfc1070
+.]
+and provides a Network Provider Interface (NPI) suitable for linking beneath
+the
+.BR clns (4)
+driver.
+.TP
+.BR cmot (4)
+This is a pushable module that can be pushed over a
+.BR tp (4)
+transport Stream to provide an RFC 1189
+.[
+rfc1189
+.]
+CMISE/CMIP over TCP implementation.  It provides a Transport Provider
+Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+providing the mOSI interface.
+.TP
+.BR isos (4)
+This is pushable module that can be pushed over a
+.BR sctp (4)
+Stream to provide an RFC 1006
+.[
+rfc1006
+.]
+implementation providing a Network Provider Interface (NPI) that can be linked
+or pushed beneath the
+.BR tp (4)
+driver to provide OSI Transport Class 0 (TP0).
+.TP
+.BR isot (4)
+This is a pushable module that can be pushed over a
+.BR tcp (4)
+Stream to provide an RFC 1006
+.[
+rfc1006
+.]
+implementation providing a Network Provider Interface (NPI) that can be linked
+or pushed beneath the
+.BR tp (4)
+driver to provide OSI Transport Class 0 (TP0).
+.TP
+.BR itos (4)
+This is pushable module that can be pushed over a
+.BR sctp (4)
+Stream to provide an RFC 2126
+.[
+rfc2126
+.]
+implementation providing a Network Provider Interface (NPI) that can be linked
+or pushed beneath the
+.BR tp (4)
+driver to provide OSI Transport Class 2 (TP2).
+.TP
+.BR itot (4)
+This is a pushable module that can be pushed over a
+.BR tcp (4)
+Stream to provide an RFC 2126
+.[
+rfc2126
+.]
+implementation providing a Network Provider Interface (NPI) that can be linked
+or pushed beneath the
+.BR tp (4)
+driver to provide OSI Transport Class 2 (TP2).
+.TP
+.BR lpp (4)
+This is a pushable module that can be pushed over an OSI Transport Stream
+.BR tp (4)
+to provide an implementation of the Lightweigth Presentation Protocol, RFC
+1189,
+.[
+rfc1189
+.]
+that provide a TPI-mOSI interface.
+.TP
+.BR xos (4)
+This is a pushable module that can be pushed over an
+.BR sctp (4)
+stream to provide and RFC 1613
+.[
+rfc1613
+.]
+X.25 connection over SCTP (XOS).  It provides a Network Provider Interface (NPI)
+suitable for use with
+.BR cons (4)
+or
+.BR tp (4).
+.TP
+.BR xot (4)
+This is a pushable module that can be pushed over an
+.BR tcp (4)
+stream to provide and RFC 1613
+.[
+rfc1613
+.]
+X.25 connection over TCP (XOT).  It provides a Network Provider Interface (NPI)
+suitable for use with
+.BR cons (4)
+or
+.BR tp (4).
+.PP
+The package builds and installs the following shared object libraries:
+.TP
+.BR libosi (3)
+The
+.BR libosi (3)
+library provides implementations of
+.I SunLink OSI
+address handling functions for OSI transport protocols.  These functions are:
+.RS
+.HP
+.BR getmyclnsnsap (3)\ \-\ \c
+get the CLNS NSAP for the local host.
+.PD 0
+.HP
+.BR getmyconsnsap (3)\ \-\ \c
+get the CONS NSAP for the local host.
+.HP
+.BR getnamebynsap (3)\ \-\ \c
+get the host name associated with an NSAP.
+.HP
+.BR getnsapbyname (3)\ \-\ \c
+get the NSAP associated with a host name.
+.HP
+.BR gettselbyname (3)\ \-\ \c
+get the TSEL associated with a service name.
+.HP
+.BR nsap2net (3)\ \-\ \c
+convert an NSAP for use with TLI.
+.HP
+.BR tsap2net (3)\ \-\ \c
+convert an NSAP and TSEL use with TLI.
+.PD
+.RE
+.PP
+This library is incomplete.
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel moduels,
+.I SVR 4.2 STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and
+development environment for the development and execution of
+.B @PACKAGE_TITLE@
+protoocl stack components and applications for the
+.I Linux Fast-STREAMS
+environment.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.PP
+This package is currently incomplete.  It is being released as a reference
+oint for the community.  If you are interested in completion of this package,
+contact
+.RB < info@openss7.org >.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ ) package contains the following
+manual pages:
+.HP
+.BR getmyclnsnsap (3)\ \-\ \c
+get the CLNS NSAP for the local host.
+.PD 0
+.HP
+.BR getmyconsnsap (3)\ \-\ \c
+get the CONS NSAP for the local host.
+.HP
+.BR getnamebynsap (3)\ \-\ \c
+get the host name associated with an NSAP.
+.HP
+.BR getnsapbyname (3)\ \-\ \c
+get the NSAP associated with a host name.
+.HP
+.BR gettselbyname (3)\ \-\ \c
+get the TSEL associated with a service name.
+.HP
+.BR libosi (3)\ \-\ \c
+the
+.I SunLink OSI
+compatible library.
+.HP
+.BR nsap2net (3)\ \-\ \c
+convert an NSAP into a \fBnetbuf\fR(3) buffer for use with TLI.
+.HP
+.BR tsap2net (3)\ \-\ \c
+convert an NSAP and TSEL into a \fBnetbuf\fR(3) buffer for use with TLI.
+.PD
+.HP
+.BR clnp (4)\ \-\ \c
+the CLNS TLI device.
+.PD 0
+.HP
+.BR clns (4)\ \-\ \c
+the CLNS network driver.
+.HP
+.BR cmot (4)\ \-\ \c
+the CMOT (CMISE over TCP) module.
+.HP
+.BR cons (4)\ \-\ \c
+the CONS network driver.
+.HP
+.BR ISO (4)\ \-\ \c
+the ISO/OSI driver subsystem.
+.HP
+.BR iso-ip (4)\ \-\ \c
+the OSI CLNS over IP driver.
+.HP
+.BR iso-lan (4)\ \-\ \c
+the OSI CONS over LLC2 driver.
+.HP
+.BR isos (4)\ \-\ \c
+the ISO TP0 over SCTP module.
+.HP
+.BR isot (4)\ \-\ \c
+the ISO TP2 over SCTP module.
+.HP
+.BR iso-udp (4)\ \-\ \c
+the OSI CLNS over UDP driver.
+.HP
+.BR itos (4)\ \-\ \c
+the ISO TP0 over TCP module.
+.HP
+.BR itot (4)\ \-\ \c
+the ISO TP2 over TCP module.
+.HP
+.BR lapb (4)\ \-\ \c
+the X.25 LAPB DL driver.
+.HP
+.BR lpp (4)\ \-\ \c
+the Lightweight Presentation Protocol (LPP) module.
+.HP
+.BR oclt (4)\ \-\ \c
+the OSI CLTS device.
+.HP
+.BR otk6 (4)\ \-\ \c
+the RFC 1006 device.
+.HP
+.BR otpi (4)\ \-\ \c
+the OSI COTS device.
+.HP
+.BR plp (4)\ \-\ \c
+the X.25 PLP CONS driver.
+.HP
+.BR tp0 (4)\ \-\ \c
+the OSI Transport Class 0 (TP0) device.
+.HP
+.BR tp1 (4)\ \-\ \c
+the OSI Transport Class 1 (TP1) device.
+.HP
+.BR tp2 (4)\ \-\ \c
+the OSI Transport Class 2 (TP2) device.
+.HP
+.BR tp3 (4)\ \-\ \c
+the OSI Transport Class 3 (TP3) device.
+.HP
+.BR tp4 (4)\ \-\ \c
+the OSI Transport Class 4 (TP4) device.
+.HP
+.BR tp (4)\ \-\ \c
+the OSI Transport driver.
+.HP
+.BR x25_lapb (4)\ \-\ \c
+the X.25 LAPB DL device.
+.HP
+.BR x25-lapb (4)\ \-\ \c
+the X.25 LAPB DL device.
+.HP
+.BR x25_plp (4)\ \-\ \c
+the X.25 PLP CONS device.
+.HP
+.BR x25-plp (4)\ \-\ \c
+the X.25 PLP CONS device.
+.HP
+.BR xol (4)\ \-\ \c
+the X.25 LLC2 DL device.
+.HP
+.BR xos (4)\ \-\ \c
+the X.25 CONS over SCTP module.
+.HP
+.BR xot (4)\ \-\ \c
+the X.25 CONS over TCP module.
+.PD
+.HP
+.BR striso (5)\ \-\ \c
+this manual page.
+.PD
+.HP
+.BR npi_osi (7)\ \-\ \c
+the NPI for OSI.
+.PD
+.HP
+.BR striso_mknod (8)\ \-\ \c
+OSI device node creation and removal.
+.PD
+.\"
+.\"
+.SH MODULES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+modules:
+.HP
+.BR cmot (4)\ \-\ \c
+CMISE/CMIP over TCP module.
+.PD 0
+.HP
+.BR isos (4)\ \-\ \c
+ISO Transport (TP0) over SCTP module.
+.HP
+.BR isot (4)\ \-\ \c
+ISO Transport (TP0) over TCP module.
+.HP
+.BR itos (4)\ \-\ \c
+ISO Transport (TP2) over SCTP module.
+.HP
+.BR itot (4)\ \-\ \c
+ISO Transport (TP2) over TCP module.
+.HP
+.BR lpp (4)\ \-\ \c
+Lightweigth Presentation Protocol (LPP) module.
+.HP
+.BR xot (4)\ \-\ \c
+X.25 over TCP (XOT) module.
+.PD
+.\"
+.\"
+.SH DRIVERS
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+drivers:
+.HP
+.BR clns (4)\ \-\ \c
+OSI CLNS
+.[
+x233
+.]
+multiplexing driver.
+.PD 0
+.HP
+.BR cons (4)\ \-\ \c
+OSI CONS
+.[
+x223
+.]
+multiplexing driver.
+.HP
+.BR tp (4)\ \-\ \c
+OSI COTS
+.[
+x224
+.]
+multiplexing driver.
+.HP
+.BR x25-lapb (4)\ \-\ \c
+X.25
+.[
+x25
+.]
+LAPB Data Link driver.
+.HP
+.BR x25-plp (4)\ \-\ \c
+X.25
+.[
+x25
+.]
+Packet Layer Protocol (PLP)
+CONS driver.
+.PD
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+devices:
+.TP
+.B /dev/clnp
+.I SunLink OSI
+compatible CONS
+.[
+x223
+.]
+device.
+.TP
+.B /dev/oclt
+.I SunLink OSI
+compatible CLTS
+.[
+x234
+.]
+device.
+.TP
+.B /dev/otpi
+.I SunLink OSI
+compatible COTS
+.[
+x224
+.]
+device.
+.TP
+.B /dev/otk6
+.I SunLink OSI
+compatible RFC 1006
+.[
+rfc1006
+.]
+device.
+.TP
+.BR /dev/clns ", " /dev/clns_cm
+OSI CLNS multiplexing driver
+.BR clone (4)
+user and connection management device.
+.TP
+.BR /dev/cons ", " /dev/cons_cm
+OSI CONS multiplexing driver
+.BR clone (4)
+user and connection management device.
+.TP
+.BR /dev/tp0 ", " /dev/tp1 ", " /dev/tp2 ", " /dev/tp3 ", " /dev/tp4
+Classed devices for the OSI COTS
+.[
+x233
+.]
+driver
+.BR tp (4).
+.TP
+.BR /dev/plp
+X.25
+.[
+x25
+.]
+CONS
+.[
+x223
+.]
+device.
+.TP
+.BR /dev/lapb
+X.25
+.[
+x25
+.]
+data link device.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR getmyclnsnsap (3),
+.BR getmyconsnsap (3),
+.BR getnamebynsap (3),
+.BR getnsapbyname (3),
+.BR gettselbyname (3),
+.BR libosi (3),
+.BR nsap2net (3),
+.BR tsap2net (3),
+.BR clnp (4),
+.BR clns (4),
+.BR cmot (4),
+.BR cons (4),
+.BR iso-ip (4),
+.BR iso-lan (4),
+.BR isos (4),
+.BR isot (4),
+.BR iso-udp (4),
+.BR itos (4),
+.BR itot (4),
+.BR lapb (4),
+.BR lpp (4),
+.BR ns-tcp (4),
+.BR oclt (4),
+.BR otk6 (4),
+.BR otpi (4),
+.BR plp (4),
+.BR tcpns (4),
+.BR tp0 (4),
+.BR tp1 (4),
+.BR tp2 (4),
+.BR tp3 (4),
+.BR tp4 (4),
+.BR tp (4),
+.BR x25_lapb (4),
+.BR x25-lapb (4),
+.BR x25_plp (4),
+.BR x25-plp (4),
+.BR xol (4),
+.BR xos (4),
+.BR xot (4),
+.BR striso (5),
+.BR npi_osi (7),
+.BR striso_mknod (8),
+.IR STREAMS (9).
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
