@@ -1,3 +1,9 @@
+2006-10-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: removed redundant debug flags
+	* src/modules/inet/rawip.c: removed redundant debug flags
+	* src/modules/inet/udp.c": removed redundant debug flags
+
 2006-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

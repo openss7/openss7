@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 20:15:49 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 10:19:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 20:15:49 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:19:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.2  2006/10/12 10:19:35  brian
+ - removed redundant debug flags
+
  Revision 0.9.2.1  2006/09/25 20:15:49  brian
  - rationalized to strinet and strxnet
 
@@ -167,10 +170,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 20:15:49 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 10:19:35 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 20:15:49 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 10:19:35 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -248,7 +251,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 20:15:49 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 10:19:35 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -629,7 +632,7 @@ tp_alloc(void)
 /* Must always be bottom-half versions to avoid lock badness.  But give these
  * different names to avoid conflict with generic definitions.  */
 
-//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+//#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 #if 1
 
 #define spin_lock_str2(__lkp, __flags) \

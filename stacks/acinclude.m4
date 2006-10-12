@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/02 11:31:26 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/12 10:19:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:26 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 10:19:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -266,39 +266,6 @@ AC_DEFUN([_SS7_CHECK_SCTP], [dnl
 # =============================================================================
 
 # =============================================================================
-# _SS7_SETUP_DEBUG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_SS7_SETUP_DEBUG], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
-    case "$linux_cv_debug" in
-    _DEBUG)
-	AC_DEFINE_UNQUOTED([SS7_CONFIG_DEBUG], [], [Define to perform
-			    internal structure tracking within SS7 as well as
-			    to provide additional /proc filesystem files for
-			    examining internal structures.])
-	;;
-    _TEST)
-	AC_DEFINE_UNQUOTED([SS7_CONFIG_TEST], [], [Define to perform
-			    performance testing with debugging.  This mode
-			    does not dump massive amounts of information into
-			    system logs, but peforms all assertion checks.])
-	;;
-    _SAFE)
-	AC_DEFINE_UNQUOTED([SS7_CONFIG_SAFE], [], [Define to perform
-			    fundamental assertion checks.  This is a safer
-			    mode of operation.])
-	;;
-    _NONE | *)
-	AC_DEFINE_UNQUOTED([SS7_CONFIG_NONE], [], [Define to perform no
-			    assertion checks but report software errors.  This
-			    is the smallest footprint, highest performance
-			    mode of operation.])
-	;;
-    esac
-])# _SS7_SETUP_DEBUG
-# =============================================================================
-
-# =============================================================================
 # _SS7_OTHER_SCTP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7_OTHER_SCTP], [dnl
@@ -377,7 +344,6 @@ AC_DEFUN([_SS7_SETUP], [dnl
     _SS7_OTHER_SCTP
     _SS7_SETUP_MODULE
     _SS7_CONFIG_KERNEL
-    _SS7_SETUP_DEBUG
 ])# _SS7_SETUP
 # =============================================================================
 
