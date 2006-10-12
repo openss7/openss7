@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/03 13:53:03 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:26:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:53:03 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 10:26:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.7  2006/10/12 10:26:37  brian
+# - removed redundant debug flags
+#
 # Revision 0.9.2.6  2006/10/03 13:53:03  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -194,38 +197,6 @@ AC_DEFUN([_SOCK_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
-# _SOCK_SETUP_DEBUG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_SOCK_SETUP_DEBUG], [dnl
-    case "$linux_cv_debug" in
-	_DEBUG)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [1], [Define to perform
-		    internal structure tracking within the STREAMS executive
-		    as well as to provide additional /proc filesystem files
-		    for examining internal structures.])
-	    ;;
-	_TEST)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TEST], [1], [Define to perform
-		    performance testing with debugging.  This mode does not
-		    dump massive amounts of information into system logs, but
-		    peforms all assertion checks.])
-	    ;;
-	_SAFE)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAFE], [1], [Define to perform
-		    fundamental assertion checks.  This is a safer mode of
-		    operation.])
-	    ;;
-	_NONE | *)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NONE], [1], [Define to perform
-		    no assertion checks but report software errors.  This is
-		    the smallest footprint, highest performance mode of
-		    operation.])
-	    ;;
-    esac
-])# _SOCK_SETUP_DEBUG
-# =============================================================================
-
-# =============================================================================
 # _SOCK_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SOCK_SETUP], [dnl
@@ -234,7 +205,6 @@ AC_DEFUN([_SOCK_SETUP], [dnl
     _GENKSYMS
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
-    _SOCK_SETUP_DEBUG
     _LINUX_STREAMS
     _STRCOMP
     _XNS

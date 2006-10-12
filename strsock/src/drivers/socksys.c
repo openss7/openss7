@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/05 12:20:37 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 10:26:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/05 12:20:37 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:26:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.5  2006/10/12 10:26:38  brian
+ - removed redundant debug flags
+
  Revision 0.9.2.4  2006/10/05 12:20:37  brian
  - updates for release
 
@@ -76,9 +79,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/05 12:20:37 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 10:26:38 $"
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/05 12:20:37 $";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 10:26:38 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -127,7 +130,7 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/05 12:20:37 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 10:26:38 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -223,7 +226,7 @@ MODULE_STATIC struct streamtab socksys_info = {
 /* Must always be bottom-half versions to avoid lock badness.  But give these
  * different names to avoid conflict with generic definitions.  */
 
-//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+//#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 #if 1
 
 #define spin_lock_str2(__lkp, __flags) \
