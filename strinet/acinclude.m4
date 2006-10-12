@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2006/10/02 11:31:41 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/10/12 10:23:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:41 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 10:23:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -225,39 +225,6 @@ AC_DEFUN([_INET_CHECK_INET], [dnl
 # =============================================================================
 
 # =============================================================================
-# _INET_SETUP_DEBUG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_INET_SETUP_DEBUG], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
-    case "$linux_cv_debug" in
-    _DEBUG)
-	AC_DEFINE_UNQUOTED([INET_CONFIG_DEBUG], [], [Define to perform
-			    internal structure tracking within INET as well as
-			    to provide additional /proc filesystem files for
-			    examining internal structures.])
-	;;
-    _TEST)
-	AC_DEFINE_UNQUOTED([INET_CONFIG_TEST], [], [Define to perform
-			    performance testing with debugging.  This mode
-			    does not dump massive amounts of information into
-			    system logs, but peforms all assertion checks.])
-	;;
-    _SAFE)
-	AC_DEFINE_UNQUOTED([INET_CONFIG_SAFE], [], [Define to perform
-			    fundamental assertion checks.  This is a safer
-			    mode of operation.])
-	;;
-    _NONE | *)
-	AC_DEFINE_UNQUOTED([INET_CONFIG_NONE], [], [Define to perform no
-			    assertion checks but report software errors.  This
-			    is the smallest footprint, highest performance
-			    mode of operation.])
-	;;
-    esac
-])# _INET_SETUP_DEBUG
-# =============================================================================
-
-# =============================================================================
 # _INET_OTHER_SCTP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_OTHER_SCTP], [dnl
@@ -335,7 +302,6 @@ dnl _XOPEN
     _INET_OTHER_SCTP
     _INET_SETUP_MODULE
     _INET_CONFIG_KERNEL
-    _INET_SETUP_DEBUG
 ])# _INET_SETUP
 # =============================================================================
 
