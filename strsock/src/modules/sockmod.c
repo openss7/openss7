@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/05 12:20:38 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 20:25:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/05 12:20:38 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 20:25:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/05 12:20:38 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 20:25:39 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/05 12:20:38 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 20:25:39 $";
 
 /*
  *  SOCKMOD - A socket module for Linux Fast-STREAMS.
@@ -119,7 +119,7 @@ static char const ident[] =
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/05 12:20:38 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 20:25:39 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"
@@ -132,6 +132,7 @@ static char const ident[] =
 			SMOD_REVISION
 
 #ifdef LINUX
+#ifdef CONFIG_STREAMS_SOCKMOD_MODULE
 MODULE_AUTHOR(SMOD_CONTACT);
 MODULE_DESCRIPTION(SMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SMOD_DEVICE);
@@ -141,6 +142,7 @@ MODULE_LICENSE(SMOD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sockmod");
 #endif
+#endif				/* CONFIG_STREAMS_SOCKMOD_MODULE */
 #endif				/* LINUX */
 
 #ifndef SMOD_MOD_NAME
@@ -176,8 +178,8 @@ static struct module_info smod_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static struct module_stat smod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat smod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat smod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat smod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int smod_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int smod_close(queue_t *, int, cred_t *);
@@ -756,10 +758,10 @@ static int sock_tpi_mmap(struct file *, struct socket *, struct vm_area_struct *
 static int sock_tpi_sendpage(struct socket *, struct page *, int, size_t, int);
 
 struct proto_ops tpi_socket_ops = {
-	.family = 0,		/* huh? what a bad place to put this */
+	.family = 0,			/* huh? what a bad place to put this */
 #ifdef HAVE_KMEMB_STRUCT_PROTO_OPS_OWNER
 	.owner = THIS_MODULE,
-#endif				/* HAVE_KMEMB_STRUCT_PROTO_OPS_OWNER */
+#endif					/* HAVE_KMEMB_STRUCT_PROTO_OPS_OWNER */
 	.release = &sock_tpi_release,
 	.bind = &sock_tpi_bind,
 	.connect = &sock_tpi_connect,
@@ -770,17 +772,17 @@ struct proto_ops tpi_socket_ops = {
 	.ioctl = &sock_tpi_ioctl,
 #ifdef HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_IOCTL
 	.compat_ioctl = &sock_tpi_compat_ioctl,
-#endif				/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_IOCTL */
+#endif					/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_IOCTL */
 	.listen = &sock_tpi_listen,
 	.shutdown = &sock_tpi_shutdown,
 	.setsockopt = &sock_tpi_setsockopt,
 	.getsockopt = &sock_tpi_getsockopt,
 #ifdef HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_GETSOCKOPT
 	.compat_setsockopt = &sock_tpi_compat_setsockopt,
-#endif				/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_GETSOCKOPT */
+#endif					/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_GETSOCKOPT */
 #ifdef HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_SETSOCKOPT
 	.compat_getsockopt = &sock_tpi_compat_getsockopt,
-#endif				/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_SETSOCKOPT */
+#endif					/* HAVE_KMEMB_STRUCT_PROTO_OPS_COMPAT_SETSOCKOPT */
 	.sendmsg = &sock_tpi_sendmsg,
 	.recvmsg = &sock_tpi_recvmsg,
 	.mmap = &sock_tpi_mmap,
@@ -805,6 +807,12 @@ struct proto_ops tpi_socket_ops = {
  * It is possible under Linux-Fast STREAMS that we can just transform the Stream into a socket.
  * This can be accomplished most easily by setting the inode to look like a socket (place a struct
  * socket inside of it and set i_sock) and implement the socket.ops as above.
+ *
+ * On further investigation that will not work even on 2.4.  Unfortunately, the system call entry
+ * points access sock->sk structure, so it must be present and sane.  This means that we need to
+ * create a new socket and sockfs file entry, remove the STREAMS file pointer from the file
+ * descriptor, add the socket file pointer to the file descriptor, and attache the STREAMS file
+ * pointer to the socket somewhere.  This technique should work for both LFS and LIS.
  *
  * The trick here is when sockmod is pushed to transform the Stream head into a socket (from the
  * filesystem and system call perspective).  This can be accomplished most eaily in a similar manner
@@ -886,12 +894,14 @@ smod_close(queue_t *q, int oflag, cred_t *crp)
 
 unsigned short modid = MOD_ID;
 
+#ifdef CONFIG_STREAMS_SOCKMOD_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SOCKMOD module. (0 for allocation.)");
+#endif				/* CONFIG_STREAMS_SOCKMOD_MODULE */
 
 /*
  *  Linux Fast-STREAMS Registration

@@ -1,5 +1,7 @@
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/sockmod.c: comments
+
 	* acinclude.m4: removed redundant debug flags
 	* src/drivers/socksys.c: removed redundant debug flags
 	* src/include/sys/strsock/config.h.in: removed redundant debug flags
