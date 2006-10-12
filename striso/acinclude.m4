@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/02 11:31:47 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/12 10:24:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:47 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 10:24:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -188,39 +188,6 @@ AC_DEFUN([_ISO_CHECK_SCTP], [dnl
 # =============================================================================
 
 # =============================================================================
-# _ISO_SETUP_DEBUG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_ISO_SETUP_DEBUG], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
-    case "$linux_cv_debug" in
-    _DEBUG)
-	AC_DEFINE_UNQUOTED([ISO_CONFIG_DEBUG], [], [Define to perform
-			    internal structure tracking within ISO as well as
-			    to provide additional /proc filesystem files for
-			    examining internal structures.])
-	;;
-    _TEST)
-	AC_DEFINE_UNQUOTED([ISO_CONFIG_TEST], [], [Define to perform
-			    performance testing with debugging.  This mode
-			    does not dump massive amounts of information into
-			    system logs, but peforms all assertion checks.])
-	;;
-    _SAFE)
-	AC_DEFINE_UNQUOTED([ISO_CONFIG_SAFE], [], [Define to perform
-			    fundamental assertion checks.  This is a safer
-			    mode of operation.])
-	;;
-    _NONE | *)
-	AC_DEFINE_UNQUOTED([ISO_CONFIG_NONE], [], [Define to perform no
-			    assertion checks but report software errors.  This
-			    is the smallest footprint, highest performance
-			    mode of operation.])
-	;;
-    esac
-])# _ISO_SETUP_DEBUG
-# =============================================================================
-
-# =============================================================================
 # _ISO_OTHER_SCTP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_OTHER_SCTP], [dnl
@@ -249,7 +216,6 @@ dnl _XOPEN
     _ISO_OTHER_SCTP
     _ISO_SETUP_MODULE
     _ISO_CONFIG_KERNEL
-    _ISO_SETUP_DEBUG
 ])# _ISO_SETUP
 # =============================================================================
 

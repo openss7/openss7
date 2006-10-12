@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:15 $
+ @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 10:24:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/10 10:44:15 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:24:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: itot.c,v $
+ Revision 0.9.2.3  2006/10/12 10:24:51  brian
+ - removed redundant debug flags, and got itot compiling
+
  Revision 0.9.2.2  2006/10/10 10:44:15  brian
  - updates for release, lots of additions and workup
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:15 $"
+#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 10:24:51 $"
 
 static char const ident[] =
-    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:15 $";
+    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 10:24:51 $";
 
 /*
  *  ISO Transport over TCP (ITOT)
@@ -87,7 +90,7 @@ static char const ident[] =
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ITOT_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:15 $"
+#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 10:24:51 $"
 #define ITOT_DEVICE	"SVR 4.2 STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL"
