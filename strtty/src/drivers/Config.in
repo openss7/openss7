@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:51:03 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/09/29 11:51:03 $ by $Author: brian $
+## Last Modified $Date: 2006/10/12 09:37:40 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Config.in,v $
+## Revision 0.9.2.3  2006/10/12 09:37:40  brian
+## - completed much of the strtty package
+##
 ## Revision 0.9.2.2  2006/09/29 11:51:03  brian
 ## - libtool library tweaks in Makefile.am
 ## - better rpm spec handling in *.spec.in
@@ -94,7 +97,8 @@
 ##driver	socksys		socksys	*
 ##driver	unix		unix	*
 ##driver	xnet		xnet	*
-driver		pty		pty	127	256	2
+driver		ptm		ptm	127	256	2
+driver		pts		pts	128	256	2
 
 ##
 ## this must be 30 for iBCS compatibility
@@ -113,7 +117,8 @@ driver		pty		pty	127	256	2
 ##objname	driver	unix		unix
 ##objname	driver	xnet		xnet
 ##objname	driver	inet		inet
-objname	driver	pty	    pty
+objname	driver	ptm	    pty
+objname	driver	pts	    pty
 
 ##
 ## Autopush specifications
@@ -196,23 +201,23 @@ loadable    pty
 ##node	/dev/ticots_ord	     c	0666	inet		42
 ##node	/dev/ticots	     c	0666	inet		43
 ##node	/dev/ticlts	     c	0666	inet		44
-node	/dev/ptmx	     c	0666	230		128
-node	/dev/pty/0	     c	0666	pty		0
-node	/dev/pty/1	     c	0666	pty		1
-node	/dev/pty/2	     c	0666	pty		2
-node	/dev/pty/3	     c	0666	pty		3
-node	/dev/pty/4	     c	0666	pty		4
-node	/dev/pty/5	     c	0666	pty		5
-node	/dev/pty/6	     c	0666	pty		6
-node	/dev/pty/7	     c	0666	pty		7
-node	/dev/pty/8	     c	0666	pty		8
-node	/dev/pty/9	     c	0666	pty		9
-node	/dev/pty/10	     c	0666	pty		10
-node	/dev/pty/11	     c	0666	pty		11
-node	/dev/pty/12	     c	0666	pty		12
-node	/dev/pty/13	     c	0666	pty		13
-node	/dev/pty/14	     c	0666	pty		14
-node	/dev/pty/15	     c	0666	pty		15
+node	/dev/ptmx	     c	0666	230		ptm
+node	/dev/pts/0	     c	0666	pts		0
+node	/dev/pts/1	     c	0666	pts		1
+node	/dev/pts/2	     c	0666	pts		2
+node	/dev/pts/3	     c	0666	pts		3
+node	/dev/pts/4	     c	0666	pts		4
+node	/dev/pts/5	     c	0666	pts		5
+node	/dev/pts/6	     c	0666	pts		6
+node	/dev/pts/7	     c	0666	pts		7
+node	/dev/pts/8	     c	0666	pts		8
+node	/dev/pts/9	     c	0666	pts		9
+node	/dev/pts/10	     c	0666	pts		10
+node	/dev/pts/11	     c	0666	pts		11
+node	/dev/pts/12	     c	0666	pts		12
+node	/dev/pts/13	     c	0666	pts		13
+node	/dev/pts/14	     c	0666	pts		14
+node	/dev/pts/15	     c	0666	pts		15
 
 # get strload to fill these out
 

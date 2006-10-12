@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/03 13:53:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/12 09:37:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:53:20 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 09:37:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2006/10/12 09:37:35  brian
+# - completed much of the strtty package
+#
 # Revision 0.9.2.7  2006/10/03 13:53:20  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -110,13 +113,20 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
-				  @PACKAGE_TARNAME@_mknod
-
-pkglibexec_PROGRAMS		= \
+				  @PACKAGE_TARNAME@_mknod \
 				  test-tty
 
-sbin_PROGRAMS			= \
+pkglibexec_PROGRAMS		=
+if WITH_LFS
+pkglibexec_PROGRAMS		+= \
+				  test-tty
+endif
+
+sbin_PROGRAMS			=
+if WITH_LFS
+sbin_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod
+endif
 
 bin_PROGRAMS			= 
 
@@ -167,16 +177,25 @@ libTTYlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libTTYlink_a_OBJECTS):	$(libTTYlink_a_SOURCES) $(libTTYlink_a_DEPENDENCIES)
 
-EXTRA_libTTYmods_a_SOURCES	= 
+EXTRA_libTTYmods_a_SOURCES	= src/modules/pckt.c \
+				  src/modules/ptem.c \
+				  src/modules/ttcompat.c \
+				  src/modules/ldterm.c
 libTTYmods_a_SOURCES		= 
+if WITH_LFS
+libTTYmods_a_SOURCES		+=  $(EXTRA_libTTYmods_a_SOURCES)
+endif
 libTTYmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libTTYmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libTTYmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libTTYmods_a_OBJECTS):	$(libTTYmods_a_DEPENDENCIES)
 
-EXTRA_libTTYdrvs_a_SOURCES	= 
-libTTYdrvs_a_SOURCES		= 
+EXTRA_libTTYdrvs_a_SOURCES	= src/drivers/pty.c 
+libTTYdrvs_a_SOURCES		=
+if WITH_LFS
+libTTYdrvs_a_SOURCES		+= $(EXTRA_libTTYdrvs_a_SOURCES)
+endif
 libTTYdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libTTYdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libTTYdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)

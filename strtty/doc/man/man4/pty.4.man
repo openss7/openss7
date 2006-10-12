@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pty.4.man,v 0.9.2.2 2006/10/06 12:18:59 brian Exp $
+.\" @(#) $Id: pty.4.man,v 0.9.2.3 2006/10/12 09:37:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:18:59 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/12 09:37:37 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pty.4.man,v $
+.\" Revision 0.9.2.3  2006/10/12 09:37:37  brian
+.\" - completed much of the strtty package
+.\"
 .\" Revision 0.9.2.2  2006/10/06 12:18:59  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -91,140 +94,273 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .HP
-.BI "int fd = open(" \fR\(lq/dev/ptmx\(rq\fP ", " \fRO_RDWR\fP );
+.BI "int fd = open(" \(lq/dev/ptmx\(rq ", O_RDWR);
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-To use the pseudo-terminal subsystem, a node for the master side driver,
+.B pty
+is an implementation of
+.I UNIX98
+.[
+susv2
+.]
+pseudo-terminals for
+.B Linux Fast-STREAMS
+using a
+.IR STREAMS -based
+terminal subsystem compatible with that described in the
+.IR "SVR 4 SPG" ,
+.[
+svr4spg
+.]
+Stevens,
+.[
+advprog
+%P Ch. 19 (Pseudo-Terminals)
+.]
+and
+.IR "The Magic Garden" .
+.[
+magic
+%P Sect. 7.13.1 (Pseudo terminals)
+.]
+.PP
+One
+.BR clone (4)
+device node is created for the master side,
 .BR /dev/ptmx ,
 and
-.I N
-number of slave drivers
-.RI ( N
-is determined at installation time)
-must be installed.  The names of the slave devices are
-.BI /dev/pts/M
-where
+.RI ` N '
+nodes are created for the slave side,
+.BI /dev/pts/ M\fR,
+where,
 .I M
-has the values zero
+is a number from zero
 .RB ( 0 )
 through
-.IB N -1\fR.
-A user accesses the pseudo-terminal device throug the master device (called
-.BR ptm )
-that in turm is access through the clone driver, see
-.BR clone (4).
-The master device is set up as a clone device where it major device number is the major for the
-clone device and its minor device number is the major for the
-.B ptm
-driver.
+.RI ` N '.
+The default for
+.RI ` N '
+is 512; but, see under
+.RI \(lq NOTICES \(rq,
+below.
 .PP
-The master is opened using the
+Master devices,
+.BR ptm ,
+are associated with corresponding slave devices
+.BR pts .
+The major device number of a master device is the major device number of the
+.B ptm
+driver; the slave, the
+.B pts
+driver.
+Master and slave devices that correspond to each other, however, have the same
+minor device (instance) number.
+.PP
+The master driver and slave driver have the following characteristics:
+.IP \(bu \w'\(bu\(em'u
+Master devices can only be opened once.
+.IP \(bu
+When the master side of a pseudo-terminal is closed and the slave side is
+still open, the master driver sends an
+.BR M_HANGUP (9)
+message to the slave side to indicate the hangup.
+.IP ""
+When the slave side Stream
+head receives the
+.BR M_HANGUP (9)
+message, the normal semantics for
+.I STREAMS
+causes all subsequent write operations on the slave to fail with error number
+.RB [ ENXIO ]
+and subsequent read operations to return terminal end-of-file once all the
+availabled data has been read.  Terminal end-of-file is indicated by a zero
+.RB ( 0 )
+return from the
+.BR read (2s)
+system call or a zero control and data part returned from the
+.BR getmsg (2)
+or
+.BR getpmsg (2s)
+system calls.
+.IP \(bu
+Slave devices can only be opened once
+they have been unlocked (see
+.RI \(lq USAGE \(rq,
+below).
+.IP \(bu
+On the last close of the slave device, a zero-length message is sent to the
+master.
+.IP ""
+Receipt of a zero-length message at the master side Stream head causes a
+terminal end-of-file condition to be indicated to the master, however, write
+side operations are still successful.  When the control process receives the
+terminal end-of-file condition, it can either close the master side,
+dismantling the pseudo-terminal, or it can keep the master side open awaiting
+a subsequent open of the slave device.  Pseudo-terminal devices can be reused
+in this fashion without relinquishing the master device.
+.IP ""
+To keep the slave device from erroneously sending a zero-length message that
+causes the master to hangup, the
+.BR ptem (4)
+module discards zero length messages written to the slave side.
+.IP \(bu
+When master and slave device are both open, a full duplex communications path
+exists from one to the other.
+The master and slave devices pass all
+.I STREAMS
+messages to their adjacent queues unaltered with the excpection of
+.BR M_FLUSH (9)
+messages.
+.IP ""
+.BR M_FLUSH (9)
+messages receive some additional processing to reverse the sense of
+the
+.BR M_FLUSH (9)
+bits is a manner identical to the
+.BR pipemod (4)
+module for a
+.IR STREAMS -based
+.BR pipe (4).
+As the read queue of the master is connected to the write queue of the slave,
+and visa versa, the
+.B FLUSHR
+flag is changed to a
+.B FLUSHW
+flag, and visa versa.  This ensures that the Stream head on the other side
+will flush the appropriate queues.
+.\"
+.\"
+.SH USAGE
+.PP
+The master device is opened using the
+.BR openpt (3tty)
+library call.  This results in an
 .BR open (2s)
-system call with
-.B /dev/ptmx
-as the device to be opened.  The clone open finds the next available minor device for that major
-device; a master device is available only if it and its corresponding slave device are not already
-open.  There are no nodes in the file system for master devices.
-
-When the master device is opened, the corresponding slave device is automatically locked out.  No
-user may open the slave device until it is unlocked.  A user may invoke a function,
-.BR grantpt (3),
-that will change the owner of the slave device to that of the user who is running this process.
-Once the permissions have been changed, the device may be unlocked by the user.  Only the owner or
-superuser can access the slave device.  The user must then invoke the
-.BR unlockpt (3)
-function to unlock the slave device.  Before opening the slave device, the user must call the
-.BR ptsname (3)
-function to obtain the name of the slave device.  The functions
-.BR grantpt (3),
-.BR unlockpt (3),
+of the appropriate
+.BR clone (4)
+master pseudo-terminal device, typically
+.BR /dev/ptmx .
+The
+.BR clone (4)
+open of the master device assigns an available minor device number for the
+.B ptm
+driver.  A minor device number associated with the
+.B ptm
+driver is considered available when neither the master nor the slave device
+is open for the associated minor device.
+.PP
+When the master device is opened, the corresponding slave device is
+automatically locked out.  No user can open the corresponding slave device
+until it is unlocked.
+.PP
+Once the master device is opened, the user process can determine the device
+node name in the file system of the corresponding slave device using the
+library call
+.BR ptsname (3tty).
+.BR ptsname (3tty)
+can be used in this fashion at any time that a master device is open.
+.BR ptsname (3tty)
+uses the
+.BR ISPTM
+input-output control supported by the
+.B ptm
+driver as described under
+.RI \(lq IOCTLS \(rq,
+below.
+.PP
+The user process that opened the master device can change permissions on the
+slave device before it is unlocked with a call to the library function
+.BR grantpt (3tty).
+This function will change the owner of the slave device node in the
+file system to that of the user invoking the
+.BR grantpt (3tty)
+function.
+.BR grantpt (3tty)
+also sets group ownership to
+.RB \(lq tty \(rq
+and group write permission.  This is to automatically support programs such as
+.BR write (1)
 and
-.BR ptsname (3)
-are called with the file descriptor of the master device.  The user may then invoke the open system
-call with the name that was returned by the
-.BR ptsname (3)
-function to open the slave device.
+.BR wall (1),
+that are setgid to
+.RB \(lq tty \(rq,
+to write to the slave device.
+.BR grantpt (3tty)
+uses the
+.BR ZONEPT
+input-output control supported by the
+.B ptm
+driver as described under
+.RI \(lq IOCTLS \(rq,
+below.
+.PP
+Once permissions have been changed to that of the calling process,
+the calling process can use
+.BR chown (2)
+and
+.BR chmod (2)
+as normal to set whatever ownership and permissions are appropriate for the
+slave side.
+Throughout this process, the slave side pseudo-terminal device remains locked.
+Any attempt to open the device will fail with error
+.RB [ EACCES ].
+.PP
+Once permissions have been changed appropriately, the device may be unlocked
+with a call to the library function
+.BR unlockpt (3tty).
+Once unlocked, any process can open the slave device node name (returned by
+.BR ptsname (3tty))
+to open the slave device.
+.BR unlockpt (3tty)
+uses the
+.BR UNLKPT
+input-output control supported by the
+.B ptm
+driver as described under
+.RI \(lq IOCTLS \(rq,
+below.
 .PP
 See
 .RI \(lq EXAMPLES \(rq,
 below.
 .PP
-Unrelated processes may open the pseudo-terminal devices.  The intitial user may pass the master
-file descriptor using a
+When both the master and slave devices are open, the user process at either
+end has a file descriptor to a
+.I STREAMS
+character device which provides a full duplex communications path to
+the other, similar to a
 .IR STREAMS -based
-pipe or a slave name to another process to enable it to open the slave.  After the slave device is
-open, the owner is free to change the permissions.
-
-Certain programs such as
-.BR write (1)
-and
-.BR wall (1)
-are setgid to
-.RB \(lq tty \(rq
-and are also able to access the slave device (for write).
-.PP
-After both the master and slave have been opened,  the user has two file descriptors which provide
-full duplex communication using two Streams.  The two Streams are automatically connected.  The user
-may then push modules onto either side of the Stream.  The user also needs to push
+.BR pipe (4).
+The two Streams are automatically connected.  The user on either side of the
+pseudo-terminal may push modules onto either Stream.
+For a fully functional pseudo-terminal, the user process with the slave side
+open should push the
 .BR ptem (4)
 and
 .BR ldterm (4)
-modules onto the slave side of the pseudo-terminal subsystem to get terminal semantics.  The master
-may push the
+modules onto the slave side of the pseudo-terminal to provide terminal
+semantics; the user process on the master side, should push the
 .BR pckt (4)
-module onto the master side of the pseudo-terminal subsystem to place the master Stream into packet
-mode.
-.PP
-The master and slave drivers pass all
-.I STREAMS
-messagse to their adjacent queues.  Only the
-.BR M_FLUSH (9)
-needs some processing.  Because the read queue of one side is connected ot the write queue of the
-other, the
-.BR FLUSHR
-flag is changed to
-.BR FLUSHW ,
-and visa versa.
-.PP
-When the master device is closed, a
-.BR M_HANGUP (9)
-message is sent to the slave device which will render the device unusable.  The process on the slave
-side get the
-.IR errno (3)
-.RB [ ENXIO ]
-when attempting to write on that Stream but it will be able to read any data remaining on the Stream
-head read queue.  When all the data has been read,
-.BR read (2s)
-returns zero
-.RB ( 0 )
-indicating that the Stream can no longer be used.
-.PP
-On the last close of the slave device, a zero-length message is sent to the master device.  When the
-application on the master side issues a
-.BR read (2s)
-or
-.BR getmsg (2)
-call, and zero
-.RB ( 0 )
-is returned, the user of the master device decides whether to issue a close that dismantles the
-pseudo-terminal subsystem.  If the master device is not closed, the pseudo-terminal subsystem will
-be available to another user to open the slave device.
-.PP
-Since zero-length messages are used to indicate that the process on the slave side has closed and
-should be interpreted that way by the process on the master side, applications on the slave side
-should not write zero-length messages.  If that occurs, the write returns zero
-.RB ( 0 ),
-and the zero-length message is discarded by the
-.BR ptem (4)
-module.
+module to place the master Stream into packet mode.
 .PP
 The standard
 .I STREAMS
 system calls can access the pseudo-terminal devices.  The slave devices support the
 .BR O_NDELAY " and " O_NONBLOCK
-flags.  Since the master side does not act like a termnal, if
+flags using
+.I TTY semantics
+as described under the system calls
+.BR read (2s)
+and
+.BR write (2s).
+Note that
+.BR ldterm (4)
+is responsible for setting the Stream head on the slave side to terminal
+semantics.
+.PP
+Since the master side does not act like a terminal, if
 .BR O_NONBLOCK " or " O_NDELAY
 is set, read on the master side returns with the
 .IR errno (3)
@@ -237,6 +373,12 @@ with
 set to
 .RB [ EAGAIN ]
 if there is internal flow control.
+This is normal
+.I STREAMS semantics
+as described under the system calls
+.BR read (2s)
+and
+.BR write (2s).
 .PP
 When data are written to the master side, the entire block of data written is treated as a single
 line.  The slave side process reading the terminal receives the entire block of data.  Data are not
@@ -252,34 +394,32 @@ input-output control.  When a process on the master side issues a
 input-output control, the argument is the number of the signal that should be sent.  The specified
 signal is then sent to the process group on the slave side.
 .PP
-The master driver and slave driver have the following characteristics:
-.IP \(bu \w'\(bu\(em'u
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.\"
-.\"
-.\".SH USAGE
-.\".PP
+Note that the
+.B TIOCSIGNAL
+input-output control is not processed by the
+.BR ptm
+driver nor
+.BR pts
+driver, but is passed directly to the
+.BR ptem (4)
+module on the slave side of the pseudo-terminal device.  See
+.BR ptem (4)
+for more information as to which input-output controls can be issued by the
+master side of a pseudo-terminal device.
 .\"
 .\"
 .SH IOCTLS
 .PP
 The master driver supports the
-.BR ISPTM " and " UNLKPT
+.BR ISPTM ", " ZONEPT " and " UNLKPT
 input-output controls that are used by the functions
-.BR grantpt (3),
-.BR unlockpt (3),
-and
-.BR ptsname (3).
+.BR ptsname "(3), " grantpt "(3) and " unlockpt (3).
 The command,
 .IR command ,
 to the
 .BR ioctl (2s)
-call is either
-.BR ISPTM " or " UNLKPT
+call is one of
+.BR ISPTM ", " ZONEPT " or " UNLKPT
 and the
 argument,
 .IR arg ,
@@ -290,19 +430,48 @@ call is zero
 On failure, minus one
 .RB ( -1 )
 is returned.
+.PP
+These input-output control commands are only recognized by the
+master side of a pseudo-terminal device.
 .\"
 .SS ISPTM
 .PP
-The input-output control
+The input-output control command
 .B ISPTM
 determines whether the file descriptor is that of an open master device.  On success, it returns the
 major/minor number (type
 .BR dev_t )
 of the master deivce which can be used to determine the name of the corresponding slave device.
+.PP
+The
+.B ISPTM
+input-output control command
+is used by the
+.BR ptsname (3tty)
+library call to determine the name of the corresponding slave device.
+.\"
+.SS ZONEPT
+.PP
+The input-output control command
+.B ZONEPT
+set the ownership permissions of the slave device node in the file system to
+that of the calling processes (i.e, the process that issued the input-output
+control).  It also sets group ownership to
+.RB \(lq tty \(rq,
+and group permissions to write-only.
+.PP
+The
+.B ZONEPT
+input-output control command
+is used by the
+.BR grantpt (3tty)
+library call to set permissions against
+.BR specfs (5)
+device nodes in the file system.
 .\"
 .SS UNLKPT
 .PP
-The input-output control
+The input-output control command
 .B UNLKPT
 unlocks the master and slave devices.  It returns zero
 .RB ( 0 )
@@ -311,36 +480,182 @@ on success.  On failure, the
 is set to
 .RB [ EINVAL ]
 indicating that the master device is not open.
+.PP
+The
+.BR UNLKPT
+input-output control command
+is used by the
+.BR unlockpt (3tty)
+library call to unlock the slave device.
 .\"
 .\"
-.\".SH NOTICES
-.\".PP
+.SH NOTICES
+.PP
+Use of the pseudo-terminal or terminal subsystem for
+.I STREAMS
+requires the installation of the
+.B @PACKAGE_TITLE@
+package,
+.BR @PACKAGE@ (5).
+This package installs the devices listed under heading,
+.RI \(lq DEVICES \(rq.
+.PP
+On Linux 2.6 systems, or Linux 2.4 systems with extended device
+numbering, and with the
+.BR specfs (5)
+file system mounted on
+.BR /dev/streams,
+the number of slave devices is almost unlimited.  Application can open 65536
+slave devices by opening
+.BI /dev/streams/pts/ M\fR,
+where
+.I M
+is a number from zero
+.RB ( 0 )
+through 65535.
+See also under
+.RI \(lq DEVICES \(rq,
+below.
+.PP
+Unlike the
+.I BSD
+pseudo-terminal subsystem, there are no device nodes in file system master
+side pseudo-terminal devices (i.e, the
+.BI /dev/ptc N
+devices of
+.IR BSD ).
+Only the
+.BR clone (4)
+device,
+.BR /dev/pmtx
+exists.
+.PP
+Note that unrelated processes may open the slave device.  It is possible to
+pass the open master side file descriptor on a
+.IR STREAMS -based
+.BR pipe (4)
+to another process at the other end of the pipe.  Also, it is possible to pass
+the name acquired using
+.BR ptsname (3tty)
+to pass the slave side device node name in the file system to another process.
+.PP
+Note also, that the slave side device is a normal
+.I STREAMS
+character device in the file system, and that the owner of the slave device or
+the super user is always able to change ownership and permissions using
+.BR chown (2)
+or
+.BR chmod (2).
+The process that has opened the slave device is also able to change ownership
+and permissions using
+.BR fchown (2)
+or
+.BR fchmod (2).
 .\"
 .\"
 .SH EXAMPLES
 .PP
-.RS
+The following provides an example of opening, releasing and unlocking a
+pseudo-terminal device:
+.sp
+.RS 2
 .nf
 \fC\s-1\
 int fdm, fds;
 char *slavename;
 extern char *ptsname();
 
-fdm = open("/dev/ptmx", O_RDWR); /* open master */
-grantpt(fdm);                    /* change permission of slave */
-unlockpt(fdm);                   /* unlock slave */
-slavename = ptsname(fdm);        /* get name of slave */
-fds = open(slavename, O_RDWR);   /* open slave */
-ioctl(fds, I_PUSH, "ptem");      /* push ptem */
-ioctl(fds, I_PUSH, "ldterm");    /* push ldterm */
-ioctl(fdm, I_PUSH, "pckt");      /* push pckt */
+fdm = open("/dev/ptmx", O_RDWR);  /* open master */
+grantpt(fdm);                     /* change permission of slave */
+unlockpt(fdm);                    /* unlock slave */
+slavename = ptsname(fdm);         /* get name of slave */
+fds = open(slavename, O_RDWR);    /* open slave */
+if (fork() == 0) {
+    close(fdm);                   /* close master */
+    ioctl(fds, I_PUSH, "ptem");   /* push ptem */
+    ioctl(fds, I_PUSH, "ldterm"); /* push ldterm */
+    exec( /* some program */ );
+}
+close(fds);                       /* close slave */
+ioctl(fdm, I_PUSH, "pckt");       /* push pckt */
+...
 \s+1\fP
 .fi
 .RE
 .\"
 .\"
-.\".SH MODULES
-.\".PP
+.SH MODULES
+.PP
+Several modules normally used with the
+.B ptm
+and
+.B pts
+drivers are as follows:
+.TP \w'\fBldterm\fR(4)\(em'u
+.BR ptem (4)
+A pseudo-terminal hardware emulation module (PTEM) that is normally pushed
+onto the slave side of a pseudo-terminal device.  See
+.BR ptem (4),
+for more information.
+.TP
+.BR pckt (4)
+A packetization module (PCKT) that is normally pushed onto the master side of
+a pseudo-terminal device.  See
+.BR pckt (4)
+for more information.
+.TP
+.BR ldterm (4)
+A line discipline terminal module (LDTERM) that is normally pushed onto the
+slave side of a pseudo-terminal device (after
+.BR ptem (4))
+that (together with
+.BR ptem (4))
+provides a line discipline to the slave-side process.
+.\"
+.\"
+.SH DEVICES
+.PP
+Devices provided by the
+.BR ptm
+and
+.BR pts
+drivers are as follows:
+.TP
+.BR /dev/ptmx
+This is the master side
+.BR clone (4)
+device for the
+.B ptm
+driver.  It is the device that can be opened by the
+.BR openpt (3tty)
+library call.
+.TP
+.BR /dev/streams/ptm/ptmx ", " /dev/streams/clone/ptm
+This is two
+.BR specfs (5)
+versions of the master side
+.BR clone (4)
+device that are equivalent to
+.BR /dev/ptmx .
+.TP
+.BI /dev/pts/ N
+These are the slave side device nodes.  On Linux 2.4 systems without extended
+device numbering the maximum number of addressable devices in the external
+file system is limited to 255 per major device number.  Two major device
+numbers are allocated for the
+.BR pts
+driver on these systems for a total of 512 minor device numbers.
+.TP
+.BI /dev/streams/pts/ N
+These are the slave side device nodes when the
+.BR specfs (5)
+file system is mounted on
+.BR /dev/streams .
+These devices provide 65536 addressable slave side devices numbered from
+.BR /dev/streams/pts/0
+through
+.BR /dev/streams/pts/65635
+on all Linux 2.4 and Linux 2.6 systems.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -394,7 +709,66 @@ uw7doc
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+Portable applications will use the
+.BR openpt (3tty)
+library call instead of opening the
+.BR /dev/ptmx
+device directly.
 .IP \(em
+Only
+.IR Solaris \(rg
+implements the
+.B ZONEPT
+input-output control.  This
+.B @PACKAGE_TITLE@
+implementation is incompatible with
+.IR Solaris \(rg
+which uses different mechanisms.
+Other implementations use a user-space programs to perform the function
+provided by
+.BR grantpt (3tty).
+See
+.BR grantpt (3tty),
+for more information.
+.IP ""
+Portable applications will use the
+.BR grantpt (3tty)
+library call instead of using the
+.BR ZONEPT
+input-output control directly.
+.IP \(em
+Some implementations such as
+.IR OSF/1 \(rg
+document a
+.BR TIOCPCKT
+input output control on the master side that is used instead of pushing the
+.BR pckt (4)
+module.
+For compatibility, the
+.B ptm
+driver should be made to enable an honor this input-output control, but it has
+not yet.
+.IP ""
+Portable applications programs will, therefore, push the
+.BR pckt (4)
+module when placing the master side Stream into packet mode.
+.IP \(em
+Some implementations such as
+.IR OSF/1 \(rg
+document that the slave side automatically performs the functions of
+.BR ptem (4)
+and that the
+.BR ptem (4)
+module is a null module.
+.IP ""
+Portable applications programs will, therefore, always push the
+.BR ptem (4)
+module on the slave side of a pseudo-terminal.  This could also be ensured by
+placing an
+.BR autopush (8)
+specification against the slave side devices that autopush the
+.BR ptem (4)
+module.
 .PP
 See
 .BR STREAMS (9)
@@ -427,7 +801,7 @@ susv3
 .\"
 .SH HISTORY
 .PP
-.B pckt
+.BR ptm " and " pts
 first appeared in SVR 3.
 .[
 svr3

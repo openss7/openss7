@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $
+ @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:14 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 09:37:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ptem.c,v $
+ Revision 0.9.2.3  2006/10/12 09:37:42  brian
+ - completed much of the strtty package
+
  Revision 0.9.2.2  2006/10/02 11:32:14  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $"
+#ident "@(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
 
 static char const ident[] =
-    "$RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $";
+    "$RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $";
 
 /*
  * PTEM - Pseudo Terminal Emulation Module.
@@ -129,9 +132,12 @@ References
 
 #include <sys/os7/compat.h>
 
+#include <sys/strtty.h>
+#include <ttcompat.h>
+
 #define PTEM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTEM_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $"
+#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
 #define PTEM_DEVICE		"SVR 4.2 STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL"
@@ -144,6 +150,7 @@ References
 				PTEM_REVISION
 
 #ifdef LINUX
+#ifdef CONFIG_STREAMS_PTEM_MODULE
 MODULE_AUTHOR(PTEM_CONTACT);
 MODULE_DESCRIPTION(PTEM_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PTEM_DEVICE);
@@ -153,6 +160,7 @@ MODULE_LICENSE(PTEM_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-ptem");
 #endif				/* MODULE_ALIAS */
+#endif				/* CONFIG_STREAMS_PTEM_MODULE */
 #endif				/* LINUX */
 
 #ifndef CONFIG_STREAMS_PTEM_NAME
@@ -169,7 +177,7 @@ MODULE_PARM(modid, "h");
 #else				/* module_param */
 module_param(modid, ushort, 0);
 #endif				/* module_param */
-MODULE_PARM_DESC(modid, "Module ID for SC.");
+MODULE_PARM_DESC(modid, "Module ID for PTEM (0 for allocation).");
 
 #ifdef MODULE_ALIAS
 #ifdef LFS
@@ -216,7 +224,7 @@ struct ptem {
  * enough, it will be contained in a FASTBUF that will be in a memory cache
  * anyway.
  */
-#define PTEM_PRIV(__q) ((struct ptem *)(__q)->q_ptr)
+#define PTEM_PRIV(__q)	    ((struct ptem *)((__q)->q_ptr))
 
 /* 
  *  Write-Side Processing
@@ -274,9 +282,6 @@ ptem_w_msg(queue_t *q, mblk_t *mp)
 			goto nak;
 
 		switch (ioc->ioc_cmd) {
-			struct termio *tio;
-			struct termios *tios;
-
 		case TCSETAF:
 			/* Note, if properly handled the M_FLUSH message will never be queued and
 			   upon successful return from this function, we have already processed the
@@ -363,51 +368,60 @@ ptem_w_msg(queue_t *q, mblk_t *mp)
 		case TCGETA:
 		{
 			struct termio *c;
+			extern void __struct_termio_is_too_large_for_fastbuf(void);
 
 			if (FASTBUF < sizeof(struct termio))
-				__undefined_call_makes_compile_fail();
+				__struct_termio_is_too_large_for_fastbuf();
 			count = sizeof(*c);
 			bp->b_rptr = bp->b_datap->db_base;
 			bp->b_wptr = bp->b_rptr + count;
-			c = (typeof(c)) b->b_rptr;
+			c = (typeof(c)) bp->b_rptr;
 
 			c->c_iflag = p->c.c_iflag;
 			c->c_oflag = p->c.c_oflag;
 			c->c_cflag = p->c.c_cflag;
 			c->c_lflag = p->c.c_lflag;
 			c->c_line = p->c.c_line;
-			bcopy(p->c.c_cc, p->c_cc, NCC);
+			bcopy(p->c.c_cc, p->c.c_cc, NCC);
 
 			goto ack;
 		}
 		case TCGETS:
+		{
+			extern void __struct_termios_is_too_large_for_fastbuf(void);
+
 			if (FASTBUF < sizeof(struct termios))
-				__undefined_call_makes_compile_fail();
-			count = sizeof(tp->c);
+				__struct_termios_is_too_large_for_fastbuf();
+			count = sizeof(p->c);
 			bp->b_rptr = bp->b_datap->db_base;
 			bp->b_wptr = bp->b_rptr + count;
 			*((struct termios *) bp->b_rptr) = p->c;
 			goto ack;
+		}
+		case TIOCGWINSZ:
+		{
+			extern void __struct_winsize_is_too_large_for_fastbuf(void);
 
-		case TIOCGWSIZ:
 			if (!(p->flags & PTEM_HAVE_WINSIZE))
 				goto nak;
 			if (FASTBUF < sizeof(struct winsize))
-				__undefined_call_makes_compile_fail();
-			count = sizeof(tp->ws);
+				__struct_winsize_is_too_large_for_fastbuf();
+			count = sizeof(p->ws);
 			bp->b_rptr = bp->b_datap->db_base;
 			bp->b_wptr = bp->b_rptr + count;
 			*((struct winsize *) bp->b_rptr) = p->ws;
 			goto ack;
-
+		}
+#ifdef JWINSIZE
 		case JWINSIZE:
 		{
 			struct jwinsize *jws;
+			extern void __struct_jwinsize_is_too_large_for_fastbuf(void);
 
 			if (!(p->flags & PTEM_HAVE_WINSIZE))
 				goto nak;
 			if (FASTBUF < sizeof(struct jwinsize))
-				__undefined_call_makes_compile_fail();
+				__struct_jwinsize_is_too_large_for_fastbuf();
 			/* always have room in a fastbuf */
 			count = sizeof(*jws);
 			bp->b_rptr = bp->b_datap->db_base;
@@ -421,6 +435,7 @@ ptem_w_msg(queue_t *q, mblk_t *mp)
 
 			goto ack;
 		}
+#endif				/* JWINSIZE */
 		case TIOCSWINSZ:
 		{
 			struct winsize *ws;
@@ -677,14 +692,16 @@ ptem_r_msg(queue_t *q, mblk_t *mp)
 		}
 		goto ack;
 	case TIOCGWINSZ:
+	{
 		/* Keeps track of the informaiton needed for teh TIOCSWINSZ, TIOCGWINSZ, JWINSIZE,
 		   input-output control commands. */
 		struct ptem *p = PTEM_PRIV(q);
+		extern void __struct_winsize_is_too_large_for_fastbuf(void);
 
 		if (!(p->flags & PTEM_HAVE_WINSIZE))
 			goto nak;
 		if (FASTBUF < sizeof(struct winsize)) {
-			__undefined_call_makes_compile_fail();
+			__struct_winsize_is_too_large_for_fastbuf();
 		}
 		/* always have room in a fastbuf */
 		count = sizeof(p->ws);
@@ -692,6 +709,8 @@ ptem_r_msg(queue_t *q, mblk_t *mp)
 		bp->b_wptr = bp->b_rptr + count;
 		*(struct winsize *) bp->b_rptr = p->ws;
 		goto ack;
+	}
+#ifdef JWINSIZE
 	case JWINSIZE:
 		/* Keeps track of the informaiton needed for teh TIOCSWINSZ, TIOCGWINSZ, JWINSIZE,
 		   input-output control commands. */
@@ -714,6 +733,7 @@ ptem_r_msg(queue_t *q, mblk_t *mp)
 		jws->bitsy = p->ws.ws_ypixel;
 		goto ack;
 	}
+#endif				/* JWINSIZE */
 	case TIOCSWINSZ:
 		/* Keeps track of the informaiton needed for teh TIOCSWINSZ, TIOCGWINSZ, JWINSIZE,
 		   input-output control commands. */
@@ -764,22 +784,32 @@ ptem_r_msg(queue_t *q, mblk_t *mp)
 		count = 0;
 		goto ack;
 	}
+#ifdef TIOCSIGNAL
 	case TIOCSIGNAL:
+#endif				/* TIOCSIGNAL */
+#ifdef O_TIOCSIGNAL
+	case O_TIOCSIGNAL:
+#endif				/* O_TIOCSIGNAL */
 	{
 		uint s;
 
 		if (!pullupmsg(bp, sizeof(s)))
 			goto nak;
-		if ((s = *(uint *) bp->b_rptr) > NSIG || s == 0)
+		if ((s = *(uint *) bp->b_rptr) > _NSIG || s == 0)
 			goto nak;
-		if (!putnextctl(q, M_PCSIG, s)) {
+		if (!putnextctl1(q, M_PCSIG, s)) {
 			error = EAGAIN;
 			goto nak;
 		}
 		count = 0;
 		goto ack;
 	}
+#ifdef TIOCREMOTE
 	case TIOCREMOTE:
+#endif				/* TIOCREMOTE */
+#ifdef O_TIOCREMOTE
+	case O_TIOCREMOTE:
+#endif				/* O_TIOCREMOTE */
 	{
 		struct ptem *p = PTEM_PRIV(q);
 		struct iocblk *ctl;
@@ -796,10 +826,10 @@ ptem_r_msg(queue_t *q, mblk_t *mp)
 		mb->b_wptr += sizeof(*ctl);
 		bzero(ctl, sizeof(ctl));
 		if (*(uint *) bp->b_rptr) {
-			ctl->ioc_cmd = MC_NO_CANNON;
+			ctl->ioc_cmd = MC_NO_CANON;
 			p->flags |= PTEM_REMOTE_MODE;
 		} else {
-			ctl->ioc_cmd = MC_DO_CANNON;
+			ctl->ioc_cmd = MC_DO_CANON;
 			p->flags &= ~PTEM_REMOTE_MODE;
 		}
 		putnext(q, mb);
@@ -912,7 +942,7 @@ ptem_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	if (q->q_ptr)
 		return (0);	/* already open */
-	if (sflag == MODOPEN && _WR(q)->q_next != NULL) {
+	if (sflag == MODOPEN && WR(q)->q_next != NULL) {
 		struct stroptions *so;
 		struct ptem *p;
 		mblk_t *mp, *hp;
@@ -947,10 +977,8 @@ ptem_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		p->c.c_oflag = OPOST | ONLCR | TAB3;
 		p->c.c_cflag = 0;
 		p->c.c_lflag = ISIG | ICANON | ECHO | ECHOK;
-		p->c.c_ispeed = 0;
-		p->c.c_ospeed = 0;
 
-		q->q_ptr = _WR(q)->q_ptr = (void *) p;
+		q->q_ptr = WR(q)->q_ptr = (void *) p;
 		qprocson(q);
 
 		putnext(q, mp);
@@ -966,10 +994,11 @@ ptem_qclose(queue_t *q, int oflag, cred_t *crp)
 	struct ptem *p;
 
 	if ((p = PTEM_PRIV(q))) {
+		mblk_t *mp;
 
 		/* didn't hang up, do it now */
 		if ((mp = xchg(&p->zero, NULL)))
-			putnext(_WR(q), mp);
+			putnext(WR(q), mp);
 
 		qprocsoff(q);
 		q->q_ptr = WR(q)->q_ptr = NULL;
@@ -987,24 +1016,24 @@ ptem_qclose(queue_t *q, int oflag, cred_t *crp)
  * ---------------------------------------------------------------------------
  */
 
-static struct qinit ptem_rqinit = {
-	.qi_putp = ptem_rput,		/* Read-side put procedure. */
-	.qi_qopen = ptem_qopen,		/* Each open. */
+static struct qinit ptem_rinit = {
+	.qi_putp = ptem_rput,	/* Read-side put procedure. */
+	.qi_qopen = ptem_qopen,	/* Each open. */
 	.qi_qclose = ptem_qclose,	/* Last close. */
 	.qi_minfo = &ptem_minfo,	/* Module information. */
 	.qi_mstat = &ptem_rstat,	/* Module statistics. */
 };
 
-static struct qinit ptem_wqinit = {
-	.qi_putp = ptem_wput,		/* Write-side put procedure. */
-	.qi_srvp = ptem_wsrv,		/* Write-side service procedure. */
+static struct qinit ptem_winit = {
+	.qi_putp = ptem_wput,	/* Write-side put procedure. */
+	.qi_srvp = ptem_wsrv,	/* Write-side service procedure. */
 	.qi_minfo = &ptem_minfo,	/* Module information. */
 	.qi_mstat = &ptem_wstat,	/* Module statistics. */
 };
 
 static struct streamtab ptem_info = {
-	.st_rdinit = &ptem_rqinit,
-	.st_wrinit = &ptem_wqinit,
+	.st_rdinit = &ptem_rinit,
+	.st_wrinit = &ptem_winit,
 };
 
 #ifdef LIS
@@ -1026,9 +1055,9 @@ ptem_init(void)
 	int err;
 
 #ifdef CONFIG_STREAMS_PTEM_MODULE
-	cmn_err(CE_NOTE, PCKT_BANNER);
+	cmn_err(CE_NOTE, PTEM_BANNER);
 #else
-	cmn_err(CE_NOTE, PCKT_SPLASH);
+	cmn_err(CE_NOTE, PTEM_SPLASH);
 #endif
 	ptem_minfo.mi_idnum = modid;
 	if ((err = register_strmod(&ptem_fmod)) < 0)

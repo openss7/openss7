@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/01 21:56:36 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:36 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/01 21:56:36 $ by $Author: brian $
+## Last Modified $Date: 2006/10/12 09:37:36 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -114,7 +114,7 @@ info_name = info-$(VERSION)
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
 
-modules = streams-pty streams-ptem streams-ldterm streams-pckt
+modules = streams-pty streams-ptem streams-ldterm streams-pckt streams-ttcompat
 preloads =
 libraries =
 tools = strtty_mknod
@@ -454,6 +454,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.3  2006/10/12 09:37:36  brian
+# - completed much of the strtty package
+#
 # Revision 0.9.2.2  2006/10/01 21:56:36  brian
 # - get debian rules working better
 #

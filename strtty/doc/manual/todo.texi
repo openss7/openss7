@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=78 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2006/08/29 11:49:06 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2006/10/12 09:37:39 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/29 11:49:06 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/12 09:37:39 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -63,17 +63,66 @@ Things to do:
 @item
 Testing.  This package is completely untested.
 
+This remains to be done.
+
 @item
-Create an @manref{ldterm(4)} @cite{Line Discipline for Terminals} @dfn{STREAMS} module.
+Create a library @manref{libtty(3)} to hold the library functions for use with
+this package:
+
+@multitable @columnfractions .05 .45 .50
+@item @tab @manref{openpt(3)}
+@item @tab @manref{grantpt(3)}
+@item @tab @manref{ptsname(3)}
+@item @tab @manref{unlockpt(3)}
+@end multitable
+
+This remains to be done.
+
+@item
+Create an @manref{ldterm(4)} @cite{Line Discipline for Terminals}
+@dfn{STREAMS} module.  This item remains to be done.  Al that is in place
+right now is a skeleton module.
+
+@item
+Create a @manref{ttcompat(4)} @cite{TTY Compatibility} @dfn{STREAMS} module.
+
+@emph{*done*}
+
+Created a @manref{ttcompat(4)} module.  This module compiles and installs and
+is fully documented, but is completely untested.
+
+@item
+Create a @manref{pckt(4)} @cite{Packet Mode} @dfn{STREAMS} module.
+
+@emph{*done*}
+
+Created a @manref{pckt(4)} module.  This module compiles and installs and is
+fully documented, but is completely untested.
+
+@item
+Create a @manref{ptem(4)} @cite{Pseudo-Terminal Emulation} @dfn{STREAMS}
+module.
+
+@emph{*done*}
+
+Created a @manref{ptem(4)} module.  This module compiles and installs and is
+fully documented,  but is completely untested.
 
 @item
 Create a @manref{pty(4)} @cite{Pseudo-Terminal} @dfn{STREAMS} driver.  This
 driver will provide both slave (@manref{pts(4)}) and master (@manref{ptm(4)})
 @dfn{STREAMS} devices.
 
+@emph{*done*}
+
+Created @manref{ptm(4)} and @manref{pts(4)} driver.  This driver compiles and
+installs and is fully documented, but is completely untested.
+
 @item
 Move already written code from the @file{stacks} or @file{strss7} directories
 into the @file{src} directory.
+
+@emph{*done*}
 
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
@@ -86,11 +135,12 @@ You are reading it.
 
 The @command{@value{PACKAGE}} package is currently incomplete.
 
-The purpose of the package was to move @dfn{STREAMS} terminal capabilities
-outside of the @dfn{STREAMS} release package so as to allow them to be used
-with both @cite{LiS} and @cite{Linux Fast-STREAMS}.  As @cite{Linux
-Fast-STREAMS} has already shown superior to @cite{LiS} in terms of both
-performance and conformance, it is no longer necessary to keep these packages
-separate and they can be combined once again (or still) with @cite{Linux
-Fast-STREAMS}.
+The purpose of the package was to provide @dfn{STREAMS} terminal capabilities
+for @cite{Linux Fast-STREAMS}.  These drivers and modules cannot possibly work
+with @cite{LiS}: @cite{LiS} does not provide TTY semantics at the Stream head
+and is incapable of providing a controlling terminal, and does not do POSIX
+job control.  The package will only build and install with @cite{Linux
+Fast-STREAMS}
 
+If someone is interested in this package, a contribution of a working
+@manref{ldterm(4)} module would be good.  Also, testing could be performed.

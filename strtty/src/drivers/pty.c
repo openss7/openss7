@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:26 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/03 13:53:26 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 09:37:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.3  2006/10/12 09:37:40  brian
+ - completed much of the strtty package
+
  Revision 0.9.2.2  2006/10/03 13:53:26  brian
  - changes to pass make check target
  - added some package config.h files
@@ -65,9 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:26 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $"
 
-static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:26 $";
+static char const ident[] =
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -80,19 +84,19 @@ static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $)
  *  LFS.
  */
 
-#include <sys/os8/compat.h>
+#include <sys/os7/compat.h>
 
-#ifdef LINUX
-#undef ASSERT
+#include <linux/termios.h>
+#include <sys/termios.h>
+#include <sys/pty.h>
 
 #include <linux/bitops.h>
 #include <linux/interrupt.h>
-
-#include <sys/pty.h>
+#include <linux/spinlock.h>
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:26 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
@@ -100,16 +104,29 @@ static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 			PTY_COPYRIGHT	"\n" \
 			PTY_REVISION	"\n" \
 			PTY_DEVICE	"\n" \
-			PTY_CONTACT	"\n" \
+			PTY_CONTACT
 #define PTY_SPLASH	PTY_DEVICE	" - " \
 			PTY_REVISION
 
+#if defined(CONFIG_STREAMS_PTM_MODULE) || defined(CONFIG_STREAMS_PTS_MODULE)
+#define CONFIG_STREAMS_PTY_MODULE 1
+#endif
+
+#ifdef LINUX
 #ifdef CONFIG_STREAMS_PTY_MODULE
 MODULE_AUTHOR(PTY_CONTACT);
 MODULE_DESCRIPTION(PTY_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PTY_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(PTY_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-pty");
+MODULE_ALIAS("streams-ptm");
+MODULE_ALIAS("streams-pts");
+#endif				/* MODULE_ALIAS */
 #endif				/* CONFIG_STREAMS_PTY_MODULE */
+#endif				/* LINUX */
 
 #define PTM_DRV_ID	CONFIG_STREAMS_PTM_MODID
 #define PTM_DRV_NAME	CONFIG_STREAMS_PTM_NAME
@@ -140,6 +157,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PTS_MAJOR));
 MODULE_ALIAS("/dev/streams/ptm");
 MODULE_ALIAS("/dev/streams/ptm/*");
 MODULE_ALIAS("/dev/streams/clone/ptm");
+MODULE_ALIAS("/dev/streams/ptm/ptmx");
 MODULE_ALIAS("/dev/streams/pts");
 MODULE_ALIAS("/dev/streams/pts/*");
 MODULE_ALIAS("/dev/streams/clone/pts");
@@ -175,11 +193,13 @@ STATIC struct module_stat ptm_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)
 STATIC streamscall int ptm_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int ptm_qclose(queue_t *, int, cred_t *);
 
+STATIC streamscall int ptm_rput(queue_t *, mblk_t *);
 STATIC streamscall int ptm_wput(queue_t *, mblk_t *);
 STATIC streamscall int ptm_wsrv(queue_t *);
 STATIC streamscall int ptm_rsrv(queue_t *);
 
-STATIC struct qinit ptm_rdinit = {
+STATIC struct qinit ptm_rinit = {
+	.qi_putp = ptm_rput,		/* Put procedure (message from below) */
 	.qi_srvp = ptm_rsrv,		/* Read service procedure. */
 	.qi_qopen = ptm_qopen,		/* Each open */
 	.qi_qclose = ptm_qclose,	/* Last close */
@@ -187,7 +207,7 @@ STATIC struct qinit ptm_rdinit = {
 	.qi_mstat = &ptm_mstat,		/* Module statistics */
 };
 
-STATIC struct qinit ptm_rdinit = {
+STATIC struct qinit ptm_winit = {
 	.qi_putp = ptm_wput,		/* Put procedure (message from above) */
 	.qi_srvp = ptm_wsrv,		/* Write service procedure. */
 	.qi_minfo = &ptm_minfo,		/* Module information */
@@ -195,8 +215,8 @@ STATIC struct qinit ptm_rdinit = {
 };
 
 MODULE_STATIC struct streamtab ptm_info = {
-	.st_rdinit = &ptm_rdinit,	/* Upper read queue */
-	.st_wrinit = &ptm_wrinid,	/* Upper write queue */
+	.st_rdinit = &ptm_rinit,	/* Upper read queue */
+	.st_wrinit = &ptm_winit,	/* Upper write queue */
 };
 
 /* The slave device. */
@@ -215,11 +235,13 @@ STATIC struct module_stat pts_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)
 STATIC streamscall int pts_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int pts_qclose(queue_t *, int, cred_t *);
 
+STATIC streamscall int pts_rput(queue_t *, mblk_t *);
 STATIC streamscall int pts_wput(queue_t *, mblk_t *);
 STATIC streamscall int pts_wsrv(queue_t *);
 STATIC streamscall int pts_rsrv(queue_t *);
 
-STATIC struct qinit pts_rdinit = {
+STATIC struct qinit pts_rinit = {
+	.qi_putp = pts_rput,		/* Put procedure (message from below). */
 	.qi_srvp = pts_rsrv,		/* Read service procedure. */
 	.qi_qopen = pts_qopen,		/* Each open */
 	.qi_qclose = pts_qclose,	/* Last close */
@@ -227,16 +249,16 @@ STATIC struct qinit pts_rdinit = {
 	.qi_mstat = &pts_mstat,		/* Module statistics */
 };
 
-STATIC struct qinit pts_rdinit = {
+STATIC struct qinit pts_winit = {
 	.qi_putp = pts_wput,		/* Put procedure (message from above) */
-	.qi_srvp = pty_wsrv,		/* Write service procedure. */
+	.qi_srvp = pts_wsrv,		/* Write service procedure. */
 	.qi_minfo = &pts_minfo,		/* Module information */
 	.qi_mstat = &pts_mstat,		/* Module statistics */
 };
 
 MODULE_STATIC struct streamtab pts_info = {
-	.st_rdinit = &pts_rdinit,	/* Upper read queue */
-	.st_wrinit = &pts_wrinid,	/* Upper write queue */
+	.st_rdinit = &pts_rinit,	/* Upper read queue */
+	.st_wrinit = &pts_winit,	/* Upper write queue */
 };
 
 /*
@@ -275,6 +297,13 @@ struct ptc {
 	minor_t minor;
 };
 
+STATIC int ptm_majors[PTM_CMAJORS] = { PTM_CMAJOR_0, };
+STATIC int pts_majors[PTS_CMAJORS] = { PTS_CMAJOR_0, };
+
+STATIC kmem_cache_t *ptc_priv_cachep = NULL;
+
+STATIC rwlock_t pty_lock = RW_LOCK_UNLOCKED;
+
 /**
  * ptc_alloc_priv - allocate a private structure for the open routine
  * @q: read queue of opening Stream
@@ -284,7 +313,7 @@ struct ptc {
  * @oflag: open flags
  * @crp: credentials pointer
  */
-STATIC struct ptc *
+STATIC struct ptm *
 ptc_alloc_priv(queue_t *q, struct ptc **ptcp, int mindex, dev_t *devp, int oflag, cred_t *crp)
 {
 	struct ptc *ptc;
@@ -295,7 +324,7 @@ ptc_alloc_priv(queue_t *q, struct ptc **ptcp, int mindex, dev_t *devp, int oflag
 		rwlock_init(&ptc->lock);
 
 		ptc->ptm.rq = q;
-		ptc->ptm.wq = _WR(q);
+		ptc->ptm.wq = WR(q);
 		ptc->ptm.major = getmajor(*devp);
 		ptc->ptm.type = PTY_TYPE_MASTER;
 		ptc->ptm.oflag = oflag;
@@ -311,8 +340,48 @@ ptc_alloc_priv(queue_t *q, struct ptc **ptcp, int mindex, dev_t *devp, int oflag
 
 		ptc->minor = getminor(*devp);
 	}
-	return (&ptc->ptm);
+	return ((struct ptm *) &ptc->ptm);
 }
+
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+#define write_lock_str(__lkp, __flags) \
+	do { (void)__flags; write_lock_bh(__lkp); } while (0)
+#define write_unlock_str(__lkp, __flags) \
+	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
+#define read_lock_str(__lkp, __flags) \
+	do { (void)__flags; read_lock_bh(__lkp); } while (0)
+#define read_unlock_str(__lkp, __flags) \
+	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
+#define local_save_str(__flags) \
+	do { (void)__flags; local_bh_disable(); } while (0)
+#define local_restore_str(__flags) \
+	do { (void)__flags; local_bh_enable(); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+#define write_lock_str(__lkp, __flags) \
+	write_lock_irqsave(__lkp, __flags)
+#define write_unlock_str(__lkp, __flags) \
+	write_unlock_irqrestore(__lkp, __flags)
+#define read_lock_str(__lkp, __flags) \
+	read_lock_irqsave(__lkp, __flags)
+#define read_unlock_str(__lkp, __flags) \
+	read_unlock_irqrestore(__lkp, __flags)
+#define local_save_str(__flags) \
+	local_irq_save(__flags)
+#define local_restore_str(__flags) \
+	local_irq_restore(__flags)
+
+#endif
 
 /**
  * ptc_free_priv - deallocate a private structure for the close routine
@@ -343,8 +412,7 @@ ptc_free_priv(struct ptc *c, struct pty *closing, struct pty *other)
 				/* Masters send M_HANGUP to slaves. */
 				mp->b_datap->db_type = M_HANGUP;
 			else
-				/* Slaves send zero-length data message to
-				   master. */
+				/* Slaves send zero-length data message to master. */
 				mp->b_flag |= MSGDELIM;
 			putnext(other->rq, mp);
 			write_unlock(&c->lock);
@@ -378,6 +446,7 @@ ptm_rput(queue_t *q, mblk_t *mp)
 {
 	if (!putq(q, mp))
 		freemsg(mp);
+	return (0);
 }
 
 STATIC streamscall __unlikely int
@@ -385,6 +454,7 @@ pts_rput(queue_t *q, mblk_t *mp)
 {
 	if (!putq(q, mp))
 		freemsg(mp);
+	return (0);
 }
 
 /*
@@ -399,32 +469,34 @@ pty_rsrv(queue_t *q, struct ptc *c, queue_t **qp)
 {
 	queue_t *wq;
 
-	read_lock(&c->lock, flags);
+	read_lock(&c->lock);
 	{
 		if ((wq = *qp) != NULL) {
 			enableok(wq);
 			qenable(wq);
 		}
 	}
-	read_unlock(&c->lock, flags);
+	read_unlock(&c->lock);
 }
 
-STATIC streamscall
+STATIC streamscall int
 ptm_rsrv(queue_t *q)
 {
 	struct ptc *c = q->q_ptr;
 
 	assert(c);
 	pty_rsrv(q, c, &c->pts.wq);
+	return (0);
 }
 
-STATIC streamscall
+STATIC streamscall int
 pts_rsrv(queue_t *q)
 {
 	struct ptc *c = q->q_ptr;
 
 	assert(c);
 	pty_rsrv(q, c, &c->ptm.wq);
+	return (0);
 }
 
 /*
@@ -470,6 +542,7 @@ ptm_wsrv(queue_t *q)
 	struct ptc *c = q->q_ptr;
 
 	pty_wsrv(q, c, &c->pts.rq);
+	return (0);
 }
 
 STATIC streamscall int
@@ -478,6 +551,7 @@ pts_wsrv(queue_t *q)
 	struct ptc *c = q->q_ptr;
 
 	pty_wsrv(q, c, &c->ptm.rq);
+	return (0);
 }
 
 STATIC streams_noinline __unlikely void
@@ -501,15 +575,15 @@ pty_m_flush(queue_t *wq, mblk_t *mp, queue_t *rq)
 		}
 		putnext(rq, mp);
 	} else {
-		/* reflect it back up our own Stream for proper flushing even
-		   after a hangup at the other end */
+		/* reflect it back up our own Stream for proper flushing even after a hangup at the 
+		   other end */
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(_RD(wq), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(wq), mp->b_rptr[1], FLUSHALL);
 			else
-				flushq(_RD(wq), FLUSHALL);
+				flushq(RD(wq), FLUSHALL);
 			mp->b_rptr[0] &= ~FLUSHW;
-			putnext(_RD(wq), mp);
+			putnext(RD(wq), mp);
 		} else {
 			freemsg(mp);
 		}
@@ -537,9 +611,9 @@ pty_m_other(queue_t *wq, mblk_t *mp, queue_t *rq)
 		pty_m_hangup(wq, mp);
 		return;
 	}
-	if (unlikely(q->q_first != NULL))
+	if (unlikely(wq->q_first != NULL))
 		goto do_putq;
-	if (unlikely(q->q_flag & QSVCBUSY))
+	if (unlikely(wq->q_flag & QSVCBUSY))
 		goto do_putq;
 	if (likely(mp->b_datap->db_type < QPCTL))
 		if (unlikely(!bcanputnext(rq, mp->b_band)))
@@ -558,6 +632,8 @@ pty_wput(queue_t *q, mblk_t *mp, struct ptc *c, queue_t **qp)
 {
 	read_lock(&c->lock);
 	{
+		int type = mp->b_datap->db_type;
+
 		if (likely(type != M_FLUSH))
 			pty_m_other(q, mp, *qp);
 		else
@@ -570,71 +646,186 @@ STATIC streamscall __hot_put int
 ptm_wput(queue_t *q, mblk_t *mp)
 {
 	struct ptc *c = q->q_ptr;
+	int type;
 
-	if (likely(mp->b_datap->db_type != M_IOCTL)) {
-		pty_wput(q, c, &c->pts.rq, mp);
+	if (likely((type = mp->b_datap->db_type) != M_IOCTL && type != M_IOCDATA)) {
+		pty_wput(q, mp, c, &c->pts.rq);
+		return (0);
 	} else {
-		struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+		int rval = 0, error = 0, count = 0;
+		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 		unsigned long flags;
-		int rval = 0, error = 0;
 
-		switch (ioc->ioc_cmd) {
-		default:
-			/* if its not for us */
-			pty_wput(q, c, &c->pts.rq, mp);
-			break;
-		case ISPTM:
-			/* Determines whether the file descriptor is of an open 
-			   master device.  UnixWare returns the device number
-			   on success.  OSF documents the return of the device
-			   number on success.  Solaris returns zero on success
-			   and non-zero (well, -1) on failure.  The library
-			   ptsname() routine can easily do an fstat(2) on the
-			   Stream to retrieve its device number (appropriately
-			   converted).  The only portable method would be if
-			   the return value is not minus one (-1) if it is
-			   zero, do an fstat(2) and get the device number,
-			   otherwise the return value can be used as the device 
-			   number. */
-			rval = makedevice(c->ptm.major, c->minor);
-			goto ack_it;
-		case UNLKPT:
-			/* Unlocks the slave. */
+		switch (type) {
+		case M_IOCTL:
+			switch (ioc->iocblk.ioc_cmd) {
+			default:
+				/* if its not for us */
+				pty_wput(q, mp, c, &c->pts.rq);
+				break;
+			case ISPTM:
+				/* Determines whether the file descriptor is of an open master
+				   device. UnixWare returns the device number on success.  OSF
+				   documents the return of the device number on success.  Solaris
+				   returns zero on success and non-zero (well, -1) on failure.  The 
+				   library ptsname() routine can easily do an fstat(2) on the
+				   Stream to retrieve its device number (appropriately converted).
+				   The only portable method would be if the return value is not
+				   minus one (-1) if it is zero, do an fstat(2) and get the device
+				   number, otherwise the return value can be used as the device
+				   number. */
+				rval = makedevice(c->ptm.major, c->minor);
+				goto ack_it;
+			case UNLKPT:
+				/* Unlocks the slave. */
 
-			write_lock_str(&c->lock, flags);
-			if (c->pts.rq == NULL || c->pts.type == PTY_TYPE_ABSENT) {
+				write_lock_str(&c->lock, flags);
+				if (c->pts.rq == NULL || c->pts.type == PTY_TYPE_ABSENT) {
+					write_unlock_str(&c->lock, flags);
+					rval = -1;
+					error = EINVAL;
+					goto nak_it;
+				}
+				/* auto grant */
+				c->pts.creds = *ioc->iocblk.ioc_cr;
+				c->pts.type = PTY_TYPE_SLAVE;
+				/* ok to unlock it if it is already unlocked, this will just do a
+				   grant */
 				write_unlock_str(&c->lock, flags);
-				rva = -1;
-				error = EINVAL;
-				goto nak_it;
+				goto ack_it;
+
+#ifdef PTSSTTY
+			case PTSSTTY:
+				/* Grants access, sets controlling terminal. */
+				/* Controlling terminal will be set when ptem is pushed. */
+				/* fall through */
+#endif				/* PTSSTTY */
+
+			case ZONEPT:
+				/* Grants access. */
+				write_lock_str(&c->lock, flags);
+				c->pts.creds = *ioc->iocblk.ioc_cr;	/* grant */
+				write_unlock_str(&c->lock, flags);
+				goto ack_it;
+#ifdef TIOCGPTN
+			case TIOCGPTN:	/* passes unsigned int * *//* Get Pty Number (of pty-mux device) Linux defines this. */
+				if (ioc->iocblk.ioc_count == TRANSPARENT) {
+					/* need to do copyout */
+					ioc->copyreq.cq_addr = *(caddr_t *) mp->b_cont->b_rptr;
+					ioc->copyreq.cq_size = sizeof(unsigned int);
+					ioc->copyreq.cq_flag = 0;
+					ioc->copyreq.cq_private = NULL;
+					mp->b_datap->db_type = M_COPYOUT;
+					qreply(q, mp);
+					break;
+				}
+				*(unsigned int *) mp->b_cont->b_rptr = c->minor;
+
+				/* implicit copyout */
+				count = sizeof(unsigned int);
+				rval = 0;
+				error = 0;
+				goto ack_it;
+#endif				/* TIOCGPTN */
+#ifdef TIOCSPTLCK
+			case TIOCSPTLCK:	/* passes int * *//* Lock/unlock Pty: Linux deinfes this. */
+			{
+				if (ioc->iocblk.ioc_count == TRANSPARENT) {
+					/* need to do copyin */
+					ioc->copyreq.cq_addr = *(caddr_t *) mp->b_cont->b_rptr;
+					ioc->copyreq.cq_size = sizeof(int);
+					ioc->copyreq.cq_flag = 0;
+					ioc->copyreq.cq_private = NULL;
+					mp->b_datap->db_type = M_COPYIN;
+					qreply(q, mp);
+					break;
+				}
+				if (ioc->iocblk.ioc_count < sizeof(int)) {
+					rval = -1;
+					error = EINVAL;
+					count = 0;
+					goto nak_it;
+				}
+				write_lock_str(&c->lock, flags);
+				if (c->pts.rq == NULL || c->pts.type == PTY_TYPE_ABSENT) {
+					write_unlock_str(&c->lock, flags);
+					rval = -1;
+					error = EINVAL;
+					count = 0;
+					goto nak_it;
+				}
+				/* autogrant */
+				c->pts.creds = *ioc->iocblk.ioc_cr;
+				/* always grant regardless of locking or unlocking */
+				/* ok to lock locked or unlock unlocked */
+				if (*(int *) mp->b_cont->b_rptr)
+					c->pts.type = PTY_TYPE_LOCKED;
+				else
+					c->pts.type = PTY_TYPE_SLAVE;
+				write_unlock_str(&c->lock, flags);
+				rval = 0;
+				error = 0;
+				count = 0;
+				goto ack_it;
 			}
-			/* auto grant */
-			c->pts.creds = *ioc->ioc_cr;
-			c->pts.type = PTY_TYPE_SLAVE;
-			/* ok to unlock it if it is already unlocked, this will 
-			   just do a grant */
-			write_unlock_str(&c->lock, flags);
-			goto ack_it;
-
-		case ZONEPT:
-			/* Grants access. */
-
-			write_lock_str(&c->lock, flags);
-			c->pts.creds = *ioc->ioc_cr;	/* grant */
-			write_unlock_str(&c->lock, flags);
-			goto ack_it;
-
+#endif				/* TIOCSPTLCK */
+			}
+			break;
+		case M_IOCDATA:
+			switch (ioc->copyresp.cp_cmd) {
+#ifdef TIOCGPTN
+			case TIOCGPTN:
+				if (ioc->copyresp.cp_rval == 0) {
+					/* copyout successful */
+					mp->b_datap->db_type = M_IOCACK;
+					ioc->iocblk.ioc_rval = 0;
+					ioc->iocblk.ioc_error = 0;
+					qreply(q, mp);
+					break;
+				}
+				break;
+#endif				/* TIOCGPTN */
+#ifdef TIOCSPTLCK
+			case TIOCSPTLCK:
+				if (ioc->copyresp.cp_rval == 0) {
+					/* copyin successful */
+					write_lock_str(&c->lock, flags);
+					if (c->pts.rq == NULL || c->pts.type == PTY_TYPE_ABSENT) {
+						write_unlock_str(&c->lock, flags);
+						rval = -1;
+						error = EINVAL;
+						goto nak_it;
+					}
+					/* autogrant */
+					c->pts.creds = *ioc->iocblk.ioc_cr;
+					/* always grant regardless of locking or unlocking */
+					/* ok to lock locked or unlock unlocked */
+					if (*(int *) mp->b_cont->b_rptr)
+						c->pts.type = PTY_TYPE_LOCKED;
+					else
+						c->pts.type = PTY_TYPE_SLAVE;
+					write_unlock_str(&c->lock, flags);
+					count = TRANSPARENT;
+					rval = 0;
+					error = 0;
+					goto ack_it;
+				}
+				break;
+#endif				/* TIOCSPTLCK */
+			}
+			break;
 		      ack_it:
 			mp->b_datap->db_type = M_IOCACK;
 			goto finish;
-		      nack_it:
+		      nak_it:
 			mp->b_datap->db_type = M_IOCNAK;
 			goto finish;
 		      finish:
-			ioc->ioc_rval = rval;
-			ioc->ioc_error = error;
+			ioc->iocblk.ioc_count = count;
+			ioc->iocblk.ioc_rval = rval;
+			ioc->iocblk.ioc_error = error;
 			qreply(q, mp);
-			break;
+			return (0);
 		}
 	}
 	return (0);
@@ -645,7 +836,7 @@ pts_wput(queue_t *q, mblk_t *mp)
 {
 	struct ptc *c = q->q_ptr;
 
-	pty_wput(q, c, &c->ptm.rq, mp);
+	pty_wput(q, mp, c, &c->ptm.rq);
 	return (0);
 }
 
@@ -653,12 +844,7 @@ pts_wput(queue_t *q, mblk_t *mp)
  *  OPEN and CLOSE Routines
  */
 
-STATIC int ptm_majors[PTM_CMAJORS] = { PTM_CMAJOR_0, };
-STATIC int pts_majors[PTS_CMAJORS] = { PTS_CMAJOR_0, };
-
 STATIC struct ptc *ptc_opens = NULL;
-
-STATIC rwlock_t pty_lock = RW_LOCK_UNLOCKED;
 
 /**
  * ptm_open - PTM driver STREAMS open routine
@@ -685,10 +871,9 @@ ptm_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		ptrace(("%s: ERROR: cannot push as module\n", PTM_DRV_NAME));
 		return (EIO);
 	}
-	/* Linux Fast-STREAMS always passes internal major device number
-	   (module id).  Note also, however, that strconf-sh attempts to
-	   allocate module ids that are identical to the base major device
-	   number anyway. */
+	/* Linux Fast-STREAMS always passes internal major device number (module id).  Note also,
+	   however, that strconf-sh attempts to allocate module ids that are identical to the base
+	   major device number anyway. */
 	if (cmajor != PTM_DRV_ID)
 		return (ENXIO);
 
@@ -696,19 +881,18 @@ ptm_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag != CLONEOPEN || cminor != 0)
 		return (ENXIO);
 
-	/* A master device is available only if it and its corresponding slave
-	   device are not already open.  When the master device is opened, the
-	   corresponding slave device is automatically locked out.  Only one
-	   open is allowed on a master device. */
+	/* A master device is available only if it and its corresponding slave device are not
+	   already open.  When the master device is opened, the corresponding slave device is
+	   automatically locked out.  Only one open is allowed on a master device. */
 	write_lock_str(&pty_lock, flags);
-	for (; *ptcp, ptcp = &(*ptcp)->next) {
+	for (; *ptcp; ptcp = &(*ptcp)->next) {
 		if (cmajor != (*ptcp)->ptm.major)
 			break;
 		if (cmajor == (*ptcp)->ptm.major) {
 			if (cminor < (*ptcp)->minor)
 				break;
 			if (cminor == (*ptcp)->minor) {
-				if (++cminor >= PTM_NMINORS) {
+				if (++cminor >= PTM_UNITS) {
 					if (++mindex >= PTM_CMAJORS
 					    || !(cmajor = ptm_majors[mindex]))
 						break;
@@ -757,7 +941,7 @@ ptm_qclose(queue_t *q, int oflag, cred_t *crp)
 	/* make sure procedures are off */
 	qprocsoff(q);
 	ptc_free_priv(c, &c->ptm, &c->pts);
-	q->q_ptr = _WR(q)->q_ptr = NULL;
+	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);
 }
 
@@ -792,10 +976,9 @@ pts_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		ptrace(("%s: ERROR: cannot push as module\n", PTS_DRV_NAME));
 		return (EIO);
 	}
-	/* Linux Fast-STREAMS always passes internal major device number
-	   (module id).  Note also, however, that strconf-sh attempts to
-	   allocate module ids that are identical to the base major device
-	   number anyway. */
+	/* Linux Fast-STREAMS always passes internal major device number (module id).  Note also,
+	   however, that strconf-sh attempts to allocate module ids that are identical to the base
+	   major device number anyway. */
 	if (cmajor != PTS_DRV_ID)
 		return (ENXIO);
 
@@ -818,9 +1001,8 @@ pts_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		write_lock_str(&c->lock, flags);
 		{
 			if (c->pts.type == PTY_TYPE_LOCKED) {
-				/* OSF says that if UNLKPT is not used in
-				   conjunction with the master, the opening of
-				   the corresponding slave will fail with
+				/* OSF says that if UNLKPT is not used in conjunction with the
+				   master, the opening of the corresponding slave will fail with
 				   EPERM. */
 				write_unlock_str(&c->lock, flags);
 				read_unlock(&pty_lock);
@@ -842,10 +1024,10 @@ pts_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
       good_open:
 	{
-		q->q_ptr = _WR(q)->q_ptr = c;
+		q->q_ptr = WR(q)->q_ptr = c;
 
 		c->pts.rq = q;
-		c->pts.wq = _WR(q);
+		c->pts.wq = WR(q);
 		c->pts.type = PTY_TYPE_SLAVE;
 		c->pts.oflag = oflag;
 		c->pts.creds = *crp;
@@ -889,8 +1071,6 @@ pts_qclose(queue_t *q, int oflag, cred_t *crp)
 /*
  *  Private struct reference counting, allocation, deallocation and cache
  */
-STATIC kmem_cache_t *ptc_priv_cachep = NULL;
-
 STATIC __unlikely int
 pty_term_caches(void)
 {
@@ -935,6 +1115,8 @@ pty_init_caches(void)
 unsigned short ptm_modid = PTM_DRV_ID;
 unsigned short pts_modid = PTS_DRV_ID;
 
+#ifdef LINUX
+#ifdef CONFIG_STREAMS_PTY_MODULE
 #ifndef module_param
 MODULE_PARM(ptm_modid, "h");
 MODULE_PARM(pts_modid, "h");
@@ -948,14 +1130,18 @@ MODULE_PARM_DESC(pts_modid, "Module ID for the PTS driver. (0 for allocation.)")
 major_t ptm_major = PTM_CMAJOR_0;
 major_t pts_major = PTS_CMAJOR_0;
 
+#ifdef MODULE_PARM
 MODULE_PARM(ptm_major, "h");
 MODULE_PARM(pts_major, "h");
 #else
-MODULE_PARM(ptm_major, uint, 0);
-MODULE_PARM(pts_major, uint, 0);
+module_param(ptm_major, uint, 0);
+module_param(pts_major, uint, 0);
 #endif
 MODULE_PARM_DESC(ptm_major, "Device number for the PTM driver. (0 for allocation.)");
 MODULE_PARM_DESC(pts_major, "Device number for the PTS driver. (0 for allocation.)");
+#endif
+#endif				/* CONFIG_STREAMS_PTY_MODULE */
+#endif				/* LINUX */
 
 /*
  *  Linux Fast-STREAMS Registration
@@ -980,8 +1166,16 @@ ptm_register_strdev(major_t major)
 {
 	int err;
 
+#if 0
 	if ((err = register_strdev(&ptm_cdev, major)) < 0)
 		return (err);
+#else
+	/* Because we are stealing Linux's device number for pseudo-terminals, we do not want to
+	   publish this device to the external file system nor create device nodes.  Leave it in
+	   the specfs(5) so that it can be accessed with /dev/streams/ptm/ptmx. */
+	if ((err = register_strdrv(&ptm_cdev)) < 0)
+		return (err);
+#endif
 	if ((err = register_strnod(&ptm_cdev, &ptmx, 0)) < 0)
 		pswerr(("Could not register ptmx node, err = %d\n", err));
 	return (0);
@@ -994,8 +1188,13 @@ ptm_unregister_strdev(major_t major)
 
 	if ((err = unregister_strnod(&ptm_cdev, 0)) < 0)
 		pswerr(("Could not unregister ptmx node, err = %d\n", err));
+#if 0
 	if ((err = unregister_strdev(&ptm_cdev, major)) < 0)
 		return (err);
+#else
+	if ((err = unregister_strdrv(&ptm_cdev)) < 0)
+		return (err);
+#endif
 	return (0);
 }
 
@@ -1013,8 +1212,16 @@ pts_register_strdev(major_t major)
 {
 	int err;
 
+#if 0
 	if ((err = register_strdev(&pts_cdev, major)) < 0)
 		return (err);
+#else
+	/* Because we are stealing Linux's device number for pseudo-terminals, we do not want to
+	   publish this device to the external file system nor create device nodes.  Leave it in
+	   the specfs(5) so that it can be accessed with /dev/streams/pts/N. */
+	if ((err = register_strdrv(&pts_cdev)) < 0)
+		return (err);
+#endif
 	return (0);
 }
 
@@ -1023,8 +1230,13 @@ pts_unregister_strdev(major_t major)
 {
 	int err;
 
+#if 0
 	if ((err = unregister_strdev(&pts_cdev, major)) < 0)
 		return (err);
+#else
+	if ((err = unregister_strdrv(&pts_cdev)) < 0)
+		return (err);
+#endif
 	return (0);
 }
 
@@ -1063,7 +1275,7 @@ ptyinit(void)
 {
 	int err, mindex = 0;
 
-	cmn_err(CE_NOTE, DRV_BANNER);
+	cmn_err(CE_NOTE, PTY_BANNER);
 	if ((err = pty_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", PTY_DRV_NAME, err);
 		ptyterminate();
@@ -1085,8 +1297,8 @@ ptyinit(void)
 		}
 		if (ptm_majors[mindex] == 0)
 			ptm_majors[mindex] = err;
-		if (major == 0)
-			major = ptm_majors[0];
+		if (ptm_major == 0)
+			ptm_major = ptm_majors[0];
 	}
 	/* Register slave device (normaly only one major). */
 	for (mindex = 0; mindex < PTS_CMAJORS; mindex++) {
@@ -1104,8 +1316,8 @@ ptyinit(void)
 		}
 		if (pts_majors[mindex] == 0)
 			pts_majors[mindex] = err;
-		if (major == 0)
-			major = pts_majors[0];
+		if (pts_major == 0)
+			pts_major = pts_majors[0];
 	}
 	return (0);
 }

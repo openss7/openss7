@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:07 $
+ @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 09:37:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:40:07 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 09:37:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldterm.c,v $
+ Revision 0.9.2.2  2006/10/12 09:37:42  brian
+ - completed much of the strtty package
+
  Revision 0.9.2.1  2006/09/29 11:40:07  brian
  - new files for strtty package and manual pages
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:07 $"
+#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 09:37:42 $"
 
-static char const ident[] = "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/29 11:40:07 $";
+static char const ident[] =
+    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 09:37:42 $";
 
 /*
  * This is ldterm (line discipline terminal) module.
@@ -144,18 +148,89 @@ static char const ident[] = "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.1
  * _________________________________________________________________
  */
 
-#include <termios.h>
+#include <sys/os7/compat.h>
 
-struct termios {
-	int c_iflag;			/* input modes */
-	int c_oflag;			/* output modes */
-	int c_cflags;			/* hardware control modes */
-	int c_lflags;			/* terminal functions handled by ldterm */
-	int c_cc;			/* control characters */
+#include <linux/termios.h>
+#include <termios.h>
+#include <sys/strtty.h>
+
+#define LDTERM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define LDTERM_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 09:37:42 $"
+#define LDTERM_DEVICE		"SVR 4.2 STREAMS Line Discipline Module (LDTERM)"
+#define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define LDTERM_LICENSE		"GPL"
+#define LDTERM_BANNER		LDTERM_DESCRIP		"\n" \
+				LDTERM_COPYRIGHT	"\n" \
+				LDTERM_REVISION		"\n" \
+				LDTERM_DEVICE		"\n" \
+				LDTERM_CONTACT
+#define LDTERM_SPLASH		LDTERM_DEVICE		" - " \
+				LDTERM_REVISION
+
+#ifdef LINUX
+MODULE_AUTHOR(LDTERM_CONTACT);
+MODULE_DESCRIPTION(LDTERM_DESCRIP);
+MODULE_SUPPORTED_DEVICE(LDTERM_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(LDTERM_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-ldterm");
+#endif				/* MODULE_ALIAS */
+#endif				/* LINUX */
+
+#ifndef CONFIG_STREAMS_LDTERM_NAME
+#error CONFIG_STREAMS_LDTERM_NAME must be defined.
+#endif
+#ifndef CONFIG_STREAMS_LDTERM_MODID
+#error CONFIG_STREAMS_LDTERM_MODID must be defined.
+#endif
+
+modID_t modid = CONFIG_STREAMS_LDTERM_MODID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else				/* module_param */
+module_param(modid, short, 0);
+#endif				/* module_param */
+MODULE_PARM_DESC(modid, "Module Id for LDTERM (0 for allocation).");
+
+#ifdef MODULE_ALIAS
+#ifdef LFS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LDTERM_MODID));
+MODULE_ALIAS("streams-module-ldterm");
+#endif				/* LFS */
+#endif				/* MODULE_ALIAS */
+
+static struct module_info ldterm_minfo = {
+	.mi_idnum = CONFIG_STREAMS_LDTERM_MODID,
+	.mi_idname = CONFIG_STREAMS_PCKT_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
+static struct module_stat ldterm_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat ldterm_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+
+#if defined __LP64__ && defined LFS
+#   undef WITH_32BIT_CONVERSION
+#   define WITH_32BIT_CONVERSION 1
+#endif
+
+/*
+ *  Private Structure.
+ */
+
+struct ldterm {
+};
+
+#define LDTERM_PRIV(__q)	((struct ldterm *)((__q)->q_ptr))
+
 /**
- * ld_rput - STREAMS read-side put procedure.
+ * ldterm_rput - STREAMS read-side put procedure.
  * @q: read queue
  * @mp: message to put
  */
@@ -282,12 +357,13 @@ struct termios {
  *	with errno set to EIO or ENXIO.
  */
 static streamscall int
-ld_rput(queue_t *q, mblk_t *mp)
+ldterm_rput(queue_t *q, mblk_t *mp)
 {
+	return (0);
 }
 
 /**
- * ld_rsrv - STREAMS read-side service procedure.
+ * ldterm_rsrv - STREAMS read-side service procedure.
  * @q: read queue to service
  */
 /*
@@ -335,12 +411,13 @@ ld_rput(queue_t *q, mblk_t *mp)
  *	See [12]M_CTL message in Read-Side Put Routine processing.
  */
 static streamscall int
-ld_rsrv(queue_t *q, mblk_t *mp)
+ldterm_rsrv(queue_t *q)
 {
+	return (0);
 }
 
 /**
- * ld_wput - STREAMS write-side put procedure.
+ * ldterm_wput - STREAMS write-side put procedure.
  * @q: write queue
  * @mp: message to put
  */
@@ -430,12 +507,13 @@ ld_rsrv(queue_t *q, mblk_t *mp)
  */
 
 static streamscall int
-ld_wput(queue_t *q, mblk_t *mp)
+ldterm_wput(queue_t *q, mblk_t *mp)
 {
+	return (0);
 }
 
 /**
- * ld_wsrv - STREAMS write-side service procedure.
+ * ldterm_wsrv - STREAMS write-side service procedure.
  * @q: write queue to service
  */
 /*
@@ -465,12 +543,21 @@ ld_wput(queue_t *q, mblk_t *mp)
  *          8. TCSBREAK
  */
 static streamscall int
-ld_wsrv(queue_t *q, mblk_t *mp)
+ldterm_wsrv(queue_t *q)
 {
+	return (0);
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ *
+ * OPEN and CLOSE Routines.
+ *
+ * ---------------------------------------------------------------------------
+ */
+
 /**
- * ld_qopen - ldterm(4) STREAMS open routine
+ * ldterm_qopen - ldterm(4) STREAMS open routine
  * @q: read queue of opened Stream
  * @devp: pointer to device number opened
  * @oflag: flags to the open call
@@ -532,12 +619,13 @@ ld_wsrv(queue_t *q, mblk_t *mp)
  * utility.
  *  */
 static streamscall int
-ld_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+ldterm_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
+	return (ENXIO);
 }
 
 /**
- * ld_qclose - ldterm(4) STREAMS close routine
+ * ldterm_qclose - ldterm(4) STREAMS close routine
  * @q: read queue of closing Stream
  * @oflag: flags to open call
  * @crp: pointer to closer's credentials
@@ -554,6 +642,89 @@ ld_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
  * The ldterm module is inactive while waiting for output to be drained.
  */
 static streamscall int
-ld_qclose(queue_t *q, int flags, cred_t *crp)
+ldterm_qclose(queue_t *q, int flags, cred_t *crp)
 {
+	return (ENXIO);
 }
+
+/*
+ * ---------------------------------------------------------------------------
+ *
+ * Registration and Initialization.
+ *
+ * ---------------------------------------------------------------------------
+ */
+
+static struct qinit ldterm_rinit = {
+	.qi_putp = ldterm_rput,
+	.qi_srvp = ldterm_rsrv,
+	.qi_qopen = ldterm_qopen,
+	.qi_qclose = ldterm_qclose,
+	.qi_minfo = &ldterm_minfo,
+	.qi_mstat = &ldterm_rstat,
+};
+
+static struct qinit ldterm_winit = {
+	.qi_putp = ldterm_wput,
+	.qi_srvp = ldterm_wsrv,
+	.qi_minfo = &ldterm_minfo,
+	.qi_mstat = &ldterm_wstat,
+};
+
+static struct streamtab ldterm_info = {
+	.st_rdinit = &ldterm_rinit,
+	.st_wrinit = &ldterm_winit,
+};
+
+#ifdef LIS
+#define fmodsw _fmodsw
+#endif
+static struct fmodsw ldterm_fmod = {
+	.f_name = CONFIG_STREAMS_LDTERM_NAME,
+	.f_str = &ldterm_info,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
+};
+
+#ifdef CONFIG_STREAMS_LDTERM_MODULE
+static
+#endif
+int __init
+ldterm_init(void)
+{
+	int err;
+
+#ifdef CONFIG_STREAMS_LDTERM_MODULE
+	cmn_err(CE_NOTE, LDTERM_BANNER);
+#else
+	cmn_err(CE_NOTE, LDTERM_SPLASH);
+#endif
+	ldterm_minfo.mi_idnum = modid;
+	if ((err = register_strmod(&ldterm_fmod)) < 0)
+		return (err);
+	if (modid == 0 && err > 0)
+		modid = err;
+	return (0);
+};
+
+#ifdef CONFIG_STREAMS_LDTERM_MODULE
+static
+#endif
+void __exit
+ldterm_exit(void)
+{
+	unregister_strmod(&ldterm_fmod);
+};
+
+/*
+ * ---------------------------------------------------------------------------
+ *
+ * Linux Registration.
+ *
+ * ---------------------------------------------------------------------------
+ */
+
+#ifdef CONFIG_STREAMS_LDTERM_MODULE
+module_init(ldterm_init);
+module_exit(ldterm_exit);
+#endif

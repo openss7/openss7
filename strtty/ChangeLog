@@ -1,3 +1,42 @@
+2006-10-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: update for release
+	* Makefile.am: added modules and drivers to build
+	* NEWS: update for release
+	* README: update for release
+	* THANKS: update for release
+	* acinclude.m4: corrections to debug flags
+	* strtty.spec.in: added modules and drivers to package
+	* debian/rules.in: added modules and drivers to package
+	* doc/man/man4/pckt.4.man: updated manual page
+	* doc/man/man4/pty.4.man: updated manual page
+	* doc/man/man5/strtty.5.man: updated manual page
+	* doc/manual/descrip.texi: update for release
+	* doc/manual/todo.texi: update for release
+	* src/drivers/Config.in: added drivers to configuration
+	* src/drivers/pty.c: worked up ptm/pts drivers
+	* src/include/Makefile.am: added header files to package
+	* src/include/sys/strtty/config.h.in: corrections
+	* src/modules/ldterm.c: at least a skeleton for ldterm
+	* src/modules/pckt.c: completed pckt module
+	* src/modules/ptem.c: completed ptem module
+	* src/modules/ttcompat.c: complete ttcompat module
+	* src/util/sysconfig/strtty.in: don't build devices
+
+	* src/include/sgtty.h: added header files for package
+	* src/include/termio.h: added header files for package
+	* src/include/termios.h: added header files for package
+	* src/include/ttcompat.h: added header files for package
+	* src/include/ttychars.h: added header files for package
+	* src/include/sys/pty.h: added header files for package
+	* src/include/sys/sgtty.h: added header files for package
+	* src/include/sys/strtty.h: added header files for package
+	* src/include/sys/termio.h: added header files for package
+	* src/include/sys/termios.h: added header files for package
+	* src/include/sys/ttychars.h: added header files for package
+	* src/include/sys/ttydev.h: added header files for package
+	* src/include/sys/ttyio.h: added header files for package
+
 2006-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 12:07:23 $
+ @(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 12:07:23 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 09:37:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ttcompat.c,v $
+ Revision 0.9.2.3  2006/10/12 09:37:42  brian
+ - completed much of the strtty package
+
  Revision 0.9.2.2  2006/10/02 12:07:23  brian
  - working up compatibility module
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 12:07:23 $"
+#ident "@(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
 
 static char const ident[] =
-    "$RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 12:07:23 $";
+    "$RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $";
 
 /*
  * Terminal compatibility module.  Provides ioctl inteface to user.  Provides
@@ -480,9 +483,15 @@ struct ltchars {
 
 #include <sys/os7/compat.h>
 
+#include <linux/termios.h>
+#include <ttcompat.h>
+#include <sys/termio.h>
+#include <sys/termios.h>
+#include <sys/strtty.h>
+
 #define TTCOMPAT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TTCOMPAT_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 12:07:23 $"
+#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
 #define TTCOMPAT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (TTCOMPAT)"
 #define TTCOMPAT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TTCOMPAT_LICENSE	"GPL"
@@ -551,7 +560,10 @@ static struct module_stat ttcompat_wstat __attribute__ ((__aligned__(SMP_CACHE_B
 struct ttcompat {
 	int flags;
 	bcid_t bufcall;
+	mblk_t *ioctls;
 };
+
+#define TTCOMPAT_EXCLUDE 0x4000000
 
 #define TTCOMPAT_PRIV(__q) ((struct ttcompat *)((__q)->q_ptr))
 
@@ -610,7 +622,7 @@ ttcompat_r_iocack(queue_t *q, mblk_t *mp)
 		if (c->c_lflag & FLUSHO)
 			flags |= LFLUSHO;
 		if (c->c_cflag & CLOCAL)
-			flags |= LHOHANG;
+			flags |= LNOHANG;
 		if (c->c_lflag & ECHOKE)
 			flags |= LCRTKIL;
 		if (c->c_lflag & CTLECH)
@@ -637,6 +649,7 @@ ttcompat_r_iocack(queue_t *q, mblk_t *mp)
 	case TIOCGETP:		/* struct sgttyb * (output) */
 	{
 		struct sgttyb *sg;
+		int flags = 0;
 
 		sg = (typeof(sg)) bp->b_rptr;
 		bp->b_wptr = bp->b_rptr + sizeof(*sg);
@@ -650,12 +663,16 @@ ttcompat_r_iocack(queue_t *q, mblk_t *mp)
 		/* The sg_ispeed and sg_ospeed fields describe the input and output speeds of the
 		   device, and reflect the values in the c_cflag field of the termios structure. */
 
+#ifndef CIBAUDEX
+#define CIBAUDEX 002000000000
+#endif				/* CIBAUDEX */
+
 		sg->sg_ispeed = (c->c_cflag & CIBAUD) >> IBSHIFT;
-		if (c->c_flag & CIBAUDEXT)
+		if (c->c_iflag & CIBAUDEX)
 			sg->sg_ispeed += (CIBAUD >> IBSHIFT) + 1;
 
 		sg->sg_ospeed = (c->c_cflag & CBAUD);
-		if (c->c_flag & CBAUDEXT)
+		if (c->c_oflag & CBAUDEX)
 			sg->sg_ospeed += CBAUD + 1;
 
 		if (sg->sg_ispeed == 0)
@@ -693,11 +710,11 @@ ttcompat_r_iocack(queue_t *q, mblk_t *mp)
 				break;
 			}
 		} else {
-			if ((c->c_oflag & (ONLRET|CR1)) == (ONLRET|CR1))
+			if ((c->c_oflag & (ONLRET | CR1)) == (ONLRET | CR1))
 				sg->sg_flags |= NL1;
 		}
-		if ((c->c_oflag & (ONLRET|NL1)) == (ONLRET|NL1))
-			sg-sg_flags |= NL2;
+		if ((c->c_oflag & (ONLRET | NL1)) == (ONLRET | NL1))
+			sg->sg_flags |= O_NL2;
 
 		switch (c->c_oflag & TABDLY) {
 		case TAB1:
@@ -938,6 +955,7 @@ ttcompat_w_ioctl(queue_t *q, mblk_t *mp)
 
 	case TIOCSDTR:
 	case TIOCCDTR:
+		ioc = (typeof(ioc)) mp->b_rptr;
 		ioc->ioc_cmd = (ioc->ioc_cmd == TIOCSDTR) ? TIOCMBIS : TIOCMBIC;
 		ioc->ioc_count = sizeof(int);
 		bp->b_rptr = bp->b_datap->db_base;
@@ -949,6 +967,7 @@ ttcompat_w_ioctl(queue_t *q, mblk_t *mp)
 	case TIOCFLUSH:
 		if (!pullupmsg(bp, sizeof(int)))
 			goto nak;
+		ioc = (typeof(ioc)) mp->b_rptr;
 		ioc->ioc_cmd = TCFLSH;
 		ioc->ioc_count = sizeof(int);
 		switch (*(int *) bp->b_rptr & (FREAD | FWRITE)) {
@@ -967,6 +986,7 @@ ttcompat_w_ioctl(queue_t *q, mblk_t *mp)
 
 	case TIOCSTOP:
 	case TIOCSTART:
+		ioc = (typeof(ioc)) mp->b_rptr;
 		*(int *) bp->b_rptr = (ioc->ioc_cmd == TIOCSTOP) ? 0 : 1;
 		ioc->ioc_cmd = TCXONC;
 		ioc->ioc_count = sizeof(int);
@@ -994,9 +1014,11 @@ ttcompat_w_ioctl(queue_t *q, mblk_t *mp)
 	case LDGETT:
 		goto ack;
 
+#if 0
 	case IOCTYPE:
 		rval = TIOC;
 		goto ack;
+#endif
 
 	case TIOCEXCL:
 		tt = TTCOMPAT_PRIV(q);
@@ -1004,7 +1026,7 @@ ttcompat_w_ioctl(queue_t *q, mblk_t *mp)
 		goto ack;
 
 	case TIOCNXCL:
-		tt = TT_COMPAT_PRIV(q);
+		tt = TTCOMPAT_PRIV(q);
 		tt->flags &= TTCOMPAT_EXCLUDE;
 		goto ack;
 
@@ -1040,7 +1062,8 @@ ttcompat_w_ioctl(queue_t *q, mblk_t *mp)
 		mb->b_wptr += sizeof(*ioc2);
 
 		bzero(ioc2, sizeof(*ioc2));	/* security */
-		ioc2->ioc_cmd = TGETS;
+		ioc2->ioc_cmd = TCGETS;
+		ioc = (typeof(ioc)) mp->b_rptr;
 		ioc2->ioc_cr = ioc->ioc_cr;	/* hmmm.. */
 		ioc2->ioc_id = ioc->ioc_id;
 		ioc2->ioc_count = sizeof(struct termios);
@@ -1057,20 +1080,22 @@ ttcompat_w_ioctl(queue_t *q, mblk_t *mp)
 		putnext(q, mb);
 		return;
 	}
-      nak:
+      ack:
 	mp->b_datap->db_type = M_IOCACK;
+	ioc = (typeof(ioc)) mp->b_rptr;
 	ioc->ioc_error = 0;
 	ioc->ioc_rval = rval;
 	ioc->ioc_count = count;
 	goto reply;
       nak:
 	mp->b_datap->db_type = M_IOCNAK;
+	ioc = (typeof(ioc)) mp->b_rptr;
 	ioc->ioc_error = error;
 	ioc->ioc_rval = -1;
 	ioc->ioc_count = 0;
       reply:
 	qreply(q, mp);
-	return (0);
+	return;
 
 }
 
@@ -1107,7 +1132,7 @@ ttcompat_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == MODOPEN && WR(q)->q_next != NULL) {
 		struct ttcompat *tt;
 
-		if ((tt = kmem_alloc(sizeof(*tt)))) {
+		if ((tt = kmem_alloc(sizeof(*tt), KM_SLEEP))) {
 			bzero(tt, sizeof(*tt));
 			tt->flags = oflag;	/* to test later for data model */
 			q->q_ptr = WR(q)->q_ptr = (void *) tt;
@@ -1201,7 +1226,7 @@ static
 void __exit
 ttcompat_exit(void)
 {
-	unregister_strmod(&ttcompatfmod);
+	unregister_strmod(&ttcompat_fmod);
 }
 
 #ifdef CONFIG_STREAMS_TTCOMPAT_MODULE

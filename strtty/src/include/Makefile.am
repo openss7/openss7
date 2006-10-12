@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/03 13:53:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:53:27 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 09:37:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/10/12 09:37:41  brian
+# - completed much of the strtty package
+#
 # Revision 0.9.2.2  2006/10/03 13:53:27  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -71,7 +74,21 @@ include ../../am/openss7.am
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-nobase_pkginclude_HEADERS =
+nobase_pkginclude_HEADERS = \
+	ttychars.h \
+	ttcompat.h \
+	sgtty.h \
+	termios.h \
+	termio.h \
+	sys/ttydev.h \
+	sys/termios.h \
+	sys/termio.h \
+	sys/sgtty.h \
+	sys/ttyio.h \
+	sys/strtty.h \
+	sys/ttychars.h \
+	sys/pty.h
+
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \

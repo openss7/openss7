@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pckt.4.man,v 0.9.2.1 2006/09/29 11:40:04 brian Exp $
+.\" @(#) $Id: pckt.4.man,v 0.9.2.2 2006/10/12 09:37:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/29 11:40:04 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/12 09:37:37 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pckt.4.man,v $
+.\" Revision 0.9.2.2  2006/10/12 09:37:37  brian
+.\" - completed much of the strtty package
+.\"
 .\" Revision 0.9.2.1  2006/09/29 11:40:04  brian
 .\" - new files for strtty package and manual pages
 .\"
@@ -97,70 +100,67 @@ sort-adjacent-labels
 .B pckt
 is a
 .IR STREAMS (9)
-module that is pushed over the control end of a
+module that is pushed over the master side of a
 .IR STREAMS -based
-master pseudo-terminal device,
+pseudo-terminal device,
 .BR pty (4),
-to packetize messages sent by the slave side of
-a pseudo-terminal that would otherwise be processed by the Stream head.  This
-allows the user process on the master side of the pseudo-terminal to be
-informed of state changes.
+to packetize messages sent by the slave side of the pseudo-terminal that would
+otherwise be processed by the Stream head.  This allows the user process on
+the master side of the pseudo-terminal to be informed of state changes.
 .PP
 To enable the packet mode on the master side of a pseudo-terminal,
 .BR pty (4),
-the master side user process must push the
+the user process must push the
 .RI \(lq pckt \(rq
 module using the
 .BR I_PUSH (7)
 .I STREAMS
 input-output control command.
 .PP
-Once packet mode has been enabled on the Stream by pushing the
+Once packet mode has been enabled on the master side Stream by pushing the
 .B pckt
-module, all
-all write-side,
+module, all master write-side operations,
 .BR write (2s),
 .BR putmsg (2),
-.BR putpmsg (2s)
-operations, are unaltered.
-When the user process writes or puts a message to the Stream, it is passed to
-the slave by the pseudo-terminal device,
+.BR putpmsg (2s),
+remain unaltered.
+When the user process on the master side writes or puts a message to the
+Stream, it is simply passed to the slave by the pseudo-terminal device,
 .BR pty (4),
-as normal.
+in the same fashion a when the module was not present.
 .PP
-In the packet mode, read-side,
+In the packet mode, master read-side operations,
 .BR read (2s),
 .BR getmsg (2),
-.BR getpmsg (2s)
-operations, are altered.
+.BR getpmsg (2s),
+are altered.
 The
 .B pckt
-module intercepts certain
+module intercepts
 .IR STREAMS (9)
-messages that would otherwise be processed by a real
+messages that would have been processed by a real
 .BR tty (4)
 driver, and converts them into
 .BR M_PROTO (9)
-messages that can be subsequently read by the user process using
+messages that to be read by the master side user process using
 .BR read (2s),
 .BR getmsg (2),
 or
 .BR getpmsg (2s).
-(Normally, without the
+(Without the
 .B pckt
-module pushed, these intercepted messages would be processed by the Stream
-head.)
+module in place, these messages normally processed by a real
+.BR tty (4),
+would be processed (and misinterpreted) by the Stream head.
 .PP
-Messages are encapsulated (packetized) by transforming them into
+Messages intercepted in this fashion are encapsulated (packetized) by
+transforming them into
 .BR M_DATA (9)
 messages and prepending an
 .BR M_PROTO (9)
-message block that contains the original value of the message type (before it
-was overwritten with
-.BR M_DATA (9))
-in the
-.BR M_PROTO (9)
-message block.
+message block that contains the original value of the message type (before
+being overwritten with
+.BR M_DATA (9)).
 .PP
 Message types that are transformed in this fashion are:
 .BR M_DATA (9),
@@ -173,41 +173,42 @@ Message types that are transformed in this fashion are:
 .BR M_STARTI (9),
 .BR M_STOP "(9) and "
 .BR M_STOPI (9).
-Other messages are passed to the Stream head unchanged.
-Of the messages packetized, most are simply packetized and passed to the
-Stream head to be read by the user process.  Several receive special treatment
+The remaining message types are passed to the Stream head unchanged.  Of the
+messages packetized, most are packetized unaltered and passed to the Stream
+head to be read by the user process.
+.BR M_FLUSH "(9), " M_IOCTL "(9) and " M_READ (9)
+receive special treatment
 as follows:
-.TP \w'\fBM_FLUSH\fR(9)\(em'u
-.BR M_FLUSH (9)
+.\"
+.SS M_FLUSH\fR(9)
 The pseudo-terminal device,
 .BR pty (4),
-slave side reverses the send of the
+slave side reverses the sense of the
 .BR M_FLUSH (9)
-flush bits so that they can be used directly by the master side Stream head.
-This is similar to the
+flush bits so that they can be used directly by the master side Stream head in
+a fashion similar to the
 .BR pipemod (4)
 module.  To provide an encapsulated message that contains flush bits that are
-exactly as they were issued by the user of the slave side of the
+the same as they were issued by the user of the slave side of the
 .BR pty (4),
 .B pckt
 reverses the
 .BR FLUSHR " and " FLUSHW
-bits before packetizing the
+bits (again) before packetizing the
 .BR M_FLUSH (9)
 message.
 Also, because every Stream must respond to
 .BR M_FLUSH (9)
 by flushing queues,
 .B pckt
-also passes the
+also passes a copy of the
 .BR M_FLUSH (9)
 message to the Stream head.  However, to preserve packetized messages that may
 be sitting on the Stream head read queue, the read side is not flushed and the
 .B FLUSHR
 bit in any
 .BR M_FLUSH (9)
-message passed to the Stream head will be cleared.
-.RS
+message copy passed to the Stream head will be cleared.
 .PP
 The result is as follows, depending on the value of the
 .BR M_FLUSH (9)
@@ -237,9 +238,8 @@ and the message is packetized.  An
 message is sent to the Stream head containing only the
 .BR FLUSHW
 flag.
-.RE
-.TP
-.BR M_IOCTL (9)
+.\"
+.SS M_IOCTL\fR(9)
 The
 .BR M_IOCTL (9)
 message is packetized as normal on 32-bit systems.  On 64-bit systems, where
@@ -256,7 +256,7 @@ module into a 32-bit representation of the
 structure
 .RB ( "struct iocblk32" )
 before being packetized.
-.IP ""
+.PP
 It is possible for the
 .BR pkct (4)
 module to determine whether the master process is a 32-bit or 64-bit process (remember that only one
@@ -276,7 +276,7 @@ field of the
 .BR iocblk (9)
 structure indicates the data model of the sender; however, the data model of the sender happens to
 be the slave side.
-.IP ""
+.PP
 .BR ptem (4)
 only sends the following input-output controls to the master side:
 .BR TCSETA ,
@@ -311,7 +311,7 @@ These three structures are all made up of
 and
 .BR char s,
 and do not require conversion.
-.IP ""
+.PP
 Although
 .BR M_IOCTL (9)
 messages are packetized, there is no way for the user process to acknowledge
@@ -322,10 +322,10 @@ message in response to any
 message received at the Stream head.)
 The
 .BR M_IOCTL (9)
-message arriving at the master side of a pseudo-terminal are have normally been sent by the
+message arriving at the master side of a pseudo-terminal have normally been sent by the
 pseudo-terminal emulation module,
 .BR ptem (4),
-that was pushed on the slave side.  These
+pushed on the slave side.  These
 .BR M_IOCTL (9)
 messages are copies of the ones for which the
 .BR ptem (4)
@@ -342,16 +342,14 @@ module discards any
 messages that might have been sent by the Stream head in response to arriving
 .BR M_IOCTL (9)
 messages.)
-.TP
-.BR M_READ (9)
+.\"
+.SS M_READ\fR(9)
 The
 .BR M_READ (9)
 message is packetized as normal on 32-bit systems.  On 64-bit systems, where
 the user process that pushed the
 .B pckt
-module on the master side of the pseudo-terminal,
-.BR pty (4),
-device is a 32-bit process, the
+module is a 32-bit process, the
 .B size_t
 count contained in the message block is transformed by the
 .B pckt
@@ -360,6 +358,16 @@ module into a 32-bit representation of the
 .RB ( size32_t )
 before being packetized.
 .PP
+(The
+.B pckt
+module can detect when it was pushed by a 32-bit process when the
+.B FILP32
+bit is set in the
+.I oflag
+argument to the
+.BR qi_qopen (9)
+call that is issued when pushing the module.)
+.PP
 The user process reading the master side of the pseudo-terminal device is
 responsible for any other 64-bit to 32-bit conversions that might be required
 on data structures contained in other messages of which the
@@ -367,13 +375,16 @@ on data structures contained in other messages of which the
 module is unaware.
 .\"
 .\"
+.SS Summary
 .PP
-The
+To summarize, the
 .B pckt
 module does the following:
 .IP \(bu \w'\(bu\(em'u
-When a message is passed to this module on its write queue, the modules does no processing and
-passes the mssage to the next module or driver.
+When a message is passed to the
+.B pckt
+module on its write queue, the modules does no processing and passes the
+mssage to the next module or driver.
 .IP \(bu
 The
 .B pckt
@@ -393,8 +404,11 @@ message when one of the following messages is passed to it:
 .IP ""
 All other messages are passed through.  The
 .BR M_PROTO (9)
-message is passed upstream and retreived when the user issues
-.BR getmsg (2).
+message containing an intercepted message is passed upstream and retreived
+when the user process on the master side issues
+.BR read (2s),
+.BR getmsg "(2) or "
+.BR getpmsg (2s).
 .IP \(bu
 If the message is an
 .BR M_FLUSH (9)
@@ -467,7 +481,7 @@ once an end-of-file has been read or the Stream is hung up by the slave side.
 .PP
 The
 .B pckt
-module does not process and intput-output controls of its own.
+module does not process any intput-output controls of its own.
 .\"
 .\"
 .SH NOTICES

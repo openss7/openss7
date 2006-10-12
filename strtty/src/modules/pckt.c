@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $
+ @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:14 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 09:37:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pckt.c,v $
+ Revision 0.9.2.3  2006/10/12 09:37:42  brian
+ - completed much of the strtty package
+
  Revision 0.9.2.2  2006/10/02 11:32:14  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -76,9 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $"
+#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
 
-static char const ident[] = "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $";
+static char const ident[] =
+    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $";
 
 /*
  * This is the pckt(4) STREAMS module, a Packet Mode module to be pushed on the
@@ -242,7 +246,7 @@ static char const ident[] = "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $
 
 #define PCKT_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PCKT_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:14 $"
+#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
 #define PCKT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PCKT_LICENSE		"GPL"
@@ -324,7 +328,7 @@ pckt_enable(long arg)
 {
 	queue_t *q = (queue_t *) arg;
 	bcid_t bc;
-	struct pkct *p;
+	struct pckt *p;
 
 	if ((p = PCKT_PRIV(q)) && (bc = xchg(&p->bufcall, 0))) {
 		qenable(q);
@@ -350,7 +354,7 @@ pckt_r_msg(queue_t *q, mblk_t *mp)
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
-		/* The pseudo-terminal device, pty(4), slave side reverses the send of the
+		/* The pseudo-terminal device, pty(4), slave side reverses the sense of the
 		   M_FLUSH(9) flush bits so that they can be used directly by the master side
 		   Stream head. This is similar to the pipemod(4) module. To provide an
 		   encapsulated message that contains flush bits that are exactly as they were
@@ -367,19 +371,17 @@ pckt_r_msg(queue_t *q, mblk_t *mp)
 		   Stream head containing the FLUSHW flag. FLUSHRW: The bits are set to FLUSHRW and 
 		   the message is packetized. An M_FLUSH(9) message is sent to the Stream head
 		   containing only the FLUSHW flag.  */
-		fp = NULL;
+		if (!(bp = allocb(1, BPRI_MED)))
+			goto bufcall;
 		if ((mp->b_rptr[0] & FLUSHW)) {
-			if (!(fp = copyb(mp)))
-				goto bufcall;
-			if (!(bp = allocb(1, BPRI_MED))) {
-				freemsg(fp);
+			if (!(fp = copyb(mp))) {
+				freeb(bp);
 				goto bufcall;
 			}
 			fp->b_rptr[0] &= ~FLUSHR;
 			putnext(q, fp);
 		} else {
-			if (!(bp = allocb(1, BPRI_MED)))
-				goto bufcall;
+			fp = NULL;
 		}
 		switch (mp->b_rptr[0] & (FLUSHR | FLUSHW)) {
 		case FLUSHR:
@@ -431,6 +433,8 @@ pckt_r_msg(queue_t *q, mblk_t *mp)
 			uint32_t size32;
 
 			/* Need to convert from native to ILP32. */
+			if ((bp = allocb(1, BPRI_MED)) == NULL)
+				goto bufcall;
 			size32 = *(size_t *) mp->b_rptr;
 			*(uint32_t *) mp->b_rptr = size32;
 			mp->b_wptr = mp->b_wptr - sizeof(size_t) + sizeof(uint32_t);
@@ -460,7 +464,7 @@ pckt_r_msg(queue_t *q, mblk_t *mp)
 		}
 	      bufcall:
 		noenable(q);
-		if (!(p->bufcall = bufcall(1, BPRI_MED, pckt_enable, q)))
+		if (!(p->bufcall = bufcall(1, BPRI_MED, pckt_enable, (long) q)))
 			qenable(q);	/* spin through service procedure */
 		return (0);
 	default:
@@ -500,7 +504,7 @@ pckt_rput(queue_t *q, mblk_t *mp)
 		if (!bcanputnext(q, mp->b_band))
 			goto queue_it;
 	}
-	if (pck_r_msg(q, mp))
+	if (pckt_r_msg(q, mp))
 		return (0);
       queue_it:
 	if (!putq(q, mp))
@@ -540,7 +544,7 @@ pckt_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == MODOPEN && WR(q)->q_next != NULL) {
 		struct pckt *p;
 
-		if ((p = kmem_alloc(sizeof(*p)))) {
+		if ((p = kmem_alloc(sizeof(*p), KM_SLEEP))) {
 			bzero(p, sizeof(*p));
 			p->flags = oflag;	/* to test later for data model */
 			q->q_ptr = WR(q)->q_ptr = (void *) p;
