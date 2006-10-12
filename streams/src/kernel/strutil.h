@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/07/24 09:01:18 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/12 10:22:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:18 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:52 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -98,7 +98,7 @@ extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t **
 #define streams_local_restore(__flags) \
 	do { (void)__flags; } while (0)
 
-#elif defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#elif defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
 #define streams_spin_lock(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

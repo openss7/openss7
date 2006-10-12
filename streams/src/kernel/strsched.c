@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/10/12 10:22:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.146  2006/10/12 10:22:50  brian
+ - removed redundant debug flags
+
  Revision 0.9.2.145  2006/08/16 07:47:28  brian
  - add security.h header file to avoid ptrace conflict, SLES changes
 
@@ -119,10 +122,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/10/12 10:22:50 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2006/08/16 07:47:28 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/10/12 10:22:50 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -277,7 +280,7 @@ qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct qbinfo *qbi = obj;
 
 		bzero(qbi, sizeof(*qbi));
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD(&qbi->qbi_list);
 #endif
 	}
@@ -294,7 +297,7 @@ allocqb(void)
 		struct qbinfo *qbi = (struct qbinfo *) qb;
 
 		atomic_set(&qbi->qbi_refs, 1);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail(&qbi->qbi_list, &si->si_head);
 		write_unlock(&si->si_rwlock);
@@ -311,7 +314,7 @@ freeqb(struct qband *qb)
 {
 	struct strinfo *si = &Strinfo[DYN_QBAND];
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	struct qbinfo *qbi = (struct qbinfo *) qb;
 
 	write_lock(&si->si_rwlock);
@@ -397,7 +400,7 @@ apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 
 		bzero(api, sizeof(*api));
 		INIT_LIST_HEAD(&api->api_more);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD(&api->api_list);
 #endif
 	}
@@ -411,7 +414,7 @@ ap_alloc(struct strapush *sap)
 	/* Note: this function is called (indirectly) by the SAD driver put procedure and,
 	   therefore, needs atomic allocations. */
 	if (likely((api = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC)) != NULL)) {
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail(&api->api_list, &si->si_head);
 		write_unlock(&si->si_rwlock);
@@ -429,7 +432,7 @@ ap_free(struct apinfo *api)
 {
 	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	write_lock(&si->si_rwlock);
 	list_del_init(&api->api_list);
 	write_unlock(&si->si_rwlock);
@@ -439,7 +442,7 @@ ap_free(struct apinfo *api)
 	/* clean it up before putting it back in the cache */
 	bzero(api, sizeof(*api));
 	INIT_LIST_HEAD(&api->api_more);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	INIT_LIST_HEAD(&api->api_list);
 #endif
 	kmem_cache_free(si->si_cache, api);
@@ -480,7 +483,7 @@ devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		bzero(di, sizeof(*di));
 		INIT_LIST_HEAD(&di->di_list);
 		INIT_LIST_HEAD(&di->di_hash);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD((struct list_head *) &di->di_next);
 #endif
 	}
@@ -497,7 +500,7 @@ di_alloc(struct cdevsw *cdev)
 	   fast streams.  Chances are it will only be called at registration time, but I will leave
 	   this at SLAB_ATOMIC until the compatibility module can be checked. */
 	if (likely((di = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC)) != NULL)) {
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail((struct list_head *) &di->di_next, &si->si_head);
 		write_unlock(&si->si_rwlock);
@@ -522,7 +525,7 @@ di_free(struct devinfo *di)
 {
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	write_lock(&si->si_rwlock);
 	list_del_init((struct list_head *) &di->di_next);
 	write_unlock(&si->si_rwlock);
@@ -534,7 +537,7 @@ di_free(struct devinfo *di)
 	bzero(di, sizeof(*di));
 	INIT_LIST_HEAD(&di->di_list);
 	INIT_LIST_HEAD(&di->di_hash);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	INIT_LIST_HEAD((struct list_head *) &di->di_next);
 #endif
 	kmem_cache_free(si->si_cache, di);
@@ -580,7 +583,7 @@ mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		bzero(mi, sizeof(*mi));
 		INIT_LIST_HEAD(&mi->mi_list);
 		INIT_LIST_HEAD(&mi->mi_hash);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
 #endif
 	}
@@ -597,7 +600,7 @@ modi_alloc(struct fmodsw *fmod)
 	   fast streams.  Chances are it will only be called at registration time, but I will leave
 	   this at SLAB_ATOMIC until the compatibility module can be checked. */
 	if (likely((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC)) != NULL)) {
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail((struct list_head *) &mi->mi_next, &si->si_head);
 		write_unlock(&si->si_rwlock);
@@ -617,7 +620,7 @@ modi_free(struct mdlinfo *mi)
 {
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	write_lock(&si->si_rwlock);
 	list_del_init((struct list_head *) &mi->mi_next);
 	write_unlock(&si->si_rwlock);
@@ -629,7 +632,7 @@ modi_free(struct mdlinfo *mi)
 	bzero(mi, sizeof(*mi));
 	INIT_LIST_HEAD(&mi->mi_list);
 	INIT_LIST_HEAD(&mi->mi_hash);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
 #endif
 	kmem_cache_free(si->si_cache, mi);
@@ -674,7 +677,7 @@ queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		qu->rq.q_flag = QREADR;
 		qu->wq.q_flag = 0;
 		init_waitqueue_head(&qu->qu_qwait);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD(&qu->qu_list);
 #endif
 	}
@@ -700,7 +703,7 @@ allocq(void)
 		struct queinfo *qu = (struct queinfo *) rq;
 
 		atomic_set(&qu->qu_refs, 1);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail(&qu->qu_list, &si->si_head);
 		write_unlock(&si->si_rwlock);
@@ -731,7 +734,7 @@ __freeq(queue_t *rq)
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
 	struct queinfo *qu = (struct queinfo *) rq;
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	write_lock(&si->si_rwlock);
 	list_del_init(&qu->qu_list);
 	write_unlock(&si->si_rwlock);
@@ -845,7 +848,7 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct mdbblock *md = obj;
 
 		bzero(md, sizeof(*md));
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD(&md->msgblk.m_list);
 		INIT_LIST_HEAD(&md->datablk.db_list);
 #endif
@@ -890,13 +893,13 @@ mdbblock_alloc_slow(uint priority, void *func)
 		mblk_t *mp = NULL;
 		int slab_flags;
 
-#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED
+#if !defined _OPTIMIZE_SPEED
 		/* might be able to do this first for other than BRPI_HI and BPRI_FT.  Another
 		   thing to do is the percentage of thewall trick: BPRI_LO => 80%, BPRI_MED => 90%, 
 		   BPRI_HI => 100% */
 		if (unlikely(atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs))	/* PROFILED */
 			goto fail;
-#endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
+#endif				/* !defined _OPTIMIZE_SPEED */
 		slab_flags = (priority == BPRI_WAITOK) ? SLAB_KERNEL : SLAB_ATOMIC;
 #if 0
 		switch (priority) {
@@ -915,7 +918,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 #endif
 		_trace();
 		if (likely((mp = kmem_cache_alloc(sdi->si_cache, slab_flags)) != NULL)) {
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 			struct mdbblock *md = (struct mdbblock *) mp;
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 			unsigned long flags;
@@ -926,7 +929,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 			md->msgblk.m_func = func;
 			_ctrace(md->msgblk.m_queue = NULL);
 #endif
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 			streams_write_lock(&smi->si_rwlock, flags);
 			list_add_tail(&md->msgblk.m_list, &smi->si_head);
 			list_add_tail(&md->datablk.db_list, &sdi->si_head);
@@ -935,10 +938,10 @@ mdbblock_alloc_slow(uint priority, void *func)
 			if (atomic_read(&smi->si_cnt) > smi->si_hwl)
 				smi->si_hwl = atomic_read(&smi->si_cnt);
 #endif
-#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED
+#if !defined _OPTIMIZE_SPEED
 			atomic_inc(&sdi->si_cnt);
-#endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
-#if !defined CONFIG_STREAMS_NONE
+#endif				/* !defined _OPTIMIZE_SPEED */
+#if !defined _NONE
 			if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 				sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
@@ -979,21 +982,21 @@ mdbblock_alloc(uint priority, void *func)
 			t->freemblks--;
 			streams_local_restore(flags);
 			{
-#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED || !defined CONFIG_STREAMS_NONE
+#if !defined _OPTIMIZE_SPEED || !defined _NONE
 				struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 #endif
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 				struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 
 				atomic_inc(&smi->si_cnt);
 				if (atomic_read(&smi->si_cnt) > smi->si_hwl)
 					smi->si_hwl = atomic_read(&smi->si_cnt);
 #endif
-#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED
+#if !defined _OPTIMIZE_SPEED
 				atomic_inc(&sdi->si_cnt);
-#endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
-#if !defined CONFIG_STREAMS_NONE
+#endif				/* !defined _OPTIMIZE_SPEED */
+#if !defined _NONE
 				if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 					sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
@@ -1117,16 +1120,16 @@ mdbblock_free(mblk_t *mp)
 	{
 		struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 
 		atomic_dec(&smi->si_cnt);
 #endif
-#if !defined CONFIG_STREAMS_OPTIMIZE_SPEED
+#if !defined _OPTIMIZE_SPEED
 		atomic_dec(&sdi->si_cnt);
 #else
 		(void) sdi;
-#endif				/* !defined CONFIG_STREAMS_OPTIMIZE_SPEED */
+#endif				/* !defined _OPTIMIZE_SPEED */
 #if defined CONFIG_STREAMS_NORECYCLE
 		kmem_cache_free(sdi->si_cache, mp);
 #endif
@@ -1180,7 +1183,7 @@ freeblocks(struct strthread *t)
 		do {
 			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 			struct mdbblock *md = (struct mdbblock *) mp;
 			unsigned long flags;
@@ -1240,7 +1243,7 @@ linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct linkblk *l = &li->li_linkblk;
 
 		bzero(li, sizeof(*li));
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD(&li->li_list);
 #endif
 		spin_lock(&link_index_lock);
@@ -1264,7 +1267,7 @@ alloclk(void)
 	   operation, and this function is only called in user context with no locks held.
 	   Therefore, we can sleep and SLAB_KERNEL is used instead of SLAB_ATOMIC. */
 	if (likely((l = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		struct linkinfo *li = (struct linkinfo *) l;
 
 		write_lock(&si->si_rwlock);
@@ -1288,7 +1291,7 @@ freelk(struct linkblk *l)
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
 	struct linkinfo *li = (struct linkinfo *) l;
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	write_lock(&si->si_rwlock);
 	list_del_init(&li->li_list);
 	write_unlock(&si->si_rwlock);
@@ -1439,7 +1442,7 @@ seinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct strevent **sep, *se = obj;
 
 		bzero(s, sizeof(*s));
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD(&s->s_list);
 #endif
 		/* XXX: are these strict locks necessary? */
@@ -1465,7 +1468,7 @@ event_alloc(int type, queue_t *q)
 			struct seinfo *s = (struct seinfo *) se;
 
 			s->s_type = type;
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 			s->s_queue = NULL;
 			write_lock(&si->si_rwlock);
 			list_add_tail(&s->s_list, &si->si_head);
@@ -1483,7 +1486,7 @@ event_free(struct strevent *se)
 {
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	struct seinfo *s = (struct seinfo *) se;
 
 	if (s->s_queue)
@@ -4345,7 +4348,7 @@ clear_shinfo(struct shinfo *sh)
 
 	bzero(sh, sizeof(*sh));
 	atomic_set(&sh->sh_refs, 0);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined(_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
 	INIT_LIST_HEAD(&sh->sh_list);
 #endif
 	sd->sd_rdopt = RNORM | RPROTNORM;
@@ -4392,7 +4395,7 @@ allocstr(void)
 			struct shinfo *sh = (struct shinfo *) sd;
 
 			atomic_set(&sh->sh_refs, 1);
-#if defined(CONFIG_STREAMS_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
+#if defined(_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
 			write_lock(&si->si_rwlock);
 			list_add_tail(&sh->sh_list, &si->si_head);
 			write_unlock(&si->si_rwlock);
@@ -4420,7 +4423,7 @@ __freestr(struct stdata *sd)
 	struct strinfo *si = &Strinfo[DYN_STREAM];
 	struct shinfo *sh = (struct shinfo *) sd;
 
-#if defined(CONFIG_STREAMS_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
+#if defined(_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
 	write_lock(&si->si_rwlock);
 	list_del_init(&sh->sh_list);
 	write_unlock(&si->si_rwlock);
@@ -4520,7 +4523,7 @@ freestr(struct stdata *sd)
  */
 
 #undef STREAMS_CACHE_FLAGS
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 #if defined CONFIG_SLAB_DEBUG
 #if defined SLAB_PANIC
 #define STREAMS_CACHE_FLAGS (SLAB_DEBUG_FREE|SLAB_RED_ZONE|SLAB_POISON|SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN|SLAB_PANIC)
@@ -4534,13 +4537,13 @@ freestr(struct stdata *sd)
 #define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN)
 #endif				/* defined SLAB_PANIC */
 #endif				/* defined CONFIG_SLAB_DEBUG */
-#else				/* defined CONFIG_STREAMS_DEBUG */
+#else				/* defined _DEBUG */
 #if defined SLAB_DESTROY_BY_RCU
 #define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN|SLAB_DESTROY_BY_RCU)
 #else				/* defined SLAB_DESTROY_BY_RCU */
 #define STREAMS_CACHE_FLAGS (SLAB_HWCACHE_ALIGN|SLAB_MUST_HWCACHE_ALIGN)
 #endif				/* defined SLAB_DESTROY_BY_RCU */
-#endif				/* defined CONFIG_STREAMS_DEBUG */
+#endif				/* defined _DEBUG */
 
 #ifndef SLAB_NO_REAP
 #define SLAB_NO_REAP 0
@@ -4591,7 +4594,7 @@ str_term_caches(void)
 
 		if (unlikely((cache = si->si_cache) == NULL))
 			continue;
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		/* if we are tracking the allocations we can kill things whether they refer to each 
 		   other or not. I hope we don't have any inodes kicking around... */
 #endif
@@ -4623,7 +4626,7 @@ str_init_caches(void)
 	struct cacheinfo *ci = Cacheinfo;
 
 	for (j = 0; j < DYN_SIZE; j++, si++, ci++) {
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 		INIT_LIST_HEAD(&si->si_head);
 #endif
 		rwlock_init(&si->si_rwlock);

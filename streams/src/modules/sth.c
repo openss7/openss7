@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2006/10/02 11:31:37 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2006/10/12 10:22:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:31:37 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.169  2006/10/12 10:22:54  brian
+ - removed redundant debug flags
+
  Revision 0.9.2.168  2006/10/02 11:31:37  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -163,10 +166,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2006/10/02 11:31:37 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2006/10/12 10:22:54 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2006/10/02 11:31:37 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2006/10/12 10:22:54 $";
 
 //#define __NO_VERSION__
 
@@ -267,7 +270,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.168 $) $Date: 2006/10/02 11:31:37 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2006/10/12 10:22:54 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -745,11 +748,11 @@ strput(struct stdata *sd, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in int
 strcopyout(const void *from, void __user *to, size_t len)
 {
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	int err = -EFAULT;
 #endif
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	if (access_ok(VERIFY_WRITE, to, len)) {
 		if ((err = copyout(from, to, len)) < 0)
 			_ptrace(("access_ok succeeded, copyout failed\n"));
@@ -766,11 +769,11 @@ strcopyout(const void *from, void __user *to, size_t len)
 STATIC streams_inline streams_fastcall __hot_out int
 strcopyin(const void __user *from, void *to, size_t len)
 {
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	int err = -EFAULT;
 #endif
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 	if (access_ok(VERIFY_READ, from, len)) {
 		if ((err = copyin(from, to, len)) < 0)
 			_ptrace(("access_ok succeeded, copyin failed\n"));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/07/25 06:39:07 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/12 10:22:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:07 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/07/25 06:39:07 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/12 10:22:47 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/07/25 06:39:07 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/12 10:22:47 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -95,7 +95,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/07/25 06:39:07 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/12 10:22:47 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -180,7 +180,7 @@ static struct module_stat log_wstat __attribute__((__aligned__(SMP_CACHE_BYTES))
 /*
  *  Locking
  */
-#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

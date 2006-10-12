@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.39 2006/07/24 09:01:12 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.40 2006/10/12 10:22:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:12 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/07/24 09:01:12 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/12 10:22:46 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -124,32 +124,7 @@
 #undef streams_noinline
 #define streams_noinline noinline
 
-#if defined(_DEBUG) && !defined(CONFIG_STREAMS_DEBUG)
-#define CONFIG_STREAMS_DEBUG 1
-#endif
-#if defined(_TEST) && !defined(CONFIG_STREAMS_TEST)
-#define CONFIG_STREAMS_TEST 1
-#endif
-#if defined(_SAFE) && !defined(CONFIG_STREAMS_SAFE)
-#define CONFIG_STREAMS_SAFE 1
-#endif
-#if defined(_NONE) && !defined(CONFIG_STREAMS_NONE)
-#define CONFIG_STREAMS_NONE 1
-#endif
-#if defined(_OPTIMIZE_NONE) && !defined(CONFIG_STREAMS_OPTIMIZE_NONE)
-#define CONFIG_STREAMS_OPTIMIZE_NONE 1
-#endif
-#if defined(_OPTIMIZE_SIZE) && !defined(CONFIG_STREAMS_OPTIMIZE_SIZE)
-#define CONFIG_STREAMS_OPTIMIZE_SIZE 1
-#endif
-#if defined(_OPTIMIZE_SPEED) && !defined(CONFIG_STREAMS_OPTIMIZE_SPEED)
-#define CONFIG_STREAMS_OPTIMIZE_SPEED 1
-#endif
-#if defined(_OPTIMIZE_NORMAL) && !defined(CONFIG_STREAMS_OPTIMIZE_NORMAL)
-#define CONFIG_STREAMS_OPTIMIZE_NORMAL 1
-#endif
-
-#if defined(CONFIG_STREAMS_OPTIMIZE_NONE) || defined(CONFIG_STREAMS_DEBUG)
+#if defined(_OPTIMIZE_NONE) || defined(_DEBUG)
 
 #undef prefetchw
 #define prefetchw(__a) ((void)(__a))
@@ -186,7 +161,7 @@
 #endif
 
 #else
-#ifdef CONFIG_STREAMS_OPTIMIZE_SIZE
+#ifdef _OPTIMIZE_SIZE
 
 #undef prefetchw
 #define prefetchw(__a) __builtin_prefetch((__a),1,3)
@@ -218,7 +193,7 @@
 #endif
 
 #else
-#ifdef CONFIG_STREAMS_OPTIMIZE_SPEED
+#ifdef _OPTIMIZE_SPEED
 
 #undef prefetchw
 #define prefetchw(__a) __builtin_prefetch((__a),1,3)
@@ -249,7 +224,7 @@
 #define __EXTERN_INLINE static inline
 #endif
 
-#else /* defined(CONFIG_STREAMS_OPTIMIZE_NORMAL) */
+#else /* defined(_OPTIMIZE_NORMAL) */
 
 #undef prefetchw
 #define prefetchw(__a) __builtin_prefetch((__a),1,3)
@@ -286,35 +261,35 @@
 
 #undef  __never
 #define __never() \
-do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+	do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
 #undef  __rare
 #define __rare() \
-do { printk(KERN_NOTICE "%s: rare() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+	do { printk(KERN_NOTICE "%s: rare() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
 #undef  __seldom
 #define __seldom() \
-do { printk(KERN_NOTICE "%s: seldom() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+	do { printk(KERN_NOTICE "%s: seldom() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
 #undef  __usual
 #define __usual(__exp) \
-do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: usual(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
+	do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: usual(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __normal
 #define __normal(__exp) \
-do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: normal(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
+	do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: normal(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __assert
 #define __assert(__exp) \
-do { if (unlikely(!(__exp))) { printk(KERN_EMERG "%s: assert(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); *(int *)0 = 0; } } while(0)
+	do { if (unlikely(!(__exp))) { printk(KERN_EMERG "%s: assert(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); *(int *)0 = 0; } } while(0)
 
 #undef  __assure
 #define __assure(__exp) \
-do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: assure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
+	do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: assure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __ensure
 #define __ensure(__exp,__sta) \
-do { if (unlikely(!(__exp))) { printk(KERN_WARNING "%s: ensure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); __sta; } } while(0)
+	do { if (unlikely(!(__exp))) { printk(KERN_WARNING "%s: ensure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); __sta; } } while(0)
 
 #undef  __unless
 #define __unless(__exp,__sta) \
@@ -322,35 +297,37 @@ __ensure(!(__exp),__sta)
 
 #undef  __trace
 #define __trace() \
-do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+	do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
 #undef  __ptrace
 #define __ptrace(__pkspec) \
-do { printk(KERN_INFO "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+	do { printk(KERN_INFO "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
 #undef  __fixme
 #define __fixme(__pkspec) \
-do { printk(KERN_INFO "%s: fixme() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+	do { printk(KERN_INFO "%s: fixme() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
 #undef  __todo
 #define __todo(__pkspec) \
-do { printk(KERN_INFO "%s: todo() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+	do { printk(KERN_INFO "%s: todo() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
 #undef  __ctrace
 #define __ctrace(__fnc) \
-({ printk(KERN_INFO "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
+	({ printk(KERN_INFO "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
 
 #undef  __printd
 #define __printd(__pkspec) \
-do { printk __pkspec; } while(0)
+	do { printk __pkspec; } while(0)
 
 #undef  __swerr
 #define __swerr() \
-do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+	do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
 #undef  __pswerr
 #define __pswerr(__pkspec) \
 do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+
+/* These are for completely suppressing a debugging macro. */
 
 #define    _never()		do { } while(0)
 #define     _rare()		do { } while(0)
@@ -372,7 +349,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    _swerr()		do { } while(0)
 #define   _pswerr(__pks)	do { } while(0)
 
-#ifdef CONFIG_STREAMS_DEBUG
+#ifdef _DEBUG
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -396,7 +373,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define   pswerr(__pks)		__pswerr(__pks)
 
 #else
-#ifdef CONFIG_STREAMS_TEST
+#ifdef _TEST
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -420,7 +397,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define   pswerr(__pks)		__pswerr(__pks)
 
 #else
-#ifdef CONFIG_STREAMS_SAFE
+#ifdef _SAFE
 
 #define    never()		do { *(int *)0 = 0; } while(0)
 #define     rare()		_rare()

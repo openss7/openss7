@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/08/16 07:47:28 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/10/12 10:22:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/08/16 07:47:28 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/10/12 10:22:50 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/08/16 07:47:28 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/10/12 10:22:50 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -594,7 +594,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 			_ptrace(("Error path taken!\n"));
 			break;
 		}
-#ifdef CONFIG_STREAMS_DEBUG
+#ifdef _DEBUG
 		if (fops->owner)
 			_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
 				 fops->owner->name, module_refcount(fops->owner)));
@@ -606,7 +606,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 			_ptrace(("Error path taken!\n"));
 			break;
 		}
-#ifdef CONFIG_STREAMS_DEBUG
+#ifdef _DEBUG
 		if (fops->owner)
 			_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
 				 fops->owner->name, module_refcount(fops->owner)));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/24 09:01:15 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/12 10:22:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:15 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/24 09:01:15 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/12 10:22:47 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/24 09:01:15 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/12 10:22:47 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/07/24 09:01:15 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/12 10:22:47 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -229,14 +229,14 @@ fifo_open(struct inode *inode, struct file *file)
 			_ptrace(("Error path taken!\n"));
 			goto error;
 		}
-#ifdef CONFIG_STREAMS_DEBUG
+#ifdef _DEBUG
 		if (f_op->owner)
 			_printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
 				 f_op->owner->name, module_refcount(f_op->owner)));
 		else
 			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
-#ifdef CONFIG_STREAMS_DEBUG
+#ifdef _DEBUG
 		if (file->f_op->owner)
 			_printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
 				 file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2006/09/18 13:20:10 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/10/12 10:22:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 13:20:10 $ by $Author: brian $
+# Last Modified $Date: 2006/10/12 10:22:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.124  2006/10/12 10:22:43  brian
+# - removed redundant debug flags
+#
 # Revision 0.9.2.123  2006/09/18 13:20:10  brian
 # - better directory detection
 #
@@ -217,30 +220,32 @@ AC_DEFUN([_LFS_SETUP_OPTIMIZE], [dnl
 # Optimizations and assertions are set up differently now.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     case "$linux_cv_debug" in
-	_DEBUG)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [1], [Define to perform
-		    internal structure tracking within the STREAMS executive
-		    as well as to provide additional /proc filesystem files
-		    for examining internal structures.])
-	    ;;
-	_TEST)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TEST], [1], [Define to perform
-		    performance testing with debugging.  This mode does not
-		    dump massive amounts of information into system logs, but
-		    peforms all assertion checks.])
-	    ;;
-	_SAFE)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAFE], [1], [Define to perform
-		    fundamental assertion checks.  This is a safer mode of
-		    operation.])
-	    ;;
-	_NONE | *)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NONE], [1], [Define to perform
-		    no assertion checks but report software errors.  This is
-		    the smallest footprint, highest performance mode of
-		    operation.])
-	    ;;
+    _DEBUG)
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [], [Define to perform
+			    internal structure tracking within the STREAMS
+			    executive as well as to provide additional /proc
+			    filesystem files for examining internal
+			    structures.])
+	;;
+    _TEST)
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TEST], [], [Define to perform
+			    performance testing with debugging.  This mode does
+			    not dump massive amounts of information into system
+			    logs, but peforms all assertion checks.])
+	;;
+    _SAFE)
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAFE], [], [Define to perform
+			    fundamental assertion checks.  This is a safer mode
+			    of operation.])
+	;;
+    _NONE | *)
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NONE], [], [Define to perform no
+			    assertion checks but report software errors.  This
+			    is the smallest footprint, highest performance mode
+			    of operation.])
+	;;
     esac
 ])# _LFS_SETUP_DEBUG
 # =============================================================================
@@ -937,7 +942,6 @@ AC_DEFUN([_LFS_SETUP], [dnl
     # checks on the kernel
     _LFS_CHECK_KERNEL
     _LFS_SETUP_OPTIMIZE
-    _LFS_SETUP_DEBUG
     _LFS_SETUP_COMPAT
     _LFS_SETUP_MODULE
     _LFS_SETUP_IRQ
@@ -949,6 +953,7 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_SETUP_MODULES
     _LFS_SETUP_DRIVERS
     _LFS_SETUP_FIFOS
+    _LFS_SETUP_DEBUG
 ])# _LFS_SETUP
 # =============================================================================
 

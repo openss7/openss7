@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.17 2006/10/03 13:52:07 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.18 2006/10/12 10:22:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/03 13:52:07 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: config.h.in,v $
+ Revision 0.9.2.18  2006/10/12 10:22:46  brian
+ - removed redundant debug flags
+
  Revision 0.9.2.17  2006/10/03 13:52:07  brian
  - changes to pass make check target
  - added some package config.h files
@@ -65,7 +68,7 @@
 #ifndef __SYS_STREAMS_CONFIG_H__
 #define __SYS_STREAMS_CONFIG_H__
 
-#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  * @configure_input@
@@ -94,28 +97,21 @@
 
 #undef CONFIG_STREAMS_MODULE
 
-#undef CONFIG_STREAMS_DEBUG
-
-#undef CONFIG_STREAMS_NONE
-
-#undef CONFIG_STREAMS_SAFE
-
-#undef CONFIG_STREAMS_TEST
-
-#undef CONFIG_STREAMS_NOIRQ
-
 #undef CONFIG_STREAMS_DO_STATS
-
-#undef _DEBUG
-
-#undef _NONE
-
-#undef _SAFE
-
-#undef _TEST
 
 #undef CONFIG_STREAMS_OVERRIDE_FIFOS
 
+/* Required by sys/strsubr.h in streams package. */
+#undef CONFIG_STREAMS_DEBUG
+
+/* Required by sys/strsubr.h in streams package. */
+#undef CONFIG_STREAMS_SYNCQS
+
+/* Required by one header file in strcompat package */
+#undef CONFIG_STREAMS_NOIRQ
+
+/* Required by several header files in streams packages and one
+   in strcompat package. */
 #undef CONFIG_STREAMS_LIS_BCM
 
 #undef HAVE_KFUNC_PROCESS_GROUP
@@ -127,10 +123,6 @@
 #undef HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
 
 #undef HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
-
-#undef HAVE_KTYPE_IRQRETURN_T
-
-#undef HAVE_LINUX_FAST_STREAMS
 
 #undef HAVE_KFUNC_READ_TRYLOCK
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/25 06:39:07 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/12 10:22:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:07 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/25 06:39:07 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/12 10:22:47 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/25 06:39:07 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/12 10:22:47 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/25 06:39:07 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/12 10:22:47 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -172,7 +172,7 @@ STATIC spinlock_t loop_lock = SPIN_LOCK_UNLOCKED;
 /*
  *  Locking
  */
-#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

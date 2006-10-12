@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/07/25 06:39:07 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:22:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:07 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.7  2006/10/12 10:22:47  brian
+ - removed redundant debug flags
+
  Revision 0.9.2.6  2006/07/25 06:39:07  brian
  - expanded minor device numbers and optimization and locking corrections
 
@@ -71,9 +74,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/07/25 06:39:07 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:22:47 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/07/25 06:39:07 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:22:47 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -101,7 +104,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.6 $) 
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2006/07/25 06:39:07 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:22:47 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"
@@ -199,7 +202,7 @@ STATIC struct vf *vf_links = NULL;
 /*
  *  Locking
  */
-#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

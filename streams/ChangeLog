@@ -1,3 +1,20 @@
+2006-10-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: removed redundant debug flags
+	* include/sys/streams/config.h.in: removed redundant debug flags
+	* include/sys/streams/strdebug.h: removed redundant debug flags
+	* src/drivers/fifo.c: removed redundant debug flags
+	* src/drivers/log.c: removed redundant debug flags
+	* src/drivers/loop.c: removed redundant debug flags
+	* src/drivers/mux.c: removed redundant debug flags
+	* src/drivers/vf.c: removed redundant debug flags
+	* src/kernel/strprocfs.c: removed redundant debug flags
+	* src/kernel/strreg.c: removed redundant debug flags
+	* src/kernel/strsched.c: removed redundant debug flags
+	* src/kernel/strspecfs.c: removed redundant debug flags
+	* src/kernel/strutil.h: removed redundant debug flags
+	* src/modules/sth.c: removed redundant debug flags
+
 2006-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* README: updates for release

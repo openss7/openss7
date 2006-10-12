@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/07/25 06:39:07 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/12 10:22:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:07 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/07/25 06:39:07 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/12 10:22:47 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/07/25 06:39:07 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/12 10:22:47 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/07/25 06:39:07 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/12 10:22:47 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -231,7 +231,7 @@ STATIC struct mux *mux_links = NULL;
 /*
  *  Locking
  */
-#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

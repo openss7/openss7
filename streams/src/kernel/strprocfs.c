@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/08/16 07:47:28 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/12 10:22:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:22:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 0.9.2.54  2006/10/12 10:22:50  brian
+ - removed redundant debug flags
+
  Revision 0.9.2.53  2006/08/16 07:47:28  brian
  - add security.h header file to avoid ptrace conflict, SLES changes
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/08/16 07:47:28 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/12 10:22:50 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/08/16 07:47:28 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/12 10:22:50 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -640,7 +643,7 @@ get_streams_strinfo_list(char *page, char **start, off_t offset, int length)
 	}
 }
 
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 STATIC int
 get_streams_stdata_hdr(char *page, int maxlen)
 {
@@ -1558,7 +1561,7 @@ strprocfs_init(void)
 	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
 #endif
 	create_proc_info_entry("strinfo", 0444, proc_str, get_streams_strinfo_list);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 #if 0
 	create_proc_info_entry("cdevsw", 0444, proc_str, get_streams_cdevsw_list);
 	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
@@ -1588,7 +1591,7 @@ strprocfs_exit(void)
 	remove_proc_entry("fmodsw", proc_str);
 #endif
 	remove_proc_entry("strinfo", proc_str);
-#if defined CONFIG_STREAMS_DEBUG
+#if defined _DEBUG
 #if 0
 	remove_proc_entry("cdevsw", proc_str);
 	remove_proc_entry("fmodsw", proc_str);
