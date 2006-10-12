@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:32 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/10/12 10:28:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:32 $ by $Author: brian $
+ Last Modified $Date: 2006/10/12 10:28:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.33  2006/10/12 10:28:38  brian
+ - removed redundant debug flags
+
  Revision 0.9.2.32  2006/10/02 11:32:32  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -166,10 +169,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:32 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/10/12 10:28:38 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:32 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/10/12 10:28:38 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -181,7 +184,6 @@ static char const ident[] =
    The driver uses the NPI (Network Provider Interface) API.
 */
 
-// #define CONFIG_STREAMS_DEBUG 1
 // #define _DEBUG 1
 
 #include <sys/os7/compat.h>
@@ -228,7 +230,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.32 $) $Date: 2006/10/02 11:32:32 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.33 $) $Date: 2006/10/12 10:28:38 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -540,7 +542,7 @@ np_alloc(void)
 /* Must always be bottom-half versions to avoid lock badness.  But give these
  * different names to avoid conflict with generic definitions.  */
 
-//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
+//#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 #if 1
 
 #define spin_lock_str2(__lkp, __flags) \
