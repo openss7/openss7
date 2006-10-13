@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strtty.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 09:53:25 $
+# @(#) $RCSfile: strtty.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 04:00:18 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,30 +28,33 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strtty'
 config="/etc/default/$name"
 desc="the STREAMS TTY modules"
+mknod="${name}_mknod"
 
 [ -e /proc/modules ] || exit 0
 
-for STRTTY_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
-    if [ -x $STRTTY_MKNOD ] ; then
-	break
-    else
-	STRTTY_MKNOD=
-    fi
-done
+if test -z "$STRTTY_MKNOD" ; then
+    for STRTTY_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
+	if [ -x $STRTTY_MKNOD ] ; then
+	    break
+	else
+	    STRTTY_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-STRTTY_MODULES=
-STRTTY_MAKEDEVICES='no'
-STRTTY_REMOVEDEVICES='no'
+[ -n "$STRTTY_MODULES"       ] || STRTTY_MODULES="streams-ldterm streams-pckt streams-ptem streams-pty streams-ttcompat"
+[ -n "$STRTTY_MAKEDEVICES"   ] || STRTTY_MAKEDEVICES="yes"
+[ -n "$STRTTY_REMOVEDEVICES" ] || STRTTY_REMOVEDEVICES="yes"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STRTTY_MKNOD" ] && STRTTY_MAKEDEVICES='no'
-[ -z "$STRTTY_MKNOD" ] && STRTTY_REMOVEDEVICES='no'
+[ -z "$STRTTY_MKNOD" ] && STRTTY_MAKEDEVICES="no"
+[ -z "$STRTTY_MKNOD" ] && STRTTY_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -197,7 +200,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strtty.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 09:53:25 $
+# @(#) $RCSfile: strtty.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 04:00:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -242,11 +245,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/23 09:53:25 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 04:00:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strtty.sh,v $
+# Revision 0.9.2.2  2006/10/13 04:00:18  brian
+# - corrected init scripts and config files
+#
 # Revision 0.9.2.1  2006/08/23 09:53:25  brian
 # - started STREAMS Terminals package
 #

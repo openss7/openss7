@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/08/22 12:36:57 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/13 03:59:58 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,11 +28,12 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='streams'
 config="/etc/default/$name"
 desc="the STREAMS subsystem"
+mknod="${name}_mknod"
 
 [ -e /proc/modules ] || exit 0
 
 if test -z "$STREAMS_MKNOD" ; then
-    for STREAMS_MKNOD in /sbin/streams_mknod /usr/sbin/streams_mknod /bin/streams_mknod /usr/bin/streams_mknod ; do
+    for STREAMS_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
 	if [ -x $STREAMS_MKNOD ] ; then
 	    break
 	else
@@ -43,7 +44,7 @@ fi
 
 # Specify defaults
 
-[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams"
+[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams streams-bufmod streams-connld streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nullmod streams-nuls streams-pipe streams-pipemod streams-sad streams-sc streams-sfx streams-spx streams-testmod"
 [ -n "$STREAMS_MAKEDEVICES"   ] || STREAMS_MAKEDEVICES="yes"
 [ -n "$STREAMS_REMOVEDEVICES" ] || STREAMS_REMOVEDEVICES="yes"
 [ -n "$STREAMS_MOUNTSPECFS"   ] || STREAMS_MOUNTSPECFS="yes"
@@ -201,11 +202,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/08/22 12:36:57 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/13 03:59:58 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -246,7 +247,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/22 12:36:57 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 03:59:58 $ by $Author: brian $
 #
 # =============================================================================
 

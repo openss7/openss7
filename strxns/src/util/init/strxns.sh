@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:41:00 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/13 04:00:20 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,30 +28,33 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strxns'
 config="/etc/default/$name"
 desc="the STREAMS XNS subsystem"
+mknod="${name}_mknod"
 
 [ -e /proc/modules ] || exit 0
 
-for STRXNS_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
-    if [ -x $STRXNS_MKNOD ] ; then
-	break
-    else
-	STRXNS_MKNOD=
-    fi
-done
+if test -z "$STRXNS_MKNOD" ; then
+    for STRXNS_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
+	if [ -x $STRXNS_MKNOD ] ; then
+	    break
+	else
+	    STRXNS_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-STRXNS_MODULES="streams-ip_strm_mod streams-ip_to_dlpi streams-ldl streams-np_ip"
-STRXNS_MAKEDEVICES="no"
-STRXNS_REMOVEDEVICES="no"
+[ -n "$STRXNS_MODULES"       ] || STRXNS_MODULES="streams-ip_strm_mod streams-ip_to_dlpi streams-ldl streams-np_ip"
+[ -n "$STRXNS_MAKEDEVICES"   ] || STRXNS_MAKEDEVICES="yes"
+[ -n "$STRXNS_REMOVEDEVICES" ] || STRXNS_REMOVEDEVICES="yes"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STRXNS_MKNOD" ] && STRXNS_MAKEDEVICES='no'
-[ -z "$STRXNS_MKNOD" ] && STRXNS_REMOVEDEVICES='no'
+[ -z "$STRXNS_MKNOD" ] && STRXNS_MAKEDEVICES="no"
+[ -z "$STRXNS_MKNOD" ] && STRXNS_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -197,11 +200,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:41:00 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/13 04:00:20 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -242,7 +245,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:41:00 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 04:00:20 $ by $Author: brian $
 #
 # =============================================================================
 

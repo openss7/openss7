@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/16 07:40:49 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/13 04:00:05 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,46 +28,53 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strinet'
 config="/etc/default/$name"
 desc="the STREAMS INET subsystem"
+mknod="${name}_mknod"
 
 [ -e /proc/modules ] || exit 0
 
-for STRINET_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
-    if [ -x $STRINET_MKNOD ] ; then
-	break
-    else
-	STRINET_MKNOD=
-    fi
-done
+if test -z "$STRINET_MKNOD" ; then
+    for STRINET_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
+	if [ -x $STRINET_MKNOD ] ; then
+	    break
+	else
+	    STRINET_MKNOD=
+	fi
+    done
+fi
 
-for INET_MKDEV in /sbin/inet_mkdev /usr/sbin/inet_mkdev /bin/inet_mkdev /usr/bin/inet_mkdev ; do
-    if [ -x $INET_MKDEV ] ; then
-	break
-    else
-	INET_MKDEV=
-    fi
-done
+if test -z "$INET_MKDEV" ; then
+    for INET_MKDEV in /sbin/inet_mkdev /usr/sbin/inet_mkdev /bin/inet_mkdev /usr/bin/inet_mkdev ; do
+	if [ -x $INET_MKDEV ] ; then
+	    break
+	else
+	    INET_MKDEV=
+	fi
+    done
+fi
 
-for INET_RMDEV in /sbin/inet_rmdev /usr/sbin/inet_rmdev /bin/inet_rmdev /usr/bin/inet_rmdev ; do
-    if [ -x $INET_RMDEV ] ; then
-	break
-    else
-	INET_RMDEV=
-    fi
-done
+if test -z "$INET_RMDEV" ; then
+    for INET_RMDEV in /sbin/inet_rmdev /usr/sbin/inet_rmdev /bin/inet_rmdev /usr/bin/inet_rmdev ; do
+	if [ -x $INET_RMDEV ] ; then
+	    break
+	else
+	    INET_RMDEV=
+	fi
+    done
+fi
 
 # Specify defaults
 
-STRINET_MODULES="streams-inet streams-rawip streams-udp"
-STRINET_MAKEDEVICES="no"
-STRINET_REMOVEDEVICES="no"
+[ -n "$STRINET_MODULES"       ] || STRINET_MODULES="streams-inet streams-rawip streams-tcp streams-udp"
+[ -n "$STRINET_MAKEDEVICES"   ] || STRINET_MAKEDEVICES="yes"
+[ -n "$STRINET_REMOVEDEVICES" ] || STRINET_REMOVEDEVICES="yes"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STRINET_MKNOD" -a -z "$INET_MKDEV" ] && STRINET_MAKEDEVICES='no'
-[ -z "$STRINET_MKNOD" -a -z "$INET_RMDEV" ] && STRINET_REMOVEDEVICES='no'
+[ -z "$STRINET_MKNOD" -a -z "$INET_MKDEV" ] && STRINET_MAKEDEVICES="no"
+[ -z "$STRINET_MKNOD" -a -z "$INET_RMDEV" ] && STRINET_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -227,11 +234,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/16 07:40:49 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/13 04:00:05 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -272,7 +279,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:40:49 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 04:00:05 $ by $Author: brian $
 #
 # =============================================================================
 

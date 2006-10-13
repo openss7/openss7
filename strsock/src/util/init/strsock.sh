@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:04:12 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 04:00:16 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,30 +28,33 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strsock'
 config="/etc/default/$name"
 desc="the STREAMS SOCK modules"
+mknod="${name}_mknod"
 
 [ -e /proc/modules ] || exit 0
 
-for STRSOCK_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
-    if [ -x $STRSOCK_MKNOD ] ; then
-	break
-    else
-	STRSOCK_MKNOD=
-    fi
-done
+if test -z "$STRSOCK_MKNOD" ; then
+    for STRSOCK_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
+	if [ -x $STRSOCK_MKNOD ] ; then
+	    break
+	else
+	    STRSOCK_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-STRSOCK_MODULES=
-STRSOCK_MAKEDEVICES='no'
-STRSOCK_REMOVEDEVICES='no'
+[ -n "$STRSOCK_MODULES"       ] || STRSOCK_MODULES="streams-sockmod streams-socksys"
+[ -n "$STRSOCK_MAKEDEVICES"   ] || STRSOCK_MAKEDEVICES="yes"
+[ -n "$STRSOCK_REMOVEDEVICES" ] || STRSOCK_REMOVEDEVICES="yes"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STRSOCK_MKNOD" ] && STRSOCK_MAKEDEVICES='no'
-[ -z "$STRSOCK_MKNOD" ] && STRSOCK_REMOVEDEVICES='no'
+[ -z "$STRSOCK_MKNOD" ] && STRSOCK_MAKEDEVICES="no"
+[ -z "$STRSOCK_MKNOD" ] && STRSOCK_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -197,7 +200,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:04:12 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 04:00:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -242,11 +245,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/23 10:04:12 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 04:00:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strsock.sh,v $
+# Revision 0.9.2.2  2006/10/13 04:00:16  brian
+# - corrected init scripts and config files
+#
 # Revision 0.9.2.1  2006/08/23 10:04:12  brian
 # - started STREAMS Sockets package
 #

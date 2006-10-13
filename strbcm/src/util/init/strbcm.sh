@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/08/16 07:40:46 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 03:59:53 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,30 +28,33 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strbcm'
 config="/etc/default/$name"
 desc="the STREAMS BCM modules"
+mknod="${name}_mknod"
 
 [ -e /proc/modules ] || exit 0
 
-for STRBCM_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
-    if [ -x $STRBCM_MKNOD ] ; then
-	break
-    else
-	STRBCM_MKNOD=
-    fi
-done
+if test -z "$STRBCM_MKNOD" ; then
+    for STRBCM_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
+	if [ -x $STRBCM_MKNOD ] ; then
+	    break
+	else
+	    STRBCM_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-STRBCM_MODULES=
-STRBCM_MAKEDEVICES='no'
-STRBCM_REMOVEDEVICES='no'
+[ -n "$STRBCM_MODULES"       ] || STRBCM_MODULES="streams-tstdrv streams-tstmod"
+[ -n "$STRBCM_MAKEDEVICES"   ] || STRBCM_MAKEDEVICES="yes"
+[ -n "$STRBCM_REMOVEDEVICES" ] || STRBCM_REMOVEDEVICES="yes"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STRBCM_MKNOD" ] && STRBCM_MAKEDEVICES='no'
-[ -z "$STRBCM_MKNOD" ] && STRBCM_REMOVEDEVICES='no'
+[ -z "$STRBCM_MKNOD" ] && STRBCM_MAKEDEVICES="no"
+[ -z "$STRBCM_MKNOD" ] && STRBCM_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -197,7 +200,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/08/16 07:40:46 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 03:59:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -242,11 +245,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:40:46 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 03:59:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strbcm.sh,v $
+# Revision 0.9.2.3  2006/10/13 03:59:53  brian
+# - corrected init scripts and config files
+#
 # Revision 0.9.2.2  2006/08/16 07:40:46  brian
 # - rework addition and removal of kernel modules
 #

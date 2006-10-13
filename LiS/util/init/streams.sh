@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/16 07:40:45 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/13 03:59:49 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,33 +28,35 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='streams'
 config="/etc/default/$name"
 desc="the STREAMS subsystem"
+mknod="strmaknodes"
 
 [ -e /proc/modules ] || exit 0
 
-for STREAMS_MKNOD in /sbin/strmakenodes /usr/sbin/strmakenodes /bin/strmakenodes /usr/bin/strmakenodes ; do
-    if [ -x $STREAMS_MKNOD ] ; then
-	break
-    else
-	STREAMS_MKNOD=
-    fi
-done
+if test -z "$STREAMS_MKNOD" ; then
+    for STREAMS_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
+	if [ -x $STREAMS_MKNOD ] ; then
+	    break
+	else
+	    STREAMS_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-#STREAMS_MODULES="streams streams-liskmod streams-mtdrv streams-pipemod"
-STREAMS_MODULES="streams"
-STREAMS_MAKEDEVICES="no"
-STREAMS_REMOVEDEVICES="no"
-STREAMS_MOUNTSPECFS="yes"
-STREAMS_MOUNTPOINT="/dev/streams"
+[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams streams-bufmod streams-echo streams-liskmod streams-mtdrv streams-mux streams-nullmod streams-nuls streams-pipemod streams-relay3 streams-testmod"
+[ -n "$STREAMS_MAKEDEVICES"   ] || STREAMS_MAKEDEVICES="yes"
+[ -n "$STREAMS_REMOVEDEVICES" ] || STREAMS_REMOVEDEVICES="yes"
+[ -n "$STREAMS_MOUNTSPECFS"   ] || STREAMS_MOUNTSPECFS="no"
+[ -n "$STREAMS_MOUNTPOINT"    ] || STREAMS_MOUNTPOINT="/dev/streams"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES='no'
-[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES='no'
+[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES="no"
+[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -97,7 +99,7 @@ start() {
 	RETVAL=1
     fi
 
-    if grep '^[[:space:]]*streams[/.]' /etc/sysctl.conf $redir ; then
+    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
 	echo -n "Reconfiguring kernel parameters: "
 	sysctl -p /etc/sysctl.conf $redir
 	if [ $? -eq 0 ] ; then
@@ -107,9 +109,9 @@ start() {
 	fi
     fi
 
-    if [ -f /etc/streams.conf ] ; then
+    if [ -f /etc/${name}.conf ] ; then
 	echo -n "Configuring STREAMS parameters: "
-	sysctl -p /etc/streams.conf $redir
+	sysctl -p /etc/${name}.conf $redir
 	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
@@ -200,7 +202,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/16 07:40:45 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/13 03:59:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -245,7 +247,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:40:45 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 03:59:49 $ by $Author: brian $
 #
 # =============================================================================
 

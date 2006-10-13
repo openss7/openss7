@@ -4,7 +4,8 @@
 
 # Kernel modules.  Needs to be populated by the configuration script.  This
 # really needs to be a '.in' file.
-STRSOCK_MODULES="@STRSOCK_MODULES@"
+#STRSOCK_MODULES="@STRSOCK_MODULES@"
+STRSOCK_MODULES="streams-sockmod streams-socksys"
 # Make real character devices before intializing subsystem?
 STRSOCK_MAKEDEVICES='yes'
 # Remove devices after removing subsystem?
@@ -12,7 +13,7 @@ STRSOCK_REMOVEDEVICES='no'
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 10:04:15 $
+# @(#) $RCSfile: strsock.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 04:00:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -57,11 +58,14 @@ STRSOCK_REMOVEDEVICES='no'
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/23 10:04:15 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 04:00:17 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strsock.in,v $
+# Revision 0.9.2.2  2006/10/13 04:00:17  brian
+# - corrected init scripts and config files
+#
 # Revision 0.9.2.1  2006/08/23 10:04:15  brian
 # - started STREAMS Sockets package
 #

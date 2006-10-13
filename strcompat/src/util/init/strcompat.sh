@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:40:47 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/13 03:59:55 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,31 +28,33 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strcompat'
 config="/etc/default/$name"
 desc="the STREAMS Compatibility subsystem"
+mknod="${name}_mknod"
 
 [ -e /proc/modules ] || exit 0
 
-for STRCOMPAT_MKNOD in /sbin/strcompat_mknod /usr/sbin/strcompat_mknod /bin/strcompat_mknod /usr/bin/strcompat_mknod ; do
-    if [ -x $STRCOMPAT_MKNOD ] ; then
-	break
-    else
-	STRCOMPAT_MKNOD=
-    fi
-done
+if test -z "$STRCOMPAT_MKNOD" ; then
+    for STRCOMPAT_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
+	if [ -x $STRCOMPAT_MKNOD ] ; then
+	    break
+	else
+	    STRCOMPAT_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-#STRCOMPAT_MODULES="streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat"
-STRCOMPAT_MODULES=""
-STRCOMPAT_MAKEDEVICES="no"
-STRCOMPAT_REMOVEDEVICES="no"
+[ -n "$STRCOMPAT_MODULES"       ] || STRCOMPAT_MODULES="streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-os7compat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat"
+[ -n "$STRCOMPAT_MAKEDEVICES"   ] || STRCOMPAT_MAKEDEVICES="yes"
+[ -n "$STRCOMPAT_REMOVEDEVICES" ] || STRCOMPAT_REMOVEDEVICES="yes"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_MAKEDEVICES='no'
-[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_REMOVEDEVICES='no'
+[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_MAKEDEVICES="no"
+[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -240,11 +242,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/08/16 07:40:47 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/13 03:59:55 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -285,7 +287,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:40:47 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 03:59:55 $ by $Author: brian $
 #
 # =============================================================================
 

@@ -2,18 +2,20 @@
 # This is an initial configuration file for the STREAMS subsystem.
 #
 
+# List of modules in load order.
+STREAMS_MODULES="streams streams-bufmod streams-echo streams-liskmod streams-mtdrv streams-mux streams-nullmod streams-nuls streams-pipemod streams-relay3 streams-testmod"
 # Make real character devices before intializing subsystem?
 STREAMS_MAKEDEVICES="yes"
 # Remove devices after removing subsystem?
 STREAMS_REMOVEDEVICES="no"
 # Mount/unmount specfs file system?
-STREAMS_MOUNTSPECFS="yes"
+STREAMS_MOUNTSPECFS="no"
 # Mount point?
 STREAMS_MOUNTPOINT="/dev/streams"
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/08 03:34:54 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 03:59:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -58,7 +60,7 @@ STREAMS_MOUNTPOINT="/dev/streams"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:34:54 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 03:59:51 $ by $Author: brian $
 #
 # =============================================================================
 # vim ft=conf

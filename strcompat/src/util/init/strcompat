@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/16 07:40:47 $
+# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/13 03:59:55 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -87,31 +87,34 @@ esac
 name='strcompat'
 lockfile="/var/lock/subsys/$name"
 config="/etc/sysconfig/$name"
+mknod="${name}_mknod"
 
 if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
 
-for STRCOMPAT_MKNOD in \
-    ./${name}_mknod /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
-    if [ -x $STRCOMPAT_MKNOD ] ; then
-	break
-    else
-	STRCOMPAT_MKNOD=
-    fi
-done
+if test -z "$STRCOMPAT_MKNOD" ; then
+    for STRCOMPAT_MKNOD in \
+	./${mknod} /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod}; do
+	if [ -x $STRCOMPAT_MKNOD ] ; then
+	    break
+	else
+	    STRCOMPAT_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-STRCOMPAT_MODULES="streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat"
-STRCOMPAT_MAKEDEVICES="yes"
-STRCOMPAT_REMOVEDEVICES="yes"
+[ -n "$STRCOMPAT_MODULES"       ] || STRCOMPAT_MODULES="streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-os7compat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat"
+[ -n "$STRCOMPAT_MAKEDEVICES"   ] || STRCOMPAT_MAKEDEVICES="yes"
+[ -n "$STRCOMPAT_REMOVEDEVICES" ] || STRCOMPAT_REMOVEDEVICES="yes"
 
 # Source redhat and/or debian config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_MAKEDEVICES='no'
-[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_REMOVEDEVICES='no'
+[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_MAKEDEVICES="no"
+[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -276,7 +279,7 @@ case "$1" in
 		    # loaded and subsystem locked
 		    for file in $config /etc/$name.conf ; do
 			if [ -f $file -a $file -nt $lockfile ] ; then
-			    # configuration file updeated, need to reload
+			    # configuration file updated, need to reload
 			    echo 'reload'
 			    break
 			fi
@@ -310,11 +313,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/08/16 07:40:47 $
+# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/13 03:59:55 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -355,7 +358,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:40:47 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 03:59:55 $ by $Author: brian $
 #
 # =============================================================================
 
