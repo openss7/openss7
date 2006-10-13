@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 08:29:50 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 08:38:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 08:29:50 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 08:38:44 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.2  2006/10/13 08:38:44  brian
+# - proper check file
+#
 # Revision 0.9.2.1  2006/10/13 08:29:50  brian
 # - added file to locate strchan package
 #
@@ -137,7 +140,7 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS Channel header files.  The
     # package normally requires Channel header files to compile.
     AC_CACHE_CHECK([for chan include directory], [chan_cv_includes], [dnl
-	chan_what="sys/xti_osi.h"
+	chan_what="sys/ch.h"
 	if test :"${with_chan:-no}" != :no -a :"${with_chan:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    AC_MSG_RESULT([(searching $with_chan)])
