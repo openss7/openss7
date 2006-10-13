@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/10 10:12:44 $
+ @(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 00:09:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/10 10:12:44 $ by $Author: brian $
+ Last Modified $Date: 2006/10/13 00:09:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pthread.c,v $
+ Revision 0.9.2.2  2006/10/13 00:09:14  brian
+ - fixed segfault in pthread_setcanceltype
+
  Revision 0.9.2.1  2006/10/10 10:12:44  brian
  - added losts of striso files
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/10 10:12:44 $"
+#ident "@(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 00:09:14 $"
 
 static char const ident[] =
-    "$RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/10 10:12:44 $";
+    "$RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 00:09:14 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -443,7 +446,8 @@ pthread_setcanceltype(int type, int *oldtype)
 	  * type and returns the oldtype from a static variable.  One of the
 	  * ramifications of this is that the cancel type might not be correct
 	  * after a fork(2). */
-	*oldtype = __pthread_canceltype;
+	if (oldtype != NULL)
+		*oldtype = __pthread_canceltype;
 	__pthread_canceltype = type;
 	return (0);
 	/** @return Returns zero (0) on success, error number on failure. */
