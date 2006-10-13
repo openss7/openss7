@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.5 2006/10/12 09:37:39 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.6 2006/10/13 08:16:26 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/12 09:37:39 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/13 08:16:26 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -110,7 +110,7 @@ module that provides @cite{UNIX@registeredsymbol{} Version 7} and @cite{4BSD}
 compatible terminal interfaces.  These interfaces are no longer in use and
 this module has only marginal value.
 
-This module is complete bu untested.
+This module is complete but untested.
 
 @end table
 
