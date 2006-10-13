@@ -1,0 +1,197 @@
+# vim: ft=sh sw=4 et nosi nocin fo+=or tw=78
+# =============================================================================
+# 
+# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:52 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# Unauthorized distribution or duplication is prohibited.
+#
+# This software and related documentation is protected by copyright and
+# distributed under licenses restricting its use, copying, distribution and
+# decompilation.  No part of this software or related documentation may be
+# reproduced in any form by any means without the prior written
+# authorization of the copyright holder, and licensors, if any.
+#
+# The recipient of this document, by its retention and use, warrants that
+# the recipient will protect this information and keep it confidential, and
+# will not disclose the information contained in this document without the
+# written permission of its owner.
+#
+# The author reserves the right to revise this software and documentation
+# for any reason, including but not limited to, conformity with standards
+# promulgated by various agencies, utilization of advances in the state of
+# the technical arts, or the reflection of changes in the design of any
+# techniques, or procedures embodied, described, or referred to herein.
+# The author is under no obligation to provide any feature listed herein.
+#
+# -----------------------------------------------------------------------------
+#
+# As an exception to the above, this software may be distributed under the
+# GNU General Public License (GPL) Version 2, so long as the software is
+# distributed with, and only used for the testing of, OpenSS7 modules,
+# drivers, and libraries.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"),
+# it is classified as "Commercial Computer Software" under paragraph
+# 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
+# ("DFARS") (or any successor regulations) and the Government is acquiring
+# only the license rights granted herein (the license rights customarily
+# provided to non-Government users).  If the Software is supplied to any unit
+# or agency of the Government other than DoD, it is classified as "Restricted
+# Computer Software" and the Government's rights in the Software are defined
+# in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
+# any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+# of the NASA Supplement to the FAR (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/10/13 07:57:52 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: atlocal.in,v $
+# Revision 0.9.2.1  2006/10/13 07:57:52  brian
+# - added initial STREAMS Channel package
+#
+# =============================================================================
+
+#
+# This file is sourced by the autotest testsuite after options parsing.
+#
+
+at_STRCONF_PACKAGE="@STRCONF_PACKAGE@"
+
+at_AUTOM4TE="@ac_pt_AUTOM4TE@"
+at_AUTOTEST="@ac_pt_AUTOTEST@"
+at_DEPMOD="@ac_pt_DEPMOD@"
+at_GENKSYMS="@ac_pt_GENKSYMS@"
+at_GPG="@ac_pt_GPG@"
+at_LDCONFIG="@ac_pt_LDCONFIG@"
+at_LSMOD="@ac_pt_LSMOD@"
+at_LSOF="@ac_pt_LSOF@"
+at_MODPROBE="@ac_pt_MODPROBE@"
+at_RPM="@ac_pt_RPM@"
+at_RPMBUILD="@ac_pt_RPMBUILD@"
+
+at_build="@build@"
+at_build_alias="@build_alias@"
+at_build_cpu="@build_cpu@"
+at_build_os="@build_os@"
+at_build_vendor="@build_vendor@"
+
+#echo "at_build         =\"$at_build\""
+#echo "at_build_alias   =\"$at_build_alias\""
+#echo "at_build_cpu     =\"$at_build_cpu\""
+#echo "at_build_os      =\"$at_build_os\""
+#echo "at_build_vendor  =\"$at_build_vendor\""
+
+at_host="@host@"
+at_host_alias="@host_alias@"
+at_host_cpu="@host_cpu@"
+at_host_os="@host_os@"
+at_host_vendor="@host_vendor@"
+
+#echo "at_host          =\"$at_host\""
+#echo "at_host_alias    =\"$at_host_alias\""
+#echo "at_host_cpu      =\"$at_host_cpu\""
+#echo "at_host_os       =\"$at_host_os\""
+#echo "at_host_vendor   =\"$at_host_vendor\""
+
+at_target="@target@"
+at_target_alias="@target_alias@"
+at_target_cpu="@target_cpu@"
+at_target_os="@target_os@"
+at_target_vendor="@target_vendor@"
+
+#echo "at_target        =\"$at_target\""
+#echo "at_target_alias  =\"$at_target_alias\""
+#echo "at_target_cpu    =\"$at_target_cpu\""
+#echo "at_target_os     =\"$at_target_os\""
+#echo "at_target_vendor =\"$at_target_vendor\""
+
+at_test=`@top_srcdir@/scripts/config.guess`
+at_test_alias=
+at_test_cpu=`echo $at_test | sed -e 's|-.*||g'`
+at_test_vendor=`echo $at_test | sed -e 's|^[^-]*-||;s|-.*||g'`
+at_test_os=`echo $at_test | sed -e 's|^[^-]*-[^-]*-||'`
+
+#echo "at_test          =\"$at_test\""
+#echo "at_test_alias    =\"$at_test_alias\""
+#echo "at_test_cpu      =\"$at_test_cpu\""
+#echo "at_test_os       =\"$at_test_os\""
+#echo "at_test_vendor   =\"$at_test_vendor\""
+
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+at_bindir="@bindir@"
+at_datadir="@datadir@"
+at_DESTDIR="${DESTDIR}"
+at_exec_prefix="@exec_prefix@"
+at_kmoduledir="@kmoduledir@"
+at_rootdir="${rootdir}"
+at_ksysmap="@ksysmap@"
+at_kversion="@kversion@"
+at_libdir="@libdir@"
+at_libexecdir="@libexecdir@"
+at_localstatedir="@localstatedir@"
+at_mkdir_p="@mkdir_p@"
+at_oldincludedir="@oldincludedir@"
+at_prefix="@prefix@"
+at_sbindir="@sbindir@"
+at_sharedstatedir="@sharedstatedir@"
+at_sysconfdir="@sysconfdir@"
+
+#
+#   The following needs to be performed by the individual test suites instead
+#   of when atlocal is sourced.  atlocal just needs to contain information
+#   from configure that is needed by the test suites themselves.
+#
+
+#if test \
+#    :"$at_target_cpu-$at_target_os" != :"$at_test_cpu-$at_test_os"
+#then
+#    echo "Build target $at_target_cpu-$at_target_os is different from test host $at_test_cpu-$at_test_os"
+#    echo "Skipping install checks."
+#    exit 0
+#fi
+#
+#if test \
+#    -r "${at_DESTDIR}${at_rootdir}/etc/modules.conf"
+#then
+#    at_kernel_tests='yes'
+#else
+#    echo "Kernel modules not installed."
+#    echo "File ${at_DESTDIR}${at_rootdir}/etc/modules.conf cannot be read."
+#    echo "Will test kernel modules in place."
+#    at_kernel_tests='no'
+#fi
+#
+#if test \
+#    -n "$at_LDCONFIG" -a \
+#    -x "$at_LDCONFIG" -a \
+#    -r "$at_sysconfdir/ld.so.conf" -a \
+#    -r "$at_sysconfdir/ld.so.cache"
+#then
+#    at_library_tests='yes'
+#else
+#    echo "Libraries not installed."
+#    echo "Will test libraries in place."
+#    at_library_tests='no'
+#fi
+
+# vim: ft=sh sw=4 et nosi nocin fo+=or tw=78

@@ -1,0 +1,192 @@
+@c -*- texinfo -*- vim: ft=texinfo nocin nosi
+@c =========================================================================
+@c
+@c @(#) $Id: descrip.texi,v 0.9.2.1 2006/10/13 07:57:35 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/10/13 07:57:35 $ by $Author: brian $
+@c
+@c =========================================================================
+@c
+@c $Log: descrip.texi,v $
+@c Revision 0.9.2.1  2006/10/13 07:57:35  brian
+@c - added initial STREAMS Channel package
+@c
+@c =========================================================================
+
+The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and
+drivers, libraries, programs, init scripts, and daemons that implement the
+@cite{OpenSS7} @dfn{STEAMS} isochronous channels for the purpose of
+implementing data transmission links, or for carrying voice or other media,
+such as channelization of T1 carrier facilities, or ATM AAL3.  This package
+also includes pseudo-isochronous channels such as those provided by RTP.
+
+Included are hardware device drivers and pseudo-device drivers that provide
+implementations of specific channels.  A pseudo-device driver is planned to
+link into the @cite{Linux} OSS (Open Sound System) and ALS (Advanced Linux
+Sound).  Specific E1/T1 cards such as the V401P are supported by this package.
+
+@ignore
+This package also supports data channel protocols for data communication over
+isochronous channels such as HDLC and SS7 DAEDR/DAEDT/AERM/SUERM as well as
+upper layer link protocols such as LAPB, LAPF, LAPD, LLC.  These modules are
+provided here because they work directly over an isochronous channel and are
+therefore designed to work with them.  These data links provide support for
+the @cite{OpenSS7 STREAMS ISO/OSI} as well as the @cite{OpenSS7 STREAMS
+SS7/ISDN/VoIP/SIGTRAN Stack} package.
+@end ignore
+
+This package builds and installs the following @dfn{STREAMS} kernel modules
+and drivers:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{streams_ch.ko} driver @dfn{/dev/ch} @dfn{/dev/ch_mg}
+@item @tab @minus{} @file{streams_mx.ko} driver @dfn{/dev/mx} @dfn{/dev/mx_mg}
+@item @tab @minus{} @file{streams_mg.ko} driver @dfn{/dev/mg} @dfn{/dev/mg_mg}
+@item @tab @minus{} @file{streams_pwe3.ko} module @dfn{pwe3}
+@item @tab @minus{} @file{streams_rtp.ko} module @dfn{rtp}
+@ignore
+@item @tab @minus{} @file{streams_hdlc.ko} module @dfn{hdlc}
+@item @tab @minus{} @file{streams_hdlc.ko} module @dfn{hdlc}
+@item @tab @minus{} @file{streams_q702.ko} module @dfn{q702}
+@item @tab @minus{} @file{streams_lapb.ko} module @dfn{lapb}
+@item @tab @minus{} @file{streams_lapf.ko} module @dfn{lapf}
+@item @tab @minus{} @file{streams_lapd.ko} module @dfn{lapd}
+@item @tab @minus{} @file{streams_llc.ko} module @dfn{llc}
+@end ignore
+@end multitable
+
+@table @manref
+
+@item ch(4)
+
+@item mx(4)
+The @manpage{mx(4)} multiplexing pseudo-device driver is a fully functional
+matrix swithing device capable of switching, performing rate adaption, echo
+cancellation, digital padding, conferencing, tones, announcements, detection
+of tones, detection of speech, continuity tests, progress tones, A-law/mu-law
+conversion, decompression/compression, comb filtering, and other functions of
+a digital switching matrix.
+
+@item mg(4)
+The @manpage{mg(4)} multiplexing pseudo-device driver is a fully functional
+media gateway device capable of providing conversion between Circuit Switched
+Network connections (via the @manpage{mx(4)} driver) and Ephemeral RTP streams
+(via the @manpage{rtp(4)} module and @manpage{udp(4)} driver).  This device
+also supports Media Gateway Control Protocol communications of several forms
+over @manpage{tcp(4)} and @manpage{sctp(4)}.
+
+@item pwe3(4)
+The @manpage{pwe3(4)} module is a pushable @dfn{STREAMS} module that is pushed
+over a @manpage{tcp(4)} or @manpage{sctp(4)} Stream to provide pseudo-wire
+emulation end-to-end.  This device appears as though it is a channel device.
+
+@item rtp(4)
+The @manpage{rtp(4)} module is a pushable @dfn{STREAMS} module that is pushed
+over a @manpage{udp(4)} Stream to provide a full duplex, controlled (RTCP)
+media stream connection.  The resulting Stream is suitable for linking under
+the @manpage{mg(4)} multiplexing driver to provide Ephemeral RTP streams for
+use with the Media Gateway Control Protocol.
+
+@ignore
+@item hdlc(4)
+The @manpage{hdlc(4)} module a pushable @dfn{STREAMS} module that provides the
+capabilties of the High-Level Data Link Control and can be pushed over a raw
+@manpage{ch(4)} channel to provide a Communications Device Interface (CDI) or
+Data Link Provider Interface (DLPI) suitable for use with ISO/OSI protocols,
+X.25 or ISDN.
+
+@item q702(4)
+The @manpage{q702(4)}
+
+@item lapb(4)
+
+@item lapf(4)
+
+@item lapd(4)
+
+@item llc(4)
+@end ignore
+
+@end table
+
+The package builds and installs the following shared object libraries:
+
+@table @manref
+
+@item librtp(3)
+The @manpage{librtp(3)} library provides replacements for the @cite{AT&T}
+@cite{rtplib} functions.  These functions are:
+
+@multitable @columnfractions .25 .70
+@item @manref{rtpopen(3)} @tab -- open an RTP channel
+@end multitable
+
+The library is incomplete.
+
+@end table
+
+The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR
+4.2} @dfn{STREAMS} drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution of
+@cite{@value{PACKAGE_TITLE}} applications for the @cite{SVR 4.2} @dfn{STREAMS}
+environment.
+
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6
+keernels and was targeted at @samp{ix86}, @samp{x86_64}, @samp{ppc} and
+@samp{ppc64} architectures, but should build and install for other
+architectures as well.
+
+This package is currently incomplete.  It is being released as a reference
+point for the community.  If you are interested in completion of this package,
+sponsor the OpenSS7 Project.  To sponsor the project, contact
+@email{info@@openss7.com}.

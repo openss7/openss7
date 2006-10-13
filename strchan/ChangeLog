@@ -1,0 +1,132 @@
+2006-10-13  Brian Bidulock  <bidulcok@openss7.org>
+
+	- started off this new STREAMS Channels package
+
+	* strchan.gif: added binary files
+	* strchan.tif: added binary files
+	* strchan.xcf: added binary files
+	* strchan.xpm: added binary files
+
+	- added initial package files
+	* ChangeLog: added
+	* AUTHORS: added
+	* Makefile.am: added
+	* NEWS: added
+	* README: added
+	* THANKS: added
+	* acinclude.m4: added
+	* configure.ac: added
+	* strchan.lsm.in: added
+	* strchan.spec.in: added
+	* debian/README.Debian: added
+	* debian/TODO.Debian: added
+	* debian/changelog: added
+	* debian/control.in: added
+	* debian/copyright: added
+	* debian/mscript_header.in: added
+	* debian/mscript_postinst.in: added
+	* debian/mscript_postrm.in: added
+	* debian/mscript_preinst.in: added
+	* debian/mscript_prerm.in: added
+	* debian/rules.in: added
+	* debian/strchan-core.postinst.in: added
+	* debian/strchan-core.postrm.in: added
+	* debian/strchan-core.preinst.in: added
+	* debian/strchan-core.prerm.in: added
+	* debian/strchan-dev.postinst.in: added
+	* debian/strchan-dev.preinst.in: added
+	* debian/strchan-dev.prerm.in: added
+	* debian/strchan-devel.preinst.in: added
+	* debian/strchan-doc.postinst.in: added
+	* debian/strchan-doc.preinst.in: added
+	* debian/strchan-doc.prerm.in: added
+	* debian/strchan-init.postinst.in: added
+	* debian/strchan-init.postrm.in: added
+	* debian/strchan-init.preinst.in: added
+	* debian/strchan-init.prerm.in: added
+	* debian/strchan-lib.preinst.in: added
+	* debian/strchan-source.preinst.in: added
+	* debian/strchan-util.preinst.in: added
+	* doc/Makefile.am: added
+	* doc/man/Makefile.am: added
+	* doc/man/strchan.macros: added
+	* doc/man/strchan.refs: added
+	* doc/man/man5/strchan.5.man: added
+	* doc/man/man8/strchan_mknod.8.man: added
+	* doc/manual/Makefile.am: added
+	* doc/manual/bugs.texi: added
+	* doc/manual/configure.texi: added
+	* doc/manual/descrip.texi: added
+	* doc/manual/news.texi: added
+	* doc/manual/prerequisites.texi: added
+	* doc/manual/releases.texi: added
+	* doc/manual/rpm.texi: added
+	* doc/manual/strchan.texi: added
+	* doc/manual/todo.texi: added
+	* doc/manual/tree.texi: added
+	* lib32/Makefile.am: added
+	* src/Makefile.am: added
+	* src/drivers/Config.in: added
+	* src/include/Makefile.am: added
+	* src/include/sys/strchan/config.h.in: added
+	* src/include/sys/strchan/version.h.in: added
+	* src/modules/Config.in: added
+	* src/test/test-chan.c: added
+	* src/util/init/README: added
+	* src/util/init/strchan: added
+	* src/util/init/strchan.sh: added
+	* src/util/modutils/strchan.in: added
+	* src/util/sysconfig/README: added
+	* src/util/sysconfig/strchan.conf: added
+	* src/util/sysconfig/strchan.in: added
+	* tests/Makefile.am: added
+	* tests/atlocal.in: added
+	* tests/dummy1.m4: added
+	* tests/dummy2.m4: added
+	* tests/dummy3.m4: added
+	* tests/dummy4.m4: added
+	* tests/kernel.at: added
+	* tests/local.at: added
+	* tests/testsuite.at: added
+
+
+-----
+
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+Ave, Cambridge, MA 02139, USA.
+
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+behalf of the U.S. Government ("Government"), the following provisions apply
+to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+is classified as "Commercial Computer Software" under paragraph 252.227-7014
+of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+successor regulations) and the Government is acquiring only the license rights
+granted herein (the license rights customarily provided to non-Government
+users).  If the Software is supplied to any unit or agency of the Government
+other than DoD, it is classified as "Restricted Computer Software" and the
+Government's rights in the Software are defined in paragraph 52.227-19 of the
+Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+(or any successor regulations).
+
+
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn nocin nosi
