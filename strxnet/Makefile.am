@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/10/04 04:41:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/10/13 08:15:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/04 04:41:23 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 08:15:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.69  2006/10/13 08:15:14  brian
+# - added init scripts
+#
 # Revision 0.9.2.68  2006/10/04 04:41:23  brian
 # - changes to pass distcheck target
 #
@@ -586,18 +589,18 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		=
+dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf
 
 if WITH_XNSL
 ## WITH_XNSL
@@ -605,7 +608,7 @@ dist_sysconf_DATA		+= src/util/sysconfig/netconfig
 ## WITH_XNSL
 endif
 
-dist_config_DATA		=
+dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 
 ## INSTALL_INITSCRIPTS
 endif
