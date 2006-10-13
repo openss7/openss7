@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/04 04:41:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/13 04:15:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/04 04:41:24 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 04:15:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/10/13 04:15:47  brian
+# - EXTRA_PROGRAMS already defined
+#
 # Revision 0.9.2.4  2006/10/04 04:41:24  brian
 # - changes to pass distcheck target
 #
@@ -84,12 +87,12 @@ include ../am/openss7.am
 
 lib32_LTLIBRARIES		=
 
-EXTRA_PROGRAMS			= test-tirdwr \
-				  test-timod \
-				  test-xnet \
-				  test-xnet_thr \
-				  test-xnsl \
-				  test-xnsl_thr
+EXTRA_PROGRAMS			+= test-tirdwr \
+				   test-timod \
+				   test-xnet \
+				   test-xnet_thr \
+				   test-xnsl \
+				   test-xnsl_thr
 
 pkglibexec32_PROGRAMS		=
 
