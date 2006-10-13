@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/13 08:14:02 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/13 08:31:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 08:14:02 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 08:31:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,6 +74,7 @@ m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
 m4_include([m4/iso.m4])
+m4_include([m4/chan.m4])
 m4_include([m4/ss7.m4])
 
 # =============================================================================
@@ -449,6 +450,13 @@ dnl
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_iso --without-iso\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-iso'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-iso"
+    fi
+    if test :"${with_STRCHAN:-yes}" != :no ; then
+	_CHAN
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_chan --without-chan\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-chan'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-chan"
     fi
     if test :"${with_STACKS:-yes}" != :no ; then
 	_SS7
