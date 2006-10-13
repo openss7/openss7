@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/12 20:24:48 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/13 08:14:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/12 20:24:48 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 08:14:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -295,6 +295,14 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test ! -d "$srcdir/netperf" ; then
 	with_NETPERF='no'
     fi
+    AC_ARG_WITH([STRCHAN],
+		AS_HELP_STRING([--without-STRCHAN],
+			       [do not include STRCHAN in master pack @<:@included@:>@]),
+		[with_STRCHAN="$withval"],
+		[with_STRCHAN="${with_ALL:-no}"])
+    if test ! -d "$srcdir/strchan" ; then
+	with_STRCHAN='no'
+    fi
     AC_ARG_WITH([STACKS],
 		AS_HELP_STRING([--without-STACKS],
 			       [do not include STACKS in master pack @<:@included@:>@]),
@@ -527,6 +535,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     fi
     if test :${with_NETPERF:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([netperf])
+    fi
+    if test :${with_STRCHAN:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strchan])
     fi
     if test :${with_STACKS:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([stacks])
