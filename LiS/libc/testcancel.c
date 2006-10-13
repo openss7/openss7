@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:20 $
+ @(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 00:04:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:31:20 $ by $Author: brian $
+ Last Modified $Date: 2006/10/13 00:04:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:20 $"
+#ident "@(#) $RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 00:04:36 $"
 
-static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:31:20 $";
+static char const ident[] = "$RCSfile: testcancel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 00:04:36 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -162,7 +162,8 @@ pthread_setcanceltype(int type, int *oldtype)
 	  * type and returns the oldtype from a static variable.  One of the
 	  * ramifications of this is that the cancel type might not be correct
 	  * after a fork(2). */
-	*oldtype = __pthread_canceltype;
+	if (oldtype != NULL)
+		*oldtype = __pthread_canceltype;
 	__pthread_canceltype = type;
 	return (0);
 	/** @return Returns zero (0) on success, error number on failure. */
