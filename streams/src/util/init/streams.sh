@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/13 03:59:58 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/13 06:59:57 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -44,7 +44,8 @@ fi
 
 # Specify defaults
 
-[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams streams-bufmod streams-connld streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nullmod streams-nuls streams-pipe streams-pipemod streams-sad streams-sc streams-sfx streams-spx streams-testmod"
+[ -n "$STREAMS_DRIVERS"       ] || STREAMS_DRIVERS="streams streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nuls streams-pipe streams-sad streams-sfx streams-spx"
+[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams-bufmod streams-connld streams-nullmod streams-pipemod streams-sc streams-testmod"
 [ -n "$STREAMS_MAKEDEVICES"   ] || STREAMS_MAKEDEVICES="yes"
 [ -n "$STREAMS_REMOVEDEVICES" ] || STREAMS_REMOVEDEVICES="yes"
 [ -n "$STREAMS_MOUNTSPECFS"   ] || STREAMS_MOUNTSPECFS="yes"
@@ -77,7 +78,7 @@ start() {
     echo -n "Loading STREAMS kernel modules: "
     RETVAL=0
     modules=
-    for module in $STREAMS_MODULES ; do
+    for module in $STREAMS_DRIVERS ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -148,7 +149,7 @@ stop() {
     fi
     echo -n "Unloading STREAMS kernel modules: "
     modules=
-    for module in $STREAMS_MODULES ; do
+    for module in $STREAMS_DRIVERS $STREAMS_MODULES ; do
 	modules="$module${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -202,7 +203,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/13 03:59:58 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/13 06:59:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -247,7 +248,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 03:59:58 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 06:59:57 $ by $Author: brian $
 #
 # =============================================================================
 

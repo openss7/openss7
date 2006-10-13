@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/13 03:59:58 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/13 06:59:57 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -102,7 +102,8 @@ fi
 
 # Specify defaults
 
-[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams streams-bufmod streams-connld streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nullmod streams-nuls streams-pipe streams-pipemod streams-sad streams-sc streams-sfx streams-spx streams-testmod"
+[ -n "$STREAMS_DRIVERS"       ] || STREAMS_DRIVERS="streams streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nuls streams-pipe streams-sad streams-sfx streams-spx"
+[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams-bufmod streams-connld streams-nullmod streams-pipemod streams-sc streams-testmod"
 [ -n "$STREAMS_MAKEDEVICES"   ] || STREAMS_MAKEDEVICES="yes"
 [ -n "$STREAMS_REMOVEDEVICES" ] || STREAMS_REMOVEDEVICES="yes"
 [ -n "$STREAMS_MOUNTSPECFS"   ] || STREAMS_MOUNTSPECFS="yes"
@@ -122,7 +123,7 @@ umask 077
 
 start() {
     modules=
-    for module in $STREAMS_MODULES ; do
+    for module in $STREAMS_DRIVERS ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -159,7 +160,7 @@ stop() {
 	RETVAL=$?
     fi
     modules=
-    for module in $STREAMS_MODULES ; do
+    for module in $STREAMS_DRIVERS $STREAMS_MODULES ; do
 	modules="${module}${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -194,7 +195,7 @@ case "$1" in
 	;;
     (status)
 	LOADED='yes'
-	for module in $STREAMS_MODULES ; do
+	for module in $STREAMS_DRIVERS $STREAMS_MODULES ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -220,7 +221,7 @@ case "$1" in
 	;;
     (probe)
 	LOADED='yes'
-	for module in $STREAMS_MODULES ; do
+	for module in $STREAMS_DRIVERS $STREAMS_MODULES ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -270,7 +271,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/13 03:59:58 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/13 06:59:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -315,7 +316,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 03:59:58 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 06:59:57 $ by $Author: brian $
 #
 # =============================================================================
 

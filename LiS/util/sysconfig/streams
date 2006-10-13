@@ -3,7 +3,8 @@
 #
 
 # List of modules in load order.
-STREAMS_MODULES="streams streams-bufmod streams-echo streams-liskmod streams-mtdrv streams-mux streams-nullmod streams-nuls streams-pipemod streams-relay3 streams-testmod"
+STREAMS_DRIVERS="streams streams-echo streams-mtdrv streams-mux streams-nuls streams-relay3"
+STREAMS_MODULES="streams-bufmod streams-liskmod streams-nullmod streams-pipemod streams-testmod"
 # Make real character devices before intializing subsystem?
 STREAMS_MAKEDEVICES="yes"
 # Remove devices after removing subsystem?
@@ -15,7 +16,7 @@ STREAMS_MOUNTPOINT="/dev/streams"
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 03:59:51 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/13 06:59:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,7 +61,7 @@ STREAMS_MOUNTPOINT="/dev/streams"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 03:59:51 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 06:59:50 $ by $Author: brian $
 #
 # =============================================================================
 # vim ft=conf

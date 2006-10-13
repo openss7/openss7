@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 03:59:53 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/13 06:59:51 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -44,7 +44,8 @@ fi
 
 # Specify defaults
 
-[ -n "$STRBCM_MODULES"       ] || STRBCM_MODULES="streams-tstdrv streams-tstmod"
+[ -n "$STRBCM_DRIVERS"       ] || STRBCM_DRIVERS="streams-tstdrv"
+[ -n "$STRBCM_MODULES"       ] || STRBCM_MODULES="streams-tstmod"
 [ -n "$STRBCM_MAKEDEVICES"   ] || STRBCM_MAKEDEVICES="yes"
 [ -n "$STRBCM_REMOVEDEVICES" ] || STRBCM_REMOVEDEVICES="yes"
 
@@ -75,7 +76,7 @@ start() {
     echo -n "Loading STREAMS kernel modules: "
     RETVAL=0
     modules=
-    for module in $STRBCM_MODULES ; do
+    for module in $STRBCM_DRIVERS ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -146,7 +147,7 @@ stop() {
     fi
     echo -n "Unloading STREAMS kernel modules: "
     modules=
-    for module in $STRBCM_MODULES ; do
+    for module in $STRBCM_DRIVERS $STRBCM_MODULES ; do
 	modules="$module${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -200,7 +201,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 03:59:53 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/13 06:59:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -245,11 +246,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 03:59:53 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 06:59:51 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strbcm.sh,v $
+# Revision 0.9.2.4  2006/10/13 06:59:51  brian
+# - load drivers but not modules by default, but remove modules
+#
 # Revision 0.9.2.3  2006/10/13 03:59:53  brian
 # - corrected init scripts and config files
 #

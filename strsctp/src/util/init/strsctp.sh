@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/13 04:00:11 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/13 07:00:05 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -44,7 +44,8 @@ fi
 
 # Specify defaults
 
-[ -n "$STRSCTP_MODULES"       ] || STRSCTP_MODULES="streams-sctp streams-tpiperf"
+[ -n "$STRSCTP_DRIVERS"       ] || STRSCTP_DRIVERS="streams-sctp"
+[ -n "$STRSCTP_MODULES"       ] || STRSCTP_MODULES="streams-tpiperf"
 [ -n "$STRSCTP_MAKEDEVICES"   ] || STRSCTP_MAKEDEVICES="yes"
 [ -n "$STRSCTP_REMOVEDEVICES" ] || STRSCTP_REMOVEDEVICES="yes"
 
@@ -75,7 +76,7 @@ start() {
     echo -n "Loading STREAMS kernel modules: "
     RETVAL=0
     modules=
-    for module in $STRSCTP_MODULES ; do
+    for module in $STRSCTP_DRIVERS ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -146,7 +147,7 @@ stop() {
     fi
     echo -n "Unloading STREAMS kernel modules: "
     modules=
-    for module in $STRSCTP_MODULES ; do
+    for module in $STRSCTP_DRIVERS $STRSCTP_MODULES ; do
 	modules="$module${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -200,7 +201,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/13 04:00:11 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/13 07:00:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -245,7 +246,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 04:00:11 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 07:00:05 $ by $Author: brian $
 #
 # =============================================================================
 

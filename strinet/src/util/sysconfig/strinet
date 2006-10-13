@@ -3,7 +3,8 @@
 #
 
 # Kernel modules to load in load order.
-STRINET_MODULES="streams-inet streams-rawip streams-tcp streams-udp"
+STRINET_DRIVERS="streams-inet streams-rawip streams-udp"
+STRINET_MODULES=""
 # Make real character devices before intializing subsystem?
 STRINET_MAKEDEVICES="yes"
 # Remove devices after removing subsystem?
@@ -11,7 +12,7 @@ STRINET_REMOVEDEVICES="no"
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 04:00:07 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/13 07:00:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -56,7 +57,7 @@ STRINET_REMOVEDEVICES="no"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 04:00:07 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 07:00:03 $ by $Author: brian $
 #
 # =============================================================================
 # vim ft=conf
