@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:26 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 09:13:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:57:26 $ by $Author: brian $
+# Last Modified $Date: 2006/10/13 09:13:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.2  2006/10/13 09:13:24  brian
+# - added missing config file
+#
 # Revision 0.9.2.1  2006/10/13 07:57:26  brian
 # - added initial STREAMS Channel package
 #
@@ -112,6 +115,7 @@ AC_DEFUN([AC_CHAN], [dnl
 		     debian/strchan-source.preinst
 		     debian/strchan-util.preinst
 		     src/util/modutils/strchan
+		     src/util/sysconfig/strchan
 		     src/include/sys/strchan/version.h])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
