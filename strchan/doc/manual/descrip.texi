@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.1 2006/10/13 07:57:35 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.2 2006/10/13 09:29:10 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/13 07:57:35 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/13 09:29:10 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: descrip.texi,v $
+@c Revision 0.9.2.2  2006/10/13 09:29:10  brian
+@c - updates
+@c
 @c Revision 0.9.2.1  2006/10/13 07:57:35  brian
 @c - added initial STREAMS Channel package
 @c
@@ -65,7 +68,7 @@
 
 The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and
 drivers, libraries, programs, init scripts, and daemons that implement the
-@cite{OpenSS7} @dfn{STEAMS} isochronous channels for the purpose of
+@cite{OpenSS7} @dfn{STREAMS} isochronous channels for the purpose of
 implementing data transmission links, or for carrying voice or other media,
 such as channelization of T1 carrier facilities, or ATM AAL3.  This package
 also includes pseudo-isochronous channels such as those provided by RTP.
@@ -94,6 +97,7 @@ and drivers:
 @item @tab @minus{} @file{streams_mg.ko} driver @dfn{/dev/mg} @dfn{/dev/mg_mg}
 @item @tab @minus{} @file{streams_pwe3.ko} module @dfn{pwe3}
 @item @tab @minus{} @file{streams_rtp.ko} module @dfn{rtp}
+@item @tab @minus{} @file{streams_zaptel.ko} module @dfn{zaptel}
 @ignore
 @item @tab @minus{} @file{streams_hdlc.ko} module @dfn{hdlc}
 @item @tab @minus{} @file{streams_hdlc.ko} module @dfn{hdlc}
@@ -136,6 +140,11 @@ over a @manpage{udp(4)} Stream to provide a full duplex, controlled (RTCP)
 media stream connection.  The resulting Stream is suitable for linking under
 the @manpage{mg(4)} multiplexing driver to provide Ephemeral RTP streams for
 use with the Media Gateway Control Protocol.
+
+@item zaptel(4)
+The @manpage{zaptel(4)} modules is a pushable @dfn{STREAMS} module that is
+pushed over a @manpage{ch(4)} channel Stream to provide the historical
+@manpage{zaptel(4)} interface for asterisk and other open-PBX packages.
 
 @ignore
 @item hdlc(4)
