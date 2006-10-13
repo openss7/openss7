@@ -1,0 +1,381 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_commands,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/05/23 22:43:38 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/05/23 22:43:38 $ by $Author: brian $
+#
+# =============================================================================
+
+#
+#   Tests various options of each installed program and script.  This goes
+#   further than the GNU stnadard options (--help and --version) and adds a
+#   few that should be present in OpenSS7 project programs and scripts.  We
+#   also display the resulting information.
+#
+me=`basename $0`
+errors=0
+warnings=0
+
+exec 5>>$top_builddir/$me.log
+
+export -p >&5
+
+function echo_v()
+{
+	echo "$me:  : $1"
+}
+function echo_t()
+{
+	echo "$me: T: $1"
+}
+function echo_s()
+{
+	case :"${MAINTAINER_MODE:-no}" in
+	(:verbose|:continue) echo "$me: S: $1" ;;
+	esac
+	echo "$me:$2: S: $1" >&5
+}
+function echo_d()
+{
+	echo "$me:$2: D: $1" >&5
+}
+function echo_e()
+{
+	echo "$me: E: --- $1" >&2
+	echo "$me:$2: E: $1" >&5
+	((errors++))
+}
+function echo_w()
+{
+#	if test :"${MAINTAINER_MODE:-no}" != :no ; then
+		echo "$me: W: --- $1" >&2
+#	fi
+	echo "$me:$2: W: $1" >&5
+	((warnings++))
+}
+function echo_fls()
+{
+	echo_s "$3" "$4"
+}
+function echo_flw()
+{
+	echo "$1:$2: warning: $3" >&2
+	echo "$me:$4: W: $3" >&5
+	((warnings++))
+}
+function echo_fle()
+{
+	echo "$1:$2: error: $3" >&2
+	echo "$me:$4: E: $3" >&5
+	((errors++))
+}
+
+export -p | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+#
+# Skip test if we have nothing to test
+#
+if test -z "$bin_PROGRAMS$sbin_PROGRAMS$libexec_PROGRAMS$pkglibexec_PROGRAMS$dist_bin_SCRIPTS$dist_sbin_SCRIPTS$pkglibexec_SCRIPTS"
+then
+	echo_d "nothing to check, skipping test" $LINENO
+	exit 77
+fi
+
+#
+# PROGRAMS must be built, so they always appear in the build directory, which is
+# the current directory.  If we are cross-compiling we cannot test compiled
+# programs on the build host.
+#
+programs="$bin_PROGRAMS $sbin_PROGRAMS $libexec_PROGRAMS $pkglibexec_PROGRAMS"
+if test -n "$programs"
+then
+	echo_v "testing programs"
+	if test :"${cross_compiling:-no}" = :no
+	then
+		for program in $programs
+		do
+			base=`basename $program`
+			echo_t "testing program $base options"
+			case " $AM_INSTALLCHECK_STD_OPTIONS_EXEMPT " in
+			*" $program "* | *" $srcdir/$program "*)
+				echo_w "$base is standard options exempt: skipping" $LINENO
+				continue
+				;;
+			esac
+			if test ! -e ./$program
+			then
+				echo_e "cannot find program $program" $LINENO
+				continue
+			fi
+			if test -x ./$program
+			then
+				for opt in --help --version --copying
+				do
+					echo_t "testing $program $opt"
+					echo_d "./$program $opt > ${me}_$$.out 2> ${me}_$$.err" $LINENO
+					./$program $opt > ${me}_$$.out 2> ${me}_$$.err \
+					&& test -n "`cat ${me}_$$.out`" \
+					&& test -z "`cat ${me}_$$.err`" \
+					|| {
+						echo_e "$program does not support $opt" $LINENO
+						echo_d "stderr was:" $LINENO
+						while read line
+						do
+							echo_d "$line" $LINENO
+						done < ${me}_$$.err
+						echo_d "stdout was:" $LINENO
+						while read line
+						do 
+							echo_d "$line" $LINENO
+						done < ${me}_$$.out
+					}
+					echo_d "rm -f ${me}_$$.out ${me}_$$.err" $LINENO
+					rm -f ${me}_$$.out ${me}_$$.err
+				done
+			else
+				echo_w "$program is not executable: skipping" $LINENO
+			fi
+		done
+	else
+		echo_w "cross compiling: cannot test programs" $LINENO
+
+	fi
+fi
+#
+# SCRIPTS could be in the source directory or they could be derived and in the
+# build directory, so we need to check for their location.
+#
+scripts="$dist_bin_SCRIPTS $dist_sbin_SCRIPTS $pkglibexec_SCRIPTS"
+if test -n "$scripts"
+then
+	echo_v "testing scripts"
+	for script in $scripts
+	do
+		base=`basename $script`
+		echo_t "testing script $base options"
+		case " $AM_INSTALLCHECK_STD_OPTIONS_EXEMPT " in
+		*" $script "* | *" $srcdir/$script "*)
+			echo_w "$base is standard options exempt: skipping" $LINENO
+			continue
+			;;
+		esac
+		s="./$script"
+		if test ! -e $s
+		then
+			s="$srcdir/$script"
+			if test ! -e $s
+			then
+				echo_e "cannot find script $base" $LINENO
+				continue
+			fi
+		fi
+		for opt in --help --version --copying
+		do
+			echo_t "testing $script $opt"
+			echo_d "${SHELL} $s $opt > ${me}_$$.out 2> ${me}_$$.err" $LINENO
+			${SHELL} $s $opt > ${me}_$$.out 2> ${me}_$$.err \
+			&& test -n "`cat ${me}_$$.out`" \
+			&& test -z "`cat ${me}_$$.err`" \
+			|| { 
+				echo_e "$s does not support $opt" $LINENO
+				echo_d "stderr was:" $LINENO
+				while read line
+				do
+					echo_d "$line" $LINENO
+				done < ${me}_$$.err
+				echo_d "stdout was:" $LINENO
+				while read line
+				do
+					echo_d "$line" $LINENO
+				done < ${me}_$$.out
+			}
+			echo_d "rm -f ${me}_$$.out ${me}_$$.err" $LINENO
+			rm -f ${me}_$$.out ${me}_$$.err
+		done
+	done
+fi
+
+if test :"${MAINTAINER_MODE:-no}" != :no
+then
+	if test -n "$PKG_MANPATH" ; then
+		manpath="$PKG_MANPATH"
+	else
+		manpath="${top_builddir}/doc/man:${top_builddir}/man:${top_builddir}:./doc/man:./man:.${mandir:+:${mandir}}"
+	fi
+	searchpath=`echo "$manpath" | sed -e 's|:| |g'`
+	#
+	# For each program or script check that we have a manual page in section 1 or 8.  This
+	# ensures that we have documented all of the programs and scripts that are to be installed.
+	# We only do this check in maintainer mode because it is a little pedantic.
+	#
+	echo_v "testing for section 1 manual pages"
+	for prog in $bin_PROGRAMS $dist_bin_SCRIPTS
+	do
+		base=`basename $prog`
+		sections="1"
+		string="$base in section $sections"
+		echo_t "testing for $base in section 1"
+		case " $AM_INSTALLCHECK_STD_OPTIONS_EXEMPT " in
+		*" $prog "* | *" $srcdir/$prog "*)
+			echo_w "$base is standard options exempt: skipping" $LINENO
+			continue
+			;;
+		esac
+		# just find it
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$base.${n}" ; done
+		for page in $list ; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :"$found" = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			echo_e "cannot find $string" $LINENO
+		fi
+#		echo_d "man -aw -M $manpath 1 $base 2>&1" $LINENO
+#		if result=`man -aw -M $manpath 1 $base 2>&1`
+#		then
+#			echo "$result" | while read line
+#			do
+#				echo_s "$line" $LINENO
+#			done
+#		else
+#			echo_e "$result" $LINENO
+#		fi
+	done
+	echo_v "testing for section 8 manual pages"
+	for prog in $sbin_PROGRAMS $dist_sbin_SCRIPTS $libexec_PROGRAMS $pkglibexec_PROGRAMS $pkglibexec_SCRIPTS
+	do
+		base=`basename $prog`
+		sections="8"
+		string="$base in section $sections"
+		echo_t "testing for $string"
+		# just find it
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$base.${n}" ; done
+		for page in $list ; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :"$found" = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			case " $AM_INSTALLCHECK_STD_OPTIONS_EXEMPT " in
+			*" $prog "* | *" $srcdir/$prog "*)
+				echo_w "$base is standard options exempt: skipping" $LINENO
+				continue
+				;;
+			esac
+			echo_e "cannot find $string" $LINENO
+		fi
+#		echo_d "man -aw -M $manpath 8 $base 2>&1" $LINENO
+#		if result=`man -aw -M $manpath 8 $base 2>&1`
+#		then
+#			echo "$result" | while read line
+#			do
+#				echo_s "$line" $LINENO
+#			done
+#		else
+#			echo_e "$result" $LINENO
+#		fi
+	done
+fi
+
+retval=0
+if test $warnings -gt 0
+then
+	echo_v "--------------"
+	echo_v "Warning summary:"
+	echo_v "--------------"
+	egrep -- '\<W:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	retval=77
+fi
+if test $errors -gt 0
+then
+	echo_v "--------------"
+	echo_v "Error summary:"
+	echo_v "--------------"
+	egrep -- '\<E:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	if test :"${MAINTAINER_MODE:-no}" = :continue
+	then
+		retval=77
+	else
+		retval=1
+	fi
+fi
+
+exit $retval
