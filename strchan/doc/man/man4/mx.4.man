@@ -1,0 +1,411 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: mx.4.man,v 0.9.2.1 2006/10/14 06:37:22 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/14 06:37:22 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mx.4.man,v $
+.\" Revision 0.9.2.1  2006/10/14 06:37:22  brian
+.\" - added manpages, module, drivers, headers from strss7 package
+.\"
+.\" Revision 0.9.2.8  2006/04/05 09:43:04  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.\"
+.\"
+.TH MX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B mx, MX
+\- Multiplex (MX) Media Drivers
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/mxi.h>
+.br
+.B #include <ss7/mxi_ioctl.h>
+.HP
+.BF "int " mx_stream " = open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B MX
+is an implementation of a local multiplex control for devices conforming to
+the
+.BR mxi (7)
+interface.
+.B MX
+provides for the control of the matrix and underlying interfaces and
+communication facilities.
+.PP
+.B MX
+is implemented as a
+.IR STREAMS (4)
+driver.
+.B MX
+Streams can be linked under the
+.BR MG (4)
+multiplexing driver using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide multiplex services to the
+.BR MG (4)
+multiplexing driver.
+.B MX
+Streams can be configured using
+.BR mxi_ioctl (4).
+.\"
+.SS Drivers
+.PP
+.B MX
+provides the following Stream types that are directly compatible with the
+Stream types provided by other
+.BR MX
+drivers.  To select one of these Stream types, the
+.I device
+argument to the
+.BR open (2)
+call can be one of the following:
+.TP
+.I /dev/mx
+This device provides the
+.B MX
+protocol service interface using the MX-primitives of the Multiplex Interface
+described in
+.BR mxi (7),
+as interpreted for use with local swithcing drivers described in
+.BR mxi_mx (7).
+This interface is suitable both for use with other SS7 modules and drivers, as
+well as with the
+.BR mg (4)
+driver using the
+.B OpenSwitch
+call framework.
+.TP
+.BR x400p (4)
+.TP
+.BR x100p (4)
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B MX
+driver is the switching workhorse of the
+.B @PACKAGE_TITLE@
+package.  Both MXI and CHI Streams can be opened on the upper multiplex.
+Bothe MXI and CHI Streams can be linked on the lower multiplex.  Any channel
+of any Stream, whether upper or lower, can be connected through the multiplex
+to any other channel.
+.PP
+The
+.B MX
+driver can perform simply isochronous conversion functions (e.g. mu-law to
+a-law), digital padding, echo cancellation, compression/decompression, minor
+rate adaption (e.g, 8-bit A-law into 5-bit GSM), that do not cause flow
+control considerations as it performs simply matrix operations.
+Preestablished or canned tones an announcements can be supported by the
+driver. Dynamic announcemets need to be provided by an external module or in
+hardware.  Complex operations such as HDLC conversion need to be provided
+upstream or in hardware.
+.PP
+The
+.B MX
+driver is intended to support single-rate and multi-rate channels; however,
+single-rate and multi-rate connection must match and no multi-rate conversion
+will be performed.
+The purpose of the
+.B MX
+driver is to perform simple circuit switching and do it very fast.
+.PP
+The
+.B MX
+driver can be modelled as a hardware Time-Space-Time switch, only switching is
+performed primarily in software.  (When the driver connects two channels from
+the lower multiplex, the data path may be through hardware instead of
+software.)
+.PP
+The
+.B MX
+driver is, however, may be able to perform channel insertion and deletion from
+a span.  For example, an entire E1 or T1 span can be connected, channel for
+channel, to another E1 or T1 span.  The drivers has the ability to remove or
+insert one or more channels on either side of the span connection.  The
+purpose of channel insertion and deletion is to pull signalling channels out
+of a span, particularly for ISDN primary rate connections and SS7 signalling.
+.\"
+.SS Configuration
+.PP
+At boot time, or when a new span or circuit is brought into service, a
+management program opens a device or pseudo-device driver to obtain a Stream
+reprsenting the new channel or span an links the Stream beneath the MX
+multiplexing driver. Input-output controls are then used to assign the channel
+or span (and timeslots within the span) to circuit identification numbers
+within the matrix.  These channel identification numbers and the mapping to
+specific hardware should be maintained in configuration files.
+.PP
+For example, when a T1 span is put into service on a V401P card, the
+management program opens a Stream on the V401P MX device that represents the
+T1 span, attaches the Stream to the T1 span, and then links the Stream beneath
+the
+.B MX
+driver.  A configuration table is used to determine the circuit number
+assignments for the card and T1 span selected.  An input-output control is
+issued to the
+.B MX
+driver with the multiplex index of the linked span, and the circuit number
+assignments for the span.  This input-output control also identifies other
+particulars about the span (number of channels, DS0 or DS0A, etc).
+The
+.B MX
+driver provides the ability for management programs to determine the lower
+multiplex identifier that is associated with any circuit or circuit range.
+This allow the management program to perform a
+.BR I_PLINK (7)
+operation and close the Stream.  It can later discover the multiplex ID from
+the circuit assigment (contained in the configuration table) with an
+input-output control to the MX driver, so that it know the multiplex ID to
+user to remove the circuit or span from service with an
+.BR I_PUNLINK (7)
+operation.
+.PP
+As another example, an Ephemeral connection manager process that is listening
+for Ephemeral connection requests on the connection management Stream of the
+.BR mg (4)
+driver, receives a request to establish an RTP Stream to a remote host.  The
+Ephemeral connection manager opens a
+.BR rawip (4)
+device, and pushes the
+.BR rtp (4)
+module over the device.
+The
+.BR rtp (4)
+module is set to convert the media Stream to that appropriate for the channel
+to which the Ephemeral connection will ultimately occur, and the Stream, which
+provides a CHI interface, is linked under the MX driver.  It assigns a
+circuit identification number with an input-output control.  The Ephemeral
+connection manager then requests that the
+.B MX
+driver connect the Ephemeral connection to a Gateway circuit through the
+matrix.
+.PP
+While CHI and MXI Streams on the lower multplex are attached to their circuits
+or connections for the full time that they are linked, CHI and MXI Streams on
+the upper multiplex are not so.  When a user-level program opens a Stream on
+the upper multiplex, it remains unattached to any particular channel.  CHI or
+MXI primitives are used to connect the upper multiplex Stream to either a
+lower or another upper multiplex Stream.
+.PP
+Upper multiplex Stream provide the ability to terminate circuit connections
+within another STREAMS module or driver above the MX driver.  For example,
+a number of MXI Streams can be opened on the upper multiplex and are
+identified by their device numbers and any asigned termination identifiers.
+These Streams, which represent unconnected circuits, can then be linked under
+a tones and announcements driver.  When a switching process such as the
+.BR mg (4)
+driver wishes to provide a tone or announcment to a circuit or an ephemeral
+connection, it request that the MX driver connect the circuit or ephemeral
+connection to one on the upper multiplex that terminates at the tones and
+announcements driver.  By sending control messages to the tones and
+announcements driver, the
+.BR mg (4)
+driver can then play progress tones or announcments to the user at the other
+end of the locally terminated connection.
+.\"
+.\"
+.SH INTERFACE
+.PP
+The
+.B MX
+driver provides two interfaces at the lower multiplex: the
+.BR chi (7)
+interface for single- and multi-rate channels and the
+.BR mxi (7)
+interface for time-division multiplexed channel groups (i.e, spans).
+.PP
+The
+.B MX
+driver provides three interfaces at the upper multiplex: the
+.BR chi (7)
+interface for single- and multi-rate channels, the
+.BR mxi (7)
+interface for time-division multiplexed channel groups (i.e, spans); and a
+management control interface for controling connections made across the
+matrix.
+.\"
+.\"
+.SH ADDRESSES
+.PP
+Circuit addresses are 32-bit identifiers that are assigned to circuits or
+cirguit groups.  Each circuit (upper or lower) has a unique identifier within
+the
+.B MX
+driver.  One of the identifiers for a circuit within a circuit group can be
+used to identify the circuit group as a whole.
+Flags are used in management primitives to indicate whether a particular
+identifier refers to a circuit or a circuit group.
+.PP
+Assignment of circuit identifiers, assign from requirements for uniqueness,
+are arbitrary.  For operation with ISUP, a good choice would be to assign some
+bit range of the identifier to be identical to the ISUP circuit identification
+code for the circuit and the remainder to uniquely identifier one like ISUP
+CIC assignment from another.
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management IO controls using
+.BR ioctl (2)
+and
+.I I_STR
+commands to the
+.BR streamio (7)
+system calls on the
+.I mx_stream
+file descriptor.  These management controls are documented in
+.BR mx_ioctl (4).
+.\"
+.\"
+.SH NOTICES
+.PP
+Unlike other OpenSS7 protocol modules and drivers providing transport
+communications services,
+.B MX
+does not provide a
+.BR sockets (3)
+interface.  This is because the special needs of switch multiplex control are
+divorced from the sockets paradigm.
+.PP
+On the other hand, the
+.PP
+For performance reasons, SS7 and ISDN primary rate signalling channels are not
+passed through the software switch matrix.  This permits signalling channels
+to be subject to a different set of flow control rules and priorities.  SS7
+and ISDN primary rate signalling channels can be dropped and inserted into a
+channel group directly from the hardware driver (e.g, V401P driver).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/mxi.h> ,
+.BR <ss7/mxi_ioctl.h> ,
+.BR <ss7/mx_ioctl.h> .
+.\"
+.\"
+.SH MODULES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/mx .
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B MX
+drivers have no known bugs.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR MG (4),
+.BR mxconfd (8),
+.BR mxi (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B MX
+interface is specific to the
+.BR OpenSS7
+MG stack.  This is Version 1 of the interface.
+.PP
+MXI interfaces are consistent with MXI Revision 0.9.2.
+.PP
+The
+.B MX
+driver does not appear until
+.B strss7
+release 0.9.2.
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

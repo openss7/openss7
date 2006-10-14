@@ -1,0 +1,206 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: MG_JOIN_REQ.7.man,v 0.9.2.1 2006/10/14 06:37:24 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/14 06:37:24 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: MG_JOIN_REQ.7.man,v $
+.\" Revision 0.9.2.1  2006/10/14 06:37:24  brian
+.\" - added manpages, module, drivers, headers from strss7 package
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:43:15  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.TH MG_JOIN_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Media Gateway Interface (MGI)"
+.SH NAME
+.B MG_JOIN_REQ, MG_join_req, MG_join_req_t
+\- join a communications session
+.SH SYNOPSIS
+.PP
+This primitive is one
+.B M_PROTO
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct MG_join_req {
+    ulong mg_primitive;         /* always MG_JOIN_REQ */
+    ulong mg_se_id;             /* session to join (0 to create) */
+    ulong mg_tp_id;             /* joined termination (0 for new) */
+    ulong mg_channel_length;    /* channel ids that make up termination */
+    ulong mg_channel_offset;    /* channel ids that make up termination */
+} MG_join_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+Requests that the specified channels be joined to the specified session with
+newly created termination point with id specified by the caller
+.RI ( mg_tp_id " non-zero)"
+or assigned by the provider
+.RI ( mg_tp_id " zero)."
+.SH PARAMETERS
+.PP
+This primitive has the following parameters:
+.TP
+.I mg_primitive
+specifies the primitive type.  Always
+.BR MG_JOIN_REQ .
+.TP
+.I mg_se_id
+specifies the communications session to join or create.  When zero (0), it
+specifies that the MG is to create a new communications session and return the
+session id in the
+.BR MG_JOIN_CON (7)
+primitive.  When non-zero, and the communications session already exists, the
+specified communications session will be joined.  When non-zero, and the
+communications session does not exist, a communications session will be
+created and assigned the specified id.
+.TP
+.I mg_tp_id
+specifies the termination point within the communications session to join or
+create.  WHen zero (0), it specifies that the MG is to pick an unused termination
+point to the communications session and return the termination point id in the
+.BR MG_JOIN_CON (7)
+primitive.  When non-zero, and the termination point is not in use, the
+sepcified termination point will be joined.
+.TP
+.I mg_channel_length
+specifies the length of the channel identifiers that make up the termination
+point.  This may be, for example, one channel identifier in a single channel
+call, or multiple channel identifiers in a multi-rate call.
+.TP
+.I mg_channel_offset
+specifies the offset, from the beginning of the
+.B M_PROTO
+message block, of the channel identifiers that make up the termination
+point.
+.SH RULES
+.PP
+.IP \(em 4
+If the specified session id is zero then a new session will be created.
+.IP \(em
+If the specified session id exists, the existing session will be joined.
+.IP \(em
+If the specified session id is non-zero but does not exist, one will be
+created with the specified id.
+.IP \(em
+If the specified termination point id is zero, then unused termination point
+will be selected in the communications session.
+.IP \(em
+If the specified termination point id is non-zero, and unused in the
+communications session, the session will be joined at the specified
+termination point.
+.IP \(em
+All channels that make up the termination point must be successfully enabled
+before this primitive will be confirmed.
+.PP
+Note that some termination points within some types of communications sessions
+have special meaning.  For example, termination point (1) could be the
+controllIng participant in a voice conference.
+.SH ACKNOWLEDGEMENT
+.PP
+.HP
+.B Successful:
+This primtive is confirmed with the
+.BR MG_JOIN_CON (7)
+primitive.
+.HP
+.B Unsuccessful:
+It is refused with the
+.BR MG_ERROR_ACK (7)
+or
+.BR MG_LEAVE_IND (7)
+primitive.
+.SH ORIGINATOR
+.PP
+Media gateway controller.
+.SH "SEE ALSO"
+.PP
+.BR MG_JOIN_CON (7).
+.SH VERSIONS
+.PP
+This manpage was written for MGI Version 1.
+.XX
+.[
+mgi
+.]
+.[
+rfc3435
+.]
+.[
+h248.1
+.]
+.[
+$LIST$
+.]
+.TI

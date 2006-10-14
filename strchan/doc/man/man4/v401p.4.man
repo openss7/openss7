@@ -1,0 +1,292 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: v401p.4.man,v 0.9.2.1 2006/10/14 06:37:22 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/14 06:37:22 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: v401p.4.man,v $
+.\" Revision 0.9.2.1  2006/10/14 06:37:22  brian
+.\" - added manpages, module, drivers, headers from strss7 package
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.TH V401P 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B v401P
+\- Varion V401P Card Driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B V401P
+driver is a
+.I STREAMS
+driver for the Varion V401P (Tormenta III Card).
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH INTERFACE
+.PP
+The
+.B V401P
+driver provides three interfaces avialable by opening Streams on the
+appropriate minor device number.  These three streams are as follows:
+.TP
+.BR mxi (7)
+This is a time-division multiplexed, channelized, channel group (e.g, E1 span)
+Stream suitable for linking under the
+.BR mx (4)
+driver switch matrix.
+.TP
+.BR chi (7)
+This is a single- or multi-rate (e.g, full T1) channel Stream, also suitable
+for linking under the
+.BR mx (4)
+driver switch matrix, but intended to be used to drop and insert signalling
+channels to and from a span for signalling applications such as Signalling
+System No. 7 F-links or ISDN Primary Rate D channels.  For the purpose of
+signalling performance an prioritization within the platform, signalling
+channels are not normally passed through the
+.BR mx (4)
+software switching matrix.
+.IP ""
+These Streams are suitable to have HDLC and upper layer protocol modules
+pushed onto them to form a complete data link Stream.
+.TP
+.BR lmi (7)
+This is a management Stream used for controlling the underlying device or
+determining other information and event notifications (e.g, group alarms,
+etc.).
+.\"
+.\"
+.SH ADDRESSES
+.PP
+Addresses consist of an 8-bit card address, an 8-bit span address and a 16-bit
+channel address.  This provides for 256 cards each with 256 spans consisting
+of 65534 circuits which should be sufficient to handle this entire family of
+cards for a long time to come.
+.PP
+Circuits are addressed using a non-zero circuit number.  Spans are addressed
+using a zero circuit number.  For example,
+.B 01.03.0001
+addresses the 1st circuit in the 3rd span of the 1st card;
+.B 02.01.0000
+addresses the 1st entire span of the 2nd card.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B V401P
+driver departs from the approach that was previously taken to the
+.BR x400p (4)
+driver.  This departure has provided the ability to support a wider range of
+functions within the driver.
+Note that the new approach splits the driver over several
+.I STREAMS
+modules.  This approach has become possible to the drastic increase in
+performance exprience by using
+.BR "Linux Fast-STREAMS"
+.[
+lfs
+.]
+over the now deprecated
+.IR LiS .
+.[
+lis
+.]
+.\"
+.SS "SS7 Operation"
+.PP
+The means of providing SS7 signalling links with this driver represents a
+departure from previous implementations.  In previous implementations the SDL,
+SDT and SL levels of the SS7 signalling link were provided directly by the
+driver.  In this implementation the SS7 interface have been removed.  The
+proper procedure for creating an SS7 signalling link from the driver is as
+follows:
+.IP 1. \w'0.\(em'u
+Open a
+.BR chi (7)
+Stream on the driver.
+.IP 2.
+Push an SDT and SL, or SDT/SL combined module on the Stream.
+.IP 3.
+Perform the configuration attach and enable of the signalling link as normal.
+Note that the CHI addresses of this driver and the SL attachment addresses of
+the previous drivers are identical.
+.\"
+.SS "ISDN Operation"
+.PP
+The
+.BR lapd (4)
+module can now be pushed over a
+.BR chi (7)
+Stream in a similar fashion to the
+.BR sdt (4)
+module described for SS7 above.
+.\"
+.SS "Zaptel Operation"
+.PP
+Unlike the
+.BR x400p (4)
+driver before it, the
+.B V401P
+driver supports bearer circuits and signalling on the same card.  This is done
+using the
+.BR chi (7)
+and
+.BR mxi (7)
+interfaces.
+These interfaces can be adapted to may needs.  The
+.B V401P
+driver now supports a high-performance
+.BR zaptel (4)
+module that provides the legacy Zapata Telephony character device interface to
+the driver.
+.PP
+The
+.BR zaptel (4)
+module is used with the driver by opening one of the non-clone minor device
+nodes associated with the driver and the
+.BR chi (7)
+interface.  These minor device numbers may have an
+.BR autopush (8)
+specification associated with them to autopush the
+.BR zaptel (4)
+module.  Once the module is pushed, using the minor device number passed to
+the module's
+.BR qi_qopen (9)
+routine, the module determines to which Zapata Telephony device it corresponds
+and present the interface for that channel.  (Note that channel 255 is special
+and provides access to all devices on the same channel.)
+Once the Stream has been opened and the module pushed, Zapata Telephony
+input-output controls, reads and writes are performed in the same manner as
+those for the legacy character device interface wc400 zaptel driver.  See
+.BR zaptel (4)
+for more information.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B V401P
+driver is currently incomplete, so all bugs have yet to be designed.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mx (4),
+.BR mxi (7),
+.BR chi (7),
+.BR lmi (7),
+.BR x400p (4),
+.BR lapd (4),
+.BR sdt (4),
+.BR zaptel (4),
+.BR autopush (8),
+.BR qi_qopen (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B V401P
+driver is compatible with the previous
+.BR x400p (4)
+drivers.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+OpenSS7 Specifications.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,184 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: MG_CONN_REQ.7.man,v 0.9.2.1 2006/10/14 06:37:23 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/14 06:37:23 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: MG_CONN_REQ.7.man,v $
+.\" Revision 0.9.2.1  2006/10/14 06:37:23  brian
+.\" - added manpages, module, drivers, headers from strss7 package
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:43:15  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.TH MG_CONN_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Media Gateway Interface (MGI)"
+.SH NAME
+.B MG_CONN_REQ, MG_conn_req, MG_conn_req_t
+\- channel connection request
+.SH SYNOPSIS
+This primitive is one
+.B M_PROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct MG_conn_req {
+    ulong mg_primitive;         /* always MG_CONN_REQ */
+    ulong mg_se_id;             /* session id */
+    ulong mg_tp_id;             /* termination point */
+    ulong mg_conn_flags;        /* connection flags */
+    ulong mg_padding;           /* digital padding */
+    ulong mg_topology_length;   /* length of topology to connect */
+    ulong mg_topology_offset;   /* offset of topology to connect */
+} MG_conn_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+Requests that the specified termination point be connected into the
+communications session in the directions indicated by
+.IR mg_conn_flags ,
+with the digital padding specified and the optional topology description.
+.PP
+If the optional topology description is not included, it is assumed that the
+termination point is requested to be connected to all other participants in
+the communications session in the directions requested.
+.PP
+If the optional topology description is included, it contains the list of
+other termination points in the session to which the the specified termination
+point is to be connected in the directions requested.
+.SH PARAMETERS
+This primitive has the following parameters:
+.TP
+.I mg_primitive
+specifies the primitive type.  Always
+.BR MG_CONN_REQ .
+.TP
+.I mg_se_id
+specifies the session id of the communications session into which to connect
+the channel.
+.TP
+.I mg_tp_id
+specifies the channel id of the termination point to connect into the session.
+.TP
+.I mg_conn_flags
+specifies the connection flags.  See
+.IR \*(lqFLAGS\*(rq ,
+below.
+.TP
+.I mg_padding
+specifies the digital padding to apply the the connection.
+.TP
+.I mg_topology_length
+specifies the length of the topology descriptor (list of channel ids in the
+communications session) to which to make the connection.
+.TP
+.I mg_topology_offset
+specifies the offset, from the beginning of the
+.B M_PROTO
+message block, of the topology descriptor (list of channel ids in the
+communications session) to which to make the connection.
+.SH FLAGS
+THe connection flags can be a bitwise OR of one or more of the following
+values:
+.TP
+.B MGF_IC_DIR
+connect the termination point in the incoming (to the termination point)
+direction only.
+.TP
+.B MGF_OG_DIR
+connect the termination point in the outgoing (from the termination point)
+direction only.
+.TP
+.B MGF_BOTH_DIR
+connect the termination point in both directions.  This flag is a bitwise OR
+of
+.BR MGF_IG_DIR " and " MG_OG_DIR .
+.SH ORIGINATION
+Media gateway controller.
+.SH "SEE ALSO"
+.BR MG_CONN_CON (7).
+.SH VERSIONS
+This manpage was written for MGI Version 1.
+.XX
+.[
+mgi
+.]
+.[
+rfc3435
+.]
+.[
+h248.1
+.]
+.[
+$LIST$
+.]
+.TI
