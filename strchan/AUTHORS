@@ -1,58 +1,158 @@
-OpenSS7 Channels -- authors.  2006-10-13
-$Id: AUTHORS,v 0.9.2.1 2006/10/13 07:57:26 brian Exp $
+OpenSS7 STREAMS Channels -- authors.  2006-10-13
+$Id: AUTHORS,v 0.9.2.2 2006/10/14 06:48:31 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
------
-
-=========================================================================
+ Authors
+========
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+The authors of the `OpenSS7 OpenSS7 STREAMS Channels' package include:
 
- All Rights Reserved.
+     - Brian Bidulock <bidulock@openss7.org>
 
- Permission is granted to make and distribute verbatim copies of this
- manual provided the copyright notice and this permission notice are
- preserved on all copies.
+See `Author Index', in the manual, for a complete listing and
+cross-index of authors to sections of this manual.
 
- Permission is granted to copy and distribute modified versions of this
- manual under the conditions for verbatim copying, provided that the
- entire resulting derived work is distributed under the terms of a
- permission notice identical to this one
+ Maintainer
+===========
 
- Since the Linux kernel and libraries are constantly changing, this
- manual page may be incorrect or out-of-date.  The author(s) assume no
- responsibility for errors or omissions, or for damages resulting from
- the use of the information contained herein.  The author(s) may not
- have taken the same level of care in the production of this manual,
- which is licensed free of charge, as they might when working
- professionally.
+The maintainer of the `OpenSS7 OpenSS7 STREAMS Channels' package is:
 
- Formatted or processed versions of this manual, if unaccompanied by the
- source, must acknowledge the copyright and authors of this work.
+     - Brian Bidulock <bidulock@openss7.org>
 
--------------------------------------------------------------------------
+Please send bug reports to <bugs@openss7.org> using the `send-pr' script
+included in the package, only after reading the `BUGS' file in the
+release, or see `Problem Reports', in the manual.
 
- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
- on behalf of the U.S. Government ("Government"), the following
- provisions apply to you.  If the Software is supplied by the Department
- of Defense ("DoD"), it is classified as "Commercial Computer Software"
- under paragraph 252.227-7014 of the DoD Supplement to the Federal
- Acquisition Regulations ("DFARS") (or any successor regulations) and
- the Government is acquiring only the license rights granted herein (the
- license rights customarily provided to non-Government users).  If the
- Software is supplied to any unit or agency of the Government other than
- DoD, it is classified as "Restricted Computer Software" and the
- Government's rights in the Software are defined in paragraph 52.227-19
- of the Federal Acquisition Regulations ("FAR") (or any successor
- regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
- NASA Supplement to the FAR (or any successor regulations).
+ Web Resources
+==============
 
-=========================================================================
+The OpenSS7 Project (http://www.openss7.org/) provides a website
+dedicated to the software packages released by the OpenSS7 Project.
 
- Commercial licensing and support of this software is available from
- OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+ Bug Reports
+............
 
-=========================================================================
+Please send bug reports to <bugs@openss7.org> using the `send-pr'
+script included in the `OpenSS7 STREAMS Channels' package, only after
+reading the `BUGS' file in the release, or see `Problem Reports', in
+the manual.  You can access the OpenSS7 GNATS database
+(http://www.openss7.org/bugreport.html) directly via the web, however,
+the preferred method for sending new bug reports is via mail with the
+`send-pr' script.
+
+ Mailing Lists
+..............
+
+The OpenSS7 Project provides a number of general discussion Mailing
+Lists for discussion concerning the `OpenSS7 OpenSS7 STREAMS Channels'
+package as well as other packages released by The OpenSS7 Project.
+
+These are `mailman' mailing lists and so have convenient web interfaces
+for subscribers to control their settings.  See
+`http://www.openss7.org/mailinglist.html'.
+
+The mailing lists are as follows:
+
+`openss7'
+     The `openss7' mailing list is for general enquiries, information
+     exchange and announcements regarding the OpenSS7 Project.  This is
+     our original mailing list and takes the highest amount of traffic.
+
+`openss7-announce'
+     The `openss7-announce' mailing list is for announcements related
+     to the OpenSS7 Project.  This list will accept announcements
+     posted by subscribers.  Subscribe to this list if you are
+     interested in announcements from the OpenSS7 Project, subscribers
+     and sponsors, related to the OpenSS7 Project or STREAMS, SS7,
+     SIGTRAN or SCTP in general.
+
+`openss7-cvs'
+     The `openss7-cvs' mailing list is for automatic CVS log reporting.
+     You must get permission of the owner to subscribe to this list.
+     Subscribers are not allowed to post to this list, this is merely
+     for distributing notification of changes to the CVS repository.h
+
+`openss7-develop'
+     The `openss7-develop' mailing list is for email exchange related
+     to the development projects under the OpenSS7 Project.  This
+     includes development requests, proposals, requests for comment or
+     proposal.  Subscribe to this list if you are interested in ongoing
+     development details regarding the OpenSS7 Project.
+
+`openss7-test'
+     The `openss7-test' mailing list is for email exchange related to
+     the testing of code under the OpenSS7 Project.  This specifically
+     relates to conformance testing, verification testing,
+     interoperability testing and beta testing.  Subscribe to this list
+     if you are interested in participating in and receiving ongoing
+     details of test activities under the OpenSS7 Project.
+
+`openss7-bugs'
+     The `openss7-bugs' mailing list is specifically tailored to bug
+     tracking.  The mailing list takes a feed from the OpenSS7 GNATS
+     bug tracking system and accepts posting of responses to bug
+     reports, tracking and resolution.  Subscribe to this list if you
+     are interested in receiving detailed `OpenSS7' release code bug
+     tracking information.  This list is not archived; for historical
+     information on problem reports, see our GNATS databases.
+
+`openss7-updates'
+     The `openss7-updates' mailing list provides updates on OpenSS7
+     Project code releases and ongoing activities.  Subscribers are not
+     allowed to post to this list; this list is for official OpenSS7
+     Project announcements only.  Subscribe to this list if you are
+     interested in receiving updates concerning official releases and
+     activities of the OpenSS7 Project.
+
+`openss7-streams'
+     The `openss7-streams' mailing list is for email exchange related
+     to the "STREAMS" development projects under the OpenSS7 Project.
+     This includes development requests, proposals, requests for
+     comment or proposal.  Subscribe to this list if you are interested
+     in ongoing development details regarding the OpenSS7 Project
+     "STREAMS" components.
+
+`linux-streams'
+     The `linux-streams' mailing list is for mail exchange related to
+     `Linux Fast-STREAMS' or `Linux STREAMS'.  This includes patches,
+     development requests, proposals, requests for comment or proposal.
+     Subscribe to this list if you are interested in ongoing
+     development details regarding the "STREAMS" for Linux components.
+     This is the the new (September 2006) home of the `linux-streams'
+     list formerly of <gsyc.escet.urjc.es>.
+
+ Spam
+.....
+
+To avoid spam being sent to the members of the `OpenSS7' mailing
+list(s), we have blocked mail from non-subscribers.  Please subscribe
+to the mailing list before attempting to post to them.  (Attempts to
+post when not subscribed get bounced.)
+
+As an additional measure against spam, subscriber lists for all
+`OpenSS7' mailing lists are not accessible to non-subscribers; for most
+lists subscriber  lists are only accessible to the list administrator.
+This keeps your mailing address from being picked off our website by
+bulk mailers.
+
+ Acceptable Use Policy
+......................
+
+It is acceptable to post professional and courteous messages regarding
+the `OpenSS7' package or any general information or questions
+concerning "STREAMS", "SS7", "SIGTRAN", "SCTP" or telecommunications
+applications in general.
+
+ Large Attachments
+..................
+
+The mailing list is blocked from messages of greater than `40k'.   If
+you have attachments (patches, test programs, etc.) and you mail them
+to the list, it will bounce to the list administrator.  If you are
+interested in  making your patches, test programs, test results or other
+large attachments available to the members of the mailing list, state
+in the message that you would like them posted and the list
+administrator will place them in the mail archives.
+

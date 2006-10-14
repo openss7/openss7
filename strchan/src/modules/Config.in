@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:45 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/14 06:48:34 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,77 +45,38 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/13 07:57:45 $ by $Author: brian $
+## Last Modified $Date: 2006/10/14 06:48:34 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Config.in,v $
+## Revision 0.9.2.2  2006/10/14 06:48:34  brian
+## - updates to include files from strss7 package
+##
 ## Revision 0.9.2.1  2006/10/13 07:57:45  brian
 ## - added initial STREAMS Channel package
 ##
 ## =============================================================================
 
-##
-## Configuration file for STREAMS device drivers
-##
-## The built-in STREAMS drivers are configured in this file.  External
-## binary packages are configured in /usr/src/linux/drivers/streams/pkg
-## (see the Makefile in that directory and the one above it).
-##
-## Pushable module specifications
-##
-## Names must be a max of 8 chars for Solaris/UnixWare compatibility
-##
-##	name		prefix
-##module	sth		sth
-##module	pipemod		pipemod
-##module	connld		connld
-##module	sc		sc
-##module	timod		timod
-##module	tirdwr		tirdwr
-##module	sockmod		sockmod
+## Driver specifications
+## -----------------------------------------------------------
+##	name	    prefix	major	n-minors    n-majors
 
-##
+## Pushable module specifications
+## -----------------------------------------------------------
+##	name	    prefix
+
 ## Object name specifications
-##
-##	type	name		object name
-##objname module	sth		sth
-##objname module	pipemod		pipemod
-##objname module	connld		connld
-##objname	module	sc		sc
-##objname module	timod		timod
-##objname module	tirdwr		tirdwr
-##objname module	sockmod		sockmod
+## -----------------------------------------------------------
+##	type	name	    object name
+objname	module	zaptel	    zaptel
 
 ##
 ## Loadable specifications
-##
-##
-## If you do not have a system with support for demand-loading modules
-## into the kernel, you will have to load these modules by hand or in
-## the startup scripts.
-## If you do not use the loadable keyword at all, everything is linked
-## into streams.o.
-##
-##loadable sth
-##loadable pipemod
-##loadable connld
-##loadable sc
-##loadable timod
-##loadable tirdwr
-##loadable sockmod
+## -----------------------------------------------------------
+##		name
+loadable	zaptel
 
-##
-## Initialization specifications
-##
-##initialize clone-drvr
-##initialize fifo
-##initialize link-drvr
-##initialize loop-around
-
-##
-## Termination specifications
-##
-##terminate fifo
-##terminate loop-around
-
+##   Node specifications
+## -----------------------------------------------------------
+##	name		    type    perm    major	minor

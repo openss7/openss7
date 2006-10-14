@@ -1,0 +1,352 @@
+OpenSS7 STREAMS Channels -- read me first file.  2006-10-13
+$Id: README,v 0.9.2.2 2006/10/14 06:48:31 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+ OpenSS7 STREAMS Channels
+=========================
+
+The `OpenSS7 STREAMS Channels' package provides "STREAMS" modules and
+drivers, libraries, programs, init scripts, and daemons that implement
+the `OpenSS7' "STREAMS" isochronous channels for the purpose of
+implementing data transmission links, or for carrying voice or other
+media, such as channelization of T1 carrier facilities, or ATM AAL3.
+This package also includes pseudo-isochronous channels such as those
+provided by RTP.
+
+Included are hardware device drivers and pseudo-device drivers that
+provide implementations of specific channels.  A pseudo-device driver
+is planned to link into the `Linux' OSS (Open Sound System) and ALS
+(Advanced Linux Sound).  Specific E1/T1 cards such as the V401P are
+supported by this package.
+
+This package builds and installs the following "STREAMS" kernel modules
+and drivers:
+
+     - `streams_ch.ko' driver "/dev/ch" "/dev/ch_mg"
+     - `streams_mx.ko' driver "/dev/mx" "/dev/mx_mg"
+     - `streams_mg.ko' driver "/dev/mg" "/dev/mg_mg"
+     - `streams_pwe3.ko' module "pwe3"
+     - `streams_rtp.ko' module "rtp"
+     - `streams_zaptel.ko' module "zaptel"
+
+`ch(4)'
+
+`mx(4)'
+     The `mx(4)' multiplexing pseudo-device driver is a fully functional
+     matrix swithing device capable of switching, performing rate
+     adaption, echo cancellation, digital padding, conferencing, tones,
+     announcements, detection of tones, detection of speech, continuity
+     tests, progress tones, A-law/mu-law conversion,
+     decompression/compression, comb filtering, and other functions of
+     a digital switching matrix.
+
+`mg(4)'
+     The `mg(4)' multiplexing pseudo-device driver is a fully functional
+     media gateway device capable of providing conversion between
+     Circuit Switched Network connections (via the `mx(4)' driver) and
+     Ephemeral RTP streams (via the `rtp(4)' module and `udp(4)'
+     driver).  This device also supports Media Gateway Control Protocol
+     communications of several forms over `tcp(4)' and `sctp(4)'.
+
+`pwe3(4)'
+     The `pwe3(4)' module is a pushable "STREAMS" module that is pushed
+     over a `tcp(4)' or `sctp(4)' Stream to provide pseudo-wire
+     emulation end-to-end.  This device appears as though it is a
+     channel device.
+
+`rtp(4)'
+     The `rtp(4)' module is a pushable "STREAMS" module that is pushed
+     over a `udp(4)' Stream to provide a full duplex, controlled (RTCP)
+     media stream connection.  The resulting Stream is suitable for
+     linking under the `mg(4)' multiplexing driver to provide Ephemeral
+     RTP streams for use with the Media Gateway Control Protocol.
+
+`zaptel(4)'
+     The `zaptel(4)' modules is a pushable "STREAMS" module that is
+     pushed over a `ch(4)' channel Stream to provide the historical `zaptel(4)'
+     interface for asterisk and other open-PBX packages.
+
+
+The package builds and installs the following shared object libraries:
+
+`librtp(3)'
+     The `librtp(3)' library provides replacements for the `AT&T'
+     `rtplib' functions.  These functions are:
+
+     `rtpopen(3)'      - open an RTP channel
+
+     The library is incomplete.
+
+
+The `OpenSS7 STREAMS Channels' package includes kernel modules, `SVR
+4.2' "STREAMS" drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of `OpenSS7 STREAMS Channels' applications for the `SVR 4.2' "STREAMS"
+environment.
+
+This distribution is only currently applicable to `Linux' 2.4 and 2.6
+keernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
+architectures, but should build and install for other architectures as
+well.
+
+This package is currently incomplete.  It is being released as a
+reference point for the community.  If you are interested in completion
+of this package, sponsor the OpenSS7 Project.  To sponsor the project,
+contact <info@openss7.com>.
+
+ Release
+--------
+
+This is the `strchan-0.9.2.1' package, released 2006-10-13.  This
+`0.9.2.1' release, and the latest version, can be obtained from the
+download area (http://www.openss7.org/download.html) of The OpenSS7
+Project website using a command such as:
+
+     $> wget http://www.openss7.org/tarballs/strchan-0.9.2.1.tar.bz2
+
+The release is available as an `autoconf(1)' tarball, `src.rpm' or
+`dsc', or as a set of binary `rpm's or `deb's.  See the download page
+(http://www.openss7.org/download.html) for the `autoconf(1)' tarballs,
+`src.rpm's or `dsc's.  See the `strchan' package page
+(http://www.openss7.org/strchan_pkg.html) for tarballs, source and
+binary packages.
+
+Please see the `NEWS' file for release notes and history of user
+visible changes for the current version, and the `ChangeLog' file for a
+more detailed history of implementation changes.  The `TODO' file lists
+features not yet implemented and other outstanding items.
+
+Please see the `INSTALL', `INSTALL-strchan' and `README-make', files (or
+see `Installation', in the manual) for installation instructions.
+
+When working from `cvs(1)' or `git(1)', please see the `README-cvs',
+file (or see `Downloading from CVS', in the manual).  An abbreviated
+installation procedure that works for most applications appears below.
+
+This release of the package is published strictly under Version 2 of
+the `GNU Public License' which can be found in the file `COPYING'.
+Package specific licensing terms (if any) can be found in the file
+`LICENSES'.  Please respect these licensing arrangements.  If you are
+interested in different licensing terms, please contact the copyright
+holder, or OpenSS7 Corporation <sales@openss7.com>.
+
+See `README-alpha' (if it exists) for alpha release information.
+
+ Prerequisites
+--------------
+
+The quickest and easiest way to ensure that all prerequisites are met
+is to download and install this package from within the `OpenSS7 Master
+Package', `openss7-0.9.2.D', instead of separately.
+
+Prerequisites for the OpenSS7 STREAMS Channels package are as follows:
+
+  1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
+     with a 2.4 or 2.6 kernel and the appropriate tool chain for
+     compiling out-of-tree kenrel modules.  Most recent `Linux'
+     distributions are okay out of the box, but some development
+     packages must be installed.  For more information, see
+     `Compatibility', in the manual.
+
+         - A fairly LSB compliant GNU/Linux distribution.  (1)
+         - Linux 2.4 kernel (2.4.10 - 2.4.27), or
+         - Linux 2.6 kernel (2.6.3 - 2.6.17);
+         - glibc2 or better.
+         - GNU info (for info files).
+         - GNU groff (for man pages).  (2)
+
+(Note: If you acquired `strchan' a part of the `OpenSS7 Master
+Package', then the dependencies listed below will already have been met
+by unpacking the master package.)
+
+  2. `OpenSS7 Linux Fast-STREAMS', streams-0.7a.6
+     (http://www.openss7.org/tarballs/streams-0.7a.6.tar.bz2).  (3)
+
+  3. `OpenSS7 STREAMS Compatibility Modules',
+     strcompat-0.9.2.4
+     (http://www.openss7.org/tarballs/strcompat-0.9.2.4.tar.bz2).
+
+When configuring and building multiple `OpenSS7 Project' release
+packages, place all of the source packages (unpacked tarballs) at the
+same directory level and all build directories at the same directory
+level (e.g. all source packages under `/usr/src').
+
+When installing packages that install as kernel modules, it is
+necessary to have the correct kernel development package installed.
+For the following distributions, use the following commands:
+
+     Ubuntu:  $> apt-get install linux-headers
+     Debian:  $> apt-get install kernel-headers
+     Fedora:  $> yum install kernel-devel
+
+You also need the same version of `gcc(1)' compiler with which the
+kernel was built.  If it is not the default, add `CC=kgcc' on the line
+after `./configure', for example:
+
+     $> ../strchan-0.9.2.1/configure CC='gcc-3.4'
+
+ Installation
+-------------
+
+The following commands will download, configure, build, check, install,
+validate, uninstall and remove the package:
+
+     $> wget http://www.openss7.org/tarballs/strchan-0.9.2.1.tar.bz2
+     $> tar -xjvf strchan-0.9.2.1.tar.bz2
+     $> mkdir build
+     $> pushd build
+     $> ../strchan-0.9.2.1/configure --enable-autotest
+     $> make
+     $> make check
+     $> sudo make install
+     $> sudo make installcheck
+     $> sudo make uninstall
+     $> popd
+     $> sudo rm -rf build
+     $> rm -rf strchan-0.9.2.1
+     $> rm -f strchan-0.9.2.1.tar.bz2
+
+If you have problems, try building with the logging targets instead.
+If the make of a logging target fails, an automatic problem report will
+be generated that can be mailed to The OpenSS7 Project
+<bugs@openss7.org>.(4) Installation steps using the logging targets
+proceed as follows:
+
+     $> wget http://www.openss7.org/tarballs/strchan-0.9.2.1.tar.bz2
+     $> tar -xjvf strchan-0.9.2.1.tar.bz2
+     $> mkdir build
+     $> pushd build
+     $> ../strchan-0.9.2.1/configure --enable-autotest
+     $> make compile.log
+     $> make check.log
+     $> sudo make install.log
+     $> sudo make installcheck.log
+     $> sudo make uninstall.log
+     $> popd
+     $> sudo rm -rf build
+     $> rm -rf strchan-0.9.2.1
+     $> rm -f strchan-0.9.2.1.tar.bz2
+
+See `README-make' for additional specialized make targets.
+
+For custom applications, see the `INSTALL' and `INSTALL-strchan' files
+or the see `Installation', in the manual, as listed below.  If you
+encounter troubles, see `Troubleshooting', in the manual, before
+issuing a bug report.
+
+ Brief Installation Instructions
+--------------------------------
+
+The OpenSS7 STREAMS Channels package is available from the downloads
+area of The OpenSS7 Project website
+(http://www.openss7.org/download.html) using a command such as:
+
+     $> wget http://www.openss7.org/tarballs/strchan-0.9.2.1.tar.bz2
+
+Unpack the tarball using a command such as:
+
+     $> tar -xjvf strchan-0.9.2.1.tar.bz2
+
+The tarball will unpack into the relative subdirectory named after the
+package name: strchan-0.9.2.1.
+
+The package builds using the GNU `autoconf' utilities and the
+`configure' script.  To build the package, we recommend using a
+separate `build' directory as follows:
+
+     $> mkdir build
+     $> cd build
+     $> ../strchan-0.9.2.1/configure
+
+In general, the package configures and builds without adding any
+special options to the `configure' script.  For general options to the
+`configure' script, see the GNU `INSTALL' file in the distribution:
+
+     $> less ../strchan-0.9.2.1/INSTALL
+
+For specific options to the `configure' script, see the
+`INSTALL-strchan' file in the distribution, or simply execute the
+configure script with the `--help' option like so:
+
+     $> ../strchan-0.9.2.1/configure --help
+
+After configuring the package, the package can be compiled simply by
+issuing the `make' command:
+
+     $> make
+
+Some specialized makefile targets exists, see the `README-make' file in
+the distribution or simply invoke the `help' target like so:
+
+     $> make help | less
+
+After successfully building the package, the package can be checked by
+invoking the `check' make target like so:
+
+     $> make check
+
+After successfully checking the package, the package can be installed
+by invoking the `install' make target (as root) like so:
+
+     $> sudo make install
+
+The test suites that ship with the package can be invoked after the
+package has been installed by invoking the `installcheck' target.  This
+target can either be invoked as root, or as a normal user, like so:
+
+     $> make installcheck
+
+(Note: you must add the `--enable-autotest' flag to `configure', above
+for the test suites to be invoked with `make installcheck'.)
+
+The package can be cleanly removed by invoking the `uninstall' target
+(as root):
+
+     $> sudo make uninstall
+
+Then the build directory and tarball can be simply removed:
+
+     $> cd ..
+     $> rm -rf build
+     $> rm -rf strchan-0.9.2.1
+     $> rm -f strchan-0.9.2.1.tar.bz2
+
+ Detailed Installation Instructions
+-----------------------------------
+
+More detailed installation instructions can be found in the
+`Installation', in the manual, contained in the distribution in `text',
+`info', `html' and `pdf' formats:
+
+     $> cd ../strchan-0.9.2.1
+     $> less doc/manual/strchan.txt
+     $> lynx doc/manual/strchan.html
+     $> info doc/manual/strchan.info
+     $> xpdf doc/manual/strchan.pdf
+
+The `text' version of the manual is always available in the `MANUAL'
+file in the release.
+
+The current manual is also always available online from `The OpenSS7
+Project' website at:
+
+     $> lynx http://www.openss7.org/strchan_manual.html
+
+---------- Footnotes ----------
+
+(1) See `GNU/Linux Distributions', in the manual, for more information.
+
+(2) If you are using a Debian release, please make sure to install the
+groff extension package (`groff_ext'), as it contains the `refer' or
+`grefer' commands necessary for including references in the manual
+pages.
+
+(3) Although, at one time, this package supported `LiS', `LiS' is now
+deprecated and unsupported.
+
+(4) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
+in the release directory for more information on filing a proper
+"Problem Report".
+
