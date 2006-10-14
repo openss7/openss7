@@ -1,0 +1,426 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: strsctp.5.man,v 1.1.2.1 2006/10/14 06:21:37 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/14 06:21:37 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strsctp.5.man,v $
+.\" Revision 1.1.2.1  2006/10/14 06:21:37  brian
+.\" - updated manual pages for release
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsctp.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsctp.macros
+.\"
+.\"
+.\"
+.\"
+.TH @PACKAGE_UCNAME@ 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B @PACKAGE@
+\- the @PACKAGE_TITLE@ package
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.BR "Linux Fast-STREAMS" .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package providers
+.IR STREAMS (9)
+modules and drivers, libraries, programs, init scripts, and daemons that
+implement and provide the Stream Control Transmission Protocol (SCTP).
+.[
+rfc2960
+.]
+.[
+rfc4460
+.]
+.PP
+The package builds an installs the following
+.IR STREAMS (9)
+kernel modules and drivers:
+.PP
+.TS
+tab(:);
+cw(1u)1lbcliss.
+\-:streams_sctp.ko:driver:/dev/sctp_n, /dev/sctp_t
+\-:streams_tpiperf.ko:module:\(lqtpiperf\(rq
+.TE
+.TP
+.BR sctp (4)
+The
+.BR sctp (4)
+driver is a
+.IR STREAMS (9)
+pseudo-device driver that provides
+.BR /dev/sctp_n " and " /dev/sctp_t
+devices.  See the
+.BR sctp (4)
+manual page for more information.
+.TP
+.BR tpiperf (4)
+The
+.BR tpiperf (4)
+module is a pushable
+.IR STREAMS (9)
+module that provides special capabilities for performance testing of TPI
+providers.
+See the
+.BR tpiperf (4)
+manual page for more information.
+.PP
+The package builds and installs the following shared object libraries:
+.TP
+.BR libsctp (3)
+The
+.BR libsctp (3)
+library provides compatibility with the suggested SCTP sockets API.
+This library requires the
+.BR strsock (5)
+package.  It provides the following functions:
+.RS
+.PP
+.TS
+tab(:);
+lb1lw(1u)1lsss.
+sctp_bindx\fR(3):\-:T{
+bind SCTP socket to multiple addresses.
+T}
+sctp_connectx\fR(3):\-:T{
+connect SCTP socket to multiple addresses.
+T}
+getsockopt\fR(3):\-:T{
+set SCTP socket options.
+T}
+setsockopt\fR(3):\-:T{
+get SCTP socket options.
+T}
+.TE
+.RE
+.PP
+This library is incomplete.
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel modules,
+.I SVR 4.2 STEAMS
+drivers, modules, libraries, utilities, test programs, daemons, and
+development environments for the development and execution of
+.B @PACKAGE_TITLE@
+protocol stack components and applications for the
+.I SVR 4.2 STEAMS
+environment.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package contains the following manual pages:
+.PP
+.TS
+tab(:);
+lb1lw(1u)1lssss.
+sctp\fR(4):\-:T{
+Stream Control Transmission Protocol (SCTP)
+T}
+sctp_ioctl\fR(4):\-:T{
+specialized SCTP input-output controls.
+T}
+sctp_n\fR(4):\-:T{
+the
+.BR sctp (4)
+Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7)
+Connection Oriented Network Service device.
+T}
+sctp_n\fR(4):\-:T{
+the
+.BR sctp (4)
+Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7)
+Connection Oriented Network Service device.
+T}
+sctp_t\fR(4):\-:T{
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7)
+Connection Oriented Transport Service device with Orderly Release.
+T}
+tpiperf\fR(4):\-:T{
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7)
+performance testing
+.IR STREAMS (9)
+module.
+T}
+strsctp\fR(5):\-:T{
+the
+.B @PACKAGE@
+package.
+T}
+npi_sctp\fR(7):\-:T{
+Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+.IR "Corrigendum for SCTP Conformance" .
+T}
+tpi_sctp\fR(7):\-:T{
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+.IR "Corrigendum for SCTP Conformance" .
+T}
+xti_sctp\fR(3):\-:T{
+X/Open Transport Interface
+.[
+xti
+.]
+.BR xti (3),
+.IR "Use of the XTI with SCTP" .
+T}
+strsctp_mknod\fR(8):\-:T{
+create or remove SCTP device nodes.
+T}
+test-etsi_n\fR(8):\-:T{
+SCTP NPI interface ETSI validate test case executable.
+T}
+test-etsi_t\fR(8):\-:T{
+SCTP TPI interface ETSI validate test case executable.
+T}
+test-interop\fR(8):\-:T{
+10th SCTP Interop test program.
+T}
+test-sctp\fR(8):\-:T{
+SCTP quick check test.
+T}
+test-sctp_n2\fR(8):\-:T{
+SCTP NPI interface validation test case executable
+T}
+test-sctp_n\fR(8):\-:T{
+SCTP NPI interface validation test case executable
+T}
+test-sctp_nc\fR(8):\-:T{
+SCTP NPI Client test program
+T}
+test-sctp_ns\fR(8):\-:T{
+SCTP NPI Server test program
+T}
+test-sctp_t\fR(8):\-:T{
+SCTP TPI interface validation test case executable.
+T}
+.TE
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH MODULES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.IR STREAMS (9)
+moduels:
+.HP
+.BR tpiperf (4)\ \-\ \c
+TPI performance test module.
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.IR STREAMS (9)
+devices:
+.HP
+.BR sctp (4)\ \-\ \c
+The SCTP pseudo-device driver.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.BI /lib/modules/ `uname\ -r` /streams/streams_sctp.ko
+The
+.BR sctp (4)
+.IR STREAMS (9)
+driver kernel module.
+.TP
+.BI /lib/modules/ `uname\ -r` /streams/streams_tpiperf.ko
+The
+.BR tpiperf (4)
+.IR STREAMS (9)
+module kernel module.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sctp (4),
+.BR strsctp (5),
+.BR strsctp_mknod (8),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B @PACKAGE_TITLE@
+is compatible with other SCTP implementations and was interoperability tested
+at the IETF supported 2nd and 9th and 10th SCTP interoperatbility events,
+twice at ETSI at the headquarters in Sophia Antipolis, France, and once at the
+University of British Columbia, Canada.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+RFC 2960,
+.[
+rfc2960
+.]
+RFC 3309,
+.[
+rfc3309
+.]
+RFC 4460,
+.[
+rfc4460
+.]
+NPI,
+.[
+npi revision 2.0.0
+.]
+TPI,
+.[
+tpi revision 2.0.0
+.]
+XTI,
+.[
+xti
+.]
+XNS 5.2.
+.[
+xns
+.]
+To date\(emasside from the protocol specification\(emthere is no standard for the
+interface or implementation of SCTP.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B @PACKAGE_TITLE@
+is one of the original kernel implementations of SCTP.
+.PP
+The
+.IR STREAMS (9)
+version of SCTP was separated from the
+.BR strss7 (5)
+package to become the
+.BR strsctp (5)
+package in the 0.8.2 releases.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

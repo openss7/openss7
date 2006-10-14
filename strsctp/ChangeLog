@@ -1,3 +1,15 @@
+2006-10-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: added package manual page
+	* doc/man/man4/sctp.4.man: updated for release
+	* doc/man/man4/sctp_ioctl.4.man: removed unused manpage
+	* doc/man/man4/sdl_sctp.4.man: removed unused manpage
+	* doc/man/man4/strsctp_soon.4.man: removed unused manpage
+	* doc/man/man5/strsctp.5.man: added package manpage
+	* doc/man/man7/strsctp_soon.7.man: removed unused manpage
+	* doc/man/man8/sctp.8.man: removed unused manpage
+	* doc/man/man8/test-xxx.8.man: removed unused manpage
+
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: removed redundant debug flags
