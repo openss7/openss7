@@ -568,6 +568,8 @@ strbcm/src/include/Makefile.in
 strbcm/src/Makefile.in
 strbcm/tests/Makefile.in
 strbcm/TODO
+strchan/doc/manual/strchan.info
+strchan/doc/manual/strchan.info-1
 strcompat/aclocal.m4
 strcompat/AUTHORS
 strcompat/autom4te.cache
