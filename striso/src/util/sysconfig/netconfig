@@ -1,0 +1,81 @@
+##
+# @(#) $RCSfile: netconfig,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 06:06:23 $
+##
+## Network Configuration Database
+## for the Network Selection Facility and the Name-to-Address Directory
+## Services.
+##
+## See netconfig(5) for more information.
+##
+# <netid> <semantics>   <flag> <family>  <proto> <device>       <n2alibs>
+# ------- ------------- ------ --------- ------- -------------- ----------------
+tp0       tpi_cots      v      osi       tp0     /dev/tp0       /usr/lib/osiaddr.so
+tp1       tpi_cots      v      osi       tp1     /dev/tp1       /usr/lib/osiaddr.so
+tp2       tpi_cots      v      osi       tp2     /dev/tp2       /usr/lib/osiaddr.so
+tp3       tpi_cots      v      osi       tp3     /dev/tp3       /usr/lib/osiaddr.so
+tp4       tpi_cots      v      osi       tp4     /dev/tp4       /usr/lib/osiaddr.so
+clts      tpi_clts      v      osi       clts    /dev/clts      /usr/lib/osiaddr.so
+clns      tpi_clts      v      osi       clns    /dev/clns      /usr/lib/osiaddr.so
+isot      tpi_cots      v      osi       tp0     /dev/isot      /usr/lib/osiaddr.so
+isos      tpi_cots      v      osi       tp0     /dev/isos      /usr/lib/osiaddr.so
+itot      tpi_cots      v      osi       tp2     /dev/itot      /usr/lib/osiaddr.so
+itos      tpi_cots      v      osi       tp2     /dev/itos      /usr/lib/osiaddr.so
+# ------- ------------- ------ --------- ------- -------------- ----------------
+
+## =============================================================================
+## 
+# @(#) $RCSfile: netconfig,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 06:06:23 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; version 2 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2006/10/16 06:06:23 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: netconfig,v $
+## Revision 0.9.2.1  2006/10/16 06:06:23  brian
+## - added config files
+##
+## =============================================================================
+## vim: ft=config comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
