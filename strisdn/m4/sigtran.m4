@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 08:28:02 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 11:56:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 08:28:02 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 11:56:11 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.2  2006/10/16 11:56:11  brian
+# - correct what to search for
+#
 # Revision 0.9.2.1  2006/10/16 08:28:02  brian
 # - added new package discovery macros
 #
@@ -70,7 +73,7 @@
 # =============================================================================
 # _SIGTRAN
 # -----------------------------------------------------------------------------
-# Check for the existence of SIGTRAN header files, particularly sigtran/sl.h.
+# Check for the existence of SIGTRAN header files, particularly sigtran/sys/m3ua.h.
 # SIGTRAN header files are required for building the SIGTRAN interface.
 # Without SIGTRAN header files, the SIGTRAN interface will not be built.
 # -----------------------------------------------------------------------------
@@ -137,7 +140,7 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS SIGTRAN header files.  The
     # package normally requires SIGTRAN header files to compile.
     AC_CACHE_CHECK([for sigtran include directory], [sigtran_cv_includes], [dnl
-	sigtran_what="sigtran/sl.h"
+	sigtran_what="sys/m3ua.h"
 	if test :"${with_sigtran:-no}" != :no -a :"${with_sigtran:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    AC_MSG_RESULT([(searching $with_sigtran)])

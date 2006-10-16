@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 08:28:02 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 11:44:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 08:28:02 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 11:44:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.2  2006/10/16 11:44:46  brian
+# - change search file
+#
 # Revision 0.9.2.1  2006/10/16 08:28:02  brian
 # - added new package discovery macros
 #
@@ -70,7 +73,7 @@
 # =============================================================================
 # _ISDN
 # -----------------------------------------------------------------------------
-# Check for the existence of ISDN header files, particularly isdn/sl.h.
+# Check for the existence of ISDN header files, particularly isdn/sys/isdni.h
 # ISDN header files are required for building the ISDN interface.
 # Without ISDN header files, the ISDN interface will not be built.
 # -----------------------------------------------------------------------------
@@ -137,7 +140,7 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS ISDN header files.  The
     # package normally requires ISDN header files to compile.
     AC_CACHE_CHECK([for isdn include directory], [isdn_cv_includes], [dnl
-	isdn_what="isdn/sl.h"
+	isdn_what="sys/isdni.h"
 	if test :"${with_isdn:-no}" != :no -a :"${with_isdn:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    AC_MSG_RESULT([(searching $with_isdn)])

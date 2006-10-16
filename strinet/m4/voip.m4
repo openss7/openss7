@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 08:28:02 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 11:56:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 08:28:02 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 11:56:11 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.2  2006/10/16 11:56:11  brian
+# - correct what to search for
+#
 # Revision 0.9.2.1  2006/10/16 08:28:02  brian
 # - added new package discovery macros
 #
@@ -70,7 +73,7 @@
 # =============================================================================
 # _VOIP
 # -----------------------------------------------------------------------------
-# Check for the existence of VOIP header files, particularly voip/sl.h.
+# Check for the existence of VOIP header files, particularly voip/sys/h225.h.
 # VOIP header files are required for building the VOIP interface.
 # Without VOIP header files, the VOIP interface will not be built.
 # -----------------------------------------------------------------------------
@@ -137,7 +140,7 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS VOIP header files.  The
     # package normally requires VOIP header files to compile.
     AC_CACHE_CHECK([for voip include directory], [voip_cv_includes], [dnl
-	voip_what="voip/sl.h"
+	voip_what="sys/h225.h"
 	if test :"${with_voip:-no}" != :no -a :"${with_voip:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    AC_MSG_RESULT([(searching $with_voip)])
