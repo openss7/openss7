@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/08/23 09:47:41 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/10/16 04:30:47 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/08/23 09:47:41 $ by $Author: brian $
+## Last Modified $Date: 2006/10/16 04:30:47 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: kernel.am,v $
+## Revision 0.9.2.70  2006/10/16 04:30:47  brian
+## - missing a few normal uninstalls
+##
 ## Revision 0.9.2.69  2006/08/23 09:47:41  brian
 ## - better detection of null kernel module list
 ##
@@ -272,6 +275,7 @@ install-modules: $(KERNEL_MODULES)
 ##
 install-preloads:
 	@$(ECHO) "Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
 	@test -n "$(KERNEL_PRELOADS)" || exit 0 ; \
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot
 	@list=` $(ECHO) " $(KERNEL_PRELOADS) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
@@ -286,6 +290,7 @@ install-preloads:
 ##
 install-modconf:
 	@$(ECHO) "Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)
 	@test -f "$(KERNEL_MODCONF)" || exit 0 ; \
 	$(ECHO) "$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)" ; \
@@ -574,6 +579,7 @@ endif
 ##
 uninstall-preload:
 	@$(ECHO) "Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
 	@list=` $(ECHO) " $(KERNEL_PRELOADS) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
 		$(ECHO_C)rm -f -- $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot/$$p ; \
 	done
@@ -589,6 +595,7 @@ uninstall-modules:
 
 uninstall-modconf:
 	@$(ECHO) "Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
 	rm -f -- "$(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)"
 
 if WITH_KO_MODULES
