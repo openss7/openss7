@@ -1,10 +1,9 @@
-# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:*** fo+=tcqlorn
 # vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/29 10:57:46 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 08:29:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 08:29:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.9  2006/10/16 08:29:20  brian
+# - corrections
+#
 # Revision 0.9.2.8  2006/09/29 10:57:46  brian
 # - autoconf does not like multiline cache variables
 #
@@ -109,6 +111,7 @@ dnl
     AC_SUBST([SS7_LDADD])dnl
     AC_SUBST([SS7_LDADD32])dnl
     AC_SUBST([SS7_LDFLAGS])dnl
+    AC_SUBST([SS7_LDFLAGS32])dnl
     AC_SUBST([SS7_MODMAP])dnl
     AC_SUBST([SS7_SYMVER])dnl
     AC_SUBST([SS7_MANPATH])dnl
@@ -253,11 +256,6 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/strss7
 			${DESTDIR}${rootdir}/usr/local/include/strss7
 			${DESTDIR}${rootdir}/usr/src/strss7/src/include
-			${DESTDIR}${includedir}/LiS/ss7
-			${DESTDIR}${rootdir}${oldincludedir}/LiS/ss7
-			${DESTDIR}${rootdir}/usr/include/LiS/ss7
-			${DESTDIR}${rootdir}/usr/local/include/LiS/ss7
-			${DESTDIR}${rootdir}/usr/src/LiS/include/ss7
 			${DESTDIR}${includedir}/ss7
 			${DESTDIR}${rootdir}${oldincludedir}/ss7
 			${DESTDIR}${rootdir}/usr/include/ss7
@@ -266,16 +264,11 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/include/strss7
 			${DESTDIR}/usr/local/include/strss7
 			${DESTDIR}/usr/src/strss7/src/include
-			${DESTDIR}${oldincludedir}/LiS/ss7
-			${DESTDIR}/usr/include/LiS/ss7
-			${DESTDIR}/usr/local/include/LiS/ss7
-			${DESTDIR}/usr/src/LiS/include/ss7
 			${DESTDIR}${oldincludedir}/ss7
 			${DESTDIR}/usr/include/ss7
 			${DESTDIR}/usr/local/include/ss7\""
 		    ;;
 		(LfS)
-		    # Linux Fast-STREAMS has always been separate.
 		    eval "ss7_search_path=\"
 			${DESTDIR}${includedir}/strss7
 			${DESTDIR}${rootdir}${oldincludedir}/strss7
@@ -509,6 +502,7 @@ AC_DEFUN([_SS7_DEFINES], [dnl
     SS7_LDADD="$ss7_cv_ldadd"
     SS7_LDADD32="$ss7_cv_ldadd32"
     SS7_LDFLAGS="$ss7_cv_ldflags"
+    SS7_LDFLAGS32="$ss7_cv_ldflags32"
     SS7_MODMAP="$ss7_cv_modmap"
     SS7_SYMVER="$ss7_cv_symver"
     SS7_MANPATH="$ss7_cv_manpath"
