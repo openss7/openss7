@@ -1,0 +1,370 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2006/07/08 05:25:56 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; version 2 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2006/07/08 05:25:56 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: deb.am,v $
+## Revision 0.9.2.81  2006/07/08 05:25:56  brian
+## - no architecture last
+##
+## Revision 0.9.2.80  2006/07/08 04:41:45  brian
+## - no architecture last
+##
+## Revision 0.9.2.79  2006/07/08 04:05:32  brian
+## - cannot depend on a directory
+##
+## Revision 0.9.2.78  2006/07/08 03:42:54  brian
+## - cannot depend on directory
+##
+## Revision 0.9.2.77  2006/07/08 03:40:34  brian
+## - do not rebuild build directory all the time
+##
+## Revision 0.9.2.76  2006/07/06 14:31:03  brian
+## - match order of noarch build
+##
+## Revision 0.9.2.75  2006/07/06 14:28:27  brian
+## - put disable arch flag back
+##
+## Revision 0.9.2.74  2006/07/06 13:37:35  brian
+## - dont disable architecture on -b builds
+##
+## Revision 0.9.2.73  2006/07/06 13:36:25  brian
+## - better debian builds
+##
+## Revision 0.9.2.72  2006/07/04 18:53:05  brian
+## - correct flags
+##
+## Revision 0.9.2.71  2006/07/04 11:04:56  brian
+## - try building arch and indep separately
+##
+## Revision 0.9.2.70  2006/07/04 00:53:26  brian
+## - tell rules file where it is building
+##
+## Revision 0.9.2.69  2006/07/04 00:32:37  brian
+## - use environment rather than configure option
+##
+## Revision 0.9.2.68  2006/07/04 00:29:07  brian
+## - must tell package where to look for cache file
+##
+## Revision 0.9.2.67  2006/06/30 03:49:38  brian
+## - do not sign changes file when just building source package
+##
+## Revision 0.9.2.66  2006/06/30 03:17:26  brian
+## - don't sign source files by default
+##
+## Revision 0.9.2.65  2006/03/06 11:35:14  brian
+## - updated headers
+##
+## =============================================================================
+
+##
+## These are the rules that I use for build debian source and binary packages using automake.  As a
+## maintainer I need to package releases using dpkg.  The following rules accomplish that for all
+## most packages.
+##
+
+if MAINTAINER_MODE
+
+##
+## For better speed when building package binaries, we skip these rules to invoke package building.
+## There is not (yet) a need to build packages when building packages...  We use maintainer mode to
+## distinguish whether these rules are necessary or not.
+##
+
+if BUILD_DPKG
+
+##
+## Debian builds are a little different from rpm builds.  We use the same bootstrapping as we do for
+## RPM in that a distributed tarball has all of the targets necessary for building dsc and deb
+## packages built in, however, the debian control file does not have the powerful macro capabilities
+## of an RPM spec file.  Therefore, one debian source package cannot be used for building all binary
+## packages as we do with RPM.  The Debian build process here consists of unpacking the distribution
+## and configuring it.  Then the .dsc and .deb packages are built from the already configured source.
+##
+
+##
+# Because we *are* the upstream source, we always use debian version @PACKAGE_DEBRELEASE@ and pack
+# the RPM release number onto the upstream version, but with a period instead of a dash to suppress
+# warnings from dpkg-source.
+##
+debianpkg		= $(PACKAGE_LCNAME)_$(VERSION)-$(PACKAGE_DEBRELEASE)
+debian_dir		= $(debbuilddir)/$(PACKAGE_LCNAME)-$(VERSION)
+debian_dir_stamp	= $(debbuilddir)/stamp-$(PACKAGE_LCNAME)-$(VERSION)
+debian_cache_files	= $(debbuilddir)/*config.cache \
+			  $(debbuilddir)/*config.site \
+			  $(debbuilddir)/*modpost.cache
+
+debian_tar_file		= $(debbuilddir)/$(debianpkg).tar.gz
+debian_dsc_file		= $(debbuilddir)/$(debianpkg).dsc
+debian_sig_file		= $(debbuilddir)/$(debianpkg).dsc.sig
+debian_source_files	= $(debian_tar_file) $(debian_dsc_file) $(debian_sig_file)
+debian_change_files	= $(debbuilddir)/$(debianpkg)_*.changes $(debbuilddir)/$(debianpkg)_*.changes.asc
+debian_binary_files	= $(debbuilddir)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*.deb \
+			  $(debbuilddir)/$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_*.deb
+
+debtop_tar_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).tar.gz
+debtop_dsc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc
+debtop_sig_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.sig
+debtop_source_files	= $(debtop_tar_file) $(debtop_dsc_file) $(debtop_sig_file)
+debtop_change_files	= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_*.changes $(PACKAGE_DEBTOPDIR)/$(debianpkg)_*.changes.asc
+debtop_binary_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*.deb \
+			  $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_*.deb
+
+RELEASE_DIRECTORIES	+= $(PACKAGE_DEBTOPDIR)
+
+##
+# For the master build package it is sometime necessary to pass extra options down to configured
+# subdirectories for a master build.  These options will contain the passed down options from the
+# environment in that case.  See the recursive build targets below.
+##
+DEBXOPTS	= -D
+
+#!
+#! Debian Build Targets:
+#! ---------------------
+#!
+#! On debian systems, or systems sporting debian packaging tools, the following
+#! targets are used to generate debian release packages.  The release number can
+#! be controlled by the contents of the .debrelease file, or with the
+#! --with-debrelease=RELEASENUMBER option to 'configure'.  See 'configure
+#! --help' for more information on options.
+#!
+$(debian_dir):: $(debian_dir_stamp)
+$(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz
+	rm -rf $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)
+	$(mkdir_p) $(debbuilddir)/$(PACKAGE)-$(VERSION)
+	$(GZIP_CMD) -dc $< | tar xf - -C $(debbuilddir)
+	@if test "$(debbuilddir)/$(PACKAGE)-$(VERSION)" != "$(debian_dir)" ; then \
+		$(ECHO) "mv -f -- $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)" ; \
+		mv -f -- $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir) ; \
+	fi
+	touch $(debian_dir_stamp)
+
+##
+# Approach to signing dsc files taken from dpkg-buildpackage:  A signed .dsc file is merely a signed
+# cleartext armoured version of the original .dsc file with the same filename.  The tar file is not
+# signed.  As there is an md5 checksum in the signed .dsc file, the signature verifies the tar file
+# as well.  We use a little trick to allow GPGPASSWD to be exported by the user to permit automated
+# builds that including signing.  If you don't like the security issues that raises, dont use it and
+# you will be prompted for a passphrase with each signature.
+##
+$(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
+	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(DEBXOPTS) )
+#	(cd "$(debbuilddir)" ; $(DPKG_SOURCE) -b -sn $(debian_dir))
+
+$(debtop_dsc_file) $(debtop_tar_file)::
+	@f=`$(ECHO) "$@" | sed -e 's|^$(PACKAGE_DEBTOPDIR)/|$(debbuilddir)/|'` ; \
+	test "$@" -ef "$$f" && exit 0 ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; } ; \
+	test "$@" -ef "$$f" && exit 0 ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
+		$(ECHO) "cp -f -- $$f $@" ; \
+		cp -f -- $$f $@ ; }
+
+$(debtop_sig_file): $(debtop_dsc_file)
+	@\
+	user="$(GNUPGUSER)" ; user="$${user:+ -u $$user}" ; \
+	home="$(GNUPGHOME)" ; home="$${home:+ --homedir $$home}" ; \
+	pass="$(GNUPGPASS)" ; pass="$${pass:+ --batch }" ; \
+	pipe="$(GNUPGPASS)" ; pipe="$${pipe:+ $(ECHO) "$$pipe" |}" ; \
+	$(ECHO) "rm -f $@" ; \
+	rm -f $@ ; \
+	$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" ; \
+	eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" || { rm -f $< $@ ; exit 1 ; }
+	cp -fp $@ $<
+	touch $@
+
+#! dsc:
+#!     This target will build the debian source change package (.dsc file).  We
+#!     use release number 0 so that the entire tarball is included in the dsc
+#!     file.  You can use release number 1 for the same purposes.  Release
+#!     numbers above 1 will not include the entire tarball.  The .dsc file will
+#!     be named: @PACKAGE_LCNAME@_@VERSION@-@PACKAGE_DEBRELEASE@.dsc
+#!
+dsc: $(debtop_dsc_file) $(debtop_tar_file)
+
+#! sigs:
+#!     This target signs the .deb files.  You will be prompted for a password,
+#!     unless to specify it to make with the GNUPGPASS variable.
+#!
+sigs: $(debtop_sig_file)
+
+AM_BINARY_TARGET = binary-arch
+
+##
+# This is the type of thing that needs to be included in the master makefile to build debs for the
+# current target, we also build any defined AM_DEBTARGETS
+##
+each-deb: $(debian_dir_stamp)
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
+	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(DEBBOPTS) -rfakeroot -uc $(DEBXOPTS) -nc )
+#	( cd $(debian_dir) ; dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
+
+##
+# This below is pretty obfuscated, but it is what we need to rebujild a deb once for LiS and another
+# time for Linux Fast-STREAMS.  When we drop LiS support, this can be cleaned out.  This uses the
+# sneaky GNU make trick that per-target variables can be defined for the target and its dependents,
+# in our case the single build target.  Packages that do not build for STREAMS should define
+# conditionals WITH_LIS and WITH_LFS to be false and the plain rule above will be used instead.
+##
+one-deb:
+@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--disable-indep' AM_BINARY_TARGET='binary-arch' each-deb
+
+lis-deb:
+@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--with-lis --without-lfs --disable-indep' AM_BINARY_TARGET='binary-lis' each-deb
+
+lfs-deb:
+@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--with-lfs --without-lis --disable-indep' AM_BINARY_TARGET='binary-lfs' each-deb
+
+noa-deb:
+	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='--disable-arch' AM_BINARY_TARGET='binary-indep' each-deb
+
+chg-deb:
+	@if test "$(PACKAGE_DEBTOPDIR)" != "$(debbuilddir)" ; then \
+		list="$(debian_binary_files) $(debian_change_files)" ; for f in $$list ; do \
+			test -f $$f || continue ; \
+			t=`echo $$f | sed -e 's|^$(debbuilddir)/|$(PACKAGE_DEBTOPDIR)/|'` ; \
+			if test ":$(FORCE)" = :force -o \( ! -f "$$t" -o "$$t" -ot "$$f" \) ; then \
+				$(ECHO) "cp -f -- $$f $$t" ; \
+				cp -f -- $$f $$t ; \
+			fi ; \
+		done ; \
+	fi
+
+#! debs:
+#!     This target will build the debian binary package (.deb file) from the
+#!     .dsc created above.  (This target will also create the .dsc if it has not
+#!     been created already.)  The subpackage .deb files will be named:
+#!     @PACKAGE_LCNAME@-*_@VERSION@-@PACKAGE_DEBRELEASE@_*.deb, where the stars indicate the subpackage and
+#!     the architecture.
+#!
+debs: lis-deb lfs-deb one-deb noa-deb chg-deb
+
+#! csig:
+#!     This target signs the .dsc file.  You will be prompted for a password,
+#!     unless to specify it to make with the GNUPGPASS variable.
+#!
+csig:
+	@list="$(debtop_change_files)" ; for f in $$list ; do \
+		test -f $$f || continue ; \
+		t=`echo $$f | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'` ; \
+		if test ! -f $$t -o $$t -ot $$f ; then \
+			user="$(GNUPGUSER)" ; user="$${user:+ -u $$user}" ; \
+			home="$(GNUPGHOME)" ; home="$${home:+ --homedir $$home}" ; \
+			pass="$(GNUPGPASS)" ; pass="$${pass:+ --batch }" ; \
+			pipe="$(GNUPGPASS)" ; pipe="$${pipe:+ $(ECHO) "$$pipe" |}" ; \
+			$(ECHO) "rm -f $$t" ; \
+			rm -f $$t ; \
+			$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $$f > $$t" ; \
+			eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $$f > $$t" || { rm -f $$f $$t ; exit 1 ; } ; \
+			cp -fp $$t $$f ; \
+			touch $$t ; \
+		fi ; \
+	done
+
+# Another sneaky trick
+all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-noa-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+
+RELEASE			+= all-dsc all-lis-deb all-lfs-deb all-one-deb all-noa-deb all-chg-deb
+RELEASE_SIGN		+= all-sigs all-csig
+RELEASE_DIRECTORIES	+= 
+
+distclean-deb:
+	rm -rf $(debian_dir)
+
+DISTCLEAN_LOCAL		+= distclean-deb
+
+DISTCLEANFILES		+= $(debian_cache_files) \
+			   $(debian_dir_stamp) \
+			   $(debian_source_files) \
+			   $(debian_change_files) \
+			   $(debian_binary_files)
+
+release-clean-deb: distclean-deb
+
+RELEASE_CLEAN_LOCAL	+= release-clean-deb
+
+RELEASECLEANFILES	+= $(debian_cache_files) \
+			   $(debian_dir_stamp) \
+			   $(debian_source_files) \
+			   $(debian_change_files) \
+			   $(debian_binary_files) \
+			   $(debtop_source_files) \
+			   $(debtop_change_files) \
+			   $(debtop_binary_files)
+
+MY_PHONY		+= dsc debs each-deb one-deb lis-deb lfs-deb noa-deb sigs csig
+ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-deb all-lis-deb all-lfs-deb all-noa-deb all-chg-deb all-sigs all-csig
+
+endif
+## BUILD_DPKG
+
+endif
+## MAINTAINER_MODE
+
+EXTRA_DIST		+= debian/changelog \
+			   debian/control \
+			   debian/rules \
+			   debian/copyright \
+			   .debrelease \
+			   .debepoch
+
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -1,0 +1,146 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: pr.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/29 11:27:42 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; version 2 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2006/03/29 11:27:42 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: pr.am,v $
+## Revision 0.9.2.7  2006/03/29 11:27:42  brian
+## - corrections for rerelease, see ChangeLog
+##
+## Revision 0.9.2.6  2006/03/24 10:07:43  brian
+## - send-pr is architecture independent
+##
+## Revision 0.9.2.5  2006/03/24 09:43:14  brian
+## - send-pr missing from distribution
+##
+## Revision 0.9.2.4  2006/03/23 11:19:15  brian
+## - working up send-pr
+##
+## Revision 0.9.2.3  2006/03/23 05:41:18  brian
+## - renamed auto-pr to send-pr
+##
+## Revision 0.9.2.2  2006/03/22 01:08:26  brian
+## - working up auto-pr
+##
+## Revision 0.9.2.1  2006/03/21 13:23:46  brian
+## - added problem reports
+##
+## =============================================================================
+
+#!
+#! Problem Report targets:
+#! -----------------------
+#!
+#! To ease problem report generation, all logging targets will automatically
+#! generate a problem report suitable for mailing in the file 'target'.pr for
+#! target 'target.log'.  This problem report file is in the form of an email
+#! and can be sent directly.
+#!
+#! There are two additional problem report targets:
+#!
+#! pr:
+#!     The pr target is for independently generating a problem report outside
+#!     of the build or installation process.  The target will automatically
+#!     generate a problem report skeleton suitable for editting and mailing in
+#!     the file 'problem.pr'.  This problem report file is in the form of an
+#!     email and can be sent directly.
+#!
+problem.pr bug pr: $(AP_CONFIG)
+	$(AP_AUTOPR) --config=$(AP_CONFIG)
+
+#! finish-pr:
+#!      The finish-pr target is for finalizing a problem report.  The problem
+#!      report will not be mailed but will simply have the comment lines removed
+#!      from the problem report.  The target will automatically finalize the
+#!      problem report in 'problem.pr'.
+finish-pr:
+	$(AP_AUTOPR) --config=$(AP_CONFIG) --file="problem.pr" --nomail
+
+#! send-pr:
+#!      The send-pr target is for finalizing and mailing a problem report
+#!      generated either inside or outside the build and installation process.
+#!      The target will automatically finalize and mail the 'problem.pr' problem
+#!      report if it has changed since the last time that send-pr was run.
+#!
+send-pr:
+	$(AP_AUTOPR) --config=$(AP_CONFIG) --file="problem.pr"
+
+clean-send-pr:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-send-pr:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(LOGGING_TARGETS)' ; for t in $$list ; do \
+		p=`echo $$t | sed -e 's|\.log$$|.pr|'` ; \
+		$(ECHO) "rm -f -- $$p" ; \
+		rm -f -- $$p ; \
+	done ; \
+	$(ECHO) "rm -f -- problem.pr" ; \
+	rm -f -- problem.pr
+
+maintainer-clean-send-pr:
+	@$(ECHO) "Making $@ in `pwd`"
+
+CLEAN_LOCAL		+= clean-send-pr
+DISTCLEAN_LOCAL		+= distclean-send-pr
+MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-send-pr
+EXTRA_SCRIPTS		+= scripts/send-pr
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+## Problem report script is architecture independent!
+pkglibexec_DATA		= $(AP_CONFIG)
+dist_pkglibexec_SCRIPTS	= $(AP_SCRIPT)
+
+## PKG_BUILD_INDEP
+endif
+
+MY_PHONY		+= bug pr send-pr finish-pr

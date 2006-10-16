@@ -1,0 +1,623 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: testsuite.texi,v 0.9.2.11 2006/08/28 10:40:45 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006/08/28 10:40:45 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@menu
+* Test Suites::			Test Suites for the package
+* Problem Reports::		Problem Reports for the package
+* Known Problems::		Known Problems with the package
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Test Suites
+@section Test Suites
+@cindex test suites
+
+@menu
+* Pre-installation Checks::	Tests performed before installation.
+* Post-installation Checks::	Tests performed after installation.
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Pre-installation Checks
+@subsection Pre-installation Checks
+@cindex pre-installation checks
+
+Most @cite{OpenSS7} packages, including the @cite{@value{PACKAGE_TITLE}} package, ship with
+pre-installation checks integral to the build system.  Pre-installation checks include check scripts
+that are shipped in the @file{scripts} subdirectory as well as specialized @command{make} targets
+that perform the checks.
+
+When building and installing the package from @dfn{RPM} or @dfn{DEB} source packages
+(@pxrefman{Building from the Source RPM}; and @refman{Building from the Debian DSC}), a fundamental set of
+post-compile, pre-installation checks are performed prior to building binary packages.  This is
+performed automatically and does not require any special actions on the part of the user creating
+binary packages from source packages.
+
+When building and installing the package from @dfn{tarball} (@pxrefman{Building from the Tar Ball}; and
+@refman{Installing the Tar Ball}), however, pre-installation checks are only performed if specifically
+invoked by the builder of the package.  Pre-installation checks are invoked after building the
+package and before installing the package.  Pre-installation checks are performed by invoking the
+@samp{check} or @samp{check.log} target to @command{make} when building the package, as shown
+in @ref{testsuite:ex0}.
+
+@cartouche
+@float Example,testsuite:ex0
+@caption{@emph{Invoking Pre-Installation Checks}}
+@example
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% pushd @value{PACKAGE}-@value{VERSION}
+% ./configure
+% make
+% make check  # <------- invoke pre-installation checks
+% popd
+@end example
+@end float
+@end cartouche
+
+Pre-installation checks fall into two categories: @dfn{System Checks} and @dfn{Maintenance Checks}.
+
+@subsubsection Pre-Installation System Checks
+
+@dfn{System Checks} are post-compilation checks that can be performed before installing the package
+that check to ensure that the compiled objects function and will be successfully installed.  When
+the @option{--enable-maintainer-mode} option has not been passed to @command{configure}, only
+@dfn{System Checks} will be performed.
+
+For example, the steps shown in @ref{testsuite:ex1} will perform @dfn{System} checks.
+
+@cartouche
+@float Example,testsuite:ex1
+@caption{@emph{Invoking System Checks}}
+@example
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% pushd @value{PACKAGE}-@value{VERSION}
+% ./configure
+% make
+% make check  # <------ invokes System pre-installation checks
+% popd
+@end example
+@end float
+@end cartouche
+
+@subsubsection Pre-Installation Maintenance Checks
+
+@dfn{Maintenance Checks} include all @dfn{System Checks}, but also checks to ensure that the kernel
+modules, applications programs, header files, development tools, test programs, documentation,
+and manual pages conform to @dfn{OpenSS7} standards.  When the @option{--enable-maintainer-mode}
+option has been passed to @command{configure}, @dfn{Maintenance Checks} will be performed.
+
+For example, the steps shown in @ref{testsuite:ex2} will perform @dfn{Maintenance} checks.
+
+@cartouche
+@float Example,testsuite:ex2
+@caption{@emph{Invoking Maintenance Checks}}
+@example
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% pushd @value{PACKAGE}-@value{VERSION}
+% ./configure --enable-maintainer-mode
+% make
+% make check  # <------ invokes Maintenance pre-installation checks
+% popd
+@end example
+@end float
+@end cartouche
+
+
+@subsubsection Specific Pre-Installation Checks
+
+A number of check scripts are provided in the @file{scripts} subdirectory of the distribution that
+perform both @dfn{System} and @dfn{Maintenance} checks.  These are as follows:
+
+@table @command
+@item check_commands
+
+This check performs both @dfn{System} and @dfn{Maintenance} checks.
+
+When performing @dfn{System} tests, the following tests are performed:
+
+Unless cross-compiling, or unless a program is included in @code{AM_INSTALLCHECK_STD_OPTIONS_EXEMPT}
+every program in @code{bin_PROGRAMS}, @code{sbin_PROGRAMS}, and @code{libexec_PROGRAMS} is tested to
+ensure that the @option{--help}, @option{--version}, and @option{--copying} options are accepted.
+When cross-compiling is is not possible to execute cross-compiled binaries, and these checks are
+skipped in that case.
+
+Script executables, on the other hand, can be executed on the build host, so, unless listed in
+@code{AM_INSTALLCHECK_STD_OPTIONS_EXEMPT}, every program in @code{dist_bit_SCRIPTS},
+@code{dist_sbin_SCRIPTS}, and @code{pkglibexec_SCRIPTS} are tested to ensure that the
+@option{--help}, @option{--version}, and @option{--copying} options are accepted.
+
+When performing @dfn{Maintenance} tests, @command{check_commands} also checks to ensure that a
+manual page exists in section 1 for every executable binary or script that will be installed from
+@code{bin_PROGRAMS} and @code{dist_bin_SCRIPTS}.  It also checks to ensure that a manual page exists
+in section 8 for every executable binary or script that will be installed from @code{sbin_PROGRAMS},
+@code{dist_sbin_SCRIPTS}, @code{libexec_PROGRAMS}, and @code{pkglibexec_SCRIPTS}.
+
+@item check_decls
+
+This check only performs @dfn{Maintenance} checks.
+
+It collects the results from the @code{check_libs}, @code{check_modules} and @code{check_headers}
+check scripts and tests to ensure every declaration of a function prototype or external variable
+contained in installed header files has a corresponding exported symbol from either a to be
+installed shared object library or a to be installed kernel module.  Declarations are exempted from
+this requirement if their identifiers have been explicitly added to the @code{EXPOSED_SYMBOL}
+variable.  If @code{WARN_EXCESS} is set to @samp{yes}, then the check script will only warn when
+excess declarations exist (without a corresponding exported symbol); otherwise, the check script
+will generate an error and the check will fail.
+
+@item check_headers
+
+This check only performs @dfn{Maintenance} checks.
+
+When performing @dfn{Maintenance} tests, it identifies all of the declarations included in to be
+installed header files.  It then checks to ensure that a manual page exists in sections 2, 3, 7 or
+9, as appropriate, for the type of declaration.  It also checks to see if a manual page source file
+exists in the source directory for a declaration that has not been included in the distribution.
+Function or prototype declarations that do not have a manual page in sections 2, 3, or 9 will cause
+the check to fail.  Other declarations (@samp{variable}, @samp{externvar}, @samp{macro}, @samp{enumerate}, @samp{enum}, @samp{struct}, @samp{union},
+@samp{typedef}, @samp{member}, etc.) will only warn if a manual page does not exist, but will not fail the check.
+
+@item check_libs
+
+This check only performs @dfn{Maintenance} checks.
+
+When performing @dfn{Maintenance} tests, it checks that each exported symbol in each to be installed
+shared object library has a manual page in section 3.  It also checks that each exported symbol has
+a @samp{function}, @samp{prototype} or @samp{externvar} declaration in the to be installed header files.  A missing
+declaration or manual page will cause this check to fail.
+
+@item check_mans
+
+This check only performs @dfn{Maintenance} checks.
+
+When performing @dfn{Maintenance} tests, it checks that to be install manual pages can be formatted
+for display without any errors or warnings from the build host @command{man} program.  It also
+checks that required headings exist for manual pages according to the section in which the manual
+page will be installed.  It warns if recommended headings are not included in the manual pages.
+Because some @dfn{RPM} distributions have manual pages that might conflict with the package manual
+pages, this check script also checks for conflicts with installed manual pages on the build host.
+This check script also checks to ensure that all to be installed manual pages are used in some
+fashion, that is, they have a declaration, or exported symbol, or are the name of a kernel module or
+STREAMS module or driver, possibly capitalized.
+
+Note that checking for conflicts with the build host should probably be included in the @dfn{System}
+checks (because @dfn{System} checks are performed before the source @dfn{RPM} @code{%install}
+scriptlet).
+
+@item check_modules
+
+This check performs both @dfn{System} and @dfn{Maintenance} checks.
+
+When performing @dfn{System} tests, it checks each to be installed kernel module to ensure that all
+undefined symbols can be resolved to either the kernel or another module.  It also checks whether an
+exported or externally declared symbol conflicts with an exported or externally declared symbol
+present in the kernel or another module.@footnote{This particular check has caught some name space
+pollution that has occurred in the 2.6.11 kernel.}
+
+When performing @dfn{Maintenance} tests, this check script tests that each to be installed kernel
+module has a manual page in section 9 and that each exported symbol that does not begin with an
+underscore, and that belongs to an exported function or exported variable, has a manual page in
+section 9.  It also checks to ensure that each exported symbol that does not begin with an
+underscore, and that belongs to an exported function or exported variable, has a @samp{function}, @samp{prototype}
+or @samp{externvar} declaration in the to be installed header files.
+
+@item check_streams
+
+This check performs only @dfn{Maintenance} checks.
+
+When performing @dfn{Maintenance} tests, it checks that for each configured @dfn{STREAMS} module or
+driver, or device node, that a manual page exists in section 4 or section 7 as appropriate.
+
+@end table
+
+The output of the pre-installation tests are fairly self explanatory.  Each check script saves some
+output to @file{@emph{name}.log}, where @emph{name} is the name of the check script as listed above.
+A summary of the results of the test are display to standard output and can also be captured to the
+@file{check.log} file if the @samp{check.log} target is used instead of the @samp{check}
+target to @command{make}.
+
+Because the check scripts proliferate @file{@emph{name}.log} files throughout the build directory, a
+@samp{make check-clean} @command{make} target has be provided to clean them out.  @samp{make
+check-clean} should be run before each successive run of @samp{make check}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Post-installation Checks
+@subsection Post-installation Checks
+@cindex post-installation checks
+
+@menu
+* Running Test Suites::		Running Test Suites in the package
+@end menu
+
+Most OpenSS7 packages ship with a compatibility and conformance test suite built using the
+@samp{autotest} capabilities of @samp{autoconf 2.59}.  These test suites act as a wrapper for the
+compatibility and conformance test programs that are shipped with the package.
+
+Unlike the pre-installation checks, the post-installation checks are always run complete.  The only
+check that post-installation test scripts perform is to test whether they have been invoked with
+root privileges or not.  When invoked as root, or as a plain user, some tests might be skipped that
+require root privileges, or that require plain user privileges, to complete successfully.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Running Test Suites
+@subsubsection Running Test Suites
+@cindex test suites, running
+
+There are several ways of invoking the conformance test suites:
+
+@enumerate
+
+@item The test suites can be run after installation of the package by invoking the @samp{make
+installcheck} or @samp{make installcheck.log} target.  Some packages require that root privileges be
+acquired before invoking the package.
+
+@item The test suites can be run from the distribution subdirectory after installation of the
+package by invoking the @command{testsuite} shell script directly.
+
+@item The test suites can be run standalone from the @file{libexec} (@file{@value{_libexecdir}})
+installation directory by invoking the @command{testsuite} shell script directly.
+
+@end enumerate
+
+Typical steps for invoking the test suites directly from @command{make} are shown in
+@ref{testsuite:ex3}.
+
+@cartouche
+@float Example,testsuite:ex3
+@caption{@emph{Invoking System Checks}}
+@example
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% pushd @value{PACKAGE}-@value{VERSION}
+% ./configure
+% make
+% make check  # <------ invokes System pre-installation checks
+% make install
+% sudo make installcheck # <------- invokes post-installation tests
+% popd
+@end example
+@end float
+@end cartouche
+
+When performing post-installation checks for the purposes of generating a problem report, the checks
+should always be performed from the build directory, either with @samp{make installcheck} or by
+invoking @command{testsuite} directly from the @file{tests} subdirectory of the build directory.
+This ensures that all of the information known to @command{configure} and pertinent to the
+configuration of the system for which a test case failed, will be collected in the resulting
+@file{testsuite.log} file deposited upon test suite failure in the @file{tests} directory.  This
+@file{testsuite.log} file can then be attached as part of the problem report and provides rich
+details to maintainers of the package.  See also @xrefman{Problem Reports}, below.
+
+Typical steps for invoking and installed @command{testsuite} standalone are shown in
+@ref{testsuite:ex4}.
+
+@cartouche
+@float Example,testsuite:ex4
+@caption{@emph{Invoking @command{testsuite} Directly}}
+@example
+% [sudo] @value{_libexecdir}/@value{PACKAGE}/testsuite
+@end example
+@end float
+@end cartouche
+
+When invoked directly, @command{testsuite} will generate a @file{testsuite.log} file in the current
+directory, and a @file{testsuite.dir} directory of failed tests cases and debugging scripts.  For
+generating a problem report for failed test cases, see @refman{Stand Alone Problem Reports}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Problem Reports
+@section Problem Reports
+@cindex problem reports
+@cindex bugs, reporting
+@cindex reporting bugs
+
+@menu
+* Problem Report Guidelines::
+* Generating Problem Reports::
+* Automatic Problem Reports::
+* Stand Alone Problem Reports::
+@end menu
+
+@node Problem Report Guidelines
+@subsection Problem Report Guidelines
+
+Problem reports in the following categories should include a log file as indicated in the table
+below:
+
+@table @samp
+
+@item ./configure
+A problem with the configuration process occurs that causes the @samp{./configure} command to fail.
+The problem report must include the @file{config.log} file that was generated by
+@command{configure}.
+
+@item make compile.log
+A problem with the build process occurs that causes the @samp{make} command to fail.  Perform
+@samp{make clean} and then @samp{make compile.log} and attach the @file{config.log} and
+@file{compile.log} files to the problem report.
+
+@item make check.log
+A problem occurs with the @samp{make check} target that causes it to fail.  Perform @samp{make
+check-clean check.log} and attach the @file{config.log}, @file{compile.log} and @file{check.log}
+files to the problem report.
+
+@item sudo make install.log
+A problem occurs with @samp{sudo make install} that causes it to fail.  Perform @samp{sudo make
+uninstall} and @samp{sudo make install.log} and attach the @file{config.log}, @file{compile.log},
+@file{check.log}, and @file{install.log} files to the problem report.
+
+@item [sudo] make installcheck.log
+A problem occurs with the @samp{make installcheck} target that causes the test suite to fail.
+Attach the resulting @file{tests/testsuite.log} and @file{installcheck.log} file to the problem
+report.  There is no need to attach the other files as they are included in
+@file{tests/testsuite.log}.
+
+@item [sudo] make uninstall.log
+A problem occurs with the @samp{make uninstall} target that causes the test suite to fail.  Perform
+@samp{sudo make uninstall.log} and attach the @file{config.log}, @file{compile.log},
+@file{check.log}, @file{install.log}, @file{installcheck.log}, @file{tests/testsuite.log} and
+@file{uninstall.log} file to the problem report.
+
+@item [sudo] make remove.log
+A problem occurs with the @samp{make remove} target that causes the test suite to fail.  Perform
+@samp{sudo make remove.log} and attach the @file{config.log}, @file{compile.log}, @file{check.log},
+@file{install.log}, @file{installcheck.log}, @file{tests/testsuite.log} and @file{remove.log} file
+to the problem report.
+
+@end table
+
+For other problems that occur during the use of the @cite{@value{PACKAGE_TITLE}} package, please
+write a test case for the test suite that recreates the problem if one does not yet exist and
+provide a test program patch with the problem report.  Also include whatever log files are generated
+by the kernel (@code{cmn_err(9)}) or by the @command{strerr(8)} or @command{strace(1)} facilities
+(@code{strlog(9)}).
+
+@c ----------------------------------------------------------------------------
+
+@node Generating Problem Reports
+@subsection Generating Problem Reports
+@cindex generating problem reports
+@cindex bug reports, generating
+@cindex generating bug reports
+
+@cite{The OpenSS7 Project} uses the @cite{GNU GNATS} system for problem reporting.  Although the
+@samp{send-pr} tool from the @cite{GNU GNATS} package can be used for bug reporting to the project's
+@cite{GNATS} database using electronic mail, it is not always convenient to download and install the
+@cite{GNATS} system to gain access to the @samp{send-pr} tool.
+
+Therefore, the @cite{@value{PACKAGE_TITLE}} package provides the @samp{send-pr} shell script that
+can be used for problem reporting.  The @samp{send-pr} shell script can invoked directly and is a
+work-alike for the @cite{GNU} @samp{send-pr} tool.
+
+The @samp{send-pr} tool takes the same flags and can be used in the same fashion, however, whereas
+@samp{send-pr} is an interactive tool@footnote{@samp{send-pr} launches the user's @var{EDITOR} to
+edit the problem report before submitting it.}, @samp{send-pr} is also able to perform batch
+processing.  Whereas @samp{send-pr} takes its field information from local databases or from using
+the @samp{query-pr} C-language program to query a remote database, the @samp{send-pr} tool has the
+field database internal to the tool.
+
+Problem reports can be generate using @command{make}, @xrefman{Problem Report Targets}.  An example of
+how simple it is to generate a problem report is illustrated in @ref{autopr:ex0}.
+@mkindex pr
+
+@cartouche
+@float Example,autopr:ex0
+@caption{@emph{Invoking Problem Report Generation}}
+@example
+% make pr
+SEND-PR:
+SEND-PR: send-pr:  send-pr was invoked to generate an external report.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@@openss7.org by calling this script as
+SEND-PR: '/home/brian/os7/scripts/send-pr --file="problem.pr"'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% make send-pr
+@end example
+@end float
+@end cartouche
+
+Using the @samp{make pr} target to generate a problem report has the advantages that it will
+assemble any available @file{*.log} files in the build directory and attach them to the problem
+report.
+
+@c ----------------------------------------------------------------------------
+
+@node Automatic Problem Reports
+@subsection Automatic Problem Reports
+@cindex generating problem reports automatically
+@cindex bug reports, automatic generation
+@cindex generating bug reports automatically
+
+The @cite{@value{PACKAGE_TITLE}} package also provides a feature for automatic problem report
+generation that meets the problem report submission guidelines detailed in the preceding sections.
+
+Whenever a logging makefile target (@pxrefman{Logging Targets}) is invoked, if the primary target
+fails, the @command{send-pr} shell script is invoked to automatically generate a problem report
+file suitable for the corresponding target (as described above under @pxrefman{Problem Report
+Guidelines}).  An example is shown in @ref{autopr:ex2}.
+
+@cartouche
+@float Example,autopr:ex2
+@caption{@emph{Problem Report from Failed Logging Target}}
+@example
+% make compile.log
+...
+...
+make[5]: *** [libXNSdrvs_a-ip.o] Error 1
+make[5]: Leaving directory `/u6/buildel4/strxns'
+make[4]: *** [all-recursive] Error 1
+make[4]: Leaving directory `/u6/buildel4/strxns'
+make[3]: *** [all] Error 2
+make[3]: Leaving directory `/u6/buildel4/strxns'
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory `/u6/buildel4'
+make[1]: *** [all] Error 2
+make[1]: Leaving directory `/u6/buildel4'
+SEND-PR:
+SEND-PR: send-pr:  Make target compile.log failed in the compile stage.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@@openss7.org by calling 'make send-pr'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% make send-pr
+@end example
+@end float
+@end cartouche
+
+@c ----------------------------------------------------------------------------
+
+@node Stand Alone Problem Reports
+@subsection Stand Alone Problem Reports
+@cindex generating problem reports stand alone
+@cindex bug reports, stand along generation
+@cindex generating bug reports
+
+The @cite{@value{PACKAGE_TITLE}} package installs the @command{send-pr} script and its configuration
+file @file{send-pr.config} in @file{$@{libexecdir@}/@value{PACKAGE}} along with the validation
+@command{testsuite}, see @xrefman{Test Suites}.  As with the @command{testsuite}, this allows the
+@command{send-pr} script to be used for problem report generation on an installed system that does
+not have a build directory.
+
+An example of invoking the package @command{testsuite} and then generating a problem report for
+failed cases is shown in @ref{autopr:ex2}.
+
+@cartouche
+@float Example,autopr:ex2
+@caption{@emph{Invoking @command{send-pr} Directly}}
+@example
+% [sudo] @value{_libexecdir}/@value{PACKAGE}/testsuite
+% # test cases failed...
+% @value{_libexecdir}/@value{PACKAGE}/send-pr
+SEND-PR:
+SEND-PR: send-pr:  send-pr was invoked to generate an external report.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@@openss7.org by calling this script as
+SEND-PR: '@value{_libexecdir}/@value{PACKAGE}/send-pr --file problem.pr'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% @value{_libexecdir}/@value{PACKAGE}/send-pr --file problem.pr
+@end example
+@end float
+@end cartouche
+
+The advantage of the approach shown in the example is that the @command{send-pr} script is capable
+of collecting the @file{testsuite.log} file and the failed test cases and debugging scripts from the
+@file{testsuite.dir} directory and including them in the problem report, as well as all package
+pertinent information from the installed @file{send-pr.config}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Known Problems
+@section Known Problems
+@cindex known problems
+@cindex problems, known
+
+@cite{The OpenSS7 Project} does not ship software with known bugs.  All bugs are unknown.
+
+Verified behaviour is that behaviour that has been verified by conformance test suites that are
+shipped with the @cite{@value{PACKAGE_TITLE}} package.
+
+Unverified behaviour may contain unknown bugs.
+
+Please remember that there is @strong{NO WARRANTY}.
+
+See also @refman{Bugs}, or file @file{BUGS} in the release directory.

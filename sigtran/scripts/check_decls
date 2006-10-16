@@ -1,0 +1,205 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_decls,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/05/23 22:43:38 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/05/23 22:43:38 $ by $Author: brian $
+#
+# =============================================================================
+
+me=`basename $0`
+errors=0
+warnings=0
+
+exec 5>>$top_builddir/$me.log
+
+export -p >&5
+
+function echo_v()
+{
+	echo "$me:  : $1"
+}
+function echo_t()
+{
+	echo "$me: T: $1"
+}
+function echo_s()
+{
+	case :"${MAINTAINER_MODE:-no}" in
+	(:verbose|:continue) echo "$me: S: $1" ;;
+	esac
+	echo "$me:$2: S: $1" >&5
+}
+function echo_d()
+{
+	echo "$me:$2: D: $1" >&5
+}
+function echo_e()
+{
+	echo "$me: E: --- $1" >&2
+	echo "$me:$2: E: $1" >&5
+	((errors++))
+}
+function echo_w()
+{
+#	if test :"${MAINTAINER_MODE:-no}" != :no ; then
+		echo "$me: W: --- $1" >&2
+#	fi
+	echo "$me:$2: W: $1" >&5
+	((warnings++))
+}
+function echo_fls()
+{
+	echo_s "$3" "$4"
+}
+function echo_flw()
+{
+	echo "$1:$2: warning: $3" >&2
+	echo "$me:$4: W: $3" >&5
+	((warnings++))
+}
+function echo_fle()
+{
+	echo "$1:$2: error: $3" >&2
+	echo "$me:$4: E: $3" >&5
+	((errors++))
+}
+
+export -p | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+#
+# Skip test if we have nothing to test
+#
+if test ! -f ${top_builddir}/check_symbols.log -o ! -f ${top_builddir}/check_ctags.log
+then
+	echo_d "nothing to check, skipping test" $LINENO
+	exit 77
+fi
+
+#
+# Collect all of the exposed symbols
+#
+exposed=
+for symbol in $EXPOSED_SYMBOLS
+do
+	exposed="${exposed:+$exposed }$symbol"
+done
+echo_d "exposed symbols are: $exposed" $LINENO
+
+if test :"${MAINTAINER_MODE:-no}" != :no
+then
+	#
+	# Read in all of the defined symbols
+	#
+	symbols=
+	echo_v "reading in all symbols" $LINENO
+	if test -f ${top_builddir}/check_symbols.log
+	then
+		while read symbol
+		do
+			symbols="${symbols:+$symbols }$symbol"
+		done < ${top_builddir}/check_symbols.log
+	fi
+	echo_t "testing prototypes and externvars for symbols"
+	if test -f ${top_builddir}/check_ctags.log
+	then
+		while read -a tokens
+		do
+			case "${tokens[1]}" in
+				(prototype|externvar) ;;
+				(*) continue ;;
+			esac
+			echo_t "testing ${tokens[1]} ${tokens[0]} for exported symbol"
+			case "${tokens[0]}" in
+				(_*)	on_error='echo_flw' ;;
+				(*)	
+					if test :"$WARN_EXCESS" = :yes
+					then on_error='echo_flw'
+					else	case " $exposed " in
+							*" ${tokens[0]} "*)
+								on_error='echo_flw' ;;
+							*)	on_error='echo_fle' ;;
+						esac
+					fi ;;
+			esac
+			case " $symbols " in
+				(*" ${tokens[0]} "*)
+					echo_s "${tokens[1]} ${tokens[0]} has exported symbol" $LINENO ;;
+				(*)	eval "$on_error \${tokens[3]} \${tokens[2]} \"cannot find symbol for \${tokens[1]} \${tokens[0]}\" \$LINENO" ;;
+			esac
+		done < ${top_builddir}/check_ctags.log
+	fi
+fi
+
+retval=0
+if test $warnings -gt 0
+then
+	echo_v "--------------"
+	echo_v "Warning summary:"
+	echo_v "--------------"
+	egrep -- '\<W:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	retval=77
+fi
+if test $errors -gt 0
+then
+	echo_v "--------------"
+	echo_v "Error summary:"
+	echo_v "--------------"
+	egrep -- '\<E:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	if test :"${MAINTAINER_MODE:-no}" = :continue
+	then
+		retval=77
+	else
+		retval=1
+	fi
+fi
+
+exit $retval

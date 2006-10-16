@@ -1,0 +1,404 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/03 01:57:57 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; version 2 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2006/07/03 01:57:57 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: info.am,v $
+## Revision 0.9.2.47  2006/07/03 01:57:57  brian
+## - bump text files down to 72 columns
+##
+## Revision 0.9.2.46  2006/03/20 13:48:37  brian
+## - get automake to run clean
+##
+## Revision 0.9.2.45  2006/03/20 11:52:11  brian
+## - add DEVELOPMENT check
+##
+## Revision 0.9.2.44  2006/03/15 11:33:37  brian
+## - can't distribute pdf and txt images
+##
+## Revision 0.9.2.43  2006/03/15 07:17:22  brian
+## - build and distribute text texinfo documentation
+##
+## Revision 0.9.2.42  2006/03/11 14:32:41  brian
+## - trying to pass distcheck on texinfo files
+##
+## Revision 0.9.2.41  2006/03/11 13:00:19  brian
+## - try to avoid rebuilding docs when unnecessary
+##
+## Revision 0.9.2.40  2006/03/07 11:00:06  brian
+## - only rebuild info in maintainer mode
+##
+## Revision 0.9.2.39  2006/03/07 10:28:49  brian
+## - keep docs from being rebuilt unless in maintainer mode
+##
+## Revision 0.9.2.38  2006/03/06 11:35:14  brian
+## - updated headers
+##
+## =============================================================================
+
+AM_INFOINCLUDES		= -I $(top_srcdir)/scripts -I $(top_builddir)/scripts -I $(srcdir)
+AM_MAKEINFOHTMLFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names --number-sections --no-split --no-validate --no-headers
+AM_MAKEINFOFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names --paragraph-indent=asis --number-sections --fill-column=80 --no-validate --force
+AM_MAKEINFOTEXTFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names --paragraph-indent=asis --number-sections --fill-column=72 --no-validate --force --no-headers
+AM_MAKEINFOSGMLFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names
+
+#DVIPS			= dvips -t letter
+
+.texi.txt:
+	$(MAKEINFO) $(AM_MAKEINFOTEXTFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) -o $@ $<
+
+.texi.sgml:
+	$(MAKEINFO) --docbook $(AM_MAKEINFOSGMLFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) -o $@ $<
+
+DVIS	= $(info_TEXINFOS:%.texi=%.dvi)
+PSS	= $(info_TEXINFOS:%.texi=%.ps)
+PDFS	= $(info_TEXINFOS:%.texi=%.pdf)
+HTMLS	= $(info_TEXINFOS:%.texi=%.html)
+TXTS	= $(info_TEXINFOS:%.texi=%.txt)
+SGMLS	= $(info_TEXINFOS:%.texi=%.sgml)
+
+txt-am: $(TXTS)
+sgml-am: $(SGMLS)
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+clean-txt:
+	@if test -n "$(TXTS)" ; then \
+		$(ECHO) "rm -f -- $(TXTS)" ; \
+		rm -f -- $(TXTS) ; \
+	fi
+
+clean-sgml:
+	@if test -n "$(SGMLS)" ; then \
+		$(ECHO) "rm -f -- $(SGMLS)" ; \
+		rm -f -- $(SGMLS) ; \
+	fi
+
+FIG_PSS  = $(FIG_FIGS:%.fig=%.ps)
+FIG_EPSS = $(FIG_FIGS:%.fig=%.eps)
+FIG_PDFS = $(FIG_FIGS:%.fig=%.pdf)
+FIG_PNGS = $(FIG_FIGS:%.fig=%.png)
+FIG_JPGS = $(FIG_FIGS:%.fig=%.jpg)
+FIG_TXTS = $(FIG_FIGS:%.fig=%.txt)
+
+MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps .txt
+
+$(FIG_PSS) : %.ps  : %.fig ; fig2dev -L  ps $< $@ || convert $< $@
+$(FIG_EPSS): %.eps : %.fig ; fig2dev -L eps $< $@ || convert $< $@
+$(FIG_PDFS): %.pdf : %.fig ; fig2dev -L pdf $< $@ || convert $< $@
+$(FIG_PNGS): %.png : %.eps ; convert -antialias $< $@
+$(FIG_JPGS): %.jpg : %.eps ; convert -antialias $< $@
+$(FIG_TXTS): txts-am
+
+txts-am:
+	@ txts="$(FIG_TXTS) $(PNG_TXTS) $(PS_TXTS)" ; for i in $$txts ; do \
+		if test ! -f $$i -o $(srcdir)/$$i -nt $$i ; then \
+			if test -f $(srcdir)/$$i ; then \
+				$(ECHO) "cp -pf $(srcdir)/$$i $$i" ; \
+				cp -pf $(srcdir)/$$i $$i ; \
+			else \
+				$(ECHO) "touch $$i" ; \
+				touch $$i ; \
+			fi ; \
+		fi ; \
+	done
+
+TBL_PSS  = $(TBL_TBLS:%.tbl=%.ps)
+TBL_EPSS = $(TBL_TBLS:%.tbl=%.eps)
+TBL_PDFS = $(TBL_TBLS:%.tbl=%.pdf)
+TBL_PNGS = $(TBL_TBLS:%.tbl=%.png)
+TBL_JPGS = $(TBL_TBLS:%.tbl=%.jpg)
+TBL_TXTS = $(TBL_TBLS:%.tbl=%.txt)
+
+.tbl.dvi: ; groff -t -Tdvi -ms $< > $@ || :
+
+$(TBL_PSS)  : %.ps  : %.tbl ; groff -t -Tps -ms $< > $@ 2>/dev/null || :
+$(TBL_EPSS) : %.eps : %.ps  ; ps2epsi $< $@ || convert $< $@
+$(TBL_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $< || convert $< $@
+$(TBL_PNGS) : %.png : %.eps ; convert -antialias $< $@
+$(TBL_JPGS) : %.jpg : %.eps ; convert -antialias $< $@
+$(TBL_TXTS) : %.txt : %.tbl ; ( $(ECHO) ""; ( groff -t -Tascii -ms -P-b -P-c -P-u -P-o $< 2>/dev/null || groff -t -Tascii -ms -P-b -P-u -P-o $< ) | sed -e '/^[[:space:]]*$$/d'; $(ECHO) "" ) > $@
+
+pngs-am:
+	@ pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
+		if test ! -f $$i -o $(srcdir)/$$i -nt $$i ; then \
+			if test -f $(srcdir)/$$i ; then \
+				$(ECHO) "cp -pf $(srcdir)/$$i $$i" ; \
+				cp -pf $(srcdir)/$$i $$i ; \
+			else \
+				$(ECHO) "touch $$i" ; \
+				touch $$i ; \
+			fi ; \
+		fi ; \
+	done
+
+PNG_PSS  = $(PNG_PNGS:%.png=%.ps)
+PNG_EPSS = $(PNG_PNGS:%.png=%.eps)
+PNG_PDFS = $(PNG_PNGS:%.png=%.pdf)
+PNG_JPGS = $(PNG_PNGS:%.png=%.jpg)
+PNG_TXTS = $(PNG_PNGS:%.png=%.txt)
+
+$(PNG_PSS)  : %.ps  : %.png ; convert -density 144 $< $@
+$(PNG_EPSS) : %.eps : %.ps  ; ps2epsi $< $@ || convert $< $@
+$(PNG_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $< || convert $< $@
+$(PNG_JPGS) : %.jpg : %.png ; convert -density 144 $< $@
+
+$(PNG_PNGS) : pngs-am
+$(PNG_TXTS) : txts-am
+
+PS_EPSS = $(PS_PSS:%.ps=%.eps)
+PS_PDFS = $(PS_PSS:%.ps=%.pdf)
+PS_PNGS = $(PS_PSS:%.ps=%.png)
+PS_JPGS = $(PS_PSS:%.ps=%.jpg)
+PS_TXTS = $(PS_PSS:%.ps=%.txt)
+
+$(PS_EPSS): %.eps : %.ps  ; ps2epsi $< $@ || convert $< $@
+$(PS_PDFS): %.pdf : %.eps ; epstopdf --outfile=$@ $< || convert $< $@
+$(PS_PNGS): %.png : %.eps ; convert -antialias $< $@
+$(PS_JPGS): %.jpg : %.eps ; convert -antialias $< $@
+
+$(PS_TXTS): txts-am
+
+IMG_EPSS = $(FIG_EPSS) $(TBL_EPSS) $(PNG_EPSS) $(PS_EPSS)
+IMG_PDFS = $(FIG_PDFS) $(TBL_PDFS) $(PNG_PDFS) $(PS_PDFS)
+IMG_PNGS = $(FIG_PNGS) $(TBL_PNGS) $(PNG_PNGS) $(PS_PNGS)
+IMG_TXTS = $(FIG_TXTS) $(TBL_TXTS) $(PNG_TXTS) $(PS_TXTS)
+IMG_JPGS = $(FIG_JPGS) $(TBL_JPGS) $(PNG_JPGS) $(PS_JPGS)
+
+##
+# I know this is ugly and GNU make specified, but...  If you are using autoconf we
+# pretty much assume you have some GNU tools around...
+# also, automake misses dependencies for ps files
+##
+
+if AMDEP
+## AMDEP
+$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
+$(PSS)       : %.ps   : %.dvi  $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
+$(PDFS)      : %.pdf  : %.texi $(IMG_PDFS) $(EXTRA_info_TEXINFOS)
+$(HTMLS)     : %.html : %.texi $(IMG_PNGS) $(EXTRA_info_TEXINFOS)
+$(TXTS)	     : %.txt  : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
+$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS) $(EXTRA_info_TEXINFOS)
+## AMDEP
+else
+## !AMDEP
+##
+# If we are not tracking dependencies skip the extra info texinfos because
+# some are usually regenerated by configure causing all of the documentation
+# to be rebuilt  we really only want to rebuild documentation in maintainer
+# mode
+##
+.SECONDARY: $(IMG_JPGS) $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_TXTS)
+
+$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS)
+$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS)
+$(PSS)       : %.ps   : %.dvi  $(IMG_EPSS)
+$(PDFS)      : %.pdf  : %.texi $(IMG_PDFS)
+$(HTMLS)     : %.html : %.texi $(IMG_PNGS)
+$(TXTS)	     : %.txt  : %.texi $(IMG_TXTS)
+$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS)
+## !AMDEP
+endif
+
+##
+# Don't distribute .ps manuals, they are way too big, no dvis or sgmls either
+##
+EXTRA_DIST	+= $(EXTRA_info_TEXINFOS) $(FIG_FIGS) $(FIG_TXTS) $(TBL_TBLS) $(PNG_PNGS) $(PS_PSS)
+EXTRA_DIST	+= $(PDFS)
+EXTRA_DIST	+= $(HTMLS) $(IMG_PNGS)
+EXTRA_DIST	+= $(TXTS)
+
+##
+# distcheck is not run in maintainer mode, and we need this, otherwise distcheck
+# breaks because it otherwise attempts to place the info files into the source
+# directory for some arcane reason
+##
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+if AMDEP
+## AMDEP
+$(INFO_DEPS) : %.info : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
+## AMDEP
+else
+## !AMDEP
+$(INFO_DEPS) : %.info : %.texi
+## !AMDEP
+endif
+## MAINTAINER_MODE
+endif
+
+texi/args.texi:
+	@ if test ! -e texi -a -e $(top_builddir)/scripts/texi ; then \
+		$(ECHO) "$(LN_S) $(top_builddir)/scripts/texi texi" ; \
+		$(LN_S) $(top_builddir)/scripts/texi texi ; \
+	fi
+
+clean-figs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@ figs="$(FIG_FIGS)" ; for i in $$figs ; do \
+		d=`$(ECHO) $$i | sed -e 's|\.fig||'` ; \
+		$(ECHO) "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+	done
+
+clean-tbls:
+	@$(ECHO) "Making $@ in `pwd`"
+	@ tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
+		d=`$(ECHO) $$i | sed -e 's|\.tbl||'` ; \
+		$(ECHO) "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+	done
+
+clean-pngs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@ pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
+		d=`$(ECHO) $$i | sed -e 's|\.png||'` ; \
+		$(ECHO) "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+	done
+
+clean-pss:
+	@$(ECHO) "Making $@ in `pwd`"
+	@ pss="$(PS_PSS)" ; for i in $$pss ; do \
+		d=`$(ECHO) $$i | sed -e 's|\.ps||'` ; \
+		$(ECHO) "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+	done
+
+clean-texi:
+	@$(ECHO) "Making $@ in `pwd`"
+	@ if test -L texi ; then \
+		$(ECHO) "rm -f -- texi" ; \
+		rm -f -- texi ; \
+	fi
+
+distclean-figs:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-tbls:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-pngs:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-pss:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-texi:
+	@$(ECHO) "Making $@ in `pwd`"
+
+maintainer-clean-figs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@figs="$(FIG_FIGS)" ; for i in $$figs ; do \
+		f=`$(ECHO) "$(srcdir)/$$i" | sed -e 's|\.fig$$||'` ; \
+		$(ECHO) "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
+		rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
+	done
+
+maintainer-clean-tbls:
+	@$(ECHO) "Making $@ in `pwd`"
+	@tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
+		f=`$(ECHO) "$(srcdir)/$$i" | sed -e 's|\.tbl$$||'` ; \
+		$(ECHO) "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
+		rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
+	done
+
+maintainer-clean-pngs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
+		f=`$(ECHO) "$(srcdir)$$i" | sed -e 's|\.png$$||'` ; \
+		$(ECHO) "rm -f -- $$f.ps $$f.eps $$f.jpg $$f.pdf" ; \
+		rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
+	done
+
+maintainer-clean-pss:
+	@$(ECHO) "Making $@ in `pwd`"
+	@pss="$(PS_PSS)" ; for i in $$pss ; do \
+		f=`$(ECHO) "$(srcdir)/$$i" | sed -e 's|\.ps$$||'` ; \
+		$(ECHO) "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
+		rm -f -- $$f.eps $$f.png $$f.jpg $$f.pdf ; \
+	done
+
+maintainer-clean-texi:
+	@$(ECHO) "Making $@ in `pwd`"
+
+##
+# Note that maintainer-clean-aminfo generated by automake will clean the info
+# files out of the source directory.
+##
+
+MY_PHONY		+= txts-am pngs-am
+
+CLEAN_LOCAL		+= clean-txt clean-sgml clean-figs clean-tbls clean-pngs clean-pss clean-texi
+
+DISTCLEAN_LOCAL		+= distclean-figs distclean-tbls distclean-pngs distclean-pss distclean-texi
+
+MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-figs maintainer-clean-tbls maintainer-clean-pngs maintainer-clean-pss maintainer-clean-texi
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+##
+# Only build docs in maintainer mode, don't build what we don't distribute
+##
+ALL_LOCAL		+= info html pdf txt # ps sgml
+## MAINTAINER_MODE
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
+endif
+
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
