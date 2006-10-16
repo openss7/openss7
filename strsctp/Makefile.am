@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/03 13:52:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/16 06:09:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:52:50 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 06:09:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.55  2006/10/16 06:09:38  brian
+# - added netconfig and sock2path config files for packages
+#
 # Revision 0.9.2.54  2006/10/03 13:52:50  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -689,6 +692,12 @@ endif
 ## Rules for init scripts
 ##
 include am/init.am
+
+##
+## Rules for net config files
+##
+include am/netconfig.am
+include am/sock2path.am
 
 ##
 ## Rules for lsms

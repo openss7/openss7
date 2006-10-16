@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/03 13:52:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 06:09:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:52:14 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 06:09:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -335,20 +335,20 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		= 
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		= 
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		= 
+dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf
 
-dist_config_DATA		= 
+dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 
 ## INSTALL_INITSCRIPTS
 endif
@@ -363,6 +363,12 @@ endif
 ## Rules for init scripts
 ##
 include am/init.am
+
+##
+## Rules for net config files
+##
+include am/netconfig.am
+include am/sock2path.am
 
 ##
 ## Rules for lsms
@@ -417,6 +423,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2006/10/16 06:09:37  brian
+# - added netconfig and sock2path config files for packages
+#
 # Revision 0.9.2.8  2006/10/03 13:52:14  brian
 # - changes to pass make check target
 # - added some package config.h files
