@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mg.4.man,v 0.9.2.1 2006/10/14 06:37:22 brian Exp $
+.\" @(#) $Id: mg.4.man,v 0.9.2.2 2006/10/16 00:23:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/14 06:37:22 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/16 00:23:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mg.4.man,v $
+.\" Revision 0.9.2.2  2006/10/16 00:23:09  brian
+.\" - update manpages and driver comments
+.\"
 .\" Revision 0.9.2.1  2006/10/14 06:37:22  brian
 .\" - added manpages, module, drivers, headers from strss7 package
 .\"
@@ -80,10 +83,16 @@ sort-adjacent-labels
 .so strchan.macros
 .\"
 .\"
+.\"
+.\"
 .TH MG 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B mg, MG
 \- Media Gateway (MG)
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <ss7/mgi.h>
@@ -91,6 +100,8 @@ sort-adjacent-labels
 .B #include <ss7/mgi_ioctl.h>
 .HP
 .BI "int " mg_stream " = open(" device ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B MG
@@ -113,7 +124,7 @@ or
 Streams are linked under the
 .B MG
 multiplexing driver using the
-.IR I_LINK " or " I_PLINK
+.IR I_LINK "(7) or " I_PLINK (7)
 commands of
 .BR streamio (7),
 to provide multiplex or channel services to
@@ -145,6 +156,107 @@ well as with the
 library using the
 .B OpenSwitch
 call framework.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B MG
+driver is the switching workhorse of the
+.B @PACKAGE_TITLE@
+package.
+.BR mgi (7)
+Streams can be opened on the upper multiplex.  Both
+.BR mxi (7)
+and
+.BR chi (7)
+Streams can be linked on the lower multiplex.  Any channel of any Stream,
+whether upper or lower, can be connected through the matrix to any other
+channel.
+.PP
+The
+.B MG
+driver can perform simple or complex conversion functions (e.g. mu-law to
+a-law), digital padding, echo cancellation, compression/decompression, rate
+adaption (e.g., 8-bit A-law to 5-bit GSM), that do or do not cause flow
+control considerations.  Preestablished or canned tones and announcments are
+supported by the driver.  Dynamic announcements need to be provided by an
+external module (using a Stream on the upper or lower multiplex) or in
+hardware.
+.PP
+The
+.B MG
+driver supports single-rate and multi-rate channels.  It also supports
+multi-rate conversion and multiple audio channels per connection leg.  The
+purpose of the
+.B MG
+driver is to perform both simple circuit switching and do it very fast, or to
+provide complex conversion and conferencing as efficiently as possible.
+.PP
+For simply matrix connections, the
+.B MG
+driver can be modelled as a hardware Time-Space-Time switch, only switching is
+performed primarily in software.  Other, more specialized,
+.BR mgi (7)
+drivers, such as
+.BR mgcp (4),
+are intended on providing device control.  The
+.B MG
+driver is a pseudo-device driver and performs switching functions in software.
+.\"
+.SS Configuration
+.PP
+At boot time, or when a new span or circuit is brough into service and is to
+be switched through the
+.B MG
+software switching matrix, a management program opens a device or
+pseudo-device driver to obtain a Stream representing the new channel or span
+and links the Stream beneath the
+.B MG
+multiplexing driver.  Input-output controls are then used to assign the
+channel or span (and timeslots within the span) to channel identification
+numbers within the switching matrix.  These channel identification numbers
+and the mapping to specific hardware should be maintained in configuration
+files.
+.PP
+For example, when a T1 span is put into service on a
+.BR v401p (4)
+card, the management program opens a Stream on the
+.BR v401p (4)
+.BR mxi (7)
+device that represents a T1 span, attaches the Stream to the T1 span, and then
+links the Stream beneath the
+.B MG
+driver.  During linking, the
+.B MG
+driver issues a
+.BR MX_INFO_REQ (7)
+or
+.BR CH_INFO_REQ (7)
+primitive downstream to interrogate the Stream as to channel characteristics.
+After linking, the management program uses a configuration table to determine
+the channel number assignments for the card an T1 span selected.  An
+input-output control is issued to the
+.B MG
+driver with the multiplex index of the linked span, and the channel number
+assignments for the span.
+The
+.B MG
+driver provides the ability for management programs to determine the lower
+multiplex identifier that is associated with any channel or channel group.
+This allows the management program to perform a
+.IR I_PLINK (7)
+operation and close the Stream: it can then later discover the multiplex
+identifier from the channel assignment (contained in the configuration file)
+with an input-output control to the
+.B MG
+driver, so that it knows the multiplex identifier to use to remove the channel
+or channel group from service with a
+.IR I_PUNLINK (7)
+operation.
+.PP
+.\"
+.\"
 .SH NOTICES
 .PP
 Unlike other OpenSS7 protocol modules and drivers providing transport
@@ -154,6 +266,8 @@ does not provide a
 .BR sockets (3)
 interface.  This is because the special needs of switch matrix control are
 divorced from the sockets paradigm.
+.\"
+.\"
 .SH IOCTLS
 .PP
 All interaces support a set of management IO controls using
@@ -166,25 +280,35 @@ system calls on the
 .I mg_stream
 file descriptor.  These management controls are documented in
 .BR mg_ioctl (4).
+.\"
+.\"
 .SH FILES
 .PP
 .BR <ss7/mgi.h> ,
 .BR <ss7/mgi_ioctl.h> ,
 .BR <ss7/mg_ioctl.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/mg .
+.\"
+.\"
 .SH BUGS
 .PP
 The
 .B MG
 drivers have no known bugs.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR MG (4),
 .BR mgconfd (8),
 .BR mgi (7),
 .BR cframe (3).
+.\"
+.\"
 .SH VERSIONS
 .PP
 The

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/14 06:37:27 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:23:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/14 06:37:27 $ by $Author: brian $
+ Last Modified $Date: 2006/10/16 00:23:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.2  2006/10/16 00:23:10  brian
+ - update manpages and driver comments
+
  Revision 0.9.2.1  2006/10/14 06:37:27  brian
  - added manpages, module, drivers, headers from strss7 package
 
@@ -64,9 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/14 06:37:27 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:23:10 $"
 
-static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/14 06:37:27 $";
+static char const ident[] =
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:23:10 $";
 
 #include <sys/os7/compat.h>
 
@@ -78,7 +82,7 @@ static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/14 06:37:27 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:23:10 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -131,75 +135,75 @@ MODULE_ALIAS("streams-mg");
 #endif				/* MODULE */
 
 STATIC struct module_info mg_winfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME,		/* Module ID name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module ID name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC struct module_info mg_rinfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME,		/* Module ID name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module ID name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC struct module_info mux_winfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME,		/* Module ID name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module ID name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC struct module_info mux_rinfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME,		/* Module ID name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module ID name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC streamscall int mg_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int mg_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit mg_rinit = {
-	qi_putp:ss7_oput,		/* Read put (message from below) */
-	qi_srvp:ss7_osrv,		/* Read queue service */
-	qi_qopen:mg_open,		/* Each open */
-	qi_qclose:mg_close,		/* Last close */
-	qi_minfo:&mg_rinfo,		/* Information */
+	.qi_putp = ss7_oput,		/* Read put (message from below) */
+	.qi_srvp = ss7_osrv,		/* Read queue service */
+	.qi_qopen = mg_open,		/* Each open */
+	.qi_qclose = mg_close,		/* Last close */
+	.qi_minfo = &mg_rinfo,		/* Information */
 };
 
 STATIC struct qinit mg_winit = {
-	qi_putp:ss7_iput,		/* Write put (message from above) */
-	qi_srvp:ss7_isrv,		/* Write queue service */
-	qi_minfo:&mg_winfo,		/* Information */
+	.qi_putp = ss7_iput,		/* Write put (message from above) */
+	.qi_srvp = ss7_isrv,		/* Write queue service */
+	.qi_minfo = &mg_winfo,		/* Information */
 };
 
 STATIC struct qinit mux_rinit = {
-	qi_putp:ss7_iput,		/* Read put (message from below) */
-	qi_srvp:ss7_isrv,		/* Read queue service */
-	qi_minfo:&mux_rinfo,		/* Information */
+	.qi_putp = ss7_iput,		/* Read put (message from below) */
+	.qi_srvp = ss7_isrv,		/* Read queue service */
+	.qi_minfo = &mux_rinfo,		/* Information */
 };
 
 STATIC struct qinit mux_winit = {
-	qi_putp:ss7_oput,		/* Write put (message from above) */
-	qi_srvp:ss7_osrv,		/* Write queue service */
-	qi_minfo:&mux_winfo,		/* Information */
+	.qi_putp = ss7_oput,		/* Write put (message from above) */
+	.qi_srvp = ss7_osrv,		/* Write queue service */
+	.qi_minfo = &mux_winfo,		/* Information */
 };
 
 MODULE_STATIC struct streamtab mginfo = {
-	st_rdinit:&mg_rinit,		/* Upper read queue */
-	st_wrinit:&mg_winit,		/* Upper write queue */
-	st_muxrinit:&mux_rinit,		/* Lower read queue */
-	st_muxwinit:&mux_winit,		/* Lower write queue */
+	.st_rdinit = &mg_rinit,		/* Upper read queue */
+	.st_wrinit = &mg_winit,		/* Upper write queue */
+	.st_muxrinit = &mux_rinit,	/* Lower read queue */
+	.st_muxwinit = &mux_winit,	/* Lower write queue */
 };
 
 /*

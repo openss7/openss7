@@ -1,3 +1,9 @@
+2006-10-16  Brian Bidulock  <bidulcok@openss7.org>
+
+	* strchan/doc/man/man4/mg.4.man: update of manpages
+	* strchan/doc/man/man4/mg_ioctl.4.man: update of manpages
+	* strchan/src/drivers/mg.c: driver comments
+
 2006-10-14  Brian Bidulock  <bidulcok@openss7.org>
 
 	- added manual pages

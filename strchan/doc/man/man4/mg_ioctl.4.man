@@ -1,1 +1,354 @@
-.so man4/ss7_undoc.4.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: mg_ioctl.4.man,v 0.9.2.2 2006/10/16 00:23:09 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/16 00:23:09 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mg_ioctl.4.man,v $
+.\" Revision 0.9.2.2  2006/10/16 00:23:09  brian
+.\" - update manpages and driver comments
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.\"
+.\"
+.TH MG_IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B mg_ioctl
+\- Media Gateway (MG) \(em Input-Output Controls
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/mgi.h>
+.br
+.B #include <sys/mg_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " mg_stream " = open(" /dev/mg ", " flags ");
+.HP
+.BI "int " retval " = ioctl(" mg_stream ", I_STR, " arg ");
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B MG-IOCTL
+is a definition of the managed objects and measurement and monitoring model for the
+.BR mg (4)
+driver using defined input-output controls.  The
+.BR mg (4)
+driver is an implementation of the Media Gateway Interface,
+.BR mgi (7).
+.B MG-IOCTL
+provides the definition of managed objects for the
+.BR mg (4)
+driver in accordance with a projecte defined managed object model and monitoring mesaurements and
+events model.
+.\"
+.SS "Protocol Service Interface"
+.PP
+.B MG
+provides the following Stream types:
+.TP
+.I /dev/mg
+This devices provides the
+.B MG
+protocol services using the
+.I MG-primitives
+of the Media Gateway Interface (MGI),
+.BR mgi (7),
+as interpreted for use with switching components.  This interface is suitable both for use with
+other
+.BR MG (4)
+modules and drivers, as well as the
+.BR cframe (3)
+library using the
+.BR OpenSwitch (n)
+call framework.
+.\"
+.SS "Object Model"
+.PP
+.B MG
+provides for management of a number of managed objects.  These objects are of a number of types as
+follows:
+.TP
+.B MG_OBJ_TYPE_DF
+The default object.  This object refers to the collection of system-wide defaults.
+.TP
+.B MG_OBJ_TYPE_MG
+A media gateway control object.  This object refers to media gateway control Stream opened on the
+upper multiplex.
+.TP
+.B MG_OBJ_TYPE_SE
+A communictions session object.
+.TP
+.B MG_OBJ_TYPE_LG
+A connection leg object.
+.TP
+.B MG_OBJ_TYPE_CH
+A channel object.   This object referes to a channel Stream on the lower multiplex.
+This is a specific lower multiplex driver Stream that provides CH services to the MG multiplexing
+driver.  The CH Stream is uniquely identified by its multiplex identifier provided by the
+.IR STREAMS (9)
+subsystem when the CH Stream is linked under the driver using a
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+operation.
+.TP
+.B MG_OBJ_TYPE_MX
+A multiplex object.  This object refers to a multiplex connection Stream on the lower mutliplex.
+This is a specific lower multiplex driver Stream that provides MX services to the MG multiplexing
+driver.  The MX Stream is uniquely identified by its multiplex identifier provided by the
+.IR STREAMS (9)
+subsystem when the MX Stream is linked under the driver using a
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+operation.
+.\"
+.SS "Management Attributes"
+.PP
+Each object has associated with it information in the following categories:
+.TP
+.I Configuration
+All of the primary attributes necessary and sufficient for the creation of each object.
+.TP
+.I Timers
+Timers associated with each object.
+.TP
+.I Options
+Options (not necessary for creation) for each object.
+.TP
+.I State
+The state of each object.
+.TP
+.I Statistics
+Statistis associated with each object class in accordance with specifications.
+.TP
+.I Events
+Events associated with each object.  This includes both management events and monitoring events.
+.TP
+.I Controls
+Management controls applicable to each object.
+.PP
+Each object class is described in each category in the sections below.
+.\"
+.\"
+.SH CONFIGURATION
+.PP
+All objects must be configured using
+.IR I_STR (7)
+.BR streamio (7)
+input-output control commands before they are usable.
+.PP
+.nf
+\fC\s-1\
+typedef struct mg_config {
+    ulong type;   /* object type */
+    ulong id;     /* object id */
+    ulong cmd;    /* configuration command */
+    /* followed by specific configuration structure */
+} mg_config_t;
+\s+1\fP
+.fi
+.TP
+.I type
+specifies the object type.  See object types under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier that identifies the object instance within the object type.  When
+the operation is
+.BR MG_ADD ,
+this field can be set to zero
+.RB ( 0 )
+and
+.BR mg (4)
+will select a new unique object identifier.  When the operation is
+.BR MG_GET ,
+this field can be set to zero
+.RB ( 0 )
+and
+.BR mg (4)
+will return all object configuration of a type that will fit into the supplied buffer.
+.TP
+.I cmd
+specifies the command.  This field can be one of the following values:
+.RS
+.TP
+.B MG_GET
+Get configuration of an object.
+This command is only valid with input-output control
+.BR MG_IOCGCONFIG .
+.TP
+.B MG_ADD
+Add an object.
+This command is not valid with input-output control
+.BR MG_IOCGCONFIG .
+.TP
+.B MG_CHA
+Change an object.
+This command is not valid with input-output control
+.BR MG_IOCGCONFIG .
+.TP
+.B MG_DEL
+Delete an object.
+This command is not valid with input-output control
+.BR MG_IOCGCONFIG .
+.RE
+.PP
+Input-output controls used to issue configuration commands are as follows:
+.TP
+.B MG_IOCGCONFIG
+Get an object configuration.
+.TP
+.B MG_IOCSCONFIG
+Set an object configuration.  This command may fail if an object is busy or cannot be allocated.
+.TP
+.B MG_IOCTCONFIG
+Test an object configuration.
+.TP
+.B MG_IOCCCONFIG
+Commit an object configuration.  This command will not fail if an object is busy.
+.PP
+The structures required to specify configuration are as follows (in order of dependency):
+.\"
+.SS "Default"
+.PP
+Although a configuration structure is defined for the default object, there is no need to create or
+configure the default object.  This object is configured at the time that the
+.BR mg (4)
+driver module loads.
+.PP
+.nf
+\fC\s-1\
+typedef struct mg_conf_df {
+} mg_conf_df_t;
+\s+1\fP
+.fi
+.\"
+.SS "Media Gateway"
+.PP
+.nf
+\fC\s-1\
+typedef struct mg_conf_mg {
+} mg_conf_mg_t;
+\s+1\fP
+.fi
+.\"
+.SS "Communications Session"
+.PP
+.nf
+\fC\s-1\
+typedef struct mg_conf_se {
+} mg_conf_se_t;
+\s+1\fP
+.fi
+.\"
+.SS "Connection Leg"
+.PP
+.nf
+\fC\s-1\
+typedef struct mg_conf_lg {
+    ulong seid;      /* session id */
+} mg_conf_lg_t;
+\s+1\fP
+.fi
+.\"
+.SS "Channel"
+.PP
+.nf
+\fC\s-1\
+typedef struct mg_conf_ch {
+    ulong tpid;      /* termination point id */
+    ulong mxid;      /* multiplex id */
+    ulong slot;      /* slot in multiplex */
+    ulong encoding;  /* channel encoding */
+} mg_conf_ch_t;
+\s+1\fP
+.fi
+.\"
+.SS "Multiplex"
+.PP
+.nf
+\fC\s-1\
+typedef struct mg_conf_mx {
+    ulong muxid;     /* lower multiplexing driver id */
+} mg_conf_mx_t;
+\s+1\fP
+.fi
+
