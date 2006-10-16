@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/13 07:00:05 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 00:15:07 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -44,6 +44,7 @@ fi
 
 # Specify defaults
 
+[ -n "$STRSCTP_PRELOAD"       ] || STRSCTP_PRELOAD=""
 [ -n "$STRSCTP_DRIVERS"       ] || STRSCTP_DRIVERS="streams-sctp"
 [ -n "$STRSCTP_MODULES"       ] || STRSCTP_MODULES="streams-tpiperf"
 [ -n "$STRSCTP_MAKEDEVICES"   ] || STRSCTP_MAKEDEVICES="yes"
@@ -76,7 +77,7 @@ start() {
     echo -n "Loading STREAMS kernel modules: "
     RETVAL=0
     modules=
-    for module in $STRSCTP_DRIVERS ; do
+    for module in $STRSCTP_PRELOAD ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -147,7 +148,7 @@ stop() {
     fi
     echo -n "Unloading STREAMS kernel modules: "
     modules=
-    for module in $STRSCTP_DRIVERS $STRSCTP_MODULES ; do
+    for module in $STRSCTP_PRELOAD $STRSCTP_DRIVERS $STRSCTP_MODULES ; do
 	modules="$module${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -201,7 +202,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/13 07:00:05 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 00:15:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -246,7 +247,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:00:05 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:15:07 $ by $Author: brian $
 #
 # =============================================================================
 

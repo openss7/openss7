@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/07/29 07:44:25 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/16 00:14:54 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:44:25 $ by $Author: brian $
+ Last Modified $Date: 2006/10/16 00:14:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.18  2006/10/16 00:14:54  brian
+ - updates for release and test case passes on UP
+
  Revision 0.9.2.17  2006/07/29 07:44:25  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/07/29 07:44:25 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/16 00:14:54 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/07/29 07:44:25 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/16 00:14:54 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -28334,7 +28337,7 @@ test_case_5_3_conn(int child)
 	for (;;) {
 		switch (wait_event(child, LONGER_WAIT)) {
 		case __EVENT_NO_MSG:
-			break;
+			continue;
 		case __TEST_ORDREL_IND:
 			break;
 		case __TEST_DATA_IND:
@@ -28348,6 +28351,9 @@ test_case_5_3_conn(int child)
 		}
 		break;
 	}
+	state++;
+	if (wait_event(child, LONGER_WAIT) != __EVENT_NO_MSG)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -28384,7 +28390,7 @@ test_case_5_3_resp(int child)
 	for (;;) {
 		switch (wait_event(child, LONGER_WAIT)) {
 		case __EVENT_NO_MSG:
-			break;
+			continue;
 		case __TEST_ORDREL_IND:
 			break;
 		case __TEST_DATA_IND:
@@ -28398,6 +28404,9 @@ test_case_5_3_resp(int child)
 		}
 		break;
 	}
+	state++;
+	if (wait_event(child, LONGER_WAIT) != __EVENT_NO_MSG)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:

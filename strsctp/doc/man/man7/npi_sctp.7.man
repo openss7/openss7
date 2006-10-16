@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: npi_sctp.7.man,v 0.9.2.3 2006/10/10 10:46:17 brian Exp $
+.\" @(#) $Id: npi_sctp.7.man,v 0.9.2.4 2006/10/16 00:14:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:46:17 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/16 00:14:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_sctp.7.man,v $
+.\" Revision 0.9.2.4  2006/10/16 00:14:36  brian
+.\" - updates for release and test case passes on UP
+.\"
 .\" Revision 0.9.2.3  2006/10/10 10:46:17  brian
 .\" - updates for release
 .\"
@@ -85,27 +88,1706 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B npi_sctp
-\- NPI Corrigendum for SCTP
+\- Network Provider Interace (NPI) \(em Corrigendum for SCTP Conformance
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-none
+.B #include <sys/npi.h>
+.br
+.B #include <sys/npi_ip.h>
+.br
+.B #include <sys/npi_sctp.h>
+.HP
+.BI int " sctp_stream " = open(" \(lq/dev/sctp_t\(rq ", " oflags ");
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-This manpage is under construction.
+.B NPI-SCTP
+provides a Stream supporting the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+to the Stream Control Transmission Protocol (SCTP)
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+.[
+rfc4460
+.]
+driver,
+.BR sctp (4).
+.\"
+.SS "INTERFACE"
+.PP
+This
+.IR STREAMS (4)
+interface provides the
+.BR sctp (4)
+protocol service interface using the N-primitives of the
+.BR npi (7).
+This interface is intended solely for use by user programs or protocol modules
+requiring the common
+.BR npi (7)
+service interface.  In particular, the
+.BR npi (7)
+interface to
+.BR sctp (4)
+is often used by SIGTRAN and other telecommunications protocols such as
+TI-SCCP internal to the kernel.  This is because the
+.B NPI-SCTP
+interface provides some richer control that is not available in the
+.BR tpi_sctp (7)
+interface or the
+.BR xti_sctp (3)
+library.
+.\"
+.SS "ADDRESS FORMATS"
+.PP
+The SCTP address format is structured as follows:
+.PP
+.sp
+.nf
+\fC\s-1\
+struct sockaddr_in {
+    sa_family_t         sin_family;  /* Address family */
+    unsigned short int  sin_port;    /* Port number */
+    struct in_addr      sin_addr;    /* Internet address */
+    /* padding */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B sockaddr_in
+structure contains the following members:
+.TP \w'sin_family\(em'u
+.I sin_family
+The address family.  Always set to
+.BR AF_INET " or " AF_UNSPEC .
+.PD 0
+.TP
+.I sin_port
+The port number of the transport endpoint in network byte order.
+.TP
+.I sin_addr
+The IP address of the transport endpoint in network byte order.
+.TP
+.I (padding)
+Padding to pad the size of the
+.B sockaddr_in
+structure to the size of a
+.B sockaddr
+structure.
+.PD
+.PP
+The structure is padded to the size of a
+.B sockaddr
+structure.
+.PP
+SCTP adresses can also be formed as an array of
+.B sockaddr_in
+structure to represent multiple addresses for multi-homed hosts.
+.\"
+.\"
+.SS OPTIONS
+.PP
+Quality of service parameters are formatted according to the format defined
+for each network provider.
+.sp
+.nf
+\fC\s-1\
+typedef union N_qos_sctp {
+    ulong n_qos_type;
+    N_qos_sel_conn_sctp_t n_qos_conn;
+    N_qos_sel_data_sctp_t n_qos_data;
+    N_qos_sel_info_sctp_t n_qos_info;
+    N_qos_range_info_sctp_t n_qos_range;
+} N_qos_sctp_t;
+\s+1\fP
+.fi
+.B NPI-SCTP
+defines the following quality of service structures for SCTP:
+.TP
+.B N_QOS_SEL_CONN_SCTP
+Identifies a structure containing QOS parameters for connection selection for SCTP.
+This structure is normally used in the
+.BR N_CONN_REQ "(7), " N_CONN_IND "(7), " N_CONN_RES "(7) and " N_CONN_CON (7)
+primitives.
+It may also be used in the
+.BR N_OPTMGMT_REQ (7)
+primitive.
+This structure type identifies a
+.B N_qos_sel_conn_sctp_t
+structure, formatted as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+    ulong n_qos_type;
+    ulong i_streams;
+    ulong o_streams;
+} N_qos_sel_conn_sctp_t;
+\s+1\fP
+.fi
+.TP \w'\fIn_qos_type\fR\(em'u
+.I n_qos_type
+always
+.BR N_QOS_SEL_CONN_SCTP .
+.PD 0
+.TP
+.I i_streams
+the maximum number of input streams accepted.
+.TP
+.I o_streams
+the number of output streams requested.
+.PD
+.RE
+.TP
+.B N_QOS_SEL_DATA_SCTP
+Identifies a structure containing QOS parameters for data selection for SCTP.
+This structure is normally used in the
+.BR N_DATA_REQ "(7), " N_DATA_IND "(7), " N_EXDATA_REQ "(7) and " N_EXDATA_IND (7)
+primitives.
+It may also be used in the
+.BR N_OPTMGMT_REQ (7)
+primitive.
+This structure type identifies a
+.B N_qos_sel_data_sctp_t
+structure, formated as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+    ulong n_qos_type;
+    ulong ppi;
+    ulong sid;
+    ulong ssn;
+    ulong tsn;
+    ulong more;
+} N_qos_sel_data_sctp_t;
+\s+1\fP
+.fi
+.TP \w'\fIn_qos_type\fR\(em'u
+.I n_qos_type
+always
+.BR N_QOS_SEL_DATA_SCTP .
+.PD 0
+.TP
+.I ppi
+the SCTP protocol payload identifier.
+.TP
+.I sid
+the SCTP stream sequence identifier.
+.TP
+.I ssn
+the SCTP stream sequence number.
+.TP
+.I tsn
+the SCTP transmit sequence number.
+.TP
+.I more
+the SCTP segmentation flag (B and E).
+.PD
+.RE
+.TP
+.B N_QOS_SEL_INFO_SCTP
+Identifies a structure containing QOS parameters for information selection for
+SCTP.  This structure is normally returned in the
+.BR N_INFO_ACK (7)
+primitive.
+It may also be used in the
+.BR N_OPTMGMT_REQ (7)
+primitive.
+This structure type identifies a
+.B N_qos_sel_info_sctp_t
+structure, formatted as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+    ulong n_qos_type;
+    ulong i_streams;
+    ulong o_streams;
+    ulong ppi;
+    ulong sid;
+    ulong max_inits;
+    ulong max_retrans;
+    ulong ck_life;
+    ulong ck_inc;
+    ulong hmac;
+    ulong throttle;
+    ulong max_sack;
+    ulong rto_ini;
+    ulong rto_min;
+    ulong rto_max;
+    ulong rtx_path;
+    ulong hb_itvl;
+    ulong options;
+} N_qos_sel_info_sctp_t;
+\s+1\fP
+.fi
+.TP \w'\fIn_qos_type\fR\(em'u
+.I n_qos_type
+always
+.BR N_QOS_SEL_INFO_SCTP .
+.PD 0
+.TP
+.I i_streams
+current number of input streams.
+.TP
+.I o_streams
+current number of output streams.
+.TP
+.I ppi
+default payload protocol identifier.
+.TP
+.I sid
+default stream identifier.
+.TP
+.I max_inits
+maximum number of INIT retries.
+.TP
+.I max_retrans
+maximum number of retransmissions per association.
+.TP
+.I ck_life
+cookie lifetime.
+.TP
+.I ck_inc
+cookie preservative increment.
+.PD
+.TP
+.I hmac
+HMAC algorithm used to sign cookies.  Curent values for this field are:
+.RS
+.TP \w'\fBSCTP_HMAC_SHA_1\fR\(em'u
+.B SCTP_HMAC_NONE
+no HMAC algorithm, fill signature with all 1's.
+.PD 0
+.TP
+.B SCTP_HMAC_SHA_1
+SHA-1 checksum signature.
+.TP
+.B SCTP_HMAC_MD5
+MD5 checksum signature.
+.PD
+.RE
+.TP
+.I throttle
+INIT and COOKIE-ECHO throttling interval.
+.PD 0
+.TP
+.I max_sack
+maximum SACK delay.
+.TP
+.I rto_ini
+initial retransmission time out.
+.TP
+.I rto_min
+minimum retransmission time out.
+.TP
+.I rto_max
+maximum retransmission time out.
+.TP
+.I rtx_path
+maximum number of retransmissions per path (destination).
+.TP
+.I hb_itvl
+hearbeat interval.
+.PD
+.TP
+.I options
+additional local (flag) options.
+Currently supported flag options include:
+.RS
+.TP \w'\fBSCTP_OPTION_DROPPING\fR\(em'u
+.B SCTP_OPTION_DROPPING
+the stream will drop packets.
+.PD 0
+.TP
+.B SCTP_OPTION_BREAK
+the stream will break first path (tx).
+.TP
+.B SCTP_OPTION_DBREAK
+the stream will break first path (rx and tx).
+.TP
+.B SCTP_OPTION_RANDOM
+the stream will drop packets at random.
+.RE
+.PD
+.RE
+.TP
+.B N_QOS_SEL_RANGE_INFO_SCTP
+Identifies a structure containing QOS parameters for information selection ranges for
+SCTP.  This structure is normally returned in the
+.BR N_INFO_ACK (7)
+primitive.
+The structure type identifies a
+.B N_qos_sel_range_info_sctp_t
+structure, formatted as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+typedef struct {
+	ulong n_qos_type;
+} N_qos_range_info_sctp_t;
+\s+1\fP
+.fi
+.TP \w'\fIn_qos_type\fR\(em'u
+.I n_qos_type
+always
+.BR N_QOS_SEL_RANGE_INFO_SCTP .
+.PD 0
+.PD
+.RE
+.\"
+.\"
+.SS "EXPEDITED DATA"
+.PP
+.B NPI-SCTP
+does not support an expedited data option end-to-end; however, expedited data
+is handled locally and is always available.
+In support of expedited data,
+.B NPI-SCTP
+uses the
+.BR N_EXDATA_REQ "(7) and " N_EXDATA_IND (7)
+primitives.
+Expedited data sent with these primitives is always sent \(lqunordered\(rq by
+SCTP.
+.PP
+SCTP expedites \(lqunordered\(rq data over \(lqordered\(rq data because
+\(lqunordered\(rq data is not subject to ordering constraints.  Also, this
+.B @PACKAGE_TITLE@
+implementation of SCTP will expedite unordered data from lower number stream
+identification number over higher numbers.  Unordered data from stream
+identifier zero (0) is given the highest priority.
+.B @PACKAGE_TITLE@
+SCTP also gives priority to new \(lqunordered\(rq data over any
+retransmissions of data.  This ensures that unordered data is expedited to the
+wire.
+.\"
+.\"
+.SS "RECEIPT CONFIRMATION"
+.PP
+.B NPI-SCTP
+does not support receipt confirmation option negotiation end-to-end; however,
+receipt confirmation can optionally be invoked locally and is always available
+to the NS user.  Receipt confirmation makes use of the
+.BR N_DATACK_REQ "(7) and "
+.BR N_DATACK_IND (7)
+primitive.
+.PP
+When an
+.BR N_DATA_REQ (7)
+primitive is issued with the
+.B N_RC_FLAG
+set in the
+.IR DATA_xfer_flags ,
+.B @PACKAGE_TITLE@
+will perform receipt confirmation.  When the TSN containing the last segment
+of the NSDU associated with the
+.BR N_DATA_REQ (7)
+with the
+.B N_RC_FLAG
+flag set is cummulatively acknoweldged by the SCTP peer, the NS provider will
+issue a
+.BR N_DATACK_IND "(7)
+primitive to the NS user to indicate that the data was successfully received
+by the SCTP peer.  Note that this does not ensure that the data was received
+by the remote NS user (as in the case of OSI protocols), but, however, that
+the data was received by the remote NS provider.
+.\".PP
+.\"When a
+.\".BR N_DATA_IND (7)
+.\"primitive is issued by the
+.\".B NPI-SCTP
+.\"NS provider and the
+.\".B DEFAULT_RC_SEL
+.\"option flag is set for the association, the NS provider will set the
+.\".B N_RC_FLAG
+.\"in the indication primitive.  Once set, the NS provider will not cummulatively
+.\"acknowledge the received TSN until the NS user acknowledges receipt of the
+.\"primitive by issuing a
+.\".BR N_DATACK_REQ (7)
+.\"primitive to the NS user.
+.PP
+This receipt confirmation capability has the effect that NSDUs that have been
+confirmed received by the remote SCTP NS provider will be confirmed to the
+local NS user.
+.\"It also has the effect of not permitting the local SCTP NS provider to
+.\"acknowledge to the remote NS provider NSDUs that have not been confirmed
+.\"received by the local NS user.
+At one time, this was a necessary capability for M2PA, but this is no longer
+the case.  Use this option with care.  It has not been thourougly tested and
+has performance impacts on both the local NS provider and local NS user.
+.\"
+.\"
+.SH "LOCAL MANAGEMENT INTERFACE"
+.PP
+.B NPI-SCTP
+provides a local management through the service interface as described in
+.BR npi (7),
+using the following primitives:
+.\"
+.SS N_INFO_REQ\fR(7)
+.PP
+This primitivie is interpreted as in
+.BR npi (7).
+.\"
+.SS N_INFO_ACK\fR(7)
+.PP
+This primitivie is interpreted as in
+.BR npi (7).
+.\".TP \w'\fIQOS_range_offset\fr\(em'u
+.\".I PRIM_type
+.TP
+.I NSDU_size
+The
+.B NPI-SCTP
+provider has an unlimited NSDU size and returns
+.B T_INFINITE
+in this field in accordace with the
+.BR npi (7).
+.TP
+.I ENSDU_size
+The
+.B NPI-SCTP
+provider supports the concept of expedited data.  Expedited data is data that
+is sent unordered.  This field should alwasy return the same value as the
+.I NSDU_size
+above.
+.TP
+.I CDATA_size
+The
+.B NPI-SCTP
+provider supports the concept of connection data.  This field will be the
+maximum amount of connection data that will fit in a COOKIE-ECHO or COOKIE-ACK
+message.
+.TP
+.I DDATA_size
+The
+.B NPI-SCTP
+provider does not support the concept of disconnection data and, therefore,
+returns
+.B T_INVALID
+in this field.
+.TP
+.I ADDR_size
+The maximum size of the
+.B SCTP
+address.  This field will aways return an integer multiple of the
+.B sockaddr_in
+structure size as described under
+.RI \(lq "ADDRESS FORMAT" ,\(rq
+above.
+.\".TP
+.\".I ADDR_length
+.\".TP
+.\".I ADDR_offset
+.\".TP
+.\".I QOS_length
+.\".TP
+.\".I QOS_offset
+.\".TP
+.\".I QOS_range_length
+.\".TP
+.\".I QOS_range_offset
+.TP
+.I OPTIONS_flags
+The options flags may be one of the following values:
+.RS
+.TP \w'\fBDEFAULT_RC_SEL\fR\(em'u
+.B REC_CONF_OPT
+Receipt confirmation selection and support.  Receipt confirmation is supported
+and, if in the connected state, was requested and negotiated.
+.B NPI-SCTP
+does not provide true negotiation of receipt confirmation support, however,
+the SCTP protocol does support receipt confirmation.
+.TP
+.B EX_DATA_OPT
+Expedited data selection and support.  Expedited data is supported and, if in
+the connected state, was requested and negotiated.
+.TP
+.B DEFAULT_RC_SEL
+Indicates if default receipt confirmaiton is selected.  When this option is
+set using the
+.BR N_CONN_REQ "(7), "  N_CONN_RES "(7) or " N_OPTMGMT_REQ (7)
+primitive, it requests that messages sent using the
+.BR write (2s)
+system call (i.e, message not containing an
+.BR M_PROTO (9)
+message block), request receipt confirmation by default.  When this flag is
+clear, receipt confirmation will not be requested for
+.BR write (2s)
+operations.
+.\".IP ""
+.\"The
+.\".B DEFAULT_RC_SEL
+.\"flag serves an additional purpose for
+.\".BR NPI-SCTP :
+.\"as receipt confirmation cannot be selected by the remote peer, this flag
+.\"determines whether the
+.\".B N_RC_FLAG
+.\"is set in
+.\".BR N_DATA_IND (7)
+.\"primitives issued to the NS user by the NS provider, and whether the NS
+.\"provider will delay SCTP cummulative acknowledgement until such time as an
+.\".BR N_DATACK_REQ (7)
+.\"is issued by the NS user.
+.IP ""
+If
+.B REC_CONF_OPT
+is not also set (using the
+.BR N_CONN_REQ "(7) or " N_CONN_RES (7)
+primitives), then the
+.B DEFAULT_RC_SEL
+flag is ignored.
+.RE
+.TP
+.I NIDU_size
+This is the maximum size of the interface data unit, which is the maximum size
+of data that can be transferred across the interface ina single
+.BR getmsg (2)
+or
+.BR putmsg (2)
+system call.  This size is always less than or equal to the
+.I NISDU_size
+above.
+.TP
+.I SERV_type
+The service type is one of the following:
+.RS
+.TP \w'\fBN_SUBNET\fR\(em'u
+.B N_CONS
+Connection-oriented network service.
+.B NPI-SCTP
+supports connection-oriented network service.
+This value is always returned by
+.BR NPI-SCTP .
+.TP
+.B N_CLNS
+Connectionless network service.
+.B NPI-SCTP
+does not support connectionless service.
+This value is never returned by
+.BR NPI-SCTP .
+.RE
+.TP
+.I CURRENT_state
+The current state of the service interface as described in
+.BR npi (7).
+.TP
+.I PROVIDER_type
+The provider type is one of the following:
+.RS
+.TP \w'\fBN_SUBNET\fR\(em'u
+.B N_SNICFP
+The provider is a subnetwork independent convergence function provider.
+This value is always returned by
+.BR NPI-SCTP .
+.TP
+.B N_SUBNET
+The provider is a subnetwork provider.
+This value is never returned by
+.BR NPI-SCTP .
+.RE
+.TP
+.I NODU_size
+Indicates the optimal NIDU size.
+.B NPI-SCTP
+always returns half of the association MTU as the optimal NIDU size.
+.\".TP
+.\".I PROTOID_length
+.\".TP
+.\".I PROTOID_offset
+.TP
+.I NPI_version
+.B NPI-SCTP
+always returns
+.B N_VERSION_2
+in this field.
+.\"
+.SS N_OPTMGMT_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7),
+with the Quality of Service parameters described under
+.RI \(lq OPTIONS ,\(rq
+above.
+.\"
+.SS N_BIND_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.TP
+.IR ADDR_length ", " ADDR_offset
+Specifies the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structures that contain the
+.B NPI-SCTP
+addresses to bind.  The
+.B NPI-SCTP
+provider supports wildcard addresses and the address
+.BR INADDR_NAY .
+This sfield can contain an integer number of addresses.
+.TP
+.I CONIND_number
+Specifies the number of connection indications.  Specifying a non-zero number
+of connection indications will place the Stream in listening mode.  Any
+COOKIE-ECHO packet receives from a unique source address will generate a
+connection indication.  Connection indications can be accepted or refused
+(without data).  This number specifies the maximum number of outstanding
+ocnnection indications (those that have neither been accepted nor refused)
+that the provider will deliver.  Because this limit is reached does not mean
+that the provider discards additional connection indications, but may queue
+them internally until the number of outstanding connection indications drops
+beneath the number specified.  See
+.BR npi (7)
+for more information.
+.TP
+.I BIND_flags
+This field can contain the bitwize OR of zero or more of the following flags:
+.RS
+.TP
+.B TOKEN_REQUEST
+Requests that the NS provider provide a connection acceptance token in the
+corresponding
+.BR N_BIND_ACK (7)
+primitive.
+.TP
+.B DEFAULT_DEST
+This flag is for CLNS service only and is not supported by the
+.B NPI-SCTP
+provider.  If this flag is set a
+.RB [ NNOTSUPPORT ]
+error will be returned in a
+.BR N_ERROR_ACK (7)
+primitive.
+.TP
+.B DEFAULT_LISTENER
+A default listener Stream is one that will accept connection indications when
+no other Stream is associated with the incoming connection.
+.B NPI-SCTP
+does not currently support the concept of a default listener and sill return
+.RB [ NNOTSUPPORT ]
+in a
+.BR N_ERROR_ACK (7)
+primitive if this flag is set.
+.RE
+.TP
+.IR PROTOID_length ", " PROTOID_offset
+Specifies the length and offset from the beginning of the message block of the
+protocol identifiers to which the endpoint is bound.
+.B NPI-SCTP
+currently ignores these fields.  At a later date it is possible that this
+field could be used for additional protocol identification such as the
+Application Layer Information.)
+.\"
+.SS N_BIND_ACK\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.TP
+.IR ADDR_length ", " ADDR_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structures that contain the
+.B NPI-SCTP
+addresses that were bound.  This filed can contain an integer number of
+addresses.
+.IP ""
+The bound address,
+.IR sin_addr ,
+returns in this field may be
+.BR INADDR_ANY " (if " INADDR_ANY
+was requested, or no address was provided to the bind).
+However, the
+.I sin_port
+component of the address will be allocated dynamically and set to a non-zero
+port number if zero (indicating any port) was specified on bind, or no address
+was provided to the bind.  If a non-zero port number could not be dynamically
+allocated,
+.RB [ NNOADDR ]
+is returned in accordance with
+.BR npi (7).
+.TP
+.I CONIND_number
+Indicates the negotiated number of connection indications.  This is normally
+the same value as was requested; however, if the user requests number that is
+considered too large, this number might be a more conservative value.
+.TP
+.I TOKEN_value
+A handle associated with the bound Stream to be used in a subsequent
+.BR N_CONN_RES (7)
+primitive to accept a connection indication from a
+.BR N_CONN_IND (7)
+primitive on this Stream.
+.TP
+.IR PROTOID_length ", " PROTOID_offset
+Indicates the length and offset from the beginning of the message block of the
+protocol identifiers that were bound to the Stream.
+.B NPI-SCTP
+does not bind protocol identifiers and these fields will always be indicated
+by the
+.B NPI-SCTP
+NS provider as zero (0).
+.\"
+.SS N_UNBIND_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.\"
+.SS N_ERROR_ACK\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.\"
+.SS N_OK_ACK\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.\"
+.\"
+.SH "PROTOCOL SERVICE INTERFACE"
+.PP
+The
+.I /dev/sctp_n
+driver providers a single interface type: connection-oriented network service.
+Note, however, that some connectionless network service primitives are
+supported.
+.\"
+.SS N_UNITDATA_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+The
+.B NPI-SCTP
+provider does not support connectionless mode service and any attempt to issue
+this primitive willnormally result in an
+.BR N_ERROR_ACK (7)
+primitive with the error number
+.RB [ NNOTSUPPORT ].
+.\"
+.SS N_UNITDATA_IND\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+The
+.B NPI-SCTP
+provider does not support connectionless mode service
+provider will not issue this primitive.
+.\"
+.SS N_UDERROR_IND\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+The
+.B NPI-SCTP
+provider does not support connectionless mode service and
+will not issue this primitive.
+.\"
+.SS N_CONN_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7),
+with the quality of service parameters described under
+.RI \(lq OPTIONS ,\(rq
+above and the following considerations:
+.TP
+.IR DEST_length ", " DEST_offset
+Specifies the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structures that contains the
+.B NPI-SCTP
+IP addresses to which to connect the Stream.  For connection to multi-homed
+.B NPI-SCTP
+hosts, this address may contain mutliple
+.B sockaddr_in
+structures.
+.TP
+.I CONN_flags
+The connection flags can be a bitwise OR of zero or more of the following
+flags:
+.RS
+.TP \w'\fBDEFAULT_RC_SEL\fR\(em'u
+.B REC_CONF_OPT
+Receipt confirmation selection and support.
+.B NPI-SCTP
+uses this flag on connection to determine whether the SCTP association will
+support receipt confirmation in either direction.
+.TP
+.B EX_DATA_OPT
+Expedited data selection and support.
+.B NPI-SCTP
+provides expedited data support regardless of whether this flag is set on
+connection or not.
+.RE
+.TP
+.IR QOS_length ", " QOS_offset
+Specifies the length and offset from the beginning of the message block of the
+quality of service parameters to use when forming an association with the
+peer.  The structure is a
+.B N_qos_sel_conn_sctp_t
+structure of type
+.BR N_QOS_SEL_CONN_SCTP .
+These quality of service parameter value can be changed with the
+.BR N_OPTMGMT_REQ (7)
+primitive, or overridden for a specific message with the
+.BR N_DATA_REQ "(7) or " N_EXDATA_REQ (7)
+primitive.
+.IP ""
+Quality of service parameters that have end-to-end significance are:
+.IR i_streams " and " o_streams .
+Quality of service parameters that have significance at connection are:
+.IR ppi ", " sid ", " max_inits ", " max_retrans ", " max_sack ", " rto_init ", " rto_min ", " rto_max ", " rtx_path ", " hb_itvl " and " options .
+.\"
+.SS N_CONN_CON\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7),
+with the quality of service parameters described under
+.RI \(lq OPTIONS ,\(rq
+above, and the following considerations:
+.PP
+The primitive is issued by the NS provider when confirming a connection.
+.B NPI-SCTP
+confirms a connection when a COOKIE-ACK is received for the SCTP association.
+.TP
+.IR RES_length ", " RES_offset
+Indicates the length and offset from the beginning of the message block of the
+.B sockaddr_in
+structures that contain the
+.B NPI-SCTP
+addresses to which the Stream is confirmed connected.  For responding
+multi-homed 
+.B NPI-SCTP
+hosts, this addres may contain multiple
+.B sockaddr_in
+structures.
+.IP ""
+Unlike TPI, NPI does not have the ability to query the addresses associated
+with an established connection.  The responding address contained in this
+field contains the address(es) associated with the remote peer.  It is the
+responsibility of the NS user to store this address for later use.
+.TP
+.I CONN_flags
+The connection flags may be a bitwize OR of zero or more of the following
+flags:
+.RS
+.TP \w'\fBDEFAULT_RC_SEL\fR\(em'u
+.B REC_CONF_OPT
+Receipt confirmation selection and support.
+.B NPI-SCTP
+confirms this flag if it was requested in the
+.BR N_CONN_REQ (7)
+primitive.  This flag is of local significance.
+.TP
+.B EX_DATA_OPT
+Expedited data selection and support.
+.B NPI-SCTP
+always confirms this flag, regardless of whether it was requested in the
+.BR N_CONN_REQ (7)
+primitive.  This flag is of local significance.
+.RE
+.TP
+.IR QOS_length ", " QOS_offset
+Indicates the length and offset from the beginning fo the message block of the
+options present in the connection request and options that are negotiated
+end-to-end.  See
+.RI \(lq OPTIONS ,\(rq
+above.  The option values represent the negotiation with the local provdier as
+well as end-to-end negotiation with the SCTP peer.
+The structure is a
+.B N_qos_sel_conn_sctp_t
+structure of type
+.BR N_QOS_SEL_CONN_SCTP .
+.\"
+.SS N_CONN_IND\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7),
+with the quality of service parameters described under
+.RI \(lq OPTIONS ,\(rq
+above, and the following considerations:
+.PP
+The primitive is issued by the NS provider when indicating an incoming
+connection request.
+.B NPI-SCTP
+issues this primitive indicating an incoming connection request when a
+COOKIE-ECHO is received initiating an SCTP connection.
+.TP
+.IR DEST_length ", " DEST_offset
+Indicates the length and offset from the beginning of the message block of the
+destination address associated with the local endpoint.  When the local host
+is multi-homed, this address can contain multiple
+.B sockaddr_in
+structures.  These addresses may differ from the addresses to which the local
+endpoint was bound (i.e, in the
+.BR N_BIND_ACK (7)
+primitive), particularly when the local NS provider was bound to a wildcard
+address.
+Unlike TPI, NPI does not have an address information primitive and it is the
+responsibility of the NS user to store these addresses for later use.
+.TP
+.IR SRC_length ", " SRC_offset
+Indicates the length and offset from the beginning of the message block of the
+source addresses associated with the remote endpoint.  When the remote host is
+multi-homed, this address can contain multiple
+.B sockaddr_in
+structures.  Unlike TPI, NPI has not address information service and it is the
+responsibility of the NS user to store these addresses for later use.
+.TP
+.I SEQ_number
+Provides a unique sequence number that identifies this connection indication
+for use by the NS user in a subsesuent
+.BR N_CONN_RES "(7) or " N_DISCON_REQ (7)
+primitive.
+.TP
+.I CONN_flags
+The connection flags may be one of the following values:
+.RS
+.TP \w'\fBDEFAULT_RC_SEL\fR\(em'u
+.B REC_CONF_OPT
+Receipt confirmation selection and support.
+.B NPI-SCTP
+always supports receipt confirmation locally and this flag will be set in all
+connection indications.  It is up to the NS user to decide whether this
+association should support receipt confirmation and to set or clear the flag
+in the
+.BR N_CONN_RES (7)
+primitive.
+.TP
+.B EX_DATA_OPT
+Expedited data selection and support.
+.B NPI-SCTP
+always supports expedited data locally and this flag will be set in all
+connection indications.
+.RE
+.TP
+.IR QOS_length ", " QOS_offset
+Indicates the length and offset from the beginning of the message block of the
+options present locally and provided from the remote end.  The structure is a
+.B N_qos_sel_conn_sctp_t
+structure of type
+.BR N_QOS_SEL_CONN_SCTP .
+Of end-to-end significance are the
+.I i_streams " and " o_streams
+members of the structure.
+See
+.IR \(lq OPTIONS ,\(rq
+above.
+.\"
+.SS N_CONN_RES\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7),
+with the quality of service parameters described under
+.RI \(lq OPTIONS ,\(rq
+above, and the following considerations:
+.PP
+When it receives this primitive, the
+.B NPI-SCTP
+NS provider will send a COOKIE-ACK to
+complete the establishment of an SCTP association.
+.TP
+.I TOKEN_value
+Specifies the acceptor identifier of the Stream onto which the connection is
+to be accepted.  Any value specified here should be the value of the
+.I TOKEN_value
+field that was returned in the
+.BR N_BIND_ACK (7)
+primitive for the associated accepting Stream.
+.IP ""
+If the connection is to be accepted on the same Stream upon
+which the corresponding
+.BR N_CONN_IND (7)
+was received, this field should be zero (0).  It is an error to accept a
+connection on the listening Stream if there is more that one connection
+indication outstanding.
+.TP
+.IR RES_length ", " RES_offset
+Specifies the length and offset from the beginning of the message block of the
+responding addresses.
+.B NPI-SCTP
+does not have the ability to provide responding addresses that differ from the
+addresses that appeared in the
+.IR DEST_length " and " DEST_offset
+fields of the associated
+.BR N_CONN_IND (7)
+primitive.
+.TP
+.I SEQ_number
+Specifies the sequence number in the corresponding
+.BR N_CONN_IND (7)
+primitive to which this primitive is responding.
+.TP
+.I CONN_flags
+The connection flags may be one of the following values:
+.RS
+.TP \w'\fBDEFAULT_RC_SEL\fR\(em'u
+.B REC_CONF_OPT
+Receipt confirmation selection and support.  This flag is set by the NS user
+if receipt confirmation is to be used on the accepting Stream.
+.TP
+.B EX_DATA_OPT
+Expedited data selection and support.  This flag is set by the NS user if
+expedited data is to be used on the accepting Stream; however, this flag is
+ignored by the
+.B NPI-SCTP
+NS provider and  expedited data is always supported locally.
+.RE
+.TP
+.IR QOS_length ", " QOS_offset
+Specifies the length and offset from the beginning of the message block of the
+quality of service parameters requested to the connection.  See
+.RI \(lq OPTIONS ,\(rq
+above.  Quality of service parameters of local significance are negotiated
+locally.  Quality of service parameters of end-to-end significance are
+negotiated with the peer.  The structure is a
+.B N_qos_sel_conn_sctp_t
+structure of type
+.BR N_QOS_SEL_CONN_SCTP .
+Of end-to-end significance are the
+.IR i_streams " and " o_streams
+members of the structure.
+See
+.RI \(lq OPTIONS ,\(rq
+above.
+.\"
+.SS N_DATA_REQ\fR(7), \fBM_DATA\fR(9)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.PP
+Data will be sent ordered on the Stream.
+.TP
+.I DATA_xfer_flags
+This field contains option flags for the NIDU.  They can be a bitwise OR of
+zero or more of the following flags:
+.RS
+.TP
+.B N_MORE_DATA_FLAG
+Specifies that a subsequent
+.BR N_DATA_REQ
+contains data continuing the same NSDU.  For
+.BR M_DATA (9)
+message blocks, the
+.B MSGDELIM
+flag is used in the same fashion.
+.BR M_DATA (9)
+messages that result from a 
+.BR write (2s)
+system call, will have their
+.B MSGDELIM
+flag checked.
+.RB ( MSGDELIM
+flags will be set on full
+.BR write (2s)
+operations.)
+When set, the data marks the end of a record.
+.TP
+.B N_RC_FLAG
+Specifies that receipt confirmation is requested for the NSDU.  This flag is
+only valid for the last NIDU of an NSDU (i.e. one that has the
+.B N_MORE_DATA_FLAG
+clear).  When receipt confirmation is requested and the SCTP cummulative
+acknowledgement point passes over the TSN assigned to the last segment of the
+NSDU, a
+.BR N_DATACK_IND (7)
+message will be issued to the NS User.
+For
+.B M_DATA (9)
+message blocks, the
+.B DEFAULT_RC_SEL
+option flag is used in the same fashion.
+.BR M_DATA (9)
+message blocks will be sent with receipt confirmation requested if the
+.B DEFAULT_RC_SEL
+options flag is set for the connection, either via the
+.BR N_CONN_REQ "(7), " N_CONN_RES "(7) or " N_OPTMGMT_REQ (7)
+primitives.
+.RE
+.PP
+.B NPI-SCTP
+supports an extension of the
+.BR N_DATA_REQ (7)
+primitive format.  The
+.B M_PROTO (7)
+message block may contain a
+.B N_qos_sel_data_sctp_t
+structure immediately following the
+.B N_data_req_t
+primitive structure, with the following additional fields:
+.TP
+.I n_qos_type
+always
+.BR N_QOS_SEL_DATA_SCTP .
+.TP
+.I ppi
+the protocol payload identifier to be placed in the SCTP DATA chunk.
+.TP
+.I sid
+the stream identifier to be placed in the SCTP DATA chunk.
+.TP
+.I ssn
+the stream sequence number contained in the  SCTP DATA chunk.
+(Ignored in
+the
+.BR N_DATA_REQ (7)
+primitive, this value will be overwritten with the next sequential stream
+sequence number for the identified stream.)
+.TP
+.I tsn
+the transmission sequence number contained in the SCTP DATA chunk.
+(Ignored in
+the
+.BR N_DATA_REQ (7)
+primitive, this value will be overwritten with the next sequential
+transmission sequence number for the corresponding association.)
+.TP
+.I more
+a flag indicating whether additional
+.BR N_DATA_REQ (7)
+primitives contain additional data belonging to the same NSDU.
+(Ignored in
+the
+.BR N_DATA_REQ (7)
+primitive, this value will be overwritten by the calculated B and E bits for
+the SCTP DATA chunk.)
+.\"
+.SS N_DATA_IND\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.PP
+Data was sent ordered on the Stream.
+.PP
+.B NPI-SCTP
+supports an extension of the
+.BR N_DATA_IND (7)
+primitive format.  The
+.B M_PROTO (7)
+message block may contain a
+.B N_qos_sel_data_sctp_t
+structure immediately following the
+.B N_data_req_t
+primitive structure, with the following additional fields:
+.TP
+.I n_qos_type
+always
+.BR N_QOS_SEL_DATA_SCTP .
+.TP
+.I ppi
+the protocol payload identifier from the SCTP DATA chunk.
+.TP
+.I sid
+the stream identifier from the SCTP DATA chunk.
+.TP
+.I ssn
+the stream sequence number from the SCTP DATA chunk.
+.TP
+.I tsn
+the transmission sequence number from the SCTP DATA chunk.
+.TP
+.I more
+the B and E bits from the SCTP DATA chunk.  (This is in fact the entire flags
+field from the DATA chunk.  This permits definitions of additional flags and
+passing of those flags to the user.)
+.\"
+.SS N_EXDATA_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.PP
+Data will be sent unordered on the Stream.
+.PP
+.B NPI-SCTP
+supports an extension of the
+.BR N_EXDATA_REQ (7)
+primitive format.  The
+.B M_PROTO (7)
+message block may contain a
+.B N_qos_sel_data_sctp_t
+structure immediately following the
+.B N_data_req_t
+primitive structure, with the following additional fields:
+.TP
+.I n_qos_type
+always
+.BR N_QOS_SEL_DATA_SCTP .
+.TP
+.I ppi
+the protocol payload identifier to be placed in the SCTP DATA chunk.
+.TP
+.I sid
+the stream identifier to be placed in the SCTP DATA chunk.
+.TP
+.I ssn
+the stream sequence number to be placed in the SCTP DATA chunk.  (This would
+normally be zero for unordered data, however, some applications may pass data
+in this field.)
+.TP
+.I tsn
+the transmission sequence number contained in the SCTP DATA chunk.
+(Ignored in
+the
+.BR N_EXDATA_REQ (7)
+primitive, this value will be overwritten with the next sequential
+transmission sequence number for the corresponding association.)
+.TP
+.I more
+a flag indicating whether additional
+.BR N_EXDATA_REQ (7)
+primitives contain additional data belonging to the same ENSDU.
+(Ignored in
+the
+.BR N_EXDATA_REQ (7)
+primitive, this value will be overwritten by the calculated B and E bits for
+the SCTP DATA chunk.)
+.\"
+.SS N_EXDATA_IND\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.PP
+Data was sent unordered on the Stream.
+.PP
+.B NPI-SCTP
+supports an extension of the
+.BR N_DATA_IND (7)
+primitive format.  The
+.B M_PROTO (7)
+message block may contain a
+.B N_qos_sel_data_sctp_t
+structure immediately following the
+.B N_data_req_t
+primitive structure, with the following additional fields:
+.TP
+.I n_qos_type
+always
+.BR N_QOS_SEL_DATA_SCTP .
+.TP
+.I ppi
+the protocol payload identifier from the SCTP DATA chunk.
+.TP
+.I sid
+the stream identifier from the SCTP DATA chunk.
+.TP
+.I ssn
+the stream sequence number from the SCTP DATA chunk.
+.TP
+.I tsn
+the transmission sequence number from the SCTP DATA chunk.
+.TP
+.I more
+the B and E bits from the SCTP DATA chunk.  (This is in fact the entire flags
+field from the DATA chunk.  This permits definitions of additional flags and
+passing of those flags to the user.)
+.\"
+.SS N_DATACK_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.PP
+The previous primitive indicating reception of data that indicated receipt
+confirmation (i.e,
+.BR N_DATA_IND (7))
+is confirmed received by the user.
+.\"
+.SS N_DATACK_IND\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.PP
+The previous primitive requesting transmission of data that requested receipt
+confirmation (i.e, 
+.BR N_DATA_REQ (7))
+is confirmed received by the peer.
+.\"
+.SS N_RESET_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.B NPI-SCTP
+does not support a remote reset procedure; however, this primitive is
+supported locally.  Issuing this primitive will cause the NS provider to
+respond with a
+.BR N_RESET_CON (7)
+primitive once it receives the primitive.  This permits the NS user to
+determine when all
+.BR N_DATA_REQ "(7) and " N_EXDATA_REQ (7)
+primitives preceding the
+.BR N_RESET_REQ (7)
+have been received by the NS provider.  (At a later date it may be possible to
+use this to reset the stream sequence number or transmission sequence number.)
+.\"
+.SS N_RESET_IND\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.B NPI-SCTP
+does not support a remote reset procedure and will not issue this primitive.
+(At a later date it may be possible to use this to indicate that the stream
+sequence number or transmission sequence number has been reset.)
+.\"
+.SS N_RESET_RES\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.B NPI-SCTP
+does not issue an
+.BR N_RESET_IND (7)
+primitive and the NS user should not, therefore, issue this primitive in
+response.  (At a later date it may be possible to use this to allow the NS
+user to respond to a stream sequence number or transmission sequence number
+reset.)
+.\"
+.SS N_RESET_CON\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+.B NPI-SCTP
+does not support a remote reset procedure.  Therefore, this primitive is only
+issued in confirmation of the receipt of a
+.BR N_RESET_REQ (7)
+primitive.
+.\"
+.SS N_DISCON_REQ\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+This will result in the refusal of any outstanding
+.B NPI-SCTP
+connection indication or an abortive release of an existing
+.B NPI-SCTP
+association.
+.TP
+.IR DISCON_reason
+Specifies the reason for disconnect and may be one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+llbllss.
+\fISEQ_number:\fIDISCON_reason:\fRType:\fRDescription
+_
+Zero:N_DISC_NORMAL:Discon:T{
+Normal condition.
+T}
+:N_DISC_ABNORMAL:Discon:T{
+Abnormal condition.
+T}
+_
+Non-zero:N_REJ_P:Reject:T{
+Permanent condition.
+T}
+:N_REJ_T:Reject:T{
+Temporary condition.
+T}
+:N_REJ_INCOMPAT_INFO:Reject:T{
+Incompatible information in NS-User-Data.
+T}
+:N_REJ_QOS_UNAVAIL_P:Reject:T{
+QOS unavailable (permanent condition).
+T}
+:N_REJ_QOS_UNAVAIL_T:Reject:T{
+QOS unavailable (temporary condition).
+T}
+:N_REJ_UNSPECIFIED:Reject:T{
+Reason unspecified.
+T}
+_
+.TE
+.PP
+The
+.I DISCON_reason
+is currently ignored by
+.BR NPI-SCTP ,
+which simply sends an ABORT with the
+.B SCTP_CAUSE_USER_INITIATED
+cause under SCTP.
+That is, all
+.I DISCON_reason
+codes form the
+.BR N_DISCON_REQ (7)
+primitive map into
+.BR SCTP_CAUSE_USER_INITIATED .
+.RE
+.TP
+.IR RES_length ", " RES_offset
+Specifies the length and offset from the beginning of the message block of the
+responding addresses.
+.B NPI-SCTP
+does not have the ability to provide responding addresses that differ from the
+addresses that appeared in the
+.IR DEST_length " and " DEST_offset
+fields of the associated
+.BR N_CONN_IND (7)
+primitive.
+.TP
+.IR SEQ_number
+When rejecting an incoming connection on a listening Stream, this field is set
+to the
+.I SEQ_number
+that was present in the corresponding
+.BR N_CONN_IND (7)
+primitive representing the incoming connection that is being rejected.
+In all other cases (i.e, disconnecting an established association), this field
+should be set to zero (0) by the NS user.
+.\"
+.SS N_DISCON_IND\fR(7)
+.PP
+This primitive is interpreted as in
+.BR npi (7).
+This indicates the refusal of an outstanding
+.B NPI-SCTP
+outgoing connection request, or the abortive release of an existing
+.B NPI-SCTP
+association.
+.TP
+.IR DISCON_orig ", " DISCON_reason
+The disconnect origin and reason may be one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lblbllss.
+\fIDISCON_org:\fIDISCON_reason:\fRType:\fRDescription
+_
+N_PROVIDER:N_DISC_P:Discon:T{
+Permanent condition.
+T}
+:N_DISC_T:Discon:T{
+Temporary condition.
+T}
+:N_REJ_NSAP_UNKNOWN:Reject:T{
+NSAP address unknown (permanent condition).
+T}
+:N_REJ_NSAP_UNREACH_P:Reject:T{
+NSAP address ureachable (permanent condition).
+T}
+:N_REJ_NSAP_UNREACH_T:Reject:T{
+NSAP address unreachable (temporary condition).
+T}
+_
+N_USER:N_DISC_NORMAL:Discon:T{
+Normal condition.
+T}
+:N_DISC_ABNORMAL:Discon:T{
+Abnormal condition.
+T}
+:N_REJ_P:Reject:T{
+Permanent condition.
+T}
+:N_REJ_T:Reject:T{
+Temporary condition.
+T}
+:N_REJ_INCOMPAT_INFO:Reject:T{
+Incompatible information in NS-User-Data.
+T}
+_
+\fREither:N_REJ_QOS_UNAVAIL_P:Reject:T{
+QOS unavailable (permanent condition).
+T}
+:N_REJ_QOS_UNAVAIL_T:Reject:T{
+QOS unavailable (temporary condition).
+T}
+:N_REJ_UNSPECIFIED:Reject:T{
+Reason unspecified.
+T}
+_
+.TE
+.RE
+.TP
+.IR RES_length ", " RES_offset
+Indicates the length and offset from the beginning of the message block of the
+responding addresses.
+.B NPI-SCTP
+does not have to ability to have responding addresses that are different from
+those indicated in the
+.IR SRC_length " and " SRC_offset
+fields of the corresponding
+.BR N_CONN_IND (7)
+primitive.
+.B NPI-SCTP
+will always set these fields to zero (0).
+.TP
+.I SEQ_number
+The sequence number of a currently outstanding connection indication to which
+the disconnect corresponds.  This value is non-zero only on a listening Stream
+for which an outstanding
+.BR N_CONN_IND (7)
+primmitive has been issued with not
+.BR N_DISCON_REQ (7)
+or
+.BR N_CONN_RES (7)
+primitive having been issued by the NS user with the same sequence number.
 .\"
 .\"
 .SH USAGE
 .PP
-Unknown.
+The
+.BR NPI-SCTP
+interface has a cleaner and simpler interface to SCTP than the
+.BR tpi_sctp (7)
+interface, yet has some richer features such as receipt confirmation.  It is
+more suitable for use as an internal service interface by
+.IR STREAMS (9)
+pushable modules and multiplexing drivers.  It is therefore the service
+interface of choice for
+.BR SIGTRAN (4)
+modules and drivers.
+.PP
+In constrast, the TPI-SCTP interface,
+.BR tpi_sctp (7)
+is more suitable for user-space programs and supports the
+.BR libxnet (3)
+XTI/TLI library.
 .\"
 .\"
 .SH IOCTLS
 .PP
-None.
+The
+.B NPI-SCTP
+provider does not supoprt input-output controls.
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+Error handling is in accordance with
+.BR npi (7).
+.\"
+.\"
+.SH ERRORS
+.PP
+Errors are in accordance with
+.BR npi (7).
+They are repeated here as follows:
+.\"
+.SS "Error Acknowledgement Codes"
+.PP
+The following error codes can be present in the
+.I NPI_error
+field of the
+.BR N_ERROR_ACK (7)
+primitive:
+.TP \w'[\fBNBADQOSPARAM\fR]\(em'u
+.RB [ NBADADDR ]
+The network address as specified in the primitive was in an incorrect format,
+or the address contained illegal information.
+.PD 0
+.TP
+.RB [ NBADOPT ]
+The options values as specified in the primitive were in an incorrect format,
+or they contained illegal information.
+.TP
+.RB [ NBADQOSPARAM ]
+The QOS values specified are outside the range supported by the NS provider.
+illegal.
+.TP
+.RB [ NBADQOSTYPE ]
+The QOS structure type is not supported by the NS provider.
+.TP
+.RB [ NBADTOKEN ]
+Token used is not associated with an open stream.
+.TP
+.RB [ NNOADDR ]
+The NS provider could not allocate an address.
+.TP
+.RB [ NACCESS ]
+The user did not have proper permissions.
+.TP
+.RB [ NOUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ NBADSEQ ]
+The sequence number specified in the primitive was incorrect or illegal.
+.TP
+.RB [ NBADFLAG ]
+The flags specified in the primitive were incorrect or illegal.
+.TP
+.RB [ NBADDATA ]
+The amount of user data specified was outside the range supported by the NS
+provider.
+.TP
+.RB [ NSYSERR ]
+A system error has occurred and the Linux system error is indicated in the
+primitive.
+.TP
+.RB [ NNOTSUPPORT ]
+Specified primitive type is not known to the NS provider.
+.PD
+.\"
+.SS "Disconnect Codes"
+.PP
+The following error codes can be present in the
+.I DISCON_reason
+field of the
+.BR N_DISCON_IND (7)
+primitive:
+.TP \w'[\fBNBADQOSPARAM\fR]\(em'u
+.RB [ ETIMEDOUT ]
+connection timed out.
+.PD 0
+.TP
+.RB [ ECONNRESET ]
+connection reset by peer.
+.TP
+.RB [ ECONNABORTED ]
+connection aborted.
+.TP
+.RB [ EPROTO ]
+protocol violation.
+.TP
+.RB [ EINVAL ]
+invalid SCTP parameter.
+.TP
+.RB [ EMSGSIZE ]
+invalid message size.
+.PD
+.\"
+.\"
+.SH NOTICES
+.PP
+.B SCTP
+has several implementations.  This manpage is for the
+.BR sctp_n (4)
+implementation that provides
+.BR npi (7)
+access to the
+.B "Linux Fast-STREAMS"
+version of
+.BR SCTP .
+For more information on the
+.I OpenSS7
+Linux NET4 version, see
+.BR sctp (7).
+.PP
+The use of the
+.B N_qos_sel_data_sctp_t
+structure of type
+.B N_QOS_SEL_DATA_SCTP
+immediately following the
+.BR N_DATA_REQ "(7) or " N_EXDATA_REQ (7)
+primitive does not strictly follow the 
+.BR npi (7).
+Applications wishing to strictly follow the
+.BR npi (7)
+will not include these structures and will, instead, issue a (non-priority)
+.BR N_OPTMGMT_REQ (7)
+primitive ahead of the
+.BR N_DATA_REQ "(7) or " N_EXDATA_REQ (7)
+primitive to set the default QOS parameters as required for the issued packet.
 .\"
 .\"
 .SH EXAMPLES
@@ -125,12 +1807,17 @@ device for
 .\"
 .SH "SEE ALSO"
 .PP
-.BR sctp_n (4).
+.BR sctp (7),
+.BR sctp (4),
+.BR sctp_n (4),
+.BR npi (7),
+.BR npi_ip (7).
 .\"
 .\"
 .SH BUGS
 .PP
-Undocumented.
+.B NPI-TPI
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -143,11 +1830,11 @@ npi revision 2.0.0
 .\"
 .SH CONFORMANCE
 .PP
-NPI.
+NPI,
 .[
 npi revision 2.0.0
 .]
-
+this Corrigendum.
 .\"
 .\"
 .SH HISTORY

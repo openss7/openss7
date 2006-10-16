@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.1 2006/08/27 12:02:31 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.2 2006/10/16 00:14:37 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,12 +53,19 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 12:02:31 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/16 00:14:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
-@item (no items)
+@item test-sctp_n -o 7.1 Sun, 15 Oct 2006 06:22:05 -0600
+I notice that when the message size in this test is larger than the receive window size on the
+receiver, the receiver aborts the association after its window fills.  If the message size is
+reduced to just beneath the receive window size, the test case succeeds.  So, it looks like we are
+not handling zero window probes very well at all.  For now I have just reduced the message size as
+this is for interface testing not packet testing.  Packet tests at IP level should reveal this
+problem.
+
 @end table
 
 

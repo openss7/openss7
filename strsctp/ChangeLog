@@ -1,3 +1,25 @@
+2006-10-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* LICENSE: deleted unused file
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* doc/man/man3/xti_sctp.3.man: completed manual page
+	* doc/man/man7/npi_sctp.7.man: completed manual page
+	* doc/man/man7/tpi_sctp.7.man: completed manual page
+	* doc/manual/bugs.texi: updates for release
+	* doc/manual/todo.texi: updates for release
+	* src/drivers/sctp2.c: corrections for test case passes
+	* src/include/sys/npi_sctp.h: corrections for test case passes
+	* src/test/test-sctp_n.c: corrected several test cases
+	* src/test/test-sctp_n2.c: corrected several test cases
+	* src/test/test-sctp_t.c: corrected several test cases
+	* src/util/init/strsctp: do not preload modules
+	* src/util/init/strsctp.sh: do not preload modules
+	* src/util/sysconfig/strsctp: do not preload modules
+	* tests/testsuite-sctp_n.at: skip unworkable tests
+
 2006-10-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: added package manual page

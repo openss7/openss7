@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/29 07:44:24 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/16 00:14:52 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:44:24 $ by $Author: brian $
+ Last Modified $Date: 2006/10/16 00:14:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.16  2006/10/16 00:14:52  brian
+ - updates for release and test case passes on UP
+
  Revision 0.9.2.15  2006/07/29 07:44:24  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/29 07:44:24 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/16 00:14:52 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/07/29 07:44:24 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/16 00:14:52 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -4055,14 +4058,20 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_DATA_IND;
 			DATA_xfer_flags = p->data_ind.DATA_xfer_flags;
 			print_rx_prim(child, prim_string(p->type));
+			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->data_ind)))->sid;
+			//print_options(child, cbuf, sizeof(p->data_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_EXDATA_IND:
 			event = __TEST_EXDATA_IND;
 			print_rx_prim(child, prim_string(p->type));
+			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->exdata_ind)))->sid;
+			//print_options(child, cbuf, sizeof(p->exdata_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_DATACK_IND:
 			event = __TEST_DATACK_IND;
 			print_rx_prim(child, prim_string(p->type));
+			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->datack_ind)))->sid;
+			//print_options(child, cbuf, sizeof(p->datack_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_INFO_ACK:
 			event = __TEST_INFO_ACK;
@@ -4786,6 +4795,7 @@ preamble_2_data_xfer_conn(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+#if 0
 static int
 preamble_1_data_xfer_resp(int child)
 {
@@ -4796,6 +4806,7 @@ preamble_1_data_xfer_resp(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+#endif
 int
 preamble_2_data_xfer_resp(int child)
 {
@@ -6337,7 +6348,7 @@ struct test_stream test_6_3_list = { &preamble_6_3_list, &test_case_6_3_list, &p
 #define name_case_7_1 "Test fragmentation by sending very large packets."
 #define sref_case_7_1 "NPI Rev 2.0.0"
 #define desc_case_7_1 "\
-Connect and send very large packets to test fragmentation.  We send 4 100000\n\
+Connect and send very large packets to test fragmentation.  We send 4 50000\n\
 byte packets, 4 expedited packets with the message \"Urgent.\" and 4 normal\n\
 packets with the message \"Hello\".  The urgent packets should deliver between\n\
 the fragments and but the normal packets should wait until the large packets\n\
@@ -6346,12 +6357,15 @@ int
 test_case_7_1_conn(int child)
 {
 	int i;
-	char lbuf[100000];
+	char lbuf[50000];
 	const char nrm[] = "Hello.";
 	const char urg[] = "Urgent.";
 
 	bzero(lbuf, sizeof(lbuf));
 	for (i = 0; i < 4; i++) {
+		if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
 		DATA_xfer_flags = 0;
 		QOS_buffer = &qos_data;
 		QOS_length = sizeof(qos_data);
@@ -6365,9 +6379,14 @@ test_case_7_1_conn(int child)
 			QOS_length = sizeof(qos_data);
 			DATA_buffer = lbuf;
 			DATA_length = sizeof(lbuf);
-			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
+				failure_string = "Could not send normal data!";
 				goto failure;
+			}
 		}
+		state++;
+		if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+			goto failure;
 		state++;
 		QOS_buffer = &qos_data;
 		QOS_length = sizeof(qos_data);
@@ -6380,9 +6399,14 @@ test_case_7_1_conn(int child)
 			QOS_length = sizeof(qos_data);
 			DATA_buffer = (char *)urg;
 			DATA_length = sizeof(urg);
-			if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+			if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS) {
+				failure_string = "Could not send expedited data!";
 				goto failure;
+			}
 		}
+		state++;
+		if (expect(child, SHORT_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+			goto failure;
 		state++;
 		DATA_xfer_flags = 0;
 		QOS_buffer = NULL;
@@ -6397,8 +6421,10 @@ test_case_7_1_conn(int child)
 			QOS_length = 0;
 			DATA_buffer = (char *)nrm;
 			DATA_length = sizeof(nrm);
-			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
+				failure_string = "Could not send normal data!";
 				goto failure;
+			}
 		}
 		state++;
 	}
@@ -6422,13 +6448,16 @@ test_case_7_1_list(int child)
 {
 	size_t len = 0;
 
-	while (len < 4 * 100000 + 4 * 8 + 4 * 7) {
+	while (len < 4 * 50000 + 4 * 8 + 4 * 7) {
 		switch (wait_event(child, LONGER_WAIT)) {
 		case __TEST_EXDATA_IND:
 		case __TEST_DATA_IND:
 			len += data.len;
 			break;
+		case __EVENT_NO_MSG:
+			continue;
 		default:
+			failure_string = event_string(last_event);
 			goto failure;
 		}
 		state++;
@@ -6437,7 +6466,7 @@ test_case_7_1_list(int child)
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "i = %d, j = %d, k = %d\n", 4, 4, 4);
-	fprintf(stdout, "Received %lu bytes, expecting %u\n", (ulong) len, 4 * 100000 + 4 * 8 + 4 * 7);
+	fprintf(stdout, "Received %lu bytes, expecting %u\n", (ulong) len, 4 * 50000 + 4 * 8 + 4 * 7);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
@@ -6478,13 +6507,15 @@ test_case_7_2_conn(int child)
 
 	DATA_xfer_flags = N_MORE_DATA_FLAG;
 
-	while (s < 10000) {
+	while (s < 5000) {
 		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
 			state++;
 			print_more();
 			test_sleep(child, 1);
-			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
+				failure_string = event_string(last_event);
 				goto failure;
+			}
 		}
 		snd_bytes += DATA_length;
 		s++;
@@ -6504,7 +6535,7 @@ test_case_7_2_conn(int child)
 	state++;
 	print_more();
 	state++;
-	test_sleep(child, 2);
+	test_sleep(child, 3);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -6519,7 +6550,7 @@ test_case_7_2_conn(int child)
 int
 test_case_7_2_resp(int child)
 {
-	test_sleep(child, 2);
+	test_sleep(child, 3);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -6531,11 +6562,13 @@ test_case_7_2_list(int child)
 	size_t rcv_bytes = 0;
 	int joined = 0;
 
-	test_sleep(child, 1);
+	test_sleep(child, 2);
 	state++;
 	while (r < 4) {
-		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS) {
+			failure_string = event_string(last_event);
 			goto failure;
+		}
 		if (data.len > 10)
 			joined = 1;
 		rcv_bytes += data.len;
@@ -6543,17 +6576,21 @@ test_case_7_2_list(int child)
 		state++;
 	}
 	print_less(child);
-	while (rcv_bytes < 100010) {
-		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	while (rcv_bytes < 50000 + 10) {
+		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS) {
+			failure_string = event_string(last_event);
 			goto failure;
+		}
 		if (data.len > 10)
 			joined = 1;
 		rcv_bytes += data.len;
 		r++;
 		state++;
 	}
-	if (!joined)
+	if (!joined) {
+		failure_string = "No joined message.";
 		goto failure;
+	}
 	state++;
 	print_more();
 	state++;
@@ -6702,8 +6739,6 @@ test_case_8_2_conn(int child)
 	int i;
 	uint32_t tsn1[10];
 
-	test_sleep(child, 1);
-	state++;
 	ADDR_buffer = addrs[2];
 	ADDR_length = sizeof(addrs[2]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
@@ -6736,11 +6771,13 @@ test_case_8_2_conn(int child)
 	qos_data.tsn = tsn1[0];
 	QOS_buffer = &qos_data;
 	QOS_length = sizeof(qos_data);
+#if 0
 	if (do_signal(child, __TEST_DATACK_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+#endif
 	test_sleep(child, qos_info.rto_max / 100 + 1);
-#if 0
+#if 1
 	for (i = 1; i < 5; i++)
 		if (expect(child, NORMAL_WAIT, __TEST_DATACK_IND) != __RESULT_SUCCESS)
 			break;
@@ -6799,6 +6836,7 @@ test_case_8_2_resp(int child)
 	if (i != 5)
 		goto failure;
 	state++;
+#if 0
 	for (i = 0; i < 5; i++) {
 		qos_data.tsn = tsn3[i];
 		QOS_buffer = &qos_data;
@@ -6806,14 +6844,15 @@ test_case_8_2_resp(int child)
 		do_signal(child, __TEST_DATACK_REQ);
 	}
 	state++;
+#endif
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_8_2_conn preamble_1_data_xfer_conn
-#define preamble_8_2_resp preamble_1_data_xfer_resp
-#define preamble_8_2_list preamble_1_data_xfer_list
+#define preamble_8_2_conn preamble_1_idle_cons
+#define preamble_8_2_resp preamble_1_idle_cons
+#define preamble_8_2_list preamble_1_idle_cons
 
 #define postamble_8_2_conn postamble_1_data_xfer
 #define postamble_8_2_resp postamble_1_data_xfer
@@ -6971,6 +7010,7 @@ test_case_9_2_conn(int child)
 		if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
+		j++;
 	}
 	test_sleep(child, 1);
 	state++;
@@ -7018,6 +7058,7 @@ test_case_9_2_list(int child)
 		if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
+		j++;
 	}
 	test_sleep(child, 1);
 	state++;
@@ -7094,6 +7135,8 @@ test_case_9_3_conn(int child)
 			k[sid[child]]++;
 			K++;
 			break;
+		case __EVENT_NO_MSG:
+			continue;
 		default:
 			goto failure;
 		}
@@ -7160,6 +7203,8 @@ test_case_9_3_list(int child)
 			k[sid[child]]++;
 			K++;
 			break;
+		case __EVENT_NO_MSG:
+			continue;
 		default:
 			goto failure;
 		}

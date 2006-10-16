@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/29 07:44:38 $
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:14:53 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:44:38 $ by $Author: brian $
+ Last Modified $Date: 2006/10/16 00:14:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n2.c,v $
+ Revision 0.9.2.2  2006/10/16 00:14:53  brian
+ - updates for release and test case passes on UP
+
  Revision 0.9.2.1  2006/07/29 07:44:38  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/29 07:44:38 $"
+#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:14:53 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/29 07:44:38 $";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:14:53 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -8581,7 +8584,7 @@ test_case_3_4_9(int child)
 #if 0
 		np_ulong type = N_QOS_SEL_CONN_IP;
 #else
-		np_ulong type = N_QOS_SEL_CONN_SCTP;
+		np_ulong type = N_QOS_SEL_DATA_SCTP;
 #endif
 
 		ADDR_buffer = &sin;
@@ -10115,8 +10118,10 @@ NS_DATA_XFER state (zero length data)."
 int
 test_case_3_10_1(int child)
 {
-	if (child != 1) {
+	if (child == 0) {
 		char buf[] = "Test Data.";
+
+		test_msleep(child, LONG_WAIT);
 
 		DATA_xfer_flags = 0;
 		DATA_buffer = buf;
@@ -10168,7 +10173,7 @@ NS_DATA_XFER state (zero length data)."
 int
 test_case_3_10_2(int child)
 {
-	if (child != 1) {
+	if (child == 0) {
 		char buf[] = "Test Data.";
 
 		DATA_buffer = buf;
@@ -10218,7 +10223,7 @@ NS_DATA_XFER state (zero length data)."
 int
 test_case_3_10_3(int child)
 {
-	if (child != 1) {
+	if (child == 0) {
 		QOS_length = 0;
 		if (do_signal(child, __TEST_DATACK_REQ) != __RESULT_SUCCESS)
 			goto failure;
@@ -10263,7 +10268,7 @@ NS_DATA_XFER state (zero length data)."
 int
 test_case_3_10_4(int child)
 {
-	if (child != 1) {
+	if (child == 0) {
 		unsigned short port = htons(10000 + 1);
 		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
 		char buf[] = "xxxxTest Data";

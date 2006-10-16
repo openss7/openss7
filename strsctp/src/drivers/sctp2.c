@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:20:59 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/16 00:14:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/23 11:20:59 $ by $Author: brian $
+ Last Modified $Date: 2006/10/16 00:14:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.49  2006/10/16 00:14:38  brian
+ - updates for release and test case passes on UP
+
  Revision 0.9.2.48  2006/08/23 11:20:59  brian
  - rationalized sctp2.c to sctp package
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:20:59 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/16 00:14:38 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:20:59 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/16 00:14:38 $";
 
 #include "sctp_compat.h"
 
@@ -91,7 +94,8 @@ static char const ident[] =
 #define t_set_bit(nr,addr)  sctp_set_bit(nr,addr)
 #define t_clr_bit(nr,addr)  sctp_clr_bit(nr,addr)
 
-#define SCTP_SPECIAL_DEBUG 1
+#undef SCTP_SPECIAL_DEBUG
+//#define SCTP_SPECIAL_DEBUG 1
 
 #define STREAMS 1
 #define SOCKETS 0
@@ -100,7 +104,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:20:59 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/16 00:14:38 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -13422,12 +13426,7 @@ sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, 
 		ptrace(("ERROR: Error path taken!\n"));
 		return (err);
 	}
-	/* we probably want to data ack out of order as well */
-#if 0
-	if (rcpt || (ord && (sp->flags & SCTP_FLAG_DEFAULT_RC_SEL)))
-#else
 	if (rcpt)
-#endif
 		flags |= SCTPCB_FLAG_CONF;
 	if (!ord) {
 		flags |= SCTPCB_FLAG_URG;
@@ -14348,7 +14347,7 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 				rtn = 0;
 				break;
 			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
+				if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
 					putnext(q, mp);
 					continue;
 				}
@@ -14367,6 +14366,12 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 				case M_PCPROTO:
 					mp->b_datap->db_type = M_PROTO;
 					break;
+				case M_PCRSE:
+					mp->b_datap->db_type = M_RSE;
+					break;
+				case M_READ:
+					mp->b_datap->db_type = M_CTL;
+					break;
 				default:
 					printd(("ERROR: (q dropping) %d\n", rtn));
 					freemsg(mp);
@@ -14380,7 +14385,7 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 			break;
 		}
 		/* perform wakeups */
-		if (procwake)
+		if (procwake != NULL)
 			procwake(q);
 		sctp_unlockq(q);
 	}
@@ -14949,7 +14954,7 @@ n_info_ack(struct sctp *sp)
 	p->NIDU_size = -1;	/* no limit on NIDU size */
 	p->SERV_type = N_CONS;
 	p->CURRENT_state = sp->i_state;
-	p->PROVIDER_type = N_SUBNET;
+	p->PROVIDER_type = N_SNICFP;
 	p->NODU_size = sp->pmtu >> 1;
 	p->PROTOID_length = pro_len;
 	p->PROTOID_offset = pro_len ? sizeof(*p) + add_len + qos_len + qor_len : 0;

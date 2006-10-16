@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_sctp.3.man,v 0.9.2.8 2006/10/10 10:46:15 brian Exp $
+.\" @(#) $Id: xti_sctp.3.man,v 0.9.2.9 2006/10/16 00:14:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:46:15 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/16 00:14:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_sctp.3.man,v $
+.\" Revision 0.9.2.9  2006/10/16 00:14:35  brian
+.\" - updates for release and test case passes on UP
+.\"
 .\" Revision 0.9.2.8  2006/10/10 10:46:15  brian
 .\" - updates for release
 .\"
@@ -1889,12 +1892,13 @@ provides a number of options, described in
 above, that may be included in this XTI/TLI call in the
 .I call->opt
 parameter to change local and end-to-end characteristics of the transport
-endpoint accepting the connection.  The options of end-to-end significance
+endpoint accepting the connection.
+The options of end-to-end significance
 that can be included in this XTI/TLI library call are:
-.TP
-.I T_IP_OPTIONS
-.TP
-.I T_IP_TOS
+.\".TP
+.\".I T_IP_OPTIONS
+.\".TP
+.\".I T_IP_TOS
 .TP
 .I T_SCTP_ISTREAMS
 sets the number of incoming streams for the transport connection.  This value
@@ -1924,26 +1928,26 @@ The association-related options that can be included in this XTI/TLI call includ
 .PP
 The options of local significance that can be included in this XTI/TLI call
 include (other options of local significance may also be included):
-.TP
-.I XTI_DEBUG
-.TP
-.I XTI_LINGER
-.TP
-.I XTI_RCVBUF
-.TP
-.I XTI_RCVLOWAT
-.TP
-.I XTI_SNDBUF
-.TP
-.I XTI_SNDLOWAT
-.TP
-.I T_IP_TTL
-.TP
-.I T_IP_REUSEADDR
-.TP
-.I T_IP_DONTROUTE
-.TP
-.I T_IP_BROADCAST
+.\".TP
+.\".I XTI_DEBUG
+.\".TP
+.\".I XTI_LINGER
+.\".TP
+.\".I XTI_RCVBUF
+.\".TP
+.\".I XTI_RCVLOWAT
+.\".TP
+.\".I XTI_SNDBUF
+.\".TP
+.\".I XTI_SNDLOWAT
+.\".TP
+.\".I T_IP_TTL
+.\".TP
+.\".I T_IP_REUSEADDR
+.\".TP
+.\".I T_IP_DONTROUTE
+.\".TP
+.\".I T_IP_BROADCAST
 .TP
 .I T_SCTP_HEARTBEAT_ITVL
 sets the heartbeat interval to be used on all destination addresses during the

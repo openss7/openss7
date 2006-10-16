@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_sctp.7.man,v 0.9.2.7 2006/10/10 10:46:17 brian Exp $
+.\" @(#) $Id: tpi_sctp.7.man,v 0.9.2.8 2006/10/16 00:14:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:46:17 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/16 00:14:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_sctp.7.man,v $
+.\" Revision 0.9.2.8  2006/10/16 00:14:36  brian
+.\" - updates for release and test case passes on UP
+.\"
 .\" Revision 0.9.2.7  2006/10/10 10:46:17  brian
 .\" - updates for release
 .\"
@@ -356,118 +359,1129 @@ yet are used by protocol levels using SCTP transport.
 The options defined with the option level
 .B T_INET_SCTP
 are as follows:
+.\"
 .TP
 .B T_SCTP_NODELAY
+This option determines whether to delay transmission of data to attempt to
+coalesce smaller packets into larger packets.
+The option value is formatted as a
+.B t_uscalar_t
+that can have the values
+.BR T_YES " or " T_NO .
+When set to
+.BR T_YES ,
+it conveys that packets are not to be delayed to coalesce smaller packets.
+When set to
+.BR T_NO ,
+it conveys that packets are being delayed to coalesce smaller packets.
+This option is used with
+.BR T_OPTMGMT_REQ (7).
+.sp
+This option parallels the
+.I T_TCP_NODELAY
+option for compatibility with
+.BR tpi_tcp (7).
+.IR T_SCTP_NODELAY " and " T_TCP_NODELAY
+can be used interchangeably.
+.sp
+When Nagle is enabled,
+.B SCTP
+uses the Nagle algorithm
+.[
+rfc896
+.]
+for bundling DATA chunks into a packet.  This results in far fewer short
+packets in the network.  The algorithm is that described in RFC 896
+.[
+rfc896
+.]
+ane RFC 1122
+.[
+rfc1122
+.]
+with the Minshall modifications to accommodate delayed SACK as described in
+draft-minshall-nagle-01.txt.
+.[
+minshall-nagle-01
+.]
+(Note: later version of
+.BR tcp (7)
+also include the Minshall modification).
+.\"
+.TP
+.B T_SCTP_MAXSEG
+This option determines the maximum segment size for outgoing packets.  Values
+greater thatn the association MTU are ignored and have no effect.  This
+parallels the
+.I T_TCP_MAXSEG
+option for compatibility with
+.BR tpi_tcp (7).
+.IR T_SCTP_MAXSEG " and " T_TCP_MAXSEG
+can be used interchangeably.
+.sp
+This value determines the maximum size (in bytes) above which SCTP will
+fragment larger DATA chunks into smaller DATA chunks, and beneath which SCTP
+will bundle DATA chunks into a single packet or combined smaller DATA chunks
+into larger DATA chunks.  Normally this value is the association MTU value
+minus the size of the current IP and SCTP headers, minus the size of one DATA
+chunk header.  If the user sets this to a lower value, the lower value will be
+used.
+.sp
+This option is formatted as a
+.B t_scalar_t
+indicating the maximum size in bytes.
+This option is used with
+.BR T_OPTMGMT_REQ (7).
+.\"
 .TP
 .B T_SCTP_CORK
-.TP
-.B T_SCTP_PPI
+This option determines whether to cork the transmission stream waiting for
+subsequent packets.  When set, this option permits a number of
+.BR T_DATA_REQ (7)
+primitives to be issued without sending the data subsequent to the cork.
+When the cork is released, all subsequent data will be permitted to proceed.
+The option is formatted as a
+.B t_scalar_t
+that can have the values
+.BR T_YES ,
+conveying that transmission is corked, or
+.BR T_NO ,
+conveying that transmission is uncorked.
+THis option is used with
+.BR T_OPTMGMT_REQ (7).
+.\"
 .TP
 .B T_SCTP_SID
+This option determines the SCTP Stream Identifier that is to be associated
+with a given data transmission.  The option value is formatted as a
+.B t_scalar_t
+that contains the numeric value of the SCTP Stream Identifier.  This option
+is used with
+.BR T_OPTMGMT_REQ (7).
+The current value that is set will be used on all packets sent with
+.BR T_OPTDATA_REQ "(7), " T_DATA_REQ "(7), " T_EXDATA_REQ "(7) or " M_DATA (9).
+When option
+.I T_SCTP_RECVSID
+is set, the value associated with the received packet will be included in
+.BR T_OPTDATA_IND (7)
+indications.
+See
+.IR T_SCTP_RECVSID .
+.\"
 .TP
-.B T_SCTP_SSN
+.B T_SCTP_PPI
+This option determines the SCTP Payload Protocol Identifier that is to be
+associated with a given data transmission.  The option value is formatted as a
+.B t_scalar_t
+that contains the numeric value of the SCTP Payload Protocol Identifier.  This
+option is used with
+.BR T_OPTMGMT_REQ (7).
+The current value that is set will be used on all packets sent with
+.BR T_OPTDATA_REQ "(7), " T_DATA_REQ "(7), " T_EXDATA_REQ "(7) or " M_DATA (9).
+When option
+.I T_SCTP_RECVPPI
+is set, the value associated with the received packet will be included in
+.BR T_OPTDATA_IND (7)
+indications.
+See
+.IR T_SCTP_RECVPPI .
+.\"
 .TP
-.B T_SCTP_TSN
+.B T_SCTP_RECVSID
+Determine whether a
+.I T_SCTP_SID
+option
+indicating the SCTP Stream Identifier of the received data
+will be included in a
+.BR T_OPTDATA_IND (7)
+message as well as reflected in the response to a current value
+.B T_GET
+operation to
+.BR T_OPTMGMT_REQ (7).
+The option value is a
+.B t_scalar_t
+with valid values
+.BR T_YES " or " T_NO .
+This option is for use with
+.BR T_OPTMGMT_REQ (7).
+.\".sp
+.\"This option is for use with the
+.\".BR sockets (3)
+.\"library.
+.\"For
+.\".BR xti (3)
+.\"it changes the semantics of the value returned to a
+.\".B T_GET
+.\"operation to
+.\".BR T_OPTMGMT_REQ (7).
+.\"When set to
+.\".BR T_YES ,
+.\"the current value obtained with a
+.\".B T_GET
+.\"operation to
+.\".BR T_OPTMGMT_REQ (7)
+.\"will be the value of the last received message.
+.\"When set to
+.\".BR T_NO ,
+.\"the current value obtains with a
+.\".B T_GET
+.\"operation to
+.\".BR T_OPTMGMT_REQ (7)
+.\"will be the default value or the value last set with a
+.\".B T_NEGOTIATE
+.\"operation to
+.\".BR T_OPTMGMT_REQ (7).
+.\"See
+.\".IR T_SCTP_SID .
+.\"
 .TP
-.B T_SCTP_RECVOPT
-.TP
-.B T_SCTP_COOKIE_LIFE
-.TP
-.B T_SCTP_SACK_DELAY
-.TP
-.B T_SCTP_PATH_MAX_RETRANS
-.TP
-.B T_SCTP_ASSOC_MAX_RESTRANS
-.TP
-.B T_SCTP_MAX_INIT_RETRIES
+.B T_SCTP_RECVPPI
+Determine whether a
+.I T_SCTP_PPI
+option
+indicating the SCTP Payload Protocol Identifier of the received data
+will be included in a
+.BR T_OPTDATA_IND (7)
+message as well as reflected in the response to a current value
+.B T_GET
+operation to
+.BR T_OPTMGMT_REQ (7).
+The option value is a
+.B t_scalar_t
+with valid values
+.BR T_YES " or " T_NO .
+This option is for use with
+.BR T_OPTMGMT_REQ (7).
+.\".sp
+.\"This option is for use with the
+.\".BR sockets (3)
+.\"library.
+.\"For
+.\".BR xti (3)
+.\"it changes the semantics of the value returned to a
+.\".B T_GET
+.\"operation to
+.\".BR T_OPTMGMT_REQ (7).
+.\"When set to
+.\".BR T_YES ,
+.\"the current value obtained with a
+.\".B T_GET
+.\"operation to
+.\".BR T_OPTMGMT_REQ (7)
+.\"will be the value of the last received message.
+.\"When set to
+.\".BR T_NO ,
+.\"the current value obtains with a
+.\".B T_GET
+.\"operation to
+.\".BR T_OPTMGMT_REQ (7)
+.\"will be the default value or the value last set with a
+.\".B T_NEGOTIATE
+.\"operation to
+.\".BR T_OPTMGMT_REQ (7).
+.\"See
+.\".IR T_SCTP_PPI .
+.\"
 .TP
 .B T_SCTP_HEARTBEAT_ITVL
-.TP
-.B T_SCTP_RTO_INITIAL
-.TP
-.B T_SCTP_RTO_MIN
-.TP
-.B T_SCTP_RTO_MAX
-.TP
-.B T_SCTP_OSTREAMS
-.TP
-.B T_SCTP_ISTREAMS
-.TP
-.B T_SCTP_COOKIE_INC
-.TP
-.B T_SCTP_THROTTLE_ITVL
-.TP
-.B T_SCTP_MAC_TYPE
+This option determines the time interval (in seconds) between successive
+HEARTBEAT messages used to probe destination transport addresses for RTT
+calculation and activity.  This option is formatted as a
+.BR t_scalar_t .
+Valud values are zero (0), indicating do not heartbeat, or a value of 1 second
+or greater indicating the heartbeat interval.
+This options is used with
+.BR T_OPTMGMT_REQ "(7), " T_CONN_REQ "(7) or " T_CONN_RES (7).
+.sp
+The value set with
+.BR T_OPTMGMT_REQ (7)
+is the value that will be assigned to new destinations.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+Active destinations can be controlled with the option
+.IR T_SCTP_HB ,
+below.
+.\"
 .TP
 .B T_SCTP_HB
+This option determines the heartbeat activation and interval associated with
+a specific destination address.  The option value is a
+.B t_sctp_hb
+structure.  This option will return an error if it is attempted on a stream in
+the unconnected state.  The
+.B t_sctp_hb
+structure is formatted as follows:
 .sp
 .nf
 \fC\s-1\
 typedef struct t_sctp_hb {
-    uint32_t hb_dest;           /* destination address */
-    t_uscalar_t hb_onoff;       /* activation flag */
-    t_uscalar_t hb_itvl;        /* interval in milliseconds */
+    uint32_t hb_dest;        /* destination address */
+    t_uscalar_t hb_onoff;    /* activation flag */
+    t_uscalar_t hb_itvl;     /* interval in milliseconds */
 } t_sctp_hb_t;
 \s+1\fR
 .fi
+.sp
+The
+.B t_sctp_hb
+structure has the following fields:
+.RS
+.TP \w'hb_onoff\(em'u
+.I hb_dest
+is the
+.B sockaddr_in
+structure that contains the destination address to which the heartbeat setting
+applies.
+.PD 0
+.TP
+.I hb_onoff
+is an integer boolean activation flag indicating whether heartbeat is active
+on the destination.
+.TP
+.I hb_itvl
+is the integer heartbeat interval in milliseconds.
+.PD
+.PP
+This option is intended to be used with
+.BR T_OPTMGMT_REQ (7).
+.I dest
+must be one of the valid addresses associated with the connection.
+Note that heartbeat activity can also be set on an association basis using the
+option
+.IR T_SCTP_HEARTBEAT_ITVL .
+.RE
+.\"
+.TP
+.B T_SCTP_RTO_INITIAL
+This option determines the time interval (in milliseconds) that will be used
+as an initial RTO (Retransmission Time Out) value when sending packets to a
+destination for the first time.
+This option if formatted as a
+.BR t_scalar_t .
+Valid values are zero or greater and must be within the range from
+.IR T_SCTP_RTO_MIN " to " T_SCTP_RTO_MAX .
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+Active destinations can be controlled with the option
+.IR T_SCTP_RTO ,
+below.
+.\"
+.TP
+.B T_SCTP_RTO_MIN
+Determine the time interval (in milliseconds) that will be used as a minimum
+RTO (Retransmission Time Out) value when sending packets.
+This option if formatted as a
+.BR t_scalar_t .
+Value values are
+zero or greater and must be less than or equal to the value
+.IR T_SCTP_RTO_MAX .
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+Active destinations can be controlled with the option
+.IR T_SCTP_RTO ,
+below.
+.\"
+.TP
+.B T_SCTP_RTO_MAX
+Determine the time interval (in milliseconds) that will be used as a maximum
+RTO (Retransmission Time Out) value when sending packets.
+This option if formatted as a
+.BR t_scalar_t .
+Value values are
+zero or greater and must be greater than or equal to the value
+.IR T_SCTP_RTO_MIN .
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+Active destinations can be controlled with the option
+.IR T_SCTP_RTO ,
+below.
+.\"
+.TP
+.B T_SCTP_PATH_MAX_RETRANS
+This option determines the number of times that the sending endpoint will
+attempt retransmitting a packet to a given destination transport address before
+it considers that destination transport address inactive.  This option is
+formatted as a
+.BR t_scalar_t .
+Value values include zero.
+This options is used with
+.BR T_OPTMGMT_REQ "(7), " T_CONN_REQ "(7) or " T_CONN_RES (7).
+.sp
+The value set with
+.BR T_OPTMGMT_REQ (7)
+is the value that will be assigned to new destinations.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+Active destinations can be controlled with the option
+.IR T_SCTP_RTO ,
+below.
+.\"
 .TP
 .B T_SCTP_RTO
+This option determines the retransmission timeout parameters associated with a
+specific destination address.
+The option value is formatted as a
+.B t_sctp_rto
+structure, formatted as follows:
 .sp
 .nf
 \fC\s-1\
 typedef struct t_sctp_rto {
-    uint32_t rto_dest;          /* destination address */
-    t_uscalar_t rto_initial;    /* RTO.Initial (milliseconds) */
-    t_uscalar_t rto_min;        /* RTO.Min (milliseconds) */
-    t_uscalar_t rto_max;        /* RTO.Max (milliseconds) */
-    t_uscalar_t max_retrans;    /* Path.Max.Retrans (retries) */
+    uint32_t rto_dest;       /* destination address */
+    t_uscalar_t rto_initial; /* RTO.Initial (millisec) */
+    t_uscalar_t rto_min;     /* RTO.Min (millisec) */
+    t_uscalar_t rto_max;     /* RTO.Max (millisec) */
+    t_uscalar_t max_retrans; /* Path.Max.Retrans (retries) */
 } t_sctp_rto_t;
 \s+1\fR
 .fi
+.sp
+The
+.B t_sctp_rto
+structure has the following fields:
+.RS
+.TP \w'max_retrans\(em'u
+.I rto_dest
+is a
+.B sockaddr_in
+structure that contains the destination address to which the rto parameter
+settings apply.
+.PD 0
 .TP
-.B T_SCTP_MAXSEG
+.I rto_initial
+is the
+.B t_uscalar_t
+initial retransmission timeout value in milliseconds.  For valid values, see
+.IR T_SCTP_RTO_INITIAL .
+.TP
+.I rto_min
+is the
+.B t_uscalar_t
+minimum retransmission timeout value in milliseconds.  For valid values, see
+.IR T_SCTP_RTO_MIN .
+.TP
+.I rto_max
+is the
+.B t_uscalar_t
+maximum retransmission timeout value in milliseconds.  For valid values, see
+.IR T_SCTP_RTO_MAX .
+.TP
+.I max_retrans
+is the
+.B t_uscalar_t
+maximum number of retransmissions.  For valid values, see
+.IR T_SCTP_PATH_MAX_RETRANS .
+.PD
+.PP
+For use with
+.BR T_OPTMGMT_REQ (7),
+.I dest
+must be one of the valid destination addresses associated with the transport
+connection.
+.RE
+.\"
+.TP
+.B T_SCTP_CKSUM_TYPE
+This option determines the checksum type that will be used to checksum SCTP
+packets.
+The option value is formatted as a
+.BR t_scalar_t ,
+and can have on of the following values:
+.RS
+.TP
+.I T_SCTP_CSUM_ADLER_32
+use the older RFC 2960
+.[
+rfc2960
+.]
+Adler 32 checksum to checksum SCTP packets.
+.TP
+.I T_SCTP_CSUM_CRC_32C
+use the newer RFC 3309
+.[
+rfc3309
+.]
+CRC32 checksum to checksum SCTP packets.
+.PP
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+.RE
+.\"
+.TP
+.B T_SCTP_MAC_TYPE
+This option determines the MAC (Message Authentication Code) type that will be
+used with signing cookies in INIT-ACK messages.
+The option value is formatted as a
+.BR t_scalar_t ,
+and can have one of the following values:
+.RS
+.TP
+.I T_SCTP_HMAC_NONE
+No message authentication code will be used.  The MAC field will be populated
+with all ones.  This completely disables the MAC features of
+.BR SCTP ,
+and should be used with caution.
+.TP
+.I T_SCTP_HMAC_SHA_1
+The message authentication code will use SHA-1 message digest.
+.TP
+.I T_SCTP_HMAC_MD5
+The message authentication code will use MD5 message digest.
+.PP
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+The option can be read at any time and reflects the current setting.
+.RE
+.\"
+.TP
+.B T_SCTP_COOKIE_LIFE
+Determines the cookie lifetime associated with a transport endpoint.  This is
+the amount of time that cookies sent to the peer endpoint in an INIT-ACK
+message will be valid.  For
+.B SCTP
+this also limits the maximum for which the HMAC secret key for the cookie will
+be valid.  The option value is formatted as a
+.B t_scalar_t
+that contains the time interval in milliseconds.  Valid values are zero (0) or
+greater.  The default value is that proscribed by RFC 2960.
+.[
+rfc2960
+.]
+This options is used with
+.BR T_OPTMGMT_REQ "(7), " T_CONN_REQ "(7) or " T_CONN_RES (7).
+.sp
+The value set with
+.BR T_OPTMGMT_REQ (7)
+is the value assigned to the transport endpoint.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+.sp
+Reducing this value will increase the changes that passive connection attempts
+will fail due to expired cookies.  Increasing the value will reduce the
+overall security of the system by permitting attackers an increased interval
+to crack HMACs and guess verification tags.  This value may be adjusted in
+conjunction with the
+.I T_SCTP_COOKIE_INC
+to meet most objected for successful passive connection attempts with the best
+security afforded by smaller values of
+.IR T_SCTP_COOKIE_LIFE .
+.sp
+Unfortunately the
+.IR T_SCTP_COOKIE_LIFE " and " T_SCTP_COOKIE_INC
+must be adjusted to accommodate the slowest peer on the slowest connection.
+The default setting is adequate for Internet applications.
+.\"
+.TP
+.B T_SCTP_COOKIE_INC
+This option determines the time increment (in milliseconds) that will be added
+to the lifespan of the cookie in an INIT-ACK if the sender of the INIT
+requested cookie preservation to lengthen the lifespan of the cookie.
+The option value is formatted as a
+.BR t_scalar_t .
+Valid values include zero.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+The option can be read at any time and reflects the current setting.
+.\"
+.TP
+.B T_SCTP_THROTTLE_ITVL
+Determines the interval (in milliseconds) within which the receiver will not
+accept more than one INIT or COOKIE-ECHO.
+The option value is formatted as a
+.BR t_scalar_t .
+Zero (don't throttle) is a valid value.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+The option can be read at any time and reflects the current setting.
+.\"
+.TP
+.B T_SCTP_ISTREAMS
+Sets the maximum number of inbound streams or gets the actual number of
+inbound streams associated with the transport connection.
+The option value is formatted as a
+.BR t_scalar_t .
+Valid values are from 1 to 16,736.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+For active transport connections, setting this option has no effect on the
+current transport connection.
+.\"
+.TP
+.B T_SCTP_OSTREAMS
+Sets the maximum number of outbound streams or gets the actual number of
+outbound streams associated with the transport connection.
+The option value is formatted as a
+.BR t_scalar_t .
+Valid values are from 1 to 16,736.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+For active transport connections, setting this option has no effect on the
+current transport connection.
+.\"
+.TP
+.B T_SCTP_SSN
+This option determines the SCTP Stream Sequence Number that is to be associated
+with a given data transmission.  The option value is formatted as a
+.B t_scalar_t
+that contains the numeric value of the SCTP Stream Sequence Number.  This options
+is used with
+.BR T_OPTMGMT_REQ (7).
+The SCTP transport provider determines which values will be used on all packets sent with
+.BR T_OPTDATA_REQ "(7), " T_DATA_REQ "(7), " T_EXDATA_REQ "(7) or " M_DATA (9).
+The current value, when indicated, using
+.BR T_OPTDATA_IND (7),
+will be the value that was contained in the last packet indicated with
+.BR T_OPTDATA_IND (7).
+.\"
+.TP
+.B T_SCTP_ECN
+This option determines whether the Explicit Congestion Notification (ECN)
+capability of RFC 3168
+.[
+rfc3168
+.]
+and Appendix A of RFC 2960
+.[
+rfc2960
+.]
+is used on the transport connection.
+The option value is formatted as a
+.B t_scalar_t
+and have have valid values
+.BR T_YES " or " T_NO .
+.sp
+When set to
+.BR T_YES ,
+explicit congestion notification is enabled on the transport connection.
+When set to
+.BR T_NO ,
+explicit congestion notification is disabled on the transport connection.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+For active transport connections, setting this option has no effect on the
+current transport connection.
+.\"
+.TP
+.B T_SCTP_ALI
+This option determines the adaptation layer information
+(described in draft-ietf-tsvwg-addip-sctp-08.txt)
+.[
+draft-ietf-tsvwg-addip-sctp-08.txt
+.]
+to be used in the INIT
+or INIT-ACK on all passive or active connection attempts on the transport
+endpoint, or gets the adaptation layer information provided by the transport
+peer on a connected transport endpoint.
+The option value is formatted as a
+.B t_scalar_t
+that contains the adaptation layer information.
+.sp
+When set to zero (0), no adaptation layer information will be included in the
+INIT or INIT-ACK; when non-zero, it contains the flag bits that will be sent
+in the adaptation layer information in the INIT or INIT-ACK.
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+.sp
+If the transport endpoint is in a disconnected state (and has never been
+connected), getting this option returns zero (0).  If the transport endpoint
+has been in a connected state, getting this option returns zero (0) if no
+adaptation layer information was present during the connection, or returns
+the adaptation layer information bits if provided by the peer.
+.sp
+This option supports the adaptation layer information features described in
+draft-ietf-tsvwg-addip-sctp-08.txt.
+.[
+draft-ietf-tsvwg-addip-sctp-08.txt
+.]
+.\"
+.TP
+.B T_SCTP_PR
+This option determines whether partial reliability (described in
+RFC 3758)
+.[
+rfc3758
+.]
+will be supported or required on transport connection establishment, or gets
+the indication of support for partial reliability provided by the peer on a
+connected transport endpoint.
+The option value is formatted as a
+.B t_scalar_t
+and can contain one of the following values:
+.RS
+.TP
+.I T_SCTP_PR_NONE
+do not place or response with a Forward TSN parameter in an INIT or INIT-ACK
+indicating to the peer that we do not support partial reliability for this
+transport connection.
+.TP
+.I T_SCTP_PR_PREFERRED
+place and response with a Forward TSN parameter in an INIT or INIT-ACK
+indicating to the peer that we support partial reliability, but do no require
+the peer to support partial reliability.
+.TP
+.I T_SCTP_PR_REQUIRED
+place and response with a Forward TSN parameter in an INIT or INIT-ACK
+indicating to the peer that we support partial reliability and require the
+peer to do the same.
+.PP
+For a connected transport endpoint, when this options is set to
+.BR T_SCTP_PR_PREFERRED " or " T_SCTP_PR_REQUIRED ,
+it indicates that the peer supports partial reliability.  When set to
+.BR T_SCTP_PR_NONE ,
+it indicates that the peer does not support partial reliability.
+.RE
+.\"
+.TP
+.B T_SCTP_MAX_INIT_RETRIES
+This option determines the number of times that an INIT or COOKIE-ECHO will be
+resent before abandoning the transport connection initialization.
+This option value is formatted as a
+.BR t_scalar_t .
+To be effective, this option must be set with the
+.BR T_CONN_REQ (7)
+primitive or before the
+.BR T_BIND_REQ (7)
+primitive with non-zero
+.IR CONIND_number ,
+or when a passive connection indication is accepted with
+.BR T_CONN_RES (7).
+.\"
+.TP
+.B T_SCTP_MAX_BURST
+This option determines the number of MTUs of data that will be sent in a
+single burst, as defined in
+SCTP Errata.
+.[
+rfc4460
+.]
+The option value is formatted as a
+.BR t_scalar_t .
+Valid values are one (1) or greater.  This option may be changed at any time
+during the transport connection lifetime.  This option is of local
+significance only.
+.\"
+.TP
+.B T_SCTP_ASSOC_MAX_RETRANS
+Determines the number of times that the sending endpoint will attempt
+retransmitting a packet on a given transport connection before it aborts the
+connection.
+This option is formatted as a
+.BR t_scalar_t .
+Value values include zero.  This value should be larger than the sum of all
+the
+.I T_SCTP_PATH_MAX_RETRANS
+values of each of the destinations.  This option may be changed on the stream
+at any time during the life of the transport connection.
+.\"
+.TP
+.B T_SCTP_SACK_DELAY
+This option determines the maximum SACK delay as the interval of time (in
+milliseconds) that the sending endpoint will delay an acknowledgment of a
+received DATA chunk.
+The option value is formatted as a
+.BR t_scalar_t .
+Valid values are zero (0) or greater, however, the maximum SACK delay should
+not exceed 500 milliseconds (setting this value to greater than 500
+milliseconds is forbidden by RFC 2960)
+.[
+rfc2960
+.]
+for Internet Applications.
+This option may be changed at any time during the life of the transport
+connection.
+.\"
+.TP
+.B T_SCTP_DISPOSITION
+This option determines whether SCTP will retain and deliver messages that were
+not successfully acknowledged by the peer for retrieval, or will deliver
+confirmation of acknowledgment for message successfully acknowledged by the
+peer.
+The option value is formatted as a
+.BR t_scalar_t ,
+and can have one of the following values:
+.RS
+.TP
+.I T_SCTP_DISPOSITION_NONE
+Messages will not be retained for retrieval and acknowledgments will not be
+provided for messages.
+.TP
+.I T_SCTP_DISPOSITION_UNSENT
+Messages that were unsent will be retained for retrieval.
+.TP
+.I T_SCTP_DISPOSITION_SENT
+Messages that were sent and unacknowledged, or that were unsent, will be
+retained for retrieval.
+.TP
+.I T_SCTP_DISPOSITION_GAP_ACKED
+Messages that were sent and gap acknowledged as well as messages that were
+sent and unacknowledged and messages that were unsent, will be retained for
+retrieval.
+.TP
+.I T_SCTP_DISPOSITION_ACKED
+Messages that were sent and acknowledged (but unconfirmed), messages that were
+sent and gap acknowledged, messages that were sent and unacknowledged, and
+messages that were unsent, will be retained for retrieval.
+.PP
+This option permits messages that are unsent, sent but not acknowledged or
+sent and gap acknowledged, to be retrieved from the transport endpoint before
+close.  This is accomplished by setting the
+.I T_SCTP_DISPOSITION
+option before shutdown or abort of the transport connection, and then checking
+.BR T_OPTDATA_IND (7)
+after
+.BR POLLHUP ", " SIGPIPE " or " EPIPE
+indicating a shutdown or abort of the transport connection.
+Messages then read will set the
+.I T_SCTP_DISPOSITION
+option on the transport endpoint to indicate whether they were
+.IR T_SCTP_DISPOSITION_UNSENT ", " T_SCTP_DISPOSITION_SENT ", " T_SCTP_DISPOSITION_GAP_ACKED " or " T_SCTP_DISPOSITION_ACKED .
+.PP
+If the transport endpoint has option
+.I T_SCTP_PR
+set and the peer supports partial reliability (see
+.IR T_SCTP_PR ),
+message which have failed partial reliability delivery (were dropped) will also
+be indicated by
+.BR T_OPTDATA_IND (7).
+.PP
+Alternatively, if the socket option
+.I T_SCTP_DISPOSITION
+is set to
+.IR T_SCTP_DISPOSITION_ACKED ,
+.BR T_OPTDATA_IND (7)
+will also be used to indicate
+acknowledgments for messages not acknowledged sent at the
+time of the transport connection disconnection.
+.PP
+This option is intended for use with the
+.BR sockets (3)
+library,
+is extremely non-portable,
+and has little use for
+.BR tpi (7).
+.RE
+.\"
+.TP
+.B T_SCTP_LIFETIME
+This option determines the SCTP lifetime
+.[
+rfc2960
+.]
+or the partial reliability timed reliability lifetime
+.[
+rfc3758
+.]
+associated with message that are sent on this transport endpoint.
+The option value is formatted as a
+.B t_scalar_t
+that contains the lifetime (in milliseconds).
+.\"
+.TP
+.B T_SCTP_ADD
+This option determines whether the transport endpoint will support the add IP
+extension
+.RB ( ADD-IP " and " DEL-IP )
+described in draft-ietf-tsvwg-addip-sctp-08.txt.
+.[
+draft-ietf-tsvwg-addip-sctp-08.txt
+.]
+The option value is formatted as a
+.B t_scalar_t
+that can have values
+.BR T_YES " or " T_NO .
+.sp
+When set to
+.BR T_YES ,
+this option request that SCTP respond to ASCONF chunks with ADD-IP or DEL-IP
+requests.  When set to
+.BR T_NO ,
+SCTP will refuse these requests for the transport connection.
+This option can be set or read at any time during the transport connection
+lifetime.
+.\"
+.TP
+.B T_SCTP_ADD_IP
+This option adds a IP address to an existing transport endpoint.
+The option value is formatted as a
+.B sockaddr_in
+structure that contains the local IP address to add.
+Option
+.I T_SCTP_ADD
+must be set to
+.B T_YES
+for this option to be valid.
+.sp
+If the transport stream is in a connected or connecting state, this invokes
+the ASCONF procedure to add the IP address to the existing transport
+connection.  If the transport stream is in a disconnected state, setting this
+option will add the local IP address to the addresses bound with
+.BR T_BIND_REQ (7),
+and acts as a hierarchal subsequent binding operation.
+.sp
+Note that if a transport endpoint was initially bound to
+.IR INADDR_ANY ,
+IP addresses may be automatically added to the transport connection
+if new network interfaces are added to the system, or if existing network
+interfaces are configured using
+.BR ifconfig (8)
+or equivalent commands.
+.\"
+.TP
+.B T_SCTP_DEL_IP
+This option deletes an IP address from an existing transport endpoint.
+The option value is formatted as a
+.B sockaddr_in
+structure that contains the local IP address to delete.
+Option
+.I T_SCTP_ADD
+must be set to
+.B T_YES
+for this option to be valid.
+.sp
+If the transport stream is in a connected or connecting state, this invokes
+the ASCONF procedure to remove the IP address from the transport connection.
+If the transport stream is in a disconnected state, setting this option will
+remove the local IP address from the addresses bound with
+.BR T_BIND_REQ (7),
+and acts as a hierarchal subsequent unbinding operation.
+.sp
+Note that if the transport endpoint was initially bound to
+.IR INADDR_ANY ,
+IP addresses may be automatically removed from the transport connection if
+existing network interfaces are removed from the system, or if network
+interfaces are reconfigured with
+.BR ifconfig (8)
+or equivalent commands.
+.\"
+.TP
+.B T_SCTP_SET
+This option determines whether the transport endpoint will support the add IP
+extensions
+.RB ( SET-PRIMARY )
+described in draft-ietf-tsvwg-addip-sctp-08.txt.
+.[
+draft-ietf-tsvwg-addip-sctp-08.txt
+.]
+The option value is formatted as a
+.B t_scalar_t
+that can have values
+.BR T_YES " or " T_NO .
+.sp
+When set to
+.BR T_YES ,
+this option request that SCTP respond to ASCONF chunks with SET-PRIMARY
+requests.  When set to
+.BR T_NO ,
+SCTP will refuse these requests for the transport connection.
+This option can be set or read at any time during the transport connection
+lifetime.
+.\"
 .TP
 .B T_SCTP_STATUS
-.RS
-.PP
-.nf
-\fC\s-1\
-typedef struct t_sctp_dest_status {
-    t_uscalar_t dest_addr;      /* dest address */
-    t_uscalar_t dest_cwnd;      /* dest congestion window */
-    t_uscalar_t dest_unack;     /* dest unacknowledged chunks */
-    t_uscalar_t dest_srtt;      /* dest smooth round trip time */
-    t_uscalar_t dest_rvar;      /* dest rtt variance */
-    t_uscalar_t dest_rto;       /* dest current rto */
-    t_uscalar_t dest_sst;       /* dest slow start threshold */
-} t_sctp_dest_status_t;
-\s+1\fR
-.fi
-.PP
+This option conveys the association status  and the status associated with
+each of the destination transport addresses forming the transport connection.
+This is a read-only option.
+The returned value is formatted as a
+.B t_sctp_status
+structure containing one
+.B t_sctp_dest_status
+structure for each destination transport address, formatted as follows:
+.sp
 .nf
 \fC\s-1\
 typedef struct t_sctp_status {
-    t_uscalar_t curr_rwnd;      /* current receive window */
-    t_uscalar_t curr_rbuf;      /* current receive buffer */
-    t_uscalar_t curr_nrep;      /* current dests reported */
-    t_sctp_dest_status_t curr_dest[0];  /* current primary dest */
+    t_uscalar_t curr_rwnd;   /* receive window */
+    t_uscalar_t curr_rbuf;   /* receive buffer */
+    t_uscalar_t curr_nrep;   /* dests reported */
+    t_sctp_dest_status_t curr_dest[0]; /* primary dest */
 } t_sctp_status_t;
+.sp
+typedef struct t_sctp_dest_status {
+    t_uscalar_t dest_addr;   /* address */
+    t_uscalar_t dest_cwnd;   /* congestion window */
+    t_uscalar_t dest_unack;  /* unacknowledged chunks */
+    t_uscalar_t dest_srtt;   /* smooth round trip time */
+    t_uscalar_t dest_rvar;   /* rtt variance */
+    t_uscalar_t dest_rto;    /* current rto */
+    t_uscalar_t dest_sst;    /* slow start threshold */
+} t_sctp_dest_status_t;
 \s+1\fR
 .fi
+.RS
+.PP
+The
+.B t_sctp_status
+structure has the following fields:
+.TP \w'dest_unack\(em'u
+.I curr_rwnd
+is the current advertised receive window in bytes.
+.PD 0
+.TP
+.I curr_rbuf
+is the current receive buffer size in bytes.
+.TP
+.I curr_nrep
+is the number of
+.B t_sctp_dest_status
+structure that follow this structure.
+.PD
+.PP
+The
+.B t_sctp_dest_status
+structure has the following fields:
+.TP \w'dest_unack\(em'u
+.I dest_addr
+is the address associated with this specific
+.B t_sctp_dest_status
+structure.
+.PD 0
+.TP
+.I dest_cwnd
+is the congestion window for the given destination transport address in bytes.
+.TP
+.I dest_unack
+is the number of unacknowledged DATA chunks outstanding to the given
+destination transport address in chunks.
+.TP
+.I dest_srtt
+is the smoothed round trip time for the destination transport address in
+milliseconds.
+.TP
+.I dest_rvar
+is the round trip time variance for the destination transport address in
+milliseconds.
+.TP
+.I dest_rto
+is the current value of the round trip timeout for the destination transport
+address in milliseconds.
+.TP
+.I dest_sst
+is the current value of the slow start threshold for the destination transport
+address in bytes.
+.PD
+.RE
+.\"
+.TP
+.B T_SCTP_TSN
+This option determines the SCTP Transmit Sequence Number that is to be associated
+with a given data transmission.  The option value is formatted as a
+.B t_scalar_t
+that contains the numeric value of the SCTP Transmit Sequence Number.
+This options is used with
+.BR T_OPTMGMT_REQ (7).
+The SCTP transport provider determines which values will be used on all packets sent with
+.BR T_OPTDATA_REQ "(7), " T_DATA_REQ "(7), " T_EXDATA_REQ "(7) or " M_DATA (9).
+The current value, when indicated, using
+.BR T_OPTDATA_IND (7),
+will be the value that was contained in the last packet indicated with
+.BR T_OPTDATA_IND (7).
+.\"
 .TP
 .B T_SCTP_DEBUG
+This option determines implementation specific debugging features.
+The option value is formatted as a
+.BR t_scalar_t ,
+that can be one of the following values:
+.RS
 .TP
-.B SCTP_OPTION_DROPPING
-causes the stream to drop packets.
+.I T_SCTP_OPTION_DROPPING
+the stream will drop packets at the software level for debugging purposes.
 .TP
-.B SCTP_OPTION_BREAK
-causes the stream to break the first destination.
+.I T_SCTP_OPTION_BREAK
+the stream will break the first destination address at intervals for debugging
+purposes.
 .TP
-.B SCTP_OPTION_DBREAK
-causes the stream to break destinations in both directions.
+.I T_SCTP_OPTION_DBREAK
+the stream will break destination addresses in both directions at intervals
+for debugging purposes.
 .TP
-.B SCTP_OPTION_RANDOM
-causes the stream to drop packets at random.
+.I T_SCTP_OPTION_RANDOM
+the stream will drop packets at random at the software level for debugging
+purposes.
 .RE
 .\"
 .\"
@@ -1146,8 +2160,9 @@ has several imlementations.  This manpage is for the
 implementation that provides
 .BR tpi (7)
 access to the \fBLinux Fast-STREAMS\fR version of
-.BR TCP .
+.BR SCTP .
 For more information on the
+.I OpenSS7
 Linux NET4
 version, see
 .BR sctp (7).
