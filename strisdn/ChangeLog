@@ -1,0 +1,124 @@
+2006-10-16  Brian Bidulock  <bidulcok@openss7.org>
+
+	- started off this new STREAMS ISDN package
+
+	* ChangeLog: added new package file
+	* AUTHORS: added new package file
+	* Makefile.am: added new package file
+	* NEWS: added new package file
+	* README: added new package file
+	* THANKS: added new package file
+	* acinclude.m4: added new package file
+	* configure.ac: added new package file
+	* configure.nexusware: added new package file
+	* strisdn.gif: added new package file
+	* strisdn.lsm.in: added new package file
+	* strisdn.spec.in: added new package file
+	* strisdn.tif: added new package file
+	* strisdn.xcf: added new package file
+	* strisdn.xpm: added new package file
+	* debian/README.Debian: added new package file
+	* debian/TODO.Debian: added new package file
+	* debian/changelog: added new package file
+	* debian/control.in: added new package file
+	* debian/copyright: added new package file
+	* debian/mscript_header.in: added new package file
+	* debian/mscript_postinst.in: added new package file
+	* debian/mscript_postrm.in: added new package file
+	* debian/mscript_preinst.in: added new package file
+	* debian/mscript_prerm.in: added new package file
+	* debian/rules.in: added new package file
+	* debian/strisdn-core.postinst.in: added new package file
+	* debian/strisdn-core.postrm.in: added new package file
+	* debian/strisdn-core.preinst.in: added new package file
+	* debian/strisdn-core.prerm.in: added new package file
+	* debian/strisdn-dev.postinst.in: added new package file
+	* debian/strisdn-dev.preinst.in: added new package file
+	* debian/strisdn-dev.prerm.in: added new package file
+	* debian/strisdn-devel.preinst.in: added new package file
+	* debian/strisdn-doc.postinst.in: added new package file
+	* debian/strisdn-doc.preinst.in: added new package file
+	* debian/strisdn-doc.prerm.in: added new package file
+	* debian/strisdn-init.postinst.in: added new package file
+	* debian/strisdn-init.postrm.in: added new package file
+	* debian/strisdn-init.preinst.in: added new package file
+	* debian/strisdn-init.prerm.in: added new package file
+	* debian/strisdn-lib.preinst.in: added new package file
+	* debian/strisdn-source.preinst.in: added new package file
+	* debian/strisdn-util.preinst.in: added new package file
+	* doc/Makefile.am: added new package file
+	* doc/man/Makefile.am: added new package file
+	* doc/man/strisdn.macros: added new package file
+	* doc/man/strisdn.refs: added new package file
+	* doc/manual/Makefile.am: added new package file
+	* doc/manual/bugs.texi: added new package file
+	* doc/manual/configure.texi: added new package file
+	* doc/manual/descrip.texi: added new package file
+	* doc/manual/news.texi: added new package file
+	* doc/manual/prerequisites.texi: added new package file
+	* doc/manual/releases.texi: added new package file
+	* doc/manual/rpm.texi: added new package file
+	* doc/manual/strisdn.texi: added new package file
+	* doc/manual/todo.texi: added new package file
+	* doc/manual/tree.texi: added new package file
+	* lib32/Makefile.am: added new package file
+	* src/Makefile.am: added new package file
+	* src/drivers/Config.in: added new package file
+	* src/include/Makefile.am: added new package file
+	* src/include/sys/strisdn/config.h.in: added new package file
+	* src/include/sys/strisdn/version.h.in: added new package file
+	* src/modules/Config.in: added new package file
+	* src/test/test-isdn.c: added new package file
+	* src/util/init/README: added new package file
+	* src/util/init/strisdn: added new package file
+	* src/util/init/strisdn.sh: added new package file
+	* src/util/modutils/strisdn.in: added new package file
+	* src/util/sysconfig/README: added new package file
+	* src/util/sysconfig/strisdn.conf: added new package file
+	* src/util/sysconfig/strisdn.in: added new package file
+	* tests/Makefile.am: added new package file
+	* tests/atlocal.in: added new package file
+	* tests/kernel.at: added new package file
+	* tests/local.at: added new package file
+	* tests/testsuite.at: added new package file
+
+-----
+
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+Ave, Cambridge, MA 02139, USA.
+
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+behalf of the U.S. Government ("Government"), the following provisions apply
+to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+is classified as "Commercial Computer Software" under paragraph 252.227-7014
+of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+successor regulations) and the Government is acquiring only the license rights
+granted herein (the license rights customarily provided to non-Government
+users).  If the Software is supplied to any unit or agency of the Government
+other than DoD, it is classified as "Restricted Computer Software" and the
+Government's rights in the Software are defined in paragraph 52.227-19 of the
+Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+(or any successor regulations).
+
+
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn nocin nosi

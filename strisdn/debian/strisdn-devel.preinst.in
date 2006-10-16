@@ -1,0 +1,168 @@
+#!/bin/sh
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: strisdn-devel.preinst.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:48:49 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/10/16 10:48:49 $ by $Author: brian $
+#
+# =============================================================================
+@mscript_header@
+
+function remove_warn_file() {
+    if [ -f "$1" ] ; then
+	echo "$0: warning: removing old file $1" >&2
+	rm -f -- $1
+    fi
+}
+function remove_warn_files() {
+    local f
+    for f in $@ ; do
+	remove_warn_file $f
+    done
+}
+function remove_warn_dir() {
+    if [ -d $1 -a "`(cd $1; pwd)`" != "/"  ] ; then
+	if [ -L $1 ] ; then
+	    echo "$0: warning: removing symbolic link $1" >&2
+	    rm -f -- $1
+	else
+	    echo "$0: warning: removing directory $1" >&2
+	    rm -rf -- $1
+	fi
+    fi
+}
+function remove_warn_dirs() {
+    local d
+    for d in $@ ; do
+	move_warn_dir $d
+    done
+}
+
+#
+# This is an initial installation of the doc subpackage.  We need to check for non-deb installations
+# on the host and remove any info entries that might later conflict with our entries.  We treat
+# every fresh installation like an upgrade from non-deb install.
+#
+function install_devel_preinst() { :
+    #
+    # Check for old non-deb install static libraries and header files.
+    #
+    # We are really the only distribution that has shipped static libraries for LiS, but we should
+    # go looking to clean them out in the usual places.
+    #
+    for d in /lib /usr/lib /usr/local/lib $libdir ; do
+	for subdir in / /LiS/ /lis/ /streams/ /strxnet/ ; do
+	    if [ -d $d${subdir} ] ; then
+		remove_warn_files \
+		    $d${subdir}libxnet.a \
+		    $d${subdir}libxti.a
+	    fi
+	done
+    done
+    #
+    # There are a lot of places that we and other distributions have placed header files.  We go an
+    # clean out all of them.
+    #
+    for d in /include /usr/include /usr/local/include $includedir $oldincludedir ; do
+	remove_warn_dirs \
+	    $d/strxns \
+	    $d/xnet \
+	    $d/xti
+    done
+}
+
+#
+# This is our chance to check that an old-prerm upgrade scriplet did at least somewhat what it was
+# supposed to do.  This is not as extensive as the non-deb install since we do not have to check
+# that package files are removed and we don't have to check for things from non-deb versions.
+#
+function upgrade_devel_preinst() { :
+    #
+    # Nothing to do really, all the devel subpackage is file based.
+    #
+}
+
+subpkg=devel
+
+@mscript_preinst@
+
+# =============================================================================
+#
+# $Log: strisdn-devel.preinst.in,v $
+# Revision 0.9.2.1  2006/10/16 10:48:49  brian
+# - added new package files
+#
+# Revision 0.9.2.1  2006/10/13 07:57:28  brian
+# - added initial STREAMS Channel package
+#
+# Revision 0.9.2.2  2006/10/02 11:32:12  brian
+# - changes to get master builds working for RPM and DEB
+# - added outside licenses to package documentation
+# - added LICENSE automated release file
+# - copy MANUAL to source directory
+# - add and remove devices in -dev debian subpackages
+# - get debian rules working better
+# - release library version files
+# - added notes to debian changelog
+# - corrections for cooked manual pages in spec files
+# - added release documentation to spec and rules files
+# - copyright header updates
+# - moved controlling tty checks in stream head
+# - missing some defines for LiS build in various source files
+# - added OSI headers to striso package
+# - added includes and manual page paths to acincludes for various packages
+# - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+#   files
+# - moved pragma weak statements ahead of declarations
+# - changes for master build of RPMS and DEBS with LiS
+#
+# Revision 0.9.2.1  2006/08/23 09:53:09  brian
+# - started STREAMS Terminals package
+#
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet
