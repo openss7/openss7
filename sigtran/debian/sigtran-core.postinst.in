@@ -1,0 +1,182 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: sigtran-core.postinst.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:42 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006/10/16 10:42:42 $ by $Author: brian $
+#
+# =============================================================================
+@mscript_header@
+
+function postinst_modconf_noupdate() {
+#   Check that our line is in the modules.conf file
+    conf_old=$sysconfdir/modules.conf
+    if ! grep -q 'include.*'$modutildir/$base $conf_old ; then
+	streams_dirs="$kmoduledir $kmoduledir/../preferred $kmoduledir/../default $kmoduledir/../boot"
+	streams_subs="$ksubdir misc streams"
+	conf_new=$tmppath/modules.conf.new.$$
+	cp -f $conf_old $conf_new
+#	if not, check for an old non-rpm LiS
+	if ( grep -q 'BEGIN LiS' $conf_old ) ; then
+	    conf_tmp=$tmppath/modules.conf.tmp.$$
+	    list=`find $kmoduledir/$base \( -name "*.o" -o -name "*.o.gz" \)`
+	    for p in $list ; do
+		f=`echo $p | sed -e 's|^.*/||'`
+		m=`echo $f | sed -r -e 's|\.(k)?o(\.gz)? | |'`
+#		Remove references to our modules from old installation.
+		sed -e '/alias[^#]*\<'$m'\>/d' $conf_new > $conf_tmp
+		mv -f $conf_tmp $conf_new
+#		Remove conflicting modules.
+		for d in $streams_dirs ; do
+		    for s in $streams_subs ; do
+			rm -f -- $d/$s/$f $d/$s/boot/$f
+		    done
+		done
+	    done
+	    for d in $streams_dirs ; do
+		for s in $streams_subs ; do
+		    rmdir --ignore-fail-on-non-empty $d/$s/boot $d/$s $d
+		done
+	    done
+	fi
+#	check for forced over installs of older LiS or LfS rpm installations
+#	or installs over older LiS or LfS autoconf installations
+	streams_old=$kmoduledir/modules.$kmodext
+	if [ -d $kmoduledir/$ksubdir -a -f $streams_old ] ; then
+	    streams_new=$tmppath/modules.$kmodext.new.$$
+	    streams_tmp=$tmppath/modules.$kmodext.tmp.$$
+	    cp -f $streams_old $streams_new
+	    list=`find $kmoduledir/$base -name "*.o"`
+	    for p in $list ; do
+		f=`echo $p | sed -e 's|^.*/||'`
+		m=`echo $f | sed -r -e 's|\.(k)?o(\.gz)? | |'`
+#		Remove references to our modules from old installation.
+		sed -e '/alias[^#]*\<'$m'\>/d' $streams_new > $streams_tmp
+		mv -f $streams_tmp $streams_new
+#		Remove conflicting modules.
+		for d in $streams_dirs ; do
+		    for s in $streams_subs ; do
+			rm -f -- $d/$s/$f $d/$s/boot/$f
+		    done
+		done
+	    done
+	    for d in $streams_dirs ; do
+		for s in $streams_subs ; do
+		    rmdir --ignore-fail-on-non-empty $d/$s/boot $d/$s $d
+		done
+	    done
+#	    can't make backups in modules directory
+	    chmod --reference=$streams_old $streams_new
+	    cp -f $streams_new $streams_old
+	    rm -f $streams_new
+	fi
+	echo "include $modutildir/$base" >> $conf_new
+	chmod --reference=$conf_old $conf_new
+	cp -fb --suffix=.old $conf_new $conf_old
+	rm -f $conf_new
+    fi
+}
+
+function postinst_modconf() {
+    if [ ! -f $sysconfdir/modules.conf \
+	 -o "`head -1 $sysconfdir/modules.conf`" != "### This file is automatically generated by update-modules\"" \
+	 -o ! -x /sbin/update-modules ]
+    then
+	postinst_modconf_noupdate
+    fi
+}
+
+function postinst_preload() {
+    prel_old=$sysconfdir/$preload
+    if [ -f $sysconfdir/$preload ] ; then
+	prel_new=$tmppath/$preload.new.$$
+	cp -f $prel_old $prel_new
+	for m in $KERNEL_PRELOADS ; do
+	    echo "$m"
+	done >> $prel_new
+	chmod --reference=$prel_old $prel_new
+	cp -fb --suffix=.old $prel_new $prel_old
+	rm -f $prel_new
+    fi
+}
+
+function postinst_depmod() {
+    if [ ":$kversion" = ":`uname -r`" ] ; then
+#	this is a running kernel, do a /sbin/depmod on the modules directory for
+	/sbin/depmod -ae
+    elif [ -r /boot/System.map-$kversion ] ; then
+#	non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
+	UNAME_MACHINE=%{_target_cpu} \
+	/sbin/depmod -ae -F /boot/System.map-$kversion $kversion
+    fi
+}
+
+function configure_core_postinst() { :
+    @WITH_KO_MODULES_FALSE@postinst_modconf
+    postinst_preload
+    postinst_depmod
+}
+
+subpkg=core
+
+@mscript_postinst@
+
+# =============================================================================
+#
+# $Log: sigtran-core.postinst.in,v $
+# Revision 0.9.2.1  2006/10/16 10:42:42  brian
+# - added new package files
+#
+# Revision 0.9.2.1  2006/10/13 07:57:28  brian
+# - added initial STREAMS Channel package
+#
+# Revision 0.9.2.1  2006/08/23 09:53:09  brian
+# - started STREAMS Terminals package
+#
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet
