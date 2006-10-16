@@ -5,6 +5,7 @@
 # Kernel modules.  Needs to be populated by the configuration script.  This
 # really needs to be a '.in' file.
 #STRTTY_MODULES="@STRTTY_MODULES@"
+STRTTY_PRELOAD=""
 STRTTY_DRIVERS="streams-pty"
 STRTTY_MODULES="streams-ldterm streams-pckt streams-ptem streams-ttcompat"
 # Make real character devices before intializing subsystem?
@@ -14,7 +15,7 @@ STRTTY_REMOVEDEVICES='no'
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strtty.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/13 07:00:13 $
+# @(#) $RCSfile: strtty.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/16 00:21:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -59,11 +60,14 @@ STRTTY_REMOVEDEVICES='no'
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:00:13 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:21:27 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strtty.in,v $
+# Revision 0.9.2.5  2006/10/16 00:21:27  brian
+# - do not load too many kernel modules on init
+#
 # Revision 0.9.2.4  2006/10/13 07:00:13  brian
 # - load drivers but not modules by default, but remove modules
 #

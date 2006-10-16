@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 06:48:00 $
+# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:21:27 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -44,8 +44,9 @@ fi
 
 # Specify defaults
 
-[ -n "$STRXNET_DRIVERS"       ] || STRXNET_DRIVERS="streams-ip_to_dlpi streams-ldl streams-np_ip"
-[ -n "$STRXNET_MODULES"       ] || STRXNET_MODULES="streams-ip_strm_mod"
+[ -n "$STRXNET_PRELOAD"       ] || STRXNET_PRELOAD=""
+[ -n "$STRXNET_DRIVERS"       ] || STRXNET_DRIVERS=""
+[ -n "$STRXNET_MODULES"       ] || STRXNET_MODULES="streams-timod streams-tirdwr"
 [ -n "$STRXNET_MAKEDEVICES"   ] || STRXNET_MAKEDEVICES="yes"
 [ -n "$STRXNET_REMOVEDEVICES" ] || STRXNET_REMOVEDEVICES="yes"
 
@@ -76,7 +77,7 @@ start() {
     echo -n "Loading STREAMS kernel modules: "
     RETVAL=0
     modules=
-    for module in $STRXNET_DRIVERS ; do
+    for module in $STRXNET_PRELOAD ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -147,7 +148,7 @@ stop() {
     fi
     echo -n "Unloading STREAMS kernel modules: "
     modules=
-    for module in $STRXNET_DRIVERS $STRXNET_MODULES ; do
+    for module in $STRXNET_PRELOAD $STRXNET_DRIVERS $STRXNET_MODULES ; do
 	modules="$module${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -201,7 +202,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 06:48:00 $
+# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:21:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -246,7 +247,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 06:48:00 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:21:27 $ by $Author: brian $
 #
 # =============================================================================
 

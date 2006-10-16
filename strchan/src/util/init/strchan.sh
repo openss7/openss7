@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strchan.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:48 $
+# @(#) $RCSfile: strchan.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:21:17 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -44,6 +44,7 @@ fi
 
 # Specify defaults
 
+[ -n "$STRCHAN_PRELOAD"       ] || STRCHAN_PRELOAD=""
 [ -n "$STRCHAN_DRIVERS"       ] || STRCHAN_DRIVERS=""
 [ -n "$STRCHAN_MODULES"       ] || STRCHAN_MODULES=""
 [ -n "$STRCHAN_MAKEDEVICES"   ] || STRCHAN_MAKEDEVICES="yes"
@@ -76,7 +77,7 @@ start() {
     echo -n "Loading STREAMS kernel modules: "
     RETVAL=0
     modules=
-    for module in $STRCHAN_DRIVERS ; do
+    for module in $STRCHAN_PRELOAD ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -147,7 +148,7 @@ stop() {
     fi
     echo -n "Unloading STREAMS kernel modules: "
     modules=
-    for module in $STRCHAN_DRIVERS $STRCHAN_MODULES ; do
+    for module in $STRCHAN_PRELOAD $STRCHAN_DRIVERS $STRCHAN_MODULES ; do
 	modules="$module${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -201,7 +202,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strchan.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:48 $
+# @(#) $RCSfile: strchan.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:21:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -246,11 +247,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:57:48 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:21:17 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strchan.sh,v $
+# Revision 0.9.2.2  2006/10/16 00:21:17  brian
+# - do not load too many kernel modules on init
+#
 # Revision 0.9.2.1  2006/10/13 07:57:48  brian
 # - added initial STREAMS Channel package
 #

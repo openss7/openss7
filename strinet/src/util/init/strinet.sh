@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/13 07:00:00 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/16 00:21:22 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -64,6 +64,7 @@ fi
 
 # Specify defaults
 
+[ -n "$STRINET_PRELOAD"       ] || STRINET_PRELOAD=""
 [ -n "$STRINET_DRIVERS"       ] || STRINET_DRIVERS="streams-inet streams-rawip streams-udp"
 [ -n "$STRINET_MODULES"       ] || STRINET_MODULES=""
 [ -n "$STRINET_MAKEDEVICES"   ] || STRINET_MAKEDEVICES="yes"
@@ -96,7 +97,7 @@ start() {
     echo -n "Loading STREAMS kernel modules: "
     RETVAL=0
     modules=
-    for module in $STRINET_DRIVERS ; do
+    for module in $STRINET_PRELOAD ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -181,7 +182,7 @@ stop() {
     fi
     echo -n "Unloading STREAMS kernel modules: "
     modules=
-    for module in $STRINET_DRIVERS $STRINET_MODULES ; do
+    for module in $STRINET_PRELOAD $STRINET_DRIVERS $STRINET_MODULES ; do
 	modules="$module${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -235,7 +236,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/13 07:00:00 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/16 00:21:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -280,7 +281,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:00:00 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:21:22 $ by $Author: brian $
 #
 # =============================================================================
 

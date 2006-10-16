@@ -3,6 +3,7 @@
 #
 
 # List of kernel modules in load order.
+STRCOMPAT_PRELOAD=""
 STRCOMPAT_DRIVERS=""
 STRCOMPAT_MODULES="streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-os7compat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat"
 # Make real character devices before intializing subsystem?
@@ -12,7 +13,7 @@ STRCOMPAT_REMOVEDEVICES="no"
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/13 06:59:55 $
+# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/16 00:21:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -57,7 +58,7 @@ STRCOMPAT_REMOVEDEVICES="no"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 06:59:55 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:21:20 $ by $Author: brian $
 #
 # =============================================================================
 # vim ft=conf

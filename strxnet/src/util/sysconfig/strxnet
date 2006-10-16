@@ -3,6 +3,7 @@
 #
 
 # Kernel modules in load order.
+STRXNET_PRELOAD=""
 STRXNET_DRIVERS=""
 STRXNET_MODULES="streams-timod streams-tirdwr"
 # Make real character devices before intializing subsystem?
@@ -12,7 +13,7 @@ STRXNET_REMOVEDEVICES="no"
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 06:49:50 $
+# @(#) $RCSfile: strxnet,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:21:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -57,7 +58,7 @@ STRXNET_REMOVEDEVICES="no"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 06:49:50 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:21:28 $ by $Author: brian $
 #
 # =============================================================================
 # vim ft=conf

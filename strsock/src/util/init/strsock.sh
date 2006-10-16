@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 07:00:09 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/16 00:21:24 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -44,6 +44,7 @@ fi
 
 # Specify defaults
 
+[ -n "$STRSOCK_PRELOAD"       ] || STRSOCK_PRELOAD=""
 [ -n "$STRSOCK_DRIVERS"       ] || STRSOCK_DRIVERS="streams-socksys"
 [ -n "$STRSOCK_MODULES"       ] || STRSOCK_MODULES="streams-sockmod"
 [ -n "$STRSOCK_MAKEDEVICES"   ] || STRSOCK_MAKEDEVICES="yes"
@@ -76,7 +77,7 @@ start() {
     echo -n "Loading STREAMS kernel modules: "
     RETVAL=0
     modules=
-    for module in $STRSOCK_DRIVERS ; do
+    for module in $STRSOCK_PRELOAD ; do
 	modules="${modules:+$modules }$module"
     done
     for module in $modules ; do
@@ -147,7 +148,7 @@ stop() {
     fi
     echo -n "Unloading STREAMS kernel modules: "
     modules=
-    for module in $STRSOCK_DRIVERS $STRSOCK_MODULES ; do
+    for module in $STRSOCK_PRELOAD $STRSOCK_DRIVERS $STRSOCK_MODULES ; do
 	modules="$module${modules:+ $modules}"
     done
     for module in $modules ; do
@@ -201,7 +202,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 07:00:09 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/16 00:21:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -246,11 +247,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:00:09 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:21:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strsock.sh,v $
+# Revision 0.9.2.4  2006/10/16 00:21:24  brian
+# - do not load too many kernel modules on init
+#
 # Revision 0.9.2.3  2006/10/13 07:00:09  brian
 # - load drivers but not modules by default, but remove modules
 #

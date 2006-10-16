@@ -3,6 +3,7 @@
 #
 
 # Kernel modules in load order.
+STRXNS_PRELOAD=""
 STRXNS_DRIVERS="streams-ip_to_dlpi streams-ldl streams-np_ip"
 STRXNS_MODULES="streams-ip_strm_mod"
 # Make real character devices before intializing subsystem?
@@ -12,7 +13,7 @@ STRXNS_REMOVEDEVICES="no"
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 07:00:17 $
+# @(#) $RCSfile: strxns,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/16 00:21:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -57,7 +58,7 @@ STRXNS_REMOVEDEVICES="no"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:00:17 $ by $Author: brian $
+# Last Modified $Date: 2006/10/16 00:21:30 $ by $Author: brian $
 #
 # =============================================================================
 # vim ft=conf
