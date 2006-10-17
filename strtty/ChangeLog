@@ -1,3 +1,7 @@
+2006-10-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/pckt.c: corrections for compile on SuSE 10.0 ix86
+
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: update for release

@@ -323,7 +323,7 @@ struct pckt {
 /* 
  *  PUTP and SRVP routines
  */
-static void
+static streamscall void
 pckt_enable(long arg)
 {
 	queue_t *q = (queue_t *) arg;
@@ -337,13 +337,13 @@ pckt_enable(long arg)
 }
 
 struct iocblk32 {
-	int ioc_cmd;
-	uint32_t ioc_cr;
-	uint ioc_id;
-	uint32_t ioc_count;
-	int ioc_error;
-	int ioc_rval;
-	uint32_t ioc_filler[4];
+	int ioc_cmd32;
+	uint32_t ioc_cr32;
+	uint ioc_id32;
+	uint32_t ioc_count32;
+	int ioc_error32;
+	int ioc_rval32;
+	uint32_t ioc_filler32[4];
 };
 
 static int
@@ -409,15 +409,16 @@ pckt_r_msg(queue_t *q, mblk_t *mp)
 			if ((bp = allocb(1, BPRI_MED)) == NULL)
 				goto bufcall;
 			ioc = (typeof(ioc)) mp->b_rptr;
-			ioc32.ioc_cmd = ioc->ioc_cmd;
-			ioc32.ioc_cr = (uint32_t) (long) ioc->ioc_cr;
-			ioc32.ioc_id = ioc->ioc_id;
-			ioc32.ioc_error = ioc->ioc_error;
-			ioc32.ioc_rval = ioc->ioc_rval;
-			ioc32.ioc_filler[0] = ioc->ioc_filler[0];
-			ioc32.ioc_filler[1] = ioc->ioc_filler[1];
-			ioc32.ioc_filler[2] = ioc->ioc_filler[2];
-			ioc32.ioc_filler[3] = ioc->ioc_filler[3];
+			ioc32.ioc_cmd32 = ioc->ioc_cmd;
+			ioc32.ioc_cr32 = (uint32_t) (long) ioc->ioc_cr;
+			ioc32.ioc_id32 = ioc->ioc_id;
+			ioc32.ioc_count32 = ioc->ioc_count;
+			ioc32.ioc_error32 = ioc->ioc_error;
+			ioc32.ioc_rval32 = ioc->ioc_rval;
+			ioc32.ioc_filler32[0] = ioc->ioc_filler[0];
+			ioc32.ioc_filler32[1] = ioc->ioc_filler[1];
+			ioc32.ioc_filler32[2] = ioc->ioc_filler[2];
+			ioc32.ioc_filler32[3] = ioc->ioc_filler[3];
 			mp->b_wptr = mp->b_wptr - sizeof(*ioc) + sizeof(ioc32);
 			*(struct iocblk32 *) mp->b_rptr = ioc32;
 			goto finish_it;
