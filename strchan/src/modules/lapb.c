@@ -57,7 +57,8 @@
 
 #ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $"
 
-static char const ident[] = "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $";
+static char const ident[] =
+    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $";
 
 /*
  *  This is a pushable STREAMS module that provides the Link Access Procedure
@@ -105,6 +106,7 @@ MODULE_LICENSE(LAPB_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-lapb");
+MODULE_ALIAS("streams-lapbmod");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 
@@ -116,14 +118,22 @@ MODULE_ALIAS("streams-lapb");
 #define LAPB_MOD_ID		0
 #endif
 
+#ifndef LAPB_DRV_NAME
+#define LAPB_DRV_NAME		"lapb"
+#endif
+
+#ifndef LAPB_DRV_ID
+#define LAPB_DRV_ID		0
+#endif
+
 /*
  *  STREAMS Definitions
  */
 
 #define MOD_ID		LAPB_MOD_ID
 #define MOD_NAME	LAPB_MOD_NAME
-#define DRV_ID		LAPB_MOD_ID
-#define DRV_NAME	LAPB_MOD_NAME
+#define DRV_ID		LAPB_DRV_ID
+#define DRV_NAME	LAPB_DRV_NAME
 
 #ifdef MODULE
 #define MOD_BANNER	LAPB_BANNER
@@ -133,9 +143,18 @@ MODULE_ALIAS("streams-lapb");
 #define DRV_BANNER	LAPB_SPLASH
 #endif				/* MODULE */
 
-static struct module_info lapb_minfo = {
+static struct module_info dl_mod_minfo = {
 	.mi_idnum = MOD_ID,
 	.mi_idname = MOD_NAME,
+	.mi_minpsz = STRMAXPSZ,
+	.mi_minpsz = STRMINPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
+};
+
+static struct module_info dl_mux_minfo = {
+	.mi_idnum = DRV_ID,
+	.mi_idname = DRV_NAME,
 	.mi_minpsz = STRMAXPSZ,
 	.mi_minpsz = STRMINPSZ,
 	.mi_hiwat = STRHIGH,
@@ -145,10 +164,29 @@ static struct module_info lapb_minfo = {
 /*
  *  PRIVATE STRUCTURE.
  *  ==================
+ *  When pushed as a module, a dl structure is allocated for the write side and a cd structure is
+ *  allocated for the read side and the two are linked together.  Both are given the major and minor
+ *  device number of the device over which the module is pushed.
+ *
+ *  When opened as a driver, a dl structure is allocated for the upper write and read side.  When a
+ *  cd stream is linked, a cd structure is allocated for the lower write and read sides.  When
+ *  bound, the dl and lower cd structures are linked.  A cd structure, cd_rput and cd_rsrv
+ *  procedures can still respond (negatively) to SABM/SABME requests.
+ *
+ *  Whenever the structures are linked (after push or after attach), the oq pointers point to the
+ *  upper read queue and the lower write queue.  These are the queues to test for canputnext and to
+ *  do a putnext with messages to be passed upstream or downstream.  For a module, this will test rq
+ *  and wq; for a multiplex, the upper rq and lower wq.  In this way, the put and service procedures
+ *  can be written just to use oq for both.  If the oq pointer is NULL, the structures have simply
+ *  not been linked yet.
  */
+
+struct dl;
+struct cd;
 
 struct dl {
 	struct dl *next;
+	struct cd *cd;
 	union {
 		struct {
 			major_t cmajor;
@@ -158,7 +196,39 @@ struct dl {
 	} u;
 	uint i_state;
 	uint i_oldstate;
+	queue_t *rq;
+	queue_t *wq;
+	queue_t *oq;			/* lower write queue */
 	dl_info_ack_t info;
+	uchar caddr;			/* remote command address, local response address */
+	uchar raddr;			/* remote response address, local command address */
+	uint flags;			/* boolean flags, see defines below */
+};
+
+#define DL_FLAG_EXTENDED	01
+#define DL_FLAG_MLP		02
+#define DL_FLAG_DCE		04
+
+#define dl_extended(__dl)	(!!((__dl)->flags & DL_FLAG_EXTENDED))
+#define dl_mlp(__dl)		(!!((__dl)->flags & DL_FLAG_MLP))
+#define dl_dce(__dl)		(!!((__dl)->flags & DL_FLAG_DCE))
+
+struct cd {
+	struct cd *next;
+	struct dl *dl;
+	union {
+		struct {
+			major_t cmajor;
+			minor_t cminor;
+		} dev;
+		long index;
+	} u;
+	uint i_state;
+	uint i_oldstate;
+	queue_t *rq;
+	queue_t *wq;
+	queue_t *oq;			/* upper read queue */
+	cd_info_ack_t info;
 };
 
 #define DL_PRIV(__q) ((struct dl *)((__q)->q_ptr))
@@ -179,9 +249,9 @@ cd_data_req(queue_t *q, mblk_t *dp)
 	struct dl *dl = DL_PRIV(q);
 	queue_t *oq;
 
-	if ((oq = dl->wq->q_next) || (oq = (dl->hdlc ? dl->hdlc->wq : NULL))) {
-		if (canputnext(oq)) {
-			putnext(oq, dp);
+	if (dl->oq) {
+		if (canputnext(dl->oq)) {
+			putnext(dl->oq, dp);
 			return (0);
 		}
 		return (-EBUSY);
@@ -254,7 +324,7 @@ dl_send_i_frame(queue_t *q, mblk_t *dp, uchar pf, uchar nr, uchar ns)
 	int err;
 
 	if ((mp = dl_allocb(q, FASTBUF, BPRI_MED, dl->caddr, dp))) {
-		if (dl->extended) {
+		if (dl_extended(dl)) {
 			*mp->b_wptr++ = ns;
 			*mp->b_wptr++ = (pf << 7) | nr;
 		} else {
@@ -276,7 +346,7 @@ dl_send_s_frame(queue_t *q, uchar cmd, uchar pf, uchar nr, uchar mtype)
 	int err;
 
 	if ((mp = dl_allocb(q, FASTBUF, BPRI_MED, cmd ? dl->caddr : dl->raddr, NULL))) {
-		if (dl->extended) {
+		if (dl_extended(dl)) {
 			*mp->b_wptr++ = mtype;
 			*mp->b_wptr++ = (pf << 7) | nr;
 		} else {
@@ -373,7 +443,7 @@ dl_send_frmr(queue_t *q, ushort rfcf, uchar pf, uchar vs, uchar cr, uchar vr, uc
 
 	if ((mp = dl_allocb(q, FASTBUF, BPRI_MED, dl->raddr, NULL))) {
 		*mp->b_wptr++ = DL_MTYPE_FRMR | (pf << 3);
-		if (dl->extended) {
+		if (dl_extended(dl)) {
 			if (rfcf & 0xff00) {
 				*mp->b_wptr++ = (rfcf >> 8);
 				*mp->b_wptr++ = rfcf & 0xff;
@@ -589,7 +659,7 @@ dl_recv_msg_slow(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	uchar pf, ns, nr, ad, ml, ca, ra, de;
-	int ext = !!dl->extended;
+	int ext = dl_extended(dl);
 	int num = ((mp->b_rptr[1] & 0xC0) != 0xC0);
 	int inf = ((mp->b_rptr[1] & 0x80) == 0x00);
 	int size = msgdsize(mp);
@@ -605,8 +675,8 @@ dl_recv_msg_slow(queue_t *q, mblk_t *mp)
 	nr = num ? (ext ? (mp->b_rptr[2] & 0x7f) : (mp->b_rptr[1] & 0x07)) : 0;
 	ns = inf ? (ext ? (mp->b_rptr[1] & 0x7f) : ((mp->b_rptr[1] & 0x70) >> 4)) : 0;
 	pf = ((num && ext) ? (mp->b_rptr[2] >> 7) : (mp->b_rptr[1] >> 3)) & 0x01;
-	ml = dl->mlp ? 0x02 : 0x01;
-	de = dl->dce ? 0x08 : 0x04;
+	ml = dl_mlp(dl) ? 0x02 : 0x01;
+	de = dl_dce(dl) ? 0x08 : 0x04;
 
 	/*- Addresses:
 	 *  SLP:    A 0xC0  DCE->DTE command  DCE<-DTE response
@@ -712,14 +782,14 @@ dl_recv_msg_slow(queue_t *q, mblk_t *mp)
 			goto toolong;
 		return dl_recv_i(q, mp, cmd, pf, ns, nr);
 	}
-	/* Frame rejection condition: A frame rejection condition is established upon the receipt of
-	 * an error-free frame with one of the conditions listed below.  At the DCE or DTE, this frame
-	 * rejection exception condition is reported by an FRMR response for approprite DTE or DCE
-	 * action, respectively.  Once a DCE has established such an exception condition, no
-	 * additional I frames are accepted until the condition is reset by the DTE, except for
-	 * examination of the P bit.  The FRMR response may be repeated at each opportunity, until
-	 * recovery is effected by the DTE, or until the DCE initiates its own recovery in case the
-	 * DTE does not respond. */
+	/* Frame rejection condition: A frame rejection condition is established upon the receipt
+	   of an error-free frame with one of the conditions listed below.  At the DCE or DTE, this 
+	   frame rejection exception condition is reported by an FRMR response for approprite DTE
+	   or DCE action, respectively.  Once a DCE has established such an exception condition, no
+	   additional I frames are accepted until the condition is reset by the DTE, except for
+	   examination of the P bit.  The FRMR response may be repeated at each opportunity, until
+	   recovery is effected by the DTE, or until the DCE initiates its own recovery in case the
+	   DTE does not respond. */
 	{
 		uchar flags;
 
@@ -748,23 +818,24 @@ dl_recv_msg_slow(queue_t *q, mblk_t *mp)
 		return dl_send_frmr();
 	}
       discard:
-	/* Invalid frame condition: Any frame that is invalid will be discarded, and no action taken
-	 * as a result of that frame.  An invalid frame is defined as one which: a) is not properly
-	 * bounded by two flags; b) in basic (modulo 8) operation, contains fewer than 32 bits between
-	 * flags; in extended (modulo 128) operation, contains fewer than 40 bits between flags of
-	 * frames that contain sequence numbers or 32 bits between flags of frames that do not contain
-	 * sequence numbers; c) or start/stop transmission, in addition to conditions listed in b),
-	 * contains an octet-framing violoation (i.e. a 0 bit occurs where a stop bit is expected); d)
-	 * contains a Frame Check Sequence (FCS) error; e) contains an address other than A or B (for
-	 * single link operation) or other than C or D (for multilink operation); or, f) frame
-	 * aborted: in synchronous transmission, a frame is aborted when it contains at least seven
-	 * contiguous 1 bits (with no inserted 0 bit); in start/stop transmission, a frame is aborted
-	 * when it contains the two-octet sequence composed fo the control escape octet followed by a
-	 * closing flag.  For those networks that are octet aligned, a detection of non-octet
-	 * alignment may be made at the Data Link Layer by adding a frame validity check that requires
-	 * the number of bits between the opening flag and the closing flag, excluding inserted bits
-	 * (for transparency or for transmission timing for start/stop transmission), to be an
-	 * integral number of octets in length, or the frame is considered invalid. */
+	/* Invalid frame condition: Any frame that is invalid will be discarded, and no action
+	   taken as a result of that frame.  An invalid frame is defined as one which: a) is not
+	   properly bounded by two flags; b) in basic (modulo 8) operation, contains fewer than 32
+	   bits between flags; in extended (modulo 128) operation, contains fewer than 40 bits
+	   between flags of frames that contain sequence numbers or 32 bits between flags of frames 
+	   that do not contain sequence numbers; c) or start/stop transmission, in addition to
+	   conditions listed in b), contains an octet-framing violoation (i.e. a 0 bit occurs where 
+	   a stop bit is expected); d) contains a Frame Check Sequence (FCS) error; e) contains an
+	   address other than A or B (for single link operation) or other than C or D (for
+	   multilink operation); or, f) frame aborted: in synchronous transmission, a frame is
+	   aborted when it contains at least seven contiguous 1 bits (with no inserted 0 bit); in
+	   start/stop transmission, a frame is aborted when it contains the two-octet sequence
+	   composed fo the control escape octet followed by a closing flag.  For those networks
+	   that are octet aligned, a detection of non-octet alignment may be made at the Data Link
+	   Layer by adding a frame validity check that requires the number of bits between the
+	   opening flag and the closing flag, excluding inserted bits (for transparency or for
+	   transmission timing for start/stop transmission), to be an integral number of octets in
+	   length, or the frame is considered invalid. */
 
 	freemsg(mp);
 	return (0);
@@ -922,7 +993,7 @@ dl_other_req(queue_t *q, mblk_t *mp)
 }
 
 static streams_noinline streams_fastcall int
-lapb_w_data(queue_t *q, mblk_t *mp)
+dl_w_data(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	int rtn;
@@ -941,7 +1012,7 @@ lapb_w_data(queue_t *q, mblk_t *mp)
 }
 
 static streams_noinline streams_fastcall int
-lapb_w_proto(queue_t *q, mblk_t *mp)
+dl_w_proto(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(uint32_t))) {
 		__swerr();
@@ -1041,7 +1112,7 @@ lapb_w_proto(queue_t *q, mblk_t *mp)
 }
 
 static streams_noinline streams_fastcall __unlikely int
-lapb_w_flush(queue_t *q, mblk_t *mp)
+dl_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHW) {
 		if (mp->b_rptr[0] & FLUSHBAND)
@@ -1053,7 +1124,7 @@ lapb_w_flush(queue_t *q, mblk_t *mp)
 		struct dl *dl = DL_PRIV(q);
 		queue_t *oq;
 
-		if ((oq = q->q_next) || (oq = dl->hdlc ? dl->hdlc->wq : NULL)) {
+		if ((oq = dl->oq)) {
 			put(oq, mp);
 			return (0);
 		}
@@ -1072,38 +1143,39 @@ lapb_w_flush(queue_t *q, mblk_t *mp)
 }
 
 static streams_noinline streams_fastcall __unlikely int
-lapb_wmsg_slow(queue_t *q, mblk_t *mp)
+dl_msg_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
-		return lapb_w_data(q, mp);
+		return dl_w_data(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
-		return lapb_w_proto(q, mp);
+		return dl_w_proto(q, mp);
 	case M_IOCTL:
 	case M_IOCDATA:
-		return lapb_w_ioctl(q, mp);
+		return dl_w_ioctl(q, mp);
 	case M_FLUSH:
-		return lapb_w_flush(q, mp);
+		return dl_w_flush(q, mp);
 	default:
-		return lapb_w_other(q, mp);
+		return dl_w_other(q, mp);
 	}
 }
 
 static streams_inline streams_fastcall __hot_write int
-lapb_wmsg(queue_t *q, mblk_t *mp)
+dl_msg(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	uchar type;
 
+	/* FIXME: this really needs to be reworked. */
 	/* optimized for data */
 	if ((type = mp->b_datap->db_type) == M_DATA) {
 		queue_t *oq;
 
 		/* just pass it */
-		if ((oq = q->q_next) || (oq = dl->hdlc ? dl->hdlc->wq : NULL)) {
-			if (bcanput(oq, mp->b_band)) {
-				put(oq, mp);
+		if ((oq = dl->oq)) {
+			if (bcanputnext(oq, mp->b_band)) {
+				putnext(oq, mp);
 				return (0);
 			}
 			return (-EBUSY);
@@ -1111,21 +1183,21 @@ lapb_wmsg(queue_t *q, mblk_t *mp)
 		/* in the wrong state, go slow */
 	}
 	if (type == M_PROTO || type = M_PCPROTO) {
-		union DL_primitives *dl = (typeof(dl)) mp->b_rptr;
+		union DL_primitives *p = (typeof(p)) mp->b_rptr;
 
-		dassert(mp->b_wptr >= mp->b_rptr + sizeof(dl->dl_primitive));
-		if (dl->dl_primitive == DL_UNITDATA_REQ && mp->b_cont && msgdsize(mp->b_cont)) {
+		dassert(mp->b_wptr >= mp->b_rptr + sizeof(p->dl_primitive));
+		if (p->dl_primitive == DL_UNITDATA_REQ && mp->b_cont && msgdsize(mp->b_cont)) {
 			queue_t *oq;
 
 			/* just pass the data */
-			if ((oq = q->q_next) || (oq = dl->hdlc ? dl->hdlc->wq : NULL)) {
+			if ((oq = dl->oq)) {
 				uchar band = mp->b_band;
 
-				if (bcanput(oq, band)) {
+				if (bcanputnext(oq, band)) {
 					/* strip the M_(PC)PROTO */
 					freeb(XCHG(&mp, mp->b_cont));
 					mp->b_band = band;
-					putnext(q, mp);
+					putnext(oq, mp);
 					return (0);
 				}
 				return (-EBUSY);
@@ -1133,7 +1205,7 @@ lapb_wmsg(queue_t *q, mblk_t *mp)
 			/* in the wrong state, go slow */
 		}
 	}
-	return lapb_wmsg_slow(q, mp);
+	return dl_msg_slow(q, mp);
 }
 
 /*
@@ -1141,29 +1213,29 @@ lapb_wmsg(queue_t *q, mblk_t *mp)
  *  ======================
  */
 static streams_noinline streams_fastcall __unlikely int
-lapb_rmsg_slow(queue_t *q, mblk_t *mp)
+cd_msg_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
-		return lapb_r_data(q, mp);
+		return dl_r_data(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
-		return lapb_r_proto(q, mp);
+		return dl_r_proto(q, mp);
 	case M_FLUSH:
-		return lapb_r_flush(q, mp);
+		return dl_r_flush(q, mp);
 	case M_HANGUP:
-		return lapb_r_hangup(q, mp);
+		return dl_r_hangup(q, mp);
 	case M_ERROR:
-		return lapb_r_error(q, mp);
+		return dl_r_error(q, mp);
 	case M_SETOPTS:
-		return labp_r_setopts(q, mp);
+		return dl_r_setopts(q, mp);
 	default:
-		return lapb_r_other(q, mp);
+		return dl_r_other(q, mp);
 	}
 }
 
 static streams_inline streams_fastcall __hot_read int
-lapb_rmsg(queue_t *q, mblk_t *mp)
+cd_msg(queue_t *q, mblk_t *mp)
 {
 	uchar type;
 
@@ -1194,85 +1266,43 @@ lapb_rmsg(queue_t *q, mblk_t *mp)
 			return (-EBUSY);
 		}
 	}
-	return lapb_rmsg_slow(q, mp);
+	return cd_msg_slow(q, mp);
 }
 
 /*
  *  PUT and SERVICE procedures.
  *  ===========================
  */
-STATIC streamscall int
-lapb_rput(queue_t *q, mblk_t *mp)
-{
-	/* This must only be called if we are pushed as a module */
-	assert(backq(q) != NULL);
 
-	/* note that an M_FLUSH will pass through to lapb_rmsg() */
-	if ((mp->b_datap->db_type < QPCTL && (q->q_flag & QSVCBUSY))
-	    || lapb_rmsg(q, mp)) {
+/*
+ * The cd_rput() and cd_rsrv() procedures are used if we are pushed as a module.  When opened
+ * as a driver, the dl_rput() and dl_rsrv() procedures are used on the upper multiplex instead.
+ */
+
+STATIC streamscall int
+cd_rput(queue_t *q, mblk_t *mp)
+{
+	if ((!pcmsg(mp->b_datap->db_type) && (q->q_first || (q->q_flag & QSVCBUSY)))
+	    || cd_msg(q, mp)) {
 		if (putq(q, mp))
 			return (0);
-		__swerr();
+		swerr();
 		freemsg(mp);
 	}
 	return (0);
 }
 
 STATIC streamscall int
-lapb_rsrv(queue_t *q)
-{
-	mblk_t *mp;
-
-	/* this part runs if we were pushed as a module */
-	while ((mp = getq(q))) {
-		if (lapb_rmsg(q, mp)) {
-			dassert(mp->b_datap->db_type < QPCTL);
-			if (putbq(q, mp))
-				break;
-			__swerr();
-			freemsg(mp);
-			continue;
-		}
-	}
-	/* this part runs if we are opened as a driver */
-	if (mp == NULL) {
-		/* processed all messages on queue, back-enable across the mux */
-		struct dl *dl = DL_PRIV(q);
-
-		if (dl->hdlc && (q = dl->hdlc->rq)) {
-			enableok(q);
-			qenable(q);
-		}
-	}
-	return (0);
-}
-
-STATIC streamscall int
-lapb_wput(queue_t *q, mblk_t *mp)
-{
-	/* note that an M_FLUSH will pass through to lapb_wmsg(), all others will queue if
-	   necessary. */
-	if ((mp->b_datap->db_type != M_FLUSH && (q->q_first || (q->q_flag & QSVCBUSY)))
-	    || lapb_wmsg(q, mp)) {
-		if (putq(q, mp))
-			return (0);
-		__swerr();
-		freemsg(mp);
-	}
-	return (0);
-}
-
-STATIC streamscall int
-lapb_wsrv(queue_t *q)
+cd_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 
 	while ((mp = getq(q))) {
-		if (lapb_wmsg(q, mp)) {
-			dassert(mp->b_datap->db_type < QPCTL);
+		if (cd_msg(q, mp)) {
+			dassert(!pcmsg(mp->b_datap->db_type));
 			if (putbq(q, mp))
 				break;
-			__swerr();
+			swerr();
 			freemsg(mp);
 		}
 	}
@@ -1280,142 +1310,140 @@ lapb_wsrv(queue_t *q)
 }
 
 STATIC streamscall int
-hdlc_rput(queue_t *q, mblk_t *mp)
+dl_rput(queue_t *q, mblk_t *mp)
 {
-	/* note that M_FLUSH will pass through to hdlc_rmsg(), all others will queue if necessary. */
-	if ((mp->b_datap->db_type != M_FLUSH && (q->q_first || (q->q_flag & QSVCBUSY)))
-	    || hdlc_rmsg(q, mp)) {
-		if (putq(q, mp))
-			return (0);
-		__swerr();
-		freemsg(mp);
-	}
-	return (0);
-}
-
-STATIC streamscall int
-hdlc_rsrv(queue_t *q)
-{
-	mblk_t *mp;
-
-	while ((mp = getq(q))) {
-		if (hdlc_rmsg(q, mp)) {
-			dassert(mp->b_datap->db_type < QPCTL);
-			if (putbq(q, mp))
-				break;
-			__swerr();
-			freemsg(mp);
-		}
-	}
-	return (0);
-}
-
-#if 0
-/* Pass everything along, we never write to this queue anyway. */
-STATIC streamscall int
-hdlc_wput(queue_t *q, mblk_t *mp)
-{
+	/* must never put a message to this queue, always put it to the next queue */
+	swerr();
 	putnext(q, mp);
 	return (0);
 }
-#endif
 
-/* Only gets invoked when back-enabling. */
 STATIC streamscall int
-hdlc_wsrv(queue_t *q)
+dl_rsrv(queue_t *q)
 {
-	struct cd *cd = CD_PRIV(q);
+	{
+		mblk_t *mp;
 
-	if (cd->lapd && (q = cd->lapd->wq)) {
-		/* back-enable across the mux */
-		enableok(q);
-		qenable(q);
+		/* never put messages to this queue, always the next queue */
+		while ((mp = getq(q))) {
+			swerr();
+			putnext(q, mp);
+		}
+	}
+	{
+		struct dl *dl = DL_PRIV(q);
+
+		if (dl->oq) {
+			/* backenable across the multiplexer */
+			enableok(dl->oq);
+			qenable(dl->oq);
+			return (0);
+		}
 	}
 }
 
+STATIC streamscall int
+cd_wput(queue_t *q, mblk_t *mp)
+{
+	/* never put messages to this queue, always the next queue */
+	swerr();
+	putnext(q, mp);
+	return (0);
+}
+
+STATIC streamscall int
+cd_wsrv(queue_t *q)
+{
+	{
+		mblk_t *mp;
+
+		/* never put messages to this queue, always the next queue */
+		while ((mp = getq(q))) {
+			swerr();
+			putnext(q, mp);
+		}
+	}
+	{
+		struct cd *cd = CD_PRIV(q);
+
+		if (cd->oq) {
+			/* backenable across the multiplexer */
+			enableok(cd->oq);
+			qenable(cd->oq);
+			return (0);
+		}
+	}
+}
+
+STATIC streamscall int
+dl_wput(queue_t *q, mblk_t *mp)
+{
+	if ((!pcmsg(mp->b_datap->db_type) && (q->q_first || (q->q_flag & QSVCBUSY)))
+	    || dl_msg(q, mp)) {
+		if (putq(q, mp))
+			return (0);
+		swerr();
+		freemsg(mp);
+	}
+	return (0);
+}
+
+STATIC streamscall int
+dl_wsrv(queue_t *q)
+{
+	mblk_t *mp;
+
+	while ((mp = getq(q))) {
+		if (dl_msg(q, mp)) {
+			dassert(!pcmsg(mp->b_datap->db_type));
+			if (putbq(q, mp))
+				break;
+			swerr();
+			freemsg(mp);
+		}
+	}
+	return (0);
+}
 
 /*
  *  OPEN and CLOSE routines.
  *  ========================
  */
 STATIC streamscall int
-lapb_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
+dl_mod_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
-	int mindex = 0;
-	major_t cmajor = getmajor(*devp);
-	minor_t cminor = getminor(*devp);
-	struct dl *dl, **dlp;
-	unsigned long flags;
-	mblk_t *mp;
 	struct stroptions *so;
+	cd_info_req_t *p;
+	struct dl *dl;
+	struct cd *cd;
+	mblk_t *mp, *bp;
 
-	if (q->q_ptr != NULL) {
+	if (q->q_ptr != NULL)
 		return (0);	/* already open */
-	}
-	if ((mp = allocb(sizeof(*so), BPRI_MED)) == NULL)
-		return (ENOBUFS);
-	if (sflag == MODOPEN || WR(q)->q_next) {
-		/* pushed as module */
-		dlp = &master.mods.list;
-
-		write_lock_str(&master.lock, flags);
-		dl = lapb_alloc_priv(q, dlp, devp, crp);
-		write_unlock_str(&master.lock, flags);
-	} else {
-		/* opened as driver */
-		/* Linux Fast-STREAMS always passes internal major device number (module id).  Note 
-		   also, however, that strconf-sh attempts to allocate module ids that are
-		   identical to the abse major device number anyway. */
-		dlp = &master.lapb.list;
-#ifdef LIS
-		/* sorry, cannot open by minor device number */
-		if (cmajor != CMAJOR_0 || cminor != 0) {
-			ptrace(("%s: ERROR: cannot open specific minor\n", DRV_NAME));
-			freeb(mp);
-			return (ENXIO);
-		}
-#endif				/* LIS */
-#ifdef LFS
-		/* sorry, cannot open by minor device number */
-		if (cmajor != DRV_ID || cminor != 0) {
-			ptrace(("%s: ERROR: cannot open specific minor\n", DRV_NAME));
-			freeb(mp);
-			return (ENXIO);
-		}
-#endif				/* LFS */
-		cminor = 1;
-		write_lock_str(&master.lock, flags);
-		for (; *dlp; dlp = &(*dlp)->next) {
-			if (cmajor != (*dlp)->u.dev.cmajor)
-				break;
-			if (cmajor == (*dlp)->u.dev.cmajor) {
-				if (cminor < (*dlp)->u.dev.cminor) {
-					if (++cminor >= NMINORS) {
-						if (++mindex >= CMAJORS
-						    || !(cmajor = lapb_majors[mindex]))
-							break;
-						cminor = 0;
-					}
-					continue;
-				}
-			}
-		}
-		if (mindex >= CMAJORS || !cmajor) {
-			ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-			write_unlock_str(&master.lock, flags);
-			freeb(mp);
-			return (ENXIO);
-		}
-		_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
-		*devp = makedevice(cmajor, cminor);
-		dl = lapb_alloc_priv(q, dlp, devp, crp);
-		write_unlock_str(&master.lock, flags);
-	}
-	if (dl == NULL) {
-		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
+	if (sflag != MODOPEN || WR(q)->q_next == NULL)
+		return (ENXIO); /* cannot be opened as driver */
+	if ((mp = allocb(sizeof(*so), BPRI_WAITOK)) == NULL)
+		return (ENXIO);
+	if ((bp = allocb(sizeof(*p), BPRI_WAITOK)) == NULL) {
 		freeb(mp);
-		return (ENOMEM);
+		return (ENXIO);
 	}
+	if ((cd = kmem_alloc(sizeof(*cd)+sizeof(*dl), KM_SLEEP)) == NULL) {
+		freeb(mp);
+		freeb(bp);
+		return (ENXIO);
+	}
+	bzero(cd, sizeof(*cd) + sizeof(*dl));
+	dl = (typeof(dl)) (cd+1);
+	cd->dl = dl;
+	dl->cd = cd;
+	cd->u.dev.cmajor = dl->u.dev.cmajor = getmajor(*devp);
+	cd->u.dev.cminor = dl->u.dev.cminor = getminor(*devp);
+	cd->rq = dl->rq = cd->oq = q;
+	cd->wq = dl->wq = dl->oq = WR(q);
+	q->q_ptr = (void *)cd;
+	WR(q)->q_ptr = (void *)dl;
+
 	so = (typeof(so)) mp->b_wptr;
 #ifdef LFS
 	so->so_flags |= SO_SKBUFF;
@@ -1424,13 +1452,118 @@ lapb_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	so->so_wroff = 12;
 	/* Not really necessary for modules. */
 	so->so_flags |= SO_MINPSZ;
-	so->so_minpsz = lapb_minfo.mi_minpsz;
+	so->so_minpsz = dl_minfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
-	so->so_maxpsz = lapb_minfo.mi_maxpsz;
+	so->so_maxpsz = dl_minfo.mi_maxpsz;
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = lapb_minfo.mi_hiwat;
+	so->so_hiwat = dl_minfo.mi_hiwat;
 	so->so_flags |= SO_LOWAT;
-	so->so_lowat = lapb_minfo.mi_lowat;
+	so->so_lowat = dl_minfo.mi_lowat;
+	mp->b_wptr += sizeof(*so);
+	mp->b_datap->db_type = M_SETOPTS;
+	putnext(q, mp);
+
+	qprocson(q);
+
+	/* interrogate the driver */
+	p = (typeof(p)) bp->b_rptr;
+	bp->b_wptr += sizeof(*p);
+	p->cd_primitive = CD_INFO_REQ;
+	putnext(WR(q), bp);
+	return (0);
+}
+STATIC streamscall int
+dl_mux_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
+{
+	int mindex = 0;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	struct dl *dl, **dlp = &master.dl.list;
+	unsigned long flags;
+	mblk_t *mp;
+	struct stroptions *so;
+
+	if (q->q_ptr != NULL) {
+		return (0);	/* already open */
+	}
+	if (sflag == MODOPEN || WR(q)->q_next)
+		return (ENXIO);
+
+	/* Linux Fast-STREAMS always passes internal major device number (module id).  Note also,
+	   however, that strconf-sh attempts to allocate module ids that are identical to the base
+	   major device number anyway. */
+#ifdef LIS
+	/* sorry, cannot open by minor device number */
+	if (cmajor != CMAJOR_0 || cminor != 0) {
+		ptrace(("%s: ERROR: cannot open specific minor\n", DRV_NAME));
+		return (ENXIO);
+	}
+#endif				/* LIS */
+#ifdef LFS
+	/* sorry, cannot open by minor device number */
+	if (cmajor != DRV_ID || cminor != 0) {
+		ptrace(("%s: ERROR: cannot open specific minor\n", DRV_NAME));
+		return (ENXIO);
+	}
+#endif				/* LFS */
+	if ((mp = allocb(sizeof(*so), BPRI_WAITOK)) == NULL)
+		return (ENOBUFS);
+	if ((dl = kmem_alloc(sizeof(*dl), KM_SLEEP)) == NULL) {
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
+		freeb(mp);
+		return (ENOMEM);
+	}
+	bzero(dl, sizeof(*dl));
+	cminor = 1;
+	write_lock_str(&master.lock, flags);
+	for (; *dlp; dlp = &(*dlp)->next) {
+		if (cmajor != (*dlp)->u.dev.cmajor)
+			break;
+		if (cmajor == (*dlp)->u.dev.cmajor) {
+			if (cminor < (*dlp)->u.dev.cminor) {
+				if (++cminor >= NMINORS) {
+					if (++mindex >= CMAJORS || !(cmajor = dl_majors[mindex]))
+						break;
+					cminor = 0;
+				}
+				continue;
+			}
+		}
+	}
+	if (mindex >= CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
+		write_unlock_str(&master.lock, flags);
+		kmem_free(dl, sizeof(*dl));
+		freeb(mp);
+		return (ENXIO);
+	}
+	_printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
+	*devp = makedevice(cmajor, cminor);
+	dl->u.dev.cmajor = cmajor;
+	dl->u.dev.cminor = cminor;
+	dl->rq = q;
+	dl->wq = WR(q);
+	dl->next = *dlp;
+	*dlp = dl;
+	write_unlock_str(&master.lock, flags);
+
+	q->q_ptr = WR(q)->q_ptr = (void *)dl;
+
+	so = (typeof(so)) mp->b_wptr;
+#ifdef LFS
+	so->so_flags |= SO_SKBUFF;
+#endif				/* LFS */
+	so->so_flags |= SO_WROFF;
+	so->so_wroff = 12;
+	/* Not really necessary for modules. */
+	so->so_flags |= SO_MINPSZ;
+	so->so_minpsz = dl_minfo.mi_minpsz;
+	so->so_flags |= SO_MAXPSZ;
+	so->so_maxpsz = dl_minfo.mi_maxpsz;
+	so->so_flags |= SO_HIWAT;
+	so->so_hiwat = dl_minfo.mi_hiwat;
+	so->so_flags |= SO_LOWAT;
+	so->so_lowat = dl_minfo.mi_lowat;
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
@@ -1438,7 +1571,30 @@ lapb_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	return (0);
 }
 STATIC streamscall int
-lapb_close(queue_t *q, dev_t *devp, int oflags)
+dl_mod_close(queue_t *q, dev_t *devp, int oflags)
+{
+	struct cd *cd = CD_PRIV(q);
+
+	_printd(("%s: closing character device %d:%d\n", DRV_NAME, cd->u.dev.cmajor,
+		 cd->u.dev.cminor));
+#ifdef LIS
+	/* protect agains LIS bugs */
+	if (q->q_ptr == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
+		return (0);
+	}
+	if (q->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			DRV_NAME, __FUNCTION__);
+	}
+	/* make sure procedures are off */
+	qprocsoff(q);
+	q->q_ptr = WR(q)->q_ptr = NULL;
+	kmem_free(cd, sizeof(*cd) + sizeof(*cd->dl));
+	return (0);
+}
+STATIC streamscall int
+dl_mux_close(queue_t *q, dev_t *devp, int oflags)
 {
 	struct dl *dl = DL_PRIV(q);
 
@@ -1456,36 +1612,67 @@ lapb_close(queue_t *q, dev_t *devp, int oflags)
 	}
 	/* make sure procedures are off */
 	qprocsoff(q);
-	lpab_free_priv(q);	/* unlink and free structure */
+	q->q_ptr = WR(q)->q_ptr = NULL;
+	kmem_free(dl, sizeof(*dl));
 	return (0);
 }
 
 /*
  *  STREAMS Definitions
  *  ===================
- *
+ */
+
+/*
+ *  Module
+ *  ------
+ */
+
+static struct module_stat dl_mod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat dl_mod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+
+static struct qinit dl_mod_rinit = {
+	.qi_putp = cd_rput,
+	.qi_srvp = cd_rsrv,
+	.qi_qopen = dl_mod_open,
+	.qi_qclose = dl_mod_close,
+	.qi_minfo = &dl_mod_minfo,
+	.qi_mstat = &dl_mod_rstat,
+};
+static struct qinit dl_mod_winit = {
+	.qi_putp = dl_wput,
+	.qi_srvp = dl_wsrv,
+	.qi_minfo = &dl_mod_minfo,
+	.qi_mstat = &dl_mod_wstat,
+};
+
+MODULE_STATIC struct streamtab lapbmodinfo = {
+	.st_rdinit = &dl_mod_rinit,
+	.st_wrinit = &dl_mod_winit,
+};
+
+/*
  *  Upper Multiplex.
  *  ----------------
  *  Provides a DLPI interface at the upper multiplex.  This can also be pushed
  *  as a module that presents a DLPI upper service interface.
  */
 
-static struct module_stat lapb_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat lapb_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat dl_mux_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat dl_mux_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
-static struct qinit lapb_rinit = {
-	.qi_putp = lapb_rput,
-	.qi_srvp = lapb_rsrv,
-	.qi_qopen = lapb_open,
-	.qi_qclose = lapb_close,
-	.qi_minfo = &lapb_minfo,
-	.qi_mstat = &lapb_rstat,
+static struct qinit dl_mux_rinit = {
+	.qi_putp = dl_rput,
+	.qi_srvp = dl_rsrv,
+	.qi_qopen = dl_mux_open,
+	.qi_qclose = dl_mux_close,
+	.qi_minfo = &dl_mux_minfo,
+	.qi_mstat = &dl_mux_rstat,
 };
-static struct qinit lapb_winit = {
-	.qi_putp = lapb_wput,
-	.qi_srvp = lapb_wsrv,
-	.qi_minfo = &lapb_minfo,
-	.qi_mstat = &lapb_wstat,
+static struct qinit dl_mux_winit = {
+	.qi_putp = dl_wput,
+	.qi_srvp = dl_wsrv,
+	.qi_minfo = &dl_mux_minfo,
+	.qi_mstat = &dl_mux_wstat,
 };
 
 /*
@@ -1495,29 +1682,27 @@ static struct qinit lapb_winit = {
  *  module that uses the CDI lower service interface.
  */
 
-static struct module_stat hdlc_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat hdlc_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat cd_mux_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat cd_mux_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
-static struct qinit hdlc_rinit = {
-	.qi_putp = hdlc_rput,
-	.qi_srvp = hdlc_rsrv,
-	.qi_minfo = &lapb_minfo,
-	.qi_mstat = &hdlc_rstat,
+static struct qinit cd_mux_rinit = {
+	.qi_putp = cd_rput,
+	.qi_srvp = cd_rsrv,
+	.qi_minfo = &dl_mux_minfo,
+	.qi_mstat = &cd_mux_rstat,
 };
-static struct qinit hdlc_winit = {
-#if 0
-	.qi_putp = hdlc_wput,		/* nulled out to cause a crash if it is invoked */
-#endif
-	.qi_srvp = hdlc_wsrv,
-	.qi_minfo = &lapb_minfo,
-	.qi_mstat = &hdlc_wstat,
+static struct qinit cd_mux_winit = {
+	.qi_putp = cd_wput,
+	.qi_srvp = cd_wsrv,
+	.qi_minfo = &dl_mux_minfo,
+	.qi_mstat = &cd_mux_wstat,
 };
 
-MODULE_STATIC struct streamtab lapbinfo = {
-	.st_rdinit = &lapb_rinit,
-	.st_wrinit = &labp_winit,
-	.st_muxrinit = &hdlc_rinit,
-	.st_muxwinit = &hdlc_winit,
+MODULE_STATIC struct streamtab lapbdrvinfo = {
+	.st_rdinit = &dl_mux_rinit,
+	.st_wrinit = &dl_mux_winit,
+	.st_muxrinit = &cd_mux_rinit,
+	.st_muxwinit = &cd_mux_winit,
 };
 
 /*
@@ -1529,66 +1714,62 @@ MODULE_STATIC struct streamtab lapbinfo = {
 #endif
 
 modID_t modid = MOD_ID;
-major_t major = CMAJOR_0 STATIC struct fmodsw lapb_fmod = {
-	.f_name = "lapbmod",
-	.f_str = &lapbinfo,
+
+major_t major = CMAJOR_0 STATIC struct fmodsw dl_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &lapbmodinfo,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 
-STATIC struct cdevsw lapb_cdev = {
+STATIC __unlikely int
+dl_register_strmod(void)
+{
+	int err;
+
+	if ((err = register_strmod(&dl_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC __unlikely int
+dl_unregister_strmod(void)
+{
+	int err;
+
+	if ((err = unregister_strmod(&dl_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+modID_t drvid = DRV_ID;
+major_t major = DRV_CMAJOR_0;
+
+STATIC struct cdevsw dl_cdev = {
 	.d_name = DRV_NAME,
-	.d_str = &lapbinfo,
+	.d_str = &lapbdrvinfo,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
 
-static int lapb_module_registered = 0;
-
 STATIC __unlikely int
-lapb_register_strmod(void)
+dl_register_strdev(major_t major)
 {
 	int err;
 
-	if (lapb_module_registered == 0) {
-		if ((err = register_strmod(&lapbfmod)) < 0)
-			return (err);
-		lapb_module_registered = 1;
-	}
-	return (0);
-}
-
-STATIC __unlikely int
-lapb_unregister_strmod(void)
-{
-	int err;
-
-	if (lapb_module_registered == 1) {
-		if ((err = unregister_strmod(&lapbfmod)) < 0)
-			return (err);
-		lapb_module_registered = 0;
-	}
-	return (0);
-}
-
-STATIC __unlikely int
-lapb_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = regsiter_strdev(&lapbcdev, major)) < 0)
+	if ((err = regsiter_strdev(&dl_cdev, major)) < 0)
 		return (err);
 	return (0);
 }
 
 STATIC __unlikely int
-lapb_unregsiter_strdev(major_t major)
+dl_unregsiter_strdev(major_t major)
 {
 	int err;
 
-	if (major && (err = unregister_strdev(&lapbcdev, major)) < 0)
+	if (major && (err = unregister_strdev(&dl_cdev, major)) < 0)
 		return (err);
 	return (0);
 }
@@ -1602,59 +1783,88 @@ module_param(modid, ushort, 0);
 #else				/* module_param */
 MODULE_PARM(modid, "h");
 #endif				/* module_param */
-MODULE_PARM_DESC(modid, "Module ID for the LAPB driver. (0 for allocation.)");
+MODULE_PARM_DESC(modid, "Module ID for the LAPB module. (0 for allocation.)");
+
+#ifdef module_param
+module_param(drvid, ushort, 0);
+#else				/* module_param */
+MODULE_PARM(drvid, "h");
+#endif				/* module_param */
+MODULE_PARM_DESC(drvid, "Module ID for the LAPB driver. (0 for allocation.)");
 
 #ifdef module_param
 module_param(major, uint, 0);
 #else				/* module_param */
 MODULE_PARM(major, "h");
 #endif				/* module_param */
-MODULE_PARM_DESC(modid, "Device number for the LAPB driver. (0 for allocation.)");
+MODULE_PARM_DESC(major, "Device number for the LAPB driver. (0 for allocation.)");
 
 MODULE_STATIC void __exit
-lapbterminate(void)
+lapbmodterminate(void)
+{
+	int err;
+
+	if ((err = dl_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", DRV_NAME);
+	if ((err = dl_term_mod_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate module caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC void __exit
+lapbdrvterminate(void)
 {
 	int err, mindex;
 
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
-		if (lapb_majors[mindex]) {
-			if ((err = lapb_unregsiter_strdev(lapb_majors[mindex])))
+		if (dl_majors[mindex]) {
+			if ((err = dl_unregsiter_strdev(dl_majors[mindex])))
 				cmn_err(CE_PANIC, "%s: cannot unregsiter major %d", DRV_NAME,
-					lapb_majors[mindex]);
+					dl_majors[mindex]);
 			if (mindex)
-				lapb_majors[mindex] = 0;
+				dl_majors[mindex] = 0;
 		}
 	}
-	if ((err = lapb_unregister_strmod()))
-		cmn_err(CE_WARN, "%s: could not unregister module", DRV_NAME);
-	if ((err = lapb_term_caches()))
-		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
-	lapb_term_hashes();
+	if ((err = dl_term_drv_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate driver caches", DRV_NAME);
 	return;
 }
 
 MODULE_STATIC int __init
-lapbinit(void)
+lapbmodinit(void)
+{
+	int err;
+
+	cmn_err(CE_NOTE, MOD_BANNER);	/* console splash */
+	if ((err = dl_init_mod_caches())) {
+		cmn_err(CE_WARN, "%s: could not init module caches, err = %d", DRV_NAME, err);
+		lapbmodterminate();
+		return (err);
+	}
+	if ((err = dl_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", DRV_NAME, err);
+		lapbmodterminate();
+		return (err);
+	}
+	return (0);
+}
+
+MODULE_STATIC int __init
+lapbdrvinit(void)
 {
 	int err, mindex = 0;
 
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
-	lapb_init_hashes();
-	if ((err = lapb_init_caches())) {
-		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
-		lapbterminate();
-		return (err);
-	}
-	if ((err = lapb_register_strmod())) {
-		cmn_err(CE_WARN, "%s: could not register module, err = %d", DRV_NAME, err);
-		lapbterminate();
+	if ((err = dl_init_drv_caches())) {
+		cmn_err(CE_WARN, "%s: could not init driver caches, err = %d", DRV_NAME, err);
+		lapbdrvterminate();
 		return (err);
 	}
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
-		if ((err = lapb_register_strdev(lapb_majors[mindex])) < 0) {
+		if ((err = dl_register_strdev(dl_majors[mindex])) < 0) {
 			if (mindex) {
 				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
-					lapb_majors[mindex]);
+					dl_majors[mindex]);
 				continue;
 			} else {
 				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
@@ -1663,13 +1873,35 @@ lapbinit(void)
 				return (err);
 			}
 		}
-		if (lapb_majors[mindex] == 0)
-			lapb_majors[mindex] = err;
+		if (dl_majors[mindex] == 0)
+			dl_majors[mindex] = err;
 #if 0
-		LIS_DEVFLAGS(lapb_majors[mindex]) |= LIS_MODFLG_CLONE;
+		LIS_DEVFLAGS(dl_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)
-			major = lapb_majors[0];
+			major = dl_majors[0];
+	}
+	return (0);
+}
+
+MODULE_STATIC void
+lapbterminate(void)
+{
+	lapbdrvterminate();
+	lapbmodterminate();
+}
+
+MODULE_STATIC int
+lapbinit(void)
+{
+	int err;
+
+	if ((err = lapbmodinit())) {
+		return (err);
+	}
+	if ((err = lapbdrvinit())) {
+		lapbmodterminate();
+		return (err);
 	}
 	return (0);
 }

@@ -1,3 +1,7 @@
+2006-10-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/lapb.c: working up lapb
+
 2006-10-16  Brian Bidulock  <bidulcok@openss7.org>
 
 	* strchan/doc/man/man4/mg.4.man: update of manpages
