@@ -1,3 +1,7 @@
+2006-10-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp2.c: printf statement correction for debug compile
+
 2006-10-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

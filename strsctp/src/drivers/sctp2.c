@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/16 00:14:38 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/17 12:11:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/16 00:14:38 $ by $Author: brian $
+ Last Modified $Date: 2006/10/17 12:11:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.50  2006/10/17 12:11:28  brian
+ - printf statement correction for debug compile
+
  Revision 0.9.2.49  2006/10/16 00:14:38  brian
  - updates for release and test case passes on UP
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/16 00:14:38 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/17 12:11:28 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/16 00:14:38 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/17 12:11:28 $";
 
 #include "sctp_compat.h"
 
@@ -104,7 +107,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/16 00:14:38 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/17 12:11:28 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -12716,7 +12719,7 @@ STATIC void
 sctp_unhash(struct sctp *sp)
 {
 
-	ptrace(("Unhashing stream sp=%p, state = %d\n", sp, sp->state));
+	ptrace(("Unhashing stream sp=%p, state = %d\n", sp, (int)sp->state));
 	local_bh_disable();
 	if (sp->prev) {
 		if (sp->vprev)
@@ -12755,7 +12758,7 @@ sctp_unhash(struct sctp *sp)
 STATIC void
 sctp_reset(struct sctp *sp)
 {
-	ptrace(("Resetting stream sp=%p, state = %d\n", sp, sp->state));
+	ptrace(("Resetting stream sp=%p, state = %d\n", sp, (int)sp->state));
 	local_bh_disable();
 	/* unhash and delete address lists */
 	sctp_change_state(sp, sp->conind ? SCTP_LISTEN : SCTP_CLOSED);
