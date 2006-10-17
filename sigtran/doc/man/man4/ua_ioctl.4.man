@@ -1,0 +1,268 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ua_ioctl.4.man,v 0.9.2.1 2006/10/17 11:55:37 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/17 11:55:37 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ua_ioctl.4.man,v $
+.\" Revision 0.9.2.1  2006/10/17 11:55:37  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.7  2006/04/05 09:43:05  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH UA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B ua_ioctl
+\- SIGTRAN User Adaptation Layer \- IO Controls
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " ua_stream " = open(" ua_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" ua_stream ", " \fRI_STR\fI ", " arg );
+.SH DESCRIPTION
+.PP
+.B UA-IOCTL
+is a common Layer Management Interface used by
+.IR OpenSS7 \(tm
+.BR SIGTRAN (4)
+drivers and modules for common layer management functions.  These IO controls
+are used by performing an
+.BR ioctl (2)
+system call ala
+.BR streamio (7)
+.IR I_STR
+command on the
+.I ua_stream
+file descriptor, with one of the IO control commands detailed in
+.BR lmi_ioctl (4),
+and a local management interface structure in the argument,
+.IR arg .
+.PP
+.B UA-IOCTL
+describes the common object model and object-type-specific structures for use
+with
+.BR lmi_ioctl (4)
+IO controls.  This object model is commmon to most, if not all, of the SIGTRAN
+User Adataptation Layers.
+.SS "Object Model"
+.PP
+.BR UA-IOCTL
+provides of management of a number of
+.B UA
+objects.  These objects are of a number of types as follows:
+.TP
+.B UA_OBJ_ASP
+Application server process.
+.TP
+.B UA_OBJ_AS
+Application server.
+.TP
+.B UA_OBJ_SGP
+Signalling gateway process.
+.TP
+.B UA_OBJ_SG
+Signalling gateway.
+.SS UA_OBJ_ASP
+.PP
+.PP
+.B Configuration
+.PP
+.B Timers
+.PP
+.B Options
+.PP
+.B State
+.PP
+.B Statistics
+.PP
+.B Events
+.PP
+.B Commands
+.SS UA_OBJ_AS
+.PP
+.PP
+.B Configuration
+.PP
+.B Timers
+.PP
+.B Options
+.PP
+.B State
+.PP
+.B Statistics
+.PP
+.B Events
+.PP
+.B Commands
+.SS UA_OBJ_SG
+.PP
+.PP
+.B Configuration
+.PP
+.B Timers
+.PP
+.B Options
+.PP
+.B State
+.PP
+.B Statistics
+.PP
+.B Events
+.PP
+.B Commands
+.SS UA_OBJ_SGP
+.PP
+.PP
+.B Configuration
+.PP
+.B Timers
+.PP
+.B Options
+.PP
+.B State
+.PP
+.B Statistics
+.PP
+.B Events
+.PP
+.B Commands
+.SH IOCTLS
+.SH NOTICES
+.PP
+.SH NOTICES
+.PP
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.SH FILES
+.PP
+.BR <ss7/ua_ioctl.h> .
+.SH DEVICES
+.PP
+.IR /dev/m2ua ,
+.IR /dev/m3ua ,
+.IR /dev/sua ,
+.IR /dev/tua ,
+.IR /dev/isua ,
+.IR /dev/bua ,
+.IR /dev/iua ,
+.IR /dev/dua ,
+.IR /dev/v5ua ,
+.IR /dev/gr303ua .
+.SH "SEE ALSO"
+.PP
+.BR m2ua (4),
+.BR m3ua (4),
+.BR sua (4),
+.BR tua (4),
+.BR isua (4),
+.BR bua (4),
+.BR iua (4),
+.BR dua (4),
+.BR v5ua (4),
+.BR gr303ua (4),
+.BR ss7confd (8),
+.BR isdnconfd (8).
+.SH VERSIONS
+.PP
+The
+.B UA
+IO Controls are specific to the
+.I OpenSS7
+.BR SS7 (4)
+stack.
+.BR m2ua (4),
+.BR m3ua (4),
+.BR sua (4),
+.BR tua (4),
+.BR isua (4),
+.BR bua (4),
+.BR iua (4),
+.BR dua (4),
+.BR v5ua (4),
+.BR gr303ua (4),
+will not appear unitl
+.B strss7
+release 0.8.4.
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

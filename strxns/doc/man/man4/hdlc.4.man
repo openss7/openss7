@@ -1,0 +1,281 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: hdlc.4.man,v 0.9.2.1 2006/10/17 11:56:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/17 11:56:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: hdlc.4.man,v $
+.\" Revision 0.9.2.1  2006/10/17 11:56:28  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.7  2006/04/05 09:43:03  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH HDLC 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B hdlc
+\-  High-Level Data Link Control
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/cdi.h>
+.br
+.B #include <sys/cdi_hdlc.h>
+.br
+.B #include <sys/hdlc_ioctl.h>
+.HP
+.BI "int " ch_stream " = open(" ch_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" ch_device ", " \fRI_PUSH\fI ", " \fR\*(lqhdlc\*(rq\fI );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B HDLC
+is an implementation of the High-Level Data Link Control (HDLC) Procedures as
+specified in
+.B IS0 3309
+.[
+ISO 3309
+.]
+and
+.BR "ISO 4333" .
+.[
+ISO 4335
+.]
+.B HDLC
+is intended to be used with the
+.BR lapb (4),
+.BR lapd (4),
+.BR lapf (4),
+multiplexing drivers.
+.\"
+.\"
+.PP
+.B HDLC
+is implemented as a pushable
+.IR STREAMS (4)
+module.  The
+.B HDLC
+mdoule can be pushed over a stream conforming to the Channel Interface (CHI)
+as described in
+.BR chi (7).
+The
+.B HDLC
+module provides HDLC access to the bit stream from the channel provided by the
+.BR chi (7)
+Stream below it, by performing HDLC functions on the raw bit stream.
+The upper interface provided by the
+.B HDLC
+module is the Communications Device Interface (CDI) as described in
+.BR cdi (7).
+.PP
+.B HDLC
+streams can be linked under
+.BR dl (4)
+drivers
+.BR lapd (4),
+.BR lapb (4),
+.BR lapf (4),
+.BR gr303 (4),
+.BR v52 (4),
+using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide a complete Data Link that can then be linked under an
+.BR isdn (4),
+.BR fr (4),
+.BR idlc (4),
+.BR dpnss (4),
+.BR iua (4),
+.BR gr303ua (4),
+.BR v5ua (4)
+or
+.BR dua (4)
+driver using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide data link services to the Layer 3 protocol.  This is normally
+performed, as required, by the ISDN Configuration Daemon,
+.BR isdnconfd (8).
+.\"
+.\"
+.SH NOTICES
+.PP
+.B HDLC
+has been implemented as a pushable module to ease the development of ISDN Data
+Link drivers for various cards.  All that is required is for the card to
+provide a Channel Interface (CHI),
+.BR chi (7),
+and push the
+.BR hdlc (4)
+and
+.BR dl (4)
+modules to provide a complete and compliant Q.921
+.[
+q921
+.]
+Data Link.
+.\"
+.\"
+.PP
+.B HDLC
+is implemented internally as a soft-HDLC using host-based table lookups.
+While this is fairly efficient, devices that are capable of performing this
+function in hardware should provide the Communications Device Interface (CDI),
+.BR cdi (7),
+directly.
+An example of a device that does not include HDLC is the
+.BR x400p (4)
+driver.  An example of one that does, is the
+.BR acb56 (4)
+driver.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B HDLC
+modules are not normally pushed or accessed directly by user-level programs.
+The
+.B HDLC
+module is used directly by some test and monitoring programs.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B HDLC
+module responds to Local Management Interface (LMI),
+.BR lmi_ioctl (4),
+IO controls as interpreted for
+.B HDLC
+operation as described in
+.BR hdlc_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cdi.h> ,
+.BR <ss7/cdi_hdlc.h> ,
+.BR <ss7/hdlc_ioctl.h> .
+.\"
+.\"
+.SH MODULES
+.PP
+.RI streams- hdlc .o
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ISDN (4),
+.BR cdi (7),
+.BR dl (4),
+.BR hdlc_ioctl (4),
+.BR isdnconfd (8).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B HDLC
+module conforms to the CDI Specification, Revision 1.0.
+.[
+cdi
+.]
+.PP
+The
+.B HDLC
+module does not appear until
+.B strss7
+release 0.8.4.
+.\"
+.\"
+.XX
+.[
+ISO 3309
+.]
+.[
+ISO 4335
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

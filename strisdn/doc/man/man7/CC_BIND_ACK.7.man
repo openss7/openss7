@@ -1,0 +1,275 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: CC_BIND_ACK.7.man,v 0.9.2.1 2006/10/17 11:56:04 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/17 11:56:04 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: CC_BIND_ACK.7.man,v $
+.\" Revision 0.9.2.1  2006/10/17 11:56:04  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:43:11  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strisdn.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strisdn.macros
+.\"
+.\"
+.TH CC_BIND_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Call Control Interface (CCI)"
+.\"
+.\"
+.SH NAME
+.B CC_BIND_ACK
+\- bind protocol address acknowledgement
+.\"
+.\"
+.SH SYNOPSIS
+The format of the message is one
+.B M_PCPROTO
+message block, and its structure is the following:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_bind_ack {
+    ulong cc_primitive;         /* always CC_BIND_ACK */
+    ulong cc_addr_length;       /* length of address */
+    ulong cc_addr_offset;       /* offset of address */
+    ulong cc_setup_ind;         /* setup indications */
+    ulong cc_token_value;       /* setup response token value */
+} CC_bind_ack_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This primitive indicates to the CCS user that the specified call control user entity has been bound to the requested
+call control address and that the specified number of connect indications are allowed to be queued by the CCS
+provider for the specified network address.
+.\"
+.\"
+.SS Parameters
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+indicates the primitive type.  Always
+.BR CC_BIND_ACK .
+.TP
+.I cc_primitive
+Indicates the primitive type.
+.TP
+.I cc_addr_length
+Is the length of the call control address that was bound.
+.TP
+.I cc_addr_offset
+Is the offset from the beginning of the M_PCPROTO block where the call control
+address begins.
+.TP
+.I cc_setup_ind
+Is the accepted number of setup indications allowed to be outstanding by the
+CCS provider for the specified call control address.  If its value is zero (0),
+this stream cannot accept
+.BR CC_SETUP_IND (7)
+messages.  If its value is greater than zero (0), then the CCS user can accept
+.BR CC_SETUP_IND (7)
+messages up to the value specified in this parameter before having to respond
+with a
+.BR CC_SETUP_RES "(7) or a " CC_DISCON_REQ
+message.
+.TP
+.I cc_token_value
+Conveys the value of the "token" assigned to this stream that can be used by
+the CCS user in a
+.BR CC_SETUP_RES (7)
+primitive to accept a call on this stream.  It is a non-zero value, and is
+unique to all streams bound to the CCS provider.
+.\"
+.\"
+.SS Rules
+The following rules apply to the binding of the specified call control address
+to the stream:
+.\"
+.\"
+.IP \(em 4
+If the cc_addr_length field in the
+.BR CC_BIND_REQ (7)
+primitive is zero (0), then the CCS provider is to assign a call control address
+to the user.
+.IP \(em
+The CCS provider is to bind the call control address as specified in the
+.BR CC_BIND_REQ (7)
+primitive.  If the CCS provider cannot bind the specified address, it may
+assign another call control address to the user.  It is the call control
+user's responsibility to check the call control address returned in the
+.BR CC_BIND_ACK (7)
+primitive to see if it is the same as the one requested.
+.PP
+The following rules apply to negotiating
+.I cc_setup_ind
+argument:
+.\"
+.\"
+.IP \(em 4
+The
+.I cc_setup_ind
+number in the
+.BR CC_BIND_ACK (7)
+primitive must be less than or equal to the corresponding requested number as
+indicated in the
+.BR CC_BIND_REQ (7)
+primitive.
+.IP \(em
+Only one stream that is bound to the indicated call control address may have a
+negotiated accepted number of maximum setup indications greater than zero.  If
+a
+.BR CC_BIND_REQ (7)
+primitive specifies a value greater than zero (0), but another stream has already
+bound itself to the given call control address with a value greater than zero
+(0),
+the CCS provider should assign another protocol address to the user.
+.IP \(em
+If a stream with
+.I cc_setup_ind
+number greater than zero is used to accept a call, the stream will be found
+busy during the duration of that call and no other streams may be bound to
+that call control address with a
+.I cc_setup_ind
+number greater than zero.  This will prevent more than one stream bound to the
+identical call control address from accepting setup indications.
+.IP \(em
+A stream requesting a
+.I cc_setup_ind
+number of zero should always be legal.  This indicates to the CCS provider
+that the stream is to be used to request call setup only.
+.IP \(em
+A stream with a negotiated
+.I cc_setup_ind
+number greater than zero may generate setup requests or accept setup
+indications.
+.PP
+If the above rules result in an error condition, then the CCS provider must
+issue a
+.BR CC_ERROR_ACK (7)
+primitive to the CCS user specifying the error as defined in the description
+of the
+.BR CC_BIND_REQ (7)
+primitive.
+.\"
+.\"
+.SS State
+This primitive is in response to a
+.BR CC_BIND_REQ (7)
+primitive and is valid in the state
+.BR CCS_WACK_BREQ .
+The new state is
+.BR CCS_IDLE .
+.\"
+.\"
+.SS Modes
+This primitive is issued in all modes.
+.\"
+.\"
+.SS Originator
+This primitive is issued by the CC Provider.
+.\"
+.\"
+.SH NOTES
+See
+.BR CC_BIND_REQ (7)
+for protocol specific considerations and rules.
+See the specific protocol documentation for formats and rules governing
+call control addresses.
+.\"
+.\"
+.SH FILES
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,295 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: CC_CONT_REPORT_REQ.7.man,v 0.9.2.1 2006/10/17 11:56:04 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/17 11:56:04 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: CC_CONT_REPORT_REQ.7.man,v $
+.\" Revision 0.9.2.1  2006/10/17 11:56:04  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:43:11  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strisdn.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strisdn.macros
+.\"
+.\"
+.TH CC_CONT_REPORT_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Call Control Interface (CCI)"
+.\"
+.\"
+.SH NAME
+.B CC_CONT_REPORT_REQ
+\- continuity report request
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The format of this message is one
+.B M_PROTO
+message block.  The structure of the
+.B M_PROTO
+block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_cont_report_req {
+    ulong cc_primitive;         /* always CC_CONT_REPORT_REQ */
+    ulong cc_user_ref;          /* user call reference */
+    ulong cc_call_ref;          /* call reference */
+    ulong cc_result;            /* result of continuity check */
+} CC_cont_report_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This primitive requests that the CCS provider indicate to the called CCS user
+that the continuity check succeeded or failed.  The CCS user should remove any
+continuity test tone generator/detection device from the circuit and verify
+silent code loop back before issuing this primitive.
+.\"
+.\"
+.SS Parameters
+.PP
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+specifies the primitive type.  Always
+.BR CC_CONT_REPORT_REQ .
+.TP
+.I cc_user_ref
+specifies the CCS user reference of the associated
+.BR CC_SETUP_REQ (7)
+primitive.  This value is non-zero when the
+.B CC_CONT_REPORT_REQ
+primitive is issued subsequent to a
+.BR CC_SETUP_REQ (7)
+primitive which had the flag
+.B ISUP_NCI_CONTINUITY_CHECK_PREVIOUS
+set to indicate the result of the continuity check on the previous circuit.
+Otherwise, this value is coded zero.
+.TP
+.I cc_call_ref
+specifies the call reference of the associated
+.BR CC_CONT_TEST_IND (7)
+primitive for the continuity check call.  This value is non-zero when the
+.B CC_CONT_REPORT_REQ
+primitive is issued in response to a
+.BR CC_CONT_TEST_IND (7)
+primitive.  Otherwise, this value is coded zero.
+.TP
+.I cc_result
+specifies the result of the continuity test, whether success or failure.  The
+value of the cc_result is protocol specific.  For values representing success
+and values representing failure, see the Addendum.
+.\"
+.\"
+.SS Rules
+.PP
+.\"
+.\"
+.SS State
+.PP
+This primitive is valid in state
+.BR CCS_WREQ_CCREP .
+When issued in response to the
+.BR CC_CONT_TEST_IND (7)
+primitive, the new state is
+.BR CCS_IDLE .
+When issued subsequent to a
+.BR CC_SETUP_REQ (7)
+primitive, the new state is either
+.BR CCS_WREQ_MORE " or " CCS_WREQ_PROCEED ,
+depending upon whether the sent address contain an ST pulse.
+.\"
+.\"
+.SS Modes
+.PP
+This primitive is valid only in NNI mode.
+.\"
+.\"
+.SS Originator
+.PP
+This primitive is originated by the CC User.
+.\"
+.\"
+.SH ACKNOWLEDGMENT
+.PP
+The CCS provider should generate one of the following acknowledgments upon
+receipt of this primitive:
+.HP
+.IR Successful :
+Successful completion is indicated via the
+.BR CC_OK_ACK (7)
+primitive.
+.TP
+.IR "Unsuccessful (Non-fatal errors)" :
+Errors are indicated via the
+.BR CC_ERROR_ACK (7)
+primitive.
+.\"
+.\"
+.SH ERRORS
+.PP
+The applicable non-fatal errors are defined as follows:
+.\"
+.\"
+.TP 16
+.RB [ CCSYSERR ]
+A system error occurred and the UNIX system error is indicated in the
+.BR CC_ERROR_ACK (7)
+primitive.
+.TP
+.RB [ CCOUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ CCBADCLR ]
+The call reference specified in the primitive was incorrect or illegal.
+.TP
+.RB [ CCBADPRIM ]
+The primitive format was incorrect.
+.\"
+.\"
+.SH NOTES
+.PP
+.sp
+.\"
+.\"
+.SS "Considerations for Q.764 and ANSI T1.113 conformance:"
+.PP
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address format and
+.BR isup (4))
+.\"
+.\"
+.SS "Considerations for Q.931/932 conformance:"
+.PP
+CCS providers conforming to Q.931/932 adhere to the following
+additional rules:
+(See also
+.BR cci_isdn (7)
+for address format and
+.BR isdn (4))
+.\"
+.\"
+.SS "Considerations for H.225.0 conformance:"
+.PP
+CCS providers conforming to H.225.0 adhere to the following
+additional rules:
+(See also
+.BR cci_h225 (7)
+for address format and
+.BR h225 (4))
+.\"
+.\"
+.SS "Considerations for BSSAP conformance:"
+.PP
+CCS providers conforming to BSSAP adhere to the following
+additional rules:
+(See also
+.BR cci_bssap (7)
+for address format and
+.BR bssap (4))
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI

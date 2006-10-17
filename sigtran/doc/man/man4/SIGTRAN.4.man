@@ -1,0 +1,337 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: SIGTRAN.4.man,v 0.9.2.1 2006/10/17 11:55:36 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/17 11:55:36 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: SIGTRAN.4.man,v $
+.\" Revision 0.9.2.1  2006/10/17 11:55:36  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.9  2006/06/13 10:25:49  brian
+.\" - updated references for IUA, DUA, M2PA
+.\"
+.\" Revision 0.9.2.8  2006/04/27 09:34:40  brian
+.\" - updated references
+.\"
+.\" Revision 0.9.2.7  2006/04/05 09:43:02  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH SIGTRAN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B SIGTRAN
+\- OpenSS7 Signalling Transport (SIGTRAN) Devices
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.HP
+.BI "int " sigtran_stream " = open(" sigtran_device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SS "SS7 Devices"
+.PP
+.B SIGTRAN
+.[
+rfc2719
+.]
+provides the following SS7 pseudo-device drivers:
+.\"
+.\"
+.TP
+.BR bua (4)
+.I SS7 BICC User Adaptation Layer (BUA)
+protocol layer transporting and distributing the services provided by
+.BR bicc (4)
+and providing an IO Control interface,
+.BR lmi_ioctl (4),
+for BUA-specific management,
+.BR bua_ioctl (4).
+.\"
+.\"
+.TP
+.BR isua (4)
+.I SS7 ISUP User Adaptation Layer (ISUA)
+.[
+isua-00
+.]
+protocol layer transporting and distributing the services provided by
+.BR isup (4)
+and providing an IO Control interface,
+.BR lmi_ioctl (4),
+for ISUA-specific management,
+.BR isua_ioctl (4).
+.\"
+.\"
+.TP
+.BR tua (4)
+.I SS7 TCAP User Adaptation Layer (TUA)
+.[
+tua-01
+.]
+protocol layer transporting and distributing the services provided by
+.BR tcap (4)
+and providing an IO Control interface,
+.BR lmi_ioctl (4),
+for TUA-specific management,
+.BR tua_ioctl (4).
+.\"
+.\"
+.TP
+.BR sua (4)
+.I SS7 SCCP User Adaptation Layer (SUA)
+.[
+SUA-RFC
+.]
+protocol layer transporting and distributing the services provided by
+.BR sccp (4)
+and providing an IO Control interface,
+.BR lmi_ioctl (4),
+for SUA-specific management,
+.BR sua_ioctl (4).
+.\"
+.\"
+.TP
+.BR m3ua (4)
+.I SS7 MTP3 User Adaptation Layer (M3UA)
+.[
+rfc3332
+.]
+protocol layer transporting and distributing the services provided by
+.BR mtp (4)
+and providing an IO Control interface,
+.BR lmi_ioctl (4),
+for M3UA-specific management,
+.BR m3ua_ioctl (4).
+.\"
+.\"
+.TP
+.BR m2ua (4)
+.I SS7 MTP2 User Adaptation Layer (M2UA)
+.[
+rfc3331
+.]
+protocol layer transporting and distributing the services provided by
+.BR sl (4)
+and providing an IO Control interface,
+.BR lmi_ioctl (4),
+for M2UA-specific management,
+.BR m2ua_ioctl (4).
+.\"
+.\"
+.SS "SS7 Modules"
+.PP
+.B SIGTRAN
+provides the following SS7 modules:
+.\"
+.\"
+.TP
+.BR m2pa (4)
+.I SS7 MTP2 User Peer-to-Peer Adaptation Layer (M2PA)
+.[
+M2PArfc
+.]
+.\"
+.\"
+.SS "ISDN Devices"
+.PP
+.B SIGTRAN
+provides the following ISDN pseudo-device drivers:
+.\"
+.\"
+.TP
+.BR iua (4)
+.I ISDN Q.921 User Adaptation Layer (IUA)
+.[
+IUArfc
+.]
+protocol layer transporting and distributing the services provided by
+.BR dl (4),
+and providing an IO Control Interface,
+.BR lmi_ioctl (4),
+for IUA-specific management,
+.BR iua_ioctl (4).
+.\"
+.\"
+.TP
+.BR dua (4)
+.I DPNSS/DASS 2 Extentions to the IUA Protocol (DUA)
+.[
+DUArfc
+.]
+protocol layer transporting and distributing the services provided by
+.BR dua (4),
+and providing an IO Control Itnerface,
+.BR lmi_ioctl (4),
+for DUA-specific management,
+.BR dua_ioctl (4).
+.\"
+.\"
+.TP
+.BR v5ua (4)
+.I V5 User Adaptation Layer (V5UA)
+.[
+V5UA-RFC
+.]
+protocol layer transporting and distributing the services provided by
+.BR v5 (4),
+and providing an IO Control Interface,
+.BR lmi_ioctl (4),
+for V5UA-specific management,
+.BR v5ua_ioctl (4).
+.\"
+.\"
+.TP
+.BR gr303ua (4)
+.I GR-303 User Adaptation Layer (GR303UA)
+.[
+gr303ua00
+.]
+protocol layer transporting and distributing the services provided by
+.BR gr303 (4),
+and providing an IO Control Interface,
+.BR lmi_ioctl (4),
+for GR303UA-specific management,
+.BR gr303ua_ioctl (4).
+.\"
+.\"
+.\".SH NOTICES
+.PP
+.\"
+.\"
+.\".SH BUGS
+.PP
+.\"
+.\"
+.\".SH FILES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/bua ,
+.IR /dev/isua ,
+.IR /dev/tua ,
+.IR /dev/tua-tpi-cl ,
+.IR /dev/tua-tpi-co ,
+.IR /dev/sua ,
+.IR /dev/sua-npi ,
+.IR /dev/sua-tpi-cl ,
+.IR /dev/sua-tpi-co ,
+.IR /dev/m3ua ,
+.IR /dev/m3ua-npi ,
+.IR /dev/m3ua-tpi-cl ,
+.IR /dev/m3ua-tpi-co ,
+.IR /dev/m2ua ,
+.IR /dev/m2ua-cdi ,
+.IR /dev/m2ua-dlpi ,
+.IR /dev/iua ,
+.IR /dev/v5ua ,
+.IR /dev/gr303ua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ss7confd (8),
+.BR isdnconfd (8),
+.BR SS7 (4),
+.BR ISDN (4),
+.BR MG (4).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was updated @PACKAGE_DATE@ for
+.B @PACKAGE@
+release
+.BR "@VERSION@" .
+.PP
+Most of the devices and modules listed here do not appear until
+.BR strss7-0.8.4 .
+.PP
+.BR m2pa (4)
+first appeared in
+.BR strss7-0.8.2 .
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

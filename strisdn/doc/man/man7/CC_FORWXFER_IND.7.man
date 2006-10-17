@@ -1,0 +1,222 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: CC_FORWXFER_IND.7.man,v 0.9.2.1 2006/10/17 11:56:04 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/17 11:56:04 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: CC_FORWXFER_IND.7.man,v $
+.\" Revision 0.9.2.1  2006/10/17 11:56:04  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:43:11  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strisdn.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strisdn.macros
+.\"
+.\"
+.TH CC_FORWXFER_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Call Control Interface (CCI)"
+.\"
+.\"
+.SH NAME
+.B CC_FORWXFER_IND
+\- forward transfer indication
+.\"
+.\"
+.SH SYNOPSIS
+The format of this message is one
+.B M_PROTO
+message block.  The structure of the
+.B M_PROTO
+block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_forwxfer_ind {
+    ulong cc_primitive;         /* always CC_FORWXFER_IND */
+    ulong cc_call_ref;          /* call reference */
+    ulong cc_opt_length;        /* optional parameter length */
+    ulong cc_opt_offset;        /* optional parameter offset */
+} CC_forwxfer_ind_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This primitive indicates to the CCS user that the peer CCS user has requested
+a forward transfer of an established call.
+.\"
+.\"
+.SS Parameters
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+indicates the primitive type.  Always
+.BR CC_FORWXFER_IND .
+.TP
+.I cc_call_ref
+indicates the call reference.  The call reference is used by the CCS provider
+to identify the call.
+.TP
+.I cc_opt_length
+indicates the length of the optional parameters associated with the forward
+transfer indication.  If no optional parameters were associated with the
+forward transfer indication, then this parameter must be coded zero.
+.TP
+.I cc_opt_offset
+indicates the offset of the optional parameters from the start of the
+.B M_PROTO
+message block.
+.\"
+.\"
+.\".SS Rules
+.\"
+.\"
+.SS State
+This primitive is valid in state
+.BR CCS_CONNECTED .
+The new state is
+.BR CCS_CONNECTED .
+.\"
+.\"
+.SS Modes
+This primitive is valid in NNI mode only.
+.\"
+.\"
+.SS Originator
+This primitive is originated by the CC User.
+.\"
+.\"
+.SH NOTES
+.sp
+.\"
+.\"
+.SS "Considerations for Q.764 and ANSI T1.113 conformance:"
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address format and
+.BR isup (4))
+.\"
+.\"
+.SS "Considerations for Q.931/932 conformance:"
+CCS providers conforming to Q.931/932 adhere to the following
+additional rules:
+(See also
+.BR cci_isdn (7)
+for address format and
+.BR isdn (4))
+.\"
+.\"
+.SS "Considerations for H.225.0 conformance:"
+CCS providers conforming to H.225.0 adhere to the following
+additional rules:
+(See also
+.BR cci_h225 (7)
+for address format and
+.BR h225 (4))
+.\"
+.\"
+.SS "Considerations for BSSAP conformance:"
+CCS providers conforming to BSSAP adhere to the following
+additional rules:
+(See also
+.BR cci_bssap (7)
+for address format and
+.BR bssap (4))
+.\"
+.\"
+.SH FILES
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI

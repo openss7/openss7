@@ -1,0 +1,1 @@
+.so man4/lapd.4.man

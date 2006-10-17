@@ -1,0 +1,250 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: CC_BLOCKING_CON.7.man,v 0.9.2.1 2006/10/17 11:56:04 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/17 11:56:04 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: CC_BLOCKING_CON.7.man,v $
+.\" Revision 0.9.2.1  2006/10/17 11:56:04  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:43:11  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strisdn.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strisdn.macros
+.\"
+.\"
+.TH CC_BLOCKING_CON 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Call Control Interface (CCI)"
+.\"
+.\"
+.SH NAME
+.B CC_BLOCKING_CON
+\- circuit management blocking confirmation
+.\"
+.\"
+.SH SYNOPSIS
+The format of this message is one
+.B M_PROTO
+message block.  The structure of the
+.B M_PROTO
+block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_blocking_con {
+    ulong cc_primitive;         /* always CC_BLOCKING_CON */
+    ulong cc_flags;             /* blocking flags */
+    ulong cc_addr_length;       /* address length */
+    ulong cc_addr_offset;       /* address offset */
+} CC_blocking_con_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This primitive confirms a previous blocking request (or indicates failure of a
+previous blocking request).
+.\"
+.\"
+.SS Parameters
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+indicates the primitive type.  Always
+.BR CC_BLOCKING_CON .
+.TP
+.I cc_flags
+indicates the options flags and result of the operation. (See
+.IR \*(lqFlags\*(rq ,
+below.)
+.TP
+.I cc_addr_length
+indicates the length of the call control address (signalling interface and
+circuit or circuit group identifiers) for which local blocking is confirmed.
+.TP
+.I cc_addr_offset
+indicates the offset of the call controll adress(es) from the beginning of the
+.B M_PROTO
+message block.
+.\"
+.\"
+.SS Flags
+The options flags are protocol and provider-specific.  For additional
+information, see the specific Addendum.
+.\"
+.\"
+.\".SS Rules
+.\"
+.\"
+.SS State
+This primitive will only be issued by the CCS provider if the local blocking
+state of the specified address(es) is
+.BR CCS_WCON_BLREQ .
+The new local blocking state will be
+.B CCS_BLOCKED
+for the specified call control addresses.
+.\"
+.\"
+.SS Modes
+This primitive will only be issued by the CCS provider for signalling
+interfaces in the NNI mode.
+.\"
+.\"
+.SS Originator
+This primitive is issued by the CC Provider.
+.\"
+.\"
+.SH NOTES
+This primitive is only currently supported for ISUP conforming CCS providers
+and will not be issued by any other provider.
+.\"
+.\"
+.PP
+.B "Rules for Q.764 and ANSI T1.113 conformance:"
+.PP
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address format and
+.BR isup (4))
+.\"
+.\"
+.IP \(em 4
+The
+.I cc_flags
+is a bitwise OR of any of the following flags:
+.RS
+.TP
+.B ISUP_GROUP
+When set, this flag confirms that the operation was performed on a
+group of call control addresses and that any circuit identifier in the
+specified call control address is to be interpreted by the CCS provider as a
+circuit group identifier.
+.TP
+.B ISUP_MAINTENANCE_ORIENTED
+When set, this flag confirms that the operation performed was for a
+maintenance oriented blocking.
+.TP
+.B ISUP_HARDWARE_FAILURE_ORIENTED
+When set, this flag confirms that the operation performed was for a hardware
+failure oriented blocking.
+.RE
+.\"
+.IP \(em
+One and only one of
+.BR ISUP_MAINTENANCE_ORIENTED " and " ISUP_HARDWARE_FAILURE_ORIENTED
+must be set.
+.\"
+.\"
+.IP \(em
+When
+.B ISUP_HARDWARE_FAILURE_ORIENTED
+is set,
+.B ISUP_GROUP
+is implied and need not be indicated by the CCS provider.
+.\"
+.\"
+.IP \(em
+When
+.B ISUP_GROUP
+is set, the call control address must be an address of scope
+.BR ISUP_SCOPE_CG ;
+when not set,
+.BR ISUP_SCOPE_CT .
+.\"
+.\"
+.SH FILES
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI

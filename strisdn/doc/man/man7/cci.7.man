@@ -1,0 +1,2073 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: cci.7.man,v 0.9.2.1 2006/10/17 11:56:09 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/10/17 11:56:09 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: cci.7.man,v $
+.\" Revision 0.9.2.1  2006/10/17 11:56:09  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:43:19  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strisdn.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strisdn.macros
+.\"
+.\"
+.TH CCI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Call Control Interface (CCI)"
+.\"
+.\"
+.SH NAME
+.B cci
+\- Call Control Interface
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/cci.h>
+.HP
+.BI "int " cc_stream " = open(" \*(lq/dev/isup\*(rq ", " flags );
+.HP
+.BI "int " cc_stream " = open(" \*(lq/dev/isdn\*(rq ", " flags );
+.HP
+.BI "int " cc_stream " = open(" \*(lq/dev/bicc\*(rq ", " flags );
+.\"
+.\"
+.SH "DESCRIPTION"
+.PP
+The Call Control Interface,
+.BR CCI ,
+specifies a
+.IR STREAMS (4)-based
+kernel-level instantiation of the ITU-T Call Control
+Interface definition.  The Call Control Interface (CCI) enables the user of a
+call control service to access and use any of a variety of conforming call
+control service providers without specific knowledge of the provider's
+protocol.  The service interface is designed to support any network call
+control protocol and user call control protocol.  This interface only
+specifies access to call control service providers, and does not address
+issues concerning call control and circuit management, protocol performance,
+and performance analysis tools.  The specification assumes that the reader is
+familiar with ITU-T state machines and call control interfaces (e.g., Q.764,
+Q.931), and
+.IR STREAMS (4).
+.\"
+.\"
+.PP
+.B CCI
+specifies an interface that supports the services provided by the Integrated
+Services Digital Network
+.RB ( isdn (4))
+and ISDN User Part
+.RB ( isup (4))
+for ITU-T applications as described in ITU-T Recommendation Q.931 and ITU-T
+Recommendation Q.764.
+.B CCI
+also supports
+.BR bicc (4),
+.BR bssap (4),
+.BR h225 (4),
+.BR gr303 (4),
+and
+.BR v5 (4).
+These specifications are targeted for use by developers and testers of
+protocol modules that require call control service.
+.\"
+.\"
+.SS "The Call Control Layer"
+.PP
+The Call Control Layer provides the means to manage the connection and
+disconnection of calls.  It is responsible for the routing and management of
+call control signalling between call control-user entities.
+.\"
+.\"
+.SS "Model of the CCI"
+.PP
+The CCI defines the services provided by the call control layer to the call
+control-user at the boundary between the call control layer and the call
+control layer user entity.  The interface consists of a set of primitives
+defined as
+.IR STREAMS (4)
+messages that provide access to the call control layer
+services, and are transferred between the CCS user entity and the CCS
+provider.  These primitives are of two types; ones that originate from the CCS
+user, and others that originate from the CCS provider.  The primitives that
+originate from the CCS user make requests to the CCS provider, or respond to
+an indication of an event of the CCS provider.  The primitives that originate
+from the CCS provider are either confirmations of a request or are indications
+to the CCS user that the event has occurred.
+.\"
+.\"
+.PP
+The CCI allows the CCS provider to be configured with any call control layer
+user (such as an ISDN user call control application) that also conforms to the
+CCI.  A cal control layer user can also be a user program that conforms to the
+CCI and accesses the CCS provide via
+.BR putmsg (2)
+and
+.BR getmsg (2)
+system calls.
+.\"
+.\"
+.SS "CCI Services"
+.PP
+The features of the CCI are defined in terms of the services provided by the
+CCS provider, and the individual primitives that may flow between the CCS user
+and the CCS provider.
+.\"
+.\"
+.PP
+The services supported by the CCI are based on three distinct modes of
+communication, user-network interface (UNI) User mode, user-network interface
+(UNI) Network mode, and network-network interface (NNI).  In addition, the CCI
+supports services for local management.
+.\"
+.\"
+.PP
+.B "UNI"
+.\"
+.\"
+.PP
+The main features of the User-Network Interface mode of communication are:
+.\"
+.\"
+.IP \(em 4
+It is call oriented.
+.\"
+.\"
+.IP \(em
+It employs facility associated signalling in that the signalling interface and
+circuits which are controlled by that signalling interface are bound by
+physical configuration.  (For example, 23B+D, 2B+D).
+.\"
+.\"
+.IP \(em
+The protocol has two aspects to the interface: one side of the interface
+follows the User protocol whereas the other side of the interface follows the
+Network protocol.
+.\"
+.\"
+.IP \(em
+The user side of the protocol has no formal maintenance or monitoring
+procedures and therefore reports most if not all system events to the user.
+.\"
+.\"
+.IP \(em
+The network side of the protocol has formal maintenance and monitoring
+procedures and therefore reports most if not all system events to maintenance.
+.\"
+.\"
+.PP
+.B "NNI"
+.\"
+.\"
+.PP
+The main features of the Network-Network Interface mode of communication are:
+.\"
+.\"
+.IP \(em 4
+It is circuit oriented.
+.\"
+.\"
+.IP \(em
+It employs quasi-associated signalling in that the path taken by signalling
+and the path taken by the circuits are not necessarily related.
+.\"
+.\"
+.IP \(em
+The protocol has one aspect and is peer-to-peer: that is, both sides of a
+signalling interface follow the same protocol in the same way.
+.\"
+.\"
+.IP \(em
+The network side of the protocol has formal maintenance and monitoring
+procedures and therefore reports most if not all system events to maintenance.
+.\"
+.\"
+.SS "Local Management"
+.PP
+The CCI specifications also define a set of local management functions that
+apply to UNI and NNI modes of communication.  These services have local
+significance only.  Tables 1, 2 and 3 summarizes the CCI service primitives by
+their state and service.
+.\"
+.\"
+.SH "CCI SERVICES DEFINITION"
+.PP
+This section describes the services of the CCI primitives.  Time-sequence
+diagrams that illustrate the sequence of primitives are included.
+(Conventions for the time-sequence diagrams are defined in ITU-T X.210.)  The
+format of the primitives are defined separately.
+.\"
+.\"
+.PP
+.TS
+center tab(:);
+|l|l|ls|.
+_:_:_
+Local Management:Both:T{
+.ad l
+.hy 0
+CC_INFO_REQ(7), CC_INFO_ACK(7),
+CC_BIND_REQ(7), CC_BIND_ACK(7),
+CC_UNBIND_REQ(7),
+CC_ADDR_REQ(7), CC_ADDR_ACK(7),
+CC_OPTMGMT_REQ(7), CC_OPTMGMT_ACK(7),
+CC_OK_ACK(7), CC_ERROR_ACK(7)
+T}
+_:_:_
+Call Setup:Both:T{
+.ad l
+.hy 0
+CC_SETUP_REQ(7), CC_SETUP_IND(7),
+CC_CALL_REATTEMPT_IND(7),
+CC_MORE_INFO_REQ(7), CC_MORE_INFO_IND(7),
+CC_INFORMATION_REQ(7), CC_INFORMATION_IND(7),
+CC_SETUP_RES(7), CC_SETUP_CON(7)
+T}
+:_:_
+:UNI:T{
+.ad l
+.hy 0
+CC_INFO_TIMEOUT_IND
+T}
+:_:_
+:NNI:T{
+.ad l
+.hy 0
+CC_CONT_REPORT_REQ(7),
+CC_CONT_REPORT_IND(7)
+T}
+_:_:_
+Call Establishment:Both:T{
+.ad l
+.hy 0
+CC_PROCEEDING_REQ(7), CC_PROCEEDING_IND(7),
+CC_ALERTING_REQ(7), CC_ALERTING_IND(7),
+CC_PROGRESS_REQ(7), CC_PROGRESS_IND(7),
+CC_CONNECT_REQ(7), CC_CONNECT_IND(7)
+T}
+_:_:_
+Call Established:Both:T{
+.ad l
+.hy 0
+CC_SUSPEND_REQ(7), CC_SUSPEND_RES(7), CC_SUSPEND_IND(7), CC_SUSPEND_CON(7),
+CC_RESUME_REQ(7), CC_RESUME_RES(7), CC_RESUME_IND(7), CC_RESUME_CON(7)
+T}
+:_:_
+:UNI:T{
+CC_SUSPEND_REJECT_REQ(7), CC_SUSPEND_REJECT_IND(7),
+CC_RESUME_REJECT_REQ(7), CC_RESUME_REJECT_IND(7)
+T}
+_:_:_
+Call Termination:Both:T{
+.ad l
+.hy 0
+CC_CALL_FAILURE_IND(7),
+CC_IBI_REQ(7), CC_IBI_IND(7),
+CC_RELEASE_REQ(7), CC_RELEASE_IND(7),
+CC_RELEASE_RES(7), CC_RELEASE_CON(7)
+T}
+:_:_
+:UNI:T{
+.ad l
+.hy 0
+CC_DISCONNECT_REQ(7), CC_DISCONNECT_IND(7)
+T}
+_:_:_
+Provider Management:UNI:T{
+.ad l
+.hy 0
+CC_RESTART_REQ(7), CC_RESTART_CON(7)
+T}
+:_:_
+:NNI:T{
+.ad l
+.hy 0
+CC_RESET_REQ(7), CC_RESET_IND(7),
+CC_RESET_RES(7), CC_RESET_CON(7),
+CC_BLOCKING_REQ(7), CC_BLOCKING_IND(7),
+CC_BLOCKING_RES(7), CC_BLOCKING_CON(7),
+CC_UNBLOCKING_REQ(7), CC_UNBLOCKING_IND(7),
+CC_UNBLOCKING_RES(7), CC_UNBLOCKING_CON(7),
+CC_QUERY_REQ(7), CC_QUERY_IND(7),
+CC_QUERY_RES(7), CC_QUERY_CON(7)
+T}
+::_
+::T{
+.ad l
+.hy 0
+CC_CONT_CHECK_REQ(7), CC_CONT_CHECK_IND(7),
+CC_CONT_TEST_REQ(7), CC_CONT_TEST_IND(7),
+CC_CONT_REPORT_REQ(7), CC_CONT_REPORT_IND(7)
+T}
+_:_:_
+.TE
+.ad b
+.hy 6
+.\"
+.\"
+.SH "LOCAL MANAGEMENT SERVICES DEFINITION"
+.PP
+The services defined in this section are outside the scope of international
+standards.  These services apply to UNI (User and Network), and NNI modes of
+communication.  They are invoked for the initialization/de-initialization of a
+stream connected to the CCS provider.  They are also used to manage options
+supported by the CCS provider and to report information on the supported
+parameter values.
+.\"
+.\"
+.SS "Call Control Information Reporting Service"
+.PP
+This service provides information on the options supported by the CCS
+provider.
+.\"
+.\"
+.TP
+.BR CC_INFO_REQ (7)
+This primitive request that the CCS provider return the values of all the
+supported protocol parameters.  This request may be invoked during any phase.
+.\"
+.\"
+.TP
+.BR CC_INFO_ACK (7)
+This primitive is in response to the N_INFO_REQ primitive and returns the
+values of the supported protocol parameters to the CCS user.
+.\"
+.\"
+.SS "CCS Address Service"
+.PP
+This service allows a CCS user to determine the bound call control address and
+the connected call control address for a given call reference associated with a
+stream.  It permits the CCS user to not necessarily retain this information
+locally, and allows the CCS user to determine this information from the CCS
+provider at any time.
+.\"
+.\"
+.TP
+.BR CC_ADDR_REQ (7)
+This primitive requests that the CCS provider return
+information concerning which call control address the CCS user is bound as
+well as the call control address upon which the CCS user is currently engaged
+in a call for the specified call reference.
+.\"
+.\"
+.TP
+.BR CC_ADDR_ACK (7)
+This primitive is in response to the CC_ADDR_REQ
+primitive and indicates to the CCS user the requested information.
+.\"
+.\"
+.SS "CCS User Bind Service"
+.PP
+This service allows a call control address to be associated with a stream.  It
+allows the CCS user to negotiate the number of setup indications that can
+remain unacknowledged for that CCS user (a setup indication is considered
+unacknowledged while it is awaiting a corresponding setup response or release
+request from the CCS user).  This service also defines a mechanism that allows
+a stream (bound to a call control address of the CCS user) to be reserved to
+handle incoming calls only.  This stream is referred to as the listener
+stream.
+.\"
+.\"
+.TP
+.BR CC_BIND_REQ (7)
+This primitive request that the CCS user be bound to a particular call control
+address and negotiate the number of allowable outstanding setup indications
+for that address.
+.\"
+.\"
+.TP
+.BR CC_BIND_ACK (7)
+This primitive is in response to the
+.BR CC_BIND_REQ (7)
+primitive and indicates to the user that the specified CCS user has been bound
+to a call control address.
+.\"
+.\"
+.SS "CCS User Unbind Service"
+.PP
+This service allows the CCS user to be unbound from a call control address.
+.\"
+.\"
+.TP
+.BR CC_UNBIND_REQ (7)
+This primitive request that the CCS user be unbound from the call control
+address that it had previously been bound to.
+.\"
+.\"
+.SS "Receipt Acknowledgment Service"
+.PP
+.\"
+.\"
+.TP
+.BR CC_OK_ACK (7)
+This primitive indicates to the CCS user that the previous (indicated) CCS
+user originated primitive was received successfully by the CCS provider.
+.\"
+.\"
+.SS "Options Management Service"
+.PP
+This service allows the CCS user to manage options parameter values associated
+with the CCS provider.
+.\"
+.\"
+.TP
+.BR CC_OPTMGMT_REQ (7)
+This primitive allows the CCS user to select default
+values for options parameters within the range supported by the CCS provider.
+.\"
+.\"
+.SS "Error Acknowledgment Service"
+.PP
+.\"
+.\"
+.TP
+.BR CC_ERROR_ACK (7)
+This primitive indicates to the CCS user that a non-fatal error has occurred
+in the last CCS user originated request or response primitive (listed in
+\fI\*(&f\n(&n\fR), on the stream.
+.\"
+.\"
+.SH "USER-NETWORK INTERFACE SERVICES DEFINITION"
+.PP
+This section describes the required call control service primitives that
+define the UNI interface.
+.\"
+.\"
+.PP
+The queue model for UNI is discussed in more detail in ITU-T Q.931.  For Q.931
+specific conformance considerations, see Addendum 1.
+.\"
+.\"
+.PP
+The queue model represents the operation of a call control connection in the
+abstract by a pair of queues linking the two call control addresses.  There is
+one queue for each direction of signalling transfer.  The ability of a user to
+add objects to a queue will be determined by the behavior of the user removing
+objects from that queue, and the state of the queue.  The pair of queues is
+considered to be available for each potential call.  Objects that are entered
+or removed from the queue are either as a result of interactions at the two
+call control addresses, or as the result of CCS provider initiatives.
+.\"
+.\"
+.IP \(em 4
+A queue is empty until a setup object has been entered and can be returned to
+this state, with loss of its contents, by the CCS provider.
+.\"
+.\"
+.IP \(em 4
+Objects may be entered into a queue as a result of the action of the source
+CCS user, subject to control by the CCS provider.
+.\"
+.\"
+.IP \(em 4
+Objects may also be entered into a queue by the CCS provider.
+.\"
+.\"
+.IP \(em 4
+Objects are removed from the queue under the control of the receiving CCS user.
+.\"
+.\"
+.IP \(em 4
+Objects are normally removed under the control of the CCS user in the same
+order as they were entered except:
+.RS
+.\"
+.\"
+.IP \(em 4
+if the object is of a type defined to be able to advance ahead of the
+preceding object, or
+.\"
+.\"
+.IP \(em 4
+if the following object is defined to be destructive with respect to the
+preceding object on the queue.  If necessary, the last object on the queue
+will be deleted to allow a destructive object to be entered \- they will
+therefore always be added to the queue.  For example, "release" objects are
+defined to be destructive with respect to all other objects.
+.RE
+.\"
+.\"
+.SS "Call Setup Phase"
+.PP
+A pair of queues is associated with a call between two call control addresses
+(facility group and channel(s)) when the CCS provider receives a
+.BR CC_SETUP_REQ (7)
+primitive at one of the call control addresses resulting in a setup object
+being entered into the queue.  The queues will remain associated with the call
+until a
+.BR CC_RELEASE_REQ (7)
+or
+.BR CC_RELEASE_IND (7)
+(resulting in a release object) is
+either entered into or removed from a queue.  Similarly, in the queue from the
+called CCS user, objects can be entered into the queue only after the setup
+object associated with the
+.BR CC_SETUP_RES (7)
+has been entered into the queue.
+Alternatively, the called CCS user can enter a release object into the queue
+instead of the setup object to terminate the call.
+.\"
+.\"
+.PP
+The call establishment procedure will fail if the CCS provider is unable to
+establish the call, or if the destination CCS user is unable to accept the
+.BR CC_SETUP_IND (7)
+(see call failure and call reject primitive definitions).
+.\"
+.\"
+.PP
+.I User Primitives for Successful Call Setup:
+.\"
+.\"
+.TP
+.BR CC_SETUP_REQ (7)
+This primitive requests that the CCS provider setup a call to the specified
+destination (called party number).
+.\"
+.\"
+.TP
+.BR CC_MORE_INFO_REQ (7)
+This primitive requests that the CCS provider provide more information to
+establish the call.  This primitive is not issued for \fIen bloc\fR
+signalling mode.
+.\"
+.\"
+.TP
+.BR CC_INFORMATION_REQ (7)
+This primitive requests that the CCS provider provide more information
+(digits) in addition to the destination (called party number) already
+specified in the
+.BR CC_SETUP_REQ (7)
+and subsequent
+.BR CC_INFORMATION_REQ (7)
+primitives.
+This primitive is not issued for \fIen block\fR signalling mode.
+.\"
+.\"
+.TP
+.BR CC_SETUP_RES (7)
+This primitive requests that the CCS provider accept a previous call setup
+indication on the specified stream.
+.\"
+.\"
+.PP
+.I Provider Primitives for Successful Call Setup:
+.\"
+.\"
+.TP
+.BR CC_CALL_REATTEMPT_IND (7)
+This primitive indicates to the calling CCS user that an event has caused call
+setup to fail on the selected address and that a reattempt should be made (or
+has been made) on another call control address (facility group and
+channel(s)).  This primitive is only issued by the CCS provider if the CCS
+user is bound at the channel level rather than the facility group  or
+equipment group levels.
+.\"
+.\"
+.TP
+.BR CC_SETUP_IND (7)
+This primitive indicates to the CCS user that a call setup request has been
+made by a user at the specified call control address (facility group and
+channel(s)).
+.\"
+.\"
+.TP
+.BR CC_MORE_INFO_IND (7)
+This primitive indicates to the CCS user that more information is required to
+establish the call.  This primitive is not issued for \fIen block\fR
+signalling mode.
+.\"
+.\"
+.TP
+.BR CC_INFORMATION_IND (7)
+This primitive indicates to the CCS user more information (digits) in addition
+to the destination (called party number) already indicated in the
+.BR CC_SETUP_IND (7)
+and subsequent
+.BR CC_INFORMATION_IND (7)
+primitives.  This primitive is not issued for \fIen block\fR signalling
+mode.
+.\"
+.\"
+.TP
+.BR CC_INFO_TIMEOUT_IND (7)
+This primitive indicates to the called CCS user that a timeout occurred while
+waiting for additional information (called party number).  The receiving CCS
+User should determine whether sufficient address digits have been received and
+either disconnect the call with the
+.BR CC_DISCONNECT_REQ (7)
+primitive or continue the call with
+.BR CC_SETUP_RES (7).
+This primitive is not issued for \fIen block\fR signalling mode.
+.\"
+.\"
+.TP
+.BR CC_SETUP_CON (7)
+This primitive indicates to the CCS user that a call setup request has been
+confirmed on the indicated call control address (channel(s)).
+.\"
+.\"
+.PP
+If the CCS provider is unable to establish a call, it indicates this to the
+request by a
+.BR CC_CALL_REATTEMPT_IND (7).
+.\"
+.\"
+.SS "Call Establishment Phase"
+.PP
+During the call establishment phase, a pair of queues has already been
+associated with the call between the selected call control addresses (facility
+group and channel(s)) during the setup phase.
+.\"
+.\"
+.PP
+.I User Primitives for Successful Call Establishment:
+.\"
+.\"
+.TP
+.BR CC_PROCEEDING_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that the call is proceeding and that all necessary information has been
+received.
+.\"
+.\"
+.TP
+.BR CC_ALERTING_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that the terminating user is being alerted.
+.\"
+.\"
+.TP
+.BR CC_PROGRESS_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that the specified progress event has occurred.
+.\"
+.\"
+.TP
+.BR CC_IBI_REQ "(7), " CC_DISCONNECT_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that in-band information is now available.  This will also invite the
+peer to release the call.
+.\"
+.\"
+.TP
+.BR CC_CONNECT_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that the call has been connected.
+.\"
+.\"
+.TP
+.BR CC_SETUP_COMPLETE_REQ (7)
+This primitive request that the CCS provider complete the call setup.
+.\"
+.\"
+.PP
+.I Provider Primitives for Successful Call Establishment:
+.\"
+.\"
+.TP
+.BR CC_PROCEEDING_IND (7)
+This primitive indicates to the CCS user that the call control peer is
+proceeding and that all necessary information has been received.
+.\"
+.\"
+.TP
+.BR CC_ALERTING_IND (7)
+This primitive indicates to the CCS user that the terminating user is being
+alerted.
+.\"
+.\"
+.TP
+.BR CC_PROGRESS_IND (7)
+This primitive indicates to the CCS user that the specified progress event has
+occurred.
+.\"
+.\"
+.TP
+.BR CC_IBI_IND "(7), " CC_DISCONNECT_IND (7)
+This primitive indicates to the CCS user that in-band information is now
+available.  It also invites the CCS user to release the call.
+.\"
+.\"
+.TP
+.BR CC_CONNECT_IND (7)
+This primitive indicates to the CCS user that the call has been connected.
+.\"
+.\"
+.TP
+.BR CC_SETUP_COMPLETE_IND (7)
+This primitive indicates to the CCS user that the call has completed setup.
+.\"
+.\"
+.PP
+.I Provider Primitives for Successful Call Setup:
+.\"
+.\"
+.SS "Call Established Phase"
+.PP
+Flow control of the call is done by management of the queue capacity, and by
+allowing objects of certain types to be inserted to the queues, as shown in
+Table X.
+.\"
+.\"
+.PP
+.B "Suspend Service"
+.\"
+.\"
+.PP
+.I User Primitives for Suspend Service:
+.\"
+.\"
+.TP
+.BR CC_SUSPEND_REQ (7)
+This primitives requests that the CCS provider temporarily suspend a call at
+the network, or indicate user suspension of a call.
+.\"
+.\"
+.TP
+.BR CC_SUSPEND_RES (7)
+This primitive indicates to the CCS provider that the CCS user (Network) is
+accepting the request for suspension of the call.
+.\"
+.\"
+.TP
+.BR CC_SUSPEND_REJECT_REQ (7)
+This primitive indicates to the CCS provider that the CCS user (Network) is
+rejecting the request for suspension of the call, and the cause for rejection.
+.\"
+.\"
+.PP
+.I Provider Primitives for Suspend Service:
+.\"
+.\"
+.TP
+.BR CC_SUSPEND_IND (7)
+This primitive indicates to the CCS user that an established call has been
+temporarily suspended at the network, or by the remote user.
+.\"
+.\"
+.TP
+.BR CC_SUSPEND_CON (7)
+This primitive confirms to the requesting CCS user (User) that the call has
+been temporarily suspended at the network.
+.\"
+.\"
+.TP
+.BR CC_SUSPEND_REJECT_IND (7)
+This primitive indicates to the requesting CCS user (User) that the request to
+suspend the call has been rejected by the network, and the cause for
+rejection.
+.\"
+.\"
+.PP
+.B "Resume Service"
+.\"
+.\"
+.PP
+.I User Primitives for Resume Service:
+.\"
+.\"
+.TP
+.BR CC_RESUME_REQ (7)
+This primitive request that the CCS provider resume a previously network
+suspended call, or indicates that the user has resumed a call.
+.\"
+.\"
+.TP
+.BR CC_RESUME_RES (7)
+This primitive indicates to the CCS provider that the CCS user (Network) is
+accepting the request for resumption of the call.
+.\"
+.\"
+.TP
+.BR CC_RESUME_REJECT_REQ (7)
+This primitive indicates to the CCS provider that the CCS user (Network) is
+rejecting the request for resumption of the call, and the cause for rejection.
+.\"
+.\"
+.PP
+.I Provider Primitives for Resume Service:
+.\"
+.\"
+.TP
+.BR CC_RESUME_IND (7)
+This primitive indicates to the CCS user that a previously suspended call has
+been resumed at the network, or by the remote user.
+.\"
+.\"
+.TP
+.BR CC_RESUME_CON (7)
+This primitive confirms to the requesting CCS user (User) that the call has
+been resumed at the network.
+.\"
+.\"
+.TP
+.BR CC_RESUME_REJECT_IND (7)
+This primitive indicates to the requesting CCS user (User) that the request to
+resume the call has been rejected by the network, and the cause for rejection.
+.\"
+.\"
+.PP
+The sequence of primitives as shown above may remain incomplete if a
+.B CC_RESET
+or
+.B CC_RELEASE
+primitive occurs (see Table 3).  A CCS user must not issue a
+.BR CC_RESUME_REQ (7)
+primitive if no
+.BR CC_SUSPEND_REQ (7)
+has been sent previously.
+Following a reset procedure
+.RB ( CC_RESET_REQ (7)
+or
+.BR CC_RESET_IND (7)),
+a CCS user may not issue a
+.BR CC_RESUME_REQ (7)
+to resume a call suspended before the reset procedure was signaled.
+.\"
+.\"
+.SS "Call Termination Phase"
+.PP
+.\"
+.\"
+.PP
+.B "Call Reject Service"
+.\"
+.\"
+.PP
+.I User Primitives for Call Reject Service:
+.\"
+.\"
+.TP
+.BR CC_REJECT_REQ (7)
+This primitive indicates that the CCS user receiving the specified
+.BR CC_SETUP_IND (7)
+requests that the specified call indication be rejected.
+.\"
+.\"
+.PP
+.I Provider Primitives for Call Reject Service:
+.\"
+.\"
+.TP
+.BR CC_REJECT_IND (7)
+This primitive indicates to the calling CCS user that the call has been
+rejected.
+.\"
+.\"
+.PP
+.B "Call Failure Service"
+.\"
+.\"
+.PP
+.I Provider Primitives for Call Failure Service:
+.\"
+.\"
+.TP
+.BR CC_CALL_FAILURE_IND (7)
+This primitive indicates to the called CCS user that an event has caused the
+call to fail and indicates the reason for the failure and the cause value
+associated with the failure.  The CCS user is required to release the call
+using the indicated cause value in a
+.BR CC_DISCONNECT_REQ (7)
+primitive.
+.\"
+.\"
+.PP
+.B "Call Release Service"
+The call release procedure is initialized by the insertion of a release object
+(associated with a
+.BR CC_DISCONNECT_REQ "(7), " CC_RELEASE_REQ "(7) or " CC_REJECT_REQ (7))
+in the queue.  As shown in Table 3, the release procedure is destructive with
+respect to other objects in the queue, and eventually results in the emptying
+of queues and termination of the call.
+.\"
+.\"
+.PP
+The Release procedure invokes the following interactions:
+.\"
+.\"
+.IP \(em 4
+A
+.BR CC_DISCONNECT_REQ (7)
+from the CCS user, followed by a
+.BR CC_RELEASE_IND (7)
+from the CCS provider and a subsequent
+.BR CC_RELEASE_RES (7)
+from the CCS user; or
+.\"
+.\"
+.IP \(em 4
+A
+.BR CC_DISCONNECT_IND (7)
+from the CCS provider, followed by a
+.BR CC_RELEASE_REQ (7)
+from the CCS user and a subsequent
+.BR CC_RELEASE_CON (7)
+from the CCS provider.
+.\"
+.\"
+.PP
+The sequence of primitive depends on the origin of the release action.  The
+sequence may be:
+.\"
+.\"
+.IP \(em 4
+invoked by the CCS user, with a request from that CCS user, leading to
+interaction (A) with that CCS user and interaction (B) with the peer CCS user;
+.\"
+.\"
+.IP \(em 4
+invoked by both CCS users, with a request from each of the CCS users, leading
+to interaction (A) with both CCS users;
+.\"
+.\"
+.IP \(em 4
+invoked by the CCS provider, leading to interaction (B) with both CCS users.
+.\"
+.\"
+.IP \(em 4
+invoked independently by one CCS user and the CCS provider, leading to
+interaction (A) with the originating CCS user and (B) with the peer CCS user.
+.\"
+.\"
+.PP
+.I User Primitives for Release Service:
+.\"
+.\"
+.TP
+.BR CC_DISCONNECT_REQ (7)
+This primitive request that the CCS provider disconnect the B-Channel or
+indicate tones and announcements present.  Tones and announcements should be
+requested in the
+.BR CC_IBI_REQ (7)
+primitive rather than the
+.BR CC_DISCONNECT_REQ (7)
+primitive.
+.\"
+.\"
+.TP
+.BR CC_RELEASE_REQ (7)
+This primitive requests that the CCS provider disconnect the B-Channel (if not
+already disconnected) and release the call reference.
+.\"
+.\"
+.TP
+.BR CC_RELEASE_RES (7)
+This primitive indicates to the CCS provider that the CCS user has accepted a
+release indication and has released the call reference.
+.\"
+.\"
+.PP
+.I Provider Primitives for Release Service:
+.\"
+.\"
+.TP
+.BR CC_DISCONNECT_IND (7)
+This primitive indicates that the remote CCS user or provider has disconnected
+the B-Channel or has made tones and announcements available.  The CCS provider
+should indicate tones and announcements present only with the
+.BR CC_IBI_IND (7)
+primitive rather than the
+.BR CC_DISCONNECT_IND (7)
+primitive.
+.\"
+.\"
+.TP
+.BR CC_RELEASE_IND (7)
+This primitive indicates that the remote CCS has disconnected the B-Channel
+and released the call reference.
+.\"
+.\"
+.TP
+.BR CC_RELEASE_CON (7)
+This primitive confirms that the remove CCS has disconnected the B-Channel and
+released the call reference.
+.\"
+.\"
+.PP
+.\"
+.\"
+.SS "Call Management"
+.PP
+.\"
+.\"
+.PP
+.I User Primitives for Call Management:
+.\"
+.\"
+.TP
+.BR CC_RESTART_REQ (7)
+This primitive requests the CCS provider to restart all the call control
+addresses (signalling interface and channels) for the UNI interface.
+.\"
+.\"
+.PP
+.I Provider Primitives for Call Management:
+.\"
+.\"
+.TP
+.BR CC_RESTART_CON (7)
+This primitive confirms to the requesting CCS user that all call control
+addresses (signalling interface and channels) for the UNI interface have been
+restarted and all calls are in the
+.B CCS_IDLE
+state.
+.\"
+.\"
+.TP
+.BR CC_MAINT_IND (7)
+This primitive indicates to CCS user that various events have occurred
+requiring maintenance notification (e.g., restart indication).
+.bp
+.\"
+.\"
+.SH "NETWORK-NETWORK INTERFACE SERVICES DEFINITION"
+.PP
+.\"
+.\"
+.PP
+This section describes the required call control service primitives that
+define the NNI interface.
+.\"
+.\"
+.PP
+The queue model for NNI is discussed in more detail in ITU-T Q.764.  For Q.764
+specific conformance considerations, see Addendum 2.  For ETSI EN 300 356-1
+V3.2.2 specific conformance considerations, see Addendum 3.
+.\"
+.\"
+.SS "Call Setup Phase"
+.PP
+A pair of queues is associated with a call between the two call control
+addresses when the CCS provider receives a
+.BR CC_SETUP_REQ (7)
+primitive at one of the call control addresses resulting in a setup object
+being entered into the queue.  The queues will remain associated with the call
+until a
+.BR CC_RELEASE_REQ (7)
+(resulting in a release object) is either entered into or removed from a
+queue.  Similarly, in the queue from the called CCS user, objects can be
+entered into the queue only after the setup object associated with the
+.BR CC_SETUP_RES (7)
+has been entered into the queue.  Alternatively, the called CCS user can enter
+a release object into the queue instead of the setup object to terminate the
+call.
+.\"
+.\"
+.PP
+The call establishment procedure will fail if the CCS provider is unable to
+establish the call, or if the destination CCS user is unable to accept the
+.BR CC_SETUP_IND (7)
+(see call release primitive definition).
+.\"
+.\"
+.PP
+.I User Primitives for Successful Call Setup:
+.\"
+.\"
+.TP
+.BR CC_SETUP_REQ (7)
+This primitive requests that the CCS provider setup a call to the specified
+destination (called party address).
+.\"
+.\"
+.TP
+.BR CC_MORE_INFO_REQ (7)
+This primitive requests that the CCS provider provide more information to
+establish the call.  This primitive is not issued for \fIen block\fR
+signalling mode.
+.\"
+.\"
+.TP
+.BR CC_INFORMATION_REQ (7)
+This primitive requests that the CCS provider provide more information
+(digits) in addition to the destination (called party number) already
+specified in the
+.BR CC_SETUP_REQ (7)
+and subsequent
+.BR CC_INFORMATION_REQ (7)
+primitives.  This primitive is not issued for \fIen block\fR signalling
+mode.
+.\"
+.\"
+.TP
+.BR CC_SETUP_RES (7)
+This primitive requests that the CCS provider accept a previous call setup
+indication on the specified stream.
+.\"
+.\"
+.PP
+.I Provider Primitives for Successful Call Setup:
+.\"
+.\"
+.TP
+.BR CC_CALL_REATTEMPT_IND (7)
+This primitive indicates to the calling CCS user that an event has caused call
+setup to fail on the selected address and that a reattempt should be made (or
+has been made) on another call control address (signalling interface and
+circuit(s)).  This primitive is only issued by the CCS provider if the CCS
+user is bound at the circuit level rather than the circuit group or trunk
+group level.
+.\"
+.\"
+.TP
+.BR CC_SETUP_IND (7)
+This primitive indicates to the CCS user that a call setup request has been
+made by a user at the specified call control address (circuit(s)).
+.\"
+.\"
+.TP
+.BR CC_MORE_INFO_IND (7)
+This primitive indicates to the CCS user that more information is required to
+establish the call.  This primitive is not issued for \fIen block\fR
+signalling mode.
+.\"
+.\"
+.TP
+.BR CC_INFORMATION_IND (7)
+This primitive indicates to the CCS user more information (digits) in addition
+to the destination (called party number) already indicated in the
+.BR CC_SETUP_IND (7)
+and subsequent
+.BR CC_INFORMATION_IND (7)
+primitives.  This primitive is not issued for \fIen block\fR signalling
+mode.
+.\"
+.\"
+.TP
+.BR CC_INFO_TIMEOUT_IND (7)
+This primitive indicates to the called CCS user that a timeout occurred while
+waiting for additional information (called party number).  The receiving CCS
+User should determine whether sufficient address digits have been received and
+either disconnect the call with the
+.BR CC_DISCONNECT_REQ
+primitive or continue
+the call with
+.BR CC_SETUP_RES (7).
+.\"
+.\"
+.TP
+.BR CC_SETUP_CON (7)
+This primitive indicates to the CCS user that a call setup request has been
+confirmed on the indicated call control address (circuits(s)).
+.\"
+.\"
+.SS "Continuity Test Phase"
+.PP
+The continuity test service is only applicable to the NNI.
+.\"
+.\"
+.PP
+During the continuity test phase, a pair of queues has already been associated
+with the call between the selected call control addresses (signalling
+interface and circuit(s)) during the setup phase.  The continuity test phase
+begins when the CCS provider returns a
+.BR CC_CONT_TEST_IND (7)
+primitive in response to a
+.BR CC_SETUP_REQ (7)
+primitive which had the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set in the call flags.  The continuity test phase also begins when the
+CCS user responds with
+a
+.BR CC_CONT_TEST_REQ (7)
+primitive in response to a
+.BR CC_SETUP_IND (7)
+primitive which had the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set in the call flags.
+.\"
+.\"
+.PP
+Upon entering the continuity test phase, it is the responsibility of the CCS
+user to establish a loop back on the call control address (signalling
+interface and circuit(s)) or to attach tone generation and detection devices
+to the call control address (signalling interface and circuit(s)).
+.\"
+.\"
+.PP
+.B "Continuity Test Successful"
+.\"
+.\"
+.PP
+.I User Primitives for Successful Continuity Test:
+.\"
+.\"
+.PP
+.\"
+.\"
+.TP
+.BR CC_SETUP_REQ (7)
+This primitive, with the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set, requests that the CCS provider setup a call and include a continuity
+check before the call is established.
+.\"
+.\"
+.TP
+.BR CC_CONT_CHECK_REQ (7)
+This primitive requests that the CCS provider perform a continuity check on
+the specified call control address (signalling interface and circuit(s)).
+This primitive is only necessary for performing continuity checks that are not
+in conjunction with a call.
+.\"
+.\"
+.TP
+.BR CC_CONT_TEST_REQ (7)
+This primitive requests that the CCS provider accept an outstanding call setup
+indication.  When the
+.BR CC_SETUP_IND (7)
+had the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set, it indicates to the CCS provider that the necessary loop back device
+has been install on the call control address (signalling interface and
+circuit(s)).
+.\"
+.\"
+.TP
+.BR CC_CONT_REPORT_REQ (7)
+This primitive requests that the CCS provider indicate to the remote CCS user
+that the continuity test has succeeded (cc_result is set to
+.BR ISUP_COT_SUCCESS ).
+.\"
+.\"
+.PP
+.I Provider Primitives for Successful Continuity Test:
+.\"
+.\"
+.PP
+.\"
+.\"
+.TP
+.BR CC_SETUP_IND (7)
+This primitive, with the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set, indicates to the CCS user that a call setup including a continuity
+check is requested.
+.\"
+.\"
+.TP
+.BR CC_CONT_CHECK_IND (7)
+This primitive indicates to the CCS user that a continuity check was requested
+on the specified call control address (signalling interface and circuit(s)).
+This primitive is only necessary for performing continuity checks that are not
+in conjunction with a call.
+.\"
+.\"
+.TP
+.BR CC_CONT_TEST_IND (7)
+This primitive indicates that the remote CCS user has accepted a call setup
+indication on the specified call control address (signalling interface and
+circuit(s)).  When the
+.BR CC_SETUP_IND (7)
+primitive had the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set, it indicates to the CCS user that the necessary loop back device has
+been installed on the remote end of the call control address (signalling
+interface and circuit(s)).  The CCS user receiving this primitive must attach
+the necessary tone generation and detection devices to the circuit(s) and
+perform the continuity test.
+.\"
+.\"
+.TP
+.BR CC_CONT_REPORT_IND (7)
+This primitive indicates to the CCS user that the continuity test was
+successful.
+.\"
+.\"
+.PP
+.B "Continuity Test Unsuccessful"
+.\"
+.\"
+.PP
+.I User Primitives for Unsuccessful Continuity Test:
+.\"
+.\"
+.PP
+.\"
+.\"
+.TP
+.BR CC_SETUP_REQ (7)
+This primitive, with the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set, requests that the CCS provider setup a call and include a continuity
+check before the call is established.
+.\"
+.\"
+.TP
+.BR CC_CONT_TEST_REQ (7)
+This primitive requests that the CCS provider accept an outstanding call setup
+indication.  When the
+.BR CC_SETUP_IND (7)
+had the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set, it also indicates to the CCS provider that the necessary loop back
+device has been install on the call control address (signalling interface and
+circuit(s)).
+.\"
+.\"
+.TP
+.BR CC_CONT_REPORT_REQ (7)
+This primitiive requests that the CCS provider indicate to the remote CCS user
+that the continuity test has failed (cc_result is set to
+.BR ISUP_COT_FAILURE ).
+.\"
+.\"
+.PP
+.I Provider Primitives for Unsuccessful Continuity Test:
+.\"
+.\"
+.PP
+.\"
+.\"
+.TP
+.BR CC_SETUP_IND (7)
+This primitive, with the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set, indicates to the CCS user that a call setup including a continuity
+check is requested.
+.\"
+.\"
+.TP
+.BR CC_CONT_TEST_IND (7)
+This primitive indicates that the remote CCS user has accepted a call setup
+indication on the specified call control address (signalling interface and
+circuit(s)).  When the
+.BR CC_SETUP_IND (7)
+primitive had the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set, it indicates to the CCS user that the necessary loop back device
+hass been installed on the remote end of the call control address (signalling
+interface and circuit(s)).  The CCS user receiving this primitive must attach
+the necessary tone generation and detection devices to the circuit(s) and
+perform the continuity test.
+.\"
+.\"
+.TP
+.BR CC_CONT_REPORT_IND (7)
+This primitive indicates to the CCS user that the continuity test failed.
+.\"
+.\"
+.TP
+.BR CC_CALL_REATTEMPT_IND (7)
+This primitive indicates to the calling CCS user that the continuity test
+failed and that a reattempt should be made (or has been made) on another call
+control address (signalling interface and circuit(s)).  This primitive is only
+issued by the CCS provider if the CCS user is bound at the circuit level
+rather than the circuit group or trunk group level.
+.\"
+.\"
+.SS "Call Establishment Phase"
+.PP
+During the call establishment phase, a pair of queues has already been
+associated with the call between the selected call control addresses
+(signalling interface and circuit(s)) during the setup phase.  The call
+establishment phase begins when the CCS provider returns a
+.BR CC_SETUP_CON (7)
+primitive (or receives a
+.BR CC_CONT_REPORT_REQ (7)
+primitive) in response to a
+.BR CC_SETUP_REQ (7)
+primitive (which had the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set).  The call establishment phase also begins when the CCS user
+responds with a
+.BR CC_SETUP_RES (7)
+primitive (or receives a
+.BR CC_CONT_REPORT_IND (7)
+primitive) in response to a
+.BR CC_SETUP_IND (7)
+primitive (which had the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set).
+.\"
+.\"
+.PP
+Upon entering the call establishment phase, it is the responsibility of the
+CCS user to remove any loop back from the call control address (signalling
+interface and circuit(s)) or to remove tone generation and detection devices
+from the call controll address (signalling interface and circuit(s)).
+.\"
+.\"
+.PP
+.I User Primitives for Successful Call Establishment:
+.\"
+.\"
+.TP
+.BR CC_PROCEEDING_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that the call is proceeding.
+.\"
+.\"
+.TP
+.BR CC_ALERTING_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that the terminating user is being alerted.
+.\"
+.\"
+.TP
+.BR CC_PROGRESS_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that the specified progress event has occurred.
+.\"
+.\"
+.TP
+.BR CC_IBI_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that interworking has been encountered and in-band information is now
+available.  This will also inform the peer CCS user that no connect indication
+is pending.
+.\"
+.\"
+.TP
+.BR CC_CONNECT_REQ (7)
+This primitive requests that the CCS provider indicate to the call control
+peer that the call has been connected.
+.\"
+.\"
+.TP
+.BR CC_SETUP_COMPLETE_REQ (7)
+This primitive requests that the CCS provider complete the call setup.  This
+primitive is used in NNI mode for interworking with UNI mode.
+.\"
+.\"
+.PP
+.I Provider Primitives for Successful Call Establishment:
+.\"
+.\"
+.TP
+.BR CC_PROCEEDING_IND (7)
+This primitive indicates to the CCS user that the call control peer is
+proceeding.
+.\"
+.\"
+.TP
+.BR CC_ALERTING_IND (7)
+This primitive indicates to the CCS user that the terminating user is being
+alerted.
+.\"
+.\"
+.TP
+.BR CC_PROGRESS_IND (7)
+This primitive indicates to the CCS user that the specified progress event has
+occurred.
+.\"
+.\"
+.TP
+.BR CC_IBI_IND (7)
+This primitive indicates to the CCS user that interworking has been
+encountered and in-band information is now available.  It also indicates to
+the CCS user that no connect indication is pending.
+.\"
+.\"
+.TP
+.BR CC_CONNECT_IND (7)
+This primitive indicates to the CCS user that the call has been connected.
+.\"
+.\"
+.TP
+.BR CC_SETUP_COMPLETE_IND (7)
+This primitive indicates to the CCS user that the call has completed setup.
+This primitive is used in NNI mode for interworking with UNI mode.
+.\"
+.\"
+.SS "Call Established Phase"
+.PP
+Flow control of the call is done by management of the queue capacity, and by
+allowing objects of certain types to be inserted to the queues, as shown in
+Table X.
+.\"
+.\"
+.PP
+.I User Primitives for Established Calls:
+.\"
+.\"
+.TP
+.BR CC_SUSPEND_REQ (7)
+This primitives requests that the CCS provider temporarily suspend a call.
+.\"
+.\"
+.TP
+.BR CC_RESUME_REQ (7)
+This primitive request that the CCS provider resume a previously suspended
+call.
+.\"
+.\"
+.PP
+.I Provider Primitives for Established Calls:
+.\"
+.\"
+.TP
+.BR CC_SUSPEND_IND (7)
+This primitive indicates to the CCS user that an established call has been
+temporarily suspended.
+.\"
+.\"
+.TP
+.BR CC_RESUME_IND (7)
+This primitive indicates to the CCS user that a previously suspended call has
+been resumed.
+.\"
+.\"
+.PP
+The sequence of primitives as shown above may remain incomplete if a
+.BR CC_RESET
+or
+.BR CC_RELEASE
+primitive occurs (see Table 3).  A CCS user must not issue a
+.BR CC_RESUME_REQ (7)
+primitive if no
+.BR CC_SUSPEND_REQ (7)
+has been sent previously.  Following a reset procedure
+.RB ( CC_RESET_REQ (7)
+or
+.BR CC_RESET_IND (7)),
+a CCS user may not issue a
+.BR CC_RESUME_REQ (7)
+to resume a call suspended before the reset procedure was signaled.
+.\"
+.\"
+.SS "Call Termination Phase"
+.PP
+.\"
+.\"
+.PP
+.B "Call Reject Service"
+.\"
+.\"
+.PP
+.I User Primitives for Call Reject Service:
+.\"
+.\"
+.TP
+.BR CC_REJECT_REQ (7)
+This primitive indicates that the CCS user receiving the specified
+.BR CC_SETUP_IND (7)
+requests that the specified call indication be rejected.
+.\"
+.\"
+.PP
+.I Provider Primitives for Call Reject Service:
+.\"
+.\"
+.TP
+.BR CC_REJECT_IND (7)
+This primitive indicates to the calling CCS user that the call has been
+rejected.
+.\"
+.\"
+.PP
+.B "Call Failure Service"
+.\"
+.\"
+.PP
+The call error procedure is indicated by the removal of a reattempt or failure
+object (associated with a local event) from the queue.  The error procedure is
+destructive with respect to other objects in the queue, and eventually results
+in the emptying of queues and termination of the call.
+.\"
+.\"
+.PP
+.I Provider Primitives for the Call Failure Service:
+.\"
+.\"
+.TP
+.BR CC_CALL_FAILURE_IND (7)
+This primitive indicates to the CCS user that an event has caused the call to
+fail and indicates the reason for the failure and the cause value associated
+with the failure.  The CCS user is required to immediately disconnect the
+circuit(s) and release the call on any previous legs using the indicated cause
+value in the primitive.
+.\"
+.\"
+.PP
+.B "Call Release Service"
+.\"
+.\"
+.PP
+The call release procedure is initialized by the insertion of a release object
+(associated with a
+.BR CC_RELEASE_REQ (7))
+into the queue.  As shown in Table 3, the
+release procedure is destructive with respect to other objects in the queue,
+and eventually results in the emptying of queues and termination of the call.
+.\"
+.\"
+.PP
+The release procedure invokes the following interactions:
+.\"
+.\"
+.IP \(em 4
+a
+.BR CC_RELEASE_REQ (7)
+from the CCS user, followed by a
+.BR CC_RELEASE_CON (7)
+from the CCS provider; or
+.\"
+.\"
+.IP \(em 4
+A
+.BR CC_RELEASE_IND (7)
+from the CCS provider, followed by a
+.BR CC_RELEASE_REQ (7)
+from the CCS user.
+.\"
+.\"
+.PP
+The sequence of primitives depends on the origin of the release action.  The
+sequence may be:
+.\"
+.\"
+.IP \(em 4
+invoked by one CCS user, with a request from that CCS user, leading to
+interaction (A) with that CCS user and interaction (B) with the peer CCS user;
+.\"
+.\"
+.IP \(em 4
+invoked by both CCS users, with a request from each of the CCS users, leading
+to interaction (A) with both CCS users;
+.\"
+.\"
+.IP \(em 4
+invoked by the CCS provider, leading to interaction (B) with both CCS users;
+.\"
+.\"
+.IP \(em 4
+invoked independently by on CCS user and the CCS provider, leading to
+interaction (A) with the originating CCS user and (B) with the peer CCS user.
+.\"
+.\"
+.PP
+.I User Primitives for the Release Service:
+.\"
+.\"
+.TP
+.BR CC_RELEASE_REQ (7)
+This primitive request that the CCS provider release the call.
+.\"
+.\"
+.TP
+.BR CC_RELEASE_RES (7)
+This primitive indicates to the CCS provider that the CCS user has accepted a
+release indication.
+.\"
+.\"
+.PP
+.I Provider Primitives for the Release Service:
+.\"
+.\"
+.TP
+.BR CC_RELEASE_IND (7)
+This primitive indicates to the CCS user that the call has been released.
+.\"
+.\"
+.TP
+.BR CC_RELEASE_CON (7)
+This primitive indicates to the CCS user that the release request has been
+confirmed.
+.\"
+.\"
+.SS "Circuit Management Services"
+.PP
+.\"
+.\"
+.PP
+.B "Reset Service"
+.\"
+.\"
+.PP
+The reset service is used by the CCS user or management to resynchronize the
+use of the call, or by the CCS provider to report detected loss of a
+unrecoverable call.
+.\"
+.\"
+.PP
+The reset service is only applicable to the NNI.
+.\"
+.\"
+.PP
+The reset procedure invokes the following interactions:
+.\"
+.\"
+.IP \(em 4
+a
+.BR CC_RESET_REQ (7)
+from the CCS user, followed by a
+.BR CC_RESET_CON (7)
+from the CCS provider; or
+.\"
+.\"
+.IP \(em 4
+a
+.BR CC_RESET_IND (7)
+from the CCS provider, followed by a
+.BR CC_RESET_RES (7)
+from the CCS user.
+.\"
+.\"
+.PP
+The complete sequence of primitives depends upon the origin of the reset
+action.  The reset service may be:
+.\"
+.\"
+.IP \(em 4
+invoked by one CCS user, leading to interaction (A) with that CCS user and
+interaction (B) with the peer CCS user.
+.\"
+.\"
+.IP \(em 4
+invoked by both CCS users, leading to interaction (A) with both CCS users;
+.\"
+.\"
+.IP \(em 4
+invoked by the CCS provider, leading to interaction (B) with both CCS users;
+.\"
+.\"
+.IP \(em 4
+invoked by one CCS user and the CCS provider, leading to interaction (A) with
+the originating CCS user and (B) with the peer CCS user.
+.\"
+.\"
+.PP
+.I User Primitives for Reset Service:
+.\"
+.\"
+.TP
+.BR CC_RESET_REQ (7)
+This primitive requests that the CCS provider reset the specified call control
+address (circuit or circuit group).
+.\"
+.\"
+.TP
+.BR CC_RESET_RES (7)
+This primitive indicates to the CCS provider that the CCS user has accepted a
+reset indication and has performed local reset of the specified call control
+address (circuit or circuit group).
+.\"
+.\"
+.sp
+Note that the
+.BR CC_RESET_RES (7)
+primitive is not required and is only provided for completeness.  The CCS
+provider is allowed to acknowledge the reset request to the peer CCS user upon
+receipt of the necessary protocol messages.  This permits automatic completion
+of the reset service at the receiving CCS provider without he presence or
+involvement of a management entity associated with the receiving provider.
+.\"
+.\"
+.PP
+.I Provider Primitives for Reset Service:
+.\"
+.\"
+.TP
+.BR CC_RESET_IND (7)
+This primitive indicates to the CCS user that the user should reset the
+specified call control address (circuit or circuit group).
+.\"
+.\"
+.TP
+.BR CC_RESET_CON (7)
+This primitive indicates to the CCS user that the specified call control
+address (circuit or circuit group) has been successfully reset by the peer.
+.\"
+.\"
+.PP
+.B "Blocking Service"
+.\"
+.\"
+.PP
+The blocking service is used by the CCS user or management to effect local
+maintenance or hardware blocking on circuits, or by the CCS provider to
+indicate to CCS user or management the remote maintenance or hardware blocking
+of circuits.
+.\"
+.\"
+.PP
+The blocking service is only applicable to the NNI.
+.\"
+.\"
+.PP
+The blocking service provides for the local and remote blocking of call
+control addresses (signalling interface and circuit or circuit group) either
+for maintenance oriented or hardware failure purposes.
+.\"
+.\"
+.PP
+Blocking should only be invoked from streams which are listening on a circuit
+group which include the circuits for which blocking is requested, or the
+.BR CC_DEFAULT_LISTENER .
+Maintenance blocking will also only be indicated on streams which are
+listening on circuit group which include the circuits for which blocking is
+requested, or in the absence of such a stream, the
+.BR CC_DEFAULT_LISTENER .
+When no stream is available to report maintenance blocking indications, the
+indication should be responded to by the CCS provider without user or
+management indication.
+.\"
+.\"
+.PP
+.I User Primitives for Blocking Service:
+.\"
+.\"
+.TP
+.BR CC_BLOCKING_REQ (7)
+This primitive requests that the specified call control address(es)
+(signalling interface and circuit or circuit group) be locally blocked either
+for maintenance oriented or hardware failure purposes.
+.\"
+.\"
+.TP
+.BR CC_BLOCKING_RES (7)
+This primitive accepts a request and indicates the call control address(es)
+(circuit or circuit group) that were remotely blocked for maintenance oriented
+or hardware failure purposes.\**
+.\"
+.\"
+.sp
+Note that the
+.BR CC_BLOCKING_RES (7)
+primitive is not required and is only provided for completeness.  The CCS
+provider is allowed to acknowledge the blocking request to the peer CCS user
+upon receipt of the necessary protocol messages.  This permits automatic
+completion of the blocking service at the receiving CCS provider without he
+presence or involvement of a management entity associated with the receiving
+provider.
+.\"
+.\"
+.PP
+.I Provider Primitives for Blocking Service:
+.\"
+.\"
+.TP
+.BR CC_BLOCKING_IND (7)
+This primitive indicates that the CCS user has requested that the specified
+call control address(es) (signalling interface and circuit or circuit group)
+be remotely blocked either for maintenance oriented or hardware failure
+purposes.
+.\"
+.\"
+.TP
+.BR CC_BLOCKING_CON (7)
+This primitive indicates that the remote CCS user has confirmed the specified
+call control address(es) (signalling interfaces and circuit or circuit group)
+as locally blocked either for maintenance oriented or hardware failure
+purposes
+.\"
+.\"
+.PP
+.B "Unblocking Service"
+.\"
+.\"
+.PP
+The unblocking service is only applicable to the NNI.
+.\"
+.\"
+.PP
+The unblocking service provides for the local and remote unblocking of call
+control addresses (signalling interface and circuit or circuit group) either
+for maintenance oriented or hardware failure purposes.
+.\"
+.\"
+.PP
+.I User Primitives for Unblocking Service:
+.\"
+.\"
+.TP
+.BR CC_UNBLOCKING_REQ (7)
+This primitive requests that the specified call control address(es)
+(signalling interfaces and circuit or circuit groups) be locally unblocked
+either for maintenance oriented or hardware failure purposes.
+.\"
+.\"
+.TP
+.BR CC_UNBLOCKING_RES (7)
+This primitive accepts a request and indicates the call control address(es)
+(circuit or circuit group) that were remotely unblocked for maintenance
+oriented or hardware failure purposes.\**
+.\"
+.\"
+.sp
+Note that the
+.BR CC_UNBLOCKING_RES (7)
+primitive is not required and is only provided for completeness.  The CCS
+provider is allowed to acknowledge the unblocking request to the peer CCS user
+upon receipt of the necessary protocol messages.  This permits automatic
+completion of the unblocking service at the receiving CCS provider without he
+presence or involvement of a management entity associated with the receiving
+provider.
+.\"
+.\"
+.PP
+.I Provider Primitives for Unblocking Service:
+.\"
+.\"
+.TP
+.BR CC_UNBLOCKING_IND (7)
+This primitive indicates that the CCS user has requested that the specified
+call control address(es) (signalling interface and circuit or circuit group)
+be remotely blocked either for maintenance oriented or hardware failure
+purposes.
+.\"
+.\"
+.TP
+.BR CC_UNBLOCKING_CON (7)
+This primitive indicates that the remote CCS user has confirmed the specified
+call control address(es) (signalling interfaces and circuit or circuit group)
+as locally unblocked either for maintenance oriented or hardware failure
+purposes.
+.\"
+.\"
+.PP
+.B "Query Service"
+.\"
+.\"
+.PP
+The query service is only applicable to the NNI.
+.\"
+.\"
+.PP
+The query service provides for the query of the remote state and blocking
+level of call control addresses (signalling interface and circuit group).
+.\"
+.\"
+.PP
+.I User Primitives for Query Service:
+.\"
+.\"
+.TP
+.BR CC_QUERY_REQ (7)
+This primitive request that the specified call control address(es) (signalling
+interfaces and circuit group) be queried for remote state and blocking level.
+.\"
+.\"
+.TP
+.BR CC_QUERY_RES (7)
+This primitive accepts a request and indicates the local state and blocking
+level for the previously requested specified call control addresses (circuit
+group).\**
+.\"
+.\"
+.sp
+Note that the
+.BR CC_QUERY_RES (7)
+primitive is not required and is only provided for completeness.  The CCS
+provider is allowed to acknowledge the query request to the peer CCS user upon
+receipt of the necessary protocol messages.  This permits automatic completion
+of the query service at the receiving CCS provider without he presence or
+involvement of a management entity associated with the receiving provider.
+.\"
+.\"
+.PP
+.I Provider Primitives for Query Service:
+.\"
+.\"
+.TP
+.BR CC_QUERY_IND (7)
+This primitive indicates that the CCS user has requested that the local state
+and blocking level for the call control address(es) (signalling interface and
+circuit group).
+.\"
+.\"
+.TP
+.BR CC_QUERY_CON (7)
+This primitive indicates that the remote CCS user has confirmed the specified
+call control addresses (signalling interface and circuit group) and has
+returned the remote state and blocking level for each address.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.SH FILES
+.PP
+.SH DEVICES
+.PP
+.SH VERSIONS
+.PP
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI
