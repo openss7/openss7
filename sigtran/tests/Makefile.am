@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/17 12:12:39 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 10:42:54 $ by $Author: brian $
+## Last Modified $Date: 2006/10/17 12:12:39 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2006/10/17 12:12:39  brian
+## - working up new packages
+##
 ## Revision 0.9.2.1  2006/10/16 10:42:54  brian
 ## - added new package files
 ##
@@ -63,6 +66,7 @@ include ../am/autotest.am
 TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
+			$(TESTSUITE)-m2pa.at \
 			$(TESTSUITE).at
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

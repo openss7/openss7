@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.2 2006/10/13 09:29:10 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.3 2006/10/17 12:12:44 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/13 09:29:10 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/17 12:12:44 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: descrip.texi,v $
+@c Revision 0.9.2.3  2006/10/17 12:12:44  brian
+@c - working up new packages
+@c
 @c Revision 0.9.2.2  2006/10/13 09:29:10  brian
 @c - updates
 @c
@@ -78,15 +81,13 @@ implementations of specific channels.  A pseudo-device driver is planned to
 link into the @cite{Linux} OSS (Open Sound System) and ALS (Advanced Linux
 Sound).  Specific E1/T1 cards such as the V401P are supported by this package.
 
-@ignore
 This package also supports data channel protocols for data communication over
 isochronous channels such as HDLC and SS7 DAEDR/DAEDT/AERM/SUERM as well as
 upper layer link protocols such as LAPB, LAPF, LAPD, LLC.  These modules are
 provided here because they work directly over an isochronous channel and are
 therefore designed to work with them.  These data links provide support for
-the @cite{OpenSS7 STREAMS ISO/OSI} as well as the @cite{OpenSS7 STREAMS
-SS7/ISDN/VoIP/SIGTRAN Stack} package.
-@end ignore
+the @cite{OpenSS7 STREAMS ISO/OSI} as well as the @cite{OpenSS7 STREAMS ISDN
+Stacks} and @cite{OpenSS7 STREAMS SS7 Stack} packages.
 
 This package builds and installs the following @dfn{STREAMS} kernel modules
 and drivers:
@@ -98,7 +99,6 @@ and drivers:
 @item @tab @minus{} @file{streams_pwe3.ko} module @dfn{pwe3}
 @item @tab @minus{} @file{streams_rtp.ko} module @dfn{rtp}
 @item @tab @minus{} @file{streams_zaptel.ko} module @dfn{zaptel}
-@ignore
 @item @tab @minus{} @file{streams_hdlc.ko} module @dfn{hdlc}
 @item @tab @minus{} @file{streams_hdlc.ko} module @dfn{hdlc}
 @item @tab @minus{} @file{streams_q702.ko} module @dfn{q702}
@@ -106,7 +106,6 @@ and drivers:
 @item @tab @minus{} @file{streams_lapf.ko} module @dfn{lapf}
 @item @tab @minus{} @file{streams_lapd.ko} module @dfn{lapd}
 @item @tab @minus{} @file{streams_llc.ko} module @dfn{llc}
-@end ignore
 @end multitable
 
 @table @manref
@@ -146,7 +145,6 @@ The @manpage{zaptel(4)} modules is a pushable @dfn{STREAMS} module that is
 pushed over a @manpage{ch(4)} channel Stream to provide the historical
 @manpage{zaptel(4)} interface for asterisk and other open-PBX packages.
 
-@ignore
 @item hdlc(4)
 The @manpage{hdlc(4)} module a pushable @dfn{STREAMS} module that provides the
 capabilties of the High-Level Data Link Control and can be pushed over a raw
@@ -158,13 +156,28 @@ X.25 or ISDN.
 The @manpage{q702(4)}
 
 @item lapb(4)
+The @manpage{lapb(4)} module is a pushable @dfn{STREAMS} module that provides
+the capability of the Link Access Procedure (Balanced) and can be pushed over
+an @manpage{hdlc(4)} module to provide a Data Link Provider Interface (DLPI)
+suitable for use with X.25 protocols.
 
 @item lapf(4)
+The @manpage{lapf(4)} module is a pushable @dfn{STREAMS} module that provides
+the capability of the Link Access Procedure (Frame) Q.922 and can be pushed
+over an @manpage{hdlc(4)} module to provide a Data Link Provider Interface
+(DLPI) suitable for use with Frame Relay, Q.932, protocols.
 
 @item lapd(4)
+The @manpage{labd(4)} module is a pushable @dfn{STREAMS} module that provides
+the capabilities of the Link Access Procedure (D-Channel) Q.921 and can be
+pushed over an @manpage{hdlc(4)} module to provide a Data Link Provider
+Interface (DLPI) suitable for use with ISDN, Q.931, protocols.
 
 @item llc(4)
-@end ignore
+The @manpage{llc(4)} module is a @dfn{STREAMS} pseudo-device driver that
+provides the capabilites of the Logical Link Control, ISO 8802, and provides a
+Data Link Provider Interface (DLPI) suitable for use with OSI protocols.  This
+pseudo-device driver hook into the Linux packet handling system.
 
 @end table
 

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/13 08:31:25 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/17 12:12:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 08:31:25 $ by $Author: brian $
+# Last Modified $Date: 2006/10/17 12:12:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,7 +75,10 @@ m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
 m4_include([m4/iso.m4])
 m4_include([m4/chan.m4])
+m4_include([m4/isdn.m4])
 m4_include([m4/ss7.m4])
+m4_include([m4/sigtran.m4])
+m4_include([m4/voip.m4])
 
 # =============================================================================
 # AC_OS7
@@ -304,6 +307,14 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test ! -d "$srcdir/strchan" ; then
 	with_STRCHAN='no'
     fi
+    AC_ARG_WITH([STRISDN],
+		AS_HELP_STRING([--without-STRISDN],
+			       [do not include STRISDN in master pack @<:@included@:>@]),
+		[with_STRISDN="$withval"],
+		[with_STRISDN="${with_ALL:-no}"])
+    if test ! -d "$srcdir/strisdn" ; then
+	with_STRISDN='no'
+    fi
     AC_ARG_WITH([STACKS],
 		AS_HELP_STRING([--without-STACKS],
 			       [do not include STACKS in master pack @<:@included@:>@]),
@@ -311,6 +322,22 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		[with_STACKS='yes'])
     if test ! -d "$srcdir/stacks" ; then
 	with_STACKS='no'
+    fi
+    AC_ARG_WITH([SIGTRAN],
+		AS_HELP_STRING([--without-SIGTRAN],
+			       [do not include SIGTRAN in master pack @<:@included@:>@]),
+		[with_SIGTRAN="$withval"],
+		[with_SIGTRAN="${with_ALL:-no}"])
+    if test ! -d "$srcdir/sigtran" ; then
+	with_SIGTRAN='no'
+    fi
+    AC_ARG_WITH([STRVOIP],
+		AS_HELP_STRING([--without-STRVOIP],
+			       [do not include STRVOIP in master pack @<:@included@:>@]),
+		[with_STRVOIP="$withval"],
+		[with_STRVOIP="${with_ALL:-no}"])
+    if test ! -d "$srcdir/strvoip" ; then
+	with_STRVOIP='no'
     fi
 ])# _OS7_OPTIONS
 # =============================================================================
@@ -458,12 +485,33 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-chan'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-chan"
     fi
+    if test :"${with_STRISDN:-yes}" != :no ; then
+	_ISDN
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_isdn --without-isdn\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-isdn'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-isdn"
+    fi
     if test :"${with_STACKS:-yes}" != :no ; then
 	_SS7
     else
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_ss7 --without-ss7\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-ss7'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-ss7"
+    fi
+    if test :"${with_SIGTRAN:-yes}" != :no ; then
+	_SIGTRAN
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_sigtran --without-sigtran\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-sigtran'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-sigtran"
+    fi
+    if test :"${with_STRVOIP:-yes}" != :no ; then
+	_VOIP
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_voip --without-voip\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-voip'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-voip"
     fi
 ])# _OS7_SETUP
 # =============================================================================
@@ -547,8 +595,17 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STRCHAN:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strchan])
     fi
+    if test :${with_STRISDN:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strisdn])
+    fi
     if test :${with_STACKS:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([stacks])
+    fi
+    if test :${with_SIGTRAN:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([sigtran])
+    fi
+    if test :${with_STRVOIP:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strvoip])
     fi
 ])# _OS7_OUTPUT
 # =============================================================================

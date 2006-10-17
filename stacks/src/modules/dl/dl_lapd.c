@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:07:41 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/17 12:12:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:07:41 $ by $Author: brian $
+ Last Modified $Date: 2006/10/17 12:12:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.16  2006/10/17 12:12:41  brian
+ - working up new packages
+
  Revision 0.9.2.15  2006/03/07 01:07:41  brian
  - binary compatible callouts, gcc 4.0
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:07:41 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/17 12:12:41 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:07:41 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/17 12:12:41 $";
 
 #include <sys/os7/compat.h>
 
@@ -76,7 +79,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/07 01:07:41 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/17 12:12:41 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -6151,7 +6154,7 @@ dl_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	int rtn;
 	dl->i_oldstate = dl_get_state(dl);
-	if (mp->b_wptr > mp->b_rptr + sizeof(prim))
+	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
 		return (-EMSGSIZE);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case DL_INFO_REQ:

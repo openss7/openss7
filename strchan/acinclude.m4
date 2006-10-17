@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 09:29:10 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/17 12:12:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 09:29:10 $ by $Author: brian $
+# Last Modified $Date: 2006/10/17 12:12:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.4  2006/10/17 12:12:42  brian
+# - working up new packages
+#
 # Revision 0.9.2.3  2006/10/13 09:29:10  brian
 # - updates
 #
@@ -72,10 +75,10 @@ m4_include([m4/kernel.m4])
 m4_include([m4/devfs.m4])
 m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
-m4_incldue([m4/public.m4])
+m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
-m4_incldue([m4/libraries.m4])
+m4_include([m4/libraries.m4])
 m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
@@ -265,7 +268,7 @@ AC_DEFUN([_CHAN_OUTPUT], [dnl
     strconf_cv_input='Config.master'
     strconf_cv_majbase=242
     strconf_cv_midbase=20
-    if test ${streams_cv_package:-Lfs} = LfS ; then
+    if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl
 dnl Tired of device conflicts on 2.6 kernels.

@@ -1,12 +1,13 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/12 10:19:34 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/17 12:12:40 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +48,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/12 10:19:34 $ by $Author: brian $
+# Last Modified $Date: 2006/10/17 12:12:40 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.54  2006/10/17 12:12:40  brian
+# - working up new packages
 #
 # =============================================================================
 
@@ -74,6 +81,7 @@ m4_include([m4/nsl.m4])
 m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
+m4_include([m4/iso.m4])
 m4_include([m4/doxy.m4])
 
 # =============================================================================
@@ -339,6 +347,7 @@ AC_DEFUN([_SS7_SETUP], [dnl
     _SOCK
     _INET
     _SCTP
+    _ISO
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _SS7_OTHER_SCTP
@@ -1356,9 +1365,10 @@ AC_DEFUN([_SS7_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

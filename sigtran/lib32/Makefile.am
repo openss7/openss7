@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/17 12:12:37 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 10:42:46 $ by $Author: brian $
+## Last Modified $Date: 2006/10/17 12:12:37 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2006/10/17 12:12:37  brian
+## - working up new packages
+##
 ## Revision 0.9.2.1  2006/10/16 10:42:46  brian
 ## - added new package files
 ##
@@ -81,6 +84,15 @@ test_sigtran_LDADD		= $(STREAMS_LDADD32)
 test_sigtran_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sigtran_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sigtran_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+pkglibexec32_PROGRAMS		+= test-m2pa
+
+test_m2pa_SOURCES		= $(top_srcdir)/src/test/test-m2pa.c
+test_m2pa_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+test_m2pa_LDADD			= $(STREAMS_LDADD32)
+test_m2pa_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
+test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_m2pa_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 ## RPM_BUILD_USER
 endif

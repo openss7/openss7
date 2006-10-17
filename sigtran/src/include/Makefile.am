@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/17 12:12:38 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 10:42:48 $ by $Author: brian $
+## Last Modified $Date: 2006/10/17 12:12:38 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2006/10/17 12:12:38  brian
+## - working up new packages
+##
 ## Revision 0.9.2.1  2006/10/16 10:42:48  brian
 ## - added new package files
 ##
@@ -61,7 +64,23 @@ include ../../am/openss7.am
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-nobase_pkginclude_HEADERS = 
+nobase_pkginclude_HEADERS = \
+	sys/dlpi_dua.h \
+	sys/dlpi_gr303ua.h \
+	sys/dlpi_iua.h \
+	sys/dlpi_m2ua.h \
+	sys/dlpi_v5ua.h \
+	sys/dua_ioctl.h \
+	sys/gr303ua_ioctl.h \
+	sys/iua_ioctl.h \
+	sys/m2pa_ioctl.h \
+	sys/m2ua_ioctl.h \
+	sys/m3ua.h \
+	sys/m3ua_ioctl.h \
+	sys/ua_lm.h \
+	sys/ua_lm_ioctl.h \
+	sys/v5ua_ioctl.h
+
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \
