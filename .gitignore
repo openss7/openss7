@@ -178,6 +178,8 @@ sctp/scripts/texinfo.tex
 sctp/src/sctp.c.old
 sctp/tests/Makefile.in
 sctp/TODO
+sigtran/doc/manual/sigtran.info
+sigtran/doc/manual/sigtran.info-1
 stacks/ABOUT-NLS
 stacks/aclocal.m4
 stacks/AUTHORS
@@ -701,6 +703,8 @@ strinet/src/Makefile.in
 strinet/tags
 strinet/tests/Makefile.in
 strinet/TODO
+strisdn/doc/manual/strisdn.info
+strisdn/doc/manual/strisdn.info-1
 striso/ABOUT-NLS
 striso/aclocal.m4
 striso/AUTHORS
@@ -1036,6 +1040,8 @@ strutil/src/include/Makefile.in
 strutil/src/Makefile.in
 strutil/tests/Makefile.in
 strutil/TODO
+strvoip/doc/manual/strvoip.info
+strvoip/doc/manual/strvoip.info-1
 strxnet/ABOUT-NLS
 strxnet/aclocal.m4
 strxnet/AUTHORS
