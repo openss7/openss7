@@ -1,0 +1,52 @@
+OpenSS7 STREAMS ISDN -- acknowledgements.  2006-10-16
+$Id: THANKS,v 0.9.2.2 2006/10/17 12:08:24 brian Exp $
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+ Acknowledgements
+=================
+
+As with most open source projects, this project would not have been
+possible without the valiant efforts and productive software of the
+`Free Software Foundation' and the `Linux Kernel Community'.
+
+ Sponsors
+---------
+
+Funding for completion of the `OpenSS7 OpenSS7 STREAMS ISDN' package was
+provided in part by:
+
+     * OpenSS7 Corporation
+
+Additional funding for The OpenSS7 Project was provided by:
+
+     * OpenSS7 Corporation
+     * Lockheed Martin Co.
+     * Performance Technologies Inc.
+     * Motorola
+     * HOB International
+     * Comverse Ltd.
+     * Sonus Networks Inc.
+     * France Telecom
+     * SS8 Networks Inc
+     * Nortel Networks
+     * Verisign
+
+ Contributors
+-------------
+
+The primary contributor to the `OpenSS7 OpenSS7 STREAMS ISDN' package is
+Brian F. G. Bidulock <bidulock@openss7.org>.  The following is a list
+of significant contributors to The OpenSS7 Project:
+
+     - Per Berquist
+     - John Boyd
+     - Chuck Winters
+     - Peter Courtney
+     - Tom Chandler
+     - Gurol Ackman
+     - Kutluk Testicioglu
+     - John Wenker
+     - Others
+

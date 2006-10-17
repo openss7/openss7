@@ -1,5 +1,5 @@
-OpenSS7 Master Package -- read me first file.  2006-10-04
-$Id: README,v 0.9.2.14 2006/10/10 10:33:33 brian Exp $
+OpenSS7 Master Package -- read me first file.  2006-10-16
+$Id: README,v 0.9.2.15 2006/10/17 12:08:12 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 Master Package
 =======================
 
-Package `openss7-0.9.2.D' Released 2006-10-04.
+Package `openss7-0.9.2.D' Released 2006-10-16.
 
 This is the `OpenSS7 Master Package' package.  It consists of a master
 package that contains all other OpenSS7 Project package releases.  Use
@@ -30,7 +30,11 @@ The `OpenSS7 Master Package' package contains:
 `strsctp-0.9.2.6' (`STREAMS SCTP'),
 `striso-0.9.2.1' (`STREAMS Open Systems Interconnect'),
 `netperf-2.3.4' (`Network Performance'),
-`strss7-0.9a.5' (`STREAMS SS7/VoIP/SIGTRAN/ISDN Stacks') and
+`strchan-0.9.2.1' (`STREAMS Channels'),
+`strisdn-0.9.2.1' (`STREAMS ISDN Stack'),
+`strss7-0.9a.5' (`STREAMS SS7 Stacks'),
+`sigtran-0.9.2.1' (`STREAMS SIGTRAN Stack'),
+`strvoip-0.9.2.1' (`STREAMS VoIP Stacks') and
 `LiS-2.18.4' (`Linux STREAMS').
 
 If you need to build an install a significant number of these packages,
@@ -39,7 +43,7 @@ the `OpenSS7 Master Package' package is the easiest way to do so.
  Release
 --------
 
-This is the `openss7-0.9.2.D' package, released 2006-10-04.  This
+This is the `openss7-0.9.2.D' package, released 2006-10-16.  This
 `0.9.2.D' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

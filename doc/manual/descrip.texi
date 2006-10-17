@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.2 2006/08/28 03:03:45 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.3 2006/10/17 12:08:14 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/28 03:03:45 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/17 12:08:14 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -80,7 +80,11 @@ The @cite{@value{PACKAGE_TITLE}} package contains:
 @command{strsctp-@value{VERSION_STRSCTP}} (@cite{STREAMS SCTP}), @*
 @command{striso-@value{VERSION_STRISO}} (@cite{STREAMS Open Systems Interconnect}), @*
 @command{netperf-@value{VERSION_NETPERF}} (@cite{Network Performance}), @*
-@command{strss7-@value{VERSION_STRSS7}} (@cite{STREAMS SS7/VoIP/SIGTRAN/ISDN Stacks}) and @*
+@command{strchan-@value{VERSION_STRCHAN}} (@cite{STREAMS Channels}), @*
+@command{strisdn-@value{VERSION_STRISDN}} (@cite{STREAMS ISDN Stack}), @*
+@command{strss7-@value{VERSION_STRSS7}} (@cite{STREAMS SS7 Stacks}), @*
+@command{sigtran-@value{VERSION_SIGTRAN}} (@cite{STREAMS SIGTRAN Stack}), @*
+@command{strvoip-@value{VERSION_STRVOIP}} (@cite{STREAMS VoIP Stacks}) and @*
 @command{LiS-@value{VERSION_LIS}} (@cite{Linux STREAMS}).
 
 If you need to build an install a significant number of these packages, the

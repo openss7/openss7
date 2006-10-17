@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/17 12:08:17 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 10:42:40 $ by $Author: brian $
+## Last Modified $Date: 2006/10/17 12:08:17 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2006/10/17 12:08:17  brian
+## - update release files
+##
 ## Revision 0.9.2.1  2006/10/16 10:42:40  brian
 ## - added new package files
 ##
@@ -81,9 +84,11 @@ if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod \
-				  test-sigtran
+				  test-sigtran \
+				  test-m2pa
 
-pkglibexec_PROGRAMS		= test-sigtran
+pkglibexec_PROGRAMS		= test-sigtran \
+				  test-m2pa
 
 sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
 
@@ -107,6 +112,13 @@ test_sigtran_LDADD		= $(STREAMS_LDADD)
 test_sigtran_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_sigtran_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sigtran_CFLAGS		= $(USER_CFLAGS)
+
+test_m2pa_SOURCES		= src/test/test-m2pa.c
+test_m2pa_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+test_m2pa_LDADD			= $(STREAMS_LDADD)
+test_m2pa_LDFLAGS		= $(STREAMS_LDFLAGS)
+test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_m2pa_CFLAGS		= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -136,15 +148,84 @@ libSIGTRANlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libSIGTRANlink_a_OBJECTS):	$(libSIGTRANlink_a_SOURCES) $(libSIGTRANlink_a_DEPENDENCIES)
 
-EXTRA_libSIGTRANmods_a_SOURCES	=
-libSIGTRANmods_a_SOURCES	= 
+EXTRA_libSIGTRANmods_a_SOURCES	= \
+				src/modules/m2tp.c
+libSIGTRANmods_a_SOURCES	= \
+				src/modules/m2pa_sl.c \
+				src/modules/sdl_sctp.c \
+				src/modules/sdt_sctp.c \
+				src/modules/sdt_tpi.c \
+				src/modules/sl_tpi.c
 libSIGTRANmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libSIGTRANmods_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libSIGTRANmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libSIGTRANmods_a_OBJECTS):	$(libSIGTRANmods_a_DEPENDENCIES)
 
-EXTRA_libSIGTRANdrvs_a_SOURCES	=
+EXTRA_libSIGTRANdrvs_a_SOURCES	= \
+				src/drivers/m2ua.c \
+				src/drivers/m3ua_as.c \
+				src/drivers/m3ua_asp.c \
+				src/drivers/m3ua_asp.h \
+				src/drivers/m3ua.c \
+				src/drivers/m3ua_data.h \
+				src/drivers/m3ua.h \
+				src/drivers/m3ua_lm.c \
+				src/drivers/m3ua_lm.h \
+				src/drivers/m3ua_lower.c \
+				src/drivers/m3ua_msg.c \
+				src/drivers/m3ua_msg.h \
+				src/drivers/m3ua_mtp.c \
+				src/drivers/m3ua_mtp.h \
+				src/drivers/m3ua_mtpp.c \
+				src/drivers/m3ua_mtpu.c \
+				src/drivers/m3ua_nsp.c \
+				src/drivers/m3ua_nsp.h \
+				src/drivers/m3ua_sg.c \
+				src/drivers/m3ua_sgp.c \
+				src/drivers/m3ua_spp.c \
+				src/drivers/m3ua_ss7.c \
+				src/drivers/m3ua_tsp.c \
+				src/drivers/m3ua_tsp.h \
+				src/drivers/sua_asp.c \
+				src/drivers/sua_asp.h \
+				src/drivers/sua.c \
+				src/drivers/sua_ctrl.h \
+				src/drivers/sua_data.h \
+				src/drivers/sua.h \
+				src/drivers/sua_lm.c \
+				src/drivers/sua_lm.h \
+				src/drivers/sua_lower.c \
+				src/drivers/sua_msg.c \
+				src/drivers/sua_msg.h \
+				src/drivers/sua_nsp.c \
+				src/drivers/sua_nsp.h \
+				src/drivers/sua_sccp.c \
+				src/drivers/sua_sccp.h \
+				src/drivers/sua_send.h \
+				src/drivers/sua_sgp.c \
+				src/drivers/sua_sm.c \
+				src/drivers/sua_spp.c \
+				src/drivers/sua_ss7.c \
+				src/drivers/sua_tsp.c \
+				src/drivers/sua_tsp.h \
+				src/drivers/tali.c \
+				src/drivers/tali_data.h \
+				src/drivers/tali.h \
+				src/drivers/tali_isup.c \
+				src/drivers/tali_lm.c \
+				src/drivers/tali_msgs.h \
+				src/drivers/tali_mtp.c \
+				src/drivers/tali_sccp.c \
+				src/drivers/tua_asp.c \
+				src/drivers/tua_asp.h \
+				src/drivers/tua.c \
+				src/drivers/tua_data.h \
+				src/drivers/tua.h \
+				src/drivers/tua_msg.h \
+				src/drivers/tua_sgp.c \
+				src/drivers/tua_spp.c \
+				src/drivers/tua_ss7.c
 libSIGTRANdrvs_a_SOURCES	=
 libSIGTRANdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libSIGTRANdrvs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
