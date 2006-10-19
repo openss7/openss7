@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sctp.h,v 0.9.2.5 2006/10/19 11:52:45 brian Exp $
+ @(#) $Id: npi_sctp.h,v 0.9.2.6 2006/10/19 12:48:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 11:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/10/19 12:48:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_sctp.h,v $
+ Revision 0.9.2.6  2006/10/19 12:48:31  brian
+ - corrections to ETSI SACK frequency
+
  Revision 0.9.2.5  2006/10/19 11:52:45  brian
  - added support for ETSI SACK frequency
 
@@ -58,7 +61,7 @@
 #ifndef _SYS_NPI_SCTP_H
 #define _SYS_NPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  LiS npi.h is version 1
@@ -179,7 +182,7 @@ typedef struct {
 /* Additional selection type added to support ETSI SACK Frequency settings.  Note that this
  * structure must be compatibile with the original version above except in the last field. */
 #define N_QOS_SEL_INFO_SCTP2	5
-typdef struct {
+typedef struct {
 	np_ulong n_qos_type;		/** Always N_QOS_SEL_INFO_SCTP2. */
 	np_ulong i_streams;		/** Maximum number of input streams. */
 	np_ulong o_streams;		/** Requested number of output streams. */

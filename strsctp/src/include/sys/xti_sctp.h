@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9.2.4 2006/10/19 11:52:45 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.5 2006/10/19 12:48:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 11:52:45 $ by $Author: brian $
+ Last Modified $Date: 2006/10/19 12:48:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_sctp.h,v $
+ Revision 0.9.2.5  2006/10/19 12:48:31  brian
+ - corrections to ETSI SACK frequency
+
  Revision 0.9.2.4  2006/10/19 11:52:45  brian
  - added support for ETSI SACK frequency
 
@@ -79,7 +82,7 @@
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define T_INET_SCTP	132	/* SCTP level (same as protocol number) */
 
@@ -107,16 +110,7 @@
 #define T_SCTP_COOKIE_INC		19
 #define T_SCTP_THROTTLE_ITVL		20
 #define T_SCTP_MAC_TYPE			21
-
-#define T_SCTP_HMAC_NONE	0
-#define T_SCTP_HMAC_SHA1	1
-#define T_SCTP_HMAC_MD5		2
-
 #define T_SCTP_CKSUM_TYPE		22
-
-#define T_SCTP_CSUM_ADLER32	0
-#define T_SCTP_CSUM_CRC32C	1
-
 #define T_SCTP_ECN			23
 #define T_SCTP_ALI			24
 #define T_SCTP_ADD			25
@@ -126,8 +120,25 @@
 #define T_SCTP_SET_IP			29
 #define T_SCTP_PR			30
 #define T_SCTP_LIFETIME			31
-
 #define T_SCTP_DISPOSITION		32
+#define T_SCTP_MAX_BURST		33
+#define T_SCTP_HB			34
+#define T_SCTP_RTO			35
+/*
+ *  Read-only options...
+ */
+#define T_SCTP_MAXSEG			36
+#define T_SCTP_STATUS			37
+#define T_SCTP_DEBUG			38
+#define T_SCTP_SACK_FREQUENCY		39
+
+
+#define T_SCTP_HMAC_NONE	0
+#define T_SCTP_HMAC_SHA1	1
+#define T_SCTP_HMAC_MD5		2
+
+#define T_SCTP_CSUM_ADLER32	0
+#define T_SCTP_CSUM_CRC32C	1
 
 #define T_SCTP_DISPOSITION_NONE		0
 #define T_SCTP_DISPOSITION_UNSENT	1
@@ -135,16 +146,12 @@
 #define T_SCTP_DISPOSITION_GAP_ACKED	3
 #define T_SCTP_DISPOSITION_ACKED	4
 
-#define T_SCTP_MAX_BURST		33
-
-#define T_SCTP_HB			34
 typedef struct t_sctp_hb {
 	t_uscalar_t hb_dest;		/* destination address */
 	t_uscalar_t hb_onoff;		/* activation flag */
 	t_uscalar_t hb_itvl;		/* interval in milliseconds */
 } t_sctp_hb_t;
 
-#define T_SCTP_RTO			35
 typedef struct t_sctp_rto {
 	t_uscalar_t rto_dest;		/* destination address */
 	t_uscalar_t rto_initial;	/* RTO.Initial (milliseconds) */
@@ -153,11 +160,6 @@ typedef struct t_sctp_rto {
 	t_uscalar_t max_retrans;	/* Path.Max.Retrans (retries) */
 } t_sctp_rto_t;
 
-/*
- *  Read-only options...
- */
-#define T_SCTP_MAXSEG			36
-#define T_SCTP_STATUS			37
 typedef struct t_sctp_dest_status {
 	t_uscalar_t dest_addr;		/* dest address */
 	t_uscalar_t dest_cwnd;		/* dest congestion window */
@@ -174,11 +176,6 @@ typedef struct t_sctp_status {
 	t_uscalar_t curr_nrep;		/* current dests reported */
 	t_sctp_dest_status_t curr_dest[0];	/* current primary dest */
 } t_sctp_status_t;
-
-#define T_SCTP_DEBUG			38
-
-/* added to support ETSI SACK frequency */
-#define T_SCTP_SACK_FREQUENCY		39
 
 #ifndef SCTP_OPTION_DROPPING
 #define SCTP_OPTION_DROPPING	0x01	/* stream will drop packets */

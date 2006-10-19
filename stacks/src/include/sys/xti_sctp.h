@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9.2.5 2006/09/25 12:10:09 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.6 2006/10/19 12:48:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:10:09 $ by $Author: brian $
+ Last Modified $Date: 2006/10/19 12:48:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_sctp.h,v $
+ Revision 0.9.2.6  2006/10/19 12:48:14  brian
+ - corrections to ETSI SACK frequency
+
  Revision 0.9.2.5  2006/09/25 12:10:09  brian
  - updated and doxygenified headers
 
@@ -70,7 +73,7 @@
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -134,6 +137,7 @@
 #define T_SCTP_MAXSEG			36
 #define T_SCTP_STATUS			37
 #define T_SCTP_DEBUG			38
+#define T_SCTP_SACK_FREQUENCY		39
 /** @} */
 
 /** @name T_SCTP_MAC_TYPE Values

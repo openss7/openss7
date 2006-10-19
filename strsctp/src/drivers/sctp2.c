@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/10/19 11:52:30 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/19 12:48:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 11:52:30 $ by $Author: brian $
+ Last Modified $Date: 2006/10/19 12:48:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.52  2006/10/19 12:48:16  brian
+ - corrections to ETSI SACK frequency
+
  Revision 0.9.2.51  2006/10/19 11:52:30  brian
  - added support for ETSI SACK frequency
 
@@ -88,9 +91,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/10/19 11:52:30 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/19 12:48:16 $"
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/10/19 11:52:30 $";
+static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/19 12:48:16 $";
 
 #include "sctp_compat.h"
 
@@ -108,7 +111,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.51
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/10/19 11:52:30 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/19 12:48:16 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -264,6 +267,7 @@ STATIC int min_sctp_max_burst = 1;
 #define sctp_default_recvopt		T_YES
 #define sctp_default_cookie_life	60	/* seconds */
 #define sctp_default_sack_delay		200	/* milliseconds */
+#define sctp_default_sack_frequency	2
 #define sctp_default_path_max_retrans	5
 #define sctp_default_assoc_max_retrans	10
 #define sctp_default_max_init_retries	8
@@ -644,6 +648,7 @@ STATIC struct sctp_options sctp_defaults = {
 	 sctp_default_recvopt,
 	 (sctp_default_cookie_life * HZ),		/* XXX */
 	 (sctp_default_sack_delay * HZ / 1000),		/* XXX */
+	 sctp_default_sack_frequency,
 	 sctp_default_path_max_retrans,
 	 sctp_default_assoc_max_retrans,
 	 sctp_default_max_init_retries,
@@ -661,7 +666,6 @@ STATIC struct sctp_options sctp_defaults = {
 	 sctp_default_rto,
 	 sctp_default_status,
 	 sctp_default_debug,
-	 sctp_default_sack_frequency,
 #if defined SCTP_CONFIG_ECN
 	 sctp_default_ecn,
 #endif
@@ -16176,13 +16180,17 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 		if (q->ck_life != -1) {
 			if (q->ck_life < 1)
 				goto badqosparam;
+#ifndef __LP64__
 			if (q->ck_life * HZ > MAX_SCHEDULE_TIMEOUT)
 				goto badqosparam;
+#endif
 			sp->ck_life = q->ck_life * HZ;
 		}
 		if (q->ck_inc != -1) {
+#ifndef __LP64__
 			if (q->ck_inc * HZ > MAX_SCHEDULE_TIMEOUT)
 				goto badqosparam;
+#endif
 			sp->ck_inc = q->ck_inc * HZ;
 		}
 		if (q->hmac != -1) {
@@ -16202,8 +16210,10 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 				goto badqosparam;
 			if (q->throttle < 1)
 				goto badqosparam;
+#ifndef __LP64__
 			if (q->throttle / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
 				goto badqosparam;
+#endif
 			sp->throttle = q->throttle * HZ / 1000;
 		}
 		if (q->max_sack != -1) {
@@ -16235,8 +16245,10 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 					goto badqosparam;
 				if (q->rto_ini < 1)
 					goto badqosparam;
+#ifndef __LP64__
 				if (q->rto_ini / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
 					goto badqosparam;
+#endif
 			}
 			sp->rto_ini = q->rto_ini * HZ / 1000;
 		}
@@ -16246,8 +16258,10 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 					goto badqosparam;
 				if (q->rto_min < 1)
 					goto badqosparam;
+#ifndef __LP64__
 				if (q->rto_min / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
 					goto badqosparam;
+#endif
 			}
 			sp->rto_min = q->rto_min * HZ / 1000;
 		}
@@ -16257,8 +16271,10 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 					goto badqosparam;
 				if (q->rto_max < 1)
 					goto badqosparam;
+#ifndef __LP64__
 				if (q->rto_max / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
 					goto badqosparam;
+#endif
 			}
 			sp->rto_max = q->rto_max * HZ / 1000;
 		}
@@ -16270,8 +16286,10 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 		if (q->hb_itvl != -1) {
 			if (q->hb_itvl < 1)
 				goto badqosparam;
+#ifndef __LP64__
 			if (q->hb_itvl * HZ > MAX_SCHEDULE_TIMEOUT)
 				goto badqosparam;
+#endif
 			sp->hb_itvl = q->hb_itvl * HZ;
 		}
 		if (q->options != -1) {
@@ -20287,7 +20305,7 @@ t_build_conn_opts(struct sctp *sp, unsigned char *op, size_t olen)
 				oh->status = T_PARTSUCCESS;
 				sp->options.sctp.sack_freq = 5;
 			}
-			if (sp->options.sctp.sack < 1)
+			if (sp->options.sctp.sack_freq < 1)
 				sp->options.sctp.sack_freq = 1;
 		}
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.sack_delay;
