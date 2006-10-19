@@ -1,3 +1,10 @@
+2006-10-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp2.c: added support for ETSI SACK frequency
+	* src/include/sys/npi_sctp.h: added support for ETSI SACK frequency
+	* src/include/sys/tpi_sctp.h: added support for ETSI SACK frequency
+	* src/include/sys/xti_sctp.h: added support for ETSI SACK frequency
+
 2006-10-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/sctp2.c: printf statement correction for debug compile
