@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 01:03:41 $
+ @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 01:03:41 $ by $Author: brian $
+ Last Modified $Date: 2006/10/19 17:49:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_ns.c,v $
+ Revision 0.9.2.6  2006/10/19 17:49:47  brian
+ - ulong becomes np_ulong
+
  Revision 0.9.2.5  2006/09/26 01:03:41  brian
  - rationalized to stacks package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 01:03:41 $"
+#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $"
 
-static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 01:03:41 $";
+static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -142,10 +145,10 @@ N_qos_sel_info_sctp_t qos_info = {
 	0,				/* sid */
 	12,				/* max_inits */
 	12,				/* max_retrans */
-	-1UL,				/* ck_life */
-	-1UL,				/* ck_inc */
-	-1UL,				/* hmac */
-	-1UL,				/* throttle */
+	-1,				/* ck_life */
+	-1,				/* ck_inc */
+	-1,				/* hmac */
+	-1,				/* throttle */
 	20,				/* max_sack */
 	100,				/* rto_ini */
 	20,				/* rto_min */

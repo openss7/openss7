@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 01:03:41 $
+ @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 01:03:41 $ by $Author: brian $
+ Last Modified $Date: 2006/10/19 17:49:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp.c,v $
+ Revision 0.9.2.6  2006/10/19 17:49:47  brian
+ - ulong becomes np_ulong
+
  Revision 0.9.2.5  2006/09/26 01:03:41  brian
  - rationalized to stacks package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 01:03:41 $"
+#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $"
 
-static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/26 01:03:41 $";
+static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $";
 
 /* 
  *  This file is for testing the sctp_n driver.
@@ -313,16 +316,16 @@ print_qos(char *qos_ptr, size_t add_len)
 	switch (qos->n_qos_type) {
 	case N_QOS_SEL_CONN_SCTP:
 		printf("CONN:");
-		printf(" i_streams = %ld,", qos->n_qos_conn.i_streams);
-		printf(" o_streams = %ld", qos->n_qos_conn.o_streams);
+		printf(" i_streams = %ld,", (long) qos->n_qos_conn.i_streams);
+		printf(" o_streams = %ld", (long) qos->n_qos_conn.o_streams);
 		break;
 
 	case N_QOS_SEL_DATA_SCTP:
 		printf("DATA: ");
-		printf(" ppi = %lu,", qos->n_qos_data.ppi);
-		printf(" sid = %ld,", qos->n_qos_data.sid);
-		printf(" ssn = %ld,", qos->n_qos_data.ssn);
-		printf(" more = %ld", qos->n_qos_data.more);
+		printf(" ppi = %lu,", (ulong) qos->n_qos_data.ppi);
+		printf(" sid = %ld,", (long) qos->n_qos_data.sid);
+		printf(" ssn = %ld,", (long) qos->n_qos_data.ssn);
+		printf(" more = %ld", (long) qos->n_qos_data.more);
 		break;
 
 	case N_QOS_SEL_INFO_SCTP:
@@ -334,7 +337,7 @@ print_qos(char *qos_ptr, size_t add_len)
 		break;
 
 	default:
-		printf("(unknown qos structure %lu)\n", qos->n_qos_type);
+		printf("(unknown qos structure %lu)\n", (ulong) qos->n_qos_type);
 		break;
 	}
 	printf("\n");

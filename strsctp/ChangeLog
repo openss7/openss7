@@ -1,5 +1,9 @@
 2006-10-19  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-sctp.c: changes to compile on x86_64 with new NPI qos structure
+	* src/test/test-sctp_nc.c: changes to compile on x86_64 with new NPI qos structure
+	* src/test/test-sctp_ns.c: changes to compile on x86_64 with new NPI qos structure
+
 	* doc/manual/strsctp.texi: added ETSI TS 102 144 PICS
 	* src/test/test-etsi_n.c: workup
 
