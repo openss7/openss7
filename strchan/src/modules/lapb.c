@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $
+ @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/19 10:37:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:56:00 $ by $Author: brian $
+ Last Modified $Date: 2006/10/19 10:37:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapb.c,v $
+ Revision 0.9.2.2  2006/10/19 10:37:25  brian
+ - working up drivers and modules
+
  Revision 0.9.2.1  2006/10/17 11:56:00  brian
  - copied files into new packages from strss7 package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $"
+#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/19 10:37:25 $"
 
 static char const ident[] =
-    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $";
+    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/19 10:37:25 $";
 
 /*
  *  This is a pushable STREAMS module that provides the Link Access Procedure
@@ -85,7 +88,7 @@ static char const ident[] =
 
 #define LAPB_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LAPB_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/19 10:37:25 $"
 #define LAPB_DEVICE	"SVR 4.2 STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"
@@ -200,18 +203,59 @@ struct dl {
 	queue_t *wq;
 	queue_t *oq;			/* lower write queue */
 	dl_info_ack_t info;
+	dl_qos_co_sel1_t qos;		/* quality of service selection */
+	dl_qor_co_range1_t qor;		/* quality of service range */
 	uchar caddr;			/* remote command address, local response address */
 	uchar raddr;			/* remote response address, local command address */
+	dl_ulong dl_max_conind;		/* maximum connection indications */
 	uint flags;			/* boolean flags, see defines below */
+	buf_queue_t conq;		/* connection queue */
+	buf_queue_t sndq;		/* send queue */
+	buf_queue_t rtxq;		/* retransmission queue */
 };
 
-#define DL_FLAG_EXTENDED	01
-#define DL_FLAG_MLP		02
-#define DL_FLAG_DCE		04
+#define DL_PRIV(__q) ((struct dl *)((__q)->q_ptr))
+
+#define DL_FLAG_AUTOXID		01
+#define DL_FLAG_AUTOTEST	02
+#define DL_FLAG_CONNMGMT	04
+
+#define DL_FLAG_EXTENDED	001
+#define DL_FLAG_SUPERMODE	002
+#define DL_FLAG_MLP		004
+#define DL_FLAG_DCE		0001
+#define DL_FLAG_DTE		0002
+#define DL_FLAG_STE		0004
 
 #define dl_extended(__dl)	(!!((__dl)->flags & DL_FLAG_EXTENDED))
+#define dl_supermode(__dl)	(!!((__dl)->flags & DL_FLAG_SUPERMODE))
 #define dl_mlp(__dl)		(!!((__dl)->flags & DL_FLAG_MLP))
 #define dl_dce(__dl)		(!!((__dl)->flags & DL_FLAG_DCE))
+#define dl_autoxid(__dl)	(!!((__dl)->flags & DL_FLAG_AUTOXID))
+#define dl_autotest(__dl)	(!!((__dl)->flags & DL_FLAG_AUTOTEST))
+
+#define DLF_UNATTACHED		(1<<DL_UNATTACHED)
+#define DLF_ATTACH_PENDING	(1<<DL_ATTACH_PENDING)
+#define DLF_DETACH_PENDING	(1<<DL_DETACH_PENDING)
+#define DLF_UNBOUND		(1<<DL_UNBOUND)
+#define DLF_BIND_PENDING	(1<<DL_BIND_PENDING)
+#define DLF_UNBIND_PENDING	(1<<DL_UNBIND_PENDING)
+#define DLF_IDLE		(1<<DL_IDLE)
+#define DLF_UDQOS_PENDING	(1<<DL_UDQOS_PENDING)
+#define DLF_OUTCON_PENDING	(1<<DL_OUTCON_PENDING)
+#define DLF_INCON_PENDING	(1<<DL_INCON_PENDING)
+#define DLF_CONN_RES_PENDING	(1<<DL_CONN_RES_PENDING)
+#define DLF_DATAXFER		(1<<DL_DATAXFER)
+#define DLF_USER_RESET_PENDING	(1<<DL_USER_RESET_PENDING)
+#define DLF_PROV_RESET_PENDING	(1<<DL_PROV_RESET_PENDING)
+#define DLF_RESET_RES_PENDING	(1<<DL_RESET_RES_PENDING)
+#define DLF_DISCON8_PENDING	(1<<DL_DISCON8_PENDING)
+#define DLF_DISCON9_PENDING	(1<<DL_DISCON9_PENDING)
+#define DLF_DISCON11_PENDING	(1<<DL_DISCON11_PENDING)
+#define DLF_DISCON12_PENDING	(1<<DL_DISCON12_PENDING)
+#define DLF_DISCON13_PENDING	(1<<DL_DISCON13_PENDING)
+#define DLF_SUBS_BIND_PND	(1<<DL_SUBS_BIND_PND)
+#define DLF_SUBS_UNBIND_PND	(1<<DL_SUBS_UNBIND_PND)
 
 struct cd {
 	struct cd *next;
@@ -231,13 +275,1191 @@ struct cd {
 	cd_info_ack_t info;
 };
 
-#define DL_PRIV(__q) ((struct dl *)((__q)->q_ptr))
+#define CD_PRIV(__q) ((struct cd *)((__q)->q_ptr))
+
+#define CDF_UNATTACHED		(1<<CD_UNATTACHED)
+#define CDF_UNUSABLE		(1<<CD_UNUSABLE)
+#define CDF_DISABLED		(1<<CD_DISABLED)
+#define CDF_ENABLE_PENDING	(1<<CD_ENABLE_PENDING)
+#define CDF_ENABLED		(1<<CD_ENABLED)
+#define CDF_READ_ACTIVE		(1<<CD_READ_ACTIVE)
+#define CDF_INPUT_ALLOWED	(1<<CD_INPUT_ALLOWED)
+#define CDF_DISABLE_PENDING	(1<<CD_DISABLE_PENDING)
+#define CDF_OUTPUT_ACTIVE	(1<<CD_OUTPUT_ACTIVE)
+#define	CDF_XRAY		(1<<CD_XRAY)
 
 #define LAPB_FRAMING_SYNCHRONOUS    0x01	/* 5-bit bit stuffing */
 #define LAPB_FRAMING_START_STOP	    0x02	/* escape character with start/stop bits */
 
 #define LAPB_ESCAPE_CHAR_DEFAULT    0xBE	/* escape character */
 #define LAPB_FLAG_CHAR_DEFAULT	    0x7E	/* flag character */
+
+/*
+ *  STATE TRANSISIONS
+ *  =================
+ */
+#ifdef _DEBUG
+STATIC INLINE const char *
+dl_state_name(ulong state)
+{
+	switch (state) {
+	case DL_UNATTACHED:
+		return ("DL_UNATTACHED");
+	case DL_ATTACH_PENDING:
+		return ("DL_ATTACH_PENDING");
+	case DL_DETACH_PENDING:
+		return ("DL_DETACH_PENDING");
+	case DL_UNBOUND:
+		return ("DL_UNBOUND");
+	case DL_BIND_PENDING:
+		return ("DL_BIND_PENDING");
+	case DL_UNBIND_PENDING:
+		return ("DL_UNBIND_PENDING");
+	case DL_IDLE:
+		return ("DL_IDLE");
+	case DL_UDQOS_PENDING:
+		return ("DL_UDQOS_PENDING");
+	case DL_OUTCON_PENDING:
+		return ("DL_OUTCON_PENDING");
+	case DL_INCON_PENDING:
+		return ("DL_INCON_PENDING");
+	case DL_CONN_RES_PENDING:
+		return ("DL_CONN_RES_PENDING");
+	case DL_DATAXFER:
+		return ("DL_DATAXFER");
+	case DL_USER_RESET_PENDING:
+		return ("DL_USER_RESET_PENDING");
+	case DL_PROV_RESET_PENDING:
+		return ("DL_PROV_RESET_PENDING");
+	case DL_RESET_RES_PENDING:
+		return ("DL_RESET_RES_PENDING");
+	case DL_DISCON8_PENDING:
+		return ("DL_DISCON8_PENDING");
+	case DL_DISCON9_PENDING:
+		return ("DL_DISCON9_PENDING");
+	case DL_DISCON11_PENDING:
+		return ("DL_DISCON11_PENDING");
+	case DL_DISCON12_PENDING:
+		return ("DL_DISCON12_PENDING");
+	case DL_DISCON13_PENDING:
+		return ("DL_DISCON13_PENDING");
+	case DL_SUBS_BIND_PND:
+		return ("DL_SUBS_BIND_PND");
+	case DL_SUBS_UNBIND_PND:
+		return ("DL_SUBS_UNBIND_PND");
+	case -1UL:
+		return ("DL_UNUSABLE");
+	default:
+		swerr();
+		return ("DL_????");
+	}
+}
+#endif
+STATIC INLINE dl_ulong
+dl_set_state(struct dl *dl, dl_ulong newstate)
+{
+	dl_ulong oldstate = dl_get_state(dl);
+
+	(void) oldstate;
+	dl->info.dl_current_state = dl->i_state = newstate;
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, dl, dl_state_name(newstate),
+		dl_state_name(oldstate)));
+	return (newstate);
+}
+STATIC INLINE dl_ulong
+dl_get_state(const struct dl *dl)
+{
+	return (dl->i_state);
+}
+STATIC INLINE dl_ulong
+dl_get_statef(const struct dl *dl)
+{
+	return (1 << dl_get_state(dl));
+}
+STATIC INLINE int
+dl_chk_state(const struct dl *dl, const dl_ulong mask)
+{
+	return ((dl_get_statef(dl) & (mask)) != 0);
+}
+STATIC INLINE int
+dl_not_state(const struct dl *dl, const dl_ulong mask)
+{
+	return ((dl_get_statef(dl) & (mask)) == 0);
+}
+
+#ifdef _DEBUG
+STATIC INLINE const char *
+cd_state_name(cd_ulong state)
+{
+	switch (state) {
+	case CD_UNATTACHED:
+		return ("CD_UNATTACHED");
+	case CD_UNUSABLE:
+		return ("CD_UNUSABLE");
+	case CD_DISABLED:
+		return ("CD_DISABLED");
+	case CD_ENABLE_PENDING:
+		return ("CD_ENABLE_PENDING");
+	case CD_ENABLED:
+		return ("CD_ENABLED");
+	case CD_READ_ACTIVE:
+		return ("CD_READ_ACTIVE");
+	case CD_INPUT_ALLOWED:
+		return ("CD_INPUT_ALLOWED");
+	case CD_DISABLE_PENDING:
+		return ("CD_DISABLE_PENDING");
+	case CD_OUTPUT_ACTIVE:
+		return ("CD_OUTPUT_ACTIVE");
+	case CD_XRAY:
+		return ("CD_XRAY");
+	default:
+		swerr();
+		return ("CD_????");
+	}
+}
+#endif
+STATIC INLINE cd_ulong
+cd_set_state(struct cd *cd, cd_ulong newstate)
+{
+	cd_ulong oldstate = cd_get_state(cd);
+
+	(void) oldstate;
+	cd->info.cd_state = cd->i_state = newstate;
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, cd, cd_state_name(newstate),
+		cd_state_name(oldstate)));
+	return (newstate);
+}
+STATIC INLINE cd_ulong
+cd_get_state(struct cd *cd)
+{
+	return (cd->i_state);
+}
+STATIC INLINE cd_ulong
+cd_get_statef(const struct cd *cd)
+{
+	return (1 << cd_get_state(cd));
+}
+STATIC INLINE int
+cd_chk_state(const struct cd *cd, const cd_ulong mask)
+{
+	return ((cd_get_statef(cd) & (mask)) != 0);
+}
+STATIC INLINE int
+cd_not_state(const struct cd *cd, const cd_ulong mask)
+{
+	return ((cd_get_statef(cd) & (mask)) == 0);
+}
+
+/*
+ *  Primitives sent upstream
+ *  ------------------------
+ *  Note that by using cd->oq as the active queue instead of q works fine.  If a bufcall results, oq
+ *  will be qenabled, which in the module case is the correct queue to qenable, and in the
+ *  multiplexing driver case will result in oq's service procedure enabling q across the multiplex.
+ */
+/**
+ * m_hangup: - send M_HANGUP upstream
+ * @dl: the data link
+ * @q: the active queue
+ * @req: message to free on success
+ */
+STATIC int
+m_hangup(struct dl *dl, queue_t *q, mblk_t *req)
+{
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, 0, BPRI_MED))) {
+		mp->b_datap->db_type = M_HANGUP;
+		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(req);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * m_error: - send M_ERROR upstream
+ * @dl: the data link
+ * @q: the active queue
+ * @req: message to free on success
+ * @rerr: read-side error
+ * @werr: write-side error
+ */
+STATIC int
+m_error(struct dl *dl, queue_t *q, mblk_t *req, uchar rerr, uchar werr)
+{
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, 2, BPRI_MED))) {
+		mp->b_datap->db_type = M_ERROR;
+		*mp->b_wptr++ = rerr;
+		*mp->b_wptr++ = werr;
+		printd(("%s: %p: <- M_ERROR\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(req);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_info_ack: - send DL_INFO_ACK upstream
+ * @dl: the data link
+ * @q: the active queue
+ * @req: message to free on success
+ *
+ * Note that LAPB does not have any addresses.
+ */
+STATIC INLINE int
+dl_info_ack(struct dl *dl, queue_t *q, mblk_t *req)
+{
+	dl_info_ack_t *p;
+	dl_qos_co_sel1_t *q;
+	dl_qor_co_range1_t *r;
+	size_t size = sizeof(*p) + sizeof(*q) + sizeof(*r);
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, size, BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_wptr += size;
+		p = (typeof(p)) mp->b_wptr;
+		q = (typeof(q)) (p + 1);
+		r = (typeof(r)) (q + 1);
+		*p = dl->info;
+		*q = dl->qos;
+		*r = dl->qor;
+		p->dl_primitive = DL_INFO_ACK;
+		p->dl_addr_length = 0;
+		p->dl_addr_offset = 0;
+		p->dl_brdcst_addr_length = 0;
+		p->dl_brdcst_addr_offset = 0;
+		printd(("%s: %p: <- DL_INFO_ACK\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(req);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_bind_ack: - send DL_BIND_ACK upstream
+ * @dl: the data link
+ * @q: the active queue
+ * @req: request message to free if successful
+ * @cd: the comm device
+ *
+ * Note that LAPB does not have any addresses.  Only one stream can be bound to each DLSAP.
+ *
+ * The DLS provider may initialize the physical line on a DL_STYLE2 provider on receipt of a
+ * DL_ATTACH_REQ or DL_BIND_REQ primitive.  Otherwise, the line must be initialized through some
+ * management mechanism before the DL_ATTACH_REQ is issued by the DLS user.  Either way, the physical
+ * link must be initialized and ready for use on successful completion of the DL_BIND_REQ.
+ */
+STATIC INLINE int
+dl_bind_ack(struct dl *dl, queue_t *q, mblk_t *req, struct cd *cd)
+{
+	dl_bind_ack_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_BIND_ACK;
+		p->dl_sap = (dl->caddr << 8) | (dl->raddr);
+		p->dl_addr_length = 0;
+		p->dl_addr_offset = 0;
+		p->dl_max_conind = dl->dl_max_conind;
+		p->dl_xidtest_flg = 0;
+		p->dl_xidtest_flg |= (dl_autoxid(dl) ? DL_AUTO_XID : 0);
+		p->dl_xidtest_flg |= (dl_autotest(dl) ? DL_AUTO_TEST : 0);
+		cd->dl = dl;
+		dl_set_state(dl, DL_IDLE);
+		printd(("%s: %p: <- DL_BIND_ACK\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(req);	/* freemsg checks for NULL */
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+#if 0
+/**
+ * dl_subs_bind_ack: - send a DL_SUBS_BIND_ACK upstream
+ * @dl: data link
+ * @q: active queue
+ * @req: request message to free if successful
+ *
+ * Unused, LAPB does not bind far less subs_bind.
+ */
+STATIC INLINE int
+dl_subs_bind_ack(struct dl *dl, queue_t *q, mblk_t *req)
+{
+	dl_subs_bind_ack_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_SUBS_BIND_ACK;
+		p->dl_subs_sap_length = 0;
+		p->dl_subs_sap_offset = 0;
+		printd(("%s: %p: <- DL_SUBS_BIND_ACK\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(req);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+#endif
+
+/* FIXME: need different message hooks here. */
+STATIC int send_UA_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
+STATIC int send_DM_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
+STATIC int send_DISC_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf);
+
+/**
+ * dl_ok_ack: - send DL_OK_ACK ustream
+ * @dl: data link
+ * @q: active queue
+ * @req: request message to free iff successful
+ * @cd: comm device
+ * @ap: accepting data link
+ * @cp: accepted connection indication
+ */
+STATIC INLINE int
+dl_ok_ack(struct dl *dl, queue_t *q, mblk_t *req, struct cd *cd, struct dl *ap, mblk_t *cp)
+{
+	mblk_t *mp;
+	dl_ok_ack_t *p;
+	int err;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_OK_ACK;
+		p->dl_correct_primitive = *(dl_ulong *) req->b_rptr;
+		if (dl->wait.cd)
+			dl_wait_unlink(dl);	/* remove from wait list */
+		switch (dl_get_state(dl)) {
+		case DL_ATTACH_PENDING:
+			if (!dl->cd.cd)
+				dl_atta_link(dl, cd);	/* add dl to cd attach list */
+			dl->state = LAPD_TEI_UNASSIGNED;
+			dl_set_state(dl, DL_UNBOUND);
+			break;
+		case DL_DETACH_PENDING:
+			if (dl->cd.cd)
+				dl_atta_unlink(dl);	/* remove from cd attach list */
+			dl->state = LAPD_TEI_UNASSIGNED;
+			dl_set_state(dl, DL_UNATTACHED);
+			break;
+		case DL_UNBIND_PENDING:
+			if (dl->bind.cd)
+				dl_bind_unlink(dl);	/* remove from bind hash */
+			if (dl->list.cd)
+				dl_list_unlink(dl);	/* remove from list hash */
+			dl->state = LAPD_TEI_UNASSIGNED;
+			dl_set_state(dl, DL_UNBOUND);
+			break;
+		case DL_CONN_RES_PENDING:
+			ensure(ap, ap = dl);
+			if (cp) {
+				ushort sapi = (cp->b_rptr[0] >> 2) & 0x3f;
+				ushort tei = (cp->b_rptr[1] >> 1) & 0x7f;
+				ushort pf = (cp->b_rptr[3] & 0x01);
+
+				if ((err = send_UA_res(q, cd, sapi, tei, pf)) < 0) {
+					freemsg(mp);
+					return (err);
+				}
+				dl_timer_start(ap, t203);
+				bufq_unlink(&dl->conq, cp);
+				freemsg(cp);
+			}
+			if (ap != dl) {
+				/* 
+				   auto attach */
+				if (dl->cd.cd != ap->cd.cd) {
+					dl_atta_unlink(ap);
+					dl_atta_link(ap, dl->cd.cd);
+				}
+				/* 
+				   auto bind */
+				if (dl->dlc.dl_sap != ap->dlc.dl_sap
+				    || dl->dlc.dl_tei != ap->dlc.dl_tei) {
+					dl_bind_unlink(ap);
+					ap->dlc = dl->dlc;
+					dl_bind_link(ap, ap->cd.cd);
+				}
+				if (dl->conq.q_msgs)
+					dl_set_state(dl, DL_INCON_PENDING);
+				else
+					dl_set_state(dl, DL_IDLE);
+			}
+			/* 
+			   move to data transfer state */
+			dl->state = LAPD_ESTABLISHED;
+			dl_set_state(ap, DL_DATAXFER);
+			/* 
+			   place in connection hashes */
+			dl_conn_link(ap, ap->cd.cd);
+			ap->vs = ap->vr = ap->va = 0;
+			break;
+		case DL_RESET_RES_PENDING:
+			dl->state = LAPD_ESTABLISHED;
+			dl_set_state(dl, DL_DATAXFER);
+			break;
+		case DL_DISCON9_PENDING:
+			if (cp) {
+				ushort sapi = (cp->b_rptr[0] >> 2) & 0x3f;
+				ushort tei = (cp->b_rptr[1] >> 1) & 0x7f;
+				ushort pf = (cp->b_rptr[3] & 0x01);
+
+				if ((err = send_DM_res(q, cd, sapi, tei, pf)) < 0) {
+					freemsg(mp);
+					return (err);
+				}
+				bufq_unlink(&dl->conq, cp);
+				freemsg(cp);
+			}
+			dl->state = LAPD_TEI_ASSIGNED;
+			dl_set_state(dl, DL_IDLE);
+			break;
+		case DL_DISCON8_PENDING:
+		case DL_DISCON11_PENDING:
+		case DL_DISCON12_PENDING:
+		case DL_DISCON13_PENDING:
+			if ((1 << cd_get_state(cd)) &
+			    (CDF_ENABLED | CDF_READ_ACTIVE | CDF_INPUT_ALLOWED | CDF_OUTPUT_ACTIVE))
+			{
+				/* 
+				   layer 1 active */
+				ushort sapi = dl->dlc.dl_sap;
+				ushort tei = dl->dlc.dl_tei;
+				ushort pf = 1;
+
+				if ((err = send_DISC_cmd(q, cd, sapi, tei, pf))) {
+					freemsg(mp);
+					return (err);
+				}
+			}
+			dl->state = LAPD_WAIT_RELEASE;
+			dl_set_state(dl, DL_IDLE);
+			break;
+		case DL_SUBS_UNBIND_REQ:
+			/* 
+			   just jam tei */
+			dl_bind_unlink(dl);
+			if (dl->dl_max_conind)
+				dl_list_unlink(dl);
+			dl->dlc.dl_tei = -1;
+			dl_bind_link(dl, dl->cd.cd);
+			if (dl->dl_max_conind)
+				dl_list_link(dl, dl->cd.cd);
+			dl->state = LAPD_TEI_UNASSIGNED;
+			dl_set_state(dl, DL_IDLE);
+			break;
+		default:
+			/* 
+			   happens for promicon, promiscoff, enabmulti, disabmulti */
+			/* 
+			   remain in the same state */
+			break;
+		}
+		printd(("%s: %p: <- DL_OK_ACK\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(req);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_error_ack: - send a DL_ERROR_ACK upstream
+ * @dl: the data link
+ * @q: the active queue
+ * @req: message to free if successful
+ * @prim: primtive in error
+ * @error: DLPI error
+ * @reason: UNIX error
+ */
+STATIC INLINE int
+dl_error_ack(struct dl *dl, queue_t *q, mblk_t *req, ulong prim, ulong error, ulong reason)
+{
+	dl_error_ack_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_ERROR_ACK;
+		p->dl_error_primitive = prim;
+		p->dl_errno = error;
+		p->dl_unix_errno = reason;
+		/* restore previous state */
+		dl_set_state(dl, dl->i_oldstate);
+		printd(("%s: %p: <- DL_ERROR_ACK\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(req);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_connect_ind: - send DL_CONNECT_IND upstream
+ * @dl: data link
+ * @q: active queue
+ * @cp: connection request message to queue if successful
+ */
+STATIC INLINE int
+dl_connect_ind(queue_t *q, struct dl *dl, mblk_t *cp)
+{
+	dl_connect_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p) + 1 + 1, BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_CONNECT_IND;
+		p->dl_correlation = (typeof(p->dl_correlation)) (long) cp;
+		p->dl_called_addr_length = 1;
+		p->dl_called_addr_offset = sizeof(*p);
+		p->dl_calling_addr_length = 1;
+		p->dl_calling_addr_offset = sizeof(*p) + 1;
+		p->dl_qos_length = 0;
+		p->dl_qos_offset = 0;
+		p->dl_growth = 0;
+		*mp->b_wptr++ = cp->b_rptr[0];
+		*mp->b_wptr++ = cp->b_rptr[0];
+		bufq_queue(&dl->conq, cp);
+		dl_set_state(dl, DL_INCON_PENDING);
+		printd(("%s: %p: <- DL_CONNECT_IND\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_connect_con:- send DL_CONNECT_CON upstream
+ * @dl: data link
+ * @q: active queue
+ * @ind: indication message to free if successful
+ */
+STATIC INLINE int
+dl_connect_con(struct dl *dl, queue_t *q, mblk_t *ind)
+{
+	dl_connect_con_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p) + 1, BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_CONNECT_CON;
+		p->dl_resp_addr_length = 1;
+		p->dl_resp_addr_offset = sizeof(*p);
+		p->dl_qos_length = 0;
+		p->dl_qos_offset = 0;
+		p->dl_growth = 0;
+		*mp->b_wptr++ = ind->b_rptr[0];
+		//dl->state = LAPD_ESTABLISHED;
+		dl_set_state(dl, DL_DATAXFER);
+		//dl_timer_start(dl, t200);
+		//dl_timer_start(dl, t203);
+		dl->vs = dl->vr = dl->va = 0;
+		printd(("%s: %p: <- DL_CONNECT_CON\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(ind);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_token_ack: - send DL_TOKEN_ACK upstream
+ * @dl: data link
+ * @q: active queue
+ * @req: request message to free if successful
+ */
+STATIC INLINE int
+dl_token_ack(struct dl *dl, queue_t *q, mblk_t *req)
+{
+	dl_token_ack_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_TOKEN_ACK;
+		p->dl_token = (typeof(p->dl_token)) (long) dl;
+		printd(("%s: %p: <- DL_TOKEN_ACK\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(req);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_disconnect_ind: - send a DL_DISCONNECT_IND upstream
+ * @dl: data link
+ * @q: active queue
+ * @ind: indication message to free if successful
+ * @orig: origin
+ * @reason: reason
+ * @cp: connection pointer to destroy if one exists
+ *
+ * If the disconnect was the result of a DISC with the P bit set, we must send
+ * a DM with the F bit set.  If it was the result of a DISC or DM without the
+ * P bit set, we do not have to reply.
+ */
+STATIC INLINE int
+dl_disconnect_ind(struct dl *dl, queue_t *q, mblk_t *ind, ulong orig, ulong reason, mblk_t *cp)
+{
+	dl_disconnect_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_DISCONNECT_IND;
+		p->dl_originator = orig;
+		p->dl_reason = reason;
+		p->dl_correlation = (ulong) cp;
+		if (cp) {
+			bufq_unlink(&dl->conq, cp);
+			if (dl->conq.q_msgs)
+				dl_set_state(dl, DL_INCON_PENDING);
+			else
+				dl_set_state(dl, DL_IDLE);
+		} else {
+			//dl->state = LAPD_TEI_ASSIGNED;
+			dl_set_state(dl, DL_IDLE);
+		}
+		printd(("%s: %p: <- DL_DISCONNECT_IND\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(ind);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_reset_ind: - send a DL_RESET_IND upstream
+ * @dl: data link
+ * @q: active queue
+ * @ind: indication message to free if successful
+ * @orig: origin
+ * @reason: reason
+ */
+STATIC INLINE int
+dl_reset_ind(struct dl *dl, queue_t *q, mblk_t *ind, ulong orig, ulong reason)
+{
+	dl_reset_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_RESET_IND;
+		p->dl_originator = orig;
+		p->dl_reason = reason;
+		dl_set_state(dl, DL_PROV_RESET_PENDING);
+		printd(("%s: %p: <- DL_RESET_IND\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(ind);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/**
+ * dl_reset_con: - send a DL_RESET_CON upstream
+ * @dl: data link
+ * @q: activeq queue
+ * @con: confirmation message to free if successful
+ */
+STATIC INLINE int
+dl_reset_con(struct dl *dl, queue_t *q, mblk_t *con)
+{
+	dl_reset_con_t *p;
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_RESET_CON;
+		//dl->state = LAPD_ESTABLISHED;
+		dl_set_state(dl, DL_DATAXFER);
+		printd(("%s: %p: <- DL_RESET_CON\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		freemsg(con);
+		return (0);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  DL_PHYS_ADDR_ACK            0x32
+ *  -----------------------------------
+ */
+STATIC INLINE int
+dl_phys_addr_ack(queue_t *q, struct dl *dl, size_t add_len, caddr_t add_ptr)
+{
+	mblk_t *mp;
+	dl_phys_addr_ack_t *p;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p) + add_len, BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_PHYS_ADDR_ACK;
+		p->dl_addr_length = add_len;
+		p->dl_addr_offset = add_len ? sizeof(*p) : 0;
+		if (add_len) {
+			bcopy(add_ptr, mp->b_wptr, add_len);
+			mp->b_wptr += add_len;
+		}
+		printd(("%s: %p: <- DL_PHYS_ADDR_ACK\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  DL_GET_STATISTICS_ACK       0x35
+ *  -----------------------------------
+ */
+STATIC INLINE int
+dl_get_statistics_ack(queue_t *q, struct dl *dl, size_t sta_len, caddr_t sta_ptr)
+{
+	mblk_t *mp;
+	dl_get_statistics_ack_t *p;
+
+	if ((mp = dl_allocb(dl, q, sizeof(*p) + sta_len, BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->dl_primitive = DL_GET_STATISTICS_ACK;
+		p->dl_stat_length = sta_len;
+		p->dl_stat_offset = sta_len ? sizeof(*p) : 0;
+		if (sta_len) {
+			bcopy(sta_ptr, mp->b_wptr, sta_len);
+			mp->b_wptr += sta_len;
+		}
+		printd(("%s: %p: <- DL_GET_STATISTICS_ACK\n", DRV_NAME, dl));
+		putnext(dl->rq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Primitive sent to downstream
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  CD_INFO_REQ                 0x00 - Information request
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_info_req(queue_t *q, struct cd *cd)
+{
+	mblk_t *mp;
+	cd_info_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_INFO_REQ;
+		printd(("%s: %p: <- CD_INFO_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_ATTACH_REQ               0x02 - Attach a PPA
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_attach_req(queue_t *q, struct cd *cd, struct dl *dl)
+{
+	mblk_t *mp;
+	cd_attach_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_ATTACH_REQ;
+		p->cd_ppa = cd->ppa;
+		dl_wait_link(dl, cd);	/* put the dl into the wait list */
+		printd(("%s: %p: <- CD_ATTACH_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_DETACH_REQ               0x03 - Detach a PPA
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_detach_req(queue_t *q, struct cd *cd, struct dl *dl)
+{
+	mblk_t *mp;
+	cd_detach_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_DETACH_REQ;
+		dl_wait_link(dl, cd);	/* put the dl into the wait list */
+		printd(("%s: %p: <- CD_DETACH_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_ENABLE_REQ               0x04 - Prepare a device
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_enable_req(queue_t *q, struct cd *cd, struct dl *dl)
+{
+	mblk_t *mp;
+	cd_enable_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_ENABLE_REQ;
+		p->cd_dial_type = CD_NODIAL;
+		p->cd_dial_length = 0;
+		p->cd_dial_offset = 0;
+		cd_set_state(cd, CD_ENABLE_PENDING);
+		dl_wait_link(dl, cd);	/* put the dl into the wait list */
+		printd(("%s: %p: <- CD_ENABLE_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_DISABLE_REQ              0x05 - Disable a device
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_disable_req(queue_t *q, struct cd *cd, struct dl *dl, ulong disposal)
+{
+	mblk_t *mp;
+	cd_disable_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_DISABLE_REQ;
+		p->cd_disposal = disposal;
+		cd_set_state(cd, CD_DISABLE_PENDING);
+		dl_wait_link(dl, cd);	/* put the dl into the wait list */
+		printd(("%s: %p: <- CD_DISABLE_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_ALLOW_INPUT_REQ          0x0b - Allow input
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_allow_input_req(queue_t *q, struct cd *cd)
+{
+	mblk_t *mp;
+	cd_allow_input_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_ALLOW_INPUT_REQ;
+		cd_set_state(cd, CD_INPUT_ALLOWED);
+		printd(("%s: %p: <- CD_ALLOW_INPUT_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_READ_REQ                 0x0c - Wait-for-input request
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_read_req(queue_t *q, struct cd *cd, ulong msec)
+{
+	mblk_t *mp;
+	cd_read_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_READ_REQ;
+		p->cd_msec = msec;
+		cd_set_state(cd, CD_READ_ACTIVE);
+		printd(("%s: %p: <- CD_READ_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_UNITDATA_REQ             0x0d - Data send request
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_unitdata_req(queue_t *q, struct cd *cd, ulong atype, ulong prio, size_t dst_len, caddr_t dst_ptr,
+		mblk_t *dp)
+{
+	mblk_t *mp;
+	cd_unitdata_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p) + dst_len, BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_UNITDATA_REQ;
+		p->cd_addr_type = atype;
+		p->cd_priority = prio;
+		p->cd_dest_addr_length = dst_len;
+		p->cd_dest_addr_offset = dst_len ? sizeof(*p) : 0;
+		if (dst_len) {
+			bcopy(dst_ptr, mp->b_wptr, dst_len);
+			mp->b_wptr += dst_len;
+		}
+		mp->b_cont = dp;
+		printd(("%s: %p: <- CD_UNITDATA_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_WRITE_READ_REQ           0x0e - Write/read request
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_write_read_req(queue_t *q, struct cd *cd, ulong atype, ulong prio, size_t dst_len,
+		  caddr_t dst_ptr, mblk_t *dp, ulong msec)
+{
+	mblk_t *mp;
+	cd_write_read_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p) + dst_len, BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_WRITE_READ_REQ;
+		p->cd_unitdata_req.cd_primitive = CD_UNITDATA_REQ;
+		p->cd_unitdata_req.cd_addr_type = atype;
+		p->cd_unitdata_req.cd_priority = prio;
+		p->cd_unitdata_req.cd_dest_addr_length = dst_len;
+		p->cd_unitdata_req.cd_dest_addr_offset = dst_len ? sizeof(*p) : 0;
+		p->cd_read_req.cd_primitive = CD_READ_REQ;
+		p->cd_read_req.cd_msec = msec;
+		if (dst_len) {
+			bcopy(dst_ptr, mp->b_wptr, dst_len);
+			mp->b_wptr += dst_len;
+		}
+		mp->b_cont = dp;
+		printd(("%s: %p: <- CD_WRITE_READ_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_HALT_INPUT_REQ           0x11 - Halt input
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_halt_input_req(queue_t *q, struct cd *cd, ulong disposal)
+{
+	mblk_t *mp;
+	cd_halt_input_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_HALT_INPUT_REQ;
+		p->cd_disposal = disposal;
+		cd_set_state(cd, CD_ENABLED);
+		printd(("%s: %p: <- CD_HALT_INPUT_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_ABORT_OUTPUT_REQ         0x12 - Abort output
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_abort_output_req(queue_t *q, struct cd *cd)
+{
+	mblk_t *mp;
+	cd_abort_output_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_ABORT_OUTPUT_REQ;
+		printd(("%s: %p: <- CD_ABORT_OUTPUT_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+#if 0
+/*
+ *  CD_MUX_NAME_REQ             0x13 - get mux name (Gcom)
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_mux_name_req(queue_t *q, struct cd *cd)
+{
+	mblk_t *mp;
+	cd_mux_name_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_MUX_NAME_REQ;
+		printd(("%s: %p: <- CD_MUX_NAME_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+#endif
+
+/*
+ *  CD_MODEM_SIG_REQ            0x15 - Assert modem signals (Gcom)
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_modem_sig_req(queue_t *q, struct cd *cd, ulong sigs)
+{
+	mblk_t *mp;
+	cd_modem_sig_req_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_MODEM_SIG_REQ;
+		p->cd_sigs = sigs;
+		printd(("%s: %p: <- CD_MODEM_SIG_REQ\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  CD_MODEM_SIG_POLL           0x17 - requests a CD_MODEM_SIG_IND (Gcom)
+ *  -------------------------------------------------------------------------
+ */
+STATIC INLINE int
+cd_modem_sig_poll(queue_t *q, struct cd *cd)
+{
+	mblk_t *mp;
+	cd_modem_sig_poll_t *p;
+
+	if ((mp = cd_allocb(cd, q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p->cd_primitive = CD_MODEM_SIG_POLL;
+		printd(("%s: %p: <- CD_MODEM_SIG_POLL\n", DRV_NAME, cd));
+		putnext(cd->oq, mp);
+		return (QR_DONE);
+	}
+	rare();
+	return (-ENOBUFS);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  STATE MACHINES
+ *
+ *  =========================================================================
+ */
 
 /*
  *  MESSAGE HANDLING.
@@ -279,51 +1501,62 @@ dl_bufcall(long arg)
 	}
 }
 
+/**
+ * dl_allocb: - allocate a message block or generate bufcall
+ * @dl: data link
+ * @q: active queue
+ * @size: sizeof of block
+ * @pri: priority of allocation
+ */
 static mblk_t *
-dl_allocb(queue_t *q, size_t size, int pri, uchar addr, mblk_t *dp)
+dl_allocb(struct dl *dl, queue_t *q, size_t size, int pri)
 {
 	mblk_t *mp;
 
-	if ((mp = allocb(size, pri))) {
-		*mp->b_wptr++ = addr;
-		mp->b_cont = dp;
-		return (mp);
-	} else {
-		struct dl *dl = DL_PRIV(q);
-		bcid_t bid;
+	if (unlikely((mp = allocb(size, pri)) == NULL)) {
+		bcid_t bid, *bidp;
 
-		if (q == dl->rq) {
-			if ((bid = xchg(&dl->rbid, bufcall(size, pri, &dl_bufcall, (long) q))))
-				unbufcall(bid);
-			return (NULL);
-		}
-		if (q == dl->wq) {
-			if ((bid = xchg(&dl->wbid, bufcall(size, pri, &dl_bufcall, (long) q))))
-				unbufcall(bid);
-			return (NULL);
-		}
+		bidp = (q == dl->wq) ? &dl->wbid : &dl->rbid;
+		if ((bid = xchg(bidp, bufcall(size, pri, &dl_bufcall, (long) q))))
+			unbufcall(bid);
 	}
+	return (mp);
 }
 
-#define DL_MTYPE_RR	0x80
-#define DL_MTYPE_RNR	0xA0
-#define DL_MTYPE_REJ	0x90
-#define DL_MTYPE_I	0x00
-#define DL_MTYPE_SABM	0xF4
-#define DL_MTYPE_SABME	0xF6
-#define DL_MTYPE_DISC	0xC2
-#define DL_MTYPE_DM	0xF0
-#define DL_MTYPE_UA	0xC0
-#define DL_MTYPE_FRMR	0xE1
+static mblk_t *
+dl_allocb_snd(struct dl *dl, queue_t *q, size_t size, int pri, ushort addr, mblk_t *dp)
+{
+	mblk_t *mp;
+
+	if ((mp = dl_allocb(dl, q, size, pri))) {
+		*mp->b_wptr++ = addr;
+		mp->b_cont = dp;
+	}
+	return (mp);
+}
+
+#define DL_MTYPE_RR	0x01 /* 0000 0001 */
+#define DL_MTYPE_RNR	0x05 /* 0000 0101 */
+#define DL_MTYPE_REJ	0x09 /* 0000 1001 */
+#define DL_MTYPE_I	0x00 /* 0000 0000 */
+#define DL_MTYPE_UI	0x03 /* 0000 0011 */
+#define DL_MTYPE_SABM	0x2F /* 0010 1111 */
+#define DL_MTYPE_SABME	0x6F /* 0110 1111 */
+#define DL_MTYPE_SM	0xC3 /* 1100 0011 */
+#define DL_MTYPE_DISC	0x43 /* 0100 0011 */
+#define DL_MTYPE_DM	0x0F /* 0000 1111 */
+#define DL_MTYPE_UA	0x63 /* 0110 0011 */
+#define DL_MTYPE_FRMR	0x87 /* 1000 0111 */
+#define DL_MTYPE_XID	0xAF /* 1010 1111 */
 
 static int
-dl_send_i_frame(queue_t *q, mblk_t *dp, uchar pf, uchar nr, uchar ns)
+dl_send_i_frame(queue_t *q, mblk_t *dp, ushort pf, ushort nr, ushort ns)
 {
 	struct dl *dl = DL_PRIV(q);
 	mblk_t *mp;
 	int err;
 
-	if ((mp = dl_allocb(q, FASTBUF, BPRI_MED, dl->caddr, dp))) {
+	if ((mp = dl_allocb_snd(dl, q, FASTBUF, BPRI_MED, dl->caddr, dp))) {
 		if (dl_extended(dl)) {
 			*mp->b_wptr++ = ns;
 			*mp->b_wptr++ = (pf << 7) | nr;
@@ -339,13 +1572,13 @@ dl_send_i_frame(queue_t *q, mblk_t *dp, uchar pf, uchar nr, uchar ns)
 }
 
 static int
-dl_send_s_frame(queue_t *q, uchar cmd, uchar pf, uchar nr, uchar mtype)
+dl_send_s_frame(queue_t *q, ushort cmd, ushort pf, ushort nr, ushort mtype)
 {
 	struct dl *dl = DL_PRIV(q);
 	mblk_t *mp;
 	int err;
 
-	if ((mp = dl_allocb(q, FASTBUF, BPRI_MED, cmd ? dl->caddr : dl->raddr, NULL))) {
+	if ((mp = dl_allocb_snd(dl, q, FASTBUF, BPRI_MED, cmd ? dl->caddr : dl->raddr, NULL))) {
 		if (dl_extended(dl)) {
 			*mp->b_wptr++ = mtype;
 			*mp->b_wptr++ = (pf << 7) | nr;
@@ -361,13 +1594,13 @@ dl_send_s_frame(queue_t *q, uchar cmd, uchar pf, uchar nr, uchar mtype)
 }
 
 static int
-dl_send_u_frame(queue_t *q, uchar cmd, uchar pf, uchar mtype)
+dl_send_u_frame(queue_t *q, ushort cmd, ushort pf, ushort mtype)
 {
 	struct dl *dl = DL_PRIV(q);
 	mblk_t *mp;
 	int err;
 
-	if ((mp = dl_allocb(q, FASTBUF, BPRI_MED, cmd ? dl->caddr : dl->raddr, NULL))) {
+	if ((mp = dl_allocb_snd(dl, q, FASTBUF, BPRI_MED, cmd ? dl->caddr : dl->raddr, NULL))) {
 		*mp->b_wptr++ = mtype | (pf << 3);
 		if ((err = cd_data_req(q, mp))) {
 			freeb(mp);
@@ -379,69 +1612,82 @@ dl_send_u_frame(queue_t *q, uchar cmd, uchar pf, uchar mtype)
 
 /* RR - Receive Ready */
 static int
-dl_send_rr(queue_t *q, uchar cmd, uchar pf, uchar nr)
+dl_send_rr(queue_t *q, ushort cmd, ushort pf, ushort nr)
 {
 	return dl_send_s_frame(q, cmd, pf, nr, DL_MTYPE_RR);
 }
 
 /* RNR - Receive Not Ready */
 static int
-dl_send_rnr(queue_t *q, uchar cmd, uchar pf, uchar nr)
+dl_send_rnr(queue_t *q, ushort cmd, ushort pf, ushort nr)
 {
 	return dl_send_s_frame(q, cmd, pf, nr, DL_MTYPE_RNR);
 }
 
 /* REJ - Reject */
 static int
-dl_send_rej(queue_t *q, uchar cmd, uchar pf, uchar nr)
+dl_send_rej(queue_t *q, ushort cmd, ushort pf, ushort nr)
 {
 	return dl_send_s_frame(q, cmd, pf, nr, DL_MTYPE_REJ);
 }
 
+/* SREJ - Selective Reject */
+static int
+dl_send_srej(queue_t *q, ushort cmd, ushort pf, ushort nr)
+{
+}
+
+/* UI - Unnumbered Information */
+static int
+dl_send_UI(queue_t *q, ushort pf, mblk_t *dp)
+{
+	return dl_send_u_frame(q, 1, pf, DL_MTYPE_UI);
+}
+
 /* SABM - Set Asynchronous Balanced Mode */
 static int
-dl_send_sabm(queue_t *q, uchar pf)
+dl_send_sabm(queue_t *q, ushort pf)
 {
 	return dl_send_u_frame(q, 1, pf, DL_MTYPE_SABM);
 }
 
 /* SABME - Set Asynchronous Balanced Mode Extended */
 static int
-dl_send_sabme(queue_t *q, uchar pf)
+dl_send_sabme(queue_t *q, ushort pf)
 {
 	return dl_send_u_frame(q, 1, pf, DL_MTYPE_SABME);
 }
 
 /* DISC - Disconnect */
 static int
-dl_send_disc(queue_t *q, uchar pf)
+dl_send_disc(queue_t *q, ushort pf)
 {
 	return dl_send_u_frame(q, 1, pf, DL_MTYPE_DISC);
 }
 
 /* DM - Disconnect Mode */
 static int
-dl_send_dm(queue_t *q, uchar pf)
+dl_send_dm(queue_t *q, ushort pf)
 {
 	return dl_send_u_frame(q, 0, pf, DL_MTYPE_DM);
 }
 
 /* UA - Unnumbered Acknowledgement */
 static int
-dl_send_ua(queue_t *q, uchar pf)
+dl_send_ua(queue_t *q, ushort pf)
 {
 	return dl_send_u_frame(q, 0, pf, DL_MTYPE_UA);
 }
 
 /* FRMR - Frame Reject */
 static int
-dl_send_frmr(queue_t *q, ushort rfcf, uchar pf, uchar vs, uchar cr, uchar vr, uchar flags)
+dl_send_frmr(queue_t *q, ushort rfcf, ushort pf, ushort vs, ushort cr, ushort vr, ushort flags)
 {
 	struct dl *dl = DL_PRIV(q);
 	mblk_t *mp;
 	int err;
 
-	if ((mp = dl_allocb(q, FASTBUF, BPRI_MED, dl->raddr, NULL))) {
+	if ((mp = dl_allocb_snd(dl, q, FASTBUF, BPRI_MED, dl->raddr, NULL))) {
 		*mp->b_wptr++ = DL_MTYPE_FRMR | (pf << 3);
 		if (dl_extended(dl)) {
 			if (rfcf & 0xff00) {
@@ -466,7 +1712,7 @@ dl_send_frmr(queue_t *q, ushort rfcf, uchar pf, uchar vs, uchar cr, uchar vr, uc
 
 /* I - Information */
 static int
-dl_send_i(queue_t *q, mblk_t *dp, uchar pf, uchar nr, uchar ns)
+dl_send_i(queue_t *q, mblk_t *dp, ushort pf, ushort nr, ushort ns)
 {
 	return dl_send_i_frame(q, dp, pf, nr, ns);
 }
@@ -484,7 +1730,14 @@ dl_send_i(queue_t *q, mblk_t *dp, uchar pf, uchar nr, uchar ns)
  * unacknowledged I frames.  If timer T1 has been stopped by the receipt of a REJ frame, the DCE will
  * follow the retransmission procedures. */
 static int
-dl_recv_rr(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_RR_cmd(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
+{
+	/* A dl entity receiving an RR with the P bit set to 1 shall set the F bit to 1 in the next
+	 * RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
+}
+/* RR - Receive Ready */
+static int
+dl_recv_RR_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
 {
 }
 
@@ -520,7 +1773,14 @@ dl_recv_rr(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
  * transmission of I frames beginning with the I frame identified by the N(R) in the received RR or
  * REJ frame. */
 static int
-dl_recv_rnr(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_RNR_cmd(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
+{
+	/* A dl entity receiving an RNR with the P bit set to 1 shall set the F bit to 1 in the next
+	 * RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
+}
+/* RNR - Receive Not Ready */
+static int
+dl_recv_RNR_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
 {
 }
 
@@ -543,37 +1803,86 @@ dl_recv_rnr(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
  * command with the P bit set to 1, the DCE will transmit an RR, RNR or REJ response with the F bit
  * set to 1 before transmitting or retransmitting the corresponding I frame. */
 static int
-dl_recv_rej(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_REJ_cmd(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
+{
+	/* A dl entity receiving an REJ with the P bit set to 1 shall set the F bit to 1 in the next
+	 * RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
+}
+/* REJ - Reject */
+static int
+dl_recv_REJ_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
+{
+}
+
+/* SREJ - Selective Reject */
+/* Receiving an SREJ response frame: When receiving an SREJ response frame with F bit set to 0, the
+ * STE shal retransmit all I frames, whose sequence numbers are indicated in the N(R) field and the
+ * information field of the SREJ frame, in the order specified in the SREJ frame.  Retransmission
+ * shall conform to the following: a) If the STE is transmitting a supervisory or I frame when it
+ * receives the SREJ frame, it shall complete the transmission before commencing of the requested I
+ * frames.  b) If the STE is transmitting an unnumbered command or response when it receives the SREJ
+ * frame, it shall ignore the request for retransmission.  c) If the STE is not transmitting any frame
+ * when it receives the SREJ frame, it shall commence transmission of the requested I frames
+ * immediately.  If there was no outstanding poll condition, then a poll shall be sent, either by
+ * transmitting an RR command (or RNR command if the STE is in the busy condition) with the P bit set
+ * to 1 or by setting the P bit in the last retransmitted I frame and Timer T1 shall be restarted.  If
+ * there is an outstanding poll condition, then timer T1 shall not be restarted.
+ * When receiving an SREJ response frame with the F bit set to 1, the STE shall retransmit all I
+ * frames whose sequence numbers are indicated in the N(R) field and the information field of the SREJ
+ * frame, in the order specified in the SREJ frame, except those I frames that were sent after the
+ * frame with the P bit set to 1 was sent.  Retransmission shall conform to the following: a) If the
+ * STE is transmitting a supervisory or I frame when it receives the SREJ frame, it shall complete
+ * that transmission before commencing transmission of the requested I frames. b) If the STE is
+ * transmitting an unnumbered command or response when it receives the SREJ frame, it shall ignore the
+ * request for retransmission.  c) If the STE is not transmitting any frame when it receives the SREJ
+ * frame, it shall commence transmission of the requested I frames immediately.  If any frames are
+ * retransmitted, then a poll shall be sent, either by transmitting an RR command (or RNR command if
+ * the STE is in the busy condition) with the P bit set to 1 or by setting the P bit in the last
+ * retransmitted I frame.  Timer T1 shall be restarted. */
+static int
+dl_recv_SREJ_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
+{
+}
+
+/* UI - Unnumbered Information */
+static int
+dl_recv_UI_cmd(queue_t *q, mblk_t *mp, ushort pf)
 {
 }
 
 /* SABM - Set Asynchronous Balanced Mode */
 static int
-dl_recv_sabm(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_SABM_cmd(queue_t *q, mblk_t *mp, ushort pf)
 {
 }
 
 /* SABME - Set Asynchronous Balanced Mode Extended */
 static int
-dl_recv_sabme(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_SABME_cmd(queue_t *q, mblk_t *mp, ushort pf)
+{
+}
+
+/* SM - Set Mode */
+static int
+dl_recv_SM_cmd(queue_t *q, mblk_t *mp, ushort pf)
 {
 }
 
 /* DISC - Disconnect */
 static int
-dl_recv_disc(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_DISC_cmd(queue_t *q, mblk_t *mp, ushort pf)
 {
 }
 
 /* DM - Disconnect Mode */
 static int
-dl_recv_dm(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_DM_cmd(queue_t *q, mblk_t *mp, ushort pf)
 {
 }
 
 /* UA - Unnumbered Acknowledgement */
 static int
-dl_recv_ua(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_UA_cmd(queue_t *q, mblk_t *mp, ushort pf)
 {
 }
 
@@ -584,7 +1893,18 @@ dl_recv_ua(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
  * established length; receipt of an invalid N(R); or, receipt of a frame with an information field
  * which is not permitted or receipt of a supervisory or unnumbered frame with an incorrect length. */
 static int
-dl_recv_frmr(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
+dl_recv_FRMR_res(queue_t *q, mblk_t *mp, ushort pf)
+{
+}
+
+/* XID - Exchange Identification */
+static int
+dl_recv_XID_cmd(queue_t *q, mblk_t *mp, ushort pf)
+{
+}
+/* XID - Exchange Identification */
+static int
+dl_recv_XID_res(queue_t *q, mblk_t *mp, ushort pf)
 {
 }
 
@@ -650,137 +1970,146 @@ dl_recv_frmr(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar nr)
  * When receiving the expected I frame, the DCE will then acknowledge the I frame as normal. */
 
 static int
-dl_recv_i(queue_t *q, mblk_t *mp, uchar cmd, uchar pf, uchar ns, uchar nr)
+dl_recv_I_cmd(queue_t *q, mblk_t *mp, ushort pf, ushort ns, ushort nr)
 {
+	/* A dl entity receiving an I frame with the P bit set to 1 shall set the F bit to 1 in the
+	 * next RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
 }
 
 static streams_inline streams_fastcall __hot_read int
 dl_recv_msg_slow(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
-	uchar pf, ns, nr, ad, ml, ca, ra, de;
+	ushort ns, pf, nr;
 	int ext = dl_extended(dl);
-	int num = ((mp->b_rptr[1] & 0xC0) != 0xC0);
-	int inf = ((mp->b_rptr[1] & 0x80) == 0x00);
+	int sup = dl_supermode(dl);
+	int mod = (sup << 1) | (ext ^ sup);
+	int num = ((mp->b_rptr[1] & 0x03) != 0x03);
+	int inf = ((mp->b_rptr[1] & 0x01) == 0x00);
 	int size = msgdsize(mp);
 	int cmd = 0;
 
 	if (size < 2)
 		goto discard;
-
-	if ((num || inf) && size < 2 + ext)
+	if (num && size < 2 + mod)
 		goto badsize;
 
-	ad = mp->b_rptr[0];
-	nr = num ? (ext ? (mp->b_rptr[2] & 0x7f) : (mp->b_rptr[1] & 0x07)) : 0;
-	ns = inf ? (ext ? (mp->b_rptr[1] & 0x7f) : ((mp->b_rptr[1] & 0x70) >> 4)) : 0;
-	pf = ((num && ext) ? (mp->b_rptr[2] >> 7) : (mp->b_rptr[1] >> 3)) & 0x01;
-	ml = dl_mlp(dl) ? 0x02 : 0x01;
-	de = dl_dce(dl) ? 0x08 : 0x04;
-
-	/*- Addresses:
-	 *  SLP:    A 0xC0  DCE->DTE command  DCE<-DTE response
-	 *	    B 0x80  DTE->DCE command  DTE<-DCE response
-	 *  MLP:    C 0xF0  DCE->DTE command  DCE<-DTE response
-	 *	    D 0xE0  DTE->DCE command  DTE<-DCE response */
-
-	if ((ad & 0x0f) != 0)
-		goto discard;	/* bad address */
-
-	switch ((ad | ml)) {
-	case 0x89:		/* dce slp */
-	case 0xC9:		/* dce slp */
-		ca = 0x80;	/* address on which I receive commands */
-		ra = 0xC0;	/* address on which I receive responses */
+	switch (mod) {
+	case 00:		/* basic - modulo 8*/
+		nr = (mp->b_rptr[1] >> 5) & 0x07;
+		ns = (mp->b_rptr[1] >> 1) & 0x07;
+		pf = (mp->b_rptr[1] >> 4) & 0x01;
 		break;
-	case 0x85:		/* dte slp */
-	case 0xC5:		/* dte slp */
-		ca = 0xC0;	/* address on which I receive commands */
-		ra = 0x80;	/* address on which I receive responses */
+	case 01:		/* extended - modulo 127*/
+		nr = (mp->b_rptr[2] >> 1) & 0x7f;
+		ns = (mp->b_rptr[1] >> 1) & 0x7f;
+		pf = (mp->b_rptr[2] >> 0) & 0x01;
 		break;
-	case 0xEA:		/* dce mlp */
-	case 0xFA:		/* dce mlp */
-		ca = 0xE0;	/* address on which I receive commands */
-		ra = 0xF0;	/* address on which I receive responses */
+	case 03:		/* super - modulo 32768 */
+		nr = ((ushort)mp->b_rptr[4] << 7) | ((ushort)mp->b_rptr[3] >> 1);
+		ns = ((ushort)mp->b_rptr[2] << 7) | ((ushort)mp->b_rptr[1] >> 1);
+		pf = (mp->b_rptr[3] >> 0) & 0x01;
 		break;
-	case 0xE6:		/* dte mlp */
-	case 0xF6:		/* dte mlp */
-		ca = 0xF0;	/* address on which I receive commands */
-		ra = 0xE0;	/* address on which I receive responses */
-		break;
-	default:
+	case 02:		/* illegal */
+		swerr();
 		goto discard;
 	}
 
-	switch (mp->b_rptr[1] & 0xC0) {
-	case 0x80:		/* Supervisory */
-		switch (mp->b_rptr[1] & 0x30) {
-		case 0x00:	/* RR *//* command, reponse */
-			cmd = (ad == ca) ? 1 : 0;
-			if (size != 2 + ext)
-				goto badsize;
-			return dl_recv_rr(q, mp, cmd, pf, nr);
-		case 0x20:	/* RNR *//* command, reponse */
-			cmd = (ad == ca) ? 1 : 0;
-			if (size != 2 + ext)
-				goto badsize;
-			return dl_recv_rnr(q, mp, cmd, pf, nr);
-		case 0x10:	/* REJ *//* command, reponse */
-			cmd = (ad == ca) ? 1 : 0;
-			if (size != 2 + ext)
-				goto badsize;
-			return dl_recv_rej(q, mp, cmd, pf, nr);
-		default:	/* error */
-			goto unrecog;
-		}
-	case 0xC0:		/* Unnumbered */
-		switch (mp->b_rptr[1] & 0x37) {
-		case 0x34:	/* SABM *//* command */
-			if (!(cmd = (ad == ca) ? 1 : 0))
-				goto discard;
-			if (size != 2)
-				goto badsize;
-			return dl_recv_sabm(q, mp, cmd, pf, nr);
-		case 0x36:	/* SABME *//* command */
-			if (!(cmd = (ad == ca) ? 1 : 0))
-				goto discard;
-			if (size != 2)
-				goto badsize;
-			return dl_recv_sabme(q, mp, cmd, pf, nr);
-		case 0x02:	/* DISC *//* command */
-			if (!(cmd = (ad == ca) ? 1 : 0))
-				goto discard;
-			if (size != 2)
-				goto badsize;
-			return dl_recv_disc(q, mp, cmd, pf, nr);
-		case 0x30:	/* DM *//* response */
-			if ((cmd = (ad == ca) ? 1 : 0))
-				goto discard;
-			if (size != 2)
-				goto badsize;
-			return dl_recv_dm(q, mp, cmd, pf, nr);
-		case 0x06:	/* UA *//* response */
-			if ((cmd = (ad == ca) ? 1 : 0))
-				goto discard;
-			if (size != 2)
-				goto badsize;
-			return dl_recv_ua(q, mp, cmd, pf, nr);
-		case 0x21:	/* FRMR *//* response */
-			if ((cmd = (ad == ca) ? 1 : 0))
-				goto discard;
-			if (size != 5 + ext) {
-				goto badsize;
-			}
-			return dl_recv_frmr(q, mp, cmd, pf, nr);
-		default:	/* error */
-			goto unrecog;
-		}
-	default:		/* Information *//* command */
-		if (!(cmd = (ad == ca) ? 1 : 0))
+	/*- Addresses:
+	 *  SLP:    A 0x03  DCE->DTE command  DCE<-DTE response
+	 *	    B 0x01  DTE->DCE command  DTE<-DCE response
+	 *  MLP:    C 0x0F  DCE->DTE command  DCE<-DTE response
+	 *	    D 0x07  DTE->DCE command  DTE<-DCE response */
+
+	if ((mp->b_rptr[0] & 0xF0) != 0)
+		goto discard;	/* bad address */
+
+	if (mp->b_rptr[0] != dl->raddr && mp->b_rptr[0] != dl->caddr)
+		goto discard;
+
+	/* address on which I receive commands is the same as the address on which I send
+	   responses. */
+	/* address on which I receive responses is the same as the address on which I send
+	   commands. */
+
+	cmd = (mp->b_rptr[0] == dl->raddr) ? 1 : 0;
+
+	switch (mp->b_rptr[1] & 0x03) {
+	case 0x00:
+	case 0x02:		/* Information *//* command */
+		if (!cmd)
 			goto discard;
 		if (size > 2 + ext + dl->info.dl_max_sdu)
 			goto toolong;
-		return dl_recv_i(q, mp, cmd, pf, ns, nr);
+		return dl_recv_I_cmd(q, mp, pf, ns, nr);
+	case 0x01:		/* Supervisory */
+		switch ((mp->b_rptr[1] >> 2) & 0x03) {
+		case 0x00:	/* RR *//* command, reponse */
+			if (size != 2 + mod)
+				goto badsize;
+			if (cmd)
+				return dl_recv_RR_cmd(q, mp, pf, nr);
+			return dl_recv_RR_res(q, mp, pf, nr);
+		case 0x01:	/* RNR *//* command, reponse */
+			if (size != 2 + mod)
+				goto badsize;
+			if (cmd)
+				return dl_recv_RNR_cmd(q, mp, pf, nr);
+			return dl_recv_RNR_res(q, mp, pf, nr);
+		case 0x02:	/* REJ *//* command, reponse */
+			if (size != 2 + mod)
+				goto badsize;
+			if (cmd)
+				return dl_recv_REJ_cmd(q, mp, pf, nr);
+			return dl_recv_REJ_res(q, mp, pf, nr);
+		case 0x03:
+			if (cmd)
+				goto discard;
+			return dl_recv_SREJ_res(q, mp, pf, nr);
+		}
+	case 0x03:		/* Unnumbered */
+		if ((mp->b_rptr[1] & 0x37) != 0x21 && size != 2)
+			goto badsize;
+		switch ((mp->b_rptr[1] >> 2) & 0x3B) {
+		case 0x00:	/* UI *//* command *//* 0000 0000 */
+			if (!cmd)
+				goto discard;
+			return dl_recv_UI_cmd(q, mp, pf);
+		case 0x0b:	/* SABM *//* command *//* 0000 1011 */
+			if (!cmd)
+				goto discard;
+			return dl_recv_SABM_cmd(q, mp, pf);
+		case 0x1b:	/* SABME *//* command *//* 0001 1011 */
+			if (!cmd)
+				goto discard;
+			return dl_recv_SABME_cmd(q, mp, pf);
+		case 0x30:	/* SM *//* command *//* 0011 0000 */
+			if (!cmd)
+				goto discard;
+			return dl_recv_SM_cmd(q, mp, pf);
+		case 0x10:	/* DISC *//* command *//* 0001 0000 */
+			if (!cmd)
+				goto discard;
+			return dl_recv_DISC_cmd(q, mp, pf);
+		case 0x03:	/* DM *//* response *//* 0000 0011 */
+			if (cmd)
+				goto discard;
+			return dl_recv_DM(q, mp, pf);
+		case 0x18:	/* UA *//* response *//* 0001 1000 */
+			if (cmd)
+				goto discard;
+			return dl_recv_UA_cmd(q, mp, pf);
+		case 0x21:	/* FRMR *//* response *//* 0010 0001 */
+			if (cmd)
+				goto discard;
+			return dl_recv_FRMR_res(q, mp, pf);
+		case 0x2b:	/* XID */
+			if (cmd)
+				return dl_recv_XID_cmd(q, mp, pf);
+			return dl_recv_XID_res(q, mp, pf);
+		default:	/* error */
+			goto unrecog;
+		}
 	}
 	/* Frame rejection condition: A frame rejection condition is established upon the receipt
 	   of an error-free frame with one of the conditions listed below.  At the DCE or DTE, this 
@@ -791,7 +2120,7 @@ dl_recv_msg_slow(queue_t *q, mblk_t *mp)
 	   recovery is effected by the DTE, or until the DCE initiates its own recovery in case the
 	   DTE does not respond. */
 	{
-		uchar flags;
+		ushort flags;
 
 	      badnr:
 #define DL_REJ_FLAG_BADNR	0x10
@@ -850,144 +2179,223 @@ bufqenable(queue_t *q, size_t size, int priority)
 {
 }
 
+/**
+ *  dl_data_req: - DL_DATA_REQ (M_DATA)
+ *  @q: upper write queue
+ *  @mp: the primitive
+ */
 static streams_noinline streams_fastcall int
-dl_data_req(queue_t *q, mblk_t *mp)
+dl_data_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
-	size_t size;
+	size_t dlen = msgdsize(mp);
+	int err;
 
-	if ((size = msgdsize(mp)) < 1 || size < dl->info.dl_min_sdu || size > dl->info.dl_max_sdu) {
-		/* error */
-		putnextctl2(OTHERQ(q), M_ERROR, EPROTO, EPROTO);
+	if (dlen < dl->info.dl_min_sdu || dlen > dl->info.dl_max_sdu)
+		goto eproto;
+	switch (dl_get_state(dl)) {
+	case DL_IDLE:
+	case DL_PROV_RESET_PENDING:
 		freemsg(mp);
 		return (0);
-	}
-	if (dl->i_state == DL_IDLE || dl->i_state == DL_PROV_RESET_PENDING) {
-		/* silent discard */
-		freemsg(mp);
+	case DL_DATAXFER:
+		bufq_queue(&dl->sndq, mp);
 		return (0);
+	default:
+	case DL_USER_RESET_PENDING:
+	case DL_RESET_RES_PENDING:
+		break;
 	}
-	if (dl->i_state != DL_DATAXFER) {
-		/* error */
-		putnextctl2(OTHERQ(q), M_ERROR, EPROTO, EPROTO);
+      eproto:
+	if ((err = m_error(q, dl, EPROTO, EPROTO)) == 0)
 		freemsg(mp);
-		return (0);
+	return (err);
+}
+static streams_noinline streams_fastcall int
+dl_info_req(struct dl *dl, queue_t *q, mblk_t *mp)
+{
+	dl_info_req_t *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto badprim;
+	return dl_info_ack(dl, q, mp);
+      badprim:
+	return dl_error_ack(dl, q, mp, DL_INFO_REQ, DL_SYSERR, EMSGSIZE);
+}
+
+/**
+ * dl_attach_req: - process DL_ATTACH_REQ primitive
+ * @dl: the data link
+ * @q: the upper write queue
+ * @mp: the primitive
+ *
+ * When this module is pushed, the device type is a STYLE1 device an no attach or detach operation
+ * is supported.  When this module is opened as a multiplexing driver, then the device type is a
+ * STYLE2 device requiring an attach and detach operation.  If there is a connection manager
+ * listening and the ppa is not found, cd_lookup() will request the ppa from the connection manager.
+ *
+ * This is a little bit different from LAPD, because LAPB only has one data link per physical link.
+ * LAPD supports multiple data links per physical link.
+ */
+static streams_noinline streams_fastcall int
+dl_attach_req(struct dl *dl, queue_t *q, mblk_t *mp)
+{
+	dl_attach_req_t *p = (typeof(p)) mp->b_rptr;
+	struct cd *cd;
+
+	if (!(cd = cd_lookup(p->dl_ppa)) || cd->info.cd_class == CD_NODEV)
+		goto badppa;
+	dl_set_state(dl, DL_ATTACH_PENDING);
+	return dl_ok_ack(dl, q, mp, cd, NULL, NULL);
+      badppa:
+	return dl_error_ack(dl, q, mp, DL_ATTACH_REQ, DL_BADPPA, ENXIO);
+}
+
+static streams_noinline streams_fastcall int
+dl_detach_req(struct dl *dl, queue_t *q, mblk_t *mp)
+{
+}
+static streams_noinline streams_fastcall int
+dl_bind_req(struct dl *dl, queue_t *q, mblk_t *mp)
+{
+	dl_bind_req_t *p = (typeof(p)) mp->b_rptr;
+	struct cd *cd = dl->cd;
+
+	if (p->dl_service_mode != DL_CODLS)
+		goto unsupported;
+	if (cd->dl != NULL && cd->dl != dl)
+		goto bound;
+	if (p->dl_addr_length != 0)
+		goto badaddr;
+	if (p->dl_max_conind > 0)
+		dl->dl_max_conind = p->dl_max_conind;
+	if (p->dl_conn_mgmt)
+		dl->flags |= DL_FLAG_CONNMGMT;
+
+	if (cd_chk_state(cd, (CDF_UNUSABLE | CDF_UNATTACHED)))
+		goto initfailed;
+	if (cd_not_state(cd, (CDF_DISABLED))) {
+		if ((dl->info.dl_min_sdu = cd->info.cd_min_sdu - (dl_exp(dl) ? 2 : 1)) < 1)
+			dl->info.dl_min_sdu = 1;
+	      if ((dl->info.dl_max_sdu = cd->info.cd_max_sdu - (dl_exp(dl): 2:1)) <
+		    1)
+			dl->info.dl_max_sdu = 1;
 	}
+	if (p->dl_xidtest_flg & DL_AUTO_XID)
+		dl->flags |= DL_FLAG_AUTOXID;
+	if (p->dl_xidtest_flg & DL_AUTO_TEST)
+		dl->flags |= DL_FLAG_AUTOTEST;
+	return dl_bind_ack(dl, q, mp, cd);
+
+      badaddr:
+	return dl_error_ack(dl, q, mp, DL_BIND_REQ, DL_BADADDR, ENXIO);
+      bound:
+	return dl_error_ack(dl, q, mp, DL_BIND_REQ, DL_BOUND, EADDRINUSE);
+      unsupported:
+	return dl_error_ack(dl, q, mp, DL_BIND_REQ, DL_UNSUPPORTED, EINVAL);
+      initfailed:
+	return dl_error_ack(dl, q, mp, DL_BIND_REQ, DL_INITFAILED, EIO);
+      enodev:
+	return dl_error_ack(dl, q, mp, DL_BIND_REQ, DL_SYSERR, ENODEV);
 }
 static streams_noinline streams_fastcall int
-dl_info_req(queue_t *q, mblk_t *mp)
+dl_unbind_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_attach_req(queue_t *q, mblk_t *mp)
+dl_subs_bind_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_detach_req(queue_t *q, mblk_t *mp)
+dl_subs_unbind_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_bind_req(queue_t *q, mblk_t *mp)
+dl_enabmulti_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_unbind_req(queue_t *q, mblk_t *mp)
+dl_disabmulti_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_subs_bind_req(queue_t *q, mblk_t *mp)
+dl_promiscon_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_subs_unbind_req(queue_t *q, mblk_t *mp)
+dl_promiscoff_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_enabmulti_req(queue_t *q, mblk_t *mp)
+dl_connect_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_disabmulti_req(queue_t *q, mblk_t *mp)
+dl_token_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_promiscon_req(queue_t *q, mblk_t *mp)
+dl_disconnect_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_promiscoff_req(queue_t *q, mblk_t *mp)
+dl_reset_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_connect_req(queue_t *q, mblk_t *mp)
+dl_reset_res(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_token_req(queue_t *q, mblk_t *mp)
+dl_unitdata_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_disconnect_req(queue_t *q, mblk_t *mp)
+dl_udqos_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_reset_req(queue_t *q, mblk_t *mp)
+dl_test_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_reset_res(queue_t *q, mblk_t *mp)
+dl_test_res(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_unitdata_req(queue_t *q, mblk_t *mp)
+dl_xid_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_udqos_req(queue_t *q, mblk_t *mp)
+dl_xid_res(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_test_req(queue_t *q, mblk_t *mp)
+dl_data_ack_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_test_res(queue_t *q, mblk_t *mp)
+dl_reply_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_xid_req(queue_t *q, mblk_t *mp)
+dl_reply_update_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_xid_res(queue_t *q, mblk_t *mp)
+dl_phys_addr_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_data_ack_req(queue_t *q, mblk_t *mp)
+dl_set_phys_addr_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_reply_req(queue_t *q, mblk_t *mp)
+dl_get_statistics_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 }
 static streams_noinline streams_fastcall int
-dl_reply_update_req(queue_t *q, mblk_t *mp)
-{
-}
-static streams_noinline streams_fastcall int
-dl_phys_addr_req(queue_t *q, mblk_t *mp)
-{
-}
-static streams_noinline streams_fastcall int
-dl_set_phys_addr_req(queue_t *q, mblk_t *mp)
-{
-}
-static streams_noinline streams_fastcall int
-dl_get_statistics_req(queue_t *q, mblk_t *mp)
-{
-}
-static streams_noinline streams_fastcall int
-dl_other_req(queue_t *q, mblk_t *mp)
+dl_other_req(struct dl *dl, queue_t *q, mblk_t *mp)
 {
 	return dl_error_ack(q, DL_PRIV(q), *(uint32_t *) mp->b_rptr, DL_BADPRIM, EOPNOTSUPP);
 }
@@ -1014,101 +2422,173 @@ dl_w_data(queue_t *q, mblk_t *mp)
 static streams_noinline streams_fastcall int
 dl_w_proto(queue_t *q, mblk_t *mp)
 {
-	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(uint32_t))) {
+	struct dl *dl = DL_PRIV(q);
+	dl_long prim;
+
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(dl_long))) {
 		__swerr();
 		freemsg(mp);
 		return (0);
 	}
-	switch (*(uint32_t *) mp->b_rptr) {
+	switch ((prim = *(dl_long *) mp->b_rptr)) {
 	case DL_INFO_REQ:
 		printd(("%s: %p: -> DL_INFO_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_info_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_info_req_t))
+			goto badprim;
+		return dl_info_req(dl, q, mp);
 	case DL_ATTACH_REQ:
 		printd(("%s: %p: -> DL_ATTACH_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_attach_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_attach_req_t))
+			goto badprim;
+		if (dl_not_state(dl, DLF_UNATTACHED))
+			goto outstate;
+		return dl_attach_req(dl, q, mp);
 	case DL_DETACH_REQ:
 		printd(("%s: %p: -> DL_DETACH_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_detach_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_detach_req_t))
+			goto badprim;
+		return dl_detach_req(dl, q, mp);
 	case DL_BIND_REQ:
 		printd(("%s: %p: -> DL_BIND_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_bind_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_bind_req_t))
+			goto badprim;
+		dl_lock(dl);
+		if (dl_not_state(dl, DLF_UNBOUND)) {
+			dl_unlock(dl);
+			goto outstate;
+		}
+		dl_set_state(dl, DL_BIND_PENDING);
+		dl_unlock(dl);
+		return dl_bind_req(dl, q, mp);
 	case DL_UNBIND_REQ:
 		printd(("%s: %p: -> DL_UNBIND_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_unbind_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_unbind_req_t))
+			goto badprim;
+		return dl_unbind_req(dl, q, mp);
 	case DL_SUBS_BIND_REQ:
 		printd(("%s: %p: -> DL_SUBS_BIND_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_subs_bind_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_subs_bind_req_t))
+			goto badprim;
+		return dl_subs_bind_req(dl, q, mp);
 	case DL_SUBS_UNBIND_REQ:
 		printd(("%s: %p: -> DL_SUBS_UNBIND_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_subs_unbind_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_subs_unbind_req_t))
+			goto badprim;
+		return dl_subs_unbind_req(dl, q, mp);
 	case DL_ENABMULTI_REQ:
 		printd(("%s: %p: -> DL_ENABMULTI_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_enabmulti_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_enabmulti_req_t))
+			goto badprim;
+		return dl_enabmulti_req(dl, q, mp);
 	case DL_DISABMULTI_REQ:
 		printd(("%s: %p: -> DL_DISABMULTI_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_disabmulti_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_disabmulti_req_t))
+			goto badprim;
+		return dl_disabmulti_req(dl, q, mp);
 	case DL_PROMISCON_REQ:
 		printd(("%s: %p: -> DL_PROMISCON_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_promiscon_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_promiscon_req_t))
+			goto badprim;
+		return dl_promiscon_req(dl, q, mp);
 	case DL_PROMISCOFF_REQ:
 		printd(("%s: %p: -> DL_PROMISCOFF_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_promiscoff_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_promiscoff_req_t))
+			goto badprim;
+		return dl_promiscoff_req(dl, q, mp);
 	case DL_CONNECT_REQ:
 		printd(("%s: %p: -> DL_CONNECT_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_connect_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_connect_req_t))
+			goto badprim;
+		return dl_connect_req(dl, q, mp);
 	case DL_TOKEN_REQ:
 		printd(("%s: %p: -> DL_TOKEN_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_token_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_token_req_t))
+			goto badprim;
+		return dl_token_req(dl, q, mp);
 	case DL_DISCONNECT_REQ:
 		printd(("%s: %p: -> DL_DISCONNECT_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_disconnect_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_disconnect_req_t))
+			goto badprim;
+		return dl_disconnect_req(dl, q, mp);
 	case DL_RESET_REQ:
 		printd(("%s: %p: -> DL_RESET_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_reset_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_reset_req_t))
+			goto badprim;
+		return dl_reset_req(dl, q, mp);
 	case DL_RESET_RES:
 		printd(("%s: %p: -> DL_RESET_RES\n", DRV_NAME, DL_PRIV(q)));
-		return dl_reset_res(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_reset_res_t))
+			goto badprim;
+		return dl_reset_res(dl, q, mp);
 	case DL_UNITDATA_REQ:
 		printd(("%s: %p: -> DL_UNITDATA_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_unitdata_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_unitdata_req_t))
+			goto badprim;
+		return dl_unitdata_req(dl, q, mp);
 	case DL_UDQOS_REQ:
 		printd(("%s: %p: -> DL_UDQOS_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_udqos_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_udqos_req_t))
+			goto badprim;
+		return dl_udqos_req(dl, q, mp);
 	case DL_TEST_REQ:
 		printd(("%s: %p: -> DL_TEST_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_test_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_test_req_t))
+			goto badprim;
+		return dl_test_req(dl, q, mp);
 	case DL_TEST_RES:
 		printd(("%s: %p: -> DL_TEST_RES\n", DRV_NAME, DL_PRIV(q)));
-		return dl_test_res(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_test_res_t))
+			goto badprim;
+		return dl_test_res(dl, q, mp);
 	case DL_XID_REQ:
 		printd(("%s: %p: -> DL_XID_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_xid_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_xid_req_t))
+			goto badprim;
+		return dl_xid_req(dl, q, mp);
 	case DL_XID_RES:
 		printd(("%s: %p: -> DL_XID_RES\n", DRV_NAME, DL_PRIV(q)));
-		return dl_xid_res(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_xid_res_t))
+			goto badprim;
+		return dl_xid_res(dl, q, mp);
 	case DL_DATA_ACK_REQ:
 		printd(("%s: %p: -> DL_DATA_ACK_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_data_ack_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_data_ack_req_t))
+			goto badprim;
+		return dl_data_ack_req(dl, q, mp);
 	case DL_REPLY_REQ:
 		printd(("%s: %p: -> DL_REPLY_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_reply_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_reply_req_t))
+			goto badprim;
+		return dl_reply_req(dl, q, mp);
 	case DL_REPLY_UPDATE_REQ:
 		printd(("%s: %p: -> DL_REPLY_UPDATE_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_reply_update_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_reply_update_req_t))
+			goto badprim;
+		return dl_reply_update_req(dl, q, mp);
 	case DL_PHYS_ADDR_REQ:
 		printd(("%s: %p: -> DL_PHYS_ADDR_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_phys_addr_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_phys_addr_req_t))
+			goto badprim;
+		return dl_phys_addr_req(dl, q, mp);
 	case DL_SET_PHYS_ADDR_REQ:
 		printd(("%s: %p: -> DL_SET_PHYS_ADDR_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_set_phys_addr_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_set_phys_addr_req_t))
+			goto badprim;
+		return dl_set_phys_addr_req(dl, q, mp);
 	case DL_GET_STATISTICS_REQ:
 		printd(("%s: %p: -> DL_GET_STATISTICS_REQ\n", DRV_NAME, DL_PRIV(q)));
-		return dl_get_statistics_req(q, mp);
+		if (mp->b_wptr < mp->b_rptr + sizeof(dl_get_statistics_req_t))
+			goto badprim;
+		return dl_get_statistics_req(dl, q, mp);
 	default:
 		printd(("%s: %p: -> DL_?? %u ??\n", DRV_NAME, DL_PRIV(q),
 			*(uint32_t *) mp->b_rptr));
-		return dl_other_req(q, mp);
+		return dl_other_req(dl, q, mp);
 	}
+      badprim:
+	return dl_error_ack(dl, q, prim, DL_SYSERR, EMSGSIZE);
+      outstate:
+	return dl_error_ack(dl, q, prim, DL_OUTSTATE, EPROTO);
 }
 
 static streams_noinline streams_fastcall __unlikely int
@@ -1421,28 +2901,89 @@ dl_mod_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag != MODOPEN || WR(q)->q_next == NULL)
-		return (ENXIO); /* cannot be opened as driver */
+		return (ENXIO);	/* cannot be opened as driver */
 	if ((mp = allocb(sizeof(*so), BPRI_WAITOK)) == NULL)
 		return (ENXIO);
 	if ((bp = allocb(sizeof(*p), BPRI_WAITOK)) == NULL) {
 		freeb(mp);
 		return (ENXIO);
 	}
-	if ((cd = kmem_alloc(sizeof(*cd)+sizeof(*dl), KM_SLEEP)) == NULL) {
+	if ((cd = kmem_alloc(sizeof(*cd) + sizeof(*dl), KM_SLEEP)) == NULL) {
 		freeb(mp);
 		freeb(bp);
 		return (ENXIO);
 	}
 	bzero(cd, sizeof(*cd) + sizeof(*dl));
-	dl = (typeof(dl)) (cd+1);
+	dl = (typeof(dl)) (cd + 1);
 	cd->dl = dl;
 	dl->cd = cd;
-	cd->u.dev.cmajor = dl->u.dev.cmajor = getmajor(*devp);
+
+	dl->info.dl_primitive = DL_INFO_ACK;
+	dl->info.dl_max_sdu = 4096;
+	dl->info.dl_min_sdu = 1;	/* never less than 1 */
+	dl->info.dl_addr_length = 1;	/* just a SAP. */
+	dl->info.dl_mac_type = DL_X25;	/* X.25 LAPB */
+	dl->info.dl_reserved = 0;
+	dl->info.dl_current_state = DL_UNBOUND;
+	dl->info.dl_sap_length = 1;
+	dl->info.dl_service_mode = DL_CODLS;
+	dl->info.dl_qos_length = sizeof(dl->qos);
+	dl->info.dl_qos_offset = sizeof(dl->info);
+	dl->info.dl_qos_range_length = sizeof(dl->qor);
+	dl->info.dl_qos_range_offset = sizeof(dl->info) + sizeof(dl->qos);
+	dl->info.dl_provider_style = DL_STYLE1;
+	dl->info.dl_addr_offset = 0;
+	dl->info.dl_version = DL_VERSION_2;
+	dl->info.dl_brdcst_addr_length = 0;
+	dl->info.dl_brdcst_addr_offset = 0;
+	dl->info.dl_growth = 0;
+
+	dl->qos.dl_qos_type = DL_QOS_CO_SEL1;
+	dl->qos.dl_rcv_throughput = 64000;
+	dl->qos.dl_rcv_trans_delay = 0;
+	dl->qos.dl_xmt_throughput = 64000;
+	dl->qos.dl_xmt_trans_delay = 0;
+	dl->qos.dl_priority = 0;
+	dl->qos.dl_protection = DL_NONE;
+	dl->qos.dl_residual_error = 0;
+	dl->qos.dl_resilience = {
+	0, 0};
+
+	dl->qor.dl_qos_type = DL_QOS_CO_RANGE1;
+	dl->qor.dl_rcv_throughput = {
+	64000, 4800};
+	dl->qor.dl_rcv_trans_delay = {
+	0, 512};
+	dl->qor.dl_xmt_throughput = {
+	64000, 4800};
+	dl->qor.dl_xmt_trans_delay = {
+	0, 512};
+	dl->qor.dl_priority = {
+	0, 100};
+	dl->qor.dl_protection = {
+	DL_NONE, DL_MAXIMUM};
+	dl->qor.dl_residual_error = 0;
+	dl->qor.dl_resilience = {
+	0, 0};
+
+	/* until we get an ack */
+	cd->info.cd_primitive = CD_INFO_ACK;
+	cd->info.cd_state = -1;
+	cd->info.cd_max_sdu = 4096;
+	cd->info.cd_min_sdu = 1;
+	cd->info.cd_class = CD_HDLC;
+	cd->info.cd_duplex = CD_FULLDUPLEX;
+	cd->info.cd_output_style = CD_UNACKEDOUTPUT
+	    cd->info.cd_features = (CD_CANREAD | CD_AUTOALLOW);
+	cd->info.cd_addr_length = 0;
+	cd->info.cd_ppa_style = CD_STYLE1;
+
+	dl->info.dl->info.cd->u.dev.cmajor = dl->u.dev.cmajor = getmajor(*devp);
 	cd->u.dev.cminor = dl->u.dev.cminor = getminor(*devp);
 	cd->rq = dl->rq = cd->oq = q;
 	cd->wq = dl->wq = dl->oq = WR(q);
-	q->q_ptr = (void *)cd;
-	WR(q)->q_ptr = (void *)dl;
+	q->q_ptr = (void *) cd;
+	WR(q)->q_ptr = (void *) dl;
 
 	so = (typeof(so)) mp->b_wptr;
 #ifdef LFS
@@ -1514,6 +3055,56 @@ dl_mux_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		return (ENOMEM);
 	}
 	bzero(dl, sizeof(*dl));
+
+	/* until refined */
+	dl->info.dl_primitive = DL_INFO_ACK;
+	dl->info.dl_max_sdu = 4096;
+	dl->info.dl_min_sdu = 1;	/* never less than 1 */
+	dl->info.dl_addr_length = 1;	/* just a SAP. */
+	dl->info.dl_mac_type = DL_X25;	/* X.25 LAPB */
+	dl->info.dl_reserved = 0;
+	dl->info.dl_current_state = DL_UNATTACHED;
+	dl->info.dl_sap_length = 1;
+	dl->info.dl_service_mode = DL_CODLS;
+	dl->info.dl_qos_length = sizeof(dl->qos);
+	dl->info.dl_qos_offset = sizeof(dl->info);
+	dl->info.dl_qos_range_length = sizeof(dl->qor);
+	dl->info.dl_qos_range_offset = sizeof(dl->info) + sizeof(dl->qos);
+	dl->info.dl_provider_style = DL_STYLE2;
+	dl->info.dl_addr_offset = 0;
+	dl->info.dl_version = DL_VERSION_2;
+	dl->info.dl_brdcst_addr_length = 0;
+	dl->info.dl_brdcst_addr_offset = 0;
+	dl->info.dl_growth = 0;
+
+	dl->qos.dl_qos_type = DL_QOS_CO_SEL1;
+	dl->qos.dl_rcv_throughput = 64000;
+	dl->qos.dl_rcv_trans_delay = 0;
+	dl->qos.dl_xmt_throughput = 64000;
+	dl->qos.dl_xmt_trans_delay = 0;
+	dl->qos.dl_priority = 0;
+	dl->qos.dl_protection = DL_NONE;
+	dl->qos.dl_residual_error = 0;
+	dl->qos.dl_resilience = {
+	0, 0};
+
+	dl->qor.dl_qos_type = DL_QOS_CO_RANGE1;
+	dl->qor.dl_rcv_throughput = {
+	64000, 4800};
+	dl->qor.dl_rcv_trans_delay = {
+	0, 512};
+	dl->qor.dl_xmt_throughput = {
+	64000, 4800};
+	dl->qor.dl_xmt_trans_delay = {
+	0, 512};
+	dl->qor.dl_priority = {
+	0, 100};
+	dl->qor.dl_protection = {
+	DL_NONE, DL_MAXIMUM};
+	dl->qor.dl_residual_error = 0;
+	dl->qor.dl_resilience = {
+	0, 0};
+
 	cminor = 1;
 	write_lock_str(&master.lock, flags);
 	for (; *dlp; dlp = &(*dlp)->next) {
@@ -1547,7 +3138,7 @@ dl_mux_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	*dlp = dl;
 	write_unlock_str(&master.lock, flags);
 
-	q->q_ptr = WR(q)->q_ptr = (void *)dl;
+	q->q_ptr = WR(q)->q_ptr = (void *) dl;
 
 	so = (typeof(so)) mp->b_wptr;
 #ifdef LFS

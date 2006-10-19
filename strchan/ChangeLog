@@ -1,3 +1,7 @@
+2006-10-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/v401p.c: workup of v401p driver
+
 2006-10-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/lapb.c: working up lapb
