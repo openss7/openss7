@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sctp.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: npi_sctp.h,v 0.9.2.4 2006/10/19 17:18:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
-                                  PUBLIC LICENSE
+ All Rights Reserved.
 
-     This license is provided without fee, provided that the above copy-
-     right notice and this public license must be retained on all copies,
-     extracts, compilations and derivative works.  Use or distribution of
-     this work in a manner that restricts its use except as provided here
-     will render this license void.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
-     The author(s) hereby waive any and all other restrictions in respect
-     of their copyright in this software and its associated documentation.
-     The authors(s) of this software place in the public domain any novel
-     methods or processes which are embodied in this software.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
-     The author(s) undertook to write it for the sake of the advancement
-     of the Arts and Sciences, but it is provided as is, and the author(s)
-     will not take any responsibility in it.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -41,65 +40,70 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/10/19 17:18:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_NPI_SCTP_H
 #define _SYS_NPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
-
-/* This file can be processed with doxygen(1). */
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  LiS npi.h is version 1
  */
 #ifndef N_VERSION_2
 
-#define N_CURRENT_VERSION   0x02	/* current version of NPI */
-#define N_VERSION_2	    0x02	/* version of npi, December 16, 1991 */
+#define N_CURRENT_VERSION   0x02	/** Current version of NPI. */
+#define N_VERSION_2	    0x02	/** Version of NPI: December 16, 1991. */
 
 /*
  * Information acknowledgement
  */
 typedef struct {
-	np_ulong PRIM_type;		/* always N_INFO_ACK */
-	np_ulong NSDU_size;		/* maximum NSDU size */
-	np_ulong ENSDU_size;		/* maximum ENSDU size */
-	np_ulong CDATA_size;		/* connect data size */
-	np_ulong DDATA_size;		/* discon data size */
-	np_ulong ADDR_size;		/* address size */
-	np_ulong ADDR_length;		/* address length */
-	np_ulong ADDR_offset;		/* address offset */
-	np_ulong QOS_length;		/* QOS values length */
-	np_ulong QOS_offset;		/* QOS values offset */
-	np_ulong QOS_range_length;	/* length of QOS values' range */
-	np_ulong QOS_range_offset;	/* offset of QOS values' range */
-	np_ulong OPTIONS_flags;		/* bit masking for options supported */
-	np_ulong NIDU_size;		/* network i/f data unit size */
-	long SERV_type;			/* service type */
-	np_ulong CURRENT_state;		/* current state */
-	np_ulong PROVIDER_type;		/* type of NS provider */
-	np_ulong NODU_size;		/* optimal NSDU size */
-	np_ulong PROTOID_length;	/* length of bound protocol ids */
-	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
-	np_ulong NPI_version;		/* version # of npi that is supported */
+	np_ulong PRIM_type;		/** Always N_INFO_ACK. */
+	np_ulong NSDU_size;		/** Maximum NSDU size. */
+	np_ulong ENSDU_size;		/** Maximum ENSDU size. */
+	np_ulong CDATA_size;		/** Connect data size. */
+	np_ulong DDATA_size;		/** Discon data size. */
+	np_ulong ADDR_size;		/** Address size. */
+	np_ulong ADDR_length;		/** Address length. */
+	np_ulong ADDR_offset;		/** Address offset. */
+	np_ulong QOS_length;		/** QOS values length. */
+	np_ulong QOS_offset;		/** QOS values offset. */
+	np_ulong QOS_range_length;	/** Length of QOS values' range. */
+	np_ulong QOS_range_offset;	/** Offset of QOS values' range. */
+	np_ulong OPTIONS_flags;		/** Bit masking for options supported. */
+	np_ulong NIDU_size;		/** Network i/f data unit size. */
+	long SERV_type;			/** Service type. */
+	np_ulong CURRENT_state;		/** Current state. */
+	np_ulong PROVIDER_type;		/** Type of NS provider. */
+	np_ulong NODU_size;		/** Optimal NSDU size. */
+	np_ulong PROTOID_length;	/** Length of bound protocol identifiers. */
+	np_ulong PROTOID_offset;	/** Offset of bound protocol identifiers. */
+	np_ulong NPI_version;		/** Version # of npi that is supported. */
 } __N_info_ack_t;
+
 #define N_info_ack_t __N_info_ack_t
 
 /*
  * Bind acknowledgement
  */
 typedef struct {
-	np_ulong PRIM_type;		/* always N_BIND_ACK */
-	np_ulong ADDR_length;		/* address length */
-	np_ulong ADDR_offset;		/* offset of address */
-	np_ulong CONIND_number;		/* connection indications */
-	np_ulong TOKEN_value;		/* value of "token" assigned to stream */
-	np_ulong PROTOID_length;	/* length of bound protocol ids */
-	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
+	np_ulong PRIM_type;		/** Always N_BIND_ACK. */
+	np_ulong ADDR_length;		/** Address length. */
+	np_ulong ADDR_offset;		/** Offset of address. */
+	np_ulong CONIND_number;		/** Connection indications. */
+	np_ulong TOKEN_value;		/** Value of "token" assigned to stream. */
+	np_ulong PROTOID_length;	/** Length of bound protocol identifiers. */
+	np_ulong PROTOID_offset;	/** Offset of bound protocol identifiers. */
 } __N_bind_ack_t;
+
 #define N_bind_ack_t __N_bind_ack_t
 
 #endif				/* N_VERSION_2 */
@@ -129,50 +133,75 @@ typedef struct sctp_addr {
 
 #define N_QOS_SEL_CONN_SCTP	1
 typedef struct {
-	ulong n_qos_type;
-	ulong i_streams;
-	ulong o_streams;
+	np_ulong n_qos_type;		/** Always N_QOS_SEL_CONN_SCTP. */
+	np_ulong i_streams;		/** Maximum number of input streams. */
+	np_ulong o_streams;		/** Requested number of output streams. */
 } N_qos_sel_conn_sctp_t;
 
 #define N_QOS_SEL_DATA_SCTP	2
 typedef struct {
-	ulong n_qos_type;
-	ulong ppi;
-	ulong sid;
-	ulong ssn;
-	ulong tsn;
-	ulong more;
+	np_ulong n_qos_type;		/** Always N_QOS_SEL_DATA_SCTP. */
+	np_ulong ppi;			/** Protocol Payload Identifier. */
+	np_ulong sid;			/** Stream identifier. */
+	np_ulong ssn;			/** Stream sequence number. */
+	np_ulong tsn;			/** Trasnsmission sequence number. */
+	np_ulong more;			/** More data in NSDU. */
 } N_qos_sel_data_sctp_t;
 
 #define N_QOS_SEL_INFO_SCTP	3
 typedef struct {
-	ulong n_qos_type;
-	ulong i_streams;
-	ulong o_streams;
-	ulong ppi;
-	ulong sid;
-	ulong max_inits;
-	ulong max_retrans;
-	ulong ck_life;
-	ulong ck_inc;
-	ulong hmac;
-	ulong throttle;
-	ulong max_sack;
-	ulong rto_ini;
-	ulong rto_min;
-	ulong rto_max;
-	ulong rtx_path;
-	ulong hb_itvl;
-	ulong options;
+	np_ulong n_qos_type;		/** Always N_QOS_SEL_INFO_SCTP. */
+	np_ulong i_streams;		/** Maximum number of input streams. */
+	np_ulong o_streams;		/** Requested number of output streams. */
+	np_ulong ppi;			/** Protocol Payload Identifier. */
+	np_ulong sid;			/** Stream identifier. */
+	np_ulong max_inits;		/** Maximum number of INIT retries. */
+	np_ulong max_retrans;		/** Maximum number of retransmissions per association. */
+	np_ulong ck_life;		/** Cookie lifetime. */
+	np_ulong ck_inc;		/** Cookie preservative time increment. */
+	np_ulong hmac;			/** Message Authentication Code algorithm. */
+	np_ulong throttle;		/** INIT/COOKIE-ECHO throttle interval. */
+	np_ulong max_sack;		/** Maximum SACK delay. */
+	np_ulong rto_ini;		/** Retransmission timeout value initial. */
+	np_ulong rto_min;		/** Retransmission timeout value minimum. */
+	np_ulong rto_max;		/** Retransmission timeout value maximum. */
+	np_ulong rtx_path;		/** Maximum number of retransmission per path (destination). */
+	np_ulong hb_itvl;		/** Heartbeat interval. */
+	np_ulong options;		/** Options flags. */
 } N_qos_sel_info_sctp_t;
+
+/* Additional selection type added to support ETSI SACK Frequency settings.  Note that this
+ * structure must be compatibile with the original version above except in the last field. */
+#define N_QOS_SEL_INFO_SCTP2	5
+typedef struct {
+	np_ulong n_qos_type;		/** Always N_QOS_SEL_INFO_SCTP2. */
+	np_ulong i_streams;		/** Maximum number of input streams. */
+	np_ulong o_streams;		/** Requested number of output streams. */
+	np_ulong ppi;			/** Protocol Payload Identifier. */
+	np_ulong sid;			/** Stream identifier. */
+	np_ulong max_inits;		/** Maximum number of INIT retries. */
+	np_ulong max_retrans;		/** Maximum number of retransmissions per association. */
+	np_ulong ck_life;		/** Cookie lifetime. */
+	np_ulong ck_inc;		/** Cookie preservative time increment. */
+	np_ulong hmac;			/** Message Authentication Code algorithm. */
+	np_ulong throttle;		/** INIT/COOKIE-ECHO throttle interval. */
+	np_ulong max_sack;		/** Maximum SACK delay. */
+	np_ulong rto_ini;		/** Retransmission timeout value initial. */
+	np_ulong rto_min;		/** Retransmission timeout value minimum. */
+	np_ulong rto_max;		/** Retransmission timeout value maximum. */
+	np_ulong rtx_path;		/** Maximum number of retransmission per path (destination). */
+	np_ulong hb_itvl;		/** Heartbeat interval. */
+	np_ulong options;		/** Options flags. */
+	np_ulong sack_freq;		/** Sack frequency. */
+} N_qos_sel_info_sctp2_t;
 
 #define N_QOS_RANGE_INFO_SCTP	4
 typedef struct {
-	ulong n_qos_type;
+	np_ulong n_qos_type;		/** Always N_QOS_RANGE_INFO_SCTP. */
 } N_qos_range_info_sctp_t;
 
 typedef union N_qos_sctp {
-	ulong n_qos_type;
+	np_ulong n_qos_type;
 	N_qos_sel_conn_sctp_t n_qos_conn;
 	N_qos_sel_data_sctp_t n_qos_data;
 	N_qos_sel_info_sctp_t n_qos_info;

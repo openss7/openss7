@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $Id: tpi_sctp.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: tpi_sctp.h,v 0.9.2.4 2006/10/19 17:18:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
-                                  PUBLIC LICENSE
+ All Rights Reserved.
 
-     This license is provided without fee, provided that the above copy-
-     right notice and this public license must be retained on all copies,
-     extracts, compilations and derivative works.  Use or distribution of
-     this work in a manner that restricts its use except as provided here
-     will render this license void.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
-     The author(s) hereby waive any and all other restrictions in respect
-     of their copyright in this software and its associated documentation.
-     The authors(s) of this software place in the public domain any novel
-     methods or processes which are embodied in this software.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
-     The author(s) undertook to write it for the sake of the advancement
-     of the Arts and Sciences, but it is provided as is, and the author(s)
-     will not take any responsibility in it.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -41,16 +40,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2006/10/19 17:18:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TPI_SCTP_H
 #define _SYS_TPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
-
-/* This file can be processed with doxygen(1). */
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #ifndef T_CURRENT_VERSION
 
@@ -72,8 +74,8 @@
 #define T_ODF_EX	T_EXPEDITED
 #endif
 #ifndef XPG4_1
-#define XPG4_1		2	/* This indicates that the transport provider conforms to XTI in XPG4 and
-				   supports the new primitives T_ADDR_REQ and T_ADDR_ACK */
+#define XPG4_1		2	/* This indicates that the transport provider conforms to XTI in
+				   XPG4 and supports the new primitives T_ADDR_REQ and T_ADDR_ACK */
 #endif
 
 /*
