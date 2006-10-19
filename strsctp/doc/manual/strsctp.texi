@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strsctp.texi,v 0.9.2.22 2006/09/18 01:07:11 brian Exp $
+% @(#) $Id: strsctp.texi,v 0.9.2.23 2006/10/19 12:52:09 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:07:11 $ by $Author: brian $
+% Last Modified $Date: 2006/10/19 12:52:09 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strsctp.texi,v $
+Revision 0.9.2.23  2006/10/19 12:52:09  brian
+- added ETSI TS 102 144 PICS
+
 Revision 0.9.2.22  2006/09/18 01:07:11  brian
 - updated manuals and release texi docs
 
@@ -967,6 +970,9 @@ perform regression, target architecture validation and trouble shooting, (@pxref
 @menu
 * NPI Interface Conformance::	    Conformance to the NPI.
 * TPI Interface Conformance::	    Conformance to the TPI.
+* XTI Interface Conformance::	    Conformance to the XTI.
+* IETF Conformance::		    Conformance to IETF
+* ETSI Conformance::		    Conformance to ETSI
 @end menu
 
 @node NPI Interface Conformance
@@ -1007,6 +1013,107 @@ Reprints of the document are not available from The OpenSS7 Project website due 
 restrictions.  Similar information is available in the manual pages that accompany the
 @samp{strxnet} package.  These can be viewed online starting at
 @uref{http://www.openss7.org/man2html?3+xti, XTI/TLI manpage}.
+
+@node IETF Conformance
+@section IETF Conformance
+@cindex IETF conformance
+
+@cite{RFC 2960}, @cite{RFC 3309} and most of @cite{RFC 4460}.  Options for ADD-IP and PR-SCTP.
+
+@node ETSI Conformance
+@section ETSI Conformance
+@cindex ETSI conformance
+
+The Stream Control Transmission Protocol (SCTP) driver conforms to the @cite{ETSI TS 102 144}
+endorsement of RFC 2960 and RFC 3309.  A PICS follows:
+
+@table @asis
+@item Section 4.1 SCTP checksum
+@emph{CONFORMS}:
+The driver supports CRC32C, Adler32 and no checksum; however, the default setting is CRC32C.
+@item Section 4.2 SCTP streams
+@emph{CONFORMS}:
+The driver supports multiple Streams in an association.  The default is to request 32 outgoing
+streams.
+@item Section 4.3 Path MTU discovery
+@emph{CONFORMS}:
+The driver supports PTMU discovery; however, the value is settable with an option.
+@item Section 4.4 Multihoming
+@emph{CONFORMS}:
+The driver supports 16 IP addresses locally and any number remotely.  During the initialization
+process, if an INIT sent to one IP address times out, the driver will send an init to the next IP
+address, and so on, until the maximum number of init retries is reached.
+@item Section 4.5 SCTP chunk size
+@emph{CONFORMS}:
+The driver segments DATA chunks to fit into the associaiton PMTU (which is the minimum of the MTUs
+of all paths).  The driver's INIT chunks fit into the minimum IP MTU.
+@item Section 4.6 Addressing methods
+@emph{CONFORMS}:
+The driver supports IPv4.  Hostname is not supported and is rejected as stated.  For single-homed
+associations, the driver does not place addresses in the INIT or INIT-ACK chunks.
+@item Section 4.7 Path supervision
+@emph{CONFORMS}:
+The hearbeat mechanism is supported and enabled by default.
+@item Section 4.8 User data size
+@emph{CONFORMS}:
+The driver places no limit on the maximum user data size.
+@item Section 4.9 User data fragmentation
+@emph{CONFORMS}:
+The driver fragments user data when to fit it into the PMTU and supports reassembly of received
+fragmented data.
+@item Section 4.10 Unordered delivery of DATA chunks
+@emph{CONFORMS}:
+Both sending and receiving of unordered DATA chunks is supported.
+@item Section 4.11 Bundling of DATA chunks
+@emph{CONFORMS}:
+The driver uses the the Nagle and Minshall algorithms for bundling of DATA chunks into IP packets;
+however, the algorithm may be defeated using an option.
+@item Section 4.12 Explicit Congestion Notification (ECN)
+@emph{CONFORMS}:
+ECN is supported.
+@item Section 5 SCTP parameter considerations
+
+@table @asis
+@item RTO.Min
+@emph{CONFORMS}:
+Supports a range from zero milliseconds to MAX_INT ticks with a granularity of a system tick clock
+(10ms or better).  The default is per RFC 2960.
+@item RTO.Max
+@emph{CONFORMS}:
+Supports a range from zero milliseconds to MAX_INT ticks with a granularity of a system tick clock
+(10ms or better).  The default is per RFC 2960.
+@item RTO.Initial
+@emph{CONFORMS}:
+Supports a range from RTO.Min to RTO.Max with a granularity of a system tick clock
+(10ms or better).  The default is per RFC 2960.
+@item RTO.Alpha
+@emph{CONFORMS}:
+Not settable.  The value is per RFC 2960.
+@item RTO.Beta
+@emph{CONFORMS}:
+Not settable.  The value is per RFC 2960.
+@item Valid.Cookie.Life
+@emph{CONFORMS}:
+Supports a range from zero milliseconds to MAX_INT ticks with a granularity of a system tick clock
+(10ms or better).  The default is per RFC 2960.
+@item HB.Inverval
+@emph{CONFORMS}:
+Supports a range from 1 milliseconds to MAX_INT ticks with a granularity of a system tick clock
+(10ms or better).  The default is per RFC 2960.
+@item SACK period
+@emph{CONFORMS}:
+Supports a range from 0 milliseconds to 1000 ms with a default of 200 ms with a granularity of a
+system tick clock (10ms or better).  The default is per RFC 2960.
+@item SACK frequency
+@emph{CONFORMS}:
+Supports a range from 1 to 5 with a default of 2.  The default is per RFC 2960.
+@item MTU size
+@emph{CONFORMS}:
+Supports the complete range of IP MTU sizes.
+@end table
+
+@end table
+
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
