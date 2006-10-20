@@ -204,7 +204,8 @@ __raise_streams(void)
 {
 	struct strthread *t = this_thread;
 
-	wake_up_process(t->proc);
+	if (atomic_read(&t->lock) == 0)
+		wake_up_process(t->proc);
 }
 
 STATIC streams_fastcall void
@@ -212,7 +213,8 @@ cpu_raise_streams(unsigned int cpu)
 {
 	struct strthread *t = &strthreads[cpu];
 
-	wake_up_process(t->proc);
+	if (atomic_read(&t->lock) == 0)
+		wake_up_process(t->proc);
 }
 
 #else				/* defined CONFIG_STREAMS_KTHREADS */

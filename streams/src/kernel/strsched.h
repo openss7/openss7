@@ -189,8 +189,10 @@ do { \
 #define local_str_enable() \
 do { \
 	struct strthread *t = this_thread; \
-	if (atomic_dec_and_test(&t->lock) && test_and_clear_bit(qwantrun, &t->flags)) \
-		__raise_streams(); \
+	if (atomic_dec_and_test(&t->lock)) \
+		if (unlikely(test_and_clear_bit(qwantrun, &t->flags))) \
+			if (unlikely((t->flags & (QRUNFLAGS)) != 0)) \
+				__raise_streams(); \
 } while (0)
 
 #if defined CONFIG_STREAMS_KTHREADS

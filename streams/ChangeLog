@@ -1,3 +1,11 @@
+2006-10-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/strsched.c: don't raise streams if runqueues already running
+	* src/kernel/strsched.h: don't raise streams unnecesssarily
+	* src/modules/sth.c:
+	  - scheduling tweaks
+	  - pulled I_PUTPMSG I_GETPMSG to head of _strioctl
+
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: removed redundant debug flags

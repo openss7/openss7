@@ -553,6 +553,14 @@ strdetached(struct stdata *sd)
  *  call runqueues(): normally the message is placed directly on the other Stream head and there is
  *  nothing to schedule.  We do need to check, though, and if something needs running we will still
  *  call runqueues().
+ *
+ *  Unfortunately we are still getting a lot of false wakeups.  When running queues to avoid a
+ *  context switch, unfortunately the streams thread is often already woken up.  So we have to
+ *  procedures, one to defer STREAMS scheduler wakeups (on the current processor) and the other
+ *  to process deferred work.  We use QWANTRUN flag for this because it is cleared by runqueues().
+ *  __raise_streams() now checks this flag and if it is set, it does not wake the STREAMS scheduler.
+ *  This way, the kernel thread should stay asleep until we run the queues ourselves, even if a soft
+ *  or hard interrupt attempts to schedule.
  */
 STATIC streams_inline streams_fastcall __hot void
 strsyscall(void)
@@ -564,11 +572,11 @@ strsyscall(void)
 #if 1
 	struct strthread *t = this_thread;
 
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every system call return -- saves a context switch */
 	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
-	/* try to avoid context switch */
-	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
 #endif
 }
@@ -583,11 +591,11 @@ strsyscall_ioctl(void)
 #if 1
 	struct strthread *t = this_thread;
 
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every system call return -- saves a context switch */
 	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
-	/* try to avoid context switch */
-	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
 #endif
 }
@@ -602,11 +610,11 @@ strsyscall_write(void)
 #if 1
 	struct strthread *t = this_thread;
 
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every system call return -- saves a context switch */
 	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
-	/* try to avoid context switch */
-	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
 #endif
 }
@@ -621,11 +629,11 @@ strsyscall_read(void)
 #if 1
 	struct strthread *t = this_thread;
 
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every system call return -- saves a context switch */
 	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
-	/* try to avoid context switch */
-	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	runqueues();
 #endif
 }
@@ -633,23 +641,23 @@ strsyscall_read(void)
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule(void)
 {
-	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
-	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
-	   the current process is blocked off other processors while it is running the STREAMS
-	   scheduler.  If we do the task switch, the process can run concurrently on another
-	   processor.  This does have a negative impact; however, on SMP kernels running on UP
-	   machines, so it would be better if we could quickly check the number of processors
+	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
+	   the STREAMS scheduler in process context here.  The reason is that if we avoid
+	   scheduling, the current process is blocked off other processors while it is running the
+	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
+	   another processor.  This does have a negative impact; however, on SMP kernels running on 
+	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
 #if 1
-	/* before every sleep -- saves a context switch */
 	struct strthread *t = this_thread;
 
-	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
-		return;
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
-	set_current_state(TASK_RUNNING);
+	/* before every sleep -- saves a context switch */
+	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	// set_current_state(TASK_RUNNING);
 	runqueues();
 #endif
 }
@@ -657,23 +665,23 @@ strschedule(void)
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule_ioctl(void)
 {
-	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
-	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
-	   the current process is blocked off other processors while it is running the STREAMS
-	   scheduler.  If we do the task switch, the process can run concurrently on another
-	   processor.  This does have a negative impact; however, on SMP kernels running on UP
-	   machines, so it would be better if we could quickly check the number of processors
+	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
+	   the STREAMS scheduler in process context here.  The reason is that if we avoid
+	   scheduling, the current process is blocked off other processors while it is running the
+	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
+	   another processor.  This does have a negative impact; however, on SMP kernels running on 
+	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
 #if 1
-	/* before every sleep -- saves a context switch */
 	struct strthread *t = this_thread;
 
-	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
-		return;
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
-	set_current_state(TASK_RUNNING);
+	/* before every sleep -- saves a context switch */
+	if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	// set_current_state(TASK_RUNNING);
 	runqueues();
 #endif
 }
@@ -682,24 +690,24 @@ STATIC streams_inline streams_fastcall __hot_in void
 strschedule_write(void)
 {
 	str_wstat.ms_acnt++;
-	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
-	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
-	   the current process is blocked off other processors while it is running the STREAMS
-	   scheduler.  If we do the task switch, the process can run concurrently on another
-	   processor.  This does have a negative impact; however, on SMP kernels running on UP
-	   machines, so it would be better if we could quickly check the number of processors
+	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
+	   the STREAMS scheduler in process context here.  The reason is that if we avoid
+	   scheduling, the current process is blocked off other processors while it is running the
+	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
+	   another processor.  This does have a negative impact; however, on SMP kernels running on 
+	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
 #if 1
-	/* before every sleep -- saves a context switch */
 	{
 		struct strthread *t = this_thread;
 
-		if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
-			return;
 		/* try to avoid context switch */
 		set_task_state(t->proc, TASK_INTERRUPTIBLE);
-		set_current_state(TASK_RUNNING);
+		/* before every sleep -- saves a context switch */
+		if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+			return;
+		// set_current_state(TASK_RUNNING);
 		runqueues();
 	}
 #endif
@@ -709,24 +717,24 @@ STATIC streams_inline streams_fastcall __hot_in void
 strschedule_read(void)
 {
 	str_rstat.ms_acnt++;
-	/* NOTE:- Better performance is acheived on (true) SMP machines by no attempting to run the
-	   STREAMS scheduler in process context here.  The reason is that if we avoid scheduling,
-	   the current process is blocked off other processors while it is running the STREAMS
-	   scheduler.  If we do the task switch, the process can run concurrently on another
-	   processor.  This does have a negative impact; however, on SMP kernels running on UP
-	   machines, so it would be better if we could quickly check the number of processors
+	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
+	   the STREAMS scheduler in process context here.  The reason is that if we avoid
+	   scheduling, the current process is blocked off other processors while it is running the
+	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
+	   another processor.  This does have a negative impact; however, on SMP kernels running on 
+	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
 #if 1
-	/* before every sleep -- saves a context switch */
 	{
 		struct strthread *t = this_thread;
 
-		if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
-			return;
 		/* try to avoid context switch */
 		set_task_state(t->proc, TASK_INTERRUPTIBLE);
-		set_current_state(TASK_RUNNING);
+		/* before every sleep -- saves a context switch */
+		if (likely((t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+			return;
+		// set_current_state(TASK_RUNNING);
 		runqueues();
 	}
 #endif
@@ -1794,7 +1802,6 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 	int err;
 
 	srunlock(sd);
-	strschedule_read();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&sd->sd_rwaitq, &wait);
 #endif
@@ -1818,6 +1825,7 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
+		strschedule_read();	/* save context switch */
 		schedule();
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -2064,7 +2072,6 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 	int err;
 
 	srunlock(sd);
-	strschedule_read();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&sd->sd_rwaitq, &wait);
 #endif
@@ -2088,6 +2095,7 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
+		strschedule_read();	/* save context switch */
 		schedule();
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -2159,7 +2167,6 @@ __strwaitband(struct stdata *sd, const int f_flags, int band, const int flags)
 		return (-ERESTARTSYS);
 
 	srunlock(sd);
-	strschedule_write();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&sd->sd_wwaitq, &wait);	/* exclusive? */
 #endif
@@ -2182,6 +2189,7 @@ __strwaitband(struct stdata *sd, const int f_flags, int band, const int flags)
 		set_bit(WSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
+		strschedule_write();	/* save context switch */
 		schedule();
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -2249,7 +2257,6 @@ __strwaitopen(struct stdata *sd, const int access)
 	int err;
 
 	swunlock(sd);
-	strschedule();		/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
 	add_wait_queue_exclusive(&sd->sd_owaitq, &wait);
 #endif
@@ -2273,6 +2280,7 @@ __strwaitopen(struct stdata *sd, const int access)
 			break;
 		swunlock(sd);
 
+		strschedule();	/* save context switch */
 		schedule();
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -2414,7 +2422,6 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 
 	waitq = (oflag & FREAD) ? &sd->sd_rwaitq : &sd->sd_wwaitq;
 
-	strschedule();		/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(waitq, &wait);
 #endif
@@ -2437,6 +2444,7 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 		}
 		srunlock(sd);
 
+		strschedule();	/* save context switch */
 		schedule();
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -2479,7 +2487,6 @@ strwaitqueue(struct stdata *sd, queue_t *q)
 	struct queinfo *qu = ((struct queinfo *) _RD(q));
 
 	set_bit(QWCLOSE_BIT, &q->q_flag);
-	strschedule();		/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&qu->qu_qwait, &wait);
 #endif
@@ -2495,6 +2502,7 @@ strwaitqueue(struct stdata *sd, queue_t *q)
 			break;
 		if (!q->q_first)
 			break;
+		strschedule();	/* save context switch */
 		timeo = schedule_timeout(timeo);
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -2572,7 +2580,6 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 	int err = 0;
 
 	srunlock(sd);
-	strschedule_ioctl();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&sd->sd_iwaitq, &wait);
 #endif
@@ -2593,6 +2600,7 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 				break;
 			srunlock(sd);
 
+			strschedule_ioctl();	/* save context switch */
 			*timeo = schedule_timeout(*timeo);
 		}
 	} else {
@@ -2607,6 +2615,7 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 				break;
 			srunlock(sd);
 
+			strschedule_ioctl();	/* save context switch */
 			schedule();
 		}
 	}
@@ -2666,7 +2675,6 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 	int err;
 
 	srunlock(sd);
-	strschedule_ioctl();	/* save context switch */
 	/* We are waiting for a response to our downwards ioctl message.  Wait until the message
 	   arrives or the io check fails. */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
@@ -2693,6 +2701,7 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 			}
 			srunlock(sd);
 
+			strschedule_ioctl();	/* save context switch */
 			*timeo = schedule_timeout(*timeo);
 			prefetchw(sd);
 		} while (1);
@@ -2714,6 +2723,7 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 			}
 			srunlock(sd);
 
+			strschedule_ioctl();	/* save context switch */
 			schedule();
 			prefetchw(sd);
 		} while (1);
@@ -4033,6 +4043,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 				mask = strpoll_fast(file, poll);
 				srunlock(sd);
 				sd_put(&sd);
+			      exit:
 				strsyscall();	/* save context switch */
 				return (mask);
 			}
@@ -4043,8 +4054,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 		sd_put(&sd);
 	} else
 		mask = POLLNVAL;
-	strsyscall();		/* save context switch */
-	return (mask);
+	goto exit;
 }
 
 /**
@@ -4458,13 +4468,14 @@ strclose(struct inode *inode, struct file *file)
 
 		/* this put balances the sd_get() in stri_insert() */
 		_ctrace(sd_put(&sd));	/* could be final */
-	} else {
-		err = -EIO;
-		_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-		stri_unlock(inode);
+	      exit:
+		strsyscall();	/* save context switch */
+		return (err);
 	}
-	strsyscall();		/* save context switch */
-	return (err);
+	err = -EIO;
+	_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+	stri_unlock(inode);
+	goto exit;
 }
 
 /**
@@ -4483,7 +4494,7 @@ strfasync(int fd, struct file *file, int on)
 	if (!(file->f_mode & (FREAD | FWRITE)))
 		err = -EBADF;
 	else if (likely((sd = stri_acquire(file)) != NULL)) {
-		if ((err = straccess_rlock(sd, FNDELAY)) == 0) {
+		if (likely((err = straccess_rlock(sd, FNDELAY)) == 0)) {
 			if ((err = fasync_helper(fd, file, on, &sd->sd_fasync)) >= 0 && on) {
 				if (file->f_owner.pid == 0) {
 					struct task_struct *c = current;
@@ -4492,14 +4503,18 @@ strfasync(int fd, struct file *file, int on)
 					file->f_owner.uid = c->uid;
 					file->f_owner.euid = c->euid;
 				}
+				srunlock(sd);
+				sd_put(&sd);
+			      exit:
+				strsyscall();	/* save context switch */
+				return (err);
 			}
 			srunlock(sd);
 		}
-		_ctrace(sd_put(&sd));
+		sd_put(&sd);
 	} else
 		err = -ENOSTR;
-	strsyscall();		/* save context switch */
-	return (err);
+	goto exit;
 }
 
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
@@ -4961,6 +4976,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 			/* PROFILED */
 			err = strread_fast(file, buf, len, ppos);
 			sd_put(&sd);
+		      exit:
 			/* We want to give the driver queues an opportunity to run. */
 			strsyscall_read();	/* save context switch */
 			return (err);
@@ -4970,10 +4986,6 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 	} else
 		err = -ENOSTR;
 	goto exit;
-      exit:
-	/* We want to give the driver queues an opportunity to run. */
-	strsyscall_read();	/* save context switch */
-	return (err);
 }
 
 /**
@@ -5246,6 +5258,7 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 			/* PROFILED */
 			err = strwrite_fast(file, buf, len, ppos);
 			sd_put(&sd);
+		      exit:
 			/* We want to give the driver queues an opportunity to run. */
 			strsyscall_write();	/* save context switch */
 			return (err);
@@ -5255,10 +5268,6 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 	} else
 		err = -ENOSTR;
 	goto exit;
-      exit:
-	/* We want to give the driver queues an opportunity to run. */
-	strsyscall_write();	/* save context switch */
-	return (err);
 }
 
 /**
@@ -5314,7 +5323,6 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 #endif
 
 			srunlock(sd);
-			strschedule_write();	/* save context switch */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 			add_wait_queue(&sd->sd_wwaitq, &wait);	/* exclusive? */
 #endif
@@ -5340,6 +5348,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 				set_bit(WSLEEP_BIT, &sd->sd_flag);
 				srunlock(sd);
 
+				strschedule_write();	/* save context switch */
 				*timeo = schedule_timeout(*timeo);
 			}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -5418,6 +5427,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 		if (likely(!sd->sd_directio) || likely(!sd->sd_directio->sendpage)) {
 			err = strsendpage(file, page, offset, size, ppos, more);
 			sd_put(&sd);
+		      exit:
 			/* We want to give the driver queues an opportunity to run. */
 			strsyscall_write();	/* save context switch */
 			return (err);
@@ -5426,9 +5436,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 		sd_put(&sd);
 	} else
 		err = -ENOSTR;
-	/* We want to give the driver queues an opportunity to run. */
-	strsyscall_write();	/* save context switch */
-	return (err);
+	goto exit;
 }
 
 STATIC streams_inline streams_fastcall __hot_put int
@@ -5594,6 +5602,7 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 				/* PROFILED */
 				err = strputpmsg_fast(file, ctlp, datp, band, flags);
 				sd_put(&sd);
+			      exit:
 				/* We want to give the driver queues an opportunity to run. */
 				strsyscall_write();	/* save context switch */
 				return (err);
@@ -5604,9 +5613,7 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 			err = -ENOSTR;
 	} else
 		err = -EBADF;
-	/* We want to give the driver queues an opportunity to run. */
-	strsyscall_write();	/* save context switch */
-	return (err);
+	goto exit;
 }
 
 STATIC streams_inline streams_fastcall __hot_get int
@@ -5984,6 +5991,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 			if (likely(!sd->sd_directio) || likely(!sd->sd_directio->getpmsg)) {
 				err = strgetpmsg_fast(file, ctlp, datp, bandp, flagsp);
 				sd_put(&sd);
+			      exit:
 				/* We want to give the driver queues an opportunity to run. */
 				strsyscall_read();	/* save context switch */
 				return (err);
@@ -5994,9 +6002,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 			err = -ENOSTR;
 	} else
 		err = -EBADF;
-	/* We want to give the driver queues an opportunity to run. */
-	strsyscall_read();	/* save context switch */
-	return (err);
+	goto exit;
 }
 
 /**
@@ -7968,6 +7974,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 
 				dev_t dev = sd->sd_dev;
 				int oflag = make_oflag(file);
+
 #ifdef CONFIG_STREAMS_LIS_BCM
 				cred_t creds = {.cr_uid = current->euid,.cr_gid =
 					    current->egid,.cr_ruid = current->uid,.cr_rgid =
@@ -7991,8 +7998,8 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 						/* TODO: MG says that if the %STRISTTY flag is set
 						   at this point (that is, STRISTTY was set by the
 						   module using M_SETOPTS) to make the stream a
-						   controlling terminal. However, do not do that
-						   if O_NOCTTY was set in oflag on open. */
+						   controlling terminal. However, do not do that if 
+						   O_NOCTTY was set in oflag on open. */
 						/* This is also where sd_session and sd_pgrp
 						   members are initialized to appropriate values */
 						sd->sd_session = task_session(current);
@@ -9832,41 +9839,22 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 }
 
 STATIC streams_inline streams_fastcall __hot int
-strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
+strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg, struct stdata *sd)
 {
-	struct stdata *sd = stri_lookup(file);
-
-	if (unlikely(!sd))
-		goto go_slow;
-
 #if defined WITH_32BIT_CONVERSION
 	if (unlikely((file->f_flags & FILP32) == FILP32))
-		goto go_slow;
-#endif
-
-	/* Fast path for data -- PROFILED */
-	/* We actually want to weight these the same */
-	switch (cmd) {
-	case I_PUTPMSG:	/* putpmsg syscall emulation */
-		_printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
-		return str_i_putpmsg(file, sd, arg);
-	case I_GETPMSG:	/* getpmsg syscall emulation */
-		_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
-		return str_i_getpmsg(file, sd, arg);
-	}
-      go_slow:
-	{
-		int err;
-
-		err = strioctl_slow(file, cmd, arg);
-		strsyscall_ioctl();
-		return (err);
-	}
+		return strioctl_compat(file, cmd, arg);
+#endif				/* defined WITH_32BIT_CONVERSION */
+	return strioctl_slow(file, cmd, arg);
 }
 
 streams_fastcall int
 strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
+#if defined WITH_32BIT_CONVERSION
+	if (unlikely((file->f_flags & FILP32) == FILP32))
+		return strioctl_compat(file, cmd, arg);
+#endif				/* defined WITH_32BIT_CONVERSION */
 	return strioctl_slow(file, cmd, arg);
 }
 
@@ -9878,18 +9866,36 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	struct stdata *sd;
 	int err;
 
+	switch (cmd) {
+	case I_PUTPMSG:
+		_printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+#ifdef WITH_32BIT_CONVERSION
+		if (unlikely((file->f_flags & FILP32) == FILP32))
+			return str_i_putpmsg32(file, sd, arg);
+#endif
+		return str_i_putpmsg(file, sd, arg);
+	case I_GETPMSG:
+		_printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+#ifdef WITH_32BIT_CONVERSION
+		if (unlikely((file->f_flags & FILP32) == FILP32))
+			return str_i_getpmsg32(file, sd, arg);
+#endif
+		return str_i_getpmsg(file, sd, arg);
+	}
+
 	if (likely((sd = stri_acquire(file)) != NULL)) {
 		if (likely(!sd->sd_directio) || likely(!sd->sd_directio->ioctl)) {
-			err = strioctl_fast(file, cmd, arg);
+			err = strioctl_fast(file, cmd, arg, sd);
 			sd_put(&sd);
+		      exit:
+			strsyscall_ioctl();	/* save context switch */
 			return (err);
 		}
 		err = sd->sd_directio->ioctl(file, cmd, arg);
 		sd_put(&sd);
 	} else
 		err = -ENOSTR;
-	strsyscall_ioctl();	/* save context switch */
-	return (err);
+	goto exit;
 }
 
 STATIC __hot int
