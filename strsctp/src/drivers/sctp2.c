@@ -101,8 +101,8 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52
 #define t_set_bit(nr,addr)  sctp_set_bit(nr,addr)
 #define t_clr_bit(nr,addr)  sctp_clr_bit(nr,addr)
 
-#undef SCTP_SPECIAL_DEBUG
-//#define SCTP_SPECIAL_DEBUG 1
+#define SCTP_SPECIAL_DEBUG 1
+#undef ETSI
 
 #define STREAMS 1
 #define SOCKETS 0
@@ -181,7 +181,9 @@ MODULE_ALIAS("streams-driver-sctp");
 #define SCTP_DEFAULT_SID			(0)
 #define SCTP_DEFAULT_PPI			(0)
 #define SCTP_DEFAULT_MAX_SACK_DELAY		(200*HZ/1000)
+#ifdef ETSI
 #define SCTP_DEFAULT_SACK_FREQUENCY		(2)
+#endif
 #define SCTP_DEFAULT_MAX_BURST			(4)
 #define SCTP_DEFAULT_ADAPTATION_LAYER_INFO	(0)
 #define SCTP_DEFAULT_PARTIAL_RELIABILITY	(0)
@@ -214,7 +216,9 @@ STATIC int sysctl_sctp_throttle_itvl = SCTP_DEFAULT_THROTTLE_ITVL;
 STATIC int sysctl_sctp_default_sid = SCTP_DEFAULT_SID;
 STATIC int sysctl_sctp_default_ppi = SCTP_DEFAULT_PPI;
 STATIC int sysctl_sctp_max_sack_delay = SCTP_DEFAULT_MAX_SACK_DELAY;
+#ifdef ETSI
 STATIC int sysctl_sctp_sack_frequency = SCTP_DEFAULT_SACK_FREQUENCY;
+#endif
 STATIC int sysctl_sctp_max_burst = SCTP_DEFAULT_MAX_BURST;
 STATIC int sysctl_sctp_adaptation_layer_info = SCTP_DEFAULT_ADAPTATION_LAYER_INFO;
 STATIC int sysctl_sctp_partial_reliability = SCTP_DEFAULT_PARTIAL_RELIABILITY;
@@ -267,7 +271,9 @@ STATIC int min_sctp_max_burst = 1;
 #define sctp_default_recvopt		T_YES
 #define sctp_default_cookie_life	60	/* seconds */
 #define sctp_default_sack_delay		200	/* milliseconds */
+#ifdef ETSI
 #define sctp_default_sack_frequency	2
+#endif
 #define sctp_default_path_max_retrans	5
 #define sctp_default_assoc_max_retrans	10
 #define sctp_default_max_init_retries	8
@@ -339,7 +345,9 @@ enum {
 	_T_BIT_SCTP_RECVOPT,
 	_T_BIT_SCTP_COOKIE_LIFE,
 	_T_BIT_SCTP_SACK_DELAY,
+#ifdef ETSI
 	_T_BIT_SCTP_SACK_FREQUENCY,
+#endif
 	_T_BIT_SCTP_PATH_MAX_RETRANS,
 	_T_BIT_SCTP_ASSOC_MAX_RETRANS,
 	_T_BIT_SCTP_MAX_INIT_RETRIES,
@@ -393,7 +401,9 @@ STATIC size_t sctp_default_throttle_itvl = SCTP_DEFAULT_THROTTLE_ITVL;
 STATIC size_t sctp_default_default_sid = SCTP_DEFAULT_SID;
 STATIC size_t sctp_default_default_ppi = SCTP_DEFAULT_PPI;
 STATIC size_t sctp_default_max_sack_delay = SCTP_DEFAULT_MAX_SACK_DELAY;
+#ifdef ETSI
 STATIC size_t sctp_default_sack_frequency = SCTP_DEFAULT_SACK_FREQUENCY;
+#endif
 STATIC size_t sctp_default_max_burst = SCTP_DEFAULT_MAX_BURST;
 STATIC size_t sctp_default_adaptation_layer_info = SCTP_DEFAULT_ADAPTATION_LAYER_INFO;
 STATIC size_t sctp_default_partial_reliability = SCTP_DEFAULT_PARTIAL_RELIABILITY;
@@ -573,7 +583,9 @@ struct sctp_options {
 		t_uscalar_t recvopt;	/* T_SCTP_RECVOPT */
 		t_uscalar_t cookie_life;	/* T_SCTP_COOKIE_LIFE */
 		t_uscalar_t sack_delay;	/* T_SCTP_SACK_DELAY */
+#ifdef ETSI
 		t_uscalar_t sack_freq;	/* T_SCTP_SACK_FREQUENCY */
+#endif
 		t_uscalar_t path_max_retrans;	/* T_SCTP_PATH_MAX_RETRANS */
 		t_uscalar_t assoc_max_retrans;	/* T_SCTP_ASSOC_MAX_RETRANS */
 		t_uscalar_t max_init_retries;	/* T_SCTP_MAX_INIT_RETRIES */
@@ -648,7 +660,9 @@ STATIC struct sctp_options sctp_defaults = {
 	 sctp_default_recvopt,
 	 (sctp_default_cookie_life * HZ),		/* XXX */
 	 (sctp_default_sack_delay * HZ / 1000),		/* XXX */
+#ifdef ETSI
 	 sctp_default_sack_frequency,
+#endif
 	 sctp_default_path_max_retrans,
 	 sctp_default_assoc_max_retrans,
 	 sctp_default_max_init_retries,
@@ -768,7 +782,9 @@ struct sctp {
 	struct sctp_strm *ostr;		/* current output stream */
 	struct sctp_strm *istr;		/* current input stream */
 	ulong max_sack;			/* maximum sack delay */
+#ifdef ETSI
 	ulong sack_freq;		/* sack frequency */
+#endif
 	ulong throttle;			/* throttle init interval */
 	ulong life;			/* data lifetime */
 	uint8_t disp;			/* data disposition */
@@ -5765,7 +5781,9 @@ sctp_bundle_sack(struct sctp *sp,	/* association */
 		}
 #endif				/* SCTP_CONFIG_ECN */
 		sp->sackf &= ~SCTP_SACKF_ANY;
+#ifdef ETSI
 		sp->sackcnt = 0;
+#endif
 		sp_del_timeout(sp, &sp->timer_sack);
 		ckp->mrem = (ckp->mrem > plen) ? ckp->mrem - plen : 0;
 		ckp->mlen += plen;
@@ -5783,7 +5801,9 @@ sctp_bundle_sack(struct sctp *sp,	/* association */
       outstate:
 	swerr();
 	sp->sackf &= ~SCTP_SACKF_ANY;
+#ifdef ETSI
 	sp->sackcnt = 0;
+#endif
 	return (0);
 }
 
@@ -9926,12 +9946,16 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		   will just get a retransmission and a dup. If the sack delay is set to zero, we
 		   do not set the timer, but issue the sack immediately. */
 		if (sp->max_sack) {
+#ifdef ETSI
 			/* support ETSI SACK frequency */
 			sp->sackf |= SCTP_SACKF_NEW;
 			if (++sp->sackcnt >= sp->sack_freq) {
 				sp->sackf |= SCTP_SACKF_WUP;
 				sp->sackcnt = 0;
 			}
+#else
+			sp->sackf += ((sp->sackf & 0x3) < 3) ? SCTP_SACKF_NEW : 0;
+#endif
 			if (!sctp_timeout_pending(&sp->timer_sack))
 				sp_set_timeout(sp, &sp->timer_sack, sp->max_sack);
 		} else
@@ -13449,7 +13473,12 @@ sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, 
 		ptrace(("ERROR: Error path taken!\n"));
 		return (err);
 	}
+	/* we probably want to data ack out of order as well */
+#if 0
+	if (rcpt || (ord && (sp->flags & SCTP_FLAG_DEFAULT_RC_SEL)))
+#else
 	if (rcpt)
+#endif
 		flags |= SCTPCB_FLAG_CONF;
 	if (!ord) {
 		flags |= SCTPCB_FLAG_URG;
@@ -13845,7 +13874,9 @@ sctp_init_struct(struct sctp *sp)
 	sp->sid = sctp_defaults.sctp.sid;
 	sp->ppi = sctp_defaults.sctp.ppi;
 	sp->max_sack = sctp_defaults.sctp.sack_delay;
+#ifdef ETSI
 	sp->sack_freq = sctp_defaults.sctp.sack_freq;
+#endif
 	sp->max_burst = sctp_defaults.sctp.max_burst;
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 	sp->prel = sctp_defaults.sctp.pr;
@@ -14390,12 +14421,14 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 				case M_PCPROTO:
 					mp->b_datap->db_type = M_PROTO;
 					break;
+#if 0
 				case M_PCRSE:
 					mp->b_datap->db_type = M_RSE;
 					break;
 				case M_READ:
 					mp->b_datap->db_type = M_CTL;
 					break;
+#endif
 				default:
 					printd(("ERROR: (q dropping) %d\n", rtn));
 					freemsg(mp);
@@ -14409,7 +14442,7 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 			break;
 		}
 		/* perform wakeups */
-		if (procwake != NULL)
+		if (procwake)
 			procwake(q);
 		sctp_unlockq(q);
 	}
@@ -14948,7 +14981,11 @@ n_info_ack(struct sctp *sp)
 {
 	mblk_t *mp;
 	N_info_ack_t *p;
+#ifdef ETSI
 	N_qos_sel_info_sctp2_t *qos;
+#else
+	N_qos_sel_info_sctp_t *qos;
+#endif
 	N_qos_range_info_sctp_t *qor;
 	size_t add_len = sp->sanum ? sizeof(uint16_t) + sp->sanum * sizeof(uint32_t) : 0;
 	size_t qos_len = sizeof(*qos);
@@ -14992,7 +15029,11 @@ n_info_ack(struct sctp *sp)
 		*(uint32_t *) mp->b_wptr = ss->saddr;
 		mp->b_wptr += sizeof(uint32_t);
 	}
+#ifdef ETSI
 	qos = (N_qos_sel_info_sctp2_t *) mp->b_wptr;
+#else
+	qos = (N_qos_sel_info_sctp_t *) mp->b_wptr;
+#endif
 	/* report N_QOS_SEL_INFO_SCTP but actually provide N_QOS_SEL_INFO_SCTP2 */
 	qos->n_qos_type = N_QOS_SEL_INFO_SCTP;
 	if ((1 << sp->i_state) & (NSF_UNBND | NSF_IDLE | NSF_WCON_CREQ)) {
@@ -15011,7 +15052,9 @@ n_info_ack(struct sctp *sp)
 	qos->hmac = sp->hmac;
 	qos->throttle = sp->throttle;
 	qos->max_sack = sp->max_sack;
+#ifdef ETSI
 	qos->sack_freq = sp->sack_freq;
+#endif
 	qos->rto_ini = sp->rto_ini;
 	qos->rto_min = sp->rto_min;
 	qos->rto_max = sp->rto_max;
@@ -16126,7 +16169,11 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 {
 	int err;
 	N_optmgmt_req_t *p = (N_optmgmt_req_t *) mp->b_rptr;
+#ifdef ETSI
 	N_qos_sel_info_sctp2_t *q = (N_qos_sel_info_sctp2_t *) (mp->b_rptr + p->QOS_offset);
+#else
+	N_qos_sel_info_sctp_t *q = (N_qos_sel_info_sctp_t *) (mp->b_rptr + p->QOS_offset);
+#endif
 
 	if (sp->i_state == NS_IDLE)
 		sp->i_state = NS_WACK_OPTREQ;
@@ -16135,18 +16182,25 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 	if (p->QOS_length) {
 		if (mp->b_wptr < mp->b_rptr + p->QOS_offset + p->QOS_length)
 			goto badopt;
+#ifdef ETSI
 		switch (q->n_qos_type) {
 		case N_QOS_SEL_INFO_SCTP:
 			if (p->QOS_length != sizeof(N_qos_sel_info_sctp_t))
 				goto badopt2;
 			break;
 		case N_QOS_SEL_INFO_SCTP2:
-			if (p->QOS_length != sizeof(*q))
+			if (p->QOS_length != sizeof(N_qos_sel_info_sctp2_t))
 				goto badopt2;
 			break;
 		default:
 			goto badqostype;
 		}
+#else
+		if (q->n_qos_type != N_QOS_SEL_INFO_SCTP)
+			goto badqostype;
+		if (p->QOS_length != sizeof(*q))
+			goto badopt2;
+#endif
 	}
 	if (p->QOS_length) {
 		if (q->i_streams != -1) {
@@ -16227,6 +16281,7 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 			}
 			sp->max_sack = q->max_sack * HZ / 1000;
 		}
+#ifdef ETSI
 		if (q->n_qos_type == N_QOS_SEL_INFO_SCTP2) {
 			/* have extra sack frequency field */
 			if (q->sack_freq != -1) {
@@ -16239,6 +16294,7 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 				sp->sack_freq = q->sack_freq;
 			}
 		}
+#endif
 		if (q->rto_ini != -1) {
 			if (q->rto_ini) {
 				if (q->rto_ini < 1000 / HZ)
@@ -17596,6 +17652,7 @@ t_parse_conn_opts(struct sctp *sp, const unsigned char *ip, size_t ilen, int req
 				sp->max_sack = *valp / 1000 * HZ;
 				continue;
 			}
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 			{
 				t_uscalar_t *valp = (t_uscalar_t *) T_OPT_DATA(ih);
@@ -17615,6 +17672,7 @@ t_parse_conn_opts(struct sctp *sp, const unsigned char *ip, size_t ilen, int req
 				sp->sack_freq = *valp;
 				continue;
 			}
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 			{
 				t_uscalar_t *valp = (t_uscalar_t *) T_OPT_DATA(ih);
@@ -18540,10 +18598,12 @@ t_size_default_options(const struct sctp *t, const unsigned char *ip, size_t ile
 				olen += _T_SPACE_SIZEOF(t_defaults.sctp.sack_delay);
 				if (ih->name != T_ALLOPT)
 					continue;
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 				olen += _T_SPACE_SIZEOF(t_defaults.sctp.sack_freq);
 				if (ih->name != T_ALLOPT)
 					continue;
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 				olen += _T_SPACE_SIZEOF(t_defaults.sctp.path_max_retrans);
 				if (ih->name != T_ALLOPT)
@@ -18826,10 +18886,12 @@ t_size_current_options(const struct sctp *t, unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t->options.sctp.sack_delay);
 				if (ih->name != T_ALLOPT)
 					continue;
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 				olen += _T_SPACE_SIZEOF(t->options.sctp.sack_freq);
 				if (ih->name != T_ALLOPT)
 					continue;
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 				olen += _T_SPACE_SIZEOF(t->options.sctp.path_max_retrans);
 				if (ih->name != T_ALLOPT)
@@ -19157,12 +19219,14 @@ t_size_check_options(const struct sctp *t, unsigned char *ip, size_t ilen)
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 				if (optlen && optlen != sizeof(t->options.sctp.sack_freq))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 				if (optlen && optlen != sizeof(t->options.sctp.path_max_retrans))
 					goto einval;
@@ -19558,6 +19622,7 @@ t_size_negotiate_options(const struct sctp *t, unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t->options.sctp.sack_delay);
 				if (ih->name != T_ALLOPT)
 					continue;
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.sctp.sack_freq))
@@ -19565,6 +19630,7 @@ t_size_negotiate_options(const struct sctp *t, unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t->options.sctp.sack_freq);
 				if (ih->name != T_ALLOPT)
 					continue;
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.sctp.path_max_retrans))
@@ -20294,6 +20360,7 @@ t_build_conn_opts(struct sctp *sp, unsigned char *op, size_t olen)
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.sack_delay;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
+#ifdef ETSI
 	if (t_tst_bit(_T_BIT_SCTP_SACK_FREQUENCY, sp->options.flags)) {
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SACK_FREQUENCY;
@@ -20311,6 +20378,7 @@ t_build_conn_opts(struct sctp *sp, unsigned char *op, size_t olen)
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.sack_delay;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
+#endif
 	if (t_tst_bit(_T_BIT_SCTP_PATH_MAX_RETRANS, sp->options.flags)) {
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_PATH_MAX_RETRANS;
@@ -20943,6 +21011,7 @@ t_build_default_options(const struct sctp *t, const unsigned char *ip, size_t il
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.sack_freq);
 				oh->level = T_INET_SCTP;
@@ -20953,6 +21022,7 @@ t_build_default_options(const struct sctp *t, const unsigned char *ip, size_t il
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.path_max_retrans);
 				oh->level = T_INET_SCTP;
@@ -21779,6 +21849,7 @@ t_build_current_options(const struct sctp *t, const unsigned char *ip, size_t il
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 				oh->len = _T_LENGTH_SIZEOF(t->options.sctp.sack_freq);
 				oh->level = T_INET_SCTP;
@@ -21790,6 +21861,7 @@ t_build_current_options(const struct sctp *t, const unsigned char *ip, size_t il
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 				oh->len = _T_LENGTH_SIZEOF(t->options.sctp.path_max_retrans);
 				oh->level = T_INET_SCTP;
@@ -23052,6 +23124,7 @@ t_build_check_options(const struct sctp *sp, const unsigned char *ip, size_t ile
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 				oh->len = ih->len;
 				oh->level = T_INET_SCTP;
@@ -23078,6 +23151,7 @@ t_build_check_options(const struct sctp *sp, const unsigned char *ip, size_t ile
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 				oh->len = ih->len;
 				oh->level = T_INET_SCTP;
@@ -24861,6 +24935,7 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			}
+#ifdef ETSI
 			case T_SCTP_SACK_FREQUENCY:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -24885,6 +24960,7 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			}
+#endif
 			case T_SCTP_PATH_MAX_RETRANS:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -29068,7 +29144,9 @@ enum {
 	NET_SCTP_ADAPTATION_LAYER_INFO = 221,
 	NET_SCTP_PARTIAL_RELIABILITY = 222,
 	NET_SCTP_MAX_BURST = 223,
+#ifdef ETSI
 	NET_SCTP_SACK_FREQUENCY = 224,
+#endif
 };
 static struct sctp_sysctl_table {
 	struct ctl_table_header *sysctl_header;
@@ -29135,8 +29213,10 @@ static struct sctp_sysctl_table {
 		    &sysctl_sctp_partial_reliability, sizeof(int), 0644, NULL, &proc_dointvec}, {
 	NET_SCTP_MAX_BURST, "sctp_max_burst", &sysctl_sctp_max_burst, sizeof(int), 0644,
 		    NULL, &proc_dointvec_minmax, &sysctl_intvec, NULL, &min_sctp_max_burst, NULL}, {
+#ifdef ETSI
 	NET_SCTP_SACK_FREQUENCY, "sctp_sack_frequency", &sysctl_sctp_sack_frequency,
 		    sizeof(int), 0644, NULL, &proc_dointvec}, {
+#endif
 	0}}, { {
 	NET_IPV4, "ipv4", NULL, 0, 0555, sctp_sysctl.sctp_vars}, {
 	0}}, { {
