@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/10/21 12:00:36 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/21 17:00:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 12:00:36 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 17:00:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.18  2006/10/21 17:00:40  brian
+ - fixed test cases, added split client/server operation
+
  Revision 0.9.2.17  2006/10/21 12:00:36  brian
  - missing checkins
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/10/21 12:00:36 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/21 17:00:40 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/10/21 12:00:36 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/21 17:00:40 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -126,6 +129,7 @@ static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
@@ -146,14 +150,24 @@ static const char *sstdname = "XNS/NPI";
 static const char *shortname = "SCTP";
 static char devname[256] = "/dev/sctp_n";
 
+static int repeat_on_success = 0;
+static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
 
+static int client_port_specified = 0;
+static int server_port_specified = 0;
+static int client_host_specified = 0;
+static int server_host_specified = 0;
+
 static int verbose = 1;
+
+static int client_exec = 0; /* execute client side */
+static int server_exec = 0; /* execute server side */
 
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
-static int show_data = 1;
+//static int show_data = 1;
 
 static int last_event = 0;
 static int last_retval = 0;
@@ -192,6 +206,8 @@ int test_fd[3] = { 0, 0, 0 };
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
 #define INFINITE_WAIT	-1
+
+static int test_duration = TEST_DURATION; /* wait on other side */
 
 ulong seq[10] = { 0, };
 ulong tok[10] = { 0, };
@@ -429,7 +445,7 @@ check_time(const char *t, long i, long lo, long hi)
 static int
 time_event(int child, int event)
 {
-	if ((verbose > 4 && show_data && show) || (verbose > 5 && show_msg)) {
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
 		float t, m;
 		struct timeval now;
 
@@ -487,6 +503,8 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
+	if (duration == (long)INFINITE_WAIT)
+		return __RESULT_SUCCESS;
 	if (timer_sethandler())
 		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -538,6 +556,7 @@ struct sockaddr_in addrs[4][3];
 #else
 struct sockaddr_in addrs[4];
 #endif
+int anums[4] = { 3, 3, 3, 3 };
 unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
@@ -2426,7 +2445,7 @@ print_syscall(int child, const char *command)
 		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
-	if ((verbose && show_data && show) || (verbose > 5 && show_msg))
+	if ((verbose && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, command);
 }
 
@@ -2514,7 +2533,7 @@ print_rx_data(int child, const char *command, size_t bytes)
 		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 
-	if ((verbose && show_data && show) || (verbose > 5 && show_msg))
+	if ((verbose && show) || (verbose > 5 && show_msg))
 		print_string_int_state(child, msgs, command, bytes);
 }
 
@@ -2528,7 +2547,7 @@ print_errno(int child, long error)
 		"                    |          [%14s]      |  |                    [%d:%03d]\n",
 	};
 
-	if ((verbose && show_data && show) || (verbose > 5 && show_msg))
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, errno_string(error));
 }
 
@@ -2542,7 +2561,7 @@ print_success(int child)
 		"                    |                 ok             |  |                    [%d:%03d]\n",
 	};
 
-	if ((verbose && show_data && show) || (verbose > 5 && show_msg))
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_double_int(child, msgs, child, state);
 }
 
@@ -2556,7 +2575,7 @@ print_success_value(int child, int value)
 		"                    |            [%10d]        |  |                    [%d:%03d]\n",
 	};
 
-	if ((verbose && show_data && show) || (verbose > 5 && show_msg))
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_triple_int(child, msgs, value, child, state);
 }
 
@@ -2577,7 +2596,7 @@ print_ti_ioctl(int child, int cmd, intptr_t arg)
 void
 print_ioctl(int child, int cmd, intptr_t arg)
 {
-	if (verbose > 3)
+	if (verbose > 4)
 		print_ti_ioctl(child, cmd, arg);
 }
 
@@ -2585,13 +2604,13 @@ void
 print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"  %1$16s->|- - %2$4d bytes- - - - - - - - ->|->|                    [%3$d:%4$03d]\n",
-		"                    |< - %2$4d bytes- - - - - - - - - |- |<-%1$16s  [%3$d:%4$03d]\n",
-		"                    |< - %2$4d bytes- - - - - - - - - |<-+--%1$16s  [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
+		"  %1$16s->|- -%2$5d bytes- - - - - - - - ->|->|                    [%3$d:%4$03d]\n",
+		"                    |< -%2$5d bytes- - - - - - - - - |- |<-%1$16s  [%3$d:%4$03d]\n",
+		"                    |< -%2$5d bytes- - - - - - - - - |<-+--%1$16s  [%3$d:%4$03d]\n",
+		"                    |- -%2$5d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 
-	if ((verbose && show_data && show) || (verbose > 5 && show_msg))
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_string_int_state(child, msgs, command, bytes);
 }
 
@@ -3014,7 +3033,7 @@ int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	if (flags & MSG_BAND || band) {
-		if ((verbose > 3 && show_data && show) || (verbose > 5 && show_msg)) {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 			int i;
 
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -3039,12 +3058,12 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 					continue;
 				return (__RESULT_FAILURE);
 			}
-			if ((verbose > 3 && show_data && show) || (verbose > 5 && show_msg))
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
 	} else {
-		if ((verbose > 3 && show_data && show) || (verbose > 5 && show_msg)) {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
@@ -3059,7 +3078,7 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 					continue;
 				return (__RESULT_FAILURE);
 			}
-			if ((verbose > 3 && show_data && show) || (verbose > 5 && show_msg))
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
@@ -3277,9 +3296,9 @@ test_pipe(int child)
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		print_errno(child, (UNIX_error = errno));
 		if (UNIX_error == EINTR || UNIX_error == ERESTART)
 			continue;
+		print_errno(child, (UNIX_error = errno));
 		return (__RESULT_FAILURE);
 	}
 }
@@ -3296,9 +3315,9 @@ test_open(int child, const char *name)
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		print_errno(child, (UNIX_error = errno));
 		if (UNIX_error == EINTR || UNIX_error == ERESTART)
 			continue;
+		print_errno(child, (UNIX_error = errno));
 		return (__RESULT_FAILURE);
 	}
 }
@@ -3315,9 +3334,9 @@ test_close(int child)
 			print_success(child);
 			return __RESULT_SUCCESS;
 		}
-		print_errno(child, (UNIX_error = errno));
 		if (UNIX_error == EINTR || UNIX_error == ERESTART)
 			continue;
+		print_errno(child, (UNIX_error = errno));
 		return __RESULT_FAILURE;
 	}
 }
@@ -3336,7 +3355,7 @@ stream_start(int child, int index)
 	int offset = 3 * index;
 	int i;
 
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < anums[3]; i++) {
 #ifndef SCTP_VERSION_2
 		addrs[3].port = htons(ports[3] + offset);
 		inet_aton(addr_strings[i], &addrs[child].addr[i]);
@@ -3350,14 +3369,20 @@ stream_start(int child, int index)
 	case 1:
 	case 2:
 	case 0:
-		for (i = 0; i < 3; i++) {
+		for (i = 0; i < anums[child]; i++) {
 #ifndef SCTP_VERSION_2
 			addrs[child].port = htons(ports[child] + offset);
 			inet_aton(addr_strings[i], &addrs[child].addr[i]);
 #else				/* SCTP_VERSION_2 */
 			addrs[child][i].sin_family = AF_INET;
-			addrs[child][i].sin_port = htons(ports[child] + offset);
-			inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
+			if ((child == 0 && !client_port_specified) ||
+			    ((child == 1 || child == 2) && !server_port_specified))
+				addrs[child][i].sin_port = htons(ports[child] + offset);
+			else
+				addrs[child][i].sin_port = htons(ports[child]);
+			if ((child == 0 && !client_host_specified) ||
+			    ((child == 1 || child == 2) && !server_host_specified))
+				inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 		}
 		if (test_open(child, devname) != __RESULT_SUCCESS)
@@ -4182,9 +4207,9 @@ wait_event(int child, int wait)
 		pfd[0].revents = 0;
 		switch (poll(pfd, 1, wait)) {
 		case -1:
-			print_errno(child, (UNIX_error = errno));
 			if (UNIX_error == EAGAIN || UNIX_error == EINTR || UNIX_error == ERESTART)
 				break;
+			print_errno(child, (UNIX_error = errno));
 			return (__RESULT_FAILURE);
 		case 0:
 			if (verbose > 4)
@@ -4206,13 +4231,13 @@ wait_event(int child, int wait)
 				data.buf = dbuf;
 				flags = 0;
 				for (;;) {
-					if ((verbose > 3 && show_data && show) || (verbose > 5 && show_msg))
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 						print_syscall(child, "getmsg()");
 					if ((ret = getmsg(test_fd[child], &ctrl, &data, &flags)) >= 0)
 						break;
-					print_errno(child, (UNIX_error = errno));
 					if (UNIX_error == EINTR || UNIX_error == ERESTART)
 						continue;
+					print_errno(child, (UNIX_error = errno));
 					if (UNIX_error == EAGAIN)
 						break;
 					return __RESULT_FAILURE;
@@ -4220,9 +4245,9 @@ wait_event(int child, int wait)
 				if (ret < 0)
 					break;
 				if (ret == 0) {
-					if ((verbose > 3 && show_data && show) || (verbose > 5 && show_msg))
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 						print_success(child);
-					if ((verbose > 3 && show_data && show) || (verbose > 5 && show_msg)) {
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 						int i;
 
 						dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -4350,11 +4375,7 @@ test_msleep(int child, unsigned long m)
 static int
 preamble_0(int child)
 {
-	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
-		goto failure;
 	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
 }
 
 static int
@@ -4377,9 +4398,6 @@ postamble_0(int child)
 		}
 		break;
 	}
-	state++;
-	if (stop_tt() != __RESULT_SUCCESS)
-		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4489,7 +4507,7 @@ preamble_1_idle_cons(int child)
 	if (preamble_1_unbnd(child) != __RESULT_SUCCESS)
 		goto failure;
 	ADDR_buffer = addrs[child];
-	ADDR_length = sizeof(addrs[child]);
+	ADDR_length = anums[child]*sizeof(addrs[child][0]);
 	CONIND_number = coninds;
 	BIND_flags = TOKEN_REQUEST;
 	PROTOID_buffer = prot;
@@ -4525,7 +4543,7 @@ preamble_1_idle_cons(int child)
 		goto failure;
 	}
 	state++;
-	if (ADDR_length != sizeof(addrs[child])) {
+	if (ADDR_length != anums[child]*sizeof(addrs[child][0])) {
 		failure_string = "bad ADDR_length";
 		goto failure;
 	}
@@ -4655,7 +4673,7 @@ preamble_1_wres_cind_conn(int child)
 	state++;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = 0;
 	QOS_buffer = NULL;
 	QOS_length = 0;
@@ -4696,7 +4714,7 @@ preamble_2_wres_cind_conn(int child)
 	state++;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = 0;
 	QOS_buffer = NULL;
 	QOS_length = 0;
@@ -4853,7 +4871,7 @@ preamble_1_data_xfer_list(int child)
 	// test_resfd = test_fd[child];
 	TOKEN_value = tok[child];
 	ADDR_buffer = addrs[child];
-	ADDR_length = sizeof(addrs[child]);
+	ADDR_length = anums[child]*sizeof(addrs[child][0]);
 	CONN_flags = 0;
 	QOS_buffer = &test_qos;
 	QOS_length = sizeof(test_qos);
@@ -4919,7 +4937,7 @@ preamble_2_data_xfer_list(int child)
 	// test_resfd = test_fd[child];
 	TOKEN_value = tok[child];
 	ADDR_buffer = addrs[child];
-	ADDR_length = sizeof(addrs[child]);
+	ADDR_length = anums[child]*sizeof(addrs[child][0]);
 	CONN_flags = 0;
 	QOS_buffer = &test_qos;
 	QOS_length = sizeof(test_qos);
@@ -5116,7 +5134,7 @@ int
 test_case_1_2(int child)
 {
 	ADDR_buffer = addrs[child];
-	ADDR_length = sizeof(addrs[child]);
+	ADDR_length = anums[child]*sizeof(addrs[child][0]);
 	CONIND_number = (child == 1) ? 5 : 0;
 	PROTOID_buffer = NULL;
 	PROTOID_length = 0;
@@ -5182,7 +5200,7 @@ test_case_2_1_conn(int child)
 		goto failure;
 	state++;
 	ADDR_buffer = addrs[child];
-	ADDR_length = sizeof(addrs[child]);
+	ADDR_length = anums[child]*sizeof(addrs[child][0]);
 	CONIND_number = 0;
 	PROTOID_buffer = NULL;
 	PROTOID_length = 0;
@@ -5194,7 +5212,7 @@ test_case_2_1_conn(int child)
 		goto failure;
 	state++;
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5262,7 +5280,7 @@ int
 test_case_2_2_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5340,7 +5358,7 @@ int
 test_case_3_1_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5417,7 +5435,7 @@ test_case_3_2_conn(int child)
 	int i;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5499,7 +5517,7 @@ int
 test_case_4_1_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5616,7 +5634,7 @@ test_case_4_2_conn(int child)
 	state++;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5722,7 +5740,7 @@ int
 test_case_5_1_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5816,7 +5834,7 @@ int
 test_case_5_2_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5908,7 +5926,7 @@ int
 test_case_5_3_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -6652,18 +6670,22 @@ test_case_8_1_conn(int child)
 			state++;
 		}
 		for (i += 6, j += 21; i > 0 || j > 0; state++) {
-			switch (wait_event(child, qos_info.hb_itvl / 50 + 1)) {
+			switch (wait_event(child, NORMAL_WAIT)) {
 			case __TEST_DATACK_IND:
 				i--;
 				continue;
 			case __TEST_DATA_IND:
 				j--;
 				continue;
+			case __EVENT_NO_MSG:
+				continue;
 			default:
 				fprintf(stdout, "i=%d, j=%d\n", i, j);
 				goto failure;
 			}
 		}
+		test_msleep(child, LONG_WAIT);
+		state++;
 	}
 	return (__RESULT_SUCCESS);
       failure:
@@ -6695,18 +6717,22 @@ test_case_8_1_list(int child)
 			state++;
 		}
 		for (i += 6, j += 21; i > 0 || j > 0; state++) {
-			switch (wait_event(child, qos_info.hb_itvl / 50 + 1)) {
+			switch (wait_event(child, NORMAL_WAIT)) {
 			case __TEST_DATACK_IND:
 				j--;
 				continue;
 			case __TEST_DATA_IND:
 				i--;
 				continue;
+			case __EVENT_NO_MSG:
+				continue;
 			default:
 				fprintf(stdout, "i=%d, j=%d\n", i, j);
 				goto failure;
 			}
 		}
+		test_msleep(child, LONG_WAIT);
+		state++;
 	}
 	return (__RESULT_SUCCESS);
       failure:
@@ -6744,7 +6770,7 @@ test_case_8_2_conn(int child)
 	uint32_t tsn1[10];
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = sizeof(addrs[2]);
+	ADDR_length = anums[2]*sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -7746,9 +7772,9 @@ test_run(struct test_stream *stream[])
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 
-	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+	if (start_tt(test_duration) != __RESULT_SUCCESS)
 		goto inconclusive;
-	if (stream[2]) {
+	if (server_exec && stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
@@ -7764,7 +7790,7 @@ test_run(struct test_stream *stream[])
 		}
 	} else
 		status[2] = __RESULT_SUCCESS;
-	if (stream[1]) {
+	if (server_exec && stream[1]) {
 		switch ((child[1] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
@@ -7778,7 +7804,7 @@ test_run(struct test_stream *stream[])
 		}
 	} else
 		status[1] = __RESULT_SUCCESS;
-	if (stream[0]) {
+	if (client_exec && stream[0]) {
 		switch ((child[0] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
@@ -8030,6 +8056,7 @@ do_tests(int num_tests)
 			end_tests(0);
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+		      rerun:
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
 				notselected++;
@@ -8144,9 +8171,15 @@ do_tests(int num_tests)
 				}
 				break;
 			}
+			if (repeat_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+				goto rerun;
+			if (repeat_on_success && (result == __RESULT_SUCCESS))
+				goto rerun;
 			tests[i].result = result;
-			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE)) {
 				aborted = 1;
+				continue;
+			}
 		}
 		if (summary && verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -8356,6 +8389,27 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    -c, --client\n\
+        execute client side of test case only.\n\
+    -S, --server\n\
+        execute server side of test case only.\n\
+    -w, --wait\n\
+        have server wait indefinitely.\n\
+    -r, --repeat\n\
+        repeat test cases on success or failure.\n\
+    -R, --repeat-fail\n\
+        repeat test cases on failure.\n\
+    -p, --client-port [PORT]\n\
+        port number from which to connect [default: 10000+index*3]\n\
+    -P, --server-port [PORT]\n\
+        port number to which to connect or upon which to listen\n\
+        [default: 10000+index*3+2]\n\
+    -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
+        client host names(s) or IP numbers\n\
+        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
+    -I, --server-host [HOSTNAME[,HOSTNAME]*]\n\
+        server host names(s) or IP numbers\n\
+        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
     -d, --device DEVICE\n\
         device name to open [default: %2$s].\n\
     -e, --exit\n\
@@ -8387,6 +8441,8 @@ Options:\n\
 ", argv[0], devname);
 }
 
+#define HOST_BUF_LEN 128
+
 int
 main(int argc, char *argv[])
 {
@@ -8394,6 +8450,11 @@ main(int argc, char *argv[])
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
+	char *hostc = "127.0.0.1,127.0.0.2,127.0.0.3";
+	char *hosts = "127.0.0.1,127.0.0.2,127.0.0.3";
+	char hostbufc[HOST_BUF_LEN];
+	char hostbufs[HOST_BUF_LEN];
+	struct hostent *haddr;
 
 	for (t = tests; t->numb; t++) {
 		if (!t->result) {
@@ -8408,6 +8469,15 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"client",	no_argument,		NULL, 'c'},
+			{"server",	no_argument,		NULL, 'S'},
+			{"wait",	no_argument,		NULL, 'w'},
+			{"client-port",	required_argument,	NULL, 'p'},
+			{"server-port",	required_argument,	NULL, 'P'},
+			{"client-host",	required_argument,	NULL, 'i'},
+			{"server-host",	required_argument,	NULL, 'I'},
+			{"repeat",	no_argument,		NULL, 'r'},
+			{"repeat-fail",	no_argument,		NULL, 'R'},
 			{"device",	required_argument,	NULL, 'd'},
 			{"exit",	no_argument,		NULL, 'e'},
 			{"list",	optional_argument,	NULL, 'l'},
@@ -8426,13 +8496,50 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "d:el::f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'c':	/* --client */
+			client_exec = 1;
+			break;
+		case 'S':	/* --server */
+			server_exec = 1;
+			break;
+		case 'w':	/* --wait */
+			test_duration = INFINITE_WAIT;
+			break;
+		case 'p':	/* --client-port */
+			client_port_specified = 1;
+			ports[3] = atoi(optarg);
+			ports[0] = ports[3];
+			break;
+		case 'P':	/* --server-port */
+			server_port_specified = 1;
+			ports[3] = atoi(optarg);
+			ports[1] = ports[3];
+			ports[2] = ports[3] + 1;
+			break;
+		case 'i':	/* --client-host *//* client host */
+			client_host_specified = 1;
+			strncpy(hostbufc, optarg, HOST_BUF_LEN);
+			hostc = hostbufc;
+			break;
+		case 'I':	/* --server-host *//* server host */
+			server_host_specified = 1;
+			strncpy(hostbufs, optarg, HOST_BUF_LEN);
+			hosts = hostbufs;
+			break;
+		case 'r':	/* --repeat */
+			repeat_on_success = 1;
+			repeat_on_failure = 1;
+			break;
+		case 'R':	/* --repeat-fail */
+			repeat_on_failure = 1;
+			break;
 		case 'd':
 			if (optarg) {
 				snprintf(devname, sizeof(devname), "%s", optarg);
@@ -8604,6 +8711,73 @@ main(int argc, char *argv[])
 		break;
 	default:
 		copying(argc, argv);
+	}
+	if (client_exec == 0 && server_exec == 0) {
+		client_exec = 1;
+		server_exec = 1;
+	}
+	if (client_host_specified) {
+		int count = 0;
+		char *token = hostc, *next_token, *delim = NULL;
+
+		fprintf(stdout, "Specified client address => %s\n", token);
+		do {
+			if ((delim = index(token, ','))) {
+				delim[0] = '\0';
+				next_token = delim + 1;
+			} else
+				next_token = NULL;
+			haddr = gethostbyname(token);
+			addrs[0][count].sin_family = AF_INET;
+			addrs[3][count].sin_family = AF_INET;
+			if (client_port_specified) {
+				addrs[0][count].sin_port = htons(ports[0]);
+				addrs[3][count].sin_port = htons(ports[3]);
+			} else {
+				addrs[0][count].sin_port = 0;
+				addrs[3][count].sin_port = 0;
+			}
+			addrs[0][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[3][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			count++;
+		} while ((token = next_token) && count < 4);
+		anums[0] = count;
+		anums[3] = count;
+		fprintf(stdout, "%d client addresses assigned\n", count);
+	}
+	if (server_host_specified) {
+		int count = 0;
+		char *token = hosts, *next_token, *delim = NULL;
+
+		fprintf(stdout, "Specified server address => %s\n", token);
+		do {
+			if ((delim = index(token, ','))) {
+				delim[0] = '\0';
+				next_token = delim + 1;
+			} else
+				next_token = NULL;
+			haddr = gethostbyname(token);
+			addrs[1][count].sin_family = AF_INET;
+			addrs[2][count].sin_family = AF_INET;
+			addrs[3][count].sin_family = AF_INET;
+			if (server_port_specified) {
+				addrs[1][count].sin_port = htons(ports[1]);
+				addrs[2][count].sin_port = htons(ports[2]);
+				addrs[3][count].sin_port = htons(ports[3]);
+			} else {
+				addrs[1][count].sin_port = 0;
+				addrs[2][count].sin_port = 0;
+				addrs[3][count].sin_port = 0;
+			}
+			addrs[1][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[2][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[3][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			count++;
+		} while ((token = next_token) && count < 4);
+		anums[1] = count;
+		anums[2] = count;
+		anums[3] = count;
+		fprintf(stdout, "%d server addresses assigned\n", count);
 	}
 	exit(do_tests(tests_to_run));
 }

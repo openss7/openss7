@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:15 $
+ @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/21 17:00:39 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/07 22:17:15 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 17:00:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-interop.c,v $
+ Revision 0.9.2.2  2006/10/21 17:00:39  brian
+ - fixed test cases, added split client/server operation
+
  Revision 0.9.2.1  2006/08/07 22:17:15  brian
  - changes from SCTP Interop
 
@@ -99,9 +102,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:15 $"
+#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/21 17:00:39 $"
 
-static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/07 22:17:15 $";
+static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/21 17:00:39 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -5150,6 +5153,19 @@ preamble_1(int child)
 	return (__RESULT_FAILURE);
 }
 
+int
+preamble_1s(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
 static int
 postamble_1(int child)
 {
@@ -5196,6 +5212,45 @@ postamble_1(int child)
 	failure_string = (failure_string == NULL) ? fail_string : failure_string;
 	return (__RESULT_FAILURE);
 }
+
+#if 0
+static int
+postamble_1e(int child)
+{
+	int failed = -1;
+
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
+		expect(child, SHORT_WAIT, __TEST_OK_ACK);
+		failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+#endif
 
 static int
 preamble_2_conn(int child)
@@ -5396,6 +5451,7 @@ postamble_2_list(int child)
 	return (__RESULT_FAILURE);
 }
 
+#if 1
 static int
 preamble_2b_conn(int child)
 {
@@ -5728,6 +5784,8 @@ preamble_8_resp(int child)
 	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1(child);
 }
+#endif
+
 /*
  *  =========================================================================
  *
@@ -10356,8 +10414,7 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options,
-				&option_index);
+		c = getopt_long(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
@@ -10417,22 +10474,17 @@ main(int argc, char *argv[])
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, l)) {
 						if (verbose > 2)
-							fprintf(stdout, "Test Group: %s\n",
-								t->tgrp);
-						fprintf(stdout, "Test Case %s-%s/%s: %s\n",
-							sstdname, shortname, t->numb, t->name);
+							fprintf(stdout, "Test Group: %s\n", t->tgrp);
+						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 						if (verbose > 2)
-							fprintf(stdout, "Test Reference: %s\n",
-								t->sref);
+							fprintf(stdout, "Test Reference: %s\n", t->sref);
 						if (verbose > 1)
 							fprintf(stdout, "%s\n\n", t->desc);
 						fflush(stdout);
 						n++;
 					}
 				if (!n) {
-					fprintf(stderr,
-						"WARNING: specification `%s' matched no test\n",
-						optarg);
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
 					fflush(stderr);
 					goto bad_option;
 				}
@@ -10445,8 +10497,7 @@ main(int argc, char *argv[])
 				for (t = tests; t->numb; t++) {
 					if (verbose > 2)
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
-					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname,
-						shortname, t->numb, t->name);
+					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 					if (verbose > 2)
 						fprintf(stdout, "Test Reference: %s\n", t->sref);
 					if (verbose > 1)
@@ -10464,8 +10515,7 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n",
-				timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
 			break;
 		case 's':
 			summary = 1;
@@ -10487,9 +10537,7 @@ main(int argc, char *argv[])
 						// }
 					}
 				if (!n) {
-					fprintf(stderr,
-						"WARNING: specification `%s' matched no test\n",
-						optarg);
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
 					fflush(stderr);
 					goto bad_option;
 				}
@@ -10525,8 +10573,7 @@ main(int argc, char *argv[])
 					// }
 				}
 			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n",
-					optarg);
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
 				fflush(stderr);
 				goto bad_option;
 			}

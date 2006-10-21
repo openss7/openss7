@@ -11,6 +11,11 @@
 	* tests/testsuite-sctp_n2.at: missing checkin
 	* src/drivers/sctp2.c: missing checkin
 
+	* src/test/test-interop.c: minor formatting
+	* src/test/test-sctp_n.c: fixed test cases, added split client/server operation
+	* src/test/test-sctp_n2.c: fixed test cases, added split client/server operation
+	* src/test/test-sctp_t.c: fixed test cases, added split client/server operation
+
 2006-10-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-sctp_n.c: fixed test cases
