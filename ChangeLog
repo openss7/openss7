@@ -1,6 +1,7 @@
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/versions.texi: bumped streams version
+	* m4/openss7.m4: better config.site generation
 
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 
