@@ -1,3 +1,7 @@
+2006-10-21  Brian Bidulock  <bidulcok@openss7.org>
+
+	* doc/manual/releases.texi: updated LiS release number
+
 2006-10-16  Brian Bidulock  <bidulcok@openss7.org>
 
 	- started off this new STREAMS ISDN package

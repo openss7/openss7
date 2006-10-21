@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.55 2006/10/21 09:17:32 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.56 2006/10/21 10:31:21 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/21 09:17:32 $ by $Author: brian $
+% Last Modified $Date: 2006/10/21 10:31:21 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -410,7 +410,7 @@ Conformance
 * Solaris Compatibility::	Solaris 9/SunOS 5.9 Compatibility
 * SUX Compatibility::		Super/UX Compatibility
 * UXP Compatibility::		UXP/V Compatibility
-* LiS Compatibility::		LiS 2.18.1 Compatibility
+* LiS Compatibility::		LiS 2.18.4 Compatibility
 
 Portability
 
@@ -423,7 +423,7 @@ Portability
 * Solaris Portability::		Porting from Solaris 9/SunOS 5.9
 * SUX Portability::		Porting from Super/UX
 * UXP Portability::		Porting from UXP/V
-* LiS Portability::		Porting from LiS 2.18.1
+* LiS Portability::		Porting from LiS 2.18.4
 
 Copying
 
@@ -548,6 +548,9 @@ package.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.56  2006/10/21 10:31:21  brian
+- updated LiS release number
+
 Revision 0.9.2.55  2006/10/21 09:17:32  brian
 - bumped streams version number
 
@@ -12845,10 +12848,10 @@ set of @dfn{STREAMS} functions.
 @item @manpage{canget(9)} @tab Test for message arrival on a stream.
 @end multitable
 
-@subsection Extensions from LiS 2.18.1
-@cindex extensions from LiS 2.18.1
-@cindex LiS 2.18.1, extensions
-@cindex LiS 2.18.1
+@subsection Extensions from LiS 2.18.4
+@cindex extensions from LiS 2.18.4
+@cindex LiS 2.18.4, extensions
+@cindex LiS 2.18.4
 @cindex LiS
 @cindex Linux STREAMS (LiS)
 
@@ -13467,10 +13470,10 @@ in the @file{streams-suncompat.o} kernel module.
 @item @manpage{qwriter(9)} @tab
 @end multitable
 
-@subsection LiS 2.18.1 Compatibility Functions
-@cindex LiS 2.18.1, compatibility functions
-@cindex compatibility functions, LiS 2.18.1
-@cindex LiS 2.18.1
+@subsection LiS 2.18.4 Compatibility Functions
+@cindex LiS 2.18.4, compatibility functions
+@cindex compatibility functions, LiS 2.18.4
+@cindex LiS 2.18.4
 @cindex LiS
 @cindex Linux STREAMS (LiS)
 
@@ -17744,7 +17747,7 @@ NAUTOPUSH found in the SAD driver's master file.
 * Solaris Compatibility::	Solaris 9/SunOS 5.9 Compatibility
 * SUX Compatibility::		Super/UX Compatibility
 * UXP Compatibility::		UXP/V Compatibility
-* LiS Compatibility::		LiS 2.18.1 Compatibility
+* LiS Compatibility::		LiS 2.18.4 Compatibility
 @end menu
 
 @node SVR 4.2 Compatibility
@@ -17796,9 +17799,9 @@ NAUTOPUSH found in the SAD driver's master file.
 @cindex UXP/V
 
 @node LiS Compatibility
-@appendixsec LiS 2.18.1 Compatibility
-@cindex LiS 2.18.1, compatibility
-@cindex compatibility, LiS 2.18.1
+@appendixsec LiS 2.18.4 Compatibility
+@cindex LiS 2.18.4, compatibility
+@cindex compatibility, LiS 2.18.4
 @cindex Linux STREAMS (LiS)
 
 @node Portability
@@ -17828,7 +17831,7 @@ Porting information is organized into sections as follows:
 * Solaris Portability::		Porting from Solaris 9/SunOS 5.9
 * SUX Portability::		Porting from Super/UX
 * UXP Portability::		Porting from UXP/V
-* LiS Portability::		Porting from LiS 2.18.1
+* LiS Portability::		Porting from LiS 2.18.4
 * Development::			Developing Portable STREAMS Modules
 @end menu
 
@@ -18722,41 +18725,41 @@ equivalents.
 
 
 @node LiS Portability
-@appendixsec Porting from LiS 2.18.1
-@cindex porting, LiS 2.18.1
-@cindex LiS 2.18.1, portability
-@cindex LiS 2.18.1
+@appendixsec Porting from LiS 2.18.4
+@cindex porting, LiS 2.18.4
+@cindex LiS 2.18.4, portability
+@cindex LiS 2.18.4
 @cindex LiS
 @cindex Linux STREAMS (LiS)
 
 @menu
-* Differences from LiS 2.18.1::
-* Commonalities with LiS 2.18.1::
-* Compatibility Functions for LiS 2.18.1::
-* Configuration ala LiS 2.18.1::
+* Differences from LiS 2.18.4::
+* Commonalities with LiS 2.18.4::
+* Compatibility Functions for LiS 2.18.4::
+* Configuration ala LiS 2.18.4::
 @end menu
 
-@node Differences from LiS 2.18.1
-@appendixsubsec Differences from LiS 2.18.1
-@cindex differences, LiS 2.18.1
-@cindex LiS 2.18.1, differences
-@cindex LiS 2.18.1
+@node Differences from LiS 2.18.4
+@appendixsubsec Differences from LiS 2.18.4
+@cindex differences, LiS 2.18.4
+@cindex LiS 2.18.4, differences
+@cindex LiS 2.18.4
 @cindex LiS
 @cindex Linux STREAMS (LiS)
 
-@node Commonalities with LiS 2.18.1
-@appendixsubsec Commonalities with LiS 2.18.1
-@cindex commonalities, LiS 2.18.1
-@cindex LiS 2.18.1, commonalities
-@cindex LiS 2.18.1
+@node Commonalities with LiS 2.18.4
+@appendixsubsec Commonalities with LiS 2.18.4
+@cindex commonalities, LiS 2.18.4
+@cindex LiS 2.18.4, commonalities
+@cindex LiS 2.18.4
 @cindex LiS
 @cindex Linux STREAMS (LiS)
 
-@node Compatibility Functions for LiS 2.18.1
-@appendixsubsec Compatibility Functions for LiS 2.18.1
-@cindex compatibility functions, LiS 2.18.1
-@cindex LiS 2.18.1, compatibility functions
-@cindex LiS 2.18.1
+@node Compatibility Functions for LiS 2.18.4
+@appendixsubsec Compatibility Functions for LiS 2.18.4
+@cindex compatibility functions, LiS 2.18.4
+@cindex LiS 2.18.4, compatibility functions
+@cindex LiS 2.18.4
 @cindex LiS
 @cindex Linux STREAMS (LiS)
 
@@ -18791,11 +18794,11 @@ equivalents.
 @item @manpage{lis_unregsiter_strmod(9)} @tab Unregister a @dfn{STREAMS} module.
 @end multitable
 
-@node Configuration ala LiS 2.18.1
-@appendixsubsec Configuration ala LiS 2.18.1
-@cindex configuration, LiS 2.18.1
-@cindex LiS 2.18.1, configuration
-@cindex LiS 2.18.1
+@node Configuration ala LiS 2.18.4
+@appendixsubsec Configuration ala LiS 2.18.4
+@cindex configuration, LiS 2.18.4
+@cindex LiS 2.18.4, configuration
+@cindex LiS 2.18.4
 @cindex LiS
 @cindex Linux STREAMS (LiS)
 

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lis_deprec.9.man,v 0.9.2.5 2006/04/05 09:42:44 brian Exp $
+.\" @(#) $Id: lis_deprec.9.man,v 0.9.2.6 2006/10/21 10:30:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:44 $ by $Author: brian $
+.\" Last Modified $Date: 2006/10/21 10:30:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lis_deprec.9.man,v $
+.\" Revision 0.9.2.6  2006/10/21 10:30:46  brian
+.\" - updated LiS release number
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:42:44  brian
 .\" - moved .so line and updated headers
 .\"
@@ -315,7 +318,7 @@ These functions had varying degrees of MP and preemptive kernel support.
 .\"
 .SH NOTICES
 .PP
-Note that most of these symbols were undocumented in LiS-2.18.19.
+Note that most of these symbols were undocumented in LiS-2.16.19.
 .\"
 .\"
 .SH "SEE ALSO"

@@ -1,3 +1,12 @@
+2006-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/SPG.texi: updated LiS release number
+	* doc/manual/SPG2.texi: updated LiS release number
+	* doc/manual/drivers.texi: updated LiS release number
+	* doc/manual/modules.texi: updated LiS release number
+	* doc/manual/news.texi: updated LiS release number
+	* doc/manual/porting.texi: updated LiS release number
+
 2006-10-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped streams version number

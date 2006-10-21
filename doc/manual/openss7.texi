@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.8 2006/10/02 11:31:16 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.9 2006/10/21 10:30:43 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/02 11:31:16 $ by $Author: brian $
+% Last Modified $Date: 2006/10/21 10:30:43 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -402,6 +402,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.9  2006/10/21 10:30:43  brian
+- updated LiS release number
+
 Revision 0.9.2.8  2006/10/02 11:31:16  brian
 - changes to get master builds working for RPM and DEB
 - added outside licenses to package documentation
@@ -675,10 +678,10 @@ dependencies between packages.
 Because OpenSS7 packages first built with @dfn{Linux STREAMS (LiS)} but now build with the superior
 @dfn{Linux Fast-STREAMS (LfS)}, the master package had the objective from the onset of being able to
 build all OpenSS7 packages against either @dfn{LiS} or @dfn{LfS} or both.  This was the case from
-@dfn{LiS} version @emph{2.18.1} through @emph{2.18.3} and @dfn{streams} version @emph{0.7a.3}
+@dfn{LiS} version @emph{2.18.1} through @emph{@value{VERSION_LIS}} and @dfn{streams} version @emph{0.7a.3}
 through @emph{0.7a.5}, or master package releases @emph{0.9.2.A} through @emph{0.9.2.C}.  With the
 release of master package @emph{0.9.2.D} containing @dfn{streams} @emph{0.7a.6}, @dfn{LiS} is no
-longer supported in the master package.  The contained @dfn{LiS} @emph{2.18.4} is the final release
+longer supported in the master package.  The contained @dfn{LiS} @emph{@value{VERSION_LIS}} is the final release
 of @dfn{LiS} from the OpenSS7 Project.
 
 @node Other Packages

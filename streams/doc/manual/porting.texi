@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: porting.texi,v 0.9.2.18 2006/08/26 09:18:12 brian Exp $
+% @(#) $Id: porting.texi,v 0.9.2.19 2006/10/21 10:31:32 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:18:12 $ by $Author: brian $
+% Last Modified $Date: 2006/10/21 10:31:32 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -213,7 +213,7 @@ Porting
 * Porting from Solaris 9/SunOS 5.9::
 * Porting from SUPER-UX::
 * Porting from UXP/V::
-* Porting from Linux STREAMS (LiS) 2.18.1::
+* Porting from Linux STREAMS (LiS) 2.18.4::
 
 Development
 
@@ -296,7 +296,7 @@ Porting information is organized into sections as follows:
 * Porting from Solaris 9/SunOS 5.9::
 * Porting from SUPER-UX::
 * Porting from UXP/V::
-* Porting from Linux STREAMS (LiS) 2.18.1::
+* Porting from Linux STREAMS (LiS) 2.18.4::
 * Development::
 @end menu
 
@@ -1162,28 +1162,28 @@ time in ticks since reboot
 @cindex configuration ala uxp/v
 
 @page
-@node Porting from Linux STREAMS (LiS) 2.18.1
-@section Porting from Linux STREAMS (LiS) 2.18.1
-@cindex Porting from Linux STREAMS (LiS) 2.18.1
+@node Porting from Linux STREAMS (LiS) 2.18.4
+@section Porting from Linux STREAMS (LiS) 2.18.4
+@cindex Porting from Linux STREAMS (LiS) 2.18.4
 
 @menu
-* Differences from LiS 2.18.1::
-* Commonalities with LiS 2.18.1::
-* Compatibility Functions for LiS 2.18.1::
-* Configuration ala LiS 2.18.1::
+* Differences from LiS 2.18.4::
+* Commonalities with LiS 2.18.4::
+* Compatibility Functions for LiS 2.18.4::
+* Configuration ala LiS 2.18.4::
 @end menu
 
-@node Differences from LiS 2.18.1
-@subsection Differences from LiS 2.18.1
-@cindex differences from lis 2.18.1
+@node Differences from LiS 2.18.4
+@subsection Differences from LiS 2.18.4
+@cindex differences from lis 2.18.4
 
-@node Commonalities with LiS 2.18.1
-@subsection Commonalities with LiS 2.18.1
-@cindex commonalities with lis 2.18.1
+@node Commonalities with LiS 2.18.4
+@subsection Commonalities with LiS 2.18.4
+@cindex commonalities with lis 2.18.4
 
-@node Compatibility Functions for LiS 2.18.1
-@subsection Compatibility Functions for LiS 2.18.1
-@cindex compatibility functions for lis 2.18.1
+@node Compatibility Functions for LiS 2.18.4
+@subsection Compatibility Functions for LiS 2.18.4
+@cindex compatibility functions for lis 2.18.4
 
 @ftable @asis
 @item @b{lis_appq}(9)
@@ -1218,9 +1218,9 @@ unregister a @cite{STREAMS} module
 calculate the size of message blocks in a @cite{STREAMS} message
 @end ftable
 
-@node Configuration ala LiS 2.18.1
-@subsection Configuration ala LiS 2.18.1
-@cindex configuration ala lis 2.18.1
+@node Configuration ala LiS 2.18.4
+@subsection Configuration ala LiS 2.18.4
+@cindex configuration ala lis 2.18.4
 
 @node Development
 @chapter Development

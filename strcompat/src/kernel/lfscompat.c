@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/12 10:21:43 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/10/21 10:31:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:21:43 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 10:31:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.26  2006/10/21 10:31:17  brian
+ - updated LiS release number
+
  Revision 0.9.2.25  2006/10/12 10:21:43  brian
  - removed redundant debug flags
 
@@ -128,10 +131,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/12 10:21:43 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/10/21 10:31:17 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/12 10:21:43 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/10/21 10:31:17 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -154,8 +157,8 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/10/12 10:21:43 $"
-#define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/10/21 10:31:17 $"
+#define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.9.2.1 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
 #define LFSCOMP_BANNER		LFSCOMP_DESCRIP	"\n" \

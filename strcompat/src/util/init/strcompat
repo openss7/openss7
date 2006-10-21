@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 00:21:19 $
+# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/21 10:31:18 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -137,7 +137,7 @@ function modprobe_action() {
 	    modname=$"IRIX(R) 6.5.17"
 	    ;;
 	(streams-liscompat)
-	    modname=$"Linux(R) STREAMS 2.18.1"
+	    modname=$"Linux(R) STREAMS 2.18.4"
 	    ;;
 	(streams-maccompat)
 	    modname=$"Mac(R) OS 9 Open Transport"
@@ -315,7 +315,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 00:21:19 $
+# @(#) $RCSfile: strcompat,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/21 10:31:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -360,7 +360,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 00:21:19 $ by $Author: brian $
+# Last Modified $Date: 2006/10/21 10:31:18 $ by $Author: brian $
 #
 # =============================================================================
 

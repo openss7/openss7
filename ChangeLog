@@ -3,6 +3,8 @@
 	* scripts/texi/versions.texi: bumped streams version
 	* m4/openss7.m4: better config.site generation
 	* openss7.refs: updated streams release number
+	* doc/manual/openss7.texi: updated LiS release number
+	* doc/manual/releases.texi: updated LiS release number
 
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 

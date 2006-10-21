@@ -16,7 +16,7 @@ Priority: optional
 Provides: @PACKAGE_LCNAME@
 Conflicts: @PACKAGE_LCNAME@
 Replaces: @PACKAGE_LCNAME@
-Depends: strxnet-lis-lib (>=0.9.2.6-0), lis-lib (>= 2.18.1-0)
+Depends: strxnet-lis-lib (>=0.9.2.6-0), lis-lib (>= 2.18.4-0)
 Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-0)
 Description: @PACKAGE_TITLE@ for Linux Fast-STREAMS (LfS)
  Test programs optioned and compiled for use with OpenSS7 Linux
@@ -30,7 +30,7 @@ Priority: optional
 Provides: @PACKAGE_LCNAME@
 Conflicts: @PACKAGE_LCNAME@
 Replaces: @PACKAGE_LCNAME@
-Depends: strxnet-streams-lib (>=0.9.2.6-0), streams-lib (>= 2.18.1-0)
+Depends: strxnet-streams-lib (>=0.9.2.6-0), streams-lib (>= 2.18.4-0)
 Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-0)
 Description: @PACKAGE_TITLE@ for Linux Fast-STREAMS (LfS)
  Test programs optioned and compiled for use with OpenSS7 Linux
