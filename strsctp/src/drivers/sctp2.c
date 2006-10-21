@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/19 12:48:16 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/21 00:22:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 12:48:16 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 00:22:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.53  2006/10/21 00:22:06  brian
+ - corrections for zero-length messages, QR_TRIMMED tweaks
+
  Revision 0.9.2.52  2006/10/19 12:48:16  brian
  - corrections to ETSI SACK frequency
 
@@ -91,9 +94,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/19 12:48:16 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/21 00:22:06 $"
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/19 12:48:16 $";
+static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/21 00:22:06 $";
 
 #include "sctp_compat.h"
 
@@ -101,7 +104,8 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52
 #define t_set_bit(nr,addr)  sctp_set_bit(nr,addr)
 #define t_clr_bit(nr,addr)  sctp_clr_bit(nr,addr)
 
-#define SCTP_SPECIAL_DEBUG 1
+//#define SCTP_SPECIAL_DEBUG 1
+#undef SCTP_SPECIAL_DEBUG
 #undef ETSI
 
 #define STREAMS 1
@@ -111,7 +115,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2006/10/19 12:48:16 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/21 00:22:06 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14228,7 +14232,8 @@ sctp_m_flush(queue_t *q, mblk_t *mp)
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
 }
 #endif
 
@@ -14275,7 +14280,7 @@ sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || (q->q_flag & QSVCBUSY))) {
 		seldom();
 		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+			_ctrace(freemsg(mp));
 		return (0);
 	}
 	if (likely((locked = sctp_trylockq(q))) || unlikely(mp->b_datap->db_type == M_FLUSH)) {
@@ -14287,15 +14292,16 @@ sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 			}
 			switch (rtn) {
 			case QR_DONE:
-				freemsg(mp);
+				_ctrace(freemsg(mp));
 			case QR_ABSORBED:
 				break;
+#if 0
 			case QR_STRIP:
 				if (mp->b_cont)
 					if (unlikely(putq(q, mp->b_cont) == 0))
-						freemsg(mp->b_cont);
+						_ctrace(freemsg(mp->b_cont));
 			case QR_TRIMMED:
-				freeb(mp);
+				_ctrace(freeb(mp));
 				break;
 			case QR_LOOP:
 				if (!q->q_next) {
@@ -14308,27 +14314,32 @@ sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 					break;
 				}
 				rtn = -EOPNOTSUPP;
+#endif
 			default:
 				ptrace(("%s: %p: ERROR: (q dropping) %d\n",
 					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
-				freemsg(mp);
+				_ctrace(freemsg(mp));
 				break;
+#if 0
 			case QR_DISABLE:
 				if (unlikely(putq(q, mp) == 0))
-					freemsg(mp);
+					_ctrace(freemsg(mp));
 				break;
 			case QR_PASSFLOW:
 				if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
 					putnext(q, mp);
 					break;
 				}
+#endif
 			case -ENOBUFS:
 			case -EBUSY:
 			case -ENOMEM:
 			case -EAGAIN:
+#if 0
 			case QR_RETRY:
+#endif
 				if (unlikely(putq(q, mp) == 0))
-					freemsg(mp);
+					_ctrace(freemsg(mp));
 				break;
 			}
 		} while (0);
@@ -14340,7 +14351,7 @@ sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 	} else {
 		seldom();
 		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+			_ctrace(freemsg(mp));
 	}
 	return (rtn);
 }
@@ -14369,15 +14380,16 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 			}
 			switch (rtn) {
 			case QR_DONE:
-				freemsg(mp);
+				_ctrace(freemsg(mp));
 			case QR_ABSORBED:
 				continue;
+#if 0
 			case QR_STRIP:
 				if (mp->b_cont)
 					if (!putbq(q, mp->b_cont))
-						freemsg(mp->b_cont);
+						_ctrace(freemsg(mp->b_cont));
 			case QR_TRIMMED:
-				freeb(mp);
+				_ctrace(freeb(mp));
 				continue;
 			case QR_LOOP:
 				if (!q->q_next) {
@@ -14390,15 +14402,17 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 					continue;
 				}
 				rtn = -EOPNOTSUPP;
+#endif
 			default:
 				pswerr(("ERROR: (q dropping) %d\n", rtn));
-				freemsg(mp);
+				_ctrace(freemsg(mp));
 				continue;
+#if 0
 			case QR_DISABLE:
 				pswerr(("ERROR: (q disabling) %d\n", rtn));
 				noenable(q);
 				if (!putbq(q, mp))
-					freemsg(mp);
+					_ctrace(freemsg(mp));
 				rtn = 0;
 				break;
 			case QR_PASSFLOW:
@@ -14406,14 +14420,18 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 					putnext(q, mp);
 					continue;
 				}
+#endif
 			case -ENOBUFS:	/* proc must schedule bufcall */
 			case -EBUSY:	/* proc must fail canput */
 			case -ENOMEM:	/* proc must schedule re-enable */
 			case -EAGAIN:	/* proc must schedule re-enable */
+#if 0
+			case QR_RETRY:
+#endif
 				if (mp->b_datap->db_type < QPCTL) {
 					printd(("ERROR: (q stalled) %d\n", rtn));
 					if (!putbq(q, mp))
-						freemsg(mp);
+						_ctrace(freemsg(mp));
 					break;
 				}
 				/* Be careful not to put a priority message back on the queue. */
@@ -14425,18 +14443,21 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 				case M_PCRSE:
 					mp->b_datap->db_type = M_RSE;
 					break;
+				case M_PCCTL:
+					mp->b_datap->db_type = M_CTL;
+					break;
 				case M_READ:
 					mp->b_datap->db_type = M_CTL;
 					break;
 #endif
 				default:
 					printd(("ERROR: (q dropping) %d\n", rtn));
-					freemsg(mp);
+					_ctrace(freemsg(mp));
 					continue;
 				}
 				mp->b_band = 255;
 				if (!putq(q, mp))
-					freemsg(mp);
+					_ctrace(freemsg(mp));
 				break;
 			}
 			break;
@@ -14542,7 +14563,7 @@ m_error(struct sctp *sp, int error)
 		if ((1 << sp->state) & SCTPF_NEEDABORT)	/* SCTP IG 2.21 */
 			sctp_send_abort_error(sp, SCTP_CAUSE_USER_INITIATED, NULL, 0);
 		sctp_unbind(sp);
-		return (-error);
+		return (QR_DONE);
 	}
 	return (-ENOBUFS);
 }
@@ -14558,7 +14579,7 @@ m_hangup(struct sctp *sp)
 		if ((1 << sp->state) & SCTPF_NEEDABORT)	/* SCTP IG 2.21 */
 			sctp_send_abort_error(sp, SCTP_CAUSE_USER_INITIATED, NULL, 0);
 		sctp_unbind(sp);
-		return (-EPIPE);
+		return (QR_DONE);
 	}
 	return (-ENOBUFS);
 }
@@ -15638,7 +15659,8 @@ n_conn_req(struct sctp *sp, mblk_t *mp)
 		sp->flags |= SCTP_FLAG_EX_DATA_OPT;
 	if ((err = sctp_conn_req(sp, dport, dsin, dnum, mp->b_cont)))
 		goto error;
-	return (QR_TRIMMED);
+	freeb(mp);
+	return (QR_ABSORBED);
 #if 0
       access:
 	err = NACCESS;
@@ -15906,6 +15928,8 @@ n_write(struct sctp *sp, mblk_t *mp)
 		goto discard;
 	if (!((1 << sp->i_state) & (NSF_DATA_XFER | NSF_WRES_RIND)))
 		goto eproto;
+	if (msgdsize(mp) == 0)
+		goto baddata;
 	{
 		t_uscalar_t ppi = sp->ppi;
 		t_uscalar_t sid = sp->sid;
@@ -15917,6 +15941,10 @@ n_write(struct sctp *sp, mblk_t *mp)
 			goto error;
 		return (QR_ABSORBED);	/* absorbed mp */
 	}
+      baddata:
+	seldom();
+	err = -EPROTO;
+	goto error;
       eproto:
 	seldom();
 	err = -EPROTO;
@@ -15958,7 +15986,8 @@ n_data_req(struct sctp *sp, mblk_t *mp)
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
 			goto error;
-		return (QR_TRIMMED);
+		freeb(mp);
+		return (QR_ABSORBED);
 	}
       baddata:
 	seldom();
@@ -16013,7 +16042,8 @@ n_exdata_req(struct sctp *sp, mblk_t *mp)
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
 			goto error;
-		return (QR_TRIMMED);
+		freeb(mp);
+		return (QR_ABSORBED);
 	}
       baddata:
 	seldom();
@@ -26961,6 +26991,8 @@ t_write(struct sctp *sp, mblk_t *mp)
 		goto discard;
 	if ((1 << sp->i_state) & ~TSM_OUTDATA)
 		goto outstate;
+	if (!msgdsize(mp))
+		goto emsgsize;
 	{
 		t_uscalar_t ppi = sp->ppi;
 		t_uscalar_t sid = sp->sid;
@@ -26975,6 +27007,10 @@ t_write(struct sctp *sp, mblk_t *mp)
       provspec:
 	err = err;
 	ptrace(("%s: %p: ERROR: provider specific %d\n", DRV_NAME, sp, err));
+	goto error;
+      emsgsize:
+	err = -EPROTO;
+	ptrace(("%s: %p: ERROR: bad amount of data\n", DRV_NAME, sp));
 	goto error;
       outstate:
 	err = -EPROTO;
@@ -27009,7 +27045,8 @@ t_data_req(struct sctp *sp, mblk_t *mp)
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
 			goto provspec;
-		return (QR_TRIMMED);
+		freeb(mp);
+		return (QR_ABSORBED);
 	}
       provspec:
 	err = err;
@@ -27061,7 +27098,8 @@ t_exdata_req(struct sctp *sp, mblk_t *mp)
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
 			goto provspec;
-		return (QR_TRIMMED);
+		freeb(mp);
+		return (QR_ABSORBED);
 	}
       provspec:
 	err = err;
@@ -27440,7 +27478,9 @@ t_optdata_req(struct sctp *sp, mblk_t *mp)
 		goto discard;
 	if ((1 << sp->i_state) & ~TSM_OUTDATA)
 		goto outstate;
-	else {
+	if (!mp->b_cont || !msgdsize(mp->b_cont))
+		goto emsgsize;
+	{
 		t_uscalar_t ppi = sp->ppi;
 		t_uscalar_t sid = sp->sid;
 		t_uscalar_t ord = !(p->DATA_flag & T_ODF_EX);
@@ -27469,7 +27509,8 @@ t_optdata_req(struct sctp *sp, mblk_t *mp)
 		}
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
 			goto provspec;
-		return (QR_TRIMMED);
+		freeb(mp);
+		return (QR_ABSORBED);
 	}
       provspec:
 	err = err;
@@ -27485,6 +27526,10 @@ t_optdata_req(struct sctp *sp, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: no permission to options\n", DRV_NAME, sp));
 	goto error;
 #endif
+      emsgsize:
+	err = -EPROTO;
+	ptrace(("%s: %p: ERROR: bad amount of data\n", DRV_NAME, sp));
+	goto error;
       outstate:
 	err = -EPROTO;
 	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sp));
