@@ -1,3 +1,11 @@
+2006-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* strcompat.lsm.in: updated streams release number
+	* debian/control.in: updated streams release number
+	* doc/man/strcompat.refs: updated streams release number
+	* doc/manual/releases.texi: updated streams release number
+	* doc/manual/strcompat.texi: updated streams release number
+
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/os7/bufpool.h: removed redundant debug flags

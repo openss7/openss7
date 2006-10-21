@@ -1,3 +1,11 @@
+2006-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* strinet.lsm.in: updated streams release number
+	* debian/control.in: updated streams release number
+	* doc/man/strinet.refs: updated streams release number
+	* doc/manual/releases.texi: updated streams release number
+	* doc/man/strisdn.refs: updated streams release number
+
 2006-10-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/xti_sctp.h: added ETSI SACK frequency option

@@ -1,3 +1,7 @@
+2006-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strtty.refs: updated streams release number
+
 2006-10-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/pckt.c: corrections for compile on SuSE 10.0 ix86

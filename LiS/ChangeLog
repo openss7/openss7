@@ -1,3 +1,7 @@
+2006-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* man/lis.refs: updated streams release number
+
 2006-10-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/LiS/genconf.h.in: added some header file defines

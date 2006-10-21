@@ -64,7 +64,7 @@ Priority: optional
 Provides: @PACKAGE_LCNAME@-util
 Conflicts: @PACKAGE_LCNAME@-util
 Replaces: @PACKAGE_LCNAME@-util
-Depends: streams-lib (>= 0.7a.3-0), ${shlibs:Depends}
+Depends: streams-lib (>= 0.9.2.1-0), ${shlibs:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@ and STREAMS
  Adminstration and configuration test utilities and commands for

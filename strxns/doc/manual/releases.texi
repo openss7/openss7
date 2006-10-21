@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.27 2006/08/28 10:15:32 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.28 2006/10/21 10:01:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/28 10:15:32 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/21 10:01:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -139,7 +139,7 @@ instead.
 
 The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux Fast-STREAMS
 (LfS)}.
-The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{streams-0.7a.6} release
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{streams-@cite{VERSION_STREAMS}} release
 that is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
 Page}.
 
