@@ -104,8 +104,8 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53
 #define t_set_bit(nr,addr)  sctp_set_bit(nr,addr)
 #define t_clr_bit(nr,addr)  sctp_clr_bit(nr,addr)
 
-//#define SCTP_SPECIAL_DEBUG 1
-#undef SCTP_SPECIAL_DEBUG
+#define SCTP_SPECIAL_DEBUG 1
+//#undef SCTP_SPECIAL_DEBUG
 #undef ETSI
 
 #define STREAMS 1

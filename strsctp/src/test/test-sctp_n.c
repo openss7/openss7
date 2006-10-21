@@ -6118,7 +6118,7 @@ test_case_6_2_conn(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-#if 0
+#if 1
 	if (expect(child, LONGER_WAIT, __TEST_DATACK_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6635,10 +6635,10 @@ returns an acknowledgement when it is SACK'ed by the other end."
 int
 test_case_8_1_conn(int child)
 {
-	int i, j, k;
+	int i = 0, j = 0, k, l;
 
 	for (k = 0; k < 2; k++) {
-		for (j = 0; j < 6; j++) {
+		for (l = 0; l < 6; l++) {
 			DATA_xfer_flags = N_RC_FLAG;
 			QOS_buffer = NULL;
 			QOS_length = 0;
@@ -6648,15 +6648,16 @@ test_case_8_1_conn(int child)
 				goto failure;
 			state++;
 		}
-		for (i = 0, j = 0; i < 21 || j < 6; state++) {
+		for (i += 6, j += 21; i > 0 || j > 0; state++) {
 			switch (wait_event(child, qos_info.hb_itvl / 50 + 1)) {
 			case __TEST_DATACK_IND:
-				j++;
+				i--;
 				continue;
 			case __TEST_DATA_IND:
-				i++;
+				j--;
 				continue;
 			default:
+				fprintf(stdout, "i=%d, j=%d\n", i, j);
 				goto failure;
 			}
 		}
@@ -6677,10 +6678,10 @@ test_case_8_1_resp(int child)
 int
 test_case_8_1_list(int child)
 {
-	int i, j, k;
+	int i = 0, j = 0, k, l;
 
 	for (k = 0; k < 2; k++) {
-		for (j = 0; j < 21; j++) {
+		for (l = 0; l < 21; l++) {
 			DATA_xfer_flags = N_RC_FLAG;
 			QOS_buffer = NULL;
 			QOS_length = 0;
@@ -6690,13 +6691,13 @@ test_case_8_1_list(int child)
 				goto failure;
 			state++;
 		}
-		for (i = 0, j = 0; i < 6 || j < 21; state++) {
+		for (i += 6, j += 21; i > 0 || j > 0; state++) {
 			switch (wait_event(child, qos_info.hb_itvl / 50 + 1)) {
 			case __TEST_DATACK_IND:
-				j++;
+				j--;
 				continue;
 			case __TEST_DATA_IND:
-				i++;
+				i--;
 				continue;
 			default:
 				fprintf(stdout, "i=%d, j=%d\n", i, j);
