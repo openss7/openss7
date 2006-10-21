@@ -28,6 +28,6 @@ Original-site:
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,
 			streams @STREAMS_VERSION@ SVR 4.2 STREAMS,
-			strcompat @STRCOMPAT_VERSION@.
+			strcompat @STRCOMP_VERSION@.
 Copying-policy:		GPL
 End

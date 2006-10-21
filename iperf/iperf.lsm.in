@@ -20,7 +20,7 @@ Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4,
-			sctp-0.2.23
+			sctp-0.2.24
 Copying-policy:		GPL
 End
 

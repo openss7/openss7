@@ -21,12 +21,12 @@ Original-site:		http://www.hp.com/ /
 			950K netperf-2.3.tar.gz
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,
-			streams-0.7a.6 SVR 4.2 STREAMS,
-			strcompat-0.9.2.4,
-			strxns-0.9.2.4,
-			strxnet-0.9.2.9,
-			strinet-0.9.2.4,
-			strsctp-0.9.2.6.
+			streams @STREAMS_VERSION@ SVR 4.2 STREAMS,
+			strcompat @STRCOMP_VERSION@,
+			strxns @XNS_VERSION@,
+			strxnet @XTI_VERSION@,
+			strinet @INET_VERSION@,
+			strsctp @SCTP_VERSION@.
 Copying-policy:		GPL
 End
 
