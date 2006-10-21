@@ -205,7 +205,9 @@ AC_DEFUN([_OPENSS7_CACHE], [dnl
 		then
 		    if touch "$config_site" >/dev/null 2>&1
 		    then
-			cat "$cache_file" | egrep -v '\<(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|ksyms_cv_|rpm_cv_|deb_cv_|strconf_cv_|sctp_cv_|xns_cv_|lis_cv_|lfs_cv_|strcomp_cv_|streams_cv_|xti_cv_|xopen_cv_|inet_cv_|xnet_cv_|devfs_cv_|init_cv_|pkg_cv_)' > "$config_site" 2>/dev/null
+			cat "$cache_file" | egrep '^(ac_cv_|am_cv_|ap_cv_|lt_cv_)' > "$config_site" 2>/dev/null
+			#cat "$cache_file" | egrep '^(ac_cv_|am_cv_|ap_cv_|lt_cv_)' | egrep -v '^(ac_cv_env_|ac_cv_host|ac_cv_target)' > "$config_site" 2>/dev/null
+			#cat "$cache_file" | egrep -v '\<(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|ksyms_cv_|rpm_cv_|deb_cv_|strconf_cv_|sctp_cv_|xns_cv_|lis_cv_|lfs_cv_|strcomp_cv_|streams_cv_|xti_cv_|xopen_cv_|inet_cv_|xnet_cv_|devfs_cv_|init_cv_|pkg_cv_)' > "$config_site" 2>/dev/null
 		    fi
 		fi
 	    done
