@@ -1,3 +1,7 @@
+streams (0.9.2.1-0) experimental; urgency=low
+
+  * First public production release.
+
 streams (0.7a.6.rc3-0) experimental; urgency=low
 
   * Sixth public release.

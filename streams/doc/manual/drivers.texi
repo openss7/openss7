@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: drivers.texi,v 0.9.2.2 2006/09/18 01:07:02 brian Exp $
+@c @(#) $Id: drivers.texi,v 0.9.2.3 2006/10/21 09:17:36 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/18 01:07:02 $ by $Author: brian $
+@c Last Modified $Date: 2006/10/21 09:17:36 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -287,8 +287,8 @@ corresponding to the @dfn{STREAMS} special file.  This is normal @cite{UNIX} beh
 @subheading Implementation
 
 @command{clone} is not implemented as a normal @dfn{STREAMS} driver: it is implemented as a shadow
-special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.7a,
-@cite{@value{PACKAGE_TITLE}} (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.9.2,
+@cite{@value{PACKAGE_TITLE}} (LfS) 0.9.2.1 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
 <http://www.openss7.org/>}} @cite{@value{PACKAGE_TITLE}} shadow special device nodes call
 @code{clone_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the
 @command{clone} device to intercept and redirect the open call to the appropriate device.  This is
@@ -747,7 +747,7 @@ Source Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7
 do not support @dfn{STREAMS}-based system @dfn{FIFO}s.
 
 Portable @dfn{STREAMS} applications will use
-@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
+@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.9.2, Linux Fast-STREAMS (LfS) 0.9.2.1 Source
 Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} instead of
 @cite{LiS}.@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
 OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}}
@@ -1346,7 +1346,7 @@ The
 @command{loop} has no known bugs.
 
 @subheading Compatibility
-@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
+@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.9.2, Linux Fast-STREAMS (LfS) 0.9.2.1 Source
 Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} provides the
 @command{loop} pseudo-device driver for testing and compatibility with
 @cite{LiS},@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,
@@ -1596,7 +1596,7 @@ The
 @command{mux} has no known bugs.
 
 @subheading Compatibility
-@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
+@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.9.2, Linux Fast-STREAMS (LfS) 0.9.2.1 Source
 Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} provides the
 @command{mux} pseudo-device driver for testing and compatibility with @cite{LiS},@footnote{@cite{LIS
 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
@@ -1707,8 +1707,8 @@ determining the major device number of the cloned device.  If the device opened 
 the name of the opened file is the name used for determining the major device number of the
 cloned device.
 
-@command{nsdev} is used by the @cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux
-Fast-STREAMS (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+@command{nsdev} is used by the @cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.9.2, Linux
+Fast-STREAMS (LfS) 0.9.2.1 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
 <@url{http://www.openss7.org/}>}} system provided drivers to limit the use of major device numbers
 to a single major device number for the @dfn{STREAMS} system installed device drivers.  Clonable
 minor devices are allocated against a single @dfn{STREAMS} system major device number rather than
@@ -1720,8 +1720,8 @@ either event, the major device number associated with the @command{nsdev} can be
 
 @subheading Implementation
 @command{nsdev} is not implemented as a normal @dfn{STREAMS} driver: it is implemented as a shadow
-special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.7a, Linux
-Fast-STREAMS (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.9.2, Linux
+Fast-STREAMS (LfS) 0.9.2.1 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
 <@url{http://www.openss7.org/}>}} @cite{@value{PACKAGE_TITLE}} shadow special device nodes call
 @code{nsdev_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the
 @command{nsdev} device to intercept and redirect the open call to the appropriate device.  This is
@@ -1931,7 +1931,7 @@ The @command{nuls} device is used with the
 @manpage{strload(8)}, and
 @manpage{strsetup(8)} commands.
 
-Under @cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6
+Under @cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.9.2, Linux Fast-STREAMS (LfS) 0.9.2.1
 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} the
 @command{nuls} device is also used with the
 @manpage{sockmod(4)} module in support of
@@ -2788,8 +2788,8 @@ opened with the
 
 @subheading Implementation
 @command{spx} is not implemented as a normal @dfn{STREAMS} driver: it is implemented as a shadow
-special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.7a, Linux
-Fast-STREAMS (LfS) 0.7a.6 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
+special device node under @cite{@value{PACKAGE_TITLE}}.@footnote{@cite{streams-0.9.2, Linux
+Fast-STREAMS (LfS) 0.9.2.1 Source Code, Brian Bidulock, ed., OpenSS7 Corporation.
 <@url{http://www.openss7.org/}>}} @cite{@value{PACKAGE_TITLE}} shadow special devices nodes call
 @code{pipe_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the pipe device
 to intercept and redirect the open call to the appropriate device.  This is consistent with the
@@ -2859,7 +2859,7 @@ The
 @command{spx} has no known bugs.
 
 @subheading Compatibility
-@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.7a, Linux Fast-STREAMS (LfS) 0.7a.6 Source
+@cite{@value{PACKAGE_TITLE}}@footnote{@cite{streams-0.9.2, Linux Fast-STREAMS (LfS) 0.9.2.1 Source
 Code, Brian Bidulock, ed., OpenSS7 Corporation.  <@url{http://www.openss7.org/}>}} provides the
 @command{spx} device for compatibility with @cite{UnixWare@registeredsymbol{}} and @cite{AIX@registeredsymbol{}}.  @cite{Solaris@registeredsymbol{}}
 and @cite{LiS}@footnote{@cite{LIS 2.18, Linux STREAMS (LiS) 2.18.4 Source Code, Brian Bidulock, ed.,

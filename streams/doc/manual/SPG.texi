@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.54 2006/09/18 01:06:47 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.55 2006/10/21 09:17:32 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:06:47 $ by $Author: brian $
+% Last Modified $Date: 2006/10/21 09:17:32 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -548,6 +548,9 @@ package.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.55  2006/10/21 09:17:32  brian
+- bumped streams version number
+
 Revision 0.9.2.54  2006/09/18 01:06:47  brian
 - updated manuals and release texi docs
 
@@ -2410,7 +2413,7 @@ The @dfn{STREAMS} logger @manpage{log(4)},
 command, and @manpage{strace(8)}
 and @manpage{strerr(8)}
 loggers are all available in the base @code{@value{PACKAGE}-@value{VERSION}} package.@footnote{I
-have been considering removing these facilities into a common @code{strutil-0.7a.1} package that
+have been considering removing these facilities into a common @code{strutil-0.9.2.1} package that
 could work with @cite{LiS} as well, perhaps.}
 
 @node Administrative Driver
@@ -2444,7 +2447,7 @@ pop modules from a terminal.  The @b{Linux} @samp{pty} only provides emulation f
 ioctl calls.
 
 A separate auxiliary package for @dfn{@value{PACKAGE_TITLE}} that provides true @dfn{STREAMS}-based
-@cite{UNIX'98} compliant pseudo terminals is available.  This is the @code{strpty-0.7a.1} package
+@cite{UNIX'98} compliant pseudo terminals is available.  This is the @code{strpty-0.9.2.1} package
 also available from @url{http://www.openss7.org/, The OpenSS7 Project}.@footnote{Actually, this
 package is not yet avilable.  I will work on it someday when it is necessary.}
 
@@ -2472,7 +2475,7 @@ configuration parameter @code{--enable-streams-fifos}.
 @dfn{@value{PACKAGE_TITLE}} also provides a character device based pipe facility using the
 @manpage{spx(4)} driver.
 @footnote{I am considering taking pipes and FIFOs out of the base
-@code{@value{PACKAGE}-@value{VERSION}} package an placing them in their own @code{strpipe-0.7a.1}
+@code{@value{PACKAGE}-@value{VERSION}} package an placing them in their own @code{strpipe-0.9.2.1}
 package.}
 
 @node FIFOs
@@ -2488,7 +2491,7 @@ By default, FIFOs created on @b{Linux} with the
 @manpage{mknod(8)}
 utility are not @dfn{STREAMS}-based.  To get @dfn{STREAMS}-based FIFOs, configure @cite{@value{PACKAGE_TITLE}} with configuration parameter @code{--enable-streams-fifos}.
 @footnote{I am considering taking pipes and FIFOs out of the base
-@code{@value{PACKAGE}-@value{VERSION}} package an placing them in their own @code{strpipe-0.7a.1}
+@code{@value{PACKAGE}-@value{VERSION}} package an placing them in their own @code{strpipe-0.9.2.1}
 package.}
 
 @node Networking

@@ -1,5 +1,13 @@
 2006-10-20  Brian Bidulock  <bidulock@openss7.org>
 
+	* .pkgrelease: bumped streams version number
+	* configure.ac: bumped streams version number
+	* debian/changelog: bumped streams version number
+	* doc/man/streams.refs: bumped streams version number
+	* doc/manual/SPG.texi: bumped streams version number
+	* doc/manual/drivers.texi: bumped streams version number
+	* m4/streams.m4: bumped streams version number
+
 	* src/kernel/strsched.c: don't raise streams if runqueues already running
 	* src/kernel/strsched.h: don't raise streams unnecesssarily
 	* src/modules/sth.c:
