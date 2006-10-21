@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/09/29 10:57:46 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/21 09:17:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
+# Last Modified $Date: 2006/10/21 09:17:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -240,7 +240,7 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
 *** Perhaps you just forgot to load the LfS STREAMS package?  The LfS
 *** STREAMS package is available from The OpenSS7 Project download page
 *** at http://www.openss7.org/ and comes in a tarball named something
-*** like "streams-0.7a-5.tar.gz".
+*** like "streams-0.9.2.1-1.tar.gz".
 *** ])
 	    ;;
     esac
@@ -712,7 +712,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 *** Perhaps you just forgot to load the LfS STREAMS package?  The LfS
 *** STREAMS package is available from The OpenSS7 Project download page
 *** at http://www.openss7.org/ and comes in a tarball named something
-*** like "streams-0.7a-5.tar.gz".
+*** like "streams-0.9.2.1-1.tar.gz".
 *** ])
     fi
     streams_what="sys/config.h"
@@ -760,7 +760,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    streams_cv_lfs_version=`grep '#define.*\<STREAMS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    LFS_VERSION="${streams_cv_lfs_version:-0:0.7a.3}"
+    LFS_VERSION="${streams_cv_lfs_version:-0:0.9.2.1}"
     AC_SUBST([LFS_VERSION])
     streams_what="sys/streams/modversions.h"
     AC_CACHE_CHECK([for streams lfs $streams_what], [streams_cv_lfs_modversions], [dnl
