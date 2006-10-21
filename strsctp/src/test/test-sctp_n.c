@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/16 00:14:52 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/10/21 12:00:36 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/16 00:14:52 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 12:00:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.17  2006/10/21 12:00:36  brian
+ - missing checkins
+
  Revision 0.9.2.16  2006/10/16 00:14:52  brian
  - updates for release and test case passes on UP
 
@@ -78,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/16 00:14:52 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/10/21 12:00:36 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/16 00:14:52 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/10/21 12:00:36 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the

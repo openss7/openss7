@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/21 00:22:06 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/21 12:00:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 00:22:06 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 12:00:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.54  2006/10/21 12:00:18  brian
+ - missing checkins
+
  Revision 0.9.2.53  2006/10/21 00:22:06  brian
  - corrections for zero-length messages, QR_TRIMMED tweaks
 
@@ -94,9 +97,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/21 00:22:06 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/21 12:00:18 $"
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/21 00:22:06 $";
+static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/21 12:00:18 $";
 
 #include "sctp_compat.h"
 
@@ -115,7 +118,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2006/10/21 00:22:06 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/21 12:00:18 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

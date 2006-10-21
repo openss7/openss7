@@ -7,6 +7,10 @@
 	* debian/control.in: updated LiS release number
 	* doc/manual/releases.texi: updated LiS release number
 
+	* src/test/test-sctp_n.c: missing checkin
+	* tests/testsuite-sctp_n2.at: missing checkin
+	* src/drivers/sctp2.c: missing checkin
+
 2006-10-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-sctp_n.c: fixed test cases

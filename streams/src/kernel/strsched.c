@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/10/12 10:22:50 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/10/21 12:00:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:22:50 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 12:00:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.147  2006/10/21 12:00:09  brian
+ - missing checkins
+
  Revision 0.9.2.146  2006/10/12 10:22:50  brian
  - removed redundant debug flags
 
@@ -122,10 +125,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/10/12 10:22:50 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/10/21 12:00:09 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2006/10/12 10:22:50 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/10/21 12:00:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -4294,7 +4297,7 @@ __runqueues(struct softirq_action *unused)
 	} while (unlikely((t->flags & (QRUNFLAGS)) != 0 && runs < 10));
 
 	if (runs >= 10)
-		__pswerr(("CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(), t->flags));
+		printd(("CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(), t->flags));
 
 	atomic_dec(&t->lock);
 
@@ -4682,7 +4685,7 @@ kstreamd(void *__bind_cpu)
 				break;
 			preempt_disable();
 			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
-				pswerr(("CPU#%d: kstreamd: false wakeup, flags = 0x%08x\n",
+				printd(("CPU#%d: kstreamd: false wakeup, flags = 0x%08x\n",
 					(int) (long) __bind_cpu, (int) t->flags));
 				set_current_state(TASK_INTERRUPTIBLE);
 				goto reschedule;
@@ -4806,7 +4809,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	switch (action) {
 	case CPU_UP_PREPARE:
 		if (IS_ERR(p = kthread_create(kstreamd, hcpu, "kstreamd/%d", cpu))) {
-			__pswerr(("kstreamd for cpu %d failed\n", cpu));
+			printd(("kstreamd for cpu %d failed\n", cpu));
 			return (NOTIFY_BAD);
 		}
 		t->proc = p;
@@ -4939,7 +4942,7 @@ kstreamd(void *__bind_cpu)
 				     && sigismember(&current->pending.signal, SIGKILL)))
 				break;
 			if (unlikely((t->flags & (QRUNFLAGS)) == 0)) {
-				pswerr(("CPU#%d: kstreamd: false wakeup\n",
+				printd(("CPU#%d: kstreamd: false wakeup\n",
 					(int) (long) __bind_cpu));
 				set_current_state(TASK_INTERRUPTIBLE);
 				goto reschedule;
@@ -4978,7 +4981,7 @@ spawn_kstreamd(void)
 			while (!t->proc)
 				yield();
 		} else
-			pswerr(("%s failed for cpu %d\n", __FUNCTION__, cpu));
+			printd(("%s failed for cpu %d\n", __FUNCTION__, cpu));
 	}
 	return (0);
 }

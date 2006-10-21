@@ -7,6 +7,12 @@
 	* doc/manual/news.texi: updated LiS release number
 	* doc/manual/porting.texi: updated LiS release number
 
+	* configure.ac: correct version number
+
+	* src/kernel/strsched.c: missing checkin
+	* src/kernel/strsched.h: missing checkin
+	* src/modules/sth.c: missing checkin
+
 2006-10-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped streams version number
