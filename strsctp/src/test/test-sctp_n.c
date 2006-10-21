@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/21 17:00:40 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/21 19:55:39 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 17:00:40 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 19:55:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.19  2006/10/21 19:55:39  brian
+ - a couple more test case corrections
+
  Revision 0.9.2.18  2006/10/21 17:00:40  brian
  - fixed test cases, added split client/server operation
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/21 17:00:40 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/21 19:55:39 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/10/21 17:00:40 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/21 19:55:39 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -6908,9 +6911,9 @@ Delivery of ordered data under noise with acknowledgement."
 int
 test_case_9_1_conn(int child)
 {
-	int i = 0, j = 0, k = 0;
+	int i = TEST_PACKETS, j = TEST_PACKETS, k = TEST_PACKETS;
 
-	while (i < TEST_PACKETS) {
+	while (i > 0) {
 		DATA_xfer_flags = N_RC_FLAG;
 		QOS_buffer = NULL;
 		QOS_length = 0;
@@ -6918,27 +6921,27 @@ test_case_9_1_conn(int child)
 		DATA_length = strlen(DATA_buffer);
 		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 			goto failure;
-		i++;
+		i--;
 	}
-	while (j < TEST_PACKETS || k < TEST_PACKETS) {
-		switch (wait_event(child, NORMAL_WAIT)) {
+	while (j > 0 || k > 0) {
+		switch (wait_event(child, LONG_WAIT)) {
 		case __TEST_DATA_IND:
-			j++;
+			j--;
 			break;
 		case __TEST_DATACK_IND:
-			k++;
+			k--;
 			break;
 		default:
 			goto failure;
 		}
 		state++;
 	}
-	test_sleep(child, 1);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, "%d sent %d inds %d acks %d\n", child, i, j, k);
+	fprintf(stdout, "%d sent %d inds %d acks %d\n", child, TEST_PACKETS - i, TEST_PACKETS - j, TEST_PACKETS - k);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
@@ -6955,9 +6958,9 @@ test_case_9_1_resp(int child)
 int
 test_case_9_1_list(int child)
 {
-	int i = 0, j = 0, k = 0;
+	int i = TEST_PACKETS, j = TEST_PACKETS, k = TEST_PACKETS;
 
-	while (i < TEST_PACKETS) {
+	while (i > 0) {
 		DATA_xfer_flags = N_RC_FLAG;
 		QOS_buffer = NULL;
 		QOS_length = 0;
@@ -6965,27 +6968,27 @@ test_case_9_1_list(int child)
 		DATA_length = strlen(DATA_buffer);
 		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 			goto failure;
-		i++;
+		i--;
 	}
-	while (j < TEST_PACKETS || k < TEST_PACKETS) {
-		switch (wait_event(child, NORMAL_WAIT)) {
+	while (j > 0 || k > 0) {
+		switch (wait_event(child, LONG_WAIT)) {
 		case __TEST_DATA_IND:
-			j++;
+			j--;
 			break;
 		case __TEST_DATACK_IND:
-			k++;
+			k--;
 			break;
 		default:
 			goto failure;
 		}
 		state++;
 	}
-	test_sleep(child, 1);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, "%d sent %d inds %d acks %d\n", child, i, j, k);
+	fprintf(stdout, "%d sent %d inds %d acks %d\n", child, TEST_PACKETS - i, TEST_PACKETS - j, TEST_PACKETS - k);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);

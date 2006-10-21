@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/21 17:00:41 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/21 19:55:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 17:00:41 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 19:55:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.20  2006/10/21 19:55:40  brian
+ - a couple more test case corrections
+
  Revision 0.9.2.19  2006/10/21 17:00:41  brian
  - fixed test cases, added split client/server operation
 
@@ -102,9 +105,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/21 17:00:41 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/21 19:55:40 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/10/21 17:00:41 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/21 19:55:40 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -24669,7 +24672,7 @@ test_case_4_3_conn(int child)
 		goto failure;
 	}
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, NORMAL_WAIT);
@@ -28473,14 +28476,18 @@ test_case_5_3_conn(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	for (;;) {
 		switch (wait_event(child, LONGER_WAIT)) {
+#if 0
 		case __EVENT_NO_MSG:
 			continue;
+#endif
 		case __TEST_ORDREL_IND:
 			break;
 		case __TEST_DATA_IND:
@@ -28495,9 +28502,11 @@ test_case_5_3_conn(int child)
 		break;
 	}
 	state++;
+#if 0
 	if (wait_event(child, LONGER_WAIT) != __EVENT_NO_MSG)
 		goto failure;
 	state++;
+#endif
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -28526,14 +28535,18 @@ test_case_5_3_resp(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	for (;;) {
 		switch (wait_event(child, LONGER_WAIT)) {
+#if 0
 		case __EVENT_NO_MSG:
 			continue;
+#endif
 		case __TEST_ORDREL_IND:
 			break;
 		case __TEST_DATA_IND:
@@ -28548,9 +28561,11 @@ test_case_5_3_resp(int child)
 		break;
 	}
 	state++;
+#if 0
 	if (wait_event(child, LONGER_WAIT) != __EVENT_NO_MSG)
 		goto failure;
 	state++;
+#endif
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -33720,9 +33735,10 @@ test_case_13_2_2(int child)
 	state++;
 	/* broadcast addresses require privilege - this might not work for TCP or SCTP */
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
-	addrs[child][0].sin_addr.s_addr = 0x0000007f;	/* 127.0.0.255 is a broadcast address */
+	addrs[child][0].sin_addr.s_addr = htonl(0x7fffffff);	/* 127.255.255.255 is a broadcast address */
+	addrs[child][0].sin_port = htons(3);			/* reserved port */
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;

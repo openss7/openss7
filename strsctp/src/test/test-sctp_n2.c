@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/21 17:00:40 $
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/21 19:55:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 17:00:40 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 19:55:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n2.c,v $
+ Revision 0.9.2.4  2006/10/21 19:55:40  brian
+ - a couple more test case corrections
+
  Revision 0.9.2.3  2006/10/21 17:00:40  brian
  - fixed test cases, added split client/server operation
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/21 17:00:40 $"
+#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/21 19:55:40 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/21 17:00:40 $";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/21 19:55:40 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -9863,9 +9866,6 @@ test_case_3_9_1(int child)
 		state++;
 		if (last_info.CURRENT_state != NS_DATA_XFER)
 			goto failure;
-		state++;
-	} else {
-		test_msleep(child, LONGER_WAIT);
 		state++;
 	}
 	test_msleep(child, LONG_WAIT);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/21 12:00:18 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/21 19:55:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 12:00:18 $ by $Author: brian $
+ Last Modified $Date: 2006/10/21 19:55:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.55  2006/10/21 19:55:24  brian
+ - a couple more test case corrections
+
  Revision 0.9.2.54  2006/10/21 12:00:18  brian
  - missing checkins
 
@@ -97,9 +100,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/21 12:00:18 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/21 19:55:24 $"
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/21 12:00:18 $";
+static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/21 19:55:24 $";
 
 #include "sctp_compat.h"
 
@@ -118,7 +121,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/21 12:00:18 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/21 19:55:24 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -11015,10 +11018,9 @@ sctp_recv_init_ack(struct sctp *sp, mblk_t *mp)
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 	sctp_ack_calc(sp, &sp->timer_init);
 	local_bh_disable();
-	if (sp->pprev) {
-		swerr();
+	/* not an error to be in the phashes */
+	if (sp->pprev)
 		__sctp_phash_unhash(sp);
-	}
 	sp->p_tag = m->i_tag;
 	__sctp_phash_insert(sp);
 	local_bh_enable();
@@ -11680,6 +11682,9 @@ sctp_recv_shutdown(struct sctp *sp, mblk_t *mp)
 				sctp_send_shutdown_ack(sp);
 		break;
 	case SCTP_SHUTDOWN_PENDING:	/* only when we have ordrel */
+		/* send up orderly release indication to ULP */
+		if ((err = sctp_ordrel_ind(sp)))
+			goto error;
 		sctp_change_state(sp, SCTP_SHUTDOWN_RECVWAIT);
 		/* fall thru */
 	case SCTP_SHUTDOWN_RECVWAIT:
@@ -13935,7 +13940,8 @@ sctp_init_struct(struct sctp *sp)
 #define ip_rt_min_pmtu 552
 #endif
 struct sctp *
-sctp_alloc_priv(queue_t *q, struct sctp **spp, int cmajor, int cminor, struct sctp_ifops *ops)
+sctp_alloc_priv(queue_t *q, struct sctp **spp, int cmajor, int cminor, struct sctp_ifops *ops,
+		cred_t *crp)
 {
 	struct sctp *sp;
 
@@ -13956,6 +13962,7 @@ sctp_alloc_priv(queue_t *q, struct sctp **spp, int cmajor, int cminor, struct sc
 		sp->cminor = cminor;
 		sp->ops = ops;
 		sp->i_state = 0;
+		sp->cred = *crp;
 #if 1
 		/* initialize queues */
 		bufq_init(&sp->rcvq);
@@ -16723,7 +16730,7 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (cminor > NMINORS)
 		goto enxio;
 	*devp = makedevice(cmajor, cminor);
-	if (!(sp = sctp_alloc_priv(q, spp, cmajor, cminor, &n_ops)))
+	if (!(sp = sctp_alloc_priv(q, spp, cmajor, cminor, &n_ops, crp)))
 		goto enomem;
 	printd(("%s: %s: opened tpi device %d:%d\n", DRV_NAME, __FUNCTION__, (int) cmajor,
 		(int) cminor));
@@ -27850,7 +27857,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (cminor > NMINORS)
 		goto enxio;
 	*devp = makedevice(cmajor, cminor);
-	if (!(sp = sctp_alloc_priv(q, spp, cmajor, cminor, &t_ops)))
+	if (!(sp = sctp_alloc_priv(q, spp, cmajor, cminor, &t_ops, crp)))
 		goto enomem;
       unlock_exit:
 	spin_unlock_bh(&sctp_protolock);

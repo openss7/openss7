@@ -16,6 +16,11 @@
 	* src/test/test-sctp_n2.c: fixed test cases, added split client/server operation
 	* src/test/test-sctp_t.c: fixed test cases, added split client/server operation
 
+	* src/drivers/sctp2.c: couple more corrections
+	* src/test/test-sctp_n.c: couple more corrections
+	* src/test/test-sctp_n2.c: couple more corrections
+	* src/test/test-sctp_t.c: couple more corrections
+
 2006-10-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-sctp_n.c: fixed test cases
