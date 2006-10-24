@@ -55,6 +55,8 @@
 static char const ident[] =
     "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:46 $";
 
+#define _LFS_SOURCE 1
+
 #include <sys/os7/compat.h>
 
 #include <sys/npi.h>
@@ -112,6 +114,11 @@ MODULE_ALIAS("streams-m2pa_sl");
 
 #define MOD_ID		M2PA_SL_MOD_ID
 #define MOD_NAME	M2PA_SL_MOD_NAME
+#ifdef MODULE
+#define MOD_SPLASH	M2PA_SL_BANNER
+#else				/* MODULE */
+#define MOD_SPLASH	M2PA_SL_SPLASH
+#endif				/* MODULE */
 
 STATIC struct module_info sl_minfo = {
 	.mi_idnum = MOD_ID,		/* Module ID number */
@@ -205,7 +212,8 @@ STATIC void sl_put(struct sl *sl);
 #define M2PA_VERSION_DRAFT6_9	0x69
 #define M2PA_VERSION_DRAFT10	0xa0
 #define M2PA_VERSION_DRAFT11	0xb0
-#define M2PA_VERSION_DEFAULT	M2PA_VERSION_DRAFT11
+#define M2PA_VERSION_RFC4165	0xc1
+#define M2PA_VERSION_DEFAULT	M2PA_VERSION_RFC4165
 
 /*
  *  =========================================================================
@@ -308,8 +316,7 @@ lmi_ok_ack(queue_t *q, struct sl *sl, long prim)
 		case LMI_DETACH_PENDING:
 			sl->i_state = LMI_UNATTACHED;
 			break;
-			/* 
-			   default is don't change state */
+			/* default is don't change state */
 		}
 		p->lmi_state = sl->i_state;
 		printd(("%s: %p: <- LMI_OK_ACK\n", MOD_NAME, sl));
@@ -366,9 +373,7 @@ lmi_error_ack(queue_t *q, struct sl *sl, long prim, long err)
 		case LMI_DISABLE_PENDING:
 			sl->i_state = LMI_ENABLED;
 			break;
-			/* 
-			 *  Default is not to change state.
-			 */
+			/* * Default is not to change state. */
 		}
 		p->lmi_state = sl->i_state;
 		printd(("%s: %p: <- LMI_ERROR_ACK\n", MOD_NAME, sl));
@@ -1045,8 +1050,7 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT4:
 	case M2PA_VERSION_DRAFT4_1:
-		/* 
-		   draft-ietf-sigtran-m2pa-04.txt does not have a separate Proving message: it uses 
+		/* draft-ietf-sigtran-m2pa-04.txt does not have a separate Proving message: it uses 
 		   the status proving message for sending proving data will fill bytes. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
@@ -1074,10 +1078,10 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT6:
 	case M2PA_VERSION_DRAFT6_1:
 	default:
-		/* 
-		   It looks like the sequence numbers stuck. */
+		/* It looks like the sequence numbers stuck. */
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
@@ -1100,8 +1104,7 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		}
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT6_9:
-		/* 
-		   It is anticipated that draft 7 will not include FSN or BSN in the status
+		/* It is anticipated that draft 7 will not include FSN or BSN in the status
 		   messages. */
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
@@ -1153,8 +1156,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT4:
 	case M2PA_VERSION_DRAFT4_1:
-		/* 
-		   draft-ietf-sigtran-m2pa-04.txt has sequence numbers in an M2PA-specific header. */
+		/* draft-ietf-sigtran-m2pa-04.txt has sequence numbers in an M2PA-specific header. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
@@ -1196,8 +1198,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		}
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT6_9:
-		/* 
-		   It is anticipated that draft 7 will not include FSN or BSN in the status
+		/* It is anticipated that draft 7 will not include FSN or BSN in the status
 		   messages. */
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
@@ -1216,6 +1217,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*(uint32_t *) mp->b_wptr = M2PA_STATUS_MESSAGE;
@@ -1236,8 +1238,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 			case M2PA_STATUS_IN_SERVICE:
 				switch (sl_get_state(sl)) {
 				case MS_PROCESSOR_OUTAGE:
-					/* 
-					   Should only really be sent on data stream when used for
+					/* Should only really be sent on data stream when used for
 					   processor outage resynchronization. */
 					qos.sid = M2PA_DATA_STREAM;
 					break;
@@ -1274,8 +1275,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		return (0);
 	switch (sl->i_version) {
 	case M2PA_VERSION_DRAFT3:
-		/* 
-		   draft-ietf-sigtran-m2pa-03.txt does not have a separate acknowledgement message. 
+		/* draft-ietf-sigtran-m2pa-03.txt does not have a separate acknowledgement message. 
 		   Acknowledgement is done at the SCTP level only. */
 		return (0);
 	case M2PA_VERSION_DRAFT3_1:
@@ -1296,14 +1296,12 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		}
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT4:
-		/* 
-		   draft-ietf-sigtran-m2pa-04.txt again does not have a separate acknowledgement
+		/* draft-ietf-sigtran-m2pa-04.txt again does not have a separate acknowledgement
 		   message.  There is no way to acknowledge data without sending status or data in
 		   M2PA-04. */
 		return (0);
 	case M2PA_VERSION_DRAFT4_1:
-		/* 
-		   This extension uses the otherwise useless "In Service" state message from
+		/* This extension uses the otherwise useless "In Service" state message from
 		   draft-ietf-sigtran-m2pa-04.txt as an acknowledgement message (like a FISU).
 		   These messages are sent expedited to speed them up, but that means they may
 		   arrive out of order and, therefore, some sequence numbers should be ignored by
@@ -1329,8 +1327,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		}
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT4_9:
-		/* 
-		   This is the same as extension 4.1, except that it uses the larger 32-bit
+		/* This is the same as extension 4.1, except that it uses the larger 32-bit
 		   sequence numbers expected to appear in draft-ietf-sigtran-m2pa-05.txt. */
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
@@ -1354,8 +1351,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT5:
 	case M2PA_VERSION_DRAFT5_1:
-		/* 
-		   Draft 5 allows acknowledgement with DATA as well as STATUS IN_SERVICE message.
+		/* Draft 5 allows acknowledgement with DATA as well as STATUS IN_SERVICE message.
 		   Draft 5 incorrectly indicates that the FSN is to be incremented. */
 		if (sl->tb.q_msgs && (sl->flags & MF_SEND_MSU) && !(sl->flags & MF_RTB_FULL)) {
 			printd(("%s: %p: Delaying ack for piggyback\n", MOD_NAME, sl));
@@ -1385,8 +1381,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 	case M2PA_VERSION_DRAFT6:
 	case M2PA_VERSION_DRAFT6_1:
 	case M2PA_VERSION_DRAFT6_9:
-		/* 
-		   draft-ietf-signtran-m2pa-06.txt and the anticipated draft 7 wil acknowledge
+		/* draft-ietf-signtran-m2pa-06.txt and the anticipated draft 7 wil acknowledge
 		   messages with an empty data message.  Draft 6 incorrectly indicatest that the
 		   FSN is to be incremented. */
 		if (sl->tb.q_msgs && (sl->flags & MF_SEND_MSU) && !(sl->flags & MF_RTB_FULL)) {
@@ -1415,8 +1410,8 @@ sl_send_ack(queue_t *q, struct sl *sl)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
-		/* 
-		   Acknowledgements must be sent immediately on the next outgoing message.  We
+	case M2PA_VERSION_RFC4165:
+		/* Acknowledgements must be sent immediately on the next outgoing message.  We
 		   check to see if there is a pending MSU waiting to be sent that will actually be
 		   sent during this pass of the state machine.  If there is one, we will piggyback
 		   so we return now.  If there is not an MSU that will be sent on this pass, we
@@ -1508,6 +1503,7 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 		default:
 		case M2PA_VERSION_DRAFT10:
 		case M2PA_VERSION_DRAFT11:
+		case M2PA_VERSION_RFC4165:
 			if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 				mp->b_datap->db_type = M_DATA;
 				*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
@@ -1725,66 +1721,56 @@ __sl_timer_stop(struct sl *sl, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/* 
-		   fall through */
+		/* fall through */
 	case t1:
 		sl_stop_timer_t1(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 	case t2:
 		sl_stop_timer_t2(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 	case t3:
 		sl_stop_timer_t3(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 	case t4:
 		sl_stop_timer_t4(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 #if 0
 	case t5:
 		sl_stop_timer_t5(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 #endif
 	case t6:
 		sl_stop_timer_t6(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 	case t7:
 		sl_stop_timer_t7(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 #if 0
 	case t8:
 		sl_stop_timer_t8(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 #endif
 	case t9:
 		sl_stop_timer_t9(sl);
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 		break;
 	default:
 		swerr();
@@ -1860,16 +1846,14 @@ sl_timer_start(struct sl *sl, const uint t)
 STATIC INLINE void
 sl_suerm_start(queue_t *q, struct sl *sl)
 {
-	/* 
-	   SCTP does this for us */
+	/* SCTP does this for us */
 	return;
 }
 
 STATIC INLINE void
 sl_suerm_stop(queue_t *q, struct sl *sl)
 {
-	/* 
-	   SCTP does this for us */
+	/* SCTP does this for us */
 	return;
 }
 
@@ -1896,8 +1880,7 @@ sl_t9_timeout(struct sl *sl)
 		int err;
 		queue_t *q = sl->iq;
 
-		/* 
-		   We use the t9 tick timer to determine how fast to send proving messages.  We
+		/* We use the t9 tick timer to determine how fast to send proving messages.  We
 		   send a proving message once every t9 during the proving period.  To adjust the
 		   bandwidth of the proving messages, adjust the t9 timer or the size of the
 		   filler. */
@@ -2255,8 +2238,7 @@ sl_lsc_emergency(queue_t *q, struct sl *sl)
 	if (proving) {
 		switch (sl_get_state(sl)) {
 		case MS_PROVING:
-			/* 
-			   For a normal Q.703 link, when we received an emergency signal in the
+			/* For a normal Q.703 link, when we received an emergency signal in the
 			   proving state, we would stop sending normal proving messages and being
 			   sending emergency proving messages.  The problem is if we have already
 			   primed the SCTP transmit queue with normal messages the change would be
@@ -2308,8 +2290,7 @@ sl_lsc_status_proving_normal(queue_t *q, struct sl *sl)
 			sl_timer_start(sl, t3);
 			sl_set_state(sl, MS_ALIGNED);
 		}
-		/* 
-		   fall thru */
+		/* fall thru */
 	case MS_ALIGNED:
 		sl->flags &= ~MF_REM_EMERG;
 		if (proving) {
@@ -2355,8 +2336,7 @@ sl_lsc_status_proving_emergency(queue_t *q, struct sl *sl)
 			sl_timer_start(sl, t3);
 			sl_set_state(sl, MS_ALIGNED);
 		}
-		/* 
-		   fall thru */
+		/* fall thru */
 	case MS_ALIGNED:
 		if (proving) {
 			sl->flags |= MF_REM_EMERG;
@@ -2480,8 +2460,7 @@ sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
 	case MS_IN_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->i_version >= M2PA_VERSION_DRAFT10) {
-			/* 
-			   In the final, when we receive a READY in the in service or processor
+			/* In the final, when we receive a READY in the in service or processor
 			   outage states, we use the BSN in the message to synchronize when
 			   synchronization was required. */
 			if (sl->flags & MF_WAIT_SYNC) {
@@ -2909,6 +2888,7 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 		return (-EMSGSIZE);
 	}
 	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
 	{
 		/* In the final, when we are waiting for synchronization (we have sent
 		   PROCESSOR_RECOVERED but have not yet received IN_SERVICE, DATA or DATA-ACK) we
@@ -3258,8 +3238,7 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 	case MS_NOT_ALIGNED:
 	case MS_ALIGNED:
 	case MS_PROVING:
-		/* 
-		   just remember for later */
+		/* just remember for later */
 		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
 		return (0);
@@ -3504,8 +3483,7 @@ sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->flags & MF_RPO) {
 			if (sl->i_version >= M2PA_VERSION_DRAFT10) {
-				/* 
-				   In the final, when we receive PROCESSOR_RECOVERED, we need to
+				/* In the final, when we receive PROCESSOR_RECOVERED, we need to
 				   send READY, and also use the BSN from the received message to
 				   synchronize FSN. */
 				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr)) & 0xffffff;
@@ -3525,14 +3503,12 @@ sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
 		default:
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			/* 
-			   auto recover */
+			/* auto recover */
 			if (!(sl->flags & MF_LPO))
 				sl_lsc_no_processor_outage(q, sl);
 			break;
 		case SS7_PVAR_ANSI_92:
-			/* 
-			   leave state latched */
+			/* leave state latched */
 			break;
 		}
 		return (QR_DONE);
@@ -3552,8 +3528,7 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 	case MS_NOT_ALIGNED:
 	case MS_ALIGNED:
 	case MS_PROVING:
-		/* 
-		   remember for later */
+		/* remember for later */
 		sl->flags &= ~MF_LPO;
 		return (0);
 	case MS_ALIGNED_READY:
@@ -3580,8 +3555,7 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 		sl_set_state(sl, MS_ALIGNED_READY);
 		return (0);
 	case MS_PROCESSOR_OUTAGE:
-		/* 
-		   This is where the really wierd behavior begins... */
+		/* This is where the really wierd behavior begins... */
 		switch (sl->option.pvar) {
 		default:
 		case SS7_PVAR_ITUT_93:
@@ -3608,8 +3582,7 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 			sl->flags &= ~MF_SEND_MSU;
 			return (0);
 		case SS7_PVAR_ANSI_92:
-			/* 
-			   XXX do we do this now??? */
+			/* XXX do we do this now??? */
 			if (sl->flags & MF_LPO) {
 				if ((err =
 				     sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE_ENDED)) < 0)
@@ -3722,8 +3695,7 @@ sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct sl *sl, ulong fsnc)
 		 *  indication with a return code of "unreasonable FSNC".
 		 */
 		fixme(("%s: %p: FIXME: Fix this check...\n", MOD_NAME, sl));
-		/* 
-		   this will pretty much clear the rtb if there is a problem with the FSNC */
+		/* this will pretty much clear the rtb if there is a problem with the FSNC */
 		while (sl->rtb.q_msgs && sl->fsnt != fsnc) {
 			freemsg(bufq_dequeue(&sl->rtb));
 			sl->fsnt--;
@@ -3949,6 +3921,7 @@ sl_recv_datack(queue_t *q, struct sl *sl, mblk_t *mp)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
 		ptrace(("%s: %p: ERROR: Invalid message for version\n", MOD_NAME, sl));
 		return (-EPROTO);
 	}
@@ -3965,8 +3938,7 @@ sl_recv_proving(queue_t *q, struct sl *sl, mblk_t *mp)
 	switch (sl->i_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
-		/* 
-		   just ignore proving packets */
+		/* just ignore proving packets */
 		return (QR_DONE);
 	case M2PA_VERSION_DRAFT4:
 	case M2PA_VERSION_DRAFT4_1:
@@ -3978,6 +3950,7 @@ sl_recv_proving(queue_t *q, struct sl *sl, mblk_t *mp)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
 		ptrace(("%s: %p: ERROR: Invalid message for version\n", MOD_NAME, sl));
 		return (-EPROTO);
 	}
@@ -4010,8 +3983,8 @@ sl_recv_status(queue_t *q, struct sl *sl, mblk_t *mp)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
-		/* 
-		   In the final analysis, sequence numbers are included in status messages. */
+	case M2PA_VERSION_RFC4165:
+		/* In the final analysis, sequence numbers are included in status messages. */
 		hlen = 2 * sizeof(uint32_t);
 		break;
 	}
@@ -4075,8 +4048,8 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
-		/* 
-		   In the final, sequence numbers are 24 bit values in a 32 bit field. */
+	case M2PA_VERSION_RFC4165:
+		/* In the final, sequence numbers are 24 bit values in a 32 bit field. */
 		hlen = 2 * sizeof(uint32_t);
 		break;
 	}
@@ -4112,15 +4085,14 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
 		break;
 	case M2PA_VERSION_DRAFT6:
 	case M2PA_VERSION_DRAFT6_1:
-		/* 
-		   draft6 and anticipated draft7 permit acknowledgement using zero payload data
+		/* draft6 and anticipated draft7 permit acknowledgement using zero payload data
 		   messages. */
 	case M2PA_VERSION_DRAFT6_9:
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
-		/* 
-		   In the final, zero-length data messages are used as spearate acknowledgements. */
+	case M2PA_VERSION_RFC4165:
+		/* In the final, zero-length data messages are used as spearate acknowledgements. */
 		if (mlen > hlen + rlen || mlen == hlen || mlen == 0)
 			return sl_rc_signal_unit(q, sl, mp);
 		break;
@@ -4689,22 +4661,18 @@ sl_power_on_req(queue_t *q, struct sl *sl, mblk_t *mp)
 STATIC int
 n_data_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp, ulong more)
 {
-	/* 
-	   Normally we receive data unfragmented and in a singled M_DATA block.  This slower
+	/* Normally we receive data unfragmented and in a singled M_DATA block.  This slower
 	   routine handles the circumstance where we receive fragmented data or data that is
 	   chained together in multiple M_DATA blocks. */
 	mblk_t *newp = NULL;
 
 	seldom();
 	if (dp->b_cont) {
-		/* 
-		   We have chained M_DATA blocks: pull them up. */
+		/* We have chained M_DATA blocks: pull them up. */
 		if (!pullupmsg(dp, -1)) {
-			/* 
-			   normall only fail because of dup'ed blocks */
+			/* normall only fail because of dup'ed blocks */
 			if (!(newp = msgpullup(dp, -1))) {
-				/* 
-				   normaly only fail because of no buffer */
+				/* normaly only fail because of no buffer */
 				ss7_bufcall(q, xmsgsize(dp), BPRI_MED);
 				return (-ENOBUFS);
 			}
@@ -4712,8 +4680,7 @@ n_data_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp, ulong more)
 		}
 	}
 	if (more) {
-		/* 
-		   We have a partial delivery.  Chain normal message together.  We might have a
+		/* We have a partial delivery.  Chain normal message together.  We might have a
 		   problem with messages split over multiple streams? Treat normal and expedited
 		   separately. */
 		if (sl->rbuf)
@@ -4774,8 +4741,7 @@ n_data_ind(queue_t *q, struct sl *sl, mblk_t *mp)
 STATIC int
 n_exdata_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp)
 {
-	/* 
-	   Normally we receive data unfragmented and in a singled M_DATA block.  This slower
+	/* Normally we receive data unfragmented and in a singled M_DATA block.  This slower
 	   routine handles the circumstance where we receive fragmented data or data that is
 	   chained together in multiple M_DATA blocks. */
 	int err;
@@ -4783,14 +4749,11 @@ n_exdata_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp)
 
 	seldom();
 	if (dp->b_cont) {
-		/* 
-		   We have chained M_DATA blocks: pull them up. */
+		/* We have chained M_DATA blocks: pull them up. */
 		if (!pullupmsg(dp, -1)) {
-			/* 
-			   normall only fail because of dup'ed blocks */
+			/* normall only fail because of dup'ed blocks */
 			if (!(newp = msgpullup(dp, -1))) {
-				/* 
-				   normaly only fail because of no buffer */
+				/* normaly only fail because of no buffer */
 				ss7_bufcall(q, xmsgsize(dp), BPRI_MED);
 				return (-ENOBUFS);
 			}
@@ -6108,8 +6071,7 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	ulong oldstate = sl->i_state;
 
-	/* 
-	   Fast Path */
+	/* Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == SL_PDU_REQ) {
 		printd(("%s: %p: -> SL_PDU_REQ\n", MOD_NAME, sl));
 		if ((rtn = sl_pdu_req(q, sl, mp)) < 0)
@@ -6317,8 +6279,7 @@ sl_r_data(queue_t *q, mblk_t *mp)
 STATIC INLINE streamscall int
 sl_r_prim(queue_t *q, mblk_t *mp)
 {
-	/* 
-	   Fast Path */
+	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sl_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -6335,8 +6296,7 @@ sl_r_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE streamscall int
 sl_w_prim(queue_t *q, mblk_t *mp)
 {
-	/* 
-	   Fast Path */
+	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sl_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -6416,12 +6376,10 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->prev = slp;
 		*slp = sl_get(sl);
 		printd(("%s: %p: linked module private structure\n", MOD_NAME, sl));
-		/* 
-		   LMI configuraiton defaults */
+		/* LMI configuraiton defaults */
 		sl->option.pvar = SS7_PVAR_ITUT_88;
 		sl->option.popt = 0;
-		/* 
-		   SDL configuration defaults */
+		/* SDL configuration defaults */
 		sl->sdl.config.ifflags = 0;
 		sl->sdl.config.iftype = SDL_TYPE_PACKET;
 		sl->sdl.config.ifrate = 10000000;
@@ -6433,10 +6391,8 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->sdl.config.ifclock = SDL_CLOCK_NONE;
 		sl->sdl.config.ifcoding = SDL_CODING_NONE;
 		sl->sdl.config.ifframing = SDL_FRAMING_NONE;
-		/* 
-		   rest zero */
-		/* 
-		   SDT configuration defaults */
+		/* rest zero */
+		/* SDT configuration defaults */
 		sl->sdt.config.Tin = 4;
 		sl->sdt.config.Tie = 1;
 		sl->sdt.config.T = 64;
@@ -6449,8 +6405,7 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->sdt.config.m = 272;
 		sl->sdt.config.b = 8;
 		sl->sdt.config.f = SDT_FLAGS_ONE;
-		/* 
-		   SL configuration defaults */
+		/* SL configuration defaults */
 		bufq_init(&sl->rb);
 		bufq_init(&sl->tb);
 		bufq_init(&sl->rtb);
@@ -6517,8 +6472,7 @@ sl_free_priv(queue_t *q)
 		sl->iq = NULL;
 		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
 		sl_put(sl);
-		/* 
-		   done, check final count */
+		/* done, check final count */
 		if (atomic_read(&sl->refcnt) != 1) {
 			printd(("%s: %s: %p: ERROR: sl lingering refereice count = %d\n",
 				MOD_NAME, __FUNCTION__, sl, atomic_read(&sl->refcnt)));
@@ -6559,32 +6513,25 @@ STATIC streamscall int
 sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	(void) crp;		/* for now */
-	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
-	if (q->q_ptr != NULL) {
-		MOD_DEC_USE_COUNT;
+	if (q->q_ptr != NULL)
 		return (0);	/* already open */
-	}
 	if (sflag == MODOPEN || WR(q)->q_next != NULL) {
 		major_t cmajor = getmajor(*devp);
 		minor_t cminor = getminor(*devp);
 		struct sl *sl;
 
 		/* test for multiple push */
-		for (sl = sl_list; sl; sl = sl->next) {
-			if (sl->u.dev.cmajor == cmajor && sl->u.dev.cminor == cminor) {
-				MOD_DEC_USE_COUNT;
+		for (sl = sl_list; sl; sl = sl->next)
+			if (sl->u.dev.cmajor == cmajor && sl->u.dev.cminor == cminor)
 				return (ENXIO);
-			}
-		}
-		if (!(sl_alloc_priv(q, &sl_list, devp, crp))) {
-			MOD_DEC_USE_COUNT;
-			return ENOMEM;
-		}
+
+		if (!(sl_alloc_priv(q, &sl_list, devp, crp)))
+			return (ENOMEM);
+
 		qprocson(q);
 		return (0);
 	}
-	MOD_DEC_USE_COUNT;
-	return EIO;
+	return (EIO);
 }
 STATIC streamscall int
 sl_close(queue_t *q, int flag, cred_t *crp)
@@ -6592,7 +6539,6 @@ sl_close(queue_t *q, int flag, cred_t *crp)
 	(void) flag;
 	(void) crp;
 	sl_free_priv(q);
-	MOD_DEC_USE_COUNT;
 	return (0);
 }
 
@@ -6622,81 +6568,29 @@ MODULE_PARM_DESC(modid, "Module ID for the M2PA-SL module. (0 for allocation.)")
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
+#ifdef LIS
+#define fmodsw _fmodsw
+#endif
 
 STATIC struct fmodsw sl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &m2pa_slinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
-
-STATIC int
-sl_register_strmod(void)
-{
-	int err;
-
-	if ((err = register_strmod(&sl_fmod)) < 0)
-		return (err);
-	return (0);
-}
-
-STATIC int
-sl_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = unregister_strmod(&sl_fmod)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-sl_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&m2pa_slinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	return (0);
-}
-
-STATIC int
-sl_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&m2pa_slinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 m2pa_slinit(void)
 {
 	int err;
 
-#ifdef MODULE
-	cmn_err(CE_NOTE, M2PA_SL_BANNER);	/* banner message */
-#else
-	cmn_err(CE_NOTE, M2PA_SL_SPLASH);	/* console splash */
-#endif
+	cmn_err(CE_NOTE, MOD_SPLASH);	/* console splash */
 	if ((err = sl_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);
 	}
-	if ((err = sl_register_strmod())) {
-		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+	if ((err = register_strmod(&sl_fmod)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, -err);
 		sl_term_caches();
 		return (err);
 	}
@@ -6710,7 +6604,7 @@ m2pa_slterminate(void)
 {
 	int err;
 
-	if ((err = sl_unregister_strmod()))
+	if ((err = unregister_strmod(&sl_fmod)) < 0)
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = sl_term_caches()))
 		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);

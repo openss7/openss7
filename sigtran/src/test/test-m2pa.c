@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -91,8 +91,18 @@
 
 static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:52 $";
 
+#include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
+
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -103,10 +113,16 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/uio.h>
+#include <time.h>
+
+#ifdef HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
+
 #include <features.h>
 #include <limits.h>
 #include <stdint.h>
-#include <sys/types.h>
 #include <endian.h>
 #include <netinet/in.h>
 
@@ -142,20 +158,63 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #endif
 #endif
 
-#define SUCCESS		 0
-#define FAILURE		 1
-#define INCONCLUSIVE	-1
-#define NOTAPPLICABLE	-2
-#define SCRIPTERROR	-3
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Configuration
+ *
+ *  -------------------------------------------------------------------------
+ */
 
-#define BUFSIZE 300
+static const char *lpkgname = "SIGnalling TRANsport";
+
+/* static const char *spkgname = "SIGTRAN"; */
+static const char *lstdname = "draft-bidulock-sigtran-m2pa-test";
+static const char *sstdname = "Q.781";
+static const char *shortname = "M2PA";
+static char devname[256] = "/dev/sctp_n";
+
+static int repeat_on_success = 0;
+static int repeat_on_failure = 0;
+static int exit_on_failure = 0;
+
+static int client_port_specified = 0;
+static int server_port_specified = 0;
+static int client_host_specified = 0;
+static int server_host_specified = 0;
+
+static int verbose = 1;
+
+static int client_exec = 0; /* execute client side */
+static int server_exec = 0; /* execute server side */
+
+static int show_msg = 0;
+static int show_acks = 0;
+static int show_timeout = 0;
+//static int show_data = 1;
+
+//static int last_prim = 0;
+//static int last_event = 0;
+static int last_errno = 0;
+static int last_retval = 0;
+
+int test_fd[3] = { 0, 0, 0 };
+
+#define BUFSIZE 32*4096
+
 // #define FFLUSH(_stream)
 #define FFLUSH(_stream) fflush((_stream))
 
-#define SHORT_WAIT   10
-#define NORMAL_WAIT  100
-#define LONG_WAIT    500
-#define MAXIMUM_WAIT 1000
+#define SHORT_WAIT	  20	// 100 // 10
+#define NORMAL_WAIT	 100	// 500 // 100
+#define LONG_WAIT	 500	// 5000 // 500
+#define LONGER_WAIT	1000	// 10000 // 5000
+#define MAXIMUM_WAIT	1000
+#define LONGEST_WAIT	5000	// 20000 // 10000
+#define TEST_DURATION	20000
+#define INFINITE_WAIT	-1
+
+static int test_duration = TEST_DURATION; /* wait on other side */
 
 #ifndef HZ
 #define HZ 100
@@ -396,9 +455,13 @@ static struct {
  */
 
 /*
- *  Timer values for tests: each timer has a low range (minus error margin) and
- *  a high range (plus error margin).
+ *  Timer values for tests: each timer has a low range (minus error margin)
+ *  and a high range (plus error margin).
  */
+
+static long timer_scale = 1;
+
+#define TEST_TIMEOUT 5000
 
 typedef struct timer_range {
 	long lo;
@@ -420,6 +483,14 @@ static timer_range_t timer[tmax] = {
 };
 
 long test_start = 0;
+
+static int state = 0;
+static const char *failure_string = NULL;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 /*
  *  Return the current time in milliseconds.
@@ -478,7 +549,7 @@ check_time(const char *t, long beg, long lo, long hi)
 		printf("****ERROR: gettimeofday\n");
 		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	i = (now.tv_sec - test_start) * 1000;
 	i += (now.tv_usec + 500L) / 1000;
@@ -487,36 +558,56 @@ check_time(const char *t, long beg, long lo, long hi)
 	    );
 	FFLUSH(stdout);
 	if (lo - 100 <= i && i <= hi + 100)
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	else
-		return FAILURE;
+		return __RESULT_FAILURE;
 }
 
 static int timer_timeout = 0;
+static int last_signum = 0;
 
 static void
-timer_handler(int signum)
+signal_handler(int signum)
 {
+	last_signum = signum;
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
 static int
-timer_sethandler(void)
+start_signals(void)
 {
 	sigset_t mask;
 	struct sigaction act;
-	act.sa_handler = timer_handler;
-	act.sa_flags = SA_RESTART | SA_ONESHOT;
-	act.sa_restorer = NULL;
+
+	act.sa_handler = signal_handler;
+//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
-		return FAILURE;
+		return __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		return __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
-	return SUCCESS;
+	siginterrupt(SIGALRM, 1);
+	siginterrupt(SIGPOLL, 1);
+	siginterrupt(SIGURG, 1);
+	siginterrupt(SIGPIPE, 1);
+	siginterrupt(SIGHUP, 1);
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -529,33 +620,69 @@ start_tt(long duration)
 		{0, 0},
 		{duration / 1000, (duration % 1000) * 1000}
 	};
-	if (timer_sethandler())
-		return FAILURE;
+
+	if (duration == (long)INFINITE_WAIT)
+		return __RESULT_SUCCESS;
+	if (start_signals())
+		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
-		return FAILURE;
+		return __RESULT_FAILURE;
 	timer_timeout = 0;
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
-/*
- *  Stop overall test timer.
- */
+#if 0
+static int
+start_st(long duration)
+{
+	long sdur = (duration + timer_scale - 1) / timer_scale;
+
+	return start_tt(sdur);
+}
+#endif
+
+static int
+stop_signals(void)
+{
+	int result = __RESULT_SUCCESS;
+	sigset_t mask;
+	struct sigaction act;
+
+	act.sa_handler = SIG_DFL;
+	act.sa_flags = 0;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(SIGALRM, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		result = __RESULT_FAILURE;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
+	return (result);
+}
+
 static int
 stop_tt(void)
 {
-	sigset_t mask;
-	struct sigaction act;
-	act.sa_handler = SIG_DFL;
-	act.sa_flags = 0;
-	act.sa_restorer = NULL;
-	sigemptyset(&act.sa_mask);
-	if (sigaction(SIGALRM, &act, NULL))
-		return FAILURE;
+	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
+
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	if (stop_signals() != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
 	timer_timeout = 0;
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGALRM);
-	sigprocmask(SIG_BLOCK, &mask, NULL);
-	return SUCCESS;
+	return (result);
 }
 
 /*
@@ -894,7 +1021,7 @@ send(int msg)
 		ptconf.qos_data.sid = 1;
 		goto pt_status_putmsg;
 #else
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #endif
 	case PROCESSOR_OUTAGE:
 		if (!cntmsg)
@@ -934,17 +1061,17 @@ send(int msg)
 		goto pt_status_putmsg;
 	case COUNT:
 		printf("           Ct = %5d    ----------------->                         \n", count);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case TRIES:
 		printf("       %5d iterations  ----------------->                         \n", tries);
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case ETC:
 		printf("                    .    ----------------->                         \n");
 		printf("                    .    ----------------->                         \n");
 		printf("                    .    ----------------->                         \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case INVALID_STATUS:
 		if (!cntmsg)
 			pt_printf("[INVALID-STATUS]", "");
@@ -965,9 +1092,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
 		data.len = 4 * sizeof(uint32_t);
@@ -984,9 +1111,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 		data.len = 5 * sizeof(uint32_t);
@@ -1003,9 +1130,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
 		data.len = 3 * sizeof(uint32_t);
@@ -1020,11 +1147,11 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
-		return FAILURE;
+		return __RESULT_FAILURE;
 #endif
 #endif
 #endif
@@ -1059,9 +1186,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
 		pt_fsn++;
@@ -1085,9 +1212,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 		pt_fsn++;
@@ -1111,17 +1238,17 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
-		return FAILURE;
+		return __RESULT_FAILURE;
 #endif
 #endif
 #endif
 	case BAD_ACK:
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
-		return INCONCLUSIVE;
+		return __RESULT_INCONCLUSIVE;
 #else
 		pt_fsn = 0xffff;
 		goto pt_ack_putmsg;
@@ -1141,9 +1268,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT4_1)
 	      pt_ack_putmsg:
@@ -1162,9 +1289,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT4_9)
 	      pt_ack_putmsg:
@@ -1183,9 +1310,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)
 	      pt_ack_putmsg:
@@ -1204,9 +1331,9 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
 #if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 	      pt_ack_putmsg:
@@ -1226,11 +1353,11 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 #else
-		return INCONCLUSIVE;
+		return __RESULT_INCONCLUSIVE;
 #endif
 #endif
 #endif
@@ -1239,43 +1366,43 @@ send(int msg)
 	case STOP:
 		printf("                  :stop                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case POWER_ON:
 		printf("              :power on                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case LPO:
 		printf("               :set lpo                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case LPR:
 		printf("             :clear lpo                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case EMERG:
 		printf("             :set emerg                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case CEASE:
 		printf("           :clear emerg                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case CONG_A:
 		printf("        :make congested                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case CONG_D:
 		printf("        :make congested                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case NO_CONG:
 		printf("       :clear congested                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case START:
 		printf("                 :start                                             \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case TX_BREAK:
 		printf("              :tx break                                             \n");
 		FFLUSH(stdout);
@@ -1287,19 +1414,19 @@ send(int msg)
 		ctrl.len = sizeof(N_discon_req_t);
 		goto pt_control_putmsg;
 	case TX_MAKE:
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case ENABLE_REQ:
 		if (verbose > 1) {
 			printf("                :enable                                             \n");
 			FFLUSH(stdout);
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case DISABLE_REQ:
 		if (verbose > 1) {
 			printf("               :disable                                             \n");
 			FFLUSH(stdout);
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case DISCON_REQ:
 		printf("            :disconnect                                             \n");
 		FFLUSH(stdout);
@@ -1342,15 +1469,15 @@ send(int msg)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	default:
 		if (verbose > 1 || !cntmsg) {
 			printf("              :????????                                             \n");
 			FFLUSH(stdout);
 		}
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 }
 
@@ -1451,23 +1578,23 @@ signal(int action)
 		if (putmsg(iut_fd, &ctrl, NULL, RS_HIPRI) < 0) {
 			printf("                                  ****ERROR: putmsg failed!\n");
 			printf("                                             %s: %s\n", __FUNCTION__, strerror(errno));
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case COUNT:
 		printf("                                                     Ct=%5d       \n", count);
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case TRIES:
 		printf("                                                     %4d iterations\n", tries);
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case ETC:
 		printf("                                                     .              \n");
 		printf("                                                     .              \n");
 		printf("                                                     .              \n");
 		FFLUSH(stdout);
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case SEND_MSU:
 		if (!cntact) {
 			printf("                                             :msu                   \n");
@@ -1484,9 +1611,9 @@ signal(int action)
 			printf("                                  ****ERROR: putmsg failed!\n");
 			printf("                                             %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case ENABLE_REQ:
 		if (verbose > 1) {
 			printf("                                             :enable                \n");
@@ -1508,9 +1635,9 @@ signal(int action)
 			printf("                                  ****ERROR: putmsg failed!\n");
 			printf("                                             %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	case CONN_REQ:
 		printf("                                             :connect               \n");
 		FFLUSH(stdout);
@@ -1567,15 +1694,15 @@ signal(int action)
 			printf("                                  ****ERROR: putmsg failed!\n");
 			printf("                                             %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	default:
 		if (!cntact) {
 			printf("                                             <????????              \n");
 			FFLUSH(stdout);
 		}
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 }
 
@@ -1650,17 +1777,17 @@ control(int prim)
 			printf("****ERROR: putmsg failed!\n");
 			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 			FFLUSH(stdout);
-			return FAILURE;
+			return __RESULT_FAILURE;
 		}
-		return SUCCESS;
+		return __RESULT_SUCCESS;
 	default:
 		if (!cntmgm) {
 			printf("              >???????? |                        \n");
 			FFLUSH(stdout);
 		}
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -1794,7 +1921,7 @@ pt_decode_data(void)
 		ret = DATA;
 		break;
 	default:
-		ret = FAILURE;
+		ret = __RESULT_FAILURE;
 		break;
 	}
 
@@ -2623,6 +2750,15 @@ get_event(void)
  *
  *  =========================================================================
  */
+
+struct test_stream {
+	int (*preamble) (int);		/* test preamble */
+	int (*testcase) (int);		/* test case */
+	int (*postamble) (int);		/* test postamble */
+};
+
+static const char sref_none[] = "(none)";
+
 #if 0
 static int
 check_snibs(unsigned char bsnib, unsigned char fsnib)
@@ -2630,11 +2766,12 @@ check_snibs(unsigned char bsnib, unsigned char fsnib)
 	printf("                 check b/f sn/ib:  ---> (%02x/%02x)\n", bsnib, fsnib);
 	FFLUSH(stdout);
 	if ((iut_bib | iut_bsn) == bsnib && (iut_fib | iut_fsn) == fsnib)
-		return SUCCESS;
-	return FAILURE;
+		return __RESULT_SUCCESS;
+	return __RESULT_FAILURE;
 }
 #endif
 
+#define numb_case_1_1a "1.1(a)"
 #define desc_case_1_1a "\
 Link State Control - Expected signal units/orders\n\
 Initialization (Power-up)"
@@ -2652,17 +2789,18 @@ test_case_1_1a(void)
 		case 1:
 			switch ((event = get_event())) {
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_1b "1.1(b)"
 #define desc_case_1_1b "\
 Link State Control - Expected signal units/orders\n\
 Initialization (Power-up)"
@@ -2677,17 +2815,18 @@ test_case_1_1b(void)
 			case NO_MSG:
 				send(POWER_ON);
 				send(OUT_OF_SERVICE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_2 "1.2"
 #define desc_case_1_2 "\
 Link State Control - Expected signal units/orders\n\
 Timer T2"
@@ -2705,7 +2844,7 @@ test_case_1_2(void)
 				state = 1;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 1:
@@ -2718,7 +2857,7 @@ test_case_1_2(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -2728,15 +2867,16 @@ test_case_1_2(void)
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T2  ", beg_time, timer[t2].lo, timer[t2].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_3 "1.3"
 #define desc_case_1_3 "\
 Link State Control - Expected signal units/orders\n\
 Timer T3"
@@ -2757,7 +2897,7 @@ test_case_1_3(void)
 				state = 2;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 2:
@@ -2768,7 +2908,7 @@ test_case_1_3(void)
 				state = 3;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 3:
@@ -2779,7 +2919,7 @@ test_case_1_3(void)
 				state = 4;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 4:
@@ -2789,15 +2929,16 @@ test_case_1_3(void)
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T3  ", beg_time, timer[t3].lo, timer[t3].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_4 "1.4"
 #define desc_case_1_4 "\
 Link State Control - Expected signal units/orders\n\
 Timer T1 & Timer T4 (Normal)"
@@ -2818,7 +2959,7 @@ test_case_1_4(void)
 				state = 2;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 2:
@@ -2831,7 +2972,7 @@ test_case_1_4(void)
 				state = 3;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 3:
@@ -2842,7 +2983,7 @@ test_case_1_4(void)
 				state = 4;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 4:
@@ -2859,14 +3000,14 @@ test_case_1_4(void)
 			case IN_SERVICE:
 				expand = 1;
 				if (check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
-					return FAILURE;
+					return __RESULT_FAILURE;
 				start_tt(iutconf.sl.t1 * 20);
 				beg_time = milliseconds(t1);
 				state = 5;
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -2876,11 +3017,11 @@ test_case_1_4(void)
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -2904,7 +3045,7 @@ test_case_1_5a(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -2916,7 +3057,7 @@ test_case_1_5a(int proving)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -2928,7 +3069,7 @@ test_case_1_5a(int proving)
 					break;
 				}
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			case IN_SERVICE:
 				expand = 1;
 				send(IN_SERVICE);
@@ -2937,7 +3078,7 @@ test_case_1_5a(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -2945,13 +3086,13 @@ test_case_1_5a(int proving)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -2975,7 +3116,7 @@ test_case_1_5b(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -2987,7 +3128,7 @@ test_case_1_5b(int proving)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -2999,7 +3140,7 @@ test_case_1_5b(int proving)
 					break;
 				}
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			case IN_SERVICE:
 				expand = 1;
 				send(IN_SERVICE);
@@ -3008,7 +3149,7 @@ test_case_1_5b(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -3016,17 +3157,18 @@ test_case_1_5b(int proving)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_5a_p "1.5(a)"
 #define desc_case_1_5a_p "\
 Link State Control = Expected signal units/orders\n\
 Normal alignment procedure\n\
@@ -3039,6 +3181,7 @@ test_case_1_5a_p(void)
 	return test_case_1_5a(1);
 }
 
+#define numb_case_1_5b_p "1.5(b)"
 #define desc_case_1_5b_p "\
 Link State Control = Expected signal units/orders\n\
 Normal alignment procedure\n\
@@ -3051,6 +3194,7 @@ test_case_1_5b_p(void)
 	return test_case_1_5b(1);
 }
 
+#define numb_case_1_5a_np "1.5(a)np"
 #define desc_case_1_5a_np "\
 Link State Control = Expected signal units/orders\n\
 Normal alignment procedure\n\
@@ -3063,6 +3207,7 @@ test_case_1_5a_np(void)
 	return test_case_1_5a(0);
 }
 
+#define numb_case_1_5b_np "1.5(b)np"
 #define desc_case_1_5b_np "\
 Link State Control = Expected signal units/orders\n\
 Normal alignment procedure\n\
@@ -3093,7 +3238,7 @@ test_case_1_6(int proving)
 				state = 1;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 1:
@@ -3108,7 +3253,7 @@ test_case_1_6(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -3119,7 +3264,7 @@ test_case_1_6(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -3130,14 +3275,14 @@ test_case_1_6(int proving)
 					send(PROVING);
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
 					send(PROVING_NORMAL);
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -3147,7 +3292,7 @@ test_case_1_6(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -3157,17 +3302,18 @@ test_case_1_6(int proving)
 			case IUT_DATA:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_6_p "1.6"
 #define desc_case_1_6_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment procedure = correct procedure (MSU)\n\
@@ -3179,6 +3325,7 @@ test_case_1_6_p(void)
 	return test_case_1_6(1);
 }
 
+#define numb_case_1_6_np "1.6np"
 #define desc_case_1_6_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment procedure = correct procedure (MSU)\n\
@@ -3190,6 +3337,7 @@ test_case_1_6_np(void)
 	return test_case_1_6(0);
 }
 
+#define numb_case_1_7 "1.7"
 #define desc_case_1_7 "\
 Link State Control - Expected signal units/orders\n\
 SIO received during normal proving period\
@@ -3208,7 +3356,7 @@ test_case_1_7(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -3221,7 +3369,7 @@ test_case_1_7(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -3232,7 +3380,7 @@ test_case_1_7(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -3257,7 +3405,7 @@ test_case_1_7(void)
 				state = 4;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -3278,11 +3426,11 @@ test_case_1_7(void)
 				return check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi);
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -3307,7 +3455,7 @@ test_case_1_8a(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -3322,7 +3470,7 @@ test_case_1_8a(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -3333,7 +3481,7 @@ test_case_1_8a(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -3348,7 +3496,7 @@ test_case_1_8a(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -3356,7 +3504,7 @@ test_case_1_8a(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -3366,7 +3514,7 @@ test_case_1_8a(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -3375,13 +3523,13 @@ test_case_1_8a(int proving)
 			case IUT_RPR:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -3407,7 +3555,7 @@ test_case_1_8b(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -3421,7 +3569,7 @@ test_case_1_8b(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -3432,7 +3580,7 @@ test_case_1_8b(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -3444,7 +3592,7 @@ test_case_1_8b(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -3452,7 +3600,7 @@ test_case_1_8b(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -3462,7 +3610,7 @@ test_case_1_8b(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -3470,17 +3618,18 @@ test_case_1_8b(int proving)
 			case IUT_RPO:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_8a_p "1.8(a)"
 #define desc_case_1_8a_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (FISU)\n\
@@ -3493,6 +3642,7 @@ test_case_1_8a_p(void)
 	return test_case_1_8a(1);
 }
 
+#define numb_case_1_8b_p "1.8(b)"
 #define desc_case_1_8b_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (FISU)\n\
@@ -3505,6 +3655,7 @@ test_case_1_8b_p(void)
 	return test_case_1_8b(1);
 }
 
+#define numb_case_1_8a_np "1.8(a)np"
 #define desc_case_1_8a_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (FISU)\n\
@@ -3517,6 +3668,7 @@ test_case_1_8a_np(void)
 	return test_case_1_8a(0);
 }
 
+#define numb_case_1_8b_np "1.8(b)np"
 #define desc_case_1_8b_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (FISU)\n\
@@ -3549,7 +3701,7 @@ test_case_1_9a(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -3563,7 +3715,7 @@ test_case_1_9a(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -3574,7 +3726,7 @@ test_case_1_9a(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -3586,7 +3738,7 @@ test_case_1_9a(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -3594,7 +3746,7 @@ test_case_1_9a(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -3604,7 +3756,7 @@ test_case_1_9a(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -3613,13 +3765,13 @@ test_case_1_9a(int proving)
 			case IUT_RPR:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -3645,7 +3797,7 @@ test_case_1_9b(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -3659,7 +3811,7 @@ test_case_1_9b(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -3671,7 +3823,7 @@ test_case_1_9b(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -3685,7 +3837,7 @@ test_case_1_9b(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 			case TIMEOUT:
 			case IN_SERVICE:
 			case DATA:
@@ -3696,7 +3848,7 @@ test_case_1_9b(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -3707,17 +3859,18 @@ test_case_1_9b(int proving)
 				send(PROCESSOR_OUTAGE);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_9a_p "1.9(a)"
 #define desc_case_1_9a_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (MSU)\n\
@@ -3730,6 +3883,7 @@ test_case_1_9a_p(void)
 	return test_case_1_9a(1);
 }
 
+#define numb_case_1_9b_p "1.9(b)"
 #define desc_case_1_9b_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (MSU)\n\
@@ -3742,6 +3896,7 @@ test_case_1_9b_p(void)
 	return test_case_1_9b(1);
 }
 
+#define numb_case_1_9a_np "1.9(a)np"
 #define desc_case_1_9a_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (MSU)\n\
@@ -3754,6 +3909,7 @@ test_case_1_9a_np(void)
 	return test_case_1_9a(0);
 }
 
+#define numb_case_1_9b_np "1.9(b)np"
 #define desc_case_1_9b_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (MSU)\n\
@@ -3786,7 +3942,7 @@ test_case_1_10(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -3801,7 +3957,7 @@ test_case_1_10(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -3812,7 +3968,7 @@ test_case_1_10(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 		case 3:
 			switch ((event = get_event())) {
@@ -3823,7 +3979,7 @@ test_case_1_10(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -3831,7 +3987,7 @@ test_case_1_10(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -3841,7 +3997,7 @@ test_case_1_10(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -3849,17 +4005,18 @@ test_case_1_10(int proving)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_10_p "1.10"
 #define desc_case_1_10_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set and cleared\n\
@@ -3871,6 +4028,7 @@ test_case_1_10_p(void)
 	return test_case_1_10(1);
 }
 
+#define numb_case_1_10_np "1.10np"
 #define desc_case_1_10_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set and cleared\n\
@@ -3902,7 +4060,7 @@ test_case_1_11(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -3917,7 +4075,7 @@ test_case_1_11(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -3928,7 +4086,7 @@ test_case_1_11(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -3939,7 +4097,7 @@ test_case_1_11(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 			case PROCESSOR_OUTAGE:
 				expand = 1;
 				send(PROCESSOR_OUTAGE);
@@ -3948,7 +4106,7 @@ test_case_1_11(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -3956,17 +4114,18 @@ test_case_1_11(int proving)
 			case IUT_RPO:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_11_p "1.11"
 #define desc_case_1_11_p "\
 Link State Control - Expected signal units/orders\n\
 Set RPO when \"Aligned not ready\"\n\
@@ -3978,6 +4137,7 @@ test_case_1_11_p(void)
 	return test_case_1_11(1);
 }
 
+#define numb_case_1_11_np "1.11np"
 #define desc_case_1_11_np "\
 Link State Control - Expected signal units/orders\n\
 Set RPO when \"Aligned not ready\"\n\
@@ -4009,7 +4169,7 @@ test_case_1_12a(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4024,7 +4184,7 @@ test_case_1_12a(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4035,7 +4195,7 @@ test_case_1_12a(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4047,7 +4207,7 @@ test_case_1_12a(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -4055,7 +4215,7 @@ test_case_1_12a(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -4066,7 +4226,7 @@ test_case_1_12a(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -4076,17 +4236,18 @@ test_case_1_12a(int proving)
 			case OUT_OF_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_12a_p "1.12(a)"
 #define desc_case_1_12a_p "\
 Link State Control - Expected signal units/orders\n\
 SIOS received when \"Aligned not ready\"\n\
@@ -4099,6 +4260,7 @@ test_case_1_12a_p(void)
 	return test_case_1_12a(1);
 }
 
+#define numb_case_1_12a_np "1.12(a)np"
 #define desc_case_1_12a_np "\
 Link State Control - Expected signal units/orders\n\
 SIOS received when \"Aligned not ready\"\n\
@@ -4132,7 +4294,7 @@ test_case_1_12b(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4147,7 +4309,7 @@ test_case_1_12b(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4158,7 +4320,7 @@ test_case_1_12b(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4170,7 +4332,7 @@ test_case_1_12b(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -4178,7 +4340,7 @@ test_case_1_12b(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -4189,7 +4351,7 @@ test_case_1_12b(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -4200,17 +4362,18 @@ test_case_1_12b(int proving)
 				send(OUT_OF_SERVICE);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_12b_p "1.12(b)"
 #define desc_case_1_12b_p "\
 Link State Control - Expected signal units/orders\n\
 SIOS received when \"Aligned not ready\"\n\
@@ -4223,6 +4386,7 @@ test_case_1_12b_p(void)
 	return test_case_1_12b(1);
 }
 
+#define numb_case_1_12b_np "1.12(b)np"
 #define desc_case_1_12b_np "\
 Link State Control - Expected signal units/orders\n\
 SIOS received when \"Aligned not ready\"\n\
@@ -4254,7 +4418,7 @@ test_case_1_13(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4269,7 +4433,7 @@ test_case_1_13(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4280,7 +4444,7 @@ test_case_1_13(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4292,7 +4456,7 @@ test_case_1_13(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -4300,7 +4464,7 @@ test_case_1_13(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -4310,7 +4474,7 @@ test_case_1_13(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -4324,17 +4488,18 @@ test_case_1_13(int proving)
 				send(OUT_OF_SERVICE);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_13_p "1.13"
 #define desc_case_1_13_p "\
 Link State Control - Expected signal units/orders\n\
 SIO received when \"Aligned not ready\"\n\
@@ -4346,6 +4511,7 @@ test_case_1_13_p(void)
 	return test_case_1_13(1);
 }
 
+#define numb_case_1_13_np "1.13np"
 #define desc_case_1_13_np "\
 Link State Control - Expected signal units/orders\n\
 SIO received when \"Aligned not ready\"\n\
@@ -4357,6 +4523,7 @@ test_case_1_13_np(void)
 	return test_case_1_13(0);
 }
 
+#define numb_case_1_14 "1.14"
 #define desc_case_1_14 "\
 Link State Control - Expected signal units/orders\n\
 Set and clear LPO when \"Initial alignment\"\
@@ -4375,7 +4542,7 @@ test_case_1_14(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4387,7 +4554,7 @@ test_case_1_14(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4400,7 +4567,7 @@ test_case_1_14(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4424,7 +4591,7 @@ test_case_1_14(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -4448,14 +4615,14 @@ test_case_1_14(void)
 				break;
 			case TIMEOUT:
 				expand = 1;
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -4478,7 +4645,7 @@ test_case_1_15(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4493,7 +4660,7 @@ test_case_1_15(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4504,7 +4671,7 @@ test_case_1_15(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4516,7 +4683,7 @@ test_case_1_15(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -4524,7 +4691,7 @@ test_case_1_15(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -4535,7 +4702,7 @@ test_case_1_15(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -4548,7 +4715,7 @@ test_case_1_15(int proving)
 				state = 5;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -4562,24 +4729,25 @@ test_case_1_15(int proving)
 				state = 6;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 6:
 			switch ((event = get_event())) {
 			case PROCESSOR_ENDED:
 				send(SEQUENCE_SYNC);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_15_p "1.15"
 #define desc_case_1_15_p "\
 Link State Control - Expected signal units/orders\n\
 Set and clear LPO when \"Aligned ready\"\n\
@@ -4591,6 +4759,7 @@ test_case_1_15_p(void)
 	return test_case_1_15(1);
 }
 
+#define numb_case_1_15_np "1.15np"
 #define desc_case_1_15_np "\
 Link State Control - Expected signal units/orders\n\
 Set and clear LPO when \"Aligned ready\"\n\
@@ -4621,7 +4790,7 @@ test_case_1_16(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4636,7 +4805,7 @@ test_case_1_16(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4647,7 +4816,7 @@ test_case_1_16(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4659,7 +4828,7 @@ test_case_1_16(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -4667,7 +4836,7 @@ test_case_1_16(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -4677,7 +4846,7 @@ test_case_1_16(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -4689,15 +4858,16 @@ test_case_1_16(int proving)
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_16_p "1.16"
 #define desc_case_1_16_p "\
 Link State Control - Expected signal units/orders\n\
 Timer T1 in \"Aligned not ready\" state\n\
@@ -4709,6 +4879,7 @@ test_case_1_16_p(void)
 	return test_case_1_16(1);
 }
 
+#define numb_case_1_16_np "1.16np"
 #define desc_case_1_16_np "\
 Link State Control - Expected signal units/orders\n\
 Timer T1 in \"Aligned not ready\" state\n\
@@ -4720,6 +4891,7 @@ test_case_1_16_np(void)
 	return test_case_1_16(0);
 }
 
+#define numb_case_1_17 "1.17"
 #define desc_case_1_17 "\
 Link State Control - Expected signal units/orders\n\
 No SIO sent during normal proving period\
@@ -4738,7 +4910,7 @@ test_case_1_17(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4750,7 +4922,7 @@ test_case_1_17(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4761,7 +4933,7 @@ test_case_1_17(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4782,15 +4954,16 @@ test_case_1_17(void)
 				return check_time("T3,4", beg_time, timer[t4n].lo, timer[t3].hi + timer[t4n].hi);
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_18 "1.18"
 #define desc_case_1_18 "\
 Link State Control - Expected signal units/orders\n\
 Set and cease emergency prior to \"start alignment\"\
@@ -4811,7 +4984,7 @@ test_case_1_18(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4823,7 +4996,7 @@ test_case_1_18(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4835,7 +5008,7 @@ test_case_1_18(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4856,15 +5029,16 @@ test_case_1_18(void)
 				return check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi);
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_19 "1.19"
 #define desc_case_1_19 "\
 Link State Control - Expected signal units/orders\n\
 Set emergency while in \"not aligned state\"\
@@ -4883,7 +5057,7 @@ test_case_1_19(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4896,7 +5070,7 @@ test_case_1_19(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4908,7 +5082,7 @@ test_case_1_19(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -4929,15 +5103,16 @@ test_case_1_19(void)
 				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_20 "1.20"
 #define desc_case_1_20 "\
 Link State Control - Expected signal units/orders\n\
 Set emergency when \"aligned\"\
@@ -4956,7 +5131,7 @@ test_case_1_20(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -4968,7 +5143,7 @@ test_case_1_20(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -4980,7 +5155,7 @@ test_case_1_20(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -5004,7 +5179,7 @@ test_case_1_20(void)
 				break;
 #endif
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -5025,15 +5200,16 @@ test_case_1_20(void)
 				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_21 "1.21"
 #define desc_case_1_21 "\
 Link State Control - Expected signal units/orders\n\
 Both ends set emergency.\
@@ -5053,7 +5229,7 @@ test_case_1_21(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -5065,7 +5241,7 @@ test_case_1_21(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5077,7 +5253,7 @@ test_case_1_21(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -5098,15 +5274,16 @@ test_case_1_21(void)
 				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_22 "1.22"
 #define desc_case_1_22 "\
 Link State Control - Expected signal units/orders\n\
 Individual end sets emergency\
@@ -5129,7 +5306,7 @@ test_case_1_22(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -5140,7 +5317,7 @@ test_case_1_22(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5151,7 +5328,7 @@ test_case_1_22(void)
 				expand = 0;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -5172,15 +5349,16 @@ test_case_1_22(void)
 				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_23 "1.23"
 #define desc_case_1_23 "\
 Link State Control - Expected signal units/orders\n\
 Set emergency during normal proving\
@@ -5199,7 +5377,7 @@ test_case_1_23(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -5211,7 +5389,7 @@ test_case_1_23(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5224,7 +5402,7 @@ test_case_1_23(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -5246,7 +5424,7 @@ test_case_1_23(void)
 				expand = 0;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -5267,15 +5445,16 @@ test_case_1_23(void)
 				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_24 "1.24"
 #define desc_case_1_24 "\
 Link State Control - Expected signal units/orders\n\
 No SIO send during emergency alignment\
@@ -5295,7 +5474,7 @@ test_case_1_24(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -5308,7 +5487,7 @@ test_case_1_24(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5319,7 +5498,7 @@ test_case_1_24(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -5339,15 +5518,16 @@ test_case_1_24(void)
 				expand = 1;
 				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_25 "1.25"
 #define desc_case_1_25 "\
 Link State Control - Expected signal units/orders\n\
 Deactivation duing intial alignment\
@@ -5366,7 +5546,7 @@ test_case_1_25(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -5377,7 +5557,7 @@ test_case_1_25(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5392,23 +5572,24 @@ test_case_1_25(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_26 "1.26"
 #define desc_case_1_26 "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during aligned state\
@@ -5427,7 +5608,7 @@ test_case_1_26(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -5439,7 +5620,7 @@ test_case_1_26(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5455,19 +5636,19 @@ test_case_1_26(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -5491,7 +5672,7 @@ test_case_1_27(int proving)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -5506,7 +5687,7 @@ test_case_1_27(int proving)
 					state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5517,7 +5698,7 @@ test_case_1_27(int proving)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -5529,7 +5710,7 @@ test_case_1_27(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #else
 			case PROVING_NORMAL:
 				if (proving) {
@@ -5537,7 +5718,7 @@ test_case_1_27(int proving)
 					expand = 0;
 					break;
 				}
-				return FAILURE;
+				return __RESULT_FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -5546,23 +5727,24 @@ test_case_1_27(int proving)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
 			switch ((event = get_event())) {
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_27_p "1.27"
 #define desc_case_1_27_p "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during aligned not ready\n\
@@ -5574,6 +5756,7 @@ test_case_1_27_p(void)
 	return test_case_1_27(1);
 }
 
+#define numb_case_1_27_np "1.27np"
 #define desc_case_1_27_np "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during aligned not ready\n\
@@ -5585,6 +5768,7 @@ test_case_1_27_np(void)
 	return test_case_1_27(0);
 }
 
+#define numb_case_1_28 "1.28"
 #define desc_case_1_28 "\
 Link State Control - Expected signal units/orders\n\
 SIO received during link in service\
@@ -5603,17 +5787,18 @@ test_case_1_28(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_29a "1.29(a)"
 #define desc_case_1_29a "\
 Link State Control - Expected signal units/orders\n\
 SIO received during link in service\n\
@@ -5634,17 +5819,18 @@ test_case_1_29a(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_29b "1.29(b)"
 #define desc_case_1_29b "\
 Link State Control - Expected signal units/orders\n\
 SIO received during link in service\n\
@@ -5663,17 +5849,18 @@ test_case_1_29b(void)
 			switch ((event = get_event())) {
 			case OUT_OF_SERVICE:
 				send(OUT_OF_SERVICE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_30a "1.30(a)"
 #define desc_case_1_30a "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during LPO\n\
@@ -5697,7 +5884,7 @@ test_case_1_30a(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5705,17 +5892,18 @@ test_case_1_30a(void)
 			case IUT_RPR:
 				break;	/* stupid ITU-T SDLs */
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_30b "1.30(b)"
 #define desc_case_1_30b "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during LPO\n\
@@ -5739,7 +5927,7 @@ test_case_1_30b(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5749,17 +5937,18 @@ test_case_1_30b(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_31a "1.31(a)"
 #define desc_case_1_31a "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during RPO\n\
@@ -5780,17 +5969,18 @@ test_case_1_31a(void)
 			case IUT_RPO:
 				break;
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_31b "1.31(b)"
 #define desc_case_1_31b "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during RPO\n\
@@ -5812,19 +6002,20 @@ test_case_1_31b(void)
 			case PROCESSOR_OUTAGE:
 				send(STOP);
 				send(OUT_OF_SERVICE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			case IUT_RPR:
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_32a "1.32(a)"
 #define desc_case_1_32a "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during the proving period\n\
@@ -5844,7 +6035,7 @@ test_case_1_32a(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -5856,7 +6047,7 @@ test_case_1_32a(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5868,7 +6059,7 @@ test_case_1_32a(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -5893,7 +6084,7 @@ test_case_1_32a(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -5911,18 +6102,19 @@ test_case_1_32a(void)
 				break;
 			case IUT_OUT_OF_SERVICE:
 				expand = 1;
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_32b "1.32(b)"
 #define desc_case_1_32b "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during the proving period\n\
@@ -5951,7 +6143,7 @@ test_case_1_32b(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -5962,7 +6154,7 @@ test_case_1_32b(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -5986,7 +6178,7 @@ test_case_1_32b(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6005,18 +6197,19 @@ test_case_1_32b(void)
 			case OUT_OF_SERVICE:
 				expand = 1;
 				send(OUT_OF_SERVICE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_33 "1.33"
 #define desc_case_1_33 "\
 Link State Control - Expected signal units/orders\n\
 SIO received instead of FISUs\
@@ -6035,7 +6228,7 @@ test_case_1_33(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6047,7 +6240,7 @@ test_case_1_33(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6058,7 +6251,7 @@ test_case_1_33(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6081,7 +6274,7 @@ test_case_1_33(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6089,17 +6282,18 @@ test_case_1_33(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_34 "1.34"
 #define desc_case_1_34 "\
 Link State Control - Expected signal units/orders\n\
 SIO received instead of FISUs\
@@ -6118,7 +6312,7 @@ test_case_1_34(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6130,7 +6324,7 @@ test_case_1_34(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6141,7 +6335,7 @@ test_case_1_34(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6165,7 +6359,7 @@ test_case_1_34(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6173,17 +6367,18 @@ test_case_1_34(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_1_35 "1.35"
 #define desc_case_1_35 "\
 Link State Control - Expected signal units/orders\n\
 SIPO received instead of FISUs\
@@ -6202,7 +6397,7 @@ test_case_1_35(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6214,7 +6409,7 @@ test_case_1_35(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6225,7 +6420,7 @@ test_case_1_35(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6249,7 +6444,7 @@ test_case_1_35(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6257,17 +6452,18 @@ test_case_1_35(void)
 			case IUT_RPO:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_2_1 "2.1"
 #define desc_case_2_1 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Out of service\" state\
@@ -6300,7 +6496,7 @@ test_case_2_1(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6311,7 +6507,7 @@ test_case_2_1(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6322,7 +6518,7 @@ test_case_2_1(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6345,7 +6541,7 @@ test_case_2_1(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6353,17 +6549,18 @@ test_case_2_1(void)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_2_2 "2.2"
 #define desc_case_2_2 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Not Aligned\" state\
@@ -6382,7 +6579,7 @@ test_case_2_2(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6406,7 +6603,7 @@ test_case_2_2(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6417,7 +6614,7 @@ test_case_2_2(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6440,7 +6637,7 @@ test_case_2_2(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6448,17 +6645,18 @@ test_case_2_2(void)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_2_3 "2.3"
 #define desc_case_2_3 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Aligned\" state\
@@ -6477,7 +6675,7 @@ test_case_2_3(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6489,7 +6687,7 @@ test_case_2_3(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6515,7 +6713,7 @@ test_case_2_3(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6538,7 +6736,7 @@ test_case_2_3(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6546,17 +6744,18 @@ test_case_2_3(void)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_2_4 "2.4"
 #define desc_case_2_4 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Proving\" state\
@@ -6575,7 +6774,7 @@ test_case_2_4(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6587,7 +6786,7 @@ test_case_2_4(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6610,7 +6809,7 @@ test_case_2_4(void)
 				expand = 0;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6633,7 +6832,7 @@ test_case_2_4(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6641,17 +6840,18 @@ test_case_2_4(void)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_2_5 "2.5"
 #define desc_case_2_5 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Aligned Ready\" state\
@@ -6670,7 +6870,7 @@ test_case_2_5(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6682,7 +6882,7 @@ test_case_2_5(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6693,7 +6893,7 @@ test_case_2_5(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6722,7 +6922,7 @@ test_case_2_5(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6730,17 +6930,18 @@ test_case_2_5(void)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_2_6 "2.6"
 #define desc_case_2_6 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Aligned Not Ready\" state\
@@ -6760,7 +6961,7 @@ test_case_2_6(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6772,7 +6973,7 @@ test_case_2_6(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6783,7 +6984,7 @@ test_case_2_6(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6813,7 +7014,7 @@ test_case_2_6(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6822,17 +7023,18 @@ test_case_2_6(void)
 			case IUT_RPR:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_2_7 "2.7"
 #define desc_case_2_7 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"In Service\" state\
@@ -6855,17 +7057,18 @@ test_case_2_7(void)
 			case IUT_IN_SERVICE:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_2_8 "2.8"
 #define desc_case_2_8 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Processor Outage\" state\
@@ -6895,7 +7098,7 @@ test_case_2_8(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6903,17 +7106,18 @@ test_case_2_8(void)
 			case IUT_RPR:
 				break;	/* stupid ITU-T SDLs */
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_3_1 "3.1"
 #define desc_case_3_1 "\
 Transmission Failure\n\
 Link aligned ready (Break Tx path)\
@@ -6932,7 +7136,7 @@ test_case_3_1(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -6944,7 +7148,7 @@ test_case_3_1(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -6955,7 +7159,7 @@ test_case_3_1(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -6974,12 +7178,12 @@ test_case_3_1(void)
 			case IN_SERVICE:
 				expand = 1;
 				if (send(TX_BREAK))
-					return INCONCLUSIVE;
+					return __RESULT_INCONCLUSIVE;
 				state = 4;
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -6988,19 +7192,20 @@ test_case_3_1(void)
 				break;
 			case IUT_OUT_OF_SERVICE:	/* FIXME */
 				send(TX_MAKE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				send(TX_MAKE);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
 			send(TX_MAKE);
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_3_2 "3.2"
 #define desc_case_3_2 "\
 Transmission Failure\n\
 Link aligned ready (Corrupt FIBs - Basic)\
@@ -7009,7 +7214,7 @@ static int
 test_case_3_2(void)
 {
 #if defined M2PA_VERSION_DRAFT11
-	return NOTAPPLICABLE;
+	return __RESULT_NOTAPPL;
 #endif
 	for (;;) {
 		switch (state) {
@@ -7027,7 +7232,7 @@ test_case_3_2(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7035,17 +7240,18 @@ test_case_3_2(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_3_3 "3.3"
 #define desc_case_3_3 "\
 Transmission Failure\n\
 Link aligned not ready (Break Tx path)\
@@ -7065,7 +7271,7 @@ test_case_3_3(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -7077,7 +7283,7 @@ test_case_3_3(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7088,7 +7294,7 @@ test_case_3_3(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -7107,12 +7313,12 @@ test_case_3_3(void)
 			case PROCESSOR_OUTAGE:
 				expand = 1;
 				if (send(TX_BREAK))
-					return INCONCLUSIVE;
+					return __RESULT_INCONCLUSIVE;
 				state = 4;
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -7121,19 +7327,20 @@ test_case_3_3(void)
 				break;
 			case IUT_OUT_OF_SERVICE:	/* FIXME */
 				send(TX_MAKE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				send(TX_MAKE);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
 			send(TX_MAKE);
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_3_4 "3.4"
 #define desc_case_3_4 "\
 Transmission Failure\n\
 Link aligned not ready (Corrupt FIBs - Basic)\
@@ -7142,7 +7349,7 @@ static int
 test_case_3_4(void)
 {
 #if defined M2PA_VERSION_DRAFT11
-	return NOTAPPLICABLE;
+	return __RESULT_NOTAPPL;
 #endif
 	for (;;) {
 		switch (state) {
@@ -7156,7 +7363,7 @@ test_case_3_4(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -7168,7 +7375,7 @@ test_case_3_4(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7179,7 +7386,7 @@ test_case_3_4(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -7203,7 +7410,7 @@ test_case_3_4(void)
 				break;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -7216,7 +7423,7 @@ test_case_3_4(void)
 				state = 5;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -7224,17 +7431,18 @@ test_case_3_4(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_3_5 "3.5"
 #define desc_case_3_5 "\
 Transmission Failure\n\
 Link in service (Break Tx path)\
@@ -7246,7 +7454,7 @@ test_case_3_5(void)
 		switch (state) {
 		case 0:
 			if (send(TX_BREAK))
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			state = 1;
 			break;
 		case 1:
@@ -7255,19 +7463,20 @@ test_case_3_5(void)
 				break;
 			case IUT_OUT_OF_SERVICE:	/* FIXME */
 				send(TX_MAKE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				send(TX_MAKE);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
 			send(TX_MAKE);
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_3_6 "3.6"
 #define desc_case_3_6 "\
 Transmission Failure\n\
 Link in service (Corrupt FIBs - Basic)\
@@ -7276,7 +7485,7 @@ static int
 test_case_3_6(void)
 {
 #if defined M2PA_VERSION_DRAFT11
-	return NOTAPPLICABLE;
+	return __RESULT_NOTAPPL;
 #endif
 	for (;;) {
 		switch (state) {
@@ -7294,7 +7503,7 @@ test_case_3_6(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7302,17 +7511,18 @@ test_case_3_6(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_3_7 "3.7"
 #define desc_case_3_7 "\
 Transmission Failure\n\
 Link in processor outage (Break Tx path)\
@@ -7332,11 +7542,11 @@ test_case_3_7(void)
 				break;	/* stupid ITU-T SDLs */
 			case PROCESSOR_OUTAGE:
 				if (send(TX_BREAK))
-					return INCONCLUSIVE;
+					return __RESULT_INCONCLUSIVE;
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7346,19 +7556,20 @@ test_case_3_7(void)
 				break;	/* stupid ITU-T SDLs */
 			case IUT_OUT_OF_SERVICE:	/* FIXME */
 				send(TX_MAKE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				send(TX_MAKE);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
 			send(TX_MAKE);
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_3_8 "3.8"
 #define desc_case_3_8 "\
 Transmission Failure\n\
 Link in processor outage (Corrupt FIBs - Basic)\
@@ -7367,7 +7578,7 @@ static int
 test_case_3_8(void)
 {
 #if defined M2PA_VERSION_DRAFT11
-	return NOTAPPLICABLE;
+	return __RESULT_NOTAPPL;
 #endif
 	for (;;) {
 		switch (state) {
@@ -7384,7 +7595,7 @@ test_case_3_8(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7399,7 +7610,7 @@ test_case_3_8(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -7409,17 +7620,18 @@ test_case_3_8(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_4_1a "4.1(a)"
 #define desc_case_4_1a "\
 Processor Outage Control\n\
 Set and clear LPO while link in service\n\
@@ -7454,9 +7666,9 @@ test_case_4_1a(void)
 			case ACK:
 				if (++dat <= 1)
 					break;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7472,9 +7684,9 @@ test_case_4_1a(void)
 			case ACK:
 				if (++dat <= 1)
 					break;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -7485,7 +7697,7 @@ test_case_4_1a(void)
 				state = 4;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -7493,7 +7705,7 @@ test_case_4_1a(void)
 			case IUT_DATA:
 				if (++ind <= dat)
 					break;
-				return (FAILURE);
+				return (__RESULT_FAILURE);
 			case TIMEOUT:
 				signal(CLEARB);
 				signal(LPR);
@@ -7501,7 +7713,7 @@ test_case_4_1a(void)
 				state = 5;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -7515,7 +7727,7 @@ test_case_4_1a(void)
 				state = 6;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 6:
@@ -7529,31 +7741,31 @@ test_case_4_1a(void)
 			case ACK:
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 7:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 8:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 9:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -7588,7 +7800,7 @@ test_case_4_1a(void)
 			case ACK:
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7601,7 +7813,7 @@ test_case_4_1a(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -7625,7 +7837,7 @@ test_case_4_1a(void)
 #endif
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -7640,7 +7852,7 @@ test_case_4_1a(void)
 				state = 5;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -7656,9 +7868,9 @@ test_case_4_1a(void)
 			case IUT_RPR:
 				break;	/* stupid ITU-T SDLs */
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 #if defined M2PA_VERSION_DRAFT11
@@ -7675,15 +7887,15 @@ test_case_4_1a(void)
 			case ACK:
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 7:
 			switch ((event = get_event())) {
 			case IUT_DATA:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 8:
@@ -7691,21 +7903,22 @@ test_case_4_1a(void)
 			case DATA:
 				pt_bsn = iut_fsn;
 				send(ACK);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			case ACK:
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 #endif
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 #endif
 
+#define numb_case_4_1b "4.1(b)"
 #define desc_case_4_1b "\
 Processor Outage Control\n\
 Set and clear LPO while link in service\n\
@@ -7741,9 +7954,9 @@ test_case_4_1b(void)
 			case ACK:
 				if (++dat <= 1)
 					break;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7764,13 +7977,13 @@ test_case_4_1b(void)
 				start_tt(iutconf.sl.t7 * 10);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			case DATA:
 				pt_bsn = iut_fsn;
 				send(ACK);
@@ -7785,47 +7998,47 @@ test_case_4_1b(void)
 				pt_fsn = iut_bsn;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 6:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 7:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 8:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 9:
 			switch ((event = get_event())) {
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -7860,7 +8073,7 @@ test_case_4_1b(void)
 			case ACK:
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7873,7 +8086,7 @@ test_case_4_1b(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -7888,7 +8101,7 @@ test_case_4_1b(void)
 				state = 4;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -7903,7 +8116,7 @@ test_case_4_1b(void)
 				state = 5;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -7913,18 +8126,19 @@ test_case_4_1b(void)
 			case IUT_RPR:
 				break;	/* stupid ITU-T SDLs */
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 #endif
 
+#define numb_case_4_2 "4.2"
 #define desc_case_4_2 "\
 Processor Outage Control\n\
 RPO during LPO\
@@ -7948,7 +8162,7 @@ test_case_4_2(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -7963,7 +8177,7 @@ test_case_4_2(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -7973,17 +8187,18 @@ test_case_4_2(void)
 				break;
 			case IUT_RPR:
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_4_3 "4.3"
 #define desc_case_4_3 "\
 Processor Outage Control\n\
 Clear LPO when \"Both processor outage\"\
@@ -8008,7 +8223,7 @@ test_case_4_3(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -8021,7 +8236,7 @@ test_case_4_3(void)
 			case PROCESSOR_ENDED:
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -8029,17 +8244,18 @@ test_case_4_3(void)
 			case IN_SERVICE:
 				break;
 			case IUT_RPR:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_5_1 "5.1"
 #define desc_case_5_1 "\
 SU delimitation, alignment, error detection and correction\n\
 More than 7 ones between MSU opening and closing flags\
@@ -8047,7 +8263,7 @@ More than 7 ones between MSU opening and closing flags\
 static int
 test_case_5_1(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	unsigned char old_bsn = 0x7f;
 	for (;;) {
@@ -8055,7 +8271,7 @@ test_case_5_1(void)
 		case 0:
 			old_bsn = iut_bsn;
 			if (send(MSU_SEVEN_ONES))
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			state = 1;
 			break;
 		case 1:
@@ -8064,23 +8280,24 @@ test_case_5_1(void)
 				break;
 			case FISU:
 				if (iut_bsn != old_bsn)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				send(FISU);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			case IUT_DATA:
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_5_2 "5.2"
 #define desc_case_5_2 "\
 SU delimitation, alignment, error detection and correction\n\
 Greater than maximum signal unit length\
@@ -8088,7 +8305,7 @@ Greater than maximum signal unit length\
 static int
 test_case_5_2(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -8109,16 +8326,17 @@ test_case_5_2(void)
 				return check_snibs(0x7f, 0xff);
 			case IUT_DATA:
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_5_3 "5.3"
 #define desc_case_5_3 "\
 SU delimitation, alignment, error detection and correction\n\
 Below minimum signal unit length\
@@ -8135,19 +8353,20 @@ test_case_5_3(void)
 		case 1:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			case ACK:
 			case IUT_DATA:
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_5_4a "5.4(a)"
 #define desc_case_5_4a "\
 SU delimitation, alignment, error detection and correction\n\
 Reception of single and multiple flags between FISUs\n\
@@ -8156,13 +8375,13 @@ Forward direction\
 static int
 test_case_5_4a(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
 		case 0:
 			if (send(FISU_FISU_1FLAG))
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			state = 1;
 			break;
 		case 1:
@@ -8171,18 +8390,19 @@ test_case_5_4a(void)
 				send(FISU);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_5_4b "5.4(b)"
 #define desc_case_5_4b "\
 SU delimitation, alignment, error detection and correction\n\
 Reception of single and multiple flags between FISUs\n\
@@ -8191,13 +8411,13 @@ Reverse direction\
 static int
 test_case_5_4b(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
 		case 0:
 			if (send(FISU_FISU_2FLAG))
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			state = 1;
 			break;
 		case 1:
@@ -8206,18 +8426,19 @@ test_case_5_4b(void)
 				send(FISU);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_5_5a "5.5(a)"
 #define desc_case_5_5a "\
 SU delimitation, alignment, error detection and correction\n\
 Reception of single and multiple flags between MSUs\n\
@@ -8226,13 +8447,13 @@ Forward direction\
 static int
 test_case_5_5a(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
 		case 0:
 			if (send(MSU_MSU_1FLAG))
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			state = 1;
 			break;
 		case 1:
@@ -8241,18 +8462,19 @@ test_case_5_5a(void)
 				send(FISU);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_5_5b "5.5(b)"
 #define desc_case_5_5b "\
 SU delimitation, alignment, error detection and correction\n\
 Reception of single and multiple flags between MSUs\n\
@@ -8261,13 +8483,13 @@ Reverse direction\
 static int
 test_case_5_5b(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
 		case 0:
 			if (send(MSU_MSU_2FLAG))
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			state = 1;
 			break;
 		case 1:
@@ -8276,18 +8498,19 @@ test_case_5_5b(void)
 				send(FISU);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_6_1 "6.1"
 #define desc_case_6_1 "\
 SUERM check\n\
 Error rate of 1 in 256 - Link remains in service\
@@ -8295,7 +8518,7 @@ Error rate of 1 in 256 - Link remains in service\
 static int
 test_case_6_1(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -8327,19 +8550,20 @@ test_case_6_1(void)
 					break;
 				}
 				send(TRIES);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				send(TRIES);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_6_2 "6.2"
 #define desc_case_6_2 "\
 SUERM check\n\
 Error rate of 1 in 254 - Link out of service\
@@ -8347,7 +8571,7 @@ Error rate of 1 in 254 - Link out of service\
 static int
 test_case_6_2(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -8378,24 +8602,25 @@ test_case_6_2(void)
 					break;
 				}
 				send(TRIES);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			case OUT_OF_SERVICE:
 				break;
 			case OUT_OF_SERVICE:
 				send(TRIES);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				send(TRIES);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_6_3 "6.3"
 #define desc_case_6_3 "\
 SUERM check\n\
 Consequtive corrupt SUs\
@@ -8403,7 +8628,7 @@ Consequtive corrupt SUs\
 static int
 test_case_6_3(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -8421,7 +8646,7 @@ test_case_6_3(void)
 				send(FISU_CORRUPT_S);
 				if (count > 128) {
 					send(COUNT);
-					return FAILURE;
+					return __RESULT_FAILURE;
 				}
 				break;
 			case OUT_OF_SERVICE:
@@ -8430,20 +8655,21 @@ test_case_6_3(void)
 				if (count > 1)
 					send(COUNT);
 				if (count > 70)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				else
-					return SUCCESS;
+					return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_6_4 "6.4"
 #define desc_case_6_4 "\
 SUERM check\n\
 Time controlled break of the link\
@@ -8451,13 +8677,13 @@ Time controlled break of the link\
 static int
 test_case_6_4(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
 		case 0:
 			if (send(TX_BREAK))
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			start_tt(100);
 			state = 1;
 			break;
@@ -8481,20 +8707,21 @@ test_case_6_4(void)
 				break;
 			case TIMEOUT:
 				send(TX_MAKE);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				send(TX_MAKE);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
 			send(TX_MAKE);
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_7_1 "7.1"
 #define desc_case_7_1 "\
 AERM check\n\
 Error rate below the normal threshold\
@@ -8502,7 +8729,7 @@ Error rate below the normal threshold\
 static int
 test_case_7_1(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -8514,7 +8741,7 @@ test_case_7_1(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -8527,7 +8754,7 @@ test_case_7_1(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -8543,7 +8770,7 @@ test_case_7_1(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -8556,7 +8783,7 @@ test_case_7_1(void)
 				state = 4;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -8575,7 +8802,7 @@ test_case_7_1(void)
 				}
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -8587,22 +8814,23 @@ test_case_7_1(void)
 			case FISU:
 				expand = 1;
 				send(FISU);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			case TIMEOUT:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_7_2 "7.2"
 #define desc_case_7_2 "\
 AERM check\n\
 Error rate at the normal threshold\
@@ -8610,7 +8838,7 @@ Error rate at the normal threshold\
 static int
 test_case_7_2(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -8622,7 +8850,7 @@ test_case_7_2(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -8636,7 +8864,7 @@ test_case_7_2(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -8651,7 +8879,7 @@ test_case_7_2(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -8664,7 +8892,7 @@ test_case_7_2(void)
 				state = 4;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -8684,7 +8912,7 @@ test_case_7_2(void)
 				}
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -8698,19 +8926,20 @@ test_case_7_2(void)
 				break;
 			case FISU:
 				expand = 1;
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_7_3 "7.3"
 #define desc_case_7_3 "\
 AERM check\n\
 Error rate above the normal threshold\
@@ -8718,7 +8947,7 @@ Error rate above the normal threshold\
 static int
 test_case_7_3(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -8730,7 +8959,7 @@ test_case_7_3(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -8744,7 +8973,7 @@ test_case_7_3(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -8760,7 +8989,7 @@ test_case_7_3(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -8773,7 +9002,7 @@ test_case_7_3(void)
 				state = 4;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -8783,8 +9012,8 @@ test_case_7_3(void)
 			case OUT_OF_SERVICE:
 				send(COUNT);
 				if (tries == iutconf.sl.M)
-					return SUCCESS;
-				return FAILURE;
+					return __RESULT_SUCCESS;
+				return __RESULT_FAILURE;
 			case NO_MSG:
 			case PROVING_NORMAL:
 				if (count <= iutconf.sdt.Tin) {
@@ -8806,7 +9035,7 @@ test_case_7_3(void)
 				}
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -8820,19 +9049,20 @@ test_case_7_3(void)
 				break;
 			case OUT_OF_SERVICE:
 				expand = 1;
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_7_4 "7.4"
 #define desc_case_7_4 "\
 AERM check\n\
 Error rate at the emergency threshold\
@@ -8840,7 +9070,7 @@ Error rate at the emergency threshold\
 static int
 test_case_7_4(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -8852,7 +9082,7 @@ test_case_7_4(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
@@ -8865,7 +9095,7 @@ test_case_7_4(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -8880,7 +9110,7 @@ test_case_7_4(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -8893,7 +9123,7 @@ test_case_7_4(void)
 				state = 4;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -8913,7 +9143,7 @@ test_case_7_4(void)
 				}
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -8927,19 +9157,20 @@ test_case_7_4(void)
 				break;
 			case FISU:
 				expand = 1;
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				expand = 1;
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_8_1 "8.1"
 #define desc_case_8_1 "\
 Transmission and reception control (Basic)\n\
 MSU transmission and reception\
@@ -8963,7 +9194,7 @@ test_case_8_1(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -8978,23 +9209,24 @@ test_case_8_1(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_8_2 "8.2"
 #define desc_case_8_2 "\
 Transmission and reception control (Basic)\n\
 Negative acknowledgement of an MSU\
@@ -9002,7 +9234,7 @@ Negative acknowledgement of an MSU\
 static int
 test_case_8_2(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -9015,7 +9247,7 @@ test_case_8_2(void)
 			switch ((event = get_event())) {
 			case DATA:
 				if (check_snibs(0xff, 0x80))
-					return FAILURE;
+					return __RESULT_FAILURE;
 				state = 2;
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
@@ -9023,14 +9255,14 @@ test_case_8_2(void)
 				send(FISU);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
 			switch ((event = get_event())) {
 			case DATA:
 				if (check_snibs(0xff, 0x81))
-					return FAILURE;
+					return __RESULT_FAILURE;
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = 0x80;
 				pt_bib = 0x00;
@@ -9043,14 +9275,14 @@ test_case_8_2(void)
 				send(FISU);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case DATA:
 				if (check_snibs(0xff, 0x00))
-					return FAILURE;
+					return __RESULT_FAILURE;
 				state = 4;
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
@@ -9059,15 +9291,15 @@ test_case_8_2(void)
 				send(FISU);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
 			switch ((event = get_event())) {
 			case DATA:
 				if (check_snibs(0xff, 0x01))
-					return FAILURE;
-				return SUCCESS;
+					return __RESULT_FAILURE;
+				return __RESULT_SUCCESS;
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = 0x80;
@@ -9075,16 +9307,17 @@ test_case_8_2(void)
 				send(FISU);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_8_3 "8.3"
 #define desc_case_8_3 "\
 Transmission and reception control (Basic)\n\
 Check RTB full\
@@ -9150,7 +9383,7 @@ test_case_8_3(void)
 				expand = 1;
 				signal(ETC);
 				signal(COUNT);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9166,7 +9399,7 @@ test_case_8_3(void)
 #endif
 					send(ACK);
 					nacks = 1;
-					return SUCCESS;
+					return __RESULT_SUCCESS;
 				}
 				expand = 0;
 				break;
@@ -9174,16 +9407,17 @@ test_case_8_3(void)
 				expand = 1;
 				signal(ETC);
 				signal(COUNT);
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
 			expand = 1;
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_8_4 "8.4"
 #define desc_case_8_4 "\
 Transmission and reception control (Basic)\n\
 Single MSU with erroneous FIB\
@@ -9211,7 +9445,7 @@ test_case_8_4(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9222,23 +9456,24 @@ test_case_8_4(void)
 			case ACK:
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_8_5 "8.5"
 #define desc_case_8_5 "\
 Transmission and reception control (Basic)\n\
 Duplicated FSN\
@@ -9247,7 +9482,7 @@ static int
 test_case_8_5(void)
 {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #else
 	int inds = 0;
 	for (;;) {
@@ -9265,10 +9500,10 @@ test_case_8_5(void)
 			case ACK:
 #if defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 || defined M2PA_VERSION_DRAFT11
 				if (iut_fsn != 0xffffff)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0xffffff) {
 					if (iut_bsn != 0)
-						return FAILURE;
+						return __RESULT_FAILURE;
 					pt_fsn--;
 					pt_fsn &= 0xffffff;
 					send(DATA);
@@ -9277,10 +9512,10 @@ test_case_8_5(void)
 				}
 #else
 				if (iut_fsn != 0)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0) {
 					if (iut_bsn != 1)
-						return FAILURE;
+						return __RESULT_FAILURE;
 					pt_fsn--;
 					pt_fsn &= 0xffffff
 					send(DATA);
@@ -9289,21 +9524,21 @@ test_case_8_5(void)
 				}
 #endif
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
 			switch ((event = wait_event(SHORT_WAIT))) {
 			case IUT_DATA:
 				if (inds++)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				break;
 			default:
 #if defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 || defined M2PA_VERSION_DRAFT11
 				if (iut_fsn != 0xffffff)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (inds) {
 					send(DATA);
 					state = 3;
@@ -9311,9 +9546,9 @@ test_case_8_5(void)
 				}
 #else
 				if (iut_fsn != 0)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 1)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (inds) {
 					send(DATA);
 					state = 3;
@@ -9327,40 +9562,41 @@ test_case_8_5(void)
 			switch ((event = wait_event(NORMAL_WAIT))) {
 			case IUT_DATA:
 				if (++inds > 2)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				break;
 			default:
 #if defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 || defined M2PA_VERSION_DRAFT11
 				if (iut_fsn != 0xffffff)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0) {
 					if (iut_bsn != 1)
-						return FAILURE;
+						return __RESULT_FAILURE;
 					if (inds == 2)
-						return SUCCESS;
+						return __RESULT_SUCCESS;
 				}
 #else
 				if (iut_fsn != 0)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 1) {
 					if (iut_bsn != 2)
-						return FAILURE;
+						return __RESULT_FAILURE;
 					if (inds == 2)
-						return SUCCESS;
+						return __RESULT_SUCCESS;
 				}
 #endif
 				break;
 			case TIMEOUT:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_8_6 "8.6"
 #define desc_case_8_6 "\
 Transmission and reception control (Basic)\n\
 Erroneous retransmission - Single MSU\
@@ -9368,7 +9604,7 @@ Erroneous retransmission - Single MSU\
 static int
 test_case_8_6(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -9389,7 +9625,7 @@ test_case_8_6(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9400,7 +9636,7 @@ test_case_8_6(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -9408,7 +9644,7 @@ test_case_8_6(void)
 			case FISU:
 				if ((iut_bib | iut_bsn) != 0xff || (iut_fib | iut_fsn) != 0xff) {
 					if (check_snibs(0x7f, 0xff))
-						return FAILURE;
+						return __RESULT_FAILURE;
 					pt_fib = 0x00;
 					pt_fsn = 0x7f;
 					oldmsg = 0;
@@ -9420,7 +9656,7 @@ test_case_8_6(void)
 				send(FISU);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -9430,22 +9666,23 @@ test_case_8_6(void)
 			case FISU:
 				if ((iut_bib | iut_bsn) != 0x7f || (iut_fib | iut_fsn) != 0xff) {
 					if (check_snibs(0x00, 0xff))
-						return FAILURE;
-					return SUCCESS;
+						return __RESULT_FAILURE;
+					return __RESULT_SUCCESS;
 				}
 				send(FISU);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_8_7 "8.7"
 #define desc_case_8_7 "\
 Transmission and reception control (Basic)\n\
 Erroneous retransmission - Multiple FISUs\
@@ -9453,7 +9690,7 @@ Erroneous retransmission - Multiple FISUs\
 static int
 test_case_8_7(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -9470,7 +9707,7 @@ test_case_8_7(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9482,7 +9719,7 @@ test_case_8_7(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -9495,7 +9732,7 @@ test_case_8_7(void)
 				start_tt(100);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -9505,18 +9742,19 @@ test_case_8_7(void)
 			case OUT_OF_SERVICE:
 				break;
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_8_8 "8.8"
 #define desc_case_8_8 "\
 Transmission and reception control (Basic)\n\
 Single FISU with corrupt FIB\
@@ -9524,7 +9762,7 @@ Single FISU with corrupt FIB\
 static int
 test_case_8_8(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -9541,7 +9779,7 @@ test_case_8_8(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9554,7 +9792,7 @@ test_case_8_8(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -9563,18 +9801,19 @@ test_case_8_8(void)
 				send(FISU);
 				break;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_8_9a "8.9(a)"
 #define desc_case_8_9a "\
 Transmission and reception control (Basic)\n\
 Single FISU prior to RPO being set\n\
@@ -9599,7 +9838,7 @@ test_case_8_9a(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9620,7 +9859,7 @@ test_case_8_9a(void)
 				state = 5;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -9632,17 +9871,18 @@ test_case_8_9a(void)
 			case ACK:
 				break;
 			case IUT_DATA:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_8_9b "8.9(b)"
 #define desc_case_8_9b "\
 Transmission and reception control (Basic)\n\
 Single FISU prior to RPO being set\n\
@@ -9665,7 +9905,7 @@ test_case_8_9b(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9676,7 +9916,7 @@ test_case_8_9b(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -9691,7 +9931,7 @@ test_case_8_9b(void)
 				state = 5;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 5:
@@ -9703,23 +9943,24 @@ test_case_8_9b(void)
 				state = 6;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 6:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_8_10 "8.10"
 #define desc_case_8_10 "\
 Transmission and reception control (Basic)\n\
 Abnormal BSN - single MSU\
@@ -9728,7 +9969,7 @@ static int
 test_case_8_10(void)
 {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #else
 	uint inds = 0;
 	for (;;) {
@@ -9749,64 +9990,65 @@ test_case_8_10(void)
 			case ACK:
 #if defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 || defined M2PA_VERSION_DRAFT11
 				if (iut_fsn != 0xffffff)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0xffffff)
 					if (iut_bsn != 0)
-						return FAILURE;
+						return __RESULT_FAILURE;
 				pt_bsn = 0xffffff;
 				send(DATA);
 				state = 4;
 				break;
 #else
 				if (iut_fsn != 0)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0)
 					if (iut_bsn != 1)
-						return FAILURE;
+						return __RESULT_FAILURE;
 				pt_bsn = 0;
 				send(DATA);
 				state = 4;
 				break;
 #endif
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
 			switch ((event = get_event())) {
 			case IUT_DATA:
 				if (inds++ > 1)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (inds == 2)
-					return SUCCESS;
+					return __RESULT_SUCCESS;
 				break;
 			case ACK:
 #if defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 || defined M2PA_VERSION_DRAFT11
 				if (iut_fsn != 0xffffff)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0)
 					if (iut_bsn != 1)
-						return FAILURE;
+						return __RESULT_FAILURE;
 				break;
 #else
 				if (iut_fsn != 0)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 1)
 					if (iut_bsn != 2)
-						return FAILURE;
+						return __RESULT_FAILURE;
 				break;
 #endif
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_8_11 "8.11"
 #define desc_case_8_11 "\
 Transmission and reception control (Basic)\n\
 Abnormal BSN - two consecutive FISUs\
@@ -9815,7 +10057,7 @@ static int
 test_case_8_11(void)
 {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #else
 	for (;;) {
 		switch (state) {
@@ -9844,7 +10086,7 @@ test_case_8_11(void)
 				start_tt(1000);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9854,18 +10096,19 @@ test_case_8_11(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_8_12a "8.12(a)"
 #define desc_case_8_12a "\
 Transmission and reception control (Basic)\n\
 Excessive delay of acknowledgement\n\
@@ -9888,7 +10131,7 @@ test_case_8_12a(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9898,15 +10141,16 @@ test_case_8_12a(void)
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_8_12b "8.12(b)"
 #define desc_case_8_12b "\
 Transmission and reception control (Basic)\n\
 Excessive delay of acknowledgement\n\
@@ -9929,7 +10173,7 @@ test_case_8_12b(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -9939,15 +10183,16 @@ test_case_8_12b(void)
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_8_13 "8.13"
 #define desc_case_8_13 "\
 Transmission and reception control (Basic)\n\
 Level 3 Stop command\
@@ -9965,23 +10210,24 @@ test_case_8_13(void)
 				state = 1;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 1:
 			switch ((event = get_event())) {
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_8_14 "8.14"
 #define desc_case_8_14 "\
 Transmission and reception control (Basic)\n\
 Abnormal FIBR\
@@ -9990,7 +10236,7 @@ static int
 test_case_8_14(void)
 {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #else
 	int nind = 0;
 	for (;;) {
@@ -10009,32 +10255,32 @@ test_case_8_14(void)
 				if (nind < 1)
 					nind++;
 				else
-					return FAILURE;
+					return __RESULT_FAILURE;
 				break;
 			case ACK:
 #if defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 || defined M2PA_VERSION_DRAFT11
 				if (iut_fsn != 0xffffff)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0xffffff)
 					if (iut_bsn != 0)
-						return FAILURE;
+						return __RESULT_FAILURE;
 				pt_fsn = 1;
 				send(DATA);
 				state = 4;
 				break;
 #else
 				if (iut_fsn != 0)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_bsn != 0)
 					if (iut_bsn != 1)
-						return FAILURE;
+						return __RESULT_FAILURE;
 				pt_fsn = 2;
 				send(DATA);
 				state = 4;
 				break;
 #endif
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
@@ -10043,28 +10289,29 @@ test_case_8_14(void)
 				if (nind < 1)
 					nind++;
 				else
-					return FAILURE;
+					return __RESULT_FAILURE;
 				break;
 #if defined M2PA_VERSION_DRAFT11
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 #else
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 #endif
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_1 "9.1"
 #define desc_case_9_1 "\
 Transmission and reception control (PCR)\n\
 MSU transmission and reception\
@@ -10072,7 +10319,7 @@ MSU transmission and reception\
 static int
 test_case_9_1(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -10098,7 +10345,7 @@ test_case_9_1(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -10108,12 +10355,12 @@ test_case_9_1(void)
 				break;
 			case FISU:
 				if (check_snibs(0xff, 0x80))
-					return FAILURE;
+					return __RESULT_FAILURE;
 				send(DATA);
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -10126,16 +10373,17 @@ test_case_9_1(void)
 				send(FISU);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_2 "9.2"
 #define desc_case_9_2 "\
 Transmission and reception control (PCR)\n\
 Priority control\
@@ -10143,7 +10391,7 @@ Priority control\
 static int
 test_case_9_2(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	int fsn_lo = 0, fsn_hi = 0, fsn_ex = 0;
 	for (;;) {
@@ -10165,7 +10413,7 @@ test_case_9_2(void)
 			case DATA:
 				if (iut_fsn < fsn_hi) {
 					if (iut_fsn != fsn_ex)
-						return FAILURE;
+						return __RESULT_FAILURE;
 					if (++fsn_ex == fsn_hi) {
 						fsn_ex = fsn_lo;
 						tries++;
@@ -10176,7 +10424,7 @@ test_case_9_2(void)
 					break;
 				}
 				if (iut_fsn != fsn_hi)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				signal(ETC);
 				signal(TRIES);
 				tries = 0;
@@ -10188,7 +10436,7 @@ test_case_9_2(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -10196,7 +10444,7 @@ test_case_9_2(void)
 			case DATA:
 				if (iut_fsn < fsn_hi) {
 					if (iut_fsn != fsn_ex)
-						return FAILURE;
+						return __RESULT_FAILURE;
 					if (++fsn_ex == fsn_hi) {
 						fsn_ex = fsn_lo;
 						tries++;
@@ -10207,7 +10455,7 @@ test_case_9_2(void)
 					break;
 				}
 				if (iut_fsn != fsn_hi)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				signal(ETC);
 				signal(TRIES);
 				tries = 0;
@@ -10215,15 +10463,15 @@ test_case_9_2(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case FISU:
 				if (iut_fsn == 2)
-					return SUCCESS;
-				return FAILURE;
+					return __RESULT_SUCCESS;
+				return __RESULT_FAILURE;
 			case DATA:
 				pt_bsn = fsn_lo;
 				send(FISU);
@@ -10239,22 +10487,23 @@ test_case_9_2(void)
 					} else
 						fsn_ex--;
 				} else if (++tries > 100)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (++fsn_ex > fsn_hi)
 					fsn_ex = fsn_lo;
 				oldisb = (oldisb & 0xff80) + fsn_ex;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_3 "9.3"
 #define desc_case_9_3 "\
 Transmission and reception control (PCR)\n\
 Forced retransmission with the value N1\
@@ -10262,14 +10511,14 @@ Forced retransmission with the value N1\
 static int
 test_case_9_3(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
 	int n = iutconf.sl.N1;
 	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
 	if (msu_len < 3)
-		return INCONCLUSIVE;
+		return __RESULT_INCONCLUSIVE;
 	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
 	for (;;) {
@@ -10292,14 +10541,14 @@ test_case_9_3(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
 			switch ((event = get_event())) {
 			case DATA:
 				if (iut_fsn == n)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_fsn == n - 1)
 					count++;
 				if (iut_fsn > 1 && iut_fsn < n - 3)
@@ -10317,7 +10566,7 @@ test_case_9_3(void)
 					signal(ETC);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -10325,7 +10574,7 @@ test_case_9_3(void)
 			case DATA:
 				if (iut_fsn == n) {
 					send(FISU);
-					return SUCCESS;
+					return __RESULT_SUCCESS;
 				}
 				if (iut_fsn > 1 && iut_fsn < n - 3)
 					oldisb++;
@@ -10335,16 +10584,17 @@ test_case_9_3(void)
 					signal(ETC);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_4 "9.4"
 #define desc_case_9_4 "\
 Transmission and reception control (PCR)\n\
 Forced retransmission with the value N2\
@@ -10352,7 +10602,7 @@ Forced retransmission with the value N2\
 static int
 test_case_9_4(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -10360,7 +10610,7 @@ test_case_9_4(void)
 	msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 	n = iutconf.sl.N2 / (msu_len + h) + 1;
 	if (msu_len > iutconf.sdl.m)
-		return INCONCLUSIVE;
+		return __RESULT_INCONCLUSIVE;
 	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
 	for (;;) {
@@ -10383,14 +10633,14 @@ test_case_9_4(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
 			switch ((event = get_event())) {
 			case DATA:
 				if (iut_fsn == n)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_fsn == n - 1)
 					count++;
 				if (iut_fsn > 1 && iut_fsn < n - 3)
@@ -10408,7 +10658,7 @@ test_case_9_4(void)
 					signal(ETC);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -10416,7 +10666,7 @@ test_case_9_4(void)
 			case DATA:
 				if (iut_fsn == n) {
 					send(FISU);
-					return SUCCESS;
+					return __RESULT_SUCCESS;
 				}
 				if (iut_fsn > 1 && iut_fsn < n - 3)
 					oldisb++;
@@ -10426,16 +10676,17 @@ test_case_9_4(void)
 					signal(ETC);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_5 "9.5"
 #define desc_case_9_5 "\
 Transmission and reception control (PCR)\n\
 Forced retransmission cancel\
@@ -10443,7 +10694,7 @@ Forced retransmission cancel\
 static int
 test_case_9_5(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -10454,7 +10705,7 @@ test_case_9_5(void)
 		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 		n = iutconf.sl.N2 / (msu_len + h) + 1;
 		if (msu_len > iutconf.sdl.m)
-			return INCONCLUSIVE;
+			return __RESULT_INCONCLUSIVE;
 	}
 	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
@@ -10478,14 +10729,14 @@ test_case_9_5(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
 			switch ((event = get_event())) {
 			case DATA:
 				if (iut_fsn == n)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_fsn == n - 1)
 					count++;
 				if (iut_fsn > 1 && iut_fsn < n - 3)
@@ -10503,17 +10754,17 @@ test_case_9_5(void)
 					signal(ETC);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case DATA:
 				if (iut_fsn == n - 3)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_fsn == n) {
 					send(FISU);
-					return SUCCESS;
+					return __RESULT_SUCCESS;
 				}
 				if (iut_fsn > 1 && iut_fsn < n - 3)
 					oldisb++;
@@ -10523,16 +10774,17 @@ test_case_9_5(void)
 					signal(ETC);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_6 "9.6"
 #define desc_case_9_6 "\
 Transmission and reception control (PCR)\n\
 Reception of forced retransmission\
@@ -10540,7 +10792,7 @@ Reception of forced retransmission\
 static int
 test_case_9_6(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -10551,7 +10803,7 @@ test_case_9_6(void)
 		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 		n = iutconf.sl.N2 / (msu_len + h) + 1;
 		if (msu_len > iutconf.sdl.m)
-			return INCONCLUSIVE;
+			return __RESULT_INCONCLUSIVE;
 	}
 	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
@@ -10575,14 +10827,14 @@ test_case_9_6(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
 			switch ((event = get_event())) {
 			case DATA:
 				if (iut_fsn == n)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				if (iut_fsn == n - 1)
 					count++;
 				if (iut_fsn > 1 && iut_fsn < n - 3)
@@ -10590,7 +10842,7 @@ test_case_9_6(void)
 				if (iut_fsn == 3 && count == 2) {
 					pt_bsn = n - 1;
 					send(FISU);
-					return SUCCESS;
+					return __RESULT_SUCCESS;
 				}
 				pt_bsn = 0x7f;
 				send(FISU);
@@ -10598,16 +10850,17 @@ test_case_9_6(void)
 					signal(ETC);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_7 "9.7"
 #define desc_case_9_7 "\
 Transmission and reception control (PCR)\n\
 MSU transmission while RPO set\
@@ -10615,7 +10868,7 @@ MSU transmission while RPO set\
 static int
 test_case_9_7(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -10637,7 +10890,7 @@ test_case_9_7(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -10651,7 +10904,7 @@ test_case_9_7(void)
 			case FISU:
 				if (!count++)
 					if (check_snibs(0xff, 0x80))
-						return FAILURE;
+						return __RESULT_FAILURE;
 				pt_bsn = 0x7f;
 				send(PROCESSOR_OUTAGE);
 				break;
@@ -10664,7 +10917,7 @@ test_case_9_7(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -10680,20 +10933,21 @@ test_case_9_7(void)
 					break;
 				}
 				send(FISU);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_8 "9.8"
 #define desc_case_9_8 "\
 Transmission and reception control (PCR)\n\
 Abnormal BSN - Single MSU\
@@ -10701,7 +10955,7 @@ Abnormal BSN - Single MSU\
 static int
 test_case_9_8(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -10721,22 +10975,23 @@ test_case_9_8(void)
 				break;
 			case FISU:
 				if (iut_bsn == 0)
-					return SUCCESS;
+					return __RESULT_SUCCESS;
 				pt_bsn = 0x7f;
 				pt_fsn = 0x7f;
 				send(DATA);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_9 "9.9"
 #define desc_case_9_9 "\
 Transmission and reception control (PCR)\n\
 Abnormal BSN - Two MSUs\
@@ -10744,7 +10999,7 @@ Abnormal BSN - Two MSUs\
 static int
 test_case_9_9(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -10766,25 +11021,26 @@ test_case_9_9(void)
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_DATA:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			case FISU:
 				pt_bsn = 0x7f;
 				pt_fsn = 0x7f;
 				send(DATA);
 				break;
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_10 "9.10"
 #define desc_case_9_10 "\
 Transmission and reception control (PCR)\n\
 Unexpected FSN\
@@ -10792,7 +11048,7 @@ Unexpected FSN\
 static int
 test_case_9_10(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -10808,28 +11064,29 @@ test_case_9_10(void)
 			switch ((event = get_event())) {
 			case IUT_DATA:
 				if (++count == 2)
-					return FAILURE;
+					return __RESULT_FAILURE;
 				break;
 			case FISU:
 				if (iut_bsn != 0x7f) {
 					if (check_snibs(0x80, 0xff))
-						return FAILURE;
-					return SUCCESS;
+						return __RESULT_FAILURE;
+					return __RESULT_SUCCESS;
 				}
 				pt_fsn = 0x7f;
 				send(DATA);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_11 "9.11"
 #define desc_case_9_11 "\
 Transmission and reception control (PCR)\n\
 Excessive delay of acknowledgement\
@@ -10837,7 +11094,7 @@ Excessive delay of acknowledgement\
 static int
 test_case_9_11(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -10858,7 +11115,7 @@ test_case_9_11(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -10872,16 +11129,17 @@ test_case_9_11(void)
 			case OUT_OF_SERVICE:
 				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_12 "9.12"
 #define desc_case_9_12 "\
 Transmission and reception control (PCR)\n\
 FISU with FSN expected for MSU\
@@ -10889,7 +11147,7 @@ FISU with FSN expected for MSU\
 static int
 test_case_9_12(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -10908,16 +11166,17 @@ test_case_9_12(void)
 			case TIMEOUT:
 				return check_snibs(0xff, 0xff);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_9_13 "9.13"
 #define desc_case_9_13 "\
 Transmission and reception control (PCR)\n\
 Level 3 Stop command\
@@ -10925,7 +11184,7 @@ Level 3 Stop command\
 static int
 test_case_9_13(void)
 {
-	return NOTAPPLICABLE;	/* can't do this */
+	return __RESULT_NOTAPPL;	/* can't do this */
 #if 0
 	for (;;) {
 		switch (state) {
@@ -10942,18 +11201,19 @@ test_case_9_13(void)
 			case OUT_OF_SERVICE:
 				break;
 			case OUT_OF_SERVICE:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 #endif
 }
 
+#define numb_case_10_1 "10.1"
 #define desc_case_10_1 "\
 Congestion Control\n\
 Congestion abatement\
@@ -10973,7 +11233,7 @@ test_case_10_1(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -10983,23 +11243,24 @@ test_case_10_1(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
 			switch ((event = get_event())) {
 			case BUSY_ENDED:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_10_2a "10.2(a)"
 #define desc_case_10_2a "\
 Congestion Control\n\
 Timer T7\n\
@@ -11023,7 +11284,7 @@ test_case_10_2a(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -11033,7 +11294,7 @@ test_case_10_2a(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -11048,23 +11309,24 @@ test_case_10_2a(void)
 				start_tt(1000);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_10_2b "10.2(b)"
 #define desc_case_10_2b "\
 Congestion Control\n\
 Timer T7\n\
@@ -11088,7 +11350,7 @@ test_case_10_2b(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -11100,7 +11362,7 @@ test_case_10_2b(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -11114,26 +11376,27 @@ test_case_10_2b(void)
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 		case 4:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			case OUT_OF_SERVICE:
 				break;
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_10_2c "10.2(c)"
 #define desc_case_10_2c "\
 Congestion Control\n\
 Timer T7\n\
@@ -11157,7 +11420,7 @@ test_case_10_2c(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -11169,7 +11432,7 @@ test_case_10_2c(void)
 				state = 3;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 3:
@@ -11181,22 +11444,23 @@ test_case_10_2c(void)
 				start_tt(1000);
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 4:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
 
+#define numb_case_10_3 "10.3"
 #define desc_case_10_3 "\
 Congestion Control\n\
 Timer T6\
@@ -11219,7 +11483,7 @@ test_case_10_3(void)
 				state = 2;
 				break;
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		case 2:
@@ -11229,11 +11493,11 @@ test_case_10_3(void)
 			case IUT_OUT_OF_SERVICE:
 				return check_time("T6  ", beg_time, timer[t6].lo, timer[t6].hi);
 			default:
-				return FAILURE;
+				return __RESULT_FAILURE;
 			}
 			break;
 		default:
-			return SCRIPTERROR;
+			return __RESULT_SCRIPT_ERROR;
 		}
 	}
 }
@@ -11267,7 +11531,7 @@ mgm_open(void)
 		printf("  ****ERROR: open failed\n");
 		printf("             %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                :ioctl |                                            \n");
@@ -11277,17 +11541,17 @@ mgm_open(void)
 		printf("  ****ERROR: ioctl failed\n");
 		printf("             %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	if ((ret = control(OPTMGMT_REQ)) != SUCCESS)
+	if ((ret = control(OPTMGMT_REQ)) != __RESULT_SUCCESS)
 		return ret;
 	if ((event = wait_event(SHORT_WAIT)) != OK_ACK)
-		return FAILURE;
-	if ((ret = control(BIND_REQ)) != SUCCESS)
+		return __RESULT_FAILURE;
+	if ((ret = control(BIND_REQ)) != __RESULT_SUCCESS)
 		return ret;
 	if ((event = wait_event(SHORT_WAIT)) != BIND_ACK)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -11304,9 +11568,9 @@ mgm_close(void)
 		printf("  ****ERROR: close failed\n");
 		printf("             %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -11331,7 +11595,7 @@ pt_open(void)
 		printf("****ERROR: open failed\n");
 		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                 :ioctl                                             \n");
@@ -11341,17 +11605,17 @@ pt_open(void)
 		printf("****ERROR: ioctl failed\n");
 		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	if ((ret = send(OPTMGMT_REQ)) != SUCCESS)
+	if ((ret = send(OPTMGMT_REQ)) != __RESULT_SUCCESS)
 		return ret;
 	if ((event = wait_event(SHORT_WAIT)) != OK_ACK)
-		return FAILURE;
-	if ((ret = send(BIND_REQ)) != SUCCESS)
+		return __RESULT_FAILURE;
+	if ((ret = send(BIND_REQ)) != __RESULT_SUCCESS)
 		return ret;
 	if ((event = wait_event(SHORT_WAIT)) != BIND_ACK)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -11368,9 +11632,9 @@ pt_close(void)
 		printf("****ERROR: close failed\n");
 		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -11395,7 +11659,7 @@ iut_open(void)
 		printf("                                   ****ERROR: open failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                                             :ioctl                 \n");
@@ -11405,17 +11669,17 @@ iut_open(void)
 		printf("                                   ****ERROR: ioctl failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	if ((ret = signal(OPTMGMT_REQ)) != SUCCESS)
-		return FAILURE;
+	if ((ret = signal(OPTMGMT_REQ)) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
 	if ((event = wait_event(SHORT_WAIT)) != OK_ACK)
-		return FAILURE;
-	if ((ret = signal(BIND_REQ)) != SUCCESS)
-		return FAILURE;
+		return __RESULT_FAILURE;
+	if ((ret = signal(BIND_REQ)) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
 	if ((event = wait_event(SHORT_WAIT)) != BIND_ACK)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -11429,19 +11693,19 @@ iut_connect(void)
 		printf("                                             :connect               \n");
 		FFLUSH(stdout);
 	}
-	if ((ret = signal(CONN_REQ)) != SUCCESS)
+	if ((ret = signal(CONN_REQ)) != __RESULT_SUCCESS)
 		return ret;
 	if ((event = wait_event(LONG_WAIT)) != CONN_IND)
-		return FAILURE;
-	if ((ret = control(CONN_RES)) != SUCCESS)
+		return __RESULT_FAILURE;
+	if ((ret = control(CONN_RES)) != __RESULT_SUCCESS)
 		return ret;
 	ret = wait_event(LONG_WAIT);
 	if (ret != OK_ACK && ret != CONN_CON)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	ret = wait_event(LONG_WAIT);
 	if (ret != OK_ACK && ret != CONN_CON)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -11459,7 +11723,7 @@ iut_m2pa_push(void)
 		printf("                                   ****ERROR: push m2pa-sl failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                                             :options sdl           \n");
@@ -11474,7 +11738,7 @@ iut_m2pa_push(void)
 		printf("                                   ****ERROR: options sdl failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                                             :config sdl            \n");
@@ -11488,7 +11752,7 @@ iut_m2pa_push(void)
 		printf("                                   ****ERROR: config sdl failed\n");
 		FFLUSH(stdout);
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                                             :options sdt           \n");
@@ -11503,7 +11767,7 @@ iut_m2pa_push(void)
 		printf("                                   ****ERROR: options sdt failed\n");
 		FFLUSH(stdout);
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                                             :config sdt            \n");
@@ -11517,7 +11781,7 @@ iut_m2pa_push(void)
 		printf("                                   ****ERROR: config sdt failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                                             :options sl            \n");
@@ -11532,7 +11796,7 @@ iut_m2pa_push(void)
 		printf("                                   ****ERROR: options sl failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
 	if (verbose > 1) {
 		printf("                                             :config sl             \n");
@@ -11546,29 +11810,29 @@ iut_m2pa_push(void)
 		printf("                                   ****ERROR: config sl failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 static int
 iut_enable(void)
 {
 	int ret;
-	if ((ret = signal(ENABLE_REQ)) != SUCCESS)
-		return FAILURE;
+	if ((ret = signal(ENABLE_REQ)) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
 	if ((event = wait_event(SHORT_WAIT)) != ENABLE_CON)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 static int
 iut_disable(void)
 {
 	int ret;
-	if ((ret = signal(DISABLE_REQ)) != SUCCESS)
-		return FAILURE;
+	if ((ret = signal(DISABLE_REQ)) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
 	if (wait_event(SHORT_WAIT) != DISABLE_CON)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 static int
 iut_pop(void)
@@ -11581,21 +11845,21 @@ iut_pop(void)
 		printf("                                   ****ERROR: pop failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 static int
 iut_disconnect(void)
 {
 	int ret;
-	if ((ret = signal(DISCON_REQ)) != SUCCESS)
+	if ((ret = signal(DISCON_REQ)) != __RESULT_SUCCESS)
 		return ret;
 	if (wait_event(SHORT_WAIT) != OK_ACK)
-		return FAILURE;
+		return __RESULT_FAILURE;
 	if (wait_event(LONG_WAIT) != DISCON_IND)
-		return FAILURE;
-	return SUCCESS;
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -11612,10 +11876,54 @@ iut_close(void)
 		printf("                                   ****ERROR: close failed\n");
 		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
-		return FAILURE;
+		return __RESULT_FAILURE;
 	}
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
+
+static int
+begin_tests(void)
+{
+	// ioctl( pt_fd, I_FLUSH, FLUSHRW); /* flush Protocol Tester (PT) */
+	state = 0;
+	event = 0;
+	count = 0;
+	tries = 0;
+	beg_time = 0;
+	expand = 0;
+	oldmsg = 0;
+	cntmsg = 0;
+	oldpsb = 0;
+	oldact = 0;
+	cntact = 0;
+	oldret = 0;
+	cntret = 0;
+	oldisb = 0;
+	oldprm = 0;
+	cntprm = 0;
+	oldmgm = 0;
+	cntmgm = 0;
+	msu_len = MSU_LEN;
+	return (__RESULT_SUCCESS);
+}
+static int
+begin_test_case(void)
+{
+	state = 0;
+	event = 0;
+	count = 0;
+	tries = 0;
+	beg_time = 0;
+	expand = 1;
+	return (__RESULT_SUCCESS);
+}
+#if 0
+static int
+end_tests(void)
+{
+	return (__RESULT_SUCCESS);
+}
+#endif
 
 /*
  *  =========================================================================
@@ -11644,7 +11952,7 @@ iut_power_off(void)
 	pt_close();
 	ioctl(mgm_fd, I_FLUSH, FLUSHRW);
 	mgm_close();
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 
 /* 
@@ -11665,20 +11973,20 @@ link_power_off(void)
 	pt_bsn = pt_fsn = iut_bsn = iut_fsn = 0x0;
 #endif				/* defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 ||
 				   defined M2PA_VERSION_DRAFT11 */
-	if (mgm_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (pt_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_connect() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_m2pa_push() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_enable() != SUCCESS)
-		return INCONCLUSIVE;
+	if (mgm_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (pt_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_connect() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_m2pa_push() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_enable() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
 	start_tt(MAXIMUM_WAIT);
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 static int
 link_out_of_service(void)
@@ -11695,22 +12003,22 @@ link_out_of_service(void)
 	pt_bsn = pt_fsn = iut_bsn = iut_fsn = 0x0;
 #endif				/* defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 ||
 				   defined M2PA_VERSION_DRAFT11 */
-	if (mgm_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (pt_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_connect() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_m2pa_push() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_enable() != SUCCESS)
-		return INCONCLUSIVE;
-	if (signal(POWER_ON) != SUCCESS)
-		return INCONCLUSIVE;
+	if (mgm_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (pt_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_connect() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_m2pa_push() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_enable() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (signal(POWER_ON) != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
 	start_tt(MAXIMUM_WAIT);
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 static int
 link_out_of_service_np(void)
@@ -11727,28 +12035,28 @@ link_out_of_service_np(void)
 	pt_bsn = pt_fsn = iut_bsn = iut_fsn = 0x0;
 #endif				/* defined M2PA_VERSION_DRAFT9 || defined M2PA_VERSION_DRAFT10 ||
 				   defined M2PA_VERSION_DRAFT11 */
-	if (mgm_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (pt_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_open() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_connect() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_m2pa_push() != SUCCESS)
-		return INCONCLUSIVE;
-	if (iut_enable() != SUCCESS)
-		return INCONCLUSIVE;
-	if (signal(POWER_ON) != SUCCESS)
-		return INCONCLUSIVE;
+	if (mgm_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (pt_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_open() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_connect() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_m2pa_push() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (iut_enable() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
+	if (signal(POWER_ON) != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
 	start_tt(MAXIMUM_WAIT);
-	return SUCCESS;
+	return __RESULT_SUCCESS;
 }
 static int
 link_in_service(void)
 {
-	if (link_out_of_service() != SUCCESS)
-		return INCONCLUSIVE;
+	if (link_out_of_service() != __RESULT_SUCCESS)
+		return __RESULT_INCONCLUSIVE;
 	for (;;) {
 		switch (state) {
 		case 0:
@@ -11760,7 +12068,7 @@ link_in_service(void)
 				state = 1;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 1:
@@ -11771,7 +12079,7 @@ link_in_service(void)
 				state = 2;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 2:
@@ -11783,7 +12091,7 @@ link_in_service(void)
 				state = 3;
 				break;
 			default:
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		case 3:
@@ -11806,17 +12114,17 @@ link_in_service(void)
 			case IUT_IN_SERVICE:
 				expand = 1;
 				start_tt(MAXIMUM_WAIT);
-				return SUCCESS;
+				return __RESULT_SUCCESS;
 			default:
 				expand = 1;
-				return INCONCLUSIVE;
+				return __RESULT_INCONCLUSIVE;
 			}
 			break;
 		default:
-			return INCONCLUSIVE;
+			return __RESULT_INCONCLUSIVE;
 		}
 	}
-	return INCONCLUSIVE;
+	return __RESULT_INCONCLUSIVE;
 }
 static int
 link_in_service_basic(void)
@@ -11831,375 +12139,824 @@ link_in_service_pcr(void)
 	return link_in_service();
 }
 
+
 /*
- *  =========================================================================
+ *  -------------------------------------------------------------------------
  *
- *  TEST CASE Lists
+ *  Test case child scheduler
  *
- *  =========================================================================
+ *  -------------------------------------------------------------------------
  */
+int
+run_stream(int child, struct test_stream *stream)
+{
+	int result = __RESULT_SCRIPT_ERROR;
+	int pre_result = __RESULT_SCRIPT_ERROR;
+	int post_result = __RESULT_SCRIPT_ERROR;
+
+	print_preamble(child);
+	state = 100;
+	failure_string = NULL;
+	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
+		switch (pre_result) {
+		case __RESULT_NOTAPPL:
+			print_notapplicable(child);
+			result = __RESULT_NOTAPPL;
+			break;
+		case __RESULT_SKIPPED:
+			print_skipped(child);
+			result = __RESULT_SKIPPED;
+			break;
+		default:
+			print_inconclusive(child);
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		}
+	} else {
+		print_test(child);
+		state = 200;
+		failure_string = NULL;
+		switch (stream->testcase(child)) {
+		default:
+		case __RESULT_INCONCLUSIVE:
+			print_inconclusive(child);
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_NOTAPPL:
+			print_notapplicable(child);
+			result = __RESULT_NOTAPPL;
+			break;
+		case __RESULT_SKIPPED:
+			print_skipped(child);
+			result = __RESULT_SKIPPED;
+			break;
+		case __RESULT_FAILURE:
+			print_failed(child);
+			result = __RESULT_FAILURE;
+			break;
+		case __RESULT_SCRIPT_ERROR:
+			print_script_error(child);
+			result = __RESULT_SCRIPT_ERROR;
+			break;
+		case __RESULT_SUCCESS:
+			print_passed(child);
+			result = __RESULT_SUCCESS;
+			break;
+		}
+		print_postamble(child);
+		state = 300;
+		failure_string = NULL;
+		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
+			switch (post_result) {
+			case __RESULT_NOTAPPL:
+				print_notapplicable(child);
+				result = __RESULT_NOTAPPL;
+				break;
+			case __RESULT_SKIPPED:
+				print_skipped(child);
+				result = __RESULT_SKIPPED;
+				break;
+			default:
+				print_inconclusive(child);
+				if (result == __RESULT_SUCCESS)
+					result = __RESULT_INCONCLUSIVE;
+				break;
+			}
+		}
+	}
+	print_test_end(child);
+	exit(result);
+}
+
+/*
+ *  Fork multiple children to do the actual testing.
+ *  The conn child (child[0]) is the connecting process, the resp child
+ *  (child[1]) is the responding process.
+ */
+
+int
+test_run(struct test_stream *stream[])
+{
+	int children = 0;
+	pid_t this_child, child[3] = { 0, };
+	int this_status, status[3] = { 0, };
+
+	if (start_tt(test_duration) != __RESULT_SUCCESS)
+		goto inconclusive;
+	if (server_exec && stream[2]) {
+		switch ((child[2] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
+		case -1:	/* error */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			if (child[1])
+				kill(child[1], SIGKILL);	/* toast stream[1] child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[2] = __RESULT_SUCCESS;
+	if (server_exec && stream[1]) {
+		switch ((child[1] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
+		case -1:	/* error */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[1] = __RESULT_SUCCESS;
+	if (client_exec && stream[0]) {
+		switch ((child[0] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
+		case -1:	/* error */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[0] = __RESULT_SUCCESS;
+	for (; children > 0; children--) {
+	      waitagain:
+		if ((this_child = wait(&this_status)) > 0) {
+			if (WIFEXITED(this_status)) {
+				if (this_child == child[0]) {
+					child[0] = 0;
+					if ((status[0] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[1])
+							kill(child[1], SIGKILL);
+						if (child[2])
+							kill(child[2], SIGKILL);
+					}
+				}
+				if (this_child == child[1]) {
+					child[1] = 0;
+					if ((status[1] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[0])
+							kill(child[0], SIGKILL);
+						if (child[2])
+							kill(child[2], SIGKILL);
+					}
+				}
+				if (this_child == child[2]) {
+					child[2] = 0;
+					if ((status[2] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[0])
+							kill(child[0], SIGKILL);
+						if (child[1])
+							kill(child[1], SIGKILL);
+					}
+				}
+			} else if (WIFSIGNALED(this_status)) {
+				int signal = WTERMSIG(this_status);
+
+				if (this_child == child[0]) {
+					print_terminated(0, signal);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					child[0] = 0;
+				}
+				if (this_child == child[1]) {
+					print_terminated(1, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					child[1] = 0;
+				}
+				if (this_child == child[2]) {
+					print_terminated(2, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					child[2] = 0;
+				}
+			} else if (WIFSTOPPED(this_status)) {
+				int signal = WSTOPSIG(this_status);
+
+				if (this_child == child[0]) {
+					print_stopped(0, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[0] = __RESULT_FAILURE;
+					child[0] = 0;
+				}
+				if (this_child == child[1]) {
+					print_stopped(1, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[1] = __RESULT_FAILURE;
+					child[1] = 0;
+				}
+				if (this_child == child[2]) {
+					print_stopped(2, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
+					status[2] = __RESULT_FAILURE;
+					child[2] = 0;
+				}
+			}
+		} else {
+			if (timer_timeout) {
+				timer_timeout = 0;
+				print_timeout(3);
+			}
+			if (child[0])
+				kill(child[0], SIGKILL);
+			if (child[1])
+				kill(child[1], SIGKILL);
+			if (child[2])
+				kill(child[2], SIGKILL);
+			goto waitagain;
+		}
+	}
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto inconclusive;
+	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
+		return (__RESULT_NOTAPPL);
+	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
+		return (__RESULT_SKIPPED);
+	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE || status[2] == __RESULT_FAILURE)
+		return (__RESULT_FAILURE);
+	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
+		return (__RESULT_SUCCESS);
+      inconclusive:
+	return (__RESULT_INCONCLUSIVE);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Test case lists
+ *
+ *  -------------------------------------------------------------------------
+ */
+
 struct test_case {
 	const char *numb;		/* test case number */
+	const char *tgrp;		/* test case group */
 	const char *name;		/* test case name */
-	int (*testcase) (void);		/* test case proper */
-	int (*preamble) (void);		/* test case preamble */
-	int (*postamble) (void);	/* test case postamble */
+	const char *desc;		/* test case description */
+	const char *sref;		/* test case standards section reference */
+	struct test_stream *stream[3];	/* test streams */
+	int (*start) (int);		/* start function */
+	int (*stop) (int);		/* stop function */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
-} test_suite[] = {
+} tests[] = {
 	{
-	"1.1(a)", desc_case_1_1a, test_case_1_1a, link_power_off, iut_power_off, 0, 0}, {
-	"1.1(b)", desc_case_1_1b, test_case_1_1b, link_out_of_service, iut_power_off, 0, 0}, {
-	"1.2", desc_case_1_2, test_case_1_2, link_out_of_service, iut_power_off, 0, 0}, {
-	"1.3", desc_case_1_3, test_case_1_3, link_out_of_service, iut_power_off, 0, 0}, {
-	"1.4", desc_case_1_4, test_case_1_4, link_out_of_service, iut_power_off, 0, 0}, {
-	"1.5(a)", desc_case_1_5a_p, test_case_1_5a_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.5(b)", desc_case_1_5b_p, test_case_1_5b_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.5(a)np", desc_case_1_5a_np, test_case_1_5a_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.5(b)np", desc_case_1_5b_np, test_case_1_5b_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.6", desc_case_1_6_p, test_case_1_6_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.6np", desc_case_1_6_np, test_case_1_6_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.7", desc_case_1_7, test_case_1_7, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.8(a)", desc_case_1_8a_p, test_case_1_8a_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.8(b)", desc_case_1_8b_p, test_case_1_8b_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.8(a)np", desc_case_1_8a_np, test_case_1_8a_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.8(b)np", desc_case_1_8b_np, test_case_1_8b_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.9(a)", desc_case_1_9a_p, test_case_1_9a_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.9(b)", desc_case_1_9b_p, test_case_1_9b_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.9(a)np", desc_case_1_9a_np, test_case_1_9a_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.9(b)np", desc_case_1_9b_np, test_case_1_9b_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.10", desc_case_1_10_p, test_case_1_10_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.10np", desc_case_1_10_np, test_case_1_10_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.11", desc_case_1_11_p, test_case_1_11_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.11np", desc_case_1_11_np, test_case_1_11_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.12(a)", desc_case_1_12a_p, test_case_1_12a_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.12(b)", desc_case_1_12b_p, test_case_1_12b_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.12(a)np", desc_case_1_12a_np, test_case_1_12a_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.12(b)np", desc_case_1_12b_np, test_case_1_12b_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.13", desc_case_1_13_p, test_case_1_13_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.13np", desc_case_1_13_np, test_case_1_13_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.14", desc_case_1_14, test_case_1_14, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.15", desc_case_1_15_p, test_case_1_15_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.15np", desc_case_1_15_np, test_case_1_15_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.16", desc_case_1_16_p, test_case_1_16_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.16np", desc_case_1_16_np, test_case_1_16_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.17", desc_case_1_17, test_case_1_17, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.18", desc_case_1_18, test_case_1_18, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.19", desc_case_1_19, test_case_1_19, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.20", desc_case_1_20, test_case_1_20, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.21", desc_case_1_21, test_case_1_21, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.22", desc_case_1_22, test_case_1_22, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.23", desc_case_1_23, test_case_1_23, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.24", desc_case_1_24, test_case_1_24, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.25", desc_case_1_25, test_case_1_25, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.26", desc_case_1_26, test_case_1_26, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.27", desc_case_1_27_p, test_case_1_27_p, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.27np", desc_case_1_27_np, test_case_1_27_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
-	"1.28", desc_case_1_28, test_case_1_28, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"1.29(a)", desc_case_1_29a, test_case_1_29a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"1.29(b)", desc_case_1_29b, test_case_1_29b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"1.30(a)", desc_case_1_30a, test_case_1_30a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"1.30(b)", desc_case_1_30b, test_case_1_30b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"1.31(a)", desc_case_1_31a, test_case_1_31a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"1.31(b)", desc_case_1_31b, test_case_1_31b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"1.32(a)", desc_case_1_32a, test_case_1_32a, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.32(b)", desc_case_1_32b, test_case_1_32b, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.33", desc_case_1_33, test_case_1_33, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.34", desc_case_1_34, test_case_1_34, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.35", desc_case_1_35, test_case_1_35, link_out_of_service, iut_power_off, 0, 0,}, {
-	"2.1", desc_case_2_1, test_case_2_1, link_out_of_service, iut_power_off, 0, 0,}, {
-	"2.2", desc_case_2_2, test_case_2_2, link_out_of_service, iut_power_off, 0, 0,}, {
-	"2.3", desc_case_2_3, test_case_2_3, link_out_of_service, iut_power_off, 0, 0,}, {
-	"2.4", desc_case_2_4, test_case_2_4, link_out_of_service, iut_power_off, 0, 0,}, {
-	"2.5", desc_case_2_5, test_case_2_5, link_out_of_service, iut_power_off, 0, 0,}, {
-	"2.6", desc_case_2_6, test_case_2_6, link_out_of_service, iut_power_off, 0, 0,}, {
-	"2.7", desc_case_2_7, test_case_2_7, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"2.8", desc_case_2_8, test_case_2_8, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"3.1", desc_case_3_1, test_case_3_1, link_out_of_service, iut_power_off, 0, 0,}, {
-	"3.2", desc_case_3_2, test_case_3_2, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"3.3", desc_case_3_3, test_case_3_3, link_out_of_service, iut_power_off, 0, 0,}, {
-	"3.4", desc_case_3_4, test_case_3_4, link_out_of_service, iut_power_off, 0, 0,}, {
-	"3.5", desc_case_3_5, test_case_3_5, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"3.6", desc_case_3_6, test_case_3_6, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"3.7", desc_case_3_7, test_case_3_7, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"3.8", desc_case_3_8, test_case_3_8, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"4.1(a)", desc_case_4_1a, test_case_4_1a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"4.1(b)", desc_case_4_1b, test_case_4_1b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"4.2", desc_case_4_2, test_case_4_2, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"4.3", desc_case_4_3, test_case_4_3, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"5.1", desc_case_5_1, test_case_5_1, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"5.2", desc_case_5_2, test_case_5_2, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"5.3", desc_case_5_3, test_case_5_3, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"5.4(a)", desc_case_5_4a, test_case_5_4a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"5.4(b)", desc_case_5_4b, test_case_5_4b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"5.5(a)", desc_case_5_5a, test_case_5_5a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"5.5(b)", desc_case_5_5b, test_case_5_5b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"6.1", desc_case_6_1, test_case_6_1, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"6.2", desc_case_6_2, test_case_6_2, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"6.3", desc_case_6_3, test_case_6_3, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"6.4", desc_case_6_4, test_case_6_4, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"7.1", desc_case_7_1, test_case_7_1, link_out_of_service, iut_power_off, 0, 0,}, {
-	"7.2", desc_case_7_2, test_case_7_2, link_out_of_service, iut_power_off, 0, 0,}, {
-	"7.3", desc_case_7_3, test_case_7_3, link_out_of_service, iut_power_off, 0, 0,}, {
-	"7.4", desc_case_7_4, test_case_7_4, link_out_of_service, iut_power_off, 0, 0,}, {
-	"8.1", desc_case_8_1, test_case_8_1, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.2", desc_case_8_2, test_case_8_2, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.3", desc_case_8_3, test_case_8_3, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.4", desc_case_8_4, test_case_8_4, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.5", desc_case_8_5, test_case_8_5, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.6", desc_case_8_6, test_case_8_6, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.7", desc_case_8_7, test_case_8_7, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.8", desc_case_8_8, test_case_8_8, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.9(a)", desc_case_8_9a, test_case_8_9a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.9(b)", desc_case_8_9b, test_case_8_9b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.10", desc_case_8_10, test_case_8_10, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.11", desc_case_8_11, test_case_8_11, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.12(a)", desc_case_8_12a, test_case_8_12a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.12(b)", desc_case_8_12b, test_case_8_12b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.13", desc_case_8_13, test_case_8_13, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.14", desc_case_8_14, test_case_8_14, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"9.1", desc_case_9_1, test_case_9_1, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.2", desc_case_9_2, test_case_9_2, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.3", desc_case_9_3, test_case_9_3, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.4", desc_case_9_4, test_case_9_4, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.5", desc_case_9_5, test_case_9_5, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.6", desc_case_9_6, test_case_9_6, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.7", desc_case_9_7, test_case_9_7, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.8", desc_case_9_8, test_case_9_8, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.9", desc_case_9_9, test_case_9_9, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.10", desc_case_9_10, test_case_9_10, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.11", desc_case_9_11, test_case_9_11, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.12", desc_case_9_12, test_case_9_12, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"9.13", desc_case_9_13, test_case_9_13, link_in_service_pcr, iut_power_off, 0, 0,}, {
-	"10.1", desc_case_10_1, test_case_10_1, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"10.2(a)", desc_case_10_2a, test_case_10_2a, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"10.2(b)", desc_case_10_2b, test_case_10_2b, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"10.2(c)", desc_case_10_2c, test_case_10_2c, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"10.3", desc_case_10_3, test_case_10_3, link_in_service_basic, iut_power_off, 0, 0,}, {
+		numb_case_1_1a, tgrp_case_1_1a, name_case_1_1a, desc_case_1_1a, sref_case_1_1a, { {
+	link_power_off, test_case_1_1a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_1b, tgrp_case_1_1b, name_case_1_1b, desc_case_1_1b, sref_case_1_1b, { {
+	link_out_of_service, test_case_1_1b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, { {
+	link_out_of_service, test_case_1_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, { {
+	link_out_of_service, test_case_1_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_4, tgrp_case_1_4, name_case_1_4, desc_case_1_4, sref_case_1_4, { {
+	link_out_of_service, test_case_1_4, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_5a_p, tgrp_case_1_5a_p, name_case_1_5a_p, desc_case_1_5a_p, sref_case_1_5a_p, { {
+	link_out_of_service, test_case_1_5a_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_5b_p, tgrp_case_1_5b_p, name_case_1_5b_p, desc_case_1_5b_p, sref_case_1_5b_p, { {
+	link_out_of_service, test_case_1_5b_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_5a_np, tgrp_case_1_5a_np, name_case_1_5a_np, desc_case_1_5a_np, sref_case_1_5a_np, { {
+	link_out_of_service_np, test_case_1_5a_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_5b_np, tgrp_case_1_5b_np, name_case_1_5b_np, desc_case_1_5b_np, sref_case_1_5b_np, { {
+	link_out_of_service_np, test_case_1_5b_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_6_p, tgrp_case_1_6_p, name_case_1_6_p, desc_case_1_6_p, sref_case_1_6_p, { {
+	link_out_of_service, test_case_1_6_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_6_np, tgrp_case_1_6_np, name_case_1_6_np, desc_case_1_6_np, sref_case_1_6_np, { {
+	link_out_of_service_np, test_case_1_6_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_7, tgrp_case_1_7, name_case_1_7, desc_case_1_7, sref_case_1_7, { {
+	link_out_of_service, test_case_1_7, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_8a_p, tgrp_case_1_8a_p, name_case_1_8a_p, desc_case_1_8a_p, sref_case_1_8a_p, { {
+	link_out_of_service, test_case_1_8a_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_8b_p, tgrp_case_1_8b_p, name_case_1_8b_p, desc_case_1_8b_p, sref_case_1_8b_p, { {
+	link_out_of_service, test_case_1_8b_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_8a_np, tgrp_case_1_8a_np, name_case_1_8a_np, desc_case_1_8a_np, sref_case_1_8a_np, { {
+	link_out_of_service_np, test_case_1_8a_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_8b_np, tgrp_case_1_8b_np, name_case_1_8b_np, desc_case_1_8b_np, sref_case_1_8b_np, { {
+	link_out_of_service_np, test_case_1_8b_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_9a_p, tgrp_case_1_9a_p, name_case_1_9a_p, desc_case_1_9a_p, sref_case_1_9a_p, { {
+	link_out_of_service, test_case_1_9a_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_9b_p, tgrp_case_1_9b_p, name_case_1_9b_p, desc_case_1_9b_p, sref_case_1_9b_p, { {
+	link_out_of_service, test_case_1_9b_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_9a_np, tgrp_case_1_9a_np, name_case_1_9a_np, desc_case_1_9a_np, sref_case_1_9a_np, { {
+	link_out_of_service_np, test_case_1_9a_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_9b_np, tgrp_case_1_9b_np, name_case_1_9b_np, desc_case_1_9b_np, sref_case_1_9b_np, { {
+	link_out_of_service_np, test_case_1_9b_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_10_p, tgrp_case_1_10_p, name_case_1_10_p, desc_case_1_10_p, sref_case_1_10_p, { {
+	link_out_of_service, test_case_1_10_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_10_np, tgrp_case_1_10_np, name_case_1_10_np, desc_case_1_10_np, sref_case_1_10_np, { {
+	link_out_of_service_np, test_case_1_10_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_11_p, tgrp_case_1_11_p, name_case_1_11_p, desc_case_1_11_p, sref_case_1_11_p, { {
+	link_out_of_service, test_case_1_11_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_11_np, tgrp_case_1_11_np, name_case_1_11_np, desc_case_1_11_np, sref_case_1_11_np, { {
+	link_out_of_service_np, test_case_1_11_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_12a_p, tgrp_case_1_12a_p, name_case_1_12a_p, desc_case_1_12a_p, sref_case_1_12a_p, { {
+	link_out_of_service, test_case_1_12a_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_12b_p, tgrp_case_1_12b_p, name_case_1_12b_p, desc_case_1_12b_p, sref_case_1_12b_p, { {
+	link_out_of_service, test_case_1_12b_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_12a_np, tgrp_case_1_12a_np, name_case_1_12a_np, desc_case_1_12a_np, sref_case_1_12a_np, { {
+	link_out_of_service_np, test_case_1_12a_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_12b_np, tgrp_case_1_12b_np, name_case_1_12b_np, desc_case_1_12b_np, sref_case_1_12b_np, { {
+	link_out_of_service_np, test_case_1_12b_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_13_p, tgrp_case_1_13_p, name_case_1_13_p, desc_case_1_13_p, sref_case_1_13_p, { {
+	link_out_of_service, test_case_1_13_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_13_np, tgrp_case_1_13_np, name_case_1_13_np, desc_case_1_13_np, sref_case_1_13_np, { {
+	link_out_of_service_np, test_case_1_13_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_14, tgrp_case_1_14, name_case_1_14, desc_case_1_14, sref_case_1_14, { {
+	link_out_of_service, test_case_1_14, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_15_p, tgrp_case_1_15_p, name_case_1_15_p, desc_case_1_15_p, sref_case_1_15_p, { {
+	link_out_of_service, test_case_1_15_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_15_np, tgrp_case_1_15_np, name_case_1_15_np, desc_case_1_15_np, sref_case_1_15_np, { {
+	link_out_of_service_np, test_case_1_15_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_16_p, tgrp_case_1_16_p, name_case_1_16_p, desc_case_1_16_p, sref_case_1_16_p, { {
+	link_out_of_service, test_case_1_16_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_16_np, tgrp_case_1_16_np, name_case_1_16_np, desc_case_1_16_np, sref_case_1_16_np, { {
+	link_out_of_service_np, test_case_1_16_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_17, tgrp_case_1_17, name_case_1_17, desc_case_1_17, sref_case_1_17, { {
+	link_out_of_service, test_case_1_17, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_18, tgrp_case_1_18, name_case_1_18, desc_case_1_18, sref_case_1_18, { {
+	link_out_of_service, test_case_1_18, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_19, tgrp_case_1_19, name_case_1_19, desc_case_1_19, sref_case_1_19, { {
+	link_out_of_service, test_case_1_19, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_20, tgrp_case_1_20, name_case_1_20, desc_case_1_20, sref_case_1_20, { {
+	link_out_of_service, test_case_1_20, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_21, tgrp_case_1_21, name_case_1_21, desc_case_1_21, sref_case_1_21, { {
+	link_out_of_service, test_case_1_21, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_22, tgrp_case_1_22, name_case_1_22, desc_case_1_22, sref_case_1_22, { {
+	link_out_of_service, test_case_1_22, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_23, tgrp_case_1_23, name_case_1_23, desc_case_1_23, sref_case_1_23, { {
+	link_out_of_service, test_case_1_23, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_24, tgrp_case_1_24, name_case_1_24, desc_case_1_24, sref_case_1_24, { {
+	link_out_of_service, test_case_1_24, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_25, tgrp_case_1_25, name_case_1_25, desc_case_1_25, sref_case_1_25, { {
+	link_out_of_service, test_case_1_25, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_26, tgrp_case_1_26, name_case_1_26, desc_case_1_26, sref_case_1_26, { {
+	link_out_of_service, test_case_1_26, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_27_p, tgrp_case_1_27_p, name_case_1_27_p, desc_case_1_27_p, sref_case_1_27_p, { {
+	link_out_of_service, test_case_1_27_p, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_27_np, tgrp_case_1_27_np, name_case_1_27_np, desc_case_1_27_np, sref_case_1_27_np, { {
+	link_out_of_service_np, test_case_1_27_np, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_28, tgrp_case_1_28, name_case_1_28, desc_case_1_28, sref_case_1_28, { {
+	link_in_service_basic, test_case_1_28, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_29a, tgrp_case_1_29a, name_case_1_29a, desc_case_1_29a, sref_case_1_29a, { {
+	link_in_service_basic, test_case_1_29a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_29b, tgrp_case_1_29b, name_case_1_29b, desc_case_1_29b, sref_case_1_29b, { {
+	link_in_service_basic, test_case_1_29b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_30a, tgrp_case_1_30a, name_case_1_30a, desc_case_1_30a, sref_case_1_30a, { {
+	link_in_service_basic, test_case_1_30a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_30b, tgrp_case_1_30b, name_case_1_30b, desc_case_1_30b, sref_case_1_30b, { {
+	link_in_service_basic, test_case_1_30b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_31a, tgrp_case_1_31a, name_case_1_31a, desc_case_1_31a, sref_case_1_31a, { {
+	link_in_service_basic, test_case_1_31a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_31b, tgrp_case_1_31b, name_case_1_31b, desc_case_1_31b, sref_case_1_31b, { {
+	link_in_service_basic, test_case_1_31b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_32a, tgrp_case_1_32a, name_case_1_32a, desc_case_1_32a, sref_case_1_32a, { {
+	link_out_of_service, test_case_1_32a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_32b, tgrp_case_1_32b, name_case_1_32b, desc_case_1_32b, sref_case_1_32b, { {
+	link_out_of_service, test_case_1_32b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_33, tgrp_case_1_33, name_case_1_33, desc_case_1_33, sref_case_1_33, { {
+	link_out_of_service, test_case_1_33, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_34, tgrp_case_1_34, name_case_1_34, desc_case_1_34, sref_case_1_34, { {
+	link_out_of_service, test_case_1_34, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_1_35, tgrp_case_1_35, name_case_1_35, desc_case_1_35, sref_case_1_35, { {
+	link_out_of_service, test_case_1_35, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_2_1, tgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, { {
+	link_out_of_service, test_case_2_1, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, { {
+	link_out_of_service, test_case_2_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_2_3, tgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, { {
+	link_out_of_service, test_case_2_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_2_4, tgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, { {
+	link_out_of_service, test_case_2_4, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_2_5, tgrp_case_2_5, name_case_2_5, desc_case_2_5, sref_case_2_5, { {
+	link_out_of_service, test_case_2_5, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_2_6, tgrp_case_2_6, name_case_2_6, desc_case_2_6, sref_case_2_6, { {
+	link_out_of_service, test_case_2_6, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_2_7, tgrp_case_2_7, name_case_2_7, desc_case_2_7, sref_case_2_7, { {
+	link_in_service_basic, test_case_2_7, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_2_8, tgrp_case_2_8, name_case_2_8, desc_case_2_8, sref_case_2_8, { {
+	link_in_service_basic, test_case_2_8, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, { {
+	link_out_of_service, test_case_3_1, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, { {
+	link_in_service_basic, test_case_3_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, { {
+	link_out_of_service, test_case_3_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_3_4, tgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, { {
+	link_out_of_service, test_case_3_4, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_3_5, tgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, { {
+	link_in_service_basic, test_case_3_5, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_3_6, tgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, { {
+	link_in_service_basic, test_case_3_6, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_3_7, tgrp_case_3_7, name_case_3_7, desc_case_3_7, sref_case_3_7, { {
+	link_in_service_basic, test_case_3_7, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_3_8, tgrp_case_3_8, name_case_3_8, desc_case_3_8, sref_case_3_8, { {
+	link_in_service_basic, test_case_3_8, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_4_1a, tgrp_case_4_1a, name_case_4_1a, desc_case_4_1a, sref_case_4_1a, { {
+	link_in_service_basic, test_case_4_1a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_4_1b, tgrp_case_4_1b, name_case_4_1b, desc_case_4_1b, sref_case_4_1b, { {
+	link_in_service_basic, test_case_4_1b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_4_2, tgrp_case_4_2, name_case_4_2, desc_case_4_2, sref_case_4_2, { {
+	link_in_service_basic, test_case_4_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_4_3, tgrp_case_4_3, name_case_4_3, desc_case_4_3, sref_case_4_3, { {
+	link_in_service_basic, test_case_4_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_5_1, tgrp_case_5_1, name_case_5_1, desc_case_5_1, sref_case_5_1, { {
+	link_in_service_basic, test_case_5_1, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_5_2, tgrp_case_5_2, name_case_5_2, desc_case_5_2, sref_case_5_2, { {
+	link_in_service_basic, test_case_5_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_5_3, tgrp_case_5_3, name_case_5_3, desc_case_5_3, sref_case_5_3, { {
+	link_in_service_basic, test_case_5_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_5_4a, tgrp_case_5_4a, name_case_5_4a, desc_case_5_4a, sref_case_5_4a, { {
+	link_in_service_basic, test_case_5_4a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_5_4b, tgrp_case_5_4b, name_case_5_4b, desc_case_5_4b, sref_case_5_4b, { {
+	link_in_service_basic, test_case_5_4b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_5_5a, tgrp_case_5_5a, name_case_5_5a, desc_case_5_5a, sref_case_5_5a, { {
+	link_in_service_basic, test_case_5_5a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_5_5b, tgrp_case_5_5b, name_case_5_5b, desc_case_5_5b, sref_case_5_5b, { {
+	link_in_service_basic, test_case_5_5b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_6_1, tgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, { {
+	link_in_service_basic, test_case_6_1, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_6_2, tgrp_case_6_2, name_case_6_2, desc_case_6_2, sref_case_6_2, { {
+	link_in_service_basic, test_case_6_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_6_3, tgrp_case_6_3, name_case_6_3, desc_case_6_3, sref_case_6_3, { {
+	link_in_service_basic, test_case_6_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_6_4, tgrp_case_6_4, name_case_6_4, desc_case_6_4, sref_case_6_4, { {
+	link_in_service_basic, test_case_6_4, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_7_1, tgrp_case_7_1, name_case_7_1, desc_case_7_1, sref_case_7_1, { {
+	link_out_of_service, test_case_7_1, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_7_2, tgrp_case_7_2, name_case_7_2, desc_case_7_2, sref_case_7_2, { {
+	link_out_of_service, test_case_7_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_7_3, tgrp_case_7_3, name_case_7_3, desc_case_7_3, sref_case_7_3, { {
+	link_out_of_service, test_case_7_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_7_4, tgrp_case_7_4, name_case_7_4, desc_case_7_4, sref_case_7_4, { {
+	link_out_of_service, test_case_7_4, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_1, tgrp_case_8_1, name_case_8_1, desc_case_8_1, sref_case_8_1, { {
+	link_in_service_basic, test_case_8_1, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_2, tgrp_case_8_2, name_case_8_2, desc_case_8_2, sref_case_8_2, { {
+	link_in_service_basic, test_case_8_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_3, tgrp_case_8_3, name_case_8_3, desc_case_8_3, sref_case_8_3, { {
+	link_in_service_basic, test_case_8_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_4, tgrp_case_8_4, name_case_8_4, desc_case_8_4, sref_case_8_4, { {
+	link_in_service_basic, test_case_8_4, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_5, tgrp_case_8_5, name_case_8_5, desc_case_8_5, sref_case_8_5, { {
+	link_in_service_basic, test_case_8_5, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_6, tgrp_case_8_6, name_case_8_6, desc_case_8_6, sref_case_8_6, { {
+	link_in_service_basic, test_case_8_6, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_7, tgrp_case_8_7, name_case_8_7, desc_case_8_7, sref_case_8_7, { {
+	link_in_service_basic, test_case_8_7, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_8, tgrp_case_8_8, name_case_8_8, desc_case_8_8, sref_case_8_8, { {
+	link_in_service_basic, test_case_8_8, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_9a, tgrp_case_8_9a, name_case_8_9a, desc_case_8_9a, sref_case_8_9a, { {
+	link_in_service_basic, test_case_8_9a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_9b, tgrp_case_8_9b, name_case_8_9b, desc_case_8_9b, sref_case_8_9b, { {
+	link_in_service_basic, test_case_8_9b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_10, tgrp_case_8_10, name_case_8_10, desc_case_8_10, sref_case_8_10, { {
+	link_in_service_basic, test_case_8_10, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_11, tgrp_case_8_11, name_case_8_11, desc_case_8_11, sref_case_8_11, { {
+	link_in_service_basic, test_case_8_11, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_12a, tgrp_case_8_12a, name_case_8_12a, desc_case_8_12a, sref_case_8_12a, { {
+	link_in_service_basic, test_case_8_12a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_12b, tgrp_case_8_12b, name_case_8_12b, desc_case_8_12b, sref_case_8_12b, { {
+	link_in_service_basic, test_case_8_12b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_13, tgrp_case_8_13, name_case_8_13, desc_case_8_13, sref_case_8_13, { {
+	link_in_service_basic, test_case_8_13, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_8_14, tgrp_case_8_14, name_case_8_14, desc_case_8_14, sref_case_8_14, { {
+	link_in_service_basic, test_case_8_14, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_1, tgrp_case_9_1, name_case_9_1, desc_case_9_1, sref_case_9_1, { {
+	link_in_service_pcr, test_case_9_1, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_2, tgrp_case_9_2, name_case_9_2, desc_case_9_2, sref_case_9_2, { {
+	link_in_service_pcr, test_case_9_2, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_3, tgrp_case_9_3, name_case_9_3, desc_case_9_3, sref_case_9_3, { {
+	link_in_service_pcr, test_case_9_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_4, tgrp_case_9_4, name_case_9_4, desc_case_9_4, sref_case_9_4, { {
+	link_in_service_pcr, test_case_9_4, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_5, tgrp_case_9_5, name_case_9_5, desc_case_9_5, sref_case_9_5, { {
+	link_in_service_pcr, test_case_9_5, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_6, tgrp_case_9_6, name_case_9_6, desc_case_9_6, sref_case_9_6, { {
+	link_in_service_pcr, test_case_9_6, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_7, tgrp_case_9_7, name_case_9_7, desc_case_9_7, sref_case_9_7, { {
+	link_in_service_pcr, test_case_9_7, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_8, tgrp_case_9_8, name_case_9_8, desc_case_9_8, sref_case_9_8, { {
+	link_in_service_pcr, test_case_9_8, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_9, tgrp_case_9_9, name_case_9_9, desc_case_9_9, sref_case_9_9, { {
+	link_in_service_pcr, test_case_9_9, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_10, tgrp_case_9_10, name_case_9_10, desc_case_9_10, sref_case_9_10, { {
+	link_in_service_pcr, test_case_9_10, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_11, tgrp_case_9_11, name_case_9_11, desc_case_9_11, sref_case_9_11, { {
+	link_in_service_pcr, test_case_9_11, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_12, tgrp_case_9_12, name_case_9_12, desc_case_9_12, sref_case_9_12, { {
+	link_in_service_pcr, test_case_9_12, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_9_13, tgrp_case_9_13, name_case_9_13, desc_case_9_13, sref_case_9_13, { {
+	link_in_service_pcr, test_case_9_13, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_10_1, tgrp_case_10_1, name_case_10_1, desc_case_10_1, sref_case_10_1, { {
+	link_in_service_basic, test_case_10_1, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_10_2a, tgrp_case_10_2a, name_case_10_2a, desc_case_10_2a, sref_case_10_2a, { {
+	link_in_service_basic, test_case_10_2a, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_10_2b, tgrp_case_10_2b, name_case_10_2b, desc_case_10_2b, sref_case_10_2b, { {
+	link_in_service_basic, test_case_10_2b, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_10_2c, tgrp_case_10_2c, name_case_10_2c, desc_case_10_2c, sref_case_10_2c, { {
+	link_in_service_basic, test_case_10_2c, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
+		numb_case_10_3, tgrp_case_10_3, name_case_10_3, desc_case_10_3, sref_case_10_3, { {
+	link_in_service_basic, test_case_10_3, iut_power_off,},}, &begin_tests, &end_tests, 0, 0,}, {
 	NULL,}
 };
 
-static int
-begin_test(void)
-{
-	// ioctl( pt_fd, I_FLUSH, FLUSHRW); /* flush Protocol Tester (PT) */
-	state = 0;
-	event = 0;
-	count = 0;
-	tries = 0;
-	beg_time = 0;
-	expand = 0;
-	oldmsg = 0;
-	cntmsg = 0;
-	oldpsb = 0;
-	oldact = 0;
-	cntact = 0;
-	oldret = 0;
-	cntret = 0;
-	oldisb = 0;
-	oldprm = 0;
-	cntprm = 0;
-	oldmgm = 0;
-	cntmgm = 0;
-	msu_len = MSU_LEN;
-	return (SUCCESS);
-}
-static int
-begin_test_case(void)
-{
-	state = 0;
-	event = 0;
-	count = 0;
-	tries = 0;
-	beg_time = 0;
-	expand = 1;
-	return (SUCCESS);
-}
-#if 0
-static int
-end_tests(void)
-{
-	return (SUCCESS);
-}
-#endif
+static int summary = 0;
 
-#if 1
-#undef lockf
-#define lockf(x,y,z) 0
-#endif
+void
+print_header(void)
+{
+	if (verbose <= 0)
+		return;
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "\n%s - %s - %s - Conformance Test Suite\n", lstdname, lpkgname, shortname);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
 
 int
-do_tests(void)
+do_tests(int num_tests)
 {
 	int i;
-	int retry = 0;
-	int result = INCONCLUSIVE;
-	int failures = 0, successes = 0, inconclusive = 0, notapplicable = 0, scripterror = 0;
-	expand = 1;
-	show_msus = 1;
-	show_fisus = 1;
-	show_timeout = 1;
-	if (verbose) {
+	int result = __RESULT_INCONCLUSIVE;
+	int notapplicable = 0;
+	int inconclusive = 0;
+	int successes = 0;
+	int failures = 0;
+	int skipped = 0;
+	int notselected = 0;
+	int aborted = 0;
+
+	print_header();
+	show = 0;
+	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "\n\nM2PA - OpenSS7 STREAMS M2PA - Conformance Test Program.\n");
+		fprintf(stdout, "\nUsing device %s\n\n", devname);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	for (i = 0; i < sizeof(test_suite) / sizeof(struct test_case) && test_suite[i].numb; i++) {
-		if (!retry && test_suite[i].result)
-			continue;
-		if (!test_suite[i].run) {
-			test_suite[i].result = INCONCLUSIVE;
-			continue;
+	if (num_tests == 1 || begin_tests(0) == __RESULT_SUCCESS) {
+		if (num_tests != 1)
+			end_tests(0);
+		show = 1;
+		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+		      rerun:
+			if (!tests[i].run) {
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				notselected++;
+				continue;
+			}
+			if (aborted) {
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				inconclusive++;
+				continue;
+			}
+			if (verbose > 0) {
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
+				if (verbose > 1)
+					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
+				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
+				if (verbose > 1)
+					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
+				if (verbose > 1)
+					fprintf(stdout, "%s\n", tests[i].desc);
+				fprintf(stdout, "\n");
+				fflush(stdout);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			if ((result = tests[i].result) == 0) {
+				if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
+					goto inconclusive;
+				result = test_run(tests[i].stream);
+				(*tests[i].stop) (i);
+			} else {
+				switch (result) {
+				case __RESULT_SUCCESS:
+					print_passed(3);
+					break;
+				case __RESULT_FAILURE:
+					print_failed(3);
+					break;
+				case __RESULT_NOTAPPL:
+					print_notapplicable(3);
+					break;
+				case __RESULT_SKIPPED:
+					print_skipped(3);
+					break;
+				default:
+				case __RESULT_INCONCLUSIVE:
+					print_inconclusive(3);
+					break;
+				}
+			}
+			switch (result) {
+			case __RESULT_SUCCESS:
+				successes++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "*********\n");
+					fprintf(stdout, "********* Test Case SUCCESSFUL\n");
+					fprintf(stdout, "*********\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_FAILURE:
+				failures++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_NOTAPPL:
+				notapplicable++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case NOT APPLICABLE\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_SKIPPED:
+				skipped++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case SKIPPED\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			default:
+			case __RESULT_INCONCLUSIVE:
+			      inconclusive:
+				inconclusive++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "?????????\n");
+					fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
+					fprintf(stdout, "?????????\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			}
+			if (repeat_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+				goto rerun;
+			if (repeat_on_success && (result == __RESULT_SUCCESS))
+				goto rerun;
+			tests[i].result = result;
+			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE)) {
+				aborted = 1;
+				continue;
+			}
 		}
-		if (verbose) {
+		if (summary && verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "\nM2PA Test Case:Q.781/%s:\n%s\n", test_suite[i].numb, test_suite[i].name);
+			fprintf(stdout, "\n");
+			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+				if (tests[i].run) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "Test Case %s-%s/%-10s ", sstdname, shortname, tests[i].numb);
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+					switch (tests[i].result) {
+					case __RESULT_SUCCESS:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "SUCCESS\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_FAILURE:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "FAILURE\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_NOTAPPL:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "NOT APPLICABLE\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_SKIPPED:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "SKIPPED\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "INCONCLUSIVE\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					}
+				}
+			}
+		}
+		if (verbose > 0 && num_tests > 1) {
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "\n");
+			fprintf(stdout, "========= %3d successes     \n", successes);
+			fprintf(stdout, "========= %3d failures      \n", failures);
+			fprintf(stdout, "========= %3d inconclusive  \n", inconclusive);
+			fprintf(stdout, "========= %3d not applicable\n", notapplicable);
+			fprintf(stdout, "========= %3d skipped       \n", skipped);
+			fprintf(stdout, "========= %3d not selected  \n", notselected);
+			fprintf(stdout, "============================\n");
+			fprintf(stdout, "========= %3d total         \n", successes + failures + inconclusive + notapplicable + skipped + notselected);
+			if (!(aborted + failures))
+				fprintf(stdout, "\nDone.\n\n");
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
-		fprintf(stdout, "\n");
-		begin_test();
-		fprintf(stdout, "                         =====Preamble=====                         \n");
-		if (test_suite[i].preamble && test_suite[i].preamble() != SUCCESS) {
-			fprintf(stdout, "                         ?? INCONCLUSIVE ??                         \n");
-			result = INCONCLUSIVE;
-		} else {
-			begin_test_case();
-			fprintf(stdout, "                         =======Test=======                         \n");
-			result = INCONCLUSIVE;
-			if (test_suite[i].testcase)
-				switch ((result = test_suite[i].testcase())) {
-				case FAILURE:
-					fprintf(stdout, "                         XXXXX FAILED XXXXX                         \n");
-					break;
-				case SUCCESS:
-					fprintf(stdout, "                         ***** PASSED *****                         \n");
-					break;
-				case NOTAPPLICABLE:
-					fprintf(stdout, "                         x NOT APPLICABLE x                         \n");
-					break;
-				default:
-					result = SCRIPTERROR;
-				case SCRIPTERROR:
-					fprintf(stdout, "                         @@@@@ ERROR @@@@@@                         \n");
-					break;
-				}
+		if (aborted) {
+			dummy = lockf(fileno(stderr), F_LOCK, 0);
+			if (verbose > 0)
+				fprintf(stderr, "\n");
+			fprintf(stderr, "Test Suite aborted due to failure.\n");
+			if (verbose > 0)
+				fprintf(stderr, "\n");
+			fflush(stderr);
+			dummy = lockf(fileno(stderr), F_ULOCK, 0);
+		} else if (failures) {
+			dummy = lockf(fileno(stderr), F_LOCK, 0);
+			if (verbose > 0)
+				fprintf(stderr, "\n");
+			fprintf(stderr, "Test Suite failed.\n");
+			if (verbose > 0)
+				fprintf(stderr, "\n");
+			fflush(stderr);
+			dummy = lockf(fileno(stderr), F_ULOCK, 0);
 		}
-		fprintf(stdout, "                         =====Postamble====                         \n");
-		if (test_suite[i].postamble && test_suite[i].postamble() != SUCCESS) {
-			fprintf(stdout, "                         ?? INCONCLUSIVE ??                         \n");
-			if (result == SUCCESS)
-				result = INCONCLUSIVE;
+		if (num_tests == 1) {
+			if (successes)
+				return (0);
+			if (failures)
+				return (1);
+			if (inconclusive)
+				return (1);
+			if (notapplicable)
+				return (0);
+			if (skipped)
+				return (77);
 		}
-		fprintf(stdout, "                         =======Done=======                         \n");
-		switch (result) {
-		case SUCCESS:
-			fprintf(stdout, "*********\n");
-			fprintf(stdout, "********* Test Case SUCCESSFUL\n");
-			fprintf(stdout, "*********\n\n");
-			break;
-		case FAILURE:
-			fprintf(stdout, "XXXXXXXXX\n");
-			fprintf(stdout, "XXXXXXXXX Test Case FAILED(%d) - test case failed in state %d, with event %d.\n", state, state, event);
-			fprintf(stdout, "XXXXXXXXX\n\n");
-			if (!retry) {
-				retry = 1;
-				verbose += 4;
-				i--;
-				continue;
-			}
-			retry = 0;
-			verbose -= 4;
-			break;
-		case INCONCLUSIVE:
-			fprintf(stdout, "?????????\n");
-			fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
-			fprintf(stdout, "?????????\n\n");
-			if (!retry) {
-				retry = 1;
-				verbose += 4;
-				i--;
-				continue;
-			}
-			retry = 0;
-			verbose -= 4;
-			break;
-		case NOTAPPLICABLE:
-			fprintf(stdout, "xxxxxxxxx\n");
-			fprintf(stdout, "xxxxxxxxx Test Case NOT APPLICABLE - test case does not apply.\n");
-			fprintf(stdout, "xxxxxxxxx\n\n");
-			break;
-		default:
-		case SCRIPTERROR:
-			fprintf(stdout, "@@@@@@@@@\n");
-			fprintf(stdout, "@@@@@@@@@ ERROR(%d) = test case complete in error in state %d with event %d.\n", state, state, event);
-			fprintf(stdout, "@@@@@@@@@\n\n");
-			if (!retry) {
-				retry = 1;
-				verbose += 4;
-				i--;
-				continue;
-			}
-			retry = 0;
-			verbose -= 4;
-			break;
-		}
-		switch ((test_suite[i].result = result)) {
-		case SUCCESS:
-			successes++;
-			break;
-		case FAILURE:
-			failures++;
-			break;
-		case INCONCLUSIVE:
-			inconclusive++;
-			break;
-		case NOTAPPLICABLE:
-			notapplicable++;
-			break;
-		default:
-		case SCRIPTERROR:
-			scripterror++;
-			break;
-		}
+		return (aborted);
+	} else {
+		end_tests(0);
+		show = 1;
+		dummy = lockf(fileno(stderr), F_LOCK, 0);
+		fprintf(stderr, "Test Suite setup failed!\n");
+		fflush(stderr);
+		dummy = lockf(fileno(stderr), F_ULOCK, 0);
+		return (2);
 	}
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	if (summary && verbose) {
-		fprintf(stdout, "\n\n");
-		for (i = 0; i < (sizeof(test_suite) / sizeof(struct test_case)) && test_suite[i].numb; i++) {
-			if (test_suite[i].run) {
-				fprintf(stdout, "Test Case M2PA:%-10s  ", test_suite[i].numb);
-				switch (test_suite[i].result) {
-				case SUCCESS:
-					fprintf(stdout, "SUCCESS\n");
-					break;
-				case FAILURE:
-					fprintf(stdout, "FAILURE\n");
-					break;
-				case INCONCLUSIVE:
-					fprintf(stdout, "INCONCLUSIVE\n");
-					break;
-				case NOTAPPLICABLE:
-					fprintf(stdout, "NOT APPLICABLE\n");
-					break;
-				default:
-				case SCRIPTERROR:
-					fprintf(stdout, "ERROR\n");
-					break;
-				}
-			}
-		}
-		fflush(stdout);
-	}
-	fprintf(stdout, "Done.\n\n");
-	fprintf(stdout, "========= %2d successes     \n", successes);
-	fprintf(stdout, "========= %2d failures      \n", failures);
-	fprintf(stdout, "========= %2d inconclusive  \n", inconclusive);
-	fprintf(stdout, "========= %2d not applicable\n", notapplicable);
-	fprintf(stdout, "========= %2d script error  \n", scripterror);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	return (0);
 }
 
 void
@@ -12207,11 +12964,11 @@ copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
+	print_header();
 	fprintf(stdout, "\
-M2PA - OpenSS7 STREAMS M2PA - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
@@ -12236,9 +12993,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -12253,6 +13009,7 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
+\n\
 ");
 }
 
@@ -12262,12 +13019,16 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
 ", argv[0], ident);
 }
 
@@ -12291,6 +13052,7 @@ help(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
@@ -12299,6 +13061,33 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    -c, --client\n\
+        execute client side of test case only.\n\
+    -S, --server\n\
+        execute server side of test case only.\n\
+    -w, --wait\n\
+        have server wait indefinitely.\n\
+    -r, --repeat\n\
+        repeat test cases on success or failure.\n\
+    -R, --repeat-fail\n\
+        repeat test cases on failure.\n\
+    -p, --client-port [PORT]\n\
+        port number from which to connect [default: 10000+index*3]\n\
+    -P, --server-port [PORT]\n\
+        port number to which to connect or upon which to listen\n\
+        [default: 10000+index*3+2]\n\
+    -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
+        client host names(s) or IP numbers\n\
+        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
+    -I, --server-host [HOSTNAME[,HOSTNAME]*]\n\
+        server host names(s) or IP numbers\n\
+        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
+    -d, --device DEVICE\n\
+        device name to open [default: %2$s].\n\
+    -e, --exit\n\
+        exit on the first failed or inconclusive test case.\n\
+    -l, --list [RANGE]\n\
+        list test case names within a range [default: all] and exit.\n\
     -f, --fast [SCALE]\n\
         increase speed of tests by scaling timers [default: 50]\n\
     -s, --summary\n\
@@ -12313,16 +13102,18 @@ Options:\n\
         suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
         increase verbosity or set to LEVEL [default: 1]\n\
-	this option may be repeated.\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
         print this usage message and exit\n\
     -V, --version\n\
-        print the version and exit\n\
+        print version and exit\n\
     -C, --copying\n\
-        prints copying permissions and exit\n\
+        print copying permission and exit\n\
 \n\
-", argv[0]);
+", argv[0], devname);
 }
+
+#define HOST_BUF_LEN 128
 
 int
 main(int argc, char *argv[])
@@ -12331,7 +13122,13 @@ main(int argc, char *argv[])
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
-	for (t = test_suite; t->numb; t++) {
+	char *hostc = "127.0.0.1,127.0.0.2,127.0.0.3";
+	char *hosts = "127.0.0.1,127.0.0.2,127.0.0.3";
+	char hostbufc[HOST_BUF_LEN];
+	char hostbufs[HOST_BUF_LEN];
+	struct hostent *haddr;
+
+	for (t = tests; t->numb; t++) {
 		if (!t->result) {
 			t->run = 1;
 			tests_to_run++;
@@ -12339,10 +13136,23 @@ main(int argc, char *argv[])
 	}
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"client",	no_argument,		NULL, 'c'},
+			{"server",	no_argument,		NULL, 'S'},
+			{"wait",	no_argument,		NULL, 'w'},
+			{"client-port",	required_argument,	NULL, 'p'},
+			{"server-port",	required_argument,	NULL, 'P'},
+			{"client-host",	required_argument,	NULL, 'i'},
+			{"server-host",	required_argument,	NULL, 'I'},
+			{"repeat",	no_argument,		NULL, 'r'},
+			{"repeat-fail",	no_argument,		NULL, 'R'},
+			{"device",	required_argument,	NULL, 'd'},
+			{"exit",	no_argument,		NULL, 'e'},
+			{"list",	optional_argument,	NULL, 'l'},
 			{"fast",	optional_argument,	NULL, 'f'},
 			{"summary",	no_argument,		NULL, 's'},
 			{"onetest",	required_argument,	NULL, 'o'},
@@ -12354,16 +13164,106 @@ main(int argc, char *argv[])
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{ 0, }
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "f::so:t:mqvhVC?", long_options, &option_index);
+
+		c = getopt_long(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'c':	/* --client */
+			client_exec = 1;
+			break;
+		case 'S':	/* --server */
+			server_exec = 1;
+			break;
+		case 'w':	/* --wait */
+			test_duration = INFINITE_WAIT;
+			break;
+		case 'p':	/* --client-port */
+			client_port_specified = 1;
+			ports[3] = atoi(optarg);
+			ports[0] = ports[3];
+			break;
+		case 'P':	/* --server-port */
+			server_port_specified = 1;
+			ports[3] = atoi(optarg);
+			ports[1] = ports[3];
+			ports[2] = ports[3] + 1;
+			break;
+		case 'i':	/* --client-host *//* client host */
+			client_host_specified = 1;
+			strncpy(hostbufc, optarg, HOST_BUF_LEN);
+			hostc = hostbufc;
+			break;
+		case 'I':	/* --server-host *//* server host */
+			server_host_specified = 1;
+			strncpy(hostbufs, optarg, HOST_BUF_LEN);
+			hosts = hostbufs;
+			break;
+		case 'r':	/* --repeat */
+			repeat_on_success = 1;
+			repeat_on_failure = 1;
+			break;
+		case 'R':	/* --repeat-fail */
+			repeat_on_failure = 1;
+			break;
+		case 'd':
+			if (optarg) {
+				snprintf(devname, sizeof(devname), "%s", optarg);
+				break;
+			}
+			goto bad_option;
+		case 'e':
+			exit_on_failure = 1;
+			break;
+		case 'l':
+			if (optarg) {
+				l = strnlen(optarg, 16);
+				fprintf(stdout, "\n");
+				for (n = 0, t = tests; t->numb; t++)
+					if (!strncmp(t->numb, optarg, l)) {
+						if (verbose > 2)
+							fprintf(stdout, "Test Group: %s\n", t->tgrp);
+						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+						if (verbose > 2)
+							fprintf(stdout, "Test Reference: %s\n", t->sref);
+						if (verbose > 1)
+							fprintf(stdout, "%s\n\n", t->desc);
+						fflush(stdout);
+						n++;
+					}
+				if (!n) {
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fflush(stderr);
+					goto bad_option;
+				}
+				if (verbose <= 1)
+					fprintf(stdout, "\n");
+				fflush(stdout);
+				exit(0);
+			} else {
+				fprintf(stdout, "\n");
+				for (t = tests; t->numb; t++) {
+					if (verbose > 2)
+						fprintf(stdout, "Test Group: %s\n", t->tgrp);
+					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+					if (verbose > 2)
+						fprintf(stdout, "Test Reference: %s\n", t->sref);
+					if (verbose > 1)
+						fprintf(stdout, "%s\n\n", t->desc);
+					fflush(stdout);
+				}
+				if (verbose <= 1)
+					fprintf(stdout, "\n");
+				fflush(stdout);
+				exit(0);
+			}
+			break;
 		case 'f':
 			if (optarg)
 				timer_scale = atoi(optarg);
@@ -12375,25 +13275,31 @@ main(int argc, char *argv[])
 			summary = 1;
 			break;
 		case 'o':
-			if (!range) {
-				for (t = test_suite; t->numb; t++)
-					t->run = 0;
-				tests_to_run = 0;
-			}
-			range = 1;
-			for (n = 0, t = test_suite; t->numb; t++)
-				if (!strncmp(t->numb, optarg, 16)) {
-					if (!t->result) {
+			if (optarg) {
+				if (!range) {
+					for (t = tests; t->numb; t++)
+						t->run = 0;
+					tests_to_run = 0;
+				}
+				range = 1;
+				for (n = 0, t = tests; t->numb; t++)
+					if (!strncmp(t->numb, optarg, 16)) {
+						// if (!t->result) {
 						t->run = 1;
 						n++;
 						tests_to_run++;
+						// }
 					}
+				if (!n) {
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fflush(stderr);
+					goto bad_option;
 				}
-			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
-				fflush(stderr);
-				goto bad_option;
+				break;
 			}
+			goto bad_option;
+		case 'q':
+			verbose = 0;
 			break;
 		case 'v':
 			if (optarg == NULL) {
@@ -12407,18 +13313,18 @@ main(int argc, char *argv[])
 		case 't':
 			l = strnlen(optarg, 16);
 			if (!range) {
-				for (t = test_suite; t->numb; t++)
+				for (t = tests; t->numb; t++)
 					t->run = 0;
 				tests_to_run = 0;
 			}
 			range = 1;
-			for (n = 0, t = test_suite; t->numb; t++)
+			for (n = 0, t = tests; t->numb; t++)
 				if (!strncmp(t->numb, optarg, l)) {
-					if (!t->result) {
-						t->run = 1;
-						n++;
-						tests_to_run++;
-					}
+					// if (!t->result) {
+					t->run = 1;
+					n++;
+					tests_to_run++;
+					// }
 				}
 			if (!n) {
 				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
@@ -12457,19 +13363,89 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/*
+	/* 
 	 * dont' ignore non-option arguments
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	if (!tests_to_run) {
-		if (verbose) {
+	switch (tests_to_run) {
+	case 0:
+		if (verbose > 0) {
 			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
 			fflush(stderr);
 		}
 		exit(2);
+	case 1:
+		break;
+	default:
+		copying(argc, argv);
 	}
-	copying(argc, argv);
-	do_tests();
-	exit(0);
+	if (client_exec == 0 && server_exec == 0) {
+		client_exec = 1;
+		server_exec = 1;
+	}
+	if (client_host_specified) {
+		int count = 0;
+		char *token = hostc, *next_token, *delim = NULL;
+
+		fprintf(stdout, "Specified client address => %s\n", token);
+		do {
+			if ((delim = index(token, ','))) {
+				delim[0] = '\0';
+				next_token = delim + 1;
+			} else
+				next_token = NULL;
+			haddr = gethostbyname(token);
+			addrs[0][count].sin_family = AF_INET;
+			addrs[3][count].sin_family = AF_INET;
+			if (client_port_specified) {
+				addrs[0][count].sin_port = htons(ports[0]);
+				addrs[3][count].sin_port = htons(ports[3]);
+			} else {
+				addrs[0][count].sin_port = 0;
+				addrs[3][count].sin_port = 0;
+			}
+			addrs[0][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[3][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			count++;
+		} while ((token = next_token) && count < 4);
+		anums[0] = count;
+		anums[3] = count;
+		fprintf(stdout, "%d client addresses assigned\n", count);
+	}
+	if (server_host_specified) {
+		int count = 0;
+		char *token = hosts, *next_token, *delim = NULL;
+
+		fprintf(stdout, "Specified server address => %s\n", token);
+		do {
+			if ((delim = index(token, ','))) {
+				delim[0] = '\0';
+				next_token = delim + 1;
+			} else
+				next_token = NULL;
+			haddr = gethostbyname(token);
+			addrs[1][count].sin_family = AF_INET;
+			addrs[2][count].sin_family = AF_INET;
+			addrs[3][count].sin_family = AF_INET;
+			if (server_port_specified) {
+				addrs[1][count].sin_port = htons(ports[1]);
+				addrs[2][count].sin_port = htons(ports[2]);
+				addrs[3][count].sin_port = htons(ports[3]);
+			} else {
+				addrs[1][count].sin_port = 0;
+				addrs[2][count].sin_port = 0;
+				addrs[3][count].sin_port = 0;
+			}
+			addrs[1][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[2][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[3][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			count++;
+		} while ((token = next_token) && count < 4);
+		anums[1] = count;
+		anums[2] = count;
+		anums[3] = count;
+		fprintf(stdout, "%d server addresses assigned\n", count);
+	}
+	exit(do_tests(tests_to_run));
 }

@@ -72,7 +72,7 @@
  */
 
 typedef struct sdl_timers {
-	sdl_ulong t9;			/* T9 timer */
+	ulong t9;			/* T9 timer */
 } sdl_timers_t;
 
 #define SDL_SYNCS 4

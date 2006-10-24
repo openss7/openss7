@@ -130,8 +130,13 @@
 #define LMI_LOSTCTS		0x00240000	/* Lost Clear to Send signal */
 #define LMI_DEVERR		0x00250000	/* Start of device-specific error codes */
 
+#ifdef __LP64__
 typedef signed long lmi_long;
 typedef unsigned long lmi_ulong;
+#else
+typedef int32_t lmi_long;
+typedef u_int32_t lmi_ulong;
+#endif
 typedef unsigned short lmi_ushort;
 typedef unsigned char lmi_uchar;
 

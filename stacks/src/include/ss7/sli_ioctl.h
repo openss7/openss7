@@ -89,41 +89,41 @@
  *  CONFIGURATION
  */
 typedef struct sl_timers {
-	sl_ulong t1;			/* T1 timer */
-	sl_ulong t2;			/* T2 timer */
-	sl_ulong t3;			/* T3 timer */
-	sl_ulong t4;			/* T4 timer */
-	sl_ulong t5;			/* T5 timer */
-	sl_ulong t6;			/* T6 timer */
-	sl_ulong t7;			/* T7 timer */
+	ulong t1;			/* T1 timer */
+	ulong t2;			/* T2 timer */
+	ulong t3;			/* T3 timer */
+	ulong t4;			/* T4 timer */
+	ulong t5;			/* T5 timer */
+	ulong t6;			/* T6 timer */
+	ulong t7;			/* T7 timer */
 } sl_timers_t;
 
 typedef struct sl_config {
-	sl_ulong t1;			/* timer t1 duration (ticks) */
-	sl_ulong t2;			/* timer t2 duration (ticks) */
-	sl_ulong t2l;			/* timer t2l duration (ticks) */
-	sl_ulong t2h;			/* timer t2h duration (ticks) */
-	sl_ulong t3;			/* timer t3 duration (ticks) */
-	sl_ulong t4n;			/* timer t4n duration (ticks) */
-	sl_ulong t4e;			/* timer t4e duration (ticks) */
-	sl_ulong t5;			/* timer t5 duration (ticks) */
-	sl_ulong t6;			/* timer t6 duration (ticks) */
-	sl_ulong t7;			/* timer t7 duration (ticks) */
-	sl_ulong rb_abate;		/* RB cong abatement (#msgs) */
-	sl_ulong rb_accept;		/* RB cong onset accept (#msgs) */
-	sl_ulong rb_discard;		/* RB cong discard (#msgs) */
-	sl_ulong tb_abate_1;		/* lev 1 cong abate (#bytes) */
-	sl_ulong tb_onset_1;		/* lev 1 cong onset (#bytes) */
-	sl_ulong tb_discd_1;		/* lev 1 cong discard (#bytes) */
-	sl_ulong tb_abate_2;		/* lev 1 cong abate (#bytes) */
-	sl_ulong tb_onset_2;		/* lev 1 cong onset (#bytes) */
-	sl_ulong tb_discd_2;		/* lev 1 cong discard (#bytes) */
-	sl_ulong tb_abate_3;		/* lev 1 cong abate (#bytes) */
-	sl_ulong tb_onset_3;		/* lev 1 cong onset (#bytes) */
-	sl_ulong tb_discd_3;		/* lev 1 cong discard (#bytes) */
-	sl_ulong N1;			/* PCR/RTBmax messages (#msg) */
-	sl_ulong N2;			/* PCR/RTBmax octets (#bytes) */
-	sl_ulong M;			/* IAC normal proving periods */
+	ulong t1;			/* timer t1 duration (ticks) */
+	ulong t2;			/* timer t2 duration (ticks) */
+	ulong t2l;			/* timer t2l duration (ticks) */
+	ulong t2h;			/* timer t2h duration (ticks) */
+	ulong t3;			/* timer t3 duration (ticks) */
+	ulong t4n;			/* timer t4n duration (ticks) */
+	ulong t4e;			/* timer t4e duration (ticks) */
+	ulong t5;			/* timer t5 duration (ticks) */
+	ulong t6;			/* timer t6 duration (ticks) */
+	ulong t7;			/* timer t7 duration (ticks) */
+	ulong rb_abate;			/* RB cong abatement (#msgs) */
+	ulong rb_accept;		/* RB cong onset accept (#msgs) */
+	ulong rb_discard;		/* RB cong discard (#msgs) */
+	ulong tb_abate_1;		/* lev 1 cong abate (#bytes) */
+	ulong tb_onset_1;		/* lev 1 cong onset (#bytes) */
+	ulong tb_discd_1;		/* lev 1 cong discard (#bytes) */
+	ulong tb_abate_2;		/* lev 1 cong abate (#bytes) */
+	ulong tb_onset_2;		/* lev 1 cong onset (#bytes) */
+	ulong tb_discd_2;		/* lev 1 cong discard (#bytes) */
+	ulong tb_abate_3;		/* lev 1 cong abate (#bytes) */
+	ulong tb_onset_3;		/* lev 1 cong onset (#bytes) */
+	ulong tb_discd_3;		/* lev 1 cong discard (#bytes) */
+	ulong N1;			/* PCR/RTBmax messages (#msg) */
+	ulong N2;			/* PCR/RTBmax octets (#bytes) */
+	ulong M;			/* IAC normal proving periods */
 } sl_config_t;
 
 #define SL_IOCGCONFIG	_IOWR( SL_IOC_MAGIC, 2, sl_config_t )

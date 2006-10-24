@@ -71,21 +71,21 @@
  *  CONFIGURATION
  */
 typedef struct sdt_timers {
-	sdt_ulong t8;			/* T8 timer */
+	ulong t8;			/* T8 timer */
 } sdt_timers_t;
 typedef struct sdt_config {
-	sdt_ulong t8;			/* T8 timeout */
-	sdt_ulong Tin;			/* AERM normal proving threshold */
-	sdt_ulong Tie;			/* AERM emergency proving threshold */
-	sdt_ulong T;			/* SUERM error threshold */
-	sdt_ulong D;			/* SUERM error rate parameter */
-	sdt_ulong Te;			/* EIM error threshold */
-	sdt_ulong De;			/* EIM correct decrement */
-	sdt_ulong Ue;			/* EIM error increment */
-	sdt_ulong N;			/* octets per su in octet-counting mode */
-	sdt_ulong m;			/* maximum SIF size */
-	sdt_ulong b;			/* transmit block size */
-	sdt_ulong f;			/* number of flags between frames */
+	ulong t8;			/* T8 timeout */
+	ulong Tin;			/* AERM normal proving threshold */
+	ulong Tie;			/* AERM emergency proving threshold */
+	ulong T;			/* SUERM error threshold */
+	ulong D;			/* SUERM error rate parameter */
+	ulong Te;			/* EIM error threshold */
+	ulong De;			/* EIM correct decrement */
+	ulong Ue;			/* EIM error increment */
+	ulong N;			/* octets per su in octet-counting mode */
+	ulong m;			/* maximum SIF size */
+	ulong b;			/* transmit block size */
+	ulong f;			/* number of flags between frames */
 } sdt_config_t;
 
 #define SDT_FLAGS_ONE	    0

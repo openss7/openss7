@@ -128,14 +128,24 @@ static const char *sstdname = "SVID/ABI";
 static const char *shortname = "ABI";
 static char devname[256] = "/dev/ch";
 
+static int repeat_on_success = 0;
+static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
 
+static int client_port_specified = 0;
+static int server_port_specified = 0;
+static int client_host_specified = 0;
+static int server_host_specified = 0;
+
 static int verbose = 1;
+
+static int client_exec = 0; /* execute client side */
+static int server_exec = 0; /* execute server side */
 
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
-static int show_data = 1;
+//static int show_data = 1;
 
 //static int last_prim = 0;
 //static int last_event = 0;
@@ -143,19 +153,22 @@ static int last_errno = 0;
 static int last_retval = 0;
 
 int test_fd[3] = { 0, 0, 0 };
-pid_t test_pid[3] = { 0, 0, 0 };
 
-#define BUFSIZE 5*4096
+#define BUFSIZE 32*4096
 
-#define FFLUSH(stream)
+// #define FFLUSH(_stream)
+#define FFLUSH(_stream) fflush((_stream))
 
 #define SHORT_WAIT	  20	// 100 // 10
-#define NORMAL_WAIT	 200	// 500 // 100
+#define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
-#define INFINITE_WAIT	-1UL
+#define MAXIMUM_WAIT	1000
+#define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
-#define INVALID_ADDRESS ((void *)(long)(-1))
+#define INFINITE_WAIT	-1
+
+static int test_duration = TEST_DURATION; /* wait on other side */
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -226,9 +239,9 @@ enum {
 
 long test_start = 0;
 
-static int state;
+static int state = 0;
+static const char *failure_string = NULL;
 
-/* lockf does not work well on SMP for some reason */
 #if 1
 #undef lockf
 #define lockf(x,y,z) 0
@@ -316,11 +329,12 @@ check_time(const char *t, long i, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
+#endif
 
 static int
 time_event(int child, int event)
 {
-	if (verbose > 4) {
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
 		float t, m;
 		struct timeval now;
 
@@ -338,7 +352,6 @@ time_event(int child, int event)
 	}
 	return (event);
 }
-#endif
 
 static int timer_timeout = 0;
 static int last_signum = 0;
@@ -398,6 +411,8 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
+	if (duration == (long)INFINITE_WAIT)
+		return __RESULT_SUCCESS;
 	if (start_signals())
 		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -459,6 +474,22 @@ stop_tt(void)
 	timer_timeout = 0;
 	return (result);
 }
+
+/*
+ *  Addresses
+ */
+#if 1
+#ifndef SCTP_VERSION_2
+addr_t addrs[4];
+#else				/* SCTP_VERSION_2 */
+struct sockaddr_in addrs[4][3];
+#endif				/* SCTP_VERSION_2 */
+#else
+struct sockaddr_in addrs[4];
+#endif
+int anums[4] = { 3, 3, 3, 3 };
+unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
+const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
  *  -------------------------------------------------------------------------
@@ -722,7 +753,7 @@ errno_string(long err)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
@@ -821,12 +852,14 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("I_GETCLTIME");	/* 2.29 */
 	case I_CANPUT:
 		return ("I_CANPUT");	/* 2.30 */
+#if 0
 	case I_SERROPT:
 		return ("I_SERROPT");	/* 2.31 */
 	case I_GERROPT:
 		return ("I_GERROPT");	/* 2.32 */
 	case I_ANCHOR:
 		return ("I_ANCHOR");	/* 2.33 */
+#endif
 #if 0
 	case I_S_RECVFD:
 		return ("I_S_RECVFD");	/* 2.34 */
@@ -834,9 +867,16 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("I_STATS");	/* 2.35 */
 	case I_BIGPIPE:
 		return ("I_BIGPIPE");	/* 2.36 */
+#endif
+#if 0
 	case I_GETTP:
 		return ("I_GETTP");	/* 2.37 */
-#endif
+	case I_AUTOPUSH:
+		return ("I_AUTOPUSH");	/* 2.44 */
+	case I_HEAP_REPORT:
+		return ("I_HEAP_REPORT");	/* 2.45 */
+	case I_FIFO:
+		return ("I_FIFO");	/* 2.43 */
 	case I_GETMSG:
 		return ("I_GETMSG");	/* 2.38 */
 	case I_PUTMSG:
@@ -845,18 +885,13 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("I_PUTPMSG");	/* 2.40 */
 	case I_GETPMSG:
 		return ("I_GETPMSG");	/* 2.41 */
-	case I_PIPE:
-		return ("I_PIPE");	/* 2.42 */
-	case I_FIFO:
-		return ("I_FIFO");	/* 2.43 */
-	case I_AUTOPUSH:
-		return ("I_AUTOPUSH");	/* 2.44 */
-	case I_HEAP_REPORT:
-		return ("I_HEAP_REPORT");	/* 2.45 */
 	case I_FATTACH:
 		return ("I_FATTACH");	/* 2.46 */
 	case I_FDETACH:
 		return ("I_FDETACH");	/* 2.47 */
+	case I_PIPE:
+		return ("I_PIPE");	/* 2.42 */
+#endif
 	default:
 		return ("(unexpected)");
 	}
@@ -1019,6 +1054,943 @@ poll_events_string(short events)
 	return (string);
 }
 
+#if 0
+const char *
+service_type(np_ulong type)
+{
+	switch (type) {
+	case 0:
+		return ("(none)");
+	case N_CLNS:
+		return ("N_CLNS");
+	case N_CONS:
+		return ("N_CONS");
+	case N_CLNS|N_CONS:
+		return ("N_CLNS|N_CONS");
+	default:
+		return ("(unknown)");
+	}
+}
+
+const char *
+provider_type(np_ulong type)
+{
+	switch (type) {
+	case N_SUBNET:
+		return ("N_SUBNET");
+	case N_SNICFP:
+		return ("N_SNICFP");
+	default:
+		return ("(unknown)");
+	}
+}
+
+const char *
+state_string(np_ulong state)
+{
+	switch (state) {
+	case NS_UNBND:
+		return ("NS_UNBND");
+	case NS_WACK_BREQ:
+		return ("NS_WACK_BREQ");
+	case NS_WACK_UREQ:
+		return ("NS_WACK_UREQ");
+	case NS_IDLE:
+		return ("NS_IDLE");
+	case NS_WACK_OPTREQ:
+		return ("NS_WACK_OPTREQ");
+	case NS_WACK_RRES:
+		return ("NS_WACK_RRES");
+	case NS_WCON_CREQ:
+		return ("NS_WCON_CREQ");
+	case NS_WRES_CIND:
+		return ("NS_WRES_CIND");
+	case NS_WACK_CRES:
+		return ("NS_WACK_CRES");
+	case NS_DATA_XFER:
+		return ("NS_DATA_XFER");
+	case NS_WCON_RREQ:
+		return ("NS_WCON_RREQ");
+	case NS_WRES_RIND:
+		return ("NS_WRES_RIND");
+	case NS_WACK_DREQ6:
+		return ("NS_WACK_DREQ6");
+	case NS_WACK_DREQ7:
+		return ("NS_WACK_DREQ7");
+	case NS_WACK_DREQ9:
+		return ("NS_WACK_DREQ9");
+	case NS_WACK_DREQ10:
+		return ("NS_WACK_DREQ10");
+	case NS_WACK_DREQ11:
+		return ("NS_WACK_DREQ11");
+	default:
+		return ("(unknown)");
+	}
+}
+
+#ifndef SCTP_VERSION_2
+void
+print_addr(char *add_ptr, size_t add_len)
+{
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	if (add_len) {
+		int i;
+
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		fprintf(stdout, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			fprintf(stdout, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+char *
+addr_string(char *add_ptr, size_t add_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+
+	if (add_len) {
+		int i;
+
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			len += snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
+	return buf;
+}
+
+void
+print_addrs(int fd, char *add_ptr, size_t add_len)
+{
+	fprintf(stdout, "Stupid!\n");
+}
+#else				/* SCTP_VERSION_2 */
+void
+print_addr(char *add_ptr, size_t add_len)
+{
+	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	size_t anum = add_len / sizeof(*a);
+
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	if (add_len > 0) {
+		int i;
+
+		if (add_len != anum * sizeof(*a))
+			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
+		fprintf(stdout, "[%d]", ntohs(a[0].sin_port));
+		for (i = 0; i < anum; i++) {
+			uint32_t addr = a[i].sin_addr.s_addr;
+
+			fprintf(stdout, "%s%d.%d.%d.%d", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+		}
+	} else
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+char *
+addr_string(char *add_ptr, size_t add_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	size_t anum = add_len / sizeof(*a);
+
+	if (add_len > 0) {
+		int i;
+
+		if (add_len != anum * sizeof(*a))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a[0].sin_port));
+		for (i = 0; i < anum; i++) {
+			uint32_t addr = a[i].sin_addr.s_addr;
+
+			len += snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+		}
+	} else
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
+	return buf;
+}
+void print_string(int child, const char *string);
+void
+print_addrs(int child, char *add_ptr, size_t add_len)
+{
+	struct sockaddr_in *sin;
+
+	if (verbose < 3)
+		return;
+	for (sin = (typeof(sin)) add_ptr; add_len >= sizeof(*sin); sin++, add_len -= sizeof(*sin)) {
+		char buf[128];
+
+		snprintf(buf, sizeof(buf), "%d.%d.%d.%d:%d", (sin->sin_addr.s_addr >> 0) & 0xff, (sin->sin_addr.s_addr >> 8) & 0xff, (sin->sin_addr.s_addr >> 16) & 0xff, (sin->sin_addr.s_addr >> 24) & 0xff, ntohs(sin->sin_port));
+		print_string(child, buf);
+	}
+}
+#endif				/* SCTP_VERSION_2 */
+
+char *
+prot_string(char *pro_ptr, size_t pro_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	int i;
+
+	buf[0] = 0;
+	for (i = 0; i < pro_len; i++) {
+		len += snprintf(buf + len, sizeof(buf) - len, "%u ", (uint) (unsigned char) pro_ptr[i]);
+	}
+	return (buf);
+}
+void
+print_prots(int child, char *pro_ptr, size_t pro_len)
+{
+	unsigned char *prot;
+	if (verbose < 3)
+		return;
+	for (prot = (typeof(prot)) pro_ptr; pro_len > 0; prot++, pro_len--) {
+		char buf[32];
+		snprintf(buf, sizeof(buf), "<%u>", (unsigned int) *prot);
+		print_string(child, buf);
+	}
+}
+
+#if 0
+char *
+status_string(struct t_opthdr *oh)
+{
+	switch (oh->status) {
+	case 0:
+		return (NULL);
+	case T_SUCCESS:
+		return ("T_SUCCESS");
+	case T_FAILURE:
+		return ("T_FAILURE");
+	case T_PARTSUCCESS:
+		return ("T_PARTSUCCESS");
+	case T_READONLY:
+		return ("T_READONLY");
+	case T_NOTSUPPORT:
+		return ("T_NOTSUPPORT");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "(unknown status %ld)", (long) oh->status);
+		return buf;
+	}
+	}
+}
+
+#ifndef T_ALLLEVELS
+#define T_ALLLEVELS -1
+#endif
+
+char *
+level_string(struct t_opthdr *oh)
+{
+	switch (oh->level) {
+	case T_ALLLEVELS:
+		return ("T_ALLLEVELS");
+	case XTI_GENERIC:
+		return ("XTI_GENERIC");
+	case T_INET_IP:
+		return ("T_INET_IP");
+	case T_INET_UDP:
+		return ("T_INET_UDP");
+	case T_INET_TCP:
+		return ("T_INET_TCP");
+	case T_INET_SCTP:
+		return ("T_INET_SCTP");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "(unknown level %ld)", (long) oh->level);
+		return buf;
+	}
+	}
+}
+
+char *
+name_string(struct t_opthdr *oh)
+{
+	if (oh->name == T_ALLOPT)
+		return ("T_ALLOPT");
+	switch (oh->level) {
+	case XTI_GENERIC:
+		switch (oh->name) {
+		case XTI_DEBUG:
+			return ("XTI_DEBUG");
+		case XTI_LINGER:
+			return ("XTI_LINGER");
+		case XTI_RCVBUF:
+			return ("XTI_RCVBUF");
+		case XTI_RCVLOWAT:
+			return ("XTI_RCVLOWAT");
+		case XTI_SNDBUF:
+			return ("XTI_SNDBUF");
+		case XTI_SNDLOWAT:
+			return ("XTI_SNDLOWAT");
+		}
+		break;
+	case T_INET_IP:
+		switch (oh->name) {
+		case T_IP_OPTIONS:
+			return ("T_IP_OPTIONS");
+		case T_IP_TOS:
+			return ("T_IP_TOS");
+		case T_IP_TTL:
+			return ("T_IP_TTL");
+		case T_IP_REUSEADDR:
+			return ("T_IP_REUSEADDR");
+		case T_IP_DONTROUTE:
+			return ("T_IP_DONTROUTE");
+		case T_IP_BROADCAST:
+			return ("T_IP_BROADCAST");
+		case T_IP_ADDR:
+			return ("T_IP_ADDR");
+		}
+		break;
+	case T_INET_UDP:
+		switch (oh->name) {
+		case T_UDP_CHECKSUM:
+			return ("T_UDP_CHECKSUM");
+		}
+		break;
+	case T_INET_TCP:
+		switch (oh->name) {
+		case T_TCP_NODELAY:
+			return ("T_TCP_NODELAY");
+		case T_TCP_MAXSEG:
+			return ("T_TCP_MAXSEG");
+		case T_TCP_KEEPALIVE:
+			return ("T_TCP_KEEPALIVE");
+		case T_TCP_CORK:
+			return ("T_TCP_CORK");
+		case T_TCP_KEEPIDLE:
+			return ("T_TCP_KEEPIDLE");
+		case T_TCP_KEEPINTVL:
+			return ("T_TCP_KEEPINTVL");
+		case T_TCP_KEEPCNT:
+			return ("T_TCP_KEEPCNT");
+		case T_TCP_SYNCNT:
+			return ("T_TCP_SYNCNT");
+		case T_TCP_LINGER2:
+			return ("T_TCP_LINGER2");
+		case T_TCP_DEFER_ACCEPT:
+			return ("T_TCP_DEFER_ACCEPT");
+		case T_TCP_WINDOW_CLAMP:
+			return ("T_TCP_WINDOW_CLAMP");
+		case T_TCP_INFO:
+			return ("T_TCP_INFO");
+		case T_TCP_QUICKACK:
+			return ("T_TCP_QUICKACK");
+		}
+		break;
+	case T_INET_SCTP:
+		switch (oh->name) {
+		case T_SCTP_NODELAY:
+			return ("T_SCTP_NODELAY");
+		case T_SCTP_CORK:
+			return ("T_SCTP_CORK");
+		case T_SCTP_PPI:
+			return ("T_SCTP_PPI");
+		case T_SCTP_SID:
+			return ("T_SCTP_SID");
+		case T_SCTP_SSN:
+			return ("T_SCTP_SSN");
+		case T_SCTP_TSN:
+			return ("T_SCTP_TSN");
+		case T_SCTP_RECVOPT:
+			return ("T_SCTP_RECVOPT");
+		case T_SCTP_COOKIE_LIFE:
+			return ("T_SCTP_COOKIE_LIFE");
+		case T_SCTP_SACK_DELAY:
+			return ("T_SCTP_SACK_DELAY");
+		case T_SCTP_PATH_MAX_RETRANS:
+			return ("T_SCTP_PATH_MAX_RETRANS");
+		case T_SCTP_ASSOC_MAX_RETRANS:
+			return ("T_SCTP_ASSOC_MAX_RETRANS");
+		case T_SCTP_MAX_INIT_RETRIES:
+			return ("T_SCTP_MAX_INIT_RETRIES");
+		case T_SCTP_HEARTBEAT_ITVL:
+			return ("T_SCTP_HEARTBEAT_ITVL");
+		case T_SCTP_RTO_INITIAL:
+			return ("T_SCTP_RTO_INITIAL");
+		case T_SCTP_RTO_MIN:
+			return ("T_SCTP_RTO_MIN");
+		case T_SCTP_RTO_MAX:
+			return ("T_SCTP_RTO_MAX");
+		case T_SCTP_OSTREAMS:
+			return ("T_SCTP_OSTREAMS");
+		case T_SCTP_ISTREAMS:
+			return ("T_SCTP_ISTREAMS");
+		case T_SCTP_COOKIE_INC:
+			return ("T_SCTP_COOKIE_INC");
+		case T_SCTP_THROTTLE_ITVL:
+			return ("T_SCTP_THROTTLE_ITVL");
+		case T_SCTP_MAC_TYPE:
+			return ("T_SCTP_MAC_TYPE");
+		case T_SCTP_CKSUM_TYPE:
+			return ("T_SCTP_CKSUM_TYPE");
+		case T_SCTP_ECN:
+			return ("T_SCTP_ECN");
+		case T_SCTP_ALI:
+			return ("T_SCTP_ALI");
+		case T_SCTP_ADD:
+			return ("T_SCTP_ADD");
+		case T_SCTP_SET:
+			return ("T_SCTP_SET");
+		case T_SCTP_ADD_IP:
+			return ("T_SCTP_ADD_IP");
+		case T_SCTP_DEL_IP:
+			return ("T_SCTP_DEL_IP");
+		case T_SCTP_SET_IP:
+			return ("T_SCTP_SET_IP");
+		case T_SCTP_PR:
+			return ("T_SCTP_PR");
+		case T_SCTP_LIFETIME:
+			return ("T_SCTP_LIFETIME");
+		case T_SCTP_DISPOSITION:
+			return ("T_SCTP_DISPOSITION");
+		case T_SCTP_MAX_BURST:
+			return ("T_SCTP_MAX_BURST");
+		case T_SCTP_HB:
+			return ("T_SCTP_HB");
+		case T_SCTP_RTO:
+			return ("T_SCTP_RTO");
+		case T_SCTP_MAXSEG:
+			return ("T_SCTP_MAXSEG");
+		case T_SCTP_STATUS:
+			return ("T_SCTP_STATUS");
+		case T_SCTP_DEBUG:
+			return ("T_SCTP_DEBUG");
+		}
+		break;
+	}
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "(unknown name %ld)", (long) oh->name);
+		return buf;
+	}
+}
+
+char *
+yesno_string(struct t_opthdr *oh)
+{
+	switch (*((t_uscalar_t *) T_OPT_DATA(oh))) {
+	case T_YES:
+		return ("T_YES");
+	case T_NO:
+		return ("T_NO");
+	default:
+		return ("(invalid)");
+	}
+}
+
+char *
+number_string(struct t_opthdr *oh)
+{
+	static char buf[32];
+
+	snprintf(buf, 32, "%d", *((t_scalar_t *) T_OPT_DATA(oh)));
+	return (buf);
+}
+
+char *
+value_string(int child, struct t_opthdr *oh)
+{
+	static char buf[64] = "(invalid)";
+
+	if (oh->len == sizeof(*oh))
+		return (NULL);
+	switch (oh->level) {
+	case XTI_GENERIC:
+		switch (oh->name) {
+		case XTI_DEBUG:
+			break;
+		case XTI_LINGER:
+			break;
+		case XTI_RCVBUF:
+			break;
+		case XTI_RCVLOWAT:
+			break;
+		case XTI_SNDBUF:
+			break;
+		case XTI_SNDLOWAT:
+			break;
+		}
+		break;
+	case T_INET_IP:
+		switch (oh->name) {
+		case T_IP_OPTIONS:
+			break;
+		case T_IP_TOS:
+			if (oh->len == sizeof(*oh) + sizeof(unsigned char))
+				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
+			return buf;
+		case T_IP_TTL:
+			if (oh->len == sizeof(*oh) + sizeof(unsigned char))
+				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
+			return buf;
+		case T_IP_REUSEADDR:
+			return yesno_string(oh);
+		case T_IP_DONTROUTE:
+			return yesno_string(oh);
+		case T_IP_BROADCAST:
+			return yesno_string(oh);
+		case T_IP_ADDR:
+			if (oh->len == sizeof(*oh) + sizeof(uint32_t)) {
+				uint32_t addr = *((uint32_t *) T_OPT_DATA(oh));
+
+				snprintf(buf, sizeof(buf), "%d.%d.%d.%d", (addr >> 0) & 0x00ff, (addr >> 8) & 0x00ff, (addr >> 16) & 0x00ff, (addr >> 24) & 0x00ff);
+			}
+			return buf;
+		}
+		break;
+	case T_INET_UDP:
+		switch (oh->name) {
+		case T_UDP_CHECKSUM:
+			return yesno_string(oh);
+		}
+		break;
+	case T_INET_TCP:
+		switch (oh->name) {
+		case T_TCP_NODELAY:
+			return yesno_string(oh);
+		case T_TCP_MAXSEG:
+			if (oh->len == sizeof(*oh) + sizeof(t_uscalar_t))
+				snprintf(buf, sizeof(buf), "%lu", (ulong) *((t_uscalar_t *) T_OPT_DATA(oh)));
+			return buf;
+		case T_TCP_KEEPALIVE:
+			break;
+		case T_TCP_CORK:
+			return yesno_string(oh);
+		case T_TCP_KEEPIDLE:
+			break;
+		case T_TCP_KEEPINTVL:
+			break;
+		case T_TCP_KEEPCNT:
+			break;
+		case T_TCP_SYNCNT:
+			break;
+		case T_TCP_LINGER2:
+			break;
+		case T_TCP_DEFER_ACCEPT:
+			break;
+		case T_TCP_WINDOW_CLAMP:
+			break;
+		case T_TCP_INFO:
+			break;
+		case T_TCP_QUICKACK:
+			break;
+		}
+		break;
+	case T_INET_SCTP:
+		switch (oh->name) {
+		case T_SCTP_NODELAY:
+			return yesno_string(oh);
+		case T_SCTP_CORK:
+			return yesno_string(oh);
+		case T_SCTP_PPI:
+			return number_string(oh);;
+		case T_SCTP_SID:
+#if 1
+			sid[child] = *((t_uscalar_t *) T_OPT_DATA(oh));
+#endif
+			return number_string(oh);;
+		case T_SCTP_SSN:
+		case T_SCTP_TSN:
+			return number_string(oh);;
+		case T_SCTP_RECVOPT:
+			return yesno_string(oh);
+		case T_SCTP_COOKIE_LIFE:
+		case T_SCTP_SACK_DELAY:
+		case T_SCTP_PATH_MAX_RETRANS:
+		case T_SCTP_ASSOC_MAX_RETRANS:
+		case T_SCTP_MAX_INIT_RETRIES:
+		case T_SCTP_HEARTBEAT_ITVL:
+		case T_SCTP_RTO_INITIAL:
+		case T_SCTP_RTO_MIN:
+		case T_SCTP_RTO_MAX:
+		case T_SCTP_OSTREAMS:
+		case T_SCTP_ISTREAMS:
+		case T_SCTP_COOKIE_INC:
+		case T_SCTP_THROTTLE_ITVL:
+			return number_string(oh);;
+		case T_SCTP_MAC_TYPE:
+			break;
+		case T_SCTP_CKSUM_TYPE:
+			break;
+		case T_SCTP_ECN:
+			break;
+		case T_SCTP_ALI:
+			break;
+		case T_SCTP_ADD:
+			break;
+		case T_SCTP_SET:
+			break;
+		case T_SCTP_ADD_IP:
+			break;
+		case T_SCTP_DEL_IP:
+			break;
+		case T_SCTP_SET_IP:
+			break;
+		case T_SCTP_PR:
+			break;
+		case T_SCTP_LIFETIME:
+		case T_SCTP_DISPOSITION:
+		case T_SCTP_MAX_BURST:
+		case T_SCTP_HB:
+		case T_SCTP_RTO:
+		case T_SCTP_MAXSEG:
+			return number_string(oh);
+		case T_SCTP_STATUS:
+			break;
+		case T_SCTP_DEBUG:
+			break;
+		}
+		break;
+	}
+	return ("(unknown value)");
+}
+#endif
+
+#if 0
+void
+parse_options(int fd, char *opt_ptr, size_t opt_len)
+{
+	struct t_opthdr *oh;
+
+	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+		if (oh->len == sizeof(*oh))
+			continue;
+		switch (oh->level) {
+		case T_INET_SCTP:
+			switch (oh->name) {
+			case T_SCTP_PPI:
+				ppi[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_SID:
+				sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_SSN:
+				ssn[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_TSN:
+				tsn[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			}
+		}
+	}
+}
+#endif
+
+const char *
+mgmtflag_string(np_ulong flag)
+{
+	switch (flag) {
+	case 0:
+		return ("(none)");
+	case DEFAULT_RC_SEL:
+		return ("DEFAULT_RC_SEL");
+	default:
+		return ("(unknown flags)");
+	}
+}
+
+#if 0
+char *
+size_string(t_uscalar_t size)
+{
+	static char buf[128];
+
+	switch (size) {
+	case T_INFINITE:
+		return ("T_INFINITE");
+	case T_INVALID:
+		return ("T_INVALID");
+	case T_UNSPEC:
+		return ("T_UNSPEC");
+	}
+	snprintf(buf, sizeof(buf), "%lu", (ulong) size);
+	return buf;
+}
+#endif
+
+const char *
+reset_reason_string(np_ulong RESET_reason)
+{
+	switch (RESET_reason) {
+	case N_CONGESTION:
+		return ("N_CONGESTION");
+	case N_RESET_UNSPECIFIED:
+		return ("N_RESET_UNSPECIFIED");
+	case N_USER_RESYNC:
+		return ("N_USER_RESYNC");
+	case N_REASON_UNDEFINED:
+		return ("N_REASON_UNDEFINED");
+	case N_UD_UNDEFINED:
+		return ("N_UD_UNDEFINED");
+	case N_UD_TD_EXCEEDED:
+		return ("N_UD_TD_EXCEEDED");
+	case N_UD_CONGESTION:
+		return ("N_UD_CONGESTION");
+	case N_UD_QOS_UNAVAIL:
+		return ("N_UD_QOS_UNAVAIL");
+	case N_UD_LIFE_EXCEEDED:
+		return ("N_UD_LIFE_EXCEEDED");
+	case N_UD_ROUTE_UNAVAIL:
+		return ("N_UD_ROUTE_UNAVAIL");
+	case N_UD_SEG_REQUIRED:
+		return ("N_UD_SEG_REQUIRED");
+	default:
+		return ("(unknown)");
+	}
+}
+
+char *
+reset_orig_string(np_ulong RESET_orig)
+{
+	switch (RESET_orig) {
+	case N_USER:
+		return ("N_USER");
+	case N_PROVIDER:
+		return ("N_PROVIDER");
+	case N_UNDEFINED:
+		return ("N_UNDEFINED");
+	default:
+		return ("(unknown)");
+	}
+}
+
+void
+print_proto(char *pro_ptr, size_t pro_len)
+{
+	uint32_t *p = (uint32_t *) pro_ptr;
+	size_t pnum = pro_len / sizeof(p[0]);
+
+	if (pro_len) {
+		int i;
+
+		if (!pnum)
+			printf("(PROTOID_length = %lu)", (ulong) pro_len);
+		for (i = 0; i < pnum; i++) {
+			printf("%s%d", i ? "," : "", p[i]);
+		}
+	} else
+		printf("(no protoids)");
+	printf("\n");
+}
+
+void
+print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
+{
+	unsigned char *qos_ptr = (unsigned char *) (cmd_buf + qos_ofs);
+	N_qos_sctp_t *qos = (N_qos_sctp_t *) qos_ptr;
+	char buf[64];
+
+	if (qos_len) {
+		switch (qos->n_qos_type) {
+		case N_QOS_SEL_CONN_SCTP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_CONN_SCTP:");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " i_streams = %ld,", (long) qos->n_qos_conn.i_streams);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " o_streams = %ld ", (long) qos->n_qos_conn.o_streams);
+			print_string(child, buf);
+			break;
+
+		case N_QOS_SEL_DATA_SCTP:
+			snprintf(buf, sizeof(buf), "DATA: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ppi = %ld,", (long) qos->n_qos_data.ppi);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " sid = %ld,", (long) qos->n_qos_data.sid);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ssn = %ld,", (long) qos->n_qos_data.ssn);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tsn = %lu,", (ulong) qos->n_qos_data.tsn);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " more = %ld", (long) qos->n_qos_data.more);
+			print_string(child, buf);
+			break;
+
+		case N_QOS_SEL_INFO_SCTP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_INFO_SCTP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " i_streams = %ld,", (long) qos->n_qos_info.i_streams);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " o_streams = %ld,", (long) qos->n_qos_info.o_streams);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ppi = %ld,", (long) qos->n_qos_info.ppi);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " sid = %ld,", (long) qos->n_qos_info.sid);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " max_inits = %ld,", (long) qos->n_qos_info.max_inits);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " max_retrans = %ld,", (long) qos->n_qos_info.max_retrans);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " max_sack = %ld,", (long) qos->n_qos_info.max_sack);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ck_life = %ld,", (long) qos->n_qos_info.ck_life);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ck_inc = %ld,", (long) qos->n_qos_info.ck_inc);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " hmac = %ld,", (long) qos->n_qos_info.hmac);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " throttle = %ld,", (long) qos->n_qos_info.throttle);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " rto_ini = %ld,", (long) qos->n_qos_info.rto_ini);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " rto_min = %ld,", (long) qos->n_qos_info.rto_min);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " rto_max = %ld,", (long) qos->n_qos_info.rto_max);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " rtx_path = %ld,", (long) qos->n_qos_info.rtx_path);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " hb_itvl = %ld", (long) qos->n_qos_info.hb_itvl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " options = ");
+			print_string(child, buf);
+			if (!qos->n_qos_info.options) {
+				snprintf(buf, sizeof(buf), "(none)");
+				print_string(child, buf);
+			}
+			if (qos->n_qos_info.options & SCTP_OPTION_DROPPING) {
+				snprintf(buf, sizeof(buf), " DEBUG-DROPPING");
+				print_string(child, buf);
+			}
+			if (qos->n_qos_info.options & SCTP_OPTION_BREAK) {
+				snprintf(buf, sizeof(buf), " DEBUG-BREAK");
+				print_string(child, buf);
+			}
+			if (qos->n_qos_info.options & SCTP_OPTION_DBREAK) {
+				snprintf(buf, sizeof(buf), " DEBUG-DBREAK");
+				print_string(child, buf);
+			}
+			if (qos->n_qos_info.options & SCTP_OPTION_RANDOM) {
+				snprintf(buf, sizeof(buf), " DEBUG-RANDOM");
+				print_string(child, buf);
+			}
+			break;
+
+		case N_QOS_RANGE_INFO_SCTP:
+			snprintf(buf, sizeof(buf), "N_QOS_RANGE_INFO_SCTP: ");
+			print_string(child, buf);
+			break;
+
+		default:
+			snprintf(buf, sizeof(buf), "(unknown qos structure %lu)\n", (ulong) qos->n_qos_type);
+			print_string(child, buf);
+			break;
+		}
+	} else {
+		snprintf(buf, sizeof(buf), "(no qos)");
+		print_string(child, buf);
+	}
+}
+
+void
+print_size(ulong size)
+{
+	switch (size) {
+	case -1:
+		printf("UNLIMITED\n");
+		break;
+	case -2:
+		printf("UNDEFINED\n");
+		break;
+	default:
+		printf("%lu\n", size);
+		break;
+	}
+}
+
+const char *
+prim_string(np_ulong prim)
+{
+	switch (prim) {
+	case N_CONN_REQ:
+		return ("N_CONN_REQ------");
+	case N_CONN_RES:
+		return ("N_CONN_RES------");
+	case N_DISCON_REQ:
+		return ("N_DISCON_REQ----");
+	case N_DATA_REQ:
+		return ("N_DATA_REQ------");
+	case N_EXDATA_REQ:
+		return ("N_EXDATA_REQ----");
+	case N_INFO_REQ:
+		return ("N_INFO_REQ------");
+	case N_BIND_REQ:
+		return ("N_BIND_REQ------");
+	case N_UNBIND_REQ:
+		return ("N_UNBIND_REQ----");
+	case N_UNITDATA_REQ:
+		return ("N_UNITDATA_REQ--");
+	case N_OPTMGMT_REQ:
+		return ("N_OPTMGMT_REQ---");
+	case N_RESET_REQ:
+		return ("N_RESET_REQ-----");
+	case N_RESET_RES:
+		return ("N_RESET_RES-----");
+	case N_CONN_IND:
+		return ("N_CONN_IND------");
+	case N_CONN_CON:
+		return ("N_CONN_CON------");
+	case N_DISCON_IND:
+		return ("N_DISCON_IND----");
+	case N_DATA_IND:
+		return ("N_DATA_IND------");
+	case N_EXDATA_IND:
+		return ("N_EXDATA_IND----");
+	case N_INFO_ACK:
+		return ("N_INFO_ACK------");
+	case N_BIND_ACK:
+		return ("N_BIND_ACK------");
+	case N_ERROR_ACK:
+		return ("N_ERROR_ACK-----");
+	case N_OK_ACK:
+		return ("N_OK_ACK--------");
+	case N_UNITDATA_IND:
+		return ("N_UNITDATA_IND--");
+	case N_UDERROR_IND:
+		return ("N_UDERROR_IND---");
+	case N_RESET_IND:
+		return ("N_RESET_IND-----");
+	case N_RESET_CON:
+		return ("N_RESET_CON-----");
+	case N_DATACK_REQ:
+		return ("N_DATACK_REQ----");
+	case N_DATACK_IND:
+		return ("N_DATACK_IND----");
+	default:
+		return ("N_????_??? -----");
+	}
+}
+#endif
+
 void
 print_less(int child)
 {
@@ -1116,9 +2088,9 @@ void
 print_open(int child, const char* name)
 {
 	static const char *msgs[] = {
-		"open()        ----->v %-30s |  |                   \n",
-		"  open()      ----->v %-30s |  |                   \n",
-		"    open()    ----->v %-30s |  |                   \n",
+		"  open()      ----->v %-30s    .                   \n",
+		"                    | %-30s    v<-----     open()  \n",
+		"                    | %-30s v<-+------     open()  \n",
 		"                    . %-30s .  .                   \n",
 	};
 
@@ -1130,9 +2102,9 @@ void
 print_close(int child)
 {
 	static const char *msgs[] = {
-		"close()       ----->X                                |  |                   \n",
-		"  close()     ----->X                                |  |                   \n",
-		"    close()   ----->X                                |  |                   \n",
+		"  close()     ----->X                                   |                   \n",
+		"                    .                                   X<-----    close()  \n",
+		"                    .                                X<-+------    close()  \n",
 		"                    .                                .  .                   \n",
 	};
 
@@ -1144,14 +2116,30 @@ void
 print_preamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+------------Preamble------------+--+                   \n",
-		"  ------------------+------------Preamble------------+--+                   \n",
-		"    ----------------+------------Preamble------------+--+                   \n",
-		"--------------------+-------------Preamble--------------+-------------------\n",
+		"--------------------+-------------Preamble-----------+--+                   \n",
+		"                    +-------------Preamble-----------+  +-------------------\n",
+		"                    +-------------Preamble-----------+--+-------------------\n",
+		"--------------------+-------------Preamble-----------+--+-------------------\n",
 	};
 
 	if (verbose > 0)
 		print_simple(child, msgs);
+}
+
+void print_string_state(int child, const char *msgs[], const char *string);
+
+void
+print_failure(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"....................|%-32s|..|                    [%d:%03d]\n",
+		"                    |%-32s|  |................... [%d:%03d]\n",
+		"                    |%-32s|...................... [%d:%03d]\n",
+		"....................|%-32s|..|................... [%d:%03d]\n",
+	};
+
+	if (string && strnlen(string, 32) > 0 && verbose > 0)
+		print_string_state(child, msgs, string);
 }
 
 void
@@ -1159,13 +2147,14 @@ print_notapplicable(int child)
 {
 	static const char *msgs[] = {
 		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
-		"  X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
-		"    X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
+		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|  |X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
 		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -1173,13 +2162,14 @@ print_skipped(int child)
 {
 	static const char *msgs[] = {
 		"::::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|                    [%d:%03d]\n",
-		"  ::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|                    [%d:%03d]\n",
-		"    ::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|                    [%d:%03d]\n",
+		"                    |:::::::::::: SKIPPED :::::::::::|  |::::::::::::::::::: [%d:%03d]\n",
+		"                    |:::::::::::: SKIPPED :::::::::::|::|::::::::::::::::::: [%d:%03d]\n",
 		"::::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|::::::::::::::::::: [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -1187,13 +2177,14 @@ print_inconclusive(int child)
 {
 	static const char *msgs[] = {
 		"????????????????????|?????????? INCONCLUSIVE ????????|??|                    [%d:%03d]\n",
-		"  ??????????????????|?????????? INCONCLUSIVE ????????|??|                    [%d:%03d]\n",
-		"    ????????????????|?????????? INCONCLUSIVE ????????|??|                    [%d:%03d]\n",
+		"                    |?????????? INCONCLUSIVE ????????|  |??????????????????? [%d:%03d]\n",
+		"                    |?????????? INCONCLUSIVE ????????|??|??????????????????? [%d:%03d]\n",
 		"????????????????????|?????????? INCONCLUSIVE ????????|??|??????????????????? [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -1201,8 +2192,8 @@ print_test(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+---------------Test-------------+--+                   \n",
-		"  ------------------+---------------Test-------------+--+                   \n",
-		"    ----------------+---------------Test-------------+--+                   \n",
+		"                    +---------------Test-------------+  +-------------------\n",
+		"                    +---------------Test-------------+--+-------------------\n",
 		"--------------------+---------------Test-------------+--+-------------------\n",
 	};
 
@@ -1214,14 +2205,15 @@ void
 print_failed(int child)
 {
 	static const char *msgs[] = {
-		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXXX|XX|                    [%d:%03d]\n",
-		"  XXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXXX|XX|                    [%d:%03d]\n",
-		"    XXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXXX|XX|                    [%d:%03d]\n",
-		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d:%03d]\n",
+		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXX|  |XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -1229,13 +2221,14 @@ print_script_error(int child)
 {
 	static const char *msgs[] = {
 		"####################|########### SCRIPT ERROR #######|##|                    [%d:%03d]\n",
-		"  ##################|########### SCRIPT ERROR #######|##|                    [%d:%03d]\n",
-		"    ################|########### SCRIPT ERROR #######|##|                    [%d:%03d]\n",
+		"                    |########### SCRIPT ERROR #######|  |################### [%d:%03d]\n",
+		"                    |########### SCRIPT ERROR #######|##|################### [%d:%03d]\n",
 		"####################|########### SCRIPT ERROR #######|##|################### [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -1243,13 +2236,14 @@ print_passed(int child)
 {
 	static const char *msgs[] = {
 		"********************|************* PASSED ***********|**|                    [%d:%03d]\n",
-		"  ******************|************* PASSED ***********|**|                    [%d:%03d]\n",
-		"    ****************|************* PASSED ***********|**|                    [%d:%03d]\n",
+		"                    |************* PASSED ***********|  |******************* [%d:%03d]\n",
+		"                    |************* PASSED ***********|**|******************* [%d:%03d]\n",
 		"********************|************* PASSED ***********|**|******************* [%d:%03d]\n",
 	};
 
 	if (verbose > 2)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -1257,8 +2251,8 @@ print_postamble(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+-------------Postamble----------+--+                   \n",
-		"  ------------------+-------------Postamble----------+--+                   \n",
-		"    ----------------+-------------Postamble----------+--+                   \n",
+		"                    +-------------Postamble----------+  +-------------------\n",
+		"                    +-------------Postamble----------+--+-------------------\n",
 		"--------------------+-------------Postamble----------+--+-------------------\n",
 	};
 
@@ -1271,8 +2265,8 @@ print_test_end(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+--------------------------------+--+                   \n",
-		"  ------------------+--------------------------------+--+                   \n",
-		"    ----------------+--------------------------------+--+                   \n",
+		"                    +--------------------------------+  +-------------------\n",
+		"                    +--------------------------------+--+-------------------\n",
 		"--------------------+--------------------------------+--+-------------------\n",
 	};
 
@@ -1284,9 +2278,9 @@ void
 print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
-		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d:%03d}\n",
-		"  @@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d:%03d}\n",
-		"    @@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d:%03d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|                    {%d:%03d}\n",
+		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
 		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
 	};
 
@@ -1298,9 +2292,9 @@ void
 print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
-		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d:%03d}\n",
-		"  &&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d:%03d}\n",
-		"    &&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d:%03d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|                    {%d:%03d}\n",
+		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
 		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
 	};
 
@@ -1312,9 +2306,9 @@ void
 print_timeout(int child)
 {
 	static const char *msgs[] = {
-		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
-		"  ++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
-		"    ++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|                    [%d:%03d]\n",
+		"                    |++++++++++++ TIMEOUT! ++++++++++|  |+++++++++++++++++++ [%d:%03d]\n",
+		"                    |++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
@@ -1328,9 +2322,9 @@ void
 print_nothing(int child)
 {
 	static const char *msgs[] = {
-		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|                    [%d:%03d]\n",
-		"  - - - - - - - - - |- - - - - - -nothing! - - - - - | -|                    [%d:%03d]\n",
-		"    - - - - - - - - |- - - - - - -nothing! - - - - - | -|                    [%d:%03d]\n",
+		"- - - - - - - - - - |- - - - - - -nothing! - - - - - |  |                    [%d:%03d]\n",
+		"                    |- - - - - - -nothing! - - - - - |  |- - - - - - - - - - [%d:%03d]\n",
+		"                    |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
 		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
@@ -1345,6 +2339,85 @@ print_string_state(int child, const char *msgs[], const char *string)
 	fprintf(stdout, msgs[child], string, child, state);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_syscall(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"%-14s----->|                                |  |                    [%d:%03d]\n",
+		"                    |                                |  |<---%-14s  [%d:%03d]\n",
+		"                    |                                |<-+----%-14s  [%d:%03d]\n",
+		"                    |          %-14s        |  |                    [%d:%03d]\n",
+	};
+
+	if ((verbose && show) || (verbose > 5 && show_msg))
+		print_string_state(child, msgs, command);
+}
+
+void
+print_tx_prim(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"--%16s->|- - - - - - - - - - - - - - - ->|->|                    [%d:%03d]\n",
+		"                    |<- - - - - - - - - - - - - - - -|- |<-%16s- [%d:%03d]\n",
+		"                    |<- - - - - - - - - - - - - - - -|<----%16s- [%d:%03d]\n",
+		"                    |                                |  |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state(child, msgs, command);
+}
+
+void
+print_rx_prim(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"<-%16s--|<- - - - - - - - - - - - - - - -| -|                    [%d:%03d]\n",
+		"                    |- - - - - - - - - - - - - - - ->|  |--%16s> [%d:%03d]\n",
+		"                    |- - - - - - - - - - - - - - - ->|--+--%16s> [%d:%03d]\n",
+		"                    |         <%16s>     |  |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state(child, msgs, command);
+}
+
+void
+print_ack_prim(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"<-%16s-/|                                |  |                    [%d:%03d]\n",
+		"                    |                                |  |\\-%16s> [%d:%03d]\n",
+		"                    |                                |\\-+--%16s> [%d:%03d]\n",
+		"                    |         <%16s>     |  |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state(child, msgs, command);
+}
+
+void
+print_long_state(int child, const char *msgs[], long value)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], value, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_no_prim(int child, long prim)
+{
+	static const char *msgs[] = {
+		"????%4ld????  ?----?|?- - - - - - -?                |  |                     [%d:%03d]\n",
+		"                    |                               |  |?--? ????%4ld????    [%d:%03d]\n",
+		"                    |                               |?-+---? ????%4ld????    [%d:%03d]\n",
+		"                    | ? - - - - - - %4ld  - - - - ? |  |                     [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_long_state(child, msgs, prim);
 }
 
 void
@@ -1422,16 +2495,30 @@ print_string_int_state(int child, const char *msgs[], const char *string, int va
 }
 
 void
+print_rx_data(int child, const char *command, size_t bytes)
+{
+	static const char *msgs[] = {
+		"<-%1$16s--|<- -%2$4d bytes- - - - - - - - - |- |                    [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes- - - - - - - - ->|  |--%1$16s> [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes- - - - - - - - - |->|--%1$16s> [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
+	};
+
+	if ((verbose && show) || (verbose > 5 && show_msg))
+		print_string_int_state(child, msgs, command, bytes);
+}
+
+void
 print_errno(int child, long error)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                                |  |                    [%d:%03d]\n",
 		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"    %-14s</|                                |  |                    [%d:%03d]\n",
+		"                    |                                |  |\\-->%14s  [%d:%03d]\n",
+		"                    |                                |\\-+--->%14s  [%d:%03d]\n",
 		"                    |          [%14s]      |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 3)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, errno_string(error));
 }
 
@@ -1439,13 +2526,13 @@ void
 print_success(int child)
 {
 	static const char *msgs[] = {
-		"ok            <----/|                                |  |                    [%d:%03d]\n",
 		"  ok          <----/|                                |  |                    [%d:%03d]\n",
-		"    ok        <----/|                                |  |                    [%d:%03d]\n",
+		"                    |                                |  |\\---->         ok   [%d:%03d]\n",
+		"                    |                                |\\-+----->         ok   [%d:%03d]\n",
 		"                    |                 ok             |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 3)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_double_int(child, msgs, child, state);
 }
 
@@ -1453,13 +2540,13 @@ void
 print_success_value(int child, int value)
 {
 	static const char *msgs[] = {
-		"%10d<--------/|                                |  |                    [%d:%03d]\n",
-		"  %10d<------/|                                |  |                    [%d:%03d]\n",
-		"    %10d<----/|                                |  |                    [%d:%03d]\n",
+		"  %10d  <----/|                                |  |                    [%d:%03d]\n",
+		"                    |                                |  |\\---->  %10d  [%d:%03d]\n",
+		"                    |                                |\\-+----->  %10d  [%d:%03d]\n",
 		"                    |            [%10d]        |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 3)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_triple_int(child, msgs, value, child, state);
 }
 
@@ -1502,24 +2589,54 @@ void
 print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"%1$14s----->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
-		"  %1$14s--->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
-		"    %1$14s->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
+		"  %1$16s->|- -%2$5d bytes- - - - - - - - ->|->|                    [%3$d:%4$03d]\n",
+		"                    |< -%2$5d bytes- - - - - - - - - |- |<-%1$16s  [%3$d:%4$03d]\n",
+		"                    |< -%2$5d bytes- - - - - - - - - |<-+--%1$16s  [%3$d:%4$03d]\n",
+		"                    |- -%2$5d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 
-	if ((verbose && show_data) || verbose > 1)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_string_int_state(child, msgs, command, bytes);
 }
+
+void
+print_libcall(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"  %-16s->|                                |  |                    [%d:%03d]\n",
+		"                    |                                |  |<-%16s  [%d:%03d]\n",
+		"                    |                                |<-+--%16s  [%d:%03d]\n",
+		"                    |        [%16s]      |  |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_string_state(child, msgs, command);
+}
+
+#if 0
+void
+print_terror(int child, long error, long terror)
+{
+	static const char *msgs[] = {
+		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
+		"                    |                                |  |\\-->%14s  [%d:%03d]\n",
+		"                    |                                |\\-+--->%14s  [%d:%03d]\n",
+		"                    |          [%14s]      |  |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_string_state(child, msgs, t_errno_string(terror, error));
+}
+#endif
 
 void
 print_expect(int child, int want)
 {
 	static const char *msgs[] = {
-		"(%-14s)    |- - - - - -[Expected]- - - - - -|- |                     [%d:%03d]\n",
-		"  (%-14s)  |- - - - - -[Expected]- - - - - -|- |                     [%d:%03d]\n",
-		"    (%-14s)|- - - - - -[Expected]- - - - - -|- |                     [%d:%03d]\n",
-		"                    |- - -[Expected %-14s] -|- |                     [%d:%03d]\n",
+		" (%-16s) |- - - - - -[Expected]- - - - - -|  |                    [%d:%03d]\n",
+		"                    |- - - - - -[Expected]- - - - - -|  | (%-16s) [%d:%03d]\n",
+		"                    |- - - - - -[Expected]- - - - - -|- | (%-16s) [%d:%03d]\n",
+		"                    |- [Expected %-16s ] -|- |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 1 && show)
@@ -1530,10 +2647,10 @@ void
 print_string(int child, const char *string)
 {
 	static const char *msgs[] = {
-		"%-16s    |                                |  |                    \n",
-		"  %-16s  |                                |  |                    \n",
-		"    %-16s|                                |  |                    \n",
-		"                    |  |      %-16s       |  |                    \n",
+		"%-20s|                                |  |                    \n",
+		"                    |                                |  |%-20s\n",
+		"                    |                                |   %-20s\n",
+		"                    |       %-20s     |  |                    \n",
 	};
 
 	if (verbose > 1 && show)
@@ -1553,9 +2670,9 @@ void
 print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                    [%d:%03d]\n",
-		"  / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                    [%d:%03d]\n",
-		"    / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                    [%d:%03d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|  |                    [%d:%03d]\n",
+		"                    | / / / Waiting %03lu seconds / / /|  | / / / / / / / / /  [%d:%03d]\n",
+		"                    | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
 		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
 	};
 
@@ -1576,9 +2693,9 @@ void
 print_mwaiting(int child, struct timespec *time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
-		"  / / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
-		"    / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
+		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |  |                    [%d:%03d]\n",
+		"                    | / / Waiting %8.4f seconds / |  | / / / / / / / / /  [%d:%03d]\n",
+		"                    | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
 		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
 	};
 
@@ -1618,12 +2735,17 @@ int
 test_ioctl(int child, int cmd, intptr_t arg)
 {
 	print_ioctl(child, cmd, arg);
-	if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (lass_errno == EINTR || lass_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
 	}
-	print_success_value(child, last_retval);
-	return (__RESULT_SUCCESS);
 }
 
 int
@@ -1652,6 +2774,22 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
+	if (verbose > 4) {
+		int i;
+
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "fdinsert to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+		fprintf(stdout, "[");
+		for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+			fprintf(stdout, "%02X", ctrl->buf[i]);
+		fprintf(stdout, "]\n");
+		fprintf(stdout, "[");
+		for (i = 0; i < (data ? data->len : 0); i++)
+			fprintf(stdout, "%02X", data->buf[i]);
+		fprintf(stdout, "]\n");
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
 	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
@@ -1672,24 +2810,73 @@ test_putmsg(int child, struct strbuf *ctrl, struct strbuf *data, int flags)
 int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
-	print_datcall(child, "putpmsg(2)----", data ? data->len : -1);
-	if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	if (flags & MSG_BAND || band) {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
+			int i;
+
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+			fprintf(stdout, "[");
+			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+				fprintf(stdout, "%02X", ctrl->buf[i]);
+			fprintf(stdout, "]\n");
+			fprintf(stdout, "[");
+			for (i = 0; i < (data ? data->len : 0); i++)
+				fprintf(stdout, "%02X", data->buf[i]);
+			fprintf(stdout, "]\n");
+			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		if (ctrl == NULL || data != NULL)
+			print_datcall(child, "M_DATA----------", data ? data->len : 0);
+		for (;;) {
+			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
+				print_errno(child, (last_errno = errno));
+				if (last_errno == EINTR || last_errno == ERESTART)
+					continue;
+				return (__RESULT_FAILURE);
+			}
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
+				print_success_value(child, last_retval);
+			return (__RESULT_SUCCESS);
+		}
+	} else {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			fflush(stdout);
+		}
+		if (ctrl == NULL || data != NULL)
+			print_datcall(child, "M_DATA----------", data ? data->len : 0);
+		for (;;) {
+			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+				print_errno(child, (last_errno = errno));
+				if (last_errno == EINTR || last_errno == ERESTART)
+					continue;
+				return (__RESULT_FAILURE);
+			}
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
+				print_success_value(child, last_retval);
+			return (__RESULT_SUCCESS);
+		}
 	}
-	print_success_value(child, last_retval);
-	return (__RESULT_SUCCESS);
 }
 
 int
 test_write(int child, const void *buf, size_t len)
 {
-	print_datcall(child, "write(2)------", len);
-	if ((last_retval = write(test_fd[child], buf, len)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	print_syscall(child, "write(2)------");
+	for (;;) {
+		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
@@ -1697,47 +2884,61 @@ int
 test_writev(int child, const struct iovec *iov, int num)
 {
 	print_syscall(child, "writev(2)-----");
-	if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 {
-	print_datcall(child, "getmsg(2)-----", data ? data->maxlen : -1);
-	if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	print_syscall(child, "getmsg(2)-----");
+	for (;;) {
+		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
 {
-	print_datcall(child, "getpmsg(2)----", data ? data->maxlen : -1);
-	if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	print_syscall(child, "getpmsg(2)----");
+	for (;;) {
+		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_read(int child, void *buf, size_t count)
 {
-	print_datcall(child, "read(2)-------", count);
-	if ((last_retval = read(test_fd[child], buf, count)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	print_syscall(child, "read(2)-------");
+	for (;;) {
+		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
@@ -1745,12 +2946,59 @@ int
 test_readv(int child, const struct iovec *iov, int count)
 {
 	print_syscall(child, "readv(2)------");
-	if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
+}
+
+int
+test_ti_ioctl(int child, int cmd, intptr_t arg)
+{
+	if (cmd == I_STR && verbose > 3) {
+		struct strioctl *icp = (struct strioctl *) arg;
+
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	print_ti_ioctl(child, cmd, arg);
+	for (;;) {
+		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
+		break;
+	}
+	if (cmd == I_STR && verbose > 3) {
+		struct strioctl *icp = (struct strioctl *) arg;
+
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "got ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (last_retval == 0)
+		return __RESULT_SUCCESS;
+	if (verbose) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "***************ERROR: ioctl failed\n");
+		if (verbose > 3)
+			fprintf(stdout, "                    : %s; result = %d\n", __FUNCTION__, last_retval);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+		fflush(stdout);
+	}
+	return (__RESULT_FAILURE);
 }
 
 int
@@ -1759,17 +3007,27 @@ test_nonblock(int child)
 	long flags;
 
 	print_syscall(child, "fcntl(2)------");
-	if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	print_syscall(child, "fcntl(2)------");
-	if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
@@ -1779,17 +3037,27 @@ test_block(int child)
 	long flags;
 
 	print_syscall(child, "fcntl(2)------");
-	if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	print_syscall(child, "fcntl(2)------");
-	if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
@@ -1829,15 +3097,19 @@ test_pipe(int child)
 {
 	int fds[2];
 
-	print_pipe(child);
-	if (pipe(fds) >= 0) {
-		test_fd[child + 0] = fds[0];
-		test_fd[child + 1] = fds[1];
-		print_success(child);
-		return (__RESULT_SUCCESS);
+	for (;;) {
+		print_pipe(child);
+		if (pipe(fds) >= 0) {
+			test_fd[child + 0] = fds[0];
+			test_fd[child + 1] = fds[1];
+			print_success(child);
+			return (__RESULT_SUCCESS);
+		}
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
 	}
-	print_errno(child, (last_errno = errno));
-	return (__RESULT_FAILURE);
 }
 
 int
@@ -1871,11 +3143,18 @@ test_open(int child, const char *name, int flags)
 {
 	int fd;
 
-	if ((fd = test_fopen(child, name, flags)) >= 0) {
-		test_fd[child] = fd;
-		return (__RESULT_SUCCESS);
+	for (;;) {
+		print_open(child, name);
+		if ((fd = open(name, flags)) >= 0) {
+			test_fd[child] = fd;
+			print_success(child);
+			return (__RESULT_SUCCESS);
+		}
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
 	}
-	return (__RESULT_FAILURE);
 }
 
 int
@@ -1884,7 +3163,17 @@ test_close(int child)
 	int fd = test_fd[child];
 
 	test_fd[child] = 0;
-	return test_fclose(child, fd);
+	for (;;) {
+		print_close(child);
+		if (close(fd) >= 0) {
+			print_success(child);
+			return __RESULT_SUCCESS;
+		}
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		print_errno(child, (last_errno = errno));
+		return __RESULT_FAILURE;
+	}
 }
 
 /*
@@ -1977,15 +3266,37 @@ static int
 begin_tests(int index)
 {
 	state = 0;
+	if (stream_start(0, index) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (stream_start(1, index) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (stream_start(2, index) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	show_acks = 1;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int
 end_tests(int index)
 {
 	show_acks = 0;
+	if (stream_stop(2) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (stream_stop(1) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (stream_stop(0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 /*
@@ -2153,6 +3464,7 @@ run_stream(int child, struct test_stream *stream)
 
 	print_preamble(child);
 	state = 100;
+	failure_string = NULL;
 	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
 		switch (pre_result) {
 		case __RESULT_NOTAPPL:
@@ -2171,6 +3483,7 @@ run_stream(int child, struct test_stream *stream)
 	} else {
 		print_test(child);
 		state = 200;
+		failure_string = NULL;
 		switch (stream->testcase(child)) {
 		default:
 		case __RESULT_INCONCLUSIVE:
@@ -2200,6 +3513,7 @@ run_stream(int child, struct test_stream *stream)
 		}
 		print_postamble(child);
 		state = 300;
+		failure_string = NULL;
 		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
 			switch (post_result) {
 			case __RESULT_NOTAPPL:
@@ -2224,158 +3538,157 @@ run_stream(int child, struct test_stream *stream)
 
 /*
  *  Fork multiple children to do the actual testing.
+ *  The conn child (child[0]) is the connecting process, the resp child
+ *  (child[1]) is the responding process.
  */
 
 int
 test_run(struct test_stream *stream[])
 {
 	int children = 0;
-	pid_t this_pid;
+	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 
-	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+	if (start_tt(test_duration) != __RESULT_SUCCESS)
 		goto inconclusive;
-	if (stream[2]) {
-		switch ((test_pid[2] = fork())) {
+	if (server_exec && stream[2]) {
+		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
 		case -1:	/* error */
-			if (test_pid[0])
-				kill(test_pid[0], SIGKILL);	/* toast stream[0] child */
-			if (test_pid[1])
-				kill(test_pid[1], SIGKILL);	/* toast stream[1] child */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			if (child[1])
+				kill(child[1], SIGKILL);	/* toast stream[1] child */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
-			// printf("Child 2 pid is %d\n", (int)test_pid[2]);
 			break;
 		}
 	} else
 		status[2] = __RESULT_SUCCESS;
-	if (stream[1]) {
-		switch ((test_pid[1] = fork())) {
+	if (server_exec && stream[1]) {
+		switch ((child[1] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
 		case -1:	/* error */
-			if (test_pid[0])
-				kill(test_pid[0], SIGKILL);	/* toast stream[0] child */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
-			// printf("Child 1 pid is %d\n", (int)test_pid[1]);
 			break;
 		}
 	} else
 		status[1] = __RESULT_SUCCESS;
-	if (stream[0]) {
-		switch ((test_pid[0] = fork())) {
+	if (client_exec && stream[0]) {
+		switch ((child[0] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
 		case -1:	/* error */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
-			// printf("Child 0 pid is %d\n", (int)test_pid[0]);
 			break;
 		}
 	} else
 		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
 	      waitagain:
-		if ((this_pid = wait(&this_status)) > 0) {
+		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
-				if (this_pid == test_pid[0]) {
-					test_pid[0] = 0;
+				if (this_child == child[0]) {
+					child[0] = 0;
 					if ((status[0] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (test_pid[1])
-							kill(test_pid[1], SIGKILL);
-						if (test_pid[2])
-							kill(test_pid[2], SIGKILL);
+						if (child[1])
+							kill(child[1], SIGKILL);
+						if (child[2])
+							kill(child[2], SIGKILL);
 					}
 				}
-				if (this_pid == test_pid[1]) {
-					test_pid[1] = 0;
+				if (this_child == child[1]) {
+					child[1] = 0;
 					if ((status[1] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (test_pid[0])
-							kill(test_pid[0], SIGKILL);
-						if (test_pid[2])
-							kill(test_pid[2], SIGKILL);
+						if (child[0])
+							kill(child[0], SIGKILL);
+						if (child[2])
+							kill(child[2], SIGKILL);
 					}
 				}
-				if (this_pid == test_pid[2]) {
-					test_pid[2] = 0;
+				if (this_child == child[2]) {
+					child[2] = 0;
 					if ((status[2] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (test_pid[0])
-							kill(test_pid[0], SIGKILL);
-						if (test_pid[1])
-							kill(test_pid[1], SIGKILL);
+						if (child[0])
+							kill(child[0], SIGKILL);
+						if (child[1])
+							kill(child[1], SIGKILL);
 					}
 				}
 			} else if (WIFSIGNALED(this_status)) {
 				int signal = WTERMSIG(this_status);
 
-				if (this_pid == test_pid[0]) {
+				if (this_child == child[0]) {
 					print_terminated(0, signal);
-					if (test_pid[1])
-						kill(test_pid[1], SIGKILL);
-					if (test_pid[2])
-						kill(test_pid[2], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
 					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					test_pid[0] = 0;
+					child[0] = 0;
 				}
-				if (this_pid == test_pid[1]) {
+				if (this_child == child[1]) {
 					print_terminated(1, signal);
-					if (test_pid[0])
-						kill(test_pid[0], SIGKILL);
-					if (test_pid[2])
-						kill(test_pid[2], SIGKILL);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
 					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					test_pid[1] = 0;
+					child[1] = 0;
 				}
-				if (this_pid == test_pid[2]) {
+				if (this_child == child[2]) {
 					print_terminated(2, signal);
-					if (test_pid[0])
-						kill(test_pid[0], SIGKILL);
-					if (test_pid[1])
-						kill(test_pid[1], SIGKILL);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
 					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					test_pid[2] = 0;
+					child[2] = 0;
 				}
 			} else if (WIFSTOPPED(this_status)) {
 				int signal = WSTOPSIG(this_status);
 
-				if (this_pid == test_pid[0]) {
+				if (this_child == child[0]) {
 					print_stopped(0, signal);
-					if (test_pid[0])
-						kill(test_pid[0], SIGKILL);
-					if (test_pid[1])
-						kill(test_pid[1], SIGKILL);
-					if (test_pid[2])
-						kill(test_pid[2], SIGKILL);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
 					status[0] = __RESULT_FAILURE;
-					test_pid[0] = 0;
+					child[0] = 0;
 				}
-				if (this_pid == test_pid[1]) {
+				if (this_child == child[1]) {
 					print_stopped(1, signal);
-					if (test_pid[0])
-						kill(test_pid[0], SIGKILL);
-					if (test_pid[1])
-						kill(test_pid[1], SIGKILL);
-					if (test_pid[2])
-						kill(test_pid[2], SIGKILL);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
 					status[1] = __RESULT_FAILURE;
-					test_pid[1] = 0;
+					child[1] = 0;
 				}
-				if (this_pid == test_pid[2]) {
+				if (this_child == child[2]) {
 					print_stopped(2, signal);
-					if (test_pid[0])
-						kill(test_pid[0], SIGKILL);
-					if (test_pid[1])
-						kill(test_pid[1], SIGKILL);
-					if (test_pid[2])
-						kill(test_pid[2], SIGKILL);
+					if (child[0])
+						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
 					status[2] = __RESULT_FAILURE;
-					test_pid[2] = 0;
+					child[2] = 0;
 				}
 			}
 		} else {
@@ -2383,12 +3696,12 @@ test_run(struct test_stream *stream[])
 				timer_timeout = 0;
 				print_timeout(3);
 			}
-			if (test_pid[0])
-				kill(test_pid[0], SIGKILL);
-			if (test_pid[1])
-				kill(test_pid[1], SIGKILL);
-			if (test_pid[2])
-				kill(test_pid[2], SIGKILL);
+			if (child[0])
+				kill(child[0], SIGKILL);
+			if (child[1])
+				kill(child[1], SIGKILL);
+			if (child[2])
+				kill(child[2], SIGKILL);
 			goto waitagain;
 		}
 	}
@@ -2475,6 +3788,7 @@ do_tests(int num_tests)
 			end_tests(0);
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+		      rerun:
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
 				notselected++;
@@ -2587,9 +3901,15 @@ do_tests(int num_tests)
 				}
 				break;
 			}
+			if (repeat_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+				goto rerun;
+			if (repeat_on_success && (result == __RESULT_SUCCESS))
+				goto rerun;
 			tests[i].result = result;
-			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE)) {
 				aborted = 1;
+				continue;
+			}
 		}
 		if (summary && verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -2799,6 +4119,27 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    -c, --client\n\
+        execute client side of test case only.\n\
+    -S, --server\n\
+        execute server side of test case only.\n\
+    -w, --wait\n\
+        have server wait indefinitely.\n\
+    -r, --repeat\n\
+        repeat test cases on success or failure.\n\
+    -R, --repeat-fail\n\
+        repeat test cases on failure.\n\
+    -p, --client-port [PORT]\n\
+        port number from which to connect [default: 10000+index*3]\n\
+    -P, --server-port [PORT]\n\
+        port number to which to connect or upon which to listen\n\
+        [default: 10000+index*3+2]\n\
+    -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
+        client host names(s) or IP numbers\n\
+        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
+    -I, --server-host [HOSTNAME[,HOSTNAME]*]\n\
+        server host names(s) or IP numbers\n\
+        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
     -d, --device DEVICE\n\
         device name to open [default: %2$s].\n\
     -e, --exit\n\
@@ -2830,6 +4171,8 @@ Options:\n\
 ", argv[0], devname);
 }
 
+#define HOST_BUF_LEN 128
+
 int
 main(int argc, char *argv[])
 {
@@ -2837,6 +4180,11 @@ main(int argc, char *argv[])
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
+	char *hostc = "127.0.0.1,127.0.0.2,127.0.0.3";
+	char *hosts = "127.0.0.1,127.0.0.2,127.0.0.3";
+	char hostbufc[HOST_BUF_LEN];
+	char hostbufs[HOST_BUF_LEN];
+	struct hostent *haddr;
 
 	for (t = tests; t->numb; t++) {
 		if (!t->result) {
@@ -2851,6 +4199,15 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"client",	no_argument,		NULL, 'c'},
+			{"server",	no_argument,		NULL, 'S'},
+			{"wait",	no_argument,		NULL, 'w'},
+			{"client-port",	required_argument,	NULL, 'p'},
+			{"server-port",	required_argument,	NULL, 'P'},
+			{"client-host",	required_argument,	NULL, 'i'},
+			{"server-host",	required_argument,	NULL, 'I'},
+			{"repeat",	no_argument,		NULL, 'r'},
+			{"repeat-fail",	no_argument,		NULL, 'R'},
 			{"device",	required_argument,	NULL, 'd'},
 			{"exit",	no_argument,		NULL, 'e'},
 			{"list",	optional_argument,	NULL, 'l'},
@@ -2869,13 +4226,50 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "d:el::f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'c':	/* --client */
+			client_exec = 1;
+			break;
+		case 'S':	/* --server */
+			server_exec = 1;
+			break;
+		case 'w':	/* --wait */
+			test_duration = INFINITE_WAIT;
+			break;
+		case 'p':	/* --client-port */
+			client_port_specified = 1;
+			ports[3] = atoi(optarg);
+			ports[0] = ports[3];
+			break;
+		case 'P':	/* --server-port */
+			server_port_specified = 1;
+			ports[3] = atoi(optarg);
+			ports[1] = ports[3];
+			ports[2] = ports[3] + 1;
+			break;
+		case 'i':	/* --client-host *//* client host */
+			client_host_specified = 1;
+			strncpy(hostbufc, optarg, HOST_BUF_LEN);
+			hostc = hostbufc;
+			break;
+		case 'I':	/* --server-host *//* server host */
+			server_host_specified = 1;
+			strncpy(hostbufs, optarg, HOST_BUF_LEN);
+			hosts = hostbufs;
+			break;
+		case 'r':	/* --repeat */
+			repeat_on_success = 1;
+			repeat_on_failure = 1;
+			break;
+		case 'R':	/* --repeat-fail */
+			repeat_on_failure = 1;
+			break;
 		case 'd':
 			if (optarg) {
 				snprintf(devname, sizeof(devname), "%s", optarg);
@@ -2933,7 +4327,7 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long)timer_scale);
 			break;
 		case 's':
 			summary = 1;
@@ -3043,6 +4437,73 @@ main(int argc, char *argv[])
 		break;
 	default:
 		copying(argc, argv);
+	}
+	if (client_exec == 0 && server_exec == 0) {
+		client_exec = 1;
+		server_exec = 1;
+	}
+	if (client_host_specified) {
+		int count = 0;
+		char *token = hostc, *next_token, *delim = NULL;
+
+		fprintf(stdout, "Specified client address => %s\n", token);
+		do {
+			if ((delim = index(token, ','))) {
+				delim[0] = '\0';
+				next_token = delim + 1;
+			} else
+				next_token = NULL;
+			haddr = gethostbyname(token);
+			addrs[0][count].sin_family = AF_INET;
+			addrs[3][count].sin_family = AF_INET;
+			if (client_port_specified) {
+				addrs[0][count].sin_port = htons(ports[0]);
+				addrs[3][count].sin_port = htons(ports[3]);
+			} else {
+				addrs[0][count].sin_port = 0;
+				addrs[3][count].sin_port = 0;
+			}
+			addrs[0][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[3][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			count++;
+		} while ((token = next_token) && count < 4);
+		anums[0] = count;
+		anums[3] = count;
+		fprintf(stdout, "%d client addresses assigned\n", count);
+	}
+	if (server_host_specified) {
+		int count = 0;
+		char *token = hosts, *next_token, *delim = NULL;
+
+		fprintf(stdout, "Specified server address => %s\n", token);
+		do {
+			if ((delim = index(token, ','))) {
+				delim[0] = '\0';
+				next_token = delim + 1;
+			} else
+				next_token = NULL;
+			haddr = gethostbyname(token);
+			addrs[1][count].sin_family = AF_INET;
+			addrs[2][count].sin_family = AF_INET;
+			addrs[3][count].sin_family = AF_INET;
+			if (server_port_specified) {
+				addrs[1][count].sin_port = htons(ports[1]);
+				addrs[2][count].sin_port = htons(ports[2]);
+				addrs[3][count].sin_port = htons(ports[3]);
+			} else {
+				addrs[1][count].sin_port = 0;
+				addrs[2][count].sin_port = 0;
+				addrs[3][count].sin_port = 0;
+			}
+			addrs[1][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[2][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			addrs[3][count].sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
+			count++;
+		} while ((token = next_token) && count < 4);
+		anums[1] = count;
+		anums[2] = count;
+		anums[3] = count;
+		fprintf(stdout, "%d server addresses assigned\n", count);
 	}
 	exit(do_tests(tests_to_run));
 }
