@@ -2581,17 +2581,17 @@ print_pipe(int child)
 }
 
 void
-print_open(int child)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
-		"  open()      ----->v                                   .                   \n",
-		"                    |                                   v<-----     open()  \n",
-		"                    |                                v<-+------     open()  \n",
-		"                    .                                .  .                   \n",
+		"  open()      ----->v %-30.30s    .                   \n",
+		"                    | %-30.30s    v<-----     open()  \n",
+		"                    | %-30.30s v<-+------     open()  \n",
+		"                    . %-30.30s .  .                   \n",
 	};
 
 	if (verbose > 3)
-		print_simple(child, msgs);
+		print_simple_string(child, msgs, name);
 }
 
 void
@@ -3597,6 +3597,37 @@ test_block(int child)
 }
 
 int
+test_isastream(int child)
+{
+	int result;
+
+	print_syscall(child, "isastream(2)--");
+	if ((result = last_retval = isastream(test_fd[child])) == -1) {
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+	print_success_value(child, last_retval);
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_poll(int child, const short events, short *revents, long ms)
+{
+	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
+	int result;
+
+	print_poll(child, events);
+	if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+	print_poll_value(child, last_retval, pfd.revents);
+	if (last_retval == 1 && revents)
+		*revents = pfd.revents;
+	return (__RESULT_SUCCESS);
+}
+
+int
 test_pipe(int child)
 {
 	int fds[2];
@@ -3617,13 +3648,39 @@ test_pipe(int child)
 }
 
 int
-test_open(int child, const char *name)
+test_fopen(int child, const char *name, int flags)
+{
+	int fd;
+
+	print_open(child, name);
+	if ((fd = open(name, flags)) >= 0) {
+		print_success(child);
+		return (fd);
+	}
+	print_errno(child, (last_errno = errno));
+	return (fd);
+}
+
+int
+test_fclose(int child, int fd)
+{
+	print_close(child);
+	if (close(fd) >= 0) {
+		print_success(child);
+		return __RESULT_SUCCESS;
+	}
+	print_errno(child, (last_errno = errno));
+	return __RESULT_FAILURE;
+}
+
+int
+test_open(int child, const char *name, int flags)
 {
 	int fd;
 
 	for (;;) {
-		print_open(child);
-		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
+		print_open(child, name);
+		if ((fd = open(name, flags)) >= 0) {
 			test_fd[child] = fd;
 			print_success(child);
 			return (__RESULT_SUCCESS);
@@ -3655,9 +3712,9 @@ test_close(int child)
 }
 
 int
-test_push(int child)
+test_push(int child, const char *name)
 {
-	if (test_ioctl(child, I_PUSH, (intptr_t) "tpiperf") != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_PUSH, (intptr_t) name) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -3714,7 +3771,7 @@ stream_start(int child, int index)
 				inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 		}
-		if (test_open(child, devname) != __RESULT_SUCCESS)
+		if (test_open(child, devname, O_NONBLOCK | O_RDWR) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
@@ -3737,6 +3794,24 @@ stream_stop(int child)
 	default:
 		return __RESULT_FAILURE;
 	}
+}
+
+void
+test_sleep(int child, unsigned long t)
+{
+	print_waiting(child, t);
+	sleep(t);
+}
+
+void
+test_msleep(int child, unsigned long m)
+{
+	struct timespec time;
+
+	time.tv_sec = m / 1000;
+	time.tv_nsec = (m % 1000) * 1000000;
+	print_mwaiting(child, &time);
+	nanosleep(&time, NULL);
 }
 
 /*
@@ -3790,13 +3865,13 @@ begin_tests_p(int index)
 	if (begin_tests(index) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (test_push(0) != __RESULT_SUCCESS)
+	if (test_push(0, "tpiperf") != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (test_push(1) != __RESULT_SUCCESS)
+	if (test_push(1, "tpiperf") != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (test_push(2) != __RESULT_SUCCESS)
+	if (test_push(2, "tpiperf") != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -4626,7 +4701,7 @@ do_signal(int child, int action)
  */
 
 static int
-do_decode_data(int child, struct strbuf *data)
+do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 
@@ -4879,7 +4954,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		}
 		if (data && data->len >= 0)
-			if (do_decode_data(child, data) != __TEST_DATA)
+			if (do_decode_data(child, ctrl, data) != __TEST_DATA)
 				event = __RESULT_FAILURE;
 	}
 	return ((last_event = event));
@@ -4892,7 +4967,7 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
 			return time_event(child, last_event);
 	} else if (data->len > 0) {
-		if ((last_event = do_decode_data(child, data)) != __EVENT_UNKNOWN)
+		if ((last_event = do_decode_data(child, ctrl, data)) != __EVENT_UNKNOWN)
 			return time_event(child, last_event);
 	}
 	return ((last_event = __EVENT_NO_MSG));
@@ -4941,7 +5016,7 @@ wait_event(int child, int wait)
 				data.buf = dbuf;
 				flags = 0;
 				for (;;) {
-					if (verbose > 4)
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 						print_syscall(child, "getmsg()");
 					if ((ret = getmsg(test_fd[child], &ctrl, &data, &flags)) >= 0)
 						break;
@@ -4955,9 +5030,9 @@ wait_event(int child, int wait)
 				if (ret < 0)
 					break;
 				if (ret == 0) {
-					if (verbose > 4)
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 						print_success(child);
-					if (verbose > 4) {
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 						int i;
 
 						dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -5055,24 +5130,6 @@ expect(int child, int wait, int want)
 		return (__RESULT_SUCCESS);
 	print_expect(child, want);
 	return (__RESULT_FAILURE);
-}
-
-void
-test_sleep(int child, unsigned long t)
-{
-	print_waiting(child, t);
-	sleep(t);
-}
-
-void
-test_msleep(int child, unsigned long m)
-{
-	struct timespec time;
-
-	time.tv_sec = m / 1000;
-	time.tv_nsec = (m % 1000) * 1000000;
-	print_mwaiting(child, &time);
-	nanosleep(&time, NULL);
 }
 
 /*
@@ -42565,7 +42622,7 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long)timer_scale);
 			break;
 		case 's':
 			summary = 1;
