@@ -411,7 +411,7 @@ typedef struct addr {
 static struct {
 	addr_t loc;
 	addr_t rem;
-} addrs[3] = {
+} test_addrs[3] = {
 	{
 		{
 			__constant_htons(10001), {
@@ -7220,7 +7220,7 @@ preamble_bind(int child)
 {
 	unsigned char proto = TEST_PROTOCOL;
 	unsigned char prot[] = { proto };
-	int coninds = (child == 2) ? 1 : 0;
+	int coninds = (child == CHILD_IUT) ? iut_connects : !iut_connects;
 
 	ADDR_buffer = addrs[child];
 	ADDR_length = anums[child] * sizeof(addrs[child][0]);
@@ -7299,25 +7299,32 @@ preamble_connect(int child)
 	if (preamble_bind(child))
 		goto failure;
 	state++;
-	switch (child) {
-	case CHILD_PTU:
-		ADDR_buffer = addrs[CHILD_MGM];
-		ADDR_length = anums[CHILD_MGM] * sizeof(addrs[CHILD_MGM][0]);
-		CONN_flags = 0;
-		QOS_buffer = NULL;
-		QOS_length = 0;
-		DATA_buffer = NULL;
-		DATA_length = 0;
+	if ((child == CHILD_PTU && iut_connects == 0) || (child == CHILD_IUT && iut_connects != 0)) {
+		/* keep trying to connect until successful or the child times out */
+		for (;;) {
+			ADDR_buffer = addrs[(child + 1) % 2];
+			ADDR_length = anums[(child + 1) % 2] * sizeof(addrs[(child + 1) % 2][0]);
+			CONN_flags = 0;
+			QOS_buffer = NULL;
+			QOS_length = 0;
+			DATA_buffer = NULL;
+			DATA_length = 0;
 
-		/* wait for listener to bind */
-		test_msleep(child, SHORT_WAIT);
-		state++;
-		if (do_signal(child, __TEST_CONN_REQ))
-			goto failure;
-		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_CONN_CON))
-			goto failure;
-		state++;
+			if (do_signal(child, __TEST_CONN_REQ))
+				goto failure;
+			state++;
+			switch (get_event(child)) {
+			case __TEST_CONN_CON:
+				state++;
+				break;
+			case __TEST_DISCON_IND:
+				state++;
+				continue;
+			default:
+				goto failure;
+			}
+			break;
+		}
 		if (do_signal(child, __TEST_INFO_REQ))
 			goto failure;
 		state++;
@@ -7328,25 +7335,7 @@ preamble_connect(int child)
 			failure_string = "bad CURRENT_state";
 			goto failure;
 		}
-		break;
-	case CHILD_IUT:
-		/* wait for connection to form */
-		test_msleep(child, NORMAL_WAIT);
-		state++;
-		if (do_signal(child, __TEST_INFO_REQ))
-			goto failure;
-		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
-			goto failure;
-		state++;
-		if (last_info.CURRENT_state != NS_DATA_XFER) {
-			failure_string = "bad CURRENT_state";
-			goto failure;
-		}
-		state++;
-		break;
-	case CHILD_MGM:
-	{
+	} else {
 		N_qos_sel_conn_sctp_t test_qos = {
 			.n_qos_type N_QOS_SEL_CONN_SCTP,
 			.i_streams = 2,
@@ -7357,8 +7346,7 @@ preamble_connect(int child)
 			goto failure;
 		state++;
 
-		test_resfd = test_fd[CHILD_IUT];
-		TOKEN_value = tok[CHILD_IUT];
+		TOKEN_value = tok[child];
 		ADDR_buffer = addrs[child];
 		ADDR_length = anums[child] * sizeof(addrs[child][0]);
 		CONN_flags = 0;
@@ -7383,11 +7371,45 @@ preamble_connect(int child)
 			failure_string = "bad CURRENT_state";
 			goto failure;
 		}
-		break;
 	}
+	if (child == CHILD_IUT) {
+		if (test_push(child, "m2pa_sl"))
+			goto failure;
+		state++;
 	}
 	return __RESULT_SUCCESS;
       failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+postamble_link_power_off(int child)
+{
+	int failed = 0;
+
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+		failed = failed ? : state;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (child == CHILD_IUT) {
+		if (test_pop(child))
+			failed = failed ? : state;
+		state++;
+		if (do_signal(child, __TEST_DISCON_REQ))
+			failed = failed ? : state;
+	} else {
+		if (expect(child, NORMAL_WAIT, __TEST_DISCON_IND))
+			if (do_signal(child, __TEST_DISCON_REQ))
+				failed = failed ? : state;
+		state++;
+	}
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failed:
 	return __RESULT_FAILURE;
 }
 
@@ -7398,8 +7420,6 @@ preamble_link_power_off(int child)
 	case CHILD_PTU:
 		break;
 	case CHILD_IUT:
-		break;
-	case CHILD_MGM:
 		break;
 	}
 	return __RESULT_SUCCESS;
@@ -7426,11 +7446,6 @@ preamble_link_power_on(int child)
 			goto failure;
 		state++;
 		break;
-	case CHILD_MGM:
-		if (preamble_link_power_off(child))
-			goto failure;
-		state++;
-		break;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -7452,11 +7467,6 @@ preamble_link_out_of_service(int child)
 		state++;
 		break;
 	case CHILD_IUT:
-		if (preamble_link_power_on(child))
-			goto failure;
-		state++;
-		break;
-	case CHILD_MGM:
 		if (preamble_link_power_on(child))
 			goto failure;
 		state++;
@@ -7502,11 +7512,6 @@ preamble_link_in_service(int child)
 			goto failure;
 		state++;
 		break;
-	case CHILD_MGM:
-		if (preamble_link_out_of_service(child))
-			goto failure;
-		state++;
-		break;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -7533,7 +7538,6 @@ static const char sref_none[] = "(none)";
 
 #define CHILD_PTU   0
 #define CHILD_IUT   1
-#define CHILD_MGM   2
 
 #if 0
 static int
@@ -7575,8 +7579,6 @@ test_power_on_pt(int child)
 			goto faiulre;
 		state++;
 		break;
-	case CHILD_MGM:
-		break;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -7608,22 +7610,11 @@ test_1_1a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_1a_mgm(int child)
-{
-	if (test_power_on_pt(child))
-		goto failure;
-	state++;
-	return __RESULT_SUCCESS;
-      failure:
-	return __RESULT_FAILURE;
-}
 
-static struct test_stream test_case_1_1a_ptu = { preamble_link_power_off, test_1_1a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_1a_iut = { preamble_link_power_off, test_1_1a_iut, iut_power_off_iut };
-static struct test_stream test_case_1_1a_mgm = { preamble_link_power_off, test_1_1a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_1a_ptu = { preamble_link_power_off, test_1_1a_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_1a_iut = { preamble_link_power_off, test_1_1a_iut, postamble_link_power_off };
 
-#define test_case_1_1a { test_case_1_1a_ptu, test_case_1_1a_iut, test_case_1_1a_mgm }
+#define test_case_1_1a { test_case_1_1a_ptu, test_case_1_1a_iut }
 
 #define tgrp_case_1_1b test_group_1
 #define sref_case_1_1b "Q.781/1.1"
@@ -7651,8 +7642,6 @@ test_power_on_sut(int child)
 		if (do_signal(child, __TEST_POWER_ON))
 			goto failure;
 		state++;
-		break;
-	case CHILD_MGM:
 		break;
 	}
 	return __RESULT_SUCCESS;
@@ -7685,22 +7674,11 @@ test_1_1b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_1b_mgm(int child)
-{
-	if (test_power_on_sut(child))
-		goto failure;
-	state++;
-	return __RESULT_SUCCESS;
-      failure:
-	return __RESULT_FAILURE;
-}
 
-static struct test_stream test_case_1_1b_ptu = { preamble_link_power_off, test_1_1b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_1b_iut = { preamble_link_power_off, test_1_1b_iut, iut_power_off_iut };
-static struct test_stream test_case_1_1b_mgm = { preamble_link_power_off, test_1_1b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_1b_ptu = { preamble_link_power_off, test_1_1b_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_1b_iut = { preamble_link_power_off, test_1_1b_iut, postamble_link_power_off };
 
-#define test_case_1_1b { test_case_1_1b_ptu, test_case_1_1b_iut, test_case_1_1b_mgm }
+#define test_case_1_1b { test_case_1_1b_ptu, test_case_1_1b_iut }
 
 #define tgrp_case_1_2 test_group_1
 #define sref_case_1_2 "Q.781/1.2"
@@ -7726,8 +7704,6 @@ test_out_of_service_sut(child)
 		break;
 	case CHILD_IUT:
 		break;
-	case CHILD_MGM:
-		break;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -7750,11 +7726,6 @@ test_aligned_sut(int child)
 			goto failure;
 		state++;
 		if (do_signal(child, __TEST_START))
-			goto failure;
-		state++;
-		break;
-	case CHILD_MGM:
-		if (test_out_of_service_sut(child))
 			goto failure;
 		state++;
 		break;
@@ -7795,17 +7766,11 @@ test_1_2_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_2_ptu = { preamble_link_power_on, test_1_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_2_iut = { preamble_link_power_on, test_1_2_iut, iut_power_off_iut };
-static struct test_stream test_case_1_2_mgm = { preamble_link_power_on, test_1_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_2_ptu = { preamble_link_power_on, test_1_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_2_iut = { preamble_link_power_on, test_1_2_iut, postamble_link_power_off };
 
-#define test_case_1_2 { test_case_1_2_ptu, test_case_1_2_iut, test_case_1_2_mgm }
+#define test_case_1_2 { test_case_1_2_ptu, test_case_1_2_iut }
 
 #define tgrp_case_1_3 test_group_1
 #define sref_case_1_3 "Q.781/1.3"
@@ -7854,11 +7819,6 @@ test_proving_sut(int child, int proving)
 			goto failure;
 		state++;
 		break;
-	case CHILD_MGM:
-		if (test_aligned_sut(child))
-			goto failure;
-		state++;
-		break;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -7896,17 +7856,11 @@ test_1_3_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_3_ptu = { preamble_link_power_on, test_1_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_3_iut = { preamble_link_power_on, test_1_3_iut, iut_power_off_iut };
-static struct test_stream test_case_1_3_mgm = { preamble_link_power_on, test_1_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_3_ptu = { preamble_link_power_on, test_1_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_3_iut = { preamble_link_power_on, test_1_3_iut, postamble_link_power_off };
 
-#define test_case_1_3 { test_case_1_3_ptu, test_case_1_3_iut, test_case_1_3_mgm }
+#define test_case_1_3 { test_case_1_3_ptu, test_case_1_3_iut }
 
 #define tgrp_case_1_4 test_group_1
 #define sref_case_1_4 "Q.781/1.4"
@@ -7979,17 +7933,11 @@ test_1_4_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_4_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_4_ptu = { preamble_link_power_on, test_1_4_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_4_iut = { preamble_link_power_on, test_1_4_iut, iut_power_off_iut };
-static struct test_stream test_case_1_4_mgm = { preamble_link_power_on, test_1_4_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_4_ptu = { preamble_link_power_on, test_1_4_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_4_iut = { preamble_link_power_on, test_1_4_iut, postamble_link_power_off };
 
-#define test_case_1_4 { test_case_1_4_ptu, test_case_1_4_iut, test_case_1_4_mgm }
+#define test_case_1_4 { test_case_1_4_ptu, test_case_1_4_iut }
 
 #define desc_case_1_5a "\
 Link State Control - Expected signal units/orders\n\
@@ -8009,8 +7957,6 @@ test_out_of_service_pt(child)
 		state++;
 		break;
 	case CHILD_IUT:
-		break;
-	case CHILD_MGM:
 		break;
 	}
 	return __RESULT_SUCCESS;
@@ -8037,11 +7983,6 @@ test_aligned_pt(int child)
 			goto failure;
 		state++;
 		if (do_signal(child, __TEST_START))
-			goto failure;
-		state++;
-		break;
-	case CHILD_MGM:
-		if (test_out_of_service_pt(child))
 			goto failure;
 		state++;
 		break;
@@ -8134,11 +8075,6 @@ test_alignment_pt(int child, int proving, int result)
 			goto failure;
 		state++;
 		break;
-	case CHILD_MGM:
-		if (test_aligned_pt(child))
-			goto failure;
-		state++;
-		break;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -8170,11 +8106,6 @@ test_1_5a_iut(int child, int proving)
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
-}
-static int
-test_1_5a_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
 }
 
 #define desc_case_1_5b "\
@@ -8264,11 +8195,6 @@ test_alignment_sut(int child, int proving, int result)
 			goto failure;
 		state++;
 		break;
-	case CHILD_MGM:
-		if (test_aligned_sut(child))
-			goto failure;
-		state++;
-		break;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -8301,11 +8227,6 @@ test_1_5b_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_5b_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_5a_p test_group_1
 #define sref_case_1_5a_p "Q.781/1.5"
@@ -8327,17 +8248,11 @@ test_1_5a_p_iut(int child)
 {
 	return test_1_5a_iut(child, 1);
 }
-static int
-test_1_5a_p_mgm(int child)
-{
-	return test_1_5a_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_5a_p_ptu = { preamble_link_power_on, test_1_5a_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_5a_p_iut = { preamble_link_power_on, test_1_5a_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_5a_p_mgm = { preamble_link_power_on, test_1_5a_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_5a_p_ptu = { preamble_link_power_on, test_1_5a_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_5a_p_iut = { preamble_link_power_on, test_1_5a_p_iut, postamble_link_power_off };
 
-#define test_case_1_5a_p { test_case_1_5a_p_ptu, test_case_1_5a_p_iut, test_case_1_5a_p_mgm }
+#define test_case_1_5a_p { test_case_1_5a_p_ptu, test_case_1_5a_p_iut }
 
 #define tgrp_case_1_5b_p test_group_1
 #define sref_case_1_5b_p "Q.781/1.5"
@@ -8359,17 +8274,11 @@ test_1_5b_p_iut(int child)
 {
 	return test_1_5b_iut(child, 1);
 }
-static int
-test_1_5b_p_mgm(int child)
-{
-	return test_1_5b_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_5b_p_ptu = { preamble_link_power_on, test_1_5b_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_5b_p_iut = { preamble_link_power_on, test_1_5b_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_5b_p_mgm = { preamble_link_power_on, test_1_5b_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_5b_p_ptu = { preamble_link_power_on, test_1_5b_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_5b_p_iut = { preamble_link_power_on, test_1_5b_p_iut, postamble_link_power_off };
 
-#define test_case_1_5b_p { test_case_1_5b_p_ptu, test_case_1_5b_p_iut, test_case_1_5b_p_mgm }
+#define test_case_1_5b_p { test_case_1_5b_p_ptu, test_case_1_5b_p_iut }
 
 #define tgrp_case_1_5a_np test_group_1
 #define sref_case_1_5a_np "Q781/1.5"
@@ -8391,17 +8300,11 @@ test_1_5a_np_iut(int child)
 {
 	return test_1_5a_iut(child, 0);
 }
-static int
-test_1_5a_np_mgm(int child)
-{
-	return test_1_5a_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_5a_np_ptu = { preamble_link_power_on, test_1_5a_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_5a_np_iut = { preamble_link_power_on, test_1_5a_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_5a_np_mgm = { preamble_link_power_on, test_1_5a_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_5a_np_ptu = { preamble_link_power_on, test_1_5a_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_5a_np_iut = { preamble_link_power_on, test_1_5a_np_iut, postamble_link_power_off };
 
-#define test_case_1_5a_np { test_case_1_5a_np_ptu, test_case_1_5a_np_iut, test_case_1_5a_np_mgm }
+#define test_case_1_5a_np { test_case_1_5a_np_ptu, test_case_1_5a_np_iut }
 
 #define tgrp_case_1_5b_np test_group_1
 #define sref_case_1_5b_np "Q.781/1.5"
@@ -8423,17 +8326,11 @@ test_1_5b_np_iut(int child)
 {
 	return test_1_5b_iut(child, 0);
 }
-static int
-test_1_5b_np_mgm(int child)
-{
-	return test_1_5b_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_5b_np_ptu = { preamble_link_power_on, test_1_5b_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_5b_np_iut = { preamble_link_power_on, test_1_5b_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_5b_np_mgm = { preamble_link_power_on, test_1_5b_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_5b_np_ptu = { preamble_link_power_on, test_1_5b_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_5b_np_iut = { preamble_link_power_on, test_1_5b_np_iut, postamble_link_power_off };
 
-#define test_case_1_5b_np { test_case_1_5b_np_ptu, test_case_1_5b_np_iut, test_case_1_5b_np_mgm }
+#define test_case_1_5b_np { test_case_1_5b_np_ptu, test_case_1_5b_np_iut }
 
 #define desc_case_1_6 "\
 Link State Control - Expected signal units/orders\n\
@@ -8469,11 +8366,6 @@ test_1_6_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_6_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_6_p test_group_1
 #define sref_case_1_6_p "Q.781/1.6"
@@ -8494,17 +8386,11 @@ test_1_6_p_iut(int child)
 {
 	return test_1_6_iut(child, 1);
 }
-static int
-test_1_6_p_mgm(int child)
-{
-	return test_1_6_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_6_p_ptu = { preamble_link_power_on, test_1_6_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_6_p_iut = { preamble_link_power_on, test_1_6_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_6_p_mgm = { preamble_link_power_on, test_1_6_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_6_p_ptu = { preamble_link_power_on, test_1_6_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_6_p_iut = { preamble_link_power_on, test_1_6_p_iut, postamble_link_power_off };
 
-#define test_case_1_6_p { test_case_1_6_p_ptu, test_case_1_6_p_iut, test_case_1_6_p_mgm }
+#define test_case_1_6_p { test_case_1_6_p_ptu, test_case_1_6_p_iut }
 
 #define tgrp_case_1_6_np test_group_1
 #define sref_case_1_6_np "Q.781/1.6"
@@ -8525,17 +8411,11 @@ test_1_6_np_iut(int child)
 {
 	return test_1_6_iut(child, 0);
 }
-static int
-test_1_6_np_mgm(int child)
-{
-	return test_1_6_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_6_np_ptu = { preamble_link_power_on, test_1_6_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_6_np_iut = { preamble_link_power_on, test_1_6_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_6_np_mgm = { preamble_link_power_on, test_1_6_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_6_np_ptu = { preamble_link_power_on, test_1_6_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_6_np_iut = { preamble_link_power_on, test_1_6_np_iut, postamble_link_power_off };
 
-#define test_case_1_6_np { test_case_1_6_np_ptu, test_case_1_6_np_iut, test_case_1_6_np_mgm }
+#define test_case_1_6_np { test_case_1_6_np_ptu, test_case_1_6_np_iut }
 
 #define tgrp_case_1_7 test_group_1
 #define sref_case_1_7 "Q.781/1.7"
@@ -8619,17 +8499,11 @@ test_1_7_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_7_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_7_ptu = { preamble_link_power_on, test_1_7_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_7_iut = { preamble_link_power_on, test_1_7_iut, iut_power_off_iut };
-static struct test_stream test_case_1_7_mgm = { preamble_link_power_on, test_1_7_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_7_ptu = { preamble_link_power_on, test_1_7_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_7_iut = { preamble_link_power_on, test_1_7_iut, postamble_link_power_off };
 
-#define test_case_1_7 { test_case_1_7_ptu, test_case_1_7_iut, test_case_1_7_mgm }
+#define test_case_1_7 { test_case_1_7_ptu, test_case_1_7_iut }
 
 #define desc_case_1_8a "\
 Link State Control - Expected signal units/orders\n\
@@ -8649,11 +8523,6 @@ test_alignment_lpo_sut(int child, int proving, int result)
 		if (do_signal(child, __TEST_LPO))
 			goto failure;
 		state++;
-		if (test_alignment_sut(child, proving, result))
-			goto failure;
-		state++;
-		break;
-	case CHILD_MGM:
 		if (test_alignment_sut(child, proving, result))
 			goto failure;
 		state++;
@@ -8693,11 +8562,6 @@ test_1_8a_iut(int child, int proving)
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
-}
-static int
-test_1_8a_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
 }
 
 #define desc_case_1_8b "\
@@ -8787,11 +8651,6 @@ test_alignment_lpo_pt(int child, int proving, int result)
 			goto failure;
 		state++;
 		break;
-	case CHILD_MGM:
-		if (test_aligned_pt(child))
-			goto failure;
-		state++;
-		break;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -8826,11 +8685,6 @@ test_1_8b_iut(int child, int proving)
 	state++;
 	return __RESULT_SUCCESS;
 }
-static int
-test_1_8b_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_8a_p test_group_1
 #define sref_case_1_8a_p "Q.781/1.8"
@@ -8852,17 +8706,11 @@ test_1_8a_p_iut(int child)
 {
 	return test_1_8a_iut(child, 1);
 }
-static int
-test_1_8a_p_mgm(int child)
-{
-	return test_1_8a_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_8a_p_ptu = { preamble_link_power_on, test_1_8a_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_8a_p_iut = { preamble_link_power_on, test_1_8a_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_8a_p_mgm = { preamble_link_power_on, test_1_8a_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_8a_p_ptu = { preamble_link_power_on, test_1_8a_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_8a_p_iut = { preamble_link_power_on, test_1_8a_p_iut, postamble_link_power_off };
 
-#define test_case_1_8a_p { test_case_1_8a_p_ptu, test_case_1_8a_p_iut, test_case_1_8a_p_mgm }
+#define test_case_1_8a_p { test_case_1_8a_p_ptu, test_case_1_8a_p_iut }
 
 #define tgrp_case_1_8b_p test_group_1
 #define sref_case_1_8b_p "Q.781/1.8"
@@ -8884,17 +8732,11 @@ test_1_8b_p_iut(int child)
 {
 	return test_1_8b_iut(child, 1);
 }
-static int
-test_1_8b_p_mgm(int child)
-{
-	return test_1_8b_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_8b_p_ptu = { preamble_link_power_on, test_1_8b_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_8b_p_iut = { preamble_link_power_on, test_1_8b_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_8b_p_mgm = { preamble_link_power_on, test_1_8b_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_8b_p_ptu = { preamble_link_power_on, test_1_8b_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_8b_p_iut = { preamble_link_power_on, test_1_8b_p_iut, postamble_link_power_off };
 
-#define test_case_1_8b_p { test_case_1_8b_p_ptu, test_case_1_8b_p_iut, test_case_1_8b_p_mgm }
+#define test_case_1_8b_p { test_case_1_8b_p_ptu, test_case_1_8b_p_iut }
 
 #define tgrp_case_1_8a_np test_group_1
 #define sref_case_1_8a_np "Q.781/1.8"
@@ -8916,17 +8758,11 @@ test_1_8a_np_iut(int child)
 {
 	return test_1_8a_iut(child, 0);
 }
-static int
-test_1_8a_np_mgm(int child)
-{
-	return test_1_8a_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_8a_np_ptu = { preamble_link_power_on, test_1_8a_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_8a_np_iut = { preamble_link_power_on, test_1_8a_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_8a_np_mgm = { preamble_link_power_on, test_1_8a_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_8a_np_ptu = { preamble_link_power_on, test_1_8a_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_8a_np_iut = { preamble_link_power_on, test_1_8a_np_iut, postamble_link_power_off };
 
-#define test_case_1_8a_np { test_case_1_8a_np_ptu, test_case_1_8a_np_iut, test_case_1_8a_np_mgm }
+#define test_case_1_8a_np { test_case_1_8a_np_ptu, test_case_1_8a_np_iut }
 
 #define tgrp_case_1_8b_np test_group_1
 #define sref_case_1_8b_np "Q.781/1.8"
@@ -8948,17 +8784,11 @@ test_1_8b_np_iut(int child)
 {
 	return test_1_8b_iut(child, 0);
 }
-static int
-test_1_8b_np_mgm(int child)
-{
-	return test_1_8b_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_8b_np_ptu = { preamble_link_power_on, test_1_8b_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_8b_np_iut = { preamble_link_power_on, test_1_8b_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_8b_np_mgm = { preamble_link_power_on, test_1_8b_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_8b_np_ptu = { preamble_link_power_on, test_1_8b_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_8b_np_iut = { preamble_link_power_on, test_1_8b_np_iut, postamble_link_power_off };
 
-#define test_case_1_8b_np { test_case_1_8b_np_ptu, test_case_1_8b_np_iut, test_case_1_8b_np_mgm }
+#define test_case_1_8b_np { test_case_1_8b_np_ptu, test_case_1_8b_np_iut }
 
 #define desc_case_1_9a "\
 Link State Control - Expected signal units/orders\n\
@@ -9011,11 +8841,6 @@ test_1_9a_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_9a_mgm(int child, int proving)
-{
-	return __RESULT_FAILURE;
-}
 
 #define desc_case_1_9b "\
 Link State Control - Expected signal units/orders\n\
@@ -9064,11 +8889,6 @@ test_1_9b_iut(int child, int proving)
 	state++;
 	return __RESULT_SUCCESS;
 }
-static int
-test_1_9b_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_9a_p test_group_1
 #define sref_case_1_9a_p "Q.781/1.9"
@@ -9090,17 +8910,11 @@ test_1_9a_p_iut(int child)
 {
 	return test_1_9a_iut(child, 1);
 }
-static int
-test_1_9a_p_mgm(int child)
-{
-	return test_1_9a_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_9a_p_ptu = { preamble_link_power_on, test_1_9a_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_9a_p_iut = { preamble_link_power_on, test_1_9a_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_9a_p_mgm = { preamble_link_power_on, test_1_9a_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_9a_p_ptu = { preamble_link_power_on, test_1_9a_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_9a_p_iut = { preamble_link_power_on, test_1_9a_p_iut, postamble_link_power_off };
 
-#define test_case_1_9a_p { test_case_1_9a_p_ptu, test_case_1_9a_p_iut, test_case_1_9a_p_mgm }
+#define test_case_1_9a_p { test_case_1_9a_p_ptu, test_case_1_9a_p_iut }
 
 #define tgrp_case_1_9b_p test_group_1
 #define sref_case_1_9b_p "Q.781/1.9"
@@ -9122,17 +8936,11 @@ test_1_9b_p_iut(int child)
 {
 	return test_1_9b_iut(child, 1);
 }
-static int
-test_1_9b_p_mgm(int child)
-{
-	return test_1_9b_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_9b_p_ptu = { preamble_link_power_on, test_1_9b_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_9b_p_iut = { preamble_link_power_on, test_1_9b_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_9b_p_mgm = { preamble_link_power_on, test_1_9b_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_9b_p_ptu = { preamble_link_power_on, test_1_9b_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_9b_p_iut = { preamble_link_power_on, test_1_9b_p_iut, postamble_link_power_off };
 
-#define test_case_1_9b_p { test_case_1_9b_p_ptu, test_case_1_9b_p_iut, test_case_1_9b_p_mgm }
+#define test_case_1_9b_p { test_case_1_9b_p_ptu, test_case_1_9b_p_iut }
 
 #define tgrp_case_1_9a_np test_group_1
 #define sref_case_1_9a_np "Q.781/1.9"
@@ -9154,17 +8962,11 @@ test_1_9a_np_iut(int child)
 {
 	return test_1_9a_iut(child, 0);
 }
-static int
-test_1_9a_np_mgm(int child)
-{
-	return test_1_9a_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_9a_np_ptu = { preamble_link_power_on, test_1_9a_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_9a_np_iut = { preamble_link_power_on, test_1_9a_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_9a_np_mgm = { preamble_link_power_on, test_1_9a_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_9a_np_ptu = { preamble_link_power_on, test_1_9a_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_9a_np_iut = { preamble_link_power_on, test_1_9a_np_iut, postamble_link_power_off };
 
-#define test_case_1_9a_np { test_case_1_9a_np_ptu, test_case_1_9a_np_iut, test_case_1_9a_np_mgm }
+#define test_case_1_9a_np { test_case_1_9a_np_ptu, test_case_1_9a_np_iut }
 
 #define tgrp_case_1_9b_np test_group_1
 #define sref_case_1_9b_np "Q.781/1.9"
@@ -9186,17 +8988,11 @@ test_1_9b_np_iut(int child)
 {
 	return test_1_9b_iut(child, 0);
 }
-static int
-test_1_9b_np_mgm(int child)
-{
-	return test_1_9b_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_9b_np_ptu = { preamble_link_power_on, test_1_9b_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_9b_np_iut = { preamble_link_power_on, test_1_9b_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_9b_np_mgm = { preamble_link_power_on, test_1_9b_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_9b_np_ptu = { preamble_link_power_on, test_1_9b_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_9b_np_iut = { preamble_link_power_on, test_1_9b_np_iut, postamble_link_power_off };
 
-#define test_case_1_9b_np { test_case_1_9b_np_ptu, test_case_1_9b_np_iut, test_case_1_9b_np_mgm }
+#define test_case_1_9b_np { test_case_1_9b_np_ptu, test_case_1_9b_np_iut }
 
 #define desc_case_1_10 "\
 Link State Control - Expected signal units/orders\n\
@@ -9237,11 +9033,6 @@ test_1_10_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_10_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_10_p test_group_1
 #define sref_case_1_10_p "Q.781/1.10"
@@ -9262,17 +9053,11 @@ test_1_10_p_iut(int child)
 {
 	return test_1_10_iut(child, 1);
 }
-static int
-test_1_10_p_mgm(int child)
-{
-	return test_1_10_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_10_p_ptu = { preamble_link_power_on, test_1_10_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_10_p_iut = { preamble_link_power_on, test_1_10_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_10_p_mgm = { preamble_link_power_on, test_1_10_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_10_p_ptu = { preamble_link_power_on, test_1_10_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_10_p_iut = { preamble_link_power_on, test_1_10_p_iut, postamble_link_power_off };
 
-#define test_case_1_10_p { test_case_1_10_p_ptu, test_case_1_10_p_iut, test_case_1_10_p_mgm }
+#define test_case_1_10_p { test_case_1_10_p_ptu, test_case_1_10_p_iut }
 
 
 #define tgrp_case_1_10_np test_group_1
@@ -9294,17 +9079,11 @@ test_1_10_np_iut(int child)
 {
 	return test_1_10_iut(child, 0);
 }
-static int
-test_1_10_np_mgm(int child)
-{
-	return test_1_10_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_10_np_ptu = { preamble_link_power_on, test_1_10_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_10_np_iut = { preamble_link_power_on, test_1_10_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_10_np_mgm = { preamble_link_power_on, test_1_10_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_10_np_ptu = { preamble_link_power_on, test_1_10_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_10_np_iut = { preamble_link_power_on, test_1_10_np_iut, postamble_link_power_off };
 
-#define test_case_1_10_np { test_case_1_10_np_ptu, test_case_1_10_np_iut, test_case_1_10_np_mgm }
+#define test_case_1_10_np { test_case_1_10_np_ptu, test_case_1_10_np_iut }
 
 #define desc_case_1_11 "\
 Link State Control - Expected signal units/orders\n\
@@ -9416,11 +9195,6 @@ test_1_11_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_11_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS:
-}
 
 #define tgrp_case_1_11_p test_group_1
 #define sref_case_1_11_p "Q.781/1.11"
@@ -9441,17 +9215,11 @@ test_1_11_p_iut(int child)
 {
 	return test_1_11_iut(child, 1);
 }
-static int
-test_1_11_p_mgm(int child)
-{
-	return test_1_11_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_11_p_ptu = { preamble_link_power_on, test_1_11_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_11_p_iut = { preamble_link_power_on, test_1_11_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_11_p_mgm = { preamble_link_power_on, test_1_11_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_11_p_ptu = { preamble_link_power_on, test_1_11_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_11_p_iut = { preamble_link_power_on, test_1_11_p_iut, postamble_link_power_off };
 
-#define test_case_1_11_p { test_case_1_11_p_ptu, test_case_1_11_p_iut, test_case_1_11_p_mgm }
+#define test_case_1_11_p { test_case_1_11_p_ptu, test_case_1_11_p_iut }
 
 #define tgrp_case_1_11_np test_group_1
 #define sref_case_1_11_np "Q.781/1.11"
@@ -9472,17 +9240,11 @@ test_1_11_np_iut(int child)
 {
 	return test_1_11_iut(child, 0);
 }
-static int
-test_1_11_np_mgm(int child)
-{
-	return test_1_11_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_11_np_ptu = { preamble_link_power_on, test_1_11_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_11_np_iut = { preamble_link_power_on, test_1_11_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_11_np_mgm = { preamble_link_power_on, test_1_11_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_11_np_ptu = { preamble_link_power_on, test_1_11_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_11_np_iut = { preamble_link_power_on, test_1_11_np_iut, postamble_link_power_off };
 
-#define test_case_1_11_np { test_case_1_11_np_ptu, test_case_1_11_np_iut, test_case_1_11_np_mgm }
+#define test_case_1_11_np { test_case_1_11_np_ptu, test_case_1_11_np_iut }
 
 #define desc_case_1_12a "\
 Link State Control - Expected signal units/orders\n\
@@ -9527,11 +9289,6 @@ test_1_12a_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_12a_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_12a_p test_group_1
 #define sref_case_1_12a_p "Q.781/1.12"
@@ -9553,17 +9310,11 @@ test_1_12a_p_iut(int child)
 {
 	return test_1_12a_iut(child, 1);
 }
-static int
-test_1_12a_p_mgm(int child)
-{
-	return test_1_12a_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_12a_p_ptu = { preamble_link_power_on, test_1_12a_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_12a_p_iut = { preamble_link_power_on, test_1_12a_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_12a_p_mgm = { preamble_link_power_on, test_1_12a_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_12a_p_ptu = { preamble_link_power_on, test_1_12a_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_12a_p_iut = { preamble_link_power_on, test_1_12a_p_iut, postamble_link_power_off };
 
-#define test_case_1_12a_p { test_case_1_12a_p_ptu, test_case_1_12a_p_iut, test_case_1_12a_p_mgm }
+#define test_case_1_12a_p { test_case_1_12a_p_ptu, test_case_1_12a_p_iut }
 
 #define tgrp_case_1_12a_np test_group_1
 #define sref_case_1_12a_np "Q.781/1.12"
@@ -9585,17 +9336,11 @@ test_1_12a_np_iut(int child)
 {
 	return test_1_12a_iut(child, 0);
 }
-static int
-test_1_12a_np_mgm(int child)
-{
-	return test_1_12a_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_12a_np_ptu = { preamble_link_power_on, test_1_12a_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_12a_np_iut = { preamble_link_power_on, test_1_12a_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_12a_np_mgm = { preamble_link_power_on, test_1_12a_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_12a_np_ptu = { preamble_link_power_on, test_1_12a_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_12a_np_iut = { preamble_link_power_on, test_1_12a_np_iut, postamble_link_power_off };
 
-#define test_case_1_12a_np { test_case_1_12a_np_ptu, test_case_1_12a_np_iut, test_case_1_12a_np_mgm }
+#define test_case_1_12a_np { test_case_1_12a_np_ptu, test_case_1_12a_np_iut }
 
 #define desc_case_1_12b "\
 Link State Control - Expected signal units/orders\n\
@@ -9643,11 +9388,6 @@ test_1_12b_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_12b_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_12b_p test_group_1
 #define sref_case_1_12b_p "Q.781/1.12"
@@ -9669,17 +9409,11 @@ test_1_12b_p_iut(int child)
 {
 	return test_1_12b_iut(child, 1);
 }
-static int
-test_1_12b_p_mgm(int child)
-{
-	return test_1_12b_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_12b_p_ptu = { preamble_link_power_on, test_1_12b_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_12b_p_iut = { preamble_link_power_on, test_1_12b_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_12b_p_mgm = { preamble_link_power_on, test_1_12b_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_12b_p_ptu = { preamble_link_power_on, test_1_12b_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_12b_p_iut = { preamble_link_power_on, test_1_12b_p_iut, postamble_link_power_off };
 
-#define test_case_1_12b_p { test_case_1_12b_p_ptu, test_case_1_12b_p_iut, test_case_1_12b_p_mgm }
+#define test_case_1_12b_p { test_case_1_12b_p_ptu, test_case_1_12b_p_iut }
 
 #define tgrp_case_1_12b_np test_group_1
 #define sref_case_1_12b_np "Q.781/1.12"
@@ -9701,17 +9435,11 @@ test_1_12b_np_iut(int child)
 {
 	return test_1_12b_iut(child, 0);
 }
-static int
-test_1_12b_np_mgm(int child)
-{
-	return test_1_12b_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_12b_np_ptu = { preamble_link_power_on, test_1_12b_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_12b_np_iut = { preamble_link_power_on, test_1_12b_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_12b_np_mgm = { preamble_link_power_on, test_1_12b_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_12b_np_ptu = { preamble_link_power_on, test_1_12b_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_12b_np_iut = { preamble_link_power_on, test_1_12b_np_iut, postamble_link_power_off };
 
-#define test_case_1_12b_np { test_case_1_12b_np_ptu, test_case_1_12b_np_iut, test_case_1_12b_np_mgm }
+#define test_case_1_12b_np { test_case_1_12b_np_ptu, test_case_1_12b_np_iut }
 
 #define desc_case_1_13 "\
 Link State Control - Expected signal units/orders\n\
@@ -9755,11 +9483,6 @@ test_1_13_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_13_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_13_p test_group_1
 #define sref_case_1_13_p "Q.781/1.13"
@@ -9780,17 +9503,11 @@ test_1_13_p_iut(int child)
 {
 	return test_1_13_iut(child, 1);
 }
-static int
-test_1_13_p_mgm(int child)
-{
-	return test_1_13_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_13_p_ptu = { preamble_link_power_on, test_1_13_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_13_p_iut = { preamble_link_power_on, test_1_13_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_13_p_mgm = { preamble_link_power_on, test_1_13_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_13_p_ptu = { preamble_link_power_on, test_1_13_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_13_p_iut = { preamble_link_power_on, test_1_13_p_iut, postamble_link_power_off };
 
-#define test_case_1_13_p { test_case_1_13_p_ptu, test_case_1_13_p_iut, test_case_1_13_p_mgm }
+#define test_case_1_13_p { test_case_1_13_p_ptu, test_case_1_13_p_iut }
 
 #define tgrp_case_1_13_np test_group_1
 #define sref_case_1_13_np "Q.781/1.13"
@@ -9811,17 +9528,11 @@ test_1_13_np_iut(int child)
 {
 	return test_1_13_iut(child, 0);
 }
-static int
-test_1_13_np_mgm(int child)
-{
-	return test_1_13_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_13_np_ptu = { preamble_link_power_on, test_1_13_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_13_np_iut = { preamble_link_power_on, test_1_13_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_13_np_mgm = { preamble_link_power_on, test_1_13_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_13_np_ptu = { preamble_link_power_on, test_1_13_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_13_np_iut = { preamble_link_power_on, test_1_13_np_iut, postamble_link_power_off };
 
-#define test_case_1_13_np { test_case_1_13_np_ptu, test_case_1_13_np_iut, test_case_1_13_np_mgm }
+#define test_case_1_13_np { test_case_1_13_np_ptu, test_case_1_13_np_iut }
 
 #define tgrp_case_1_14 test_group_1
 #define sref_case_1_14 "Q.781/1.14"
@@ -9878,17 +9589,11 @@ test_1_14_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_14_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_14_ptu = { preamble_link_power_on, test_1_14_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_14_iut = { preamble_link_power_on, test_1_14_iut, iut_power_off_iut };
-static struct test_stream test_case_1_14_mgm = { preamble_link_power_on, test_1_14_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_14_ptu = { preamble_link_power_on, test_1_14_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_14_iut = { preamble_link_power_on, test_1_14_iut, postamble_link_power_off };
 
-#define test_case_1_14 { test_case_1_14_ptu, test_case_1_14_iut, test_case_1_14_mgm }
+#define test_case_1_14 { test_case_1_14_ptu, test_case_1_14_iut }
 
 #define desc_case_1_15 "\
 Link State Control - Expected signal units/orders\n\
@@ -9946,11 +9651,6 @@ test_1_15_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_15_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_15_p test_group_1
 #define sref_case_1_15_p "Q.781/1.15"
@@ -9971,17 +9671,11 @@ test_1_15_p_iut(int child)
 {
 	return test_1_15_iut(child, 1);
 }
-static int
-test_1_15_p_mgm(int child)
-{
-	return test_1_15_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_15_p_ptu = { preamble_link_power_on, test_1_15_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_15_p_iut = { preamble_link_power_on, test_1_15_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_15_p_mgm = { preamble_link_power_on, test_1_15_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_15_p_ptu = { preamble_link_power_on, test_1_15_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_15_p_iut = { preamble_link_power_on, test_1_15_p_iut, postamble_link_power_off };
 
-#define test_case_1_15_p { test_case_1_15_p_ptu, test_case_1_15_p_iut, test_case_1_15_p_mgm }
+#define test_case_1_15_p { test_case_1_15_p_ptu, test_case_1_15_p_iut }
 
 #define tgrp_case_1_15_np test_group_1
 #define sref_case_1_15_np "Q.781/1.15"
@@ -10002,17 +9696,11 @@ test_1_15_np_iut(int child)
 {
 	return test_1_15_iut(child, 0);
 }
-static int
-test_1_15_np(int child)
-{
-	return test_1_15_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_15_np_ptu = { preamble_link_power_on, test_1_15_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_15_np_iut = { preamble_link_power_on, test_1_15_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_15_np_mgm = { preamble_link_power_on, test_1_15_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_15_np_ptu = { preamble_link_power_on, test_1_15_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_15_np_iut = { preamble_link_power_on, test_1_15_np_iut, postamble_link_power_off };
 
-#define test_case_1_15_np { test_case_1_15_np_ptu, test_case_1_15_np_iut, test_case_1_15_np_mgm }
+#define test_case_1_15_np { test_case_1_15_np_ptu, test_case_1_15_np_iut }
 
 #define desc_case_1_16 "\
 Link State Control - Expected signal units/orders\n\
@@ -10054,11 +9742,6 @@ test_1_16_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_16_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_16_p test_group_1
 #define sref_case_1_16_p "Q.781/1.16"
@@ -10079,17 +9762,11 @@ test_1_16_p_iut(int child)
 {
 	return test_1_16_iut(child, 1);
 }
-static int
-test_1_16_p_mgm(int child)
-{
-	return test_1_16_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_16_p_ptu = { preamble_link_power_on, test_1_16_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_16_p_iut = { preamble_link_power_on, test_1_16_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_16_p_mgm = { preamble_link_power_on, test_1_16_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_16_p_ptu = { preamble_link_power_on, test_1_16_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_16_p_iut = { preamble_link_power_on, test_1_16_p_iut, postamble_link_power_off };
 
-#define test_case_1_16_p { test_case_1_16_p_ptu, test_case_1_16_p_iut, test_case_1_16_p_mgm }
+#define test_case_1_16_p { test_case_1_16_p_ptu, test_case_1_16_p_iut }
 
 #define tgrp_case_1_16_np test_group_1
 #define sref_case_1_16_np "Q.781/1.16"
@@ -10110,17 +9787,11 @@ test_1_16_np_iut(int child)
 {
 	return test_1_16_iut(child, 0);
 }
-static int
-test_1_16_np_mgm(int child)
-{
-	return test_1_16_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_16_np_ptu = { preamble_link_power_on, test_1_16_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_16_np_iut = { preamble_link_power_on, test_1_16_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_16_np_mgm = { preamble_link_power_on, test_1_16_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_16_np_ptu = { preamble_link_power_on, test_1_16_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_16_np_iut = { preamble_link_power_on, test_1_16_np_iut, postamble_link_power_off };
 
-#define test_case_1_16_np { test_case_1_16_np_ptu, test_case_1_16_np_iut, test_case_1_16_np_mgm }
+#define test_case_1_16_np { test_case_1_16_np_ptu, test_case_1_16_np_iut }
 
 #define tgrp_case_1_17 test_group_1
 #define sref_case_1_17 "Q.781/1.17"
@@ -10192,17 +9863,11 @@ test_1_17_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_17_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_17_ptu = { preamble_link_power_on, test_1_17_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_17_iut = { preamble_link_power_on, test_1_17_iut, iut_power_off_iut };
-static struct test_stream test_case_1_17_mgm = { preamble_link_power_on, test_1_17_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_17_ptu = { preamble_link_power_on, test_1_17_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_17_iut = { preamble_link_power_on, test_1_17_iut, postamble_link_power_off };
 
-#define test_case_1_17 { test_case_1_17_ptu, test_case_1_17_iut, test_case_1_17_mgm }
+#define test_case_1_17 { test_case_1_17_ptu, test_case_1_17_iut }
 
 #define tgrp_case_1_18 test_group_1
 #define sref_case_1_18 "Q.781/1.18"
@@ -10273,17 +9938,11 @@ test_1_18_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_18_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_18_ptu = { preamble_link_power_on, test_1_18_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_18_iut = { preamble_link_power_on, test_1_18_iut, iut_power_off_iut };
-static struct test_stream test_case_1_18_mgm = { preamble_link_power_on, test_1_18_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_18_ptu = { preamble_link_power_on, test_1_18_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_18_iut = { preamble_link_power_on, test_1_18_iut, postamble_link_power_off };
 
-#define test_case_1_18 { test_case_1_18_ptu, test_case_1_18_iut, test_case_1_18_mgm }
+#define test_case_1_18 { test_case_1_18_ptu, test_case_1_18_iut }
 
 #define tgrp_case_1_19 test_group_1
 #define sref_case_1_19 "Q.781/1.19"
@@ -10365,17 +10024,11 @@ test_1_19_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_19_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_19_ptu = { preamble_link_power_on, test_1_19_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_19_iut = { preamble_link_power_on, test_1_19_iut, iut_power_off_iut };
-static struct test_stream test_case_1_19_mgm = { preamble_link_power_on, test_1_19_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_19_ptu = { preamble_link_power_on, test_1_19_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_19_iut = { preamble_link_power_on, test_1_19_iut, postamble_link_power_off };
 
-#define test_case_1_19 { test_case_1_19_ptu, test_case_1_19_iut, test_case_1_19_mgm }
+#define test_case_1_19 { test_case_1_19_ptu, test_case_1_19_iut }
 
 #define tgrp_case_1_20 test_group_1
 #define sref_case_1_20 "Q.781/1.20"
@@ -10462,17 +10115,11 @@ test_1_20_iut(int child)
 	expand = 1;
 	return __RESULT_FAILURE;
 }
-static int
-test_1_20_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_20_ptu = { preamble_link_power_on, test_1_20_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_20_iut = { preamble_link_power_on, test_1_20_iut, iut_power_off_iut };
-static struct test_stream test_case_1_20_mgm = { preamble_link_power_on, test_1_20_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_20_ptu = { preamble_link_power_on, test_1_20_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_20_iut = { preamble_link_power_on, test_1_20_iut, postamble_link_power_off };
 
-#define test_case_1_20 { test_case_1_20_ptu, test_case_1_20_iut, test_case_1_20_mgm }
+#define test_case_1_20 { test_case_1_20_ptu, test_case_1_20_iut }
 
 #define tgrp_case_1_21 test_group_1
 #define sref_case_1_21 "Q.781/1.21"
@@ -10496,11 +10143,6 @@ test_in_service(int child, int proving)
 		break;
 	case CHILD_IUT:
 		if (test_alignment_sut(child, proving, __EVENT_IUT_IN_SERVICE))
-			goto failure;
-		state++;
-		break;
-	case CHILD_MGM:
-		if (test_alignment_sut(child, proving, __STATUS_IN_SERVICE))
 			goto failure;
 		state++;
 		break;
@@ -10541,17 +10183,11 @@ test_1_21_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_21_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_21_ptu = { preamble_link_power_on, test_1_21_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_21_iut = { preamble_link_power_on, test_1_21_iut, iut_power_off_iut };
-static struct test_stream test_case_1_21_mgm = { preamble_link_power_on, test_1_21_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_21_ptu = { preamble_link_power_on, test_1_21_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_21_iut = { preamble_link_power_on, test_1_21_iut, postamble_link_power_off };
 
-#define test_case_1_21 { test_case_1_21_ptu, test_case_1_21_iut, test_case_1_21_mgm }
+#define test_case_1_21 { test_case_1_21_ptu, test_case_1_21_iut }
 
 #define tgrp_case_1_22 test_group_1
 #define sref_case_1_22 "Q.781/1.22"
@@ -10590,17 +10226,11 @@ test_1_22_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_22_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_22_ptu = { preamble_link_power_on, test_1_22_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_22_iut = { preamble_link_power_on, test_1_22_iut, iut_power_off_iut };
-static struct test_stream test_case_1_22_mgm = { preamble_link_power_on, test_1_22_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_22_ptu = { preamble_link_power_on, test_1_22_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_22_iut = { preamble_link_power_on, test_1_22_iut, postamble_link_power_off };
 
-#define test_case_1_22 { test_case_1_22_ptu, test_case_1_22_iut, test_case_1_22_mgm }
+#define test_case_1_22 { test_case_1_22_ptu, test_case_1_22_iut }
 
 #define tgrp_case_1_23 test_group_1
 #define sref_case_1_23 "Q.781/1.23"
@@ -10678,17 +10308,11 @@ test_1_23_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_23_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_23_ptu = { preamble_link_power_on, test_1_23_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_23_iut = { preamble_link_power_on, test_1_23_iut, iut_power_off_iut };
-static struct test_stream test_case_1_23_mgm = { preamble_link_power_on, test_1_23_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_23_ptu = { preamble_link_power_on, test_1_23_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_23_iut = { preamble_link_power_on, test_1_23_iut, postamble_link_power_off };
 
-#define test_case_1_23 { test_case_1_23_ptu, test_case_1_23_iut, test_case_1_23_mgm }
+#define test_case_1_23 { test_case_1_23_ptu, test_case_1_23_iut }
 
 #define tgrp_case_1_24 test_group_1
 #define sref_case_1_24 "Q.781/1.24"
@@ -10763,17 +10387,11 @@ test_1_24_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_24_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_24_ptu = { preamble_link_power_on, test_1_24_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_24_iut = { preamble_link_power_on, test_1_24_iut, iut_power_off_iut };
-static struct test_stream test_case_1_24_mgm = { preamble_link_power_on, test_1_24_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_24_ptu = { preamble_link_power_on, test_1_24_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_24_iut = { preamble_link_power_on, test_1_24_iut, postamble_link_power_off };
 
-#define test_case_1_24 { test_case_1_24_ptu, test_case_1_24_iut, test_case_1_24_mgm }
+#define test_case_1_24 { test_case_1_24_ptu, test_case_1_24_iut }
 
 #define tgrp_case_1_25 test_group_1
 #define sref_case_1_25 "Q.781/1.25"
@@ -10818,17 +10436,11 @@ test_1_25_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_25_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_25_ptu = { preamble_link_power_on, test_1_25_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_25_iut = { preamble_link_power_on, test_1_25_iut, iut_power_off_iut };
-static struct test_stream test_case_1_25_mgm = { preamble_link_power_on, test_1_25_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_25_ptu = { preamble_link_power_on, test_1_25_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_25_iut = { preamble_link_power_on, test_1_25_iut, postamble_link_power_off };
 
-#define test_case_1_25 { test_case_1_25_ptu, test_case_1_25_iut, test_case_1_25_mgm }
+#define test_case_1_25 { test_case_1_25_ptu, test_case_1_25_iut }
 
 #define tgrp_case_1_26 test_group_1
 #define sref_case_1_26 "Q.781/1.26"
@@ -10890,17 +10502,11 @@ test_1_26_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_26_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_26_ptu = { preamble_link_power_on, test_1_26_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_26_iut = { preamble_link_power_on, test_1_26_iut, iut_power_off_iut };
-static struct test_stream test_case_1_26_mgm = { preamble_link_power_on, test_1_26_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_26_ptu = { preamble_link_power_on, test_1_26_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_26_iut = { preamble_link_power_on, test_1_26_iut, postamble_link_power_off };
 
-#define test_case_1_26 { test_case_1_26_ptu, test_case_1_26_iut, test_case_1_26_mgm }
+#define test_case_1_26 { test_case_1_26_ptu, test_case_1_26_iut }
 
 #define desc_case_1_27 "\
 Link State Control - Expected signal units/orders\n\
@@ -10941,11 +10547,6 @@ test_1_27_iut(int child, int proving)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_27_mgm(int child, int proving)
-{
-	return __RESULT_SUCCESS;
-}
 
 #define tgrp_case_1_27_p test_group_1
 #define sref_case_1_27_p "Q.781/1.27"
@@ -10966,17 +10567,11 @@ test_1_27_p_iut(int child)
 {
 	return test_1_27_iut(child, 1);
 }
-static int
-test_1_27_p_mgm(int child)
-{
-	return test_1_27_mgm(child, 1);
-}
 
-static struct test_stream test_case_1_27_p_ptu = { preamble_link_power_on, test_1_27_p_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_27_p_iut = { preamble_link_power_on, test_1_27_p_iut, iut_power_off_iut };
-static struct test_stream test_case_1_27_p_mgm = { preamble_link_power_on, test_1_27_p_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_27_p_ptu = { preamble_link_power_on, test_1_27_p_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_27_p_iut = { preamble_link_power_on, test_1_27_p_iut, postamble_link_power_off };
 
-#define test_case_1_27_p { test_case_1_27_p_ptu, test_case_1_27_p_iut, test_case_1_27_p_mgm }
+#define test_case_1_27_p { test_case_1_27_p_ptu, test_case_1_27_p_iut }
 
 #define tgrp_case_1_27_np test_group_1
 #define sref_case_1_27_np "Q.781/1.27"
@@ -10997,17 +10592,11 @@ test_1_27_np_iut(int child)
 {
 	return test_1_27_iut(child, 0);
 }
-static int
-test_1_27_np_mgm(int child)
-{
-	return test_1_27_mgm(child, 0);
-}
 
-static struct test_stream test_case_1_27_np_ptu = { preamble_link_power_on, test_1_27_np_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_27_np_iut = { preamble_link_power_on, test_1_27_np_iut, iut_power_off_iut };
-static struct test_stream test_case_1_27_np_mgm = { preamble_link_power_on, test_1_27_np_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_27_np_ptu = { preamble_link_power_on, test_1_27_np_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_27_np_iut = { preamble_link_power_on, test_1_27_np_iut, postamble_link_power_off };
 
-#define test_case_1_27_np { test_case_1_27_np_ptu, test_case_1_27_np_iut, test_case_1_27_np_mgm }
+#define test_case_1_27_np { test_case_1_27_np_ptu, test_case_1_27_np_iut }
 
 #define tgrp_case_1_28 test_group_1
 #define sref_case_1_28 "Q.781/1.28"
@@ -11046,17 +10635,11 @@ test_1_28_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_28_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_28_ptu = { preamble_link_in_service, test_1_28_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_28_iut = { preamble_link_in_service, test_1_28_iut, iut_power_off_iut };
-static struct test_stream test_case_1_28_mgm = { preamble_link_in_service, test_1_28_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_28_ptu = { preamble_link_in_service, test_1_28_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_28_iut = { preamble_link_in_service, test_1_28_iut, postamble_link_power_off };
 
-#define test_case_1_28 { test_case_1_28_ptu, test_case_1_28_iut, test_case_1_28_mgm }
+#define test_case_1_28 { test_case_1_28_ptu, test_case_1_28_iut }
 
 #define tgrp_case_1_29a test_group_1
 #define sref_case_1_29a "Q.781/1.29"
@@ -11093,17 +10676,11 @@ test_1_29a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_29a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_29a_ptu = { preamble_link_in_service, test_1_29a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_29a_iut = { preamble_link_in_service, test_1_29a_iut, iut_power_off_iut };
-static struct test_stream test_case_1_29a_mgm = { preamble_link_in_service, test_1_29a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_29a_ptu = { preamble_link_in_service, test_1_29a_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_29a_iut = { preamble_link_in_service, test_1_29a_iut, postamble_link_power_off };
 
-#define test_case_1_29a { test_case_1_29a_ptu, test_case_1_29a_iut, test_case_1_29a_mgm }
+#define test_case_1_29a { test_case_1_29a_ptu, test_case_1_29a_iut }
 
 #define tgrp_case_1_29b test_group_1
 #define sref_case_1_29b "Q.781/1.29"
@@ -11140,17 +10717,11 @@ test_1_29b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_29b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_29b_ptu = { preamble_link_in_service, test_1_29b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_29b_iut = { preamble_link_in_service, test_1_29b_iut, iut_power_off_iut };
-static struct test_stream test_case_1_29b_mgm = { preamble_link_in_service, test_1_29b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_29b_ptu = { preamble_link_in_service, test_1_29b_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_29b_iut = { preamble_link_in_service, test_1_29b_iut, postamble_link_power_off };
 
-#define test_case_1_29b { test_case_1_29b_ptu, test_case_1_29b_iut, test_case_1_29b_mgm }
+#define test_case_1_29b { test_case_1_29b_ptu, test_case_1_29b_iut }
 
 #define tgrp_case_1_30a test_group_1
 #define sref_case_1_30a "Q.781/1.30"
@@ -11195,17 +10766,11 @@ test_1_30a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_30a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_30a_ptu = { preamble_link_in_service, test_1_30a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_30a_iut = { preamble_link_in_service, test_1_30a_iut, iut_power_off_iut };
-static struct test_stream test_case_1_30a_mgm = { preamble_link_in_service, test_1_30a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_30a_ptu = { preamble_link_in_service, test_1_30a_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_30a_iut = { preamble_link_in_service, test_1_30a_iut, postamble_link_power_off };
 
-#define test_case_1_30a { test_case_1_30a_ptu, test_case_1_30a_iut, test_case_1_30a_mgm }
+#define test_case_1_30a { test_case_1_30a_ptu, test_case_1_30a_iut }
 
 #define tgrp_case_1_30b test_group_1
 #define sref_case_1_30b "Q.781/1.30"
@@ -11251,17 +10816,11 @@ test_1_30b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_30b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_30b_ptu = { preamble_link_in_service, test_1_30b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_30b_iut = { preamble_link_in_service, test_1_30b_iut, iut_power_off_iut };
-static struct test_stream test_case_1_30b_mgm = { preamble_link_in_service, test_1_30b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_30b_ptu = { preamble_link_in_service, test_1_30b_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_30b_iut = { preamble_link_in_service, test_1_30b_iut, postamble_link_power_off };
 
-#define test_case_1_30b { test_case_1_30b_ptu, test_case_1_30b_iut, test_case_1_30b_mgm }
+#define test_case_1_30b { test_case_1_30b_ptu, test_case_1_30b_iut }
 
 #define tgrp_case_1_31a test_group_1
 #define sref_case_1_31a "Q.781/1.31"
@@ -11304,17 +10863,11 @@ test_1_31a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_31a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_31a_ptu = { preamble_link_in_service, test_1_31a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_31a_iut = { preamble_link_in_service, test_1_31a_iut, iut_power_off_iut };
-static struct test_stream test_case_1_31a_mgm = { preamble_link_in_service, test_1_31a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_31a_ptu = { preamble_link_in_service, test_1_31a_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_31a_iut = { preamble_link_in_service, test_1_31a_iut, postamble_link_power_off };
 
-#define test_case_1_31a { test_case_1_31a_ptu, test_case_1_31a_iut, test_case_1_31a_mgm }
+#define test_case_1_31a { test_case_1_31a_ptu, test_case_1_31a_iut }
 
 #define tgrp_case_1_31b test_group_1
 #define sref_case_1_31b "Q.781/1.31"
@@ -11359,17 +10912,11 @@ test_1_31b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_31b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_31b_ptu = { preamble_link_in_service, test_1_31b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_31b_iut = { preamble_link_in_service, test_1_31b_iut, iut_power_off_iut };
-static struct test_stream test_case_1_31b_mgm = { preamble_link_in_service, test_1_31b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_31b_ptu = { preamble_link_in_service, test_1_31b_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_31b_iut = { preamble_link_in_service, test_1_31b_iut, postamble_link_power_off };
 
-#define test_case_1_31b { test_case_1_31b_ptu, test_case_1_31b_iut, test_case_1_31b_mgm }
+#define test_case_1_31b { test_case_1_31b_ptu, test_case_1_31b_iut }
 
 #define tgrp_case_1_32a test_group_1
 #define sref_case_1_32a "Q.781/1.32"
@@ -11438,17 +10985,11 @@ test_1_32a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_32a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_32a_ptu = { preamble_link_power_on, test_1_32a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_32a_iut = { preamble_link_power_on, test_1_32a_iut, iut_power_off_iut };
-static struct test_stream test_case_1_32a_mgm = { preamble_link_power_on, test_1_32a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_32a_ptu = { preamble_link_power_on, test_1_32a_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_32a_iut = { preamble_link_power_on, test_1_32a_iut, postamble_link_power_off };
 
-#define test_case_1_32a { test_case_1_32a_ptu, test_case_1_32a_iut, test_case_1_32a_mgm }
+#define test_case_1_32a { test_case_1_32a_ptu, test_case_1_32a_iut }
 
 #define tgrp_case_1_32b test_group_1
 #define sref_case_1_32b "Q.781/1.32"
@@ -11485,17 +11026,11 @@ test_1_32b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_32b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_32b_ptu = { preamble_link_power_on, test_1_32b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_32b_iut = { preamble_link_power_on, test_1_32b_iut, iut_power_off_iut };
-static struct test_stream test_case_1_32b_mgm = { preamble_link_power_on, test_1_32b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_32b_ptu = { preamble_link_power_on, test_1_32b_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_32b_iut = { preamble_link_power_on, test_1_32b_iut, postamble_link_power_off };
 
-#define test_case_1_32b { test_case_1_32b_ptu, test_case_1_32b_iut, test_case_1_32b_mgm }
+#define test_case_1_32b { test_case_1_32b_ptu, test_case_1_32b_iut }
 
 #define tgrp_case_1_33 test_group_1
 #define sref_case_1_33 "Q.781/1.33"
@@ -11531,17 +11066,11 @@ test_1_33_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_33_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_33_ptu = { preamble_link_power_on, test_1_33_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_33_iut = { preamble_link_power_on, test_1_33_iut, iut_power_off_iut };
-static struct test_stream test_case_1_33_mgm = { preamble_link_power_on, test_1_33_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_33_ptu = { preamble_link_power_on, test_1_33_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_33_iut = { preamble_link_power_on, test_1_33_iut, postamble_link_power_off };
 
-#define test_case_1_33 { test_case_1_33_ptu, test_case_1_33_iut, test_case_1_33_mgm }
+#define test_case_1_33 { test_case_1_33_ptu, test_case_1_33_iut }
 
 #define tgrp_case_1_34 test_group_1
 #define sref_case_1_34 "Q.781/1.34"
@@ -11577,17 +11106,11 @@ test_1_34_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_34_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_34_ptu = { preamble_link_power_on, test_1_34_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_34_iut = { preamble_link_power_on, test_1_34_iut, iut_power_off_iut };
-static struct test_stream test_case_1_34_mgm = { preamble_link_power_on, test_1_34_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_34_ptu = { preamble_link_power_on, test_1_34_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_34_iut = { preamble_link_power_on, test_1_34_iut, postamble_link_power_off };
 
-#define test_case_1_34 { test_case_1_34_ptu, test_case_1_34_iut, test_case_1_34_mgm }
+#define test_case_1_34 { test_case_1_34_ptu, test_case_1_34_iut }
 
 #define tgrp_case_1_35 test_group_1
 #define sref_case_1_35 "Q.781/1.35"
@@ -11623,17 +11146,11 @@ test_1_35_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_1_35_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_1_35_ptu = { preamble_link_power_on, test_1_35_ptu, iut_power_off_ptu };
-static struct test_stream test_case_1_35_iut = { preamble_link_power_on, test_1_35_iut, iut_power_off_iut };
-static struct test_stream test_case_1_35_mgm = { preamble_link_power_on, test_1_35_mgm, iut_power_off_mgm };
+static struct test_stream test_case_1_35_ptu = { preamble_link_power_on, test_1_35_ptu, postamble_link_power_off };
+static struct test_stream test_case_1_35_iut = { preamble_link_power_on, test_1_35_iut, postamble_link_power_off };
 
-#define test_case_1_35 { test_case_1_35_ptu, test_case_1_35_iut, test_case_1_35_mgm }
+#define test_case_1_35 { test_case_1_35_ptu, test_case_1_35_iut }
 
 #define test_group_2 "Link State Control - Unexpected signal units/orders"
 #define tgrp_case_2_1 test_group_2
@@ -11747,17 +11264,11 @@ test_2_1_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_2_1_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_2_1_ptu = { preamble_link_power_on, test_2_1_ptu, iut_power_off_ptu };
-static struct test_stream test_case_2_1_iut = { preamble_link_power_on, test_2_1_iut, iut_power_off_iut };
-static struct test_stream test_case_2_1_mgm = { preamble_link_power_on, test_2_1_mgm, iut_power_off_mgm };
+static struct test_stream test_case_2_1_ptu = { preamble_link_power_on, test_2_1_ptu, postamble_link_power_off };
+static struct test_stream test_case_2_1_iut = { preamble_link_power_on, test_2_1_iut, postamble_link_power_off };
 
-#define test_case_2_1 { test_case_2_1_ptu, test_case_2_1_iut, test_case_2_1_mgm }
+#define test_case_2_1 { test_case_2_1_ptu, test_case_2_1_iut }
 
 #define tgrp_case_2_2 test_group_2
 #define sref_case_2_2 "Q.781/2.2"
@@ -11856,17 +11367,11 @@ test_2_2_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_2_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_2_2_ptu = { preamble_link_power_on, test_2_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_2_2_iut = { preamble_link_power_on, test_2_2_iut, iut_power_off_iut };
-static struct test_stream test_case_2_2_mgm = { preamble_link_power_on, test_2_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_2_2_ptu = { preamble_link_power_on, test_2_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_2_2_iut = { preamble_link_power_on, test_2_2_iut, postamble_link_power_off };
 
-#define test_case_2_2 { test_case_2_2_ptu, test_case_2_2_iut, test_case_2_2_mgm }
+#define test_case_2_2 { test_case_2_2_ptu, test_case_2_2_iut }
 
 #define tgrp_case_2_3 test_group_2
 #define sref_case_2_3 "Q.781/2.3"
@@ -11974,17 +11479,11 @@ test_2_3_iut(int child)
 	expand = 1;
 	return __RESULT_FAILURE;
 }
-static int
-test_2_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_2_3_ptu = { preamble_link_power_on, test_2_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_2_3_iut = { preamble_link_power_on, test_2_3_iut, iut_power_off_iut };
-static struct test_stream test_case_2_3_mgm = { preamble_link_power_on, test_2_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_2_3_ptu = { preamble_link_power_on, test_2_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_2_3_iut = { preamble_link_power_on, test_2_3_iut, postamble_link_power_off };
 
-#define test_case_2_3 { test_case_2_3_ptu, test_case_2_3_iut, test_case_2_3_mgm }
+#define test_case_2_3 { test_case_2_3_ptu, test_case_2_3_iut }
 
 #define tgrp_case_2_4 test_group_2
 #define sref_case_2_4 "Q.781/2.4"
@@ -12087,17 +11586,11 @@ test_2_4_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_2_4_mgm(int child)
-{
-      return __RESULT_SUCCESS:
-}
 
-static struct test_stream test_case_2_4_ptu = { preamble_link_power_on, test_2_4_ptu, iut_power_off_ptu };
-static struct test_stream test_case_2_4_iut = { preamble_link_power_on, test_2_4_iut, iut_power_off_iut };
-static struct test_stream test_case_2_4_mgm = { preamble_link_power_on, test_2_4_mgm, iut_power_off_mgm };
+static struct test_stream test_case_2_4_ptu = { preamble_link_power_on, test_2_4_ptu, postamble_link_power_off };
+static struct test_stream test_case_2_4_iut = { preamble_link_power_on, test_2_4_iut, postamble_link_power_off };
 
-#define test_case_2_4 { test_case_2_4_ptu, test_case_2_4_iut, test_case_2_4_mgm }
+#define test_case_2_4 { test_case_2_4_ptu, test_case_2_4_iut }
 
 #define tgrp_case_2_5 test_group_2
 #define sref_case_2_5 "Q.781/2.5"
@@ -12155,17 +11648,11 @@ test_2_5_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_2_5_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_2_5_ptu = { preamble_link_power_on, test_2_5_ptu, iut_power_off_ptu };
-static struct test_stream test_case_2_5_iut = { preamble_link_power_on, test_2_5_iut, iut_power_off_iut };
-static struct test_stream test_case_2_5_mgm = { preamble_link_power_on, test_2_5_mgm, iut_power_off_mgm };
+static struct test_stream test_case_2_5_ptu = { preamble_link_power_on, test_2_5_ptu, postamble_link_power_off };
+static struct test_stream test_case_2_5_iut = { preamble_link_power_on, test_2_5_iut, postamble_link_power_off };
 
-#define test_case_2_5 { test_case_2_5_ptu, test_case_2_5_iut, test_case_2_5_mgm }
+#define test_case_2_5 { test_case_2_5_ptu, test_case_2_5_iut }
 
 #define tgrp_case_2_6 test_group_2
 #define sref_case_2_6 "Q.781/2.6"
@@ -12234,17 +11721,11 @@ test_2_6_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_2_6_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_2_6_ptu = { preamble_link_power_on, test_2_6_ptu, iut_power_off_ptu };
-static struct test_stream test_case_2_6_iut = { preamble_link_power_on, test_2_6_iut, iut_power_off_iut };
-static struct test_stream test_case_2_6_mgm = { preamble_link_power_on, test_2_6_mgm, iut_power_off_mgm };
+static struct test_stream test_case_2_6_ptu = { preamble_link_power_on, test_2_6_ptu, postamble_link_power_off };
+static struct test_stream test_case_2_6_iut = { preamble_link_power_on, test_2_6_iut, postamble_link_power_off };
 
-#define test_case_2_6 { test_case_2_6_ptu, test_case_2_6_iut, test_case_2_6_mgm }
+#define test_case_2_6 { test_case_2_6_ptu, test_case_2_6_iut }
 
 #define tgrp_case_2_7 test_group_2
 #define sref_case_2_7 "Q.781/2.7"
@@ -12289,17 +11770,11 @@ test_2_7_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_2_7_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_2_7_ptu = { preamble_link_in_service, test_2_7_ptu, iut_power_off_ptu };
-static struct test_stream test_case_2_7_iut = { preamble_link_in_service, test_2_7_iut, iut_power_off_iut };
-static struct test_stream test_case_2_7_mgm = { preamble_link_in_service, test_2_7_mgm, iut_power_off_mgm };
+static struct test_stream test_case_2_7_ptu = { preamble_link_in_service, test_2_7_ptu, postamble_link_power_off };
+static struct test_stream test_case_2_7_iut = { preamble_link_in_service, test_2_7_iut, postamble_link_power_off };
 
-#define test_case_2_7 { test_case_2_7_ptu, test_case_2_7_iut, test_case_2_7_mgm }
+#define test_case_2_7 { test_case_2_7_ptu, test_case_2_7_iut }
 
 #define tgrp_case_2_8 test_group_2
 #define sref_case_2_8 "Q.781/2.8"
@@ -12361,17 +11836,11 @@ test_2_8_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_2_8_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_2_8_ptu = { preamble_link_in_service, test_2_8_ptu, iut_power_off_ptu };
-static struct test_stream test_case_2_8_iut = { preamble_link_in_service, test_2_8_iut, iut_power_off_iut };
-static struct test_stream test_case_2_8_mgm = { preamble_link_in_service, test_2_8_mgm, iut_power_off_mgm };
+static struct test_stream test_case_2_8_ptu = { preamble_link_in_service, test_2_8_ptu, postamble_link_power_off };
+static struct test_stream test_case_2_8_iut = { preamble_link_in_service, test_2_8_iut, postamble_link_power_off };
 
-#define test_case_2_8 { test_case_2_8_ptu, test_case_2_8_iut, test_case_2_8_mgm }
+#define test_case_2_8 { test_case_2_8_ptu, test_case_2_8_iut }
 
 #deifne test_group_3 "Transmission Failure"
 #define tgrp_case_3_1 test_group_3
@@ -12416,17 +11885,11 @@ test_3_1_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_3_1_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_3_1_ptu = { preamble_link_power_on, test_3_1_ptu, iut_power_off_ptu };
-static struct test_stream test_case_3_1_iut = { preamble_link_power_on, test_3_1_iut, iut_power_off_iut };
-static struct test_stream test_case_3_1_mgm = { preamble_link_power_on, test_3_1_mgm, iut_power_off_mgm };
+static struct test_stream test_case_3_1_ptu = { preamble_link_power_on, test_3_1_ptu, postamble_link_power_off };
+static struct test_stream test_case_3_1_iut = { preamble_link_power_on, test_3_1_iut, postamble_link_power_off };
 
-#define test_case_3_1 { test_case_3_1_ptu, test_case_3_1_iut, test_case_3_1_mgm }
+#define test_case_3_1 { test_case_3_1_ptu, test_case_3_1_iut }
 
 #define tgrp_case_3_2 test_group_3
 #define sref_case_3_2 "Q.781/3.2"
@@ -12481,17 +11944,11 @@ test_3_2_iut(int child)
       notappl:
 	return __RESULT_NOTAPPL;
 }
-static int
-test_3_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_3_2_ptu = { preamble_link_in_service, test_3_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_3_2_iut = { preamble_link_in_service, test_3_2_iut, iut_power_off_iut };
-static struct test_stream test_case_3_2_mgm = { preamble_link_in_service, test_3_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_3_2_ptu = { preamble_link_in_service, test_3_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_3_2_iut = { preamble_link_in_service, test_3_2_iut, postamble_link_power_off };
 
-#define test_case_3_2 { test_case_3_2_ptu, test_case_3_2_iut, test_case_3_2_mgm }
+#define test_case_3_2 { test_case_3_2_ptu, test_case_3_2_iut }
 
 #define tgrp_case_3_3 test_group_3
 #define sref_case_3_3 "Q.781/3.3"
@@ -12535,17 +11992,11 @@ test_3_3_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_3_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_3_3_ptu = { preamble_link_power_on, test_3_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_3_3_iut = { preamble_link_power_on, test_3_3_iut, iut_power_off_iut };
-static struct test_stream test_case_3_3_mgm = { preamble_link_power_on, test_3_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_3_3_ptu = { preamble_link_power_on, test_3_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_3_3_iut = { preamble_link_power_on, test_3_3_iut, postamble_link_power_off };
 
-#define test_case_3_3 { test_case_3_3_ptu, test_case_3_3_iut, test_case_3_3_mgm }
+#define test_case_3_3 { test_case_3_3_ptu, test_case_3_3_iut }
 
 #define tgrp_case_3_4 test_group_3
 #define sref_case_3_4 "Q.781/3.4"
@@ -12606,17 +12057,11 @@ test_3_4_iut(int child)
       notappl:
 	return __RESULT_NOTAPPL;
 }
-static int
-test_3_4_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_3_4_ptu = { preamble_link_power_on, test_3_4_ptu, iut_power_off_ptu };
-static struct test_stream test_case_3_4_iut = { preamble_link_power_on, test_3_4_iut, iut_power_off_iut };
-static struct test_stream test_case_3_4_mgm = { preamble_link_power_on, test_3_4_mgm, iut_power_off_mgm };
+static struct test_stream test_case_3_4_ptu = { preamble_link_power_on, test_3_4_ptu, postamble_link_power_off };
+static struct test_stream test_case_3_4_iut = { preamble_link_power_on, test_3_4_iut, postamble_link_power_off };
 
-#define test_case_3_4 { test_case_3_4_ptu, test_case_3_4_iut, test_case_3_4_mgm }
+#define test_case_3_4 { test_case_3_4_ptu, test_case_3_4_iut }
 
 #define tgrp_case_3_5 test_group_3
 #define numb_case_3_5 "3.5"
@@ -12656,17 +12101,11 @@ test_3_5_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_3_5_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_3_5_ptu = { preamble_link_in_service, test_3_5_ptu, iut_power_off_ptu };
-static struct test_stream test_case_3_5_iut = { preamble_link_in_service, test_3_5_iut, iut_power_off_iut };
-static struct test_stream test_case_3_5_mgm = { preamble_link_in_service, test_3_5_mgm, iut_power_off_mgm };
+static struct test_stream test_case_3_5_ptu = { preamble_link_in_service, test_3_5_ptu, postamble_link_power_off };
+static struct test_stream test_case_3_5_iut = { preamble_link_in_service, test_3_5_iut, postamble_link_power_off };
 
-#define test_case_3_5 { test_case_3_5_ptu, test_case_3_5_iut, test_case_3_5_mgm }
+#define test_case_3_5 { test_case_3_5_ptu, test_case_3_5_iut }
 
 #define tgrp_case_3_6 test_group_3
 #define sref_case_3_6 "Q.781/3.6"
@@ -12724,17 +12163,11 @@ test_3_6_iut(int child)
       notappl:
 	return __RESULT_NOTAPPL;
 }
-static int
-test_3_6_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_3_6_ptu = { preamble_link_in_service, test_3_6_ptu, iut_power_off_ptu };
-static struct test_stream test_case_3_6_iut = { preamble_link_in_service, test_3_6_iut, iut_power_off_iut };
-static struct test_stream test_case_3_6_mgm = { preamble_link_in_service, test_3_6_mgm, iut_power_off_mgm };
+static struct test_stream test_case_3_6_ptu = { preamble_link_in_service, test_3_6_ptu, postamble_link_power_off };
+static struct test_stream test_case_3_6_iut = { preamble_link_in_service, test_3_6_iut, postamble_link_power_off };
 
-#define test_case_3_6 { test_case_3_6_ptu, test_case_3_6_iut, test_case_3_6_mgm }
+#define test_case_3_6 { test_case_3_6_ptu, test_case_3_6_iut }
 
 #define tgrp_case_3_7 test_group_3
 #define sref_case_3_7 "Q.781/3.7"
@@ -12783,17 +12216,11 @@ test_3_7_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_3_7_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_3_7_ptu = { preamble_link_in_service, test_3_7_ptu, iut_power_off_ptu };
-static struct test_stream test_case_3_7_iut = { preamble_link_in_service, test_3_7_iut, iut_power_off_iut };
-static struct test_stream test_case_3_7_mgm = { preamble_link_in_service, test_3_7_mgm, iut_power_off_mgm };
+static struct test_stream test_case_3_7_ptu = { preamble_link_in_service, test_3_7_ptu, postamble_link_power_off };
+static struct test_stream test_case_3_7_iut = { preamble_link_in_service, test_3_7_iut, postamble_link_power_off };
 
-#define test_case_3_7 { test_case_3_7_ptu, test_case_3_7_iut, test_case_3_7_mgm }
+#define test_case_3_7 { test_case_3_7_ptu, test_case_3_7_iut }
 
 #define tgrp_case_3_8 test_group_3
 #define sref_case_3_8 "Q.781/3.8"
@@ -12859,17 +12286,11 @@ test_3_8_iut(int child)
       notappl:
 	return __RESULT_NOTAPPL;
 }
-static int
-test_3_8_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_3_8_ptu = { preamble_link_in_service, test_3_8_ptu, iut_power_off_ptu };
-static struct test_stream test_case_3_8_iut = { preamble_link_in_service, test_3_8_iut, iut_power_off_iut };
-static struct test_stream test_case_3_8_mgm = { preamble_link_in_service, test_3_8_mgm, iut_power_off_mgm };
+static struct test_stream test_case_3_8_ptu = { preamble_link_in_service, test_3_8_ptu, postamble_link_power_off };
+static struct test_stream test_case_3_8_iut = { preamble_link_in_service, test_3_8_iut, postamble_link_power_off };
 
-#define test_case_3_8 { test_case_3_8_ptu, test_case_3_8_iut, test_case_3_8_mgm }
+#define test_case_3_8 { test_case_3_8_ptu, test_case_3_8_iut }
 
 #define test_group_4 "Processor Outage Control"
 #define tgrp_case_4_1a test_group_4
@@ -13014,11 +12435,6 @@ test_4_1a_11_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_4_1a_11_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
 static int
 test_4_1a_other_ptu(int child)
@@ -13128,11 +12544,6 @@ test_4_1a_other_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_4_1a_other_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
 static int
 test_4_1a_ptu(int child)
@@ -13156,23 +12567,11 @@ test_4_1a_iut(int child)
 		return test_4_1a_other_iut(child);
 	}
 }
-static int
-test_4_1a_mgm(int child)
-{
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT_11:
-	case M2PA_VERSION_RFC4165:
-		return test_4_1a_11_mgm(child);
-	default:
-		return test_4_1a_other_mgm(child);
-	}
-}
 
-static struct test_stream test_case_4_1a_ptu = { preamble_link_in_service, test_4_1a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_4_1a_iut = { preamble_link_in_service, test_4_1a_iut, iut_power_off_iut };
-static struct test_stream test_case_4_1a_mgm = { preamble_link_in_service, test_4_1a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_4_1a_ptu = { preamble_link_in_service, test_4_1a_ptu, postamble_link_power_off };
+static struct test_stream test_case_4_1a_iut = { preamble_link_in_service, test_4_1a_iut, postamble_link_power_off };
 
-#define test_case_4_1a { test_case_4_1a_ptu, test_case_4_1a_iut, test_case_4_1a_mgm }
+#define test_case_4_1a { test_case_4_1a_ptu, test_case_4_1a_iut }
 
 #define tgrp_case_4_1b test_group_4
 #define sref_case_4_1b "Q.781/4.1"
@@ -13299,11 +12698,6 @@ test_4_1b_11_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_4_1b_11_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
 static int
 test_4_1b_other_ptu(int child)
@@ -13419,11 +12813,6 @@ test_4_1b_other_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_4_1b_other_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
 static int
 test_4_1b_ptu(int child)
@@ -13447,23 +12836,11 @@ test_4_1b_iut(int child)
 		return test_4_1b_other_iut(child);
 	}
 }
-static int
-test_4_1b_mgm(int child)
-{
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT11:
-	case M2PA_VERSION_RFC4165:
-		return test_4_1b_11_mgm(child);
-	default:
-		return test_4_1b_other_mgm(child);
-	}
-}
 
-static struct test_stream test_case_4_1b_ptu = { preamble_link_in_service, test_4_1b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_4_1b_iut = { preamble_link_in_service, test_4_1b_iut, iut_power_off_iut };
-static struct test_stream test_case_4_1b_mgm = { preamble_link_in_service, test_4_1b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_4_1b_ptu = { preamble_link_in_service, test_4_1b_ptu, postamble_link_power_off };
+static struct test_stream test_case_4_1b_iut = { preamble_link_in_service, test_4_1b_iut, postamble_link_power_off };
 
-#define test_case_4_1b { test_case_4_1b_ptu, test_case_4_1b_iut, test_case_4_1b_mgm }
+#define test_case_4_1b { test_case_4_1b_ptu, test_case_4_1b_iut }
 
 #define tgrp_case_4_2 test_group_4
 #define sref_case_4_2 "Q.781/4.2"
@@ -13507,17 +12884,11 @@ test_4_2_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_4_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_4_2_ptu = { preamble_link_in_service, test_4_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_4_2_iut = { preamble_link_in_service, test_4_2_iut, iut_power_off_iut };
-static struct test_stream test_case_4_2_mgm = { preamble_link_in_service, test_4_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_4_2_ptu = { preamble_link_in_service, test_4_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_4_2_iut = { preamble_link_in_service, test_4_2_iut, postamble_link_power_off };
 
-#define test_case_4_2 { test_case_4_2_ptu, test_case_4_2_iut, test_case_4_2_mgm }
+#define test_case_4_2 { test_case_4_2_ptu, test_case_4_2_iut }
 
 #define tgrp_case_4_3 test_group_4
 #define sref_case_4_3 "Q.781/4.3"
@@ -13573,17 +12944,11 @@ test_4_3_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_4_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_4_3_ptu = { preamble_link_in_service, test_4_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_4_3_iut = { preamble_link_in_service, test_4_3_iut, iut_power_off_iut };
-static struct test_stream test_case_4_3_mgm = { preamble_link_in_service, test_4_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_4_3_ptu = { preamble_link_in_service, test_4_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_4_3_iut = { preamble_link_in_service, test_4_3_iut, postamble_link_power_off };
 
-#define test_case_4_3 { test_case_4_3_ptu, test_case_4_3_iut, test_case_4_3_mgm }
+#define test_case_4_3 { test_case_4_3_ptu, test_case_4_3_iut }
 
 #define test_group_5 "SU delimitation, alignment, error detection and correction"
 #define tgrp_case_5_1 test_group_5
@@ -13604,17 +12969,11 @@ test_5_1_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_5_1_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_5_1_ptu = { preamble_link_in_service, test_5_1_ptu, iut_power_off_ptu };
-static struct test_stream test_case_5_1_iut = { preamble_link_in_service, test_5_1_iut, iut_power_off_iut };
-static struct test_stream test_case_5_1_mgm = { preamble_link_in_service, test_5_1_mgm, iut_power_off_mgm };
+static struct test_stream test_case_5_1_ptu = { preamble_link_in_service, test_5_1_ptu, postamble_link_power_off };
+static struct test_stream test_case_5_1_iut = { preamble_link_in_service, test_5_1_iut, postamble_link_power_off };
 
-#define test_case_5_1 { test_case_5_1_ptu, test_case_5_1_iut, test_case_5_1_mgm }
+#define test_case_5_1 { test_case_5_1_ptu, test_case_5_1_iut }
 
 #define tgrp_case_5_2 test_group_5
 #define sref_case_5_2 "Q.781/5.2"
@@ -13634,17 +12993,11 @@ test_5_2_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_5_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_5_2_ptu = { preamble_link_in_service, test_5_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_5_2_iut = { preamble_link_in_service, test_5_2_iut, iut_power_off_iut };
-static struct test_stream test_case_5_2_mgm = { preamble_link_in_service, test_5_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_5_2_ptu = { preamble_link_in_service, test_5_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_5_2_iut = { preamble_link_in_service, test_5_2_iut, postamble_link_power_off };
 
-#define test_case_5_2 { test_case_5_2_ptu, test_case_5_2_iut, test_case_5_2_mgm }
+#define test_case_5_2 { test_case_5_2_ptu, test_case_5_2_iut }
 
 #define tgrp_case_5_3 test_group_5
 #define sref_case_5_3 "Q.781/5.3"
@@ -13677,17 +13030,11 @@ test_5_3_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_5_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_5_3_ptu = { preamble_link_in_service, test_5_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_5_3_iut = { preamble_link_in_service, test_5_3_iut, iut_power_off_iut };
-static struct test_stream test_case_5_3_mgm = { preamble_link_in_service, test_5_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_5_3_ptu = { preamble_link_in_service, test_5_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_5_3_iut = { preamble_link_in_service, test_5_3_iut, postamble_link_power_off };
 
-#define test_case_5_3 { test_case_5_3_ptu, test_case_5_3_iut, test_case_5_3_mgm }
+#define test_case_5_3 { test_case_5_3_ptu, test_case_5_3_iut }
 
 #define tgrp_case_5_4a test_group_5
 #define sref_case_5_4a "Q.781/5.4"
@@ -13708,17 +13055,11 @@ test_5_4a_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_5_4a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_5_4a_ptu = { preamble_link_in_service, test_5_4a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_5_4a_iut = { preamble_link_in_service, test_5_4a_iut, iut_power_off_iut };
-static struct test_stream test_case_5_4a_mgm = { preamble_link_in_service, test_5_4a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_5_4a_ptu = { preamble_link_in_service, test_5_4a_ptu, postamble_link_power_off };
+static struct test_stream test_case_5_4a_iut = { preamble_link_in_service, test_5_4a_iut, postamble_link_power_off };
 
-#define test_case_5_4a { test_case_5_4a_ptu, test_case_5_4a_iut, test_case_5_4a_mgm }
+#define test_case_5_4a { test_case_5_4a_ptu, test_case_5_4a_iut }
 
 #define tgrp_case_5_4b test_group_5
 #define sref_case_5_4b "Q.781/5.4"
@@ -13739,17 +13080,11 @@ test_5_4b_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_5_4b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_5_4b_ptu = { preamble_link_in_service, test_5_4b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_5_4b_iut = { preamble_link_in_service, test_5_4b_iut, iut_power_off_iut };
-static struct test_stream test_case_5_4b_mgm = { preamble_link_in_service, test_5_4b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_5_4b_ptu = { preamble_link_in_service, test_5_4b_ptu, postamble_link_power_off };
+static struct test_stream test_case_5_4b_iut = { preamble_link_in_service, test_5_4b_iut, postamble_link_power_off };
 
-#define test_case_5_4b { test_case_5_4b_ptu, test_case_5_4b_iut, test_case_5_4b_mgm }
+#define test_case_5_4b { test_case_5_4b_ptu, test_case_5_4b_iut }
 
 #define tgrp_case_5_5a test_group_5
 #define sref_case_5_5a "Q.781/5.5"
@@ -13770,17 +13105,11 @@ test_5_5a_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_5_5a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_5_5a_ptu = { preamble_link_in_service, test_5_5a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_5_5a_iut = { preamble_link_in_service, test_5_5a_iut, iut_power_off_iut };
-static struct test_stream test_case_5_5a_mgm = { preamble_link_in_service, test_5_5a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_5_5a_ptu = { preamble_link_in_service, test_5_5a_ptu, postamble_link_power_off };
+static struct test_stream test_case_5_5a_iut = { preamble_link_in_service, test_5_5a_iut, postamble_link_power_off };
 
-#define test_case_5_5a { test_case_5_5a_ptu, test_case_5_5a_iut, test_case_5_5a_mgm }
+#define test_case_5_5a { test_case_5_5a_ptu, test_case_5_5a_iut }
 
 #define tgrp_case_5_5b test_group_5
 #define sref_case_5_5b "Q.781/5.5"
@@ -13801,17 +13130,11 @@ test_5_5b_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_5_5b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_5_5b_ptu = { preamble_link_in_service, test_5_5b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_5_5b_iut = { preamble_link_in_service, test_5_5b_iut, iut_power_off_iut };
-static struct test_stream test_case_5_5b_mgm = { preamble_link_in_service, test_5_5b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_5_5b_ptu = { preamble_link_in_service, test_5_5b_ptu, postamble_link_power_off };
+static struct test_stream test_case_5_5b_iut = { preamble_link_in_service, test_5_5b_iut, postamble_link_power_off };
 
-#define test_case_5_5b { test_case_5_5b_ptu, test_case_5_5b_iut, test_case_5_5b_mgm }
+#define test_case_5_5b { test_case_5_5b_ptu, test_case_5_5b_iut }
 
 #define test_group_6 "SUERM check"
 #define tgrp_case_6_1 test_group_6
@@ -13832,17 +13155,11 @@ test_6_1_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_6_1_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_6_1_ptu = { preamble_link_in_service, test_6_1_ptu, iut_power_off_ptu };
-static struct test_stream test_case_6_1_iut = { preamble_link_in_service, test_6_1_iut, iut_power_off_iut };
-static struct test_stream test_case_6_1_mgm = { preamble_link_in_service, test_6_1_mgm, iut_power_off_mgm };
+static struct test_stream test_case_6_1_ptu = { preamble_link_in_service, test_6_1_ptu, postamble_link_power_off };
+static struct test_stream test_case_6_1_iut = { preamble_link_in_service, test_6_1_iut, postamble_link_power_off };
 
-#define test_case_6_1 { test_case_6_1_ptu, test_case_6_1_iut, test_case_6_1_mgm }
+#define test_case_6_1 { test_case_6_1_ptu, test_case_6_1_iut }
 
 #define tgrp_case_6_2 test_group_6
 #define sref_case_6_2 "Q.781/6.2"
@@ -13862,17 +13179,11 @@ test_6_2_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_6_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_6_2_ptu = { preamble_link_in_service, test_6_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_6_2_iut = { preamble_link_in_service, test_6_2_iut, iut_power_off_iut };
-static struct test_stream test_case_6_2_mgm = { preamble_link_in_service, test_6_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_6_2_ptu = { preamble_link_in_service, test_6_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_6_2_iut = { preamble_link_in_service, test_6_2_iut, postamble_link_power_off };
 
-#define test_case_6_2 { test_case_6_2_ptu, test_case_6_2_iut, test_case_6_2_mgm }
+#define test_case_6_2 { test_case_6_2_ptu, test_case_6_2_iut }
 
 #define tgrp_case_6_3 test_group_6
 #define sref_case_6_3 "Q.781/6.3"
@@ -13892,17 +13203,11 @@ test_6_3_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_6_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_6_3_ptu = { preamble_link_in_service, test_6_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_6_3_iut = { preamble_link_in_service, test_6_3_iut, iut_power_off_iut };
-static struct test_stream test_case_6_3_mgm = { preamble_link_in_service, test_6_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_6_3_ptu = { preamble_link_in_service, test_6_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_6_3_iut = { preamble_link_in_service, test_6_3_iut, postamble_link_power_off };
 
-#define test_case_6_3 { test_case_6_3_ptu, test_case_6_3_iut, test_case_6_3_mgm }
+#define test_case_6_3 { test_case_6_3_ptu, test_case_6_3_iut }
 
 #define tgrp_case_6_4 test_group_6
 #define sref_case_6_4 "Q.781/6.4"
@@ -13922,17 +13227,11 @@ test_6_4_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_6_4_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_6_4_ptu = { preamble_link_in_service, test_6_4_ptu, iut_power_off_ptu };
-static struct test_stream test_case_6_4_iut = { preamble_link_in_service, test_6_4_iut, iut_power_off_iut };
-static struct test_stream test_case_6_4_mgm = { preamble_link_in_service, test_6_4_mgm, iut_power_off_mgm };
+static struct test_stream test_case_6_4_ptu = { preamble_link_in_service, test_6_4_ptu, postamble_link_power_off };
+static struct test_stream test_case_6_4_iut = { preamble_link_in_service, test_6_4_iut, postamble_link_power_off };
 
-#define test_case_6_4 { test_case_6_4_ptu, test_case_6_4_iut, test_case_6_4_mgm }
+#define test_case_6_4 { test_case_6_4_ptu, test_case_6_4_iut }
 
 #define test_group_7 "AERM check"
 #define tgrp_case_7_1 test_group_7
@@ -13953,17 +13252,11 @@ test_7_1_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_7_1_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_7_1_ptu = { preamble_link_power_on, test_7_1_ptu, iut_power_off_ptu };
-static struct test_stream test_case_7_1_iut = { preamble_link_power_on, test_7_1_iut, iut_power_off_iut };
-static struct test_stream test_case_7_1_mgm = { preamble_link_power_on, test_7_1_mgm, iut_power_off_mgm };
+static struct test_stream test_case_7_1_ptu = { preamble_link_power_on, test_7_1_ptu, postamble_link_power_off };
+static struct test_stream test_case_7_1_iut = { preamble_link_power_on, test_7_1_iut, postamble_link_power_off };
 
-#define test_case_7_1 { test_case_7_1_ptu, test_case_7_1_iut, test_case_7_1_mgm }
+#define test_case_7_1 { test_case_7_1_ptu, test_case_7_1_iut }
 
 #define tgrp_case_7_2 test_group_7
 #define sref_case_7_2 "Q.781/7.2"
@@ -13983,17 +13276,11 @@ test_7_2_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_7_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_7_2_ptu = { preamble_link_power_on, test_7_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_7_2_iut = { preamble_link_power_on, test_7_2_iut, iut_power_off_iut };
-static struct test_stream test_case_7_2_mgm = { preamble_link_power_on, test_7_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_7_2_ptu = { preamble_link_power_on, test_7_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_7_2_iut = { preamble_link_power_on, test_7_2_iut, postamble_link_power_off };
 
-#define test_case_7_2 { test_case_7_2_ptu, test_case_7_2_iut, test_case_7_2_mgm }
+#define test_case_7_2 { test_case_7_2_ptu, test_case_7_2_iut }
 
 #define tgrp_case_7_3 test_group_7
 #define sref_case_7_3 "Q.781/7.3"
@@ -14013,17 +13300,11 @@ test_7_3_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_7_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_7_3_ptu = { preamble_link_power_on, test_7_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_7_3_iut = { preamble_link_power_on, test_7_3_iut, iut_power_off_iut };
-static struct test_stream test_case_7_3_mgm = { preamble_link_power_on, test_7_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_7_3_ptu = { preamble_link_power_on, test_7_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_7_3_iut = { preamble_link_power_on, test_7_3_iut, postamble_link_power_off };
 
-#define test_case_7_3 { test_case_7_3_ptu, test_case_7_3_iut, test_case_7_3_mgm }
+#define test_case_7_3 { test_case_7_3_ptu, test_case_7_3_iut }
 
 #define tgrp_case_7_4 test_group_7
 #define sref_case_7_4 "Q.781/7.4"
@@ -14043,17 +13324,11 @@ test_7_4_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_7_4_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_7_4_ptu = { preamble_link_power_on, test_7_4_ptu, iut_power_off_ptu };
-static struct test_stream test_case_7_4_iut = { preamble_link_power_on, test_7_4_iut, iut_power_off_iut };
-static struct test_stream test_case_7_4_mgm = { preamble_link_power_on, test_7_4_mgm, iut_power_off_mgm };
+static struct test_stream test_case_7_4_ptu = { preamble_link_power_on, test_7_4_ptu, postamble_link_power_off };
+static struct test_stream test_case_7_4_iut = { preamble_link_power_on, test_7_4_iut, postamble_link_power_off };
 
-#define test_case_7_4 { test_case_7_4_ptu, test_case_7_4_iut, test_case_7_4_mgm }
+#define test_case_7_4 { test_case_7_4_ptu, test_case_7_4_iut }
 
 #define test_group_8 "Transmission and reception control (Basic)"
 #define tgrp_case_8_1 test_group_8
@@ -14125,17 +13400,11 @@ test_8_1_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_8_1_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_1_ptu = { preamble_link_in_service, test_8_1_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_1_iut = { preamble_link_in_service, test_8_1_iut, iut_power_off_iut };
-static struct test_stream test_case_8_1_mgm = { preamble_link_in_service, test_8_1_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_1_ptu = { preamble_link_in_service, test_8_1_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_1_iut = { preamble_link_in_service, test_8_1_iut, postamble_link_power_off };
 
-#define test_case_8_1 { test_case_8_1_ptu, test_case_8_1_iut, test_case_8_1_mgm }
+#define test_case_8_1 { test_case_8_1_ptu, test_case_8_1_iut }
 
 #define tgrp_case_8_2 test_group_8
 #define sref_case_8_2 "Q.781/8.2"
@@ -14155,17 +13424,11 @@ test_8_2_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_8_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_2_ptu = { preamble_link_in_service, test_8_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_2_iut = { preamble_link_in_service, test_8_2_iut, iut_power_off_iut };
-static struct test_stream test_case_8_2_mgm = { preamble_link_in_service, test_8_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_2_ptu = { preamble_link_in_service, test_8_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_2_iut = { preamble_link_in_service, test_8_2_iut, postamble_link_power_off };
 
-#define test_case_8_2 { test_case_8_2_ptu, test_case_8_2_iut, test_case_8_2_mgm }
+#define test_case_8_2 { test_case_8_2_ptu, test_case_8_2_iut }
 
 #define tgrp_case_8_3 test_group_8
 #define sref_case_8_3 "Q.781/8.3"
@@ -14320,17 +13583,11 @@ test_8_3_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_8_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_3_ptu = { preamble_link_in_service, test_8_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_3_iut = { preamble_link_in_service, test_8_3_iut, iut_power_off_iut };
-static struct test_stream test_case_8_3_mgm = { preamble_link_in_service, test_8_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_3_ptu = { preamble_link_in_service, test_8_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_3_iut = { preamble_link_in_service, test_8_3_iut, postamble_link_power_off };
 
-#define test_case_8_3 { test_case_8_3_ptu, test_case_8_3_iut, test_case_8_3_mgm }
+#define test_case_8_3 { test_case_8_3_ptu, test_case_8_3_iut }
 
 #define tgrp_case_8_4 test_group_8
 #define sref_case_8_4 "Q.781/8.4"
@@ -14386,17 +13643,11 @@ test_8_4_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_8_4_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_4_ptu = { preamble_link_in_service, test_8_4_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_4_iut = { preamble_link_in_service, test_8_4_iut, iut_power_off_iut };
-static struct test_stream test_case_8_4_mgm = { preamble_link_in_service, test_8_4_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_4_ptu = { preamble_link_in_service, test_8_4_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_4_iut = { preamble_link_in_service, test_8_4_iut, postamble_link_power_off };
 
-#define test_case_8_4 { test_case_8_4_ptu, test_case_8_4_iut, test_case_8_4_mgm }
+#define test_case_8_4 { test_case_8_4_ptu, test_case_8_4_iut }
 
 #define tgrp_case_8_5 test_group_8
 #define sref_case_8_5 "Q.781/8.5"
@@ -14529,17 +13780,11 @@ test_8_5_iut(int child)
       notappl:
 	return __RESULT_NOTAPPL;
 }
-static int
-test_8_5_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_5_ptu = { preamble_link_in_service, test_8_5_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_5_iut = { preamble_link_in_service, test_8_5_iut, iut_power_off_iut };
-static struct test_stream test_case_8_5_mgm = { preamble_link_in_service, test_8_5_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_5_ptu = { preamble_link_in_service, test_8_5_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_5_iut = { preamble_link_in_service, test_8_5_iut, postamble_link_power_off };
 
-#define test_case_8_5 { test_case_8_5_ptu, test_case_8_5_iut, test_case_8_5_mgm }
+#define test_case_8_5 { test_case_8_5_ptu, test_case_8_5_iut }
 
 #define tgrp_case_8_6 test_group_8
 #define sref_case_8_6 "Q.781/8.6"
@@ -14559,17 +13804,11 @@ test_8_6_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_8_6_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_6_ptu = { preamble_link_in_service, test_8_6_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_6_iut = { preamble_link_in_service, test_8_6_iut, iut_power_off_iut };
-static struct test_stream test_case_8_6_mgm = { preamble_link_in_service, test_8_6_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_6_ptu = { preamble_link_in_service, test_8_6_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_6_iut = { preamble_link_in_service, test_8_6_iut, postamble_link_power_off };
 
-#define test_case_8_6 { test_case_8_6_ptu, test_case_8_6_iut, test_case_8_6_mgm }
+#define test_case_8_6 { test_case_8_6_ptu, test_case_8_6_iut }
 
 #define tgrp_case_8_7 test_group_8
 #define sref_case_8_7 "Q.781/8.7"
@@ -14589,17 +13828,11 @@ test_8_7_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_8_7_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_7_ptu = { preamble_link_in_service, test_8_7_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_7_iut = { preamble_link_in_service, test_8_7_iut, iut_power_off_iut };
-static struct test_stream test_case_8_7_mgm = { preamble_link_in_service, test_8_7_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_7_ptu = { preamble_link_in_service, test_8_7_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_7_iut = { preamble_link_in_service, test_8_7_iut, postamble_link_power_off };
 
-#define test_case_8_7 { test_case_8_7_ptu, test_case_8_7_iut, test_case_8_7_mgm }
+#define test_case_8_7 { test_case_8_7_ptu, test_case_8_7_iut }
 
 #define tgrp_case_8_8 test_group_8
 #define sref_case_8_8 "Q.781/8.8"
@@ -14619,17 +13852,11 @@ test_8_8_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_8_8_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_8_ptu = { preamble_link_in_service, test_8_8_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_8_iut = { preamble_link_in_service, test_8_8_iut, iut_power_off_iut };
-static struct test_stream test_case_8_8_mgm = { preamble_link_in_service, test_8_8_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_8_ptu = { preamble_link_in_service, test_8_8_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_8_iut = { preamble_link_in_service, test_8_8_iut, postamble_link_power_off };
 
-#define test_case_8_8 { test_case_8_8_ptu, test_case_8_8_iut, test_case_8_8_mgm }
+#define test_case_8_8 { test_case_8_8_ptu, test_case_8_8_iut }
 
 #define tgrp_case_8_9a test_group_8
 #define sref_case_8_9a "Q.781/8.9"
@@ -14681,17 +13908,11 @@ test_8_9a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_8_9a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_9a_ptu = { preamble_link_in_service, test_8_9a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_9a_iut = { preamble_link_in_service, test_8_9a_iut, iut_power_off_iut };
-static struct test_stream test_case_8_9a_mgm = { preamble_link_in_service, test_8_9a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_9a_ptu = { preamble_link_in_service, test_8_9a_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_9a_iut = { preamble_link_in_service, test_8_9a_iut, postamble_link_power_off };
 
-#define test_case_8_9a { test_case_8_9a_ptu, test_case_8_9a_iut, test_case_8_9a_mgm }
+#define test_case_8_9a { test_case_8_9a_ptu, test_case_8_9a_iut }
 
 #define tgrp_case_8_9b test_group_8
 #define sref_case_8_9b "Q.781/8.9"
@@ -14766,17 +13987,11 @@ test_8_9b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_8_9b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_9b_ptu = { preamble_link_in_service, test_8_9b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_9b_iut = { preamble_link_in_service, test_8_9b_iut, iut_power_off_iut };
-static struct test_stream test_case_8_9b_mgm = { preamble_link_in_service, test_8_9b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_9b_ptu = { preamble_link_in_service, test_8_9b_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_9b_iut = { preamble_link_in_service, test_8_9b_iut, postamble_link_power_off };
 
-#define test_case_8_9b { test_case_8_9b_ptu, test_case_8_9b_iut, test_case_8_9b_mgm }
+#define test_case_8_9b { test_case_8_9b_ptu, test_case_8_9b_iut }
 
 #define tgrp_case_8_10 test_group_8
 #define sref_case_8_10 "Q.781/8.10"
@@ -14886,17 +14101,11 @@ test_8_10_iut(int child)
       notappl:
 	return __RESULT_NOTAPPL;
 }
-static int
-test_8_10_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_10_ptu = { preamble_link_in_service, test_8_10_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_10_iut = { preamble_link_in_service, test_8_10_iut, iut_power_off_iut };
-static struct test_stream test_case_8_10_mgm = { preamble_link_in_service, test_8_10_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_10_ptu = { preamble_link_in_service, test_8_10_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_10_iut = { preamble_link_in_service, test_8_10_iut, postamble_link_power_off };
 
-#define test_case_8_10 { test_case_8_10_ptu, test_case_8_10_iut, test_case_8_10_mgm }
+#define test_case_8_10 { test_case_8_10_ptu, test_case_8_10_iut }
 
 #define tgrp_case_8_11 tgrp_csae_8
 #define sref_case_8_11 "Q.781/8.11"
@@ -14990,17 +14199,11 @@ test_8_11_iut(int child)
       notappl:
 	return __RESULT_NOTAPPL;
 }
-static int
-test_8_11_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_11_ptu = { preamble_link_in_service, test_8_11_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_11_iut = { preamble_link_in_service, test_8_11_iut, iut_power_off_iut };
-static struct test_stream test_case_8_11_mgm = { preamble_link_in_service, test_8_11_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_11_ptu = { preamble_link_in_service, test_8_11_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_11_iut = { preamble_link_in_service, test_8_11_iut, postamble_link_power_off };
 
-#define test_case_8_11 { test_case_8_11_ptu, test_case_8_11_iut, test_case_8_11_mgm }
+#define test_case_8_11 { test_case_8_11_ptu, test_case_8_11_iut }
 
 #define tgrp_case_8_12a test_group_8
 #define sref_case_8_12a "Q.781/8.12"
@@ -15041,17 +14244,11 @@ test_8_12a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_8_12a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_12a_ptu = { preamble_link_in_service, test_8_12a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_12a_iut = { preamble_link_in_service, test_8_12a_iut, iut_power_off_iut };
-static struct test_stream test_case_8_12a_mgm = { preamble_link_in_service, test_8_12a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_12a_ptu = { preamble_link_in_service, test_8_12a_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_12a_iut = { preamble_link_in_service, test_8_12a_iut, postamble_link_power_off };
 
-#define test_case_8_12a { test_case_8_12a_ptu, test_case_8_12a_iut, test_case_8_12a_mgm }
+#define test_case_8_12a { test_case_8_12a_ptu, test_case_8_12a_iut }
 
 #define tgrp_case_8_12b test_group_8
 #define sref_case_8_12b "Q.781/8.12"
@@ -15109,17 +14306,11 @@ test_8_12b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_8_12b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_12b_ptu = { preamble_link_in_service, test_8_12b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_12b_iut = { preamble_link_in_service, test_8_12b_iut, iut_power_off_iut };
-static struct test_stream test_case_8_12b_mgm = { preamble_link_in_service, test_8_12b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_12b_ptu = { preamble_link_in_service, test_8_12b_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_12b_iut = { preamble_link_in_service, test_8_12b_iut, postamble_link_power_off };
 
-#define test_case_8_12b { test_case_8_12b_ptu, test_case_8_12b_iut, test_case_8_12b_mgm }
+#define test_case_8_12b { test_case_8_12b_ptu, test_case_8_12b_iut }
 
 #define tgrp_case_8_13 test_group_8
 #define sref_case_8_13 "Q.781/8.13"
@@ -15151,17 +14342,11 @@ test_8_13_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_8_13_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_13_ptu = { preamble_link_in_service, test_8_13_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_13_iut = { preamble_link_in_service, test_8_13_iut, iut_power_off_iut };
-static struct test_stream test_case_8_13_mgm = { preamble_link_in_service, test_8_13_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_13_ptu = { preamble_link_in_service, test_8_13_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_13_iut = { preamble_link_in_service, test_8_13_iut, postamble_link_power_off };
 
-#define test_case_8_13 { test_case_8_13_ptu, test_case_8_13_iut, test_case_8_13_mgm }
+#define test_case_8_13 { test_case_8_13_ptu, test_case_8_13_iut }
 
 #define tgrp_case_8_14 test_group_8
 #define sref_case_8_14 "Q.781/8.14"
@@ -15273,17 +14458,11 @@ test_8_14_iut(int child)
       notappl:
 	return __RESULT_NOTAPPL;
 }
-static int
-test_8_14_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_8_14_ptu = { preamble_link_in_service, test_8_14_ptu, iut_power_off_ptu };
-static struct test_stream test_case_8_14_iut = { preamble_link_in_service, test_8_14_iut, iut_power_off_iut };
-static struct test_stream test_case_8_14_mgm = { preamble_link_in_service, test_8_14_mgm, iut_power_off_mgm };
+static struct test_stream test_case_8_14_ptu = { preamble_link_in_service, test_8_14_ptu, postamble_link_power_off };
+static struct test_stream test_case_8_14_iut = { preamble_link_in_service, test_8_14_iut, postamble_link_power_off };
 
-#define test_case_8_14 { test_case_8_14_ptu, test_case_8_14_iut, test_case_8_14_mgm }
+#define test_case_8_14 { test_case_8_14_ptu, test_case_8_14_iut }
 
 #define test_group_9 "Transmission and reception control (PCR)"
 #define tgrp_case_9_1 test_group_9
@@ -15304,17 +14483,11 @@ test_9_1_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_1_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_1_ptu = { preamble_link_in_service_pcr, test_9_1_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_1_iut = { preamble_link_in_service_pcr, test_9_1_iut, iut_power_off_iut };
-static struct test_stream test_case_9_1_mgm = { preamble_link_in_service_pcr, test_9_1_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_1_ptu = { preamble_link_in_service_pcr, test_9_1_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_1_iut = { preamble_link_in_service_pcr, test_9_1_iut, postamble_link_power_off };
 
-#define test_case_9_1 { test_case_9_1_ptu, test_case_9_1_iut, test_case_9_1_mgm }
+#define test_case_9_1 { test_case_9_1_ptu, test_case_9_1_iut }
 
 #define tgrp_case_9_2 test_group_9
 #define sref_case_9_2 "Q.781/9.2"
@@ -15334,17 +14507,11 @@ test_9_2_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_2_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_2_ptu = { preamble_link_in_service_pcr, test_9_2_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_2_iut = { preamble_link_in_service_pcr, test_9_2_iut, iut_power_off_iut };
-static struct test_stream test_case_9_2_mgm = { preamble_link_in_service_pcr, test_9_2_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_2_ptu = { preamble_link_in_service_pcr, test_9_2_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_2_iut = { preamble_link_in_service_pcr, test_9_2_iut, postamble_link_power_off };
 
-#define test_case_9_2 { test_case_9_2_ptu, test_case_9_2_iut, test_case_9_2_mgm }
+#define test_case_9_2 { test_case_9_2_ptu, test_case_9_2_iut }
 
 #define tgrp_case_9_3 test_group_9
 #define sref_case_9_3 "Q.781/9.3"
@@ -15364,17 +14531,11 @@ test_9_3_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_3_ptu = { preamble_link_in_service_pcr, test_9_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_3_iut = { preamble_link_in_service_pcr, test_9_3_iut, iut_power_off_iut };
-static struct test_stream test_case_9_3_mgm = { preamble_link_in_service_pcr, test_9_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_3_ptu = { preamble_link_in_service_pcr, test_9_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_3_iut = { preamble_link_in_service_pcr, test_9_3_iut, postamble_link_power_off };
 
-#define test_case_9_3 { test_case_9_3_ptu, test_case_9_3_iut, test_case_9_3_mgm }
+#define test_case_9_3 { test_case_9_3_ptu, test_case_9_3_iut }
 
 #define tgrp_case_9_4 test_group_9
 #define sref_case_9_4 "Q.781/9.4"
@@ -15394,17 +14555,11 @@ test_9_4_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_4_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_4_ptu = { preamble_link_in_service_pcr, test_9_4_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_4_iut = { preamble_link_in_service_pcr, test_9_4_iut, iut_power_off_iut };
-static struct test_stream test_case_9_4_mgm = { preamble_link_in_service_pcr, test_9_4_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_4_ptu = { preamble_link_in_service_pcr, test_9_4_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_4_iut = { preamble_link_in_service_pcr, test_9_4_iut, postamble_link_power_off };
 
-#define test_case_9_4 { test_case_9_4_ptu, test_case_9_4_iut, test_case_9_4_mgm }
+#define test_case_9_4 { test_case_9_4_ptu, test_case_9_4_iut }
 
 #define tgrp_case_9_5 test_group_9
 #define sref_case_9_5 "Q.781/9.5"
@@ -15424,17 +14579,11 @@ test_9_5_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_5_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_5_ptu = { preamble_link_in_service_pcr, test_9_5_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_5_iut = { preamble_link_in_service_pcr, test_9_5_iut, iut_power_off_iut };
-static struct test_stream test_case_9_5_mgm = { preamble_link_in_service_pcr, test_9_5_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_5_ptu = { preamble_link_in_service_pcr, test_9_5_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_5_iut = { preamble_link_in_service_pcr, test_9_5_iut, postamble_link_power_off };
 
-#define test_case_9_5 { test_case_9_5_ptu, test_case_9_5_iut, test_case_9_5_mgm }
+#define test_case_9_5 { test_case_9_5_ptu, test_case_9_5_iut }
 
 #define tgrp_case_9_6 test_group_9
 #define sref_case_9_6 "Q.781/9.6"
@@ -15454,17 +14603,11 @@ test_9_6_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_6_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_6_ptu = { preamble_link_in_service_pcr, test_9_6_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_6_iut = { preamble_link_in_service_pcr, test_9_6_iut, iut_power_off_iut };
-static struct test_stream test_case_9_6_mgm = { preamble_link_in_service_pcr, test_9_6_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_6_ptu = { preamble_link_in_service_pcr, test_9_6_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_6_iut = { preamble_link_in_service_pcr, test_9_6_iut, postamble_link_power_off };
 
-#define test_case_9_6 { test_case_9_6_ptu, test_case_9_6_iut, test_case_9_6_mgm }
+#define test_case_9_6 { test_case_9_6_ptu, test_case_9_6_iut }
 
 #define tgrp_case_9_7 test_group_9
 #define sref_case_9_7 "Q.781/9.7"
@@ -15484,17 +14627,11 @@ test_9_7_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_7_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_7_ptu = { preamble_link_in_service_pcr, test_9_7_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_7_iut = { preamble_link_in_service_pcr, test_9_7_iut, iut_power_off_iut };
-static struct test_stream test_case_9_7_mgm = { preamble_link_in_service_pcr, test_9_7_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_7_ptu = { preamble_link_in_service_pcr, test_9_7_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_7_iut = { preamble_link_in_service_pcr, test_9_7_iut, postamble_link_power_off };
 
-#define test_case_9_7 { test_case_9_7_ptu, test_case_9_7_iut, test_case_9_7_mgm }
+#define test_case_9_7 { test_case_9_7_ptu, test_case_9_7_iut }
 
 #define tgrp_case_9_8 test_group_9
 #define sref_case_9_8 "Q.781/9.8"
@@ -15514,17 +14651,11 @@ test_9_8_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_8_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_8_ptu = { preamble_link_in_service_pcr, test_9_8_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_8_iut = { preamble_link_in_service_pcr, test_9_8_iut, iut_power_off_iut };
-static struct test_stream test_case_9_8_mgm = { preamble_link_in_service_pcr, test_9_8_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_8_ptu = { preamble_link_in_service_pcr, test_9_8_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_8_iut = { preamble_link_in_service_pcr, test_9_8_iut, postamble_link_power_off };
 
-#define test_case_9_8 { test_case_9_8_ptu, test_case_9_8_iut, test_case_9_8_mgm }
+#define test_case_9_8 { test_case_9_8_ptu, test_case_9_8_iut }
 
 #define tgrp_case_9_9 test_group_9
 #define sref_case_9_9 "Q.781/9.9"
@@ -15544,17 +14675,11 @@ test_9_9_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_9_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_9_ptu = { preamble_link_in_service_pcr, test_9_9_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_9_iut = { preamble_link_in_service_pcr, test_9_9_iut, iut_power_off_iut };
-static struct test_stream test_case_9_9_mgm = { preamble_link_in_service_pcr, test_9_9_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_9_ptu = { preamble_link_in_service_pcr, test_9_9_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_9_iut = { preamble_link_in_service_pcr, test_9_9_iut, postamble_link_power_off };
 
-#define test_case_9_9 { test_case_9_9_ptu, test_case_9_9_iut, test_case_9_9_mgm }
+#define test_case_9_9 { test_case_9_9_ptu, test_case_9_9_iut }
 
 #define tgrp_case_9_10 test_group_9
 #define sref_case_9_10 "Q.781/9.10"
@@ -15574,17 +14699,11 @@ test_9_10_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_10_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_10_ptu = { preamble_link_in_service_pcr, test_9_10_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_10_iut = { preamble_link_in_service_pcr, test_9_10_iut, iut_power_off_iut };
-static struct test_stream test_case_9_10_mgm = { preamble_link_in_service_pcr, test_9_10_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_10_ptu = { preamble_link_in_service_pcr, test_9_10_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_10_iut = { preamble_link_in_service_pcr, test_9_10_iut, postamble_link_power_off };
 
-#define test_case_9_10 { test_case_9_10_ptu, test_case_9_10_iut, test_case_9_10_mgm }
+#define test_case_9_10 { test_case_9_10_ptu, test_case_9_10_iut }
 
 #define tgrp_case_9_11 test_group_9
 #define sref_case_9_11 "Q.781/9.11"
@@ -15604,17 +14723,11 @@ test_9_11_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_11_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_11_ptu = { preamble_link_in_service_pcr, test_9_11_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_11_iut = { preamble_link_in_service_pcr, test_9_11_iut, iut_power_off_iut };
-static struct test_stream test_case_9_11_mgm = { preamble_link_in_service_pcr, test_9_11_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_11_ptu = { preamble_link_in_service_pcr, test_9_11_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_11_iut = { preamble_link_in_service_pcr, test_9_11_iut, postamble_link_power_off };
 
-#define test_case_9_11 { test_case_9_11_ptu, test_case_9_11_iut, test_case_9_11_mgm }
+#define test_case_9_11 { test_case_9_11_ptu, test_case_9_11_iut }
 
 #define tgrp_case_9_12 test_group_9
 #define sref_case_9_12 "Q.781/9.12"
@@ -15634,17 +14747,11 @@ test_9_12_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_12_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_12_ptu = { preamble_link_in_service_pcr, test_9_12_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_12_iut = { preamble_link_in_service_pcr, test_9_12_iut, iut_power_off_iut };
-static struct test_stream test_case_9_12_mgm = { preamble_link_in_service_pcr, test_9_12_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_12_ptu = { preamble_link_in_service_pcr, test_9_12_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_12_iut = { preamble_link_in_service_pcr, test_9_12_iut, postamble_link_power_off };
 
-#define test_case_9_12 { test_case_9_12_ptu, test_case_9_12_iut, test_case_9_12_mgm }
+#define test_case_9_12 { test_case_9_12_ptu, test_case_9_12_iut }
 
 #define tgrp_case_9_13 test_group_9
 #define sref_case_9_13 "Q.781/9.13"
@@ -15664,17 +14771,11 @@ test_9_13_iut(int child)
 {
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
-static int
-test_9_13_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_9_13_ptu = { preamble_link_in_service_pcr, test_9_13_ptu, iut_power_off_ptu };
-static struct test_stream test_case_9_13_iut = { preamble_link_in_service_pcr, test_9_13_iut, iut_power_off_iut };
-static struct test_stream test_case_9_13_mgm = { preamble_link_in_service_pcr, test_9_13_mgm, iut_power_off_mgm };
+static struct test_stream test_case_9_13_ptu = { preamble_link_in_service_pcr, test_9_13_ptu, postamble_link_power_off };
+static struct test_stream test_case_9_13_iut = { preamble_link_in_service_pcr, test_9_13_iut, postamble_link_power_off };
 
-#define test_case_9_13 { test_case_9_13_ptu, test_case_9_13_iut, test_case_9_13_mgm }
+#define test_case_9_13 { test_case_9_13_ptu, test_case_9_13_iut }
 
 #define test_group_10 "Congestion Control"
 #define tgrp_case_10_1 test_group_10
@@ -15717,17 +14818,11 @@ test_10_1_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_10_1_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_10_1_ptu = { preamble_link_in_service, test_10_1_ptu, iut_power_off_ptu };
-static struct test_stream test_case_10_1_iut = { preamble_link_in_service, test_10_1_iut, iut_power_off_iut };
-static struct test_stream test_case_10_1_mgm = { preamble_link_in_service, test_10_1_mgm, iut_power_off_mgm };
+static struct test_stream test_case_10_1_ptu = { preamble_link_in_service, test_10_1_ptu, postamble_link_power_off };
+static struct test_stream test_case_10_1_iut = { preamble_link_in_service, test_10_1_iut, postamble_link_power_off };
 
-#define test_case_10_1 { test_case_10_1_ptu, test_case_10_1_iut, test_case_10_1_mgm }
+#define test_case_10_1 { test_case_10_1_ptu, test_case_10_1_iut }
 
 #define tgrp_case_10_2a test_group_10
 #define sref_case_10_2a "Q.781/10.2"
@@ -15789,17 +14884,11 @@ test_10_2a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_10_2a_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_10_2a_ptu = { preamble_link_in_service, test_10_2a_ptu, iut_power_off_ptu };
-static struct test_stream test_case_10_2a_iut = { preamble_link_in_service, test_10_2a_iut, iut_power_off_iut };
-static struct test_stream test_case_10_2a_mgm = { preamble_link_in_service, test_10_2a_mgm, iut_power_off_mgm };
+static struct test_stream test_case_10_2a_ptu = { preamble_link_in_service, test_10_2a_ptu, postamble_link_power_off };
+static struct test_stream test_case_10_2a_iut = { preamble_link_in_service, test_10_2a_iut, postamble_link_power_off };
 
-#define test_case_10_2a { test_case_10_2a_ptu, test_case_10_2a_iut, test_case_10_2a_mgm }
+#define test_case_10_2a { test_case_10_2a_ptu, test_case_10_2a_iut }
 
 #define tgrp_case_10_2b test_group_10
 #define sref_case_10_2b "Q.781/10.2"
@@ -15852,17 +14941,11 @@ test_10_2b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_10_2b_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_10_2b_ptu = { preamble_link_in_service, test_10_2b_ptu, iut_power_off_ptu };
-static struct test_stream test_case_10_2b_iut = { preamble_link_in_service, test_10_2b_iut, iut_power_off_iut };
-static struct test_stream test_case_10_2b_mgm = { preamble_link_in_service, test_10_2b_mgm, iut_power_off_mgm };
+static struct test_stream test_case_10_2b_ptu = { preamble_link_in_service, test_10_2b_ptu, postamble_link_power_off };
+static struct test_stream test_case_10_2b_iut = { preamble_link_in_service, test_10_2b_iut, postamble_link_power_off };
 
-#define test_case_10_2b { test_case_10_2b_ptu, test_case_10_2b_iut, test_case_10_2b_mgm }
+#define test_case_10_2b { test_case_10_2b_ptu, test_case_10_2b_iut }
 
 #define tgrp_case_10_2c test_group_10
 #define sref_case_10_2c "Q.781/10.2"
@@ -15919,17 +15002,11 @@ test_10_2c_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_10_2c_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_10_2c_ptu = { preamble_link_in_service, test_10_2c_ptu, iut_power_off_ptu };
-static struct test_stream test_case_10_2c_iut = { preamble_link_in_service, test_10_2c_iut, iut_power_off_iut };
-static struct test_stream test_case_10_2c_mgm = { preamble_link_in_service, test_10_2c_mgm, iut_power_off_mgm };
+static struct test_stream test_case_10_2c_ptu = { preamble_link_in_service, test_10_2c_ptu, postamble_link_power_off };
+static struct test_stream test_case_10_2c_iut = { preamble_link_in_service, test_10_2c_iut, postamble_link_power_off };
 
-#define test_case_10_2c { test_case_10_2c_ptu, test_case_10_2c_iut, test_case_10_2c_mgm }
+#define test_case_10_2c { test_case_10_2c_ptu, test_case_10_2c_iut }
 
 #define tgrp_case_10_3 test_group_10
 #define sref_case_10_3 "Q.781/10.3"
@@ -15973,17 +15050,11 @@ test_10_3_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
-test_10_3_mgm(int child)
-{
-	return __RESULT_SUCCESS;
-}
 
-static struct test_stream test_case_10_3_ptu = { preamble_link_in_service, test_10_3_ptu, iut_power_off_ptu };
-static struct test_stream test_case_10_3_iut = { preamble_link_in_service, test_10_3_iut, iut_power_off_iut };
-static struct test_stream test_case_10_3_mgm = { preamble_link_in_service, test_10_3_mgm, iut_power_off_mgm };
+static struct test_stream test_case_10_3_ptu = { preamble_link_in_service, test_10_3_ptu, postamble_link_power_off };
+static struct test_stream test_case_10_3_iut = { preamble_link_in_service, test_10_3_iut, postamble_link_power_off };
 
-#define test_case_10_3 { test_case_10_3_ptu, test_case_10_3_iut, test_case_10_3_mgm }
+#define test_case_10_3 { test_case_10_3_ptu, test_case_10_3_iut }
 
 /*
  *  =========================================================================
@@ -16759,27 +15830,11 @@ int
 test_run(struct test_stream *stream[])
 {
 	int children = 0;
-	pid_t this_child, child[3] = { 0, };
-	int this_status, status[3] = { 0, };
+	pid_t this_child, child[2] = { 0, };
+	int this_status, status[2] = { 0, };
 
 	if (start_tt(test_duration))
 		goto inconclusive;
-	if (server_exec && stream[2]) {
-		switch ((child[2] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
-		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
-			if (child[1])
-				kill(child[1], SIGKILL);	/* toast stream[1] child */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[2] = __RESULT_SUCCESS;
 	if (server_exec && stream[1]) {
 		switch ((child[1] = fork())) {
 		case 00:	/* we are the child */
@@ -16815,8 +15870,6 @@ test_run(struct test_stream *stream[])
 					if ((status[0] = WEXITSTATUS(this_status))) {
 						if (child[1])
 							kill(child[1], SIGKILL);
-						if (child[2])
-							kill(child[2], SIGKILL);
 					}
 				}
 				if (this_child == child[1]) {
@@ -16824,17 +15877,6 @@ test_run(struct test_stream *stream[])
 					if ((status[1] = WEXITSTATUS(this_status))) {
 						if (child[0])
 							kill(child[0], SIGKILL);
-						if (child[2])
-							kill(child[2], SIGKILL);
-					}
-				}
-				if (this_child == child[2]) {
-					child[2] = 0;
-					if ((status[2] = WEXITSTATUS(this_status))) {
-						if (child[0])
-							kill(child[0], SIGKILL);
-						if (child[1])
-							kill(child[1], SIGKILL);
 					}
 				}
 			} else if (WIFSIGNALED(this_status)) {
@@ -16844,8 +15886,6 @@ test_run(struct test_stream *stream[])
 					print_terminated(0, signal);
 					if (child[1])
 						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
 					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
 					child[0] = 0;
 				}
@@ -16853,19 +15893,8 @@ test_run(struct test_stream *stream[])
 					print_terminated(1, signal);
 					if (child[0])
 						kill(child[0], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
 					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
 					child[1] = 0;
-				}
-				if (this_child == child[2]) {
-					print_terminated(2, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[2] = 0;
 				}
 			} else if (WIFSTOPPED(this_status)) {
 				int signal = WSTOPSIG(this_status);
@@ -16876,8 +15905,6 @@ test_run(struct test_stream *stream[])
 						kill(child[0], SIGKILL);
 					if (child[1])
 						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
 					status[0] = __RESULT_FAILURE;
 					child[0] = 0;
 				}
@@ -16887,21 +15914,8 @@ test_run(struct test_stream *stream[])
 						kill(child[0], SIGKILL);
 					if (child[1])
 						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
 					status[1] = __RESULT_FAILURE;
 					child[1] = 0;
-				}
-				if (this_child == child[2]) {
-					print_stopped(2, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
-					status[2] = __RESULT_FAILURE;
-					child[2] = 0;
 				}
 			}
 		} else {
@@ -16913,20 +15927,18 @@ test_run(struct test_stream *stream[])
 				kill(child[0], SIGKILL);
 			if (child[1])
 				kill(child[1], SIGKILL);
-			if (child[2])
-				kill(child[2], SIGKILL);
 			goto waitagain;
 		}
 	}
 	if (stop_tt())
 		goto inconclusive;
-	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
+	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL)
 		return (__RESULT_NOTAPPL);
-	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
+	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED)
 		return (__RESULT_SKIPPED);
-	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE || status[2] == __RESULT_FAILURE)
+	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE)
 		return (__RESULT_FAILURE);
-	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
+	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS)
 		return (__RESULT_SUCCESS);
       inconclusive:
 	return (__RESULT_INCONCLUSIVE);
@@ -16946,7 +15958,7 @@ struct test_case {
 	const char *name;		/* test case name */
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
-	struct test_stream *stream[3];	/* test streams */
+	struct test_stream *stream[2];	/* test streams */
 	int (*start) (int);		/* start function */
 	int (*stop) (int);		/* stop function */
 	int run;			/* whether to run this test */
