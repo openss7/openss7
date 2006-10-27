@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/27 23:24:12 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 07:26:38 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:24:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.27  2006/10/27 23:24:12  brian
+ - corrected output format
+
  Revision 0.9.2.26  2006/07/08 07:26:38  brian
  - removed trigraphs
 
@@ -129,9 +132,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/27 23:24:12 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:38 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/27 23:24:12 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -2417,9 +2420,9 @@ print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"  %-14s--->|  |                                |                    [%d:%03d]\n",
-		"                    |  |                                |<---%14s  [%d:%03d]\n",
-		"                    |  |                                |<---%14s  [%d:%03d]\n",
-		"                    |  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |<---%-14s  [%d:%03d]\n",
+		"                    |  |                                |<---%-14s  [%d:%03d]\n",
+		"                    |  |       %-14s           |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2433,7 +2436,7 @@ print_tx_prim(int child, const char *command)
 		"--%16s->|  |                                |                    [%d:%03d]\n",
 		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
 		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
-		"                    |  |                                |                    [%d:%03d]\n",
+		"                    |  |      %-16s          |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2637,10 +2640,10 @@ void
 print_expect(int child, int want)
 {
 	static const char *msgs[] = {
-		" (%-16s) |  | - - - -[Expected]- - - - - - - |                     [%d:%03d]\n",
-		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
-		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
-		"                    |- |- [Expected %-16s ] -|                     [%d:%03d]\n",
+		" (%-16s) |  | - - - -[Expected]- - - - - - - |                    [%d:%03d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s) [%d:%03d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s) [%d:%03d]\n",
+		"                    |- |- [Expected %-16s ] -|                    [%d:%03d]\n",
 	};
 
 	if (verbose > 1 && show)
