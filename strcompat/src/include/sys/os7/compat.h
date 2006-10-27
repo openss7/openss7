@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.33 2006/07/29 07:43:00 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.34 2006/10/27 23:02:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,22 +44,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:43:00 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:02:22 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_COMPAT_H__
 #define __LOCAL_COMPAT_H__
 
-#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.33 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.34 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define __OPTIMIZE__ 1
 
+#include "sys/strcompat/config.h"
 /*
  *  Unfortunately this is necessary for older non-rpm LIS releases.
  */
 #ifdef LINUX
-#include <linux/config.h>
+#include <linux/autoconf.h>
+#include <linux/compile.h>
+#ifdef HAVE_KINC_LINUX_UTSRELEASE_H
+#include <linux/utsrelease.h>
+#endif
 #include <linux/version.h>
 #include <linux/compiler.h>
 #include <linux/module.h>

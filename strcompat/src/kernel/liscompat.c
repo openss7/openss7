@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:21:44 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/27 23:02:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:21:44 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:02:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:21:44 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/27 23:02:26 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:21:44 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/27 23:02:26 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -72,13 +72,17 @@ static char const ident[] =
 
 #define _LIS_SOURCE
 
+#include <linux/compile.h>
+#ifdef HAVE_KINC_LINUX_UTSRELEASE_H
+#include <linux/utsrelease.h>
+#endif
 #include "sys/os7/compat.h"
 
 #include <asm/dma.h>		/* for request_dma and friends */
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:21:44 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/27 23:02:26 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"

@@ -1,3 +1,17 @@
+2006-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - checks for header files from Linux Fast-STREAMS
+	* src/include/sys/os7/compat.h:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - include config file for finding UTS_RELEASE
+	  - include linux/utsrelease.h when available
+	* src/include/sys/strcompat/config.h.in:
+	  - add result of check for linux/utsrelease.h
+	* src/kernel/liscompat.c:
+	  - include linux/utsrelease.h when available
+
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* strcompat.lsm.in: updated streams release number

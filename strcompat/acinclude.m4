@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/09/18 13:20:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/10/27 23:02:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 13:20:09 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 23:02:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -647,9 +647,13 @@ AC_DEFUN([_COMPAT_CHECK_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h linux/slab.h linux/hardirq.h linux/security.h], [:], [:], [
+			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
+			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
+			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
+			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/smp_lock.h \
+			  linux/devfs_fs_kernel.h linux/utsrelease.h], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -690,7 +694,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 				;;
 			esac ], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -725,7 +729,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
 			 read_trylock write_trylock], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -756,7 +760,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 ])
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -800,7 +804,7 @@ dnl
 			 struct super_operations.read_inode2,
 			 struct kstatfs.f_type], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -830,7 +834,7 @@ dnl
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -864,7 +868,7 @@ dnl
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
