@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/06 11:37:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/27 22:42:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,17 +45,23 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:37:50 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:42:07 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/10/27 22:42:07  brian
+# - corrected --disable-devel build
+#
 # Revision 0.9.2.4  2006/03/06 11:37:50  brian
 # - updated headers
 #
 # =============================================================================
 
 include ../../am/openss7.am
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 MANMACRO_PFX			= iperf
 
@@ -64,6 +70,9 @@ man_MANS = \
 
 dist_noinst_MANS = \
 	man1/iperf.1.man
+
+## PKG_BUILD_INDEP
+endif
 
 include ../../am/man.am
 

@@ -62,7 +62,7 @@ endif
 
 SUBDIRS += src
 
-if PKG_BUILD_INDEP
+if DEVELOPMENT
 SUBDIRS += doc
 endif
 
