@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:31 $
+ @(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:52:31 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 22:57:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:31 $"
+#ident "@(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:18 $"
 
-static char const ident[] = "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:31 $";
+static char const ident[] = "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:18 $";
 
 /*
  *  This file contains all the algorithms for generating MAC for SCTP cookies
@@ -79,7 +79,7 @@ static char const ident[] = "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.
 #endif
 
 #ifdef LINUX
-#   include <linux/config.h>
+#   include <linux/autoconf.h>
 #   include <linux/version.h>
 #   ifndef HAVE_SYS_LIS_MODULE_H
 #	include <linux/module.h>

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/17 12:12:40 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/27 22:57:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/17 12:12:40 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:57:17 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.55  2006/10/27 22:57:17  brian
+# - changes for build on 2.6.18 kernel
+#
 # Revision 0.9.2.54  2006/10/17 12:12:40  brian
 # - working up new packages
 #
@@ -385,7 +388,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 	    CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <net/ip.h>
 #include <net/icmp.h>
@@ -404,7 +407,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
 			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -425,7 +428,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 #include <linux/sched.h>
     ])
     _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -438,7 +441,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
 			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -464,7 +467,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 			struct inet_protocol,
 			struct net_protocol], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -491,7 +494,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 ])
     _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -519,7 +522,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
 			  struct dst_entry.path], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -592,7 +595,7 @@ dnl 	])
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -619,7 +622,7 @@ dnl 	])
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -644,7 +647,7 @@ dnl 	])
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 3 arguments], [linux_cv_have___ip_select_ident_3_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -677,7 +680,7 @@ dnl 	fi
 	AC_CACHE_CHECK([for kernel skb_linearize with 1 argument], [linux_cv_have_skb_linearize_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/skbuff.h>]],
@@ -696,7 +699,7 @@ dnl 	fi
 	    AC_CHECK_MEMBER([struct inet_protocol.protocol],
 		[linux_cv_inet_protocol_style='old'],
 		[:], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -708,7 +711,7 @@ dnl 	fi
 	    AC_CHECK_MEMBER([struct inet_protocol.no_policy],
 		[linux_cv_inet_protocol_style='new'],
 		[:], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -720,7 +723,7 @@ dnl 	fi
 	    AC_CHECK_MEMBER([struct dst_entry.path],
 		[linux_cv_dst_entry_path='yes'],
 		[linux_cv_dst_entry_path='no'], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -769,7 +772,7 @@ dnl 	fi
 	    AC_DEFINE([HAVE_STRUCT_SOCKADDR_STORAGE], [1], [Most 2.4
 		kernels do not define struct sockaddr_storage.  Define to 1 if
 		your kernel supports struct sockaddr_storage.])], [:], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -793,7 +796,7 @@ dnl
 			  struct sock.protinfo.af_inet.ttl,
 			  struct sock.protinfo.af_inet.uc_ttl,
 			  struct sock.tp_pinfo.af_sctp], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -828,7 +831,7 @@ dnl
 						    undefined for either the transitional Linux 2.6
 						    or older Linux 2.4 socket structure.])], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -843,7 +846,7 @@ dnl
 						    style struct sock.  Otherwise leave undefined
 						    for the new Linux 2.6 struct sock.])], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -855,7 +858,7 @@ dnl
     _LINUX_CHECK_MEMBERS([struct sock.sk_localroute,
 			  struct sock.sk_debug], [], [], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -869,7 +872,7 @@ dnl
 			   tcp_set_skb_tso_segs,
 			   tcp_set_skb_tso_factor], [], [])
     _LINUX_CHECK_FUNCS([inet_csk], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -885,7 +888,7 @@ dnl
 	AC_CACHE_CHECK([for kernel function tcp_set_skb_tso_segs with sock argument], [linux_cv_tcp_set_skb_tso_segs_sock], [
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -915,7 +918,7 @@ dnl These are SCTP-only checks
 dnl
     _LINUX_CHECK_HEADERS([linux/percpu.h], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

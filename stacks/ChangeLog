@@ -1,3 +1,32 @@
+2006-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_adler32.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_cache.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_cookie.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_crc32c.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_hash.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_hmac_md5.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_hmac_sha1.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_input.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_md5.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_msg.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_n.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_output.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_route.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_sha1.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sctp/sctp_t.c: change linux/config.h to autoconf.h for 2.6.18
+
+	* src/include/ss7/lmi.h: changes for 32-bit compatibility
+	* src/include/ss7/sdli_ioctl.h: changes for 32-bit compatibility
+	* src/include/ss7/sdti_ioctl.h: changes for 32-bit compatibility
+	* src/include/ss7/sli_ioctl.h: changes for 32-bit compatibility
+	* src/test/m2pa/test-m2pa.c: changes for 32-bit compatibility
+	* src/test/sl/test-q781.c: changes for 32-bit compatibility
+	* src/test/x400p-ss7/test-x100p.c: changes for 32-bit compatibility
+	* src/test/x400p-ss7/test-x400p.c: changes for 32-bit compatibility
+
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.lsm.in: updated streams release number

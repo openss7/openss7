@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:32 $
+ @(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:57:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:52:32 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 22:57:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:32 $"
+#ident "@(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:57:19 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/26 00:52:32 $";
+    "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:57:19 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/compiler.h>
 #include <linux/types.h>

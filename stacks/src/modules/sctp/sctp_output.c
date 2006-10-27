@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:32 $
+ @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:52:32 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 22:57:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:32 $"
+#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:19 $"
 
-static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/26 00:52:32 $";
+static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:19 $";
 
 #define __NO_VERSION__
 
@@ -72,7 +72,7 @@ static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.
 #endif
 
 #ifdef LINUX
-#   include <linux/config.h>
+#   include <linux/autoconf.h>
 #   include <linux/version.h>
 #   ifndef HAVE_SYS_LIS_MODULE_H
 #	include <linux/module.h>
