@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/12 10:18:30 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/27 22:44:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/12 10:18:30 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:44:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -237,7 +237,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 	    CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <net/ip.h>
 #include <net/icmp.h>
@@ -256,7 +256,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
 			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -277,7 +277,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <linux/sched.h>
     ])
     _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -290,7 +290,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
 			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -315,7 +315,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			struct inet_protocol,
 			struct net_protocol], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -341,7 +341,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
     ])
     _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -369,7 +369,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
 			  struct dst_entry.path], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -442,7 +442,7 @@ dnl 	])
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -469,7 +469,7 @@ dnl 	])
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -494,7 +494,7 @@ dnl 	])
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 3 arguments], [linux_cv_have___ip_select_ident_3_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -527,7 +527,7 @@ dnl 	fi
 	AC_CACHE_CHECK([for kernel sk_filter with 2 arguments], [linux_cv_have_sk_filter_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -545,7 +545,7 @@ dnl 	fi
 	AC_CACHE_CHECK([for kernel sk_filter with 3 arguments], [linux_cv_have_sk_filter_3_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -563,7 +563,7 @@ dnl 	fi
 	AC_CACHE_CHECK([for kernel skb_linearize with 1 argument], [linux_cv_have_skb_linearize_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/skbuff.h>]],
@@ -578,7 +578,7 @@ dnl 	fi
     ])
     _LINUX_KERNEL_SYMBOLS([inet_proto_lock, inet_protos])
     _LINUX_CHECK_HEADERS([net/xfrm.h net/dst.h], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/sysctl.h>
 #include <linux/types.h>
 #include <linux/fcntl.h>
@@ -596,7 +596,7 @@ dnl 	fi
 #include <net/inet_common.h>
     ])
     _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -613,7 +613,7 @@ dnl 	fi
 			  struct sock.protinfo.af_inet.ttl,
 			  struct sock.protinfo.af_inet.uc_ttl,
 			  struct sock.tp_pinfo.af_sctp], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -628,7 +628,7 @@ dnl 	fi
 #endif
     ])
     _LINUX_CHECK_FUNCS([dst_pmtu], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -685,7 +685,7 @@ dnl 	fi
 	    CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $CPPFLAGS"
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -744,7 +744,7 @@ if (sizeof(system_sk_buff_structure.cb) < sizeof(mycb)) {
 	    CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $CPPFLAGS"
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>

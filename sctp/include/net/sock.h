@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sock.h,v 0.9.2.3 2005/07/18 11:56:32 brian Exp $
+ @(#) $Id: sock.h,v 0.9.2.4 2006/10/27 22:44:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:56:32 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 22:44:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_NET_NET_SOCK_H__
 #define __OS7_NET_NET_SOCK_H__
 
-#ident "@(#) $RCSfile: sock.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sock.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/timer.h>
 #include <linux/cache.h>
 #include <linux/in.h>		/* struct sockaddr_in */

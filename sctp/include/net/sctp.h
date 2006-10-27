@@ -55,7 +55,7 @@
 
 #ident "@(#) sctp.h,v LINUX-2-4-20-SCTP(1.1.6.4) 2004/02/09 17:33:55"
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/slab.h>
 #include <linux/poll.h>
 #include <net/checksum.h>

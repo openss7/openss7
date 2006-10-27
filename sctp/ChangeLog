@@ -1,3 +1,17 @@
+2006-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: change linux/config.h to autoconf.h for 2.6.18
+	* include/net/sctp.h: change linux/config.h to autoconf.h for 2.6.18
+	* include/net/sock.h: change linux/config.h to autoconf.h for 2.6.18
+	* src/sctp.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/sctp_adler32.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/sctp_crc32c.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/sctp_glue.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/sctp_hmac_md5.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/sctp_hmac_sha1.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/sctp_md5.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/sctp_sha1.c: change linux/config.h to autoconf.h for 2.6.18
+
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/sctp.refs: updated streams release number
