@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/03 12:06:12 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/27 22:56:34 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 12:06:12 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 22:56:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.16  2006/10/27 22:56:34  brian
+ - changes for 32-bit compatibility
+
  Revision 0.9.2.15  2006/03/03 12:06:12  brian
  - 32/64-bit compatibility
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/03 12:06:12 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/27 22:56:34 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/03/03 12:06:12 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/27 22:56:34 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -2323,7 +2326,7 @@ iut_decode_msg(char *buf)
 		}
 		return UNKNOWN;
 	default:
-		printf("                                             !(unknown %5ld)       \n", p->sl.sl_primitive);
+		printf("                                             !(unknown %5ld)       \n", (long)p->sl.sl_primitive);
 		FFLUSH(stdout);
 		return UNKNOWN;
 	}
