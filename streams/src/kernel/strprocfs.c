@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/12 10:22:50 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/27 23:19:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:22:50 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 0.9.2.55  2006/10/27 23:19:36  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.54  2006/10/12 10:22:50  brian
  - removed redundant debug flags
 
@@ -68,12 +71,12 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/12 10:22:50 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/27 23:19:36 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/10/12 10:22:50 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/27 23:19:36 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

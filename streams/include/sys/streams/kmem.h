@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.19 2006/02/22 11:35:46 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.20 2006/10/27 23:19:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/22 11:35:46 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: kmem.h,v $
+ Revision 0.9.2.20  2006/10/27 23:19:32  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.19  2006/02/22 11:35:46  brian
  - added __x86_64__ and __k8__ to regparms
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_STREAMS_KMEM_H__
 #define __SYS_STREAMS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_KMEM_H__
 #warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
@@ -86,7 +89,7 @@
 #define __STREAMS_EXTERN __EXTERN streams_fastcall
 #endif
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/module.h>
 #include <linux/types.h>	/* for various types */
 

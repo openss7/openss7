@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.170 $) $Date: 2006/10/21 12:00:12 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2006/10/27 23:19:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 12:00:12 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.171  2006/10/27 23:19:40  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.170  2006/10/21 12:00:12  brian
  - missing checkins
 
@@ -169,16 +172,16 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.170 $) $Date: 2006/10/21 12:00:12 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2006/10/27 23:19:40 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.170 $) $Date: 2006/10/21 12:00:12 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2006/10/27 23:19:40 $";
 
 //#define __NO_VERSION__
 
 #include <stdbool.h>		/* for bool type, true and false */
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -273,7 +276,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.170 $) $Date: 2006/10/21 12:00:12 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2006/10/27 23:19:40 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -4340,7 +4343,11 @@ stropen(struct inode *inode, struct file *file)
  *  afterward. (XXX: I think this is now covered with the call to straccess() below.)
  */
 STATIC __unlikely int
+#ifdef HAVE_FILE_OPERATIONS_FLUSH_FL_OWNER_T
+strflush(struct file *file, fl_owner_t id)
+#else
 strflush(struct file *file)
+#endif
 {
 	int err = -ENOSTR;
 	struct stdata *sd;

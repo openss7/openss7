@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/09/29 11:50:26 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/27 23:19:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:50:26 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/09/29 11:50:26 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/27 23:19:34 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/09/29 11:50:26 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/27 23:19:34 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/09/29 11:50:26 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/27 23:19:34 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"

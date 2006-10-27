@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:22:47 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:22:47 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.8  2006/10/27 23:19:34  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.7  2006/10/12 10:22:47  brian
  - removed redundant debug flags
 
@@ -74,9 +77,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:22:47 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:34 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:22:47 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:34 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.7 $) 
  *  more complicated driver and module.
  */
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -104,7 +107,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.7 $) 
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:22:47 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:34 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"

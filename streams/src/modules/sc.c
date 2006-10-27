@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:09:13 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/27 23:19:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/23 11:09:13 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.49  2006/10/27 23:19:40  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.48  2006/08/23 11:09:13  brian
  - rationalized to strutil
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:09:13 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/27 23:19:40 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:09:13 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/27 23:19:40 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -82,7 +85,7 @@ static char const ident[] =
  *  be pushed over that module or over the NULS (Null STREAM) driver.
  */
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -101,7 +104,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/08/23 11:09:13 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/27 23:19:40 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"

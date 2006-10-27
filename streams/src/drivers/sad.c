@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:15 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/10/27 23:19:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:15 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 0.9.2.48  2006/10/27 23:19:34  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.47  2006/07/24 09:01:15  brian
  - results of udp2 optimizations
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:15 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/10/27 23:19:34 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:15 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/10/27 23:19:34 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -84,7 +87,7 @@ static char const ident[] =
  * for both because they are known to the Stream head.
  */
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -101,7 +104,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/07/24 09:01:15 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/10/27 23:19:34 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"

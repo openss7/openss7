@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/08/16 07:47:29 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/10/27 23:19:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:29 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.134  2006/10/27 23:19:38  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.133  2006/08/16 07:47:29  brian
  - add security.h header file to avoid ptrace conflict, SLES changes
 
@@ -86,12 +89,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/08/16 07:47:29 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/10/27 23:19:38 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2006/08/16 07:47:29 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/10/27 23:19:38 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
+#include <linux/compile.h>
+#ifdef HAVE_KINC_LINUX_UTSRELEASE_H
+#include <linux/utsrelease.h>
+#endif
+#include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
 

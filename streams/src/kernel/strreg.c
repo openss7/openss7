@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/10/12 10:22:50 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/10/27 23:19:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:22:50 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/10/12 10:22:50 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/10/27 23:19:36 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/10/12 10:22:50 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/10/27 23:19:36 $";
 
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

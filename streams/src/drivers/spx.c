@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/09/29 11:50:26 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/27 23:19:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:50:26 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/09/29 11:50:26 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/27 23:19:34 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/09/29 11:50:26 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/27 23:19:34 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/09/29 11:50:26 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/27 23:19:34 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"

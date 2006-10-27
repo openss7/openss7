@@ -1,3 +1,65 @@
+2006-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: change linux/config.h to autoconf.h for 2.6.18
+	  - added checks for header files linux/compile.h (old)
+	    linux/utsrelease.h (new) and linux/devfs_fs_kernel.h (no longer
+	    present)
+	  - check for simple_statfs
+	  - check for i_private member of inode struct
+	  - check for i_blksize member of inode struct
+	  - check for file_operations.flush with two arguments
+	  - check for super_operations.statfs with dentry instead of super block
+	  - check for file_system_type.get_sb with vfsmount argument
+	* include/sys/streams/ddi.h: do not care about UTS_VERSION or UTS_RELEASE
+	* include/sys/streams/dki.h: change linux/config.h to autoconf.h for 2.6.18
+	* include/sys/streams/kmem.h: change linux/config.h to autoconf.h for 2.6.18
+	* include/sys/streams/stream.h: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/clone.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/echo.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/fifo.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/log.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/loop.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/mux.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/nsdev.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/nuls.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/pipe.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sad.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sfx.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/spx.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/vf.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strattach.c:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - do not include devfs_fs_kernel.h if not available
+	* src/kernel/strlookup.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strmain.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strpipe.c:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - do not include devfs_fs_kernel.h if not available
+	* src/kernel/strprocfs.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strreg.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strsad.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strsched.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strspecfs.c:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - change u.generic_ip to i_private
+	  - spec_statfs needs dentry argument on 2.6.18
+	  - specfs_get_sb needs vfsmount argument on 2.6.18
+	  - do not reference i_blksize if not available
+	* src/kernel/strsyms.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strsysctl.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/kernel/strutil.c:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - include compile.h and utsrelease.h if available
+	* src/modules/bufmod.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/connld.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/nullmod.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/pipemod.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sc.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/modules/sth.c:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - strflush needs fl_owner_t argument on 2.6.18
+	* src/modules/testmod.c: change linux/config.h to autoconf.h for 2.6.18
+
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/SPG.texi: updated LiS release number

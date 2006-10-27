@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/10/21 12:00:09 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/10/27 23:19:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 12:00:09 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.148  2006/10/27 23:19:37  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.147  2006/10/21 12:00:09  brian
  - missing checkins
 
@@ -125,12 +128,12 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/10/21 12:00:09 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/10/27 23:19:37 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2006/10/21 12:00:09 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/10/27 23:19:37 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

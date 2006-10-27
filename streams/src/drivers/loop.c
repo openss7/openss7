@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/12 10:22:47 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:19:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:22:47 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/12 10:22:47 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:19:34 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/12 10:22:47 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:19:34 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -62,7 +62,7 @@ static char const ident[] =
  *  module beneath each STREAM head.  Upper level STREAMS are linked together using ioctl()
  *  commands contained in <sys/loop.h>.
  */
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/12 10:22:47 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:19:34 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"

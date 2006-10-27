@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/08/16 07:47:29 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/27 23:19:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:29 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsysctl.c,v $
+ Revision 0.9.2.39  2006/10/27 23:19:38  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.38  2006/08/16 07:47:29  brian
  - add security.h header file to avoid ptrace conflict, SLES changes
 
@@ -58,12 +61,12 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/08/16 07:47:29 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/27 23:19:38 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/08/16 07:47:29 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/27 23:19:38 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

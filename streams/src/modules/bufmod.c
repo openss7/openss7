@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:20 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:20 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.8  2006/10/27 23:19:40  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.7  2006/07/24 09:01:20  brian
  - results of udp2 optimizations
 
@@ -75,10 +78,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:20 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:40 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:20 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:40 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -91,7 +94,7 @@ static char const ident[] =
  *  verifying various internal STREAMS functions.
  */
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -106,7 +109,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/07/24 09:01:20 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:40 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"

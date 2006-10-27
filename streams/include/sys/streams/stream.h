@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.90 2006/09/01 08:45:48 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.91 2006/10/27 23:19:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/01 08:45:48 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.91  2006/10/27 23:19:32  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.90  2006/09/01 08:45:48  brian
  - bug fixes reported by Neil Fagan
 
@@ -89,7 +92,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.90 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.91 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -103,7 +106,7 @@
 #define HAVE_LINUX_FAST_STREAMS
 #endif				/* HAVE_LINUX_FAST_STREAMS */
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/module.h>
 #include <linux/types.h>	/* for various types */
 

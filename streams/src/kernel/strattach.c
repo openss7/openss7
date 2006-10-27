@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/08/16 07:47:28 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/27 23:19:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:28 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/08/16 07:47:28 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/27 23:19:36 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/08/16 07:47:28 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/27 23:19:36 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -65,7 +65,9 @@ static char const ident[] =
 #include <linux/init.h>
 #include <linux/quotaops.h>
 #include <linux/acct.h>
+#ifdef HAVE_KINC_LINUX_DEVFS_FS_KERNEL_H
 #include <linux/devfs_fs_kernel.h>
+#endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 

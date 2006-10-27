@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/10/12 10:22:51 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/10/27 23:19:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:22:51 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/10/12 10:22:51 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/10/27 23:19:37 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/10/12 10:22:51 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/10/27 23:19:37 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -104,7 +104,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2006/10/12 10:22:51 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/10/27 23:19:37 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -175,7 +175,7 @@ MODULE_ALIAS("/dev/streams/*");
    |          |                 |  |                       ______||        |                |                
    |__________|                 |  |                      |       |        |                |                
    |          |                 |  |                      | ______|        |                |                
-   |__________|                 |  | u.generic_ip         || u.generic_ip  |                |                
+   |__________|                 |  | i_private            || i_private     |                |                
                                 |  |                      ||               |                |                
                              ___v__|___             ______||__             |                |                
                     +------>|          |<-.        |          |<--. i_pipe |                |                
@@ -216,7 +216,7 @@ MODULE_ALIAS("/dev/streams/*");
       minor.  The minor inode can be found using an iget() lookup by inode number calculated from
       the internal major and minor device numbers.  The i_pipe pointer for the inode can be checked
       to see if an stdata structure already exists.  If there is a devnode structure associated with
-      the inode (u.generic_ip pointer) then minor device specifications and and autopush lists can
+      the inode (i_private pointer) then minor device specifications and and autopush lists can
       be determined from the devnode structure.  The superblock inode_create operation will create a
       new inode and associate it with a devnode if one exists for the minor device instance.
                                                                                                              
@@ -256,6 +256,10 @@ MODULE_ALIAS("/dev/streams/*");
     --------------------------------------------------------------------------------------------------------
  */
 
+#ifndef HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
+#define i_private u.generic_ip
+#endif
+
 /* we want macro versions of these */
 
 #undef getmajor
@@ -289,7 +293,7 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 		return ERR_PTR(-ENOMEM);
 	}
 	if (snode->i_state & I_NEW) {
-		snode->u.generic_ip = cdev;
+		snode->i_private = cdev;
 		sb->s_op->read_inode(snode);
 		unlock_new_inode(snode);
 	}
@@ -455,7 +459,7 @@ EXPORT_SYMBOL_NOVERS(spec_open);
  *  The inode numbers of these directories are made up of '0' as the major device number and the
  *  first registered major device number as the minor device number.  Whenever a STREAMS device is
  *  registered, it appears under the root directory.  We hang the cdevsw table entry off of the
- *  u.generic_ip pointer (but we could actually put it right inside the inode).
+ *  i_private pointer (but we could actually put it right inside the inode).
  *
  *  if someone goes to look up a name in a specific device directory and the name does not exist, we
  *  try to load a module with the name streams-%s-%s.o where the first string is the major device
@@ -463,7 +467,7 @@ EXPORT_SYMBOL_NOVERS(spec_open);
  *  directory for autoloading devices.  Then we just repeat the lookup and echo back whatever
  *  appeared (or didn't).
  *
- *  Directory inodes can exist after the module has been unloaded, so we cannot use the u.generic_ip
+ *  Directory inodes can exist after the module has been unloaded, so we cannot use the i_private
  *  pointer, we need to get the cdev entry from the inode number again.
  */
 #if defined HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
@@ -575,7 +579,7 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 		file->f_pos++;
 		/* fall through */
 	default:
-		/* Cannot take cdevsw structure pointer from u.generic_ip because the directory
+		/* Cannot take cdevsw structure pointer from i_private because the directory
 		   inode might exist even though the module is unloaded.  So we need to look it up
 		   again, but without locks... */
 		if ((cdev = cdrv_get(getminor(dentry->d_inode->i_ino)))) {
@@ -904,9 +908,9 @@ spec_parse_options(char *options, struct spec_sb_info *sbi)
 STATIC void
 spec_read_inode(struct inode *inode)
 {
-	struct cdevsw *cdev = inode->u.generic_ip;
+	struct cdevsw *cdev = inode->i_private;
 
-	/* generic_ip is just another way of passing another argument to iget() */
+	/* i_private is just another way of passing another argument to iget() */
 	_printd(("%s: reading inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
 	if (!cdev)
 		goto bad_inode;
@@ -959,7 +963,7 @@ spec_read_inode(struct inode *inode)
 		inode->i_nlink = 2;
 	}
 	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
-	inode->u.generic_ip = NULL;	/* done with it */
+	inode->i_private = NULL;	/* done with it */
 	return;
       bad_inode:
 	_ptrace(("bad inode no %lu\n", inode->i_ino));
@@ -990,7 +994,7 @@ spec_read_inode(struct inode *inode)
 STATIC void
 spec_read_inode2(struct inode *inode, void *opaque)
 {
-	inode->u.generic_ip = opaque;
+	inode->i_private = opaque;
 	return spec_read_inode(inode);
 }
 #endif
@@ -1039,7 +1043,7 @@ spec_put_inode(struct inode *inode)
  *  have an i_pipe pointer set.
  *
  *  Because the inode numbers are controls and the mode of the inode is controlled by us, we can
- *  know what type of underlying structure may be hanging off of the u.generic_ip pointer.
+ *  know what type of underlying structure may be hanging off of the i_private pointer.
  */
 STATIC void
 spec_delete_inode(struct inode *inode)
@@ -1048,25 +1052,25 @@ spec_delete_inode(struct inode *inode)
 	switch (inode->i_mode & S_IFMT) {
 	case S_IFDIR:
 		/* directory inodes potentially have a cdevsw structure hanging off of the
-		   u.generic_ip pointer, these are for sanity checks only. When we referemce the
+		   i_private pointer, these are for sanity checks only. When we referemce the
 		   inode from the module structure, we hold a reference count on the inode.  We
-		   should never get here with either the u.generic_ip pointer set or the d_inode
+		   should never get here with either the i_private pointer set or the d_inode
 		   reference still held.  Forced deletions might get us here anyway. */
-		assert(inode->u.generic_ip == NULL);
+		assert(inode->i_private == NULL);
 		break;
 	case S_IFCHR:
 		/* character special device inodes potentially have a minor devnode structure
-		   hanging off of the u.generic_ip pointer and stream heads hanging off of the
+		   hanging off of the i_private pointer and stream heads hanging off of the
 		   i_pipe pointer. When we reference the inode from the devnode structure, we hold
 		   a reference count on the inode.  We should never get here with either the
-		   u.generic_ip pointer set or the n_inode reference still held.  Forced deletions
+		   i_private pointer set or the n_inode reference still held.  Forced deletions
 		   might get us here anyway. */
-		assert(inode->u.generic_ip == NULL);
+		assert(inode->i_private == NULL);
 		/* fall through */
 	default:
 	case S_IFIFO:
 		/* unnamed pipe inodes potentially have stream heads hanging off of the i_pipe
-		   pointer and nothing hanging off of the u.generic_ip pointer. */
+		   pointer and nothing hanging off of the i_private pointer. */
 	case S_IFSOCK:
 		/* socket inodes potentially have stream heads hanging off of the i_pipe pointer
 		   and nothing hanging off of the u.generic_ip_pointer. */
@@ -1113,6 +1117,16 @@ spec_put_super(struct super_block *sb)
  *  @sb:	super block
  *  @buf:	buffer for statfs data
  */
+#if defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY
+STATIC int
+spec_statfs(struct dentry *dentry, struct kstatfs *buf)
+{
+	buf->f_type = dentry->d_sb->s_magic;
+	buf->f_bsize = PAGE_CACHE_SIZE;
+	buf->f_namelen = NAME_MAX;
+	return 0;
+}
+#else				/* defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY */
 #if defined HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE
 STATIC int
 spec_statfs(struct super_block *sb, struct kstatfs *buf)
@@ -1121,12 +1135,12 @@ STATIC int
 spec_statfs(struct super_block *sb, struct statfs *buf)
 #endif
 {
-	(void) sb;
 	buf->f_type = sb->s_magic;
 	buf->f_bsize = PAGE_CACHE_SIZE;
 	buf->f_namelen = NAME_MAX;
 	return 0;
 }
+#endif				/* defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY */
 
 /**
  *  spec_remount_fs: - remount the shadow special filesystem
@@ -1179,12 +1193,14 @@ spec_clear_inode(struct inode *inode)
 	stri_unlock(inode);
 }
 
+#if 0
 STATIC void
 spec_umount_begin(struct super_block *sb)
 {
 	(void) sb;
 	return;
 }
+#endif
 
 STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 	.read_inode = spec_read_inode,
@@ -1197,7 +1213,9 @@ STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 	.statfs = spec_statfs,		/* like simple_statfs */
 	.remount_fs = spec_remount_fs,
 	.clear_inode = spec_clear_inode,
+#if 0
 	.umount_begin = spec_umount_begin,
+#endif
 };
 
 /* TODO: handle extended attributes */
@@ -1233,7 +1251,9 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	inode->i_ino = -1UL;	/* unused (non-zero) inode number */
 	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
 	inode->i_blocks = 0;
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_BLKSIZE
 	inode->i_blksize = 1024;
+#endif
 	inode->i_uid = inode->i_gid = 0;
 	inode->i_mode = S_IFDIR | S_IRUGO | S_IXUGO | S_IWUSR;
 	inode->i_op = &spec_root_i_ops;
@@ -1260,12 +1280,22 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 }
 
 #ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
+#ifdef HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT
+STATIC int
+specfs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *data,
+	      struct vfsmount *mnt)
+{
+	_ptrace(("reading superblock\n"));
+	return get_sb_single(fs_type, flags, data, specfs_fill_super, mnt);
+}
+#else				/* HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT */
 STATIC struct super_block *
 specfs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *data)
 {
 	_ptrace(("reading superblock\n"));
 	return get_sb_single(fs_type, flags, data, specfs_fill_super);
 }
+#endif				/* HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT */
 STATIC void
 specfs_kill_sb(struct super_block *sb)
 {

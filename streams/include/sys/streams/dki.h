@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.15 2005/12/19 12:44:53 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.16 2006/10/27 23:19:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DKI_H__
 #define __SYS_STREAMS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 12:44:53 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/27 23:19:32 $"
 
 #ifndef __SYS_DKI_H__
 #warning "Do no include sys/streams/dki.h directly, include sys/dki.h instead."
@@ -62,7 +62,7 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/types.h>
 #include <linux/kdev_t.h>
 

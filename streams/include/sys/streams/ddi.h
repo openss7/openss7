@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.38 2006/09/01 08:45:48 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.39 2006/10/27 23:19:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/01 08:45:48 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:19:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.39  2006/10/27 23:19:32  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.38  2006/09/01 08:45:48  brian
  - bug fixes reported by Neil Fagan
 
@@ -66,7 +69,7 @@
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.38 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.39 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_DDI_H__
 #warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -99,12 +102,6 @@
 #endif				/* __STRUTIL_EXTERN_INLINE */
 
 #include <asm/uaccess.h>	/* for copy_[to|from]_user */
-#if 0
-#include <linux/compile.h>	/* for UTS_VERSION */
-#else
-#define UTS_VERSION ""
-#endif
-#include <linux/version.h>	/* for UTS_RELEASE */
 #include <asm/delay.h>		/* for udelay */
 #include <sys/dki.h>
 #if 0
