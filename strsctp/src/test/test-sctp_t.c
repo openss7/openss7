@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/21 19:55:40 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/27 23:10:14 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 19:55:40 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:10:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.21  2006/10/27 23:10:14  brian
+ - rationalized to new test suites
+
  Revision 0.9.2.20  2006/10/21 19:55:40  brian
  - a couple more test case corrections
 
@@ -105,9 +108,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/21 19:55:40 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/27 23:10:14 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/21 19:55:40 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/27 23:10:14 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -3610,6 +3613,7 @@ test_isastream(int child)
 	return (__RESULT_SUCCESS);
 }
 
+#if 0
 int
 test_poll(int child, const short events, short *revents, long ms)
 {
@@ -3626,6 +3630,7 @@ test_poll(int child, const short events, short *revents, long ms)
 		*revents = pfd.revents;
 	return (__RESULT_SUCCESS);
 }
+#endif
 
 int
 test_pipe(int child)
