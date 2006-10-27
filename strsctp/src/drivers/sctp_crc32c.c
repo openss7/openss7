@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/29 07:44:22 $
+ @(#) $RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:10:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:44:22 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:10:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/29 07:44:22 $"
+#ident "@(#) $RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:10:56 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/07/29 07:44:22 $";
+    "$RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:10:56 $";
 
 #undef _DEBUG
 #undef SCTP_CONFIG_DEBUG
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/compiler.h>
 #include <linux/types.h>

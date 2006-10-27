@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 00:54:52 $
+ @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:10:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:54:52 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:10:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 00:54:52 $"
+#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:10:56 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/26 00:54:52 $";
+    "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:10:56 $";
 
 #define __NO_VERSION__
 
@@ -73,7 +73,7 @@ static char const ident[] =
 #endif
 
 #ifdef LINUX
-#   include <linux/config.h>
+#   include <linux/autoconf.h>
 #   include <linux/version.h>
 #   ifndef HAVE_SYS_LIS_MODULE_H
 #	include <linux/module.h>

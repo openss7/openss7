@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/07 00:49:40 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/27 23:10:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 00:49:40 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:10:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp.c,v $
+ Revision 0.9.2.11  2006/10/27 23:10:56  brian
+ - changes for 2.6.18 kernel
+
  Revision 0.9.2.10  2006/03/07 00:49:40  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/07 00:49:40 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/27 23:10:56 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/07 00:49:40 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/27 23:10:56 $";
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
@@ -76,7 +79,7 @@ static char const ident[] =
 #endif
 
 #ifdef LINUX
-#   include <linux/config.h>
+#   include <linux/autoconf.h>
 #   include <linux/version.h>
 #   ifndef HAVE_SYS_LIS_MODULE_H
 #	include <linux/module.h>
@@ -172,7 +175,7 @@ struct sockaddr_storage {
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/03/07 00:49:40 $"
+#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/27 23:10:56 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

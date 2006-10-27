@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $
+ @(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/27 23:10:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 23:10:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $"
+#ident "@(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/27 23:10:56 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $";
+    "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/27 23:10:56 $";
 
 /*
  *  This file contains all the algorithms for generating MAC for SCTP cookies
@@ -80,7 +80,7 @@ static char const ident[] =
 #endif
 
 #ifdef LINUX
-#   include <linux/config.h>
+#   include <linux/autoconf.h>
 #   include <linux/version.h>
 #   ifndef HAVE_SYS_LIS_MODULE_H
 #	include <linux/module.h>

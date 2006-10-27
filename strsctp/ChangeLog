@@ -1,3 +1,27 @@
+2006-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_adler32.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_cache.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_cookie.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_crc32c.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_hash.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_hmac_md5.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_hmac_sha1.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_input.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_md5.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_msg.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_n.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_output.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_route.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_sha1.c: change linux/config.h to autoconf.h for 2.6.18
+	* src/drivers/sctp_t.c: change linux/config.h to autoconf.h for 2.6.18
+
+	* src/test/test-interop.c: rationalized to new test suites
+	* src/test/test-sctp_n.c: rationalized to new test suites
+	* src/test/test-sctp_t.c: rationalized to new test suites
+
 2006-10-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man8/test-interop.8.man: documented client server options
