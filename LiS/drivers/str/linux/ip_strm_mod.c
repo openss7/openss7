@@ -146,7 +146,7 @@
 # endif
 #include <linux/skbuff.h>
 
-/* #include <linux/config.h> */
+/* #include <linux/autoconf.h> */
 #include <linux/kernel.h>
 #include <linux/param.h>
 /*

@@ -74,7 +74,7 @@
 #ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.11 $) $Date: 2005/12/19 12:42:48 $"
 
 #ifdef __KERNEL__
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -499,7 +499,11 @@ extern int lis_major;
 
 #if defined(KERNEL_2_5)
 #ifdef __LIS_INTERNAL__
+#ifdef HAVE_FILE_OPERATIONS_FLUSH_FL_OWNER_T
+int lis_strflush(struct file *f, fl_owner_t id);
+#else
 extern int lis_strflush(struct file *);
+#endif
 #endif
 #endif
 

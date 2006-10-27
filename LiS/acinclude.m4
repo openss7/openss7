@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.49 $) $Date: 2006/09/18 13:20:05 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.50 $) $Date: 2006/10/27 22:38:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 13:20:05 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:38:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.50  2006/10/27 22:38:53  brian
+# - changes for 2.6.18 build
+#
 # Revision 1.1.6.49  2006/09/18 13:20:05  brian
 # - better directory detection
 #
@@ -469,9 +472,10 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
 			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
-			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h], [:], [:], [
+			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/smp_lock.h \
+			  linux/devfs_fs_kernel.h linux/utsrelease.h], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -485,6 +489,11 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/sched.h>
 ])
     AC_SUBST([EXPOSED_SYMBOLS])dnl
+dnl
+dnl  Well, not exporting kthread_ functions is just about the stupidest thing
+dnl  I've seen from a distro yet.  SLES takes the prize for this stupidity.
+dnl
+    _LINUX_KERNEL_SYMBOLS([kthread_create, kthread_should_stop, kthread_stop, kthread_bind])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
@@ -500,9 +509,10 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			read_trylock write_trylock atomic_add_return path_lookup \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
 			num_online_cpus generic_delete_inode access_ok set_user_nice \
-			set_cpus_allowed_yield \
+			set_cpus_allowed yield \
 			prepare_to_wait prepare_to_wait_exclusive finish_wait \
-			compat_ptr register_ioctl32_conversion unregister_ioctl32_conversion], [:], [
+			compat_ptr register_ioctl32_conversion unregister_ioctl32_conversion \
+			simple_statfs], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
@@ -516,7 +526,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 				;;
 			esac ], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -564,7 +574,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			 read_trylock write_trylock num_online_cpus \
 			 cpumask_scnprintf access_ok], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -598,7 +608,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 ])
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -636,6 +646,7 @@ dnl specific information has been put in place instead.  We don't really care
 dnl one way to the other, but this check discovers which way is used.
 dnl 
     _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
+			  struct task_struct.signal,
 			  struct file_operations.flush,
 			  struct super_operations.drop_inode,
 			  struct task_struct.session,
@@ -647,9 +658,15 @@ dnl
 			  struct super_operations.read_inode2,
 			  struct kstatfs.f_type,
 			  struct kobject.kref,
-			  struct inode.i_mutex], [:], [:], [
+			  struct inode.i_mutex,
+			  struct file_operations.unlocked_ioctl,
+			  struct inode.i_lock,
+			  struct files_struct.max_fdset,
+			  struct files_struct.fdtab,
+			  struct inode.i_private,
+			  struct inode.i_blksize], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -660,6 +677,7 @@ dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
 #if HAVE_KINC_LINUX_STATFS_H
@@ -669,11 +687,17 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
+    at_ioctl_getmsg="$linux_cv_member_struct_file_operations_unlocked_ioctl"
+    AC_SUBST([at_ioctl_getmsg])dnl
+    AM_CONDITIONAL(USING_IOCTL_GETPMSG_PUTPMSG, test :$at_ioctl_getmsg = :yes)dnl
 	_LINUX_KERNEL_SYMBOLS([ioctl32_hash_table, ioctl32_sem, compat_ptr])
+	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, kill_sl, kill_proc_info, send_group_sig_info, session_of_pgrp])
 	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq_irqoff])
+	_LINUX_KERNEL_EXPORT_ONLY([__symbol_get])
+	_LINUX_KERNEL_EXPORT_ONLY([__symbol_put])
 	_LINUX_KERNEL_SYMBOL_EXPORT([put_filp])
 	_LINUX_KERNEL_ENV([dnl
 	    AC_CACHE_CHECK([for kernel inode_operation lookup with nameidata],
@@ -681,7 +705,7 @@ dnl
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -710,12 +734,114 @@ dnl
 		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [1],
 		    [Set if inode_operation lookup function takes nameidata pointer.])
 	    fi
+	    AC_CACHE_CHECK([for kernel file_operations flush with fl_owner_t],
+			   [linux_cv_have_fop_flush_fl_owner_t], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif]],
+[[struct file_operations temp;
+(*temp.flush)((struct file *)0, (fl_owner_t)0);]]) ],
+		    [linux_cv_have_fop_flush_fl_owner_t='yes'],
+		    [linux_cv_have_fop_flush_fl_owner_t='no'])
+	    ])
+	    if test :$linux_cv_have_fop_flush_fl_owner_t = :yes ; then
+		AC_DEFINE([HAVE_FILE_OPERATIONS_FLUSH_FL_OWNER_T], [1],
+			  [Set if file_operations flush function takes fl_owner_t.])
+	    fi
+	    AC_CACHE_CHECK([for kernel super_operation statfs with dentry],
+			   [linux_cv_have_sop_statfs_dentry], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif]],
+[[struct super_operations temp;
+(*temp.statfs)((struct dentry *)0, (struct kstatfs *)0);]]) ],
+		    [linux_cv_have_sop_statfs_dentry='yes'],
+		    [linux_cv_have_sop_statfs_dentry='no'])
+	    ])
+	    if test :$linux_cv_have_sop_statfs_dentry = :yes ; then
+		AC_DEFINE([HAVE_SUPER_OPERATIONS_STATFS_DENTRY], [1],
+			  [Set if super_operations statfs function takes dentry pointer.])
+	    fi
+	    AC_CACHE_CHECK([for kernel file_system_type get_sb with vfsmount],
+			   [linux_cv_have_fst_get_sb_vfsmount], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif]],
+[[struct file_system_type temp;
+(*temp.get_sb)((struct file_system_type *)0, 0, (char *)0, (void *)0, (struct vfsmount *)0);]]) ],
+		    [linux_cv_have_fst_get_sb_vfsmount='yes'],
+		    [linux_cv_have_fst_get_sb_vfsmount='no'])
+	    ])
+	    if test :$linux_cv_have_fst_get_sb_vfsmount = :yes ; then
+		AC_DEFINE([HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT], [1],
+			  [Set if file_system_type get_sb function takes vfsmount pointer.])
+	    fi
 	    AC_CACHE_CHECK([for kernel do_settimeofday with timespec],
 			   [linux_cv_have_timespec_settimeofday], [dnl
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -948,7 +1074,7 @@ AC_DEFUN([_LIS_SIGMASKLOCK], [dnl
 	AC_DEFINE([SIGMASKLOCK], [1])], [dnl
 	LIS_SIGMASKLOCK='n'], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -1069,7 +1195,7 @@ AC_DEFUN([_LIS_SET_CPUS_ALLOWED], [dnl
 	 to use the available function.]) ],
 	[LIS_SET_CPUS_ALLOWED=n], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

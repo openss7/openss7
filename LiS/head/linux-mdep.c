@@ -468,7 +468,11 @@ extern void lis_cache_destroy(kmem_cache_t *p, lis_atomic_t *c, char *label);
  * kernel should be fixed to call them when appropriate.
  */
 #if defined(KERNEL_2_5)
+#ifdef HAVE_FILE_OPERATIONS_FLUSH_FL_OWNER_T
+int lis_strflush(struct file *f, fl_owner_t id);
+#else
 int lis_strflush(struct file *f);
+#endif
 #endif
 
 /*
@@ -520,12 +524,12 @@ struct inode_operations lis_streams_iops = {
 /*
  * LiS inode structure.
  *
- * We use the generic_ip to point back to the stream head.  We also need
+ * We use the i_private to point back to the stream head.  We also need
  * a place for the LiS dev_t.  In pre-2.6 kernels the i_rdev field is a
  * "short" (16 bits).  We need 32 bits.  So for pre-2.6 kernels we define
  * a structure that we overlay at the "u" field in the inode structure.
  *
- * The 2.6 kernel got rid of the big union, leaving just the generic_ip
+ * The 2.6 kernel got rid of the big union, leaving just the i_private
  * pointer -- so there is no room for a structure overlay.  This is OK
  * because the 2.6 i_rdev is a 32-bit word, so we can use it directly.
  *
@@ -543,30 +547,35 @@ typedef struct {
 /*
  * File system operations
  */
-#if defined(KERNEL_2_5)
+#ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
+#ifdef HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT
+int lis_fs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name,
+		  void *ptr, struct vfsmount *mnt);
+#else				/* HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT */
 struct super_block *lis_fs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name,
 				  void *ptr);
+#endif				/* HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT */
 void lis_fs_kill_sb(struct super_block *);
-#else
+#else				/* HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB */
 struct super_block *lis_fs_read_super(struct super_block *sb, void *ptr, int silent);
-#endif
+#endif				/* HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB */
 
 #define LIS_FS_NAME	"LiS"
 
 struct file_system_type lis_file_system_ops = {
-	name:LIS_FS_NAME,
-#if defined(KERNEL_2_5)
-	get_sb:lis_fs_get_sb,
-	kill_sb:lis_fs_kill_sb,
-	owner:NULL,
-#else
-	read_super:lis_fs_read_super,
-	owner:NULL,
-#endif
+      name:LIS_FS_NAME,
+#ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
+      get_sb:lis_fs_get_sb,
+      kill_sb:lis_fs_kill_sb,
+      owner:NULL,
+#else				/* HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB */
+      read_super:lis_fs_read_super,
+      owner:NULL,
+#endif				/* HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB */
 #if defined(FATTACH_VIA_MOUNT)
-	fs_flags:0,
+      fs_flags:0,
 #else
-	fs_flags:(FS_NOMOUNT | FS_SINGLE),
+      fs_flags:(FS_NOMOUNT | FS_SINGLE),
 #endif
 };
 
@@ -630,11 +639,15 @@ lis_mntput_fcn(struct vfsmount *m, const char *file, int line, const char *fn)
 /*
  * Super block operations
  */
-#if defined(KERNEL_2_5)
+#if defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY
+int lis_super_statfs(struct dentry *dentry, struct kstatfs *stat);
+#else				/* defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY */
+#if defined HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE
 int lis_super_statfs(struct super_block *sb, struct kstatfs *stat);
-#else
+#else				/* defined HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE */
 int lis_super_statfs(struct super_block *sb, struct statfs *stat);
-#endif
+#endif				/* defined HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE */
+#endif				/* defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY */
 
 void lis_super_put_inode(struct inode *);
 
@@ -653,10 +666,17 @@ struct super_operations lis_super_ops = {
 	drop_inode:lis_drop_inode,
 #endif
 #if defined(FATTACH_VIA_MOUNT)
+#if 0
+	/* let this a always be called from put_super */
 	umount_begin:lis_super_umount_begin,
+#endif
 	put_super:lis_super_put_super,
 #endif
 };
+
+#ifndef HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
+#define i_private u.generic_ip
+#endif
 
 #if defined(KERNEL_2_5)
 #define S_FS_INFO(s)    ((s)->s_fs_info)
@@ -1029,7 +1049,7 @@ struct stdata *
 lis_inode_str(struct inode *i)
 {
 #if defined(KERNEL_2_5)
-	return ((struct stdata *) (i)->u.generic_ip);
+	return ((struct stdata *) (i)->i_private);
 #else
 	{
 		lis_inode_info_t *p = (lis_inode_info_t *) & i->u;
@@ -1043,7 +1063,7 @@ void
 lis_set_inode_str(struct inode *i, struct stdata *s)
 {
 #if defined(KERNEL_2_5)
-	i->u.generic_ip = (void *) s;
+	i->i_private = (void *) s;
 #else
 	lis_inode_info_t *p = (lis_inode_info_t *) & i->u;
 
@@ -1414,13 +1434,18 @@ lis_print_dentry(struct dentry *d, char *comment)
 * Return file system stats.						*
 *									*
 ************************************************************************/
-#if defined(KERNEL_2_5)
+#if defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY
+int
+lis_super_statfs(struct dentry *dentry, struct kstatfs *stat)
+#else				/* defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY */
+#if defined HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE
 int
 lis_super_statfs(struct super_block *sb, struct kstatfs *stat)
-#else
+#else				/* defined HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE */
 int
 lis_super_statfs(struct super_block *sb, struct statfs *stat)
-#endif
+#endif					/* defined HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE */
+#endif					/* defined HAVE_SUPER_OPERATIONS_STATFS_DENTRY */
 {
 	stat->f_type = LIS_SB_MAGIC;
 	stat->f_bsize = 1024;
@@ -1587,7 +1612,18 @@ lis_fs_setup_sb(struct super_block *sb, void *ptr, int silent)
 		return lis_fs_kern_mount_sb(sb, ptr, silent);
 }
 
-#if defined(KERNEL_2_5)
+#ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
+#ifdef HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT
+int
+lis_fs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *ptr, struct vfsmount *mnt)
+{
+#if defined(FATTACH_VIA_MOUNT) && 1
+	return get_sb_nodev(fs_type, flags, ptr, lis_fs_setup_sb, mnt);
+#else
+	return get_sb_single(fs_type, flags, ptr, lis_fs_setup_sb, mnt);
+#endif
+}
+#else				/* HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT */
 struct super_block *
 lis_fs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *ptr)
 {
@@ -1606,6 +1642,7 @@ lis_fs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name,
 #endif
 	return sb;
 }
+#endif				/* HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT */
 
 void
 lis_fs_kill_sb(struct super_block *sb)
@@ -2227,7 +2264,11 @@ lis_cleanup_file_closing(struct file *f, stdata_t *head)
  * lis_strflush - see file_operations
  */
 int
+#ifdef HAVE_FILE_OPERATIONS_FLUSH_FL_OWNER_T
+lis_strflush(struct file *f, fl_owner_t id)
+#else
 lis_strflush(struct file *f)
+#endif
 {
 	int err = 0;
 

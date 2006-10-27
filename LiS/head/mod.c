@@ -1239,7 +1239,7 @@ lis_find_strdev(major_t major)
 		if (initname != NULL) {	/* call initialization */
 			void (*init) (void);
 
-#if defined HAVE_KFUNC___SYMBOL_GET && defined HAVE_KFUNC___SYMBOL_PUT
+#if (defined HAVE_KFUNC___SYMBOL_GET || defined HAVE___SYMBOL_GET_EXPORT)
 			char symbolname[64];
 
 			snprintf(symbolname, 64, "%s%s", MODULE_SYMBOL_PREFIX, initname);
@@ -1252,7 +1252,7 @@ lis_find_strdev(major_t major)
 				       "in module %s for major %u\n", initname, objname, major);
 			else {
 				(*init) ();
-#if defined HAVE_KFUNC___SYMBOL_GET && defined HAVE_KFUNC___SYMBOL_PUT
+#if (defined HAVE_KFUNC___SYMBOL_PUT || defined HAVE___SYMBOL_PUT_EXPORT)
 				__symbol_put(symbolname);
 #else
 				inter_module_put(initname);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/08 22:04:50 $
+ @(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:38:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 22:04:50 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 22:38:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mod_wrap.c,v $
+ Revision 0.9.2.2  2006/10/27 22:38:58  brian
+ - changes for 2.6.18 build
+
  Revision 0.9.2.1  2006/07/08 22:04:50  brian
  - add wrapper files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/08 22:04:50 $"
+#ident "@(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:38:58 $"
 
-static char const ident[] = "$RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/07/08 22:04:50 $";
+static char const ident[] = "$RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:38:58 $";
 
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

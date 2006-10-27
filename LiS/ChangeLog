@@ -1,3 +1,37 @@
+2006-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - added check for linux/devfs_fs_kernel.h that was deleted
+	  - added check for linux/utsrelease.h that now includes UTS_RELEASE
+	  - added check for simple_statfs that might be used later
+	  - added checks from Linux Fast-STREAMS for simplicity
+	  - added checks for i_private and i_blksize (inode diet)
+	  - added checks for __symbol_get and __symbol_put exports
+	  - added check for file_operations.flush taking fl_owner_t
+	  - added check for super_operations.statfs with dentry
+	  - added check for file_system_type.get_sb with vfsmount
+	* drivers/str/echo.c: change linux/config.h to autoconf.h for 2.6.18
+	* drivers/str/mux.c: change linux/config.h to autoconf.h for 2.6.18
+	* drivers/str/nullmod.c: change linux/config.h to autoconf.h for 2.6.18
+	* drivers/str/nuls.c: change linux/config.h to autoconf.h for 2.6.18
+	* drivers/str/testmod.c: change linux/config.h to autoconf.h for 2.6.18
+	* drivers/str/linux/ip_strm_mod.c: change linux/config.h to autoconf.h for 2.6.18
+	* drivers/str/linux/liskmod.c: change linux/config.h to autoconf.h for 2.6.18
+	* head/linux-mdep.c:
+	  - use i_private instead of u.generic_ip (inode diet)
+	  - lis_fs_get_sb needs vfsmount on 2.6.18 and returns int
+	  - lis_super_statfs needs dentry on 2.6.18
+	  - lis_strflush needs fl_owner_t on 2.6.18
+	* head/mod.c:
+	  - check for __symbol_get and __symbol_put exports as well
+	* head/version.c: change linux/config.h to autoconf.h for 2.6.18
+	* include/sys/LiS/linux-mdep.h:
+	  - change linux/config.h to autoconf.h for 2.6.18
+	  - lis_strflush needs fl_owner_t on 2.6.18
+	* pkg/drv_wrap.c: change linux/config.h to autoconf.h for 2.6.18
+	* pkg/mod_wrap.c: change linux/config.h to autoconf.h for 2.6.18
+
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* man/lis.refs: updated streams release number
