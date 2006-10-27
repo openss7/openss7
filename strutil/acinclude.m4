@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/10/12 10:27:34 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/10/27 23:05:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/12 10:27:34 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 23:05:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -597,7 +597,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
 			  asm/uaccess.h], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -638,7 +638,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 				;;
 			esac ], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -680,7 +680,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 			 read_trylock write_trylock num_online_cpus \
 			 cpumask_scnprintf access_ok], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -714,7 +714,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 ])
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -761,7 +761,7 @@ dnl
 			  struct kstatfs.f_type,
 			  struct kobject.kref], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -792,7 +792,7 @@ dnl
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -826,7 +826,7 @@ dnl
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
