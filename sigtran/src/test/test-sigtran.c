@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:51 $
+ @(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:43 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/16 10:42:51 $ by $Author: brian $
+ Last Modified $Date: 2006/10/27 22:50:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sigtran.c,v $
+ Revision 0.9.2.2  2006/10/27 22:50:43  brian
+ - working up modules and testsuite
+
  Revision 0.9.2.1  2006/10/16 10:42:51  brian
  - added new package files
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:51 $"
+#ident "@(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:43 $"
 
-static char const ident[] = "$RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:51 $";
+static char const ident[] = "$RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:43 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -109,7 +112,10 @@ static char const ident[] = "$RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0
 #include <getopt.h>
 #endif
 
-#include <linux/limits.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 
 /*
@@ -139,20 +145,45 @@ static int server_host_specified = 0;
 
 static int verbose = 1;
 
-static int client_exec = 0; /* execute client side */
-static int server_exec = 0; /* execute server side */
+static int client_exec = 0;		/* execute client side */
+static int server_exec = 0;		/* execute server side */
 
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+
 //static int show_data = 1;
 
 //static int last_prim = 0;
 //static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
+#if 0
+static int PRIM_type = 0;
+static int NPI_error = 0;
+static int CONIND_number = 2;
+static int TOKEN_value = 0;
+static int SEQ_number = 1;
+static int SERV_type = N_CLNS;
+static int CURRENT_state = NS_UNBND;
+N_info_ack_t last_info = { 0, };
+static int last_prio = 0;
+
+static int DATA_xfer_flags = 0;
+static int BIND_flags = 0;
+static int RESET_orig = N_UNDEFINED;
+static int RESET_reason = 0;
+static int DISCON_reason = 0;
+static int CONN_flags = 0;
+static int ERROR_type = 0;
+static int RESERVED_field[2] = { 0, 0 };
+#endif
+
+#define TEST_PROTOCOL 132
 
 int test_fd[3] = { 0, 0, 0 };
+uint32_t bsn[3] = { 0, 0, 0 };
+uint32_t fsn[3] = { 0, 0, 0 };
 
 #define BUFSIZE 32*4096
 
@@ -163,18 +194,49 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
-#define MAXIMUM_WAIT	1000
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
 #define INFINITE_WAIT	-1
 
-static int test_duration = TEST_DURATION; /* wait on other side */
+static int test_duration = TEST_DURATION;	/* wait on other side */
+
+ulong seq[10] = { 0, };
+ulong tok[10] = { 0, };
+ulong tsn[10] = { 0, };
+ulong sid[10] = { 0, };
+ulong ssn[10] = { 0, };
+ulong ppi[10] = { 0, };
+ulong exc[10] = { 0, };
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
 
 struct strbuf ctrl = { BUFSIZE, -1, cbuf };
 struct strbuf data = { BUFSIZE, -1, dbuf };
+
+#if 0
+static int test_pflags = MSG_BAND;	/* MSG_BAND | MSG_HIPRI */
+static int test_pband = 0;
+static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
+static int test_gband = 0;
+static int test_bufsize = 256;
+static int test_nidu = 256;
+static int OPTMGMT_flags = 0;
+static struct sockaddr_in *ADDR_buffer = NULL;
+static socklen_t ADDR_length = sizeof(*ADDR_buffer);
+static struct sockaddr_in *DEST_buffer = NULL;
+static socklen_t DEST_length = 0;
+static struct sockaddr_in *SRC_buffer = NULL;
+static socklen_t SRC_length = 0;
+static unsigned char *PROTOID_buffer = NULL;
+static size_t PROTOID_length = 0;
+static char *DATA_buffer = NULL;
+static size_t DATA_length = 0;
+static int test_resfd = -1;
+static int test_timout = 200;
+static void *QOS_buffer = NULL;
+static int QOS_length = 0;
+#endif
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -186,6 +248,19 @@ struct strfdinsert fdi = {
 int flags = 0;
 
 int dummy = 0;
+
+#ifndef SCTP_VERSION_2
+#define SCTP_VERSION_2
+#endif
+
+#if 1
+#ifndef SCTP_VERSION_2
+typedef struct addr {
+	uint16_t port __attribute__ ((packed));
+	struct in_addr addr[3] __attribute__ ((packed));
+} addr_t;
+#endif				/* SCTP_VERSION_2 */
+#endif
 
 struct timeval when;
 
@@ -208,6 +283,39 @@ enum {
  */
 
 int show = 1;
+
+enum {
+	__TEST_CONN_REQ = 100, __TEST_CONN_RES, __TEST_DISCON_REQ,
+	__TEST_DATA_REQ, __TEST_EXDATA_REQ, __TEST_INFO_REQ, __TEST_BIND_REQ,
+	__TEST_UNBIND_REQ, __TEST_UNITDATA_REQ, __TEST_OPTMGMT_REQ,
+	__TEST_ORDREL_REQ, __TEST_OPTDATA_REQ, __TEST_ADDR_REQ,
+	__TEST_CAPABILITY_REQ, __TEST_CONN_IND, __TEST_CONN_CON,
+	__TEST_DISCON_IND, __TEST_DATA_IND, __TEST_EXDATA_IND,
+	__TEST_INFO_ACK, __TEST_BIND_ACK, __TEST_ERROR_ACK, __TEST_OK_ACK,
+	__TEST_UNITDATA_IND, __TEST_UDERROR_IND, __TEST_OPTMGMT_ACK,
+	__TEST_ORDREL_IND, __TEST_NRM_OPTDATA_IND, __TEST_EXP_OPTDATA_IND,
+	__TEST_ADDR_ACK, __TEST_CAPABILITY_ACK, __TEST_WRITE, __TEST_WRITEV,
+	__TEST_PUTMSG_DATA, __TEST_PUTPMSG_DATA, __TEST_PUSH, __TEST_POP,
+	__TEST_READ, __TEST_READV, __TEST_GETMSG, __TEST_GETPMSG,
+	__TEST_DATA,
+	__TEST_DATACK_REQ, __TEST_DATACK_IND, __TEST_RESET_REQ,
+	__TEST_RESET_IND, __TEST_RESET_RES, __TEST_RESET_CON,
+	__TEST_O_TI_GETINFO, __TEST_O_TI_OPTMGMT, __TEST_O_TI_BIND,
+	__TEST_O_TI_UNBIND,
+	__TEST__O_TI_GETINFO, __TEST__O_TI_OPTMGMT, __TEST__O_TI_BIND,
+	__TEST__O_TI_UNBIND, __TEST__O_TI_GETMYNAME, __TEST__O_TI_GETPEERNAME,
+	__TEST__O_TI_XTI_HELLO, __TEST__O_TI_XTI_GET_STATE,
+	__TEST__O_TI_XTI_CLEAR_EVENT, __TEST__O_TI_XTI_MODE,
+	__TEST__O_TI_TLI_MODE,
+	__TEST_TI_GETINFO, __TEST_TI_OPTMGMT, __TEST_TI_BIND,
+	__TEST_TI_UNBIND, __TEST_TI_GETMYNAME, __TEST_TI_GETPEERNAME,
+	__TEST_TI_SETMYNAME, __TEST_TI_SETPEERNAME, __TEST_TI_SYNC,
+	__TEST_TI_GETADDRS, __TEST_TI_CAPABILITY,
+	__TEST_TI_SETMYNAME_DATA, __TEST_TI_SETPEERNAME_DATA,
+	__TEST_TI_SETMYNAME_DISC, __TEST_TI_SETPEERNAME_DISC,
+	__TEST_TI_SETMYNAME_DISC_DATA, __TEST_TI_SETPEERNAME_DISC_DATA,
+	__TEST_PRIM_TOO_SHORT, __TEST_PRIM_WAY_TOO_SHORT,
+};
 
 /*
  *  -------------------------------------------------------------------------
@@ -331,7 +439,7 @@ check_time(const char *t, long i, long lo, long hi)
 }
 #endif
 
-static int
+int
 time_event(int child, int event)
 {
 	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
@@ -372,7 +480,7 @@ start_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = signal_handler;
-//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
@@ -411,7 +519,7 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
-	if (duration == (long)INFINITE_WAIT)
+	if (duration == (long) INFINITE_WAIT)
 		return __RESULT_SUCCESS;
 	if (start_signals())
 		return __RESULT_FAILURE;
@@ -759,6 +867,52 @@ errno_string(long err)
 	}
 }
 
+#if 0
+char *
+nerrno_string(ulong nerr, long uerr)
+{
+	switch (nerr) {
+	case NBADADDR:
+		return ("[NBADADDR]");
+	case NBADOPT:
+		return ("[NBADOPT]");
+	case NACCESS:
+		return ("[NACCESS]");
+	case NNOADDR:
+		return ("[NNOADDR]");
+	case NOUTSTATE:
+		return ("[NOUTSTATE]");
+	case NBADSEQ:
+		return ("[NBADSEQ]");
+	case NSYSERR:
+		return errno_string(uerr);
+	case NBADDATA:
+		return ("[NBADDATA]");
+	case NBADFLAG:
+		return ("[NBADFLAG]");
+	case NNOTSUPPORT:
+		return ("[NNOTSUPPORT]");
+	case NBOUND:
+		return ("[NBOUND]");
+	case NBADQOSPARAM:
+		return ("[NBADQOSPARAM]");
+	case NBADQOSTYPE:
+		return ("[NBADQOSTYPE]");
+	case NBADTOKEN:
+		return ("[NBADTOKEN]");
+	case NNOPROTOID:
+		return ("[NNOPROTOID]");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) nerr);
+		return buf;
+	}
+	}
+}
+#endif
+
 const char *
 event_string(int event)
 {
@@ -781,6 +935,60 @@ event_string(int event)
 		return ("SUCCESS");
 	case __RESULT_FAILURE:
 		return ("FAILURE");
+	case __TEST_CONN_REQ:
+		return ("N_CONN_REQ");
+	case __TEST_CONN_RES:
+		return ("N_CONN_RES");
+	case __TEST_DISCON_REQ:
+		return ("N_DISCON_REQ");
+	case __TEST_DATA_REQ:
+		return ("N_DATA_REQ");
+	case __TEST_EXDATA_REQ:
+		return ("N_EXDATA_REQ");
+	case __TEST_INFO_REQ:
+		return ("N_INFO_REQ");
+	case __TEST_BIND_REQ:
+		return ("N_BIND_REQ");
+	case __TEST_UNBIND_REQ:
+		return ("N_UNBIND_REQ");
+	case __TEST_UNITDATA_REQ:
+		return ("N_UNITDATA_REQ");
+	case __TEST_OPTMGMT_REQ:
+		return ("N_OPTMGMT_REQ");
+	case __TEST_CONN_IND:
+		return ("N_CONN_IND");
+	case __TEST_CONN_CON:
+		return ("N_CONN_CON");
+	case __TEST_DISCON_IND:
+		return ("N_DISCON_IND");
+	case __TEST_DATA_IND:
+		return ("N_DATA_IND");
+	case __TEST_EXDATA_IND:
+		return ("N_EXDATA_IND");
+	case __TEST_INFO_ACK:
+		return ("N_INFO_ACK");
+	case __TEST_BIND_ACK:
+		return ("N_BIND_ACK");
+	case __TEST_ERROR_ACK:
+		return ("N_ERROR_ACK");
+	case __TEST_OK_ACK:
+		return ("N_OK_ACK");
+	case __TEST_UNITDATA_IND:
+		return ("N_UNITDATA_IND");
+	case __TEST_UDERROR_IND:
+		return ("N_UDERROR_IND");
+	case __TEST_DATACK_REQ:
+		return ("N_DATACK_REQ");
+	case __TEST_DATACK_IND:
+		return ("N_DATACK_IND");
+	case __TEST_RESET_REQ:
+		return ("N_RESET_REQ");
+	case __TEST_RESET_IND:
+		return ("N_RESET_IND");
+	case __TEST_RESET_RES:
+		return ("N_RESET_RES");
+	case __TEST_RESET_CON:
+		return ("N_RESET_CON");
 	default:
 		return ("(unexpected");
 	}
@@ -791,106 +999,162 @@ ioctl_string(int cmd, intptr_t arg)
 {
 	switch (cmd) {
 	case I_NREAD:
-		return ("I_NREAD");	/* 2.1 */
+		return ("I_NREAD");
 	case I_PUSH:
-		return ("I_PUSH");	/* 2.2 */
+		return ("I_PUSH");
 	case I_POP:
-		return ("I_POP");	/* 2.3 */
+		return ("I_POP");
 	case I_LOOK:
-		return ("I_LOOK");	/* 2.4 */
+		return ("I_LOOK");
 	case I_FLUSH:
-		return ("I_FLUSH");	/* 2.5 */
+		return ("I_FLUSH");
 	case I_SRDOPT:
-		return ("I_SRDOPT");	/* 2.6 */
+		return ("I_SRDOPT");
 	case I_GRDOPT:
-		return ("I_GRDOPT");	/* 2.7 */
+		return ("I_GRDOPT");
 	case I_STR:
-		return ("I_STR");	/* 2.8 */
+		if (arg) {
+			struct strioctl *icp = (struct strioctl *) arg;
+
+			switch (icp->ic_cmd) {
+#if 0
+			case _O_TI_BIND:
+				return ("_O_TI_BIND");
+			case O_TI_BIND:
+				return ("O_TI_BIND");
+			case _O_TI_GETINFO:
+				return ("_O_TI_GETINFO");
+			case O_TI_GETINFO:
+				return ("O_TI_GETINFO");
+			case _O_TI_GETMYNAME:
+				return ("_O_TI_GETMYNAME");
+			case _O_TI_GETPEERNAME:
+				return ("_O_TI_GETPEERNAME");
+			case _O_TI_OPTMGMT:
+				return ("_O_TI_OPTMGMT");
+			case O_TI_OPTMGMT:
+				return ("O_TI_OPTMGMT");
+			case _O_TI_TLI_MODE:
+				return ("_O_TI_TLI_MODE");
+			case _O_TI_UNBIND:
+				return ("_O_TI_UNBIND");
+			case O_TI_UNBIND:
+				return ("O_TI_UNBIND");
+			case _O_TI_XTI_CLEAR_EVENT:
+				return ("_O_TI_XTI_CLEAR_EVENT");
+			case _O_TI_XTI_GET_STATE:
+				return ("_O_TI_XTI_GET_STATE");
+			case _O_TI_XTI_HELLO:
+				return ("_O_TI_XTI_HELLO");
+			case _O_TI_XTI_MODE:
+				return ("_O_TI_XTI_MODE");
+			case TI_BIND:
+				return ("TI_BIND");
+			case TI_CAPABILITY:
+				return ("TI_CAPABILITY");
+			case TI_GETADDRS:
+				return ("TI_GETADDRS");
+			case TI_GETINFO:
+				return ("TI_GETINFO");
+			case TI_GETMYNAME:
+				return ("TI_GETMYNAME");
+			case TI_GETPEERNAME:
+				return ("TI_GETPEERNAME");
+			case TI_OPTMGMT:
+				return ("TI_OPTMGMT");
+			case TI_SETMYNAME:
+				return ("TI_SETMYNAME");
+			case TI_SETPEERNAME:
+				return ("TI_SETPEERNAME");
+			case TI_SYNC:
+				return ("TI_SYNC");
+			case TI_UNBIND:
+				return ("TI_UNBIND");
+#endif
+			}
+		}
+		return ("I_STR");
 	case I_SETSIG:
-		return ("I_SETSIG");	/* 2.9 */
+		return ("I_SETSIG");
 	case I_GETSIG:
-		return ("I_GETSIG");	/* 2.10 */
+		return ("I_GETSIG");
 	case I_FIND:
-		return ("I_FIND");	/* 2.11 */
+		return ("I_FIND");
 	case I_LINK:
-		return ("I_LINK");	/* 2.12 */
+		return ("I_LINK");
 	case I_UNLINK:
-		return ("I_UNLINK");	/* 2.13 */
+		return ("I_UNLINK");
 	case I_RECVFD:
-		return ("I_RECVFD");	/* 2.14 */
+		return ("I_RECVFD");
 	case I_PEEK:
-		return ("I_PEEK");	/* 2.15 */
+		return ("I_PEEK");
 	case I_FDINSERT:
-		return ("I_FDINSERT");	/* 2.16 */
+		return ("I_FDINSERT");
 	case I_SENDFD:
-		return ("I_SENDFD");	/* 2.17 */
+		return ("I_SENDFD");
 #if 0
 	case I_E_RECVFD:
-		return ("I_E_RECVFD");	/* 2.18 */
+		return ("I_E_RECVFD");
 #endif
 	case I_SWROPT:
-		return ("I_SWROPT");	/* 2.19 */
+		return ("I_SWROPT");
 	case I_GWROPT:
-		return ("I_GWROPT");	/* 2.20 */
+		return ("I_GWROPT");
 	case I_LIST:
-		return ("I_LIST");	/* 2.21 */
+		return ("I_LIST");
 	case I_PLINK:
-		return ("I_PLINK");	/* 2.22 */
+		return ("I_PLINK");
 	case I_PUNLINK:
-		return ("I_PUNLINK");	/* 2.23 */
+		return ("I_PUNLINK");
 	case I_FLUSHBAND:
-		return ("I_FLUSHBAND");	/* 2.24 */
+		return ("I_FLUSHBAND");
 	case I_CKBAND:
-		return ("I_CKBAND");	/* 2.25 */
+		return ("I_CKBAND");
 	case I_GETBAND:
-		return ("I_GETBAND");	/* 2.26 */
+		return ("I_GETBAND");
 	case I_ATMARK:
-		return ("I_ATMARK");	/* 2.27 */
+		return ("I_ATMARK");
 	case I_SETCLTIME:
-		return ("I_SETCLTIME");	/* 2.28 */
+		return ("I_SETCLTIME");
 	case I_GETCLTIME:
-		return ("I_GETCLTIME");	/* 2.29 */
+		return ("I_GETCLTIME");
 	case I_CANPUT:
-		return ("I_CANPUT");	/* 2.30 */
+		return ("I_CANPUT");
 #if 0
 	case I_SERROPT:
-		return ("I_SERROPT");	/* 2.31 */
+		return ("I_SERROPT");
 	case I_GERROPT:
-		return ("I_GERROPT");	/* 2.32 */
+		return ("I_GERROPT");
 	case I_ANCHOR:
-		return ("I_ANCHOR");	/* 2.33 */
+		return ("I_ANCHOR");
 #endif
 #if 0
 	case I_S_RECVFD:
-		return ("I_S_RECVFD");	/* 2.34 */
+		return ("I_S_RECVFD");
 	case I_STATS:
-		return ("I_STATS");	/* 2.35 */
+		return ("I_STATS");
 	case I_BIGPIPE:
-		return ("I_BIGPIPE");	/* 2.36 */
+		return ("I_BIGPIPE");
 #endif
 #if 0
 	case I_GETTP:
-		return ("I_GETTP");	/* 2.37 */
+		return ("I_GETTP");
 	case I_AUTOPUSH:
-		return ("I_AUTOPUSH");	/* 2.44 */
+		return ("I_AUTOPUSH");
 	case I_HEAP_REPORT:
-		return ("I_HEAP_REPORT");	/* 2.45 */
+		return ("I_HEAP_REPORT");
 	case I_FIFO:
-		return ("I_FIFO");	/* 2.43 */
-	case I_GETMSG:
-		return ("I_GETMSG");	/* 2.38 */
-	case I_PUTMSG:
-		return ("I_PUTMSG");	/* 2.39 */
+		return ("I_FIFO");
 	case I_PUTPMSG:
-		return ("I_PUTPMSG");	/* 2.40 */
+		return ("I_PUTPMSG");
 	case I_GETPMSG:
-		return ("I_GETPMSG");	/* 2.41 */
+		return ("I_GETPMSG");
 	case I_FATTACH:
-		return ("I_FATTACH");	/* 2.46 */
+		return ("I_FATTACH");
 	case I_FDETACH:
-		return ("I_FDETACH");	/* 2.47 */
+		return ("I_FDETACH");
 	case I_PIPE:
-		return ("I_PIPE");	/* 2.42 */
+		return ("I_PIPE");
 #endif
 	default:
 		return ("(unexpected)");
@@ -1065,7 +1329,7 @@ service_type(np_ulong type)
 		return ("N_CLNS");
 	case N_CONS:
 		return ("N_CONS");
-	case N_CLNS|N_CONS:
+	case N_CLNS | N_CONS:
 		return ("N_CLNS|N_CONS");
 	default:
 		return ("(unknown)");
@@ -1238,6 +1502,8 @@ print_addrs(int child, char *add_ptr, size_t add_len)
 
 	if (verbose < 3)
 		return;
+	if (add_len == 0)
+		print_string(child, "(no address)");
 	for (sin = (typeof(sin)) add_ptr; add_len >= sizeof(*sin); sin++, add_len -= sizeof(*sin)) {
 		char buf[128];
 
@@ -1260,14 +1526,17 @@ prot_string(char *pro_ptr, size_t pro_len)
 	}
 	return (buf);
 }
+
 void
 print_prots(int child, char *pro_ptr, size_t pro_len)
 {
 	unsigned char *prot;
+
 	if (verbose < 3)
 		return;
 	for (prot = (typeof(prot)) pro_ptr; pro_len > 0; prot++, pro_len--) {
 		char buf[32];
+
 		snprintf(buf, sizeof(buf), "<%u>", (unsigned int) *prot);
 		print_string(child, buf);
 	}
@@ -1927,6 +2196,41 @@ print_size(ulong size)
 	}
 }
 
+#if 0
+const char *
+oos_string(sl_ulong reason)
+{
+	switch (reason) {
+	case SL_FAIL_UNSPECIFIED:
+		return ("!out of service (unspec)");
+	case SL_FAIL_CONG_TIMEOUT:
+		return ("!out of service (T6)");
+	case SL_FAIL_ACK_TIMEOUT:
+		return ("!out of service (T7)");
+	case SL_FAIL_ABNORMAL_BSNR:
+		return ("!out of service (BSNR)");
+	case SL_FAIL_ABNORMAL_FIBR:
+		return ("!out of service (FIBR)");
+	case SL_FAIL_SUERM_EIM:
+		return ("!out of service (SUERM)");
+	case SL_FAIL_ALIGNMENT_NOT_POSSIBLE:
+		return ("!out of service (AERM)");
+	case SL_FAIL_RECEIVED_SIO:
+		return ("!out of service (SIO)");
+	case SL_FAIL_RECEIVED_SIN:
+		return ("!out of service (SIN)");
+	case SL_FAIL_RECEIVED_SIE:
+		return ("!out of service (SIE)");
+	case SL_FAIL_RECEIVED_SIOS:
+		return ("!out of service (SIOS)");
+	case SL_FAIL_T1_TIMEOUT:
+		return ("!out of service (T1)");
+	default:
+		return ("!out of service (\?\?\?)");
+	}
+}
+#endif
+
 const char *
 prim_string(np_ulong prim)
 {
@@ -1985,46 +2289,140 @@ prim_string(np_ulong prim)
 		return ("N_DATACK_REQ----");
 	case N_DATACK_IND:
 		return ("N_DATACK_IND----");
+#if 0
+	case SL_REMOTE_PROCESSOR_OUTAGE_IND:
+		return ("!rpo");
+	case SL_REMOTE_PROCESSOR_RECOVERED_IND:
+		return ("!rpr");
+	case SL_IN_SERVICE_IND:
+		return ("!in service");
+	case SL_OUT_OF_SERVICE_IND:
+		return ("!out of service");
+	case SL_PDU_IND:
+		return ("!msu");
+	case SL_LINK_CONGESTED_IND:
+		return ("!congested");
+	case SL_LINK_CONGESTION_CEASED_IND:
+		return ("!congestion ceased");
+	case SL_RETRIEVED_MESSAGE_IND:
+		return ("!retrieved message");
+	case SL_RETRIEVAL_COMPLETE_IND:
+		return ("!retrieval complete");
+	case SL_RB_CLEARED_IND:
+		return ("!rb cleared");
+	case SL_BSNT_IND:
+		return ("!bsnt");
+	case SL_RTB_CLEARED_IND:
+		return ("!rtb cleared");
+	case LMI_INFO_ACK:
+		return ("!info ack");
+	case LMI_OK_ACK:
+		return ("!ok ack");
+	case LMI_ERROR_ACK:
+		return ("!error ack");
+	case LMI_ENABLE_CON:
+		return ("!enable con");
+	case LMI_DISABLE_CON:
+		return ("!disable con");
+	case LMI_ERROR_IND:
+		return ("!error ind");
+	case LMI_STATS_IND:
+		return ("!stats ind");
+	case LMI_EVENT_IND:
+		return ("!event ind");
+#endif
 	default:
-		return ("N_????_??? -----");
+		return ("?_????_??? -----");
 	}
 }
 #endif
 
-void
-print_less(int child)
+#if 0
+static const char *
+status_string(uint32_t status)
 {
-	if (verbose < 1 || !show)
-		return;
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	switch (child) {
-	case 0:
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		fprintf(stdout, " .  (more) .  <---->|               .               :  :                     [%d:%03d]\n", child, state);
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
+	switch (status) {
+	case M2PA_STATUS_OUT_OF_SERVICE:
+		return ("OUT-OF-SERVICE");
+	case M2PA_STATUS_IN_SERVICE:
+		switch (m2pa_version) {
+		case M2PA_VERSION_DRAFT3:
+		case M2PA_VERSION_DRAFT3_1:
+			return ("IN-SERVICE");
+		}
+		return ("READY");
+	case M2PA_STATUS_PROVING_NORMAL:
+		return ("PROVING-NORMAL");
+	case M2PA_STATUS_PROVING_EMERGENCY:
+		return ("PROVING-EMERGENCY");
+	case M2PA_STATUS_ALIGNMENT:
+		return ("ALIGNMENT");
+	case M2PA_STATUS_PROCESSOR_OUTAGE:
+		return ("PROCESSOR-OUTAGE");
+	case M2PA_STATUS_BUSY:
+		return ("BUSY");
+	case M2PA_STATUS_PROCESSOR_OUTAGE_ENDED:
+		switch (m2pa_version) {
+		case M2PA_VERSION_DRAFT9:
+		case M2PA_VERSION_DRAFT10:
+		case M2PA_VERSION_DRAFT11:
+		case M2PA_VERSION_RFC4165:
+			return ("PROCESSOR-RECOVERED");
+		case M2PA_VERSION_DRAFT3:
+		case M2PA_VERSION_DRAFT3_1:
+		case M2PA_VERSION_DRAFT4:
+		case M2PA_VERSION_DRAFT4_1:
+		case M2PA_VERSION_DRAFT5:
+		case M2PA_VERSION_DRAFT5_1:
+		case M2PA_VERSION_DRAFT6:
+		case M2PA_VERSION_DRAFT6_1:
+		case M2PA_VERSION_DRAFT6_9:
+		case M2PA_VERSION_DRAFT7:
+		default:
+			break;
+		}
+		return ("PROCESSOR-OUTAGE-ENDED");
+	case M2PA_STATUS_BUSY_ENDED:
+		return ("BUSY-ENDED");
+	case M2PA_STATUS_NONE:
+		switch (m2pa_version) {
+		case M2PA_VERSION_DRAFT4:
+		case M2PA_VERSION_DRAFT4_1:
+		case M2PA_VERSION_DRAFT4_9:
+			return ("ACK");
+		}
 		break;
-	case 1:
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		break;
-	case 2:
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		break;
+	case M2PA_STATUS_INVALID:
+		return ("[INVALID-STATUS]");
 	}
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	show = 0;
-	return;
+	return ("[UNKNOWN-STATUS]");
 }
 
-void
-print_more(void)
+static const char *
+msg_string(uint32_t msg)
 {
-	show = 1;
+	switch (msg) {
+	case M2PA_STATUS_MESSAGE:
+		return ("STATUS");
+	case M2PA_ACK_MESSAGE:
+		switch (m2pa_version) {
+		case M2PA_VERSION_DRAFT3_1:
+			return ("ACK");
+		}
+		break;
+	case M2PA_PROVING_MESSAGE:
+		switch (m2pa_version) {
+		case M2PA_VERSION_DRAFT3:
+		case M2PA_VERSION_DRAFT3_1:
+			return ("PROVING");
+		}
+		break;
+	case M2PA_DATA_MESSAGE:
+		return ("DATA");
+	}
+	return ("[UNKNOWN-MESSAGE]");
 }
+#endif
 
 void
 print_simple(int child, const char *msgs[])
@@ -2072,6 +2470,47 @@ print_simple_string(int child, const char *msgs[], const char *string)
 }
 
 void
+print_string_state(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_triple_string(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], "", child, state);
+	fprintf(stdout, msgs[child], string, child, state);
+	fprintf(stdout, msgs[child], "", child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_more(void)
+{
+	show = 1;
+}
+
+void
+print_less(int child)
+{
+	static const char *msgs[] = {
+		"  . %1$6.6s .  <---->|                 .                 :                   [%2$d:%3$03d]\n",
+		"                    :                 .                 |<---->  . %1$-6.6s . [%2$d:%3$03d]\n",
+		"                    :                 .              |<-:----->  . %1$-6.6s . [%2$d:%3$03d]\n",
+		"  . %1$6.6s .  <---->:                 .              :<-:<---->  . %1$-6.6s . [%2$d:%3$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_triple_string(child, msgs, "(more)");
+	show = 0;
+}
+
+void
 print_pipe(int child)
 {
 	static const char *msgs[] = {
@@ -2085,13 +2524,13 @@ print_pipe(int child)
 }
 
 void
-print_open(int child, const char* name)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
-		"  open()      ----->v %-30s    .                   \n",
-		"                    | %-30s    v<-----     open()  \n",
-		"                    | %-30s v<-+------     open()  \n",
-		"                    . %-30s .  .                   \n",
+		"  open()      ----->v %-30.30s    .                   \n",
+		"                    | %-30.30s    v<-----     open()  \n",
+		"                    | %-30.30s v<-+------     open()  \n",
+		"                    . %-30.30s .  .                   \n",
 	};
 
 	if (verbose > 3)
@@ -2116,26 +2555,24 @@ void
 print_preamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+-------------Preamble-----------+--+                   \n",
-		"                    +-------------Preamble-----------+  +-------------------\n",
+		"--------------------+-------------Preamble--------------+                   \n",
+		"                    +-------------Preamble--------------+-------------------\n",
 		"                    +-------------Preamble-----------+--+-------------------\n",
-		"--------------------+-------------Preamble-----------+--+-------------------\n",
+		"--------------------+-------------Preamble--------------+-------------------\n",
 	};
 
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_string_state(int child, const char *msgs[], const char *string);
-
 void
 print_failure(int child, const char *string)
 {
 	static const char *msgs[] = {
-		"....................|%-32s|..|                    [%d:%03d]\n",
-		"                    |%-32s|  |................... [%d:%03d]\n",
-		"                    |%-32s|...................... [%d:%03d]\n",
-		"....................|%-32s|..|................... [%d:%03d]\n",
+		"....................|%-32.32s   |                    [%d:%03d]\n",
+		"                    |%-32.32s   |................... [%d:%03d]\n",
+		"                    |%-32.32s|...................... [%d:%03d]\n",
+		"....................|%-32.32s...|................... [%d:%03d]\n",
 	};
 
 	if (string && strnlen(string, 32) > 0 && verbose > 0)
@@ -2146,10 +2583,10 @@ void
 print_notapplicable(int child)
 {
 	static const char *msgs[] = {
-		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
-		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|  |X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
-		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
-		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-X-X|                    [%d:%03d]\n",
+		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2161,10 +2598,10 @@ void
 print_skipped(int child)
 {
 	static const char *msgs[] = {
-		"::::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|                    [%d:%03d]\n",
-		"                    |:::::::::::: SKIPPED :::::::::::|  |::::::::::::::::::: [%d:%03d]\n",
+		"::::::::::::::::::::|:::::::::::: SKIPPED ::::::::::::::|                    [%d:%03d]\n",
+		"                    |:::::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
 		"                    |:::::::::::: SKIPPED :::::::::::|::|::::::::::::::::::: [%d:%03d]\n",
-		"::::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|::::::::::::::::::: [%d:%03d]\n",
+		"::::::::::::::::::::|:::::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2176,10 +2613,10 @@ void
 print_inconclusive(int child)
 {
 	static const char *msgs[] = {
-		"????????????????????|?????????? INCONCLUSIVE ????????|??|                    [%d:%03d]\n",
-		"                    |?????????? INCONCLUSIVE ????????|  |??????????????????? [%d:%03d]\n",
+		"????????????????????|?????????? INCONCLUSIVE ???????????|                    [%d:%03d]\n",
+		"                    |?????????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
 		"                    |?????????? INCONCLUSIVE ????????|??|??????????????????? [%d:%03d]\n",
-		"????????????????????|?????????? INCONCLUSIVE ????????|??|??????????????????? [%d:%03d]\n",
+		"????????????????????|?????????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2191,10 +2628,10 @@ void
 print_test(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+---------------Test-------------+--+                   \n",
-		"                    +---------------Test-------------+  +-------------------\n",
+		"--------------------+---------------Test----------------+                   \n",
+		"                    +---------------Test----------------+-------------------\n",
 		"                    +---------------Test-------------+--+-------------------\n",
-		"--------------------+---------------Test-------------+--+-------------------\n",
+		"--------------------+---------------Test----------------+-------------------\n",
 	};
 
 	if (verbose > 0)
@@ -2205,10 +2642,10 @@ void
 print_failed(int child)
 {
 	static const char *msgs[] = {
-		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d:%03d]\n",
-		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXX|  |XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d:%03d]\n",
+		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
 		"                    |XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
-		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2220,10 +2657,10 @@ void
 print_script_error(int child)
 {
 	static const char *msgs[] = {
-		"####################|########### SCRIPT ERROR #######|##|                    [%d:%03d]\n",
-		"                    |########### SCRIPT ERROR #######|  |################### [%d:%03d]\n",
+		"####################|########### SCRIPT ERROR ##########|                    [%d:%03d]\n",
+		"                    |########### SCRIPT ERROR ##########|################### [%d:%03d]\n",
 		"                    |########### SCRIPT ERROR #######|##|################### [%d:%03d]\n",
-		"####################|########### SCRIPT ERROR #######|##|################### [%d:%03d]\n",
+		"####################|########### SCRIPT ERROR ##########|################### [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2235,10 +2672,10 @@ void
 print_passed(int child)
 {
 	static const char *msgs[] = {
-		"********************|************* PASSED ***********|**|                    [%d:%03d]\n",
-		"                    |************* PASSED ***********|  |******************* [%d:%03d]\n",
+		"********************|************* PASSED **************|                    [%d:%03d]\n",
+		"                    |************* PASSED **************|******************* [%d:%03d]\n",
 		"                    |************* PASSED ***********|**|******************* [%d:%03d]\n",
-		"********************|************* PASSED ***********|**|******************* [%d:%03d]\n",
+		"********************|************* PASSED **************|******************* [%d:%03d]\n",
 	};
 
 	if (verbose > 2)
@@ -2250,10 +2687,10 @@ void
 print_postamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+-------------Postamble----------+--+                   \n",
-		"                    +-------------Postamble----------+  +-------------------\n",
+		"--------------------+-------------Postamble-------------+                   \n",
+		"                    +-------------Postamble-------------+-------------------\n",
 		"                    +-------------Postamble----------+--+-------------------\n",
-		"--------------------+-------------Postamble----------+--+-------------------\n",
+		"--------------------+-------------Postamble-------------+-------------------\n",
 	};
 
 	if (verbose > 0)
@@ -2264,10 +2701,10 @@ void
 print_test_end(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+--------------------------------+--+                   \n",
-		"                    +--------------------------------+  +-------------------\n",
+		"--------------------+-----------------------------------+                   \n",
+		"                    +-----------------------------------+-------------------\n",
 		"                    +--------------------------------+--+-------------------\n",
-		"--------------------+--------------------------------+--+-------------------\n",
+		"--------------------+-----------------------------------+-------------------\n",
 	};
 
 	if (verbose > 0)
@@ -2278,10 +2715,10 @@ void
 print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
-		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|                    {%d:%03d}\n",
-		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@@@@|                    {%d:%03d}\n",
+		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
 		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
-		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
 	};
 
 	if (verbose > 0)
@@ -2292,10 +2729,10 @@ void
 print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
-		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|                    {%d:%03d}\n",
-		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                    {%d:%03d}\n",
+		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
 		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
-		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
 	};
 
 	if (verbose > 0)
@@ -2306,10 +2743,10 @@ void
 print_timeout(int child)
 {
 	static const char *msgs[] = {
-		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|                    [%d:%03d]\n",
-		"                    |++++++++++++ TIMEOUT! ++++++++++|  |+++++++++++++++++++ [%d:%03d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! +++++++++++++|                    [%d:%03d]\n",
+		"                    |++++++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
 		"                    |++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
-		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
 	if (show_timeout || verbose > 0) {
@@ -2322,10 +2759,10 @@ void
 print_nothing(int child)
 {
 	static const char *msgs[] = {
-		"- - - - - - - - - - |- - - - - - -nothing! - - - - - |  |                    [%d:%03d]\n",
-		"                    |- - - - - - -nothing! - - - - - |  |- - - - - - - - - - [%d:%03d]\n",
+		"- - - - - - - - - - |- - - - - - -nothing! - - - - - - -|                    [%d:%03d]\n",
+		"                    |- - - - - - -nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
 		"                    |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
-		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
+		"- - - - - - - - - - |- - - - - - -nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
 	if (verbose > 1)
@@ -2333,22 +2770,13 @@ print_nothing(int child)
 }
 
 void
-print_string_state(int child, const char *msgs[], const char *string)
-{
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, child, state);
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-}
-
-void
 print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"%-14s----->|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |<---%-14s  [%d:%03d]\n",
+		"%-14s----->|                                   |                    [%d:%03d]\n",
+		"                    |                                   |<---%-14s  [%d:%03d]\n",
 		"                    |                                |<-+----%-14s  [%d:%03d]\n",
-		"                    |          %-14s        |  |                    [%d:%03d]\n",
+		"                    |          %-14s           |                    [%d:%03d]\n",
 	};
 
 	if ((verbose && show) || (verbose > 5 && show_msg))
@@ -2359,13 +2787,13 @@ void
 print_tx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"--%16s->|- - - - - - - - - - - - - - - ->|->|                    [%d:%03d]\n",
-		"                    |<- - - - - - - - - - - - - - - -|- |<-%16s- [%d:%03d]\n",
+		"--%16s->| - - - - - - - - - - - - - - - - ->|                    [%d:%03d]\n",
+		"                    |<- - - - - - - - - - - - - - - - - |<-%16s- [%d:%03d]\n",
 		"                    |<- - - - - - - - - - - - - - - -|<----%16s- [%d:%03d]\n",
-		"                    |                                |  |                    [%d:%03d]\n",
+		"                    |         %-16s          |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -2373,27 +2801,126 @@ void
 print_rx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"<-%16s--|<- - - - - - - - - - - - - - - -| -|                    [%d:%03d]\n",
-		"                    |- - - - - - - - - - - - - - - ->|  |--%16s> [%d:%03d]\n",
+		"<-%16s--|<- - - - - - - - - - - - - - - - - |                    [%d:%03d]\n",
+		"                    |- - - - - - - - - - - - - - - - - >|--%16s> [%d:%03d]\n",
 		"                    |- - - - - - - - - - - - - - - ->|--+--%16s> [%d:%03d]\n",
-		"                    |         <%16s>     |  |                    [%d:%03d]\n",
+		"                    |         <%16s>        |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, command);
+}
+
+#if 0
+void
+print_string_state_sn(int child, const char *msgs[], const char *string, uint32_t bsn, uint32_t fsn)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, bsn, fsn, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_tx_msg_sn(int child, const char *string, uint32_t bsn, uint32_t fsn)
+{
+	static const char *msgs[] = {
+		"%1$20.20s| ---------[%2$06X,%3$06X]--------> |                    [%4$d:%5$03d]\n",
+		"                    | <--------[%3$06X,%2$06X]--------- |%1$-20.20s[%4$d:%5$03d]\n",
+		"                    | <--------[%3$06X,%2$06X]------ |  |%1$-20.20s[%4$d:%5$03d]\n",
+		"                    |      <%1$-20.20s>       |                    [%4$d:%5$03d]\n",
 	};
 
 	if (show && verbose > 0)
-		print_string_state(child, msgs, command);
+		print_string_state_sn(child, msgs, string, bsn, fsn);
 }
+
+void
+print_rx_msg_sn(int child, const char *string, uint32_t bsn, uint32_t fsn)
+{
+	static const char *msgs[] = {
+		"%1$20.20s| <--------[%2$06X,%3$06X]--------- |                    [%4$d:%5$03d]\n",
+		"                    | ---------[%3$06X,%2$06X]--------> |%1$-20.20s[%4$d:%5$03d]\n",
+		"                    | ---------[%3$06X,%2$06X]-----> |   %1$-20.20s[%4$d:%5$03d]\n",
+		"                    |       <%1$20.20s>      |                    [%4$d:%5$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state_sn(child, msgs, string, bsn, fsn);
+}
+
+void
+print_tx_msg(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%20.20s| --------------------------------> |                    [%d:%03d]\n",
+		"                    | <-------------------------------- |%-20.20s[%d:%03d]\n",
+		"                    | <----------------------------- |  |%-20.20s[%d:%03d]\n",
+		"                    |      <%-20.20s>       |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0) {
+		switch (m2pa_version) {
+		case M2PA_VERSION_DRAFT4:
+		case M2PA_VERSION_DRAFT4_1:
+		case M2PA_VERSION_DRAFT4_9:
+		case M2PA_VERSION_DRAFT9:
+		case M2PA_VERSION_DRAFT10:
+		case M2PA_VERSION_DRAFT11:
+		case M2PA_VERSION_RFC4165:
+			if (fsn[child] != 0xffffff || bsn[child] != 0xffffff) {
+				print_tx_msg_sn(child, string, bsn[child], fsn[child]);
+				return;
+			}
+		default:
+			print_string_state(child, msgs, string);
+			return;
+		}
+	}
+}
+
+void
+print_rx_msg(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%20.20s| <-------------------------------- |                    [%d:%03d]\n",
+		"                    | --------------------------------> |%-20.20s[%d:%03d]\n",
+		"                    | -----------------------------> |   %-20.20s[%d:%03d]\n",
+		"                    |       <%20.20s>      |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0) {
+		switch (m2pa_version) {
+		case M2PA_VERSION_DRAFT4:
+		case M2PA_VERSION_DRAFT4_1:
+		case M2PA_VERSION_DRAFT4_9:
+		case M2PA_VERSION_DRAFT9:
+		case M2PA_VERSION_DRAFT10:
+		case M2PA_VERSION_DRAFT11:
+		case M2PA_VERSION_RFC4165:
+			if (fsn[child] != 0xffffff || bsn[child] != 0xffffff) {
+				print_rx_msg_sn(child, string, bsn[child], fsn[child]);
+				return;
+			}
+		default:
+			print_string_state(child, msgs, string);
+			return;
+		}
+	}
+}
+#endif
 
 void
 print_ack_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"<-%16s-/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\-%16s> [%d:%03d]\n",
+		"<-%16s-/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\-%16s> [%d:%03d]\n",
 		"                    |                                |\\-+--%16s> [%d:%03d]\n",
-		"                    |         <%16s>     |  |                    [%d:%03d]\n",
+		"                    |         <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -2410,13 +2937,13 @@ void
 print_no_prim(int child, long prim)
 {
 	static const char *msgs[] = {
-		"????%4ld????  ?----?|?- - - - - - -?                |  |                     [%d:%03d]\n",
-		"                    |                               |  |?--? ????%4ld????    [%d:%03d]\n",
-		"                    |                               |?-+---? ????%4ld????    [%d:%03d]\n",
-		"                    | ? - - - - - - %4ld  - - - - ? |  |                     [%d:%03d]\n",
+		"????%4ld????  ?----?| ?- - - - - - - - - - - - - - - -? |                     [%d:%03d]\n",
+		"                    | ?- - - - - - - - - - - - - - - -? |?--? ????%4ld????    [%d:%03d]\n",
+		"                    | ?- - - - - - - -- - - - - - -? |?-+---? ????%4ld????    [%d:%03d]\n",
+		"                    | ?- - - - - - -%4ld- - - - - -? |  |                     [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (verbose > 1)
 		print_long_state(child, msgs, prim);
 }
 
@@ -2424,42 +2951,14 @@ void
 print_signal(int child, int signum)
 {
 	static const char *msgs[] = {
-		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
-		"  >>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
-		"    >>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
-		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|                    [%d:%03d]\n",
+		"                    |>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		"                    |>>>>>>>>>>>> %-8.8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
 		print_string_state(child, msgs, signal_string(signum));
-}
-
-void
-print_syscall(int child, const char *command)
-{
-	static const char *msgs[] = {
-		"%-14s----->|                                |  |                    [%d:%03d]\n",
-		"  %-14s--->|                                |  |                    [%d:%03d]\n",
-		"    %-14s->|                                |  |                    [%d:%03d]\n",
-		"                    |          %-14s        |  |                    [%d:%03d]\n",
-	};
-
-	if (verbose > 0)
-		print_string_state(child, msgs, command);
-}
-
-void
-print_command(int child, const char *command)
-{
-	static const char *msgs[] = {
-		"%-14s----->|                                |  |                    [%d:%03d]\n",
-		"  %-14s--->|                                |  |                    [%d:%03d]\n",
-		"    %-14s->|                                |  |                    [%d:%03d]\n",
-		"                    |          %-14s        |  |                    [%d:%03d]\n",
-	};
-
-	if (verbose > 3)
-		print_string_state(child, msgs, command);
 }
 
 void
@@ -2475,10 +2974,10 @@ void
 print_command_info(int child, const char *command, const char *info)
 {
 	static const char *msgs[] = {
-		"%-14s----->|       %16s         |  |                    [%d:%03d]\n",
-		"  %-14s--->|       %16s         |  |                    [%d:%03d]\n",
-		"    %-14s->|       %16s         |  |                    [%d:%03d]\n",
-		"                    | %-14s %16s|  |                    [%d:%03d]\n",
+		"%1$-14s----->|         %2$-16.16s          |                    [%3$d:%4$03d]\n",
+		"                    |         %2$-16.16s          |<---%1$-14s  [%3$d:%4$03d]\n",
+		"                    |         %2$-16.16s       |<-+----%1$-14s  [%3$d:%4$03d]\n",
+		"                    | %1$-14s %2$-16.16s|  |                    [%3$d:%4$03d]\n",
 	};
 
 	if (verbose > 3)
@@ -2495,13 +2994,27 @@ print_string_int_state(int child, const char *msgs[], const char *string, int va
 }
 
 void
+print_tx_data(int child, const char *command, size_t bytes)
+{
+	static const char *msgs[] = {
+		"--%1$16s->| - %2$5d bytes - - - - - - - - - ->|                    [%3$d:%4$03d]\n",
+		"                    |<- %2$5d bytes - - - - - - - - - - |<-%1$16s- [%3$d:%4$03d]\n",
+		"                    |<- %2$5d bytes - - - - - - - - -|<-+ -%1$16s- [%3$d:%4$03d]\n",
+		"                    | - %2$5d bytes %1$16s    |                    [%3$d:%4$03d]\n",
+	};
+
+	if ((verbose && show) || verbose > 4)
+		print_string_int_state(child, msgs, command, bytes);
+}
+
+void
 print_rx_data(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"<-%1$16s--|<- -%2$4d bytes- - - - - - - - - |- |                    [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes- - - - - - - - ->|  |--%1$16s> [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes- - - - - - - - - |->|--%1$16s> [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
+		"<-%1$16s--|<- -%2$4d bytes- - - - - - - - - - -|                    [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes- - - - - - - - - - >|--%1$16s> [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes- - - - - - - - ->|--+--%1$16s> [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes %1$16s    |                    [%3$d:%4$03d]\n",
 	};
 
 	if ((verbose && show) || (verbose > 5 && show_msg))
@@ -2512,10 +3025,10 @@ void
 print_errno(int child, long error)
 {
 	static const char *msgs[] = {
-		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\-->%14s  [%d:%03d]\n",
+		"  %-14s<--/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\-->%14s  [%d:%03d]\n",
 		"                    |                                |\\-+--->%14s  [%d:%03d]\n",
-		"                    |          [%14s]      |  |                    [%d:%03d]\n",
+		"                    |          [%14s]         |                    [%d:%03d]\n",
 	};
 
 	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
@@ -2526,10 +3039,10 @@ void
 print_success(int child)
 {
 	static const char *msgs[] = {
-		"  ok          <----/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\---->         ok   [%d:%03d]\n",
+		"  ok          <----/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\---->         ok   [%d:%03d]\n",
 		"                    |                                |\\-+----->         ok   [%d:%03d]\n",
-		"                    |                 ok             |  |                    [%d:%03d]\n",
+		"                    |                 ok                |                    [%d:%03d]\n",
 	};
 
 	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
@@ -2540,10 +3053,10 @@ void
 print_success_value(int child, int value)
 {
 	static const char *msgs[] = {
-		"  %10d  <----/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\---->  %10d  [%d:%03d]\n",
+		"  %10d  <----/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\---->  %10d  [%d:%03d]\n",
 		"                    |                                |\\-+----->  %10d  [%d:%03d]\n",
-		"                    |            [%10d]        |  |                    [%d:%03d]\n",
+		"                    |            [%10d]           |                    [%d:%03d]\n",
 	};
 
 	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
@@ -2563,14 +3076,28 @@ void
 print_poll_value(int child, int value, short revents)
 {
 	static const char *msgs[] = {
-		"%10d<--------/|%-32s|  |                    [%d:%03d]\n",
-		"  %10d<------/|%-32s|  |                    [%d:%03d]\n",
-		"    %10d<----/|%-32s|  |                    [%d:%03d]\n",
-		"          %10d|%-32s|  |                    [%d:%03d]\n",
+		"  %1$10d  <----/| %2$-30.30s    |                    [%3$d:%4$03d]\n",
+		"                    | %2$-30.30s    |\\---->  %1$10d  [%3$d:%4$03d]\n",
+		"                    | %2$-30.30s |\\-+----->  %1$10d  [%3$d:%4$03d]\n",
+		"                    | %2$-20.20s [%1$10d] |                    [%3$d:%4$03d]\n",
 	};
 
 	if (verbose > 3)
 		print_int_string_state(child, msgs, value, poll_events_string(revents));
+}
+
+void
+print_ti_ioctl(int child, int cmd, intptr_t arg)
+{
+	static const char *msgs[] = {
+		"--ioctl(2)--------->|       %16s            |                    [%d:%03d]\n",
+		"                    |       %16s            |<---ioctl(2)------  [%d:%03d]\n",
+		"                    |       %16s         |<-+----ioctl(2)------  [%d:%03d]\n",
+		"                    |       %16s ioctl(2)   |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 1)
+		print_string_state(child, msgs, ioctl_string(cmd, arg));
 }
 
 void
@@ -2589,10 +3116,10 @@ void
 print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"  %1$16s->|- -%2$5d bytes- - - - - - - - ->|->|                    [%3$d:%4$03d]\n",
-		"                    |< -%2$5d bytes- - - - - - - - - |- |<-%1$16s  [%3$d:%4$03d]\n",
-		"                    |< -%2$5d bytes- - - - - - - - - |<-+--%1$16s  [%3$d:%4$03d]\n",
-		"                    |- -%2$5d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
+		"  %1$16s->| - %2$5d bytes - - - - - - - - - ->|                    [%3$d:%4$03d]\n",
+		"                    |<- %2$5d bytes - - - - - - - - - - |<-%1$16s  [%3$d:%4$03d]\n",
+		"                    |<- %2$5d bytes - - - - - - - - -|<-+--%1$16s  [%3$d:%4$03d]\n",
+		"                    | - %2$5d bytes %1$16s    |                    [%3$d:%4$03d]\n",
 	};
 
 	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
@@ -2603,13 +3130,13 @@ void
 print_libcall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"  %-16s->|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |<-%16s  [%d:%03d]\n",
+		"  %-16s->|                                   |                    [%d:%03d]\n",
+		"                    |                                   |<-%16s  [%d:%03d]\n",
 		"                    |                                |<-+--%16s  [%d:%03d]\n",
-		"                    |        [%16s]      |  |                    [%d:%03d]\n",
+		"                    |        [%16s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -2618,14 +3145,30 @@ void
 print_terror(int child, long error, long terror)
 {
 	static const char *msgs[] = {
-		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"                    |                                |  |\\-->%14s  [%d:%03d]\n",
+		"  %-14s<--/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\-->%14s  [%d:%03d]\n",
 		"                    |                                |\\-+--->%14s  [%d:%03d]\n",
-		"                    |          [%14s]      |  |                    [%d:%03d]\n",
+		"                    |          [%14s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (verbose > 1)
 		print_string_state(child, msgs, t_errno_string(terror, error));
+}
+#endif
+
+#if 0
+void
+print_tlook(int child, int tlook)
+{
+	static const char *msgs[] = {
+		"  %-14s<--/|                                   |                    [%d:%03d]\n",
+		"                    |                                   |\\-->%14s  [%d:%03d]\n",
+		"                    |                                |\\-|--->%14s  [%d:%03d]\n",
+		"                    |          [%14s]         |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 1)
+		print_string_state(child, msgs, t_look_string(tlook));
 }
 #endif
 
@@ -2633,10 +3176,10 @@ void
 print_expect(int child, int want)
 {
 	static const char *msgs[] = {
-		" (%-16s) |- - - - - -[Expected]- - - - - -|  |                    [%d:%03d]\n",
-		"                    |- - - - - -[Expected]- - - - - -|  | (%-16s) [%d:%03d]\n",
+		" (%-16s) |- - - - - -[Expected]- - - - - - - |                    [%d:%03d]\n",
+		"                    |- - - - - -[Expected]- - - - - - - | (%-16s) [%d:%03d]\n",
 		"                    |- - - - - -[Expected]- - - - - -|- | (%-16s) [%d:%03d]\n",
-		"                    |- [Expected %-16s ] -|- |                    [%d:%03d]\n",
+		"                    |- [Expected %-16s ] - - |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 1 && show)
@@ -2647,14 +3190,28 @@ void
 print_string(int child, const char *string)
 {
 	static const char *msgs[] = {
-		"%-20s|                                |  |                    \n",
-		"                    |                                |  |%-20s\n",
+		"%-20s|                                   |                    \n",
+		"                    |                                   |%-20s\n",
 		"                    |                                |   %-20s\n",
-		"                    |       %-20s     |  |                    \n",
+		"                    |       %-20s        |                    \n",
 	};
 
-	if (verbose > 1 && show)
+	if (show && verbose > 0)
 		print_simple_string(child, msgs, string);
+}
+
+void
+print_command_state(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%20s|                                   |                    [%d:%03d]\n",
+		"                    |                                   |%-20s[%d:%03d]\n",
+		"                    |                                |   %-20s[%d:%03d]\n",
+		"                    |       %-20s        |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state(child, msgs, string);
 }
 
 void
@@ -2670,10 +3227,10 @@ void
 print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|  |                    [%d:%03d]\n",
-		"                    | / / / Waiting %03lu seconds / / /|  | / / / / / / / / /  [%d:%03d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / / / |                    [%d:%03d]\n",
+		"                    | / / / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
 		"                    | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 
 	if (verbose > 0 && show)
@@ -2693,10 +3250,10 @@ void
 print_mwaiting(int child, struct timespec *time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |  |                    [%d:%03d]\n",
-		"                    | / / Waiting %8.4f seconds / |  | / / / / / / / / /  [%d:%03d]\n",
-		"                    | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
-		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
+		"/ / / / / / / / / / | / / Waiting %8.4f seconds/ / / |                    [%d:%03d]\n",
+		"                    | / / Waiting %8.4f seconds/ / / | / / / / / / / / /  [%d:%03d]\n",
+		"                    | / / Waiting %8.4f seconds/ /|/ / / / / / / / / / /  [%d:%03d]\n",
+		"/ / / / / / / / / / | / / Waiting %8.4f seconds/ / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 
 	if (verbose > 0 && show) {
@@ -2708,6 +3265,238 @@ print_mwaiting(int child, struct timespec *time)
 		print_float_state(child, msgs, delay);
 	}
 }
+
+#if 0
+void
+print_mgmtflag(int child, np_ulong flag)
+{
+	print_string(child, mgmtflag_string(flag));
+}
+
+void
+print_opt_level(int child, struct t_opthdr *oh)
+{
+	char *level = level_string(oh);
+
+	if (level)
+		print_string(child, level);
+}
+
+void
+print_opt_name(int child, struct t_opthdr *oh)
+{
+	char *name = name_string(oh);
+
+	if (name)
+		print_string(child, name);
+}
+
+void
+print_opt_status(int child, struct t_opthdr *oh)
+{
+	char *status = status_string(oh);
+
+	if (status)
+		print_string(child, status);
+}
+
+void
+print_opt_length(int child, struct t_opthdr *oh)
+{
+	int len = oh->len - sizeof(*oh);
+
+	if (len) {
+		char buf[32];
+
+		snprintf(buf, sizeof(buf), "(len=%d)", len);
+		print_string(child, buf);
+	}
+}
+void
+print_opt_value(int child, struct t_opthdr *oh)
+{
+	char *value = value_string(child, oh);
+
+	if (value)
+		print_string(child, value);
+}
+#endif
+
+#if 0
+void
+print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
+{
+	unsigned char *qos_ptr = (unsigned char *) (cmd_buf + qos_ofs);
+	union N_qos_ip_types *qos = (union N_qos_ip_types *) qos_ptr;
+	char buf[64];
+
+	if (qos_len) {
+		switch (qos->n_qos_type) {
+		case N_QOS_SEL_CONN_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_CONN_IP:");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_conn.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_conn.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_conn.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_conn.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_conn.mtu);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_conn.saddr));
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " daddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_conn.daddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_SEL_UD_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_UD_IP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_ud.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_ud.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_ud.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_ud.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_ud.saddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_SEL_INFO_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_SEL_INFO_IP: ");
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " protocol = %ld,", (long) qos->n_qos_sel_info.protocol);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " priority = %ld,", (long) qos->n_qos_sel_info.priority);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " ttl = %ld,", (long) qos->n_qos_sel_info.ttl);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " tos = %ld,", (long) qos->n_qos_sel_info.tos);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " mtu = %ld,", (long) qos->n_qos_sel_info.mtu);
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " saddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_info.saddr));
+			print_string(child, buf);
+			snprintf(buf, sizeof(buf), " daddr = 0x%x,", (unsigned int) ntohl(qos->n_qos_sel_info.daddr));
+			print_string(child, buf);
+			break;
+
+		case N_QOS_RANGE_INFO_IP:
+			snprintf(buf, sizeof(buf), "N_QOS_RANGE_INFO_IP: ");
+			print_string(child, buf);
+			break;
+
+		default:
+			snprintf(buf, sizeof(buf), "(unknown qos structure %lu)\n", (ulong) qos->n_qos_type);
+			print_string(child, buf);
+			break;
+		}
+	} else {
+		snprintf(buf, sizeof(buf), "(no qos)");
+		print_string(child, buf);
+	}
+}
+
+void
+print_info(int child, N_info_ack_t * info)
+{
+	char buf[64];
+
+	if (verbose < 4)
+		return;
+	snprintf(buf, sizeof(buf), "NSDU_size = %d", (int) info->NSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ENSDU_size = %d", (int) info->ENSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "CDATA_size = %d", (int) info->CDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "DDATA_size = %d", (int) info->DDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ADDR_size = %d", (int) info->ADDR_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "OPTIONS_flags = %x", (int) info->OPTIONS_flags);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "NIDU_size = %d", (int) info->NIDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", service_type(info->SERV_type));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", state_string(info->CURRENT_state));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", provider_type(info->PROVIDER_type));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "NODU_size = %d", (int) info->NODU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "NPI_version = %d", (int) info->NPI_version);
+	print_string(child, buf);
+}
+
+void
+print_reset_reason(int child, np_ulong RESET_reason)
+{
+	print_string(child, reset_reason_string(RESET_reason));
+}
+
+void
+print_reset_orig(int child, np_ulong RESET_orig)
+{
+	print_string(child, reset_orig_string(RESET_orig));
+}
+
+int
+ip_n_open(const char *name, int *fdp)
+{
+	int fd;
+
+	for (;;) {
+		print_open(fdp, name);
+		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
+			*fdp = fd;
+			print_success(fd);
+			return (__RESULT_SUCCESS);
+		}
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return (__RESULT_FAILURE);
+	}
+}
+
+int
+ip_close(int *fdp)
+{
+	int fd = *fdp;
+
+	*fdp = 0;
+	for (;;) {
+		print_close(fdp);
+		if (close(fd) >= 0) {
+			print_success(fd);
+			return __RESULT_SUCCESS;
+		}
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return __RESULT_FAILURE;
+	}
+}
+
+int
+ip_datack_req(int fd)
+{
+	int ret;
+
+	data.len = -1;
+	ctrl.len = sizeof(cmd.npi.datack_req) + sizeof(qos_data);
+	cmd.prim = N_DATACK_REQ;
+	bcopy(&qos_data, cbuf + sizeof(cmd.npi.datack_req), sizeof(qos_data));
+	ret = put_msg(fd, 0, MSG_BAND, 0);
+	return (ret);
+}
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -2738,7 +3527,7 @@ test_ioctl(int child, int cmd, intptr_t arg)
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
 			print_errno(child, (last_errno = errno));
-			if (lass_errno == EINTR || lass_errno == ERESTART)
+			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -2790,7 +3579,7 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -2831,9 +3620,9 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			print_datcall(child, "M_DATA----------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
 				if (last_errno == EINTR || last_errno == ERESTART)
 					continue;
+				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
 			}
 			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
@@ -2851,9 +3640,9 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			print_datcall(child, "M_DATA----------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
 				if (last_errno == EINTR || last_errno == ERESTART)
 					continue;
+				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
 			}
 			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
@@ -2863,15 +3652,163 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 	}
 }
 
+#if 0
+int
+test_m2pa_status(int child, uint32_t status)
+{
+	struct strbuf ctrl_buf, data_buf, *ctrl = &ctrl_buf, *data = &data_buf;
+	char cbuf[BUFSIZE], dbuf[BUFSIZE];
+	union N_primitives *p = (typeof(p)) cbuf;
+
+	switch (m2pa_version) {
+	case M2PA_VERSION_DRAFT3:
+	case M2PA_VERSION_DRAFT3_1:
+		data->len = 3 * sizeof(uint32_t);
+		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) dbuf)[1] = htonl(data->len);
+		((uint32_t *) dbuf)[2] = status;
+		break;
+	case M2PA_VERSION_DRAFT4:
+	case M2PA_VERSION_DRAFT4_1:
+		data->len = 4 * sizeof(uint32_t);
+		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) dbuf)[1] = htonl(data->len);
+		((uint16_t *) dbuf)[4] = htons(bsn[child]);
+		((uint16_t *) dbuf)[5] = htons(fsn[child]);
+		((uint32_t *) dbuf)[3] = status;
+		break;
+	case M2PA_VERSION_DRAFT6_9:
+	case M2PA_VERSION_DRAFT7:
+		data->len = 3 * sizeof(uint32_t);
+		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) dbuf)[1] = htonl(data->len);
+		((uint32_t *) dbuf)[2] = status;
+		break;
+	case M2PA_VERSION_DRAFT4_9:
+	case M2PA_VERSION_DRAFT5:
+	case M2PA_VERSION_DRAFT6:
+	case M2PA_VERSION_DRAFT6_1:
+	case M2PA_VERSION_DRAFT9:
+	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
+		data->len = 5 * sizeof(uint32_t);
+		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) dbuf)[1] = htonl(data->len);
+		((uint32_t *) dbuf)[2] = htonl(bsn[child] & 0x00ffffff);
+		((uint32_t *) dbuf)[3] = htonl(fsn[child] & 0x00ffffff);
+		((uint32_t *) dbuf)[4] = status;
+		break;
+	default:
+		return __RESULT_SCRIPT_ERROR;
+	}
+	ctrl->len = sizeof(p->data_req) + sizeof(qos[0].data);
+	p->type = N_DATA_REQ;
+	p->data_req.DATA_xfer_flags = 0;
+	bcopy(&qos[0].data, (&p->data_req) + 1, sizeof(qos[0].data));
+	print_tx_msg(child, status_string(status));
+	return test_putpmsg(child, ctrl, data, MSG_BAND, 0);
+}
+
+static size_t nacks = 1;
+
+int
+test_m2pa_ack(int child)
+{
+	struct strbuf ctrl_buf, data_buf, *ctrl = &ctrl_buf, *data = &data_buf;
+	char cbuf[BUFSIZE], dbuf[BUFSIZE];
+	union N_primitives *p = (typeof(p)) cbuf;
+
+	switch (m2pa_version) {
+	case M2PA_VERSION_DRAFT3:
+	case M2PA_VERSION_DRAFT3_1:
+		qos[0].data.sid = 1;
+		data->len = 3 * sizeof(uint32_t);
+		ctrl->len = sizeof(p->exdata_req) + sizeof(qos[0].data);
+		((uint32_t *) data->buf)[0] = M2PA_ACK_MESSAGE;
+		((uint32_t *) data->buf)[1] = htonl(data->len);
+		((uint32_t *) data->buf)[2] = htonl(nacks);
+		p->type = N_EXDATA_REQ;
+		bcopy(&qos[0].data, (&p->exdata_req) + 1, sizeof(qos[0].data));
+		break;
+
+	case M2PA_VERSION_DRAFT4:
+	case M2PA_VERSION_DRAFT4_1:
+		qos[0].data.sid = 0;
+		data->len = 4 * sizeof(uint32_t);
+		ctrl->len = sizeof(p->exdata_req) + sizeof(qos[0].data);
+		((uint32_t *) data->buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) data->buf)[1] = htonl(data->len);
+		((uint16_t *) data->buf)[4] = htons(bsn[child]);
+		((uint16_t *) data->buf)[5] = htons(fsn[child]);
+		((uint32_t *) data->buf)[3] = M2PA_STATUS_NONE;
+		p->type = N_EXDATA_REQ;
+		bcopy(&qos[0].data, (&p->exdata_req) + 1, sizeof(qos[0].data));
+		break;
+
+	case M2PA_VERSION_DRAFT4_9:
+		qos[0].data.sid = 0;
+		data->len = 5 * sizeof(uint32_t);
+		ctrl->len = sizeof(p->exdata_req) + sizeof(qos[0].data);
+		((uint32_t *) data->buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) data->buf)[1] = htonl(data->len);
+		((uint32_t *) data->buf)[2] = htonl(bsn[child] & 0xffffff);
+		((uint32_t *) data->buf)[3] = htonl(fsn[child] & 0xffffff);
+		((uint32_t *) data->buf)[4] = M2PA_STATUS_NONE;
+		p->type = N_EXDATA_REQ;
+		bcopy(&qos[0].data, (&p->exdata_req) + 1, sizeof(qos[0].data));
+		break;
+
+	case M2PA_VERSION_DRAFT5:
+	case M2PA_VERSION_DRAFT5_1:
+		qos[0].data.sid = 0;
+		data->len = 5 * sizeof(uint32_t);
+		ctrl->len = sizeof(p->exdata_req) + sizeof(qos[0].data);
+		((uint32_t *) data->buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) data->buf)[1] = htonl(data->len);
+		((uint32_t *) data->buf)[2] = htonl(bsn[child] & 0xffffff);
+		((uint32_t *) data->buf)[3] = htonl(fsn[child] & 0xffffff);
+		((uint32_t *) data->buf)[4] = M2PA_STATUS_IN_SERVICE;
+		p->type = N_EXDATA_REQ;
+		bcopy(&qos[0].data, (&p->exdata_req) + 1, sizeof(qos[0].data));
+		break;
+
+	case M2PA_VERSION_DRAFT6:
+	case M2PA_VERSION_DRAFT6_1:
+	case M2PA_VERSION_DRAFT6_9:
+	case M2PA_VERSION_DRAFT7:
+	case M2PA_VERSION_DRAFT9:
+	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
+		qos[0].data.sid = 1;
+		data->len = 4 * sizeof(uint32_t);
+		ctrl->len = sizeof(p->data_req) + sizeof(qos[0].data);
+		((uint32_t *) data->buf)[0] = M2PA_DATA_MESSAGE;
+		((uint32_t *) data->buf)[1] = htonl(data->len);
+		((uint32_t *) data->buf)[2] = htonl(bsn[child] & 0xffffff);
+		((uint32_t *) data->buf)[3] = htonl(fsn[child] & 0xffffff);
+		p->type = N_DATA_REQ;
+		p->data_req.DATA_xfer_flags = 0;
+		bcopy(&qos[0].data, (&p->data_req) + 1, sizeof(qos[0].data));
+		break;
+	default:
+		return __RESULT_SCRIPT_ERROR;
+	}
+	print_tx_msg(child, "ACK");
+	return test_putpmsg(child, ctrl, data, MSG_BAND, 0);
+}
+#endif
+
 int
 test_write(int child, const void *buf, size_t len)
 {
 	print_syscall(child, "write(2)------");
 	for (;;) {
 		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2886,9 +3823,9 @@ test_writev(int child, const struct iovec *iov, int num)
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
 		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3078,7 +4015,7 @@ test_isastream(int child)
 int
 test_poll(int child, const short events, short *revents, long ms)
 {
-	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
+	struct pollfd pfd = {.fd = test_fd[child],.events = events,.revents = 0 };
 	int result;
 
 	print_poll(child, events);
@@ -3176,17 +4113,52 @@ test_close(int child)
 	}
 }
 
+int
+test_push(int child, const char *name)
+{
+	if (show && verbose > 1)
+		print_command_state(child, ":push");
+	if (test_ioctl(child, I_PUSH, (intptr_t) name))
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
+int
+test_pop(int child)
+{
+	if (show && verbose > 1)
+		print_command_state(child, ":pop");
+	if (test_ioctl(child, I_POP, (intptr_t) 0))
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
- *  Stream Initialization
+ *  STREAM Initialization
  *
  *  -------------------------------------------------------------------------
  */
 
-int
+static int
 stream_start(int child, int index)
 {
+#if 0
+	int offset = 3 * index;
+	int i;
+
+	for (i = 0; i < anums[3]; i++) {
+#ifndef SCTP_VERSION_2
+		addrs[3].port = htons(ports[3] + offset);
+		inet_aton(addr_strings[i], &addrs[child].addr[i]);
+#else				/* SCTP_VERSION_2 */
+		addrs[3][i].sin_family = AF_INET;
+		addrs[3][i].sin_port = htons(ports[3] + offset);
+		inet_aton(addr_strings[i], &addrs[3][i].sin_addr);
+#endif				/* SCTP_VERSION_2 */
+	}
+#endif
 	switch (child) {
 	case 1:
 		if (test_pipe(0) != __RESULT_SUCCESS)
@@ -3211,7 +4183,7 @@ stream_start(int child, int index)
 	}
 }
 
-int
+static int
 stream_stop(int child)
 {
 	switch (child) {
@@ -3276,14 +4248,23 @@ begin_tests(int index)
 		goto failure;
 	state++;
 	show_acks = 1;
-	return (__RESULT_SUCCESS);
+	return __RESULT_SUCCESS;
       failure:
-	return (__RESULT_FAILURE);
+	return __RESULT_FAILURE;
 }
 
 static int
 end_tests(int index)
 {
+#if 0
+	qos_data.sid = 0;
+	qos_info.hmac = SCTP_HMAC_NONE;
+	qos_info.options = 0;
+	qos_info.i_streams = 1;
+	qos_info.o_streams = 1;
+	qos_conn.i_streams = 1;
+	qos_conn.o_streams = 1;
+#endif
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
 		goto failure;
@@ -3294,9 +4275,9 @@ end_tests(int index)
 	if (stream_stop(0) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	return (__RESULT_SUCCESS);
+	return __RESULT_SUCCESS;
       failure:
-	return (__RESULT_FAILURE);
+	return __RESULT_FAILURE;
 }
 
 /*
@@ -3461,6 +4442,13 @@ run_stream(int child, struct test_stream *stream)
 	int result = __RESULT_SCRIPT_ERROR;
 	int pre_result = __RESULT_SCRIPT_ERROR;
 	int post_result = __RESULT_SCRIPT_ERROR;
+
+#if 0
+	oldact = 0;		/* previous action for this child */
+	cntact = 0;		/* count of this action for this child */
+	oldevt = 0;		/* previous return for this child */
+	cntevt = 0;		/* count of this return for this child */
+#endif
 
 	print_preamble(child);
 	state = 100;
@@ -3730,6 +4718,9 @@ test_run(struct test_stream *stream[])
 struct test_case {
 	const char *numb;		/* test case number */
 	const char *tgrp;		/* test case group */
+#if 0
+	const char *sgrp;		/* test case subgroup */
+#endif
 	const char *name;		/* test case name */
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
@@ -3801,12 +4792,16 @@ do_tests(int num_tests)
 			}
 			if (verbose > 0) {
 				dummy = lockf(fileno(stdout), F_LOCK, 0);
-				if (verbose > 1)
+				if (verbose > 1 && tests[i].tgrp)
 					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
+#if 0
+				if (verbose > 1 && tests[i].sgrp)
+					fprintf(stdout, "\nTest Subgroup: %s", tests[i].sgrp);
+#endif
 				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
-				if (verbose > 1)
+				if (verbose > 1 && tests[i].sref)
 					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
-				if (verbose > 1)
+				if (verbose > 1 && tests[i].desc)
 					fprintf(stdout, "%s\n", tests[i].desc);
 				fprintf(stdout, "\n");
 				fflush(stdout);
@@ -3906,10 +4901,8 @@ do_tests(int num_tests)
 			if (repeat_on_success && (result == __RESULT_SUCCESS))
 				goto rerun;
 			tests[i].result = result;
-			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE)) {
+			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
 				aborted = 1;
-				continue;
-			}
 		}
 		if (summary && verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -4285,12 +5278,16 @@ main(int argc, char *argv[])
 				fprintf(stdout, "\n");
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, l)) {
-						if (verbose > 2)
+						if (verbose > 2 && t->tgrp)
 							fprintf(stdout, "Test Group: %s\n", t->tgrp);
+#if 0
+						if (verbose > 2 && t->sgrp)
+							fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
+#endif
 						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
-						if (verbose > 2)
+						if (verbose > 2 && t->sref)
 							fprintf(stdout, "Test Reference: %s\n", t->sref);
-						if (verbose > 1)
+						if (verbose > 1 && t->desc)
 							fprintf(stdout, "%s\n\n", t->desc);
 						fflush(stdout);
 						n++;
@@ -4307,12 +5304,16 @@ main(int argc, char *argv[])
 			} else {
 				fprintf(stdout, "\n");
 				for (t = tests; t->numb; t++) {
-					if (verbose > 2)
+					if (verbose > 2 && t->tgrp)
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
+#if 0
+					if (verbose > 2 && t->sgrp)
+						fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
+#endif
 					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
-					if (verbose > 2)
+					if (verbose > 2 && t->sref)
 						fprintf(stdout, "Test Reference: %s\n", t->sref);
-					if (verbose > 1)
+					if (verbose > 1 && t->desc)
 						fprintf(stdout, "%s\n\n", t->desc);
 					fflush(stdout);
 				}
@@ -4327,7 +5328,7 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long)timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long) timer_scale);
 			break;
 		case 's':
 			summary = 1;

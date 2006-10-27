@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,21 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/10/27 22:50:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: m2pa_dl.c,v $
+ Revision 0.9.2.1  2006/10/27 22:50:40  brian
+ - working up modules and testsuite
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $";
 
 #include <sys/os7/compat.h>
 
 #define M2PA_DL_DESCRIP		"M2PA/SCTP SS7 DATA LINK (DL) STREAMS MODULE"
-#define M2PA_DL_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define M2PA_DL_REVISION	"OpenSS7 $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $"
 #define M2PA_DL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
 #define M2PA_DL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

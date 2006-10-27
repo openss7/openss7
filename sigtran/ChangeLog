@@ -1,3 +1,11 @@
+2006-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/m2pa_sl.c: working up module
+	* src/modules/m2pa_dl.c: added working file
+	* src/modules/sl_dl.c: added working file
+	* src/test/test-m2pa.c: working up test suite
+	* src/test/test-sigtran.c: working up test suite
+
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/sigtran.refs: updated streams release number

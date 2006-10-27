@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/10/27 22:50:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sl_dl.c,v $
+ Revision 0.9.2.1  2006/10/27 22:50:40  brian
+ - working up modules and testsuite
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $";
 
 /*
  * This is a simple SL to DL conversion module that converst between the
@@ -68,7 +71,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/os7/compat.h>
 
 #define SL_DL_DESCRIP		"SIGNALLING LINK (SL) DATA LINK (DL) STREAMS MODULE"
-#define SL_DL_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define SL_DL_REVISION		"OpenSS7 $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $"
 
 #define SL_DL_COPYRIGHT		"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
