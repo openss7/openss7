@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Binary Compatibility Modules -- read me first file.  2006-10-16
-$Id: README,v 0.9.2.13 2006/10/17 12:08:19 brian Exp $
+OpenSS7 STREAMS Binary Compatibility Modules -- read me first file.  2006-10-27
+$Id: README,v 0.9.2.14 2006/10/27 22:23:54 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -45,7 +45,7 @@ of this package, contact <info@openss7.com>.
  Release
 --------
 
-This is the `strbcm-0.9.2.2' package, released 2006-10-16.  This
+This is the `strbcm-0.9.2.2' package, released 2006-10-27.  This
 `0.9.2.2' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -108,8 +108,8 @@ package are as follows:
 then the dependencies listed below will already have been met by
 unpacking the master package.)
 
-  2. `OpenSS7 Linux Fast-STREAMS', streams-0.7a.6
-     (http://www.openss7.org/tarballs/streams-0.7a.6.tar.bz2).  (3)
+  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.1
+     (http://www.openss7.org/tarballs/streams-0.9.2.1.tar.bz2).  (3)
 
   3. `OpenSS7 STREAMS Compatibility Modules',
      strcompat-0.9.2.4
