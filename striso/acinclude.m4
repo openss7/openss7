@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/12 10:24:49 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/27 23:05:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/12 10:24:49 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 23:05:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -248,7 +248,7 @@ AC_DEFUN([_ISO_CONFIG_KERNEL], [dnl
 			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
 			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -270,7 +270,7 @@ AC_DEFUN([_ISO_CONFIG_KERNEL], [dnl
     ])
     _LINUX_CHECK_TYPES([irqreturn_t, pm_message_t], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
