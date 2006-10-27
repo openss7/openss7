@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/16 09:49:25 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/27 22:17:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/16 09:49:25 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:17:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/16 09:49:25 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/27 22:17:04 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -802,13 +802,17 @@ write_cache() {
 read_dump() {
     count=0
     progress=0
-    while read crc sym path junk ; do
+    while read crc sym path exp junk ; do
 	((count++))
 	((progress++))
 	if test $progress -ge 100 ; then
 	    progress=0
 	    command_info "processed $count symbols"
 	fi
+	case "$exp" in
+	    (EXPORT_SYMBOL*) ;;
+	    (*) junk="$exp${junk:+ $junk}" ;;
+	esac
 	if test :"$junk" != : ; then
 	    command_warn "line $count junk on line $junk"
 	    continue

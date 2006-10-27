@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/09/29 10:57:46 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/27 22:17:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:17:02 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.20  2006/10/27 22:17:02  brian
+# - changes for 2.6.18 kernel
+#
 # Revision 0.9.2.19  2006/09/29 10:57:46  brian
 # - autoconf does not like multiline cache variables
 #
@@ -477,7 +480,7 @@ dnl use defines.
 AC_DEFUN([_STRCOMP_KERNEL], [dnl
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

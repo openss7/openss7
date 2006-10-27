@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/18 00:33:53 $
+# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/27 22:17:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 00:33:53 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:17:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -217,7 +217,7 @@ AC_DEFUN([_XOPEN_OPENSS7_SCTP], [dnl
     AC_CACHE_CHECK([for xopen sctp openss7 kernel], [xopen_cv_openss7_sctp], [dnl
 	_LINUX_KERNEL_ENV([dnl
 	    AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <net/sctp.h>
@@ -293,7 +293,7 @@ AC_DEFUN([_XOPEN_SETUP_INET], [dnl
 			       sysctl_tcp_fin_timeout])
 	_LINUX_CHECK_MEMBERS([struct sock.protinfo.af_inet.ttl,
 			      struct sock.protinfo.af_inet.uc_ttl], [], [], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>

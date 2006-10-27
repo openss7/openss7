@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/08/16 07:30:47 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/10/27 22:17:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:30:47 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:17:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2268,7 +2268,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG_internal], [dnl
     AC_CACHE_CHECK([$linux_tmp], [linux_cv_$2], [dnl
 	AC_EGREP_CPP([\<yes_we_have_$2_defined\>], [
 #include <linux/version.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #ifdef $2
     yes_we_have_$2_defined
 #endif
@@ -2446,7 +2446,7 @@ AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
 	then
 	    _LINUX_KERNEL_ENV([dnl
 		AC_EGREP_CPP([\<yes_symbol_$1_is_exported\>], [
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #ifdef $1

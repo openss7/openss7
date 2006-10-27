@@ -1,3 +1,11 @@
+2006-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: change linux/config.h to autoconf.h for 2.6.18
+	* m4/strcomp.m4: change linux/config.h to autoconf.h for 2.6.18
+	* m4/streams.m4: change linux/config.h to autoconf.h for 2.6.18
+	* m4/xopen.m4: change linux/config.h to autoconf.h for 2.6.18
+	* scripts/modpost.sh: Module.symver has extra EXPORT_SYMBOL* field in 2.6.18
+
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/versions.texi: bumped streams version

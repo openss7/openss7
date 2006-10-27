@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/21 09:17:38 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2006/10/27 22:17:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/21 09:17:38 $ by $Author: brian $
+# Last Modified $Date: 2006/10/27 22:17:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -798,7 +798,7 @@ dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will jus
 AC_DEFUN([_LINUX_STREAMS_KERNEL], [dnl
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
