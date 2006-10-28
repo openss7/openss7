@@ -1,3 +1,17 @@
+2006-10-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: rip symbol for cd_forget()
+	* src/drivers/fifo.c:
+	  - change external character device based FIFOs to S_IFIFO and forget
+	    i_cdev when on inode diet an i_pipe is a union with i_cdev.
+	* src/kernel/strattach.c:
+	  - strap out i_pipe based stream check when on inode diet (it will fail
+	    to detect a Stream.  Need a better check.  (The inode must be a
+	    specfs inode because we never fattach external filesystem inodes.)
+	* src/kernel/strspecfs.c:
+	  - insert comment indicating that we are already doing the right thing
+	    with regard to clearing i_pipe before clearing a specfs inode.
+
 2006-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: change linux/config.h to autoconf.h for 2.6.18

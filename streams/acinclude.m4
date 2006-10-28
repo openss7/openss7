@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/10/27 23:19:31 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2006/10/28 01:08:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/27 23:19:31 $ by $Author: brian $
+# Last Modified $Date: 2006/10/28 01:08:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.126  2006/10/28 01:08:31  brian
+# - better support for 2.6.18 inode diet
+#
 # Revision 0.9.2.125  2006/10/27 23:19:31  brian
 # - changes for 2.6.18 kernel
 #
@@ -1067,6 +1070,12 @@ dnl  Well, not exporting kthread_ functions is just about the stupidest thing
 dnl  I've seen from a distro yet.  SLES takes the prize for this stupidity.
 dnl
     _LINUX_KERNEL_SYMBOLS([kthread_create, kthread_should_stop, kthread_stop, kthread_bind])
+dnl
+dnl On the inode diet it is necessary to forget any i_cdev pointer before
+dnl using i_pipe when an external inode is being reused for character device
+dnl based FIFOS.
+dnl
+    _LINUX_KERNEL_SYMBOLS([cd_forget])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \

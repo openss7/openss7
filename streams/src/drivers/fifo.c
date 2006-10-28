@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/10/27 23:19:34 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/28 01:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
+ Last Modified $Date: 2006/10/28 01:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/10/27 23:19:34 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/28 01:08:33 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/10/27 23:19:34 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/28 01:08:33 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -66,6 +66,14 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#if defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
+#include <linux/cdev.h>
+#if defined HAVE_CD_FORGET_ADDR
+static void (*cd_forget_fp)(struct inode *) = (typeof(&cd_forget)) HAVE_CD_FORGET_ADDR;
+#define cd_forget(inode) cd_forget_fp(inode)
+#endif
+#endif
+
 #ifndef HAVE_KFUNC_MODULE_PUT
 #define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
 #endif
@@ -78,7 +86,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/10/27 23:19:34 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/28 01:08:33 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -246,6 +254,19 @@ fifo_open(struct inode *inode, struct file *file)
 		fops_put(file->f_op);
 		file->f_op = f_op;
 	}
+#if defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
+	/* When we are on the inode diet (starting with 2.6.18), the i_pipe pointer used by STREAMS 
+	   to point to the Stream head clone list and the i_cdev pointer are the same pointer.  If
+	   the external inode is a character device inode we need to remove anything hanging off of 
+	   i_cdev and change i_mode to S_IFIFO.  That way we can used i_pipe to our heart's
+	   content and the node will also suddenly appear as a FIFO instead of a character device. 
+	   This is only necessary if the inode is not already S_IFIFO, and if the file operations
+	   have not already been replaced. */
+	if ((inode->i_mode & S_IFMT) == S_IFCHR) {
+		cd_forget(inode);
+		inode->i_mode = (inode->i_mode & ~S_IFMT) | S_IFIFO;
+	}
+#endif				/* defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE */
 	file->private_data = &dev;	/* use this device number instead of inode number */
 	file->f_flags &= ~O_CLONE;	/* FIFOs never clone */
 	err = file->f_op->open(inode, file);

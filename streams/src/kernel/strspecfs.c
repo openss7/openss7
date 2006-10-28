@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/10/27 23:19:37 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/28 01:08:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:37 $ by $Author: brian $
+ Last Modified $Date: 2006/10/28 01:08:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/10/27 23:19:37 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/28 01:08:34 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/10/27 23:19:37 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/28 01:08:34 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -104,7 +104,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2006/10/27 23:19:37 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/28 01:08:34 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1182,6 +1182,10 @@ spec_remount_fs(struct super_block *sb, int *flags, char *data)
  *  want to overload those pointers within the specfs, we need to clear them here before vfs
  *  mistakes those pointers as block or character device pointers.  We use i_pipe, but let's clear
  *  it here too.
+ *
+ *  Under the inode diet starting with 2.6.18 i_pipe is a union with i_cdev and i_bdev; however,
+ *  i_cdev is never set within the specfs.  Therefore, we must still clear it here before cdput
+ *  mistakes it for a valud i_cdev pointer (because this may be an S_IFCHR inode).
  */
 STATIC void
 spec_clear_inode(struct inode *inode)
