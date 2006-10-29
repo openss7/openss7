@@ -1269,6 +1269,15 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 #ifndef thread_group_leader
 #define thread_group_leader(p) (p->pid == p->tgid)
 #endif
+
+#ifndef HAVE_TASKLIST_LOCK_EXPORT
+#ifndef HAVE_TASKLIST_LOCK_ADDR
+#error Need access to tasklist_lock.
+#endif				/* HAVE_TASKLIST_LOCK_ADDR */
+static rwlock_t *tasklist_lock_p = (typeof(&tasklist_lock)) HAVE_TASKLIST_LOCK_ADDR;
+#define tasklist_lock (*tasklist_lock_p)
+#endif				/* HAVE_TASKLIST_LOCK_EXPORT */
+
 /**
  *  str_find_thread_group_leader: - given a thread find the thread group leader
  *  @procp:	the process

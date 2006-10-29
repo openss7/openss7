@@ -1073,9 +1073,9 @@ dnl
 dnl
 dnl On the inode diet it is necessary to forget any i_cdev pointer before
 dnl using i_pipe when an external inode is being reused for character device
-dnl based FIFOS.
+dnl based FIFOS.  2.6.18 does not export tasklist_lock
 dnl
-    _LINUX_KERNEL_SYMBOLS([cd_forget])
+    _LINUX_KERNEL_SYMBOLS([cd_forget, tasklist_lock])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \

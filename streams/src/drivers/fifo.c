@@ -68,11 +68,26 @@ static char const ident[] =
 
 #if defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
 #include <linux/cdev.h>
-#if defined HAVE_CD_FORGET_ADDR
-static void (*cd_forget_fp)(struct inode *) = (typeof(&cd_forget)) HAVE_CD_FORGET_ADDR;
+
+#if !defined HAVE_CD_FORGET_EXPORT
+#if !defined HAVE_CD_FORGET_ADDR
+#error Need access to cd_forget().
+#endif				/* !defined HAVE_CD_FORGET_ADDR */
+static void (*cd_forget_fp) (struct inode *) = (typeof(&cd_forget)) HAVE_CD_FORGET_ADDR;
+
 #define cd_forget(inode) cd_forget_fp(inode)
-#endif
-#endif
+#endif				/* !defined HAVE_CD_FORGET_EXPORT */
+
+#if !defined HAVE_CDEV_PUT_EXPORT
+#if !defined HAVE_CDEV_PUT_ADDR
+#error Need access to cdev_put().
+#endif				/* !defined HAVE_CDEV_PUT_ADDR */
+static void (*cdev_put_fp) (struct cdev *) = (typeof(&cdev_put)) HAVE_CDEV_PUT_ADDR;
+
+#define cdev_put(cdev) cdev_put_fp(cdev)
+#endif				/* !defined HAVE_CDEV_PUT_EXPORT */
+
+#endif				/* defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE */
 
 #ifndef HAVE_KFUNC_MODULE_PUT
 #define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
@@ -263,6 +278,8 @@ fifo_open(struct inode *inode, struct file *file)
 	   This is only necessary if the inode is not already S_IFIFO, and if the file operations
 	   have not already been replaced. */
 	if ((inode->i_mode & S_IFMT) == S_IFCHR) {
+		if (inode->i_cdev)
+			cdev_put(inode->i_cdev);
 		cd_forget(inode);
 		inode->i_mode = (inode->i_mode & ~S_IFMT) | S_IFIFO;
 	}
