@@ -1,3 +1,11 @@
+2006-10-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: rip tasklist_lock, final changes for FC5 2.6.18 w/ inode diet
+	* src/drivers/fifo.c: final changes for FC5 2.6.18 w/ inode diet
+	* src/kernel/strattach.c: final changes for FC5 2.6.18 w/ inode diet
+	* src/kernel/strspecfs.c: final changes for FC5 2.6.18 w/ inode diet
+	* src/modules/sth.c: final changes for FC5 2.6.18 w/ inode diet
+
 2006-10-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: rip symbol for cd_forget()
