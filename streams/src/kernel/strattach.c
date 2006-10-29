@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/28 01:08:34 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/10/29 13:11:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/28 01:08:34 $ by $Author: brian $
+ Last Modified $Date: 2006/10/29 13:11:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/28 01:08:34 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/10/29 13:11:43 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/28 01:08:34 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/10/29 13:11:43 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -143,12 +143,9 @@ do_fattach(const struct file *file, const char *file_name)
 	struct vfsmount *mnt;
 	int err;
 
-#if !defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
 	err = -EINVAL;
-	/* FIXME: need better check when on inode diet */
-	if (!file->f_dentry->d_inode->i_pipe)
+	if (file->f_dentry->d_sb->s_magic != SPECFS_MAGIC)
 		goto out;	/* not a STREAM */
-#endif				/* !defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE */
 	err = -ENOENT;
 	if (!file_name || !*file_name)
 		goto out;
@@ -239,11 +236,8 @@ do_fdetach(const char *file_name)
 		goto release;	/* not mounted */
 	if (!check_mnt(nd.mnt))
 		goto release;
-#if !defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
-	/* FIXME: need better check when on inode diet */
-	if (!nd.dentry->d_inode->i_pipe)
+	if (nd.dentry->d_sb->s_magic != SPECFS_MAGIC)
 		goto release;	/* not a STREAM */
-#endif				/* !defined HAVE_KMEMB_STRUCT_INODE_I_PRIVATE */
 
 	err = -EPERM;
 	/* the owner of the (real) file is permitted to fdetach */

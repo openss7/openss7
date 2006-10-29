@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/28 01:08:34 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2006/10/29 13:11:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/28 01:08:34 $ by $Author: brian $
+ Last Modified $Date: 2006/10/29 13:11:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/28 01:08:34 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2006/10/29 13:11:43 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/28 01:08:34 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2006/10/29 13:11:43 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -104,7 +104,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2006/10/28 01:08:34 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2006/10/29 13:11:43 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -157,38 +157,38 @@ MODULE_ALIAS("/dev/streams/*");
       cdevsw              struct cdevsw          struct devnode                                              
     __________               __________                               struct stdata   struct stdata          
    |          |------------>|          |            __________         __________      __________            
-   |__________|     ,------>|          |           |          |------>|          |--->|          |           
-   |          |     |,----->|          |---------->| non-clone|<--.   |          |    |          |           
-   |__________|     ||      |          |       ,---|__________|<-.|   |          |    |          |           
-   |          |     ||      |__________|       |    __________   ||   |__________|    |__________|           
-   |__________|     ||          |  ^           '-->|          |  ||        ^                ^                
-   |          |_____||  d_inode |  |               |  clone   |  ||        |                |                
-   |__________|      |          |  |           ,---|__________|  ||        |                |                
-   |          |      |          |  |           |    __________   ||        |                |                
-   |__________|      |          |  |           '-->|          |  ||        |                |                
-   |          |      |          |  |               |          |  ||        |                |                
-   |__________|      |          |  |           ,---|__________|  ||        |                |                
-   |          |______|          |  |           |                 ||        |                |                
-   |__________|                 |  |           '-->              ||        |                |                
-   |          |                 |  |                             ||        |                |                
-   |__________|                 |  |                             ||        |                |                
-   |          |                 |  |                       ______||        |                |                
-   |__________|                 |  |                      |       |        |                |                
-   |          |                 |  |                      | ______|        |                |                
-   |__________|                 |  | i_private            || i_private     |                |                
-                                |  |                      ||               |                |                
-                             ___v__|___             ______||__             |                |                
-                    +------>|          |<-.        |          |<--. i_pipe |                |                
+   |__________|     ,------>|          |---------->|          |------>|          |--->|          |           
+   |          |     |,----->|          |           | non-clone|       |          |    |          |           
+   |__________|     ||      |          |       ,---|__________|       |          |    |          |           
+   |          |     ||      |__________|       |    __________        |__________|    |__________|           
+   |__________|     ||           |             '-->|          |            ^                ^                
+   |          |_____||   d_inode |                 |  clone   |            |                |                
+   |__________|      |           |             ,---|__________|            |                |                
+   |          |      |           |             |    __________             |                |                
+   |__________|      |           |             '-->|          |            |                |                
+   |          |      |           |                 |          |            |                |                
+   |__________|      |           |             ,---|__________|            |                |                
+   |          |______|           |             |        |                  |                |                
+   |__________|                  |             '-->     | n_inode          |                |                
+   |          |                  |                      |                  |                |                
+   |__________|                  |                      |                  |                |                
+   |          |                  |                      |                  |                |                
+   |__________|                  |                      |                  |                |                
+   |          |                  |                      |                  |                |                
+   |__________|                  |                      |                  |                |                
+                                 |                      |                  |                |                
+                             ____v_____             ____v_____             |                |                
+                    +------>|          |<-.        |          |<--. i_str  |                |                
                     |  ,----|__________|  |        |__________|---|--------'                |                
-     sb inode       |  |     __________   |         ______|___    |                         |                
-    __________      |  +--->|          |<-|-.      |          |<--|-.      i_pipe           |                
+     sb inode       |  |     __________   |         __________    |                         |                
+    __________      |  +--->|          |<-|-.      |          |<--|-.      i_str            |                
    |          |_____|  ,----|__________|  | |      |__________|---|-|-----------------------'                
    |__________|        +--->|          |  | |      |          |<--|-|-.                                      
                        ,----|__________|  | |      |__________|   | | |                                      
                        |     __________   | |       __________    | | |       struct stdata                  
 		       +--->|          |  | |      |          |   | | |        __________                    
 		       ,----|__________|  | |      |__________|---|-|-|------>|          |                   
-                       |                  | |                     | | | i_pipe|          |                   
+                       |                  | |                     | | | i_str |          |                   
                        +---> dir inodes   | |       dev inodes    | | |       |          |                   
                                           | |                     | | |       |__________|                   
                                           | |                     | | |                                      
@@ -214,9 +214,9 @@ MODULE_ALIAS("/dev/streams/*");
       number can be calculated using the external major device number and the cdevsw entry.  The
       internal minor device number can also be calculated using the external major and external
       minor.  The minor inode can be found using an iget() lookup by inode number calculated from
-      the internal major and minor device numbers.  The i_pipe pointer for the inode can be checked
+      the internal major and minor device numbers.  The i_str  pointer for the inode can be checked
       to see if an stdata structure already exists.  If there is a devnode structure associated with
-      the inode (i_private pointer) then minor device specifications and and autopush lists can
+      the inode (si_node pointer) then minor device specifications and and autopush lists can
       be determined from the devnode structure.  The superblock inode_create operation will create a
       new inode and associate it with a devnode if one exists for the minor device instance.
                                                                                                              
@@ -256,9 +256,13 @@ MODULE_ALIAS("/dev/streams/*");
     --------------------------------------------------------------------------------------------------------
  */
 
-#ifndef HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
+#define i_private i_private
+#define i_str i_private
+#else				/* HAVE_KMEMB_STRUCT_INODE_I_PRIVATE */
 #define i_private u.generic_ip
-#endif
+#define i_str i_pipe
+#endif				/* HAVE_KMEMB_STRUCT_INODE_I_PRIVATE */
 
 /* we want macro versions of these */
 
@@ -289,13 +293,15 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 
 #if defined HAVE_KFUNC_IGET_LOCKED
 	if (!(snode = iget_locked(sb, dev))) {
-		_ptrace(("couldn't allocate inode\n"));
+		_ptrace(("couldn't allocate snode\n"));
 		return ERR_PTR(-ENOMEM);
-	}
-	if (snode->i_state & I_NEW) {
-		snode->i_private = cdev;
-		sb->s_op->read_inode(snode);
-		unlock_new_inode(snode);
+	} else {
+		if (snode->i_state & I_NEW) {
+			/* just a way to pass another argument to read_inode() */
+			snode->i_private = cdev;
+			sb->s_op->read_inode(snode);
+			unlock_new_inode(snode);
+		}
 	}
 #else
 	if (!(snode = iget4(sb, dev, NULL, cdev))) {
@@ -381,7 +387,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 			_printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
 #endif
 		fops_put(file->f_op);
-		file->f_op = (struct file_operations *)f_op;
+		file->f_op = (struct file_operations *) f_op;
 	}
 	dput(file->f_dentry);
 	file->f_dentry = dentry;
@@ -579,9 +585,9 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 		file->f_pos++;
 		/* fall through */
 	default:
-		/* Cannot take cdevsw structure pointer from i_private because the directory
-		   inode might exist even though the module is unloaded.  So we need to look it up
-		   again, but without locks... */
+		/* Cannot take cdevsw structure pointer from the snode because the directory inode
+		   might exist even though the module is unloaded.  So we need to look it up again, 
+		   but without locks... */
 		if ((cdev = cdrv_get(getminor(dentry->d_inode->i_ino)))) {
 			int i = nr - 2, err = 0;
 
@@ -1032,63 +1038,6 @@ spec_put_inode(struct inode *inode)
 }
 
 /**
- *  spec_delete_inode: - delete an inode from the filesystem
- *  @inode:	inode to delete
- *
- *  The delete_inode() superblock operation is called before removing an inode.  We need to detach
- *  the inode from the underlying stream head structure and initiate the close procedure on that
- *  stream head if it has no other references.
- *
- *  Module (directory) inodes do not have any stream head associated with them and therefore do not
- *  have an i_pipe pointer set.
- *
- *  Because the inode numbers are controls and the mode of the inode is controlled by us, we can
- *  know what type of underlying structure may be hanging off of the i_private pointer.
- */
-STATIC void
-spec_delete_inode(struct inode *inode)
-{
-	_printd(("%s: deleting inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
-	switch (inode->i_mode & S_IFMT) {
-	case S_IFDIR:
-		/* directory inodes potentially have a cdevsw structure hanging off of the
-		   i_private pointer, these are for sanity checks only. When we referemce the
-		   inode from the module structure, we hold a reference count on the inode.  We
-		   should never get here with either the i_private pointer set or the d_inode
-		   reference still held.  Forced deletions might get us here anyway. */
-		assert(inode->i_private == NULL);
-		break;
-	case S_IFCHR:
-		/* character special device inodes potentially have a minor devnode structure
-		   hanging off of the i_private pointer and stream heads hanging off of the
-		   i_pipe pointer. When we reference the inode from the devnode structure, we hold
-		   a reference count on the inode.  We should never get here with either the
-		   i_private pointer set or the n_inode reference still held.  Forced deletions
-		   might get us here anyway. */
-		assert(inode->i_private == NULL);
-		/* fall through */
-	default:
-	case S_IFIFO:
-		/* unnamed pipe inodes potentially have stream heads hanging off of the i_pipe
-		   pointer and nothing hanging off of the i_private pointer. */
-	case S_IFSOCK:
-		/* socket inodes potentially have stream heads hanging off of the i_pipe pointer
-		   and nothing hanging off of the u.generic_ip_pointer. */
-		/* When we referemce the inode from the stdata structure, we hold a reference count 
-		   on the inode.  We should never get here with the the sd_inode reference still
-		   held.  Forced deletions might get us here anyway. */
-
-		/* otherwise bad things will happen in clear_inode() */
-		assert(inode->i_pipe == NULL);
-		break;
-	}
-	clear_inode(inode);	/* we must call clear_inode when we take this hook */
-	/* note that clear_inode() will remove the i_cdev regardless of the mode of the inode; note 
-	   that i_pipe is not cleared (we did it above) */
-	/* well, we clear i_pipe in spec_clear_inode below */
-}
-
-/**
  *  spec_put_super: - put a superblock for the filesystem
  *  @sb:	super block to put
  *
@@ -1164,39 +1113,6 @@ spec_remount_fs(struct super_block *sb, int *flags, char *data)
 	return (data ? spec_parse_options(data, sbi) : 0);
 }
 
-#if defined HAVE_KMEMB_STRUCT_INODE_I_LOCK
-#define stri_trylock(__i)   (int)({ spin_lock(&(__i)->i_lock); 0; })
-#define stri_lock(__i)	    spin_lock(&(__i)->i_lock)
-#define stri_unlock(__i)    spin_unlock(&(__i)->i_lock);
-#else
-#define stri_trylock(__i)   down_interruptible(&(__i)->i_sem)
-#define stri_lock(__i)	    down(&(__i)->i_sem)
-#define stri_unlock(__i)    up(&(__i)->i_sem)
-#endif
-
-/**
- *  spec_clear_inode: - clear filesystem specific junk out of inode
- *  @inode:	inode to clear
- *
- *  This is called before bd_forget or cdput are called on i_bdev and i_cdev.  This means that if we
- *  want to overload those pointers within the specfs, we need to clear them here before vfs
- *  mistakes those pointers as block or character device pointers.  We use i_pipe, but let's clear
- *  it here too.
- *
- *  Under the inode diet starting with 2.6.18 i_pipe is a union with i_cdev and i_bdev; however,
- *  i_cdev is never set within the specfs.  Therefore, we must still clear it here before cdput
- *  mistakes it for a valud i_cdev pointer (because this may be an S_IFCHR inode).
- */
-STATIC void
-spec_clear_inode(struct inode *inode)
-{
-	/* Never adjust i_pipe without taking the inode semaphore. */
-	stri_lock(inode);
-	if (inode->i_pipe)
-		inode->i_pipe = NULL;
-	stri_unlock(inode);
-}
-
 #if 0
 STATIC void
 spec_umount_begin(struct super_block *sb)
@@ -1206,17 +1122,54 @@ spec_umount_begin(struct super_block *sb)
 }
 #endif
 
+STATIC kmem_cache_t *snode_cachep = NULL;
+
+/**
+ *  spec_alloc_inode: - allocate an inode for the special shadow filesystem.
+ *  @sb: filesystem super block
+ *
+ *  Traditionally the specfs did not allocate its own inodes although the ability (super_operations
+ *  alloc_inode) has existed from early 2.4 kernels.  The inode diet of later 2.6 kernels forced
+ *  using the i_private pointer instead of the i_pipe pointer for Stream heads (an approach that
+ *  does not work for earlier kernels that have a full 'u' union); therefore, requiring that specfs
+ *  specific pointers be allocated beyond the inode structure.
+ *
+ *  This approach has the beneficial side effect that Stream head performance should increase
+ *  because snodes are now memory cached in their own cache.
+ *
+ *  It is quite simply really and should have been done before.
+ */
+STATIC struct inode *
+spec_alloc_inode(struct super_block *sb)
+{
+
+	return ((struct inode *) kmem_cache_alloc(snode_cachep, SLAB_KERNEL));
+}
+
+/**
+ *  spec_destroy_inode: - deallocate an inode for the specfs.
+ *  @inode: inode to deallocate.
+ *
+ *  See discussion under spec_alloc_inode().
+ */
+STATIC void
+spec_destroy_inode(struct inode *inode)
+{
+	if (inode)
+		kmem_cache_free(snode_cachep, inode);
+}
+
 STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
+	.alloc_inode = spec_alloc_inode,
+	.destroy_inode = spec_destroy_inode,
 	.read_inode = spec_read_inode,
 #if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
 	.read_inode2 = spec_read_inode2,
-#endif
+#endif					/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2 */
 	.put_inode = spec_put_inode,
-	.delete_inode = spec_delete_inode,
 	.put_super = spec_put_super,
 	.statfs = spec_statfs,		/* like simple_statfs */
 	.remount_fs = spec_remount_fs,
-	.clear_inode = spec_clear_inode,
 #if 0
 	.umount_begin = spec_umount_begin,
 #endif
@@ -1375,6 +1328,51 @@ specfs_umount(void)
 EXPORT_SYMBOL_NOVERS(specfs_umount);
 
 /**
+ *  specfs_term_cache: - terminate the snode cache.
+ */
+static void
+specfs_term_cache(void)
+{
+	if (snode_cachep != NULL) {
+		if (kmem_cache_destroy(snode_cachep)) {
+			printk(KERN_WARNING "%s: did not destroy snode_cachep\n", __FUNCTION__);
+			return;
+		}
+		printk(KERN_DEBUG "%s: destroyed snode cache\n", __FUNCTION__);
+		snode_cachep = NULL;
+	}
+	return;
+}
+
+static void
+snode_init_once(void *data, kmem_cache_t *cachep, unsigned long flags)
+{
+	struct inode *inode = (struct inode *) data;
+
+	if ((flags & (SLAB_CTOR_VERIFY|SLAB_CTOR_CONSTRUCTOR)) ==
+			SLAB_CTOR_CONSTRUCTOR)
+		inode_init_once(inode);
+}
+
+/**
+ *  specfs_init_cache: - initialize the snode cache.
+ */
+static int
+specfs_init_cache(void)
+{
+	if (snode_cachep == NULL) {
+		snode_cachep = kmem_cache_create("snode_cache", sizeof(struct inode), 0,
+						 SLAB_HWCACHE_ALIGN, snode_init_once, NULL);
+		if (snode_cachep == NULL) {
+			printk(KERN_WARNING "%s: Cannot allocate snode_cache\n", __FUNCTION__);
+			return (-ENOMEM);
+		}
+		printk(KERN_DEBUG "%s: initialized snode cache\n", __FUNCTION__);
+	}
+	return (0);
+}
+
+/**
  *  strspecfs_init: - initialize the shadow special filesystem
  */
 #ifdef CONFIG_STREAMS_MODULE
@@ -1390,6 +1388,8 @@ specfs_init(void)
 #else
 	printk(KERN_INFO SPECFS_SPLASH);	/* console splash */
 #endif
+	if ((result = specfs_init_cache()))
+		goto no_cache;
 	if ((result = register_filesystem(&spec_fs_type)))
 		goto no_specfs;
 	if ((result = strlookup_init()))
@@ -1398,6 +1398,8 @@ specfs_init(void)
       no_lookup:
 	unregister_filesystem(&spec_fs_type);
       no_specfs:
+	specfs_term_cache();
+      no_cache:
 	return (result);
 }
 
@@ -1412,6 +1414,7 @@ specfs_exit(void)
 {
 	strlookup_exit();
 	unregister_filesystem(&spec_fs_type);
+	specfs_term_cache();
 }
 
 #ifdef CONFIG_STREAMS_MODULE

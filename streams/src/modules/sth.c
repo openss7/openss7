@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2006/10/27 23:19:40 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2006/10/29 13:11:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:40 $ by $Author: brian $
+ Last Modified $Date: 2006/10/29 13:11:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.172  2006/10/29 13:11:44  brian
+ - final changes for FC5 2.6.18 w/ inode diet
+
  Revision 0.9.2.171  2006/10/27 23:19:40  brian
  - changes for 2.6.18 kernel
 
@@ -172,10 +175,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2006/10/27 23:19:40 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2006/10/29 13:11:44 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2006/10/27 23:19:40 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2006/10/29 13:11:44 $";
 
 //#define __NO_VERSION__
 
@@ -276,7 +279,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2006/10/27 23:19:40 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2006/10/29 13:11:44 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -453,6 +456,20 @@ stri_remove(struct file *file)
 #undef verify_area
 #define verify_area(__x,__y,__z) (access_ok((__x),(__y),(__z)) ? 0 : -EFAULT)
 
+/*
+ *  Starting with the FC5 2.6.18 kernel (that, unlike stock 2.6.18, contains the inode diet patches)
+ *  the i_pipe pointer that we used to hang Stream heads from is an anonymous union with the i_cdev
+ *  pointer.  Setting the i_cdev pointer causes problems in __fput() and other places, so we need a
+ *  different approach for the inode diet.  The different approach is that no known in-kernel
+ *  filesystem uses the i_private pointer for FIFOs, so we can steal that pointer instead for
+ *  external filesystem nodes.
+ */
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_PRIVATE
+#define i_str i_private
+#else				/* HAVE_KMEMB_STRUCT_INODE_I_PRIVATE */
+#define i_str i_pipe
+#endif				/* HAVE_KMEMB_STRUCT_INODE_I_PRIVATE */
+
 /**
  *  strinsert:	- insert a stream head to an inode
  *  @inode:	inode to which to attach the stream head
@@ -482,8 +499,8 @@ strinsert(struct inode *inode, struct stdata *sd)
 		/* should always be successful */
 		assert(sd->sd_inode != NULL);
 		/* link into clone list */
-		sd->sd_clone = (void *) inode->i_pipe;
-		inode->i_pipe = (void *) sd;
+		sd->sd_clone = (void *) inode->i_str;
+		inode->i_str = (void *) sd;
 	}
 	return (0);
 }
@@ -508,7 +525,7 @@ strremove_locked(struct inode *inode, struct stdata *sd)
 		struct stdata **sdp;
 
 		_ptrace(("removing stream %p from inode %p\n", sd, inode));
-		for (sdp = (struct stdata **) &(inode->i_pipe); *sdp && *sdp != sd;
+		for (sdp = (struct stdata **) &(inode->i_str); *sdp && *sdp != sd;
 		     sdp = &((*sdp)->sd_clone)) ;
 		assert(*sdp && *sdp == sd);
 		/* delete stream head from clone list */
@@ -4201,7 +4218,7 @@ stropen(struct inode *inode, struct file *file)
 	/* first find out of we already have a stream head, or we need a new one anyway */
 	if (sflag != CLONEOPEN) {
 		_ptrace(("driver open in effect\n"));
-		_ctrace(sd = sd_get((struct stdata *) inode->i_pipe));
+		_ctrace(sd = sd_get((struct stdata *) inode->i_str));
 	} else {
 		_ptrace(("clone open in effect\n"));
 		sd = NULL;
