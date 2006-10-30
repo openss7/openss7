@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.50 $) $Date: 2006/10/27 22:38:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.51 $) $Date: 2006/10/30 06:39:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/27 22:38:53 $ by $Author: brian $
+# Last Modified $Date: 2006/10/30 06:39:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.51  2006/10/30 06:39:58  brian
+# - changes to handle missing linux/compile.h on SuSE
+#
 # Revision 1.1.6.50  2006/10/27 22:38:53  brian
 # - changes for 2.6.18 build
 #

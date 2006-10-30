@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/10/27 23:19:38 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/10/30 06:40:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:38 $ by $Author: brian $
+ Last Modified $Date: 2006/10/30 06:40:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.135  2006/10/30 06:40:09  brian
+ - changes to handle missing linux/compile.h on SuSE
+
  Revision 0.9.2.134  2006/10/27 23:19:38  brian
  - changes for 2.6.18 kernel
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/10/27 23:19:38 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/10/30 06:40:09 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/10/27 23:19:38 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/10/30 06:40:09 $";
 
 #include <linux/autoconf.h>
 #ifdef HAVE_KINC_LINUX_COMPILE_H
