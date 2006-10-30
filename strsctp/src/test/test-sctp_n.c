@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/27 23:10:13 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/30 20:26:32 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:10:13 $ by $Author: brian $
+ Last Modified $Date: 2006/10/30 20:26:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.21  2006/10/30 20:26:32  brian
+ - bug hunting
+
  Revision 0.9.2.20  2006/10/27 23:10:13  brian
  - rationalized to new test suites
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/27 23:10:13 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/30 20:26:32 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/27 23:10:13 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/30 20:26:32 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -7308,7 +7311,11 @@ struct test_stream test_8_2_list = { &preamble_8_2_list, &test_case_8_2_list, &p
 #define sref_case_9_1 "NPI Rev 2.0.0"
 #define desc_case_9_1 "\
 Delivery of ordered data under noise with acknowledgement."
+#if 0
 #define TEST_PACKETS 300
+#else
+#define TEST_PACKETS 30
+#endif
 int
 test_case_9_1_conn(int child)
 {
@@ -7395,6 +7402,8 @@ test_case_9_1_list(int child)
 	return (__RESULT_FAILURE);
 }
 
+#undef TEST_PACKETS
+
 #define preamble_9_1_conn preamble_1_data_xfer_conn
 #define preamble_9_1_resp preamble_1_idle_cons
 #define preamble_9_1_list preamble_1_data_xfer_list
@@ -7417,6 +7426,11 @@ struct test_stream test_9_1_list = { &preamble_9_1_list, &test_case_9_1_list, &p
 #define sref_case_9_2 "NPI Rev 2.0.0"
 #define desc_case_9_2 "\
 Delivery of un-ordered data under noise."
+#if 0
+#define TEST_PACKETS 300
+#else
+#define TEST_PACKETS 30
+#endif
 int
 test_case_9_2_conn(int child)
 {
@@ -7505,6 +7519,8 @@ test_case_9_2_list(int child)
 	return (__RESULT_FAILURE);
 }
 
+#undef TEST_PACKETS
+
 #define preamble_9_2_conn preamble_1_data_xfer_conn
 #define preamble_9_2_resp preamble_1_idle_cons
 #define preamble_9_2_list preamble_1_data_xfer_list
@@ -7517,11 +7533,6 @@ struct test_stream test_9_2_conn = { &preamble_9_2_conn, &test_case_9_2_conn, &p
 struct test_stream test_9_2_resp = { &preamble_9_2_resp, &test_case_9_2_resp, &postamble_9_2_resp };
 struct test_stream test_9_2_list = { &preamble_9_2_list, &test_case_9_2_list, &postamble_9_2_list };
 
-#undef TEST_PACKETS
-
-#define TEST_PACKETS 10
-#define TEST_STREAMS 32
-#define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
 /*
  *  Delivering ordered data in multiple streams under noise.
  */
@@ -7532,6 +7543,9 @@ struct test_stream test_9_2_list = { &preamble_9_2_list, &test_case_9_2_list, &p
 #define sref_case_9_3 "NPI Rev 2.0.0"
 #define desc_case_9_3 "\
 Delivery of ordered data in multiple streams under noise."
+#define TEST_PACKETS 10
+#define TEST_STREAMS 32
+#define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
 int
 test_case_9_3_conn(int child)
 {
@@ -7660,6 +7674,10 @@ test_case_9_3_list(int child)
 	return (__RESULT_FAILURE);
 }
 
+#undef TEST_PACKETS
+#undef TEST_STREAMS
+#undef TEST_TOTAL
+
 #define preamble_9_3_conn preamble_2_data_xfer_conn
 #define preamble_9_3_resp preamble_1_idle_cons
 #define preamble_9_3_list preamble_2_data_xfer_list
@@ -7682,6 +7700,9 @@ struct test_stream test_9_3_list = { &preamble_9_3_list, &test_case_9_3_list, &p
 #define sref_case_9_4 "NPI Rev 2.0.0"
 #define desc_case_9_4 "\
 Delivery of ordered and un-ordered data in multiple streams under noise."
+#define TEST_PACKETS 10
+#define TEST_STREAMS 32
+#define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
 int
 test_case_9_4_conn(int child)
 {
@@ -7843,6 +7864,9 @@ test_case_9_4_list(int child)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
+#undef TEST_PACKETS
+#undef TEST_STREAMS
+#undef TEST_TOTAL
 
 #define preamble_9_4_conn preamble_2_data_xfer_conn
 #define preamble_9_4_resp preamble_1_idle_cons

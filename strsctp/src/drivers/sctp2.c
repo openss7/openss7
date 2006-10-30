@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/21 19:55:24 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/30 20:26:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/21 19:55:24 $ by $Author: brian $
+ Last Modified $Date: 2006/10/30 20:26:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.56  2006/10/30 20:26:18  brian
+ - bug hunting
+
  Revision 0.9.2.55  2006/10/21 19:55:24  brian
  - a couple more test case corrections
 
@@ -100,9 +103,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/21 19:55:24 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/30 20:26:18 $"
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/21 19:55:24 $";
+static char const ident[] =
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/30 20:26:18 $";
 
 #include "sctp_compat.h"
 
@@ -121,7 +125,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/21 19:55:24 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/30 20:26:18 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -143,23 +147,14 @@ MODULE_SUPPORTED_DEVICE(SCTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SCTP_LICENSE);
 #endif				/* MODULE_LICENSE */
-#if STREAMS
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sctp");
 #ifdef LFS
 MODULE_ALIAS("streams-driver-sctp");
 #endif
 #endif
-#endif				/* STREAMS */
 #endif				/* SCTP_CONFIG_MODULE */
 #endif				/* LINUX */
-
-#if SOCKETS
-#define skb_next(__skb) \
-	(((__skb)->next != ((struct sk_buff *) (__skb)->list)) ? (__skb)->next : NULL)
-#define skb_prev(__skb) \
-	(((__skb)->prev != ((struct sk_buff *) (__skb)->list)) ? (__skb)->prev : NULL)
-#endif				/* SOCKETS */
 
 /*
  *  =========================================================================
@@ -168,7 +163,6 @@ MODULE_ALIAS("streams-driver-sctp");
  *
  *  =========================================================================
  */
-#if STREAMS
 /* ip defaults */
 #define SCTP_DEFAULT_IP_TOS			(0x0)
 #define SCTP_DEFAULT_IP_TTL			(64)
@@ -176,7 +170,6 @@ MODULE_ALIAS("streams-driver-sctp");
 #define SCTP_DEFAULT_IP_DONTROUTE		(0)
 #define SCTP_DEFAULT_IP_BROADCAST		(0)
 #define SCTP_DEFAULT_IP_PRIORITY		(0)
-#endif				/* STREAMS */
 /* per association defaults */
 #define SCTP_DEFAULT_RMEM			(1<<15)	/* XXX */
 #define SCTP_DEFAULT_MAX_ISTREAMS		(33)
@@ -204,53 +197,6 @@ MODULE_ALIAS("streams-driver-sctp");
 #define SCTP_DEFAULT_RTO_MAX			(60*HZ)
 #define SCTP_DEFAULT_HEARTBEAT_ITVL		(30*HZ)
 
-#if SOCKETS
-/*
- *  sysctls
- */
-/* FIXME: These memory sysctls are not actually used. */
-STATIC int sysctl_sctp_mem[3];		/* XXX */
-STATIC int sysctl_sctp_rmem[3] = { 4 * 1024, 87380, 87380 * 2 };	/* XXX */
-STATIC int sysctl_sctp_wmem[3] = { 4 * 1024, 16 * 1024, 128 * 1024 };	/* XXX */
-
-/* per association defaults */
-STATIC int sysctl_sctp_max_istreams = SCTP_DEFAULT_MAX_ISTREAMS;
-STATIC int sysctl_sctp_req_ostreams = SCTP_DEFAULT_REQ_OSTREAMS;
-STATIC int sysctl_sctp_max_init_retries = SCTP_DEFAULT_MAX_INIT_RETRIES;
-STATIC int sysctl_sctp_assoc_max_retrans = SCTP_DEFAULT_ASSOC_MAX_RETRANS;
-STATIC int sysctl_sctp_valid_cookie_life = SCTP_DEFAULT_VALID_COOKIE_LIFE;
-STATIC int sysctl_sctp_cookie_inc = SCTP_DEFAULT_COOKIE_INC;
-STATIC int sysctl_sctp_mac_type = SCTP_DEFAULT_MAC_TYPE;
-STATIC int sysctl_sctp_csum_type = SCTP_DEFAULT_CSUM_TYPE;
-STATIC int sysctl_sctp_throttle_itvl = SCTP_DEFAULT_THROTTLE_ITVL;
-STATIC int sysctl_sctp_default_sid = SCTP_DEFAULT_SID;
-STATIC int sysctl_sctp_default_ppi = SCTP_DEFAULT_PPI;
-STATIC int sysctl_sctp_max_sack_delay = SCTP_DEFAULT_MAX_SACK_DELAY;
-#ifdef ETSI
-STATIC int sysctl_sctp_sack_frequency = SCTP_DEFAULT_SACK_FREQUENCY;
-#endif
-STATIC int sysctl_sctp_max_burst = SCTP_DEFAULT_MAX_BURST;
-STATIC int sysctl_sctp_adaptation_layer_info = SCTP_DEFAULT_ADAPTATION_LAYER_INFO;
-STATIC int sysctl_sctp_partial_reliability = SCTP_DEFAULT_PARTIAL_RELIABILITY;
-
-/* per destination defaults */
-STATIC int sysctl_sctp_rto_initial = SCTP_DEFAULT_RTO_INITIAL;
-STATIC int sysctl_sctp_rto_min = SCTP_DEFAULT_RTO_MIN;
-STATIC int sysctl_sctp_rto_max = SCTP_DEFAULT_RTO_MAX;
-STATIC int sysctl_sctp_path_max_retrans = SCTP_DEFAULT_PATH_MAX_RETRANS;
-STATIC int sysctl_sctp_heartbeat_itvl = SCTP_DEFAULT_HEARTBEAT_ITVL;
-
-#ifdef CONFIG_INET_ECN
-STATIC int sysctl_sctp_ecn = 1;
-#else				/* CONFIG_INET_ECN */
-STATIC int sysctl_sctp_ecn = 0;
-#endif				/* CONFIG_INET_ECN */
-
-STATIC int min_sctp_max_istreams = 1;
-STATIC int min_sctp_req_ostreams = 1;
-STATIC int min_sctp_max_burst = 1;
-#endif				/* SOCKETS */
-#if STREAMS
 #ifndef SK_RMEM_MAX
 #define SK_RMEM_MAX 65535
 #endif
@@ -411,6 +357,7 @@ STATIC size_t sctp_default_throttle_itvl = SCTP_DEFAULT_THROTTLE_ITVL;
 STATIC size_t sctp_default_default_sid = SCTP_DEFAULT_SID;
 STATIC size_t sctp_default_default_ppi = SCTP_DEFAULT_PPI;
 STATIC size_t sctp_default_max_sack_delay = SCTP_DEFAULT_MAX_SACK_DELAY;
+
 #ifdef ETSI
 STATIC size_t sctp_default_sack_frequency = SCTP_DEFAULT_SACK_FREQUENCY;
 #endif
@@ -425,7 +372,6 @@ STATIC size_t sctp_default_rto_max = SCTP_DEFAULT_RTO_MAX;
 STATIC size_t sctp_default_path_max_retrans = SCTP_DEFAULT_PATH_MAX_RETRANS;
 STATIC size_t sctp_default_heartbeat_itvl = SCTP_DEFAULT_HEARTBEAT_ITVL;
 #endif
-#endif				/* STREAMS */
 
 /*
  *  =========================================================================
@@ -637,7 +583,6 @@ struct sctp_options {
 	} sctp;
 };
 
-#if STREAMS
 STATIC struct sctp_options sctp_defaults = {
 	{0,}
 	,
@@ -668,21 +613,21 @@ STATIC struct sctp_options sctp_defaults = {
 	 sctp_default_ssn,
 	 sctp_default_tsn,
 	 sctp_default_recvopt,
-	 (sctp_default_cookie_life * HZ),		/* XXX */
-	 (sctp_default_sack_delay * HZ / 1000),		/* XXX */
+	 (sctp_default_cookie_life * HZ),	/* XXX */
+	 (sctp_default_sack_delay * HZ / 1000),	/* XXX */
 #ifdef ETSI
 	 sctp_default_sack_frequency,
 #endif
 	 sctp_default_path_max_retrans,
 	 sctp_default_assoc_max_retrans,
 	 sctp_default_max_init_retries,
-	 (sctp_default_heartbeat_itvl * HZ),		/* XXX */
+	 (sctp_default_heartbeat_itvl * HZ),	/* XXX */
 	 (sctp_default_rto_initial * HZ / 1000),	/* XXX */
-	 (sctp_default_rto_min * HZ / 1000),		/* XXX */
-	 (sctp_default_rto_max * HZ / 1000),		/* XXX */
+	 (sctp_default_rto_min * HZ / 1000),	/* XXX */
+	 (sctp_default_rto_max * HZ / 1000),	/* XXX */
 	 sctp_default_ostreams,
 	 sctp_default_istreams,
-	 (sctp_default_cookie_inc * HZ / 1000),		/* XXX */
+	 (sctp_default_cookie_inc * HZ / 1000),	/* XXX */
 	 (sctp_default_throttle_itvl * HZ / 1000),	/* XXX */
 	 sctp_default_mac_type,
 	 sctp_default_cksum_type,
@@ -715,7 +660,6 @@ STATIC struct sctp_options sctp_defaults = {
 };
 
 #define t_defaults sctp_defaults
-#endif				/* STREAMS */
 
 /*
  *  Foolish me, I thought that this structure was stable...
@@ -749,7 +693,7 @@ struct sctp {
 	queue_t *wwait;			/* WR queue waiting on lock */
 	int users;			/* lock holders */
 	int bcid;			/* bufcall id */
-//	t_uscalar_t i_flags;		/* Interface flags */
+//      t_uscalar_t i_flags;            /* Interface flags */
 	t_uscalar_t i_state;		/* Interface state */
 	t_uscalar_t state;		/* SCTP state */
 	sctp_t *bnext;			/* linkage for bind hash */
@@ -894,16 +838,6 @@ struct sctp {
 STATIC struct sctp *sctp_protolist = NULL;
 STATIC atomic_t sctp_stream_count = ATOMIC_INIT(0);
 
-#if SOCKETS
-/*
- *  Private struct macros
- */
-#define __sp_offset ((unsigned int)&(((struct sock *)(0))->tp_pinfo))
-#define SCTP_PROT(__sk) ((struct sctp_opt *)&(__sk)->tp_pinfo)
-#define SCTP_SOCK(__sp) ((struct sock *)(((uint8_t *)(__sp)) - __sp_offset))
-#endif				/* SOCKETS */
-
-#if STREAMS
 /*
  *  User locks.
  */
@@ -911,7 +845,6 @@ STATIC atomic_t sctp_stream_count = ATOMIC_INIT(0);
 #define SCTP_RCVBUF_LOCK	2
 #define SCTP_BINDADDR_LOCK	4
 #define SCTP_BINDPORT_LOCK	8
-#endif				/* STREAMS */
 /*
  *  SCTP Origin Codes (Match with NPI).
  */
@@ -942,16 +875,6 @@ STATIC atomic_t sctp_stream_count = ATOMIC_INIT(0);
 #define SCTP_FLAG_EX_DATA_OPT		0x00000002
 #define SCTP_FLAG_DEFAULT_RC_SEL	0x00000004
 #define SCTP_FLAG_NEED_CLEANUP		0x00000008
-#if SOCKETS
-/*
- *  SCTP cmsg flags
- */
-#define SCTP_CMSGF_RECVSID  0x01
-#define SCTP_CMSGF_RECVPPI  0x02
-#define SCTP_CMSGF_RECVSSN  0x04
-#define SCTP_CMSGF_RECVTSN  0x08
-#endif				/* SOCKETS */
-#if STREAMS
 /*
  *  HMAC types.
  */
@@ -984,7 +907,6 @@ STATIC atomic_t sctp_stream_count = ATOMIC_INIT(0);
 #define SCTP_OPTION_BREAK	0x02	/* stream will break dest #1 and 2 one way */
 #define SCTP_OPTION_DBREAK	0x04	/* stream will break dest both ways */
 #define SCTP_OPTION_RANDOM	0x08	/* stream will drop packets at random */
-#endif				/* STREAMS */
 
 /*
  *  Capabilities
@@ -1055,15 +977,9 @@ DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
 #endif				/* DEFINE_SNMP_STAT */
 #endif				/* HAVE_OPENSS7_SCTP || HAVE_LKSCTP_SCTP */
 
-#if SOCKETS
-#define SCTP_INC_STATS(field)		SNMP_INC_STATS(sctp_statistics, field)
-#define SCTP_INC_STATS_BH(field)	SNMP_INC_STATS_BH(sctp_statistics, field)
-#define SCTP_INC_STATS_USER(field)	SNMP_INC_STATS_USER(sctp_statistics, field)
-#else				/* SOCKETS */
 #define SCTP_INC_STATS(field)		SNMP_INC_STATS(sctp_statistics, field)
 #define SCTP_INC_STATS_BH(field)	SNMP_INC_STATS(sctp_statistics, field)
 #define SCTP_INC_STATS_USER(field)	SNMP_INC_STATS(sctp_statistics, field)
-#endif				/* SOCKETS */
 
 #ifdef HAVE_KINC_LINUX_SNMP_H
 #define SctpRtoAlgorithm	SCTP_MIB_RTOALGORITHM
@@ -1103,7 +1019,6 @@ DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
  *  For sockets, base SCTP states off of TCP states to avoid rewriting a lot of TCP code at the
  *  inet_socket level.
  */
-#if STREAMS
 #define SCTP_ESTABLISHED	 1	/* ESTABLISHED */
 #define SCTP_COOKIE_WAIT	 2	/* COOKIE-WAIT */
 #define SCTP_COOKIE_ECHOED	 3	/* COOKIE-ECHOED */
@@ -1116,7 +1031,6 @@ DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
 #define SCTP_LISTEN		10	/* LISTEN */
 #define SCTP_SHUTDOWN_ACK_SENT	11	/* SHUTDOWN-ACK-SENT */
 #define SCTP_MAX_STATES		12
-#endif				/* STREAMS */
 #define SCTPF_CLOSED             (1<<SCTP_CLOSED		)
 #define SCTPF_LISTEN             (1<<SCTP_LISTEN		)
 #define SCTPF_COOKIE_WAIT        (1<<SCTP_COOKIE_WAIT		)
@@ -1786,12 +1700,6 @@ struct sctp_tcb {
 
 #define SCTP_TCB(__mp) ((sctp_tcb_t *)((__mp)->b_datap->db_base))
 
-#if SOCKETS
-#define __cb_offset ((unsigned int)&(((struct sk_buff *)(NULL))->cb[0]))
-#define SCTP_SKB_CB(__skb) ((struct sctp_skb_cb *)(&(__skb)->cb[0]))
-#define SCTP_CB_SKB(__cb) ((struct sk_buff *)(((uint8_t *)(__cb)) - __cb_offset))
-#endif				/* SOCKETS */
-
 /*
  * TLI interface state flags
  */
@@ -2071,12 +1979,10 @@ STATIC int sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *ds
 			 mblk_t *dp);
 STATIC int sctp_conn_res(struct sctp *sp, mblk_t *cp, struct sctp *ap, mblk_t *dp);
 
-#if STREAMS
 STATIC int sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more,
 			 uint rctp, mblk_t *dp);
 STATIC int sctp_reset_req(struct sctp *sp);
 STATIC int sctp_reset_res(struct sctp *sp);
-#endif				/* STREAMS */
 STATIC int sctp_discon_req(struct sctp *sp, mblk_t *cp);
 STATIC int sctp_ordrel_req(struct sctp *sp);
 STATIC int sctp_unbind_req(struct sctp *sp);
@@ -2100,7 +2006,6 @@ STATIC int sctp_recv_err(struct sctp *sp, mblk_t *mp);
  */
 #define SCTP_FR_COUNT 4
 
-#if STREAMS
 /* STREAMS needs to redefine these for streams structure instead of socket. */
 #ifdef SCTP_CONFIG_ECN
 #undef INET_ECN_xmit
@@ -2108,7 +2013,6 @@ STATIC int sctp_recv_err(struct sctp *sp, mblk_t *mp);
 #undef INET_ECN_dontxmit
 #define	INET_ECN_dontxmit(sp) do { (sp)->inet.tos &= ~3; } while (0)
 #endif				/* SCTP_CONFIG_ECN */
-#endif				/* STREAMS */
 
 /*
  *  =========================================================================
@@ -2117,20 +2021,6 @@ STATIC int sctp_recv_err(struct sctp *sp, mblk_t *mp);
  *
  *  =========================================================================
  */
-#if SOCKETS
-STATIC INLINE uint32_t
-nocsum_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
-{
-	if (access_ok(VERIFY_READ, src, len)) {
-		bcopy(src, dst, len);
-		return (sum);
-	}
-	if (len)
-		*errp = -EFAULT;
-	return sum;
-}
-#endif
-
 #if defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C)
 /*
  *  -------------------------------------------------------------------------
@@ -2211,7 +2101,6 @@ adler32_and_copy_from_user(const char *src, char *dst, int len, int sum, int *er
 	return sum;
 }
 #endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
-#ifdef SCTP_CONFIG_CRC_32C
 /*
  *  -------------------------------------------------------------------------
  *
@@ -2219,89 +2108,10 @@ adler32_and_copy_from_user(const char *src, char *dst, int len, int sum, int *er
  *
  *  -------------------------------------------------------------------------
  */
+#ifdef SCTP_CONFIG_CRC_32C
 #include "sctp_crc32c.h"
-#if SOCKETS
-/*
- *  Partial checksumming a CCITT checksum relies on the fact that the result of the checksum is a
- *  long division.  If there are two partial checksums on *  two strings of length `l' bits, then
- *
- *  A message d can be split into two substrings d1 and d2 such that d = (d1 * 2**l2) + d2.
- *  Dividing this by the generator polynomial p, we have:
- *
- *  d/p = (d1/p * 2**l2/p) + d2/p.
- *
- *  The term is brackets is really the long division on d1 taken to l2 more places.  By staring with
- *  the value 1 and calculating the normal crc with a subsequent message of all zeros to l2 places,
- *  a table in l2 can be built which will supply the contant term, or the constant term can be
- *  calculated by taking a CRO  on zeros (abbreviated calculation) to l2 places.
- *
- */
-#define DOZ1	{sum=(sum>>8)^crc_table[sum&0xff];}
-#define DOZ2	DOZ1; DOZ1;
-#define DOZ4	DOZ2; DOZ2;
-#define DOZ8	DOZ4; DOZ4;
-#define DOZ16	DOZ8; DOZ8
-STATIC INLINE uint32_t
-__add_crc32c(register uint32_t sum, uint32_t csum2, register uint16_t len)
-{
-	if (len) {
-		while (len >= 16) {
-			DOZ16;
-			len -= 16;
-		}
-		if (len != 0)
-			do {
-				DOZ1;
-			} while (--len);
-		sum += csum2;
-	}
-	return (sum);
-}
-STATIC INLINE uint32_t
-__final_crc32c(uint32_t csum)
-{
-	return csum;
-}
 #endif
 
-#if SOCKETS
-#define CPCRC1(i)   {crc=(crc>>8)^crc_table[(crc^(dst[i]=src[i]))&0xff];}
-#define CPCRC2(i)   CPCRC1(i); CPCRC1(i+1);
-#define CPCRC4(i)   CPCRC2(i); CPCRC2(i+2);
-#define CPCRC8(i)   CPCRC4(i); CPCRC4(i+4);
-#define CPCRC16	    CPCRC8(0); CPCRC8(8)
-/* Note crc should be initialized to 0xffffffff */
-STATIC INLINE uint32_t
-__crc32c_partial_copy_from_user(register const unsigned char *src, register unsigned char *dst,
-				register int len, register uint32_t crc, int *errp)
-{
-	(void) errp;
-	if (len) {
-		while (len >= 16) {
-			CPCRC16;
-			src += 16;
-			dst += 16;
-			len -= 16;
-		}
-		if (len != 0)
-			do {
-				crc = (crc >> 8) ^ crc_table[(crc ^ (*dst++ = *src++))
-							     & 0xff];
-			} while (--len);
-	}
-	return crc;
-}
-STATIC INLINE uint32_t
-crc32c_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
-{
-	if (access_ok(VERIFY_READ, src, len))
-		return __crc32c_partial_copy_from_user(src, dst, len, sum, errp);
-	if (len)
-		*errp = -EFAULT;
-	return sum;
-}
-#endif
-#endif				/* SCTP_CONFIG_CRC_32C */
 /*
  *  -------------------------------------------------------------------------
  *
@@ -2357,23 +2167,6 @@ __final_cksum(struct sctp *sp, uint32_t csum)
 	}
 }
 #endif
-#if SOCKETS
-STATIC INLINE uint32_t
-cksum_and_copy_from_user(struct sctp *sp, const char *src, char *dst, int len, int sum, int *errp)
-{
-	switch (sp->cksum) {
-	default:
-#ifdef SCTP_CONFIG_CRC_32C
-	case SCTP_CSUM_CRC32C:
-		return crc32c_and_copy_from_user(src, dst, len, sum, errp);
-#endif				/* SCTP_CONFIG_CRC_32C */
-#if defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C)
-	case SCTP_CSUM_ADLER32:
-		return adler32_and_copy_from_user(src, dst, len, sum, errp);
-#endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
-	}
-}
-#endif
 STATIC INLINE int
 cksum_verify(uint32_t csum, void *buf, size_t len)
 {
@@ -2421,57 +2214,6 @@ cksum_generate(void *buf, size_t len)
 }
 
 /*
- *  FIXME: These two functions serve a purpose on the sockets verion.  I need to take a look an see
- *  if equivalent functions are necessary in the STREAMS version. This is the only place that
- *  SCTPCB_FLAG_CKSUMMED is currently used.
- */
-#if SOCKETS
-STATIC INLINE int
-skb_add_data(struct sctp *sp, mblk_t *mp, char *from, int copy)
-{
-	int err = 0;
-	uint32_t csum;
-	int off = skb->len;
-
-	if (!(SCTP_TCB(mp)->flags & SCTPCB_FLAG_CKSUMMED))
-		csum = nocsum_and_copy_from_user(from, skb_put(skb, copy), copy, skb->csum, &err);
-	else
-		csum =
-		    cksum_and_copy_from_user(sp, from, skb_put(skb, copy), copy, skb->csum, &err);
-	if (!err) {
-		skb->csum = csum;
-		return (0);
-	}
-	__skb_trim(skb, off);
-	return (-EFAULT);
-}
-#endif				/* SOCKETS */
-#if SOCKETS
-STATIC INLINE void
-skb_init_cksum(mblk_t *mp)
-{
-	if ((skb->sk->route_caps & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM))) {
-		skb->csum = 0;
-		return;
-	}
-	SCTP_TCB(mp)->flags |= SCTPCB_FLAG_CKSUMMED;
-	switch (SCTP_PROT(skb->sk)->cksum) {
-	default:
-#ifdef SCTP_CONFIG_CRC_32C
-	case SCTP_CSUM_CRC32C:
-		skb->csum = 1;
-		return;
-#endif				/* SCTP_CONFIG_CRC_32C */
-#if defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C)
-	case SCTP_CSUM_ADLER32:
-		skb->csum = ~0;
-		return;
-#endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
-	}
-}
-#endif				/* SOCKETS */
-
-/*
  *  =========================================================================
  *
  *  CACHES
@@ -2488,13 +2230,11 @@ STATIC kmem_cache_t *sctp_strm_cachep = NULL;
 STATIC void
 sctp_init_caches(void)
 {
-#if STREAMS
 	if (!sctp_sctp_cachep
 	    && !(sctp_sctp_cachep =
 		 kmem_cache_create("sctp_sctp_cachep", sizeof(struct sctp), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s:Cannot alloc sctp_sctp_cachep.\n", __FUNCTION__);
-#endif				/* STREAMS */
 	if (!sctp_bind_cachep
 	    && !(sctp_bind_cachep =
 		 kmem_cache_create("sctp_bind_bucket", sizeof(struct sctp_bind_bucket), 0,
@@ -2522,11 +2262,9 @@ sctp_init_caches(void)
 STATIC void
 sctp_term_caches(void)
 {
-#if STREAMS
 	if (sctp_sctp_cachep)
 		if (kmem_cache_destroy(sctp_sctp_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_sctp_cachep", __FUNCTION__);
-#endif				/* STREAMS */
 	if (sctp_bind_cachep)
 		if (kmem_cache_destroy(sctp_bind_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_bind_cachep", __FUNCTION__);
@@ -2542,7 +2280,6 @@ sctp_term_caches(void)
 	return;
 }
 #endif				/* defined SCTP_CONFIG_MODULE */
-#if STREAMS
 STATIC INLINE sctp_t *
 sctp_get(void)
 {
@@ -2554,7 +2291,6 @@ sctp_get(void)
 	}
 	return (sp);
 }
-#endif				/* STREAMS */
 STATIC INLINE void
 sctp_hold(sctp_t * sp)
 {
@@ -2617,7 +2353,6 @@ sctp_dput(struct sctp_daddr *sd)
  *  structures will not be deallocated until the buffer calls are complete.
  */
 
-#if STREAMS
 STATIC void streamscall
 sctp_bufsrv(long data)
 {
@@ -2682,7 +2417,6 @@ sctp_dupb(struct sctp *sp, mblk_t *bp)
 	return (mp);
 	return (NULL);
 }
-#endif				/* STREAMS */
 
 /*
  *  =========================================================================
@@ -2696,9 +2430,6 @@ sctp_dupb(struct sctp *sp, mblk_t *bp)
  *  the STREAMS version to just use the Linux timers now that we have this aligned with the Linux
  *  Native Sockets version.
  */
-#if SOCKETS
-typedef void timo_fcn_t (unsigned long);
-#endif
 
 #ifdef _DEBUG
 #define SCTP_TIMER_BACKOFF 100
@@ -3008,8 +2739,8 @@ __sctp_daddr_free(struct sctp_daddr *sd)
 	if ((*sd->prev = sd->next))
 		sd->next->prev = sd->prev;
 	printd(("INFO: Deallocating destination address %d.%d.%d.%d for sp = %p\n",
-		 (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
-		 (sd->daddr >> 24) & 0xff, sd->sp));
+		(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
+		(sd->daddr >> 24) & 0xff, sd->sp));
 	sd->next = NULL;
 	sd->prev = &sd->next;
 	sctp_dput(sd);
@@ -3695,18 +3426,6 @@ ___sctp_thash_insert(sctp_t * sp, struct sctp_hash_bucket *hp)
 		swerr();
 }
 
-#if SOCKETS
-/* STREAMS doesn't need the locking version, sockets do. */
-STATIC void
-__sctp_thash_insert(sctp_t * sp)
-{
-	struct sctp_hash_bucket *hp = &sctp_thash[sctp_sp_thashfn(sp)];
-
-	write_lock(&hp->lock);
-	___sctp_thash_insert(sp, hp);
-	write_unlock(&hp->lock);
-}
-#endif				/* SOCKETS */
 STATIC void
 __sctp_lhash_unhash(sctp_t * sp)
 {
@@ -3843,7 +3562,7 @@ ___sctp_bhash_insert(sctp_t * sp, struct sctp_bind_bucket *sb)
 		sp->sport = htons(sb->port);
 	} else if (sp->state == SCTP_LISTEN) {
 		printd(("INFO: Re-adding listening stream %p to bind bucket at port = %d\n", sp,
-			 sb->port));
+			sb->port));
 	} else
 		swerr();
 	if (!sp->reuse || sp->state == SCTP_LISTEN)
@@ -3872,7 +3591,7 @@ __sctp_bhash_unhash(struct sctp *sp)
 	write_lock(&bp->lock);
 	if (sp->bprev) {
 		printd(("INFO: Removing stream %p from bind bucket at port = %d, num = %d\n", sp,
-			 sp->bindb ? sp->bindb->port : -1U, sp->num));
+			sp->bindb ? sp->bindb->port : -1U, sp->num));
 		if ((*(sp->bprev) = sp->bnext))
 			sp->bnext->bprev = sp->bprev;
 		sp->bnext = NULL;
@@ -3882,7 +3601,7 @@ __sctp_bhash_unhash(struct sctp *sp)
 				struct sctp_bind_bucket *sb = sp->bindb;
 
 				printd(("INFO: Deallocating bind bucket for port = %d\n",
-					 sb->port));
+					sb->port));
 				if (sb->prev) {
 					if ((*(sb->prev) = sb->next))
 						sb->next->prev = sb->prev;
@@ -4845,7 +4564,6 @@ my_dst_check(struct dst_entry **dstp)
 	}
 }
 
-#if STREAMS
 STATIC void
 sp_dst_reset(struct sctp *sp)
 {
@@ -4864,7 +4582,6 @@ sp_dst_reset(struct sctp *sp)
 
 #undef RT_CONN_FLAGS
 #define RT_CONN_FLAGS(__sp) (RT_TOS(sp->inet.tos) | sp->localroute)
-#endif				/* STREAMS */
 
 STATIC int
 sctp_update_routes(struct sctp *sp, int force_reselect)
@@ -5164,7 +4881,6 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 #endif
 #endif
 #endif
-#if STREAMS
 			/* For sockets the passed in sk_buff represents a single packet.  For
 			   STREAMS, the passed in mblk_t pointer is possibly a message buffer chain
 			   and we must iterate along the b_cont pointer. */
@@ -5177,7 +4893,6 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 				} else
 					rare();
 			}
-#endif
 			/* TODO:- For STREAMS it would be better to combine copying the buffer
 			   segments above with performing the checking below.  */
 			sh->check = 0;
@@ -5279,7 +4994,6 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 #endif
 #endif
 #endif
-#if STREAMS
 			/* For sockets the passed in sk_buff represents a single packet.  For
 			   STREAMS, the passed in mblk_t pointer is possibly a message buffer chain
 			   and we must iterate along the b_cont pointer. */
@@ -5292,7 +5006,6 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 				} else
 					rare();
 			}
-#endif
 			/* TODO:- For STREAMS it would be better to combine copying the buffer
 			   segments above with performing the checking below.  */
 			sh->check = 0;
@@ -5376,7 +5089,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 #endif				/* (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) &&
 				   defined SCTP_CONFIG_ERROR_GENERATOR */
 	printd(("INFO: Preparing message sp %p, hlen %u, plen %u, tlen %u\n", sp, (uint) hlen,
-		 (uint) plen, (uint) tlen));
+		(uint) plen, (uint) tlen));
 	unusual(plen == 0 || plen > 1 << 15);
 	/* IMPLEMENTATION NOTE:- We could clone these sk_buffs or dup these mblks and put them into 
 	   a fraglist, however, this would require copying the sk_buff header on each data chunk
@@ -5504,156 +5217,6 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 /*
  *  ==========================================================================
  *
- *  Socket Buffer Management
- *
- *  ==========================================================================
- *  All of the following perambulations are for the management of socket buffers.  Unlike STREAMS
- *  (and I don't know that it really follows BSD either), Linux needs to have buffer occupancy in
- *  terms of bytes of data managed separate from the socket buffer queues themselves.  Under STREAMS
- *  we use our own buffer management routines for this.
- */
-
-#if SOCKETS
-STATIC INLINE int
-sctp_rspace(struct sock *sk)
-{
-	sctp_t *sp = SCTP_PROT(sk);
-	int amt = 0;
-
-	if (!(sk->shutdown & RCV_SHUTDOWN)) {
-		amt = sk->rcvbuf - atomic_read(&sk->rmem_alloc);
-		if (PADC(amt + sizeof(struct sctp_data)) < sp->amps)
-			amt = 0;
-	}
-	return amt;
-}
-STATIC INLINE int
-sctp_min_wspace(struct sock *sk)
-{
-	return atomic_read(&sk->wmem_alloc) >> 1;
-}
-STATIC INLINE int
-sctp_wspace(struct sock *sk)
-{
-	sctp_t *sp = SCTP_PROT(sk);
-	int amt = 0;
-
-	if (!(sk->shutdown & SEND_SHUTDOWN)) {
-		ensure(atomic_read(&sk->wmem_alloc) >= 0, atomic_set(&sk->wmem_alloc, 0));
-		amt = sk->sndbuf - atomic_read(&sk->wmem_alloc);
-		if (PADC(amt + sizeof(struct sctp_data)) < sp->amps)
-			amt = 0;
-	}
-	return amt;
-}
-STATIC void
-sctp_write_space(struct sock *sk)
-{
-	struct socket *sock = sk->socket;
-
-	if (sctp_wspace(sk) >= sctp_min_wspace(sk) && sock) {
-		clear_bit(SOCK_NOSPACE, &sock->flags);
-		if (sk->sleep && waitqueue_active(sk->sleep))
-			wake_up_interruptible(sk->sleep);
-		if (sock->fasync_list && !(sk->shutdown & SEND_SHUTDOWN))
-			sock_wake_async(sock, 2, POLL_OUT);
-	}
-}
-STATIC void
-sctp_rfree(struct sk_buff *skb)
-{
-	struct sock *sk = skb->sk;
-	sctp_t *sp = SCTP_PROT(sk);
-
-	atomic_sub(SCTP_SKB_CB(skb)->dlen, &sk->rmem_alloc);
-	if (!(sk->shutdown & RCV_SHUTDOWN)) {
-		/* SCTP IG 2.15.2, Receive SWS Avoidance RFC 1122 4.2.3.3 */
-		size_t rbuf = sk->rcvbuf >> 1;
-		size_t amps = sp->amps;
-		size_t alloc = atomic_read(&sk->rmem_alloc);
-		size_t a_rwnd = (sk->rcvbuf > alloc) ? sk->rcvbuf - alloc : 0;
-
-		if (a_rwnd >= sp->a_rwnd + ((amps < rbuf) ? amps : rbuf)) {
-			sp->a_rwnd = a_rwnd;
-			sp->sackf |= SCTP_SACKF_WND;	/* RFC 2960 6.2 */
-		}
-	}
-}
-STATIC void
-sctp_wfree(struct sk_buff *skb)
-{
-	struct sock *sk = skb->sk;
-
-	atomic_sub(skb->truesize, &sk->wmem_alloc);
-	ensure(atomic_read(&sk->wmem_alloc) >= 0, atomic_set(&sk->wmem_alloc, 0));
-	if (!sk->use_write_queue)
-		sk->write_space(sk);
-	sock_put(sk);
-}
-STATIC INLINE void
-sctp_set_owner_r(struct sk_buff *skb, struct sock *sk)
-{
-	sctp_t *sp = SCTP_PROT(sk);
-
-	skb->sk = sk;
-	skb->destructor = sctp_rfree;
-	atomic_add(SCTP_SKB_CB(skb)->dlen, &sk->rmem_alloc);
-	if (!(sk->shutdown & RCV_SHUTDOWN)) {
-		/* SCTP IG 2.15.2, Receive SWS Avoidance RFC 1122 4.2.3.3 */
-		size_t rbuf = sk->rcvbuf >> 1;
-		size_t amps = sp->amps;
-		size_t alloc = atomic_read(&sk->rmem_alloc);
-		size_t a_rwnd = (sk->rcvbuf > alloc) ? sk->rcvbuf - alloc : 0;
-
-		if (a_rwnd > amps || a_rwnd > rbuf)
-			sp->a_rwnd = a_rwnd;
-		else
-			sp->a_rwnd = 0;
-	}
-}
-STATIC INLINE void
-sctp_set_owner_w(struct sk_buff *skb, struct sock *sk)
-{
-	sock_hold(sk);
-	skb->sk = sk;
-	skb->destructor = sctp_wfree;
-	atomic_add(skb->truesize, &sk->wmem_alloc);
-	ensure(atomic_read(&sk->wmem_alloc) >= 0, atomic_set(&sk->wmem_alloc, 0));
-}
-STATIC INLINE void
-sctp_get_owner_r(struct sk_buff *new, struct sk_buff *old)
-{
-	new->sk = old->sk;
-	new->destructor = old->destructor;
-	old->sk = NULL;
-	old->destructor = NULL;
-}
-STATIC INLINE void
-sctp_put_owner_r(struct sk_buff *skb)
-{
-	if (skb->destructor)
-		skb->destructor(skb);
-	skb->sk = NULL;
-	skb->destructor = NULL;
-}
-STATIC struct sk_buff *
-sctp_wmalloc(struct sock *sk, unsigned long size, int force, int priority)
-{
-	if (force || atomic_read(&sk->wmem_alloc) < sk->sndbuf) {
-		struct sk_buff *skb;
-
-		if ((skb = alloc_skb(size, priority))) {
-			sctp_set_owner_w(skb, sk);
-			return skb;
-		}
-	}
-	return NULL;
-}
-#endif				/* SOCKETS */
-
-/*
- *  ==========================================================================
- *
  *  SCTP --> SCTP Peer Messages (Send Messages)
  *
  *  ==========================================================================
@@ -5740,7 +5303,6 @@ sctp_bundle_sack(struct sctp *sp,	/* association */
 		sctp_tcb_t *gap = sp->gaps;
 		sctp_tcb_t *dup = sp->dups;
 
-#if STREAMS
 		/* For sockets, socket buffer management maintaines the sp->a_rwnd value at the
 		   current available receive window. For STREAMS, sp->a_rwnd is the maximum
 		   available receive window and we subtract the queued bytes in each of the receive 
@@ -5753,7 +5315,6 @@ sctp_bundle_sack(struct sctp *sp,	/* association */
 		   take into account SWS. */
 		arwnd = (count < arwnd) ? arwnd - count : 0;
 		ptrace(("INFO: arwnd = %u, oooq = %u:%u, dupq = %u:%u, rcvq = %u:%u, expq = %u:%u\n", (uint) arwnd, (uint) bufq_size(&sp->oooq), (uint) bufq_length(&sp->oooq), (uint) bufq_size(&sp->dupq), (uint) bufq_length(&sp->dupq), (uint) bufq_size(&sp->rcvq), (uint) bufq_length(&sp->rcvq), (uint) bufq_size(&sp->expq), (uint) bufq_length(&sp->expq)));
-#endif				    /* STREAMS */
 		/* fill out sack message information */
 		m = (typeof(m)) mp->b_wptr;
 		m->ch.type = SCTP_CTYPE_SACK;
@@ -6103,7 +5664,6 @@ sctp_frag_chunk(bufq_t * bq, mblk_t *mp, size_t mps)
 		/* skb_copy and copyb do not copy the hidden control block */
 		bcopy(mp->b_datap->db_base, dp->b_datap->db_base,
 		      mp->b_datap->db_lim - mp->b_datap->db_base);
-#if STREAMS
 		/* For socket buffers, when we copy the buffer we copy all of the data associated
 		   with the buffer.  For message blocks, we must separately duplicate the message
 		   blocks that form the data. */
@@ -6113,7 +5673,6 @@ sctp_frag_chunk(bufq_t * bq, mblk_t *mp, size_t mps)
 			return;
 		}
 		dp->b_cont = bp;
-#endif				/* STREAMS */
 	}
 	{
 		sctp_tcb_t *cb1;
@@ -6467,12 +6026,10 @@ sctp_alloc_chk(struct sctp *sp, size_t clen, size_t dlen)
 		bzero(cb, sizeof(*cb));
 		cb->mp = mp;
 		cb->dlen = dlen;
-#if STREAMS
 		/* Sockets control blocks are part of the sk_buff structure and do not need to be
 		   hidden. */
 		mp->b_rptr += sizeof(*cb);	/* hide control block */
 		mp->b_wptr += sizeof(*cb);
-#endif
 		/* pre-zero padding */
 		bzero(mp->b_wptr + clen, plen - clen);
 		mp->b_next = NULL;
@@ -6480,7 +6037,6 @@ sctp_alloc_chk(struct sctp *sp, size_t clen, size_t dlen)
 	return (mp);
 }
 
-#if STREAMS
 /*
  *  ALLOC CTL
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -6504,19 +6060,16 @@ sctp_alloc_ctl(struct sctp *sp, size_t clen, size_t dlen)
 		bzero(cb, sizeof(*cb));
 		cb->mp = mp;
 		cb->dlen = dlen;
-#if STREAMS
 		/* Sockets control blocks are part of the sk_buff structure and do not need to be
 		   hidden. */
 		mp->b_rptr += sizeof(*cb);	/* hide control block */
 		mp->b_wptr += sizeof(*cb);
-#endif
 		/* pre-zero padding */
 		bzero(mp->b_wptr + clen, plen - clen);
 		mp->b_next = NULL;
 	}
 	return (mp);
 }
-#endif				/* STREAMS */
 
 /*
  *  ALLOC MSG
@@ -6544,12 +6097,10 @@ sctp_alloc_msg(struct sctp *sp, size_t clen)
 		bzero(cb, sizeof(*cb));
 		cb->mp = mp;
 		cb->dlen = mlen;
-#if STREAMS
 		/* Sockets control blocks are part of the sk_buff structure and do not need to be
 		   hidden. */
 		mp->b_rptr += sizeof(*cb);	/* hide control block */
 		mp->b_wptr += sizeof(*cb);
-#endif
 		/* pull the hard and IP header headroom */
 		mp->b_wptr += hlen;
 		sh = (struct sctphdr *) mp->b_wptr;
@@ -6590,12 +6141,10 @@ sctp_alloc_reply(struct sctp *sp, struct sctphdr *rh, size_t clen)
 		bzero(cb, sizeof(*cb));
 		cb->mp = mp;
 		cb->dlen = mlen;
-#if STREAMS
 		/* Sockets control blocks are part of the sk_buff structure and do not need to be
 		   hidden. */
 		mp->b_rptr += sizeof(*cb);	/* hide control block */
 		mp->b_wptr += sizeof(*cb);
-#endif
 		/* reserve IP and hard header room */
 		mp->b_wptr += hlen;
 		sh = (struct sctphdr *) mp->b_wptr;
@@ -6629,22 +6178,6 @@ freechunks(mblk_t *mp)
 			freemsg(mp);
 		}
 	}
-}
-
-STATIC INLINE void
-sctp_error_report(struct sctp *sp, int err)
-{
-	/* FIXME: For STREAMS, on an error report we need to set the poll error bit and send up an
-	   error using a M_ERROR message.  Or do we...? */
-#if SOCKETS
-	if (sock_locked(sk) || !sk->protinfo.af_inet.recverr)
-		sk->err_soft = err;
-	else {
-		sk->err = err;
-		if (!sk->dead)
-			sk->error_report(sk);
-	}
-#endif
 }
 
 /*
@@ -6682,8 +6215,6 @@ sctp_route_normal(struct sctp *sp)
 			   not abort simply due to temporary routing changes. */
 			sctp_abort(sp, SCTP_ORIG_PROVIDER, -EHOSTUNREACH);
 		}
-		/* report the error */
-		sctp_error_report(sp, err);
 		return (NULL);
 	}
 	sd = sp->taddr;
@@ -6782,7 +6313,6 @@ ___sctp_transmit_wakeup(struct sctp *sp)
 	return;
 }
 
-#if STREAMS
 STATIC streamscall void
 _sctp_transmit_wakeup(queue_t *q)
 {
@@ -6790,7 +6320,6 @@ _sctp_transmit_wakeup(queue_t *q)
 
 	return ___sctp_transmit_wakeup(sp);
 }
-#endif
 
 STATIC void
 sctp_transmit_wakeup(struct sctp *sp)
@@ -6798,15 +6327,11 @@ sctp_transmit_wakeup(struct sctp *sp)
 	/* The STREAMS version defers transmitter wakeup by scheduling the write queue of the
 	   stream.  This eventually calls ___sctp_transmit_wakeup. On the sockets version, we have
 	   to call ___sctp_transmit_wakeup directly. */
-#if SOCKETS
-	return ___sctp_transmit_wakeup(sk);
-#else				/* SOCKETS */
 	if (sp->wq) {
 		qenable(sp->wq);
 		return;
 	}
 	swerr();
-#endif				/* SOCKETS */
 }
 
 /*
@@ -7141,7 +6666,7 @@ sctp_assoc_timedout(struct sctp *sp,	/* association */
 		int err = -ETIMEDOUT;
 
 		seldom();
-#if SOCKETS
+#if SOCKETS || 1
 		sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, err, NULL);
 #endif
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
@@ -7584,7 +7109,7 @@ sctp_guard_timeout(caddr_t data)
 	{
 		int err = -ETIMEDOUT;
 
-#if SOCKETS
+#if SOCKETS || 1
 		sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, err, NULL);
 #endif
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
@@ -8367,14 +7892,6 @@ sctp_send_cookie_ack(struct sctp *sp)
 	mp->b_wptr += PADC(clen);
 	SCTP_INC_STATS(SctpOutCtrlChunks);
 	printd(("Sending COOKIE-ACK from stream %p\n", sp));
-#if SOCKETS
-	/* process data bundled with cookie echo on new stream */
-	if (sctp_return_more(mp) > 0) {
-		sctp_recv_msg(sp, mp);
-		if (sp->state != SCTP_ESTABLISHED)
-			goto done;
-	}
-#endif
 	sctp_bundle_more(sp, sd, mp, 1);	/* don't nagle */
 	sctp_send_msg(sp, sd, mp);
 	goto done;
@@ -9397,13 +8914,11 @@ sctp_cumm_ack(struct sctp *sp, uint32_t ack)
 			bufq_queue(&sp->ackq, mp);
 		else
 			freemsg(mp);
-#if STREAMS
 		/* NOTE: In STREAMS we need to back-enable the write queue if required.  In the
 		   Linux socket code this is accomplished by the skb destructor with the kfree_skb
 		   above, or when the ackq is purged. */
 		if (sp->wq->q_count)
 			qenable(sp->wq);
-#endif
 	}
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 	/* PR-SCTP 3.5 (A3 - C1) */
@@ -9533,7 +9048,6 @@ sctp_deliver_data(struct sctp *sp)
 					bufq_unlock(&sp->expq);
 					SCTP_INC_STATS(SctpInUnorderChunks);
 				}
-#if STREAMS
 				/* STREAMS calculates reassembled user messages here.  Sockets does
 				   not.  Sockets calculates reassembled user messages in
 				   sctp_recvmsg. Thus sockets calculates delivered reassembled user
@@ -9541,7 +9055,6 @@ sctp_deliver_data(struct sctp *sp)
 				   messages. */
 				if (!(cb)->flags & SCTPCB_FLAG_FIRST_FRAG)
 					SCTP_INC_STATS_USER(SctpReasmUsrMsgs);
-#endif				/* STREAMS */
 				sp->nunds--;
 			} else {
 				rare();
@@ -9624,11 +9137,12 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		size_t clen, dlen;
 		uint flags;
 		int ord;
+
 #if 0
 		int more;
 #endif
 		if (mp->b_rptr == mp->b_wptr)
-			break; /* we're done */
+			break;	/* we're done */
 		if (mp->b_rptr > mp->b_wptr) {
 			pswerr(("Should have been caught on last iteration!\n"));
 			goto emsgsize;
@@ -9651,7 +9165,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		if (clen < sizeof(*m))
 			goto emsgsize;
 		if ((dlen = clen - sizeof(*m)) == 0)
-			goto baddata; /* zero length data */
+			goto baddata;	/* zero length data */
 
 #if 0
 		if ((!(m = (typeof(m)) mp->b_rptr))
@@ -9847,13 +9361,11 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		freemsg(dp);
 		break;
 #endif
-#if STREAMS
 	      free_nobufs:
 		freemsg(dp);
 		/* We should not break with ENOBUFS or ENOMEM or EBUSY here... I'm not sure that we 
 		   have left the buffer in a state where it can be put back on the queue and
 		   processed later. */
-#endif
 	      enobufs:
 		ptrace(("ERROR: could not allocate buffer\n"));
 		err = -ENOBUFS;
@@ -9876,6 +9388,9 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 			   For now we just abort the association. */
 			err = -ECONNRESET;
 			sctp_send_abort(sp);
+#if 0
+			sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, err, NULL);
+#endif
 			sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
 			break;
 		}
@@ -9976,7 +9491,6 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
       no_data:
 	goto done;
       done:
-#if STREAMS
 	/* We should not break with ENOBUFS or ENOMEM or EBUSY here... I'm not sure that we have
 	   left the buffer in a state where it can be put back on the queue and processed later. */
 	switch (err) {
@@ -9988,7 +9502,6 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		sctp_send_sack(sp);
 		err = 0;
 	}
-#endif				/* STREAMS */
 	return (err);
       outstate:
 	/* We have received DATA in the wrong state.  If so, it is probably an old packet that was
@@ -10044,12 +9557,10 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 	/* RFC 2960 6.2.1 (D) i) */
 	if (before(ack, sp->t_ack))
 		goto discard;
-#if STREAMS
 	/* If the receive window is increasing and we have data in the write queue, we might need
 	   to backenable. */
 	if (rwnd > sp->p_rwnd && sp->wq && sp->wq->q_count)
 		qenable(sp->wq);
-#endif				/* STREAMS */
 	/* RFC 1122 4.2.3.4 IMPLEMENTATION (3) */
 	sp->p_rbuf = (sp->p_rbuf >= rwnd) ? sp->p_rbuf : rwnd;
 	/* RFC 2960 6.2.1 (D) ii) */
@@ -12516,7 +12027,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		/* These are resource problems */
 		if ((1 << sp->state) & (SCTPF_NEEDABORT))
 			sctp_send_abort_error(sp, SCTP_CAUSE_RES_SHORTAGE, NULL, 0);
-#if SOCKETS
+#if SOCKETS || 0
 		sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, -ECONNABORTED, NULL);
 #endif
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, -ECONNABORTED);
@@ -12526,7 +12037,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		/* This is a protocol violation */
 		if ((1 << sp->state) & (SCTPF_NEEDABORT))
 			sctp_send_abort_error(sp, SCTP_CAUSE_PROTO_VIOLATION, NULL, 0);
-#if SOCKETS
+#if SOCKETS || 0
 		sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, err, NULL);
 #endif
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
@@ -12536,7 +12047,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		/* This is an invalid parameter */
 		if ((1 << sp->state) & (SCTPF_NEEDABORT))
 			sctp_send_abort_error(sp, SCTP_CAUSE_INVALID_PARM, NULL, 0);
-#if SOCKETS
+#if SOCKETS || 0
 		sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, err, NULL);
 #endif
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
@@ -12546,7 +12057,7 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 		/* This is a message formatting error */
 		if ((1 << sp->state) & (SCTPF_NEEDABORT))
 			sctp_send_abort(sp);
-#if SOCKETS
+#if SOCKETS || 0
 		sctp_discon_ind(sp, SCTP_ORIG_PROVIDER, err, NULL);
 #endif
 		sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
@@ -12608,10 +12119,6 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 		if (!sd)
 			goto done;
 		/* Sockets does this directly from the bottom half, streams does not. */
-#if SOCKETS
-		if (sctp_locked(sp))
-			goto lock_dropped;
-#endif				/* SOCKETS */
 		/* Adjust destination specifics. */
 		sd->ssthresh = ((sd->cwnd >> 1) > (sd->mtu << 1)) ? sd->cwnd >> 1 : sd->mtu << 1;
 		sd->cwnd = sd->mtu;
@@ -12625,10 +12132,6 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 		if (code > NR_ICMP_UNREACH)
 			goto done;
 		if (code == ICMP_FRAG_NEEDED) {
-#if SOCKETS
-			if (sctp_locked(sp))
-				goto lock_dropped;
-#endif				/* SOCKETS */
 			if (sd && sd->dst_cache) {
 				size_t mtu = ntohs(icmph->un.frag.mtu);
 
@@ -12686,7 +12189,6 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 			break;
 		}
 	}
-	sctp_error_report(sp, err);
 	if (sd && sd->dst_cache)
 		dst_negative_advice(&sd->dst_cache);
 	goto done;
@@ -12698,12 +12200,6 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
       closed:
 	ptrace(("ERROR: ICMP for closed stream\n"));
 	goto done;
-#if SOCKETS
-      lock_dropped:
-	ptrace(("ERROR: Hit locks on stream\n"));
-	NET_INC_STATS_BH(LockDroppedIcmps);
-	goto done;
-#endif				/* SOCKETS */
 }
 
 /*
@@ -12730,11 +12226,6 @@ sctp_clear(struct sctp *sp)
 	sp->pmtu = 576;
 #endif
 	ptrace(("Clearing stream sp=%p, state = %lu\n", sp, (ulong) sp->state));
-#if SOCKETS
-	/* clear flags */
-	sk->shutdown = 0;
-	sk->done = 0;
-#endif
 	/* purge queues */
 	bufq_purge(&sp->expq);
 	bufq_purge(&sp->rcvq);
@@ -12775,7 +12266,7 @@ STATIC void
 sctp_unhash(struct sctp *sp)
 {
 
-	ptrace(("Unhashing stream sp=%p, state = %d\n", sp, (int)sp->state));
+	ptrace(("Unhashing stream sp=%p, state = %d\n", sp, (int) sp->state));
 	local_bh_disable();
 	if (sp->prev) {
 		if (sp->vprev)
@@ -12814,7 +12305,7 @@ sctp_unhash(struct sctp *sp)
 STATIC void
 sctp_reset(struct sctp *sp)
 {
-	ptrace(("Resetting stream sp=%p, state = %d\n", sp, (int)sp->state));
+	ptrace(("Resetting stream sp=%p, state = %d\n", sp, (int) sp->state));
 	local_bh_disable();
 	/* unhash and delete address lists */
 	sctp_change_state(sp, sp->conind ? SCTP_LISTEN : SCTP_CLOSED);
@@ -13026,10 +12517,8 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 		goto eisconn;
 	if (!num)
 		goto eaddrnotavail;
-#if STREAMS
 	if (num < PROT_SOCK && sp->cred.cr_uid != 0)
 		goto eacces;
-#endif
 	if ((err = sctp_alloc_sock_daddrs(sp, dport, dsin, dnum)) < 0)
 		goto error;
 	if (err == 0)
@@ -13054,10 +12543,6 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 		}
 	}
 	sp->dport = dport;
-#if SOCKETS
-	sk->daddr = sp->daddr->daddr;
-	sk->saddr = sp->saddr->saddr;
-#endif
 	/* obtain a verification tag */
 	sp->v_tag = sctp_get_vtag(sp->saddr->saddr, sp->daddr->daddr, sp->sport, sp->dport);
 	sp->p_tag = 0;
@@ -13091,26 +12576,12 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 #endif				/* SCTP_CONFIG_ECN */
 	    0;
 	sp->ck_inc = 0;
-#if SOCKETS
-	sk->err = 0;
-	sk->err_soft = 0;
-	sk->done = 0;
-#endif
 	/* place in connection hashes */
 	if ((err = sctp_conn_hash(sp)))
 		goto error;
-#if STREAMS
 	/* fake a data request if data in conn req */
 	if (dp && (err = sctp_data_req(sp, sp->ppi, sp->sid, 0, 0, 0, dp)))
 		goto unhash_error;
-#endif
-#if SOCKETS
-	/* why do we do this? */
-	if (!sk->dead)
-		sk->state_change(sk);
-	else
-		swerr();
-#endif				/* SOCKETS */
 	if ((err = sctp_send_init(sp)))
 		goto unhash_error;
 	bh_unlock_sctp(sp);
@@ -13119,11 +12590,9 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
       einval:
 	err = -EINVAL;
 	goto error;
-#if STREAMS
       eacces:
 	err = -EACCES;
 	goto error;
-#endif				/* STREAMS */
       eafnosupport:
 	err = -EAFNOSUPPORT;
 	goto error;
@@ -13189,9 +12658,7 @@ sctp_unbind(struct sctp *sp)
 	assert(sp);
 	sctp_change_state(sp, SCTP_CLOSED);
 	sp->userlocks = 0;	/* break user locks */
-#if STREAMS
 	sp->conind = 0;		/* remove from listen hashes */
-#endif				/* STREAMS */
 	sctp_reset(sp);
 	sctp_clear(sp);
 	/* XXX: should really send an abort to each connection indication */
@@ -13236,7 +12703,6 @@ sctp_unbind_req(struct sctp *sp)
  *  other end.  Although this would work, it is probably better to discconnect and reconnect the
  *  association.  For now we just confirm the reset and do nothing.
  */
-#if STREAMS
 STATIC int
 sctp_reset_req(struct sctp *sp)
 {
@@ -13248,7 +12714,6 @@ sctp_reset_req(struct sctp *sp)
 		return (err);
 	return (0);
 }
-#endif				/* STREAMS */
 
 /*
  *  RESET_RES:
@@ -13258,7 +12723,6 @@ sctp_reset_req(struct sctp *sp)
  *  such a direct mechanism.  For XTI/TPI and Sockets, the response should be automatically
  *  generated internal to the provider.
  */
-#if STREAMS
 STATIC int
 sctp_reset_res(struct sctp *sp)
 {
@@ -13271,7 +12735,6 @@ sctp_reset_res(struct sctp *sp)
 	}
 	return sctp_conn_res(sp, cp, sp, NULL);
 }
-#endif				/* STREAMS */
 
 /*
  *  CONN_RES:
@@ -13301,7 +12764,6 @@ sctp_conn_res(struct sctp *sp, mblk_t *cp, struct sctp *ap, mblk_t *dp)
 	local_bh_disable();
 	bh_lock_sctp(ap);
 #endif
-#if STREAMS
 	/* STREAMS uses either the listening stream or another stream that is possibly already
 	   bound to an accepting address.  Because of this it is necessary in STREAMS to clear the
 	   state of the accepting stream and rebind it if necessary.  For sockets, we always start
@@ -13313,7 +12775,6 @@ sctp_conn_res(struct sctp *sp, mblk_t *cp, struct sctp *ap, mblk_t *dp)
 	}
 	sctp_reset(ap);		/* we need to rebind the accepting stream */
 	sctp_clear(ap);
-#endif				/* STREAMS */
 	/* Force user locks because both the source port and source addresses are specified in the
 	   cookie.  */
 	if (ap != sp)
@@ -13364,27 +12825,7 @@ sctp_conn_res(struct sctp *sp, mblk_t *cp, struct sctp *ap, mblk_t *dp)
 	if ((err = sctp_update_routes(ap, 1)))
 		goto error;
 	sctp_change_state(ap, SCTP_ESTABLISHED);
-#if STREAMS
 	ap->users++;
-#endif				/* STREAMS */
-#if SOCKETS
-#ifdef INET_REFCNT_DEBUG
-	atomic_inc(&inet_sock_nr);
-#endif				/* INET_REFCNT_DEBUG */
-	/* put on master list */
-	spin_lock_bh(&sctp_protolock);
-	if ((ak->next = sctp_protolist))
-		ak->next->pprev = &ak->next;
-	ak->pprev = &sctp_protolist;
-	sctp_protolist = ak;
-#ifdef SCTP_CONFIG_MODULE
-	MOD_INC_USE_COUNT;
-#endif				/* SCTP_CONFIG_MODULE */
-	atomic_inc(&sctp_socket_count);
-	spin_unlock_bh(&sctp_protolock);
-	printd(("INFO: There are now %d sockets allocated\n", atomic_read(&sctp_socket_count)));
-	ak->use_write_queue = 0;
-#endif				/* SOCKETS */
 #ifndef SCTP_SPECIAL_DEBUG
 	/* unlock accepting socket or stream */
 	bh_unlock_sctp(ap);
@@ -13393,11 +12834,9 @@ sctp_conn_res(struct sctp *sp, mblk_t *cp, struct sctp *ap, mblk_t *dp)
 	/* process any chunks bundled with cookie echo on accepting stream */
 	if (sctp_return_more(cp) > 0)
 		sctp_recv_msg(ap, cp);
-#if STREAMS
 	/* fake a data request if data in conn res */
 	if (dp && (err = sctp_data_req(ap, ap->ppi, ap->sid, 0, 0, 0, dp)))
 		goto release_error;
-#endif				/* STREAMS */
 	sctp_send_cookie_ack(ap);
 	SCTP_INC_STATS_USER(SctpPassiveEstabs);
 	/* caller will unlink connect indication */
@@ -13414,7 +12853,6 @@ sctp_conn_res(struct sctp *sp, mblk_t *cp, struct sctp *ap, mblk_t *dp)
 	local_bh_enable();
 #endif
 	return (err);
-#if STREAMS
       release_error:
 	if (ap != sp)
 		ap->userlocks = 0;	/* break bind locks */
@@ -13423,7 +12861,6 @@ sctp_conn_res(struct sctp *sp, mblk_t *cp, struct sctp *ap, mblk_t *dp)
 	release_sctp(ap);
 #endif
 	return (err);
-#endif				/* STREAMS */
 }
 
 /*
@@ -13465,7 +12902,6 @@ sctp_ordrel_req(struct sctp *sp)
  *  DATA_REQ:
  *  -------------------------------------------------------------------------
  */
-#if STREAMS
 STATIC int
 sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, uint rcpt,
 	      mblk_t *mp)
@@ -13508,7 +12944,6 @@ sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, 
 		flags |= SCTPCB_FLAG_LAST_FRAG;
 	return sctp_send_data(sp, st, flags, mp);
 }
-#endif				/* STREAMS */
 
 /*
  *  ---------------------------------------------------------------------------
@@ -13664,17 +13099,6 @@ sctp_bind_req(struct sctp *sp, uint16_t sport, struct sockaddr_in *ssin, size_t 
 	if ((err = sctp_alloc_sock_saddrs(sp, sport, ssin, snum)) < 0)
 		goto error;
 	usual(err >= 0);
-#if SOCKETS
-	/* set primary */
-	if (err > 0) {
-		if (sp->saddr)
-			saddr = sp->saddr->saddr;
-		else
-			swerr();
-	}
-	usual(saddr);
-	sk->rcv_saddr = sk->saddr = saddr;
-#endif
 	(void) saddr;
 	/* also places us in bind (and possibly listen for streams) hashes */
 	sctp_change_state(sp, (sp->conind = cons) ? SCTP_LISTEN : SCTP_CLOSED);
@@ -13700,9 +13124,7 @@ sctp_bind_req(struct sctp *sp, uint16_t sport, struct sockaddr_in *ssin, size_t 
 	goto error;
       error:
 	sctp_change_state(sp, SCTP_CLOSED);
-#if STREAMS
 	sp->conind = 0;
-#endif				/* STREAMS */
 	/* stream was not locked */
 	return (err);
 }
@@ -13851,7 +13273,6 @@ sctp_init_struct(struct sctp *sp)
 #endif				/* SCTP_CONFIG_THROTTLE_HEARTBEATS */
 	/* start in closed state */
 	sctp_change_state(sp, SCTP_CLOSED);
-#if STREAMS
 	/* ip defaults */
 	sp->inet.tos = sctp_defaults.ip.tos;
 #if 0
@@ -13871,7 +13292,6 @@ sctp_init_struct(struct sctp *sp)
 #if 0
 	sp->priority = sctp_defaults.ip.priority;
 #endif
-#endif				/* STREAMS */
 	/* association defaults */
 	sp->a_rwnd = sctp_defaults.xti.rcvbuf;
 	sp->max_istr = sctp_defaults.sctp.istreams;
@@ -13935,7 +13355,6 @@ sctp_init_struct(struct sctp *sp)
  *
  *  --------------------------------------------------------------------------
  */
-#if STREAMS
 #ifndef ip_rt_min_pmtu
 #define ip_rt_min_pmtu 552
 #endif
@@ -13983,7 +13402,6 @@ sctp_alloc_priv(queue_t *q, struct sctp **spp, int cmajor, int cminor, struct sc
 	usual(sp);
 	return (sp);
 }
-#endif
 
 /*
  *  --------------------------------------------------------------------------
@@ -13992,7 +13410,6 @@ sctp_alloc_priv(queue_t *q, struct sctp **spp, int cmajor, int cminor, struct sc
  *
  *  --------------------------------------------------------------------------
  */
-#if STREAMS
 STATIC void
 sctp_free_priv(queue_t *q)
 {
@@ -14029,7 +13446,6 @@ sctp_free_priv(queue_t *q)
 	sp->rq = sp->wq = NULL;
 	sctp_put(sp);
 }
-#endif
 
 /*
  *  SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
@@ -14045,7 +13461,6 @@ sctp_free_priv(queue_t *q)
  *  This is called to clean up the read queue by the STREAMS read service routine.  This permits
  *  backenabling to work.
  */
-#if STREAMS
 STATIC streamscall void
 sctp_cleanup_read(struct sctp *sp)
 {
@@ -14154,7 +13569,6 @@ sctp_trylockq(queue_t *q)
 #endif
 	return (res);
 }
-#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -14163,7 +13577,6 @@ sctp_trylockq(queue_t *q)
  *
  *  -------------------------------------------------------------------------
  */
-#if STREAMS
 STATIC int
 sctp_r_other(queue_t *q, mblk_t *mp)
 {
@@ -14179,7 +13592,6 @@ sctp_r_other(queue_t *q, mblk_t *mp)
 	return (-EOPNOTSUPP);
 #endif
 }
-#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -14188,7 +13600,6 @@ sctp_r_other(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-#if STREAMS
 STATIC int
 sctp_r_data(queue_t *q, mblk_t *mp)
 {
@@ -14196,7 +13607,6 @@ sctp_r_data(queue_t *q, mblk_t *mp)
 
 	return sctp_recv_msg(sp, mp);
 }
-#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -14205,7 +13615,6 @@ sctp_r_data(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-#if STREAMS
 STATIC int
 sctp_r_ctl(queue_t *q, mblk_t *mp)
 {
@@ -14214,7 +13623,6 @@ sctp_r_ctl(queue_t *q, mblk_t *mp)
 	rare();
 	return sctp_recv_err(sp, mp);
 }
-#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -14223,7 +13631,6 @@ sctp_r_ctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-#if STREAMS
 STATIC int
 sctp_m_flush(queue_t *q, mblk_t *mp)
 {
@@ -14245,7 +13652,24 @@ sctp_m_flush(queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (QR_ABSORBED);
 }
-#endif
+
+STATIC noinline streams_fastcall int
+sctp_r_flush(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(q, FLUSHALL);
+		putnext(q, mp);
+		return (QR_ABSORBED);
+	}
+	if (mp->b_rptr[0] & FLUSHW) {
+		putnext(q, mp);
+		return (QR_ABSORBED);
+	}
+	return (QR_DONE);
+}
 
 /*
  *  =========================================================================
@@ -14258,26 +13682,34 @@ sctp_m_flush(queue_t *q, mblk_t *mp)
 /*
  *  IP Read Message
  */
-#if STREAMS
-STATIC INLINE streamscall int
-sctp_r_prim(queue_t *q, mblk_t *mp)
+STATIC noinline streams_fastcall __unlikely int
+sctp_r_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		return sctp_r_data(q, mp);
 	case M_CTL:
 		return sctp_r_ctl(q, mp);
+	case M_FLUSH:
+		return sctp_r_flush(q, mp);
 	default:
 		return sctp_r_other(q, mp);
 	}
 }
-#endif
+STATIC INLINE streamscall __hot_in int
+sctp_r_prim(queue_t *q, mblk_t *mp)
+{
+	/* fast path for data */
+	if (likely(mp->b_datap->db_type == M_DATA))
+		return sctp_recv_msg(SCTP_PRIV(q), mp);
+	return sctp_r_prim_slow(q, mp);
+}
 
 /*
  *  PUTQ Put Routine
  *  -----------------------------------
  */
-#if STREAMS
+#if 0
 STATIC INLINE int
 sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 	  streamscall void (*procwake) (queue_t *q))
@@ -14367,11 +13799,90 @@ sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 }
 #endif
 
+STATIC noinline streams_fastcall void
+sctp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
+{
+	switch (rtn) {
+	case QR_DONE:
+		freemsg(mp);
+	case QR_ABSORBED:
+		break;
+	case QR_STRIP:
+		if (mp->b_cont)
+			if (unlikely(!putq(q, mp->b_cont)))
+				freemsg(mp->b_cont);
+	case QR_TRIMMED:
+		freeb(mp);
+		break;
+	case QR_LOOP:
+		if (!q->q_next) {
+			qreply(q, mp);
+			break;
+		}
+	case QR_PASSALONG:
+		if (q->q_next) {
+			putnext(q, mp);
+			break;
+		}
+		rtn = -EOPNOTSUPP;
+	default:
+		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		freemsg(mp);
+		break;
+	case QR_DISABLE:
+		if (unlikely(!putq(q, mp)))
+			freemsg(mp);
+		break;
+	case QR_PASSFLOW:
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			break;
+		}
+	case -ENOBUFS:
+	case -EBUSY:
+	case -ENOMEM:
+	case -EAGAIN:
+	case QR_RETRY:
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
+		break;
+	}
+	return;
+}
+
+STATIC streamscall __hot_in int
+sctp_rput(queue_t *q, mblk_t *mp)
+{
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
+		// q->q_qinfo->qi_mstat.ms_acnt++;
+		if (unlikely(!putq(q, mp)))
+			freemsg(mp);
+	} else {
+		int rtn;
+
+		rtn = sctp_r_prim(q, mp);
+		/* Fast Paths */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (likely(rtn == QR_DONE))
+			freemsg(mp);
+		else
+			sctp_putq_slow(q, mp, rtn);
+		_sctp_cleanup_read(q);
+	}
+	return (0);
+
+#if 0
+	return (int) sctp_putq(q, mp, &sctp_r_prim, &_sctp_cleanup_read);
+#endif
+}
+
 /*
  *  SRVQ Service Routine
  *  -----------------------------------
  */
-#if STREAMS
+#if 0
 STATIC INLINE int
 sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 	  streamscall void (*procwake) (queue_t *q))
@@ -14479,18 +13990,120 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 	}
 	return (rtn);
 }
+#endif
 
-STATIC streamscall int
-sctp_rput(queue_t *q, mblk_t *mp)
+STATIC noinline streams_fastcall int
+sctp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
-	return (int) sctp_putq(q, mp, &sctp_r_prim, &_sctp_cleanup_read);
+	switch (rtn) {
+	case QR_DONE:
+		freemsg(mp);
+	case QR_ABSORBED:
+		return (1);
+	case QR_STRIP:
+		if (mp->b_cont)
+			if (unlikely(!putbq(q, mp->b_cont)))
+				freemsg(mp->b_cont);
+	case QR_TRIMMED:
+		freeb(mp);
+		return (1);
+	case QR_LOOP:
+		if (!q->q_next) {
+			qreply(q, mp);
+			return (1);
+		}
+	case QR_PASSALONG:
+		if (q->q_next) {
+			putnext(q, mp);
+			return (1);
+		}
+		rtn = -EOPNOTSUPP;
+	default:
+		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		freemsg(mp);
+		return (1);
+	case QR_DISABLE:
+		printd(("%s: %p: ERROR; (q disabling) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+			q->q_ptr, rtn));
+		noenable(q);
+		if (unlikely(!putbq(q, mp)))
+			freemsg(mp);
+		return (0);
+	case QR_PASSFLOW:
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			return (1);
+		}
+	case -ENOBUFS:		/* proc must have scheduled bufcall */
+	case -EBUSY:		/* proc must have failed canput */
+	case -ENOMEM:		/* proc must have scheduled bufcall */
+	case -EAGAIN:		/* proc must renable on some event */
+		if (mp->b_datap->db_type < QPCTL) {
+			printd(("%s: %p: ERROR: (q stalled) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+				q->q_ptr, rtn));
+			if (!putbq(q, mp))
+				freemsg(mp);
+			return (0);
+		}
+		/* Be careful not to put a priority message back on the queue.  */
+		switch (mp->b_datap->db_type) {
+		case M_PCPROTO:
+			mp->b_datap->db_type = M_PROTO;
+			break;
+		case M_PCRSE:
+			mp->b_datap->db_type = M_RSE;
+			break;
+		case M_PCCTL:
+			mp->b_datap->db_type = M_CTL;
+			break;
+		default:
+			printd(("%s: %p: ERROR (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
+				q->q_ptr, rtn));
+			freemsg(mp);
+			return (1);
+		}
+		mp->b_band = 255;
+		if (unlikely(!putq(q, mp)))
+			freemsg(mp);
+		return (0);
+	case QR_RETRY:
+		if (unlikely(!putq(q, mp)))
+			freemsg(mp);
+		return (1);
+	}
 }
-STATIC streamscall int
+
+STATIC streamscall __hot_in int
 sctp_rsrv(queue_t *q)
 {
-	return (int) sctp_srvq(q, &sctp_r_prim, &_sctp_cleanup_read);
-}
+	mblk_t *mp;
+
+#if 1
+	/* try bottom half locking across loop to allow softirqd to burst. */
+	local_bh_disable();
 #endif
+	while (likely((mp = getq(q)) != NULL)) {
+		int rtn;
+
+		rtn = sctp_r_prim(q, mp);
+		/* Fast Path */
+		if (likely(rtn == QR_ABSORBED))
+			continue;
+		else if (unlikely(sctp_srvq_slow(q, mp, rtn) == 0))
+			break;
+	}
+	_sctp_cleanup_read(q);
+#if 1
+	/* this should run the burst from softirqd. */
+	local_bh_enable();
+#endif
+	return (0);
+
+#if 0
+	return (int) sctp_srvq(q, &sctp_r_prim, &_sctp_cleanup_read);
+#endif
+}
 
 /*
  *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -14543,7 +14156,6 @@ static struct qinit sctp_m_winit = {
 };
 
 #endif				/* defined WITH_NPI_IP_MUX */
-
 
 STATIC int
 m_flush(struct sctp *sp, int how, int band)
@@ -15012,6 +14624,7 @@ n_info_ack(struct sctp *sp)
 {
 	mblk_t *mp;
 	N_info_ack_t *p;
+
 #ifdef ETSI
 	N_qos_sel_info_sctp2_t *qos;
 #else
@@ -15305,8 +14918,8 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 		}
 		break;
 	}
-	/* Note: if we are not in a WACK state we simply do not change state.  This occurs
-	   normally when we are responding to an N_OPTMGMT_REQ in other than the NS_IDLE state. */
+	/* Note: if we are not in a WACK state we simply do not change state.  This occurs normally 
+	   when we are responding to an N_OPTMGMT_REQ in other than the NS_IDLE state. */
 	if (cp != NULL)
 		bufq_unlock(&sp->conq);
 	putnext(sp->rq, mp);
@@ -15619,7 +15232,7 @@ n_conn_req(struct sctp *sp, mblk_t *mp)
 	sp->i_state = NS_WCON_CREQ;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
-	if (p->CONN_flags & ~(REC_CONF_OPT|EX_DATA_OPT))
+	if (p->CONN_flags & ~(REC_CONF_OPT | EX_DATA_OPT))
 		goto badflag;
 	if ((dlen = p->DEST_length)) {
 		unsigned char *dptr = mp->b_rptr + p->DEST_offset;
@@ -16101,9 +15714,9 @@ n_bind_req(struct sctp *sp, mblk_t *mp)
 	sp->i_state = NS_WACK_BREQ;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
-	if ((p->BIND_flags & ~(TOKEN_REQUEST|DEFAULT_DEST|DEFAULT_LISTENER)))
+	if ((p->BIND_flags & ~(TOKEN_REQUEST | DEFAULT_DEST | DEFAULT_LISTENER)))
 		goto badflag;
-	if ((p->BIND_flags & (DEFAULT_DEST|DEFAULT_LISTENER)))
+	if ((p->BIND_flags & (DEFAULT_DEST | DEFAULT_LISTENER)))
 		goto notsupport;
 	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
 		goto badaddr;
@@ -16209,6 +15822,7 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 {
 	int err;
 	N_optmgmt_req_t *p = (N_optmgmt_req_t *) mp->b_rptr;
+
 #ifdef ETSI
 	N_qos_sel_info_sctp2_t *q = (N_qos_sel_info_sctp2_t *) (mp->b_rptr + p->QOS_offset);
 #else
@@ -16662,8 +16276,8 @@ sctp_n_w_other(queue_t *q, mblk_t *mp)
 /*
  *  NPI Write Message
  */
-STATIC INLINE streamscall int
-sctp_n_w_prim(queue_t *q, mblk_t *mp)
+STATIC noinline streams_fastcall __unlikely int
+sctp_n_w_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -16677,15 +16291,101 @@ sctp_n_w_prim(queue_t *q, mblk_t *mp)
 		return sctp_n_w_other(q, mp);
 	}
 }
-STATIC streamscall int
+STATIC noinline streams_fastcall __unlikely int
+sctp_n_w_prim_error(queue_t *q, np_ulong prim, const int rtn)
+{
+	struct sctp *sp = SCTP_PRIV(q);
+
+	switch (rtn) {
+	case -EBUSY:
+	case -EAGAIN:
+	case -ENOMEM:
+	case -ENOBUFS:
+	case -EOPNOTSUPP:
+		return n_error_ack(sp, prim, rtn);
+	case -EPROTO:
+		return m_error_reply(sp, -EPROTO);
+	default:
+		return (0);
+	}
+}
+STATIC INLINE streamscall __hot_out int
+sctp_n_w_prim(queue_t *q, mblk_t *mp)
+{
+	if (likely(mp->b_datap->db_type == M_PROTO)) {
+		/* fast path for data */
+		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(np_ulong))) {
+			struct sctp *sp = SCTP_PRIV(q);
+			np_ulong prim;
+			int rtn;
+
+			switch ((prim = *((np_ulong *) mp->b_rptr))) {
+			case N_DATA_REQ:
+				if (likely((rtn = n_data_req(sp, mp)) >= 0))
+					return (rtn);
+				return sctp_n_w_prim_error(q, prim, rtn);
+			case N_EXDATA_REQ:
+				if (likely((rtn = n_exdata_req(sp, mp)) >= 0))
+					return (rtn);
+				return sctp_n_w_prim_error(q, prim, rtn);
+			default:
+				break;
+			}
+		}
+	}
+	return sctp_n_w_prim_slow(q, mp);
+}
+STATIC streamscall __hot_out int
 sctp_n_wput(queue_t *q, mblk_t *mp)
 {
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
+		// q->q_qinfo->qi_minfo->mi_mstat->ms_acnt++;
+		if (unlikely(!putq(q, mp)))
+			freemsg(mp);
+	} else {
+		int rtn = sctp_n_w_prim(q, mp);
+
+		/* Fast Paths */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (likely(rtn == QR_DONE))
+			freemsg(mp);
+		else
+			sctp_putq_slow(q, mp, rtn);
+		_sctp_transmit_wakeup(q);
+	}
+	return (0);
+#if 0
 	return (int) sctp_putq(q, mp, &sctp_n_w_prim, &_sctp_transmit_wakeup);
+#endif
 }
-STATIC streamscall int
+STATIC streamscall __hot_out int
 sctp_n_wsrv(queue_t *q)
 {
+	mblk_t *mp;
+
+#if 0
+	/* try bottom half locking across loop to bundle burst for softirqd. */
+	local_bh_disable();
+#endif
+	while (likely((mp = getq(q)) != NULL)) {
+		register int rtn = sctp_n_w_prim(q, mp);
+
+		/* Fast Path */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (unlikely(sctp_srvq_slow(q, mp, rtn) == 0))
+			break;
+	}
+	_sctp_transmit_wakeup(q);
+#if 0
+	/* this should run the burst to softirqd. */
+	local_bh_enable();
+#endif
+	return (0);
+#if 0
 	return (int) sctp_srvq(q, &sctp_n_w_prim, &_sctp_transmit_wakeup);
+#endif
 }
 
 /*
@@ -27252,7 +26952,8 @@ t_unbind_req(struct sctp *sp, mblk_t *mp)
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state %d\n", DRV_NAME, sp, (int)sp->i_state));
+	ptrace(("%s: %p: ERROR: would place i/f out of state %d\n", DRV_NAME, sp,
+		(int) sp->i_state));
 	goto error;
       error:
 	return t_error_ack(sp, T_UNBIND_REQ, err);
@@ -27503,7 +27204,7 @@ t_optdata_req(struct sctp *sp, mblk_t *mp)
 			struct t_opthdr *oh;
 
 			for (oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0);
-					oh; oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0)) {
+			     oh; oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0)) {
 				if (oh->len < sizeof(*oh))
 					break;
 				if (oh->level == T_INET_SCTP)
@@ -27791,8 +27492,8 @@ sctp_t_w_other(queue_t *q, mblk_t *mp)
 /*
  *  TPI Write Message
  */
-STATIC INLINE streamscall int
-sctp_t_w_prim(queue_t *q, mblk_t *mp)
+STATIC noinline streams_fastcall __unlikely int
+sctp_t_w_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -27806,15 +27507,101 @@ sctp_t_w_prim(queue_t *q, mblk_t *mp)
 		return sctp_t_w_other(q, mp);
 	}
 }
+STATIC noinline streams_fastcall __unlikely int
+sctp_t_w_prim_error(queue_t *q, t_uscalar_t prim, const int rtn)
+{
+	struct sctp *sp = SCTP_PRIV(q);
+
+	switch (rtn) {
+	case -EBUSY:
+	case -EAGAIN:
+	case -ENOMEM:
+	case -ENOBUFS:
+	case -EOPNOTSUPP:
+		return t_error_ack(sp, prim, rtn);
+	case -EPROTO:
+		return m_error_reply(sp, -EPROTO);
+	default:
+		return (0);
+	}
+}
+STATIC INLINE streamscall __hot_out int
+sctp_t_w_prim(queue_t *q, mblk_t *mp)
+{
+	if (likely(mp->b_datap->db_type == M_PROTO)) {
+		/* fast path for data */
+		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_uscalar_t))) {
+			struct sctp *sp = SCTP_PRIV(q);
+			t_uscalar_t prim;
+			int rtn;
+
+			switch ((prim = *((t_uscalar_t *) mp->b_rptr))) {
+			case T_DATA_REQ:
+				if (likely((rtn = t_data_req(sp, mp)) >= 0))
+					return (rtn);
+				return sctp_t_w_prim_error(q, prim, rtn);
+			case T_EXDATA_REQ:
+				if (likely((rtn = t_exdata_req(sp, mp)) >= 0))
+					return (rtn);
+				return sctp_t_w_prim_error(q, prim, rtn);
+			default:
+				break;
+			}
+		}
+	}
+	return sctp_t_w_prim_slow(q, mp);
+}
 STATIC streamscall int
 sctp_t_wput(queue_t *q, mblk_t *mp)
 {
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
+		// q->q_qinfo->qi_minfo->mi_mstat->ms_acnt++;
+		if (unlikely(!putq(q, mp)))
+			freemsg(mp);
+	} else {
+		int rtn = sctp_t_w_prim(q, mp);
+
+		/* Fast Paths */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (likely(rtn == QR_DONE))
+			freemsg(mp);
+		else
+			sctp_putq_slow(q, mp, rtn);
+		_sctp_transmit_wakeup(q);
+	}
+	return (0);
+#if 0
 	return (int) sctp_putq(q, mp, &sctp_t_w_prim, &_sctp_transmit_wakeup);
+#endif
 }
 STATIC streamscall int
 sctp_t_wsrv(queue_t *q)
 {
+	mblk_t *mp;
+
+#if 0
+	/* try bottom half locking across loop to bundle burst for softirqd. */
+	local_bh_disable();
+#endif
+	while (likely((mp = getq(q)) != NULL)) {
+		register int rtn = sctp_t_w_prim(q, mp);
+
+		/* Fast Path */
+		if (likely(rtn == QR_TRIMMED))
+			freeb(mp);
+		else if (unlikely(sctp_srvq_slow(q, mp, rtn) == 0))
+			break;
+	}
+	_sctp_transmit_wakeup(q);
+#if 0
+	/* this should run the burst to softirqd. */
+	local_bh_enable();
+#endif
+	return (0);
+#if 0
 	return (int) sctp_srvq(q, &sctp_t_w_prim, &_sctp_transmit_wakeup);
+#endif
 }
 
 /*
@@ -28515,14 +28302,6 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 		goto no_stream;
 	if (sp->state == SCTP_CLOSED)
 		goto closed;
-#if SOCKETS
-	/* For sockets we call sctp_recv_err directly.  For STREAMS we create and queue an mblk
-	   M_CTL message that is placed on the stream's lower read queue. */
-	{
-		sctp_recv_err(sk, skb);
-	}
-#endif
-#if STREAMS
 	/* No need to take locks here, the reference held from sctp_lookup_xxx() is sufficient for
 	   our purposes here. */
 	{
@@ -28549,7 +28328,6 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 		freeb(mp);
 		goto discard_and_put;
 	}
-#endif
 	goto discard_and_put;
       discard_and_put:
 	sctp_put(sp);
@@ -28580,7 +28358,6 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
  *  checksum on the packet.  If the Adler-32 checksum fails then we should silently discard the
  *  packet per RFC 2960.
  */
-#if STREAMS
 STATIC void streamscall
 sctp_free(caddr_t data)
 {
@@ -28591,7 +28368,6 @@ sctp_free(caddr_t data)
 	kfree_skb(skb);
 	return;
 }
-#endif				/* STREAMS */
 
 STATIC int
 sctp_v4_rcv(struct sk_buff *skb)
@@ -28599,9 +28375,8 @@ sctp_v4_rcv(struct sk_buff *skb)
 	mblk_t *mp;
 	struct sctp *sp;
 	struct sctphdr *sh, *sh2;
-#if STREAMS
+
 	frtn_t fr = { &sctp_free, (char *) skb };
-#endif				/* STREAMS */
 
 	if (skb->pkt_type != PACKET_HOST)
 		goto bad_pkt_type;
@@ -28633,9 +28408,12 @@ sctp_v4_rcv(struct sk_buff *skb)
 		if (skb->len < PADC(clen))
 			goto bad_chunk_len;
 	}
-#if STREAMS
 	if (!(mp = esballoc(skb->nh.raw, skb->len + (skb->data - skb->nh.raw), BPRI_MED, &fr)))
 		goto no_buffers;
+#ifndef LIS
+	/* tell others it is a socket buffer */
+	mp->b_datap->db_flag |= DB_SKBUFF;
+#endif
 	printd(("%s: mp %p ref count %d\n", __FUNCTION__, mp, mp->b_datap->db_ref));
 	mp->b_datap->db_type = M_DATA;
 	mp->b_wptr = mp->b_rptr + skb->len + (skb->data - skb->nh.raw);
@@ -28645,7 +28423,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 	if (sh->check != sh2->check)
 		goto sanity;
 	mp->b_rptr += sizeof(struct sctphdr);
-#endif				/* STREAMS */
 	/* we do the lookup before the checksum */
 	{
 		struct iphdr *iph = skb->nh.iph;
@@ -28665,18 +28442,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 		}
 		sh->check = htonl(skb->csum);
 	}
-#if SOCKETS
-	/* TODO: We have no easy way of performing IPSEC security under STREAMS, so we leave this
-	   out for the moment.  Below is the sockets version. */
-#ifdef HAVE_IPSEC_SK_POLICY_SYMBOL
-	if (!ipsec_sk_policy(sk, skb))
-		goto failed_security;
-#endif				/* HAVE_IPSEC_SK_POLICY_SYMBOL */
-#ifdef HAVE___XFRM_POLICY_CHECK_SYMBOL
-	if (!xfrm4_policy_check(sk, XFRM_POLICY_IN, skb))
-		goto failed_security;
-#endif				/* HAVE___XFRM_POLICY_CHECK_SYMBOL */
-#endif				/* SOCKETS */
 	skb->dev = NULL;
 	if (!sp->rq || !canput(sp->rq))
 		goto flow_controlled;
@@ -28703,13 +28468,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 	}
 	ptrace(("ERROR: Received OOTB packet\n"));
 	SCTP_INC_STATS_BH(SctpOutOfBlues);
-#if SOCKETS
-	/* Another IPSEC policy check that we cannot perform on STREAMS yet. */
-#ifdef HAVE___XFRM_POLICY_CHECK_SYMBOL
-	if (!xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb))
-		goto discard_it;
-#endif				/* HAVE___XFRM_POLICY_CHECK_SYMBOL */
-#endif				/* SOCKETS */
 #ifndef SCTP_CONFIG_DISCARD_OOTB
 	icmp_send(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, 0);
 	/* RFC 2960 Section 8.4 */
@@ -28741,7 +28499,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 	ptrace(("ERROR: Discarding frame silently\n"));
 	kfree_skb(skb);
 	return (0);
-#if STREAMS
       flow_controlled:
 	sctp_put(sp);
 	ptrace(("ERROR: Flow Controlled\n"));
@@ -28753,17 +28510,6 @@ sctp_v4_rcv(struct sk_buff *skb)
       no_buffers:
 	ptrace(("ERROR: Couldn't allocate mblk\n"));
 	goto discard_it;
-#endif
-#if SOCKETS
-	goto failed_security;	/* shut up compiler */
-      failed_security:
-	ptrace(("ERROR: Packet failed security policy\n"));
-	goto discard_and_putsk;
-      discard_and_putsk:
-	bh_unlock_sock(sk);
-	sock_put(sk);
-	goto discard_it;
-#endif
 }
 
 #ifdef SCTP_CONFIG_ADD_IP
@@ -28916,209 +28662,6 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
  */
 
 #ifdef CONFIG_PROC_FS
-#if SOCKETS
-STATIC void
-get_sctp_sock(struct sock *sk, char *tmpbuf, int i)
-{
-	unsigned int daddr, saddr;
-	uint16_t dport, sport;
-	int timer_active;
-	unsigned long timer_expires;
-	sctp_t *sp = SCTP_PROT(sk);
-
-	daddr = sk->daddr;
-	saddr = sk->rcv_saddr;
-	dport = ntohs(sk->dport);
-	sport = ntohs(sk->sport);
-	if (sctp_timeout_pending(&sp->timer_init)) {
-		timer_active = 1;
-		timer_expires = sp->timer_init.expires;
-	} else if (sctp_timeout_pending(&sp->timer_cookie)) {
-		timer_active = 2;
-		timer_expires = sp->timer_cookie.expires;
-	} else if (sctp_timeout_pending(&sp->timer_asconf)) {
-		timer_active = 3;
-		timer_expires = sp->timer_asconf.expires;
-	} else if (sctp_timeout_pending(&sp->timer_shutdown)) {
-		timer_active = 4;
-		timer_expires = sp->timer_shutdown.expires;
-	} else if (sctp_timeout_pending(&sp->timer_guard)) {
-		timer_active = 5;
-		timer_expires = sp->timer_guard.expires;
-	} else if (sctp_timeout_pending(&sp->timer_life)) {
-		timer_active = 6;
-		timer_expires = sp->timer_life.expires;
-	} else if (sctp_timeout_pending(&sp->timer_sack)) {
-		timer_active = 7;
-		timer_expires = sp->timer_sack.expires;
-	} else {
-		timer_active = 0;
-		timer_expires = jiffies;
-	}
-	sprintf(tmpbuf,
-		"%4d: %08X:%04X %08X:%04X " " %02X %08X:%08X %02X:%08lX %08X %5d %8d %lu %d %p", i,
-		saddr, sport, daddr, dport, sk->state, atomic_read(&sk->wmem_alloc),
-		atomic_read(&sk->rmem_alloc), timer_active, timer_expires - jiffies,
-		sp->retransmits, sock_i_uid(sk), 0, sock_i_ino(sk), atomic_read(&sk->refcnt), sk);
-}
-
-/*
- *  Use this as a replacement for afinet_get_info.
- */
-#if SOCKETS
-STATIC struct proto sctp_prot;
-#endif
-static int
-fold_prot_inuse(struct proto *proto)
-{
-	int res = 0;
-	int cpu;
-
-	for (cpu = 0; cpu < smp_num_cpus; cpu++)
-		res += proto->stats[cpu_logical_map(cpu)].inuse;
-	return res;
-}
-STATIC int
-__os7_afinet_get_info(char *buffer, char **start, off_t offset, int length)
-{
-	int len = socket_get_info(buffer, start, offset, length);
-
-	len +=
-	    sprintf(buffer + len, "SCTP: inuse %d orphan %d alloc %d\n",
-		    fold_prot_inuse(&sctp_prot), atomic_read(&sctp_orphan_count),
-		    atomic_read(&sctp_socket_count));
-	len +=
-	    sprintf(buffer + len, "TCP: inuse %d orphan %d tw %d alloc %d mem %d\n",
-		    fold_prot_inuse(&tcp_prot), atomic_read(&tcp_orphan_count), tcp_tw_count,
-		    atomic_read(&tcp_sockets_allocated), atomic_read(&tcp_memory_allocated));
-	len += sprintf(buffer + len, "UDP: inuse %d\n", fold_prot_inuse(&udp_prot));
-	len += sprintf(buffer + len, "RAW: inuse %d\n", fold_prot_inuse(&raw_prot));
-	len +=
-	    sprintf(buffer + len, "FRAG: inuse %d memory %d\n", ip_frag_nqueues,
-		    atomic_read(&ip_frag_mem));
-	if (offset >= len) {
-		*start = buffer;
-		return 0;
-	}
-	*start = buffer + offset;
-	len -= offset;
-	if (len > length)
-		len = length;
-	if (len < 0)
-		len = 0;
-	return len;
-}
-
-static unsigned long
-fold_field(unsigned long *begin, int sz, int nr)
-{
-	unsigned long res = 0;
-	int i;
-	sz /= sizeof(unsigned long);
-	for (i = 0; i < smp_num_cpus; i++) {
-		res += begin[2 * cpu_logical_map(i) * sz + nr];
-		res += begin[(2 * cpu_logical_map(i) + 1) * sz + nr];
-	}
-	return res;
-}
-STATIC int
-__os7_snmp_get_info(char *buffer, char **start, off_t offset, int length)
-{
-	int len = snmp_get_info(buffer, start, offset, length), i;
-
-	len +=
-	    sprintf(buffer + len,
-		    "Sctp: RtoAlgorithm RtoMin RtoMax RtoInitial MaxAssoc ValCookieLife MaxInitRetr CurrEstab ActiveEstabs PassiveEstabs Aborteds Shutdowns OutOfBlues ChecksumErrors OutCtrlChunks OutOrderChunks OutUnorderChunks InCtrlChunks InOrderChunks InUnorderChunks FragUsrMsgs ReasmUserMsgs OutSCTPPacks InSCTPPacks DiscontinuityTime\n"
-		    "Sctp:");
-	for (i = 0; i < offsetof(struct sctp_mib, __pad) / sizeof(unsigned long); i++)
-		len +=
-		    sprintf(buffer + len, " %lu",
-			    fold_field((unsigned long *) sctp_statistics, sizeof(struct sctp_mib),
-				       i));
-	len += sprintf(buffer + len, "\n");
-	if (offset >= len) {
-		*start = buffer;
-		return 0;
-	}
-	*start = buffer + offset;
-	len -= offset;
-	if (len > length)
-		len = length;
-	if (len < 0)
-		len = 0;
-	return len;
-}
-
-#define TMPSZ 150
-STATIC int
-sctp_get_info(char *buffer, char **start, off_t offset, int length)
-{
-	int len = 0, num = 0, i;
-	off_t begin, pos = 0;
-	char tmpbuf[TMPSZ + 1];
-
-	if (offset < TMPSZ)
-		len +=
-		    sprintf(buffer, "%-*s\n", TMPSZ - 1,
-			    "  sl  local_address rem_address   st tx_queue "
-			    "rx_queue tr tm->when retrnsmt   uid  timeout inode");
-	pos = TMPSZ;
-	/* First, walk listening socket table */
-	local_bh_disable();
-	for (i = 0; i < sctp_lhash_size; i++) {
-		sctp_t *sp;
-		struct sctp_hash_bucket *hp = &sctp_lhash[i];
-
-		read_lock_bh(&hp->lock);
-		for (sp = hp->list; sp; sp = sp->lnext) {
-			struct sock *sk = SCTP_SOCK(sp);
-
-			pos += TMPSZ;
-			if (pos <= offset)
-				continue;
-			get_sctp_sock(sk, tmpbuf, num);
-			len += sprintf(buffer + len, "%-*s\n", TMPSZ - 1, tmpbuf);
-			if (pos >= offset + length) {
-				read_unlock_bh(&hp->lock);
-				goto out;
-			}
-			/* all open requests are in normal hash table */
-		}
-		read_unlock_bh(&hp->lock);
-	}
-	/* next walk established hash */
-	for (i = 0; i < sctp_thash_size; i++) {
-		sctp_t *sp;
-		struct sctp_hash_bucket *hp = &sctp_thash[i];
-
-		read_lock_bh(&hp->lock);
-		for (sp = hp->list; sp; sp = sp->tnext) {
-			struct sock *sk = SCTP_SOCK(sp);
-
-			pos += TMPSZ;
-			if (pos <= offset)
-				continue;
-			get_sctp_sock(sk, tmpbuf, num);
-			len += sprintf(buffer + len, "%-*s\n", TMPSZ - 1, tmpbuf);
-			if (pos >= offset + length) {
-				read_unlock_bh(&hp->lock);
-				goto out;
-			}
-		}
-		read_unlock_bh(&hp->lock);
-	}
-      out:
-	local_bh_enable();
-	begin = len - (pos - offset);
-	*start = buffer + begin;
-	len -= begin;
-	if (len > length)
-		len = length;
-	if (len < 0)
-		len = 0;
-	return len;
-}
-#endif				/* SOCKETS */
 
 #ifdef HAVE_KINC_LINUX_PERCPU_H
 STATIC void
@@ -29135,31 +28678,6 @@ sctp_term_stats(void)
 }
 #endif				/* HAVE_KINC_LINUX_PERCPU_H */
 
-STATIC void
-sctp_init_procfs(void)
-{
-#if SOCKETS
-	proc_net_create("sctp", 0, sctp_get_info);
-	proc_net_remove("snmp");
-	proc_net_create("snmp", 0, __os7_snmp_get_info);
-	proc_net_remove("sockstat");
-	proc_net_create("sockstat", 0, __os7_afinet_get_info);
-#endif				/* SOCKETS */
-	return;
-}
-
-STATIC void
-sctp_term_procfs(void)
-{
-#if SOCKETS
-	proc_net_remove("sctp");
-	proc_net_remove("snmp");
-	proc_net_create("snmp", 0, snmp_get_info);
-	proc_net_remove("sockstat");
-	proc_net_create("sockstat", 0, afinet_get_info);
-#endif				/* SOCKETS */
-	return;
-}
 #endif				/* CONFIG_PROC_FS */
 
 /*
@@ -29172,265 +28690,20 @@ sctp_term_procfs(void)
  *  version.  These are really just defaults.  For STREAMS the default values should be changed with
  *  XTI_OPTIONS or other options on the stream.
  */
-#ifdef CONFIG_SYSCTL
-#if SOCKETS
-enum {
-	NET_SCTP_RTO_INITIAL = 200,
-	NET_SCTP_RTO_MIN = 201,
-	NET_SCTP_RTO_MAX = 202,
-	NET_SCTP_HEARTBEAT_ITVL = 203,
-	NET_SCTP_INIT_RETRIES = 204,
-	NET_SCTP_VALID_COOKIE_LIFE = 205,
-	NET_SCTP_MAX_SACK_DELAY = 206,
-	NET_SCTP_PATH_MAX_RETRANS = 207,
-	NET_SCTP_ASSOC_MAX_RETRANS = 208,
-	NET_SCTP_MAC_TYPE = 209,
-	NET_SCTP_CSUM_TYPE = 210,
-	NET_SCTP_COOKIE_INC = 211,
-	NET_SCTP_THROTTLE_ITVL = 212,
-	NET_SCTP_DEFAULT_PPI = 213,
-	NET_SCTP_DEFAULT_SID = 214,
-	NET_SCTP_MEM = 215,
-	NET_SCTP_WMEM = 216,
-	NET_SCTP_RMEM = 217,
-	NET_SCTP_MAX_ISTREAMS = 218,
-	NET_SCTP_REQ_OSTREAMS = 219,
-	NET_SCTP_ECN = 220,
-	NET_SCTP_ADAPTATION_LAYER_INFO = 221,
-	NET_SCTP_PARTIAL_RELIABILITY = 222,
-	NET_SCTP_MAX_BURST = 223,
-#ifdef ETSI
-	NET_SCTP_SACK_FREQUENCY = 224,
-#endif
-};
-static struct sctp_sysctl_table {
-	struct ctl_table_header *sysctl_header;
-	ctl_table sctp_vars[25];
-	ctl_table sctp_proto_dir[2];
-	ctl_table sctp_root_dir[2];
-} sctp_sysctl = {
-	NULL, { {
-	NET_SCTP_RTO_INITIAL, "sctp_rto_initial", &sysctl_sctp_rto_initial,
-			    sizeof(int), 0644, NULL,
-			    &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec,
-			    NULL, &sysctl_sctp_rto_min, &sysctl_sctp_rto_max}, {
-	NET_SCTP_RTO_MIN, "sctp_rto_min", &sysctl_sctp_rto_min, sizeof(int), 0644, NULL,
-		    &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL, NULL,
-		    &sysctl_sctp_rto_max}, {
-	NET_SCTP_RTO_MAX, "sctp_rto_max", &sysctl_sctp_rto_max, sizeof(int), 0644, NULL,
-		    &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL,
-		    &sysctl_sctp_rto_min, NULL}, {
-	NET_SCTP_HEARTBEAT_ITVL, "sctp_heartbeat_itvl", &sysctl_sctp_heartbeat_itvl,
-		    sizeof(int), 0644, NULL, &proc_dointvec_jiffies, &sysctl_jiffies}, {
-	NET_SCTP_INIT_RETRIES, "sctp_init_retries", &sysctl_sctp_max_init_retries,
-		    sizeof(int), 0644, NULL, &proc_dointvec}, {
-	NET_SCTP_VALID_COOKIE_LIFE, "sctp_valid_cookie_life",
-		    &sysctl_sctp_valid_cookie_life, sizeof(int), 0644, NULL,
-		    &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL, NULL, NULL}, {
-	NET_SCTP_MAX_SACK_DELAY, "sctp_max_sack_delay", &sysctl_sctp_max_sack_delay,
-		    sizeof(int), 0644, NULL, &proc_doulongvec_ms_jiffies_minmax,
-		    &sysctl_intvec, NULL, NULL, NULL}, {
-	NET_SCTP_PATH_MAX_RETRANS, "sctp_path_max_retrans", &sysctl_sctp_path_max_retrans,
-		    sizeof(int), 0644, NULL, &proc_dointvec}, {
-	NET_SCTP_ASSOC_MAX_RETRANS, "sctp_assoc_max_retrans",
-		    &sysctl_sctp_assoc_max_retrans, sizeof(int), 0644, NULL, &proc_dointvec}, {
-	NET_SCTP_MAC_TYPE, "sctp_mac_type", &sysctl_sctp_mac_type, sizeof(int), 0644, NULL,
-		    &proc_dointvec}, {
-	NET_SCTP_CSUM_TYPE, "sctp_csum_type", &sysctl_sctp_csum_type, sizeof(int), 0644,
-		    NULL, &proc_dointvec}, {
-	NET_SCTP_COOKIE_INC, "sctp_cookie_inc", &sysctl_sctp_cookie_inc, sizeof(int), 0644,
-		    NULL, &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL, NULL, NULL}, {
-	NET_SCTP_THROTTLE_ITVL, "sctp_throttle_itvl", &sysctl_sctp_throttle_itvl,
-		    sizeof(int), 0644, NULL, &proc_doulongvec_ms_jiffies_minmax}, {
-	NET_SCTP_DEFAULT_PPI, "sctp_default_ppi", &sysctl_sctp_default_ppi, sizeof(int),
-		    0644, NULL, &proc_dointvec}, {
-	NET_SCTP_DEFAULT_SID, "sctp_default_sid", &sysctl_sctp_default_sid, sizeof(int),
-		    0644, NULL, &proc_dointvec}, {
-	NET_SCTP_MEM, "sctp_mem", &sysctl_sctp_mem, sizeof(sysctl_sctp_mem), 0644, NULL,
-		    &proc_dointvec}
-	, {
-	NET_SCTP_WMEM, "sctp_wmem", &sysctl_sctp_wmem, sizeof(sysctl_sctp_wmem), 0644, NULL,
-		    &proc_dointvec}
-	, {
-	NET_SCTP_RMEM, "sctp_rmem", &sysctl_sctp_rmem, sizeof(sysctl_sctp_rmem), 0644, NULL,
-		    &proc_dointvec}
-	, {
-	NET_SCTP_MAX_ISTREAMS, "sctp_max_istreams", &sysctl_sctp_max_istreams, sizeof(int),
-		    0644, NULL, &proc_dointvec_minmax, &sysctl_intvec, NULL,
-		    &min_sctp_max_istreams, NULL}, {
-	NET_SCTP_REQ_OSTREAMS, "sctp_req_ostreams", &sysctl_sctp_req_ostreams, sizeof(int),
-		    0644, NULL, &proc_dointvec_minmax, &sysctl_intvec, NULL,
-		    &min_sctp_req_ostreams, NULL}, {
-	NET_SCTP_ECN, "sctp_ecn", &sysctl_sctp_ecn, sizeof(int), 0644, NULL, &proc_dointvec}, {
-	NET_SCTP_ADAPTATION_LAYER_INFO, "sctp_adaptation_layer_info",
-		    &sysctl_sctp_adaptation_layer_info, sizeof(int), 0644, NULL, &proc_dointvec}, {
-	NET_SCTP_PARTIAL_RELIABILITY, "sctp_partial_reliability",
-		    &sysctl_sctp_partial_reliability, sizeof(int), 0644, NULL, &proc_dointvec}, {
-	NET_SCTP_MAX_BURST, "sctp_max_burst", &sysctl_sctp_max_burst, sizeof(int), 0644,
-		    NULL, &proc_dointvec_minmax, &sysctl_intvec, NULL, &min_sctp_max_burst, NULL}, {
-#ifdef ETSI
-	NET_SCTP_SACK_FREQUENCY, "sctp_sack_frequency", &sysctl_sctp_sack_frequency,
-		    sizeof(int), 0644, NULL, &proc_dointvec}, {
-#endif
-	0}}, { {
-	NET_IPV4, "ipv4", NULL, 0, 0555, sctp_sysctl.sctp_vars}, {
-	0}}, { {
-	CTL_NET, "net", NULL, 0, 0555, sctp_sysctl.sctp_proto_dir}, {
-	0}}
-};
-#endif				/* SOCKETS */
-
-STATIC void
-sctp_init_sysctl(void)
-{
-#if SOCKETS
-	sctp_sysctl.sysctl_header = register_sysctl_table(sctp_sysctl.sctp_root_dir, 0);
-#endif				/* SOCKETS */
-	return;
-}
-
-STATIC void
-sctp_term_sysctl(void)
-{
-#if SOCKETS
-	unregister_sysctl_table(sctp_sysctl.sysctl_header);
-#endif				/* SOCKETS */
-	return;
-}
-#endif				/* CONFIG_SYSCTL */
-
-/*
- *  ==========================================================================
- *
- *  Sockets Hooks
- *
- *  ==========================================================================
- *  The sockets version hooks into the inet socket protocol family to add SCTP to the SOCK_STREAM
- *  and SOCK_SEQPACKET socket types for inet.  STREAMS does not do this in this way.  The sockets
- *  (over XTI) facility provided by STREAMS accomplishes this.
- */
-
-#if SOCKETS
-STATIC struct proto sctp_prot = {
-	.name = "SCTP",
-	.close = &sctp_close,
-	.connect = &sctp_connect,
-	.disconnect = &sctp_disconnect,
-	.accept = &sctp_accept,
-	.ioctl = &sctp_ioctl,
-	.init = &sctp_init_sock,
-	.destroy = &sctp_destroy,
-	.shutdown = &sctp_shutdown,
-	.setsockopt = &sctp_setsockopt,
-	.getsockopt = &sctp_getsockopt,
-	.sendmsg = &sctp_sendmsg,
-	.recvmsg = &sctp_recvmsg,
-	.bind = &sctp_bind,
-	.backlog_rcv = &sctp_backlog_rcv,
-	.hash = &sctp_hash,
-	.unhash = &sctp_unhash,
-	.get_port = &sctp_get_port,
-};
-struct proto_ops inet_sctp_ops = {
-	.family = PF_INET,
-	.release = &inet_release,
-	.bind = &inet_bind,
-	.connect = &inet_stream_connect,
-	.socketpair = &sock_no_socketpair,
-	.accept = &inet_accept,
-#ifdef HAVE_INET_MULTI_GETNAME_SYMBOL
-	.getname = &inet_multi_getname,
-#endif
-#ifdef HAVE_INET_GETNAME_SYMBOL
-	.getname = &inet_getname,
-#endif
-	.poll = &sctp_poll,
-	.ioctl = &inet_ioctl,
-	.listen = &sctp_listen,
-	.shutdown = &inet_shutdown,
-	.setsockopt = &inet_setsockopt,
-	.getsockopt = &inet_getsockopt,
-	.sendmsg = &inet_sendmsg,
-	.recvmsg = &inet_recvmsg,
-	.mmap = &sock_no_mmap,
-	.sendpage = &sock_no_sendpage,	/* TODO: make an SCTP sendpage */
-};
-
-STATIC struct inet_protosw sctpsw_array[] = {
-	{
-	 .type = SOCK_SEQPACKET,
-	 .protocol = IPPROTO_SCTP,
-	 .prot = &sctp_prot,
-	 .ops = &inet_sctp_ops,
-	 .capability = -1,
-	 .no_check = 0,
-	 .flags = 0,
-	 }
-#ifdef SCTP_CONFIG_TCP_COMPATIBLE
-	,
-	{
-	 .type = SOCK_STREAM,
-	 .protocol = IPPROTO_SCTP,
-	 .prot = &sctp_prot,
-	 .ops = &inet_sctp_ops,
-	 .capability = -1,
-	 .no_check = 0,
-	 .flags = 0,
-	 }
-#endif				/* SCTP_CONFIG_TCP_COMPATIBLE */
-#ifdef SCTP_CONFIG_UDP_COMPATIBLE
-	,
-	{
-	 .type = SOCK_RDM,
-	 .protocol = IPPROTO_SCTP,
-	 .prot = &sctp_prot,
-	 .ops = &inet_sctp_ops,
-	 .capability = -1,
-	 .no_check = 0,
-	 .flags = 0,
-	 }
-#endif				/* SCTP_CONFIG_UDP_COMPATIBLE */
-};
-
-#define SCTPSW_ARRAY_LEN (sizeof(sctpsw_array)/sizeof(struct inet_protosw))
-#endif				/* SOCKETS */
 
 STATIC void
 sctp_init_protosw(void)
 {
-#if STREAMS
 	sctp_n_init();
 	sctp_t_init();
-#endif
-#if SOCKETS
-	struct inet_protosw *s;
-
-	for (s = sctpsw_array; s < &sctpsw_array[SCTPSW_ARRAY_LEN]; ++s)
-		inet_register_protosw(s);
-#endif
 	return;
 }
 
 STATIC void
 sctp_term_protosw(void)
 {
-#if STREAMS
 	sctp_t_term();
 	sctp_n_term();
-#endif
-#if SOCKETS
-	struct sock *sk;
-	struct inet_protosw *s;
-
-	spin_lock_bh(&sctp_protolock);
-	for (sk = sctp_protolist; sk; sk = sk->next) {
-		sctp_discon_ind(sk, SCTP_ORIG_PROVIDER, -ECONNABORTED, NULL);
-		sctp_abort(sk, SCTP_ORIG_PROVIDER, -ECONNABORTED);
-	}
-	spin_unlock_bh(&sctp_protolock);
-	for (s = sctpsw_array; s < &sctpsw_array[SCTPSW_ARRAY_LEN]; ++s)
-		inet_unregister_protosw(s);
-#endif
 	return;
 }
 
@@ -29515,36 +28788,6 @@ sctp_term_proto(void)
 #endif				/* HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY */
 /* *INDENT-ON* */
 
-#if SOCKETS
-extern void __skb_cb_too_small_for_sctp(int, int);	/* never defined */
-STATIC int
-sctp_load_test(void)
-{
-	struct sk_buff *skb = NULL;
-
-	if (sizeof(sctp_tcb_t) > sizeof(skb->cb)) {
-		/* 
-		 *  The control block asigned to an sk_buff is too small for
-		 *  SCTP, so I suppose we are doomed.  This (never defined) call
-		 *  will fail to resolve when compiler detects above.  Sneaky
-		 *  trick taken from NET4 TCP code.
-		 */
-		__skb_cb_too_small_for_sctp(sizeof(sctp_tcb_t), sizeof(skb->cb));
-	}
-#ifdef SCTP_CONFIG_DEBUG
-	if (SCTP_SOCK(SCTP_PROT((struct sock *) NULL)) != NULL) {
-		ptrace(("ERROR: macro failure\n"));
-		return -EFAULT;
-	}
-	if (SCTP_CB_SKB(SCTP_SKB_CB((struct sk_buff *) NULL)) != NULL) {
-		ptrace(("ERROR: macro failure\n"));
-		return -EFAULT;
-	}
-#endif				/* SCTP_CONFIG_DEBUG */
-	return (0);
-}
-#endif				/* SOCKETS */
-
 STATIC void
 sctp_init(void)
 {
@@ -29562,12 +28805,6 @@ sctp_init(void)
 	sctp_init_protosw();
 	/* TODO: adjust buffer size sysctls, port ranges and other parameters based on dynamic
 	   allocations.  */
-#ifdef CONFIG_SYSCTL
-	sctp_init_sysctl();
-#endif				/* CONFIG_SYSCTL */
-#ifdef CONFIG_PROC_FS
-	sctp_init_procfs();
-#endif				/* CONFIG_PROC_FS */
 #ifdef HAVE_KINC_LINUX_PERCPU_H
 	sctp_init_stats();
 #endif				/* HAVE_KINC_LINUX_PERCPU_H */
@@ -29580,12 +28817,6 @@ sctp_terminate(void)
 #ifdef HAVE_KINC_LINUX_PERCPU_H
 	sctp_term_stats();
 #endif				/* HAVE_KINC_LINUX_PERCPU_H */
-#ifdef CONFIG_PROC_FS
-	sctp_term_procfs();
-#endif				/* CONFIG_PROC_FS */
-#ifdef CONFIG_SYSCTL
-	sctp_term_sysctl();
-#endif				/* CONFIG_SYSCTL */
 	sctp_term_protosw();
 	sctp_term_proto();
 #ifdef SCTP_CONFIG_ADD_IP
@@ -29607,11 +28838,6 @@ sctp_terminate(void)
 int
 init_module(void)
 {
-#if SOCKETS
-	if (sctp_load_test() != 0) {
-		return (-EFAULT);
-	}
-#endif				/* SOCKETS */
 	sctp_init();
 	return (0);
 }

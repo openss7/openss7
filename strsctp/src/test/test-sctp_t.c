@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/27 23:10:14 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/10/30 20:26:33 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:10:14 $ by $Author: brian $
+ Last Modified $Date: 2006/10/30 20:26:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.22  2006/10/30 20:26:33  brian
+ - bug hunting
+
  Revision 0.9.2.21  2006/10/27 23:10:14  brian
  - rationalized to new test suites
 
@@ -108,9 +111,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/27 23:10:14 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/10/30 20:26:33 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/27 23:10:14 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/10/30 20:26:33 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -36154,7 +36157,7 @@ for the T_DATA_REQ primitive."
 int
 test_case_13_6_1_4_conn(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
+	if (expect(child, LONGEST_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
 		state++;
 		test_data = NULL;
 		last_sequence = 0;
@@ -36833,7 +36836,7 @@ for the T_EXDATA_REQ primitive."
 int
 test_case_13_8_1_4_conn(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
+	if (expect(child, LONGEST_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
 		state++;
 		test_data = NULL;
 		last_sequence = 0;
@@ -37254,7 +37257,7 @@ for the T_OPTDATA_REQ primitive."
 int
 test_case_13_10_1_4_conn(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
+	if (expect(child, LONGEST_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS) {
 		state++;
 		test_data = NULL;
 		last_sequence = 0;

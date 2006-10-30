@@ -1,5 +1,12 @@
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/bugs.texi: noted strange bug
+	* src/drivers/sctp2.c:
+	  - removed sockets code for readability
+	  - improved put and service procedures for speed
+	* src/test/test-sctp_n.c: lowered test packets
+	* src/test/test-sctp_t.c: timing corrections
+
 	* tests/local.at: added ability to sync between test cases
 	* tests/testsuite-sctp.at: added ability to sync between test cases
 	* tests/testsuite-sctp_n.at: added ability to sync between test cases
