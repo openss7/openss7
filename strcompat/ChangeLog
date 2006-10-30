@@ -1,3 +1,9 @@
+2006-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: include check for linux/compile.h
+	* src/include/sys/os7/compat.h: include linux/utsrelease if available
+	* src/kernel/liscompat.c: fix a few versions, remove includes contained in compat.h
+
 2006-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4:

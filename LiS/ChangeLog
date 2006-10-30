@@ -1,3 +1,9 @@
+2006-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: add check for linux/compile.h
+	* drivers/str/linux/ip_to_dlpi.c: include linux/utsrelease.h if available
+	* head/linux-mdep.c: include linux/utsrelease.h if available
+
 2006-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4:

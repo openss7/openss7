@@ -90,7 +90,10 @@
 #include <sys/stream.h>
 
 #include <asm/param.h>
-#include <linux/version.h>
+#include <linux/version.h>	/* for UTS_RELEASE */
+#ifdef HAVE_KINC_LINUX_UTSRELEASE_H
+#include <linux/utsrelease.h>	/* for UTS_RELEASE */
+#endif
 #include <linux/sched.h>
 #include <linux/kernel.h>	/* printk() */
 #include <linux/errno.h>	/* error codes */
@@ -204,19 +207,19 @@ struct module_info ip2xinetminfo = {
 	IP2XINETM_ID, "ip2xinet", 0, 8192, 8192, 1024
 };
 
-struct qinit ip2xineturinit = {		/* upper read */
+struct qinit ip2xineturinit = {	/* upper read */
 	NULL, ip2xinetursrv, ip2xinetopen, ip2xinetclose, NULL, &ip2xinetminfo, NULL
 };
 
-struct qinit ip2xinetuwinit = {		/* upper write */
+struct qinit ip2xinetuwinit = {	/* upper write */
 	ip2xinetuwput, NULL, ip2xinetopen, ip2xinetclose, NULL, &ip2xinetminfo, NULL
 };
 
-struct qinit ip2xinetlrinit = {		/* lower read */
+struct qinit ip2xinetlrinit = {	/* lower read */
 	ip2xinetlrput, NULL, NULL, NULL, NULL, &ip2xinetminfo, NULL
 };
 
-struct qinit ip2xinetlwinit = {		/* lower write */
+struct qinit ip2xinetlwinit = {	/* lower write */
 	NULL, ip2xinetlwsrv, NULL, NULL, NULL, &ip2xinetminfo, NULL
 };
 

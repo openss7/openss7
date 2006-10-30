@@ -61,11 +61,10 @@
  */
 #ifdef LINUX
 #include <linux/autoconf.h>
-#include <linux/compile.h>
+#include <linux/version.h>	/* for UTS_RELEASE */
 #ifdef HAVE_KINC_LINUX_UTSRELEASE_H
-#include <linux/utsrelease.h>
+#include <linux/utsrelease.h>	/* for UTS_RELEASE */
 #endif
-#include <linux/version.h>
 #include <linux/compiler.h>
 #include <linux/module.h>
 #include <linux/init.h>

@@ -651,7 +651,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
 			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
 			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/smp_lock.h \
-			  linux/devfs_fs_kernel.h linux/utsrelease.h], [:], [:], [
+			  linux/devfs_fs_kernel.h linux/compile.h linux/utsrelease.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>

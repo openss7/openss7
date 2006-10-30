@@ -303,7 +303,7 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/brlock.h \
 			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
-			  net/request_sock.h, linux/utsrelease.h], [:], [:], [
+			  net/request_sock.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>

@@ -95,7 +95,10 @@ static char const ident[] =
     "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/10/27 23:19:38 $";
 
 #include <linux/autoconf.h>
+#ifdef HAVE_KINC_LINUX_COMPILE_H
+/* some brain-dead distributions such as SuSE do not distribute linux/compile.h */
 #include <linux/compile.h>
+#endif
 #ifdef HAVE_KINC_LINUX_UTSRELEASE_H
 #include <linux/utsrelease.h>
 #endif
@@ -4181,7 +4184,11 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(int *) value_p = (int) sysctl_str_strmsgsz;
 		return (0);
 	case HW_PROVIDER:
+#ifdef UTS_VERSION
 		*(char **) value_p = "Linux " UTS_RELEASE " " UTS_VERSION;
+#else
+		*(char **) value_p = "Linux " UTS_RELEASE;
+#endif
 		return (0);
 	case DRV_MAXBIOSIZE:
 	case SYSCRED:

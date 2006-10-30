@@ -72,10 +72,6 @@ static char const ident[] =
 
 #define _LIS_SOURCE
 
-#include <linux/compile.h>
-#ifdef HAVE_KINC_LINUX_UTSRELEASE_H
-#include <linux/utsrelease.h>
-#endif
 #include "sys/os7/compat.h"
 
 #include <asm/dma.h>		/* for request_dma and friends */
@@ -382,13 +378,13 @@ EXPORT_SYMBOL_NOVERS(lis_poll_file);
 char *lis_stropts_file = "<linux/stropts.h>";
 
 EXPORT_SYMBOL_NOVERS(lis_stropts_file);
-char lis_date[] = "2003/10/28 08:00:04";
+char lis_date[] = "2006/10/30 08:00:04";
 
 EXPORT_SYMBOL_NOVERS(lis_date);
 char lis_kernel_version[] = UTS_RELEASE;
 
 EXPORT_SYMBOL_NOVERS(lis_kernel_version);
-char lis_version[] = "1.1.2.17";
+char lis_version[] = "2.18.4";
 
 EXPORT_SYMBOL_NOVERS(lis_version);
 #ifdef LIS_DEPRECARTED_FUNCTIONS

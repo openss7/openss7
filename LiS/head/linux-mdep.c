@@ -100,7 +100,10 @@
 #include <sys/lislocks.h>
 #include <linux/module.h>
 #include <sys/LiS/modcnt.h>	/* after linux-mdep.h & module.h */
-#include <linux/version.h>
+#include <linux/version.h>	/* for UTS_RELEASE */
+#ifdef HAVE_KINC_LINUX_UTSRELEASE_H
+#include <linux/utsrelease.h>	/* for UTS_RELEASE */
+#endif
 
 #include <linux/sched.h>
 #define	__KERNEL_SYSCALLS__	1	/* to make kernel_thread visible */
