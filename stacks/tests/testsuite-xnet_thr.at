@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-xnet_thr.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 22:21:59 $
+dnl @(#) $RCSfile: testsuite-xnet_thr.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/30 06:50:15 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/09/25 22:21:59 $ by $Author: brian $
+dnl Last Modified $Date: 2006/10/30 06:50:15 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-xnet_thr.at,v $
+dnl Revision 0.9.2.2  2006/10/30 06:50:15  brian
+dnl - added ability to sync between test cases
+dnl
 dnl Revision 0.9.2.1  2006/09/25 22:21:59  brian
 dnl - added testsuites for optional components
 dnl
@@ -116,6 +119,7 @@ function test_xnet_thr() {
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    if test $at_arg_given_sync = : ; then sync || : ; fi
     if test-xnet_thr $options -e -o $1
     then
 	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS

@@ -1,3 +1,13 @@
+2006-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/local.at: added ability to sync between test cases
+	* tests/testsuite-inet_raw.at: added ability to sync between test cases
+	* tests/testsuite-inet_raw2.at: added ability to sync between test cases
+	* tests/testsuite-inet_sctp.at: added ability to sync between test cases
+	* tests/testsuite-inet_tcp.at: added ability to sync between test cases
+	* tests/testsuite-inet_udp.at: added ability to sync between test cases
+	* tests/testsuite-inet_udp2.at: added ability to sync between test cases
+
 2006-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: change linux/config.h to autoconf.h for 2.6.18

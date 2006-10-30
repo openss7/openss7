@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/07 22:01:34 $
+dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/30 06:50:45 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/04/07 22:01:34 $ by $Author: brian $
+dnl Last Modified $Date: 2006/10/30 06:50:45 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: local.at,v $
+dnl Revision 0.9.2.2  2006/10/30 06:50:45  brian
+dnl - added ability to sync between test cases
+dnl
 dnl Revision 0.9.2.1  2006/04/07 22:01:34  brian
 dnl - initial branch
 dnl
@@ -119,6 +122,9 @@ AT_ARG_OPTION([messages], AS_HELP_STRING([--messages],
 AT_ARG_OPTION([quiet], AS_HELP_STRING([--quiet],
 	[suppress normal output]))
 
+AT_ARG_OPTION([sync], AS_HELP_STRING([--sync],
+	[do a disk sync before running tests @<:@default: off@:>@]))
+
 AT_BANNER(
 [Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -169,6 +175,9 @@ Corporation  at a fee.  See http://www.openss7.com/]
 
 dnl ==========================================================================
 dnl $Log: local.at,v $
+dnl Revision 0.9.2.2  2006/10/30 06:50:45  brian
+dnl - added ability to sync between test cases
+dnl
 dnl Revision 0.9.2.1  2006/04/07 22:01:34  brian
 dnl - initial branch
 dnl

@@ -1,3 +1,9 @@
+2006-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/local.at: added ability to sync between test cases
+	* tests/testsuite-xnsl.at: added ability to sync between test cases
+	* tests/testsuite-xnsl_thr.at: added ability to sync between test cases
+
 2006-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strnsl.refs: updated streams release number

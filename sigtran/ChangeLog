@@ -1,3 +1,8 @@
+2006-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/local.at: added ability to sync between test cases
+	* tests/testsuite-m2pa.at: added ability to sync between test cases
+
 2006-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/m2pa_sl.c: working up module

@@ -1,5 +1,21 @@
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/local.at: added ability to sync between test cases
+	* tests/testsuite-clone.at: added ability to sync between test cases
+	* tests/testsuite-connld.at: added ability to sync between test cases
+	* tests/testsuite-echo.at: added ability to sync between test cases
+	* tests/testsuite-fifo.at: added ability to sync between test cases
+	* tests/testsuite-log.at: added ability to sync between test cases
+	* tests/testsuite-loop.at: added ability to sync between test cases
+	* tests/testsuite-mux.at: added ability to sync between test cases
+	* tests/testsuite-nsdev.at: added ability to sync between test cases
+	* tests/testsuite-nuls.at: added ability to sync between test cases
+	* tests/testsuite-pipe.at: added ability to sync between test cases
+	* tests/testsuite-pipemod.at: added ability to sync between test cases
+	* tests/testsuite-sad.at: added ability to sync between test cases
+	* tests/testsuite-sc.at: added ability to sync between test cases
+	* tests/testsuite-streams.at: added ability to sync between test cases
+
 	* acinclude.m4: add check for linux/compile.h
 	* src/kernel/strutil.c: include linux/compile.h only if available
 

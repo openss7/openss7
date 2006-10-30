@@ -1,5 +1,9 @@
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/local.at: added ability to sync between test cases
+	* tests/testsuite-ip.at: added ability to sync between test cases
+	* tests/testsuite-np_ip.at: added ability to sync between test cases
+
 	* acinclude.m4: remove checks for compile.h and utsrelease (in compat.h)
 
 2006-10-27  Brian Bidulock  <bidulock@openss7.org>

@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-pipe.at,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/09/18 00:48:49 $
+dnl @(#) $RCSfile: testsuite-pipe.at,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/30 06:50:26 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/09/18 00:48:49 $ by $Author: brian $
+dnl Last Modified $Date: 2006/10/30 06:50:26 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-pipe.at,v $
+dnl Revision 0.9.2.11  2006/10/30 06:50:26  brian
+dnl - added ability to sync between test cases
+dnl
 dnl Revision 0.9.2.10  2006/09/18 00:48:49  brian
 dnl - updated testsuite headers
 dnl
@@ -237,6 +240,7 @@ ACEOF
 	    options='-vvv'
 	fi
     fi
+    if test $at_arg_given_sync = : ; then sync || : ; fi
     if test-pipe $options -e -o $1
     then
 	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS

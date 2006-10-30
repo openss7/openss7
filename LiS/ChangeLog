@@ -4,6 +4,17 @@
 	* drivers/str/linux/ip_to_dlpi.c: include linux/utsrelease.h if available
 	* head/linux-mdep.c: include linux/utsrelease.h if available
 
+	* tests/local.at: added ability to sync between test cases
+	* tests/testsuite-fifo.at: added ability to sync between test cases
+	* tests/testsuite-pipe.at: added ability to sync between test cases
+	* tests/testsuite-sad.at: added ability to sync between test cases
+	* tests/testsuite-streams.at: added ability to sync between test cases
+	* tests/testsuite-strtst.at: added ability to sync between test cases
+	* tests/testsuite-test.at: added ability to sync between test cases
+	* tests/testsuite-test2.at: added ability to sync between test cases
+	* tests/testsuite-thrtst.at: added ability to sync between test cases
+	* tests/testsuite-timetst.at: added ability to sync between test cases
+
 2006-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4:
