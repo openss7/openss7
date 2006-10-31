@@ -1,3 +1,7 @@
+2006-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/sys/dki.h: do not define HZ for heavens sake
+
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: add check for linux/compile.h

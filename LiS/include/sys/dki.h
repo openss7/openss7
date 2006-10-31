@@ -120,8 +120,10 @@ void lis_terminate_timers(void);	/* mdep rouitine */
 
 #endif				/* __KERNEL__ */
 
+#if 0
 #ifndef HZ
 #define	HZ	100		/* ticks per second */
+#endif
 #endif
 
 /*
