@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/10/12 10:21:44 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/10/31 20:57:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:21:44 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 20:57:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.24  2006/10/31 20:57:15  brian
+ - timer corrections plus 32-bit compatibility
+
  Revision 0.9.2.23  2006/10/12 10:21:44  brian
  - removed redundant debug flags
 
@@ -125,10 +128,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/10/12 10:21:44 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/10/31 20:57:15 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/10/12 10:21:44 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/10/31 20:57:15 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -149,7 +152,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/10/12 10:21:44 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/10/31 20:57:15 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -594,7 +597,7 @@ ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *))
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 
-	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || q->q_flag & QSVCBUSY)) {
+	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || (q->q_flag & QSVCBUSY))) {
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 		return (0);
@@ -935,15 +938,15 @@ ss7_isrv(queue_t *q)
 EXPORT_SYMBOL_NOVERS(ss7_isrv);
 
 __OS7_EXTERN_INLINE streamscall void ss7_do_timeout(caddr_t data, const char *timer,
-						    const char *mod, ulong *timeo,
+						    const char *mod, toid_t *timeo,
 						    int (*to_fnc) (struct head *),
 						    void streamscall (*exp_func) (caddr_t));
 EXPORT_SYMBOL_NOVERS(ss7_do_timeout);
 __OS7_EXTERN_INLINE streamscall void ss7_stop_timer(struct head *h, const char *timer,
-						    const char *mod, ulong *timeo);
+						    const char *mod, toid_t *timeo);
 EXPORT_SYMBOL_NOVERS(ss7_stop_timer);
 __OS7_EXTERN_INLINE streamscall void ss7_start_timer(struct head *h, const char *timer,
-						     const char *mod, ulong *timeo,
+						     const char *mod, toid_t *timeo,
 						     void streamscall (*exp_func) (caddr_t),
 						     ulong val);
 EXPORT_SYMBOL_NOVERS(ss7_start_timer);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timer.h,v 0.9.2.10 2006/07/24 09:00:58 brian Exp $
+ @(#) $Id: timer.h,v 0.9.2.11 2006/10/31 20:57:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:00:58 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 20:57:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_TIMER_H__
 #define __OS7_TIMER_H__
 
-#ident "@(#) $RCSfile: timer.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: timer.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define SS7_DECLARE_TIMER(__n,__o,__t,__c) \
 STATIC int __o ## _ ## __t ## _timeout(struct __o *); \
@@ -71,40 +71,42 @@ STATIC void __o ## _start_timer_ ## __t (struct __o * __o) \
 } \
 
 __OS7_EXTERN_INLINE streamscall void
-ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
+ss7_do_timeout(caddr_t data, const char *timer, const char *mod, toid_t *timeo,
 	       int (*to_fnc) (struct head *), void streamscall (*exp_func) (caddr_t))
 {
-	struct head *h = (struct head *) data;
+	struct str *s = (struct str *) data;
 
 	if (xchg(timeo, 0)) {
-		if (spin_trylock(&h->lock)) {
-			printd(("%s: %p: %s timeout at %lu\n", mod, h, timer, jiffies));
-			switch (to_fnc(h)) {
-			default:
-			case QR_DONE:
-				spin_unlock(&h->lock);
-				if (h->priv_put)
-					h->priv_put(h);
-				else
-					printd(("%s: %p: object has no put procedure\n", mod, h));
-				return;
-			case -ENOMEM:
-			case -ENOBUFS:
-			case -EBUSY:
-			case -EAGAIN:
-				break;
+		if (spin_trylock(&s->qlock)) {
+			if (s->users == 0) {
+				printd(("%s: %p: %s timeout at %lu\n", mod, s, timer, jiffies));
+				switch (to_fnc((struct head *)s)) {
+				default:
+				case QR_DONE:
+					spin_unlock(&s->qlock);
+					if (s->priv_put)
+						s->priv_put(s);
+					else
+						printd(("%s: %p: object has no put procedure\n", mod, s));
+					return;
+				case -ENOMEM:
+				case -ENOBUFS:
+				case -EBUSY:
+				case -EAGAIN:
+					break;
+				}
 			}
-			spin_unlock(&h->lock);
+			spin_unlock(&s->qlock);
 		} else
-			printd(("%s: %p: %s timeout collision at %lu\n", mod, h, timer, jiffies));
+			printd(("%s: %p: %s timeout collision at %lu\n", mod, s, timer, jiffies));
 		/* back off timer two ticks */
 		*timeo = timeout(exp_func, data, 2);
 	}
 }
 __OS7_EXTERN_INLINE streamscall void
-ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
+ss7_stop_timer(struct head *h, const char *timer, const char *mod, toid_t *timeo)
 {
-	ulong to;
+	toid_t to;
 
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
@@ -117,7 +119,7 @@ ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 	return;
 }
 __OS7_EXTERN_INLINE streamscall void
-ss7_start_timer(struct head *h, const char *timer, const char *mod, ulong *timeo,
+ss7_start_timer(struct head *h, const char *timer, const char *mod, toid_t *timeo,
 		void streamscall (*exp_func) (caddr_t), ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", mod, h, timer, val * 1000 / HZ, jiffies));
