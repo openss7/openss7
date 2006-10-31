@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:47 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/31 20:34:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:55:47 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 20:34:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:47 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/31 20:34:21 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:47 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/31 20:34:21 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:47 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/31 20:34:21 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"
@@ -2536,11 +2536,11 @@ t_info_ack(queue_t *q, mblk_t *mp)
 			sdt->t.pdu_size = p->TIDU_size;
 		if ((sdt->sdt.config.m =
 		     sdt->t.pdu_size - 1 - ((sdt->option.popt & SS7_POPT_XSN) ? 6 : 3)) < 272)
-			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %ld",
-				MOD_NAME, sdt->sdt.config.m);
+			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %lu",
+				MOD_NAME, (ulong) sdt->sdt.config.m);
 		if ((sdt->t.add_size = p->ADDR_size) > sizeof(struct sockaddr))
-			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %ld",
-				MOD_NAME, (unsigned long) p->ADDR_size);
+			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %lu",
+				MOD_NAME, (ulong) p->ADDR_size);
 		sdt->t.opt_size = p->OPT_size;
 		sdt->t.state = p->CURRENT_state;
 		sdt->t.serv_type = p->SERV_type;

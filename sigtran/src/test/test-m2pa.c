@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:42 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:23 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:50:42 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 20:34:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.3  2006/10/31 20:34:23  brian
+ - more buildup of test suite
+
  Revision 0.9.2.2  2006/10/27 22:50:42  brian
  - working up modules and testsuite
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:42 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:23 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:42 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:23 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -247,15 +250,12 @@ static int count = 0;
 
 #define BUFSIZE 32*4096
 
-#define FFLUSH(stream)
-// #define FFLUSH(stream) fflush((_stream))
-
 #define SHORT_WAIT	  20	// 100 // 10
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define LONGEST_WAIT	5000	// 20000 // 10000
-#define TEST_DURATION	20000
+#define TEST_DURATION	120000
 #define INFINITE_WAIT	-1
 
 static int test_duration = TEST_DURATION;	/* wait on other side */
@@ -493,10 +493,6 @@ struct {
 	},}, {
 },};
 
-#ifndef HZ
-#define HZ 100
-#endif
-
 static struct {
 	lmi_option_t opt;
 	sdl_config_t sdl;
@@ -529,7 +525,7 @@ static struct {
 		    .ifsync = 0,	/* */
 	},			/* sdl */
 	{
-		.t8 = 100 * HZ / 1000,	/* t8 - T8 timeout */
+		.t8 = 100,	/* t8 - T8 timeout (milliseconds) */
 		    .Tin = 4,	/* Tin - AERM normal proving threshold */
 		    .Tie = 1,	/* Tie - AERM emergency proving threshold */
 		    .T = 64,	/* T - SUERM error threshold */
@@ -543,16 +539,16 @@ static struct {
 		    .f = 1,	/* f */
 	},			/* sdt */
 	{
-		.t1 = 45 * HZ,	/* t1 - timer t1 duration (ticks) */
-		    .t2 = 5 * HZ,	/* t2 - timer t2 duration (ticks) */
-		    .t2l = 20 * HZ,	/* t2l - timer t2l duration (ticks) */
-		    .t2h = 100 * HZ,	/* t2h - timer t2h duration (ticks) */
-		    .t3 = 1 * HZ,	/* t3 - timer t3 duration (ticks) */
-		    .t4n = 8 * HZ,	/* t4n - timer t4n duration (ticks) */
-		    .t4e = 500 * HZ / 1000,	/* t4e - timer t4e duration (ticks) */
-		    .t5 = 100 * HZ / 1000,	/* t5 - timer t5 duration (ticks) */
-		    .t6 = 4 * HZ,	/* t6 - timer t6 duration (ticks) */
-		    .t7 = 2 * HZ,	/* t7 - timer t7 duration (ticks) */
+		.t1 = 45 * 1000,	/* t1 - timer t1 duration (milliseconds) */
+		    .t2 = 5 * 1000,	/* t2 - timer t2 duration (milliseconds) */
+		    .t2l = 20 * 1000,	/* t2l - timer t2l duration (milliseconds) */
+		    .t2h = 100 * 1000,	/* t2h - timer t2h duration (milliseconds) */
+		    .t3 = 1 * 1000,	/* t3 - timer t3 duration (milliseconds) */
+		    .t4n = 8 * 1000,	/* t4n - timer t4n duration (milliseconds) */
+		    .t4e = 500 * 1000 / 1000,	/* t4e - timer t4e duration (milliseconds) */
+		    .t5 = 125 * 1000 / 1000,	/* t5 - timer t5 duration (milliseconds) */
+		    .t6 = 4 * 1000,	/* t6 - timer t6 duration (milliseconds) */
+		    .t7 = 2 * 1000,	/* t7 - timer t7 duration (milliseconds) */
 		    .rb_abate = 3,	/* rb_abate - RB cong abatement (#msgs) */
 		    .rb_accept = 6,	/* rb_accept - RB cong onset accept (#msgs) */
 		    .rb_discard = 9,	/* rb_discard - RB cong discard (#msgs) */
@@ -620,22 +616,46 @@ static const char *failure_string = NULL;
  *  Return the current time in milliseconds.
  */
 static long
-dual_milliseconds(int t1, int t2)
+dual_milliseconds(int child, int t1, int t2)
 {
 	long ret;
 	struct timeval now;
+	static const char *msgs[] = {
+		"             %1$-6.6s !      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld     :                    [%7$d:%8$03d]\n",
+		"                    :      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld     ! %1$-6.6s             [%7$d:%8$03d]\n",
+		"                    :      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld  !  : %1$-6.6s             [%7$d:%8$03d]\n",
+		"                    !  %1$-6.6s %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld  !                    [%7$d:%8$03d]\n",
+	};
+	static const char *blank[] = {
+		"                    !                                   :                    \n",
+		"                    :                                   !                    \n",
+		"                    :                                !  :                    \n",
+		"                    !                                   !                    \n",
+	};
+	static const char *plus[] = {
+		"               +    !                                   :                    \n",
+		"                    :                                   !    +               \n",
+		"                    :                                !  :    +               \n",
+		"                    !      +                            !                    \n",
+	};
 
-	printf("                               !                                    \n");
-	printf("                               !  %-6.6s     %ld.%03ld <= %-2.2s <= %ld.%03ld   \n", timer[t1].name, timer[t1].lo / 1000, timer[t1].lo - ((timer[t1].lo / 1000) * 1000), timer[t1].name, timer[t1].hi / 1000, timer[t1].hi - ((timer[t1].hi / 1000) * 1000));
-	printf("                               !   +                                \n");
-	printf("                               !  %-6.6s     %ld.%03ld <= %-2.2s <= %ld.%03ld   \n", timer[t2].name, timer[t2].lo / 1000, timer[t2].lo - ((timer[t2].lo / 1000) * 1000), timer[t2].name, timer[t2].hi / 1000, timer[t2].hi - ((timer[t2].hi / 1000) * 1000));
-	printf("                               !                                    \n");
-	FFLUSH(stdout);
 	gettimeofday(&now, NULL);
 	if (!test_start)	/* avoid blowing over precision */
 		test_start = now.tv_sec;
 	ret = (now.tv_sec - test_start) * 1000;
-	ret += (now.tv_usec + 500L) / 1000;
+	ret += (now.tv_usec + 500) / 1000;
+
+	if (show && verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, blank[child]);
+		fprintf(stdout, msgs[child], timer[t1].name, timer[t1].lo / 1000, timer[t1].lo - ((timer[t1].lo / 1000) * 1000), timer[t1].name, timer[t1].hi / 1000, timer[t1].hi - ((timer[t1].hi / 1000) * 1000), child, state);
+		fprintf(stdout, plus[child]);
+		fprintf(stdout, msgs[child], timer[t2].name, timer[t2].lo / 1000, timer[t2].lo - ((timer[t2].lo / 1000) * 1000), timer[t2].name, timer[t2].hi / 1000, timer[t2].hi - ((timer[t2].hi / 1000) * 1000), child, state);
+		fprintf(stdout, blank[child]);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+
 	return ret;
 }
 
@@ -643,20 +663,38 @@ dual_milliseconds(int t1, int t2)
  *  Return the current time in milliseconds.
  */
 static long
-milliseconds(int t)
+milliseconds(int child, int t)
 {
 	long ret;
 	struct timeval now;
+	static const char *msgs[] = {
+		"             %1$-6.6s !      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld     :                    [%7$d:%8$03d]\n",
+		"                    :      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld     ! %1$-6.6s             [%7$d:%8$03d]\n",
+		"                    :      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld  !  : %1$-6.6s             [%7$d:%8$03d]\n",
+		"                    !  %1$-6.6s %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld  !                    [%7$d:%8$03d]\n",
+	};
+	static const char *blank[] = {
+		"                    !                                   :                    \n",
+		"                    :                                   !                    \n",
+		"                    :                                !  :                    \n",
+		"                    !                                   !                    \n",
+	};
 
-	printf("                               !                                    \n");
-	printf("                               !  %-6.6s     %ld.%03ld <= %-2.2s <= %ld.%03ld   \n", timer[t].name, timer[t].lo / 1000, timer[t].lo - ((timer[t].lo / 1000) * 1000), timer[t].name, timer[t].hi / 1000, timer[t].hi - ((timer[t].hi / 1000) * 1000));
-	printf("                               !                                    \n");
-	FFLUSH(stdout);
 	gettimeofday(&now, NULL);
 	if (!test_start)	/* avoid blowing over precision */
 		test_start = now.tv_sec;
 	ret = (now.tv_sec - test_start) * 1000;
-	ret += (now.tv_usec + 500L) / 1000;
+	ret += (now.tv_usec + 500) / 1000;
+
+	if (show && verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, blank[child]);
+		fprintf(stdout, msgs[child], timer[t].name, timer[t].lo / 1000, timer[t].lo - ((timer[t].lo / 1000) * 1000), timer[t].name, timer[t].hi / 1000, timer[t].hi - ((timer[t].hi / 1000) * 1000), child, state);
+		fprintf(stdout, blank[child]);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+
 	return ret;
 }
 
@@ -667,23 +705,35 @@ milliseconds(int t)
  *  the allowable range and FAILURE otherwise.
  */
 static int
-check_time(const char *t, long beg, long lo, long hi)
+check_time(int child, const char *t, long beg, long lo, long hi)
 {
 	long i;
 	struct timeval now;
+	static const char *msgs[] = {
+		"       check %1$-6.6s ? [%2$3ld.%3$03ld <= %4$3ld.%5$03ld <= %6$3ld.%7$03ld]   |                    [%8$d:%9$03d]\n",
+		"                    | [%2$3ld.%3$03ld <= %4$3ld.%5$03ld <= %6$3ld.%7$03ld]   ? %1$-6.6s check       [%8$d:%9$03d]\n",
+		"                    | [%2$3ld.%3$03ld <= %4$3ld.%5$03ld <= %6$3ld.%7$03ld]?  | %1$-6.6s check       [%8$d:%9$03d]\n",
+		"       check %1$-6.6s ? [%2$3ld.%3$03ld <= %4$3ld.%5$03ld <= %6$3ld.%7$03ld]   ?                    [%8$d:%9$03d]\n",
+	};
 
 	if (gettimeofday(&now, NULL)) {
 		printf("****ERROR: gettimeofday\n");
 		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
-		FFLUSH(stdout);
+		fflush(stdout);
 		return __RESULT_FAILURE;
 	}
+
 	i = (now.tv_sec - test_start) * 1000;
-	i += (now.tv_usec + 500L) / 1000;
+	i += (now.tv_usec + 500) / 1000;
 	i -= beg;
-	printf("                           check timeout     %s [%ld.%03ld <= %ld.%03ld <= %ld.%03ld]\n", t, (lo - 100) / 1000, (lo - 100) - (((lo - 100) / 1000) * 1000), i / 1000, i - ((i / 1000) * 1000), (hi + 100) / 1000, (hi + 100) - (((hi + 100) / 1000) * 1000)
-	    );
-	FFLUSH(stdout);
+
+	if (show && verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, msgs[child], t, (lo - 100) / 1000, (lo - 100) - (((lo - 100) / 1000) * 1000), i / 1000, i - ((i / 1000) * 1000), (hi + 100) / 1000, (hi + 100) - (((hi + 100) / 1000) * 1000), child, state);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+
 	if (lo - 100 <= i && i <= hi + 100)
 		return __RESULT_SUCCESS;
 	else
@@ -693,6 +743,13 @@ check_time(const char *t, long beg, long lo, long hi)
 static int
 time_event(int child, int event)
 {
+	static const char *msgs[] = {
+		"                    ! %11.6g                |                    <%d:%03d>\n",
+		"                    |                %11.6g !                    <%d:%03d>\n",
+		"                    |             %11.6g !  |                    <%d:%03d>\n",
+		"                    !        %11.6g         !                    <%d:%03d>\n",
+	};
+
 	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
 		float t, m;
 		struct timeval now;
@@ -704,8 +761,9 @@ time_event(int child, int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
+
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                    |  |                    <%d:%03d>\n", t, child, state);
+		fprintf(stdout, msgs[child], t, child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -1309,6 +1367,30 @@ event_string(int event)
 		return ("N_RESET_RES");
 	case __TEST_RESET_CON:
 		return ("N_RESET_CON");
+	case __STATUS_OUT_OF_SERVICE:
+		return ("OUT-OF-SERVICE");
+	case __STATUS_ALIGNMENT:
+		return ("ALIGNMENT");
+	case __STATUS_PROVING_NORMAL:
+		return ("PROVING-NORMAL");
+	case __STATUS_PROVING_EMERG:
+		return ("PROVING-EMERGENCY");
+	case __STATUS_IN_SERVICE:
+		return ("IN-SERVICE");
+	case __STATUS_PROCESSOR_OUTAGE:
+		return ("PROCESSOR-OUTAGE");
+	case __STATUS_PROCESSOR_ENDED:
+		return ("PROCESSOR-ENDED");
+	case __STATUS_BUSY:
+		return ("BUSY");
+	case __STATUS_BUSY_ENDED:
+		return ("BUSY-ENDED");
+	case __STATUS_SEQUENCE_SYNC:
+		return ("READY");
+	case __MSG_PROVING:
+		return ("PROVING");
+	case __TEST_ACK:
+		return ("ACK");
 	default:
 		return ("(unexpected");
 	}
@@ -1819,7 +1901,7 @@ print_addrs(int child, char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *sin;
 
-	if (verbose < 3)
+	if (verbose < 3 || !show)
 		return;
 	if (add_len == 0)
 		print_string(child, "(no address)");
@@ -1852,7 +1934,7 @@ print_prots(int child, char *pro_ptr, size_t pro_len)
 {
 	unsigned char *prot;
 
-	if (verbose < 3)
+	if (verbose < 3 || !show)
 		return;
 	for (prot = (typeof(prot)) pro_ptr; pro_len > 0; prot++, pro_len--) {
 		char buf[32];
@@ -2399,6 +2481,8 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 	N_qos_sctp_t *qos = (N_qos_sctp_t *) qos_ptr;
 	char buf[64];
 
+	if (verbose < 3 || !show)
+		return;
 	if (qos_len) {
 		switch (qos->n_qos_type) {
 		case N_QOS_SEL_CONN_SCTP:
@@ -2812,10 +2896,10 @@ void
 print_less(int child)
 {
 	static const char *msgs[] = {
-		"  . %1$6.6s .  <---->|                 .                 :                   [%2$d:%3$03d]\n",
-		"                    :                 .                 |<---->  . %1$-6.6s . [%2$d:%3$03d]\n",
-		"                    :                 .              |<-:----->  . %1$-6.6s . [%2$d:%3$03d]\n",
-		"  . %1$6.6s .  <---->:                 .              :<-:<---->  . %1$-6.6s . [%2$d:%3$03d]\n",
+		"         . %1$6.6s . | <------         .         ------> :                    [%2$d:%3$03d]\n",
+		"                    : <------         .         ------> | . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"                    : <------         .      ------> |  : . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"         . %1$6.6s . : <------         .      ------> :> : . %1$-6.6s .         [%2$d:%3$03d]\n",
 	};
 
 	if (show && verbose > 0)
@@ -2832,7 +2916,7 @@ print_pipe(int child)
 		"                    .  .                                .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
@@ -2846,7 +2930,7 @@ print_open(int child, const char *name)
 		"                    . %-30.30s .  .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple_string(child, msgs, name);
 }
 
@@ -2860,7 +2944,7 @@ print_close(int child)
 		"                    .                                .  .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
@@ -3078,7 +3162,7 @@ print_nothing(int child)
 		"- - - - - - - - - - |- - - - - - -nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_double_int(child, msgs, child, state);
 }
 
@@ -3291,7 +3375,7 @@ print_command_info(int child, const char *command, const char *info)
 		"                    | %1$-14s %2$-16.16s|  |                    [%3$d:%4$03d]\n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_double_string_state(child, msgs, command, info);
 }
 
@@ -3393,7 +3477,7 @@ print_poll_value(int child, int value, short revents)
 		"                    | %2$-20.20s [%1$10d] |                    [%3$d:%4$03d]\n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_int_string_state(child, msgs, value, poll_events_string(revents));
 }
 
@@ -3407,7 +3491,7 @@ print_ti_ioctl(int child, int cmd, intptr_t arg)
 		"                    |       %16s ioctl(2)   |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, ioctl_string(cmd, arg));
 }
 
@@ -3447,7 +3531,7 @@ print_libcall(int child, const char *command)
 		"                    |        [%16s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -3462,7 +3546,7 @@ print_terror(int child, long error, long terror)
 		"                    |          [%14s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, t_errno_string(terror, error));
 }
 #endif
@@ -3478,7 +3562,7 @@ print_tlook(int child, int tlook)
 		"                    |          [%14s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, t_look_string(tlook));
 }
 #endif
@@ -3641,6 +3725,8 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 	union N_qos_ip_types *qos = (union N_qos_ip_types *) qos_ptr;
 	char buf[64];
 
+	if (verbose < 3 || !show)
+		return;
 	if (qos_len) {
 		switch (qos->n_qos_type) {
 		case N_QOS_SEL_CONN_IP:
@@ -3718,7 +3804,7 @@ print_info(int child, N_info_ack_t * info)
 {
 	char buf[64];
 
-	if (verbose < 4)
+	if (verbose < 4 || !show)
 		return;
 	snprintf(buf, sizeof(buf), "NSDU_size = %d", (int) info->NSDU_size);
 	print_string(child, buf);
@@ -3844,7 +3930,7 @@ test_ioctl(int child, int cmd, intptr_t arg)
 				continue;
 			return (__RESULT_FAILURE);
 		}
-		if (verbose > 3)
+		if (show && verbose > 3)
 			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	}
@@ -3876,7 +3962,7 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (verbose > 4) {
+	if (show && verbose > 4) {
 		int i;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -3968,8 +4054,11 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 int
 test_m2pa_status(int child, uint32_t status)
 {
-	struct strbuf ctrl_buf, data_buf, *ctrl = &ctrl_buf, *data = &data_buf;
 	char cbuf[BUFSIZE], dbuf[BUFSIZE];
+	struct strbuf ctrl_buf = {.buf = cbuf,.len = 0,.maxlen = 0, };
+	struct strbuf data_buf = {.buf = dbuf,.len = 0,.maxlen = 0, };
+	struct strbuf *ctrl = &ctrl_buf;
+	struct strbuf *data = &data_buf;
 	union N_primitives *p = (typeof(p)) cbuf;
 
 	switch (m2pa_version) {
@@ -4019,7 +4108,72 @@ test_m2pa_status(int child, uint32_t status)
 	p->data_req.DATA_xfer_flags = 0;
 	bcopy(&qos[0].data, (&p->data_req) + 1, sizeof(qos[0].data));
 	print_tx_msg(child, status_string(status));
-	return test_putpmsg(child, ctrl, data, MSG_BAND, 0);
+	return test_putpmsg(child, ctrl, data, 0, MSG_BAND);
+}
+
+int
+test_m2pa_data(int child)
+{
+	char cbuf[BUFSIZE], dbuf[BUFSIZE];
+	struct strbuf ctrl_buf = {.buf = cbuf,.len = 0,.maxlen = 0, };
+	struct strbuf data_buf = {.buf = dbuf,.len = 0,.maxlen = 0, };
+	struct strbuf *ctrl = &ctrl_buf;
+	struct strbuf *data = &data_buf;
+	union N_primitives *p = (typeof(p)) cbuf;
+
+	switch (m2pa_version) {
+	case M2PA_VERSION_DRAFT3:
+	case M2PA_VERSION_DRAFT3_1:
+		qos[0].data.sid = 1;
+		data->len = 2 * sizeof(uint32_t) + msu_len + 1;
+		ctrl->len = sizeof(p->data_req) + sizeof(qos[0].data);
+		((uint32_t *) data->buf)[0] = M2PA_DATA_MESSAGE;
+		((uint32_t *) data->buf)[1] = htonl(data->len);
+		memset(&(((uint32_t *) data->buf)[2]), 'B', msu_len + 1);
+		memset(&(((uint32_t *) data->buf)[2]), 0, 1);
+		break;
+	case M2PA_VERSION_DRAFT4:
+	case M2PA_VERSION_DRAFT4_1:
+		fsn[child] = (fsn[child] + 1) & 0xffff;
+		qos[0].data.sid = 1;
+		data->len = 3 * sizeof(uint32_t) + msu_len + 1;
+		ctrl->len = sizeof(p->data_req) + sizeof(qos[0].data);
+		((uint32_t *) data->buf)[0] = M2PA_DATA_MESSAGE;
+		((uint32_t *) data->buf)[1] = htonl(data->len);
+		((uint16_t *) data->buf)[4] = htons(bsn[child]);
+		((uint16_t *) data->buf)[5] = htons(fsn[child]);
+		memset(&(((uint32_t *) data->buf)[3]), 'B', msu_len + 1);
+		memset(&(((uint32_t *) data->buf)[3]), 0, 1);
+		break;
+	default:
+	case M2PA_VERSION_DRAFT4_9:
+	case M2PA_VERSION_DRAFT5:
+	case M2PA_VERSION_DRAFT5_1:
+	case M2PA_VERSION_DRAFT6:
+	case M2PA_VERSION_DRAFT6_1:
+	case M2PA_VERSION_DRAFT6_9:
+	case M2PA_VERSION_DRAFT7:
+	case M2PA_VERSION_DRAFT9:
+	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
+		fsn[child] = (fsn[child] + 1) & 0xffffff;
+		qos[0].data.sid = 1;
+		data->len = 4 * sizeof(uint32_t) + msu_len + 1;
+		ctrl->len = sizeof(p->data_req) + sizeof(qos[0].data);
+		((uint32_t *) data->buf)[0] = M2PA_DATA_MESSAGE;
+		((uint32_t *) data->buf)[1] = htonl(data->len);
+		((uint32_t *) data->buf)[2] = htonl(bsn[child]);
+		((uint32_t *) data->buf)[3] = htonl(fsn[child]);
+		memset(&(((uint32_t *) data->buf)[4]), 'B', msu_len + 1);
+		memset(&(((uint32_t *) data->buf)[4]), 0, 1);
+		break;
+	}
+	p->type = N_DATA_REQ;
+	p->data_req.DATA_xfer_flags = (m2pa_version == M2PA_VERSION_DRAFT3) ? N_RC_FLAG : 0;
+	bcopy(&qos[0].data, (&p->data_req) + 1, sizeof(qos[0].data));
+	print_tx_msg(child, "DATA");
+	return test_putpmsg(child, ctrl, data, 0, MSG_BAND);
 }
 
 static size_t nacks = 1;
@@ -4027,12 +4181,12 @@ static size_t nacks = 1;
 int
 test_m2pa_ack(int child)
 {
-	struct strbuf ctrl_buf, data_buf, *ctrl = &ctrl_buf, *data = &data_buf;
 	char cbuf[BUFSIZE], dbuf[BUFSIZE];
+	struct strbuf ctrl_buf = {.buf = cbuf,.len = 0,.maxlen = 0, };
+	struct strbuf data_buf = {.buf = dbuf,.len = 0,.maxlen = 0, };
+	struct strbuf *ctrl = &ctrl_buf;
+	struct strbuf *data = &data_buf;
 	union N_primitives *p = (typeof(p)) cbuf;
-
-	data->buf = dbuf;
-	ctrl->buf = cbuf;
 
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
@@ -4111,7 +4265,7 @@ test_m2pa_ack(int child)
 		return __RESULT_SCRIPT_ERROR;
 	}
 	print_tx_msg(child, "ACK");
-	return test_putpmsg(child, ctrl, data, MSG_BAND, 0);
+	return test_putpmsg(child, ctrl, data, 0, MSG_BAND);
 }
 
 int
@@ -4154,6 +4308,8 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 	print_syscall(child, "getmsg(2)-----");
 	for (;;) {
 		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -4169,6 +4325,8 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 	print_syscall(child, "getpmsg(2)----");
 	for (;;) {
 		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -4184,6 +4342,8 @@ test_read(int child, void *buf, size_t count)
 	print_syscall(child, "read(2)-------");
 	for (;;) {
 		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -4199,6 +4359,8 @@ test_readv(int child, const struct iovec *iov, int count)
 	print_syscall(child, "readv(2)------");
 	for (;;) {
 		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -4222,16 +4384,16 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 	print_ti_ioctl(child, cmd, arg);
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
-		if (verbose > 3)
+		if (show && verbose > 3)
 			print_success_value(child, last_retval);
 		break;
 	}
-	if (cmd == I_STR && verbose > 3) {
+	if (cmd == I_STR && show && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -4244,7 +4406,7 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 	if (verbose) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "***************ERROR: ioctl failed\n");
-		if (verbose > 3)
+		if (show && verbose > 3)
 			fprintf(stdout, "                    : %s; result = %d\n", __FUNCTION__, last_retval);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		fflush(stdout);
@@ -4260,9 +4422,9 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -4271,9 +4433,9 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -4290,9 +4452,9 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -4301,9 +4463,9 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -4318,11 +4480,16 @@ test_isastream(int child)
 	int result;
 
 	print_syscall(child, "isastream(2)--");
-	if ((result = last_retval = isastream(test_fd[child])) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((result = last_retval = isastream(test_fd[child])) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
@@ -4333,13 +4500,18 @@ test_poll(int child, const short events, short *revents, long ms)
 	int result;
 
 	print_poll(child, events);
-	if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_poll_value(child, last_retval, pfd.revents);
+		if (last_retval == 1 && revents)
+			*revents = pfd.revents;
+		break;
 	}
-	print_poll_value(child, last_retval, pfd.revents);
-	if (last_retval == 1 && revents)
-		*revents = pfd.revents;
 	return (__RESULT_SUCCESS);
 }
 
@@ -4584,6 +4756,23 @@ end_tests(int index)
 	return __RESULT_FAILURE;
 }
 
+static long old_test_duration = 0;
+
+static int
+begin_sanity(int index)
+{
+	old_test_duration = test_duration;
+	test_duration = 5000;
+	return begin_tests(index);
+}
+
+static int
+end_sanity(int index)
+{
+	test_duration = old_test_duration;
+	return end_tests(index);
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -4611,11 +4800,14 @@ do_signal(int child, int action)
 
 	if (action != oldact) {
 		oldact = action;
-		if (cntact > 0) {
-			char buf[64];
+		show = 1;
+		if (verbose > 1) {
+			if (cntact > 0) {
+				char buf[64];
 
-			snprintf(buf, sizeof(buf), "Ct=%5d", cntact + 1);
-			print_command_state(child, buf);
+				snprintf(buf, sizeof(buf), "Ct=%5d", cntact + 1);
+				print_command_state(child, buf);
+			}
 		}
 		cntact = 0;
 	} else if (!show)
@@ -4918,7 +5110,7 @@ do_signal(int child, int action)
 #else
 		print_addrs(child, cbuf + p->npi.bind_ack.ADDR_offset, p->npi.bind_ack.ADDR_length);
 #endif
-		if (verbose > 3) {
+		if (show && verbose > 3) {
 			char buf[64];
 
 			snprintf(buf, sizeof(buf), "CONIND_number = %d", CONIND_number);
@@ -4952,7 +5144,7 @@ do_signal(int child, int action)
 #else
 		print_addrs(child, cbuf + p->npi.bind_ack.ADDR_offset, p->npi.bind_ack.ADDR_length);
 #endif
-		if (verbose > 3) {
+		if (show && verbose > 3) {
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_UNBIND_REQ:
@@ -5211,6 +5403,16 @@ do_signal(int child, int action)
 		if (child == 1)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
+	case __TEST_CLEARB:
+		ctrl->len = sizeof(p->sl.clear_buffers_req);
+		p->sl.clear_buffers_req.sl_primitive = SL_CLEAR_BUFFERS_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_command_state(child, ":clear buffers");
+		if (child == 1)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
 
 	case __TEST_COUNT:
 	{
@@ -5230,6 +5432,7 @@ do_signal(int child, int action)
 	case __TEST_SEND_MSU_S:
 		if (msu_len > BUFSIZE - 10)
 			msu_len = BUFSIZE - 10;
+		print_command_state(child, ":msu");
 		ctrl->len = sizeof(p->sl.pdu_req);
 		data->len = msu_len;
 		memset(dbuf, 'B', msu_len);
@@ -5299,6 +5502,14 @@ do_signal(int child, int action)
 		qos[child].data.sid = 0;
 		return test_m2pa_status(child, M2PA_STATUS_INVALID);
 
+	case __TEST_MSU_TOO_SHORT:
+		msu_len = 1;
+		return test_m2pa_data(child);
+	case __TEST_DATA:
+		if (msu_len > BUFSIZE - 10)
+			msu_len = BUFSIZE - 10;
+		return test_m2pa_data(child);
+
 	case __TEST_BAD_ACK:
 		fsn[child] = 0xffff;
 		/* fall through */
@@ -5306,7 +5517,7 @@ do_signal(int child, int action)
 		return test_m2pa_ack(child);
 	case __TEST_TX_BREAK:
 		print_command_state(child, ":tx break");
-		return __RESULT_SUCCESS;
+		return __RESULT_FAILURE;
 	case __TEST_TX_MAKE:
 		return __RESULT_SUCCESS;
 
@@ -5518,7 +5729,6 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				default:
 					return __RESULT_SCRIPT_ERROR;
 				}
-				print_rx_msg(child, status_string(mystatus));
 				switch (mystatus) {
 				case M2PA_STATUS_OUT_OF_SERVICE:
 					event = __STATUS_OUT_OF_SERVICE;
@@ -5581,7 +5791,6 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				break;
 			case M2PA_DATA_MESSAGE:
 				event = __TEST_DATA;
-				print_rx_msg(child, msg_string(msg));
 				switch (m2pa_version) {
 				case M2PA_VERSION_DRAFT3:
 				case M2PA_VERSION_DRAFT3_1:
@@ -5610,6 +5819,8 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 					if (ntohl(((uint32_t *) data->buf)[1]) == 4 * sizeof(uint32_t)) {
 						print_rx_msg(child, "ACK");
 						event = __TEST_ACK;
+					} else {
+						print_rx_msg(child, "DATA");
 					}
 					break;
 				}
@@ -5619,7 +5830,8 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				if ((event != __TEST_DATA && event != __TEST_ACK) || show)
 					cntevt = 0;
 				oldevt = event;
-				if (show && verbose > 1) {
+				show = 1;
+				if (verbose > 1) {
 					if (cntevt) {
 						char buf[32];
 
@@ -5658,7 +5870,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 					{
 						char buf[32];
 
-						snprintf(buf, sizeof(buf), "PROVING [%d bytes]", (int)(ntohl(((uint32_t *) data->buf)[1]) - 2 * sizeof(uint32_t)));
+						snprintf(buf, sizeof(buf), "PROVING [%d bytes]", (int) (ntohl(((uint32_t *) data->buf)[1]) - 2 * sizeof(uint32_t)));
 						print_rx_msg(child, buf);
 						return event;
 					}
@@ -5733,7 +5945,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				{
 					char buf[32];
 
-					snprintf(buf, sizeof(buf), "DATA [%d bytes]", (int)(ntohl(((uint32_t *) data->buf)[1]) - 2 * sizeof(uint32_t)));
+					snprintf(buf, sizeof(buf), "DATA [%d bytes]", (int) (ntohl(((uint32_t *) data->buf)[1]) - 2 * sizeof(uint32_t)));
 					print_rx_msg(child, buf);
 					break;
 				}
@@ -5886,7 +6098,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 #else
 			print_addrs(child, cbuf + p->npi.bind_ack.ADDR_offset, p->npi.bind_ack.ADDR_length);
 #endif
-			if (verbose > 3) {
+			if (show && verbose > 3) {
 				snprintf(buf, sizeof(buf), "CONIND_number = %d", CONIND_number);
 				print_string(child, buf);
 				snprintf(buf, sizeof(buf), "TOKEN_value = %x", TOKEN_value);
@@ -6020,8 +6232,8 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		}
 		if (data && data->len >= 0)
-			if (do_decode_data(child, ctrl, data) != __TEST_DATA)
-				event = __RESULT_FAILURE;
+			if ((last_event = do_decode_data(child, ctrl, data)) != __TEST_DATA)
+				event = last_event;
 	}
 	return ((last_event = event));
 }
@@ -6051,25 +6263,25 @@ wait_event(int child, int wait)
 			last_event = __EVENT_TIMEOUT;
 			return time_event(child, __EVENT_TIMEOUT);
 		}
-		if (verbose > 4)
+		if (show && verbose > 4)
 			print_syscall(child, "poll()");
 		pfd[0].fd = test_fd[child];
 		pfd[0].events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		switch (poll(pfd, 1, wait)) {
 		case -1:
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
-				break;
+			if (errno == EINTR || errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		case 0:
-			if (verbose > 4)
+			if (show && verbose > 4)
 				print_success(child);
 			print_nothing(child);
 			last_event = __EVENT_NO_MSG;
 			return time_event(child, __EVENT_NO_MSG);
 		case 1:
-			if (verbose > 4)
+			if (show && verbose > 4)
 				print_success(child);
 			if (pfd[0].revents) {
 				int ret;
@@ -6086,10 +6298,10 @@ wait_event(int child, int wait)
 						print_syscall(child, "getmsg()");
 					if ((ret = getmsg(test_fd[child], &ctrl, &data, &flags)) >= 0)
 						break;
-					if (last_errno == EINTR || last_errno == ERESTART)
+					if (errno == EINTR || errno == ERESTART)
 						continue;
 					print_errno(child, (last_errno = errno));
-					if (last_errno == EAGAIN)
+					if (errno == EAGAIN)
 						break;
 					return __RESULT_FAILURE;
 				}
@@ -6224,6 +6436,12 @@ preamble_unbound(int child)
 }
 
 static int
+postamble_unbound(int child)
+{
+	return __RESULT_SUCCESS;
+}
+
+static int
 preamble_bind(int child)
 {
 	unsigned char proto = TEST_PROTOCOL;
@@ -6302,6 +6520,32 @@ preamble_bind(int child)
 }
 
 static int
+postamble_unbind(int child)
+{
+	int failed = 0;
+
+	if (stop_tt())
+		failed = failed ? : state;
+	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ))
+		failed = failed ? : state;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+		failed = failed ? : state;
+	state++;
+	if (postamble_unbound(child))
+		failed = failed ? : state;
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+
+}
+
+static int
 preamble_connect(int child)
 {
 	if (preamble_bind(child))
@@ -6326,6 +6570,8 @@ preamble_connect(int child)
 				state++;
 				break;
 			case __TEST_DISCON_IND:
+				state++;
+				test_msleep(child, NORMAL_WAIT);
 				state++;
 				continue;
 			default:
@@ -6381,11 +6627,91 @@ preamble_connect(int child)
 			goto failure;
 		}
 	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+postamble_disconnect(int child)
+{
+	int failed = 0;
+
+	if (child == CHILD_IUT) {
+		ADDR_buffer = NULL;
+		ADDR_length = 0;
+		if (do_signal(child, __TEST_DISCON_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
+			failed = failed ? : state;
+	} else {
+		if (expect(child, INFINITE_WAIT, __TEST_DISCON_IND)) {
+			ADDR_buffer = NULL;
+			ADDR_length = 0;
+			if (do_signal(child, __TEST_DISCON_REQ))
+				failed = failed ? : state;
+			state++;
+			if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
+				failed = failed ? : state;
+		}
+	}
+	state++;
+	if (postamble_unbind(child))
+		failed = failed ? : state;
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+preamble_push(int child)
+{
+	if (preamble_connect(child))
+		goto failure;
 	if (child == CHILD_IUT) {
 		state++;
 		if (do_signal(child, __TEST_PUSH))
 			goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+postamble_pop(int child)
+{
+	int failed = 0;
+
+	if (child == CHILD_IUT) {
 		state++;
+		if (test_ioctl(child, I_POP, 0))
+			failed = failed ? : state;
+	}
+	state++;
+	if (postamble_disconnect(child))
+		failed = failed ? : state;
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+preamble_config(int child)
+{
+	if (preamble_push(child))
+		goto failure;
+	state++;
+	if (child == CHILD_IUT) {
 		if (do_signal(child, __TEST_SDL_OPTIONS))
 			goto failure;
 		state++;
@@ -6403,12 +6729,52 @@ preamble_connect(int child)
 		state++;
 		if (do_signal(child, __TEST_SL_CONFIG))
 			goto failure;
-		state++;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+preamble_enable(int child)
+{
+	if (preamble_config(child))
+		goto failure;
+	state++;
+	if (child == CHILD_IUT) {
 		if (do_signal(child, __TEST_ENABLE_REQ))
 			goto failure;
 		state++;
 		if (expect(child, INFINITE_WAIT, __TEST_ENABLE_CON))
 			goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+postamble_disable(int child)
+{
+	int failed = 0;
+
+	if (child == CHILD_IUT) {
+		state++;
+		if (do_signal(child, __TEST_DISABLE_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_DISABLE_CON))
+			failed = failed ? : state;
+		state++;
+		if (test_ioctl(child, I_FLUSH, FLUSHRW))
+			failed = failed ? : state;
+	}
+	state++;
+	if (postamble_pop(child))
+		failed = failed ? : state;
+	if (failed) {
+		state = failed;
+		goto failure;
 	}
 	return __RESULT_SUCCESS;
       failure:
@@ -6423,40 +6789,13 @@ postamble_link_power_off(int child)
 	if (stop_tt())
 		failed = failed ? : state;
 	state++;
-	if (child == CHILD_IUT) {
-		if (do_signal(child, __TEST_STOP))
-			failed = failed ? : state;
-		state++;
-	}
 	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		failed = failed ? : state;
 	state++;
-	test_msleep(child, NORMAL_WAIT);
+	test_msleep(child, LONG_WAIT);
 	state++;
-	if (child == CHILD_IUT) {
-		if (do_signal(child, __TEST_DISABLE_REQ))
-			failed = failed ? : state;
-		state++;
-		if (expect(child, NORMAL_WAIT, __TEST_DISABLE_CON))
-			failed = failed ? : state;
-		state++;
-		if (test_ioctl(child, I_FLUSH, FLUSHRW))
-			failed = failed ? : state;
-		state++;
-		if (do_signal(child, __TEST_POP))
-			failed = failed ? : state;
-		state++;
-		if (do_signal(child, __TEST_DISCON_REQ))
-			failed = failed ? : state;
-	} else {
-		if (test_ioctl(child, I_FLUSH, FLUSHRW))
-			failed = failed ? : state;
-		state++;
-		if (expect(child, NORMAL_WAIT, __TEST_DISCON_IND))
-			if (do_signal(child, __TEST_DISCON_REQ))
-				failed = failed ? : state;
-		state++;
-	}
+	if (postamble_disable(child))
+		failed = failed ? : state;
 	if (failed) {
 		state = failed;
 		goto failure;
@@ -6510,11 +6849,11 @@ preamble_link_power_off(int child)
 
 	switch (child) {
 	case CHILD_PTU:
-		if (preamble_connect(child))
+		if (preamble_enable(child))
 			goto failure;
 		break;
 	case CHILD_IUT:
-		if (preamble_connect(child))
+		if (preamble_enable(child))
 			goto failure;
 		break;
 	}
@@ -6522,6 +6861,7 @@ preamble_link_power_off(int child)
       failure:
 	return __RESULT_FAILURE;
 }
+
 #if 0
 static int
 preamble_link_power_off_pr(int child)
@@ -6546,6 +6886,7 @@ preamble_link_power_on(int child)
 		state++;
 		if (do_signal(child, __TEST_POWER_ON))
 			goto failure;
+		state++;
 		break;
 	case CHILD_IUT:
 		if (preamble_link_power_off(child))
@@ -6559,6 +6900,7 @@ preamble_link_power_on(int child)
       failure:
 	return __RESULT_FAILURE;
 }
+
 #if 0
 static int
 preamble_link_power_on_pr(int child)
@@ -6581,10 +6923,10 @@ preamble_link_out_of_service(int child)
 		if (preamble_link_power_on(child))
 			goto failure;
 		state++;
-		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		break;
 	case CHILD_IUT:
@@ -6596,6 +6938,7 @@ preamble_link_out_of_service(int child)
       failure:
 	return __RESULT_FAILURE;
 }
+
 #if 0
 static int
 preamble_link_out_of_service_pr(int child)
@@ -6611,6 +6954,29 @@ preamble_link_out_of_service_np(int child)
 }
 #endif
 static int
+postamble_link_out_of_service(int child)
+{
+	int failed = 0;
+
+	if (stop_tt())
+		failed = failed ? : state;
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+		failed = failed ? : state;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (postamble_disable(child))
+		failed = failed ? : state;
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+static int
 preamble_link_in_service(int child)
 {
 	switch (child) {
@@ -6621,10 +6987,10 @@ preamble_link_in_service(int child)
 		if (do_signal(child, __TEST_START))
 			goto failure;
 		state++;
-		if (do_signal(child, __STATUS_ALIGNMENT))
+		if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT))
+		if (do_signal(child, __STATUS_ALIGNMENT))
 			goto failure;
 		state++;
 		if (!(iutconf.opt.popt & SS7_POPT_NOPR)) {
@@ -6648,9 +7014,6 @@ preamble_link_in_service(int child)
 		}
 		if (do_signal(child, __STATUS_IN_SERVICE))
 			goto failure;
-		state++;
-		if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE))
-			goto failure;
 		break;
 	case CHILD_IUT:
 		if (preamble_link_out_of_service(child))
@@ -6668,6 +7031,7 @@ preamble_link_in_service(int child)
 	print_more(child);
 	return __RESULT_FAILURE;
 }
+
 #if 0
 static int
 preamble_link_in_service_pr(int child)
@@ -6694,6 +7058,36 @@ preamble_link_in_service_pcr(int child)
 	iutconf.opt.popt = SS7_POPT_PCR;
 	return preamble_link_in_service(child);
 }
+static int
+postamble_link_in_service(int child)
+{
+	int failed = 0;
+
+	if (stop_tt())
+		failed = failed ? : state;
+	state++;
+	if (child == CHILD_IUT) {
+		if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
+			failed = failed ? : state;
+		state++;
+	} else {
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+			failed = failed ? : state;
+		state++;
+	}
+	if (postamble_link_out_of_service(child))
+		failed = failed ? : state;
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
 
 /*
  *  =========================================================================
@@ -6714,7 +7108,7 @@ static int
 check_snibs(unsigned char bsnib, unsigned char fsnib)
 {
 	printf("                 check b/f sn/ib:  ---> (%02x/%02x)\n", bsnib, fsnib);
-	FFLUSH(stdout);
+	fflush(stdout);
 	if ((bib[1] | bsn[1]) == bsnib && (fib[1] | fsn[1]) == fsnib)
 		return __RESULT_SUCCESS;
 	return __RESULT_FAILURE;
@@ -6737,14 +7131,20 @@ Checks that the test case guard timer will fire and bring down the children."
 int
 test_0_1_ptu(int child)
 {
-	test_sleep(child, 40);
+	if (test_duration == INFINITE_WAIT)
+		return __RESULT_NOTAPPL;
+	test_msleep(child, test_duration + 1000);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_0_1_iut(int child)
 {
-	test_sleep(child, 40);
+	if (test_duration == INFINITE_WAIT)
+		return __RESULT_NOTAPPL;
+	test_msleep(child, test_duration + 1000);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6752,6 +7152,231 @@ struct test_stream test_case_0_1_ptu = { preamble_none, &test_0_1_ptu, postamble
 struct test_stream test_case_0_1_iut = { preamble_none, &test_0_1_iut, postamble_none };
 
 #define test_case_0_1 { &test_case_0_1_ptu, &test_case_0_1_iut, NULL }
+
+#define test_group_0_2 "0.2. Preambles and Postambles"
+#define tgrp_case_0_2_1 test_group_0
+#define sgrp_case_0_2_1 test_group_0_2
+#define numb_case_0_2_1 "0.2.1"
+#define name_case_0_2_1 "Base preamble."
+#define sref_case_0_2_1 "(none)"
+#define desc_case_0_2_1 "\
+Checks that two Streams can be opened and closed."
+
+int
+test_0_2_1_ptu(int child)
+{
+	return __RESULT_SUCCESS;
+}
+
+int
+test_0_2_1_iut(int child)
+{
+	return __RESULT_SUCCESS;
+}
+
+struct test_stream test_case_0_2_1_ptu = { preamble_none, test_0_2_1_ptu, postamble_none };
+struct test_stream test_case_0_2_1_iut = { preamble_none, test_0_2_1_iut, postamble_none };
+
+#define test_case_0_2_1 { &test_case_0_2_1_ptu, &test_case_0_2_1_iut, NULL }
+
+#define tgrp_case_0_2_2 test_group_0
+#define sgrp_case_0_2_2 test_group_0_2
+#define numb_case_0_2_2 "0.2.2"
+#define name_case_0_2_2 "Unbound preamble."
+#define sref_case_0_2_2 "(none)"
+#define desc_case_0_2_2 "\
+Checks that two Streams can be opened, information obtained, and closed."
+
+int
+test_0_2_2_ptu(int child)
+{
+	return __RESULT_SUCCESS;
+}
+
+int
+test_0_2_2_iut(int child)
+{
+	return __RESULT_SUCCESS;
+}
+
+struct test_stream test_case_0_2_2_ptu = { preamble_unbound, test_0_2_2_ptu, postamble_unbound };
+struct test_stream test_case_0_2_2_iut = { preamble_unbound, test_0_2_2_iut, postamble_unbound };
+
+#define test_case_0_2_2 { &test_case_0_2_2_ptu, &test_case_0_2_2_iut, NULL }
+
+#define tgrp_case_0_2_3 test_group_0
+#define sgrp_case_0_2_3 test_group_0_2
+#define numb_case_0_2_3 "0.2.3"
+#define name_case_0_2_3 "Bound preamble."
+#define sref_case_0_2_3 "(none)"
+#define desc_case_0_2_3 "\
+Checks that two Streams can be opened, information obtained, bound,\n\
+unbound, and closed."
+
+int
+test_0_2_3_ptu(int child)
+{
+	return __RESULT_SUCCESS;
+}
+
+int
+test_0_2_3_iut(int child)
+{
+	return __RESULT_SUCCESS;
+}
+
+struct test_stream test_case_0_2_3_ptu = { preamble_bind, test_0_2_3_ptu, postamble_unbind };
+struct test_stream test_case_0_2_3_iut = { preamble_bind, test_0_2_3_iut, postamble_unbind };
+
+#define test_case_0_2_3 { &test_case_0_2_3_ptu, &test_case_0_2_3_iut, NULL }
+
+#define tgrp_case_0_2_4 test_group_0
+#define sgrp_case_0_2_4 test_group_0_2
+#define numb_case_0_2_4 "0.2.4"
+#define name_case_0_2_4 "Connect preamble."
+#define sref_case_0_2_4 "(none)"
+#define desc_case_0_2_4 "\
+Checks that two Streams can be opened, information obtained, bound,\n\
+connected, disconnected, unbound and closed."
+
+int
+test_0_2_4_ptu(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+int
+test_0_2_4_iut(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+struct test_stream test_case_0_2_4_ptu = { preamble_connect, test_0_2_4_ptu, postamble_disconnect };
+struct test_stream test_case_0_2_4_iut = { preamble_connect, test_0_2_4_iut, postamble_disconnect };
+
+#define test_case_0_2_4 { &test_case_0_2_4_ptu, &test_case_0_2_4_iut, NULL }
+
+#define tgrp_case_0_2_5 test_group_0
+#define sgrp_case_0_2_5 test_group_0_2
+#define numb_case_0_2_5 "0.2.5"
+#define name_case_0_2_5 "Push preamble."
+#define sref_case_0_2_5 "(none)"
+#define desc_case_0_2_5 "\
+Checks that two Streams can be opened, information obtained, bound,\n\
+connected, module pushed, module popped, disconnected, unbound and\n\
+closed."
+
+int
+test_0_2_5_ptu(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+int
+test_0_2_5_iut(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+struct test_stream test_case_0_2_5_ptu = { preamble_push, test_0_2_5_ptu, postamble_pop };
+struct test_stream test_case_0_2_5_iut = { preamble_push, test_0_2_5_iut, postamble_pop };
+
+#define test_case_0_2_5 { &test_case_0_2_5_ptu, &test_case_0_2_5_iut, NULL }
+
+#define tgrp_case_0_2_6 test_group_0
+#define sgrp_case_0_2_6 test_group_0_2
+#define numb_case_0_2_6 "0.2.6"
+#define name_case_0_2_6 "Config preamble"
+#define sref_case_0_2_6 "(none)"
+#define desc_case_0_2_6 "\
+Checks that two Streams can be opened, information obtained, bound,\n\
+connected, module pushed, module configured, module popped,\n\
+disconnected, unbound and closed."
+
+int
+test_0_2_6_ptu(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+int
+test_0_2_6_iut(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+struct test_stream test_case_0_2_6_ptu = { preamble_config, test_0_2_6_ptu, postamble_pop };
+struct test_stream test_case_0_2_6_iut = { preamble_config, test_0_2_6_iut, postamble_pop };
+
+#define test_case_0_2_6 { &test_case_0_2_6_ptu, &test_case_0_2_6_iut, NULL }
+
+#define tgrp_case_0_2_7 test_group_0
+#define sgrp_case_0_2_7 test_group_0_2
+#define numb_case_0_2_7 "0.2.7"
+#define name_case_0_2_7 "Enable preamble."
+#define sref_case_0_2_7 "(none)"
+#define desc_case_0_2_7 "\
+Checks that two Streams can be opened, information obtained, bound,\n\
+connected, module pushed, module configured, enabled, disabled, popped,\n\
+disconnected, unbound and closed."
+
+int
+test_0_2_7_ptu(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+int
+test_0_2_7_iut(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+struct test_stream test_case_0_2_7_ptu = { preamble_enable, test_0_2_7_ptu, postamble_disable };
+struct test_stream test_case_0_2_7_iut = { preamble_enable, test_0_2_7_iut, postamble_disable };
+
+#define test_case_0_2_7 { &test_case_0_2_7_ptu, &test_case_0_2_7_iut, NULL }
+
+#define tgrp_case_0_2_8 test_group_0
+#define sgrp_case_0_2_8 test_group_0_2
+#define numb_case_0_2_8 "0.2.8"
+#define name_case_0_2_8 "Link power off preamble."
+#define sref_case_0_2_8 "(none)"
+#define desc_case_0_2_8 "\
+Checks that two Streasm can be opeed, information obtained, bound,\n\
+connected, module pushed, module configured, enabled, link power on,\n\
+disabled, popped, disconnected, unbound and closed."
+
+int
+test_0_2_8_ptu(int child)
+{
+	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+int
+test_0_2_8_iut(int child)
+{
+	test_sleep(child, 1);
+	return __RESULT_SUCCESS;
+}
+
+struct test_stream test_case_0_2_8_ptu = { preamble_link_power_on, test_0_2_8_ptu, postamble_link_out_of_service };
+struct test_stream test_case_0_2_8_iut = { preamble_link_power_on, test_0_2_8_iut, postamble_link_out_of_service };
+
+#define test_case_0_2_8 { &test_case_0_2_8_ptu, &test_case_0_2_8_iut, NULL }
 
 #define test_group_1 "1. Link State Control - Expected signal units/orders"
 #define tgrp_case_1_1a test_group_1
@@ -6770,10 +7395,10 @@ test_power_on_pt(int child)
 		if (do_signal(child, __TEST_POWER_ON))
 			goto failure;
 		state++;
-		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
 		break;
@@ -6814,8 +7439,8 @@ test_1_1a_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_1a_ptu = { preamble_link_power_off, test_1_1a_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_1a_iut = { preamble_link_power_off, test_1_1a_iut, postamble_link_power_off };
+static struct test_stream test_case_1_1a_ptu = { preamble_link_power_off, test_1_1a_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_1a_iut = { preamble_link_power_off, test_1_1a_iut, postamble_link_out_of_service };
 
 #define test_case_1_1a { &test_case_1_1a_ptu, &test_case_1_1a_iut, NULL }
 
@@ -6832,10 +7457,10 @@ test_power_on_sut(int child)
 {
 	switch (child) {
 	case CHILD_PTU:
-		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+		if (do_signal(child, __TEST_POWER_ON))
 			goto failure;
 		state++;
-		if (do_signal(child, __TEST_POWER_ON))
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
 		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
@@ -6879,8 +7504,8 @@ test_1_1b_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_1b_ptu = { preamble_link_power_off, test_1_1b_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_1b_iut = { preamble_link_power_off, test_1_1b_iut, postamble_link_power_off };
+static struct test_stream test_case_1_1b_ptu = { preamble_link_power_off, test_1_1b_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_1b_iut = { preamble_link_power_off, test_1_1b_iut, postamble_link_out_of_service };
 
 #define test_case_1_1b { &test_case_1_1b_ptu, &test_case_1_1b_iut, NULL }
 
@@ -6947,13 +7572,13 @@ test_1_2_ptu(int child)
 	if (test_aligned_sut(child))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t2 * 20);
-	beg_time = milliseconds(t2);
+	beg_time = milliseconds(child, t2);
+	start_tt(iutconf.sl.t2 * 2);
 	state++;
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (check_time("T2  ", beg_time, timer[t2].lo, timer[t2].hi))
+	if (check_time(child, "T2  ", beg_time, timer[t2].lo, timer[t2].hi))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -6974,8 +7599,8 @@ test_1_2_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_2_ptu = { preamble_link_power_on, test_1_2_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_2_iut = { preamble_link_power_on, test_1_2_iut, postamble_link_power_off };
+static struct test_stream test_case_1_2_ptu = { preamble_link_power_on, test_1_2_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_2_iut = { preamble_link_power_on, test_1_2_iut, postamble_link_out_of_service };
 
 #define test_case_1_2 { &test_case_1_2_ptu, &test_case_1_2_iut, NULL }
 
@@ -7040,13 +7665,13 @@ test_1_3_ptu(int child)
 	if (test_proving_sut(child, 1))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t3 * 20);
-	beg_time = milliseconds(t3);
+	beg_time = milliseconds(child, t3);
+	start_tt(iutconf.sl.t3 * 2);
 	state++;
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (check_time("T3  ", beg_time, timer[t3].lo, timer[t3].hi))
+	if (check_time(child, "T3  ", beg_time, timer[t3].lo, timer[t3].hi))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -7067,8 +7692,8 @@ test_1_3_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_3_ptu = { preamble_link_power_on, test_1_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_3_iut = { preamble_link_power_on, test_1_3_iut, postamble_link_power_off };
+static struct test_stream test_case_1_3_ptu = { preamble_link_power_on, test_1_3_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_3_iut = { preamble_link_power_on, test_1_3_iut, postamble_link_out_of_service };
 
 #define test_case_1_3 { &test_case_1_3_ptu, &test_case_1_3_iut, NULL }
 
@@ -7098,8 +7723,8 @@ test_1_4_ptu(int child)
 	if (do_signal(child, __STATUS_ALIGNMENT))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t4n * 20);
-	beg_time = milliseconds(t4n);
+	beg_time = milliseconds(child, t4n);
+	start_tt(iutconf.sl.t4n * 2);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
@@ -7119,14 +7744,14 @@ test_1_4_ptu(int child)
 		}
 		break;
 	}
-	if (check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
+	if (check_time(child, "T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
 		goto failure;
-	start_tt(iutconf.sl.t1 * 20);
-	beg_time = milliseconds(t1);
+	beg_time = milliseconds(child, t1);
+	start_tt(iutconf.sl.t1 * 2);
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi))
+	if (check_time(child, "T1  ", beg_time, timer[t1].lo, timer[t1].hi))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -7147,8 +7772,8 @@ test_1_4_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_4_ptu = { preamble_link_power_on, test_1_4_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_4_iut = { preamble_link_power_on, test_1_4_iut, postamble_link_power_off };
+static struct test_stream test_case_1_4_ptu = { preamble_link_power_on, test_1_4_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_4_iut = { preamble_link_power_on, test_1_4_iut, postamble_link_out_of_service };
 
 #define test_case_1_4 { &test_case_1_4_ptu, &test_case_1_4_iut, NULL }
 
@@ -7162,10 +7787,10 @@ test_out_of_service_pt(int child)
 {
 	switch (child) {
 	case CHILD_PTU:
-		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
 		break;
@@ -7204,7 +7829,8 @@ test_aligned_pt(int child)
       failure:
 	return __RESULT_FAILURE;
 }
-static int
+
+int
 test_alignment_pt(int child, int proving, int result)
 {
 	long beg_time = 0;
@@ -7231,7 +7857,7 @@ test_alignment_pt(int child, int proving, int result)
 				case __STATUS_PROVING_EMERG:
 				case __STATUS_PROVING_NORMAL:
 					if (!beg_time)
-						beg_time = milliseconds(t4n);
+						beg_time = milliseconds(child, t4n);
 					if (do_signal(child, __STATUS_PROVING_NORMAL))
 						goto failure;
 					state++;
@@ -7241,7 +7867,7 @@ test_alignment_pt(int child, int proving, int result)
 					if (last_event == result) {
 						state++;
 						print_more(child);
-						if (check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
+						if (check_time(child, "T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
 							goto failure;
 						break;
 					}
@@ -7257,7 +7883,7 @@ test_alignment_pt(int child, int proving, int result)
 				case __STATUS_PROVING_EMERG:
 				case __STATUS_PROVING_NORMAL:
 					if (!beg_time)
-						beg_time = milliseconds(t4e);
+						beg_time = milliseconds(child, t4e);
 					if (do_signal(child, __STATUS_PROVING_EMERG))
 						goto failure;
 					state++;
@@ -7267,7 +7893,7 @@ test_alignment_pt(int child, int proving, int result)
 					if (last_event == result) {
 						state++;
 						print_more(child);
-						if (check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
+						if (check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
 							goto failure;
 						break;
 					}
@@ -7294,38 +7920,6 @@ test_alignment_pt(int child, int proving, int result)
 	print_more(child);
 	return __RESULT_FAILURE;
 }
-static int
-test_1_5a_ptu(int child, int proving)
-{
-	if (test_alignment_pt(child, proving, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (do_signal(child, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
-	return __RESULT_SUCCESS;
-      failure:
-	return __RESULT_FAILURE;
-}
-static int
-test_1_5a_iut(int child, int proving)
-{
-	if (test_alignment_pt(child, proving, __EVENT_IUT_IN_SERVICE))
-		goto failure;
-	state++;
-	return __RESULT_SUCCESS;
-      failure:
-	return __RESULT_FAILURE;
-}
-
-#define desc_case_1_5b "\
-Link State Control - Expected signal units/orders\n\
-Normal alignment procedure\n\
-Reverse direction\
-"
 static int
 test_alignment_sut(int child, int proving, int result)
 {
@@ -7358,7 +7952,7 @@ test_alignment_sut(int child, int proving, int result)
 					if (do_signal(child, __STATUS_PROVING_NORMAL))
 						goto failure;
 					state++;
-					print_less(child);
+					// print_less(child);
 					continue;
 				default:
 					if (last_event == result) {
@@ -7383,7 +7977,7 @@ test_alignment_sut(int child, int proving, int result)
 					if (do_signal(child, __STATUS_PROVING_EMERG))
 						goto failure;
 					state++;
-					print_less(child);
+					// print_less(child);
 					continue;
 				default:
 					if (last_event == result) {
@@ -7414,6 +8008,40 @@ test_alignment_sut(int child, int proving, int result)
 	print_more(child);
 	return __RESULT_FAILURE;
 }
+static int
+test_1_5a_ptu(int child, int proving)
+{
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, proving, __STATUS_IN_SERVICE))
+		goto failure;
+	state++;
+	if (do_signal(child, __STATUS_IN_SERVICE))
+		goto failure;
+	state++;
+	if (expect(child, LONGEST_WAIT, __EVENT_NO_MSG))
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+static int
+test_1_5a_iut(int child, int proving)
+{
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, proving, __EVENT_IUT_IN_SERVICE))
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+#define desc_case_1_5b "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment procedure\n\
+Reverse direction\
+"
 static int
 test_1_5b_ptu(int child, int proving)
 {
@@ -7463,8 +8091,8 @@ test_1_5a_p_iut(int child)
 	return test_1_5a_iut(child, 1);
 }
 
-static struct test_stream test_case_1_5a_p_ptu = { preamble_link_power_on, test_1_5a_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_5a_p_iut = { preamble_link_power_on, test_1_5a_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_5a_p_ptu = { preamble_link_power_on, test_1_5a_p_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_5a_p_iut = { preamble_link_power_on, test_1_5a_p_iut, postamble_link_in_service };
 
 #define test_case_1_5a_p { &test_case_1_5a_p_ptu, &test_case_1_5a_p_iut, NULL }
 
@@ -7490,8 +8118,8 @@ test_1_5b_p_iut(int child)
 	return test_1_5b_iut(child, 1);
 }
 
-static struct test_stream test_case_1_5b_p_ptu = { preamble_link_power_on, test_1_5b_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_5b_p_iut = { preamble_link_power_on, test_1_5b_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_5b_p_ptu = { preamble_link_power_on, test_1_5b_p_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_5b_p_iut = { preamble_link_power_on, test_1_5b_p_iut, postamble_link_in_service };
 
 #define test_case_1_5b_p { &test_case_1_5b_p_ptu, &test_case_1_5b_p_iut, NULL }
 
@@ -7517,8 +8145,8 @@ test_1_5a_np_iut(int child)
 	return test_1_5a_iut(child, 0);
 }
 
-static struct test_stream test_case_1_5a_np_ptu = { preamble_link_power_on_np, test_1_5a_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_5a_np_iut = { preamble_link_power_on_np, test_1_5a_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_5a_np_ptu = { preamble_link_power_on_np, test_1_5a_np_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_5a_np_iut = { preamble_link_power_on_np, test_1_5a_np_iut, postamble_link_in_service };
 
 #define test_case_1_5a_np { &test_case_1_5a_np_ptu, &test_case_1_5a_np_iut, NULL }
 
@@ -7544,8 +8172,8 @@ test_1_5b_np_iut(int child)
 	return test_1_5b_iut(child, 0);
 }
 
-static struct test_stream test_case_1_5b_np_ptu = { preamble_link_power_on_np, test_1_5b_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_5b_np_iut = { preamble_link_power_on_np, test_1_5b_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_5b_np_ptu = { preamble_link_power_on_np, test_1_5b_np_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_5b_np_iut = { preamble_link_power_on_np, test_1_5b_np_iut, postamble_link_in_service };
 
 #define test_case_1_5b_np { &test_case_1_5b_np_ptu, &test_case_1_5b_np_iut, NULL }
 
@@ -7605,8 +8233,8 @@ test_1_6_p_iut(int child)
 	return test_1_6_iut(child, 1);
 }
 
-static struct test_stream test_case_1_6_p_ptu = { preamble_link_power_on, test_1_6_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_6_p_iut = { preamble_link_power_on, test_1_6_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_6_p_ptu = { preamble_link_power_on, test_1_6_p_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_6_p_iut = { preamble_link_power_on, test_1_6_p_iut, postamble_link_in_service };
 
 #define test_case_1_6_p { &test_case_1_6_p_ptu, &test_case_1_6_p_iut, NULL }
 
@@ -7631,8 +8259,8 @@ test_1_6_np_iut(int child)
 	return test_1_6_iut(child, 0);
 }
 
-static struct test_stream test_case_1_6_np_ptu = { preamble_link_power_on_np, test_1_6_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_6_np_iut = { preamble_link_power_on_np, test_1_6_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_6_np_ptu = { preamble_link_power_on_np, test_1_6_np_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_6_np_iut = { preamble_link_power_on_np, test_1_6_np_iut, postamble_link_in_service };
 
 #define test_case_1_6_np { &test_case_1_6_np_ptu, &test_case_1_6_np_iut, NULL }
 
@@ -7656,7 +8284,7 @@ test_1_7_ptu(int child)
 	if (do_signal(child, __STATUS_PROVING_NORMAL))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t4n * 10 / 2);
+	start_tt(iutconf.sl.t4n / 2);
 	state++;
 	show_timeout = 1;
 	for (;;) {
@@ -7669,11 +8297,11 @@ test_1_7_ptu(int child)
 			print_less(child);
 			continue;
 		case __EVENT_TIMEOUT:
-			start_tt(iutconf.sl.t4n * 20);
+			start_tt(iutconf.sl.t4n * 2);
 			if (do_signal(child, __STATUS_ALIGNMENT))
 				goto failure;
 			state++;
-			beg_time = milliseconds(t4n);
+			beg_time = milliseconds(child, t4n);
 			if (do_signal(child, __STATUS_PROVING_NORMAL))
 				goto failure;
 			state++;
@@ -7695,7 +8323,10 @@ test_1_7_ptu(int child)
 		case __STATUS_IN_SERVICE:
 			state++;
 			print_more(child);
-			if (check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
+			if (check_time(child, "T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
+				goto failure;
+			state++;
+			if (do_signal(child, __STATUS_IN_SERVICE))
 				goto failure;
 			state++;
 			break;
@@ -7715,7 +8346,7 @@ test_1_7_iut(int child)
 	if (test_proving_sut(child, 1))
 		goto failure;
 	state++;
-	if (expect(child, LONGEST_WAIT, __EVENT_IUT_IN_SERVICE))
+	if (expect(child, INFINITE_WAIT, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -7723,8 +8354,8 @@ test_1_7_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_7_ptu = { preamble_link_power_on, test_1_7_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_7_iut = { preamble_link_power_on, test_1_7_iut, postamble_link_power_off };
+static struct test_stream test_case_1_7_ptu = { preamble_link_power_on, test_1_7_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_7_iut = { preamble_link_power_on, test_1_7_iut, postamble_link_in_service };
 
 #define test_case_1_7 { &test_case_1_7_ptu, &test_case_1_7_iut, NULL }
 
@@ -7779,9 +8410,6 @@ test_1_8a_iut(int child, int proving)
 	if (test_alignment_lpo_sut(child, proving, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_IUT_RPR))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -7806,10 +8434,10 @@ test_alignment_lpo_pt(int child, int proving, int result)
 		if (do_signal(child, __TEST_START))
 			goto failure;
 		state++;
-		if (do_signal(child, __STATUS_ALIGNMENT))
+		if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT))
+		if (do_signal(child, __STATUS_ALIGNMENT))
 			goto failure;
 		state++;
 		switch (proving) {
@@ -7889,9 +8517,6 @@ test_1_8b_ptu(int child, int proving)
 	if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -7900,9 +8525,6 @@ static int
 test_1_8b_iut(int child, int proving)
 {
 	if (test_alignment_lpo_pt(child, proving, __EVENT_IUT_RPO))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -7932,8 +8554,8 @@ test_1_8a_p_iut(int child)
 	return test_1_8a_iut(child, 1);
 }
 
-static struct test_stream test_case_1_8a_p_ptu = { preamble_link_power_on, test_1_8a_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_8a_p_iut = { preamble_link_power_on, test_1_8a_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_8a_p_ptu = { preamble_link_power_on, test_1_8a_p_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_8a_p_iut = { preamble_link_power_on, test_1_8a_p_iut, postamble_link_in_service };
 
 #define test_case_1_8a_p { &test_case_1_8a_p_ptu, &test_case_1_8a_p_iut, NULL }
 
@@ -7959,8 +8581,8 @@ test_1_8b_p_iut(int child)
 	return test_1_8b_iut(child, 1);
 }
 
-static struct test_stream test_case_1_8b_p_ptu = { preamble_link_power_on, test_1_8b_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_8b_p_iut = { preamble_link_power_on, test_1_8b_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_8b_p_ptu = { preamble_link_power_on, test_1_8b_p_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_8b_p_iut = { preamble_link_power_on, test_1_8b_p_iut, postamble_link_in_service };
 
 #define test_case_1_8b_p { &test_case_1_8b_p_ptu, &test_case_1_8b_p_iut, NULL }
 
@@ -7986,8 +8608,8 @@ test_1_8a_np_iut(int child)
 	return test_1_8a_iut(child, 0);
 }
 
-static struct test_stream test_case_1_8a_np_ptu = { preamble_link_power_on_np, test_1_8a_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_8a_np_iut = { preamble_link_power_on_np, test_1_8a_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_8a_np_ptu = { preamble_link_power_on_np, test_1_8a_np_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_8a_np_iut = { preamble_link_power_on_np, test_1_8a_np_iut, postamble_link_in_service };
 
 #define test_case_1_8a_np { &test_case_1_8a_np_ptu, &test_case_1_8a_np_iut, NULL }
 
@@ -8013,8 +8635,8 @@ test_1_8b_np_iut(int child)
 	return test_1_8b_iut(child, 0);
 }
 
-static struct test_stream test_case_1_8b_np_ptu = { preamble_link_power_on_np, test_1_8b_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_8b_np_iut = { preamble_link_power_on_np, test_1_8b_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_8b_np_ptu = { preamble_link_power_on_np, test_1_8b_np_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_8b_np_iut = { preamble_link_power_on_np, test_1_8b_np_iut, postamble_link_in_service };
 
 #define test_case_1_8b_np { &test_case_1_8b_np_ptu, &test_case_1_8b_np_iut, NULL }
 
@@ -8032,10 +8654,13 @@ test_1_9a_ptu(int child, int proving)
 	if (do_signal(child, __TEST_DATA))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_ACK))
+	if (expect(child, iutconf.sl.t7 * 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+		goto failure;
+	state++;
+	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8046,23 +8671,7 @@ test_1_9a_ptu(int child, int proving)
 static int
 test_1_9a_iut(int child, int proving)
 {
-	if (test_alignment_lpo_sut(child, proving, __EVENT_IUT_IN_SERVICE))
-		goto failure;
-	state++;
-	for (;;) {
-		switch (get_event(child)) {
-		case __EVENT_IUT_DATA:
-			state++;
-			break;
-		case __EVENT_IUT_RPR:
-			state++;
-			continue;
-		default:
-			goto failure;
-		}
-		break;
-	}
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (test_alignment_lpo_sut(child, proving, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8084,17 +8693,9 @@ test_1_9b_ptu(int child, int proving)
 	if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
 		goto failure;
 	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __TEST_DATA:
-		if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
-			goto failure;
-		/* fall through */
-	case __EVENT_NO_MSG:
-		state++;
-		break;
-	default:
+	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
-	}
+	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -8111,7 +8712,7 @@ test_1_9b_iut(int child, int proving)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPO))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (do_signal(child, __TEST_STOP))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8141,8 +8742,8 @@ test_1_9a_p_iut(int child)
 	return test_1_9a_iut(child, 1);
 }
 
-static struct test_stream test_case_1_9a_p_ptu = { preamble_link_power_on, test_1_9a_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_9a_p_iut = { preamble_link_power_on, test_1_9a_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_9a_p_ptu = { preamble_link_power_on, test_1_9a_p_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_9a_p_iut = { preamble_link_power_on, test_1_9a_p_iut, postamble_link_out_of_service };
 
 #define test_case_1_9a_p { &test_case_1_9a_p_ptu, &test_case_1_9a_p_iut, NULL }
 
@@ -8168,8 +8769,8 @@ test_1_9b_p_iut(int child)
 	return test_1_9b_iut(child, 1);
 }
 
-static struct test_stream test_case_1_9b_p_ptu = { preamble_link_power_on, test_1_9b_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_9b_p_iut = { preamble_link_power_on, test_1_9b_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_9b_p_ptu = { preamble_link_power_on, test_1_9b_p_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_9b_p_iut = { preamble_link_power_on, test_1_9b_p_iut, postamble_link_out_of_service };
 
 #define test_case_1_9b_p { &test_case_1_9b_p_ptu, &test_case_1_9b_p_iut, NULL }
 
@@ -8195,8 +8796,8 @@ test_1_9a_np_iut(int child)
 	return test_1_9a_iut(child, 0);
 }
 
-static struct test_stream test_case_1_9a_np_ptu = { preamble_link_power_on_np, test_1_9a_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_9a_np_iut = { preamble_link_power_on_np, test_1_9a_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_9a_np_ptu = { preamble_link_power_on_np, test_1_9a_np_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_9a_np_iut = { preamble_link_power_on_np, test_1_9a_np_iut, postamble_link_out_of_service };
 
 #define test_case_1_9a_np { &test_case_1_9a_np_ptu, &test_case_1_9a_np_iut, NULL }
 
@@ -8222,8 +8823,8 @@ test_1_9b_np_iut(int child)
 	return test_1_9b_iut(child, 0);
 }
 
-static struct test_stream test_case_1_9b_np_ptu = { preamble_link_power_on_np, test_1_9b_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_9b_np_iut = { preamble_link_power_on_np, test_1_9b_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_9b_np_ptu = { preamble_link_power_on_np, test_1_9b_np_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_9b_np_iut = { preamble_link_power_on_np, test_1_9b_np_iut, postamble_link_out_of_service };
 
 #define test_case_1_9b_np { &test_case_1_9b_np_ptu, &test_case_1_9b_np_iut, NULL }
 
@@ -8234,13 +8835,11 @@ Normal alignment with PO set and cleared\
 static int
 test_1_10_ptu(int child, int proving)
 {
-	if (test_alignment_pt(child, proving, __STATUS_IN_SERVICE))
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, proving, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8256,10 +8855,8 @@ test_1_10_iut(int child, int proving)
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
 	state++;
-	if (test_alignment_pt(child, proving, __EVENT_IUT_IN_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, proving, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8288,8 +8885,8 @@ test_1_10_p_iut(int child)
 	return test_1_10_iut(child, 1);
 }
 
-static struct test_stream test_case_1_10_p_ptu = { preamble_link_power_on, test_1_10_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_10_p_iut = { preamble_link_power_on, test_1_10_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_10_p_ptu = { preamble_link_power_on, test_1_10_p_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_10_p_iut = { preamble_link_power_on, test_1_10_p_iut, postamble_link_in_service };
 
 #define test_case_1_10_p { &test_case_1_10_p_ptu, &test_case_1_10_p_iut, NULL }
 
@@ -8314,8 +8911,8 @@ test_1_10_np_iut(int child)
 	return test_1_10_iut(child, 0);
 }
 
-static struct test_stream test_case_1_10_np_ptu = { preamble_link_power_on_np, test_1_10_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_10_np_iut = { preamble_link_power_on_np, test_1_10_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_10_np_ptu = { preamble_link_power_on_np, test_1_10_np_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_10_np_iut = { preamble_link_power_on_np, test_1_10_np_iut, postamble_link_in_service };
 
 #define test_case_1_10_np { &test_case_1_10_np_ptu, &test_case_1_10_np_iut, NULL }
 
@@ -8326,7 +8923,7 @@ Set RPO when \"Aligned not ready\"\
 static int
 test_1_11_ptu(int child, int proving)
 {
-	if (expect(child, LONG_WAIT, __STATUS_OUT_OF_SERVICE))
+	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POWER_ON))
@@ -8338,7 +8935,7 @@ test_1_11_ptu(int child, int proving)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT, __STATUS_ALIGNMENT))
+	if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_START))
@@ -8347,7 +8944,7 @@ test_1_11_ptu(int child, int proving)
 	if (do_signal(child, __STATUS_ALIGNMENT))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t4n * 20);
+	start_tt(iutconf.sl.t4n * 2);
 	state++;
 	switch (proving) {
 	case 0:
@@ -8357,7 +8954,7 @@ test_1_11_ptu(int child, int proving)
 		break;
 	case 1:
 		for (;;) {
-			switch (wait_event(child, LONG_WAIT)) {
+			switch (get_event(child)) {
 			case __MSG_PROVING:
 			case __STATUS_PROVING_EMERG:
 			case __STATUS_PROVING_NORMAL:
@@ -8378,7 +8975,7 @@ test_1_11_ptu(int child, int proving)
 		break;
 	case 2:
 		for (;;) {
-			switch (wait_event(child, LONG_WAIT)) {
+			switch (get_event(child)) {
 			case __MSG_PROVING:
 			case __STATUS_PROVING_EMERG:
 			case __STATUS_PROVING_NORMAL:
@@ -8422,7 +9019,7 @@ test_1_11_iut(int child, int proving)
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
-	if (expect(child, LONGEST_WAIT, __EVENT_IUT_RPO))
+	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPO))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8451,8 +9048,8 @@ test_1_11_p_iut(int child)
 	return test_1_11_iut(child, 1);
 }
 
-static struct test_stream test_case_1_11_p_ptu = { preamble_link_power_on, test_1_11_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_11_p_iut = { preamble_link_power_on, test_1_11_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_11_p_ptu = { preamble_link_power_on, test_1_11_p_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_11_p_iut = { preamble_link_power_on, test_1_11_p_iut, postamble_link_in_service };
 
 #define test_case_1_11_p { &test_case_1_11_p_ptu, &test_case_1_11_p_iut, NULL }
 
@@ -8477,8 +9074,8 @@ test_1_11_np_iut(int child)
 	return test_1_11_iut(child, 0);
 }
 
-static struct test_stream test_case_1_11_np_ptu = { preamble_link_power_on_np, test_1_11_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_11_np_iut = { preamble_link_power_on_np, test_1_11_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_11_np_ptu = { preamble_link_power_on_np, test_1_11_np_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_11_np_iut = { preamble_link_power_on_np, test_1_11_np_iut, postamble_link_in_service };
 
 #define test_case_1_11_np { &test_case_1_11_np_ptu, &test_case_1_11_np_iut, NULL }
 
@@ -8490,7 +9087,8 @@ Forward direction\
 static int
 test_1_12a_ptu(int child, int proving)
 {
-	if (test_alignment_pt(child, proving, __STATUS_PROCESSOR_OUTAGE))
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, proving, __STATUS_PROCESSOR_OUTAGE))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_STOP))
@@ -8500,9 +9098,6 @@ test_1_12a_ptu(int child, int proving)
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8548,8 +9143,8 @@ test_1_12a_p_iut(int child)
 	return test_1_12a_iut(child, 1);
 }
 
-static struct test_stream test_case_1_12a_p_ptu = { preamble_link_power_on, test_1_12a_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_12a_p_iut = { preamble_link_power_on, test_1_12a_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_12a_p_ptu = { preamble_link_power_on, test_1_12a_p_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_12a_p_iut = { preamble_link_power_on, test_1_12a_p_iut, postamble_link_out_of_service };
 
 #define test_case_1_12a_p { &test_case_1_12a_p_ptu, &test_case_1_12a_p_iut, NULL }
 
@@ -8575,8 +9170,8 @@ test_1_12a_np_iut(int child)
 	return test_1_12a_iut(child, 0);
 }
 
-static struct test_stream test_case_1_12a_np_ptu = { preamble_link_power_on_np, test_1_12a_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_12a_np_iut = { preamble_link_power_on_np, test_1_12a_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_12a_np_ptu = { preamble_link_power_on_np, test_1_12a_np_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_12a_np_iut = { preamble_link_power_on_np, test_1_12a_np_iut, postamble_link_out_of_service };
 
 #define test_case_1_12a_np { &test_case_1_12a_np_ptu, &test_case_1_12a_np_iut, NULL }
 
@@ -8597,7 +9192,7 @@ test_1_12b_ptu(int child, int proving)
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8614,12 +9209,6 @@ test_1_12b_iut(int child, int proving)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_STOP))
-		goto failure;
-	state++;
-	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8649,8 +9238,8 @@ test_1_12b_p_iut(int child)
 	return test_1_12b_iut(child, 1);
 }
 
-static struct test_stream test_case_1_12b_p_ptu = { preamble_link_power_on, test_1_12b_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_12b_p_iut = { preamble_link_power_on, test_1_12b_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_12b_p_ptu = { preamble_link_power_on, test_1_12b_p_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_12b_p_iut = { preamble_link_power_on, test_1_12b_p_iut, postamble_link_out_of_service };
 
 #define test_case_1_12b_p { &test_case_1_12b_p_ptu, &test_case_1_12b_p_iut, NULL }
 
@@ -8676,8 +9265,8 @@ test_1_12b_np_iut(int child)
 	return test_1_12b_iut(child, 0);
 }
 
-static struct test_stream test_case_1_12b_np_ptu = { preamble_link_power_on_np, test_1_12b_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_12b_np_iut = { preamble_link_power_on_np, test_1_12b_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_12b_np_ptu = { preamble_link_power_on_np, test_1_12b_np_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_12b_np_iut = { preamble_link_power_on_np, test_1_12b_np_iut, postamble_link_out_of_service };
 
 #define test_case_1_12b_np { &test_case_1_12b_np_ptu, &test_case_1_12b_np_iut, NULL }
 
@@ -8688,16 +9277,14 @@ SIO received when \"Aligned not ready\"\
 static int
 test_1_13_ptu(int child, int proving)
 {
-	if (test_alignment_pt(child, proving, __STATUS_PROCESSOR_OUTAGE))
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, proving, __STATUS_PROCESSOR_OUTAGE))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_ALIGNMENT))
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8714,9 +9301,6 @@ test_1_13_iut(int child, int proving)
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8745,8 +9329,8 @@ test_1_13_p_iut(int child)
 	return test_1_13_iut(child, 1);
 }
 
-static struct test_stream test_case_1_13_p_ptu = { preamble_link_power_on, test_1_13_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_13_p_iut = { preamble_link_power_on, test_1_13_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_13_p_ptu = { preamble_link_power_on, test_1_13_p_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_13_p_iut = { preamble_link_power_on, test_1_13_p_iut, postamble_link_out_of_service };
 
 #define test_case_1_13_p { &test_case_1_13_p_ptu, &test_case_1_13_p_iut, NULL }
 
@@ -8771,8 +9355,8 @@ test_1_13_np_iut(int child)
 	return test_1_13_iut(child, 0);
 }
 
-static struct test_stream test_case_1_13_np_ptu = { preamble_link_power_on_np, test_1_13_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_13_np_iut = { preamble_link_power_on_np, test_1_13_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_13_np_ptu = { preamble_link_power_on_np, test_1_13_np_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_13_np_iut = { preamble_link_power_on_np, test_1_13_np_iut, postamble_link_out_of_service };
 
 #define test_case_1_13_np { &test_case_1_13_np_ptu, &test_case_1_13_np_iut, NULL }
 
@@ -8788,13 +9372,11 @@ Set and clear LPO when \"Initial alignment\"\
 static int
 test_1_14_ptu(int child)
 {
-	if (test_alignment_pt(child, 1, __STATUS_IN_SERVICE))
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, 1, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8813,7 +9395,7 @@ test_1_14_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t4n * 10 / 2 - SHORT_WAIT);
+	start_tt(iutconf.sl.t4n / 2 - SHORT_WAIT);
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT))
 		goto failure;
@@ -8825,16 +9407,13 @@ test_1_14_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_14_ptu = { preamble_link_power_on, test_1_14_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_14_iut = { preamble_link_power_on, test_1_14_iut, postamble_link_power_off };
+static struct test_stream test_case_1_14_ptu = { preamble_link_power_on, test_1_14_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_14_iut = { preamble_link_power_on, test_1_14_iut, postamble_link_in_service };
 
 #define test_case_1_14 { &test_case_1_14_ptu, &test_case_1_14_iut, NULL }
 
@@ -8845,7 +9424,8 @@ Set and clear LPO when \"Aligned ready\"\
 static int
 test_1_15_ptu(int child, int proving)
 {
-	if (test_alignment_pt(child, proving, __STATUS_IN_SERVICE))
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, proving, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_IN_SERVICE))
@@ -8860,8 +9440,7 @@ test_1_15_ptu(int child, int proving)
 	if (do_signal(child, __STATUS_SEQUENCE_SYNC))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
+	test_msleep(child, 5000);
 	state++;
 	return __RESULT_SUCCESS;
       failure:
@@ -8879,16 +9458,12 @@ test_1_15_iut(int child, int proving)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	if (expect(child, 5000, __EVENT_NO_MSG))
-		goto failure;
+	test_msleep(child, 1000);
 	state++;
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
+	test_msleep(child, 4000);
 	state++;
 	return __RESULT_SUCCESS;
       failure:
@@ -8916,8 +9491,8 @@ test_1_15_p_iut(int child)
 	return test_1_15_iut(child, 1);
 }
 
-static struct test_stream test_case_1_15_p_ptu = { preamble_link_power_on, test_1_15_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_15_p_iut = { preamble_link_power_on, test_1_15_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_15_p_ptu = { preamble_link_power_on, test_1_15_p_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_15_p_iut = { preamble_link_power_on, test_1_15_p_iut, postamble_link_in_service };
 
 #define test_case_1_15_p { &test_case_1_15_p_ptu, &test_case_1_15_p_iut, NULL }
 
@@ -8942,8 +9517,8 @@ test_1_15_np_iut(int child)
 	return test_1_15_iut(child, 0);
 }
 
-static struct test_stream test_case_1_15_np_ptu = { preamble_link_power_on_np, test_1_15_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_15_np_iut = { preamble_link_power_on_np, test_1_15_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_15_np_ptu = { preamble_link_power_on_np, test_1_15_np_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_15_np_iut = { preamble_link_power_on_np, test_1_15_np_iut, postamble_link_in_service };
 
 #define test_case_1_15_np { &test_case_1_15_np_ptu, &test_case_1_15_np_iut, NULL }
 
@@ -8959,16 +9534,13 @@ test_1_16_ptu(int child, int proving)
 	if (test_alignment_lpo_sut(child, proving, __STATUS_PROCESSOR_OUTAGE))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t1 * 20);
-	beg_time = milliseconds(t1);
+	beg_time = milliseconds(child, t1);
+	start_tt(iutconf.sl.t1 * 2);
 	state++;
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (check_time(child, "T1  ", beg_time, timer[t1].lo, timer[t1].hi))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8980,9 +9552,6 @@ static int
 test_1_16_iut(int child, int proving)
 {
 	if (test_alignment_lpo_sut(child, proving, __EVENT_IUT_OUT_OF_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9011,8 +9580,8 @@ test_1_16_p_iut(int child)
 	return test_1_16_iut(child, 1);
 }
 
-static struct test_stream test_case_1_16_p_ptu = { preamble_link_power_on, test_1_16_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_16_p_iut = { preamble_link_power_on, test_1_16_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_16_p_ptu = { preamble_link_power_on, test_1_16_p_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_16_p_iut = { preamble_link_power_on, test_1_16_p_iut, postamble_link_out_of_service };
 
 #define test_case_1_16_p { &test_case_1_16_p_ptu, &test_case_1_16_p_iut, NULL }
 
@@ -9037,8 +9606,8 @@ test_1_16_np_iut(int child)
 	return test_1_16_iut(child, 0);
 }
 
-static struct test_stream test_case_1_16_np_ptu = { preamble_link_power_on_np, test_1_16_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_16_np_iut = { preamble_link_power_on_np, test_1_16_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_16_np_ptu = { preamble_link_power_on_np, test_1_16_np_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_16_np_iut = { preamble_link_power_on_np, test_1_16_np_iut, postamble_link_out_of_service };
 
 #define test_case_1_16_np { &test_case_1_16_np_ptu, &test_case_1_16_np_iut, NULL }
 
@@ -9075,7 +9644,7 @@ test_1_17_ptu(int child)
 		case __STATUS_PROVING_NORMAL:
 			state++;
 			if (!beg_time)
-				beg_time = dual_milliseconds(t3, t4n);
+				beg_time = dual_milliseconds(child, t3, t4n);
 			if (do_signal(child, last_event))
 				goto failure;
 			state++;
@@ -9084,7 +9653,7 @@ test_1_17_ptu(int child)
 		case __STATUS_IN_SERVICE:
 			state++;
 			print_more(child);
-			if (check_time("T3,4", beg_time, timer[t4n].lo, timer[t3].hi + timer[t4n].hi))
+			if (check_time(child, "T3,4", beg_time, timer[t4n].lo, timer[t3].hi + timer[t4n].hi))
 				goto failure;
 			state++;
 			break;
@@ -9093,7 +9662,7 @@ test_1_17_ptu(int child)
 		}
 		break;
 	}
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (do_signal(child, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9107,16 +9676,13 @@ test_1_17_iut(int child)
 	if (test_alignment_sut(child, 1, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_17_ptu = { preamble_link_power_on, test_1_17_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_17_iut = { preamble_link_power_on, test_1_17_iut, postamble_link_power_off };
+static struct test_stream test_case_1_17_ptu = { preamble_link_power_on, test_1_17_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_17_iut = { preamble_link_power_on, test_1_17_iut, postamble_link_in_service };
 
 #define test_case_1_17 { &test_case_1_17_ptu, &test_case_1_17_iut, NULL }
 
@@ -9140,7 +9706,7 @@ test_1_18_ptu(int child)
 	if (do_signal(child, __STATUS_PROVING_NORMAL))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t4n);
+	beg_time = milliseconds(child, t4n);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
@@ -9160,13 +9726,10 @@ test_1_18_ptu(int child)
 		}
 		break;
 	}
-	if (check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
+	if (check_time(child, "T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9185,16 +9748,13 @@ test_1_18_iut(int child)
 	if (test_alignment_sut(child, 1, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_18_ptu = { preamble_link_power_on, test_1_18_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_18_iut = { preamble_link_power_on, test_1_18_iut, postamble_link_power_off };
+static struct test_stream test_case_1_18_ptu = { preamble_link_power_on, test_1_18_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_18_iut = { preamble_link_power_on, test_1_18_iut, postamble_link_in_service };
 
 #define test_case_1_18 { &test_case_1_18_ptu, &test_case_1_18_iut, NULL }
 
@@ -9230,7 +9790,7 @@ test_1_19_ptu(int child)
 		case __MSG_PROVING:
 		case __STATUS_PROVING_EMERG:
 			if (!beg_time)
-				beg_time = milliseconds(t4e);
+				beg_time = milliseconds(child, t4e);
 			if (do_signal(child, last_event))
 				goto failure;
 			state++;
@@ -9239,7 +9799,7 @@ test_1_19_ptu(int child)
 		case __STATUS_IN_SERVICE:
 			state++;
 			print_more(child);
-			if (check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
+			if (check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
 				goto failure;
 			state++;
 			break;
@@ -9249,9 +9809,6 @@ test_1_19_ptu(int child)
 		break;
 	}
 	if (do_signal(child, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9274,16 +9831,13 @@ test_1_19_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_19_ptu = { preamble_link_power_on, test_1_19_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_19_iut = { preamble_link_power_on, test_1_19_iut, postamble_link_power_off };
+static struct test_stream test_case_1_19_ptu = { preamble_link_power_on, test_1_19_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_19_iut = { preamble_link_power_on, test_1_19_iut, postamble_link_in_service };
 
 #define test_case_1_19 { &test_case_1_19_ptu, &test_case_1_19_iut, NULL }
 
@@ -9312,7 +9866,7 @@ test_1_20_ptu(int child)
 		switch (get_event(child)) {
 		case __MSG_PROVING:
 			if (!beg_time)
-				beg_time = milliseconds(t4e);
+				beg_time = milliseconds(child, t4e);
 			if (do_signal(child, __MSG_PROVING))
 				goto failure;
 			state++;
@@ -9326,7 +9880,7 @@ test_1_20_ptu(int child)
 			continue;
 		case __STATUS_PROVING_EMERG:
 			if (!beg_time)
-				beg_time = milliseconds(t4e);
+				beg_time = milliseconds(child, t4e);
 			if (do_signal(child, __STATUS_PROVING_NORMAL))
 				goto failure;
 			state++;
@@ -9335,7 +9889,7 @@ test_1_20_ptu(int child)
 		case __STATUS_IN_SERVICE:
 			state++;
 			print_more(child);
-			if (check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
+			if (check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
 				goto failure;
 			state++;
 			break;
@@ -9345,9 +9899,6 @@ test_1_20_ptu(int child)
 		break;
 	}
 	if (do_signal(child, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9367,17 +9918,14 @@ test_1_20_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	print_more(child);
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_20_ptu = { preamble_link_power_on, test_1_20_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_20_iut = { preamble_link_power_on, test_1_20_iut, postamble_link_power_off };
+static struct test_stream test_case_1_20_ptu = { preamble_link_power_on, test_1_20_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_20_iut = { preamble_link_power_on, test_1_20_iut, postamble_link_in_service };
 
 #define test_case_1_20 { &test_case_1_20_ptu, &test_case_1_20_iut, NULL }
 
@@ -9421,9 +9969,6 @@ test_1_21_ptu(int child)
 	if (test_in_service(child, 2))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -9437,16 +9982,13 @@ test_1_21_iut(int child)
 	if (test_in_service(child, 2))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_21_ptu = { preamble_link_power_on, test_1_21_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_21_iut = { preamble_link_power_on, test_1_21_iut, postamble_link_power_off };
+static struct test_stream test_case_1_21_ptu = { preamble_link_power_on, test_1_21_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_21_iut = { preamble_link_power_on, test_1_21_iut, postamble_link_in_service };
 
 #define test_case_1_21 { &test_case_1_21_ptu, &test_case_1_21_iut, NULL }
 
@@ -9468,9 +10010,6 @@ test_1_22_ptu(int child)
 	if (test_in_service(child, 2))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -9481,16 +10020,13 @@ test_1_22_iut(int child)
 	if (test_in_service(child, 1))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_22_ptu = { preamble_link_power_on, test_1_22_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_22_iut = { preamble_link_power_on, test_1_22_iut, postamble_link_power_off };
+static struct test_stream test_case_1_22_ptu = { preamble_link_power_on, test_1_22_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_22_iut = { preamble_link_power_on, test_1_22_iut, postamble_link_in_service };
 
 #define test_case_1_22 { &test_case_1_22_ptu, &test_case_1_22_iut, NULL }
 
@@ -9519,7 +10055,7 @@ test_1_23_ptu(int child)
 		switch (get_event(child)) {
 		case __STATUS_PROVING_EMERG:
 			if (!beg_time)
-				beg_time = milliseconds(t4e);
+				beg_time = milliseconds(child, t4e);
 		case __MSG_PROVING:
 		case __STATUS_PROVING_NORMAL:
 			if (do_signal(child, __STATUS_PROVING_NORMAL))
@@ -9530,7 +10066,7 @@ test_1_23_ptu(int child)
 		case __STATUS_IN_SERVICE:
 			state++;
 			print_more(child);
-			if (check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
+			if (check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
 				goto failure;
 			state++;
 			break;
@@ -9540,9 +10076,6 @@ test_1_23_ptu(int child)
 		break;
 	}
 	if (do_signal(child, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9557,7 +10090,7 @@ test_1_23_iut(int child)
 		goto failure;
 	state++;
 	/* send in the middle of the normal proving period */
-	if (expect(child, iutconf.sl.t4n * 10 / 2, __EVENT_NO_MSG))
+	if (expect(child, iutconf.sl.t4n / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_EMERG))
@@ -9566,16 +10099,13 @@ test_1_23_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_23_ptu = { preamble_link_power_on, test_1_23_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_23_iut = { preamble_link_power_on, test_1_23_iut, postamble_link_power_off };
+static struct test_stream test_case_1_23_ptu = { preamble_link_power_on, test_1_23_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_23_iut = { preamble_link_power_on, test_1_23_iut, postamble_link_in_service };
 
 #define test_case_1_23 { &test_case_1_23_ptu, &test_case_1_23_iut, NULL }
 
@@ -9612,7 +10142,7 @@ test_1_24_ptu(int child)
 		case __STATUS_PROVING_EMERG:
 			state++;
 			if (!beg_time)
-				beg_time = dual_milliseconds(t3, t4e);
+				beg_time = dual_milliseconds(child, t3, t4e);
 			if (do_signal(child, last_event))
 				goto failure;
 			state++;
@@ -9621,7 +10151,7 @@ test_1_24_ptu(int child)
 		case __STATUS_IN_SERVICE:
 			state++;
 			print_more(child);
-			if (check_time("T3,4", beg_time, timer[t4e].lo, timer[t3].hi + timer[t4e].hi))
+			if (check_time(child, "T3,4", beg_time, timer[t4e].lo, timer[t3].hi + timer[t4e].hi))
 				goto failure;
 			state++;
 			break;
@@ -9630,7 +10160,7 @@ test_1_24_ptu(int child)
 		}
 		break;
 	}
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (do_signal(child, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9647,16 +10177,13 @@ test_1_24_iut(int child)
 	if (test_alignment_sut(child, 1, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_24_ptu = { preamble_link_power_on, test_1_24_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_24_iut = { preamble_link_power_on, test_1_24_iut, postamble_link_power_off };
+static struct test_stream test_case_1_24_ptu = { preamble_link_power_on, test_1_24_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_24_iut = { preamble_link_power_on, test_1_24_iut, postamble_link_in_service };
 
 #define test_case_1_24 { &test_case_1_24_ptu, &test_case_1_24_iut, NULL }
 
@@ -9678,9 +10205,6 @@ test_1_25_ptu(int child)
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -9697,16 +10221,13 @@ test_1_25_iut(int child)
 	if (do_signal(child, __TEST_STOP))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_25_ptu = { preamble_link_power_on, test_1_25_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_25_iut = { preamble_link_power_on, test_1_25_iut, postamble_link_power_off };
+static struct test_stream test_case_1_25_ptu = { preamble_link_power_on, test_1_25_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_25_iut = { preamble_link_power_on, test_1_25_iut, postamble_link_out_of_service };
 
 #define test_case_1_25 { &test_case_1_25_ptu, &test_case_1_25_iut, NULL }
 
@@ -9744,9 +10265,6 @@ test_1_26_ptu(int child)
 		}
 		break;
 	}
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	print_more(child);
@@ -9764,16 +10282,13 @@ test_1_26_iut(int child)
 	if (do_signal(child, __TEST_STOP))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_26_ptu = { preamble_link_power_on, test_1_26_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_26_iut = { preamble_link_power_on, test_1_26_iut, postamble_link_power_off };
+static struct test_stream test_case_1_26_ptu = { preamble_link_power_on, test_1_26_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_26_iut = { preamble_link_power_on, test_1_26_iut, postamble_link_out_of_service };
 
 #define test_case_1_26 { &test_case_1_26_ptu, &test_case_1_26_iut, NULL }
 
@@ -9793,9 +10308,6 @@ test_1_27_ptu(int child, int proving)
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -9807,9 +10319,6 @@ test_1_27_iut(int child, int proving)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_STOP))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9838,8 +10347,8 @@ test_1_27_p_iut(int child)
 	return test_1_27_iut(child, 1);
 }
 
-static struct test_stream test_case_1_27_p_ptu = { preamble_link_power_on, test_1_27_p_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_27_p_iut = { preamble_link_power_on, test_1_27_p_iut, postamble_link_power_off };
+static struct test_stream test_case_1_27_p_ptu = { preamble_link_power_on, test_1_27_p_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_27_p_iut = { preamble_link_power_on, test_1_27_p_iut, postamble_link_out_of_service };
 
 #define test_case_1_27_p { &test_case_1_27_p_ptu, &test_case_1_27_p_iut, NULL }
 
@@ -9864,8 +10373,8 @@ test_1_27_np_iut(int child)
 	return test_1_27_iut(child, 0);
 }
 
-static struct test_stream test_case_1_27_np_ptu = { preamble_link_power_on_np, test_1_27_np_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_27_np_iut = { preamble_link_power_on_np, test_1_27_np_iut, postamble_link_power_off };
+static struct test_stream test_case_1_27_np_ptu = { preamble_link_power_on_np, test_1_27_np_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_27_np_iut = { preamble_link_power_on_np, test_1_27_np_iut, postamble_link_out_of_service };
 
 #define test_case_1_27_np { &test_case_1_27_np_ptu, &test_case_1_27_np_iut, NULL }
 
@@ -9887,7 +10396,7 @@ test_1_28_ptu(int child)
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9900,16 +10409,13 @@ test_1_28_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_28_ptu = { preamble_link_in_service, test_1_28_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_28_iut = { preamble_link_in_service, test_1_28_iut, postamble_link_power_off };
+static struct test_stream test_case_1_28_ptu = { preamble_link_in_service, test_1_28_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_28_iut = { preamble_link_in_service, test_1_28_iut, postamble_link_out_of_service };
 
 #define test_case_1_28 { &test_case_1_28_ptu, &test_case_1_28_iut, NULL }
 
@@ -9950,8 +10456,8 @@ test_1_29a_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_29a_ptu = { preamble_link_in_service, test_1_29a_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_29a_iut = { preamble_link_in_service, test_1_29a_iut, postamble_link_power_off };
+static struct test_stream test_case_1_29a_ptu = { preamble_link_in_service, test_1_29a_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_29a_iut = { preamble_link_in_service, test_1_29a_iut, postamble_link_out_of_service };
 
 #define test_case_1_29a { &test_case_1_29a_ptu, &test_case_1_29a_iut, NULL }
 
@@ -9984,16 +10490,13 @@ test_1_29b_iut(int child)
 	if (do_signal(child, __TEST_STOP))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_29b_ptu = { preamble_link_in_service, test_1_29b_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_29b_iut = { preamble_link_in_service, test_1_29b_iut, postamble_link_power_off };
+static struct test_stream test_case_1_29b_ptu = { preamble_link_in_service, test_1_29b_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_29b_iut = { preamble_link_in_service, test_1_29b_iut, postamble_link_out_of_service };
 
 #define test_case_1_29b { &test_case_1_29b_ptu, &test_case_1_29b_iut, NULL }
 
@@ -10016,9 +10519,6 @@ test_1_30a_ptu(int child)
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -10029,12 +10529,7 @@ test_1_30a_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
 	if (do_signal(child, __TEST_STOP))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -10042,8 +10537,8 @@ test_1_30a_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_30a_ptu = { preamble_link_in_service, test_1_30a_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_30a_iut = { preamble_link_in_service, test_1_30a_iut, postamble_link_power_off };
+static struct test_stream test_case_1_30a_ptu = { preamble_link_in_service, test_1_30a_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_30a_iut = { preamble_link_in_service, test_1_30a_iut, postamble_link_out_of_service };
 
 #define test_case_1_30a { &test_case_1_30a_ptu, &test_case_1_30a_iut, NULL }
 
@@ -10093,8 +10588,8 @@ test_1_30b_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_30b_ptu = { preamble_link_in_service, test_1_30b_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_30b_iut = { preamble_link_in_service, test_1_30b_iut, postamble_link_power_off };
+static struct test_stream test_case_1_30b_ptu = { preamble_link_in_service, test_1_30b_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_30b_iut = { preamble_link_in_service, test_1_30b_iut, postamble_link_out_of_service };
 
 #define test_case_1_30b { &test_case_1_30b_ptu, &test_case_1_30b_iut, NULL }
 
@@ -10141,8 +10636,8 @@ test_1_31a_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_31a_ptu = { preamble_link_in_service, test_1_31a_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_31a_iut = { preamble_link_in_service, test_1_31a_iut, postamble_link_power_off };
+static struct test_stream test_case_1_31a_ptu = { preamble_link_in_service, test_1_31a_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_31a_iut = { preamble_link_in_service, test_1_31a_iut, postamble_link_out_of_service };
 
 #define test_case_1_31a { &test_case_1_31a_ptu, &test_case_1_31a_iut, NULL }
 
@@ -10181,8 +10676,6 @@ test_1_31b_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
 	state++;
@@ -10191,8 +10684,8 @@ test_1_31b_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_31b_ptu = { preamble_link_in_service, test_1_31b_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_31b_iut = { preamble_link_in_service, test_1_31b_iut, postamble_link_power_off };
+static struct test_stream test_case_1_31b_ptu = { preamble_link_in_service, test_1_31b_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_31b_iut = { preamble_link_in_service, test_1_31b_iut, postamble_link_out_of_service };
 
 #define test_case_1_31b { &test_case_1_31b_ptu, &test_case_1_31b_iut, NULL }
 
@@ -10215,7 +10708,7 @@ test_1_32a_ptu(int child)
 	if (do_signal(child, last_event))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t4n * 10 / 2);
+	start_tt(iutconf.sl.t4n / 2);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
@@ -10265,8 +10758,8 @@ test_1_32a_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_32a_ptu = { preamble_link_power_on, test_1_32a_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_32a_iut = { preamble_link_power_on, test_1_32a_iut, postamble_link_power_off };
+static struct test_stream test_case_1_32a_ptu = { preamble_link_power_on, test_1_32a_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_32a_iut = { preamble_link_power_on, test_1_32a_iut, postamble_link_out_of_service };
 
 #define test_case_1_32a { &test_case_1_32a_ptu, &test_case_1_32a_iut, NULL }
 
@@ -10283,7 +10776,8 @@ Reverse direction\
 static int
 test_1_32b_ptu(int child)
 {
-	if (test_alignment_pt(child, 1, __STATUS_OUT_OF_SERVICE))
+	/* FIXME: should be test_alignement_pt() */
+	if (test_alignment_sut(child, 1, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_OUT_OF_SERVICE))
@@ -10296,7 +10790,10 @@ test_1_32b_ptu(int child)
 static int
 test_1_32b_iut(int child)
 {
-	if (expect(child, iutconf.sl.t4n * 10 / 2, __EVENT_NO_MSG))
+	if (do_signal(child, __TEST_START))
+		goto failure;
+	state++;
+	if (expect(child, iutconf.sl.t4n / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_STOP))
@@ -10307,8 +10804,8 @@ test_1_32b_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_32b_ptu = { preamble_link_power_on, test_1_32b_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_32b_iut = { preamble_link_power_on, test_1_32b_iut, postamble_link_power_off };
+static struct test_stream test_case_1_32b_ptu = { preamble_link_power_on, test_1_32b_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_32b_iut = { preamble_link_power_on, test_1_32b_iut, postamble_link_out_of_service };
 
 #define test_case_1_32b { &test_case_1_32b_ptu, &test_case_1_32b_iut, NULL }
 
@@ -10348,8 +10845,8 @@ test_1_33_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_33_ptu = { preamble_link_power_on, test_1_33_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_33_iut = { preamble_link_power_on, test_1_33_iut, postamble_link_power_off };
+static struct test_stream test_case_1_33_ptu = { preamble_link_power_on, test_1_33_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_33_iut = { preamble_link_power_on, test_1_33_iut, postamble_link_out_of_service };
 
 #define test_case_1_33 { &test_case_1_33_ptu, &test_case_1_33_iut, NULL }
 
@@ -10389,8 +10886,8 @@ test_1_34_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_34_ptu = { preamble_link_power_on, test_1_34_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_34_iut = { preamble_link_power_on, test_1_34_iut, postamble_link_power_off };
+static struct test_stream test_case_1_34_ptu = { preamble_link_power_on, test_1_34_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_1_34_iut = { preamble_link_power_on, test_1_34_iut, postamble_link_out_of_service };
 
 #define test_case_1_34 { &test_case_1_34_ptu, &test_case_1_34_iut, NULL }
 
@@ -10430,8 +10927,8 @@ test_1_35_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_1_35_ptu = { preamble_link_power_on, test_1_35_ptu, postamble_link_power_off };
-static struct test_stream test_case_1_35_iut = { preamble_link_power_on, test_1_35_iut, postamble_link_power_off };
+static struct test_stream test_case_1_35_ptu = { preamble_link_power_on, test_1_35_ptu, postamble_link_in_service };
+static struct test_stream test_case_1_35_iut = { preamble_link_power_on, test_1_35_iut, postamble_link_in_service };
 
 #define test_case_1_35 { &test_case_1_35_ptu, &test_case_1_35_iut, NULL }
 
@@ -10552,8 +11049,8 @@ test_2_1_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_2_1_ptu = { preamble_link_power_on, test_2_1_ptu, postamble_link_power_off };
-static struct test_stream test_case_2_1_iut = { preamble_link_power_on, test_2_1_iut, postamble_link_power_off };
+static struct test_stream test_case_2_1_ptu = { preamble_link_power_on, test_2_1_ptu, postamble_link_in_service };
+static struct test_stream test_case_2_1_iut = { preamble_link_power_on, test_2_1_iut, postamble_link_in_service };
 
 #define test_case_2_1 { &test_case_2_1_ptu, &test_case_2_1_iut, NULL }
 
@@ -10654,8 +11151,8 @@ test_2_2_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_2_2_ptu = { preamble_link_power_on, test_2_2_ptu, postamble_link_power_off };
-static struct test_stream test_case_2_2_iut = { preamble_link_power_on, test_2_2_iut, postamble_link_power_off };
+static struct test_stream test_case_2_2_ptu = { preamble_link_power_on, test_2_2_ptu, postamble_link_in_service };
+static struct test_stream test_case_2_2_iut = { preamble_link_power_on, test_2_2_iut, postamble_link_in_service };
 
 #define test_case_2_2 { &test_case_2_2_ptu, &test_case_2_2_iut, NULL }
 
@@ -10765,8 +11262,8 @@ test_2_3_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_2_3_ptu = { preamble_link_power_on, test_2_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_2_3_iut = { preamble_link_power_on, test_2_3_iut, postamble_link_power_off };
+static struct test_stream test_case_2_3_ptu = { preamble_link_power_on, test_2_3_ptu, postamble_link_in_service };
+static struct test_stream test_case_2_3_iut = { preamble_link_power_on, test_2_3_iut, postamble_link_in_service };
 
 #define test_case_2_3 { &test_case_2_3_ptu, &test_case_2_3_iut, NULL }
 
@@ -10856,7 +11353,7 @@ test_2_4_iut(int child)
 		goto failure;
 	state++;
 	/* wait for half of proving period */
-	if (expect(child, iutconf.sl.t4n * 10 / 2, __EVENT_NO_MSG))
+	if (expect(child, iutconf.sl.t4n / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CEASE))
@@ -10873,8 +11370,8 @@ test_2_4_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_2_4_ptu = { preamble_link_power_on, test_2_4_ptu, postamble_link_power_off };
-static struct test_stream test_case_2_4_iut = { preamble_link_power_on, test_2_4_iut, postamble_link_power_off };
+static struct test_stream test_case_2_4_ptu = { preamble_link_power_on, test_2_4_ptu, postamble_link_in_service };
+static struct test_stream test_case_2_4_iut = { preamble_link_power_on, test_2_4_iut, postamble_link_in_service };
 
 #define test_case_2_4 { &test_case_2_4_ptu, &test_case_2_4_iut, NULL }
 
@@ -10936,8 +11433,8 @@ test_2_5_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_2_5_ptu = { preamble_link_power_on, test_2_5_ptu, postamble_link_power_off };
-static struct test_stream test_case_2_5_iut = { preamble_link_power_on, test_2_5_iut, postamble_link_power_off };
+static struct test_stream test_case_2_5_ptu = { preamble_link_power_on, test_2_5_ptu, postamble_link_in_service };
+static struct test_stream test_case_2_5_iut = { preamble_link_power_on, test_2_5_iut, postamble_link_in_service };
 
 #define test_case_2_5 { &test_case_2_5_ptu, &test_case_2_5_iut, NULL }
 
@@ -11003,15 +11500,13 @@ test_2_6_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_2_6_ptu = { preamble_link_power_on, test_2_6_ptu, postamble_link_power_off };
-static struct test_stream test_case_2_6_iut = { preamble_link_power_on, test_2_6_iut, postamble_link_power_off };
+static struct test_stream test_case_2_6_ptu = { preamble_link_power_on, test_2_6_ptu, postamble_link_in_service };
+static struct test_stream test_case_2_6_iut = { preamble_link_power_on, test_2_6_iut, postamble_link_in_service };
 
 #define test_case_2_6 { &test_case_2_6_ptu, &test_case_2_6_iut, NULL }
 
@@ -11028,9 +11523,6 @@ static int
 test_2_7_ptu(int child)
 {
 	if (do_signal(child, __STATUS_INVALID_STATUS))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -11052,16 +11544,13 @@ test_2_7_iut(int child)
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __EVENT_IUT_IN_SERVICE))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_2_7_ptu = { preamble_link_in_service, test_2_7_ptu, postamble_link_power_off };
-static struct test_stream test_case_2_7_iut = { preamble_link_in_service, test_2_7_iut, postamble_link_power_off };
+static struct test_stream test_case_2_7_ptu = { preamble_link_in_service, test_2_7_ptu, postamble_link_in_service };
+static struct test_stream test_case_2_7_iut = { preamble_link_in_service, test_2_7_iut, postamble_link_in_service };
 
 #define test_case_2_7 { &test_case_2_7_ptu, &test_case_2_7_iut, NULL }
 
@@ -11095,9 +11584,6 @@ test_2_8_ptu(int child)
 	if (do_signal(child, __STATUS_BUSY_ENDED))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -11108,8 +11594,6 @@ test_2_8_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
 	if (do_signal(child, __TEST_EMERG))
 		goto failure;
 	state++;
@@ -11119,16 +11603,13 @@ test_2_8_iut(int child)
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_2_8_ptu = { preamble_link_in_service, test_2_8_ptu, postamble_link_power_off };
-static struct test_stream test_case_2_8_iut = { preamble_link_in_service, test_2_8_iut, postamble_link_power_off };
+static struct test_stream test_case_2_8_ptu = { preamble_link_in_service, test_2_8_ptu, postamble_link_in_service };
+static struct test_stream test_case_2_8_iut = { preamble_link_in_service, test_2_8_iut, postamble_link_in_service };
 
 #define test_case_2_8 { &test_case_2_8_ptu, &test_case_2_8_iut, NULL }
 
@@ -11149,22 +11630,16 @@ test_3_1_ptu(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_TX_BREAK))
-		return __RESULT_INCONCLUSIVE;
-	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
-		goto make_failure;
+		goto inconclusive;
 	state++;
 	if (do_signal(child, __TEST_TX_MAKE))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
-      make_failure:
-	do_signal(child, __TEST_TX_MAKE);
       failure:
 	return __RESULT_FAILURE;
+      inconclusive:
+	return __RESULT_INCONCLUSIVE;
 }
 static int
 test_3_1_iut(int child)
@@ -11177,8 +11652,8 @@ test_3_1_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_3_1_ptu = { preamble_link_power_on, test_3_1_ptu, postamble_link_power_off };
-static struct test_stream test_case_3_1_iut = { preamble_link_power_on, test_3_1_iut, postamble_link_power_off };
+static struct test_stream test_case_3_1_ptu = { preamble_link_power_on, test_3_1_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_3_1_iut = { preamble_link_power_on, test_3_1_iut, postamble_link_out_of_service };
 
 #define test_case_3_1 { &test_case_3_1_ptu, &test_case_3_1_iut, NULL }
 
@@ -11197,6 +11672,12 @@ test_3_2_ptu(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
 		goto notappl;
 	}
 	if (do_signal(child, __TEST_BAD_ACK))
@@ -11223,6 +11704,9 @@ test_3_2_iut(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
+		if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
+			goto failure;
+		state++;
 		goto notappl;
 	}
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
@@ -11235,8 +11719,8 @@ test_3_2_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_3_2_ptu = { preamble_link_in_service, test_3_2_ptu, postamble_link_power_off };
-static struct test_stream test_case_3_2_iut = { preamble_link_in_service, test_3_2_iut, postamble_link_power_off };
+static struct test_stream test_case_3_2_ptu = { preamble_link_in_service, test_3_2_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_3_2_iut = { preamble_link_in_service, test_3_2_iut, postamble_link_out_of_service };
 
 #define test_case_3_2 { &test_case_3_2_ptu, &test_case_3_2_iut, NULL }
 
@@ -11258,13 +11742,7 @@ test_3_3_ptu(int child)
 	if (do_signal(child, __TEST_TX_BREAK))
 		goto inconclusive;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_TX_MAKE))
-		goto failure;
-	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -11284,8 +11762,8 @@ test_3_3_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_3_3_ptu = { preamble_link_power_on, test_3_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_3_3_iut = { preamble_link_power_on, test_3_3_iut, postamble_link_power_off };
+static struct test_stream test_case_3_3_ptu = { preamble_link_power_on, test_3_3_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_3_3_iut = { preamble_link_power_on, test_3_3_iut, postamble_link_out_of_service };
 
 #define test_case_3_3 { &test_case_3_3_ptu, &test_case_3_3_iut, NULL }
 
@@ -11304,6 +11782,12 @@ test_3_4_ptu(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
 		goto notappl;
 	}
 	if (test_alignment_lpo_sut(child, 1, __STATUS_PROCESSOR_OUTAGE))
@@ -11348,8 +11832,8 @@ test_3_4_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_3_4_ptu = { preamble_link_power_on, test_3_4_ptu, postamble_link_power_off };
-static struct test_stream test_case_3_4_iut = { preamble_link_power_on, test_3_4_iut, postamble_link_power_off };
+static struct test_stream test_case_3_4_ptu = { preamble_link_power_on, test_3_4_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_3_4_iut = { preamble_link_power_on, test_3_4_iut, postamble_link_out_of_service };
 
 #define test_case_3_4 { &test_case_3_4_ptu, &test_case_3_4_iut, NULL }
 
@@ -11368,13 +11852,7 @@ test_3_5_ptu(int child)
 	if (do_signal(child, __TEST_TX_BREAK))
 		goto inconclusive;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_TX_MAKE))
-		goto failure;
-	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -11394,8 +11872,8 @@ test_3_5_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_3_5_ptu = { preamble_link_in_service, test_3_5_ptu, postamble_link_power_off };
-static struct test_stream test_case_3_5_iut = { preamble_link_in_service, test_3_5_iut, postamble_link_power_off };
+static struct test_stream test_case_3_5_ptu = { preamble_link_in_service, test_3_5_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_3_5_iut = { preamble_link_in_service, test_3_5_iut, postamble_link_out_of_service };
 
 #define test_case_3_5 { &test_case_3_5_ptu, &test_case_3_5_iut, NULL }
 
@@ -11414,6 +11892,12 @@ test_3_6_ptu(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
 		goto notappl;
 	}
 	if (do_signal(child, __TEST_BAD_ACK))
@@ -11455,8 +11939,8 @@ test_3_6_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_3_6_ptu = { preamble_link_in_service, test_3_6_ptu, postamble_link_power_off };
-static struct test_stream test_case_3_6_iut = { preamble_link_in_service, test_3_6_iut, postamble_link_power_off };
+static struct test_stream test_case_3_6_ptu = { preamble_link_in_service, test_3_6_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_3_6_iut = { preamble_link_in_service, test_3_6_iut, postamble_link_out_of_service };
 
 #define test_case_3_6 { &test_case_3_6_ptu, &test_case_3_6_iut, NULL }
 
@@ -11478,13 +11962,7 @@ test_3_7_ptu(int child)
 	if (do_signal(child, __TEST_TX_BREAK))
 		goto inconclusive;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_TX_MAKE))
-		goto failure;
-	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -11499,8 +11977,6 @@ test_3_7_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
 	state++;
@@ -11509,8 +11985,8 @@ test_3_7_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_3_7_ptu = { preamble_link_in_service, test_3_7_ptu, postamble_link_power_off };
-static struct test_stream test_case_3_7_iut = { preamble_link_in_service, test_3_7_iut, postamble_link_power_off };
+static struct test_stream test_case_3_7_ptu = { preamble_link_in_service, test_3_7_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_3_7_iut = { preamble_link_in_service, test_3_7_iut, postamble_link_out_of_service };
 
 #define test_case_3_7 { &test_case_3_7_ptu, &test_case_3_7_iut, NULL }
 
@@ -11529,6 +12005,12 @@ test_3_8_ptu(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
 		goto notappl;
 	}
 	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_OUTAGE))
@@ -11561,12 +12043,13 @@ test_3_8_iut(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
+		if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
+			goto failure;
+		state++;
 		goto notappl;
 	}
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
-	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
@@ -11578,8 +12061,8 @@ test_3_8_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_3_8_ptu = { preamble_link_in_service, test_3_8_ptu, postamble_link_power_off };
-static struct test_stream test_case_3_8_iut = { preamble_link_in_service, test_3_8_iut, postamble_link_power_off };
+static struct test_stream test_case_3_8_ptu = { preamble_link_in_service, test_3_8_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_3_8_iut = { preamble_link_in_service, test_3_8_iut, postamble_link_out_of_service };
 
 #define test_case_3_8 { &test_case_3_8_ptu, &test_case_3_8_iut, NULL }
 
@@ -11597,7 +12080,7 @@ Forward direction\
 static int
 test_4_1a_11_ptu(int child)
 {
-	int dat = 0, msu = 0;
+	int dat = 0, msu = 0, rpo = 0;
 
 	if (do_signal(child, __TEST_DATA))
 		goto failure;
@@ -11609,17 +12092,21 @@ test_4_1a_11_ptu(int child)
 				if (do_signal(child, __TEST_DATA))
 					goto failure;
 				state++;
-				start_tt(iutconf.sl.t7 * 10 / 2);
+				start_tt(iutconf.sl.t7 / 2);
+				bsn[0] = fsn[1];
+				if (do_signal(child, __TEST_ACK))
+					goto failure;
+				state++;
 				break;
 			}
-			bsn[0] = fsn[1];
-			if (do_signal(child, __TEST_ACK))
-				goto failure;
-			state++;
-			continue;
+			goto failure;
 		case __TEST_ACK:
 			if (++dat <= 1)
 				continue;
+			goto failure;
+		case __STATUS_PROCESSOR_OUTAGE:
+			if (++rpo == 1)
+				break;
 			goto failure;
 		default:
 			goto failure;
@@ -11629,29 +12116,44 @@ test_4_1a_11_ptu(int child)
 	for (;;) {
 		switch (get_event(child)) {
 		case __TEST_DATA:
-			if (++msu == 2) {
-				bsn[0]++;
-				if (do_signal(child, __TEST_ACK))
-					goto failure;
-				state++;
-				break;
-			}
-			continue;
+			bsn[0] = fsn[1];
+			if (do_signal(child, __TEST_ACK))
+				goto failure;
+			state++;
+			break;
 		case __TEST_ACK:
 			if (++dat <= 1)
 				continue;
+			goto failure;
+		case __STATUS_PROCESSOR_OUTAGE:
+			if (++rpo == 1)
+				break;
 			goto failure;
 		default:
 			goto failure;
 		}
 		break;
 	}
-	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_OUTAGE))
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA))
-		goto failure;
-	state++;
+	for (;;) {
+		switch (get_event(child)) {
+		case __TEST_DATA:
+			goto failure;
+		case __TEST_ACK:
+			if (++dat <= 1)
+				continue;
+			goto failure;
+		case __STATUS_PROCESSOR_OUTAGE:
+			if (++rpo == 1)
+				break;
+			goto failure;
+		default:
+			goto failure;
+		}
+		break;
+	}
+	if (dat == 0)
+		if (expect(child, INFINITE_WAIT, __TEST_ACK))
+			goto failure;
 	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_ENDED))
 		goto failure;
 	state++;
@@ -11695,16 +12197,15 @@ test_4_1a_11_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
-	test_msleep(child, NORMAL_WAIT);
+	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
+		goto failure;
+	state++;
+	expect(child, LONGEST_WAIT, __EVENT_NO_MSG);
 	state++;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
-		goto failure;
-	state++;
-	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
-		goto failure;
+	expect(child, LONGEST_WAIT, __EVENT_NO_MSG);
 	state++;
 	if (do_signal(child, __TEST_CLEARB))
 		goto failure;
@@ -11736,7 +12237,7 @@ test_4_1a_other_ptu(int child)
 				if (do_signal(child, __TEST_DATA))
 					goto failure;
 				state++;
-				start_tt(iutconf.sl.t7 * 10 / 2);
+				start_tt(iutconf.sl.t7 / 2);
 				break;
 			}
 			switch (m2pa_version) {
@@ -11815,19 +12316,12 @@ test_4_1a_other_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
-	test_msleep(child, iutconf.sl.t7 * 10 / 2);
+	test_msleep(child, iutconf.sl.t7 / 2);
 	state++;
 	if (do_signal(child, __TEST_CLEARB))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_LPR))
-		goto failure;
-	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -11858,8 +12352,8 @@ test_4_1a_iut(int child)
 	}
 }
 
-static struct test_stream test_case_4_1a_ptu = { preamble_link_in_service, test_4_1a_ptu, postamble_link_power_off };
-static struct test_stream test_case_4_1a_iut = { preamble_link_in_service, test_4_1a_iut, postamble_link_power_off };
+static struct test_stream test_case_4_1a_ptu = { preamble_link_in_service, test_4_1a_ptu, postamble_link_in_service };
+static struct test_stream test_case_4_1a_iut = { preamble_link_in_service, test_4_1a_iut, postamble_link_in_service };
 
 #define test_case_4_1a { &test_case_4_1a_ptu, &test_case_4_1a_iut, NULL }
 
@@ -11895,7 +12389,7 @@ test_4_1b_11_ptu(int child)
 				if (do_signal(child, __TEST_DATA))
 					goto failure;
 				state++;
-				start_tt(iutconf.sl.t7 * 10);
+				start_tt(iutconf.sl.t7);
 				state++;
 				break;
 			}
@@ -11920,10 +12414,10 @@ test_4_1b_11_ptu(int child)
 			if (do_signal(child, __TEST_DATA))
 				goto failure;
 			state++;
-			start_tt(iutconf.sl.t7 * 10 / 2);
+			start_tt(iutconf.sl.t7 / 2);
 			break;
 		case __TEST_DATA:
-			start_tt(iutconf.sl.t7 * 10);
+			start_tt(iutconf.sl.t7);
 			continue;
 		case __TEST_ACK:
 			state++;
@@ -11998,7 +12492,7 @@ test_4_1b_other_ptu(int child)
 				if (do_signal(child, __TEST_DATA))
 					goto failure;
 				state++;
-				start_tt(iutconf.sl.t7 * 10 / 2);
+				start_tt(iutconf.sl.t7 / 2);
 				state++;
 				break;
 			}
@@ -12058,9 +12552,6 @@ test_4_1b_other_ptu(int child)
 	if (do_signal(child, __STATUS_SEQUENCE_SYNC))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -12079,9 +12570,7 @@ test_4_1b_other_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
-	if (expect(child, iutconf.sl.t7 * 10 / 2, __EVENT_NO_MSG))
+	if (expect(child, iutconf.sl.t7 / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CLEARB))
@@ -12092,8 +12581,6 @@ test_4_1b_other_iut(int child)
 	state++;
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
-	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT))
 		goto failure;
@@ -12126,8 +12613,8 @@ test_4_1b_iut(int child)
 	}
 }
 
-static struct test_stream test_case_4_1b_ptu = { preamble_link_in_service, test_4_1b_ptu, postamble_link_power_off };
-static struct test_stream test_case_4_1b_iut = { preamble_link_in_service, test_4_1b_iut, postamble_link_power_off };
+static struct test_stream test_case_4_1b_ptu = { preamble_link_in_service, test_4_1b_ptu, postamble_link_in_service };
+static struct test_stream test_case_4_1b_iut = { preamble_link_in_service, test_4_1b_iut, postamble_link_in_service };
 
 #define test_case_4_1b { &test_case_4_1b_ptu, &test_case_4_1b_iut, NULL }
 
@@ -12162,8 +12649,6 @@ test_4_2_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPO))
 		goto failure;
 	state++;
@@ -12175,8 +12660,8 @@ test_4_2_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_4_2_ptu = { preamble_link_in_service, test_4_2_ptu, postamble_link_power_off };
-static struct test_stream test_case_4_2_iut = { preamble_link_in_service, test_4_2_iut, postamble_link_power_off };
+static struct test_stream test_case_4_2_ptu = { preamble_link_in_service, test_4_2_ptu, postamble_link_in_service };
+static struct test_stream test_case_4_2_iut = { preamble_link_in_service, test_4_2_iut, postamble_link_in_service };
 
 #define test_case_4_2 { &test_case_4_2_ptu, &test_case_4_2_iut, NULL }
 
@@ -12229,15 +12714,13 @@ test_4_3_iut(int child)
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_4_3_ptu = { preamble_link_in_service, test_4_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_4_3_iut = { preamble_link_in_service, test_4_3_iut, postamble_link_power_off };
+static struct test_stream test_case_4_3_ptu = { preamble_link_in_service, test_4_3_ptu, postamble_link_in_service };
+static struct test_stream test_case_4_3_iut = { preamble_link_in_service, test_4_3_iut, postamble_link_in_service };
 
 #define test_case_4_3 { &test_case_4_3_ptu, &test_case_4_3_iut, NULL }
 
@@ -12262,8 +12745,8 @@ test_5_1_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_5_1_ptu = { preamble_link_in_service, test_5_1_ptu, postamble_link_power_off };
-static struct test_stream test_case_5_1_iut = { preamble_link_in_service, test_5_1_iut, postamble_link_power_off };
+static struct test_stream test_case_5_1_ptu = { preamble_link_in_service, test_5_1_ptu, postamble_link_in_service };
+static struct test_stream test_case_5_1_iut = { preamble_link_in_service, test_5_1_iut, postamble_link_in_service };
 
 #define test_case_5_1 { &test_case_5_1_ptu, &test_case_5_1_iut, NULL }
 
@@ -12287,8 +12770,8 @@ test_5_2_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_5_2_ptu = { preamble_link_in_service, test_5_2_ptu, postamble_link_power_off };
-static struct test_stream test_case_5_2_iut = { preamble_link_in_service, test_5_2_iut, postamble_link_power_off };
+static struct test_stream test_case_5_2_ptu = { preamble_link_in_service, test_5_2_ptu, postamble_link_in_service };
+static struct test_stream test_case_5_2_iut = { preamble_link_in_service, test_5_2_iut, postamble_link_in_service };
 
 #define test_case_5_2 { &test_case_5_2_ptu, &test_case_5_2_iut, NULL }
 
@@ -12307,9 +12790,6 @@ test_5_3_ptu(int child)
 	if (do_signal(child, __TEST_MSU_TOO_SHORT))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -12317,16 +12797,11 @@ test_5_3_ptu(int child)
 static int
 test_5_3_iut(int child)
 {
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
-      failure:
-	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_5_3_ptu = { preamble_link_in_service, test_5_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_5_3_iut = { preamble_link_in_service, test_5_3_iut, postamble_link_power_off };
+static struct test_stream test_case_5_3_ptu = { preamble_link_in_service, test_5_3_ptu, postamble_link_in_service };
+static struct test_stream test_case_5_3_iut = { preamble_link_in_service, test_5_3_iut, postamble_link_in_service };
 
 #define test_case_5_3 { &test_case_5_3_ptu, &test_case_5_3_iut, NULL }
 
@@ -12351,8 +12826,8 @@ test_5_4a_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_5_4a_ptu = { preamble_link_in_service, test_5_4a_ptu, postamble_link_power_off };
-static struct test_stream test_case_5_4a_iut = { preamble_link_in_service, test_5_4a_iut, postamble_link_power_off };
+static struct test_stream test_case_5_4a_ptu = { preamble_link_in_service, test_5_4a_ptu, postamble_link_in_service };
+static struct test_stream test_case_5_4a_iut = { preamble_link_in_service, test_5_4a_iut, postamble_link_in_service };
 
 #define test_case_5_4a { &test_case_5_4a_ptu, &test_case_5_4a_iut, NULL }
 
@@ -12377,8 +12852,8 @@ test_5_4b_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_5_4b_ptu = { preamble_link_in_service, test_5_4b_ptu, postamble_link_power_off };
-static struct test_stream test_case_5_4b_iut = { preamble_link_in_service, test_5_4b_iut, postamble_link_power_off };
+static struct test_stream test_case_5_4b_ptu = { preamble_link_in_service, test_5_4b_ptu, postamble_link_in_service };
+static struct test_stream test_case_5_4b_iut = { preamble_link_in_service, test_5_4b_iut, postamble_link_in_service };
 
 #define test_case_5_4b { &test_case_5_4b_ptu, &test_case_5_4b_iut, NULL }
 
@@ -12403,8 +12878,8 @@ test_5_5a_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_5_5a_ptu = { preamble_link_in_service, test_5_5a_ptu, postamble_link_power_off };
-static struct test_stream test_case_5_5a_iut = { preamble_link_in_service, test_5_5a_iut, postamble_link_power_off };
+static struct test_stream test_case_5_5a_ptu = { preamble_link_in_service, test_5_5a_ptu, postamble_link_in_service };
+static struct test_stream test_case_5_5a_iut = { preamble_link_in_service, test_5_5a_iut, postamble_link_in_service };
 
 #define test_case_5_5a { &test_case_5_5a_ptu, &test_case_5_5a_iut, NULL }
 
@@ -12429,8 +12904,8 @@ test_5_5b_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_5_5b_ptu = { preamble_link_in_service, test_5_5b_ptu, postamble_link_power_off };
-static struct test_stream test_case_5_5b_iut = { preamble_link_in_service, test_5_5b_iut, postamble_link_power_off };
+static struct test_stream test_case_5_5b_ptu = { preamble_link_in_service, test_5_5b_ptu, postamble_link_in_service };
+static struct test_stream test_case_5_5b_iut = { preamble_link_in_service, test_5_5b_iut, postamble_link_in_service };
 
 #define test_case_5_5b { &test_case_5_5b_ptu, &test_case_5_5b_iut, NULL }
 
@@ -12455,8 +12930,8 @@ test_6_1_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_6_1_ptu = { preamble_link_in_service, test_6_1_ptu, postamble_link_power_off };
-static struct test_stream test_case_6_1_iut = { preamble_link_in_service, test_6_1_iut, postamble_link_power_off };
+static struct test_stream test_case_6_1_ptu = { preamble_link_in_service, test_6_1_ptu, postamble_link_in_service };
+static struct test_stream test_case_6_1_iut = { preamble_link_in_service, test_6_1_iut, postamble_link_in_service };
 
 #define test_case_6_1 { &test_case_6_1_ptu, &test_case_6_1_iut, NULL }
 
@@ -12480,8 +12955,8 @@ test_6_2_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_6_2_ptu = { preamble_link_in_service, test_6_2_ptu, postamble_link_power_off };
-static struct test_stream test_case_6_2_iut = { preamble_link_in_service, test_6_2_iut, postamble_link_power_off };
+static struct test_stream test_case_6_2_ptu = { preamble_link_in_service, test_6_2_ptu, postamble_link_in_service };
+static struct test_stream test_case_6_2_iut = { preamble_link_in_service, test_6_2_iut, postamble_link_in_service };
 
 #define test_case_6_2 { &test_case_6_2_ptu, &test_case_6_2_iut, NULL }
 
@@ -12505,8 +12980,8 @@ test_6_3_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_6_3_ptu = { preamble_link_in_service, test_6_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_6_3_iut = { preamble_link_in_service, test_6_3_iut, postamble_link_power_off };
+static struct test_stream test_case_6_3_ptu = { preamble_link_in_service, test_6_3_ptu, postamble_link_in_service };
+static struct test_stream test_case_6_3_iut = { preamble_link_in_service, test_6_3_iut, postamble_link_in_service };
 
 #define test_case_6_3 { &test_case_6_3_ptu, &test_case_6_3_iut, NULL }
 
@@ -12530,8 +13005,8 @@ test_6_4_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_6_4_ptu = { preamble_link_in_service, test_6_4_ptu, postamble_link_power_off };
-static struct test_stream test_case_6_4_iut = { preamble_link_in_service, test_6_4_iut, postamble_link_power_off };
+static struct test_stream test_case_6_4_ptu = { preamble_link_in_service, test_6_4_ptu, postamble_link_in_service };
+static struct test_stream test_case_6_4_iut = { preamble_link_in_service, test_6_4_iut, postamble_link_in_service };
 
 #define test_case_6_4 { &test_case_6_4_ptu, &test_case_6_4_iut, NULL }
 
@@ -12700,16 +13175,13 @@ test_8_1_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_8_1_ptu = { preamble_link_in_service, test_8_1_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_1_iut = { preamble_link_in_service, test_8_1_iut, postamble_link_power_off };
+static struct test_stream test_case_8_1_ptu = { preamble_link_in_service, test_8_1_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_1_iut = { preamble_link_in_service, test_8_1_iut, postamble_link_in_service };
 
 #define test_case_8_1 { &test_case_8_1_ptu, &test_case_8_1_iut, NULL }
 
@@ -12733,8 +13205,8 @@ test_8_2_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_8_2_ptu = { preamble_link_in_service, test_8_2_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_2_iut = { preamble_link_in_service, test_8_2_iut, postamble_link_power_off };
+static struct test_stream test_case_8_2_ptu = { preamble_link_in_service, test_8_2_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_2_iut = { preamble_link_in_service, test_8_2_iut, postamble_link_in_service };
 
 #define test_case_8_2 { &test_case_8_2_ptu, &test_case_8_2_iut, NULL }
 
@@ -12753,7 +13225,7 @@ test_8_3_ptu(int child)
 	int n = iutconf.sl.N1;
 
 	show_timeout = 1;
-	start_tt(iutconf.sl.t7 * 10 / 2 - 100);
+	start_tt(iutconf.sl.t7 / 2 - 100);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
@@ -12780,7 +13252,7 @@ test_8_3_ptu(int child)
 				count = 0;
 				oldevt = 0;
 				cntevt = 0;
-				start_tt(iutconf.sl.t7 * 10 / 2 + 200);
+				start_tt(iutconf.sl.t7 / 2 + 200);
 				break;
 			}
 			state++;
@@ -12808,7 +13280,7 @@ test_8_3_ptu(int child)
 			count = 0;
 			oldevt = 0;
 			cntevt = 0;
-			start_tt(iutconf.sl.t7 * 10 / 2 + 200);
+			start_tt(iutconf.sl.t7 / 2 + 200);
 			show_timeout = 1;
 			break;
 		default:
@@ -12878,7 +13350,7 @@ test_8_3_iut(int child)
 		state++;
 	}
 	show_timeout = 1;
-	start_tt(iutconf.sl.t7 * 10 * 2);
+	start_tt(iutconf.sl.t7 * 2);
 	if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT))
 		goto failure;
 	state++;
@@ -12887,8 +13359,8 @@ test_8_3_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_8_3_ptu = { preamble_link_in_service, test_8_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_3_iut = { preamble_link_in_service, test_8_3_iut, postamble_link_power_off };
+static struct test_stream test_case_8_3_ptu = { preamble_link_in_service, test_8_3_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_3_iut = { preamble_link_in_service, test_8_3_iut, postamble_link_in_service };
 
 #define test_case_8_3 { &test_case_8_3_ptu, &test_case_8_3_iut, NULL }
 
@@ -12948,8 +13420,8 @@ test_8_4_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_8_4_ptu = { preamble_link_in_service, test_8_4_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_4_iut = { preamble_link_in_service, test_8_4_iut, postamble_link_power_off };
+static struct test_stream test_case_8_4_ptu = { preamble_link_in_service, test_8_4_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_4_iut = { preamble_link_in_service, test_8_4_iut, postamble_link_in_service };
 
 #define test_case_8_4 { &test_case_8_4_ptu, &test_case_8_4_iut, NULL }
 
@@ -13077,9 +13549,6 @@ test_8_5_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -13087,8 +13556,8 @@ test_8_5_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_8_5_ptu = { preamble_link_in_service, test_8_5_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_5_iut = { preamble_link_in_service, test_8_5_iut, postamble_link_power_off };
+static struct test_stream test_case_8_5_ptu = { preamble_link_in_service, test_8_5_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_5_iut = { preamble_link_in_service, test_8_5_iut, postamble_link_in_service };
 
 #define test_case_8_5 { &test_case_8_5_ptu, &test_case_8_5_iut, NULL }
 
@@ -13112,8 +13581,8 @@ test_8_6_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_8_6_ptu = { preamble_link_in_service, test_8_6_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_6_iut = { preamble_link_in_service, test_8_6_iut, postamble_link_power_off };
+static struct test_stream test_case_8_6_ptu = { preamble_link_in_service, test_8_6_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_6_iut = { preamble_link_in_service, test_8_6_iut, postamble_link_in_service };
 
 #define test_case_8_6 { &test_case_8_6_ptu, &test_case_8_6_iut, NULL }
 
@@ -13137,8 +13606,8 @@ test_8_7_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_8_7_ptu = { preamble_link_in_service, test_8_7_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_7_iut = { preamble_link_in_service, test_8_7_iut, postamble_link_power_off };
+static struct test_stream test_case_8_7_ptu = { preamble_link_in_service, test_8_7_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_7_iut = { preamble_link_in_service, test_8_7_iut, postamble_link_in_service };
 
 #define test_case_8_7 { &test_case_8_7_ptu, &test_case_8_7_iut, NULL }
 
@@ -13162,8 +13631,8 @@ test_8_8_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_8_8_ptu = { preamble_link_in_service, test_8_8_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_8_iut = { preamble_link_in_service, test_8_8_iut, postamble_link_power_off };
+static struct test_stream test_case_8_8_ptu = { preamble_link_in_service, test_8_8_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_8_iut = { preamble_link_in_service, test_8_8_iut, postamble_link_in_service };
 
 #define test_case_8_8 { &test_case_8_8_ptu, &test_case_8_8_iut, NULL }
 
@@ -13219,8 +13688,8 @@ test_8_9a_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_8_9a_ptu = { preamble_link_in_service, test_8_9a_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_9a_iut = { preamble_link_in_service, test_8_9a_iut, postamble_link_power_off };
+static struct test_stream test_case_8_9a_ptu = { preamble_link_in_service, test_8_9a_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_9a_iut = { preamble_link_in_service, test_8_9a_iut, postamble_link_in_service };
 
 #define test_case_8_9a { &test_case_8_9a_ptu, &test_case_8_9a_iut, NULL }
 
@@ -13261,9 +13730,6 @@ test_8_9b_ptu(int child)
 	if (do_signal(child, __TEST_ACK))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -13286,12 +13752,7 @@ test_8_9b_iut(int child)
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
 	state++;
-	expect(child, SHORT_WAIT, __EVENT_IUT_RPR);
-	state++;
 	if (do_signal(child, __TEST_SEND_MSU))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -13299,8 +13760,8 @@ test_8_9b_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_8_9b_ptu = { preamble_link_in_service, test_8_9b_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_9b_iut = { preamble_link_in_service, test_8_9b_iut, postamble_link_power_off };
+static struct test_stream test_case_8_9b_ptu = { preamble_link_in_service, test_8_9b_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_9b_iut = { preamble_link_in_service, test_8_9b_iut, postamble_link_in_service };
 
 #define test_case_8_9b { &test_case_8_9b_ptu, &test_case_8_9b_iut, NULL }
 
@@ -13414,8 +13875,8 @@ test_8_10_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_8_10_ptu = { preamble_link_in_service, test_8_10_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_10_iut = { preamble_link_in_service, test_8_10_iut, postamble_link_power_off };
+static struct test_stream test_case_8_10_ptu = { preamble_link_in_service, test_8_10_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_10_iut = { preamble_link_in_service, test_8_10_iut, postamble_link_in_service };
 
 #define test_case_8_10 { &test_case_8_10_ptu, &test_case_8_10_iut, NULL }
 
@@ -13511,8 +13972,8 @@ test_8_11_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_8_11_ptu = { preamble_link_in_service, test_8_11_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_11_iut = { preamble_link_in_service, test_8_11_iut, postamble_link_power_off };
+static struct test_stream test_case_8_11_ptu = { preamble_link_in_service, test_8_11_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_8_11_iut = { preamble_link_in_service, test_8_11_iut, postamble_link_out_of_service };
 
 #define test_case_8_11 { &test_case_8_11_ptu, &test_case_8_11_iut, NULL }
 
@@ -13534,11 +13995,11 @@ test_8_12a_ptu(int child)
 	if (expect(child, INFINITE_WAIT, __TEST_DATA))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t7);
+	beg_time = milliseconds(child, t7);
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi))
+	if (check_time(child, "T7  ", beg_time, timer[t7].lo, timer[t7].hi))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -13559,8 +14020,8 @@ test_8_12a_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_8_12a_ptu = { preamble_link_in_service, test_8_12a_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_12a_iut = { preamble_link_in_service, test_8_12a_iut, postamble_link_power_off };
+static struct test_stream test_case_8_12a_ptu = { preamble_link_in_service, test_8_12a_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_8_12a_iut = { preamble_link_in_service, test_8_12a_iut, postamble_link_out_of_service };
 
 #define test_case_8_12a { &test_case_8_12a_ptu, &test_case_8_12a_iut, NULL }
 
@@ -13582,7 +14043,7 @@ test_8_12b_ptu(int child)
 	if (expect(child, INFINITE_WAIT, __TEST_DATA))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t7);
+	beg_time = milliseconds(child, t7);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
@@ -13597,7 +14058,7 @@ test_8_12b_ptu(int child)
 		}
 		break;
 	}
-	if (check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi))
+	if (check_time(child, "T7  ", beg_time, timer[t7].lo, timer[t7].hi))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -13610,7 +14071,7 @@ test_8_12b_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
-	if (expect(child, iutconf.sl.t7 * 10 / 2, __EVENT_NO_MSG))
+	if (expect(child, iutconf.sl.t7 / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SEND_MSU))
@@ -13624,8 +14085,8 @@ test_8_12b_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_8_12b_ptu = { preamble_link_in_service, test_8_12b_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_12b_iut = { preamble_link_in_service, test_8_12b_iut, postamble_link_power_off };
+static struct test_stream test_case_8_12b_ptu = { preamble_link_in_service, test_8_12b_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_8_12b_iut = { preamble_link_in_service, test_8_12b_iut, postamble_link_out_of_service };
 
 #define test_case_8_12b { &test_case_8_12b_ptu, &test_case_8_12b_iut, NULL }
 
@@ -13661,8 +14122,8 @@ test_8_13_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_8_13_ptu = { preamble_link_in_service, test_8_13_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_13_iut = { preamble_link_in_service, test_8_13_iut, postamble_link_power_off };
+static struct test_stream test_case_8_13_ptu = { preamble_link_in_service, test_8_13_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_8_13_iut = { preamble_link_in_service, test_8_13_iut, postamble_link_out_of_service };
 
 #define test_case_8_13 { &test_case_8_13_ptu, &test_case_8_13_iut, NULL }
 
@@ -13776,8 +14237,8 @@ test_8_14_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_8_14_ptu = { preamble_link_in_service, test_8_14_ptu, postamble_link_power_off };
-static struct test_stream test_case_8_14_iut = { preamble_link_in_service, test_8_14_iut, postamble_link_power_off };
+static struct test_stream test_case_8_14_ptu = { preamble_link_in_service, test_8_14_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_8_14_iut = { preamble_link_in_service, test_8_14_iut, postamble_link_out_of_service };
 
 #define test_case_8_14 { &test_case_8_14_ptu, &test_case_8_14_iut, NULL }
 
@@ -13802,8 +14263,8 @@ test_9_1_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_1_ptu = { preamble_link_in_service_pcr, test_9_1_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_1_iut = { preamble_link_in_service_pcr, test_9_1_iut, postamble_link_power_off };
+static struct test_stream test_case_9_1_ptu = { preamble_link_in_service_pcr, test_9_1_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_1_iut = { preamble_link_in_service_pcr, test_9_1_iut, postamble_link_in_service };
 
 #define test_case_9_1 { &test_case_9_1_ptu, &test_case_9_1_iut, NULL }
 
@@ -13827,8 +14288,8 @@ test_9_2_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_2_ptu = { preamble_link_in_service_pcr, test_9_2_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_2_iut = { preamble_link_in_service_pcr, test_9_2_iut, postamble_link_power_off };
+static struct test_stream test_case_9_2_ptu = { preamble_link_in_service_pcr, test_9_2_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_2_iut = { preamble_link_in_service_pcr, test_9_2_iut, postamble_link_in_service };
 
 #define test_case_9_2 { &test_case_9_2_ptu, &test_case_9_2_iut, NULL }
 
@@ -13852,8 +14313,8 @@ test_9_3_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_3_ptu = { preamble_link_in_service_pcr, test_9_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_3_iut = { preamble_link_in_service_pcr, test_9_3_iut, postamble_link_power_off };
+static struct test_stream test_case_9_3_ptu = { preamble_link_in_service_pcr, test_9_3_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_3_iut = { preamble_link_in_service_pcr, test_9_3_iut, postamble_link_in_service };
 
 #define test_case_9_3 { &test_case_9_3_ptu, &test_case_9_3_iut, NULL }
 
@@ -13877,8 +14338,8 @@ test_9_4_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_4_ptu = { preamble_link_in_service_pcr, test_9_4_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_4_iut = { preamble_link_in_service_pcr, test_9_4_iut, postamble_link_power_off };
+static struct test_stream test_case_9_4_ptu = { preamble_link_in_service_pcr, test_9_4_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_4_iut = { preamble_link_in_service_pcr, test_9_4_iut, postamble_link_in_service };
 
 #define test_case_9_4 { &test_case_9_4_ptu, &test_case_9_4_iut, NULL }
 
@@ -13902,8 +14363,8 @@ test_9_5_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_5_ptu = { preamble_link_in_service_pcr, test_9_5_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_5_iut = { preamble_link_in_service_pcr, test_9_5_iut, postamble_link_power_off };
+static struct test_stream test_case_9_5_ptu = { preamble_link_in_service_pcr, test_9_5_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_5_iut = { preamble_link_in_service_pcr, test_9_5_iut, postamble_link_in_service };
 
 #define test_case_9_5 { &test_case_9_5_ptu, &test_case_9_5_iut, NULL }
 
@@ -13927,8 +14388,8 @@ test_9_6_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_6_ptu = { preamble_link_in_service_pcr, test_9_6_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_6_iut = { preamble_link_in_service_pcr, test_9_6_iut, postamble_link_power_off };
+static struct test_stream test_case_9_6_ptu = { preamble_link_in_service_pcr, test_9_6_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_6_iut = { preamble_link_in_service_pcr, test_9_6_iut, postamble_link_in_service };
 
 #define test_case_9_6 { &test_case_9_6_ptu, &test_case_9_6_iut, NULL }
 
@@ -13952,8 +14413,8 @@ test_9_7_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_7_ptu = { preamble_link_in_service_pcr, test_9_7_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_7_iut = { preamble_link_in_service_pcr, test_9_7_iut, postamble_link_power_off };
+static struct test_stream test_case_9_7_ptu = { preamble_link_in_service_pcr, test_9_7_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_7_iut = { preamble_link_in_service_pcr, test_9_7_iut, postamble_link_in_service };
 
 #define test_case_9_7 { &test_case_9_7_ptu, &test_case_9_7_iut, NULL }
 
@@ -13977,8 +14438,8 @@ test_9_8_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_8_ptu = { preamble_link_in_service_pcr, test_9_8_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_8_iut = { preamble_link_in_service_pcr, test_9_8_iut, postamble_link_power_off };
+static struct test_stream test_case_9_8_ptu = { preamble_link_in_service_pcr, test_9_8_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_8_iut = { preamble_link_in_service_pcr, test_9_8_iut, postamble_link_in_service };
 
 #define test_case_9_8 { &test_case_9_8_ptu, &test_case_9_8_iut, NULL }
 
@@ -14002,8 +14463,8 @@ test_9_9_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_9_ptu = { preamble_link_in_service_pcr, test_9_9_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_9_iut = { preamble_link_in_service_pcr, test_9_9_iut, postamble_link_power_off };
+static struct test_stream test_case_9_9_ptu = { preamble_link_in_service_pcr, test_9_9_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_9_iut = { preamble_link_in_service_pcr, test_9_9_iut, postamble_link_in_service };
 
 #define test_case_9_9 { &test_case_9_9_ptu, &test_case_9_9_iut, NULL }
 
@@ -14027,8 +14488,8 @@ test_9_10_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_10_ptu = { preamble_link_in_service_pcr, test_9_10_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_10_iut = { preamble_link_in_service_pcr, test_9_10_iut, postamble_link_power_off };
+static struct test_stream test_case_9_10_ptu = { preamble_link_in_service_pcr, test_9_10_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_10_iut = { preamble_link_in_service_pcr, test_9_10_iut, postamble_link_in_service };
 
 #define test_case_9_10 { &test_case_9_10_ptu, &test_case_9_10_iut, NULL }
 
@@ -14052,8 +14513,8 @@ test_9_11_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_11_ptu = { preamble_link_in_service_pcr, test_9_11_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_11_iut = { preamble_link_in_service_pcr, test_9_11_iut, postamble_link_power_off };
+static struct test_stream test_case_9_11_ptu = { preamble_link_in_service_pcr, test_9_11_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_11_iut = { preamble_link_in_service_pcr, test_9_11_iut, postamble_link_in_service };
 
 #define test_case_9_11 { &test_case_9_11_ptu, &test_case_9_11_iut, NULL }
 
@@ -14077,8 +14538,8 @@ test_9_12_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_12_ptu = { preamble_link_in_service_pcr, test_9_12_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_12_iut = { preamble_link_in_service_pcr, test_9_12_iut, postamble_link_power_off };
+static struct test_stream test_case_9_12_ptu = { preamble_link_in_service_pcr, test_9_12_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_12_iut = { preamble_link_in_service_pcr, test_9_12_iut, postamble_link_in_service };
 
 #define test_case_9_12 { &test_case_9_12_ptu, &test_case_9_12_iut, NULL }
 
@@ -14102,8 +14563,8 @@ test_9_13_iut(int child)
 	return __RESULT_NOTAPPL;	/* can't do this */
 }
 
-static struct test_stream test_case_9_13_ptu = { preamble_link_in_service_pcr, test_9_13_ptu, postamble_link_power_off };
-static struct test_stream test_case_9_13_iut = { preamble_link_in_service_pcr, test_9_13_iut, postamble_link_power_off };
+static struct test_stream test_case_9_13_ptu = { preamble_link_in_service_pcr, test_9_13_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_13_iut = { preamble_link_in_service_pcr, test_9_13_iut, postamble_link_in_service };
 
 #define test_case_9_13 { &test_case_9_13_ptu, &test_case_9_13_iut, NULL }
 
@@ -14142,16 +14603,13 @@ test_10_1_iut(int child)
 	if (do_signal(child, __TEST_NO_CONG))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_10_1_ptu = { preamble_link_in_service, test_10_1_ptu, postamble_link_power_off };
-static struct test_stream test_case_10_1_iut = { preamble_link_in_service, test_10_1_iut, postamble_link_power_off };
+static struct test_stream test_case_10_1_ptu = { preamble_link_in_service, test_10_1_ptu, postamble_link_in_service };
+static struct test_stream test_case_10_1_iut = { preamble_link_in_service, test_10_1_iut, postamble_link_in_service };
 
 #define test_case_10_1 { &test_case_10_1_ptu, &test_case_10_1_iut, NULL }
 
@@ -14176,8 +14634,8 @@ test_10_2a_ptu(int child)
 	if (do_signal(child, __STATUS_BUSY))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t7);
-	if (expect(child, iutconf.sl.t6 * 10 - 100, __EVENT_NO_MSG))
+	beg_time = milliseconds(child, t7);
+	if (expect(child, iutconf.sl.t6 - 100, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_BUSY_ENDED))
@@ -14198,9 +14656,6 @@ test_10_2a_ptu(int child)
 	if (do_signal(child, __TEST_ACK))
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -14211,16 +14666,13 @@ test_10_2a_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_10_2a_ptu = { preamble_link_in_service, test_10_2a_ptu, postamble_link_power_off };
-static struct test_stream test_case_10_2a_iut = { preamble_link_in_service, test_10_2a_iut, postamble_link_power_off };
+static struct test_stream test_case_10_2a_ptu = { preamble_link_in_service, test_10_2a_ptu, postamble_link_in_service };
+static struct test_stream test_case_10_2a_iut = { preamble_link_in_service, test_10_2a_iut, postamble_link_in_service };
 
 #define test_case_10_2a { &test_case_10_2a_ptu, &test_case_10_2a_iut, NULL }
 
@@ -14245,20 +14697,20 @@ test_10_2b_ptu(int child)
 	if (do_signal(child, __STATUS_BUSY))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t6);
+	beg_time = milliseconds(child, t6);
 	state++;
-	if (expect(child, iutconf.sl.t6 * 10 - 300, __EVENT_NO_MSG))
+	if (expect(child, iutconf.sl.t6 - 300, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_BUSY_ENDED))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t7);
+	beg_time = milliseconds(child, t7);
 	state++;
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi))
+	if (check_time(child, "T7  ", beg_time, timer[t7].lo, timer[t7].hi))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -14279,8 +14731,8 @@ test_10_2b_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_10_2b_ptu = { preamble_link_in_service, test_10_2b_ptu, postamble_link_power_off };
-static struct test_stream test_case_10_2b_iut = { preamble_link_in_service, test_10_2b_iut, postamble_link_power_off };
+static struct test_stream test_case_10_2b_ptu = { preamble_link_in_service, test_10_2b_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_10_2b_iut = { preamble_link_in_service, test_10_2b_iut, postamble_link_out_of_service };
 
 #define test_case_10_2b { &test_case_10_2b_ptu, &test_case_10_2b_iut, NULL }
 
@@ -14305,24 +14757,21 @@ test_10_2c_ptu(int child)
 	if (do_signal(child, __STATUS_BUSY))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t6);
+	beg_time = milliseconds(child, t6);
 	state++;
-	if (expect(child, iutconf.sl.t6 * 10 - 300, __EVENT_NO_MSG))
+	if (expect(child, iutconf.sl.t6 - 300, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_BUSY_ENDED))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t7);
+	beg_time = milliseconds(child, t7);
 	state++;
-	if (expect(child, iutconf.sl.t7 * 10 - 300, __EVENT_NO_MSG))
+	if (expect(child, iutconf.sl.t7 - 300, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	bsn[0] = fsn[1];
 	if (do_signal(child, __TEST_ACK))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -14335,16 +14784,13 @@ test_10_2c_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_10_2c_ptu = { preamble_link_in_service, test_10_2c_ptu, postamble_link_power_off };
-static struct test_stream test_case_10_2c_iut = { preamble_link_in_service, test_10_2c_iut, postamble_link_power_off };
+static struct test_stream test_case_10_2c_ptu = { preamble_link_in_service, test_10_2c_ptu, postamble_link_in_service };
+static struct test_stream test_case_10_2c_iut = { preamble_link_in_service, test_10_2c_iut, postamble_link_in_service };
 
 #define test_case_10_2c { &test_case_10_2c_ptu, &test_case_10_2c_iut, NULL }
 
@@ -14365,7 +14811,7 @@ test_10_3_ptu(int child)
 	if (expect(child, INFINITE_WAIT, __TEST_DATA))
 		goto failure;
 	state++;
-	beg_time = milliseconds(t6);
+	beg_time = milliseconds(child, t6);
 	state++;
 	if (do_signal(child, __STATUS_BUSY))
 		goto failure;
@@ -14373,7 +14819,7 @@ test_10_3_ptu(int child)
 	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
-	if (check_time("T6  ", beg_time, timer[t6].lo, timer[t6].hi))
+	if (check_time(child, "T6  ", beg_time, timer[t6].lo, timer[t6].hi))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -14394,8 +14840,8 @@ test_10_3_iut(int child)
 	return __RESULT_FAILURE;
 }
 
-static struct test_stream test_case_10_3_ptu = { preamble_link_in_service, test_10_3_ptu, postamble_link_power_off };
-static struct test_stream test_case_10_3_iut = { preamble_link_in_service, test_10_3_iut, postamble_link_power_off };
+static struct test_stream test_case_10_3_ptu = { preamble_link_in_service, test_10_3_ptu, postamble_link_out_of_service };
+static struct test_stream test_case_10_3_iut = { preamble_link_in_service, test_10_3_iut, postamble_link_out_of_service };
 
 #define test_case_10_3 { &test_case_10_3_ptu, &test_case_10_3_iut, NULL }
 
@@ -14695,137 +15141,146 @@ struct test_case {
 	int (*stop) (int);		/* stop function */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
+	int expect;			/* expected result */
 } tests[] = {
 	{
-	numb_case_0_1, tgrp_case_0_1, sgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, test_case_0_1, &begin_tests, &end_tests, 0, 0}, {
-	numb_case_1_1a, tgrp_case_1_1a, sgrp_case_1_1a, name_case_1_1a, desc_case_1_1a, sref_case_1_1a, test_case_1_1a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_1b, tgrp_case_1_1b, sgrp_case_1_1b, name_case_1_1b, desc_case_1_1b, sref_case_1_1b, test_case_1_1b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_2, tgrp_case_1_2, sgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, test_case_1_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_3, tgrp_case_1_3, sgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, test_case_1_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_4, tgrp_case_1_4, sgrp_case_1_4, name_case_1_4, desc_case_1_4, sref_case_1_4, test_case_1_4, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_5a_p, tgrp_case_1_5a_p, sgrp_case_1_5a_p, name_case_1_5a_p, desc_case_1_5a_p, sref_case_1_5a_p, test_case_1_5a_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_5b_p, tgrp_case_1_5b_p, sgrp_case_1_5b_p, name_case_1_5b_p, desc_case_1_5b_p, sref_case_1_5b_p, test_case_1_5b_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_5a_np, tgrp_case_1_5a_np, sgrp_case_1_5a_np, name_case_1_5a_np, desc_case_1_5a_np, sref_case_1_5a_np, test_case_1_5a_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_5b_np, tgrp_case_1_5b_np, sgrp_case_1_5b_np, name_case_1_5b_np, desc_case_1_5b_np, sref_case_1_5b_np, test_case_1_5b_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_6_p, tgrp_case_1_6_p, sgrp_case_1_6_p, name_case_1_6_p, desc_case_1_6_p, sref_case_1_6_p, test_case_1_6_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_6_np, tgrp_case_1_6_np, sgrp_case_1_6_np, name_case_1_6_np, desc_case_1_6_np, sref_case_1_6_np, test_case_1_6_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_7, tgrp_case_1_7, sgrp_case_1_7, name_case_1_7, desc_case_1_7, sref_case_1_7, test_case_1_7, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_8a_p, tgrp_case_1_8a_p, sgrp_case_1_8a_p, name_case_1_8a_p, desc_case_1_8a_p, sref_case_1_8a_p, test_case_1_8a_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_8b_p, tgrp_case_1_8b_p, sgrp_case_1_8b_p, name_case_1_8b_p, desc_case_1_8b_p, sref_case_1_8b_p, test_case_1_8b_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_8a_np, tgrp_case_1_8a_np, sgrp_case_1_8a_np, name_case_1_8a_np, desc_case_1_8a_np, sref_case_1_8a_np, test_case_1_8a_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_8b_np, tgrp_case_1_8b_np, sgrp_case_1_8b_np, name_case_1_8b_np, desc_case_1_8b_np, sref_case_1_8b_np, test_case_1_8b_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_9a_p, tgrp_case_1_9a_p, sgrp_case_1_9a_p, name_case_1_9a_p, desc_case_1_9a_p, sref_case_1_9a_p, test_case_1_9a_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_9b_p, tgrp_case_1_9b_p, sgrp_case_1_9b_p, name_case_1_9b_p, desc_case_1_9b_p, sref_case_1_9b_p, test_case_1_9b_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_9a_np, tgrp_case_1_9a_np, sgrp_case_1_9a_np, name_case_1_9a_np, desc_case_1_9a_np, sref_case_1_9a_np, test_case_1_9a_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_9b_np, tgrp_case_1_9b_np, sgrp_case_1_9b_np, name_case_1_9b_np, desc_case_1_9b_np, sref_case_1_9b_np, test_case_1_9b_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_10_p, tgrp_case_1_10_p, sgrp_case_1_10_p, name_case_1_10_p, desc_case_1_10_p, sref_case_1_10_p, test_case_1_10_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_10_np, tgrp_case_1_10_np, sgrp_case_1_10_np, name_case_1_10_np, desc_case_1_10_np, sref_case_1_10_np, test_case_1_10_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_11_p, tgrp_case_1_11_p, sgrp_case_1_11_p, name_case_1_11_p, desc_case_1_11_p, sref_case_1_11_p, test_case_1_11_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_11_np, tgrp_case_1_11_np, sgrp_case_1_11_np, name_case_1_11_np, desc_case_1_11_np, sref_case_1_11_np, test_case_1_11_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_12a_p, tgrp_case_1_12a_p, sgrp_case_1_12a_p, name_case_1_12a_p, desc_case_1_12a_p, sref_case_1_12a_p, test_case_1_12a_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_12b_p, tgrp_case_1_12b_p, sgrp_case_1_12b_p, name_case_1_12b_p, desc_case_1_12b_p, sref_case_1_12b_p, test_case_1_12b_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_12a_np, tgrp_case_1_12a_np, sgrp_case_1_12a_np, name_case_1_12a_np, desc_case_1_12a_np, sref_case_1_12a_np, test_case_1_12a_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_12b_np, tgrp_case_1_12b_np, sgrp_case_1_12b_np, name_case_1_12b_np, desc_case_1_12b_np, sref_case_1_12b_np, test_case_1_12b_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_13_p, tgrp_case_1_13_p, sgrp_case_1_13_p, name_case_1_13_p, desc_case_1_13_p, sref_case_1_13_p, test_case_1_13_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_13_np, tgrp_case_1_13_np, sgrp_case_1_13_np, name_case_1_13_np, desc_case_1_13_np, sref_case_1_13_np, test_case_1_13_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_14, tgrp_case_1_14, sgrp_case_1_14, name_case_1_14, desc_case_1_14, sref_case_1_14, test_case_1_14, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_15_p, tgrp_case_1_15_p, sgrp_case_1_15_p, name_case_1_15_p, desc_case_1_15_p, sref_case_1_15_p, test_case_1_15_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_15_np, tgrp_case_1_15_np, sgrp_case_1_15_np, name_case_1_15_np, desc_case_1_15_np, sref_case_1_15_np, test_case_1_15_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_16_p, tgrp_case_1_16_p, sgrp_case_1_16_p, name_case_1_16_p, desc_case_1_16_p, sref_case_1_16_p, test_case_1_16_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_16_np, tgrp_case_1_16_np, sgrp_case_1_16_np, name_case_1_16_np, desc_case_1_16_np, sref_case_1_16_np, test_case_1_16_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_17, tgrp_case_1_17, sgrp_case_1_17, name_case_1_17, desc_case_1_17, sref_case_1_17, test_case_1_17, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_18, tgrp_case_1_18, sgrp_case_1_18, name_case_1_18, desc_case_1_18, sref_case_1_18, test_case_1_18, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_19, tgrp_case_1_19, sgrp_case_1_19, name_case_1_19, desc_case_1_19, sref_case_1_19, test_case_1_19, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_20, tgrp_case_1_20, sgrp_case_1_20, name_case_1_20, desc_case_1_20, sref_case_1_20, test_case_1_20, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_21, tgrp_case_1_21, sgrp_case_1_21, name_case_1_21, desc_case_1_21, sref_case_1_21, test_case_1_21, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_22, tgrp_case_1_22, sgrp_case_1_22, name_case_1_22, desc_case_1_22, sref_case_1_22, test_case_1_22, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_23, tgrp_case_1_23, sgrp_case_1_23, name_case_1_23, desc_case_1_23, sref_case_1_23, test_case_1_23, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_24, tgrp_case_1_24, sgrp_case_1_24, name_case_1_24, desc_case_1_24, sref_case_1_24, test_case_1_24, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_25, tgrp_case_1_25, sgrp_case_1_25, name_case_1_25, desc_case_1_25, sref_case_1_25, test_case_1_25, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_26, tgrp_case_1_26, sgrp_case_1_26, name_case_1_26, desc_case_1_26, sref_case_1_26, test_case_1_26, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_27_p, tgrp_case_1_27_p, sgrp_case_1_27_p, name_case_1_27_p, desc_case_1_27_p, sref_case_1_27_p, test_case_1_27_p, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_27_np, tgrp_case_1_27_np, sgrp_case_1_27_np, name_case_1_27_np, desc_case_1_27_np, sref_case_1_27_np, test_case_1_27_np, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_28, tgrp_case_1_28, sgrp_case_1_28, name_case_1_28, desc_case_1_28, sref_case_1_28, test_case_1_28, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_29a, tgrp_case_1_29a, sgrp_case_1_29a, name_case_1_29a, desc_case_1_29a, sref_case_1_29a, test_case_1_29a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_29b, tgrp_case_1_29b, sgrp_case_1_29b, name_case_1_29b, desc_case_1_29b, sref_case_1_29b, test_case_1_29b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_30a, tgrp_case_1_30a, sgrp_case_1_30a, name_case_1_30a, desc_case_1_30a, sref_case_1_30a, test_case_1_30a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_30b, tgrp_case_1_30b, sgrp_case_1_30b, name_case_1_30b, desc_case_1_30b, sref_case_1_30b, test_case_1_30b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_31a, tgrp_case_1_31a, sgrp_case_1_31a, name_case_1_31a, desc_case_1_31a, sref_case_1_31a, test_case_1_31a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_31b, tgrp_case_1_31b, sgrp_case_1_31b, name_case_1_31b, desc_case_1_31b, sref_case_1_31b, test_case_1_31b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_32a, tgrp_case_1_32a, sgrp_case_1_32a, name_case_1_32a, desc_case_1_32a, sref_case_1_32a, test_case_1_32a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_32b, tgrp_case_1_32b, sgrp_case_1_32b, name_case_1_32b, desc_case_1_32b, sref_case_1_32b, test_case_1_32b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_33, tgrp_case_1_33, sgrp_case_1_33, name_case_1_33, desc_case_1_33, sref_case_1_33, test_case_1_33, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_34, tgrp_case_1_34, sgrp_case_1_34, name_case_1_34, desc_case_1_34, sref_case_1_34, test_case_1_34, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_1_35, tgrp_case_1_35, sgrp_case_1_35, name_case_1_35, desc_case_1_35, sref_case_1_35, test_case_1_35, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_2_1, tgrp_case_2_1, sgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, test_case_2_1, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_2_2, tgrp_case_2_2, sgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, test_case_2_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_2_3, tgrp_case_2_3, sgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, test_case_2_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_2_4, tgrp_case_2_4, sgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, test_case_2_4, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_2_5, tgrp_case_2_5, sgrp_case_2_5, name_case_2_5, desc_case_2_5, sref_case_2_5, test_case_2_5, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_2_6, tgrp_case_2_6, sgrp_case_2_6, name_case_2_6, desc_case_2_6, sref_case_2_6, test_case_2_6, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_2_7, tgrp_case_2_7, sgrp_case_2_7, name_case_2_7, desc_case_2_7, sref_case_2_7, test_case_2_7, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_2_8, tgrp_case_2_8, sgrp_case_2_8, name_case_2_8, desc_case_2_8, sref_case_2_8, test_case_2_8, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, test_case_3_1, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_3_2, tgrp_case_3_2, sgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, test_case_3_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_3_3, tgrp_case_3_3, sgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, test_case_3_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_3_4, tgrp_case_3_4, sgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, test_case_3_4, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_3_5, tgrp_case_3_5, sgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, test_case_3_5, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_3_6, tgrp_case_3_6, sgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, test_case_3_6, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_3_7, tgrp_case_3_7, sgrp_case_3_7, name_case_3_7, desc_case_3_7, sref_case_3_7, test_case_3_7, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_3_8, tgrp_case_3_8, sgrp_case_3_8, name_case_3_8, desc_case_3_8, sref_case_3_8, test_case_3_8, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_4_1a, tgrp_case_4_1a, sgrp_case_4_1a, name_case_4_1a, desc_case_4_1a, sref_case_4_1a, test_case_4_1a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_4_1b, tgrp_case_4_1b, sgrp_case_4_1b, name_case_4_1b, desc_case_4_1b, sref_case_4_1b, test_case_4_1b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_4_2, tgrp_case_4_2, sgrp_case_4_2, name_case_4_2, desc_case_4_2, sref_case_4_2, test_case_4_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_4_3, tgrp_case_4_3, sgrp_case_4_3, name_case_4_3, desc_case_4_3, sref_case_4_3, test_case_4_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, desc_case_5_1, sref_case_5_1, test_case_5_1, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_5_2, tgrp_case_5_2, sgrp_case_5_2, name_case_5_2, desc_case_5_2, sref_case_5_2, test_case_5_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_5_3, tgrp_case_5_3, sgrp_case_5_3, name_case_5_3, desc_case_5_3, sref_case_5_3, test_case_5_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_5_4a, tgrp_case_5_4a, sgrp_case_5_4a, name_case_5_4a, desc_case_5_4a, sref_case_5_4a, test_case_5_4a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_5_4b, tgrp_case_5_4b, sgrp_case_5_4b, name_case_5_4b, desc_case_5_4b, sref_case_5_4b, test_case_5_4b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_5_5a, tgrp_case_5_5a, sgrp_case_5_5a, name_case_5_5a, desc_case_5_5a, sref_case_5_5a, test_case_5_5a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_5_5b, tgrp_case_5_5b, sgrp_case_5_5b, name_case_5_5b, desc_case_5_5b, sref_case_5_5b, test_case_5_5b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_6_1, tgrp_case_6_1, sgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, test_case_6_1, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_6_2, tgrp_case_6_2, sgrp_case_6_2, name_case_6_2, desc_case_6_2, sref_case_6_2, test_case_6_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_6_3, tgrp_case_6_3, sgrp_case_6_3, name_case_6_3, desc_case_6_3, sref_case_6_3, test_case_6_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_6_4, tgrp_case_6_4, sgrp_case_6_4, name_case_6_4, desc_case_6_4, sref_case_6_4, test_case_6_4, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_7_1, tgrp_case_7_1, sgrp_case_7_1, name_case_7_1, desc_case_7_1, sref_case_7_1, test_case_7_1, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_7_2, tgrp_case_7_2, sgrp_case_7_2, name_case_7_2, desc_case_7_2, sref_case_7_2, test_case_7_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_7_3, tgrp_case_7_3, sgrp_case_7_3, name_case_7_3, desc_case_7_3, sref_case_7_3, test_case_7_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_7_4, tgrp_case_7_4, sgrp_case_7_4, name_case_7_4, desc_case_7_4, sref_case_7_4, test_case_7_4, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_1, tgrp_case_8_1, sgrp_case_8_1, name_case_8_1, desc_case_8_1, sref_case_8_1, test_case_8_1, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_2, tgrp_case_8_2, sgrp_case_8_2, name_case_8_2, desc_case_8_2, sref_case_8_2, test_case_8_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_3, tgrp_case_8_3, sgrp_case_8_3, name_case_8_3, desc_case_8_3, sref_case_8_3, test_case_8_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_4, tgrp_case_8_4, sgrp_case_8_4, name_case_8_4, desc_case_8_4, sref_case_8_4, test_case_8_4, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_5, tgrp_case_8_5, sgrp_case_8_5, name_case_8_5, desc_case_8_5, sref_case_8_5, test_case_8_5, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_6, tgrp_case_8_6, sgrp_case_8_6, name_case_8_6, desc_case_8_6, sref_case_8_6, test_case_8_6, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_7, tgrp_case_8_7, sgrp_case_8_7, name_case_8_7, desc_case_8_7, sref_case_8_7, test_case_8_7, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_8, tgrp_case_8_8, sgrp_case_8_8, name_case_8_8, desc_case_8_8, sref_case_8_8, test_case_8_8, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_9a, tgrp_case_8_9a, sgrp_case_8_9a, name_case_8_9a, desc_case_8_9a, sref_case_8_9a, test_case_8_9a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_9b, tgrp_case_8_9b, sgrp_case_8_9b, name_case_8_9b, desc_case_8_9b, sref_case_8_9b, test_case_8_9b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_10, tgrp_case_8_10, sgrp_case_8_10, name_case_8_10, desc_case_8_10, sref_case_8_10, test_case_8_10, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_11, tgrp_case_8_11, sgrp_case_8_11, name_case_8_11, desc_case_8_11, sref_case_8_11, test_case_8_11, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_12a, tgrp_case_8_12a, sgrp_case_8_12a, name_case_8_12a, desc_case_8_12a, sref_case_8_12a, test_case_8_12a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_12b, tgrp_case_8_12b, sgrp_case_8_12b, name_case_8_12b, desc_case_8_12b, sref_case_8_12b, test_case_8_12b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_13, tgrp_case_8_13, sgrp_case_8_13, name_case_8_13, desc_case_8_13, sref_case_8_13, test_case_8_13, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_8_14, tgrp_case_8_14, sgrp_case_8_14, name_case_8_14, desc_case_8_14, sref_case_8_14, test_case_8_14, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_1, tgrp_case_9_1, sgrp_case_9_1, name_case_9_1, desc_case_9_1, sref_case_9_1, test_case_9_1, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_2, tgrp_case_9_2, sgrp_case_9_2, name_case_9_2, desc_case_9_2, sref_case_9_2, test_case_9_2, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_3, tgrp_case_9_3, sgrp_case_9_3, name_case_9_3, desc_case_9_3, sref_case_9_3, test_case_9_3, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_4, tgrp_case_9_4, sgrp_case_9_4, name_case_9_4, desc_case_9_4, sref_case_9_4, test_case_9_4, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_5, tgrp_case_9_5, sgrp_case_9_5, name_case_9_5, desc_case_9_5, sref_case_9_5, test_case_9_5, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_6, tgrp_case_9_6, sgrp_case_9_6, name_case_9_6, desc_case_9_6, sref_case_9_6, test_case_9_6, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_7, tgrp_case_9_7, sgrp_case_9_7, name_case_9_7, desc_case_9_7, sref_case_9_7, test_case_9_7, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_8, tgrp_case_9_8, sgrp_case_9_8, name_case_9_8, desc_case_9_8, sref_case_9_8, test_case_9_8, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_9, tgrp_case_9_9, sgrp_case_9_9, name_case_9_9, desc_case_9_9, sref_case_9_9, test_case_9_9, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_10, tgrp_case_9_10, sgrp_case_9_10, name_case_9_10, desc_case_9_10, sref_case_9_10, test_case_9_10, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_11, tgrp_case_9_11, sgrp_case_9_11, name_case_9_11, desc_case_9_11, sref_case_9_11, test_case_9_11, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_12, tgrp_case_9_12, sgrp_case_9_12, name_case_9_12, desc_case_9_12, sref_case_9_12, test_case_9_12, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_9_13, tgrp_case_9_13, sgrp_case_9_13, name_case_9_13, desc_case_9_13, sref_case_9_13, test_case_9_13, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_10_1, tgrp_case_10_1, sgrp_case_10_1, name_case_10_1, desc_case_10_1, sref_case_10_1, test_case_10_1, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_10_2a, tgrp_case_10_2a, sgrp_case_10_2a, name_case_10_2a, desc_case_10_2a, sref_case_10_2a, test_case_10_2a, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_10_2b, tgrp_case_10_2b, sgrp_case_10_2b, name_case_10_2b, desc_case_10_2b, sref_case_10_2b, test_case_10_2b, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_10_2c, tgrp_case_10_2c, sgrp_case_10_2c, name_case_10_2c, desc_case_10_2c, sref_case_10_2c, test_case_10_2c, &begin_tests, &end_tests, 0, 0,}, {
-	numb_case_10_3, tgrp_case_10_3, sgrp_case_10_3, name_case_10_3, desc_case_10_3, sref_case_10_3, test_case_10_3, &begin_tests, &end_tests, 0, 0,}, {
+	numb_case_0_1, tgrp_case_0_1, sgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, test_case_0_1, &begin_sanity, &end_sanity, 0, 0, __RESULT_INCONCLUSIVE,}, {
+	numb_case_0_2_1, tgrp_case_0_2_1, sgrp_case_0_2_1, name_case_0_2_1, desc_case_0_2_1, sref_case_0_2_1, test_case_0_2_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_2, tgrp_case_0_2_2, sgrp_case_0_2_2, name_case_0_2_2, desc_case_0_2_2, sref_case_0_2_2, test_case_0_2_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_3, tgrp_case_0_2_3, sgrp_case_0_2_3, name_case_0_2_3, desc_case_0_2_3, sref_case_0_2_3, test_case_0_2_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_4, tgrp_case_0_2_4, sgrp_case_0_2_4, name_case_0_2_4, desc_case_0_2_4, sref_case_0_2_4, test_case_0_2_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_5, tgrp_case_0_2_5, sgrp_case_0_2_5, name_case_0_2_5, desc_case_0_2_5, sref_case_0_2_5, test_case_0_2_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_6, tgrp_case_0_2_6, sgrp_case_0_2_6, name_case_0_2_6, desc_case_0_2_6, sref_case_0_2_6, test_case_0_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_7, tgrp_case_0_2_7, sgrp_case_0_2_7, name_case_0_2_7, desc_case_0_2_7, sref_case_0_2_7, test_case_0_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_8, tgrp_case_0_2_8, sgrp_case_0_2_8, name_case_0_2_8, desc_case_0_2_8, sref_case_0_2_8, test_case_0_2_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_1a, tgrp_case_1_1a, sgrp_case_1_1a, name_case_1_1a, desc_case_1_1a, sref_case_1_1a, test_case_1_1a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_1b, tgrp_case_1_1b, sgrp_case_1_1b, name_case_1_1b, desc_case_1_1b, sref_case_1_1b, test_case_1_1b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_2, tgrp_case_1_2, sgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, test_case_1_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_3, tgrp_case_1_3, sgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, test_case_1_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_4, tgrp_case_1_4, sgrp_case_1_4, name_case_1_4, desc_case_1_4, sref_case_1_4, test_case_1_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5a_p, tgrp_case_1_5a_p, sgrp_case_1_5a_p, name_case_1_5a_p, desc_case_1_5a_p, sref_case_1_5a_p, test_case_1_5a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5b_p, tgrp_case_1_5b_p, sgrp_case_1_5b_p, name_case_1_5b_p, desc_case_1_5b_p, sref_case_1_5b_p, test_case_1_5b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5a_np, tgrp_case_1_5a_np, sgrp_case_1_5a_np, name_case_1_5a_np, desc_case_1_5a_np, sref_case_1_5a_np, test_case_1_5a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5b_np, tgrp_case_1_5b_np, sgrp_case_1_5b_np, name_case_1_5b_np, desc_case_1_5b_np, sref_case_1_5b_np, test_case_1_5b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_6_p, tgrp_case_1_6_p, sgrp_case_1_6_p, name_case_1_6_p, desc_case_1_6_p, sref_case_1_6_p, test_case_1_6_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_6_np, tgrp_case_1_6_np, sgrp_case_1_6_np, name_case_1_6_np, desc_case_1_6_np, sref_case_1_6_np, test_case_1_6_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_7, tgrp_case_1_7, sgrp_case_1_7, name_case_1_7, desc_case_1_7, sref_case_1_7, test_case_1_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8a_p, tgrp_case_1_8a_p, sgrp_case_1_8a_p, name_case_1_8a_p, desc_case_1_8a_p, sref_case_1_8a_p, test_case_1_8a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8b_p, tgrp_case_1_8b_p, sgrp_case_1_8b_p, name_case_1_8b_p, desc_case_1_8b_p, sref_case_1_8b_p, test_case_1_8b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8a_np, tgrp_case_1_8a_np, sgrp_case_1_8a_np, name_case_1_8a_np, desc_case_1_8a_np, sref_case_1_8a_np, test_case_1_8a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8b_np, tgrp_case_1_8b_np, sgrp_case_1_8b_np, name_case_1_8b_np, desc_case_1_8b_np, sref_case_1_8b_np, test_case_1_8b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9a_p, tgrp_case_1_9a_p, sgrp_case_1_9a_p, name_case_1_9a_p, desc_case_1_9a_p, sref_case_1_9a_p, test_case_1_9a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9b_p, tgrp_case_1_9b_p, sgrp_case_1_9b_p, name_case_1_9b_p, desc_case_1_9b_p, sref_case_1_9b_p, test_case_1_9b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9a_np, tgrp_case_1_9a_np, sgrp_case_1_9a_np, name_case_1_9a_np, desc_case_1_9a_np, sref_case_1_9a_np, test_case_1_9a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9b_np, tgrp_case_1_9b_np, sgrp_case_1_9b_np, name_case_1_9b_np, desc_case_1_9b_np, sref_case_1_9b_np, test_case_1_9b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_10_p, tgrp_case_1_10_p, sgrp_case_1_10_p, name_case_1_10_p, desc_case_1_10_p, sref_case_1_10_p, test_case_1_10_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_10_np, tgrp_case_1_10_np, sgrp_case_1_10_np, name_case_1_10_np, desc_case_1_10_np, sref_case_1_10_np, test_case_1_10_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_11_p, tgrp_case_1_11_p, sgrp_case_1_11_p, name_case_1_11_p, desc_case_1_11_p, sref_case_1_11_p, test_case_1_11_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_11_np, tgrp_case_1_11_np, sgrp_case_1_11_np, name_case_1_11_np, desc_case_1_11_np, sref_case_1_11_np, test_case_1_11_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12a_p, tgrp_case_1_12a_p, sgrp_case_1_12a_p, name_case_1_12a_p, desc_case_1_12a_p, sref_case_1_12a_p, test_case_1_12a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12b_p, tgrp_case_1_12b_p, sgrp_case_1_12b_p, name_case_1_12b_p, desc_case_1_12b_p, sref_case_1_12b_p, test_case_1_12b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12a_np, tgrp_case_1_12a_np, sgrp_case_1_12a_np, name_case_1_12a_np, desc_case_1_12a_np, sref_case_1_12a_np, test_case_1_12a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12b_np, tgrp_case_1_12b_np, sgrp_case_1_12b_np, name_case_1_12b_np, desc_case_1_12b_np, sref_case_1_12b_np, test_case_1_12b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_13_p, tgrp_case_1_13_p, sgrp_case_1_13_p, name_case_1_13_p, desc_case_1_13_p, sref_case_1_13_p, test_case_1_13_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_13_np, tgrp_case_1_13_np, sgrp_case_1_13_np, name_case_1_13_np, desc_case_1_13_np, sref_case_1_13_np, test_case_1_13_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_14, tgrp_case_1_14, sgrp_case_1_14, name_case_1_14, desc_case_1_14, sref_case_1_14, test_case_1_14, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_15_p, tgrp_case_1_15_p, sgrp_case_1_15_p, name_case_1_15_p, desc_case_1_15_p, sref_case_1_15_p, test_case_1_15_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_15_np, tgrp_case_1_15_np, sgrp_case_1_15_np, name_case_1_15_np, desc_case_1_15_np, sref_case_1_15_np, test_case_1_15_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_16_p, tgrp_case_1_16_p, sgrp_case_1_16_p, name_case_1_16_p, desc_case_1_16_p, sref_case_1_16_p, test_case_1_16_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_16_np, tgrp_case_1_16_np, sgrp_case_1_16_np, name_case_1_16_np, desc_case_1_16_np, sref_case_1_16_np, test_case_1_16_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_17, tgrp_case_1_17, sgrp_case_1_17, name_case_1_17, desc_case_1_17, sref_case_1_17, test_case_1_17, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_18, tgrp_case_1_18, sgrp_case_1_18, name_case_1_18, desc_case_1_18, sref_case_1_18, test_case_1_18, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_19, tgrp_case_1_19, sgrp_case_1_19, name_case_1_19, desc_case_1_19, sref_case_1_19, test_case_1_19, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_20, tgrp_case_1_20, sgrp_case_1_20, name_case_1_20, desc_case_1_20, sref_case_1_20, test_case_1_20, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_21, tgrp_case_1_21, sgrp_case_1_21, name_case_1_21, desc_case_1_21, sref_case_1_21, test_case_1_21, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_22, tgrp_case_1_22, sgrp_case_1_22, name_case_1_22, desc_case_1_22, sref_case_1_22, test_case_1_22, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_23, tgrp_case_1_23, sgrp_case_1_23, name_case_1_23, desc_case_1_23, sref_case_1_23, test_case_1_23, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_24, tgrp_case_1_24, sgrp_case_1_24, name_case_1_24, desc_case_1_24, sref_case_1_24, test_case_1_24, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_25, tgrp_case_1_25, sgrp_case_1_25, name_case_1_25, desc_case_1_25, sref_case_1_25, test_case_1_25, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_26, tgrp_case_1_26, sgrp_case_1_26, name_case_1_26, desc_case_1_26, sref_case_1_26, test_case_1_26, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_27_p, tgrp_case_1_27_p, sgrp_case_1_27_p, name_case_1_27_p, desc_case_1_27_p, sref_case_1_27_p, test_case_1_27_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_27_np, tgrp_case_1_27_np, sgrp_case_1_27_np, name_case_1_27_np, desc_case_1_27_np, sref_case_1_27_np, test_case_1_27_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_28, tgrp_case_1_28, sgrp_case_1_28, name_case_1_28, desc_case_1_28, sref_case_1_28, test_case_1_28, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_29a, tgrp_case_1_29a, sgrp_case_1_29a, name_case_1_29a, desc_case_1_29a, sref_case_1_29a, test_case_1_29a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_29b, tgrp_case_1_29b, sgrp_case_1_29b, name_case_1_29b, desc_case_1_29b, sref_case_1_29b, test_case_1_29b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_30a, tgrp_case_1_30a, sgrp_case_1_30a, name_case_1_30a, desc_case_1_30a, sref_case_1_30a, test_case_1_30a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_30b, tgrp_case_1_30b, sgrp_case_1_30b, name_case_1_30b, desc_case_1_30b, sref_case_1_30b, test_case_1_30b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_31a, tgrp_case_1_31a, sgrp_case_1_31a, name_case_1_31a, desc_case_1_31a, sref_case_1_31a, test_case_1_31a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_31b, tgrp_case_1_31b, sgrp_case_1_31b, name_case_1_31b, desc_case_1_31b, sref_case_1_31b, test_case_1_31b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_32a, tgrp_case_1_32a, sgrp_case_1_32a, name_case_1_32a, desc_case_1_32a, sref_case_1_32a, test_case_1_32a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_32b, tgrp_case_1_32b, sgrp_case_1_32b, name_case_1_32b, desc_case_1_32b, sref_case_1_32b, test_case_1_32b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_33, tgrp_case_1_33, sgrp_case_1_33, name_case_1_33, desc_case_1_33, sref_case_1_33, test_case_1_33, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_34, tgrp_case_1_34, sgrp_case_1_34, name_case_1_34, desc_case_1_34, sref_case_1_34, test_case_1_34, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_35, tgrp_case_1_35, sgrp_case_1_35, name_case_1_35, desc_case_1_35, sref_case_1_35, test_case_1_35, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1, tgrp_case_2_1, sgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, test_case_2_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_2, tgrp_case_2_2, sgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, test_case_2_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3, tgrp_case_2_3, sgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, test_case_2_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_4, tgrp_case_2_4, sgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, test_case_2_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_5, tgrp_case_2_5, sgrp_case_2_5, name_case_2_5, desc_case_2_5, sref_case_2_5, test_case_2_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_6, tgrp_case_2_6, sgrp_case_2_6, name_case_2_6, desc_case_2_6, sref_case_2_6, test_case_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_7, tgrp_case_2_7, sgrp_case_2_7, name_case_2_7, desc_case_2_7, sref_case_2_7, test_case_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_8, tgrp_case_2_8, sgrp_case_2_8, name_case_2_8, desc_case_2_8, sref_case_2_8, test_case_2_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, test_case_3_1, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_2, tgrp_case_3_2, sgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, test_case_3_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_3, tgrp_case_3_3, sgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, test_case_3_3, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_4, tgrp_case_3_4, sgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, test_case_3_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_5, tgrp_case_3_5, sgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, test_case_3_5, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_6, tgrp_case_3_6, sgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, test_case_3_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_7, tgrp_case_3_7, sgrp_case_3_7, name_case_3_7, desc_case_3_7, sref_case_3_7, test_case_3_7, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_8, tgrp_case_3_8, sgrp_case_3_8, name_case_3_8, desc_case_3_8, sref_case_3_8, test_case_3_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_1a, tgrp_case_4_1a, sgrp_case_4_1a, name_case_4_1a, desc_case_4_1a, sref_case_4_1a, test_case_4_1a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_1b, tgrp_case_4_1b, sgrp_case_4_1b, name_case_4_1b, desc_case_4_1b, sref_case_4_1b, test_case_4_1b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_2, tgrp_case_4_2, sgrp_case_4_2, name_case_4_2, desc_case_4_2, sref_case_4_2, test_case_4_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_3, tgrp_case_4_3, sgrp_case_4_3, name_case_4_3, desc_case_4_3, sref_case_4_3, test_case_4_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, desc_case_5_1, sref_case_5_1, test_case_5_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_2, tgrp_case_5_2, sgrp_case_5_2, name_case_5_2, desc_case_5_2, sref_case_5_2, test_case_5_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_3, tgrp_case_5_3, sgrp_case_5_3, name_case_5_3, desc_case_5_3, sref_case_5_3, test_case_5_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_4a, tgrp_case_5_4a, sgrp_case_5_4a, name_case_5_4a, desc_case_5_4a, sref_case_5_4a, test_case_5_4a, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_4b, tgrp_case_5_4b, sgrp_case_5_4b, name_case_5_4b, desc_case_5_4b, sref_case_5_4b, test_case_5_4b, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_5a, tgrp_case_5_5a, sgrp_case_5_5a, name_case_5_5a, desc_case_5_5a, sref_case_5_5a, test_case_5_5a, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_5b, tgrp_case_5_5b, sgrp_case_5_5b, name_case_5_5b, desc_case_5_5b, sref_case_5_5b, test_case_5_5b, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_6_1, tgrp_case_6_1, sgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, test_case_6_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_6_2, tgrp_case_6_2, sgrp_case_6_2, name_case_6_2, desc_case_6_2, sref_case_6_2, test_case_6_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_6_3, tgrp_case_6_3, sgrp_case_6_3, name_case_6_3, desc_case_6_3, sref_case_6_3, test_case_6_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_6_4, tgrp_case_6_4, sgrp_case_6_4, name_case_6_4, desc_case_6_4, sref_case_6_4, test_case_6_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_7_1, tgrp_case_7_1, sgrp_case_7_1, name_case_7_1, desc_case_7_1, sref_case_7_1, test_case_7_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_7_2, tgrp_case_7_2, sgrp_case_7_2, name_case_7_2, desc_case_7_2, sref_case_7_2, test_case_7_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_7_3, tgrp_case_7_3, sgrp_case_7_3, name_case_7_3, desc_case_7_3, sref_case_7_3, test_case_7_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_7_4, tgrp_case_7_4, sgrp_case_7_4, name_case_7_4, desc_case_7_4, sref_case_7_4, test_case_7_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_1, tgrp_case_8_1, sgrp_case_8_1, name_case_8_1, desc_case_8_1, sref_case_8_1, test_case_8_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_2, tgrp_case_8_2, sgrp_case_8_2, name_case_8_2, desc_case_8_2, sref_case_8_2, test_case_8_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_3, tgrp_case_8_3, sgrp_case_8_3, name_case_8_3, desc_case_8_3, sref_case_8_3, test_case_8_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_4, tgrp_case_8_4, sgrp_case_8_4, name_case_8_4, desc_case_8_4, sref_case_8_4, test_case_8_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_5, tgrp_case_8_5, sgrp_case_8_5, name_case_8_5, desc_case_8_5, sref_case_8_5, test_case_8_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_6, tgrp_case_8_6, sgrp_case_8_6, name_case_8_6, desc_case_8_6, sref_case_8_6, test_case_8_6, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_7, tgrp_case_8_7, sgrp_case_8_7, name_case_8_7, desc_case_8_7, sref_case_8_7, test_case_8_7, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_8, tgrp_case_8_8, sgrp_case_8_8, name_case_8_8, desc_case_8_8, sref_case_8_8, test_case_8_8, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_9a, tgrp_case_8_9a, sgrp_case_8_9a, name_case_8_9a, desc_case_8_9a, sref_case_8_9a, test_case_8_9a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_9b, tgrp_case_8_9b, sgrp_case_8_9b, name_case_8_9b, desc_case_8_9b, sref_case_8_9b, test_case_8_9b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_10, tgrp_case_8_10, sgrp_case_8_10, name_case_8_10, desc_case_8_10, sref_case_8_10, test_case_8_10, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_11, tgrp_case_8_11, sgrp_case_8_11, name_case_8_11, desc_case_8_11, sref_case_8_11, test_case_8_11, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_12a, tgrp_case_8_12a, sgrp_case_8_12a, name_case_8_12a, desc_case_8_12a, sref_case_8_12a, test_case_8_12a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_12b, tgrp_case_8_12b, sgrp_case_8_12b, name_case_8_12b, desc_case_8_12b, sref_case_8_12b, test_case_8_12b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_13, tgrp_case_8_13, sgrp_case_8_13, name_case_8_13, desc_case_8_13, sref_case_8_13, test_case_8_13, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_14, tgrp_case_8_14, sgrp_case_8_14, name_case_8_14, desc_case_8_14, sref_case_8_14, test_case_8_14, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_1, tgrp_case_9_1, sgrp_case_9_1, name_case_9_1, desc_case_9_1, sref_case_9_1, test_case_9_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_2, tgrp_case_9_2, sgrp_case_9_2, name_case_9_2, desc_case_9_2, sref_case_9_2, test_case_9_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_3, tgrp_case_9_3, sgrp_case_9_3, name_case_9_3, desc_case_9_3, sref_case_9_3, test_case_9_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_4, tgrp_case_9_4, sgrp_case_9_4, name_case_9_4, desc_case_9_4, sref_case_9_4, test_case_9_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_5, tgrp_case_9_5, sgrp_case_9_5, name_case_9_5, desc_case_9_5, sref_case_9_5, test_case_9_5, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_6, tgrp_case_9_6, sgrp_case_9_6, name_case_9_6, desc_case_9_6, sref_case_9_6, test_case_9_6, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_7, tgrp_case_9_7, sgrp_case_9_7, name_case_9_7, desc_case_9_7, sref_case_9_7, test_case_9_7, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_8, tgrp_case_9_8, sgrp_case_9_8, name_case_9_8, desc_case_9_8, sref_case_9_8, test_case_9_8, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_9, tgrp_case_9_9, sgrp_case_9_9, name_case_9_9, desc_case_9_9, sref_case_9_9, test_case_9_9, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_10, tgrp_case_9_10, sgrp_case_9_10, name_case_9_10, desc_case_9_10, sref_case_9_10, test_case_9_10, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_11, tgrp_case_9_11, sgrp_case_9_11, name_case_9_11, desc_case_9_11, sref_case_9_11, test_case_9_11, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_12, tgrp_case_9_12, sgrp_case_9_12, name_case_9_12, desc_case_9_12, sref_case_9_12, test_case_9_12, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_13, tgrp_case_9_13, sgrp_case_9_13, name_case_9_13, desc_case_9_13, sref_case_9_13, test_case_9_13, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_10_1, tgrp_case_10_1, sgrp_case_10_1, name_case_10_1, desc_case_10_1, sref_case_10_1, test_case_10_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_10_2a, tgrp_case_10_2a, sgrp_case_10_2a, name_case_10_2a, desc_case_10_2a, sref_case_10_2a, test_case_10_2a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_10_2b, tgrp_case_10_2b, sgrp_case_10_2b, name_case_10_2b, desc_case_10_2b, sref_case_10_2b, test_case_10_2b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_10_2c, tgrp_case_10_2c, sgrp_case_10_2c, name_case_10_2c, desc_case_10_2c, sref_case_10_2c, test_case_10_2c, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_10_3, tgrp_case_10_3, sgrp_case_10_3, name_case_10_3, desc_case_10_3, sref_case_10_3, test_case_10_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	NULL,}
 };
 
@@ -14899,7 +15354,37 @@ do_tests(int num_tests)
 					goto inconclusive;
 				result = test_run(tests[i].stream);
 				(*tests[i].stop) (i);
+				if (result == tests[i].expect) {
+					switch (result) {
+					case __RESULT_SUCCESS:
+					case __RESULT_NOTAPPL:
+					case __RESULT_SKIPPED:
+						/* autotest can handle these */
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+					case __RESULT_FAILURE:
+						/* these are expected failures */
+						result = __RESULT_SUCCESS;
+						break;
+					}
+				}
 			} else {
+				if (result == tests[i].expect) {
+					switch (result) {
+					case __RESULT_SUCCESS:
+					case __RESULT_NOTAPPL:
+					case __RESULT_SKIPPED:
+						/* autotest can handle these */
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+					case __RESULT_FAILURE:
+						/* these are expected failures */
+						result = __RESULT_SUCCESS;
+						break;
+					}
+				}
 				switch (result) {
 				case __RESULT_SUCCESS:
 					print_passed(3);

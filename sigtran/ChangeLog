@@ -1,3 +1,13 @@
+2006-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/m2pa_sl.c: more debugging and a few corrections
+	* src/modules/sdt_tpi.c: printf corrections
+	* src/modules/sl_tpi.c: printf corrections
+	* src/test/test-m2pa.c: many corrections to test cases
+	* src/util/init/sigtran: added m2pa_sl module to modules list
+	* src/util/sysconfig/sigtran.in: added m2pa_sl module to modules list
+	* tests/testsuite-m2pa.at: added sanity checks to testsuite
+
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: added ability to sync between test cases

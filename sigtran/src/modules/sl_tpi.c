@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:47 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/31 20:34:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:55:47 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 20:34:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:47 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/31 20:34:21 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:47 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/31 20:34:21 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -6134,11 +6134,11 @@ t_info_ack(queue_t *q, mblk_t *mp)
 			sl->t.pdu_size = p->TIDU_size;
 		if ((sl->sdt.config.m =
 		     sl->t.pdu_size - 1 - ((sl->option.popt & SS7_POPT_XSN) ? 6 : 3)) < 272)
-			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %ld",
-				SL_TPI_MOD_NAME, sl->sdt.config.m);
+			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %lu",
+				SL_TPI_MOD_NAME, (ulong) sl->sdt.config.m);
 		if ((sl->t.add_size = p->ADDR_size) > sizeof(struct sockaddr))
-			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %ld",
-				SL_TPI_MOD_NAME, (long) p->ADDR_size);
+			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %lu",
+				SL_TPI_MOD_NAME, (ulong) p->ADDR_size);
 		sl->t.opt_size = p->OPT_size;
 		sl->t.state = p->CURRENT_state;
 		sl->t.serv_type = p->SERV_type;

@@ -7,7 +7,7 @@
 #SIGTRAN_MODULES="@SIGTRAN_MODULES@"
 SIGTRAN_PRELOAD=""
 SIGTRAN_DRIVERS=""
-SIGTRAN_MODULES=""
+SIGTRAN_MODULES="streams-m2pa_sl"
 # Make real character devices before intializing subsystem?
 SIGTRAN_MAKEDEVICES='no'
 # Remove devices after removing subsystem?
@@ -15,7 +15,7 @@ SIGTRAN_REMOVEDEVICES='no'
 
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:54 $
+# @(#) $RCSfile: sigtran.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/31 20:34:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@ SIGTRAN_REMOVEDEVICES='no'
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 10:42:54 $ by $Author: brian $
+# Last Modified $Date: 2006/10/31 20:34:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.in,v $
+# Revision 0.9.2.2  2006/10/31 20:34:26  brian
+# - more buildup of test suite
+#
 # Revision 0.9.2.1  2006/10/16 10:42:54  brian
 # - added new package files
 #
