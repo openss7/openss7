@@ -1,3 +1,7 @@
+2006-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: optimization correction
+
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: added ability to sync between test cases
