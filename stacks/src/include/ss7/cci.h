@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: cci.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
+ @(#) $Id: cci.h,v 0.9.2.4 2006/10/31 21:04:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,16 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 21:04:37 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: cci.h,v $
+ Revision 0.9.2.4  2006/10/31 21:04:37  brian
+ - changes for 32-bit compatibility and remove HZ dependency
 
  *****************************************************************************/
 
 #ifndef __CCI_H__
 #define __CCI_H__
 
-#ident "@(#) $RCSfile: cci.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: cci.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
+
+typedef lmi_long cc_long;
+typedef lmi_ulong cc_ulong;
+typedef lmi_ushort cc_ushort;
+typedef lmi_uchar cc_uchar;
 
 #define CC_INFO_REQ		0
 #define CC_OPTMGMT_REQ		1
@@ -192,19 +203,19 @@ enum {
 };
 
 typedef struct CC_ok_ack {
-	ulong cc_primitive;		/* always CC_OK_ACK */
-	ulong cc_correct_prim;		/* primitive being acknowledged */
-	ulong cc_state;			/* current state */
-	ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_primitive;		/* always CC_OK_ACK */
+	cc_ulong cc_correct_prim;	/* primitive being acknowledged */
+	cc_ulong cc_state;		/* current state */
+	cc_ulong cc_call_ref;		/* call reference */
 } CC_ok_ack_t;
 
 typedef struct CC_error_ack {
-	ulong cc_primitive;		/* always CC_ERROR_ACK */
-	ulong cc_error_primitive;	/* primitive in error */
-	ulong cc_error_type;		/* CCI error code */
-	ulong cc_unix_error;		/* UNIX system error code */
-	ulong cc_state;			/* current state */
-	ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_primitive;		/* always CC_ERROR_ACK */
+	cc_ulong cc_error_primitive;	/* primitive in error */
+	cc_ulong cc_error_type;		/* CCI error code */
+	cc_ulong cc_unix_error;		/* UNIX system error code */
+	cc_ulong cc_state;		/* current state */
+	cc_ulong cc_call_ref;		/* call reference */
 } CC_error_ack_t;
 
 enum {
@@ -224,22 +235,20 @@ enum {
 };
 
 typedef struct CC_info_req {
-	ulong cc_primitive;		/* always CC_INFO_REQ */
+	cc_ulong cc_primitive;		/* always CC_INFO_REQ */
 } CC_info_req_t;
 
 typedef struct CC_info_ack {
-	ulong cc_primitive;		/* always CC_INFO_ACK */
-	/*
-	   FIXME ... more ... 
-	 */
+	cc_ulong cc_primitive;		/* always CC_INFO_ACK */
+	/* FIXME ... more ...  */
 } CC_info_ack_t;
 
 typedef struct CC_bind_req {
-	ulong cc_primitive;		/* always CC_BIND_REQ */
-	ulong cc_addr_length;		/* length of address */
-	ulong cc_addr_offset;		/* offset of address */
-	ulong cc_setup_ind;		/* req # of setup inds to be queued */
-	ulong cc_bind_flags;		/* bind options flags */
+	cc_ulong cc_primitive;		/* always CC_BIND_REQ */
+	cc_ulong cc_addr_length;	/* length of address */
+	cc_ulong cc_addr_offset;	/* offset of address */
+	cc_ulong cc_setup_ind;		/* req # of setup inds to be queued */
+	cc_ulong cc_bind_flags;		/* bind options flags */
 } CC_bind_req_t;
 
 /*
@@ -253,612 +262,612 @@ typedef struct CC_bind_req {
 #define CC_MONITOR			0x000000020UL
 
 typedef struct CC_bind_ack {
-	ulong cc_primitive;		/* always CC_BIND_ACK */
-	ulong cc_addr_length;		/* length of address */
-	ulong cc_addr_offset;		/* offset of address */
-	ulong cc_setup_ind;		/* setup indications */
-	ulong cc_token_value;		/* setup response token value */
+	cc_ulong cc_primitive;		/* always CC_BIND_ACK */
+	cc_ulong cc_addr_length;	/* length of address */
+	cc_ulong cc_addr_offset;	/* offset of address */
+	cc_ulong cc_setup_ind;		/* setup indications */
+	cc_ulong cc_token_value;	/* setup response token value */
 } CC_bind_ack_t;
 
 typedef struct CC_unbind_req {
-	ulong cc_primitive;		/* always CC_UNBIND_REQ */
+	cc_ulong cc_primitive;		/* always CC_UNBIND_REQ */
 } CC_unbind_req_t;
 
 typedef struct CC_addr_req {
-	ulong cc_primitive;		/* always CC_ADDR_REQ */
-	ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_primitive;		/* always CC_ADDR_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
 } CC_addr_req_t;
 
 typedef struct CC_addr_ack {
-	ulong cc_primitive;		/* always CC_ADDR_ACK */
-	ulong cc_bind_length;		/* length of bound address */
-	ulong cc_bind_offset;		/* offset of bound address */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_conn_length;		/* length of connected address */
-	ulong cc_conn_offset;		/* offset of connected address */
+	cc_ulong cc_primitive;		/* always CC_ADDR_ACK */
+	cc_ulong cc_bind_length;	/* length of bound address */
+	cc_ulong cc_bind_offset;	/* offset of bound address */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_conn_length;	/* length of connected address */
+	cc_ulong cc_conn_offset;	/* offset of connected address */
 } CC_addr_ack_t;
 
 typedef struct CC_optmgmt_req {
-	ulong cc_primitive;		/* always CC_OPTMGMT_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* length of option values */
-	ulong cc_opt_offset;		/* offset of option values */
-	ulong cc_opt_flags;		/* option flags */
+	cc_ulong cc_primitive;		/* always CC_OPTMGMT_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* length of option values */
+	cc_ulong cc_opt_offset;		/* offset of option values */
+	cc_ulong cc_opt_flags;		/* option flags */
 } CC_optmgmt_req_t;
 
 typedef struct CC_optmgmt_ack {
-	ulong cc_primitive;		/* always CC_OPTMGMT_ACK */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* length of option values */
-	ulong cc_opt_offset;		/* offset of option values */
-	ulong cc_opt_flags;		/* option flags */
+	cc_ulong cc_primitive;		/* always CC_OPTMGMT_ACK */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* length of option values */
+	cc_ulong cc_opt_offset;		/* offset of option values */
+	cc_ulong cc_opt_flags;		/* option flags */
 } CC_optmgmt_ack_t;
 
 typedef struct CC_setup_req {
-	ulong cc_primitive;		/* always CC_SETUP_REQ */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_call_type;		/* call type */
-	ulong cc_call_flags;		/* call flags */
-	ulong cc_cdpn_length;		/* called party number length */
-	ulong cc_cdpn_offset;		/* called party number offset */
-	ulong cc_opt_length;		/* optional parameters length */
-	ulong cc_opt_offset;		/* optional parameters offset */
-	ulong cc_addr_length;		/* connect to address length */
-	ulong cc_addr_offset;		/* connect to address offset */
+	cc_ulong cc_primitive;		/* always CC_SETUP_REQ */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_call_type;		/* call type */
+	cc_ulong cc_call_flags;		/* call flags */
+	cc_ulong cc_cdpn_length;	/* called party number length */
+	cc_ulong cc_cdpn_offset;	/* called party number offset */
+	cc_ulong cc_opt_length;		/* optional parameters length */
+	cc_ulong cc_opt_offset;		/* optional parameters offset */
+	cc_ulong cc_addr_length;	/* connect to address length */
+	cc_ulong cc_addr_offset;	/* connect to address offset */
 } CC_setup_req_t;
 
 typedef struct CC_call_reattempt_ind {
-	ulong cc_primitive;		/* always CC_CALL_REATTEMPT_IND */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_reason;		/* reason for reattempt */
+	cc_ulong cc_primitive;		/* always CC_CALL_REATTEMPT_IND */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_reason;		/* reason for reattempt */
 } CC_call_reattempt_ind_t;
 
 typedef struct CC_setup_ind {
-	ulong cc_primitive;		/* always CC_SETUP_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_call_type;		/* call type */
-	ulong cc_call_flags;		/* call flags */
-	ulong cc_cdpn_length;		/* called party number length */
-	ulong cc_cdpn_offset;		/* called party number offset */
-	ulong cc_opt_length;		/* optional parameters length */
-	ulong cc_opt_offset;		/* optional parameters offset */
-	ulong cc_addr_length;		/* connecting address length */
-	ulong cc_addr_offset;		/* connecting address offset */
+	cc_ulong cc_primitive;		/* always CC_SETUP_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_call_type;		/* call type */
+	cc_ulong cc_call_flags;		/* call flags */
+	cc_ulong cc_cdpn_length;	/* called party number length */
+	cc_ulong cc_cdpn_offset;	/* called party number offset */
+	cc_ulong cc_opt_length;		/* optional parameters length */
+	cc_ulong cc_opt_offset;		/* optional parameters offset */
+	cc_ulong cc_addr_length;	/* connecting address length */
+	cc_ulong cc_addr_offset;	/* connecting address offset */
 } CC_setup_ind_t;
 
 typedef struct CC_setup_res {
-	ulong cc_primitive;		/* always CC_SETUP_RES */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_token_value;		/* call response token value */
+	cc_ulong cc_primitive;		/* always CC_SETUP_RES */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_token_value;	/* call response token value */
 } CC_setup_res_t;
 
 typedef struct CC_setup_con {
-	ulong cc_primitive;		/* always CC_SETUP_CON */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_addr_length;		/* connecting address length */
-	ulong cc_addr_offset;		/* connecting address offset */
+	cc_ulong cc_primitive;		/* always CC_SETUP_CON */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_addr_length;	/* connecting address length */
+	cc_ulong cc_addr_offset;	/* connecting address offset */
 } CC_setup_con_t;
 
 typedef struct CC_cont_check_req {
-	ulong cc_primitive;		/* always CC_CONT_CHECK_REQ */
-	ulong cc_addr_length;		/* adress length */
-	ulong cc_addr_offset;		/* adress offset */
+	cc_ulong cc_primitive;		/* always CC_CONT_CHECK_REQ */
+	cc_ulong cc_addr_length;	/* adress length */
+	cc_ulong cc_addr_offset;	/* adress offset */
 } CC_cont_check_req_t;
 
 typedef struct CC_cont_check_ind {
-	ulong cc_primitive;		/* always CC_CONT_CHECK_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_addr_length;		/* adress length */
-	ulong cc_addr_offset;		/* adress offset */
+	cc_ulong cc_primitive;		/* always CC_CONT_CHECK_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_addr_length;	/* adress length */
+	cc_ulong cc_addr_offset;	/* adress offset */
 } CC_cont_check_ind_t;
 
 typedef struct CC_cont_test_req {
-	ulong cc_primitive;		/* always CC_CONT_TEST_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_token_value;		/* token value */
+	cc_ulong cc_primitive;		/* always CC_CONT_TEST_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_token_value;	/* token value */
 } CC_cont_test_req_t;
 
 typedef struct CC_cont_test_ind {
-	ulong cc_primitive;		/* always CC_CONT_TEST_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_addr_length;		/* adress length */
-	ulong cc_addr_offset;		/* adress offset */
+	cc_ulong cc_primitive;		/* always CC_CONT_TEST_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_addr_length;	/* adress length */
+	cc_ulong cc_addr_offset;	/* adress offset */
 } CC_cont_test_ind_t;
 
 typedef struct CC_cont_report_req {
-	ulong cc_primitive;		/* always CC_CONT_REPORT_REQ */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_result;		/* result of continuity check */
+	cc_ulong cc_primitive;		/* always CC_CONT_REPORT_REQ */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_result;		/* result of continuity check */
 } CC_cont_report_req_t;
 
 typedef struct CC_cont_report_ind {
-	ulong cc_primitive;		/* always CC_CONT_REPORT_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_result;		/* result of continuity check */
+	cc_ulong cc_primitive;		/* always CC_CONT_REPORT_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_result;		/* result of continuity check */
 } CC_cont_report_ind_t;
 
 typedef struct CC_more_info_req {
-	ulong cc_primitive;		/* always CC_MORE_INFO_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_MORE_INFO_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_more_info_req_t;
 
 typedef struct CC_more_info_ind {
-	ulong cc_primitive;		/* always CC_MORE_INFO_IND */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_MORE_INFO_IND */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_more_info_ind_t;
 
 typedef struct CC_information_req {
-	ulong cc_primitive;		/* always CC_INFORMATION_REQ */
-	ulong cc_user_ref;		/* call reference */
-	ulong cc_subn_length;		/* subsequent number length */
-	ulong cc_subn_offset;		/* subsequent number offset */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_INFORMATION_REQ */
+	cc_ulong cc_user_ref;		/* call reference */
+	cc_ulong cc_subn_length;	/* subsequent number length */
+	cc_ulong cc_subn_offset;	/* subsequent number offset */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_information_req_t;
 
 typedef struct CC_information_ind {
-	ulong cc_primitive;		/* always CC_INFORMATION_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_subn_length;		/* subsequent number length */
-	ulong cc_subn_offset;		/* subsequent number offset */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_INFORMATION_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_subn_length;	/* subsequent number length */
+	cc_ulong cc_subn_offset;	/* subsequent number offset */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_information_ind_t;
 
 typedef struct CC_info_timeout_ind {
-	ulong cc_primitive;		/* always CC_INFO_TIMEOUT_IND */
-	ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_primitive;		/* always CC_INFO_TIMEOUT_IND */
+	cc_ulong cc_call_ref;		/* call reference */
 } CC_info_timeout_ind_t;
 
 typedef struct CC_proceeding_req {
-	ulong cc_primitive;		/* always CC_PROCEEDING_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* proceeding flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_PROCEEDING_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* proceeding flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_proceeding_req_t;
 
 typedef struct CC_proceeding_ind {
-	ulong cc_primitive;		/* always CC_PROCEEDING_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* proceeding flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_PROCEEDING_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* proceeding flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_proceeding_ind_t;
 
 typedef struct CC_alerting_req {
-	ulong cc_primitive;		/* always CC_ALERTING_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* alerting flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_ALERTING_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* alerting flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_alerting_req_t;
 
 typedef struct CC_alerting_ind {
-	ulong cc_primitive;		/* always CC_ALERTING_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* alerting flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_ALERTING_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* alerting flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_alerting_ind_t;
 
 typedef struct CC_progress_req {
-	ulong cc_primitive;		/* always CC_PROGRESS_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_event;			/* progress event */
-	ulong cc_flags;			/* progress flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_PROGRESS_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_event;		/* progress event */
+	cc_ulong cc_flags;		/* progress flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_progress_req_t;
 
 typedef struct CC_progress_ind {
-	ulong cc_primitive;		/* always CC_PROGRESS_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_event;			/* progress event */
-	ulong cc_flags;			/* progress flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_PROGRESS_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_event;		/* progress event */
+	cc_ulong cc_flags;		/* progress flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_progress_ind_t;
 
 typedef struct CC_ibi_req {
-	ulong cc_primitive;		/* always CC_IBI_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* ibi flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_IBI_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* ibi flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_ibi_req_t;
 
 typedef struct CC_ibi_ind {
-	ulong cc_primitive;		/* always CC_IBI_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* ibi flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_IBI_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* ibi flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_ibi_ind_t;
 
 typedef struct CC_connect_req {
-	ulong cc_primitive;		/* always CC_CONNECT_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* connect flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_CONNECT_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* connect flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_connect_req_t;
 
 typedef struct CC_connect_ind {
-	ulong cc_primitive;		/* always CC_CONNECT_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* connect flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_CONNECT_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* connect flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_connect_ind_t;
 
 typedef struct CC_setup_complete_req {
-	ulong cc_primitive;		/* always CC_SETUP_COMPLETE_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_SETUP_COMPLETE_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_setup_complete_req_t;
 
 typedef struct CC_setup_complete_ind {
-	ulong cc_primitive;		/* always CC_SETUP_COMPLETE_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_SETUP_COMPLETE_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_setup_complete_ind_t;
 
 typedef struct CC_forwxfer_req {
-	ulong cc_primitive;		/* always CC_FORWXFER_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_FORWXFER_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_forwxfer_req_t;
 
 typedef struct CC_forwxfer_ind {
-	ulong cc_primitive;		/* always CC_FORWXFER_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_FORWXFER_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_forwxfer_ind_t;
 
 typedef struct CC_suspend_req {
-	ulong cc_primitive;		/* always CC_SUSPEND_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* suspend flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_SUSPEND_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* suspend flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_suspend_req_t;
 
 typedef struct CC_suspend_ind {
-	ulong cc_primitive;		/* always CC_SUSPEND_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* suspend flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_SUSPEND_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* suspend flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_suspend_ind_t;
 
 typedef struct CC_suspend_res {
-	ulong cc_primitive;		/* always CC_SUSPEND_RES */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_SUSPEND_RES */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_suspend_res_t;
 
 typedef struct CC_suspend_con {
-	ulong cc_primitive;		/* always CC_SUSPEND_CON */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_SUSPEND_CON */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_suspend_con_t;
 
 typedef struct CC_suspend_reject_req {
-	ulong cc_primitive;		/* always CC_SUSPEND_REJECT_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_SUSPEND_REJECT_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_suspend_reject_req_t;
 
 typedef struct CC_suspend_reject_ind {
-	ulong cc_primitive;		/* always CC_SUSPEND_REJECT_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_SUSPEND_REJECT_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_suspend_reject_ind_t;
 
 typedef struct CC_resume_req {
-	ulong cc_primitive;		/* always CC_RESUME_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* suspend flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RESUME_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* suspend flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_resume_req_t;
 
 typedef struct CC_resume_ind {
-	ulong cc_primitive;		/* always CC_RESUME_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_flags;			/* suspend flags */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RESUME_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_flags;		/* suspend flags */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_resume_ind_t;
 
 typedef struct CC_resume_res {
-	ulong cc_primitive;		/* always CC_RESUME_RES */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RESUME_RES */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_resume_res_t;
 
 typedef struct CC_resume_con {
-	ulong cc_primitive;		/* always CC_RESUME_CON */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RESUME_CON */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_resume_con_t;
 
 typedef struct CC_resume_reject_req {
-	ulong cc_primitive;		/* always CC_RESUME_REJECT_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RESUME_REJECT_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_resume_reject_req_t;
 
 typedef struct CC_resume_reject_ind {
-	ulong cc_primitive;		/* always CC_RESUME_REJECT_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RESUME_REJECT_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_resume_reject_ind_t;
 
 typedef struct CC_reject_req {
-	ulong cc_primitive;		/* always CC_REJECT_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_REJECT_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_reject_req_t;
 
 typedef struct CC_reject_ind {
-	ulong cc_primitive;		/* always CC_REJECT_IND */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_REJECT_IND */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_reject_ind_t;
 
 typedef struct CC_error_ind {
-	ulong cc_primitive;		/* always CC_ERROR_IND */
-	ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_primitive;		/* always CC_ERROR_IND */
+	cc_ulong cc_call_ref;		/* call reference */
 } CC_error_ind_t;
 
 typedef struct CC_call_failure_ind {
-	ulong cc_primitive;		/* always CC_CALL_FAILURE_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_reason;		/* reason for failure */
-	ulong cc_cause;			/* cause to use in release */
+	cc_ulong cc_primitive;		/* always CC_CALL_FAILURE_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_reason;		/* reason for failure */
+	cc_ulong cc_cause;		/* cause to use in release */
 } CC_call_failure_ind_t;
 
 typedef struct CC_disconnect_req {
-	ulong cc_primitive;		/* always CC_DISCONNECT_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_DISCONNECT_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_disconnect_req_t;
 
 typedef struct CC_disconnect_ind {
-	ulong cc_primitive;		/* always CC_DISCONNECT_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_DISCONNECT_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_disconnect_ind_t;
 
 typedef struct CC_release_req {
-	ulong cc_primitive;		/* always CC_RELEASE_REQ */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RELEASE_REQ */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_release_req_t;
 
 typedef struct CC_release_ind {
-	ulong cc_primitive;		/* always CC_RELEASE_IND */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_cause;			/* cause value */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RELEASE_IND */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_cause;		/* cause value */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_release_ind_t;
 
 typedef struct CC_release_res {
-	ulong cc_primitive;		/* always CC_RELEASE_RES */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RELEASE_RES */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_release_res_t;
 
 typedef struct CC_release_con {
-	ulong cc_primitive;		/* always CC_RELEASE_CON */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_RELEASE_CON */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_release_con_t;
 
 typedef struct CC_notify_req {
-	ulong cc_primitive;		/* always CC_NOTIFY_REQ */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_NOTIFY_REQ */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_notify_req_t;
 
 typedef struct CC_notify_ind {
-	ulong cc_primitive;		/* always CC_NOTIFY_IND */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_opt_length;		/* optional parameter length */
-	ulong cc_opt_offset;		/* optional parameter offset */
+	cc_ulong cc_primitive;		/* always CC_NOTIFY_IND */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_opt_length;		/* optional parameter length */
+	cc_ulong cc_opt_offset;		/* optional parameter offset */
 } CC_notify_ind_t;
 
 typedef struct CC_restart_req {
-	ulong cc_primitive;		/* always CC_RESTART_REQ */
-	ulong cc_flags;			/* restart flags */
-	ulong cc_addr_length;		/* adddress length */
-	ulong cc_addr_offset;		/* adddress offset */
+	cc_ulong cc_primitive;		/* always CC_RESTART_REQ */
+	cc_ulong cc_flags;		/* restart flags */
+	cc_ulong cc_addr_length;	/* adddress length */
+	cc_ulong cc_addr_offset;	/* adddress offset */
 } CC_restart_req_t;
 
 typedef struct CC_restart_con {
-	ulong cc_primitive;		/* always CC_RESTART_CON */
-	ulong cc_flags;			/* restart flags */
-	ulong cc_addr_length;		/* adddress length */
-	ulong cc_addr_offset;		/* adddress offset */
+	cc_ulong cc_primitive;		/* always CC_RESTART_CON */
+	cc_ulong cc_flags;		/* restart flags */
+	cc_ulong cc_addr_length;	/* adddress length */
+	cc_ulong cc_addr_offset;	/* adddress offset */
 } CC_restart_con_t;
 
 typedef struct CC_status_ind {
-	ulong cc_primitive;		/* always CC_STATUS_IND */
-	ulong cc_flags;			/* status flags */
-	ulong cc_addr_length;		/* adddress length */
-	ulong cc_addr_offset;		/* adddress offset */
+	cc_ulong cc_primitive;		/* always CC_STATUS_IND */
+	cc_ulong cc_flags;		/* status flags */
+	cc_ulong cc_addr_length;	/* adddress length */
+	cc_ulong cc_addr_offset;	/* adddress offset */
 } CC_status_ind_t;
 
 typedef struct CC_datalink_failure_ind {
-	ulong cc_primitive;		/* always CC_DATALINK_FAILURE_IND */
-	ulong cc_user_ref;		/* user call reference */
-	ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_primitive;		/* always CC_DATALINK_FAILURE_IND */
+	cc_ulong cc_user_ref;		/* user call reference */
+	cc_ulong cc_call_ref;		/* call reference */
 } CC_datalink_failure_ind_t;
 
 typedef struct CC_reset_req {
-	ulong cc_primitive;		/* always CC_RESET_REQ */
-	ulong cc_flags;			/* reset flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_RESET_REQ */
+	cc_ulong cc_flags;		/* reset flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_reset_req_t;
 
 typedef struct CC_reset_ind {
-	ulong cc_primitive;		/* always CC_RESET_IND */
-	ulong cc_flags;			/* reset flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_RESET_IND */
+	cc_ulong cc_flags;		/* reset flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_reset_ind_t;
 
 typedef struct CC_reset_res {
-	ulong cc_primitive;		/* always CC_RESET_RES */
-	ulong cc_flags;			/* reset flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_RESET_RES */
+	cc_ulong cc_flags;		/* reset flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_reset_res_t;
 
 typedef struct CC_reset_con {
-	ulong cc_primitive;		/* always CC_RESET_CON */
-	ulong cc_flags;			/* reset flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_RESET_CON */
+	cc_ulong cc_flags;		/* reset flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_reset_con_t;
 
 typedef struct CC_blocking_req {
-	ulong cc_primitive;		/* always CC_BLOCKING_REQ */
-	ulong cc_flags;			/* blocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_BLOCKING_REQ */
+	cc_ulong cc_flags;		/* blocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_blocking_req_t;
 
 typedef struct CC_blocking_ind {
-	ulong cc_primitive;		/* always CC_BLOCKING_IND */
-	ulong cc_flags;			/* blocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_BLOCKING_IND */
+	cc_ulong cc_flags;		/* blocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_blocking_ind_t;
 
 typedef struct CC_blocking_res {
-	ulong cc_primitive;		/* always CC_BLOCKING_RES */
-	ulong cc_flags;			/* blocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_BLOCKING_RES */
+	cc_ulong cc_flags;		/* blocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_blocking_res_t;
 
 typedef struct CC_blocking_con {
-	ulong cc_primitive;		/* always CC_BLOCKING_CON */
-	ulong cc_flags;			/* blocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_BLOCKING_CON */
+	cc_ulong cc_flags;		/* blocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_blocking_con_t;
 
 typedef struct CC_unblocking_req {
-	ulong cc_primitive;		/* always CC_UNBLOCKING_REQ */
-	ulong cc_flags;			/* unblocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_UNBLOCKING_REQ */
+	cc_ulong cc_flags;		/* unblocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_unblocking_req_t;
 
 typedef struct CC_unblocking_ind {
-	ulong cc_primitive;		/* always CC_UNBLOCKING_IND */
-	ulong cc_flags;			/* unblocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_UNBLOCKING_IND */
+	cc_ulong cc_flags;		/* unblocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_unblocking_ind_t;
 
 typedef struct CC_unblocking_res {
-	ulong cc_primitive;		/* always CC_UNBLOCKING_RES */
-	ulong cc_flags;			/* blocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_UNBLOCKING_RES */
+	cc_ulong cc_flags;		/* blocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_unblocking_res_t;
 
 typedef struct CC_unblocking_con {
-	ulong cc_primitive;		/* always CC_UNBLOCKING_CON */
-	ulong cc_flags;			/* unblocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_UNBLOCKING_CON */
+	cc_ulong cc_flags;		/* unblocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_unblocking_con_t;
 
 typedef struct CC_query_req {
-	ulong cc_primitive;		/* always CC_QUERY_REQ */
-	ulong cc_flags;			/* query flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_QUERY_REQ */
+	cc_ulong cc_flags;		/* query flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_query_req_t;
 
 typedef struct CC_query_ind {
-	ulong cc_primitive;		/* always CC_QUERY_IND */
-	ulong cc_flags;			/* query flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_QUERY_IND */
+	cc_ulong cc_flags;		/* query flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_query_ind_t;
 
 typedef struct CC_query_res {
-	ulong cc_primitive;		/* always CC_QUERY_RES */
-	ulong cc_flags;			/* blocking flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_QUERY_RES */
+	cc_ulong cc_flags;		/* blocking flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_query_res_t;
 
 typedef struct CC_query_con {
-	ulong cc_primitive;		/* always CC_QUERY_CON */
-	ulong cc_flags;			/* query flags */
-	ulong cc_addr_length;		/* address length */
-	ulong cc_addr_offset;		/* address offset */
+	cc_ulong cc_primitive;		/* always CC_QUERY_CON */
+	cc_ulong cc_flags;		/* query flags */
+	cc_ulong cc_addr_length;	/* address length */
+	cc_ulong cc_addr_offset;	/* address offset */
 } CC_query_con_t;
 
 typedef struct CC_maint_ind {
-	ulong cc_primitive;		/* always CC_MAINT_IND */
-	ulong cc_reason;		/* reason for indication */
-	ulong cc_call_ref;		/* call reference */
-	ulong cc_addr_length;		/* length of address */
-	ulong cc_addr_offset;		/* length of address */
+	cc_ulong cc_primitive;		/* always CC_MAINT_IND */
+	cc_ulong cc_reason;		/* reason for indication */
+	cc_ulong cc_call_ref;		/* call reference */
+	cc_ulong cc_addr_length;	/* length of address */
+	cc_ulong cc_addr_offset;	/* length of address */
 } CC_maint_ind_t;
 
 union CC_primitives {
-	ulong cc_primitive;
+	cc_ulong cc_primitive;
 	CC_ok_ack_t ok_ack;
 	CC_error_ack_t error_ack;
 	CC_info_req_t info_req;

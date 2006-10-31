@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sli_ioctl.h,v 0.9.2.4 2006/10/27 22:56:33 brian Exp $
+ @(#) $Id: sli_ioctl.h,v 0.9.2.5 2006/10/31 21:04:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:56:33 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 21:04:37 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SLI_IOCTL_H__
 #define __SLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -88,42 +88,44 @@
 /*
  *  CONFIGURATION
  */
+#ifdef __KERNEL__
 typedef struct sl_timers {
-	ulong t1;			/* T1 timer */
-	ulong t2;			/* T2 timer */
-	ulong t3;			/* T3 timer */
-	ulong t4;			/* T4 timer */
-	ulong t5;			/* T5 timer */
-	ulong t6;			/* T6 timer */
-	ulong t7;			/* T7 timer */
+	toid_t t1;			/* T1 timer */
+	toid_t t2;			/* T2 timer */
+	toid_t t3;			/* T3 timer */
+	toid_t t4;			/* T4 timer */
+	toid_t t5;			/* T5 timer */
+	toid_t t6;			/* T6 timer */
+	toid_t t7;			/* T7 timer */
 } sl_timers_t;
+#endif
 
 typedef struct sl_config {
-	ulong t1;			/* timer t1 duration (ticks) */
-	ulong t2;			/* timer t2 duration (ticks) */
-	ulong t2l;			/* timer t2l duration (ticks) */
-	ulong t2h;			/* timer t2h duration (ticks) */
-	ulong t3;			/* timer t3 duration (ticks) */
-	ulong t4n;			/* timer t4n duration (ticks) */
-	ulong t4e;			/* timer t4e duration (ticks) */
-	ulong t5;			/* timer t5 duration (ticks) */
-	ulong t6;			/* timer t6 duration (ticks) */
-	ulong t7;			/* timer t7 duration (ticks) */
-	ulong rb_abate;			/* RB cong abatement (#msgs) */
-	ulong rb_accept;		/* RB cong onset accept (#msgs) */
-	ulong rb_discard;		/* RB cong discard (#msgs) */
-	ulong tb_abate_1;		/* lev 1 cong abate (#bytes) */
-	ulong tb_onset_1;		/* lev 1 cong onset (#bytes) */
-	ulong tb_discd_1;		/* lev 1 cong discard (#bytes) */
-	ulong tb_abate_2;		/* lev 1 cong abate (#bytes) */
-	ulong tb_onset_2;		/* lev 1 cong onset (#bytes) */
-	ulong tb_discd_2;		/* lev 1 cong discard (#bytes) */
-	ulong tb_abate_3;		/* lev 1 cong abate (#bytes) */
-	ulong tb_onset_3;		/* lev 1 cong onset (#bytes) */
-	ulong tb_discd_3;		/* lev 1 cong discard (#bytes) */
-	ulong N1;			/* PCR/RTBmax messages (#msg) */
-	ulong N2;			/* PCR/RTBmax octets (#bytes) */
-	ulong M;			/* IAC normal proving periods */
+	sl_ulong t1;			/* timer t1 duration (milliseconds) */
+	sl_ulong t2;			/* timer t2 duration (milliseconds) */
+	sl_ulong t2l;			/* timer t2l duration (milliseconds) */
+	sl_ulong t2h;			/* timer t2h duration (milliseconds) */
+	sl_ulong t3;			/* timer t3 duration (milliseconds) */
+	sl_ulong t4n;			/* timer t4n duration (milliseconds) */
+	sl_ulong t4e;			/* timer t4e duration (milliseconds) */
+	sl_ulong t5;			/* timer t5 duration (milliseconds) */
+	sl_ulong t6;			/* timer t6 duration (milliseconds) */
+	sl_ulong t7;			/* timer t7 duration (milliseconds) */
+	sl_ulong rb_abate;		/* RB cong abatement (#msgs) */
+	sl_ulong rb_accept;		/* RB cong onset accept (#msgs) */
+	sl_ulong rb_discard;		/* RB cong discard (#msgs) */
+	sl_ulong tb_abate_1;		/* lev 1 cong abate (#bytes) */
+	sl_ulong tb_onset_1;		/* lev 1 cong onset (#bytes) */
+	sl_ulong tb_discd_1;		/* lev 1 cong discard (#bytes) */
+	sl_ulong tb_abate_2;		/* lev 1 cong abate (#bytes) */
+	sl_ulong tb_onset_2;		/* lev 1 cong onset (#bytes) */
+	sl_ulong tb_discd_2;		/* lev 1 cong discard (#bytes) */
+	sl_ulong tb_abate_3;		/* lev 1 cong abate (#bytes) */
+	sl_ulong tb_onset_3;		/* lev 1 cong onset (#bytes) */
+	sl_ulong tb_discd_3;		/* lev 1 cong discard (#bytes) */
+	sl_ulong N1;			/* PCR/RTBmax messages (#msg) */
+	sl_ulong N2;			/* PCR/RTBmax octets (#bytes) */
+	sl_ulong M;			/* IAC normal proving periods */
 } sl_config_t;
 
 #define SL_IOCGCONFIG	_IOWR( SL_IOC_MAGIC, 2, sl_config_t )

@@ -1,3 +1,26 @@
+2006-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/ss7/cci.h: 32-bit compatibility
+	* src/include/ss7/isdni.h: 32-bit compatibility
+	* src/include/ss7/isdni_ioctl.h: 32-bit compatibility
+	* src/include/ss7/isupi.h: 32-bit compatibility
+	* src/include/ss7/isupi_ioctl.h: 32-bit compatibility
+	* src/include/ss7/sdli_ioctl.h: 32-bit compatibility
+	* src/include/ss7/sdti_ioctl.h: 32-bit compatibility
+	* src/include/ss7/sli_ioctl.h: 32-bit compatibility
+	* src/modules/m2pa/m2pa_sl.c: rationalized to sigtran package
+	* src/test/isup/test-q784.c: remove HZ definition
+	* src/test/m2pa/test-m2pa.c: rationalized to sigtran package
+	* src/test/sl/test-q781-pipe.c: remove HZ definition
+	* src/test/sl/test-q781.c: remove HZ definition
+	* src/test/tli/test-timod.c: remove HZ definition
+	* src/test/tli/test-tirdwr.c: remove HZ definition
+	* src/test/x400p-ss7/test-x100p.c: remove HZ definition
+	* src/test/x400p-ss7/test-x400p-cap.c: remove HZ definition
+	* src/test/x400p-ss7/test-x400p-cap2.c: remove HZ definition
+	* src/test/x400p-ss7/test-x400p.c: remove HZ definition
+	* src/test/xnet/test-xnet.c: remove HZ definition
+
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: added ability to sync between test cases

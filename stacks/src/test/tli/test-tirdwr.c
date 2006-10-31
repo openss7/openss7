@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:45 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/31 21:04:51 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 07:25:45 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 21:04:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.10  2006/10/31 21:04:51  brian
+ - changes for 32-bit compatibility and remove HZ dependency
+
  Revision 0.9.2.9  2006/07/08 07:25:45  brian
  - removed trigraphs
 
@@ -78,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:45 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/31 21:04:51 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/07/08 07:25:45 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/31 21:04:51 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -262,10 +265,10 @@ enum {
 	t30, t31, t32, t33, t34, t35, t36, t37, t38, tmax
 };
 
+#if 0
 #undef HZ
 #define HZ 1000
 
-#if 0
 /* *INDENT-OFF* */
 static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */

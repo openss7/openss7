@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:56:38 $
+ @(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:53 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:56:38 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 21:04:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x100p.c,v $
+ Revision 0.9.2.7  2006/10/31 21:04:53  brian
+ - changes for 32-bit compatibility and remove HZ dependency
+
  Revision 0.9.2.6  2006/10/27 22:56:38  brian
  - changes for 32-bit compatibility
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:56:38 $"
+#ident "@(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:53 $"
 
-static char const ident[] = "$RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:56:38 $";
+static char const ident[] = "$RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:53 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -176,10 +179,6 @@ int verbose = 1;
  *
  *  -------------------------------------------------------------------------
  */
-
-#ifndef HZ
-#define HZ 100
-#endif
 
 static struct {
 	lmi_option_t opt;
@@ -414,7 +413,7 @@ static int expand = 0;
 static long beg_time = 0;
 
 static unsigned long iut_options = 0;
-static unsigned long iut_t7 = 1 * HZ;
+static unsigned long iut_t7 = 1 * 1000;
 static unsigned long pt_flags = SDT_FLAGS_ONE;
 
 int pt_fd = 0;
@@ -8646,7 +8645,7 @@ pt_config(void)
 	// FFLUSH(stdout);
 	ptconf.sdt.N = 16;
 	ptconf.sdt.m = 272;
-	ptconf.sdt.t8 = 100 * HZ / 1000;
+	ptconf.sdt.t8 = 100;
 	ptconf.sdt.Tin = 4;
 	ptconf.sdt.Tie = 1;
 	ptconf.sdt.T = 64;
@@ -8953,10 +8952,6 @@ iut_disable(void)
 	return SUCCESS;
 }
 
-#ifndef HZ
-#define HZ 100
-#endif
-
 static int
 iut_config(void)
 {
@@ -9092,7 +9087,7 @@ iut_config(void)
 	// printf(" :config sdt\n");
 	// FFLUSH(stdout);
 #if 0
-	iutconf.sdt.t8 = 100 * HZ / 1000;
+	iutconf.sdt.t8 = 100;
 	iutconf.sdt.Tin = 4;
 	iutconf.sdt.Tie = 1;
 	iutconf.sdt.T = 64;
@@ -9124,7 +9119,7 @@ iut_config(void)
 		return FAILURE;
 	}
 #if 0
-	if (iutconf.sdt.t8 != 100 * HZ / 1000
+	if (iutconf.sdt.t8 != 100
 	    || iutconf.sdt.Tin != 4
 	    || iutconf.sdt.Tie != 1
 	    || iutconf.sdt.T != 64
@@ -9138,16 +9133,16 @@ iut_config(void)
 #endif
 	// printf(" :config sl\n");
 	// FFLUSH(stdout);
-	iutconf.sl.t1 = 45 * HZ;	/* jiffies */
-	iutconf.sl.t2 = 5 * HZ;	/* jiffies */
-	iutconf.sl.t2l = 20 * HZ;	/* jiffies */
-	iutconf.sl.t2h = 100 * HZ;	/* jiffies */
-	iutconf.sl.t3 = 1 * HZ;	/* jiffies */
-	iutconf.sl.t4n = 8 * HZ;	/* jiffies */
-	iutconf.sl.t4e = 500 * HZ / 1000;	/* jiffies */
-	iutconf.sl.t5 = 100 * HZ / 1000;	/* jiffies */
-	iutconf.sl.t6 = 4 * HZ;	/* jiffies */
-	iutconf.sl.t7 = iut_t7;	/* jiffies */
+	iutconf.sl.t1 = 45 * 1000;	/* milliseconds */
+	iutconf.sl.t2 = 5 * 1000;	/* milliseconds */
+	iutconf.sl.t2l = 20 * 1000;	/* milliseconds */
+	iutconf.sl.t2h = 100 * 1000;	/* milliseconds */
+	iutconf.sl.t3 = 1 * 1000;	/* milliseconds */
+	iutconf.sl.t4n = 8 * 1000;	/* milliseconds */
+	iutconf.sl.t4e = 500;		/* milliseconds */
+	iutconf.sl.t5 = 100;		/* milliseconds */
+	iutconf.sl.t6 = 4 * 1000;	/* milliseconds */
+	iutconf.sl.t7 = iut_t7;		/* milliseconds */
 	iutconf.sl.rb_abate = 3;	/* messages */
 	iutconf.sl.rb_accept = 6;	/* messages */
 	iutconf.sl.rb_discard = 9;	/* messages */
@@ -9181,15 +9176,15 @@ iut_config(void)
 	ctl.ic_dp = (char *) &iutconf.sl;
 	if (ioctl(iut_fd, I_STR, &ctl) < 0)
 		goto config_sl_failed;
-	if (iutconf.sl.t1 != 45 * HZ
-	    || iutconf.sl.t2 != 5 * HZ
-	    || iutconf.sl.t2l != 20 * HZ
-	    || iutconf.sl.t2h != 100 * HZ
-	    || iutconf.sl.t3 != 1 * HZ
-	    || iutconf.sl.t4n != 8 * HZ
-	    || iutconf.sl.t4e != 500 * HZ / 1000
-	    || iutconf.sl.t5 != 100 * HZ / 1000
-	    || iutconf.sl.t6 != 4 * HZ
+	if (iutconf.sl.t1 != 45 * 1000
+	    || iutconf.sl.t2 != 5 * 1000
+	    || iutconf.sl.t2l != 20 * 1000
+	    || iutconf.sl.t2h != 100 * 1000
+	    || iutconf.sl.t3 != 1 * 1000
+	    || iutconf.sl.t4n != 8 * 1000
+	    || iutconf.sl.t4e != 500
+	    || iutconf.sl.t5 != 100
+	    || iutconf.sl.t6 != 4 * 1000
 	    || iutconf.sl.t7 != iut_t7
 	    || iutconf.sl.rb_abate != 3
 	    || iutconf.sl.rb_accept != 6
@@ -9238,7 +9233,7 @@ link_power_off(void)
 	if ((ret = iut_attach()) != SUCCESS)
 		return INCONCLUSIVE;
 	iut_options = 0;
-	iut_t7 = 1 * HZ;
+	iut_t7 = 1 * 1000;
 	if ((ret = iut_config()) != SUCCESS)
 		return INCONCLUSIVE;
 	if ((ret = iut_enable()) != SUCCESS)
@@ -9264,7 +9259,7 @@ link_out_of_service(void)
 	if ((ret = iut_attach()) != SUCCESS)
 		return INCONCLUSIVE;
 	iut_options = 0;
-	iut_t7 = 1 * HZ;
+	iut_t7 = 1 * 1000;
 	if ((ret = iut_config()) != SUCCESS)
 		return INCONCLUSIVE;
 	if ((ret = iut_enable()) != SUCCESS)
@@ -9371,7 +9366,7 @@ static int
 link_in_service_basic(void)
 {
 	iut_options = 0;
-	iut_t7 = 1 * HZ;
+	iut_t7 = 1 * 1000;
 	return link_in_service();
 }
 
@@ -9379,7 +9374,7 @@ static int
 link_in_service_pcr(void)
 {
 	iut_options = SS7_POPT_PCR;
-	iut_t7 = 2 * HZ;
+	iut_t7 = 2 * 1000;
 	return link_in_service();
 }
 
@@ -9387,7 +9382,7 @@ static int
 link_in_service_basic_long_ack(void)
 {
 	iut_options = 0;
-	iut_t7 = 4 * HZ;
+	iut_t7 = 4 * 1000;
 	return link_in_service();
 }
 
@@ -9395,7 +9390,7 @@ static int
 link_in_service_pcr_long_ack(void)
 {
 	iut_options = SS7_POPT_PCR;
-	iut_t7 = 8 * HZ;
+	iut_t7 = 8 * 1000;
 	return link_in_service();
 }
 

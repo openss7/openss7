@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/04 13:00:38 $
+ @(#) $RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/31 21:04:46 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:38 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 21:04:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-q781-pipe.c,v $
+ Revision 0.9.2.6  2006/10/31 21:04:46  brian
+ - changes for 32-bit compatibility and remove HZ dependency
+
  Revision 0.9.2.5  2006/03/04 13:00:38  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/04 13:00:38 $"
+#ident "@(#) $RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/31 21:04:46 $"
 
-static char const ident[] = "$RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/04 13:00:38 $";
+static char const ident[] = "$RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/31 21:04:46 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -8257,10 +8260,6 @@ test_10_3(void)
 }
 #endif
 
-#ifndef HZ
-#define HZ 100
-#endif
-
 int iut_showmsg(struct strbuf *ctrl, struct strbuf *data);
 
 typedef struct ppa {
@@ -8629,7 +8628,7 @@ pt_config(void)
 	}
 	ptconf.sdt.N = 16;
 	ptconf.sdt.m = 272;
-	ptconf.sdt.t8 = 100 * HZ / 1000;
+	ptconf.sdt.t8 = 100;
 	ptconf.sdt.Tin = 4;
 	ptconf.sdt.Tie = 1;
 	ptconf.sdt.D = 256;
@@ -9060,7 +9059,7 @@ iut_config(void)
 	}
 	iutconf.sdt.N = 16;
 	iutconf.sdt.m = 272;
-	iutconf.sdt.t8 = 100 * HZ / 1000;
+	iutconf.sdt.t8 = 100;
 	iutconf.sdt.Tin = 4;
 	iutconf.sdt.Tie = 1;
 	iutconf.sdt.T = 64;
@@ -9088,7 +9087,7 @@ iut_config(void)
 	ctl.ic_dp = (char *) &iutconf.sdt;
 	if (ioctl(iut_fd, I_STR, &ctl) < 0)
 		goto config_sdt_failed;
-	if (iutconf.sdt.N != 16 || iutconf.sdt.m != 272 || iutconf.sdt.t8 != 100 * HZ / 1000
+	if (iutconf.sdt.N != 16 || iutconf.sdt.m != 272 || iutconf.sdt.t8 != 100
 	    || iutconf.sdt.Tin != 4 || iutconf.sdt.Tie != 1 || iutconf.sdt.T != 64
 	    || iutconf.sdt.D != 256 || iutconf.sdt.Te != 577169 || iutconf.sdt.De != 9308000
 	    || iutconf.sdt.Ue != 144292000 || iutconf.sdt.b != 8 || iutconf.sdt.f != 0)
@@ -9097,16 +9096,16 @@ iut_config(void)
 		printf("                                  :config sl\n");
 		FFLUSH(stdout);
 	}
-	iutconf.sl.t1 = 45 * HZ;	/* jiffies */
-	iutconf.sl.t2 = 5 * HZ;	/* jiffies */
-	iutconf.sl.t2l = 20 * HZ;	/* jiffies */
-	iutconf.sl.t2h = 100 * HZ;	/* jiffies */
-	iutconf.sl.t3 = 1 * HZ;	/* jiffies */
-	iutconf.sl.t4n = 8 * HZ;	/* jiffies */
-	iutconf.sl.t4e = 500 * HZ / 1000;	/* jiffies */
-	iutconf.sl.t5 = 100 * HZ / 1000;	/* jiffies */
-	iutconf.sl.t6 = 4 * HZ;	/* jiffies */
-	iutconf.sl.t7 = 1 * HZ;	/* jiffies */
+	iutconf.sl.t1 = 45 * 1000;	/* milliseconds */
+	iutconf.sl.t2 = 5 * 1000;	/* milliseconds */
+	iutconf.sl.t2l = 20 * 1000;	/* milliseconds */
+	iutconf.sl.t2h = 100 * 1000;	/* milliseconds */
+	iutconf.sl.t3 = 1 * 1000;	/* milliseconds */
+	iutconf.sl.t4n = 8 * 1000;	/* milliseconds */
+	iutconf.sl.t4e = 500;		/* milliseconds */
+	iutconf.sl.t5 = 100;		/* milliseconds */
+	iutconf.sl.t6 = 4 * 1000;	/* milliseconds */
+	iutconf.sl.t7 = 1 * 1000;	/* milliseconds */
 	iutconf.sl.rb_abate = 3;	/* messages */
 	iutconf.sl.rb_accept = 6;	/* messages */
 	iutconf.sl.rb_discard = 9;	/* messages */
@@ -9140,10 +9139,10 @@ iut_config(void)
 	ctl.ic_dp = (char *) &iutconf.sl;
 	if (ioctl(iut_fd, I_STR, &ctl) < 0)
 		goto config_sl_failed;
-	if (iutconf.sl.t1 != 45 * HZ || iutconf.sl.t2 != 5 * HZ || iutconf.sl.t2l != 20 * HZ
-	    || iutconf.sl.t2h != 100 * HZ || iutconf.sl.t3 != 1 * HZ || iutconf.sl.t4n != 8 * HZ
-	    || iutconf.sl.t4e != 500 * HZ / 1000 || iutconf.sl.t5 != 100 * HZ / 1000
-	    || iutconf.sl.t6 != 4 * HZ || iutconf.sl.t7 != 1 * HZ || iutconf.sl.rb_abate != 3
+	if (iutconf.sl.t1 != 45 * 1000 || iutconf.sl.t2 != 5 * 1000 || iutconf.sl.t2l != 20 * 1000
+	    || iutconf.sl.t2h != 100 * 1000 || iutconf.sl.t3 != 1 * 1000 || iutconf.sl.t4n != 8 * 1000
+	    || iutconf.sl.t4e != 500 || iutconf.sl.t5 != 100
+	    || iutconf.sl.t6 != 4 * 1000 || iutconf.sl.t7 != 1 * 1000 || iutconf.sl.rb_abate != 3
 	    || iutconf.sl.rb_accept != 6 || iutconf.sl.rb_discard != 9
 	    || iutconf.sl.tb_abate_1 != 128 * 272 || iutconf.sl.tb_onset_1 != 256 * 272
 	    || iutconf.sl.tb_discd_1 != 384 * 272 || iutconf.sl.tb_abate_2 != 512 * 272

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/07 01:16:08 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/31 21:04:41 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:16:08 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 21:04:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-q784.c,v $
+ Revision 0.9.2.8  2006/10/31 21:04:41  brian
+ - changes for 32-bit compatibility and remove HZ dependency
+
  Revision 0.9.2.7  2006/03/07 01:16:08  brian
  - 64bit issues
 
@@ -72,10 +75,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/07 01:16:08 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/31 21:04:41 $"
 
 static char const ident[] =
-    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/03/07 01:16:08 $";
+    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/31 21:04:41 $";
 
 /* 
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -195,7 +198,7 @@ struct isup_addr iut_mnt_addr = {
 };
 
 #undef HZ
-#define HZ 100
+#define HZ 1000
 
 static struct isup_opt_conf_ct iut_ct_opt = {
 };
@@ -14609,10 +14612,6 @@ test_case_9_1_2(void)
 	state = 0;
 	return INCONCLUSIVE;
 }
-
-#ifndef HZ
-#define HZ 100
-#endif
 
 static int
 pt_open(void)

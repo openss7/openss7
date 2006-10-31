@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdti_ioctl.h,v 0.9.2.4 2006/10/27 22:56:33 brian Exp $
+ @(#) $Id: sdti_ioctl.h,v 0.9.2.5 2006/10/31 21:04:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:56:33 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 21:04:37 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SDTI_IOCTL_H__
 #define __SDTI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdti_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sdti_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -70,22 +70,24 @@
 /*
  *  CONFIGURATION
  */
+#ifdef __KERNEL__
 typedef struct sdt_timers {
-	ulong t8;			/* T8 timer */
+	toid_t t8;			/* T8 timer */
 } sdt_timers_t;
+#endif
 typedef struct sdt_config {
-	ulong t8;			/* T8 timeout */
-	ulong Tin;			/* AERM normal proving threshold */
-	ulong Tie;			/* AERM emergency proving threshold */
-	ulong T;			/* SUERM error threshold */
-	ulong D;			/* SUERM error rate parameter */
-	ulong Te;			/* EIM error threshold */
-	ulong De;			/* EIM correct decrement */
-	ulong Ue;			/* EIM error increment */
-	ulong N;			/* octets per su in octet-counting mode */
-	ulong m;			/* maximum SIF size */
-	ulong b;			/* transmit block size */
-	ulong f;			/* number of flags between frames */
+	sdt_ulong t8;			/* T8 timeout (milliseconds) */
+	sdt_ulong Tin;			/* AERM normal proving threshold */
+	sdt_ulong Tie;			/* AERM emergency proving threshold */
+	sdt_ulong T;			/* SUERM error threshold */
+	sdt_ulong D;			/* SUERM error rate parameter */
+	sdt_ulong Te;			/* EIM error threshold */
+	sdt_ulong De;			/* EIM correct decrement */
+	sdt_ulong Ue;			/* EIM error increment */
+	sdt_ulong N;			/* octets per su in octet-counting mode */
+	sdt_ulong m;			/* maximum SIF size */
+	sdt_ulong b;			/* transmit block size */
+	sdt_ulong f;			/* number of flags between frames */
 } sdt_config_t;
 
 #define SDT_FLAGS_ONE	    0

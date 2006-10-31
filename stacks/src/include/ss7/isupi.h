@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: isupi.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
+ @(#) $Id: isupi.h,v 0.9.2.4 2006/10/31 21:04:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
+ Last Modified $Date: 2006/10/31 21:04:37 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: isupi.h,v $
+ Revision 0.9.2.4  2006/10/31 21:04:37  brian
+ - changes for 32-bit compatibility and remove HZ dependency
 
  *****************************************************************************/
 
 #ifndef __SS7_ISUPI_H__
 #define __SS7_ISUPI_H__
 
-#ident "@(#) $RCSfile: isupi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: isupi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -61,9 +67,9 @@
  */
 
 typedef struct isup_addr {
-	ulong scope;			/* the scope of the identifier */
-	ulong id;			/* the identifier within the scope */
-	ulong cic;			/* circuit identification code within the scope */
+	cc_ulong scope;			/* the scope of the identifier */
+	cc_ulong id;			/* the identifier within the scope */
+	cc_ulong cic;			/* circuit identification code within the scope */
 } isup_addr_t;
 
 #define ISUP_SCOPE_CT		1	/* circuit scope */
