@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:23 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:44 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 20:34:23 $ by $Author: brian $
+ Last Modified $Date: 2006/11/02 12:54:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.4  2006/11/02 12:54:44  brian
+ - major corrections and updates to M2PA module and tests cases
+
  Revision 0.9.2.3  2006/10/31 20:34:23  brian
  - more buildup of test suite
 
@@ -93,9 +96,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:23 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:44 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:23 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:44 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -233,7 +236,7 @@ uint32_t fsn[3] = { 0, 0, 0 };
 uint8_t fib[3] = { 0, 0, 0, };
 uint8_t bib[3] = { 0, 0, 0, };
 
-static int iut_connects = 0;
+static int iut_connects = 1;
 
 #define MSU_LEN 35
 static int msu_len = MSU_LEN;
@@ -399,9 +402,10 @@ enum {
 };
 
 enum {
-	__TEST_ENABLE_REQ = 400, __TEST_ENABLE_CON, __TEST_DISABLE_REQ, __TEST_DISABLE_CON,
-	__TEST_ERROR_IND, __TEST_SDL_OPTIONS, __TEST_SDL_CONFIG, __TEST_SDT_OPTIONS,
-	__TEST_SDT_CONFIG, __TEST_SL_OPTIONS, __TEST_SL_CONFIG,
+	__TEST_ATTACH_REQ = 400, __TEST_DETACH_REQ, __TEST_ENABLE_REQ, __TEST_ENABLE_CON,
+	__TEST_DISABLE_REQ, __TEST_DISABLE_CON, __TEST_ERROR_IND, __TEST_SDL_OPTIONS,
+	__TEST_SDL_CONFIG, __TEST_SDT_OPTIONS, __TEST_SDT_CONFIG, __TEST_SL_OPTIONS,
+	__TEST_SL_CONFIG,
 };
 
 /*
@@ -606,6 +610,10 @@ long test_start = 0;
 
 static int state = 0;
 static const char *failure_string = NULL;
+
+#define __stringify_1(x) #x
+#define __stringify(x) __stringify_1(x)
+#define FAILURE_STRING(string) "[" __stringify(__LINE__) "] " string
 
 #if 1
 #undef lockf
@@ -1292,7 +1300,7 @@ nerrno_string(ulong nerr, long uerr)
 }
 
 const char *
-event_string(int event)
+event_string(int child, int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -1367,33 +1375,55 @@ event_string(int event)
 		return ("N_RESET_RES");
 	case __TEST_RESET_CON:
 		return ("N_RESET_CON");
-	case __STATUS_OUT_OF_SERVICE:
-		return ("OUT-OF-SERVICE");
-	case __STATUS_ALIGNMENT:
-		return ("ALIGNMENT");
-	case __STATUS_PROVING_NORMAL:
-		return ("PROVING-NORMAL");
-	case __STATUS_PROVING_EMERG:
-		return ("PROVING-EMERGENCY");
-	case __STATUS_IN_SERVICE:
-		return ("IN-SERVICE");
-	case __STATUS_PROCESSOR_OUTAGE:
-		return ("PROCESSOR-OUTAGE");
-	case __STATUS_PROCESSOR_ENDED:
-		return ("PROCESSOR-ENDED");
-	case __STATUS_BUSY:
-		return ("BUSY");
-	case __STATUS_BUSY_ENDED:
-		return ("BUSY-ENDED");
-	case __STATUS_SEQUENCE_SYNC:
-		return ("READY");
-	case __MSG_PROVING:
-		return ("PROVING");
-	case __TEST_ACK:
-		return ("ACK");
-	default:
-		return ("(unexpected");
 	}
+	switch (child) {
+	case CHILD_IUT:
+		switch (event) {
+		case __EVENT_IUT_OUT_OF_SERVICE:
+			return ("!out of service");
+		case __EVENT_IUT_IN_SERVICE:
+			return ("!in service");
+		case __EVENT_IUT_RPO:
+			return ("!rpo");
+		case __EVENT_IUT_RPR:
+			return ("!rpr");
+		case __EVENT_IUT_DATA:
+			return ("!msu");
+		}
+		break;
+	default:
+	case CHILD_PTU:
+		switch (event) {
+		case __STATUS_OUT_OF_SERVICE:
+			return ("OUT-OF-SERVICE");
+		case __STATUS_ALIGNMENT:
+			return ("ALIGNMENT");
+		case __STATUS_PROVING_NORMAL:
+			return ("PROVING-NORMAL");
+		case __STATUS_PROVING_EMERG:
+			return ("PROVING-EMERGENCY");
+		case __STATUS_IN_SERVICE:
+			return ("IN-SERVICE");
+		case __STATUS_PROCESSOR_OUTAGE:
+			return ("PROCESSOR-OUTAGE");
+		case __STATUS_PROCESSOR_ENDED:
+			return ("PROCESSOR-ENDED");
+		case __STATUS_BUSY:
+			return ("BUSY");
+		case __STATUS_BUSY_ENDED:
+			return ("BUSY-ENDED");
+		case __STATUS_SEQUENCE_SYNC:
+			return ("READY");
+		case __MSG_PROVING:
+			return ("PROVING");
+		case __TEST_ACK:
+			return ("ACK");
+		case __TEST_DATA:
+			return ("DATA");
+		}
+		break;
+	}
+	return ("(unexpected)");
 }
 
 const char *
@@ -3221,9 +3251,9 @@ void
 print_tx_msg_sn(int child, const char *string, uint32_t bsn, uint32_t fsn)
 {
 	static const char *msgs[] = {
-		"%1$20.20s| ---------[%2$06X,%3$06X]--------> |                    [%4$d:%5$03d]\n",
-		"                    | <--------[%3$06X,%2$06X]--------- |%1$-20.20s[%4$d:%5$03d]\n",
-		"                    | <--------[%3$06X,%2$06X]------ |  |%1$-20.20s[%4$d:%5$03d]\n",
+		"%1$20.20s| ---------[%3$06X,%2$06X]--------> |                    [%4$d:%5$03d]\n",
+		"                    | <--------[%2$06X,%3$06X]--------- |%1$-20.20s[%4$d:%5$03d]\n",
+		"                    | <--------[%2$06X,%3$06X]------ |  |%1$-20.20s[%4$d:%5$03d]\n",
 		"                    |      <%1$-20.20s>       |                    [%4$d:%5$03d]\n",
 	};
 
@@ -3578,7 +3608,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 1 && show)
-		print_string_state(child, msgs, event_string(want));
+		print_string_state(child, msgs, event_string(child, want));
 }
 
 void
@@ -5434,6 +5464,7 @@ do_signal(int child, int action)
 			msu_len = BUFSIZE - 10;
 		print_command_state(child, ":msu");
 		ctrl->len = sizeof(p->sl.pdu_req);
+		p->sl.pdu_req.sl_primitive = SL_PDU_REQ;
 		data->len = msu_len;
 		memset(dbuf, 'B', msu_len);
 		test_pflags = MSG_BAND;
@@ -5570,14 +5601,48 @@ do_signal(int child, int action)
 		ic.ic_dp = (char *) &iutconf.sl;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
 
+	case __TEST_ATTACH_REQ:
+		ctrl->len = sizeof(p->lmi.attach_req) + (ADDR_buffer ? ADDR_length : 0);
+		p->lmi.attach_req.lmi_primitive = LMI_ATTACH_REQ;
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.attach_req), ADDR_length);
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		if (show && verbose > 1) {
+			print_command_state(child, ":attach");
+#ifndef SCTP_VERSION_2
+			print_string(child, addr_string(cbuf + sizeof(p->lmi.attach_req), ADDR_length));
+#else
+			print_addrs(child, cbuf + sizeof(p->lmi.attach_req), ADDR_length);
+#endif
+		}
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DETACH_REQ:
+		ctrl->len = sizeof(p->lmi.detach_req);
+		p->lmi.detach_req.lmi_primitive = LMI_DETACH_REQ;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		if (show && verbose > 1)
+			print_command_state(child, ":detach");
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_ENABLE_REQ:
-		ctrl->len = sizeof(p->lmi.enable_req);
+		ctrl->len = sizeof(p->lmi.enable_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.enable_req.lmi_primitive = LMI_ENABLE_REQ;
+		if (ADDR_buffer)
+			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.enable_req), ADDR_length);
 		data = NULL;
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
-		if (show && verbose > 1)
+		if (show && verbose > 1) {
 			print_command_state(child, ":enable");
+#ifndef SCTP_VERSION_2
+			print_string(child, addr_string(cbuf + sizeof(p->lmi.enable_req), ADDR_length));
+#else
+			print_addrs(child, cbuf + sizeof(p->lmi.enable_req), ADDR_length);
+#endif
+		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_DISABLE_REQ:
 		ctrl->len = sizeof(p->lmi.disable_req);
@@ -5817,10 +5882,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 					bsn[1] = ntohl(((uint32_t *) data->buf)[2]);
 					fsn[1] = ntohl(((uint32_t *) data->buf)[3]);
 					if (ntohl(((uint32_t *) data->buf)[1]) == 4 * sizeof(uint32_t)) {
-						print_rx_msg(child, "ACK");
 						event = __TEST_ACK;
-					} else {
-						print_rx_msg(child, "DATA");
 					}
 					break;
 				}
@@ -5935,7 +5997,9 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				case __STATUS_ALIGNMENT:
 				case __STATUS_OUT_OF_SERVICE:
 				case __STATUS_PROCESSOR_OUTAGE:
+				case __STATUS_PROCESSOR_ENDED:
 				case __STATUS_BUSY:
+				case __STATUS_BUSY_ENDED:
 					print_rx_msg(child, status_string(mystatus));
 					break;
 				case __MSG_PROVING:
@@ -5949,6 +6013,9 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 					print_rx_msg(child, buf);
 					break;
 				}
+				case __TEST_ACK:
+					print_rx_msg(child, "ACK");
+					break;
 				}
 				return event;
 			}
@@ -6232,7 +6299,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		}
 		if (data && data->len >= 0)
-			if ((last_event = do_decode_data(child, ctrl, data)) != __TEST_DATA)
+			if ((last_event = do_decode_data(child, ctrl, data)) != __EVENT_UNKNOWN)
 				event = last_event;
 	}
 	return ((last_event = event));
@@ -6423,11 +6490,11 @@ preamble_unbound(int child)
 	if (do_signal(child, __TEST_INFO_REQ))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_INFO_ACK))
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK))
 		goto failure;
 	state++;
 	if (last_info.CURRENT_state != NS_UNBND) {
-		failure_string = "bad CURRENT_state";
+		failure_string = FAILURE_STRING("bad CURRENT_state");
 		goto failure;
 	}
 	return __RESULT_SUCCESS;
@@ -6461,46 +6528,46 @@ preamble_bind(int child)
 	if (do_signal(child, __TEST_BIND_REQ))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_BIND_ACK))
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK))
 		goto failure;
 	state++;
 	if (CONIND_number != coninds) {
-		failure_string = "bad CONIND_number";
+		failure_string = FAILURE_STRING("bad CONIND_number");
 		goto failure;
 	}
 	state++;
 	if (TOKEN_value == 0) {
-		failure_string = "bad TOKEN_value";
+		failure_string = FAILURE_STRING("bad TOKEN_value");
 		goto failure;
 	}
 	state++;
 	if (PROTOID_length != 0 && PROTOID_length != sizeof(prot)) {
-		failure_string = "bad PROTOID_length";
+		failure_string = FAILURE_STRING("bad PROTOID_length");
 		goto failure;
 	}
 	state++;
 	if (PROTOID_length != 0 && PROTOID_buffer[0] != proto) {
-		failure_string = "bad PROTOID_buffer";
+		failure_string = FAILURE_STRING("bad PROTOID_buffer");
 		goto failure;
 	}
 	state++;
 	if (ADDR_length == 0) {
-		failure_string = "zero ADDR_length";
+		failure_string = FAILURE_STRING("zero ADDR_length");
 		goto failure;
 	}
 	state++;
 	if (ADDR_length != anums[child] * sizeof(addrs[child][0])) {
-		failure_string = "bad ADDR_length";
+		failure_string = FAILURE_STRING("bad ADDR_length");
 		goto failure;
 	}
 	state++;
 	if (ADDR_buffer->sin_family != AF_INET) {
-		failure_string = "bad sin_family";
+		failure_string = FAILURE_STRING("bad sin_family");
 		goto failure;
 	}
 	state++;
 	if (ADDR_buffer->sin_addr.s_addr != addrs[child][0].sin_addr.s_addr) {
-		failure_string = "bad sin_addr";
+		failure_string = FAILURE_STRING("bad sin_addr");
 		goto failure;
 	}
 	state++;
@@ -6511,7 +6578,7 @@ preamble_bind(int child)
 		goto failure;
 	state++;
 	if (last_info.SERV_type != N_CONS) {
-		failure_string = "bad SERV_type";
+		failure_string = FAILURE_STRING("bad SERV_type");
 		goto failure;
 	}
 	return __RESULT_SUCCESS;
@@ -6548,9 +6615,6 @@ postamble_unbind(int child)
 static int
 preamble_connect(int child)
 {
-	if (preamble_bind(child))
-		goto failure;
-	state++;
 	if ((child == CHILD_PTU && iut_connects == 0) || (child == CHILD_IUT && iut_connects != 0)) {
 		/* keep trying to connect until successful or the child times out */
 		for (;;) {
@@ -6582,11 +6646,11 @@ preamble_connect(int child)
 		if (do_signal(child, __TEST_INFO_REQ))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_INFO_ACK))
+		if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK))
 			goto failure;
 		state++;
 		if (last_info.CURRENT_state != NS_DATA_XFER) {
-			failure_string = "bad CURRENT_state";
+			failure_string = FAILURE_STRING("bad CURRENT_state");
 			goto failure;
 		}
 	} else {
@@ -6613,17 +6677,17 @@ preamble_connect(int child)
 			goto failure;
 		SEQ_number = 0;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
 			goto failure;
 		state++;
 		if (do_signal(child, __TEST_INFO_REQ))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_INFO_ACK))
+		if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK))
 			goto failure;
 		state++;
 		if (last_info.CURRENT_state != NS_DATA_XFER) {
-			failure_string = "bad CURRENT_state";
+			failure_string = FAILURE_STRING("bad CURRENT_state");
 			goto failure;
 		}
 	}
@@ -6643,22 +6707,19 @@ postamble_disconnect(int child)
 		if (do_signal(child, __TEST_DISCON_REQ))
 			failed = failed ? : state;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
 			failed = failed ? : state;
 	} else {
-		if (expect(child, INFINITE_WAIT, __TEST_DISCON_IND)) {
+		if (expect(child, LONGEST_WAIT, __TEST_DISCON_IND)) {
 			ADDR_buffer = NULL;
 			ADDR_length = 0;
 			if (do_signal(child, __TEST_DISCON_REQ))
 				failed = failed ? : state;
 			state++;
-			if (expect(child, INFINITE_WAIT, __TEST_OK_ACK))
+			if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
 				failed = failed ? : state;
 		}
 	}
-	state++;
-	if (postamble_unbind(child))
-		failed = failed ? : state;
 	if (failed) {
 		state = failed;
 		goto failure;
@@ -6671,8 +6732,6 @@ postamble_disconnect(int child)
 static int
 preamble_push(int child)
 {
-	if (preamble_connect(child))
-		goto failure;
 	if (child == CHILD_IUT) {
 		state++;
 		if (do_signal(child, __TEST_PUSH))
@@ -6690,12 +6749,9 @@ postamble_pop(int child)
 
 	if (child == CHILD_IUT) {
 		state++;
-		if (test_ioctl(child, I_POP, 0))
+		if (do_signal(child, __TEST_POP))
 			failed = failed ? : state;
 	}
-	state++;
-	if (postamble_disconnect(child))
-		failed = failed ? : state;
 	if (failed) {
 		state = failed;
 		goto failure;
@@ -6736,16 +6792,77 @@ preamble_config(int child)
 }
 
 static int
-preamble_enable(int child)
+preamble_attach(int child)
 {
+	int failed = 0;
+
 	if (preamble_config(child))
 		goto failure;
 	state++;
 	if (child == CHILD_IUT) {
+		ADDR_buffer = addrs[child];
+		ADDR_length = anums[child] * sizeof(addrs[child][0]);
+		if (do_signal(child, __TEST_ATTACH_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+			failed = failed ? : state;
+	}
+	if (child == CHILD_PTU) {
+		return preamble_bind(child);
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+postamble_detach(int child)
+{
+	int failed = 0;
+
+	if (child == CHILD_IUT) {
+		state++;
+		if (do_signal(child, __TEST_DETACH_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+			failed = failed ? : state;
+	}
+	if (child == CHILD_PTU) {
+		state++;
+		if (postamble_unbind(child))
+			failed = failed ? : state;
+	}
+	state++;
+	if (postamble_pop(child))
+		failed = failed ? : state;
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
+preamble_enable(int child)
+{
+	if (preamble_attach(child))
+		goto failure;
+	state++;
+	if (child == CHILD_IUT) {
+		ADDR_buffer = addrs[(child + 1) % 2];
+		ADDR_length = anums[(child + 1) % 2] * sizeof(addrs[(child + 1) % 2][0]);
 		if (do_signal(child, __TEST_ENABLE_REQ))
 			goto failure;
 		state++;
 		if (expect(child, INFINITE_WAIT, __TEST_ENABLE_CON))
+			goto failure;
+	}
+	if (child == CHILD_PTU) {
+		if (preamble_connect(child))
 			goto failure;
 	}
 	return __RESULT_SUCCESS;
@@ -6758,8 +6875,8 @@ postamble_disable(int child)
 {
 	int failed = 0;
 
+	state++;
 	if (child == CHILD_IUT) {
-		state++;
 		if (do_signal(child, __TEST_DISABLE_REQ))
 			failed = failed ? : state;
 		state++;
@@ -6769,8 +6886,12 @@ postamble_disable(int child)
 		if (test_ioctl(child, I_FLUSH, FLUSHRW))
 			failed = failed ? : state;
 	}
+	if (child == CHILD_PTU) {
+		if (postamble_disconnect(child))
+			failed = failed ? : state;
+	}
 	state++;
-	if (postamble_pop(child))
+	if (postamble_detach(child))
 		failed = failed ? : state;
 	if (failed) {
 		state = failed;
@@ -6923,7 +7044,7 @@ preamble_link_out_of_service(int child)
 		if (preamble_link_power_on(child))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+		if (expect(child, LONGEST_WAIT, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
 		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
@@ -7157,7 +7278,7 @@ struct test_stream test_case_0_1_iut = { preamble_none, &test_0_1_iut, postamble
 #define tgrp_case_0_2_1 test_group_0
 #define sgrp_case_0_2_1 test_group_0_2
 #define numb_case_0_2_1 "0.2.1"
-#define name_case_0_2_1 "Base preamble."
+#define name_case_0_2_1 "Base preamble, base postamble."
 #define sref_case_0_2_1 "(none)"
 #define desc_case_0_2_1 "\
 Checks that two Streams can be opened and closed."
@@ -7182,7 +7303,7 @@ struct test_stream test_case_0_2_1_iut = { preamble_none, test_0_2_1_iut, postam
 #define tgrp_case_0_2_2 test_group_0
 #define sgrp_case_0_2_2 test_group_0_2
 #define numb_case_0_2_2 "0.2.2"
-#define name_case_0_2_2 "Unbound preamble."
+#define name_case_0_2_2 "Unbound preamble, unbound postamble."
 #define sref_case_0_2_2 "(none)"
 #define desc_case_0_2_2 "\
 Checks that two Streams can be opened, information obtained, and closed."
@@ -7207,11 +7328,11 @@ struct test_stream test_case_0_2_2_iut = { preamble_unbound, test_0_2_2_iut, pos
 #define tgrp_case_0_2_3 test_group_0
 #define sgrp_case_0_2_3 test_group_0_2
 #define numb_case_0_2_3 "0.2.3"
-#define name_case_0_2_3 "Bound preamble."
+#define name_case_0_2_3 "Push preamble, pop postamble."
 #define sref_case_0_2_3 "(none)"
 #define desc_case_0_2_3 "\
-Checks that two Streams can be opened, information obtained, bound,\n\
-unbound, and closed."
+Checks that two Streams can be opened, information obtained, module\n\
+pushed, popped, and closed."
 
 int
 test_0_2_3_ptu(int child)
@@ -7225,19 +7346,19 @@ test_0_2_3_iut(int child)
 	return __RESULT_SUCCESS;
 }
 
-struct test_stream test_case_0_2_3_ptu = { preamble_bind, test_0_2_3_ptu, postamble_unbind };
-struct test_stream test_case_0_2_3_iut = { preamble_bind, test_0_2_3_iut, postamble_unbind };
+struct test_stream test_case_0_2_3_ptu = { preamble_push, test_0_2_3_ptu, postamble_pop };
+struct test_stream test_case_0_2_3_iut = { preamble_push, test_0_2_3_iut, postamble_pop };
 
 #define test_case_0_2_3 { &test_case_0_2_3_ptu, &test_case_0_2_3_iut, NULL }
 
 #define tgrp_case_0_2_4 test_group_0
 #define sgrp_case_0_2_4 test_group_0_2
 #define numb_case_0_2_4 "0.2.4"
-#define name_case_0_2_4 "Connect preamble."
+#define name_case_0_2_4 "Config preamble, pop postamble."
 #define sref_case_0_2_4 "(none)"
 #define desc_case_0_2_4 "\
-Checks that two Streams can be opened, information obtained, bound,\n\
-connected, disconnected, unbound and closed."
+Checks that two Streams can be opened, information obtained, module\n\
+pushed, configured, popped and closed."
 
 int
 test_0_2_4_ptu(int child)
@@ -7253,20 +7374,20 @@ test_0_2_4_iut(int child)
 	return __RESULT_SUCCESS;
 }
 
-struct test_stream test_case_0_2_4_ptu = { preamble_connect, test_0_2_4_ptu, postamble_disconnect };
-struct test_stream test_case_0_2_4_iut = { preamble_connect, test_0_2_4_iut, postamble_disconnect };
+struct test_stream test_case_0_2_4_ptu = { preamble_config, test_0_2_4_ptu, postamble_pop };
+struct test_stream test_case_0_2_4_iut = { preamble_config, test_0_2_4_iut, postamble_pop };
 
 #define test_case_0_2_4 { &test_case_0_2_4_ptu, &test_case_0_2_4_iut, NULL }
 
 #define tgrp_case_0_2_5 test_group_0
 #define sgrp_case_0_2_5 test_group_0_2
 #define numb_case_0_2_5 "0.2.5"
-#define name_case_0_2_5 "Push preamble."
+#define name_case_0_2_5 "Attach preamble, detach postamble."
 #define sref_case_0_2_5 "(none)"
 #define desc_case_0_2_5 "\
-Checks that two Streams can be opened, information obtained, bound,\n\
-connected, module pushed, module popped, disconnected, unbound and\n\
-closed."
+Checks that two Streams can be opened, information obtained, module\n\
+pushed, configured, bound/attached, unbound/detached, module popped,\n\
+and closed."
 
 int
 test_0_2_5_ptu(int child)
@@ -7282,20 +7403,20 @@ test_0_2_5_iut(int child)
 	return __RESULT_SUCCESS;
 }
 
-struct test_stream test_case_0_2_5_ptu = { preamble_push, test_0_2_5_ptu, postamble_pop };
-struct test_stream test_case_0_2_5_iut = { preamble_push, test_0_2_5_iut, postamble_pop };
+struct test_stream test_case_0_2_5_ptu = { preamble_attach, test_0_2_5_ptu, postamble_detach };
+struct test_stream test_case_0_2_5_iut = { preamble_attach, test_0_2_5_iut, postamble_detach };
 
 #define test_case_0_2_5 { &test_case_0_2_5_ptu, &test_case_0_2_5_iut, NULL }
 
 #define tgrp_case_0_2_6 test_group_0
 #define sgrp_case_0_2_6 test_group_0_2
 #define numb_case_0_2_6 "0.2.6"
-#define name_case_0_2_6 "Config preamble"
+#define name_case_0_2_6 "Enable preamble, disable postamble."
 #define sref_case_0_2_6 "(none)"
 #define desc_case_0_2_6 "\
-Checks that two Streams can be opened, information obtained, bound,\n\
-connected, module pushed, module configured, module popped,\n\
-disconnected, unbound and closed."
+Checks that two Streams can be opened, information obtained, module\n\
+pushed, configured, bound/attached, connected/enabled, disconnected/\n\
+disabled, unbound/detached, module popped and closed."
 
 int
 test_0_2_6_ptu(int child)
@@ -7311,26 +7432,33 @@ test_0_2_6_iut(int child)
 	return __RESULT_SUCCESS;
 }
 
-struct test_stream test_case_0_2_6_ptu = { preamble_config, test_0_2_6_ptu, postamble_pop };
-struct test_stream test_case_0_2_6_iut = { preamble_config, test_0_2_6_iut, postamble_pop };
+struct test_stream test_case_0_2_6_ptu = { preamble_enable, test_0_2_6_ptu, postamble_disable };
+struct test_stream test_case_0_2_6_iut = { preamble_enable, test_0_2_6_iut, postamble_disable };
 
 #define test_case_0_2_6 { &test_case_0_2_6_ptu, &test_case_0_2_6_iut, NULL }
 
 #define tgrp_case_0_2_7 test_group_0
 #define sgrp_case_0_2_7 test_group_0_2
 #define numb_case_0_2_7 "0.2.7"
-#define name_case_0_2_7 "Enable preamble."
+#define name_case_0_2_7 "Link power on preamble, out of service postamble."
 #define sref_case_0_2_7 "(none)"
 #define desc_case_0_2_7 "\
-Checks that two Streams can be opened, information obtained, bound,\n\
-connected, module pushed, module configured, enabled, disabled, popped,\n\
-disconnected, unbound and closed."
+Checks that two Streams can be opened, information obtained, module\n\
+pushed, configured, bound/attached, connected/enabled, link power on,\n\
+disconnected/disabled, unbound/detached, module popped and closed."
 
 int
 test_0_2_7_ptu(int child)
 {
-	test_sleep(child, 1);
+	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+		goto failure;
+	state++;
+	if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+		goto failure;
+	state++;
 	return __RESULT_SUCCESS;
+failure:
+	return __RESULT_FAILURE;
 }
 
 int
@@ -7340,43 +7468,10 @@ test_0_2_7_iut(int child)
 	return __RESULT_SUCCESS;
 }
 
-struct test_stream test_case_0_2_7_ptu = { preamble_enable, test_0_2_7_ptu, postamble_disable };
-struct test_stream test_case_0_2_7_iut = { preamble_enable, test_0_2_7_iut, postamble_disable };
+struct test_stream test_case_0_2_7_ptu = { preamble_link_power_on, test_0_2_7_ptu, postamble_link_out_of_service };
+struct test_stream test_case_0_2_7_iut = { preamble_link_power_on, test_0_2_7_iut, postamble_link_out_of_service };
 
 #define test_case_0_2_7 { &test_case_0_2_7_ptu, &test_case_0_2_7_iut, NULL }
-
-#define tgrp_case_0_2_8 test_group_0
-#define sgrp_case_0_2_8 test_group_0_2
-#define numb_case_0_2_8 "0.2.8"
-#define name_case_0_2_8 "Link power off preamble."
-#define sref_case_0_2_8 "(none)"
-#define desc_case_0_2_8 "\
-Checks that two Streasm can be opeed, information obtained, bound,\n\
-connected, module pushed, module configured, enabled, link power on,\n\
-disabled, popped, disconnected, unbound and closed."
-
-int
-test_0_2_8_ptu(int child)
-{
-	if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
-		goto failure;
-	state++;
-	return __RESULT_SUCCESS;
-      failure:
-	return __RESULT_FAILURE;
-}
-
-int
-test_0_2_8_iut(int child)
-{
-	test_sleep(child, 1);
-	return __RESULT_SUCCESS;
-}
-
-struct test_stream test_case_0_2_8_ptu = { preamble_link_power_on, test_0_2_8_ptu, postamble_link_out_of_service };
-struct test_stream test_case_0_2_8_iut = { preamble_link_power_on, test_0_2_8_iut, postamble_link_out_of_service };
-
-#define test_case_0_2_8 { &test_case_0_2_8_ptu, &test_case_0_2_8_iut, NULL }
 
 #define test_group_1 "1. Link State Control - Expected signal units/orders"
 #define tgrp_case_1_1a test_group_1
@@ -7831,9 +7926,9 @@ test_aligned_pt(int child)
 }
 
 int
-test_alignment_pt(int child, int proving, int result)
+test_alignment_pt(int child, int proving, int signal, int result)
 {
-	long beg_time = 0;
+	int signalled = 0;
 
 	switch (child) {
 	case CHILD_PTU:
@@ -7843,58 +7938,66 @@ test_alignment_pt(int child, int proving, int result)
 		if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT))
 			goto failure;
 		state++;
-		beg_time = 0;
 		switch (proving) {
 		case 0:
+			if (do_signal(child, signal))
+				goto failure;
+			state++;
 			if (expect(child, INFINITE_WAIT, result))
 				goto failure;
 			state++;
 			break;
 		case 1:
+			if (do_signal(child, __STATUS_PROVING_NORMAL))
+				goto failure;
+			state++;
 			for (;;) {
 				switch (get_event(child)) {
 				case __MSG_PROVING:
 				case __STATUS_PROVING_EMERG:
 				case __STATUS_PROVING_NORMAL:
-					if (!beg_time)
-						beg_time = milliseconds(child, t4n);
-					if (do_signal(child, __STATUS_PROVING_NORMAL))
-						goto failure;
-					state++;
-					print_less(child);
+					if (!signalled) {
+						if (do_signal(child, signal))
+							goto failure;
+						signalled = 1;
+						state++;
+						print_less(child);
+					}
 					continue;
 				default:
 					if (last_event == result) {
 						state++;
 						print_more(child);
-						if (check_time(child, "T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
-							goto failure;
 						break;
 					}
 					goto failure;
 				}
 				break;
 			}
+			if (do_signal(child, signal))
+				goto failure;
 			break;
 		case 2:
+			if (do_signal(child, __STATUS_PROVING_EMERG))
+				goto failure;
+			state++;
 			for (;;) {
 				switch (get_event(child)) {
 				case __MSG_PROVING:
 				case __STATUS_PROVING_EMERG:
 				case __STATUS_PROVING_NORMAL:
-					if (!beg_time)
-						beg_time = milliseconds(child, t4e);
-					if (do_signal(child, __STATUS_PROVING_EMERG))
-						goto failure;
-					state++;
-					print_less(child);
+					if (!signalled) {
+						if (do_signal(child, signal))
+							goto failure;
+						signalled = 1;
+						state++;
+						print_less(child);
+					}
 					continue;
 				default:
 					if (last_event == result) {
 						state++;
 						print_more(child);
-						if (check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
-							goto failure;
 						break;
 					}
 					goto failure;
@@ -8011,11 +8114,7 @@ test_alignment_sut(int child, int proving, int result)
 static int
 test_1_5a_ptu(int child, int proving)
 {
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, proving, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (do_signal(child, __STATUS_IN_SERVICE))
+	if (test_alignment_pt(child, proving, __STATUS_IN_SERVICE, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	if (expect(child, LONGEST_WAIT, __EVENT_NO_MSG))
@@ -8028,8 +8127,7 @@ test_1_5a_ptu(int child, int proving)
 static int
 test_1_5a_iut(int child, int proving)
 {
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, proving, __EVENT_IUT_IN_SERVICE))
+	if (test_alignment_pt(child, proving, 0, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8437,6 +8535,10 @@ test_alignment_lpo_pt(int child, int proving, int result)
 		if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT))
 			goto failure;
 		state++;
+		/* wait to allow IUT to queue data, for test 1.9(b)np */
+		if (expect(child, LONG_WAIT, __EVENT_NO_MSG))
+			goto failure;
+		state++;
 		if (do_signal(child, __STATUS_ALIGNMENT))
 			goto failure;
 		state++;
@@ -8687,7 +8789,7 @@ Reverse direction\
 static int
 test_1_9b_ptu(int child, int proving)
 {
-	if (test_alignment_lpo_pt(child, proving, __STATUS_IN_SERVICE))
+	if (test_alignment_lpo_pt(child, proving, __TEST_DATA))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
@@ -8835,11 +8937,7 @@ Normal alignment with PO set and cleared\
 static int
 test_1_10_ptu(int child, int proving)
 {
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, proving, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (do_signal(child, __STATUS_IN_SERVICE))
+	if (test_alignment_pt(child, proving, __STATUS_IN_SERVICE, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -8855,8 +8953,7 @@ test_1_10_iut(int child, int proving)
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
 	state++;
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, proving, __EVENT_IUT_IN_SERVICE))
+	if (test_alignment_pt(child, proving, 0, __EVENT_IUT_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9087,9 +9184,22 @@ Forward direction\
 static int
 test_1_12a_ptu(int child, int proving)
 {
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, proving, __STATUS_PROCESSOR_OUTAGE))
-		goto failure;
+	switch (proving) {
+	case 0:
+		if (test_alignment_pt(child, proving, __STATUS_ALIGNMENT, __STATUS_PROCESSOR_OUTAGE))
+			goto failure;
+		break;
+	case 1:
+		if (test_alignment_pt(child, proving, __STATUS_PROVING_NORMAL, __STATUS_PROCESSOR_OUTAGE))
+			goto failure;
+		break;
+	case 2:
+		if (test_alignment_pt(child, proving, __STATUS_PROVING_EMERG, __STATUS_PROCESSOR_OUTAGE))
+			goto failure;
+		break;
+	default:
+		return __RESULT_SCRIPT_ERROR;
+	}
 	state++;
 	if (do_signal(child, __TEST_STOP))
 		goto failure;
@@ -9277,9 +9387,22 @@ SIO received when \"Aligned not ready\"\
 static int
 test_1_13_ptu(int child, int proving)
 {
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, proving, __STATUS_PROCESSOR_OUTAGE))
-		goto failure;
+	switch (proving) {
+	case 0:
+		if (test_alignment_pt(child, proving, __STATUS_ALIGNMENT, __STATUS_PROCESSOR_OUTAGE))
+			goto failure;
+		break;
+	case 1:
+		if (test_alignment_pt(child, proving, __STATUS_PROVING_NORMAL, __STATUS_PROCESSOR_OUTAGE))
+			goto failure;
+		break;
+	case 2:
+		if (test_alignment_pt(child, proving, __STATUS_PROVING_EMERG, __STATUS_PROCESSOR_OUTAGE))
+			goto failure;
+		break;
+	default:
+		return __RESULT_SCRIPT_ERROR;
+	}
 	state++;
 	if (do_signal(child, __STATUS_ALIGNMENT))
 		goto failure;
@@ -9372,11 +9495,7 @@ Set and clear LPO when \"Initial alignment\"\
 static int
 test_1_14_ptu(int child)
 {
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, 1, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (do_signal(child, __STATUS_IN_SERVICE))
+	if (test_alignment_pt(child, 1, __STATUS_IN_SERVICE, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9424,11 +9543,7 @@ Set and clear LPO when \"Aligned ready\"\
 static int
 test_1_15_ptu(int child, int proving)
 {
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, proving, __STATUS_IN_SERVICE))
-		goto failure;
-	state++;
-	if (do_signal(child, __STATUS_IN_SERVICE))
+	if (test_alignment_pt(child, proving, __STATUS_IN_SERVICE, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_OUTAGE))
@@ -9889,7 +10004,7 @@ test_1_20_ptu(int child)
 		case __STATUS_IN_SERVICE:
 			state++;
 			print_more(child);
-			if (check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
+			if (!beg_time || check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
 				goto failure;
 			state++;
 			break;
@@ -9910,6 +10025,9 @@ static int
 test_1_20_iut(int child)
 {
 	if (test_proving_sut(child, 1))
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_EMERG))
@@ -10776,11 +10894,7 @@ Reverse direction\
 static int
 test_1_32b_ptu(int child)
 {
-	/* FIXME: should be test_alignement_pt() */
-	if (test_alignment_sut(child, 1, __STATUS_OUT_OF_SERVICE))
-		goto failure;
-	state++;
-	if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+	if (test_alignment_pt(child, 1, __STATUS_PROVING_NORMAL, __STATUS_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -11522,7 +11636,14 @@ Unexpected signal units/orders in \"In Service\" state\
 static int
 test_2_7_ptu(int child)
 {
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG))
+		goto failure;
+	state++;
 	if (do_signal(child, __STATUS_INVALID_STATUS))
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -11892,10 +12013,10 @@ test_3_6_ptu(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
-		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
-		if (do_signal(child, __STATUS_OUT_OF_SERVICE))
+		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
 		goto notappl;
@@ -12080,83 +12201,84 @@ Forward direction\
 static int
 test_4_1a_11_ptu(int child)
 {
-	int dat = 0, msu = 0, rpo = 0;
+	int dat = 0, ack = 0;
 
+	/* (1) The test begins with the link in the "In Service" state. */
+	/* (2) Send one data message from SP B to SP A. */
 	if (do_signal(child, __TEST_DATA))
 		goto failure;
 	state++;
+	/* (3) Send two MSUs from SP A, issue a level 3 "Set Local Processor
+	 *     Outage" command at SP A, and send another MSU from SP A. */
+	test_msleep(child, LONG_WAIT);
+	state++;
+	/* (4) Send another data message from SP B to SP A and acknowledge the
+	 *     first data message sent from SP A. */
+	/* (5) Check that SP A sends two Data messages and acknowledges one
+	 *     data message before sending "Processor Outage" message. */
+
 	for (;;) {
 		switch (get_event(child)) {
 		case __TEST_DATA:
-			if (++msu == 1) {
+			if (dat == 0) {
+				dat++;
 				if (do_signal(child, __TEST_DATA))
 					goto failure;
 				state++;
-				start_tt(iutconf.sl.t7 / 2);
+				/* first data message, acknowledge it */
 				bsn[0] = fsn[1];
 				if (do_signal(child, __TEST_ACK))
 					goto failure;
 				state++;
+				continue;
+			} else if (dat == 1) {
+				/* second data message, don't ack it */
+				dat++;
+				state++;
+				if (ack == 0)
+					continue;
 				break;
 			}
 			goto failure;
 		case __TEST_ACK:
-			if (++dat <= 1)
-				continue;
-			goto failure;
-		case __STATUS_PROCESSOR_OUTAGE:
-			if (++rpo == 1)
+			if (ack == 0) {
+				ack++;
+				state++;
+				if (dat != 2)
+					continue;
 				break;
+			}
 			goto failure;
 		default:
 			goto failure;
 		}
 		break;
 	}
-	for (;;) {
-		switch (get_event(child)) {
-		case __TEST_DATA:
-			bsn[0] = fsn[1];
-			if (do_signal(child, __TEST_ACK))
-				goto failure;
-			state++;
-			break;
-		case __TEST_ACK:
-			if (++dat <= 1)
-				continue;
-			goto failure;
-		case __STATUS_PROCESSOR_OUTAGE:
-			if (++rpo == 1)
-				break;
-			goto failure;
-		default:
-			goto failure;
-		}
-		break;
-	}
-	for (;;) {
-		switch (get_event(child)) {
-		case __TEST_DATA:
-			goto failure;
-		case __TEST_ACK:
-			if (++dat <= 1)
-				continue;
-			goto failure;
-		case __STATUS_PROCESSOR_OUTAGE:
-			if (++rpo == 1)
-				break;
-			goto failure;
-		default:
-			goto failure;
-		}
-		break;
-	}
-	if (dat == 0)
-		if (expect(child, INFINITE_WAIT, __TEST_ACK))
-			goto failure;
+
+	/* (6) Check that the second data message sent after "Set Local
+	 *     Processor Outage" was asserted is not acknowledged or
+	 *     indicated. */
+	/* (7) Upon receiving a status "Procesor Outage" message from SP A,
+	 *     send another data message to SP A from SP B. */
+	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_OUTAGE))
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_DATA))
+		goto failure;
+	state++;
+	/* (8) Check that this last message is neither acknowledged by nor
+	 *     indicated at SP A. */
+	/* (9) Issue a Level 3 "Clear Buffers" and Level 3 "Clear Local
+	 *     Processor Outage" commands at SP A and send another MSU from SP A.  */
+	/* (10) Check that SP A sends a status "Processor Outage Ended"
+	 *     message. */
 	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_ENDED))
 		goto failure;
 	state++;
+	/* (11) Send another data message to SP A and send a status "Ready"
+	 *      message from SP B to SP A with the appropriate sequence
+	 *      numbers. */
+
 	if (do_signal(child, __TEST_DATA))
 		goto failure;
 	state++;
@@ -12164,26 +12286,23 @@ test_4_1a_11_ptu(int child)
 	if (do_signal(child, __STATUS_SEQUENCE_SYNC))
 		goto failure;
 	state++;
+	/* (12) Check that the message sent before status "Ready" is neither
+	 *      acknowledged by nor indicated at SP A. */
+	if (expect(child, INFINITE_WAIT, __TEST_DATA))
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_ACK))
+		goto failure;
+	state++;
+	/* (13) Send another data message to SP A. */
 	if (do_signal(child, __TEST_DATA))
 		goto failure;
 	state++;
-	for (;;) {
-		switch (wait_event(child, NORMAL_WAIT)) {
-		case __TEST_DATA:
-			bsn[0] = fsn[1];
-			if (do_signal(child, __TEST_ACK))
-				goto failure;
-			state++;
-			continue;
-		case __TEST_ACK:
-			continue;
-		case __EVENT_NO_MSG:
-			break;
-		default:
-			goto failure;
-		}
-		break;
-	}
+	/* (14) Check that SP A and SP B exchange this last set of data
+	 *      messages and akcnowledgements */
+	if (expect(child, INFINITE_WAIT, __TEST_ACK))
+		goto failure;
+	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -12200,8 +12319,6 @@ test_4_1a_11_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
-	expect(child, LONGEST_WAIT, __EVENT_NO_MSG);
-	state++;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -12214,9 +12331,6 @@ test_4_1a_11_iut(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SEND_MSU))
-		goto failure;
-	state++;
-	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
@@ -12370,85 +12484,98 @@ Reverse direction\
 static int
 test_4_1b_11_ptu(int child)
 {
-	int dat = 0, msu = 0;
+	int dat = 0, ack = 0;
 
+	/* ( 1) The test begins with the link in the "In Service" state. */
+	/* ( 2) Send two data messages from SP A to SP B and one data message from SP B to SP A. */
 	if (do_signal(child, __TEST_DATA))
 		goto failure;
 	state++;
+	/* ( 3) Check that SP A acknowledges the data message sent from SP B to SP A. */
+	/* ( 4) Send a "Data Ack" message from SP B to SP A acknowledging the first data messsage
+	 *      and send a status "Processor Outage" message. */
 	for (;;) {
 		switch (get_event(child)) {
 		case __TEST_DATA:
-			if (++msu == 2) {
-				bsn[0]++;
+			if (dat == 0) {
+				state++;
+				dat++;
+				bsn[0] = fsn[1];
 				if (do_signal(child, __TEST_ACK))
 					goto failure;
 				state++;
 				if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
 					goto failure;
 				state++;
-				if (do_signal(child, __TEST_DATA))
-					goto failure;
+				continue;
+			} else if (dat == 1) {
+				dat++;
 				state++;
-				start_tt(iutconf.sl.t7);
-				state++;
+				if (ack == 0)
+					continue;
 				break;
 			}
-			state++;
-			continue;
+			goto failure;
 		case __TEST_ACK:
 			state++;
-			if (++dat <= 1)
-				continue;
+			if (ack == 0) {
+				ack++;
+				if (dat != 2)
+					continue;
+				break;
+			}
 			goto failure;
 		default:
 			goto failure;
 		}
 		break;
 	}
-	for (;;) {
-		switch (get_event(child)) {
-		case __EVENT_TIMEOUT:
-			if (do_signal(child, __STATUS_PROCESSOR_ENDED))
-				goto failure;
-			state++;
-			if (do_signal(child, __TEST_DATA))
-				goto failure;
-			state++;
-			start_tt(iutconf.sl.t7 / 2);
-			break;
-		case __TEST_DATA:
-			start_tt(iutconf.sl.t7);
-			continue;
-		case __TEST_ACK:
-			state++;
-			continue;
-		}
-		break;
-	}
-	for (;;) {
-		switch (get_event(child)) {
-		case __EVENT_TIMEOUT:
-			state++;
-			break;
-		case __TEST_DATA:
-			bsn[0] = fsn[1];
-			if (do_signal(child, __TEST_ACK))
-				goto failure;
-			state++;
-			continue;
-		case __TEST_ACK:
-			state++;
-			continue;
-		case __STATUS_IN_SERVICE:
-			state++;
-			fsn[0] = bsn[1];
-			continue;
-		default:
-			goto failure;
-
-		}
-		break;
-	}
+	/* ( 5) Send another data message from SP B to SP A and send another MSU from SP A to SP B
+	 *      (during the processor outage period). */
+	if (do_signal(child, __TEST_DATA))
+		goto failure;
+	state++;
+	/* ( 6) Check that SP A acknowledges the data message sent to it during the processor outage
+	 *      period. */
+	if (expect(child, INFINITE_WAIT, __TEST_ACK))
+		goto failure;
+	state++;
+	/* ( 7) Check that SP A does not issue a data message from the MSU requested at SP A after
+	 *      receipt of status "Processor Outage". */
+	if (expect(child, iutconf.sl.t7 * 2, __EVENT_NO_MSG))
+		goto failure;
+	state++;
+	/* ( 8) Check that SP A indicates both MSUs and "Remote Processor Outage" to Level 3. */
+	/* ( 9) Wait for T7 to ensure that SP A does not require acknowledgement to the data message
+	 *      sent before processor outage was invoked. */
+	/* (10) Send a status "Processor Recovered" message to SP A. */
+	if (do_signal(child, __STATUS_PROCESSOR_ENDED))
+		goto failure;
+	state++;
+	/* (11) Check that SP A responds with a status "Ready" message and indicates "Remote
+	 *      Processor Recovered" message to SP A. */
+	if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE))
+		goto failure;
+	state++;
+	/* (12) Check that SP A sends a data message for the MSU that was requested during processor
+	 *      outage. */
+	if (expect(child, INFINITE_WAIT, __TEST_DATA))
+		goto failure;
+	state++;
+	/* (13) Send a "Data Ack" message to SP A to acknowledge the data message. */
+	bsn[0] = fsn[1];
+	if (do_signal(child, __TEST_ACK))
+		goto failure;
+	state++;
+	/* (14) Send a data mesasge to SP A. */
+	if (do_signal(child, __TEST_DATA))
+		goto failure;
+	state++;
+	/* (15) Check that SP A acknowledges the data message with a "Data Ack" message with the
+	 *      appropriate sequence numbers. */
+	if (expect(child, INFINITE_WAIT, __TEST_ACK))
+		goto failure;
+	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -12475,6 +12602,9 @@ test_4_1b_11_iut(int child)
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPR))
+		goto failure;
+	state++;
+	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -12639,6 +12769,9 @@ test_4_2_ptu(int child)
 	if (do_signal(child, __STATUS_PROCESSOR_ENDED))
 		goto failure;
 	state++;
+	if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE))
+		goto failure;
+	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -12677,13 +12810,19 @@ Clear LPO when \"Both processor outage\"\
 static int
 test_4_3_ptu(int child)
 {
+	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_OUTAGE))
+		goto failure;
+	state++;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_OUTAGE))
+	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_ENDED))
+		goto failure;
+	state++;
+	if (do_signal(child, __STATUS_SEQUENCE_SYNC))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_LPR))
@@ -12692,7 +12831,7 @@ test_4_3_ptu(int child)
 	if (do_signal(child, __STATUS_PROCESSOR_ENDED))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_ENDED))
+	if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -12702,16 +12841,16 @@ test_4_3_ptu(int child)
 static int
 test_4_3_iut(int child)
 {
-	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPO))
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPR))
+	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPO))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_LPR))
+		goto failure;
+	state++;
+	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPR))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -15152,7 +15291,6 @@ struct test_case {
 	numb_case_0_2_5, tgrp_case_0_2_5, sgrp_case_0_2_5, name_case_0_2_5, desc_case_0_2_5, sref_case_0_2_5, test_case_0_2_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_0_2_6, tgrp_case_0_2_6, sgrp_case_0_2_6, name_case_0_2_6, desc_case_0_2_6, sref_case_0_2_6, test_case_0_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_0_2_7, tgrp_case_0_2_7, sgrp_case_0_2_7, name_case_0_2_7, desc_case_0_2_7, sref_case_0_2_7, test_case_0_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_0_2_8, tgrp_case_0_2_8, sgrp_case_0_2_8, name_case_0_2_8, desc_case_0_2_8, sref_case_0_2_8, test_case_0_2_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_1a, tgrp_case_1_1a, sgrp_case_1_1a, name_case_1_1a, desc_case_1_1a, sref_case_1_1a, test_case_1_1a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_1b, tgrp_case_1_1b, sgrp_case_1_1b, name_case_1_1b, desc_case_1_1b, sref_case_1_1b, test_case_1_1b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_2, tgrp_case_1_2, sgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, test_case_1_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {

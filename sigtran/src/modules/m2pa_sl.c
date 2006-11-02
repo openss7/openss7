@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:21 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,25 +45,34 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 20:34:21 $ by $Author: brian $
+ Last Modified $Date: 2006/11/02 12:54:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.4  2006/11/02 12:54:42  brian
+ - major corrections and updates to M2PA module and tests cases
+
  Revision 0.9.2.3  2006/10/31 20:34:21  brian
  - more buildup of test suite
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:21 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:42 $"
 
-static char const ident[] = "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:21 $";
+static char const ident[] =
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:42 $";
 
 #define _LFS_SOURCE 1
 
 #define _DEBUG 1
 
 #include <sys/os7/compat.h>
+
+#include <stdbool.h>
+
+#include <linux/socket.h>
+#include <net/ip.h>
 
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
@@ -78,8 +87,8 @@ static char const ident[] = "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/31 20:34:21 $"
-#define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:42 $"
+#define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M2PA_SL_LICENSE		"GPL"
@@ -172,6 +181,9 @@ struct streamtab m2pa_slinfo = {
  */
 typedef struct sl {
 	STR_DECLARATION (struct sl);	/* stream declaration */
+	int n_request;			/* npi request */
+	int n_state;			/* npi state */
+	int coninds;			/* npi connection indications */
 	mblk_t *rbuf;			/* reassembly buffer */
 	uint rmsu;			/* received unacked msus */
 	uint tmsu;			/* transmitted unacked msus */
@@ -205,6 +217,14 @@ typedef struct sl {
 		sdl_timers_t timers;	/* SDL timers */
 		sdl_config_t config;	/* SDL configuration options */
 	} sdl;
+	struct {
+		N_info_ack_t n;		/* NPI information */
+		lmi_info_ack_t lm;	/* LMI information */
+	} info;
+	size_t loc_len;			/* local address length */
+	size_t rem_len;			/* remote address length */
+	struct sockaddr_in loc[8];	/* up to 8 local addresses */
+	struct sockaddr_in rem[8];	/* up to 8 remote addresses */
 } sl_t;
 
 #define SL_PRIV(__q) ((struct sl *)(__q)->q_ptr)
@@ -213,6 +233,177 @@ STATIC struct sl *sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t
 STATIC void sl_free_priv(queue_t *q);
 STATIC struct sl *sl_get(struct sl *sl);
 STATIC void sl_put(struct sl *sl);
+
+#if 0
+#define NSF_UNBND	(1<<NS_UNBND)
+#define NSF_WACK_BREQ	(1<<NS_WACK_BREQ)
+#define NSF_WACK_UREQ	(1<<NS_WACK_UREQ)
+#define NSF_IDLE	(1<<NS_IDLE)
+#define NSF_WACK_OPTREQ	(1<<NS_WACK_OPTREQ)
+#define NSF_WACK_RRES	(1<<NS_WACK_RRES)
+#define NSF_WCON_CREQ	(1<<NS_WCON_CREQ)
+#define NSF_WRES_CIND	(1<<NS_WRES_CIND)
+#define NSF_WACK_CRES	(1<<NS_WACK_CRES)
+#define NSF_DATA_XFER	(1<<NS_DATA_XFER)
+#define NSF_WCON_RREQ	(1<<NS_WCON_RREQ)
+#define NSF_WRES_RIND	(1<<NS_WRES_RIND)
+#define NSF_WACK_DREQ6	(1<<NS_WACK_DREQ6)
+#define NSF_WACK_DREQ7	(1<<NS_WACK_DREQ7)
+#define NSF_WACK_DREQ9	(1<<NS_WACK_DREQ9)
+#define NSF_WACK_DREQ10	(1<<NS_WACK_DREQ10)
+#define NSF_WACK_DREQ11	(1<<NS_WACK_DREQ11)
+#endif
+
+#ifdef _DEBUG
+const char *
+sl_n_state_name(int state)
+{
+	switch (state) {
+	case NS_UNBND:		/* NS user not bound to network address */
+		return ("NS_UNBND");
+	case NS_WACK_BREQ:	/* Awaiting acknowledgement of N_BIND_REQ */
+		return ("NS_WACK_BREQ");
+	case NS_WACK_UREQ:	/* Pending acknowledgement for N_UNBIND_REQ */
+		return ("NS_WACK_UREQ");
+	case NS_IDLE:		/* Idle, no connection */
+		return ("NS_IDLE");
+	case NS_WACK_OPTREQ:	/* Pending acknowledgement of N_OPTMGMT_REQ */
+		return ("NS_WACK_OPTREQ");
+	case NS_WACK_RRES:	/* Pending acknowledgement of N_RESET_RES */
+		return ("NS_WACK_RRES");
+	case NS_WCON_CREQ:	/* Pending confirmation of N_CONN_REQ */
+		return ("NS_WCON_CREQ");
+	case NS_WRES_CIND:	/* Pending response of N_CONN_REQ */
+		return ("NS_WRES_CIND");
+	case NS_WACK_CRES:	/* Pending acknowledgement of N_CONN_RES */
+		return ("NS_WACK_CRES");
+	case NS_DATA_XFER:	/* Connection-mode data transfer */
+		return ("NS_DATA_XFER");
+	case NS_WCON_RREQ:	/* Pending confirmation of N_RESET_REQ */
+		return ("NS_WCON_RREQ");
+	case NS_WRES_RIND:	/* Pending response of N_RESET_IND */
+		return ("NS_WRES_RIND");
+	case NS_WACK_DREQ6:	/* Waiting ack of N_DISCON_REQ */
+		return ("NS_WACK_DREQ6");
+	case NS_WACK_DREQ7:	/* Waiting ack of N_DISCON_REQ */
+		return ("NS_WACK_DREQ7");
+	case NS_WACK_DREQ9:	/* Waiting ack of N_DISCON_REQ */
+		return ("NS_WACK_DREQ9");
+	case NS_WACK_DREQ10:	/* Waiting ack of N_DISCON_REQ */
+		return ("NS_WACK_DREQ10");
+	case NS_WACK_DREQ11:	/* Waiting ack of N_DISCON_REQ */
+		return ("NS_WACK_DREQ11");
+	default:
+		return ("(unknown)");
+	}
+}
+STATIC int
+sl_set_n_state(struct sl *sl, int newstate)
+{
+	int oldstate = sl->n_state;
+
+	printd(("%s: %p: %s <- %s\n", MOD_NAME, sl, sl_n_state_name(oldstate),
+		sl_n_state_name(newstate)));
+	return ((sl->n_state = newstate));
+}
+#else				/* _DEBUG */
+STATIC int
+sl_set_n_state(struct sl *sl, int newstate)
+{
+	return ((sl->n_state = newstate));
+}
+#endif				/* _DEBUG */
+STATIC INLINE int
+sl_get_n_state(struct sl *sl)
+{
+	return (sl->n_state);
+}
+STATIC INLINE int
+sl_get_n_statef(struct sl *sl)
+{
+	return ((1 << sl_get_n_state(sl)));
+}
+STATIC INLINE int
+sl_chk_n_state(struct sl *sl, int mask)
+{
+	return (sl_get_n_statef(sl) & mask);
+}
+STATIC INLINE int
+sl_not_n_state(struct sl *sl, int mask)
+{
+	return (sl_chk_n_state(sl, ~mask));
+}
+
+#define LMF_UNATTACHED	    (1<<LMI_UNATTACHED)
+#define LMF_ATTACH_PENDING  (1<<LMI_ATTACH_PENDING)
+#define LMF_UNUSABLE	    (1<<LMI_UNUSABLE)
+#define LMF_DISABLED	    (1<<LMI_DISABLED)
+#define LMF_ENABLE_PENDING  (1<<LMI_ENABLE_PENDING)
+#define LMF_ENABLED	    (1<<LMI_ENABLED)
+#define LMF_DISABLE_PENDING (1<<LMI_DISABLE_PENDING)
+#define LMF_DETACH_PENDING  (1<<LMI_DETACH_PENDING)
+
+#ifdef _DEBUG
+const char *
+sl_i_state_name(int state)
+{
+	switch (state) {
+	case LMI_UNATTACHED:
+		return ("LMI_UNATTACHED");
+	case LMI_ATTACH_PENDING:
+		return ("LMI_ATTACH_PENDING");
+	case LMI_UNUSABLE:
+		return ("LMI_UNUSABLE");
+	case LMI_DISABLED:
+		return ("LMI_DISABLED");
+	case LMI_ENABLE_PENDING:
+		return ("LMI_ENABLE_PENDING");
+	case LMI_ENABLED:
+		return ("LMI_ENABLED");
+	case LMI_DISABLE_PENDING:
+		return ("LMI_DISABLE_PENDING");
+	case LMI_DETACH_PENDING:
+		return ("LMI_DETACH_PENDING");
+	default:
+		return ("(unknown)");
+	}
+}
+STATIC int
+sl_set_i_state(struct sl *sl, int newstate)
+{
+	int oldstate = sl->i_state;
+
+	printd(("%s: %p: %s <- %s\n", MOD_NAME, sl, sl_i_state_name(newstate),
+		sl_i_state_name(oldstate)));
+	return ((sl->info.lm.lmi_state = sl->i_state = newstate));
+}
+#else				/* _DEBUG */
+STATIC INLINE int
+sl_set_i_state(struct sl *sl, int newstate)
+{
+	return ((sl->i_state = newstate));
+}
+#endif				/* _DEBUG */
+STATIC INLINE int
+sl_get_i_state(struct sl *sl)
+{
+	return sl->i_state;
+}
+STATIC INLINE int
+sl_get_i_statef(struct sl *sl)
+{
+	return (1 << sl_get_i_state(sl));
+}
+STATIC INLINE int
+sl_chk_i_state(struct sl *sl, int mask)
+{
+	return (sl_get_i_statef(sl) & mask);
+}
+STATIC INLINE int
+sl_not_i_state(struct sl *sl, int mask)
+{
+	return (sl_chk_i_state(sl, ~mask));
+}
 
 #define M2PA_VERSION_DRAFT3	0x30
 #define M2PA_VERSION_DRAFT3_1	0x31
@@ -274,32 +465,90 @@ STATIC void sl_put(struct sl *sl);
  *  OUTPUT Events
  *
  *  =========================================================================
+ */
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  N Provider -> N User Primitives
+ *
+ *  -------------------------------------------------------------------------
+ */
+#if 0
+/**
+ * n_error_ack: - issue an N_ERROR_ACK primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @prim: primitive in error
+ * @err: positive NPI or negative UNIX error
+ */
+static int
+n_error_ack(struct sl *sl, queue_t *q, int prim, int err)
+{
+	N_error_ack_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_ERROR_ACK;
+		p->ERROR_prim = prim;
+		p->NPI_error = err > 0 ? err : NSYSERR;
+		p->UNIX_error = err < 0 ? -err : 0;
+		mp->b_wptr += sizeof(*p);
+		printd(("%s: %p: <- N_ERROR_ACK\n", MOD_NAME, sl));
+		/* no state change */
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-EBUSY);
+}
+#endif
+
+static int
+n_pass_along(struct sl *sl, queue_t *q, mblk_t *mp, int npistate, int lmistate)
+{
+	if (mp->b_datap->db_type < QPCTL && !bcanputnext(q, mp->b_band))
+		goto busy;
+	sl_set_n_state(sl, npistate);
+	sl_set_i_state(sl, lmistate);
+	sl->n_request = false;
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      busy:
+	return (-EBUSY);
+}
+
+/*
  *  -------------------------------------------------------------------------
  *
  *  SL Provider (M2PA) -> SL User Primitives
  *
  *  -------------------------------------------------------------------------
- *
- *  LMI_INFO_ACK
- *  ---------------------------------------------
  */
-STATIC INLINE int
-lmi_info_ack(queue_t *q, struct sl *sl)
+/**
+ * lmi_info_ack: - issue an LMI_INFO_ACK prmitive upstream
+ * @sl: private structure
+ * @q: active queue
+ */
+static int
+lmi_info_ack(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	lmi_info_ack_t *p;
+	mblk_t *mp;
 
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = ss7_allocb(q, sizeof(*p) + sl->loc_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
-		p->lmi_state = sl->i_state;
-		p->lmi_max_sdu = -1;
-		p->lmi_min_sdu = 0;
-		p->lmi_header_len = 0;
-		p->lmi_ppa_style = LMI_STYLE1;
+		p->lmi_version = sl->info.lm.lmi_version;
+		p->lmi_state = sl->info.lm.lmi_state;
+		p->lmi_max_sdu = sl->info.lm.lmi_max_sdu;
+		p->lmi_min_sdu = sl->info.lm.lmi_min_sdu;
+		p->lmi_header_len = sl->info.lm.lmi_header_len;
+		p->lmi_ppa_style = sl->info.lm.lmi_ppa_style;
+		mp->b_wptr += sizeof(*p);
+		bcopy(&sl->loc, mp->b_wptr, sl->loc_len);
+		mp->b_wptr += sl->loc_len;
 		printd(("%s: %p: <- LMI_INFO_ACK\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -307,49 +556,123 @@ lmi_info_ack(queue_t *q, struct sl *sl)
 	return (-ENOBUFS);
 }
 
-#if 0
-/*
- *  LMI_OK_ACK
- *  ---------------------------------------------
+/**
+ * lmi_ok_ack: - issue an LMI_OK_ACK prmitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @prim: correct primitive
  */
-STATIC INLINE int
-lmi_ok_ack(queue_t *q, struct sl *sl, long prim)
+static int
+lmi_ok_ack(struct sl *sl, queue_t *q, lmi_long prim)
 {
-	mblk_t *mp;
 	lmi_ok_ack_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_ok_ack_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = prim;
-		switch (sl->i_state) {
+		switch (sl_get_i_state(sl)) {
 		case LMI_ATTACH_PENDING:
-			sl->i_state = LMI_DISABLED;
+			p->lmi_state = LMI_DISABLED;
+			sl_set_i_state(sl, LMI_DISABLED);
+			sl_set_n_state(sl, NS_IDLE);
 			break;
 		case LMI_DETACH_PENDING:
-			sl->i_state = LMI_UNATTACHED;
+			p->lmi_state = LMI_UNATTACHED;
+			sl_set_i_state(sl, LMI_UNATTACHED);
+			sl_set_n_state(sl, NS_UNBND);
 			break;
+		default:
 			/* default is don't change state */
+			p->lmi_state = sl_get_i_state(sl);
+			break;
 		}
-		p->lmi_state = sl->i_state;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- LMI_OK_ACK\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
-#endif
-/*
- *  LMI_ERROR_ACK
- *  ---------------------------------------------
+
+/**
+ * lmi_error_ack: - issue an LMI_ERROR_ACK prmitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @prim: primitive in error
+ * @err: positive LMI error or negative UNIX error
  */
 STATIC int
-lmi_error_ack(queue_t *q, struct sl *sl, long prim, long err)
+lmi_error_ack(struct sl *sl, queue_t *q, lmi_long prim, lmi_long err)
 {
-	mblk_t *mp;
 	lmi_error_ack_t *p;
+	mblk_t *mp;
 
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_ERROR_ACK;
+		p->lmi_errno = err < 0 ? -err : 0;
+		p->lmi_reason = err < 0 ? LMI_SYSERR : err;
+		p->lmi_error_primitive = prim;
+		switch (sl_get_i_state(sl)) {
+		case LMI_ATTACH_PENDING:
+			p->lmi_state = LMI_UNATTACHED;
+			sl_set_i_state(sl, LMI_UNATTACHED);
+			sl_set_n_state(sl, NS_UNBND);
+			break;
+		case LMI_DETACH_PENDING:
+		case LMI_ENABLE_PENDING:
+			p->lmi_state = LMI_DISABLED;
+			sl_set_i_state(sl, LMI_DISABLED);
+			sl_set_n_state(sl, NS_IDLE);
+			break;
+		case LMI_DISABLE_PENDING:
+			p->lmi_state = LMI_ENABLED;
+			sl_set_i_state(sl, LMI_ENABLED);
+			switch (sl_get_n_state(sl)) {
+			case NS_WACK_DREQ6:
+				sl_set_n_state(sl, NS_WCON_CREQ);
+				break;
+			case NS_WACK_DREQ7:
+				sl_set_n_state(sl, NS_WRES_CIND);
+				break;
+			case NS_WACK_DREQ9:
+				sl_set_n_state(sl, NS_DATA_XFER);
+				break;
+			case NS_WACK_DREQ10:
+				sl_set_n_state(sl, NS_WCON_RREQ);
+				break;
+			case NS_WACK_DREQ11:
+				sl_set_n_state(sl, NS_WRES_RIND);
+				break;
+			default:
+				/* Default is not to change state. */
+				swerr();
+				break;
+			}
+			break;
+		}
+		mp->b_wptr += sizeof(*p);
+		printd(("%s: %p: <- LMI_ERROR_ACK\n", MOD_NAME, sl));
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * lmi_error_reply: - repy with an LMI_ERROR_ACK prmitive if necessary
+ * @sl: private structure
+ * @q: active queue
+ * @prim: primitive in error
+ * @err: positive LMI error or negative UNIX error
+ */
+static int
+lmi_error_reply(struct sl *sl, queue_t *q, lmi_long prim, lmi_long err)
+{
 	switch (err) {
 	case QR_DONE:
 	case QR_ABSORBED:
@@ -366,54 +689,28 @@ lmi_error_ack(queue_t *q, struct sl *sl, long prim, long err)
 	case -ENOBUFS:
 		return (err);
 	}
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_ERROR_ACK;
-		p->lmi_errno = err < 0 ? -err : 0;
-		p->lmi_reason = err < 0 ? LMI_SYSERR : err;
-		p->lmi_error_primitive = prim;
-		switch (sl->i_state) {
-		case LMI_ATTACH_PENDING:
-			sl->i_state = LMI_UNATTACHED;
-			break;
-		case LMI_DETACH_PENDING:
-			sl->i_state = LMI_DISABLED;
-			break;
-		case LMI_ENABLE_PENDING:
-			sl->i_state = LMI_DISABLED;
-			break;
-		case LMI_DISABLE_PENDING:
-			sl->i_state = LMI_ENABLED;
-			break;
-			/* Default is not to change state. */
-		}
-		p->lmi_state = sl->i_state;
-		printd(("%s: %p: <- LMI_ERROR_ACK\n", MOD_NAME, sl));
-		putnext(sl->oq, mp);
-		return (0);
-	}
-	return (-ENOBUFS);
+	return lmi_error_ack(sl, q, prim, err);
 }
 
-/*
- *  LMI_ENABLE_CON
- *  ---------------------------------------------
+/**
+ * lmi_enable_con: - issue an LMI_ENABLE_CON primitive upstream
+ * @sl: private strucutre
+ * @q: active queue
  */
-STATIC INLINE int
-lmi_enable_con(queue_t *q, struct sl *sl)
+static int
+lmi_enable_con(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	lmi_enable_con_t *p;
+	mblk_t *mp;
 
-	ensure(sl->i_state == LMI_ENABLE_PENDING, return (-EFAULT));
+	ensure(sl_get_i_state(sl) == LMI_ENABLE_PENDING, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_CON;
-		p->lmi_state = sl->i_state = LMI_ENABLED;
+		p->lmi_state = LMI_ENABLED;
+		mp->b_wptr += sizeof(*p);
+		sl_set_i_state(sl, LMI_ENABLED);
 		printd(("%s: %p: <- LMI_ENABLE_CON\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -421,23 +718,26 @@ lmi_enable_con(queue_t *q, struct sl *sl)
 	return (-ENOBUFS);
 }
 
-/*
- *  LMI_DISABLE_CON
- *  ---------------------------------------------
+/**
+ * lmi_disable_con: - issue an LMI_DISABLE_CON primitive upstream
+ * @sl: private structure
+ * @q: active queue
  */
-STATIC INLINE int
-lmi_disable_con(queue_t *q, struct sl *sl)
+static int
+lmi_disable_con(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	lmi_disable_con_t *p;
+	mblk_t *mp;
 
-	ensure(sl->i_state == LMI_DISABLE_PENDING, return (-EFAULT));
+	ensure(sl_get_i_state(sl) == LMI_DISABLE_PENDING, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_CON;
-		p->lmi_state = sl->i_state = LMI_DISABLED;
+		p->lmi_state = LMI_DISABLED;
+		sl_set_i_state(sl, LMI_DISABLED);
+		sl_set_n_state(sl, NS_IDLE);
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- LMI_DISABLE_CON\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -451,7 +751,7 @@ lmi_disable_con(queue_t *q, struct sl *sl)
  */
 #if 0
 STATIC INLINE int
-lmi_optmgmt_ack(queue_t *q, struct sl *sl, ulong flags, void *opt_ptr, size_t opt_len)
+lmi_optmgmt_ack(queue_t *q, struct sl *sl, lmi_ulong flags, void *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
@@ -472,72 +772,88 @@ lmi_optmgmt_ack(queue_t *q, struct sl *sl, ulong flags, void *opt_ptr, size_t op
 	return (-ENOBUFS);
 }
 #endif
-/*
- *  LMI_ERROR_IND
- *  ---------------------------------------------
+/**
+ * lmi_error_ind: - issue an LMI_ERROR_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @err: postitive LMI or negative UNIX error
+ * @fatal: whether error is fatal or not
  */
-#if 0
-STATIC INLINE int
-lmi_error_ind(queue_t *q, struct sl *sl, long err)
+static int
+lmi_error_ind(struct sl *sl, queue_t *q, lmi_long err, int fatal)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_error_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_errno = err < 0 ? -err : 0;
 		p->lmi_reason = err < 0 ? LMI_SYSERR : err;
-		p->lmi_state = sl->i_state;
+		if (fatal)
+			sl_set_i_state(sl, LMI_UNUSABLE);
+		p->lmi_state = sl_get_i_state(sl);
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- LMI_ERROR_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
-#endif
-/*
- *  LMI_STATS_IND
- *  ---------------------------------------------
- */
+
 #if 0
+/**
+ * lmi_stats_ind: - issue an LMI_STATS_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @interval: interval reported
+ * @timestamp: timestamp of report
+ */
 STATIC INLINE int
-lmi_stats_ind(queue_t *q, struct sl *sl, ulong interval, ulong timestamp)
+lmi_stats_ind(struct sl *sl, queue_t *q, lmi_ulong interval, lmi_ulong timestamp)
 {
-	mblk_t *mp;
 	lmi_stats_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((lmi_stats_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_STATS_IND;
 		p->lmi_interval = interval;
 		p->lmi_timestamp = timestamp;
+		mp->b_wptr += sizeof(*p);
 		putnext(sl->oq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
 #endif
-/*
- *  LMI_EVENT_IND
- *  ---------------------------------------------
+
+/**
+ * lmi_event_ind: - issue an LMI_EVENT_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @oid: event id
+ * @severity: event severity
+ * @inf_ptr: information pointer
+ * @inf_len: information length
  */
-STATIC int
-lmi_event_ind(queue_t *q, struct sl *sl, ulong oid, ulong severity, void *inf_ptr, size_t inf_len)
+static int
+lmi_event_ind(struct sl *sl, queue_t *q, lmi_ulong oid, lmi_ulong severity, void *inf_ptr,
+	      size_t inf_len)
 {
-	mblk_t *mp;
 	lmi_event_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p) + inf_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_EVENT_IND;
 		p->lmi_objectid = oid;
 		p->lmi_timestamp = jiffies;
 		p->lmi_severity = severity;
+		mp->b_wptr += sizeof(*p);
 		bcopy(mp->b_wptr, inf_ptr, inf_len);
 		mp->b_wptr += inf_len;
 		printd(("%s: %p: <- LMI_EVENT_IND\n", MOD_NAME, sl));
@@ -547,21 +863,23 @@ lmi_event_ind(queue_t *q, struct sl *sl, ulong oid, ulong severity, void *inf_pt
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_PDU_IND
- *  ---------------------------------------------
+/**
+ * sl_pdu_ind: - issued an SL_PDU_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @dp: user data to indicate
  */
-STATIC INLINE int
-sl_pdu_ind(queue_t *q, struct sl *sl, mblk_t *dp)
+static inline fastcall __hot_in int
+sl_pdu_ind(struct sl *sl, queue_t *q, mblk_t *dp)
 {
-	mblk_t *mp;
 	sl_pdu_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_PDU_IND;
+		mp->b_wptr += sizeof(*p);
 		mp->b_cont = dp;
 		printd(("%s: %p: <- SL_PDU_IND [%lu]\n", MOD_NAME, sl, (ulong) msgdsize(mp)));
 		putnext(sl->oq, mp);
@@ -570,24 +888,27 @@ sl_pdu_ind(queue_t *q, struct sl *sl, mblk_t *dp)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_LINK_CONGESTED_IND
- *  ---------------------------------------------
+/**
+ * sl_link_congested_ind: - issue an SL_LINK_CONGESTED_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @cong: congestion status
+ * @disc: discard status
  */
-STATIC INLINE int
-sl_link_congested_ind(queue_t *q, struct sl *sl, ulong cong, ulong disc)
+static int
+sl_link_congested_ind(struct sl *sl, queue_t *q, sl_ulong cong, sl_ulong disc)
 {
-	mblk_t *mp;
 	sl_link_cong_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LINK_CONGESTED_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_cong_status = cong;
 		p->sl_disc_status = disc;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_LINK_CONGESTED_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -595,24 +916,27 @@ sl_link_congested_ind(queue_t *q, struct sl *sl, ulong cong, ulong disc)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_LINK_CONGESTION_CEASED_IND
- *  ---------------------------------------------
+/**
+ * sl_link_congestion_ceased_ind: - issue an SL_LINK_CONGESTION_CEASED_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @cong: congestion status
+ * @disc: discard status
  */
-STATIC INLINE int
-sl_link_congestion_ceased_ind(queue_t *q, struct sl *sl, ulong cong, ulong disc)
+static int
+sl_link_congestion_ceased_ind(struct sl *sl, queue_t *q, sl_ulong cong, sl_ulong disc)
 {
-	mblk_t *mp;
 	sl_link_cong_ceased_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LINK_CONGESTION_CEASED_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_cong_status = cong;
 		p->sl_disc_status = disc;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_LINK_CONGESTION_CEASED_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -620,21 +944,23 @@ sl_link_congestion_ceased_ind(queue_t *q, struct sl *sl, ulong cong, ulong disc)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RETRIEVED_MESSAGE_IND
- *  ---------------------------------------------
+/**
+ * sl_retrieved_message_ind: - issue an SL_RETRIEVED_MESSAGE_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @dp: retrieved user data
  */
-STATIC INLINE int
-sl_retrieved_message_ind(queue_t *q, struct sl *sl, mblk_t *dp)
+static int
+sl_retrieved_message_ind(struct sl *sl, queue_t *q, mblk_t *dp)
 {
-	mblk_t *mp;
 	sl_retrieved_msg_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVED_MESSAGE_IND;
+		mp->b_wptr += sizeof(*p);
 		mp->b_cont = dp;
 		printd(("%s: %p: <- SL_RETRIEVED_MESSAGE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
@@ -643,21 +969,22 @@ sl_retrieved_message_ind(queue_t *q, struct sl *sl, mblk_t *dp)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RETRIEVAL_COMPLETE_IND
- *  ---------------------------------------------
+/**
+ * sl_retrieval_complete_ind: - issue an SL_RETRIEVAL_COMPLETE_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
  */
-STATIC INLINE int
-sl_retrieval_complete_ind(queue_t *q, struct sl *sl)
+static int
+sl_retrieval_complete_ind(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	sl_retrieval_comp_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_RETRIEVAL_COMPLETE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -665,21 +992,22 @@ sl_retrieval_complete_ind(queue_t *q, struct sl *sl)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RB_CLEARED_IND
- *  ---------------------------------------------
+/**
+ * sl_rb_cleared_ind: - issue an SL_RB_CLEARED_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
  */
-STATIC INLINE int
-sl_rb_cleared_ind(queue_t *q, struct sl *sl)
+static int
+sl_rb_cleared_ind(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	sl_rb_cleared_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RB_CLEARED_IND;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_RB_CLEARED_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -687,22 +1015,24 @@ sl_rb_cleared_ind(queue_t *q, struct sl *sl)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_BSNT_IND
- *  ---------------------------------------------
+/**
+ * sl_bsnt_ind: - issue an SL_BSNT_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @bsnt: value of BSNT to indicate
  */
-STATIC INLINE int
-sl_bsnt_ind(queue_t *q, struct sl *sl, ulong bsnt)
+static int
+sl_bsnt_ind(struct sl *sl, queue_t *q, sl_ulong bsnt)
 {
-	mblk_t *mp;
 	sl_bsnt_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_BSNT_IND;
 		p->sl_bsnt = bsnt;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_BSNT_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -710,45 +1040,48 @@ sl_bsnt_ind(queue_t *q, struct sl *sl, ulong bsnt)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_IN_SERVICE_IND
- *  ---------------------------------------------
+/**
+ * sl_in_service_ind: - issue an SL_IN_SERVICE_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
  */
-STATIC int
-sl_in_service_ind(queue_t *q, struct sl *sl)
+static int
+sl_in_service_ind(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	sl_in_service_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_IN_SERVICE_IND;
 		printd(("%s: %p: <- SL_IN_SERVICE_IND\n", MOD_NAME, sl));
+		mp->b_wptr += sizeof(*p);
 		putnext(sl->oq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_OUT_OF_SERVICE_IND
- *  ---------------------------------------------
+/**
+ * sl_out_of_service_ind: - issue an SL_OUT_OF_SERVICE_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @reason: reason for failure
  */
-STATIC INLINE int
-sl_out_of_service_ind(queue_t *q, struct sl *sl, ulong reason)
+static int
+sl_out_of_service_ind(struct sl *sl, queue_t *q, sl_ulong reason)
 {
-	mblk_t *mp;
 	sl_out_of_service_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_reason = reason;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_OUT_OF_SERVICE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -756,22 +1089,23 @@ sl_out_of_service_ind(queue_t *q, struct sl *sl, ulong reason)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_REMOTE_PROCESSOR_OUTAGE_IND
- *  ---------------------------------------------
+/**
+ * sl_remote_processor_outage_ind: - issue an SL_REMOTE_PROCESSOR_OUTAGE_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
  */
-STATIC int
-sl_remote_processor_outage_ind(queue_t *q, struct sl *sl)
+static int
+sl_remote_processor_outage_ind(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	sl_rem_proc_out_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
 		p->sl_timestamp = jiffies;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_PROCESSOR_OUTAGE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -779,22 +1113,23 @@ sl_remote_processor_outage_ind(queue_t *q, struct sl *sl)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_REMOTE_PROCESSOR_RECOVERED_IND
- *  ---------------------------------------------
+/**
+ * sl_remote_processor_recovered_ind: - issue an SL_REMOTE_PROCESSOR_RECOVERED_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
  */
-STATIC int
-sl_remote_processor_recovered_ind(queue_t *q, struct sl *sl)
+static int
+sl_remote_processor_recovered_ind(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	sl_rem_proc_recovered_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
 		p->sl_timestamp = jiffies;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_RECOVERED_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -802,21 +1137,22 @@ sl_remote_processor_recovered_ind(queue_t *q, struct sl *sl)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RTB_CLEARED_IND
- *  ---------------------------------------------
+/**
+ * sl_rtb_cleared_ind: - issue an SL_RTB_CLEARED_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
  */
-STATIC int
-sl_rtb_cleared_ind(queue_t *q, struct sl *sl)
+static int
+sl_rtb_cleared_ind(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	sl_rtb_cleared_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RTB_CLEARED_IND;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_RTB_CLEARED_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -824,21 +1160,22 @@ sl_rtb_cleared_ind(queue_t *q, struct sl *sl)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RETRIEVAL_NOT_POSSIBLE_IND
- *  ---------------------------------------------
+/**
+ * sl_retrieval_not_possible_ind: - issue an SL_RETRIEVAL_NOT_POSSIBLE_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
  */
-STATIC INLINE int
-sl_retrieval_not_possible_ind(queue_t *q, struct sl *sl)
+static int
+sl_retrieval_not_possible_ind(struct sl *sl, queue_t *q)
 {
-	mblk_t *mp;
 	sl_retrieval_not_poss_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_NOT_POSSIBLE_IND;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_RETRIEVAL_NOT_POSSIBLE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -846,22 +1183,25 @@ sl_retrieval_not_possible_ind(queue_t *q, struct sl *sl)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_BSNT_NOT_RETRIEVABLE_IND
- *  ---------------------------------------------
- */
 #if 0
+/**
+ * sl_bsnt_not_retrievable_ind: - issue an SL_BSNT_NOT_RETRIEVABLE_IND primitive upstream
+ * @sl: private structure
+ * @q: active queue
+ * @bsnt: BSNT
+ */
 STATIC INLINE int
-sl_bsnt_not_retrievable_ind(queue_t *q, struct sl *sl, ulong bsnt)
+sl_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, sl_ulong bsnt)
 {
-	mblk_t *mp;
 	sl_bsnt_not_retr_ind_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_bsnt_not_retr_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_BSNT_NOT_RETRIEVABLE_IND;
 		p->sl_bsnt = bsnt;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- SL_BSNT_NOT_RETRIEVABLE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
 		return (0);
@@ -869,28 +1209,180 @@ sl_bsnt_not_retrievable_ind(queue_t *q, struct sl *sl, ulong bsnt)
 	return (-ENOBUFS);
 }
 #endif
+
 /*
  *  -------------------------------------------------------------------------
  *
  *  NPI User (M2PA) -> NPI Provider (SCTP) Primitives
  *
  *  -------------------------------------------------------------------------
- *
- *  N_DATA_REQ
- *  ---------------------------------------------
  */
-STATIC INLINE int
-n_data_req(queue_t *q, struct sl *sl, ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
+
+#if 0
+static int
+n_pass_down(struct sl *sl, queue_t *q, mblk_t *mp, int npistate, int lmistate)
 {
+	if (mp->b_datap->db_type < QPCTL && !bcanputnext(q, mp->b_band))
+		goto busy;
+	sl_set_n_state(sl, npistate);
+	sl_set_i_state(sl, lmistate);
+	sl->n_request = true;
+	putnext(q, mp);
+	return (QR_ABSORBED);
+      busy:
+	return (-EBUSY);
+}
+#endif
+
+/**
+ * n_bind_req: - issue a bind request to fullfill an attach request
+ * @sl: private structure
+ * @q: active queue
+ * @add_ptr: pointer to address to bind
+ * @add_len: length of bind address
+ */
+static int
+n_bind_req(struct sl *sl, queue_t *q, caddr_t add_ptr, size_t add_len)
+{
+	N_bind_req_t *p;
 	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_BIND_REQ;
+		p->ADDR_length = add_len;
+		p->ADDR_offset = add_len ? sizeof(*p) : 0;
+		p->CONIND_number = 0;
+		p->BIND_flags = TOKEN_REQUEST;
+		p->PROTOID_length = 0;
+		p->PROTOID_offset = 0;
+		mp->b_wptr += sizeof(*p);
+		bcopy(add_ptr, mp->b_wptr, add_len);
+		mp->b_wptr += add_len;
+		sl_set_i_state(sl, LMI_ATTACH_PENDING);
+		printd(("%s: %p: N_BIND_REQ ->\n", MOD_NAME, sl));
+		putnext(sl->iq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_unbind_req: - issue an unbind request to fullfull a detach request
+ * @sl: private structure
+ * @q: active queue
+ */
+static int
+n_unbind_req(struct sl *sl, queue_t *q)
+{
+	N_unbind_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_UNBIND_REQ;
+		mp->b_wptr += sizeof(*p);
+		sl_set_i_state(sl, LMI_DETACH_PENDING);
+		printd(("%s: %p: N_UNBIND_REQ ->\n", MOD_NAME, sl));
+		putnext(sl->iq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_conn_req: - issue a connection request to fulfull an enable request
+ * @sl: private structure
+ * @q: active queue
+ * @dst_ptr: destination address
+ * @dst_len: destination adresss length
+ * @qos_ptr: quality of service parameters
+ * @qos_len: quality of service parameters length
+ */
+static int
+n_conn_req(struct sl *sl, queue_t *q, caddr_t dst_ptr, size_t dst_len)
+{
+	N_qos_sel_conn_sctp_t *n;
+	N_conn_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + sizeof(*n), BPRI_MED))) {
+		mp->b_datap->db_type = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_CONN_REQ;
+		p->DEST_length = dst_len;
+		p->DEST_offset = dst_len ? sizeof(*p) : 0;
+		p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
+		p->QOS_length = sizeof(*n);
+		p->QOS_offset = sizeof(*p) + dst_len;
+		mp->b_wptr += sizeof(*p);
+		bcopy(dst_ptr, mp->b_wptr, dst_len);
+		mp->b_wptr += dst_len;
+		n = (typeof(n)) mp->b_wptr;
+		n->n_qos_type = N_QOS_SEL_CONN_SCTP;
+		n->i_streams = 2;
+		n->o_streams = 2;
+		mp->b_wptr += sizeof(*n);
+		sl_set_i_state(sl, LMI_ENABLE_PENDING);
+		printd(("%s: %p: N_CONN_REQ ->\n", MOD_NAME, sl));
+		putnext(sl->iq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_discon_req: - issue a disconnection request to fulfill a disable request
+ * @sl: private structure
+ * @q: active queue
+ * @reason: disconnect reason
+ */
+static int
+n_discon_req(struct sl *sl, queue_t *q, np_ulong reason)
+{
+	N_discon_req_t *p;
+	mblk_t *mp;
+
+	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_DISCON_REQ;
+		p->DISCON_reason = reason;
+		p->RES_length = 0;
+		p->RES_offset = 0;
+		p->SEQ_number = 0;
+		mp->b_wptr += sizeof(*p);
+		sl_set_i_state(sl, LMI_DISABLE_PENDING);
+		printd(("%s: %p: N_DISCON_REQ ->\n", MOD_NAME, sl));
+		putnext(sl->iq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_data_req: - issue a data transfer request
+ * @sl: private structure
+ * @q: active queue
+ * @flags: data transfer flags
+ * @qos_ptr: quality of service parameters
+ * @qos_len: quality of service parameters length
+ * @dp: user data to transfer
+ */
+static inline fastcall __hot_out int
+n_data_req(struct sl *sl, queue_t *q, np_ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
+{
 	N_data_req_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_DATA_REQ;
 		p->DATA_xfer_flags = flags;
+		mp->b_wptr += sizeof(*p);
 		bcopy(qos_ptr, mp->b_wptr, qos_len);
 		mp->b_wptr += qos_len;
 		mp->b_cont = dp;
@@ -901,21 +1393,25 @@ n_data_req(queue_t *q, struct sl *sl, ulong flags, void *qos_ptr, size_t qos_len
 	return (-ENOBUFS);
 }
 
-/*
- *  N_EXDATA_REQ
- *  ---------------------------------------------
+/**
+ * n_exdata_req: - issue an expedited data transfer request
+ * @sl: private structure
+ * @q: active queue
+ * @qos_ptr: qualitfy of service parameters
+ * @qos_len: qualitfy of service parameters length
+ * @dp: user data to transfer
  */
-STATIC INLINE int
-n_exdata_req(queue_t *q, struct sl *sl, void *qos_ptr, size_t qos_len, mblk_t *dp)
+static inline fastcall int
+n_exdata_req(struct sl *sl, queue_t *q, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
-	mblk_t *mp;
 	N_exdata_req_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_EXDATA_REQ;
+		mp->b_wptr += sizeof(*p);
 		bcopy(qos_ptr, mp->b_wptr, qos_len);
 		mp->b_wptr += qos_len;
 		mp->b_cont = dp;
@@ -952,6 +1448,7 @@ n_exdata_req(queue_t *q, struct sl *sl, void *qos_ptr, size_t qos_len, mblk_t *d
 #define MF_CLEAR_RTB		0x00010000
 #define MF_NEED_FLUSH		0x00020000
 #define MF_WAIT_SYNC		0x00040000
+#define MF_REM_ALN		0x00080000
 
 #define MS_POWER_OFF		0
 #define MS_OUT_OF_SERVICE	1
@@ -965,7 +1462,7 @@ n_exdata_req(queue_t *q, struct sl *sl, void *qos_ptr, size_t qos_len, mblk_t *d
 
 #ifdef _DEBUG
 const char *
-sl_state_name(ulong state)
+sl_state_name(int state)
 {
 	switch (state) {
 	case MS_POWER_OFF:
@@ -991,9 +1488,9 @@ sl_state_name(ulong state)
 	}
 }
 STATIC void
-sl_set_state(struct sl *sl, ulong newstate)
+sl_set_state(struct sl *sl, int newstate)
 {
-	ulong oldstate = sl->state;
+	int oldstate = sl->state;
 
 	printd(("%s: %p: %s <- %s\n", MOD_NAME, sl, sl_state_name(newstate),
 		sl_state_name(oldstate)));
@@ -1001,12 +1498,12 @@ sl_set_state(struct sl *sl, ulong newstate)
 }
 #else
 STATIC INLINE void
-sl_set_state(struct sl *sl, ulong newstate)
+sl_set_state(struct sl *sl, int newstate)
 {
 	sl->state = newstate;
 }
 #endif
-STATIC INLINE ulong
+STATIC INLINE int
 sl_get_state(struct sl *sl)
 {
 	return sl->state;
@@ -1038,7 +1535,7 @@ static const char filler[] = {
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
+sl_send_proving(struct sl *sl, queue_t *q, uint32_t status)
 {
 	int err;
 	mblk_t *mp;
@@ -1056,7 +1553,7 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_wptr += sizeof(uint32_t);
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1081,7 +1578,7 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_wptr += sizeof(uint32_t);
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1111,7 +1608,7 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_wptr += sizeof(uint32_t);
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1131,7 +1628,7 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_wptr += sizeof(uint32_t);
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1145,7 +1642,7 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
  *  ---------------------------------------------
  */
 STATIC int
-sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
+sl_send_status(struct sl *sl, queue_t *q, uint32_t status)
 {
 	int err;
 	mblk_t *mp;
@@ -1199,7 +1696,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_wptr += sizeof(uint32_t);
 			*(uint32_t *) mp->b_wptr = status;
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1220,7 +1717,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_wptr += sizeof(uint16_t);
 			*(uint32_t *) mp->b_wptr = status;
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1242,7 +1739,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_wptr += sizeof(uint32_t);
 			*(uint32_t *) mp->b_wptr = status;
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1259,7 +1756,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_wptr += sizeof(uint32_t);
 			*(uint32_t *) mp->b_wptr = status;
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1302,7 +1799,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 				qos.sid = M2PA_STATUS_STREAM;
 				break;
 			}
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
 			return (err);
@@ -1316,7 +1813,7 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_send_ack(queue_t *q, struct sl *sl)
+sl_send_ack(struct sl *sl, queue_t *q)
 {
 	int err;
 	mblk_t *mp;
@@ -1339,7 +1836,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_wptr += sizeof(uint32_t);
 			*(uint32_t *) mp->b_wptr = htonl(sl->rack);
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
+			if ((err = n_exdata_req(sl, q, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
 			}
@@ -1370,7 +1867,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_wptr += sizeof(uint16_t);
 			*(uint32_t *) mp->b_wptr = M2PA_STATUS_ACK;
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
+			if ((err = n_exdata_req(sl, q, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
 			}
@@ -1393,7 +1890,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_wptr += sizeof(uint32_t);
 			*(uint32_t *) mp->b_wptr = M2PA_STATUS_ACK;
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
+			if ((err = n_exdata_req(sl, q, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
 			}
@@ -1422,7 +1919,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_wptr += sizeof(uint32_t);
 			*(uint32_t *) mp->b_wptr = M2PA_STATUS_IN_SERVICE;
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
+			if ((err = n_exdata_req(sl, q, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
 			}
@@ -1451,7 +1948,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_wptr += sizeof(uint32_t);
 			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt & 0xffffff);
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0) {
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
 			}
@@ -1485,7 +1982,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_wptr += sizeof(uint32_t);
 			*(uint32_t *) mp->b_wptr = htonl(sl->fsnt & 0xffffff);
 			mp->b_wptr += sizeof(uint32_t);
-			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0) {
+			if ((err = n_data_req(sl, q, 0, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
 			}
@@ -1501,82 +1998,106 @@ sl_send_ack(queue_t *q, struct sl *sl)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
+sl_send_data(struct sl *sl, queue_t *q, mblk_t *dp)
 {
 	int err;
-	mblk_t *mp, *db;
-	ulong rcpt = sl->i_version < M2PA_VERSION_DRAFT3_1 ? N_RC_FLAG : 0;
-	size_t dlen = msgdsize(dp);
+	mblk_t *mp, *b;
+	int rcpt = sl->i_version < M2PA_VERSION_DRAFT3_1 ? N_RC_FLAG : 0;
+	size_t blen, dlen = msgdsize(dp);
 	N_qos_sel_data_sctp_t qos = { N_QOS_SEL_DATA_SCTP, M2PA_PPI, M2PA_DATA_STREAM, };
 
 	printd(("%s: %p: DATA ->\n", MOD_NAME, sl));
-	if ((db = dupmsg(dp))) {
-		switch (sl->i_version) {
-		case M2PA_VERSION_DRAFT3:
-		case M2PA_VERSION_DRAFT3_1:
-			if ((mp = ss7_allocb(q, 2 * sizeof(uint32_t), BPRI_MED))) {
-				mp->b_datap->db_type = M_DATA;
-				*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
-				mp->b_wptr += sizeof(uint32_t);
-				*(uint32_t *) mp->b_wptr = htonl(dlen + 2 * sizeof(uint32_t));
-				mp->b_wptr += sizeof(uint32_t);
-				mp->b_cont = db;
-				pullupmsg(mp, -1);
-				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
-					return (0);
-				freemsg(mp);
-				return (err);
+	switch (sl->i_version) {
+	case M2PA_VERSION_DRAFT3:
+	case M2PA_VERSION_DRAFT3_1:
+		if ((mp = ss7_allocb(q, dlen + 2 * sizeof(uint32_t), BPRI_MED))) {
+			mp->b_datap->db_type = M_DATA;
+			*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(dlen + 2 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			/* copy it in */
+			for (b = dp; b; b = b->b_next) {
+				if (b->b_wptr <= b->b_rptr)
+					continue;
+				blen = b->b_wptr - b->b_rptr;
+				if (blen > dlen)
+					blen = dlen;
+				bcopy(b->b_rptr, mp->b_wptr, blen);
+				mp->b_wptr += blen;
+				dlen -= blen;
 			}
-			break;
-		case M2PA_VERSION_DRAFT4:
-		case M2PA_VERSION_DRAFT4_1:
-			if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
-				mp->b_datap->db_type = M_DATA;
-				*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
-				mp->b_wptr += sizeof(uint32_t);
-				*(uint32_t *) mp->b_wptr = htonl(dlen + 3 * sizeof(uint32_t));
-				mp->b_wptr += sizeof(uint32_t);
-				*(uint16_t *) mp->b_wptr = htons(sl->fsnr);
-				mp->b_wptr += sizeof(uint16_t);
-				*(uint16_t *) mp->b_wptr = htons(sl->fsnt + 1);
-				mp->b_wptr += sizeof(uint16_t);
-				mp->b_cont = db;
-				pullupmsg(mp, -1);
-				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
-					return (0);
-				freemsg(mp);
-				return (err);
-			}
-			break;
-		case M2PA_VERSION_DRAFT4_9:
-		case M2PA_VERSION_DRAFT5:
-		case M2PA_VERSION_DRAFT6:
-		case M2PA_VERSION_DRAFT6_1:
-		case M2PA_VERSION_DRAFT6_9:
-		default:
-		case M2PA_VERSION_DRAFT10:
-		case M2PA_VERSION_DRAFT11:
-		case M2PA_VERSION_RFC4165:
-			if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
-				mp->b_datap->db_type = M_DATA;
-				*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
-				mp->b_wptr += sizeof(uint32_t);
-				*(uint32_t *) mp->b_wptr = htonl(dlen + 4 * sizeof(uint32_t));
-				mp->b_wptr += sizeof(uint32_t);
-				*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
-				mp->b_wptr += sizeof(uint32_t);
-				*(uint32_t *) mp->b_wptr = htonl((sl->fsnt + 1) & 0xffffff);
-				mp->b_wptr += sizeof(uint32_t);
-				mp->b_cont = db;
-				pullupmsg(mp, -1);
-				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
-					return (0);
-				freemsg(mp);
-				return (err);
-			}
-			break;
+			if ((err = n_data_req(sl, q, rcpt, &qos, sizeof(qos), mp)) >= 0)
+				return (0);
+			freemsg(mp);
+			return (err);
 		}
-		freemsg(db);
+		break;
+	case M2PA_VERSION_DRAFT4:
+	case M2PA_VERSION_DRAFT4_1:
+		if ((mp = ss7_allocb(q, dlen + 3 * sizeof(uint32_t), BPRI_MED))) {
+			mp->b_datap->db_type = M_DATA;
+			*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(dlen + 3 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint16_t *) mp->b_wptr = htons(sl->fsnr);
+			mp->b_wptr += sizeof(uint16_t);
+			*(uint16_t *) mp->b_wptr = htons(sl->fsnt + 1);
+			mp->b_wptr += sizeof(uint16_t);
+			/* copy it in */
+			for (b = dp; b; b = b->b_next) {
+				if (b->b_wptr <= b->b_rptr)
+					continue;
+				blen = b->b_wptr - b->b_rptr;
+				if (blen > dlen)
+					blen = dlen;
+				bcopy(b->b_rptr, mp->b_wptr, blen);
+				mp->b_wptr += blen;
+				dlen -= blen;
+			}
+			if ((err = n_data_req(sl, q, rcpt, &qos, sizeof(qos), mp)) >= 0)
+				return (0);
+			freemsg(mp);
+			return (err);
+		}
+		break;
+	case M2PA_VERSION_DRAFT4_9:
+	case M2PA_VERSION_DRAFT5:
+	case M2PA_VERSION_DRAFT6:
+	case M2PA_VERSION_DRAFT6_1:
+	case M2PA_VERSION_DRAFT6_9:
+	default:
+	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
+	case M2PA_VERSION_RFC4165:
+		if ((mp = ss7_allocb(q, dlen + 4 * sizeof(uint32_t), BPRI_MED))) {
+			mp->b_datap->db_type = M_DATA;
+			*(uint32_t *) mp->b_wptr = M2PA_DATA_MESSAGE;
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(dlen + 4 * sizeof(uint32_t));
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl(sl->fsnr & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			*(uint32_t *) mp->b_wptr = htonl((sl->fsnt + 1) & 0xffffff);
+			mp->b_wptr += sizeof(uint32_t);
+			/* copy it in */
+			for (b = dp; b; b = b->b_next) {
+				if (b->b_wptr <= b->b_rptr)
+					continue;
+				blen = b->b_wptr - b->b_rptr;
+				if (blen > dlen)
+					blen = dlen;
+				bcopy(b->b_rptr, mp->b_wptr, blen);
+				mp->b_wptr += blen;
+				dlen -= blen;
+			}
+			if ((err = n_data_req(sl, q, rcpt, &qos, sizeof(qos), mp)) >= 0)
+				return (0);
+			freemsg(mp);
+			return (err);
+		}
+		break;
 	}
 	return (-ENOBUFS);
 }
@@ -1893,21 +2414,21 @@ sl_timer_start(struct sl *sl, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-sl_suerm_start(queue_t *q, struct sl *sl)
+sl_suerm_start(struct sl *sl, queue_t *q)
 {
 	/* SCTP does this for us */
 	return;
 }
 
 STATIC INLINE void
-sl_suerm_stop(queue_t *q, struct sl *sl)
+sl_suerm_stop(struct sl *sl, queue_t *q)
 {
 	/* SCTP does this for us */
 	return;
 }
 
 STATIC INLINE void
-sl_aerm_start(queue_t *q, struct sl *sl)
+sl_aerm_start(struct sl *sl, queue_t *q)
 {
 	printd(("%s: %p: Start Proving...\n", MOD_NAME, sl));
 #ifndef _DEBUG
@@ -1917,7 +2438,7 @@ sl_aerm_start(queue_t *q, struct sl *sl)
 }
 
 STATIC INLINE void
-sl_aerm_stop(queue_t *q, struct sl *sl)
+sl_aerm_stop(struct sl *sl, queue_t *q)
 {
 	sl_timer_stop(sl, t9);
 	printd(("%s: %p: Stop Proving...\n", MOD_NAME, sl));
@@ -1938,46 +2459,46 @@ sl_t9_timeout(struct sl *sl)
 		   filler. */
 		if (proving) {
 			if (sl->flags & MF_LOC_EMERG)
-				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
+				err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_EMERGENCY);
 			else
-				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
+				err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_NORMAL);
 			if (err)
 				return (err);
 			sl_timer_start(sl, t9);
 		}
 		return (0);
 	}
-	ptrace(("%s: %p: Received timeout t9 in uexpected state %lu\n", MOD_NAME, sl,
+	ptrace(("%s: %p: Received timeout t9 in uexpected state %d\n", MOD_NAME, sl,
 		sl_get_state(sl)));
 	return (-EPROTO);
 }
 
-STATIC int sl_lsc_out_of_service(queue_t *q, struct sl *sl, ulong reason);
+STATIC int sl_lsc_out_of_service(struct sl *sl, queue_t *q, uint reason);
 
 #if 0
 STATIC INLINE int
-sl_iac_abort_proving(queue_t *q, struct sl *sl)
+sl_iac_abort_proving(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl_get_state(sl) == MS_PROVING) {
 		sl->sl.statem.Cp++;
 		sl_timer_stop(sl, t4);
-		sl_aerm_stop(q, sl);
+		sl_aerm_stop(sl, q);
 		if (sl->sl.statem.Cp == sl->sl.config.M) {
 			if (sl->sl.notify.events & SL_EVT_FAIL_ALIGNMENT)
 				if ((err =
-				     lmi_event_ind(q, sl, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
+				     lmi_event_ind(sl, q, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
 					return (err);
 			if ((err =
-			     sl_lsc_out_of_service(q, sl, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
+			     sl_lsc_out_of_service(sl, q, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
 				return (err);
 			ptrace(("%s: %p: Link failed: Alignement not possible\n", MOD_NAME, sl));
 			sl->sl.stats.sl_fail_align_or_proving++;
 			return (0);
 		}
 		sl_timer_start(sl, t4);
-		sl_aerm_start(q, sl);
+		sl_aerm_start(sl, q);
 		return (0);
 	}
 	ptrace(("%s: Received signal iac-abort-proving in unexpected state %u.\n", MOD_NAME,
@@ -2008,7 +2529,7 @@ sl_iac_abort_proving(queue_t *q, struct sl *sl)
  *  -----------------------------------------------------------------------
  */
 STATIC void
-sl_is_stats(queue_t *q, struct sl *sl)
+sl_is_stats(struct sl *sl, queue_t *q)
 {
 	if (sl->sl.stamp.sl_dur_unavail)
 		sl->sl.stats.sl_dur_unavail += jiffies - xchg(&sl->sl.stamp.sl_dur_unavail, 0);
@@ -2021,7 +2542,7 @@ sl_is_stats(queue_t *q, struct sl *sl)
 	sl->sl.stamp.sl_dur_in_service = jiffies;
 }
 STATIC void
-sl_oos_stats(queue_t *q, struct sl *sl)
+sl_oos_stats(struct sl *sl, queue_t *q)
 {
 	if (sl->sl.stamp.sl_dur_in_service)
 		sl->sl.stats.sl_dur_in_service +=
@@ -2035,7 +2556,7 @@ sl_oos_stats(queue_t *q, struct sl *sl)
 	sl->sl.stamp.sl_dur_unavail = jiffies;
 }
 STATIC void
-sl_rpo_stats(queue_t *q, struct sl *sl)
+sl_rpo_stats(struct sl *sl, queue_t *q)
 {
 	if (sl->sl.stamp.sl_dur_in_service)
 		sl->sl.stats.sl_dur_in_service +=
@@ -2043,30 +2564,30 @@ sl_rpo_stats(queue_t *q, struct sl *sl)
 	sl->sl.stamp.sl_dur_unavail_rpo = jiffies;
 }
 STATIC void
-sl_rpr_stats(queue_t *q, struct sl *sl)
+sl_rpr_stats(struct sl *sl, queue_t *q)
 {
 	if (sl->sl.stamp.sl_dur_unavail_rpo)
 		sl->sl.stats.sl_dur_unavail_rpo +=
 		    jiffies - xchg(&sl->sl.stamp.sl_dur_unavail_rpo, 0);
 }
 STATIC int
-sl_lsc_stop(queue_t *q, struct sl *sl)
+sl_lsc_stop(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl_get_state(sl) > MS_OUT_OF_SERVICE) {
-		if ((err = sl_send_status(q, sl, M2PA_STATUS_OUT_OF_SERVICE)) < 0)
+		if ((err = sl_send_status(sl, q, M2PA_STATUS_OUT_OF_SERVICE)) < 0)
 			return (err);
 		sl_timer_stop(sl, tall);
-		sl_aerm_stop(q, sl);
-		sl_suerm_stop(q, sl);
+		sl_aerm_stop(sl, q);
+		sl_suerm_stop(sl, q);
 		sl->flags &= ~MF_LPO;
 		if (sl->flags & MF_RPO) {
 			if (sl->sl.notify.events & SL_EVT_RPO_END)
-				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
+				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
 					return (err);
 			ptrace(("%s: %p: RPO Ends\n", MOD_NAME, sl));
-			sl_rpr_stats(q, sl);
+			sl_rpr_stats(sl, q);
 			sl->flags &= ~MF_RPO;
 		}
 		sl->flags &= ~MF_LOC_INS;
@@ -2075,21 +2596,21 @@ sl_lsc_stop(queue_t *q, struct sl *sl)
 		sl->flags &= ~MF_REM_BUSY;
 		sl->flags &= ~MF_LOC_EMERG;
 		sl->flags &= ~MF_REM_EMERG;
-		sl_oos_stats(q, sl);
+		sl_oos_stats(sl, q);
 		sl_set_state(sl, MS_OUT_OF_SERVICE);
 		return (0);
 	}
 	return (0);
 }
 STATIC int
-sl_lsc_out_of_service(queue_t *q, struct sl *sl, ulong reason)
+sl_lsc_out_of_service(struct sl *sl, queue_t *q, uint reason)
 {
 	int err;
 
 	if (sl_get_state(sl) > MS_OUT_OF_SERVICE) {
-		if ((err = sl_out_of_service_ind(q, sl, reason)) < 0)
+		if ((err = sl_out_of_service_ind(sl, q, reason)) < 0)
 			return (err);
-		if ((err = sl_lsc_stop(q, sl)) < 0)
+		if ((err = sl_lsc_stop(sl, q)) < 0)
 			return (err);
 		sl->sl.stamp.sl_dur_unavail_failed = jiffies;
 		return (0);
@@ -2097,7 +2618,7 @@ sl_lsc_out_of_service(queue_t *q, struct sl *sl, ulong reason)
 	return (0);
 }
 STATIC INLINE int
-sl_lsc_power_on(queue_t *q, struct sl *sl)
+sl_lsc_power_on(struct sl *sl, queue_t *q)
 {
 	int err;
 
@@ -2114,19 +2635,21 @@ sl_lsc_power_on(queue_t *q, struct sl *sl)
 		sl->bbsn = 0;
 		sl->bfsn = 0;
 		sl->flags = 0;
-		if ((err = sl_send_status(q, sl, M2PA_STATUS_OUT_OF_SERVICE)) < 0)
+		if ((err = sl_send_status(sl, q, M2PA_STATUS_OUT_OF_SERVICE)) < 0)
 			return (err);
 		sl_set_state(sl, MS_OUT_OF_SERVICE);
 		return (0);
 	}
-	ptrace(("%s: %p: Received primitive SL_POWER_ON_REQ in unexpected state %lu\n",
+	ptrace(("%s: %p: Received primitive SL_POWER_ON_REQ in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
+STATIC int sl_ready(struct sl *sl, queue_t *q);
 STATIC INLINE int
-sl_lsc_start(queue_t *q, struct sl *sl)
+sl_lsc_start(struct sl *sl, queue_t *q)
 {
 	int err;
+	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 
 	if (sl_get_state(sl) == MS_OUT_OF_SERVICE) {
 		sl->rmsu = 0;
@@ -2141,13 +2664,28 @@ sl_lsc_start(queue_t *q, struct sl *sl)
 		sl->bbsn = 0;
 		sl->bfsn = 0;
 		// sl->flags = 0;
-		if ((err = sl_send_status(q, sl, M2PA_STATUS_ALIGNMENT)) < 0)
+		if ((err = sl_send_status(sl, q, M2PA_STATUS_ALIGNMENT)) < 0)
 			return (err);
-		sl_timer_start(sl, t2);
-		sl_set_state(sl, MS_NOT_ALIGNED);
-		return (0);
+		if (!(sl->flags & MF_REM_ALN)) {
+			sl_timer_start(sl, t2);
+			sl_set_state(sl, MS_NOT_ALIGNED);
+			return (QR_DONE);
+		} else {
+			if (proving) {
+				if (sl->flags & MF_LOC_EMERG)
+					err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_EMERGENCY);
+				else
+					err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_NORMAL);
+				if (err)
+					return (err);
+				sl_timer_start(sl, t3);
+				sl_set_state(sl, MS_ALIGNED);
+				return (QR_DONE);
+			}
+			return sl_ready(sl, q);
+		}
 	}
-	ptrace(("%s: %p: Received primitive SL_START_REQ in unexpected state %lu\n",
+	ptrace(("%s: %p: Received primitive SL_START_REQ in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
@@ -2158,37 +2696,37 @@ sl_t2_timeout(struct sl *sl)
 
 	if (sl_get_state(sl) == MS_NOT_ALIGNED) {
 		if (sl->sl.notify.events & SL_EVT_FAIL_ALIGNMENT)
-			if ((err = lmi_event_ind(NULL, sl, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(NULL, sl, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
 			return (err);
 		printd(("%s: %p: Link failed: Alignment not possible\n", MOD_NAME, sl));
 		sl->sl.stats.sl_fail_align_or_proving++;
 		return (0);
 	}
-	ptrace(("%s: %p: Received timeout t2 in uexpected state %lu\n", MOD_NAME, sl,
+	ptrace(("%s: %p: Received timeout t2 in uexpected state %d\n", MOD_NAME, sl,
 		sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC int
-sl_ready(queue_t *q, struct sl *sl)
+sl_ready(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	sl->flags &= ~MF_LOC_EMERG;
 	sl->flags &= ~MF_REM_EMERG;
-	sl_suerm_start(NULL, sl);
+	sl_suerm_start(sl, NULL);
 	sl->flags |= MF_LOC_INS;
 	if (sl->flags & MF_LPO) {
-		if ((err = sl_send_status(NULL, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
+		if ((err = sl_send_status(sl, NULL, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
 			return (err);
 		if (sl->flags & MF_REM_INS) {
-			if ((err = sl_in_service_ind(NULL, sl)) < 0)
+			if ((err = sl_in_service_ind(sl, NULL)) < 0)
 				return (err);
 			sl->flags &= ~MF_SEND_MSU;
 			sl->flags &= ~MF_RECV_MSU;
-			sl_oos_stats(NULL, sl);
+			sl_oos_stats(sl, NULL);
 			sl_set_state(sl, MS_PROCESSOR_OUTAGE);
 		} else {
 			sl_timer_start(sl, t1);
@@ -2198,7 +2736,7 @@ sl_ready(queue_t *q, struct sl *sl)
 		mblk_t *mp;
 
 		if ((mp = sl->tb.q_head)) {
-			if ((err = sl_send_data(NULL, sl, mp)) < 0)
+			if ((err = sl_send_data(sl, NULL, mp)) < 0)
 				return (err);
 			sl->tmsu++;
 			sl->fsnt++;
@@ -2213,18 +2751,18 @@ sl_ready(queue_t *q, struct sl *sl)
 			    || sl->tmsu + sl->tack > 0x7ffffff)
 				sl->flags |= MF_RTB_FULL;
 		} else {
-			if ((err = sl_send_status(NULL, sl, M2PA_STATUS_IN_SERVICE)) < 0)
+			if ((err = sl_send_status(sl, NULL, M2PA_STATUS_IN_SERVICE)) < 0)
 				return (err);
 		}
 		if (sl->flags & MF_REM_INS) {
-			if ((err = sl_in_service_ind(NULL, sl)) < 0)
+			if ((err = sl_in_service_ind(sl, NULL)) < 0)
 				return (err);
 			sl->flags |= MF_SEND_MSU;
 			sl->flags |= MF_RECV_MSU;
-			sl_is_stats(NULL, sl);
+			sl_is_stats(sl, NULL);
 			sl_set_state(sl, MS_IN_SERVICE);
 		} else if (sl->flags & MF_RPO) {
-			if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
+			if ((err = sl_remote_processor_outage_ind(sl, q)) < 0)
 				return (err);
 			sl->flags &= ~MF_SEND_MSU;
 			sl->flags &= ~MF_RECV_MSU;
@@ -2238,11 +2776,12 @@ sl_ready(queue_t *q, struct sl *sl)
 }
 
 STATIC INLINE int
-sl_lsc_status_alignment(queue_t *q, struct sl *sl)
+sl_lsc_status_alignment(struct sl *sl, queue_t *q)
 {
 	int err;
 	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 
+	sl->flags |= MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
@@ -2251,9 +2790,9 @@ sl_lsc_status_alignment(queue_t *q, struct sl *sl)
 		sl_timer_stop(sl, t2);
 		if (proving) {
 			if (sl->flags & MF_LOC_EMERG)
-				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
+				err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_EMERGENCY);
 			else
-				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
+				err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_NORMAL);
 			if (err)
 				return (err);
 			sl_timer_start(sl, t3);
@@ -2263,18 +2802,18 @@ sl_lsc_status_alignment(queue_t *q, struct sl *sl)
 	case MS_ALIGNED:
 		if (proving)
 			return (QR_DONE);
-		return sl_ready(q, sl);
+		return sl_ready(sl, q);
 	case MS_PROVING:
-		sl_aerm_stop(q, sl);
+		sl_aerm_stop(sl, q);
 		sl_timer_stop(sl, t4);
 		sl_timer_start(sl, t3);
 		sl_set_state(sl, MS_ALIGNED);
 		return (QR_DONE);
 	default:
 		if (sl->sl.notify.events & SL_EVT_FAIL_RECEIVED_SIO)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_FAIL_RECEIVED_SIO, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_RECEIVED_SIO, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(q, sl, SL_FAIL_RECEIVED_SIO)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_RECEIVED_SIO)) < 0)
 			return (err);
 		printd(("%s: %p: Link failed: Received SIO\n", MOD_NAME, sl));
 		return (QR_DONE);
@@ -2282,7 +2821,7 @@ sl_lsc_status_alignment(queue_t *q, struct sl *sl)
 }
 
 STATIC INLINE int
-sl_lsc_emergency(queue_t *q, struct sl *sl)
+sl_lsc_emergency(struct sl *sl, queue_t *q)
 {
 	int err;
 	int proving = !(sl->option.popt & SS7_POPT_NOPR);
@@ -2299,45 +2838,46 @@ sl_lsc_emergency(queue_t *q, struct sl *sl)
 			   can be made at any time.  The only way that we can change mid-burst is
 			   to send proving messages in smaller chunks or on some sort of timed
 			   basis. */
-			if ((err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
+			if ((err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
 				return (err);
 			sl_timer_stop(sl, t4);
-			sl_aerm_stop(q, sl);
+			sl_aerm_stop(sl, q);
 			sl_timer_start(sl, t4);
-			sl_aerm_start(q, sl);
+			sl_aerm_start(sl, q);
 			return (0);
 		case MS_ALIGNED:
-			if ((err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
+			if ((err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
 				return (err);
 			return (0);
 		}
 	}
-	ptrace(("%s: %p: Received primitive SL_EMERGENCY_REQ in unexpected state %lu\n",
+	ptrace(("%s: %p: Received primitive SL_EMERGENCY_REQ in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC INLINE int
-sl_lsc_emergency_ceases(queue_t *q, struct sl *sl)
+sl_lsc_emergency_ceases(struct sl *sl, queue_t *q)
 {
 	sl->flags &= ~MF_LOC_EMERG;
 	return (0);
 }
 
 STATIC INLINE int
-sl_lsc_status_proving_normal(queue_t *q, struct sl *sl)
+sl_lsc_status_proving_normal(struct sl *sl, queue_t *q)
 {
 	int err;
 	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	case MS_NOT_ALIGNED:
 		sl_timer_stop(sl, t2);
 		if (proving) {
 			if (sl->flags & MF_LOC_EMERG)
-				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
+				err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_EMERGENCY);
 			else
-				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
+				err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_NORMAL);
 			if (err)
 				return (err);
 			sl_timer_start(sl, t3);
@@ -2348,42 +2888,43 @@ sl_lsc_status_proving_normal(queue_t *q, struct sl *sl)
 		sl->flags &= ~MF_REM_EMERG;
 		if (proving) {
 			sl_timer_stop(sl, t3);
-			sl_aerm_start(q, sl);
+			sl_aerm_start(sl, q);
 			sl_timer_start(sl, t4);
 			sl->sl.statem.Cp = 0;
 			sl_set_state(sl, MS_PROVING);
 			return (QR_DONE);
 		}
-		return sl_ready(q, sl);
+		return sl_ready(sl, q);
 	case MS_IN_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->sl.notify.events & SL_EVT_FAIL_RECEIVED_SIN)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_FAIL_RECEIVED_SIN, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_RECEIVED_SIN, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(q, sl, SL_FAIL_RECEIVED_SIN)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_RECEIVED_SIN)) < 0)
 			return (err);
 		printd(("%s: %p: Link failed: Received SIN\n", MOD_NAME, sl));
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: Received status PROVING_NORMAL in unexpected state %lu\n",
+	ptrace(("%s: %p: Received status PROVING_NORMAL in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC INLINE int
-sl_lsc_status_proving_emergency(queue_t *q, struct sl *sl)
+sl_lsc_status_proving_emergency(struct sl *sl, queue_t *q)
 {
 	int err;
 	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	case MS_NOT_ALIGNED:
 		sl_timer_stop(sl, t2);
 		if (proving) {
 			if (sl->flags & MF_LOC_EMERG)
-				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
+				err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_EMERGENCY);
 			else
-				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
+				err = sl_send_proving(sl, q, M2PA_STATUS_PROVING_NORMAL);
 			if (err)
 				return (err);
 			sl_timer_start(sl, t3);
@@ -2394,13 +2935,13 @@ sl_lsc_status_proving_emergency(queue_t *q, struct sl *sl)
 		if (proving) {
 			sl->flags |= MF_REM_EMERG;
 			sl_timer_stop(sl, t3);
-			sl_aerm_start(q, sl);
+			sl_aerm_start(sl, q);
 			sl_timer_start(sl, t4);
 			sl->sl.statem.Cp = 0;
 			sl_set_state(sl, MS_PROVING);
 			return (QR_DONE);
 		}
-		return sl_ready(q, sl);
+		return sl_ready(sl, q);
 	case MS_PROVING:
 		if (sl->flags & MF_REM_EMERG)
 			return (QR_DONE);
@@ -2410,22 +2951,22 @@ sl_lsc_status_proving_emergency(queue_t *q, struct sl *sl)
 		}
 		sl->flags |= MF_REM_EMERG;
 		sl_timer_stop(sl, t4);
-		sl_aerm_stop(q, sl);
-		sl_aerm_start(q, sl);
+		sl_aerm_stop(sl, q);
+		sl_aerm_start(sl, q);
 		sl_timer_start(sl, t4);
 		sl->sl.statem.further_proving = 0;
 		return (QR_DONE);
 	case MS_IN_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->sl.notify.events & SL_EVT_FAIL_RECEIVED_SIE)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_FAIL_RECEIVED_SIE, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_RECEIVED_SIE, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(q, sl, SL_FAIL_RECEIVED_SIE)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_RECEIVED_SIE)) < 0)
 			return (err);
 		printd(("%s: %p: Link failed: Received SIE\n", MOD_NAME, sl));
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: Received status PROVING_EMERGENCY in unexpected state %lu\n",
+	ptrace(("%s: %p: Received status PROVING_EMERGENCY in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
@@ -2436,9 +2977,9 @@ sl_t1_timeout(struct sl *sl)
 	int err;
 
 	if (sl->sl.notify.events & SL_EVT_FAIL_T1_TIMEOUT)
-		if ((err = lmi_event_ind(NULL, sl, SL_EVT_FAIL_T1_TIMEOUT, 0, NULL, 0)) < 0)
+		if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_T1_TIMEOUT, 0, NULL, 0)) < 0)
 			return (err);
-	if ((err = sl_lsc_out_of_service(NULL, sl, SL_FAIL_T1_TIMEOUT)) < 0)
+	if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_T1_TIMEOUT)) < 0)
 		return (err);
 	printd(("%s: %p: Link failed: T1 Timeout\n", MOD_NAME, sl));
 	sl->sl.stats.sl_fail_align_or_proving++;
@@ -2452,15 +2993,15 @@ sl_t3_timeout(struct sl *sl)
 
 	if (sl_get_state(sl) == MS_ALIGNED) {
 		if (sl->sl.notify.events & SL_EVT_FAIL_ALIGNMENT)
-			if ((err = lmi_event_ind(NULL, sl, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(NULL, sl, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
 			return (err);
 		printd(("%s: %p: Link failed: T3 Timeout\n", MOD_NAME, sl));
 		sl->sl.stats.sl_fail_align_or_proving++;
 		return (0);
 	}
-	ptrace(("%s: %p: Received timeout t3 in uexpected state %lu\n", MOD_NAME, sl,
+	ptrace(("%s: %p: Received timeout t3 in uexpected state %d\n", MOD_NAME, sl,
 		sl_get_state(sl)));
 	return (-EPROTO);
 }
@@ -2471,43 +3012,51 @@ sl_t4_timeout(struct sl *sl)
 	int err;
 
 	if (sl_get_state(sl) == MS_PROVING) {
-		sl_aerm_stop(NULL, sl);
-		if ((err = sl_ready(NULL, sl)))
+		sl_aerm_stop(sl, NULL);
+		if ((err = sl_ready(sl, NULL)))
 			return (err);
 		return (0);
 	}
-	ptrace(("%s: %p: Received timeout t4 in unexpected state %lu\n", MOD_NAME, sl,
+	ptrace(("%s: %p: Received timeout t4 in unexpected state %d\n", MOD_NAME, sl,
 		sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC void streamscall sl_tx_wakeup(queue_t *q);
 STATIC INLINE int
-sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_lsc_status_in_service(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
+	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
+	case MS_NOT_ALIGNED:
+		if (proving)
+			break;
+		sl_timer_stop(sl, t2);
+		sl->flags |= MF_REM_INS;
+		return sl_ready(sl, q);
 	case MS_ALIGNED:
 	case MS_PROVING:
 		sl->flags |= MF_REM_INS;
 		return (QR_DONE);
 	case MS_ALIGNED_NOT_READY:
-		if ((err = sl_in_service_ind(q, sl)) < 0)
+		if ((err = sl_in_service_ind(sl, q)) < 0)
 			return (err);
 		sl_timer_stop(sl, t1);
 		sl->flags &= ~MF_SEND_MSU;
 		sl->flags &= ~MF_RECV_MSU;
-		sl_oos_stats(q, sl);
+		sl_oos_stats(sl, q);
 		sl_set_state(sl, MS_PROCESSOR_OUTAGE);
 		return (QR_DONE);
 	case MS_ALIGNED_READY:
-		if ((err = sl_in_service_ind(q, sl)) < 0)
+		if ((err = sl_in_service_ind(sl, q)) < 0)
 			return (err);
 		sl_timer_stop(sl, t1);
 		sl->flags |= MF_SEND_MSU;
 		sl->flags |= MF_RECV_MSU;
-		sl_is_stats(q, sl);
+		sl_is_stats(sl, q);
 		sl_set_state(sl, MS_IN_SERVICE);
 		return (QR_DONE);
 	case MS_IN_SERVICE:
@@ -2525,11 +3074,11 @@ sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
 		}
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
-		ptrace(("%s: %p: Received status IN_SERVICE in unusual state %lu\n",
+		ptrace(("%s: %p: Received status IN_SERVICE in unusual state %d\n",
 			MOD_NAME, sl, sl_get_state(sl)));
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: Received status IN_SERVICE in unexpected state %lu\n", MOD_NAME,
+	ptrace(("%s: %p: Received status IN_SERVICE in unexpected state %d\n", MOD_NAME,
 		sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
@@ -2558,7 +3107,7 @@ sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
  *  --------------------------------------------------------------------------
  */
 STATIC INLINE int
-sl_rb_congestion_function(queue_t *q, struct sl *sl)
+sl_rb_congestion_function(struct sl *sl, queue_t *q)
 {
 	int err;
 
@@ -2567,7 +3116,7 @@ sl_rb_congestion_function(queue_t *q, struct sl *sl)
 			if (sl->rb.q_msgs <= sl->sl.config.rb_abate && canputnext(sl->oq)) {
 				if (sl->flags & MF_LOC_BUSY)
 					if ((err =
-					     sl_send_status(q, sl, M2PA_STATUS_BUSY_ENDED)) < 0)
+					     sl_send_status(sl, q, M2PA_STATUS_BUSY_ENDED)) < 0)
 						return (err);
 				sl->flags &= ~MF_LOC_BUSY;
 				sl->flags &= ~MF_CONG_DISCARD;
@@ -2579,7 +3128,7 @@ sl_rb_congestion_function(queue_t *q, struct sl *sl)
 			if (sl->rb.q_msgs >= sl->sl.config.rb_discard || !canput(sl->oq)) {
 				sl->flags |= MF_CONG_DISCARD;
 				if (!(sl->flags & MF_LOC_BUSY)) {
-					if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY)) < 0)
+					if ((err = sl_send_status(sl, q, M2PA_STATUS_BUSY)) < 0)
 						return (err);
 					printd(("%s: %p: Receive congestion: congestion discard\n",
 						MOD_NAME, sl));
@@ -2598,7 +3147,7 @@ sl_rb_congestion_function(queue_t *q, struct sl *sl)
 					sl->flags |= MF_CONG_ACCEPT;
 					if (!(sl->flags & MF_LOC_BUSY)) {
 						if ((err =
-						     sl_send_status(q, sl, M2PA_STATUS_BUSY)) < 0)
+						     sl_send_status(sl, q, M2PA_STATUS_BUSY)) < 0)
 							return (err);
 						printd(("%s: %p: Receive congestion: congestion accept\n", MOD_NAME, sl));
 						printd(("%s:   sl->rb.q_msgs           = %12lu\n",
@@ -2630,7 +3179,7 @@ sl_rx_wakeup(queue_t *q)
 	default:
 		if (sl->flags & MF_RECV_MSU && sl->rb.q_msgs) {
 			while ((mp = bufq_dequeue(&sl->rb))) {
-				if ((err = sl_pdu_ind(q, sl, mp)) < 0) {
+				if ((err = sl_pdu_ind(sl, q, mp)) < 0) {
 					bufq_queue_head(&sl->rb, mp);
 					rare();
 					return;
@@ -2640,12 +3189,12 @@ sl_rx_wakeup(queue_t *q)
 				sl->rmsu++;
 				sl->fsnr++;
 				sl->fsnr &= 0xffffff;
-				sl_rb_congestion_function(q, sl);
+				sl_rb_congestion_function(sl, q);
 				if (!(sl->flags & MF_CONG_ACCEPT))
 					sl->rack += xchg(&sl->rmsu, 0);
 			}
 			if (sl->rack)
-				sl_send_ack(q, sl);
+				sl_send_ack(sl, q);
 		}
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
@@ -2689,10 +3238,10 @@ sl_rx_wakeup(queue_t *q)
 		((int16_t)((uint16_t)(__s2)-(uint16_t)(__s1))) : \
 		((int16_t)((uint16_t)(__s1)-(uint16_t)(__s2))))
 
-STATIC int sl_check_congestion(queue_t *q, struct sl *sl);
+STATIC int sl_check_congestion(struct sl *sl, queue_t *q);
 
 STATIC INLINE int
-sl_txc_datack(queue_t *q, struct sl *sl, ulong count)
+sl_txc_datack(struct sl *sl, queue_t *q, uint count)
 {
 	int err;
 
@@ -2712,18 +3261,18 @@ sl_txc_datack(queue_t *q, struct sl *sl, ulong count)
 				if (sl->back) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
 						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
+						     lmi_event_ind(sl, q, SL_EVT_FAIL_ABNORMAL_BSNR,
 								   0, NULL, 0)) < 0)
 							return (err);
 					if ((err =
-					     sl_lsc_out_of_service(q, sl,
+					     sl_lsc_out_of_service(sl, q,
 								   SL_FAIL_ABNORMAL_BSNR)) < 0)
 						return (err);
 					printd(("%s: %p: Link failed: Abnormal BSNR\n",
 						MOD_NAME, sl));
 					return (0);
 				}
-				printd(("%s: %p: Received bad acknowledgement acks = %lu\n",
+				printd(("%s: %p: Received bad acknowledgement acks = %u\n",
 					MOD_NAME, sl, count + 1));
 				sl->back++;
 				return (0);
@@ -2736,18 +3285,18 @@ sl_txc_datack(queue_t *q, struct sl *sl, ulong count)
 		} else if (!(sl->flags & (MF_REM_BUSY | MF_RPO)))
 			sl_timer_start(sl, t7);
 		sl->flags &= ~MF_RTB_FULL;
-		sl_check_congestion(q, sl);
+		sl_check_congestion(sl, q);
 		sl_tx_wakeup(q);
 		return (0);
 	default:
-		ptrace(("%s: %p: Received ACK in unexpected state %lu\n", MOD_NAME, sl,
+		ptrace(("%s: %p: Received ACK in unexpected state %d\n", MOD_NAME, sl,
 			sl_get_state(sl)));
 		return (0);
 	}
 }
 
 STATIC INLINE int
-sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
 
@@ -2774,11 +3323,11 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				if (sl->bfsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_FIBR)
 						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_FIBR,
+						     lmi_event_ind(sl, q, SL_EVT_FAIL_ABNORMAL_FIBR,
 								   0, NULL, 0)) < 0)
 							return (err);
 					if ((err =
-					     sl_lsc_out_of_service(q, sl,
+					     sl_lsc_out_of_service(sl, q,
 								   SL_FAIL_ABNORMAL_FIBR)) < 0)
 						return (err);
 					printd(("%s: %p: Link failed: Abnormal FIBR\n",
@@ -2795,11 +3344,11 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				if (sl->bbsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
 						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
+						     lmi_event_ind(sl, q, SL_EVT_FAIL_ABNORMAL_BSNR,
 								   0, NULL, 0)) < 0)
 							return (err);
 					if ((err =
-					     sl_lsc_out_of_service(q, sl,
+					     sl_lsc_out_of_service(sl, q,
 								   SL_FAIL_ABNORMAL_BSNR)) < 0)
 						return (err);
 					printd(("%s: %p: Link failed: Abnormal BSNR\n",
@@ -2812,7 +3361,7 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 			} else {
 				if (sl->bsnr != bsnr) {
 					if ((err =
-					     sl_txc_datack(q, sl, diff16(sl->bsnr, bsnr))) < 0)
+					     sl_txc_datack(sl, q, diff16(sl->bsnr, bsnr))) < 0)
 						return (err);
 					sl->bsnr = bsnr;
 				}
@@ -2845,11 +3394,11 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				if (sl->bfsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_FIBR)
 						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_FIBR,
+						     lmi_event_ind(sl, q, SL_EVT_FAIL_ABNORMAL_FIBR,
 								   0, NULL, 0)) < 0)
 							return (err);
 					if ((err =
-					     sl_lsc_out_of_service(q, sl,
+					     sl_lsc_out_of_service(sl, q,
 								   SL_FAIL_ABNORMAL_FIBR)) < 0)
 						return (err);
 					printd(("%s: %p: Link failed: Abnormal FIBR\n",
@@ -2867,11 +3416,11 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				if (sl->bbsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
 						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
+						     lmi_event_ind(sl, q, SL_EVT_FAIL_ABNORMAL_BSNR,
 								   0, NULL, 0)) < 0)
 							return (err);
 					if ((err =
-					     sl_lsc_out_of_service(q, sl,
+					     sl_lsc_out_of_service(sl, q,
 								   SL_FAIL_ABNORMAL_BSNR)) < 0)
 						return (err);
 					printd(("%s: %p: Link failed: Abnormal BSNR\n",
@@ -2885,7 +3434,7 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 			} else {
 				if (sl->bsnr != bsnr) {
 					if ((err =
-					     sl_txc_datack(q, sl, diff24(sl->bsnr, bsnr))) < 0)
+					     sl_txc_datack(sl, q, diff24(sl->bsnr, bsnr))) < 0)
 						return (err);
 					sl->bsnr = bsnr;
 				}
@@ -2913,11 +3462,11 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				if (sl->bfsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_FIBR)
 						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_FIBR,
+						     lmi_event_ind(sl, q, SL_EVT_FAIL_ABNORMAL_FIBR,
 								   0, NULL, 0)) < 0)
 							return (err);
 					if ((err =
-					     sl_lsc_out_of_service(q, sl,
+					     sl_lsc_out_of_service(sl, q,
 								   SL_FAIL_ABNORMAL_FIBR)) < 0)
 						return (err);
 					printd(("%s: %p: Link failed: Abnormal FIBR\n",
@@ -2935,11 +3484,11 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				if (sl->bbsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
 						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
+						     lmi_event_ind(sl, q, SL_EVT_FAIL_ABNORMAL_BSNR,
 								   0, NULL, 0)) < 0)
 							return (err);
 					if ((err =
-					     sl_lsc_out_of_service(q, sl,
+					     sl_lsc_out_of_service(sl, q,
 								   SL_FAIL_ABNORMAL_BSNR)) < 0)
 						return (err);
 					printd(("%s: %p: Link failed: Abnormal BSNR\n",
@@ -2953,7 +3502,7 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 			} else {
 				if (sl->bsnr != bsnr) {
 					if ((err =
-					     sl_txc_datack(q, sl, diff24(sl->bsnr, bsnr))) < 0)
+					     sl_txc_datack(sl, q, diff24(sl->bsnr, bsnr))) < 0)
 						return (err);
 					sl->bsnr = bsnr;
 				}
@@ -2993,11 +3542,11 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				if (sl->bbsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
 						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
+						     lmi_event_ind(sl, q, SL_EVT_FAIL_ABNORMAL_BSNR,
 								   0, NULL, 0)) < 0)
 							return (err);
 					if ((err =
-					     sl_lsc_out_of_service(q, sl,
+					     sl_lsc_out_of_service(sl, q,
 								   SL_FAIL_ABNORMAL_BSNR)) < 0)
 						return (err);
 					printd(("%s: %p: Link failed: Abnormal BSNR\n",
@@ -3011,7 +3560,7 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 			} else {
 				if (sl->bsnr != bsnr) {
 					if ((err =
-					     sl_txc_datack(q, sl, diff24(sl->bsnr, bsnr))) < 0)
+					     sl_txc_datack(sl, q, diff24(sl->bsnr, bsnr))) < 0)
 						return (err);
 					sl->bsnr = bsnr;
 				}
@@ -3027,31 +3576,32 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 }
 
 STATIC INLINE int
-sl_rc_signal_unit(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_rc_signal_unit(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
 
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	case MS_ALIGNED_READY:
-		if ((err = sl_in_service_ind(q, sl)) < 0)
+		if ((err = sl_in_service_ind(sl, q)) < 0)
 			return (err);
 		sl_timer_stop(sl, t1);
 		sl->flags |= MF_SEND_MSU;
 		sl->flags |= MF_RECV_MSU;
-		sl_is_stats(q, sl);
+		sl_is_stats(sl, q);
 		sl_set_state(sl, MS_IN_SERVICE);
 		/* fall through */
 	default:
-		if ((err = sl_rc_sn_check(q, sl, mp)) < 0)
+		if ((err = sl_rc_sn_check(sl, q, mp)) < 0)
 			return (err);
 		if (sl->flags & MF_RECV_MSU) {
 			if (!(sl->flags & MF_CONG_DISCARD)) {
 				if (mp->b_wptr - mp->b_rptr > sizeof(uint32_t)) {
 					bufq_queue(&sl->rb, mp);
-					sl_rb_congestion_function(q, sl);
+					sl_rb_congestion_function(sl, q);
 					sl->fsnx++;
 					sl->fsnx &= 0xffffff;
-					sl_rx_wakeup(sl->iq);
+					// sl_rx_wakeup(sl->iq);
 					return (QR_ABSORBED);
 				}
 				return (QR_DONE);
@@ -3062,7 +3612,7 @@ sl_rc_signal_unit(queue_t *q, struct sl *sl, mblk_t *mp)
 		return (-EPROTO);
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
-		ptrace(("%s: %p: Received SIGNAL UNIT in unexpected state %lu\n", MOD_NAME,
+		ptrace(("%s: %p: Received SIGNAL UNIT in unexpected state %d\n", MOD_NAME,
 			sl, sl_get_state(sl)));
 		return (QR_DONE);
 	}
@@ -3079,7 +3629,7 @@ sl_tx_wakeup(queue_t *q)
 	switch (sl_get_state(sl)) {
 	default:
 		if (sl->rack)
-			if ((err = sl_send_ack(q, sl)) < 0)
+			if ((err = sl_send_ack(sl, q)) < 0)
 				return;
 		if (sl->flags & MF_SEND_MSU && sl->tb.q_msgs && !(sl->flags & MF_RTB_FULL)) {
 			if (!sl->rtb.q_count) {
@@ -3089,7 +3639,7 @@ sl_tx_wakeup(queue_t *q)
 					sl_timer_start(sl, t7);
 			}
 			while ((mp = sl->tb.q_head)) {
-				if ((err = sl_send_data(q, sl, mp)) < 0)
+				if ((err = sl_send_data(sl, q, mp)) < 0)
 					return;
 				sl->tmsu++;
 				sl->fsnt++;
@@ -3113,10 +3663,10 @@ sl_tx_wakeup(queue_t *q)
 	}
 }
 STATIC INLINE int
-sl_lsc_pdu(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_lsc_pdu(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	bufq_queue(&sl->tb, mp);
-	sl_check_congestion(q, sl);
+	sl_check_congestion(sl, q);
 	return (0);
 }
 STATIC int
@@ -3125,16 +3675,17 @@ sl_t7_timeout(struct sl *sl)
 	int err;
 
 	if (sl->sl.notify.events & SL_EVT_FAIL_ACK_TIMEOUT)
-		if ((err = lmi_event_ind(NULL, sl, SL_EVT_FAIL_ACK_TIMEOUT, 0, NULL, 0)) < 0)
+		if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_ACK_TIMEOUT, 0, NULL, 0)) < 0)
 			return (err);
-	if ((err = sl_lsc_out_of_service(NULL, sl, SL_FAIL_ACK_TIMEOUT)) < 0)
+	if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_ACK_TIMEOUT)) < 0)
 		return (err);
 	printd(("%s: %p: Link failed: T7 Timeout\n", MOD_NAME, sl));
 	return (0);
 }
 STATIC INLINE int
-sl_lsc_status_busy(queue_t *q, struct sl *sl)
+sl_lsc_status_busy(struct sl *sl, queue_t *q)
 {
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	case MS_IN_SERVICE:
 		if (!(sl->flags & MF_REM_BUSY)) {
@@ -3151,17 +3702,17 @@ sl_lsc_status_busy(queue_t *q, struct sl *sl)
 	case MS_OUT_OF_SERVICE:
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: Received status BUSY in unexpected state %lu\n", MOD_NAME, sl,
+	ptrace(("%s: %p: Received status BUSY in unexpected state %d\n", MOD_NAME, sl,
 		sl_get_state(sl)));
 	return (-EPROTO);
 }
 STATIC INLINE int
-sl_lsc_congestion_discard(queue_t *q, struct sl *sl)
+sl_lsc_congestion_discard(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (!(sl->flags & MF_LOC_BUSY)) {
-		if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY)) < 0)
+		if ((err = sl_send_status(sl, q, M2PA_STATUS_BUSY)) < 0)
 			return (err);
 		sl->sl.stats.sl_sibs_sent++;
 		sl->flags |= MF_LOC_BUSY;
@@ -3171,12 +3722,12 @@ sl_lsc_congestion_discard(queue_t *q, struct sl *sl)
 	return (0);
 }
 STATIC INLINE int
-sl_lsc_congestion_accept(queue_t *q, struct sl *sl)
+sl_lsc_congestion_accept(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (!(sl->flags & MF_LOC_BUSY)) {
-		if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY)) < 0)
+		if ((err = sl_send_status(sl, q, M2PA_STATUS_BUSY)) < 0)
 			return (err);
 		sl->sl.stats.sl_sibs_sent++;
 		sl->flags |= MF_LOC_BUSY;
@@ -3186,11 +3737,12 @@ sl_lsc_congestion_accept(queue_t *q, struct sl *sl)
 	return (0);
 }
 STATIC INLINE int
-sl_lsc_status_busy_ended(queue_t *q, struct sl *sl)
+sl_lsc_status_busy_ended(struct sl *sl, queue_t *q)
 {
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	default:
-		ptrace(("%s: %p: Received status BUSY_ENDED in unexpected state %lu\n",
+		ptrace(("%s: %p: Received status BUSY_ENDED in unexpected state %d\n",
 			MOD_NAME, sl, sl_get_state(sl)));
 	case MS_IN_SERVICE:
 		sl->flags &= ~MF_REM_BUSY;
@@ -3209,20 +3761,20 @@ sl_t6_timeout(struct sl *sl)
 	int err;
 
 	if (sl->sl.notify.events & SL_EVT_FAIL_CONG_TIMEOUT)
-		if ((err = lmi_event_ind(NULL, sl, SL_EVT_FAIL_CONG_TIMEOUT, 0, NULL, 0)) < 0)
+		if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_CONG_TIMEOUT, 0, NULL, 0)) < 0)
 			return (err);
-	if ((err = sl_lsc_out_of_service(NULL, sl, SL_FAIL_CONG_TIMEOUT)) < 0)
+	if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_CONG_TIMEOUT)) < 0)
 		return (err);
 	printd(("%s: %p: Link failed: T6 Timeout\n", MOD_NAME, sl));
 	return (0);
 }
 STATIC INLINE int
-sl_lsc_no_congestion(queue_t *q, struct sl *sl)
+sl_lsc_no_congestion(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl->flags & MF_LOC_BUSY)
-		if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY_ENDED)) < 0)
+		if ((err = sl_send_status(sl, q, M2PA_STATUS_BUSY_ENDED)) < 0)
 			return (err);
 	sl->flags &= ~MF_LOC_BUSY;
 	sl->flags &= ~MF_CONG_DISCARD;
@@ -3233,21 +3785,34 @@ sl_lsc_no_congestion(queue_t *q, struct sl *sl)
 }
 
 STATIC INLINE int
-sl_lsc_status_processor_outage(queue_t *q, struct sl *sl)
+sl_lsc_status_processor_outage(struct sl *sl, queue_t *q)
 {
 	int err;
+	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
-	case MS_NOT_ALIGNED:
 		/* ignored in these states */
 		return (QR_DONE);
+	case MS_NOT_ALIGNED:
+		if (proving)
+			return (QR_DONE);
+		sl_timer_stop(sl, t2);
+		if (!(sl->flags & MF_RPO)) {
+			if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
+				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
+					return (err);
+			sl->flags |= MF_RPO;
+			ptrace(("%s: %p: RPO Begins\n", MOD_NAME, sl));
+		}
+		return sl_ready(sl, q);
 	case MS_ALIGNED:
 	case MS_PROVING:
 		if (!(sl->flags & MF_RPO)) {
 			if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
-				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
+				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
 					return (err);
 			/* just remember for later */
 			sl->flags |= MF_RPO;
@@ -3258,12 +3823,12 @@ sl_lsc_status_processor_outage(queue_t *q, struct sl *sl)
 	case MS_ALIGNED_NOT_READY:
 		if (!(sl->flags & MF_RPO)) {
 			if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
-				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
+				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
 					return (err);
-			if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
+			if ((err = sl_remote_processor_outage_ind(sl, q)) < 0)
 				return (err);
 			sl->flags |= MF_RPO;
-			sl_rpo_stats(q, sl);
+			sl_rpo_stats(sl, q);
 			ptrace(("%s: %p: RPO Begins\n", MOD_NAME, sl));
 		}
 		sl_timer_stop(sl, t1);
@@ -3271,10 +3836,10 @@ sl_lsc_status_processor_outage(queue_t *q, struct sl *sl)
 		return (QR_DONE);
 	case MS_IN_SERVICE:
 		if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
 				return (err);
 		if (!(sl->flags & MF_RPO)) {
-			if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
+			if ((err = sl_remote_processor_outage_ind(sl, q)) < 0)
 				return (err);
 			sl->flags |= MF_RPO;
 		}
@@ -3292,21 +3857,21 @@ sl_lsc_status_processor_outage(queue_t *q, struct sl *sl)
 			sl->rack += xchg(&sl->rmsu, 0);
 			fixme(("%s: %p: FIXME: Bad idea\n", MOD_NAME, sl));
 			if (sl->flags & MF_LOC_BUSY)
-				if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY_ENDED)) < 0)
+				if ((err = sl_send_status(sl, q, M2PA_STATUS_BUSY_ENDED)) < 0)
 					return (err);
 			sl->flags &= ~MF_LOC_BUSY;
 			break;
 		}
-		sl_rpo_stats(q, sl);
+		sl_rpo_stats(sl, q);
 		sl_set_state(sl, MS_PROCESSOR_OUTAGE);
 		return (QR_DONE);
 	case MS_PROCESSOR_OUTAGE:
 		if (!(sl->flags & MF_RPO)) {
 			if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
-				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
+				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
 					return (err);
 			if (!(sl->flags & MF_RPO)) {
-				if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
+				if ((err = sl_remote_processor_outage_ind(sl, q)) < 0)
 					return (err);
 				sl->flags |= MF_RPO;
 			}
@@ -3314,13 +3879,13 @@ sl_lsc_status_processor_outage(queue_t *q, struct sl *sl)
 		}
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: Received status PROCESSOR_OUTAGE in unexpected state %lu\n",
+	ptrace(("%s: %p: Received status PROCESSOR_OUTAGE in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC INLINE int
-sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
+sl_lsc_local_processor_outage(struct sl *sl, queue_t *q)
 {
 	int err;
 
@@ -3335,7 +3900,7 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 		sl->flags |= MF_LPO;
 		return (0);
 	case MS_ALIGNED_READY:
-		if ((err = sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
+		if ((err = sl_send_status(sl, q, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
 			return (err);
 		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
@@ -3345,7 +3910,7 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 		sl_set_state(sl, MS_ALIGNED_NOT_READY);
 		return (0);
 	case MS_IN_SERVICE:
-		if ((err = sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
+		if ((err = sl_send_status(sl, q, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
 			return (err);
 		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
@@ -3362,17 +3927,17 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 			sl->rack += xchg(&sl->rmsu, 0);
 			fixme(("%s: %p: FIXME: Bad idea\n", MOD_NAME, sl));
 			if (sl->flags & MF_LOC_BUSY)
-				if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY_ENDED)) < 0)
+				if ((err = sl_send_status(sl, q, M2PA_STATUS_BUSY_ENDED)) < 0)
 					return (err);
 			sl->flags &= ~MF_LOC_BUSY;
 			break;
 		}
-		sl_rpo_stats(q, sl);
+		sl_rpo_stats(sl, q);
 		sl_set_state(sl, MS_PROCESSOR_OUTAGE);
 		return (0);
 	case MS_PROCESSOR_OUTAGE:
 		if (!(sl->flags & MF_LPO))
-			if ((err = sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
+			if ((err = sl_send_status(sl, q, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
 				return (err);
 		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
@@ -3380,11 +3945,11 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 		sl_timer_stop(sl, t6);	/* ??? */
 		return (0);
 	}
-	ptrace(("%s: %p: Received primitive SL_LOCAL_PROCESSOR_OUTAGE_REQ in unexpected state %lu\n", MOD_NAME, sl, sl_get_state(sl)));
+	ptrace(("%s: %p: Received primitive SL_LOCAL_PROCESSOR_OUTAGE_REQ in unexpected state %d\n", MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 STATIC INLINE int
-sl_lsc_clear_rtb(queue_t *q, struct sl *sl)
+sl_lsc_clear_rtb(struct sl *sl, queue_t *q)
 {
 	int err;
 
@@ -3394,35 +3959,35 @@ sl_lsc_clear_rtb(queue_t *q, struct sl *sl)
 		sl->tack = 0;
 		sl->flags &= ~MF_RTB_FULL;
 		sl->flags &= ~MF_CLEAR_RTB;
-		if ((err = sl_rtb_cleared_ind(q, sl)) < 0)
+		if ((err = sl_rtb_cleared_ind(sl, q)) < 0)
 			return (err);
-		if ((err = sl_check_congestion(q, sl)) < 0)
+		if ((err = sl_check_congestion(sl, q)) < 0)
 			return (err);
 		sl_timer_stop(sl, t7);
 		sl_timer_stop(sl, t6);
 		sl->flags &= ~MF_LPO;
 		if (sl->flags & MF_RPO) {
 			if (sl->sl.notify.events & SL_EVT_RPO_END)
-				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
+				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
 					return (err);
 			ptrace(("%s: %p: RPO Ends\n", MOD_NAME, sl));
-			sl_rpr_stats(q, sl);
+			sl_rpr_stats(sl, q);
 			sl->flags &= ~MF_RPO;
 		}
 		sl->flags &= ~MF_SEND_MSU;
 		sl->flags |= MF_SEND_MSU;
-		if ((err = sl_remote_processor_recovered_ind(q, sl)) < 0)
+		if ((err = sl_remote_processor_recovered_ind(sl, q)) < 0)
 			return (err);
-		sl_is_stats(q, sl);
+		sl_is_stats(sl, q);
 		sl_set_state(sl, MS_IN_SERVICE);
 		return (0);
 	}
-	ptrace(("%s: %p: Received primitive SL_CLEAR_RTB_REQ in unexpected state %lu\n",
+	ptrace(("%s: %p: Received primitive SL_CLEAR_RTB_REQ in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 STATIC INLINE int
-sl_lsc_clear_buffers(queue_t *q, struct sl *sl)
+sl_lsc_clear_buffers(struct sl *sl, queue_t *q)
 {
 	int err;
 
@@ -3438,7 +4003,7 @@ sl_lsc_clear_buffers(queue_t *q, struct sl *sl)
 		case SS7_PVAR_ITUT_96:
 			return (0);
 		case SS7_PVAR_ANSI_92:
-			if ((err = sl_rtb_cleared_ind(q, sl)) < 0)
+			if ((err = sl_rtb_cleared_ind(sl, q)) < 0)
 				return (err);
 			sl->flags &= ~MF_LPO;	/* ??? */
 			return (0);
@@ -3451,7 +4016,7 @@ sl_lsc_clear_buffers(queue_t *q, struct sl *sl)
 		case SS7_PVAR_ITUT_96:
 			return (0);
 		case SS7_PVAR_ANSI_92:
-			if ((err = sl_rtb_cleared_ind(q, sl)) < 0)
+			if ((err = sl_rtb_cleared_ind(sl, q)) < 0)
 				return (err);
 			sl->flags &= ~MF_LPO;
 			sl_timer_stop(sl, t7);	/* ??? */
@@ -3470,7 +4035,7 @@ sl_lsc_clear_buffers(queue_t *q, struct sl *sl)
 		sl_timer_stop(sl, t6);
 		sl->flags &= ~MF_RTB_FULL;
 		sl->flags &= ~MF_CLEAR_RTB;
-		if ((err = sl_check_congestion(q, sl)) < 0)
+		if ((err = sl_check_congestion(sl, q)) < 0)
 			return (err);
 		switch (sl->option.pvar) {
 		default:
@@ -3484,36 +4049,36 @@ sl_lsc_clear_buffers(queue_t *q, struct sl *sl)
 			return (0);
 		case SS7_PVAR_ANSI_92:
 			if (sl->sl.notify.events & SL_EVT_RPO_END)
-				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
+				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
 					return (err);
-			if ((err = sl_rtb_cleared_ind(q, sl)) < 0)
+			if ((err = sl_rtb_cleared_ind(sl, q)) < 0)
 				return (err);
 			bufq_purge(&sl->rb);
 			flushq(sl->oq, FLUSHDATA);
-			if ((err = sl_rb_cleared_ind(q, sl)) < 0)
+			if ((err = sl_rb_cleared_ind(sl, q)) < 0)
 				return (err);
 			if (sl->flags & MF_RPO) {
-				if ((err = sl_remote_processor_recovered_ind(q, sl)) < 0)
+				if ((err = sl_remote_processor_recovered_ind(sl, q)) < 0)
 					return (err);
 				sl->flags &= ~MF_RPO;
 			}
 			ptrace(("%s: %p: RPO Ends\n", MOD_NAME, sl));
-			sl_rpr_stats(q, sl);
+			sl_rpr_stats(sl, q);
 			break;
 		}
 		sl->flags |= MF_RECV_MSU;
 		sl->flags |= MF_SEND_MSU;
 		sl->flags &= ~MF_LPO;
-		sl_is_stats(q, sl);
+		sl_is_stats(sl, q);
 		sl_set_state(sl, MS_IN_SERVICE);
 		return (0);
 	}
-	ptrace(("%s: %p: Received primitive SL_CLEAR_BUFFERS_REQ in unexpected state %lu\n",
+	ptrace(("%s: %p: Received primitive SL_CLEAR_BUFFERS_REQ in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 STATIC void
-sl_lsc_no_processor_outage(queue_t *q, struct sl *sl)
+sl_lsc_no_processor_outage(struct sl *sl, queue_t *q)
 {
 	switch (sl_get_state(sl)) {
 	case MS_PROCESSOR_OUTAGE:
@@ -3530,7 +4095,7 @@ sl_lsc_no_processor_outage(queue_t *q, struct sl *sl)
 				else
 					sl_timer_start(sl, t7);
 			}
-			sl_is_stats(q, sl);
+			sl_is_stats(sl, q);
 			sl_set_state(sl, MS_IN_SERVICE);
 		}
 	}
@@ -3541,7 +4106,7 @@ sl_lsc_no_processor_outage(queue_t *q, struct sl *sl)
    This was the blue book way of doing things... 
  */
 STATIC INLINE int
-sl_lsc_continue(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_lsc_continue(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	switch (sl_get_state(sl)) {
 	case MS_PROCESSOR_OUTAGE:
@@ -3556,7 +4121,7 @@ sl_lsc_continue(queue_t *q, struct sl *sl, mblk_t *mp)
 					sl_timer_start(sl, t7);
 			}
 			sl->flags &= ~MF_LPO;
-			sl_is_stats(q, sl);
+			sl_is_stats(sl, q);
 			sl_set_state(sl, MS_IN_SERVICE);
 		}
 		return (0);
@@ -3568,10 +4133,11 @@ sl_lsc_continue(queue_t *q, struct sl *sl, mblk_t *mp)
 #endif
 
 STATIC INLINE int
-sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_lsc_status_processor_outage_ended(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
 
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->flags & MF_RPO) {
@@ -3580,25 +4146,25 @@ sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
 				   send READY, and also use the BSN from the received message to
 				   synchronize FSN. */
 				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr)) & 0xffffff;
-				if ((err = sl_send_status(q, sl, M2PA_STATUS_IN_SERVICE)))
+				if ((err = sl_send_status(sl, q, M2PA_STATUS_IN_SERVICE)))
 					return (err);
 			}
 			if (sl->sl.notify.events & SL_EVT_RPO_END)
-				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
+				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
 					return (err);
-			if ((err = sl_remote_processor_recovered_ind(q, sl)) < 0)
+			if ((err = sl_remote_processor_recovered_ind(sl, q)) < 0)
 				return (err);
 			sl->flags &= ~MF_RPO;
 			ptrace(("%s: %p: RPO Ends\n", MOD_NAME, sl));
 		}
-		sl_rpr_stats(q, sl);
+		sl_rpr_stats(sl, q);
 		switch (sl->option.pvar) {
 		default:
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
 			/* auto recover */
 			if (!(sl->flags & MF_LPO))
-				sl_lsc_no_processor_outage(q, sl);
+				sl_lsc_no_processor_outage(sl, q);
 			break;
 		case SS7_PVAR_ANSI_92:
 			/* leave state latched */
@@ -3606,13 +4172,13 @@ sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
 		}
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: Received status PROCESSOR_OUTAGE_ENDED in unexpected state %lu\n",
+	ptrace(("%s: %p: Received status PROCESSOR_OUTAGE_ENDED in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC INLINE int
-sl_lsc_resume(queue_t *q, struct sl *sl)
+sl_lsc_resume(struct sl *sl, queue_t *q)
 {
 	int err;
 
@@ -3633,14 +4199,14 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 		switch (sl->option.pvar) {
 		case SS7_PVAR_ITUT_96:
 			if (!(sl->flags & MF_RPO))
-				sl_lsc_no_processor_outage(q, sl);
+				sl_lsc_no_processor_outage(sl, q);
 			sl->flags |= MF_RECV_MSU;	/* ??? */
 			break;
 		case SS7_PVAR_ANSI_92:
 			break;
 		default:
 			if (!(sl->flags & MF_RPO))
-				sl_lsc_no_processor_outage(q, sl);
+				sl_lsc_no_processor_outage(sl, q);
 			break;
 		}
 		sl_timer_stop(sl, t7);
@@ -3656,19 +4222,19 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 		case SS7_PVAR_ITUT_96:
 			if (sl->flags & MF_LPO) {
 				if ((err =
-				     sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE_ENDED)) < 0)
+				     sl_send_status(sl, q, M2PA_STATUS_PROCESSOR_OUTAGE_ENDED)) < 0)
 					return (err);
 				if (sl->i_version >= M2PA_VERSION_DRAFT10)
 					sl->flags |= MF_WAIT_SYNC;
 				sl->flags &= ~MF_LPO;
 			}
 			if (!(sl->flags & MF_RPO))
-				sl_lsc_no_processor_outage(q, sl);
+				sl_lsc_no_processor_outage(sl, q);
 			sl->rack += xchg(&sl->rmsu, 0);
 			sl->flags &= ~MF_CONG_DISCARD;
 			sl->flags &= ~MF_CONG_ACCEPT;
 			if (sl->flags & MF_LOC_BUSY)
-				if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY_ENDED)) < 0)
+				if ((err = sl_send_status(sl, q, M2PA_STATUS_BUSY_ENDED)) < 0)
 					return (err);
 			sl->flags &= ~MF_LOC_BUSY;
 			sl_timer_stop(sl, t7);
@@ -3679,7 +4245,7 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 			/* XXX do we do this now??? */
 			if (sl->flags & MF_LPO) {
 				if ((err =
-				     sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE_ENDED)) < 0)
+				     sl_send_status(sl, q, M2PA_STATUS_PROCESSOR_OUTAGE_ENDED)) < 0)
 					return (err);
 				if (sl->i_version >= M2PA_VERSION_DRAFT10)
 					sl->flags |= MF_WAIT_SYNC;
@@ -3691,7 +4257,7 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 				sl_timer_stop(sl, t6);
 				sl->flags &= ~MF_SEND_MSU;
 				fixme(("%s: %p: FIXME: We should not do this...\n", MOD_NAME, sl));
-				if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
+				if ((err = sl_remote_processor_outage_ind(sl, q)) < 0)
 					return (err);
 				return (0);
 			}
@@ -3704,20 +4270,21 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 			}
 			break;
 		}
-		sl_is_stats(q, sl);
+		sl_is_stats(sl, q);
 		sl_set_state(sl, MS_IN_SERVICE);
 		return (0);
 	}
-	ptrace(("%s: %p: Received primitive SL_RESUME_REQ in unexpected state %lu\n",
+	ptrace(("%s: %p: Received primitive SL_RESUME_REQ in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC INLINE int
-sl_lsc_status_out_of_service(queue_t *q, struct sl *sl)
+sl_lsc_status_out_of_service(struct sl *sl, queue_t *q)
 {
 	int err;
 
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	case MS_ALIGNED_READY:
 	case MS_ALIGNED_NOT_READY:
@@ -3725,9 +4292,9 @@ sl_lsc_status_out_of_service(queue_t *q, struct sl *sl)
 	case MS_PROCESSOR_OUTAGE:
 		sl->flags &= ~MF_REM_INS;
 		if (sl->sl.notify.events & SL_EVT_FAIL_RECEIVED_SIOS)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_FAIL_RECEIVED_SIOS, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_RECEIVED_SIOS, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(q, sl, SL_FAIL_RECEIVED_SIOS)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_RECEIVED_SIOS)) < 0)
 			return (err);
 		ptrace(("%s: %p: Link failed: Received SIOS\n", MOD_NAME, sl));
 		return (QR_DONE);
@@ -3735,9 +4302,9 @@ sl_lsc_status_out_of_service(queue_t *q, struct sl *sl)
 	case MS_PROVING:
 		sl->flags &= ~MF_REM_INS;
 		if (sl->sl.notify.events & SL_EVT_FAIL_ALIGNMENT)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(q, sl, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
 			return (err);
 		ptrace(("%s: %p: Link failed: Alignment not possible\n", MOD_NAME, sl));
 		sl->sl.stats.sl_fail_align_or_proving++;
@@ -3747,28 +4314,28 @@ sl_lsc_status_out_of_service(queue_t *q, struct sl *sl)
 	case MS_NOT_ALIGNED:
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: Received status OUT_OF_SERVICE in unexpected state %lu\n",
+	ptrace(("%s: %p: Received status OUT_OF_SERVICE in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC INLINE int
-sl_lsc_retrieve_bsnt(queue_t *q, struct sl *sl)
+sl_lsc_retrieve_bsnt(struct sl *sl, queue_t *q)
 {
 	switch (sl_get_state(sl)) {
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
-		sl_bsnt_ind(q, sl, sl->fsnr);
+		sl_bsnt_ind(sl, q, sl->fsnr);
 		return (0);
 	}
-	ptrace(("%s: %p: Received primitive SL_RETRIEVE_BSNT_REQ in unexpected state %lu\n",
+	ptrace(("%s: %p: Received primitive SL_RETRIEVE_BSNT_REQ in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
 
 STATIC INLINE int
-sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct sl *sl, ulong fsnc)
+sl_lsc_retrieval_request_and_fsnc(struct sl *sl, queue_t *q, uint fsnc)
 {
 	int err;
 	mblk_t *mp;
@@ -3798,24 +4365,24 @@ sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct sl *sl, ulong fsnc)
 			sl->fsnt &= 0xffffff;
 		}
 		while ((mp = bufq_dequeue(&sl->rtb))) {
-			if ((err = sl_retrieved_message_ind(q, sl, mp)) < 0) {
+			if ((err = sl_retrieved_message_ind(sl, q, mp)) < 0) {
 				bufq_queue_head(&sl->rtb, mp);
 				return (err);
 			}
 			sl->flags &= ~MF_RTB_FULL;
 		}
 		while ((mp = bufq_dequeue(&sl->tb))) {
-			if ((err = sl_retrieved_message_ind(q, sl, mp)) < 0) {
+			if ((err = sl_retrieved_message_ind(sl, q, mp)) < 0) {
 				bufq_queue_head(&sl->tb, mp);
 				return (err);
 			}
 		}
-		if ((err = sl_retrieval_complete_ind(q, sl)) < 0)
+		if ((err = sl_retrieval_complete_ind(sl, q)) < 0)
 			return (err);
 		return (0);
 	}
-	ptrace(("%s: %p: Received primitive SL_RETRIEVAL_REQUEST_AND_FSNC_REQ in unexpected state %lu\n", MOD_NAME, sl, sl_get_state(sl)));
-	if ((err = sl_retrieval_not_possible_ind(q, sl)) < 0)
+	ptrace(("%s: %p: Received primitive SL_RETRIEVAL_REQUEST_AND_FSNC_REQ in unexpected state %d\n", MOD_NAME, sl, sl_get_state(sl)));
+	if ((err = sl_retrieval_not_possible_ind(sl, q)) < 0)
 		return (err);
 	return (-EPROTO);
 }
@@ -3839,7 +4406,7 @@ sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct sl *sl, ulong fsnc)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-sl_check_congestion(queue_t *q, struct sl *sl)
+sl_check_congestion(struct sl *sl, queue_t *q)
 {
 	int err;
 	unsigned int occupancy = sl->tb.q_count + sl->rtb.q_count;
@@ -3934,14 +4501,14 @@ sl_check_congestion(queue_t *q, struct sl *sl)
 	if (sl->sl.statem.cong_status != old_cong_status
 	    || sl->sl.statem.disc_status != old_disc_status) {
 		if (sl->sl.statem.cong_status < old_cong_status)
-			sl_link_congestion_ceased_ind(q, sl, sl->sl.statem.cong_status,
+			sl_link_congestion_ceased_ind(sl, q, sl->sl.statem.cong_status,
 						      sl->sl.statem.disc_status);
 		else {
 			if (sl->sl.statem.cong_status > old_cong_status) {
 				if (sl->sl.notify.events & SL_EVT_CONGEST_ONSET_IND
 				    && !sl->sl.stats.sl_cong_onset_ind[sl->sl.statem.cong_status]++)
 					if ((err =
-					     lmi_event_ind(q, sl, SL_EVT_CONGEST_ONSET_IND, 0,
+					     lmi_event_ind(sl, q, SL_EVT_CONGEST_ONSET_IND, 0,
 							   &sl->sl.statem.cong_status,
 							   sizeof(sl->sl.statem.cong_status))) < 0)
 						return (err);
@@ -3951,14 +4518,14 @@ sl_check_congestion(queue_t *q, struct sl *sl)
 				if (sl->sl.notify.events & SL_EVT_CONGEST_DISCD_IND
 				    && !sl->sl.stats.sl_cong_discd_ind[sl->sl.statem.disc_status]++)
 					if ((err =
-					     lmi_event_ind(q, sl, SL_EVT_CONGEST_DISCD_IND, 0,
+					     lmi_event_ind(sl, q, SL_EVT_CONGEST_DISCD_IND, 0,
 							   &sl->sl.statem.disc_status,
 							   sizeof(sl->sl.statem.disc_status))) < 0)
 						return (err);
 				ptrace(("%s: %p: Congestion discard: level %ld\n", MOD_NAME,
 					sl, (ulong) sl->sl.statem.cong_status));
 			}
-			sl_link_congested_ind(q, sl, sl->sl.statem.cong_status,
+			sl_link_congested_ind(sl, q, sl->sl.statem.cong_status,
 					      sl->sl.statem.disc_status);
 		}
 	}
@@ -3983,11 +4550,12 @@ sl_check_congestion(queue_t *q, struct sl *sl)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_recv_datack(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_recv_datack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
 	uint count;
 
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl->i_version) {
 	case M2PA_VERSION_DRAFT3_1:
 	{
@@ -3996,7 +4564,7 @@ sl_recv_datack(queue_t *q, struct sl *sl, mblk_t *mp)
 			count = ntohl(*(uint32_t *) mp->b_wptr);
 			mp->b_wptr += sizeof(uint32_t);
 			if (count) {
-				if ((err = sl_txc_datack(q, sl, count)) < 0)
+				if ((err = sl_txc_datack(sl, q, count)) < 0)
 					return (err);
 				return (QR_DONE);
 			}
@@ -4028,9 +4596,9 @@ sl_recv_datack(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_recv_proving(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_recv_proving(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	(void) mp;
+	sl->flags &= ~MF_REM_ALN;
 	switch (sl->i_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
@@ -4057,7 +4625,7 @@ sl_recv_proving(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_recv_status(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_recv_status(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	size_t hlen;			/* M2PA-specific header length */
 	size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
@@ -4090,34 +4658,34 @@ sl_recv_status(queue_t *q, struct sl *sl, mblk_t *mp)
 		switch (status) {
 		case M2PA_STATUS_BUSY_ENDED:
 			printd(("%s: %p: <- BUSY-ENDED\n", MOD_NAME, sl));
-			return sl_lsc_status_busy_ended(q, sl);
+			return sl_lsc_status_busy_ended(sl, q);
 		case M2PA_STATUS_IN_SERVICE:
 			printd(("%s: %p: <- IN-SERVICE\n", MOD_NAME, sl));
-			return sl_lsc_status_in_service(q, sl, mp);
+			return sl_lsc_status_in_service(sl, q, mp);
 		case M2PA_STATUS_PROCESSOR_OUTAGE_ENDED:
 			printd(("%s: %p: <- PROCESSOR-ENDED\n", MOD_NAME, sl));
-			return sl_lsc_status_processor_outage_ended(q, sl, mp);
+			return sl_lsc_status_processor_outage_ended(sl, q, mp);
 		case M2PA_STATUS_OUT_OF_SERVICE:
 			printd(("%s: %p: <- OUT-OF-SERVICE\n", MOD_NAME, sl));
-			return sl_lsc_status_out_of_service(q, sl);
+			return sl_lsc_status_out_of_service(sl, q);
 		case M2PA_STATUS_PROCESSOR_OUTAGE:
 			printd(("%s: %p: <- PROCESSOR-OUTAGE\n", MOD_NAME, sl));
-			return sl_lsc_status_processor_outage(q, sl);
+			return sl_lsc_status_processor_outage(sl, q);
 		case M2PA_STATUS_BUSY:
 			printd(("%s: %p: <- BUSY\n", MOD_NAME, sl));
-			return sl_lsc_status_busy(q, sl);
+			return sl_lsc_status_busy(sl, q);
 		case M2PA_STATUS_ALIGNMENT:
 			printd(("%s: %p: <- ALIGNMENT\n", MOD_NAME, sl));
-			return sl_lsc_status_alignment(q, sl);
+			return sl_lsc_status_alignment(sl, q);
 		case M2PA_STATUS_PROVING_NORMAL:
 			printd(("%s: %p: <- PROVING-NORMAL\n", MOD_NAME, sl));
-			return sl_lsc_status_proving_normal(q, sl);
+			return sl_lsc_status_proving_normal(sl, q);
 		case M2PA_STATUS_PROVING_EMERGENCY:
 			printd(("%s: %p: <- PROVING-EMERGENCY\n", MOD_NAME, sl));
-			return sl_lsc_status_proving_emergency(q, sl);
+			return sl_lsc_status_proving_emergency(sl, q);
 		case M2PA_STATUS_ACK:
 			printd(("%s: %p: <- ACK\n", MOD_NAME, sl));
-			return sl_rc_signal_unit(q, sl, mp);
+			return sl_rc_signal_unit(sl, q, mp);
 		}
 		rare();
 		return (-EPROTO);
@@ -4131,7 +4699,7 @@ sl_recv_status(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_recv_data(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	size_t hlen;			/* M2PA-specific header length */
 	size_t rlen;			/* Routing Label length */
@@ -4188,7 +4756,7 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
 	case M2PA_VERSION_DRAFT5:
 		if (mlen > hlen + rlen || mlen == 0) {
 			printd(("%s: %p: <- DATA\n", MOD_NAME, sl));
-			return sl_rc_signal_unit(q, sl, mp);
+			return sl_rc_signal_unit(sl, q, mp);
 		}
 		break;
 	case M2PA_VERSION_DRAFT6:
@@ -4203,7 +4771,7 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
 		/* In the final, zero-length data messages are used as spearate acknowledgements. */
 		if (mlen > hlen + rlen || mlen == hlen || mlen == 0) {
 			printd(("%s: %p: <- DATA\n", MOD_NAME, sl));
-			return sl_rc_signal_unit(q, sl, mp);
+			return sl_rc_signal_unit(sl, q, mp);
 		}
 		break;
 	}
@@ -4216,7 +4784,7 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC int
-sl_recv_msg(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_recv_msg(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	uint32_t mlen;
 	uint32_t type;
@@ -4250,16 +4818,16 @@ sl_recv_msg(queue_t *q, struct sl *sl, mblk_t *mp)
 
 		switch (type) {
 		case M2PA_DATA_MESSAGE:
-			err = sl_recv_data(q, sl, mp);
+			err = sl_recv_data(sl, q, mp);
 			break;
 		case M2PA_STATUS_MESSAGE:
-			err = sl_recv_status(q, sl, mp);
+			err = sl_recv_status(sl, q, mp);
 			break;
 		case M2PA_PROVING_MESSAGE:
-			err = sl_recv_proving(q, sl, mp);
+			err = sl_recv_proving(sl, q, mp);
 			break;
 		case M2PA_ACK_MESSAGE:
-			err = sl_recv_datack(q, sl, mp);
+			err = sl_recv_datack(sl, q, mp);
 			break;
 		default:
 			goto eproto;
@@ -4280,129 +4848,390 @@ sl_recv_msg(queue_t *q, struct sl *sl, mblk_t *mp)
 /*
  *  -------------------------------------------------------------------------
  *
+ *  NP User -> NP Provider Primitives
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+#if 0
+/**
+ * ne_conn_req: - process N_CONN_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_CONN_REQ primitive
+ */
+static int
+ne_conn_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_not_n_state(sl, NSF_IDLE))
+		goto outstate;
+	return n_pass_down(sl, q, mp, NS_WCON_CREQ, LMI_ENABLE_PENDING);
+      outstate:
+	return n_error_ack(sl, q, N_CONN_REQ, NOUTSTATE);
+}
+
+/**
+ * ne_conn_res: - process N_CONN_RES primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_CONN_RES primitive
+ */
+static int
+ne_conn_res(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_not_n_state(sl, NSF_WRES_CIND))
+		goto outstate;
+	return n_pass_down(sl, q, mp, NS_WACK_CRES, LMI_ENABLE_PENDING);
+      outstate:
+	return n_error_ack(sl, q, N_CONN_RES, NOUTSTATE);
+}
+
+/**
+ * ne_discon_req: - process N_DISCON_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_DISCON_REQ primitive
+ */
+static int
+ne_discon_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_not_n_state(sl, (NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER |
+				NSF_WCON_RREQ | NSF_WRES_RIND)))
+		goto outstate;
+	switch (sl_get_n_state(sl)) {
+	case NS_WCON_CREQ:
+		return n_pass_down(sl, q, mp, NS_WACK_DREQ6, LMI_DISABLE_PENDING);
+	case NS_WRES_CIND:
+		return n_pass_down(sl, q, mp, NS_WACK_DREQ7, LMI_DISABLE_PENDING);
+	case NS_DATA_XFER:
+		return n_pass_down(sl, q, mp, NS_WACK_DREQ9, LMI_DISABLE_PENDING);
+	case NS_WCON_RREQ:
+		return n_pass_down(sl, q, mp, NS_WACK_DREQ10, LMI_DISABLE_PENDING);
+	case NS_WRES_RIND:
+		return n_pass_down(sl, q, mp, NS_WACK_DREQ11, LMI_DISABLE_PENDING);
+	}
+	goto outstate;
+      outstate:
+	return n_error_ack(sl, q, N_DISCON_REQ, NOUTSTATE);
+}
+
+STATIC int m_error_reply(struct sl *sl, queue_t *q, int err);
+
+/**
+ * ne_data_req: - process N_DATA_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_DATA_REQ primitive
+ */
+static int
+ne_data_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_chk_n_state(sl, NSF_IDLE))
+		goto discard;
+	if (sl_not_n_state(sl, NSF_DATA_XFER))
+		goto outstate;
+	return n_pass_down(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+      outstate:
+	return m_error_reply(sl, q, -EPROTO);
+      discard:
+	return (QR_DONE);
+}
+
+/**
+ * ne_exdata_req: - process N_EXDATA_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_EXDATA_REQ primitive
+ */
+static int
+ne_exdata_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_chk_n_state(sl, NSF_IDLE))
+		goto discard;
+	if (sl_not_n_state(sl, NSF_DATA_XFER))
+		goto outstate;
+	return n_pass_down(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+      outstate:
+	return m_error_reply(sl, q, -EPROTO);
+      discard:
+	return (QR_DONE);
+}
+
+/**
+ * ne_info_req: - process N_INFO_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_INFO_REQ primitive
+ */
+static int
+ne_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	return n_pass_down(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+}
+
+/**
+ * ne_bind_req: - process N_BIND_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_BIND_REQ primitive
+ */
+static int
+ne_bind_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_not_n_state(sl, NSF_UNBND))
+		goto outstate;
+	return n_pass_down(sl, q, mp, NS_WACK_BREQ, LMI_ATTACH_PENDING);
+      outstate:
+	return n_error_ack(sl, q, N_BIND_REQ, NOUTSTATE);
+}
+
+/**
+ * ne_unbind_req: - process N_UNBIND_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_UNBIND_REQ primitive
+ */
+static int
+ne_unbind_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_not_n_state(sl, NSF_IDLE))
+		goto outstate;
+	return n_pass_down(sl, q, mp, NS_WACK_UREQ, LMI_DETACH_PENDING);
+      outstate:
+	return n_error_ack(sl, q, N_UNBIND_REQ, NOUTSTATE);
+}
+
+/**
+ * ne_unitdata_req: - process N_UNITDATA_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_UNITDATA_REQ primitive
+ */
+static int
+ne_unitdata_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_not_n_state(sl, NSF_IDLE))
+		goto outstate;
+	return n_pass_down(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+      outstate:
+	return m_error_reply(sl, q, -EPROTO);
+}
+
+/**
+ * ne_optmgmt_req: - process N_OPTMGMT_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_OPTMGMT_REQ primitive
+ */
+static int
+ne_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_get_n_state(sl) == NS_IDLE)
+		return n_pass_down(sl, q, mp, NS_WACK_OPTREQ, sl_get_i_state(sl));
+	return n_pass_down(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+}
+
+/**
+ * ne_datack_req: - process N_DATACK_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_DATACK_REQ primitive
+ */
+static int
+ne_datack_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_get_n_state(sl) != NS_IDLE)
+		goto outstate;
+	return n_pass_down(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+      outstate:
+	return m_error_reply(sl, q, -EPROTO);
+}
+
+/**
+ * ne_reset_req: - process N_RESET_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_RESET_REQ primitive
+ */
+static int
+ne_reset_req(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_not_n_state(sl, NSF_DATA_XFER))
+		goto outstate;
+	return n_pass_down(sl, q, mp, NS_WCON_CREQ, LMI_ENABLED);
+      outstate:
+	return n_error_ack(sl, q, N_RESET_REQ, NOUTSTATE);
+}
+
+/**
+ * ne_reset_res: - process N_RESET_RES primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the N_RESET_RES primitive
+ */
+static int
+ne_reset_res(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	if (sl_not_n_state(sl, NSF_WRES_RIND))
+		goto outstate;
+	return n_pass_down(sl, q, mp, NS_WACK_RRES, LMI_ENABLED);
+      outstate:
+	return n_error_ack(sl, q, N_RESET_RES, NOUTSTATE);
+}
+#endif
+
+/*
+ *  -------------------------------------------------------------------------
+ *
  *  SL User -> SL Provider (M2PA) Primitives
  *
  *  -------------------------------------------------------------------------
+ */
+
+/**
+ * lmi_info_req: - process LMI_INFO_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the LMI_INFO_REQ primitive
+ */
+static int
+lmi_info_req(struct sl * sl, queue_t *q, mblk_t *mp)
+{
+	return lmi_info_ack(sl, q);
+}
+
+/**
+ * lmi_attach_req: - process LMI_ATTACH_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the LMI_ATTACH_REQ primitive
  *
- *  LMI_INFO_REQ
- *  ---------------------------------------------
+ * The attach request was orignally unsupported in M2PA but there was a problem with data being
+ * delivered to the Stream head when connected before the module was pushed, so attach is now
+ * equivalent to a bind.  The PPA is the local sockaddr_in structure to which to bind.
  */
-STATIC INLINE int
-lmi_info_req(queue_t *q, struct sl *sl, mblk_t *mp)
+static int
+lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	return lmi_info_ack(q, sl);
+	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
+	int err;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_get_i_state(sl) != LMI_UNATTACHED)
+		goto outstate;
+	return n_bind_req(sl, q, (caddr_t) (p + 1), mp->b_wptr - mp->b_rptr - sizeof(*p));
+      outstate:
+	ptrace(("%s: %p: PROTO: would place interface out of state\n", MOD_NAME, sl));
+	err = LMI_OUTSTATE;
+	goto error;
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return lmi_error_ack(sl, q, LMI_ATTACH_REQ, err);
 }
 
-/*
- *  LMI_ATTACH_REQ
- *  ---------------------------------------------
+/**
+ * lmi_detach_req: - process LMI_DETACH_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the LMI_DETACH_REQ primitive
+ *
+ * The detach request was originally unsupported in M2PA, but there was a problem with data being
+ * delivered to the Stream head when connected before the module was pushed, so detach is now
+ * equivalent to an unbind.
  */
-STATIC INLINE int
-lmi_attach_req(queue_t *q, struct sl *sl, mblk_t *mp)
+static int
+lmi_detach_req(struct sl * sl, queue_t *q, mblk_t *mp)
 {
+	lmi_detach_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	lmi_attach_req_t *p = (lmi_attach_req_t *) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		if (sl->i_state == LMI_UNATTACHED) {
-			sl->i_state = LMI_ATTACH_PENDING;
-			ptrace(("%s: %p: PROTO: Primitive is not supported\n", MOD_NAME, sl));
-			err = LMI_NOTSUPP;
-		} else {
-			ptrace(("%s: %p: PROTO: would place interface out of state\n",
-				MOD_NAME, sl));
-			err = LMI_OUTSTATE;
-		}
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return lmi_error_ack(q, sl, LMI_ATTACH_REQ, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_get_i_state(sl) != LMI_DISABLED)
+		goto outstate;
+	return n_unbind_req(sl, q);
+      outstate:
+	ptrace(("%s: %p: PROTO: would place interface out of state\n", MOD_NAME, sl));
+	err = LMI_OUTSTATE;
+	goto error;
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return lmi_error_ack(sl, q, LMI_DETACH_REQ, err);
 }
 
-/*
- *  LMI_DETACH_REQ
- *  ---------------------------------------------
+/**
+ * lmi_enable_req: - process LMI_ENABLE_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the LMI_ENABLE_REQ primitive
+ *
+ * The enable request was originally a null operation in M2PA, but there was a problem with data
+ * being delivered to the Stream head when connected before the module was pushed, so enable is now
+ * equivalent to a connect.
  */
-STATIC INLINE int
-lmi_detach_req(queue_t *q, struct sl *sl, mblk_t *mp)
+static int
+lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
+	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	lmi_detach_req_t *p = (lmi_detach_req_t *) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		if (sl->i_state == LMI_DISABLED) {
-			sl->i_state = LMI_DETACH_PENDING;
-			ptrace(("%s: %p: PROTO: Primitive is not supported\n", MOD_NAME, sl));
-			err = LMI_NOTSUPP;
-		} else {
-			ptrace(("%s: %p: PROTO: would place interface out of state\n",
-				MOD_NAME, sl));
-			err = LMI_OUTSTATE;
-		}
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return lmi_error_ack(q, sl, LMI_DETACH_REQ, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_get_i_state(sl) != LMI_DISABLED)
+		goto outstate;
+	return n_conn_req(sl, q, (caddr_t) (p + 1), mp->b_wptr - mp->b_rptr - sizeof(*p));
+      outstate:
+	ptrace(("%s: %p: PROTO: would place interface out of state\n", MOD_NAME, sl));
+	err = LMI_OUTSTATE;
+	goto error;
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return lmi_error_ack(sl, q, LMI_ENABLE_REQ, err);
 }
 
-/*
- *  LMI_ENABLE_REQ
- *  ---------------------------------------------
+/**
+ * lmi_disable_req: - process LMI_DISABLE_REQ primitive
+ * @sl: private structure
+ * @q: active queue (write queue)
+ * @mp: the LMI_DISABLE_REQ primitive
+ *
+ * The disable request was originally a null operation in M2PA, but there was a problem with data
+ * being delivered to the Stream head when connected before the module was pushed, so disable is now
+ * equivalent to a disconnect.
  */
-STATIC INLINE int
-lmi_enable_req(queue_t *q, struct sl *sl, mblk_t *mp)
+static int
+lmi_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
+	lmi_disable_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	lmi_enable_req_t *p = (lmi_enable_req_t *) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		if (sl->i_state == LMI_DISABLED) {
-			sl->i_state = LMI_ENABLE_PENDING;
-			return lmi_enable_con(q, sl);
-		} else {
-			ptrace(("%s: %p: PROTO: would place interface out of state\n",
-				MOD_NAME, sl));
-			err = LMI_OUTSTATE;
-		}
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return lmi_error_ack(q, sl, LMI_ENABLE_REQ, err);
-}
-
-/*
- *  LMI_DISABLE_REQ
- *  ---------------------------------------------
- */
-STATIC INLINE int
-lmi_disable_req(queue_t *q, struct sl *sl, mblk_t *mp)
-{
-	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	lmi_disable_req_t *p = (lmi_disable_req_t *) mp->b_rptr;
-
-	if (mlen >= sizeof(*p)) {
-		if (sl->i_state == LMI_ENABLED || sl->i_state == LMI_ENABLE_PENDING) {
-			if ((err = sl_lsc_stop(q, sl)) < 0)
-				return (err);
-			sl->i_state = LMI_DISABLE_PENDING;
-			return lmi_disable_con(q, sl);
-		} else {
-			ptrace(("%s: %p: PROTO: would place interface out of state\n",
-				MOD_NAME, sl));
-			err = LMI_OUTSTATE;
-		}
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return lmi_error_ack(q, sl, LMI_DISABLE_REQ, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_not_i_state(sl, (LMF_ENABLED | LMF_ENABLE_PENDING)))
+		goto outstate;
+	if ((err = sl_lsc_stop(sl, q)) < 0)
+		return (err);
+	return n_discon_req(sl, q, N_DISC_NORMAL);
+      outstate:
+	ptrace(("%s: %p: PROTO: would place interface out of state\n", MOD_NAME, sl));
+	err = LMI_OUTSTATE;
+	goto error;
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return lmi_error_reply(sl, q, LMI_DISABLE_REQ, err);
 }
 
 /*
@@ -4410,20 +5239,24 @@ lmi_disable_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-lmi_optmgmt_req(queue_t *q, struct sl *sl, mblk_t *mp)
+lmi_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	lmi_optmgmt_req_t *p = (lmi_optmgmt_req_t *) mp->b_rptr;
+	lmi_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		ptrace(("%s: %p: PROTO: Primitive is not supported\n", MOD_NAME, sl));
-		err = LMI_NOTSUPP;
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return lmi_error_ack(q, sl, LMI_OPTMGMT_REQ, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	goto notsupp;
+      notsupp:
+	ptrace(("%s: %p: PROTO: Primitive is not supported\n", MOD_NAME, sl));
+	err = LMI_NOTSUPP;
+	goto error;
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return lmi_error_ack(sl, q, LMI_OPTMGMT_REQ, err);
 }
 
 /*
@@ -4434,7 +5267,7 @@ lmi_optmgmt_req(queue_t *q, struct sl *sl, mblk_t *mp)
 #define abs(x) ((x)<0 ? -(x):(x))
 #endif
 STATIC int
-m_error_reply(queue_t *q, struct sl *sl, int err)
+m_error_reply(struct sl *sl, queue_t *q, int err)
 {
 	mblk_t *mp;
 
@@ -4471,27 +5304,29 @@ m_error_reply(queue_t *q, struct sl *sl, int err)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_pdu_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_pdu_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
 	mblk_t *dp;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_pdu_req_t *p = (sl_pdu_req_t *) mp->b_rptr;
+	sl_pdu_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		if ((dp = mp->b_cont)) {
-			if ((err = sl_lsc_pdu(q, sl, dp)) < 0)
-				return (err);
-			return (QR_TRIMMED);	/* data absorbed */
-		} else {
-			ptrace(("%s: %p: PROTO: No M_DATA block\n", MOD_NAME, sl));
-			err = LMI_BADPRIM;
-		}
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if ((dp = mp->b_cont) == NULL)
+		goto badprim;
+	if ((err = sl_lsc_pdu(sl, q, dp)) < 0)
+		return (err);
+	return (QR_TRIMMED);	/* data absorbed */
+      badprim:
+	ptrace(("%s: %p: PROTO: No M_DATA block\n", MOD_NAME, sl));
+	err = LMI_BADPRIM;
+	goto error;
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4499,19 +5334,20 @@ sl_pdu_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_emergency_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_emergency_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_emergency_req_t *p = (sl_emergency_req_t *) mp->b_rptr;
+	sl_emergency_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_emergency(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_emergency(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4519,19 +5355,20 @@ sl_emergency_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_emergency_ceases_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_emergency_ceases_req_t *p = (sl_emergency_ceases_req_t *) mp->b_rptr;
+	sl_emergency_ceases_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_emergency_ceases(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_emergency_ceases(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4539,19 +5376,20 @@ sl_emergency_ceases_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_start_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_start_req_t *p = (sl_start_req_t *) mp->b_rptr;
+	sl_start_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_start(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_start(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4559,19 +5397,20 @@ sl_start_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_stop_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_stop_req_t *p = (sl_stop_req_t *) mp->b_rptr;
+	sl_stop_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_stop(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_stop(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4579,19 +5418,20 @@ sl_stop_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_retrieve_bsnt_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_retrieve_bsnt_req_t *p = (sl_retrieve_bsnt_req_t *) mp->b_rptr;
+	sl_retrieve_bsnt_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_retrieve_bsnt(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_retrieve_bsnt(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4599,19 +5439,20 @@ sl_retrieve_bsnt_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_retrieval_request_and_fsnc_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_retrieval_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_retrieval_req_and_fsnc_t *p = (sl_retrieval_req_and_fsnc_t *) mp->b_rptr;
+	sl_retrieval_req_and_fsnc_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_retrieval_request_and_fsnc(q, sl, p->sl_fsnc);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_retrieval_request_and_fsnc(sl, q, p->sl_fsnc);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4619,19 +5460,20 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_resume_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_resume_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_resume_req_t *p = (sl_resume_req_t *) mp->b_rptr;
+	sl_resume_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_resume(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_resume(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4639,19 +5481,20 @@ sl_resume_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_clear_buffers_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_clear_buffers_req_t *p = (sl_clear_buffers_req_t *) mp->b_rptr;
+	sl_clear_buffers_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_clear_buffers(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_clear_buffers(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4659,19 +5502,20 @@ sl_clear_buffers_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_clear_rtb_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_clear_rtb_req_t *p = (sl_clear_rtb_req_t *) mp->b_rptr;
+	sl_clear_rtb_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_clear_rtb(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_clear_rtb(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4679,19 +5523,20 @@ sl_clear_rtb_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_local_processor_outage_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_local_proc_outage_req_t *p = (sl_local_proc_outage_req_t *) mp->b_rptr;
+	sl_local_proc_outage_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_local_processor_outage(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_local_processor_outage(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4699,19 +5544,20 @@ sl_local_processor_outage_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_congestion_discard_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_cong_discard_req_t *p = (sl_cong_discard_req_t *) mp->b_rptr;
+	sl_cong_discard_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_congestion_discard(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_congestion_discard(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4719,19 +5565,20 @@ sl_congestion_discard_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_congestion_accept_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_cong_accept_req_t *p = (sl_cong_accept_req_t *) mp->b_rptr;
+	sl_cong_accept_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_congestion_accept(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_congestion_accept(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4739,19 +5586,20 @@ sl_congestion_accept_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_no_congestion_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_no_cong_req_t *p = (sl_no_cong_req_t *) mp->b_rptr;
+	sl_no_cong_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_no_congestion(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_no_congestion(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4759,19 +5607,20 @@ sl_no_congestion_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  ---------------------------------------------
  */
 STATIC INLINE int
-sl_power_on_req(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_power_on_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sl_power_on_req_t *p = (sl_power_on_req_t *) mp->b_rptr;
+	sl_power_on_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
-		return sl_lsc_power_on(q, sl);
-	} else {
-		ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
-		err = LMI_PROTOSHORT;
-	}
-	return m_error_reply(q, sl, err);
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	return sl_lsc_power_on(sl, q);
+      protoshort:
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, sl));
+	err = LMI_PROTOSHORT;
+	goto error;
+      error:
+	return m_error_reply(sl, q, err);
 }
 
 /*
@@ -4780,20 +5629,397 @@ sl_power_on_req(queue_t *q, struct sl *sl, mblk_t *mp)
  *  NPI Provider -> NPI User (M2PA) Primitives
  *
  *  -------------------------------------------------------------------------
- *
- *  N_DATA_IND
- *  ---------------------------------------------
+ */
+
+/**
+ * ne_bind_ack: - process received N_BIND_ACK primitive
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_BIND_ACK primitive
  */
 STATIC int
-n_data_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp, ulong more)
+ne_bind_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	/* Normally we receive data unfragmented and in a singled M_DATA block.  This slower
-	   routine handles the circumstance where we receive fragmented data or data that is
-	   chained together in multiple M_DATA blocks. */
-	mblk_t *newp = NULL;
+	N_bind_ack_t *p = (typeof(p)) mp->b_rptr;
 
-	seldom();
-	if (dp->b_cont) {
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl->n_request) {
+		if (sl_get_n_state(sl) != NS_WACK_BREQ)
+			goto outstate;
+		bcopy(mp->b_rptr + p->ADDR_offset, &sl->loc, p->ADDR_length);
+		sl->loc_len = p->ADDR_length;
+		return n_pass_along(sl, q, mp, NS_IDLE, LMI_DISABLED);
+	} else {
+		if (sl_get_i_state(sl) != LMI_ATTACH_PENDING)
+			goto outstate;
+		bcopy(mp->b_rptr + p->ADDR_offset, &sl->loc, p->ADDR_length);
+		sl->loc_len = p->ADDR_length;
+		return lmi_ok_ack(sl, q, LMI_ATTACH_REQ);
+	}
+      protoshort:
+	pswerr(("%s: %p: N_BIND_ACK received too short!\n", MOD_NAME, sl));
+	return (-EMSGSIZE);
+      outstate:
+	pswerr(("%s: %p: N_BIND_ACK received in incorrect state!\n", MOD_NAME, sl));
+	return (-EPROTO);
+}
+
+/**
+ * ne_ok_ack: - process received N_OK_ACK primitive
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_OK_ACK primitive
+ */
+STATIC int
+ne_ok_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	N_ok_ack_t *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl->n_request) {
+		switch (p->CORRECT_prim) {
+		case N_UNBIND_REQ:
+			if (sl_get_n_state(sl) != NS_WACK_UREQ)
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_UNBND, LMI_UNATTACHED);
+		case N_DISCON_REQ:
+			if (sl_not_n_state(sl, (NSF_WACK_DREQ6 | NSF_WACK_DREQ7 |
+						NSF_WACK_DREQ9 | NSF_WACK_DREQ10 |
+						NSF_WACK_DREQ11)))
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_IDLE, LMI_DISABLED);
+		case N_OPTMGMT_REQ:
+			if (sl_get_n_state(sl) == NS_WACK_OPTREQ)
+				return n_pass_along(sl, q, mp, NS_IDLE, LMI_DISABLED);
+			return n_pass_along(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+		case N_CONN_RES:
+			if (sl_get_n_state(sl) != NS_WACK_CRES)
+				goto outstate;
+			/* FIXME: NS_DATA_XFER if accepted on listening stream */
+			if (--sl->coninds)
+				return n_pass_along(sl, q, mp, NS_WRES_CIND, LMI_ENABLED);
+			return n_pass_along(sl, q, mp, NS_IDLE, LMI_ENABLED);
+		case N_RESET_RES:
+			if (sl_get_n_state(sl) != NS_WACK_RRES)
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_DATA_XFER, LMI_ENABLED);
+		default:
+			swerr();
+			return n_pass_along(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+		}
+	} else {
+		switch (p->CORRECT_prim) {
+		case N_UNBIND_REQ:
+			if (sl_get_i_state(sl) != LMI_DETACH_PENDING)
+				goto outstate;
+			return lmi_ok_ack(sl, q, LMI_DETACH_REQ);
+		case N_DISCON_REQ:
+			if (sl_get_i_state(sl) != LMI_DISABLE_PENDING)
+				goto outstate;
+			return lmi_disable_con(sl, q);
+		case N_OPTMGMT_REQ:
+			return (0);
+		case N_CONN_RES:
+		case N_RESET_RES:
+		default:
+			swerr();
+			return (0);
+		}
+	}
+      protoshort:
+	pswerr(("%s: %p: N_OK_ACK received too short!\n", MOD_NAME, sl));
+	return (-EMSGSIZE);
+      outstate:
+	pswerr(("%s: %p: Unpexected N_OK_ACK primitive!\n", MOD_NAME, sl));
+	return (-EPROTO);
+}
+
+/**
+ * ne_conn_con: - process received N_CONN_CON primitive
+ * @q: active queue (read queue)
+ * @sl: private structure
+ * @mp: the N_CONN_CON primitive
+ */
+STATIC int
+ne_conn_con(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	N_conn_con_t *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl->n_request) {
+		if (sl_get_n_state(sl) != NS_WCON_CREQ)
+			goto outstate;
+		return n_pass_along(sl, q, mp, NS_DATA_XFER, LMI_ENABLED);
+	} else {
+		if (sl_get_i_state(sl) != LMI_ENABLE_PENDING)
+			goto outstate;
+		return lmi_enable_con(sl, q);
+	}
+      protoshort:
+	pswerr(("%s: %p: N_CONN_CON received too short!\n", MOD_NAME, sl));
+	return (-EMSGSIZE);
+      outstate:
+	pswerr(("%s: %p: N_CONN_CON primitive unexpected!\n", MOD_NAME, sl));
+	return (-EPROTO);
+}
+
+/**
+ * ne_discon_ind: - process received N_DISCON_IND primitive
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_DISCON_IND primitive
+ *
+ * TODO: careful about flushing when sending N_DISCON_REQ.  When we receive a
+ * flush from below, we should really not pass it to the Stream head but
+ * should loop it back around.  Also when we receive a flush from the Stream
+ * head, we should not pass it down, but loop it back to the Stream head, both
+ * as though we were a multiplexing driver instead of a module.
+ */
+STATIC int
+ne_discon_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	N_discon_ind_t *p = (typeof(p)) mp->b_rptr;
+	int err;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (p->RES_length != 0 && p->RES_length % sizeof(struct sockaddr_in) != 0)
+		goto badaddr;
+	if (sl_get_i_state(sl) == LMI_ENABLED) {
+		/* double out of service ok, double notify not ok */
+		if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_SUERM_EIM)) < 0)
+			return (err);
+		ptrace(("%s: %p: Link failed: SUERM/EIM\n", MOD_NAME, sl));
+		if (sl->sl.notify.events & SL_EVT_FAIL_SUERM_EIM)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_SUERM_EIM, 0, NULL, 0)) < 0)
+				return (err);
+	}
+	if (sl->n_request) {
+		if (sl_not_n_state(sl, (NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER |
+					NSF_WCON_RREQ | NSF_WRES_RIND)))
+			goto outstate;
+		return n_pass_along(sl, q, mp, NS_IDLE, LMI_DISABLED);
+	} else {
+		switch (sl_get_i_state(sl)) {
+		case LMI_ENABLE_PENDING:
+			return lmi_error_ack(sl, q, LMI_ENABLE_REQ, -ECONNABORTED);
+		case LMI_ENABLED:
+			return lmi_error_ind(sl, q, LMI_DISC, true);
+		case LMI_DISABLE_PENDING:
+		case LMI_DISABLED:
+		case LMI_UNUSABLE:
+			/* ignore it, we are already disabled */
+			goto discard;
+		default:
+			goto outstate;
+		}
+	}
+      discard:
+	return (QR_DONE);
+      protoshort:
+	pswerr(("%s: %p: N_CONN_CON received too short!\n", MOD_NAME, sl));
+	return (-EMSGSIZE);
+      badaddr:
+	pswerr(("%s: %p: N_CONN_CON contained badd address!\n", MOD_NAME, sl));
+	return (-EINVAL);
+      outstate:
+	pswerr(("%s: %p: N_CONN_CON primitive unexpected!\n", MOD_NAME, sl));
+	return (-EPROTO);
+}
+
+/**
+ * ne_error_ack: - process received N_ERROR_ACK primitive
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_ERROR_ACK primitive
+ */
+STATIC int
+ne_error_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	N_error_ack_t *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl->n_request) {
+		switch (p->ERROR_prim) {
+		case N_BIND_REQ:
+			if (sl_get_n_state(sl) != NS_WACK_BREQ)
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_UNBND, LMI_UNATTACHED);
+		case N_UNBIND_REQ:
+			if (sl_get_n_state(sl) != NS_WACK_UREQ)
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_IDLE, LMI_DISABLED);
+		case N_CONN_REQ:
+			if (sl_get_n_state(sl) != NS_WCON_CREQ)
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_IDLE, LMI_DISABLED);
+		case N_CONN_RES:
+			if (sl_get_n_state(sl) != NS_WACK_CRES)
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_WRES_CIND, LMI_ENABLE_PENDING);
+		case N_RESET_REQ:
+			if (sl_get_n_state(sl) != NS_WCON_RREQ)
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_DATA_XFER, LMI_ENABLED);
+		case N_RESET_RES:
+			if (sl_get_n_state(sl) != NS_WRES_RIND)
+				goto outstate;
+			return n_pass_along(sl, q, mp, NS_DATA_XFER, LMI_ENABLED);
+		case N_DISCON_REQ:
+			switch (sl_get_n_state(sl)) {
+			case NS_WACK_DREQ6:
+				return n_pass_along(sl, q, mp, NS_WCON_CREQ, LMI_ENABLED);
+			case NS_WACK_DREQ7:
+				return n_pass_along(sl, q, mp, NS_WRES_CIND, LMI_ENABLED);
+			case NS_WACK_DREQ9:
+				return n_pass_along(sl, q, mp, NS_DATA_XFER, LMI_ENABLED);
+			case NS_WACK_DREQ10:
+				return n_pass_along(sl, q, mp, NS_WCON_RREQ, LMI_ENABLED);
+			case NS_WACK_DREQ11:
+				return n_pass_along(sl, q, mp, NS_WRES_RIND, LMI_ENABLED);
+			default:
+				goto outstate;
+			}
+		default:
+			swerr();
+			return n_pass_along(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+		}
+	} else {
+		switch (p->ERROR_prim) {
+		case N_BIND_REQ:
+			if (sl_get_i_state(sl) != LMI_ATTACH_PENDING)
+				goto outstate;
+			return lmi_error_ack(sl, q, LMI_ATTACH_REQ, -EFAULT);
+		case N_UNBIND_REQ:
+			if (sl_get_i_state(sl) != LMI_DETACH_PENDING)
+				goto outstate;
+			return lmi_error_ack(sl, q, LMI_DETACH_REQ, -EFAULT);
+		case N_CONN_REQ:
+			if (sl_get_i_state(sl) != LMI_ENABLE_PENDING)
+				goto outstate;
+			return lmi_error_ack(sl, q, LMI_ENABLE_REQ, -EFAULT);
+		case N_DISCON_REQ:
+			if (sl_get_i_state(sl) != LMI_DISABLE_PENDING)
+				goto outstate;
+			return lmi_error_ack(sl, q, LMI_DISABLE_REQ, -EFAULT);
+		case N_OPTMGMT_REQ:
+			return lmi_error_ack(sl, q, LMI_OPTMGMT_REQ, -EFAULT);
+		case N_INFO_REQ:
+			return (-EFAULT);
+		default:
+			swerr();
+			return (QR_DONE);
+		}
+	}
+      outstate:
+	pswerr(("%s: %p: N_ERROR_ACK received in wrong state!\n", MOD_NAME, sl));
+	return (-EPROTO);
+      protoshort:
+	pswerr(("%s: %p: N_ERROR_ACK received too short!\n", MOD_NAME, sl));
+	return (-EMSGSIZE);
+}
+
+/**
+ * ne_info_ack: - process received N_INFO_ACK primitive
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_INFO_ACK primitive
+ */
+STATIC int
+ne_info_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	N_info_ack_t *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	sl->info.n = *p;
+	if (p->ADDR_length && p->ADDR_offset
+	    && mp->b_wptr >= mp->b_rptr + p->ADDR_offset + p->ADDR_length) {
+		bcopy(mp->b_rptr + p->ADDR_offset, &sl->loc, p->ADDR_length);
+		sl->loc_len = p->ADDR_length;
+	}
+	/* Translate N information into LMI information */
+	if (p->NSDU_size < sl->info.lm.lmi_max_sdu + sl->info.lm.lmi_header_len)
+		sl->info.lm.lmi_max_sdu = p->NSDU_size - sl->info.lm.lmi_header_len;
+	if (p->NIDU_size < sl->info.lm.lmi_max_sdu)
+		sl->info.lm.lmi_max_sdu = p->NIDU_size - sl->info.lm.lmi_header_len;
+	if (p->NODU_size < sl->info.lm.lmi_max_sdu)
+		sl->info.lm.lmi_max_sdu = p->NODU_size - sl->info.lm.lmi_header_len;
+	if (sl->info.lm.lmi_min_sdu > sl->info.lm.lmi_max_sdu)
+		sl->info.lm.lmi_min_sdu = sl->info.lm.lmi_max_sdu;
+	switch (p->CURRENT_state) {
+	case NS_UNBND:
+		sl_set_i_state(sl, LMI_UNATTACHED);
+		break;
+	case NS_WACK_BREQ:
+		sl_set_i_state(sl, LMI_ATTACH_PENDING);
+		break;
+	case NS_WACK_UREQ:
+		sl_set_i_state(sl, LMI_DETACH_PENDING);
+		break;
+	case NS_IDLE:
+	case NS_WACK_OPTREQ:
+		sl_set_i_state(sl, LMI_DISABLED);
+		break;
+	case NS_WCON_CREQ:
+		sl_set_i_state(sl, LMI_ENABLE_PENDING);
+		break;
+	case NS_WACK_DREQ6:
+	case NS_WACK_DREQ9:
+	case NS_WACK_DREQ11:
+		sl_set_i_state(sl, LMI_DISABLE_PENDING);
+		break;
+	case NS_WACK_RRES:
+	case NS_DATA_XFER:
+	case NS_WRES_RIND:
+		sl_set_i_state(sl, LMI_ENABLED);
+		break;
+	default:
+	case NS_WRES_CIND:
+	case NS_WACK_DREQ7:
+	case NS_WACK_CRES:
+	case NS_WCON_RREQ:
+	case NS_WACK_DREQ10:
+		sl_set_i_state(sl, LMI_UNUSABLE);
+		break;
+	}
+	sl_set_n_state(sl, p->CURRENT_state);
+	if (sl->n_request)
+		return n_pass_along(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
+	return (QR_DONE);
+      protoshort:
+	pswerr(("%s: %p: N_INFO_ACK received too short!\n", MOD_NAME, sl));
+	return (-EMSGSIZE);
+}
+
+/**
+ * ne_data_ind_slow: - slow path processing for N_DATA_IND
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_DATA_IND primitive
+ * 
+ * Normally we receive data unfragmented and in a singled M_DATA block.  This slower routine handles
+ * the circumstance where we receive fragmented data or data that is chained together in multiple
+ * M_DATA blocks.  It also handles various slow path error conditions.
+ */
+static noinline fastcall __unlikely int
+ne_data_ind_slow(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	N_data_ind_t *p = (typeof(p)) mp->b_rptr;
+	mblk_t *dp, *bp, *newp = NULL;
+	int err;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_not_i_state(sl, LMF_ENABLED))
+		goto outstate;
+	if ((dp = mp->b_cont) == NULL)
+		goto baddata;
+	if (dp->b_cont != NULL) {
 		/* We have chained M_DATA blocks: pull them up. */
 		if (!pullupmsg(dp, -1)) {
 			/* normall only fail because of dup'ed blocks */
@@ -4805,177 +6031,307 @@ n_data_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp, ulong more)
 			dp = newp;
 		}
 	}
-	if (more) {
+	if (p->DATA_xfer_flags & N_MORE_DATA_FLAG) {
 		/* We have a partial delivery.  Chain normal message together.  We might have a
 		   problem with messages split over multiple streams? Treat normal and expedited
 		   separately. */
-		if (sl->rbuf)
-			linkb(sl->rbuf, dp);
-		else
-			sl->rbuf = dp;
+		sl->rbuf = linkmsg(sl->rbuf, dp);
 	} else {
-		int err;
-
-		if (sl->rbuf) {
-			linkb(sl->rbuf, dp);
-			dp = xchg(&sl->rbuf, NULL);
+		bp = linkmsg(XCHG(&sl->rbuf, NULL), dp);
+		if ((err = sl_recv_msg(sl, q, bp)) != QR_ABSORBED) {
+			if (err < 0) {
+				sl->rbuf = unlinkmsg(sl->rbuf, dp);
+				if (newp)
+					freemsg(newp);
+			}
+			return (err);
 		}
-		if ((err = sl_recv_msg(q, sl, dp)) == QR_ABSORBED)
-			return (newp ? QR_DONE : QR_TRIMMED);
-		return (err);
 	}
 	return (newp ? QR_DONE : QR_TRIMMED);
-}
-STATIC INLINE int
-n_data_ind(queue_t *q, struct sl *sl, mblk_t *mp)
-{
-	int err;
-	mblk_t *dp;
-	N_data_ind_t *p = ((typeof(p)) mp->b_rptr);
-	size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 
-	if (mlen >= sizeof(*p)) {
-		if ((dp = mp->b_cont)) {
-			if (sl->i_state == LMI_ENABLED) {
-				if (!(p->DATA_xfer_flags & N_MORE_DATA_FLAG) && !dp->b_cont) {
-					if ((err = sl_recv_msg(q, sl, dp)) == QR_ABSORBED)
-						return (QR_TRIMMED);	/* data only */
-					return (err);
-				} else
-					return n_data_ind_slow(q, sl, dp,
-							       p->
-							       DATA_xfer_flags & N_MORE_DATA_FLAG);
-			} else {
-				ptrace(("%s: %p: ERROR: Ignore data in other states\n",
-					MOD_NAME, sl));
-				return (-EPROTO);
-			}
-		} else {
-			ptrace(("%s: %p: ERROR: No data\n", MOD_NAME, sl));
-			return (-EFAULT);
-		}
-	} else {
-		ptrace(("%s: %p: ERROR: M_PROTO block too short\n", MOD_NAME, sl));
-		return (-EFAULT);
-	}
+      protoshort:
+	pswerr(("%s: %p: N_DATA_IND primitive too short!\n", MOD_NAME, sl));
+	err = -EFAULT;
+	goto error;
+      outstate:
+	pswerr(("%s: %p: N_DATA_IND received in unexpected state!\n", MOD_NAME, sl));
+	err = -EFAULT;
+	goto error;
+      baddata:
+	pswerr(("%s: %p: N_DATA_IND received with no data!\n", MOD_NAME, sl));
+	err = -EFAULT;
+	goto error;
+      error:
+	return (err);
 }
 
-/*
- *  N_EXDATA_IND
- *  ---------------------------------------------
+/**
+ * ne_data_ind: - fast path processing for N_DATA_IND
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_DATA_IND primitive
  */
-STATIC int
-n_exdata_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp)
+static inline fastcall __hot_in int
+ne_data_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	/* Normally we receive data unfragmented and in a singled M_DATA block.  This slower
-	   routine handles the circumstance where we receive fragmented data or data that is
-	   chained together in multiple M_DATA blocks. */
+	N_data_ind_t *p = (typeof(p)) mp->b_rptr;
+	mblk_t *dp;
 	int err;
-	mblk_t *newp = NULL;
 
-	seldom();
-	if (dp->b_cont) {
-		/* We have chained M_DATA blocks: pull them up. */
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto go_slow;
+	if (unlikely(sl_not_i_state(sl, LMF_ENABLED)))
+		goto go_slow;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto go_slow;
+	if (unlikely(p->DATA_xfer_flags & N_MORE_DATA_FLAG))
+		goto go_slow;
+	if (unlikely(sl->rbuf != NULL))
+		goto go_slow;
+	if ((err = sl_recv_msg(sl, q, dp)) == QR_ABSORBED)
+		return (QR_TRIMMED);	/* data only */
+	return (err);
+
+      go_slow:
+	return ne_data_ind_slow(sl, q, mp);
+
+}
+
+/**
+ * ne_exdata_ind_slow: - slow path processing for N_EXDATA_IND
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_EXDATA_IND primitive
+ * 
+ * Normally we receive data unfragmented and in a singled M_DATA block.  This slower routine handles
+ * the circumstance where we receive fragmented data or data that is chained together in multiple
+ * M_DATA blocks.  It also handles other slow path error conditions.
+ */
+static noinline fastcall __unlikely int
+ne_exdata_ind_slow(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	N_exdata_ind_t *p = (typeof(p)) mp->b_rptr;
+	mblk_t *dp, *newp = NULL;
+	int err;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_get_n_state(sl) != NS_DATA_XFER)
+		goto outstate;
+	if (sl_get_i_state(sl) != LMI_ENABLED)
+		goto outstate;
+	if ((dp = mp->b_cont) == NULL)
+		goto baddata;
+	if (dp->b_cont != NULL) {
+		/* We have chaned M_DATA blocks: pull them up. */
+		/* normally only fails because of dup'ed blocks */
 		if (!pullupmsg(dp, -1)) {
-			/* normall only fail because of dup'ed blocks */
+			/* normally only fails because of buffer allocation failure */
 			if (!(newp = msgpullup(dp, -1))) {
-				/* normaly only fail because of no buffer */
 				ss7_bufcall(q, xmsgsize(dp), BPRI_MED);
 				return (-ENOBUFS);
 			}
 			dp = newp;
 		}
 	}
-	if ((err = sl_recv_msg(q, sl, dp)) == QR_ABSORBED)
+	if ((err = sl_recv_msg(sl, q, dp)) == QR_ABSORBED)
 		return (newp ? QR_DONE : QR_TRIMMED);
 	if (err < 0 && newp)
 		freemsg(newp);
 	return (err);
+
+      protoshort:
+	pswerr(("%s: %p: N_EXDATA_IND primitive too short!\n", MOD_NAME, sl));
+	err = -EFAULT;
+	goto error;
+      outstate:
+	pswerr(("%s: %p: N_EXDATA_IND received in unexpected state!\n", MOD_NAME, sl));
+	err = -EFAULT;
+	goto error;
+      baddata:
+	pswerr(("%s: %p: N_EXDATA_IND received with no data!\n", MOD_NAME, sl));
+	err = -EFAULT;
+	goto error;
+      error:
+	return (err);
 }
-STATIC INLINE int
-n_exdata_ind(queue_t *q, struct sl *sl, mblk_t *mp)
+
+/**
+ * ne_exdata_ind: - fast path processing for N_EXDATA_IND
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_EXDATA_IND primitive
+ */
+static inline fastcall __hot_in int
+ne_exdata_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	int err;
+	N_exdata_ind_t *p = (typeof(p)) mp->b_rptr;
 	mblk_t *dp;
-
-	ensure(mp->b_wptr - mp->b_rptr >= sizeof(N_exdata_ind_t), return (-EFAULT));
-	if ((dp = mp->b_cont)) {
-		if (sl->i_state == LMI_ENABLED) {
-			if (!dp->b_cont) {
-				if ((err = sl_recv_msg(q, sl, dp)) == QR_ABSORBED)
-					return (QR_TRIMMED);	/* data only */
-				return (err);
-			} else
-				return n_exdata_ind_slow(q, sl, dp);
-		}
-		ptrace(("%s: %p: ERROR: Ignore data in other states\n", MOD_NAME, sl));
-		return (-EPROTO);
-	}
-	ptrace(("%s: %p: ERROR: No data\n", MOD_NAME, sl));
-	return (-EFAULT);
-}
-
-/*
- *  N_DATACK_IND
- *  ---------------------------------------------
- */
-STATIC INLINE int
-n_datack_ind(queue_t *q, struct sl *sl, mblk_t *mp)
-{
 	int err;
 
-	ensure(mp->b_wptr - mp->b_rptr >= sizeof(N_datack_ind_t), return (-EFAULT));
-	if (sl->i_version < M2PA_VERSION_DRAFT3_1) {
-		if ((err = sl_txc_datack(q, sl, 1)) < 0)
-			return (err);
-		return (0);
-	}
-	swerr();
-	return (-EFAULT);
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
+		goto go_slow;
+	if (unlikely(sl_get_n_state(sl) != NS_DATA_XFER))
+		goto go_slow;
+	if (unlikely(sl_get_i_state(sl) != LMI_ENABLED))
+		goto go_slow;
+	if (unlikely((dp = mp->b_cont) == NULL))
+		goto go_slow;
+	if (unlikely(dp->b_cont != NULL))
+		goto go_slow;
+
+	if ((err = sl_recv_msg(sl, q, dp)) == QR_ABSORBED)
+		return (QR_TRIMMED);	/* data only */
+	return (err);
+
+      go_slow:
+	return ne_exdata_ind_slow(sl, q, mp);
 }
 
-/*
- *  N_DISCON_IND
- *  ---------------------------------------------
+/**
+ * ne_datack_ind: - processing for N_DATACK_IND
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_DATACK_IND primitive
+ *
+ * For M2PA draft 03 and before, messages were not acknowledged by the M2PA peer with ack messages
+ * but an acknowlegement at the SCTP level was considered an acknowledgement for M2PA as well.  When
+ * sending in that draft mode, M2PA sets the receive confirmation flag and obtains the SCTP ack
+ * indication that is used to clear the retransmission buffer.  Each ack represents the earliest
+ * outstanding data message, and only one message.
  */
 STATIC INLINE int
-n_discon_ind(queue_t *q, struct sl *sl, mblk_t *mp)
+ne_datack_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
+	N_datack_ind_t *p;
 	int err;
 
-	ensure(mp->b_wptr - mp->b_rptr >= sizeof(N_discon_ind_t), return (-EFAULT));
-	if (sl->sl.notify.events & SL_EVT_FAIL_SUERM_EIM)
-		if ((err = lmi_event_ind(q, sl, SL_EVT_FAIL_SUERM_EIM, 0, NULL, 0)) < 0)
-			return (err);
-	if ((err = sl_lsc_out_of_service(q, sl, SL_FAIL_SUERM_EIM)) < 0)
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_not_i_state(sl, NSF_DATA_XFER))
+		goto outstate;
+	if (sl->i_version >= M2PA_VERSION_DRAFT3_1)
+		goto unexpected;
+	if ((err = sl_txc_datack(sl, q, 1)) < 0)
 		return (err);
-	ptrace(("%s: %p: Link failed: SUERM/EIM\n", MOD_NAME, sl));
-	fixme(("%s: %p: FIXME: Do something here... send a HANGUP or something...\n",
-	       MOD_NAME, sl));
 	return (0);
+      unexpected:
+	pswerr(("%s: %p: N_DATACK_IND unexpected in any state!\n", MOD_NAME, sl));
+	err = -EPROTO;
+	goto error;
+      outstate:
+	pswerr(("%s: %p: N_DATACK_IND received in unexpected state!\n", MOD_NAME, sl));
+	err = -EPROTO;
+	goto error;
+      protoshort:
+	pswerr(("%s: %p: N_DATACK_IND too short!\n", MOD_NAME, sl));
+	err = -EMSGSIZE;
+	goto error;
+      error:
+	return (err);
 }
 
-/*
- *  N_RESET_IND
- *  ---------------------------------------------
+/**
+ * ne_reset_ind: - processing for N_RESET_IND
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_RESET_IND primitive
+ *
+ * NPI SCTP only sends N_RESET_IND when an association has restarted.  In that case, the other end
+ * should be sending SIOS very soon, or if it can muddle on from a previous state, then all is well.
+ * Otherwise, link semantics and timers should bring the link down if there is a problem.  So, we
+ * will ignore this situation for the moment.
  */
-STATIC INLINE int
-n_reset_ind(queue_t *q, struct sl *sl, mblk_t *mp)
+static noinline fastcall __unlikely int
+ne_reset_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	ensure(mp->b_wptr - mp->b_rptr >= sizeof(N_reset_ind_t), return (-EFAULT));
-	fixme(("%s: %p: FIXME: Do something here...\n", MOD_NAME, sl));
-	return (-EFAULT);
+	N_reset_ind_t *p = (typeof(p)) mp->b_rptr;
+	int err;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_not_i_state(sl, (LMF_ENABLED | LMF_UNUSABLE)))
+		goto outstate;
+	/* just ignore it */
+	return (0);
+      outstate:
+	pswerr(("%s: %p: N_RESET_IND received in unexpected state!\n", MOD_NAME, sl));
+	err = -EPROTO;
+	goto error;
+      protoshort:
+	pswerr(("%s: %p: N_RESET_IND too short!\n", MOD_NAME, sl));
+	err = -EMSGSIZE;
+	goto error;
+      error:
+	return (err);
 }
 
-/*
- *  Others...
- *  ---------------------------------------------
+/**
+ * ne_reset_con: - processing for N_RESET_CON
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_RESET_CON primitive
+ *
+ * There is no mechanism in the SL interface for confirming a reset request, pass the confirmation
+ * along.
  */
-STATIC INLINE int
-n_other_ind(queue_t *q, struct sl *sl, mblk_t *mp)
+static noinline fastcall __unlikely int
+ne_reset_con(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	fixme(("%s: %p: FIXME: Do something here...\n", MOD_NAME, sl));
-	return (-EFAULT);
+	N_reset_con_t *p = (typeof(p)) mp->b_rptr;
+	int err;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_not_i_state(sl, NSF_WCON_RREQ))
+		goto outstate;
+	return n_pass_along(sl, q, mp, NS_DATA_XFER, LMI_ENABLED);
+      outstate:
+	pswerr(("%s: %p: N_RESET_CON received in unexpected state!\n", MOD_NAME, sl));
+	err = -EPROTO;
+	goto error;
+      protoshort:
+	pswerr(("%s: %p: N_RESET_CON too short!\n", MOD_NAME, sl));
+	err = -EMSGSIZE;
+	goto error;
+      error:
+	return (err);
+}
+
+/**
+ * ne_conn_ind: - processing for N_CONN_IND
+ * @sl: private structure
+ * @q: active queue (read queue)
+ * @mp: the N_CONN_IND primitive
+ *
+ * There is no mechanism in the SL interface for providing a connection indication, however, if the
+ * provider was bound with CONIND_number greater than zero, pass the connection indication primitive
+ * along.
+ */
+static noinline fastcall __unlikely int
+ne_conn_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+{
+	N_conn_ind_t *p = (typeof(p)) mp->b_rptr;
+	int err;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (sl_not_n_state(sl, (NSF_IDLE | NSF_WRES_CIND)))
+		goto outstate;
+	sl->coninds++;
+	if ((err = n_pass_along(sl, q, mp, NS_WRES_CIND, LMI_ENABLE_PENDING)) != QR_ABSORBED)
+		sl->coninds--;
+	return (err);
+      outstate:
+	pswerr(("%s: %p: N_RESET_CON received in unexpected state!\n", MOD_NAME, sl));
+	err = -EPROTO;
+	goto error;
+      protoshort:
+	pswerr(("%s: %p: N_RESET_CON too short!\n", MOD_NAME, sl));
+	err = -EMSGSIZE;
+	goto error;
+      error:
+	return (err);
 }
 
 /*
@@ -5004,7 +6360,7 @@ sl_commit_config(struct sl *sl, sl_config_t * arg)
 }
 #endif
 STATIC int
-sl_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocgoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5021,7 +6377,7 @@ sl_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocsoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5038,7 +6394,7 @@ sl_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocgconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5068,7 +6424,7 @@ sl_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocsconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5125,7 +6481,7 @@ sl_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_ioctconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_ioctconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5143,7 +6499,7 @@ sl_ioctconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_ioccconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_ioccconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5161,7 +6517,7 @@ sl_ioccconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocgstatem(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5178,7 +6534,7 @@ sl_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_ioccmreset(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5195,7 +6551,7 @@ sl_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocgstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5212,7 +6568,7 @@ sl_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocsstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5229,7 +6585,7 @@ sl_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocgstats(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5246,7 +6602,7 @@ sl_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_ioccstats(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5263,7 +6619,7 @@ sl_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocgnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5280,7 +6636,7 @@ sl_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_iocsnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5297,7 +6653,7 @@ sl_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sl_ioccnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sl_ioccnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5368,7 +6724,7 @@ sdt_commit_config(struct sl *sl, sdt_config_t * arg)
 	return (0);
 }
 STATIC int
-sdt_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocgoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5385,7 +6741,7 @@ sdt_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocsoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5402,7 +6758,7 @@ sdt_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocgconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5419,7 +6775,7 @@ sdt_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocsconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5436,7 +6792,7 @@ sdt_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_ioctconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_ioctconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -5447,7 +6803,7 @@ sdt_ioctconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_ioccconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_ioccconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -5458,7 +6814,7 @@ sdt_ioccconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocgstatem(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5476,7 +6832,7 @@ sdt_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_ioccmreset(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5494,7 +6850,7 @@ sdt_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocgstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5512,7 +6868,7 @@ sdt_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocsstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5530,7 +6886,7 @@ sdt_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocgstats(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5548,7 +6904,7 @@ sdt_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_ioccstats(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5566,7 +6922,7 @@ sdt_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocgnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5584,7 +6940,7 @@ sdt_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_iocsnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5602,7 +6958,7 @@ sdt_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_ioccnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_ioccnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5620,7 +6976,7 @@ sdt_ioccnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdt_ioccabort(queue_t *q, struct sl *sl, mblk_t *mp)
+sdt_ioccabort(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5646,7 +7002,7 @@ sdt_ioccabort(queue_t *q, struct sl *sl, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-sdl_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocgoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5663,7 +7019,7 @@ sdl_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocsoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5680,7 +7036,7 @@ sdl_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocgconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5697,7 +7053,7 @@ sdl_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocsconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5714,7 +7070,7 @@ sdl_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_ioctconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_ioctconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5732,7 +7088,7 @@ sdl_ioctconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_ioccconfig(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_ioccconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5750,7 +7106,7 @@ sdl_ioccconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocgstatem(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5768,7 +7124,7 @@ sdl_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_ioccmreset(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5786,7 +7142,7 @@ sdl_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocgstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5804,7 +7160,7 @@ sdl_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocsstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5822,7 +7178,7 @@ sdl_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocgstats(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5840,7 +7196,7 @@ sdl_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_ioccstats(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5858,7 +7214,7 @@ sdl_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocgnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5876,7 +7232,7 @@ sdl_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_iocsnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5894,7 +7250,7 @@ sdl_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_ioccnotify(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_ioccnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
@@ -5912,7 +7268,7 @@ sdl_ioccnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EINVAL);
 }
 STATIC int
-sdl_ioccdisctx(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_ioccdisctx(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int ret = 0;
 
@@ -5924,7 +7280,7 @@ sdl_ioccdisctx(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (ret);
 }
 STATIC int
-sdl_ioccconntx(queue_t *q, struct sl *sl, mblk_t *mp)
+sdl_ioccconntx(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int ret = 0;
 
@@ -5980,57 +7336,57 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 	}
 	case SL_IOC_MAGIC:
 	{
-		if (count < size || sl->i_state == LMI_UNATTACHED) {
-			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %lu\n",
-				MOD_NAME, count, size, sl->i_state));
+		if (count < size || sl_get_i_state(sl) == LMI_UNUSABLE) {
+			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %d\n",
+				MOD_NAME, count, size, sl_get_i_state(sl)));
 			ret = -EINVAL;
 			break;
 		}
 		switch (nr) {
 		case _IOC_NR(SL_IOCGOPTIONS):	/* lmi_option_t */
-			ret = sl_iocgoptions(q, sl, mp);
+			ret = sl_iocgoptions(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCSOPTIONS):	/* lmi_option_t */
-			ret = sl_iocsoptions(q, sl, mp);
+			ret = sl_iocsoptions(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCGCONFIG):	/* sl_config_t */
-			ret = sl_iocgconfig(q, sl, mp);
+			ret = sl_iocgconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCSCONFIG):	/* sl_config_t */
-			ret = sl_iocsconfig(q, sl, mp);
+			ret = sl_iocsconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCTCONFIG):	/* sl_config_t */
-			ret = sl_ioctconfig(q, sl, mp);
+			ret = sl_ioctconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCCCONFIG):	/* sl_config_t */
-			ret = sl_ioccconfig(q, sl, mp);
+			ret = sl_ioccconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCGSTATEM):	/* sl_statem_t */
-			ret = sl_iocgstatem(q, sl, mp);
+			ret = sl_iocgstatem(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCCMRESET):	/* sl_statem_t */
-			ret = sl_ioccmreset(q, sl, mp);
+			ret = sl_ioccmreset(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCGSTATSP):	/* lmi_sta_t */
-			ret = sl_iocgstatsp(q, sl, mp);
+			ret = sl_iocgstatsp(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCSSTATSP):	/* lmi_sta_t */
-			ret = sl_iocsstatsp(q, sl, mp);
+			ret = sl_iocsstatsp(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCGSTATS):	/* sl_stats_t */
-			ret = sl_iocgstats(q, sl, mp);
+			ret = sl_iocgstats(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCCSTATS):	/* sl_stats_t */
-			ret = sl_ioccstats(q, sl, mp);
+			ret = sl_ioccstats(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCGNOTIFY):	/* sl_notify_t */
-			ret = sl_iocgnotify(q, sl, mp);
+			ret = sl_iocgnotify(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCSNOTIFY):	/* sl_notify_t */
-			ret = sl_iocsnotify(q, sl, mp);
+			ret = sl_iocsnotify(sl, q, mp);
 			break;
 		case _IOC_NR(SL_IOCCNOTIFY):	/* sl_notify_t */
-			ret = sl_ioccnotify(q, sl, mp);
+			ret = sl_ioccnotify(sl, q, mp);
 			break;
 		default:
 			ptrace(("%s: ERROR: Unspported SL ioctl %d\n", MOD_NAME, nr));
@@ -6041,60 +7397,60 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 	}
 	case SDT_IOC_MAGIC:
 	{
-		if (count < size || sl->i_state == LMI_UNATTACHED) {
-			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %lu\n",
-				MOD_NAME, count, size, sl->i_state));
+		if (count < size || sl_get_i_state(sl) == LMI_UNUSABLE) {
+			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %d\n",
+				MOD_NAME, count, size, sl_get_i_state(sl)));
 			ret = -EINVAL;
 			break;
 		}
 		switch (nr) {
 		case _IOC_NR(SDT_IOCGOPTIONS):	/* lmi_option_t */
-			ret = sdt_iocgoptions(q, sl, mp);
+			ret = sdt_iocgoptions(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCSOPTIONS):	/* lmi_option_t */
-			ret = sdt_iocsoptions(q, sl, mp);
+			ret = sdt_iocsoptions(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCGCONFIG):	/* sdt_config_t */
-			ret = sdt_iocgconfig(q, sl, mp);
+			ret = sdt_iocgconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCSCONFIG):	/* sdt_config_t */
-			ret = sdt_iocsconfig(q, sl, mp);
+			ret = sdt_iocsconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCTCONFIG):	/* sdt_config_t */
-			ret = sdt_ioctconfig(q, sl, mp);
+			ret = sdt_ioctconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCCCONFIG):	/* sdt_config_t */
-			ret = sdt_ioccconfig(q, sl, mp);
+			ret = sdt_ioccconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCGSTATEM):	/* sdt_statem_t */
-			ret = sdt_iocgstatem(q, sl, mp);
+			ret = sdt_iocgstatem(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCCMRESET):	/* sdt_statem_t */
-			ret = sdt_ioccmreset(q, sl, mp);
+			ret = sdt_ioccmreset(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCGSTATSP):	/* lmi_sta_t */
-			ret = sdt_iocgstatsp(q, sl, mp);
+			ret = sdt_iocgstatsp(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCSSTATSP):	/* lmi_sta_t */
-			ret = sdt_iocsstatsp(q, sl, mp);
+			ret = sdt_iocsstatsp(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCGSTATS):	/* sdt_stats_t */
-			ret = sdt_iocgstats(q, sl, mp);
+			ret = sdt_iocgstats(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCCSTATS):	/* sdt_stats_t */
-			ret = sdt_ioccstats(q, sl, mp);
+			ret = sdt_ioccstats(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCGNOTIFY):	/* sdt_notify_t */
-			ret = sdt_iocgnotify(q, sl, mp);
+			ret = sdt_iocgnotify(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCSNOTIFY):	/* sdt_notify_t */
-			ret = sdt_iocsnotify(q, sl, mp);
+			ret = sdt_iocsnotify(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCCNOTIFY):	/* sdt_notify_t */
-			ret = sdt_ioccnotify(q, sl, mp);
+			ret = sdt_ioccnotify(sl, q, mp);
 			break;
 		case _IOC_NR(SDT_IOCCABORT):	/* */
-			ret = sdt_ioccabort(q, sl, mp);
+			ret = sdt_ioccabort(sl, q, mp);
 			break;
 		default:
 			ptrace(("%s: ERROR: Unspported SDT ioctl %d\n", MOD_NAME, nr));
@@ -6105,63 +7461,63 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 	}
 	case SDL_IOC_MAGIC:
 	{
-		if (count < size || sl->i_state == LMI_UNATTACHED) {
-			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %lu\n",
-				MOD_NAME, count, size, sl->i_state));
+		if (count < size || sl_get_i_state(sl) == LMI_UNUSABLE) {
+			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %d\n",
+				MOD_NAME, count, size, sl_get_i_state(sl)));
 			ret = -EINVAL;
 			break;
 		}
 		switch (nr) {
 		case _IOC_NR(SDL_IOCGOPTIONS):	/* lmi_option_t */
-			ret = sdl_iocgoptions(q, sl, mp);
+			ret = sdl_iocgoptions(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCSOPTIONS):	/* lmi_option_t */
-			ret = sdl_iocsoptions(q, sl, mp);
+			ret = sdl_iocsoptions(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCGCONFIG):	/* sdl_config_t */
-			ret = sdl_iocgconfig(q, sl, mp);
+			ret = sdl_iocgconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCSCONFIG):	/* sdl_config_t */
-			ret = sdl_iocsconfig(q, sl, mp);
+			ret = sdl_iocsconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCTCONFIG):	/* sdl_config_t */
-			ret = sdl_ioctconfig(q, sl, mp);
+			ret = sdl_ioctconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCCCONFIG):	/* sdl_config_t */
-			ret = sdl_ioccconfig(q, sl, mp);
+			ret = sdl_ioccconfig(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCGSTATEM):	/* sdl_statem_t */
-			ret = sdl_iocgstatem(q, sl, mp);
+			ret = sdl_iocgstatem(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCCMRESET):	/* sdl_statem_t */
-			ret = sdl_ioccmreset(q, sl, mp);
+			ret = sdl_ioccmreset(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCGSTATSP):	/* sdl_stats_t */
-			ret = sdl_iocgstatsp(q, sl, mp);
+			ret = sdl_iocgstatsp(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCSSTATSP):	/* sdl_stats_t */
-			ret = sdl_iocsstatsp(q, sl, mp);
+			ret = sdl_iocsstatsp(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCGSTATS):	/* sdl_stats_t */
-			ret = sdl_iocgstats(q, sl, mp);
+			ret = sdl_iocgstats(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCCSTATS):	/* sdl_stats_t */
-			ret = sdl_ioccstats(q, sl, mp);
+			ret = sdl_ioccstats(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCGNOTIFY):	/* sdl_notify_t */
-			ret = sdl_iocgnotify(q, sl, mp);
+			ret = sdl_iocgnotify(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCSNOTIFY):	/* sdl_notify_t */
-			ret = sdl_iocsnotify(q, sl, mp);
+			ret = sdl_iocsnotify(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCCNOTIFY):	/* sdl_notify_t */
-			ret = sdl_ioccnotify(q, sl, mp);
+			ret = sdl_ioccnotify(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCCDISCTX):	/* */
-			ret = sdl_ioccdisctx(q, sl, mp);
+			ret = sdl_ioccdisctx(sl, q, mp);
 			break;
 		case _IOC_NR(SDL_IOCCCONNTX):	/* */
-			ret = sdl_ioccconntx(q, sl, mp);
+			ret = sdl_ioccconntx(sl, q, mp);
 			break;
 		default:
 			ptrace(("%s: ERROR: Unspported SDL ioctl %d\n", MOD_NAME, nr));
@@ -6197,101 +7553,158 @@ STATIC int
 sl_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
-	ulong prim;
+	sl_ulong prim;
 	struct sl *sl = SL_PRIV(q);
-	ulong oldstate = sl->i_state;
+	int oldnpistate = sl_get_n_state(sl);
+	int oldlmistate = sl_get_i_state(sl);
 
 	/* Fast Path */
-	if ((prim = *(ulong *) mp->b_rptr) == SL_PDU_REQ) {
+	if ((prim = *(sl_ulong *) mp->b_rptr) == SL_PDU_REQ) {
 		printd(("%s: %p: -> SL_PDU_REQ\n", MOD_NAME, sl));
-		if ((rtn = sl_pdu_req(q, sl, mp)) < 0)
-			sl->i_state = oldstate;
+		if ((rtn = sl_pdu_req(sl, q, mp)) < 0) {
+			sl_set_n_state(sl, oldnpistate);
+			sl_set_i_state(sl, oldlmistate);
+		}
 		return (rtn);
 	}
 	switch (prim) {
+#if 0
+	case N_CONN_REQ:
+		printd(("%s: %p: -> N_CONN_REQ\n", MOD_NAME, sl));
+		rtn = ne_conn_req(sl, q, mp);
+		break;
+	case N_CONN_RES:
+		printd(("%s: %p: -> N_CONN_RES\n", MOD_NAME, sl));
+		rtn = ne_conn_res(sl, q, mp);
+		break;
+	case N_DISCON_REQ:
+		printd(("%s: %p: -> N_DISCON_REQ\n", MOD_NAME, sl));
+		rtn = ne_discon_req(sl, q, mp);
+		break;
+	case N_DATA_REQ:
+		printd(("%s: %p: -> N_DATA_REQ\n", MOD_NAME, sl));
+		rtn = ne_data_req(sl, q, mp);
+		break;
+	case N_EXDATA_REQ:
+		printd(("%s: %p: -> N_EXDATA_REQ\n", MOD_NAME, sl));
+		rtn = ne_exdata_req(sl, q, mp);
+		break;
+	case N_INFO_REQ:
+		printd(("%s: %p: -> N_INFO_REQ\n", MOD_NAME, sl));
+		rtn = ne_info_req(sl, q, mp);
+		break;
+	case N_BIND_REQ:
+		printd(("%s: %p: -> N_BIND_REQ\n", MOD_NAME, sl));
+		rtn = ne_bind_req(sl, q, mp);
+		break;
+	case N_UNBIND_REQ:
+		printd(("%s: %p: -> N_UNBIND_REQ\n", MOD_NAME, sl));
+		rtn = ne_unbind_req(sl, q, mp);
+		break;
+	case N_UNITDATA_REQ:
+		printd(("%s: %p: -> N_UNITDATA_REQ\n", MOD_NAME, sl));
+		rtn = ne_unitdata_req(sl, q, mp);
+		break;
+	case N_OPTMGMT_REQ:
+		printd(("%s: %p: -> N_OPTMGMT_REQ\n", MOD_NAME, sl));
+		rtn = ne_optmgmt_req(sl, q, mp);
+		break;
+	case N_DATACK_REQ:
+		printd(("%s: %p: -> N_DATACK_REQ\n", MOD_NAME, sl));
+		rtn = ne_datack_req(sl, q, mp);
+		break;
+	case N_RESET_REQ:
+		printd(("%s: %p: -> N_RESET_REQ\n", MOD_NAME, sl));
+		rtn = ne_reset_req(sl, q, mp);
+		break;
+	case N_RESET_RES:
+		printd(("%s: %p: -> N_RESET_RES\n", MOD_NAME, sl));
+		rtn = ne_reset_res(sl, q, mp);
+		break;
+#endif
 	case LMI_INFO_REQ:
 		printd(("%s: %p: -> LMI_INFO_REQ\n", MOD_NAME, sl));
-		rtn = lmi_info_req(q, sl, mp);
+		rtn = lmi_info_req(sl, q, mp);
 		break;
 	case LMI_ATTACH_REQ:
 		printd(("%s: %p: -> LMI_ATTACH_REQ\n", MOD_NAME, sl));
-		rtn = lmi_attach_req(q, sl, mp);
+		rtn = lmi_attach_req(sl, q, mp);
 		break;
 	case LMI_DETACH_REQ:
 		printd(("%s: %p: -> LMI_DETACH_REQ\n", MOD_NAME, sl));
-		rtn = lmi_detach_req(q, sl, mp);
+		rtn = lmi_detach_req(sl, q, mp);
 		break;
 	case LMI_ENABLE_REQ:
 		printd(("%s: %p: -> LMI_ENABLE_REQ\n", MOD_NAME, sl));
-		rtn = lmi_enable_req(q, sl, mp);
+		rtn = lmi_enable_req(sl, q, mp);
 		break;
 	case LMI_DISABLE_REQ:
 		printd(("%s: %p: -> LMI_DISABLE_REQ\n", MOD_NAME, sl));
-		rtn = lmi_disable_req(q, sl, mp);
+		rtn = lmi_disable_req(sl, q, mp);
 		break;
 	case LMI_OPTMGMT_REQ:
 		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", MOD_NAME, sl));
-		rtn = lmi_optmgmt_req(q, sl, mp);
+		rtn = lmi_optmgmt_req(sl, q, mp);
 		break;
 	case SL_PDU_REQ:
-		rtn = sl_pdu_req(q, sl, mp);
+		rtn = sl_pdu_req(sl, q, mp);
 		printd(("%s: %p: -> SL_PDU_REQ\n", MOD_NAME, sl));
 		break;
 	case SL_EMERGENCY_REQ:
-		rtn = sl_emergency_req(q, sl, mp);
+		rtn = sl_emergency_req(sl, q, mp);
 		printd(("%s: %p: -> SL_EMERGENCY_REQ\n", MOD_NAME, sl));
 		break;
 	case SL_EMERGENCY_CEASES_REQ:
 		printd(("%s: %p: -> SL_EMERGENCY_CEASES_REQ\n", MOD_NAME, sl));
-		rtn = sl_emergency_ceases_req(q, sl, mp);
+		rtn = sl_emergency_ceases_req(sl, q, mp);
 		break;
 	case SL_START_REQ:
 		printd(("%s: %p: -> SL_START_REQ\n", MOD_NAME, sl));
-		rtn = sl_start_req(q, sl, mp);
+		rtn = sl_start_req(sl, q, mp);
 		break;
 	case SL_STOP_REQ:
 		printd(("%s: %p: -> SL_STOP_REQ\n", MOD_NAME, sl));
-		rtn = sl_stop_req(q, sl, mp);
+		rtn = sl_stop_req(sl, q, mp);
 		break;
 	case SL_RETRIEVE_BSNT_REQ:
 		printd(("%s: %p: -> SL_RETRIEVE_BSNT_REQ\n", MOD_NAME, sl));
-		rtn = sl_retrieve_bsnt_req(q, sl, mp);
+		rtn = sl_retrieve_bsnt_req(sl, q, mp);
 		break;
 	case SL_RETRIEVAL_REQUEST_AND_FSNC_REQ:
 		printd(("%s: %p: -> SL_RETRIEVAL_REQUEST_AND_FSNC_REQ\n", MOD_NAME, sl));
-		rtn = sl_retrieval_request_and_fsnc_req(q, sl, mp);
+		rtn = sl_retrieval_request_and_fsnc_req(sl, q, mp);
 		break;
 	case SL_RESUME_REQ:
 		printd(("%s: %p: -> SL_RESUME_REQ\n", MOD_NAME, sl));
-		rtn = sl_resume_req(q, sl, mp);
+		rtn = sl_resume_req(sl, q, mp);
 		break;
 	case SL_CLEAR_BUFFERS_REQ:
 		printd(("%s: %p: -> SL_CLEAR_BUFFERS_REQ\n", MOD_NAME, sl));
-		rtn = sl_clear_buffers_req(q, sl, mp);
+		rtn = sl_clear_buffers_req(sl, q, mp);
 		break;
 	case SL_CLEAR_RTB_REQ:
 		printd(("%s: %p: -> SL_CLEAR_RTB_REQ\n", MOD_NAME, sl));
-		rtn = sl_clear_rtb_req(q, sl, mp);
+		rtn = sl_clear_rtb_req(sl, q, mp);
 		break;
 	case SL_LOCAL_PROCESSOR_OUTAGE_REQ:
 		printd(("%s: %p: -> SL_LOCAL_PROCESSOR_OUTAGE_REQ\n", MOD_NAME, sl));
-		rtn = sl_local_processor_outage_req(q, sl, mp);
+		rtn = sl_local_processor_outage_req(sl, q, mp);
 		break;
 	case SL_CONGESTION_DISCARD_REQ:
 		printd(("%s: %p: -> SL_CONGESTION_DISCARD_REQ\n", MOD_NAME, sl));
-		rtn = sl_congestion_discard_req(q, sl, mp);
+		rtn = sl_congestion_discard_req(sl, q, mp);
 		break;
 	case SL_CONGESTION_ACCEPT_REQ:
 		printd(("%s: %p: -> SL_CONGESTION_ACCEPT_REQ\n", MOD_NAME, sl));
-		rtn = sl_congestion_accept_req(q, sl, mp);
+		rtn = sl_congestion_accept_req(sl, q, mp);
 		break;
 	case SL_NO_CONGESTION_REQ:
 		printd(("%s: %p: -> SL_NO_CONGESTION_REQ\n", MOD_NAME, sl));
-		rtn = sl_no_congestion_req(q, sl, mp);
+		rtn = sl_no_congestion_req(sl, q, mp);
 		break;
 	case SL_POWER_ON_REQ:
 		printd(("%s: %p: -> SL_POWER_ON_REQ\n", MOD_NAME, sl));
-		rtn = sl_power_on_req(q, sl, mp);
+		rtn = sl_power_on_req(sl, q, mp);
 		break;
 	default:
 		printd(("%s: %p: -> (?????)\n", MOD_NAME, sl));
@@ -6299,7 +7712,8 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	}
 	if (rtn < 0) {
-		sl->i_state = oldstate;
+		sl_set_n_state(sl, oldnpistate);
+		sl_set_i_state(sl, oldlmistate);
 	}
 	return (rtn);
 }
@@ -6308,56 +7722,56 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
 	int rtn;
-	ulong prim;
+	np_ulong prim;
 
-	switch ((prim = *((ulong *) mp->b_rptr))) {
+	switch ((prim = *((np_ulong *) mp->b_rptr))) {
 	case N_DATA_IND:
 		printd(("%s: %p: N_DATA_IND <-\n", MOD_NAME, sl));
-		rtn = n_data_ind(q, sl, mp);
+		rtn = ne_data_ind(sl, q, mp);
 		break;
 	case N_EXDATA_IND:
 		printd(("%s: %p: N_EXDATA_IND <-\n", MOD_NAME, sl));
-		rtn = n_exdata_ind(q, sl, mp);
+		rtn = ne_exdata_ind(sl, q, mp);
 		break;
 	case N_DATACK_IND:
 		printd(("%s: %p: N_DATACK_IND <-\n", MOD_NAME, sl));
-		rtn = n_datack_ind(q, sl, mp);
+		rtn = ne_datack_ind(sl, q, mp);
 		break;
 	case N_DISCON_IND:
 		printd(("%s: %p: N_DISCON_IND <-\n", MOD_NAME, sl));
-		rtn = n_discon_ind(q, sl, mp);
+		rtn = ne_discon_ind(sl, q, mp);
 		break;
 	case N_RESET_IND:
 		printd(("%s: %p: N_RESET_IND <-\n", MOD_NAME, sl));
-		rtn = n_reset_ind(q, sl, mp);
-		break;
-	case N_CONN_IND:
-		printd(("%s: %p: N_CONN_IND <-\n", MOD_NAME, sl));
-		rtn = n_other_ind(q, sl, mp);
+		rtn = ne_reset_ind(sl, q, mp);
 		break;
 	case N_CONN_CON:
 		printd(("%s: %p: N_CONN_CON <-\n", MOD_NAME, sl));
-		rtn = n_other_ind(q, sl, mp);
+		rtn = ne_conn_con(sl, q, mp);
 		break;
 	case N_INFO_ACK:
 		printd(("%s: %p: N_INFO_ACK <-\n", MOD_NAME, sl));
-		rtn = n_other_ind(q, sl, mp);
+		rtn = ne_info_ack(sl, q, mp);
 		break;
 	case N_BIND_ACK:
 		printd(("%s: %p: N_BIND_ACK <-\n", MOD_NAME, sl));
-		rtn = n_other_ind(q, sl, mp);
+		rtn = ne_bind_ack(sl, q, mp);
 		break;
 	case N_OK_ACK:
 		printd(("%s: %p: N_OK_ACK <-\n", MOD_NAME, sl));
-		rtn = n_other_ind(q, sl, mp);
+		rtn = ne_ok_ack(sl, q, mp);
 		break;
 	case N_ERROR_ACK:
 		printd(("%s: %p: N_ERROR_ACK <-\n", MOD_NAME, sl));
-		rtn = n_other_ind(q, sl, mp);
+		rtn = ne_error_ack(sl, q, mp);
+		break;
+	case N_CONN_IND:
+		printd(("%s: %p: N_CONN_IND <-\n", MOD_NAME, sl));
+		rtn = ne_conn_ind(sl, q, mp);
 		break;
 	case N_RESET_CON:
 		printd(("%s: %p: N_RESET_CON <-\n", MOD_NAME, sl));
-		rtn = n_other_ind(q, sl, mp);
+		rtn = ne_reset_con(sl, q, mp);
 		break;
 	default:
 		printd(("%s: %p: (????) <-\n", MOD_NAME, sl));
@@ -6383,7 +7797,7 @@ sl_w_data(queue_t *q, mblk_t *mp)
 	int err;
 
 	printd(("%s: %p: -> M_DATA [%lu]\n", MOD_NAME, sl, (ulong) msgdsize(mp)));
-	if ((err = sl_lsc_pdu(q, sl, mp)) < 0)
+	if ((err = sl_lsc_pdu(sl, q, mp)) < 0)
 		return (err);
 	return (QR_ABSORBED);	/* data absorbed */
 }
@@ -6394,7 +7808,7 @@ sl_r_data(queue_t *q, mblk_t *mp)
 	int err;
 
 	printd(("%s: %p: M_DATA [%lu] <-\n", MOD_NAME, sl, (ulong) msgdsize(mp)));
-	if ((err = sl_recv_msg(q, sl, mp)) == QR_ABSORBED)
+	if ((err = sl_recv_msg(sl, q, mp)) == QR_ABSORBED)
 		return (QR_ABSORBED);	/* data absorbed */
 	return (err);
 }
@@ -6515,9 +7929,9 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->obid = 0;
 		sl->iwait = NULL;
 		sl->owait = NULL;
-		sl->i_state = LMI_DISABLED;
+		sl->i_state = LMI_UNUSABLE;
 		sl->i_flags = 0;
-		sl->i_style = 0;
+		sl->i_style = LMI_STYLE2;
 		sl->i_version = M2PA_VERSION_DEFAULT;
 		sl->i_oldstate = sl->i_state;
 
@@ -6529,6 +7943,9 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		printd(("%s: %p: linked module private structure\n", MOD_NAME, sl));
 
 		/* intialize sl structure */
+		sl->n_state = NS_UNBND;	/* until info ack */
+		sl->n_request = 0;
+		sl->coninds = 0;
 		sl->rbuf = NULL;
 		sl->rmsu = 0;
 		sl->tmsu = 0;
@@ -6605,6 +8022,15 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->sl.config.N1 = 127;
 		sl->sl.config.N2 = 8192;
 		sl->sl.config.M = 5;
+
+		/* LM information defaults */
+		sl->info.lm.lmi_primitive = LMI_INFO_ACK;
+		sl->info.lm.lmi_version = 1;
+		sl->info.lm.lmi_state = LMI_UNUSABLE;
+		sl->info.lm.lmi_max_sdu = 538;
+		sl->info.lm.lmi_min_sdu = 1;
+		sl->info.lm.lmi_header_len = 10;
+		sl->info.lm.lmi_ppa_style = LMI_STYLE2;
 
 		printd(("%s: %p: setting module private structure defaults\n", MOD_NAME, sl));
 	} else
@@ -6691,22 +8117,33 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		major_t cmajor = getmajor(*devp);
 		minor_t cminor = getminor(*devp);
 		struct sl *sl;
+		mblk_t *mp;
+
+		if ((mp = allocb(sizeof(N_info_req_t), BPRI_WAITOK)) == NULL)
+			return (ENOSR);
 
 		spin_lock_bh(&sl_lock);
 		/* test for multiple push */
 		for (sl = sl_list; sl; sl = sl->next)
 			if (sl->u.dev.cmajor == cmajor && sl->u.dev.cminor == cminor) {
 				spin_unlock_bh(&sl_lock);
+				freemsg(mp);
 				return (ENXIO);
 			}
 
 		if (!(sl_alloc_priv(q, &sl_list, devp, crp))) {
 			spin_unlock_bh(&sl_lock);
+			freemsg(mp);
 			return (ENOMEM);
 		}
 		spin_unlock_bh(&sl_lock);
 
+		mp->b_datap->db_type = M_PCPROTO;
+		((N_info_req_t *)mp->b_wptr)->PRIM_type = N_INFO_REQ;
+		mp->b_wptr += sizeof(N_info_req_t);
+
 		qprocson(q);
+		putnext(WR(q), mp); /* immediate info request */
 		return (0);
 	}
 	return (EIO);

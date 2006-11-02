@@ -1,3 +1,11 @@
+2006-11-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/m2pa_sl.c: major rework for test cases and attach/enable
+	  capability
+	* src/test/test-m2pa.c: corresponding alterations to test cases and test
+	  case corrections from testing
+	* tests/testsuite-m2pa.at: removed old test case
+
 2006-10-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/m2pa_sl.c: more debugging and a few corrections
