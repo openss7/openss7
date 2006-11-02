@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/10/31 20:57:15 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/02 12:50:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 20:57:15 $ by $Author: brian $
+ Last Modified $Date: 2006/11/02 12:50:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.25  2006/11/02 12:50:06  brian
+ - put procedure needs to call wakeup
+
  Revision 0.9.2.24  2006/10/31 20:57:15  brian
  - timer corrections plus 32-bit compatibility
 
@@ -128,10 +131,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/10/31 20:57:15 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/02 12:50:06 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/10/31 20:57:15 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/02 12:50:06 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -152,7 +155,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/10/31 20:57:15 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/02 12:50:06 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -574,6 +577,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
  * @q: queue to put
  * @mp: message to put
  * @proc: procedure to process the message
+ * @procwake: procedure to call after message is processed
  *
  * Notes: M_FLUSH messages are processed without locking and are not queued.  All other normal
  * priority messages are queued if there exists messages on the queue, or if the service procedure
@@ -590,7 +594,8 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
  * has exclusive access to the queue pair private structure.
  */
 streamscall __hot int
-ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *))
+ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *),
+		void streamscall (*procwake)(queue_t *))
 {
 	int locked = 0;
 
@@ -610,8 +615,12 @@ ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *))
 		if (likely(rtn == QR_TRIMMED)) {
 			freeb(mp);
 		      unlock_exit:
-			if (locked)
+			if (locked) {
+				/* perform wakeups */
+				if (procwake)
+					procwake(q);
 				ss7_unlockq(q);
+			}
 			return (0);
 		}
 		if (likely(rtn == QR_DONE)) {
@@ -807,7 +816,7 @@ ss7_oput(queue_t *q, mblk_t *mp)
 
 	if (likely(s->oq != NULL)) {
 		if (likely(s->o_prim != NULL)) {
-			ss7_putq(s->oq, mp, s->o_prim);
+			ss7_putq(s->oq, mp, s->o_prim, s->o_wakeup);
 			return (0);
 		}
 	}
@@ -890,7 +899,7 @@ ss7_iput(queue_t *q, mblk_t *mp)
 
 	if (likely(s->iq != NULL)) {
 		if (likely(s->i_prim != NULL)) {
-			ss7_putq(s->iq, mp, s->i_prim);
+			ss7_putq(s->iq, mp, s->i_prim, s->i_wakeup);
 			return (0);
 		}
 	}
