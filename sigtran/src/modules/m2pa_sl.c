@@ -4097,6 +4097,7 @@ sl_lsc_no_processor_outage(struct sl *sl, queue_t *q)
 			}
 			sl_is_stats(sl, q);
 			sl_set_state(sl, MS_IN_SERVICE);
+			sl_tx_wakeup(q);
 		}
 	}
 }
@@ -4142,12 +4143,20 @@ sl_lsc_status_processor_outage_ended(struct sl *sl, queue_t *q, mblk_t *mp)
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->flags & MF_RPO) {
 			if (sl->i_version >= M2PA_VERSION_DRAFT10) {
+				/* always clear the retransmission buffer */
+				bufq_purge(&sl->rtb);
+				sl->tack = 0;
+				sl->flags &= ~MF_RTB_FULL;
+				sl->flags &= ~MF_CLEAR_RTB;
+				if ((err = sl_check_congestion(sl, q)) < 0)
+					return (err);
 				/* In the final, when we receive PROCESSOR_RECOVERED, we need to
 				   send READY, and also use the BSN from the received message to
 				   synchronize FSN. */
 				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr)) & 0xffffff;
 				if ((err = sl_send_status(sl, q, M2PA_STATUS_IN_SERVICE)))
 					return (err);
+				sl->flags &= ~MF_WAIT_SYNC;
 			}
 			if (sl->sl.notify.events & SL_EVT_RPO_END)
 				if ((err = lmi_event_ind(sl, q, SL_EVT_RPO_END, 0, NULL, 0)) < 0)

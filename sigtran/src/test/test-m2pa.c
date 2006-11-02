@@ -3324,8 +3324,8 @@ print_rx_msg(int child, const char *string)
 		case M2PA_VERSION_DRAFT10:
 		case M2PA_VERSION_DRAFT11:
 		case M2PA_VERSION_RFC4165:
-			if (fsn[child] != 0xffffff || bsn[child] != 0xffffff) {
-				print_rx_msg_sn(child, string, bsn[child], fsn[child]);
+			if (fsn[(child + 1) % 2] != 0xffffff || bsn[(child + 1) % 2] != 0xffffff) {
+				print_rx_msg_sn(child, string, bsn[(child + 1) %2], fsn[(child + 1) %2]);
 				return;
 			}
 		default:
@@ -12498,18 +12498,18 @@ test_4_1b_11_ptu(int child)
 		switch (get_event(child)) {
 		case __TEST_DATA:
 			if (dat == 0) {
-				state++;
 				dat++;
+				state++;
 				bsn[0] = fsn[1];
 				if (do_signal(child, __TEST_ACK))
-					goto failure;
-				state++;
-				if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
 					goto failure;
 				state++;
 				continue;
 			} else if (dat == 1) {
 				dat++;
+				state++;
+				if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
+					goto failure;
 				state++;
 				if (ack == 0)
 					continue;
@@ -13382,6 +13382,7 @@ test_8_3_ptu(int child)
 				case M2PA_VERSION_DRAFT11:
 				case M2PA_VERSION_RFC4165:
 					bsn[0] += nacks;
+					bsn[0] &= 0xffffff;
 					break;
 				}
 				if (do_signal(child, __TEST_ACK))
@@ -13410,6 +13411,7 @@ test_8_3_ptu(int child)
 			case M2PA_VERSION_DRAFT11:
 			case M2PA_VERSION_RFC4165:
 				bsn[0] += nacks;
+				bsn[0] &= 0xffffff;
 				break;
 			}
 			if (do_signal(child, __TEST_ACK))
@@ -13447,6 +13449,7 @@ test_8_3_ptu(int child)
 				case M2PA_VERSION_DRAFT11:
 				case M2PA_VERSION_RFC4165:
 					bsn[0] += nacks;
+					bsn[0] &= 0xffffff;
 					break;
 				}
 				if (do_signal(child, __TEST_ACK))
@@ -13466,6 +13469,10 @@ test_8_3_ptu(int child)
 		}
 		break;
 	}
+	start_tt(iutconf.sl.t7 + 200);
+	if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT))
+		goto failure;
+	state++;
 	return __RESULT_SUCCESS;
       failure:
 	print_more(child);
@@ -13618,7 +13625,7 @@ test_8_5_ptu(int child)
 		}
 		break;
 	}
-	if (expect(child, INFINITE_WAIT, __TEST_ACK))
+	if (expect(child, iutconf.sl.t7, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	switch (m2pa_version) {
@@ -13630,7 +13637,7 @@ test_8_5_ptu(int child)
 			goto failure;
 		if (bsn[1] != 0)
 			goto failure;
-		if (do_signal(1, __TEST_DATA))
+		if (do_signal(child, __TEST_DATA))
 			goto failure;
 		state++;
 		break;
@@ -13644,7 +13651,7 @@ test_8_5_ptu(int child)
 		state++;
 		break;
 	}
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+	if (expect(child, INFINITE_WAIT, __TEST_ACK))
 		goto failure;
 	state++;
 	switch (m2pa_version) {
