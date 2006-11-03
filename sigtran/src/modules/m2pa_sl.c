@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:42 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/02 12:54:42 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 11:08:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.5  2006/11/03 11:08:46  brian
+ - 32-bit compatibility testsuite passes
+
  Revision 0.9.2.4  2006/11/02 12:54:42  brian
  - major corrections and updates to M2PA module and tests cases
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:42 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:46 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:42 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:46 $";
 
 #define _LFS_SOURCE 1
 
@@ -87,7 +90,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:42 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:46 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1377,18 +1380,22 @@ n_data_req(struct sl *sl, queue_t *q, np_ulong flags, void *qos_ptr, size_t qos_
 	N_data_req_t *p;
 	mblk_t *mp;
 
-	if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_DATA_REQ;
-		p->DATA_xfer_flags = flags;
-		mp->b_wptr += sizeof(*p);
-		bcopy(qos_ptr, mp->b_wptr, qos_len);
-		mp->b_wptr += qos_len;
-		mp->b_cont = dp;
-		printd(("%s: %p: N_DATA_REQ ->\n", MOD_NAME, sl));
-		putnext(sl->iq, mp);
-		return (0);
+	if (likely((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(sl->iq))) {
+			mp->b_datap->db_type = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_DATA_REQ;
+			p->DATA_xfer_flags = flags;
+			mp->b_wptr += sizeof(*p);
+			bcopy(qos_ptr, mp->b_wptr, qos_len);
+			mp->b_wptr += qos_len;
+			mp->b_cont = dp;
+			printd(("%s: %p: N_DATA_REQ ->\n", MOD_NAME, sl));
+			putnext(sl->iq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
 	}
 	return (-ENOBUFS);
 }
@@ -1407,17 +1414,22 @@ n_exdata_req(struct sl *sl, queue_t *q, void *qos_ptr, size_t qos_len, mblk_t *d
 	N_exdata_req_t *p;
 	mblk_t *mp;
 
-	if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_EXDATA_REQ;
-		mp->b_wptr += sizeof(*p);
-		bcopy(qos_ptr, mp->b_wptr, qos_len);
-		mp->b_wptr += qos_len;
-		mp->b_cont = dp;
-		printd(("%s: %p: N_EXDATA_REQ ->\n", MOD_NAME, sl));
-		putnext(sl->iq, mp);
-		return (0);
+	if (likely((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED)) != NULL)) {
+		mp->b_band = 1; /* expedite */
+		if (likely(bcanputnext(sl->iq, mp->b_band))) {
+			mp->b_datap->db_type = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_EXDATA_REQ;
+			mp->b_wptr += sizeof(*p);
+			bcopy(qos_ptr, mp->b_wptr, qos_len);
+			mp->b_wptr += qos_len;
+			mp->b_cont = dp;
+			printd(("%s: %p: N_EXDATA_REQ ->\n", MOD_NAME, sl));
+			putnext(sl->iq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
 	}
 	return (-ENOBUFS);
 }
@@ -3667,6 +3679,7 @@ sl_lsc_pdu(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	bufq_queue(&sl->tb, mp);
 	sl_check_congestion(sl, q);
+	sl_tx_wakeup(q);
 	return (0);
 }
 STATIC int

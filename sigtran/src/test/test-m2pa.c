@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:44 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:48 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/02 12:54:44 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 11:08:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.5  2006/11/03 11:08:48  brian
+ - 32-bit compatibility testsuite passes
+
  Revision 0.9.2.4  2006/11/02 12:54:44  brian
  - major corrections and updates to M2PA module and tests cases
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:44 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:48 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:44 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:48 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -182,6 +185,7 @@ static const char *sstdname = "Q.781";
 static const char *shortname = "M2PA";
 static char devname[256] = "/dev/sctp_n";
 
+static int repeat_verbose = 0;
 static int repeat_on_success = 0;
 static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
@@ -1299,9 +1303,156 @@ nerrno_string(ulong nerr, long uerr)
 	}
 }
 
+char *
+lmerrno_string(ulong lmerr, long uerr)
+{
+	switch (lmerr) {
+	case LMI_UNSPEC:	/* Unknown or unspecified */
+		return ("[LMI_UNSPEC]");
+	case LMI_BADADDRESS:	/* Address was invalid */
+		return ("[LMI_BADADDRESS]");
+	case LMI_BADADDRTYPE:	/* Invalid address type */
+		return ("[LMI_BADADDRTYPE]");
+	case LMI_BADDIAL:	/* (not used) */
+		return ("[LMI_BADDIAL]");
+	case LMI_BADDIALTYPE:	/* (not used) */
+		return ("[LMI_BADDIALTYPE]");
+	case LMI_BADDISPOSAL:	/* Invalid disposal parameter */
+		return ("[LMI_BADDISPOSAL]");
+	case LMI_BADFRAME:	/* Defective SDU received */
+		return ("[LMI_BADFRAME]");
+	case LMI_BADPPA:	/* Invalid PPA identifier */
+		return ("[LMI_BADPPA]");
+	case LMI_BADPRIM:	/* Unregognized primitive */
+		return ("[LMI_BADPRIM]");
+	case LMI_DISC:		/* Disconnected */
+		return ("[LMI_DISC]");
+	case LMI_EVENT:	/* Protocol-specific event ocurred */
+		return ("[LMI_EVENT]");
+	case LMI_FATALERR:	/* Device has become unusable */
+		return ("[LMI_FATALERR]");
+	case LMI_INITFAILED:	/* Link initialization failed */
+		return ("[LMI_INITFAILED]");
+	case LMI_NOTSUPP:	/* Primitive not supported by this device */
+		return ("[LMI_NOTSUPP]");
+	case LMI_OUTSTATE:	/* Primitive was issued from invalid state */
+		return ("[LMI_OUTSTATE]");
+	case LMI_PROTOSHORT:	/* M_PROTO block too short */
+		return ("[LMI_PROTOSHORT]");
+	case LMI_SYSERR:	/* UNIX system error */
+		return errno_string(uerr);
+	case LMI_WRITEFAIL:	/* Unitdata request failed */
+		return ("[LMI_WRITEFAIL]");
+	case LMI_CRCERR:	/* CRC or FCS error */
+		return ("[LMI_CRCERR]");
+	case LMI_DLE_EOT:	/* DLE EOT detected */
+		return ("[LMI_DLE_EOT]");
+	case LMI_FORMAT:	/* Format error detected */
+		return ("[LMI_FORMAT]");
+	case LMI_HDLC_ABORT:	/* Aborted frame detected */
+		return ("[LMI_HDLC_ABORT]");
+	case LMI_OVERRUN:	/* Input overrun */
+		return ("[LMI_OVERRUN]");
+	case LMI_TOOSHORT:	/* Frame too short */
+		return ("[LMI_TOOSHORT]");
+	case LMI_INCOMPLETE:	/* Partial frame received */
+		return ("[LMI_INCOMPLETE]");
+	case LMI_BUSY:		/* Telephone was busy */
+		return ("[LMI_BUSY]");
+	case LMI_NOANSWER:	/* Connection went unanswered */
+		return ("[LMI_NOANSWER]");
+	case LMI_CALLREJECT:	/* Connection rejected */
+		return ("[LMI_CALLREJECT]");
+	case LMI_HDLC_IDLE:	/* HDLC line went idle */
+		return ("[LMI_HDLC_IDLE]");
+	case LMI_HDLC_NOTIDLE:	/* HDLC link no longer idle */
+		return ("[LMI_HDLC_NOTIDLE]");
+	case LMI_QUIESCENT:	/* Line being reassigned */
+		return ("[LMI_QUIESCENT]");
+	case LMI_RESUMED:	/* Line has been reassigned */
+		return ("[LMI_RESUMED]");
+	case LMI_DSRTIMEOUT:	/* Did not see DSR in time */
+		return ("[LMI_DSRTIMEOUT]");
+	case LMI_LAN_COLLISIONS:	/* LAN excessive collisions */
+		return ("[LMI_LAN_COLLISIONS]");
+	case LMI_LAN_REFUSED:	/* LAN message refused */
+		return ("[LMI_LAN_REFUSED]");
+	case LMI_LAN_NOSTATION:	/* LAN no such station */
+		return ("[LMI_LAN_NOSTATION]");
+	case LMI_LOSTCTS:	/* Lost Clear to Send signal */
+		return ("[LMI_LOSTCTS]");
+	case LMI_DEVERR:	/* Start of device-specific error codes */
+		return ("[LMI_DEVERR]");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) lmerr);
+		return buf;
+	}
+	}
+}
+
 const char *
 event_string(int child, int event)
 {
+	switch (child) {
+	case CHILD_IUT:
+		switch (event) {
+		case __EVENT_IUT_OUT_OF_SERVICE:
+			return ("!out of service");
+		case __EVENT_IUT_IN_SERVICE:
+			return ("!in service");
+		case __EVENT_IUT_RPO:
+			return ("!rpo");
+		case __EVENT_IUT_RPR:
+			return ("!rpr");
+		case __EVENT_IUT_DATA:
+			return ("!msu");
+		case __TEST_ENABLE_CON:
+			return ("!enable con");
+		case __TEST_DISABLE_CON:
+			return ("!disable con");
+		case __TEST_OK_ACK:
+			return ("!ok ack");
+		case __TEST_ERROR_ACK:
+			return ("!error ack");
+		case __TEST_ERROR_IND:
+			return ("!error ind");
+		}
+		break;
+	default:
+	case CHILD_PTU:
+		switch (event) {
+		case __STATUS_OUT_OF_SERVICE:
+			return ("OUT-OF-SERVICE");
+		case __STATUS_ALIGNMENT:
+			return ("ALIGNMENT");
+		case __STATUS_PROVING_NORMAL:
+			return ("PROVING-NORMAL");
+		case __STATUS_PROVING_EMERG:
+			return ("PROVING-EMERGENCY");
+		case __STATUS_IN_SERVICE:
+			return ("IN-SERVICE");
+		case __STATUS_PROCESSOR_OUTAGE:
+			return ("PROCESSOR-OUTAGE");
+		case __STATUS_PROCESSOR_ENDED:
+			return ("PROCESSOR-ENDED");
+		case __STATUS_BUSY:
+			return ("BUSY");
+		case __STATUS_BUSY_ENDED:
+			return ("BUSY-ENDED");
+		case __STATUS_SEQUENCE_SYNC:
+			return ("READY");
+		case __MSG_PROVING:
+			return ("PROVING");
+		case __TEST_ACK:
+			return ("ACK");
+		case __TEST_DATA:
+			return ("DATA");
+		}
+		break;
+	}
 	switch (event) {
 	case __EVENT_EOF:
 		return ("END OF FILE");
@@ -1375,53 +1526,6 @@ event_string(int child, int event)
 		return ("N_RESET_RES");
 	case __TEST_RESET_CON:
 		return ("N_RESET_CON");
-	}
-	switch (child) {
-	case CHILD_IUT:
-		switch (event) {
-		case __EVENT_IUT_OUT_OF_SERVICE:
-			return ("!out of service");
-		case __EVENT_IUT_IN_SERVICE:
-			return ("!in service");
-		case __EVENT_IUT_RPO:
-			return ("!rpo");
-		case __EVENT_IUT_RPR:
-			return ("!rpr");
-		case __EVENT_IUT_DATA:
-			return ("!msu");
-		}
-		break;
-	default:
-	case CHILD_PTU:
-		switch (event) {
-		case __STATUS_OUT_OF_SERVICE:
-			return ("OUT-OF-SERVICE");
-		case __STATUS_ALIGNMENT:
-			return ("ALIGNMENT");
-		case __STATUS_PROVING_NORMAL:
-			return ("PROVING-NORMAL");
-		case __STATUS_PROVING_EMERG:
-			return ("PROVING-EMERGENCY");
-		case __STATUS_IN_SERVICE:
-			return ("IN-SERVICE");
-		case __STATUS_PROCESSOR_OUTAGE:
-			return ("PROCESSOR-OUTAGE");
-		case __STATUS_PROCESSOR_ENDED:
-			return ("PROCESSOR-ENDED");
-		case __STATUS_BUSY:
-			return ("BUSY");
-		case __STATUS_BUSY_ENDED:
-			return ("BUSY-ENDED");
-		case __STATUS_SEQUENCE_SYNC:
-			return ("READY");
-		case __MSG_PROVING:
-			return ("PROVING");
-		case __TEST_ACK:
-			return ("ACK");
-		case __TEST_DATA:
-			return ("DATA");
-		}
-		break;
 	}
 	return ("(unexpected)");
 }
@@ -4812,7 +4916,7 @@ end_sanity(int index)
  */
 
 union primitives {
-	ulong prim;
+	np_ulong prim;
 	union LMI_primitives lmi;
 	union SDL_primitives sdl;
 	union SDT_primitives sdt;
@@ -6264,8 +6368,10 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_OK_ACK;
 			break;
 		case LMI_ERROR_ACK:
-			if (show && verbose > 1)
+			if (show && verbose > 1) {
 				print_command_state(child, prim_string(p->prim));
+				print_string(child, lmerrno_string(p->lmi.error_ack.lmi_errno, p->lmi.error_ack.lmi_reason));
+			}
 			event = __TEST_ERROR_ACK;
 			break;
 		case LMI_ENABLE_CON:
@@ -7245,6 +7351,7 @@ check_snibs(unsigned char bsnib, unsigned char fsnib)
 #define sgrp_case_0_1 test_group_0_1
 #define numb_case_0_1 "0.1"
 #define name_case_0_1 "Check test case guard timer."
+#define xtra_case_0_1 NULL
 #define sref_case_0_1 "(none)"
 #define desc_case_0_1 "\
 Checks that the test case guard timer will fire and bring down the children."
@@ -7279,6 +7386,7 @@ struct test_stream test_case_0_1_iut = { preamble_none, &test_0_1_iut, postamble
 #define sgrp_case_0_2_1 test_group_0_2
 #define numb_case_0_2_1 "0.2.1"
 #define name_case_0_2_1 "Base preamble, base postamble."
+#define xtra_case_0_2_1 NULL
 #define sref_case_0_2_1 "(none)"
 #define desc_case_0_2_1 "\
 Checks that two Streams can be opened and closed."
@@ -7304,6 +7412,7 @@ struct test_stream test_case_0_2_1_iut = { preamble_none, test_0_2_1_iut, postam
 #define sgrp_case_0_2_2 test_group_0_2
 #define numb_case_0_2_2 "0.2.2"
 #define name_case_0_2_2 "Unbound preamble, unbound postamble."
+#define xtra_case_0_2_2 NULL
 #define sref_case_0_2_2 "(none)"
 #define desc_case_0_2_2 "\
 Checks that two Streams can be opened, information obtained, and closed."
@@ -7329,6 +7438,7 @@ struct test_stream test_case_0_2_2_iut = { preamble_unbound, test_0_2_2_iut, pos
 #define sgrp_case_0_2_3 test_group_0_2
 #define numb_case_0_2_3 "0.2.3"
 #define name_case_0_2_3 "Push preamble, pop postamble."
+#define xtra_case_0_2_3 NULL
 #define sref_case_0_2_3 "(none)"
 #define desc_case_0_2_3 "\
 Checks that two Streams can be opened, information obtained, module\n\
@@ -7355,6 +7465,7 @@ struct test_stream test_case_0_2_3_iut = { preamble_push, test_0_2_3_iut, postam
 #define sgrp_case_0_2_4 test_group_0_2
 #define numb_case_0_2_4 "0.2.4"
 #define name_case_0_2_4 "Config preamble, pop postamble."
+#define xtra_case_0_2_4 NULL
 #define sref_case_0_2_4 "(none)"
 #define desc_case_0_2_4 "\
 Checks that two Streams can be opened, information obtained, module\n\
@@ -7383,6 +7494,7 @@ struct test_stream test_case_0_2_4_iut = { preamble_config, test_0_2_4_iut, post
 #define sgrp_case_0_2_5 test_group_0_2
 #define numb_case_0_2_5 "0.2.5"
 #define name_case_0_2_5 "Attach preamble, detach postamble."
+#define xtra_case_0_2_5 NULL
 #define sref_case_0_2_5 "(none)"
 #define desc_case_0_2_5 "\
 Checks that two Streams can be opened, information obtained, module\n\
@@ -7412,6 +7524,7 @@ struct test_stream test_case_0_2_5_iut = { preamble_attach, test_0_2_5_iut, post
 #define sgrp_case_0_2_6 test_group_0_2
 #define numb_case_0_2_6 "0.2.6"
 #define name_case_0_2_6 "Enable preamble, disable postamble."
+#define xtra_case_0_2_6 NULL
 #define sref_case_0_2_6 "(none)"
 #define desc_case_0_2_6 "\
 Checks that two Streams can be opened, information obtained, module\n\
@@ -7441,6 +7554,7 @@ struct test_stream test_case_0_2_6_iut = { preamble_enable, test_0_2_6_iut, post
 #define sgrp_case_0_2_7 test_group_0_2
 #define numb_case_0_2_7 "0.2.7"
 #define name_case_0_2_7 "Link power on preamble, out of service postamble."
+#define xtra_case_0_2_7 NULL
 #define sref_case_0_2_7 "(none)"
 #define desc_case_0_2_7 "\
 Checks that two Streams can be opened, information obtained, module\n\
@@ -7473,15 +7587,18 @@ struct test_stream test_case_0_2_7_iut = { preamble_link_power_on, test_0_2_7_iu
 
 #define test_case_0_2_7 { &test_case_0_2_7_ptu, &test_case_0_2_7_iut, NULL }
 
-#define test_group_1 "1. Link State Control - Expected signal units/orders"
+#define test_group_1 "1. Link State Control"
+#define test_subgroup_1 "Expected signal units/orders"
 #define tgrp_case_1_1a test_group_1
-#define sgrp_case_1_1a test_group_1
+#define sgrp_case_1_1a test_subgroup_1
 #define sref_case_1_1a "Q.781/1.1"
 #define numb_case_1_1a "1.1(a)"
 #define name_case_1_1a "Initialization (power-up)"
+#define xtra_case_1_1a "Forward"
 #define desc_case_1_1a "\
-Link State Control - Expected signal units/orders\n\
-Initialization (Power-up)"
+Arrange the IUT to power on and send an SIOS message.  Power on the IUT\n\
+and check that the IUT sends an SIOS message.  Check that the IUT\n\
+maintains the \"Out of Service\" state."
 static int
 test_power_on_pt(int child)
 {
@@ -7540,13 +7657,16 @@ static struct test_stream test_case_1_1a_iut = { preamble_link_power_off, test_1
 #define test_case_1_1a { &test_case_1_1a_ptu, &test_case_1_1a_iut, NULL }
 
 #define tgrp_case_1_1b test_group_1
-#define sgrp_case_1_1b test_group_1
+#define sgrp_case_1_1b test_subgroup_1
 #define sref_case_1_1b "Q.781/1.1"
 #define numb_case_1_1b "1.1(b)"
 #define name_case_1_1b "Initialization (power-up)"
+#define xtra_case_1_1b "Reverse"
 #define desc_case_1_1b "\
-Link State Control - Expected signal units/orders\n\
-Initialization (Power-up)"
+Power on the IUT and check that the IUT sends an SIOS message.  Arrange\n\
+the IUT to power on and send an SIOS message.  Check that the IUT\n\
+maintains the \"Out of Service\" state."
+
 static int
 test_power_on_sut(int child)
 {
@@ -7605,10 +7725,11 @@ static struct test_stream test_case_1_1b_iut = { preamble_link_power_off, test_1
 #define test_case_1_1b { &test_case_1_1b_ptu, &test_case_1_1b_iut, NULL }
 
 #define tgrp_case_1_2 test_group_1
-#define sgrp_case_1_2 test_group_1
+#define sgrp_case_1_2 test_subgroup_1
 #define sref_case_1_2 "Q.781/1.2"
 #define numb_case_1_2 "1.2"
 #define name_case_1_2 "Timer T2"
+#define xtra_case_1_2 NULL
 #define desc_case_1_2 "\
 Arrange the IUT to send an SIO message to initiate alignment.  Arrange\n\
 the PT to not respond to the SIO message.  When the T2 timer expires at\n\
@@ -7700,10 +7821,11 @@ static struct test_stream test_case_1_2_iut = { preamble_link_power_on, test_1_2
 #define test_case_1_2 { &test_case_1_2_ptu, &test_case_1_2_iut, NULL }
 
 #define tgrp_case_1_3 test_group_1
-#define sgrp_case_1_3 test_group_1
+#define sgrp_case_1_3 test_subgroup_1
 #define sref_case_1_3 "Q.781/1.3"
 #define numb_case_1_3 "1.3"
 #define name_case_1_3 "Timer T3"
+#define xtra_case_1_3 NULL
 #define desc_case_1_3 "\
 Arrange the IUT to send an SIO message to initiate alignment.  Arrange\n\
 the PT to send an SIO message in response, but to not send proving\n\
@@ -7793,10 +7915,11 @@ static struct test_stream test_case_1_3_iut = { preamble_link_power_on, test_1_3
 #define test_case_1_3 { &test_case_1_3_ptu, &test_case_1_3_iut, NULL }
 
 #define tgrp_case_1_4 test_group_1
-#define sgrp_case_1_4 test_group_1
+#define sgrp_case_1_4 test_subgroup_1
 #define sref_case_1_4 "Q.781/1.4"
 #define numb_case_1_4 "1.4"
-#define name_case_1_4 "Timer T1 & Timer T4 (Normal)"
+#define name_case_1_4 "Timer T1 & Timer T4"
+#define xtra_case_1_4 "Normal"
 #define desc_case_1_4 "\
 Arrange the IUT to start the link and send an SIO.  Arrange the PT to\n\
 respond with SIO, normal proving messages, SIN, but to not issue the\n\
@@ -8168,10 +8291,11 @@ test_1_5b_iut(int child, int proving)
 }
 
 #define tgrp_case_1_5a_p test_group_1
-#define sgrp_case_1_5a_p test_group_1
+#define sgrp_case_1_5a_p test_subgroup_1
 #define sref_case_1_5a_p "Q.781/1.5"
 #define numb_case_1_5a_p "1.5(a)"
 #define name_case_1_5a_p "Normal alignment procedure"
+#define xtra_case_1_5a_p "Forward - Proving"
 #define desc_case_1_5a_p "\
 Link State Control = Expected signal units/orders\n\
 Normal alignment procedure\n\
@@ -8195,10 +8319,11 @@ static struct test_stream test_case_1_5a_p_iut = { preamble_link_power_on, test_
 #define test_case_1_5a_p { &test_case_1_5a_p_ptu, &test_case_1_5a_p_iut, NULL }
 
 #define tgrp_case_1_5b_p test_group_1
-#define sgrp_case_1_5b_p test_group_1
+#define sgrp_case_1_5b_p test_subgroup_1
 #define sref_case_1_5b_p "Q.781/1.5"
 #define numb_case_1_5b_p "1.5(b)"
 #define name_case_1_5b_p "Normal alignment procedure"
+#define xtra_case_1_5b_p "Reverse - Proving"
 #define desc_case_1_5b_p "\
 Link State Control = Expected signal units/orders\n\
 Normal alignment procedure\n\
@@ -8222,10 +8347,11 @@ static struct test_stream test_case_1_5b_p_iut = { preamble_link_power_on, test_
 #define test_case_1_5b_p { &test_case_1_5b_p_ptu, &test_case_1_5b_p_iut, NULL }
 
 #define tgrp_case_1_5a_np test_group_1
-#define sgrp_case_1_5a_np test_group_1
+#define sgrp_case_1_5a_np test_subgroup_1
 #define sref_case_1_5a_np "Q781/1.5"
 #define numb_case_1_5a_np "1.5(a)np"
 #define name_case_1_5a_np "Normal alignment procedure"
+#define xtra_case_1_5a_np "Forward - No Proving"
 #define desc_case_1_5a_np "\
 Link State Control = Expected signal units/orders\n\
 Normal alignment procedure\n\
@@ -8249,10 +8375,11 @@ static struct test_stream test_case_1_5a_np_iut = { preamble_link_power_on_np, t
 #define test_case_1_5a_np { &test_case_1_5a_np_ptu, &test_case_1_5a_np_iut, NULL }
 
 #define tgrp_case_1_5b_np test_group_1
-#define sgrp_case_1_5b_np test_group_1
+#define sgrp_case_1_5b_np test_subgroup_1
 #define sref_case_1_5b_np "Q.781/1.5"
 #define numb_case_1_5b_np "1.5(b)np"
 #define name_case_1_5b_np "Normal alignment procedure"
+#define xtra_case_1_5b_np "Reverse - No Proving"
 #define desc_case_1_5b_np "\
 Link State Control = Expected signal units/orders\n\
 Normal alignment procedure\n\
@@ -8311,10 +8438,11 @@ test_1_6_iut(int child, int proving)
 }
 
 #define tgrp_case_1_6_p test_group_1
-#define sgrp_case_1_6_p test_group_1
+#define sgrp_case_1_6_p test_subgroup_1
 #define sref_case_1_6_p "Q.781/1.6"
 #define numb_case_1_6_p "1.6"
-#define name_case_1_6_p "Normal alignment procedure (MSU)"
+#define name_case_1_6_p "Normal alignment procedure"
+#define xtra_case_1_6_p "MSU - Proving"
 #define desc_case_1_6_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment procedure = correct procedure (MSU)\n\
@@ -8337,10 +8465,11 @@ static struct test_stream test_case_1_6_p_iut = { preamble_link_power_on, test_1
 #define test_case_1_6_p { &test_case_1_6_p_ptu, &test_case_1_6_p_iut, NULL }
 
 #define tgrp_case_1_6_np test_group_1
-#define sgrp_case_1_6_np test_group_1
+#define sgrp_case_1_6_np test_subgroup_1
 #define sref_case_1_6_np "Q.781/1.6"
 #define numb_case_1_6_np "1.6np"
-#define name_case_1_6_np "Normal alignment procedure (MSU)"
+#define name_case_1_6_np "Normal alignment procedure"
+#define xtra_case_1_6_np "MSU - No Proving"
 #define desc_case_1_6_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment procedure = correct procedure (MSU)\n\
@@ -8363,10 +8492,11 @@ static struct test_stream test_case_1_6_np_iut = { preamble_link_power_on_np, te
 #define test_case_1_6_np { &test_case_1_6_np_ptu, &test_case_1_6_np_iut, NULL }
 
 #define tgrp_case_1_7 test_group_1
-#define sgrp_case_1_7 test_group_1
+#define sgrp_case_1_7 test_subgroup_1
 #define sref_case_1_7 "Q.781/1.7"
 #define numb_case_1_7 "1.7"
 #define name_case_1_7 "SIO received during normal proving period"
+#define xtra_case_1_7 NULL
 #define desc_case_1_7 "\
 Link State Control - Expected signal units/orders\n\
 SIO received during normal proving period\
@@ -8635,10 +8765,11 @@ test_1_8b_iut(int child, int proving)
 }
 
 #define tgrp_case_1_8a_p test_group_1
-#define sgrp_case_1_8a_p test_group_1
+#define sgrp_case_1_8a_p test_subgroup_1
 #define sref_case_1_8a_p "Q.781/1.8"
 #define numb_case_1_8a_p "1.8(a)"
-#define name_case_1_8a_p "Normal alignment PO set (FISU)"
+#define name_case_1_8a_p "Normal alignment PO set"
+#define xtra_case_1_8a_p "FISU - Forward - Proving"
 #define desc_case_1_8a_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (FISU)\n\
@@ -8662,10 +8793,11 @@ static struct test_stream test_case_1_8a_p_iut = { preamble_link_power_on, test_
 #define test_case_1_8a_p { &test_case_1_8a_p_ptu, &test_case_1_8a_p_iut, NULL }
 
 #define tgrp_case_1_8b_p test_group_1
-#define sgrp_case_1_8b_p test_group_1
+#define sgrp_case_1_8b_p test_subgroup_1
 #define sref_case_1_8b_p "Q.781/1.8"
 #define numb_case_1_8b_p "1.8(b)"
-#define name_case_1_8b_p "Normal alignment PO set (FISU)"
+#define name_case_1_8b_p "Normal alignment PO set"
+#define xtra_case_1_8b_p "FISU - Reverse - Proving"
 #define desc_case_1_8b_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (FISU)\n\
@@ -8689,10 +8821,11 @@ static struct test_stream test_case_1_8b_p_iut = { preamble_link_power_on, test_
 #define test_case_1_8b_p { &test_case_1_8b_p_ptu, &test_case_1_8b_p_iut, NULL }
 
 #define tgrp_case_1_8a_np test_group_1
-#define sgrp_case_1_8a_np test_group_1
+#define sgrp_case_1_8a_np test_subgroup_1
 #define sref_case_1_8a_np "Q.781/1.8"
 #define numb_case_1_8a_np "1.8(a)np"
-#define name_case_1_8a_np "Normal alignment PO set (FISU)"
+#define name_case_1_8a_np "Normal alignment PO set"
+#define xtra_case_1_8a_np "FISU - Forward - No Proving"
 #define desc_case_1_8a_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (FISU)\n\
@@ -8716,10 +8849,11 @@ static struct test_stream test_case_1_8a_np_iut = { preamble_link_power_on_np, t
 #define test_case_1_8a_np { &test_case_1_8a_np_ptu, &test_case_1_8a_np_iut, NULL }
 
 #define tgrp_case_1_8b_np test_group_1
-#define sgrp_case_1_8b_np test_group_1
+#define sgrp_case_1_8b_np test_subgroup_1
 #define sref_case_1_8b_np "Q.781/1.8"
 #define numb_case_1_8b_np "1.8(b)np"
-#define name_case_1_8b_np "Normal alignemnt PO set (FISU)"
+#define name_case_1_8b_np "Normal alignemnt PO set"
+#define xtra_case_1_8b_np "FISU - Reverse - No Proving"
 #define desc_case_1_8b_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (FISU)\n\
@@ -8823,10 +8957,11 @@ test_1_9b_iut(int child, int proving)
 }
 
 #define tgrp_case_1_9a_p test_group_1
-#define sgrp_case_1_9a_p test_group_1
+#define sgrp_case_1_9a_p test_subgroup_1
 #define sref_case_1_9a_p "Q.781/1.9"
 #define numb_case_1_9a_p "1.9(a)"
-#define name_case_1_9a_p "Normal alignment PO set (MSU)"
+#define name_case_1_9a_p "Normal alignment PO set"
+#define xtra_case_1_9a_p "MSU - Forward - Proving"
 #define desc_case_1_9a_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (MSU)\n\
@@ -8850,10 +8985,11 @@ static struct test_stream test_case_1_9a_p_iut = { preamble_link_power_on, test_
 #define test_case_1_9a_p { &test_case_1_9a_p_ptu, &test_case_1_9a_p_iut, NULL }
 
 #define tgrp_case_1_9b_p test_group_1
-#define sgrp_case_1_9b_p test_group_1
+#define sgrp_case_1_9b_p test_subgroup_1
 #define sref_case_1_9b_p "Q.781/1.9"
 #define numb_case_1_9b_p "1.9(b)"
-#define name_case_1_9b_p "Normal alignment PO set (MSU)"
+#define name_case_1_9b_p "Normal alignment PO set"
+#define xtra_case_1_9b_p "MSU - Reverse - Proving"
 #define desc_case_1_9b_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (MSU)\n\
@@ -8877,10 +9013,11 @@ static struct test_stream test_case_1_9b_p_iut = { preamble_link_power_on, test_
 #define test_case_1_9b_p { &test_case_1_9b_p_ptu, &test_case_1_9b_p_iut, NULL }
 
 #define tgrp_case_1_9a_np test_group_1
-#define sgrp_case_1_9a_np test_group_1
+#define sgrp_case_1_9a_np test_subgroup_1
 #define sref_case_1_9a_np "Q.781/1.9"
 #define numb_case_1_9a_np "1.9(a)np"
-#define name_case_1_9a_np "Normal alignment PO set (MSU)"
+#define name_case_1_9a_np "Normal alignment PO set"
+#define xtra_case_1_9a_np "MSU - Forward - No Proving"
 #define desc_case_1_9a_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (MSU)\n\
@@ -8904,10 +9041,11 @@ static struct test_stream test_case_1_9a_np_iut = { preamble_link_power_on_np, t
 #define test_case_1_9a_np { &test_case_1_9a_np_ptu, &test_case_1_9a_np_iut, NULL }
 
 #define tgrp_case_1_9b_np test_group_1
-#define sgrp_case_1_9b_np test_group_1
+#define sgrp_case_1_9b_np test_subgroup_1
 #define sref_case_1_9b_np "Q.781/1.9"
 #define numb_case_1_9b_np "1.9(b)np"
-#define name_case_1_9b_np "Normal alignment PO set (MSU)"
+#define name_case_1_9b_np "Normal alignment PO set"
+#define xtra_case_1_9b_np "MSU - Reverse - No Proving"
 #define desc_case_1_9b_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set (MSU)\n\
@@ -8962,10 +9100,11 @@ test_1_10_iut(int child, int proving)
 }
 
 #define tgrp_case_1_10_p test_group_1
-#define sgrp_case_1_10_p test_group_1
+#define sgrp_case_1_10_p test_subgroup_1
 #define sref_case_1_10_p "Q.781/1.10"
 #define numb_case_1_10_p "1.10"
 #define name_case_1_10_p "Normal alignment PO set and cleared"
+#define xtra_case_1_10_p "Proving"
 #define desc_case_1_10_p "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set and cleared\n\
@@ -8988,10 +9127,11 @@ static struct test_stream test_case_1_10_p_iut = { preamble_link_power_on, test_
 #define test_case_1_10_p { &test_case_1_10_p_ptu, &test_case_1_10_p_iut, NULL }
 
 #define tgrp_case_1_10_np test_group_1
-#define sgrp_case_1_10_np test_group_1
+#define sgrp_case_1_10_np test_subgroup_1
 #define sref_case_1_10_np "Q.781/1.10"
 #define numb_case_1_10_np "1.10np"
 #define name_case_1_10_np "Normal alignment PO set and cleared"
+#define xtra_case_1_10_np "No Proving"
 #define desc_case_1_10_np "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set and cleared\n\
@@ -9125,10 +9265,11 @@ test_1_11_iut(int child, int proving)
 }
 
 #define tgrp_case_1_11_p test_group_1
-#define sgrp_case_1_11_p test_group_1
+#define sgrp_case_1_11_p test_subgroup_1
 #define sref_case_1_11_p "Q.781/1.11"
 #define numb_case_1_11_p "1.11"
 #define name_case_1_11_p "RPO set \"Aligned not ready\""
+#define xtra_case_1_11_p "Proving"
 #define desc_case_1_11_p "\
 Link State Control - Expected signal units/orders\n\
 Set RPO when \"Aligned not ready\"\n\
@@ -9151,10 +9292,11 @@ static struct test_stream test_case_1_11_p_iut = { preamble_link_power_on, test_
 #define test_case_1_11_p { &test_case_1_11_p_ptu, &test_case_1_11_p_iut, NULL }
 
 #define tgrp_case_1_11_np test_group_1
-#define sgrp_case_1_11_np test_group_1
+#define sgrp_case_1_11_np test_subgroup_1
 #define sref_case_1_11_np "Q.781/1.11"
 #define numb_case_1_11_np "1.11np"
 #define name_case_1_11_np "RPO set \"Aligned not ready\""
+#define xtra_case_1_11_np "No Proving"
 #define desc_case_1_11_np "\
 Link State Control - Expected signal units/orders\n\
 Set RPO when \"Aligned not ready\"\n\
@@ -9232,10 +9374,11 @@ test_1_12a_iut(int child, int proving)
 }
 
 #define tgrp_case_1_12a_p test_group_1
-#define sgrp_case_1_12a_p test_group_1
+#define sgrp_case_1_12a_p test_subgroup_1
 #define sref_case_1_12a_p "Q.781/1.12"
 #define numb_case_1_12a_p "1.12(a)"
 #define name_case_1_12a_p "SIOS received when \"Aligned not ready\""
+#define xtra_case_1_12a_p "Forward - Proving"
 #define desc_case_1_12a_p "\
 Link State Control - Expected signal units/orders\n\
 SIOS received when \"Aligned not ready\"\n\
@@ -9259,10 +9402,11 @@ static struct test_stream test_case_1_12a_p_iut = { preamble_link_power_on, test
 #define test_case_1_12a_p { &test_case_1_12a_p_ptu, &test_case_1_12a_p_iut, NULL }
 
 #define tgrp_case_1_12a_np test_group_1
-#define sgrp_case_1_12a_np test_group_1
+#define sgrp_case_1_12a_np test_subgroup_1
 #define sref_case_1_12a_np "Q.781/1.12"
 #define numb_case_1_12a_np "1.12(a)np"
 #define name_case_1_12a_np "SIOS received when \"Aligned not ready\""
+#define xtra_case_1_12a_np "Forward - No Proving"
 #define desc_case_1_12a_np "\
 Link State Control - Expected signal units/orders\n\
 SIOS received when \"Aligned not ready\"\n\
@@ -9327,10 +9471,11 @@ test_1_12b_iut(int child, int proving)
 }
 
 #define tgrp_case_1_12b_p test_group_1
-#define sgrp_case_1_12b_p test_group_1
+#define sgrp_case_1_12b_p test_subgroup_1
 #define sref_case_1_12b_p "Q.781/1.12"
 #define numb_case_1_12b_p "1.12(b)"
 #define name_case_1_12b_p "SIOS received when \"Aligned not ready\""
+#define xtra_case_1_12b_p "Reverse - Proving"
 #define desc_case_1_12b_p "\
 Link State Control - Expected signal units/orders\n\
 SIOS received when \"Aligned not ready\"\n\
@@ -9354,10 +9499,11 @@ static struct test_stream test_case_1_12b_p_iut = { preamble_link_power_on, test
 #define test_case_1_12b_p { &test_case_1_12b_p_ptu, &test_case_1_12b_p_iut, NULL }
 
 #define tgrp_case_1_12b_np test_group_1
-#define sgrp_case_1_12b_np test_group_1
+#define sgrp_case_1_12b_np test_subgroup_1
 #define sref_case_1_12b_np "Q.781/1.12"
 #define numb_case_1_12b_np "1.12(b)np"
 #define name_case_1_12b_np "SIOS received when \"Aligned not ready\""
+#define xtra_case_1_12b_np "Reverse - No Proving"
 #define desc_case_1_12b_np "\
 Link State Control - Expected signal units/orders\n\
 SIOS received when \"Aligned not ready\"\n\
@@ -9432,10 +9578,11 @@ test_1_13_iut(int child, int proving)
 }
 
 #define tgrp_case_1_13_p test_group_1
-#define sgrp_case_1_13_p test_group_1
+#define sgrp_case_1_13_p test_subgroup_1
 #define sref_case_1_13_p "Q.781/1.13"
 #define numb_case_1_13_p "1.13"
 #define name_case_1_13_p "SIO received when \"Aligned not ready\""
+#define xtra_case_1_13_p "Proving"
 #define desc_case_1_13_p "\
 Link State Control - Expected signal units/orders\n\
 SIO received when \"Aligned not ready\"\n\
@@ -9458,10 +9605,11 @@ static struct test_stream test_case_1_13_p_iut = { preamble_link_power_on, test_
 #define test_case_1_13_p { &test_case_1_13_p_ptu, &test_case_1_13_p_iut, NULL }
 
 #define tgrp_case_1_13_np test_group_1
-#define sgrp_case_1_13_np test_group_1
+#define sgrp_case_1_13_np test_subgroup_1
 #define sref_case_1_13_np "Q.781/1.13"
 #define numb_case_1_13_np "1.13np"
 #define name_case_1_13_np "SIO received when \"Aligned not ready\""
+#define xtra_case_1_13_np "No Proving"
 #define desc_case_1_13_np "\
 Link State Control - Expected signal units/orders\n\
 SIO received when \"Aligned not ready\"\n\
@@ -9484,10 +9632,11 @@ static struct test_stream test_case_1_13_np_iut = { preamble_link_power_on_np, t
 #define test_case_1_13_np { &test_case_1_13_np_ptu, &test_case_1_13_np_iut, NULL }
 
 #define tgrp_case_1_14 test_group_1
-#define sgrp_case_1_14 test_group_1
+#define sgrp_case_1_14 test_subgroup_1
 #define sref_case_1_14 "Q.781/1.14"
 #define numb_case_1_14 "1.14"
 #define name_case_1_14 "Set and clear LPO when \"Initial alignment\""
+#define xtra_case_1_14 NULL
 #define desc_case_1_14 "\
 Link State Control - Expected signal units/orders\n\
 Set and clear LPO when \"Initial alignment\"\
@@ -9586,10 +9735,11 @@ test_1_15_iut(int child, int proving)
 }
 
 #define tgrp_case_1_15_p test_group_1
-#define sgrp_case_1_15_p test_group_1
+#define sgrp_case_1_15_p test_subgroup_1
 #define sref_case_1_15_p "Q.781/1.15"
 #define numb_case_1_15_p "1.15"
 #define name_case_1_15_p "Set and clear LPO when \"Aligned ready\""
+#define xtra_case_1_15_p "Proving"
 #define desc_case_1_15_p "\
 Link State Control - Expected signal units/orders\n\
 Set and clear LPO when \"Aligned ready\"\n\
@@ -9612,10 +9762,11 @@ static struct test_stream test_case_1_15_p_iut = { preamble_link_power_on, test_
 #define test_case_1_15_p { &test_case_1_15_p_ptu, &test_case_1_15_p_iut, NULL }
 
 #define tgrp_case_1_15_np test_group_1
-#define sgrp_case_1_15_np test_group_1
+#define sgrp_case_1_15_np test_subgroup_1
 #define sref_case_1_15_np "Q.781/1.15"
 #define numb_case_1_15_np "1.15np"
 #define name_case_1_15_np "Set and clear LPO when \"Aligned ready\""
+#define xtra_case_1_15_np "No Proving"
 #define desc_case_1_15_np "\
 Link State Control - Expected signal units/orders\n\
 Set and clear LPO when \"Aligned ready\"\n\
@@ -9675,10 +9826,11 @@ test_1_16_iut(int child, int proving)
 }
 
 #define tgrp_case_1_16_p test_group_1
-#define sgrp_case_1_16_p test_group_1
+#define sgrp_case_1_16_p test_subgroup_1
 #define sref_case_1_16_p "Q.781/1.16"
 #define numb_case_1_16_p "1.16"
 #define name_case_1_16_p "Timer T1 in \"Aligned not ready\" state"
+#define xtra_case_1_16_p "Proving"
 #define desc_case_1_16_p "\
 Link State Control - Expected signal units/orders\n\
 Timer T1 in \"Aligned not ready\" state\n\
@@ -9701,10 +9853,11 @@ static struct test_stream test_case_1_16_p_iut = { preamble_link_power_on, test_
 #define test_case_1_16_p { &test_case_1_16_p_ptu, &test_case_1_16_p_iut, NULL }
 
 #define tgrp_case_1_16_np test_group_1
-#define sgrp_case_1_16_np test_group_1
+#define sgrp_case_1_16_np test_subgroup_1
 #define sref_case_1_16_np "Q.781/1.16"
 #define numb_case_1_16_np "1.16np"
 #define name_case_1_16_np "Timer T1 in \"Aligned not ready\" state"
+#define xtra_case_1_16_np "No Proving"
 #define desc_case_1_16_np "\
 Link State Control - Expected signal units/orders\n\
 Timer T1 in \"Aligned not ready\" state\n\
@@ -9727,10 +9880,11 @@ static struct test_stream test_case_1_16_np_iut = { preamble_link_power_on_np, t
 #define test_case_1_16_np { &test_case_1_16_np_ptu, &test_case_1_16_np_iut, NULL }
 
 #define tgrp_case_1_17 test_group_1
-#define sgrp_case_1_17 test_group_1
+#define sgrp_case_1_17 test_subgroup_1
 #define sref_case_1_17 "Q.781/1.17"
 #define numb_case_1_17 "1.17"
 #define name_case_1_17 "No SIO sent during normal proving period"
+#define xtra_case_1_17 NULL
 #define desc_case_1_17 "\
 Link State Control - Expected signal units/orders\n\
 No SIO sent during normal proving period\
@@ -9802,10 +9956,11 @@ static struct test_stream test_case_1_17_iut = { preamble_link_power_on, test_1_
 #define test_case_1_17 { &test_case_1_17_ptu, &test_case_1_17_iut, NULL }
 
 #define tgrp_case_1_18 test_group_1
-#define sgrp_case_1_18 test_group_1
+#define sgrp_case_1_18 test_subgroup_1
 #define sref_case_1_18 "Q.781/1.18"
 #define numb_case_1_18 "1.18"
 #define name_case_1_18 "Set and cease emergency prior to \"start alignment\""
+#define xtra_case_1_18 NULL
 #define desc_case_1_18 "\
 Link State Control - Expected signal units/orders\n\
 Set and cease emergency prior to \"start alignment\"\
@@ -9874,10 +10029,11 @@ static struct test_stream test_case_1_18_iut = { preamble_link_power_on, test_1_
 #define test_case_1_18 { &test_case_1_18_ptu, &test_case_1_18_iut, NULL }
 
 #define tgrp_case_1_19 test_group_1
-#define sgrp_case_1_19 test_group_1
+#define sgrp_case_1_19 test_subgroup_1
 #define sref_case_1_19 "Q.781/1.19"
 #define numb_case_1_19 "1.19"
 #define name_case_1_19 "Set emergency while in \"not aligned state\""
+#define xtra_case_1_19 NULL
 #define desc_case_1_19 "\
 Link State Control - Expected signal units/orders\n\
 Set emergency while in \"not aligned state\"\
@@ -9957,10 +10113,11 @@ static struct test_stream test_case_1_19_iut = { preamble_link_power_on, test_1_
 #define test_case_1_19 { &test_case_1_19_ptu, &test_case_1_19_iut, NULL }
 
 #define tgrp_case_1_20 test_group_1
-#define sgrp_case_1_20 test_group_1
+#define sgrp_case_1_20 test_subgroup_1
 #define sref_case_1_20 "Q.781/1.20"
 #define numb_case_1_20 "1.20"
 #define name_case_1_20 "Set emergency when \"aligned\""
+#define xtra_case_1_20 NULL
 #define desc_case_1_20 "\
 Link State Control - Expected signal units/orders\n\
 Set emergency when \"aligned\"\
@@ -10048,10 +10205,11 @@ static struct test_stream test_case_1_20_iut = { preamble_link_power_on, test_1_
 #define test_case_1_20 { &test_case_1_20_ptu, &test_case_1_20_iut, NULL }
 
 #define tgrp_case_1_21 test_group_1
-#define sgrp_case_1_21 test_group_1
+#define sgrp_case_1_21 test_subgroup_1
 #define sref_case_1_21 "Q.781/1.21"
 #define numb_case_1_21 "1.21"
 #define name_case_1_21 "Both ends set emergency."
+#define xtra_case_1_21 NULL
 #define desc_case_1_21 "\
 Link State Control - Expected signal units/orders\n\
 Both ends set emergency.\
@@ -10111,10 +10269,11 @@ static struct test_stream test_case_1_21_iut = { preamble_link_power_on, test_1_
 #define test_case_1_21 { &test_case_1_21_ptu, &test_case_1_21_iut, NULL }
 
 #define tgrp_case_1_22 test_group_1
-#define sgrp_case_1_22 test_group_1
+#define sgrp_case_1_22 test_subgroup_1
 #define sref_case_1_22 "Q.781/1.22"
 #define numb_case_1_22 "1.22"
 #define name_case_1_22 "Individual end sets emergency"
+#define xtra_case_1_22 NULL
 #define desc_case_1_22 "\
 Link State Control - Expected signal units/orders\n\
 Individual end sets emergency\
@@ -10149,10 +10308,11 @@ static struct test_stream test_case_1_22_iut = { preamble_link_power_on, test_1_
 #define test_case_1_22 { &test_case_1_22_ptu, &test_case_1_22_iut, NULL }
 
 #define tgrp_case_1_23 test_group_1
-#define sgrp_case_1_23 test_group_1
+#define sgrp_case_1_23 test_subgroup_1
 #define sref_case_1_23 "Q.781/1.23"
 #define numb_case_1_23 "1.23"
 #define name_case_1_23 "Set emergency during normal proving"
+#define xtra_case_1_23 NULL
 #define desc_case_1_23 "\
 Link State Control - Expected signal units/orders\n\
 Set emergency during normal proving\
@@ -10228,10 +10388,11 @@ static struct test_stream test_case_1_23_iut = { preamble_link_power_on, test_1_
 #define test_case_1_23 { &test_case_1_23_ptu, &test_case_1_23_iut, NULL }
 
 #define tgrp_case_1_24 test_group_1
-#define sgrp_case_1_24 test_group_1
+#define sgrp_case_1_24 test_subgroup_1
 #define sref_case_1_24 "Q.781/1.24"
 #define numb_case_1_24 "1.24"
 #define name_case_1_24 "No SIO sent during emergency alignment"
+#define xtra_case_1_24 NULL
 #define desc_case_1_24 "\
 Link State Control - Expected signal units/orders\n\
 No SIO sent during emergency alignment\
@@ -10306,10 +10467,11 @@ static struct test_stream test_case_1_24_iut = { preamble_link_power_on, test_1_
 #define test_case_1_24 { &test_case_1_24_ptu, &test_case_1_24_iut, NULL }
 
 #define tgrp_case_1_25 test_group_1
-#define sgrp_case_1_25 test_group_1
+#define sgrp_case_1_25 test_subgroup_1
 #define sref_case_1_25 "Q.781/1.25"
 #define numb_case_1_25 "1.25"
 #define name_case_1_25 "Deactivation duing intial alignment"
+#define xtra_case_1_25 NULL
 #define desc_case_1_25 "\
 Link State Control - Expected signal units/orders\n\
 Deactivation duing intial alignment\
@@ -10350,10 +10512,11 @@ static struct test_stream test_case_1_25_iut = { preamble_link_power_on, test_1_
 #define test_case_1_25 { &test_case_1_25_ptu, &test_case_1_25_iut, NULL }
 
 #define tgrp_case_1_26 test_group_1
-#define sgrp_case_1_26 test_group_1
+#define sgrp_case_1_26 test_subgroup_1
 #define sref_case_1_26 "Q.781/1.26"
 #define numb_case_1_26 "1.26"
 #define name_case_1_26 "Deactivation during aligned state"
+#define xtra_case_1_26 NULL
 #define desc_case_1_26 "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during aligned state\
@@ -10445,10 +10608,11 @@ test_1_27_iut(int child, int proving)
 }
 
 #define tgrp_case_1_27_p test_group_1
-#define sgrp_case_1_27_p test_group_1
+#define sgrp_case_1_27_p test_subgroup_1
 #define sref_case_1_27_p "Q.781/1.27"
 #define numb_case_1_27_p "1.27"
 #define name_case_1_27_p "Deactivation during aligned not ready"
+#define xtra_case_1_27_p "Proving"
 #define desc_case_1_27_p "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during aligned not ready\n\
@@ -10471,10 +10635,11 @@ static struct test_stream test_case_1_27_p_iut = { preamble_link_power_on, test_
 #define test_case_1_27_p { &test_case_1_27_p_ptu, &test_case_1_27_p_iut, NULL }
 
 #define tgrp_case_1_27_np test_group_1
-#define sgrp_case_1_27_np test_group_1
+#define sgrp_case_1_27_np test_subgroup_1
 #define sref_case_1_27_np "Q.781/1.27"
 #define numb_case_1_27_np "1.27np"
 #define name_case_1_27_np "Deactivation during aligned not ready"
+#define xtra_case_1_27_np "No Proving"
 #define desc_case_1_27_np "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during aligned not ready\n\
@@ -10497,10 +10662,11 @@ static struct test_stream test_case_1_27_np_iut = { preamble_link_power_on_np, t
 #define test_case_1_27_np { &test_case_1_27_np_ptu, &test_case_1_27_np_iut, NULL }
 
 #define tgrp_case_1_28 test_group_1
-#define sgrp_case_1_28 test_group_1
+#define sgrp_case_1_28 test_subgroup_1
 #define sref_case_1_28 "Q.781/1.28"
 #define numb_case_1_28 "1.28"
 #define name_case_1_28 "SIO received during link in service"
+#define xtra_case_1_28 NULL
 #define desc_case_1_28 "\
 Link State Control - Expected signal units/orders\n\
 SIO received during link in service\
@@ -10538,10 +10704,11 @@ static struct test_stream test_case_1_28_iut = { preamble_link_in_service, test_
 #define test_case_1_28 { &test_case_1_28_ptu, &test_case_1_28_iut, NULL }
 
 #define tgrp_case_1_29a test_group_1
-#define sgrp_case_1_29a test_group_1
+#define sgrp_case_1_29a test_subgroup_1
 #define sref_case_1_29a "Q.781/1.29"
 #define numb_case_1_29a "1.29(a)"
 #define name_case_1_29a "SIOS received during link in service"
+#define xtra_case_1_29a "Forward"
 #define desc_case_1_29a "\
 Link State Control - Expected signal units/orders\n\
 SIOS received during link in service\n\
@@ -10580,10 +10747,11 @@ static struct test_stream test_case_1_29a_iut = { preamble_link_in_service, test
 #define test_case_1_29a { &test_case_1_29a_ptu, &test_case_1_29a_iut, NULL }
 
 #define tgrp_case_1_29b test_group_1
-#define sgrp_case_1_29b test_group_1
+#define sgrp_case_1_29b test_subgroup_1
 #define sref_case_1_29b "Q.781/1.29"
 #define numb_case_1_29b "1.29(b)"
 #define name_case_1_29b "SIOS received during link in service"
+#define xtra_case_1_29b "Reverse"
 #define desc_case_1_29b "\
 Link State Control - Expected signal units/orders\n\
 SIOS received during link in service\n\
@@ -10619,10 +10787,11 @@ static struct test_stream test_case_1_29b_iut = { preamble_link_in_service, test
 #define test_case_1_29b { &test_case_1_29b_ptu, &test_case_1_29b_iut, NULL }
 
 #define tgrp_case_1_30a test_group_1
-#define sgrp_case_1_30a test_group_1
+#define sgrp_case_1_30a test_subgroup_1
 #define sref_case_1_30a "Q.781/1.30"
 #define numb_case_1_30a "1.30(a)"
 #define name_case_1_30a "Deactivation during LPO"
+#define xtra_case_1_30a "Forward"
 #define desc_case_1_30a "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during LPO\n\
@@ -10661,10 +10830,11 @@ static struct test_stream test_case_1_30a_iut = { preamble_link_in_service, test
 #define test_case_1_30a { &test_case_1_30a_ptu, &test_case_1_30a_iut, NULL }
 
 #define tgrp_case_1_30b test_group_1
-#define sgrp_case_1_30b test_group_1
+#define sgrp_case_1_30b test_subgroup_1
 #define sref_case_1_30b "Q.781/1.30"
 #define numb_case_1_30b "1.30(b)"
 #define name_case_1_30b "Deactivation during LPO"
+#define xtra_case_1_30b "Reverse"
 #define desc_case_1_30b "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during LPO\n\
@@ -10712,10 +10882,11 @@ static struct test_stream test_case_1_30b_iut = { preamble_link_in_service, test
 #define test_case_1_30b { &test_case_1_30b_ptu, &test_case_1_30b_iut, NULL }
 
 #define tgrp_case_1_31a test_group_1
-#define sgrp_case_1_31a test_group_1
+#define sgrp_case_1_31a test_subgroup_1
 #define sref_case_1_31a "Q.781/1.31"
 #define numb_case_1_31a "1.31(a)"
 #define name_case_1_31a "Deactivation during RPO"
+#define xtra_case_1_31a "Forward"
 #define desc_case_1_31a "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during RPO\n\
@@ -10760,10 +10931,11 @@ static struct test_stream test_case_1_31a_iut = { preamble_link_in_service, test
 #define test_case_1_31a { &test_case_1_31a_ptu, &test_case_1_31a_iut, NULL }
 
 #define tgrp_case_1_31b test_group_1
-#define sgrp_case_1_31b test_group_1
+#define sgrp_case_1_31b test_subgroup_1
 #define sref_case_1_31b "Q.781/1.31"
 #define numb_case_1_31b "1.31(b)"
 #define name_case_1_31b "Deactivation during RPO"
+#define xtra_case_1_31b "Reverse"
 #define desc_case_1_31b "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during RPO\n\
@@ -10808,10 +10980,11 @@ static struct test_stream test_case_1_31b_iut = { preamble_link_in_service, test
 #define test_case_1_31b { &test_case_1_31b_ptu, &test_case_1_31b_iut, NULL }
 
 #define tgrp_case_1_32a test_group_1
-#define sgrp_case_1_32a test_group_1
+#define sgrp_case_1_32a test_subgroup_1
 #define sref_case_1_32a "Q.781/1.32"
 #define numb_case_1_32a "1.32(a)"
 #define name_case_1_32a "Deactivation during the proving period"
+#define xtra_case_1_32a "Forward"
 #define desc_case_1_32a "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during the proving period\n\
@@ -10882,10 +11055,11 @@ static struct test_stream test_case_1_32a_iut = { preamble_link_power_on, test_1
 #define test_case_1_32a { &test_case_1_32a_ptu, &test_case_1_32a_iut, NULL }
 
 #define tgrp_case_1_32b test_group_1
-#define sgrp_case_1_32b test_group_1
+#define sgrp_case_1_32b test_subgroup_1
 #define sref_case_1_32b "Q.781/1.32"
 #define numb_case_1_32b "1.32(b)"
 #define name_case_1_32b "Deactivation during the proving period"
+#define xtra_case_1_32b "Reverse"
 #define desc_case_1_32b "\
 Link State Control - Expected signal units/orders\n\
 Deactivation during the proving period\n\
@@ -10924,10 +11098,11 @@ static struct test_stream test_case_1_32b_iut = { preamble_link_power_on, test_1
 #define test_case_1_32b { &test_case_1_32b_ptu, &test_case_1_32b_iut, NULL }
 
 #define tgrp_case_1_33 test_group_1
-#define sgrp_case_1_33 test_group_1
+#define sgrp_case_1_33 test_subgroup_1
 #define sref_case_1_33 "Q.781/1.33"
 #define numb_case_1_33 "1.33"
 #define name_case_1_33 "SIO received instead of FISUs"
+#define xtra_case_1_33 NULL
 #define desc_case_1_33 "\
 Link State Control - Expected signal units/orders\n\
 SIO received instead of FISUs\
@@ -10965,10 +11140,11 @@ static struct test_stream test_case_1_33_iut = { preamble_link_power_on, test_1_
 #define test_case_1_33 { &test_case_1_33_ptu, &test_case_1_33_iut, NULL }
 
 #define tgrp_case_1_34 test_group_1
-#define sgrp_case_1_34 test_group_1
+#define sgrp_case_1_34 test_subgroup_1
 #define sref_case_1_34 "Q.781/1.34"
 #define numb_case_1_34 "1.34"
 #define name_case_1_34 "SIOS received instead of FISUs"
+#define xtra_case_1_34 NULL
 #define desc_case_1_34 "\
 Link State Control - Expected signal units/orders\n\
 SIOS received instead of FISUs\
@@ -11006,10 +11182,11 @@ static struct test_stream test_case_1_34_iut = { preamble_link_power_on, test_1_
 #define test_case_1_34 { &test_case_1_34_ptu, &test_case_1_34_iut, NULL }
 
 #define tgrp_case_1_35 test_group_1
-#define sgrp_case_1_35 test_group_1
+#define sgrp_case_1_35 test_subgroup_1
 #define sref_case_1_35 "Q.781/1.35"
 #define numb_case_1_35 "1.35"
 #define name_case_1_35 "SIPO received instead of FISUs"
+#define xtra_case_1_35 NULL
 #define desc_case_1_35 "\
 Link State Control - Expected signal units/orders\n\
 SIPO received instead of FISUs\
@@ -11046,12 +11223,14 @@ static struct test_stream test_case_1_35_iut = { preamble_link_power_on, test_1_
 
 #define test_case_1_35 { &test_case_1_35_ptu, &test_case_1_35_iut, NULL }
 
-#define test_group_2 "2. Link State Control - Unexpected signal units/orders"
+#define test_group_2 "2. Link State Control"
+#define test_subgroup_2 "Unexpected signal units/orders"
 #define tgrp_case_2_1 test_group_2
-#define sgrp_case_2_1 test_group_2
+#define sgrp_case_2_1 test_subgroup_2
 #define sref_case_2_1 "Q.781/2.1"
 #define numb_case_2_1 "2.1"
 #define name_case_2_1 "Unexpected signal units/orders in \"Out of service\" state"
+#define xtra_case_2_1 NULL
 #define desc_case_2_1 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Out of service\" state\
@@ -11169,10 +11348,11 @@ static struct test_stream test_case_2_1_iut = { preamble_link_power_on, test_2_1
 #define test_case_2_1 { &test_case_2_1_ptu, &test_case_2_1_iut, NULL }
 
 #define tgrp_case_2_2 test_group_2
-#define sgrp_case_2_2 test_group_2
+#define sgrp_case_2_2 test_subgroup_2
 #define sref_case_2_2 "Q.781/2.2"
 #define numb_case_2_2 "2.2"
 #define name_case_2_2 "Unexpected signal units/orders in \"Not Aligned\" state"
+#define xtra_case_2_2 NULL
 #define desc_case_2_2 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Not Aligned\" state\
@@ -11271,10 +11451,11 @@ static struct test_stream test_case_2_2_iut = { preamble_link_power_on, test_2_2
 #define test_case_2_2 { &test_case_2_2_ptu, &test_case_2_2_iut, NULL }
 
 #define tgrp_case_2_3 test_group_2
-#define sgrp_case_2_3 test_group_2
+#define sgrp_case_2_3 test_subgroup_2
 #define sref_case_2_3 "Q.781/2.3"
 #define numb_case_2_3 "2.3"
 #define name_case_2_3 "Unexpected signal units/orders in \"Aligned\" state"
+#define xtra_case_2_3 NULL
 #define desc_case_2_3 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Aligned\" state\
@@ -11382,10 +11563,11 @@ static struct test_stream test_case_2_3_iut = { preamble_link_power_on, test_2_3
 #define test_case_2_3 { &test_case_2_3_ptu, &test_case_2_3_iut, NULL }
 
 #define tgrp_case_2_4 test_group_2
-#define sgrp_case_2_4 test_group_2
+#define sgrp_case_2_4 test_subgroup_2
 #define sref_case_2_4 "Q.781/2.4"
 #define numb_case_2_4 "2.4"
 #define name_case_2_4 "Unexpected signal units/orders in \"Proving\" state"
+#define xtra_case_2_4 NULL
 #define desc_case_2_4 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Proving\" state\
@@ -11490,10 +11672,11 @@ static struct test_stream test_case_2_4_iut = { preamble_link_power_on, test_2_4
 #define test_case_2_4 { &test_case_2_4_ptu, &test_case_2_4_iut, NULL }
 
 #define tgrp_case_2_5 test_group_2
-#define sgrp_case_2_5 test_group_2
+#define sgrp_case_2_5 test_subgroup_2
 #define sref_case_2_5 "Q.781/2.5"
 #define numb_case_2_5 "2.5"
 #define name_case_2_5 "Unexpected signal units/orders in \"Aligned Ready\" state"
+#define xtra_case_2_5 NULL
 #define desc_case_2_5 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Aligned Ready\" state\
@@ -11553,10 +11736,11 @@ static struct test_stream test_case_2_5_iut = { preamble_link_power_on, test_2_5
 #define test_case_2_5 { &test_case_2_5_ptu, &test_case_2_5_iut, NULL }
 
 #define tgrp_case_2_6 test_group_2
-#define sgrp_case_2_6 test_group_2
+#define sgrp_case_2_6 test_subgroup_2
 #define sref_case_2_6 "Q.781/2.6"
 #define numb_case_2_6 "2.6"
 #define name_case_2_6 "Unexpected signal units/orders in \"Aligned Not Ready\" state"
+#define xtra_case_2_6 NULL
 #define desc_case_2_6 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Aligned Not Ready\" state\
@@ -11625,10 +11809,11 @@ static struct test_stream test_case_2_6_iut = { preamble_link_power_on, test_2_6
 #define test_case_2_6 { &test_case_2_6_ptu, &test_case_2_6_iut, NULL }
 
 #define tgrp_case_2_7 test_group_2
-#define sgrp_case_2_7 test_group_2
+#define sgrp_case_2_7 test_subgroup_2
 #define sref_case_2_7 "Q.781/2.7"
 #define numb_case_2_7 "2.7"
 #define name_case_2_7 "Unexpected signal units/orders in \"In Service\" state"
+#define xtra_case_2_7 NULL
 #define desc_case_2_7 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"In Service\" state\
@@ -11676,10 +11861,11 @@ static struct test_stream test_case_2_7_iut = { preamble_link_in_service, test_2
 #define test_case_2_7 { &test_case_2_7_ptu, &test_case_2_7_iut, NULL }
 
 #define tgrp_case_2_8 test_group_2
-#define sgrp_case_2_8 test_group_2
+#define sgrp_case_2_8 test_subgroup_2
 #define sref_case_2_8 "Q.781/2.8"
 #define numb_case_2_8 "2.8"
 #define name_case_2_8 "Unexpected signal units/orders in \"Processor Outage\" state"
+#define xtra_case_2_8 NULL
 #define desc_case_2_8 "\
 Link State Control - Unexpected signal units/orders\n\
 Unexpected signal units/orders in \"Processor Outage\" state\
@@ -11735,11 +11921,13 @@ static struct test_stream test_case_2_8_iut = { preamble_link_in_service, test_2
 #define test_case_2_8 { &test_case_2_8_ptu, &test_case_2_8_iut, NULL }
 
 #define test_group_3 "3. Transmission Failure"
+#define test_subgroup_3_1 "Break Tx path"
 #define tgrp_case_3_1 test_group_3
-#define sgrp_case_3_1 test_group_3
+#define sgrp_case_3_1 test_subgroup_3_1
 #define sref_case_3_1 "Q.781/3.1"
 #define numb_case_3_1 "3.1"
-#define name_case_3_1 "Link aligned ready (Break Tx path)"
+#define name_case_3_1 "Link aligned ready"
+#define xtra_case_3_1 "Break Tx path"
 #define desc_case_3_1 "\
 Transmission Failure\n\
 Link aligned ready (Break Tx path)\
@@ -11778,11 +11966,13 @@ static struct test_stream test_case_3_1_iut = { preamble_link_power_on, test_3_1
 
 #define test_case_3_1 { &test_case_3_1_ptu, &test_case_3_1_iut, NULL }
 
+#define test_subgroup_3_2 "Corrupt FIBs - Basic"
 #define tgrp_case_3_2 test_group_3
-#define sgrp_case_3_2 test_group_3
+#define sgrp_case_3_2 test_subgroup_3_2
 #define sref_case_3_2 "Q.781/3.2"
 #define numb_case_3_2 "3.2"
-#define name_case_3_2 "Link aligned ready (Corrupt FIBs - Basic)"
+#define name_case_3_2 "Link aligned ready"
+#define xtra_case_3_2 "Corrupt FIBs - Basic"
 #define desc_case_3_2 "\
 Transmission Failure\n\
 Link aligned ready (Corrupt FIBs - Basic)\
@@ -11846,10 +12036,11 @@ static struct test_stream test_case_3_2_iut = { preamble_link_in_service, test_3
 #define test_case_3_2 { &test_case_3_2_ptu, &test_case_3_2_iut, NULL }
 
 #define tgrp_case_3_3 test_group_3
-#define sgrp_case_3_3 test_group_3
+#define sgrp_case_3_3 test_subgroup_3_1
 #define sref_case_3_3 "Q.781/3.3"
 #define numb_case_3_3 "3.3"
-#define name_case_3_3 "Link aligned not ready (Break Tx path)"
+#define name_case_3_3 "Link aligned not ready"
+#define xtra_case_3_3 "Break Tx path"
 #define desc_case_3_3 "\
 Transmission Failure\n\
 Link aligned not ready (Break Tx path)\
@@ -11889,10 +12080,11 @@ static struct test_stream test_case_3_3_iut = { preamble_link_power_on, test_3_3
 #define test_case_3_3 { &test_case_3_3_ptu, &test_case_3_3_iut, NULL }
 
 #define tgrp_case_3_4 test_group_3
-#define sgrp_case_3_4 test_group_3
+#define sgrp_case_3_4 test_subgroup_3_2
 #define sref_case_3_4 "Q.781/3.4"
 #define numb_case_3_4 "3.4"
-#define name_case_3_4 "Link aligned not ready (Corrupt FIBs - Basic)"
+#define name_case_3_4 "Link aligned not ready"
+#define xtra_case_3_4 "Corrupt FIBs - Basic"
 #define desc_case_3_4 "\
 Transmission Failure\n\
 Link aligned not ready (Corrupt FIBs - Basic)\
@@ -11959,10 +12151,11 @@ static struct test_stream test_case_3_4_iut = { preamble_link_power_on, test_3_4
 #define test_case_3_4 { &test_case_3_4_ptu, &test_case_3_4_iut, NULL }
 
 #define tgrp_case_3_5 test_group_3
-#define sgrp_case_3_5 test_group_3
+#define sgrp_case_3_5 test_subgroup_3_1
 #define sref_case_3_5 "Q.781/3.5"
 #define numb_case_3_5 "3.5"
-#define name_case_3_5 "Link in service (Break Tx path)"
+#define name_case_3_5 "Link in service"
+#define xtra_case_3_5 "Break Tx path"
 #define desc_case_3_5 "\
 Transmission Failure\n\
 Link in service (Break Tx path)\
@@ -11999,10 +12192,11 @@ static struct test_stream test_case_3_5_iut = { preamble_link_in_service, test_3
 #define test_case_3_5 { &test_case_3_5_ptu, &test_case_3_5_iut, NULL }
 
 #define tgrp_case_3_6 test_group_3
-#define sgrp_case_3_6 test_group_3
+#define sgrp_case_3_6 test_subgroup_3_2
 #define sref_case_3_6 "Q.781/3.6"
 #define numb_case_3_6 "3.6"
-#define name_case_3_6 "Link in service (Corrupt FIBs - Basic)"
+#define name_case_3_6 "Link in service"
+#define xtra_case_3_6 "Corrupt FIBs - Basic"
 #define desc_case_3_6 "\
 Transmission Failure\n\
 Link in service (Corrupt FIBs - Basic)\
@@ -12066,10 +12260,11 @@ static struct test_stream test_case_3_6_iut = { preamble_link_in_service, test_3
 #define test_case_3_6 { &test_case_3_6_ptu, &test_case_3_6_iut, NULL }
 
 #define tgrp_case_3_7 test_group_3
-#define sgrp_case_3_7 test_group_3
+#define sgrp_case_3_7 test_subgroup_3_1
 #define sref_case_3_7 "Q.781/3.7"
 #define numb_case_3_7 "3.7"
-#define name_case_3_7 "Link in processor outage (Break Tx path)"
+#define name_case_3_7 "Link in processor outage"
+#define xtra_case_3_7 "Break Tx path"
 #define desc_case_3_7 "\
 Transmission Failure\n\
 Link in processor outage (Break Tx path)\
@@ -12112,10 +12307,11 @@ static struct test_stream test_case_3_7_iut = { preamble_link_in_service, test_3
 #define test_case_3_7 { &test_case_3_7_ptu, &test_case_3_7_iut, NULL }
 
 #define tgrp_case_3_8 test_group_3
-#define sgrp_case_3_8 test_group_3
+#define sgrp_case_3_8 test_subgroup_3_2
 #define sref_case_3_8 "Q.781/3.8"
 #define numb_case_3_8 "3.8"
-#define name_case_3_8 "Link in processor outage (Corrupt FIBs - Basic)"
+#define name_case_3_8 "Link in processor outage"
+#define xtra_case_3_8 "Corrupt FIBs - Basic"
 #define desc_case_3_8 "\
 Transmission Failure\n\
 Link in processor outage (Corrupt FIBs - Basic)\
@@ -12188,11 +12384,13 @@ static struct test_stream test_case_3_8_iut = { preamble_link_in_service, test_3
 #define test_case_3_8 { &test_case_3_8_ptu, &test_case_3_8_iut, NULL }
 
 #define test_group_4 "4. Processor Outage Control"
+#define test_subgroup_4_1 "Local Processor Outage"
 #define tgrp_case_4_1a test_group_4
-#define sgrp_case_4_1a test_group_4
+#define sgrp_case_4_1a test_subgroup_4_1
 #define sref_case_4_1a "Q.781/4.1"
 #define numb_case_4_1a "4.1(a)"
 #define name_case_4_1a "Set and clear LPO while link in service"
+#define xtra_case_4_1a "Forward"
 #define desc_case_4_1a "\
 Processor Outage Control\n\
 Set and clear LPO while link in service\n\
@@ -12472,10 +12670,11 @@ static struct test_stream test_case_4_1a_iut = { preamble_link_in_service, test_
 #define test_case_4_1a { &test_case_4_1a_ptu, &test_case_4_1a_iut, NULL }
 
 #define tgrp_case_4_1b test_group_4
-#define sgrp_case_4_1b test_group_4
+#define sgrp_case_4_1b test_subgroup_4_1
 #define sref_case_4_1b "Q.781/4.1"
 #define numb_case_4_1b "4.1(b)"
 #define name_case_4_1b "Set and clear LPO while link in service"
+#define xtra_case_4_1b "Reverse"
 #define desc_case_4_1b "\
 Processor Outage Control\n\
 Set and clear LPO while link in service\n\
@@ -12748,11 +12947,13 @@ static struct test_stream test_case_4_1b_iut = { preamble_link_in_service, test_
 
 #define test_case_4_1b { &test_case_4_1b_ptu, &test_case_4_1b_iut, NULL }
 
+#define test_subgroup_4_2 "Remote Processor Outage"
 #define tgrp_case_4_2 test_group_4
-#define sgrp_case_4_2 test_group_4
+#define sgrp_case_4_2 test_subgroup_4_2
 #define sref_case_4_2 "Q.781/4.2"
 #define numb_case_4_2 "4.2"
 #define name_case_4_2 "RPO during LPO"
+#define xtra_case_4_2 NULL
 #define desc_case_4_2 "\
 Processor Outage Control\n\
 RPO during LPO\
@@ -12799,10 +13000,11 @@ static struct test_stream test_case_4_2_iut = { preamble_link_in_service, test_4
 #define test_case_4_2 { &test_case_4_2_ptu, &test_case_4_2_iut, NULL }
 
 #define tgrp_case_4_3 test_group_4
-#define sgrp_case_4_3 test_group_4
+#define sgrp_case_4_3 test_subgroup_4_1
 #define sref_case_4_3 "Q.781/4.3"
 #define numb_case_4_3 "4.3"
 #define name_case_4_3 "Clear LPO when \"Both processor outage\""
+#define xtra_case_4_3 NULL
 #define desc_case_4_3 "\
 Processor Outage Control\n\
 Clear LPO when \"Both processor outage\"\
@@ -12864,11 +13066,13 @@ static struct test_stream test_case_4_3_iut = { preamble_link_in_service, test_4
 #define test_case_4_3 { &test_case_4_3_ptu, &test_case_4_3_iut, NULL }
 
 #define test_group_5 "5. SU delimitation, alignment, error detection and correction"
+#define test_subgroup_5 "Various framing errors"
 #define tgrp_case_5_1 test_group_5
-#define sgrp_case_5_1 test_group_5
+#define sgrp_case_5_1 test_subgroup_5
 #define sref_case_5_1 "Q.781/5.1"
 #define numb_case_5_1 "5.1"
 #define name_case_5_1 "More than 7 ones between MSU opening and closing flags"
+#define xtra_case_5_1 NULL
 #define desc_case_5_1 "\
 SU delimitation, alignment, error detection and correction\n\
 More than 7 ones between MSU opening and closing flags\
@@ -12890,10 +13094,11 @@ static struct test_stream test_case_5_1_iut = { preamble_link_in_service, test_5
 #define test_case_5_1 { &test_case_5_1_ptu, &test_case_5_1_iut, NULL }
 
 #define tgrp_case_5_2 test_group_5
-#define sgrp_case_5_2 test_group_5
+#define sgrp_case_5_2 test_subgroup_5
 #define sref_case_5_2 "Q.781/5.2"
 #define numb_case_5_2 "5.2"
 #define name_case_5_2 "Greater than maximum signal unit length"
+#define xtra_case_5_2 NULL
 #define desc_case_5_2 "\
 SU delimitation, alignment, error detection and correction\n\
 Greater than maximum signal unit length\
@@ -12915,10 +13120,11 @@ static struct test_stream test_case_5_2_iut = { preamble_link_in_service, test_5
 #define test_case_5_2 { &test_case_5_2_ptu, &test_case_5_2_iut, NULL }
 
 #define tgrp_case_5_3 test_group_5
-#define sgrp_case_5_3 test_group_5
+#define sgrp_case_5_3 test_subgroup_5
 #define sref_case_5_3 "Q.781/5.3"
 #define numb_case_5_3 "5.3"
 #define name_case_5_3 "Below minimum signal unit length"
+#define xtra_case_5_3 NULL
 #define desc_case_5_3 "\
 SU delimitation, alignment, error detection and correction\n\
 Below minimum signal unit length\
@@ -12945,10 +13151,11 @@ static struct test_stream test_case_5_3_iut = { preamble_link_in_service, test_5
 #define test_case_5_3 { &test_case_5_3_ptu, &test_case_5_3_iut, NULL }
 
 #define tgrp_case_5_4a test_group_5
-#define sgrp_case_5_4a test_group_5
+#define sgrp_case_5_4a test_subgroup_5
 #define sref_case_5_4a "Q.781/5.4"
 #define numb_case_5_4a "5.4(a)"
 #define name_case_5_4a "Reception of single and multiple flags between FISUs"
+#define xtra_case_5_4a "Forward"
 #define desc_case_5_4a "\
 SU delimitation, alignment, error detection and correction\n\
 Reception of single and multiple flags between FISUs\n\
@@ -12971,10 +13178,11 @@ static struct test_stream test_case_5_4a_iut = { preamble_link_in_service, test_
 #define test_case_5_4a { &test_case_5_4a_ptu, &test_case_5_4a_iut, NULL }
 
 #define tgrp_case_5_4b test_group_5
-#define sgrp_case_5_4b test_group_5
+#define sgrp_case_5_4b test_subgroup_5
 #define sref_case_5_4b "Q.781/5.4"
 #define numb_case_5_4b "5.4(b)"
 #define name_case_5_4b "Reception of single and multiple flags between FISUs"
+#define xtra_case_5_4b "Reverse"
 #define desc_case_5_4b "\
 SU delimitation, alignment, error detection and correction\n\
 Reception of single and multiple flags between FISUs\n\
@@ -12997,10 +13205,11 @@ static struct test_stream test_case_5_4b_iut = { preamble_link_in_service, test_
 #define test_case_5_4b { &test_case_5_4b_ptu, &test_case_5_4b_iut, NULL }
 
 #define tgrp_case_5_5a test_group_5
-#define sgrp_case_5_5a test_group_5
+#define sgrp_case_5_5a test_subgroup_5
 #define sref_case_5_5a "Q.781/5.5"
 #define numb_case_5_5a "5.5(a)"
 #define name_case_5_5a "Reception of single and multiple flags between MSUs"
+#define xtra_case_5_5a "Forward"
 #define desc_case_5_5a "\
 SU delimitation, alignment, error detection and correction\n\
 Reception of single and multiple flags between MSUs\n\
@@ -13023,10 +13232,11 @@ static struct test_stream test_case_5_5a_iut = { preamble_link_in_service, test_
 #define test_case_5_5a { &test_case_5_5a_ptu, &test_case_5_5a_iut, NULL }
 
 #define tgrp_case_5_5b test_group_5
-#define sgrp_case_5_5b test_group_5
+#define sgrp_case_5_5b test_subgroup_5
 #define sref_case_5_5b "Q.781/5.5"
 #define numb_case_5_5b "5.5(b)"
 #define name_case_5_5b "Reception of single and multiple flags between MSUs"
+#define xtra_case_5_5b "Reverse"
 #define desc_case_5_5b "\
 SU delimitation, alignment, error detection and correction\n\
 Reception of single and multiple flags between MSUs\n\
@@ -13049,11 +13259,13 @@ static struct test_stream test_case_5_5b_iut = { preamble_link_in_service, test_
 #define test_case_5_5b { &test_case_5_5b_ptu, &test_case_5_5b_iut, NULL }
 
 #define test_group_6 "6. SUERM check"
+#define test_subgroup_6 "Various error conditions"
 #define tgrp_case_6_1 test_group_6
-#define sgrp_case_6_1 test_group_6
+#define sgrp_case_6_1 test_subgroup_6
 #define sref_case_6_1 "Q.781/6.1"
 #define numb_case_6_1 "6.1"
 #define name_case_6_1 "Error rate of 1 in 256 - Link remains in service"
+#define xtra_case_6_1 NULL
 #define desc_case_6_1 "\
 SUERM check\n\
 Error rate of 1 in 256 - Link remains in service\
@@ -13075,10 +13287,11 @@ static struct test_stream test_case_6_1_iut = { preamble_link_in_service, test_6
 #define test_case_6_1 { &test_case_6_1_ptu, &test_case_6_1_iut, NULL }
 
 #define tgrp_case_6_2 test_group_6
-#define sgrp_case_6_2 test_group_6
+#define sgrp_case_6_2 test_subgroup_6
 #define sref_case_6_2 "Q.781/6.2"
 #define numb_case_6_2 "6.2"
 #define name_case_6_2 "Error rate of 1 in 254 - Link out of service"
+#define xtra_case_6_2 NULL
 #define desc_case_6_2 "\
 SUERM check\n\
 Error rate of 1 in 254 - Link out of service\
@@ -13100,10 +13313,11 @@ static struct test_stream test_case_6_2_iut = { preamble_link_in_service, test_6
 #define test_case_6_2 { &test_case_6_2_ptu, &test_case_6_2_iut, NULL }
 
 #define tgrp_case_6_3 test_group_6
-#define sgrp_case_6_3 test_group_6
+#define sgrp_case_6_3 test_subgroup_6
 #define sref_case_6_3 "Q.781/6.3"
 #define numb_case_6_3 "6.3"
 #define name_case_6_3 "Consequtive corrupt SUs"
+#define xtra_case_6_3 NULL
 #define desc_case_6_3 "\
 SUERM check\n\
 Consequtive corrupt SUs\
@@ -13125,10 +13339,11 @@ static struct test_stream test_case_6_3_iut = { preamble_link_in_service, test_6
 #define test_case_6_3 { &test_case_6_3_ptu, &test_case_6_3_iut, NULL }
 
 #define tgrp_case_6_4 test_group_6
-#define sgrp_case_6_4 test_group_6
+#define sgrp_case_6_4 test_subgroup_6
 #define sref_case_6_4 "Q.781/6.4"
 #define numb_case_6_4 "6.4"
 #define name_case_6_4 "Time controlled break of the link"
+#define xtra_case_6_4 NULL
 #define desc_case_6_4 "\
 SUERM check\n\
 Time controlled break of the link\
@@ -13150,11 +13365,13 @@ static struct test_stream test_case_6_4_iut = { preamble_link_in_service, test_6
 #define test_case_6_4 { &test_case_6_4_ptu, &test_case_6_4_iut, NULL }
 
 #define test_group_7 "7. AERM check"
+#define test_subgroup_7 "Various error rates"
 #define tgrp_case_7_1 test_group_7
-#define sgrp_case_7_1 test_group_7
+#define sgrp_case_7_1 test_subgroup_7
 #define sref_case_7_1 "Q.781/7.1"
 #define numb_case_7_1 "7.1"
 #define name_case_7_1 "Error rate below the normal threshold"
+#define xtra_case_7_1 NULL
 #define desc_case_7_1 "\
 AERM check\n\
 Error rate below the normal threshold\
@@ -13176,10 +13393,11 @@ static struct test_stream test_case_7_1_iut = { preamble_link_power_on, test_7_1
 #define test_case_7_1 { &test_case_7_1_ptu, &test_case_7_1_iut, NULL }
 
 #define tgrp_case_7_2 test_group_7
-#define sgrp_case_7_2 test_group_7
+#define sgrp_case_7_2 test_subgroup_7
 #define sref_case_7_2 "Q.781/7.2"
 #define numb_case_7_2 "7.2"
 #define name_case_7_2 "Error rate at the normal threshold"
+#define xtra_case_7_2 NULL
 #define desc_case_7_2 "\
 AERM check\n\
 Error rate at the normal threshold\
@@ -13201,10 +13419,11 @@ static struct test_stream test_case_7_2_iut = { preamble_link_power_on, test_7_2
 #define test_case_7_2 { &test_case_7_2_ptu, &test_case_7_2_iut, NULL }
 
 #define tgrp_case_7_3 test_group_7
-#define sgrp_case_7_3 test_group_7
+#define sgrp_case_7_3 test_subgroup_7
 #define sref_case_7_3 "Q.781/7.3"
 #define numb_case_7_3 "7.3"
 #define name_case_7_3 "Error rate above the normal threshold"
+#define xtra_case_7_3 NULL
 #define desc_case_7_3 "\
 AERM check\n\
 Error rate above the normal threshold\
@@ -13226,10 +13445,11 @@ static struct test_stream test_case_7_3_iut = { preamble_link_power_on, test_7_3
 #define test_case_7_3 { &test_case_7_3_ptu, &test_case_7_3_iut, NULL }
 
 #define tgrp_case_7_4 test_group_7
-#define sgrp_case_7_4 test_group_7
+#define sgrp_case_7_4 test_subgroup_7
 #define sref_case_7_4 "Q.781/7.4"
 #define numb_case_7_4 "7.4"
 #define name_case_7_4 "Error rate at the emergency threshold"
+#define xtra_case_7_4 NULL
 #define desc_case_7_4 "\
 AERM check\n\
 Error rate at the emergency threshold\
@@ -13251,11 +13471,13 @@ static struct test_stream test_case_7_4_iut = { preamble_link_power_on, test_7_4
 #define test_case_7_4 { &test_case_7_4_ptu, &test_case_7_4_iut, NULL }
 
 #define test_group_8 "8. Transmission and reception control (Basic)"
+#define test_subgroup_8 "Basic transmission method"
 #define tgrp_case_8_1 test_group_8
-#define sgrp_case_8_1 test_group_8
+#define sgrp_case_8_1 test_subgroup_8
 #define sref_case_8_1 "Q.781/8.1"
 #define numb_case_8_1 "8.1"
 #define name_case_8_1 "MSU transmission and reception"
+#define xtra_case_8_1 NULL
 #define desc_case_8_1 "\
 Transmission and reception control (Basic)\n\
 MSU transmission and reception\
@@ -13325,10 +13547,11 @@ static struct test_stream test_case_8_1_iut = { preamble_link_in_service, test_8
 #define test_case_8_1 { &test_case_8_1_ptu, &test_case_8_1_iut, NULL }
 
 #define tgrp_case_8_2 test_group_8
-#define sgrp_case_8_2 test_group_8
+#define sgrp_case_8_2 test_subgroup_8
 #define sref_case_8_2 "Q.781/8.2"
 #define numb_case_8_2 "8.2"
 #define name_case_8_2 "Negative acknowledgement of an MSU"
+#define xtra_case_8_2 NULL
 #define desc_case_8_2 "\
 Transmission and reception control (Basic)\n\
 Negative acknowledgement of an MSU\
@@ -13350,10 +13573,11 @@ static struct test_stream test_case_8_2_iut = { preamble_link_in_service, test_8
 #define test_case_8_2 { &test_case_8_2_ptu, &test_case_8_2_iut, NULL }
 
 #define tgrp_case_8_3 test_group_8
-#define sgrp_case_8_3 test_group_8
+#define sgrp_case_8_3 test_subgroup_8
 #define sref_case_8_3 "Q.781/8.3"
 #define numb_case_8_3 "8.3"
 #define name_case_8_3 "Check RTB full"
+#define xtra_case_8_3 NULL
 #define desc_case_8_3 "\
 Transmission and reception control (Basic)\n\
 Check RTB full\
@@ -13511,10 +13735,11 @@ static struct test_stream test_case_8_3_iut = { preamble_link_in_service, test_8
 #define test_case_8_3 { &test_case_8_3_ptu, &test_case_8_3_iut, NULL }
 
 #define tgrp_case_8_4 test_group_8
-#define sgrp_case_8_4 test_group_8
+#define sgrp_case_8_4 test_subgroup_8
 #define sref_case_8_4 "Q.781/8.4"
 #define numb_case_8_4 "8.4"
 #define name_case_8_4 "Single MSU with erroneous FIB"
+#define xtra_case_8_4 NULL
 #define desc_case_8_4 "\
 Transmission and reception control (Basic)\n\
 Single MSU with erroneous FIB\
@@ -13572,10 +13797,11 @@ static struct test_stream test_case_8_4_iut = { preamble_link_in_service, test_8
 #define test_case_8_4 { &test_case_8_4_ptu, &test_case_8_4_iut, NULL }
 
 #define tgrp_case_8_5 test_group_8
-#define sgrp_case_8_5 test_group_8
+#define sgrp_case_8_5 test_subgroup_8
 #define sref_case_8_5 "Q.781/8.5"
 #define numb_case_8_5 "8.5"
 #define name_case_8_5 "Duplicated FSN"
+#define xtra_case_8_5 NULL
 #define desc_case_8_5 "\
 Transmission and reception control (Basic)\n\
 Duplicated FSN\
@@ -13708,10 +13934,11 @@ static struct test_stream test_case_8_5_iut = { preamble_link_in_service, test_8
 #define test_case_8_5 { &test_case_8_5_ptu, &test_case_8_5_iut, NULL }
 
 #define tgrp_case_8_6 test_group_8
-#define sgrp_case_8_6 test_group_8
+#define sgrp_case_8_6 test_subgroup_8
 #define sref_case_8_6 "Q.781/8.6"
 #define numb_case_8_6 "8.6"
 #define name_case_8_6 "Erroneous retransmission - Single MSU"
+#define xtra_case_8_6 NULL
 #define desc_case_8_6 "\
 Transmission and reception control (Basic)\n\
 Erroneous retransmission - Single MSU\
@@ -13733,10 +13960,11 @@ static struct test_stream test_case_8_6_iut = { preamble_link_in_service, test_8
 #define test_case_8_6 { &test_case_8_6_ptu, &test_case_8_6_iut, NULL }
 
 #define tgrp_case_8_7 test_group_8
-#define sgrp_case_8_7 test_group_8
+#define sgrp_case_8_7 test_subgroup_8
 #define sref_case_8_7 "Q.781/8.7"
 #define numb_case_8_7 "8.7"
 #define name_case_8_7 "Erroneous retransmission - Multiple FISUs"
+#define xtra_case_8_7 NULL
 #define desc_case_8_7 "\
 Transmission and reception control (Basic)\n\
 Erroneous retransmission - Multiple FISUs\
@@ -13758,10 +13986,11 @@ static struct test_stream test_case_8_7_iut = { preamble_link_in_service, test_8
 #define test_case_8_7 { &test_case_8_7_ptu, &test_case_8_7_iut, NULL }
 
 #define tgrp_case_8_8 test_group_8
-#define sgrp_case_8_8 test_group_8
+#define sgrp_case_8_8 test_subgroup_8
 #define sref_case_8_8 "Q.781/8.8"
 #define numb_case_8_8 "8.8"
 #define name_case_8_8 "Single FISU with corrupt FIB"
+#define xtra_case_8_8 NULL
 #define desc_case_8_8 "\
 Transmission and reception control (Basic)\n\
 Single FISU with corrupt FIB\
@@ -13783,10 +14012,11 @@ static struct test_stream test_case_8_8_iut = { preamble_link_in_service, test_8
 #define test_case_8_8 { &test_case_8_8_ptu, &test_case_8_8_iut, NULL }
 
 #define tgrp_case_8_9a test_group_8
-#define sgrp_case_8_9a test_group_8
+#define sgrp_case_8_9a test_subgroup_8
 #define sref_case_8_9a "Q.781/8.9"
 #define numb_case_8_9a "8.9(a)"
 #define name_case_8_9a "Single FISU prior to RPO being set"
+#define xtra_case_8_9a "Forward"
 #define desc_case_8_9a "\
 Transmission and reception control (Basic)\n\
 Single FISU prior to RPO being set\n\
@@ -13840,10 +14070,11 @@ static struct test_stream test_case_8_9a_iut = { preamble_link_in_service, test_
 #define test_case_8_9a { &test_case_8_9a_ptu, &test_case_8_9a_iut, NULL }
 
 #define tgrp_case_8_9b test_group_8
-#define sgrp_case_8_9b test_group_8
+#define sgrp_case_8_9b test_subgroup_8
 #define sref_case_8_9b "Q.781/8.9"
 #define numb_case_8_9b "8.9(b)"
 #define name_case_8_9b "Single FISU prior to RPO being set"
+#define xtra_case_8_9b "Reverse"
 #define desc_case_8_9b "\
 Transmission and reception control (Basic)\n\
 Single FISU prior to RPO being set\n\
@@ -13912,10 +14143,11 @@ static struct test_stream test_case_8_9b_iut = { preamble_link_in_service, test_
 #define test_case_8_9b { &test_case_8_9b_ptu, &test_case_8_9b_iut, NULL }
 
 #define tgrp_case_8_10 test_group_8
-#define sgrp_case_8_10 test_group_8
+#define sgrp_case_8_10 test_subgroup_8
 #define sref_case_8_10 "Q.781/8.10"
 #define numb_case_8_10 "8.10"
 #define name_case_8_10 "Abnormal BSN - single MSU"
+#define xtra_case_8_10 NULL
 #define desc_case_8_10 "\
 Transmission and reception control (Basic)\n\
 Abnormal BSN - single MSU\
@@ -14027,10 +14259,11 @@ static struct test_stream test_case_8_10_iut = { preamble_link_in_service, test_
 #define test_case_8_10 { &test_case_8_10_ptu, &test_case_8_10_iut, NULL }
 
 #define tgrp_case_8_11 test_group_8
-#define sgrp_case_8_11 test_group_8
+#define sgrp_case_8_11 test_subgroup_8
 #define sref_case_8_11 "Q.781/8.11"
 #define numb_case_8_11 "8.11"
 #define name_case_8_11 "Abnormal BSN - two consecutive FISUs"
+#define xtra_case_8_11 NULL
 #define desc_case_8_11 "\
 Transmission and reception control (Basic)\n\
 Abnormal BSN - two consecutive FISUs\
@@ -14124,10 +14357,11 @@ static struct test_stream test_case_8_11_iut = { preamble_link_in_service, test_
 #define test_case_8_11 { &test_case_8_11_ptu, &test_case_8_11_iut, NULL }
 
 #define tgrp_case_8_12a test_group_8
-#define sgrp_case_8_12a test_group_8
+#define sgrp_case_8_12a test_subgroup_8
 #define sref_case_8_12a "Q.781/8.12"
 #define numb_case_8_12a "8.12(a)"
 #define name_case_8_12a "Excessive delay of acknowledgement"
+#define xtra_case_8_12a "Single data"
 #define desc_case_8_12a "\
 Transmission and reception control (Basic)\n\
 Excessive delay of acknowledgement\n\
@@ -14172,10 +14406,11 @@ static struct test_stream test_case_8_12a_iut = { preamble_link_in_service, test
 #define test_case_8_12a { &test_case_8_12a_ptu, &test_case_8_12a_iut, NULL }
 
 #define tgrp_case_8_12b test_group_8
-#define sgrp_case_8_12b test_group_8
+#define sgrp_case_8_12b test_subgroup_8
 #define sref_case_8_12b "Q.781/8.12"
 #define numb_case_8_12b "8.12(b)"
 #define name_case_8_12b "Excessive delay of acknowledgement"
+#define xtra_case_8_12b "Multiple data"
 #define desc_case_8_12b "\
 Transmission and reception control (Basic)\n\
 Excessive delay of acknowledgement\n\
@@ -14237,10 +14472,11 @@ static struct test_stream test_case_8_12b_iut = { preamble_link_in_service, test
 #define test_case_8_12b { &test_case_8_12b_ptu, &test_case_8_12b_iut, NULL }
 
 #define tgrp_case_8_13 test_group_8
-#define sgrp_case_8_13 test_group_8
+#define sgrp_case_8_13 test_subgroup_8
 #define sref_case_8_13 "Q.781/8.13"
 #define numb_case_8_13 "8.13"
 #define name_case_8_13 "Level 3 Stop command"
+#define xtra_case_8_13 NULL
 #define desc_case_8_13 "\
 Transmission and reception control (Basic)\n\
 Level 3 Stop command\
@@ -14274,10 +14510,11 @@ static struct test_stream test_case_8_13_iut = { preamble_link_in_service, test_
 #define test_case_8_13 { &test_case_8_13_ptu, &test_case_8_13_iut, NULL }
 
 #define tgrp_case_8_14 test_group_8
-#define sgrp_case_8_14 test_group_8
+#define sgrp_case_8_14 test_subgroup_8
 #define sref_case_8_14 "Q.781/8.14"
 #define numb_case_8_14 "8.14"
 #define name_case_8_14 "Abnormal FIBR"
+#define xtra_case_8_14 NULL
 #define desc_case_8_14 "\
 Transmission and reception control (Basic)\n\
 Abnormal FIBR\
@@ -14383,17 +14620,19 @@ test_8_14_iut(int child)
 	return __RESULT_NOTAPPL;
 }
 
-static struct test_stream test_case_8_14_ptu = { preamble_link_in_service, test_8_14_ptu, postamble_link_out_of_service };
-static struct test_stream test_case_8_14_iut = { preamble_link_in_service, test_8_14_iut, postamble_link_out_of_service };
+static struct test_stream test_case_8_14_ptu = { preamble_link_in_service, test_8_14_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_14_iut = { preamble_link_in_service, test_8_14_iut, postamble_link_in_service };
 
 #define test_case_8_14 { &test_case_8_14_ptu, &test_case_8_14_iut, NULL }
 
 #define test_group_9 "9. Transmission and reception control (PCR)"
+#define test_subgroup_9 "Preventative Cyclic Retransmission method"
 #define tgrp_case_9_1 test_group_9
-#define sgrp_case_9_1 test_group_9
+#define sgrp_case_9_1 test_subgroup_9
 #define sref_case_9_1 "Q.781/9.1"
 #define numb_case_9_1 "9.1"
 #define name_case_9_1 "MSU transmission and reception"
+#define xtra_case_9_1 NULL
 #define desc_case_9_1 "\
 Transmission and reception control (PCR)\n\
 MSU transmission and reception\
@@ -14415,10 +14654,11 @@ static struct test_stream test_case_9_1_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_1 { &test_case_9_1_ptu, &test_case_9_1_iut, NULL }
 
 #define tgrp_case_9_2 test_group_9
-#define sgrp_case_9_2 test_group_9
+#define sgrp_case_9_2 test_subgroup_9
 #define sref_case_9_2 "Q.781/9.2"
 #define numb_case_9_2 "9.2"
 #define name_case_9_2 "Priority control"
+#define xtra_case_9_2 NULL
 #define desc_case_9_2 "\
 Transmission and reception control (PCR)\n\
 Priority control\
@@ -14440,10 +14680,11 @@ static struct test_stream test_case_9_2_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_2 { &test_case_9_2_ptu, &test_case_9_2_iut, NULL }
 
 #define tgrp_case_9_3 test_group_9
-#define sgrp_case_9_3 test_group_9
+#define sgrp_case_9_3 test_subgroup_9
 #define sref_case_9_3 "Q.781/9.3"
 #define numb_case_9_3 "9.3"
 #define name_case_9_3 "Forced retransmission with the value N1"
+#define xtra_case_9_3 NULL
 #define desc_case_9_3 "\
 Transmission and reception control (PCR)\n\
 Forced retransmission with the value N1\
@@ -14465,10 +14706,11 @@ static struct test_stream test_case_9_3_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_3 { &test_case_9_3_ptu, &test_case_9_3_iut, NULL }
 
 #define tgrp_case_9_4 test_group_9
-#define sgrp_case_9_4 test_group_9
+#define sgrp_case_9_4 test_subgroup_9
 #define sref_case_9_4 "Q.781/9.4"
 #define numb_case_9_4 "9.4"
 #define name_case_9_4 "Forced retransmission with the value N2"
+#define xtra_case_9_4 NULL
 #define desc_case_9_4 "\
 Transmission and reception control (PCR)\n\
 Forced retransmission with the value N2\
@@ -14490,10 +14732,11 @@ static struct test_stream test_case_9_4_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_4 { &test_case_9_4_ptu, &test_case_9_4_iut, NULL }
 
 #define tgrp_case_9_5 test_group_9
-#define sgrp_case_9_5 test_group_9
+#define sgrp_case_9_5 test_subgroup_9
 #define sref_case_9_5 "Q.781/9.5"
 #define numb_case_9_5 "9.5"
 #define name_case_9_5 "Forced retransmission cancel"
+#define xtra_case_9_5 NULL
 #define desc_case_9_5 "\
 Transmission and reception control (PCR)\n\
 Forced retransmission cancel\
@@ -14515,10 +14758,11 @@ static struct test_stream test_case_9_5_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_5 { &test_case_9_5_ptu, &test_case_9_5_iut, NULL }
 
 #define tgrp_case_9_6 test_group_9
-#define sgrp_case_9_6 test_group_9
+#define sgrp_case_9_6 test_subgroup_9
 #define sref_case_9_6 "Q.781/9.6"
 #define numb_case_9_6 "9.6"
 #define name_case_9_6 "Reception of forced retransmission"
+#define xtra_case_9_6 NULL
 #define desc_case_9_6 "\
 Transmission and reception control (PCR)\n\
 Reception of forced retransmission\
@@ -14540,10 +14784,11 @@ static struct test_stream test_case_9_6_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_6 { &test_case_9_6_ptu, &test_case_9_6_iut, NULL }
 
 #define tgrp_case_9_7 test_group_9
-#define sgrp_case_9_7 test_group_9
+#define sgrp_case_9_7 test_subgroup_9
 #define sref_case_9_7 "Q.781/9.7"
 #define numb_case_9_7 "9.7"
 #define name_case_9_7 "MSU transmission while RPO set"
+#define xtra_case_9_7 NULL
 #define desc_case_9_7 "\
 Transmission and reception control (PCR)\n\
 MSU transmission while RPO set\
@@ -14565,10 +14810,11 @@ static struct test_stream test_case_9_7_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_7 { &test_case_9_7_ptu, &test_case_9_7_iut, NULL }
 
 #define tgrp_case_9_8 test_group_9
-#define sgrp_case_9_8 test_group_9
+#define sgrp_case_9_8 test_subgroup_9
 #define sref_case_9_8 "Q.781/9.8"
 #define numb_case_9_8 "9.8"
 #define name_case_9_8 "Abnormal BSN - Single MSU"
+#define xtra_case_9_8 NULL
 #define desc_case_9_8 "\
 Transmission and reception control (PCR)\n\
 Abnormal BSN - Single MSU\
@@ -14590,10 +14836,11 @@ static struct test_stream test_case_9_8_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_8 { &test_case_9_8_ptu, &test_case_9_8_iut, NULL }
 
 #define tgrp_case_9_9 test_group_9
-#define sgrp_case_9_9 test_group_9
+#define sgrp_case_9_9 test_subgroup_9
 #define sref_case_9_9 "Q.781/9.9"
 #define numb_case_9_9 "9.9"
 #define name_case_9_9 "Abnormal BSN - Two MSUs"
+#define xtra_case_9_9 NULL
 #define desc_case_9_9 "\
 Transmission and reception control (PCR)\n\
 Abnormal BSN - Two MSUs\
@@ -14615,10 +14862,11 @@ static struct test_stream test_case_9_9_iut = { preamble_link_in_service_pcr, te
 #define test_case_9_9 { &test_case_9_9_ptu, &test_case_9_9_iut, NULL }
 
 #define tgrp_case_9_10 test_group_9
-#define sgrp_case_9_10 test_group_9
+#define sgrp_case_9_10 test_subgroup_9
 #define sref_case_9_10 "Q.781/9.10"
 #define numb_case_9_10 "9.10"
 #define name_case_9_10 "Unexpected FSN"
+#define xtra_case_9_10 NULL
 #define desc_case_9_10 "\
 Transmission and reception control (PCR)\n\
 Unexpected FSN\
@@ -14640,10 +14888,11 @@ static struct test_stream test_case_9_10_iut = { preamble_link_in_service_pcr, t
 #define test_case_9_10 { &test_case_9_10_ptu, &test_case_9_10_iut, NULL }
 
 #define tgrp_case_9_11 test_group_9
-#define sgrp_case_9_11 test_group_9
+#define sgrp_case_9_11 test_subgroup_9
 #define sref_case_9_11 "Q.781/9.11"
 #define numb_case_9_11 "9.11"
 #define name_case_9_11 "Excessive delay of acknowledgement"
+#define xtra_case_9_11 NULL
 #define desc_case_9_11 "\
 Transmission and reception control (PCR)\n\
 Excessive delay of acknowledgement\
@@ -14665,10 +14914,11 @@ static struct test_stream test_case_9_11_iut = { preamble_link_in_service_pcr, t
 #define test_case_9_11 { &test_case_9_11_ptu, &test_case_9_11_iut, NULL }
 
 #define tgrp_case_9_12 test_group_9
-#define sgrp_case_9_12 test_group_9
+#define sgrp_case_9_12 test_subgroup_9
 #define sref_case_9_12 "Q.781/9.12"
 #define numb_case_9_12 "9.12"
 #define name_case_9_12 "FISU with FSN expected for MSU"
+#define xtra_case_9_12 NULL
 #define desc_case_9_12 "\
 Transmission and reception control (PCR)\n\
 FISU with FSN expected for MSU\
@@ -14690,10 +14940,11 @@ static struct test_stream test_case_9_12_iut = { preamble_link_in_service_pcr, t
 #define test_case_9_12 { &test_case_9_12_ptu, &test_case_9_12_iut, NULL }
 
 #define tgrp_case_9_13 test_group_9
-#define sgrp_case_9_13 test_group_9
+#define sgrp_case_9_13 test_subgroup_9
 #define sref_case_9_13 "Q.781/9.13"
 #define numb_case_9_13 "9.13"
 #define name_case_9_13 "Level 3 Stop command"
+#define xtra_case_9_13 NULL
 #define desc_case_9_13 "\
 Transmission and reception control (PCR)\n\
 Level 3 Stop command\
@@ -14715,11 +14966,13 @@ static struct test_stream test_case_9_13_iut = { preamble_link_in_service_pcr, t
 #define test_case_9_13 { &test_case_9_13_ptu, &test_case_9_13_iut, NULL }
 
 #define test_group_10 "10. Congestion Control"
+#define test_subgroup_10 "Congestion onset and abatement"
 #define tgrp_case_10_1 test_group_10
-#define sgrp_case_10_1 test_group_10
+#define sgrp_case_10_1 test_subgroup_10
 #define sref_case_10_1 "Q.781/10.1"
 #define numb_case_10_1 "10.1"
 #define name_case_10_1 "Congestion abatement"
+#define xtra_case_10_1 NULL
 #define desc_case_10_1 "\
 Congestion Control\n\
 Congestion abatement\
@@ -14760,10 +15013,11 @@ static struct test_stream test_case_10_1_iut = { preamble_link_in_service, test_
 #define test_case_10_1 { &test_case_10_1_ptu, &test_case_10_1_iut, NULL }
 
 #define tgrp_case_10_2a test_group_10
-#define sgrp_case_10_2a test_group_10
+#define sgrp_case_10_2a test_subgroup_10
 #define sref_case_10_2a "Q.781/10.2"
 #define numb_case_10_2a "10.2(a)"
 #define name_case_10_2a "Timer T7 during receive congestion"
+#define xtra_case_10_2a NULL
 #define desc_case_10_2a "\
 Congestion Control\n\
 Timer T7\n\
@@ -14823,10 +15077,11 @@ static struct test_stream test_case_10_2a_iut = { preamble_link_in_service, test
 #define test_case_10_2a { &test_case_10_2a_ptu, &test_case_10_2a_iut, NULL }
 
 #define tgrp_case_10_2b test_group_10
-#define sgrp_case_10_2b test_group_10
+#define sgrp_case_10_2b test_subgroup_10
 #define sref_case_10_2b "Q.781/10.2"
 #define numb_case_10_2b "10.2(b)"
 #define name_case_10_2b "Timer T7 after receive congestion"
+#define xtra_case_10_2b NULL
 #define desc_case_10_2b "\
 Congestion Control\n\
 Timer T7\n\
@@ -14883,10 +15138,11 @@ static struct test_stream test_case_10_2b_iut = { preamble_link_in_service, test
 #define test_case_10_2b { &test_case_10_2b_ptu, &test_case_10_2b_iut, NULL }
 
 #define tgrp_case_10_2c test_group_10
-#define sgrp_case_10_2c test_group_10
+#define sgrp_case_10_2c test_subgroup_10
 #define sref_case_10_2c "Q.781/10.2"
 #define numb_case_10_2c "10.2(c)"
 #define name_case_10_2c "Timer T7 after receive congestion"
+#define xtra_case_10_2c NULL
 #define desc_case_10_2c "\
 Congestion Control\n\
 Timer T7\n\
@@ -14941,10 +15197,11 @@ static struct test_stream test_case_10_2c_iut = { preamble_link_in_service, test
 #define test_case_10_2c { &test_case_10_2c_ptu, &test_case_10_2c_iut, NULL }
 
 #define tgrp_case_10_3 test_group_10
-#define sgrp_case_10_3 test_group_10
+#define sgrp_case_10_3 test_subgroup_10
 #define sref_case_10_3 "Q.781/10.3"
 #define numb_case_10_3 "10.3"
 #define name_case_10_3 "Timer T6"
+#define xtra_case_10_3 NULL
 #define desc_case_10_3 "\
 Congestion Control\n\
 Timer T6\
@@ -15280,6 +15537,7 @@ struct test_case {
 	const char *tgrp;		/* test case group */
 	const char *sgrp;		/* test case subgroup */
 	const char *name;		/* test case name */
+	const char *xtra;		/* test case extra information */
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
 	struct test_stream *stream[3];	/* test streams */
@@ -15290,142 +15548,142 @@ struct test_case {
 	int expect;			/* expected result */
 } tests[] = {
 	{
-	numb_case_0_1, tgrp_case_0_1, sgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, test_case_0_1, &begin_sanity, &end_sanity, 0, 0, __RESULT_INCONCLUSIVE,}, {
-	numb_case_0_2_1, tgrp_case_0_2_1, sgrp_case_0_2_1, name_case_0_2_1, desc_case_0_2_1, sref_case_0_2_1, test_case_0_2_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_0_2_2, tgrp_case_0_2_2, sgrp_case_0_2_2, name_case_0_2_2, desc_case_0_2_2, sref_case_0_2_2, test_case_0_2_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_0_2_3, tgrp_case_0_2_3, sgrp_case_0_2_3, name_case_0_2_3, desc_case_0_2_3, sref_case_0_2_3, test_case_0_2_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_0_2_4, tgrp_case_0_2_4, sgrp_case_0_2_4, name_case_0_2_4, desc_case_0_2_4, sref_case_0_2_4, test_case_0_2_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_0_2_5, tgrp_case_0_2_5, sgrp_case_0_2_5, name_case_0_2_5, desc_case_0_2_5, sref_case_0_2_5, test_case_0_2_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_0_2_6, tgrp_case_0_2_6, sgrp_case_0_2_6, name_case_0_2_6, desc_case_0_2_6, sref_case_0_2_6, test_case_0_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_0_2_7, tgrp_case_0_2_7, sgrp_case_0_2_7, name_case_0_2_7, desc_case_0_2_7, sref_case_0_2_7, test_case_0_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_1a, tgrp_case_1_1a, sgrp_case_1_1a, name_case_1_1a, desc_case_1_1a, sref_case_1_1a, test_case_1_1a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_1b, tgrp_case_1_1b, sgrp_case_1_1b, name_case_1_1b, desc_case_1_1b, sref_case_1_1b, test_case_1_1b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_2, tgrp_case_1_2, sgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, test_case_1_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_3, tgrp_case_1_3, sgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, test_case_1_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_4, tgrp_case_1_4, sgrp_case_1_4, name_case_1_4, desc_case_1_4, sref_case_1_4, test_case_1_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_5a_p, tgrp_case_1_5a_p, sgrp_case_1_5a_p, name_case_1_5a_p, desc_case_1_5a_p, sref_case_1_5a_p, test_case_1_5a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_5b_p, tgrp_case_1_5b_p, sgrp_case_1_5b_p, name_case_1_5b_p, desc_case_1_5b_p, sref_case_1_5b_p, test_case_1_5b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_5a_np, tgrp_case_1_5a_np, sgrp_case_1_5a_np, name_case_1_5a_np, desc_case_1_5a_np, sref_case_1_5a_np, test_case_1_5a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_5b_np, tgrp_case_1_5b_np, sgrp_case_1_5b_np, name_case_1_5b_np, desc_case_1_5b_np, sref_case_1_5b_np, test_case_1_5b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_6_p, tgrp_case_1_6_p, sgrp_case_1_6_p, name_case_1_6_p, desc_case_1_6_p, sref_case_1_6_p, test_case_1_6_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_6_np, tgrp_case_1_6_np, sgrp_case_1_6_np, name_case_1_6_np, desc_case_1_6_np, sref_case_1_6_np, test_case_1_6_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_7, tgrp_case_1_7, sgrp_case_1_7, name_case_1_7, desc_case_1_7, sref_case_1_7, test_case_1_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_8a_p, tgrp_case_1_8a_p, sgrp_case_1_8a_p, name_case_1_8a_p, desc_case_1_8a_p, sref_case_1_8a_p, test_case_1_8a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_8b_p, tgrp_case_1_8b_p, sgrp_case_1_8b_p, name_case_1_8b_p, desc_case_1_8b_p, sref_case_1_8b_p, test_case_1_8b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_8a_np, tgrp_case_1_8a_np, sgrp_case_1_8a_np, name_case_1_8a_np, desc_case_1_8a_np, sref_case_1_8a_np, test_case_1_8a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_8b_np, tgrp_case_1_8b_np, sgrp_case_1_8b_np, name_case_1_8b_np, desc_case_1_8b_np, sref_case_1_8b_np, test_case_1_8b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_9a_p, tgrp_case_1_9a_p, sgrp_case_1_9a_p, name_case_1_9a_p, desc_case_1_9a_p, sref_case_1_9a_p, test_case_1_9a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_9b_p, tgrp_case_1_9b_p, sgrp_case_1_9b_p, name_case_1_9b_p, desc_case_1_9b_p, sref_case_1_9b_p, test_case_1_9b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_9a_np, tgrp_case_1_9a_np, sgrp_case_1_9a_np, name_case_1_9a_np, desc_case_1_9a_np, sref_case_1_9a_np, test_case_1_9a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_9b_np, tgrp_case_1_9b_np, sgrp_case_1_9b_np, name_case_1_9b_np, desc_case_1_9b_np, sref_case_1_9b_np, test_case_1_9b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_10_p, tgrp_case_1_10_p, sgrp_case_1_10_p, name_case_1_10_p, desc_case_1_10_p, sref_case_1_10_p, test_case_1_10_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_10_np, tgrp_case_1_10_np, sgrp_case_1_10_np, name_case_1_10_np, desc_case_1_10_np, sref_case_1_10_np, test_case_1_10_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_11_p, tgrp_case_1_11_p, sgrp_case_1_11_p, name_case_1_11_p, desc_case_1_11_p, sref_case_1_11_p, test_case_1_11_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_11_np, tgrp_case_1_11_np, sgrp_case_1_11_np, name_case_1_11_np, desc_case_1_11_np, sref_case_1_11_np, test_case_1_11_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_12a_p, tgrp_case_1_12a_p, sgrp_case_1_12a_p, name_case_1_12a_p, desc_case_1_12a_p, sref_case_1_12a_p, test_case_1_12a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_12b_p, tgrp_case_1_12b_p, sgrp_case_1_12b_p, name_case_1_12b_p, desc_case_1_12b_p, sref_case_1_12b_p, test_case_1_12b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_12a_np, tgrp_case_1_12a_np, sgrp_case_1_12a_np, name_case_1_12a_np, desc_case_1_12a_np, sref_case_1_12a_np, test_case_1_12a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_12b_np, tgrp_case_1_12b_np, sgrp_case_1_12b_np, name_case_1_12b_np, desc_case_1_12b_np, sref_case_1_12b_np, test_case_1_12b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_13_p, tgrp_case_1_13_p, sgrp_case_1_13_p, name_case_1_13_p, desc_case_1_13_p, sref_case_1_13_p, test_case_1_13_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_13_np, tgrp_case_1_13_np, sgrp_case_1_13_np, name_case_1_13_np, desc_case_1_13_np, sref_case_1_13_np, test_case_1_13_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_14, tgrp_case_1_14, sgrp_case_1_14, name_case_1_14, desc_case_1_14, sref_case_1_14, test_case_1_14, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_15_p, tgrp_case_1_15_p, sgrp_case_1_15_p, name_case_1_15_p, desc_case_1_15_p, sref_case_1_15_p, test_case_1_15_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_15_np, tgrp_case_1_15_np, sgrp_case_1_15_np, name_case_1_15_np, desc_case_1_15_np, sref_case_1_15_np, test_case_1_15_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_16_p, tgrp_case_1_16_p, sgrp_case_1_16_p, name_case_1_16_p, desc_case_1_16_p, sref_case_1_16_p, test_case_1_16_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_16_np, tgrp_case_1_16_np, sgrp_case_1_16_np, name_case_1_16_np, desc_case_1_16_np, sref_case_1_16_np, test_case_1_16_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_17, tgrp_case_1_17, sgrp_case_1_17, name_case_1_17, desc_case_1_17, sref_case_1_17, test_case_1_17, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_18, tgrp_case_1_18, sgrp_case_1_18, name_case_1_18, desc_case_1_18, sref_case_1_18, test_case_1_18, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_19, tgrp_case_1_19, sgrp_case_1_19, name_case_1_19, desc_case_1_19, sref_case_1_19, test_case_1_19, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_20, tgrp_case_1_20, sgrp_case_1_20, name_case_1_20, desc_case_1_20, sref_case_1_20, test_case_1_20, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_21, tgrp_case_1_21, sgrp_case_1_21, name_case_1_21, desc_case_1_21, sref_case_1_21, test_case_1_21, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_22, tgrp_case_1_22, sgrp_case_1_22, name_case_1_22, desc_case_1_22, sref_case_1_22, test_case_1_22, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_23, tgrp_case_1_23, sgrp_case_1_23, name_case_1_23, desc_case_1_23, sref_case_1_23, test_case_1_23, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_24, tgrp_case_1_24, sgrp_case_1_24, name_case_1_24, desc_case_1_24, sref_case_1_24, test_case_1_24, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_25, tgrp_case_1_25, sgrp_case_1_25, name_case_1_25, desc_case_1_25, sref_case_1_25, test_case_1_25, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_26, tgrp_case_1_26, sgrp_case_1_26, name_case_1_26, desc_case_1_26, sref_case_1_26, test_case_1_26, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_27_p, tgrp_case_1_27_p, sgrp_case_1_27_p, name_case_1_27_p, desc_case_1_27_p, sref_case_1_27_p, test_case_1_27_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_27_np, tgrp_case_1_27_np, sgrp_case_1_27_np, name_case_1_27_np, desc_case_1_27_np, sref_case_1_27_np, test_case_1_27_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_28, tgrp_case_1_28, sgrp_case_1_28, name_case_1_28, desc_case_1_28, sref_case_1_28, test_case_1_28, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_29a, tgrp_case_1_29a, sgrp_case_1_29a, name_case_1_29a, desc_case_1_29a, sref_case_1_29a, test_case_1_29a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_29b, tgrp_case_1_29b, sgrp_case_1_29b, name_case_1_29b, desc_case_1_29b, sref_case_1_29b, test_case_1_29b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_30a, tgrp_case_1_30a, sgrp_case_1_30a, name_case_1_30a, desc_case_1_30a, sref_case_1_30a, test_case_1_30a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_30b, tgrp_case_1_30b, sgrp_case_1_30b, name_case_1_30b, desc_case_1_30b, sref_case_1_30b, test_case_1_30b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_31a, tgrp_case_1_31a, sgrp_case_1_31a, name_case_1_31a, desc_case_1_31a, sref_case_1_31a, test_case_1_31a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_31b, tgrp_case_1_31b, sgrp_case_1_31b, name_case_1_31b, desc_case_1_31b, sref_case_1_31b, test_case_1_31b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_32a, tgrp_case_1_32a, sgrp_case_1_32a, name_case_1_32a, desc_case_1_32a, sref_case_1_32a, test_case_1_32a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_32b, tgrp_case_1_32b, sgrp_case_1_32b, name_case_1_32b, desc_case_1_32b, sref_case_1_32b, test_case_1_32b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_33, tgrp_case_1_33, sgrp_case_1_33, name_case_1_33, desc_case_1_33, sref_case_1_33, test_case_1_33, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_34, tgrp_case_1_34, sgrp_case_1_34, name_case_1_34, desc_case_1_34, sref_case_1_34, test_case_1_34, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_35, tgrp_case_1_35, sgrp_case_1_35, name_case_1_35, desc_case_1_35, sref_case_1_35, test_case_1_35, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_2_1, tgrp_case_2_1, sgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, test_case_2_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_2_2, tgrp_case_2_2, sgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, test_case_2_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_2_3, tgrp_case_2_3, sgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, test_case_2_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_2_4, tgrp_case_2_4, sgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, test_case_2_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_2_5, tgrp_case_2_5, sgrp_case_2_5, name_case_2_5, desc_case_2_5, sref_case_2_5, test_case_2_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_2_6, tgrp_case_2_6, sgrp_case_2_6, name_case_2_6, desc_case_2_6, sref_case_2_6, test_case_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_2_7, tgrp_case_2_7, sgrp_case_2_7, name_case_2_7, desc_case_2_7, sref_case_2_7, test_case_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_2_8, tgrp_case_2_8, sgrp_case_2_8, name_case_2_8, desc_case_2_8, sref_case_2_8, test_case_2_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, test_case_3_1, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
-	numb_case_3_2, tgrp_case_3_2, sgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, test_case_3_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_3_3, tgrp_case_3_3, sgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, test_case_3_3, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
-	numb_case_3_4, tgrp_case_3_4, sgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, test_case_3_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_3_5, tgrp_case_3_5, sgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, test_case_3_5, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
-	numb_case_3_6, tgrp_case_3_6, sgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, test_case_3_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_3_7, tgrp_case_3_7, sgrp_case_3_7, name_case_3_7, desc_case_3_7, sref_case_3_7, test_case_3_7, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
-	numb_case_3_8, tgrp_case_3_8, sgrp_case_3_8, name_case_3_8, desc_case_3_8, sref_case_3_8, test_case_3_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_4_1a, tgrp_case_4_1a, sgrp_case_4_1a, name_case_4_1a, desc_case_4_1a, sref_case_4_1a, test_case_4_1a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_4_1b, tgrp_case_4_1b, sgrp_case_4_1b, name_case_4_1b, desc_case_4_1b, sref_case_4_1b, test_case_4_1b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_4_2, tgrp_case_4_2, sgrp_case_4_2, name_case_4_2, desc_case_4_2, sref_case_4_2, test_case_4_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_4_3, tgrp_case_4_3, sgrp_case_4_3, name_case_4_3, desc_case_4_3, sref_case_4_3, test_case_4_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, desc_case_5_1, sref_case_5_1, test_case_5_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_2, tgrp_case_5_2, sgrp_case_5_2, name_case_5_2, desc_case_5_2, sref_case_5_2, test_case_5_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_3, tgrp_case_5_3, sgrp_case_5_3, name_case_5_3, desc_case_5_3, sref_case_5_3, test_case_5_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_5_4a, tgrp_case_5_4a, sgrp_case_5_4a, name_case_5_4a, desc_case_5_4a, sref_case_5_4a, test_case_5_4a, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_4b, tgrp_case_5_4b, sgrp_case_5_4b, name_case_5_4b, desc_case_5_4b, sref_case_5_4b, test_case_5_4b, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_5a, tgrp_case_5_5a, sgrp_case_5_5a, name_case_5_5a, desc_case_5_5a, sref_case_5_5a, test_case_5_5a, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_5b, tgrp_case_5_5b, sgrp_case_5_5b, name_case_5_5b, desc_case_5_5b, sref_case_5_5b, test_case_5_5b, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_6_1, tgrp_case_6_1, sgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, test_case_6_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_6_2, tgrp_case_6_2, sgrp_case_6_2, name_case_6_2, desc_case_6_2, sref_case_6_2, test_case_6_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_6_3, tgrp_case_6_3, sgrp_case_6_3, name_case_6_3, desc_case_6_3, sref_case_6_3, test_case_6_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_6_4, tgrp_case_6_4, sgrp_case_6_4, name_case_6_4, desc_case_6_4, sref_case_6_4, test_case_6_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_7_1, tgrp_case_7_1, sgrp_case_7_1, name_case_7_1, desc_case_7_1, sref_case_7_1, test_case_7_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_7_2, tgrp_case_7_2, sgrp_case_7_2, name_case_7_2, desc_case_7_2, sref_case_7_2, test_case_7_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_7_3, tgrp_case_7_3, sgrp_case_7_3, name_case_7_3, desc_case_7_3, sref_case_7_3, test_case_7_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_7_4, tgrp_case_7_4, sgrp_case_7_4, name_case_7_4, desc_case_7_4, sref_case_7_4, test_case_7_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_8_1, tgrp_case_8_1, sgrp_case_8_1, name_case_8_1, desc_case_8_1, sref_case_8_1, test_case_8_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_2, tgrp_case_8_2, sgrp_case_8_2, name_case_8_2, desc_case_8_2, sref_case_8_2, test_case_8_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_8_3, tgrp_case_8_3, sgrp_case_8_3, name_case_8_3, desc_case_8_3, sref_case_8_3, test_case_8_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_4, tgrp_case_8_4, sgrp_case_8_4, name_case_8_4, desc_case_8_4, sref_case_8_4, test_case_8_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_5, tgrp_case_8_5, sgrp_case_8_5, name_case_8_5, desc_case_8_5, sref_case_8_5, test_case_8_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_6, tgrp_case_8_6, sgrp_case_8_6, name_case_8_6, desc_case_8_6, sref_case_8_6, test_case_8_6, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_8_7, tgrp_case_8_7, sgrp_case_8_7, name_case_8_7, desc_case_8_7, sref_case_8_7, test_case_8_7, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_8_8, tgrp_case_8_8, sgrp_case_8_8, name_case_8_8, desc_case_8_8, sref_case_8_8, test_case_8_8, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_8_9a, tgrp_case_8_9a, sgrp_case_8_9a, name_case_8_9a, desc_case_8_9a, sref_case_8_9a, test_case_8_9a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_9b, tgrp_case_8_9b, sgrp_case_8_9b, name_case_8_9b, desc_case_8_9b, sref_case_8_9b, test_case_8_9b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_10, tgrp_case_8_10, sgrp_case_8_10, name_case_8_10, desc_case_8_10, sref_case_8_10, test_case_8_10, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_11, tgrp_case_8_11, sgrp_case_8_11, name_case_8_11, desc_case_8_11, sref_case_8_11, test_case_8_11, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_12a, tgrp_case_8_12a, sgrp_case_8_12a, name_case_8_12a, desc_case_8_12a, sref_case_8_12a, test_case_8_12a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_12b, tgrp_case_8_12b, sgrp_case_8_12b, name_case_8_12b, desc_case_8_12b, sref_case_8_12b, test_case_8_12b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_13, tgrp_case_8_13, sgrp_case_8_13, name_case_8_13, desc_case_8_13, sref_case_8_13, test_case_8_13, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_14, tgrp_case_8_14, sgrp_case_8_14, name_case_8_14, desc_case_8_14, sref_case_8_14, test_case_8_14, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_9_1, tgrp_case_9_1, sgrp_case_9_1, name_case_9_1, desc_case_9_1, sref_case_9_1, test_case_9_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_2, tgrp_case_9_2, sgrp_case_9_2, name_case_9_2, desc_case_9_2, sref_case_9_2, test_case_9_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_3, tgrp_case_9_3, sgrp_case_9_3, name_case_9_3, desc_case_9_3, sref_case_9_3, test_case_9_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_4, tgrp_case_9_4, sgrp_case_9_4, name_case_9_4, desc_case_9_4, sref_case_9_4, test_case_9_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_5, tgrp_case_9_5, sgrp_case_9_5, name_case_9_5, desc_case_9_5, sref_case_9_5, test_case_9_5, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_6, tgrp_case_9_6, sgrp_case_9_6, name_case_9_6, desc_case_9_6, sref_case_9_6, test_case_9_6, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_7, tgrp_case_9_7, sgrp_case_9_7, name_case_9_7, desc_case_9_7, sref_case_9_7, test_case_9_7, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_8, tgrp_case_9_8, sgrp_case_9_8, name_case_9_8, desc_case_9_8, sref_case_9_8, test_case_9_8, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_9, tgrp_case_9_9, sgrp_case_9_9, name_case_9_9, desc_case_9_9, sref_case_9_9, test_case_9_9, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_10, tgrp_case_9_10, sgrp_case_9_10, name_case_9_10, desc_case_9_10, sref_case_9_10, test_case_9_10, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_11, tgrp_case_9_11, sgrp_case_9_11, name_case_9_11, desc_case_9_11, sref_case_9_11, test_case_9_11, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_12, tgrp_case_9_12, sgrp_case_9_12, name_case_9_12, desc_case_9_12, sref_case_9_12, test_case_9_12, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_13, tgrp_case_9_13, sgrp_case_9_13, name_case_9_13, desc_case_9_13, sref_case_9_13, test_case_9_13, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_10_1, tgrp_case_10_1, sgrp_case_10_1, name_case_10_1, desc_case_10_1, sref_case_10_1, test_case_10_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_10_2a, tgrp_case_10_2a, sgrp_case_10_2a, name_case_10_2a, desc_case_10_2a, sref_case_10_2a, test_case_10_2a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_10_2b, tgrp_case_10_2b, sgrp_case_10_2b, name_case_10_2b, desc_case_10_2b, sref_case_10_2b, test_case_10_2b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_10_2c, tgrp_case_10_2c, sgrp_case_10_2c, name_case_10_2c, desc_case_10_2c, sref_case_10_2c, test_case_10_2c, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_10_3, tgrp_case_10_3, sgrp_case_10_3, name_case_10_3, desc_case_10_3, sref_case_10_3, test_case_10_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_1, tgrp_case_0_1, sgrp_case_0_1, name_case_0_1, xtra_case_0_1, desc_case_0_1, sref_case_0_1, test_case_0_1, &begin_sanity, &end_sanity, 0, 0, __RESULT_INCONCLUSIVE,}, {
+	numb_case_0_2_1, tgrp_case_0_2_1, sgrp_case_0_2_1, name_case_0_2_1, xtra_case_0_2_1, desc_case_0_2_1, sref_case_0_2_1, test_case_0_2_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_2, tgrp_case_0_2_2, sgrp_case_0_2_2, name_case_0_2_2, xtra_case_0_2_2, desc_case_0_2_2, sref_case_0_2_2, test_case_0_2_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_3, tgrp_case_0_2_3, sgrp_case_0_2_3, name_case_0_2_3, xtra_case_0_2_3, desc_case_0_2_3, sref_case_0_2_3, test_case_0_2_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_4, tgrp_case_0_2_4, sgrp_case_0_2_4, name_case_0_2_4, xtra_case_0_2_4, desc_case_0_2_4, sref_case_0_2_4, test_case_0_2_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_5, tgrp_case_0_2_5, sgrp_case_0_2_5, name_case_0_2_5, xtra_case_0_2_5, desc_case_0_2_5, sref_case_0_2_5, test_case_0_2_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_6, tgrp_case_0_2_6, sgrp_case_0_2_6, name_case_0_2_6, xtra_case_0_2_6, desc_case_0_2_6, sref_case_0_2_6, test_case_0_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_7, tgrp_case_0_2_7, sgrp_case_0_2_7, name_case_0_2_7, xtra_case_0_2_7, desc_case_0_2_7, sref_case_0_2_7, test_case_0_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_1a, tgrp_case_1_1a, sgrp_case_1_1a, name_case_1_1a, xtra_case_1_1a, desc_case_1_1a, sref_case_1_1a, test_case_1_1a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_1b, tgrp_case_1_1b, sgrp_case_1_1b, name_case_1_1b, xtra_case_1_1b, desc_case_1_1b, sref_case_1_1b, test_case_1_1b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_2, tgrp_case_1_2, sgrp_case_1_2, name_case_1_2, xtra_case_1_2, desc_case_1_2, sref_case_1_2, test_case_1_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_3, tgrp_case_1_3, sgrp_case_1_3, name_case_1_3, xtra_case_1_3, desc_case_1_3, sref_case_1_3, test_case_1_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_4, tgrp_case_1_4, sgrp_case_1_4, name_case_1_4, xtra_case_1_4, desc_case_1_4, sref_case_1_4, test_case_1_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5a_p, tgrp_case_1_5a_p, sgrp_case_1_5a_p, name_case_1_5a_p, xtra_case_1_5a_p, desc_case_1_5a_p, sref_case_1_5a_p, test_case_1_5a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5b_p, tgrp_case_1_5b_p, sgrp_case_1_5b_p, name_case_1_5b_p, xtra_case_1_5b_p, desc_case_1_5b_p, sref_case_1_5b_p, test_case_1_5b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5a_np, tgrp_case_1_5a_np, sgrp_case_1_5a_np, name_case_1_5a_np, xtra_case_1_5a_np, desc_case_1_5a_np, sref_case_1_5a_np, test_case_1_5a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5b_np, tgrp_case_1_5b_np, sgrp_case_1_5b_np, name_case_1_5b_np, xtra_case_1_5b_np, desc_case_1_5b_np, sref_case_1_5b_np, test_case_1_5b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_6_p, tgrp_case_1_6_p, sgrp_case_1_6_p, name_case_1_6_p, xtra_case_1_6_p, desc_case_1_6_p, sref_case_1_6_p, test_case_1_6_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_6_np, tgrp_case_1_6_np, sgrp_case_1_6_np, name_case_1_6_np, xtra_case_1_6_np, desc_case_1_6_np, sref_case_1_6_np, test_case_1_6_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_7, tgrp_case_1_7, sgrp_case_1_7, name_case_1_7, xtra_case_1_7, desc_case_1_7, sref_case_1_7, test_case_1_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8a_p, tgrp_case_1_8a_p, sgrp_case_1_8a_p, name_case_1_8a_p, xtra_case_1_8a_p, desc_case_1_8a_p, sref_case_1_8a_p, test_case_1_8a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8b_p, tgrp_case_1_8b_p, sgrp_case_1_8b_p, name_case_1_8b_p, xtra_case_1_8b_p, desc_case_1_8b_p, sref_case_1_8b_p, test_case_1_8b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8a_np, tgrp_case_1_8a_np, sgrp_case_1_8a_np, name_case_1_8a_np, xtra_case_1_8a_np, desc_case_1_8a_np, sref_case_1_8a_np, test_case_1_8a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8b_np, tgrp_case_1_8b_np, sgrp_case_1_8b_np, name_case_1_8b_np, xtra_case_1_8b_np, desc_case_1_8b_np, sref_case_1_8b_np, test_case_1_8b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9a_p, tgrp_case_1_9a_p, sgrp_case_1_9a_p, name_case_1_9a_p, xtra_case_1_9a_p, desc_case_1_9a_p, sref_case_1_9a_p, test_case_1_9a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9b_p, tgrp_case_1_9b_p, sgrp_case_1_9b_p, name_case_1_9b_p, xtra_case_1_9b_p, desc_case_1_9b_p, sref_case_1_9b_p, test_case_1_9b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9a_np, tgrp_case_1_9a_np, sgrp_case_1_9a_np, name_case_1_9a_np, xtra_case_1_9a_np, desc_case_1_9a_np, sref_case_1_9a_np, test_case_1_9a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9b_np, tgrp_case_1_9b_np, sgrp_case_1_9b_np, name_case_1_9b_np, xtra_case_1_9b_np, desc_case_1_9b_np, sref_case_1_9b_np, test_case_1_9b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_10_p, tgrp_case_1_10_p, sgrp_case_1_10_p, name_case_1_10_p, xtra_case_1_10_p, desc_case_1_10_p, sref_case_1_10_p, test_case_1_10_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_10_np, tgrp_case_1_10_np, sgrp_case_1_10_np, name_case_1_10_np, xtra_case_1_10_np, desc_case_1_10_np, sref_case_1_10_np, test_case_1_10_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_11_p, tgrp_case_1_11_p, sgrp_case_1_11_p, name_case_1_11_p, xtra_case_1_11_p, desc_case_1_11_p, sref_case_1_11_p, test_case_1_11_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_11_np, tgrp_case_1_11_np, sgrp_case_1_11_np, name_case_1_11_np, xtra_case_1_11_np, desc_case_1_11_np, sref_case_1_11_np, test_case_1_11_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12a_p, tgrp_case_1_12a_p, sgrp_case_1_12a_p, name_case_1_12a_p, xtra_case_1_12a_p, desc_case_1_12a_p, sref_case_1_12a_p, test_case_1_12a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12b_p, tgrp_case_1_12b_p, sgrp_case_1_12b_p, name_case_1_12b_p, xtra_case_1_12b_p, desc_case_1_12b_p, sref_case_1_12b_p, test_case_1_12b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12a_np, tgrp_case_1_12a_np, sgrp_case_1_12a_np, name_case_1_12a_np, xtra_case_1_12a_np, desc_case_1_12a_np, sref_case_1_12a_np, test_case_1_12a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12b_np, tgrp_case_1_12b_np, sgrp_case_1_12b_np, name_case_1_12b_np, xtra_case_1_12b_np, desc_case_1_12b_np, sref_case_1_12b_np, test_case_1_12b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_13_p, tgrp_case_1_13_p, sgrp_case_1_13_p, name_case_1_13_p, xtra_case_1_13_p, desc_case_1_13_p, sref_case_1_13_p, test_case_1_13_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_13_np, tgrp_case_1_13_np, sgrp_case_1_13_np, name_case_1_13_np, xtra_case_1_13_np, desc_case_1_13_np, sref_case_1_13_np, test_case_1_13_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_14, tgrp_case_1_14, sgrp_case_1_14, name_case_1_14, xtra_case_1_14, desc_case_1_14, sref_case_1_14, test_case_1_14, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_15_p, tgrp_case_1_15_p, sgrp_case_1_15_p, name_case_1_15_p, xtra_case_1_15_p, desc_case_1_15_p, sref_case_1_15_p, test_case_1_15_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_15_np, tgrp_case_1_15_np, sgrp_case_1_15_np, name_case_1_15_np, xtra_case_1_15_np, desc_case_1_15_np, sref_case_1_15_np, test_case_1_15_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_16_p, tgrp_case_1_16_p, sgrp_case_1_16_p, name_case_1_16_p, xtra_case_1_16_p, desc_case_1_16_p, sref_case_1_16_p, test_case_1_16_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_16_np, tgrp_case_1_16_np, sgrp_case_1_16_np, name_case_1_16_np, xtra_case_1_16_np, desc_case_1_16_np, sref_case_1_16_np, test_case_1_16_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_17, tgrp_case_1_17, sgrp_case_1_17, name_case_1_17, xtra_case_1_17, desc_case_1_17, sref_case_1_17, test_case_1_17, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_18, tgrp_case_1_18, sgrp_case_1_18, name_case_1_18, xtra_case_1_18, desc_case_1_18, sref_case_1_18, test_case_1_18, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_19, tgrp_case_1_19, sgrp_case_1_19, name_case_1_19, xtra_case_1_19, desc_case_1_19, sref_case_1_19, test_case_1_19, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_20, tgrp_case_1_20, sgrp_case_1_20, name_case_1_20, xtra_case_1_20, desc_case_1_20, sref_case_1_20, test_case_1_20, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_21, tgrp_case_1_21, sgrp_case_1_21, name_case_1_21, xtra_case_1_21, desc_case_1_21, sref_case_1_21, test_case_1_21, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_22, tgrp_case_1_22, sgrp_case_1_22, name_case_1_22, xtra_case_1_22, desc_case_1_22, sref_case_1_22, test_case_1_22, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_23, tgrp_case_1_23, sgrp_case_1_23, name_case_1_23, xtra_case_1_23, desc_case_1_23, sref_case_1_23, test_case_1_23, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_24, tgrp_case_1_24, sgrp_case_1_24, name_case_1_24, xtra_case_1_24, desc_case_1_24, sref_case_1_24, test_case_1_24, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_25, tgrp_case_1_25, sgrp_case_1_25, name_case_1_25, xtra_case_1_25, desc_case_1_25, sref_case_1_25, test_case_1_25, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_26, tgrp_case_1_26, sgrp_case_1_26, name_case_1_26, xtra_case_1_26, desc_case_1_26, sref_case_1_26, test_case_1_26, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_27_p, tgrp_case_1_27_p, sgrp_case_1_27_p, name_case_1_27_p, xtra_case_1_27_p, desc_case_1_27_p, sref_case_1_27_p, test_case_1_27_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_27_np, tgrp_case_1_27_np, sgrp_case_1_27_np, name_case_1_27_np, xtra_case_1_27_np, desc_case_1_27_np, sref_case_1_27_np, test_case_1_27_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_28, tgrp_case_1_28, sgrp_case_1_28, name_case_1_28, xtra_case_1_28, desc_case_1_28, sref_case_1_28, test_case_1_28, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_29a, tgrp_case_1_29a, sgrp_case_1_29a, name_case_1_29a, xtra_case_1_29a, desc_case_1_29a, sref_case_1_29a, test_case_1_29a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_29b, tgrp_case_1_29b, sgrp_case_1_29b, name_case_1_29b, xtra_case_1_29b, desc_case_1_29b, sref_case_1_29b, test_case_1_29b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_30a, tgrp_case_1_30a, sgrp_case_1_30a, name_case_1_30a, xtra_case_1_30a, desc_case_1_30a, sref_case_1_30a, test_case_1_30a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_30b, tgrp_case_1_30b, sgrp_case_1_30b, name_case_1_30b, xtra_case_1_30b, desc_case_1_30b, sref_case_1_30b, test_case_1_30b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_31a, tgrp_case_1_31a, sgrp_case_1_31a, name_case_1_31a, xtra_case_1_31a, desc_case_1_31a, sref_case_1_31a, test_case_1_31a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_31b, tgrp_case_1_31b, sgrp_case_1_31b, name_case_1_31b, xtra_case_1_31b, desc_case_1_31b, sref_case_1_31b, test_case_1_31b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_32a, tgrp_case_1_32a, sgrp_case_1_32a, name_case_1_32a, xtra_case_1_32a, desc_case_1_32a, sref_case_1_32a, test_case_1_32a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_32b, tgrp_case_1_32b, sgrp_case_1_32b, name_case_1_32b, xtra_case_1_32b, desc_case_1_32b, sref_case_1_32b, test_case_1_32b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_33, tgrp_case_1_33, sgrp_case_1_33, name_case_1_33, xtra_case_1_33, desc_case_1_33, sref_case_1_33, test_case_1_33, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_34, tgrp_case_1_34, sgrp_case_1_34, name_case_1_34, xtra_case_1_34, desc_case_1_34, sref_case_1_34, test_case_1_34, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_35, tgrp_case_1_35, sgrp_case_1_35, name_case_1_35, xtra_case_1_35, desc_case_1_35, sref_case_1_35, test_case_1_35, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1, tgrp_case_2_1, sgrp_case_2_1, name_case_2_1, xtra_case_2_1, desc_case_2_1, sref_case_2_1, test_case_2_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_2, tgrp_case_2_2, sgrp_case_2_2, name_case_2_2, xtra_case_2_2, desc_case_2_2, sref_case_2_2, test_case_2_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3, tgrp_case_2_3, sgrp_case_2_3, name_case_2_3, xtra_case_2_3, desc_case_2_3, sref_case_2_3, test_case_2_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_4, tgrp_case_2_4, sgrp_case_2_4, name_case_2_4, xtra_case_2_4, desc_case_2_4, sref_case_2_4, test_case_2_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_5, tgrp_case_2_5, sgrp_case_2_5, name_case_2_5, xtra_case_2_5, desc_case_2_5, sref_case_2_5, test_case_2_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_6, tgrp_case_2_6, sgrp_case_2_6, name_case_2_6, xtra_case_2_6, desc_case_2_6, sref_case_2_6, test_case_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_7, tgrp_case_2_7, sgrp_case_2_7, name_case_2_7, xtra_case_2_7, desc_case_2_7, sref_case_2_7, test_case_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_8, tgrp_case_2_8, sgrp_case_2_8, name_case_2_8, xtra_case_2_8, desc_case_2_8, sref_case_2_8, test_case_2_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, xtra_case_3_1, desc_case_3_1, sref_case_3_1, test_case_3_1, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_2, tgrp_case_3_2, sgrp_case_3_2, name_case_3_2, xtra_case_3_2, desc_case_3_2, sref_case_3_2, test_case_3_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_3, tgrp_case_3_3, sgrp_case_3_3, name_case_3_3, xtra_case_3_3, desc_case_3_3, sref_case_3_3, test_case_3_3, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_4, tgrp_case_3_4, sgrp_case_3_4, name_case_3_4, xtra_case_3_4, desc_case_3_4, sref_case_3_4, test_case_3_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_5, tgrp_case_3_5, sgrp_case_3_5, name_case_3_5, xtra_case_3_5, desc_case_3_5, sref_case_3_5, test_case_3_5, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_6, tgrp_case_3_6, sgrp_case_3_6, name_case_3_6, xtra_case_3_6, desc_case_3_6, sref_case_3_6, test_case_3_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_7, tgrp_case_3_7, sgrp_case_3_7, name_case_3_7, xtra_case_3_7, desc_case_3_7, sref_case_3_7, test_case_3_7, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_8, tgrp_case_3_8, sgrp_case_3_8, name_case_3_8, xtra_case_3_8, desc_case_3_8, sref_case_3_8, test_case_3_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_1a, tgrp_case_4_1a, sgrp_case_4_1a, name_case_4_1a, xtra_case_4_1a, desc_case_4_1a, sref_case_4_1a, test_case_4_1a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_1b, tgrp_case_4_1b, sgrp_case_4_1b, name_case_4_1b, xtra_case_4_1b, desc_case_4_1b, sref_case_4_1b, test_case_4_1b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_2, tgrp_case_4_2, sgrp_case_4_2, name_case_4_2, xtra_case_4_2, desc_case_4_2, sref_case_4_2, test_case_4_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_3, tgrp_case_4_3, sgrp_case_4_3, name_case_4_3, xtra_case_4_3, desc_case_4_3, sref_case_4_3, test_case_4_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, xtra_case_5_1, desc_case_5_1, sref_case_5_1, test_case_5_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_2, tgrp_case_5_2, sgrp_case_5_2, name_case_5_2, xtra_case_5_2, desc_case_5_2, sref_case_5_2, test_case_5_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_3, tgrp_case_5_3, sgrp_case_5_3, name_case_5_3, xtra_case_5_3, desc_case_5_3, sref_case_5_3, test_case_5_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_4a, tgrp_case_5_4a, sgrp_case_5_4a, name_case_5_4a, xtra_case_5_4a, desc_case_5_4a, sref_case_5_4a, test_case_5_4a, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_4b, tgrp_case_5_4b, sgrp_case_5_4b, name_case_5_4b, xtra_case_5_4b, desc_case_5_4b, sref_case_5_4b, test_case_5_4b, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_5a, tgrp_case_5_5a, sgrp_case_5_5a, name_case_5_5a, xtra_case_5_5a, desc_case_5_5a, sref_case_5_5a, test_case_5_5a, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_5b, tgrp_case_5_5b, sgrp_case_5_5b, name_case_5_5b, xtra_case_5_5b, desc_case_5_5b, sref_case_5_5b, test_case_5_5b, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_6_1, tgrp_case_6_1, sgrp_case_6_1, name_case_6_1, xtra_case_6_1, desc_case_6_1, sref_case_6_1, test_case_6_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_6_2, tgrp_case_6_2, sgrp_case_6_2, name_case_6_2, xtra_case_6_2, desc_case_6_2, sref_case_6_2, test_case_6_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_6_3, tgrp_case_6_3, sgrp_case_6_3, name_case_6_3, xtra_case_6_3, desc_case_6_3, sref_case_6_3, test_case_6_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_6_4, tgrp_case_6_4, sgrp_case_6_4, name_case_6_4, xtra_case_6_4, desc_case_6_4, sref_case_6_4, test_case_6_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_7_1, tgrp_case_7_1, sgrp_case_7_1, name_case_7_1, xtra_case_7_1, desc_case_7_1, sref_case_7_1, test_case_7_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_7_2, tgrp_case_7_2, sgrp_case_7_2, name_case_7_2, xtra_case_7_2, desc_case_7_2, sref_case_7_2, test_case_7_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_7_3, tgrp_case_7_3, sgrp_case_7_3, name_case_7_3, xtra_case_7_3, desc_case_7_3, sref_case_7_3, test_case_7_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_7_4, tgrp_case_7_4, sgrp_case_7_4, name_case_7_4, xtra_case_7_4, desc_case_7_4, sref_case_7_4, test_case_7_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_1, tgrp_case_8_1, sgrp_case_8_1, name_case_8_1, xtra_case_8_1, desc_case_8_1, sref_case_8_1, test_case_8_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_2, tgrp_case_8_2, sgrp_case_8_2, name_case_8_2, xtra_case_8_2, desc_case_8_2, sref_case_8_2, test_case_8_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_3, tgrp_case_8_3, sgrp_case_8_3, name_case_8_3, xtra_case_8_3, desc_case_8_3, sref_case_8_3, test_case_8_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_4, tgrp_case_8_4, sgrp_case_8_4, name_case_8_4, xtra_case_8_4, desc_case_8_4, sref_case_8_4, test_case_8_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_5, tgrp_case_8_5, sgrp_case_8_5, name_case_8_5, xtra_case_8_5, desc_case_8_5, sref_case_8_5, test_case_8_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_6, tgrp_case_8_6, sgrp_case_8_6, name_case_8_6, xtra_case_8_6, desc_case_8_6, sref_case_8_6, test_case_8_6, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_7, tgrp_case_8_7, sgrp_case_8_7, name_case_8_7, xtra_case_8_7, desc_case_8_7, sref_case_8_7, test_case_8_7, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_8, tgrp_case_8_8, sgrp_case_8_8, name_case_8_8, xtra_case_8_8, desc_case_8_8, sref_case_8_8, test_case_8_8, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_9a, tgrp_case_8_9a, sgrp_case_8_9a, name_case_8_9a, xtra_case_8_9a, desc_case_8_9a, sref_case_8_9a, test_case_8_9a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_9b, tgrp_case_8_9b, sgrp_case_8_9b, name_case_8_9b, xtra_case_8_9b, desc_case_8_9b, sref_case_8_9b, test_case_8_9b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_10, tgrp_case_8_10, sgrp_case_8_10, name_case_8_10, xtra_case_8_10, desc_case_8_10, sref_case_8_10, test_case_8_10, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_11, tgrp_case_8_11, sgrp_case_8_11, name_case_8_11, xtra_case_8_11, desc_case_8_11, sref_case_8_11, test_case_8_11, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_12a, tgrp_case_8_12a, sgrp_case_8_12a, name_case_8_12a, xtra_case_8_12a, desc_case_8_12a, sref_case_8_12a, test_case_8_12a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_12b, tgrp_case_8_12b, sgrp_case_8_12b, name_case_8_12b, xtra_case_8_12b, desc_case_8_12b, sref_case_8_12b, test_case_8_12b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_13, tgrp_case_8_13, sgrp_case_8_13, name_case_8_13, xtra_case_8_13, desc_case_8_13, sref_case_8_13, test_case_8_13, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_14, tgrp_case_8_14, sgrp_case_8_14, name_case_8_14, xtra_case_8_14, desc_case_8_14, sref_case_8_14, test_case_8_14, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_1, tgrp_case_9_1, sgrp_case_9_1, name_case_9_1, xtra_case_9_1, desc_case_9_1, sref_case_9_1, test_case_9_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_2, tgrp_case_9_2, sgrp_case_9_2, name_case_9_2, xtra_case_9_2, desc_case_9_2, sref_case_9_2, test_case_9_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_3, tgrp_case_9_3, sgrp_case_9_3, name_case_9_3, xtra_case_9_3, desc_case_9_3, sref_case_9_3, test_case_9_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_4, tgrp_case_9_4, sgrp_case_9_4, name_case_9_4, xtra_case_9_4, desc_case_9_4, sref_case_9_4, test_case_9_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_5, tgrp_case_9_5, sgrp_case_9_5, name_case_9_5, xtra_case_9_5, desc_case_9_5, sref_case_9_5, test_case_9_5, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_6, tgrp_case_9_6, sgrp_case_9_6, name_case_9_6, xtra_case_9_6, desc_case_9_6, sref_case_9_6, test_case_9_6, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_7, tgrp_case_9_7, sgrp_case_9_7, name_case_9_7, xtra_case_9_7, desc_case_9_7, sref_case_9_7, test_case_9_7, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_8, tgrp_case_9_8, sgrp_case_9_8, name_case_9_8, xtra_case_9_8, desc_case_9_8, sref_case_9_8, test_case_9_8, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_9, tgrp_case_9_9, sgrp_case_9_9, name_case_9_9, xtra_case_9_9, desc_case_9_9, sref_case_9_9, test_case_9_9, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_10, tgrp_case_9_10, sgrp_case_9_10, name_case_9_10, xtra_case_9_10, desc_case_9_10, sref_case_9_10, test_case_9_10, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_11, tgrp_case_9_11, sgrp_case_9_11, name_case_9_11, xtra_case_9_11, desc_case_9_11, sref_case_9_11, test_case_9_11, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_12, tgrp_case_9_12, sgrp_case_9_12, name_case_9_12, xtra_case_9_12, desc_case_9_12, sref_case_9_12, test_case_9_12, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_13, tgrp_case_9_13, sgrp_case_9_13, name_case_9_13, xtra_case_9_13, desc_case_9_13, sref_case_9_13, test_case_9_13, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_10_1, tgrp_case_10_1, sgrp_case_10_1, name_case_10_1, xtra_case_10_1, desc_case_10_1, sref_case_10_1, test_case_10_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_10_2a, tgrp_case_10_2a, sgrp_case_10_2a, name_case_10_2a, xtra_case_10_2a, desc_case_10_2a, sref_case_10_2a, test_case_10_2a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_10_2b, tgrp_case_10_2b, sgrp_case_10_2b, name_case_10_2b, xtra_case_10_2b, desc_case_10_2b, sref_case_10_2b, test_case_10_2b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_10_2c, tgrp_case_10_2c, sgrp_case_10_2c, name_case_10_2c, xtra_case_10_2c, desc_case_10_2c, sref_case_10_2c, test_case_10_2c, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_10_3, tgrp_case_10_3, sgrp_case_10_3, name_case_10_3, xtra_case_10_3, desc_case_10_3, sref_case_10_3, test_case_10_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	NULL,}
 };
 
@@ -15454,6 +15712,8 @@ do_tests(int num_tests)
 	int skipped = 0;
 	int notselected = 0;
 	int aborted = 0;
+	int repeat = 0;
+	int oldverbose = verbose;
 
 	print_header();
 	show = 0;
@@ -15485,7 +15745,10 @@ do_tests(int num_tests)
 					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
 				if (verbose > 1 && tests[i].sgrp)
 					fprintf(stdout, "\nTest Subgroup: %s", tests[i].sgrp);
-				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
+				if (tests[i].xtra)
+					fprintf(stdout, "\nTest Case %s-%s/%s: %s (%s)\n", sstdname, shortname, tests[i].numb, tests[i].name, tests[i].xtra);
+				else
+					fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
 				if (verbose > 1 && tests[i].sref)
 					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
 				if (verbose > 1 && tests[i].desc)
@@ -15563,7 +15826,8 @@ do_tests(int num_tests)
 				}
 				break;
 			case __RESULT_FAILURE:
-				failures++;
+				if (!repeat_verbose || repeat)
+					failures++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "\n");
@@ -15601,7 +15865,8 @@ do_tests(int num_tests)
 			default:
 			case __RESULT_INCONCLUSIVE:
 			      inconclusive:
-				inconclusive++;
+				if (!repeat_verbose || repeat)
+					inconclusive++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "\n");
@@ -15617,6 +15882,14 @@ do_tests(int num_tests)
 				goto rerun;
 			if (repeat_on_success && (result == __RESULT_SUCCESS))
 				goto rerun;
+			if (repeat) {
+				repeat = 0;
+				verbose = oldverbose;
+			} else if (repeat_verbose && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE)) {
+				repeat = 1;
+				verbose = 5;
+				goto rerun;
+			}
 			tests[i].result = result;
 			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
 				aborted = 1;
@@ -15837,6 +16110,8 @@ Options:\n\
         execute client side of test case only.\n\
     -S, --server\n\
         execute server side of test case only.\n\
+    -a, --again\n\
+        repeat failed tests verbose.\n\
     -w, --wait\n\
         have server wait indefinitely.\n\
     -r, --repeat\n\
@@ -15917,6 +16192,7 @@ main(int argc, char *argv[])
 			{"draft",	required_argument,	NULL, 'D'},
 			{"client",	no_argument,		NULL, 'c'},
 			{"server",	no_argument,		NULL, 'S'},
+			{"again",	no_argument,		NULL, 'a'},
 			{"wait",	no_argument,		NULL, 'w'},
 			{"client-port",	required_argument,	NULL, 'p'},
 			{"server-port",	required_argument,	NULL, 'P'},
@@ -15942,9 +16218,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "uD:cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "uD:cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "uD:cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "uD:cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -16012,6 +16288,9 @@ main(int argc, char *argv[])
 		case 'S':	/* --server */
 			server_exec = 1;
 			break;
+		case 'a':	/* --again */
+			repeat_verbose = 1;
+			break;
 		case 'w':	/* --wait */
 			test_duration = INFINITE_WAIT;
 			break;
@@ -16062,7 +16341,10 @@ main(int argc, char *argv[])
 							fprintf(stdout, "Test Group: %s\n", t->tgrp);
 						if (verbose > 2 && t->sgrp)
 							fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
-						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+						if (t->xtra)
+							fprintf(stdout, "Test Case %s-%s/%s: %s (%s)\n", sstdname, shortname, t->numb, t->name, t->xtra);
+						else
+							fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 						if (verbose > 2 && t->sref)
 							fprintf(stdout, "Test Reference: %s\n", t->sref);
 						if (verbose > 1 && t->desc)
@@ -16086,7 +16368,10 @@ main(int argc, char *argv[])
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
 					if (verbose > 2 && t->sgrp)
 						fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
-					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+					if (t->xtra)
+						fprintf(stdout, "Test Case %s-%s/%s: %s (%s)\n", sstdname, shortname, t->numb, t->name, t->xtra);
+					else
+						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 					if (verbose > 2 && t->sref)
 						fprintf(stdout, "Test Reference: %s\n", t->sref);
 					if (verbose > 1 && t->desc)

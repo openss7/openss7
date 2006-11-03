@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-m2pa.at,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/11/02 12:54:46 $
+dnl @(#) $RCSfile: testsuite-m2pa.at,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:53 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/11/02 12:54:46 $ by $Author: brian $
+dnl Last Modified $Date: 2006/11/03 11:08:53 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-m2pa.at,v $
+dnl Revision 0.9.2.5  2006/11/03 11:08:53  brian
+dnl - 32-bit compatibility testsuite passes
+dnl
 dnl Revision 0.9.2.4  2006/11/02 12:54:46  brian
 dnl - major corrections and updates to M2PA module and tests cases
 dnl
@@ -82,7 +85,7 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_m2pa() {
-    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--verbose=3' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -162,342 +165,342 @@ AT_CHECK([test_m2pa "0.2.7"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.1(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.1(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.1(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.1(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.2])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.3])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.4])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.4"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.5(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.5(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.5(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.5(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.5(a)np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.5(a)np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.5(b)np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.5(b)np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.6])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.6"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.6np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.6np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.7])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.7"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.8(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.8(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.8(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.8(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.8(a)np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.8(a)np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.8(b)np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.8(b)np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.9(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.9(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.9(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.9(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.9(a)np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.9(a)np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.9(b)np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.9(b)np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.10])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.10"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.10np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.10np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.11])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.11"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.11np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.11np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.12(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.12(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.12(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.12(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.12(a)np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.12(a)np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.12(b)np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.12(b)np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.13])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.13"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.13np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.13np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.14])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.14"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.15])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.15"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.15np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.15np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.16])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.16"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.16np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.16np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.17])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.17"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.18])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.18"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.19])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CTP IOT])
 AT_CHECK([test_m2pa "1.19"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.20])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.20"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.21])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.21"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.22])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.22"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.23])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.23"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.24])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.24"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.25])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.25"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.26])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.26"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.27])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.27"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.27np])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.27np"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.28])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.28"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.29(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.29(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.29(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.29(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.30(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.30(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.30(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.30(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.31(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.31(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.31(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.31(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.32(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.32(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.32(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "1.32(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.33])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.33"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.34])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "1.34"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 1.35])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "1.35"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 2.1])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "2.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 2.2])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "2.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 2.3])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "2.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 2.4])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "2.4"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 2.5])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "2.5"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 2.6])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "2.6"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 2.7])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "2.7"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 2.8])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "2.8"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 3.1])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "3.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -507,7 +510,7 @@ AT_CHECK([test_m2pa "3.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 3.3])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "3.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -517,7 +520,7 @@ AT_CHECK([test_m2pa "3.4"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 3.5])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "3.5"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -527,7 +530,7 @@ AT_CHECK([test_m2pa "3.6"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 3.7])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "3.7"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -537,22 +540,22 @@ AT_CHECK([test_m2pa "3.8"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 4.1(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "4.1(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 4.1(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "4.1(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 4.2])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "4.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 4.3])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "4.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -567,7 +570,7 @@ AT_CHECK([test_m2pa "5.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 5.3])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "5.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -632,7 +635,7 @@ AT_CHECK([test_m2pa "7.4"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.1])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT CPT IOT])
 AT_CHECK([test_m2pa "8.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -642,17 +645,17 @@ AT_CHECK([test_m2pa "8.2"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.3])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "8.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.4])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "8.4"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.5])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "8.5"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -667,42 +670,42 @@ AT_CHECK([test_m2pa "8.7"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.8])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "8.8"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.9(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "8.9(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.9(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "8.9(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.10])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "8.10"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.11])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "8.11"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.12(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "8.12(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.12(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "8.12(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 8.13])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "8.13"], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -777,27 +780,27 @@ AT_CHECK([test_m2pa "9.13"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 10.1])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT IOT])
 AT_CHECK([test_m2pa "10.1"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 10.2(a)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "10.2(a)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 10.2(b)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "10.2(b)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 10.2(c)])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "10.2(c)"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([m2pa test 10.3])
-AT_KEYWORDS([m2pa])
+AT_KEYWORDS([m2pa VAT])
 AT_CHECK([test_m2pa "10.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 

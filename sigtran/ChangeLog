@@ -1,3 +1,9 @@
+2006-11-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/m2pa_sl.c: check for flow control, 32-bit compat corrections
+	* src/test/test-m2pa.c: 32-bit compat corrections, labelling
+	* tests/testsuite-m2pa.at: labelling
+
 2006-11-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/m2pa_sl.c: major rework for test cases and attach/enable
