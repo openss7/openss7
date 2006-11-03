@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.35 2006/10/30 06:40:05 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.36 2006/11/03 10:39:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/30 06:40:05 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: compat.h,v $
+ Revision 0.9.2.36  2006/11/03 10:39:21  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
 #ifndef __LOCAL_COMPAT_H__
 #define __LOCAL_COMPAT_H__
 
-#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.35 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.36 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define __OPTIMIZE__ 1
 

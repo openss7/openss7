@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: priv.h,v 0.9.2.8 2006/04/23 18:11:05 brian Exp $
+ @(#) $Id: priv.h,v 0.9.2.9 2006/11/03 10:39:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/23 18:11:05 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: priv.h,v $
+ Revision 0.9.2.9  2006/11/03 10:39:21  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
 #ifndef __OS7_PRIV_H__
 #define __OS7_PRIV_H__
 
-#ident "@(#) $RCSfile: priv.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: priv.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  =========================================================================

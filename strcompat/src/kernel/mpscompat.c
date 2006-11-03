@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/06 12:13:18 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/11/03 10:39:28 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/06 12:13:18 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.28  2006/11/03 10:39:28  brian
+ - updated headers, correction to mi_timer_expiry type
+
  Revision 0.9.2.27  2006/10/06 12:13:18  brian
  - updated manual pages to pass make check and for release
  - updated release files for release
@@ -137,10 +139,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/06 12:13:18 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/11/03 10:39:28 $"
 
-static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/06 12:13:18 $";
+static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/11/03 10:39:28 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -168,7 +169,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/10/06 12:13:18 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/11/03 10:39:28 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -236,7 +237,7 @@ EXPORT_SYMBOL_NOVERS(mi_zalloc_sleep);	/* mps/ddi.h */
  */
 __MPS_EXTERN_INLINE void mi_free(void *ptr);
 
-EXPORT_SYMBOL_NOVERS(mi_free);		/* mps/ddi.h */
+EXPORT_SYMBOL_NOVERS(mi_free);	/* mps/ddi.h */
 
 /*
  *  =========================================================================
@@ -468,8 +469,8 @@ EXPORT_SYMBOL_NOVERS(mi_attach);	/* mps/ddi.h, mac/ddi.h */
  *  MI_OPEN_COMM
  *  -------------------------------------------------------------------------
  */
-__MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag,
-				     int sflag, cred_t *credp);
+__MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp,
+				     int flag, int sflag, cred_t *credp);
 EXPORT_SYMBOL_NOVERS(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
 
 /*
@@ -949,7 +950,7 @@ typedef struct mi_timeb {
 #undef mi_timer_alloc
 #undef mi_timer
 
-static void
+static streamscall void
 mi_timer_expiry(caddr_t data)
 {
 	tblk_t *tb = (typeof(tb)) data;
@@ -1110,8 +1111,9 @@ mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 			/* tb is idle */
 			tb->tb_state = TB_ACTIVE;
 			tb->tb_time = jiffies + drv_msectohz(msec);
-			if (!(tb->tb_tid = timeout((timo_fcn_t *) mi_timer_expiry,
-						   (caddr_t) tb, tb->tb_time - jiffies))) {
+			if (!
+			    (tb->tb_tid =
+			     timeout(mi_timer_expiry, (caddr_t) tb, tb->tb_time - jiffies))) {
 				/* failed timeout allocation */
 				if (tb->tb_q) {
 					tb->tb_state = TB_RESCHEDULED;
@@ -1189,8 +1191,7 @@ mi_timer_move(queue_t *q, mblk_t *mp)
 			goto dequeue;
 		untimeout(tid);
 		tb->tb_q = q;
-		if (!(tb->tb_tid = timeout((timo_fcn_t *) mi_timer_expiry,
-					   (caddr_t) tb, tb->tb_time - jiffies))) {
+		if (!(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) tb, tb->tb_time - jiffies))) {
 			/* failed timeout allocation */
 			if (q) {
 				tb->tb_state = TB_RESCHEDULED;
@@ -1259,8 +1260,7 @@ mi_timer_valid(mblk_t *mp)
 		return (0);
 	case TB_RESCHEDULED:
 		tb->tb_state = TB_ACTIVE;
-		if (!(tb->tb_tid = timeout((timo_fcn_t *) mi_timer_expiry,
-					   (caddr_t) tb, tb->tb_time - jiffies))) {
+		if (!(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) tb, tb->tb_time - jiffies))) {
 			/* failed timeout allocation */
 			tb->tb_state = TB_RESCHEDULED;
 			if (tb->tb_q) {
@@ -1398,7 +1398,7 @@ mi_number(mblk_t **mpp, unsigned long long num, int base, int width, int decimal
 	if (flags & _MI_FLAG_SIGN) {
 		if ((signed long long) num < 0) {
 			sign = '-';
-			num = - (signed long long) num;
+			num = -(signed long long) num;
 			width--;
 		} else if (flags & _MI_FLAG_PLUS) {
 			sign = '+';
@@ -1424,7 +1424,7 @@ mi_number(mblk_t **mpp, unsigned long long num, int base, int width, int decimal
 	else {
 		const char *hexdig =
 		    (flags & _MI_FLAG_LARGE) ? "0123456789ABCDEF" : "0123456789abcdef";
-		for (; num != 0; tmp[i++] = hexdig[do_div(num,base)]) ;
+		for (; num != 0; tmp[i++] = hexdig[do_div(num, base)]) ;
 	}
 	if (i > decimal)
 		decimal = i;
@@ -2073,7 +2073,7 @@ EXPORT_SYMBOL_NOVERS(mps_intr_enable);
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
 static
 #endif
-    int __init
+int __init
 mpscomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
@@ -2087,7 +2087,7 @@ mpscomp_init(void)
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
 static
 #endif
-    void __exit
+void __exit
 mpscomp_exit(void)
 {
 	return;

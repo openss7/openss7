@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: lock.h,v 0.9.2.5 2006/04/22 01:05:35 brian Exp $
+ @(#) $Id: lock.h,v 0.9.2.6 2006/11/03 10:39:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/22 01:05:35 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: lock.h,v $
+ Revision 0.9.2.6  2006/11/03 10:39:21  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
 #ifndef __OS7_LOCK_H__
 #define __OS7_LOCK_H__
 
-#ident "@(#) $RCSfile: lock.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: lock.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 extern int streamscall ss7_trylockq(queue_t *q);
 extern void streamscall ss7_unlockq(queue_t *q);

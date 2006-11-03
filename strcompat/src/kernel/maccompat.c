@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/06 12:13:18 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/03 10:39:28 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/06 12:13:18 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: maccompat.c,v $
+ Revision 0.9.2.17  2006/11/03 10:39:28  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/06 12:13:18 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/03 10:39:28 $"
 
-static char const ident[] =
-    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/06 12:13:18 $";
+static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/03 10:39:28 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +78,7 @@ static char const ident[] =
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/10/06 12:13:18 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/03 10:39:28 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"

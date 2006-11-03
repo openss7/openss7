@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/24 09:01:05 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/03 10:39:27 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:05 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:27 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: aixcompat.c,v $
+ Revision 0.9.2.25  2006/11/03 10:39:27  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/24 09:01:05 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/03 10:39:27 $"
 
-static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/24 09:01:05 $";
+static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/03 10:39:27 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +78,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/07/24 09:01:05 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/03 10:39:27 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -123,7 +127,7 @@ wantio(queue_t *q, struct wantio *w)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(wantio);		/* aix/ddi.h */
+EXPORT_SYMBOL_NOVERS(wantio);	/* aix/ddi.h */
 
 /* 
  *  WANTMSG
@@ -131,7 +135,7 @@ EXPORT_SYMBOL_NOVERS(wantio);		/* aix/ddi.h */
  */
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int streamscall (*func) (mblk_t *));
 
-EXPORT_SYMBOL_NOVERS(wantmsg);		/* aix/ddi.h */
+EXPORT_SYMBOL_NOVERS(wantmsg);	/* aix/ddi.h */
 #endif
 
 /* 

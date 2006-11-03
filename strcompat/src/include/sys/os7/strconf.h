@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.6 2006/06/22 13:11:26 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.7 2006/11/03 10:39:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:26 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strconf.h,v $
+ Revision 0.9.2.7  2006/11/03 10:39:21  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
 #ifndef __SYS_OS7_STRCONF_H__
 #define __SYS_OS7_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/os7/strconf.h directly, include sys/strconf.h instead."

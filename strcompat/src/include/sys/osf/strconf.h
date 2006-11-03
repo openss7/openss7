@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.12 2006/06/22 13:11:27 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.13 2006/11/03 10:39:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:27 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:22 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strconf.h,v $
+ Revision 0.9.2.13  2006/11/03 10:39:22  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
 #ifndef __SYS_OSF_STRCONF_H__
 #define __SYS_OSF_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/06/22 13:11:27 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."

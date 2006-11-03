@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.6 2006/06/22 13:11:26 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.7 2006/11/03 10:39:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/22 13:11:26 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: stream.h,v $
+ Revision 0.9.2.7  2006/11/03 10:39:21  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
 #ifndef __SYS_OS7_STREAM_H__
 #define __SYS_OS7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/irix/stream.h directly, include sys/stream.h instead."

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/30 06:40:07 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/11/03 10:39:27 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/30 06:40:07 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:27 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: liscompat.c,v $
+ Revision 0.9.2.41  2006/11/03 10:39:27  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/30 06:40:07 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/11/03 10:39:27 $"
 
-static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/30 06:40:07 $";
+static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/11/03 10:39:27 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +82,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/10/30 06:40:07 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/11/03 10:39:27 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"

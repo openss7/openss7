@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 0.9.2.12 2006/11/02 12:50:04 brian Exp $
+ @(#) $Id: queue.h,v 0.9.2.13 2006/11/03 10:39:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/02 12:50:04 $ by $Author: brian $
+ Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: queue.h,v $
+ Revision 0.9.2.13  2006/11/03 10:39:21  brian
+ - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
 #ifndef __OS7_QUEUE_H__
 #define __OS7_QUEUE_H__
 
-#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define QR_DONE		0
 #define QR_ABSORBED	1
