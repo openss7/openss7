@@ -6035,6 +6035,61 @@ asp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (-EOPNOTSUPP);
 }
 STATIC int
+sgp_mark_asp_inactive(struct spp *spp, queue_t *q)
+{
+	int err;
+	struct gp *gp;
+
+	/* Newly connecting ASPs can already has AS associated with them by configuration. Walking
+	   the AS-ASP graph finds all of the AS that have been associated with the ASP.  We issue a 
+	   notification of the state of each AS to the newly connecting ASP because it may not have 
+	   prior information or information available from other ASPs concerning the state of the
+	   associated AS.  This is primarily for statically allocated IIDs and RCs, as there is
+	   another opportunity to notify the ASP of the state of an AS when the ASP registers for
+	   an IID or RC. */
+	for (gp = spp->gp.list; gp; gp = gp->spp.next) {
+		struct as *as = gp->as.as;
+		struct xp *xp = gp->spp.spp->xp;
+
+		if (gp_get_state(gp) != AS_DOWN)
+			continue;
+		/* FEATURE: ASPs which have just come up should be immediately notified of AS
+		   state, they can then use the notifications to determine their next best action.
+		   This is not required nor recommended by the specification, but is in general
+		   good practice. */
+		if (as_tst_flags(as, ASF_ACTIVE)) {
+			if ((err = ua_send_mgmt_ntfy_simple(q, xp, UA_STATUS_AS_ACTIVE, NULL)))
+				return (err);
+			if (as_tst_flags(as, ASF_INSUFFICIENT_ASPS) && as->minasp > 1)
+				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
+								    UA_STATUS_AS_INSUFFICIENT_ASPS,
+								    NULL)))
+					return (err);
+			if (as_tst_flags(as, ASF_MINIMUM_ASPS) && as->minasp > 1)
+				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
+								    UA_STATUS_AS_MINIMUM_ASPS,
+								    NULL)))
+					return (err);
+		} else {
+			if (as_tst_flags(as, ASF_PENDING)) {
+				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
+								    UA_STATUS_AS_PENDING, NULL)))
+					return (err);
+			} else {
+				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
+								    UA_STATUS_AS_INACTIVE, NULL)))
+					return (err);
+			}
+		}
+		/* For static configuration, the ASP is marked in the AS_INACTIVE state in all AS
+		   of which it is (already) a member by static configuration. */
+		if ((err = gp_u_set_state(q, gp, AS_INACTIVE)))
+			return (err);
+		/* FIXME: Must also deregister all routing keys registered to the ASP */
+	}
+	return (0);
+}
+STATIC int
 sgp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 {
 	int err;
@@ -6042,7 +6097,6 @@ sgp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 	struct sp *sp;
 	struct spp *spp;
 
-	fixme(("Need to check ASPID\n"));
 	if (!(spp = xp->spp)) {
 		if (!(sp = xp->sp))
 			goto disable;
@@ -6052,18 +6106,27 @@ sgp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 		   new) spp.  If there is no ASPID in the message, we should refuse the ASPUP with
 		   an ERR. */
 		if (!m->aspid.ptr.c)
+			/* Because the transport endpoint is not associated with an ASP by
+			   configuration, it is necessary that an ASP Id be provided in the ASP Up
+			   message. */
 			goto needaspid;
 		if (!m->aspid.val)
+			/* We do not permit an ASP Id value of zero.  ASP Ids must be unique
+			   non-zero numbers. */
 			goto badaspid;
 		for (spp = sp->spp.list; spp && spp->aspid != m->aspid.val; spp = spp->sp.next) ;
 		/* FEATURE: We create an ASP if a structure does not exist. This ASP is given
 		   access to all of the AS defined for this SGP.  If one wants security, the ASP
 		   should have never been allowed to connect. */
 		if (!spp) {
+			/* Did not find an existing spp with the same aspid: allocate a new one. */
 			if (!(spp = ua_alloc_spp(spp_get_id(0), UA_OBJ_TYPE_ASP,
 						 sp, m->aspid.val, 0)))
 				goto enomem;
 		} else if (spp->xp)
+			/* Found an existing spp with the same aspid so there is a conflict;
+			   however, check if the conflict has a transport associated with it, if
+			   not then it is just a place holder. */
 			goto badaspid;
 	} else {
 		sp = spp->sp.sp;
@@ -6072,15 +6135,28 @@ sgp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 
 			if (!spp->aspid) {
 				if (!m->aspid.val)
-					goto needaspid;
+					/* We do not permit an ASP Id value of zero.  ASP Ids must
+					   be unique non-zero numbers. */
+					goto badaspid;
 				for (s = sp->spp.list; s && s->aspid != m->aspid.val;
 				     s = s->sp.next) ;
 				if (s)
+					/* If another ASP exists wth the asm ASP Id value, then the 
+					   ASP Id is bad. */
 					goto badaspid;
 				spp->aspid = m->aspid.val;
+				/* Otherwise, use the requested ASP Id value as the identifier for
+				   the ASP. */
 			} else if (spp->aspid != m->aspid.val)
+				/* If an ASP Id was provided in the message and one is already
+				   assigned to the ASP by configuration, if the two do not match,
+				   the provided ASP Id is considered bad. */
 				goto badaspid;
 		} else if (!spp->aspid)
+			/* If there is no ASP Id in the message that is acceptable if the transport 
+			   is already associated with an ASP that has a (non-zero) ASP Id assigned
+			   to it.  If the ASP Id is zero, (i.e, one has not been assigned) it is
+			   necessary that an ASP Id be provided in the ASP Up message. */
 			goto needaspid;
 	}
 	switch (spp_get_state(spp)) {
@@ -6088,53 +6164,25 @@ sgp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 		if (spp_tst_flags(spp, ASF_MGMT_BLOCKED))
 			goto blocked;
 		asp_set_state(q, spp, ASP_WACK_ASPUP);
-		/* fall through */
+		goto asp_wack_aspup;
 	case ASP_WACK_ASPUP:
-		for (gp = spp->gp.list; gp; gp = gp->spp.next) {
-			struct as *as = gp->as.as;
-			struct xp *xp = gp->spp.spp->xp;
-
-			if (gp_get_state(gp) != AS_DOWN)
-				continue;
-			/* FEATURE: ASPs which have just come up should be immediately notified of
-			   AS state, they can then use the notifications to determine their next
-			   best action */
-			if (as_tst_flags(as, ASF_ACTIVE)) {
-				if ((err = ua_send_mgmt_ntfy_simple(q, xp, UA_STATUS_AS_ACTIVE,
-								    NULL)))
-					return (err);
-				if (as_tst_flags(as, ASF_INSUFFICIENT_ASPS) && as->minasp > 1)
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_AS_INSUFFICIENT_ASPS,
-									    NULL)))
-						return (err);
-				if (as_tst_flags(as, ASF_MINIMUM_ASPS) && as->minasp > 1)
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_AS_MINIMUM_ASPS,
-									    NULL)))
-						return (err);
-			} else {
-				if (as_tst_flags(as, ASF_PENDING)) {
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_AS_PENDING,
-									    NULL)))
-						return (err);
-				} else {
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_AS_INACTIVE,
-									    NULL)))
-						return (err);
-				}
-			}
-			if ((err = gp_u_set_state(q, gp, AS_INACTIVE)))
-				return (err);
-		}
-		asp_set_state(q, spp, ASP_WACK_ASPDN);
-		/* fall through */
-	case ASP_WACK_ASPDN:
+		if ((err = sgp_mark_asp_inactive(spp, q)))
+			return (err);
 		todo(("Notify management that the ASP has come up\n"));
+		if ((err = ua_send_asps_aspup_ack(q, xp, NULL, NULL, 0)))
+			return (err);
 		asp_set_state(q, spp, ASP_UP);
-		/* fall through */
+		return (QR_DONE);
+
+	case ASP_WACK_ASPDN:
+		if ((err = sgp_mark_asp_inactive(spp, q)))
+			return (err);
+		todo(("Notify management that the ASP has come up\n"));
+		if ((err = ua_send_asps_aspup_ack(q, xp, NULL, NULL, 0)))
+			return (err);
+		asp_set_state(q, spp, ASP_UP);
+		return (QR_DONE);
+
 	case ASP_UP:
 		if ((err = ua_send_asps_aspup_ack(q, xp, NULL, NULL, 0)))
 			return (err);
