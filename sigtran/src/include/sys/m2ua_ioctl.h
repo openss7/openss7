@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m2ua_ioctl.h,v 0.9.2.1 2006/10/17 11:55:45 brian Exp $
+ @(#) $Id: m2ua_ioctl.h,v 0.9.2.2 2006/11/04 11:35:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:55:45 $ by $Author: brian $
+ Last Modified $Date: 2006/11/04 11:35:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __M2UA_IOCTL_H__
 #define __M2UA_IOCTL_H__
 
-#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
-#define M2UA_IOC_MAGIC '2'
+#define M2UA_IOC_MAGIC	'2'
 
 #define M2UA_OBJ_TYPE_LM	 0	/* layer management */
 #define M2UA_OBJ_TYPE_AS_U	 1	/* application server (user) */

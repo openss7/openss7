@@ -1,3 +1,13 @@
+2006-11-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/descrip.texi: noted open source release of commercial package
+	* doc/manual/news.texi: noted open source release of commercial package
+	* doc/manual/releases.texi: noted open source release of commercial package
+	* src/drivers/m2ua.c: updates
+	* src/include/sys/m2ua_ioctl.h: updates
+	* src/drivers/ua.c: added common UA file from commercial release
+	* src/include/sys/ua_ioctl.h: added common UA file from commercial release
+
 2006-11-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/m2pa_sl.c: check for flow control, 32-bit compat corrections
