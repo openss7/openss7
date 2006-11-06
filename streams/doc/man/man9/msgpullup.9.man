@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: msgpullup.9.man,v 0.9.2.22 2006/04/05 09:44:14 brian Exp $
+.\" @(#) $Id: msgpullup.9.man,v 0.9.2.23 2006/11/06 08:26:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:14 $ by $Author: brian $
+.\" Last Modified $Date: 2006/11/06 08:26:03 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: msgpullup.9.man,v $
+.\" Revision 0.9.2.23  2006/11/06 08:26:03  brian
+.\" - found msgpullup() bug
+.\"
 .\" Revision 0.9.2.22  2006/04/05 09:44:14  brian
 .\" - moved .so line and updated headers
 .\"
@@ -324,7 +327,7 @@ and
 .BR msgpullup ()
 (through
 .IR "SVR 4.2 MP DDI/DKI" )
-are suitable for worst-case DMA and are phsysically contiguous.
+are suitable for worst-case DMA and are physically contiguous.
 .[
 uw7doc
 .]
@@ -340,7 +343,7 @@ necessarily suitable for worst-case DMA are allocated by
 .IP ""
 Portable
 .I STREAMS
-drivers and modules will no make any assumptions about the phsyical contiguity or suitability for
+drivers and modules will not make any assumptions about the physical contiguity or suitability for
 worst-case DMA of data buffers allocated via
 .BR msgpullup ().
 .\".IP \(em

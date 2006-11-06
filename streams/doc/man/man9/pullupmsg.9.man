@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.19 2006/04/05 09:44:14 brian Exp $
+.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.20 2006/11/06 08:26:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:14 $ by $Author: brian $
+.\" Last Modified $Date: 2006/11/06 08:26:03 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pullupmsg.9.man,v $
+.\" Revision 0.9.2.20  2006/11/06 08:26:03  brian
+.\" - found msgpullup() bug
+.\"
 .\" Revision 0.9.2.19  2006/04/05 09:44:14  brian
 .\" - moved .so line and updated headers
 .\"
@@ -250,10 +253,17 @@ aligned to the layer 1 cache line for the architecture), the initial data block 
 checks for this possibility and efficiently reuses the initial data block where possible.
 .PP
 If the data block is not reused and a new data block is allocated and attached onto the initial
-message block, then the existing inital data block is freed.  This has the side effect that any free
+message block, then the existing initial data block is freed.  This has the side effect that any free
 routine callback is also executed.  Also, any message blocks that are subsumed into the initial data
-block are also freed, possibly excuting the free routine callbacks of their associated data blocks
+block are also freed, possibly executing the free routine callbacks of their associated data blocks
 as well.
+.PP
+Care must be taken with the function because it possibly invalidates all
+pointer references to data within the data block.  Any pointers within the
+data of the data block will be incorrect if the initial data block is copied
+and the message block retained (with
+.BR b_rptr " and " b_wptr
+adjusted accordingly).
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -410,7 +420,7 @@ and
 .BR msgpullup (9)
 (through
 .IR "SVR 4.2 MP DDI/DKI" )
-are suitable for worst-case DMA and are phsysically contiguous.
+are suitable for worst-case DMA and are physically contiguous.
 .[
 uw7doc
 .]
@@ -428,7 +438,7 @@ to change the character of the data buffer.
 .IP ""
 Portable
 .I STREAMS
-drivers and modules will no make any assumptions about the phsyical contiguity or suitability for
+drivers and modules will not make any assumptions about the physical contiguity or suitability for
 worst-case DMA of data buffers allocated via
 .BR msgpullup (9).
 .\".IP \(em

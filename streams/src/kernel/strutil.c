@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/10/30 06:40:09 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/11/06 08:26:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/30 06:40:09 $ by $Author: brian $
+ Last Modified $Date: 2006/11/06 08:26:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.136  2006/11/06 08:26:04  brian
+ - found msgpullup() bug
+
  Revision 0.9.2.135  2006/10/30 06:40:09  brian
  - changes to handle missing linux/compile.h on SuSE
 
@@ -92,10 +95,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/10/30 06:40:09 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/11/06 08:26:04 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/10/30 06:40:09 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/11/06 08:26:04 $";
 
 #include <linux/autoconf.h>
 #ifdef HAVE_KINC_LINUX_COMPILE_H
@@ -800,7 +803,7 @@ msgpullup(mblk_t *mp, ssize_t length)
 	for (b = msg; b; b = b->b_cont) {
 		if ((blen = b->b_wptr - b->b_rptr) <= 0)
 			continue;
-		if (b->b_datap->db_type == type)
+		if (b->b_datap->db_type != type)
 			break;
 		if ((size += blen) > len && len > 0)
 			goto copy_len;
