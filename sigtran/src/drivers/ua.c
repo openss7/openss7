@@ -57,7 +57,8 @@
 
 #ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/04 11:31:15 $"
 
-static char const ident[] = "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/04 11:31:15 $";
+static char const ident[] =
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/04 11:31:15 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
 #define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/04 11:31:15 $"
@@ -117,36 +118,38 @@ MODULE_ALIAS("streams-ua");
 #endif				/* MODULE */
 
 STATIC struct module_info ua_winfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME "-wr",	/* Module ID name */
-	mi_minpsz:1,			/* Min packet size expected */
-	mi_maxpsz:272 + 1,		/* Max packet size expected */
-	mi_hiwat:STRHIGH,		/* Hi water mark */
-	mi_lowat:STRLOW,		/* Lo water mark */
+      mi_idnum:DRV_ID,		/* Module ID number */
+      mi_idname:DRV_NAME "-wr",/* Module ID name */
+      mi_minpsz:1,		/* Min packet size expected */
+      mi_maxpsz:272 + 1,	/* Max packet size expected */
+      mi_hiwat:STRHIGH,	/* Hi water mark */
+      mi_lowat:STRLOW,		/* Lo water mark */
 };
 STATIC struct module_info ua_rinfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME "-rd",	/* Module ID name */
-	mi_minpsz:1,			/* Min packet size expected */
-	mi_maxpsz:272 + 1,		/* Max packet size expected */
-	mi_hiwat:STRHIGH,		/* Hi water mark */
-	mi_lowat:STRLOW,		/* Lo water mark */
+      mi_idnum:DRV_ID,		/* Module ID number */
+      mi_idname:DRV_NAME "-rd",/* Module ID name */
+      mi_minpsz:1,		/* Min packet size expected */
+      mi_maxpsz:272 + 1,	/* Max packet size expected */
+      mi_hiwat:STRHIGH,	/* Hi water mark */
+      mi_lowat:STRLOW,		/* Lo water mark */
 };
 STATIC struct module_info mux_winfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME "-mxw",	/* Module ID name */
-	mi_minpsz:1,			/* Min packet size expected */
-	mi_maxpsz:272 + 1,		/* Max packet size expected */
-	mi_hiwat:STRHIGH,		/* Hi water mark */
-	mi_lowat:STRLOW,		/* Lo water mark */
+      mi_idnum:DRV_ID,		/* Module ID number */
+      mi_idname:DRV_NAME "-mxw",
+	/* Module ID name */
+      mi_minpsz:1,		/* Min packet size expected */
+      mi_maxpsz:272 + 1,	/* Max packet size expected */
+      mi_hiwat:STRHIGH,	/* Hi water mark */
+      mi_lowat:STRLOW,		/* Lo water mark */
 };
 STATIC struct module_info mux_rinfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME "-mxr",	/* Module ID name */
-	mi_minpsz:1,			/* Min packet size expected */
-	mi_maxpsz:272 + 1,		/* Max packet size expected */
-	mi_hiwat:STRHIGH,		/* Hi water mark */
-	mi_lowat:STRLOW,		/* Lo water mark */
+      mi_idnum:DRV_ID,		/* Module ID number */
+      mi_idname:DRV_NAME "-mxr",
+	/* Module ID name */
+      mi_minpsz:1,		/* Min packet size expected */
+      mi_maxpsz:272 + 1,	/* Max packet size expected */
+      mi_hiwat:STRHIGH,	/* Hi water mark */
+      mi_lowat:STRLOW,		/* Lo water mark */
 };
 
 STATIC streamscall int ua_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -156,36 +159,36 @@ STATIC streamscall int ua_oput(queue_t *, mblk_t *);
 STATIC streamscall int ua_osrv(queue_t *);
 
 STATIC struct qinit ua_rinit = {
-	qi_putp:ua_oput,		/* Read put (message from below) */
-	qi_srvp:ua_osrv,		/* Read queue service */
-	qi_qopen:ua_open,		/* Each open */
-	qi_qclose:ua_close,		/* Last close */
-	qi_minfo:&ua_rinfo,		/* Information */
+      qi_putp:ua_oput,		/* Read put (message from below) */
+      qi_srvp:ua_osrv,		/* Read queue service */
+      qi_qopen:ua_open,	/* Each open */
+      qi_qclose:ua_close,	/* Last close */
+      qi_minfo:&ua_rinfo,	/* Information */
 };
 
 STATIC struct qinit ua_winit = {
-	qi_putp:ss7_iput,		/* Write put (message from above) */
-	qi_srvp:ss7_isrv,		/* Write queue service */
-	qi_minfo:&ua_winfo,		/* Information */
+      qi_putp:ss7_iput,	/* Write put (message from above) */
+      qi_srvp:ss7_isrv,	/* Write queue service */
+      qi_minfo:&ua_winfo,	/* Information */
 };
 
 STATIC struct qinit mux_rinit = {
-	qi_putp:ss7_iput,		/* Read put (message from below) */
-	qi_srvp:ss7_isrv,		/* Read queue service */
-	qi_minfo:&mux_rinfo,		/* Information */
+      qi_putp:ss7_iput,	/* Read put (message from below) */
+      qi_srvp:ss7_isrv,	/* Read queue service */
+      qi_minfo:&mux_rinfo,	/* Information */
 };
 
 STATIC struct qinit mux_winit = {
-	qi_putp:ua_oput,		/* Write put (message from above) */
-	qi_srvp:ua_osrv,		/* Write queue service */
-	qi_minfo:&mux_winfo,		/* Information */
+      qi_putp:ua_oput,		/* Write put (message from above) */
+      qi_srvp:ua_osrv,		/* Write queue service */
+      qi_minfo:&mux_winfo,	/* Information */
 };
 
 MODULE_STATIC struct streamtab uainfo = {
-	st_rdinit:&ua_rinit,		/* Upper read queue */
-	st_wrinit:&ua_winit,		/* Upper write queue */
-	st_muxrinit:&mux_rinit,		/* Lower read queue */
-	st_muxwinit:&mux_winit,		/* Lower write queue */
+      st_rdinit:&ua_rinit,	/* Upper read queue */
+      st_wrinit:&ua_winit,	/* Upper write queue */
+      st_muxrinit:&mux_rinit,	/* Lower read queue */
+      st_muxwinit:&mux_winit,	/* Lower write queue */
 };
 
 /*
@@ -204,17 +207,17 @@ MODULE_STATIC struct streamtab uainfo = {
 #define SLIST_COUNT(__s) \
 	struct { \
 		struct __s *list; \
-		size_t numb;				/* number of elements in list */ \
+		uint numb;				/* number of elements in list */ \
 		union { \
 			struct { \
-				size_t down;		/* number of elements down in list */ \
-				size_t inactive;	/* number of elements inactive in list */ \
-				size_t wack_aspac;	/* number of elements activating in list */ \
-				size_t wack_aspia;	/* number of elements deactivating in list */ \
-				size_t active;		/* number of elements active in list */ \
+				uint down;		/* number of elements down in list */ \
+				uint inactive;		/* number of elements inactive in list */ \
+				uint wack_aspac;	/* number of elements activating in list */ \
+				uint wack_aspia;	/* number of elements deactivating in list */ \
+				uint active;		/* number of elements active in list */ \
 			} c; \
-			size_t counts[AS_ACTIVE + 1]; \
-		} u; \
+			uint counts[AS_ACTIVE + 1]; \
+		}; \
 	} __s \
 
 /*
@@ -223,6 +226,8 @@ MODULE_STATIC struct streamtab uainfo = {
 struct df;				/* DF structure */
 struct as;				/* AS structure */
 struct ap;				/* AG (AS-U to AS-P mapping) structure */
+struct lg;				/* LG structure */
+struct lp;				/* LP (LG to SPP mapping) structure */
 struct gp;				/* GP (AS to SPP mapping) structure */
 struct sp;				/* SP structure */
 struct np;				/* NP (SP-U to SP-P (SG) mapping) structure */
@@ -230,20 +235,113 @@ struct spp;				/* SPP proxy */
 struct ss;				/* SS structure */
 
 /*
+ *  One more kick at the can for these complex data structures.  An sp structure represent either an
+ *  ASP pool or an SG (SGP pool).  Each ASP pool or SG has a set of AS that it serves or provides.
+ *  SG pools are rather fixed.  SGP are assigned to one and only one SG.  ASP pools are a loose
+ *  concept.  An ASP pool is a set of ASPs serving AS.  An ASP pool is associated with a set of SG
+ *  that provide it with service.
+ */
+
+/*
+ *  LG Structure
+ *  -----------------------------------
+ *  The LG structure represents a load group within an AS and provides a mapping
+ *  of load selections to serving SSPs via the LP mapping.  For an override AS,
+ *  the selected load group, if any, is the first load group on the list.  For a
+ *  broadcast AS, each load group is iterated across.  For a loadshare AS, the
+ *  load group is selected via the load selection map.
+ */
+
+struct lg {
+	uint32_t state;			/* LG state */
+	uint32_t flags;			/* LG flags */
+	uint32_t ldist;			/* load distribution method */
+	SLIST_LINKAGE (as, lg, as);	/* AS linkage */
+	SLIST_COUNT (lp);		/* GP (SPP graph) */
+	bufq_t bufq;			/* Buffer queue */
+	ua_ldkey_t key;			/* Load Key */
+	ua_timers_lg_t timers;		/* Load group timers */
+	ua_opt_conf_lg_t config;	/* Load group configuration */
+	ua_stats_lg_t stats;		/* Load group statistics */
+	ua_stats_lg_t statsp;		/* Load group statistics periods */
+};
+
+/*
+ *  LP (LG to SPP mapping) structure
+ *  -----------------------------------
+ *  The LP structure maps LG to remote ASP/SGP/SPPs that are members of the LG.
+ *  It also indicates the LS (load selection) that is used by the remote
+ *  ASP/SGP/SPP for this LG and the state of the remote ASP/SGP/SPP for this LG.
+ */
+struct lp {
+	uint32_t state;			/* LG state for this SPP */
+	uint32_t flags;			/* LG flags fro this SPP */
+	uint32_t ls;			/* LG LS for this SPP */
+	SLIST_LINKAGE (lg, lp, lg);	/* LG linkage */
+	SLIST_LINKAGE (spp, lp, spp);	/* SPP linkage */
+	bufq_t bufq;			/* Buffer queue */
+	ua_ldkey_t key;			/* Load Key */
+	ua_timers_lp_t timers;		/* Load selection timers */
+};
+
+/*
  *  AS Structure
  *  -----------------------------------
  *  The AS-U structure represents each AS which is currently being served to
- *  remote UA ASPs via the AP map or to local SS users via the SS-U.  An
- *  AS-U belongs to a local SP (local SGP/remote ASP relation) and has service
- *  provided by a map of AS-P.
+ *  remote UA ASPs via the LG list, AP map or to local SS users via the SS-U.
+ *  An AS-U belongs to a local SP (local SGP/remote ASP relation) and has
+ *  service provided by a map of AS-P.
  *
  *  The AS-P structure represents each AS which is currently being provided by
- *  remote UA SGPs via the GP map or by local SS providers via the SS-P.  An
- *  AS-P belongs to a local SG (local ASP/remote SG relation) and provides
- *  service to a map of AS-U.
+ *  remote UA SGPs via the LG list, GP map or by local SS providers via the
+ *  SS-P.  An AS-P belongs to a local SG (local ASP/remote SG relation) and
+ *  provides service to a map of AS-U.
+ *
+ *  For an AS-U or AS-P that supports load selection (LOADSEL) or load grouping
+ *  (LOADGRP), the LG list provides access to the list of load selections for
+ *  the AS.  Even when the AS does not support LOADSEL/LOADGRP, but is a load
+ *  sharing AS, the LG list provides the load sharing distribution.  An empty LG
+ *  list indicates that load sharing and load selection is not in effect.  For
+ *  simple override and broadcast AS, the GP map provides access to the SPP
+ *  serving the AS.  The GP map is always provided.
+ *
+ *  Selection procedures:
+ *
+ *  When sending messages that are not subject to load distribution and are
+ *  broadcast to all ASPs (such as SNMM regardless of traffic mode) each SPP in
+ *  the GP map that is in the appropriate state is selected and receives a copy
+ *  of the message.  If the SPP is pending the message is neither sent nor
+ *  buffered.
+ *
+ *  When sending distributed messages, and the LG list is not empty, a load key
+ *  derived from the message is compared against the load key present in each LG
+ *  structure until a match is found.  If the LG is buffering, the message is
+ *  simply buffered, otherwise an SPP in the LP map for the LG is selected
+ *  according to the load distribution algorithm and the state of the SPP in the
+ *  LG.  This may, again, be according to load key.  Again the SPP may be
+ *  buffering.
+ *
+ *  When sending distributed messages, and the LG list is empty, the AS is used
+ *  in the LG's stead.  If the AS is buffering, the message is simply buffered,
+ *  otherwise an SPP in the GP map for the AS is selected according to the
+ *  traffic mode and the state of the SPP in the AS.  This may be according to
+ *  load key (load sharing AS).  The SPP may be buffering in which case the
+ *  message is simply buffered, otherwise it is sent to the SPP.
+ *
+ *  Note that the LG list is empty unless the AS is an AS-U and the ASP serving
+ *  the AS-U support LOADSEL or LOADGRP.  When the AS is an AS-P, the LG list is
+ *  always empty.  If the AS-P is a load sharing AS-P, load sharing is performed
+ *  using the GP map only.
+ *
+ *  At an SGP, the AS-U represents a remote SS7 User and the AS-P a local SS7 Provider.
+ *  At an ASP, the AS-U represents a local SS7 User and the AS-P a remote SS7 Provider.
+ *  At an SPP, the AS-U represents a local SS7 User and the AS-P a remote SS7 User.
  */
 struct as {
 	HEAD_DECLARATION (struct as);	/* head delcaration */
+	uint level;			/* UA level */
+	uint32_t tmode;			/* traffice mode (for AS-U) */
+	uint ktype;			/* load key type (for AS-U) */
 	union {
 		uint32_t iid;		/* Interface Identifier */
 		uint32_t rc;		/* Routing Context */
@@ -252,7 +350,9 @@ struct as {
 	SLIST_HEAD (ss, ss);		/* SS for this AS */
 	SLIST_COUNT (ap);		/* AP (AS graph) list */
 	SLIST_LINKAGE (sp, as, sp);	/* SP linkage */
+	SLIST_COUNT (lg);		/* LG (Load group) list */
 	SLIST_COUNT (gp);		/* GP (SPP graph) list */
+	bufq_t bufq;			/* Buffer queue */
 	ua_addr_t add;			/* SS address */
 	ua_timers_as_t timers;		/* Application server timers */
 	ua_opt_conf_as_t config;	/* Application server configuration */
@@ -260,25 +360,33 @@ struct as {
 	ua_stats_as_t statsp;		/* Application server statistics periods */
 };
 
+#define AS_LEVEL_IUA		1
+#define AS_LEVEL_M2UA		2
+#define AS_LEVEL_M3UA		3
+#define AS_LEVEL_SUA		4
+#define AS_LEVEL_TUA		5
+
 #define ASF_INSUFFICIENT_ASPS	(1<< 0)	/* AS has insufficient asps */
 #define ASF_MINIMUM_ASPS	(1<< 1)	/* AS has minmum number of asps */
 #define ASF_PENDING		(1<< 2)	/* AS pending */
 #define ASF_ACTIVE		(1<< 3)	/* AS active */
 #define ASF_MGMT_BLOCKED	(1<< 4)	/* AS management blocked */
 #define ASF_OPERATION_PENDING	(1<< 5)	/* operation pending */
-#define ASF_BSNT_REQUEST	(1<< 6)	/* bsnt requested */
-#define ASF_CLEAR_RTB		(1<< 7)	/* clear rtb performed */
-#define ASF_EMERGENCY		(1<< 8)	/* emergency set */
-#define ASF_FLUSH_BUFFERS	(1<< 9)	/* flush buffers performed */
-#define ASF_LOC_PROC_OUTAGE	(1<<10)	/* local processor outage */
-#define ASF_REM_PROC_OUTAGE	(1<<11)	/* remote processor outage */
-#define ASF_RECOVERY		(1<<12)	/* waiting for recovery from remote processor outage */
-#define ASF_RETRIEVAL		(1<<13)	/* in the process or retrieval */
-#define ASF_USR_PROC_OUTAGE	(1<<14)	/* user process outage */
-#define ASF_PRV_PROC_OUTAGE	(1<<15)	/* provider process outage */
-#define ASF_CONG_ACCEPT		(1<<16)	/* congestion accept */
-#define ASF_CONG_DISCARD	(1<<17)	/* congestion discard */
-#define ASF_WANTW		(1<<18)	/* wanted to write across multiplex */
+#define ASF_REGISTRATION	(1<< 6) /* registration required */
+
+#define ASF_BSNT_REQUEST	(1<<16)	/* bsnt requested */
+#define ASF_CLEAR_RTB		(1<<17)	/* clear rtb performed */
+#define ASF_EMERGENCY		(1<<18)	/* emergency set */
+#define ASF_FLUSH_BUFFERS	(1<<19)	/* flush buffers performed */
+#define ASF_LOC_PROC_OUTAGE	(1<<20)	/* local processor outage */
+#define ASF_REM_PROC_OUTAGE	(1<<21)	/* remote processor outage */
+#define ASF_RECOVERY		(1<<22)	/* waiting for recovery from remote processor outage */
+#define ASF_RETRIEVAL		(1<<23)	/* in the process or retrieval */
+#define ASF_USR_PROC_OUTAGE	(1<<24)	/* user process outage */
+#define ASF_PRV_PROC_OUTAGE	(1<<25)	/* provider process outage */
+#define ASF_CONG_ACCEPT		(1<<26)	/* congestion accept */
+#define ASF_CONG_DISCARD	(1<<27)	/* congestion discard */
+#define ASF_WANTW		(1<<28)	/* wanted to write across multiplex */
 
 /*
  *  AP (AS-U to AS-P mapping) structure
@@ -296,11 +404,16 @@ struct ap {
  *  SP structure
  *  -----------------------------------
  *  The SP structure represents a local SGP (SP-U) or a remote SG (SP-P).
+ *
+ *  At an SGP, the SP-U represents a remote ASP and the SP-P represents a local SG.
+ *  At an ASP, the SP-U represents a local ASP and the SP-P represents a remote SG.
+ *  At an IPSP, the SP-U represents a local IPSP and the SP-P represents a remote IPSP pool.
  */
 struct sp {
 	HEAD_DECLARATION (struct sp);	/* head declaration */
 	uint32_t cost;			/* cost */
-	uint32_t tmode;			/* traffic mode */
+	uint32_t tmode;			/* traffic mode (for SG) */
+	uint32_t ktype;			/* load key type (for SG) */
 	SLIST_COUNT (np);		/* GS (SP graph) */
 	SLIST_HEAD (as, as);		/* AS list */
 	SLIST_COUNT (spp);		/* ASP list */
@@ -310,6 +423,8 @@ struct sp {
 	ua_stats_sp_t statsp;		/* Signalling point statistics periods */
 };
 
+#if 0
+/* Don't need this, the AP structure is identical. */
 /*
  *  NP (SP to SG mapping) structure
  *  -----------------------------------
@@ -321,16 +436,76 @@ struct np {
 	SLIST_LINKAGE (sp, np, u);	/* SP-U linkage */
 	SLIST_LINKAGE (sp, np, p);	/* SP-P linkage */
 };
+#endif
 
 /*
  *  SPP structure
  *  -----------------------------------
+ *  The SPP structure represents an instance of a connection to an SG or ASP.  The primary reason
+ *  for having multiple connections to an SG or ASP is because there may be one primary connection
+ *  to an SG or ASP and many secondary connections (via other ASPs or via other SGP).  Primarily
+ *  this permits an SGP to be able to transfer data destined to an ASP to which it is not directly
+ *  connected via other SGP, and permits transfer of data received from an ASP to the SGP providing
+ *  the SS-P for that traffic.  When switching traffic between connections because the primary
+ *  connection has failed, divertable traffic must be queued for a time in accordance with the CORID
+ *  draft and Heartbeat procedures effected on the old path before traffic is restarted.
+ *
+ *  Selection process: when traffic destined for an AS-U or AS-P has selected an ASP/SGP/SSP to
+ *  receive the traffic, the SPP structures are walked and the first active, pending or queueing SPP
+ *  is selected.  SPP structtures are sorted according to cost, with the lowest cost paths first in
+ *  the list.  We do not effect traffic modes over SPP, but simply select the first active, pending
+ *  or queueing SPP.
+ *
+ *  At an SGP, the SPP associated with the SP-U represents an association with a remote ASP.
+ *  At an SGP, the SPP associated with the SP-P (SG) represents a peer SGP.
+ *
+ *  At an ASP, the SPP associated with the SP-U represents a peer ASP.
+ *  At an ASP, the SPP associated with the SP-P (SG) represents an association with a remote SGP.
+ *
+ *  At an IPSP, the SPP associated with the SP-U represents a peer IPSP.
+ *  At an IPSP, the SPP associated with the SP-P represents an association with a remote IPSP.
+ *
+ *  The GP list represents the state of this SPP within each AS that it serves.
+ *  The SP list represents the peer SPP associated with the same SP.
+ *
+ *  Selection:
+ *
+ *  At an SGP, messages are received from the local SS7 Provider or from a peer SGP.  Messages are
+ *  transfered by selecting an SP-U (ASP) associated with this SP-P (SG) active for the appropriate
+ *  AS-U.  The SP-U (ASP) for that AS-U is selected according to the traffic mode of the AS-U.  For
+ *  selected SP-U (ASPs), an SPP is selected that is the active ASP association for the ASP.
+ *
+ *  At an SGP, messages are received from a remote ASP.  Messages are transferred using the same
+ *  procedures as the ASP, below, but there is only one SG to choose from and a local SS7 Provider
+ *  is given precedence over peer SGP.
+ *
+ *  At an ASP, messages are received from the local SS7 User or from a peer ASP.  Messages are
+ *  transfered by selecting an SP-P (SG) associated with this SP-U (ASP) active for the appropriate
+ *  AS-P.  Considerations that go into SP-P (SG) selection are load sharing and network management
+ *  (i.e. SNMM).  For the selected SG an SPP (SGP) that is active for the AS-P is selected.
+ *  Selection of an active SPP (SGP) normally involves load sharing over the available SGP by can be
+ *  controlled with the traffic mode (unmanaged) of the SP-P (SG).
+ *
+ *  At an ASP, messages are received from a remote SGP.  Messages are transferred using the same
+ *  procedures as the SGP, above, but there is only one SP to choose from and a local SS7 User is
+ *  given precedence over a peer ASP.  Also, message distribution can be more complex in that
+ *  LOADSEL or LOADGRP or other schemes can be used depending on the exact nature of the message
+ *  transferred.
+ *
+ *  At an IPSP, the SP-U (local IPSP node) takes on the role of the ASP and the SP-P (remote IPSP
+ *  pool) the role of an SG.  Transfers are more SG-SG in nature than ASP-ASP.  However, when
+ *  selecting a remote IPSP node, the traffic mode of the AS-P is used instead of an unmanaged SG
+ *  method.
+ *
+ *  Proxy arrangements are possible where an proxy node proxies between ASPs above and SGP below,
+ *  translating RC (IID) and traffic modes in the process.
  */
 struct spp {
 	HEAD_DECLARATION (struct spp);	/* head declaration */
 	uint32_t aspid;			/* ASP Id for this SPP */
 	uint32_t cost;			/* cost */
-	struct xp *xp;			/* XP transport for this ASP */
+	struct spp *xsp;		/* cross-link structure for this SPP */
+	SLIST_LINKAGE (xp, spp, xp);	/* XP linkage */
 	SLIST_LINKAGE (sp, spp, sp);	/* SP linkage */
 	SLIST_COUNT (gp);		/* GP (AS graph) */
 	ua_timers_spp_t timers;		/* Signalling peer process timers */
@@ -342,13 +517,13 @@ struct spp {
 /*
  *  GP (AS to SPP mapping) structure
  *  -----------------------------------
- *  The AP structure maps AS Users (AS-U) to remote ASPs that are using the
- *  AS.  It also indicates the base IID that is used by the remote ASP for
- *  this AS-U and the state of the remote ASP for this AS-U.
+ *  The GP structure maps AS Users (AS-U) to remote ASPs that are using the AS.
+ *  It also indicates the RC (base IID) that is used by the remote ASP for this
+ *  AS-U and the state of the remote ASP for this AS-U.
  *
- *  The AP structure maps AS Users (AS-P) to remote SGPs that are providing the
- *  AS.  It also indicates the base IID that is provided by the remote SGP for
- *  this AS-P and the state of the remote SGP for this AS-P.
+ *  The GP structure maps AS Users (AS-P) to remote SGPs that are providing the
+ *  AS.  It also indicates the RC (base IID) that is provided by the remote SGP
+ *  for this AS-P and the state of the remote SGP for this AS-P.
  */
 struct gp {
 	uint32_t state;			/* AS state for this SPP */
@@ -360,6 +535,9 @@ struct gp {
 	};
 	SLIST_LINKAGE (as, gp, as);	/* AS linkage */
 	SLIST_LINKAGE (spp, gp, spp);	/* SPP linkage */
+	bufq_t bufq;			/* Buffer queue */
+	ua_ldkey_t key;			/* Load key */
+	ua_timers_gp_t timers;		/* Load selection timers */
 };
 
 /*
@@ -406,7 +584,7 @@ struct ss {
 struct xp {
 	STR_DECLARATION (struct xp);	/* stream declaration */
 	struct sp *sp;			/* associated SP/SG */
-	struct spp *spp;		/* Associated ASP/SGP */
+	SLIST_COUNT(spp);		/* Associated ASP/SGP/SPP */
 	mblk_t *nm_reassem;		/* normal reassembly buffer */
 	mblk_t *ex_reassem;		/* expedited reassembly buffer */
 	uchar loc[MAX_TPI_ADDR_SIZE];	/* loc opaque address */
@@ -567,9 +745,9 @@ ss_set_i_state(struct ss *ss, uint32_t state)
 
 struct ua_parm {
 	union {
-		uchar *c;		/* pointer to parameter field */
-		uint32_t *w;		/* pointer to parameter field */
-	} ptr;
+		uchar *cp;		/* pointer to parameter field */
+		uint32_t *wp;		/* pointer to parameter field */
+	};
 	size_t len;			/* length of paramter field */
 	uint32_t val;			/* value of first 4 bytes */
 };
@@ -580,8 +758,10 @@ struct ua_msg {
 	uint32_t class;			/* message class */
 	uint32_t type;			/* message type */
 	uint32_t len;			/* message length */
+	struct ua_parm rc;		/* routing context */
 	struct ua_parm iid;		/* interface id */
 	struct ua_parm iid_text;	/* interface id (text) */
+	struct ua_parm iid_range;	/* interface id (range) */
 	struct ua_parm info;		/* information */
 	struct ua_parm diag;		/* diagnostic */
 	struct ua_parm hinfo;		/* heartbeat information */
@@ -589,20 +769,42 @@ struct ua_msg {
 	struct ua_parm tmode;		/* traffic mode */
 	struct ua_parm ecode;
 	struct ua_parm aspid;		/* asp identifier */
-	struct ua_parm data1;		/* data type 1 */
-	struct ua_parm data2;		/* data type 2 */
-	struct ua_parm status;		/* status */
-	struct ua_parm event;		/* event */
+	struct ua_parm ssn;
+	struct ua_parm smi;
 	struct ua_parm cong;		/* congestion status */
 	struct ua_parm disc;		/* discard status */
-	struct ua_parm action;		/* action */
-	struct ua_parm seqno;		/* sequence number */
+	struct ua_parm cause;
+	struct ua_parm status;		/* status */
 	struct ua_parm result;		/* result */
-	struct ua_parm linkkey;
-	struct ua_parm keyid;
-	struct ua_parm sdti;
-	struct ua_parm sdli;
 	struct ua_parm corid;		/* correlation id */
+	struct ua_parm keyid;		/* link or routing key id */
+	union {
+		struct {
+		} iua;
+		struct {
+			struct ua_parm data1;	/* data type 1 */
+			struct ua_parm data2;	/* data type 2 */
+			struct ua_parm event;	/* event */
+			struct ua_parm action;	/* action */
+			struct ua_parm seqno;	/* sequence number */
+			struct ua_parm linkkey;
+			struct ua_parm sdti;
+			struct ua_parm sdli;
+		} m2ua;
+		struct {
+			struct ua_parm na;
+			struct ua_parm cdest;
+			struct ua_parm rk;
+			struct ua_parm dpc;
+			struct ua_parm si;
+			struct ua_parm opc_list;
+			struct ua_parm prot_data;
+		} m3ua;
+		struct {
+		} sua;
+		struct {
+		} tua;
+	};
 };
 
 #define M2UA_PPI    5
@@ -625,7 +827,7 @@ struct ua_msg {
 #define UA_CLASS_SNMM	0x02	/* Signalling Network Mgmt (SNM) Messages */
 #define UA_CLASS_ASPS	0x03	/* ASP State Maintenance (ASPSM) Messages */
 #define UA_CLASS_ASPT	0x04	/* ASP Traffic Maintenance (ASPTM) Messages */
-#define UA_CLASS_Q921	0x05	/* Q.931 User Part Messages */
+#define UA_CLASS_QPTM	0x05	/* Q.931 User Part Messages */
 #define UA_CLASS_MAUP	0x06	/* M2UA Messages */
 #define UA_CLASS_CNLS	0x07	/* SUA Connectionless Messages */
 #define UA_CLASS_CONS	0x08	/* SUA Connection Oriented Messages */
@@ -639,6 +841,8 @@ struct ua_msg {
 #define UA_MGMT_ERR		UA_MHDR(UA_VERSION, 0, UA_CLASS_MGMT, 0x00)
 #define UA_MGMT_NTFY		UA_MHDR(UA_VERSION, 0, UA_CLASS_MGMT, 0x01)
 #define UA_MGMT_LAST		0x01
+
+#define UA_XFER_DATA		UA_MHDR(UA_VERSION, 0, UA_CLASS_XFER, 0x01)
 
 #define UA_SNMM_DUNA		UA_MHDR(UA_VERSION, 0, UA_CLASS_SNMM, 0x01)
 #define UA_SNMM_DAVA		UA_MHDR(UA_VERSION, 0, UA_CLASS_SNMM, 0x02)
@@ -693,25 +897,33 @@ struct ua_msg {
  */
 #define UA_PARM_RESERVED	UA_CONST_PHDR(0x0000,0)
 #define UA_PARM_IID		UA_CONST_PHDR(0x0001,sizeof(uint32_t))
-#define UA_PARM_IID_RANGE	UA_CONST_PHDR(0x0002,0)	/* m2ua-10 */
+#define UA_PARM_IID_RANGE_O	UA_CONST_PHDR(0x0002,0)	/* m2ua-10 */
 #define UA_PARM_DATA		UA_CONST_PHDR(0x0003,0)	/* sua-07 */
 #define UA_PARM_IID_TEXT	UA_CONST_PHDR(0x0003,0)
 #define UA_PARM_INFO		UA_CONST_PHDR(0x0004,0)
-#define UA_PARM_APC		UA_CONST_PHDR(0x0005,sizeof(uint32_t))	/* sua-07 */
+//#define UA_PARM_APC           UA_CONST_PHDR(0x0005,sizeof(uint32_t))  /* sua-07 */
 #define UA_PARM_DLCI		UA_CONST_PHDR(0x0005,sizeof(uint32_t))	/* rfc3057 */
 #define UA_PARM_RC		UA_CONST_PHDR(0x0006,sizeof(uint32_t))
 #define UA_PARM_DIAG		UA_CONST_PHDR(0x0007,0)
-#define UA_PARM_IID_RANGE1	UA_CONST_PHDR(0x0008,0)	/* rfc3057 */
+#define UA_PARM_IID_RANGE	UA_CONST_PHDR(0x0008,0)	/* rfc3057, rfc3331 */
 #define UA_PARM_HBDATA		UA_CONST_PHDR(0x0009,0)
 #define UA_PARM_REASON		UA_CONST_PHDR(0x000a,sizeof(uint32_t))
 #define UA_PARM_TMODE		UA_CONST_PHDR(0x000b,sizeof(uint32_t))
 #define UA_PARM_ECODE		UA_CONST_PHDR(0x000c,sizeof(uint32_t))
 #define UA_PARM_STATUS		UA_CONST_PHDR(0x000d,sizeof(uint32_t))
-#define UA_PARM_ASPID		UA_CONST_PHDR(0x000e,sizeof(uint32_t))
+//#define UA_PARM_ASPID         UA_CONST_PHDR(0x000e,sizeof(uint32_t))
 #define UA_PARM_PROT_DATA	UA_CONST_PHDR(0x000e,sizeof(uint32_t))	/* rfc3057 */
 #define UA_PARM_CONG_LEVEL	UA_CONST_PHDR(0x000f,sizeof(uint32_t))	/* sua-07 */
 #define UA_PARM_REL_REASON	UA_CONST_PHDR(0x000f,sizeof(uint32_t))	/* rfc3057 */
 #define UA_PARM_TEI_STATUS	UA_CONST_PHDR(0x0010,sizeof(uint32_t))	/* rfc3057 */
+#define UA_PARM_ASPID		UA_CONST_PHDR(0x0011,sizeof(uint32_t))
+#define UA_PARM_APC		UA_CONST_PHDR(0x0012,sizeof(uint32_t))
+#define UA_PARM_CORID		UA_CONST_PHDR(0x0013,sizeof(uint32_t))
+#define UA_PARM_REG_RESULT	UA_CONST_PHDR(0x0014,sizeof(uint32_t))	/* rfc3868, tua-04 */
+#define UA_PARM_DEREG_RESULT	UA_CONST_PHDR(0x0015,sizeof(uint32_t)*4) /* rfc3868, tua-04 */
+#define UA_PARM_REG_STATUS	UA_CONST_PHDR(0x0016,sizeof(uint32_t))	/* rfc3868, tua-04 */
+#define UA_PARM_DEREG_STATUS	UA_CONST_PHDR(0x0017,sizeof(uint32_t))	/* rfc3868, tua-04 */
+#define UA_PARM_LOC_KEY_ID	UA_CONST_PHDR(0x0018,sizeof(uint32_t))	/* rfc3868, tua-04 */
 
 /*
  *  Somewhat common field values:
@@ -761,6 +973,13 @@ struct ua_msg {
 
 #define UA_RESULT_SUCCESS			(0x00)
 #define UA_RESULT_FAILURE			(0x01)
+
+#define UA_DEREG_STATUS_SUCCESS			(0x0)
+#define UA_DEREG_STATUS_UNKNOWN			(0x1)
+#define UA_DEREG_STATUS_INVALID_ID		(0x2)
+#define UA_DEREG_STATUS_PERMISSION_DENIED	(0x3)
+#define UA_DEREG_STATUS_NOT_REGISTERED		(0x4)
+#define UA_DEREG_STATUS_ID_ACTIVE_FOR_AS	(0x5) /* but not m2ua */
 
 /*
  *  M2UA-Specific Messages: per draft-ietf-sigtran-m2ua-10.txt
@@ -833,6 +1052,91 @@ struct ua_msg {
 #define M2UA_LEVEL_3			(0x03)
 #define M2UA_LEVEL_4			(0x04)	/* big argument */
 
+/* M3UA Specific parameters. */
+
+#define M3UA_PARM_NTWK_APP	UA_CONST_PHDR(0x0200,sizeof(uint32_t))
+#define M3UA_PARM_PROT_DATA1	UA_CONST_PHDR(0x0201,0)
+#define M3UA_PARM_PROT_DATA2	UA_CONST_PHDR(0x0202,0)
+#define M3UA_PARM_AFFECT_DEST	UA_CONST_PHDR(0x0203,sizeof(uint32_t))
+#define M3UA_PARM_USER_CAUSE	UA_CONST_PHDR(0x0204,sizeof(uint32_t))
+#define M3UA_PARM_CONG_IND	UA_CONST_PHDR(0x0205,sizeof(uint32_t))
+#define M3UA_PARM_CONCERN_DEST	UA_CONST_PHDR(0x0206,sizeof(uint32_t))
+#define M3UA_PARM_ROUTING_KEY	UA_CONST_PHDR(0x0207,0)
+#define M3UA_PARM_REG_RESULT	UA_CONST_PHDR(0x0208,sizeof(uint32_t))
+#define M3UA_PARM_DEREG_RESULT	UA_CONST_PHDR(0x0209,sizeof(uint32_t)*4)
+#define M3UA_PARM_LOC_KEY_ID	UA_CONST_PHDR(0x020a,sizeof(uint32_t))
+#define M3UA_PARM_DPC		UA_CONST_PHDR(0x020b,0)
+#define M3UA_PARM_SI		UA_CONST_PHDR(0x020c,0)
+#define M3UA_PARM_SSN		UA_CONST_PHDR(0x020d,0)
+#define M3UA_PARM_OPC		UA_CONST_PHDR(0x020e,0)
+#define M3UA_PARM_CIC		UA_CONST_PHDR(0x020f,0)
+#define M3UA_PARM_PROT_DATA3	UA_CONST_PHDR(0x0210,0)	/* proposed */
+#define M3UA_PARM_REG_STATUS	UA_CONST_PHDR(0x0212,sizeof(uint32_t))
+#define M3UA_PARM_DEREG_STATUS	UA_CONST_PHDR(0x0213,sizeof(uint32_t))
+
+/* SUA Specific parameters. */
+
+#define SUA_PARM_FLAGS		UA_CONST_PHDR(0x0101,sizeof(uint32_t))
+#define SUA_PARM_SRCE_ADDR	UA_CONST_PHDR(0x0102,sizeof(uint32_t)*5)	/* XXX */
+#define SUA_PARM_DEST_ADDR	UA_CONST_PHDR(0x0103,0)
+#define SUA_PARM_SRN		UA_CONST_PHDR(0x0104,sizeof(uint32_t))
+#define SUA_PARM_DRN		UA_CONST_PHDR(0x0105,sizeof(uint32_t))
+#define SUA_PARM_CAUSE		UA_CONST_PHDR(0x0106,sizeof(uint32_t))
+#define SUA_PARM_SEQ_NUM	UA_CONST_PHDR(0x0107,sizeof(uint32_t))
+#define SUA_PARM_RX_SEQ_NUM	UA_CONST_PHDR(0x0108,sizeof(uint32_t))
+#define SUA_PARM_ASP_CAPS	UA_CONST_PHDR(0x0109,sizeof(uint32_t))
+#define SUA_PARM_CREDIT		UA_CONST_PHDR(0x010a,sizeof(uint32_t))
+#define SUA_PARM_RESERVED1	UA_CONST_PHDR(0x010b,0)
+#define SUA_PARM_SMI_SUBSYS	UA_CONST_PHDR(0x010c,sizeof(uint32_t))
+#define SUA_PARM_CAUSE		UA_CONST_PHDR(0x010c,sizeof(uint32_t))
+#define SUA_PARM_SMI		UA_CONST_PHDR(0x0112,sizeof(uint32_t))
+#define SUA_PARM_CONG		UA_CONST_PHDR(0x0118,sizeof(uint32_t))
+
+#define SUA_SPARM_GT		UA_CONST_PHDR(0x8001,0)
+#define SUA_SPARM_PC		UA_CONST_PHDR(0x8002,sizeof(uint32_t))
+#define SUA_SPARM_SSN		UA_CONST_PHDR(0x8003,sizeof(uint32_t))
+#define SUA_SPARM_IPV4_ADDR	UA_CONST_PHDR(0x8004,sizeof(uint32_t))
+#define SUA_SPARM_HOSTNAME	UA_CONST_PHDR(0x8005,0)
+#define SUA_SPARM_IPV6_ADDR	UA_CONST_PHDR(0x8006,sizeof(uint32_t)*4)
+
+/* TUA Specific parameters */
+
+#define TUA_PARM_QOS		UA_CONST_PHDR(0x0101,sizeof(uint32_t))
+#define TUA_PARM_DEST_ADDR	UA_CONST_PHDR(0x0102,0)
+#define TUA_PARM_ORIG_ADDR	UA_CONST_PHDR(0x0103,0)
+#define TUA_PARM_APPL_CTXT	UA_CONST_PHDR(0x0104,0)
+#define TUA_PARM_USER_INFO	UA_CONST_PHDR(0x0105,0)
+#define TUA_PARM_COMP_PRES	UA_CONST_PHDR(0x0106,sizeof(uint32_t))
+#define TUA_PARM_TERM		UA_CONST_PHDR(0x0107,sizeof(uint32_t))
+#define TUA_PARM_P_ABORT	UA_CONST_PHDR(0x0108,sizeof(uint32_t))
+#define TUA_PARM_REPT_CAUS	UA_CONST_PHDR(0x0109,sizeof(uint32_t))
+
+#define TUA_PARM_INVK_ID	UA_CONST_PHDR(0x0201,sizeof(uint32_t))
+#define TUA_PARM_LAST_COMP	UA_CONST_PHDR(0x0202,sizeof(uint32_t))
+#define TUA_PARM_TIMEOUT	UA_CONST_PHDR(0x0203,sizeof(uint32_t))
+#define TUA_PARM_OPCODE		UA_CONST_PHDR(0x0204,sizeof(uint32_t)*2)
+#define TUA_PARM_PARMS		UA_CONST_PHDR(0x0205,0)
+#define TUA_PARM_ERROR		UA_CONST_PHDR(0x0206,sizeof(uint32_t))
+#define TUA_PARM_PBCODE		UA_CONST_PHDR(0x0207,sizeof(uint32_t))
+#define TUA_PARM_CORR_ID	UA_CONST_PHDR(0x0208,sizeof(uint32_t))
+
+#define TUA_PARM_SECU_CTXT	UA_CONST_PHDR(0x0301,0)
+#define TUA_PARM_CONFIDENT	UA_CONST_PHDR(0x0302,0)
+#define TUA_PARM_UABT_INFO	UA_CONST_PHDR(0x0303,0)
+
+#define TUA_PARM_ABCODE		UA_CONST_PHDR(0x0401,sizeof(uint32_t))
+#define TUA_PARM_CLASS		UA_CONST_PHDR(0x0402,sizeof(uint32_t))
+
+#define TUA_PARM_SSN		UA_CONST_PHDR(0x0419,sizeof(uint32_t))
+#define TUA_PARM_SMI		UA_CONST_PHDR(0x041a,sizeof(uint32_t))
+#define TUA_PARM_CONG		UA_CONST_PHDR(0x041b,sizeof(uint32_t))
+#define TUA_PARM_CAUSE		UA_CONST_PHDR(0x041c,sizeof(uint32_t))
+
+#define TUA_PARM_CNV_TYPE	UA_CONST_PHDR(0x0503,sizeof(uint32_t))
+#define TUA_PARM_INV_TYPE	UA_CONST_PHDR(0x0504,sizeof(uint32_t))
+#define TUA_PARM_REJ_TYPE	UA_CONST_PHDR(0x0505,sizeof(uint32_t))
+#define TUA_PARM_QRY_TYPE	UA_CONST_PHDR(0x0506,sizeof(uint32_t))
+
 /* FIXME: need other UA specific message definitions */
 
 /*
@@ -846,7 +1150,7 @@ struct ua_msg {
  *  -----------------------------------
  */
 STATIC int
-m_error(queue_t *q, struct ss *ss, int error)
+m_error(struct ss *ss, queue_t *q, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
@@ -882,1815 +1186,21 @@ m_error(queue_t *q, struct ss *ss, int error)
 	return (-ENOBUFS);
 }
 
-/*
- * M2UA SS User Primitives
- */
-/*
- *  LMI_INFO_ACK
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_info_ack(queue_t *q, struct ss *ss, uchar *ppa_ptr, size_t ppa_len)
-{
-	mblk_t *mp;
-	lmi_info_ack_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
-		p->lmi_state = ss_get_i_state(ss);
-		p->lmi_max_sdu = 272 + 1 + ((ss->proto.popt & SS7_POPT_XSN) ? 6 : 3);
-		p->lmi_min_sdu = ((ss->proto.popt & SS7_POPT_XSN) ? 6 : 3);
-		p->lmi_header_len = 0;
-		p->lmi_ppa_style = LMI_STYLE2;
-		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
-		mp->b_wptr += ppa_len;
-		printd(("%s: %p: <- LMI_INFO_ACK\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_OK_ACK
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_ok_ack(queue_t *q, struct ss *ss, sl_long prim)
-{
-	mblk_t *mp;
-	lmi_ok_ack_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_OK_ACK;
-		p->lmi_correct_primitive = prim;
-		switch (ss_get_i_state(ss)) {
-		case LMI_ATTACH_PENDING:
-			ss_set_i_state(ss, LMI_DISABLED);
-			break;
-		case LMI_DETACH_PENDING:
-			ss_set_i_state(ss, LMI_UNATTACHED);
-			break;
-		default:
-			break;
-		}
-		p->lmi_state = ss_get_i_state(ss);
-		printd(("%s: %p: <- LMI_OK_ACK\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_ERROR_ACK
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_error_ack(queue_t *q, struct ss *ss, sl_long prim, sl_long error)
-{
-	mblk_t *mp;
-	lmi_error_ack_t *p;
-
-	/* filter out queue returns */
-	switch (error) {
-	case QR_ABSORBED:
-	case QR_TRIMMED:
-	case QR_LOOP:
-	case QR_PASSALONG:
-	case QR_PASSFLOW:
-	case QR_DISABLE:
-	case QR_STRIP:
-	case QR_RETRY:
-	case -EBUSY:
-	case -ENOBUFS:
-	case -ENOMEM:
-	case -EAGAIN:
-		return (error);
-	}
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_ERROR_ACK;
-		p->lmi_reason = error > 0 ? error : LMI_SYSERR;
-		p->lmi_errno = error > 0 ? 0 : -error;
-		p->lmi_error_primitive = prim;
-		switch (ss_get_i_state(ss)) {
-		case LMI_ATTACH_PENDING:
-			ss_set_i_state(ss, LMI_UNATTACHED);
-			break;
-		case LMI_DETACH_PENDING:
-			ss_set_i_state(ss, LMI_DISABLED);
-			break;
-		case LMI_ENABLE_PENDING:
-			ss_set_i_state(ss, LMI_DISABLED);
-			break;
-		case LMI_DISABLE_PENDING:
-			ss_set_i_state(ss, LMI_ENABLED);
-			break;
-		default:
-			break;
-		}
-		p->lmi_state = ss_get_i_state(ss);
-		printd(("%s: %p: <- LMI_ERROR_ACK\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_ENABLE_CON
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_enable_con(queue_t *q, struct ss *ss)
-{
-	mblk_t *mp;
-	lmi_enable_con_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_ENABLE_CON;
-		assure(ss_get_i_state(ss) == LMI_ENABLE_PENDING);
-		ss_set_i_state(ss, LMI_ENABLED);
-		p->lmi_state = ss_get_i_state(ss);
-		printd(("%s: %p: <- LMI_ENABLE_CON\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_DISABLE_CON
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_disable_con(queue_t *q, struct ss *ss)
-{
-	mblk_t *mp;
-	lmi_disable_con_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_DISABLE_CON;
-		assure(ss_get_i_state(ss) == LMI_DISABLE_PENDING);
-		ss_set_i_state(ss, LMI_DISABLED);
-		p->lmi_state = ss_get_i_state(ss);
-		printd(("%s: %p: <- LMI_DISABLE_CON\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-#if 0
-/*
- *  LMI_OPTMGMT_ACK
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_optmgmt_ack(queue_t *q, struct ss *ss, uint32_t flags, uchar *opt_ptr, size_t opt_len)
-{
-	mblk_t *mp;
-	lmi_optmgmt_ack_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_OPTMGMT_ACK;
-		p->lmi_opt_length = opt_len;
-		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
-		p->lmi_mgmt_flags = flags;
-		printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-#endif
-
-/*
- *  LMI_ERROR_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_error_ind(queue_t *q, struct ss *ss, uint32_t errno, uint32_t reason)
-{
-	mblk_t *mp;
-	lmi_error_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_ERROR_IND;
-		p->lmi_errno = errno;
-		p->lmi_reason = reason;
-		p->lmi_state = ss_get_i_state(ss);
-		printd(("%s: %p: <- LMI_ERROR_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_STATS_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_stats_ind(queue_t *q, struct ss *ss, uint32_t interval, mblk_t *dp)
-{
-	mblk_t *mp;
-	lmi_stats_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->lmi_primitive = LMI_STATS_IND;
-			p->lmi_interval = interval;
-			p->lmi_timestamp = drv_hztomsec(jiffies);
-			mp->b_cont = dp;
-			printd(("%s: %p: <- LMI_STATS_IND\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_EVENT_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_event_ind(queue_t *q, struct ss *ss, uint32_t oid, uint32_t level)
-{
-	mblk_t *mp;
-	lmi_event_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->lmi_primitive = LMI_EVENT_IND;
-			p->lmi_objectid = oid;
-			p->lmi_timestamp = drv_hztomsec(jiffies);
-			p->lmi_severity = level;
-			printd(("%s: %p: <- LMI_EVENT_IND\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_PDU_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_pdu_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *dp;
-
-	assure(!m->mp->b_cont);
-	if ((dp = ss7_dupb(q, m->mp))) {
-		uint32_t mpri;
-		mblk_t *mp;
-		sl_pdu_ind_t *p;
-
-		if (m->data1.ptr.c) {
-			mpri = 0;
-			dp->b_rptr = dp->b_wptr = m->data1.ptr.c;
-			dp->b_wptr += m->data1.len;
-		} else if (m->data2.ptr.c) {
-			mpri = m->data2.ptr.c[0] & 0x3;
-			dp->b_rptr = dp->b_wptr = m->data2.ptr.c + 1;
-			dp->b_wptr += m->data2.len - 1;
-		} else {
-			freeb(dp);
-			swerr();
-			return (-EFAULT);
-		}
-		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-			if (canputnext(ss->oq)) {
-				mp->b_datap->db_type = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				mp->b_wptr += sizeof(*p);
-				p->sl_primitive = SL_PDU_IND;
-				p->sl_mp = mpri;
-				mp->b_cont = dp;
-				printd(("%s: %p: <- SL_PDU_IND\n", DRV_NAME, ss));
-				putnext(ss->oq, mp);
-				return (QR_DONE);
-			}
-			freemsg(mp);
-			return (-EBUSY);
-		}
-		freeb(dp);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_LINK_CONGESTED_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_link_congested_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_link_cong_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_LINK_CONGESTED_IND;
-		p->sl_cong_status = m->cong.val;
-		p->sl_disc_status = m->disc.val;
-		printd(("%s: %p: <- SL_LINK_CONGESTED_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_LINK_CONGESTION_CEASED_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_link_congestion_ceased_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_link_cong_ceased_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_LINK_CONGESTION_CEASED_IND;
-		p->sl_timestamp = drv_hztomsec(jiffies);
-		p->sl_cong_status = m->cong.val;
-		p->sl_disc_status = m->disc.val;
-		printd(("%s: %p: <- SL_LINK_CONGESTION_CEASED_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_RETRIEVED_MESSAGE_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_retrieved_message_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *dp;
-
-	assure(!m->mp->b_cont);
-	if ((dp = ss7_dupb(q, m->mp))) {
-		uint32_t mpri;
-		mblk_t *mp;
-		sl_retrieved_msg_ind_t *p;
-
-		if (m->data1.ptr.c) {
-			mpri = 0;
-			dp->b_rptr = dp->b_wptr = m->data1.ptr.c;
-			dp->b_wptr += m->data1.len;
-		} else if (m->data2.ptr.c) {
-			mpri = m->data2.ptr.c[0] & 0x3;
-			dp->b_rptr = dp->b_wptr = m->data2.ptr.c + 1;
-			dp->b_wptr += m->data2.len - 1;
-		} else {
-			freeb(dp);
-			swerr();
-			return (-EFAULT);
-		}
-		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-			if (canputnext(ss->oq)) {
-				mp->b_datap->db_type = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				mp->b_wptr += sizeof(*p);
-				p->sl_primitive = SL_RETRIEVED_MESSAGE_IND;
-				p->sl_mp = mpri;
-				mp->b_cont = dp;
-				printd(("%s: %p: <- SL_RETRIEVED_MESSAGE_IND\n", DRV_NAME, ss));
-				putnext(ss->oq, mp);
-				return (QR_DONE);
-			}
-			freemsg(mp);
-			return (-EBUSY);
-		}
-		freeb(dp);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_RETRIEVAL_COMPLETE_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_retrieval_complete_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *dp = NULL;
-
-	if ((!m->data1.ptr.c && !m->data2.ptr.c) || (dp = ss7_dupb(q, m->mp))) {
-		uint32_t mpri = 0;
-		mblk_t *mp;
-		sl_retrieval_comp_ind_t *p;
-
-		if (m->data1.ptr.c) {
-			mpri = 0;
-			dp->b_rptr = dp->b_wptr = m->data1.ptr.c;
-			dp->b_wptr += m->data1.len;
-		}
-		if (m->data2.ptr.c) {
-			mpri = m->data2.ptr.c[0] & 0x3;
-			dp->b_rptr = dp->b_wptr = m->data2.ptr.c + 1;
-			dp->b_wptr += m->data2.len - 1;
-		}
-		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-			if (canputnext(ss->oq)) {
-				mp->b_datap->db_type = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				mp->b_wptr += sizeof(*p);
-				p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
-				p->sl_mp = mpri;
-				mp->b_cont = dp;
-				printd(("%s: %p: <- SL_RETRIEVAL_COMPLETE_IND\n", DRV_NAME, ss));
-				putnext(ss->oq, mp);
-				return (QR_DONE);
-			}
-			freemsg(mp);
-			return (-EBUSY);
-		}
-		if (dp)
-			freeb(dp);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_RB_CLEARED_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_rb_cleared_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_rb_cleared_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_RB_CLEARED_IND;
-			printd(("%s: %p: <- SL_RB_CLEARED_IND\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_BSNT_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_bsnt_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_bsnt_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_BSNT_IND;
-			p->sl_bsnt = m->seqno.val;
-			printd(("%s: %p: <- SL_BSNT_IND\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_IN_SERVICE_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_in_service_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_in_service_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_IN_SERVICE_IND;
-			printd(("%s: %p: <- SL_IN_SERVICE_IND\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_OUT_OF_SERVICE_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_out_of_service_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_out_of_service_ind_t *p;
-	uint32_t reason = m ? (m->type == M2UA_MAUP_REL_CON ? 0 : SL_FAIL_UNSPECIFIED)
-	    : SL_FAIL_UNSPECIFIED;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
-		p->sl_timestamp = drv_hztomsec(jiffies);
-		p->sl_reason = reason;
-		printd(("%s: %p: <- SL_OUT_OF_SERVICE_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_LOCAL_PROCESSOR_OUTAGE_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_local_processor_outage_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_loc_proc_out_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_IND;
-		p->sl_timestamp = drv_hztomsec(jiffies);
-		printd(("%s: %p: <- SL_LOCAL_PROCESSOR_OUTAGE_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_LOCAL_PROCESSOR_RECOVERED_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_local_processor_recovered_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_loc_proc_recovered_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_LOCAL_PROCESSOR_RECOVERED_IND;
-		p->sl_timestamp = drv_hztomsec(jiffies);
-		printd(("%s: %p: <- SL_LOCAL_PROCESSOR_RECOVERED_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_REMOTE_PROCESSOR_OUTAGE_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_remote_processor_outage_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_rem_proc_out_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
-		p->sl_timestamp = drv_hztomsec(jiffies);
-		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_OUTAGE_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_REMOTE_PROCESSOR_RECOVERED_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_remote_processor_recovered_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_rem_proc_recovered_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
-		p->sl_timestamp = drv_hztomsec(jiffies);
-		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_RECOVERED_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_RTB_CLEARED_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_rtb_cleared_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_rtb_cleared_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_RTB_CLEARED_IND;
-			printd(("%s: %p: <- SL_RTB_CLEARED_IND\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_RETRIEVAL_NOT_POSSIBLE_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_retrieval_not_possible_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_retrieval_not_poss_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_RETRIEVAL_NOT_POSSIBLE_IND;
-			printd(("%s: %p: <- SL_RETRIEVAL_NOT_POSSIBLE_IND\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_BSNT_NOT_RETRIEVABLE_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_bsnt_not_retrievable_ind(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_bsnt_not_retr_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_BSNT_NOT_RETRIEVABLE_IND;
-			p->sl_bsnt = m->seqno.ptr.c ? m->seqno.val : 0;
-			printd(("%s: %p: <- SL_BSNT_NOT_RETRIEVABLE_IND\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-#if 0
-/*
- *  SL_OPTMGMT_ACK
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_optmgmt_ack(queue_t *q, struct ss *ss, uchar *opt_ptr, size_t opt_len, uint32_t flags)
-{
-	mblk_t *mp;
-	sl_optmgmt_ack_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_OPTMGMT_ACK;
-		p->opt_length = opt_len;
-		p->opt_offset = opt_len ? sizeof(*p) : 0;
-		p->mgmt_flags = flags;
-		bcopy(opt_ptr, mp->b_wptr, opt_len);
-		mp->b_wptr += opt_len;
-		printd(("%s: %p: <- SL_OPTMGMT_ACK\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-#endif
-
-#if 0
-/*
- *  SL_NOTIFY_IND
- *  -----------------------------------
- */
-STATIC INLINE int
-slu_notify_ind(queue_t *q, struct ss *ss, uint32_t oid, uint32_t level)
-{
-	mblk_t *mp;
-	sl_notify_ind_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_NOTIFY_IND;
-		p->sl_objectid = oid;
-		p->sl_timestamp = drv_hztomsec(jiffies);
-		p->sl_severity = level;
-		printd(("%s: %p: <- SL_NOTIFY_IND\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-#endif
+#include "ua_sl.h"
+#include "ua_mtp.h"
+#include "ua_tri.h"
+#include "ua_tci.h"
+#include "ua_dlpi.h"
+#include "ua_npi.h"
+#include "ua_tpi.h"
 
 /*
  *  -------------------------------------------------------------------------
  *
- *  Primitives sent downstream (to SL Provider)
+ *  Primitives sent downstream (to SS Provider)
  *
  *  -------------------------------------------------------------------------
  */
-/*
- *  LMI_INFO_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_info_req(queue_t *q, struct ss *ss)
-{
-	mblk_t *mp;
-	lmi_info_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_ATTACH_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_attach_req(queue_t *q, struct ss *ss, uchar *ppa_ptr, size_t ppa_len)
-{
-	mblk_t *mp;
-	lmi_attach_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_ATTACH_REQ;
-		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
-		mp->b_wptr += ppa_len;
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_DETACH_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_detach_req(queue_t *q, struct ss *ss)
-{
-	mblk_t *mp;
-	lmi_detach_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_DETACH_REQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_ENABLE_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_enable_req(queue_t *q, struct ss *ss, uchar *rem_ptr, size_t rem_len)
-{
-	mblk_t *mp;
-	lmi_enable_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + rem_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_ENABLE_REQ;
-		bcopy(rem_ptr, mp->b_wptr, rem_len);
-		mp->b_wptr += rem_len;
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  LMI_DISABLE_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_disable_req(queue_t *q, struct ss *ss)
-{
-	mblk_t *mp;
-	lmi_disable_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_DISABLE_REQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-#if 0
-/*
- *  LMI_OPTMGMT_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_optmgmt_req(queue_t *q, struct ss *ss, uchar *opt_ptr, size_t opt_len, uint32_t flags)
-{
-	mblk_t *mp;
-	lmi_optmgmt_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->lmi_primitive = LMI_OPTMGMT_REQ;
-			p->lmi_opt_length = opt_len;
-			p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
-			p->lmi_mgmt_flags = flags;
-			bcopy(opt_ptr, mp->b_wptr, opt_len);
-			mp->b_wptr += opt_len;
-			printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-#endif
-
-/*
- *  SL_PDU_REQ
- *  -----------------------------------
- */
-STATIC int
-slp_pdu_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *dp;
-
-	assure(!m->mp->b_cont);
-	if ((dp = ss7_dupb(q, m->mp))) {
-		uint32_t mpri;
-		mblk_t *mp;
-		sl_pdu_req_t *p;
-
-		if (m->data1.ptr.c) {
-			mpri = 0;
-			dp->b_rptr = dp->b_wptr = m->data1.ptr.c;
-			dp->b_wptr += m->data1.len;
-		} else if (m->data2.ptr.c) {
-			mpri = m->data2.ptr.c[0] & 0x3;
-			dp->b_rptr = dp->b_wptr = m->data2.ptr.c + 1;
-			dp->b_wptr += m->data2.len - 1;
-		} else {
-			freeb(dp);
-			swerr();
-			return (-EFAULT);
-		}
-		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-			if (canputnext(ss->oq)) {
-				mp->b_datap->db_type = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				mp->b_wptr += sizeof(*p);
-				p->sl_primitive = SL_PDU_REQ;
-				p->sl_mp = mpri;
-				mp->b_cont = dp;
-				printd(("%s: %p: SL_PDU_REQ ->\n", DRV_NAME, ss));
-				putnext(ss->oq, mp);
-				return (QR_DONE);
-			}
-			freemsg(mp);
-			return (-EBUSY);
-		}
-		freeb(dp);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_EMERGENCY_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_emergency_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_emergency_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_EMERGENCY_REQ;
-		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_EMERGENCY_CEASES_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_emergency_ceases_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_emergency_ceases_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
-		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_START_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_start_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_start_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_START_REQ;
-			printd(("%s: %p: SL_START_REQ ->\n", DRV_NAME, ss));
-			puntext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_STOP_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_stop_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_stop_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_STOP_REQ;
-			printd(("%s: %p: SL_STOP_REQ ->\n", DRV_NAME, ss));
-			puntext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_RETRIEVE_BSNT_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_retrieve_bsnt_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_retrieve_bsnt_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
-			printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_RETRIEVAL_REQUEST_AND_FSNC_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_retrieval_request_and_fsnc_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_retrieval_req_and_fsnc_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
-			p->sl_fsnc = m->seqno.val;
-			printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_CLEAR_BUFFERS_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_clear_buffers_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_clear_buffers_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
-			printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_CLEAR_RTB_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_clear_rtb_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_clear_rtb_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_CLEAR_RTB_REQ;
-			printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_CONTINUE_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_continue_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_continue_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_CONTINUE_REQ;
-			printd(("%s: %p: SL_CONTINUE_REQ ->\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_LOCAL_PROCESSOR_OUTAGE_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_local_processor_outage_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_local_proc_outage_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
-		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_RESUME_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_resume_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_resume_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(ss->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->sl_primitive = SL_RESUME_REQ;
-			printd(("%s: %p: SL_RESUME_REQ ->\n", DRV_NAME, ss));
-			putnext(ss->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_CONGESTION_DISCARD_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_congestion_discard_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_cong_discard_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
-		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_CONGESTION_ACCEPT_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_congestion_accept_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_cong_accept_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
-		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_NO_CONGESTION_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_no_congestion_req(queue_t *q, struct ss *ss, struct ua_msg *m)
-{
-	mblk_t *mp;
-	sl_no_cong_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_NO_CONGESTION_REQ;
-		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  SL_POWER_ON_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-slp_power_on_req(queue_t *q, struct ss *ss)
-{
-	mblk_t *mp;
-	sl_power_on_req_t *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->sl_primitive = SL_POWER_ON_REQ;
-		printd(("%s: %p: SL_POWER_ON_REQ ->\n", DRV_NAME, ss));
-		putnext(ss->oq, mp);
-		return (QR_DONE);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  -------------------------------------------------------------------------
- *
- *  Primitives sent downstream (to Transport Provider)
- *
- *  -------------------------------------------------------------------------
- */
-/*
- *  T_CONN_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_conn_req(queue_t *q, struct xp *xp, uchar *dst_ptr, size_t dst_len, uchar *opt_ptr,
-	   size_t opt_len, mblk_t *dp)
-{
-	mblk_t *mp;
-	struct T_conn_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_CONN_REQ;
-			p->DEST_length = dst_len;
-			p->DEST_offset = dst_len ? sizeof(*p) : 0;
-			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) + dst_len : 0;
-			bcopy(dst_ptr, mp->b_wptr, dst_len);
-			mp->b_wptr += dst_len;
-			bcopy(opt_ptr, mp->b_wptr, opt_len);
-			mp->b_wptr += opt_len;
-			mp->b_cont = dp;
-			printd(("%s; %p: T_CONN_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_CONN_RES
- *  -----------------------------------
- */
-STATIC INLINE int
-t_conn_res(queue_t *q, struct xp *xp, uint32_t acceptor, uchar *opt_ptr, size_t opt_len,
-	   uint32_t seqno, mblk_t *dp)
-{
-	mblk_t *mp;
-	struct T_conn_res *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_CONN_RES;
-			p->ACCEPTOR_id = acceptor;
-			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) : 0;
-			p->SEQ_number = seqno;
-			bcopy(opt_ptr, mp->b_wptr, opt_len);
-			mp->b_wptr += opt_len;
-			mp->b_cont = dp;
-			printd(("%s; %p: T_CONN_RES ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_DISCON_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_discon_req(queue_t *q, struct xp *xp, uint32_t seqno, mblk_t *dp)
-{
-	mblk_t *mp;
-	struct T_discon_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_DISCON_REQ;
-			p->SEQ_number = seqno;
-			mp->b_cont = dp;
-			printd(("%s; %p: T_DISCON_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_DATA_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_data_req(queue_t *q, struct xp *xp, uint32_t more, mblk_t *dp)
-{
-	mblk_t *mp;
-	struct T_data_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_DATA_REQ;
-			p->MORE_flag = more;
-			mp->b_cont = dp;
-			printd(("%s; %p: T_DATA_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_EXDATA_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_exdata_req(queue_t *q, struct xp *xp, uint32_t more, mblk_t *dp)
-{
-	mblk_t *mp;
-	struct T_exdata_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_EXDATA_REQ;
-			p->MORE_flag = more;
-			mp->b_cont = dp;
-			printd(("%s; %p: T_EXDATA_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_INFO_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_info_req(queue_t *q, struct xp *xp)
-{
-	mblk_t *mp;
-	struct T_info_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_INFO_REQ;
-			printd(("%s; %p: T_INFO_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_BIND_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_bind_req(queue_t *q, struct xp *xp, uchar *add_ptr, size_t add_len, uint32_t conind)
-{
-	mblk_t *mp;
-	struct T_bind_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_BIND_REQ;
-			p->ADDR_length = add_len;
-			p->ADDR_offset = add_len ? sizeof(*p) : 0;
-			p->CONIND_number = conind;
-			bcopy(add_ptr, mp->b_wptr, add_len);
-			mp->b_wptr += add_len;
-			printd(("%s; %p: T_BIND_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_UNBIND_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_unbind_req(queue_t *q, struct xp *xp)
-{
-	mblk_t *mp;
-	struct T_unbind_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_UNBIND_REQ;
-			printd(("%s; %p: T_UNBIND_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_UNITDATA_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_unitdata_req(queue_t *q, struct xp *xp, uchar *dst_ptr, size_t dst_len, uchar *opt_ptr,
-	       size_t opt_len, mblk_t *dp)
-{
-	mblk_t *mp;
-	struct T_unitdata_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_UNITDATA_REQ;
-			p->DEST_length = dst_len;
-			p->DEST_offset = dst_len ? sizeof(*p) : 0;
-			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) + dst_len : 0;
-			mp->b_cont = dp;
-			printd(("%s; %p: T_UNITDATA_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_OPTMGMT_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_optmgmt_req(queue_t *q, struct xp *xp, uchar *opt_ptr, size_t opt_len, uint32_t flags)
-{
-	mblk_t *mp;
-	struct T_optmgmt_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_OPTMGMT_REQ;
-			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) : 0;
-			p->MGMT_flags = flags;
-			bcopy(opt_ptr, mp->b_wptr, opt_len);
-			mp->b_wptr += opt_len;
-			printd(("%s; %p: T_OPTMGMT_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_ORDREL_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_ordrel_req(queue_t *q, struct xp *xp)
-{
-	mblk_t *mp;
-	struct T_ordrel_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_ORDREL_REQ;
-			printd(("%s; %p: T_ORDREL_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_OPTDATA_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_optdata_req(queue_t *q, struct xp *xp, uint32_t flags, uint32_t sid, mblk_t *dp)
-{
-	mblk_t *mp;
-	struct T_optdata_req *p;
-	uchar opt[2 * sizeof(struct t_opthdr) + 2 * sizeof(t_uscalar_t)];
-	size_t opt_len = (xp->type == UA_OBJ_TYPE_XP_SCTP) ? sizeof(opt) : 0;
-
-	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_OPTDATA_REQ;
-			p->DATA_flag = flags;
-			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) : 0;
-			if (opt_len) {
-				struct t_opthdr *oh;
-
-				oh = (typeof(oh)) mp->b_wptr;
-				mp->b_wptr += sizeof(*oh);
-				oh->level = T_INET_SCTP;
-				oh->name = T_SCTP_PPI;
-				oh->len = sizeof(t_uscalar_t);
-				*(t_uscalar_t *) mp->b_wptr = xp->ppi;
-				mp->b_wptr += sizeof(t_uscalar_t);
-				oh = (typeof(oh)) mp->b_wptr;
-				mp->b_wptr += sizeof(*oh);
-				oh->level = T_INET_SCTP;
-				oh->name = T_SCTP_SID;
-				oh->len = sizeof(t_uscalar_t);
-				*(t_uscalar_t *) mp->b_wptr = sid;
-				mp->b_wptr += sizeof(t_uscalar_t);
-			}
-			mp->b_cont = dp;
-			printd(("%s; %p: T_OPTDATA_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-/*
- *  T_ADDR_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_addr_req(queue_t *q, struct xp *xp)
-{
-	mblk_t *mp;
-	struct T_addr_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_ADDR_REQ;
-			printd(("%s; %p: T_ADDR_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-
-#ifdef T_CAPABILITY_REQ
-/*
- *  T_CAPABILITY_REQ
- *  -----------------------------------
- */
-STATIC INLINE int
-t_capability_req(queue_t *q, struct xp *xp)
-{
-	mblk_t *mp;
-	struct T_capability_req *p;
-
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(xp->oq)) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			p->PRIM_type = T_CAPABILITY_REQ;
-			printd(("%s; %p: T_CAPABILITY_REQ ->\n", DRV_NAME, xp));
-			putnext(xp->oq, mp);
-			return (QR_DONE);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-#endif
-
 /*
  *  =========================================================================
  *
@@ -2724,8 +1234,8 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
 				parm = &m->iid;
 			break;
-		case UA_TAG(UA_PARM_IID_RANGE):	/* UA_CONST_PHDR(0x0002,0) */
-			parm = &m->iid;
+		case UA_TAG(UA_PARM_IID_RANGE_O):	/* UA_CONST_PHDR(0x0002,0) */
+			parm = &m->iid_range;
 			break;
 		case UA_TAG(UA_PARM_IID_TEXT):	/* UA_CONST_PHDR(0x0003,0) */
 			parm = &m->iid_text;
@@ -2736,8 +1246,8 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
 		case UA_TAG(UA_PARM_DIAG):	/* UA_CONST_PHDR(0x0007,0) */
 			parm = &m->diag;
 			break;
-		case UA_TAG(UA_PARM_IID_RANGE1):	/* UA_CONST_PHDR(0x0008,0) */
-			parm = &m->iid;
+		case UA_TAG(UA_PARM_IID_RANGE):	/* UA_CONST_PHDR(0x0008,0) */
+			parm = &m->iid_range;
 			break;
 		case UA_TAG(UA_PARM_HBDATA):	/* UA_CONST_PHDR(0x0009,0) */
 			parm = &m->hinfo;
@@ -2762,11 +1272,13 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
 				parm = &m->aspid;
 			break;
+		}
+		switch (UA_PTAG(*wp)) {
 		case UA_TAG(M2UA_PARM_DATA1):	/* UA_CONST_PHDR(0x0300,0) */
-			parm = &m->data1;
+			parm = &m->m2ua.data1;
 			break;
 		case UA_TAG(M2UA_PARM_DATA2):	/* UA_CONST_PHDR(0x0301,0) */
-			parm = &m->data2;
+			parm = &m->m2ua.data2;
 			break;
 		case UA_TAG(M2UA_PARM_STATE_REQUEST):	/* UA_CONST_PHDR(0x0302,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
@@ -2774,7 +1286,7 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
 			break;
 		case UA_TAG(M2UA_PARM_STATE_EVENT):	/* UA_CONST_PHDR(0x0303,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
-				parm = &m->event;
+				parm = &m->m2ua.event;
 			break;
 		case UA_TAG(M2UA_PARM_CONG_STATUS):	/* UA_CONST_PHDR(0x0304,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
@@ -2786,11 +1298,11 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
 			break;
 		case UA_TAG(M2UA_PARM_ACTION):	/* UA_CONST_PHDR(0x0306,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
-				parm = &m->action;
+				parm = &m->m2ua.action;
 			break;
 		case UA_TAG(M2UA_PARM_SEQNO):	/* UA_CONST_PHDR(0x0307,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
-				parm = &m->seqno;
+				parm = &m->m2ua.seqno;
 			break;
 		case UA_TAG(M2UA_PARM_RETR_RESULT):	/* UA_CONST_PHDR(0x0308,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
@@ -2799,7 +1311,7 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
 		case UA_TAG(M2UA_PARM_LINK_KEY):	/* UA_CONST_PHDR(0x0309,sizeof(uint32_t)*6) 
 							 */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t) * 6)
-				parm = &m->linkkey;
+				parm = &m->m2ua.linkkey;
 			break;
 		case UA_TAG(M2UA_PARM_LOC_KEY_ID):	/* UA_CONST_PHDR(0x030a,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
@@ -2807,11 +1319,11 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
 			break;
 		case UA_TAG(M2UA_PARM_SDTI):	/* UA_CONST_PHDR(0x030b,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
-				parm = &m->sdti;
+				parm = &m->m2ua.sdti;
 			break;
 		case UA_TAG(M2UA_PARM_SDLI):	/* UA_CONST_PHDR(0x030c,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
-				parm = &m->sdli;
+				parm = &m->m2ua.sdli;
 			break;
 		case UA_TAG(M2UA_PARM_REG_RESULT):	/* UA_CONST_PHDR(0x030d,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
@@ -2832,17 +1344,115 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
 			break;
 		case UA_TAG(M2UA_PARM_CORR_ID):	/* UA_CONST_PHDR(0x0311,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
-				parm = &m->corid;
+				parm = &m->m2ua.corid;
 			break;
 		case UA_TAG(M2UA_PARM_CORR_ID_ACK):	/* UA_CONST_PHDR(0x0312,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
-				parm = &m->corid;
+				parm = &m->m2ua.corid;
+			break;
+		}
+		switch (UA_PTAG(*wp)) {
+		case UA_TAG(M3UA_PARM_NTWK_APP):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->m3ua.na;
+			break;
+		case UA_TAG(M3UA_PARM_USER_CAUSE):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->cause;
+			break;
+		case UA_TAG(M3UA_PARM_CONG_IND):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->cong;
+			break;
+		case UA_TAG(M3UA_PARM_CONCERN_DEST):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->m3ua.cdest;
+			break;
+		case UA_TAG(M3UA_PARM_ROUTING_KEY):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->m3ua.rk;
+			break;
+		case UA_TAG(M3UA_PARM_REG_RESULT):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->result;
+			break;
+		case UA_TAG(M3UA_PARM_DEREG_RESULT):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->result;
+			break;
+		case UA_TAG(M3UA_PARM_LOC_KEY_ID):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->keyid;
+			break;
+		case UA_TAG(M3UA_PARM_DPC):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->m3ua.dpc;
+			break;
+		case UA_TAG(M3UA_PARM_SI):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->m3ua.si;
+			break;
+		case UA_TAG(M3UA_PARM_OPC):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->m3ua.opc_list;
+			break;
+		case UA_TAG(M3UA_PARM_PROT_DATA3):
+			parm = &m->m3ua.prot_data;
+			break;
+		case UA_TAG(M3UA_PARM_REG_STATUS):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->status;
+			break;
+		case UA_TAG(M3UA_PARM_DEREG_STATUS):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->status;
+			break;
+		}
+		switch (UA_PTAG(*wp)) {
+		case UA_TAG(SUA_SPARM_SSN):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->ssn;
+			break;
+		case UA_TAG(SUA_PARM_SMI):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->smi;
+			break;
+		case UA_TAG(SUA_PARM_CONG):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->cong;
+			break;
+		case UA_TAG(SUA_PARM_CAUSE):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->cause;
+			break;
+		}
+		switch (UA_PTAG(*wp)) {
+		case UA_TAG(TUA_PARM_SSN):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->ssn;
+			break;
+		case UA_TAG(TUA_PARM_SMI):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->smi;
+			break;
+		case UA_TAG(TUA_PARM_CONG):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->cong;
+			break;
+		case UA_TAG(TUA_PARM_CAUSE):
+			if (UA_PLEN(*wp) >= sizeof(uint32_t))
+				parm = &m->cause;
 			break;
 		}
 		if (parm) {
-			parm->val = ntohl(wp[1]);
-			parm->val = wp[1];
-			parm->len = UA_PLEN(*wp);
+			/* We accept the first of repeated parameters.  There are really no
+			   instances where parameters are repeated. */
+			if (parm->wp == NULL) {
+				parm->wp = wp;
+				parm->len = UA_PLEN(*wp);
+				parm->val = ntohl(wp[1]);
+			} else
+				swerr();
 		}
 	}
 	return (QR_DONE);
@@ -2855,16 +1465,71 @@ ua_dec_msg(struct xp *xp, queue_t *q, mblk_t *mp, struct ua_msg *m)
  *
  *  -------------------------------------------------------------------------
  */
+STATIC mblk_t *
+ua_build_optdata_req(queue_t *q, t_uscalar_t flags, t_uscalar_t ppi, t_uscalar_t sid)
+{
+	mblk_t *mp;
+	struct T_optdata_req *p;
+	struct t_opthdr *oh;
+	static const size_t opt_len = sizeof(*oh) + sizeof(ppi) + sizeof(*oh) + sizeof(sid);
+
+	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = T_OPTDATA_REQ;
+		p->DATA_flag = flags;
+		p->OPT_length = opt_len;
+		p->OPT_offset = sizeof(*p);
+		mp->b_wptr += sizeof(*p);
+
+		oh = (typeof(oh)) mp->b_wptr;
+		oh->level = T_INET_SCTP;
+		oh->name = T_SCTP_PPI;
+		oh->len = sizeof(t_uscalar_t);
+		mp->b_wptr += sizeof(*oh);
+		*(t_uscalar_t *) mp->b_wptr = ppi;
+		mp->b_wptr += sizeof(t_uscalar_t);
+
+		oh = (typeof(oh)) mp->b_wptr;
+		oh->level = T_INET_SCTP;
+		oh->name = T_SCTP_SID;
+		oh->len = sizeof(t_uscalar_t);
+		mp->b_wptr += sizeof(*oh);
+		*(t_uscalar_t *) mp->b_wptr = sid;
+		mp->b_wptr += sizeof(t_uscalar_t);
+	}
+	return (mp);
+}
+
+STATIC int
+ua_send_optdata_req(queue_t *q, struct xp *xp, mblk_t *mp, mblk_t *dp)
+{
+	if (mp) {
+		if (canputnext(q)) {
+			if (dp) {
+				linkb(mp, dp);
+				putnext(q, mp);
+				return (QR_ABSORBED);
+			}
+			putnext(q, mp);
+			return (QR_DONE);
+		}
+		freemsg(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
 /**
- * ua_send_mgmt_err: - send a UA_MGMT_ERR message
+ * ua_build_mgmt_err: - build a UA_MGMT_ERR message
  * @q: active queue
- * @xp: transport on which to send
+ * @ppi: protocol payload identifier
  * @ecode: error code
  * @dia_ptr: DIAGNOSTIC pointer
  * @dia_len: DIAGNOSTIC length
  */
-STATIC INLINE int
-ua_send_mgmt_err(queue_t *q, struct xp *xp, uint32_t ecode, uchar *dia_ptr, size_t dia_len)
+STATIC INLINE mblk_t *
+ua_build_mgmt_err(queue_t *q, uint32_t ppi, uint32_t ecode, uchar *dia_ptr, size_t dia_len)
 {
 	mblk_t *mp;
 	size_t mlen =
@@ -2872,32 +1537,51 @@ ua_send_mgmt_err(queue_t *q, struct xp *xp, uint32_t ecode, uchar *dia_ptr, size
 	    UA_PAD4(dia_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_MGMT_ERR;
-		p[1] = htonl(mlen);;
-		p[2] = UA_PARM_ECODE;
-		p[3] = htonl(ecode);
-		p += 4;
-		if (dia_len) {
-			*p++ = UA_PHDR(UA_PARM_DIAG, dia_len);
-			bcopy(dia_ptr, p, dia_len);
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_MGMT_ERR;
+			p[1] = htonl(mlen);;
+			p[2] = UA_PARM_ECODE;
+			p[3] = htonl(ecode);
+			p += 4;
+			if (dia_len) {
+				*p++ = UA_PHDR(UA_PARM_DIAG, dia_len);
+				bcopy(dia_ptr, p, dia_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(dia_len);
+
+			mb->b_cont = mp;
+			return (mb);
 		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(dia_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 
 /**
- * ua_send_mgmt_ntfy: - send a UA_MGMT_NTFY message
- * @q: active queue
+ * ua_send_mgmt_err: - send a UA_MGMT_ERR message
  * @xp: transport on which to send
+ * @q: active queue
+ * @ecode: error code
+ * @dia_ptr: DIAGNOSTIC pointer
+ * @dia_len: DIAGNOSTIC length
+ */
+STATIC INLINE int
+ua_send_mgmt_err(struct xp *xp, queue_t *q, uint32_t ecode, uchar *dia_ptr, size_t dia_len)
+{
+	mblk_t *mp = ua_build_mgmt_err(q, xp->ppi, ecode, dia_ptr, dia_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_mgmt_ntfy: - build a UA_MGMT_NTFY message
+ * @q: active queue
+ * @ppi: protocol payload identifier
  * @status: status code
  * @aspid: ASP Id to include (if non-NULL)
  * @iid: Interface Ids to include if non-NULL
@@ -2911,9 +1595,9 @@ ua_send_mgmt_err(queue_t *q, struct xp *xp, uint32_t ecode, uchar *dia_ptr, size
  * the type of the xp to determine whether to interpret the list of 32-bit
  * identifiers as interface ids or as routing contexts.
  */
-STATIC INLINE int
-ua_send_mgmt_ntfy(queue_t *q, struct xp *xp, uint32_t status, uint32_t *aspid, uint32_t *iid,
-		  size_t num_iid, uint32_t *rc, size_t num_rc, uchar *inf_ptr, size_t inf_len)
+STATIC INLINE mblk_t *
+ua_build_mgmt_ntfy(queue_t *q, uint32_t ppi, uint32_t status, uint32_t *aspid, uint32_t *iid,
+		   size_t num_iid, uint32_t *rc, size_t num_rc, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
 	size_t mlen =
@@ -2922,63 +1606,252 @@ ua_send_mgmt_ntfy(queue_t *q, struct xp *xp, uint32_t status, uint32_t *aspid, u
 	    UA_PAD4(inf_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_MGMT_NTFY;
-		p[1] = htonl(mlen);
-		p[2] = UA_PARM_STATUS;
-		p[3] = htonl(status);
-		p += 4;
-		if (aspid) {
-			p[0] = UA_PARM_ASPID;
-			p[1] = htonl(*aspid);
-			p += 2;
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_MGMT_NTFY;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_STATUS;
+			p[3] = htonl(status);
+			p += 4;
+			if (aspid) {
+				p[0] = UA_PARM_ASPID;
+				p[1] = *aspid;	/* already network byte order */
+				p += 2;
+			}
+			if (num_iid) {
+				uint32_t *ip = iid;
+
+				*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+				while (num_iid--)
+					*p++ = *ip++;	/* already network byte order */
+			}
+			if (num_rc) {
+				uint32_t *rcp = rc;
+
+				*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
+				while (num_rc--)
+					*p++ = *rcp++;	/* already network byte order */
+
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
 		}
-		if (num_iid) {
-			uint32_t *ip = iid;
-
-			*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
-			while (num_iid--)
-				*p++ = htonl(*ip++);
-		}
-		if (num_rc) {
-			uint32_t *rcp = rc;
-
-			*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
-			while (num_rc--)
-				*p++ = htonl(*rcp++);
-
-		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, iid ? *iid : rc ? *rc : 0, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
-STATIC INLINE int
-ua_send_mgmt_ntfy_simple(queue_t *q, struct xp *xp, uint32_t status, uint32_t *aspid)
+
+/**
+ * ua_send_mgmt_ntfy_asp: - send a UA_MGMT_NTFY message notifying for an ASP failure
+ * @spp: ASP or SPP for which to send
+ * @q: active queue
+ * @asp: ASP or SPP failed
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO len
+ *
+ * There are only two notification messages, one that pertains to an AS and one that pertains to an
+ * ASP/SPP.  This is the ASP/SPP version.  The only status for this version is ASP Failure.  The
+ * message will include the ASP Id of the failed ASP (or it is a rather useless message).
+ */
+STATIC int
+ua_send_mgmt_ntfy_asp(struct spp *spp, queue_t *q, struct spp *asp, uchar *inf_ptr, size_t inf_len)
 {
-	return ua_send_mgmt_ntfy(q, xp, status, aspid, NULL, 0, NULL, 0, NULL, 0);
+	mblk_t *mp;
+	struct xp *xp = spp->xp.xp;
+	uint32_t *aspid = asp ? (asp->aspid ? &asp->aspid : NULL) : NULL;
+	uint32_t ppi = 0;
+
+	/* TODO: we could include the RC (IID) for which the failed ASP was configured by waling
+	   the asp->gp.list */
+	mp = ua_build_mgmt_ntfy(q, xp->ppi, UA_STATUS_ASP_FAILURE, aspid, NULL, 0, NULL, 0, inf_ptr, inf_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_send_mgmt_ntfy_as: - send a UA_MGMT_NTFY message notifying for an AS state change
+ * @gp: ASP/AS or SPP/AS relation for which to send
+ * @q: active queue
+ * @status: status
+ * @asp: ASP or SPP causing state transition
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO len
+ *
+ * There are two notification messages, one that pertains to an AS and one that pertains to an
+ * ASP/SPP.  This is the AS version.  The status for this version is the resulting state of an AS
+ * state change.  The message will include the RC (IID) for the AS for which the state has changed
+ * and the ASP Id (if any) of the ASP that caused the state change to occur.
+ */
+STATIC int
+ua_send_mgmt_ntfy_as(struct gp *gp, queue_t *q, uint32_t status, struct spp *asp, uchar *inf_ptr,
+		     size_t inf_len)
+{
+	mblk_t *mp;
+	struct spp *spp = gp->spp.spp;
+	struct xp *xp = spp->xp.xp;
+	struct as *as = gp->as.as;
+	uint32_t tmode = as->tmode;
+	uint32_t *aspid = asp ? (asp->aspid ? &asp->aspid : NULL) : NULL;
+	uint32_t *iid, *rc, iid_val, rc_val;
+	size_t num_iid, num_rc;
+	uint32_t ppi;
+
+	switch (as->level) {
+	case AS_LEVEL_IUA:
+		ppi = IUA_PPI;
+		goto do_iid;
+	case AS_LEVEL_M2UA:
+		ppi = M2UA_PPI;
+		goto do_iid;
+	      do_iid:
+		iid_val = htonl(as->iid);
+		iid = &iid_val;
+		num_iid = 1;
+		rc_val = 0;
+		rc = NULL;
+		num_rc = 0;
+		break;
+	default:
+		swerr();
+		pp = 0;
+		goto do_rc;
+	case AS_LEVEL_M3UA:
+		ppi = M3UA_PPI;
+		goto do_rc;
+	case AS_LEVEL_SUA:
+		ppi = SUA_PPI;
+		goto do_rc;
+	case AS_LEVEL_TUA:
+		ppi = TUA_PPI;
+		goto do_rc;
+	      do_rc:
+		iid_val = 0;
+		iid = NULL;
+		num_iid = 0;
+		rc_val = htonl(as->rc);
+		rc = &rc_val;
+		num_rc = 1;
+		break;
+	}
+
+	mp = ua_build_mgmt_ntfy(q, ppi, status, aspid, iid, num_iid, rc, num_rc, inf_ptr, inf_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+static int
+ua_send_mgmt_ntfy(struct gp *gp, queue_t *q, uint oldflags, uint newflags, struct spp *asp, uchar *inf_ptr, size_t inf_len)
+{
+	int err;
+
+	if (newflags & ASF_ACTIVE) {
+		if (newflags & ASF_INSUFFICIENT_ASPS) {
+			if (!(oldflags & ASF_INSUFFICIENT_ASPS))
+				if ((err = ua_send_mgmt_ntfy_as(gp, q, UA_STATUS_AS_INSUFFICIENT_ASPS, asp, inf_ptr, inf_len)))
+					return (err);
+		} else {
+			if (!(oldflags & ASF_ACTIVE))
+				if ((err = ua_send_mgmt_ntfy_as(gp, q, UA_STATUS_AS_ACTIVE, asp, inf_ptr, inf_len)))
+					return (err);
+		}
+		if (newflags & ASF_MINIMUM_ASPS) {
+			if (!(oldflags & ASF_MINIMUM_ASPS))
+				if ((err = ua_send_mgmt_ntfy_as(gp, q, UA_STATUS_AS_MINIMUM_ASPS, asp, inf_ptr, inf_len)))
+					return (err);
+		}
+	} else if (newflags & ASF_PENDING) {
+		if (!(oldflags & ASF_PENDING))
+			if ((err = ua_send_mgmt_ntfy_as(gp, q, UA_STATUS_AS_PENDING, asp, inf_ptr, inf_len)))
+				return (err);
+	} else {
+		if (oldflags & (ASF_ACTIVE|ASF_PENDING))
+			if ((err = ua_send_mgmt_ntfy_as(gp, q, UA_STATUS_AS_INACTIVE, asp, inf_ptr, inf_len)))
+				return (err);
+	}
+}
+
+/**
+ * ua_build_asps_aspup_req: - build ASP Up message (UA_ASPS_ASPUP_REQ)
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @aspid: ASP Identifier
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE mblk_t *
+ua_build_asps_aspup_req(queue_t *q, uint32_t ppi, uint32_t *aspid, uchar *inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	size_t mlen =
+	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE +
+	    UA_PAD4(inf_len) : 0;
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_ASPS_ASPUP_REQ;
+			p[1] = htonl(mlen);
+			p += 2;
+			if (aspid) {
+				p[0] = UA_PARM_ASPID;
+				p[1] = *aspid;	/* already network byte order */
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
 }
 
 /**
  * ua_send_asps_aspup_req: - send ASP Up message (UA_ASPS_ASPUP_REQ)
+ * @spp: ASP or SPP from which to send message
  * @q: active queue
- * @xp: transport on which to send
- * @aspid: ASP Identifier
  * @inf_ptr: INFO pointer
  * @inf_len: INFO length
  */
 STATIC INLINE int
-ua_send_asps_aspup_req(queue_t *q, struct xp *xp, uint32_t *aspid, uchar *inf_ptr, size_t inf_len)
+ua_send_asps_aspup_req(struct spp *spp, queue_t *q, uchar *inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct xp *xp = spp->xp.xp;
+	uint32_t *aspid = spp->aspid ? &spp->aspid : NULL;
+
+	mp = ua_build_asps_aspup_req(q, xp->ppi, aspid, inf_ptr, inf_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_asps_aspdn_req: - build ASP Down message (UA_ASPS_ASPDN_REQ)
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @aspid: ASP Identifier
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE mblk_t *
+ua_build_asps_aspdn_req(queue_t *q, uint32_t ppi, uint32_t *aspid, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
 	size_t mlen =
@@ -2986,117 +1859,176 @@ ua_send_asps_aspup_req(queue_t *q, struct xp *xp, uint32_t *aspid, uchar *inf_pt
 	    UA_PAD4(inf_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_ASPS_ASPUP_REQ;
-		p[1] = htonl(mlen);
-		p += 2;
-		if (aspid) {
-			p[0] = UA_PARM_ASPID;
-			p[1] = htonl(*aspid);
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_ASPS_ASPDN_REQ;
+			p[1] = htonl(mlen);
 			p += 2;
+			if (aspid) {
+				p[0] = UA_PARM_ASPID;
+				p[1] = *aspid;	/* already network byte order */
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
 		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 
 /**
  * ua_send_asps_aspdn_req: - send ASP Down message (UA_ASPS_ASPDN_REQ)
+ * @spp: ASP or SPP from which to send message
  * @q: active queue
- * @xp: transport on which to send
- * @aspid: ASP Identifier
  * @inf_ptr: INFO pointer
  * @inf_len: INFO length
  */
 STATIC INLINE int
-ua_send_asps_aspdn_req(queue_t *q, struct xp *xp, uint32_t *aspid, uchar *inf_ptr, size_t inf_len)
+ua_send_asps_aspdn_req(struct spp *spp, queue_t *q, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen =
-	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE +
-	    UA_PAD4(inf_len) : 0;
+	struct xp *xp = spp->xp.xp;
+	uint32_t *aspid = spp->aspid ? &spp->aspid : NULL;
+	
+	mp = ua_build_asps_aspdn_req(q, xp->ppi, aspid, inf_ptr, inf_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_asps_hbeat_req: - build BEAT message (UA_ASPS_HBEAT_REQ)
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @hbt_ptr: Heartbeat Data pointer
+ * @hbt_len: Heartbeat Data length
+ */
+STATIC INLINE int
+ua_build_asps_hbeat_req(queue_t *q, uint32_t ppi, uchar *hbt_ptr, size_t hbt_len)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + hbt_len ? UA_PHDR_SIZE + UA_PAD4(hbt_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_ASPS_ASPDN_REQ;
-		p[1] = htonl(mlen);
-		p += 2;
-		if (aspid) {
-			p[0] = UA_PARM_ASPID;
-			p[1] = htonl(*aspid);
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_ASPS_HBEAT_REQ;
+			p[1] = htonl(mlen);
 			p += 2;
+			if (hbt_len) {
+				*p++ = UA_PHDR(UA_PARM_HBDATA, hbt_len);
+				bcopy(hbt_ptr, p, hbt_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(hbt_len);
+			mb->b_cont = mp;
+			return (mb);
 		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 
 /**
  * ua_send_asps_hbeat_req: - send BEAT message (UA_ASPS_HBEAT_REQ)
- * @q: active queue
  * @xp: transport on which to send
+ * @q: active queue
  * @hbt_ptr: Heartbeat Data pointer
  * @hbt_len: Heartbeat Data length
  */
 STATIC INLINE int
-ua_send_asps_hbeat_req(queue_t *q, struct xp *xp, uchar *hbt_ptr, size_t hbt_len)
+ua_send_asps_hbeat_req(struct xp *xp, queue_t *q, uchar *hbt_ptr, size_t hbt_len)
+{
+	mblk_t *mp = ua_build_asps_hbead_req(q, xp->ppi, hbt_ptr, hbt_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_asps_aspup_ack: - build ASP Up Ack message (UA_ASPS_ASPUP_ACK)
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @aspid: ASP Identifier
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE mblk_t *
+ua_build_asps_aspup_ack(queue_t *q, uint32_t ppi, uint32_t *aspid, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE + hbt_len ? UA_PHDR_SIZE + UA_PAD4(hbt_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE +
+	    UA_PAD4(inf_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_ASPS_HBEAT_REQ;
-		p[1] = htonl(mlen);
-		p += 2;
-		if (hbt_len) {
-			*p++ = UA_PHDR(UA_PARM_HBDATA, hbt_len);
-			bcopy(hbt_ptr, p, hbt_len);
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_ASPS_ASPUP_ACK;
+			p[1] = htonl(mlen);
+			p += 2;
+			if (aspid) {
+				p[0] = UA_PARM_ASPID;
+				p[1] = *aspid;	/* already network byte order */
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
 		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(hbt_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 
 /**
  * ua_send_asps_aspup_ack: - send ASP Up Ack message (UA_ASPS_ASPUP_ACK)
+ * @spp: ASP or SPP for which to send message
  * @q: active queue
- * @xp: transport on which to send
- * @aspid: ASP Identifier
  * @inf_ptr: INFO pointer
  * @inf_len: INFO length
  */
 STATIC INLINE int
-ua_send_asps_aspup_ack(queue_t *q, struct xp *xp, uint32_t *aspid, uchar *inf_ptr, size_t inf_len)
+ua_send_asps_aspup_ack(struct spp *spp, queue_t *q, uchar *inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct xp *xp = spp->xp.xp;
+	uint32_t *aspid = spp->aspid ? &spp->aspid : NULL;
+	
+	mp = ua_build_asps_aspup_ack(q, xp->ppi, aspid, inf_ptr, inf_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_asps_aspdn_ack: - build ASP Down Ack message (UA_ASPS_ASPDN_ACK)
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @aspid: ASP Identifier
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE mblk_t *
+ua_build_asps_aspdn_ack(queue_t *q, uint32_t ppi, uint32_t *aspid, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
 	size_t mlen =
@@ -3104,111 +2036,107 @@ ua_send_asps_aspup_ack(queue_t *q, struct xp *xp, uint32_t *aspid, uchar *inf_pt
 	    UA_PAD4(inf_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_ASPS_ASPUP_ACK;
-		p[1] = htonl(mlen);
-		p += 2;
-		if (aspid) {
-			p[0] = UA_PARM_ASPID;
-			p[1] = htonl(*aspid);
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_ASPS_ASPDN_ACK;
+			p[1] = htonl(mlen);
 			p += 2;
+			if (aspid) {
+				p[0] = UA_PARM_ASPID;
+				p[1] = *aspid;
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
 		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 
 /**
  * ua_send_asps_aspdn_ack: - send ASP Down Ack message (UA_ASPS_ASPDN_ACK)
+ * @spp: ASP or SPP for which to send message
  * @q: active queue
- * @xp: transport on which to send
- * @aspid: ASP Identifier
  * @inf_ptr: INFO pointer
  * @inf_len: INFO length
  */
 STATIC INLINE int
-ua_send_asps_aspdn_ack(queue_t *q, struct xp *xp, uint32_t *aspid, uchar *inf_ptr, size_t inf_len)
+ua_send_asps_aspdn_ack(struct spp *spp, queue_t *q, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen =
-	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE +
-	    UA_PAD4(inf_len) : 0;
+	struct xp *xp = spp->xp.xp;
+	uint32_t *aspid = spp->aspid ? &spp->aspid : NULL;
+	
+	mp = ua_build_asps_aspdn_ack(q, xp->ppi, aspid, inf_ptr, inf_len);
 
-	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
-
-		p[0] = UA_ASPS_ASPDN_ACK;
-		p[1] = htonl(mlen);
-		p += 2;
-		if (aspid) {
-			p[0] = UA_PARM_ASPID;
-			p[1] = htonl(*aspid);
-			p += 2;
-		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
-		freeb(mp);
-		return (err);
-	}
-	return (-ENOBUFS);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /**
- * ua_send_asps_hbeat_ack: - send BEAT Ack message (UA_ASPS_HBEAT_ACK)
+ * ua_build_asps_hbeat_ack: - build BEAT Ack message (UA_ASPS_HBEAT_ACK)
  * @q: active queue
- * @xp: transport on which to send
+ * @ppi: protocol payload identifier
  * @hbt_ptr: Heartbeat Data pointer
  * @hbt_len: Heartbeat Data length
  */
-STATIC INLINE int
-ua_send_asps_hbeat_ack(queue_t *q, struct xp *xp, uchar *hbt_ptr, size_t hbt_len)
+STATIC INLINE mblk_t *
+ua_build_asps_hbeat_ack(queue_t *q, uint32_t ppi, uchar *hbt_ptr, size_t hbt_len)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + hbt_len ? UA_PHDR_SIZE + UA_PAD4(hbt_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_ASPS_HBEAT_ACK;
-		p[1] = htonl(mlen);
-		p += 2;
-		if (hbt_len) {
-			*p++ = UA_PHDR(UA_PARM_HBDATA, hbt_len);
-			bcopy(hbt_ptr, p, hbt_len);
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_ASPS_HBEAT_ACK;
+			p[1] = htonl(mlen);
+			p += 2;
+			if (hbt_len) {
+				*p++ = UA_PHDR(UA_PARM_HBDATA, hbt_len);
+				bcopy(hbt_ptr, p, hbt_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(hbt_len);
+			mb->b_cont = mp;
+			return (mb);
 		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(hbt_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 
 /**
- * ua_send_aspt_aspac_req: - send ASP Active message (UA_ASPT_ASPAC_REQ)
- * @q: active queue
+ * ua_send_asps_hbeat_ack: - send BEAT Ack message (UA_ASPS_HBEAT_ACK)
  * @xp: transport on which to send
+ * @q: active queue
+ * @hbt_ptr: Heartbeat Data pointer
+ * @hbt_len: Heartbeat Data length
+ */
+STATIC INLINE int
+ua_send_asps_hbeat_ack(struct xp *xp, queue_t *q, uchar *hbt_ptr, size_t hbt_len)
+{
+	mblk_t *mp = ua_build_asps_hbeat_ack(q, xp->ppi, hbt_ptr, hbt_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_aspt_aspac_req: - build ASP Active message (UA_ASPT_ASPAC_REQ)
+ * @q: active queue
+ * @ppi: protocol payload identifier
  * @tmode: traffic mode
  * @iid: interface ids
  * @num_iid: number of interface ids
@@ -3221,9 +2149,9 @@ ua_send_asps_hbeat_ack(queue_t *q, struct xp *xp, uchar *hbt_ptr, size_t hbt_len
  * the type of the xp to determine whether to interpret the list of 32-bit
  * identifiers as interface ids or as routing contexts.
  */
-STATIC INLINE int
-ua_send_aspt_aspac_req(queue_t *q, struct xp *xp, uint32_t tmode, uint32_t *iid, size_t num_iid,
-		       uint32_t *rc, size_t num_rc, uchar *inf_ptr, size_t inf_len)
+STATIC INLINE mblk_t *
+ua_build_aspt_aspac_req(queue_t *q, uint32_t ppi, uint32_t tmode, uint32_t *iid, size_t num_iid,
+			uint32_t *rc, size_t num_rc, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
 	size_t mlen =
@@ -3231,100 +2159,226 @@ ua_send_aspt_aspac_req(queue_t *q, struct xp *xp, uint32_t tmode, uint32_t *iid,
 	    num_iid * sizeof(uint32_t) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_ASPT_ASPAC_REQ;
-		p[1] = htonl(mlen);
-		p[2] = UA_PARM_TMODE;
-		p[3] = htonl(tmode);
-		p += 4;
-		if (num_iid) {
-			uint32_t *ip = iid;
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, iid ? *iid : rc ? *rc : 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-			*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
-			while (num_iid--)
-				*p++ = htonl(*ip++);
-		}
-		if (num_rc) {
-			uint32_t *rcp = rc;
-			*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
-			while (num_rc--)
-				*p++ = htonl(*rcp++);
-		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			p[0] = UA_ASPT_ASPAC_REQ;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_TMODE;
+			p[3] = htonl(tmode);
+			p += 4;
+			if (num_iid) {
+				uint32_t *ip = iid;
 
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, iid ? *iid : rc ? *rc : 0, mp)) >= 0)
-			return (QR_DONE);
+				*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+				while (num_iid--)
+					*p++ = *ip++;	/* already network byte order */
+			}
+			if (num_rc) {
+				uint32_t *rcp = rc;
+				*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
+				while (num_rc--)
+					*p++ = *rcp++;	/* already network byte order */
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+
+/**
+ * ua_send_aspt_aspac_req: - send ASP Active message (UA_ASPT_ASPAC_REQ)
+ * @gp: ASP/AS or SPP/AS relation for which to send
+ * @q: active queue
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE int
+ua_send_aspt_aspac_req(struct gp *gp, queue_t *q, uchar *inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct spp *spp = gp->spp.spp;
+	struct xp *xp = spp->xp.xp;
+	struct as *as = gp->as.as;
+	uint32_t tmode = as->tmode;
+	uint32_t *iid, *rc, iid_val, rc_val;
+	size_t num_iid, num_rc;
+	uint32_t ppi;
+
+	switch (as->level) {
+	case AS_LEVEL_IUA:
+		ppi = IUA_PPI;
+		goto do_iid;
+	case AS_LEVEL_M2UA:
+		ppi = M2UA_PPI;
+		goto do_iid;
+	      do_iid:
+		iid_val = htonl(as->iid);
+		iid = &iid_val;
+		num_iid = 1;
+		rc_val = 0;
+		rc = NULL;
+		num_rc = 0;
+		break;
+	default:
+		swerr();
+		pp = 0;
+		goto do_rc;
+	case AS_LEVEL_M3UA:
+		ppi = M3UA_PPI;
+		goto do_rc;
+	case AS_LEVEL_SUA:
+		ppi = SUA_PPI;
+		goto do_rc;
+	case AS_LEVEL_TUA:
+		ppi = TUA_PPI;
+		goto do_rc;
+	      do_rc:
+		iid_val = 0;
+		iid = NULL;
+		num_iid = 0;
+		rc_val = htonl(as->rc);
+		rc = &rc_val;
+		num_rc = 1;
+		break;
+	}
+
+	mp = ua_build_aspt_aspac_req(q, ppi, tmode, iid, num_iid, rc, num_rc, inf_ptr, inf_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_aspt_aspia_req: - build ASP Inactive message (UA_ASPT_ASPIA_REQ)
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @iid: interface identifiers
+ * @num_iid: number of interface identifiers
+ * @rc: routing contexts
+ * @num_rc: number of routing contexts
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE mblk_t *
+ua_build_aspt_aspia_req(queue_t *q, uint32_t ppi, uint32_t *iid, size_t num_iid,
+			uint32_t *rc, size_t num_rc, uchar *inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	size_t mlen =
+	    UA_MHDR_SIZE + num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
+	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, iid ? *iid : rc ? *rc : 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_ASPT_ASPIA_REQ;
+			p[1] = htonl(mlen);
+			p += 2;
+			if (num_iid) {
+				uint32_t *ip = iid;
+
+				*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+				while (num_iid--)
+					*p++ = *ip++;	/* already network byte order */
+			}
+			if (num_rc) {
+				uint32_t *rcp = rc;
+
+				*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
+				while (num_rc--)
+					*p++ = *rcp++;	/* already network byte order */
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
 }
 
 /**
  * ua_send_aspt_aspia_req: - send ASP Inactive message (UA_ASPT_ASPIA_REQ)
+ * @gp: ASP/AS or SPP/AS relation for which to send message
  * @q: active queue
- * @xp: transport on which to send
- * @iid: interface identifiers
- * @num_iid: number of interface identifiers
- * @rc: routing contexts
- * @num_rc: number of routing contexts
  * @inf_ptr: INFO pointer
  * @inf_len: INFO length
  */
 STATIC INLINE int
-ua_send_aspt_aspia_req(queue_t *q, struct xp *xp, uint32_t *iid, size_t num_iid,
-		       uint32_t *rc, size_t num_rc, uchar *inf_ptr, size_t inf_len)
+ua_send_aspt_aspia_req(struct gp *gp, queue_t *q, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen =
-	    UA_MHDR_SIZE + num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
-	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+	struct spp *spp = gp->spp.spp;
+	struct xp *xp = spp->xp.xp;
+	struct as *as = gp->as.as;
+	uint32_t *iid, *rc, iid_val, rc_val;
+	size_t num_iid, num_rc;
+	uint32_t ppi;
 
-	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
-
-		p[0] = UA_ASPT_ASPIA_REQ;
-		p[1] = htonl(mlen);
-		p += 2;
-		if (num_iid) {
-			uint32_t *ip = iid;
-
-			*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
-			while (num_iid--)
-				*p++ = htonl(*ip++);
-		}
-		if (num_rc) {
-			uint32_t *rcp = rc;
-
-			*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
-			while (num_rc--)
-				*p++ = htonl(*rcp++);
-		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, iid ? *iid : rc ? *rc : 0, mp)) >= 0)
-			return (QR_DONE);
-		freeb(mp);
-		return (err);
+	switch (as->level) {
+	case AS_LEVEL_IUA:
+		ppi = IUA_PPI;
+		goto do_iid;
+	case AS_LEVEL_M2UA:
+		ppi = M2UA_PPI;
+		goto do_iid;
+	      do_iid:
+		iid_val = htonl(as->iid);
+		iid = &iid_val;
+		num_iid = 1;
+		rc_val = 0;
+		rc = NULL;
+		num_rc = 0;
+		break;
+	default:
+		swerr();
+		pp = 0;
+		goto do_rc;
+	case AS_LEVEL_M3UA:
+		ppi = M3UA_PPI;
+		goto do_rc;
+	case AS_LEVEL_SUA:
+		ppi = SUA_PPI;
+		goto do_rc;
+	case AS_LEVEL_TUA:
+		ppi = TUA_PPI;
+		goto do_rc;
+	      do_rc:
+		iid_val = 0;
+		iid = NULL;
+		num_iid = 0;
+		rc_val = htonl(as->rc);
+		rc = &rc_val;
+		num_rc = 1;
+		break;
 	}
-	return (-ENOBUFS);
+
+	mp = ua_build_aspt_aspia_req(q, ppi, iid, num_iid, rc, num_rc, inf_ptr, inf_len);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /**
- * ua_send_aspt_aspac_ack: - send ASP Inactive Ack message (UA_ASPT_ASPAC_ACK)
+ * ua_build_aspt_aspac_ack: - build ASP Inactive Ack message (UA_ASPT_ASPAC_ACK)
  * @q: active queue
- * @xp: transport in which to send
+ * @ppi: protocol payload identifier
  * @iid: interface identifiers
  * @num_iid: number of interface identifiers
  * @rc: routing contexts
@@ -3332,9 +2386,9 @@ ua_send_aspt_aspia_req(queue_t *q, struct xp *xp, uint32_t *iid, size_t num_iid,
  * @inf_ptr: INFO pointer
  * @inf_len: INFO length
  */
-STATIC INLINE int
-ua_send_aspt_aspac_ack(queue_t *q, struct xp *xp, uint tmode, uint32_t *iid, size_t num_iid,
-		       uint32_t *rc, size_t num_rc, uchar *inf_ptr, size_t inf_len)
+STATIC INLINE mblk_t *
+ua_build_aspt_aspac_ack(queue_t *q, uint32_t ppi, uint tmode, uint32_t *iid, size_t num_iid,
+			uint32_t *rc, size_t num_rc, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
 	size_t mlen =
@@ -3342,45 +2396,109 @@ ua_send_aspt_aspac_ack(queue_t *q, struct xp *xp, uint tmode, uint32_t *iid, siz
 	    num_iid * sizeof(uint32_t) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_ASPT_ASPAC_ACK;
-		p[1] = htonl(mlen);
-		p[2] = UA_PARM_TMODE;
-		p[3] = htonl(tmode);
-		p += 4;
-		if (num_iid) {
-			uint32_t *ip = iid;
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, iid ? *iid : rc ? *rc : 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-			*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
-			while (num_iid--)
-				*p++ = htonl(*ip++);
-		}
-		if (num_rc) {
-			uint32_t *rcp = rc;
-			*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
-			while (num_rc--)
-				*p++ = htonl(*rcp++);
-		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			p[0] = UA_ASPT_ASPAC_ACK;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_TMODE;
+			p[3] = htonl(tmode);
+			p += 4;
+			if (num_iid) {
+				uint32_t *ip = iid;
 
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, iid ? *iid : rc ? *rc : 0, mp)) >= 0)
-			return (QR_DONE);
+				*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+				while (num_iid--)
+					*p++ = *ip++;	/* already network byte order */
+			}
+			if (num_rc) {
+				uint32_t *rcp = rc;
+				*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
+				while (num_rc--)
+					*p++ = *rcp++;	/* already network byte order */
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 
 /**
- * ua_send_aspt_apia_ack: - send ASP Inactive Ack message (UA_ASPT_ASPIA_ACK)
+ * ua_send_aspt_aspac_ack: - send ASP Inactive Ack message (UA_ASPT_ASPAC_ACK)
+ * @gp: SGP/AS or SPP/AS relation for which to send message
  * @q: active queue
- * @xp: transport in which to send
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE int
+ua_send_aspt_aspac_ack(struct gp *gp, queue_t *q, uchar *inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct spp *spp = gp->spp.spp;
+	struct xp *xp = spp->xp.xp;
+	struct as *as = gp->as.as;
+	uint32_t tmode = as->tmode;
+	uint32_t *iid, *rc, iid_val, rc_val;
+	size_t num_iid, num_rc;
+	uint32_t ppi;
+
+	switch (as->level) {
+	case AS_LEVEL_IUA:
+		ppi = IUA_PPI;
+		goto do_iid;
+	case AS_LEVEL_M2UA:
+		ppi = M2UA_PPI;
+		goto do_iid;
+	      do_iid:
+		iid_val = htonl(as->iid);
+		iid = &iid_val;
+		num_iid = 1;
+		rc_val = 0;
+		rc = NULL;
+		num_rc = 0;
+		break;
+	default:
+		swerr();
+		pp = 0;
+		goto do_rc;
+	case AS_LEVEL_M3UA:
+		ppi = M3UA_PPI;
+		goto do_rc;
+	case AS_LEVEL_SUA:
+		ppi = SUA_PPI;
+		goto do_rc;
+	case AS_LEVEL_TUA:
+		ppi = TUA_PPI;
+		goto do_rc;
+	      do_rc:
+		iid_val = 0;
+		iid = NULL;
+		num_iid = 0;
+		rc_val = htonl(as->rc);
+		rc = &rc_val;
+		num_rc = 1;
+		break;
+	}
+
+	mp = ua_build_aspt_aspac_ack(q, ppi, tmode, iid, num_iid, rc, num_rc, inf_ptr, inf_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_aspt_apia_ack: - build ASP Inactive Ack message (UA_ASPT_ASPIA_ACK)
+ * @q: active queue
+ * @ppi: protocol payload identifier
  * @iid: interface identifiers
  * @num_iid: number of interface identifiers
  * @rc: routing contexts
@@ -3388,9 +2506,9 @@ ua_send_aspt_aspac_ack(queue_t *q, struct xp *xp, uint tmode, uint32_t *iid, siz
  * @inf_ptr: INFO pointer
  * @inf_len: INFO length
  */
-STATIC INLINE int
-ua_send_aspt_aspia_ack(queue_t *q, struct xp *xp, uint32_t *iid, size_t num_iid, uint32_t *rc,
-		       size_t num_rc, uchar *inf_ptr, size_t inf_len)
+STATIC INLINE mblk_t *
+ua_build_aspt_aspia_ack(queue_t *q, uint32_t ppi, uint32_t *iid, size_t num_iid, uint32_t *rc,
+			size_t num_rc, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
 	size_t mlen =
@@ -3398,43 +2516,106 @@ ua_send_aspt_aspia_ack(queue_t *q, struct xp *xp, uint32_t *iid, size_t num_iid,
 	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_ASPT_ASPIA_ACK;
-		p[1] = htonl(mlen);
-		p += 2;
-		if (num_iid) {
-			uint32_t *ip = iid;
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, iid ? *iid : rc ? *rc : 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-			*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
-			while (num_iid--)
-				*p++ = htonl(*ip++);
-		}
-		if (num_rc) {
-			uint32_t *rcp = rc;
-			*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
-			while (num_rc--)
-				*p++ = htonl(*rcp++);
-		}
-		if (inf_len) {
-			*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
-			bcopy(inf_ptr, p, inf_len);
-		}
-		mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			p[0] = UA_ASPT_ASPIA_ACK;
+			p[1] = htonl(mlen);
+			p += 2;
+			if (num_iid) {
+				uint32_t *ip = iid;
 
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, iid ? *iid : rc ? *rc : 0, mp)) >= 0)
-			return (QR_DONE);
+				*p++ = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+				while (num_iid--)
+					*p++ = *ip++;	/* already network byte order */
+			}
+			if (num_rc) {
+				uint32_t *rcp = rc;
+				*p++ = UA_PHDR(UA_PARM_RC, num_rc * sizeof(uint32_t));
+				while (num_rc--)
+					*p++ = *rcp++;	/* already network byte order */
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+
+/**
+ * ua_send_aspt_apia_ack: - send ASP Inactive Ack message (UA_ASPT_ASPIA_ACK)
+ * @gp: SGP/AS or SPP/AS relation for which to send message
+ * @q: active queue
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE int
+ua_send_aspt_aspia_ack(struct gp *gp, queue_t *q, uchar *inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct spp *spp = gp->spp.spp;
+	struct xp *xp = spp->xp.xp;
+	struct as *as = gp->as.as;
+	uint32_t *iid, *rc, iid_val, rc_val;
+	size_t num_iid, num_rc;
+	uint32_t ppi;
+
+	switch (as->level) {
+	case AS_LEVEL_IUA:
+		ppi = IUA_PPI;
+		goto do_iid;
+	case AS_LEVEL_M2UA:
+		ppi = M2UA_PPI;
+		goto do_iid;
+	      do_iid:
+		iid_val = htonl(as->iid);
+		iid = &iid_val;
+		num_iid = 1;
+		rc_val = 0;
+		rc = NULL;
+		num_rc = 0;
+		break;
+	default:
+		swerr();
+		pp = 0;
+		goto do_rc;
+	case AS_LEVEL_M3UA:
+		ppi = M3UA_PPI;
+		goto do_rc;
+	case AS_LEVEL_SUA:
+		ppi = SUA_PPI;
+		goto do_rc;
+	case AS_LEVEL_TUA:
+		ppi = TUA_PPI;
+		goto do_rc;
+	      do_rc:
+		iid_val = 0;
+		iid = NULL;
+		num_iid = 0;
+		rc_val = htonl(as->rc);
+		rc = &rc_val;
+		num_rc = 1;
+		break;
+	}
+
+	mp = ua_build_aspt_aspia_ack(q, ppi, iid, num_iid, rc, num_rc, inf_ptr, inf_len);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /**
  * ua_send_rkmm_reg_req: - send REG REQ message (UA_RKMM_REG_REQ)
+ * @ppi: protocol payload identifier
  * @q: active queue
- * @xp: transport on which to send
  * @id: request identifier
  * @sdti: signalling data terminal identifier
  * @sdli: signalling data link identifier
@@ -3442,38 +2623,262 @@ ua_send_aspt_aspia_ack(queue_t *q, struct xp *xp, uint32_t *iid, size_t num_iid,
  * FIXME: This is specific to M2UA.
  */
 STATIC INLINE int
-ua_send_rkmm_reg_req(queue_t *q, struct xp *xp, uint32_t id, uint32_t sdti, uint32_t sdli)
+m2ua_build_rkmm_reg_req(queue_t *q, uint32_t ppi, struct ua_key *key, size_t num_keys)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(M2UA_PARM_LINK_KEY);
 
-	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
-
-		p[0] = UA_RKMM_REG_REQ;
-		p[1] = __constant_htonl(mlen);
-		p[2] = M2UA_PARM_LINK_KEY;
-		p[3] = M2UA_PARM_LOC_KEY_ID;
-		p[4] = htonl(id);
-		p[5] = M2UA_PARM_SDTI;
-		p[6] = htonl(sdti);
-		p[7] = M2UA_PARM_SDLI;
-		p[8] = htonl(sdli);
-		mp->b_wptr = (unsigned char *) &p[9];
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
-		freeb(mp);
-		return (err);
+	if (num_keys != 1) {
+		swerr();
+		return (-EFAULT);
 	}
-	return (-ENOBUFS);
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_RKMM_REG_REQ;
+			p[1] = __constant_htonl(mlen);
+			p[2] = M2UA_PARM_LINK_KEY;
+			p[3] = M2UA_PARM_LOC_KEY_ID;
+			p[4] = htonl(key->id);
+			p[5] = M2UA_PARM_SDTI;
+			p[6] = htonl(key->m2ua.sdti);
+			p[7] = M2UA_PARM_SDLI;
+			p[8] = htonl(key->m2ua.sdli);
+			mp->b_wptr = (unsigned char *) &p[9];
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+STATIC INLINE mblk_t *
+m3ua_build_rkmm_reg_req(queue_t *q, uint32_t ppi, struct ua_key *key, size_t num_keys)
+{
+	mblk_t *mp;
+	int i, j;
+	size_t klen[num_keys] = { 0, };
+	size_t mlen = UA_HDR_SIZE;
+
+	for (i = 0; i < num_keys; i++) {
+		klen[i] = UA_PHDR_SIZE + (key[i].m3ua.rc == -1) ? 0 : UA_SIZE(UA_PARM_RC)
+		    + (key[i].m3ua.tmode == -1) ? 0 : UA_SIZE(UA_PARM_TMODE)
+		    + (key[i].m3ua.na == -1) ? 0 : UA_SIZE(M3UA_PARM_NTWK_APP)
+		    + (key[i].m3ua.si_num) ? UA_PHDR_SIZE + UA_PAD4(key[i].m3ua.si_num) : 0
+		    + (key[i].m3ua.opc_num) ? UA_PHDR_SIZE + (key[i].m3ua.opc_num << 2) : 0
+		    + UA_SIZE(M3UA_PARM_DPC);
+		mlen += klen[i];
+	}
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_RKMM_REG_REQ;
+			p[1] = htonl(mlen);
+			p += 2;
+
+			for (i = 0; i < num_keys; i++) {
+				p[0] = UA_PHDR(M3UA_PARM_ROUTING_KEY, klen[i]);
+				p[1] = M3UA_PARM_LOC_KEY_ID;
+				p[2] = htonl(key->id);
+				p += 3;
+				if (key[i].m3ua.rc != -1) {
+					p[0] = UA_PARM_RC;
+					p[1] = htonl(key[i].m3ua.rc);
+					p += 2;
+				}
+				if (key[i].m3ua.tmode != -1) {
+					p[0] = UA_PARM_TMODE;
+					p[1] = htonl(key[i].m3ua.tmod);
+					p += 2;
+				}
+				if (key[i].m3ua.na != -1) {
+					p[0] = M3UA_PARM_NTWK_APP;
+					p[1] = htonl(key[i].m3ua.na);
+					p += 2;
+				}
+				p[0] = M3UA_PARM_DPC;
+				p[1] = htonl(key[i].m3ua.dpc);
+				p += 2;
+				if (key[i].m3ua.si_num) {
+					*p++ = UA_PHDR(M3UA_PARM_SI, key[i].m3ua.si_num);
+					for (j = 0; j < (key[i].m3ua.si_num + 3) >> 2; j++)
+						*p++ = htonl(key[i].m3ua.si[j]);
+				}
+				if (key[i].m3ua.opc_num) {
+					*p++ =
+					    UA_PHDR(M3UA_PARM_OPC_LIST, key[i].m3ua.opc_num << 2);
+					for (j = 0; j < key[i].m3ua.opc_num; j++)
+						*p++ = htonl(key[i].m3ua.opc[j]);
+				}
+			}
+			mp->b_wptr = (unsigned char *) p;
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+STATIC INLINE mblk_t *
+sua_build_rkmm_reg_req(queue_t *q, uint32_t ppi, struct ua_key *key, size_t num_keys)
+{
+	mblk_t *mp;
+	int i, j;
+	size_t klen[num_keys] = { 0, };
+	size_t mlen = UA_HDR_SIZE;
+
+	for (i = 0; i < num_keys; i++) {
+		klen[i] = UA_PHDR_SIZE + 0;
+		mlen += klen[i];
+	}
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_RKMM_REG_REQ;
+			p[1] = htonl(mlen);
+			p += 2;
+
+			/* FIXME: build up routing key */
+
+			mp->b_wptr = (unsigned char *) p;
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+STATIC INLINE mblk_t *
+tua_build_rkmm_reg_req(queue_t *q, uint32_t ppi, struct ua_key *key, size_t num_keys)
+{
+	mblk_t *mp;
+	int i, j;
+	size_t klen[num_keys] = { 0, };
+	size_t mlen = UA_HDR_SIZE;
+
+	for (i = 0; i < num_keys; i++) {
+		klen[i] = UA_PHDR_SIZE + 0;
+		mlen += klen[i];
+	}
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_RKMM_REG_REQ;
+			p[1] = htonl(mlen);
+			p += 2;
+
+			/* FIXME: build up routing key */
+
+			mp->b_wptr = (unsigned char *) p;
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+
+STATIC INLINE mblk_t *
+ua_build_rkmm_reg_req(queue_t *q, uint32_t ppi, struct ua_key *key, size_t num_keys)
+{
+	switch (ppi) {
+	default:
+		never();
+		return (-EFAULT);
+	case M2UA_PPI:
+		return m2ua_build_rkmm_reg_req(q, ppi, key, num_keys);
+	case M3UA_PPI:
+		return m3ua_build_rkmm_reg_req(q, ppi, key, num_keys);
+	case SUA_PPI:
+		return sua_build_rkmm_reg_req(q, ppi, key, num_keys);
+	case TUA_PPI:
+		return tua_build_rkmm_reg_req(q, ppi, key, num_keys);
+	}
+}
+
+STATIC INLINE int
+ua_send_rkmm_reg_req(struct xp *xp, queue_t *q, struct ua_key *key, size_t num_keys)
+{
+	mblk_t *mp;
+
+	mp = ua_build_rkmm_reg_req(q, xp->ppi, key, num_keys);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_rkmm_reg_rsp: - build REG RESP message (UA_RKMM_REG_RSP)
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @id: request identifier
+ * @status: request status
+ * @iid: interface id
+ * @rc: routing context
+ *
+ * FIXME: This is still M2UA specific.
+ */
+STATIC INLINE mblk_t *
+ua_build_rkmm_reg_rsp(queue_t *q, uint32_t ppi, uint32_t id, uint32_t status, uint32_t *iid,
+		      uint32_t *rc)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(M2UA_PARM_REG_RESULT);
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_RKMM_REG_RSP;
+			p[1] = __constant_htonl(mlen);
+			p[2] = M2UA_PARM_REG_RESULT;
+			p[3] = M2UA_PARM_LOC_KEY_ID;
+			p[4] = htonl(id);
+			p[5] = M2UA_PARM_REG_STATUS;
+			p[6] = htonl(status);
+			p += 7;
+			if (iid) {
+				p[0] = UA_PARM_IID;
+				p[1] = *iid;	/* already network byte order */
+				p += 2;
+			}
+			if (rc) {
+				p[0] = UA_PARM_RC;
+				p[1] = *rc;	/* already network byte order */
+				p += 2;
+			}
+			mp->b_wptr = (unsigned char *) p;
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
 }
 
 /**
  * ua_send_rkmm_reg_rsp: - send REG RESP message (UA_RKMM_REG_RSP)
- * @q: active queue
  * @xp: transport on which to send
+ * @q: active queue
  * @id: request identifier
  * @status: request status
  * @iid: interface id
@@ -3482,214 +2887,891 @@ ua_send_rkmm_reg_req(queue_t *q, struct xp *xp, uint32_t id, uint32_t sdti, uint
  * FIXME: This is still M2UA specific.
  */
 STATIC INLINE int
-ua_send_rkmm_reg_rsp(queue_t *q, struct xp *xp, uint32_t id, uint32_t status, uint32_t *iid,
+ua_send_rkmm_reg_rsp(struct xp *xp, queue_t *q, uint32_t id, uint32_t status, uint32_t *iid,
 		     uint32_t *rc)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE + UA_SIZE(M2UA_PARM_REG_RESULT);
 
-	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
-
-		p[0] = UA_RKMM_REG_RSP;
-		p[1] = __constant_htonl(mlen);
-		p[2] = M2UA_PARM_REG_RESULT;
-		p[3] = M2UA_PARM_LOC_KEY_ID;
-		p[4] = htonl(id);
-		p[5] = M2UA_PARM_REG_STATUS;
-		p[6] = htonl(status);
-		p += 7;
-		if (iid) {
-			p[0] = UA_PARM_IID;
-			p[1] = htonl(*iid);
-			p += 2;
-		}
-		if (rc) {
-			p[0] = UA_PARM_RC;
-			p[1] = htonl(*rc);
-			p += 2;
-		}
-		mp->b_wptr = (unsigned char *) p;
-
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
-		freeb(mp);
-		return (err);
-	}
-	return (-ENOBUFS);
+	mp = ua_build_rkmm_reg_rsp(q, xp->ppi, id, status, iid, rc);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /**
- * ua_send_rkmm_dereg_req: - send DEREG REQ message (UA_RKMM_DEREG_REQ)
+ * ua_build_rkmm_dereg_req: - build DEREG REQ message (UA_RKMM_DEREG_REQ)
  * @q: active queue
- * @xp: transport on which to send
+ * @ppi: protocol payload identifier
  * @iid: interface identifier
  * @rc: routing context
  */
-STATIC INLINE int
-ua_send_rkmm_dereg_req(queue_t *q, struct xp *xp, uint32_t *iid, uint32_t *rc)
+STATIC INLINE mblk_t *
+ua_build_rkmm_dereg_req(queue_t *q, uint32_t ppi, uint32_t *iid, uint32_t *rc)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_RKMM_DEREG_REQ;
-		p[1] = __constant_htonl(mlen);
-		p += 2;
-		if (iid) {
-			p[0] = UA_PARM_IID;
-			p[1] = htonl(*iid);
-			p += 2;
-		}
-		if (rc) {
-			p[0] = UA_PARM_RC;
-			p[1] = htonl(*rc);
-			p += 2;
-		}
-		mp->b_wptr = (unsigned char *) p;
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = UA_RKMM_DEREG_REQ;
+			p[1] = __constant_htonl(mlen);
+			p += 2;
+			if (iid) {
+				p[0] = UA_PARM_IID;
+				p[1] = *iid;	/* already network byte order */
+				p += 2;
+			}
+			if (rc) {
+				p[0] = UA_PARM_RC;
+				p[1] = *rc;	/* already network byte order */
+				p += 2;
+			}
+			mp->b_wptr = (unsigned char *) p;
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+
+/**
+ * ua_send_rkmm_dereg_req: - send DEREG REQ message (UA_RKMM_DEREG_REQ)
+ * @xp: transport on which to send
+ * @q: active queue
+ * @iid: interface identifier
+ * @rc: routing context
+ */
+STATIC INLINE int
+ua_send_rkmm_dereg_req(struct xp *xp, queue_t *q, uint32_t *iid, uint32_t *rc)
+{
+	mblk_t *mp;
+
+	mp = ua_build_rkmm_dereg_req(q, xp->ppi, iid, rc);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_rkmm_dereg_rsp: - build DEREG RESP message (UA_RKMM_DEREG_RSP)
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @num_rciid: number of routing contexts or interface identifiers and results
+ * @rciid: routing context or interface identifiers
+ * @status: deregistration status
+ */
+STATIC INLINE mblk_t *
+ua_build_rkmm_dereg_rsp(queue_t *q, uint32_t ppi, size_t num_rciid, uint32_t *rciid,
+			uint32_t *status)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + num_rciid * UA_SIZE(UA_PARM_DEREG_RESULT);
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, 0))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+			int i;
+
+			p[0] = UA_RKMM_DEREG_RSP;
+			p[1] = __constant_htonl(mlen);
+			p += 2;
+			for (i = 0; i < num_rciid; i++) {
+				switch (ppi) {
+				case M2UA_PPI:
+					p[0] = M2UA_PARM_DEREG_RESULT;
+					p[1] = UA_PARM_IID;
+					p[2] = rciid[i];	/* already network byte order */
+					p[3] = M2UA_PARM_DEREG_STATUS;
+					p[4] = status[i];	/* already network byte order */
+					p += 5;
+					break;
+				case M3UA_PPI:
+					p[0] = M3UA_PARM_DEREG_RESULT;
+					p[1] = UA_PARM_RC;
+					p[2] = rciid[i];	/* already network byte order */
+					p[3] = M3UA_PARM_DEREG_STATUS;
+					p[4] = status[i];	/* already network byte order */
+					p += 5;
+					break;
+				default:
+					swerr();
+				case SUA_PPI:
+				case TUA_PPI:
+					p[0] = UA_PARM_DEREG_RESULT;
+					p[1] = UA_PARM_RC;
+					p[2] = rciid[i];	/* already network byte order */
+					p[3] = UA_PARM_DEREG_STATUS;
+					p[4] = status[i];	/* already network byte order */
+					p += 5;
+					break;
+				}
+			}
+			mp->b_wptr = (unsigned char *) p;
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
 }
 
 /**
  * ua_send_rkmm_dereg_rsp: - send DEREG RESP message (UA_RKMM_DEREG_RSP)
+ * @spp: SPP for which to send
  * @q: active queue
- * @xp: transport on which to send
- * @iid: interface identifier
- * @rc: routing context
- * @status: deregistration status
- *
- * FIXME: This is still M2UA specific.
+ * @num_rciid: number of rc or iid and results
+ * @rciid: list of rc or iid
+ * @status: deregistration statuses
  */
 STATIC INLINE int
-ua_send_rkmm_dereg_rsp(queue_t *q, struct xp *xp, uint32_t *iid, uint32_t *rc, uint32_t status)
+ua_send_rkmm_dereg_rsp(struct spp *spp, queue_t *q, size_t num_rciid, uint32_t *rciid, uint32_t *status)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE + UA_SIZE(M2UA_PARM_DEREG_STATUS);
+	struct xp *xp = spp->xp;
+
+	mp = ua_build_rkmm_dereg_rsp(q, xp->ppi, num_rciid, rcidd, status);
+
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/*
+ *  --------------------------------------------------------------------------
+ *
+ *  Send SNMM Messages for M3UA, SUA or TUA.
+ *
+ *  --------------------------------------------------------------------------
+ */
+/**
+ * ua_build_snmm_duna: - build UA_SNMM_DUNA message
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @rc: routing context
+ * @apc: affected point codes (if non-NULL) (network byte order)
+ * @num_apc: number of affected point codes
+ * @ssn: subsystem number (network byte order)
+ * @smi: subsystem multiplicity indicator (network byte order)
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE int
+ua_build_snmm_duna(queue_t *q, uint32_t ppi, uint32_t rc, uint32_t *apc, size_t num_apc,
+		   uint32_t *ssn, uint32_t *smi, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
+	    + (ssn ? UA_PHDR_SIZE + sizeof(*ssn) : 0)
+	    + (smi ? UA_PHDR_SIZE + sizeof(*smi) : 0)
+	    + (num_apc ? UA_PHDR_SIZE + num_apc * sizeof(*apc) : 0)
+	    + (inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = UA_RKMM_DEREG_RSP;
-		p[1] = __constant_htonl(mlen);
-		p[2] = M2UA_PARM_DEREG_RESULT;
-		p += 3;
-		if (iid) {
-			p[0] = UA_PARM_IID;
-			p[1] = htonl(*iid);
-			p += 2;
-		}
-		if (rc) {
-			p[0] = UA_PARM_IID;
-			p[1] = htonl(*rc);
-			p += 2;
-		}
-		p[0] = M2UA_PARM_DEREG_STATUS;
-		p[1] = htonl(status);
-		p += 2;
-		mp->b_wptr = (unsigned char *) p;
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, rc))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, xp, T_ODF_EX, 0, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = UA_SNMM_DUNA;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_RC;
+			p[3] = htonl(rc);
+			p += 4;
+
+			if (num_apc) {
+				uint32_t *apcp = apc;
+
+				*p++ = UA_PHDR(UA_PARM_APC, num_apc * sizeof(*apc));
+				while (num_apc--)
+					*p++ = *apcp++;	/* already network byte order */
+			}
+			if (ssn) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_SPARM_SSN;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SSN;
+					break;
+				}
+				p[1] = *ssn;	/* already network byte order */
+				p += 2;
+			}
+			if (smi) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_PARM_SMI;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SMI;
+					break;
+				}
+				p[1] = *smi;	/* already network byte order */
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 
 /**
+ * ua_send_snmm_duna: - send UA_SNMM_DUNA message
+ * @gp: SPP/AS relation for which to send
+ * @q: active queue
+ * @apc: affected point codes (if non-NULL) (network byte order)
+ * @num_apc: number of affected point codes
+ * @ssn: subsystem number (network byte order)
+ * @smi: subsystem multiplicity indicator (network byte order)
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE int
+ua_send_snmm_duna(struct gp *gp, queue_t *q, uint32_t *apc, size_t num_apc,
+		  uint32_t *ssn, uint32_t *smi, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = ua_build_snmm_duna(q, xp->ppi, gp->as.as->rc, apc, num_apc, ssn, smi, inf_ptr,
+				inf_len);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_snmm_dava: - build UA_SNMM_DAVA message
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @rc: routing context
+ * @apc: affected point code (if non-NULL) (network byte order)
+ * @num_apc: number of affected point codes
+ * @ssn: subsystem number (network byte order)
+ * @smi: subsystem multiplicity indicator (network byte order)
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE int
+ua_build_snmm_dava(queue_t *q, uint32_t ppi, uint32_t rc, uint32_t *apc, size_t num_apc,
+		   uint32_t *ssn, uint32_t *smi, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
+	    + (ssn ? UA_PHDR_SIZE + sizeof(*ssn) : 0)
+	    + (smi ? UA_PHDR_SIZE + sizeof(*smi) : 0)
+	    + (num_apc ? UA_PHDR_SIZE + num_apc * sizeof(*apc) : 0)
+	    + (inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0);
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, rc))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_SNMM_DAVA;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_RC;
+			p[3] = htonl(rc);
+			p += 4;
+
+			if (num_apc) {
+				uint32_t *apcp = apc;
+
+				*p++ = UA_PHDR(UA_PARM_APC, num_apc * sizeof(*apc));
+				while (num_apc--)
+					*p++ = *apcp++;	/* already network byte order */
+			}
+			if (ssn) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_SPARM_SSN;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SSN;
+					break;
+				}
+				p[1] = *ssn;	/* already network byte order */
+				p += 2;
+			}
+			if (smi) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_PARM_SMI;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SMI;
+					break;
+				}
+				p[1] = *smi;	/* already network byte order */
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+
+/**
+ * ua_send_snmm_dava: - send UA_SNMM_DAVA message
+ * @gp: SPP/AS relation for which to send
+ * @q: active queue
+ * @apc: affected point code (if non-NULL) (network byte order)
+ * @num_apc: number of affected point codes
+ * @ssn: subsystem number (network byte order)
+ * @smi: subsystem multiplicity indicator (network byte order)
+ * @inf_ptr: INFO pointer
+ * @inf_len: INFO length
+ */
+STATIC INLINE int
+ua_send_snmm_dava(struct gp *gp, queue_t *q, uint32_t *apc, size_t num_apc, uint32_t *ssn,
+		  uint32_t *smi, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = ua_build_snmm_dava(q, xp->ppi, gp->as.as->rc, apc, num_apc, ssn, smi, inf_ptr,
+				inf_len);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+STATIC INLINE int
+ua_send_snmm_daud(queue_t *q, uint32_t ppi, uint32_t rc, uint32_t *apc, size_t num_apc,
+		  uint32_t *ssn, uint32_t *cause, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
+	    + (ssn ? UA_PHDR_SIZE + sizeof(*ssn) : 0)
+	    + (cause ? UA_PHDR_SIZE + sizeof(*cause) : 0)
+	    + (num_apc ? UA_PHDR_SIZE + num_apc * sizeof(*apc) : 0)
+	    + (inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0);
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, rc))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_SNMM_DAUD;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_RC;
+			p[3] = htonl(rc);
+			p += 4;
+
+			if (num_apc) {
+				uint32_t *apcp = apc;
+
+				*p++ = UA_PHDR(UA_PARM_APC, num_apc * sizeof(*apc));
+				while (num_apc--)
+					*p++ = *apcp++;	/* already network byte order */
+			}
+			if (ssn) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_SPARM_SSN;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SSN;
+					break;
+				}
+				p[1] = *ssn;	/* already network byte order */
+				p += 2;
+			}
+			if (cause) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					/* I really don't know why this parameter was included as
+					   optional in RFC 3868. */
+					p[0] = SUA_PARM_CAUSE;
+					break;
+				}
+				p[1] = *cause;	/* already network byte order */
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+
+STATIC INLINE int
+ua_send_snmm_daud(struct gp *gp, queue_t *q, uint32_t *apc, size_t num_apc, uint32_t *ssn,
+		  uint32_t *cause, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = ua_build_snmm_daud(q, xp->ppi, gp->as.as->rc, apc, num_apc, ssn, cause, inf_ptr,
+				inf_len);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/**
+ * ua_build_snmm_scon: - build UA_SNMM_SCON message
+ * @q: active queue
+ * @ppi: protocol payload identifier
+ * @rc: routing context
+ * @cdest: concerned destination (if non-NULL) (network byte order)
+ * @cong: congestion status (if non-NULL) (network byte order)
+ * @apc: affected point codes (if non-NULL) (network byte order)
+ * @num_apc: number of affected point codes
+ * @ssn: subsystem number (if non-NULL) (network byte order)
+ * @smi: subsystem multiplicity indicator (if non-NULL) (network byte order)
+ * @inf_ptr: INFO pointer
+ * @inf_len : INFO length
+ */
+STATIC INLINE int
+ua_build_snmm_scon(queue_t *q, uint32_t ppi, uint32_t rc, uint32_t *cdest, uint32_t *cong,
+		   uint32_t *apc, size_t num_apc, uint32_t *ssn, uint32_t *smi, caddr_t inf_ptr,
+		   size_t inf_len)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
+	    + (cdest ? UA_SIZE(M3UA_PARM_CONCERN_DEST) : 0)
+	    + (cong ? UA_PDHR_SIZE + sizeof(*cong) : 0)
+	    + (ssn ? UA_PHDR_SIZE + sizeof(*ssn) : 0)
+	    + (smi ? UA_PHDR_SIZE + sizeof(*smi) : 0)
+	    + (num_apc ? UA_PHDR_SIZE + num_apc * sizeof(*apc) : 0)
+	    + (inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0);
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, rc))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_SNMM_SCON;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_RC;
+			p[3] = htonl(rc);
+			p += 4;
+
+			if (num_apc) {
+				uint32_t *apcp = apc;
+
+				*p++ = UA_PHDR(UA_PARM_APC, num_apc * sizeof(*apc));
+				while (num_apc--)
+					*p++ = *apcp++;	/* already network byte order */
+			}
+			if (cdest) {
+				p[0] = M3UA_PARM_CONCERN_DEST;
+				p[1] = *cdest;	/* already network byte order */
+				p += 2;
+			}
+			if (ssn) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_SPARM_SSN;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SSN;
+					break;
+				}
+				p[1] = *ssn;	/* already network byte order */
+				p += 2;
+			}
+			if (cong) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case M3UA_PPI:
+					p[0] = M3UA_PARM_CONG_IND;
+					break;
+				case SUA_PPI:
+					p[0] = SUA_PARM_CONG;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_CONG;
+					break;
+				}
+				p[1] = *cong;	/* already network byte order */
+				p += 2;
+			}
+			if (smi) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_PARM_SMI;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SMI;
+					break;
+				}
+				p[1] = *smi;	/* already network byte order */
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+
+/**
+ * ua_send_snmm_scon: - send UA_SNMM_SCON message
+ * @gp: SPP/AS relation for which to send
+ * @q: active queue
+ * @cdest: concerned destination (if non-NULL) (network byte order)
+ * @cong: congestion status (if non-NULL) (network byte order)
+ * @apc: affected point codes (if non-NULL) (network byte order)
+ * @num_apc: number of affected point codes
+ * @ssn: subsystem number (if non-NULL) (network byte order)
+ * @smi: subsystem multiplicity indicator (if non-NULL) (network byte order)
+ * @inf_ptr: INFO pointer
+ * @inf_len : INFO length
+ */
+STATIC INLINE int
+ua_send_snmm_scon(struct gp *gp, queue_t *q, uint32_t *cdest, uint32_t *cong,
+		  uint32_t *apc, size_t num_apc, uint32_t *ssn, uint32_t *smi, caddr_t inf_ptr,
+		  size_t inf_len)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = ua_send_snmm_scon(q, xp->ppi, gp->as.as->rc, cdest, cong, apc, num_apc, ssn, smi,
+			       inf_ptr, inf_len);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+STATIC INLINE mblk_t *
+ua_build_snmm_dupu(queue_t *q, uint32_t ppi, uint32_t rc, uint16_t cause, uint16_t user,
+		   uint32_t *apc, size_t num_apc, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
+	    + UA_PHDR_SIZE + sizeof(cause) + sizeof(user)
+	    + (num_apc ? UA_PHDR_SIZE + num_apc * sizeof(*apc) : 0)
+	    + (inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0);
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, rc))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_SNMM_DUPU;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_RC;
+			p[3] = htonl(rc);
+			p += 4;
+
+			if (num_apc) {
+				uint32_t *apcp = apc;
+
+				*p++ = UA_PHDR(UA_PARM_APC, num_apc * sizeof(*apc));
+				while (num_apc--)
+					*p++ = *apcp++;	/* already network byte order */
+			}
+
+			/* Thank RFC authors that cannot get together for this switch statement. */
+			switch (ppi) {
+			default:
+				swerr();
+			case M3UA_PPI:
+				p[0] = M3UA_PARM_USER_CAUSE;
+				break;
+			case SUA_PPI:
+				p[0] = SUA_PARM_CAUSE;
+				break;
+			case TUA_PPI:
+				p[0] = TUA_PARM_CAUSE;
+				break;
+			}
+			p[1] = htonl(((uint32_t) cause << 16) | (uint32_t) user);
+			p += 2;
+
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+STATIC INLINE int
+ua_send_snmm_dupu(struct gp *gp, queue_t *q, uint16_t cause, uint16_t user, uint32_t *apc,
+		  size_t num_apc, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = ua_build_snmm_scon(q, xp->ppi, gp->as.as->rc, cause, user, apc, num_apc, inf_ptr,
+				inf_len);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+STATIC INLINE mblk_t *
+ua_build_snmm_drst(queue_t *q, uint32_t ppi, uint32_t rc, uint32_t *apc, size_t num_apc,
+		   uint32_t *ssn, uint32_t *smi, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
+	    + (ssn ? UA_PHDR_SIZE + sizeof(*ssn) : 0)
+	    + (smi ? UA_PHDR_SIZE + sizeof(*smi) : 0)
+	    + (num_apc ? UA_PHDR_SIZE + num_apc * sizeof(*apc) : 0)
+	    + (inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0);
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, T_ODF_EX, ppi, rc))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_SNMM_DRST;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_RC;
+			p[3] = htonl(rc);
+			p += 4;
+
+			if (num_apc) {
+				uint32_t *apcp = apc;
+
+				*p++ = UA_PHDR(UA_PARM_APC, num_apc * sizeof(*apc));
+				while (num_apc--)
+					*p++ = *apcp++;	/* already network byte order */
+			}
+			if (ssn) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_SPARM_SSN;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SSN;
+					break;
+				}
+				p[1] = *ssn;	/* already network byte order */
+				p += 2;
+			}
+			if (smi) {
+				/* Thank RFC authors that cannot get together for this switch
+				   statement. */
+				switch (ppi) {
+				default:
+					swerr();
+				case SUA_PPI:
+					p[0] = SUA_PARM_SMI;
+					break;
+				case TUA_PPI:
+					p[0] = TUA_PARM_SMI;
+					break;
+				}
+				p[1] = *smi;	/* already network byte order */
+				p += 2;
+			}
+			if (inf_len) {
+				*p++ = UA_PHDR(UA_PARM_INFO, inf_len);
+				bcopy(inf_ptr, p, inf_len);
+			}
+			mp->b_wptr = (unsigned char *) p + UA_PAD4(inf_len);
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+
+STATIC INLINE int
+ua_send_snmm_drst(struct gp *gp, queue_t *q, uint32_t *apc, size_t num_apc, uint32_t *ssn,
+		  uint32_t *smi, caddr_t inf_ptr, size_t inf_len)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = ua_build_snmm_drst(q, xp->ppi, gp->as.as->rc, apc, num_apc, ssn, smi, inf_ptr,
+				inf_len);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/*
  *  M2UA_MAUP_DATA
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_data1(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_data1(queue_t *q, uint32_t iid, mblk_t *bp)
 {
 	mblk_t *mp;
 	size_t dlen = msgdsize(bp->b_cont);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_PHDR_SIZE;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_DATA;
-		p[1] = htonl(mlen + dlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = UA_PHDR(M2UA_PARM_DATA1, dlen);
-		mp->b_wptr = (unsigned char *) &p[5];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		mp->b_cont = bp->b_cont;
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_TRIMMED);
+			p[0] = M2UA_MAUP_DATA;
+			p[1] = htonl(mlen + dlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = UA_PHDR(M2UA_PARM_DATA1, dlen);
+			mp->b_wptr = (unsigned char *) &p[5];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 STATIC INLINE int
-m2ua_send_maup_data2(queue_t *q, struct gp *gp, mblk_t *bp)
+m2ua_send_maup_data1(struct gp *gp, queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_data1(q, gp->as.as->iid, bp);
+	return ua_send_optdata_req(xp->oq, mp, bp);
+}
+STATIC INLINE mblk_t *
+m2ua_build_maup_data2(queue_t *q, uint32_t iid, mblk_t *bp)
 {
 	mblk_t *mp;
 	size_t dlen = msgdsize(bp->b_cont);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_PHDR_SIZE;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_DATA;
-		p[1] = htonl(mlen + dlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = UA_PHDR(M2UA_PARM_DATA2, dlen);
-		mp->b_wptr = (unsigned char *) &p[5];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		mp->b_cont = bp->b_cont;
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_TRIMMED);
+			p[0] = M2UA_MAUP_DATA;
+			p[1] = htonl(mlen + dlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = UA_PHDR(M2UA_PARM_DATA2, dlen);
+			mp->b_wptr = (unsigned char *) &p[5];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_data2(struct gp *gp, queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_data2(q, gp->as.as->iid, bp);
+	return ua_send_optdata_req(xp->oq, mp, bp);
 }
 
 /*
  *  M2UA_MAUP_ESTAB_REQ
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_estab_req(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_estab_req(queue_t *q, uint32_t iid)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_ESTAB_REQ;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		mp->b_wptr = (unsigned char *) &p[4];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_ESTAB_REQ;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			mp->b_wptr = (unsigned char *) &p[4];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_estab_req(struct gp *gp, queue_t *q)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_estab_req(q, gp->as.as->iid);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
@@ -3697,481 +3779,506 @@ m2ua_send_maup_estab_req(queue_t *q, struct gp *gp, mblk_t *bp)
  *  -----------------------------------
  */
 STATIC INLINE int
-m2ua_send_maup_estab_con(queue_t *q, struct gp *gp, mblk_t *bp)
+m2ua_build_maup_estab_con(queue_t *q, uint32_t iid)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_ESTAB_CON;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		mp->b_wptr = (unsigned char *) &p[4];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_ESTAB_CON;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			mp->b_wptr = (unsigned char *) &p[4];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_estab_con(struct gp *gp, queue_t *q)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_estab_con(q, gp->as.as->iid);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_REL_REQ
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_rel_req(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_rel_req(queue_t *q, uint32_t iid)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_REL_REQ;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		mp->b_wptr = (unsigned char *) &p[4];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_REL_REQ;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			mp->b_wptr = (unsigned char *) &p[4];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_rel_req(struct gp *gp, queue_t *q)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_rel_req(q, gp->as.as->iid);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_REL_CON
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_rel_con(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_rel_con(queue_t *q, uint32_t iid)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_REL_CON;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		mp->b_wptr = (unsigned char *) &p[4];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_REL_CON;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			mp->b_wptr = (unsigned char *) &p[4];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_rel_con(struct gp *gp, queue_t *q)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_rel_con(q, gp->as.as->iid);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_REL_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_rel_ind(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_rel_ind(queue_t *q, uint32_t iid)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_REL_IND;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		mp->b_wptr = (unsigned char *) &p[4];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_REL_IND;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			mp->b_wptr = (unsigned char *) &p[4];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_rel_ind(struct gp *gp, queue_t *q)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_rel_ind(q, gp->as.as->iid);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_STATE_REQ
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_state_req(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_state_req(queue_t *q, uint32_t iid, const uint32_t request)
 {
 	mblk_t *mp;
 	static const size_t mlen =
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_STATE_REQUEST);
-	union SL_primitives *p = (typeof(p)) bp->b_rptr;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_STATE_REQ;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = M2UA_PARM_STATE_REQUEST;
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		switch (p->sl_primitive) {
-		case SL_EMERGENCY_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_EMER_SET);
-			break;
-		case SL_EMERGENCY_CEASES_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_EMER_CLEAR);
-			break;
-		case SL_CONTINUE_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_CONTINUE);
-			break;
-		case SL_CLEAR_BUFFERS_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_FLUSH_BUFFERS);
-			break;
-		case SL_CLEAR_RTB_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_CLEAR_RTB);
-			break;
-		case SL_LOCAL_PROCESSOR_OUTAGE_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_LPO_SET);
-			break;
-		case SL_RESUME_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_LPO_CLEAR);
-			break;
-		case SL_CONGESTION_DISCARD_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_CONG_DISCARD);
-			break;
-		case SL_CONGESTION_ACCEPT_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_CONG_ACCEPT);
-			break;
-		case SL_NO_CONGESTION_REQ:
-			p[5] = __constant_htonl(M2UA_STATUS_CONG_CLEAR);
-			break;
-		default:
-			goto efault;
+			p[0] = M2UA_MAUP_STATE_REQ;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = M2UA_PARM_STATE_REQUEST;
+			p[5] = request;	/* already network byte order */
+			mp->b_wptr = (unsigned char *) &p[6];
+			mb->b_cont = mp;
+			return (mb);
 		}
-		mp->b_wptr = (unsigned char *) &p[6];
-
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
-      efault:
-	swerr();
-	return (-EFAULT);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_state_req(struct gp *gp, queue_t *q, const uint32_t request)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_state_req(q, gp->as.as->iid, request);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_STATE_CON
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_state_con(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_state_con(queue_t *q, uint32_t iid, const uint32_t request)
 {
 	mblk_t *mp;
 	static const size_t mlen =
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_STATE_REQUEST);
-	union SL_primitives *p = (typeof(p)) bp->b_rptr;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_STATE_CON;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = M2UA_PARM_STATE_REQUEST;
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		switch (p->sl_primitive) {
-		case SL_RB_CLEARED_IND:
-			p[5] = __constant_htonl(M2UA_STATUS_FLUSH_BUFFERS);
-			break;
-		case SL_RTB_CLEARED_IND:
-			p[5] = __constant_htonl(M2UA_STATUS_CLEAR_RTB);
-			break;
-		default:
-			goto efault;
+			p[0] = M2UA_MAUP_STATE_CON;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = M2UA_PARM_STATE_REQUEST;
+			p[5] = request;	/* already network byte order */
+			mp->b_wptr = (unsigned char *) &p[6];
+			mb->b_cont = mp;
+			return (mb);
 		}
-		mp->b_wptr = (unsigned char *) &p[6];
-
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
-      efault:
-	swerr();
-	freeb(mp);
-	return (-EFAULT);
+	return (mp);
 }
 STATIC INLINE int
-m2ua_send_maup_con(queue_t *q, struct gp *gp, struct ua_msg *m)
+m2ua_send_maup_state_con(struct gp *gp, queue_t *q, const uint32_t request)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_state_con(q, gp->as.as->iid, request);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+STATIC INLINE mblk_t *
+m2ua_build_maup_con(queue_t *q, uint32_t iid, struct ua_msg *m)
 {
 	mblk_t *mp;
 	static const size_t mlen =
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_STATE_REQUEST);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_STATE_CON;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = M2UA_PARM_STATE_REQUEST;
-		p[5] = htonl(m->status.val);
-		mp->b_wptr = (unsigned char *) &p[6];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_STATE_CON;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = M2UA_PARM_STATE_REQUEST;
+			p[5] = htonl(m->status.val);
+			mp->b_wptr = (unsigned char *) &p[6];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_con(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_con(q, gp->as.as->iid, m);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_STATE_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_state_ind(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_state_ind(queue_t *q, uint32_t iid, const uint32_t event)
 {
 	mblk_t *mp;
 	static const size_t mlen =
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_STATE_EVENT);
-	union SL_primitives *p = (typeof(p)) bp->b_rptr;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_STATE_IND;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = M2UA_PARM_STATE_EVENT;
-		switch (p->sl_primitive) {
-		case SL_REMOTE_PROCESSOR_OUTAGE_IND:
-			p[5] = __constant_htonl(M2UA_EVENT_RPO_ENTER);
-			break;
-		case SL_REMOTE_PROCESSOR_RECOVERED_IND:
-			p[5] = __constant_htonl(M2UA_EVENT_RPO_EXIT);
-			break;
-		case SL_LOCAL_PROCESSOR_OUTAGE_IND:
-			p[5] = __constant_htonl(M2UA_EVENT_LPO_ENTER);
-			break;
-		case SL_LOCAL_PROCESSOR_RECOVERED_IND:
-			p[5] = __constant_htonl(M2UA_EVENT_LPO_EXIT);
-			break;
-		default:
-			goto efault;
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = M2UA_MAUP_STATE_IND;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = M2UA_PARM_STATE_EVENT;
+			p[5] = event;	/* already network byte order */
+			mp->b_wptr = (unsigned char *) &p[6];
+			mb->b_cont = mp;
+			return (mb);
 		}
-		mp->b_wptr = (unsigned char *) &p[6];
-
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
-      efault:
-	swerr();
-	return (-EFAULT);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_state_ind(struct gp *gp, queue_t *q, const uint32_t event)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_state_ind(q, gp->as.as->iid, event);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_RETR_REQ
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_retr_req(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_retr_req(queue_t *q, uint32_t iid, uint32_t *fsnc)
 {
 	mblk_t *mp;
-	union SL_primitives *p = (typeof(p)) bp->b_rptr;
-	static const size_t mlen =
-	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_ACTION) +
-	    (p->sl_primitive == SL_RETRIEVAL_REQUEST_AND_FSNC_REQ) ? UA_SIZE(M2UA_PARM_SEQNO) : 0;
+	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID)
+	    + UA_SIZE(M2UA_PARM_ACTION)
+	    + fsnc ? UA_SIZE(M2UA_PARM_SEQNO) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[1] = M2UA_MAUP_RETR_REQ;
-		p[2] = __constant_htonl(mlen);
-		p[3] = UA_PARM_IID;
-		p[4] = htonl(gp->as.as->iid);
-		p[5] = M2UA_PARM_ACTION;
-		switch (p->sl_primitive) {
-		case SL_RETRIEVE_BSNT_REQ:
-			p[6] = __constant_htonl(M2UA_ACTION_RTRV_BSN);
-			mp->b_wptr = (unsigned char *) &p[7];
-			break;
-		case SL_RETRIEVAL_REQUEST_AND_FSNC_REQ:
-			p[6] = __constant_htonl(M2UA_ACTION_RTRV_MSGS);
-			p[7] = M2UA_PARM_SEQNO;
-			p[8] = htonl(p->retrieval_req_and_fsnc.sl_fsnc);
-			mp->b_wptr = (unsigned char *) &p[9];
-			break;
-		default:
-			goto efault;
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[1] = M2UA_MAUP_RETR_REQ;
+			p[2] = __constant_htonl(mlen);
+			p[3] = UA_PARM_IID;
+			p[4] = htonl(iid);
+			p[5] = M2UA_PARM_ACTION;
+
+			if (fsnc) {
+				p[6] = __constant_htonl(M2UA_ACTION_RTRV_MSGS);
+				p[7] = M2UA_PARM_SEQNO;
+				p[8] = *fsnc;	/* already network byte order */
+				mp->b_wptr = (unsigned char *) &p[9];
+			} else {
+				p[6] = __constant_htonl(M2UA_ACTION_RTRV_BSN);
+				mp->b_wptr = (unsigned char *) &p[7];
+			}
+			mb->b_cont = mp;
+			return (mb);
 		}
-
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
-      efault:
-	swerr();
-	return (-EFAULT);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_retr_req(struct gp *gp, queue_t *q, uint32_t *fsnc)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_retr_req(q, gp->as.as->iid, fsnc);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_RETR_CON
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_retr_con(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_retr_con(queue_t *q, uint32_t iid, uint32_t action, uint32_t result, uint32_t *bsnt)
 {
 	mblk_t *mp;
-	union SL_primitives *p = (typeof(p)) bp->b_rptr;
-	size_t mlen =
-	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_ACTION) +
-	    UA_SIZE(M2UA_PARM_RETR_RESULT) + UA_SIZE(M2UA_PARM_SEQNO);
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID)
+	    + UA_SIZE(M2UA_PARM_ACTION)
+	    + UA_SIZE(M2UA_PARM_RETR_RESULT)
+	    + bsnt ? UA_SIZE(M2UA_PARM_SEQNO) : 0;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_RETR_CON;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = M2UA_PARM_ACTION;
-		switch (p->sl_primitive) {
-		case SL_BSNT_IND:
-			p[5] = __constant_htonl(M2UA_ACTION_RTRV_BSN);
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = M2UA_MAUP_RETR_CON;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = M2UA_PARM_ACTION;
+			p[5] = action;	/* already network byte order */
 			p[6] = M2UA_PARM_RETR_RESULT;
-			p[7] = __constant_htonl(UA_RESULT_SUCCESS);
-			p[8] = M2UA_PARM_SEQNO;
-			p[9] = htonl(p->bsnt_ind.sl_bsnt);
-			break;
-		case SL_BSNT_NOT_RETRIEVABLE_IND:
-			p[5] = __constant_htonl(M2UA_ACTION_RTRV_BSN);
-			p[6] = M2UA_PARM_RETR_RESULT;
-			p[7] = __constant_htonl(UA_RESULT_FAILURE);
-			p[8] = M2UA_PARM_SEQNO;
-			p[9] = htonl(p->bsnt_not_retr_ind.sl_bsnt);
-			break;
-		case SL_RETRIEVAL_NOT_POSSIBLE_IND:
-			p[5] = __constant_htonl(M2UA_ACTION_RTRV_MSGS);
-			p[6] = M2UA_PARM_RETR_RESULT;
-			p[7] = __constant_htonl(UA_RESULT_FAILURE);
-			p[8] = M2UA_PARM_SEQNO;
-			p[9] = 0;
-			break;
-		default:
-			goto efault;
+			p[7] = result;	/* already newtork byte order */
+			p += 8;
+			if (bsnt) {
+				p[0] = M2UA_PARM_SEQNO;
+				p[1] = *bsnt;	/* already network byte order */
+				p += 2;
+			}
+			mp->b_wptr = (unsigned char *) p;
+			mb->b_cont = mp;
+			return (mb);
 		}
-		mp->b_wptr = (unsigned char *) &p[10];
-
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
-      efault:
-	swerr();
-	return (-EFAULT);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_retr_con(struct gp *gp, queue_t *q, uint32_t action, uint32_t result, uint32_t *bsnt)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_retr_con(q, gp->as.as->iid, action, result, bsnt);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_RETR_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_retr_ind1(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_retr_ind1(queue_t *q, uint32_t iid, mblk_t *bp)
 {
 	mblk_t *mp;
 	size_t dlen = msgdsize(bp->b_cont);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_PHDR_SIZE;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_RETR_IND;
-		p[1] = htonl(mlen + dlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = UA_PHDR(M2UA_PARM_DATA1, dlen);
-		mp->b_wptr = (unsigned char *) &p[5];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		mp->b_cont = bp->b_cont;
-
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0) {
-			freeb(bp);
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_RETR_IND;
+			p[1] = htonl(mlen + dlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = UA_PHDR(M2UA_PARM_DATA1, dlen);
+			mp->b_wptr = (unsigned char *) &p[5];
+			mb->b_cont = mp;
+			return (mb);
 		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
 }
 STATIC INLINE int
-m2ua_send_maup_retr_ind2(queue_t *q, struct gp *gp, mblk_t *bp)
+m2ua_send_maup_retr_ind1(struct gp *gp, queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_retr_ind(q, gp->as.as->iid, bp);
+	return ua_send_optdata_req(xp->oq, mp, bp);
+}
+STATIC INLINE mblk_t *
+m2ua_build_maup_retr_ind2(queue_t *q, uint32_t iid, mblk_t *bp)
 {
 	mblk_t *mp;
 	size_t dlen = msgdsize(bp->b_cont);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_PHDR_SIZE;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_RETR_IND;
-		p[1] = htonl(mlen + dlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = UA_PHDR(M2UA_PARM_DATA2, dlen);
-		mp->b_wptr = (unsigned char *) &p[5];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		mp->b_cont = bp->b_cont;
-
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0) {
-			freeb(bp);
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_RETR_IND;
+			p[1] = htonl(mlen + dlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = UA_PHDR(M2UA_PARM_DATA2, dlen);
+			mp->b_wptr = (unsigned char *) &p[5];
+			mb->b_cont = mp;
+			return (mb);
 		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_retr_ind2(struct gp *gp, queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_retr_ind2(q, gp->as.as->iid, bp);
+	return ua_send_optdata_req(xp->oq, mp, bp);
 }
 
 /*
  *  M2UA_MAUP_RETR_COMP_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_retr_comp_ind(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_retr_comp_ind(queue_t *q, uint32_t iid)
 {
 	mblk_t *mp;
 	static const size_t mlen =
@@ -4179,33 +4286,44 @@ m2ua_send_maup_retr_comp_ind(queue_t *q, struct gp *gp, mblk_t *bp)
 	    UA_SIZE(M2UA_PARM_RETR_RESULT);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_RETR_COMP_IND;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = M2UA_PARM_ACTION;
-		p[5] = __constant_htonl(M2UA_ACTION_RTRV_MSGS);
-		p[6] = M2UA_PARM_RETR_RESULT;
-		p[7] = __constant_htonl(UA_RESULT_SUCCESS);
-		mp->b_wptr = (unsigned char *) &p[8];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_RETR_COMP_IND;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = M2UA_PARM_ACTION;
+			p[5] = __constant_htonl(M2UA_ACTION_RTRV_MSGS);
+			p[6] = M2UA_PARM_RETR_RESULT;
+			p[7] = __constant_htonl(UA_RESULT_SUCCESS);
+			mp->b_wptr = (unsigned char *) &p[8];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_retr_comp_ind(struct gp *gp, queue_t *q)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_retr_comp_ind(q, gp->as.as->iid);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
  *  M2UA_MAUP_CONG_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-m2ua_send_maup_cong_ind(queue_t *q, struct gp *gp, mblk_t *bp)
+STATIC INLINE mblk_t *
+m2ua_build_maup_cong_ind(queue_t *q, uint32_t iid, uint32_t cong, uint32_t disc)
 {
 	mblk_t *mp;
 	static const size_t mlen =
@@ -4213,41 +4331,36 @@ m2ua_send_maup_cong_ind(queue_t *q, struct gp *gp, mblk_t *bp)
 	    UA_SIZE(M2UA_PARM_DISC_STATUS);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
-		union SL_primitives *p = (typeof(p)) bp->b_rptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_CONG_IND;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		switch (p->sl_primitive) {
-		case SL_LINK_CONGESTED_IND:
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = M2UA_MAUP_CONG_IND;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
 			p[4] = M2UA_PARM_CONG_STATUS;
-			p[5] = htonl(p->link_cong_ind.sl_cong_status);
+			p[5] = htonl(cong);
 			p[6] = M2UA_PARM_DISC_STATUS;
-			p[7] = htonl(p->link_cong_ind.sl_disc_status);
-			break;
-		case SL_LINK_CONGESTION_CEASED_IND:
-			p[4] = M2UA_PARM_CONG_STATUS;
-			p[5] = mp->b_wptr += sizeof(uint32_t);
-			p[6] = M2UA_PARM_DISC_STATUS;
-			p[7] = htonl(p->link_cong_ceased_ind.sl_disc_status);
-			break;
-		default:
-			goto efault;
+			p[7] = htonl(disc);
+			mp->b_wptr = (unsigned char *) &p[8];
+			mb->b_cont = mp;
+			return (mb);
 		}
-		mp->b_wptr = (unsigned char *) &p[8];
-
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
-      efault:
-	swerr();
-	return (-EFAULT);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_cong_ind(struct gp *gp, queue_t *q, uint32_t cong, uint32_t disc)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_build_maup_cong_ind(q, gp->as.as->iid, cong, disc);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
 }
 
 /*
@@ -4255,30 +4368,101 @@ m2ua_send_maup_cong_ind(queue_t *q, struct gp *gp, mblk_t *bp)
  *  -----------------------------------
  */
 STATIC INLINE int
-m2ua_send_maup_data_ack(queue_t *q, struct gp *gp, struct ua_msg *m)
+m2ua_build_maup_data_ack(queue_t *q, uint32_t iid, struct ua_msg *m)
 {
 	mblk_t *mp;
 	static const size_t mlen =
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_CORR_ID_ACK);
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
-		int err;
-		register uint32_t *p = (typeof(p)) mp->b_wptr;
+		mblk_t *mb;
 
-		p[0] = M2UA_MAUP_DATA_ACK;
-		p[1] = __constant_htonl(mlen);
-		p[2] = UA_PARM_IID;
-		p[3] = htonl(gp->as.as->iid);
-		p[4] = M2UA_PARM_CORR_ID_ACK;
-		p[5] = htonl(m->corid.val);
-		mp->b_wptr = (unsigned char *) &p[6];
+		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		if ((err = t_optdata_req(q, gp->spp.spp->xp, 0, gp->as.as->iid, mp)) >= 0)
-			return (QR_DONE);
+			p[0] = M2UA_MAUP_DATA_ACK;
+			p[1] = __constant_htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = M2UA_PARM_CORR_ID_ACK;
+			p[5] = htonl(m->corid.val);
+			mp->b_wptr = (unsigned char *) &p[6];
+			mb->b_cont = mp;
+			return (mb);
+		}
 		freeb(mp);
-		return (err);
+		return (NULL);
 	}
-	return (-ENOBUFS);
+	return (mp);
+}
+STATIC INLINE int
+m2ua_send_maup_data_ack(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m2ua_send_maup_data_ack(q, gp->as.as->iid, m);
+	return ua_send_optdata_req(xp->oq, mp, NULL);
+}
+
+/*
+ *  M3UA_XFER_DATA
+ *  -----------------------------------
+ */
+STATIC INLINE mblk_t *
+m3ua_build_xfer_data(queue_t *q, uint32_t rc, uint32_t opc, uint32_t dpc, uint8_t si, uint8_t ni,
+		     uint8_t mp, uint8_t sls, mblk_t *bp)
+{
+	mblk_t *mp;
+	size_t dlen = msgdsize(bp->b_cont) + 3 * sizeof(uint32);
+	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC) + UA_PHDR_SIZE;
+
+	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
+		mblk_t *mb;
+
+		if ((mb = ua_build_optdata_req(q, 0, M3UA_PPI, rc))) {
+			register uint32_t *p = (typeof(p)) mp->b_wptr;
+
+			p[0] = UA_XFER_DATA;
+			p[1] = htonl(mlen + dlen);
+			p[2] = UA_PARM_RC;
+			p[3] = htonl(rc);
+			p[4] = UA_PHDR(M3UA_PARM_PROT_DATA3, dlen);
+			p[5] = htonl(opc);
+			p[6] = htonl(dpc);
+			p[7] = htonl(((uint32_t) si << 24) | ((uint32_t) ni << 16) |
+				     ((uint32_t) mp << 8) | ((uint32_t) sls << 0));
+			mp->b_wptr = (unsigned char *) &p[8];
+			mb->b_cont = mp;
+			return (mb);
+		}
+		freeb(mp);
+		return (NULL);
+	}
+	return (mp);
+}
+
+/**
+ * m3ua_send_xfer_data: - send UA_XFER_DATA message
+ * @gp: SPP/AS relation for which to send
+ * @q: active queue
+ * @opc: originating point code
+ * @dpc: destination point code
+ * @si: service indicator
+ * @ni: network indicator
+ * @mp: message priority
+ * @sls: signalling link selection
+ * @bp: MTP user data
+ */
+STATIC INLINE int
+m3ua_send_xfer_data(struct gp *gp, queue_t *q, uint32_t opc, uint32_t dpc, uint8_t si, uint8_t ni,
+		    uint8_t mp, uint8_t sls, mblk_t *bp)
+{
+	mblk_t *mp;
+	struct xp *xp = gp->spp.spp->xp.xp;
+
+	mp = m3ua_build_xfer_data(q, gp->as.as->rc, opc, dpc, si, ni, mp, sls, bp);
+	return ua_send_optdata_req(xp->oq, mp, bp);
 }
 
 /*
@@ -5091,42 +5275,105 @@ gp_clr_flags(struct gp *gp, t_uscalar_t flags)
 	gp->flags &= ~flags;
 }
 
-STATIC INLINE int gp_p_set_state(queue_t *q, struct gp *gp, t_uscalar_t newstate);
-STATIC INLINE int gp_u_set_state(queue_t *q, struct gp *gp, t_uscalar_t newstate);
+STATIC INLINE int gp_p_set_state(struct gp *gp, queue_t *q, t_uscalar_t newstate);
+STATIC INLINE int gp_u_set_state(struct gp *gp, queue_t *q, t_uscalar_t newstate);
 
+/**
+ * asp_as_p_recalc_state: - push AS-P state as a result of AS-U state changes.
+ * @as: the AS-P
+ * @q: active queue
+ *
+ * Calculate what actions are to be performed with regard to an AS-P as a result of state changes to
+ * an AS-U.  This is accomplished by determining what the overall AS-U state is an then determining
+ * if any actions are necessary to alter the AS-P state as follows:
+ *
+ *  Overall AS-U State	    Current AS-P State		Actions			Next State
+ *  ------------------	    ------------------		-------------------	--------------------
+ *  AS_DOWN or AS_INACTIVE  AS_DOWN or AS_INACTIVE	No action.		Unchanged.
+ *  AS_WACK_ASPAC	    AS_DOWN			No action.		Unchanged.
+ *  AS_WACK_ASPAC	    AS_INACTIVE			Activate provider.	AS_WACK_ASPAC
+ *  AS_WACK_ASPAC	    AS_WACK_ASPAC		No action.		Unchanged.
+ *  AS_WACK_ASPAC	    AS_WACK_ASPIA		Activate provider.	AS_WACK_ASPAC
+ *  AS_WACK_ASPAC	    AS_ACTIVE			(Not possible.)
+ *
+ */
 STATIC int
-asp_as_p_recalc_state(queue_t *q, struct as *as)
+asp_as_p_recalc_state(struct as *as, queue_t *q)
 {
+	int err;
 	struct gp *gp;
-	t_uscalar_t newstate;
+	t_uscalar_t state;
 
-	for (newstate = AS_ACTIVE; newstate && as->ap.u.counts[newstate] != 0; newstate--) ;
-	switch (newstate) {
+	/* Determine the new overall state of the AS-U. */
+
+	for (state = AS_ACTIVE; state && as->ap.counts[state] == 0; state--) ;
+	switch (state) {
 	case AS_DOWN:
+		switch (as_get_state(as)) {
+			case AS_DOWN:
+			case AS_INACTIVE:
+				return (QR_DONE); /* ignore */
+			case AS_WACK_ASPAC:
+			case AS_WACK_ASPIA:
+			case AS_ACTIVE:
+		}
 		for (gp = as->gp.list; gp; gp = gp->as.next) {
 			switch (gp_get_state(gp)) {
 			}
 		}
 		break;
 	case AS_INACTIVE:
+		switch (as_get_state(as)) {
+			case AS_DOWN:
+			case AS_INACTIVE:
+				return (QR_DONE); /* ignore */
+			case AS_WACK_ASPAC:
+			case AS_WACK_ASPIA:
+			case AS_ACTIVE:
+		}
 		for (gp = as->gp.list; gp; gp = gp->as.next) {
 			switch (gp_get_state(gp)) {
 			}
 		}
 		break;
 	case AS_WACK_ASPAC:
+		switch (as_get_state(as)) {
+			case AS_DOWN:
+			case AS_INACTIVE:
+				return (QR_DONE); /* ignore */
+			case AS_WACK_ASPAC:
+			case AS_WACK_ASPIA:
+			case AS_ACTIVE:
+		}
 		for (gp = as->gp.list; gp; gp = gp->as.next) {
 			switch (gp_get_state(gp)) {
 			}
 		}
 		break;
 	case AS_WACK_ASPIA:
+		switch (as_get_state(as)) {
+			case AS_DOWN:
+			case AS_INACTIVE:
+				return (QR_DONE); /* ignore */
+			case AS_WACK_ASPAC:
+			case AS_WACK_ASPIA:
+			case AS_ACTIVE:
+		}
 		for (gp = as->gp.list; gp; gp = gp->as.next) {
 			switch (gp_get_state(gp)) {
 			}
 		}
 		break;
 	case AS_ACTIVE:
+		switch (as_get_state(as)) {
+			case AS_DOWN:
+			case AS_INACTIVE:
+				as_set_flags(as, ASF_PENDING);
+				return (QR_DONE); /* ignore */
+			case AS_WACK_ASPAC:
+			case AS_WACK_ASPIA:
+			case AS_ACTIVE:
+		}
 		for (gp = as->gp.list; gp; gp = gp->as.next) {
 			switch (gp_get_state(gp)) {
 			}
@@ -5136,18 +5383,18 @@ asp_as_p_recalc_state(queue_t *q, struct as *as)
 	return (QR_DONE);
 }
 
-STATIC INLINE int ss_u_set_state(queue_t *, struct ss *, t_uscalar_t);
+STATIC INLINE int ss_u_set_state(struct ss *, queue_t *, t_uscalar_t);
 
 #if 0
 STATIC int
-sgp_as_u_recalc_state(queue_t *q, struct as *as)
+sgp_as_u_recalc_state(struct as *as, queue_t *q)
 {
 	int err;
 	struct gp *gp;
 	struct ss *ss;
 	t_uscalar_t newstate;
 
-	for (newstate = AS_ACTIVE; newstate && as->ap.u.counts[newstate] != 0; newstate--) ;
+	for (newstate = AS_ACTIVE; newstate && as->ap.counts[newstate] != 0; newstate--) ;
 	switch (newstate) {
 	case AS_DOWN:
 	case AS_INACTIVE:
@@ -5161,12 +5408,9 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
 					continue;
 			case AS_WACK_ASPIA:
 			case AS_ACTIVE:
-				if ((xp = gp->spp.spp->xp))
-					if ((err = ua_send_aspt_aspia_ack(q, xp,
-									  &as->iid,
-									  1, NULL, 0, NULL, 0)))
-						return (err);
-				if ((err = gp_u_set_state(q, gp, AS_INACTIVE)))
+				if ((err = ua_send_aspt_aspia_ack(gp, q, NULL, 0)))
+					return (err);
+				if ((err = gp_u_set_state(gp, q, AS_INACTIVE)))
 					return (err);
 			}
 		}
@@ -5176,15 +5420,15 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
 				if (newstate == AS_WACK_ASPAC)
 					continue;
 			case AS_WACK_ASPIA:
-				if ((err = slu_disable_con(q, ss)))
+				if ((err = sl_disable_con(ss, q)))
 					return (err);
-				if ((err = ss_u_set_state(q, ss, AS_INACTIVE)))
+				if ((err = ss_u_set_state(ss, q, AS_INACTIVE)))
 					return (err);
 				break;
 			case AS_ACTIVE:
-				if ((err = slu_error_ind(q, ss, 0, 0)))
+				if ((err = sl_error_ind(ss, q, 0, 0)))
 					return (err);
-				if ((err = ss_u_set_state(q, ss, AS_INACTIVE)))
+				if ((err = ss_u_set_state(ss, q, AS_INACTIVE)))
 					return (err);
 			}
 		}
@@ -5196,22 +5440,18 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
 
 			switch (gp_get_state(gp)) {
 			case AS_WACK_ASPAC:
-				if ((xp = gp->spp.spp->xp))
-					if ((err = ua_send_aspt_aspac_ack(q, xp,
-									  as->sp.sp->tmode,
-									  &as->iid,
-									  1, NULL, 0, NULL, 0)))
-						return (err);
-				if ((err = gp_u_set_state(q, gp, AS_ACTIVE)))
+				if ((err = ua_send_aspt_aspac_ack(gp, q, NULL, 0)))
+					return (err);
+				if ((err = gp_u_set_state(gp, q, AS_ACTIVE)))
 					return (err);
 			}
 		}
 		for (ss = as->ss.list; ss; ss = ss->as.next) {
 			switch (ss_get_state(ss)) {
 			case AS_WACK_ASPAC:
-				if ((err = slu_enable_con(q, ss)))
+				if ((err = sl_enable_con(ss, q)))
 					return (err);
-				if ((err = ss_u_set_state(q, ss, AS_ACTIVE)))
+				if ((err = ss_u_set_state(ss, q, AS_ACTIVE)))
 					return (err);
 			}
 		}
@@ -5225,112 +5465,59 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
    AS-U propagating ASP state changes to AS-P and ASPs 
  */
 STATIC int
-asp_as_u_recalc_state(queue_t *q, struct as *as)
+asp_as_u_recalc_state(struct as *as, queue_t *q, struct spp *asp)
 {
-	int err;
+	int err, n = 1;
 	struct ap *ap;
 	struct gp *gp;
 	t_uscalar_t oldstate = as_get_state(as), newstate;
 	t_uscalar_t oldflags = as_get_flags(as), newflags = oldflags;
 
-	assure(as->ap.numb > 0);
-	ensure(oldstate <= AS_ACTIVE, return (-EFAULT));
-	for (newstate = AS_ACTIVE; newstate && as->gp.u.counts[newstate] != 0; newstate--) ;
+	dassert(as->ap.numb > 0);
+	dassert(oldstate <= AS_ACTIVE);
+
+	/* Find new state.  The new state is the maximum state at or above which at least 'n'
+	   processes exist (where 'n' is the number required to push a state transition), and then
+	   only if we follow this ridiculousness from RFC 4666 -- which we don't and 'n' is always
+	   set to one. */
+	for (newstate = AS_ACTIVE; newstate && (n -= as->gp.counts[newstate]) > 0; newstate--) ;
+
 	/* propagate state changes to ASP */
-	if ((newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) && as->gp.u.c.active < as->minasp
+	if ((newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) && as->gp.c.active < as->minasp
 	    && as->minasp > 1)
 		newflags |= ASF_INSUFFICIENT_ASPS;
-	if ((newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) && as->gp.u.c.active == as->minasp
+	else
+		newflags &= ~ASF_INSUFFICIENT_ASPS;
+	if ((newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) && as->gp.c.active == as->minasp
 	    && as->minasp > 1)
 		newflags |= ASF_MINIMUM_ASPS;
-	if ((newstate == AS_WACK_ASPAC || newstate == AS_INACTIVE)
-	    && (oldstate == AS_WACK_ASPIA || oldstate == AS_ACTIVE))
-		newflags |= ASF_PENDING;
+	else
+		newflags &= ~ASF_MINIMUM_ASPS;
+	if (newstate == AS_WACK_ASPAC || newstate == AS_INACTIVE)
+		if (oldstate == AS_WACK_ASPIA || oldstate == AS_ACTIVE)
+			newflags |= ASF_PENDING;
 	if (newstate == AS_WACK_ASPIA || newstate == AS_ACTIVE)
 		newflags &= ~ASF_PENDING;
 	for (gp = as->gp.list; gp; gp = gp->as.next) {
-		struct xp *xp = gp->spp.spp->xp;
+		struct xp *xp = gp->spp.spp->xp.xp;
 		t_uscalar_t state = gp_get_state(gp);
 
-		if (state == AS_DOWN)
+		if (gp_get_state(gp) == AS_DOWN)
 			continue;
 		/* notify of state change */
-		switch (newstate) {
-		default:
-		case AS_ACTIVE:
-		case AS_WACK_ASPIA:
-			if ((newflags & ASF_INSUFFICIENT_ASPS)
-			    && !(oldflags & ASF_INSUFFICIENT_ASPS))
-				/* notify of insufficient ASPs */
-				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-								    UA_STATUS_AS_INSUFFICIENT_ASPS,
-								    NULL)))
-					return (err);
-			if (!(newflags & ASF_INSUFFICIENT_ASPS)
-			    && (oldflags & ASF_INSUFFICIENT_ASPS))
-				/* notify of AS active */
-				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-								    UA_STATUS_AS_ACTIVE, NULL)))
-					return (err);
-			if ((newflags & ASF_MINIMUM_ASPS) && !(oldflags & ASF_MINIMUM_ASPS))
-				/* notify of minimum ASPs */
-				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-								    UA_STATUS_AS_MINIMUM_ASPS,
-								    NULL)))
-					return (err);
-			switch (oldstate) {
-			default:
-			case AS_DOWN:
-			case AS_INACTIVE:
-			case AS_WACK_ASPAC:
-				/* withold AS_ACTIVE notification until sufficient ASPs */
-				if (!(newflags & ASF_INSUFFICIENT_ASPS))
-					/* notify of AS active */
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_AS_ACTIVE,
-									    NULL)))
-						return (err);
-				break;
-			}
-			break;
-		case AS_DOWN:
-		case AS_INACTIVE:
-		case AS_WACK_ASPAC:
-			switch (oldstate) {
-			case AS_ACTIVE:
-			case AS_WACK_ASPIA:
-				/* don't notify during override transitions */
-				if (newstate != AS_WACK_ASPAC
-				    || as->sp.sp->tmode != UA_TMODE_OVERRIDE) {
-					if ((newflags & ASF_PENDING)) {
-						if (!(oldflags & ASF_PENDING))
-							/* notify of AS pending */
-							if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-											    UA_STATUS_AS_PENDING,
-											    NULL)))
-								return (err);
-					} else {
-						/* notify of AS inactive */
-						if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-										    UA_STATUS_AS_INACTIVE,
-										    NULL)))
-							return (err);
-					}
-				}
-				break;
-			}
-			break;
-		}
+		if ((err = ua_send_mgmt_ntfy(gp, q, oldflags, newflags, asp, NULL, 0)))
+			return (err);
 	}
+	/* No need to propagate state when it has not changed. */
 	if (oldstate == newstate)
 		return (QR_DONE);
 	/* propagate state changes to AS-P */
 	for (ap = as->ap.list; ap; ap = ap->u.next) {
-		ap->p.as->ap.u.counts[oldstate]--;
-		ap->p.as->ap.u.counts[newstate]++;
-		if ((err = asp_as_p_recalc_state(q, ap->p.as))) {
-			ap->p.as->ap.u.counts[oldstate]++;
-			ap->p.as->ap.u.counts[newstate]--;
+		ap->p.as->ap.counts[oldstate]--;
+		ap->p.as->ap.counts[newstate]++;
+		if ((err = asp_as_p_recalc_state(ap->p.as, q))) {
+			ap->p.as->ap.counts[oldstate]++;
+			ap->p.as->ap.counts[newstate]--;
 			return (err);
 		}
 	}
@@ -5348,7 +5535,7 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 }
 
 STATIC int
-sgp_as_p_recalc_state(queue_t *q, struct as *as)
+sgp_as_p_recalc_state(struct as *as, queue_t *q)
 {
 	int err;
 	struct ap *ap;
@@ -5356,14 +5543,14 @@ sgp_as_p_recalc_state(queue_t *q, struct as *as)
 
 	assure(as->ap.numb > 0);
 	ensure(oldstate <= AS_ACTIVE, return (-EFAULT));
-	for (newstate = AS_ACTIVE; newstate && as->gp.u.counts[newstate] != 0; newstate--) ;
+	for (newstate = AS_ACTIVE; newstate && as->gp.counts[newstate] != 0; newstate--) ;
 	if (oldstate != newstate)
 		for (ap = as->ap.list; ap; ap = ap->p.next) {
-			ap->u.as->ap.u.counts[oldstate]--;
-			ap->u.as->ap.u.counts[newstate]++;
-			if ((err = asp_as_p_recalc_state(q, ap->u.as))) {
-				ap->u.as->ap.u.counts[oldstate]++;
-				ap->u.as->ap.u.counts[newstate]--;
+			ap->u.as->ap.counts[oldstate]--;
+			ap->u.as->ap.counts[newstate]++;
+			if ((err = asp_as_p_recalc_state(ap->u.as, q))) {
+				ap->u.as->ap.counts[oldstate]++;
+				ap->u.as->ap.counts[newstate]--;
 				return (err);
 			}
 		}
@@ -5379,7 +5566,7 @@ sgp_as_p_recalc_state(queue_t *q, struct as *as)
  *  Set the state of an ASP in an AS-U.
  */
 STATIC INLINE int
-gp_u_set_state(queue_t *q, struct gp *gp, const t_uscalar_t newstate)
+gp_u_set_state(struct gp *gp, queue_t *q, const t_uscalar_t newstate)
 {
 	int err;
 	struct as *as = gp->as.as;
@@ -5387,11 +5574,24 @@ gp_u_set_state(queue_t *q, struct gp *gp, const t_uscalar_t newstate)
 
 	if (newstate == oldstate)
 		return (QR_DONE);
-	as->gp.u.counts[oldstate]--;
-	as->gp.u.counts[newstate]++;
-	if ((err = asp_as_u_recalc_state(q, as))) {
-		as->gp.u.counts[oldstate]++;
-		as->gp.u.counts[newstate]--;
+	if (oldstate == AS_DOWN && newstate == AS_INACTIVE)
+		/* FEATURE: ASPs which have just come up should be immediately notified of AS
+		   state, they can then use the notifications to determine their next best action.
+		   This is not required nor recommended by the specification (it is now by RFC
+		   4666), but is in general good practice.  By setting oldflags to zero in the
+		   following call, the ASP will be notified of the current state of the AS with the 
+		   sole exception of when the AS is in the AS-INACTIVE state.  Note also that these 
+		   notifications are sent before any associated ASP Up Ack is sent, but not before
+		   a REG RESP (because the ASP cannot possibly known the approprirate RC (IID)
+		   value until the REG RESP is received). */
+		if ((err = ua_send_mgmt_ntfy(gp, q, 0, as_get_flags(as), gp->spp.spp, NULL, 0)))
+			return (err);
+
+	as->gp.counts[oldstate]--;
+	as->gp.counts[newstate]++;
+	if ((err = asp_as_u_recalc_state(as, q, gp->spp.spp))) {
+		as->gp.counts[oldstate]++;
+		as->gp.counts[newstate]--;
 		return (err);
 	}
 	if (newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) {
@@ -5411,7 +5611,7 @@ gp_u_set_state(queue_t *q, struct gp *gp, const t_uscalar_t newstate)
  *  Set the state of an SL-U in an AS-U.
  */
 STATIC INLINE int
-ss_u_set_state(queue_t *q, struct ss *ss, const t_uscalar_t newstate)
+ss_u_set_state(struct ss *ss, queue_t *q, const t_uscalar_t newstate)
 {
 	int err;
 	struct as *as = ss->as.as;
@@ -5419,11 +5619,11 @@ ss_u_set_state(queue_t *q, struct ss *ss, const t_uscalar_t newstate)
 
 	if (newstate == oldstate)
 		return (QR_DONE);
-	as->gp.u.counts[oldstate]--;
-	as->gp.u.counts[newstate]++;
-	if ((err = asp_as_u_recalc_state(q, as))) {
-		as->gp.u.counts[oldstate]++;
-		as->gp.u.counts[newstate]--;
+	as->gp.counts[oldstate]--;
+	as->gp.counts[newstate]++;
+	if ((err = asp_as_u_recalc_state(as, q, NULL))) {
+		as->gp.counts[oldstate]++;
+		as->gp.counts[newstate]--;
 		return (err);
 	}
 	if (newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA)
@@ -5438,21 +5638,21 @@ ss_u_set_state(queue_t *q, struct ss *ss, const t_uscalar_t newstate)
  *  Set the state of the SGP in the AS-P
  */
 STATIC INLINE int
-gp_p_set_state(queue_t *q, struct gp *gp, const t_uscalar_t newstate)
+gp_p_set_state(struct gp *gp, queue_t *q, const t_uscalar_t newstate)
 {
 	int err;
 	struct as *as = gp->as.as;
 	t_uscalar_t oldstate = gp_get_state(gp);
-	t_uscalar_t oldwack = as->gp.u.c.wack_aspac + as->gp.u.c.wack_aspia, newwack;
+	t_uscalar_t oldwack = as->gp.c.wack_aspac + as->gp.c.wack_aspia, newwack;
 
 	if (oldstate == newstate)
 		return (QR_DONE);
-	as->gp.u.counts[oldstate]--;
-	as->gp.u.counts[newstate]++;
-	newwack = as->gp.u.c.wack_aspac + as->gp.u.c.wack_aspia;
-	if ((err = sgp_as_p_recalc_state(q, as))) {
-		as->gp.u.counts[oldstate]++;
-		as->gp.u.counts[newstate]--;
+	as->gp.counts[oldstate]--;
+	as->gp.counts[newstate]++;
+	newwack = as->gp.c.wack_aspac + as->gp.c.wack_aspia;
+	if ((err = sgp_as_p_recalc_state(as, q))) {
+		as->gp.counts[oldstate]++;
+		as->gp.counts[newstate]--;
 		return (err);
 	}
 	if (oldwack && !newwack)
@@ -5471,7 +5671,7 @@ gp_p_set_state(queue_t *q, struct gp *gp, const t_uscalar_t newstate)
  *  Set the state of the SL-P in the AS-P
  */
 STATIC INLINE int
-ss_p_set_state(queue_t *q, struct ss *ss, const t_uscalar_t newstate)
+ss_p_set_state(struct ss *ss, queue_t *q, const t_uscalar_t newstate)
 {
 	int err;
 	struct as *as = ss->as.as;
@@ -5479,11 +5679,11 @@ ss_p_set_state(queue_t *q, struct ss *ss, const t_uscalar_t newstate)
 
 	if (oldstate == newstate)
 		return (QR_DONE);
-	as->gp.u.counts[oldstate]--;
-	as->gp.u.counts[newstate]++;
-	if ((err = sgp_as_p_recalc_state(q, as))) {
-		as->gp.u.counts[oldstate]++;
-		as->gp.u.counts[newstate]--;
+	as->gp.counts[oldstate]--;
+	as->gp.counts[newstate]++;
+	if ((err = sgp_as_p_recalc_state(as, q))) {
+		as->gp.counts[oldstate]++;
+		as->gp.counts[newstate]--;
 		return (err);
 	}
 	if (newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA)
@@ -5495,7 +5695,7 @@ ss_p_set_state(queue_t *q, struct ss *ss, const t_uscalar_t newstate)
 }
 
 STATIC INLINE int
-asp_set_state(queue_t *q, struct spp *spp, const t_uscalar_t newstate)
+asp_spp_set_state(struct spp *spp, queue_t *q, const t_uscalar_t newstate)
 {
 	int err;
 	struct gp *gp;
@@ -5509,16 +5709,23 @@ asp_set_state(queue_t *q, struct spp *spp, const t_uscalar_t newstate)
 			swerr();
 			/* fall through */
 		case ASP_DOWN:
-		case ASP_WACK_ASPUP:
-			/* move to the inactive state in all AS */
-			for (gp = spp->gp.list; gp; gp = gp->spp.next)
-				if ((err = gp_u_set_state(q, gp, ASP_INACTIVE)))
-					return (err);
-			/* fall through */
-			spp_set_state(spp, ASP_WACK_ASPDN);
 		case ASP_WACK_ASPDN:
+			spp_set_state(spp, ASP_WACK_ASPUP);
+		case ASP_WACK_ASPUP:
+			/* move to the inactive state in all AS, if AS were registered, consider
+			   them unregistered. */
+			for (gp = spp->gp.list; gp; gp = gp->spp.next) {
+				if (gp_tst_flags(gp, ASF_REGISTERED)) {
+					if ((err = gp_u_set_state(gp, q, AS_DOWN)))
+						return (err);
+				} else {
+					if ((err = gp_u_set_state(gp, q, AS_INACTIVE)))
+						return (err);
+				}
+			}
+			/* fall through */
 		case ASP_UP:
-			if ((err = ua_send_asps_aspup_ack(q, spp->xp, NULL, NULL, 0)))
+			if ((err = ua_send_asps_aspup_ack(spp, q, NULL, 0)))
 				return (err);
 			spp_set_state(spp, ASP_UP);
 			return (QR_DONE);
@@ -5531,15 +5738,16 @@ asp_set_state(queue_t *q, struct spp *spp, const t_uscalar_t newstate)
 			swerr();
 			/* fall through */
 		case ASP_UP:
+		case ASP_WACK_ASPUP:
+			spp_set_state(spp, ASP_WACK_ASPDN);
 		case ASP_WACK_ASPDN:
 			/* move to the down state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
-				if ((err = gp_u_set_state(q, gp, ASP_DOWN)))
+				if ((err = gp_u_set_state(gp, q, AS_DOWN)))
 					return (err);
 			/* fall through */
-		case ASP_WACK_ASPUP:
 		case ASP_DOWN:
-			if ((err = ua_send_asps_aspdn_ack(q, spp->xp, NULL, NULL, 0)))
+			if ((err = ua_send_asps_aspdn_ack(spp, q, NULL, 0)))
 				return (err);
 			spp_set_state(spp, ASP_DOWN);
 			return (QR_DONE);
@@ -5554,7 +5762,7 @@ asp_set_state(queue_t *q, struct spp *spp, const t_uscalar_t newstate)
  *  SGP changing state.
  */
 STATIC INLINE int
-sgp_set_state(queue_t *q, struct spp *spp, const t_uscalar_t newstate)
+sgp_spp_set_state(struct spp *spp, queue_t *q, const t_uscalar_t newstate)
 {
 	int err;
 	struct gp *gp;
@@ -5574,7 +5782,7 @@ sgp_set_state(queue_t *q, struct spp *spp, const t_uscalar_t newstate)
 			spp_timer_stop(spp, tack);
 			/* move to the down state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
-				if ((err = gp_p_set_state(q, gp, ASP_DOWN)))
+				if ((err = gp_p_set_state(gp, q, ASP_DOWN)))
 					return (err);
 			spp_set_state(spp, newstate);
 			return (QR_DONE);
@@ -5582,23 +5790,23 @@ sgp_set_state(queue_t *q, struct spp *spp, const t_uscalar_t newstate)
 			/* unsolicited ASPDN Ack */
 			/* move to the down state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
-				if ((err = gp_p_set_state(q, gp, ASP_DOWN)))
+				if ((err = gp_p_set_state(gp, q, ASP_DOWN)))
 					return (err);
 			/* try to bring it back up */
-			if ((err = ua_send_asps_aspup_req(q, spp->xp, NULL, NULL, 0)))
+			if ((err = ua_send_asps_aspup_req(spp, q, NULL, 0)))
 				return (err);
 			spp_timer_start(spp, tack);
 			spp_set_state(spp, ASP_WACK_ASPUP);
 			return (QR_DONE);
 		}
 	case ASP_WACK_ASPUP:
-		if ((err = ua_send_asps_aspup_req(q, spp->xp, NULL, NULL, 0)))
+		if ((err = ua_send_asps_aspup_req(spp, q, NULL, 0)))
 			return (err);
 		spp_timer_start(spp, tack);
 		spp_set_state(spp, newstate);
 		return (QR_DONE);
 	case ASP_WACK_ASPDN:
-		if ((err = ua_send_asps_aspdn_req(q, spp->xp, NULL, NULL, 0)))
+		if ((err = ua_send_asps_aspdn_req(spp, q, NULL, 0)))
 			return (err);
 		spp_timer_start(spp, tack);
 		spp_set_state(spp, newstate);
@@ -5618,14 +5826,29 @@ sgp_set_state(queue_t *q, struct spp *spp, const t_uscalar_t newstate)
 		case ASP_DOWN:
 			/* move to the inactive state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
-				if ((err = gp_p_set_state(q, gp, ASP_INACTIVE)))
-					return (err);
+				if (gp_tst_flags(gp, ASF_REGSITERED)) {
+					if ((err = gp_p_set_state(gp, q, AS_DOWN)))
+						return (err);
+				} else {
+					if ((err = gp_p_set_state(gp, q, AS_INACTIVE)))
+						return (err);
+				}
 			spp_set_state(spp, newstate);
 			return (QR_DONE);
 		}
 	}
 	swerr();
 	return (-EFAULT);
+}
+
+/*
+ *  SPP changing state.
+ */
+static int
+spp_spp_set_state(struct spp *spp, queue_t *q, const t_uscalar_t newstate)
+{
+	/* Do what SGP does. */
+	return sgp_spp_set_state(spp, q, newstate);
 }
 
 /*
@@ -5726,6 +5949,21 @@ xp_tack_timeout(struct xp *xp)
  *
  *  -------------------------------------------------------------------------
  */
+/**
+ * spp_find_gp: - find a SPP-AS graph for an interface id or routing context
+ * @spp: SPP for which to find
+ * @iids: list of one or more interface ids or routing contexts
+ * @iid_len: the length of the interface ids or routing contexts in bytes
+ *
+ * Finds the SPP-AS relation that corresponds to an interface identifier or
+ * routing context.  When multiplex interface identifiers or routing contexts
+ * are provided, it returns the SSP-AS relation for the first interface
+ * identifier or routing context found.
+ *
+ * The gp structure represents an SPP-AS relation.  This associates an
+ * Application Server (AS) with an Signalling Point Process (SPP).  This
+ * function can used appropriately with SGP, ASP and SPP nodes.
+ */
 STATIC INLINE struct gp *
 spp_find_gp(struct spp *spp, uint32_t *iids, size_t iid_len)
 {
@@ -5739,8 +5977,16 @@ spp_find_gp(struct spp *spp, uint32_t *iids, size_t iid_len)
 				return (gp);
 	return (gp);
 }
+
+/**
+ * ap_find_ssu: - find an SS-U node from an AS-U/AS-P relation.
+ * @ap: AS-U/AS-P relation
+ *
+ * Finds and returns the first available local user signalling server for an
+ * AS-U/AS-P relation.
+ */
 STATIC INLINE struct ss *
-ap_find_slu(struct ap *ap)
+ap_find_ssu(struct ap *ap)
 {
 	struct ss *ss;
 
@@ -5749,8 +5995,18 @@ ap_find_slu(struct ap *ap)
 	     ss = ss->as.next) ;
 	return (ss);
 }
+
+/**
+ * ap_find_ssu_next: - find next SS-U node from an AS-U/AS-P relation.
+ * @ap: AS-U/AS-P relation
+ * @ss: previousl signalling server node
+ * @command: whether command or data is being transferred
+ *
+ * Finds the next signalling server node for a given AS-U/AS-P relation and the
+ * previous node found.
+ */
 STATIC INLINE struct ss *
-ap_find_slu_next(struct ap *ap, struct ss *ss, const int command)
+ap_find_ssu_next(struct ap *ap, struct ss *ss, const int command)
 {
 	struct as *as = ap->u.as;
 
@@ -5759,6 +6015,7 @@ ap_find_slu_next(struct ap *ap, struct ss *ss, const int command)
 		return (NULL);
 	default:
 	case UA_TMODE_LOADSHARE:
+		/* Commands are only delivered to one ASP in a loadshared AS. */
 		if (!command)
 			return (NULL);
 		/* fall through */
@@ -5829,7 +6086,7 @@ as_p_find_ap_next(struct as *as, struct ap *ap, const int command)
  *  Selecting an SS-P.
  */
 STATIC INLINE struct ss *
-ap_find_slp(struct ap *ap)
+ap_find_ssp(struct ap *ap)
 {
 	struct ss *ss;
 
@@ -5839,7 +6096,7 @@ ap_find_slp(struct ap *ap)
 	return (ss);
 }
 STATIC INLINE struct ss *
-ap_find_slp_next(struct ap *ap, struct ss *ss, const int command)
+ap_find_ssp_next(struct ap *ap, struct ss *ss, const int command)
 {
 	return (NULL);
 }
@@ -5872,7 +6129,7 @@ as_u_find_ap(struct as *as)
 	struct ap *ap;
 
 	/* return first available sg */
-	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
+	for (ap = as->ap.list; ap && as_tst_flags(ap->p.as, ASF_ACTIVE | ASF_PENDING);
 	     ap = ap->u.next) ;
 	return ap;
 }
@@ -5889,12 +6146,18 @@ as_u_find_ap_next(struct as *as, struct ap *ap, const int command)
  *
  *  -------------------------------------------------------------------------
  */
-/*
- *  UA_MGMT_ERR
- *  -----------------------------------
+/**
+ * sgp_recv_mgmt_err: - process received UA_MGMT_ERR message from an SGP
+ * @sp: SGP associated with the message
+ * @q: active queue (lower read queue)
+ * @m: the message
+ *
+ * MGMT ERR messages are often handled within the local SGP state machine, but may be applicable to
+ * an AS-P if the message contains an RC value.  Also, the message class and type (and any other
+ * information) included in the diagnostic can be helpful.
  */
 STATIC int
-asp_recv_mgmt_err(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_mgmt_err(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	switch (m->ecode.val) {
 	case UA_ECODE_INVALID_VERSION:	/* (0x01) */
@@ -5931,7 +6194,7 @@ asp_recv_mgmt_err(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (QR_DISABLE);
 }
 STATIC int
-sgp_recv_mgmt_err(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_mgmt_err(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	switch (m->ecode.val) {
 	case UA_ECODE_INVALID_VERSION:	/* (0x01) */
@@ -5968,7 +6231,7 @@ sgp_recv_mgmt_err(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (QR_DISABLE);
 }
 STATIC int
-spp_recv_mgmt_err(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_mgmt_err(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	switch (m->ecode.val) {
 	case UA_ECODE_INVALID_VERSION:	/* (0x01) */
@@ -6009,20 +6272,220 @@ spp_recv_mgmt_err(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  UA_MGMT_NTFY
  *  -----------------------------------
  */
+static int
+gp_recv_mgmt_ntfy(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->status.val) {
+	case UA_STATUS_AS_INACTIVE:
+		if (gp_get_state(gp) != AS_INACTIVE) {
+			if (gp_tst_flags(gp, (ASF_ACTIVE | ASF_PENDING)))
+				gp_clr_flags(gp, (ASF_ACTIVE | ASF_PENDING));
+			gp_set_state(gp, AS_INACTIVE);
+		}
+		break;
+	case UA_STATUS_AS_ACTIVE:
+		if (gp_get_state(gp) != AS_ACTIVE) {
+			if (gp_tst_flags(gp, (ASF_ACTIVE | ASF_PENDING))) {
+				gp_clr_flags(gp, ASF_PENDING);
+				gp_set_flags(gp, ASF_ACTIVE);
+			}
+			gp_set_state(gp, AS_ACTIVE);
+		}
+		break;
+	case UA_STATUS_AS_PENDING:
+		if (gp_get_state(gp) != AS_PENDING) {
+			gp_clr_flags(gp, ASF_ACTIVE);
+			gp_set_flags(gp, ASF_PENDING);
+			gp_set_state(gp, AS_PENDING);
+		}
+		break;
+	case UA_STATUS_AS_INSUFFICIENT_ASPS:
+		if (!gp_tst_flags(gp, ASF_INFSUFFICIENT_ASPS))
+			gp_set_flags(gp, ASF_INSUFFICIENT_ASPS);
+		break;
+	case UA_STATUS_ALTERNATE_ASP_ACTIVE:
+		if (gp_get_state(gp) != ASP_INACTIVE) {
+			if (gp_tst_flags(gp, ASF_ACTIVE))
+				gp_clr_flags(gp, (ASF_ACTIVE | ASF_PENDING));
+			gp_set_state(gp, ASP_INACTIVE);
+		}
+		break;
+	case UA_STATUS_ASP_FAILURE:
+		break;
+	case UA_STATUS_AS_MINIMUM_ASPS:
+		gp_set_flags(gp, ASF_MINIMUM_ASPS);
+		break;
+	default:
+	case UA_STATUS_AS_DOWN:
+		return (-EINVAL);
+	}
+	return (QR_DONE);
+}
+
+/**
+ * sgp_recv_mgmt_ntfy: - process a UA_MGMT_NTFY message received from an SGP
+ * @spp: SGP associated with the message
+ * @q: active queue (lower read queue)
+ * @m: (partially) decoded message
+ *
+ * MGMT NTFY messages are specific to an AS with the possible exception of ASP
+ * Failure.  If one or more RC (IID) are contained in the message, the message
+ * is specific to those GP mappings corresponding to the RC (IID) contained in
+ * the message.  If there is no RC (IID) contained in the message, the message
+ * applies to all GP mappings associated with the receiving SPP.  Note that AS
+ * state is SGP specific and only specifies the state in the GP mapping.  The
+ * overall state of the AS-P is determined by considering the combined state of
+ * all SGP, and the state of the AS-U is the combined state of all AS-P.  State
+ * changes to the AS-U can cause further propagation of notification messages to
+ * peer ASPs.
+ *
+ * Error handling.  Notification messages can be processed repeatedly without
+ * affect on the state machine.  If we receive an allocation or flow control
+ * error when processing the message for any gp, simply return the error.  This
+ * means that preceding operations will be repeated on the next pass; however,
+ * as no state change should result.  If there is an invalid RC (IID) in the
+ * bunch, it is simply not processed.  Once processing of all valid RC (IID) is
+ * complete, an error message is retruned indicating invalid RC (IID).
+ *
+ * Of course this is unecessarily complicated.  One mandatory RC/IID value per
+ * message (except for ASP Failure) would have been better.
+ */
 STATIC int
-asp_recv_mgmt_ntfy(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_mgmt_ntfy(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	int err, error = 0;
+	struct gp *gp;
+
+	if (m->iid.wp) {
+		int i, iid_num;
+
+		if (m->iid.len < sizeof(uint32_t))
+			return (-EMSGSIZE);	/* parameter with wrong length field */
+		if (m->iid.len % sizeof(uint32_t))
+			return (-EMSGSIZE);	/* parameter with wrong length field */
+
+		iid_num = m->iid.len / sizeof(uint32_t);
+		for (i = 0; i < iid_num; i++) {
+			uint32_t iid = ntohl(m->iid.wp[i]);
+
+			/* find gp associated with iid for sgp */
+			for (gp = spp->gp.list; gp && gp->as.as->iid != iid; gp = gp->spp.next) ;
+			/* process notification for gp */
+			if (gp) {
+				if ((err = gp_recv_mgmt_ntfy(gp, q, m)) < 0)
+					error = error ? : err;
+				continue;
+			}
+			error = error ? : -EIO;	/* Invalid RC (IID) */
+		}
+		if (error)
+			return (error);
+	} else if (m->iid_text.cp) {
+		/* find gp associated with text iid for sgp */
+		for (gp = spp->gp.list;
+		     gp && strncmp(m->iid_text.cp, gp->as.as->iid_text, m->iid_text.len);
+		     gp = gp->spp.next) ;
+		/* process notification for gp */
+		if (gp) {
+			if ((err = gp_recv_mgmt_ntfy(gp, q, m)) < 0)
+				error = err;
+		} else
+			err = -EIO;	/* Invalid IID */
+	} else if (m->iid_range.wp) {
+		int i, iid_range_num;
+
+		if (m->iid_range.len < (sizeof(uint32_t) << 1))
+			return (-EMSGSIZE);	/* parameter with wrong length field */
+		if (m->iid_range.len % (sizeof(uint32_t) << 1))
+			return (-EMSGSIZE);	/* parameter with wrong length field */
+
+		iid_range_num = m->iid.len / sizeof(uint32_t);
+		for (i = 0; i < iid_range_num; i += 2) {
+			uint32_t iid;
+			uint32_t iid_start = ntohl(m->iid_range.wp[i]);
+			uint32_t iid_stop = ntohl(m->iid_range.wp[i + 1]);
+
+			if (iid_start > iid_stop)
+				error = error ? : -EIO;
+			for (iid = iid_start; iid <= iid_stop; iid++) {
+				/* find gp associated with iid for sgp */
+				for (gp = spp->gp.list; gp && gp->as.as->iid != iid;
+				     gp = gp->spp.next) ;
+				/* process notification for gp */
+				if (gp) {
+					if ((err = gp_recv_mgmt_ntfy(gp, q, m)) < 0)
+						error = error ? : err;
+					continue;
+				}
+				error = -EIO;
+			}
+		}
+	} else if (m->rc.wp) {
+		/* message applies to specified RC (IID) */
+		int i, rc_num;
+
+		if (m->rc.len < sizeof(uint32_t))
+			return (-EMSGSIZE);	/* parameter with wrong length field */
+		if (m->rc.len % sizeof(uint32_t))
+			return (-EMSGSIZE);	/* parameter with wrong length field */
+
+		rc_num = m->rc.len / sizeof(uint32_t);
+		for (i = 0; i < rc_num; i++) {
+			uint32_t rc = ntohl(m->rc.wp[i]);
+
+			/* find gp associated with rc for sgp */
+			for (gp = spp->gp.list; gp && gp->as.as->rc != rc; gp = gp->spp.next) ;
+			/* process notification for gp */
+			if (gp) {
+				if ((err = gp_recv_mgmt_ntfy(gp, q, m)) < 0)
+					error = error ? : err;
+				continue;
+			}
+			error = -EIO;	/* Invalid RC (IID) */
+		}
+	} else {
+		/* message applies to all RC (IID) */
+		struct gp *gp;
+		bool processed = false;
+
+		for (gp = spp->gp.list; gp; gp = gp->spp.next) {
+			if ((err = gp_recv_mgmt_ntfy(gp, q, m)) < 0)
+				error = error ? : err;
+			processed = true;
+		}
+		if (!processed)
+			error = -EXDEV;	/* No configured AS for ASP. */
+	}
+	if (error)
+		return (error);
+	return (QR_DONE);
+}
+
+/**
+ * asp_recv_mgmt_ntfy: - process a UA_MGMT_NTFY message received from an ASP
+ * @spp: ASP to which message pertains
+ * @q: active queue (lower read queue)
+ * @m: (partially) decoded message
+ *
+ * MGMT NTFY messages are not sent by an ASP, so to receive one from an
+ * ASP is an unexpected message error.
+ */
+STATIC int
+asp_recv_mgmt_ntfy(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	return (-EPROTO); /* Unexpected in this direction. */
+}
+
+/**
+ * spp_recv_mgmt_ntfy: - process a UA_MGMT_NTFY message received from an SPP
+ * @spp: SPP associated with the message
+ * @q: active queue (lower read queue)
+ * @m: (partially) decoded message
+ */
+STATIC int
+spp_recv_mgmt_ntfy(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (QR_DISABLE);
-}
-STATIC int
-sgp_recv_mgmt_ntfy(struct xp *xp, queue_t *q, struct ua_msg *m)
-{
-	return (-EPROTO);
-}
-STATIC int
-spp_recv_mgmt_ntfy(struct xp *xp, queue_t *q, struct ua_msg *m)
-{
-	return (-EPROTO);
 }
 
 /*
@@ -6030,187 +6493,192 @@ spp_recv_mgmt_ntfy(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_asps_aspup_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return (-EOPNOTSUPP);
+	return (-EPROTO); /* Unexpected in this direction. */
 }
+
+/**
+ * sp_recv_asps_aspup_req: - process anonymous ASP Up message
+ * @xp: transport on which the message was received
+ * @m: the message
+ *
+ * This function is only called for transports that have been associated with an SP-U (that is, the
+ * connection is from an ASP), but it cannot be determined from the connecting information (IP
+ * addresses and port) for which ASP the connection has been made.  This occurs when there are
+ * multiple ASPs for the same IP addresses (multiple processes on the same host) and dynamic port
+ * allocation is used by the host to connect.  In that case, we have not yet associated the remote
+ * ASP with an SPP structure, but were waiting for an ASP Up with an ASP Id parameter to identify
+ * the ASP.  Another instance is when an ASP is connecting to our well-known port number and we have
+ * not been configured to recognize the ASP at all.  In this case too, we must wait for an ASP Up
+ * with an ASP Id parameter to identify the ASP.  A third instance is when an ASP for which we are
+ * configured connects from an unexpected source address (perhaps it has connected via a NAT or
+ * something).
+ */
 STATIC int
-sgp_mark_asp_inactive(struct spp *spp, queue_t *q)
+sp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct gp *gp;
-
-	/* Newly connecting ASPs can already has AS associated with them by configuration. Walking
-	   the AS-ASP graph finds all of the AS that have been associated with the ASP.  We issue a 
-	   notification of the state of each AS to the newly connecting ASP because it may not have 
-	   prior information or information available from other ASPs concerning the state of the
-	   associated AS.  This is primarily for statically allocated IIDs and RCs, as there is
-	   another opportunity to notify the ASP of the state of an AS when the ASP registers for
-	   an IID or RC. */
-	for (gp = spp->gp.list; gp; gp = gp->spp.next) {
-		struct as *as = gp->as.as;
-		struct xp *xp = gp->spp.spp->xp;
-
-		if (gp_get_state(gp) != AS_DOWN)
-			continue;
-		/* FEATURE: ASPs which have just come up should be immediately notified of AS
-		   state, they can then use the notifications to determine their next best action.
-		   This is not required nor recommended by the specification, but is in general
-		   good practice. */
-		if (as_tst_flags(as, ASF_ACTIVE)) {
-			if ((err = ua_send_mgmt_ntfy_simple(q, xp, UA_STATUS_AS_ACTIVE, NULL)))
-				return (err);
-			if (as_tst_flags(as, ASF_INSUFFICIENT_ASPS) && as->minasp > 1)
-				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-								    UA_STATUS_AS_INSUFFICIENT_ASPS,
-								    NULL)))
-					return (err);
-			if (as_tst_flags(as, ASF_MINIMUM_ASPS) && as->minasp > 1)
-				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-								    UA_STATUS_AS_MINIMUM_ASPS,
-								    NULL)))
-					return (err);
-		} else {
-			if (as_tst_flags(as, ASF_PENDING)) {
-				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-								    UA_STATUS_AS_PENDING, NULL)))
-					return (err);
-			} else {
-				if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-								    UA_STATUS_AS_INACTIVE, NULL)))
-					return (err);
-			}
-		}
-		/* For static configuration, the ASP is marked in the AS_INACTIVE state in all AS
-		   of which it is (already) a member by static configuration. */
-		if ((err = gp_u_set_state(q, gp, AS_INACTIVE)))
-			return (err);
-		/* FIXME: Must also deregister all routing keys registered to the ASP */
-	}
-	return (0);
-}
-STATIC int
-sgp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
-{
-	int err;
-	struct gp *gp;
-	struct sp *sp;
 	struct spp *spp;
 
-	if (!(spp = xp->spp)) {
-		if (!(sp = xp->sp))
-			goto disable;
-		/* If we are not yet associated with an spp but we are associated with an sp (must
-		   be one or the other) then if there is an ASPID in the mssage then we can
-		   discover whether this is a unique ASP and associate it with the correct (or a
-		   new) spp.  If there is no ASPID in the message, we should refuse the ASPUP with
-		   an ERR. */
-		if (!m->aspid.ptr.c)
-			/* Because the transport endpoint is not associated with an ASP by
-			   configuration, it is necessary that an ASP Id be provided in the ASP Up
-			   message. */
-			goto needaspid;
-		if (!m->aspid.val)
-			/* We do not permit an ASP Id value of zero.  ASP Ids must be unique
-			   non-zero numbers. */
-			goto badaspid;
-		for (spp = sp->spp.list; spp && spp->aspid != m->aspid.val; spp = spp->sp.next) ;
-		/* FEATURE: We create an ASP if a structure does not exist. This ASP is given
-		   access to all of the AS defined for this SGP.  If one wants security, the ASP
-		   should have never been allowed to connect. */
-		if (!spp) {
-			/* Did not find an existing spp with the same aspid: allocate a new one. */
-			if (!(spp = ua_alloc_spp(spp_get_id(0), UA_OBJ_TYPE_ASP,
-						 sp, m->aspid.val, 0)))
-				goto enomem;
-		} else if (spp->xp)
-			/* Found an existing spp with the same aspid so there is a conflict;
-			   however, check if the conflict has a transport associated with it, if
-			   not then it is just a place holder. */
-			goto badaspid;
-	} else {
-		sp = spp->sp.sp;
-		if (m->aspid.ptr.c) {
+	/* If we are not yet associated with an spp but we are associated with an sp (must be one
+	   or the other) then if there is an ASP Id in the message, we can discover whether this is 
+	   a unique ASP and associate it with the correct (or a new) spp.  If there is no ASPID in
+	   the message, refuse the ASP Up with an ERR indicating that an ASP Id is required.
+	   Perhaps the ASP will reattempt with an ASP Id. */
+	if (!m->aspid.cp)
+		/* Because the transport endpoint is not associated with an ASP by configuration,
+		   it is necessary that an ASP Id be provided in the ASP Up message. */
+		return (-ESRCH);	/* ASP Id required. */
+	if (!m->aspid.val)
+		/* We do not permit an ASP Id value of zero, which we treat as special to indicate
+		   that an ASP Id has not yet been assigned.  ASP Ids must be unique non-zero
+		   numbers. */
+		return (-ENOENT);	/* Bad ASP Id. */
+	/* Find an ASP SPP structure that contains that ASP Id. */
+	for (spp = xp->sp->spp.list; spp; spp = spp->sp.next) {
+		/* watch out for cross-link SPP structures in list */
+		if (spp->type != UA_OBJ_TYPE_ASP)
+			continue;
+		if (spp->aspid != m->aspid.val)
+			continue;
+		break;
+	}
+	/* FEATURE: We create an ASP if a structure does not exist. This ASP is given access to all 
+	   of the AS defined for this ASP Pool (SP-U).  If the ASP should not be permitted to
+	   access the ASP Pool it should not have been linked with it by the connection manager.
+	   That is, the ASP must be connecting at least from a known IP address from which ASPs
+	   normally connect to the ASP pool. */
+	if (!spp) {
+		/* Did not find an existing spp with the same aspid: allocate a new one. */
+		if (!(spp = ua_alloc_spp(spp_get_id(0), UA_OBJ_TYPE_ASP, xp->sp, m->aspid.val, 0)))
+			return (-ENOMEM);
+	} else if (spp->xp.xp)
+		/* Found an existing spp with the same aspid already associated with a different
+		   transport; so there is a conflict. */
+		return (-ENOENT);	/* Bad ASP Id. */
+
+	/* After this point, if an error occurs, we will not return here (an SPP has already been
+	   associated with the transport). */
+
+	/* cannot have been in any other state */
+	dassert(spp_get_state(spp) == ASP_DOWN);
+
+	if (spp_tst_flags(spp, ASF_MGMT_BLOCKED))
+		return (-EPERM);	/* Management blocked. */
+	asp_spp_set_state(spp, q, ASP_WACK_ASPUP);
+
+	todo(("Notify management that the ASP has come up\n"));
+	if ((err = ua_send_asps_aspup_ack(spp, q, NULL, 0)))
+		return (err);
+
+	asp_spp_set_state(spp, q, ASP_UP);
+
+	return (QR_DONE);
+}
+
+STATIC int
+asp_recv_asps_aspup_req(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	int err;
+	struct gp *gp;
+
+	if (m->aspid.cp) {
+		if (!spp->aspid) {
 			struct spp *s;
 
-			if (!spp->aspid) {
-				if (!m->aspid.val)
-					/* We do not permit an ASP Id value of zero.  ASP Ids must
-					   be unique non-zero numbers. */
-					goto badaspid;
-				for (s = sp->spp.list; s && s->aspid != m->aspid.val;
-				     s = s->sp.next) ;
-				if (s)
-					/* If another ASP exists wth the asm ASP Id value, then the 
-					   ASP Id is bad. */
-					goto badaspid;
+			if (!m->aspid.val)
+				/* We do not permit an ASP Id value of zero.  ASP Ids must be
+				   unique non-zero numbers. */
+				return (-ENOENT);	/* Bad ASP Id. */
+			for (s = spp->sp.sp->spp.list; s; s = s->sp.next) {
+				if (s->type != spp->type)
+					continue;
+				if (s->aspid != m->aspid.val)
+					continue;
+				break;
+			}
+			if (!s) {
+				/* Use the requested ASP Id value as the identifier for the ASP.  */
 				spp->aspid = m->aspid.val;
-				/* Otherwise, use the requested ASP Id value as the identifier for
-				   the ASP. */
-			} else if (spp->aspid != m->aspid.val)
-				/* If an ASP Id was provided in the message and one is already
-				   assigned to the ASP by configuration, if the two do not match,
-				   the provided ASP Id is considered bad. */
-				goto badaspid;
-		} else if (!spp->aspid)
-			/* If there is no ASP Id in the message that is acceptable if the transport 
-			   is already associated with an ASP that has a (non-zero) ASP Id assigned
-			   to it.  If the ASP Id is zero, (i.e, one has not been assigned) it is
-			   necessary that an ASP Id be provided in the ASP Up message. */
-			goto needaspid;
-	}
+			} else {
+				/* If another ASP exists wth the same ASP Id value and has a
+				   transport, then the ASP Id is bad; if there is no transport,
+				   then the SPP is a placeholder: the transport should be removed
+				   from the existing SPP with a zero ASP Id and attached to the new 
+				   SPP with the correct ASP Id.  */
+				if (s->xp.xp)
+					return (-ENOENT);	/* Bad ASP Id. */
+				else {
+					struct xp *xp = spp->xp.xp;
+
+					/* XXX: triple check this */
+					/* unlink from current transport */
+					if ((*spp->xp.prev = spp->xp.next))
+						spp->xp.next->prev = spp->xp.prev;
+					spp->xp.next = NULL;
+					spp->xp.prev = &ssp->xp.next;
+					spp->xp.xp = NULL;
+					spp_put(spp);
+					/* link to new transport */
+					if ((s->xp.next = xp->spp.list))
+						s->xp.next->xp.prev = &s->xp.next;
+					s->xp.prev = &xp->spp.list;
+					s->xp.xp = xp;
+					xp->spp.list = spp_get(s);
+					spp = s; /* proceed with new spp structure */
+				}
+			}
+		} else if (spp->aspid != m->aspid.val)
+			/* If an ASP Id was provided in the message and one is already assigned to
+			   the ASP by configuration, if the two do not match, the provided ASP Id
+			   is considered bad. */
+			return (-ENOENT);	/* Bad ASP Id. */
+	} else if (!spp->aspid)
+		/* If there is no ASP Id in the message that is acceptable if the transport is
+		   already associated with an ASP that has a (non-zero) ASP Id assigned to it.  If
+		   the ASP Id is zero, (i.e, one has not been assigned) it is necessary that an ASP 
+		   Id be provided in the ASP Up message. */
+		return (-ESRCH);	/* ASP Id required. */
 	switch (spp_get_state(spp)) {
 	case ASP_DOWN:
 		if (spp_tst_flags(spp, ASF_MGMT_BLOCKED))
-			goto blocked;
-		asp_set_state(q, spp, ASP_WACK_ASPUP);
-		goto asp_wack_aspup;
+			return (-EPERM);	/* Management blocked. */
+		asp_spp_set_state(spp, q, ASP_WACK_ASPUP);
 	case ASP_WACK_ASPUP:
-		if ((err = sgp_mark_asp_inactive(spp, q)))
-			return (err);
+		for (gp = spp->gp.list; gp; gp = gp->spp.next)
+			if ((err = gp_u_set_state(gp, q, AS_INACTIVE)))
+				return (err);
 		todo(("Notify management that the ASP has come up\n"));
-		if ((err = ua_send_asps_aspup_ack(q, xp, NULL, NULL, 0)))
+		if ((err = ua_send_asps_aspup_ack(spp, q, NULL, 0)))
 			return (err);
-		asp_set_state(q, spp, ASP_UP);
+		asp_spp_set_state(spp, q, ASP_UP);
 		return (QR_DONE);
 
 	case ASP_WACK_ASPDN:
-		if ((err = sgp_mark_asp_inactive(spp, q)))
-			return (err);
+		for (gp = spp->gp.list; gp; gp = gp->spp.next)
+			if ((err = gp_u_set_state(gp, q, AS_INACTIVE)))
+				return (err);
 		todo(("Notify management that the ASP has come up\n"));
-		if ((err = ua_send_asps_aspup_ack(q, xp, NULL, NULL, 0)))
+		if ((err = ua_send_asps_aspup_ack(spp, q, NULL, 0)))
 			return (err);
-		asp_set_state(q, spp, ASP_UP);
+		asp_spp_set_state(spp, q, ASP_UP);
 		return (QR_DONE);
 
 	case ASP_UP:
-		if ((err = ua_send_asps_aspup_ack(q, xp, NULL, NULL, 0)))
+		if ((err = ua_send_asps_aspup_ack(spp, q, NULL, 0)))
 			return (err);
 		return (QR_DONE);
 	}
 	swerr();
 	return (-EFAULT);
-      enomem:
-	rare();
-	return (-ENOMEM);
-      blocked:
-	rare();
-	return (-EPERM);
-      needaspid:
-	rare();
-	return (-ESRCH);
-      badaspid:
-	rare();
-	return (-ENOENT);
-      disable:
-	swerr();
-	return (QR_DISABLE);
 }
 STATIC int
-ssp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_asps_aspup_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	/* Do what the SGP does. */
-	return sgp_recv_asps_aspup_req(xp, q, m);
+	/* do what the SGP does */
+	return asp_recv_asps_aspup_req(spp, q, m);
 }
 
 /*
@@ -6218,50 +6686,46 @@ ssp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_asps_aspdn_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_asps_aspdn_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return (-EOPNOTSUPP);
+	return (-EPROTO); /* Unexpected in this direction. */
 }
 STATIC int
-sgp_recv_asps_aspdn_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_asps_aspdn_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct gp *gp;
 	struct spp *spp;
 
-	if (!(spp = xp->spp)) {
-		if (!(xp->sp))
-			goto disable;
-		return (-EPROTO);
-	}
-	if (m->aspid.ptr.c && m->aspid.val && m->aspid.val != spp->aspid) {
+#if 0
+	if (m->aspid.cp && m->aspid.val && m->aspid.val != spp->aspid) {
 		/* FEATURE: As discussed on SIGTRAN list it might be advantageous to have an ASP
 		   indicate ASP Down for an ASP other than itself.  To do so, it would include the
 		   ASPID of the other ASP. So, if there is an ASPID in the message, we look for the 
 		   other ASP. */
 		for (spp = spp->sp.sp->spp.list; spp && spp->aspid != m->aspid.val;
 		     spp = spp->sp.next) ;
-		if (!spp || !spp->xp)
+		if (!spp || !spp->xp.xp)
 			goto badaspid;
-		xp = spp->xp;
+		xp = spp->xp.xp;
 	}
+#endif
 	switch (spp_get_state(spp)) {
 	case ASP_UP:
-		asp_set_state(q, spp, ASP_WACK_ASPDN);
+		asp_spp_set_state(spp, q, ASP_WACK_ASPDN);
 		/* fall through */
 	case ASP_WACK_ASPDN:
 		for (gp = spp->gp.list; gp; gp = gp->spp.next)
-			if (gp_get_state(gp) != AS_DOWN)
-				if ((err = gp_u_set_state(q, gp, AS_DOWN)))
-					return (err);
-		asp_set_state(q, spp, ASP_WACK_ASPUP);
+			if ((err = gp_u_set_state(gp, q, AS_DOWN)))
+				return (err);
+		asp_spp_set_state(spp, q, ASP_WACK_ASPUP);
 		/* fall through */
 	case ASP_WACK_ASPUP:
 		todo(("Notify management that the ASP has gone down\n"));
-		asp_set_state(q, spp, ASP_DOWN);
+		asp_spp_set_state(spp, q, ASP_DOWN);
 		/* fall through */
 	case ASP_DOWN:
-		if ((err = ua_send_asps_aspdn_ack(q, spp->xp, &spp->aspid, NULL, 0)))
+		if ((err = ua_send_asps_aspdn_ack(spp, q, NULL, 0)))
 			return (err);
 		return (QR_DONE);
 	}
@@ -6273,10 +6737,10 @@ sgp_recv_asps_aspdn_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (-ENOENT);
 }
 STATIC int
-ssp_recv_asps_aspdn_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_asps_aspdn_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	/* Do what the SGP does. */
-	return sgp_recv_asps_aspdn_req(xp, q, m);
+	return asp_recv_asps_aspdn_req(spp, q, m);
 }
 
 /*
@@ -6284,19 +6748,19 @@ ssp_recv_asps_aspdn_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_asps_hbeat_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_asps_hbeat_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return ua_send_asps_hbeat_ack(q, xp, m->hinfo.ptr.c, m->hinfo.len);
+	return ua_send_asps_hbeat_ack(spp->xp.xp, q, m->hinfo.cp, m->hinfo.len);
 }
 STATIC int
-sgp_recv_asps_hbeat_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_asps_hbeat_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return ua_send_asps_hbeat_ack(q, xp, m->hinfo.ptr.c, m->hinfo.len);
+	return ua_send_asps_hbeat_ack(spp->xp.xp, q, m->hinfo.cp, m->hinfo.len);
 }
 STATIC int
-spp_recv_asps_hbeat_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_asps_hbeat_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return ua_send_asps_hbeat_ack(q, xp, m->hinfo.ptr.c, m->hinfo.len);
+	return ua_send_asps_hbeat_ack(spp->xp.xp, q, m->hinfo.cp, m->hinfo.len);
 }
 
 /*
@@ -6304,35 +6768,30 @@ spp_recv_asps_hbeat_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_asps_aspup_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_asps_aspup_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
 	switch (spp_get_state(spp)) {
 	case ASP_UP:
 		/* ignore: probably a late ack to our ASPUP */
 		return (QR_DONE);
 	case ASP_WACK_ASPUP:
 		todo(("Indicate to management that the ASP is up.\n"));
-		return sgp_set_state(q, spp, ASP_UP);
+		return sgp_spp_set_state(spp, q, ASP_UP);
 	}
-	return (-EPROTO);
+	return (-EPROTO); /* Unexpected in this state. */
       disable:
 	return (QR_DISABLE);
 }
 STATIC int
-sgp_recv_asps_aspup_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_asps_aspup_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return (-EPROTO);
+	return (-EPROTO); /* Unexpected in this direction. */
 }
 STATIC int
-spp_recv_asps_aspup_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_asps_aspup_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	/* Do what the ASP does. */
-	return asp_recv_asps_aspup_ack(xp, q, m);
-
+	return sgp_recv_asps_aspup_ack(spp, q, m);
 }
 
 /*
@@ -6340,26 +6799,23 @@ spp_recv_asps_aspup_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_asps_aspdn_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_asps_aspdn_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	int err;
-	struct spp *spp;
 
-	if (!(spp = xp->spp))
-		goto disable;
 	switch (spp_get_state(spp)) {
 	case ASP_WACK_ASPDN:
 	case ASP_WACK_ASPUP:
 		/* solicited ASPDN Ack */
 		todo(("Indicate to management that the ASP is down.\n"));
-		return sgp_set_state(q, spp, ASP_DOWN);
+		return sgp_spp_set_state(spp, q, ASP_DOWN);
 	case ASP_UP:
 		/* unsolicited ASP Down: we attempt once to re-establish the ASP.  If the second
 		   attempt fails (in state ASP_WACK_ASPUP) we notify management and remain in the
 		   down state. */
-		if ((err = ua_send_asps_aspup_req(q, xp, NULL, NULL, 0)))
+		if ((err = ua_send_asps_aspup_req(spp, q, NULL, 0)))
 			return (err);
-		return sgp_set_state(q, spp, ASP_DOWN);
+		return sgp_spp_set_state(spp, q, ASP_DOWN);
 		return (QR_DONE);
 	}
 	rare();
@@ -6367,15 +6823,15 @@ asp_recv_asps_aspdn_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (QR_DISABLE);
 }
 STATIC int
-sgp_recv_asps_aspdn_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_asps_aspdn_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return (-EPROTO);
+	return (-EPROTO); /* Unexpected in this direction. */
 }
 STATIC int
-spp_recv_asps_aspdn_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_asps_aspdn_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	/* Do what the ASP does. */
-	return asp_recv_asps_aspdn_ack(xp, q, m);
+	return sgp_recv_asps_aspdn_ack(spp, q, m);
 
 }
 
@@ -6384,36 +6840,24 @@ spp_recv_asps_aspdn_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_asps_hbeat_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_asps_hbeat_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if ((spp = xp->spp)) {
-		spp_timer_stop(spp, tbeat);
-		spp_timer_start(spp, tidle);
-	}
+	spp_timer_stop(spp, tbeat);
+	spp_timer_start(spp, tidle);
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_asps_hbeat_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_asps_hbeat_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if ((spp = xp->spp)) {
-		spp_timer_stop(spp, tbeat);
-		spp_timer_start(spp, tidle);
-	}
+	spp_timer_stop(spp, tbeat);
+	spp_timer_start(spp, tidle);
 	return (QR_DONE);
 }
 STATIC int
-spp_recv_asps_hbeat_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_asps_hbeat_ack(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if ((spp = xp->spp)) {
-		spp_timer_stop(spp, tbeat);
-		spp_timer_start(spp, tidle);
-	}
+	spp_timer_stop(spp, tbeat);
+	spp_timer_start(spp, tidle);
 	return (QR_DONE);
 }
 
@@ -6422,43 +6866,60 @@ spp_recv_asps_hbeat_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_aspt_aspac_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_aspt_aspac_req(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
 	return (-EOPNOTSUPP);
 }
 STATIC int
-sgp_recv_aspt_aspac_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_aspt_aspac_req(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
 	int err;
-	struct spp *spp;
-	struct gp *gp, *g2;
+	struct gp *g2;
 	struct xp *x2;
 	struct as *as;
 	struct sp *sp;
 	struct ss *ss;
 
-	if (!(spp = xp->spp)) {
-		if (!(xp->sp))
-			goto disable;
-		goto badstate;
+	as = gp->as.as;
+	dassert(as != NULL);
+	sp = as->sp.sp;
+	dassert(sp != NULL);
+	if (m->tmode.wp) {
+		if (sp->tmode == 0) {
+			/* The AS has not been configured for a traffic mode yet but the ASP has
+			   specified a traffic mode.  Use whatever the ASP specified in the
+			   message. */
+			switch (m->tmode.val) {
+			case UA_TMODE_OVERRIDE:
+			case UA_TMODE_LOADSHARE:
+			case UA_TMODE_BROADCAST:
+				break;
+			default:
+				return (-ENOSYS);	/* Bad traffic mode. */
+			}
+			sp->tmode = m->tmode.val;
+		} else {
+			/* The AS has been configured for a traffic mode and the ASP must be
+			   consistent with that. */
+			if (sp->tmode != m->tmode.val)
+				return (-ENOSYS);	/* Bad traffic mode. */
+		}
+	} else {
+		if (sp->tmode == 0)
+			/* Strange.  The AS has not been configured for a traffic mode (that is we
+			   were prepared to accept any traffic mode the ASP requested), the ASP has
+			   not specified one, but one is necessary.  The SG is free to choose one by
+			   default.  We choose loadshare (because this will actually work with
+			   override as well if the ASPs behave as expected. */
+			sp->mode = UA_TMODE_LOADSHARE;
 	}
-	if (!m->iid.ptr.c || !m->tmode.ptr.c)
-		goto missing;
-	if (m->iid.len / sizeof(uint32_t) < 1)
-		goto badparm;
-	if (!(gp = spp_find_gp(spp, m->iid.ptr.w, m->iid.len)))
-		goto badiid;
-	if (!(as = gp->as.as) || !(sp = as->sp.sp))
-		goto efault;
-	if (sp->tmode != m->tmode.val)
-		goto badtmode;
 	switch (gp_get_state(gp)) {
 	case AS_DOWN:
-		return (-EPROTO);
+		return (-EPROTO); /* Unexpected in this state. */
 	case AS_INACTIVE:
 		if (gp_tst_flags(gp, ASF_MGMT_BLOCKED))
-			goto blocked;
-		if ((err = gp_u_set_state(q, gp, AS_WACK_ASPAC)))
+			return (-EPERM);	/* Management blocking. */
+		if ((err = gp_u_set_state(gp, q, AS_WACK_ASPAC)))
 			return (err);
 		/* fall through */
 	case AS_WACK_ASPAC:
@@ -6473,19 +6934,17 @@ sgp_recv_aspt_aspac_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			for (g2 = as->gp.list; g2 && g2 != gp && gp_get_state(g2) != AS_WACK_ASPAC;
 			     g2 = g2->as.next) ;
 			if (g2) {
-				if ((x2 = g2->spp.spp->xp)
-				    && (err =
-					ua_send_aspt_aspia_ack(q, x2, NULL, 0, NULL, 0, NULL, 0)))
+				if ((err = ua_send_aspt_aspia_ack(g2, q, NULL, 0)))
 					return (err);
-				if ((err = gp_u_set_state(q, g2, AS_INACTIVE)))
+				if ((err = gp_u_set_state(g2, q, AS_INACTIVE)))
 					return (err);
 			}
 			for (ss = as->ss.list; ss && ss_get_state(ss) != AS_WACK_ASPAC;
 			     ss = ss->as.next) ;
 			if (ss) {
-				if ((err = slu_error_ind(q, ss, 0, 0)))
+				if ((err = sl_error_ind(ss, q, 0, 0)))
 					return (err);
-				if ((err = ss_u_set_state(q, ss, AS_INACTIVE)))
+				if ((err = ss_u_set_state(ss, q, AS_INACTIVE)))
 					return (err);
 			}
 			return (QR_DONE);
@@ -6496,19 +6955,17 @@ sgp_recv_aspt_aspac_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			for (g2 = as->gp.list; g2 && g2 != gp && gp_get_state(g2) != AS_WACK_ASPIA;
 			     g2 = g2->as.next) ;
 			if (g2) {
-				if ((x2 = g2->spp.spp->xp)
-				    && (err =
-					ua_send_aspt_aspia_ack(q, x2, NULL, 0, NULL, 0, NULL, 0)))
+				if ((err = ua_send_aspt_aspia_ack(g2, q, NULL, 0)))
 					return (err);
-				if ((err = gp_u_set_state(q, g2, AS_INACTIVE)))
+				if ((err = gp_u_set_state(g2, q, AS_INACTIVE)))
 					return (err);
 			}
 			for (ss = as->ss.list; ss && ss_get_state(ss) != AS_WACK_ASPIA;
 			     ss = ss->as.next) ;
 			if (ss) {
-				if ((err = slu_disable_con(q, ss)))
+				if ((err = sl_disable_con(ss, q)))
 					return (err);
-				if ((err = ss_u_set_state(q, ss, AS_INACTIVE)))
+				if ((err = ss_u_set_state(ss, q, AS_INACTIVE)))
 					return (err);
 			}
 			break;
@@ -6519,21 +6976,19 @@ sgp_recv_aspt_aspac_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			for (g2 = as->gp.list; g2 && g2 != gp && gp_get_state(g2) != AS_ACTIVE;
 			     g2 = g2->as.next) ;
 			if (g2) {
-				if ((x2 = g2->spp.spp->xp)
-				    && (err = ua_send_mgmt_ntfy(q, x2,
+				if ((err = ua_send_mgmt_ntfy_as(g2, q,
 								UA_STATUS_ALTERNATE_ASP_ACTIVE,
-								&spp->aspid, &as->iid,
-								1, NULL, 0, NULL, 0)))
+								spp, NULL, 0)))
 					return (err);
-				if ((err = gp_u_set_state(q, g2, AS_INACTIVE)))
+				if ((err = gp_u_set_state(g2, q, AS_INACTIVE)))
 					return (err);
 			}
 			for (ss = as->ss.list; ss && ss_get_state(ss) != AS_ACTIVE;
 			     ss = ss->as.next) ;
 			if (ss) {
-				if ((err = slu_error_ind(q, ss, 0, 0)))
+				if ((err = sl_error_ind(ss, q, 0, 0)))
 					return (err);
-				if ((err = ss_u_set_state(q, ss, AS_INACTIVE)))
+				if ((err = ss_u_set_state(ss, q, AS_INACTIVE)))
 					return (err);
 			}
 			break;
@@ -6541,41 +6996,21 @@ sgp_recv_aspt_aspac_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 		/* fall through */
 	case AS_WACK_ASPIA:
 		todo(("Notify management that ASP has gone active\n"));
-		if ((err = gp_u_set_state(q, gp, AS_ACTIVE)))
+		if ((err = gp_u_set_state(gp, q, AS_ACTIVE)))
 			return (err);
 	case AS_ACTIVE:
-		if ((err = ua_send_aspt_aspac_ack(q, xp, as->sp.sp->tmode,
-						  m->iid.ptr.w, m->iid.len / sizeof(uint32_t),
-						  m->rc.ptr.w, m->rc.len / sizeof(uint32_t),
-						  NULL, 0)))
+		if ((err = ua_send_aspt_aspac_ack(gp, q, NULL, 0)))
 			return (err);
 		return (QR_DONE);
 	}
-      badstate:
-	return (-EPROTO);
-      efault:
 	swerr();
-	return (-EFAULT);
-      blocked:
-	return ua_send_aspt_aspia_ack(q, xp,
-				      m->iid.ptr.w, m->iid.len / sizeof(uint32_t),
-				      m->rc.ptr.w, m->rc.len / sizeof(uint32_t), NULL, 0);
-      badtmode:
-	return (-ENOSYS);
-      badiid:
-	return (-EIO);
-      missing:
-	return (-ENXIO);
-      badparm:
-	return (-EMSGSIZE);
-      disable:
-	return (QR_DISABLE);
+	return (-EFAULT);	/* Bad state. */
 }
 STATIC int
-spp_recv_aspt_aspac_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_aspt_aspac_req(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
 	/* Do what the SGP does. */
-	return sgp_recv_aspt_aspac_req(xp, q, m);
+	return asp_recv_aspt_aspac_req(gp, q, m);
 }
 
 /*
@@ -6583,35 +7018,28 @@ spp_recv_aspt_aspac_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_aspt_aspia_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_aspt_aspia_req(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
 	return (-EOPNOTSUPP);
 }
 STATIC int
-sgp_recv_aspt_aspia_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_aspt_aspia_req(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
 	int err;
-	struct spp *spp;
-	struct gp *gp;
 	struct as *as;
 	struct sp *sp;
 
-	if (!(spp = xp->spp)) {
-		if (!(xp->sp))
-			goto disable;
-		goto badstate;
-	}
-	if (!m->iid.ptr.w)
-		goto missing;
-	if (!(gp = spp_find_gp(spp, m->iid.ptr.w, m->iid.len)))
-		goto badiid;
-	if (!(as = gp->as.as) || !(sp = as->sp.sp))
-		goto efault;
+	as = gp->as.as;
+	dassert(as != NULL);
+
+	sp = as->sp.sp;
+	dassert(sp != NULL);
+
 	switch (gp_get_state(gp)) {
 	case AS_DOWN:
-		return (-EPROTO);
+		return (-EPROTO); /* Unexpected in this state. */
 	case AS_ACTIVE:
-		if ((err = gp_u_set_state(q, gp, AS_WACK_ASPIA)))
+		if ((err = gp_u_set_state(gp, q, AS_WACK_ASPIA)))
 			return (err);
 		/* fall through */
 	case AS_WACK_ASPIA:
@@ -6619,28 +7047,23 @@ sgp_recv_aspt_aspia_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 	case AS_INACTIVE:
 		break;
 	}
-	gp_u_set_state(q, gp, ASP_WACK_ASPIA);
-	if ((err = ua_send_aspt_aspia_ack(q, xp,
-					  m->iid.ptr.w, m->iid.len / sizeof(uint32_t),
-					  m->rc.ptr.w, m->rc.len / sizeof(uint32_t), NULL, 0)))
+	gp_u_set_state(gp, q, ASP_WACK_ASPIA);
+	if ((err = ua_send_aspt_aspia_ack(gp, q, NULL, 0)))
 		return (err);
-	gp_u_set_state(q, gp, ASP_INACTIVE);
+	gp_u_set_state(gp, q, ASP_INACTIVE);
       efault:
 	swerr();
 	return (-EFAULT);
       badstate:
 	return (-EPROTO);
-      badiid:
-	return (-EIO);
-      missing:
-	return (-ENXIO);
       disable:
 	return (QR_DISABLE);
 }
 STATIC int
-spp_recv_aspt_aspia_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_aspt_aspia_req(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
-	return sgp_recv_aspt_aspia_req(xp, q, m);
+	/* Do what SGP does. */
+	return asp_recv_aspt_aspia_req(gp, q, m);
 }
 
 /*
@@ -6648,17 +7071,8 @@ spp_recv_aspt_aspia_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_aspt_aspac_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_aspt_aspac_ack(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-	struct gp *gp;
-
-	if (!(spp = xp->spp))
-		goto disable;
-	if (!m->iid.ptr.w)
-		goto missing;
-	if (!(gp = spp_find_gp(spp, m->iid.ptr.w, m->iid.len)))
-		goto badiid;
 	switch (gp_get_state(gp)) {
 	case ASP_ACTIVE:
 		return (QR_DONE);
@@ -6672,23 +7086,20 @@ asp_recv_aspt_aspac_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
 		/* attempt deactivation */
 		return (QR_DONE);
 	}
-	return (-EPROTO);
-      badiid:
-	return (-EIO);
-      missing:
-	return (-ENXIO);
+	return (-EPROTO); /* Unexpected in this state. */
       disable:
 	return (QR_DISABLE);
 }
 STATIC int
-sgp_recv_aspt_aspac_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_aspt_aspac_ack(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
-	return (-EPROTO);
+	return (-EPROTO); /* Unexpected in this direction. */
 }
 STATIC int
-spp_recv_aspt_aspac_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_aspt_aspac_ack(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
-	return asp_recv_aspt_aspac_ack(xp, q, m);
+	/* Do what ASP does. */
+	return sgp_recv_aspt_aspac_ack(gp, q, m);
 }
 
 /*
@@ -6696,25 +7107,16 @@ spp_recv_aspt_aspac_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_aspt_aspia_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_aspt_aspia_ack(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
 	int err;
-	struct spp *spp;
-	struct gp *gp;
-
-	if (!(spp = xp->spp))
-		goto disable;
-	if (!m->iid.ptr.w)
-		goto missing;
-	if (!(gp = spp_find_gp(spp, m->iid.ptr.w, m->iid.len)))
-		goto badiid;
 	switch (gp_get_state(gp)) {
 	case ASP_INACTIVE:
 		/* ignore, probably late ack to our ASPIA */
 		/* XXX: maybe we should inform management here */
 		return (QR_DONE);
 	case ASP_WACK_ASPIA:
-		gp_p_set_state(q, gp, ASP_INACTIVE);
+		gp_p_set_state(gp, q, ASP_INACTIVE);
 		return (QR_DONE);
 	case ASP_WACK_ASPAC:
 		/* ignore, wait for timer to fire */
@@ -6725,31 +7127,26 @@ asp_recv_aspt_aspia_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
 		   inactive state.  We must placed the ASP in the inactive state and then try to
 		   bring it back up again. */
 		/* FIXME: handle routing contexts */
-		if ((err = ua_send_aspt_aspac_req(q, xp, gp->as.as->sp.sp->tmode,
-						  m->iid.ptr.w, m->iid.len / sizeof(uint32_t),
-						  NULL, 0, NULL, 0)))
+		if ((err = ua_send_aspt_aspac_req(gp, q, NULL, 0)))
 			return (err);
-		gp_p_set_state(q, gp, ASP_INACTIVE);
-		gp_p_set_state(q, gp, ASP_WACK_ASPAC);
+		gp_p_set_state(gp, q, ASP_INACTIVE);
+		gp_p_set_state(gp, q, ASP_WACK_ASPAC);
 		return (QR_DONE);
 	}
 	return (-EOPNOTSUPP);
-      badiid:
-	return (-EIO);
-      missing:
-	return (-ENXIO);
       disable:
 	return (QR_DISABLE);
 }
 STATIC int
-sgp_recv_aspt_aspia_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_aspt_aspia_ack(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
-	return (-EPROTO);
+	return (-EPROTO); /* Unexpected in this direction. */
 }
 STATIC int
-spp_recv_aspt_aspia_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_aspt_aspia_ack(struct gp *gp, queue_t *q, struct ua_msg *m)
 {
-	return asp_recv_aspt_aspia_ack(xp, q, m);
+	/* Does what ASP does. */
+	return sgp_recv_aspt_aspia_ack(gp, q, m);
 }
 
 /*
@@ -6757,31 +7154,21 @@ spp_recv_aspt_aspia_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_rkmm_reg_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_rkmm_reg_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EOPNOTSUPP);
 }
 STATIC int
-sgp_recv_rkmm_reg_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_rkmm_reg_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
-	return (-EPROTO);
-      disable:
-	return (QR_DISABLE);
+	fixme(("Write this function.\n"));
+	return (-EFAULT);
 }
 STATIC int
-spp_recv_rkmm_reg_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_rkmm_reg_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
-	return (-EPROTO);
-      disable:
-	return (QR_DISABLE);
+	/* Do what SGP does. */
+	return asp_recv_rkmm_reg_req(spp, q, m);
 }
 
 /*
@@ -6789,31 +7176,21 @@ spp_recv_rkmm_reg_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_rkmm_reg_rsp(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_rkmm_reg_rsp(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
-	return (-EPROTO);
-      disable:
-	return (QR_DISABLE);
+	fixme(("Write this function.\n"));
+	return (-EFAULT);
 }
 STATIC int
-sgp_recv_rkmm_reg_rsp(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_rkmm_reg_rsp(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return (-EOPNOTSUPP);
+	return (-EPROTO); /* Unexpected in this direction. */
 }
 STATIC int
-spp_recv_rkmm_reg_rsp(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_rkmm_reg_rsp(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
-	return (-EPROTO);
-      disable:
-	return (QR_DISABLE);
+	/* Do what ASP does. */
+	return sgp_recv_rkmm_reg_rsp(spp, q, m);
 }
 
 /*
@@ -6821,31 +7198,137 @@ spp_recv_rkmm_reg_rsp(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_rkmm_dereg_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_rkmm_dereg_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	return (-EOPNOTSUPP);
+	return (-EPROTO); /* Unexpected in this direction. */
+}
+/**
+ * asp_recv_rkmm_deref_req: - deregister for an AS
+ * @spp: ASP from which the message was received
+ * @q: active qeuue
+ * @m: the message
+ *
+ * Note that we should lookup up routing key management messages by AS and enter this function with
+ * a gp instead of an spp.  If this SPP needs to register for the AS (as indicated by flags in the
+ * GP structure) and the GP is in the AS-INACTIVE state, move the GP to the AS-DOWN state and
+ * respond with success.  If the GP is in the AS-ACTIVE (or transitional) state, respond with
+ * failure Error - ASP Currently Active for Routing Context and do nothing.  If the GP is already in
+ * the AS-DOWN state,
+ *
+ * M2UA DEREG REQ contains a list of binary or text interface identifiers as a repeated list of
+ * parameters.  We do not support text interface identifiers for DEREG REQ or repeated binary
+ * Interface Identifier parameters (the binary identifier was returned in response to the REG REQ
+ * and * can contain multiple identifiers).  The M3UA, SUA and TUA DEREG REQ contains a routing
+ * context parameter that can contain one or more routing contexts.
+ */
+STATIC int
+asp_recv_rkmm_dereg_req(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	int err, num_rc = 0, processed = 0;
+	uint32_t *wp = NULL;
+	unsigned char *cp = NULL;
+	struct gp *gp;
+
+	if ((wp = m->rc.wp)) {
+		if (m->rc.len < sizeof(uint32_t)
+		    || (m->rc.len & (sizeof(uint32_t) - 1)))
+			return (-EMSGSIZE);
+		num_rc = m->rc.len >> 2;
+	} else if ((wp = m->iid.wp)) {
+		if (m->iid.len < sizeof(uint32_t)
+		    || (m->iid.len & (sizeof(uint32_t) - 1)))
+			return (-EMSGSIZE);
+		num_rc = m->iid.len >> 2;
+	} else
+		return (-ENXIO);	/* missing mandatory parameter */
+
+	{
+		mblk_t *dp;
+		uint32_t *results;
+
+		if (!(dp = ss7_allocb(num_rc * sizeof(uint32_t), BPRI_MED)))
+			return (-ENOBUFS);
+		results = (uint32_t *) bp->b_wptr;
+
+		for (i = 0; i < num_rc; i++)
+			results[i] = __constant_htonl(UA_DEREG_STATUS_INVALID_ID);
+
+		for (processed = 0, gp = spp->gp.list; gp; gp = gp->spp.next) {
+			int i;
+
+			for (i = 0; i < num_rc; i++)
+				if (gp->as.as->rc == ntohl(wp[i]))
+					break;
+			if (i >= num_rc)
+				continue;
+			if (!gp_tst_flags(gp, ASF_REGISTRATION)) {
+				results[i] = __constant_htonl(UA_DEREG_STATUS_PERMISSION_DENIED);
+				continue;
+			}
+			switch (gp_get_state(gp)) {
+			case AS_DOWN:
+				results[i] = __constant_htonl(UA_DEREG_STATUS_NOT_REGISTERED);
+				break;
+			case AS_ACTIVE:
+			case AS_WACK_ASPAC:
+			case AS_WACK_ASPIA:
+				/* FIXME: M2UA needs to send an ERR message. */
+				results[i] = __constant_htonl(UA_DEREG_STATUS_ID_ACTIVE_FOR_AS);
+				break;
+			case AS_INACTIVE:
+				results[i] = __constant_htonl(UA_DEREG_STATUS_SUCCESS);
+				break;
+			default:
+				results[i] = __constant_htonl(UA_DEREG_STATUS_UNKNOWN);
+				break;
+			}
+			processed++;
+			if (processed >= num_rc)
+				break;
+		}
+		if ((err = ua_send_rkmm_dereg_rsp(spp, q, num_rc, wp, results)) < 0) {
+			freeb(dp);
+			return (err);
+		}
+		freeb(dp);
+		/* Once more, moving all the deregistered ones to the AS_DOWN state. */
+		for (processed = 0, gp = spp->gp.list; gp; gp = gp->spp.next) {
+			int i;
+
+			for (i = 0; i < num_rc; i++)
+				if (gp->as.as->rc == ntohl(wp[i]))
+					break;
+			if (i >= num_rc)
+				continue;
+			if (!gp_tst_flags(gp, ASF_REGISTRATION))
+				continue;
+			if (gp_get_state(gp) == AS_INACTIVE) {
+				/* Note that moving a GP from the AS_INACTIVE state to the AS_DOWN
+				   state should never change the state of the AS-U in such a way
+				   that notification is required.  That is, if we are the last ASP
+				   in the AS_INACTIVE state, the AS-U transition from AS-INACTIVE
+				   to AS-DOWN sends no notifications and does not affect the state
+				   of the AS-P. */
+				if ((err = gp_u_set_state(gp, AS_DOWN))) {
+					swerr();
+					/* force it to that state anyway */
+					gp->as.as->counts.inactive--;
+					gp->as.as->counts.down++;
+					gp_set_state(gp, AS_DOWN);
+				}
+			}
+			processed++;
+			if (processed >= num_rc)
+				break;
+		}
+	}
+	return (QR_DONE);
 }
 STATIC int
-sgp_recv_rkmm_dereg_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_rkmm_dereg_req(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
-	return (-EPROTO);
-      disable:
-	return (QR_DISABLE);
-}
-STATIC int
-spp_recv_rkmm_dereg_req(struct xp *xp, queue_t *q, struct ua_msg *m)
-{
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
-	return (-EPROTO);
-      disable:
-	return (QR_DISABLE);
+	/* Do what SGP does. */
+	return asp_recv_rkmm_dereg_req(spp, q, m);
 }
 
 /*
@@ -6853,71 +7336,241 @@ spp_recv_rkmm_dereg_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_rkmm_dereg_rsp(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_rkmm_dereg_rsp(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
 	return (-EPROTO);
-      disable:
-	return (QR_DISABLE);
 }
 STATIC int
-sgp_recv_rkmm_dereg_rsp(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_rkmm_dereg_rsp(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EOPNOTSUPP);
 }
 STATIC int
-spp_recv_rkmm_dereg_rsp(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_rkmm_dereg_rsp(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	struct spp *spp;
-
-	if (!(spp = xp->spp))
-		goto disable;
 	return (-EPROTO);
-      disable:
-	return (QR_DISABLE);
 }
 
 /*
- *  M2UA_MAUP_ESTAB_REQ:
- *  -----------------------------------
+ *  IUA Received Messages
+ */
+/* Data Request */
+STATIC int
+sgp_recv_qptm_data_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_data_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_data_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Data Indication */
+STATIC int
+sgp_recv_qptm_data_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_data_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_data_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Unitdata Request */
+STATIC int
+sgp_recv_qptm_udat_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_udat_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_udat_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Unitdata Indication */
+STATIC int
+sgp_recv_qptm_udat_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_udat_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_udat_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Establish Request */
+STATIC int
+sgp_recv_qptm_estb_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_estb_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_estb_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Establish Confirm */
+STATIC int
+sgp_recv_qptm_estb_con(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_estb_con(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_estb_con(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Establish Indication */
+STATIC int
+sgp_recv_qptm_estb_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_estb_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_estb_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Release Request */
+STATIC int
+sgp_recv_qptm_rels_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_rels_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_rels_req(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Release Confirm */
+STATIC int
+sgp_recv_qptm_rels_con(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_rels_con(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_rels_con(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/* Release Indication */
+STATIC int
+sgp_recv_qptm_rels_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_qptm_rels_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_qptm_rels_ind(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/*
+ *  M2UA Received Messages
+ */
+
+/* M2UA_MAUP_ESTAB_REQ */
+
+/**
+ * sgp_recv_maup_estab_req: - process received M2UA_MAUP_ESTAB_REQ
+ * @sgp: SGP/AS relation for which the message was received
+ * @q: active queue (read queue)
+ * @m: decoded M2UA message
+ *
+ * The M2UA_MAUP_ESTAB_REQ message should never be received from an SGP.
  */
 STATIC int
-asp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_estab_req(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
+
+/**
+ * asp_recv_maup_estab_req: process recieved M2UA_MAUP_ESTAB_REQ
+ * @asp: ASP/AS relation for which the message was received
+ * @q: active queue (read queue)
+ * @m: decoded M2UA message
+ */
 STATIC int
-sgp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_estab_req(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	int err;
-	struct as *as;
-	struct ss *ssp;
+	struct as *as = asp->as.as;
 	struct ap *ap;
-	struct gp *asp, *sgp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(asp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (!gp_tst_flags(asp, ASF_ACTIVE))
-		return (QR_DONE);
-	if (!(as = asp->as.as))
-		return (-EFAULT);
+	dassert(as != NULL);
+
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		struct ss *ssp;
+		struct gp *sgp;
+
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			switch (ss_get_s_state(ssp)) {
 			case SLS_WCON_RELREQ:
 				/* The signalling link has failed and we are restarting it. */
 				rare();
 			case SLS_IDLE:
 				if (!ss_tst_flags(ssp, ASF_RETRIEVAL)) {
-					if ((err = slp_start_req(q, ssp, m)) < 0)
+					if ((err = sl_start_req(ssp, q)) < 0)
 						return (err);
 					gp_set_s_state(asp, SLS_WCON_EREQ);
 					ss_set_s_state(ssp, SLS_WCON_EREQ);
@@ -6926,7 +7579,7 @@ sgp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 					/* Someone else is retrieving messages so we need to
 					   indicate that the signalling link has failed (reason
 					   will be unspecified). */
-					if ((err = m2ua_send_maup_rel_ind(q, asp, NULL)) < 0)
+					if ((err = m2ua_send_maup_rel_ind(asp, q)) < 0)
 						return (err);
 					gp_set_s_state(asp, SLS_IDLE);
 					return (QR_DONE);
@@ -6939,7 +7592,7 @@ sgp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			case SLS_ESTABLISHED:
 				/* The signalling link is already established by some signalling
 				   link user. Indicate that the link is in service. */
-				if ((err = m2ua_send_maup_estab_con(q, asp, NULL)) < 0)
+				if ((err = m2ua_send_maup_estab_con(asp, q)) < 0)
 					return (err);
 				gp_set_s_state(asp, SLS_ESTABLISHED);
 				return (QR_DONE);
@@ -6949,7 +7602,9 @@ sgp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			}
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			if (!(xp = sgp->spp.spp->xp))
+			struct xp *xp;
+
+			if (!(xp = sgp->spp.spp->xp.xp))
 				return (-EFAULT);
 			switch (gp_get_s_state(sgp)) {
 			case SLS_WCON_RELREQ:
@@ -6968,7 +7623,7 @@ sgp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 					/* Someone else is retrieving messages so we need to
 					   indicate that the signalling link has failed (reason
 					   will be unspecified). */
-					if ((err = m2ua_send_maup_rel_ind(q, asp, NULL)) < 0)
+					if ((err = m2ua_send_maup_rel_ind(asp, q)) < 0)
 						return (err);
 					gp_set_s_state(asp, SLS_IDLE);
 					return (QR_DONE);
@@ -6981,7 +7636,7 @@ sgp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			case SLS_ESTABLISHED:
 				/* The signalling link is already established by some signalling
 				   link user. Indicate that the link is in service. */
-				if ((err = m2ua_send_maup_estab_con(q, asp, NULL)) < 0)
+				if ((err = m2ua_send_maup_estab_con(asp, q)) < 0)
 					return (err);
 				gp_set_s_state(asp, SLS_ESTABLISHED);
 				return (QR_DONE);
@@ -6994,8 +7649,17 @@ sgp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 	}
 	return (-EFAULT);
 }
+
+/**
+ * spp_recv_maup_estab_req: - proces received M2UA_MAUP_ESTAB_REQ
+ * @spp: SPP/AS relation for which the message was received
+ * @q: active queue (read queue)
+ * @m: decoded M2UA message
+ *
+ * No M2UA messages are expected to be received on an SPP.
+ */
 STATIC int
-spp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_estab_req(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7005,40 +7669,31 @@ spp_recv_maup_estab_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_estab_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_estab_con(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_get_s_state(ssu) == SLS_WCON_EREQ) {
-				if ((err = slu_in_service_ind(q, ssu, m)))
+				if ((err = sl_in_service_ind(ssu, q)))
 					return (err);
 				ss_set_s_state(ssu, SLS_ESTABLISHED);
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_get_s_state(asp) == SLS_WCON_EREQ) {
-				if (!canputnext(asp->spp.spp->xp->oq))
+				if (!canputnext(asp->spp.spp->xp.xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(asp->spp.spp->xp->oq, bp);
+				putnext(asp->spp.spp->xp.xp->oq, bp);
 				gp_set_s_state(asp, SLS_ESTABLISHED);
 			}
 	}
@@ -7046,12 +7701,12 @@ asp_recv_maup_estab_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_estab_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_estab_con(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_estab_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_estab_con(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7061,36 +7716,27 @@ spp_recv_maup_estab_con(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_rel_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_rel_req(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-sgp_recv_maup_rel_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_rel_req(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
 	struct ss *ssp;
 	struct ap *ap;
-	struct gp *sgp, *asp;
+	struct gp *sgp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(asp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (!gp_tst_flags(asp, ASF_ACTIVE))
-		return (QR_DONE);
 	if (!(as = asp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			switch (ss_get_s_state(ssp)) {
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
-				if ((err = slp_stop_req(q, ssp, m)))
+				if ((err = sl_stop_req(ssp, q)))
 					return (err);
 				/* no confirmation from SL-P */
 				ss_set_s_state(ssp, SLS_WCON_RELREQ);
@@ -7099,7 +7745,7 @@ sgp_recv_maup_rel_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 				ss_set_s_state(ssp, SLS_IDLE);
 				/* fall through */
 			case SLS_IDLE:
-				if ((err = m2ua_send_maup_rel_con(q, asp, NULL)))
+				if ((err = m2ua_send_maup_rel_con(asp, q)))
 					return (err);
 				/* FIXME: All local signalling link users that believe the link to
 				   be active must be notified with a link failure with unspecified
@@ -7114,7 +7760,7 @@ sgp_recv_maup_rel_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			return (QR_DONE);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			if (!(xp = sgp->spp.spp->xp))
+			if (!(xp = sgp->spp.spp->xp.xp))
 				return (-EFAULT);
 			switch (gp_get_s_state(sgp)) {
 			case SLS_WCON_EREQ:
@@ -7129,7 +7775,7 @@ sgp_recv_maup_rel_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 				/* The signalling link has already been put out of service by some
 				   other signalling link user or we can't put it out of service.
 				   Just silently accept the request. */
-				if ((err = m2ua_send_maup_rel_con(q, asp, NULL)))
+				if ((err = m2ua_send_maup_rel_con(asp, q)))
 					return (err);
 				break;
 			default:
@@ -7143,7 +7789,7 @@ sgp_recv_maup_rel_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (-EFAULT);
 }
 STATIC int
-spp_recv_maup_rel_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_rel_req(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7153,35 +7799,26 @@ spp_recv_maup_rel_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_rel_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_rel_con(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	assure(gp_get_s_state(sgp) == SLS_WCON_RELREQ);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			switch (ss_get_s_state(ssu)) {
 			case SLS_WCON_RELREQ:
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
 			case SLS_UNKNOWN:
-				if ((err = slu_out_of_service_ind(q, ssu, m)))
+				if ((err = sl_out_of_service_ind(ssu, q, 0)))
 					return (err);
 				ss_set_s_state(ssu, SLS_IDLE);
 			}
@@ -7191,11 +7828,11 @@ asp_recv_maup_rel_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
 			case SLS_UNKNOWN:
-				if (!canputnext(asp->spp.spp->xp->oq))
+				if (!canputnext(asp->spp.spp->xp.xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(asp->spp.spp->xp->oq, bp);
+				putnext(asp->spp.spp->xp.xp->oq, bp);
 				gp_set_s_state(asp, SLS_IDLE);
 			}
 	}
@@ -7203,12 +7840,12 @@ asp_recv_maup_rel_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_rel_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_rel_con(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_rel_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_rel_con(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7218,32 +7855,24 @@ spp_recv_maup_rel_con(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_rel_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_rel_ind(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	assure(gp_get_s_state(sgp) != SLS_IDLE);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1)) {
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1)) {
 			if (!ss_tst_flags(ssu, ASF_OPERATION_PENDING)) {
 				if (ss_get_s_state(ssu) != SLS_IDLE) {
-					if ((err = slu_out_of_service_ind(q, ssu, m)))
+					if ((err =
+					     sl_out_of_service_ind(ssu, q, SL_FAIL_UNSPECIFIED)))
 						return (err);
 					ss_set_s_state(ssu, SLS_IDLE);
 					ss_set_flags(ssu, ASF_OPERATION_PENDING);
@@ -7253,11 +7882,11 @@ asp_recv_maup_rel_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1)) {
 			if (!gp_tst_flags(asp, ASF_OPERATION_PENDING)) {
 				if (gp_get_s_state(asp) != SLS_IDLE) {
-					if (!canputnext(asp->spp.spp->xp->oq))
+					if (!canputnext(asp->spp.spp->xp.xp->oq))
 						return (-EBUSY);
 					if (!(bp = ss7_dupmsg(q, m->mp)))
 						return (-ENOBUFS);
-					putnext(asp->spp.spp->xp->oq, bp);
+					putnext(asp->spp.spp->xp.xp->oq, bp);
 					gp_set_s_state(asp, SLS_IDLE);
 					gp_set_flags(asp, ASF_OPERATION_PENDING);
 				}
@@ -7265,7 +7894,7 @@ asp_recv_maup_rel_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
 		}
 	}
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			ss_clr_flags(ssu, ASF_OPERATION_PENDING);
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			gp_clr_flags(asp, ASF_OPERATION_PENDING);
@@ -7274,12 +7903,12 @@ asp_recv_maup_rel_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_rel_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_rel_ind(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_rel_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_rel_ind(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7289,32 +7918,23 @@ spp_recv_maup_rel_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_state_req(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_state_req(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
 	struct ss *ssp;
 	struct ap *ap;
-	struct gp *sgp, *asp;
+	struct gp *sgp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || !m->status.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(asp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (!gp_tst_flags(asp, ASF_ACTIVE))
-		return (QR_DONE);
 	if (!(as = asp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (!ss_tst_flags(ssp, ASF_OPERATION_PENDING)) {
 				switch (m->status.val) {
 				case M2UA_STATUS_LPO_SET:
@@ -7322,9 +7942,8 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 					   physical link if we are the only signalling link user. */
 					if (!gp_tst_flags(asp, ASF_USR_PROC_OUTAGE)) {
 						if (!ss_tst_flags(ssp, ASF_USR_PROC_OUTAGE)) {
-							if ((err = slp_local_processor_outage_req(q,
-												  ssp,
-												  m)))
+							if ((err =
+							     sl_local_processor_outage_req(ssp, q)))
 								return (err);
 							ss_set_flags(ssp, ASF_USR_PROC_OUTAGE);
 						}
@@ -7336,7 +7955,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 					   physical link if we are the only signalling link user. */
 					if (gp_tst_flags(asp, ASF_USR_PROC_OUTAGE)) {
 						if (ss_tst_flags(ssp, ASF_USR_PROC_OUTAGE)) {
-							if ((err = slp_resume_req(q, ssp, m)))
+							if ((err = sl_resume_req(ssp, q)))
 								return (err);
 							ss_clr_flags(ssp, ASF_USR_PROC_OUTAGE);
 						}
@@ -7346,7 +7965,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 				case M2UA_STATUS_EMER_SET:
 					if (!gp_tst_flags(asp, ASF_EMERGENCY)) {
 						if (!ss_tst_flags(ssp, ASF_EMERGENCY)) {
-							if ((err = slp_emergency_req(q, ssp, m)))
+							if ((err = sl_emergency_req(ssp, q)))
 								return (err);
 							ss_set_flags(ssp, ASF_EMERGENCY);
 						}
@@ -7356,8 +7975,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 				case M2UA_STATUS_EMER_CLEAR:
 					if (gp_tst_flags(asp, ASF_EMERGENCY)) {
 						if (ss_tst_flags(ssp, ASF_EMERGENCY)) {
-							if ((err = slp_emergency_ceases_req(q, ssp,
-											    m)))
+							if ((err = sl_emergency_ceases_req(ssp, q)))
 								return (err);
 							ss_clr_flags(ssp, ASF_EMERGENCY);
 						}
@@ -7370,8 +7988,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 					   response. */
 					if (!gp_tst_flags(asp, ASF_FLUSH_BUFFERS)) {
 						if (!ss_tst_flags(ssp, ASF_FLUSH_BUFFERS)) {
-							if ((err = slp_clear_buffers_req(q, ssp,
-											 m)))
+							if ((err = sl_clear_buffers_req(ssp, q)))
 								return (err);
 							ss_set_flags(ssp, ASF_FLUSH_BUFFERS);
 						}
@@ -7381,7 +7998,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 				case M2UA_STATUS_CONTINUE:
 					if (gp_tst_flags(asp, ASF_RECOVERY)) {
 						if (ss_tst_flags(ssp, ASF_RECOVERY)) {
-							if ((err = slp_continue_req(q, ssp, m)))
+							if ((err = sl_continue_req(ssp, q)))
 								return (err);
 							ss_clr_flags(ssp,
 								     (ASF_RECOVERY |
@@ -7399,7 +8016,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 					   response. */
 					if (!gp_tst_flags(asp, ASF_CLEAR_RTB)) {
 						if (!ss_tst_flags(ssp, ASF_CLEAR_RTB)) {
-							if ((err = slp_clear_rtb_req(q, ssp, m)))
+							if ((err = sl_clear_rtb_req(ssp, q)))
 								return (err);
 							ss_set_flags(ssp, ASF_CLEAR_RTB);
 						}
@@ -7413,8 +8030,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 					if (gp_tst_flags(asp, (ASF_CONG_ACCEPT | ASF_CONG_DISCARD))) {
 						if (ss_tst_flags
 						    (ssp, (ASF_CONG_ACCEPT | ASF_CONG_DISCARD))) {
-							if ((err = slp_no_congestion_req(q, ssp,
-											 m)))
+							if ((err = sl_no_congestion_req(ssp, q)))
 								return (err);
 							ss_clr_flags(ssp,
 								     (ASF_CONG_ACCEPT |
@@ -7427,8 +8043,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 				case M2UA_STATUS_CONG_ACCEPT:
 					if (!gp_tst_flags(asp, ASF_CONG_ACCEPT)) {
 						if (!ss_tst_flags(ssp, ASF_CONG_ACCEPT)) {
-							if ((err = slp_congestion_accept_req(q, ssp,
-											     m)))
+							if ((err = sl_congestion_accept_req(ssp q)))
 								return (err);
 							ss_set_flags(ssp, ASF_CONG_ACCEPT);
 							ss_clr_flags(ssp, ASF_CONG_DISCARD);
@@ -7440,9 +8055,8 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 				case M2UA_STATUS_CONG_DISCARD:
 					if (!gp_tst_flags(asp, ASF_CONG_DISCARD)) {
 						if (!ss_tst_flags(ssp, ASF_CONG_DISCARD)) {
-							if ((err = slp_congestion_discard_req(q,
-											      ssp,
-											      m)))
+							if ((err =
+							     sl_congestion_discard_req(ssp, q)))
 								return (err);
 							ss_set_flags(ssp, ASF_CONG_DISCARD);
 							ss_clr_flags(ssp, ASF_CONG_ACCEPT);
@@ -7470,7 +8084,7 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			case M2UA_STATUS_CONG_CLEAR:
 			case M2UA_STATUS_CONG_ACCEPT:
 			case M2UA_STATUS_CONG_DISCARD:
-				if ((err = m2ua_send_maup_con(q, asp, m)))
+				if ((err = m2ua_send_maup_con(asp, q, m)))
 					return (err);
 				break;
 			}
@@ -7478,18 +8092,20 @@ sgp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			return (QR_DONE);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			if (!sgp->spp.spp->xp)
+			struct xp *xp;
+
+			if (!(xp = sgp->spp.spp->xp.xp))
 				return (-EFAULT);
-			if (!canputnext(sgp->spp.spp->xp->oq))
+			if (!canputnext(xp->oq))
 				return (-EBUSY);
-			putnext(sgp->spp.spp->xp->oq, m->mp);
+			putnext(xp->oq, m->mp);
 			return (QR_DONE);
 		}
 	}
 	return (-EFAULT);
 }
 STATIC int
-spp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_state_req(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7499,40 +8115,31 @@ spp_recv_maup_state_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_state_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_state_con(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || !m->status.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1)) {
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1)) {
 			switch (m->status.val) {
 			case M2UA_STATUS_LPO_SET:
 			case M2UA_STATUS_LPO_CLEAR:
 				break;
 			case M2UA_STATUS_FLUSH_BUFFERS:
 				if (ss_tst_flags(ssu, ASF_FLUSH_BUFFERS))
-					if ((err = slu_rb_cleared_ind(q, ssu, m)))
+					if ((err = sl_rb_cleared_ind(ssu, q)))
 						return (err);
 				break;
 			case M2UA_STATUS_CLEAR_RTB:
 				if (ss_tst_flags(ssu, ASF_CLEAR_RTB))
-					if ((err = slu_rtb_cleared_ind(q, ssu, m)))
+					if ((err = sl_rtb_cleared_ind(ssu, q)))
 						return (err);
 				break;
 			case M2UA_STATUS_EMER_SET:
@@ -7551,6 +8158,8 @@ asp_recv_maup_state_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 			}
 		}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1)) {
+			struct xp *xp;
+
 			switch (m->status.val) {
 			case M2UA_STATUS_LPO_SET:
 			case M2UA_STATUS_LPO_CLEAR:
@@ -7563,11 +8172,13 @@ asp_recv_maup_state_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 			case M2UA_STATUS_CONG_CLEAR:
 			case M2UA_STATUS_CONG_ACCEPT:
 			case M2UA_STATUS_CONG_DISCARD:
-				if (!canputnext(asp->spp.spp->xp->oq))
+				if (!(xp = asp->spp.spp->xp.xp))
+					return (-EFAULT);
+				if (!canputnext(xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(asp->spp.spp->xp->oq, bp);
+				putnext(xp->oq, bp);
 				break;
 			default:
 				return (-EINVAL);
@@ -7577,12 +8188,12 @@ asp_recv_maup_state_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_state_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_state_con(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_state_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_state_con(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7592,54 +8203,45 @@ spp_recv_maup_state_con(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_state_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_state_ind(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || !m->event.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1)) {
-			switch (m->event.val) {
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1)) {
+			switch (m->m2ua.event.val) {
 			case M2UA_EVENT_RPO_ENTER:
 				if (ss_tst_flags(ssu, ASF_REM_PROC_OUTAGE))
 					continue;
-				if ((err = slu_remote_processor_outage_ind(q, ssu, m)))
+				if ((err = sl_remote_processor_outage_ind(ssu, q)))
 					return (err);
 				ss_set_flags(ssu, ASF_REM_PROC_OUTAGE);
 				continue;
 			case M2UA_EVENT_RPO_EXIT:
 				if (!ss_tst_flags(ssu, ASF_REM_PROC_OUTAGE))
 					continue;
-				if ((err = slu_remote_processor_recovered_ind(q, ssu, m)))
+				if ((err = sl_remote_processor_recovered_ind(ssu, q)))
 					return (err);
 				ss_clr_flags(ssu, ASF_REM_PROC_OUTAGE);
 				continue;
 			case M2UA_EVENT_LPO_ENTER:
 				if (ss_tst_flags(ssu, ASF_LOC_PROC_OUTAGE))
 					continue;
-				if ((err = slu_local_processor_outage_ind(q, ssu, m)))
+				if ((err = sl_local_processor_outage_ind(ssu, q)))
 					return (err);
 				ss_set_flags(ssu, ASF_LOC_PROC_OUTAGE);
 				continue;
 			case M2UA_EVENT_LPO_EXIT:
 				if (!ss_tst_flags(ssu, ASF_LOC_PROC_OUTAGE))
 					continue;
-				if ((err = slu_local_processor_recovered_ind(q, ssu, m)))
+				if ((err = sl_local_processor_recovered_ind(ssu, q)))
 					return (err);
 				ss_clr_flags(ssu, ASF_LOC_PROC_OUTAGE);
 				continue;
@@ -7648,7 +8250,12 @@ asp_recv_maup_state_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
 			}
 		}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1)) {
-			switch (m->event.val) {
+			struct xp *xp;
+
+			if (!(xp = asp->spp.spp->xp.xp))
+				return (-EFAULT);
+
+			switch (m->m2ua.event.val) {
 			case M2UA_EVENT_RPO_ENTER:
 				if (ss_tst_flags(ssu, ASF_REM_PROC_OUTAGE))
 					continue;
@@ -7668,22 +8275,22 @@ asp_recv_maup_state_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
 			default:
 				return (-EINVAL);
 			}
-			if (!canputnext(asp->spp.spp->xp->oq))
+			if (!canputnext(xp->oq))
 				return (-EBUSY);
 			if (!(bp = ss7_dupmsg(q, m->mp)))
 				return (-ENOBUFS);
-			putnext(asp->spp.spp->xp->oq, bp);
+			putnext(xp->oq, bp);
 		}
 	}
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_state_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_state_ind(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_state_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_state_ind(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7693,54 +8300,51 @@ spp_recv_maup_state_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_retr_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_retr_req(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-sgp_recv_maup_retr_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_retr_req(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
 	struct ap *ap;
 	struct ss *ssp;
-	struct gp *asp, *sgp;
+	struct gp *sgp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || !m->action.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(asp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (!gp_tst_flags(asp, ASF_ACTIVE))
-		return (QR_DONE);
+	static const uint32_t action = __constant_htonl(M2UA_ACTION_RTRV_BSN);
+	static const uint32_t result = __constant_htonl(UA_RESULT_FAILURE);
+
 	if (!(as = asp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
-			switch (m->action.val) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
+			switch (m->m2ua.action.val) {
 			case M2UA_ACTION_RTRV_BSN:
 				/* If the commend has already been effected, we simply set our flag 
 				   to indicate that we are interested in the response. */
 				if (!ss_tst_flags(ssp, ASF_BSNT_REQUEST)) {
-					if ((err = slp_retrieve_bsnt_req(q, ssp, m)))
+					if ((err = sl_retrieve_bsnt_req(ssp, q)))
 						return (err);
 					ss_set_flags(ssp, ASF_BSNT_REQUEST);
 				}
 				gp_set_flags(asp, ASF_BSNT_REQUEST);
 				break;
 			case M2UA_ACTION_RTRV_MSGS:
-				if (!m->seqno.ptr.w)
+				if (!m->m2ua.seqno.wp)
 					return (-ENXIO);
 				if (ss_get_s_state(ssp) == SLS_IDLE
 				    && !ss_tst_flags(ssp, ASF_RETRIEVAL)) {
-					if ((err = slp_retrieval_request_and_fsnc_req(q, ssp, m)))
+					if ((err =
+					     sl_retrieval_request_and_fsnc_req(ssp, q,
+									       m->m2ua.seqno.val)))
 						return (err);
 					ss_set_flags(ssp, ASF_RETRIEVAL);
 					gp_set_flags(asp, ASF_RETRIEVAL);
 				} else {
-					if ((err = m2ua_send_maup_retr_con(q, asp, NULL)))
+					if ((err =
+					     m2ua_send_maup_retr_con(asp, q, action, result, NULL)))
 						return (err);
 				}
 				break;
@@ -7750,18 +8354,20 @@ sgp_recv_maup_retr_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 			return (QR_DONE);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			if (!sgp->spp.spp->xp)
+			struct xp *xp;
+
+			if (!(xp = sgp->spp.spp->xp.xp))
 				return (-EFAULT);
-			if (!canputnext(sgp->spp.spp->xp->oq))
+			if (!canputnext(xp->oq))
 				return (-EBUSY);
-			putnext(sgp->spp.spp->xp->oq, m->mp);
+			putnext(xp->oq, m->mp);
 			return (QR_DONE);
 		}
 	}
 	return (-EFAULT);
 }
 STATIC int
-spp_recv_maup_retr_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_retr_req(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7771,41 +8377,35 @@ spp_recv_maup_retr_req(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_retr_con(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || !m->action.ptr.w || !m->result.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1)) {
-			switch (m->action.val) {
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1)) {
+			switch (m->m2ua.action.val) {
 			case M2UA_ACTION_RTRV_BSN:
 				if (!ss_tst_flags(ssu, ASF_BSNT_REQUEST))
 					continue;
 				switch (m->result.val) {
 				case UA_RESULT_SUCCESS:
-					if (!m->seqno.ptr.w)
+					if (!m->m2ua.seqno.wp)
 						return (-ENXIO);
-					if ((err = slu_bsnt_ind(q, ssu, m)))
+					if ((err = sl_bsnt_ind(ssu, q, m->m2ua.seqno.val)))
 						return (err);
 					break;
 				case UA_RESULT_FAILURE:
-					if ((err = slu_bsnt_not_retrievable_ind(q, ssu, m)))
+					if ((err =
+					     sl_bsnt_not_retrievable_ind(ssu, q,
+									 m->m2ua.seqno.cp ? m->m2ua.
+									 seqno.val : 0)))
 						return (err);
 					break;
 				default:
@@ -7820,7 +8420,7 @@ asp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 				case UA_RESULT_SUCCESS:
 					continue;
 				case UA_RESULT_FAILURE:
-					if ((err = slu_retrieval_not_possible_ind(q, ssu, m)))
+					if ((err = sl_retrieval_not_possible_ind(ssu, q)))
 						return (err);
 					break;
 				}
@@ -7831,13 +8431,18 @@ asp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 			}
 		}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1)) {
-			switch (m->action.val) {
+			struct xp *xp;
+
+			if (!(xp = asp->spp.spp->xp.xp))
+				return (-EFAULT);
+
+			switch (m->m2ua.action.val) {
 			case M2UA_ACTION_RTRV_BSN:
 				if (!gp_tst_flags(asp, ASF_BSNT_REQUEST))
 					continue;
 				switch (m->result.val) {
 				case UA_RESULT_SUCCESS:
-					if (!m->seqno.ptr.w)
+					if (!m->m2ua.seqno.wp)
 						return (-ENXIO);
 					break;
 				case UA_RESULT_FAILURE:
@@ -7845,11 +8450,11 @@ asp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 				default:
 					return (-EINVAL);
 				}
-				if (!canputnext(asp->spp.spp->xp->oq))
+				if (!canputnext(xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(asp->spp.spp->xp->oq, bp);
+				putnext(xp->oq, bp);
 				gp_clr_flags(asp, ASF_BSNT_REQUEST);
 				break;
 			case M2UA_ACTION_RTRV_MSGS:
@@ -7863,11 +8468,11 @@ asp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 				default:
 					return (-EINVAL);
 				}
-				if (!canputnext(asp->spp.spp->xp->oq))
+				if (!canputnext(xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(asp->spp.spp->xp->oq, bp);
+				putnext(xp->oq, bp);
 				gp_clr_flags(asp, ASF_RETRIEVAL);
 				break;
 			default:
@@ -7878,12 +8483,12 @@ asp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_retr_con(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_retr_con(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7893,51 +8498,43 @@ spp_recv_maup_retr_con(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_retr_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_retr_ind(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *sgp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || (!m->data1.ptr.w && !m->data2.ptr.w))
-		return (-ENXIO);
-	if (m->data1.ptr.w && m->data2.ptr.w)
-		return (-EBADMSG);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_RETRIEVAL))
-				if ((err = slu_retrieved_message_ind(q, ssu, m)))
+				if ((err = sl_retrieved_message_ind(ssu, q, m)))
 					return (err);
 		for (sgp = ap_find_asp(ap); sgp; sgp = ap_find_asp_next(ap, sgp, 1))
 			if (gp_tst_flags(sgp, ASF_RETRIEVAL)) {
-				if (!canputnext(sgp->spp.spp->xp->oq))
+				struct xp *xp;
+
+				if (!(xp = sgp->spp.spp->xp.xp))
+					return (-EFAULT);
+				if (!canputnext(xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(sgp->spp.spp->xp->oq, bp);
+				putnext(xp->oq, bp);
 			}
 	}
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_retr_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_retr_ind(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_retr_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_retr_ind(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -7947,54 +8544,47 @@ spp_recv_maup_retr_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_retr_comp_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_retr_comp_ind(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w)
-		return (-ENXIO);
-	if (m->data1.ptr.w && m->data2.ptr.w)
-		return (-EBADMSG);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_RETRIEVAL)) {
-				if ((err = slu_retrieval_complete_ind(q, ssu, m)))
+				if ((err = sl_retrieval_complete_ind(ssu, q, m)))
 					return (err);
 				ss_clr_flags(ssu, ASF_RETRIEVAL);
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_tst_flags(sgp, ASF_RETRIEVAL)) {
-				if (!canputnext(asp->spp.spp->xp->oq))
+				struct xp *xp;
+
+				if (!(xp = asp->spp.spp->xp.xp))
+					return (-EFAULT);
+				if (!canputnext(xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(asp->spp.spp->xp->oq, bp);
+				putnext(xp->oq, bp);
 				gp_clr_flags(sgp, ASF_RETRIEVAL);
 			}
 	}
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_retr_comp_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_retr_comp_ind(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_retr_comp_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_retr_comp_ind(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -8004,59 +8594,58 @@ spp_recv_maup_retr_comp_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_cong_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_cong_ind(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *sgp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || !m->cong.ptr.w || !m->disc.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	if (m->cong.val > 4 || m->disc.val > 4)
 		return (-EINVAL);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1)) {
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1)) {
 			if (ss_get_s_state(ssu) == SLS_ESTABLISHED) {
 				if (!m->cong.val && !m->disc.val) {
-					if ((err = slu_link_congestion_ceased_ind(q, ssu, m)))
+					if ((err =
+					     sl_link_congestion_ceased_ind(ssu, q, m->cong.val,
+									   m->disc.val)))
 						return (err);
 				} else {
-					if ((err = slu_link_congested_ind(q, ssu, m)))
+					if ((err =
+					     sl_link_congested_ind(ssu, q, m->cong.val,
+								   m->disc.val)))
 						return (err);
 				}
 			}
 		}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1)) {
 			if (ss_get_s_state(ssu) == SLS_ESTABLISHED) {
-				if (!canputnext(asp->spp.spp->xp->oq))
+				struct xp *xp;
+
+				if (!(xp = asp->spp.spp->xp.xp))
+					return (-EFAULT);
+				if (!canputnext(xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(asp->spp.spp->xp->oq, bp);
+				putnext(xp->oq, bp);
 			}
 		}
 	}
 	return (QR_DONE);
 }
 STATIC int
-sgp_recv_maup_cong_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_cong_ind(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 STATIC int
-spp_recv_maup_cong_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_cong_ind(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -8066,40 +8655,30 @@ spp_recv_maup_cong_ind(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-asp_recv_maup_data(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_data(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || (!m->data1.ptr.w && !m->data2.ptr.w))
-		return (-ENXIO);
-	if (m->data1.ptr.w && m->data2.ptr.w)
-		return (-EBADMSG);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
-	if ((m->data1.ptr.w && m->data1.len < 4) || (m->data2.ptr.w && m->data2.len < 4))
+	if ((m->m2ua.data1.wp && m->m2ua.data1.len < 4)
+	    || (m->m2ua.data2.wp && m->m2ua.data2.len < 4))
 		return (-EINVAL);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1)) {
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1)) {
 			if (ss_get_s_state(ssu) == SLS_ESTABLISHED) {
 				if (!ss_tst_flags(ssu, ASF_OPERATION_PENDING)) {
-					if ((err = slu_pdu_ind(q, ssu, m)))
+					if ((err = sl_pdu_ind(ssu, q, m)))
 						return (err);
 					ss_set_flags(ssu, ASF_OPERATION_PENDING);
 				}
-				if (m->corid.ptr.w)
-					if ((err = m2ua_send_maup_data_ack(q, sgp, m)))
+				if (m->corid.wp)
+					if ((err = m2ua_send_maup_data_ack(sgp, q, m)))
 						return (err);
 				ss_clr_flags(ssu, ASF_OPERATION_PENDING);
 				return (QR_DONE);
@@ -8107,11 +8686,15 @@ asp_recv_maup_data(struct xp *xp, queue_t *q, struct ua_msg *m)
 		}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1)) {
 			if (gp_get_s_state(asp) == SLS_ESTABLISHED) {
-				if (!canputnext(asp->spp.spp->xp->oq))
+				struct xp *xp;
+
+				if (!(xp = asp->spp.spp->xp.xp))
+					return (-EFAULT);
+				if (!canputnext(xp->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, m->mp)))
 					return (-ENOBUFS);
-				putnext(asp->spp.spp->xp->oq, bp);
+				putnext(xp->oq, bp);
 				return (QR_DONE);
 			}
 		}
@@ -8119,39 +8702,30 @@ asp_recv_maup_data(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (-EFAULT);
 }
 STATIC int
-sgp_recv_maup_data(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_data(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
-	struct xp *xp = XP_PRIV(q);
 	int err;
 	struct as *as;
 	struct ss *ssp;
 	struct ap *ap;
-	struct gp *asp, *sgp;
+	struct gp *sgp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if ((!m->iid.ptr.w) || (!m->data1.ptr.w && !m->data2.ptr.w))
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(asp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (!gp_tst_flags(asp, ASF_ACTIVE))
-		return (QR_DONE);
 	if (!(as = asp->as.as))
 		return (-EFAULT);
-	if ((m->data1.ptr.w && m->data2.ptr.w)
-	    || ((m->data1.ptr.w && m->data1.len < 4) || (m->data2.ptr.w && m->data2.len < 4)))
+	if ((m->m2ua.data1.wp && m->m2ua.data2.wp)
+	    || ((m->m2ua.data1.wp && m->m2ua.data1.len < 4)
+		|| (m->m2ua.data2.wp && m->m2ua.data2.len < 4)))
 		return (-EINVAL);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (ss_get_s_state(ssp) == SLS_ESTABLISHED) {
 				if (!ss_tst_flags(ssp, ASF_OPERATION_PENDING)) {
-					if ((err = slp_pdu_req(q, ssp, m)))
+					if ((err = sl_pdu_req(ssp, q, m)))
 						return (err);
 					ss_set_flags(ssp, ASF_OPERATION_PENDING);
 				}
-				if (m->corid.ptr.w)
-					if ((err = m2ua_send_maup_data_ack(q, asp, m)))
+				if (m->corid.wp)
+					if ((err = m2ua_send_maup_data_ack(asp, q, m)))
 						return (err);
 				ss_clr_flags(ssp, ASF_OPERATION_PENDING);
 				return (QR_DONE);
@@ -8159,11 +8733,13 @@ sgp_recv_maup_data(struct xp *xp, queue_t *q, struct ua_msg *m)
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
 			if (gp_get_s_state(sgp) == SLS_ESTABLISHED) {
-				if (!sgp->spp.spp->xp)
+				struct xp *xp;
+
+				if (!(xp = sgp->spp.spp->xp.xp))
 					return (-EFAULT);
-				if (!canputnext(sgp->spp.spp->xp->oq))
+				if (!canputnext(xp->oq))
 					return (-EBUSY);
-				putnext(sgp->spp.spp->xp->oq, m->mp);
+				putnext(xp->oq, m->mp);
 				return (QR_DONE);
 			}
 		}
@@ -8171,7 +8747,7 @@ sgp_recv_maup_data(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (-EFAULT);
 }
 STATIC int
-spp_recv_maup_data(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_data(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
@@ -8181,7 +8757,7 @@ spp_recv_maup_data(struct xp *xp, queue_t *q, struct ua_msg *m)
  *  -----------------------------------
  */
 STATIC int
-slu_recv_maup_data_ack(queue_t *q, struct ss *ss, struct ua_msg *m)
+slu_recv_maup_data_ack(struct ss *ss, queue_t *q, struct ua_msg *m)
 {
 	/* 
 	 *  TODO: What we could do here is walk an internal transmit buffer at the SL-U and strike the acknowledged
@@ -8195,7 +8771,7 @@ slu_recv_maup_data_ack(queue_t *q, struct ss *ss, struct ua_msg *m)
 	return (QR_DONE);
 }
 STATIC int
-slp_recv_maup_data_ack(queue_t *q, struct ss *ss, struct ua_msg *m)
+slp_recv_maup_data_ack(struct ss *ss, queue_t *q, struct ua_msg *m)
 {
 	/* 
 	 *  Again what we could do is walk an internal receive buffer at the SL-P and strike the acknowledged MSUs.
@@ -8209,398 +8785,2523 @@ slp_recv_maup_data_ack(queue_t *q, struct ss *ss, struct ua_msg *m)
 	return (QR_DONE);
 }
 STATIC int
-asp_recv_maup_data_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_maup_data_ack(struct gp *sgp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
-	struct gp *asp, *sgp;
+	struct gp *asp;
 	struct ap *ap;
 	struct ss *ssu;
 	mblk_t *bp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if (!m->iid.ptr.w || !m->corid.ptr.w)
-		return (-ENXIO);
-	if (m->data1.ptr.w && m->data2.ptr.w)
-		return (-EBADMSG);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(sgp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (gp_get_state(sgp) != AS_ACTIVE)
-		return (QR_DONE);
 	if (!(as = sgp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1)) {
-			if ((err = slu_recv_maup_data_ack(q, ssu, m)))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1)) {
+			if ((err = slu_recv_maup_data_ack(ssu, q, m)))
 				return (err);
 			return (QR_DONE);
 		}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1)) {
-			if (!canputnext(asp->spp.spp->xp->oq))
+			struct xp *xp;
+
+			if (!(xp = asp->spp.spp->xp.xp))
+				return (-EFAULT);
+			if (!canputnext(xp->oq))
 				return (-EBUSY);
 			if (!(bp = ss7_dupmsg(q, m->mp)))
 				return (-ENOBUFS);
-			putnext(asp->spp.spp->xp->oq, bp);
+			putnext(xp->oq, bp);
 			return (QR_DONE);
 		}
 	}
 	return (-EFAULT);
 }
 STATIC int
-sgp_recv_maup_data_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+asp_recv_maup_data_ack(struct gp *asp, queue_t *q, struct ua_msg *m)
 {
 	int err;
 	struct as *as;
 	struct ss *ssp;
 	struct ap *ap;
-	struct gp *asp, *sgp;
+	struct gp *sgp;
 
-	if (!xp->spp)
-		return (QR_DISABLE);
-	if ((!m->iid.ptr.w) || !m->corid.ptr.w)
-		return (-ENXIO);
-	if (m->iid.len != sizeof(uint32_t)
-	    || !(asp = spp_find_gp(xp->spp, m->iid.ptr.w, m->iid.len)))
-		return (-EIO);
-	if (!gp_tst_flags(asp, ASF_ACTIVE))
-		return (QR_DONE);
 	if (!(as = asp->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
-			if ((err = slp_recv_maup_data_ack(q, ssp, m)))
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
+			if ((err = slp_recv_maup_data_ack(ssp, q, m)))
 				return (err);
 			return (QR_DONE);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			if (!sgp->spp.spp->xp)
+			struct xp *xp;
+
+			if (!(xp = sgp->spp.spp->xp.xp))
 				return (-EFAULT);
-			if (!canputnext(sgp->spp.spp->xp->oq))
+			if (!canputnext(xp->oq))
 				return (-EBUSY);
-			putnext(sgp->spp.spp->xp->oq, m->mp);
+			putnext(xp->oq, m->mp);
 			return (QR_DONE);
 		}
 	}
 	return (-EFAULT);
 }
 STATIC int
-spp_recv_maup_data_ack(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_maup_data_ack(struct gp *spp, queue_t *q, struct ua_msg *m)
 {
 	return (-EPROTO);
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ *
+ * SNMM messages.
+ *
+ * ---------------------------------------------------------------------------
+ */
+
+/**
+ * sgp_recv_snmm_duna: - process received UA_SNMM_DUNA message
+ * @gp: SGP/AS relation for which the message was received.
+ * @q: active queue (lower read queue)
+ * @m: decoded M3UA message
+ */
+STATIC int
+sgp_recv_snmm_duna(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	int err;
+	struct as *as = gp->as.as;
+	struct ap *ap;
+
+	dassert(as != NULL);
+
+	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
+	     ap = ap->u.next) {
+		{
+			struct ss *ssu;
+			struct mtp_addr addr;
+
+			if (!m->apc.wp)
+				goto skip_ssu;
+			addr.pc = m->apc.val;
+			addr.si = 0;
+			addr.ni = 0;	/* FIXME */
+
+			for (ssu = ap->u.as->ss.list;
+			     ssu && ss_tst_flags(ssu, ASF_ACTIVE | ASF_PENDING);
+			     ssu = ssu->as.next) {
+				if ((err = mtp_pause_ind(ss, q, (caddr_t) &addr, sizeof(addr))))
+					return (err);
+			}
+		}
+	      skip_ssu:
+		{
+			struct gp *asp;
+
+			for (asp = ap->u.as->ssp.list;
+			     asp && gp_tst_flags(asp, ASF_ACTIVE | ASF_PENDING);
+			     asp = asp->as.next) {
+				static const char info[] = "SGP propagated DUNA";
+
+				if ((err = ua_send_snmm_duna(asp, q,
+							     m->apc.wp, m->apc.len >> 2, NULL, NULL,
+							     info, sizeof(info))))
+					return (err);
+			}
+		}
+	}
+	return (QR_DONE);
+}
+STATIC int
+asp_recv_snmm_duna(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Unexpected in this direction. */
+	return (-EPROTO);
+}
+STATIC int
+spp_recv_snmm_duna(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Unexpected from IPSP. */
+	return (-EPROTO);
+}
+
+/*
+ * UA_SNMM_DAVA
+ * ---------------------------------------------------------------------------
+ */
+STATIC int
+sgp_recv_snmm_dava(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	int err;
+	struct as *as = gp->as.as;
+	struct ap *ap;
+
+	dassert(as != NULL);
+
+	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
+	     ap = ap->u.next) {
+		{
+			struct ss *ssu;
+			struct mtp_addr addr;
+
+			if (!m->apc.wp)
+				goto skip_ssu;
+			addr.pc = m->apc.val;
+			addr.si = 0;
+			addr.ni = 0;	/* FIXME */
+
+			for (ssu = ap->u.as->ss.list;
+			     ssu && ss_tst_flags(ssu, ASF_ACTIVE | ASF_PENDING);
+			     ssu = ssu->as.next) {
+				if ((err = mtp_resume_ind(ss, q, (caddr_t) &addr, sizeof(addr))))
+					return (err);
+			}
+		}
+	      skip_ssu:
+		{
+			struct gp *asp;
+
+			for (asp = ap->u.as->ssp.list;
+			     asp && gp_tst_flags(asp, ASF_ACTIVE | ASF_PENDING);
+			     asp = asp->as.next) {
+				static const char info[] = "SGP propagated DAVA";
+
+				if ((err = ua_send_snmm_dava(asp, q,
+							     m->apc.wp, m->apc.len >> 2, NULL, NULL,
+							     info, sizeof(info))))
+					return (err);
+			}
+		}
+	}
+	return (QR_DONE);
+}
+STATIC int
+asp_recv_snmm_dava(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Unexpected in this direction. */
+	return (-EPROTO);
+}
+STATIC int
+spp_recv_snmm_dava(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Unexpected from IPSP. */
+	return (-EPROTO);
+}
+
+/*
+ * UA_SNMM_DAUD
+ * ---------------------------------------------------------------------------
+ */
+STATIC int
+sgp_recv_snmm_daud(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Unexpected in this direction. */
+	return (-EPROTO);
+}
+STATIC int
+asp_recv_snmm_daud(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_snmm_daud(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Unexpected for M3UA in this direction (but not SUA). */
+	return (-EFAULT);
+}
+
+/*
+ * UA_SNMM_SCON
+ * ---------------------------------------------------------------------------
+ */
+STATIC int
+sgp_recv_snmm_scon(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_snmm_scon(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Yes, SCON can be received from an ASP. */
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_snmm_scon(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/*
+ * UA_SNMM_DUPU
+ * ---------------------------------------------------------------------------
+ */
+STATIC int
+sgp_recv_snmm_dupu(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_snmm_dupu(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Unexpected in this direction.  If the ASP wishes to indicate UPU because the RK is larger
+	 * than an SI value, the ASP is welcome to sent UPU in a DATA message. */
+	return (-EPROTO);
+}
+STATIC int
+spp_recv_snmm_dupu(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/*
+ * UA_SNMM_DRST
+ * ---------------------------------------------------------------------------
+ */
+STATIC int
+sgp_recv_snmm_drst(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_snmm_drst(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* Unexpected in this direction. */
+	return (-EPROTO);
+}
+STATIC int
+spp_recv_snmm_drst(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ *
+ * M3UA Messages.
+ *
+ * ---------------------------------------------------------------------------
+ */
+
+/*
+ * UA_XFER_DATA
+ * ---------------------------------------------------------------------------
+ */
+/**
+ * sgp_recv_xfer_data: - process received UA_XFER_DATA
+ * @sgp: SGP/AS relation for which the message pertains
+ * @q: active queue
+ * @m: decoded M3UA message
+ *
+ * The message is to be passed to the SS-U or ASP.
+ *
+ */
+STATIC int
+sgp_recv_xfer_data(struct gp *sgp, queue_t *q, struct ua_msg *m)
+{
+	int err;
+	struct as *as = sgp->as.as;
+	struct ap *ap;
+
+	dassert(as != NULL);
+
+	/* Find the first active AS-U serving this AS-P. */
+	for (ap = as->ap.list; ap; ap = ap->p.next) {
+		struct ss *ssu;
+		struct gp *asp;
+		struct as *as_u = ap->u.as;
+
+		if (!as_tst_flags(ap->u.as, (ASF_ACTIVE | ASF_PENDING)))
+			continue;
+
+		dassert(as_u != NULL);
+
+		/* Find the first active SS-U (if any). */
+		for (ssu = as_u->ss.list; ss && !ss_tst_flags(ss, (ASF_ACTIVE | ASF_PENDING));
+		     ssu = ssu->as.next) ;
+		if (ssu != NULL) {
+			/* If there is a local SS-U, deliver the message there. */
+			if ((err = mtp_transfer_ind(ssu, q, m)))
+				return (err);
+			return (QR_DONE);
+		}
+		/* If there is no local SS-U, distribute the message to available ASPs according to
+		   the traffic mode of the AS-U. ASPs are associated with SP-U structures.  We must
+		   select ASPs (SP-U) that are active for the AS-U. */
+		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 0)) {
+			struct xp *xp = asp->spp.spp->xp.xp;
+
+			/* Well, no, we want to copy the message information and adjust it
+			   accordingly and duplicate the data.  Use the m3ua_send_xfer_data
+			   function instead. */
+
+			dassert(xp != NULL);
+
+			if (!canputnext(xp->oq))
+				return (-EBUSY);
+			{
+				mblk_t *bp;
+
+				if (!(bp = ss7_dupmsg(q, m->mp)))
+					return (-ENOBUFS);
+				putnext(xp->oq, bp);
+			}
+			return (QR_DONE);
+		}
+	}
+	return (-EFAULT);
+}
+
+/**
+ * asp_recv_xfer_data: - process received UA_XFER_DATA
+ * @asp: ASP/AS relation for which the message pertains
+ * @q: active queue
+ * @m: decoded M3UA message
+ */
+STATIC int
+asp_recv_xfer_data(struct gp *asp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/**
+ * spp_recv_xfer_data: - process received UA_XFER_DATA
+ * @gp: SPP/AS relation for which the message pertains
+ * @q: active queue
+ * @m: decoded M3UA message
+ */
+STATIC int
+spp_recv_xfer_data(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/*
+ *  SUA Messages.
+ */
+STATIC int
+sgp_recv_clns_cldt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_clns_cldt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_clns_cldt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_clns_cldr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_clns_cldr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_clns_cldr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+STATIC int
+sgp_recv_cons_core(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_core(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_core(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_coak(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_coak(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_coak(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_coref(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_coref(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_coref(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_relre(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_relre(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_relre(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_relco(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_relco(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_relco(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_resco(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_resco(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_resco(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_resre(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_resre(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_resre(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_codt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_codt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_codt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_coda(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_coda(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_coda(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_coerr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_coerr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_coerr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_cons_coit(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_cons_coit(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_cons_coit(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/*
+ *  TUA Messages.
+ */
+
+STATIC int
+sgp_recv_tdhm_tuni(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	int err;
+	struct gp *sgp;
+	struct as *as;
+	struct ap *ap;
+
+	if (!gp_tst_flags(gp, ASF_ACTIVE))
+		return (QR_DONE);
+	if (!(as = gp->as.as))
+		return (-EFAULT);
+	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 0)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 0)) {
+			if ((err = tc_uni_req(ssp, q, m)))
+				return (err);
+			return (QR_DONE);
+		}
+		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 0)) {
+			struct xp *xp;
+
+			if (!(xp = sgp->spp.spp->xp.xp))
+				return (-EFAULT);
+			if ((err = tua_send_tdhm_tuni(xp, q, m)))
+				return (err);
+		}
+	}
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tdhm_tuni(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tdhm_tuni(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tdhm_tqry(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tdhm_tqry(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tdhm_tqry(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tdhm_tcnv(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tdhm_tcnv(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tdhm_tcnv(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tdhm_trsp(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tdhm_trsp(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tdhm_trsp(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tdhm_tuab(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tdhm_tuab(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tdhm_tuab(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tdhm_tpab(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tdhm_tpab(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tdhm_tpab(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tdhm_tnot(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tdhm_tnot(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tdhm_tnot(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+STATIC int
+sgp_recv_tchm_cinv(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tchm_cinv(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tchm_cinv(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tchm_cres(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tchm_cres(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tchm_cres(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tchm_cerr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tchm_cerr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tchm_cerr(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tchm_crej(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tchm_crej(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tchm_crej(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+sgp_recv_tchm_ccan(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+asp_recv_tchm_ccan(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+STATIC int
+spp_recv_tchm_ccan(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	return (-EFAULT);
+}
+
+/**
+ * sgp_recv_teis: - process received UA_MGMT_TEIS message
+ * @spp: SGP associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded MGMT TEIS message
+ */
 static int
-asp_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
+sgp_recv_mgmt_teis(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case IUA_MGMT_TEIS_REQ:
+		return sgp_recv_mgmt_teis_req(spp, q, m);
+	case IUA_MGMT_TEIS_CON:
+		return sgp_recv_mgmt_teis_con(spp, q, m);
+	case IUA_MGMT_TEIS_IND:
+		return sgp_recv_mgmt_teis_ind(spp, q, m);
+	case IUA_MGMT_TEIQ_REQ:
+		return sgp_recv_mgmt_teiq_req(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+/**
+ * sgp_recv_mgmt: - process received UA_CLASS_MGMT message
+ * @spp: SGP assocated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded MGMT message
+ */
+static int
+sgp_recv_mgmt(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_MGMT_ERR:
+		return sgp_recv_mgmt_err(spp, q, m);
+	case UA_MGMT_NTFY:
+		return sgp_recv_mgmt_ntfy(spp, q, m);
+	case IUA_MGMT_TEIS_REQ:
+	case IUA_MGMT_TEIS_CON:
+	case IUA_MGMT_TEIS_IND:
+	case IUA_MGMT_TEIQ_REQ:
+		return sgp_recv_mgmt_teis(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+/**
+ * sgp_recv_xfer: - process received UA_CLASS_XFER message
+ * @gp: SGP/AS relation associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded XFER message
+ *
+ * Transfer messages either require an RC value or there is only one AS.
+ */
+static streams_fastcall streams_inline __hot_in int
+sgp_recv_xfer(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	/* If we are not active for the AS to which the message is associated from the SGP, then it
+	   is extraneaous and is discarded.  We should probably peg a discard count here. */
+	if (!gp_tst_flags(gp, (ASF_ACTIVE | ASF_PENDING)))
+		return (QR_DONE);	/* Discard */
+	switch (m->type) {
+	case UA_XFER_DATA:
+		return sgp_recv_xfer_data(gp, q, m);
+	default:
+		return (-ENOPROTOOPT);
+	}
+}
+
+STATIC int
+ssu_proc_snmm_m3ua(struct ss *ss, queue_t *q, struct ua_msg *m)
+{
+	struct mtp_addr addr;
+
+	addr.pc = m->apc.val;
+	addr.si = m->user.val;
+	addr.ni = 0;		/* FIXME */
+
+	switch (m->type) {
+	case UA_SNMM_DUNA:
+		/* depends on protocol level */
+		return mtp_pause_ind(ssu, q, (caddr_t) &addr, sizeof(addr));
+	case UA_SNMM_DAVA:
+		/* depends on protocol level */
+		return mtp_resume_ind(ssu, q, (caddr_t) &addr, sizeof(addr));
+	case UA_SNMM_DAUD:
+		/* Wrong direction. */
+		return (-EPROTO);
+	case UA_SNMM_SCON:
+		/* depends on protocol level */
+		return mtp_status_ind(ssu, q, (caddr_t) &addr, sizeof(addr),
+				      MTP_STATUS_TYPE_CONG,
+				      m->cong.wp ? m->cong.val : MTP_STATUS_CONGESTION);
+	case UA_SNMM_DUPU:
+		/* depends on protocol level */
+		return mtp_status_ind(ssu, q, (caddr_t) &addr, sizeof(addr),
+				      MTP_STATUS_TYPE_UPU, m->cause.val);
+	case UA_SNMM_DRST:
+		/* depends on protocol level */
+		return mtp_status_ind(ssu, q, (caddr_t) &addr, sizeof(addr),
+				      MTP_STATUS_TYPE_RESTR, 0);
+	}
+	return (-ENOPROTOOPT);
+}
+
+STATIC int
+ssu_proc_snmm_sua(struct ss *ss, queue_t *q, struct ua_msg *m)
+{
+	struct sccp_addr addr;
+
+	return (-ENOPROTOOPT);
+}
+
+STATIC int
+ssu_proc_snmm_tua(struct ss *ss, queue_t *q, struct ua_msg *m)
+{
+	struct sccp_addr addr;
+
+	return (-ENOPROTOOPT);
+}
+
+STATIC int
+ssu_proc_snmm(struct ss *ss, queue_t *q, struct ua_msg *m)
+{
+	switch (ss->as.as->level) {
+	case AS_LEVEL_M3UA:
+		return ssu_proc_snmm_m3ua(ss, q, m);
+	case AS_LEVEL_SUA:
+		return ssu_proc_snmm_sua(ss, q, m);
+	case AS_LEVEL_TUA:
+		return ssu_proc_snmm_tua(ss, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+STATIC int
+asp_proc_snmm(struct gp *asp, queue_t *q, struct ua_msg *m)
+{
+	static const char info[] = "SGP propagated SNMM";
+	uint32_t *conp = m->cong.wp ? &m->cong.val : NULL;
+
+	switch (m->type) {
+	case UA_SNMM_DUNA:
+		return ua_send_snmm_duna(asp, q,
+					 m->apc.wp, m->apc.len >> 2,
+					 m->ssn.wp, m->smi.wp, info, sizeof(info));
+	case UA_SNMM_DAVA:
+		return ua_send_snmm_dava(asp, q,
+					 m->apc.wp, m->apc.len >> 2,
+					 m->ssn.wp, m->smi.wp, info, sizeof(info));
+	case UA_SNMM_DAUD:
+		/* Wrong direction. */
+		return (-EPROTO);
+	case UA_SNMM_SCON:
+		/* Never concerned destination for SGP generated SCON. */
+		return ua_send_snmm_scon(asp, q, NULL, m->cong.wp,
+					 m->apc.wp, m->apc.len >> 2,
+					 m->ssn.wp, m->smi.wp, info, sizeof(info));
+	case UA_SNMM_DUPU:
+		return ua_send_snmm_dupu(asp, q,
+					 m->apc.wp, m->apc.len >> 2,
+					 m->ssn.wp, m->smi.wp, info, sizeof(info));
+	case UA_SNMM_DRST:
+		return ua_send_snmm_drst(asp, q,
+					 m->apc.wp, m->apc.len >> 2,
+					 m->ssn.wp, m->smi.wp, info, sizeof(info));
+	default:
+		return (-ENOPROTOOPT);
+	}
+}
+
+/**
+ * sgp_recv_snmm: - process received UA_CLASS_SNMM message
+ * @spp: SGP associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded SNMM message
+ *
+ * Note that if the message is proxied to an ASP that we are serving, the new SNMM message will
+ * contain the RC value corresponding to that AS.
+ */
+static int
+sgp_recv_snmm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_SNMM_DUNA:
+		return sgp_recv_snmm_duna(gp, q, m);
+	case UA_SNMM_DAVA:
+		return sgp_recv_snmm_dava(gp, q, m);
+	case UA_SNMM_DAUD:
+		return sgp_recv_snmm_daud(gp, q, m);
+	case UA_SNMM_SCON:
+		return sgp_recv_snmm_scon(gp, q, m);
+	case UA_SNMM_DUPU:
+		return sgp_recv_snmm_dupu(gp, q, m);
+	case UA_SNMM_DRST:
+		return sgp_recv_snmm_drst(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+/**
+ * sgp_recv_asps: - process received UA_CLASS_ASPS message
+ * @spp: SGP associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded ASPS message
+ */
+static int
+sgp_recv_asps(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPS_ASPUP_REQ:
+		return sgp_recv_asps_aspup_req(spp, q, m);
+	case UA_ASPS_ASPDN_REQ:
+		return sgp_recv_asps_aspdn_req(spp, q, m);
+	case UA_ASPS_HBEAT_REQ:
+		return sgp_recv_asps_hbeat_req(spp, q, m);
+	case UA_ASPS_ASPUP_ACK:
+		return sgp_recv_asps_aspup_ack(spp, q, m);
+	case UA_ASPS_ASPDN_ACK:
+		return sgp_recv_asps_aspdn_ack(spp, q, m);
+	case UA_ASPS_HBEAT_ACK:
+		return sgp_recv_asps_hbeat_ack(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+/**
+ * sgp_recv_aspt: - process received UA_CLASS_ASPT message
+ * @gp: SGP/AS relation associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded ASPT message
+ */
+static int
+sgp_recv_aspt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPT_ASPAC_REQ:
+		return sgp_recv_aspt_aspac_req(gp, q, m);
+	case UA_ASPT_ASPIA_REQ:
+		return sgp_recv_aspt_aspia_req(gp, q, m);
+	case UA_ASPT_ASPAC_ACK:
+		return sgp_recv_aspt_aspac_ack(gp, q, m);
+	case UA_ASPT_ASPIA_ACK:
+		return sgp_recv_aspt_aspia_ack(gp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+/**
+ * sgp_recv_qptm: - process received UA_CLASS_QPTM message
+ * @gp: SGP/AS relation associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded QPTM message
+ */
+static int
+sgp_recv_qptm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case IUA_QPTM_DATA_REQ:
+		return sgp_recv_qptm_data_req(gp, q, m);
+	case IUA_QPTM_DATA_IND:
+		return sgp_recv_qptm_data_ind(gp, q, m);
+	case IUA_QPTM_UDAT_REQ:
+		return sgp_recv_qptm_udat_req(gp, q, m);
+	case IUA_QPTM_UDAT_IND:
+		return sgp_recv_qptm_udat_ind(gp, q, m);
+	case IUA_QPTM_ESTB_REQ:
+		return sgp_recv_qptm_estb_req(gp, q, m);
+	case IUA_QPTM_ESTB_CON:
+		return sgp_recv_qptm_estb_con(gp, q, m);
+	case IUA_QPTM_ESTB_IND:
+		return sgp_recv_qptm_estb_ind(gp, q, m);
+	case IUA_QPTM_RELS_REQ:
+		return sgp_recv_qptm_rels_req(gp, q, m);
+	case IUA_QPTM_RELS_CON:
+		return sgp_recv_qptm_rels_con(gp, q, m);
+	case IUA_QPTM_RESL_IND:
+		return sgp_recv_qptm_rels_ind(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+/**
+ * sgp_recv_maup: - process received UA_CLASS_MAUP message
+ * @gp: SGP/AS relation associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded MAUP message
+ */
+static int
+sgp_recv_maup(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case M2UA_MAUP_ESTAB_REQ:
+		return sgp_recv_maup_estab_req(gp, q, m);
+	case M2UA_MAUP_ESTAB_CON:
+		return sgp_recv_maup_estab_con(gp, q, m);
+	case M2UA_MAUP_REL_REQ:
+		return sgp_recv_maup_rel_req(gp, q, m);
+	case M2UA_MAUP_REL_CON:
+		return sgp_recv_maup_rel_con(gp, q, m);
+	case M2UA_MAUP_REL_IND:
+		return sgp_recv_maup_rel_ind(gp, q, m);
+	case M2UA_MAUP_STATE_REQ:
+		return sgp_recv_maup_state_req(gp, q, m);
+	case M2UA_MAUP_STATE_CON:
+		return sgp_recv_maup_state_con(gp, q, m);
+	case M2UA_MAUP_STATE_IND:
+		return sgp_recv_maup_state_ind(gp, q, m);
+	case M2UA_MAUP_RETR_REQ:
+		return sgp_recv_maup_retr_req(gp, q, m);
+	case M2UA_MAUP_RETR_CON:
+		return sgp_recv_maup_retr_con(gp, q, m);
+	case M2UA_MAUP_RETR_IND:
+		return sgp_recv_maup_retr_ind(gp, q, m);
+	case M2UA_MAUP_RETR_COMP_IND:
+		return sgp_recv_maup_retr_comp_ind(gp, q, m);
+	case M2UA_MAUP_CONG_IND:
+		return sgp_recv_maup_cong_ind(gp, q, m);
+	case M2UA_MAUP_DATA:
+		return sgp_recv_maup_data(gp, q, m);
+	case M2UA_MAUP_DATA_ACK:
+		return sgp_recv_maup_data_ack(gp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+/**
+ * sgp_recv_cnls: - process received UA_CLASS_CNLS message
+ * @gp: SGP/AS relation associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded CNLS message
+ */
+static int
+sgp_recv_cnls(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case SUA_CLNS_CLDT:
+		return sgp_recv_clns_cldt(gp, q, m);
+	case SUA_CLNS_CLDR:
+		return sgp_recv_clns_cldr(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+/**
+ * sgp_recv_cons: - process received UA_CLASS_CONS message
+ * @gp: SGP/AS relation associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded CONS message
+ */
+static int
+sgp_recv_cons(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case SUA_CONS_CORE:
+		return sgp_recv_cons_core(gp, q, m);
+	case SUA_CONS_COAK:
+		return sgp_recv_cons_coak(gp, q, m);
+	case SUA_CONS_COREF:
+		return sgp_recv_cons_coref(gp, q, m);
+	case SUA_CONS_RELRE:
+		return sgp_recv_cons_relre(gp, q, m);
+	case SUA_CONS_RELCO:
+		return sgp_recv_cons_relco(gp, q, m);
+	case SUA_CONS_RESCO:
+		return sgp_recv_cons_resco(gp, q, m);
+	case SUA_CONS_RESRE:
+		return sgp_recv_cons_resre(gp, q, m);
+	case SUA_CONS_CODT:
+		return sgp_recv_cons_codt(gp, q, m);
+	case SUA_CONS_CODA:
+		return sgp_recv_cons_coda(gp, q, m);
+	case SUA_CONS_COERR:
+		return sgp_recv_cons_coerr(gp, q, m);
+	case SUA_CONS_COIT:
+		return sgp_recv_cons_coit(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+/**
+ * sgp_recv_rkmm: - process received UA_CLASS_RKMM message
+ * @spp: SGP associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded RKMM message
+ */
+static int
+sgp_recv_rkmm(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_RKMM_REG_REQ:
+		return sgp_recv_rkmm_reg_req(spp, q, m);
+	case UA_RKMM_REG_RSP:
+		return sgp_recv_rkmm_reg_rsp(spp, q, m);
+	case UA_RKMM_DEREG_REQ:
+		return sgp_recv_rkmm_dereg_req(spp, q, m);
+	case UA_RKMM_DEREG_RSP:
+		return sgp_recv_rkmm_dereg_rsp(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+/**
+ * sgp_recv_tdhm: - process received UA_CLASS_TDHM message
+ * @gp: SGP/AS relation associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded TDHM message
+ */
+static int
+sgp_recv_tdhm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case TUA_TDHM_TUNI:
+		return sgp_recv_tdhm_tuni(gp, q, m);
+	case TUA_TDHM_TQRY:
+		return sgp_recv_tdhm_tqry(gp, q, m);
+	case TUA_TDHM_TCNV:
+		return sgp_recv_tdhm_tcnv(gp, q, m);
+	case TUA_TDHM_TRSP:
+		return sgp_recv_tdhm_trsp(gp, q, m);
+	case TUA_TDHM_TUAB:
+		return sgp_recv_tdhm_tuab(gp, q, m);
+	case TUA_TDHM_TPAB:
+		return sgp_recv_tdhm_tpab(gp, q, m);
+	case TUA_TDHM_TNOT:
+		return sgp_recv_tdhm_tnot(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+/**
+ * sgp_recv_tchm: - process received UA_CLASS_TCHM message
+ * @gp: SGP/AS relation associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded TCHM message
+ */
+static int
+sgp_recv_tchm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case TUA_TCHM_CINV:
+		return sgp_recv_tchm_cinv(gp, q, m);
+	case TUA_TCHM_CRES:
+		return sgp_recv_tchm_cres(gp, q, m);
+	case TUA_TCHM_CERR:
+		return sgp_recv_tchm_cerr(gp, q, m);
+	case TUA_TCHM_CREJ:
+		return sgp_recv_tchm_crej(gp, q, m);
+	case TUA_TCHM_CCAN:
+		return sgp_recv_tchm_ccan(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+/**
+ * sgp_recv_msg: - process UA message received from an SGP
+ * @spp: SGP associated with the message
+ * @q: active queue (lower read queue)
+ * @m: decoded UA message
+ *
+ * Selection procedures for receiving messages from an SGP:
+ *
+ * When a message is received at an ASP from an SGP association (XP-P) they are processed by message
+ * class.  Messages that are associated with an Application Server are passed up the datastructures
+ * in a manner depending on the mesage type and the traffic modes of the related application server.
+ * This association (XP-P) is associated with a single local SGP instance (SPP-P).  The local SGP
+ * instance (SPP-P) belongs to one SG (SP-P).  The ASP is active for one or more AS-P associated with
+ * the SG, one to which the message must belong (by RC value).  For this AS-P there is a
+ * corresponding AS-U (representing the AS at the local ASP) to which corresponds an SS-U (SS7
+ * User) and any peer ASPs (SPP-U) that are also active for the AS-U.  If a local SS-U is active,
+ * the message is converted in to SS7 Provider primitives and passed upstream from the upper multiplex
+ * to the SS7 User.  If no local SS-U is active, the message is passed to the a peer ASP.  If no
+ * peer ASP is active, the message is received in error (the AS-U is really inactive and the message
+ * is discarded (or buffered)).  This entire selection process can be accomplised by passing the message to a
+ * single function (after it has been determined that the message class and type qualitfies it for
+ * this process).  Initial decoding of the message need only identify the message class and type,
+ * the RC (IID) value(s), if any, and the load selection parameters (if any).  In fact demand
+ * decoding can be performed past message class and type (except for data messages which need single
+ * pass decoding for the fast path).
+ */
+static int
+sgp_recv_msg(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	switch (m->class) {
 	case UA_CLASS_MGMT:	/* UA Management (MGMT) Message */
-		switch (m->type) {
-		case UA_MGMT_ERR:
-			return asp_recv_mgmt_err(xp, q, m);
-		case UA_MGMT_NTFY:
-			return asp_recv_mgmt_ntfy(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_XFER:	/* M3UA Data transfer message */
-		return (-ENOPROTOOPT);
+		return sgp_recv_mgmt(spp, q, mp);
 	case UA_CLASS_SNMM:	/* Signalling Network Mgmt (SNM) Messages */
-		return (-ENOPROTOOPT);
+		return ua_recv_snmm(spp, q, m);
 	case UA_CLASS_ASPS:	/* ASP State Maintenance (ASPSM) Messages */
-		switch (m->type) {
-		case UA_ASPS_ASPUP_REQ:
-			return asp_recv_asps_aspup_req(xp, q, m);
-		case UA_ASPS_ASPDN_REQ:
-			return asp_recv_asps_aspdn_req(xp, q, m);
-		case UA_ASPS_HBEAT_REQ:
-			return asp_recv_asps_hbeat_req(xp, q, m);
-		case UA_ASPS_ASPUP_ACK:
-			return asp_recv_asps_aspup_ack(xp, q, m);
-		case UA_ASPS_ASPDN_ACK:
-			return asp_recv_asps_aspdn_ack(xp, q, m);
-		case UA_ASPS_HBEAT_ACK:
-			return asp_recv_asps_hbeat_ack(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
+		return sgp_recv_asps(spp, q, m);
 	case UA_CLASS_ASPT:	/* ASP Traffic Maintenance (ASPTM) Messages */
-		switch (m->type) {
-		case UA_ASPT_ASPAC_REQ:
-			return asp_recv_aspt_aspac_req(xp, q, m);
-		case UA_ASPT_ASPIA_REQ:
-			return asp_recv_aspt_aspia_req(xp, q, m);
-		case UA_ASPT_ASPAC_ACK:
-			return asp_recv_aspt_aspac_ack(xp, q, m);
-		case UA_ASPT_ASPIA_ACK:
-			return asp_recv_aspt_aspia_ack(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_Q921:	/* Q.931 User Part Messages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_MAUP:	/* M2UA Messages */
-		switch (m->type) {
-		case M2UA_MAUP_ESTAB_REQ:
-			return asp_recv_maup_estab_req(xp, q, m);
-		case M2UA_MAUP_ESTAB_CON:
-			return asp_recv_maup_estab_con(xp, q, m);
-		case M2UA_MAUP_REL_REQ:
-			return asp_recv_maup_rel_req(xp, q, m);
-		case M2UA_MAUP_REL_CON:
-			return asp_recv_maup_rel_con(xp, q, m);
-		case M2UA_MAUP_REL_IND:
-			return asp_recv_maup_rel_ind(xp, q, m);
-		case M2UA_MAUP_STATE_REQ:
-			return asp_recv_maup_state_req(xp, q, m);
-		case M2UA_MAUP_STATE_CON:
-			return asp_recv_maup_state_con(xp, q, m);
-		case M2UA_MAUP_STATE_IND:
-			return asp_recv_maup_state_ind(xp, q, m);
-		case M2UA_MAUP_RETR_REQ:
-			return asp_recv_maup_retr_req(xp, q, m);
-		case M2UA_MAUP_RETR_CON:
-			return asp_recv_maup_retr_con(xp, q, m);
-		case M2UA_MAUP_RETR_IND:
-			return asp_recv_maup_retr_ind(xp, q, m);
-		case M2UA_MAUP_RETR_COMP_IND:
-			return asp_recv_maup_retr_comp_ind(xp, q, m);
-		case M2UA_MAUP_CONG_IND:
-			return asp_recv_maup_cong_ind(xp, q, m);
-		case M2UA_MAUP_DATA:
-			return asp_recv_maup_data(xp, q, m);
-		case M2UA_MAUP_DATA_ACK:
-			return asp_recv_maup_data_ack(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
-		return (-ENOPROTOOPT);
+		return ua_recv_aspt(spp, q, m);
 	case UA_CLASS_RKMM:	/* Routing Key Management Messages */
-		switch (m->type) {
-		case UA_RKMM_REG_REQ:
-			return asp_recv_rkmm_reg_req(xp, q, m);
-		case UA_RKMM_REG_RSP:
-			return asp_recv_rkmm_reg_rsp(xp, q, m);
-		case UA_RKMM_DEREG_REQ:
-			return asp_recv_rkmm_dereg_req(xp, q, m);
-		case UA_RKMM_DEREG_RSP:
-			return asp_recv_rkmm_dereg_rsp(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
+		return sgp_recv_rkmm(spp, q, m);
+	case UA_CLASS_XFER:	/* M3UA Data transfer message */
+	case UA_CLASS_QPTM:	/* Q.931 User Part Messages */
+	case UA_CLASS_MAUP:	/* M2UA Messages */
+	case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
+	case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
 	case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
-		return (-ENOPROTOOPT);
 	case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
-		return (-ENOPROTOOPT);
+	{
+		int err;
+		struct gp *gp = NULL;
+
+		if ((err = find_gp_spp_data_msg(&gp, spp, m)))
+			return (err);
+		switch (m->class) {
+		case UA_CLASS_XFER:	/* M3UA Data transfer message */
+			return sgp_recv_xfer(gp, q, mp);
+		case UA_CLASS_QPTM:	/* Q.921 User Part Messages */
+			return sgp_recv_qptm(gp, q, m);
+		case UA_CLASS_MAUP:	/* M2UA Messages */
+			return sgp_recv_maup(gp, q, m);
+		case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
+			return sgp_recv_cnls(gp, q, m);
+		case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
+			return sgp_recv_cons(gp, q, m);
+		case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
+			return sgp_recv_tdhm(gp, q, m);
+		case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
+			return sgp_recv_tchm(gp, q, m);
+		}
+		swerr();
+	}
+	}
+	return (-ENOPROTOOPT);
+}
+
+static
+asp_recv_mgmt(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_MGMT_ERR:
+		return asp_recv_mgmt_err(spp, q, m);
+	case UA_MGMT_NTFY:
+		return asp_recv_mgmt_ntfy(spp, q, m);
+	case IUA_MGMT_TEIS_REQ:
+		return asp_recv_mgmt_teis_req(spp, q, m);
+	case IUA_MGMT_TEIS_CON:
+		return asp_recv_mgmt_teis_con(spp, q, m);
+	case IUA_MGMT_TEIS_IND:
+		return asp_recv_mgmt_teis_ind(spp, q, m);
+	case IUA_MGMT_TEIQ_REQ:
+		return asp_recv_mgmt_teiq_req(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+static
+asp_recv_xfer(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_XFER_DATA:
+		return asp_recv_xfer_data(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+static
+asp_recv_snmm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_SNMM_DUNA:
+		return asp_recv_snmm_duna(gp, q, m);
+	case UA_SNMM_DAVA:
+		return asp_recv_snmm_dava(gp, q, m);
+	case UA_SNMM_DAUD:
+		return asp_recv_snmm_daud(gp, q, m);
+	case UA_SNMM_SCON:
+		return asp_recv_snmm_scon(gp, q, m);
+	case UA_SNMM_DUPU:
+		return asp_recv_snmm_dupu(gp, q, m);
+	case UA_SNMM_DRST:
+		return asp_recv_snmm_drst(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+static
+asp_recv_asps(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPS_ASPUP_REQ:
+		return asp_recv_asps_aspup_req(spp, q, m);
+	case UA_ASPS_ASPDN_REQ:
+		return asp_recv_asps_aspdn_req(spp, q, m);
+	case UA_ASPS_HBEAT_REQ:
+		return asp_recv_asps_hbeat_req(spp, q, m);
+	case UA_ASPS_ASPUP_ACK:
+		return asp_recv_asps_aspup_ack(spp, q, m);
+	case UA_ASPS_ASPDN_ACK:
+		return asp_recv_asps_aspdn_ack(spp, q, m);
+	case UA_ASPS_HBEAT_ACK:
+		return asp_recv_asps_hbeat_ack(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+static
+asp_recv_aspt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPT_ASPAC_REQ:
+		return asp_recv_aspt_aspac_req(gp, q, m);
+	case UA_ASPT_ASPIA_REQ:
+		return asp_recv_aspt_aspia_req(gp, q, m);
+	case UA_ASPT_ASPAC_ACK:
+		return asp_recv_aspt_aspac_ack(gp, q, m);
+	case UA_ASPT_ASPIA_ACK:
+		return asp_recv_aspt_aspia_ack(gp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+static
+asp_recv_qptm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case IUA_QPTM_DATA_REQ:
+		return asp_recv_qptm_data_req(gp, q, m);
+	case IUA_QPTM_DATA_IND:
+		return asp_recv_qptm_data_ind(gp, q, m);
+	case IUA_QPTM_UDAT_REQ:
+		return asp_recv_qptm_udat_req(gp, q, m);
+	case IUA_QPTM_UDAT_IND:
+		return asp_recv_qptm_udat_ind(gp, q, m);
+	case IUA_QPTM_ESTB_REQ:
+		return asp_recv_qptm_estb_req(gp, q, m);
+	case IUA_QPTM_ESTB_CON:
+		return asp_recv_qptm_estb_con(gp, q, m);
+	case IUA_QPTM_ESTB_IND:
+		return asp_recv_qptm_estb_ind(gp, q, m);
+	case IUA_QPTM_RELS_REQ:
+		return asp_recv_qptm_rels_req(gp, q, m);
+	case IUA_QPTM_RELS_CON:
+		return asp_recv_qptm_rels_con(gp, q, m);
+	case IUA_QPTM_RESL_IND:
+		return asp_recv_qptm_rels_ind(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+static
+asp_recv_maup(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case M2UA_MAUP_ESTAB_REQ:
+		return asp_recv_maup_estab_req(gp, q, m);
+	case M2UA_MAUP_ESTAB_CON:
+		return asp_recv_maup_estab_con(gp, q, m);
+	case M2UA_MAUP_REL_REQ:
+		return asp_recv_maup_rel_req(gp, q, m);
+	case M2UA_MAUP_REL_CON:
+		return asp_recv_maup_rel_con(gp, q, m);
+	case M2UA_MAUP_REL_IND:
+		return asp_recv_maup_rel_ind(gp, q, m);
+	case M2UA_MAUP_STATE_REQ:
+		return asp_recv_maup_state_req(gp, q, m);
+	case M2UA_MAUP_STATE_CON:
+		return asp_recv_maup_state_con(gp, q, m);
+	case M2UA_MAUP_STATE_IND:
+		return asp_recv_maup_state_ind(gp, q, m);
+	case M2UA_MAUP_RETR_REQ:
+		return asp_recv_maup_retr_req(gp, q, m);
+	case M2UA_MAUP_RETR_CON:
+		return asp_recv_maup_retr_con(gp, q, m);
+	case M2UA_MAUP_RETR_IND:
+		return asp_recv_maup_retr_ind(gp, q, m);
+	case M2UA_MAUP_RETR_COMP_IND:
+		return asp_recv_maup_retr_comp_ind(gp, q, m);
+	case M2UA_MAUP_CONG_IND:
+		return asp_recv_maup_cong_ind(gp, q, m);
+	case M2UA_MAUP_DATA_ACK:
+		return asp_recv_maup_data_ack(gp, q, m);
+	case M2UA_MAUP_DATA:
+		return asp_recv_maup_data(gp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+static
+asp_recv_cnls(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case SUA_CLNS_CLDT:
+		return asp_recv_clns_cldt(gp, q, m);
+	case SUA_CLNS_CLDR:
+		return asp_recv_clns_cldr(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+static
+asp_recv_cons(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case SUA_CONS_CORE:
+		return asp_recv_cons_core(gp, q, m);
+	case SUA_CONS_COAK:
+		return asp_recv_cons_coak(gp, q, m);
+	case SUA_CONS_COREF:
+		return asp_recv_cons_coref(gp, q, m);
+	case SUA_CONS_RELRE:
+		return asp_recv_cons_relre(gp, q, m);
+	case SUA_CONS_RELCO:
+		return asp_recv_cons_relco(gp, q, m);
+	case SUA_CONS_RESCO:
+		return asp_recv_cons_resco(gp, q, m);
+	case SUA_CONS_RESRE:
+		return asp_recv_cons_resre(gp, q, m);
+	case SUA_CONS_CODT:
+		return asp_recv_cons_codt(gp, q, m);
+	case SUA_CONS_CODA:
+		return asp_recv_cons_coda(gp, q, m);
+	case SUA_CONS_COERR:
+		return asp_recv_cons_coerr(gp, q, m);
+	case SUA_CONS_COIT:
+		return asp_recv_cons_coit(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+static
+asp_recv_rkmm(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_RKMM_REG_REQ:
+		return asp_recv_rkmm_reg_req(spp, q, m);
+	case UA_RKMM_REG_RSP:
+		return asp_recv_rkmm_reg_rsp(spp, q, m);
+	case UA_RKMM_DEREG_REQ:
+		return asp_recv_rkmm_dereg_req(spp, q, m);
+	case UA_RKMM_DEREG_RSP:
+		return asp_recv_rkmm_dereg_rsp(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+
+static
+asp_recv_tdhm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case TUA_TDHM_TUNI:
+		return asp_recv_tdhm_tuni(gp, q, m);
+	case TUA_TDHM_TQRY:
+		return asp_recv_tdhm_tqry(gp, q, m);
+	case TUA_TDHM_TCNV:
+		return asp_recv_tdhm_tcnv(gp, q, m);
+	case TUA_TDHM_TRSP:
+		return asp_recv_tdhm_trsp(gp, q, m);
+	case TUA_TDHM_TUAB:
+		return asp_recv_tdhm_tuab(gp, q, m);
+	case TUA_TDHM_TPAB:
+		return asp_recv_tdhm_tpab(gp, q, m);
+	case TUA_TDHM_TNOT:
+		return asp_recv_tdhm_tnot(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+static
+asp_recv_tchm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case TUA_TCHM_CINV:
+		return asp_recv_tchm_cinv(gp, q, m);
+	case TUA_TCHM_CRES:
+		return asp_recv_tchm_cres(gp, q, m);
+	case TUA_TCHM_CERR:
+		return asp_recv_tchm_cerr(gp, q, m);
+	case TUA_TCHM_CREJ:
+		return asp_recv_tchm_crej(gp, q, m);
+	case TUA_TCHM_CCAN:
+		return asp_recv_tchm_ccan(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+/**
+ * asp_recv_msg: - process UA message received from an ASP
+ * @spp: remote ASP to which message pertains
+ * @q: active queue (lower read queue)
+ * @m: (partially) decoded UA message
+ *
+ * Selection procedures when receiving messagers from an ASP:
+ *
+ * WHen a message is received at an SGP from an ASP association (XP-U) they are processed by message
+ * class.  Messages that are associated with an Application Server are passed down the datastructure
+ * in a manner depending on the message type.  The association (XP-U) is associated with a single
+ * local ASP association (SPP-U).  The local ASP association (SPP-U) belongs to one ASP (SP-U).  The
+ * ASP is active for one or more AS-U associated with the ASP, one to which the message must belong
+ * (by RC value).  For this AS-U there is one corresponding AS-P (representing the local SG at the
+ * local SGP) to which corresponds an SS-P (SS7 Provider) and any peer SGP (SPP-P) that are also
+ * active for the AS-P.  if a local SS-P is active, the message is converted into SS7 User
+ * primitives and passed downstream to the peer from the lower multiplex to the SS7 Provider.  If no
+ * local SS-P is active, the message is passed to a peer SGP (SSP-P).  If no peer SSP is active, the
+ * message is received in error (the AS-P is really inactive and the message is discarded (or
+ * buffered)).  The peer SPP can be selected by the traffic mode of the SG (SP-P).
+ */
+static int
+asp_recv_msg(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->class) {
+	case UA_CLASS_MGMT:	/* UA Management (MGMT) Message */
+		return asp_recv_mgmt(spp, q, m);
+	case UA_CLASS_SNMM:	/* Signalling Network Mgmt (SNM) Messages */
+		return ua_recv_snmm(spp, q, m);
+	case UA_CLASS_ASPS:	/* ASP State Maintenance (ASPSM) Messages */
+		return asp_recv_asps(spp, q, m);
+	case UA_CLASS_ASPT:	/* ASP Traffic Maintenance (ASPTM) Messages */
+		return ua_recv_aspt(spp, q, m);
+	case UA_CLASS_RKMM:	/* Routing Key Management Messages */
+		return asp_recv_rkmm(spp, q, m);
+	case UA_CLASS_XFER:	/* M3UA Data transfer message */
+	case UA_CLASS_QPTM:	/* Q.931 User Part Messages */
+	case UA_CLASS_MAUP:	/* M2UA Messages */
+	case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
+	case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
+	case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
+	case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
+	{
+		int err;
+		struct gp *gp = NULL;
+
+		if ((err = find_gp_spp_data_msg(&gp, spp, m)))
+			return (err);
+		switch (m->class) {
+		case UA_CLASS_XFER:	/* M3UA Data transfer message */
+			return asp_recv_xfer(gp, q, m);
+		case UA_CLASS_QPTM:	/* Q.931 User Part Messages */
+			return asp_recv_qptm(gp, q, m);
+		case UA_CLASS_MAUP:	/* M2UA Messages */
+			return asp_recv_maup(gp, q, m);
+		case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
+			return asp_recv_cnls(gp, q, m);
+		case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
+			return asp_recv_cons(gp, q, m);
+		case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
+			return asp_recv_tdhm(gp, q, m);
+		case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
+			return asp_recv_tchm(gp, q, m);
+		}
+		swerr();
+	}
 	}
 	return (-ENOPROTOOPT);
 }
 
 static int
-sgp_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_mgmt(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
-	switch (m->class) {
-	case UA_CLASS_MGMT:	/* UA Management (MGMT) Message */
-		switch (m->type) {
-		case UA_MGMT_ERR:
-			return sgp_recv_mgmt_err(xp, q, m);
-		case UA_MGMT_NTFY:
-			return sgp_recv_mgmt_ntfy(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_XFER:	/* M3UA Data transfer message */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_SNMM:	/* Signalling Network Mgmt (SNM) Messages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_ASPS:	/* ASP State Maintenance (ASPSM) Messages */
-		switch (m->type) {
-		case UA_ASPS_ASPUP_REQ:
-			return sgp_recv_asps_aspup_req(xp, q, m);
-		case UA_ASPS_ASPDN_REQ:
-			return sgp_recv_asps_aspdn_req(xp, q, m);
-		case UA_ASPS_HBEAT_REQ:
-			return sgp_recv_asps_hbeat_req(xp, q, m);
-		case UA_ASPS_ASPUP_ACK:
-			return sgp_recv_asps_aspup_ack(xp, q, m);
-		case UA_ASPS_ASPDN_ACK:
-			return sgp_recv_asps_aspdn_ack(xp, q, m);
-		case UA_ASPS_HBEAT_ACK:
-			return sgp_recv_asps_hbeat_ack(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_ASPT:	/* ASP Traffic Maintenance (ASPTM) Messages */
-		switch (m->type) {
-		case UA_ASPT_ASPAC_REQ:
-			return sgp_recv_aspt_aspac_req(xp, q, m);
-		case UA_ASPT_ASPIA_REQ:
-			return sgp_recv_aspt_aspia_req(xp, q, m);
-		case UA_ASPT_ASPAC_ACK:
-			return sgp_recv_aspt_aspac_ack(xp, q, m);
-		case UA_ASPT_ASPIA_ACK:
-			return sgp_recv_aspt_aspia_ack(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_Q921:	/* Q.931 User Part Messages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_MAUP:	/* M2UA Messages */
-		switch (m->type) {
-		case M2UA_MAUP_ESTAB_REQ:
-			return sgp_recv_maup_estab_req(xp, q, m);
-		case M2UA_MAUP_ESTAB_CON:
-			return sgp_recv_maup_estab_con(xp, q, m);
-		case M2UA_MAUP_REL_REQ:
-			return sgp_recv_maup_rel_req(xp, q, m);
-		case M2UA_MAUP_REL_CON:
-			return sgp_recv_maup_rel_con(xp, q, m);
-		case M2UA_MAUP_REL_IND:
-			return sgp_recv_maup_rel_ind(xp, q, m);
-		case M2UA_MAUP_STATE_REQ:
-			return sgp_recv_maup_state_req(xp, q, m);
-		case M2UA_MAUP_STATE_CON:
-			return sgp_recv_maup_state_con(xp, q, m);
-		case M2UA_MAUP_STATE_IND:
-			return sgp_recv_maup_state_ind(xp, q, m);
-		case M2UA_MAUP_RETR_REQ:
-			return sgp_recv_maup_retr_req(xp, q, m);
-		case M2UA_MAUP_RETR_CON:
-			return sgp_recv_maup_retr_con(xp, q, m);
-		case M2UA_MAUP_RETR_IND:
-			return sgp_recv_maup_retr_ind(xp, q, m);
-		case M2UA_MAUP_RETR_COMP_IND:
-			return sgp_recv_maup_retr_comp_ind(xp, q, m);
-		case M2UA_MAUP_CONG_IND:
-			return sgp_recv_maup_cong_ind(xp, q, m);
-		case M2UA_MAUP_DATA_ACK:
-			return sgp_recv_maup_data_ack(xp, q, m);
-		case M2UA_MAUP_DATA:
-			return sgp_recv_maup_data(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_RKMM:	/* Routing Key Management Messages */
-		switch (m->type) {
-		case UA_RKMM_REG_REQ:
-			return sgp_recv_rkmm_reg_req(xp, q, m);
-		case UA_RKMM_REG_RSP:
-			return sgp_recv_rkmm_reg_rsp(xp, q, m);
-		case UA_RKMM_DEREG_REQ:
-			return sgp_recv_rkmm_dereg_req(xp, q, m);
-		case UA_RKMM_DEREG_RSP:
-			return sgp_recv_rkmm_dereg_rsp(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
-		return (-ENOPROTOOPT);
+	switch (m->type) {
+	case UA_MGMT_ERR:
+		return spp_recv_mgmt_err(spp, q, m);
+	case UA_MGMT_NTFY:
+		return spp_recv_mgmt_ntfy(spp, q, m);
+	case IUA_MGMT_TEIS_REQ:
+		return spp_recv_mgmt_teis_req(spp, q, m);
+	case IUA_MGMT_TEIS_CON:
+		return spp_recv_mgmt_teis_con(spp, q, m);
+	case IUA_MGMT_TEIS_IND:
+		return spp_recv_mgmt_teis_ind(spp, q, m);
+	case IUA_MGMT_TEIQ_REQ:
+		return spp_recv_mgmt_teiq_req(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+spp_recv_xfer(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_XFER_DATA:
+		return spp_recv_xfer_data(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+spp_recv_snmm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_SNMM_DUNA:
+		return spp_recv_snmm_duna(gp, q, m);
+	case UA_SNMM_DAVA:
+		return spp_recv_snmm_dava(gp, q, m);
+	case UA_SNMM_DAUD:
+		return spp_recv_snmm_daud(gp, q, m);
+	case UA_SNMM_SCON:
+		return spp_recv_snmm_scon(gp, q, m);
+	case UA_SNMM_DUPU:
+		return spp_recv_snmm_dupu(gp, q, m);
+	case UA_SNMM_DRST:
+		return spp_recv_snmm_drst(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+spp_recv_asps(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPS_ASPUP_REQ:
+		return spp_recv_asps_aspup_req(spp, q, m);
+	case UA_ASPS_ASPDN_REQ:
+		return spp_recv_asps_aspdn_req(spp, q, m);
+	case UA_ASPS_HBEAT_REQ:
+		return spp_recv_asps_hbeat_req(spp, q, m);
+	case UA_ASPS_ASPUP_ACK:
+		return spp_recv_asps_aspup_ack(spp, q, m);
+	case UA_ASPS_ASPDN_ACK:
+		return spp_recv_asps_aspdn_ack(spp, q, m);
+	case UA_ASPS_HBEAT_ACK:
+		return spp_recv_asps_hbeat_ack(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+spp_recv_aspt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPT_ASPAC_REQ:
+		return spp_recv_aspt_aspac_req(gp, q, m);
+	case UA_ASPT_ASPIA_REQ:
+		return spp_recv_aspt_aspia_req(gp, q, m);
+	case UA_ASPT_ASPAC_ACK:
+		return spp_recv_aspt_aspac_ack(gp, q, m);
+	case UA_ASPT_ASPIA_ACK:
+		return spp_recv_aspt_aspia_ack(gp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+spp_recv_qptm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case IUA_QPTM_DATA_REQ:
+		return spp_recv_qptm_data_req(gp, q, m);
+	case IUA_QPTM_DATA_IND:
+		return spp_recv_qptm_data_ind(gp, q, m);
+	case IUA_QPTM_UDAT_REQ:
+		return spp_recv_qptm_udat_req(gp, q, m);
+	case IUA_QPTM_UDAT_IND:
+		return spp_recv_qptm_udat_ind(gp, q, m);
+	case IUA_QPTM_ESTB_REQ:
+		return spp_recv_qptm_estb_req(gp, q, m);
+	case IUA_QPTM_ESTB_CON:
+		return spp_recv_qptm_estb_con(gp, q, m);
+	case IUA_QPTM_ESTB_IND:
+		return spp_recv_qptm_estb_ind(gp, q, m);
+	case IUA_QPTM_RELS_REQ:
+		return spp_recv_qptm_rels_req(gp, q, m);
+	case IUA_QPTM_RELS_CON:
+		return spp_recv_qptm_rels_con(gp, q, m);
+	case IUA_QPTM_RESL_IND:
+		return spp_recv_qptm_rels_ind(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+spp_recv_maup(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case M2UA_MAUP_ESTAB_REQ:
+		return spp_recv_maup_estab_req(gp, q, m);
+	case M2UA_MAUP_ESTAB_CON:
+		return spp_recv_maup_estab_con(gp, q, m);
+	case M2UA_MAUP_REL_REQ:
+		return spp_recv_maup_rel_req(gp, q, m);
+	case M2UA_MAUP_REL_CON:
+		return spp_recv_maup_rel_con(gp, q, m);
+	case M2UA_MAUP_REL_IND:
+		return spp_recv_maup_rel_ind(gp, q, m);
+	case M2UA_MAUP_STATE_REQ:
+		return spp_recv_maup_state_req(gp, q, m);
+	case M2UA_MAUP_STATE_CON:
+		return spp_recv_maup_state_con(gp, q, m);
+	case M2UA_MAUP_STATE_IND:
+		return spp_recv_maup_state_ind(gp, q, m);
+	case M2UA_MAUP_RETR_REQ:
+		return spp_recv_maup_retr_req(gp, q, m);
+	case M2UA_MAUP_RETR_CON:
+		return spp_recv_maup_retr_con(gp, q, m);
+	case M2UA_MAUP_RETR_IND:
+		return spp_recv_maup_retr_ind(gp, q, m);
+	case M2UA_MAUP_RETR_COMP_IND:
+		return spp_recv_maup_retr_comp_ind(gp, q, m);
+	case M2UA_MAUP_CONG_IND:
+		return spp_recv_maup_cong_ind(gp, q, m);
+	case M2UA_MAUP_DATA_ACK:
+		return spp_recv_maup_data_ack(gp, q, m);
+	case M2UA_MAUP_DATA:
+		return spp_recv_maup_data(gp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+spp_recv_cnls(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case SUA_CLNS_CLDT:
+		return spp_recv_clns_cldt(gp, q, m);
+	case SUA_CLNS_CLDR:
+		return spp_recv_clns_cldr(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+spp_recv_cons(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case SUA_CONS_CORE:
+		return spp_recv_cons_core(gp, q, m);
+	case SUA_CONS_COAK:
+		return spp_recv_cons_coak(gp, q, m);
+	case SUA_CONS_COREF:
+		return spp_recv_cons_coref(gp, q, m);
+	case SUA_CONS_RELRE:
+		return spp_recv_cons_relre(gp, q, m);
+	case SUA_CONS_RELCO:
+		return spp_recv_cons_relco(gp, q, m);
+	case SUA_CONS_RESCO:
+		return spp_recv_cons_resco(gp, q, m);
+	case SUA_CONS_RESRE:
+		return spp_recv_cons_resre(gp, q, m);
+	case SUA_CONS_CODT:
+		return spp_recv_cons_codt(gp, q, m);
+	case SUA_CONS_CODA:
+		return spp_recv_cons_coda(gp, q, m);
+	case SUA_CONS_COERR:
+		return spp_recv_cons_coerr(gp, q, m);
+	case SUA_CONS_COIT:
+		return spp_recv_cons_coit(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+spp_recv_rkmm(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_RKMM_REG_REQ:
+		return spp_recv_rkmm_reg_req(spp, q, m);
+	case UA_RKMM_REG_RSP:
+		return spp_recv_rkmm_reg_rsp(spp, q, m);
+	case UA_RKMM_DEREG_REQ:
+		return spp_recv_rkmm_dereg_req(spp, q, m);
+	case UA_RKMM_DEREG_RSP:
+		return spp_recv_rkmm_dereg_rsp(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+spp_recv_tdhm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case TUA_TDHM_TUNI:
+		return spp_recv_tdhm_tuni(gp, q, m);
+	case TUA_TDHM_TQRY:
+		return spp_recv_tdhm_tqry(gp, q, m);
+	case TUA_TDHM_TCNV:
+		return spp_recv_tdhm_tcnv(gp, q, m);
+	case TUA_TDHM_TRSP:
+		return spp_recv_tdhm_trsp(gp, q, m);
+	case TUA_TDHM_TUAB:
+		return spp_recv_tdhm_tuab(gp, q, m);
+	case TUA_TDHM_TPAB:
+		return spp_recv_tdhm_tpab(gp, q, m);
+	case TUA_TDHM_TNOT:
+		return spp_recv_tdhm_tnot(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+spp_recv_tchm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case TUA_TCHM_CINV:
+		return spp_recv_tchm_cinv(gp, q, m);
+	case TUA_TCHM_CRES:
+		return spp_recv_tchm_cres(gp, q, m);
+	case TUA_TCHM_CERR:
+		return spp_recv_tchm_cerr(gp, q, m);
+	case TUA_TCHM_CREJ:
+		return spp_recv_tchm_crej(gp, q, m);
+	case TUA_TCHM_CCAN:
+		return spp_recv_tchm_ccan(gp, q, m);
 	}
 	return (-ENOPROTOOPT);
 }
 
 static int
-spp_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
+spp_recv_msg(struct spp *spp, queue_t *q, struct ua_msg *m)
 {
 	switch (m->class) {
 	case UA_CLASS_MGMT:	/* UA Management (MGMT) Message */
-		switch (m->type) {
-		case UA_MGMT_ERR:
-			return spp_recv_mgmt_err(xp, q, m);
-		case UA_MGMT_NTFY:
-			return spp_recv_mgmt_ntfy(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_XFER:	/* M3UA Data transfer message */
-		return (-ENOPROTOOPT);
+		return spp_recv_mgmt(spp, q, mp);
 	case UA_CLASS_SNMM:	/* Signalling Network Mgmt (SNM) Messages */
-		return (-ENOPROTOOPT);
+		return ua_recv_snmm(spp, q, m);
 	case UA_CLASS_ASPS:	/* ASP State Maintenance (ASPSM) Messages */
-		switch (m->type) {
-		case UA_ASPS_ASPUP_REQ:
-			return spp_recv_asps_aspup_req(xp, q, m);
-		case UA_ASPS_ASPDN_REQ:
-			return spp_recv_asps_aspdn_req(xp, q, m);
-		case UA_ASPS_HBEAT_REQ:
-			return spp_recv_asps_hbeat_req(xp, q, m);
-		case UA_ASPS_ASPUP_ACK:
-			return spp_recv_asps_aspup_ack(xp, q, m);
-		case UA_ASPS_ASPDN_ACK:
-			return spp_recv_asps_aspdn_ack(xp, q, m);
-		case UA_ASPS_HBEAT_ACK:
-			return spp_recv_asps_hbeat_ack(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
+		return spp_recv_asps(spp, q, mp);
 	case UA_CLASS_ASPT:	/* ASP Traffic Maintenance (ASPTM) Messages */
-		switch (m->type) {
-		case UA_ASPT_ASPAC_REQ:
-			return spp_recv_aspt_aspac_req(xp, q, m);
-		case UA_ASPT_ASPIA_REQ:
-			return spp_recv_aspt_aspia_req(xp, q, m);
-		case UA_ASPT_ASPAC_ACK:
-			return spp_recv_aspt_aspac_ack(xp, q, m);
-		case UA_ASPT_ASPIA_ACK:
-			return spp_recv_aspt_aspia_ack(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_Q921:	/* Q.931 User Part Messages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_MAUP:	/* M2UA Messages */
-		switch (m->type) {
-		case M2UA_MAUP_ESTAB_REQ:
-			return spp_recv_maup_estab_req(xp, q, m);
-		case M2UA_MAUP_ESTAB_CON:
-			return spp_recv_maup_estab_con(xp, q, m);
-		case M2UA_MAUP_REL_REQ:
-			return spp_recv_maup_rel_req(xp, q, m);
-		case M2UA_MAUP_REL_CON:
-			return spp_recv_maup_rel_con(xp, q, m);
-		case M2UA_MAUP_REL_IND:
-			return spp_recv_maup_rel_ind(xp, q, m);
-		case M2UA_MAUP_STATE_REQ:
-			return spp_recv_maup_state_req(xp, q, m);
-		case M2UA_MAUP_STATE_CON:
-			return spp_recv_maup_state_con(xp, q, m);
-		case M2UA_MAUP_STATE_IND:
-			return spp_recv_maup_state_ind(xp, q, m);
-		case M2UA_MAUP_RETR_REQ:
-			return spp_recv_maup_retr_req(xp, q, m);
-		case M2UA_MAUP_RETR_CON:
-			return spp_recv_maup_retr_con(xp, q, m);
-		case M2UA_MAUP_RETR_IND:
-			return spp_recv_maup_retr_ind(xp, q, m);
-		case M2UA_MAUP_RETR_COMP_IND:
-			return spp_recv_maup_retr_comp_ind(xp, q, m);
-		case M2UA_MAUP_CONG_IND:
-			return spp_recv_maup_cong_ind(xp, q, m);
-		case M2UA_MAUP_DATA_ACK:
-			return spp_recv_maup_data_ack(xp, q, m);
-		case M2UA_MAUP_DATA:
-			return spp_recv_maup_data(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
-	case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
-		return (-ENOPROTOOPT);
-	case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
-		return (-ENOPROTOOPT);
+		return ua_recv_aspt(spp, q, mp);
 	case UA_CLASS_RKMM:	/* Routing Key Management Messages */
-		switch (m->type) {
-		case UA_RKMM_REG_REQ:
-			return spp_recv_rkmm_reg_req(xp, q, m);
-		case UA_RKMM_REG_RSP:
-			return spp_recv_rkmm_reg_rsp(xp, q, m);
-		case UA_RKMM_DEREG_REQ:
-			return spp_recv_rkmm_dereg_req(xp, q, m);
-		case UA_RKMM_DEREG_RSP:
-			return spp_recv_rkmm_dereg_rsp(xp, q, m);
-		}
-		return (-EOPNOTSUPP);
+		return spp_recv_rkmm(spp, q, mp);
+	case UA_CLASS_XFER:	/* M3UA Data transfer message */
+	case UA_CLASS_QPTM:	/* Q.931 User Part Messages */
+	case UA_CLASS_MAUP:	/* M2UA Messages */
+	case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
+	case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
 	case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
-		return (-ENOPROTOOPT);
 	case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
-		return (-ENOPROTOOPT);
+	{
+		int err;
+		struct gp *gp = NULL;
+
+		if ((err = find_gp_spp_data_msg(&gp, spp, m)))
+			return (err);
+		switch (m->class) {
+		case UA_CLASS_XFER:	/* M3UA Data transfer message */
+			return spp_recv_xfer(gp, q, mp);
+		case UA_CLASS_QPTM:	/* Q.931 User Part Messages */
+			return spp_recv_qptm(gp, q, mp);
+		case UA_CLASS_MAUP:	/* M2UA Messages */
+			return spp_recv_maup(gp, q, mp);
+		case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
+			return spp_recv_cnls(gp, q, mp);
+		case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
+			return spp_recv_cons(gp, q, mp);
+		case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
+			return spp_recv_tdhm(gp, q, mp);
+		case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
+			return spp_recv_tchm(gp, q, mp);
+		}
+		swerr();
+	}
 	}
 	return (-ENOPROTOOPT);
+}
+
+static int
+xgp_recv_mgmt(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_MGMT_ERR:
+		return xgp_recv_mgmt_err(spp, q, m);
+	case UA_MGMT_NTFY:
+		return xgp_recv_mgmt_ntfy(spp, q, m);
+	case IUA_MGMT_TEIS_REQ:
+		return xgp_recv_mgmt_teis_req(spp, q, m);
+	case IUA_MGMT_TEIS_CON:
+		return xgp_recv_mgmt_teis_con(spp, q, m);
+	case IUA_MGMT_TEIS_IND:
+		return xgp_recv_mgmt_teis_ind(spp, q, m);
+	case IUA_MGMT_TEIQ_REQ:
+		return xgp_recv_mgmt_teiq_req(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+xgp_recv_xfer(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_XFER_DATA:
+		return xgp_recv_xfer_data(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+xgp_recv_snmm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_SNMM_DUNA:
+		return xgp_recv_snmm_duna(gp, q, m);
+	case UA_SNMM_DAVA:
+		return xgp_recv_snmm_dava(gp, q, m);
+	case UA_SNMM_DAUD:
+		return xgp_recv_snmm_daud(gp, q, m);
+	case UA_SNMM_SCON:
+		return xgp_recv_snmm_scon(gp, q, m);
+	case UA_SNMM_DUPU:
+		return xgp_recv_snmm_dupu(gp, q, m);
+	case UA_SNMM_DRST:
+		return xgp_recv_snmm_drst(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+/**
+ * xgp_recv_asps: - process ASPS message on XGP
+ *
+ * When an XGP receives an ASP Up or ASP Up Ack message they are treated the same, ASP Down and ASP
+ * Down Ack are the same as well.  When receiving an ASP Up or ASP Up Ack, all AS configured are
+ * moved to the ASP Inactive state for the the XGP, which (if the associated local providers are not
+ * present) may result in one or more AS-P moving to the ASP Inactive state, resulting (possibly) in
+ * one or more AS-U moving to the ASP Inactive state which may subsequently cause notifications and
+ * unsolicited ASP Inactive Acks to be sent to the ASPs served by the SGP.
+ */
+static int
+xgp_recv_asps(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPS_ASPUP_REQ:
+		return xgp_recv_asps_aspup_req(spp, q, m);
+	case UA_ASPS_ASPDN_REQ:
+		return xgp_recv_asps_aspdn_req(spp, q, m);
+	case UA_ASPS_HBEAT_REQ:
+		return xgp_recv_asps_hbeat_req(spp, q, m);
+	case UA_ASPS_ASPUP_ACK:
+		return xgp_recv_asps_aspup_ack(spp, q, m);
+	case UA_ASPS_ASPDN_ACK:
+		return xgp_recv_asps_aspdn_ack(spp, q, m);
+	case UA_ASPS_HBEAT_ACK:
+		return xgp_recv_asps_hbeat_ack(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+/**
+ * xgp_recv_aspt: - process ASPT message on XGP
+ *
+ * When an XGP receives an ASP Active or ASP Active Ack message they are treated the differently,
+ * ASP Inactive and ASP Inactive Ack are different as well.  When receiving an ASP Active, the XGP
+ * is moved to the active state for the associated AS-P which may result in further state changes.
+ * When receiving an ASP Active Ack, if the local provider is unavailable, an ASP Inactive is sent,
+ * otherwise the ASP Active Ack is ignored.
+ */
+static int
+xgp_recv_aspt(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPT_ASPAC_REQ:
+		return xgp_recv_aspt_aspac_req(gp, q, m);
+	case UA_ASPT_ASPIA_REQ:
+		return xgp_recv_aspt_aspia_req(gp, q, m);
+	case UA_ASPT_ASPAC_ACK:
+		return xgp_recv_aspt_aspac_ack(gp, q, m);
+	case UA_ASPT_ASPIA_ACK:
+		return xgp_recv_aspt_aspia_ack(gp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+xgp_recv_qptm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case IUA_QPTM_DATA_REQ:
+		return xgp_recv_qptm_data_req(gp, q, m);
+	case IUA_QPTM_DATA_IND:
+		return xgp_recv_qptm_data_ind(gp, q, m);
+	case IUA_QPTM_UDAT_REQ:
+		return xgp_recv_qptm_udat_req(gp, q, m);
+	case IUA_QPTM_UDAT_IND:
+		return xgp_recv_qptm_udat_ind(gp, q, m);
+	case IUA_QPTM_ESTB_REQ:
+		return xgp_recv_qptm_estb_req(gp, q, m);
+	case IUA_QPTM_ESTB_CON:
+		return xgp_recv_qptm_estb_con(gp, q, m);
+	case IUA_QPTM_ESTB_IND:
+		return xgp_recv_qptm_estb_ind(gp, q, m);
+	case IUA_QPTM_RELS_REQ:
+		return xgp_recv_qptm_rels_req(gp, q, m);
+	case IUA_QPTM_RELS_CON:
+		return xgp_recv_qptm_rels_con(gp, q, m);
+	case IUA_QPTM_RESL_IND:
+		return xgp_recv_qptm_rels_ind(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+xgp_recv_maup(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case M2UA_MAUP_ESTAB_REQ:
+		return xgp_recv_maup_estab_req(gp, q, m);
+	case M2UA_MAUP_ESTAB_CON:
+		return xgp_recv_maup_estab_con(gp, q, m);
+	case M2UA_MAUP_REL_REQ:
+		return xgp_recv_maup_rel_req(gp, q, m);
+	case M2UA_MAUP_REL_CON:
+		return xgp_recv_maup_rel_con(gp, q, m);
+	case M2UA_MAUP_REL_IND:
+		return xgp_recv_maup_rel_ind(gp, q, m);
+	case M2UA_MAUP_STATE_REQ:
+		return xgp_recv_maup_state_req(gp, q, m);
+	case M2UA_MAUP_STATE_CON:
+		return xgp_recv_maup_state_con(gp, q, m);
+	case M2UA_MAUP_STATE_IND:
+		return xgp_recv_maup_state_ind(gp, q, m);
+	case M2UA_MAUP_RETR_REQ:
+		return xgp_recv_maup_retr_req(gp, q, m);
+	case M2UA_MAUP_RETR_CON:
+		return xgp_recv_maup_retr_con(gp, q, m);
+	case M2UA_MAUP_RETR_IND:
+		return xgp_recv_maup_retr_ind(gp, q, m);
+	case M2UA_MAUP_RETR_COMP_IND:
+		return xgp_recv_maup_retr_comp_ind(gp, q, m);
+	case M2UA_MAUP_CONG_IND:
+		return xgp_recv_maup_cong_ind(gp, q, m);
+	case M2UA_MAUP_DATA_ACK:
+		return xgp_recv_maup_data_ack(gp, q, m);
+	case M2UA_MAUP_DATA:
+		return xgp_recv_maup_data(gp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+xgp_recv_cnls(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case SUA_CLNS_CLDT:
+		return xgp_recv_clns_cldt(gp, q, m);
+	case SUA_CLNS_CLDR:
+		return xgp_recv_clns_cldr(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+xgp_recv_cons(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case SUA_CONS_CORE:
+		return xgp_recv_cons_core(gp, q, m);
+	case SUA_CONS_COAK:
+		return xgp_recv_cons_coak(gp, q, m);
+	case SUA_CONS_COREF:
+		return xgp_recv_cons_coref(gp, q, m);
+	case SUA_CONS_RELRE:
+		return xgp_recv_cons_relre(gp, q, m);
+	case SUA_CONS_RELCO:
+		return xgp_recv_cons_relco(gp, q, m);
+	case SUA_CONS_RESCO:
+		return xgp_recv_cons_resco(gp, q, m);
+	case SUA_CONS_RESRE:
+		return xgp_recv_cons_resre(gp, q, m);
+	case SUA_CONS_CODT:
+		return xgp_recv_cons_codt(gp, q, m);
+	case SUA_CONS_CODA:
+		return xgp_recv_cons_coda(gp, q, m);
+	case SUA_CONS_COERR:
+		return xgp_recv_cons_coerr(gp, q, m);
+	case SUA_CONS_COIT:
+		return xgp_recv_cons_coit(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+xgp_recv_rkmm(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_RKMM_REG_REQ:
+		return xgp_recv_rkmm_reg_req(spp, q, m);
+	case UA_RKMM_REG_RSP:
+		return xgp_recv_rkmm_reg_rsp(spp, q, m);
+	case UA_RKMM_DEREG_REQ:
+		return xgp_recv_rkmm_dereg_req(spp, q, m);
+	case UA_RKMM_DEREG_RSP:
+		return xgp_recv_rkmm_dereg_rsp(spp, q, m);
+	}
+	return (-EOPNOTSUPP);
+}
+static int
+xgp_recv_tdhm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case TUA_TDHM_TUNI:
+		return xgp_recv_tdhm_tuni(gp, q, m);
+	case TUA_TDHM_TQRY:
+		return xgp_recv_tdhm_tqry(gp, q, m);
+	case TUA_TDHM_TCNV:
+		return xgp_recv_tdhm_tcnv(gp, q, m);
+	case TUA_TDHM_TRSP:
+		return xgp_recv_tdhm_trsp(gp, q, m);
+	case TUA_TDHM_TUAB:
+		return xgp_recv_tdhm_tuab(gp, q, m);
+	case TUA_TDHM_TPAB:
+		return xgp_recv_tdhm_tpab(gp, q, m);
+	case TUA_TDHM_TNOT:
+		return xgp_recv_tdhm_tnot(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+static int
+xgp_recv_tchm(struct gp *gp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case TUA_TCHM_CINV:
+		return xgp_recv_tchm_cinv(gp, q, m);
+	case TUA_TCHM_CRES:
+		return xgp_recv_tchm_cres(gp, q, m);
+	case TUA_TCHM_CERR:
+		return xgp_recv_tchm_cerr(gp, q, m);
+	case TUA_TCHM_CREJ:
+		return xgp_recv_tchm_crej(gp, q, m);
+	case TUA_TCHM_CCAN:
+		return xgp_recv_tchm_ccan(gp, q, m);
+	}
+	return (-ENOPROTOOPT);
+}
+
+static int
+find_gp_spp_data_msg(struct gp **gpp, struct spp *spp, struct ua_msg *m)
+{
+	struct gp *gp = NULL;
+
+	/* For data messages, either the message contains an IID or RC, or there must be only one
+	   AS (the default AS) configured for the XGP. */
+	if (m->rc.wp) {
+		if (m->rc.len != sizeof(uint32_t))
+			return (-EMSGSIZE);	/* Need one and only one RC. */
+		/* Find gp associated with RC for XGP. */
+		for (gp = spp->gp.list; gp && gp->as.as->rc != m->rc.val; gp = gp->spp.next) ;
+	} else if (m->iid.wp) {
+		if (m->iid.len != sizeof(uint32_t))
+			return (-EMSGSIZE);	/* Need one and only one IID. */
+		/* Find gp associated with IID for XGP. */
+		for (gp = spp->gp.list; gp && gp->as.as->iid != m->iid.val; gp = gp->spp.next) ;
+	} else if (m->iid_text.cp) {
+		for (gp = spp->gl.list;
+		     gp && strncmp(m->iid_text.cp, gp->as.as->iid_text, m->iid_text.len);
+		     gp = gp->spp.next) ;
+	} else {
+		/* Message applies to default AS, must have one and only one default AS configured. 
+		 */
+		if (!(gp = spp->gp.list) || gp->spp.next)
+			return (-EXDEV);
+	}
+	if (!gp)
+		return (-EIO);
+	*gpp = gp;
+	return (0);
+}
+
+/*
+ * XGP receive is a little different than the others.  This is used for provider cross-links between
+ * SGP belonging to the same SG.  When we receive data transfer messages on an XGP we perform a
+ * normal provider selection process and send the message out (unless the selection process yields
+ * the same XGP upon which the message arrived.  XGP are like inverted SPPs (which always send
+ * data messages to the user) in that they always send data messages to the provider.  Asside from
+ * that they are like SSP with regards to management messages.
+ */
+static int
+xgp_recv_msg(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->class) {
+	case UA_CLASS_MGMT:	/* UA Management (MGMT) Message */
+		return xgp_recv_mgmt(spp, q, mp);
+	case UA_CLASS_SNMM:	/* Signalling Network Mgmt (SNM) Messages */
+		/* Handles RC a little bit different from data messages. */
+		return ua_recv_snmm(spp, q, m);
+	case UA_CLASS_ASPS:	/* ASP State Maintenance (ASPSM) Messages */
+		return xgp_recv_asps(spp, q, mp);
+	case UA_CLASS_ASPT:	/* ASP Traffic Maintenance (ASPTM) Messages */
+		/* Handles RC (IID) a little bit different from data messages. */
+		return ua_recv_aspt(spp, q, mp);
+	case UA_CLASS_RKMM:	/* Routing Key Management Messages */
+		return xgp_recv_rkmm(spp, q, mp);
+	case UA_CLASS_XFER:	/* M3UA Data transfer message */
+	case UA_CLASS_QPTM:	/* Q.931 User Part Messages */
+	case UA_CLASS_MAUP:	/* M2UA Messages */
+	case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
+	case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
+	case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
+	case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
+	{
+		int err;
+		struct gp *gp = NULL;
+
+		if ((err = find_gp_spp_data_msg(&gp, spp, m)))
+			return (err);
+		switch (m->class) {
+		case UA_CLASS_XFER:	/* M3UA Data transfer message */
+			return xgp_recv_xfer(gp, q, mp);
+		case UA_CLASS_QPTM:	/* Q.931 User Part Messages */
+			return xgp_recv_qptm(gp, q, mp);
+		case UA_CLASS_MAUP:	/* M2UA Messages */
+			return xgp_recv_maup(gp, q, mp);
+		case UA_CLASS_CNLS:	/* SUA Connectionless Messages */
+			return xgp_recv_cnls(gp, q, mp);
+		case UA_CLASS_CONS:	/* SUA Connection Oriented Messages */
+			return xgp_recv_cons(gp, q, mp);
+		case UA_CLASS_TDHM:	/* TUA Dialog Handling Mesages */
+			return xgp_recv_tdhm(gp, q, mp);
+		case UA_CLASS_TCHM:	/* TUA Component Handling Messages */
+			return xgp_recv_tchm(gp, q, mp);
+		}
+		swerr();
+	}
+	}
+	return (-ENOPROTOOPT);
+}
+
+STATIC int
+ua_recv_aspt(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	int err, num_rc = 0, processed = 0;
+	uint32_t *wp = NULL;
+	unsigned char *cp = NULL;
+	bool ranging = false;
+	struct gp *gp;
+
+	/* ASPT messages are processed individually for each RC contained in the message.  If no RC
+	   is contained in the message and there is only one AS for the SGP, the message is
+	   processed for that AS.  If there is more than one AS for the SGP, the error no default AS
+	   for ASP is returned.  The RC (IID) value zero has no special meaning here. */
+	if ((wp = m->rc.wp)) {
+		if (m->rc.len < sizeof(uint32_t)
+		    || (m->rc.len & (sizeof(uint32_t) - 1)))
+			return (-EMSGSIZE);
+		num_rc = m->rc.len >> 2;
+	} else if ((wp = m->iid.wp)) {
+		if (m->iid.len < sizeof(uint32_t)
+		    || (m->iid.len & (sizeof(uint32_t) - 1)))
+			return (-EMSGSIZE);
+		num_rc = m->iid.len >> 2;
+	} else if ((wp = m->iid_range.wp)) {
+		if (m->iid_range.len < (sizeof(uint32_t) << 1)
+		    || (m->iid_range & ((sizeof(uint32_t) << 1) - 1)))
+			return (-EMSGSIZE);
+		num_rc = m->iid.len >> 2;
+		ranging = true;
+	} else if ((cp = m->iid_text.cp)) {
+		num_rc = 1;
+	}
+	for (gp = spp->gp.list; gp; gp = gp->spp.next) {
+		int i;
+
+		for (i = 0; i < num_rc; i++) {
+			if (wp) {
+				if (ranging) {
+					if (gp->as.as->rc >= ntohl(wp[i])
+					    && gp->as.as->rc <= htohl(wp[i + 1]))
+						break;
+					i++;
+				} else {
+					if (gp->as.as->rc == ntohl(wp[i]))
+						break;
+				}
+			} else if (cp) {
+				if (gp->as.as->iid_text
+				    && !strncmp(gp->as.as->iid_text, cp, m->iid_text.len))
+					break;
+			} else {
+				swerr();
+				return (-EFAULT);
+			}
+		}
+		if (i && i >= num_rc)
+			continue;
+		if (!num_rc && gp->spp.next)
+			return (-EXDEV);	/* No default AS for ASP. */
+		switch (spp->type) {
+		case UA_OBJ_TYPE_ASP:
+			err = asp_recv_aspt(gp, q, m);
+			break;
+		case UA_OBJ_TYPE_SGP:
+			err = sgp_recv_aspt(gp, q, m);
+			break;
+		case UA_OBJ_TYPE_SPP:
+			err = spp_recv_aspt(gp, q, m);
+			break;
+		case UA_OBJ_TYPE_XGP:
+			err = xgp_recv_aspt(gp, q, m);
+			break;
+		default:
+			swerr();
+			err = -EFAULT;
+		}
+		if (err < 0)
+			return (err);
+		processed++;
+		if (!ranging && processed >= num_rc)
+			break;
+	}
+	if (!ranging && processed < num_rc)
+		return (-EIO);	/* Invalid RC value in list. */
+	return (QR_DONE);
+}
+
+STATIC int
+ua_recv_snmm(struct spp *spp, queue_t *q, struct ua_msg *m)
+{
+	int err, num_rc = 0, processed = 0;
+	uint32_t *wp = NULL;
+	struct gp *gp;
+
+	/* SNMM messages are processed individually for each RC contained in the message. If no RC
+	   is contained in the message, and there is only one AS for the SGP, the message is
+	   processed for that AS.  If there is more than one AS for the SGP, it is possible to send 
+	   an ERROR message indicating that an RC is required (no default AS), however, we assume
+	   here that it corresponds to all AS.  We also consider the special RC value of zero to
+	   indicate all AS (wildcarded RC value) as well. */
+	if ((wp = m->rc.wp)) {
+		if (m->rc.len < sizeof(uint32_t)
+		    || (m->rc.len & (sizeof(uint32_t) - 1)))
+			return (-EMSGSIZE);
+		num_rc = m->rc.len >> 2;
+		/* Treat special value of zero to mean all RC (for SUA). */
+		if (num_rc == 1 && m->rc.val == 0)
+			num_rc = 0;
+	}
+	/* TODO: Currently we sequentially search all AS and match on RC value.  This linear search 
+	   does not scale.  A hash mechanism for AS will be necessary if the number of AS gets
+	   large (as it could for SUA or TUA). */
+	for (gp = spp->gp.list; gp; gp = gp->spp.next) {
+		int i;
+
+		for (i = 0; i < num_rc; i++)
+			if (gp->as.as->rc == ntohl(wp[i]))
+				break;
+		if (i && i >= num_rc)
+			continue;
+		switch (spp->type) {
+		case UA_OBJ_TYPE_ASP:
+			err = asp_recv_snmm(gp, q, mp);
+			break;
+		case UA_OBJ_TYPE_SGP:
+			err = sgp_recv_snmm(gp, q, mp);
+			break;
+		case UA_OBJ_TYPE_SPP:
+			err = spp_recv_snmm(gp, q, mp);
+			break;
+		case UA_OBJ_TYPE_XGP:
+			err = xgp_recv_snmm(gp, q, mp);
+			break;
+		default:
+			swerr();
+			err = -EFAULT;
+		}
+		if (err < 0)
+			return (err);
+		processed++;
+	}
+	if (processed < num_rc)
+		return (-EIO);	/* Invalid RC value in list. */
+	return (QR_DONE);
+}
+
+STATIC int
+sp_recv_mgmt(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_MGMT_ERR:
+		return sp_recv_mgmt_err(xp, q, m);
+	case UA_MGMT_NTFY:
+		return (-EPROTO); /* Unexpected in this state. */
+	}
+	return (-EOPNOTSUPP); /* Unsupported message type. */
+}
+
+STATIC int
+sp_recv_asps(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_ASPS_ASPUP_REQ:
+		return sp_recv_asps_aspup_req(xp, q, m);
+	case UA_ASPS_ASPDN_REQ:
+		return sp_recv_asps_aspdn_req(xp, q, m);
+	case UA_ASPS_HBEAT_REQ:
+	case UA_ASPS_ASPUP_ACK:
+	case UA_ASPS_ASPDN_ACK:
+	case UA_ASPS_HBEAT_ACK:
+		return (-EPROTO);	/* Unexpected in this state. */
+	}
+	return (-EOPNOTSUPP);	/* Unsupported message type. */
+}
+
+STATIC int
+sp_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->class) {
+	case UA_CLASS_MGMT:
+		return sp_recv_mgmt(xp, q, m);
+	case UA_CLASS_ASPS:
+		return sp_recv_asps(xp, q, m);
+	case UA_CLASS_SNMM:
+	case UA_CLASS_ASPT:
+	case UA_CLASS_RKMM:
+	case UA_CLASS_XFER:
+	case UA_CLASS_QPTM:
+	case UA_CLASS_MAUP:
+	case UA_CLASS_CNLS:
+	case UA_CLASS_CONS:
+	case UA_CLASS_TDHM:
+	case UA_CLASS_TCHM:
+		return (-EPROTO);	/* Unexpected in this state. */
+	}
+	return (-ENOPROTOOPT);	/* Bad message class. */
+}
+
+STATIC int
+sg_recv_mgmt(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->type) {
+	case UA_MGMT_ERR:
+		return sg_recv_mgmt_err(xp, q, m);
+	case UA_MGMT_NTFY:
+		return (-EPROTO); /* Unexpected in this state. */
+	}
+	return (-EOPNOTSUPP); /* Unsupported message type. */
+}
+
+STATIC int
+sg_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	switch (m->class) {
+	case UA_CLASS_MGMT:
+		return sg_recv_mgmt(xp, q, m);
+	case UA_CLASS_ASPS:
+	case UA_CLASS_SNMM:
+	case UA_CLASS_ASPT:
+	case UA_CLASS_RKMM:
+	case UA_CLASS_XFER:
+	case UA_CLASS_QPTM:
+	case UA_CLASS_MAUP:
+	case UA_CLASS_CNLS:
+	case UA_CLASS_CONS:
+	case UA_CLASS_TDHM:
+	case UA_CLASS_TCHM:
+		return (-EPROTO);	/* Unexpected in this state. */
+	}
+	return (-ENOPROTOOPT);	/* Bad message class. */
 }
 
 STATIC int
@@ -8611,31 +11312,70 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 	struct spp *spp;
 	struct ua_msg msg;
 
+	/* SCTP always delivers messages to us as single data blocks so this should never be
+	   needed. If some module in between fragments data blocks, this will handle the problem
+	   once, here. */
+
+	if ((err = ss7_pullupmsg(q, mp, -1)))
+		return (err);
+
 	if ((err = ua_dec_msg(xp, q, mp, &msg)) >= 0) {
-		if ((spp = xp->spp)) {
+		/* XP nodes can be associated with multiple SPP nodes.  If an ASP Id is contained
+		   in the message, we look for an SPP that matches the ASP Id.  If there is no ASP
+		   Id in the message, the list must contain one and only one SPP structure. */
+		if (msp.aspid.wp)
+			for (spp = xp->spp.list; spp && spp->aspid != msg.aspid.val;
+			     spp = spp->xp.next) ;
+		else if ((spp = xp->spp.list) && spp->xp.next)
+			/* No ASP Id in the message, the SPP list must contain exactly one or zero
+			   SPP or it is an error. */
+			return (-EXDEV);	/* Invalid ASP Id. */
+		if (spp) {
 			switch (spp->type) {
 			case UA_OBJ_TYPE_ASP:
-				err = sgp_recv_msg(xp, q, &msg);
+				err = asp_recv_msg(spp, q, &msg);
 				break;
 			case UA_OBJ_TYPE_SGP:
-				err = asp_recv_msg(xp, q, &msg);
+				err = sgp_recv_msg(spp, q, &msg);
 				break;
 			case UA_OBJ_TYPE_SPP:
-				err = spp_recv_msg(xp, q, &msg);
+				err = spp_recv_msg(spp, q, &msg);
+				break;
+			case UA_OBJ_TYPE_XGP:
+				err = xgp_recv_msg(spp, q, &msg);
 				break;
 			default:
-				goto efault;
+				swerr();
+				return (-EFAULT);
 			}
 		} else if ((sp = xp->sp)) {
+			/* Direct links are associated with either an SP-U or an SP-P structure.
+			   Direct links associated with an SP-U structure represent connecting
+			   transports to remote ASPs that have not yet identified themselves.
+			   Because an ASP or SPP always knows which remote SGP or SPP to which it
+			   is connecting, directly links associated with only an SP-P structure
+			   represent an error. */
+			/* Cross-links are associated with either an SP-U or an SP-P structure.
+			   Cross-links associated with an SP-U structure represent peer ASPs or
+			   SPPs that have not yet identified themselves.  Cross-links associated
+			   with an SP-P structure represent peer SGPs that have not yet identified
+			   themselves. */
+			/* The only case in which a remote ASP or SPP, or in which a peer ASP, SGP
+			   or SPP is when dynamic port allocation is used and the local process
+			   must wait for the ASP Up containing an ASP Id to fully identify the
+			   process at the other end of the transport. */
 			switch (sp->type) {
 			case UA_OBJ_TYPE_SP:
-				/* Unknown ASP connecting */
-				err = sgp_recv_msg(xp, q, &msg);
+				/* Unknown ASP or SPP connecting. */
+				err = sp_recv_msg(xp, q, &msg);
 				break;
 			case UA_OBJ_TYPE_SG:
+				/* Unknown SGP or SPP connecting. */
+				err = sg_recv_msg(xp, q, &msg);
 				goto disable;
 			default:
-				goto efault;
+				swerr();
+				return (-EFAULT);
 			}
 		} else
 			goto disable;
@@ -8662,8 +11402,11 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 		uaerr = UA_ECODE_MISSING_PARAMETER;
 		break;
 	case -EIO:
-		break;
 		uaerr = UA_ECODE_INVALID_IID;
+		uaerr = UA_ECODE_INVALID_ROUTING_CONTEXT;
+		break;
+	case -EXDEV:
+		uaerr = UA_ECODE_NO_CONFIGURED_AS_FOR_ASP;
 		break;
 	case -EPERM:
 		uaerr = UA_ECODE_REFUSED_MANAGEMENT_BLOCKING;
@@ -8683,13 +11426,10 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 	default:
 		return (err);
 	}
-	return ua_send_mgmt_err(q, xp, uaerr, mp->b_rptr, msgdsize(mp));
+	return ua_send_mgmt_err(xp, q, uaerr, mp->b_rptr, msgdsize(mp));
       disable:
 	swerr();
 	return (QR_DISABLE);
-      efault:
-	swerr();
-	return (-EFAULT);
 }
 
 /*
@@ -8704,9 +11444,14 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
-/*
- *  LMI_INFO_REQ
- *  -----------------------------------
+/**
+ * slu_info_req: - process LMI_INFO_REQ primitive
+ * @ss: private structure
+ * @q: active queue (upper write queue)
+ * @mp: the LMI_INFO_REQ message
+ *
+ * The LMI_INFO_REQ primitive is processed locally and does not cause the provider to be
+ * interrogated.
  */
 STATIC int
 slu_info_req(struct ss *ss, queue_t *q, mblk_t *mp)
@@ -8721,21 +11466,26 @@ slu_info_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	case LMI_DISABLED:
 	case LMI_ENABLE_PENDING:
 	case LMI_DISABLE_PENDING:
-		return slu_info_ack(q, ss, (unsigned char *) &ss->add, sizeof(ss->add));
+		return sl_info_ack(ss, q, (unsigned char *) &ss->add, sizeof(ss->add));
 	default:
-		return slu_info_ack(q, ss, NULL, 0);
+		return sl_info_ack(ss, q, NULL, 0);
 	}
       badprim:
 	err = LMI_PROTOSHORT;
 	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", DRV_NAME, ss));
 	goto error;
       error:
-	return slu_error_ack(q, ss, p->lmi_primitive, err);
+	return sl_error_ack(ss, q, p->lmi_primitive, err);
 }
 
-/*
- *  LMI_ATTACH_REQ
- *  -----------------------------------
+/**
+ * slu_attach_req: - process LMI_ATTACH_REQ primitive
+ * @ss: private structure
+ * @q: active queue (upper write queue)
+ * @mp: the LMI_INFO_REQ message
+ *
+ * The LMI_ATTACH_REQ is a request to associate the upper multiplex Stream with an interface
+ * identified by the PPA.
  */
 STATIC int
 slu_attach_req(struct ss *ss, queue_t *q, mblk_t *mp)
@@ -8761,7 +11511,7 @@ slu_attach_req(struct ss *ss, queue_t *q, mblk_t *mp)
 		if (as->sp.sp->id == add.spid && as->add.sdli == add.sdli)
 			break;
 	}
-	if (!as)
+	if (!as) {
 		/* FIXME: Instead of generating an error here, we need to perform dynamic
 		   allocation and configuration of signalling link providers.  We do that by
 		   passing the LMI_ATTACH_REQ primitive upstream on the management Stream, but
@@ -8771,6 +11521,7 @@ slu_attach_req(struct ss *ss, queue_t *q, mblk_t *mp)
 		   requesting Stream.  The requesting Stream then researches the list (as above)
 		   and either completes the attachment or fails. */
 		goto badppa;
+	}
 	/* link SL-U to AS-U */
 	if ((ss->as.next = as->ss.list))
 		ss->as.next->as.prev = &ss->as.next;
@@ -8778,9 +11529,9 @@ slu_attach_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	ss->as.as = as_get(as);
 	as->ss.list = ss_get(ss);
 	as->ss.numb++;
-	if ((err = ss_u_set_state(q, ss, AS_INACTIVE)))
+	if ((err = ss_u_set_state(ss, q, AS_INACTIVE)))
 		goto error;
-	return slu_ok_ack(q, ss, p->lmi_primitive);
+	return sl_ok_ack(ss, q, p->lmi_primitive);
       badppa:
 	err = LMI_BADPPA;
 	ptrace(("%s: %p: PROTO: bad PPA\n", DRV_NAME, ss));
@@ -8794,7 +11545,7 @@ slu_attach_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", DRV_NAME, ss));
 	goto error;
       error:
-	return slu_error_ack(q, ss, p->lmi_primitive, err);
+	return sl_error_ack(ss, q, p->lmi_primitive, err);
 }
 
 /*
@@ -8815,7 +11566,7 @@ slu_detach_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	if (ss_get_state(ss) != AS_INACTIVE)
 		goto efault;
 	ss_set_i_state(ss, LMI_DETACH_PENDING);
-	if ((err = ss_u_set_state(q, ss, AS_DOWN)))
+	if ((err = ss_u_set_state(ss, q, AS_DOWN)))
 		goto error;
 	/* unlink SL-U from AS-U */
 	if ((as = ss->as.as)) {
@@ -8827,7 +11578,7 @@ slu_detach_req(struct ss *ss, queue_t *q, mblk_t *mp)
 		as->ss.numb--;
 		as_put(xchg(&ss->as.as, NULL));
 	}
-	return slu_ok_ack(q, ss, p->lmi_primitive);
+	return sl_ok_ack(ss, q, p->lmi_primitive);
       efault:
 	err = -EFAULT;
 	pswerr(("%s: %p: SWERR: software error\n", DRV_NAME, ss));
@@ -8841,7 +11592,7 @@ slu_detach_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", DRV_NAME, ss));
 	goto error;
       error:
-	return slu_error_ack(q, ss, p->lmi_primitive, err);
+	return sl_error_ack(ss, q, p->lmi_primitive, err);
 }
 
 /*
@@ -8879,7 +11630,7 @@ slu_enable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	case AS_INACTIVE:
 		if (as_tst_flags(ss->as.as, ASF_MGMT_BLOCKED))
 			goto blocked;
-		if ((err = ss_u_set_state(q, ss, AS_WACK_ASPAC)))
+		if ((err = ss_u_set_state(ss, q, AS_WACK_ASPAC)))
 			goto error;
 		ss_set_i_state(ss, LMI_ENABLE_PENDING);
 		/* fall through */
@@ -8895,11 +11646,9 @@ slu_enable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 			for (asp = as->gp.list; asp && gp_get_state(asp) != AS_WACK_ASPAC;
 			     asp = asp->as.next) ;
 			if (asp) {
-				if ((xp = asp->spp.spp->xp)
-				    && (err =
-					ua_send_aspt_aspia_ack(q, xp, NULL, 0, NULL, 0, NULL, 0)))
+				if ((err = ua_send_aspt_aspia_ack(asp, q, NULL, 0)))
 					goto error;
-				if ((err = gp_u_set_state(q, asp, AS_INACTIVE)))
+				if ((err = gp_u_set_state(asp, q, AS_INACTIVE)))
 					goto error;
 			}
 			return (QR_DONE);	/* wait for activation to confirm */
@@ -8910,11 +11659,9 @@ slu_enable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 			for (asp = as->gp.list; asp && gp_get_state(asp) != AS_WACK_ASPIA;
 			     asp = asp->as.next) ;
 			if (asp) {
-				if ((xp = asp->spp.spp->xp)
-				    && (err =
-					ua_send_aspt_aspia_ack(q, xp, NULL, 0, NULL, 0, NULL, 0)))
+				if ((err = ua_send_aspt_aspia_ack(asp, q, NULL, 0)))
 					goto error;
-				if ((err = gp_u_set_state(q, asp, AS_INACTIVE)))
+				if ((err = gp_u_set_state(asp, q, AS_INACTIVE)))
 					goto error;
 			}
 			break;
@@ -8925,13 +11672,11 @@ slu_enable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 			for (asp = as->gp.list; asp && gp_get_state(asp) != AS_ACTIVE;
 			     asp = asp->as.next) ;
 			if (asp) {
-				if ((xp = asp->spp.spp->xp)
-				    && (err = ua_send_mgmt_ntfy(q, xp,
+				if ((err = ua_send_mgmt_ntfy_as(asp, q,
 								UA_STATUS_ALTERNATE_ASP_ACTIVE,
-								NULL, &as->iid, 1,
-								NULL, 0, NULL, 0)))
+								NULL, NULL, 0)))
 					goto error;
-				if ((err = gp_u_set_state(q, asp, AS_INACTIVE)))
+				if ((err = gp_u_set_state(asp, q, AS_INACTIVE)))
 					goto error;
 			}
 			break;
@@ -8939,11 +11684,11 @@ slu_enable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 		/* fall through */
 	case AS_WACK_ASPIA:
 		todo(("Notify management that SL-U has gone active\n"));
-		if ((err = ss_u_set_state(q, ss, AS_ACTIVE)))
+		if ((err = ss_u_set_state(ss, q, AS_ACTIVE)))
 			goto error;
 	case AS_ACTIVE:
 	      ignore:
-		if ((err = slu_enable_con(q, ss)))
+		if ((err = sl_enable_con(ss, q)))
 			goto error;
 		ss_set_i_state(ss, LMI_ENABLED);
 		return (QR_DONE);
@@ -8968,7 +11713,7 @@ slu_enable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: waiting for stream to become usable\n", DRV_NAME, ss));
 	goto error;
       error:
-	return slu_error_ack(q, ss, p->lmi_primitive, err);
+	return sl_error_ack(ss, q, p->lmi_primitive, err);
 }
 
 /*
@@ -9002,7 +11747,7 @@ slu_disable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 		swerr();
 		goto outstate;
 	case AS_ACTIVE:
-		if ((err = ss_u_set_state(q, ss, AS_WACK_ASPIA)))
+		if ((err = ss_u_set_state(ss, q, AS_WACK_ASPIA)))
 			goto error;
 		ss_set_i_state(ss, LMI_DISABLE_PENDING);
 		/* fall through */
@@ -9013,10 +11758,10 @@ slu_disable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 		/* fall through */
 	case AS_WACK_ASPAC:
 		todo(("Notify management that SL-U has gone inactive\n"));
-		if ((err = ss_u_set_state(q, ss, AS_INACTIVE)))
+		if ((err = ss_u_set_state(ss, q, AS_INACTIVE)))
 			goto error;
 	case AS_INACTIVE:
-		if ((err = slu_disable_con(q, ss)))
+		if ((err = sl_disable_con(ss, q)))
 			goto error;
 		return (QR_DONE);
 	}
@@ -9039,7 +11784,7 @@ slu_disable_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: waiting for stream to become usable\n", DRV_NAME, ss));
 	goto error;
       error:
-	return slu_error_ack(q, ss, p->lmi_primitive, err);
+	return sl_error_ack(ss, q, p->lmi_primitive, err);
 }
 
 #if 0
@@ -9052,7 +11797,7 @@ slu_optmgmt_req(struct ss *ss, queue_t *q, mblk_t *mp)
 {
 	lmi_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
 
-	return slu_error_ack(q, ss, p->sl_primitive, LMI_NOTSUPP);
+	return sl_error_ack(ss, q, p->sl_primitive, LMI_NOTSUPP);
 }
 #endif
 
@@ -9080,7 +11825,7 @@ slu_send_msg(struct ss *ssu, queue_t *q, mblk_t *mp, int type,
 	if (!(as = ssu->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (!(bp = ss7_dupmsg(q, mp)))
 				return (-ENOBUFS);
 			if ((err = pass_f(q, ssp, bp)) < 0) {
@@ -9125,7 +11870,7 @@ slu_write(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (!(as = ssu->as.as))
 		goto efault;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (!canputnext(ssp->oq))
 				goto ebusy;
 			putnext(ssp->oq, mp);
@@ -9133,11 +11878,11 @@ slu_write(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
 			if ((ssu->proto.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
-				if ((err = m2ua_send_maup_data1(q, sgp, mp)) < 0)
+				if ((err = m2ua_send_maup_data1(sgp, q, mp)) < 0)
 					goto error;
 				return (QR_ABSORBED);
 			} else {
-				if ((err = m2ua_send_maup_data2(q, sgp, mp)) < 0)
+				if ((err = m2ua_send_maup_data2(sgp, q, mp)) < 0)
 					goto error;
 				return (QR_ABSORBED);
 			}
@@ -9160,7 +11905,7 @@ slu_write(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return m_error(q, ssu, EPROTO);
+	return m_error(ssu, q, EPROTO);
 }
 
 /*
@@ -9187,7 +11932,7 @@ slu_pdu_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (!(as = ssu->as.as))
 		goto efault;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (canputnext(ssp->oq)) {
 				putnext(ssp->oq, mp);
 				return (QR_ABSORBED);
@@ -9196,11 +11941,11 @@ slu_pdu_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
 			if ((ssu->proto.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
-				if ((err = m2ua_send_maup_data1(q, sgp, mp->b_cont)) < 0)
+				if ((err = m2ua_send_maup_data1(sgp, q, mp->b_cont)) < 0)
 					goto error;
 				return (QR_TRIMMED);
 			} else {
-				if ((err = m2ua_send_maup_data2(q, sgp, mp->b_cont)) < 0)
+				if ((err = m2ua_send_maup_data2(sgp, q, mp->b_cont)) < 0)
 					goto error;
 				return (QR_TRIMMED);
 			}
@@ -9228,7 +11973,7 @@ slu_pdu_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -9244,6 +11989,7 @@ slu_emergency_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_EMER_SET);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		goto discard;
@@ -9254,7 +12000,7 @@ slu_emergency_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (ss_tst_flags(ssu, ASF_EMERGENCY))
 		goto discard;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (ss_tst_flags(ssp, ASF_EMERGENCY)) {
 				ss_set_flags(ssu, ASF_EMERGENCY);
 				return (QR_DONE);
@@ -9287,7 +12033,7 @@ slu_emergency_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			case SLS_WCON_RELREQ:
 			case SLS_ESTABLISHED:
 			case SLS_UNKNOWN:
-				if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+				if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 					goto error;
 				ss_set_flags(ssu, ASF_EMERGENCY);
 				return (err);
@@ -9298,7 +12044,7 @@ slu_emergency_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* No active or pending provider */
-	if ((err = slu_local_processor_outage_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_local_processor_outage_ind(ssu, q)) < 0)
 		goto error;
 	ss_set_flags(ssu, ASF_PRV_PROC_OUTAGE);
 	ss_set_flags(ssu, ASF_EMERGENCY);
@@ -9319,7 +12065,7 @@ slu_emergency_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -9335,6 +12081,7 @@ slu_emergency_ceases_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_EMER_CLEAR);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		goto discard;
@@ -9345,7 +12092,7 @@ slu_emergency_ceases_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (!ss_tst_flags(ssu, ASF_EMERGENCY))
 		goto discard;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (!ss_tst_flags(ssp, ASF_EMERGENCY)) {
 				ss_clr_flags(ssu, ASF_EMERGENCY);
 				return (QR_DONE);
@@ -9378,7 +12125,7 @@ slu_emergency_ceases_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			case SLS_WCON_RELREQ:
 			case SLS_ESTABLISHED:
 			case SLS_UNKNOWN:
-				if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+				if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 					goto error;
 				ss_clr_flags(ssu, ASF_EMERGENCY);
 				return (err);
@@ -9389,7 +12136,7 @@ slu_emergency_ceases_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* No active or pending provider */
-	if ((err = slu_local_processor_outage_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_local_processor_outage_ind(ssu, q)) < 0)
 		goto error;
 	ss_set_flags(ssu, ASF_PRV_PROC_OUTAGE);
 	ss_clr_flags(ssu, ASF_EMERGENCY);
@@ -9410,7 +12157,7 @@ slu_emergency_ceases_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -9438,7 +12185,7 @@ slu_start_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (ss_get_s_state(ssu) != SLS_IDLE)
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			switch (ss_get_s_state(ssp)) {
 			case SLS_WCON_RELREQ:
 				/* The signalling link has failed and we are restarting it */
@@ -9456,7 +12203,9 @@ slu_start_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 					/* Someone else is retrieving messages, so we need to
 					   indicate that the signalling link has failed (reason
 					   will be unspecified). */
-					if ((err = slu_out_of_service_ind(q, ssu, NULL)) < 0)
+					if ((err =
+					     sl_out_of_service_ind(ssu, q,
+								   SL_FAIL_UNSPECIFIED)) < 0)
 						goto error;
 					ss_set_s_state(ssu, SLS_IDLE);
 					return (QR_DONE);
@@ -9469,7 +12218,7 @@ slu_start_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			case SLS_ESTABLISHED:
 				/* The signalling link is already established by some other
 				   signalling link user. Indicate that the link is in service */
-				if ((err = slu_in_service_ind(q, ssu, NULL)) < 0)
+				if ((err = sl_in_service_ind(ssu, q)) < 0)
 					goto error;
 				ss_set_s_state(ssu, SLS_ESTABLISHED);
 				return (QR_DONE);
@@ -9485,7 +12234,7 @@ slu_start_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 				rare();
 			case SLS_IDLE:
 				if (!gp_tst_flags(sgp, ASF_RETRIEVAL)) {
-					if ((err = m2ua_send_maup_estab_req(q, sgp, mp)) < 0)
+					if ((err = m2ua_send_maup_estab_req(sgp, q)) < 0)
 						goto error;
 					ss_set_s_state(ssu, SLS_WCON_EREQ);
 					gp_set_s_state(sgp, SLS_WCON_EREQ);
@@ -9494,7 +12243,9 @@ slu_start_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 					/* Someone else is retrieving messages, so we need to
 					   indicate that the signalling link has failed (reason
 					   will be unspecified). */
-					if ((err = slu_out_of_service_ind(q, ssu, NULL)) < 0)
+					if ((err =
+					     sl_out_of_service_ind(ssu, q,
+								   SL_FAIL_UNSPECIFIED)) < 0)
 						goto error;
 					ss_set_s_state(ssu, SLS_IDLE);
 					return (err);
@@ -9507,7 +12258,7 @@ slu_start_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			case SLS_ESTABLISHED:
 				/* The signalling link is already established by some other
 				   signalling link user. Indicate that the link is in service */
-				if ((err = slu_in_service_ind(q, ssu, NULL)) < 0)
+				if ((err = sl_in_service_ind(ssu, q)) < 0)
 					goto error;
 				ss_set_s_state(ssu, SLS_ESTABLISHED);
 				return (QR_DONE);
@@ -9518,7 +12269,7 @@ slu_start_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* No active or pending provider */
-	if ((err = slu_local_processor_outage_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_local_processor_outage_ind(ssu, q)) < 0)
 		goto error;
 	ss_set_flags(ssu, ASF_PRV_PROC_OUTAGE);
 	return (err);
@@ -9542,7 +12293,7 @@ slu_start_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -9570,7 +12321,7 @@ slu_stop_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_s_state(ssu)) & (SLSF_IDLE | SLSF_WCON_RELREQ))
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			switch (ss_get_s_state(ssp)) {
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
@@ -9597,7 +12348,7 @@ slu_stop_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			switch (gp_get_s_state(sgp)) {
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
-				if ((err = m2ua_send_maup_rel_req(q, sgp, mp)) < 0)
+				if ((err = m2ua_send_maup_rel_req(sgp, q)) < 0)
 					goto error;
 				ss_set_s_state(ssu, SLS_IDLE);
 				gp_set_s_state(sgp, SLS_IDLE);
@@ -9638,7 +12389,7 @@ slu_stop_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -9666,7 +12417,7 @@ slu_retrieve_bsnt_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (ss_tst_flags(ssu, ASF_BSNT_REQUEST))
 		goto outstate;	/* alreday requested */
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (ss_tst_flags(ssp, ASF_BSNT_REQUEST)) {
 				ss_set_flags(ssu, ASF_BSNT_REQUEST);
 				return (QR_DONE);
@@ -9683,7 +12434,7 @@ slu_retrieve_bsnt_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 				goto ebusy;
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
-				if ((err = slu_bsnt_not_retrievable_ind(q, ssu, NULL)) < 0)
+				if ((err = sl_bsnt_not_retrievable_ind(ssu, q, 0)) < 0)
 					goto error;
 				return (err);
 			default:
@@ -9699,14 +12450,14 @@ slu_retrieve_bsnt_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			switch (gp_get_s_state(sgp)) {
 			case SLS_IDLE:
 			case SLS_WCON_RELREQ:
-				if ((err = m2ua_send_maup_retr_req(q, sgp, mp)) < 0)
+				if ((err = m2ua_send_maup_retr_req(sgp, q, NULL)) < 0)
 					goto error;
 				ss_set_flags(ssu, ASF_BSNT_REQUEST);
 				gp_set_flags(sgp, ASF_BSNT_REQUEST);
 				return (err);
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
-				if ((err = slu_bsnt_not_retrievable_ind(q, ssu, NULL)) < 0)
+				if ((err = sl_bsnt_not_retrievable_ind(ssu, q, 0)) < 0)
 					goto error;
 				return (err);
 			default:
@@ -9716,7 +12467,7 @@ slu_retrieve_bsnt_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* No active or pending provider */
-	if ((err = slu_bsnt_not_retrievable_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_bsnt_not_retrievable_ind(ssu, q, 0)) < 0)
 		goto error;
 	return (err);
       discard:
@@ -9740,7 +12491,7 @@ slu_retrieve_bsnt_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -9757,6 +12508,8 @@ slu_retrieval_request_and_fsnc_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *sgp;
 
+	uint32_t fsnc = htohl(p->sl_fsnc);
+
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9766,7 +12519,7 @@ slu_retrieval_request_and_fsnc_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (ss_get_s_state(ssu) != SLS_IDLE)
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			switch (ss_get_s_state(ssp)) {
 			case SLS_IDLE:
 			case SLS_WCON_RELREQ:
@@ -9785,7 +12538,7 @@ slu_retrieval_request_and_fsnc_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 				/* Retrieval is not possible or someone else is already retrieving. 
 				   Only one signalling link user can be allowed to retrieve.  We
 				   must refuse the retrieval request. */
-				if ((err = slu_retrieval_not_possible_ind(q, ssu, NULL)) < 0)
+				if ((err = sl_retrieval_not_possible_ind(ssu, q)) < 0)
 					goto error;
 				ss_set_s_state(ssu, SLS_IDLE);
 				return (err);
@@ -9798,7 +12551,7 @@ slu_retrieval_request_and_fsnc_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			case SLS_IDLE:
 			case SLS_WCON_RELREQ:
 				if (!gp_tst_flags(sgp, ASF_RETRIEVAL)) {
-					if ((err = m2ua_send_maup_retr_req(q, sgp, mp)) < 0)
+					if ((err = m2ua_send_maup_retr_req(sgp, q, &fsnc)) < 0)
 						goto error;
 					gp_set_flags(sgp, ASF_RETRIEVAL);
 					ss_set_flags(ssu, ASF_RETRIEVAL);
@@ -9810,7 +12563,7 @@ slu_retrieval_request_and_fsnc_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 				/* Retrieval is not possible or someone else is already retrieving. 
 				   Only one signalling link user can be allowed to retrieve.  We
 				   must refuse the retrieval request. */
-				if ((err = slu_retrieval_not_possible_ind(q, ssu, NULL)) < 0)
+				if ((err = sl_retrieval_not_possible_ind(ssu, q)) < 0)
 					goto error;
 				ss_set_s_state(ssu, SLS_IDLE);
 				return (err);
@@ -9820,7 +12573,7 @@ slu_retrieval_request_and_fsnc_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* No active or pending provider */
-	if ((err = slu_retrieval_not_possible_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_retrieval_not_possible_ind(ssu, q)) < 0)
 		goto error;
 	ss_set_s_state(ssu, SLS_IDLE);
 	return (err);
@@ -9845,7 +12598,7 @@ slu_retrieval_request_and_fsnc_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -9861,6 +12614,7 @@ slu_clear_buffers_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_FLUSH_BUFFERS);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		goto discard;
@@ -9873,7 +12627,7 @@ slu_clear_buffers_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (!ss_tst_flags(ssu, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE)))
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			/* active or pending local ssp */
 			if (!ss_tst_flags(ssp, ASF_FLUSH_BUFFERS)) {
 				if (ss_tst_flags(ssp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
@@ -9891,7 +12645,7 @@ slu_clear_buffers_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			/* active or pending sgp */
 			if (!gp_tst_flags(sgp, ASF_FLUSH_BUFFERS)) {
 				if (gp_tst_flags(sgp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
-					if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+					if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 						goto error;
 					gp_clr_flags(sgp, ASF_USR_PROC_OUTAGE);
 					ss_clr_flags(ssu, ASF_USR_PROC_OUTAGE);
@@ -9902,7 +12656,7 @@ slu_clear_buffers_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* No active or pending provider */
-	if ((err = slu_local_processor_outage_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_local_processor_outage_ind(ssu, q)) < 0)
 		goto error;
 	ss_set_flags(ssu, ASF_PRV_PROC_OUTAGE);
 	ss_clr_flags(ssu, ASF_USR_PROC_OUTAGE);
@@ -9929,7 +12683,7 @@ slu_clear_buffers_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -9945,6 +12699,7 @@ slu_clear_rtb_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_CLEAR_RTB);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		goto discard;
@@ -9957,7 +12712,7 @@ slu_clear_rtb_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (!ss_tst_flags(ssu, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE)))
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			/* active or pending local ssp */
 			if (!ss_tst_flags(ssp, (ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS))) {
 				if (ss_tst_flags(ssp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
@@ -9976,7 +12731,7 @@ slu_clear_rtb_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			/* active or pending sgp */
 			if (!gp_tst_flags(sgp, (ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS))) {
 				if (gp_tst_flags(sgp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
-					if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+					if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 						goto error;
 					gp_clr_flags(sgp, ASF_USR_PROC_OUTAGE);
 				}
@@ -9987,7 +12742,7 @@ slu_clear_rtb_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* No active or pending provider */
-	if ((err = slu_local_processor_outage_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_local_processor_outage_ind(ssu, q)) < 0)
 		goto error;
 	ss_set_flags(ssu, ASF_PRV_PROC_OUTAGE);
 	ss_clr_flags(ssu, ASF_USR_PROC_OUTAGE);
@@ -10013,7 +12768,7 @@ slu_clear_rtb_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -10029,6 +12784,7 @@ slu_continue_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_CONTINUE);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		goto discard;
@@ -10041,7 +12797,7 @@ slu_continue_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (!ss_tst_flags(ssu, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE)))
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			/* active or pending local ssp */
 			if (!ss_tst_flags(ssp, (ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS))) {
 				if (ss_tst_flags(ssp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
@@ -10060,7 +12816,7 @@ slu_continue_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			/* active or pending sgp */
 			if (!gp_tst_flags(sgp, (ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS))) {
 				if (gp_tst_flags(sgp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
-					if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+					if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 						goto error;
 					gp_clr_flags(sgp, ASF_USR_PROC_OUTAGE);
 				}
@@ -10071,7 +12827,7 @@ slu_continue_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* No active or pending provider */
-	if ((err = slu_local_processor_outage_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_local_processor_outage_ind(ssu, q)) < 0)
 		goto error;
 	ss_set_flags(ssu, ASF_PRV_PROC_OUTAGE);
 	ss_clr_flags(ssu, ASF_USR_PROC_OUTAGE);
@@ -10097,7 +12853,7 @@ slu_continue_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -10113,6 +12869,7 @@ slu_local_processor_outage_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_LPO_SET);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		goto discard;
@@ -10123,7 +12880,7 @@ slu_local_processor_outage_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (ss_tst_flags(ssu, ASF_USR_PROC_OUTAGE))
 		goto discard;	/* already done */
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			/* Active or pending ssp */
 			if (!ss_tst_flags(ssp, ASF_USR_PROC_OUTAGE)) {
 				if (!canputnext(ssp->oq))
@@ -10138,7 +12895,7 @@ slu_local_processor_outage_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
 			/* Active or pending sgp */
 			if (!gp_tst_flags(sgp, ASF_USR_PROC_OUTAGE)) {
-				if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+				if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 					goto error;
 				gp_set_flags(sgp, ASF_USR_PROC_OUTAGE);
 			}
@@ -10166,7 +12923,7 @@ slu_local_processor_outage_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -10182,6 +12939,7 @@ slu_resume_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_LPO_CLEAR);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		goto discard;
@@ -10193,7 +12951,7 @@ slu_resume_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	    || ss_tst_flags(ssu, (ASF_PRV_PROC_OUTAGE | ASF_LOC_PROC_OUTAGE | ASF_REM_PROC_OUTAGE)))
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			/* active or pending local ssp */
 			if (!ss_tst_flags
 			    (ssp,
@@ -10219,7 +12977,7 @@ slu_resume_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			    (sgp,
 			     (ASF_PRV_PROC_OUTAGE | ASF_LOC_PROC_OUTAGE | ASF_REM_PROC_OUTAGE))) {
 				if (!gp_tst_flags(sgp, ASF_RECOVERY)) {
-					if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+					if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 						goto error;
 					gp_clr_flags(sgp,
 						     (ASF_RECOVERY | ASF_USR_PROC_OUTAGE |
@@ -10233,7 +12991,7 @@ slu_resume_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 		}
 	}
 	/* no active or pending provider */
-	if ((err = slu_local_processor_outage_ind(q, ssu, NULL)) < 0)
+	if ((err = sl_local_processor_outage_ind(ssu, q)) < 0)
 		goto error;
 	ss_set_flags(ssu, ASF_PRV_PROC_OUTAGE);
 	ss_clr_flags(ssu, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE | ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS));
@@ -10259,7 +13017,7 @@ slu_resume_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, ssu));
 	goto error;
       error:
-	return slu_error_ack(q, ssu, p->sl_primitive, err);
+	return sl_error_ack(ssu, q, p->sl_primitive, err);
 }
 
 /*
@@ -10275,13 +13033,14 @@ slu_congestion_discard_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *sgp;
 	mblk_t *bp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_CONG_DISCARD);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = ssu->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (!canputnext(ssp->oq))
 				return (-EBUSY);
 			if (!(bp = ss7_dupmsg(q, mp)))
@@ -10290,7 +13049,7 @@ slu_congestion_discard_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			return (QR_ABSORBED);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+			if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 				return (err);
 			return (QR_DONE);
 		}
@@ -10311,13 +13070,14 @@ slu_congestion_accept_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *sgp;
 	mblk_t *bp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_CONG_ACCEPT);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = ssu->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (!canputnext(ssp->oq))
 				return (-EBUSY);
 			if (!(bp = ss7_dupmsg(q, mp)))
@@ -10326,7 +13086,7 @@ slu_congestion_accept_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			return (QR_ABSORBED);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+			if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 				return (err);
 			return (QR_DONE);
 		}
@@ -10347,13 +13107,14 @@ slu_no_congestion_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *sgp;
 	mblk_t *bp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_CONG_CLEAR);
 
 	if (ss_get_i_state(ssu) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = ssu->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (!canputnext(ssp->oq))
 				return (-EBUSY);
 			if (!(bp = ss7_dupmsg(q, mp)))
@@ -10362,7 +13123,7 @@ slu_no_congestion_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 			return (QR_ABSORBED);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
+			if ((err = m2ua_send_maup_state_req(sgp, q, request)) < 0)
 				return (err);
 			return (QR_DONE);
 		}
@@ -10388,7 +13149,7 @@ slu_power_on_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 	if (!(as = ssu->as.as))
 		return (-EFAULT);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
-		for (ssp = ap_find_slp(ap); ssp; ssp = ap_find_slp_next(ap, ssp, 1)) {
+		for (ssp = ap_find_ssp(ap); ssp; ssp = ap_find_ssp_next(ap, ssp, 1)) {
 			if (!canputnext(ssp->oq))
 				return (-EBUSY);
 			if (!(bp = ss7_dupmsg(q, mp)))
@@ -10413,7 +13174,7 @@ slu_optmgmt_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 {
 	int err;
 
-	if ((err = sl_error_ack(q, ssu, SL_OPTMGMT_REQ, LMI_NOTSUPP, EOPNOTSUPP)))
+	if ((err = sl_error_ack(ssu, q, SL_OPTMGMT_REQ, LMI_NOTSUPP, EOPNOTSUPP)))
 		return (err);
 	return (-EPROTO);
 }
@@ -10429,7 +13190,7 @@ slu_notify_req(struct ss *ssu, queue_t *q, mblk_t *mp)
 {
 	int err;
 
-	if ((err = sl_error_ack(q, ssu, SL_NOTIFY_REQ, LMI_NOTSUPP, EOPNOTSUPP)))
+	if ((err = sl_error_ack(ssu, q, SL_NOTIFY_REQ, LMI_NOTSUPP, EOPNOTSUPP)))
 		return (err);
 	return (-EPROTO);
 }
@@ -10487,7 +13248,7 @@ slp_ok_ack(struct ss *ss, queue_t *q, mblk_t *mp)
 		assure(ss_get_state(ss) == AS_DOWN);
 		ss_set_i_state(ss, LMI_DISABLED);
 		todo(("Notify management that SL-P is up\n"));
-		if ((err = ss_p_set_state(q, ss, AS_INACTIVE)))
+		if ((err = ss_p_set_state(ss, q, AS_INACTIVE)))
 			return (err);
 		return (QR_DONE);
 	case LMI_DETACH_PENDING:
@@ -10495,7 +13256,7 @@ slp_ok_ack(struct ss *ss, queue_t *q, mblk_t *mp)
 		assure(ss_get_state(ss) == AS_INACTIVE);
 		ss_set_i_state(ss, LMI_UNATTACHED);
 		todo(("Notify management that SL-P is down\n"));
-		if ((err = ss_p_set_state(q, ss, AS_DOWN)))
+		if ((err = ss_p_set_state(ss, q, AS_DOWN)))
 			return (err);
 		return (QR_DONE);
 	}
@@ -10535,7 +13296,7 @@ slp_error_ack(struct ss *ss, queue_t *q, mblk_t *mp)
 		assure(ss_get_state(ss) == AS_WACK_ASPAC);
 		ss_set_i_state(ss, LMI_DISABLED);
 		todo(("Notify management that the SL-P is inactive\n"));
-		if ((err = ss_p_set_state(q, ss, AS_INACTIVE)))
+		if ((err = ss_p_set_state(ss, q, AS_INACTIVE)))
 			return (err);
 		return (QR_DONE);
 	case LMI_DISABLE_PENDING:
@@ -10543,7 +13304,7 @@ slp_error_ack(struct ss *ss, queue_t *q, mblk_t *mp)
 		assure(ss_get_state(ss) == AS_WACK_ASPIA);
 		ss_set_i_state(ss, LMI_ENABLED);
 		todo(("Notify management that the SL-P is active\n"));
-		if ((err = ss_p_set_state(q, ss, AS_ACTIVE)))
+		if ((err = ss_p_set_state(ss, q, AS_ACTIVE)))
 			return (err);
 		return (QR_DONE);
 	}
@@ -10570,7 +13331,7 @@ slp_enable_con(struct ss *ss, queue_t *q, mblk_t *mp)
 		assure(ss_get_state(ss) == AS_WACK_ASPAC);
 		ss_set_i_state(ss, LMI_ENABLED);
 		todo(("Notify management that the SL-P is active\n"));
-		if ((err = ss_p_set_state(q, ss, AS_ACTIVE)))
+		if ((err = ss_p_set_state(ss, q, AS_ACTIVE)))
 			return (err);
 		return (QR_DONE);
 	}
@@ -10597,7 +13358,7 @@ slp_disable_con(struct ss *ss, queue_t *q, mblk_t *mp)
 		assure(ss_get_state(ss) == AS_WACK_ASPIA);
 		ss_set_i_state(ss, LMI_DISABLED);
 		todo(("Notify management that the SL-P is inactive\n"));
-		if ((err = ss_p_set_state(q, ss, AS_INACTIVE)))
+		if ((err = ss_p_set_state(ss, q, AS_INACTIVE)))
 			return (err);
 		return (QR_DONE);
 	}
@@ -10640,7 +13401,7 @@ slp_error_ind(struct ss *ss, queue_t *q, mblk_t *mp)
 		assure(ss_get_state(ss) == AS_ACTIVE);
 		ss_set_i_state(ss, LMI_DISABLED);
 		todo(("Notify management that SL-P is inactive\n"));
-		if ((err = ss_p_set_state(q, ss, AS_INACTIVE)))
+		if ((err = ss_p_set_state(ss, q, AS_INACTIVE)))
 			return (err);
 		return (QR_DONE);
 	case LMI_DISABLED:
@@ -10651,7 +13412,7 @@ slp_error_ind(struct ss *ss, queue_t *q, mblk_t *mp)
 		assure(ss_get_state(ss) == AS_WACK_ASPIA);
 		ss_set_i_state(ss, LMI_DISABLED);
 		todo(("Notify management that SL-P is inactive\n"));
-		if ((err = ss_p_set_state(q, ss, AS_INACTIVE)))
+		if ((err = ss_p_set_state(ss, q, AS_INACTIVE)))
 			return (err);
 		return (QR_DONE);
 	}
@@ -10721,7 +13482,7 @@ slp_read(struct ss *ssp, queue_t *q, mblk_t *mp)
 	if (!(as = ssp->as.as))
 		return (-EFAULT);
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (!ss_tst_flags(ssu, ASF_OPERATION_PENDING)) {
 				if ((1 << ss_get_s_state(ssu)) &
 				    (SLSF_WCON_RELREQ | SLSF_ESTABLISHED)) {
@@ -10742,10 +13503,10 @@ slp_read(struct ss *ssp, queue_t *q, mblk_t *mp)
 					if (!(bp = ss7_dupmsg(q, mp)))
 						return (-ENOBUFS);
 					if ((ssp->proto.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
-						if ((err = m2ua_send_maup_data1(q, asp, bp)) < 0)
+						if ((err = m2ua_send_maup_data1(asp, q, bp)) < 0)
 							return (err);
 					} else {
-						if ((err = m2ua_send_maup_data2(q, asp, bp)) < 0)
+						if ((err = m2ua_send_maup_data2(asp, q, bp)) < 0)
 							return (err);
 					}
 					freeb(bp);
@@ -10756,10 +13517,10 @@ slp_read(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 	}
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			ss_clr_flags(ssu, ASF_OPERATION_PENDING);
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
-			xp_clr_flags(asp->spp.spp->xp, ASF_OPERATION_PENDING);
+			xp_clr_flags(asp->spp.spp->xp.xp, ASF_OPERATION_PENDING);
 	}
 	return (QR_DONE);
 }
@@ -10786,7 +13547,7 @@ slp_pdu_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 	if (!(as = ssp->as.as))
 		return (-EFAULT);
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (!ss_tst_flags(ssu, ASF_OPERATION_PENDING)) {
 				if ((1 << ss_get_s_state(ssu)) &
 				    (SLSF_WCON_RELREQ | SLSF_ESTABLISHED)) {
@@ -10807,10 +13568,10 @@ slp_pdu_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 					if (!(bp = ss7_dupmsg(q, mp->b_cont)))
 						return (-ENOBUFS);
 					if ((ssp->proto.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
-						if ((err = m2ua_send_maup_data1(q, asp, bp)) < 0)
+						if ((err = m2ua_send_maup_data1(asp, q, bp)) < 0)
 							return (err);
 					} else {
-						if ((err = m2ua_send_maup_data2(q, asp, bp)) < 0)
+						if ((err = m2ua_send_maup_data2(asp, q, bp)) < 0)
 							return (err);
 					}
 					freeb(bp);
@@ -10821,10 +13582,10 @@ slp_pdu_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 	}
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			ss_clr_flags(ssu, ASF_OPERATION_PENDING);
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
-			xp_clr_flags(asp->spp.spp->xp, ASF_OPERATION_PENDING);
+			xp_clr_flags(asp->spp.spp->xp.xp, ASF_OPERATION_PENDING);
 	}
 	return (QR_DONE);
 }
@@ -10837,19 +13598,25 @@ slp_pdu_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 STATIC int
 slp_link_congested_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 {
+	sl_link_cong_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct ss *ssu;
 	int err;
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+	uint32_t cong, disc;
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = ssp->as.as))
 		return (-EFAULT);
 	assure(ss_get_s_state(ssp) == SLS_ESTABLISHED);
+
+	cong = p->sl_cong_status;
+	disc = p->sl_disc_status;
+
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (!ss_tst_flags(ssu, ASF_OPERATION_PENDING)) {
 				if (ss_get_s_state(ssu) == SLS_ESTABLISHED) {
 					mblk_t *bp;
@@ -10867,7 +13634,7 @@ slp_link_congested_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (!gp_tst_flags(asp, ASF_OPERATION_PENDING)) {
 				if (gp_get_s_state(asp) == SLS_ESTABLISHED) {
-					if ((err = m2ua_send_maup_cong_ind(q, asp, mp)))
+					if ((err = m2ua_send_maup_cong_ind(asp, q, cong, disc)))
 						return (err);
 					if (as->sp.sp->tmode == UA_TMODE_BROADCAST)
 						return (QR_DONE);
@@ -10876,10 +13643,10 @@ slp_link_congested_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 	}
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			ss_clr_flags(ssu, ASF_OPERATION_PENDING);
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
-			xp_clr_flags(asp->spp.spp->xp, ASF_OPERATION_PENDING);
+			xp_clr_flags(asp->spp.spp->xp.xp, ASF_OPERATION_PENDING);
 	}
 	return (QR_DONE);
 }
@@ -10892,11 +13659,16 @@ slp_link_congested_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 STATIC int
 slp_congestion_ceased_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 {
+	sl_link_cong_ceased_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct ss *ssu;
 	int err;
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+	uint32_t cong, disc;
+
+	cong = p->sl_cong_status;
+	disc = p->sl_disc_status;
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
@@ -10904,7 +13676,7 @@ slp_congestion_ceased_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure(ss_get_s_state(ssp) == SLS_ESTABLISHED);
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (!ss_tst_flags(ssu, ASF_OPERATION_PENDING)) {
 				if (ss_get_s_state(ssu) == SLS_ESTABLISHED) {
 					mblk_t *bp;
@@ -10922,7 +13694,7 @@ slp_congestion_ceased_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (!gp_tst_flags(asp, ASF_OPERATION_PENDING)) {
 				if (gp_get_s_state(asp) == SLS_ESTABLISHED) {
-					if ((err = m2ua_send_maup_cong_ind(q, asp, mp)))
+					if ((err = m2ua_send_maup_cong_ind(asp, q, cong, disc)))
 						return (err);
 					if (as->sp.sp->tmode == UA_TMODE_BROADCAST)
 						return (QR_DONE);
@@ -10931,10 +13703,10 @@ slp_congestion_ceased_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 	}
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			ss_clr_flags(ssu, ASF_OPERATION_PENDING);
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
-			xp_clr_flags(asp->spp.spp->xp, ASF_OPERATION_PENDING);
+			xp_clr_flags(asp->spp.spp->xp.xp, ASF_OPERATION_PENDING);
 	}
 	return (QR_DONE);
 }
@@ -10960,7 +13732,7 @@ slp_retrieved_message_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure(ss_get_s_state(ssp) == SLS_IDLE);
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_RETRIEVAL)) {
 				if (!canputnext(ssu->oq))
 					return (-EBUSY);
@@ -10970,10 +13742,10 @@ slp_retrieved_message_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_tst_flags(asp, ASF_RETRIEVAL)) {
 				if ((ssp->proto.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
-					if ((err = m2ua_send_maup_retr_ind1(q, asp, mp)))
+					if ((err = m2ua_send_maup_retr_ind1(asp, q, mp)))
 						return (err);
 				} else {
-					if ((err = m2ua_send_maup_retr_ind2(q, asp, mp)))
+					if ((err = m2ua_send_maup_retr_ind2(asp, q, mp)))
 						return (err);
 				}
 				return (QR_TRIMMED);
@@ -11003,7 +13775,7 @@ slp_retrieval_complete_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure(ss_get_s_state(ssp) == SLS_IDLE);
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_RETRIEVAL)) {
 				if (!canputnext(ssu->oq))
 					return (-EBUSY);
@@ -11014,7 +13786,7 @@ slp_retrieval_complete_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_tst_flags(asp, ASF_RETRIEVAL)) {
-				if ((err = m2ua_send_maup_retr_comp_ind(q, asp, mp)))
+				if ((err = m2ua_send_maup_retr_comp_ind(asp, q)))
 					return (err);
 				gp_set_s_state(asp, SLS_IDLE);
 				ss_set_s_state(ssp, SLS_IDLE);
@@ -11037,6 +13809,7 @@ slp_rb_cleared_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_FLUSH_BUFFERS);
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
@@ -11044,7 +13817,7 @@ slp_rb_cleared_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure(ss_tst_flags(ssp, ASF_FLUSH_BUFFERS));
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_FLUSH_BUFFERS)) {
 				mblk_t *bp;
 
@@ -11057,7 +13830,7 @@ slp_rb_cleared_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_tst_flags(asp, ASF_FLUSH_BUFFERS)) {
-				if ((err = m2ua_send_maup_state_con(q, asp, mp)))
+				if ((err = m2ua_send_maup_state_con(asp, q, request)))
 					return (err);
 				gp_clr_flags(asp, ASF_FLUSH_BUFFERS);
 			}
@@ -11074,11 +13847,16 @@ slp_rb_cleared_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 STATIC int
 slp_bsnt_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 {
+	sl_bsnt_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct ss *ssu;
 	int err;
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
+	static const uint32_t action = __constant_htonl(M2UA_ACTION_RTRV_BSN);
+	static const uint32_t result = __constant_htonl(UA_RESULT_SUCCESS);
+	uint32_t bsnt = htohl(p->sl_bsnt);
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
@@ -11086,7 +13864,7 @@ slp_bsnt_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure(ss_tst_flags(ssp, ASF_BSNT_REQUEST));
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_BSNT_REQUEST)) {
 				mblk_t *bp;
 
@@ -11101,7 +13879,7 @@ slp_bsnt_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_tst_flags(asp, ASF_BSNT_REQUEST)) {
-				if ((err = m2ua_send_maup_retr_con(q, asp, mp)))
+				if ((err = m2ua_send_maup_retr_con(asp, q, action, result, &bsnt)))
 					return (err);
 				gp_clr_flags(asp, ASF_BSNT_REQUEST);
 				if (as->sp.sp->tmode == UA_TMODE_OVERRIDE)
@@ -11132,7 +13910,7 @@ slp_in_service_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		goto efault;
 	assure(ss_get_s_state(ssp) == SLS_WCON_EREQ);
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_get_s_state(ssu) == SLS_WCON_EREQ) {
 				mblk_t *bp;
 
@@ -11145,7 +13923,7 @@ slp_in_service_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_get_s_state(asp) == SLS_WCON_EREQ) {
-				if ((err = m2ua_send_maup_estab_con(q, asp, mp)))
+				if ((err = m2ua_send_maup_estab_con(asp, q)))
 					return (err);
 				gp_set_s_state(asp, SLS_ESTABLISHED);
 			}
@@ -11187,7 +13965,7 @@ slp_out_of_service_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure((1 << ss_get_s_state(ssp)) & (SLSF_WCON_EREQ | SLSF_ESTABLISHED));
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if ((1 << ss_get_s_state(ssu)) & (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
 				mblk_t *bp;
 
@@ -11200,7 +13978,7 @@ slp_out_of_service_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if ((1 << gp_get_s_state(asp)) & (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
-				if ((err = m2ua_send_maup_rel_ind(q, asp, mp)))
+				if ((err = m2ua_send_maup_rel_ind(asp, q)))
 					return (err);
 				gp_set_s_state(asp, SLS_IDLE);
 			}
@@ -11221,6 +13999,7 @@ slp_remote_processor_outage_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+	static const uint32_t event = __constant_htonl(M2UA_EVENT_RPO_ENTER);
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
@@ -11228,7 +14007,7 @@ slp_remote_processor_outage_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure((1 << ss_get_s_state(ssp)) & (SLSF_WCON_EREQ | SLSF_ESTABLISHED));
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (!ss_tst_flags(ssu, ASF_OPERATION_PENDING)) {
 				if ((1 << ss_get_s_state(ssu)) &
 				    (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
@@ -11246,14 +14025,14 @@ slp_remote_processor_outage_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			if (!gp_tst_flags(asp, ASF_OPERATION_PENDING)) {
 				if ((1 << gp_get_s_state(asp)) &
 				    (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
-					if ((err = m2ua_send_maup_state_ind(q, asp, mp)))
+					if ((err = m2ua_send_maup_state_ind(asp, q, event)))
 						return (err);
 				}
 				gp_set_flags(asp, ASF_OPERATION_PENDING);
 			}
 	}
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			ss_clr_flags(ssu, ASF_OPERATION_PENDING);
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			gp_clr_flags(asp, ASF_OPERATION_PENDING);
@@ -11273,6 +14052,7 @@ slp_remote_processor_recovered_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+	static const uint32_t event = __constant_htonl(M2UA_EVENT_RPO_EXIT);
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
@@ -11280,7 +14060,7 @@ slp_remote_processor_recovered_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure((1 << ss_get_s_state(ssp)) & (SLSF_WCON_EREQ | SLSF_ESTABLISHED));
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (!ss_tst_flags(ssu, ASF_OPERATION_PENDING)) {
 				if ((1 << ss_get_s_state(ssu)) &
 				    (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
@@ -11298,14 +14078,14 @@ slp_remote_processor_recovered_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			if (!gp_tst_flags(asp, ASF_OPERATION_PENDING)) {
 				if ((1 << gp_get_s_state(asp)) &
 				    (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
-					if ((err = m2ua_send_maup_state_ind(q, asp, mp)))
+					if ((err = m2ua_send_maup_state_ind(asp, q, event)))
 						return (err);
 				}
 				gp_set_flags(asp, ASF_OPERATION_PENDING);
 			}
 	}
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			ss_clr_flags(ssu, ASF_OPERATION_PENDING);
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			gp_clr_flags(asp, ASF_OPERATION_PENDING);
@@ -11325,6 +14105,7 @@ slp_rtb_cleared_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+	static const uint32_t request = __constant_htonl(M2UA_STATUS_CLEAR_RTB);
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
@@ -11332,7 +14113,7 @@ slp_rtb_cleared_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure(ss_tst_flags(ssp, ASF_CLEAR_RTB));
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_CLEAR_RTB)) {
 				mblk_t *bp;
 
@@ -11345,7 +14126,7 @@ slp_rtb_cleared_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_tst_flags(asp, ASF_CLEAR_RTB)) {
-				if ((err = m2ua_send_maup_state_con(q, asp, mp)))
+				if ((err = m2ua_send_maup_state_con(asp, q, request)))
 					return (err);
 				gp_clr_flags(asp, ASF_CLEAR_RTB);
 			}
@@ -11363,11 +14144,15 @@ slp_rtb_cleared_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 STATIC int
 slp_retrieval_not_possible_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 {
+	sl_retrieval_no_poss_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct ss *ssu;
 	int err;
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
+	static const uint32_t action = __constant_htonl(M2UA_ACTION_RTRV_MSGS);
+	static const uint32_t result = __constant_htonl(UA_RESULT_FAILURE);
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
@@ -11375,7 +14160,7 @@ slp_retrieval_not_possible_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure(ss_get_s_state(ssp) == SLS_IDLE);
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_RETRIEVAL)) {
 				if (!canputnext(ssu->oq))
 					return (-EBUSY);
@@ -11386,7 +14171,7 @@ slp_retrieval_not_possible_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_tst_flags(asp, ASF_RETRIEVAL)) {
-				if ((err = m2ua_send_maup_retr_con(q, asp, mp)))
+				if ((err = m2ua_send_maup_retr_con(asp, q, action, result, NULL)))
 					return (err);
 				gp_set_s_state(asp, SLS_IDLE);
 				ss_set_s_state(ssp, SLS_IDLE);
@@ -11403,11 +14188,15 @@ slp_retrieval_not_possible_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 STATIC int
 slp_bsnt_not_retrievable_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 {
+	sl_bsnt_not_retr_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct ss *ssu;
 	int err;
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
+	static const uint32_t action = __constant_htonl(M2UA_ACTION_RTRV_BSN);
+	static const uint32_t result = __constant_htonl(UA_RESULT_FAILURE);
 
 	if (ss_get_i_state(ssp) != LMI_ENABLED)
 		return (QR_DONE);
@@ -11415,7 +14204,7 @@ slp_bsnt_not_retrievable_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 		return (-EFAULT);
 	assure(ss_tst_flags(ssp, ASF_BSNT_REQUEST));
 	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
-		for (ssu = ap_find_slu(ap); ssu; ssu = ap_find_slu_next(ap, ssu, 1))
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
 			if (ss_tst_flags(ssu, ASF_BSNT_REQUEST)) {
 				mblk_t *bp;
 
@@ -11430,7 +14219,7 @@ slp_bsnt_not_retrievable_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 			}
 		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
 			if (gp_tst_flags(asp, ASF_BSNT_REQUEST)) {
-				if ((err = m2ua_send_maup_retr_con(q, asp, mp)))
+				if ((err = m2ua_send_maup_retr_con(asp, q, action, result, NULL)))
 					return (err);
 				gp_clr_flags(asp, ASF_BSNT_REQUEST);
 				if (as->sp.sp->tmode == UA_TMODE_OVERRIDE)
@@ -11472,7 +14261,1117 @@ slp_notify_ind(struct ss *ssp, queue_t *q, mblk_t *mp)
 /*
  *  -------------------------------------------------------------------------
  *
- *  XP to M2UA primitives.
+ *  SS-P to M3UA primitives.
+ *
+ *  -------------------------------------------------------------------------
+ */
+/**
+ * mtpp_ok_ack: - process MTP_OK_ACK from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_OK_ACK message
+ */
+STATIC int
+mtpp_ok_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	struct MTP_ok_ack *p;
+
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+
+	swerr();
+	return (QR_DISABLE);
+}
+
+/**
+ * mtpp_error_ack: - process MTP_ERROR_ACK from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_ERROR_ACK message
+ */
+STATIC int
+mtpp_error_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	swerr();
+	return (QR_DISABLE);
+}
+
+/**
+ * mtpp_bind_ack: - process MTP_BIND_ACK from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_BIND_ACK message
+ */
+STATIC int
+mtpp_bind_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	swerr();
+	return (QR_DISABLE);
+}
+
+/**
+ * mtpp_addr_ack: - process MTP_ADDR_ACK from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_ADDR_ACK message
+ */
+STATIC int
+mtpp_addr_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	swerr();
+	return (QR_DISABLE);
+}
+
+/**
+ * mtpp_info_ack: - process MTP_INFO_ACK from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_INFO_ACK message
+ */
+STATIC int
+mtpp_info_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	swerr();
+	return (QR_DISABLE);
+}
+
+/**
+ * mtpp_optmgmt_ack: - process MTP_OPTMGMT_ACK from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_OPTMGMT_ACK message
+ */
+STATIC int
+mtpp_optmgmt_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	swerr();
+	return (QR_DISABLE);
+}
+
+/**
+ * mtpp_transfer_ind: - process MTP_TRANSFER_IND from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_TRANSFER_IND message
+ */
+STATIC int
+mtpp_transfer_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	struct MTP_transfer_ind *p = (typeof(p)) mp->b_rptr;
+	struct as *asu;
+	struct ap *ap;
+	bool delivered = false;
+
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+	dassert(mp->b_cont);
+	dassert(ss->as.as != NULL);
+	if (ss_get_i_state(ss) != MTPS_IDLE && ss_get_i_state(ss) != MTPS_CONNECTED)
+		goto discard;
+	for (ap = ss->as.as->ap.list; ap; ap = ap->u.next) {
+		if (!as_tst_flags((asu = ap->u.as), ASF_ACTIVE | ASF_PENDING))
+			continue;
+#if 0
+		if (asu->lg.list != NULL) {
+			struct lg *lgp;
+			uint32_t askey = 0;
+
+			if (asu->tmode == UA_TMODE_LOADSHARE) {
+				/* Derive a load key for the message according to the load key type 
+				   for the AS. For M3UA there are two load key types: SLS and CIC.
+				   CIC can have 15 significant bits, so be careful. */
+				switch (asu->ktype) {
+				default:
+					swerr();
+				case AS_KTYPE_SLS:
+					askey = p->mtp_sls;
+					break;
+				case AS_KTYPE_CIC:
+					/* ITU/Old ANSI - 4096 circuits, New ANSI 32768 circuits,
+					   do not mask spare bits */
+					askey |= mp->b_cont->b_rptr[1];
+					askey <<= 8;
+					askey |= mp->b_cont->b_rptr[0];
+					break;
+				}
+			}
+			/* Note that tmode is always loadshare for LOADSEL, but may be different
+			   for LOADGRP. */
+			for (lgp = asu->lg.list; lgp; lgp = lgp->as.next) {
+				struct lp *asp;
+				uint32_t lskey = 0;
+
+				if (lgp->key.min > askey || askey > lgp->key.max)
+					continue;
+				if (!(lgp->flags & ASF_ACTIVE))
+					continue;
+				if (lgp->ldist == UA_TMODE_LOADSHARE) {
+					switch (lgp->ktype) {
+					default:
+						swerr();
+					case AS_KTYPE_SLS:
+						lskey = p->mtp_sls;
+						break;
+					case AS_KTYPE_CIC:
+						lskey |= mp->b_cont->b_rptr[1];
+						lskey <<= 8;
+						lskey |= mp->b_cont->b_rptr[0];
+						break;
+					}
+				}
+				for (asp = lgp->lp.list; asp; asp = asp->lg.next) {
+					if (asp->key.min > lskey || lskey > asp->key.max)
+						continue;
+					if (!(asp->flags & ASF_ACTIVE))
+						continue;
+					/* DELIVER THE MESSAGE */
+					delivered = true;
+					if (lgp->ldist != UA_TMODE_BROADCAST)
+						break;
+				}
+				if (asu->tmode != UA_TMODE_BROADCAST)
+					break;
+			}
+		} else
+#endif
+		if (asu->gp.list != NULL) {
+			struct gp *asp;
+			uint32_t askey = 0;
+
+			if (asu->tmode == UA_TMODE_LOADSHARE) {
+				/* Derive a load key for the message according to the load key type 
+				   for the AS. For M3UA there are two load key types: SLS and CIC.
+				   CIC can have 15 significant bits, so be careful. */
+				switch (asu->ktype) {
+				default:
+					swerr();
+				case AS_KTYPE_SLS:
+					askey = p->mtp_sls;
+					break;
+				case AS_KTYPE_CIC:
+					/* ITU/Old ANSI - 4096 circuits, New ANSI 32768 circuits,
+					   do not mask spare bits */
+					askey |= mp->b_cont->b_rptr[1];
+					askey <<= 8;
+					askey |= mp->b_cont->b_rptr[0];
+					break;
+				}
+			}
+			for (asp = asu->gp.list; asp; asp = asp->as.next) {
+				if (!(asp->flags & ASF_ACTIVE))
+					continue;
+				if (asp->key.min > askey || askey > asp->key.max)
+					continue;
+				/* DELIVER THE MESSAGE */
+				delivered = true;
+				if (asu->tmode != UA_TMODE_BROADCAST)
+					break;
+			}
+
+		}
+		if (!delivered && asu->ss.list != NULL) {
+			struct ss *ssu;
+
+			/* Things wind up here if we are not proxying (this is the ASP), or if this 
+			   is the SGP, there is no suitable ASP, and there exists an internal
+			   "default ASP". */
+			for (ssu = asu->ss.list; ssu; ssu = ssu->as.next) {
+				mblk_t *bp;
+
+				if (!(ssu->flags & ASF_ACTIVE))
+					continue;
+				/* DELIVER THE MESSAGE */
+				if (unlikely((bp = ss7_copymsg(q, mp)) == NULL))
+					return (-ENOBUFS);
+				if (unlikely(!canputnext(ssu->oq))) {
+					freemsg(bp);
+					return (-EBUSY);
+				}
+				delivered = true;
+				putnext(ssu->oq, bp);
+				break;
+			}
+		}
+		if (delivered)
+			break;
+	}
+	if (!delivered)
+		swerr();	/* SS-Provider should have been shut down. */
+	return (QR_DONE);
+}
+
+/**
+ * mtpp_pause_ind: - process MTP_PAUSE_IND from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_PAUSE_IND message
+ * 
+ * Note that, if the procedure encounters flow control on one Stream or if it fails to allocate a
+ * buffer, the original indication primitive will be placed back on q and this function will be
+ * called again when flow control subsides or when a buffer becomes available.  When this procedure
+ * is invoked for the second time, it again generates indications to all local and remote MTP users.
+ * This means that some local or remote MTP users may receive an additional copy of the indication.
+ * Because the nature of the indication is an absolute status, this should not cause a problem with
+ * the MTP user.
+ *
+ * This actually supports a little bit more than OpenSS7 MTP currently indicates:  If there are
+ * multiple addresses in the address field of the primitive, we will issue a DUNA with multiple
+ * affected point codes.  If there is no address indicated in the address field of the
+ * primitive, we assume that it corresponds to all addresses (isolation, or MTP Restart Begins)
+ * and issue a DUNA with a wildcard affected point code.
+ */
+STATIC streams_noinline int
+mtpp_pause_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	int err;
+	struct MTP_pause_ind *p = (typeof(p)) mp->b_rptr;
+	struct mtp_addr *a;
+	struct as *as = ss->as.as;
+	struct ap *ap;
+	int num_apc;
+
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+	dassert(mp->b_cont == NULL);
+	dassert(as != NULL);
+
+	if (ss_get_i_state(ss) != MTPS_IDLE && ss_get_i_state(ss) != MTPS_CONNECTED)
+		return (-EPROTO);
+	if ((p->mtp_addr_length < sizeof(*a)) || (p->mtp_addr_length % sizeof(*a)))
+		return (-EPROTO);
+	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
+		return (-EPROTO);
+
+	num_apc = p->mtp_addr_length / sizeof(*a);
+
+	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
+	     ap = ap->u.next) {
+		{
+			struct ss *ssu;
+
+			/* pass a copy to every active local MTP user */
+			for (ssu = ap->u.as->ss.list; ssu && ss_tst_flags(ssu, ASF_ACTIVE);
+			     ssu = ssu->as.next) {
+				mblk_t *bp;
+
+				if (!(bp = ss7_copymsg(q, mp)))
+					return (-ENOBUFS);
+
+				if (!bcanputnext(ssu->oq, mp->b_band)) {
+					freemsg(bp);
+					return (-EBUSY);
+				}
+				putnext(ssu->oq, bp);
+			}
+		}
+		{
+			struct gp *asp;
+			uint32_t apc[num_apc ? : 1];
+			int i;
+
+			for (i = num_apc, a = (typeof(a)) (mp->b_rptr + p->mtp_addr_offset); i;
+			     i--, a++)
+				apc[num_apc - i] = htonl(a->pc);
+			/* treat missing addresses as wildcarded */
+			if (!num_apc)
+				apc[0] = __constant_htonl(0xff000000);
+
+			/* pass an indication to every ASP that is active for this AS */
+			for (asp = ap->u.as->gp.list; asp && gp_tst_flags(asp, ASF_ACTIVE);
+			     asp = asp->as.next) {
+				static const char info[] = "MTP provider generated DUNA";
+
+				if ((err = ua_send_snmm_duna(asp, q,
+							     &apc, num_apc ? : 1, NULL, NULL,
+							     info, sizeof(info))))
+					return (err);
+			}
+		}
+	}
+	return (QR_DONE);
+}
+
+/**
+ * mtpp_resume_ind: - process MTP_RESUME_IND from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_RESUME_IND message
+ * 
+ * Note that, if the procedure encounters flow control on one Stream or if it fails to allocate a
+ * buffer, the original indication primitive will be placed back on q and this function will be
+ * called again when flow control subsides or when a buffer becomes available.  When this procedure
+ * is invoked for the second time, it again generates indications to all local and remote MTP users.
+ * This means that some local or remote MTP users may receive an additional copy of the indication.
+ * Because the nature of the indication is an absolute status, this should not cause a problem with
+ * the MTP user.
+ *
+ * This actually supports a little bit more than OpenSS7 MTP currently indicates:  If there are
+ * multiple addresses in the address field of the primitive, we will issue a DAVA with multiple
+ * affected point codes.  If there is no address indicated in the address field of the
+ * primitive, we assume that it corresponds to all addresses (all available, or MTP Restart
+ * Ends) and issue a DUNA with a wildcard affected point code.
+ */
+STATIC streams_noinline int
+mtpp_resume_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	int err;
+	struct MTP_resume_ind *p = (typeof(p)) mp->b_rptr;
+	struct mtp_addr *a;
+	struct as *as = ss->as.as;
+	struct ap *ap;
+	int num_apc;
+
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+	dassert(mp->b_cont == NULL);
+	dassert(as != NULL);
+
+	if (ss_get_i_state(ss) != MTPS_IDLE && ss_get_i_state(ss) != MTPS_CONNECTED)
+		return (-EPROTO);
+	if ((p->mtp_addr_length < sizeof(*a)) || (p->mtp_addr_length % sizeof(*a)))
+		return (-EPROTO);
+	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
+		return (-EPROTO);
+
+	num_apc = p->mtp_addr_length / sizeof(*a);
+
+	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
+	     ap = ap->u.next) {
+		{
+			struct ss *ssu;
+
+			/* pass a copy to every active local MTP user */
+			for (ssu = ap->u.as->ss.list; ssu && ss_tst_flags(ssu, ASF_ACTIVE);
+			     ssu = ssu->as.next) {
+				mblk_t *bp;
+
+				if (!(bp = ss7_copymsg(q, mp)))
+					return (-ENOBUFS);
+
+				if (!bcanputnext(ssu->oq, mp->b_band)) {
+					freemsg(bp);
+					return (-EBUSY);
+				}
+				putnext(ssu->oq, bp);
+			}
+		}
+		{
+			struct gp *asp;
+			uint32_t apc[num_apc ? : 1];
+			int i;
+
+			for (i = num_apc, a = (typeof(a)) (mp->b_rptr + p->mtp_addr_offset); i;
+			     i--, a++)
+				apc[num_apc - i] = htonl(a->pc);
+			/* treat missing addresses as wildcarded */
+			if (!num_apc)
+				apc[0] = __constant_htonl(0xff000000);
+
+			/* pass an indication to every ASP that is active for this AS */
+			for (asp = ap->u.as->gp.list; asp && gp_tst_flags(asp, ASF_ACTIVE);
+			     asp = asp->as.next) {
+				static const char info[] = "MTP provider generated DAVA";
+
+				if ((err = ua_send_snmm_dava(asp, q,
+							     &apc, num_apc ? : 1, NULL, NULL,
+							     info, sizeof(info))))
+					return (err);
+			}
+		}
+	}
+	return (QR_DONE);
+}
+
+/**
+ * mtpp_status_ind: - process MTP_STATUS_IND from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_STATUS_IND message
+ * 
+ * Note that, if the procedure encounters flow control on one Stream or if it fails to allocate a
+ * buffer, the original indication primitive will be placed back on q and this function will be
+ * called again when flow control subsides or when a buffer becomes available.  When this procedure
+ * is invoked for the second time, it again generates indications to all local and remote MTP users.
+ * This means that some local or remote MTP users may receive an additional copy of the indication.
+ * Because the nature of the indication is an absolute status, this should not cause a problem with
+ * the MTP user.
+ *
+ * Needed to add one more status type here (MTP_STATUS_TYPE_RESTR) for the purpose of
+ * indicating DRST.  The OpenSS7 MTP stack does not currently indicate this status type, so
+ * DRST will not be generated.  At some point in the future it might for virutal point codes
+ * associated with STP.
+ */
+STATIC int
+mtpp_status_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	int err;
+	struct MTP_status_ind *p = (typeof(p)) mp->b_rptr;
+	struct mtp_addr *a;
+	struct as *as = ss->as.as;
+	struct ap *ap;
+	uint32_t apc, status = 0, *congp = NULL;
+
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+	dassert(mp->b_cont == NULL);
+	dassert(as != NULL);
+
+	if (ss_get_i_state(ss) != MTPS_IDLE && ss_get_i_state(ss) != MTPS_CONNECTED)
+		return (-EPROTO);
+	if (p->mtp_addr_length < sizeof(*a))
+		return (-EPROTO);
+	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
+		return (-EPROTO);
+
+	a = (typeof(a)) (mp->b_rptr + p->mtp_addr_offset);
+	apc = htonl(a->pc);
+	user = a->si;
+	status = htonl(p->mtp_status);
+
+	switch (p->mtp_type) {
+	case MTP_STATUS_TYPE_CONG:
+		switch (p->mtp_status) {
+		case MTP_STATUS_CONGESTION_LEVEL0:
+		case MTP_STATUS_CONGESTION_LEVEL1:
+		case MTP_STATUS_CONGESTION_LEVEL2:
+		case MTP_STATUS_CONGESTION_LEVEL3:
+			congp = &status;
+			break;
+		case MTP_STATUS_CONGESTION:
+			congp = NULL;
+			break;
+		default:
+			return (-EPROTO);
+		}
+		break;
+	case MTP_STATUS_TYPE_UPU:
+		switch (p->mtp_status) {
+		case MTP_STATUS_UPU_UNKNOWN:
+			break;
+		case MTP_STATUS_UPU_UNEQUIPPED:
+			break;
+		case MTP_STATUS_UPU_INACCESSIBLE:
+			break;
+		default:
+			return (-EPROTO);
+		}
+		break;
+	case MTP_STATUS_TYPE_RESTR:
+		break;
+	default:
+		return (-EPROTO);
+	}
+
+	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
+	     ap = ap->u.next) {
+		struct ss *ssu;
+		struct gp *asp;
+
+		/* pass a copy to every active local MTP user */
+		for (ssu = ap->u.as->ss.list; ssu && ss_tst_flags(ssu, ASF_ACTIVE);
+		     ssu = ssu->as.next) {
+			mblk_t *bp;
+
+			if (!(bp = ss7_copymsg(q, mp)))
+				return (-ENOBUFS);
+
+			if (!bcanputnext(ssu->oq, mp->b_band)) {
+				freemsg(bp);
+				return (-EBUSY);
+			}
+			putnext(ssu->oq, bp);
+		}
+		/* pass an indication to every ASP that is active for this AS */
+		for (asp = ap->u.as->gp.list; asp && gp_tst_flags(asp, ASF_ACTIVE);
+		     asp = asp->as.next) {
+
+			switch (p->mtp_type) {
+			case MTP_STATUS_TYPE_UPU:
+			{
+				static const char info[] = "MTP provider generated DUPU";
+
+				if ((err = ua_send_snmm_dupu(asp, q, p->mtp_status, a->si,
+							     &apc, 1, info, sizeof(info))))
+					return (err);
+				continue;
+			}
+			case MTP_STATUS_TYPE_CONG:
+			{
+				static const char info[] = "MTP provider generated SCON";
+
+				if ((err = ua_send_snmm_scon(asp, q, NULL, congp,
+							     &apc, 1, NULL, NULL, info,
+							     sizeof(info))))
+					return (err);
+				continue;
+			}
+			case MTP_STATUS_TYPE_RESTR:
+			{
+				static const char info[] = "MTP provider generated DRST";
+
+				if ((err = ua_send_snmm_drst(asp, q,
+							     &apc, 1, NULL, NULL,
+							     info, sizeof(info))))
+					return (err);
+				continue;
+			}
+			}
+		}
+	}
+	return (QR_DONE);
+}
+
+/**
+ * mtpp_restart_begins_ind: - process MTP_RESTART_BEGINS_IND from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_RESTART_BEGINS_IND message
+ * 
+ * Note that, if the procedure encounters flow control on one Stream or if it fails to allocate a
+ * buffer, the original indication primitive will be placed back on q and this function will be
+ * called again when flow control subsides or when a buffer becomes available.  When this procedure
+ * is invoked for the second time, it again generates indications to all local and remote MTP users.
+ * This means that some local or remote MTP users may receive an additional copy of the indication.
+ * Because the nature of the indication is an absolute status, this should not cause a problem with
+ * the MTP user.
+ *
+ * Discussion: MTP User expectations are in accordance with Q.701 as follows: When the MTP restart
+ * procedure is terminated, the MTP indicates the end of MTP restart to all local MTP Users showing
+ * each signalling point's accessibility or inaccessibility.  The means of doing this is
+ * implementation dependent (see 9/Q.704).
+ *
+ * Note that when MTP restart begins on a running signalling point, all destinations have already
+ * been marked prohibited and DUNA messages have already been delivered for all of them.  When a
+ * node initially starts up, if a user assuming that it can send to a destination sends a message,
+ * it will receive an MTP_PAUSE_IND in response.  This primitive is unnecessary and is not issued by
+ * the OpenSS7 MTP stack.
+ *
+ * If, perchance, this primitive is indicated by the MTP provider, it is translated into a DUNA(*)
+ * message.
+ */
+STATIC int
+mtpp_restart_begins_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	int err;
+	struct MTP_restart_begins_ind *p = (typeof(p)) mp->b_rptr;
+	struct as *as = ss->as.as;
+	struct ap *ap;
+	static const uint32_t apc = __constant_htonl(0xff000000);
+
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+	dassert(mp->b_cont == NULL);
+	dassert(as != NULL);
+
+	if (ss_get_i_state(ss) != MTPS_IDLE && ss_get_i_state(ss) != MTPS_CONNECTED)
+		return (-EPROTO);
+
+	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
+	     ap = ap->u.next) {
+		struct ss *ssu;
+		struct gp *asp;
+
+		/* pass a copy to every active local MTP user */
+		for (ssu = ap->u.as->ss.list; ssu && ss_tst_flags(ssu, ASF_ACTIVE);
+		     ssu = ssu->as.next) {
+			mblk_t *bp;
+
+			if (!(bp = ss7_copymsg(q, mp)))
+				return (-ENOBUFS);
+
+			if (!bcanputnext(ssu->oq, mp->b_band)) {
+				freemsg(bp);
+				return (-EBUSY);
+			}
+			putnext(ssu->oq, bp);
+		}
+		/* pass an indication to every ASP that is active for this AS */
+		for (asp = ap->u.as->gp.list; asp && gp_tst_flags(asp, ASF_ACTIVE);
+		     asp = asp->as.next) {
+			static const char info[] = "MTP provider generated DUNA(*)";
+
+			if ((err = ua_send_snmm_duna(asp, q,
+						     &apc, 1, NULL, NULL, info, sizeof(info))))
+				return (err);
+		}
+	}
+	return (QR_DONE);
+}
+
+/**
+ * mtpp_restart_complete_ind: - process MTP_RESTART_COMPLETE_IND from MTP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: MTP_RESTART_COMPLETE_IND message
+ * 
+ * Note that, if the procedure encounters flow control on one Stream or if it fails to allocate a
+ * buffer, the original indication primitive will be placed back on q and this function will be
+ * called again when flow control subsides or when a buffer becomes available.  When this procedure
+ * is invoked for the second time, it again generates indications to all local and remote MTP users.
+ * This means that some local or remote MTP users may receive an additional copy of the indication.
+ * Because the nature of the indication is an absolute status, this should not cause a problem with
+ * the MTP user.
+ *
+ * Discussion: MTP User expectations are in accordance with Q.701 as follows: When the MTP restart
+ * procedure is terminated, the MTP indicates the end of MTP restart to all local MTP Users showing
+ * each signalling point's accessibility or inaccessibility.  The means of doing this is
+ * implementation dependent (see 9/Q.704).
+ *
+ * Note that when isolation began, MTP-PAUSE indications were issued for all accessible
+ * destinations for each MTP User.  Therefore, once MTP Restart completes, MTP-RESUME indications
+ * can be sent for each available/restricted destination.  Therefore, this primitive is unnecessary
+ * and is not issued by the OpenSS7 MTP stack.
+ *
+ * If, perchance, this pimritive is indicated by the MTP provider, it is translated to SCON[0](*)
+ * followed by DAVA(*), that is, all destinations are uncongested and available.  When the MTP user
+ * attempts to send to any given destination, an appropriate SCON or DUNA or DRST message will be
+ * issued by the MTP provider.
+ */
+STATIC int
+mtpp_restart_complete_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	int err;
+	struct MTP_restart_complete_ind *p = (typeof(p)) mp->b_rptr;
+	struct as *as = ss->as.as;
+	struct ap *ap;
+	uint32_t cong = 0;
+	static const uint32_t apc = __constant_htonl(0xff000000);
+
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+	dassert(mp->b_cont == NULL);
+	dassert(as != NULL);
+
+	if (ss_get_i_state(ss) != MTPS_IDLE && ss_get_i_state(ss) != MTPS_CONNECTED)
+		return (-EPROTO);
+
+	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
+	     ap = ap->u.next) {
+		struct ss *ssu;
+		struct gp *asp;
+
+		/* pass a copy to every active local MTP user */
+		for (ssu = ap->u.as->ss.list; ssu && ss_tst_flags(ssu, ASF_ACTIVE);
+		     ssu = ssu->as.next) {
+			mblk_t *bp;
+
+			if (!(bp = ss7_copymsg(q, mp)))
+				return (-ENOBUFS);
+
+			if (!bcanputnext(ssu->oq, mp->b_band)) {
+				freemsg(bp);
+				return (-EBUSY);
+			}
+			putnext(ssu->oq, bp);
+		}
+		/* pass an indication to every ASP that is active for this AS */
+		for (asp = ap->u.as->gp.list; asp && gp_tst_flags(asp, ASF_ACTIVE);
+		     asp = asp->as.next) {
+			static const char info1[] = "MTP provider generated SCON[0](*)";
+			static const char info2[] = "MTP provider generated DAVA(*)";
+
+			if ((err = ua_send_snmm_scon(asp, q, NULL, &cong,
+						     &apc, 1, NULL, NULL, info1, sizeof(info1))))
+				return (err);
+			if ((err = ua_send_snmm_dava(asp, q,
+						     &apc, 1, NULL, NULL, info2, sizeof(info2))))
+				return (err);
+		}
+	}
+	return (QR_DONE);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  SS-P to IUA primitives.
+ *
+ *  -------------------------------------------------------------------------
+ */
+STATIC int
+dlp_info_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	int err;
+	struct ss *ssu;
+	struct as *as;
+	struct ap *ap;
+	struct gp *asp;
+
+	if (!(as = ssp->as.as))
+		return (-EFAULT);
+	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
+		for (ssu = ap_find_ssu(ap); ssu; ssu = ap_find_ssu_next(ap, ssu, 1))
+			if (ss_tst_flags(ssu, ASF_INFO_REQUEST)) {
+				ss_clr_flags(ssu, ASF_INFO_REQUEST);
+				putnext(ssu->oq, mp);
+				return (QR_ABSORBED);
+			}
+		for (asp = ap_find_asp(ap); asp; asp = ap_find_asp_next(ap, asp, 1))
+			if (gp_tst_flags(asp, ASF_INFO_REQUEST)) {
+				if ((err = iua_send_iua_status_ind(asp, q, mp)))
+					return (err);
+				gp_clr_flags(asp, ASF_INFO_REQUEST);
+				return (QR_ABSORBED);
+			}
+	}
+	return (QR_DONE);
+}
+STATIC int
+dlp_bind_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	int err;
+	struct ss *ssu;
+	struct as *as;
+	struct ap *ap;
+	struct gp *asp;
+
+	if (!(as = ssp->as.as))
+		return (-EFAULT);
+	for (ap = as_u_find_ap(as); ap; ap = as_u_find_ap_next(as, ap, 1)) {
+		for (ssu = ap->u.as->ss.list; ssu; ssu = ssu->as.next)
+			if (ss_get_state(ssu) == DL_BIND_PENDING) {
+				ss_set_state(ssu, DL_IDLE);
+				putnext(ssu->oq, mp);
+				return (QR_ABSORBED);
+			}
+		/* FIXME: no no no no */
+		for (asp = ap->u.as->gp.list; asp; asp = asp->as.next)
+			if (gp_get_state(asp) == AS_WACK_ASPAC) {
+				if ((err = ua_send_aspt_aspac_ack(asp, q, NULL, 0)))
+					return (err);
+				ss_set_state(ssu, AS_ACTIVE);
+				return (QR_ABSORBED);
+			}
+	}
+	return (QR_DONE);
+}
+STATIC int
+dlp_ok_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_error_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_subs_bind_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_unitdata_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_uderror_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_connect_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_connect_con(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_token_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_disconnect_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_reset_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_reset_con(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_data_ack_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_data_ack_status_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_reply_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_reply_status_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_reply_update_status_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_xid_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_xid_con(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_test_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_test_con(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_phys_addr_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+STATIC int
+dlp_get_statistics_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  SS-P to SUA primitives.
+ *
+ *  -------------------------------------------------------------------------
+ */
+/**
+ * np_conn_ind: process N_CONN_IND from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_CONN_IND message
+ */
+STATIC int
+np_conn_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+	N_conn_ind_t *p = (typeof(p)) mp->b_rptr;
+	struct as *as = ss->as.as;
+	struct ap *ap;
+	int err;
+
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+	dassert(mp->b_cont);
+	dassert(as != NULL);
+
+	if (ss_get_i_state(ss) != NS_IDLE && ss_get_i_state(ss) != NS_WRES_CIND)
+		goto discard;
+	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE); ap = ap->u.next) {
+		/* Here's an idea, instead of walking through the SSU and ASPs, for
+		   UA_TMODE_OVERRIDE, set the current controlling SSU or ASP.  For loadshare, use
+		   the load selection to find the load group and the distribute over the load group 
+		   by load group traffic mode. */
+		{
+			struct ss *ssu, *ssu_selection = NULL;
+
+			for (ssu = ap->u.as->ss.list; ssu && ss_tst_flags(ssu, ASF_ACTIVE);
+			     ssu = ssu->as.next) {
+				switch (ap->u.as->tmode) {
+				case UA_TMODE_OVERRIDE:
+					ssu_selection = ssu;
+					break;
+				case UA_TMODE_LOADSHARE:
+					/* FIXME: need to select SSU by load selection. */
+					ssu_selection = ssu;
+					continue;
+				case UA_TMODE_BROADCAST:
+					if ((err = n_conn_ind(ssu, q,
+							      seq, flags,
+							      &daddr, sizeof(daddr),
+							      &saddr, sizeof(saddr),
+							      &qos, sizeof(qos), dp)))
+						return (err);
+					continue;
+				}
+				break;
+			}
+			if (ssu_selection)
+				if ((err = n_conn_ind(ssu, q,
+						      seq, flags,
+						      &daddr, sizeof(daddr),
+						      &saddr, sizeof(saddr),
+						      &qos, sizeof(qos), dp)))
+					return (err);
+			if (ssu_selection || ssu->u.as->tmode == UA_TMODE_BROADCAST) {
+				ss_set_i_state(ss, NS_WRES_CIND);
+				return (QR_DONE);
+			}
+		}
+		{
+			struct gp *asp, *asp_selection = NULL;
+
+			for (asp = ap->u.as->gp.list; asp && gp_tst_flags(asp, ASF_ACTIVE);
+			     asp = asp->as.next) {
+				switch (asp->u.as->tmode) {
+				case UA_TMODE_OVERRIDE:
+					asp_selection = asp;
+					break;
+				case UA_TMODE_LOADSHARE:
+					/* FIXME: need to select ASP by load selection. */
+					asp_selection = asp;
+					continue;
+				case UA_TMODE_BROADCAST:
+					issue_it;
+					continue;
+				}
+			}
+			if (asp_selection)
+				issue_it;
+			if (asp_selection || asp->u.as->tmode == UA_TMODE_BROADCAST) {
+				ss_set_i_state(ss, NS_WRES_CIND);
+				return (QR_DONE);
+			}
+		}
+	}
+	/* Ignore it. */
+	return (QR_DONE);
+}
+
+/**
+ * np_conn_con: process N_CONN_CON from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_CONN_CON message
+ */
+STATIC int
+np_conn_con(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_discon_ind: process N_DISCON_IND from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_DISCON_IND message
+ */
+STATIC int
+np_discon_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_data_ind: process N_DATA_IND from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_DATA_IND message
+ */
+STATIC int
+np_data_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_exdata_ind: process N_EXDATA_IND from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_EXDATA_IND message
+ */
+STATIC int
+np_exdata_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_info_ack: process N_INFO_ACK from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_INFO_ACK message
+ */
+STATIC int
+np_info_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_bind_ack: process N_BIND_ACK from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_BIND_ACK message
+ */
+STATIC int
+np_bind_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_error_ack: process N_ERROR_ACK from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_ERROR_ACK message
+ */
+STATIC int
+np_error_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_ok_ack: process N_OK_ACK from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_OK_ACK message
+ */
+STATIC int
+np_ok_ack(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_unitdata_ind: process N_UNITDATA_IND from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_UNITDATA_IND message
+ */
+STATIC int
+np_unitdata_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_uderror_ind: process N_UDERROR_IND from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_UDERROR_IND message
+ */
+STATIC int
+np_uderror_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_datack_ind: process N_DATACK_IND from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_DATACK_IND message
+ */
+STATIC int
+np_datack_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_reset_ind: process N_RESET_IND from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_RESET_IND message
+ */
+STATIC int
+np_reset_ind(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/**
+ * np_reset_con: process N_RESET_CON from SCCP Provider
+ * @ss: private structure
+ * @q: active queue (lower read queue)
+ * @mp: N_RESET_CON message
+ */
+STATIC int
+np_reset_con(struct ss *ss, queue_t *q, mblk_t *mp)
+{
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  XP to UA primitives.
  *
  *  -------------------------------------------------------------------------
  */
@@ -11496,7 +15395,7 @@ xp_conn_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	struct gp *asp, *sgp;
 	struct spp *spp, *sp2;
 
-	if (!(spp = xp->spp)) {
+	if (!(spp = xp->spp.list)) {
 		if (!(xp->sp))
 			goto disable;
 		return (-EPROTO);
@@ -11535,7 +15434,7 @@ xp_discon_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	struct gp *asp, *sgp;
 	struct spp *spp, *sp2;
 
-	if (!(spp = xp->spp)) {
+	if (!(spp = xp->spp.list)) {
 		if (!(xp->sp))
 			goto disable;
 		return (-EPROTO);
@@ -11544,57 +15443,65 @@ xp_discon_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	case UA_OBJ_TYPE_ASP:
 		switch (spp_get_state(spp)) {
 		case ASP_UP:
-			asp_set_state(q, spp, ASP_WACK_ASPDN);
+			asp_spp_set_state(spp, q, ASP_WACK_ASPDN);
 			/* fall through */
 		case ASP_WACK_ASPDN:
 			for (asp = spp->gp.list; asp; asp = asp->spp.next)
 				if (gp_get_state(asp) != AS_DOWN)
-					if ((err = gp_u_set_state(q, asp, AS_DOWN)))
+					if ((err = gp_u_set_state(asp, q, AS_DOWN)))
 						return (err);
-			asp_set_state(q, spp, ASP_WACK_ASPUP);
+			asp_spp_set_state(spp, q, ASP_WACK_ASPUP);
 			/* fall through */
 		case ASP_WACK_ASPUP:
 			todo(("Notify management that the SPP has failed\n"));
-			asp_set_state(q, spp, ASP_DOWN);
+			asp_spp_set_state(spp, q, ASP_DOWN);
 			/* fall through */
 		case ASP_DOWN:
-			for (sp2 = spp->sp.sp->spp.list; sp2 && sp2 != spp; sp2 = sp2->sp.next)
+			for (sp2 = spp->sp.sp->spp.list; sp2; sp2 = sp2->sp.next) {
+				if (sp2 == spp)
+					continue;
 				if (spp_get_state(sp2) != ASP_DOWN
-				    && spp_get_state(sp2) != ASP_WACK_ASPUP)
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_ASP_FAILURE,
-									    &spp->aspid)))
+				    && spp_get_state(sp2) != ASP_WACK_ASPUP) {
+					if ((err = ua_send_mgmt_ntfy_asp(sp2, q, spp, NULL, 0)))
 						return (err);
+					break;
+				}
+			}
 			return (QR_DONE);
 		}
 		break;
 	case UA_OBJ_TYPE_SGP:
 		switch (spp_get_state(spp)) {
 		case ASP_UP:
-			sgp_set_state(q, spp, ASP_WACK_ASPDN);
+			sgp_spp_set_state(spp, q, ASP_WACK_ASPDN);
 			/* fall through */
 		case ASP_WACK_ASPDN:
 			for (sgp = spp->gp.list; sgp; sgp = sgp->spp.next)
 				if (gp_get_state(sgp) != AS_DOWN)
-					if ((err = gp_p_set_state(q, sgp, AS_DOWN)))
+					if ((err = gp_p_set_state(sgp, q, AS_DOWN)))
 						return (err);
-			sgp_set_state(q, spp, ASP_WACK_ASPUP);
+			sgp_spp_set_state(spp, q, ASP_WACK_ASPUP);
 			/* fall through */
 		case ASP_WACK_ASPUP:
 			todo(("Notify management that the SPP has failed\n"));
-			sgp_set_state(q, spp, ASP_DOWN);
+			sgp_spp_set_state(spp, q, ASP_DOWN);
 			/* fall through */
 		case ASP_DOWN:
-			for (sp2 = spp->sp.sp->spp.list; sp2 && sp2 != spp; sp2 = sp2->sp.next)
+			for (sp2 = spp->sp.sp->spp.list; sp2; sp2 = sp2->sp.next) {
+				if (sp2 == spp)
+					continue;
 				if (spp_get_state(sp2) != ASP_DOWN
-				    && spp_get_state(sp2) != ASP_WACK_ASPUP)
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_ASP_FAILURE,
-									    &spp->aspid)))
+				    && spp_get_state(sp2) != ASP_WACK_ASPUP) {
+					if ((err = ua_send_mgmt_ntfy_asp(sp2, q, spp, NULL, 0)))
 						return (err);
+				}
+			}
 			return (QR_DONE);
 		}
 		break;
+	case UA_OBJ_TYPE_SPP:
+		switch (spp_get_state(spp)) {
+		}
 	}
 	swerr();
 	return (-EFAULT);
@@ -11624,8 +15531,6 @@ xp_read(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	int err;
 
-	if ((err = ss7_pullupmsg(q, mp, -1)))
-		return (err);
 	return ua_recv_msg(xp, q, mp);
 }
 
@@ -11639,8 +15544,8 @@ xp_data_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	int err;
 	struct T_data_ind *p = (typeof(p)) mp->b_rptr;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto efault;
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+
 	if (p->MORE_flag) {
 		mblk_t *rp;
 
@@ -11665,13 +15570,8 @@ xp_data_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 			freeb(xchg(rpp, (*rpp)->b_next));
 			return (-EAGAIN);
 		}
-		if ((err = ss7_pullupmsg(q, mp->b_cont, -1)))
-			return (err);
 		return ua_recv_msg(xp, q, mp->b_cont);
 	}
-      efault:
-	swerr();
-	return (-EFAULT);
 }
 
 /*
@@ -11684,8 +15584,8 @@ xp_exdata_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	int err;
 	struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto efault;
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+
 	if (p->MORE_flag) {
 		mblk_t *rp;
 
@@ -11710,13 +15610,8 @@ xp_exdata_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 			freeb(xchg(rpp, (*rpp)->b_next));
 			return (-EAGAIN);
 		}
-		if ((err = ss7_pullupmsg(q, mp->b_cont, -1)))
-			return (err);
 		return ua_recv_msg(xp, q, mp->b_cont);
 	}
-      efault:
-	swerr();
-	return (-EFAULT);
 }
 
 /*
@@ -11728,13 +15623,10 @@ xp_info_ack(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	struct T_info_ack *p = (typeof(p)) mp->b_rptr;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto efault;
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+
 	xp->info = *p;
 	return (QR_DONE);
-      efault:
-	swerr();
-	return (-EFAULT);
 }
 
 /*
@@ -11814,7 +15706,7 @@ xp_ordrel_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	struct gp *asp, *sgp;
 	struct spp *spp, *sp2;
 
-	if (!(spp = xp->spp)) {
+	if (!(spp = xp->spp.list)) {
 		if (!(xp->sp))
 			goto disable;
 		return (-EPROTO);
@@ -11823,26 +15715,24 @@ xp_ordrel_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	case UA_OBJ_TYPE_ASP:
 		switch (spp_get_state(spp)) {
 		case ASP_UP:
-			asp_set_state(q, spp, ASP_WACK_ASPDN);
+			asp_spp_set_state(spp, q, ASP_WACK_ASPDN);
 			/* fall through */
 		case ASP_WACK_ASPDN:
 			for (asp = spp->gp.list; asp; asp = asp->spp.next)
 				if (gp_get_state(asp) != AS_DOWN)
-					if ((err = gp_u_set_state(q, asp, AS_DOWN)))
+					if ((err = gp_u_set_state(asp, q, AS_DOWN)))
 						return (err);
-			asp_set_state(q, spp, ASP_WACK_ASPUP);
+			asp_spp_set_state(spp, q, ASP_WACK_ASPUP);
 			/* fall through */
 		case ASP_WACK_ASPUP:
 			todo(("Notify management that the SPP has failed\n"));
-			asp_set_state(q, spp, ASP_DOWN);
+			asp_spp_set_state(spp, q, ASP_DOWN);
 			/* fall through */
 		case ASP_DOWN:
 			for (sp2 = spp->sp.sp->spp.list; sp2 && sp2 != spp; sp2 = sp2->sp.next)
 				if (spp_get_state(sp2) != ASP_DOWN
 				    && spp_get_state(sp2) != ASP_WACK_ASPUP)
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_ASP_FAILURE,
-									    &spp->aspid)))
+					if ((err = ua_send_mgmt_ntfy_asp(sp2, q, spp, NULL, 0)))
 						return (err);
 			return (QR_DONE);
 		}
@@ -11850,26 +15740,24 @@ xp_ordrel_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	case UA_OBJ_TYPE_SGP:
 		switch (spp_get_state(spp)) {
 		case ASP_UP:
-			sgp_set_state(q, spp, ASP_WACK_ASPDN);
+			sgp_spp_set_state(spp, q, ASP_WACK_ASPDN);
 			/* fall through */
 		case ASP_WACK_ASPDN:
 			for (sgp = spp->gp.list; sgp; sgp = sgp->spp.next)
 				if (gp_get_state(sgp) != AS_DOWN)
-					if ((err = gp_p_set_state(q, sgp, AS_DOWN)))
+					if ((err = gp_p_set_state(sgp, q, AS_DOWN)))
 						return (err);
-			sgp_set_state(q, spp, ASP_WACK_ASPUP);
+			sgp_spp_set_state(spp, q, ASP_WACK_ASPUP);
 			/* fall through */
 		case ASP_WACK_ASPUP:
 			todo(("Notify management that the SPP has failed\n"));
-			sgp_set_state(q, spp, ASP_DOWN);
+			sgp_spp_set_state(spp, q, ASP_DOWN);
 			/* fall through */
 		case ASP_DOWN:
 			for (sp2 = spp->sp.sp->spp.list; sp2 && sp2 != spp; sp2 = sp2->sp.next)
 				if (spp_get_state(sp2) != ASP_DOWN
 				    && spp_get_state(sp2) != ASP_WACK_ASPUP)
-					if ((err = ua_send_mgmt_ntfy_simple(q, xp,
-									    UA_STATUS_ASP_FAILURE,
-									    &spp->aspid)))
+					if ((err = ua_send_mgmt_ntfy_asp(sp2, q, spp, NULL, 0)))
 						return (err);
 			return (QR_DONE);
 		}
@@ -11893,15 +15781,15 @@ xp_optdata_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 	struct T_optdata_ind *p = (typeof(p)) mp->b_rptr;
 	t_uscalar_t sid = 0;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto efault;
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+
 	if (p->OPT_length) {
 		uchar *op = mp->b_rptr + p->OPT_offset;
 		uchar *oe = op + p->OPT_length;
 		struct t_opthdr *oh = (struct t_opthdr *) op;
 
-		if (mp->b_wptr < oe)
-			goto efault;
+		dassert(mp->b_wptr >= oe);
+
 		/* parse the options */
 		for (; op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh) && op + oh->len <= oe;
 		     op += oh->len, oh = (typeof(oh)) op)
@@ -11934,8 +15822,6 @@ xp_optdata_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 				freeb(xchg(rpp, (*rpp)->b_next));
 				return (-EAGAIN);
 			}
-			if ((err = ss7_pullupmsg(q, mp->b_cont, -1)))
-				return (err);
 			return ua_recv_msg(xp, q, mp->b_cont);
 		}
 	} else {
@@ -11964,14 +15850,9 @@ xp_optdata_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 				freeb(xchg(rpp, (*rpp)->b_next));
 				return (-EAGAIN);
 			}
-			if ((err = ss7_pullupmsg(q, mp->b_cont, -1)))
-				return (err);
 			return ua_recv_msg(xp, q, mp->b_cont);
 		}
 	}
-      efault:
-	swerr();
-	return (-EFAULT);
 }
 
 #ifdef T_ADDR_ACK
@@ -11989,26 +15870,21 @@ xp_addr_ack(struct xp *xp, queue_t *q, mblk_t *mp)
 	uchar *rem_ptr = NULL;
 	size_t rem_len = 0;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto efault;
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
+
 	if ((loc_len = p->LOCADDR_length)) {
 		loc_ptr = mp->b_rptr + p->LOCADDR_offset;
-		if (mp->b_wptr < loc_ptr + loc_len)
-			goto efault;
+		dassert(mp->b_wptr >= loc_ptr + loc_len);
 		if (loc_len <= sizeof(xp->loc))
 			bcopy(loc_ptr, &xp->loc, sizeof(xp->loc));
 	}
 	if ((rem_len = p->REMADDR_length)) {
 		rem_ptr = mp->b_rptr + p->REMADDR_offset;
-		if (mp->b_wptr < rem_ptr + rem_len)
-			goto efault;
+		dassert(mp->b_wptr >= rem_ptr + rem_len);
 		if (rem_len <= sizeof(xp->rem))
 			bcopy(rem_ptr, &xp->rem, sizeof(xp->rem));
 	}
 	return (QR_DONE);
-      efault:
-	swerr();
-	return (-EFAULT);
 }
 #endif
 #ifdef T_CAPABILITY_ACK
@@ -12040,7 +15916,7 @@ STATIC int
 sl_iocpass(queue_t *q, mblk_t *mp)
 {
 	int ret = 0;
-	struct ss *slu = SL_PRIV(q), *slp = NULL;
+	struct ss *slu = SS_PRIV(q), *slp = NULL;
 	struct as *as_u, *as_p;
 	struct ap *ap;
 
@@ -12070,7 +15946,7 @@ STATIC int
 sl_ackpass(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
-		struct ss *slp = SL_PRIV(q), *slu;
+		struct ss *slp = SS_PRIV(q), *slu;
 
 		if (slp->ioc) {
 			ss_put((slu = xchg(&slp->ioc, NULL)));
@@ -12093,7 +15969,7 @@ sl_iocgoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
-		struct ss *slu = SL_PRIV(q), *slp = NULL;
+		struct ss *slu = SS_PRIV(q), *slp = NULL;
 		struct as *as_u, *as_p;
 		struct ap *ap;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -12127,7 +16003,7 @@ STATIC int
 sl_ackgoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
-		struct ss *slp = SL_PRIV(q), *slu;
+		struct ss *slp = SS_PRIV(q), *slu;
 
 		if (slp->ioc) {
 			lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -12153,7 +16029,7 @@ sl_iocsoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret = 0;
-		struct ss *slu = SL_PRIV(q), *slp = NULL;
+		struct ss *slu = SS_PRIV(q), *slp = NULL;
 		struct as *as_u, *as_p;
 		struct ap *ap;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -12187,7 +16063,7 @@ STATIC int
 sl_acksoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
-		struct ss *slp = SL_PRIV(q), *slu;
+		struct ss *slp = SS_PRIV(q), *slu;
 
 		if (slp->ioc) {
 			lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -12508,7 +16384,7 @@ ua_get_spp(ua_config_t * arg, struct spp *spp, int size)
 	arg = (typeof(arg)) (cnf + 1);
 	/* write out list of XP */
 	chd = (typeof(chd)) (arg + 1);
-	if ((xp = spp->xp) && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg)) {
+	if ((xp = spp->xp.xp) && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg)) {
 		arg->type = xp->type;
 		arg->id = xp->id;
 		chd->sppid = spp->id;
@@ -12552,8 +16428,8 @@ ua_get_xp(ua_config_t * arg, struct xp *xp, int size)
 	if (!xp)
 		return (-EINVAL);
 	/* write out queried object */
-	cnf->sppid = xp->spp ? xp->spp->id : 0;
-	cnf->spid = xp->sp ? xp->sp->id : ((xp->spp && xp->spp->sp.sp) ? xp->spp->sp.sp->id : 0);
+	cnf->sppid = xp->spp.list ? xp->spp.list->id : 0;
+	cnf->spid = xp->sp ? xp->sp->id : ((xp->spp.list && xp->spp.list->sp.sp) ? xp->spp.list->sp.sp->id : 0);
 	cnf->muxid = xp->u.mux.index;
 	arg = (typeof(arg)) (cnf + 1);
 	/* terminate list with zero object type */
@@ -12603,41 +16479,34 @@ ua_add_as(ua_config_t * arg, struct as *as, int size, int force, int test)
 	ua_conf_as_t *cnf = (typeof(cnf)) (arg + 1);
 
 	if (as || (size -= sizeof(*cnf)) < 0)
-		goto einval;
+		return (-EINVAL);
 	if (cnf->spid)
 		sp = sp_lookup(cnf->spid);
 	if (!sp)
-		goto einval;
+		return (-EINVAL);
 	for (as = sp->as.list; as; as = as->sp.next)
 		if (as->iid == cnf->iid)
-			goto einval;
+			return (-EINVAL);
 	/* make sure user has specified correct types */
 	switch (arg->type) {
 	case M2UA_OBJ_TYPE_AS_U:
 		if (sp->type != M2UA_OBJ_TYPE_SP)
-			goto einval;
+			return (-EINVAL);
 		break;
 	case M2UA_OBJ_TYPE_AS_P:
 		if (sp->type != M2UA_OBJ_TYPE_SG)
-			goto einval;
+			return (-EINVAL);
 		break;
 	default:
 		swerr();
-		goto efault;
+		return (-EFAULT);
 	}
 	if (!test) {
 		if (!(as = ua_alloc_as(as_get_id(arg->id), arg->type, sp, cnf->iid, &cnf->add)))
-			goto enomem;
+			return (-ENOMEM);
 		arg->id = as->id;
 	}
 	return (QR_DONE);
-      einval:
-	return (-EINVAL);
-      enomem:
-	return (-ENOMEM);
-      efault:
-	swerr();
-	return (-EFAULT);
 }
 STATIC int
 ua_add_sp(ua_config_t * arg, struct sp *sp, int size, int force, int test)
@@ -12646,20 +16515,20 @@ ua_add_sp(ua_config_t * arg, struct sp *sp, int size, int force, int test)
 	ua_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
 
 	if (sp || (size -= sizeof(*cnf)) < 0)
-		goto einval;
+		return (-EINVAL);
 	if (cnf->spid)
 		osp = sp_lookup(cnf->spid);
 	/* make sure user has specified correct types */
 	switch (arg->type) {
 	case M2UA_OBJ_TYPE_SP:
 		if (osp)
-			goto einval;
+			return (-EINVAL);
 		break;
 	case M2UA_OBJ_TYPE_SG:
 		if (!osp)
-			goto einval;
+			return (-EINVAL);
 		if (osp->type != M2UA_OBJ_TYPE_SP)
-			goto einval;
+			return (-EINVAL);
 		break;
 	default:
 		swerr();
@@ -12686,28 +16555,28 @@ ua_add_spp(ua_config_t * arg, struct spp *spp, int size, int force, int test)
 	ua_conf_spp_t *cnf = (typeof(cnf)) (arg + 1);
 
 	if (spp || (size -= sizeof(*cnf)) < 0)
-		goto einval;
+		return (-EINVAL);
 	if (cnf->spid)
 		sp = sp_lookup(cnf->spid);
 	if (!sp)
-		goto einval;
+		return (-EINVAL);
 	if (cnf->aspid)
 		for (spp = sp->spp.list; spp; spp = spp->sp.next)
 			if (spp->aspid == cnf->aspid)
-				goto einval;
+				return (-EINVAL);
 	/* make sure user has specified correct types */
 	switch (arg->type) {
 	case M2UA_OBJ_TYPE_ASP:
 		if (sp->type != M2UA_OBJ_TYPE_SP)
-			goto einval;
+			return (-EINVAL);
 		break;
 	case M2UA_OBJ_TYPE_SGP:
 		if (sp->type != M2UA_OBJ_TYPE_SG)
-			goto einval;
+			return (-EINVAL);
 		break;
 	case M2UA_OBJ_TYPE_SPP:
 		if ((sp->type != M2UA_OBJ_TYPE_SP) && (sp->type != M2UA_OBJ_TYPE_SG))
-			goto einval;
+			return (-EINVAL);
 		break;
 	default:
 		swerr();
@@ -12735,19 +16604,19 @@ ua_add_ss(ua_config_t * arg, struct ss *ss, int size, int force, int test)
 	ua_conf_ss_t *cnf = (typeof(cnf)) (arg + 1);
 
 	if (ss || (size -= sizeof(*cnf)) < 0)
-		goto einval;
+		return (-EINVAL);
 	if (cnf->asid)
 		as = as_lookup(cnf->asid);
 	if (!as)
-		goto einval;
+		return (-EINVAL);
 	if (!(ss = (struct ss *) link_lookup(cnf->muxid)))
-		goto einval;
+		return (-EINVAL);
 	/* already typed */
 	if (ss->type)
-		goto einval;
+		return (-EINVAL);
 	/* no, sorry, we can't link SL-Us */
 	if (arg->type != M2UA_OBJ_TYPE_SL_P)
-		goto einval;
+		return (-EINVAL);
 	if (!test) {
 		ua_alloc_ss(ss, ss_get_id(arg->id), arg->type, as, cnf->iid, &cnf->add);
 		arg->id = ss->id;
@@ -12764,19 +16633,19 @@ ua_add_xp(ua_config_t * arg, struct xp *xp, int size, int force, int test)
 	ua_conf_xp_t *cnf = (typeof(cnf)) (arg + 1);
 
 	if (xp || (size -= sizeof(*cnf)) < 0)
-		goto einval;
+		return (-EINVAL);
 	if (cnf->spid)
 		sp = sp_lookup(cnf->spid);
 	if (cnf->sppid)
 		spp = spp_lookup(cnf->sppid);
 	/* must specify one or the other */
 	if ((!spp && !sp) || (spp && sp))
-		goto einval;
+		return (-EINVAL);
 	if (!(xp = (struct xp *) link_lookup(cnf->muxid)))
-		goto einval;
+		return (-EINVAL);
 	/* already typed */
 	if (xp->type)
-		goto einval;
+		return (-EINVAL);
 	if (!test) {
 		ua_alloc_xp(xp, xp_get_id(arg->id), arg->type, spp, sp);
 		arg->id = xp->id;
@@ -12791,8 +16660,8 @@ ua_add_df(ua_config_t * arg, struct df *df, int size, int force, int test)
 	ua_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
 
 	if (df || (size -= sizeof(*cnf)) < 0)
-		goto einval;
-	goto einval;
+		return (-EINVAL);
+	return (-EINVAL);
       einval:
 	return (-EINVAL);
 }
@@ -12905,7 +16774,7 @@ ua_cha_xp(ua_config_t * arg, struct xp *xp, int size, int force, int test)
 
 	if (!xp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	if (cnf->sppid && (!xp->spp || cnf->sppid != xp->spp->id))
+	if (cnf->sppid && (!xp->spp.list || cnf->sppid != xp->spp.list->id))
 		return (-EINVAL);
 	if (cnf->spid && (!xp->sp || cnf->spid != xp->sp->id))
 		return (-EINVAL);
@@ -12997,7 +16866,7 @@ ua_del_spp(ua_config_t * arg, struct spp *spp, int size, int force, int test)
 		return (-EINVAL);
 	if (!force) {
 		/* attached to XP */
-		if (spp->xp)
+		if (spp->xp.xp)
 			return (-EBUSY);
 		/* attached to AS */
 		if (spp->gp.list)
@@ -13054,17 +16923,17 @@ ua_del_xp(ua_config_t * arg, struct xp *xp, int size, int force, int test)
 		return (-EINVAL);
 	if (!force) {
 		/* bound to internal datastructures */
-		if (xp->spp || xp->sp)
+		if (xp->spp.list || xp->sp)
 			return (-EBUSY);
 	}
 	if (!test) {
 		noenable(xp->iq);
 		noenable(xp->oq);
 		/* unlink from spp */
-		if (xp->spp) {
+		if (xp->spp.list) {
 			fixme(("Check deactivation of all AS\n"));
-			xp_put(xchg(&xp->spp->xp, NULL));
-			spp_put(xchg(&xp->spp, NULL));
+			xp_put(xchg(&xp->spp.list->xp.xp, NULL));
+			spp_put(xchg(&xp->spp.list, NULL));
 		}
 		/* unlink from sp */
 		if (xp->sp) {
@@ -13562,7 +17431,7 @@ ua_act_ss(ua_mgmt_t * arg, struct ss *ss)
 STATIC int
 ua_act_xp(ua_mgmt_t * arg, struct xp *xp)
 {
-	if (!xp || !xp->spp || xp->spp->type != M2UA_OBJ_TYPE_SGP)
+	if (!xp || !xp->spp.list || xp->spp.list->type != M2UA_OBJ_TYPE_SGP)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -13613,7 +17482,7 @@ ua_deact_ss(ua_mgmt_t * arg, struct ss *ss)
 STATIC int
 ua_deact_xp(ua_mgmt_t * arg, struct xp *xp)
 {
-	if (!xp || !xp->spp || xp->spp->type != M2UA_OBJ_TYPE_SGP)
+	if (!xp || !xp->spp.list || xp->spp.list->type != M2UA_OBJ_TYPE_SGP)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -13670,9 +17539,9 @@ ua_up_blo_ss(ua_mgmt_t * arg, struct ss *ss)
 STATIC int
 ua_up_blo_xp(ua_mgmt_t * arg, struct xp *xp)
 {
-	if (!xp || !xp->spp)
+	if (!xp || !xp->spp.list)
 		return (-EINVAL);
-	spp_set_flags(xp->spp, ASF_MGMT_BLOCKED);
+	spp_set_flags(xp->spp.list, ASF_MGMT_BLOCKED);
 	return (QR_DONE);
 }
 STATIC int
@@ -13737,9 +17606,9 @@ ua_up_ubl_ss(ua_mgmt_t * arg, struct ss *ss)
 STATIC int
 ua_up_ubl_xp(ua_mgmt_t * arg, struct xp *xp)
 {
-	if (!xp || !xp->spp)
+	if (!xp || !xp->spp.list)
 		return (-EINVAL);
-	spp_clr_flags(xp->spp, ASF_MGMT_BLOCKED);
+	spp_clr_flags(xp->spp.list, ASF_MGMT_BLOCKED);
 	return (QR_DONE);
 }
 STATIC int
@@ -13805,7 +17674,7 @@ ua_act_blo_xp(ua_mgmt_t * arg, struct xp *xp)
 {
 	if (!xp)
 		return (-EINVAL);
-	return ua_act_blo_spp(arg, xp->spp);
+	return ua_act_blo_spp(arg, xp->spp.list);
 }
 STATIC int
 ua_act_blo_df(ua_mgmt_t * arg, struct df *df)
@@ -13863,7 +17732,7 @@ ua_act_ubl_xp(ua_mgmt_t * arg, struct xp *xp)
 {
 	if (!xp)
 		return (-EINVAL);
-	return ua_act_ubl_spp(arg, xp->spp);
+	return ua_act_ubl_spp(arg, xp->spp.list);
 }
 STATIC int
 ua_act_ubl_df(ua_mgmt_t * arg, struct df *df)
@@ -13890,6 +17759,8 @@ ua_act_ubl_df(ua_mgmt_t * arg, struct df *df)
 STATIC int
 ua_iocgoptions(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		ua_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -13898,27 +17769,32 @@ ua_iocgoptions(queue_t *q, mblk_t *mp)
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_opt_get_as(arg, as_lookup(arg->id), size);
+				ret = ua_opt_get_as(arg, as_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_opt_get_sp(arg, sp_lookup(arg->id), size);
+				ret = ua_opt_get_sp(arg, sp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_opt_get_spp(arg, spp_lookup(arg->id), size);
+				ret = ua_opt_get_spp(arg, spp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_opt_get_ss(arg, ss_lookup(arg->id), size);
+				ret = ua_opt_get_ss(arg, ss_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_opt_get_xp(arg, xp_lookup(arg->id), size);
+				ret = ua_opt_get_xp(arg, xp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_opt_get_df(arg, &master, size);
+				ret = ua_opt_get_df(arg, &master, size);
+				break;
 			}
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -13928,6 +17804,8 @@ ua_iocgoptions(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocsoptions(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		ua_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -13936,27 +17814,32 @@ ua_iocsoptions(queue_t *q, mblk_t *mp)
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_opt_set_as(arg, as_lookup(arg->id), size);
+				ret = ua_opt_set_as(arg, as_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_opt_set_sp(arg, sp_lookup(arg->id), size);
+				ret = ua_opt_set_sp(arg, sp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_opt_set_spp(arg, spp_lookup(arg->id), size);
+				ret = ua_opt_set_spp(arg, spp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_opt_set_ss(arg, ss_lookup(arg->id), size);
+				ret = ua_opt_set_ss(arg, ss_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_opt_set_xp(arg, xp_lookup(arg->id), size);
+				ret = ua_opt_set_xp(arg, xp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_opt_set_df(arg, &master, size);
+				ret = ua_opt_set_df(arg, &master, size);
+				break;
 			}
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -13966,6 +17849,8 @@ ua_iocsoptions(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocgconfig(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		ua_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -13974,27 +17859,32 @@ ua_iocgconfig(queue_t *q, mblk_t *mp)
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_get_as(arg, as_lookup(arg->id), size);
+				ret = ua_get_as(arg, as_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_get_sp(arg, sp_lookup(arg->id), size);
+				ret = ua_get_sp(arg, sp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_get_spp(arg, spp_lookup(arg->id), size);
+				ret = ua_get_spp(arg, spp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_get_ss(arg, ss_lookup(arg->id), size);
+				ret = ua_get_ss(arg, ss_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_get_xp(arg, xp_lookup(arg->id), size);
+				ret = ua_get_xp(arg, xp_lookup(arg->id), size);
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_get_df(arg, &master, size);
+				ret = ua_get_df(arg, &master, size);
+				break;
 			}
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14004,6 +17894,8 @@ ua_iocgconfig(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocsconfig(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		ua_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -14014,75 +17906,92 @@ ua_iocsconfig(queue_t *q, mblk_t *mp)
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_add_as(arg, as_lookup(arg->id), size, 0, 0);
+					ret = ua_add_as(arg, as_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_add_sp(arg, sp_lookup(arg->id), size, 0, 0);
+					ret = ua_add_sp(arg, sp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_add_spp(arg, spp_lookup(arg->id), size, 0, 0);
+					ret = ua_add_spp(arg, spp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_add_ss(arg, ss_lookup(arg->id), size, 0, 0);
+					ret = ua_add_ss(arg, ss_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_add_xp(arg, xp_lookup(arg->id), size, 0, 0);
+					ret = ua_add_xp(arg, xp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_add_df(arg, &master, size, 0, 0);
+					ret = ua_add_df(arg, &master, size, 0, 0);
+					break;
 				}
 				break;
 			case M2UA_CHA:
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_cha_as(arg, as_lookup(arg->id), size, 0, 0);
+					ret = ua_cha_as(arg, as_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_cha_sp(arg, sp_lookup(arg->id), size, 0, 0);
+					ret = ua_cha_sp(arg, sp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_cha_spp(arg, spp_lookup(arg->id), size, 0, 0);
+					ret = ua_cha_spp(arg, spp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_cha_ss(arg, ss_lookup(arg->id), size, 0, 0);
+					ret = ua_cha_ss(arg, ss_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_cha_xp(arg, xp_lookup(arg->id), size, 0, 0);
+					ret = ua_cha_xp(arg, xp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_cha_df(arg, &master, size, 0, 0);
+					ret = ua_cha_df(arg, &master, size, 0, 0);
+					break;
 				}
 				break;
 			case M2UA_DEL:
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_del_as(arg, as_lookup(arg->id), size, 0, 0);
+					ret = ua_del_as(arg, as_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_del_sp(arg, sp_lookup(arg->id), size, 0, 0);
+					ret = ua_del_sp(arg, sp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_del_spp(arg, spp_lookup(arg->id), size, 0, 0);
+					ret = ua_del_spp(arg, spp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_del_ss(arg, ss_lookup(arg->id), size, 0, 0);
+					ret = ua_del_ss(arg, ss_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_del_xp(arg, xp_lookup(arg->id), size, 0, 0);
+					ret = ua_del_xp(arg, xp_lookup(arg->id), size, 0, 0);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_del_df(arg, &master, size, 0, 0);
+					ret = ua_del_df(arg, &master, size, 0, 0);
+					break;
 				}
 				break;
 			}
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14092,6 +18001,8 @@ ua_iocsconfig(queue_t *q, mblk_t *mp)
 STATIC int
 ua_ioctconfig(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		ua_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -14102,75 +18013,92 @@ ua_ioctconfig(queue_t *q, mblk_t *mp)
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_add_as(arg, as_lookup(arg->id), size, 0, 1);
+					ret = ua_add_as(arg, as_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_add_sp(arg, sp_lookup(arg->id), size, 0, 1);
+					ret = ua_add_sp(arg, sp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_add_spp(arg, spp_lookup(arg->id), size, 0, 1);
+					ret = ua_add_spp(arg, spp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_add_ss(arg, ss_lookup(arg->id), size, 0, 1);
+					ret = ua_add_ss(arg, ss_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_add_xp(arg, xp_lookup(arg->id), size, 0, 1);
+					ret = ua_add_xp(arg, xp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_add_df(arg, &master, size, 0, 1);
+					ret = ua_add_df(arg, &master, size, 0, 1);
+					break;
 				}
 				break;
 			case M2UA_CHA:
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_cha_as(arg, as_lookup(arg->id), size, 0, 1);
+					ret = ua_cha_as(arg, as_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_cha_sp(arg, sp_lookup(arg->id), size, 0, 1);
+					ret = ua_cha_sp(arg, sp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_cha_spp(arg, spp_lookup(arg->id), size, 0, 1);
+					ret = ua_cha_spp(arg, spp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_cha_ss(arg, ss_lookup(arg->id), size, 0, 1);
+					ret = ua_cha_ss(arg, ss_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_cha_xp(arg, xp_lookup(arg->id), size, 0, 1);
+					ret = ua_cha_xp(arg, xp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_cha_df(arg, &master, size, 0, 1);
+					ret = ua_cha_df(arg, &master, size, 0, 1);
+					break;
 				}
 				break;
 			case M2UA_DEL:
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_del_as(arg, as_lookup(arg->id), size, 0, 1);
+					ret = ua_del_as(arg, as_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_del_sp(arg, sp_lookup(arg->id), size, 0, 1);
+					ret = ua_del_sp(arg, sp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_del_spp(arg, spp_lookup(arg->id), size, 0, 1);
+					ret = ua_del_spp(arg, spp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_del_ss(arg, ss_lookup(arg->id), size, 0, 1);
+					ret = ua_del_ss(arg, ss_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_del_xp(arg, xp_lookup(arg->id), size, 0, 1);
+					ret = ua_del_xp(arg, xp_lookup(arg->id), size, 0, 1);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_del_df(arg, &master, size, 0, 1);
+					ret = ua_del_df(arg, &master, size, 0, 1);
+					break;
 				}
 				break;
 			}
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14180,6 +18108,8 @@ ua_ioctconfig(queue_t *q, mblk_t *mp)
 STATIC int
 ua_ioccconfig(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		ua_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
@@ -14190,75 +18120,92 @@ ua_ioccconfig(queue_t *q, mblk_t *mp)
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_add_as(arg, as_lookup(arg->id), size, 1, 0);
+					ret = ua_add_as(arg, as_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_add_sp(arg, sp_lookup(arg->id), size, 1, 0);
+					ret = ua_add_sp(arg, sp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_add_spp(arg, spp_lookup(arg->id), size, 1, 0);
+					ret = ua_add_spp(arg, spp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_add_ss(arg, ss_lookup(arg->id), size, 1, 0);
+					ret = ua_add_ss(arg, ss_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_add_xp(arg, xp_lookup(arg->id), size, 1, 0);
+					ret = ua_add_xp(arg, xp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_add_df(arg, &master, size, 1, 0);
+					ret = ua_add_df(arg, &master, size, 1, 0);
+					break;
 				}
 				break;
 			case M2UA_CHA:
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_cha_as(arg, as_lookup(arg->id), size, 1, 0);
+					ret = ua_cha_as(arg, as_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_cha_sp(arg, sp_lookup(arg->id), size, 1, 0);
+					ret = ua_cha_sp(arg, sp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_cha_spp(arg, spp_lookup(arg->id), size, 1, 0);
+					ret = ua_cha_spp(arg, spp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_cha_ss(arg, ss_lookup(arg->id), size, 1, 0);
+					ret = ua_cha_ss(arg, ss_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_cha_xp(arg, xp_lookup(arg->id), size, 1, 0);
+					ret = ua_cha_xp(arg, xp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_cha_df(arg, &master, size, 1, 0);
+					ret = ua_cha_df(arg, &master, size, 1, 0);
+					break;
 				}
 				break;
 			case M2UA_DEL:
 				switch (arg->type) {
 				case M2UA_OBJ_TYPE_AS_U:
 				case M2UA_OBJ_TYPE_AS_P:
-					return ua_del_as(arg, as_lookup(arg->id), size, 1, 0);
+					ret = ua_del_as(arg, as_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_SP:
 				case M2UA_OBJ_TYPE_SG:
-					return ua_del_sp(arg, sp_lookup(arg->id), size, 1, 0);
+					ret = ua_del_sp(arg, sp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_ASP:
 				case M2UA_OBJ_TYPE_SGP:
 				case M2UA_OBJ_TYPE_SPP:
-					return ua_del_spp(arg, spp_lookup(arg->id), size, 1, 0);
+					ret = ua_del_spp(arg, spp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_SL_U:
 				case M2UA_OBJ_TYPE_SL_P:
-					return ua_del_ss(arg, ss_lookup(arg->id), size, 1, 0);
+					ret = ua_del_ss(arg, ss_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_XP_SCTP:
 				case M2UA_OBJ_TYPE_XP_TCP:
 				case M2UA_OBJ_TYPE_XP_SSCOP:
-					return ua_del_xp(arg, xp_lookup(arg->id), size, 1, 0);
+					ret = ua_del_xp(arg, xp_lookup(arg->id), size, 1, 0);
+					break;
 				case M2UA_OBJ_TYPE_DF:
-					return ua_del_df(arg, &master, size, 1, 0);
+					ret = ua_del_df(arg, &master, size, 1, 0);
+					break;
 				}
 				break;
 			}
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14269,8 +18216,9 @@ ua_ioccconfig(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocgstatem(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
-		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		ua_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14280,35 +18228,33 @@ ua_iocgstatem(queue_t *q, mblk_t *mp)
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
-			return ua_sta_as(arg, as_lookup(arg->id), size);
+			ret = ua_sta_as(arg, as_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SP:
 		case M2UA_OBJ_TYPE_SG:
-			return ua_sta_sp(arg, sp_lookup(arg->id), size);
+			ret = ua_sta_sp(arg, sp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_ASP:
 		case M2UA_OBJ_TYPE_SGP:
 		case M2UA_OBJ_TYPE_SPP:
-			return ua_sta_spp(arg, spp_lookup(arg->id), size);
+			ret = ua_sta_spp(arg, spp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SL_U:
 		case M2UA_OBJ_TYPE_SL_P:
-			return ua_sta_ss(arg, ss_lookup(arg->id), size);
+			ret = ua_sta_ss(arg, ss_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_XP_SCTP:
 		case M2UA_OBJ_TYPE_XP_TCP:
 		case M2UA_OBJ_TYPE_XP_SSCOP:
-			return ua_sta_xp(arg, xp_lookup(arg->id), size);
+			ret = ua_sta_xp(arg, xp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_DF:
-			return ua_sta_df(arg, &master, size);
-		default:
-			goto einval;
+			ret = ua_sta_df(arg, &master, size);
+			break;
 		}
-	      einval:
-		ret = -EINVAL;
-		goto exit;
-	      exit:
 		spin_unlock_ua(&master.lock);
-		return (ret);
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14337,8 +18283,9 @@ ua_ioccmreset(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocgstatsp(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
-		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14348,35 +18295,33 @@ ua_iocgstatsp(queue_t *q, mblk_t *mp)
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
-			return ua_statp_get_as(arg, as_lookup(arg->id), size);
+			ret = ua_statp_get_as(arg, as_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SP:
 		case M2UA_OBJ_TYPE_SG:
-			return ua_statp_get_sp(arg, sp_lookup(arg->id), size);
+			ret = ua_statp_get_sp(arg, sp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_ASP:
 		case M2UA_OBJ_TYPE_SGP:
 		case M2UA_OBJ_TYPE_SPP:
-			return ua_statp_get_spp(arg, spp_lookup(arg->id), size);
+			ret = ua_statp_get_spp(arg, spp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SL_U:
 		case M2UA_OBJ_TYPE_SL_P:
-			return ua_statp_get_ss(arg, ss_lookup(arg->id), size);
+			ret = ua_statp_get_ss(arg, ss_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_XP_SCTP:
 		case M2UA_OBJ_TYPE_XP_TCP:
 		case M2UA_OBJ_TYPE_XP_SSCOP:
-			return ua_statp_get_xp(arg, xp_lookup(arg->id), size);
+			ret = ua_statp_get_xp(arg, xp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_DF:
-			return ua_statp_get_df(arg, &master, size);
-		default:
-			goto einval;
+			ret = ua_statp_get_df(arg, &master, size);
+			break;
 		}
-	      einval:
-		ret = -EINVAL;
-		goto exit;
-	      exit:
 		spin_unlock_ua(&master.lock);
-		return (ret);
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14387,8 +18332,9 @@ ua_iocgstatsp(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocsstatsp(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
-		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14398,35 +18344,33 @@ ua_iocsstatsp(queue_t *q, mblk_t *mp)
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
-			return ua_statp_set_as(arg, as_lookup(arg->id), size);
+			ret = ua_statp_set_as(arg, as_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SP:
 		case M2UA_OBJ_TYPE_SG:
-			return ua_statp_set_sp(arg, sp_lookup(arg->id), size);
+			ret = ua_statp_set_sp(arg, sp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_ASP:
 		case M2UA_OBJ_TYPE_SGP:
 		case M2UA_OBJ_TYPE_SPP:
-			return ua_statp_set_spp(arg, spp_lookup(arg->id), size);
+			ret = ua_statp_set_spp(arg, spp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SL_U:
 		case M2UA_OBJ_TYPE_SL_P:
-			return ua_statp_set_ss(arg, ss_lookup(arg->id), size);
+			ret = ua_statp_set_ss(arg, ss_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_XP_SCTP:
 		case M2UA_OBJ_TYPE_XP_TCP:
 		case M2UA_OBJ_TYPE_XP_SSCOP:
-			return ua_statp_set_xp(arg, xp_lookup(arg->id), size);
+			ret = ua_statp_set_xp(arg, xp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_DF:
-			return ua_statp_set_df(arg, &master, size);
-		default:
-			goto einval;
+			ret = ua_statp_set_df(arg, &master, size);
+			break;
 		}
-	      einval:
-		ret = -EINVAL;
-		goto exit;
-	      exit:
 		spin_unlock_ua(&master.lock);
-		return (ret);
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14436,8 +18380,9 @@ ua_iocsstatsp(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocgstats(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
-		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14447,35 +18392,33 @@ ua_iocgstats(queue_t *q, mblk_t *mp)
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
-			return ua_stat_get_as(arg, as_lookup(arg->id), size);
+			ret = ua_stat_get_as(arg, as_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SP:
 		case M2UA_OBJ_TYPE_SG:
-			return ua_stat_get_sp(arg, sp_lookup(arg->id), size);
+			ret = ua_stat_get_sp(arg, sp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_ASP:
 		case M2UA_OBJ_TYPE_SGP:
 		case M2UA_OBJ_TYPE_SPP:
-			return ua_stat_get_spp(arg, spp_lookup(arg->id), size);
+			ret = ua_stat_get_spp(arg, spp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SL_U:
 		case M2UA_OBJ_TYPE_SL_P:
-			return ua_stat_get_ss(arg, ss_lookup(arg->id), size);
+			ret = ua_stat_get_ss(arg, ss_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_XP_SCTP:
 		case M2UA_OBJ_TYPE_XP_TCP:
 		case M2UA_OBJ_TYPE_XP_SSCOP:
-			return ua_stat_get_xp(arg, xp_lookup(arg->id), size);
+			ret = ua_stat_get_xp(arg, xp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_DF:
-			return ua_stat_get_df(arg, &master, size);
-		default:
-			goto einval;
+			ret = ua_stat_get_df(arg, &master, size);
+			break;
 		}
-	      einval:
-		ret = -EINVAL;
-		goto exit;
-	      exit:
 		spin_unlock_ua(&master.lock);
-		return (ret);
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14485,8 +18428,9 @@ ua_iocgstats(queue_t *q, mblk_t *mp)
 STATIC int
 ua_ioccstats(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
-		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14496,35 +18440,33 @@ ua_ioccstats(queue_t *q, mblk_t *mp)
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
-			return ua_stat_clr_as(arg, as_lookup(arg->id), size);
+			ret = ua_stat_clr_as(arg, as_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SP:
 		case M2UA_OBJ_TYPE_SG:
-			return ua_stat_clr_sp(arg, sp_lookup(arg->id), size);
+			ret = ua_stat_clr_sp(arg, sp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_ASP:
 		case M2UA_OBJ_TYPE_SGP:
 		case M2UA_OBJ_TYPE_SPP:
-			return ua_stat_clr_spp(arg, spp_lookup(arg->id), size);
+			ret = ua_stat_clr_spp(arg, spp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SL_U:
 		case M2UA_OBJ_TYPE_SL_P:
-			return ua_stat_clr_ss(arg, ss_lookup(arg->id), size);
+			ret = ua_stat_clr_ss(arg, ss_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_XP_SCTP:
 		case M2UA_OBJ_TYPE_XP_TCP:
 		case M2UA_OBJ_TYPE_XP_SSCOP:
-			return ua_stat_clr_xp(arg, xp_lookup(arg->id), size);
+			ret = ua_stat_clr_xp(arg, xp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_DF:
-			return ua_stat_clr_df(arg, &master, size);
-		default:
-			goto einval;
+			ret = ua_stat_clr_df(arg, &master, size);
+			break;
 		}
-	      einval:
-		ret = -EINVAL;
-		goto exit;
-	      exit:
 		spin_unlock_ua(&master.lock);
-		return (ret);
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14534,8 +18476,9 @@ ua_ioccstats(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocgnotify(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
-		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14545,35 +18488,33 @@ ua_iocgnotify(queue_t *q, mblk_t *mp)
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
-			return ua_not_get_as(arg, as_lookup(arg->id), size);
+			ret = ua_not_get_as(arg, as_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SP:
 		case M2UA_OBJ_TYPE_SG:
-			return ua_not_get_sp(arg, sp_lookup(arg->id), size);
+			ret = ua_not_get_sp(arg, sp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_ASP:
 		case M2UA_OBJ_TYPE_SGP:
 		case M2UA_OBJ_TYPE_SPP:
-			return ua_not_get_spp(arg, spp_lookup(arg->id), size);
+			ret = ua_not_get_spp(arg, spp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SL_U:
 		case M2UA_OBJ_TYPE_SL_P:
-			return ua_not_get_ss(arg, ss_lookup(arg->id), size);
+			ret = ua_not_get_ss(arg, ss_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_XP_SCTP:
 		case M2UA_OBJ_TYPE_XP_TCP:
 		case M2UA_OBJ_TYPE_XP_SSCOP:
-			return ua_not_get_xp(arg, xp_lookup(arg->id), size);
+			ret = ua_not_get_xp(arg, xp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_DF:
-			return ua_not_get_df(arg, &master, size);
-		default:
-			goto einval;
+			ret = ua_not_get_df(arg, &master, size);
+			break;
 		}
-	      einval:
-		ret = -EINVAL;
-		goto exit;
-	      exit:
 		spin_unlock_ua(&master.lock);
-		return (ret);
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14583,8 +18524,9 @@ ua_iocgnotify(queue_t *q, mblk_t *mp)
 STATIC int
 ua_iocsnotify(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
-		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14594,35 +18536,33 @@ ua_iocsnotify(queue_t *q, mblk_t *mp)
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
-			return ua_not_set_as(arg, as_lookup(arg->id), size);
+			ret = ua_not_set_as(arg, as_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SP:
 		case M2UA_OBJ_TYPE_SG:
-			return ua_not_set_sp(arg, sp_lookup(arg->id), size);
+			ret = ua_not_set_sp(arg, sp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_ASP:
 		case M2UA_OBJ_TYPE_SGP:
 		case M2UA_OBJ_TYPE_SPP:
-			return ua_not_set_spp(arg, spp_lookup(arg->id), size);
+			ret = ua_not_set_spp(arg, spp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SL_U:
 		case M2UA_OBJ_TYPE_SL_P:
-			return ua_not_set_ss(arg, ss_lookup(arg->id), size);
+			ret = ua_not_set_ss(arg, ss_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_XP_SCTP:
 		case M2UA_OBJ_TYPE_XP_TCP:
 		case M2UA_OBJ_TYPE_XP_SSCOP:
-			return ua_not_set_xp(arg, xp_lookup(arg->id), size);
+			ret = ua_not_set_xp(arg, xp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_DF:
-			return ua_not_set_df(arg, &master, size);
-		default:
-			goto einval;
+			ret = ua_not_set_df(arg, &master, size);
+			break;
 		}
-	      einval:
-		ret = -EINVAL;
-		goto exit;
-	      exit:
 		spin_unlock_ua(&master.lock);
-		return (ret);
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14632,8 +18572,9 @@ ua_iocsnotify(queue_t *q, mblk_t *mp)
 STATIC int
 ua_ioccnotify(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
-		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14643,35 +18584,33 @@ ua_ioccnotify(queue_t *q, mblk_t *mp)
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
-			return ua_not_clr_as(arg, as_lookup(arg->id), size);
+			ret = ua_not_clr_as(arg, as_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SP:
 		case M2UA_OBJ_TYPE_SG:
-			return ua_not_clr_sp(arg, sp_lookup(arg->id), size);
+			ret = ua_not_clr_sp(arg, sp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_ASP:
 		case M2UA_OBJ_TYPE_SGP:
 		case M2UA_OBJ_TYPE_SPP:
-			return ua_not_clr_spp(arg, spp_lookup(arg->id), size);
+			ret = ua_not_clr_spp(arg, spp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_SL_U:
 		case M2UA_OBJ_TYPE_SL_P:
-			return ua_not_clr_ss(arg, ss_lookup(arg->id), size);
+			ret = ua_not_clr_ss(arg, ss_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_XP_SCTP:
 		case M2UA_OBJ_TYPE_XP_TCP:
 		case M2UA_OBJ_TYPE_XP_SSCOP:
-			return ua_not_clr_xp(arg, xp_lookup(arg->id), size);
+			ret = ua_not_clr_xp(arg, xp_lookup(arg->id), size);
+			break;
 		case M2UA_OBJ_TYPE_DF:
-			return ua_not_clr_df(arg, &master, size);
-		default:
-			goto einval;
+			ret = ua_not_clr_df(arg, &master, size);
+			break;
 		}
-	      einval:
-		ret = -EINVAL;
-		goto exit;
-	      exit:
 		spin_unlock_ua(&master.lock);
-		return (ret);
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14681,6 +18620,8 @@ ua_ioccnotify(queue_t *q, mblk_t *mp)
 STATIC int
 ua_ioccmgmt(queue_t *q, mblk_t *mp)
 {
+	int ret = -EINVAL;
+
 	if (mp->b_cont) {
 		ua_mgmt_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 
@@ -14689,190 +18630,237 @@ ua_ioccmgmt(queue_t *q, mblk_t *mp)
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_up_as(arg, as_lookup(arg->id));
+				ret = ua_up_as(arg, as_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_up_sp(arg, sp_lookup(arg->id));
+				ret = ua_up_sp(arg, sp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_up_spp(arg, spp_lookup(arg->id));
+				ret = ua_up_spp(arg, spp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_up_ss(arg, ss_lookup(arg->id));
+				ret = ua_up_ss(arg, ss_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_up_xp(arg, xp_lookup(arg->id));
+				ret = ua_up_xp(arg, xp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_up_df(arg, &master);
+				ret = ua_up_df(arg, &master);
+				break;
 			}
 			break;
 		case M2UA_MGMT_ACTIVATE:
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_act_as(arg, as_lookup(arg->id));
+				ret = ua_act_as(arg, as_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_act_sp(arg, sp_lookup(arg->id));
+				ret = ua_act_sp(arg, sp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_act_spp(arg, spp_lookup(arg->id));
+				ret = ua_act_spp(arg, spp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_act_ss(arg, ss_lookup(arg->id));
+				ret = ua_act_ss(arg, ss_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_act_xp(arg, xp_lookup(arg->id));
+				ret = ua_act_xp(arg, xp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_act_df(arg, &master);
+				ret = ua_act_df(arg, &master);
+				break;
 			}
 			break;
 		case M2UA_MGMT_DEACTIVATE:
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_deact_as(arg, as_lookup(arg->id));
+				ret = ua_deact_as(arg, as_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_deact_sp(arg, sp_lookup(arg->id));
+				ret = ua_deact_sp(arg, sp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_deact_spp(arg, spp_lookup(arg->id));
+				ret = ua_deact_spp(arg, spp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_deact_ss(arg, ss_lookup(arg->id));
+				ret = ua_deact_ss(arg, ss_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_deact_xp(arg, xp_lookup(arg->id));
+				ret = ua_deact_xp(arg, xp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_deact_df(arg, &master);
+				ret = ua_deact_df(arg, &master);
+				break;
 			}
 			break;
 		case M2UA_MGMT_DOWN:
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_down_as(arg, as_lookup(arg->id));
+				ret = ua_down_as(arg, as_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_down_sp(arg, sp_lookup(arg->id));
+				ret = ua_down_sp(arg, sp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_down_spp(arg, spp_lookup(arg->id));
+				ret = ua_down_spp(arg, spp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_down_ss(arg, ss_lookup(arg->id));
+				ret = ua_down_ss(arg, ss_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_down_xp(arg, xp_lookup(arg->id));
+				ret = ua_down_xp(arg, xp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_down_df(arg, &master);
+				ret = ua_down_df(arg, &master);
+				break;
 			}
 			break;
 		case M2UA_MGMT_UP_BLOCK:
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_up_blo_as(arg, as_lookup(arg->id));
+				ret = ua_up_blo_as(arg, as_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_up_blo_sp(arg, sp_lookup(arg->id));
+				ret = ua_up_blo_sp(arg, sp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_up_blo_spp(arg, spp_lookup(arg->id));
+				ret = ua_up_blo_spp(arg, spp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_up_blo_ss(arg, ss_lookup(arg->id));
+				ret = ua_up_blo_ss(arg, ss_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_up_blo_xp(arg, xp_lookup(arg->id));
+				ret = ua_up_blo_xp(arg, xp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_up_blo_df(arg, &master);
+				ret = ua_up_blo_df(arg, &master);
+				break;
 			}
 			break;
 		case M2UA_MGMT_UP_UNBLOCK:
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_up_ubl_as(arg, as_lookup(arg->id));
+				ret = ua_up_ubl_as(arg, as_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_up_ubl_sp(arg, sp_lookup(arg->id));
+				ret = ua_up_ubl_sp(arg, sp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_up_ubl_spp(arg, spp_lookup(arg->id));
+				ret = ua_up_ubl_spp(arg, spp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_up_ubl_ss(arg, ss_lookup(arg->id));
+				ret = ua_up_ubl_ss(arg, ss_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_up_ubl_xp(arg, xp_lookup(arg->id));
+				ret = ua_up_ubl_xp(arg, xp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_up_ubl_df(arg, &master);
+				ret = ua_up_ubl_df(arg, &master);
+				break;
 			}
 			break;
 		case M2UA_MGMT_ACT_BLOCK:
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_act_blo_as(arg, as_lookup(arg->id));
+				ret = ua_act_blo_as(arg, as_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_act_blo_sp(arg, sp_lookup(arg->id));
+				ret = ua_act_blo_sp(arg, sp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_act_blo_spp(arg, spp_lookup(arg->id));
+				ret = ua_act_blo_spp(arg, spp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_act_blo_ss(arg, ss_lookup(arg->id));
+				ret = ua_act_blo_ss(arg, ss_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_act_blo_xp(arg, xp_lookup(arg->id));
+				ret = ua_act_blo_xp(arg, xp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_act_blo_df(arg, &master);
+				ret = ua_act_blo_df(arg, &master);
+				break;
 			}
 			break;
 		case M2UA_MGMT_ACT_UNBLOCK:
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
 			case M2UA_OBJ_TYPE_AS_P:
-				return ua_act_ubl_as(arg, as_lookup(arg->id));
+				ret = ua_act_ubl_as(arg, as_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SP:
 			case M2UA_OBJ_TYPE_SG:
-				return ua_act_ubl_sp(arg, sp_lookup(arg->id));
+				ret = ua_act_ubl_sp(arg, sp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_ASP:
 			case M2UA_OBJ_TYPE_SGP:
 			case M2UA_OBJ_TYPE_SPP:
-				return ua_act_ubl_spp(arg, spp_lookup(arg->id));
+				ret = ua_act_ubl_spp(arg, spp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_SL_U:
 			case M2UA_OBJ_TYPE_SL_P:
-				return ua_act_ubl_ss(arg, ss_lookup(arg->id));
+				ret = ua_act_ubl_ss(arg, ss_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_XP_SCTP:
 			case M2UA_OBJ_TYPE_XP_TCP:
 			case M2UA_OBJ_TYPE_XP_SSCOP:
-				return ua_act_ubl_xp(arg, xp_lookup(arg->id));
+				ret = ua_act_ubl_xp(arg, xp_lookup(arg->id));
+				break;
 			case M2UA_OBJ_TYPE_DF:
-				return ua_act_ubl_df(arg, &master);
+				ret = ua_act_ubl_df(arg, &master);
+				break;
 			}
 			break;
 		}
 	}
-	rare();
-	return (-EINVAL);
+	return (ret);
 }
 
 /*
@@ -14882,40 +18870,42 @@ ua_ioccmgmt(queue_t *q, mblk_t *mp)
 STATIC int
 ua_ioccpass(queue_t *q, mblk_t *mp)
 {
-	if (likely(mp->b_cont != NULL)) {
-		mblk_t *bp, *dp;
-		union link *lk;
-		ua_pass_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	mblk_t *bp, *dp;
+	union link *lk;
+	ua_pass_t *arg;
 
-		if (likely((lk = link_lookup(arg->muxid)) && lk->str.oq)) {
-			if (likely((bp = ss7_dupb(q, mp)) != NULL)) {
-				if (likely((dp = ss7_dupb(q, mp)) != NULL)) {
-					if (likely(arg->type >= QPCTL
-						   || bcanputnext(lk->str.oq, mp->b_band))) {
-						bp->b_datap->db_type = arg->type;
-						bp->b_band = arg->band;
-						bp->b_cont = dp;
-						bp->b_rptr += sizeof(*arg);
-						bp->b_wptr = bp->b_rptr + arg->ctl_length;
-						dp->b_datap->db_type = M_DATA;
-						dp->b_rptr += sizeof(*arg) + arg->ctl_length;
-						dp->b_wptr = dp->b_rptr + arg->dat_length;
-						putnext(lk->str.oq, bp);
-						return (QR_DONE);
-					}
-					freemsg(bp);
-					return (-EBUSY);
-				}
-				freeb(bp);
-				return (-ENOBUFS);
-			}
-			return (-ENOBUFS);
-		}
-		rare();
+	if (unlikely(mp->b_cont == NULL))
 		return (-EINVAL);
+
+	arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+	if (unlikely(!(lk = link_lookup(arg->muxid)) || !lk->str.oq))
+		return (-EINVAL);
+
+	if (unlikely((bp = ss7_dupb(q, mp)) == NULL))
+		return (-ENOBUFS);
+
+	if (unlikely((dp = ss7_dupb(q, mp)) == NULL)) {
+		freeb(bp);
+		return (-ENOBUFS);
 	}
-	rare();
-	return (-EINVAL);
+
+	if (unlikely(arg->type < QPCTL && !bcanputnext(lk->str.oq, mp->b_band))) {
+		freeb(bp);
+		freeb(dp);
+		return (-EBUSY);
+	}
+
+	bp->b_datap->db_type = arg->type;
+	bp->b_band = arg->band;
+	bp->b_cont = dp;
+	bp->b_rptr += sizeof(*arg);
+	bp->b_wptr = bp->b_rptr + arg->ctl_length;
+	dp->b_datap->db_type = M_DATA;
+	dp->b_rptr += sizeof(*arg) + arg->ctl_length;
+	dp->b_wptr = dp->b_rptr + arg->dat_length;
+	putnext(lk->str.oq, bp);
+	return (QR_DONE);
 }
 
 /*
@@ -15224,7 +19214,7 @@ slp_r_iocack(queue_t *q, mblk_t *mp)
 STATIC int
 slp_r_iocnak(queue_t *q, mblk_t *mp)
 {
-	struct ss *slp = SL_PRIV(q), *slu;
+	struct ss *slp = SS_PRIV(q), *slu;
 
 	if ((slp->ioc)) {
 		ss_put((slu = xchg(&slp->ioc, NULL)));
@@ -15252,7 +19242,7 @@ STATIC int
 slu_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
-	struct ss *ss = SL_PRIV(q);
+	struct ss *ss = SS_PRIV(q);
 
 	ss->i_oldstate = ss->i_state;
 
@@ -15377,7 +19367,7 @@ STATIC int
 slp_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
-	struct ss *ss = SL_PRIV(q);
+	struct ss *ss = SS_PRIV(q);
 
 	ss->i_oldstate = ss->i_state;
 
@@ -15499,7 +19489,194 @@ slp_r_proto(queue_t *q, mblk_t *mp)
 }
 
 /*
- *  Primitives from XP to M2UA.
+ *  Primitives from MTP-P to M3UA.
+ *  -----------------------------------
+ */
+STATIC int
+mtpp_r_proto(queue_t *q, mblk_t *mp)
+{
+	int rtn;
+	struct ss *ss = SS_PRIV(q);
+
+	ss->i_oldstate = ss->i_state;
+
+	switch (*(mtp_ulong *) mp->b_rptr) {
+	case MTP_OK_ACK:
+		printd(("%s: %p: MTP_OK_ACK <-\n", DRV_NAME, ss));
+		rtn = mtpp_ok_ack(ss, q, mp);
+		break;
+	case MTP_ERROR_ACK:
+		printd(("%s: %p: MTP_ERROR_ACK <-\n", DRV_NAME, ss));
+		rtn = mtpp_error_ack(ss, q, mp);
+		break;
+	case MTP_BIND_ACK:
+		printd(("%s: %p: MTP_BIND_ACK <-\n", DRV_NAME, ss));
+		rtn = mtpp_bind_ack(ss, q, mp);
+		break;
+	case MTP_ADDR_ACK:
+		printd(("%s: %p: MTP_ADDR_ACK <-\n", DRV_NAME, ss));
+		rtn = mtpp_addr_ack(ss, q, mp);
+		break;
+	case MTP_INFO_ACK:
+		printd(("%s: %p: MTP_INFO_ACK <-\n", DRV_NAME, ss));
+		rtn = mtpp_info_ack(ss, q, mp);
+		break;
+	case MTP_OPTMGMT_ACK:
+		printd(("%s: %p: MTP_OPTMGMT_ACK <-\n", DRV_NAME, ss));
+		rtn = mtpp_optmgmt_ack(ss, q, mp);
+		break;
+	case MTP_TRANSFER_IND:
+		printd(("%s: %p: MTP_TRANSFER_IND <-\n", DRV_NAME, ss));
+		rtn = mtpp_trasnfer_ind(ss, q, mp);
+		break;
+	case MTP_PAUSE_IND:
+		printd(("%s: %p: MTP_PAUSE_IND <-\n", DRV_NAME, ss));
+		rtn = mtpp_pause_ind(ss, q, mp);
+		break;
+	case MTP_RESUME_IND:
+		printd(("%s: %p: MTP_RESUME_IND <-\n", DRV_NAME, ss));
+		rtn = mtpp_resume_ind(ss, q, mp);
+		break;
+	case MTP_STATUS_IND:
+		printd(("%s: %p: MTP_STATUS_IND <-\n", DRV_NAME, ss));
+		rtn = mtpp_status_ind(ss, q, mp);
+		break;
+	case MTP_RESTART_BEGINS_IND:
+		printd(("%s: %p: MTP_RESTART_BEGINS_IND <-\n", DRV_NAME, ss));
+		rtn = mtpp_restart_begins_ind(ss, q, mp);
+		break;
+	case MTP_RESTART_COMPLETE_IND:
+		printd(("%s: %p: MTP_RESTART_COMPLETE_IND <-\n", DRV_NAME, ss));
+		rtn = mtpp_restart_complete_ind(ss, q, mp);
+		break;
+	default:
+		printd(("%s: %p: MTP_???? <-\n", DRV_NAME, xp));
+		rtn = -EOPNOTSUPP;
+		break;
+	}
+	if (rtn < 0)
+		ss->i_state = ss->i_oldstate;
+	return (rtn);
+}
+
+/*
+ *  Primitives from DL-P to IUA.
+ *  -----------------------------------
+ */
+STATIC int
+dlp_r_proto(queue_t *q, mblk_t *mp)
+{
+	int rtn;
+	struct ss *ss = SS_PRIV(q);
+
+	ss->i_oldstate = ss->i_state;
+
+	switch (*(dl_ulong *) mp->b_rptr) {
+	case DL_INFO_ACK:
+		printd(("%s: %p: DL_INFO_ACK <-\n", DRV_NAME, ss));
+		rtn = dlp_info_ack(ss, q, mp);
+		break;
+	case DL_BIND_ACK:
+		printd(("%s: %p: DL_BIND_ACK <-\n", DRV_NAME, ss));
+		rtn = dlp_bind_ack(ss, q, mp);
+		break;
+	case DL_OK_ACK:
+		printd(("%s: %p: DL_OK_ACK <-\n", DRV_NAME, ss));
+		rtn = dlp_ok_ack(ss, q, mp);
+		break;
+	case DL_ERROR_ACK:
+		printd(("%s: %p: DL_ERROR_ACK <-\n", DRV_NAME, ss));
+		rtn = dlp_error_ack(ss, q, mp);
+		break;
+	case DL_SUBS_BIND_ACK:
+		printd(("%s: %p: DL_SUBS_BIND_ACK <-\n", DRV_NAME, ss));
+		rtn = dlp_subs_bind_ack(ss, q, mp);
+		break;
+	case DL_UNITDATA_IND:
+		printd(("%s: %p: DL_UNITDATA_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_unitdata_ind(ss, q, mp);
+		break;
+	case DL_UDERROR_IND:
+		printd(("%s: %p: DL_UDERROR_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_uderror_ind(ss, q, mp);
+		break;
+	case DL_CONNECT_IND:
+		printd(("%s: %p: DL_CONNECT_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_connect_ind(ss, q, mp);
+		break;
+	case DL_CONNECT_CON:
+		printd(("%s: %p: DL_CONNECT_CON <-\n", DRV_NAME, ss));
+		rtn = dlp_connect_con(ss, q, mp);
+		break;
+	case DL_TOKEN_ACK:
+		printd(("%s: %p: DL_TOKEN_ACK <-\n", DRV_NAME, ss));
+		rtn = dlp_token_ack(ss, q, mp);
+		break;
+	case DL_DISCONNECT_IND:
+		printd(("%s: %p: DL_DISCONNECT_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_disconnect_ind(ss, q, mp);
+		break;
+	case DL_RESET_IND:
+		printd(("%s: %p: DL_RESET_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_reset_ind(ss, q, mp);
+		break;
+	case DL_RESET_CON:
+		printd(("%s: %p: DL_RESET_CON <-\n", DRV_NAME, ss));
+		rtn = dlp_reset_con(ss, q, mp);
+		break;
+	case DL_DATA_ACK_IND:
+		printd(("%s: %p: DL_DATA_ACK_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_data_ack_ind(ss, q, mp);
+		break;
+	case DL_DATA_ACK_STATUS_IND:
+		printd(("%s: %p: DL_DATA_ACK_STATUS_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_data_ack_status_ind(ss, q, mp);
+		break;
+	case DL_REPLY_IND:
+		printd(("%s: %p: DL_REPLY_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_reply_ind(ss, q, mp);
+		break;
+	case DL_REPLY_STATUS_IND:
+		printd(("%s: %p: DL_REPLY_STATUS_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_reply_status_ind(ss, q, mp);
+		break;
+	case DL_REPLY_UPDATE_STATUS_IND:
+		printd(("%s: %p: DL_REPLY_UPDATE_STATUS_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_reply_update_status_ind(ss, q, mp);
+		break;
+	case DL_XID_IND:
+		printd(("%s: %p: DL_XID_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_xid_ind(ss, q, mp);
+		break;
+	case DL_XID_CON:
+		printd(("%s: %p: DL_XID_CON <-\n", DRV_NAME, ss));
+		rtn = dlp_xid_con(ss, q, mp);
+		break;
+	case DL_TEST_IND:
+		printd(("%s: %p: DL_TEST_IND <-\n", DRV_NAME, ss));
+		rtn = dlp_test_ind(ss, q, mp);
+		break;
+	case DL_TEST_CON:
+		printd(("%s: %p: DL_TEST_CON <-\n", DRV_NAME, ss));
+		rtn = dlp_test_con(ss, q, mp);
+		break;
+	case DL_PHYS_ADDR_ACK:
+		printd(("%s: %p: DL_PHYS_ADDR_ACK <-\n", DRV_NAME, ss));
+		rtn = dlp_phys_addr_ack(ss, q, mp);
+		break;
+	case DL_GET_STATISTICS_ACK:
+		printd(("%s: %p: DL_GET_STATISTICS_ACK <-\n", DRV_NAME, ss));
+		rtn = dlp_get_statistics_ack(ss, q, mp);
+		break;
+	default:
+	}
+	if (rtn < 0)
+		ss->i_state = ss->i_oldstate;
+	return (rtn);
+}
+
+/*
+ *  Primitives from XP to UA.
  *  -----------------------------------
  */
 STATIC int
@@ -15599,7 +19776,7 @@ xp_r_proto(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 slu_w_data(queue_t *q, mblk_t *mp)
 {
-	struct ss *ss = SL_PRIV(q);
+	struct ss *ss = SS_PRIV(q);
 
 	/* data from above */
 	return slu_write(ss, q, mp);
@@ -15607,7 +19784,7 @@ slu_w_data(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 slp_r_data(queue_t *q, mblk_t *mp)
 {
-	struct ss *ss = SL_PRIV(q);
+	struct ss *ss = SS_PRIV(q);
 
 	/* data from below */
 	return slp_read(ss, q, mp);
@@ -15765,7 +19942,7 @@ ua_oput(queue_t *q, mblk_t *mp)
 STATIC streamscall void
 slu_o_wakeup(queue_t *q)
 {
-	struct *ssu = SL_PRIV(q);
+	struct *ssu = SS_PRIV(q);
 	struct as *as;
 
 	if ((as = ssu->as.as) != NULL) {
@@ -15783,7 +19960,7 @@ slu_o_wakeup(queue_t *q)
 			for (sgp = ap->p.as->gp.list; sgp; sgp = sgp->as.next) {
 				struct xp *xp;
 
-				if ((xp = sgp->spp.spp->xp)) {
+				if ((xp = sgp->spp.spp->xp.xp)) {
 					if (xp_tst_flags(xp, ASF_WANTW)) {
 						xp_clr_flags(xp, ASF_WANTW);
 						qenable(xp->iq);
@@ -15808,7 +19985,7 @@ slu_o_wakeup(queue_t *q)
 STATIC streamscall void
 slp_o_wakeup(queue_t *q)
 {
-	struct ss *ssp = SL_PRIV(q);
+	struct ss *ssp = SS_PRIV(q);
 	struct as *as;
 
 	if ((as = ssp->as.as) != NULL) {
@@ -15826,7 +20003,7 @@ slp_o_wakeup(queue_t *q)
 			for (asp = ap->u.as->gp.list; asp; asp = asp->as.next) {
 				struct xp *xp;
 
-				if ((xp = asp->spp.spp->xp)) {
+				if ((xp = asp->spp.spp->xp.xp)) {
 					if (xp_tst_flags(xp, ASF_WANTW)) {
 						xp_clr_flags(xp, ASF_WANTW);
 						qenable(xp->iq);
@@ -15871,7 +20048,7 @@ asp_o_wakeup(struct spp *asp)
 				for (sgp = ap->p.as->gp.list; sgp; sgp = sgp->as.next) {
 					struct xp *xp;
 
-					if ((xp = sgp->spp.spp->xp))
+					if ((xp = sgp->spp.spp->xp.xp))
 						if (xp_tst_flags(xp, ASF_WANTW)) {
 							xp_clr_flags(xp, ASF_WANTW);
 							qenable(xp->iq);
@@ -15914,7 +20091,7 @@ sgp_o_wakeup(struct spp *sgp)
 				for (asp = ap->u.as->gp.list; asp; asp = asp->as.next) {
 					struct xp *xp;
 
-					if ((xp = asp->spp.spp->xp))
+					if ((xp = asp->spp.spp->xp.xp))
 						if (xp_tst_flags(xp, ASF_WANTW)) {
 							xp_clr_flags(xp, ASF_WANTW);
 							qenable(xp->iq);
@@ -15954,7 +20131,7 @@ sp_o_wakeup(struct sp *sp)
 			for (sgp = ap->p.as->gp.list; sgp; sgp = sgp->as.next) {
 				struct xp *xp;
 
-				if ((xp = sgp->spp.spp->xp))
+				if ((xp = sgp->spp.spp->xp.xp))
 					if (xp_tst_flags(xp, ASF_WANTW)) {
 						xp_clr_flags(xp, ASF_WANTW);
 						qenable(xp->iq);
@@ -15977,7 +20154,7 @@ xp_o_wakeup(queue_t *q)
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
 
-	if ((spp = xp->spp)) {
+	if ((spp = xp->spp.list)) {
 		switch (spp->type) {
 		case UA_OBJ_TYPE_ASP:
 			asp_o_wakeup(spp);
@@ -16592,8 +20769,10 @@ ua_alloc_as(int id, int type, struct sp *sp, uint32_t iid, ua_addr_t * add)
 		sp->as.numb++;
 		/* generate graph nodes for all of the SP's SPPs */
 		for (spp = sp->spp.list; spp; spp = spp->sp.next)
-			if (!ua_alloc_gp(iid, as, spp))
-				goto enomem;
+			if (!ua_alloc_gp(iid, as, spp)) {
+				ua_free_as(as);
+				return (NULL);
+			}
 		/* generate graph nodes to all matching AS for other SPs */
 		if ((np = sp->np.list)) {
 			struct as *a2;
@@ -16605,8 +20784,10 @@ ua_alloc_as(int id, int type, struct sp *sp, uint32_t iid, ua_addr_t * add)
 						    || (add->spid == a2->add.spid
 							&& add->sdti == a2->add.sdti
 							&& add->sdli == a2->add.sdli))
-							if (!ua_alloc_ap(as, a2))
-								goto enomem;
+							if (!ua_alloc_ap(as, a2)) {
+								ua_free_as(as);
+								return (NULL);
+							}
 			if (sp == np->p.sp)
 				for (; np; np = np->p.next)
 					for (a2 = np->u.sp->as.list; a2; a2 = a2->sp.next)
@@ -16614,17 +20795,16 @@ ua_alloc_as(int id, int type, struct sp *sp, uint32_t iid, ua_addr_t * add)
 						    || (add->spid == a2->add.spid
 							&& add->sdti == a2->add.sdti
 							&& add->sdli == a2->add.sdli))
-							if (!ua_alloc_ap(a2, as))
-								goto enomem;
+							if (!ua_alloc_ap(a2, as)) {
+								ua_free_as(as);
+								return (NULL);
+							}
 		}
 		/* as structures are created without any linked ss structures */
 	} else
 		printd(("%s: %s: ERROR: failed to allocate as structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (as);
-      enomem:
-	ua_free_as(as);
-	return (NULL);
 }
 STATIC void
 ua_free_as(struct as *as)
@@ -16754,17 +20934,16 @@ ua_alloc_sp(int id, int type, struct sp *osp, int cost, int tmode)
 		master.sp.numb++;
 		if (osp) {
 			/* link to other sp */
-			if (!ua_alloc_np(sp, osp))
-				goto enomem;
+			if (!ua_alloc_np(sp, osp)) {
+				ua_free_sp(sp);
+				return (NULL);
+			}
 		}
 		/* when sp are created they have no as and no spp */
 	} else
 		printd(("%s: %s: ERROR: failed to allocate sp structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (sp);
-      enomem:
-	ua_free_sp(sp);
-	return (NULL);
 }
 STATIC void
 ua_free_sp(struct sp *sp)
@@ -16887,16 +21066,15 @@ ua_alloc_spp(int id, int type, struct sp *sp, int aspid, int cost)
 		sp->spp.numb++;
 		/* generate graph nodes for all other SP's AS's */
 		for (as = sp->as.list; as; as = as->sp.next)
-			if (!ua_alloc_gp(as->iid, as, spp))
-				goto enomem;
+			if (!ua_alloc_gp(as->iid, as, spp)) {
+				ua_free_spp(spp);
+				return (NULL);
+			}
 		/* spp structures are created without any linked xp structures */
 	} else
 		printd(("%s: %s: ERROR: failed to allocate spp structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (spp);
-      enomem:
-	ua_free_spp(spp);
-	return (NULL);
 }
 STATIC void
 ua_free_spp(struct spp *spp)
@@ -16910,7 +21088,7 @@ ua_free_spp(struct spp *spp)
 		struct gp *gp;
 
 		/* unlink from xp */
-		if ((xp = spp->xp)) {
+		if ((xp = spp->xp.xp)) {
 			fixme(("Disable and hangup xp\n"));
 			ua_free_xp(xp);
 		}
@@ -17134,8 +21312,8 @@ ua_alloc_xp(struct xp *xp, int id, int type, struct spp *spp, struct sp *sp)
 		   corresponds.  If the aspid of the corresponding SPP is zero, we will not require 
 		   an ASPID on ASPUP. If the aspid is non-zero, any provided ASPID must match the
 		   ASPID set. */
-		spp->xp = xp_get(xp);
-		xp->spp = spp_get(spp);
+		spp->xp.xp = xp_get(xp);
+		xp->spp.list = spp_get(spp);
 	}
 	if (sp) {
 		/* link to SP: this is done when we don't know the ASP or SGP to which the
@@ -17184,10 +21362,10 @@ ua_free_xp(struct xp *xp)
 			xp->ex_reassem = NULL;
 		}
 		/* unlink from spp */
-		if (xp->spp) {
+		if (xp->spp.list) {
 			fixme(("Check deactivation of all AS\n"));
-			xp_put(xchg(&xp->spp->xp, NULL));
-			spp_put(xchg(&xp->spp, NULL));
+			xp_put(xchg(&xp->spp.list->xp.xp, NULL));
+			spp_put(xchg(&xp->spp.list, NULL));
 		}
 		/* unlink from sp */
 		if (xp->sp) {
@@ -17320,7 +21498,7 @@ ua_free_link(queue_t *q)
 	case UA_OBJ_TYPE_XP_SCTP:
 	case UA_OBJ_TYPE_XP_TCP:
 	case UA_OBJ_TYPE_XP_SSCOP:
-		return ua_free_xp(&lk->xp);
+		return ua_free_xp(&lk->xp.xp);
 	case 0:
 		break;
 	default:
