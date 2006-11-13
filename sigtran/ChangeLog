@@ -1,3 +1,14 @@
+2006-11-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ua.c: working up master driver for release
+	* src/drivers/ua_dlpi.h: added separate local headers for release
+	* src/drivers/ua_mtp.h: added separate local headers for release
+	* src/drivers/ua_npi.h: added separate local headers for release
+	* src/drivers/ua_sl.h: added separate local headers for release
+	* src/drivers/ua_tci.h: added separate local headers for release
+	* src/drivers/ua_tpi.h: added separate local headers for release
+	* src/drivers/ua_tri.h: added separate local headers for release
+
 2006-11-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/descrip.texi: noted open source release of commercial package
