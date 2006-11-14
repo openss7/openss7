@@ -1193,3 +1193,6 @@ strxns/TODO
 .*.swp
 tags
 TODO
+*.bak
+*.info-*
+*.old

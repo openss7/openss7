@@ -1,0 +1,284 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH SIGTRAN.CONF 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B sigtran.conf
+\- configuration file for \fISIGTRAN\fR driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B /etc/sigtran.conf
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.SS "OBJECTS"
+.PP
+Primary objects include the following:
+.TP
+.B Association
+An SCTP association.  There are 4 types of associations:
+.RS
+.TP
+.I ASP to SGP (XP-G)
+This is a standard association between a local ASP and a remote SGP belonging to a remote SG.
+.TP
+.I SGP to ASP (XP-A)
+This is a standard association between a local SGP and a remote ASP belonging to a remote ASP pool.
+.TP
+.I SPP to SPP (XP-S)
+This is a standard association between a local SPP and a remote SPP belonging to a remote IPSP.
+.TP
+.I Cross Link (XP-X)
+A cross-link is either between ASPs, between SGP or between SPP.  These associations are not subject
+to standardization, however, they use the same SIGTRAN protocol with the exception that all messages
+contain the ASP Id parameter identifying to which ASP, SGP or SPP the message is intended.
+.RS
+.TP
+.I ASP to ASP (XP-X)
+An association between ASPs (normally in the same ASP pool).  The ASP to ASP cross-link can either
+provide access to the remote ASP, or can provide access to a remote SGP via the peer ASP.  In the
+former case it behaves as an SGP to ASP association; the later, an ASP to SGP association.  ASP to
+ASP cross-links normally occur at an ASP and are not necessary for proper operation of the complex.
+They are only useful when the ASPs are colocated (such as in ASP proxy scenarios).
+.TP
+.I SGP to SGP (XP-X)
+An association between SGPs (normally in the same SG).  The SGP to SGP cross-link can either
+provide access to the remote SGP, or can provide access to a remote ASP via the peer SGP.  In the
+former case it behaves as an ASP to SGP association; the later, an SGP to ASP association.  SGP to
+SGP cross-links normally only occur at an SGP.  Because all SGP belonging to an SG are typically
+colocated, these links are useful within an SG but not as useful between SG (unless SG are located
+in the same complex as with ASP proxy scenarios).
+.TP
+.I SPP to SPP (XP-X)
+An association between SSP (normally in the same IPSP).  The SPP to SPP cross-link can either
+provide access to the remote SPP, or can provide access to a remote SPP via the peer SPP.  In both
+cases they behave as a normal SPP to SPP association.  Because all SPP belonging to an IPSP are
+typically colocated, these links are useful within an IPSP.
+.RE
+.PP
+An association is described as a local ASP, SGP or SPP identifier and a remote SGP, ASP or SPP
+identifier.  Each remote ASP, SGP or SPP has associated with it an IP address for contact and
+possibly a port number.  Regardless of whether the connection is direct or cross-link, the process
+taking the role of the ASP for the association will initiate the connection and the process taking
+the role of the SGP for the association will listen for connections on the well-known UA port
+number; processes taking on the role of an SPP will both initiate connections.  At the process
+taking on the role of an SGP for the connection, either there is a port number associated with the
+remote end (in which case the ASP can be identified by port number) or the process taking on the
+role of the ASP must identify itself in the ASP Up message by including the ASP Id parameter.
+.PP
+Both direct and cross-link associations are grouped by the ASP, SGP or SPP identifier of the ASP,
+SGP or SPP at the remote end.
+.PP
+Each association has a cost associated with it.  Direct associations typically have a cost of zero;
+cross-link associations, a cost of 1 or greater.
+.RE
+.PP
+Cross-link associations implement an ASP to ASP, SGP to SGP, or SPP to SPP protocol that is not
+subject to standardization.  Nevertheless, OpenSS7 uses a slight modification to the existing
+standards to implement this protocol.  The differences from the standard SIGTRAN protcols is that
+the ASP Id parameter is included on all messages.  The ASP Id parameter identifies an ASP, SGP or
+SPP within the system.  Each end behaves in a DE-IPSP fashion: that is, it registers and activates
+for traffic that it is willing to receive, each message being prefixed with the ASP Id identifying
+the ASP, SGP or SPP to which the traffic relates.  At an ASP or SPP, traffic destined for the ASP's
+or SPP's own ASP Id are delivered locally to the SS-U; at an SGP, the SS-P.  Traffic destined for
+another ASP, SGP or SPP are delivered to that node if possible, otherwise an ASP Inactive Ack for
+the appropriate ASP Id and traffic range (RC or IID) is issued.  In this way, standard SIGTRAN
+mechanisms are reused for cross-links between associated ASP, SGP or SPP.
+.RE
+.TP
+.B ASP (SPP-A)
+An ASP is described by its ASP Id.  A unique ASP Id must be assigned to every ASP in the system.
+The ASP Id assignment must be consistent with ASP Id assignments made by peer ASPs and SGP in the
+system.  Each ASP belongs to one and only one ASP pool.
+.TP
+.B SGP (SPP-G)
+An SGP is described by its SGP Id.  A unique SGP Id must be assigned to every SGP in the system.
+The SGP Id assignment must be consistent with SGP Id assignments made by peer SGPs and ASPs in the
+system.
+Because the SGP Id never appears on the standard on-the-wire protocol (only on cross-links), its
+assignment does not need to be consistent with remote ASP Pools, SGs or IPSPs.  Each SGP belongs to
+one and only one SG.
+.TP
+.B SSP (SPP-S)
+An SPP is described by its ASP Id.  A unique ASP Id must be asigned to every SPP in the system.  The
+ASP Id assignment must be consistent with ASP Id assignments made by peer SPP in the system.
+The ASP Id assignment must be consistent with ASP Id assignments made by peer IPSPs in the system.
+Each SPP belongs to one and only one IPSP.
+.TP
+.B ASP pool/IPSP (SP-U)
+A set of ASPs (or SPPs).  Each ASP pool (IPSP) contains a list of remote SG (IPSP) from which the
+ASP pool (IPSP) obtains service for a set of preconfigured AS.
+.IP ""
+For a local ASP, there is normally only one ASP pool which is the set of remote peer ASPs associated
+with the local ASP to which the local ASP wishes to provide redundant SGP access and from which it
+hopes to obtain redundant SGP access.  Indirect ASP to SGP and SGP to ASP associations can be
+configured between the local ASP and any ASP in this pool.  Peer ASPs connecting and successfully
+completing ASP Up procedures can be dynamically added to the default pool.  The ASP pool is
+associated with one or more SG from which it receives service.
+.IP ""
+For a local SGP, there is also normally only one ASP pool which is the set of remote ASPs associated
+with the local SGP to which the local SGP may act as an AS provider.  The SGP can be configured to
+only accept connections from ASPs in the ASP pool, or can dynamically add ASPs to the ASP pool as
+they connect and successfully complete ASP Up procedures.  At an SGP, when an ASP connects and
+succesfully completes ASP Up procedures, the ASP is moved to the ASP-Inactive state for each AS
+preconfigured for the ASP pool.
+.IP ""
+For a local SPP, there is normally only one SPP pool (IPSP) which is the set of remote peer SPPs
+associated with the local IPSP to which the local SPP wishes to provide redundant SPP access and
+from which it hopes to obtain redundant SPP access.  Indirect SPP to SPP associations (cross-links)
+can be configured between the local SPP and any SPP in this pool.  Peer SPPs connecting and
+successfully completing ASP Up procedure can be dynamically added to the default pool.  The SPP
+pool is associated with the local IPSP.  At an SPP, when an SPP connects and successfully completes
+ASP Up porcedures, the SPP is moved to the ASP-Inactive state for each AS preconfigured for the
+IPSP.
+.IP ""
+At an SGP or IPSP, ASP pools/IPSP have associated with them an access control list which specifies
+the IP addresses from which ASPs are allowed to connect anonymously (to later identify themselves
+with an ASP Id).
+.TP
+.B SG/IPSP (SP-P)
+A set of SGPs.  SGPs belonging to the same SG provide like service (connectivity to the SS7 network)
+to ASPs.  Each SG has a traffic mode associated with it that describes how ASPs in an ASP pool
+distribute messages over SGP in the SG.  For link UALs (M2UA, IUA), the traffic mode is moot as
+there is only one SGP per SG.  For routing UALs (M3UA, SUA, TUA), the traffic mode can be override,
+loadshare or broadcast (but is typically loadshare based on the SLS or Sequence Control in the
+outbound message).  Each SG contains a list of ASP pools to which it provides service and as set of
+preconfigured AS that it provides to ASPs.
+.IP ""
+For a local ASP, there can be one or more SG providing service to the ASP pool.  SG providing like
+service can be group into pairs (mated STP).  For M3UA, each SG represents set of route-sets.
+.IP ""
+For a local SGP, there can be one or more SG providing service to the ASP pools, one to which the
+local SGP belongs, the others representing remote SGs.
+.TP
+.B SG Group
+A group of SG (normally a pair acting as STPs) providing like service to ASPs.
+.TP
+.B AS
+An AS (Application Server) defines a range of traffic (associated with a link or routing key) for
+which ASP obtain service or for which SGP provide service.  Each AS defined for the system has a
+unique AS identifier.  An AS is only associated with a specific IID (interface id) or RC (Routing
+Context) when it is associated with an ASP pool, SG or IPSP.  When statically allocated from tables,
+and with an ASP pool, SG or IPSP, it is necessary to specify the IID or RC assignment to the
+relation (that is, an assignment of an AS to an ASP pool or SG is a tuple consisting of the AS
+identifier and the IID or RC value).
+.\"
+.SS "FILE FORMAT"
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
