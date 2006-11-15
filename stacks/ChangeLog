@@ -1,3 +1,7 @@
+2006-11-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/x400p-ss7/sl_x400p.c: error in sdl rx found by inspection
+
 2006-11-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/ss7/lmi.h: 32-bit compatibility correction

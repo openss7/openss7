@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:01:17 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/11/15 08:58:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:01:17 $ by $Author: brian $
+ Last Modified $Date: 2006/11/15 08:58:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.18  2006/11/15 08:58:54  brian
+ - error in sdl rx found by inspection
+
  Revision 0.9.2.17  2006/05/08 11:01:17  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:01:17 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/11/15 08:58:54 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/08 11:01:17 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/11/15 08:58:54 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -4935,12 +4938,12 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 					chan = 0;
 					break;
 				case SDL_TYPE_T1:
-					*rx->nxt->b_wptr++ = (*bp + (xp_t1_chan_map[chan] << 2));
+					*rx->nxt->b_wptr++ = *(bp + (xp_t1_chan_map[chan] << 2));
 					if (++chan > 23)
 						chan = 0;
 					break;
 				case SDL_TYPE_E1:
-					*rx->nxt->b_wptr++ = (*bp + (xp_e1_chan_map[chan] << 2));
+					*rx->nxt->b_wptr++ = *(bp + (xp_e1_chan_map[chan] << 2));
 					if (++chan > 30)
 						chan = 0;
 					break;
@@ -10003,7 +10006,7 @@ MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif
-MODULE_PARM_DESC(modid, "Module ID for the X100P-SL driver. (0 for allocation.)");
+MODULE_PARM_DESC(modid, "Module ID for the X400P-SL driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
 #ifndef module_param
@@ -10011,7 +10014,7 @@ MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0);
 #endif
-MODULE_PARM_DESC(major, "Device number for the X100P-SL driver. (0 for allocation.)");
+MODULE_PARM_DESC(major, "Device number for the X400P-SL driver. (0 for allocation.)");
 
 /*
  *  Linux Fast-STREAMS Registration
