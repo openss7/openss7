@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/11/16 20:37:42 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/16 20:37:42 $
 
  -----------------------------------------------------------------------------
 
@@ -50,14 +50,14 @@
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
- Revision 1.1.2.1  2006/11/16 20:37:42  brian
+ Revision 0.9.2.1  2006/11/16 20:37:42  brian
  - added MX driver or firmware for V401P cards
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/11/16 20:37:42 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/16 20:37:42 $"
 
-static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2006/11/16 20:37:42 $";
+static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/16 20:37:42 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
