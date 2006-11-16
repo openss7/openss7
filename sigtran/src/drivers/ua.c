@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/04 11:31:15 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/16 20:45:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/04 11:31:15 $ by $Author: brian $
+ Last Modified $Date: 2006/11/16 20:45:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.2  2006/11/16 20:45:41  brian
+ - working up UA driver release
+
  Revision 0.9.2.1  2006/11/04 11:31:15  brian
  - new generic ua files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/04 11:31:15 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/16 20:45:41 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/04 11:31:15 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/16 20:45:41 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/04 11:31:15 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/16 20:45:41 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -765,7 +768,7 @@ STATIC void ss_put(struct ss *);
 STATIC uint32_t ss_get_id(uint32_t);
 STATIC struct ss *ss_lookup(uint32_t);
 
-STATIC void ua_alloc_xp(struct xp *, uint32_t, uint32_t, struct spp *, struct sp *);
+STATIC int ua_alloc_xp(struct xp *, uint32_t, uint32_t, struct spp *, struct sp *);
 STATIC void ua_free_xp(struct xp *);
 STATIC struct xp *xp_get(struct xp *);
 STATIC void xp_put(struct xp *);
@@ -4586,7 +4589,7 @@ pp_do_timeout(caddr_t data, const char *timer, toid_t *timeo, int (to_fnc) (stru
 			default:
 			case QR_DONE:
 				spin_unlock(&pp->xp.xp->lock);
-				pp_put(pp);
+				xp_put(pp->xp.xp);
 				return;
 			case -ENOMEM:
 			case -ENOBUFS:
@@ -4610,7 +4613,7 @@ pp_stop_timer(struct pp *pp, const char *timer, toid_t *timeo)
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, pp, timer, jiffies));
-		pp_put(pp);
+		xp_put(pp->xp.xp);
 	}
 	return;
 }
@@ -4620,7 +4623,7 @@ pp_start_timer(struct pp *pp, const char *timer, toid_t *timeo,
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, pp, timer, val * 1000 / HZ,
 		jiffies));
-	*timeo = timeout(exp_fnc, (caddr_t) pp_get(pp), val);
+	*timeo = timeout(exp_fnc, (caddr_t) xp_get(pp->xp.xp), val);
 }
 
 UA_DECLARE_TIMER(pp, tack);
@@ -5567,14 +5570,22 @@ asp_as_u_recalc_state(struct as *as, queue_t *q, struct spp *asp)
 	if (newstate == AS_WACK_ASPIA || newstate == AS_ACTIVE)
 		newflags &= ~ASF_PENDING;
 	for (gp = as->gp.list; gp; gp = gp->as.next) {
-		struct xp *xp = gp->spp.spp->xp.xp;
-		t_uscalar_t state = gp_get_state(gp);
+		struct rp *rp;
 
-		if (gp_get_state(gp) == AS_DOWN)
+		if (gp_get_state(gp) < AS_INACTIVE)
 			continue;
-		/* notify of state change */
-		if ((err = ua_send_mgmt_ntfy(gp, q, oldflags, newflags, asp, NULL, 0)))
-			return (err);
+
+		for (rp = gp->rp.list; rp; rp = rp->gp.next) {
+			struct xp *xp = rp->pp.pp->xp.xp;
+
+			if (rp_get_state(rp) < AS_INACTIVE)
+				continue;
+
+			/* notify of state change */
+			if ((err = ua_send_mgmt_ntfy(rp, q, oldflags, newflags, asp, NULL, 0)))
+				return (err);
+			break;	/* Only send state notification to primary transport for each ASP. */
+		}
 	}
 	/* No need to propagate state when it has not changed. */
 	if (oldstate == newstate)
@@ -5627,6 +5638,78 @@ sgp_as_p_recalc_state(struct as *as, queue_t *q)
 		as_set_flags(as, ASF_ACTIVE);
 	if (newstate != AS_ACTIVE && newstate != AS_WACK_ASPIA)
 		as_clr_flags(as, ASF_ACTIVE);
+	return (QR_DONE);
+}
+
+static inline int
+asp_gp_u_recalc_state(struct gp *gp, queue_t *q, struct spp *asp)
+{
+	int err;
+	struct as *as = gp->as.as;
+	t_uscalar_t newstate, oldstate = gp_get_state(gp);
+
+	/* calculate new state */
+	for (newstate = AS_ACTIVE; newstate > 0 && gp->rp.counts[newstate] == 0; newstate--) ;
+	if (newstate == oldstate)
+		return (QR_DONE);
+	if (oldstate == AS_DOWN && newstate == AS_INACTIVE)
+		/* FEATURE: ASPs which have just come up should be immediately notified of AS
+		   state, they can then use the notifications to determine their next best action.
+		   This is not required nor recommended by the specification (it is now by RFC
+		   4666), but is in general good practice.  By setting oldflags to zero in the
+		   following call, the ASP will be notified of the current state of the AS with the 
+		   sole exception of when the AS is in the AS-INACTIVE state.  Note also that these 
+		   notifications are sent before any associated ASP Up Ack is sent, but not before
+		   a REG RESP (because the ASP cannot possibly known the approprirate RC (IID)
+		   value until the REG RESP is received). */
+		if ((err = ua_send_mgmt_ntfy(gp, q, 0, as_get_flags(as), asp, NULL, 0)))
+			return (err);
+	as->gp.counts[oldstate]--;
+	as->gp.counts[newstate]++;
+	if ((err = asp_as_u_recalc_state(as, q, asp))) {
+		as->gp.counts[oldstate]++;
+		as->gp.counts[newstate]--;
+		return (err);
+	}
+	if (newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) {
+		gp_clr_flags(gp, ASF_PENDING);
+		gp_set_flags(gp, ASF_ACTIVE);
+	}
+	if (newstate != AS_ACTIVE && newstate != AS_WACK_ASPIA) {
+		if (oldstate == AS_ACTIVE || oldstate == AS_WACK_ASPIA)
+			gp_set_flags(gp, ASF_PENDING);
+		gp_clr_flags(gp, ASF_ACTIVE);
+	}
+	gp_set_state(gp, newstate);
+	return (QR_DONE);
+}
+
+static inline int
+rp_u_set_state(struct rp *rp, queue_t *q, const t_uscalar_t newstate)
+{
+	int err;
+	struct gp *gp = rp->gp.gp;
+	t_uscalar_t oldstate = rp_get_state(rp);
+
+	if (newstate == oldstate)
+		return (QR_DONE);
+	gp->rp.counts[oldstate]--;
+	gp->rp.counts[newstate]++;
+	if ((err = asp_gp_u_recalc_state(gp, q, gp->spp.spp))) {
+		gp->rp.counts[oldstate]++;
+		gp->rp.counts[newstate]--;
+		return (err);
+	}
+	if (newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) {
+		rp_clr_flags(rp, ASF_PENDING);
+		rp_set_flags(rp, ASF_ACTIVE);
+	}
+	if (newstate != AS_ACTIVE && newstate != AS_WACK_ASPIA) {
+		if (oldstate == AS_ACTIVE || oldstate == AS_WACK_ASPIA)
+			rp_set_flags(rp, ASF_PENDING);
+		rp_clr_flags(rp, ASF_ACTIVE);
+	}
+	rp_set_state(rp, newstate);
 	return (QR_DONE);
 }
 
@@ -6741,6 +6824,56 @@ spp_recv_asps_aspup_req(struct pp *pp, queue_t *q, struct ua_msg *m)
 {
 	/* do what the SGP does */
 	return asp_recv_asps_aspup_req(pp, q, m);
+}
+
+static int
+xs_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	return (-EPROTO); /* Unexpected in this direction. */
+}
+/**
+ * xg_recv_asps_aspup_req: - process anonymous ASP Up message
+ * @xp: transport on which the message was received
+ * @m: the message
+ *
+ * This function is called from cross-link transports that have been associated with an SP or SG but
+ * do not have an ASP, SGP or SPP structure allocated for the corresponding ASP Id.  ASP Up received
+ * on these links with an ASP Id is an offer to relay messages to (but not from) that ASP, SGP, SPP
+ * using the cross-link.  ASP Up received with the ASP Id of the peer at the other end of the
+ * cross-link is a request to accept messages destined for local SS-U or SS-P.  This can be
+ * distinguished, even in a dynamic case, by the fact that the spp->sp.sp->type matches the
+ * xp->sp->type; however, we do not yet support the dynamic case (cross-links must be fully
+ * specified with IP addresses and port numbers at both ends).
+ */
+static int
+xg_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	int err;
+	struct np *np;
+	struct pp *pp;
+	struct spp *spp = NULL;
+
+	if (!m->aspid.cp)
+		return (-EXDEV);	/* ASP Id required on cross-links. */
+
+	/* look for an ASP with the same id */
+	for (np = xp->sp->np.list; np; np = np->p.next)
+		for (spp = np->u.sp->spp.list; spp && spp->aspid != m->aspid.val;
+		     spp = spp->sp.next) ;
+	if (spp == NULL)
+		return (-ENOENT);	/* Bad ASP Id */
+	pp = ua_alloc_pp(spp, xp);
+	if (pp == NULL)
+		return (-ENOMEM);
+	/* Process as though it was there in the first place, in which case it would have been
+	   processed like an ASP. */
+	return asp_recv_asps_aspup_req(pp, q, m);
+}
+static int
+xp_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	/* XPP does what XGP does. */
+	return xg_recv_asps_asup_req(xp, q, m);
 }
 
 /*
@@ -11358,10 +11491,9 @@ find_rp_pp_data_msg(struct rp **rpp, struct pp *pp, struct ua_msg *m)
 /*
  * XGP receive is a little different than the others.  This is used for provider cross-links between
  * SGP belonging to the same SG.  When we receive data transfer messages on an XGP we perform a
- * normal provider selection process and send the message out (unless the selection process yields
- * the same XGP upon which the message arrived.  XGP are like inverted SPPs (which always send
- * data messages to the user) in that they always send data messages to the provider.  Asside from
- * that they are like SSP with regards to management messages.
+ * local provider selection only and send the message out (to avoid loop).  XGP are like inverted
+ * SPPs (which always send data messages to the user) in that they always send data messages to the
+ * provider.  Asside from that they are like SSP with regards to management messages.
  */
 static int
 xgp_recv_msg(struct pp *pp, queue_t *q, struct ua_msg *m)
@@ -11477,17 +11609,17 @@ ua_recv_aspt(struct pp *pp, queue_t *q, struct ua_msg *m)
 			continue;
 		if (!num_rc && rp->pp.next)
 			return (-EXDEV);	/* No default AS for ASP. */
-		switch (pp->xp.xp->type) {
-		case UA_OBJ_TYPE_XP_ASP:
+		switch (pp->spp.spp->type) {
+		case UA_OBJ_TYPE_ASP:
 			err = asp_recv_aspt(rp, q, m);
 			break;
-		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_SGP:
 			err = sgp_recv_aspt(rp, q, m);
 			break;
-		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_SPP:
 			err = spp_recv_aspt(rp, q, m);
 			break;
-		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XGP:
 			err = xgp_recv_aspt(rp, q, m);
 			break;
 		default:
@@ -11539,17 +11671,17 @@ ua_recv_snmm(struct pp *pp, queue_t *q, struct ua_msg *m)
 				break;
 		if (i && i >= num_rc)
 			continue;
-		switch (pp->xp.xp->type) {
-		case UA_OBJ_TYPE_XP_ASP:
+		switch (pp->spp.spp->type) {
+		case UA_OBJ_TYPE_ASP:
 			err = asp_recv_snmm(as, q, mp);
 			break;
-		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_SGP:
 			err = sgp_recv_snmm(as, q, mp);
 			break;
-		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_SPP:
 			err = spp_recv_snmm(as, q, mp);
 			break;
-		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XGP:
 			err = xgp_recv_snmm(as, q, mp);
 			break;
 		default:
@@ -11651,6 +11783,111 @@ sg_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
 	return (-ENOPROTOOPT);	/* Bad message class. */
 }
 
+static int
+xs_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	if (m->aspid.cp == NULL)
+		return (-EXDEV);
+
+	switch (m->class) {
+	case UA_CLASS_MGMT:
+	case UA_CLASS_ASPS:
+		switch (m->type) {
+		case UA_ASPS_ASPUP_REQ:
+			return xs_recv_asps_aspup_req(xp, q, m);
+		case UA_ASPS_ASPDN_REQ:
+		case UA_ASPS_HBEAT_REQ:
+		case UA_ASPS_ASPUP_ACK:
+		case UA_ASPS_ASPDN_ACK:
+		case UA_ASPS_HBEAT_ACK:
+			return (-EPROTO);	/* Unexpected in this state. */
+		}
+		return (-EOPNOTSUPP);	/* Unsupported message type. */
+	case UA_CLASS_SNMM:
+	case UA_CLASS_ASPT:
+	case UA_CLASS_RKMM:
+	case UA_CLASS_XFER:
+	case UA_CLASS_QPTM:
+	case UA_CLASS_MAUP:
+	case UA_CLASS_CNLS:
+	case UA_CLASS_CONS:
+	case UA_CLASS_TDHM:
+	case UA_CLASS_TCHM:
+		return (-EPROTO);	/* Unexpected in this state. */
+	}
+	return (-ENOPROTOOPT);	/* Bad message class. */
+}
+
+static int
+xg_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	if (m->aspid.cp == NULL)
+		return (-EXDEV);
+
+	switch (m->class) {
+	case UA_CLASS_MGMT:
+	case UA_CLASS_ASPS:
+		switch (m->type) {
+		case UA_ASPS_ASPUP_REQ:
+			return xg_recv_asps_aspup_req(xp, q, m);
+		case UA_ASPS_ASPDN_REQ:
+		case UA_ASPS_HBEAT_REQ:
+		case UA_ASPS_ASPUP_ACK:
+		case UA_ASPS_ASPDN_ACK:
+		case UA_ASPS_HBEAT_ACK:
+			return (-EPROTO);	/* Unexpected in this state. */
+		}
+		return (-EOPNOTSUPP);	/* Unsupported message type. */
+	case UA_CLASS_SNMM:
+	case UA_CLASS_ASPT:
+	case UA_CLASS_RKMM:
+	case UA_CLASS_XFER:
+	case UA_CLASS_QPTM:
+	case UA_CLASS_MAUP:
+	case UA_CLASS_CNLS:
+	case UA_CLASS_CONS:
+	case UA_CLASS_TDHM:
+	case UA_CLASS_TCHM:
+		return (-EPROTO);	/* Unexpected in this state. */
+	}
+	return (-ENOPROTOOPT);	/* Bad message class. */
+}
+
+static int
+xp_recv_msg(struct xp *xp, queue_t *q, struct ua_msg *m)
+{
+	if (m->aspid.cp == NULL)
+		return (-EXDEV);
+
+	switch (m->class) {
+	case UA_CLASS_MGMT:
+	case UA_CLASS_ASPS:
+		switch (m->type) {
+		case UA_ASPS_ASPUP_REQ:
+			return xp_recv_asps_aspup_req(xp, q, m);
+		case UA_ASPS_ASPDN_REQ:
+		case UA_ASPS_HBEAT_REQ:
+		case UA_ASPS_ASPUP_ACK:
+		case UA_ASPS_ASPDN_ACK:
+		case UA_ASPS_HBEAT_ACK:
+			return (-EPROTO);	/* Unexpected in this state. */
+		}
+		return (-EOPNOTSUPP);	/* Unsupported message type. */
+	case UA_CLASS_SNMM:
+	case UA_CLASS_ASPT:
+	case UA_CLASS_RKMM:
+	case UA_CLASS_XFER:
+	case UA_CLASS_QPTM:
+	case UA_CLASS_MAUP:
+	case UA_CLASS_CNLS:
+	case UA_CLASS_CONS:
+	case UA_CLASS_TDHM:
+	case UA_CLASS_TCHM:
+		return (-EPROTO);	/* Unexpected in this state. */
+	}
+	return (-ENOPROTOOPT);	/* Bad message class. */
+}
+
 STATIC int
 ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 {
@@ -11673,7 +11910,8 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 		if (msp.aspid.cp)
 			for (pp = xp->pp.list; pp && pp->spp.spp->aspid != msg.aspid.val;
 			     pp = pp->xp.next) ;
-		else if ((pp = xp->pp.list) && pp->xp.next)
+		else
+			if ((pp = xp->pp.list) && pp->xp.next)
 			/* No ASP Id in the message, the SPP list must contain exactly one or zero
 			   SPP or it is an error. */
 			return (-EXDEV);	/* Invalid ASP Id. */
@@ -11688,8 +11926,50 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 			case UA_OBJ_TYPE_XP_SPP:
 				err = spp_recv_msg(pp, q, &msg);
 				break;
+			case UA_OBJ_TYPE_XP_XSP:
+				/* SGP and SPP messages from a specific SGP or SPP on an ASP X-link
+				 * are treated normally.  ASP messages from the peer ASP on the
+				 * X-link are treated specially. */
+				switch (pp->spp.spp->type) {
+				case UA_OBJ_TYPE_ASP:
+					err = xsp_recv_msg(pp, q, &msg);
+					break;
+				case UA_OBJ_TYPE_SGP:
+					err = sgp_recv_msg(pp, q, &msg);
+					break;
+				case UA_OBJ_TYPE_SPP:
+					err = spp_recv_msg(pp, q, &msg);
+					break;
+				}
+				break;
 			case UA_OBJ_TYPE_XP_XGP:
-				err = xgp_recv_msg(pp, q, &msg);
+				/* ASP and SPP messages from a specific ASP or SPP on an SGP X-link
+				 * are treated normally.  SGP messages from the peer SGP on the
+				 * X-link are treated specially. */
+				switch (pp->spp.spp->type) {
+				case UA_OBJ_TYPE_ASP:
+					err = asp_recv_msg(pp, q, &msg);
+					break;
+				case UA_OBJ_TYPE_SGP:
+					err = xgp_recv_msg(pp, q, &msg);
+					break;
+				case UA_OBJ_TYPE_SPP:
+					err = spp_recv_msg(pp, q, &msg);
+					break;
+				}
+				break;
+			case UA_OBJ_TYPE_XP_XPP:
+				/* ASP and SGP messages are not permitted on an SPP X-link.  Whether
+				 * the message pertains to a peer SPP or not can be determined from
+				 * the SP type. */
+				switch (pp->spp.spp->sp.sp->type) {
+				case UA_OBJ_TYPE_SP:
+					err = xpp_recv_msg(pp, q, &msg);
+					break;
+				case UA_OBJ_TYPE_SG:
+					err = spp_recv_msg(pp, q, &msg);
+					break;
+				}
 				break;
 			default:
 				swerr();
@@ -11711,15 +11991,28 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 			   or SPP is when dynamic port allocation is used and the local process
 			   must wait for the ASP Up containing an ASP Id to fully identify the
 			   process at the other end of the transport. */
-			switch (sp->type) {
-			case UA_OBJ_TYPE_SP:
+			switch (xp->type) {
+			case UA_OBJ_TYPE_XP_ASP:
 				/* Unknown ASP or SPP connecting. */
 				err = sp_recv_msg(xp, q, &msg);
 				break;
-			case UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
 				/* Unknown SGP or SPP connecting. */
 				err = sg_recv_msg(xp, q, &msg);
-				goto disable;
+				break;
+			case UA_OBJ_TYPE_XP_XSP:
+				/* New ASP, SGP or SPP connecting. */
+				err = xs_recv_msg(xp, q, &msg);
+				break;
+			case UA_OBJ_TYPE_XP_XGP:
+				/* New ASP, SGP or SPP connecting. */
+				err = xg_recv_msg(xp, q, &msg);
+				break;
+			case UA_OBJ_TYPE_XP_XPP:
+				/* New SPP connecting. */
+				err = xp_recv_msg(xp, q, &msg);
+				break;
 			default:
 				swerr();
 				return (-EFAULT);
@@ -11853,7 +12146,7 @@ slu_attach_req(struct ss *ss, queue_t *q, mblk_t *mp)
 	ss_set_i_state(ss, LMI_ATTACH_PENDING);
 	bcopy((p + 1), &add, sizeof(add));
 	for (as = master.as.list; as; as = as->next) {
-		if (as->type != M2UA_OBJ_TYPE_AS_U)
+		if (as->type != UA_OBJ_TYPE_AS_U)
 			continue;
 		if (as->sp.sp->id == add.spid && as->add.sdli == add.sdli)
 			break;
@@ -16838,12 +17131,12 @@ ua_add_as(ua_config_t * arg, struct as *as, int size, int force, int test)
 			return (-EINVAL);
 	/* make sure user has specified correct types */
 	switch (arg->type) {
-	case M2UA_OBJ_TYPE_AS_U:
-		if (sp->type != M2UA_OBJ_TYPE_SP)
+	case UA_OBJ_TYPE_AS_U:
+		if (sp->type != UA_OBJ_TYPE_SP)
 			return (-EINVAL);
 		break;
-	case M2UA_OBJ_TYPE_AS_P:
-		if (sp->type != M2UA_OBJ_TYPE_SG)
+	case UA_OBJ_TYPE_AS_P:
+		if (sp->type != UA_OBJ_TYPE_SG)
 			return (-EINVAL);
 		break;
 	default:
@@ -16869,14 +17162,14 @@ ua_add_sp(ua_config_t * arg, struct sp *sp, int size, int force, int test)
 		osp = sp_lookup(cnf->spid);
 	/* make sure user has specified correct types */
 	switch (arg->type) {
-	case M2UA_OBJ_TYPE_SP:
+	case UA_OBJ_TYPE_SP:
 		if (osp)
 			return (-EINVAL);
 		break;
-	case M2UA_OBJ_TYPE_SG:
+	case UA_OBJ_TYPE_SG:
 		if (!osp)
 			return (-EINVAL);
-		if (osp->type != M2UA_OBJ_TYPE_SP)
+		if (osp->type != UA_OBJ_TYPE_SP)
 			return (-EINVAL);
 		break;
 	default:
@@ -16915,16 +17208,16 @@ ua_add_spp(ua_config_t * arg, struct spp *spp, int size, int force, int test)
 				return (-EINVAL);
 	/* make sure user has specified correct types */
 	switch (arg->type) {
-	case M2UA_OBJ_TYPE_ASP:
-		if (sp->type != M2UA_OBJ_TYPE_SP)
+	case UA_OBJ_TYPE_ASP:
+		if (sp->type != UA_OBJ_TYPE_SP)
 			return (-EINVAL);
 		break;
-	case M2UA_OBJ_TYPE_SGP:
-		if (sp->type != M2UA_OBJ_TYPE_SG)
+	case UA_OBJ_TYPE_SGP:
+		if (sp->type != UA_OBJ_TYPE_SG)
 			return (-EINVAL);
 		break;
-	case M2UA_OBJ_TYPE_SPP:
-		if ((sp->type != M2UA_OBJ_TYPE_SP) && (sp->type != M2UA_OBJ_TYPE_SG))
+	case UA_OBJ_TYPE_SPP:
+		if ((sp->type != UA_OBJ_TYPE_SP) && (sp->type != UA_OBJ_TYPE_SG))
 			return (-EINVAL);
 		break;
 	default:
@@ -16964,7 +17257,7 @@ ua_add_ss(ua_config_t * arg, struct ss *ss, int size, int force, int test)
 	if (ss->type)
 		return (-EINVAL);
 	/* no, sorry, we can't link SL-Us */
-	if (arg->type != M2UA_OBJ_TYPE_SL_P)
+	if (arg->type != UA_OBJ_TYPE_SL_P)
 		return (-EINVAL);
 	if (!test) {
 		ua_alloc_ss(ss, ss_get_id(arg->id), arg->type, as, cnf->iid, &cnf->add);
@@ -16996,7 +17289,10 @@ ua_add_xp(ua_config_t * arg, struct xp *xp, int size, int force, int test)
 	if (xp->type)
 		return (-EINVAL);
 	if (!test) {
-		ua_alloc_xp(xp, xp_get_id(arg->id), arg->type, spp, sp);
+		int err;
+
+		if ((err = ua_alloc_xp(xp, xp_get_id(arg->id), arg->type, spp, sp)))
+			return (err);
 		arg->id = xp->id;
 	}
 	return (QR_DONE);
@@ -17748,7 +18044,7 @@ ua_down_df(ua_mgmt_t * arg, struct df *df)
 STATIC int
 ua_act_as(ua_mgmt_t * arg, struct as *as)
 {
-	if (!as || as->type != M2UA_OBJ_TYPE_AS_P)
+	if (!as || as->type != UA_OBJ_TYPE_AS_P)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17756,7 +18052,7 @@ ua_act_as(ua_mgmt_t * arg, struct as *as)
 STATIC int
 ua_act_sp(ua_mgmt_t * arg, struct sp *sp)
 {
-	if (!sp || sp->type != M2UA_OBJ_TYPE_SG)
+	if (!sp || sp->type != UA_OBJ_TYPE_SG)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17764,7 +18060,7 @@ ua_act_sp(ua_mgmt_t * arg, struct sp *sp)
 STATIC int
 ua_act_spp(ua_mgmt_t * arg, struct spp *spp)
 {
-	if (!spp || spp->type != M2UA_OBJ_TYPE_SGP)
+	if (!spp || spp->type != UA_OBJ_TYPE_SGP)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17772,7 +18068,7 @@ ua_act_spp(ua_mgmt_t * arg, struct spp *spp)
 STATIC int
 ua_act_ss(ua_mgmt_t * arg, struct ss *ss)
 {
-	if (!ss || ss->type != M2UA_OBJ_TYPE_SL_P)
+	if (!ss || ss->type != UA_OBJ_TYPE_SL_P)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17780,7 +18076,7 @@ ua_act_ss(ua_mgmt_t * arg, struct ss *ss)
 STATIC int
 ua_act_xp(ua_mgmt_t * arg, struct xp *xp)
 {
-	if (!xp || !xp->spp.list || xp->spp.list->type != M2UA_OBJ_TYPE_SGP)
+	if (!xp || !xp->spp.list || xp->spp.list->type != UA_OBJ_TYPE_SGP)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17799,7 +18095,7 @@ ua_act_df(ua_mgmt_t * arg, struct df *df)
 STATIC int
 ua_deact_as(ua_mgmt_t * arg, struct as *as)
 {
-	if (!as || as->type != M2UA_OBJ_TYPE_AS_P)
+	if (!as || as->type != UA_OBJ_TYPE_AS_P)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17807,7 +18103,7 @@ ua_deact_as(ua_mgmt_t * arg, struct as *as)
 STATIC int
 ua_deact_sp(ua_mgmt_t * arg, struct sp *sp)
 {
-	if (!sp || sp->type != M2UA_OBJ_TYPE_SG)
+	if (!sp || sp->type != UA_OBJ_TYPE_SG)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17815,7 +18111,7 @@ ua_deact_sp(ua_mgmt_t * arg, struct sp *sp)
 STATIC int
 ua_deact_spp(ua_mgmt_t * arg, struct spp *spp)
 {
-	if (!spp || spp->type != M2UA_OBJ_TYPE_SGP)
+	if (!spp || spp->type != UA_OBJ_TYPE_SGP)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17823,7 +18119,7 @@ ua_deact_spp(ua_mgmt_t * arg, struct spp *spp)
 STATIC int
 ua_deact_ss(ua_mgmt_t * arg, struct ss *ss)
 {
-	if (!ss || ss->type != M2UA_OBJ_TYPE_SL_P)
+	if (!ss || ss->type != UA_OBJ_TYPE_SL_P)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17831,7 +18127,7 @@ ua_deact_ss(ua_mgmt_t * arg, struct ss *ss)
 STATIC int
 ua_deact_xp(ua_mgmt_t * arg, struct xp *xp)
 {
-	if (!xp || !xp->spp.list || xp->spp.list->type != M2UA_OBJ_TYPE_SGP)
+	if (!xp || !xp->spp.list || xp->spp.list->type != UA_OBJ_TYPE_SGP)
 		return (-EINVAL);
 	todo(("Write this function\n"));
 	return (-ENOSYS);
@@ -17902,10 +18198,10 @@ ua_up_blo_df(ua_mgmt_t * arg, struct df *df)
 	for (spp = master.spp.list; spp; spp = spp->next)
 		spp_set_flags(spp, ASF_MGMT_BLOCKED);
 	for (ss = (struct ss *) master.priv.list; ss; ss = ss->next)
-		if (ss->type == M2UA_OBJ_TYPE_SL_U)
+		if (ss->type == UA_OBJ_TYPE_SL_U)
 			ss_set_flags(ss, ASF_MGMT_BLOCKED);
 	for (ss = (struct ss *) master.link.list; ss; ss = ss->next)
-		if (ss->type == M2UA_OBJ_TYPE_SL_P)
+		if (ss->type == UA_OBJ_TYPE_SL_P)
 			ss_set_flags(ss, ASF_MGMT_BLOCKED);
 	return (QR_DONE);
 }
@@ -17969,10 +18265,10 @@ ua_up_ubl_df(ua_mgmt_t * arg, struct df *df)
 	for (spp = master.spp.list; spp; spp = spp->next)
 		spp_clr_flags(spp, ASF_MGMT_BLOCKED);
 	for (ss = (struct ss *) master.priv.list; ss; ss = ss->next)
-		if (ss->type == M2UA_OBJ_TYPE_SL_U)
+		if (ss->type == UA_OBJ_TYPE_SL_U)
 			ss_clr_flags(ss, ASF_MGMT_BLOCKED);
 	for (ss = (struct ss *) master.link.list; ss; ss = ss->next)
-		if (ss->type == M2UA_OBJ_TYPE_SL_P)
+		if (ss->type == UA_OBJ_TYPE_SL_P)
 			ss_clr_flags(ss, ASF_MGMT_BLOCKED);
 	return (QR_DONE);
 }
@@ -18116,29 +18412,32 @@ ua_iocgoptions(queue_t *q, mblk_t *mp)
 
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_opt_get_as(arg, as_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_opt_get_sp(arg, sp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_opt_get_spp(arg, spp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_opt_get_ss(arg, ss_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_opt_get_xp(arg, xp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_opt_get_df(arg, &master, size);
 				break;
 			}
@@ -18161,29 +18460,32 @@ ua_iocsoptions(queue_t *q, mblk_t *mp)
 
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_opt_set_as(arg, as_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_opt_set_sp(arg, sp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_opt_set_spp(arg, spp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_opt_set_ss(arg, ss_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_opt_set_xp(arg, xp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_opt_set_df(arg, &master, size);
 				break;
 			}
@@ -18206,29 +18508,32 @@ ua_iocgconfig(queue_t *q, mblk_t *mp)
 
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_get_as(arg, as_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_get_sp(arg, sp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_get_spp(arg, spp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_get_ss(arg, ss_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_get_xp(arg, xp_lookup(arg->id), size);
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_get_df(arg, &master, size);
 				break;
 			}
@@ -18253,87 +18558,96 @@ ua_iocsconfig(queue_t *q, mblk_t *mp)
 			switch (arg->cmd) {
 			case M2UA_ADD:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_add_as(arg, as_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_add_sp(arg, sp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_add_spp(arg, spp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_add_ss(arg, ss_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_add_xp(arg, xp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_add_df(arg, &master, size, 0, 0);
 					break;
 				}
 				break;
 			case M2UA_CHA:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_cha_as(arg, as_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_cha_sp(arg, sp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_cha_spp(arg, spp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_cha_ss(arg, ss_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_cha_xp(arg, xp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_cha_df(arg, &master, size, 0, 0);
 					break;
 				}
 				break;
 			case M2UA_DEL:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_del_as(arg, as_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_del_sp(arg, sp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_del_spp(arg, spp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_del_ss(arg, ss_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_del_xp(arg, xp_lookup(arg->id), size, 0, 0);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_del_df(arg, &master, size, 0, 0);
 					break;
 				}
@@ -18360,87 +18674,96 @@ ua_ioctconfig(queue_t *q, mblk_t *mp)
 			switch (arg->cmd) {
 			case M2UA_ADD:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_add_as(arg, as_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_add_sp(arg, sp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_add_spp(arg, spp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_add_ss(arg, ss_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_add_xp(arg, xp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_add_df(arg, &master, size, 0, 1);
 					break;
 				}
 				break;
 			case M2UA_CHA:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_cha_as(arg, as_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_cha_sp(arg, sp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_cha_spp(arg, spp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_cha_ss(arg, ss_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_cha_xp(arg, xp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_cha_df(arg, &master, size, 0, 1);
 					break;
 				}
 				break;
 			case M2UA_DEL:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_del_as(arg, as_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_del_sp(arg, sp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_del_spp(arg, spp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_del_ss(arg, ss_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_del_xp(arg, xp_lookup(arg->id), size, 0, 1);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_del_df(arg, &master, size, 0, 1);
 					break;
 				}
@@ -18467,87 +18790,96 @@ ua_ioccconfig(queue_t *q, mblk_t *mp)
 			switch (arg->cmd) {
 			case M2UA_ADD:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_add_as(arg, as_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_add_sp(arg, sp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_add_spp(arg, spp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_add_ss(arg, ss_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_add_xp(arg, xp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_add_df(arg, &master, size, 1, 0);
 					break;
 				}
 				break;
 			case M2UA_CHA:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_cha_as(arg, as_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_cha_sp(arg, sp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_cha_spp(arg, spp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_cha_ss(arg, ss_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_cha_xp(arg, xp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_cha_df(arg, &master, size, 1, 0);
 					break;
 				}
 				break;
 			case M2UA_DEL:
 				switch (arg->type) {
-				case M2UA_OBJ_TYPE_AS_U:
-				case M2UA_OBJ_TYPE_AS_P:
+				case UA_OBJ_TYPE_AS_U:
+				case UA_OBJ_TYPE_AS_P:
 					ret = ua_del_as(arg, as_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_SP:
-				case M2UA_OBJ_TYPE_SG:
+				case UA_OBJ_TYPE_SP:
+				case UA_OBJ_TYPE_SG:
 					ret = ua_del_sp(arg, sp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_ASP:
-				case M2UA_OBJ_TYPE_SGP:
-				case M2UA_OBJ_TYPE_SPP:
+				case UA_OBJ_TYPE_ASP:
+				case UA_OBJ_TYPE_SGP:
+				case UA_OBJ_TYPE_SPP:
 					ret = ua_del_spp(arg, spp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_SL_U:
-				case M2UA_OBJ_TYPE_SL_P:
+				case UA_OBJ_TYPE_SL_U:
+				case UA_OBJ_TYPE_SL_P:
 					ret = ua_del_ss(arg, ss_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_XP_SCTP:
-				case M2UA_OBJ_TYPE_XP_TCP:
-				case M2UA_OBJ_TYPE_XP_SSCOP:
+				case UA_OBJ_TYPE_XP_ASP:
+				case UA_OBJ_TYPE_XP_SGP:
+				case UA_OBJ_TYPE_XP_SPP:
+				case UA_OBJ_TYPE_XP_XSP:
+				case UA_OBJ_TYPE_XP_XGP:
+				case UA_OBJ_TYPE_XP_XPP:
 					ret = ua_del_xp(arg, xp_lookup(arg->id), size, 1, 0);
 					break;
-				case M2UA_OBJ_TYPE_DF:
+				case UA_OBJ_TYPE_DF:
 					ret = ua_del_df(arg, &master, size, 1, 0);
 					break;
 				}
@@ -18575,29 +18907,32 @@ ua_iocgstatem(queue_t *q, mblk_t *mp)
 			return (-EMSGSIZE);
 		spin_lock_ua(&master.lock);
 		switch (arg->type) {
-		case M2UA_OBJ_TYPE_AS_U:
-		case M2UA_OBJ_TYPE_AS_P:
+		case UA_OBJ_TYPE_AS_U:
+		case UA_OBJ_TYPE_AS_P:
 			ret = ua_sta_as(arg, as_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SP:
-		case M2UA_OBJ_TYPE_SG:
+		case UA_OBJ_TYPE_SP:
+		case UA_OBJ_TYPE_SG:
 			ret = ua_sta_sp(arg, sp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_ASP:
-		case M2UA_OBJ_TYPE_SGP:
-		case M2UA_OBJ_TYPE_SPP:
+		case UA_OBJ_TYPE_ASP:
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
 			ret = ua_sta_spp(arg, spp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SL_U:
-		case M2UA_OBJ_TYPE_SL_P:
+		case UA_OBJ_TYPE_SL_U:
+		case UA_OBJ_TYPE_SL_P:
 			ret = ua_sta_ss(arg, ss_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_XP_SCTP:
-		case M2UA_OBJ_TYPE_XP_TCP:
-		case M2UA_OBJ_TYPE_XP_SSCOP:
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
 			ret = ua_sta_xp(arg, xp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_DF:
+		case UA_OBJ_TYPE_DF:
 			ret = ua_sta_df(arg, &master, size);
 			break;
 		}
@@ -18642,29 +18977,32 @@ ua_iocgstatsp(queue_t *q, mblk_t *mp)
 			return (-EMSGSIZE);
 		spin_lock_ua(&master.lock);
 		switch (arg->type) {
-		case M2UA_OBJ_TYPE_AS_U:
-		case M2UA_OBJ_TYPE_AS_P:
+		case UA_OBJ_TYPE_AS_U:
+		case UA_OBJ_TYPE_AS_P:
 			ret = ua_statp_get_as(arg, as_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SP:
-		case M2UA_OBJ_TYPE_SG:
+		case UA_OBJ_TYPE_SP:
+		case UA_OBJ_TYPE_SG:
 			ret = ua_statp_get_sp(arg, sp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_ASP:
-		case M2UA_OBJ_TYPE_SGP:
-		case M2UA_OBJ_TYPE_SPP:
+		case UA_OBJ_TYPE_ASP:
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
 			ret = ua_statp_get_spp(arg, spp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SL_U:
-		case M2UA_OBJ_TYPE_SL_P:
+		case UA_OBJ_TYPE_SL_U:
+		case UA_OBJ_TYPE_SL_P:
 			ret = ua_statp_get_ss(arg, ss_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_XP_SCTP:
-		case M2UA_OBJ_TYPE_XP_TCP:
-		case M2UA_OBJ_TYPE_XP_SSCOP:
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
 			ret = ua_statp_get_xp(arg, xp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_DF:
+		case UA_OBJ_TYPE_DF:
 			ret = ua_statp_get_df(arg, &master, size);
 			break;
 		}
@@ -18691,29 +19029,32 @@ ua_iocsstatsp(queue_t *q, mblk_t *mp)
 			return (-EMSGSIZE);
 		spin_lock_ua(&master.lock);
 		switch (arg->type) {
-		case M2UA_OBJ_TYPE_AS_U:
-		case M2UA_OBJ_TYPE_AS_P:
+		case UA_OBJ_TYPE_AS_U:
+		case UA_OBJ_TYPE_AS_P:
 			ret = ua_statp_set_as(arg, as_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SP:
-		case M2UA_OBJ_TYPE_SG:
+		case UA_OBJ_TYPE_SP:
+		case UA_OBJ_TYPE_SG:
 			ret = ua_statp_set_sp(arg, sp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_ASP:
-		case M2UA_OBJ_TYPE_SGP:
-		case M2UA_OBJ_TYPE_SPP:
+		case UA_OBJ_TYPE_ASP:
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
 			ret = ua_statp_set_spp(arg, spp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SL_U:
-		case M2UA_OBJ_TYPE_SL_P:
+		case UA_OBJ_TYPE_SL_U:
+		case UA_OBJ_TYPE_SL_P:
 			ret = ua_statp_set_ss(arg, ss_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_XP_SCTP:
-		case M2UA_OBJ_TYPE_XP_TCP:
-		case M2UA_OBJ_TYPE_XP_SSCOP:
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
 			ret = ua_statp_set_xp(arg, xp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_DF:
+		case UA_OBJ_TYPE_DF:
 			ret = ua_statp_set_df(arg, &master, size);
 			break;
 		}
@@ -18739,29 +19080,32 @@ ua_iocgstats(queue_t *q, mblk_t *mp)
 			return (-EMSGSIZE);
 		spin_lock_ua(&master.lock);
 		switch (arg->type) {
-		case M2UA_OBJ_TYPE_AS_U:
-		case M2UA_OBJ_TYPE_AS_P:
+		case UA_OBJ_TYPE_AS_U:
+		case UA_OBJ_TYPE_AS_P:
 			ret = ua_stat_get_as(arg, as_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SP:
-		case M2UA_OBJ_TYPE_SG:
+		case UA_OBJ_TYPE_SP:
+		case UA_OBJ_TYPE_SG:
 			ret = ua_stat_get_sp(arg, sp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_ASP:
-		case M2UA_OBJ_TYPE_SGP:
-		case M2UA_OBJ_TYPE_SPP:
+		case UA_OBJ_TYPE_ASP:
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
 			ret = ua_stat_get_spp(arg, spp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SL_U:
-		case M2UA_OBJ_TYPE_SL_P:
+		case UA_OBJ_TYPE_SL_U:
+		case UA_OBJ_TYPE_SL_P:
 			ret = ua_stat_get_ss(arg, ss_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_XP_SCTP:
-		case M2UA_OBJ_TYPE_XP_TCP:
-		case M2UA_OBJ_TYPE_XP_SSCOP:
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
 			ret = ua_stat_get_xp(arg, xp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_DF:
+		case UA_OBJ_TYPE_DF:
 			ret = ua_stat_get_df(arg, &master, size);
 			break;
 		}
@@ -18787,29 +19131,32 @@ ua_ioccstats(queue_t *q, mblk_t *mp)
 			return (-EMSGSIZE);
 		spin_lock_ua(&master.lock);
 		switch (arg->type) {
-		case M2UA_OBJ_TYPE_AS_U:
-		case M2UA_OBJ_TYPE_AS_P:
+		case UA_OBJ_TYPE_AS_U:
+		case UA_OBJ_TYPE_AS_P:
 			ret = ua_stat_clr_as(arg, as_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SP:
-		case M2UA_OBJ_TYPE_SG:
+		case UA_OBJ_TYPE_SP:
+		case UA_OBJ_TYPE_SG:
 			ret = ua_stat_clr_sp(arg, sp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_ASP:
-		case M2UA_OBJ_TYPE_SGP:
-		case M2UA_OBJ_TYPE_SPP:
+		case UA_OBJ_TYPE_ASP:
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
 			ret = ua_stat_clr_spp(arg, spp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SL_U:
-		case M2UA_OBJ_TYPE_SL_P:
+		case UA_OBJ_TYPE_SL_U:
+		case UA_OBJ_TYPE_SL_P:
 			ret = ua_stat_clr_ss(arg, ss_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_XP_SCTP:
-		case M2UA_OBJ_TYPE_XP_TCP:
-		case M2UA_OBJ_TYPE_XP_SSCOP:
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
 			ret = ua_stat_clr_xp(arg, xp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_DF:
+		case UA_OBJ_TYPE_DF:
 			ret = ua_stat_clr_df(arg, &master, size);
 			break;
 		}
@@ -18835,29 +19182,32 @@ ua_iocgnotify(queue_t *q, mblk_t *mp)
 			return (-EMSGSIZE);
 		spin_lock_ua(&master.lock);
 		switch (arg->type) {
-		case M2UA_OBJ_TYPE_AS_U:
-		case M2UA_OBJ_TYPE_AS_P:
+		case UA_OBJ_TYPE_AS_U:
+		case UA_OBJ_TYPE_AS_P:
 			ret = ua_not_get_as(arg, as_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SP:
-		case M2UA_OBJ_TYPE_SG:
+		case UA_OBJ_TYPE_SP:
+		case UA_OBJ_TYPE_SG:
 			ret = ua_not_get_sp(arg, sp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_ASP:
-		case M2UA_OBJ_TYPE_SGP:
-		case M2UA_OBJ_TYPE_SPP:
+		case UA_OBJ_TYPE_ASP:
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
 			ret = ua_not_get_spp(arg, spp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SL_U:
-		case M2UA_OBJ_TYPE_SL_P:
+		case UA_OBJ_TYPE_SL_U:
+		case UA_OBJ_TYPE_SL_P:
 			ret = ua_not_get_ss(arg, ss_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_XP_SCTP:
-		case M2UA_OBJ_TYPE_XP_TCP:
-		case M2UA_OBJ_TYPE_XP_SSCOP:
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
 			ret = ua_not_get_xp(arg, xp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_DF:
+		case UA_OBJ_TYPE_DF:
 			ret = ua_not_get_df(arg, &master, size);
 			break;
 		}
@@ -18883,29 +19233,32 @@ ua_iocsnotify(queue_t *q, mblk_t *mp)
 			return (-EMSGSIZE);
 		spin_lock_ua(&master.lock);
 		switch (arg->type) {
-		case M2UA_OBJ_TYPE_AS_U:
-		case M2UA_OBJ_TYPE_AS_P:
+		case UA_OBJ_TYPE_AS_U:
+		case UA_OBJ_TYPE_AS_P:
 			ret = ua_not_set_as(arg, as_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SP:
-		case M2UA_OBJ_TYPE_SG:
+		case UA_OBJ_TYPE_SP:
+		case UA_OBJ_TYPE_SG:
 			ret = ua_not_set_sp(arg, sp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_ASP:
-		case M2UA_OBJ_TYPE_SGP:
-		case M2UA_OBJ_TYPE_SPP:
+		case UA_OBJ_TYPE_ASP:
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
 			ret = ua_not_set_spp(arg, spp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SL_U:
-		case M2UA_OBJ_TYPE_SL_P:
+		case UA_OBJ_TYPE_SL_U:
+		case UA_OBJ_TYPE_SL_P:
 			ret = ua_not_set_ss(arg, ss_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_XP_SCTP:
-		case M2UA_OBJ_TYPE_XP_TCP:
-		case M2UA_OBJ_TYPE_XP_SSCOP:
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
 			ret = ua_not_set_xp(arg, xp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_DF:
+		case UA_OBJ_TYPE_DF:
 			ret = ua_not_set_df(arg, &master, size);
 			break;
 		}
@@ -18931,29 +19284,32 @@ ua_ioccnotify(queue_t *q, mblk_t *mp)
 			return (-EMSGSIZE);
 		spin_lock_ua(&master.lock);
 		switch (arg->type) {
-		case M2UA_OBJ_TYPE_AS_U:
-		case M2UA_OBJ_TYPE_AS_P:
+		case UA_OBJ_TYPE_AS_U:
+		case UA_OBJ_TYPE_AS_P:
 			ret = ua_not_clr_as(arg, as_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SP:
-		case M2UA_OBJ_TYPE_SG:
+		case UA_OBJ_TYPE_SP:
+		case UA_OBJ_TYPE_SG:
 			ret = ua_not_clr_sp(arg, sp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_ASP:
-		case M2UA_OBJ_TYPE_SGP:
-		case M2UA_OBJ_TYPE_SPP:
+		case UA_OBJ_TYPE_ASP:
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
 			ret = ua_not_clr_spp(arg, spp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_SL_U:
-		case M2UA_OBJ_TYPE_SL_P:
+		case UA_OBJ_TYPE_SL_U:
+		case UA_OBJ_TYPE_SL_P:
 			ret = ua_not_clr_ss(arg, ss_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_XP_SCTP:
-		case M2UA_OBJ_TYPE_XP_TCP:
-		case M2UA_OBJ_TYPE_XP_SSCOP:
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
 			ret = ua_not_clr_xp(arg, xp_lookup(arg->id), size);
 			break;
-		case M2UA_OBJ_TYPE_DF:
+		case UA_OBJ_TYPE_DF:
 			ret = ua_not_clr_df(arg, &master, size);
 			break;
 		}
@@ -18977,232 +19333,256 @@ ua_ioccmgmt(queue_t *q, mblk_t *mp)
 		switch (arg->cmd) {
 		case M2UA_MGMT_UP:
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_up_as(arg, as_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_up_sp(arg, sp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_up_spp(arg, spp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_up_ss(arg, ss_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_up_xp(arg, xp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_up_df(arg, &master);
 				break;
 			}
 			break;
 		case M2UA_MGMT_ACTIVATE:
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_act_as(arg, as_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_act_sp(arg, sp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_act_spp(arg, spp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_act_ss(arg, ss_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_act_xp(arg, xp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_act_df(arg, &master);
 				break;
 			}
 			break;
 		case M2UA_MGMT_DEACTIVATE:
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_deact_as(arg, as_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_deact_sp(arg, sp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_deact_spp(arg, spp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_deact_ss(arg, ss_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_deact_xp(arg, xp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_deact_df(arg, &master);
 				break;
 			}
 			break;
 		case M2UA_MGMT_DOWN:
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_down_as(arg, as_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_down_sp(arg, sp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_down_spp(arg, spp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_down_ss(arg, ss_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_down_xp(arg, xp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_down_df(arg, &master);
 				break;
 			}
 			break;
 		case M2UA_MGMT_UP_BLOCK:
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_up_blo_as(arg, as_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_up_blo_sp(arg, sp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_up_blo_spp(arg, spp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_up_blo_ss(arg, ss_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_up_blo_xp(arg, xp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_up_blo_df(arg, &master);
 				break;
 			}
 			break;
 		case M2UA_MGMT_UP_UNBLOCK:
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_up_ubl_as(arg, as_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_up_ubl_sp(arg, sp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_up_ubl_spp(arg, spp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_up_ubl_ss(arg, ss_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_up_ubl_xp(arg, xp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_up_ubl_df(arg, &master);
 				break;
 			}
 			break;
 		case M2UA_MGMT_ACT_BLOCK:
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_act_blo_as(arg, as_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_act_blo_sp(arg, sp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_act_blo_spp(arg, spp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_act_blo_ss(arg, ss_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_act_blo_xp(arg, xp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_act_blo_df(arg, &master);
 				break;
 			}
 			break;
 		case M2UA_MGMT_ACT_UNBLOCK:
 			switch (arg->type) {
-			case M2UA_OBJ_TYPE_AS_U:
-			case M2UA_OBJ_TYPE_AS_P:
+			case UA_OBJ_TYPE_AS_U:
+			case UA_OBJ_TYPE_AS_P:
 				ret = ua_act_ubl_as(arg, as_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SP:
-			case M2UA_OBJ_TYPE_SG:
+			case UA_OBJ_TYPE_SP:
+			case UA_OBJ_TYPE_SG:
 				ret = ua_act_ubl_sp(arg, sp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_ASP:
-			case M2UA_OBJ_TYPE_SGP:
-			case M2UA_OBJ_TYPE_SPP:
+			case UA_OBJ_TYPE_ASP:
+			case UA_OBJ_TYPE_SGP:
+			case UA_OBJ_TYPE_SPP:
 				ret = ua_act_ubl_spp(arg, spp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_SL_U:
-			case M2UA_OBJ_TYPE_SL_P:
+			case UA_OBJ_TYPE_SL_U:
+			case UA_OBJ_TYPE_SL_P:
 				ret = ua_act_ubl_ss(arg, ss_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_XP_SCTP:
-			case M2UA_OBJ_TYPE_XP_TCP:
-			case M2UA_OBJ_TYPE_XP_SSCOP:
+			case UA_OBJ_TYPE_XP_ASP:
+			case UA_OBJ_TYPE_XP_SGP:
+			case UA_OBJ_TYPE_XP_SPP:
+			case UA_OBJ_TYPE_XP_XSP:
+			case UA_OBJ_TYPE_XP_XGP:
+			case UA_OBJ_TYPE_XP_XPP:
 				ret = ua_act_ubl_xp(arg, xp_lookup(arg->id));
 				break;
-			case M2UA_OBJ_TYPE_DF:
+			case UA_OBJ_TYPE_DF:
 				ret = ua_act_ubl_df(arg, &master);
 				break;
 			}
@@ -21441,10 +21821,8 @@ ua_free_spp(struct spp *spp)
 		struct gp *gp;
 
 		/* unlink from xp */
-		while ((pp = spp->pp.list)) {
-			fixme(("Disable and hangup xp\n"));
+		while ((pp = spp->pp.list))
 			ua_free_pp(pp);
-		}
 		/* unlink from as */
 		while ((gp = spp->gp.list))
 			ua_free_gp(gp);
@@ -21659,20 +22037,33 @@ static void
 ua_free_rp(struct rp *rp)
 {
 	if (rp) {
+		struct gp *gp = rp->gp.gp;
+
+		/* Freeing an RP structure should not result in a state change. */
+		if (rp_get_state(rp) != AS_DOWN) {
+			swerr();
+			gp->rp.counts[rp->state]--;
+			gp->rp.counts[AS_DOWN]++;
+			rp->state = AS_DOWN;
+			rp->flags = 0;
+		}
+		gp->rp.counts[AS_DOWN]--;
 		/* unlink from GP */
 		if ((*rp->gp.prev = rp->gp.next))
 			rp->gp.next->gp.prev = rp->gp.prev;
 		rp->gp.next = NULL;
 		rp->gp.prev = &rp->gp.next;
 		rp->gp.gp->rp.numb--;
-		gp_put(xchg(&rp->gp.gp, NULL));
+		rp->gp.gp = NULL;
+
 		/* unlink from PP */
 		if ((*rp->pp.prev = rp->pp.next))
 			rp->pp.next->pp.prev = rp->pp.prev;
 		rp->pp.next = NULL;
 		rp->pp.prev = &rp->pp.next;
 		rp->pp.pp->rp.numb--;
-		pp_put(xchg(&rp->pp.pp, NULL));
+		rp->pp.pp = NULL;
+
 		kmem_cache_free(ua_rp_cachep, rp);
 		printd(("%s: %s: %p: deallocated rp structure\n", DRV_NAME, __FUNCTION__, rp));
 		return;
@@ -21687,19 +22078,22 @@ ua_alloc_rp(struct gp *gp, struct pp *pp)
 	printd(("%s: %s: rp graph gp %ld pp %lu\n", DRV_NAME, __FUNCTION__, gp->id, pp->id));
 	if ((rp = kmem_cache_alloc(ua_rp_cachep, SLAB_ATOMIC))) {
 		bzero(rp, sizeof(rp));
-		rp_set_state(rp, 0);
+		rp_set_state(rp, AS_DOWN);
+
 		/* link to GP */
 		if ((rp->gp.next = gp->rp.list))
 			rp->gp.next->gp.prev = &rp->gp.next;
 		rp->gp.prev = &gp->rp.list;
-		rp->gp.gp = gp_get(gp);
+		rp->gp.gp = gp;
 		gp->rp.list = rp;
 		gp->rp.numb++;
+		gp->rp.counts[AS_DOWN]++; /* will not change state of GP */
+
 		/* link to PP */
 		if ((rp->pp.next = pp->rp.list))
 			rp->pp.next->pp.prev = &rp->pp.next;
 		rp->pp.prev = &pp->rp.list;
-		rp->pp.pp = pp_get(pp);
+		rp->pp.pp = pp;
 		pp->rp.list = rp;
 		pp->rp.numb++;
 	} else
@@ -21718,10 +22112,20 @@ ua_free_pp(struct pp *pp)
 {
 	if (pp) {
 		struct rp *rp;
+		struct spp *spp = pp->spp.spp;
 
 		/* remove RP graphs */
 		while ((rp = pp->rp.list))
 			ua_free_rp(rp);
+		/* Freeing a PP structure should not result in a state change. */
+		if (pp_get_state(pp) != ASP_DOWN) {
+			swerr();
+			spp->pp.counts[pp->state]--;
+			spp->pp.counts[ASP_DOWN]++;
+			pp->state = ASP_DOWN;
+			pp->flags = 0;
+		}
+		spp->rp.counts[ASP_DOWN]--;
 		/* unlink from SPP */
 		if ((*pp->spp.prev = pp->spp.next))
 			pp->spp.next->spp.prev = pp->spp.prev;
@@ -21729,6 +22133,7 @@ ua_free_pp(struct pp *pp)
 		pp->spp.prev = &pp->spp.next;
 		pp->spp.spp->pp.numb--;
 		spp_put(xchg(&pp->spp.spp, NULL));
+
 		/* unlink from XP */
 		if ((*pp->xp.prev = pp->xp.next))
 			pp->xp.next->xp.prev = pp->xp.prev;
@@ -21736,12 +22141,24 @@ ua_free_pp(struct pp *pp)
 		pp->xp.prev = &pp->xp.next;
 		pp->xp.xp->pp.numb--;
 		xp_put(xchg(&pp->xp.xp, NULL));
+
 		kmem_cache_free(ua_pp_cachep, pp);
 		printd(("%s: %s: %p: deallocated pp structure\n", DRV_NAME, __FUNCTION__, pp));
 		return;
 	}
 	swerr();
 }
+/**
+ *  ua_alloc_pp: allocate SPP to XP mapping structure
+ *  @spp: SPP to map
+ *  @xp: XP tp map
+ *
+ *  PP structure start life in the ASP_DOWN state.  If the structure is allocated to link an SGP
+ *  or SPP to a transport, it is desirable to initiate the ASP Up procedure (i.e. send an ASP Up
+ *  message with the ASP Id of the SGP or SPP).  Once the ASP Up procedure completes, we will also
+ *  initiate a Regsitration procedure for each dynamic AS whose RP structure is in the AS_DOWN
+ *  state.
+ */
 static void
 ua_alloc_pp(struct spp *spp, struct xp *xp)
 {
@@ -21750,7 +22167,8 @@ ua_alloc_pp(struct spp *spp, struct xp *xp)
 	printd(("%s: %s: pp graph spp %ld xp %lu\n", DRV_NAME, __FUNCTION__, spp->id, xp->id));
 	if ((pp = kmem_cache_alloc(ua_pp_cachep, SLAB_ATOMIC))) {
 		bzero(pp, sizeof(pp));
-		pp_set_state(pp, 0);
+		pp_set_state(pp, ASP_DOWN);
+
 		/* link to SPP */
 		if ((pp->spp.next = spp->pp.list))
 			pp->spp.next->spp.prev = &pp->spp.next;
@@ -21758,6 +22176,8 @@ ua_alloc_pp(struct spp *spp, struct xp *xp)
 		pp->spp.spp = spp_get(spp);
 		spp->pp.list = pp;
 		spp->pp.numb++;
+		spp->pp.counts[ASP_DOWN]++;	/* will not change state of SPP */
+
 		/* link to XP */
 		if ((pp->xp.next = xp->pp.list))
 			pp->xp.next->xp.prev = &pp->xp.next;
@@ -21776,6 +22196,28 @@ ua_alloc_pp(struct spp *spp, struct xp *xp)
 				}
 			}
 		}
+		switch (spp->type) {
+		case UA_OBJ_TYPE_ASP:
+			break;
+		case UA_OBJ_TYPE_SGP:
+		case UA_OBJ_TYPE_SPP:
+		{
+			static const char info[] = "Automatic ASP Up procedure.";
+			uint32_t aspid_val = spp->sp.sp->np.list->u.sp->aspid;
+			uint32_t *aspid = aspid_val ? &aspid_val : NULL;
+			int err;
+
+			spp->pp.counts[ASP_DOWN]--;
+			spp->pp.counts[ASP_WACK_ASPUP]++;
+			if (spp_get_state(spp) < ASP_WACK_ASPUP)
+				spp_set_state(spp, ASP_WACK_ASPUP);
+			/* Note, never propagates a state change */
+			pp_timer_start(pp, tack);
+
+			mp = ua_build_asps_aspup_req(NULL, xp->ppi, aspid, info, sizeof(info));
+			ua_send_optdata_req(xp->oq, mp, NULL);
+		}
+		}
 		return (pp);
 	}
       failed:
@@ -21790,37 +22232,6 @@ ua_alloc_pp(struct spp *spp, struct xp *xp)
  *  Transport provider allocation, deallocation and reference counting.
  */
 STATIC void
-ua_alloc_xp(struct xp *xp, int id, int type, struct spp *spp, struct sp *sp)
-{
-	xp->id = id;
-	xp->type = type;
-	if (spp) {
-		/* link to SPP: this is done when we know to which ASP or SGP the stream
-		   corresponds.  If the aspid of the corresponding SPP is zero, we will not require 
-		   an ASPID on ASPUP. If the aspid is non-zero, any provided ASPID must match the
-		   ASPID set. */
-		spp->xp.xp = xp_get(xp);
-		xp->spp.list = spp_get(spp);
-	}
-	if (sp) {
-		/* link to SP: this is done when we don't know the ASP or SGP to which the
-		   transport stream corresponds, and we will wait for the ASPUP with an ASPID to
-		   determine to which SGP the stream cooresponds. */
-		xp->sp = sp_get(sp);
-	}
-	switch (xp->type) {
-	case UA_OBJ_TYPE_XP_SCTP:
-	case UA_OBJ_TYPE_XP_TCP:
-	case UA_OBJ_TYPE_XP_SSCOP:
-		xp->o_prim = NULL;
-		xp->i_prim = &xp_r_prim;
-		break;
-	}
-	/* link is characterized, it can now be enabled */
-	enableok(xp->iq);
-	enableok(xp->oq);
-}
-STATIC void
 ua_free_xp(struct xp *xp)
 {
 
@@ -21829,6 +22240,7 @@ ua_free_xp(struct xp *xp)
 	spin_lock_ua(&xp->lock);
 	{
 		mblk_t *b_next, *bp;
+		struct pp *pp;
 
 		noenable(xp->iq);
 		noenable(xp->oq);
@@ -21849,11 +22261,9 @@ ua_free_xp(struct xp *xp)
 			xp->ex_reassem = NULL;
 		}
 		/* unlink from spp */
-		if (xp->spp.list) {
-			fixme(("Check deactivation of all AS\n"));
-			xp_put(xchg(&xp->spp.list->xp.xp, NULL));
-			spp_put(xchg(&xp->spp.list, NULL));
-		}
+		while ((pp = xp->pp.list))
+			ua_free_pp(pp);
+
 		/* unlink from sp */
 		if (xp->sp) {
 			sp_put(xchg(&xp->sp, NULL));
@@ -21887,6 +22297,107 @@ ua_free_xp(struct xp *xp)
 	}
 	spin_unlock_ua(&xp->lock);
 	xp_put(xp);		/* final put */
+}
+STATIC int
+ua_alloc_xp(struct xp *xp, int id, int type, struct spp *spp, struct sp *sp)
+{
+	if (spp) {
+		switch (type) {
+		case UA_OBJ_TYPE_XP_XSP:
+			if (spp->type != UA_OBJ_TYPE_ASP) {
+				swerr();
+				return (-EINVAL);
+			}
+			break;
+		case UA_OBJ_TYPE_XP_XGP:
+			if (spp->type != UA_OBJ_TYPE_SGP) {
+				swerr();
+				return (-EINVAL);
+			}
+			break;
+		case UA_OBJ_TYPE_XP_XPP:
+			if (spp->type != UA_OBJ_TYPE_SPP) {
+				swerr();
+				return (-EINVAL);
+			}
+			break;
+		}
+		/* link to SPP: this is done when we know to which ASP, SGP or SPP, the stream
+		   corresponds.  If the aspid of the corresponding SPP is zero, we will not require 
+		   an ASPID on ASPUP. If the aspid is non-zero, any provided ASPID must match the
+		   ASPID set.  Note that this will also automatically allocate RP structures for
+		   each GP structure belonging to the SPP. */
+		if (ua_alloc_pp(spp, xp) == NULL)
+			return (-ENOMEM);
+
+		/* For cross-links we also need to allocate PP structures representing ASP or SGP
+		   accessible via the peer.  That is, SGP for XSP, ASP for XGP or XSP. */
+		switch (type) {
+			struct np *np;
+
+		case UA_OBJ_TYPE_XP_XSP:
+			for (np = spp->sp.sp->np.list; np; np = np->u.next) {
+				struct spp *sgp;
+
+				for (sgp = np->p.sp->spp.list; sgp; sgp = sgp->sp.next) {
+					if (ua_alloc_pp(sgp, xp) == NULL) {
+						ua_free_xp(xp);
+						return (-ENOMEM);
+					}
+				}
+			}
+			break;
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
+			for (np = spp->sp.sp->np.list; np; np = np->p.next) {
+				struct ssp *asp;
+
+				for (asp = np->u.sp->spp.list; asp; asp = asp->sp.next) {
+					if (ua_alloc_pp(asp, xp) == NULL) {
+						ua_free_xp(xp);
+						return (-ENOMEM);
+					}
+				}
+			}
+			break;
+		}
+
+	} else if (sp) {
+		/* link to SP: this is done when we don't know the ASP, SGP or SPP to which the
+		   transport stream corresponds, and we will wait for the ASPUP with an ASPID to
+		   determine to which ASP the stream cooresponds.  This is also used for XGP
+		   connections to indicated the type but demand allocate cross-link structures. */
+		switch (type) {
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
+			swerr();
+			return (-EINVAL);
+		}
+		xp->sp = sp_get(sp);
+	} else {
+		swerr();
+		return (-EINVAL);
+	}
+	xp->id = id;
+	xp->type = type;
+	switch (type) {
+	case UA_OBJ_TYPE_XP_ASP:
+	case UA_OBJ_TYPE_XP_SGP:
+	case UA_OBJ_TYPE_XP_SPP:
+	case UA_OBJ_TYPE_XP_XSP:
+	case UA_OBJ_TYPE_XP_XGP:
+	case UA_OBJ_TYPE_XP_XPP:
+		xp->o_prim = NULL;
+		xp->i_prim = &xp_r_prim;
+		break;
+	}
+	/* link is characterized, it can now be enabled (and scheduled) */
+	enableok(xp->iq);
+	enableok(xp->oq);
+	qenable(xp->iq);
+	qenable(xp->oq);
+	return (0);
 }
 STATIC struct xp *
 xp_get(struct xp *xp)
@@ -21926,9 +22437,17 @@ xp_lookup(int id)
 	struct xp *xp;
 
 	for (xp = (struct xp *) master.link.list; xp; xp = xp->next) {
-		if (xp->type != UA_OBJ_TYPE_XP_SCTP && xp->type != UA_OBJ_TYPE_XP_TCP
-		    && xp->type != UA_OBJ_TYPE_XP_SSCOP)
+		switch (xp->type) {
+		case UA_OBJ_TYPE_XP_ASP:
+		case UA_OBJ_TYPE_XP_SGP:
+		case UA_OBJ_TYPE_XP_SPP:
+		case UA_OBJ_TYPE_XP_XSP:
+		case UA_OBJ_TYPE_XP_XGP:
+		case UA_OBJ_TYPE_XP_XPP:
+			break;
+		default:
 			continue;
+		}
 		if (xp->id != id)
 			continue;
 	}
@@ -21982,9 +22501,12 @@ ua_free_link(queue_t *q)
 	case UA_OBJ_TYPE_SS_U:
 	case UA_OBJ_TYPE_SS_P:
 		return ua_free_ss(&lk->ss);
-	case UA_OBJ_TYPE_XP_SCTP:
-	case UA_OBJ_TYPE_XP_TCP:
-	case UA_OBJ_TYPE_XP_SSCOP:
+	case UA_OBJ_TYPE_XP_ASP:
+	case UA_OBJ_TYPE_XP_SGP:
+	case UA_OBJ_TYPE_XP_SPP:
+	case UA_OBJ_TYPE_XP_XSP:
+	case UA_OBJ_TYPE_XP_XGP:
+	case UA_OBJ_TYPE_XP_XPP:
 		return ua_free_xp(&lk->xp.xp);
 	case 0:
 		break;
