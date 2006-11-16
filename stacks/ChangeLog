@@ -1,3 +1,10 @@
+2006-11-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/x400p-ss7/v400pfw.h: new file
+	* src/modules/x400p-ss7/v401p.c: new file
+	* src/modules/x400p-ss7/v401pfw.h: new file
+	  Added MX driver and firmware files for V400P and V401P cards.
+
 2006-11-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/x400p-ss7/sl_x400p.c: error in sdl rx found by inspection
