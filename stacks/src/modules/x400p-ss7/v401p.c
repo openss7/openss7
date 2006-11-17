@@ -342,9 +342,42 @@ STATIC fastcall int
 mx_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 }
+
+/**
+ * mx_attach_req: - process MX_ATTACH_REQ primitive
+ * @q: active queue (write queue)
+ * @mp: the primitive
+ */
 STATIC fastcall int
 mx_attach_req(queue_t *q, mblk_t *mp)
 {
+	struct MX_attach_req *p = (typeof(p)) mp->b_rptr;
+	uint32_t addr;
+	int card, span;
+	int err;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto protoshort;
+	if (p->mx_addr_length != sizeof(addr))
+		goto badaddr;
+	if (mp->b_wptr < mp->b_rptr + p->mx_addr_length + p->mx_addr_offset)
+		goto protoshort;
+	/* avoid alignment problems */
+	bcopy(mp->b_rptr, &addr, sizeof(addr));
+	/* address is simply 8-bit card number and 8-bit span number and 8-bit channel number
+	   (ignored) */
+	card = (addr >> 16) & 0x0ff;
+	span = (addr >> 8) & 0x0ff;
+
+	return (QR_DONE);
+      badaddr:
+	err = MXBADADDR;
+	goto error;
+      protoshort:
+	err = -EMSGSIZE;
+	goto error;
+      error:
+	return mx_error_reply(q, MX_ATTACH_REQ, err);
 }
 STATIC fastcall int
 mx_enable_req(queue_t *q, mblk_t *mp)
@@ -575,11 +608,82 @@ mx_rput(queue_t *q, mblk_t *mp)
 	return putq(q, mp);
 }
 
+/* Reserve no more than 32ms worth of blocks. */
+#define VP_RX_RESERVE_MIN (128/FASTBUF)
+#define VP_RX_RESERVE_MAX ((128/FASTBUF) << 5)
+
+/**
+ * mx_rx_resupply: - resupply buffers for the system to the reserve pool
+ *
+ * Keep this function out of the way because it should only run until the reserve is adequate or we
+ * have already encountered an overflow.  The reserve starts out at 128/FASTBUF blocks, enough for
+ * 1 RX ISR run for the span (1ms).  When the RX ISR cannot acquire a block from the pool, it marks
+ * an overflow.  When the read service procedure runs, it checks if the reserve is inadequate and
+ * doubles the reserve and tops up the reserve.  A hard maximum (32ms worth of blocks) is set on the
+ * reserve.  Each time that the TX ISR sucessfully recycles a message block and there have been no
+ * overflows, the reserve is dropped by one.
+ */
+STATIC noinline fastcall void
+mx_rx_resupply(struct vp_span *span)
+{
+	struct vp_rx *rx = &span->rx;
+	mblk_t *mp;
+	pl_t pl;
+
+	spin_lock_irqsave(&rx->lock, pl);
+	{
+		if (XCHG(&rx->overflows, 0) && (rx->reserve <<= 1) > VP_RX_RESERVE_MAX)
+			rx->reserve = VP_RX_RESERVE_MAX;
+		while (rx->avail < rx->reserve) {
+			spin_unlock_irqsave(&rx->lock, pl);
+			if (unlikely((mp = allocb(FASTBUF, BPRI_HI)) == NULL))
+				goto nobufs;
+			spin_lock_irqsave(&rx->lock, pl);
+			*rx->tail = mp;
+			rx->tail = &mp->b_cont;
+			rx->avail++;
+		}
+	}
+	spin_unlock_irqsave(&rx->lock, pl);
+      nobufs:
+	return;
+}
+
+/**
+ * mx_tx_recycle: - recycle buffers to the system from the free list
+ *
+ * When the TX has a message block that cannot be recycled, it adds it to the free list.  When the
+ * read service procedure runs, it frees all the blocks on this list.  Keep this function out of the
+ * way because it is usually the case that the TX block can be recycled to the RX.
+ */
+STATIC noinline fastcall void
+mx_tx_recycle(struct vp_span *span)
+{
+	stuct vp_tx *tx = &span->tx;
+	mblk_t *mp;
+	pl_t pl;
+
+	spin_lock_irqsave(&tx->lock, pl);
+	{
+		while ((mp = tx->head)) {
+			if ((tx->head = mp->b_cont) == NULL)
+				tx->tail = &tx->head;
+			spin_unlock_irqrestore(&tx->lock, pl);
+			freeb(mp);
+			spin_lock_irqsave(&tx->lock, pl);
+
+		}
+	}
+	spin_unlock_irqrestore(&tx->lock, pl);
+}
+
 /**
  * mx_rsrv: - read service procedure
  * @q: queue to service
  *
- * This is a simple flow controlled drainage procedure.
+ * This is a simple flow controlled drainage procedure.  A check is made at the end to ensure
+ * that there are sufficient blocks in the reserve buffer pool and that message block that could not
+ * be recycled are freed.
  */
 STATIC streamscall __hot_read int
 mx_rsrv(queue_t *q)
@@ -598,6 +702,16 @@ mx_rsrv(queue_t *q)
 			putbq(q, mp);
 			break;
 		} while (unlikely(!!(mp = getq(q))));
+	}
+	{
+		struct vp_span *span = MX_PRIV(q)->span;
+
+		/* If there are no buffers in the reserve pool, top it up. */
+		if (unlikely(span->rx.avail < span->rx.reserve))
+			mx_rx_resupply(span);
+		/* If there are buffers to free due to receive congestion, free them now. */
+		if (unlikely(!!span->tx.pool))
+			mx_tx_recycle(span);
 	}
 	return (0);
 }
@@ -849,7 +963,7 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	int span, b, board, device, devrev, hw_flags;
 	const char *name;
 	struct vp *vp;
-	
+
 	if (vp_card >= VP_MAX_CARDS) {
 		printd(("%s: ERROR: Too many cards.\n", DRV_NAME));
 		return (-ENXIO);
@@ -1008,7 +1122,9 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 
 	switch (vp->board) {
 		int word;
+#if 0
 		int ebuf;
+#endif
 
 	case V401PT:
 	case T400P:
@@ -1018,8 +1134,10 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		/* initialize channel values for T1 */
 		for (word = 0; word < 256; word++) {
 			vp->xll[word] = 0x7f7f7f7f;
+#if 0
 			for (ebuf = 0; ebuf < V400P_EBUFNO; ebuf++)
 				vp->wbuf[(ebuf << 8) + word] = 0x7f7f7f7f;
+#endif
 		}
 		break;
 	case V401PE:
@@ -1030,8 +1148,10 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		/* initialize channel values for E1 */
 		for (word = 0; word < 256; word++) {
 			vp->xll[word] = 0xffffffff;
+#if 0
 			for (ebuf = 0; ebuf < V400P_EBUFNO; ebuf++)
 				vp->wbuf[(ebuf << 8) + word] = 0xffffffff;
+#endif
 		}
 		break;
 	default:
@@ -1044,15 +1164,10 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 	vp->irq = dev->irq;
 	printd(("%s: acquired IRQ %ld for %s card\n", DRV_NAME, vp->irq, vp->brdname));
-#if 0
-	/* no, no, no.  Allocate span structures with the card structures to keep them cached
-	 * together.   Also, we should statically allocate an array of card structures for speed. */
-	/* allocate span structures */
-	for (span = 0; span < V400_SPANS; span++)
-		if (!vp_alloc_sp(vp, span))
-			goto error_remove;
-#endif
 	vp->plx[INTCSR] = PLX_INTENA;	/* enable interrupts */
+	/* I don't think that we need an atomic here.  I think that hardware probes are never done
+	   in parallel. */
+	vp_card++;
 	return (0);
       error_remove:
 	vp_remove(dev);
