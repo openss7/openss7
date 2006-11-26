@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/11/26 15:27:37 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/11/26 18:55:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 15:27:37 $ by $Author: brian $
+ Last Modified $Date: 2006/11/26 18:55:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/11/26 15:27:37 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/11/26 18:55:06 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/11/26 15:27:37 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/11/26 18:55:06 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -95,7 +95,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/11/26 15:27:37 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/11/26 18:55:06 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -231,6 +231,7 @@ struct log {
 	dev_t dev;			/* device number */
 	int traceids;			/* the number of trace ids in the trace block */
 	mblk_t *traceblk;		/* a message block containing trace ids */
+	queue_t **logq;			/* log for which we are a queue */
 };
 
 #define PROMOTE_SIZE		(sizeof(int))
@@ -391,13 +392,11 @@ log_wput(queue_t *q, mblk_t *mp)
 			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
-			err = -EFAULT;
-			if (!dp)
-				goto nak;
 			err = -ENXIO;
 			if (log_conq != NULL)
 				goto nak;
 			log_conq = RD(q);
+			log->logq = &log_conq;
 			goto ack;
 		case I_ERRLOG:
 			err = -EPERM;
@@ -406,13 +405,11 @@ log_wput(queue_t *q, mblk_t *mp)
 			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
-			err = -EFAULT;
-			if (!dp)
-				goto nak;
 			err = -ENXIO;
 			if (log_errq != NULL)
 				goto nak;
 			log_errq = RD(q);
+			log->logq = &log_errq;
 			goto ack;
 		case I_TRCLOG:
 			err = -EPERM;
@@ -432,10 +429,11 @@ log_wput(queue_t *q, mblk_t *mp)
 			    || (dp->b_wptr - dp->b_rptr) % sizeof(struct trace_ids) != 0)
 				goto nak;
 			err = -ENOSR;
-			if ((log->traceblk = dupb(dp)) == NULL)
+			if ((log->traceblk = copyb(dp)) == NULL)
 				goto nak;
 			log->traceids = (dp->b_wptr - dp->b_rptr) / sizeof(struct trace_ids);
 			log_trcq = RD(q);
+			log->logq = &log_trcq;
 			goto ack;
 		}
 		err = -EINVAL;
@@ -459,16 +457,16 @@ log_wput(queue_t *q, mblk_t *mp)
 		if (lp->flags & (SL_CONSOLE | SL_ERROR | SL_TRACE)) {
 			if (lp->flags & SL_CONSOLE)
 				log_deliver_msg(log_conq, lp->mid, lp->sid, lp->level, lp->flags,
-						atomic_add_return(1, &conlog_sequence), mp,
+						atomic_add_return(1, &conlog_sequence), mp->b_cont,
 						LOG_USER);
 			if (lp->flags & SL_ERROR)
 				log_deliver_msg(log_errq, lp->mid, lp->sid, lp->level, lp->flags,
-						atomic_add_return(1, &errlog_sequence), mp,
+						atomic_add_return(1, &errlog_sequence), mp->b_cont,
 						LOG_USER);
 			if (lp->flags & SL_TRACE
 			    && log_trace_filter(log_trcq, lp->mid, lp->sid, lp->level))
 				log_deliver_msg(log_trcq, lp->mid, lp->sid, lp->level, lp->flags,
-						atomic_add_return(1, &trclog_sequence), mp,
+						atomic_add_return(1, &trclog_sequence), mp->b_cont,
 						LOG_USER);
 		}
 		break;
@@ -574,6 +572,10 @@ log_close(queue_t *q, int oflag, cred_t *crp)
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	qprocsoff(q);
+	if (p->logq)
+		*p->logq = NULL;
+	if (p->traceblk)
+		freemsg(xchg(&p->traceblk, NULL));
 	spin_lock_str(&log_lock, flags);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;

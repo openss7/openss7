@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:39 $
+ @(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/11/26 18:55:07 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 15:27:39 $ by $Author: brian $
+ Last Modified $Date: 2006/11/26 18:55:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-log.c,v $
+ Revision 0.9.2.23  2006/11/26 18:55:07  brian
+ - testing of log driver: user submitted logs works fine
+
  Revision 0.9.2.22  2006/11/26 15:27:39  brian
  - testing and corrections to strlog capabilities
 
@@ -141,9 +144,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:39 $"
+#ident "@(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/11/26 18:55:07 $"
 
-static char const ident[] = "$RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:39 $";
+static char const ident[] = "$RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/11/26 18:55:07 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -445,7 +448,7 @@ start_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = signal_handler;
-//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
@@ -862,7 +865,19 @@ ioctl_string(int cmd, intptr_t arg)
 	case I_GRDOPT:
 		return ("I_GRDOPT");	/* 2.7 */
 	case I_STR:
+	{
+		struct strioctl *ic = (typeof(ic)) arg;
+
+		switch (ic->ic_cmd) {
+		case I_CONSLOG:
+			return ("I_CONSLOG");
+		case I_TRCLOG:
+			return ("I_TRCLOG");
+		case I_ERRLOG:
+			return ("I_ERRLOG");
+		}
 		return ("I_STR");	/* 2.8 */
+	}
 	case I_SETSIG:
 		return ("I_SETSIG");	/* 2.9 */
 	case I_GETSIG:
@@ -1822,7 +1837,7 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "M_DATA----------", data ? data->len : 0);
+			print_datcall(child, "M_DATA--------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
 				if (last_errno == EINTR || last_errno == ERESTART)
@@ -1842,7 +1857,7 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			fflush(stdout);
 		}
 		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "M_DATA----------", data ? data->len : 0);
+			print_datcall(child, "M_DATA--------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
 				if (last_errno == EINTR || last_errno == ERESTART)
@@ -2240,23 +2255,6 @@ end_tests(int index)
 	return (__RESULT_SUCCESS);
 }
 
-/*
- *  -------------------------------------------------------------------------
- *
- *  Preambles and postambles
- *
- *  -------------------------------------------------------------------------
- */
-
-int
-preamble_0(int child)
-{
-	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_RDWR) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	state++;
-	return __RESULT_SUCCESS;
-}
-
 static long old_test_duration = 0;
 
 static int
@@ -2295,18 +2293,9 @@ postamble_none(int child)
 }
 
 int
-preamble_0_1(int child)
+preamble_0(int child)
 {
-	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_RDONLY) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	state++;
-	return __RESULT_SUCCESS;
-}
-
-int
-preamble_0_2(int child)
-{
-	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_WRONLY) != __RESULT_SUCCESS)
+	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_RDWR) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -2319,6 +2308,85 @@ postamble_0(int child)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
+}
+
+int
+preamble_err(int child)
+{
+	struct strioctl ioc;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (getuid() != 0)
+		goto skipped;
+	ioc.ic_cmd = I_ERRLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = 0;
+	ioc.ic_dp = NULL;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
+}
+
+int
+preamble_trc(int child)
+{
+	struct strioctl ioc;
+	struct trace_ids tid[2];
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (getuid() != 0)
+		goto skipped;
+	tid[0].ti_mid = 2;
+	tid[0].ti_sid = 0;
+	tid[0].ti_level = 1;
+	tid[1].ti_mid = 1002;
+	tid[1].ti_sid = -1;
+	tid[1].ti_level = -1;
+	ioc.ic_cmd = I_TRCLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(tid);
+	ioc.ic_dp = (char *) tid;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
+}
+
+int
+preamble_con(int child)
+{
+	struct strioctl ioc;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (getuid() != 0)
+		goto skipped;
+	ioc.ic_cmd = I_CONSLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = 0;
+	ioc.ic_dp = NULL;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
 }
 
 /*
@@ -2336,6 +2404,7 @@ struct test_stream {
 };
 
 static const char sref_none[] = "(none)";
+static const char sref_log[] = "SVR 4.2/SPG/Magic/log(4)";
 
 /*
  *  Check test case guard timer.
@@ -2347,7 +2416,7 @@ static const char sref_none[] = "(none)";
 #define numb_case_0_1 "0.1"
 #define name_case_0_1 "Check test case guard timer."
 #define xtra_case_0_1 NULL
-#define sref_case_0_1 "(none)"
+#define sref_case_0_1 sref_none
 #define desc_case_0_1 "\
 Checks that the test case guard timer will fire and bring down the children."
 
@@ -2404,7 +2473,7 @@ struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
 #define numb_case_1_2 "1.2"
 #define name_case_1_2 "Open and close 3 Streams."
 #define xtra_case_1_2 NULL
-#define sref_case_1_2 sref_none
+#define sref_case_1_2 sref_log
 #define desc_case_1_2 "\
 Checks that three Streams can be opened and closed."
 
@@ -2422,6 +2491,773 @@ struct test_stream test_1_2 = { NULL, &test_case_1_2, NULL };
 #define test_case_1_2_stream_0 (&test_1_2)
 #define test_case_1_2_stream_1 (&test_1_2)
 #define test_case_1_2_stream_2 (&test_1_2)
+
+static const char test_group_2[] = "Open a Logger";
+
+/*
+ *  Open an error logger.
+ */
+#define tgrp_case_2_1 test_group_2
+#define sgrp_case_2_1 NULL
+#define numb_case_2_1 "2.1"
+#define name_case_2_1 "Open an error logger Stream."
+#define xtra_case_2_1 NULL
+#define sref_case_2_1 sref_log
+#define desc_case_2_1 "\
+Checks that a log Stream can be opened and made an Error logger Stream.\n\
+Note that root permission is required to open an error logger."
+
+int
+test_case_2_1(int child)
+{
+	struct strioctl ioc;
+
+	ioc.ic_cmd = I_ERRLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = 0;
+	ioc.ic_dp = NULL;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) != __RESULT_SUCCESS)
+		if (last_errno != EPERM || getuid() == 0)
+			goto failure;
+	if (getuid() != 0)
+		goto skipped;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
+}
+
+struct test_stream test_2_1 = { &preamble_0, &test_case_2_1, &postamble_0 };
+
+#define test_case_2_1_stream_0 (&test_2_1)
+#define test_case_2_1_stream_1 (NULL)
+#define test_case_2_1_stream_2 (NULL)
+
+/*
+ *  Open a trace logger.
+ */
+#define tgrp_case_2_2 test_group_2
+#define sgrp_case_2_2 NULL
+#define numb_case_2_2 "2.2"
+#define name_case_2_2 "Open an trace logger Stream."
+#define xtra_case_2_2 NULL
+#define sref_case_2_2 sref_log
+#define desc_case_2_2 "\
+Checks that a log Stream can be opened and made a Trace logger Stream.\n\
+Note that root permission is required to open a trace logger."
+
+int
+test_case_2_2(int child)
+{
+	struct strioctl ioc;
+	struct trace_ids tid[2];
+
+	tid[0].ti_mid = 2;
+	tid[0].ti_sid = 0;
+	tid[0].ti_level = 1;
+	tid[1].ti_mid = 1002;
+	tid[1].ti_sid = -1;
+	tid[1].ti_level = -1;
+	ioc.ic_cmd = I_TRCLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(tid);
+	ioc.ic_dp = (char *) tid;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) != __RESULT_SUCCESS)
+		if (last_errno != EPERM || getuid() == 0)
+			goto failure;
+	if (getuid() != 0)
+		goto skipped;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
+}
+
+struct test_stream test_2_2 = { &preamble_0, &test_case_2_2, &postamble_0 };
+
+#define test_case_2_2_stream_0 (&test_2_2)
+#define test_case_2_2_stream_1 (NULL)
+#define test_case_2_2_stream_2 (NULL)
+
+/*
+ *  Open a console logger.
+ */
+#define tgrp_case_2_3 test_group_2
+#define sgrp_case_2_3 NULL
+#define numb_case_2_3 "2.3"
+#define name_case_2_3 "Open a console logger Stream."
+#define xtra_case_2_3 NULL
+#define sref_case_2_3 sref_log
+#define desc_case_2_3 "\
+Checks that a log Stream can be opened and made a Console logger Stream.\n\
+Note that root permission is required to open a console logger."
+
+int
+test_case_2_3(int child)
+{
+	struct strioctl ioc;
+
+	ioc.ic_cmd = I_CONSLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = 0;
+	ioc.ic_dp = NULL;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) != __RESULT_SUCCESS)
+		if (last_errno != EPERM || getuid() == 0)
+			goto failure;
+	if (getuid() != 0)
+		goto skipped;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
+}
+
+struct test_stream test_2_3 = { &preamble_0, &test_case_2_3, &postamble_0 };
+
+#define test_case_2_3_stream_0 (&test_2_3)
+#define test_case_2_3_stream_1 (NULL)
+#define test_case_2_3_stream_2 (NULL)
+
+/*
+ *  Open a console, error and trace logger.
+ */
+#define tgrp_case_2_4 test_group_2
+#define sgrp_case_2_4 NULL
+#define numb_case_2_4 "2.4"
+#define name_case_2_4 "Open a console, error and trace logger Stream."
+#define xtra_case_2_4 NULL
+#define sref_case_2_4 sref_log
+#define desc_case_2_4 "\
+Checks that three log Stream can be opened and one made a Console logger,\n\
+another an Error logger, and the third a Trace logger.  Note that root\n\
+permission is required to create a logger."
+
+#define test_case_2_4_stream_0 (&test_2_1)
+#define test_case_2_4_stream_1 (&test_2_2)
+#define test_case_2_4_stream_2 (&test_2_3)
+
+/*
+ *  Open two error loggers.
+ */
+#define tgrp_case_2_5 test_group_2
+#define sgrp_case_2_5 NULL
+#define numb_case_2_5 "2.5"
+#define name_case_2_5 "Open two error logger Streams."
+#define xtra_case_2_5 NULL
+#define sref_case_2_5 sref_log
+#define desc_case_2_5 "\
+Checks that two error logger Streams cannot be formed.  Note that root\n\
+permission is required for this test."
+
+int
+test_case_2_5(int child)
+{
+	struct strioctl ioc;
+
+	ioc.ic_cmd = I_ERRLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = 0;
+	ioc.ic_dp = NULL;
+
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) == __RESULT_SUCCESS)
+		if (last_errno != EPERM || getuid() == 0)
+			if (last_errno != ENXIO)
+				goto failure;
+	state++;
+	if (getuid() != 0)
+		goto skipped;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
+}
+
+struct test_stream test_2_5_0 = { &preamble_0, &test_case_2_1, &postamble_0 };
+struct test_stream test_2_5_1 = { &preamble_0, &test_case_2_5, &postamble_0 };
+
+#define test_case_2_5_stream_0 (&test_2_5_0)
+#define test_case_2_5_stream_1 (&test_2_5_1)
+#define test_case_2_5_stream_2 (NULL)
+
+/*
+ *  Open two trace loggers.
+ */
+#define tgrp_case_2_6 test_group_2
+#define sgrp_case_2_6 NULL
+#define numb_case_2_6 "2.6"
+#define name_case_2_6 "Open two trace logger Streams."
+#define xtra_case_2_6 NULL
+#define sref_case_2_6 sref_log
+#define desc_case_2_6 "\
+Checks that two trace logger Streams cannot be formed.  Note that root\n\
+permission is required for this test."
+
+int
+test_case_2_6(int child)
+{
+	struct strioctl ioc;
+	struct trace_ids tid[2];
+
+	tid[0].ti_mid = 2;
+	tid[0].ti_sid = 0;
+	tid[0].ti_level = 1;
+	tid[1].ti_mid = 1002;
+	tid[1].ti_sid = -1;
+	tid[1].ti_level = -1;
+	ioc.ic_cmd = I_TRCLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = sizeof(tid);
+	ioc.ic_dp = (char *) tid;
+
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) == __RESULT_SUCCESS)
+		if (last_errno != EPERM || getuid() == 0)
+			if (last_errno != ENXIO)
+				goto failure;
+	state++;
+	if (getuid() != 0)
+		goto skipped;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
+}
+
+struct test_stream test_2_6_0 = { &preamble_0, &test_case_2_2, &postamble_0 };
+struct test_stream test_2_6_1 = { &preamble_0, &test_case_2_6, &postamble_0 };
+
+#define test_case_2_6_stream_0 (&test_2_6_0)
+#define test_case_2_6_stream_1 (&test_2_6_1)
+#define test_case_2_6_stream_2 (NULL)
+
+/*
+ *  Open two console loggers.
+ */
+#define tgrp_case_2_7 test_group_2
+#define sgrp_case_2_7 NULL
+#define numb_case_2_7 "2.7"
+#define name_case_2_7 "Open two console logger Streams."
+#define xtra_case_2_7 NULL
+#define sref_case_2_7 sref_log
+#define desc_case_2_7 "\
+Checks that two console logger Streams cannot be formed.  Note that root\n\
+permission is required for this test."
+
+int
+test_case_2_7(int child)
+{
+	struct strioctl ioc;
+
+	ioc.ic_cmd = I_CONSLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = 0;
+	ioc.ic_dp = NULL;
+
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (test_ioctl(child, I_STR, (intptr_t) &ioc) == __RESULT_SUCCESS)
+		if (last_errno != EPERM || getuid() == 0)
+			if (last_errno != ENXIO)
+				goto failure;
+	state++;
+	if (getuid() != 0)
+		goto skipped;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+      skipped:
+	return __RESULT_SKIPPED;
+}
+
+struct test_stream test_2_7_0 = { &preamble_0, &test_case_2_3, &postamble_0 };
+struct test_stream test_2_7_1 = { &preamble_0, &test_case_2_7, &postamble_0 };
+
+#define test_case_2_7_stream_0 (&test_2_7_0)
+#define test_case_2_7_stream_1 (&test_2_7_1)
+#define test_case_2_7_stream_2 (NULL)
+
+static const char test_group_3[] = "Writing logs";
+
+/*
+ *  Open a stream and write a trace log.
+ */
+#define tgrp_case_3_1 test_group_3
+#define sgrp_case_3_1 NULL
+#define numb_case_3_1 "3.1"
+#define name_case_3_1 "Write a trace log."
+#define xtra_case_3_1 "No trace loggers active."
+#define sref_case_3_1 sref_log
+#define desc_case_3_1 "\
+Checks that a trace log can be written to a logger stream without\n\
+a trace logger listening."
+
+int
+test_case_3_1(int child)
+{
+	struct strbuf ctl, dat;
+	struct log_ctl lc = { 0, };
+	char message[] = "Honey, I'm home.";
+
+	ctl.len = ctl.maxlen = sizeof(lc);
+	ctl.buf = (char *) &lc;
+	dat.len = dat.maxlen = strlen(message)+1;
+	dat.buf = message;
+	lc.mid = 2;
+	lc.sid = 0;
+	lc.level = 1;
+	lc.flags = SL_TRACE;
+
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+struct test_stream test_3_1 = { &preamble_0, &test_case_3_1, &postamble_0 };
+
+#define test_case_3_1_stream_0 (&test_3_1)
+#define test_case_3_1_stream_1 (NULL)
+#define test_case_3_1_stream_2 (NULL)
+
+/*
+ *  Open a stream and write an error log.
+ */
+#define tgrp_case_3_2 test_group_3
+#define sgrp_case_3_2 NULL
+#define numb_case_3_2 "3.2"
+#define name_case_3_2 "Write an error log."
+#define xtra_case_3_2 "No error loggers active."
+#define sref_case_3_2 sref_log
+#define desc_case_3_2 "\
+Checks that an error log can be written to a logger stream without\n\
+an error logger listening."
+
+int
+test_case_3_2(int child)
+{
+	struct strbuf ctl, dat;
+	struct log_ctl lc = { 0, };
+	char message[] = "Honey, I'm home.";
+
+	ctl.len = ctl.maxlen = sizeof(lc);
+	ctl.buf = (char *) &lc;
+	dat.len = dat.maxlen = strlen(message)+1;
+	dat.buf = message;
+	lc.mid = 2;
+	lc.sid = 0;
+	lc.level = 1;
+	lc.flags = SL_ERROR;
+
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+struct test_stream test_3_2 = { &preamble_0, &test_case_3_2, &postamble_0 };
+
+#define test_case_3_2_stream_0 (&test_3_2)
+#define test_case_3_2_stream_1 (NULL)
+#define test_case_3_2_stream_2 (NULL)
+
+/*
+ *  Open a stream and write a console log.
+ */
+#define tgrp_case_3_3 test_group_3
+#define sgrp_case_3_3 NULL
+#define numb_case_3_3 "3.3"
+#define name_case_3_3 "Write a console log."
+#define xtra_case_3_3 "No console loggers active."
+#define sref_case_3_3 sref_log
+#define desc_case_3_3 "\
+Checks that a console log can be written to a logger stream without\n\
+a console logger listening."
+
+int
+test_case_3_3(int child)
+{
+	struct strbuf ctl, dat;
+	struct log_ctl lc = { 0, };
+	char message[] = "Honey, I'm home.";
+
+	ctl.len = ctl.maxlen = sizeof(lc);
+	ctl.buf = (char *) &lc;
+	dat.len = dat.maxlen = strlen(message)+1;
+	dat.buf = message;
+	lc.mid = 2;
+	lc.sid = 0;
+	lc.level = 1;
+	lc.flags = SL_CONSOLE;
+
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+struct test_stream test_3_3 = { &preamble_0, &test_case_3_3, &postamble_0 };
+
+#define test_case_3_3_stream_0 (&test_3_3)
+#define test_case_3_3_stream_1 (NULL)
+#define test_case_3_3_stream_2 (NULL)
+
+/*
+ *  Open a stream and write a trace log.
+ */
+#define tgrp_case_3_4 test_group_3
+#define sgrp_case_3_4 NULL
+#define numb_case_3_4 "3.4"
+#define name_case_3_4 "Write a trace log."
+#define xtra_case_3_4 "No trace loggers active."
+#define sref_case_3_4 sref_log
+#define desc_case_3_4 "\
+Checks that a trace log can be written to a logger stream without\n\
+a trace logger listening, but with an error logger."
+
+struct test_stream test_3_4_0 = { &preamble_0, &test_case_3_1, &postamble_0 };
+struct test_stream test_3_4_1 = { &preamble_0, &test_case_2_1, &postamble_0 };
+
+#define test_case_3_4_stream_0 (&test_3_4_0)
+#define test_case_3_4_stream_1 (&test_3_4_1)
+#define test_case_3_4_stream_2 (NULL)
+
+/*
+ *  Open a stream and write a error log.
+ */
+#define tgrp_case_3_5 test_group_3
+#define sgrp_case_3_5 NULL
+#define numb_case_3_5 "3.5"
+#define name_case_3_5 "Write a error log."
+#define xtra_case_3_5 "No error loggers active."
+#define sref_case_3_5 sref_log
+#define desc_case_3_5 "\
+Checks that a error log can be written to a logger stream without\n\
+a error logger listening, but with an console logger."
+
+struct test_stream test_3_5_0 = { &preamble_0, &test_case_3_2, &postamble_0 };
+struct test_stream test_3_5_1 = { &preamble_0, &test_case_2_3, &postamble_0 };
+
+#define test_case_3_5_stream_0 (&test_3_5_0)
+#define test_case_3_5_stream_1 (&test_3_5_1)
+#define test_case_3_5_stream_2 (NULL)
+
+/*
+ *  Open a stream and write a console log.
+ */
+#define tgrp_case_3_6 test_group_3
+#define sgrp_case_3_6 NULL
+#define numb_case_3_6 "3.6"
+#define name_case_3_6 "Write a console log."
+#define xtra_case_3_6 "No console loggers active."
+#define sref_case_3_6 sref_log
+#define desc_case_3_6 "\
+Checks that a console log can be written to a logger stream without\n\
+a console logger listening, but with a trace logger."
+
+struct test_stream test_3_6_0 = { &preamble_0, &test_case_3_3, &postamble_0 };
+struct test_stream test_3_6_1 = { &preamble_0, &test_case_2_2, &postamble_0 };
+
+#define test_case_3_6_stream_0 (&test_3_6_0)
+#define test_case_3_6_stream_1 (&test_3_6_1)
+#define test_case_3_6_stream_2 (NULL)
+
+/*
+ *  Open a stream and write a trace log.
+ */
+#define tgrp_case_3_7 test_group_3
+#define sgrp_case_3_7 NULL
+#define numb_case_3_7 "3.7"
+#define name_case_3_7 "Write a trace log."
+#define xtra_case_3_7 "Trace logger active."
+#define sref_case_3_7 sref_log
+#define desc_case_3_7 "\
+Checks that a trace log can be written to a logger stream with\n\
+a trace logger listening."
+
+int
+test_case_3_7(int child)
+{
+	struct strbuf ctrl, data;
+	struct log_ctl lc;
+	char buf[256];
+	int flags = 0;
+
+	ctrl.len = ctrl.maxlen = 3 * sizeof(lc);
+	ctrl.buf = (char *)&lc;
+	data.len = data.maxlen = 256;
+	data.buf = (char *)buf;
+
+	if (test_block(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_getmsg(child, &ctrl, &data, &flags) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (ctrl.len != sizeof(lc))
+		fprintf(stderr, "Control size is %d, should be %d\n", ctrl.len, sizeof(lc));
+	state++;
+	if (data.len != 17)
+		fprintf(stderr, "Data size is %d, should be %d\n", data.len, 17);
+	state++;
+	pstrlog(stdout, &ctrl, &data);
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+struct test_stream test_3_7_0 = { &preamble_0, &test_case_3_1, &postamble_0 };
+struct test_stream test_3_7_1 = { &preamble_trc, &test_case_3_7, &postamble_0 };
+
+#define test_case_3_7_stream_0 (&test_3_7_0)
+#define test_case_3_7_stream_1 (&test_3_7_1)
+#define test_case_3_7_stream_2 (NULL)
+
+/*
+ *  Open a stream and write a error log.
+ */
+#define tgrp_case_3_8 test_group_3
+#define sgrp_case_3_8 NULL
+#define numb_case_3_8 "3.8"
+#define name_case_3_8 "Write a error log."
+#define xtra_case_3_8 "Error logger active."
+#define sref_case_3_8 sref_log
+#define desc_case_3_8 "\
+Checks that a error log can be written to a logger stream with\n\
+an error logger listening."
+
+int
+test_case_3_8(int child)
+{
+	struct strbuf ctrl, data;
+	struct log_ctl lc;
+	char buf[256];
+	int flags = 0;
+
+	ctrl.len = ctrl.maxlen = 3 * sizeof(lc);
+	ctrl.buf = (char *)&lc;
+	data.len = data.maxlen = 256;
+	data.buf = (char *)buf;
+
+	if (test_block(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_getmsg(child, &ctrl, &data, &flags) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (ctrl.len != sizeof(lc))
+		fprintf(stderr, "Control size is %d, should be %d\n", ctrl.len, sizeof(lc));
+	state++;
+	if (data.len != 17)
+		fprintf(stderr, "Data size is %d, should be %d\n", data.len, 17);
+	state++;
+	pstrlog(stdout, &ctrl, &data);
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+struct test_stream test_3_8_0 = { &preamble_0, &test_case_3_2, &postamble_0 };
+struct test_stream test_3_8_1 = { &preamble_err, &test_case_3_8, &postamble_0 };
+
+#define test_case_3_8_stream_0 (&test_3_8_0)
+#define test_case_3_8_stream_1 (&test_3_8_1)
+#define test_case_3_8_stream_2 (NULL)
+
+/*
+ *  Open a stream and write a console log.
+ */
+#define tgrp_case_3_9 test_group_3
+#define sgrp_case_3_9 NULL
+#define numb_case_3_9 "3.9"
+#define name_case_3_9 "Write a console log."
+#define xtra_case_3_9 "Console logger active."
+#define sref_case_3_9 sref_log
+#define desc_case_3_9 "\
+Checks that a console log can be written to a logger stream with\n\
+a console logger listening."
+
+int
+test_case_3_9(int child)
+{
+	struct strbuf ctrl, data;
+	struct log_ctl lc;
+	char buf[256];
+	int flags = 0;
+
+	ctrl.len = ctrl.maxlen = 3 * sizeof(lc);
+	ctrl.buf = (char *)&lc;
+	data.len = data.maxlen = 256;
+	data.buf = (char *)buf;
+
+	if (test_block(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_getmsg(child, &ctrl, &data, &flags) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (ctrl.len != sizeof(lc))
+		fprintf(stderr, "Control size is %d, should be %d\n", ctrl.len, sizeof(lc));
+	state++;
+	if (data.len != 17)
+		fprintf(stderr, "Data size is %d, should be %d\n", data.len, 17);
+	state++;
+	pstrlog(stdout, &ctrl, &data);
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+struct test_stream test_3_9_0 = { &preamble_0, &test_case_3_3, &postamble_0 };
+struct test_stream test_3_9_1 = { &preamble_con, &test_case_3_9, &postamble_0 };
+
+#define test_case_3_9_stream_0 (&test_3_9_0)
+#define test_case_3_9_stream_1 (&test_3_9_1)
+#define test_case_3_9_stream_2 (NULL)
+
+static const char test_group_4[] = "Write full logs.";
+
+#define tgrp_case_4_1 test_group_4
+#define sgrp_case_4_1 NULL
+#define numb_case_4_1 "4.1"
+#define name_case_4_1 "Write a full console log."
+#define xtra_case_4_1 "Console logger active."
+#define sref_case_4_1 sref_log
+#define desc_case_4_1 "\
+Checks that a console log can be written to a logger stream with\n\
+a console logger listening and printed correctly."
+
+int
+test_case_4_x_0(int child, int flag, const char *numb, int line)
+{
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	if (strlog(2, 0, 1, flag, "This is test case %s at line number %d.", numb, line) == -1)
+		goto failure;
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+int
+test_case_4_1_0(int child)
+{
+	return test_case_4_x_0(child, SL_CONSOLE, numb_case_4_1, __LINE__);
+}
+
+int
+test_case_4_x_1(int child)
+{
+	struct strbuf ctrl, data;
+	struct log_ctl lc;
+	char buf[256];
+	int flags = 0;
+
+	ctrl.len = ctrl.maxlen = sizeof(lc);
+	ctrl.buf = (char *)&lc;
+	data.len = data.maxlen = 256;
+	data.buf = (char *)buf;
+
+	if (test_block(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_getmsg(child, &ctrl, &data, &flags) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (ctrl.len != sizeof(lc))
+		fprintf(stderr, "Control size is %d, should be %d\n", ctrl.len, sizeof(lc));
+	state++;
+	pstrlog(stdout, &ctrl, &data);
+	state++;
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+struct test_stream test_4_1_0 = { &preamble_0, &test_case_4_1_0, &postamble_0 };
+struct test_stream test_4_1_1 = { &preamble_con, &test_case_4_x_1, &postamble_0 };
+
+#define test_case_4_1_stream_0 (&test_4_1_0)
+#define test_case_4_1_stream_1 (&test_4_1_1)
+#define test_case_4_1_stream_2 (NULL)
+
+#define tgrp_case_4_2 test_group_4
+#define sgrp_case_4_2 NULL
+#define numb_case_4_2 "4.2"
+#define name_case_4_2 "Write a full error log."
+#define xtra_case_4_2 "Console logger active."
+#define sref_case_4_2 sref_log
+#define desc_case_4_2 "\
+Checks that an error log can be written to a logger stream with\n\
+an error logger listening and printed correctly."
+
+int
+test_case_4_2_0(int child)
+{
+	return test_case_4_x_0(child, SL_ERROR, numb_case_4_2, __LINE__);
+}
+
+struct test_stream test_4_2_0 = { &preamble_0, &test_case_4_2_0, &postamble_0 };
+struct test_stream test_4_2_1 = { &preamble_err, &test_case_4_x_1, &postamble_0 };
+
+#define test_case_4_2_stream_0 (&test_4_2_0)
+#define test_case_4_2_stream_1 (&test_4_2_1)
+#define test_case_4_2_stream_2 (NULL)
+
+#define tgrp_case_4_3 test_group_4
+#define sgrp_case_4_3 NULL
+#define numb_case_4_3 "4.3"
+#define name_case_4_3 "Write a full trace log."
+#define xtra_case_4_3 "Console logger active."
+#define sref_case_4_3 sref_log
+#define desc_case_4_3 "\
+Checks that a trace log can be written to a logger stream with\n\
+a trace logger listening and printed correctly."
+
+int
+test_case_4_3_0(int child)
+{
+	return test_case_4_x_0(child, SL_TRACE, numb_case_4_3, __LINE__);
+}
+
+struct test_stream test_4_3_0 = { &preamble_0, &test_case_4_3_0, &postamble_0 };
+struct test_stream test_4_3_1 = { &preamble_trc, &test_case_4_x_1, &postamble_0 };
+
+#define test_case_4_3_stream_0 (&test_4_3_0)
+#define test_case_4_3_stream_1 (&test_4_3_1)
+#define test_case_4_3_stream_2 (NULL)
 
 /*
  *  -------------------------------------------------------------------------
@@ -2722,6 +3558,44 @@ struct test_case {
 	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_1_2, tgrp_case_1_2, sgrp_case_1_2, name_case_1_2, xtra_case_1_2, desc_case_1_2, sref_case_1_2, {
 	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_1, tgrp_case_2_1, sgrp_case_2_1, name_case_2_1, xtra_case_2_1, desc_case_2_1, sref_case_2_1, {
+	test_case_2_1_stream_0, test_case_2_1_stream_1, test_case_2_1_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_2, tgrp_case_2_2, sgrp_case_2_2, name_case_2_2, xtra_case_2_2, desc_case_2_2, sref_case_2_2, {
+	test_case_2_2_stream_0, test_case_2_2_stream_1, test_case_2_2_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_3, tgrp_case_2_3, sgrp_case_2_3, name_case_2_3, xtra_case_2_3, desc_case_2_3, sref_case_2_3, {
+	test_case_2_3_stream_0, test_case_2_3_stream_1, test_case_2_3_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_4, tgrp_case_2_4, sgrp_case_2_4, name_case_2_4, xtra_case_2_4, desc_case_2_4, sref_case_2_4, {
+	test_case_2_4_stream_0, test_case_2_4_stream_1, test_case_2_4_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_5, tgrp_case_2_5, sgrp_case_2_5, name_case_2_5, xtra_case_2_5, desc_case_2_5, sref_case_2_5, {
+	test_case_2_5_stream_0, test_case_2_5_stream_1, test_case_2_5_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_6, tgrp_case_2_6, sgrp_case_2_6, name_case_2_6, xtra_case_2_6, desc_case_2_6, sref_case_2_6, {
+	test_case_2_6_stream_0, test_case_2_6_stream_1, test_case_2_6_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_7, tgrp_case_2_7, sgrp_case_2_7, name_case_2_7, xtra_case_2_7, desc_case_2_7, sref_case_2_7, {
+	test_case_2_7_stream_0, test_case_2_7_stream_1, test_case_2_7_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, xtra_case_3_1, desc_case_3_1, sref_case_3_1, {
+	test_case_3_1_stream_0, test_case_3_1_stream_1, test_case_3_1_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_2, tgrp_case_3_2, sgrp_case_3_2, name_case_3_2, xtra_case_3_2, desc_case_3_2, sref_case_3_2, {
+	test_case_3_2_stream_0, test_case_3_2_stream_1, test_case_3_2_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_3, tgrp_case_3_3, sgrp_case_3_3, name_case_3_3, xtra_case_3_3, desc_case_3_3, sref_case_3_3, {
+	test_case_3_3_stream_0, test_case_3_3_stream_1, test_case_3_3_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_4, tgrp_case_3_4, sgrp_case_3_4, name_case_3_4, xtra_case_3_4, desc_case_3_4, sref_case_3_4, {
+	test_case_3_4_stream_0, test_case_3_4_stream_1, test_case_3_4_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_5, tgrp_case_3_5, sgrp_case_3_5, name_case_3_5, xtra_case_3_5, desc_case_3_5, sref_case_3_5, {
+	test_case_3_5_stream_0, test_case_3_5_stream_1, test_case_3_5_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_6, tgrp_case_3_6, sgrp_case_3_6, name_case_3_6, xtra_case_3_6, desc_case_3_6, sref_case_3_6, {
+	test_case_3_6_stream_0, test_case_3_6_stream_1, test_case_3_6_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_7, tgrp_case_3_7, sgrp_case_3_7, name_case_3_7, xtra_case_3_7, desc_case_3_7, sref_case_3_7, {
+	test_case_3_7_stream_0, test_case_3_7_stream_1, test_case_3_7_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_8, tgrp_case_3_8, sgrp_case_3_8, name_case_3_8, xtra_case_3_8, desc_case_3_8, sref_case_3_8, {
+	test_case_3_8_stream_0, test_case_3_8_stream_1, test_case_3_8_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_9, tgrp_case_3_9, sgrp_case_3_9, name_case_3_9, xtra_case_3_9, desc_case_3_9, sref_case_3_9, {
+	test_case_3_9_stream_0, test_case_3_9_stream_1, test_case_3_9_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_4_1, tgrp_case_4_1, sgrp_case_4_1, name_case_4_1, xtra_case_4_1, desc_case_4_1, sref_case_4_1, {
+	test_case_4_1_stream_0, test_case_4_1_stream_1, test_case_4_1_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_4_2, tgrp_case_4_2, sgrp_case_4_2, name_case_4_2, xtra_case_4_2, desc_case_4_2, sref_case_4_2, {
+	test_case_4_2_stream_0, test_case_4_2_stream_1, test_case_4_2_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_4_3, tgrp_case_4_3, sgrp_case_4_3, name_case_4_3, xtra_case_4_3, desc_case_4_3, sref_case_4_3, {
+	test_case_4_3_stream_0, test_case_4_3_stream_1, test_case_4_3_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
 	NULL,}
 };
 

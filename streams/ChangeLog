@@ -1,5 +1,9 @@
 2006-11-26  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/log.c: corrections from testing
+	* src/test/test-log.c: test suite executable for log driver
+	* tests/testsuite-log.at: auto test test suite for log driver
+
 	* acinclude.m4: added note about the dangers of bottom half suppression
 
 	* Makefile.am: added strlog files
