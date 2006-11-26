@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/10/27 23:19:34 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/11/26 15:27:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
+ Last Modified $Date: 2006/11/26 15:27:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/10/27 23:19:34 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/11/26 15:27:37 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/10/27 23:19:34 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/11/26 15:27:37 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -95,7 +95,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/10/27 23:19:34 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/11/26 15:27:37 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -647,6 +647,7 @@ log_alloc_data(char *fmt, va_list args)
 		bp->b_datap->db_type = M_DATA;
 		bp->b_wptr = bp->b_rptr;
 		va_copy(args2, args);
+		/* two passes, one for sizing the next for argument list preparation */
 		for (; *fmt; ++fmt, bp->b_wptr++) {
 			if ((*bp->b_wptr = *fmt) != '%')
 				continue;
@@ -654,13 +655,9 @@ log_alloc_data(char *fmt, va_list args)
 			for (++fmt, bp->b_wptr++;; ++fmt, bp->b_wptr++) {
 				switch ((*bp->b_wptr = *fmt)) {
 				case '-':
-					continue;
 				case '+':
-					continue;
 				case ' ':
-					continue;
 				case '#':
-					continue;
 				case '0':
 					continue;
 				default:
@@ -700,7 +697,6 @@ log_alloc_data(char *fmt, va_list args)
 					++fmt;
 					bp->b_wptr++;
 					alen += PROMOTE_SIZEOF(int);
-
 					(void) va_arg(args2, int);
 
 					if (++nargs == NLOGARGS)
@@ -758,11 +754,6 @@ log_alloc_data(char *fmt, va_list args)
 					break;
 				}
 				switch (type) {
-				case 'c':
-					alen += PROMOTE_SIZEOF(char);
-					(void) va_arg(args2, int);
-
-					break;
 				case 'p':
 					alen += PROMOTE_SIZEOF(void *);
 					(void) va_arg(args2, void *);
@@ -794,6 +785,11 @@ log_alloc_data(char *fmt, va_list args)
 					(void) va_arg(args2, int);
 
 					break;
+				case 'c':
+					alen += PROMOTE_SIZEOF(char);
+					(void) va_arg(args2, int);
+
+					break;
 				case 'i':
 				default:
 					alen += PROMOTE_SIZEOF(int);
@@ -806,11 +802,11 @@ log_alloc_data(char *fmt, va_list args)
 				continue;
 			case 's':
 			{
-				char *s = va_arg(args, char *);
-				size_t len = strnlen(s, LOGMSGSZ);
-				size_t plen = PROMOTE_ALIGN(len + 1);
+				char *s = va_arg(args2, char *);
+				size_t slen = strnlen(s, LOGMSGSZ);
+				size_t splen = PROMOTE_ALIGN(slen + 1);
 
-				alen += plen;
+				alen += splen;
 				if (++nargs == NLOGARGS)
 					break;
 				continue;
@@ -821,6 +817,7 @@ log_alloc_data(char *fmt, va_list args)
 			}
 			break;
 		}
+		*bp->b_wptr++ = '\0'; /* terminate format string */
 		va_end(args2);
 		/* pass through once more with arguments */
 		if ((dp = allocb(alen, BPRI_MED))) {
@@ -832,13 +829,9 @@ log_alloc_data(char *fmt, va_list args)
 				for (++fmt;; ++fmt) {
 					switch (*fmt) {
 					case '-':
-						continue;
 					case '+':
-						continue;
 					case ' ':
-						continue;
 					case '#':
-						continue;
 					case '0':
 						continue;
 					default:
@@ -947,12 +940,12 @@ log_alloc_data(char *fmt, va_list args)
 						dp->b_wptr += PROMOTE_SIZEOF(ptrdiff_t);
 						break;
 					case 'h':
-						*(short *) dp->b_wptr = va_arg(args, int);
+						*(int *) dp->b_wptr = va_arg(args, int);
 						dp->b_wptr += PROMOTE_SIZEOF(short);
 
 						break;
 					case 'c':
-						*(short *) dp->b_wptr = va_arg(args, int);
+						*(int *) dp->b_wptr = va_arg(args, int);
 						dp->b_wptr += PROMOTE_SIZEOF(short);
 
 						break;
@@ -968,12 +961,12 @@ log_alloc_data(char *fmt, va_list args)
 				case 's':
 				{
 					char *s = va_arg(args, char *);
-					size_t len = strnlen(s, LOGMSGSZ);
-					size_t plen = PROMOTE_ALIGN(len + 1);
+					size_t slen = strnlen(s, LOGMSGSZ);
+					size_t splen = PROMOTE_ALIGN(slen + 1);
 
-					strncpy(dp->b_wptr, s, len);
-					dp->b_wptr[len] = '\0';
-					dp->b_wptr += plen;
+					strncpy(dp->b_wptr, s, slen);
+					dp->b_wptr[slen] = '\0';
+					dp->b_wptr += splen;
 					if (!--nargs)
 						break;
 					continue;

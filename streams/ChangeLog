@@ -1,3 +1,50 @@
+2006-11-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: added note about the dangers of bottom half suppression
+
+	* Makefile.am: added strlog files
+	* include/sys/streams/strlog.h: added declarations for library functions
+	* lib/libc/strlog.c: added strlog functions to STREAMS library
+	* lib32/Makefile.am: added strlog files
+
+	* src/test/testlog.c: minor user test program for checking strlog packing algorithm
+
+	* src/drivers/log.c: corrections from testing
+	* src/util/strace.c: corrections from testing
+	* src/util/strerr.c:corrections from testing
+	* src/util/strlog.c:corrections from testing
+
+	* src/test/test-clone.c: enhanced capabilities from m2pa tests
+	* src/test/test-connld.c: enhanced capabilities from m2pa tests
+	* src/test/test-echo.c: enhanced capabilities from m2pa tests
+	* src/test/test-fifo.c: enhanced capabilities from m2pa tests
+	* src/test/test-log.c: enhanced capabilities from m2pa tests
+	* src/test/test-loop.c: enhanced capabilities from m2pa tests
+	* src/test/test-mux.c: enhanced capabilities from m2pa tests
+	* src/test/test-nsdev.c: enhanced capabilities from m2pa tests
+	* src/test/test-nuls.c: enhanced capabilities from m2pa tests
+	* src/test/test-pipe.c: enhanced capabilities from m2pa tests
+	* src/test/test-pipemod.c: enhanced capabilities from m2pa tests
+	* src/test/test-sad.c: enhanced capabilities from m2pa tests
+	* src/test/test-sc.c: enhanced capabilities from m2pa tests
+	* src/test/test-streams.c: enhanced capabilities from m2pa tests
+
+	* tests/kernel.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-clone.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-connld.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-echo.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-fifo.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-log.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-loop.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-mux.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-nsdev.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-nuls.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-pipe.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-pipemod.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-sad.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-sc.at: enhanced capabilities from m2pa tests
+	* tests/testsuite-streams.at: enhanced capabilities from m2pa tests
+
 2006-11-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/msgpullup.9.man: doc update

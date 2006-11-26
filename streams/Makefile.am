@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2006/10/03 13:52:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/11/26 15:27:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:52:02 $ by $Author: brian $
+# Last Modified $Date: 2006/11/26 15:27:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.142  2006/11/26 15:27:32  brian
+# - testing and corrections to strlog capabilities
+#
 # Revision 0.9.2.141  2006/10/03 13:52:02  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -180,7 +183,7 @@ dist_sbin_SCRIPTS		+= \
 				  src/util/strsetup
 endif
 
-pkglibexec_PROGRAMS		=
+pkglibexec_PROGRAMS		= testlog
 if CONFIG_STREAMS_STH
 pkglibexec_PROGRAMS		+= test-streams
 endif
@@ -572,6 +575,7 @@ libstreams_la_SOURCES		= \
 				lib/libc/pipe.c \
 				lib/libc/fattach.c \
 				lib/libc/fdetach.c \
+				lib/libc/strlog.c \
 				lib/libc/streams.h
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
@@ -593,6 +597,7 @@ libLiS_la_SOURCES		= \
 				lib/libc/pipe.c \
 				lib/libc/fattach.c \
 				lib/libc/fdetach.c \
+				lib/libc/strlog.c \
 				lib/libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
@@ -613,6 +618,7 @@ libpLiS_la_SOURCES		= \
 				lib/libc/isastream.c \
 				lib/libc/fattach.c \
 				lib/libc/fdetach.c \
+				lib/libc/strlog.c \
 				lib/libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libpLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION
@@ -852,6 +858,12 @@ test_streams_LDFLAGS		=
 test_streams_LDADD		= libstreams.la
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS)
+
+testlog_SOURCES			= src/test/testlog.c
+testlog_LDFLAGS			=
+testlog_LDADD			= libstreams.la
+testlog_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+testlog_CFLAGS			= $(LFS_CFLAGS)
 
 ## PKG_BUILD_ARCH
 endif

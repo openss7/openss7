@@ -1,8 +1,8 @@
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin fo+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.128 $) $Date: 2006/10/30 06:40:08 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/11/26 15:27:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/30 06:40:08 $ by $Author: brian $
+# Last Modified $Date: 2006/11/26 15:27:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.129  2006/11/26 15:27:32  brian
+# - testing and corrections to strlog capabilities
+#
 # Revision 0.9.2.128  2006/10/30 06:40:08  brian
 # - changes to handle missing linux/compile.h on SuSE
 #
@@ -265,6 +268,15 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
 # =============================================================================
 # _LFS_SETUP_IRQ
 # -----------------------------------------------------------------------------
+# A note about this feature:  bottom half suppression is more expensive than
+# interrupt suppression for the following reason: when bottom half suppression
+# is released, pending bottom half processes are run causing cache pollution.
+# When interrupts are released, no other process is run, avoiding memory cache
+# pollution.  For performance, memory cache pollution is more important than
+# the cycle cost if interrupt suppression.  Therefore, this feature is only
+# (marginally) useful when doing interrupt based profiling one wishes sample
+# data during the interrupt suppression period to be available.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_IRQ], [dnl
     AC_ARG_ENABLE([streams-irq],
 	AS_HELP_STRING([--disable-streams-irq],
@@ -281,7 +293,7 @@ AC_DEFUN([_LFS_SETUP_IRQ], [dnl
 	    lock protection.  When defined a driver's put() procedure must not
 	    be called from an ISR and must only be called from bottom half or
 	    tasklets.  Bottom half locking is more expensive: don't enable
-	    this.])
+	    this except for interrupt based profiling.])
 	    ;;
     esac
     AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${lfs_streams_irq:-yes} = :no])
@@ -1644,5 +1656,5 @@ AC_DEFUN([_LFS_], [dnl
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin fo+=tcqlor
 # =============================================================================

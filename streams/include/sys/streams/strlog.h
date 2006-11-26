@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.19 2006/09/18 13:52:41 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.20 2006/11/26 15:27:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:41 $ by $Author: brian $
+ Last Modified $Date: 2006/11/26 15:27:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.h,v $
+ Revision 0.9.2.20  2006/11/26 15:27:34  brian
+ - testing and corrections to strlog capabilities
+
  Revision 0.9.2.19  2006/09/18 13:52:41  brian
  - added doxygen markers to sources
 
@@ -63,7 +66,7 @@
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -83,7 +86,7 @@
 #define SL_NOPUTBUF 0x0080	/* uw7 compatibility */
 
 #define LOGMSGSZ    1024	/* max format string length */
-#define NLOGARGS    3		/* max number of arguments (really unlimited) */
+#define NLOGARGS    10		/* max number of arguments (really unlimited) */
 
 #define LOGCTL		(('L')<<8)
 #define I_ERRLOG	(LOGCTL | 1)	/* error logger */
@@ -115,6 +118,15 @@ __STREAMS_EXTERN int vstrlog(short mid, short sid, char level, unsigned short fl
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
 __STREAMS_EXTERN vstrlog_t register_strlog(vstrlog_t newlog);
+
+#else				/* __KERNEL__ */
+
+#include <stdio.h>
+
+extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
+    __attribute__ ((__format__(__printf__, 5, 6)));
+extern int vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args);
+extern int pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data);
 
 #endif				/* __KERNEL__ */
 

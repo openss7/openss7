@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/29 11:50:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/26 15:27:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:25 $ by $Author: brian $
+# Last Modified $Date: 2006/11/26 15:27:36 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/11/26 15:27:36  brian
+# - testing and corrections to strlog capabilities
+#
 # Revision 0.9.2.4  2006/09/29 11:50:25  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -85,6 +88,14 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 MACHINE_FLAGS			= -m32
+
+pkglibexec32_PROGRAMS		+= testlog
+
+testlog_SOURCES			= $(top_srcdir)/src/test/testlog.c
+testlog_LDFLAGS			= $(MACHINE_FLAGS)
+testlog_LDADD			= libstreams.la
+testlog_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+testlog_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_STH
 pkglibexec32_PROGRAMS		+= test-streams
@@ -279,6 +290,7 @@ libstreams_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/pipe.c \
 				  $(top_srcdir)/lib/libc/fattach.c \
 				  $(top_srcdir)/lib/libc/fdetach.c \
+				  $(top_srcdir)/lib/libc/strlog.c \
 				  $(top_srcdir)/lib/libc/streams.h
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \
@@ -298,6 +310,7 @@ libLiS_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/pipe.c \
 				  $(top_srcdir)/lib/libc/fattach.c \
 				  $(top_srcdir)/lib/libc/fdetach.c \
+				  $(top_srcdir)/lib/libc/strlog.c \
 				  $(top_srcdir)/lib/libc/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \
@@ -316,6 +329,7 @@ libpLiS_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 				  $(top_srcdir)/lib/libc/isastream.c \
 				  $(top_srcdir)/lib/libc/fattach.c \
 				  $(top_srcdir)/lib/libc/fdetach.c \
+				  $(top_srcdir)/lib/libc/strlog.c \
 				  $(top_srcdir)/lib/libc/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libpLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \

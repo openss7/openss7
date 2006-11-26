@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-sc.at,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/30 06:50:26 $
+dnl @(#) $RCSfile: testsuite-sc.at,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/11/26 15:27:46 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/10/30 06:50:26 $ by $Author: brian $
+dnl Last Modified $Date: 2006/11/26 15:27:46 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-sc.at,v $
+dnl Revision 0.9.2.14  2006/11/26 15:27:46  brian
+dnl - testing and corrections to strlog capabilities
+dnl
 dnl Revision 0.9.2.13  2006/10/30 06:50:26  brian
 dnl - added ability to sync between test cases
 dnl
@@ -118,17 +121,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_sc() {
-    if test $at_verbose = echo
-    then
-	options='-vvvvv'
-    else
-	if test $at_arg_given_quiet != false
-	then
-	    options='-q'
-	else
-	    options='-vvv'
-	fi
-    fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
+    if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
     if test-sc $options -e -o $1
     then
@@ -149,11 +145,21 @@ function test_sc() {
 	return $?
     fi
 }
+function test_sc_root() {
+    if test `id -u` -ne 0 ; then return 77 ; fi
+    test_sc $1
+    return $?
+}
 m4_divert_pop([DEFAULTS])
 
 AT_TESTED([test-sc])
 
 AT_BANNER([SC Test])
+
+AT_SETUP([sc test 0.1])
+AT_KEYWORDS([sc])
+AT_CHECK([test_sc 0.1], [], [ignore], [], [], [])
+AT_CLEANUP
 
 AT_SETUP([sc test 1.1])
 AT_KEYWORDS([sc])

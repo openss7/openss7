@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:23:59 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:23:59 $ by $Author: brian $
+ Last Modified $Date: 2006/11/26 15:27:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strerr.c,v $
+ Revision 0.9.2.22  2006/11/26 15:27:45  brian
+ - testing and corrections to strlog capabilities
+
  Revision 0.9.2.21  2006/03/10 07:23:59  brian
  - rationalized streams and strutil package sources
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:23:59 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:45 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:23:59 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:45 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -138,27 +141,27 @@ static const char *logdevices[] = {
 #define PROMOTE_ALIGN(__x)	(((__x) + PROMOTE_SIZE - 1) & ~(PROMOTE_SIZE - 1))
 #define PROMOTE_SIZEOF(__x)	((sizeof(__x) < PROMOTE_SIZE) ? PROMOTE_SIZE : sizeof(__x))
 #define PROMOTE_ARGVAL(__type,__ptr) \
-				(long long)({  \
-					long long val; \
-					if (sizeof(__type) < PROMOTE_SIZEOF(__type)) { \
-						val = (long long)*((PROMOTE_TYPE *)(__ptr)); \
-						__ptr = (typeof(__ptr))((char *)__ptr + PROMOTE_SIZE); \
-					} else { \
-						val = (long long)*((__type *)(__ptr)); \
-						__ptr = (typeof(__ptr))((char *)__ptr + sizeof(__type)); \
-					} \
-					val; \
-				})
+	(long long)({ \
+		long long val; \
+		if (sizeof(__type) < PROMOTE_SIZEOF(__type)) { \
+			val = (long long)*((PROMOTE_TYPE *)(__ptr)); \
+			__ptr = (typeof(__ptr))((char *)__ptr + PROMOTE_SIZE); \
+		} else { \
+			val = (long long)*((__type *)(__ptr)); \
+			__ptr = (typeof(__ptr))((char *)__ptr + sizeof(__type)); \
+		} \
+		val; \
+	})
 
 /*
- *  This function prints a formatted number to a file pointer.  It is largely
+ *  This function prints a formatted number to a buffer.  It is largely
  *  taken from /usr/src/linux/lib/vsprintf.c
  */
 static int
 number(char *sbuf, const char *end, long long num, int base, int width, int decimal, int flags)
 {
 	char sign;
-	int i;
+	int i, iszero = (num == 0);
 	char *str;
 	char tmp[66];
 
@@ -182,13 +185,15 @@ number(char *sbuf, const char *end, long long num, int base, int width, int deci
 		}
 	}
 	if (flags & FLAG_SPECIAL) {
-		switch (base) {
-		case 16:
-			width -= 2;	/* for 0x */
-			break;
-		case 8:
-			width--;	/* for 0 */
-			break;
+		if (!iszero) {
+			switch (base) {
+			case 16:
+				width -= 2;	/* for 0x */
+				break;
+			case 8:
+				width--;	/* for 0 */
+				break;
+			}
 		}
 	}
 	i = 0;
@@ -208,10 +213,12 @@ number(char *sbuf, const char *end, long long num, int base, int width, int deci
 		decimal = i;
 	width -= decimal;
 	if (!(flags & (FLAG_ZEROPAD | FLAG_LEFT)))
-		while (width-- > 0) {
-			*str = ' ';
-			if (++str >= end)
-				goto done;
+		if (width > 0) {
+			while (width-- > 0) {
+				*str = ' ';
+				if (++str >= end)
+					goto done;
+			}
 		}
 	if (sign != '\0') {
 		*str = sign;
@@ -219,48 +226,58 @@ number(char *sbuf, const char *end, long long num, int base, int width, int deci
 			goto done;
 	}
 	if (flags & FLAG_SPECIAL) {
-		switch (base) {
-		case 8:
-			*str = '0';
-			if (++str >= end)
-				goto done;
-			break;
-		case 16:
-			*str = '0';
-			if (++str >= end)
-				goto done;
-			if (flags & FLAG_LARGE)
-				*str = 'X';
-			else
-				*str = 'x';
-			if (++str >= end)
-				goto done;
-			break;
+		if (!iszero) {
+			switch (base) {
+			case 8:
+				*str = '0';
+				if (++str >= end)
+					goto done;
+				break;
+			case 16:
+				*str = '0';
+				if (++str >= end)
+					goto done;
+				if (flags & FLAG_LARGE)
+					*str = 'X';
+				else
+					*str = 'x';
+				if (++str >= end)
+					goto done;
+				break;
+			}
 		}
 	}
 	if (!(flags & FLAG_LEFT)) {
 		char pad = (flags & FLAG_ZEROPAD) ? '0' : ' ';
 
-		while (width-- > 0) {
-			*str = pad;
+		if (width > 0) {
+			while (width-- > 0) {
+				*str = pad;
+				if (++str >= end)
+					goto done;
+			}
+		}
+	}
+	if (i < decimal) {
+		while (i < decimal--) {
+			*str = '0';
 			if (++str >= end)
 				goto done;
 		}
 	}
-	while (i < decimal--) {
-		*str = '0';
-		if (++str >= end)
-			goto done;
+	if (i > 0) {
+		while (i-- > 0) {
+			*str = tmp[i];
+			if (++str >= end)
+				goto done;
+		}
 	}
-	while (i-- > 0) {
-		*str = tmp[i];
-		if (++str >= end)
-			goto done;
-	}
-	while (width-- > 0) {
-		*str = ' ';
-		if (++str >= end)
-			goto done;
+	if (width > 0) {
+		while (width-- > 0) {
+			*str = ' ';
+			if (++str >= end)
+				goto done;
+		}
 	}
       done:
 	return (str - sbuf);
@@ -303,6 +320,10 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 				goto done;
 			continue;
 		}
+		flags = 0;
+		width = -1;
+		decimal = -1;
+		base = 10;
 		pos = fmt;	/* remember position of % */
 		/* process flags */
 		for (++fmt;; ++fmt) {
@@ -325,10 +346,11 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 			default:
 				break;
 			}
+			break;
 		}
 		/* get field width */
 		if (isdigit(*fmt))
-			for (width = 0; isdigit(*fmt); width *= 10, width += (*fmt - '0')) ;
+			for (width = 0; isdigit(*fmt); width *= 10, width += (*fmt++ - '0')) ;
 		else if (*fmt == '*') {
 			++fmt;
 			if (args + PROMOTE_SIZEOF(int) <= aend) {
@@ -391,10 +413,12 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 			char c = ' ';
 
 			if (!(flags & FLAG_LEFT))
-				while (--width > 0) {
-					*str = ' ';
-					if (++str >= end)
-						goto done;
+				if (width > 0) {
+					while (--width > 0) {
+						*str = ' ';
+						if (++str >= end)
+							goto done;
+					}
 				}
 			if (args + PROMOTE_SIZEOF(char) <= aend)
 				 c = PROMOTE_ARGVAL(char, args);
@@ -404,10 +428,12 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 			*str = c;
 			if (++str >= end)
 				goto done;
-			while (--width > 0) {
-				*str = ' ';
-				if (++str >= end)
-					goto done;
+			if (width > 0) {
+				while (--width > 0) {
+					*str = ' ';
+					if (++str >= end)
+						goto done;
+				}
 			}
 			continue;
 		}
@@ -415,35 +441,39 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 		{
 			const char *s;
 			int i;
-			size_t len = 0, plen = 0;
+			int slen = 0, splen = 0;
 
 			s = args;
 			if (args < aend) {
-				len = strlen(s);
-				plen = PROMOTE_ALIGN(len + 1);
+				slen = strlen(s);
+				splen = PROMOTE_ALIGN(slen + 1);
 			} else
 				args = aend;
-			if (args + plen <= aend)
-				args += plen;
+			if (args + splen <= aend)
+				args += splen;
 			else
 				args = aend;
-			if (len > (size_t) decimal)
-				len = (size_t) decimal;
+			if (slen > (size_t) decimal)
+				slen = (size_t) decimal;
 			if (!(flags & FLAG_LEFT))
-				while (len < width--) {
-					*str = ' ';
-					if (++str >= end)
-						goto done;
+				if (slen < width) {
+					while (slen < width--) {
+						*str = ' ';
+						if (++str >= end)
+							goto done;
+					}
 				}
-			for (i = 0; i < len; ++i, ++s) {
+			for (i = 0; i < slen; ++i, ++s) {
 				*str = *s;
 				if (++str >= end)
 					goto done;
 			}
-			while (len < width--) {
-				*str = ' ';
-				if (++str >= end)
-					goto done;
+			if (slen < width) {
+				while (slen < width--) {
+					*str = ' ';
+					if (++str >= end)
+						goto done;
+				}
 			}
 			continue;
 		}
@@ -466,6 +496,7 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 					width = 2 * sizeof(void *);
 					flags |= FLAG_ZEROPAD;
 				}
+				flags |= FLAG_SPECIAL;
 				base = 16;
 				break;
 			case 'o':
