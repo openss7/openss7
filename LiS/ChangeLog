@@ -1,3 +1,7 @@
+2006-11-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/sys/LiS/strlog.h: rationalize to Linux Fast-STREAMS
+
 2006-10-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/dki.h: do not define HZ for heavens sake

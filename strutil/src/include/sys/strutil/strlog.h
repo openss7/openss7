@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.13 2006/09/29 11:51:12 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.14 2006/11/26 19:10:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:12 $ by $Author: brian $
+ Last Modified $Date: 2006/11/26 19:10:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.h,v $
+ Revision 0.9.2.14  2006/11/26 19:10:10  brian
+ - rationalize to Linux Fast-STREAMS' working strlog driver
+
  Revision 0.9.2.13  2006/09/29 11:51:12  brian
  - libtool library tweaks in Makefile.am
  - better rpm spec handling in *.spec.in
@@ -63,7 +67,7 @@
 #ifndef __SYS_STRUTIL_STRLOG_H__
 #define __SYS_STRUTIL_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -80,10 +84,10 @@
 #define SL_FATAL    0x0010
 #define SL_WARN	    0x0020
 #define SL_NOTE	    0x0040
-#define SL_NOPUTBUF 0x0080	/* uw7 compatibility */
+#define SL_NOPUTBUF 0x0080	/* uw7 src compatibility (does nothing) */
 
 #define LOGMSGSZ    1024	/* max format string length */
-#define NLOGARGS    3		/* max number of arguments (really unlimited) */
+#define NLOGARGS    20		/* max number of arguments (really unlimited) */
 
 #define LOGCTL		(('L')<<8)
 #define I_ERRLOG	(LOGCTL | 1)	/* error logger */
@@ -115,6 +119,15 @@ __STREAMS_EXTERN int vstrlog(short mid, short sid, char level, unsigned short fl
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
 __STREAMS_EXTERN vstrlog_t register_strlog(vstrlog_t newlog);
+
+#else				/* __KERNEL__ */
+
+#include <stdio.h>
+
+extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
+    __attribute__ ((__format__(__printf__, 5, 6)));
+extern int vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args);
+extern int pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data);
 
 #endif				/* __KERNEL__ */
 

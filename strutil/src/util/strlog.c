@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/20 13:02:41 $
+ @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/26 19:10:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/20 13:02:41 $ by $Author: brian $
+ Last Modified $Date: 2006/11/26 19:10:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.c,v $
+ Revision 0.9.2.5  2006/11/26 19:10:11  brian
+ - rationalize to Linux Fast-STREAMS' working strlog driver
+
  Revision 0.9.2.4  2005/07/20 13:02:41  brian
  - updating log driver and utils
 
@@ -65,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/20 13:02:41 $"
+#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/26 19:10:11 $"
 
-static char const ident[] =
-    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/20 13:02:41 $";
+static char const ident[] = "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/26 19:10:11 $";
+
 
 /*
  *  Linux Fast-STREAMS Utility: strlog - logs STREAMS error or trace messages
@@ -109,7 +111,7 @@ version(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -195,15 +197,14 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version 2 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\

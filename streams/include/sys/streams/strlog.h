@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.20 2006/11/26 15:27:34 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.21 2006/11/26 19:10:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -44,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 15:27:34 $ by $Author: brian $
+ Last Modified $Date: 2006/11/26 19:10:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.h,v $
+ Revision 0.9.2.21  2006/11/26 19:10:08  brian
+ - rationalize to Linux Fast-STREAMS' working strlog driver
+
  Revision 0.9.2.20  2006/11/26 15:27:34  brian
  - testing and corrections to strlog capabilities
 
@@ -66,7 +70,7 @@
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.21 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -83,10 +87,10 @@
 #define SL_FATAL    0x0010
 #define SL_WARN	    0x0020
 #define SL_NOTE	    0x0040
-#define SL_NOPUTBUF 0x0080	/* uw7 compatibility */
+#define SL_NOPUTBUF 0x0080	/* uw7 src compatibility (does nothing) */
 
 #define LOGMSGSZ    1024	/* max format string length */
-#define NLOGARGS    10		/* max number of arguments (really unlimited) */
+#define NLOGARGS    20		/* max number of arguments (really unlimited) */
 
 #define LOGCTL		(('L')<<8)
 #define I_ERRLOG	(LOGCTL | 1)	/* error logger */

@@ -1,5 +1,9 @@
 2006-11-26  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/strlog.h: rationalization to strutil package
+	* include/sys/strlog.h: rationalization to strutil package
+	* include/sys/streams/strlog.h: rationalization to strutil package
+
 	* src/drivers/log.c: corrections from testing
 	* src/test/test-log.c: test suite executable for log driver
 	* tests/testsuite-log.at: auto test test suite for log driver

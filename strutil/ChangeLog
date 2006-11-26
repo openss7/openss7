@@ -1,3 +1,10 @@
+2006-11-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/strutil/strlog.h: rationalizations and corrections to Linux Fast-STREAMS
+	* src/util/strace.c: rationalizations and corrections to Linux Fast-STREAMS
+	* src/util/strerr.c: rationalizations and corrections to Linux Fast-STREAMS
+	* src/util/strlog.c: rationalizations and corrections to Linux Fast-STREAMS
+
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: added ability to sync between test cases
