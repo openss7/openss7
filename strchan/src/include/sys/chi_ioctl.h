@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi_ioctl.h,v 0.9.2.1 2006/10/14 06:37:28 brian Exp $
+ @(#) $Id: chi_ioctl.h,v 0.9.2.2 2006/11/27 11:41:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/14 06:37:28 $ by $Author: brian $
+ Last Modified $Date: 2006/11/27 11:41:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi_ioctl.h,v $
+ Revision 0.9.2.2  2006/11/27 11:41:58  brian
+ - updated CH and MX headers to interface version 1.1
+
  Revision 0.9.2.1  2006/10/14 06:37:28  brian
  - added manpages, module, drivers, headers from strss7 package
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_CHI_IOCTL_H__
 #define __SYS_CHI_IOCTL_H__
 
-#ident "@(#) $RCSfile: chi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: chi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -70,10 +73,12 @@
  *  CONFIGURATION
  */
 typedef struct ch_config {
-	ch_ulong block_size;		/* data block size (bits) */
+	ch_ulong type;			/* unused */
 	ch_ulong encoding;		/* encoding */
+	ch_ulong block_size;		/* data block size (bits) */
+	ch_ulong samples;		/* samples per block */
 	ch_ulong sample_size;		/* sample size (bits) */
-	ch_ulong rate;			/* clock rate (Hz) */
+	ch_ulong rate;			/* clock rate (samples/second) */
 	ch_ulong tx_channels;		/* number of tx channels */
 	ch_ulong rx_channels;		/* number of rx channels */
 	ch_ulong opt_flags;		/* options flags */
@@ -121,8 +126,16 @@ typedef struct ch_notify {
 #define	CH_IOCSNOTIFY	_IOW(	CH_IOC_MAGIC,	13, ch_notify_t	    )
 #define	CH_IOCCNOTIFY	_IOW(	CH_IOC_MAGIC,	14, ch_notify_t	    )
 
+typedef struct ch_mgmt {
+	ch_ulong cmd;
+} ch_mgmt_t;
+
+#define CH_MGMT_RESET		1
+
+#define	CH_IOCCMGMT	_IOW(	CH_IOC_MAGIC,	15, ch_mgmt_t	    )
+
 #define CH_IOC_FIRST	 0
-#define CH_IOC_LAST	14
+#define CH_IOC_LAST	15
 #define CH_IOC_PRIVATE	32
 
 #endif				/* __SYS_CHI_IOCTL_H__ */

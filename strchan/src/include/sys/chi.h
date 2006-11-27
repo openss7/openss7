@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi.h,v 0.9.2.1 2006/10/14 06:37:28 brian Exp $
+ @(#) $Id: chi.h,v 0.9.2.2 2006/11/27 11:41:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/14 06:37:28 $ by $Author: brian $
+ Last Modified $Date: 2006/11/27 11:41:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi.h,v $
+ Revision 0.9.2.2  2006/11/27 11:41:58  brian
+ - updated CH and MX headers to interface version 1.1
+
  Revision 0.9.2.1  2006/10/14 06:37:28  brian
  - added manpages, module, drivers, headers from strss7 package
 
@@ -58,14 +61,14 @@
 #ifndef __SYS_CHI_H__
 #define __SYS_CHI_H__
 
-#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
-typedef long ch_long;
-typedef ulong ch_ulong;
-typedef ushort ch_ushort;
-typedef uchar ch_uchar;
+typedef int32_t ch_long;
+typedef uint32_t ch_ulong;
+typedef uint16_t ch_ushort;
+typedef uint8_t ch_uchar;
 
 #define CH_INFO_REQ		 1UL
 #define CH_OPTMGMT_REQ		 2UL
@@ -111,6 +114,26 @@ typedef uchar ch_uchar;
 #define CHS_CONNECTED		13UL
 
 /*
+ *  CH STATE FLAGS
+ */
+#define CHSF_UNINIT		(1<<CHS_UNINIT)
+#define CHSF_UNUSABLE		(1<<CHS_UNUSABLE)
+#define CHSF_DETACHED		(1<<CHS_DETACHED)
+#define CHSF_WACK_AREQ		(1<<CHS_WACK_AREQ)
+#define CHSF_WACK_UREQ		(1<<CHS_WACK_UREQ)
+#define CHSF_ATTACHED		(1<<CHS_ATTACHED)
+#define CHSF_WACK_EREQ		(1<<CHS_WACK_EREQ)
+#define CHSF_WCON_EREQ		(1<<CHS_WCON_EREQ)
+#define CHSF_WACK_RREQ		(1<<CHS_WACK_RREQ)
+#define CHSF_WCON_RREQ		(1<<CHS_WCON_RREQ)
+#define CHSF_ENABLED		(1<<CHS_ENABLED)
+#define CHSF_WACK_CREQ		(1<<CHS_WACK_CREQ)
+#define CHSF_WCON_CREQ		(1<<CHS_WCON_CREQ)
+#define CHSF_WACK_DREQ		(1<<CHS_WACK_DREQ)
+#define CHSF_WCON_DREQ		(1<<CHS_WCON_DREQ)
+#define CHSF_CONNECTED		(1<<CHS_CONNECTED)
+
+/*
  *  CH PROTOCOL PRIMITIVES
  */
 
@@ -144,15 +167,17 @@ typedef struct CH_info_ack {
 #define CH_STYLE2	0x1	/* does perform attach */
 
 #define CH_VERSION_1_0	0x10	/* version 1.0 of interface */
-#define CH_VERSION	CH_VERSION_1_0
+#define CH_VERSION_1_1	0x11	/* version 1.1 of interface */
+#define CH_VERSION	CH_VERSION_1_1
 
 #define CH_PARMS_CIRCUIT	0x01	/* parms structure type */
 typedef struct CH_parms_circuit {
 	ch_ulong cp_type;		/* always CH_PARMS_CIRCUIT */
-	ch_ulong cp_block_size;		/* data block size (bits) */
 	ch_ulong cp_encoding;		/* encoding */
+	ch_ulong cp_block_size;		/* data block size (bits) */
+	ch_ulong cp_samples;		/* samples per block */
 	ch_ulong cp_sample_size;	/* sample size (bits) */
-	ch_ulong cp_rate;		/* clock rate (Hz) */
+	ch_ulong cp_rate;		/* clock rate (samples/second) */
 	ch_ulong cp_tx_channels;	/* number of tx channels */
 	ch_ulong cp_rx_channels;	/* number of rx channels */
 	ch_ulong cp_opt_flags;		/* options flags */
@@ -231,8 +256,8 @@ typedef struct CH_optmgmt_ack {
 /*
    management flags for CH_OPTMGMT 
  */
-#define CH_SET		0x01
-#define CH_GET		0x02
+#define CH_SET_OPT	0x01
+#define CH_GET_OPT	0x02
 #define CH_NEGOTIATE	0x03
 #define CH_DEFAULT	0x04
 
@@ -289,6 +314,7 @@ typedef struct CH_error_ack {
 #define CHBADFLAG	 6	/* Bad flag */
 #define CHBADPRIM	 7	/* Bad primitive */
 #define CHNOTSUPP	 8	/* Primitive not supported */
+#define CHBADSLOT	 9	/* Bad multplex slot */
 
 /*
  *  CH_ENABLE_REQ

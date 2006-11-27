@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi_ioctl.h,v 0.9.2.1 2006/10/14 06:37:28 brian Exp $
+ @(#) $Id: mxi_ioctl.h,v 0.9.2.2 2006/11/27 11:41:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/14 06:37:28 $ by $Author: brian $
+ Last Modified $Date: 2006/11/27 11:41:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi_ioctl.h,v $
+ Revision 0.9.2.2  2006/11/27 11:41:58  brian
+ - updated CH and MX headers to interface version 1.1
+
  Revision 0.9.2.1  2006/10/14 06:37:28  brian
  - added manpages, module, drivers, headers from strss7 package
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_MXI_IOCTL_H__
 #define __SYS_MXI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -70,13 +73,15 @@
  *  CONFIGURATION
  */
 typedef struct mx_config {
-	ulong block_size;		/* data block size (bits) */
-	ulong encoding;			/* encoding */
-	ulong sample_size;		/* sample size (bits) */
-	ulong rate;			/* clock rate (Hz) */
-	ulong tx_channels;		/* number of tx channels */
-	ulong rx_channels;		/* number of rx channels */
-	ulong opt_flags;		/* options flags */
+	mx_ulong type;			/* unused */
+	mx_ulong encoding;		/* encoding */
+	mx_ulong block_size;		/* data block size (bits) */
+	mx_ulong samples;		/* samples per block */
+	mx_ulong sample_size;		/* sample size (bits) */
+	mx_ulong rate;			/* clock rate (samples/second) */
+	mx_ulong tx_channels;		/* number of tx channels */
+	mx_ulong rx_channels;		/* number of rx channels */
+	mx_ulong opt_flags;		/* options flags */
 } mx_config_t;
 
 #define MX_IOCGCONFIG	_IOR(	MX_IOC_MAGIC,	2,  mx_config_t	    )
@@ -89,8 +94,8 @@ typedef struct mx_config {
  */
 
 typedef struct mx_statem {
-	ulong state;
-	ulong flags;
+	mx_ulong state;
+	mx_ulong flags;
 } mx_statem_t;
 
 #define	MX_IOCGSTATEM	_IOR(	MX_IOC_MAGIC,	6,  mx_statem_t	    )
@@ -101,7 +106,7 @@ typedef struct mx_statem {
  */
 
 typedef struct mx_stats {
-	ulong header;
+	mx_ulong header;
 } mx_stats_t;
 
 #define	MX_IOCGSTATSP	_IOR(	MX_IOC_MAGIC,	 8, mx_stats_t	    )
@@ -114,7 +119,7 @@ typedef struct mx_stats {
  */
 
 typedef struct mx_notify {
-	ulong events;
+	mx_ulong events;
 } mx_notify_t;
 
 #define	MX_IOCGNOTIFY	_IOR(	MX_IOC_MAGIC,	12, mx_notify_t	    )
@@ -122,7 +127,7 @@ typedef struct mx_notify {
 #define	MX_IOCCNOTIFY	_IOW(	MX_IOC_MAGIC,	14, mx_notify_t	    )
 
 typedef struct mx_mgmt {
-	ulong cmd;
+	mx_ulong cmd;
 } mx_mgmt_t;
 
 #define MX_MGMT_RESET		1

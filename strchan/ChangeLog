@@ -1,3 +1,10 @@
+2006-11-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/chi.h: updates to channel and multiplex headers
+	* src/include/sys/chi_ioctl.h: updates to channel and multiplex headers
+	* src/include/sys/mxi.h: updates to channel and multiplex headers
+	* src/include/sys/mxi_ioctl.h: updates to channel and multiplex headers
+
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: added ability to sync between test cases

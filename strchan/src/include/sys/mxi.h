@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.1 2006/10/14 06:37:28 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.2 2006/11/27 11:41:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/14 06:37:28 $ by $Author: brian $
+ Last Modified $Date: 2006/11/27 11:41:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi.h,v $
+ Revision 0.9.2.2  2006/11/27 11:41:58  brian
+ - updated CH and MX headers to interface version 1.1
+
  Revision 0.9.2.1  2006/10/14 06:37:28  brian
  - added manpages, module, drivers, headers from strss7 package
 
@@ -58,9 +61,14 @@
 #ifndef __SYS_MXI_H__
 #define __SYS_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
+
+typedef int32_t mx_long;
+typedef uint32_t mx_ulong;
+typedef uint16_t mx_ushort;
+typedef uint8_t mx_uchar;
 
 #define MX_INFO_REQ		 1UL
 #define MX_OPTMGMT_REQ		 2UL
@@ -83,6 +91,7 @@
 #define MX_DISCONNECT_CON	18UL
 #define MX_DISABLE_IND		19UL
 #define MX_DISABLE_CON		20UL
+#define MX_EVENT_IND		21UL
 
 /*
  *  MX STATES
@@ -133,7 +142,7 @@
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_info_req {
-	ulong mx_primitive;		/* always MX_INFO_REQ */
+	mx_ulong mx_primitive;		/* always MX_INFO_REQ */
 } MX_info_req_t;
 
 /*
@@ -143,37 +152,39 @@ typedef struct MX_info_req {
  *  multiplex provider and the attached multiplex (if any).
  */
 typedef struct MX_info_ack {
-	ulong mx_primitive;		/* always MX_INFO_ACK */
-	ulong mx_addr_length;		/* channel address length */
-	ulong mx_addr_offset;		/* channel address offset */
-	ulong mx_parm_length;		/* channel paramters length */
-	ulong mx_parm_offset;		/* channel paramters offset */
-	ulong mx_prov_flags;		/* provider options flags */
-	ulong mx_style;			/* provider style */
-	ulong mx_version;		/* channel interface version */
+	mx_ulong mx_primitive;		/* always MX_INFO_ACK */
+	mx_ulong mx_addr_length;	/* multiplex address length */
+	mx_ulong mx_addr_offset;	/* multiplex address offset */
+	mx_ulong mx_parm_length;	/* multiplex paramters length */
+	mx_ulong mx_parm_offset;	/* multiplex paramters offset */
+	mx_ulong mx_prov_flags;		/* provider options flags */
+	mx_ulong mx_style;		/* provider style */
+	mx_ulong mx_version;		/* multiplex interface version */
+	mx_ulong mx_state;		/* multiplex state */
 } MX_info_ack_t;
 
 #define MX_STYLE1	0x0	/* does not perform attach */
 #define MX_STYLE2	0x1	/* does perform attach */
 
 #define MX_VERSION_1_0	0x10	/* version 1.0 of interface */
-#define MX_VERSION	MX_VERSION_1_0
+#define MX_VERSION_1_1	0x11	/* version 1.1 of interface */
+#define MX_VERSION	MX_VERSION_1_1
 
 #define MX_PARMS_CIRCUIT	0x01	/* parms structure type */
 typedef struct MX_parms_circuit {
-	ulong cp_type;			/* always MX_PARMS_CIRCUIT */
-	ulong cp_encoding;		/* encoding */
-	ulong cp_block_size;		/* data block size (bits) */
-	ulong cp_samples;		/* samples per block */
-	ulong cp_sample_size;		/* sample size (bits) */
-	ulong cp_rate;			/* clock rate (samples/second) */
-	ulong cp_tx_channels;		/* number of tx channels */
-	ulong cp_rx_channels;		/* number of rx channels */
-	ulong cp_opt_flags;		/* options flags */
+	mx_ulong cp_type;		/* always MX_PARMS_CIRCUIT */
+	mx_ulong cp_encoding;		/* encoding */
+	mx_ulong cp_block_size;		/* data block size (bits) */
+	mx_ulong cp_samples;		/* samples per block */
+	mx_ulong cp_sample_size;	/* sample size (bits) */
+	mx_ulong cp_rate;		/* clock rate (samples/second) */
+	mx_ulong cp_tx_channels;	/* number of tx channels */
+	mx_ulong cp_rx_channels;	/* number of rx channels */
+	mx_ulong cp_opt_flags;		/* options flags */
 } MX_parms_circuit_t;
 
 union MX_parms {
-	ulong cp_type;			/* structure type */
+	mx_ulong cp_type;		/* structure type */
 	MX_parms_circuit_t circuit;	/* circuit structure */
 };
 
@@ -215,16 +226,20 @@ union MX_parms {
 #define MX_RATE_22050		22050
 #define MX_RATE_44100		44100
 #define MX_RATE_90000		90000
+#define MX_RATE_184000		184000	/* 23B */
+#define MX_RATE_192000		192000	/* T1 */
+#define MX_RATE_240000		240000	/* 30B */
+#define MX_RATE_248000		248000	/* E1 */
 
 /*
  *  MX_OPTMGMT_REQ
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_optmgmt_req {
-	ulong mx_primitive;		/* always MX_OPTMGMT_REQ */
-	ulong mx_opt_length;		/* length of options */
-	ulong mx_opt_offset;		/* offset of options */
-	ulong mx_mgmt_flags;		/* option flags */
+	mx_ulong mx_primitive;		/* always MX_OPTMGMT_REQ */
+	mx_ulong mx_opt_length;		/* length of options */
+	mx_ulong mx_opt_offset;		/* offset of options */
+	mx_ulong mx_mgmt_flags;		/* option flags */
 } MX_optmgmt_req_t;
 
 /*
@@ -232,10 +247,10 @@ typedef struct MX_optmgmt_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_optmgmt_ack {
-	ulong mx_primitive;		/* always MX_OPTMGMT_REQ */
-	ulong mx_opt_length;		/* length of options */
-	ulong mx_opt_offset;		/* offset of options */
-	ulong mx_mgmt_flags;		/* option flags */
+	mx_ulong mx_primitive;		/* always MX_OPTMGMT_REQ */
+	mx_ulong mx_opt_length;		/* length of options */
+	mx_ulong mx_opt_offset;		/* offset of options */
+	mx_ulong mx_mgmt_flags;		/* option flags */
 } MX_optmgmt_ack_t;
 
 /*
@@ -251,10 +266,10 @@ typedef struct MX_optmgmt_ack {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_attach_req {
-	ulong mx_primitive;		/* always MX_ATTACH_REQ */
-	ulong mx_addr_length;		/* length of channel address */
-	ulong mx_addr_offset;		/* offset of channel address */
-	ulong mx_flags;			/* options flags */
+	mx_ulong mx_primitive;		/* always MX_ATTACH_REQ */
+	mx_ulong mx_addr_length;	/* length of multiplex address */
+	mx_ulong mx_addr_offset;	/* offset of multiplex address */
+	mx_ulong mx_flags;		/* options flags */
 } MX_attach_req_t;
 
 /*
@@ -262,7 +277,7 @@ typedef struct MX_attach_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_detach_req {
-	ulong mx_primitive;		/* always MX_DETACH_REQ */
+	mx_ulong mx_primitive;		/* always MX_DETACH_REQ */
 } MX_detach_req_t;
 
 /*
@@ -270,9 +285,9 @@ typedef struct MX_detach_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_ok_ack {
-	ulong mx_primitive;		/* always MX_OK_ACK */
-	ulong mx_correct_prim;		/* correct primitive */
-	ulong mx_state;			/* resulting state */
+	mx_ulong mx_primitive;		/* always MX_OK_ACK */
+	mx_ulong mx_correct_prim;	/* correct primitive */
+	mx_ulong mx_state;		/* resulting state */
 } MX_ok_ack_t;
 
 /*
@@ -280,33 +295,33 @@ typedef struct MX_ok_ack {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_error_ack {
-	ulong mx_primitive;		/* always MX_ERROR_ACK */
-	ulong mx_error_primitive;	/* primitive in error */
-	ulong mx_error_type;		/* MXI error */
-	ulong mx_unix_error;		/* UNIX error */
-	ulong mx_state;			/* resulting state */
+	mx_ulong mx_primitive;		/* always MX_ERROR_ACK */
+	mx_ulong mx_error_primitive;	/* primitive in error */
+	mx_ulong mx_error_type;		/* MXI error */
+	mx_ulong mx_unix_error;		/* UNIX error */
+	mx_ulong mx_state;		/* resulting state */
 } MX_error_ack_t;
 
 /*
    error types 
  */
-#define MXSYSERR		 0	/* UNIX system error */
-#define MXBADADDR		 1	/* Bad address format or content */
-#define MXOUTSTATE		 2	/* Interface out of state */
-#define MXBADOPT		 3	/* Bad options format or content */
-#define MXBADPARM		 4	/* Bad parameter format or content */
-#define MXBADPARMTYPE		 5	/* Bad paramater structure type */
-#define MXBADFLAG		 6	/* Bad flag */
-#define MXBADPRIM		 7	/* Bad primitive */
-#define MXNOTSUPP		 8	/* Primitive not supported */
-#define MXBADSLOT		 9	/* Bad multplex slot */
+#define MXSYSERR	 0	/* UNIX system error */
+#define MXBADADDR	 1	/* Bad address format or content */
+#define MXOUTSTATE	 2	/* Interface out of state */
+#define MXBADOPT	 3	/* Bad options format or content */
+#define MXBADPARM	 4	/* Bad parameter format or content */
+#define MXBADPARMTYPE	 5	/* Bad paramater structure type */
+#define MXBADFLAG	 6	/* Bad flag */
+#define MXBADPRIM	 7	/* Bad primitive */
+#define MXNOTSUPP	 8	/* Primitive not supported */
+#define MXBADSLOT	 9	/* Bad multplex slot */
 
 /*
  *  MX_ENABLE_REQ
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_enable_req {
-	ulong mx_primitive;		/* always MX_ENABLE_REQ */
+	mx_ulong mx_primitive;		/* always MX_ENABLE_REQ */
 } MX_enable_req_t;
 
 /*
@@ -314,7 +329,7 @@ typedef struct MX_enable_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_enable_con {
-	ulong mx_primitive;		/* always MX_ENABLE_CON */
+	mx_ulong mx_primitive;		/* always MX_ENABLE_CON */
 } MX_enable_con_t;
 
 /*
@@ -322,7 +337,7 @@ typedef struct MX_enable_con {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_disable_req {
-	ulong mx_primitive;		/* always MX_DISABLE_REQ */
+	mx_ulong mx_primitive;		/* always MX_DISABLE_REQ */
 } MX_disable_req_t;
 
 /*
@@ -330,8 +345,8 @@ typedef struct MX_disable_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_disable_ind {
-	ulong mx_primitive;		/* always MX_DISABLE_IND */
-	ulong mx_cause;			/* cause for disable */
+	mx_ulong mx_primitive;		/* always MX_DISABLE_IND */
+	mx_ulong mx_cause;		/* cause for disable */
 } MX_disable_ind_t;
 
 /*
@@ -339,7 +354,7 @@ typedef struct MX_disable_ind {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_disable_con {
-	ulong mx_primitive;		/* always MX_DISABLE_CON */
+	mx_ulong mx_primitive;		/* always MX_DISABLE_CON */
 } MX_disable_con_t;
 
 /*
@@ -347,8 +362,8 @@ typedef struct MX_disable_con {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_data_req {
-	ulong mx_primitive;		/* always MX_DATA_REQ */
-	ulong mx_slot;			/* slot within channel */
+	mx_ulong mx_primitive;		/* always MX_DATA_REQ */
+	mx_ulong mx_slot;		/* slot within multiplex */
 } MX_data_req_t;
 
 /*
@@ -356,8 +371,8 @@ typedef struct MX_data_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_data_ind {
-	ulong mx_primitive;		/* always MX_DATA_IND */
-	ulong mx_slot;			/* slot within channel */
+	mx_ulong mx_primitive;		/* always MX_DATA_IND */
+	mx_ulong mx_slot;		/* slot within multiplex */
 } MX_data_ind_t;
 
 /*
@@ -365,9 +380,9 @@ typedef struct MX_data_ind {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_connect_req {
-	ulong mx_primitive;		/* always MX_CONNECT_REQ */
-	ulong mx_conn_flags;		/* direction to connect */
-	ulong mx_slot;			/* slot within channel */
+	mx_ulong mx_primitive;		/* always MX_CONNECT_REQ */
+	mx_ulong mx_conn_flags;		/* direction to connect */
+	mx_ulong mx_slot;		/* slot within multiplex */
 } MX_connect_req_t;
 
 /*
@@ -382,9 +397,9 @@ typedef struct MX_connect_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_connect_con {
-	ulong mx_primitive;		/* always MX_CONNECT_CON */
-	ulong mx_conn_flags;		/* direction connected */
-	ulong mx_slot;			/* slot within channel */
+	mx_ulong mx_primitive;		/* always MX_CONNECT_CON */
+	mx_ulong mx_conn_flags;		/* direction connected */
+	mx_ulong mx_slot;		/* slot within multiplex */
 } MX_connect_con_t;
 
 /*
@@ -392,9 +407,9 @@ typedef struct MX_connect_con {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_disconnect_req {
-	ulong mx_primitive;		/* always MX_DISCONNECT_REQ */
-	ulong mx_conn_flags;		/* direction to disconnect */
-	ulong mx_slot;			/* slot within channel */
+	mx_ulong mx_primitive;		/* always MX_DISCONNECT_REQ */
+	mx_ulong mx_conn_flags;		/* direction to disconnect */
+	mx_ulong mx_slot;		/* slot within multiplex */
 } MX_disconnect_req_t;
 
 /*
@@ -402,10 +417,10 @@ typedef struct MX_disconnect_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_disconnect_ind {
-	ulong mx_primitive;		/* always MX_DISCONNECT_IND */
-	ulong mx_conn_flags;		/* direction disconnected */
-	ulong mx_cause;			/* cause for disconnection */
-	ulong mx_slot;			/* slot within channel */
+	mx_ulong mx_primitive;		/* always MX_DISCONNECT_IND */
+	mx_ulong mx_conn_flags;		/* direction disconnected */
+	mx_ulong mx_cause;		/* cause for disconnection */
+	mx_ulong mx_slot;		/* slot within multiplex */
 } MX_disconnect_ind_t;
 
 /*
@@ -413,9 +428,60 @@ typedef struct MX_disconnect_ind {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_disconnect_con {
-	ulong mx_primitive;		/* always MX_DISCONNECT_CON */
-	ulong mx_conn_flags;		/* direction disconnected */
-	ulong mx_slot;			/* slot within channel */
+	mx_ulong mx_primitive;		/* always MX_DISCONNECT_CON */
+	mx_ulong mx_conn_flags;		/* direction disconnected */
+	mx_ulong mx_slot;		/* slot within multiplex */
 } MX_disconnect_con_t;
+
+/*
+ *  MX_EVENT_IND
+ *  -------------------------------------------------------------------------
+ */
+typedef struct MX_event_ind {
+	ch_ulong ch_primitive;		/* always MX_EVENT_IND */
+	ch_ulong ch_event;		/* event */
+	ch_ulong ch_slot;		/* slot within channel for event */
+} MX_event_ind_t;
+
+#define MX_EVT_DCD_ASSERT		 0
+#define MX_EVT_DCD_DEASSERT		 1
+#define MX_EVT_DSR_ASSERT		 2
+#define MX_EVT_DSR_DEASSERT		 3
+#define MX_EVT_DTR_ASSERT		 4
+#define MX_EVT_DTR_DEASSERT		 5
+#define MX_EVT_RTS_ASSERT		 6
+#define MX_EVT_RTS_DEASSERT		 7
+#define MX_EVT_CTS_ASSERT		 8
+#define MX_EVT_CTS_DEASSERT		 9
+#define MX_EVT_RI_ASSERT		10
+#define MX_EVT_RI_DEASSERT		11
+#define MX_EVT_YEL_ALARM		12
+#define MX_EVT_BLU_ALARM		13
+#define MX_EVT_RED_ALARM		14
+#define MX_EVT_NO_ALARM			15
+
+#define MXF_EVT_DCD_ASSERT		(1 <<  0)
+#define MXF_EVT_DCD_DEASSERT		(1 <<  1)
+#define MXF_EVT_DSR_ASSERT		(1 <<  2)
+#define MXF_EVT_DSR_DEASSERT		(1 <<  3)
+#define MXF_EVT_DTR_ASSERT		(1 <<  4)
+#define MXF_EVT_DTR_DEASSERT		(1 <<  5)
+#define MXF_EVT_RTS_ASSERT		(1 <<  6)
+#define MXF_EVT_RTS_DEASSERT		(1 <<  7)
+#define MXF_EVT_CTS_ASSERT		(1 <<  8)
+#define MXF_EVT_CTS_DEASSERT		(1 <<  9)
+#define MXF_EVT_RI_ASSERT		(1 << 10)
+#define MXF_EVT_RI_DEASSERT		(1 << 11)
+#define MXF_EVT_YEL_ALARM		(1 << 12)
+#define MXF_EVT_BLU_ALARM		(1 << 13)
+#define MXF_EVT_RED_ALARM		(1 << 14)
+#define MXF_EVT_NO_ALARM		(1 << 15)
+
+#define MXF_EVT_DCD_CHANGE		(MXF_EVT_DCD_ASSERT|MXF_EVT_DCD_DEASSERT)
+#define MXF_EVT_DSR_CHANGE		(MXF_EVT_DSR_ASSERT|MXF_EVT_DSR_DEASSERT)
+#define MXF_EVT_DTR_CHANGE		(MXF_EVT_DTR_ASSERT|MXF_EVT_DTR_DEASSERT)
+#define MXF_EVT_RTS_CHANGE		(MXF_EVT_RTS_ASSERT|MXF_EVT_RTS_DEASSERT)
+#define MXF_EVT_CTS_CHANGE		(MXF_EVT_CTS_ASSERT|MXF_EVT_CTS_DEASSERT)
+#define MXF_EVT_RI_CHANGE		(MXF_EVT_RI_ASSERT|MXF_EVT_RI_DEASSERT)
 
 #endif				/* __SYS_MXI_H__ */
