@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: mxi_ioctl.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
+ @(#) $Id: mxi_ioctl.h,v 0.9.2.4 2006/11/27 11:47:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
+ Last Modified $Date: 2006/11/27 11:47:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_MXI_IOCTL_H__
 #define __SS7_MXI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -64,13 +64,15 @@
  *  CONFIGURATION
  */
 typedef struct mx_config {
-	ulong block_size;		/* data block size (bits) */
-	ulong encoding;			/* encoding */
-	ulong sample_size;		/* sample size (bits) */
-	ulong rate;			/* clock rate (Hz) */
-	ulong tx_channels;		/* number of tx channels */
-	ulong rx_channels;		/* number of rx channels */
-	ulong opt_flags;		/* options flags */
+	mx_ulong type;			/* unused */
+	mx_ulong encoding;		/* encoding */
+	mx_ulong block_size;		/* data block size (bits) */
+	mx_ulong samples;		/* samples per block */
+	mx_ulong sample_size;		/* sample size (bits) */
+	mx_ulong rate;			/* clock rate (samples/second) */
+	mx_ulong tx_channels;		/* number of tx channels */
+	mx_ulong rx_channels;		/* number of rx channels */
+	mx_ulong opt_flags;		/* options flags */
 } mx_config_t;
 
 #define MX_IOCGCONFIG	_IOR(	MX_IOC_MAGIC,	2,  mx_config_t	    )
@@ -83,8 +85,8 @@ typedef struct mx_config {
  */
 
 typedef struct mx_statem {
-	ulong state;
-	ulong flags;
+	mx_ulong state;
+	mx_ulong flags;
 } mx_statem_t;
 
 #define	MX_IOCGSTATEM	_IOR(	MX_IOC_MAGIC,	6,  mx_statem_t	    )
@@ -95,7 +97,7 @@ typedef struct mx_statem {
  */
 
 typedef struct mx_stats {
-	ulong header;
+	mx_ulong header;
 } mx_stats_t;
 
 #define	MX_IOCGSTATSP	_IOR(	MX_IOC_MAGIC,	 8, mx_stats_t	    )
@@ -108,7 +110,7 @@ typedef struct mx_stats {
  */
 
 typedef struct mx_notify {
-	ulong events;
+	mx_ulong events;
 } mx_notify_t;
 
 #define	MX_IOCGNOTIFY	_IOR(	MX_IOC_MAGIC,	12, mx_notify_t	    )
@@ -116,7 +118,7 @@ typedef struct mx_notify {
 #define	MX_IOCCNOTIFY	_IOW(	MX_IOC_MAGIC,	14, mx_notify_t	    )
 
 typedef struct mx_mgmt {
-	ulong cmd;
+	mx_ulong cmd;
 } mx_mgmt_t;
 
 #define MX_MGMT_RESET		1

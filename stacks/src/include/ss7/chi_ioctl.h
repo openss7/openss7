@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: chi_ioctl.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
+ @(#) $Id: chi_ioctl.h,v 0.9.2.4 2006/11/27 11:47:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
+ Last Modified $Date: 2006/11/27 11:47:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_CHI_IOCTL_H__
 #define __SS7_CHI_IOCTL_H__
 
-#ident "@(#) $RCSfile: chi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: chi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -64,10 +64,12 @@
  *  CONFIGURATION
  */
 typedef struct ch_config {
-	ch_ulong block_size;		/* data block size (bits) */
+	ch_ulong type;			/* unused */
 	ch_ulong encoding;		/* encoding */
+	ch_ulong block_size;		/* data block size (bits) */
+	ch_ulong samples;		/* samples per block */
 	ch_ulong sample_size;		/* sample size (bits) */
-	ch_ulong rate;			/* clock rate (Hz) */
+	ch_ulong rate;			/* clock rate (samples/second) */
 	ch_ulong tx_channels;		/* number of tx channels */
 	ch_ulong rx_channels;		/* number of rx channels */
 	ch_ulong opt_flags;		/* options flags */
@@ -115,8 +117,16 @@ typedef struct ch_notify {
 #define	CH_IOCSNOTIFY	_IOW(	CH_IOC_MAGIC,	13, ch_notify_t	    )
 #define	CH_IOCCNOTIFY	_IOW(	CH_IOC_MAGIC,	14, ch_notify_t	    )
 
+typedef struct ch_mgmt {
+	ch_ulong cmd;
+} ch_mgmt_t;
+
+#define CH_MGMT_RESET		1
+
+#define	CH_IOCCMGMT	_IOW(	CH_IOC_MAGIC,	15, ch_mgmt_t	    )
+
 #define CH_IOC_FIRST	 0
-#define CH_IOC_LAST	14
+#define CH_IOC_LAST	15
 #define CH_IOC_PRIVATE	32
 
 #endif				/* __SS7_CHI_IOCTL_H__ */

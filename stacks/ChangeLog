@@ -1,3 +1,12 @@
+2006-11-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/ss7/chi.h: updated interface to version 1.1
+	* src/include/ss7/chi_ioctl.h: updated interface to version 1.1
+	* src/include/ss7/mxi.h: updated interface to version 1.1
+	* src/include/ss7/mxi_ioctl.h: updated interface to version 1.1
+	* src/modules/x400p-ss7/v401p.c: checked in changes.  Note that this
+	  driver has (already) moved to the strchan package.
+
 2006-11-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/x400p-ss7/v400pfw.h: new file
