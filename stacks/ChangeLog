@@ -1,3 +1,9 @@
+2006-11-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/cd/cd.c: cosmetic changes
+	* src/modules/x400p-ss7/v401p.c: working up driver
+	* src/modules/x400p-ss7/v401p.vim: added vim syntax file
+
 2006-11-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/ss7/chi.h: updated interface to version 1.1

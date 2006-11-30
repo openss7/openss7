@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/27 11:47:43 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:25:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/27 11:47:43 $ by $Author: brian $
+ Last Modified $Date: 2006/11/30 13:25:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.3  2006/11/30 13:25:46  brian
+ - working up driver
+
  Revision 0.9.2.2  2006/11/27 11:47:43  brian
  - updated CH and MX interface to Version 1.1 per strchan package
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/27 11:47:43 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:25:46 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/27 11:47:43 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:25:46 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -229,43 +232,6 @@ static char const ident[] =
  *  layer module.
  */
 
-/*
- * Streams definitions.
- */
-
-STATIC struct module_info vp_minfo = {
-	.mi_idnum = DRV_ID,
-	.mi_idname = DRV_NAME,
-	.mi_minpsz = STRMINPSZ,
-	.mi_maxpsz = STRMAXPSZ,
-	.mi_hiwat = STRHIGH,
-	.mi_lowat = STRLOW,
-};
-
-STATIC struct module_stat vp_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat vp_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-
-STATIC struct qinit vp_rinit = {
-	.qi_putp = NULL,
-	.qi_srvp = NULL,
-	.qi_qopen = vp_open,
-	.qi_qclose = vp_close,
-	.qi_minfo = &vp_minfo,
-	.qi_mstat = &vp_rstat,
-};
-
-STATIC struct qinit vp_winit = {
-	.qi_putp = vp_wput,
-	.qi_srvp = vp_wsrv,
-	.qi_minfo = &vp_minfo,
-	.qi_mstat = &vp_wstat,
-};
-
-STATIC struct streamtab v400mxinfo = {
-	.st_rdinit = &vp_rinit,
-	.st_wrinit = &vp_winit,
-};
-
 enum vp_board {
 	PLX9030 = 0,
 	PLXDEVBRD,
@@ -333,7 +299,7 @@ static struct {
 };
 /* *INDENT-ON* */
 
-STATIC struct pci_device_id vp_pci_table[] __devinitdata = {
+static struct pci_device_id vp_pci_table[] __devinitdata = {
 	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, 0, 0, PLX9030},
 	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, 0, 0, PLXDEVBRD},
 	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, V400P},
@@ -344,7 +310,7 @@ STATIC struct pci_device_id vp_pci_table[] __devinitdata = {
 };
 
 /* Map from Tormenta channel to T1 time slot (less 1). */
-STATIC int vp_t1_slot_map[] = {
+static int vp_t1_slot_map[] = {
 	-1, 0, 1, 2,
 	-1, 3, 4, 5,
 	-1, 6, 7, 8,
@@ -355,7 +321,7 @@ STATIC int vp_t1_slot_map[] = {
 	-1, 21, 22, 23
 };
 /* Map from Tormenta channel to E1 time slot (less 1). */
-STATIC int vp_e1_slot_map[] = {
+static int vp_e1_slot_map[] = {
 	-1, 0, 1, 2,
 	3, 4, 5, 6,
 	7, 8, 9, 10,
@@ -366,7 +332,7 @@ STATIC int vp_e1_slot_map[] = {
 	27, 28, 29, 30
 };
 /* Map from T1 time slot (less 1) to Tormenta channel. */
-STATIC int vp_t1_chan_map[] = {
+static int vp_t1_chan_map[] = {
 	1, 2, 3,
 	5, 6, 7,
 	9, 10, 11,
@@ -377,7 +343,7 @@ STATIC int vp_t1_chan_map[] = {
 	29, 30, 31
 };
 /* Map from E1 time slot (less 1) to Tormenta channel. */
-STATIC int vp_e1_chan_map[] = {
+static int vp_e1_chan_map[] = {
 	1, 2, 3, 4,
 	5, 6, 7, 8,
 	9, 10, 11, 12,
@@ -392,6 +358,9 @@ STATIC int vp_e1_chan_map[] = {
 #define VP_E1_TS_VALID_MASK	0x7fffffff /* Mask of valid E1 time slots. */
 #define VP_T1_CHAN_VALID_MASK	0xeeeeeeee /* Mask of valid T1 Tormenta channels. */
 #define VP_E1_CHAN_VALID_MASK	0xfffffffe /* Mask of valid E1 Tormenta channels. */
+
+unsigned modID_t modid = DRV_ID;
+unsigned major_t major = DRV_ID;
 
 /*
  *  Private structures.
@@ -481,11 +450,11 @@ static spinlock_t vp_daccs_lock = SPIN_LOCK_UNLOCKED;
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_info_ack(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_info_ack(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -496,11 +465,11 @@ ch_info_ack(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_optmgmt_ack(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_optmgmt_ack(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -511,11 +480,11 @@ ch_optmgmt_ack(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_ok_ack(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_ok_ack(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -526,11 +495,11 @@ ch_ok_ack(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_error_ack(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_error_ack(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -541,11 +510,11 @@ ch_error_ack(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_enable_con(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_enable_con(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -556,11 +525,11 @@ ch_enable_con(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_connect_con(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_connect_con(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -571,11 +540,11 @@ ch_connect_con(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_data_ind(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_data_ind(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -586,11 +555,11 @@ ch_data_ind(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_disconnect_ind(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_disconnect_ind(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -601,11 +570,11 @@ ch_disconnect_ind(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_disconnect_con(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_disconnect_con(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -616,11 +585,11 @@ ch_disconnect_con(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_disable_ind(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_disable_ind(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -631,20 +600,20 @@ ch_disable_ind(queue_t *q, mblk_t *bp, struct vp *vp)
  * @bp: message to free or consume if successful
  * @vp: VP private structure
  */
-STATIC fastcall inline int
+static fastcall inline int
 mx_disable_con(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_disable_con(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
 
-STATIC fastcall inline int
+static fastcall inline int
 mx_event_ind(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
-STATIC fastcall inline int
+static fastcall inline int
 ch_event_ind(queue_t *q, mblk_t *bp, struct vp *vp)
 {
 }
@@ -657,11 +626,11 @@ ch_event_ind(queue_t *q, mblk_t *bp, struct vp *vp)
  * @q: active queue (write queue)
  * @mp: the primitive
  */
-STATIC fastcall int
+static fastcall int
 mx_info_req(queue_t *q, mblk_t *mp)
 {
 }
-STATIC fastcall int
+static fastcall int
 ch_info_req(queue_t *q, mblk_t *mp)
 {
 }
@@ -671,11 +640,11 @@ ch_info_req(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  */
-STATIC fastcall int
+static fastcall int
 mx_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 }
-STATIC fastcall int
+static fastcall int
 ch_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 }
@@ -689,7 +658,7 @@ ch_optmgmt_req(queue_t *q, mblk_t *mp)
  * specified card an span must exist, and be available.
  *
  */
-STATIC fastcall int
+static fastcall int
 mx_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct MX_attach_req *p = (typeof(p)) mp->b_rptr;
@@ -720,7 +689,7 @@ mx_attach_req(queue_t *q, mblk_t *mp)
       error:
 	return mx_error_reply(q, MX_ATTACH_REQ, err);
 }
-STATIC fastcall int
+static fastcall int
 ch_attach_req(queue_t *q, mblk_t *mp)
 {
 }
@@ -730,11 +699,11 @@ ch_attach_req(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  */
-STATIC fastcall int
+static fastcall int
 mx_enable_req(queue_t *q, mblk_t *mp)
 {
 }
-STATIC fastcall int
+static fastcall int
 ch_enable_req(queue_t *q, mblk_t *mp)
 {
 }
@@ -744,11 +713,11 @@ ch_enable_req(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  */
-STATIC fastcall int
+static fastcall int
 mx_connect_req(queue_t *q, mblk_t *mp)
 {
 }
-STATIC fastcall int
+static fastcall int
 ch_connect_req(queue_t *q, mblk_t *mp)
 {
 }
@@ -758,11 +727,11 @@ ch_connect_req(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  */
-STATIC fastcall int
+static fastcall int
 mx_data_req(queue_t *q, mblk_t *mp)
 {
 }
-STATIC fastcall int
+static fastcall int
 ch_data_req(queue_t *q, mblk_t *mp)
 {
 }
@@ -772,11 +741,11 @@ ch_data_req(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  */
-STATIC fastcall int
+static fastcall int
 mx_disconnect_req(queue_t *q, mblk_t *mp)
 {
 }
-STATIC fastcall int
+static fastcall int
 ch_disconnect_req(queue_t *q, mblk_t *mp)
 {
 }
@@ -786,11 +755,11 @@ ch_disconnect_req(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  */
-STATIC fastcall int
+static fastcall int
 mx_disable_req(queue_t *q, mblk_t *mp)
 {
 }
-STATIC fastcall int
+static fastcall int
 ch_disable_req(queue_t *q, mblk_t *mp)
 {
 }
@@ -800,16 +769,16 @@ ch_disable_req(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  */
-STATIC fastcall int
+static fastcall int
 mx_detach_req(queue_t *q, mblk_t *mp)
 {
 }
-STATIC fastcall int
+static fastcall int
 ch_detach_req(queue_t *q, mblk_t *mp)
 {
 }
 
-STATIC noinline fastcall int
+static noinline fastcall int
 vp_w_proto(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_wptr < mp->b_rptr + sizeof(uint32_t))
@@ -860,7 +829,7 @@ vp_w_proto(queue_t *q, mblk_t *mp)
 	return (-EPROTO);
 }
 
-STATIC noinline fastcall int
+static noinline fastcall int
 vp_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHW) {
@@ -880,7 +849,7 @@ vp_w_flush(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
 }
 
-STATIC noinline fastcall __hot_put int
+static noinline fastcall __hot_put int
 vp_w_msg(queue_t *q, mblk_t *mp, int type)
 {
 	int rtn;
@@ -977,7 +946,7 @@ vp_w_msg(queue_t *q, mblk_t *mp, int type)
  * another block, but data can still be filled out in the in-place TX block.
  */
 
-STATIC streamscall __hot_write int
+static streamscall __hot_write int
 vp_wput(queue_t *q, mblk_t *mp)
 {
 	int type;
@@ -1025,7 +994,7 @@ vp_wput(queue_t *q, mblk_t *mp)
  * Otherwise, process the message.  Note that if we are debugging we can make a few checks on the
  * message.
  */
-STATIC streamscall __hot_out int
+static streamscall __hot_out int
 vp_wsrv(queue_t *q)
 {
 	struct vp *vp = VP_PRIV(q);
@@ -1167,12 +1136,12 @@ vp_wsrv(queue_t *q)
  *  =======================
  */
 
-STATIC spinlock_t vp_lock = SPIN_LOCK_UNLOCKED;
-STATIC struct vp *vp_list = NULL;
-STATIC major_t vp_majors[CMAJORS] = { CMAJOR_0, };
+static spinlock_t vp_lock = SPIN_LOCK_UNLOCKED;
+static struct vp *vp_list = NULL;
+static major_t vp_majors[CMAJORS] = { CMAJOR_0, };
 
-STATIC streamscall int
-vp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+static streamscall int
+vp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
 	pl_t flags;
 	int mindex = 0;
@@ -1180,7 +1149,7 @@ vp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	struct vp *vp, *vpp;
 
-	if (q->q_ptr != NULL)
+	if (q->q_ptr)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next) {
 		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
@@ -1234,8 +1203,9 @@ vp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 
 	return (0);
 }
-STATIC streamscall int
-vp_close(queue_t *q, int flag, cred_t *crp)
+
+static streamscall int
+vp_qclose(queue_t *q, int oflags, cred_t *crp)
 {
 	struct vp *vp = VP_PRIV(q);
 	pl_t flags;
@@ -1314,7 +1284,7 @@ vp_close(queue_t *q, int flag, cred_t *crp)
  * to occur upstream).  This also allows the write put procedure to simply place messages on the
  * queue in band 1.
  */
-STATIC __hot_in void
+static __hot_in void
 vp_tx_tasklet(unsigned long data)
 {
 	struct vp *vp = (struct vp *) data;
@@ -1418,7 +1388,7 @@ vp_tx_tasklet(unsigned long data)
  * This is called when an esballoc'ed RX block is freed.  The purpose of this free routine is to
  * simply release MX Streams from overflows.
  */
-STATIC streamscall __hot_read void
+static streamscall __hot_read void
 vp_rx_free(caddr_t arg)
 {
 	struct vp *vp = (struct vp *)arg;
@@ -1440,7 +1410,7 @@ vp_rx_free(caddr_t arg)
  * processing, MX Streams are passed an esballoc'ed block and full CH message blocks are passed
  * upstream.  If another block has become available, the tasklet is redispatched.
  */
-STATIC __hot_in void
+static __hot_in void
 vp_rx_tasklet(unsigned long data)
 {
 	struct vp *vp = (struct vp *) data;
@@ -1515,7 +1485,7 @@ vp_rx_tasklet(unsigned long data)
  * associated with the RX/TX block.  The purpose of this free routine is to simply track
  * overrun/underrun conditions and to provide simple on/off flow control.
  */
-STATIC streamscall __hot_read void
+static streamscall __hot_read void
 vp_free(caddr_t arg)
 {
 	struct vp *vp = (struct vp *) arg;
@@ -1540,7 +1510,7 @@ vp_free(caddr_t arg)
  *
  * Yet another approach.  Providing
  */
-STATIC void
+static void
 vp_tasklet(unsigned long data)
 {
 	freertn vp_freertn = { &vp_free, (caddr_t) data };
@@ -1582,7 +1552,7 @@ vp_tasklet(unsigned long data)
  * non-NULL, the corresponding bit is set in vp->xmask.  When set, a pointer points to the first
  * byte corresponding to the output channel in the appropriate output TX block.
  */
-STATIC noinline __unlikely int
+static noinline __unlikely int
 vp_cross_connect(uint32_t addr1, uint32_t addr2, uint32_t chans)
 {
 	int card1 = (addr1 >> 16) & 0x0ff;
@@ -1679,7 +1649,7 @@ vp_cross_connect(uint32_t addr1, uint32_t addr2, uint32_t chans)
  *
  * Remove a both-way cross-connect between a group of channels.
  */
-STATIC noinline __unlikely int
+static noinline __unlikely int
 vp_cross_disconnect(uint32_t addr1, uint32_t addr2, uint32_t chans)
 {
 	int card1 = (addr1 >> 16) & 0x0ff;
@@ -1820,7 +1790,7 @@ vp_cross_disconnect(uint32_t addr1, uint32_t addr2, uint32_t chans)
  * map entry will be created for each card.  When mapping within the same card, neither rxdccs nor
  * txdccs is adjusted.
  */
-STATIC noinline fastcall __hot void
+static noinline fastcall __hot void
 vp_daccs(struct vp *vp)
 {
 	uint32_t xmask_save;
@@ -1875,7 +1845,7 @@ vp_daccs(struct vp *vp)
  * while this card is transferring it (leading to mysterious slippages).  Any process changing
  * txdccs must irq lock the structure first.
  */
-STATIC inline fastcall __hot void
+static inline fastcall __hot void
 vp_rxtx_burst(struct vp *vp)
 {
 	uint32_t cmask_save;
@@ -1945,7 +1915,7 @@ vp_rxtx_burst(struct vp *vp)
  * Want this function to be fast, but we want it separate from the main loop because it is only
  * executed 4 times in 64 cycles.
  */
-STATIC noinline fastcall __hot void
+static noinline fastcall __hot void
 vp_alarms(register struct vp *vp, register int span)
 {
 }
@@ -1962,7 +1932,7 @@ vp_alarms(register struct vp *vp, register int span)
  * executed 1 time in 1000 cycles.  The purpose of this function is to collect span statistics for
  * each span for the last one second interval.
  */
-STATIC noinline fastcall __hot void
+static noinline fastcall __hot void
 vp_bpv(register struct vp *vp)
 {
 	int base, smask = vp->smask;
@@ -2003,7 +1973,7 @@ vp_bpv(register struct vp *vp)
 		}
 }
 
-STATIC noinline fastcall __hot void
+static noinline fastcall __hot void
 vp_eval_syncsrc(register struct vp *vp)
 {
 }
@@ -2021,7 +1991,7 @@ vp_eval_syncsrc(register struct vp *vp)
  * Locking is to keep another processor from altering the vp structure while this processor is
  * servicing an interrupt for the same card.
  */
-STATIC __hot irqreturn_t
+static __hot irqreturn_t
 vp_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	register struct vp *vp = (struct vp *) dev_id;
@@ -2061,7 +2031,7 @@ vp_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  ===============================
  */
 
-STATIC void __devexit
+static void __devexit
 vp_remove(struct pci_dev *dev)
 {
 	struct vp *vp;
@@ -2127,7 +2097,7 @@ vp_remove(struct pci_dev *dev)
 #include "v400pfw.h"
 #include "v401pfw.h"
 
-STATIC int __devinit
+static int __devinit
 vp_download_firmware(struct vp *vp, enum vp_board board)
 {
 	unsigned int byte;
@@ -2191,13 +2161,6 @@ vp_download_firmware(struct vp *vp, enum vp_board board)
 	return (0);
 }
 
-#ifndef module_param
-MODULE_PARM(loadfw, "h");
-#else
-module_param(loadfw, ushort, 0);
-#endif
-MODULE_PARM_DESC(loadfw, "Load firmware for the V401P-MX driver.");
-
 unsigned short loadfw = 1;
 
 #define VP_MAX_CARDS	8	/* No machines with more than 8 PCI slots? */
@@ -2207,7 +2170,7 @@ static struct vp vp_cards[VP_MAX_CARDS];
 
 static int vp_card;
 
-STATIC int __devinit
+static int __devinit
 vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
 	int span, b, board, device, devrev, hw_flags;
@@ -2426,13 +2389,13 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 }
 
 #ifdef CONFIG_PM
-STATIC int
+static int
 vp_suspend(struct pci_dev *pdev, pm_message_t state)
 {
 	fixme(("Write a suspend routine.\n"));
 	return 0;
 }
-STATIC int
+static int
 vp_resume(struct pci_dev *pdev)
 {
 	fixme(("Write a resume routine.\n"));
@@ -2440,7 +2403,7 @@ vp_resume(struct pci_dev *pdev)
 }
 #endif				/* CONFIG_PM */
 
-STATIC struct pci_driver vp_driver = {
+static struct pci_driver vp_driver = {
 	.name = DRV_NAME,
 	.probe = vp_probe,
 	.remove = __devexit_p(vp_remove),
@@ -2454,7 +2417,7 @@ STATIC struct pci_driver vp_driver = {
 /**
  * vp_pci_init: - init PCI for the V401P driver
  */
-STATIC noinline __unlikely int
+static noinline __unlikely int
 vp_pci_init(void)
 {
 	return pci_module_init(&vp_driver);
@@ -2463,7 +2426,7 @@ vp_pci_init(void)
 /**
  * vp_pci_cleanup: - cleanup PCI for the V401P driver
  */
-STATIC noinline __unlikely int
+static noinline __unlikely int
 vp_pci_cleanup(void)
 {
 	pci_unregister_driver(&vp_driver);
@@ -2471,26 +2434,62 @@ vp_pci_cleanup(void)
 }
 
 #ifdef LINUX
-
-unsigned short modid = DRV_ID;
-
-#ifndef module_param
+/*
+ *  Linux registration
+ */
+#ifdef module_param
+module_param(modid, modID_t, 0);
+module_param(major, major_t, 0);
+module_param(loadfw, ushort, 0);
+#else				/* module_param */
 MODULE_PARM(modid, "h");
-#else
-module_param(modid, ushort, 0);
-#endif
+MODULE_PARM(major, "d");
+MODULE_PARM(loadfw, "h");
+#endif				/* module_param */
+
 MODULE_PARM_DESC(modid, "Module ID for the V401P-MX driver. (0 for allocation.)");
-
-unsigned short major = DRV_ID;
-
-#ifndef module_param
-MODULE_PARM(major, "h");
-#else
-module_param(major, ushort, 0);
-#endif
 MODULE_PARM_DESC(major, "Device number for the V401P-MX driver. (0 for allocation.)");
+MODULE_PARM_DESC(loadfw, "Load firmware for the V401P-MX driver.");
 
-STATIC struct cdevsw vp_cdev = {
+/*
+ * Streams definitions.
+ */
+
+static struct module_info vp_minfo = {
+	.mi_idnum = DRV_ID,
+	.mi_idname = DRV_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
+};
+
+static struct module_stat vp_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat vp_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+
+static struct qinit vp_rinit = {
+	.qi_putp = NULL,
+	.qi_srvp = NULL,
+	.qi_qopen = vp_qopen,
+	.qi_qclose = vp_qclose,
+	.qi_minfo = &vp_minfo,
+	.qi_mstat = &vp_rstat,
+};
+
+static struct qinit vp_winit = {
+	.qi_putp = vp_wput,
+	.qi_srvp = vp_wsrv,
+	.qi_minfo = &vp_minfo,
+	.qi_mstat = &vp_wstat,
+};
+
+static struct streamtab v400mxinfo = {
+	.st_rdinit = &vp_rinit,
+	.st_wrinit = &vp_winit,
+};
+
+
+static struct cdevsw vp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &v400mxinfo,
 	.d_flag = D_MP,
@@ -2499,7 +2498,7 @@ STATIC struct cdevsw vp_cdev = {
 	.d_kmod = THIS_MODULE,
 };
 
-STATIC noinline __unlikely int
+static noinline __unlikely int
 vp_register_strdev(major_t major)
 {
 	int err;
@@ -2508,7 +2507,8 @@ vp_register_strdev(major_t major)
 		return (err);
 	return (0);
 }
-STATIC noinline __unlikely int
+
+static noinline __unlikely int
 vp_unregister_strdev(major_t major)
 {
 	int err;
@@ -2516,7 +2516,7 @@ vp_unregister_strdev(major_t major)
 	if ((err = unregister_strdev(&vp_cdev, major)) < 0)
 		return (err);
 	return (0);
-};
+}
 
 MODULE_STATIC void __exit
 v400mxterminate(void)
@@ -2570,6 +2570,9 @@ v400mxinit(void)
 		}
 		if (vp_majors[mindex] == 0)
 			vp_majors[mindex] = err;
+#if 0
+		LIS_DEVFLAGS(vp_majors[index]) |= LIS_MODFLG_CLONE;
+#endif
 		if (major == 0)
 			major = vp_majors[0];
 	}
