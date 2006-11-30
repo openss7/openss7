@@ -1,3 +1,18 @@
+2006-11-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/v400pfw.h: added file
+	* src/drivers/v401p.vim: added file
+	* src/drivers/v401pfw.h: added file
+	* src/drivers/x400pfw.h: added file
+	* src/modules/Makefile: added file
+	* src/modules/cd.c: added file
+	* src/modules/ch.c: added file
+	* src/modules/chmod.c: added file
+	* src/modules/perf.c: added file
+	* src/modules/tab.c: added file
+	* src/modules/tab.h: added file
+	* src/modules/test.c: added file
+
 2006-11-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/chi.h: updates to channel and multiplex headers
