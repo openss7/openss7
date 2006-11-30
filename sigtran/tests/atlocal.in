@@ -1,7 +1,7 @@
 # vim: ft=sh sw=4 et nosi nocin fo+=or tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:54 $
+# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:20:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 10:42:54 $ by $Author: brian $
+# Last Modified $Date: 2006/11/30 13:20:50 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: atlocal.in,v $
+# Revision 0.9.2.2  2006/11/30 13:20:50  brian
+# - cosmetic changes
+#
 # Revision 0.9.2.1  2006/10/16 10:42:54  brian
 # - added new package files
 #
@@ -155,6 +158,8 @@ at_prefix="@prefix@"
 at_sbindir="@sbindir@"
 at_sharedstatedir="@sharedstatedir@"
 at_sysconfdir="@sysconfdir@"
+
+at_ioctl_getmsg="@at_ioctl_getmsg@"
 
 #
 #   The following needs to be performed by the individual test suites instead

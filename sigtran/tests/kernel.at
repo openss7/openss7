@@ -1,9 +1,9 @@
 # vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:54 $
+# @(#) $RCSfile: kernel.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:20:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -62,11 +62,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 10:42:54 $ by $Author: brian $
+# Last Modified $Date: 2006/11/30 13:20:50 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: kernel.at,v $
+# Revision 0.9.2.2  2006/11/30 13:20:50  brian
+# - cosmetic changes
+#
 # Revision 0.9.2.1  2006/10/16 10:42:54  brian
 # - added new package files
 #
@@ -119,6 +122,6 @@ AT_CLEANUP
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
