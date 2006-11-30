@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:05:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:56:00 $ by $Author: brian $
+ Last Modified $Date: 2006/11/30 13:05:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.2  2006/11/30 13:05:27  brian
+ - checking in working copies
+
  Revision 0.9.2.1  2006/10/17 11:56:00  brian
  - copied files into new packages from strss7 package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:05:27 $"
 
-static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:00 $";
+static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:05:27 $";
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link
@@ -66,8 +69,8 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $
  *  interface.  This module is for raw channel devices and support HDLC in
  *  software.  Some devices might support HDLC in device firmware, in which
  *  case, the device driver itself will present the CDI interface.  The CDI
- *  interface presented supports the lapb(4), lapf(4) and lapd(4) data link
- *  modules.
+ *  interface presented supports the lapb(4), lapf(4), lapd(4), lapm(4) data
+ *  link modules and the sl(4) SS7 link module.
  *
  *  This module is originally intended for use with the V401P card, but can be
  *  used with any raw channel device.

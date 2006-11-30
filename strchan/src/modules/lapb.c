@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/19 10:37:25 $
+ @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:05:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 10:37:25 $ by $Author: brian $
+ Last Modified $Date: 2006/11/30 13:05:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapb.c,v $
+ Revision 0.9.2.3  2006/11/30 13:05:27  brian
+ - checking in working copies
+
  Revision 0.9.2.2  2006/10/19 10:37:25  brian
  - working up drivers and modules
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/19 10:37:25 $"
+#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:05:27 $"
 
 static char const ident[] =
-    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/19 10:37:25 $";
+    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:05:27 $";
 
 /*
  *  This is a pushable STREAMS module that provides the Link Access Procedure
@@ -88,7 +91,7 @@ static char const ident[] =
 
 #define LAPB_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LAPB_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/19 10:37:25 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:05:27 $"
 #define LAPB_DEVICE	"SVR 4.2 STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"
@@ -3305,8 +3308,9 @@ MODULE_STATIC struct streamtab lapbdrvinfo = {
 #endif
 
 modID_t modid = MOD_ID;
+major_t major = CMAJOR_0;
 
-major_t major = CMAJOR_0 STATIC struct fmodsw dl_fmod = {
+STATIC struct fmodsw dl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &lapbmodinfo,
 	.f_flag = D_MP,

@@ -1,5 +1,11 @@
 2006-11-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/v401p.c: checking in working copy
+	* src/include/sys/chi.h: checking in working copy
+	* src/include/sys/mxi.h: checking in working copy
+	* src/modules/hdlc.c: checking in working copy
+	* src/modules/lapb.c: checking in working copy
+
 	* src/drivers/v400pfw.h: added file
 	* src/drivers/v401p.vim: added file
 	* src/drivers/v401pfw.h: added file

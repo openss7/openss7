@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.2 2006/11/27 11:41:58 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.3 2006/11/30 13:05:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/27 11:41:58 $ by $Author: brian $
+ Last Modified $Date: 2006/11/30 13:05:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi.h,v $
+ Revision 0.9.2.3  2006/11/30 13:05:26  brian
+ - checking in working copies
+
  Revision 0.9.2.2  2006/11/27 11:41:58  brian
  - updated CH and MX headers to interface version 1.1
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_MXI_H__
 #define __SYS_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -116,22 +119,22 @@ typedef uint8_t mx_uchar;
 /*
  *  MX STATE FLAGS
  */
-#define MXSF_UNINIT		(1<<MXS_UNINIT)
-#define MXSF_UNUSABLE		(1<<MXS_UNUSABLE)
-#define MXSF_DETACHED		(1<<MXS_DETACHED)
-#define MXSF_WACK_AREQ		(1<<MXS_WACK_AREQ)
-#define MXSF_WACK_UREQ		(1<<MXS_WACK_UREQ)
-#define MXSF_ATTACHED		(1<<MXS_ATTACHED)
-#define MXSF_WACK_EREQ		(1<<MXS_WACK_EREQ)
-#define MXSF_WCON_EREQ		(1<<MXS_WCON_EREQ)
-#define MXSF_WACK_RREQ		(1<<MXS_WACK_RREQ)
-#define MXSF_WCON_RREQ		(1<<MXS_WCON_RREQ)
-#define MXSF_ENABLED		(1<<MXS_ENABLED)
-#define MXSF_WACK_CREQ		(1<<MXS_WACK_CREQ)
-#define MXSF_WCON_CREQ		(1<<MXS_WCON_CREQ)
-#define MXSF_WACK_DREQ		(1<<MXS_WACK_DREQ)
-#define MXSF_WCON_DREQ		(1<<MXS_WCON_DREQ)
-#define MXSF_CONNECTED		(1<<MXS_CONNECTED)
+#define MXSF_UNINIT		(1<<(2+MXS_UNINIT))
+#define MXSF_UNUSABLE		(1<<(2+MXS_UNUSABLE))
+#define MXSF_DETACHED		(1<<(2+MXS_DETACHED))
+#define MXSF_WACK_AREQ		(1<<(2+MXS_WACK_AREQ))
+#define MXSF_WACK_UREQ		(1<<(2+MXS_WACK_UREQ))
+#define MXSF_ATTACHED		(1<<(2+MXS_ATTACHED))
+#define MXSF_WACK_EREQ		(1<<(2+MXS_WACK_EREQ))
+#define MXSF_WCON_EREQ		(1<<(2+MXS_WCON_EREQ))
+#define MXSF_WACK_RREQ		(1<<(2+MXS_WACK_RREQ))
+#define MXSF_WCON_RREQ		(1<<(2+MXS_WCON_RREQ))
+#define MXSF_ENABLED		(1<<(2+MXS_ENABLED))
+#define MXSF_WACK_CREQ		(1<<(2+MXS_WACK_CREQ)
+#define MXSF_WCON_CREQ		(1<<(2+MXS_WCON_CREQ))
+#define MXSF_WACK_DREQ		(1<<(2+MXS_WACK_DREQ))
+#define MXSF_WCON_DREQ		(1<<(2+MXS_WCON_DREQ))
+#define MXSF_CONNECTED		(1<<(2+MXS_CONNECTED))
 
 /*
  *  MX PROTOCOL PRIMITIVES
@@ -158,10 +161,13 @@ typedef struct MX_info_ack {
 	mx_ulong mx_parm_length;	/* multiplex paramters length */
 	mx_ulong mx_parm_offset;	/* multiplex paramters offset */
 	mx_ulong mx_prov_flags;		/* provider options flags */
+	mx_ulong mx_prov_class;		/* provider class */
 	mx_ulong mx_style;		/* provider style */
 	mx_ulong mx_version;		/* multiplex interface version */
 	mx_ulong mx_state;		/* multiplex state */
 } MX_info_ack_t;
+
+#define MX_CIRCUIT	0x01	/* circuit provider class */
 
 #define MX_STYLE1	0x0	/* does not perform attach */
 #define MX_STYLE2	0x1	/* does perform attach */
@@ -172,19 +178,19 @@ typedef struct MX_info_ack {
 
 #define MX_PARMS_CIRCUIT	0x01	/* parms structure type */
 typedef struct MX_parms_circuit {
-	mx_ulong cp_type;		/* always MX_PARMS_CIRCUIT */
-	mx_ulong cp_encoding;		/* encoding */
-	mx_ulong cp_block_size;		/* data block size (bits) */
-	mx_ulong cp_samples;		/* samples per block */
-	mx_ulong cp_sample_size;	/* sample size (bits) */
-	mx_ulong cp_rate;		/* clock rate (samples/second) */
-	mx_ulong cp_tx_channels;	/* number of tx channels */
-	mx_ulong cp_rx_channels;	/* number of rx channels */
-	mx_ulong cp_opt_flags;		/* options flags */
+	mx_ulong mp_type;		/* always MX_PARMS_CIRCUIT */
+	mx_ulong mp_encoding;		/* encoding */
+	mx_ulong mp_block_size;		/* data block size (bits) */
+	mx_ulong mp_samples;		/* samples per block */
+	mx_ulong mp_sample_size;	/* sample size (bits) */
+	mx_ulong mp_rate;		/* channel clock rate (samples/second) */
+	mx_ulong mp_tx_channels;	/* number of tx channels */
+	mx_ulong mp_rx_channels;	/* number of rx channels */
+	mx_ulong mp_opt_flags;		/* options flags */
 } MX_parms_circuit_t;
 
 union MX_parms {
-	mx_ulong cp_type;		/* structure type */
+	mx_ulong mp_type;		/* structure type */
 	MX_parms_circuit_t circuit;	/* circuit structure */
 };
 

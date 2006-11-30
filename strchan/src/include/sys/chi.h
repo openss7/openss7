@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi.h,v 0.9.2.2 2006/11/27 11:41:58 brian Exp $
+ @(#) $Id: chi.h,v 0.9.2.3 2006/11/30 13:05:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/27 11:41:58 $ by $Author: brian $
+ Last Modified $Date: 2006/11/30 13:05:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi.h,v $
+ Revision 0.9.2.3  2006/11/30 13:05:26  brian
+ - checking in working copies
+
  Revision 0.9.2.2  2006/11/27 11:41:58  brian
  - updated CH and MX headers to interface version 1.1
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_CHI_H__
 #define __SYS_CHI_H__
 
-#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -116,22 +119,22 @@ typedef uint8_t ch_uchar;
 /*
  *  CH STATE FLAGS
  */
-#define CHSF_UNINIT		(1<<CHS_UNINIT)
-#define CHSF_UNUSABLE		(1<<CHS_UNUSABLE)
-#define CHSF_DETACHED		(1<<CHS_DETACHED)
-#define CHSF_WACK_AREQ		(1<<CHS_WACK_AREQ)
-#define CHSF_WACK_UREQ		(1<<CHS_WACK_UREQ)
-#define CHSF_ATTACHED		(1<<CHS_ATTACHED)
-#define CHSF_WACK_EREQ		(1<<CHS_WACK_EREQ)
-#define CHSF_WCON_EREQ		(1<<CHS_WCON_EREQ)
-#define CHSF_WACK_RREQ		(1<<CHS_WACK_RREQ)
-#define CHSF_WCON_RREQ		(1<<CHS_WCON_RREQ)
-#define CHSF_ENABLED		(1<<CHS_ENABLED)
-#define CHSF_WACK_CREQ		(1<<CHS_WACK_CREQ)
-#define CHSF_WCON_CREQ		(1<<CHS_WCON_CREQ)
-#define CHSF_WACK_DREQ		(1<<CHS_WACK_DREQ)
-#define CHSF_WCON_DREQ		(1<<CHS_WCON_DREQ)
-#define CHSF_CONNECTED		(1<<CHS_CONNECTED)
+#define CHSF_UNINIT		(1<<(2+CHS_UNINIT))
+#define CHSF_UNUSABLE		(1<<(2+CHS_UNUSABLE))
+#define CHSF_DETACHED		(1<<(2+CHS_DETACHED))
+#define CHSF_WACK_AREQ		(1<<(2+CHS_WACK_AREQ))
+#define CHSF_WACK_UREQ		(1<<(2+CHS_WACK_UREQ))
+#define CHSF_ATTACHED		(1<<(2+CHS_ATTACHED))
+#define CHSF_WACK_EREQ		(1<<(2+CHS_WACK_EREQ))
+#define CHSF_WCON_EREQ		(1<<(2+CHS_WCON_EREQ))
+#define CHSF_WACK_RREQ		(1<<(2+CHS_WACK_RREQ))
+#define CHSF_WCON_RREQ		(1<<(2+CHS_WCON_RREQ))
+#define CHSF_ENABLED		(1<<(2+CHS_ENABLED))
+#define CHSF_WACK_CREQ		(1<<(2+CHS_WACK_CREQ))
+#define CHSF_WCON_CREQ		(1<<(2+CHS_WCON_CREQ))
+#define CHSF_WACK_DREQ		(1<<(2+CHS_WACK_DREQ))
+#define CHSF_WCON_DREQ		(1<<(2+CHS_WCON_DREQ))
+#define CHSF_CONNECTED		(1<<(2+CHS_CONNECTED))
 
 /*
  *  CH PROTOCOL PRIMITIVES
@@ -158,10 +161,13 @@ typedef struct CH_info_ack {
 	ch_ulong ch_parm_length;	/* channel paramters length */
 	ch_ulong ch_parm_offset;	/* channel paramters offset */
 	ch_ulong ch_prov_flags;		/* provider options flags */
+	ch_ulong ch_prov_class;		/* provider class */
 	ch_ulong ch_style;		/* provider style */
 	ch_ulong ch_version;		/* channel interface version */
 	ch_ulong ch_state;		/* channel state */
 } CH_info_ack_t;
+
+#define CH_CIRCUIT	0x01	/* circuit provider class */
 
 #define CH_STYLE1	0x0	/* does not perform attach */
 #define CH_STYLE2	0x1	/* does perform attach */
