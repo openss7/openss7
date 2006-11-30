@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strlog.9.man,v 0.9.2.15 2006/10/06 12:13:07 brian Exp $
+.\" @(#) $Id: strlog.9.man,v 0.9.2.16 2006/11/30 13:11:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:07 $ by $Author: brian $
+.\" Last Modified $Date: 2006/11/30 13:11:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strlog.9.man,v $
+.\" Revision 0.9.2.16  2006/11/30 13:11:45  brian
+.\" - strlog documentation update
+.\"
 .\" Revision 0.9.2.15  2006/10/06 12:13:07  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -304,15 +307,50 @@ trace logging processes when the a process is actually listening for the specifi
 message.
 This allows running
 .I STREAMS
-modules to be traced at the discretion of a user level process.  It is one excellent diagnotic tool
-that is applicable to running systems, instead of crashed systems.
+modules to be traced at the discretion of a user level process.
 .PP
 .BR strlog ()
-also provide additional
-.IR STREAMS -specific
-information that otherwise has to be formatted by the driver or module calling
+impacts driver performance less than
+.BR cmn_err (9)
+in a number of ways:
+.IP 1. \w'0.\(em'u
+.BR strlog ()
+provides the ability to filter messages of interest early making the only cost of discarded messages
+the cost of stacking parameters in the call to
+.BR strlog ().
+In contrast,
+.BR cmn_err (9)
+must format and output every message that it is passed.
+.IP 2.
+.BR strlog ()
+does not incur the penalty of formatting output strings within the
+.BR strlog ()
+call, but, rather quickly packages the format string and parameter pointers and passes them to the
+console, error or trace logger Stream, which then passes them to a user process that formats the
+output string.
+In contrast,
+.BR cmn_err (9)
+must format the message that it was passed before returning.
+.IP 3.
+.BR strlog ()
+provides the ability to specify module identifier, stream instance identifier, logging levels and
+logger flags that otherwise would have to be formatted in an inconsistent fashion by the driver or
+module calling
 .BR cmn_err (9).
+.IP 4.
+.BR strlog ()
+trace (debugging) logs have a more sophisticated filtering mechanism that can filter on module
+identifier, stream identifier level and flags, allowing a user level trace logger (see
+.BR strace (9))
+to chose a narrow range of messages without assistance from the driver.
+In contrast,
+.BR cmn_err (9)
+must deliver every message it is passed, making selection of appopriate debugging messages difficult
+and module specific.
 .PP
+.BR strlog ()
+is one excellent general purpose standard diagnotic tool that is applicable to running systems,
+instead of crashed systems.
 Where possible,
 .I STREAMS
 drivers and module should use

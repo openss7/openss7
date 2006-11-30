@@ -1,3 +1,7 @@
+2006-11-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/strlog.9.man: documentation update
+
 2006-11-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/strlog.h: rationalized to Linux Fast-STREAMS
