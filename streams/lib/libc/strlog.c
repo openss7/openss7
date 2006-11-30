@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/26 15:27:35 $
+ @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:08:26 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 15:27:35 $ by $Author: brian $
+ Last Modified $Date: 2006/11/30 13:08:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/26 15:27:35 $"
+#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:08:26 $"
 
-static char const ident[] = "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/26 15:27:35 $";
+static char const ident[] = "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:08:26 $";
 
 #include "streams.h"
 
@@ -1046,6 +1046,10 @@ __streams_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 		}
 		if (tp == '\0')
 			break;
+		if (tp > timebuf + sizeof(timebuf) - 1) {
+			*tp = '\0';
+			break;
+		}
 	}
 	fprintf(file, " %s", timebuf);
 	fprintf(file, " %lu", (unsigned long) lc.ttime);
