@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:17:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/11/30 13:17:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tua_as.c,v $
+ Revision 0.9.2.1  2006/11/30 13:17:57  brian
+ - added files from strss7 package
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:17:57 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:17:57 $";
 
 /*
  *  This is the AS side of TUA implemented as a pushable module that pushes over an SCTP NPI
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/tpi_tcap.h>
 
 #define TUA_AS_DESCRIP		"TUA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:17:57 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

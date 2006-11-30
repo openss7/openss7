@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ua_sl.h,v 0.9.2.1 2006/11/30 13:17:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/11/30 13:17:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ua_sl.h,v $
+ Revision 0.9.2.1  2006/11/30 13:17:55  brian
+ - added files from strss7 package
+
  *****************************************************************************/
 
 #ifndef __LOCAL_UA_SL_H__
 #define __LOCAL_UA_SL_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ua_sl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  This file contains inline functions for use with the Signaling Link Interface.

@@ -1,3 +1,21 @@
+2006-11-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man5/sigtran.conf.5.man: documentation start
+	* doc/manual/fig1.fig: documentation start
+	* doc/manual/fig2.fig: documentation start
+	* doc/manual/fig3.fig: documentation start
+	* src/drivers/ua_dlpi.h: added file from strss7 package
+	* src/drivers/ua_mtp.h: added file from strss7 package
+	* src/drivers/ua_npi.h: added file from strss7 package
+	* src/drivers/ua_sl.h: added file from strss7 package
+	* src/drivers/ua_tci.h: added file from strss7 package
+	* src/drivers/ua_tpi.h: added file from strss7 package
+	* src/drivers/ua_tri.h: added file from strss7 package
+	* src/modules/m2ua_as.c: added file from strss7 package
+	* src/modules/m3ua_as.c: added file from strss7 package
+	* src/modules/sua_as.c: added file from strss7 package
+	* src/modules/tua_as.c: added file from strss7 package
+
 2006-11-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/ua.c: working up master driver for release
