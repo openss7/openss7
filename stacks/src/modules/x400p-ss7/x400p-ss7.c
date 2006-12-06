@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/05 02:53:32 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/06 11:45:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/06/05 02:53:32 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:45:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400p-ss7.c,v $
+ Revision 0.9.2.22  2006/12/06 11:45:24  brian
+ - updated X400P driver and test suites
+
  Revision 0.9.2.21  2006/06/05 02:53:32  brian
  - working up udp zero-copy
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/05 02:53:32 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/06 11:45:24 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/06/05 02:53:32 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/06 11:45:24 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -104,7 +107,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2006/06/05 02:53:32 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2006/12/06 11:45:24 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

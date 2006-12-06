@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:01 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/06 11:45:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/24 05:01:01 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:45:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:01 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/06 11:45:18 $"
 
 static char const ident[] =
-    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:01 $";
+    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/06 11:45:18 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/04/24 05:01:01 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/06 11:45:18 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

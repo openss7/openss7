@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:48 $
+ @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:31 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:48 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:45:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-q781.c,v $
+ Revision 0.9.2.8  2006/12/06 11:45:31  brian
+ - updated X400P driver and test suites
+
  Revision 0.9.2.7  2006/10/31 21:04:48  brian
  - changes for 32-bit compatibility and remove HZ dependency
 
@@ -78,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:48 $"
+#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:31 $"
 
-static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:48 $";
+static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:31 $";
 
 #include <stropts.h>
 #include <stdlib.h>

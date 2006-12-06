@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:54 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:54 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:45:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.8  2006/12/06 11:45:33  brian
+ - updated X400P driver and test suites
+
  Revision 0.9.2.7  2006/10/31 21:04:54  brian
  - changes for 32-bit compatibility and remove HZ dependency
 
@@ -78,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:54 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:54 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -173,7 +176,6 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9
 #define IUT_TEST_SPAN	1
 #define IUT_TEST_CHAN	19
 
-
 /*
  *  -------------------------------------------------------------------------
  *
@@ -211,7 +213,9 @@ static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
 static int show_fisus = 1;
+#if 1
 static int show_msus = 1;
+#endif
 
 //static int show_data = 1;
 
@@ -219,7 +223,9 @@ static int last_prim = 0;
 static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
+static int last_prio = 0;
 static int PRIM_type = 0;
+
 #if 0
 static int NPI_error = 0;
 static int CONIND_number = 2;
@@ -228,10 +234,7 @@ static int SEQ_number = 1;
 static int SERV_type = N_CLNS;
 static int CURRENT_state = NS_UNBND;
 N_info_ack_t last_info = { 0, };
-#endif
-static int last_prio = 0;
 
-#if 0
 static int DATA_xfer_flags = 0;
 static int BIND_flags = 0;
 static int RESET_orig = N_UNDEFINED;
@@ -269,6 +272,7 @@ static int oldevt = 0;
 static int cntevt = 0;
 
 static int count = 0;
+static int tries = 0;
 
 #define BUFSIZE 32*4096
 
@@ -300,6 +304,8 @@ static int test_pflags = MSG_BAND;	/* MSG_BAND | MSG_HIPRI */
 static int test_pband = 0;
 static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
+static int test_timout = 200;
+
 #if 0
 static int test_bufsize = 256;
 static int test_nidu = 256;
@@ -314,23 +320,18 @@ static unsigned char *PROTOID_buffer = NULL;
 static size_t PROTOID_length = 0;
 static char *DATA_buffer = NULL;
 static size_t DATA_length = 0;
+static int test_resfd = -1;
+static void *QOS_buffer = NULL;
+static int QOS_length = 0;
 #else
 static unsigned short addrs[3][1] = {
-	{  (PTU_TEST_SLOT << 12) | (PTU_TEST_SPAN << 8) | (PTU_TEST_CHAN << 0) },
-	{  (IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0) },
-	{  (IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0) }
+	{(PTU_TEST_SLOT << 12) | (PTU_TEST_SPAN << 8) | (PTU_TEST_CHAN << 0)},
+	{(IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0)},
+	{(IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0)}
 };
 static int anums[3] = { 1, 1, 1 };
 static unsigned short *ADDR_buffer = NULL;
 static size_t ADDR_length = sizeof(unsigned short);
-#endif
-#if 0
-static int test_resfd = -1;
-#endif
-static int test_timout = 200;
-#if 0
-static void *QOS_buffer = NULL;
-static int QOS_length = 0;
 #endif
 
 struct strfdinsert fdi = {
@@ -357,9 +358,9 @@ typedef struct addr {
 } addr_t;
 #endif				/* SCTP_VERSION_2 */
 #endif
-#endif
-
+#else
 typedef unsigned short ppa_t;
+#endif
 
 struct timeval when;
 
@@ -866,7 +867,6 @@ stop_tt(void)
 }
 
 static int event = 0;
-static int tries = 0;
 static int expand = 0;
 static long beg_time = 0;
 
@@ -895,6 +895,7 @@ static int cntmsg = 0;
 static int oldisb = 0;
 static int oldret = 0;
 static int cntret = 0;
+
 #if 0
 static int oldprm = 0;
 static int cntprm = 0;
@@ -1940,7 +1941,8 @@ poll_events_string(short events)
 #if 1
 void print_string(int child, const char *string);
 void
-print_ppa(int child, ppa_t *ppa) {
+print_ppa(int child, ppa_t * ppa)
+{
 	char buf[32];
 
 	snprintf(buf, sizeof(buf), "%d:%d:%d", ((*ppa) >> 12) & 0x0f, ((*ppa) >> 8) & 0x0f, (*ppa) & 0x0ff);
@@ -3527,6 +3529,7 @@ print_rx_msg(int child, const char *string)
 
 	if (show && verbose > 0) {
 		int other = (child + 1) % 2;
+
 		if (fsn[other] != 0x7f || bsn[other] != 0x7f || fib[other] != 0 || bib[other] != 0)
 			print_rx_msg_sn(child, string, bib[other] | bsn[other], fib[other] | fsn[other]);
 		else
@@ -3896,7 +3899,9 @@ print_mgmtflag(int child, np_ulong flag)
 {
 	print_string(child, mgmtflag_string(flag));
 }
+#endif
 
+#if 0
 void
 print_opt_level(int child, struct t_opthdr *oh)
 {
@@ -4863,10 +4868,41 @@ test_pop(int child)
 static int
 stream_start(int child, int index)
 {
+#if 0
+	int offset = 3 * index;
+	int i;
+
+	for (i = 0; i < anums[3]; i++) {
+#ifndef SCTP_VERSION_2
+		addrs[3].port = htons(ports[3] + offset);
+		inet_aton(addr_strings[i], &addrs[child].addr[i]);
+#else				/* SCTP_VERSION_2 */
+		addrs[3][i].sin_family = AF_INET;
+		addrs[3][i].sin_port = htons(ports[3] + offset);
+		inet_aton(addr_strings[i], &addrs[3][i].sin_addr);
+#endif				/* SCTP_VERSION_2 */
+	}
+#endif
 	switch (child) {
 	case 1:
 	case 2:
 	case 0:
+#if 0
+		for (i = 0; i < anums[child]; i++) {
+#ifndef SCTP_VERSION_2
+			addrs[child].port = htons(ports[child] + offset);
+			inet_aton(addr_strings[i], &addrs[child].addr[i]);
+#else				/* SCTP_VERSION_2 */
+			addrs[child][i].sin_family = AF_INET;
+			if ((child == 0 && !client_port_specified) || ((child == 1 || child == 2) && !server_port_specified))
+				addrs[child][i].sin_port = htons(ports[child] + offset);
+			else
+				addrs[child][i].sin_port = htons(ports[child]);
+			if ((child == 0 && !client_host_specified) || ((child == 1 || child == 2) && !server_host_specified))
+				inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
+#endif				/* SCTP_VERSION_2 */
+		}
+#endif
 		if (test_open(child, devname, O_NONBLOCK | O_RDWR) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
@@ -4940,6 +4976,15 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+#if 0
+	qos_data.sid = 0;
+	qos_info.hmac = SCTP_HMAC_NONE;
+	qos_info.options = 0;
+	qos_info.i_streams = 1;
+	qos_info.o_streams = 1;
+	qos_conn.i_streams = 1;
+	qos_conn.o_streams = 1;
+#endif
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
 		goto failure;
@@ -4987,8 +5032,6 @@ union primitives {
 	union SDT_primitives sdt;
 	union SL_primitives sl;
 };
-
-static int pt_config(void);
 
 static int
 do_signal(int child, int action)
@@ -5176,7 +5219,7 @@ do_signal(int child, int action)
 		goto send_message;
 	case __TEST_FISU_BAD_FIB:
 		if (!cntmsg)
-			print_tx_msg_sn(child, "FISU(bad fib)", bib[child]|bsn[child], (fib[child]|fsn[child])^0x80);
+			print_tx_msg_sn(child, "FISU(bad fib)", bib[child] | bsn[child], (fib[child] | fsn[child]) ^ 0x80);
 		dbuf[0] = bib[child] | bsn[child];
 		dbuf[1] = (fib[child] | fsn[child]) ^ 0x80;
 		dbuf[2] = 0;
@@ -5267,12 +5310,12 @@ do_signal(int child, int action)
 	case __TEST_FISU_FISU_2FLAG:
 		print_tx_msg(child, "FISU-F-F-FISU");
 		config->sdt.f = SDT_FLAGS_TWO;
-		if (pt_config() != __RESULT_SUCCESS)
+		if (do_signal(child, __TEST_SDT_CONFIG) != __RESULT_SUCCESS)
 			return __RESULT_INCONCLUSIVE;
 		do_signal(child, __TEST_FISU_S);
 		do_signal(child, __TEST_FISU_S);
 		config->sdt.f = SDT_FLAGS_ONE;
-		if (pt_config() != __RESULT_SUCCESS)
+		if (do_signal(child, __TEST_SDT_CONFIG) != __RESULT_SUCCESS)
 			return __RESULT_INCONCLUSIVE;
 		return __RESULT_SUCCESS;
 	case __TEST_MSU_MSU_1FLAG:
@@ -5283,12 +5326,12 @@ do_signal(int child, int action)
 	case __TEST_MSU_MSU_2FLAG:
 		print_tx_msg(child, "MSU-F-F-MSU");
 		config->sdt.f = SDT_FLAGS_TWO;
-		if (pt_config() != __RESULT_SUCCESS)
+		if (do_signal(child, __TEST_SDT_CONFIG) != __RESULT_SUCCESS)
 			return __RESULT_INCONCLUSIVE;
 		do_signal(child, __TEST_MSU_S);
 		do_signal(child, __TEST_MSU_S);
 		config->sdt.f = SDT_FLAGS_ONE;
-		if (pt_config() != __RESULT_SUCCESS)
+		if (do_signal(child, __TEST_SDT_CONFIG) != __RESULT_SUCCESS)
 			return __RESULT_INCONCLUSIVE;
 		return __RESULT_SUCCESS;
 	      send_message:
@@ -6090,7 +6133,7 @@ do_signal(int child, int action)
 			print_addrs(child, cbuf + sizeof(p->lmi.attach_req), ADDR_length);
 #endif
 #else
-			print_ppa(child, (ppa_t *)p->lmi.attach_req.lmi_ppa);
+			print_ppa(child, (ppa_t *) p->lmi.attach_req.lmi_ppa);
 #endif
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -6120,7 +6163,7 @@ do_signal(int child, int action)
 			print_addrs(child, cbuf + sizeof(p->lmi.enable_req), ADDR_length);
 #endif
 #else
-			print_ppa(child, (ppa_t *)p->lmi.enable_req.lmi_rem);
+			print_ppa(child, (ppa_t *) p->lmi.enable_req.lmi_rem);
 #endif
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -6305,7 +6348,8 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 			}
 			if (show_fisus || event != __TEST_FISU) {
 				if (event != oldret || oldisb != (((bib[child] | bsn[child]) << 8) | (fib[child] | fsn[child]))) {
-					// if (oldisb == (((bib[child] | bsn[child]) << 8) | (fib[child] |
+					// if (oldisb == (((bib[child] | bsn[child]) << 8) |
+					// (fib[child] |
 					// fsn[child])) &&
 					// ((event == __TEST_FISU && oldret == __TEST_MSU) ||
 					// (event == __TEST_MSU && oldret == __TEST_FISU))) {
@@ -6325,6 +6369,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 			}
 			if (!cntret) {
 				char buf[32];
+
 				switch (event) {
 				case __TEST_FISU:
 					if (show_fisus) {
@@ -6393,6 +6438,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 #endif
 #if 0
 			uint32_t msg;
+			int mystatus = -1;
 
 			switch ((msg = ((uint32_t *) data->buf)[0])) {
 			case M2PA_STATUS_MESSAGE:
@@ -6661,7 +6707,6 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 	}
 	return ((last_event = event));
 }
-
 
 static int
 do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
@@ -7451,18 +7496,20 @@ preamble_config(int child)
 		goto failure;
 	state++;
 #endif
-	if (do_signal(child, __TEST_SDL_OPTIONS))
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_SDL_CONFIG))
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_SDT_OPTIONS))
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_SDT_CONFIG))
-		goto failure;
-	state++;
+	{
+		if (do_signal(child, __TEST_SDL_OPTIONS))
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_SDL_CONFIG))
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_SDT_OPTIONS))
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_SDT_CONFIG))
+			goto failure;
+		state++;
+	}
 	if (child == CHILD_IUT) {
 		if (do_signal(child, __TEST_SL_OPTIONS))
 			goto failure;
@@ -7483,13 +7530,15 @@ preamble_attach(int child)
 	if (preamble_config(child))
 		goto failure;
 	state++;
-	ADDR_buffer = addrs[child];
-	ADDR_length = anums[child] * sizeof(addrs[child][0]);
-	if (do_signal(child, __TEST_ATTACH_REQ))
-		failed = failed ? : state;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
-		failed = failed ? : state;
+	{
+		ADDR_buffer = addrs[child];
+		ADDR_length = anums[child] * sizeof(addrs[child][0]);
+		if (do_signal(child, __TEST_ATTACH_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+			failed = failed ? : state;
+	}
 #if 0
 	if (child == CHILD_PTU) {
 		return preamble_bind(child);
@@ -7505,12 +7554,14 @@ postamble_detach(int child)
 {
 	int failed = 0;
 
-	state++;
-	if (do_signal(child, __TEST_DETACH_REQ))
-		failed = failed ? : state;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
-		failed = failed ? : state;
+	{
+		state++;
+		if (do_signal(child, __TEST_DETACH_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+			failed = failed ? : state;
+	}
 #if 0
 	if (child == CHILD_PTU) {
 		state++;
@@ -7536,13 +7587,15 @@ preamble_enable(int child)
 	if (preamble_attach(child))
 		goto failure;
 	state++;
-	ADDR_buffer = addrs[(child + 1) % 2];
-	ADDR_length = anums[(child + 1) % 2] * sizeof(addrs[(child + 1) % 2][0]);
-	if (do_signal(child, __TEST_ENABLE_REQ))
-		goto failure;
-	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_ENABLE_CON))
-		goto failure;
+	{
+		ADDR_buffer = addrs[(child + 1) % 2];
+		ADDR_length = anums[(child + 1) % 2] * sizeof(addrs[(child + 1) % 2][0]);
+		if (do_signal(child, __TEST_ENABLE_REQ))
+			goto failure;
+		state++;
+		if (expect(child, INFINITE_WAIT, __TEST_ENABLE_CON))
+			goto failure;
+	}
 #if 0
 	if (child == CHILD_PTU) {
 		if (preamble_connect(child))
@@ -7560,14 +7613,16 @@ postamble_disable(int child)
 	int failed = 0;
 
 	state++;
-	if (do_signal(child, __TEST_DISABLE_REQ))
-		failed = failed ? : state;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DISABLE_CON))
-		failed = failed ? : state;
-	state++;
-	if (test_ioctl(child, I_FLUSH, FLUSHRW))
-		failed = failed ? : state;
+	{
+		if (do_signal(child, __TEST_DISABLE_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_DISABLE_CON))
+			failed = failed ? : state;
+		state++;
+		if (test_ioctl(child, I_FLUSH, FLUSHRW))
+			failed = failed ? : state;
+	}
 #if 0
 	if (child == CHILD_PTU) {
 		if (postamble_disconnect(child))
@@ -7898,1244 +7953,6 @@ postamble_link_in_service(int child)
 	return __RESULT_FAILURE;
 }
 
-
-int iut_showmsg(struct strbuf *ctrl, struct strbuf *data);
-
-#if 0
-static int
-pt_open(void)
-{
-	// printf(" :open\n");
-	// fflush(stdout);
-	if ((test_fd[0] = open(devname, O_NONBLOCK | O_RDWR)) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	// printf(" :ioctl\n");
-	// fflush(stdout);
-	if (ioctl(test_fd[0], I_SRDOPT, RMSGD) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	return __RESULT_SUCCESS;
-}
-
-static int
-pt_close(void)
-{
-	// printf(" :close\n");
-	// fflush(stdout);
-	if (close(test_fd[0]) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	return __RESULT_SUCCESS;
-}
-
-static int
-pt_attach(void)
-{
-	int ret, flags = 0;
-	char cbuf[BUFSIZE];
-	char dbuf[BUFSIZE];
-	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
-	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	ppa_t ppa;
-	ppa = (PTU_TEST_SLOT << 12) | (PTU_TEST_SPAN << 8) | (PTU_TEST_CHAN << 0);
-	// printf(" :attach\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = sizeof(p->attach_req) + sizeof(ppa_t);
-	ctrl.buf = cbuf;
-	p->attach_req.lmi_primitive = LMI_ATTACH_REQ;
-	bcopy(&ppa, p->attach_req.lmi_ppa, sizeof(ppa_t));
-	if ((ret = putmsg(test_fd[0], &ctrl, NULL, RS_HIPRI)) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	for (;;) {
-		flags = 0;
-		ctrl.maxlen = BUFSIZE;
-		ctrl.len = 0;
-		ctrl.buf = cbuf;
-		data.maxlen = BUFSIZE;
-		data.len = 0;
-		data.buf = dbuf;
-		if ((ret = getmsg(test_fd[0], &ctrl, &data, &flags)) < 0) {
-			printf("%s: %s\n", __FUNCTION__, strerror(errno));
-			fflush(stdout);
-			return __RESULT_FAILURE;
-		}
-		if (p->lmi_primitive != LMI_OK_ACK) {
-			iut_showmsg(&ctrl, &data);
-			return __RESULT_FAILURE;
-		} else {
-			return __RESULT_SUCCESS;
-		}
-	}
-}
-
-static int
-pt_detach(void)
-{
-	int ret;
-	char cbuf[BUFSIZE];
-	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	// printf(" :detach\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = sizeof(p->detach_req);
-	ctrl.buf = cbuf;
-	p->detach_req.lmi_primitive = LMI_DETACH_REQ;
-	if ((ret = putmsg(test_fd[0], &ctrl, NULL, RS_HIPRI)) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	return __RESULT_SUCCESS;
-}
-
-static int
-pt_enable(void)
-{
-	int ret, flags = 0;
-	char cbuf[BUFSIZE];
-	char dbuf[BUFSIZE];
-	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
-	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	// printf(" :enable\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = sizeof(p->enable_req);
-	ctrl.buf = cbuf;
-	p->enable_req.lmi_primitive = LMI_ENABLE_REQ;
-	ctrl.len = sizeof(p->enable_req);
-	if ((ret = putmsg(test_fd[0], &ctrl, NULL, RS_HIPRI)) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	for (;;) {
-		flags = 0;
-		ctrl.maxlen = BUFSIZE;
-		ctrl.len = 0;
-		ctrl.buf = cbuf;
-		data.maxlen = BUFSIZE;
-		data.len = 0;
-		data.buf = dbuf;
-		if ((ret = getmsg(test_fd[0], &ctrl, &data, &flags)) < 0) {
-			if (errno != EAGAIN && errno != EINTR) {
-				printf("%s: %s\n", __FUNCTION__, strerror(errno));
-				fflush(stdout);
-				return __RESULT_FAILURE;
-			}
-			continue;
-		}
-		if (p->lmi_primitive != LMI_ENABLE_CON && p->lmi_primitive != LMI_OK_ACK) {
-			printf("%s: %s\n", __FUNCTION__, strerror(errno));
-			fflush(stdout);
-			iut_showmsg(&ctrl, &data);
-		} else
-			return __RESULT_SUCCESS;
-	}
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-pt_stats(void)
-{
-	struct strioctl ctl;
-	sdt_stats_t stats;
-	printf("    :stats sdt\n");
-	fflush(stdout);
-	ctl.ic_cmd = SDT_IOCGSTATS;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(stats);
-	ctl.ic_dp = (char *) &stats;
-	if (ioctl(test_fd[0], I_STR, &ctl) < 0) {
-		printf("****ERROR: stats for sdt failed\n");
-		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
-		exit(2);
-	}
-	fflush(stdout);
-	printf("tx_bytes = %lu\n", stats.tx_bytes);
-	printf("tx_sus = %lu\n", stats.tx_sus);
-	printf("tx_sus_repeated = %lu\n", stats.tx_sus_repeated);
-	printf("tx_underruns = %lu\n", stats.tx_underruns);
-	printf("tx_aborts = %lu\n", stats.tx_aborts);
-	printf("tx_buffer_overflows = %lu\n", stats.tx_buffer_overflows);
-	printf("tx_sus_in_error = %lu\n", stats.tx_sus_in_error);
-	printf("rx_bytes = %lu\n", stats.rx_bytes);
-	printf("rx_sus = %lu\n", stats.rx_sus);
-	printf("rx_sus_compressed = %lu\n", stats.rx_sus_compressed);
-	printf("rx_overruns = %lu\n", stats.rx_overruns);
-	printf("rx_aborts = %lu\n", stats.rx_aborts);
-	printf("rx_buffer_overflows = %lu\n", stats.rx_buffer_overflows);
-	printf("rx_sus_in_error = %lu\n", stats.rx_sus_in_error);
-	printf("rx_sync_transitions = %lu\n", stats.rx_sync_transitions);
-	printf("rx_bits_octet_counted = %lu\n", stats.rx_bits_octet_counted);
-	printf("rx_crc_errors = %lu\n", stats.rx_crc_errors);
-	printf("rx_frame_errors = %lu\n", stats.rx_frame_errors);
-	printf("rx_frame_overflows = %lu\n", stats.rx_frame_overflows);
-	printf("rx_frame_too_long = %lu\n", stats.rx_frame_too_long);
-	printf("rx_frame_too_short = %lu\n", stats.rx_frame_too_short);
-	printf("rx_residue_errors = %lu\n", stats.rx_residue_errors);
-	printf("rx_length_error = %lu\n", stats.rx_length_error);
-	printf("carrier_cts_lost = %lu\n", stats.carrier_cts_lost);
-	printf("carrier_dcd_lost = %lu\n", stats.carrier_dcd_lost);
-	printf("carrier_lost = %lu\n", stats.carrier_lost);
-	fflush(stdout);
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-pt_disable(void)
-{
-	char cbuf[BUFSIZE];
-	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	struct strbuf ctrl = { sizeof(*cbuf), sizeof(p->disable_req), cbuf };
-	// printf(" :disable\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = LMI_DISABLE_REQ_SIZE;
-	ctrl.buf = cbuf;
-	p->disable_req.lmi_primitive = LMI_DISABLE_REQ;
-	ctrl.len = LMI_DISABLE_REQ_SIZE;
-	if (putmsg(test_fd[0], &ctrl, NULL, RS_HIPRI) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	return __RESULT_SUCCESS;
-}
-#endif
-
-static int
-pt_config(void)
-{
-	struct strioctl ctl;
-
-	// printf(" :config\n");
-	// fflush(stdout);
-	// printf(" :options sdl\n");
-	// fflush(stdout);
-	config->opt.pvar = SS7_PVAR_ITUT_96;
-	config->opt.popt = 0;
-	ctl.ic_cmd = SDL_IOCSOPTIONS;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->opt);
-	ctl.ic_dp = (char *) &config->opt;
-	if (ioctl(test_fd[0], I_STR, &ctl) < 0) {
-		printf("****ERROR: options sdl failed\n");
-		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
-		exit(2);
-	}
-	/* go with defaults */
-#if 0
-	printf("    :config sdl\n");
-	fflush(stdout);
-	config->sdl.ifflags = 0;
-	config->sdl.iftype = SDL_TYPE_DS0;
-	config->sdl.ifrate = 64000;
-	config->sdl.ifgtype = SDL_GTYPE_NONE;
-	config->sdl.ifgrate = 1544000;
-	conficonfigDL_MODE_PEER;
-	config->sdl.ifgmode = SDL_GMODE_NONE;
-	config->sdl.ifgcrc = SDL_GCRC_CRC4;
-	config->sdl.ifcoding = SDL_CODING_B8ZS;
-	config->sdl.ifframing = SDL_FRAMING_ESF;
-	config->sdl.ifleads = 0;
-	config->sdl.ifalarms = 0;
-	config->sdl.ifrxlevel = 0;
-	config->sdl.iftxlevel = 0;
-	config->sdl.ifsync = 0;
-	config->sdl.ifsyncsrc[0] = 0;
-	config->sdl.ifsyncsrc[1] = 0;
-	config->sdl.ifsyncsrc[2] = 0;
-	config->sdl.ifsyncsrc[3] = 0;
-	ctl.ic_cmd = SDL_IOCSCONFIG;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->sdl);
-	ctl.ic_dp = (char *) &config->sdl;
-	if (ioctl(test_fd[0], I_STR, &ctl) < 0) {
-		printf("****ERROR: config sdl failed\n");
-		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
-		return __RESULT_FAILURE;
-	}
-#endif
-	// printf(" :config sdt\n");
-	// fflush(stdout);
-	config->sdt.N = 16;
-	config->sdt.m = 272;
-	config->sdt.t8 = 100;
-	config->sdt.Tin = 4;
-	config->sdt.Tie = 1;
-	config->sdt.T = 64;
-	config->sdt.D = 256;
-	config->sdt.Te = 577169;
-	config->sdt.De = 9308000;
-	config->sdt.Ue = 144292000;
-	config->sdt.b = 8;
-	config->sdt.f = SDT_FLAGS_ONE;
-	ctl.ic_cmd = SDT_IOCSCONFIG;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->sdt);
-	ctl.ic_dp = (char *) &config->sdt;
-	if (ioctl(test_fd[0], I_STR, &ctl) < 0) {
-		printf("****ERROR: config sdt failed\n");
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		return __RESULT_FAILURE;
-	}
-	return __RESULT_SUCCESS;
-}
-
-/*
- *  The PT is enabled in SDL mode.  This will allow most of the test cases.
- *  For several test cases in Q.781, however, it is necessary to enable the
- *  device in raw mode so that the PT can have control over the number of
- *  flags sent between frames as well as the validity of the CRC bits.  For
- *  those test cases, a raw mode is used where the PT writes bits directly to
- *  the line.
- */
-int
-pt_power_on(void)
-{
-	int ret;
-	char cbuf[BUFSIZE];
-	// char dbuf[BUFSIZE];
-	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	// struct strbuf data = { sizeof(*dbuf), 0, dbuf };
-	union SDT_primitives *d = (union SDT_primitives *) cbuf;
-
-	// printf(" :power on\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = sizeof(d->daedt_start_req);
-	ctrl.buf = cbuf;
-	d->daedt_start_req.sdt_primitive = SDT_DAEDT_START_REQ;
-	if ((ret = putmsg(test_fd[0], &ctrl, NULL, RS_HIPRI)) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = sizeof(d->daedr_start_req);
-	ctrl.buf = cbuf;
-	d->daedr_start_req.sdt_primitive = SDT_DAEDR_START_REQ;
-	if ((ret = putmsg(test_fd[0], &ctrl, NULL, RS_HIPRI)) < 0) {
-		printf("%s: %s\n", __FUNCTION__, strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	return __RESULT_SUCCESS;
-}
-
-#if 0
-static int
-pt_start(void)
-{
-	if (pt_open() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (pt_attach() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (pt_config() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (pt_enable() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (pt_power_on() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
-}
-
-static int
-pt_end(void)
-{
-	if (pt_disable() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (pt_detach() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (pt_close() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-iut_open(void)
-{
-	return test_open(CHILD_IUT, devname, O_NONBLOCK | O_RDWR);
-}
-#endif
-
-#if 0
-static int
-iut_close(void)
-{
-	return test_close(CHILD_IUT);
-}
-#endif
-
-#if 0
-static int
-iut_attach(void)
-{
-	int ret, flags = 0;
-	char cbuf[BUFSIZE];
-	char dbuf[BUFSIZE];
-	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
-	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	ppa_t ppa;
-	ppa = (IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0);
-	// printf(" :attach\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = sizeof(p->attach_req) + sizeof(ppa_t);
-	ctrl.buf = cbuf;
-	p->attach_req.lmi_primitive = LMI_ATTACH_REQ;
-	bcopy(&ppa, p->attach_req.lmi_ppa, sizeof(ppa_t));
-	if ((ret = putmsg(test_fd[1], &ctrl, NULL, RS_HIPRI)) < 0) {
-		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	for (;;) {
-		flags = 0;
-		ctrl.maxlen = BUFSIZE;
-		ctrl.len = 0;
-		ctrl.buf = cbuf;
-		data.maxlen = BUFSIZE;
-		data.len = 0;
-		data.buf = dbuf;
-		if ((ret = getmsg(test_fd[1], &ctrl, &data, &flags)) < 0) {
-			if (errno != EAGAIN && errno != EINTR) {
-				printf
-				    ("                                   ****ERROR: getmsg failed\n");
-				printf("                                              %s: %s\n",
-				       __FUNCTION__, strerror(errno));
-				fflush(stdout);
-				return __RESULT_FAILURE;
-			}
-			continue;
-		}
-		if (p->lmi_primitive != LMI_OK_ACK) {
-			printf("                                   ****ERROR: getmsg failed\n");
-			fflush(stdout);
-			printf("                                              %s: %s\n",
-			       __FUNCTION__, strerror(errno));
-			iut_showmsg(&ctrl, &data);
-		} else
-			return __RESULT_SUCCESS;
-	}
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-iut_detach(void)
-{
-	int ret;
-	char cbuf[BUFSIZE];
-	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	// printf(" :detach\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = sizeof(p->detach_req);
-	ctrl.buf = cbuf;
-	p->detach_req.lmi_primitive = LMI_DETACH_REQ;
-	if ((ret = putmsg(test_fd[1], &ctrl, NULL, RS_HIPRI)) < 0) {
-		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-iut_enable(void)
-{
-	int ret, flags = 0;
-	char cbuf[BUFSIZE];
-	char dbuf[BUFSIZE];
-	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
-	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	// printf(" :enable\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = sizeof(p->enable_req);
-	ctrl.buf = cbuf;
-	p->enable_req.lmi_primitive = LMI_ENABLE_REQ;
-	ctrl.len = sizeof(p->enable_req);
-	if ((ret = putmsg(test_fd[1], &ctrl, NULL, RS_HIPRI)) < 0) {
-		printf("                                   ****ERROR: putmsg failed\n");
-		fflush(stdout);
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		return __RESULT_FAILURE;
-	}
-	for (;;) {
-		flags = 0;
-		ctrl.maxlen = BUFSIZE;
-		ctrl.len = 0;
-		ctrl.buf = cbuf;
-		data.maxlen = BUFSIZE;
-		data.len = 0;
-		data.buf = dbuf;
-		if ((ret = getmsg(test_fd[1], &ctrl, &data, &flags)) < 0) {
-			if (errno != EAGAIN && errno != EINTR) {
-				printf
-				    ("                                   ****ERROR: getmsg failed\n");
-				printf("                                              %s: %s\n",
-				       __FUNCTION__, strerror(errno));
-				fflush(stdout);
-				return __RESULT_FAILURE;
-			}
-			continue;
-		}
-		if (p->lmi_primitive != LMI_ENABLE_CON && p->lmi_primitive != LMI_OK_ACK) {
-			printf("                                   ****ERROR: getmsg failed\n");
-			fflush(stdout);
-			printf("                                              %s: %s\n",
-			       __FUNCTION__, strerror(errno));
-			iut_showmsg(&ctrl, &data);
-		} else
-			return __RESULT_SUCCESS;
-	}
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-iut_disable(void)
-{
-	char cbuf[BUFSIZE];
-	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	struct strbuf ctrl = { sizeof(*cbuf), sizeof(p->disable_req), cbuf };
-	// printf(" :disable\n");
-	// fflush(stdout);
-	ctrl.maxlen = BUFSIZE;
-	ctrl.len = LMI_DISABLE_REQ_SIZE;
-	ctrl.buf = cbuf;
-	p->disable_req.lmi_primitive = LMI_DISABLE_REQ;
-	ctrl.len = LMI_DISABLE_REQ_SIZE;
-	if (putmsg(test_fd[1], &ctrl, NULL, RS_HIPRI) < 0) {
-		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-iut_config(void)
-{
-	struct strioctl ctl;
-	// printf(" :config\n");
-	// fflush(stdout);
-	// printf(" :options sdl\n");
-	// fflush(stdout);
-	config->opt.pvar = SS7_PVAR_ITUT_96;
-	config->opt.popt = 0;
-	ctl.ic_cmd = SL_IOCSOPTIONS;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->opt);
-	ctl.ic_dp = (char *) &config->opt;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
-	      option_sdl_failed:
-		printf("                                   ****ERROR: options sdl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	ctl.ic_cmd = SL_IOCGOPTIONS;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->opt);
-	ctl.ic_dp = (char *) &config->opt;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
-		goto option_sdl_failed;
-	if (config->opt.pvar != SS7_PVAR_ITUT_96 || config->opt.popt != 0)
-		goto option_sdl_failed;
-	// printf(" :options sdt\n");
-	// fflush(stdout);
-	config->opt.pvar = SS7_PVAR_ITUT_96;
-	config->opt.popt = 0;
-	ctl.ic_cmd = SDT_IOCSOPTIONS;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->opt);
-	ctl.ic_dp = (char *) &config->opt;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
-	      option_sdt_failed:
-		printf("                                   ****ERROR: options sdt failed\n");
-		fflush(stdout);
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		return __RESULT_FAILURE;
-	}
-	ctl.ic_cmd = SDT_IOCGOPTIONS;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->opt);
-	ctl.ic_dp = (char *) &config->opt;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
-		goto option_sdt_failed;
-	if (config->opt.pvar != SS7_PVAR_ITUT_96 || config->opt.popt != 0)
-		goto option_sdt_failed;
-	// printf(" :options sl\n");
-	// fflush(stdout);
-	config->opt.pvar = SS7_PVAR_ITUT_96;
-	config->opt.popt = 0;
-	ctl.ic_cmd = SL_IOCSOPTIONS;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->opt);
-	ctl.ic_dp = (char *) &config->opt;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
-	      option_sl_failed:
-		printf("                                   ****ERROR: options sl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	ctl.ic_cmd = SL_IOCGOPTIONS;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->opt);
-	ctl.ic_dp = (char *) &config->opt;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
-		goto option_sl_failed;
-	if (config->opt.pvar != SS7_PVAR_ITUT_96 || config->opt.popt != 0)
-		goto option_sl_failed;
-	// printf(" :config sdl\n");
-	// fflush(stdout);
-	/* go with defaults */
-#if 0
-	config->sdl.ifflags = 0;
-	config->sdl.iftype = SDL_TYPE_DS0;
-	config->sdl.ifrate = 64000;
-	config->sdl.ifgtype = SDL_GTYPE_NONE;
-	config->sdl.ifgrate = 1544000;
-	config->sdl.ifmode = SDL_MODE_PEER;
-	config->sdl.ifgmode = SDL_GMODE_NONE;
-	config->sdl.ifgcrc = SDL_GCRC_CRC4;
-	config->sdl.ifcoding = SDL_CODING_B8ZS;
-	config->sdl.ifframing = SDL_FRAMING_ESF;
-	config->sdl.ifleads = 0;
-	config->sdl.ifalarms = 0;
-	config->sdl.ifrxlevel = 0;
-	config->sdl.iftxlevel = 0;
-	config->sdl.ifsync = 0;
-	config->sdl.ifsyncsrc[0] = 0;
-	config->sdl.ifsyncsrc[1] = 0;
-	config->sdl.ifsyncsrc[2] = 0;
-	config->sdl.ifsyncsrc[3] = 0;
-	ctl.ic_cmd = SDL_IOCSCONFIG;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->sdl);
-	ctl.ic_dp = (char *) &config->sdl;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
-		goto config_sdl_failed;
-#endif
-	ctl.ic_cmd = SDL_IOCGCONFIG;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->sdl);
-	ctl.ic_dp = (char *) &config->sdl;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
-		// config_sdl_failed:
-		printf("                                   ****ERROR: config sdl failed\n");
-		fflush(stdout);
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		return __RESULT_FAILURE;
-	}
-	/* go with defaults */
-#if 0
-	if (config->sdl.iftype != SDL_TYPE_DS0
-	    || config->sdl.ifrate != 64000
-	    || config->sdl.ifgtype != SDL_GTYPE_NONE
-	    || config->sdl.ifgrate != 1544000
-	    || config->sdl.ifmode != SDL_MODE_PEER
-	    || config->sdl.ifgmode != SDL_GMODE_NONE
-	    || config->sdl.ifgcrc != SDL_GCRC_CRC4
-	    || config->sdl.ifcoding != SDL_CODING_B8ZS || config->sdl.ifframing != SDL_FRAMING_ESF)
-		goto config_sdl_failed;
-#endif
-	// printf(" :config sdt\n");
-	// fflush(stdout);
-#if 0
-	config->sdt.t8 = 100;
-	config->sdt.Tin = 4;
-	config->sdt.Tie = 1;
-	config->sdt.T = 64;
-	config->sdt.D = 256;
-	config->sdt.Te = 577169;
-	config->sdt.De = 9308000;
-	config->sdt.Ue = 144292000;
-	config->sdt.N = 16;
-	config->sdt.m = 272;
-	config->sdt.b = 8;
-	config->sdt.f = iut_flags;
-	ctl.ic_cmd = SDT_IOCSCONFIG;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->sdt);
-	ctl.ic_dp = (char *) &config->sdt;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
-		goto config_sdt_failed;
-#endif
-	ctl.ic_cmd = SDT_IOCGCONFIG;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->sdt);
-	ctl.ic_dp = (char *) &config->sdt;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
-		// config_sdt_failed:
-		printf("                                   ****ERROR: config sdt failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-#if 0
-	if (config->sdt.t8 != 100
-	    || config->sdt.Tin != 4
-	    || config->sdt.Tie != 1
-	    || config->sdt.T != 64
-	    || config->sdt.D != 256
-	    || config->sdt.Te != 577169
-	    || config->sdt.De != 9308000
-	    || config->sdt.Ue != 144292000
-	    || config->sdt.N != 16
-	    || config->sdt.m != 272 || config->sdt.b != 8 || config->sdt.f != iut_flags)
-		goto config_sdt_failed;
-#endif
-	// printf(" :config sl\n");
-	// fflush(stdout);
-	config->sl.t1 = 45 * 1000;	/* milliseconds */
-	config->sl.t2 = 5 * 1000;	/* milliseconds */
-	config->sl.t2l = 20 * 1000;	/* milliseconds */
-	config->sl.t2h = 100 * 1000;	/* milliseconds */
-	config->sl.t3 = 1 * 1000;	/* milliseconds */
-	config->sl.t4n = 8 * 1000;	/* milliseconds */
-	config->sl.t4e = 500;		/* milliseconds */
-	config->sl.t5 = 100;		/* milliseconds */
-	config->sl.t6 = 4 * 1000;	/* milliseconds */
-	config->sl.t7 = 1 * 1000;		/* milliseconds */
-	config->sl.rb_abate = 3;	/* messages */
-	config->sl.rb_accept = 6;	/* messages */
-	config->sl.rb_discard = 9;	/* messages */
-	config->sl.tb_abate_1 = 128 * 272;	/* octets */
-	config->sl.tb_onset_1 = 256 * 272;	/* octets */
-	config->sl.tb_discd_1 = 384 * 272;	/* octets */
-	config->sl.tb_abate_2 = 512 * 272;	/* octets */
-	config->sl.tb_onset_2 = 640 * 272;	/* octets */
-	config->sl.tb_discd_2 = 768 * 272;	/* octets */
-	config->sl.tb_abate_3 = 896 * 272;	/* octets */
-	config->sl.tb_onset_3 = 1024 * 272;	/* octets */
-	config->sl.tb_discd_3 = 1152 * 272;	/* octets */
-	config->sl.N1 = 127;	/* messages */
-	config->sl.N2 = 8192;	/* octets */
-	config->sl.M = 5;
-	ctl.ic_cmd = SL_IOCSCONFIG;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->sl);
-	ctl.ic_dp = (char *) &config->sl;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
-	      config_sl_failed:
-		printf("                                   ****ERROR: config sl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
-		fflush(stdout);
-		return __RESULT_FAILURE;
-	}
-	ctl.ic_cmd = SL_IOCGCONFIG;
-	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(config->sl);
-	ctl.ic_dp = (char *) &config->sl;
-	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
-		goto config_sl_failed;
-	if (config->sl.t1 != 45 * 1000
-	    || config->sl.t2 != 5 * 1000
-	    || config->sl.t2l != 20 * 1000
-	    || config->sl.t2h != 100 * 1000
-	    || config->sl.t3 != 1 * 1000
-	    || config->sl.t4n != 8 * 1000
-	    || config->sl.t4e != 500
-	    || config->sl.t5 != 100
-	    || config->sl.t6 != 4 * 1000
-	    || config->sl.t7 != 1 * 1000
-	    || config->sl.rb_abate != 3
-	    || config->sl.rb_accept != 6
-	    || config->sl.rb_discard != 9
-	    || config->sl.tb_abate_1 != 128 * 272
-	    || config->sl.tb_onset_1 != 256 * 272
-	    || config->sl.tb_discd_1 != 384 * 272
-	    || config->sl.tb_abate_2 != 512 * 272
-	    || config->sl.tb_onset_2 != 640 * 272
-	    || config->sl.tb_discd_2 != 768 * 272
-	    || config->sl.tb_abate_3 != 896 * 272
-	    || config->sl.tb_onset_3 != 1024 * 272
-	    || config->sl.tb_discd_3 != 1152 * 272
-	    || config->sl.N1 != 127 || config->sl.N2 != 8192 || config->sl.M != 5)
-		goto config_sl_failed;
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-iut_power_off(void)
-{
-	do_signal(CHILD_IUT, __TEST_STOP);
-	stop_tt();
-	show_msus = 0;
-	show_fisus = 1;
-	iut_disable();
-	iut_detach();
-	while (wait_event(CHILD_IUT, 250) != __EVENT_NO_MSG) ;
-	ioctl(test_fd[1], I_FLUSH, FLUSHRW);	/* flush IUT */
-	iut_close();
-	ioctl(test_fd[0], I_FLUSH, FLUSHRW);	/* flush PT */
-	return __RESULT_SUCCESS;
-}
-
-static int
-link_power_off(void)
-{
-	int ret = __RESULT_SUCCESS;
-	show_msus = 1;
-	show_fisus = 1;
-	show_timeout = 0;
-	bib[0] = fib[0] = bib[1] = fib[1] = 0x80;
-	bsn[0] = fsn[0] = bsn[1] = fsn[1] = 0x7f;
-	if ((ret = iut_open()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	if ((ret = iut_attach()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	config->opt.popt = 0;
-	config->sl.t7 = 1 * 1000;
-	if ((ret = iut_config()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	if ((ret = iut_enable()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	sleep(10);
-	// while (wait_event(child, 0) != __EVENT_NO_MSG);
-	// ioctl(test_fd[0], I_FLUSH, FLUSHRW); /* flush PT */
-	start_tt(10000);
-	return __RESULT_SUCCESS;
-}
-
-static int
-link_out_of_service(void)
-{
-	int ret = __RESULT_SUCCESS;
-	show_msus = 1;
-	show_fisus = 1;
-	show_timeout = 0;
-	bib[0] = fib[0] = bib[1] = fib[1] = 0x80;
-	bsn[0] = fsn[0] = bsn[1] = fsn[1] = 0x7f;
-	if ((ret = iut_open()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	if ((ret = iut_attach()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	config->opt.popt = 0;
-	config->sl.t7 = 1 * 1000;
-	if ((ret = iut_config()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	if ((ret = iut_enable()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	// sleep(1);
-	if ((ret = do_signal(CHILD_IUT, __TEST_POWER_ON)) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	// while (wait_event(child, 0) != __EVENT_NO_MSG);
-	// get_event();
-	// ioctl(test_fd[0], I_FLUSH, FLUSHRW); /* flush PT */
-	start_tt(10000);
-	return __RESULT_SUCCESS;
-}
-#endif
-
-#if 0
-static int
-link_in_service(void)
-{
-	int ret = __RESULT_SUCCESS;
-	show_msus = 1;
-	show_fisus = 1;
-	show_timeout = 0;
-	bib[0] = fib[0] = bib[1] = fib[1] = 0x80;
-	bsn[0] = fsn[0] = bsn[1] = fsn[1] = 0x7f;
-	if ((ret = iut_open()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	if ((ret = iut_attach()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	if ((ret = iut_config()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	if ((ret = iut_enable()) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	// sleep(1);
-	if ((ret = do_signal(CHILD_IUT, __TEST_POWER_ON)) != __RESULT_SUCCESS)
-		return __RESULT_INCONCLUSIVE;
-	// while (wait_event(child, 0) != __EVENT_NO_MSG);
-	// get_event();
-	// ioctl(test_fd[0], I_FLUSH, FLUSHRW); /* flush PT */
-	start_tt(10000);
-	for (;;) {
-		switch (state) {
-		case 0:
-			switch ((event = get_event(CHILD_PTU))) {
-			case __TEST_SIOS:
-				do_signal(CHILD_PTU, __TEST_SIOS);
-				do_signal(CHILD_IUT, __TEST_START);
-				state = 1;
-				break;
-			case __EVENT_TIMEOUT:
-				return __RESULT_INCONCLUSIVE;
-			default:
-				break;
-			}
-			break;
-		case 1:
-			switch ((event = get_event(CHILD_PTU))) {
-			case __TEST_SIOS:
-				do_signal(CHILD_PTU, __TEST_SIOS);
-				break;
-			case __TEST_SIO:
-				do_signal(CHILD_PTU, __TEST_SIO);
-				state = 2;
-				break;
-			default:
-				return __RESULT_INCONCLUSIVE;
-			}
-			break;
-		case 2:
-			switch ((event = get_event(CHILD_PTU))) {
-			case __TEST_SIO:
-				do_signal(CHILD_PTU, __TEST_SIO);
-				break;
-			case __TEST_SIN:
-				do_signal(CHILD_PTU, __TEST_SIE);
-				start_tt(config->sl.t4e * 20);
-				state = 3;
-				break;
-			default:
-				return __RESULT_INCONCLUSIVE;
-			}
-			break;
-		case 3:
-			switch ((event = get_event(CHILD_PTU))) {
-			case __TEST_SIN:
-				do_signal(CHILD_PTU, __TEST_SIE);
-				break;
-			case __TEST_FISU:
-				do_signal(CHILD_PTU, __TEST_FISU);
-				break;
-			case __EVENT_IUT_IN_SERVICE:
-				start_tt(10000);
-				return __RESULT_SUCCESS;
-			default:
-				return __RESULT_INCONCLUSIVE;
-			}
-			break;
-		default:
-			return __RESULT_INCONCLUSIVE;
-		}
-	}
-	return __RESULT_INCONCLUSIVE;
-}
-#endif
-
-#if 0
-static int
-link_in_service_basic(void)
-{
-	config->opt.popt = 0;
-	config->sl.t7 = 1 * 1000;
-	return link_in_service();
-}
-
-static int
-link_in_service_pcr(void)
-{
-	config->opt.popt = SS7_POPT_PCR;
-	config->sl.t7 = 2 * 1000;
-	return link_in_service();
-}
-
-static int
-link_in_service_basic_long_ack(void)
-{
-	config->opt.popt = 0;
-	config->sl.t7 = 4 * 1000;
-	return link_in_service();
-}
-
-static int
-link_in_service_pcr_long_ack(void)
-{
-	config->opt.popt = SS7_POPT_PCR;
-	config->sl.t7 = 8 * 1000;
-	return link_in_service();
-}
-#endif
-
-#if 0
-static int
-run_test(test_case_t * tcase)
-{
-	int ret = 0;
-	printf(tcase->title);
-	fflush(stdout);
-	state = 0;
-	event = 0;
-	count = 0;
-	tries = 0;
-	beg_time = 0;
-	expand = 0;
-	oldmsg = 0;
-	cntmsg = 0;
-	oldpsb = 0;
-	oldact = 0;
-	cntact = 0;
-	oldret = 0;
-	cntret = 0;
-	oldisb = 0;
-	oldprm = 0;
-	cntprm = 0;
-	msu_len = MSU_LEN;
-	if (pt_start() == __RESULT_SUCCESS) {
-		printf("\nPrecondition:\n");
-		fflush(stdout);
-		if ((ret = (*tcase->precond) ()) == __RESULT_SUCCESS) {
-			state = 0;
-			event = 0;
-			count = 0;
-			tries = 0;
-			beg_time = 0;
-			expand = 0;
-			printf("\nTest case:\n");
-			fflush(stdout);
-			ret = (*tcase->test) ();
-		}
-	} else
-		ret = __RESULT_INCONCLUSIVE;
-	switch (ret) {
-	case __RESULT_SUCCESS:
-		printf("                 =====SUCCESS=====\n");
-		break;
-	case __RESULT_FAILURE:
-		printf("                 +++++__RESULT_FAILURE+++++\n");
-		break;
-	case __RESULT_INCONCLUSIVE:
-		printf("                 ??INCONCLUSIVE???\n");
-		break;
-	default:
-		printf("                 =+=+=+ERROR+=+=+=\n");
-		break;
-	}
-	printf("\nPostcondition:\n");
-	fflush(stdout);
-	iut_power_off();
-	// if (ret != __RESULT_SUCCESS)
-	// pt_stats();
-	pt_end();
-	return ret;
-}
-#endif
-
-int
-iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
-{
-	union LMI_primitives *p = (union LMI_primitives *) ctrl->buf;
-	union SL_primitives *l = (union SL_primitives *) ctrl->buf;
-
-	if (ctrl->len > 0) {
-		switch (p->lmi_primitive) {
-		case LMI_INFO_ACK:
-		{
-			int ppalen = ctrl->len - sizeof(p->info_ack);
-			printf("LMI_INFO_ACK:\n");
-			printf("Version = 0x%08lx\n", (ulong)p->info_ack.lmi_version);
-			printf("State = %lu\n", (ulong)p->info_ack.lmi_state);
-			printf("Max sdu = %lu\n", (ulong)p->info_ack.lmi_max_sdu);
-			printf("Min sdu = %lu\n", (ulong)p->info_ack.lmi_min_sdu);
-			printf("Header len = %lu\n", (ulong)p->info_ack.lmi_header_len);
-			printf("PPA style = %lu\n", (ulong)p->info_ack.lmi_ppa_style);
-			printf("PPA length = %u\n", ppalen);
-			fflush(stdout);
-			print_ppa(CHILD_IUT, (ppa_t *) p->info_ack.lmi_ppa_addr);
-		}
-			return (p->lmi_primitive);
-		case LMI_OK_ACK:
-		{
-			printf("LMI_OK_ACK:\n");
-			printf("Correct primitive = %lu\n", (ulong)p->ok_ack.lmi_correct_primitive);
-			printf("State = %lu\n", (ulong)p->ok_ack.lmi_state);
-			fflush(stdout);
-		}
-			return (p->lmi_primitive);
-		case LMI_ERROR_ACK:
-		{
-			printf("LMI_ERROR_ACK:\n");
-			printf("Error number = %lu\n", (ulong)p->error_ack.lmi_errno);
-			printf("Error string = %s\n", strerror(p->error_ack.lmi_errno));
-			printf("Reason number = %lu\n", (ulong)p->error_ack.lmi_reason);
-			printf("Reason string = %s\n", lmi_strreason(p->error_ack.lmi_reason));
-			printf("Error primitive = %lu\n", (ulong)p->error_ack.lmi_error_primitive);
-			printf("State = %lu\n", (ulong)p->error_ack.lmi_state);
-			fflush(stdout);
-		}
-			return (p->lmi_primitive);
-		case LMI_ERROR_IND:
-		{
-			printf("LMI_ERROR_IND:\n");
-			printf("Error number = %lu\n", (ulong)p->error_ind.lmi_errno);
-			printf("Error string = %s\n", strerror(p->error_ind.lmi_errno));
-			printf("Reason number = %lu\n", (ulong)p->error_ind.lmi_reason);
-			printf("Reason string = %s\n", lmi_strreason(p->error_ind.lmi_reason));
-			printf("State = %lu\n", (ulong)p->error_ind.lmi_state);
-			fflush(stdout);
-		}
-			return (p->lmi_primitive);
-		case LMI_ENABLE_CON:
-		{
-			printf("LMI_ENABLE_CON:\n");
-			printf("State = %lu\n", (ulong)p->enable_con.lmi_state);
-			fflush(stdout);
-		}
-			return (p->lmi_primitive);
-		case LMI_DISABLE_CON:
-		{
-			printf("LMI_DISABLE_CON:\n");
-			printf("State = %lu\n", (ulong)p->enable_con.lmi_state);
-			fflush(stdout);
-		}
-			return (p->lmi_primitive);
-		default:
-			switch (l->sl_primitive) {
-			case SL_PDU_IND:
-			{
-				int i;
-				char *c = data->buf;
-				printf("SL_PDU_IND:\n");
-				printf("  Data: ");
-				for (i = 0; i < data->len; i++, c++)
-					printf("%02x", *c);
-				printf("\n");
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_LINK_CONGESTED_IND:
-			{
-				printf("SL_LINK_CONGESTED_IND:\n");
-				printf("  timestamp = %lu\n", (ulong)l->link_cong_ind.sl_timestamp);
-				printf("  cong stat = %lu\n", (ulong)l->link_cong_ind.sl_cong_status);
-				printf("  disc stat = %lu\n", (ulong)l->link_cong_ind.sl_disc_status);
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_LINK_CONGESTION_CEASED_IND:
-			{
-				printf("SL_LINK_CONGESTION_CEASED_IND:\n");
-				printf("  timestamp = %lu\n", (ulong)l->link_cong_ceased_ind.sl_timestamp);
-				printf("  cong stat = %lu\n", (ulong)l->link_cong_ceased_ind.sl_cong_status);
-				printf("  disc stat = %lu\n", (ulong)l->link_cong_ceased_ind.sl_disc_status);
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_RETRIEVED_MESSAGE_IND:
-			{
-				int i;
-				char *c = data->buf;
-				printf("SL_RETRIEVED_MESSAGE_IND:\n");
-				printf("  Data: ");
-				for (i = 0; i < data->len; i++, c++)
-					printf("%02x", *c);
-				printf("\n");
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_RB_CLEARED_IND:
-			{
-				printf("SL_RB_CLEARED_IND\n");
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_BSNT_IND:
-			{
-				printf("SL_BSNT_IND:\n");
-				printf("  bsnt = %lu\n", (ulong)l->bsnt_ind.sl_bsnt);
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_IN_SERVICE_IND:
-			{
-				printf("SL_IN_SERVICE_IND\n");
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_OUT_OF_SERVICE_IND:
-			{
-				printf("SL_OUT_OF_SERVICE_IND:\n");
-				printf("  timestamp = %lu\n", (ulong)l->out_of_service_ind.sl_timestamp);
-				printf("  reason    = %lu\n", (ulong)l->out_of_service_ind.sl_reason);
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_REMOTE_PROCESSOR_OUTAGE_IND:
-			{
-				printf("SL_REMOTE_PROCESSOR_OUTAGE_IND:\n");
-				printf("  timestamp = %lu\n", (ulong)l->rem_proc_out_ind.sl_timestamp);
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_REMOTE_PROCESSOR_RECOVERED_IND:
-			{
-				printf("SL_REMOTE_PROCESSOR_RECOVERED_IND:\n");
-				printf("  timestamp = %lu\n", (ulong)l->rem_proc_recovered_ind.sl_timestamp);
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			case SL_RTB_CLEARED_IND:
-			{
-				printf("SL_RTB_CLEARED_IND\n");
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			default:
-			{
-				printf("Unrecognized primitive %lu!\n", (ulong)l->sl_primitive);
-				fflush(stdout);
-			}
-				return (l->sl_primitive);
-			}
-		}
-	}
-	return (0);
-}
 /*
  *  =========================================================================
  *
@@ -9150,6 +7967,7 @@ struct test_stream {
 	int (*postamble) (int);		/* test postamble */
 };
 
+#if 1
 static int
 check_snibs(int child, unsigned char bsnib, unsigned char fsnib)
 {
@@ -9158,6 +7976,7 @@ check_snibs(int child, unsigned char bsnib, unsigned char fsnib)
 		return __RESULT_SUCCESS;
 	return __RESULT_FAILURE;
 }
+#endif
 
 /*
  *  Check test case guard timer.
@@ -9388,7 +8207,7 @@ test_0_2_7_ptu(int child)
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
-failure:
+      failure:
 	return __RESULT_FAILURE;
 }
 
@@ -9540,7 +8359,6 @@ static struct test_stream test_case_1_1b_ptu = { preamble_link_power_off, test_1
 static struct test_stream test_case_1_1b_iut = { preamble_link_power_off, test_1_1b_iut, postamble_link_out_of_service };
 
 #define test_case_1_1b { &test_case_1_1b_ptu, &test_case_1_1b_iut, NULL }
-
 
 #define tgrp_case_1_2 test_group_1
 #define sgrp_case_1_2 test_subgroup_1
@@ -9735,7 +8553,7 @@ test_1_3_ptu(int child)
 	start_tt(config->sl.t3 * 2);
 	state++;
 	for (;;) {
-		switch(get_event(child)) {
+		switch (get_event(child)) {
 		case __MSG_PROVING:
 		case __TEST_SIE:
 		case __TEST_SIN:
@@ -9934,7 +8752,7 @@ test_alignment_pt(int child, int proving, int signal, int result)
 			goto failure;
 		state++;
 		for (;;) {
-			switch(get_event(child)) {
+			switch (get_event(child)) {
 			case __TEST_SIOS:
 				if (do_signal(child, __TEST_SIO))
 					goto failure;
@@ -10062,7 +8880,7 @@ test_alignment_sut(int child, int proving, int result)
 		switch (proving) {
 		case 0:
 			for (;;) {
-				switch(get_event(child)) {
+				switch (get_event(child)) {
 				case __TEST_SIO:
 					if (do_signal(child, __TEST_SIO))
 						goto failure;
@@ -11169,7 +9987,7 @@ test_1_11_ptu(int child, int proving)
 		goto failure;
 	state++;
 	for (;;) {
-		switch(get_event(child)) {
+		switch (get_event(child)) {
 		case __TEST_SIOS:
 			if (do_signal(child, __TEST_SIOS))
 				goto failure;
@@ -11194,7 +10012,7 @@ test_1_11_ptu(int child, int proving)
 	switch (proving) {
 	case 0:
 		for (;;) {
-			switch(get_event(child)) {
+			switch (get_event(child)) {
 			case __TEST_SIO:
 				if (do_signal(child, __TEST_SIO))
 					goto failure;
@@ -11260,7 +10078,7 @@ test_1_11_ptu(int child, int proving)
 	start_tt(1000);
 	state++;
 	for (;;) {
-		switch(get_event(child)) {
+		switch (get_event(child)) {
 		case __TEST_SIPO:
 			if (do_signal(child, __TEST_SIPO))
 				goto failure;
@@ -17712,7 +16530,6 @@ static struct test_stream test_case_8_7_iut = { preamble_link_in_service, test_8
 
 #define test_case_8_7 { &test_case_8_7_ptu, &test_case_8_7_iut, NULL }
 
-
 #define tgrp_case_8_8 test_group_8
 #define sgrp_case_8_8 test_subgroup_8
 #define sref_case_8_8 "Q.781/8.8"
@@ -18801,8 +17618,7 @@ test_9_3_ptu(int child)
 		goto inconclusive;
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n,
-	       msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (;;) {
@@ -18908,8 +17724,7 @@ test_9_3_iut(int child)
 		goto inconclusive;
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n,
-	       msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (i = 0; i < n + 1; i++)
@@ -20826,41 +19641,41 @@ struct test_case {
 	numb_case_2_6, tgrp_case_2_6, sgrp_case_2_6, name_case_2_6, xtra_case_2_6, desc_case_2_6, sref_case_2_6, test_case_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_2_7, tgrp_case_2_7, sgrp_case_2_7, name_case_2_7, xtra_case_2_7, desc_case_2_7, sref_case_2_7, test_case_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_2_8, tgrp_case_2_8, sgrp_case_2_8, name_case_2_8, xtra_case_2_8, desc_case_2_8, sref_case_2_8, test_case_2_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, xtra_case_3_1, desc_case_3_1, sref_case_3_1, test_case_3_1, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, xtra_case_3_1, desc_case_3_1, sref_case_3_1, test_case_3_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_3_2, tgrp_case_3_2, sgrp_case_3_2, name_case_3_2, xtra_case_3_2, desc_case_3_2, sref_case_3_2, test_case_3_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_3_3, tgrp_case_3_3, sgrp_case_3_3, name_case_3_3, xtra_case_3_3, desc_case_3_3, sref_case_3_3, test_case_3_3, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_3, tgrp_case_3_3, sgrp_case_3_3, name_case_3_3, xtra_case_3_3, desc_case_3_3, sref_case_3_3, test_case_3_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_3_4, tgrp_case_3_4, sgrp_case_3_4, name_case_3_4, xtra_case_3_4, desc_case_3_4, sref_case_3_4, test_case_3_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_3_5, tgrp_case_3_5, sgrp_case_3_5, name_case_3_5, xtra_case_3_5, desc_case_3_5, sref_case_3_5, test_case_3_5, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_5, tgrp_case_3_5, sgrp_case_3_5, name_case_3_5, xtra_case_3_5, desc_case_3_5, sref_case_3_5, test_case_3_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_3_6, tgrp_case_3_6, sgrp_case_3_6, name_case_3_6, xtra_case_3_6, desc_case_3_6, sref_case_3_6, test_case_3_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_3_7, tgrp_case_3_7, sgrp_case_3_7, name_case_3_7, xtra_case_3_7, desc_case_3_7, sref_case_3_7, test_case_3_7, &begin_tests, &end_tests, 0, __RESULT_INCONCLUSIVE, __RESULT_INCONCLUSIVE,}, {
+	numb_case_3_7, tgrp_case_3_7, sgrp_case_3_7, name_case_3_7, xtra_case_3_7, desc_case_3_7, sref_case_3_7, test_case_3_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_3_8, tgrp_case_3_8, sgrp_case_3_8, name_case_3_8, xtra_case_3_8, desc_case_3_8, sref_case_3_8, test_case_3_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_4_1a, tgrp_case_4_1a, sgrp_case_4_1a, name_case_4_1a, xtra_case_4_1a, desc_case_4_1a, sref_case_4_1a, test_case_4_1a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_4_1b, tgrp_case_4_1b, sgrp_case_4_1b, name_case_4_1b, xtra_case_4_1b, desc_case_4_1b, sref_case_4_1b, test_case_4_1b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_4_2, tgrp_case_4_2, sgrp_case_4_2, name_case_4_2, xtra_case_4_2, desc_case_4_2, sref_case_4_2, test_case_4_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_4_3, tgrp_case_4_3, sgrp_case_4_3, name_case_4_3, xtra_case_4_3, desc_case_4_3, sref_case_4_3, test_case_4_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, xtra_case_5_1, desc_case_5_1, sref_case_5_1, test_case_5_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_2, tgrp_case_5_2, sgrp_case_5_2, name_case_5_2, xtra_case_5_2, desc_case_5_2, sref_case_5_2, test_case_5_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, xtra_case_5_1, desc_case_5_1, sref_case_5_1, test_case_5_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2, tgrp_case_5_2, sgrp_case_5_2, name_case_5_2, xtra_case_5_2, desc_case_5_2, sref_case_5_2, test_case_5_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_5_3, tgrp_case_5_3, sgrp_case_5_3, name_case_5_3, xtra_case_5_3, desc_case_5_3, sref_case_5_3, test_case_5_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_5_4a, tgrp_case_5_4a, sgrp_case_5_4a, name_case_5_4a, xtra_case_5_4a, desc_case_5_4a, sref_case_5_4a, test_case_5_4a, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_4b, tgrp_case_5_4b, sgrp_case_5_4b, name_case_5_4b, xtra_case_5_4b, desc_case_5_4b, sref_case_5_4b, test_case_5_4b, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_5a, tgrp_case_5_5a, sgrp_case_5_5a, name_case_5_5a, xtra_case_5_5a, desc_case_5_5a, sref_case_5_5a, test_case_5_5a, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_5_5b, tgrp_case_5_5b, sgrp_case_5_5b, name_case_5_5b, xtra_case_5_5b, desc_case_5_5b, sref_case_5_5b, test_case_5_5b, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_6_1, tgrp_case_6_1, sgrp_case_6_1, name_case_6_1, xtra_case_6_1, desc_case_6_1, sref_case_6_1, test_case_6_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_6_2, tgrp_case_6_2, sgrp_case_6_2, name_case_6_2, xtra_case_6_2, desc_case_6_2, sref_case_6_2, test_case_6_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_6_3, tgrp_case_6_3, sgrp_case_6_3, name_case_6_3, xtra_case_6_3, desc_case_6_3, sref_case_6_3, test_case_6_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_6_4, tgrp_case_6_4, sgrp_case_6_4, name_case_6_4, xtra_case_6_4, desc_case_6_4, sref_case_6_4, test_case_6_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_7_1, tgrp_case_7_1, sgrp_case_7_1, name_case_7_1, xtra_case_7_1, desc_case_7_1, sref_case_7_1, test_case_7_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_7_2, tgrp_case_7_2, sgrp_case_7_2, name_case_7_2, xtra_case_7_2, desc_case_7_2, sref_case_7_2, test_case_7_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_7_3, tgrp_case_7_3, sgrp_case_7_3, name_case_7_3, xtra_case_7_3, desc_case_7_3, sref_case_7_3, test_case_7_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_7_4, tgrp_case_7_4, sgrp_case_7_4, name_case_7_4, xtra_case_7_4, desc_case_7_4, sref_case_7_4, test_case_7_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_5_4a, tgrp_case_5_4a, sgrp_case_5_4a, name_case_5_4a, xtra_case_5_4a, desc_case_5_4a, sref_case_5_4a, test_case_5_4a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_4b, tgrp_case_5_4b, sgrp_case_5_4b, name_case_5_4b, xtra_case_5_4b, desc_case_5_4b, sref_case_5_4b, test_case_5_4b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_5a, tgrp_case_5_5a, sgrp_case_5_5a, name_case_5_5a, xtra_case_5_5a, desc_case_5_5a, sref_case_5_5a, test_case_5_5a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_5b, tgrp_case_5_5b, sgrp_case_5_5b, name_case_5_5b, xtra_case_5_5b, desc_case_5_5b, sref_case_5_5b, test_case_5_5b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1, tgrp_case_6_1, sgrp_case_6_1, name_case_6_1, xtra_case_6_1, desc_case_6_1, sref_case_6_1, test_case_6_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_2, tgrp_case_6_2, sgrp_case_6_2, name_case_6_2, xtra_case_6_2, desc_case_6_2, sref_case_6_2, test_case_6_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3, tgrp_case_6_3, sgrp_case_6_3, name_case_6_3, xtra_case_6_3, desc_case_6_3, sref_case_6_3, test_case_6_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_4, tgrp_case_6_4, sgrp_case_6_4, name_case_6_4, xtra_case_6_4, desc_case_6_4, sref_case_6_4, test_case_6_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_1, tgrp_case_7_1, sgrp_case_7_1, name_case_7_1, xtra_case_7_1, desc_case_7_1, sref_case_7_1, test_case_7_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_2, tgrp_case_7_2, sgrp_case_7_2, name_case_7_2, xtra_case_7_2, desc_case_7_2, sref_case_7_2, test_case_7_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_3, tgrp_case_7_3, sgrp_case_7_3, name_case_7_3, xtra_case_7_3, desc_case_7_3, sref_case_7_3, test_case_7_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_4, tgrp_case_7_4, sgrp_case_7_4, name_case_7_4, xtra_case_7_4, desc_case_7_4, sref_case_7_4, test_case_7_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_1, tgrp_case_8_1, sgrp_case_8_1, name_case_8_1, xtra_case_8_1, desc_case_8_1, sref_case_8_1, test_case_8_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_2, tgrp_case_8_2, sgrp_case_8_2, name_case_8_2, xtra_case_8_2, desc_case_8_2, sref_case_8_2, test_case_8_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_2, tgrp_case_8_2, sgrp_case_8_2, name_case_8_2, xtra_case_8_2, desc_case_8_2, sref_case_8_2, test_case_8_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_3, tgrp_case_8_3, sgrp_case_8_3, name_case_8_3, xtra_case_8_3, desc_case_8_3, sref_case_8_3, test_case_8_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_4, tgrp_case_8_4, sgrp_case_8_4, name_case_8_4, xtra_case_8_4, desc_case_8_4, sref_case_8_4, test_case_8_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_5, tgrp_case_8_5, sgrp_case_8_5, name_case_8_5, xtra_case_8_5, desc_case_8_5, sref_case_8_5, test_case_8_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_8_6, tgrp_case_8_6, sgrp_case_8_6, name_case_8_6, xtra_case_8_6, desc_case_8_6, sref_case_8_6, test_case_8_6, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_8_7, tgrp_case_8_7, sgrp_case_8_7, name_case_8_7, xtra_case_8_7, desc_case_8_7, sref_case_8_7, test_case_8_7, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_8_8, tgrp_case_8_8, sgrp_case_8_8, name_case_8_8, xtra_case_8_8, desc_case_8_8, sref_case_8_8, test_case_8_8, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_8_6, tgrp_case_8_6, sgrp_case_8_6, name_case_8_6, xtra_case_8_6, desc_case_8_6, sref_case_8_6, test_case_8_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_7, tgrp_case_8_7, sgrp_case_8_7, name_case_8_7, xtra_case_8_7, desc_case_8_7, sref_case_8_7, test_case_8_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_8, tgrp_case_8_8, sgrp_case_8_8, name_case_8_8, xtra_case_8_8, desc_case_8_8, sref_case_8_8, test_case_8_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_9a, tgrp_case_8_9a, sgrp_case_8_9a, name_case_8_9a, xtra_case_8_9a, desc_case_8_9a, sref_case_8_9a, test_case_8_9a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_9b, tgrp_case_8_9b, sgrp_case_8_9b, name_case_8_9b, xtra_case_8_9b, desc_case_8_9b, sref_case_8_9b, test_case_8_9b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_10, tgrp_case_8_10, sgrp_case_8_10, name_case_8_10, xtra_case_8_10, desc_case_8_10, sref_case_8_10, test_case_8_10, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
@@ -20869,19 +19684,19 @@ struct test_case {
 	numb_case_8_12b, tgrp_case_8_12b, sgrp_case_8_12b, name_case_8_12b, xtra_case_8_12b, desc_case_8_12b, sref_case_8_12b, test_case_8_12b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_13, tgrp_case_8_13, sgrp_case_8_13, name_case_8_13, xtra_case_8_13, desc_case_8_13, sref_case_8_13, test_case_8_13, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_8_14, tgrp_case_8_14, sgrp_case_8_14, name_case_8_14, xtra_case_8_14, desc_case_8_14, sref_case_8_14, test_case_8_14, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_9_1, tgrp_case_9_1, sgrp_case_9_1, name_case_9_1, xtra_case_9_1, desc_case_9_1, sref_case_9_1, test_case_9_1, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_2, tgrp_case_9_2, sgrp_case_9_2, name_case_9_2, xtra_case_9_2, desc_case_9_2, sref_case_9_2, test_case_9_2, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_3, tgrp_case_9_3, sgrp_case_9_3, name_case_9_3, xtra_case_9_3, desc_case_9_3, sref_case_9_3, test_case_9_3, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_4, tgrp_case_9_4, sgrp_case_9_4, name_case_9_4, xtra_case_9_4, desc_case_9_4, sref_case_9_4, test_case_9_4, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_5, tgrp_case_9_5, sgrp_case_9_5, name_case_9_5, xtra_case_9_5, desc_case_9_5, sref_case_9_5, test_case_9_5, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_6, tgrp_case_9_6, sgrp_case_9_6, name_case_9_6, xtra_case_9_6, desc_case_9_6, sref_case_9_6, test_case_9_6, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_7, tgrp_case_9_7, sgrp_case_9_7, name_case_9_7, xtra_case_9_7, desc_case_9_7, sref_case_9_7, test_case_9_7, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_8, tgrp_case_9_8, sgrp_case_9_8, name_case_9_8, xtra_case_9_8, desc_case_9_8, sref_case_9_8, test_case_9_8, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_9, tgrp_case_9_9, sgrp_case_9_9, name_case_9_9, xtra_case_9_9, desc_case_9_9, sref_case_9_9, test_case_9_9, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_10, tgrp_case_9_10, sgrp_case_9_10, name_case_9_10, xtra_case_9_10, desc_case_9_10, sref_case_9_10, test_case_9_10, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_11, tgrp_case_9_11, sgrp_case_9_11, name_case_9_11, xtra_case_9_11, desc_case_9_11, sref_case_9_11, test_case_9_11, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_12, tgrp_case_9_12, sgrp_case_9_12, name_case_9_12, xtra_case_9_12, desc_case_9_12, sref_case_9_12, test_case_9_12, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
-	numb_case_9_13, tgrp_case_9_13, sgrp_case_9_13, name_case_9_13, xtra_case_9_13, desc_case_9_13, sref_case_9_13, test_case_9_13, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_9_1, tgrp_case_9_1, sgrp_case_9_1, name_case_9_1, xtra_case_9_1, desc_case_9_1, sref_case_9_1, test_case_9_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_2, tgrp_case_9_2, sgrp_case_9_2, name_case_9_2, xtra_case_9_2, desc_case_9_2, sref_case_9_2, test_case_9_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_3, tgrp_case_9_3, sgrp_case_9_3, name_case_9_3, xtra_case_9_3, desc_case_9_3, sref_case_9_3, test_case_9_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_4, tgrp_case_9_4, sgrp_case_9_4, name_case_9_4, xtra_case_9_4, desc_case_9_4, sref_case_9_4, test_case_9_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_5, tgrp_case_9_5, sgrp_case_9_5, name_case_9_5, xtra_case_9_5, desc_case_9_5, sref_case_9_5, test_case_9_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_6, tgrp_case_9_6, sgrp_case_9_6, name_case_9_6, xtra_case_9_6, desc_case_9_6, sref_case_9_6, test_case_9_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_7, tgrp_case_9_7, sgrp_case_9_7, name_case_9_7, xtra_case_9_7, desc_case_9_7, sref_case_9_7, test_case_9_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_8, tgrp_case_9_8, sgrp_case_9_8, name_case_9_8, xtra_case_9_8, desc_case_9_8, sref_case_9_8, test_case_9_8, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_9, tgrp_case_9_9, sgrp_case_9_9, name_case_9_9, xtra_case_9_9, desc_case_9_9, sref_case_9_9, test_case_9_9, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_10, tgrp_case_9_10, sgrp_case_9_10, name_case_9_10, xtra_case_9_10, desc_case_9_10, sref_case_9_10, test_case_9_10, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_11, tgrp_case_9_11, sgrp_case_9_11, name_case_9_11, xtra_case_9_11, desc_case_9_11, sref_case_9_11, test_case_9_11, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_12, tgrp_case_9_12, sgrp_case_9_12, name_case_9_12, xtra_case_9_12, desc_case_9_12, sref_case_9_12, test_case_9_12, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_9_13, tgrp_case_9_13, sgrp_case_9_13, name_case_9_13, xtra_case_9_13, desc_case_9_13, sref_case_9_13, test_case_9_13, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_10_1, tgrp_case_10_1, sgrp_case_10_1, name_case_10_1, xtra_case_10_1, desc_case_10_1, sref_case_10_1, test_case_10_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_10_2a, tgrp_case_10_2a, sgrp_case_10_2a, name_case_10_2a, xtra_case_10_2a, desc_case_10_2a, sref_case_10_2a, test_case_10_2a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_10_2b, tgrp_case_10_2b, sgrp_case_10_2b, name_case_10_2b, xtra_case_10_2b, desc_case_10_2b, sref_case_10_2b, test_case_10_2b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
@@ -21406,6 +20221,7 @@ main(int argc, char *argv[])
 			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "uD:cSawrRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "uD:cSawrRd:el::f::so:t:mqvhVC?");

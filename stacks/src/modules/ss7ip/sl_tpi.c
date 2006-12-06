@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/14 06:58:11 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/06 11:45:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/14 06:58:11 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:45:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/14 06:58:11 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/06 11:45:19 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/05/14 06:58:11 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/06 11:45:19 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which

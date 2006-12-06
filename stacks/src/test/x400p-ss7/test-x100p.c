@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:53 $
+ @(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:53 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:45:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x100p.c,v $
+ Revision 0.9.2.8  2006/12/06 11:45:33  brian
+ - updated X400P driver and test suites
+
  Revision 0.9.2.7  2006/10/31 21:04:53  brian
  - changes for 32-bit compatibility and remove HZ dependency
 
@@ -78,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:53 $"
+#ident "@(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $"
 
-static char const ident[] = "$RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/31 21:04:53 $";
+static char const ident[] = "$RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $";
 
 #include <stropts.h>
 #include <stdlib.h>

@@ -1,3 +1,29 @@
+2006-12-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added sdlconf utility and sl_x400p.c to public build
+	* src/include/ss7/lmi.h: get lmi_long and lmi_ulong right
+	* src/include/ss7/sdli_ioctl.h: added japanese modes and tx levels
+	* src/modules/m2pa/lis.conf: correct header
+	* src/modules/m2pa/m2pa_sl.c: rationalize to sigtran package
+	* src/modules/sdl/spm.c: fix wakeups
+	* src/modules/ss7ip/sdt_tpi.c: 64-bit compat
+	* src/modules/ss7ip/sl_tpi.c: 64-bit compat
+	* src/modules/x400p-ss7/sl_x100p.c: regparms compat
+	* src/modules/x400p-ss7/sl_x400p.c: strapped in new Tor3 driver code
+	* src/modules/x400p-ss7/x400p-ss7.c: minor corrections
+	* src/test/m2pa/test-m2pa.c: rationalized to sigtran package and test-x400p
+	* src/test/sl/test-q781.c: 64-bit compat
+	* src/test/x400p-ss7/test-x100p.c: 64-bit compat
+	* src/test/x400p-ss7/test-x400p.c: rationalized to M2PA test program
+	* tests/Makefile.am: added m2pa and x400p test suite
+	* tests/testsuite.at.in: added m2pa and x400p test suite
+
+	* src/modules/x400p-ss7/sl_v400p.c: added driver file
+	- this driver is now integrated into sl_x400p.c
+	* src/util/sdlconf.c: added configuration file from old distribution
+	* tests/testsuite-m2pa.at: added Q.781 testsuite for M2PA from sigtran package
+	* tests/testsuite-x400p-sl.at: added Q.781 testsuite for X400P-SS7 driver
+
 2006-11-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/cd/cd.c: cosmetic changes

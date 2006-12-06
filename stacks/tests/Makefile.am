@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/06 11:45:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 00:52:44 $ by $Author: brian $
+# Last Modified $Date: 2006/12/06 11:45:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.15  2006/12/06 11:45:37  brian
+# - updated X400P driver and test suites
+#
 # Revision 0.9.2.14  2006/09/26 00:52:44  brian
 # - rationalized to embedded packages
 #
@@ -89,7 +92,9 @@ include ../am/autotest.am
 TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
-			$(TESTSUITE).at
+			$(TESTSUITE).at \
+			$(TESTSUITE)-m2pa.at \
+			$(TESTSUITE)-x400p-sl.at
 
 if WITH_TLI
 ## WITH_TLI

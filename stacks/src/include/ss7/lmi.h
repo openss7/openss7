@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lmi.h,v 0.9.2.5 2006/11/03 11:12:03 brian Exp $
+ @(#) $Id: lmi.h,v 0.9.2.6 2006/12/06 11:45:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 11:12:03 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:45:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LMI_H__
 #define __LMI_H__
 
-#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
