@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/11/15 08:58:54 $
+ @(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/15 08:58:54 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:36:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: sl_x400p.c,v $
+ $Log: sl_v400p.c,v $
+ Revision 0.9.2.1  2006/12/06 11:36:19  brian
+ - added new driver and test files
+
  Revision 0.9.2.18  2006/11/15 08:58:54  brian
  - error in sdl rx found by inspection
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/11/15 08:58:54 $"
+#ident "@(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:19 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/11/15 08:58:54 $";
+    "$RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:19 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -103,18 +106,25 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #ifdef X400P_DOWNLOAD_FIRMWARE
-#include "x400p-ss7/x400pfw.h"	/* X400P-SS7 firmware load */
+#include "v400pfw.h"
+#include "v401pfw.h"
 #endif
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
+#define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:19 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X400P_LICENSE	"GPL"
 #define SL_X400P_BANNER		SL_X400P_DESCRIP	"\n" \
+				SL_X400P_EXTRA		"\n" \
+				SL_X400P_REVISION	"\n" \
 				SL_X400P_COPYRIGHT	"\n" \
-				SL_X400P_DEVICE	"\n" \
+				SL_X400P_DEVICE		"\n" \
 				SL_X400P_CONTACT	"\n"
+#define SL_X400P_SPLASH		SL_X400P_DESCRIP	" - " \
+				SL_X400P_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(SL_X400P_CONTACT);
@@ -301,9 +311,14 @@ typedef struct cd {
 	volatile int eval_syncsrc;	/* need to reevaluate sync src */
 	volatile int leds;		/* leds on the card */
 	int card;			/* index (card) */
+	int board;			/* board hardware index */
+	int device;			/* device hardware index */
+	int devrev;			/* device hardware revision */
+	int hw_flags;			/* board and device hardware flags */
 	ulong irq;			/* card irq */
 	ulong iobase;			/* card iobase */
 	struct tasklet_struct tasklet;	/* card tasklet */
+	irqreturn_t (*isr)(int, void *, struct pt_regs *); /* interrupt service routine */
 	sdl_config_t config;		/* card configuration */
 } cd_t;
 
@@ -430,6 +445,8 @@ static struct {
 	{ "V401PE",			1, 0xffffffff },
 	{ "V401PT",			1, 0xfefefefe },
 };
+
+#define XPF_SUPPORTED	0x01
 
 #define XP_DEV_IDMASK	0xf0
 #define XP_DEV_SHIFT	4
@@ -1681,8 +1698,7 @@ STATIC sdl_config_t sdl_default_e1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 1,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0}
-	,
+	.ifsyncsrc = {0, 0, 0, 0},
 };
 STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifname = NULL,
@@ -1704,8 +1720,7 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 0,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0}
-	,
+	.ifsyncsrc = {0, 0, 0, 0},
 };
 STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifname = NULL,
@@ -6860,6 +6875,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	if (!(sp->config.ifflags & SDL_IF_UP)) {
 		/* need to bring up span */
 		psw_t flags = 0;
+		unsigned long timeout;
 		volatile unsigned char *xlb = &cd->xlb[sp->span << 8];
 
 		switch (cd->config.ifgtype) {
@@ -6880,7 +6896,6 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			case E400PSS7:
 			{
 				uint8_t ccr1 = 0, tcr1 = 0;
-				unsigned long timeout;
 
 				/* Set up for interleaved serial bus operation, byte mode */
 				if (sp->span == 0)
@@ -7101,7 +7116,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			int japan = (cd->config.ifgtype == SDL_GTYPE_J1);
 
 			printd(("%s: performing enable on %s span %d\n", DRV_NAME,
-				japab ? "J1" : "T1", sp->span));
+				japan ? "J1" : "T1", sp->span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
@@ -7115,7 +7130,6 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			case T400P:
 			case T400PSS7:
 			{
-				unsigned long timeout;
 				unsigned char val;
 
 				/* Set up for interleaved serial bus operation, byte mode */
@@ -7211,6 +7225,8 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			}
 			case V401PT:
 			{
+				unsigned char reg04, reg05, reg06, reg07;
+
 				/* The DS2155 contains an on-chip power-up reset function that
 				   automatically clears the writeable register space immediately
 				   after power is supplied to the DS2155. The user can issue a chip 
@@ -7303,7 +7319,10 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 				xlb[0x40] = 0x00;	/* RCCS, TCCS set to zero for T1 */
 
 				xlb[0x79] = 0x58;	/* JACLK on for T1 (and reset) */
-				while (jiffies < timeout) ;	/* 100ms wait */
+				timeout = jiffies + 100 * HZ / 1000;
+				spin_unlock_irqrestore(&cd->lock, flags);
+				while (jiffies < timeout) ;
+				spin_lock_irqsave(&cd->lock, flags);
 				xlb[0x79] = 0x18;	/* JACLK on for T1 */
 				xlb[0x7b] = 0x0a;	/* 100 ohm, MCLK 2.048 MHz */
 
@@ -8784,6 +8803,57 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 				}
 				case XP_DEV_DS2155:
 				{
+					unsigned char reg04, reg05, reg06, reg07;
+
+					reg04 = 0x00;
+					reg05 = 0x10;	/* TSSE */
+					reg06 = 0x00;
+					reg07 = 0x00;
+
+					switch (sp->config.ifgcrc) {
+					default:
+					case SDL_GCRC_CRC6:
+						break;
+					case SDL_GCRC_CRC6J:
+						reg04 |= 0x02;
+						reg05 |= 0x80;
+						break;
+					}
+					switch (sp->config.ifframing) {
+					default:
+					case SDL_FRAMING_ESF:
+						reg04 |= 0x40;
+						reg07 |= 0x04;
+						break;
+					case SDL_FRAMING_SF:	/* D4 */
+						break;
+					}
+					switch (sp->config.ifcoding) {
+					default:
+					case SDL_CODING_B8ZS:
+						reg04 |= 0x20;
+						reg06 |= 0x80;
+						break;
+					case SDL_CODING_AMI:
+						break;
+					}
+					xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
+					xlb[0x05] = reg05;	/* TSSE TCRC6J */
+					xlb[0x06] = reg06;	/* TB8ZS */
+					xlb[0x07] = reg07;	/* TESF */
+
+					if (sp->config.iftxlevel < 8) {
+						xlb[0x7a] = 0x00;	/* no boost, not monitoring 
+									 */
+						xlb[0x78] =
+						    0x01 | ((sp->config.iftxlevel & 0x7) << 5);
+					} else {
+						/* monitoring mode */
+						xlb[0x78] = 0x00;	/* 0db CSU, transmitters
+									   off */
+						xlb[0x7a] =
+						    0x00 | ((sp->config.iftxlevel & 0x3) << 3);
+					}
 					break;
 				}
 				}
@@ -9653,7 +9723,7 @@ xp_e1_txrx_burst(struct cd *cd)
 
 			for (xll = cd->xll, wbuf = cd->wbuf + (lebno << 8);
 			     wbuf < cd->wbuf + (lebno << 8) + 256;) {
-				for (wbuf++, xll++, slot = 1; slot < 32, slot++, xll++, wbuf++) {
+				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++) {
 					prefetch(wbuf + 1);
 					*xll = *wbuf;
 				}
@@ -9667,7 +9737,7 @@ xp_e1_txrx_burst(struct cd *cd)
 
 			for (xll = cd->xll, rbuf = cd->rbuf + (lebno << 8);
 			     rbuf < cd->rbuf + (lebno << 8) + 256;)
-				for (rbuf++, xll++, slot = 1; slot < 32, slot++, xll++, rbuf++) {
+				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++) {
 					prefetchw(rbuf + 1);
 					*rbuf = *xll;
 				}
@@ -9944,7 +10014,7 @@ xp_t1_txrx_burst(struct cd *cd)
 
 			for (xll = cd->xll, wbuf = cd->wbuf + (lebno << 8);
 			     wbuf < cd->wbuf + (lebno << 8) + 256;) {
-				for (wbuf++, xll++, slot = 1; slot < 32, slot++, xll++, wbuf++)
+				for (wbuf++, xll++, slot = 1; slot < 32; slot++, xll++, wbuf++)
 					if (slot & 0x3) {
 						prefetch(wbuf + 2);
 						*xll = *wbuf;
@@ -9959,7 +10029,7 @@ xp_t1_txrx_burst(struct cd *cd)
 
 			for (xll = cd->xll, rbuf = cd->rbuf + (lebno << 8);
 			     rbuf < cd->rbuf + (lebno << 8) + 256;)
-				for (rbuf++, xll++, slot = 1; slot < 32, slot++, xll++, rbuf++)
+				for (rbuf++, xll++, slot = 1; slot < 32; slot++, xll++, rbuf++)
 					if (slot & 0x3) {
 						prefetchw(rbuf + 2);
 						*rbuf = *xll;
@@ -10617,30 +10687,39 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 		rtn = sdt_suerm_stop_req(q, mp);
 		break;
 	case SDL_BITS_FOR_TRANSMISSION_REQ:
+		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ\n", DRV_NAME, xp));
 		rtn = sdl_bits_for_transmission_req(q, mp);
 		break;
 	case SDL_CONNECT_REQ:
+		printd(("%s: %p: -> SDL_CONNECT_REQ\n", DRV_NAME, xp));
 		rtn = sdl_connect_req(q, mp);
 		break;
 	case SDL_DISCONNECT_REQ:
+		printd(("%s: %p: -> SDL_DISCONNECT_REQ\n", DRV_NAME, xp));
 		rtn = sdl_disconnect_req(q, mp);
 		break;
 	case LMI_INFO_REQ:
+		printd(("%s: %p: -> LMI_INFO_REQ\n", DRV_NAME, xp));
 		rtn = lmi_info_req(q, mp);
 		break;
 	case LMI_ATTACH_REQ:
+		printd(("%s: %p: -> LMI_ATTACH_REQ\n", DRV_NAME, xp));
 		rtn = lmi_attach_req(q, mp);
 		break;
 	case LMI_DETACH_REQ:
+		printd(("%s: %p: -> LMI_DETACH_REQ\n", DRV_NAME, xp));
 		rtn = lmi_detach_req(q, mp);
 		break;
 	case LMI_ENABLE_REQ:
+		printd(("%s: %p: -> LMI_ENABLE_REQ\n", DRV_NAME, xp));
 		rtn = lmi_enable_req(q, mp);
 		break;
 	case LMI_DISABLE_REQ:
+		printd(("%s: %p: -> LMI_DISABLE_REQ\n", DRV_NAME, xp));
 		rtn = lmi_disable_req(q, mp);
 		break;
 	case LMI_OPTMGMT_REQ:
+		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", DRV_NAME, xp));
 		rtn = lmi_optmgmt_req(q, mp);
 		break;
 	default:
@@ -10729,7 +10808,7 @@ xp_w_flush(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 xp_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
@@ -10741,7 +10820,7 @@ xp_r_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 xp_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
@@ -10774,6 +10853,10 @@ STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct xp *xp_list = NULL;
 STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
+/*
+ *  OPEN
+ *  -------------------------------------------------------------------------
+ */
 STATIC streamscall int
 xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
@@ -10784,14 +10867,11 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	struct xp *xp, **xpp = &xp_list;
 
 	(void) crp;
-	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
 	if (q->q_ptr != NULL) {
-		MOD_DEC_USE_COUNT;
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
 		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
-		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
 	if (!cminor)
@@ -10826,7 +10906,6 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&xp_lock, flags);
-		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
 	printd(("%s: opened character device %hu:%hu\n", DRV_NAME, cmajor, cminor));
@@ -10834,12 +10913,16 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (!(xp = xp_alloc_priv(q, xpp, devp, crp))) {
 		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&xp_lock, flags);
-		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
 	spin_unlock_irqrestore(&xp_lock, flags);
 	return (0);
 }
+
+/*
+ *  CLOSE
+ *  -------------------------------------------------------------------------
+ */
 STATIC streamscall int
 xp_close(queue_t *q, int flag, cred_t *crp)
 {
@@ -10876,53 +10959,6 @@ STATIC kmem_cache_t *xp_xbuf_cachep = NULL;
  *  -------------------------------------------------------------------------
  */
 STATIC int
-xp_init_caches(void)
-{
-	if (!xp_priv_cachep &&
-	    !(xp_priv_cachep =
-	      kmem_cache_create("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))
-	    ) {
-		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
-		return (-ENOMEM);
-	} else
-		printd(("%s: initialized device private structure cache\n", DRV_NAME));
-	if (!xp_span_cachep &&
-	    !(xp_span_cachep =
-	      kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))
-	    ) {
-		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
-		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
-		return (-ENOMEM);
-	} else
-		printd(("%s: initialized span private structure cache\n", DRV_NAME));
-	if (!xp_card_cachep &&
-	    !(xp_card_cachep =
-	      kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))
-	    ) {
-		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
-		kmem_cache_destroy(xchg(&xp_span_cachep, NULL));
-		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
-		return (-ENOMEM);
-	} else
-		printd(("%s: initialized card private structure cache\n", DRV_NAME));
-	if (!xp_xbuf_cachep &&
-	    !(xp_xbuf_cachep =
-	      kmem_cache_create("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))
-	    ) {
-		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
-		kmem_cache_destroy(xchg(&xp_card_cachep, NULL));
-		kmem_cache_destroy(xchg(&xp_span_cachep, NULL));
-		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
-		return (-ENOMEM);
-	} else
-		printd(("%s: initialized card read/write buffer cache\n", DRV_NAME));
-	return (0);
-}
-STATIC int
 xp_term_caches(void)
 {
 	int err = 0;
@@ -10956,6 +10992,46 @@ xp_term_caches(void)
 			printd(("%s: shrunk xp_priv_cache to zero\n", DRV_NAME));
 	}
 	return (err);
+}
+
+STATIC int
+xp_init_caches(void)
+{
+	if (!xp_priv_cachep &&
+	    !(xp_priv_cachep =
+	      kmem_cache_create("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
+		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
+		goto error;
+	} else
+		printd(("%s: initialized device private structure cache\n", DRV_NAME));
+	if (!xp_span_cachep &&
+	    !(xp_span_cachep =
+	      kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
+		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
+		goto error;
+	} else
+		printd(("%s: initialized span private structure cache\n", DRV_NAME));
+	if (!xp_card_cachep &&
+	    !(xp_card_cachep =
+	      kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
+		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
+		goto error;
+	} else
+		printd(("%s: initialized card private structure cache\n", DRV_NAME));
+	if (!xp_xbuf_cachep &&
+	    !(xp_xbuf_cachep =
+	      kmem_cache_create("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
+		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
+		goto error;
+	} else
+		printd(("%s: initialized card read/write buffer cache\n", DRV_NAME));
+	return (0);
+      error:
+	return (-EFAULT);
 }
 
 /*
@@ -11334,11 +11410,9 @@ xp_remove(struct pci_dev *dev)
 	pci_disable_device(dev);
 }
 
-#include "v400pfw.h"
-#include "v401pfw.h"
-
+#ifdef X400P_DOWNLOAD_FIRMWARE
 STATIC int __devinit
-xp_download_firmware(struct cd *cd, enum xp_board board)
+xp_download_fw(struct cd *cd, enum xp_board board)
 {
 	unsigned int byte;
 	unsigned char *f;
@@ -11401,6 +11475,7 @@ xp_download_firmware(struct cd *cd, enum xp_board board)
 	__printd(("%s: Xilinx Firmware Load: Successful\n", DRV_NAME));
 	return (0);
 }
+#endif
 
 /*
  *  X400P-SS7 Probe
@@ -11412,7 +11487,7 @@ xp_download_firmware(struct cd *cd, enum xp_board board)
 STATIC int __devinit
 xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
-	int span, b, board;
+	int span, board;
 	struct cd *cd;
 	const char *name;
 
@@ -11506,7 +11581,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->device = (cd->devrev & XP_DEV_IDMASK) >> XP_DEV_SHIFT;
 	cd->devrev &= XP_DEV_REVMASK;
 
-	if (!(xp_device_info[cd->device].hw_flags & XDF_SUPPORTED)) {
+	if (!(xp_device_info[cd->device].hw_flags & XPF_SUPPORTED)) {
 		printd(("%s: Usupported framer device %s\n", DRV_NAME,
 			xp_device_info[cd->device].name));
 		goto error_remove;
@@ -11543,7 +11618,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->board = T400PSS7;
 			break;
 		default:
-			cd->board = = 1;
+			cd->board = -1;
 			break;
 		}
 	case XP_DEV_DS2155:
@@ -11560,14 +11635,14 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	if (cd->board == -1) {
 		printd(("%s: Device %s not supported for card %s\n", DRV_NAME,
 			xp_board_info[cd->board].name, xp_board_info[cd->device].name));
-		goto remove_error;
+		goto error_remove;
 	}
 	cd->hw_flags = xp_board_info[cd->board].hw_flags;
 	cd->hw_flags |= xp_device_info[cd->device].hw_flags;
 
 	__printd(("%s: %s (%s Rev. %c)\n", DRV_NAME,
 		  xp_board_info[cd->board].name,
-		  xp_device_info[cd->device].name, (char) (vp->devrev + 65)));
+		  xp_device_info[cd->device].name, (char) (cd->devrev + 65)));
 
 	{
 		int word, idle_word = xp_board_info[cd->board].idle_word;
@@ -11598,6 +11673,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	case V400PT:
 	case T400P:
 	case T400PSS7:
+#if 0
 		if (!japan) {
 			/* setup T1 card defaults */
 			cd->config = sdl_default_t1_chan;
@@ -11607,8 +11683,14 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->config = sdl_default_t1_chan;
 			cd->isr = &xp_j400_interrupt;
 		}
+#else
+		/* setup T1 card defaults */
+		cd->config = sdl_default_t1_chan;
+		cd->isr = &xp_t400_interrupt;
+#endif
 		break;
 	case V401PT:
+#if 0
 		if (!japan) {
 			/* setup T1 card defaults */
 			cd->config = sdl_default_t1_chan;
@@ -11618,6 +11700,12 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->config = sdl_default_j1_chan;
 			cd->isr = &xp_j401_interrupt;
 		}
+#else
+		(void) sdl_default_j1_chan;
+		/* setup T1 card defaults */
+		cd->config = sdl_default_t1_chan;
+		cd->isr = &xp_t401_interrupt;
+#endif
 		break;
 	}
 	if (request_irq(dev->irq, cd->isr, SA_INTERRUPT | SA_SHIRQ, DRV_NAME, cd)) {

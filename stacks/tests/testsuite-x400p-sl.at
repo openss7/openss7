@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl =========================================================================
 dnl 
-dnl @(#) $RCSfile$ $Name$($Revision$) $Date$
+dnl @(#) $RCSfile: testsuite-x400p-sl.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:22 $
 dnl
 dnl -------------------------------------------------------------------------
 dnl
@@ -47,11 +47,14 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date$ by $Author$
+dnl Last Modified $Date: 2006/12/06 11:36:22 $ by $Author: brian $
 dnl
 dnl -------------------------------------------------------------------------
 dnl
-dnl $Log$
+dnl $Log: testsuite-x400p-sl.at,v $
+dnl Revision 0.9.2.1  2006/12/06 11:36:22  brian
+dnl - added new driver and test files
+dnl
 dnl =========================================================================
 
 m4_divert_push([DEFAULTS])
@@ -95,9 +98,684 @@ m4_divert_pop([DEFAULTS])
 AT_TESTED([test-x400p])
 AT_BANNER([X400P SS7 driver tests])
 
-AT_SETUP([x400p test 1.1])
+AT_SETUP([x400p test 0.1])
 AT_KEYWORDS([])
-AT_CHECK([test_x400p_sl 1.1], [], [ignore], [], [], [])
+AT_CHECK([test_x400p_sl "0.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 0.2.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "0.2.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 0.2.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "0.2.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 0.2.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "0.2.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 0.2.4])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "0.2.4"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 0.2.5])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "0.2.5"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 0.2.6])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "0.2.6"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 0.2.7])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "0.2.7"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.1(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.1(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.1(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.1(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.4])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.4"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.5(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.5(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.5(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.5(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.5(a)np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.5(a)np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.5(b)np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.5(b)np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.6])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.6"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.6np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.6np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.7])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.7"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.8(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.8(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.8(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.8(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.8(a)np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.8(a)np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.8(b)np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.8(b)np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.9(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.9(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.9(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.9(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.9(a)np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.9(a)np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.9(b)np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.9(b)np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.10])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.10"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.10np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.10np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.11])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.11"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.11np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.11np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.12(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.12(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.12(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.12(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.12(a)np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.12(a)np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.12(b)np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.12(b)np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.13])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.13"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.13np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.13np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.14])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.14"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.15])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.15"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.15np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.15np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.16])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.16"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.16np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.16np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.17])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.17"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.18])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.18"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.19])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.19"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.20])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.20"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.21])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.21"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.22])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.22"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.23])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.23"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.24])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.24"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.25])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.25"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.26])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.26"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.27])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.27"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.27np])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.27np"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.28])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.28"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.29(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.29(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.29(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.29(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.30(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.30(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.30(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.30(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.31(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.31(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.31(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.31(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.32(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.32(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.32(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.32(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.33])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.33"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.34])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.34"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 1.35])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "1.35"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 2.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "2.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 2.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "2.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 2.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "2.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 2.4])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "2.4"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 2.5])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "2.5"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 2.6])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "2.6"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 2.7])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "2.7"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 2.8])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "2.8"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 3.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "3.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 3.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "3.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 3.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "3.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 3.4])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "3.4"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 3.5])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "3.5"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 3.6])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "3.6"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 3.7])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "3.7"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 3.8])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "3.8"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 4.1(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "4.1(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 4.1(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "4.1(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 4.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "4.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 4.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "4.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 5.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "5.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 5.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "5.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 5.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "5.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 5.4(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "5.4(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 5.4(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "5.4(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 5.5(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "5.5(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 5.5(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "5.5(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 6.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "6.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 6.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "6.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 6.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "6.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 6.4])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "6.4"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 7.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "7.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 7.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "7.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 7.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "7.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 7.4])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "7.4"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.4])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.4"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.5])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.5"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.6])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.6"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.7])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.7"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.8])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.8"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.9(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.9(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.9(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.9(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.10])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.10"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.11])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.11"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.12(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.12(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.12(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.12(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.13])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.13"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 8.14])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "8.14"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.2])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.2"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.3"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.4])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.4"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.5])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.5"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.6])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.6"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.7])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.7"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.8])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.8"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.9])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.9"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.10])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.10"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.11])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.11"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.12])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.12"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 9.13])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "9.13"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 10.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "10.1"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 10.2(a)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "10.2(a)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 10.2(b)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "10.2(b)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 10.2(c)])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "10.2(c)"], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([x400p test 10.3])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl "10.3"], [], [ignore], [], [], [])
 AT_CLEANUP
 
 

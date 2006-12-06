@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2003/11/05 12:45:39 $
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2003/11/05 12:45:39 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:36:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2003/11/05 12:45:39 $"
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:21 $"
 
 static char const ident[] =
-    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2003/11/05 12:45:39 $";
+    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:21 $";
 
 #include <stropts.h>
 #include <stdlib.h>
