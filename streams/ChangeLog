@@ -1,3 +1,7 @@
+2006-12-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/news.texi: updated news
+
 2006-11-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/strlog.9.man: documentation update
