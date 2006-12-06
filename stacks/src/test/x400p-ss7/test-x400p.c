@@ -165,9 +165,9 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9
  *  be used to test itself.
  */
 
-#define PT_TEST_SLOT	0
-#define PT_TEST_SPAN	0
-#define PT_TEST_CHAN	19
+#define PTU_TEST_SLOT	0
+#define PTU_TEST_SPAN	0
+#define PTU_TEST_CHAN	19
 
 #define IUT_TEST_SLOT	0
 #define IUT_TEST_SPAN	1
@@ -195,10 +195,12 @@ static int repeat_on_success = 0;
 static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
 
+#if 0
 static int client_port_specified = 0;
 static int server_port_specified = 0;
 static int client_host_specified = 0;
 static int server_host_specified = 0;
+#endif
 
 static int verbose = 1;
 
@@ -218,11 +220,11 @@ static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 static int PRIM_type = 0;
+#if 0
 static int NPI_error = 0;
 static int CONIND_number = 2;
 static int TOKEN_value = 0;
 static int SEQ_number = 1;
-#if 0
 static int SERV_type = N_CLNS;
 static int CURRENT_state = NS_UNBND;
 N_info_ack_t last_info = { 0, };
@@ -298,8 +300,8 @@ static int test_pflags = MSG_BAND;	/* MSG_BAND | MSG_HIPRI */
 static int test_pband = 0;
 static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
-static int test_bufsize = 256;
 #if 0
+static int test_bufsize = 256;
 static int test_nidu = 256;
 static int OPTMGMT_flags = 0;
 static struct sockaddr_in *ADDR_buffer = NULL;
@@ -313,12 +315,18 @@ static size_t PROTOID_length = 0;
 static char *DATA_buffer = NULL;
 static size_t DATA_length = 0;
 #else
-static uint32_t addrs[3][1];
+static unsigned short addrs[3][1] = {
+	{  (PTU_TEST_SLOT << 12) | (PTU_TEST_SPAN << 8) | (PTU_TEST_CHAN << 0) },
+	{  (IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0) },
+	{  (IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0) }
+};
 static int anums[3] = { 1, 1, 1 };
-static uint32_t *ADDR_buffer = NULL;
-static size_t ADDR_length = sizeof(uint32_t);
+static unsigned short *ADDR_buffer = NULL;
+static size_t ADDR_length = sizeof(unsigned short);
 #endif
+#if 0
 static int test_resfd = -1;
+#endif
 static int test_timout = 200;
 #if 0
 static void *QOS_buffer = NULL;
@@ -336,6 +344,7 @@ int flags = 0;
 
 int dummy = 0;
 
+#if 0
 #ifndef SCTP_VERSION_2
 #define SCTP_VERSION_2
 #endif
@@ -348,6 +357,9 @@ typedef struct addr {
 } addr_t;
 #endif				/* SCTP_VERSION_2 */
 #endif
+#endif
+
+typedef unsigned short ppa_t;
 
 struct timeval when;
 
@@ -448,13 +460,7 @@ enum {
 
 static int ss7_pvar = SS7_PVAR_ITUT_96;
 
-static struct {
-	lmi_option_t opt;
-	sdl_config_t sdl;
-	sdt_config_t sdt;
-} ptconf;
-
-static struct {
+struct test_config {
 	lmi_option_t opt;
 	sdl_config_t sdl;
 	sdt_config_t sdt;
@@ -526,6 +532,8 @@ static struct {
 		    .N2 = 8192,	/* N2 - PCR/RTBmax octets (#bytes) */
 		    .M = 5	/* M - IAC normal proving periods */
 } /* sl */ };
+
+struct test_config *config = &iutconf;
 
 /*
  *  -------------------------------------------------------------------------
@@ -862,10 +870,6 @@ static int tries = 0;
 static int expand = 0;
 static long beg_time = 0;
 
-static unsigned long iut_options = 0;
-static unsigned long iut_t7 = 1 * 1000;
-static unsigned long pt_flags = SDT_FLAGS_ONE;
-
 int pt_fd = 0;
 unsigned char pt_fib = 0x80;
 unsigned char pt_fsn = 0x7f;
@@ -883,14 +887,18 @@ unsigned char iut_li = 0;
 unsigned char iut_sio = 0;
 unsigned char iut_len = 0;
 
+#if 0
 static int oldpsb = 0;
+#endif
 static int oldmsg = 0;
 static int cntmsg = 0;
 static int oldisb = 0;
 static int oldret = 0;
 static int cntret = 0;
+#if 0
 static int oldprm = 0;
 static int cntprm = 0;
+#endif
 
 char *
 errno_string(long err)
@@ -1928,6 +1936,17 @@ poll_events_string(short events)
 	}
 	return (string);
 }
+
+#if 1
+void print_string(int child, const char *string);
+void
+print_ppa(int child, ppa_t *ppa) {
+	char buf[32];
+
+	snprintf(buf, sizeof(buf), "%d:%d:%d", ((*ppa) >> 12) & 0x0f, ((*ppa) >> 8) & 0x0f, (*ppa) & 0x0ff);
+	print_string(child, buf);
+}
+#endif
 
 #if 0
 const char *
@@ -4971,9 +4990,6 @@ union primitives {
 
 static int pt_config(void);
 
-typedef uint32_t ppa_t;
-void print_ppa(ppa_t * ppa);
-
 static int
 do_signal(int child, int action)
 {
@@ -5250,12 +5266,12 @@ do_signal(int child, int action)
 		return __RESULT_SUCCESS;
 	case __TEST_FISU_FISU_2FLAG:
 		print_tx_msg(child, "FISU-F-F-FISU");
-		pt_flags = SDT_FLAGS_TWO;
+		config->sdt.f = SDT_FLAGS_TWO;
 		if (pt_config() != __RESULT_SUCCESS)
 			return __RESULT_INCONCLUSIVE;
 		do_signal(child, __TEST_FISU_S);
 		do_signal(child, __TEST_FISU_S);
-		pt_flags = SDT_FLAGS_ONE;
+		config->sdt.f = SDT_FLAGS_ONE;
 		if (pt_config() != __RESULT_SUCCESS)
 			return __RESULT_INCONCLUSIVE;
 		return __RESULT_SUCCESS;
@@ -5266,12 +5282,12 @@ do_signal(int child, int action)
 		return __RESULT_SUCCESS;
 	case __TEST_MSU_MSU_2FLAG:
 		print_tx_msg(child, "MSU-F-F-MSU");
-		pt_flags = SDT_FLAGS_TWO;
+		config->sdt.f = SDT_FLAGS_TWO;
 		if (pt_config() != __RESULT_SUCCESS)
 			return __RESULT_INCONCLUSIVE;
 		do_signal(child, __TEST_MSU_S);
 		do_signal(child, __TEST_MSU_S);
-		pt_flags = SDT_FLAGS_ONE;
+		config->sdt.f = SDT_FLAGS_ONE;
 		if (pt_config() != __RESULT_SUCCESS)
 			return __RESULT_INCONCLUSIVE;
 		return __RESULT_SUCCESS;
@@ -6013,48 +6029,48 @@ do_signal(int child, int action)
 			print_command_state(child, ":options sdl");
 		ic.ic_cmd = SDL_IOCSOPTIONS;
 		ic.ic_timout = 0;
-		ic.ic_len = sizeof(iutconf.opt);
-		ic.ic_dp = (char *) &iutconf.opt;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_SDL_CONFIG:
 		if (show && verbose > 1)
 			print_command_state(child, ":config sdl");
 		ic.ic_cmd = SDL_IOCSCONFIG;
 		ic.ic_timout = 0;
-		ic.ic_len = sizeof(iutconf.sdl);
-		ic.ic_dp = (char *) &iutconf.sdl;
+		ic.ic_len = sizeof(config->sdl);
+		ic.ic_dp = (char *) &config->sdl;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_SDT_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sdt");
 		ic.ic_cmd = SDT_IOCSOPTIONS;
 		ic.ic_timout = 0;
-		ic.ic_len = sizeof(iutconf.opt);
-		ic.ic_dp = (char *) &iutconf.opt;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_SDT_CONFIG:
 		if (show && verbose > 1)
 			print_command_state(child, ":config sdt");
 		ic.ic_cmd = SDT_IOCSCONFIG;
 		ic.ic_timout = 0;
-		ic.ic_len = sizeof(iutconf.sdt);
-		ic.ic_dp = (char *) &iutconf.sdt;
+		ic.ic_len = sizeof(config->sdt);
+		ic.ic_dp = (char *) &config->sdt;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_SL_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sl");
 		ic.ic_cmd = SL_IOCSOPTIONS;
 		ic.ic_timout = 0;
-		ic.ic_len = sizeof(iutconf.opt);
-		ic.ic_dp = (char *) &iutconf.opt;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_SL_CONFIG:
 		if (show && verbose > 1)
 			print_command_state(child, ":config sl");
 		ic.ic_cmd = SL_IOCSCONFIG;
 		ic.ic_timout = 0;
-		ic.ic_len = sizeof(iutconf.sl);
-		ic.ic_dp = (char *) &iutconf.sl;
+		ic.ic_len = sizeof(config->sl);
+		ic.ic_dp = (char *) &config->sl;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
 
 	case __TEST_ATTACH_REQ:
@@ -6074,7 +6090,7 @@ do_signal(int child, int action)
 			print_addrs(child, cbuf + sizeof(p->lmi.attach_req), ADDR_length);
 #endif
 #else
-			print_ppa((ppa_t *)p->lmi.attach_req.lmi_ppa);
+			print_ppa(child, (ppa_t *)p->lmi.attach_req.lmi_ppa);
 #endif
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -6104,7 +6120,7 @@ do_signal(int child, int action)
 			print_addrs(child, cbuf + sizeof(p->lmi.enable_req), ADDR_length);
 #endif
 #else
-			print_ppa((ppa_t *)p->lmi.enable_req.lmi_rem);
+			print_ppa(child, (ppa_t *)p->lmi.enable_req.lmi_rem);
 #endif
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -7142,10 +7158,10 @@ expect(int child, int wait, int want)
  *
  *  -------------------------------------------------------------------------
  */
-#if 0
 static int
 preamble_unbound(int child)
 {
+#if 0
 	if (do_signal(child, __TEST_INFO_REQ))
 		goto failure;
 	state++;
@@ -7158,6 +7174,7 @@ preamble_unbound(int child)
 	}
 	return __RESULT_SUCCESS;
       failure:
+#endif
 	return __RESULT_FAILURE;
 }
 
@@ -7167,6 +7184,7 @@ postamble_unbound(int child)
 	return __RESULT_SUCCESS;
 }
 
+#if 0
 static int
 preamble_bind(int child)
 {
@@ -7428,22 +7446,24 @@ postamble_pop(int child)
 static int
 preamble_config(int child)
 {
+#if 0
 	if (preamble_push(child))
 		goto failure;
 	state++;
+#endif
+	if (do_signal(child, __TEST_SDL_OPTIONS))
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_SDL_CONFIG))
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_SDT_OPTIONS))
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_SDT_CONFIG))
+		goto failure;
+	state++;
 	if (child == CHILD_IUT) {
-		if (do_signal(child, __TEST_SDL_OPTIONS))
-			goto failure;
-		state++;
-		if (do_signal(child, __TEST_SDL_CONFIG))
-			goto failure;
-		state++;
-		if (do_signal(child, __TEST_SDT_OPTIONS))
-			goto failure;
-		state++;
-		if (do_signal(child, __TEST_SDT_CONFIG))
-			goto failure;
-		state++;
 		if (do_signal(child, __TEST_SL_OPTIONS))
 			goto failure;
 		state++;
@@ -7463,15 +7483,13 @@ preamble_attach(int child)
 	if (preamble_config(child))
 		goto failure;
 	state++;
-	if (child == CHILD_IUT) {
-		ADDR_buffer = addrs[child];
-		ADDR_length = anums[child] * sizeof(addrs[child][0]);
-		if (do_signal(child, __TEST_ATTACH_REQ))
-			failed = failed ? : state;
-		state++;
-		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
-			failed = failed ? : state;
-	}
+	ADDR_buffer = addrs[child];
+	ADDR_length = anums[child] * sizeof(addrs[child][0]);
+	if (do_signal(child, __TEST_ATTACH_REQ))
+		failed = failed ? : state;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+		failed = failed ? : state;
 #if 0
 	if (child == CHILD_PTU) {
 		return preamble_bind(child);
@@ -7487,14 +7505,12 @@ postamble_detach(int child)
 {
 	int failed = 0;
 
-	if (child == CHILD_IUT) {
-		state++;
-		if (do_signal(child, __TEST_DETACH_REQ))
-			failed = failed ? : state;
-		state++;
-		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
-			failed = failed ? : state;
-	}
+	state++;
+	if (do_signal(child, __TEST_DETACH_REQ))
+		failed = failed ? : state;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+		failed = failed ? : state;
 #if 0
 	if (child == CHILD_PTU) {
 		state++;
@@ -7502,9 +7518,9 @@ postamble_detach(int child)
 			failed = failed ? : state;
 	}
 	state++;
-#endif
 	if (postamble_pop(child))
 		failed = failed ? : state;
+#endif
 	if (failed) {
 		state = failed;
 		goto failure;
@@ -7520,15 +7536,13 @@ preamble_enable(int child)
 	if (preamble_attach(child))
 		goto failure;
 	state++;
-	if (child == CHILD_IUT) {
-		ADDR_buffer = addrs[(child + 1) % 2];
-		ADDR_length = anums[(child + 1) % 2] * sizeof(addrs[(child + 1) % 2][0]);
-		if (do_signal(child, __TEST_ENABLE_REQ))
-			goto failure;
-		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_ENABLE_CON))
-			goto failure;
-	}
+	ADDR_buffer = addrs[(child + 1) % 2];
+	ADDR_length = anums[(child + 1) % 2] * sizeof(addrs[(child + 1) % 2][0]);
+	if (do_signal(child, __TEST_ENABLE_REQ))
+		goto failure;
+	state++;
+	if (expect(child, INFINITE_WAIT, __TEST_ENABLE_CON))
+		goto failure;
 #if 0
 	if (child == CHILD_PTU) {
 		if (preamble_connect(child))
@@ -7546,16 +7560,14 @@ postamble_disable(int child)
 	int failed = 0;
 
 	state++;
-	if (child == CHILD_IUT) {
-		if (do_signal(child, __TEST_DISABLE_REQ))
-			failed = failed ? : state;
-		state++;
-		if (expect(child, NORMAL_WAIT, __TEST_DISABLE_CON))
-			failed = failed ? : state;
-		state++;
-		if (test_ioctl(child, I_FLUSH, FLUSHRW))
-			failed = failed ? : state;
-	}
+	if (do_signal(child, __TEST_DISABLE_REQ))
+		failed = failed ? : state;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DISABLE_CON))
+		failed = failed ? : state;
+	state++;
+	if (test_ioctl(child, I_FLUSH, FLUSHRW))
+		failed = failed ? : state;
 #if 0
 	if (child == CHILD_PTU) {
 		if (postamble_disconnect(child))
@@ -7663,13 +7675,13 @@ preamble_link_power_off(int child)
 static int
 preamble_link_power_off_pr(int child)
 {
-	iutconf.opt.popt = 0;
+	config->opt.popt = 0;
 	return preamble_link_power_off(child);
 }
 static int
 preamble_link_power_off_np(int child)
 {
-	iutconf.opt.popt = SS7_POPT_NOPR;
+	config->opt.popt = SS7_POPT_NOPR;
 	return preamble_link_power_off(child);
 }
 #endif
@@ -7702,14 +7714,14 @@ preamble_link_power_on(int child)
 static int
 preamble_link_power_on_pr(int child)
 {
-	iutconf.opt.popt = 0;
+	config->opt.popt = 0;
 	return preamble_link_power_on(child);
 }
 #endif
 static int
 preamble_link_power_on_np(int child)
 {
-	iutconf.opt.popt = SS7_POPT_NOPR;
+	config->opt.popt = SS7_POPT_NOPR;
 	return preamble_link_power_on(child);
 }
 static int
@@ -7740,13 +7752,13 @@ preamble_link_out_of_service(int child)
 static int
 preamble_link_out_of_service_pr(int child)
 {
-	iutconf.opt.popt = 0;
+	config->opt.popt = 0;
 	return preamble_link_out_of_service(child);
 }
 static int
 preamble_link_out_of_service_np(int child)
 {
-	iutconf.opt.popt = SS7_POPT_NOPR;
+	config->opt.popt = SS7_POPT_NOPR;
 	return preamble_link_out_of_service(child);
 }
 #endif
@@ -7790,7 +7802,7 @@ preamble_link_in_service(int child)
 		if (do_signal(child, __TEST_SIO))
 			goto failure;
 		state++;
-		if (!(iutconf.opt.popt & SS7_POPT_NOPR)) {
+		if (!(config->opt.popt & SS7_POPT_NOPR)) {
 			for (;;) {
 				switch (get_event(child)) {
 				case __MSG_PROVING:
@@ -7833,26 +7845,26 @@ preamble_link_in_service(int child)
 static int
 preamble_link_in_service_pr(int child)
 {
-	iutconf.opt.popt = 0;
+	config->opt.popt = 0;
 	return preamble_link_in_service(child);
 }
 static int
 preamble_link_in_service_np(int child)
 {
-	iutconf.opt.popt = SS7_POPT_NOPR;
+	config->opt.popt = SS7_POPT_NOPR;
 	return preamble_link_in_service(child);
 }
 static int
 preamble_link_in_service_basic(int child)
 {
-	iutconf.opt.popt = 0;
+	config->opt.popt = 0;
 	return preamble_link_in_service(child);
 }
 #endif
 static int
 preamble_link_in_service_pcr(int child)
 {
-	iutconf.opt.popt = SS7_POPT_PCR;
+	config->opt.popt = SS7_POPT_PCR;
 	return preamble_link_in_service(child);
 }
 static int
@@ -7889,23 +7901,13 @@ postamble_link_in_service(int child)
 
 int iut_showmsg(struct strbuf *ctrl, struct strbuf *data);
 
-void
-print_ppa(ppa_t * ppa)
-{
-	printf("PPA slot = %d\n", ((*ppa) >> 12) & 0xf);
-	printf("PPA span = %d\n", ((*ppa) >> 8) & 0xf);
-	printf("PPA chan = %d\n", ((*ppa) >> 0) & 0xff);
-	fflush(stdout);
-}
-
-#define PT_SDT_DEVICE "/dev/x400p-sl"
-
+#if 0
 static int
 pt_open(void)
 {
 	// printf(" :open\n");
 	// fflush(stdout);
-	if ((test_fd[0] = open(PT_SDT_DEVICE, O_NONBLOCK | O_RDWR)) < 0) {
+	if ((test_fd[0] = open(devname, O_NONBLOCK | O_RDWR)) < 0) {
 		printf("%s: %s\n", __FUNCTION__, strerror(errno));
 		fflush(stdout);
 		return __RESULT_FAILURE;
@@ -7943,7 +7945,7 @@ pt_attach(void)
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
 	ppa_t ppa;
-	ppa = (PT_TEST_SLOT << 12) | (PT_TEST_SPAN << 8) | (PT_TEST_CHAN << 0);
+	ppa = (PTU_TEST_SLOT << 12) | (PTU_TEST_SPAN << 8) | (PTU_TEST_CHAN << 0);
 	// printf(" :attach\n");
 	// fflush(stdout);
 	ctrl.maxlen = BUFSIZE;
@@ -8045,6 +8047,7 @@ pt_enable(void)
 	}
 	return __RESULT_SUCCESS;
 }
+#endif
 
 #if 0
 static int
@@ -8095,6 +8098,7 @@ pt_stats(void)
 }
 #endif
 
+#if 0
 static int
 pt_disable(void)
 {
@@ -8115,6 +8119,7 @@ pt_disable(void)
 	}
 	return __RESULT_SUCCESS;
 }
+#endif
 
 static int
 pt_config(void)
@@ -8125,12 +8130,12 @@ pt_config(void)
 	// fflush(stdout);
 	// printf(" :options sdl\n");
 	// fflush(stdout);
-	ptconf.opt.pvar = SS7_PVAR_ITUT_96;
-	ptconf.opt.popt = 0;
+	config->opt.pvar = SS7_PVAR_ITUT_96;
+	config->opt.popt = 0;
 	ctl.ic_cmd = SDL_IOCSOPTIONS;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(ptconf.opt);
-	ctl.ic_dp = (char *) &ptconf.opt;
+	ctl.ic_len = sizeof(config->opt);
+	ctl.ic_dp = (char *) &config->opt;
 	if (ioctl(test_fd[0], I_STR, &ctl) < 0) {
 		printf("****ERROR: options sdl failed\n");
 		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
@@ -8140,29 +8145,29 @@ pt_config(void)
 #if 0
 	printf("    :config sdl\n");
 	fflush(stdout);
-	ptconf.sdl.ifflags = 0;
-	ptconf.sdl.iftype = SDL_TYPE_DS0;
-	ptconf.sdl.ifrate = 64000;
-	ptconf.sdl.ifgtype = SDL_GTYPE_NONE;
-	ptconf.sdl.ifgrate = 1544000;
-	ptconf.sdl.ifmode = SDL_MODE_PEER;
-	ptconf.sdl.ifgmode = SDL_GMODE_NONE;
-	ptconf.sdl.ifgcrc = SDL_GCRC_CRC4;
-	ptconf.sdl.ifcoding = SDL_CODING_B8ZS;
-	ptconf.sdl.ifframing = SDL_FRAMING_ESF;
-	ptconf.sdl.ifleads = 0;
-	ptconf.sdl.ifalarms = 0;
-	ptconf.sdl.ifrxlevel = 0;
-	ptconf.sdl.iftxlevel = 0;
-	ptconf.sdl.ifsync = 0;
-	ptconf.sdl.ifsyncsrc[0] = 0;
-	ptconf.sdl.ifsyncsrc[1] = 0;
-	ptconf.sdl.ifsyncsrc[2] = 0;
-	ptconf.sdl.ifsyncsrc[3] = 0;
+	config->sdl.ifflags = 0;
+	config->sdl.iftype = SDL_TYPE_DS0;
+	config->sdl.ifrate = 64000;
+	config->sdl.ifgtype = SDL_GTYPE_NONE;
+	config->sdl.ifgrate = 1544000;
+	conficonfigDL_MODE_PEER;
+	config->sdl.ifgmode = SDL_GMODE_NONE;
+	config->sdl.ifgcrc = SDL_GCRC_CRC4;
+	config->sdl.ifcoding = SDL_CODING_B8ZS;
+	config->sdl.ifframing = SDL_FRAMING_ESF;
+	config->sdl.ifleads = 0;
+	config->sdl.ifalarms = 0;
+	config->sdl.ifrxlevel = 0;
+	config->sdl.iftxlevel = 0;
+	config->sdl.ifsync = 0;
+	config->sdl.ifsyncsrc[0] = 0;
+	config->sdl.ifsyncsrc[1] = 0;
+	config->sdl.ifsyncsrc[2] = 0;
+	config->sdl.ifsyncsrc[3] = 0;
 	ctl.ic_cmd = SDL_IOCSCONFIG;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(ptconf.sdl);
-	ctl.ic_dp = (char *) &ptconf.sdl;
+	ctl.ic_len = sizeof(config->sdl);
+	ctl.ic_dp = (char *) &config->sdl;
 	if (ioctl(test_fd[0], I_STR, &ctl) < 0) {
 		printf("****ERROR: config sdl failed\n");
 		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
@@ -8171,22 +8176,22 @@ pt_config(void)
 #endif
 	// printf(" :config sdt\n");
 	// fflush(stdout);
-	ptconf.sdt.N = 16;
-	ptconf.sdt.m = 272;
-	ptconf.sdt.t8 = 100;
-	ptconf.sdt.Tin = 4;
-	ptconf.sdt.Tie = 1;
-	ptconf.sdt.T = 64;
-	ptconf.sdt.D = 256;
-	ptconf.sdt.Te = 577169;
-	ptconf.sdt.De = 9308000;
-	ptconf.sdt.Ue = 144292000;
-	ptconf.sdt.b = 8;
-	ptconf.sdt.f = pt_flags;
+	config->sdt.N = 16;
+	config->sdt.m = 272;
+	config->sdt.t8 = 100;
+	config->sdt.Tin = 4;
+	config->sdt.Tie = 1;
+	config->sdt.T = 64;
+	config->sdt.D = 256;
+	config->sdt.Te = 577169;
+	config->sdt.De = 9308000;
+	config->sdt.Ue = 144292000;
+	config->sdt.b = 8;
+	config->sdt.f = SDT_FLAGS_ONE;
 	ctl.ic_cmd = SDT_IOCSCONFIG;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(ptconf.sdt);
-	ctl.ic_dp = (char *) &ptconf.sdt;
+	ctl.ic_len = sizeof(config->sdt);
+	ctl.ic_dp = (char *) &config->sdt;
 	if (ioctl(test_fd[0], I_STR, &ctl) < 0) {
 		printf("****ERROR: config sdt failed\n");
 		printf("%s: %s\n", __FUNCTION__, strerror(errno));
@@ -8237,6 +8242,7 @@ pt_power_on(void)
 	return __RESULT_SUCCESS;
 }
 
+#if 0
 static int
 pt_start(void)
 {
@@ -8264,21 +8270,25 @@ pt_end(void)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
+#endif
 
-#define IUT_SL_DEVICE "/dev/x400p-sl"
-
+#if 0
 static int
 iut_open(void)
 {
-	return test_open(CHILD_IUT, IUT_SL_DEVICE, O_NONBLOCK | O_RDWR);
+	return test_open(CHILD_IUT, devname, O_NONBLOCK | O_RDWR);
 }
+#endif
 
+#if 0
 static int
 iut_close(void)
 {
 	return test_close(CHILD_IUT);
 }
+#endif
 
+#if 0
 static int
 iut_attach(void)
 {
@@ -8334,7 +8344,9 @@ iut_attach(void)
 	}
 	return __RESULT_SUCCESS;
 }
+#endif
 
+#if 0
 static int
 iut_detach(void)
 {
@@ -8357,7 +8369,9 @@ iut_detach(void)
 	}
 	return __RESULT_SUCCESS;
 }
+#endif
 
+#if 0
 static int
 iut_enable(void)
 {
@@ -8411,7 +8425,9 @@ iut_enable(void)
 	}
 	return __RESULT_SUCCESS;
 }
+#endif
 
+#if 0
 static int
 iut_disable(void)
 {
@@ -8434,7 +8450,9 @@ iut_disable(void)
 	}
 	return __RESULT_SUCCESS;
 }
+#endif
 
+#if 0
 static int
 iut_config(void)
 {
@@ -8443,12 +8461,12 @@ iut_config(void)
 	// fflush(stdout);
 	// printf(" :options sdl\n");
 	// fflush(stdout);
-	iutconf.opt.pvar = SS7_PVAR_ITUT_96;
-	iutconf.opt.popt = iut_options;
+	config->opt.pvar = SS7_PVAR_ITUT_96;
+	config->opt.popt = 0;
 	ctl.ic_cmd = SL_IOCSOPTIONS;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.opt);
-	ctl.ic_dp = (char *) &iutconf.opt;
+	ctl.ic_len = sizeof(config->opt);
+	ctl.ic_dp = (char *) &config->opt;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
 	      option_sdl_failed:
 		printf("                                   ****ERROR: options sdl failed\n");
@@ -8459,20 +8477,20 @@ iut_config(void)
 	}
 	ctl.ic_cmd = SL_IOCGOPTIONS;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.opt);
-	ctl.ic_dp = (char *) &iutconf.opt;
+	ctl.ic_len = sizeof(config->opt);
+	ctl.ic_dp = (char *) &config->opt;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
 		goto option_sdl_failed;
-	if (iutconf.opt.pvar != SS7_PVAR_ITUT_96 || iutconf.opt.popt != iut_options)
+	if (config->opt.pvar != SS7_PVAR_ITUT_96 || config->opt.popt != 0)
 		goto option_sdl_failed;
 	// printf(" :options sdt\n");
 	// fflush(stdout);
-	iutconf.opt.pvar = SS7_PVAR_ITUT_96;
-	iutconf.opt.popt = iut_options;
+	config->opt.pvar = SS7_PVAR_ITUT_96;
+	config->opt.popt = 0;
 	ctl.ic_cmd = SDT_IOCSOPTIONS;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.opt);
-	ctl.ic_dp = (char *) &iutconf.opt;
+	ctl.ic_len = sizeof(config->opt);
+	ctl.ic_dp = (char *) &config->opt;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
 	      option_sdt_failed:
 		printf("                                   ****ERROR: options sdt failed\n");
@@ -8483,20 +8501,20 @@ iut_config(void)
 	}
 	ctl.ic_cmd = SDT_IOCGOPTIONS;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.opt);
-	ctl.ic_dp = (char *) &iutconf.opt;
+	ctl.ic_len = sizeof(config->opt);
+	ctl.ic_dp = (char *) &config->opt;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
 		goto option_sdt_failed;
-	if (iutconf.opt.pvar != SS7_PVAR_ITUT_96 || iutconf.opt.popt != iut_options)
+	if (config->opt.pvar != SS7_PVAR_ITUT_96 || config->opt.popt != 0)
 		goto option_sdt_failed;
 	// printf(" :options sl\n");
 	// fflush(stdout);
-	iutconf.opt.pvar = SS7_PVAR_ITUT_96;
-	iutconf.opt.popt = iut_options;
+	config->opt.pvar = SS7_PVAR_ITUT_96;
+	config->opt.popt = 0;
 	ctl.ic_cmd = SL_IOCSOPTIONS;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.opt);
-	ctl.ic_dp = (char *) &iutconf.opt;
+	ctl.ic_len = sizeof(config->opt);
+	ctl.ic_dp = (char *) &config->opt;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
 	      option_sl_failed:
 		printf("                                   ****ERROR: options sl failed\n");
@@ -8507,46 +8525,46 @@ iut_config(void)
 	}
 	ctl.ic_cmd = SL_IOCGOPTIONS;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.opt);
-	ctl.ic_dp = (char *) &iutconf.opt;
+	ctl.ic_len = sizeof(config->opt);
+	ctl.ic_dp = (char *) &config->opt;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
 		goto option_sl_failed;
-	if (iutconf.opt.pvar != SS7_PVAR_ITUT_96 || iutconf.opt.popt != iut_options)
+	if (config->opt.pvar != SS7_PVAR_ITUT_96 || config->opt.popt != 0)
 		goto option_sl_failed;
 	// printf(" :config sdl\n");
 	// fflush(stdout);
 	/* go with defaults */
 #if 0
-	iutconf.sdl.ifflags = 0;
-	iutconf.sdl.iftype = SDL_TYPE_DS0;
-	iutconf.sdl.ifrate = 64000;
-	iutconf.sdl.ifgtype = SDL_GTYPE_NONE;
-	iutconf.sdl.ifgrate = 1544000;
-	iutconf.sdl.ifmode = SDL_MODE_PEER;
-	iutconf.sdl.ifgmode = SDL_GMODE_NONE;
-	iutconf.sdl.ifgcrc = SDL_GCRC_CRC4;
-	iutconf.sdl.ifcoding = SDL_CODING_B8ZS;
-	iutconf.sdl.ifframing = SDL_FRAMING_ESF;
-	iutconf.sdl.ifleads = 0;
-	iutconf.sdl.ifalarms = 0;
-	iutconf.sdl.ifrxlevel = 0;
-	iutconf.sdl.iftxlevel = 0;
-	iutconf.sdl.ifsync = 0;
-	iutconf.sdl.ifsyncsrc[0] = 0;
-	iutconf.sdl.ifsyncsrc[1] = 0;
-	iutconf.sdl.ifsyncsrc[2] = 0;
-	iutconf.sdl.ifsyncsrc[3] = 0;
+	config->sdl.ifflags = 0;
+	config->sdl.iftype = SDL_TYPE_DS0;
+	config->sdl.ifrate = 64000;
+	config->sdl.ifgtype = SDL_GTYPE_NONE;
+	config->sdl.ifgrate = 1544000;
+	config->sdl.ifmode = SDL_MODE_PEER;
+	config->sdl.ifgmode = SDL_GMODE_NONE;
+	config->sdl.ifgcrc = SDL_GCRC_CRC4;
+	config->sdl.ifcoding = SDL_CODING_B8ZS;
+	config->sdl.ifframing = SDL_FRAMING_ESF;
+	config->sdl.ifleads = 0;
+	config->sdl.ifalarms = 0;
+	config->sdl.ifrxlevel = 0;
+	config->sdl.iftxlevel = 0;
+	config->sdl.ifsync = 0;
+	config->sdl.ifsyncsrc[0] = 0;
+	config->sdl.ifsyncsrc[1] = 0;
+	config->sdl.ifsyncsrc[2] = 0;
+	config->sdl.ifsyncsrc[3] = 0;
 	ctl.ic_cmd = SDL_IOCSCONFIG;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.sdl);
-	ctl.ic_dp = (char *) &iutconf.sdl;
+	ctl.ic_len = sizeof(config->sdl);
+	ctl.ic_dp = (char *) &config->sdl;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
 		goto config_sdl_failed;
 #endif
 	ctl.ic_cmd = SDL_IOCGCONFIG;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.sdl);
-	ctl.ic_dp = (char *) &iutconf.sdl;
+	ctl.ic_len = sizeof(config->sdl);
+	ctl.ic_dp = (char *) &config->sdl;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
 		// config_sdl_failed:
 		printf("                                   ****ERROR: config sdl failed\n");
@@ -8557,42 +8575,42 @@ iut_config(void)
 	}
 	/* go with defaults */
 #if 0
-	if (iutconf.sdl.iftype != SDL_TYPE_DS0
-	    || iutconf.sdl.ifrate != 64000
-	    || iutconf.sdl.ifgtype != SDL_GTYPE_NONE
-	    || iutconf.sdl.ifgrate != 1544000
-	    || iutconf.sdl.ifmode != SDL_MODE_PEER
-	    || iutconf.sdl.ifgmode != SDL_GMODE_NONE
-	    || iutconf.sdl.ifgcrc != SDL_GCRC_CRC4
-	    || iutconf.sdl.ifcoding != SDL_CODING_B8ZS || iutconf.sdl.ifframing != SDL_FRAMING_ESF)
+	if (config->sdl.iftype != SDL_TYPE_DS0
+	    || config->sdl.ifrate != 64000
+	    || config->sdl.ifgtype != SDL_GTYPE_NONE
+	    || config->sdl.ifgrate != 1544000
+	    || config->sdl.ifmode != SDL_MODE_PEER
+	    || config->sdl.ifgmode != SDL_GMODE_NONE
+	    || config->sdl.ifgcrc != SDL_GCRC_CRC4
+	    || config->sdl.ifcoding != SDL_CODING_B8ZS || config->sdl.ifframing != SDL_FRAMING_ESF)
 		goto config_sdl_failed;
 #endif
 	// printf(" :config sdt\n");
 	// fflush(stdout);
 #if 0
-	iutconf.sdt.t8 = 100;
-	iutconf.sdt.Tin = 4;
-	iutconf.sdt.Tie = 1;
-	iutconf.sdt.T = 64;
-	iutconf.sdt.D = 256;
-	iutconf.sdt.Te = 577169;
-	iutconf.sdt.De = 9308000;
-	iutconf.sdt.Ue = 144292000;
-	iutconf.sdt.N = 16;
-	iutconf.sdt.m = 272;
-	iutconf.sdt.b = 8;
-	iutconf.sdt.f = iut_flags;
+	config->sdt.t8 = 100;
+	config->sdt.Tin = 4;
+	config->sdt.Tie = 1;
+	config->sdt.T = 64;
+	config->sdt.D = 256;
+	config->sdt.Te = 577169;
+	config->sdt.De = 9308000;
+	config->sdt.Ue = 144292000;
+	config->sdt.N = 16;
+	config->sdt.m = 272;
+	config->sdt.b = 8;
+	config->sdt.f = iut_flags;
 	ctl.ic_cmd = SDT_IOCSCONFIG;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.sdt);
-	ctl.ic_dp = (char *) &iutconf.sdt;
+	ctl.ic_len = sizeof(config->sdt);
+	ctl.ic_dp = (char *) &config->sdt;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
 		goto config_sdt_failed;
 #endif
 	ctl.ic_cmd = SDT_IOCGCONFIG;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.sdt);
-	ctl.ic_dp = (char *) &iutconf.sdt;
+	ctl.ic_len = sizeof(config->sdt);
+	ctl.ic_dp = (char *) &config->sdt;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
 		// config_sdt_failed:
 		printf("                                   ****ERROR: config sdt failed\n");
@@ -8602,49 +8620,49 @@ iut_config(void)
 		return __RESULT_FAILURE;
 	}
 #if 0
-	if (iutconf.sdt.t8 != 100
-	    || iutconf.sdt.Tin != 4
-	    || iutconf.sdt.Tie != 1
-	    || iutconf.sdt.T != 64
-	    || iutconf.sdt.D != 256
-	    || iutconf.sdt.Te != 577169
-	    || iutconf.sdt.De != 9308000
-	    || iutconf.sdt.Ue != 144292000
-	    || iutconf.sdt.N != 16
-	    || iutconf.sdt.m != 272 || iutconf.sdt.b != 8 || iutconf.sdt.f != iut_flags)
+	if (config->sdt.t8 != 100
+	    || config->sdt.Tin != 4
+	    || config->sdt.Tie != 1
+	    || config->sdt.T != 64
+	    || config->sdt.D != 256
+	    || config->sdt.Te != 577169
+	    || config->sdt.De != 9308000
+	    || config->sdt.Ue != 144292000
+	    || config->sdt.N != 16
+	    || config->sdt.m != 272 || config->sdt.b != 8 || config->sdt.f != iut_flags)
 		goto config_sdt_failed;
 #endif
 	// printf(" :config sl\n");
 	// fflush(stdout);
-	iutconf.sl.t1 = 45 * 1000;	/* milliseconds */
-	iutconf.sl.t2 = 5 * 1000;	/* milliseconds */
-	iutconf.sl.t2l = 20 * 1000;	/* milliseconds */
-	iutconf.sl.t2h = 100 * 1000;	/* milliseconds */
-	iutconf.sl.t3 = 1 * 1000;	/* milliseconds */
-	iutconf.sl.t4n = 8 * 1000;	/* milliseconds */
-	iutconf.sl.t4e = 500;		/* milliseconds */
-	iutconf.sl.t5 = 100;		/* milliseconds */
-	iutconf.sl.t6 = 4 * 1000;	/* milliseconds */
-	iutconf.sl.t7 = iut_t7;		/* milliseconds */
-	iutconf.sl.rb_abate = 3;	/* messages */
-	iutconf.sl.rb_accept = 6;	/* messages */
-	iutconf.sl.rb_discard = 9;	/* messages */
-	iutconf.sl.tb_abate_1 = 128 * 272;	/* octets */
-	iutconf.sl.tb_onset_1 = 256 * 272;	/* octets */
-	iutconf.sl.tb_discd_1 = 384 * 272;	/* octets */
-	iutconf.sl.tb_abate_2 = 512 * 272;	/* octets */
-	iutconf.sl.tb_onset_2 = 640 * 272;	/* octets */
-	iutconf.sl.tb_discd_2 = 768 * 272;	/* octets */
-	iutconf.sl.tb_abate_3 = 896 * 272;	/* octets */
-	iutconf.sl.tb_onset_3 = 1024 * 272;	/* octets */
-	iutconf.sl.tb_discd_3 = 1152 * 272;	/* octets */
-	iutconf.sl.N1 = 127;	/* messages */
-	iutconf.sl.N2 = 8192;	/* octets */
-	iutconf.sl.M = 5;
+	config->sl.t1 = 45 * 1000;	/* milliseconds */
+	config->sl.t2 = 5 * 1000;	/* milliseconds */
+	config->sl.t2l = 20 * 1000;	/* milliseconds */
+	config->sl.t2h = 100 * 1000;	/* milliseconds */
+	config->sl.t3 = 1 * 1000;	/* milliseconds */
+	config->sl.t4n = 8 * 1000;	/* milliseconds */
+	config->sl.t4e = 500;		/* milliseconds */
+	config->sl.t5 = 100;		/* milliseconds */
+	config->sl.t6 = 4 * 1000;	/* milliseconds */
+	config->sl.t7 = 1 * 1000;		/* milliseconds */
+	config->sl.rb_abate = 3;	/* messages */
+	config->sl.rb_accept = 6;	/* messages */
+	config->sl.rb_discard = 9;	/* messages */
+	config->sl.tb_abate_1 = 128 * 272;	/* octets */
+	config->sl.tb_onset_1 = 256 * 272;	/* octets */
+	config->sl.tb_discd_1 = 384 * 272;	/* octets */
+	config->sl.tb_abate_2 = 512 * 272;	/* octets */
+	config->sl.tb_onset_2 = 640 * 272;	/* octets */
+	config->sl.tb_discd_2 = 768 * 272;	/* octets */
+	config->sl.tb_abate_3 = 896 * 272;	/* octets */
+	config->sl.tb_onset_3 = 1024 * 272;	/* octets */
+	config->sl.tb_discd_3 = 1152 * 272;	/* octets */
+	config->sl.N1 = 127;	/* messages */
+	config->sl.N2 = 8192;	/* octets */
+	config->sl.M = 5;
 	ctl.ic_cmd = SL_IOCSCONFIG;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.sl);
-	ctl.ic_dp = (char *) &iutconf.sl;
+	ctl.ic_len = sizeof(config->sl);
+	ctl.ic_dp = (char *) &config->sl;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0) {
 	      config_sl_failed:
 		printf("                                   ****ERROR: config sl failed\n");
@@ -8655,37 +8673,39 @@ iut_config(void)
 	}
 	ctl.ic_cmd = SL_IOCGCONFIG;
 	ctl.ic_timout = 0;
-	ctl.ic_len = sizeof(iutconf.sl);
-	ctl.ic_dp = (char *) &iutconf.sl;
+	ctl.ic_len = sizeof(config->sl);
+	ctl.ic_dp = (char *) &config->sl;
 	if (ioctl(test_fd[1], I_STR, &ctl) < 0)
 		goto config_sl_failed;
-	if (iutconf.sl.t1 != 45 * 1000
-	    || iutconf.sl.t2 != 5 * 1000
-	    || iutconf.sl.t2l != 20 * 1000
-	    || iutconf.sl.t2h != 100 * 1000
-	    || iutconf.sl.t3 != 1 * 1000
-	    || iutconf.sl.t4n != 8 * 1000
-	    || iutconf.sl.t4e != 500
-	    || iutconf.sl.t5 != 100
-	    || iutconf.sl.t6 != 4 * 1000
-	    || iutconf.sl.t7 != iut_t7
-	    || iutconf.sl.rb_abate != 3
-	    || iutconf.sl.rb_accept != 6
-	    || iutconf.sl.rb_discard != 9
-	    || iutconf.sl.tb_abate_1 != 128 * 272
-	    || iutconf.sl.tb_onset_1 != 256 * 272
-	    || iutconf.sl.tb_discd_1 != 384 * 272
-	    || iutconf.sl.tb_abate_2 != 512 * 272
-	    || iutconf.sl.tb_onset_2 != 640 * 272
-	    || iutconf.sl.tb_discd_2 != 768 * 272
-	    || iutconf.sl.tb_abate_3 != 896 * 272
-	    || iutconf.sl.tb_onset_3 != 1024 * 272
-	    || iutconf.sl.tb_discd_3 != 1152 * 272
-	    || iutconf.sl.N1 != 127 || iutconf.sl.N2 != 8192 || iutconf.sl.M != 5)
+	if (config->sl.t1 != 45 * 1000
+	    || config->sl.t2 != 5 * 1000
+	    || config->sl.t2l != 20 * 1000
+	    || config->sl.t2h != 100 * 1000
+	    || config->sl.t3 != 1 * 1000
+	    || config->sl.t4n != 8 * 1000
+	    || config->sl.t4e != 500
+	    || config->sl.t5 != 100
+	    || config->sl.t6 != 4 * 1000
+	    || config->sl.t7 != 1 * 1000
+	    || config->sl.rb_abate != 3
+	    || config->sl.rb_accept != 6
+	    || config->sl.rb_discard != 9
+	    || config->sl.tb_abate_1 != 128 * 272
+	    || config->sl.tb_onset_1 != 256 * 272
+	    || config->sl.tb_discd_1 != 384 * 272
+	    || config->sl.tb_abate_2 != 512 * 272
+	    || config->sl.tb_onset_2 != 640 * 272
+	    || config->sl.tb_discd_2 != 768 * 272
+	    || config->sl.tb_abate_3 != 896 * 272
+	    || config->sl.tb_onset_3 != 1024 * 272
+	    || config->sl.tb_discd_3 != 1152 * 272
+	    || config->sl.N1 != 127 || config->sl.N2 != 8192 || config->sl.M != 5)
 		goto config_sl_failed;
 	return __RESULT_SUCCESS;
 }
+#endif
 
+#if 0
 static int
 iut_power_off(void)
 {
@@ -8715,14 +8735,14 @@ link_power_off(void)
 		return __RESULT_INCONCLUSIVE;
 	if ((ret = iut_attach()) != __RESULT_SUCCESS)
 		return __RESULT_INCONCLUSIVE;
-	iut_options = 0;
-	iut_t7 = 1 * 1000;
+	config->opt.popt = 0;
+	config->sl.t7 = 1 * 1000;
 	if ((ret = iut_config()) != __RESULT_SUCCESS)
 		return __RESULT_INCONCLUSIVE;
 	if ((ret = iut_enable()) != __RESULT_SUCCESS)
 		return __RESULT_INCONCLUSIVE;
 	sleep(10);
-	// while (wait_event(0) != __EVENT_NO_MSG);
+	// while (wait_event(child, 0) != __EVENT_NO_MSG);
 	// ioctl(test_fd[0], I_FLUSH, FLUSHRW); /* flush PT */
 	start_tt(10000);
 	return __RESULT_SUCCESS;
@@ -8741,8 +8761,8 @@ link_out_of_service(void)
 		return __RESULT_INCONCLUSIVE;
 	if ((ret = iut_attach()) != __RESULT_SUCCESS)
 		return __RESULT_INCONCLUSIVE;
-	iut_options = 0;
-	iut_t7 = 1 * 1000;
+	config->opt.popt = 0;
+	config->sl.t7 = 1 * 1000;
 	if ((ret = iut_config()) != __RESULT_SUCCESS)
 		return __RESULT_INCONCLUSIVE;
 	if ((ret = iut_enable()) != __RESULT_SUCCESS)
@@ -8750,13 +8770,15 @@ link_out_of_service(void)
 	// sleep(1);
 	if ((ret = do_signal(CHILD_IUT, __TEST_POWER_ON)) != __RESULT_SUCCESS)
 		return __RESULT_INCONCLUSIVE;
-	// while (wait_event(0) != __EVENT_NO_MSG);
+	// while (wait_event(child, 0) != __EVENT_NO_MSG);
 	// get_event();
 	// ioctl(test_fd[0], I_FLUSH, FLUSHRW); /* flush PT */
 	start_tt(10000);
 	return __RESULT_SUCCESS;
 }
+#endif
 
+#if 0
 static int
 link_in_service(void)
 {
@@ -8777,7 +8799,7 @@ link_in_service(void)
 	// sleep(1);
 	if ((ret = do_signal(CHILD_IUT, __TEST_POWER_ON)) != __RESULT_SUCCESS)
 		return __RESULT_INCONCLUSIVE;
-	// while (wait_event(0) != __EVENT_NO_MSG);
+	// while (wait_event(child, 0) != __EVENT_NO_MSG);
 	// get_event();
 	// ioctl(test_fd[0], I_FLUSH, FLUSHRW); /* flush PT */
 	start_tt(10000);
@@ -8816,7 +8838,7 @@ link_in_service(void)
 				break;
 			case __TEST_SIN:
 				do_signal(CHILD_PTU, __TEST_SIE);
-				start_tt(iutconf.sl.t4e * 20);
+				start_tt(config->sl.t4e * 20);
 				state = 3;
 				break;
 			default:
@@ -8844,39 +8866,43 @@ link_in_service(void)
 	}
 	return __RESULT_INCONCLUSIVE;
 }
+#endif
 
+#if 0
 static int
 link_in_service_basic(void)
 {
-	iut_options = 0;
-	iut_t7 = 1 * 1000;
+	config->opt.popt = 0;
+	config->sl.t7 = 1 * 1000;
 	return link_in_service();
 }
 
 static int
 link_in_service_pcr(void)
 {
-	iut_options = SS7_POPT_PCR;
-	iut_t7 = 2 * 1000;
+	config->opt.popt = SS7_POPT_PCR;
+	config->sl.t7 = 2 * 1000;
 	return link_in_service();
 }
 
 static int
 link_in_service_basic_long_ack(void)
 {
-	iut_options = 0;
-	iut_t7 = 4 * 1000;
+	config->opt.popt = 0;
+	config->sl.t7 = 4 * 1000;
 	return link_in_service();
 }
 
 static int
 link_in_service_pcr_long_ack(void)
 {
-	iut_options = SS7_POPT_PCR;
-	iut_t7 = 8 * 1000;
+	config->opt.popt = SS7_POPT_PCR;
+	config->sl.t7 = 8 * 1000;
 	return link_in_service();
 }
+#endif
 
+#if 0
 static int
 run_test(test_case_t * tcase)
 {
@@ -8938,6 +8964,7 @@ run_test(test_case_t * tcase)
 	pt_end();
 	return ret;
 }
+#endif
 
 int
 iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
@@ -8959,7 +8986,7 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			printf("PPA style = %lu\n", (ulong)p->info_ack.lmi_ppa_style);
 			printf("PPA length = %u\n", ppalen);
 			fflush(stdout);
-			print_ppa((ppa_t *) p->info_ack.lmi_ppa_addr);
+			print_ppa(CHILD_IUT, (ppa_t *) p->info_ack.lmi_ppa_addr);
 		}
 			return (p->lmi_primitive);
 		case LMI_OK_ACK:
@@ -9123,17 +9150,14 @@ struct test_stream {
 	int (*postamble) (int);		/* test postamble */
 };
 
-#if 0
 static int
-check_snibs(unsigned char bsnib, unsigned char fsnib)
+check_snibs(int child, unsigned char bsnib, unsigned char fsnib)
 {
-	printf("                 check b/f sn/ib:  ---> (%02x/%02x)\n", bsnib, fsnib);
-	fflush(stdout);
+	print_rx_msg_sn(child, "check b/f sn/ib", bsnib, fsnib);
 	if ((bib[1] | bsn[1]) == bsnib && (fib[1] | fsn[1]) == fsnib)
 		return __RESULT_SUCCESS;
 	return __RESULT_FAILURE;
 }
-#endif
 
 /*
  *  Check test case guard timer.
@@ -9400,7 +9424,7 @@ test_power_on_pt(int child)
 		if (do_signal(child, __TEST_POWER_ON))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(0xff, 0xff))
+		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
 			goto failure;
 		state++;
 		if (do_signal(child, __TEST_SIOS))
@@ -9468,7 +9492,7 @@ test_power_on_sut(int child)
 		if (do_signal(child, __TEST_POWER_ON))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(0xff, 0xff))
+		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
 			goto failure;
 		state++;
 		if (do_signal(child, __TEST_SIOS))
@@ -9535,7 +9559,7 @@ test_out_of_service_sut(int child)
 {
 	switch (child) {
 	case CHILD_PTU:
-		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(0xff, 0xff))
+		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
 			goto failure;
 		state++;
 		if (do_signal(child, __TEST_SIOS))
@@ -9595,7 +9619,7 @@ test_1_2_ptu(int child)
 		goto failure;
 	state++;
 	beg_time = milliseconds(child, t2);
-	start_tt(iutconf.sl.t2 * 2);
+	start_tt(config->sl.t2 * 2);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
@@ -9708,7 +9732,7 @@ test_1_3_ptu(int child)
 		goto failure;
 	state++;
 	beg_time = milliseconds(child, t3);
-	start_tt(iutconf.sl.t3 * 2);
+	start_tt(config->sl.t3 * 2);
 	state++;
 	for (;;) {
 		switch(get_event(child)) {
@@ -9781,7 +9805,7 @@ test_1_4_ptu(int child)
 		goto failure;
 	state++;
 	beg_time = milliseconds(child, t4n);
-	start_tt(iutconf.sl.t4n * 2);
+	start_tt(config->sl.t4n * 2);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
@@ -9804,7 +9828,7 @@ test_1_4_ptu(int child)
 	if (check_time(child, "T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
 		goto failure;
 	beg_time = milliseconds(child, t1);
-	start_tt(iutconf.sl.t1 * 2);
+	start_tt(config->sl.t1 * 2);
 	for (;;) {
 		switch (get_event(child)) {
 		case __TEST_FISU:
@@ -10409,7 +10433,7 @@ test_1_7_ptu(int child)
 	if (do_signal(child, __TEST_SIN))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t4n / 2);
+	start_tt(config->sl.t4n / 2);
 	state++;
 	show_timeout = 1;
 	for (;;) {
@@ -10422,7 +10446,7 @@ test_1_7_ptu(int child)
 			print_less(child);
 			continue;
 		case __EVENT_TIMEOUT:
-			start_tt(iutconf.sl.t4n * 2);
+			start_tt(config->sl.t4n * 2);
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
@@ -10578,8 +10602,7 @@ test_alignment_lpo_pt(int child, int proving, int result)
 		}
 		state++;
 		/* wait to allow IUT to queue data, for test 1.9(b)np */
-		if (test_msleep(child, LONG_WAIT))
-			goto failure;
+		test_msleep(child, LONG_WAIT);
 		state++;
 		if (do_signal(child, __TEST_SIO))
 			goto failure;
@@ -10824,7 +10847,7 @@ test_1_9a_ptu(int child, int proving)
 	if (do_signal(child, __TEST_DATA))
 		goto failure;
 	state++;
-	if (start_tt(iutconf.sl.t7 * 2))
+	if (start_tt(config->sl.t7 * 2))
 		goto failure;
 	state++;
 	for (;;) {
@@ -11166,7 +11189,7 @@ test_1_11_ptu(int child, int proving)
 	if (do_signal(child, __TEST_SIO))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t4n * 2);
+	start_tt(config->sl.t4n * 2);
 	state++;
 	switch (proving) {
 	case 0:
@@ -11710,7 +11733,7 @@ test_1_14_iut(int child)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	start_tt(iutconf.sl.t4n / 2 - SHORT_WAIT);
+	start_tt(config->sl.t4n / 2 - SHORT_WAIT);
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT))
 		goto failure;
@@ -11874,7 +11897,7 @@ test_1_16_ptu(int child, int proving)
 		goto failure;
 	state++;
 	beg_time = milliseconds(child, t1);
-	start_tt(iutconf.sl.t1 * 2);
+	start_tt(config->sl.t1 * 2);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
@@ -12504,7 +12527,7 @@ test_1_23_iut(int child)
 		goto failure;
 	state++;
 	/* send in the middle of the normal proving period */
-	if (expect(child, iutconf.sl.t4n / 2, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t4n / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_EMERG))
@@ -12754,7 +12777,7 @@ Deactivation during aligned not ready\
 static int
 test_1_27_ptu(int child, int proving)
 {
-	int origin;
+	int origin = state;
 
 	for (;;) {
 		switch (state - origin) {
@@ -13333,7 +13356,7 @@ test_1_32a_ptu(int child)
 				goto failure;
 			if (do_signal(child, last_event))
 				goto failure;
-			if (start_tt(iutconf.sl.t4n / 2))
+			if (start_tt(config->sl.t4n / 2))
 				goto failure;
 			state++;
 			continue;
@@ -13428,7 +13451,7 @@ test_1_32b_iut(int child)
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
-	if (expect(child, iutconf.sl.t4n / 2, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t4n / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_STOP))
@@ -13970,7 +13993,7 @@ test_2_4_iut(int child)
 		goto failure;
 	state++;
 	/* wait for half of proving period */
-	if (expect(child, iutconf.sl.t4n / 2, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t4n / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CEASE))
@@ -14543,19 +14566,12 @@ test_3_4_ptu(int child)
 static int
 test_3_4_iut(int child)
 {
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT11:
-	case M2PA_VERSION_RFC4165:
-		goto notappl;
-	}
 	if (test_alignment_lpo_sut(child, 1, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
-      notappl:
-	return __RESULT_NOTAPPL;
 }
 
 static struct test_stream test_case_3_4_ptu = { preamble_link_power_on, test_3_4_ptu, postamble_link_out_of_service };
@@ -15146,7 +15162,7 @@ test_4_1b_ptu(int child)
 	state++;
 	/* ( 7) Check that SP A does not issue a data message from the MSU requested at SP A after
 	   receipt of status "Processor Outage". */
-	if (start_tt(iutconf.sl.t7 * 2))
+	if (start_tt(config->sl.t7 * 2))
 		goto failure;
 	state++;
 	for (;;) {
@@ -15463,7 +15479,7 @@ test_5_1_ptu(int child)
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
-			if (start_tt(iutconf.sl.t7 * 2))
+			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
 			continue;
@@ -15496,7 +15512,7 @@ static int
 test_5_1_iut(int child)
 {
 #if 1
-	if (expect(child, iutconf.sl.t7 * 3, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t7 * 3, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -15535,7 +15551,7 @@ test_5_2_ptu(int child)
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
-			if (start_tt(iutconf.sl.t7 * 2))
+			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
 			continue;
@@ -15543,14 +15559,14 @@ test_5_2_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if (bsn[1] != 0x7f) {
-					if (check_snibs(0x7f, 0xff))
+					if (check_snibs(child, 0x7f, 0xff))
 						goto failure;
 				}
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
 				break;
 			case __EVENT_TIMEOUT:
-				if (check_snibs(0x7f, 0xff))
+				if (check_snibs(child, 0x7f, 0xff))
 					goto failure;
 				break;
 			default:
@@ -15572,7 +15588,7 @@ static int
 test_5_2_iut(int child)
 {
 #if 1
-	if (expect(child, iutconf.sl.t7 * 3, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t7 * 3, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -15611,7 +15627,7 @@ test_5_3_ptu(int child)
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
-			if (start_tt(iutconf.sl.t7 * 2))
+			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
 			continue;
@@ -15619,7 +15635,7 @@ test_5_3_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if (bsn[1] != 0x7f) {
-					if (check_snibs(0x7f, 0xff))
+					if (check_snibs(child, 0x7f, 0xff))
 						goto failure;
 				}
 				if (do_signal(child, __TEST_FISU))
@@ -15647,7 +15663,7 @@ static int
 test_5_3_iut(int child)
 {
 #if 1
-	if (expect(child, ituconf.sl.t7 * 3, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t7 * 3, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -15685,7 +15701,7 @@ test_5_4a_ptu(int child)
 		case 0:
 			if (do_signal(child, __TEST_FISU_FISU_1FLAG))
 				goto failure;
-			if (start_tt(iutconf.sl.t7))
+			if (start_tt(config->sl.t7))
 				goto failure;
 			state++;
 			continue;
@@ -15716,7 +15732,7 @@ static int
 test_5_4a_iut(int child)
 {
 #if 1
-	if (expect(child, iutconf.sl.t7 * 2, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t7 * 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -15754,7 +15770,7 @@ test_5_4b_ptu(int child)
 		case 0:
 			if (do_signal(child, __TEST_FISU_FISU_2FLAG))
 				goto failure;
-			if (start_tt(iutconf.sl.t7))
+			if (start_tt(config->sl.t7))
 				goto failure;
 			state++;
 			continue;
@@ -15785,7 +15801,7 @@ static int
 test_5_4b_iut(int child)
 {
 #if 1
-	if (expect(child, iutconf.sl.t7 * 2, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t7 * 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -15823,7 +15839,7 @@ test_5_5a_ptu(int child)
 		case 0:
 			if (do_signal(child, __TEST_MSU_MSU_1FLAG))
 				goto failure;
-			if (start_tt(iutconf.sl.t7 * 2))
+			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
 			continue;
@@ -15832,7 +15848,7 @@ test_5_5a_ptu(int child)
 			case __TEST_FISU:
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
-				stop_tt(child);
+				stop_tt();
 				break;
 			case __EVENT_TIMEOUT:
 				break;
@@ -15855,10 +15871,10 @@ static int
 test_5_5a_iut(int child)
 {
 #if 1
-	if (expect(child, iutconf.sl.t7, __EVENT_IUT_DATA))
+	if (expect(child, config->sl.t7, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
-	if (expect(child, iutconf.sl.t7, __EVENT_IUT_DATA))
+	if (expect(child, config->sl.t7, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -15896,7 +15912,7 @@ test_5_5b_ptu(int child)
 		case 0:
 			if (do_signal(child, __TEST_MSU_MSU_2FLAG))
 				goto failure;
-			if (start_tt(iutconf.sl.t7 * 2))
+			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
 			continue;
@@ -15905,7 +15921,7 @@ test_5_5b_ptu(int child)
 			case __TEST_FISU:
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
-				stop_tt(child);
+				stop_tt();
 				break;
 			case __EVENT_TIMEOUT:
 				break;
@@ -15928,10 +15944,10 @@ static int
 test_5_5b_iut(int child)
 {
 #if 1
-	if (expect(child, iutconf.sl.t7, __EVENT_IUT_DATA))
+	if (expect(child, config->sl.t7, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
-	if (expect(child, iutconf.sl.t7, __EVENT_IUT_DATA))
+	if (expect(child, config->sl.t7, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -15970,7 +15986,7 @@ test_6_1_ptu(int child)
 		case 0:
 			if (do_signal(child, __TEST_FISU_CORRUPT))
 				goto failure;
-			if (stop_tt(child))
+			if (stop_tt())
 				goto failure;
 			count = 255;
 			state++;
@@ -16064,7 +16080,7 @@ test_6_2_ptu(int child)
 	for (;;) {
 		switch (state - origin) {
 		case 0:
-			stop_tt(child);
+			stop_tt();
 			count = 253;
 			state++;
 			continue;
@@ -16164,10 +16180,10 @@ test_6_3_ptu(int child)
 			count = 1;
 			if (do_signal(child, __TEST_FISU_CORRUPT))
 				goto failure;
-			for (; count < iutconf.sdt.T + 1; count++)
+			for (; count < config->sdt.T + 1; count++)
 				if (do_signal(child, __TEST_FISU_CORRUPT_S))
 					goto failure;
-			if (start_tt(iutconf.sl.t7 * 2))
+			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
 			continue;
@@ -16355,7 +16371,7 @@ test_7_1_ptu(int child)
 				if (do_signal(child, last_event))
 					goto failure;
 				beg_time = milliseconds(child, t4n);
-				if (start_tt(iutconf.sl.t4n * 10 / 2))
+				if (start_tt(config->sl.t4n * 10 / 2))
 					goto failure;
 				state++;
 				continue;
@@ -16380,7 +16396,7 @@ test_7_1_ptu(int child)
 			switch (wait_event(child, 0)) {
 			case __EVENT_NO_MSG:
 			case __TEST_SIN:
-				if (count < iutconf.sdt.Tin - 1) {
+				if (count < config->sdt.Tin - 1) {
 					if (do_signal(child, __TEST_LSSU_CORRUPT))
 						goto failure;
 					count++;
@@ -16390,7 +16406,7 @@ test_7_1_ptu(int child)
 						goto failure;
 					if (do_signal(child, __TEST_SIN))
 						goto failure;
-					if (start_tt(ituconf.sl.t4n * 10))
+					if (start_tt(config->sl.t4n * 10))
 						goto failure;
 					state++;
 					continue;
@@ -16474,7 +16490,7 @@ test_7_2_ptu(int child)
 			case __TEST_SIO:
 				if (do_signal(child, __TEST_SIO))
 					goto failure;
-				if (start_tt(iutconf.sl.t4n * 20))
+				if (start_tt(config->sl.t4n * 20))
 					goto failure;
 				state++;
 				continue;
@@ -16491,7 +16507,7 @@ test_7_2_ptu(int child)
 			case __TEST_SIN:
 				if (do_signal(child, __TEST_SIN))
 					goto failure;
-				if (start_tt(iutconf.sl.t4n * 10 / 2))
+				if (start_tt(config->sl.t4n * 10 / 2))
 					goto failure;
 				state++;
 				continue;
@@ -16516,7 +16532,7 @@ test_7_2_ptu(int child)
 			switch (wait_event(child, 0)) {
 			case __EVENT_NO_MSG:
 			case __TEST_SIN:
-				if (count < iutconf.sdt.Tin) {
+				if (count < config->sdt.Tin) {
 					if (do_signal(child, __TEST_LSSU_CORRUPT))
 						goto failure;
 					count++;
@@ -16527,7 +16543,7 @@ test_7_2_ptu(int child)
 					if (do_signal(child, __TEST_SIN))
 						goto failure;
 					beg_time = milliseconds(child, t4n);
-					if (start_tt(iutconf.sl.t4n * 20))
+					if (start_tt(config->sl.t4n * 20))
 						goto failure;
 					state++;
 					continue;
@@ -16576,8 +16592,6 @@ test_7_2_iut(int child)
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
-      scripterror:
-	return __RESULT_SCRIPT_ERROR;
 #else
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif
@@ -16615,7 +16629,7 @@ test_7_3_ptu(int child)
 			case __TEST_SIO:
 				if (do_signal(child, __TEST_SIO))
 					goto failure;
-				if (start_tt(iutconf.sl.t4n * 20))
+				if (start_tt(config->sl.t4n * 20))
 					goto failure;
 				state++;
 				continue;
@@ -16632,7 +16646,7 @@ test_7_3_ptu(int child)
 			case __TEST_SIN:
 				if (do_signal(child, __TEST_SIN))
 					goto failure;
-				if (start_tt(iutconf.sl.t4n * 10 / 2))
+				if (start_tt(config->sl.t4n * 10 / 2))
 					goto failure;
 				tries = 1;
 				state++;
@@ -16655,16 +16669,16 @@ test_7_3_ptu(int child)
 			}
 			break;
 		case 3:
-			switch ((event = wait_event(0))) {
+			switch ((event = wait_event(child, 0))) {
 			case __TEST_SIOS:
 				if (do_signal(child, __TEST_COUNT))
 					goto failure;
-				if (tries == iutconf.sl.M)
+				if (tries == config->sl.M)
 					break;
 				goto failure;
 			case __EVENT_NO_MSG:
 			case __TEST_SIN:
-				if (count <= iutconf.sdt.Tin) {
+				if (count <= config->sdt.Tin) {
 					if (do_signal(child, __TEST_LSSU_CORRUPT))
 						goto failure;
 					count++;
@@ -16674,13 +16688,13 @@ test_7_3_ptu(int child)
 					count = 0;
 					if (do_signal(child, __TEST_SIN))
 						goto failure;
-					if (tries < iutconf.sl.M) {
-						if (start_tt(iutconf.sl.t4n * 10 / 2))
+					if (tries < config->sl.M) {
+						if (start_tt(config->sl.t4n * 10 / 2))
 							goto failure;
 						state--;
 						tries++;
 					} else {
-						if (start_tt(iutconf.sl.t4n * 20))
+						if (start_tt(config->sl.t4n * 20))
 							goto failure;
 						state++;
 					}
@@ -16782,7 +16796,7 @@ test_7_4_ptu(int child)
 			case __TEST_SIN:
 				if (do_signal(child, __TEST_SIE))
 					goto failure;
-				if (start_tt(iutconf.sl.t4e * 10 / 2))
+				if (start_tt(config->sl.t4e * 10 / 2))
 					goto failure;
 				state++;
 				continue;
@@ -16799,7 +16813,7 @@ test_7_4_ptu(int child)
 			case __EVENT_TIMEOUT:
 				if (do_signal(child, __TEST_LSSU_CORRUPT))
 					goto failure;
-				for (count = 1; count < iutconf.sdt.Tie; count++)
+				for (count = 1; count < config->sdt.Tie; count++)
 					if (do_signal(child, __TEST_LSSU_CORRUPT_S))
 						goto failure;
 				if (do_signal(child, __TEST_COUNT))
@@ -16807,7 +16821,7 @@ test_7_4_ptu(int child)
 				if (do_signal(child, __TEST_SIE))
 					goto failure;
 				beg_time = milliseconds(child, t4e);
-				if (start_tt(iutconf.sl.t4e * 20))
+				if (start_tt(config->sl.t4e * 20))
 					goto failure;
 				state++;
 				continue;
@@ -16901,7 +16915,7 @@ test_8_1_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0xff || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x80, 0xff))
+					if (check_snibs(child, 0x80, 0xff))
 						goto failure;
 					if (do_signal(child, __TEST_FISU))
 						goto failure;
@@ -16918,13 +16932,13 @@ test_8_1_ptu(int child)
 		case 2:
 			switch (get_event(child)) {
 			case __TEST_FISU:
-				if (check_snibs(0x80, 0xff))
+				if (check_snibs(child, 0x80, 0xff))
 					goto failure;
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
 				continue;
 			case __TEST_MSU:
-				if (check_snibs(0x80, 0x80))
+				if (check_snibs(child, 0x80, 0x80))
 					goto failure;
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
@@ -16937,7 +16951,7 @@ test_8_1_ptu(int child)
 		case 3:
 			switch (get_event(child)) {
 			case __TEST_FISU:
-				if (check_snibs(0x80, 0x80))
+				if (check_snibs(child, 0x80, 0x80))
 					goto failure;
 				break;
 			default:
@@ -16996,7 +17010,7 @@ test_8_2_ptu(int child)
 		case 1:
 			switch (get_event(child)) {
 			case __TEST_MSU:
-				if (check_snibs(0xff, 0x80))
+				if (check_snibs(child, 0xff, 0x80))
 					goto failure;
 				state++;
 			case __TEST_FISU:
@@ -17012,7 +17026,7 @@ test_8_2_ptu(int child)
 		case 2:
 			switch (get_event(child)) {
 			case __TEST_MSU:
-				if (check_snibs(0xff, 0x81))
+				if (check_snibs(child, 0xff, 0x81))
 					goto failure;
 				fsn[0] = bsn[0] = 0x7f;
 				fib[0] = 0x80;
@@ -17034,7 +17048,7 @@ test_8_2_ptu(int child)
 		case 3:
 			switch (get_event(child)) {
 			case __TEST_MSU:
-				if (check_snibs(0xff, 0x00))
+				if (check_snibs(child, 0xff, 0x00))
 					goto failure;
 				state++;
 			case __TEST_FISU:
@@ -17051,7 +17065,7 @@ test_8_2_ptu(int child)
 		case 4:
 			switch (get_event(child)) {
 			case __TEST_MSU:
-				if (check_snibs(0xff, 0x01))
+				if (check_snibs(child, 0xff, 0x01))
 					goto failure;
 				break;
 			case __TEST_FISU:
@@ -17121,14 +17135,14 @@ test_8_3_ptu(int child)
 	if (msu_len > 12)
 		msu_len = 12;
 	for (;;) {
-		int n = iutconf.sl.N1;
+		int n = config->sl.N1;
 
 		stop_tt();
 		switch (state - origin) {
 		case 0:
 			show_fisus = 0;
 			show_timeout = 1;
-			if (start_tt(iutconf.sl.t7 * 10 / 2 - 200))
+			if (start_tt(config->sl.t7 * 10 / 2 - 200))
 				goto failure;
 			state++;
 			continue;
@@ -17162,7 +17176,7 @@ test_8_3_ptu(int child)
 				fib[0] = 0x80;
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
-				if (start_tt(iutconf.sl.t7 * 10 / 2 + 200))
+				if (start_tt(config->sl.t7 * 10 / 2 + 200))
 					goto failure;
 				show_timeout = 1;
 				show_fisus = 1;
@@ -17223,7 +17237,7 @@ static int
 test_8_3_iut(int child)
 {
 	int i;
-	int n = iutconf.sl.N1;
+	int n = config->sl.N1;
 
 	print_less(child);
 	for (i = 0; i < n; i++) {
@@ -17237,7 +17251,7 @@ test_8_3_iut(int child)
 		state++;
 	}
 	show_timeout = 1;
-	start_tt(iutconf.sl.t7 * 2);
+	start_tt(config->sl.t7 * 2);
 	if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT))
 		goto failure;
 	state++;
@@ -17278,7 +17292,7 @@ test_8_4_ptu(int child)
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
-			if (start_tt(iutconf.sl.t7 * 20))
+			if (start_tt(config->sl.t7 * 20))
 				goto failure;
 			if (start_tt(10000))
 				goto failure;
@@ -17288,13 +17302,13 @@ test_8_4_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0xff || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x7f, 0xff))
+					if (check_snibs(child, 0x7f, 0xff))
 						goto failure;
 					fib[0] = 0x00;
 					fsn[0] = 0x7f;
 					if (do_signal(child, __TEST_MSU))
 						goto failure;
-					if (start_tt(iutconf.sl.t7 * 20))
+					if (start_tt(config->sl.t7 * 20))
 						goto failure;
 					state++;
 					continue;
@@ -17310,7 +17324,7 @@ test_8_4_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0x7f || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x00, 0xff))
+					if (check_snibs(child, 0x00, 0xff))
 						goto failure;
 					break;
 				}
@@ -17379,7 +17393,7 @@ test_8_5_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0xff || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x80, 0xff))
+					if (check_snibs(child, 0x80, 0xff))
 						goto failure;
 					fsn[0] = 0x7f;
 					if (do_signal(child, __TEST_MSU))
@@ -17401,7 +17415,7 @@ test_8_5_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0x80 || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x00, 0xff))
+					if (check_snibs(child, 0x00, 0xff))
 						goto failure;
 					fib[0] = 0x00;
 					fsn[0] = 0x00;
@@ -17421,7 +17435,7 @@ test_8_5_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0x00 || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x01, 0xff))
+					if (check_snibs(child, 0x01, 0xff))
 						goto failure;
 					break;
 				}
@@ -17517,7 +17531,7 @@ test_8_6_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0xff || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x7f, 0xff))
+					if (check_snibs(child, 0x7f, 0xff))
 						goto failure;
 					fib[0] = 0x00;
 					fsn[0] = 0x7f;
@@ -17539,7 +17553,7 @@ test_8_6_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0x7f || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x00, 0xff))
+					if (check_snibs(child, 0x00, 0xff))
 						goto failure;
 					break;
 				}
@@ -17866,7 +17880,7 @@ test_8_9a_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0xff || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x7f, 0xff))
+					if (check_snibs(child, 0x7f, 0xff))
 						goto failure;
 					fib[0] = 0x00;
 					fsn[0] = 0x7f;
@@ -17886,7 +17900,7 @@ test_8_9a_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0x7f || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x00, 0xff))
+					if (check_snibs(child, 0x00, 0xff))
 						goto failure;
 					break;
 				}
@@ -18059,7 +18073,7 @@ test_8_10_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0xff || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x7f, 0xff))
+					if (check_snibs(child, 0x7f, 0xff))
 						goto failure;
 					fib[0] = 0x00;
 					fsn[0] = 0x7f;
@@ -18079,7 +18093,7 @@ test_8_10_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bib[1] | bsn[1]) != 0x7f || (fib[1] | fsn[1]) != 0xff) {
-					if (check_snibs(0x00, 0xff))
+					if (check_snibs(child, 0x00, 0xff))
 						goto failure;
 					break;
 				}
@@ -18247,7 +18261,7 @@ test_8_12a_ptu(int child)
 					goto failure;
 				continue;
 			case __TEST_MSU:
-				if (start_tt(iutconf.sl.t7 * 20))
+				if (start_tt(config->sl.t7 * 20))
 					goto failure;
 				beg_time = milliseconds(child, t7);
 				bsn[0] = fsn[0] = 0x7f;
@@ -18352,7 +18366,7 @@ test_8_12b_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
-	if (expect(child, iutconf.sl.t7 / 2, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t7 / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SEND_MSU))
@@ -18435,102 +18449,41 @@ Abnormal FIBR\
 static int
 test_8_14_ptu(int child)
 {
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT3:
-	case M2PA_VERSION_DRAFT3_1:
-		goto notappl;	/* can't do this */
-	}
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT9:
-	case M2PA_VERSION_DRAFT10:
-	case M2PA_VERSION_DRAFT11:
-	case M2PA_VERSION_RFC4165:
-		bsn[0] = 0xffffff;
-		break;
-	default:
-		bsn[0] = 0x3fff;
-	}
+	bsn[0] = 0x7f;
 	if (do_signal(child, __TEST_DATA))
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __TEST_ACK))
 		goto failure;
 	state++;
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT9:
-	case M2PA_VERSION_DRAFT10:
-	case M2PA_VERSION_DRAFT11:
-	case M2PA_VERSION_RFC4165:
-		if (fsn[1] != 0xffffff)
-			goto failure;
-		if (bsn[1] != 0xffffff)
-			if (bsn[1] != 0)
-				goto failure;
-		fsn[0] = 1;
-		if (do_signal(child, __TEST_DATA))
-			goto failure;
-		state++;
-		break;
-	default:
-		if (fsn[1] != 0)
-			goto failure;
+	if (fsn[1] != 0x7f)
+		goto failure;
+	if (bsn[1] != 0x7f)
 		if (bsn[1] != 0)
-			if (bsn[1] != 1)
-				goto failure;
-		fsn[0] = 2;
-		if (do_signal(child, __TEST_DATA))
 			goto failure;
-		state++;
-		break;
-	}
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT11:
-	case M2PA_VERSION_RFC4165:
-		if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-			goto failure;
-		state++;
-		break;
-	default:
-		if (expect(child, INFINITE_WAIT, __TEST_SIOS))
-			goto failure;
-		state++;
-		break;
-	}
+	fsn[0] = 1;
+	if (do_signal(child, __TEST_DATA))
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+		goto failure;
+	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
-      notappl:
-	return __RESULT_NOTAPPL;
 }
 static int
 test_8_14_iut(int child)
 {
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT3:
-	case M2PA_VERSION_DRAFT3_1:
-		goto notappl;	/* can't do this */
-	}
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
-	switch (m2pa_version) {
-	case M2PA_VERSION_DRAFT11:
-	case M2PA_VERSION_RFC4165:
-		if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-			goto failure;
-		state++;
-		break;
-	default:
-		if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
-			goto failure;
-		state++;
-		break;
-	}
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+		goto failure;
+	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
-      notappl:
-	return __RESULT_NOTAPPL;
 }
 
 static struct test_stream test_case_8_14_ptu = { preamble_link_in_service, test_8_14_ptu, postamble_link_in_service };
@@ -18589,7 +18542,7 @@ test_9_1_ptu(int child)
 					goto failure;
 				continue;
 			case __TEST_FISU:
-				if (check_snibs(0xff, 0x80))
+				if (check_snibs(child, 0xff, 0x80))
 					goto failure;
 				if (do_signal(child, __TEST_MSU))
 					goto failure;
@@ -18603,7 +18556,7 @@ test_9_1_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if ((bsn[1] | bib[1]) != 0xff || (fsn[1] | fib[1]) != 0x80) {
-					if (check_snibs(0x80, 0x80))
+					if (check_snibs(child, 0x80, 0x80))
 						goto failure;
 					break;
 				}
@@ -18839,24 +18792,23 @@ static int
 test_9_3_ptu(int child)
 {
 #if 1
-	int i;
-	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
-	int n = iutconf.sl.N1;
+	int h = (config->opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = config->sl.N1;
 	int origin = state;
 
-	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	msu_len = config->sl.N2 / config->sl.N1 - h - 1;
 	if (msu_len < 3)
 		goto inconclusive;
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n,
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n,
 	       msu_len);
 	fflush(stdout);
 
 	for (;;) {
 		switch (state - origin) {
 		case 0:
-			if (start_tt(iutconf.sl.t7 * 10 + 1000))
+			if (start_tt(config->sl.t7 * 10 + 1000))
 				goto failure;
 			state++;
 			continue;
@@ -18948,15 +18900,15 @@ test_9_3_iut(int child)
 {
 #if 1
 	int i;
-	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
-	int n = iutconf.sl.N1;
+	int h = (config->opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = config->sl.N1;
 
-	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	msu_len = config->sl.N2 / config->sl.N1 - h - 1;
 	if (msu_len < 3)
 		goto inconclusive;
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n,
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n,
 	       msu_len);
 	fflush(stdout);
 
@@ -18967,6 +18919,8 @@ test_9_3_iut(int child)
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
+      inconclusive:
+	return __RESULT_INCONCLUSIVE;
 #else
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif
@@ -18991,21 +18945,21 @@ static int
 test_9_4_ptu(int child)
 {
 #if 1
-	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
-	int n = iutconf.sl.N1 - 1;
+	int h = (config->opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = config->sl.N1 - 1;
 	int origin = state;
 
-	msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
-	n = iutconf.sl.N2 / (msu_len + h) + 1;
-	if (msu_len > iutconf.sdt.m)
+	msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
+	n = config->sl.N2 / (msu_len + h) + 1;
+	if (msu_len > config->sdt.m)
 		goto inconclusive;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n, msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (;;) {
 		switch (state - origin) {
 		case 0:
-			if (start_tt(iutconf.sl.t7 * 10 + 1000))
+			if (start_tt(config->sl.t7 * 10 + 1000))
 				goto failure;
 			state++;
 			continue;
@@ -19096,14 +19050,14 @@ test_9_4_iut(int child)
 {
 #if 1
 	int i;
-	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
-	int n = iutconf.sl.N1 - 1;
+	int h = (config->opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = config->sl.N1 - 1;
 
-	msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
-	n = iutconf.sl.N2 / (msu_len + h) + 1;
-	if (msu_len > iutconf.sdt.m)
+	msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
+	n = config->sl.N2 / (msu_len + h) + 1;
+	if (msu_len > config->sdt.m)
 		goto inconclusive;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n, msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (i = 0; i < n + 1; i++)
@@ -19116,6 +19070,8 @@ test_9_4_iut(int child)
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
+      inconclusive:
+	return __RESULT_INCONCLUSIVE;
 #else
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif
@@ -19140,27 +19096,27 @@ static int
 test_9_5_ptu(int child)
 {
 #if 1
-	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
-	int n = iutconf.sl.N1;
+	int h = (config->opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = config->sl.N1;
 	int origin = state;
 
-	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	msu_len = config->sl.N2 / config->sl.N1 - h - 1;
 	if (msu_len < 3) {
-		n = iutconf.sl.N1 - 1;
-		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
-		n = iutconf.sl.N2 / (msu_len + h) + 1;
-		if (msu_len > iutconf.sdt.m)
+		n = config->sl.N1 - 1;
+		msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
+		n = config->sl.N2 / (msu_len + h) + 1;
+		if (msu_len > config->sdt.m)
 			goto inconclusive;
 	}
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n, msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (;;) {
 		switch (state - origin) {
 		case 0:
-			if (start_tt(iutconf.sl.t7 * 10 + 1000))
+			if (start_tt(config->sl.t7 * 10 + 1000))
 				goto failure;
 			state++;
 			continue;
@@ -19254,19 +19210,20 @@ test_9_5_iut(int child)
 {
 #if 1
 	int i;
-	int n = iutconf.sl.N1;
+	int h = (config->opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = config->sl.N1;
 
-	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	msu_len = config->sl.N2 / config->sl.N1 - h - 1;
 	if (msu_len < 3) {
-		n = iutconf.sl.N1 - 1;
-		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
-		n = iutconf.sl.N2 / (msu_len + h) + 1;
-		if (msu_len > iutconf.sdt.m)
+		n = config->sl.N1 - 1;
+		msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
+		n = config->sl.N2 / (msu_len + h) + 1;
+		if (msu_len > config->sdt.m)
 			goto inconclusive;
 	}
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n, msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (i = 0; i < n + 1; i++)
@@ -19302,28 +19259,27 @@ static int
 test_9_6_ptu(int child)
 {
 #if 1
-	int i;
-	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
-	int n = iutconf.sl.N1;
+	int h = (config->opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = config->sl.N1;
 	int origin = state;
 
-	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	msu_len = config->sl.N2 / config->sl.N1 - h - 1;
 	if (msu_len < 3) {
-		n = iutconf.sl.N1 - 1;
-		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
-		n = iutconf.sl.N2 / (msu_len + h) + 1;
-		if (msu_len > iutconf.sdt.m)
+		n = config->sl.N1 - 1;
+		msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
+		n = config->sl.N2 / (msu_len + h) + 1;
+		if (msu_len > config->sdt.m)
 			goto inconclusive;
 	}
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n, msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (;;) {
 		switch (state - origin) {
 		case 0:
-			if (start_tt(iutconf.sl.t7 * 10 + 1000))
+			if (start_tt(config->sl.t7 * 10 + 1000))
 				goto failure;
 			state++;
 			continue;
@@ -19392,20 +19348,20 @@ test_9_6_iut(int child)
 {
 #if 1
 	int i;
-	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
-	int n = iutconf.sl.N1;
+	int h = (config->opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = config->sl.N1;
 
-	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	msu_len = config->sl.N2 / config->sl.N1 - h - 1;
 	if (msu_len < 3) {
-		n = iutconf.sl.N1 - 1;
-		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
-		n = iutconf.sl.N2 / (msu_len + h) + 1;
-		if (msu_len > iutconf.sdt.m)
+		n = config->sl.N1 - 1;
+		msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
+		n = config->sl.N2 / (msu_len + h) + 1;
+		if (msu_len > config->sdt.m)
 			goto inconclusive;
 	}
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n, msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (i = 0; i < n + 1; i++)
@@ -19462,7 +19418,7 @@ test_9_7_ptu(int child)
 					goto failure;
 				if (do_signal(child, __TEST_SIPO))
 					goto failure;
-				if (start_tt(iutconf.sl.t7 * 20))
+				if (start_tt(config->sl.t7 * 20))
 					goto failure;
 				state++;
 				continue;
@@ -19479,7 +19435,7 @@ test_9_7_ptu(int child)
 				continue;
 			case __TEST_FISU:
 				if (!count++)
-					if (check_snibs(0xff, 0x80))
+					if (check_snibs(child, 0xff, 0x80))
 						goto failure;
 				bsn[0] = 0x7f;
 				if (do_signal(child, __TEST_SIPO))
@@ -19769,7 +19725,7 @@ test_9_10_ptu(int child)
 			switch (get_event(child)) {
 			case __TEST_FISU:
 				if (bsn[1] != 0x7f) {
-					if (check_snibs(0x80, 0xff))
+					if (check_snibs(child, 0x80, 0xff))
 						goto failure;
 					break;
 				}
@@ -19848,7 +19804,7 @@ test_9_11_ptu(int child)
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
 				beg_time = milliseconds(child, t7);
-				if (start_tt(iutconf.sl.t7 * 20))
+				if (start_tt(config->sl.t7 * 20))
 					goto failure;
 				state++;
 				continue;
@@ -19940,7 +19896,7 @@ test_9_12_ptu(int child)
 			state++;
 			continue;
 		case __EVENT_TIMEOUT:
-			if (check_snibs(0xff, 0xff))
+			if (check_snibs(child, 0xff, 0xff))
 				goto failure;
 			break;
 		default:
@@ -20094,7 +20050,7 @@ test_10_1_ptu(int child)
 					goto failure;
 				if (check_time(child, "T5  ", beg_time, timer[t5].lo, timer[t5].hi))
 					goto failure;
-				if (start_tt(iutconf.sl.t5 * 20))
+				if (start_tt(config->sl.t5 * 20))
 					goto failure;
 				count = 0;
 				state++;
@@ -20167,7 +20123,7 @@ During receive congestion\
 static int
 test_10_2a_ptu(int child)
 {
-	int n = (iutconf.sl.t6 - iutconf.sl.t7) / iutconf.sl.t5;
+	int n = (config->sl.t6 - config->sl.t7) / config->sl.t5;
 	int origin = state;
 
 	for (;;) {
@@ -20180,7 +20136,7 @@ test_10_2a_ptu(int child)
 				continue;
 			case __TEST_MSU:
 				bsn[0] = fsn[0] = 0x7f;
-				if (start_tt(iutconf.sl.t5 * 10))
+				if (start_tt(config->sl.t5 * 10))
 					goto failure;
 				if (do_signal(child, __TEST_SIB))
 					goto failure;
@@ -20202,12 +20158,12 @@ test_10_2a_ptu(int child)
 				if (count == n) {
 					if (do_signal(child, __TEST_COUNT))
 						goto failure;
-					if (start_tt(iutconf.sl.t7 * 10 - 200))
+					if (start_tt(config->sl.t7 * 10 - 200))
 						goto failure;
 					state++;
 					continue;
 				}
-				if (start_tt(iutconf.sl.t5 * 10))
+				if (start_tt(config->sl.t5 * 10))
 					goto failure;
 			case __TEST_FISU:
 				bsn[0] = fsn[0] = 0x7f;
@@ -20301,7 +20257,7 @@ test_10_2b_ptu(int child)
 	state++;
 	beg_time = milliseconds(child, t6);
 	state++;
-	if (expect(child, iutconf.sl.t6 - 300, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t6 - 300, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_BUSY_ENDED))
@@ -20362,7 +20318,7 @@ test_10_2c_ptu(int child)
 	state++;
 	beg_time = milliseconds(child, t6);
 	state++;
-	if (expect(child, iutconf.sl.t6 - 300, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t6 - 300, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __STATUS_BUSY_ENDED))
@@ -20370,7 +20326,7 @@ test_10_2c_ptu(int child)
 	state++;
 	beg_time = milliseconds(child, t7);
 	state++;
-	if (expect(child, iutconf.sl.t7 - 300, __EVENT_NO_MSG))
+	if (expect(child, config->sl.t7 - 300, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	bsn[0] = fsn[1];
@@ -20410,7 +20366,7 @@ Timer T6\
 static int
 test_10_3_ptu(int child)
 {
-	int n = (iutconf.sl.t6 + 20) / iutconf.sl.t5 + 20;
+	int n = (config->sl.t6 + 20) / config->sl.t5 + 20;
 	int origin = state;
 
 	for (;;) {
@@ -20423,7 +20379,7 @@ test_10_3_ptu(int child)
 				continue;
 			case __TEST_MSU:
 				bsn[0] = fsn[0] = 0x7f;
-				if (start_tt(iutconf.sl.t5 * 10))
+				if (start_tt(config->sl.t5 * 10))
 					goto failure;
 				if (do_signal(child, __TEST_SIB))
 					goto failure;
@@ -20446,7 +20402,7 @@ test_10_3_ptu(int child)
 							goto failure;
 					goto failure;
 				}
-				if (start_tt(iutconf.sl.t5 * 10))
+				if (start_tt(config->sl.t5 * 10))
 					goto failure;
 			case __TEST_FISU:
 				bsn[0] = fsn[0] = 0x7f;
@@ -21461,9 +21417,9 @@ main(int argc, char *argv[])
 			iut_connects = 1;
 			break;
 		case 'D':	/* --decl-std */
-			ss7_pvar = stroul(optarg, NULL, 0);
+			ss7_pvar = strtoul(optarg, NULL, 0);
 			switch (ss7_pvar) {
-			case SS7_PVAR_ITUT_83:
+			case SS7_PVAR_ITUT_88:
 			case SS7_PVAR_ITUT_93:
 			case SS7_PVAR_ITUT_96:
 			case SS7_PVAR_ITUT_00:
@@ -21476,12 +21432,12 @@ main(int argc, char *argv[])
 			case SS7_PVAR_ANSI_00:
 			case SS7_PVAR_JTTC_94:
 			case SS7_PVAR_CHIN_00:
-			case SS7_PVAR_SING | SS7_VAR_88:
-			case SS7_PVAR_SPAN | SS7_VAR_88:
+			case SS7_PVAR_SING | SS7_PVAR_88:
+			case SS7_PVAR_SPAN | SS7_PVAR_88:
 				break;
 			default:
-				if (!strcmp(optarg, "SS7_PVAR_ITUT_83"))
-					ss7_pvar = SS7_PVAR_ITUT_83;
+				if (!strcmp(optarg, "SS7_PVAR_ITUT_88"))
+					ss7_pvar = SS7_PVAR_ITUT_88;
 				else if (!strcmp(optarg, "SS7_PVAR_ITUT_93"))
 					ss7_pvar = SS7_PVAR_ITUT_93;
 				else if (!strcmp(optarg, "SS7_PVAR_ITUT_96"))
@@ -21715,9 +21671,11 @@ main(int argc, char *argv[])
 		client_exec = 1;
 		server_exec = 1;
 	}
+#if 0
 	if (client_ppa_specified) {
 	}
 	if (server_ppa_specified) {
 	}
+#endif
 	exit(do_tests(tests_to_run));
 }

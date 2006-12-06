@@ -9140,7 +9140,7 @@ xp_w_flush(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 xp_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
@@ -9152,7 +9152,7 @@ xp_r_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 xp_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
