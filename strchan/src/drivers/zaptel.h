@@ -24,7 +24,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
  *
- * $Id: zaptel.h 865 2005-12-17 02:04:05Z kpfleming $
+ * $Id: zaptel.h,v 0.9.2.1 2006/12/06 11:23:23 brian Exp $
  */
 
 #ifndef _LINUX_ZAPTEL_H

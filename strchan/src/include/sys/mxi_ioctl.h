@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi_ioctl.h,v 0.9.2.2 2006/11/27 11:41:58 brian Exp $
+ @(#) $Id: mxi_ioctl.h,v 0.9.2.3 2006/12/06 11:26:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/27 11:41:58 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:26:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi_ioctl.h,v $
+ Revision 0.9.2.3  2006/12/06 11:26:11  brian
+ - current development updates
+
  Revision 0.9.2.2  2006/11/27 11:41:58  brian
  - updated CH and MX headers to interface version 1.1
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_MXI_IOCTL_H__
 #define __SYS_MXI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 

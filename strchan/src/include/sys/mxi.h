@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.3 2006/11/30 13:05:26 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.4 2006/12/06 11:26:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:05:26 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:26:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi.h,v $
+ Revision 0.9.2.4  2006/12/06 11:26:11  brian
+ - current development updates
+
  Revision 0.9.2.3  2006/11/30 13:05:26  brian
  - checking in working copies
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_MXI_H__
 #define __SYS_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 

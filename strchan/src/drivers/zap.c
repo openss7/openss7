@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: zap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:23:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2006/12/06 11:23:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: zap.c,v $
+ Revision 0.9.2.1  2006/12/06 11:23:23  brian
+ - added new files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: zap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:23:23 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: zap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:23:23 $";
 
 static int
 zap_m_ioctl(struct zt_chan *chan, queue_t *q, mblk_t *mp)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:05:25 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/06 11:26:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:05:25 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:26:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.4  2006/12/06 11:26:10  brian
+ - current development updates
+
  Revision 0.9.2.3  2006/11/30 13:05:25  brian
  - checking in working copies
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:05:25 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/06 11:26:10 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:05:25 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/06 11:26:10 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
