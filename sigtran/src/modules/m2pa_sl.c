@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:46 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/06 11:31:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 11:08:46 $ by $Author: brian $
+ Last Modified $Date: 2006/12/06 11:31:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.6  2006/12/06 11:31:25  brian
+ - rationalized to x400p driver and test program
+
  Revision 0.9.2.5  2006/11/03 11:08:46  brian
  - 32-bit compatibility testsuite passes
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:46 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/06 11:31:25 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:46 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/06 11:31:25 $";
 
 #define _LFS_SOURCE 1
 
@@ -90,7 +93,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 11:08:46 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/06 11:31:25 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -754,7 +757,7 @@ lmi_disable_con(struct sl *sl, queue_t *q)
  */
 #if 0
 STATIC INLINE int
-lmi_optmgmt_ack(queue_t *q, struct sl *sl, lmi_ulong flags, void *opt_ptr, size_t opt_len)
+lmi_optmgmt_ack(struct sl *sl, queue_t *q, lmi_ulong flags, void *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
@@ -4140,7 +4143,7 @@ sl_lsc_continue(struct sl *sl, queue_t *q, mblk_t *mp)
 		}
 		return (0);
 	}
-	ptrace(("%s: %p: Received primitive SL_CONTINUE_REQ in unexpected state %lu\n",
+	ptrace(("%s: %p: Received primitive SL_CONTINUE_REQ in unexpected state %d\n",
 		MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
@@ -5166,7 +5169,7 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
  * equivalent to an unbind.
  */
 static int
-lmi_detach_req(struct sl * sl, queue_t *q, mblk_t *mp)
+lmi_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	lmi_detach_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;

@@ -1,12 +1,12 @@
 ## vim: ft=config comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/17 12:12:39 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/06 11:31:25 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
-## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/17 12:12:39 $ by $Author: brian $
+## Last Modified $Date: 2006/12/06 11:31:25 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Config.in,v $
+## Revision 0.9.2.3  2006/12/06 11:31:25  brian
+## - rationalized to x400p driver and test program
+##
 ## Revision 0.9.2.2  2006/10/17 12:12:39  brian
 ## - working up new packages
 ##

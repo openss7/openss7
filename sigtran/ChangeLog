@@ -1,3 +1,9 @@
+2006-12-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/Config.in: minor header change
+	* src/modules/m2pa_sl.c: several corrections in comments
+	* src/test/test-m2pa.c: rationalize to test-x400p test program
+
 2006-11-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/atlocal.in: cosmetic changes
