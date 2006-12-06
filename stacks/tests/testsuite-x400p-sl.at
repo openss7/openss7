@@ -1,0 +1,104 @@
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
+dnl =========================================================================
+dnl 
+dnl @(#) $RCSfile$ $Name$($Revision$) $Date$
+dnl
+dnl -------------------------------------------------------------------------
+dnl
+dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl
+dnl All Rights Reserved.
+dnl 
+dnl This program is free software; you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by the Free
+dnl Software Foundation; version 2 of the License.
+dnl 
+dnl This program is distributed in the hope that it will be useful, but
+dnl WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+dnl or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+dnl for more details.
+dnl 
+dnl You should have received a copy of the GNU General Public License along
+dnl with this program; if not, write to the Free Software Foundation, Inc.,
+dnl 675 Mass Ave, Cambridge, MA 02139, USA.
+dnl 
+dnl -------------------------------------------------------------------------
+dnl
+dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+dnl behalf of the U.S. Government ("Government"), the following provisions
+dnl apply to you.  If the Software is supplied by the Department of Defense
+dnl ("DoD"), it is classified as "Commercial Computer Software" under
+dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+dnl Regulations ("DFARS") (or any successor regulations) and the Government is
+dnl acquiring only the license rights granted herein (the license rights
+dnl customarily provided to non-Government users).  If the Software is
+dnl supplied to any unit or agency of the Government other than DoD, it is
+dnl classified as "Restricted Computer Software" and the Government's rights
+dnl in the Software are defined in paragraph 52.227-19 of the Federal
+dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+dnl (or any successor regulations).
+dnl
+dnl -------------------------------------------------------------------------
+dnl
+dnl Commercial licensing and support of this software is available from
+dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+dnl
+dnl -------------------------------------------------------------------------
+dnl
+dnl Last Modified $Date$ by $Author$
+dnl
+dnl -------------------------------------------------------------------------
+dnl
+dnl $Log$
+dnl =========================================================================
+
+m4_divert_push([DEFAULTS])
+function test_x400p_sl() {
+    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--verbose=4' ; fi
+    if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    if test $at_arg_given_sync = : ; then sync || : ; fi
+    if test-x400p $options -d /dev/x400p-sl -e -o $1
+    then
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
+	then
+	    # check for leaks
+	    if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
+	    then
+		sleep 1
+		if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
+		then
+		    return 1
+		else
+		    return 0
+		fi
+	    else
+		return 0
+	    fi
+	else
+	    return 0
+	fi
+    else
+	return $?
+    fi
+}
+function test_x400p_sl_root() {
+    if test `id -u` -ne 0 ; then return 77 ; fi
+    test_x400p_sl $1
+    return $?
+}
+m4_divert_pop([DEFAULTS])
+
+AT_TESTED([test-x400p])
+AT_BANNER([X400P SS7 driver tests])
+
+AT_SETUP([x400p test 1.1])
+AT_KEYWORDS([])
+AT_CHECK([test_x400p_sl 1.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

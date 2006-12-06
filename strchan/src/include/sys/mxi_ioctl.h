@@ -84,6 +84,128 @@ typedef struct mx_config {
 	mx_ulong opt_flags;		/* options flags */
 } mx_config_t;
 
+typedef struct mx_ifconfig {
+	mx_ulong ifaddr;		/* ppa (card,span,channel) */
+	volatile mx_ulong ifflags;	/* interface flags */
+#define MX_IF_UP	    0x01
+#define MX_IF_RX_RUNNING    0x02
+#define MX_IF_TX_RUNNING    0x04
+
+	mx_ulong iftype;		/* interface type */
+#define MX_TYPE_NONE	    0
+#define MX_TYPE_V35	    1
+#define MX_TYPE_DS0	    2
+#define MX_TYPE_DS0A	    3
+#define MX_TYPE_E1	    4
+#define MX_TYPE_T1	    5
+#define MX_TYPE_ATM	    6
+#define MX_TYPE_PACKET	    7
+
+	mx_ulong ifrate;		/* interface rate */
+	mx_ulong ifgtype;		/* interface group (span) type */
+#define MX_GTYPE_NONE	    0
+#define MX_GTYPE_T1	    1
+#define MX_GTYPE_E1	    2
+#define MX_GTYPE_J1	    3
+#define MX_GTYPE_ATM	    4
+#define MX_GTYPE_ETH	    5
+#define MX_GTYPE_IP	    6
+#define MX_GTYPE_UDP	    7
+#define MX_GTYPE_TCP	    8
+#define MX_GTYPE_RTP	    9
+#define MX_GTYPE_SCTP	    10
+
+	mx_ulong ifgrate;		/* interface group (span) rate */
+	mx_ulong ifmode;		/* interface mode */
+#define MX_MODE_NONE	    0
+#define MX_MODE_DSU	    1
+#define MX_MODE_CSU	    2
+#define MX_MODE_DTE	    3
+#define MX_MODE_DCE	    4
+#define MX_MODE_CLIENT	    5
+#define MX_MODE_SERVER	    6
+#define MX_MODE_PEER	    7
+#define MX_MODE_REM_LB	    8
+#define MX_MODE_LOC_LB	    9
+#define MX_MODE_LB_ECHO	    10
+#define MX_MODE_TEST	    11
+
+	mx_ulong ifgmode;		/* interface group (span) mode */
+#define MX_GMODE_NONE	    0
+#define MX_GMODE_LOC_LB	    1
+#define MX_GMODE_REM_LB	    2
+
+	mx_ulong ifgcrc;		/* interface group crc */
+#define MX_GCRC_NONE	    0
+#define MX_GCRC_CRC4	    1
+#define MX_GCRC_CRC5	    2
+#define MX_GCRC_CRC6	    3
+
+	mx_ulong ifclock;		/* interface clock */
+#define MX_CLOCK_NONE	    0
+#define MX_CLOCK_INT	    1
+#define MX_CLOCK_EXT	    2
+#define MX_CLOCK_LOOP	    3
+#define MX_CLOCK_MASTER	    4
+#define MX_CLOCK_SLAVE	    5
+#define MX_CLOCK_DPLL	    6
+#define MX_CLOCK_ABR	    7
+#define MX_CLOCK_SHAPER	    8
+#define MX_CLOCK_TICK	    9
+
+	mx_ulong ifcoding;
+#define MX_CODING_NONE	    0
+#define MX_CODING_NRZ	    1
+#define MX_CODING_NRZI	    2
+#define MX_CODING_AMI	    3
+#define MX_CODING_B6ZS	    4
+#define MX_CODING_B8ZS	    5
+#define MX_CODING_ESF	    6
+#define MX_CODING_AAL1	    7
+#define MX_CODING_AAL2	    8
+#define MX_CODING_AAL5	    9
+#define MX_CODING_HDB3	    10
+
+	mx_ulong ifframing;
+#define MX_FRAMING_NONE	    0
+#define MX_FRAMING_CCS	    1
+#define MX_FRAMING_CAS	    2
+#define MX_FRAMING_SF	    3
+#define MX_FRAMING_D4	    MX_FRAMING_SF
+#define MX_FRAMING_ESF	    4
+
+	mx_ulong ifblksize;
+	volatile mx_ulong ifleads;
+#define MX_LEAD_DTR	    0x01
+#define MX_LEAD_RTS	    0x02
+#define MX_LEAD_DCD	    0x04
+#define MX_LEAD_CTS	    0x08
+#define MX_LEAD_DSR	    0x10
+
+	mx_ulong ifbpv;
+	mx_ulong ifalarms;
+#define MX_ALARM_RED	    0x01
+#define MX_ALARM_BLU	    0x02
+#define MX_ALARM_YEL	    0x04
+#define MX_ALARM_REC	    0x08
+
+	mx_ulong ifrxlevel;
+	mx_ulong iftxlevel;
+#define MX_LEVEL_NONE	    0
+#define MX_LEVEL_75OHM	    1
+#define MX_LEVEL_100OHM	    2
+#define MX_LEVEL_120OHM	    3
+#define MX_LEVEL_LBO_1	    4
+#define MX_LEVEL_LBO_2	    5
+#define MX_LEVEL_LBO_3	    6
+#define MX_LEVEL_LBO_4	    7
+#define MX_LEVEL_LBO_5	    8
+#define MX_LEVEL_LBO_6	    9
+
+	mx_ulong ifsync;
+	mx_ulong ifsyncsrc[MX_SYNCS];
+} mx_ifconfig_t;
+
 #define MX_IOCGCONFIG	_IOR(	MX_IOC_MAGIC,	2,  mx_config_t	    )
 #define MX_IOCSCONFIG	_IOWR(	MX_IOC_MAGIC,	3,  mx_config_t	    )
 #define MX_IOCTCONFIG	_IOWR(	MX_IOC_MAGIC,	4,  mx_config_t	    )

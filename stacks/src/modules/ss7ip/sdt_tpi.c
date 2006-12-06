@@ -2537,7 +2537,7 @@ t_info_ack(queue_t *q, mblk_t *mp)
 		if ((sdt->sdt.config.m =
 		     sdt->t.pdu_size - 1 - ((sdt->option.popt & SS7_POPT_XSN) ? 6 : 3)) < 272)
 			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %ld",
-				MOD_NAME, sdt->sdt.config.m);
+				MOD_NAME, (long) sdt->sdt.config.m);
 		if ((sdt->t.add_size = p->ADDR_size) > sizeof(struct sockaddr))
 			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %ld",
 				MOD_NAME, (unsigned long) p->ADDR_size);

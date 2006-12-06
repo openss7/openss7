@@ -365,9 +365,63 @@ STATIC int vp_e1_chan_map[] = {
 /*
  *  Private structures.
  */
+struct ch;
 struct mx;
 struct sp;
 struct vp;
+
+struct ch {
+	int mid;			/* Module identifier */
+	int sid;			/* Stream identifier */
+	int lock;			/* lock word */
+	int flags;			/* flags word */
+	queue_t *rq;			/* read queue (used by tasklet) */
+	queue_t *wq;			/* write queue (used by tasklet) */
+	bcid_t bid;			/* bufcall identifier */
+	struct CH_info_ack info;	/* information */
+
+	uint32_t addr;			/* address */
+	uint32_t smask;			/* span mask, 4 bits now, 8 bits later */
+	uint32_t cmask;			/* overall channel mask (OR of cmasks) */
+	uint32_t cmasks[8];		/* channel mask, 4 for now, 8 later */
+	struct CH_parms_circuit parm;	/* parameters */
+
+	int spans;			/* Number of spans in span mask (0-8) */
+	int channels;			/* Number of channels in channel masks (0-31) */
+
+	struct ch_config config;	/* configuration */
+	struct ch_stats stats;		/* statistics */
+	struct ch_statem state;		/* state machine */
+	struct ch_notify notify;	/* notification events */
+
+	struct {
+		struct vp *vp;		/* VP card to which we are attached */
+		struct ch *next;	/* VP card attach list linkage */
+		struct ch **prev;	/* VP card attach list linkage */
+	} a;
+	struct {
+		struct vp *vp;		/* VP card to which we are connected */
+		struct ch *next;	/* VP card connect list linkage */
+		struct ch **prev;	/* VP card connect list linkage */
+	} c;
+	struct {
+		struct vp *vp;		/* VP card to which we are cross-connected */
+		struct ch *next;	/* VP card cross-connect list linkage */
+		struct ch **prev;	/* VP card cross-connect list linkage */
+	} x;
+
+	/* statistics */
+	struct {
+		ulong overflows;
+		ulong underruns;
+		mblk_t *nxt;
+	} rx;
+	struct {
+		ulong overflows;
+		ulong underruns;
+		mblk_t *nxt;
+	} tx;
+};
 
 struct mx {
 	int mid;			/* Module identifier */
@@ -375,6 +429,7 @@ struct mx {
 	int lock;			/* lock word */
 	int flags;			/* flags word */
 	queue_t *rq;			/* read queue (used by tasklet) */
+	queue_t *wq;			/* write queue (used by tasklet) */
 	bcid_t bid;			/* bufcall identifier */
 	struct MX_info_ack info;	/* information */
 
@@ -471,6 +526,12 @@ struct vp {
 	int **chan_map;			/* set to vp_t1_chan_map or vp_e1_chan_map */
 
 	struct {
+		struct ch *attached;	/* attached ch list */
+		struct ch *connects;	/* connected ch list */
+		struct ch *xconnect;	/* cross-connected ch list */
+	} ch;
+
+	struct {
 		struct mx *attached;	/* attached mx list */
 		struct mx *connects;	/* connected mx list */
 		struct mx *xconnect;	/* cross-connected mx list */
@@ -478,7 +539,8 @@ struct vp {
 
 	int blocks;			/* Number of RX/TX blocks outstanding. */
 	int spans;			/* Number of spans, always 4 for current cards. */
-	int channels;			/* Number of channels per span: 24 or 31 for current cards. */
+	int channels;			/* Number of channels per span: 24 or 31 for current cards. 
+					 */
 	uint32_t smask;			/* Mask of enabled spans. */
 	uint32_t cmask;			/* Mask of enabled channels (for any span). */
 	uint32_t xmask;			/* Mask of cross-connected channels (for any span). */
@@ -490,7 +552,9 @@ struct vp {
 	volatile uint8_t *map[32][4];	/* Digital cross-connect map from this card. */
 };
 
+#ifdef CONFIG_SMP
 STATIC spinlock_t vp_daccs_lock = SPIN_LOCK_UNLOCKED;
+#endif
 
 #define V400P_EBUFNO	(1<<7)	/* 128k of elastic buffers per card. */
 
@@ -504,10 +568,15 @@ mx_init_priv(struct mx *mx, queue_t *q, major_t major, minor_t minor)
 	mx->flags = 0;
 	mx->bid = 0;
 	mx->rq = q;
+	mx->wq = _WR(q);
 
 	mx->a.next = NULL;
 	mx->a.prev = &mx->a.next;
 	mx->a.vp = NULL;
+
+	mx->c.next = NULL;
+	mx->c.prev = &mx->c.next;
+	x->c.vp = NULL;
 
 	mx->x.next = NULL;
 	mx->x.prev = &mx->x.next;
@@ -600,7 +669,7 @@ mx_attach(struct mx *mx, mx_ulong ppa, mx_ulong style)
 	int card = (ppa >> 16) & 0x0ff;
 	int span = (ppa >> 8) & 0x0ff;
 	int i, p, slot = (ppa >> 0) & 0x0ff;
-	uint32_t xmask = (vp->channels == 24) ? 0xeeeeeeee : 0xfffffffe;
+	uint32_t xmask = (vp->channels == 24) ? VP_T1_CHAN_VALID_MASK : VP_E1_CHAN_VALID_MASK;
 
 	/* locate card */
 	vp = &vp_cards[card];
@@ -1896,6 +1965,862 @@ mx_event_ind(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong event, mx_ulong sl
 }
 
 /*
+ *  State Machine and Zaptel Integration.
+ *  =====================================
+ */
+
+/**
+ * __vp_start_card: - start a card
+ * @vp: the card to start
+ *
+ * This driver, unlike the tor2 and tor3 drivers always maintains the configuration for all channels
+ * and all spans while the card is running.  When the first span comes up, the card will be started.
+ */
+static void
+__vp_start_card(struct vp *vp)
+{
+	/* FIXME: start the card up */
+}
+
+/**
+ * __vp_stop_card: - stop a card
+ * @vp: the card to stop
+ *
+ * This driver, unlike the tor2 and tor3 drivers always maintains the configuration for all channels
+ * and all spans while the card is running.  When the last span has been taken down, the card will
+ * be stopped.
+ */
+static void
+__vp_stop_card(struct vp *vp)
+{
+	/* FIXME: stop the card */
+}
+
+/**
+ * __vp_start_span: - start a card span
+ * @vp: the card
+ * @span: the span number (0-4)
+ *
+ * If no span is running then the card is disabled.  The card is (re)started on the first span to
+ * come up.
+ */
+static void
+__vp_start_span(struct vp *vp, int span)
+{
+	int base = (span << 8);
+	struct sp *sp = &vp->spans[span];
+
+	if (!vp->smask)
+		__vp_start_card(vp);
+	switch (vp->board) {
+	case E400P:
+	case E400PSS7:
+		vp->xlb[CTLREG] = E1DIV;
+		vp->xlb[LEDREG] = 0xff;
+		/* zero all span registers */
+		for (offset = 0; offset < 192; offset++)
+			vp->xlb[base + offset] = 0x00;
+		/* set up for interleaved bus operation, byte mode */
+		vp->xlb[base + 0xb5] = (span == 0) ? 0x09 : 0x08;
+		vp->xlb[base + 0x1a] = 0x04;	/* CRC2: set LOTCMC */
+		for (offset = 0x00; offset <= 0x08; offset++)
+			vp->xlb[base + offset] = 0x00;
+		for (offset = 0x10; offset <= 0x4f; offset++)
+			if (offset != 0x1a)
+				vp->xlb[base + offset] = 0x00;
+		vp->xlb[base + 0x10] = 0x20;	/* RCR1: Rsync as input */
+		vp->xlb[base + 0x11] = 0x06;	/* RCR2: Sysclk = 2.048 MHz */
+		vp->xlb[base + 0x12] = (tcrc1 = 0x09);	/* TCRC1: TSiS mode */
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
+		case SDL_FRAMING_CCS:
+			ccr1 |= 0x08;
+			break;
+		case SDL_FRAMING_CAS:
+			ccr1 |= 0x20;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
+		case SDL_CODING_HDB3:
+			ccr1 |= 0x44;
+			break;
+		case SDL_CODING_AMI:
+			ccr1 |= 0x00;
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			ccr1 |= 0x11;
+			break;
+		default:
+			ccr1 |= 0x00;
+			break;
+		}
+		vp->xlb[base + 0x12] = tcr1;
+		vp->xlb[base + 0x14] = ccr1;
+		vp->xlb[base + 0x18] = 0x20;	/* 120 Ohm, Normal */
+		vp->xlb[base + 0x1b] = 0x8a;	/* CRC3: LIRST & TSCLKM */
+		vp->xlb[base + 0x20] = 0x1b;	/* TAFR */
+		vp->xlb[base + 0x21] - 0x5f;	/* TSR1 */
+		for (offset = 0x41; offset <= 0x4f; offset++)
+			vp->xlb[base + offset] = 0x55;
+		for (offset = 0x22; offset <= 0x25; offset++)
+			vp->xlb[base + offset] = 0xff;
+		timeout = jiffies + 100 * HZ / 1000;
+		spin_unlock_irqrestore(&vp->lock, flags);
+		/* XXX: WHAT THE H*** IS THIS? */
+		while (jiffies < timeout) ;
+		spin_lock_irqsave(&vp->lock, flags);
+		vp->xlb[base + 0x1b] = 0x9a;	/* CRC3: set ESR as well */
+		vp->xlb[base + 0x1b] = 0x82;	/* CRC3: TSCLKM only */
+		vp->smask |= (1 << span);
+		/* enable interrupts */
+		vp->xlb[CTLREG] = (INTENA | E1DIV);
+		break;
+	case T400P:
+	case T400PSS7:
+		vp->xlb[CTLREG] = 0x00;
+		vp->xlb[LEDREG] = 0xff;
+		/* zero all span registers */
+		for (offset = 0; offset < 192; offset++)
+			vp->xlb[base + offset] = 0x00;
+		/* set up for interleaved bus operation, byte mode */
+		vp->xlb[base + 0xb5] = (span == 0) ? 0x09 : 0x08;
+		vp->xlb[base + 0x2b] = 0x08;	/* full-on sync required (RCR1) */
+		vp->xlb[base + 0x2c] = 0x08;	/* RSYNC is an input (RCR2) */
+		vp->xlb[base + 0x35] = 0x10;	/* RBS enable (TCR1) */
+		vp->xlb[base + 0x36] = 0x04;	/* TSYNC to be output (TCR2) */
+		vp->xlb[base + 0x37] = 0x9c;	/* Tx and Rx Elastic stor, sysclk(s) = 2.048 mhz,
+						   loopback controls (CCR1) */
+		vp->xlb[base + 0x12] = 0x22;	/* Set up received loopup and loopdown codes */
+		vp->xlb[base + 0x14] = 0x80;
+		vp->xlb[base + 0x15] = 0x80;
+		vp->xlb[base + 0x09] = 0x70;	/* 20db gain for monitoring */
+		/* enable F bits pattern */
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_SF;
+		case SDL_FRAMING_SF:
+			val = 0x20;
+			break;
+		case SDL_FRAMING_ESF:
+			val = 0x88;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_AMI;
+		case SDL_CODING_AMI:
+			break;
+		case SDL_CODING_B8ZS:
+			val |= 0x44;
+			break;
+		}
+		vp->xlb[base + 0x38] = val;
+		if (sp->config.ifcoding != SDL_CODING_B8ZS)
+			vp->xlb[base + 0x7e] = 0x1c;	/* Set FDL register to 0x1c */
+		cd->xlb[base + 0x7c] = sp->config.iftxlevel << 5;	/* LBO */
+		cd->xlb[base + 0x0a] = 0x80;	/* LIRST to reset line interface */
+		timeout = jiffies + 100 * HZ / 1000;
+		spin_unlock_irqrestore(&vp->lock, flags);
+		/* XXX: WHAT THE H*** IS THIS? */
+		while (jiffies < timeout) ;
+		spin_lock_irqsave(&vp->lock, flags);
+		cd->xlb[base + 0x0a] = 0x30;	/* LISRT back to normal, resetting elastic buffers */
+		vp->smask |= (1 << span);
+		/* enable interrupts */
+		vp->xlb[CTLREG] = (INTENA);
+		spin_unlock_irqrestore(&vp->lock, flags);
+		/* establish which channels are clear channel */
+		for (c = 0; c < 24; c++) {
+			int slot = xp_t1_chan_map[c];
+
+			byte = c >> 3;
+			if (!vp->spans[span]->slots[slot]
+			    || vp->spans[span]->slots[slot]->sdl.config.iftype != SDL_TYPE_DS0A)
+				mask |= 1 << (c % 8);
+			if ((c % 8) == 7)
+				vp->xlb[base + 0x39 + byte] = mask;
+		}
+
+		break;
+	case V401PE:
+	{
+		u_char reg33, reg35, reg40;
+
+		vp->xlb[CTLREG] = E1DIV;
+		vp->xlb[LEDREG] = 0xff;
+		/* zero all span registers */
+		for (offset = 0; offset < 192; offset++)
+			vp->xlb[base + offset] = 0x00;
+		/* The DS2155 contains an on-chip power-up reset function that automatically clears
+		   the writeable register space immediately after power is supplied to the DS2155.
+		   The user can issue a chip reset at any time.  Issuing a reset disrupts traffic
+		   flowing through the DS2155 until the device is reprogrammed.  The reset can be
+		   issued through hardware using the TSTRST pin or through software using the SFTRST
+		   function in the master mode register.  The LIRST (LIC2.6) should be toggled from 0 
+		   to 1 to reset the line interface circuitry.  (It takes the DS2155 about 40ms to
+		   recover from the LIRST bit being toggled.) Finally, after the TSYSCLK and RSYSCLK
+		   inputs are stable, the receive and transmit elastic stores should be reset (this
+		   step can be skipped if the elastic stores are disabled). */
+		vp->xlb[base + 0x00] = 0x02;	/* E1 mode */
+		/* Note that we could change the order of interleave here (3 - span) to accomodate
+		   little-endian or big-endian word reads, hah! */
+		vp->xlb[base + 0xc5] = 0x28 + span;	/* 4 devices channel interleaved on bus */
+		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK 
+		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
+		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
+		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
+		vp->xlb[base + 0x70] = 0x02;	/* LOTCMC into TCSS0 */
+		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1
+		   RSYNC is an input (elastic store). */
+		vp->xlb[base + 0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
+		vp->xlb[base + 0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
+		vp->xlb[base + 0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#if 0
+		/* We should really reset the elastic store after reset like so: */
+		vp->xlb[base + 0x4f] = 0x55;	/* RES/TES (elastic store) reset */
+		vp->xlb[base + 0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+		/* And even align it like so: */
+		vp->xlb[base + 0x4f] = 0x99;	/* RES/TES (elastic store) reset */
+		vp->xlb[base + 0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#endif
+
+		reg33 = 0x00;
+		reg35 = 0x10;	/* TSiS */
+		reg40 = 0x00;
+
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
+		case SDL_FRAMING_CCS:
+			reg40 |= 0x06;
+			reg33 |= 0x40;
+			break;
+		case SDL_FRAMING_CAS:
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
+		case SDL_CODING_HDB3:
+			reg33 |= 0x20;
+			reg35 |= 0x04;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			reg33 |= 0x08;
+			reg35 |= 0x01;
+			break;
+		default:
+			break;
+		}
+		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic
+		   AIS generation (0x02) (E1). */
+		vp->xlb[base + 0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from O14.6) */
+		vp->xlb[base + 0x36] = 0x04;	/* AEBE 36.2 */
+		vp->xlb[base + 0x33] = reg33;	/* RCR4, RHDB3, RSM */
+		vp->xlb[base + 0x34] = 0x01;	/* RCL (1ms) */
+		vp->xlb[base + 0x40] = reg40;	/* RCCS, TCCS */
+		/* This is a little peculiar: the host should be using Method 3 in section 22.3 of
+		   the DS2155 manual instead of this method that only permits 250us to read or
+		   write the bits. */
+		vp->xlb[base + 0xd0] = 0x1b;	/* TAFR */
+		vp->xlb[base + 0xd1] = 0x5f;	/* TNAFR */
+
+		/* power the transmit */
+		vp->xlb[base + 0x78] = 0x21;	/* 120 Ohm normal, power transmitter */
+		vp->xlb[base + 0x79] = 0x98;	/* JACLK on for E1 */
+		vp->xlb[base + 0x7b] = 0x0f;	/* 120 Ohm term, MCLK prescaled for 2.048 MHz */
+		/* This register is where we set internal linear gain boost for monitoring
+		   applications: 0x08 is 20db, 0x10 is 26db, 0x18 is 32 db. */
+		vp->xlb[base + 0x7a] = 0x00;	/* no boost */
+
+		vp->smask |= (1 << span);
+		/* enable interrupts */
+		vp->xlb[CTLREG] = (INTENA | E1DIV);
+		spin_unlock_irqrestore(&vp->lock, flags);
+		break;
+	}
+	case V401PT:
+	{
+		vp->xlb[CTLREG] = 0x00;
+		vp->xlb[LEDREG] = 0xff;
+		/* zero all span registers */
+		for (offset = 0; offset < 192; offset++)
+			vp->xlb[base + offset] = 0x00;
+		/* The DS2155 contains an on-chip power-up reset function that automatically clears
+		   the writeable register space immediately after power is supplied to the DS2155.
+		   The user can issue a chip reset at any time.  Issuing a reset disrupts traffic
+		   flowing through the DS2155 until the device is reprogrammed.  The reset can be
+		   issued through hardware using the TSTRST pin or through software using the SFTRST
+		   function in the master mode register.  The LIRST (LIC2.6) should be toggled from 0 
+		   to 1 to reset the line interface circuitry.  (It takes the DS2155 about 40ms to
+		   recover from the LIRST bit being toggled.) Finally, after the TSYSCLK and RSYSCLK
+		   inputs are stable, the receive and transmit elastic stores should be reset (this
+		   step can be skipped if the elastic stores are disabled). */
+		vp->xlb[base + 0x00] = 0x00;	/* T1 mode */
+		/* Note that we could change the order of interleave here (3 - span) to accomodate
+		   little-endian or big-endian word reads, hah! */
+		vp->xlb[base + 0xc5] = 0x28 + span;	/* 4 devices channel interleaved on bus */
+		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK 
+		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
+		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
+		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
+		vp->xlb[base + 0x70] = 0x00;	/* LOTCMC into TCSS0 */
+		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1
+		   RSYNC is an input (elastic store). */
+		vp->xlb[base + 0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
+		vp->xlb[base + 0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
+		vp->xlb[base + 0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#if 0
+		/* We should really reset the elastic store after reset like so: */
+		vp->xlb[base + 0x4f] = 0x55;	/* RES/TES (elastic store) reset */
+		vp->xlb[base + 0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+		/* And even align it like so: */
+		vp->xlb[base + 0x4f] = 0x99;	/* RES/TES (elastic store) reset */
+		vp->xlb[base + 0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#endif
+		reg04 = japan ? 0x02 : 0x00;
+		reg05 = japan ? 0x90 : 0x00; /* japan always as TSSE? */
+		reg06 = 0x00;
+
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_ESF;
+		case SDL_FRAMING_ESF:
+			reg04 |= 0x40;
+			break;
+		case SDL_FRAMING_SF:
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_B8ZS;
+		case SDL_CODING_B8ZS:
+			reg04 |= 0x20;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		vp->xlb[base + 0x03] = 0x08;	/* SYNCC */
+		vp->xlb[base + 0x04] = 0x60;	/* ESF B8ZS */
+		vp->xlb[base + 0x05] = 0x10;	/* TSSE */
+		vp->xlb[base + 0x06] = 0x80;	/* TB8ZS */
+		vp->xlb[base + 0x07] = 0x04;	/* ESF */
+
+		vp->xlb[base + 0x40] = reg40;	/* RCCS, TCCS */
+
+		vp->xlb[base + 0x79] = 0x58;	/* JACLK on for T1 (and reset) */
+		while (jiffies < timeout) ;	/* 100ms wait */
+		vp->xlb[base + 0x79] = 0x18;	/* JACLK on for T1 */
+		/* This is the register where we do line build out. */
+		vp->xlb[base + 0x78] = 0x01;	/* Enable transmitter, DSX-1 OdB */
+		vp->xlb[base + 0x7b] = 0x0a;	/* 100 ohm, MCLK prescaled for 2.048 MHz */
+		/* This register is where we set internal linear gain boost for monitoring
+		   applications: 0x08 is 20db, 0x10 is 26db, 0x18 is 32 db. */
+		vp->xlb[base + 0x7a] = 0x00;	/* no boost */
+
+		vp->smask |= (1 << span);
+		/* enable interrupts */
+		vp->xlb[CTLREG] = (INTENA);
+		spin_unlock_irqrestore(&vp->lock, flags);
+		break;
+	}
+	}
+	/* FIXME: start the span */
+	vp->smask |= (1 << span);
+}
+
+/**
+ * __vp_stop_span: - stop a card span
+ * @vp: the card
+ * @span: the span number (0-4)
+ *
+ * If no span is running the card is disabled.  The card is (re)started on the first span to come
+ * up.
+ */
+static void
+__vp_stop_span(struct vp *vp, int span)
+{
+	/* FIXME: stop the span */
+	vp->smask &= ~(1<<span);
+	if (!vp->span)
+		__vp_stop_card(vp);
+}
+
+/**
+ * vp_setchunksize: - zaptel callback, set chunk size
+ * @span: the span for which to set chunk size
+ * @chunksize: the chunk size to set
+ *
+ * Required: Set the requested chunk size.  This is the unit in which you must report results for
+ * conferencing, etc.  Really, this is never called by current (1.2.9.1) zaptel and is therefore
+ * certainly NOT REQUIRED.
+ */
+static int
+vp_setchunksize(struct zt_span *span, int chunksize)
+{
+	struct vp *vp = (struct vp *)span->pvt;
+
+	if (chunksize != ZT_CHUNKSIZE)
+		return (-1);
+	return (0);
+}
+
+/**
+ * vp_spanconfig: - zaptel callback, configure span
+ * @span: the span to configure
+ * @lc: the configuration information
+ *
+ * Configure the span (if appropriate).  lc has three significant fields: lbo (line build-out),
+ * lineconfig (line configuration parameters), sync (level of synchronization source).  Zaptel
+ * cannot be allowed to perform disruptive reconfigurations while CH or MX streams are connected.
+ */
+static int
+vp_spanconfig(struct zt_span *span, struct zt_lineconfig *lc)
+{
+	struct vp *vp = (struct vp *) span->pvt;
+	int spanno = span->offset;
+	struct ch *ch;
+	struct mx *mx;
+
+	for (ch = vp->ch.connects; ch; ch = ch->c.next)
+		smask |= ch->smask;
+	for (mx = vp->mx.connects; mx; mx = mx->c.next)
+		smask |= mx->smask;
+	if (!(smask & (1 << spanno))) {
+	} else
+		err = -EBUSY;
+	if (err)
+		strlog(modid, 0, 0, SL_ERROR, "vp_spanconfig() span conflict");
+	return (err);
+}
+
+/**
+ * vp_startup: - start the span
+ * @span: the span to start
+ *
+ * Start the span.  Zaptel can start any span that has not started.  When the first span is brought
+ * up, start the card.
+ */
+static int
+vp_startup(struct zt_span *span)
+{
+	if (!(span->flags & ZT_FLAG_RUNNING)) {
+		struct vp *vp = (struct vp *) span->pvt;
+		unsigned long flags;
+
+		spin_lock_irqsave(&vp->lock, flags);
+		{
+			if (!(vp->smask & (1<<span)))
+				__vp_start_span(vp, span);
+		}
+		spin_unlock_irqrestore(&vp->lock, flags);
+	}
+	return (0);
+}
+
+/**
+ * vp_shutdown: - zaptel callback, shutdown span
+ * @span: span to shut down
+ *
+ * Shut down the span.  Zaptel cannot be allowed to stop spans for which CH or MX devices are
+ * enabled, but the span can be marked down to zaptel.  When the last span is taken down, stop the
+ * card.
+ */
+static int
+vp_shutdown(struct zt_span *span)
+{
+	if (span->flags & ZT_FLAG_RUNNING) {
+		struct vp *vp = (struct vp *) span->pvt;
+		unsigned long flags;
+		uint32_t smask = 0;
+		struct ch *ch;
+		struct mx *mx;
+		int spanno = span->offset;
+
+		spin_lock_irqsave(&vp->lock, flags);
+		{
+			if ((vp->smask & (1<<spanno))) {
+				for (ch = vp->ch.enabled; ch; ch = ch->e.next)
+					smask |= ch->smask;
+				for (mx = vp->mx.enabled; mx; mx = mx->e.next)
+					smask |= mx->smask;
+				if (!(smask & (1<<spanno)) && (vp->smask & (1<<spanno)))
+					__vp_stop_span(vp, spanno);
+			}
+		}
+		spin_unlock_irqrestore(&vp->lock, flags);
+	}
+	return (0);
+}
+
+/**
+ * vp_maint: - zaptel callback, perform maintenance on span
+ * @span: span to maintain
+ * @mode: maintainenacne mode
+ *
+ * Zaptel cannot be allowed to perform maintenance on spans to which there is a CH device attached
+ * or to which there is an MX device connected.  Otherwise, span maintenance is permitted.  Note
+ * that zaptel calls this callback with a lock on the span and locak interrupts suppressed,
+ * therefore, we only need to take a lock on the card.
+ */
+static int
+vp_maint(struct zt_span *span, int mode)
+{
+	struct vp *vp = (struct vp *) span->pvt;
+	struct ch *ch;
+	struct mx *mx;
+	uint32_t smask;
+	int base = span << 8;
+
+	spin_lock(&vp->lock);
+	for (ch = vp->ch.attached; ch; ch = ch->a.next)
+		smask |= ch->smask;
+	for (mx = vp->mx.connects; mx; mx = mx->c.next)
+		smask |= mx->smask;
+	if (!(smask & (1 << span->offset))) {
+		switch (vp->device) {
+		case VP_DEV_DS2154:
+		case VP_DEV_DS21354:
+		case VP_DEV_DS21554:
+			/* tor2 e1 card */
+			switch (mode) {
+			case ZT_MAINT_NONE:	/* normal mode */
+				vp->xlb[base + 0xa8] = 0x00;
+				break;
+			case ZT_MAINT_LOCALLOOP:	/* local loopback */
+				vp->xlb[base + 0xa8] = 0x40;
+				break;
+			case ZT_MAINT_REMOTELOOP:	/* remote loopback */
+				vp->xlb[base + 0xa8] = 0x80;
+				break;
+			default:	/* T1 only */
+			case ZT_MAINT_LOOPUP:	/* send loopup code */
+			case ZT_MAINT_LOOPDOWN:	/* send loopdown code */
+			case ZT_MAINT_LOOPSTOP:	/* stop sending loop codes */
+				err = -ENOSYS;
+				break;
+			}
+			break;
+		case VP_DEV_DS2152:
+		case VP_DEV_DS21352:
+		case VP_DEV_DS21552:
+			/* tor2 t1 card */
+			switch (mode) {
+			case ZT_MAINT_NONE:	/* normal mode */
+				/* bit 0x80 is the transmit japanese CRC6 enable */
+				vp->xlb[base + 0x19] = (japan ? 0x80 : 0x00) | 0x00;
+				vp->xlb[base + 0x0a] = 0x00;
+				break;
+			case ZT_MAINT_LOCALLOOP:	/* local loopback */
+				/* bit 0x80 is the transmit japanese CRC6 enable */
+				vp->xlb[base + 0x19] = (japan ? 0x80 : 0x00) | 0x40;
+				vp->xlb[base + 0x0a] = 0x00;
+				break;
+			case ZT_MAINT_REMOTELOOP:	/* remote loopback */
+				/* bit 0x80 is the transmit japanese CRC6 enable */
+				vp->xlb[base + 0x19] = (japan ? 0x80 : 0x00) | 0x00;
+				vp->xlb[base + 0x0a] = 0x40;
+				break;
+			case ZT_MAINT_LOOPUP:	/* send loopup code */
+				vp->xlb[base + 0x30] = 0x02;	/* transmit loop code */
+				vp->xlb[base + 0x12] = 0x22;
+				vp->xlb[base + 0x13] = 0x80;	/* code to transmit */
+				break;
+			case ZT_MAINT_LOOPDOWN:	/* send loopdown code */
+				vp->xlb[base + 0x30] = 0x02;	/* transmit loop code */
+				vp->xlb[base + 0x12] = 0x62;
+				vp->xlb[base + 0x13] = 0x90;	/* code to transmit */
+				break;
+			case ZT_MAINT_LOOPSTOP:	/* stop sending loop codes */
+				vp->xlb[base + 0x30] = 0x00;
+				break;
+			default:
+				err = -ENOSYS;
+				break;
+			}
+			break;
+		case VP_DEV_DS2155:
+			switch (vp->board) {
+			case V401PE:
+				/* tor3 e1 card */
+				switch (mode) {
+				case ZT_MAINT_NONE:	/* normal mode */
+					vp->xlb[base + 0x4a] = 0x00;
+					break;
+				case ZT_MAINT_LOCALLOOP:	/* local loopback */
+					vp->xlb[base + 0x4a] = 0x08;
+					break;
+				case ZT_MAINT_REMOTELOOP:	/* remote loopback */
+					vp->xlb[base + 0x4a] = 0x04;
+					break;
+				default:	/* T1 only */
+				case ZT_MAINT_LOOPUP:	/* send loopup code */
+				case ZT_MAINT_LOOPDOWN:	/* send loopdown code */
+				case ZT_MAINT_LOOPSTOP:	/* stop sending loop codes */
+					err = -ENOSYS;
+					break;
+				}
+				break;
+			case V401PT:
+				/* tor3 t1 card */
+				switch (mode) {
+				case ZT_MAINT_NONE:	/* normal mode */
+					vp->xlb[base + 0x4a] = 0x00;
+					break;
+				case ZT_MAINT_LOCALLOOP:	/* local loopback */
+					vp->xlb[base + 0x4a] = 0x08;
+					break;
+				case ZT_MAINT_REMOTELOOP:	/* remote loopback */
+					vp->xlb[base + 0x4a] = 0x04;
+					break;
+				case ZT_MAINT_LOOPUP:	/* send loopup code */
+					vp->xlb[base + 0xb6] &= ~0xc0;	/* 5 bit code */
+					vp->xlb[base + 0xb7] = 0x80;	/* loop up code */
+					vp->xlb[base + 0x07] |= 0x01;	/* send loop code */
+					break;
+				case ZT_MAINT_LOOPDOWN:	/* send loopdown code */
+					vp->xlb[base + 0xb6] &= ~0xc0;	/* 5 bit code */
+					vp->xlb[base + 0xb7] = 0x90;	/* loop down code */
+					vp->xlb[base + 0x07] |= 0x01;	/* send loop code */
+					break;
+				case ZT_MAINT_LOOPSTOP:	/* stop sending loop codes */
+					vp->xlb[base + 0x07] &= ~0x01;	/* stop sending loop code */
+					break;
+				default:
+					err = -ENOSYS;
+					break;
+				}
+				break;
+			default:
+				err = -ENOSYS;
+				break;
+			}
+			break;
+		default:
+			err = -ENOSYS;
+			break;
+		}
+	} else
+		err = -EBUSY;
+	spin_unlock(&vp->lock);
+	if (err)
+		strlog(modid, 0, 0, SL_ERROR, "vp_maint() error %d", -err);
+	return (err);
+}
+
+/**
+ * vp_chanconfig: zaptell callback, channel configuration
+ * @chan: channel to configure
+ * @sigtype: signalling type
+ *
+ * Zaptel cannot be allowed to reconfigure channels to which there is a CH device attached or to
+ * which there is an MX device connected.  Otherwise, changes to clear channels on running T1 spans
+ * cause a reconfiguration.
+ */
+static int
+vp_chanconfig(struct zt_chan *chan, int sigtype)
+{
+	struct vp *vp = (struct vp *) chan->span->pvt;
+	int err = 0, span = chan->span->offset;
+	unsigned long flags;
+	struct ch *ch;
+	struct mx *mx;
+	uint32_t cmask = 0;
+
+	spin_lock_irqsave(&vp->lock, flags);
+	{
+		for (ch = vp->ch.attached; ch; ch = ch->a.next)
+			cmask |= ch->cmasks[span];
+		for (mx = vp->mx.connects; mx; mx = mx->c.next)
+			cmask |= mx->cmasks[span];
+		if (!(cmask & (1 << chan->chanpos))) {
+			if ((chan->span->channels == 24)
+			    && (chan->span->flags & ZT_FLAG_RUNNING)
+			    && ((chan->sig & ZT_SIG_CLEAR) ^ (sigtype & ZT_SIG_CLEAR)))
+				__vp_set_clear(vp, span);
+		} else
+			/* there is a channel conflict */
+			err = -EBUSY;
+	}
+	spin_unlock_irqrestore(&vp->lock, flags);
+	if (err)
+		strlog(modid, 0, 0, SL_ERROR, "invalid vp_chanconfig()");
+	return (err);
+}
+
+/**
+ * vp_open: zaptell callback, open a channel
+ * @chan: channel to open
+ *
+ * Prepare a channel for I/O.  The original Tor 2 and Tor 3 zaptel drivers do nothing here.  The
+ * OpenSS7 driver is a little more efficient in that it only transfers data accross the PCI bus when
+ * necessary and, therefore, it keeps track of spans and channels that are activated using span and
+ * channel bitmasks.  Also, channels that are being used by the MX or CH drivers are not available
+ * for use by zaptel.
+ */
+static int
+vp_open(struct zt_chan *chan)
+{
+	struct vp *vp = (struct vp *) chan->span->pvt;
+	int err = 0, span = chan->span->offset;
+	unsigned long flags;
+	struct zt_chan *c;
+	uint32_t cmask = 0;
+
+	spin_lock_irqsave(&vp->lock, flags);
+	{
+		for (c = chan; c->chanpos != chan->span->channels - 1 && c->master == chan->master; c++)
+			cmask |= (1 << c->chanpos);
+		if (!(cmask & vp->cmasks[span])) {
+			vp->cmasks[span] |= cmask;
+			vp->cmask |= cmask;
+			vp->smask |= (1 << span);
+		} else {
+			/* there was a channel conflict */
+			err = -EBUSY;
+		}
+	}
+	spin_unlock_irqrestore(&vp->lock, flags);
+	if (err)
+		strlog(modid, 0, 0, SL_ERROR, "invalid vp_open()");
+	return (err);
+}
+
+/**
+ * vp_close: zaptell callback, close a channel
+ * @chan: channel to close
+ *
+ * Close channel for I/O.  The original Tor 2 and Tor 3 drivers do nothing here.  The OpenSS7 driver
+ * is a little more efficient in that it only trasnfers data across the PCI bus when necessary and,
+ * therefore, it keeps track of spans and channels that are activated using span and channel
+ * bitmasks.  Also, channels that are not being used by zaptel are available for use by the MX or CH
+ * drivers.
+ */
+static int
+vp_close(struct zt_chan *chan)
+{
+	struct vp *vp = (struct vp *) chan->span->pvt;
+	int err = 0, span = chan->span->offset;
+	unsigned long flags;
+	struct zt_chan *c;
+	uint32_t cmask = 0;
+
+	spin_lock_irqsave(&vp->lock, flags);
+	{
+		for (c = chan; c->chanpos != chan->span->channels - 1 && c->master == chan->master; c++)
+			cmask |= (1 << c->chanpos);
+		if (!((cmask ^ vp->cmasks[span]) & cmask)) {
+			vp->cmasks[span] &= ~cmask;
+			vp->cmask = 0;
+			vp->smask = 0;
+			/* recalculate overall masks */
+			for (span = 0; span < vp->spans; span++) {
+				if (vp->cmasks[span]) {
+					vp->cmask |= vp->cmasks[span];
+					vp->smask |= (1 << span);
+				}
+			}
+		} else
+			err = -EINVAL;
+	}
+	spin_unlock_irqrestore(&vp->lock, flags);
+	if (err)
+		strlog(modid, 0, 0, SL_CONSOLE, "invalid vp_close()");
+	return (err);
+}
+
+/**
+ * vp_ioctl: zaptel callback, perform input-output control
+ * @chan: channel to control
+ * @cmd: I/O control command
+ * @data: I/O control argument
+ *
+ * This is a placeholder.  When zaptel has no defined input-output control if this callback is not
+ * defined, zaptel will return -ENOTTY.  Here it is defined by we take the default behavior of
+ * returning -ENOTTY anyway for now.
+ */
+static int
+vp_ioctl(struct zt_chan *chan, unsigned int cmd, unsigned long data)
+{
+	return (-ENOTTY);
+}
+
+/**
+ * vp_echocan: - native echo cancellation
+ * @chan: channel to echo cancel
+ * @ecval: 0 off, non-zero on, 32-256, number of filter taps.
+ * 
+ * Native echo cancellation
+ */
+static int
+vp_echocan(struct zt_chan *chan, int ecval)
+{
+	struct vp *vp = (struct vp *)chan->span->pvt;
+}
+
+/**
+ * vp_rbsbits: - zaptel callback, assert RBS bits
+ * @chan: channel to signal on
+ * @bits: RBS bits set
+ *
+ * If you are a T1 like interface, you can just provide an rbsbits function and zaptel will assert
+ * robbed bits.  Be sure to set the ZT_FLAG_RBS in this case.
+ */
+static int
+vp_rbsbits(struct zt_chan *chan, int bit)
+{
+	struct vp *vp = (struct vp *)chan->span->pvt;
+	/* Option 1: If you're a T1 like interface, you can just provide a rbsbits function and
+	   we'll assert robbed bits for you.  Be sure to set the ZT_FLAG_RBS in this case.  */
+
+	/* Opt: If the span uses A/B bits, set them here */
+}
+
+#if 0
+static int
+vp_hooksig(struct zt_chan *chan, zt_txsig_t hookstate)
+{
+	struct vp *vp = (struct vp *)chan->span->pvt;
+	/* Option 2: If you don't know about sig bits, but do have their equivalents (i.e. you can
+	   disconnect battery, detect off hook, generate ring, etc directly) then you can just
+	   specify a sethook function, and we'll call you with appropriate hook states to set.
+	   Still set the ZT_FLAG_RBS in this case as well */
+}
+
+static int
+vp_sethook(struct zt_chan *chan, int hookstate)
+{
+	struct vp *vp = (struct vp *)chan->span->pvt;
+	/* Option 3: If you can't use sig bits, you can write a function which handles the
+	   individual hook states */
+}
+#endif
+
+/**
+ * vp_dacs: - zaptel callback, set up pseudo-digital cross-connect
+ * @chan1: from channel
+ * @chan2: to channel
+ *
+ * Dacs the contents of chan2 into chan1 if possible.  The second argument (chan2) is NULL when
+ * chan1 is to be disconnected.
+ */
+static int
+vp_dacs(struct zt_chan *chan1, struct zt_chan *chan2)
+{
+	struct vp *vp = (struct vp *)chan->span->pvt;
+}
+
+
+/*
  *  CH Primitives received from upstream.
  *  =====================================
  */
@@ -1910,6 +2835,7 @@ ch_info_req(struct ch *ch, queue_t *q, mblk_t *mp)
 {
 	return ch_info_ack(ch, q, mp);
 }
+
 /**
  * ch_optmgmt_req: - process CH_OPTMGMT_REQ primitive
  * @ch: CH private structure
@@ -1921,6 +2847,7 @@ ch_optmgmt_req(struct ch *ch, queue_t *q, mblk_t *mp)
 {
 	return ch_error_ack(ch, q, mp, CH_OPTMGMT_REQ, CHNOTSUPP, EOPNOTSUPP);
 }
+
 /**
  * ch_attach_req: - process CH_ATTACH_REQ primitive
  * @ch: CH private structure
@@ -1951,8 +2878,8 @@ ch_attach_req(struct ch *ch, queue_t *q, mblk_t *mp)
 	bcopy(mp->b_rptr, &addr, sizeof(addr));
 	{
 		int card = (addr >> 16) & 0x0ff;
-		int span = (addr >>  8) & 0x0ff;
-		int slot = (addr >>  0) & 0x0ff;
+		int span = (addr >> 8) & 0x0ff;
+		int slot = (addr >> 0) & 0x0ff;
 
 		if (vp_card + 1 < card || card < 1)
 			goto badaddr;
@@ -1971,6 +2898,7 @@ ch_attach_req(struct ch *ch, queue_t *q, mblk_t *mp)
       protoshort:
 	return ch_error_ack(ch, q, mp, CH_ATTACH_REQ, CHBADPRIM, EMSGSIZE);
 }
+
 /**
  * ch_enable_req: - process CH_ENABLE_REQ primitive
  * @ch: CH private structure
@@ -1981,6 +2909,7 @@ STATIC noinline __unlikely int
 ch_enable_req(struct ch *ch, queue_t *q, mblk_t *mp)
 {
 }
+
 /**
  * ch_connect_req: - process CH_CONNECT_REQ primitive
  * @ch: CH private structure
@@ -1991,6 +2920,7 @@ STATIC noinline __unlikely int
 ch_connect_req(struct ch *ch, queue_t *q, mblk_t *mp)
 {
 }
+
 /**
  * ch_data_req: - process CH_DATA_REQ primitive
  * @ch: CH private structure
@@ -2001,6 +2931,7 @@ STATIC noinline __unlikely int
 ch_data_req(struct ch *ch, queue_t *q, mblk_t *mp)
 {
 }
+
 /**
  * ch_disconnect_req: - process CH_DISCONNECT_REQ primitive
  * @ch: CH private structure
@@ -2011,6 +2942,7 @@ STATIC noinline __unlikely int
 ch_disconnect_req(struct ch *ch, queue_t *q, mblk_t *mp)
 {
 }
+
 /**
  * ch_disable_req: - process CH_DISABLE_REQ primitive
  * @ch: CH private structure
@@ -2021,6 +2953,7 @@ STATIC noinline __unlikely int
 ch_disable_req(struct ch *ch, queue_t *q, mblk_t *mp)
 {
 }
+
 /**
  * ch_detach_req: - process CH_DETACH_REQ primitive
  * @ch: CH private structure
@@ -2271,8 +3204,8 @@ mx_attach_req(struct mx *mx, queue_t *q, mblk_t *mp)
 	bcopy(mp->b_rptr, &addr, sizeof(addr));
 	{
 		int card = (addr >> 16) & 0x0ff;
-		int span = (addr >>  8) & 0x0ff;
-		int slot = (addr >>  0) & 0x0ff;
+		int span = (addr >> 8) & 0x0ff;
+		int slot = (addr >> 0) & 0x0ff;
 
 		if (vp_card + 1 < card || card < 1)
 			goto badaddr;
@@ -2539,6 +3472,110 @@ mx_w_proto(queue_t *q, mblk_t *mp)
 	return (err);
 }
 
+STATIC noinline fastcall __unlikely int
+mx_w_ioctl(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	mblk_t *dp;
+
+	if (DB_TYPE(mp) != M_IOCTL || ioc->ioc_count == TRANSPARENT)
+		goto einval;
+	switch (_IOC_TYPE(ioc->ioc_cmd)) {
+	case MX_IOC_MAGIC:
+		switch (_IOC_NR(ioc->ioc_cmd)) {
+		case _IOC_NR(MX_IOCGCONFIG):
+		{
+			struct mx_config *c;
+
+			if (!(dp = allocb(sizeof(*c), BPRI_MED)))
+				goto enosr;
+			c = (typeof(c)) dp->b_rptr;
+			dp->b_wptr += sizeof(*c);
+			*c = mx->config;
+			mioc2ack(q, mp, dp, sizeof(*c), 0);
+			return (0);
+		}
+		case _IOC_NR(MX_IOCSCONFIG):
+		{
+			struct mx_config *c;
+
+			if (ioc->ioc_count != sizeof(*c))
+				goto einval;
+			c = (typeof(c)) dp->b_rptr;
+			/* FIXME: check values first */
+			mx->config = *c;
+			miocack(q, mp, 0, 0);
+			return (0);
+		}
+		case _IOC_NR(MX_IOCTCONFIG):
+		{
+			struct mx_config *c;
+
+			if (ioc->ioc_count != sizeof(*c))
+				goto einval;
+			c = (typeof(c)) dp->b_rptr;
+			/* FIXME: check values */
+			miocack(q, mp, 0, 0);
+			return (0);
+		}
+		case _IOC_NR(MX_IOCCCONFIG):
+		{
+			struct mx_config *c;
+
+			if (ioc->ioc_count != sizeof(*c))
+				goto einval;
+			c = (typeof(c)) dp->b_rptr;
+			/* FIXME: check values first */
+			mx->config = *c;
+			miocack(q, mp, 0, 0);
+			return (0);
+		}
+		case _IOC_NR(MX_IOCGSTATEM):
+		{
+			struct mx_statem *s;
+
+			if (!(dp = allocb(sizeof(*s), BPRI_MED)))
+				goto enosr;
+			s = (typeof(s)) dp->b_rptr;
+			dp->b_wptr += sizeof(*s);
+			*s = mx->statem;
+			mioc2ack(q, mp, dp, sizeof(*s), 0);
+			return (0);
+		}
+		case _IOC_NR(MX_IOCCMRESET):
+		case _IOC_NR(MX_IOCGSTATSP):
+		case _IOC_NR(MX_IOCSSTATSP):
+		case _IOC_NR(MX_IOCGSTATS):
+		{
+			struct mx_stats *s;
+
+			if (!(dp = allocb(sizeof(*s), BPRI_MED)))
+				goto enosr;
+			s = (typeof(s)) dp->b_rptr;
+			dp->b_wptr += sizeof(*s);
+			*s = mx->stats;
+			mioc2ack(q, mp, dp, sizeof(*s), 0);
+			return (0);
+		}
+		case _IOC_NR(MX_IOCCSTATS):
+		case _IOC_NR(MX_IOCGNOTIFY):
+		case _IOC_NR(MX_IOCSNOTIFY):
+		case _IOC_NR(MX_IOCCNOTIFY):
+		case _IOC_NR(MX_IOCCMGMT):
+		default:
+			miocnak(q, mp, 0, EINVAL);
+			return (0);
+		}
+	}
+      einval:
+	miocnak(q, mp, 0, EINVAL);
+	return (0);
+      enosr:
+	miocnak(q, mp, 0, ENOSR);
+	return (0);
+}
+
 STATIC noinline fastcall int
 mx_w_flush(queue_t *q, mblk_t *mp)
 {
@@ -2772,6 +3809,7 @@ mx_wsrv(queue_t *q)
 	/* resupply buffers to tasklet if necessary */
 	if (mx->c.vp && mx->tx.nxt == NULL) {
 		frtn_t free = { &vp_rx_free, (long) mx };
+
 		mx->tx.nxt = esballoc(mx->c.vp->buf, V400P_BLOCK_SIZE << 1, BPRI_MED, &free);
 	}
 	return (0);
@@ -3019,64 +4057,62 @@ vp_tasklet(unsigned long data)
 	   need to only block interrupts on the current card (e.g. by deferring acknowledgment of
 	   the interrupt until after this procedure completes). */
 	spin_lock(&vp->lock);
-	{
-		/* process statitical multiplexed data channels */
-		for (ch = vp->ch.connects; ch; ch = ch->c.next) {
-			if (canput(ch->rq) && (mp = xchg(ch->tx.nxt, NULL))) {
-				unsigned char *frame;
-				unsigned char *bptr;
 
-				for (bptr = mp->b_rptr, frame = vp->buf;
-				     frame < vp->buf + V400P_BLOCK_SIZE; frame += 128) {
-					uint32_t smask;
-					int span;
+	/* process statitical multiplexed data channels */
+	for (ch = vp->ch.connects; ch; ch = ch->c.next) {
+		if (canput(ch->rq) && (mp = xchg(ch->tx.nxt, NULL))) {
+			unsigned char *frame;
+			unsigned char *bptr;
 
-					for (smask = ch->smask, span = 0; smask & span < 4;
-					     span++, smask >>= 1) {
-						unsigned char *pos;
-						uint32_t cmask;
+			for (bptr = mp->b_rptr, frame = vp->buf;
+			     frame < vp->buf + V400P_BLOCK_SIZE; frame += 128) {
+				uint32_t smask;
+				int span;
 
-						if (!(smask & 0x1))
+				for (smask = ch->smask, span = 0; smask & span < 4;
+				     span++, smask >>= 1) {
+					unsigned char *pos;
+					uint32_t cmask;
+
+					if (!(smask & 0x1))
+						continue;
+					for (cmask = mx->cmasks[span], pos = frame + span;
+					     cmask && pos < frame + 128; pos += 4, cmask >>= 1) {
+						if (!(cmask & 0x1))
 							continue;
-						for (cmask = mx->cmasks[span], pos = frame + span;
-						     cmask && pos < frame + 128;
-						     pos += 4, cmask >>= 1) {
-							if (!(cmask & 0x1))
-								continue;
-							pos[1024] = *bptr;
-							*bptr = *pos;
-							bptr++;
-						}
+						pos[1024] = *bptr;
+						*bptr = *pos;
+						bptr++;
 					}
 				}
-				/* The upper layer module must be very careful to simply process
-				   the data quickly and return.  In the case of data channels, this
-				   should really be just a putq unless minimal latency is required.
-				 */
-				putnext(ch->rq, mp);
-				qenable(ch->wq);	/* resupply buffers */
-			} else {
-				ch->tx.underruns += ch->channels * 8;
-				ch->rx.overflows += ch->channels * 8;
 			}
-		}
-
-		/* process switching matrix multiplexers */
-		for (mx = vp->mx.connects; mx; mx = mx->c.next) {
-			/* No flow control check because only 1 block can be outstanding. */
-			if (!mx->rx.nxt && (mp = xchg(ch->tx.nxt, NULL))) {
-				mx->rx.nxt = mp;
-				/* The upper layer module must be very careful to simply process
-				   the data quickly and return.  In the case of multiplexers, this
-				   should really be just a copy, qreply of the message and return. */
-				putnext(mx->rq, mp);
-				qenable(mx->wq);	/* resupply buffers */
-			} else {
-				mx->rx.overflows += mx->channels * 8;
-				mx->tx.underruns += mx->channels * 8;
-			}
+			/* The upper layer module must be very careful to simply process the data
+			   quickly and return.  In the case of data channels, this should really be 
+			   just a putq unless minimal latency is required. */
+			putnext(ch->rq, mp);
+			qenable(ch->wq);	/* resupply buffers */
+		} else {
+			ch->tx.underruns += ch->channels * 8;
+			ch->rx.overflows += ch->channels * 8;
 		}
 	}
+
+	/* process switching matrix multiplexers */
+	for (mx = vp->mx.connects; mx; mx = mx->c.next) {
+		/* No flow control check because only 1 block can be outstanding. */
+		if (!mx->rx.nxt && (mp = xchg(ch->tx.nxt, NULL))) {
+			mx->rx.nxt = mp;
+			/* The upper layer module must be very careful to simply process the data
+			   quickly and return.  In the case of multiplexers, this should really be
+			   just a copy, qreply of the message and return. */
+			putnext(mx->rq, mp);
+			qenable(mx->wq);	/* resupply buffers */
+		} else {
+			mx->rx.overflows += mx->channels * 8;
+			mx->tx.underruns += mx->channels * 8;
+		}
+	}
+
 	spin_unlock(&vp->lock);
 
 	runqueues();
@@ -3351,10 +4387,13 @@ vp_daccs(struct vp *vp)
 		register int byte, slot, chan;
 		register uint32_t xmask, xmask_save = vp->xmask;
 		register uint8_t **map = vp->map;
+
+#ifdef CONFIG_SMP
 		int rxdccs = vp->rxdccs;
 
 		if (rxdccs)
 			spin_lock(&vp_daccs_lock);
+#endif
 		for (byte = 0; byte < 1024; byte += 128) {
 			for (xmask = xmask_save, slot = (byte >> 2) + 1, chan = 1;
 			     chan < 32; slot++, chan++, xmask <<= 1) {
@@ -3376,8 +4415,10 @@ vp_daccs(struct vp *vp)
 				}
 			}
 		}
+#ifdef CONFIG_SMP
 		if (rxdccs)
 			spin_unlock(&vp_daccs_lock);
+#endif
 	}
 }
 
@@ -3399,53 +4440,58 @@ vp_daccs(struct vp *vp)
 STATIC inline fastcall __hot void
 vp_rxtx_burst(struct vp *vp)
 {
-	uint32_t cmask_save;
+	uint32_t cmask, dmask;
 	struct mx *mx;
 
-	if (unlikely(!(cmask_save = vp->cmask | vp->xmask)))
+	/* first set of 4 channels are always dead */
+	if (unlikely(!((cmask = vp->cmask | vp->xmask) >> 1)))
 		goto done;
 
+	dmask = (vp->channels == 24) ? VP_TI_CHAN_VALID_MASK : VP_E1_CHAN_VALID_MASK;
+
 	if (likely(!vp->blocks)) {
-		{
-			register volatile uint32_t *xll = vp->xll;
-			register uint32_t *buf = vp->buf;
+		register int chans = ((vp->channels + 7) & ~7);	/* 24 or 32 */
+		register volatile uint32_t *xll = vp->xll;
+		register uint32_t *buf = vp->buf;
+		register int iword, islot, oword, oslot;
+		register uint32_t x;
 
-			{
-				register int word, slot;
-				register uint32_t cmask;
-
-				/* first half of buffer is receive */
-				for (word = 0; word < 256; word += 32) {
-					prefetchw(&buf[word + 32]);
-					for (cmask = cmask_save, slot = word + 1;
-					     cmask && slot < word + 32; slot++, cmask >>= 1)
-						if (cmask & 0x01)	/* skip disabled channels */
-							buf[slot] = xll[slot];
-				}
+		/* first half of buffer is receive */
+		for (oword = 0, iword = 0; iword < 256; iword += 32, oword += chans) {
+			prefetchw(&buf[oword + chans]);
+			for (x = 0x01, oslot = oword, islot = iword + 1;
+			     (cmask & ~(x - 1)) && islot < iword + 32; islot++, x <<= 1) {
+				if (cmask & x)	/* skip disabled channels */
+					buf[oslot++] = xll[islot];
+				else if (dmask & x)	/* step over allocated channels */
+					oslot++;
 			}
+
 		}
-		buf += 256;
+		buf += chans << 3;	/* 8 words per channel */
 		/* perform digital cross-connect if necessary */
 		if (vp->xmask)
 			vp_daccs(vp);
-		{
-			register int word, slot;
-			register uint32_t cmask;
-			int txdccs = vp->txdccs;
-
-			/* second half of buffer is transmit */
-			if (txdccs)
-				spin_lock(&vp_daccs_lock);
-			for (word = 0; word < 256; word += 32) {
-				prefetch(&buf[word + 32]);
-				for (cmask = cmask_save, slot = word + 1;
-				     cmask && slot < word + 32; slot++, cmask >>= 1)
-					if (cmask & 0x01)	/* skip disabled channels */
-						xll[slot] = buf[slot];
+#ifdef CONFIG_SMP
+		/* second half of buffer is transmit */
+		if (vp->txdccs)
+			spin_lock(&vp_daccs_lock);
+#endif
+		for (iword = 0, oword = 0; oword < 256; oword += 32, iword += chans) {
+			prefetch(&buf[iword + chans]);
+			for (x = 0x01, islot = iword, oslot = oword + 1;
+			     (cmask & ~(x - 1)) && oslot < oword + 32; oslot++, x <<= 1) {
+				if (cmask & x)	/* skip disabled channels */
+					xll[oslot] = buf[islot++];
+				else if (dmask & x)
+					islot++;
 			}
-			if (txdccs)
-				spin_unlock(&vp_daccs_lock);
 		}
+#ifdef CONFIG_SMP
+		if (vp->txdccs)
+			spin_unlock(&vp_daccs_lock);
+#endif
+
 		vp->blocks++;	/* keep track of outstanding blocks */
 		tasklet_hi_schedule(&vp->tasklet);
 	} else {

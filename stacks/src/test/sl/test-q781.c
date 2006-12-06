@@ -7503,7 +7503,7 @@ test_9_4(void)
 	n = iutconf.sl.N2 / (msu_len + h) + 1;
 	if (msu_len > iutconf.sdt.m)
 		return INCONCLUSIVE;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
 	for (;;) {
 		switch (state) {

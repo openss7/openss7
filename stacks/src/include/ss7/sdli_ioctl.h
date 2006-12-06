@@ -92,9 +92,16 @@ typedef struct sdl_config {
 #	define	SDL_TYPE_DS0A		3	/* DS0A channel */
 #	define	SDL_TYPE_E1		4	/* full E1 span */
 #	define	SDL_TYPE_T1		5	/* full T1 span */
-#	define	SDL_TYPE_ATM		6	/* ATM SSCF */
-#	define	SDL_TYPE_PACKET		7	/* other packet */
+#	define	SDL_TYPE_J1		6	/* full J1 span */
+#	define	SDL_TYPE_ATM		7	/* ATM SSCF */
+#	define	SDL_TYPE_PACKET		8	/* other packet */
 	sdl_ulong ifrate;		/* interface rate */
+#	define	SDL_RATE_NONE		0
+#	define	SDL_RATE_DS0A		56000
+#	define	SDL_RATE_DS0		64000
+#	define	SDL_RATE_T1		1544000
+#	define	SDL_RATE_J1		1544000
+#	define	SDL_RATE_E1		2048000
 	sdl_ulong ifgtype;		/* group type */
 #	define	SDL_GTYPE_NONE		0	/* */
 #	define	SDL_GTYPE_T1		1	/* */
@@ -108,6 +115,10 @@ typedef struct sdl_config {
 #	define	SDL_GTYPE_RTP		9	/* */
 #	define	SDL_GTYPE_SCTP		10	/* */
 	sdl_ulong ifgrate;		/* interface group rate */
+#	define	SDL_GRATE_NONE		0
+#	define	SDL_GRATE_T1		1544000
+#	define	SDL_GRATE_J1		1544000
+#	define	SDL_GRATE_E1		2048000
 	sdl_ulong ifmode;		/* interface mode */
 #	define	SDL_MODE_NONE		0	/* */
 #	define	SDL_MODE_DSU		1	/* */
@@ -131,6 +142,7 @@ typedef struct sdl_config {
 #	define	SDL_GCRC_CRC4		1	/* */
 #	define	SDL_GCRC_CRC5		2	/* */
 #	define	SDL_GCRC_CRC6		3	/* */
+#	define	SDL_GCRC_CRC6J		4	/* */
 	sdl_ulong ifclock;		/* interface clock */
 #	define	SDL_CLOCK_NONE		0	/* */
 #	define	SDL_CLOCK_INT		1	/* */
@@ -149,7 +161,6 @@ typedef struct sdl_config {
 #	define	SDL_CODING_AMI		3	/* */
 #	define	SDL_CODING_B6ZS		4	/* */
 #	define	SDL_CODING_B8ZS		5	/* */
-#	define	SDL_CODING_ESF		6	/* FIXME: this is actually a framing value */
 #	define	SDL_CODING_AAL1		7	/* */
 #	define	SDL_CODING_AAL2		8	/* */
 #	define	SDL_CODING_AAL5		9	/* */
@@ -159,6 +170,7 @@ typedef struct sdl_config {
 #	define	SDL_FRAMING_CCS		1	/* */
 #	define	SDL_FRAMING_CAS		2	/* */
 #	define	SDL_FRAMING_SF		3	/* */
+#	define	SDL_FRAMING_D4		SDL_FRAMING_SF
 #	define	SDL_FRAMING_ESF		4	/* */
 	sdl_ulong ifblksize;		/* interface block size */
 	volatile sdl_ulong ifleads;	/* interface leads */
@@ -175,6 +187,28 @@ typedef struct sdl_config {
 #	define	SDL_ALARM_REC		0x08	/* for E1/T1 Alarm Recovery */
 	volatile sdl_ulong ifrxlevel;	/* interface rxlevel */
 	volatile sdl_ulong iftxlevel;	/* interface txlevel */
+#	define	SDL_TXLEVEL_NONE	0
+#	define	SDL_TXLEVEL_DSX_133FT	1
+#	define	SDL_TXLEVEL_DSX_266FT	2
+#	define	SDL_TXLEVEL_DSX_399FT	3
+#	define	SDL_TXLEVEL_DSX_533FT	4
+#	define	SDL_TXLEVEL_DSX_666FT	5
+#	define	SDL_TXLEVEL_CSU_0DB	1
+#	define	SDL_TXLEVEL_CSU_8DB	6
+#	define	SDL_TXLEVEL_CSU_15DB	7
+#	define	SDL_TXLEVEL_CSU_23DB	8
+#	define	SDL_TXLEVEL_75OHM_NM	1
+#	define	SDL_TXLEVEL_120OHM_NM	2
+#	define	SDL_TXLEVEL_75OHM_PR	3
+#	define	SDL_TXLEVEL_120OHM_PR	4
+#	define	SDL_TXLEVEL_75OHM_HRL	5
+#	define	SDL_TXLEVEL_120OHM_HRL	6
+#	define	SDL_TXLEVEL_MON_0DB	9
+#	define	SDL_TXLEVEL_MON_12DB	10
+#	define	SDL_TXLEVEL_MON_20DB	11
+#	define	SDL_TXLEVEL_MON_26DB	11
+#	define	SDL_TXLEVEL_MON_30DB	11
+#	define	SDL_TXLEVEL_MON_32DB	12
 	volatile sdl_ulong ifsync;	/* current interface sync src (E1/T1) */
 	sdl_ulong ifsyncsrc[SDL_SYNCS];	/* interface sync src (E1/T1) */
 } sdl_config_t;

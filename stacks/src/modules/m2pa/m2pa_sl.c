@@ -2586,7 +2586,7 @@ sl_rb_congestion_function(queue_t *q, struct sl *sl)
 					printd(("%s:   sl->rb.q_msgs           = %12lu\n",
 						MOD_NAME, (ulong) sl->rb.q_msgs));
 					printd(("%s:   sl->sl.config.rb_discard   = %12lu\n",
-						MOD_NAME, sl->sl.config.rb_discard));
+						MOD_NAME, (ulong) sl->sl.config.rb_discard));
 					printd(("%s:   canput                  = %12s\n",
 						MOD_NAME, canput(sl->oq) ? "YES" : "NO"));
 					sl->sl.stats.sl_sibs_sent++;
@@ -2603,7 +2603,7 @@ sl_rb_congestion_function(queue_t *q, struct sl *sl)
 						printd(("%s: %p: Receive congestion: congestion accept\n", MOD_NAME, sl));
 						printd(("%s:   sl->rb.q_msgs           = %12lu\n",
 							MOD_NAME, (ulong) sl->rb.q_msgs));
-						printd(("%s:   sl->sl.config.rb_accept    = %12lu\n", MOD_NAME, sl->sl.config.rb_accept));
+						printd(("%s:   sl->sl.config.rb_accept    = %12lu\n", MOD_NAME, (ulong) sl->sl.config.rb_accept));
 						printd(("%s:   cantputnext?            = %12s\n",
 							MOD_NAME,
 							canputnext(sl->oq) ? "YES" : "NO"));
@@ -3946,7 +3946,7 @@ sl_check_congestion(queue_t *q, struct sl *sl)
 							   sizeof(sl->sl.statem.cong_status))) < 0)
 						return (err);
 				ptrace(("%s: %p: Congestion onset: level %ld\n", MOD_NAME,
-					sl, sl->sl.statem.cong_status));
+					sl, (long) sl->sl.statem.cong_status));
 			} else {
 				if (sl->sl.notify.events & SL_EVT_CONGEST_DISCD_IND
 				    && !sl->sl.stats.sl_cong_discd_ind[sl->sl.statem.disc_status]++)
@@ -3956,7 +3956,7 @@ sl_check_congestion(queue_t *q, struct sl *sl)
 							   sizeof(sl->sl.statem.disc_status))) < 0)
 						return (err);
 				ptrace(("%s: %p: Congestion discard: level %ld\n", MOD_NAME,
-					sl, sl->sl.statem.cong_status));
+					sl, (long) sl->sl.statem.cong_status));
 			}
 			sl_link_congested_ind(q, sl, sl->sl.statem.cong_status,
 					      sl->sl.statem.disc_status);

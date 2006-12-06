@@ -177,13 +177,20 @@ pkglibexec_PROGRAMS		= \
 				  test-x400p
 
 sbin_PROGRAMS			= \
-				  @PACKAGE_TARNAME@_mknod
+				  @PACKAGE_TARNAME@_mknod \
+				  sdlconfig
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+sdlconfig_SOURCES		= src/util/sdlconf.c
+sdlconfig_LDADD			= $(STREAMS_LDADD)
+sdlconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
+sdlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+sdlconfig_CFLAGS		= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDADD			= $(STREAMS_LDADD)
@@ -327,6 +334,8 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/ss7sctp/sdl_sctp.c \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
+				  src/modules/x400p-ss7/sl_x400p.c \
+				  src/modules/x400p-ss7/sl_x100p.c \
 				  src/modules/x400p-ss7/x400pfw.h \
 				  config.h strconf.h
 
@@ -457,13 +466,20 @@ pkglibexec_PROGRAMS		= \
 				  test-x400p-sl
 
 sbin_PROGRAMS			= \
-				  @PACKAGE_TARNAME@_mknod
+				  @PACKAGE_TARNAME@_mknod \
+				  sdlconfig
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+sdlconfig_SOURCES		= src/util/sdlconf.c
+sdlconfig_LDADD			= $(STREAMS_LDADD)
+sdlconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
+sdlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+sdlconfig_CFLAGS		= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDADD			= $(STREAMS_LDADD)

@@ -446,7 +446,7 @@ typedef struct MX_disconnect_con {
 typedef struct MX_event_ind {
 	ch_ulong ch_primitive;		/* always MX_EVENT_IND */
 	ch_ulong ch_event;		/* event */
-	ch_ulong ch_slot;		/* slot within channel for event */
+	ch_ulong ch_slot;		/* slot within multiplex for event */
 } MX_event_ind_t;
 
 #define MX_EVT_DCD_ASSERT		 0

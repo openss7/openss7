@@ -1312,7 +1312,7 @@ spm_rx_wakeup(queue_t *q)
 STATIC streamscall int
 spm_rput(queue_t *q, mblk_t *mp)
 {
-	return (int) ss7_putq(q, mp, &spm_r_prim);
+	return (int) ss7_putq(q, mp, &spm_r_prim, &spm_rx_wakeup);
 }
 STATIC streamscall int
 spm_rsrv(queue_t *q)
@@ -1326,7 +1326,7 @@ spm_tx_wakeup(queue_t *q)
 STATIC streamscall int
 spm_wput(queue_t *q, mblk_t *mp)
 {
-	return (int) ss7_putq(q, mp, &spm_w_prim);
+	return (int) ss7_putq(q, mp, &spm_w_prim, &spm_tx_wakeup);
 }
 STATIC streamscall int
 spm_wsrv(queue_t *q)

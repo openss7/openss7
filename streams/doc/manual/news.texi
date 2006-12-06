@@ -85,6 +85,10 @@ The sections that follow provide information on OpenSS7 releases of the
 
 @itemize
 @item
+Testing of, and a few bug corrections to, the strlog() feature.  Trace and
+error logging working well.
+
+@item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
 
