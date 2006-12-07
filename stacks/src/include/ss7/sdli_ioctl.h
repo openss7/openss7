@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdli_ioctl.h,v 0.9.2.6 2006/12/06 11:45:15 brian Exp $
+ @(#) $Id: sdli_ioctl.h,v 0.9.2.7 2006/12/07 12:56:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:45:15 $ by $Author: brian $
+ Last Modified $Date: 2006/12/07 12:56:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SDLI_IOCTL_H__
 #define __SDLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -170,8 +170,8 @@ typedef struct sdl_config {
 #	define	SDL_FRAMING_CCS		1	/* */
 #	define	SDL_FRAMING_CAS		2	/* */
 #	define	SDL_FRAMING_SF		3	/* */
-#	define	SDL_FRAMING_D4		SDL_FRAMING_SF
 #	define	SDL_FRAMING_ESF		4	/* */
+#	define	SDL_FRAMING_D4		SDL_FRAMING_SF
 	sdl_ulong ifblksize;		/* interface block size */
 	volatile sdl_ulong ifleads;	/* interface leads */
 #	define	SDL_LEAD_DTR		0x01	/* for V.35 DTR lead set or clr */

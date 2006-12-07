@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/07 09:58:39 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/07 12:56:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/07 09:58:39 $ by $Author: brian $
+ Last Modified $Date: 2006/12/07 12:56:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.21  2006/12/07 12:56:17  brian
+ - corrections from testing
+
  Revision 0.9.2.20  2006/12/07 09:58:39  brian
  - corrections and init scripts
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/07 09:58:39 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/07 12:56:17 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/07 09:58:39 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/07 12:56:17 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -117,7 +120,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/07 09:58:39 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/07 12:56:17 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -141,6 +144,9 @@ MODULE_LICENSE(SL_X400P_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sl_x400p");
 #endif
+#if defined MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -150,6 +156,21 @@ MODULE_ALIAS("streams-sl_x400p");
 #define SL_X400P_CMAJOR_0	CONFIG_STREAMS_SL_X400P_MAJOR
 #define SL_X400P_UNITS		CONFIG_STREAMS_SL_X400P_NMINORS
 #endif
+
+#ifdef LINUX
+#ifdef MODULE_ALIAS
+#ifdef LFS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SL_X400P_MODID));
+MODULE_ALIAS("streams-driver-sl-x400p");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SL_X400P_MAJOR));
+MODULE_ALIAS("/dev/streams/x400p-sl");
+#endif				/* LFS */
+MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0) "-0");
+MODULE_ALIAS("/dev/x400p-sl");
+#endif				/* MODULE_ALIAS */
+#endif				/* LINUX */
 
 /*
  *  =======================================================================
@@ -488,15 +509,28 @@ STATIC struct {
 /* *INDENT-ON* */
 
 STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
-	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, 0, 0, PLX9030},
-	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, 0, 0, PLXDEVBRD},
-	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, X400P},
-	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, 0, 0, X400PSS7},
-	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, 0, 0, V400P},
-	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, V401PT},
-	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, V401PE},
+	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLX9030},
+	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLXDEVBRD},
+	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400P},
+	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400PSS7},
+	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V400P},
+	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PT},
+	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
 	{0,}
 };
+
+#ifdef MODULE_DEVICE_TABLE
+MODULE_DEVICE_TABLE(pci, xp_pci_tbl);
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("pci:v000010B5d000009030sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000003001sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D00Dsv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000000557sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000004000sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D33Dsv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd*bc06sc80i*");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE_DEVICE_TABLE */
 
 STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
 STATIC void __devexit xp_remove(struct pci_dev *);
@@ -8104,6 +8138,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 	spin_lock_irqsave(&xp->lock, flags);
 	do {
 		if (arg->ifflags) {
+			trace();
 			ret = -EINVAL;
 			break;
 		}
@@ -8117,12 +8152,14 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 			break;
 		case SDL_TYPE_E1:	/* full E1 span */
 			if (xp->sp->config.ifgtype != SDL_GTYPE_E1) {
+				trace();
 				ret = (-EINVAL);
 				break;
 			}
 			break;
 		case SDL_TYPE_T1:	/* full T1 span */
 			if (xp->sp->config.ifgtype != SDL_GTYPE_T1) {
+				trace();
 				ret = (-EINVAL);
 				break;
 			}
@@ -8130,11 +8167,13 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 		case SDL_TYPE_J1:	/* full J1 span */
 			if (xp->sp->config.ifgtype != SDL_GTYPE_T1 &&
 			    xp->sp->config.ifgtype != SDL_GTYPE_J1) {
-				return (-EINVAL);
+				trace();
+				ret = (-EINVAL);
 				break;
 			}
 			break;
 		default:
+			trace();
 			ret = (-EINVAL);
 			break;
 		}
@@ -8153,6 +8192,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 		case SDL_MODE_TEST:	/* */
 			break;
 		default:
+			trace();
 			ret = (-EINVAL);
 			break;
 		}
@@ -8162,6 +8202,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 			break;
 		case SDL_GMODE_REM_LB:
 		default:
+			trace();
 			ret = (-EINVAL);
 			break;
 		}
@@ -8176,11 +8217,13 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 			case SDL_GTYPE_T1:	/* */
 			case SDL_GTYPE_J1:	/* */
 				if (arg->ifgtype != xp->sp->config.ifgtype) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			default:
+				trace();
 				ret = (-EINVAL);
 				break;
 			}
@@ -8199,35 +8242,41 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 					arg->ifgcrc = SDL_GCRC_CRC6J;
 					break;
 				default:
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			case SDL_GCRC_CRC4:	/* */
 				if (arg->ifgtype != SDL_GTYPE_E1) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			case SDL_GCRC_CRC5:	/* */
 				if (arg->ifgtype != SDL_GTYPE_E1) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			case SDL_GCRC_CRC6:	/* */
 				if (arg->ifgtype != SDL_GTYPE_T1) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			case SDL_GCRC_CRC6J:
 				if (arg->ifgtype != SDL_GTYPE_J1) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			default:
+				trace();
 				ret = (-EINVAL);
 				break;
 			}
@@ -8248,6 +8297,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 			case SDL_CLOCK_LOOP:	/* */
 				break;
 			default:
+				trace();
 				ret = (-EINVAL);
 				break;
 			}
@@ -8261,18 +8311,21 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 				break;
 			case SDL_CODING_B8ZS:	/* */
 				if (arg->ifgtype != SDL_GTYPE_T1 || arg->ifgtype != SDL_GTYPE_J1) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			case SDL_CODING_HDB3:	/* */
 				if (arg->ifgtype != SDL_GTYPE_E1) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			default:
 			case SDL_CODING_B6ZS:	/* */
+				trace();
 				ret = (-EINVAL);
 				break;
 			}
@@ -8285,6 +8338,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 			case SDL_FRAMING_CCS:	/* */
 			case SDL_FRAMING_CAS:	/* */
 				if (arg->ifgtype != SDL_GTYPE_E1) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
@@ -8292,11 +8346,13 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 			case SDL_FRAMING_SF:	/* */
 			case SDL_FRAMING_ESF:	/* */
 				if (arg->ifgtype != SDL_GTYPE_T1 || arg->ifgtype != SDL_GTYPE_J1) {
+					trace();
 					ret = (-EINVAL);
 					break;
 				}
 				break;
 			default:
+				trace();
 				ret = (-EINVAL);
 				break;
 			}
@@ -8306,8 +8362,10 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 				arg->iftxlevel = xp->sp->config.iftxlevel;
 			else if (arg->iftxlevel <= 16)
 				arg->iftxlevel--;
-			else
+			else {
+				trace();
 				ret = (-EINVAL);
+			}
 			if (ret)
 				break;
 			if (xp->sp->cd) {
@@ -8315,16 +8373,19 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 
 				for (src = 0; src < SDL_SYNCS; src++)
 					if (arg->ifsyncsrc[src] < 0 || arg->ifsyncsrc[src] > 4) {
+						trace();
 						ret = (-EINVAL);
 						break;
 					}
 				if (ret)
 					break;
 			} else {
+				trace();
 				ret = (-EFAULT);
 				break;
 			}
 		} else {
+			trace();
 			ret = (-EFAULT);
 			break;
 		}
@@ -11163,8 +11224,11 @@ xp_free_priv(struct xp *xp)
 			xp->prev = &xp->next;
 			xp_put(xp);
 		}
+		xp_put(xchg(&xp->oq->q_ptr, NULL));
+		xp_put(xchg(&xp->iq->q_ptr, NULL));
 	}
 	spin_unlock(&xp->lock);
+	assure(atomic_read(&xp->refcnt) == 1);
 	xp_put(xp);		/* final put */
 }
 
@@ -11197,7 +11261,7 @@ xp_alloc_sp(struct cd *cd, uint8_t span)
 	if ((sp = kmem_cache_alloc(xp_span_cachep, SLAB_ATOMIC))) {
 		printd(("%s: allocated span private structure\n", DRV_NAME));
 		bzero(sp, sizeof(*sp));
-		cd_get(cd);	/* first get */
+		sp_get(sp);	/* first get */
 		spin_lock_init(&sp->lock);	/* "sp-priv-lock" */
 		/* create linkage */
 		cd->spans[span] = sp_get(sp);
@@ -11243,6 +11307,8 @@ xp_free_sp(struct sp *sp)
 		printd(("%s: unlinked span private structure from slots\n", DRV_NAME));
 	} else
 		ptrace(("%s: ERROR: spans cannot exist without cards\n", DRV_NAME));
+	assure(atomic_read(&sp->refcnt) == 1);
+	sp_put(sp); /* final put */
 }
 STATIC struct sp *
 sp_get(struct sp *sp)
@@ -11335,6 +11401,7 @@ xp_free_cd(struct cd *cd)
 		printd(("%s: unlinked card private structure\n", DRV_NAME));
 	}
 	spin_unlock_irqrestore(&cd->lock, flags);
+	assure(atomic_read(&cd->refcnt) == 1);
 	cd_put(cd);		/* final put */
 }
 STATIC struct cd *
@@ -11633,8 +11700,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	case XP_DEV_DS2155:
 		switch (board) {
 		case V401PE:
+			cd->board = V401PE;
 			break;
 		case V401PT:
+			cd->board = V401PT;
 			break;
 		default:
 			cd->board = -1;
@@ -11716,6 +11785,9 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->isr = &xp_t401_interrupt;
 #endif
 		break;
+	default:
+		swerr();
+		goto error_remove;
 	}
 	if (request_irq(dev->irq, cd->isr, SA_INTERRUPT | SA_SHIRQ, DRV_NAME, cd)) {
 		ptrace(("%s: ERROR: Unable to request IRQ %d\n", DRV_NAME, dev->irq));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:21 $
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/07 12:56:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:36:21 $ by $Author: brian $
+ Last Modified $Date: 2006/12/07 12:56:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:21 $"
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/07 12:56:20 $"
 
 static char const ident[] =
-    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:36:21 $";
+    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/07 12:56:20 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -164,8 +164,8 @@ static struct key_val framing_names[] = {
 	{"ccs", SDL_FRAMING_CCS},
 	{"cas", SDL_FRAMING_CAS},
 	{"d4", SDL_FRAMING_D4},
-	{"sf", SDL_FRAMING_SF},
-	{"esf", SDL_FRAMING_ESF}
+	{"esf", SDL_FRAMING_ESF},
+	{"sf", SDL_FRAMING_SF}
 };
 static struct key_val rate_names[] = {
 	{"default", SDL_RATE_NONE},

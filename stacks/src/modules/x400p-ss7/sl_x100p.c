@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/12/06 11:45:21 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/07 12:56:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:45:21 $ by $Author: brian $
+ Last Modified $Date: 2006/12/07 12:56:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x100p.c,v $
+ Revision 0.9.2.17  2006/12/07 12:56:16  brian
+ - corrections from testing
+
  Revision 0.9.2.16  2006/12/06 11:45:21  brian
  - updated X400P driver and test suites
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/12/06 11:45:21 $"
+#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/07 12:56:16 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/12/06 11:45:21 $";
+    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/07 12:56:16 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -102,7 +105,7 @@ static char const ident[] =
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2006/12/06 11:45:21 $"
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2006/12/07 12:56:16 $"
 #define SL_X100P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -124,7 +127,7 @@ MODULE_SUPPORTED_DEVICE(SL_X100P_DEVICE);
 MODULE_LICENSE(SL_X100P_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
-MODULE_ALIAS("streams-sl_x400p");
+MODULE_ALIAS("streams-sl_x100p");
 #endif
 #endif				/* LINUX */
 
