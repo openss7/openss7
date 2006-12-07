@@ -8,6 +8,7 @@
 	* src/util/sysconfig/README: added init scripts
 	* src/util/sysconfig/strss7: added init scripts
 	* src/util/sysconfig/strss7.conf: added init scripts
+	* Makefile.am: added init scripts
 
 2006-12-06  Brian Bidulock  <bidulock@openss7.org>
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2006/12/06 11:45:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2006/12/07 10:04:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/06 11:45:13 $ by $Author: brian $
+# Last Modified $Date: 2006/12/07 10:04:34 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.79  2006/12/07 10:04:34  brian
+# - added init scripts to master makefile
+#
 # Revision 0.9.2.78  2006/12/06 11:45:13  brian
 # - updated X400P driver and test suites
 #
@@ -1247,20 +1250,20 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		=
+dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf
 
-dist_config_DATA		=
+dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 
 ## INSTALL_INITSCRIPTS
 endif
