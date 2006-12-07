@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/06 11:45:22 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/07 09:58:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:45:22 $ by $Author: brian $
+ Last Modified $Date: 2006/12/07 09:58:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.20  2006/12/07 09:58:39  brian
+ - corrections and init scripts
+
  Revision 0.9.2.19  2006/12/06 11:45:22  brian
  - updated X400P driver and test suites
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/06 11:45:22 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/07 09:58:39 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/06 11:45:22 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/07 09:58:39 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -78,7 +81,9 @@ static char const ident[] =
  *  complete SS7 MTP Level 2 OpenSS7 implementation.
  */
 
-#define X400P_DOWNLOAD_FIRMWARE
+#define _DEBUG 1
+#define _LFS_SOURCE 1
+#define X400P_DOWNLOAD_FIRMWARE 1
 
 #include <sys/os7/compat.h>
 
@@ -112,7 +117,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/06 11:45:22 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/07 09:58:39 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6818,7 +6823,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 #ifdef _DEBUG
 	if (cd->config.ifgtype != SDL_GTYPE_E1 && cd->config.ifgtype != SDL_GTYPE_T1
 	    && cd->config.ifgtype != SDL_GTYPE_J1) {
-		ptrace(("%s: ERROR: card group type = %lu\n", DRV_NAME, cd->config.ifgtype));
+		ptrace(("%s: ERROR: card group type = %u\n", DRV_NAME, cd->config.ifgtype));
 		return m_error(q, xp, EFAULT);
 	}
 #endif
@@ -11086,13 +11091,17 @@ xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 	return (xp);
 }
 
+/**
+ * xp_free_priv: - free a Stream private structure
+ * @xp: private structure to free
+ *
+ * Note: this function must be called with CPU local interrupts already supressed.
+ */
 STATIC void
 xp_free_priv(struct xp *xp)
 {
-	psw_t flags = 0;
-
 	ensure(xp, return);
-	spin_lock_irqsave(&xp->lock, flags);
+	spin_lock(&xp->lock);
 	{
 		struct sp *sp;
 
@@ -11130,7 +11139,7 @@ xp_free_priv(struct xp *xp)
 			printd(("%s: unlinked device private structure from span\n", DRV_NAME));
 		}
 		ss7_unbufcall((str_t *) xp);
-		xp_timer_stop(xp, tall);
+		__xp_timer_stop(xp, tall);
 		if (xp->tx.msg && xp->tx.msg != xp->tx.cmp)
 			freemsg(xchg(&xp->tx.msg, NULL));
 		if (xp->tx.cmp)
@@ -11155,7 +11164,7 @@ xp_free_priv(struct xp *xp)
 			xp_put(xp);
 		}
 	}
-	spin_unlock_irqrestore(&xp->lock, flags);
+	spin_unlock(&xp->lock);
 	xp_put(xp);		/* final put */
 }
 
