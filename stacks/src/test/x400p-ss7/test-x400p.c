@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/08 05:32:11 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:45:33 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:32:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.9  2006/12/08 05:32:11  brian
+ - changes from testing of X400P-SS7 driver
+
  Revision 0.9.2.8  2006/12/06 11:45:33  brian
  - updated X400P driver and test suites
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/08 05:32:11 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:33 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/08 05:32:11 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -476,20 +479,20 @@ struct test_config {
 		    .ifflags = 0,	/* */
 		    .iftype = SDL_TYPE_DS0,	/* */
 		    .ifrate = 64000,	/* */
-		    .ifgtype = SDL_GTYPE_E1,	/* */
-		    .ifgrate = 2048000,	/* */
+		    .ifgtype = SDL_GTYPE_T1,	/* */
+		    .ifgrate = 0,	/* */
 		    .ifmode = SDL_MODE_NONE,	/* */
 		    .ifgmode = SDL_GMODE_NONE,	/* */
-		    .ifgcrc = SDL_GCRC_CRC4,	/* */
+		    .ifgcrc = SDL_GCRC_CRC6,	/* */
 		    .ifclock = SDL_CLOCK_NONE,	/* */
-		    .ifcoding = SDL_CODING_HDB3,	/* */
-		    .ifframing = SDL_FRAMING_CCS,	/* */
+		    .ifcoding = SDL_CODING_B8ZS,	/* */
+		    .ifframing = SDL_FRAMING_ESF,	/* */
 		    .ifblksize = 0,	/* */
 		    .ifleads = 0,	/* */
 		    .ifbpv = 0,	/* */
 		    .ifalarms = 0,	/* */
 		    .ifrxlevel = 0,	/* */
-		    .iftxlevel = 1,	/* */
+		    .iftxlevel = 0,	/* */
 		    .ifsync = 0,	/* */
 	},			/* sdl */
 	{
@@ -5344,8 +5347,6 @@ do_signal(int child, int action)
 		p->sdt.daedt_transmission_req.sdt_primitive = SDT_DAEDT_TRANSMISSION_REQ;
 		return test_putmsg(child, ctrl, data, 0);
 #endif
-	case __TEST_POWER_ON:
-
 	case __TEST_WRITE:
 		data->len = snprintf(dbuf, BUFSIZE, "%s", "Write test data.");
 		return test_write(child, dbuf, data->len);
@@ -5829,15 +5830,23 @@ do_signal(int child, int action)
  */
 
 	case __TEST_POWER_ON:
-		ctrl->len = sizeof(p->sl.power_on_req);
-		p->sl.power_on_req.sl_primitive = SL_POWER_ON_REQ;
-		data = NULL;
-		test_pflags = MSG_HIPRI;
-		test_pband = 0;
+		if (child == CHILD_PTU) {
+			ctrl->len = sizeof(p->sdt.daedt_start_req);
+			p->sdt.daedt_start_req.sdt_primitive = SDT_DAEDT_START_REQ;
+			data = NULL;
+			test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+			ctrl->len = sizeof(p->sdt.daedr_start_req);
+			p->sdt.daedr_start_req.sdt_primitive = SDT_DAEDR_START_REQ;
+			data = NULL;
+		} else {
+			ctrl->len = sizeof(p->sl.power_on_req);
+			p->sl.power_on_req.sl_primitive = SL_POWER_ON_REQ;
+			data = NULL;
+			test_pflags = MSG_HIPRI;
+			test_pband = 0;
+		}
 		print_command_state(child, ":power on");
-		if (child == 1)
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		return __RESULT_SUCCESS;
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_START:
 		ctrl->len = sizeof(p->sl.start_req);
 		p->sl.start_req.sl_primitive = SL_START_REQ;
@@ -5845,7 +5854,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":start");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_STOP:
@@ -5855,7 +5864,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":stop");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_LPO:
@@ -5865,7 +5874,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":set lpo");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_LPR:
@@ -5875,7 +5884,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":clear lpo");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_CONG_A:
@@ -5885,7 +5894,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":make congested");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_CONG_D:
@@ -5895,7 +5904,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":make congested");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_NO_CONG:
@@ -5905,7 +5914,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":clear congested");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_EMERG:
@@ -5915,7 +5924,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":set emerg");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_CEASE:
@@ -5925,7 +5934,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":clear emerg");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_CLEARB:
@@ -5935,7 +5944,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_command_state(child, ":clear buffers");
-		if (child == 1)
+		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 
@@ -7527,9 +7536,6 @@ preamble_attach(int child)
 {
 	int failed = 0;
 
-	if (preamble_config(child))
-		goto failure;
-	state++;
 	{
 		ADDR_buffer = addrs[child];
 		ADDR_length = anums[child] * sizeof(addrs[child][0]);
@@ -7539,6 +7545,9 @@ preamble_attach(int child)
 		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
 			failed = failed ? : state;
 	}
+	state++;
+	if (preamble_config(child))
+		goto failure;
 #if 0
 	if (child == CHILD_PTU) {
 		return preamble_bind(child);

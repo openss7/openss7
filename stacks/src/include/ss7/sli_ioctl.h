@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sli_ioctl.h,v 0.9.2.5 2006/10/31 21:04:37 brian Exp $
+ @(#) $Id: sli_ioctl.h,v 0.9.2.6 2006/12/08 05:32:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:37 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:32:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SLI_IOCTL_H__
 #define __SLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -89,6 +89,17 @@
  *  CONFIGURATION
  */
 #ifdef __KERNEL__
+#ifdef _MPS_SOURCE
+typedef struct sl_timers {
+	mblk_t *t1;			/* T1 timer */
+	mblk_t *t2;			/* T2 timer */
+	mblk_t *t3;			/* T3 timer */
+	mblk_t *t4;			/* T4 timer */
+	mblk_t *t5;			/* T5 timer */
+	mblk_t *t6;			/* T6 timer */
+	mblk_t *t7;			/* T7 timer */
+} sl_timers_t;
+#else				/* _MPS_SOURCE */
 typedef struct sl_timers {
 	toid_t t1;			/* T1 timer */
 	toid_t t2;			/* T2 timer */
@@ -98,7 +109,8 @@ typedef struct sl_timers {
 	toid_t t6;			/* T6 timer */
 	toid_t t7;			/* T7 timer */
 } sl_timers_t;
-#endif
+#endif				/* _MPS_SOURCE */
+#endif				/* __KERNEL__ */
 
 typedef struct sl_config {
 	sl_ulong t1;			/* timer t1 duration (milliseconds) */

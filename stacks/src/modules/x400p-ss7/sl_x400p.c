@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/07 12:56:17 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/08 05:32:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/07 12:56:17 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:32:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.22  2006/12/08 05:32:09  brian
+ - changes from testing of X400P-SS7 driver
+
  Revision 0.9.2.21  2006/12/07 12:56:17  brian
  - corrections from testing
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/07 12:56:17 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/08 05:32:09 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/07 12:56:17 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/08 05:32:09 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -85,7 +88,11 @@ static char const ident[] =
  */
 
 #define _DEBUG 1
-#define _LFS_SOURCE 1
+
+#define _LFS_SOURCE	1
+#define _MPS_SOURCE	1
+#define _SVR4_SOURCE	1
+
 #define X400P_DOWNLOAD_FIRMWARE 1
 
 #include <sys/os7/compat.h>
@@ -120,7 +127,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/07 12:56:17 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/08 05:32:09 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -571,7 +578,7 @@ STATIC struct cd *x400p_cards;
  *  -----------------------------------
  */
 STATIC int
-m_error(queue_t *q, struct xp *xp, int err)
+m_error(struct xp *xp, queue_t *q, int err)
 {
 	mblk_t *mp;
 
@@ -592,7 +599,7 @@ m_error(queue_t *q, struct xp *xp, int err)
  *  We don't actually use SL_PDU_INDs, we pass along M_DATA messages.
  */
 STATIC INLINE int
-sl_pdu_ind(queue_t *q, struct xp *xp, mblk_t *dp)
+sl_pdu_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
 	sl_pdu_ind_t *p;
@@ -615,7 +622,7 @@ sl_pdu_ind(queue_t *q, struct xp *xp, mblk_t *dp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_link_congested_ind(queue_t *q, struct xp *xp, ulong cong, ulong disc)
+sl_link_congested_ind(struct xp *xp, queue_t *q, ulong cong, ulong disc)
 {
 	mblk_t *mp;
 	sl_link_cong_ind_t *p;
@@ -639,7 +646,7 @@ sl_link_congested_ind(queue_t *q, struct xp *xp, ulong cong, ulong disc)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_link_congestion_ceased_ind(queue_t *q, struct xp *xp, ulong cong, ulong disc)
+sl_link_congestion_ceased_ind(struct xp *xp, queue_t *q, ulong cong, ulong disc)
 {
 	mblk_t *mp;
 	sl_link_cong_ceased_ind_t *p;
@@ -664,7 +671,7 @@ sl_link_congestion_ceased_ind(queue_t *q, struct xp *xp, ulong cong, ulong disc)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_retrieved_message_ind(queue_t *q, struct xp *xp, mblk_t *dp)
+sl_retrieved_message_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
 	sl_retrieved_msg_ind_t *p;
@@ -687,7 +694,7 @@ sl_retrieved_message_ind(queue_t *q, struct xp *xp, mblk_t *dp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_retrieval_complete_ind(queue_t *q, struct xp *xp)
+sl_retrieval_complete_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sl_retrieval_comp_ind_t *p;
@@ -709,7 +716,7 @@ sl_retrieval_complete_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_rb_cleared_ind(queue_t *q, struct xp *xp)
+sl_rb_cleared_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sl_rb_cleared_ind_t *p;
@@ -731,7 +738,7 @@ sl_rb_cleared_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_bsnt_ind(queue_t *q, struct xp *xp, ulong bsnt)
+sl_bsnt_ind(struct xp *xp, queue_t *q, ulong bsnt)
 {
 	mblk_t *mp;
 	sl_bsnt_ind_t *p;
@@ -754,7 +761,7 @@ sl_bsnt_ind(queue_t *q, struct xp *xp, ulong bsnt)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_in_service_ind(queue_t *q, struct xp *xp)
+sl_in_service_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sl_in_service_ind_t *p;
@@ -776,7 +783,7 @@ sl_in_service_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_out_of_service_ind(queue_t *q, struct xp *xp, ulong reason)
+sl_out_of_service_ind(struct xp *xp, queue_t *q, ulong reason)
 {
 	mblk_t *mp;
 	sl_out_of_service_ind_t *p;
@@ -800,7 +807,7 @@ sl_out_of_service_ind(queue_t *q, struct xp *xp, ulong reason)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_remote_processor_outage_ind(queue_t *q, struct xp *xp)
+sl_remote_processor_outage_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sl_rem_proc_out_ind_t *p;
@@ -823,7 +830,7 @@ sl_remote_processor_outage_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_remote_processor_recovered_ind(queue_t *q, struct xp *xp)
+sl_remote_processor_recovered_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sl_rem_proc_recovered_ind_t *p;
@@ -846,7 +853,7 @@ sl_remote_processor_recovered_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_rtb_cleared_ind(queue_t *q, struct xp *xp)
+sl_rtb_cleared_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sl_rtb_cleared_ind_t *p;
@@ -868,7 +875,7 @@ sl_rtb_cleared_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_retrieval_not_possible_ind(queue_t *q, struct xp *xp)
+sl_retrieval_not_possible_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sl_retrieval_not_poss_ind_t *p;
@@ -890,7 +897,7 @@ sl_retrieval_not_possible_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_bsnt_not_retrievable_ind(queue_t *q, struct xp *xp, ulong bsnt)
+sl_bsnt_not_retrievable_ind(struct xp *xp, queue_t *q, ulong bsnt)
 {
 	mblk_t *mp;
 	sl_bsnt_not_retr_ind_t *p;
@@ -914,7 +921,7 @@ sl_bsnt_not_retrievable_ind(queue_t *q, struct xp *xp, ulong bsnt)
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_optmgmt_ack(queue_t *q, struct xp *xp, caddr_t opt_ptr, size_t opt_len, ulong flags)
+sl_optmgmt_ack(struct xp *xp, queue_t *q, caddr_t opt_ptr, size_t opt_len, ulong flags)
 {
 	mblk_t *mp;
 	sl_optmgmt_ack_t *p;
@@ -941,7 +948,7 @@ sl_optmgmt_ack(queue_t *q, struct xp *xp, caddr_t opt_ptr, size_t opt_len, ulong
  *  -----------------------------------
  */
 STATIC INLINE int
-sl_notify_ind(queue_t *q, struct xp *xp)
+sl_notify_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sl_notify_ind_t *p;
@@ -964,7 +971,7 @@ sl_notify_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_info_ack(queue_t *q, struct xp *xp, caddr_t ppa_ptr, size_t ppa_len)
+lmi_info_ack(struct xp *xp, queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_info_ack_t *p;
@@ -1000,7 +1007,7 @@ lmi_info_ack(queue_t *q, struct xp *xp, caddr_t ppa_ptr, size_t ppa_len)
  *  Can't user buffer service.
  */
 STATIC INLINE int
-sdt_rc_signal_unit_ind(queue_t *q, struct xp *xp, mblk_t *dp, ulong count)
+sdt_rc_signal_unit_ind(struct xp *xp, queue_t *q, mblk_t *dp, ulong count)
 {
 	if (count) {
 		if (canputnext(xp->oq)) {
@@ -1036,7 +1043,7 @@ sdt_rc_signal_unit_ind(queue_t *q, struct xp *xp, mblk_t *dp, ulong count)
  *  -----------------------------------
  */
 STATIC INLINE int
-sdt_rc_congestion_accept_ind(queue_t *q, struct xp *xp)
+sdt_rc_congestion_accept_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sdt_rc_congestion_accept_ind_t *p;
@@ -1058,7 +1065,7 @@ sdt_rc_congestion_accept_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sdt_rc_congestion_discard_ind(queue_t *q, struct xp *xp)
+sdt_rc_congestion_discard_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sdt_rc_congestion_discard_ind_t *p;
@@ -1080,7 +1087,7 @@ sdt_rc_congestion_discard_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sdt_rc_no_congestion_ind(queue_t *q, struct xp *xp)
+sdt_rc_no_congestion_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sdt_rc_no_congestion_ind_t *p;
@@ -1102,7 +1109,7 @@ sdt_rc_no_congestion_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sdt_iac_correct_su_ind(queue_t *q, struct xp *xp)
+sdt_iac_correct_su_ind(struct xp *xp, queue_t *q)
 {
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
@@ -1128,7 +1135,7 @@ sdt_iac_correct_su_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sdt_iac_abort_proving_ind(queue_t *q, struct xp *xp)
+sdt_iac_abort_proving_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sdt_iac_abort_proving_ind_t *p;
@@ -1150,7 +1157,7 @@ sdt_iac_abort_proving_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sdt_lsc_link_failure_ind(queue_t *q, struct xp *xp)
+sdt_lsc_link_failure_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sdt_lsc_link_failure_ind_t *p;
@@ -1172,7 +1179,7 @@ sdt_lsc_link_failure_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sdt_txc_transmission_request_ind(queue_t *q, struct xp *xp)
+sdt_txc_transmission_request_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sdt_txc_transmission_request_ind_t *p;
@@ -1196,7 +1203,7 @@ sdt_txc_transmission_request_ind(queue_t *q, struct xp *xp)
  *  driver.
  */
 STATIC INLINE int
-sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
+sdl_received_bits_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 {
 	if (canputnext(xp->oq)) {
 		ss7_oput(xp->oq, dp);
@@ -1212,7 +1219,7 @@ sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
  *  -----------------------------------
  */
 STATIC INLINE int
-sdl_disconnect_ind(queue_t *q, struct xp *xp)
+sdl_disconnect_ind(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	sdl_disconnect_ind_t *p;
@@ -1235,7 +1242,7 @@ sdl_disconnect_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_ok_ack(queue_t *q, struct xp *xp, ulong state, long prim)
+lmi_ok_ack(struct xp *xp, queue_t *q, ulong state, long prim)
 {
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
@@ -1259,7 +1266,7 @@ lmi_ok_ack(queue_t *q, struct xp *xp, ulong state, long prim)
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_error_ack(queue_t *q, struct xp *xp, ulong state, long prim, ulong errno, ulong reason)
+lmi_error_ack(struct xp *xp, queue_t *q, ulong state, long prim, ulong errno, ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
@@ -1285,7 +1292,7 @@ lmi_error_ack(queue_t *q, struct xp *xp, ulong state, long prim, ulong errno, ul
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_enable_con(queue_t *q, struct xp *xp)
+lmi_enable_con(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
@@ -1308,7 +1315,7 @@ lmi_enable_con(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_disable_con(queue_t *q, struct xp *xp)
+lmi_disable_con(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
@@ -1331,7 +1338,7 @@ lmi_disable_con(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t opt_len)
+lmi_optmgmt_ack(struct xp *xp, queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
@@ -1356,7 +1363,7 @@ lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t 
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
+lmi_error_ind(struct xp *xp, queue_t *q, ulong errno, ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
@@ -1381,7 +1388,7 @@ lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
+lmi_stats_ind(struct xp *xp, queue_t *q, ulong interval)
 {
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
@@ -1409,7 +1416,7 @@ lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
  *  -----------------------------------
  */
 STATIC INLINE int
-lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
+lmi_event_ind(struct xp *xp, queue_t *q, ulong oid, ulong level)
 {
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
@@ -1794,6 +1801,100 @@ STATIC sdl_config_t sdl_default_j1_chan = {
  */
 enum { tall, t1, t2, t3, t4, t5, t6, t7, t8, t9 };
 
+#ifdef _MPS_SOURCE
+static void
+xp_stop_timer_t1(struct xp *xp)
+{
+	mi_timer_stop(xp->sl.timers.t1);
+}
+static void
+xp_start_timer_t1(struct xp *xp)
+{
+	mi_timer_MAC(xp->sl.timers.t1, xp->sl.config.t1);
+}
+static void
+xp_stop_timer_t2(struct xp *xp)
+{
+	mi_timer_stop(xp->sl.timers.t2);
+}
+static void
+xp_start_timer_t2(struct xp *xp)
+{
+	mi_timer_MAC(xp->sl.timers.t2, xp->sl.config.t2);
+}
+static void
+xp_stop_timer_t3(struct xp *xp)
+{
+	mi_timer_stop(xp->sl.timers.t3);
+}
+static void
+xp_start_timer_t3(struct xp *xp)
+{
+	mi_timer_MAC(xp->sl.timers.t3, xp->sl.config.t3);
+}
+static void
+xp_stop_timer_t4(struct xp *xp)
+{
+	mi_timer_stop(xp->sl.timers.t4);
+}
+static void
+xp_start_timer_t4(struct xp *xp)
+{
+	mi_timer_MAC(xp->sl.timers.t4, xp->sl.statem.t4v);
+}
+static void
+xp_stop_timer_t5(struct xp *xp)
+{
+	mi_timer_stop(xp->sl.timers.t5);
+}
+static void
+xp_start_timer_t5(struct xp *xp)
+{
+	mi_timer_MAC(xp->sl.timers.t5, xp->sl.config.t5);
+}
+static void
+xp_stop_timer_t6(struct xp *xp)
+{
+	mi_timer_stop(xp->sl.timers.t6);
+}
+static void
+xp_start_timer_t6(struct xp *xp)
+{
+	mi_timer_MAC(xp->sl.timers.t6, xp->sl.config.t6);
+}
+static void
+xp_stop_timer_t7(struct xp *xp)
+{
+	mi_timer_stop(xp->sl.timers.t7);
+}
+static void
+xp_start_timer_t7(struct xp *xp)
+{
+	mi_timer_MAC(xp->sl.timers.t7, xp->sl.config.t7);
+}
+static void
+xp_stop_timer_t8(struct xp *xp)
+{
+	mi_timer_stop(xp->sdt.timers.t8);
+}
+static void
+xp_start_timer_t8(struct xp *xp)
+{
+	mi_timer_MAC(xp->sdt.timers.t8, xp->sdt.config.t8);
+}
+#if 0
+static void
+xp_stop_timer_t9(struct xp *xp)
+{
+	mi_timer_stop(xp->sdl.timers.t9);
+}
+static void
+xp_start_timer_t9(struct xp *xp)
+{
+	mi_timer_MAC(xp->sdl.timers.t9, xp->sdl.config.t9);
+}
+#endif
+#else				/* _MPS_SOURCE */
 STATIC int xp_t1_timeout(struct xp *);
 STATIC streamscall void
 xp_t1_expiry(caddr_t data)
@@ -1966,6 +2067,7 @@ xp_start_timer_t9(struct xp *xp)
 			xp->sdl.timestamp - jiffies);
 };
 #endif
+#endif				/* _MPS_SOURCE */
 
 STATIC INLINE void
 __xp_timer_stop(struct xp *xp, const uint t)
@@ -2041,50 +2143,126 @@ xp_timer_stop(struct xp *xp, const uint t)
 	spin_unlock_irqrestore(&xp->lock, flags);
 }
 STATIC INLINE void
+__xp_timer_start(struct xp *xp, const uint t)
+{
+	__xp_timer_stop(xp, t);
+	switch (t) {
+	case t1:
+		xp_start_timer_t1(xp);
+		break;
+	case t2:
+		xp_start_timer_t2(xp);
+		break;
+	case t3:
+		xp_start_timer_t3(xp);
+		break;
+	case t4:
+		xp_start_timer_t4(xp);
+		break;
+	case t5:
+		xp_start_timer_t5(xp);
+		break;
+	case t6:
+		xp_start_timer_t6(xp);
+		break;
+	case t7:
+		xp_start_timer_t7(xp);
+		break;
+	case t8:
+		xp_start_timer_t8(xp);
+		break;
+#if 0
+	case t9:
+		xp_start_timer_t9(xp);
+		break;
+#endif
+	default:
+		swerr();
+		break;
+	}
+}
+STATIC INLINE void
 xp_timer_start(struct xp *xp, const uint t)
 {
 	psw_t flags;
 
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		__xp_timer_stop(xp, t);
-		switch (t) {
-		case t1:
-			xp_start_timer_t1(xp);
-			break;
-		case t2:
-			xp_start_timer_t2(xp);
-			break;
-		case t3:
-			xp_start_timer_t3(xp);
-			break;
-		case t4:
-			xp_start_timer_t4(xp);
-			break;
-		case t5:
-			xp_start_timer_t5(xp);
-			break;
-		case t6:
-			xp_start_timer_t6(xp);
-			break;
-		case t7:
-			xp_start_timer_t7(xp);
-			break;
-		case t8:
-			xp_start_timer_t8(xp);
-			break;
-#if 0
-		case t9:
-			xp_start_timer_t9(xp);
-			break;
-#endif
-		default:
-			swerr();
-			break;
-		}
+		__xp_timer_start(xp, t);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 }
+
+#ifdef _MPS_SOURCE
+STATIC void
+xp_free_timers(struct xp *xp)
+{
+	mblk_t *tp;
+
+	if ((tp = XCHG(&xp->sl.timers.t1, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&xp->sl.timers.t2, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&xp->sl.timers.t3, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&xp->sl.timers.t4, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&xp->sl.timers.t5, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&xp->sl.timers.t6, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&xp->sl.timers.t7, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&xp->sdt.timers.t8, NULL)))
+		mi_timer_free(tp);
+#if 0
+	if ((tp = XCHG(&xp->sdl.timers.t9, NULL)))
+		mi_timer_free(tp);
+#endif
+}
+STATIC int
+xp_alloc_timers(struct xp *xp)
+{
+	mblk_t *tp;
+
+	/* SDL timer allocation */
+#if 0
+	if (!(tp = xp->sdl.timers.t9 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t9;
+#endif
+	/* SDT timer allocation */
+	if (!(tp = xp->sdt.timers.t8 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t8;
+	/* SL timer allocation */
+	if (!(tp = xp->sl.timers.t7 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t7;
+	if (!(tp = xp->sl.timers.t6 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t6;
+	if (!(tp = xp->sl.timers.t5 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t5;
+	if (!(tp = xp->sl.timers.t4 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t4;
+	if (!(tp = xp->sl.timers.t3 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t3;
+	if (!(tp = xp->sl.timers.t2 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t2;
+	if (!(tp = xp->sl.timers.t1 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
+		goto enobufs;
+	*(int *)tp->b_rptr = t1;
+	return (0);
+      enobufs:
+	xp_free_timers(xp);
+	return (-ENOBUFS);
+}
+#endif				/* _MPS_SOURCE */
 
 /*
  *  -------------------------------------------------------------------------
@@ -2173,84 +2351,84 @@ sl_rpr_stats(queue_t *q)
 
 #define sl_cc_stop sl_cc_normal
 STATIC INLINE void
-sl_cc_normal(queue_t *q, struct xp *xp)
+sl_cc_normal(struct xp *xp, queue_t *q)
 {
-	xp_timer_stop(xp, t5);
+	__xp_timer_stop(xp, t5);
 	xp->sl.statem.cc_state = SL_STATE_IDLE;
 }
 
 STATIC INLINE void
-sl_rc_stop(queue_t *q, struct xp *xp)
+sl_rc_stop(struct xp *xp, queue_t *q)
 {
-	sl_cc_normal(q, xp);
+	sl_cc_normal(xp, q);
 	xp->sl.statem.rc_state = SL_STATE_IDLE;
 }
 
 STATIC INLINE void
-sl_aerm_stop(queue_t *q, struct xp *xp)
+sl_aerm_stop(struct xp *xp, queue_t *q)
 {
 	xp->sdt.statem.aerm_state = SDT_STATE_IDLE;
 	xp->sdt.statem.Ti = xp->sdt.config.Tin;
 }
 
 STATIC INLINE void
-sl_iac_stop(queue_t *q, struct xp *xp)
+sl_iac_stop(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.iac_state != SL_STATE_IDLE) {
-		xp_timer_stop(xp, t3);
-		xp_timer_stop(xp, t2);
-		ctrace(xp_timer_stop(xp, t4));
-		sl_aerm_stop(q, xp);
+		__xp_timer_stop(xp, t3);
+		__xp_timer_stop(xp, t2);
+		ctrace(__xp_timer_stop(xp, t4));
+		sl_aerm_stop(xp, q);
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.iac_state = SL_STATE_IDLE;
 	}
 }
 
 STATIC INLINE void
-sl_txc_send_sios(queue_t *q, struct xp *xp)
+sl_txc_send_sios(struct xp *xp, queue_t *q)
 {
-	xp_timer_stop(xp, t7);
+	__xp_timer_stop(xp, t7);
 	if (xp->option.pvar == SS7_PVAR_ANSI_92)
-		xp_timer_stop(xp, t6);
+		__xp_timer_stop(xp, t6);
 	xp->sl.statem.lssu_available = 1;
 	xp->sl.statem.tx.sio = LSSU_SIOS;
 }
 
 STATIC INLINE void
-sl_poc_stop(queue_t *q, struct xp *xp)
+sl_poc_stop(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.poc_state = SL_STATE_IDLE;
 }
 
 STATIC INLINE void
-sl_eim_stop(queue_t *q, struct xp *xp)
+sl_eim_stop(struct xp *xp, queue_t *q)
 {
 	xp->sdt.statem.eim_state = SDT_STATE_IDLE;
-	xp_timer_stop(xp, t8);
+	__xp_timer_stop(xp, t8);
 }
 
 STATIC INLINE void
-sl_suerm_stop(queue_t *q, struct xp *xp)
+sl_suerm_stop(struct xp *xp, queue_t *q)
 {
-	sl_eim_stop(q, xp);
+	sl_eim_stop(xp, q);
 	xp->sdt.statem.suerm_state = SDT_STATE_IDLE;
 }
 
 STATIC INLINE int
-sl_lsc_link_failure(queue_t *q, struct xp *xp, ulong reason)
+sl_lsc_link_failure(struct xp *xp, queue_t *q, ulong reason)
 {
 	int err;
 
 	if (xp->sl.statem.lsc_state != SL_STATE_OUT_OF_SERVICE) {
-		if ((err = sl_out_of_service_ind(q, xp, reason)))
+		if ((err = sl_out_of_service_ind(xp, q, reason)))
 			return (err);
 		xp->sl.statem.failure_reason = reason;
-		sl_iac_stop(q, xp);	/* ok if not aligning */
-		xp_timer_stop(xp, t1);	/* ok if not running */
-		sl_suerm_stop(q, xp);	/* ok if not running */
-		sl_rc_stop(q, xp);
-		ctrace(sl_txc_send_sios(q, xp));
-		sl_poc_stop(q, xp);	/* ok if not ITUT */
+		sl_iac_stop(xp, q);	/* ok if not aligning */
+		__xp_timer_stop(xp, t1);	/* ok if not running */
+		sl_suerm_stop(xp, q);	/* ok if not running */
+		sl_rc_stop(xp, q);
+		ctrace(sl_txc_send_sios(xp, q));
+		sl_poc_stop(xp, q);	/* ok if not ITUT */
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.local_processor_outage = 0;
 		xp->sl.statem.remote_processor_outage = 0;	/* ok if not ANSI */
@@ -2260,77 +2438,77 @@ sl_lsc_link_failure(queue_t *q, struct xp *xp, ulong reason)
 }
 
 STATIC INLINE void
-sl_txc_send_sib(queue_t *q, struct xp *xp)
+sl_txc_send_sib(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.tx.sio = LSSU_SIB;
 	xp->sl.statem.lssu_available = 1;
 }
 
 STATIC INLINE void
-sl_txc_send_sipo(queue_t *q, struct xp *xp)
+sl_txc_send_sipo(struct xp *xp, queue_t *q)
 {
-	xp_timer_stop(xp, t7);
+	__xp_timer_stop(xp, t7);
 	if (xp->option.pvar == SS7_PVAR_ANSI_92)
-		xp_timer_stop(xp, t6);
+		__xp_timer_stop(xp, t6);
 	xp->sl.statem.tx.sio = LSSU_SIPO;
 	xp->sl.statem.lssu_available = 1;
 }
 
 STATIC INLINE void
-sl_txc_send_sio(queue_t *q, struct xp *xp)
+sl_txc_send_sio(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.tx.sio = LSSU_SIO;
 	xp->sl.statem.lssu_available = 1;
 }
 
 STATIC INLINE void
-sl_txc_send_sin(queue_t *q, struct xp *xp)
+sl_txc_send_sin(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.tx.sio = LSSU_SIN;
 	xp->sl.statem.lssu_available = 1;
 }
 
 STATIC INLINE void
-sl_txc_send_sie(queue_t *q, struct xp *xp)
+sl_txc_send_sie(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.tx.sio = LSSU_SIE;
 	xp->sl.statem.lssu_available = 1;
 }
 
 STATIC INLINE void
-sl_txc_send_msu(queue_t *q, struct xp *xp)
+sl_txc_send_msu(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.rtb.q_count)
-		xp_timer_start(xp, t7);
+		__xp_timer_start(xp, t7);
 	xp->sl.statem.msu_inhibited = 0;
 	xp->sl.statem.lssu_available = 0;
 }
 
 STATIC INLINE void
-sl_txc_send_fisu(queue_t *q, struct xp *xp)
+sl_txc_send_fisu(struct xp *xp, queue_t *q)
 {
-	xp_timer_stop(xp, t7);
+	__xp_timer_stop(xp, t7);
 	if (xp->option.pvar == SS7_PVAR_ANSI_92 && !(xp->option.popt & SS7_POPT_PCR))
-		xp_timer_stop(xp, t6);
+		__xp_timer_stop(xp, t6);
 	xp->sl.statem.msu_inhibited = 1;
 	xp->sl.statem.lssu_available = 0;
 }
 
 STATIC INLINE void
-sl_txc_fsnx_value(queue_t *q, struct xp *xp)
+sl_txc_fsnx_value(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.tx.X.fsn != xp->sl.statem.rx.X.fsn)
 		xp->sl.statem.tx.X.fsn = xp->sl.statem.rx.X.fsn;
 }
 
 STATIC INLINE void
-sl_txc_nack_to_be_sent(queue_t *q, struct xp *xp)
+sl_txc_nack_to_be_sent(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib ? 0 : xp->sl.statem.ib_mask;
 }
 
 STATIC INLINE int
-sl_lsc_rtb_cleared(queue_t *q, struct xp *xp)
+sl_lsc_rtb_cleared(struct xp *xp, queue_t *q)
 {
 	int err;
 
@@ -2338,20 +2516,20 @@ sl_lsc_rtb_cleared(queue_t *q, struct xp *xp)
 		xp->sl.statem.remote_processor_outage = 0;
 		if (xp->sl.statem.local_processor_outage)
 			return (QR_DONE);
-		if ((err = sl_remote_processor_recovered_ind(q, xp)))
+		if ((err = sl_remote_processor_recovered_ind(xp, q)))
 			return (err);
-		if ((err = sl_rtb_cleared_ind(q, xp)))
+		if ((err = sl_rtb_cleared_ind(xp, q)))
 			return (err);
-		sl_txc_send_msu(q, xp);
+		sl_txc_send_msu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 	}
 	return (QR_DONE);
 }
 
-STATIC void sl_check_congestion(queue_t *q, struct xp *xp);
+STATIC void sl_check_congestion(struct xp *xp, queue_t *q);
 
 STATIC INLINE void
-sl_txc_bsnr_and_bibr(queue_t *q, struct xp *xp)
+sl_txc_bsnr_and_bibr(struct xp *xp, queue_t *q)
 {
 	int pcr = xp->option.popt & SS7_POPT_PCR;
 
@@ -2360,7 +2538,7 @@ sl_txc_bsnr_and_bibr(queue_t *q, struct xp *xp)
 	if (xp->sl.statem.clear_rtb) {
 		bufq_purge(&xp->sl.rtb);
 		xp->sl.statem.Ct = 0;
-		sl_check_congestion(q, xp);
+		sl_check_congestion(xp, q);
 		xp->sl.statem.tx.F.fsn = (xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask;
 		xp->sl.statem.tx.L.fsn = xp->sl.statem.tx.R.bsn;
 		xp->sl.statem.tx.N.fsn = xp->sl.statem.tx.R.bsn;
@@ -2368,7 +2546,7 @@ sl_txc_bsnr_and_bibr(queue_t *q, struct xp *xp)
 		xp->sl.statem.Z = (xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask;
 		xp->sl.statem.z_ptr = NULL;
 		/* FIXME: handle error return */
-		sl_lsc_rtb_cleared(q, xp);
+		sl_lsc_rtb_cleared(xp, q);
 		xp->sl.statem.clear_rtb = 0;
 		xp->sl.statem.rtb_full = 0;
 		return;
@@ -2376,7 +2554,7 @@ sl_txc_bsnr_and_bibr(queue_t *q, struct xp *xp)
 	if (xp->sl.statem.tx.F.fsn != ((xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask)) {
 		if (xp->sl.statem.sib_received) {
 			xp->sl.statem.sib_received = 0;
-			xp_timer_stop(xp, t6);
+			__xp_timer_stop(xp, t6);
 		}
 		do {
 			freemsg(bufq_dequeue(&xp->sl.rtb));
@@ -2385,11 +2563,11 @@ sl_txc_bsnr_and_bibr(queue_t *q, struct xp *xp)
 			    (xp->sl.statem.tx.F.fsn + 1) & xp->sl.statem.sn_mask;
 		} while (xp->sl.statem.tx.F.fsn !=
 			 ((xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask));
-		sl_check_congestion(q, xp);
+		sl_check_congestion(xp, q);
 		if (xp->sl.rtb.q_count == 0) {
-			xp_timer_stop(xp, t7);
+			__xp_timer_stop(xp, t7);
 		} else {
-			xp_timer_start(xp, t7);
+			__xp_timer_start(xp, t7);
 		}
 		if (!pcr
 		    || (xp->sl.rtb.q_msgs < xp->sl.config.N1
@@ -2406,7 +2584,7 @@ sl_txc_bsnr_and_bibr(queue_t *q, struct xp *xp)
 	if (xp->sl.statem.tx.N.fib != xp->sl.statem.tx.R.bib) {
 		if (xp->sl.statem.sib_received) {
 			xp->sl.statem.sib_received = 0;
-			xp_timer_stop(xp, t6);
+			__xp_timer_stop(xp, t6);
 		}
 		xp->sl.statem.tx.N.fib = xp->sl.statem.tx.R.bib;
 		xp->sl.statem.tx.N.fsn = (xp->sl.statem.tx.F.fsn - 1) & xp->sl.statem.sn_mask;
@@ -2417,7 +2595,7 @@ sl_txc_bsnr_and_bibr(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_txc_sib_received(queue_t *q, struct xp *xp)
+sl_txc_sib_received(struct xp *xp, queue_t *q)
 {
 	/* FIXME: consider these variations for all */
 	if (xp->option.pvar == SS7_PVAR_ANSI_92 && xp->sl.statem.lssu_available)
@@ -2426,14 +2604,14 @@ sl_txc_sib_received(queue_t *q, struct xp *xp)
 	if (xp->option.pvar != SS7_PVAR_ITUT_93 && !xp->sl.rtb.q_count)
 		return;
 	if (!xp->sl.statem.sib_received) {
-		xp_timer_start(xp, t6);
+		__xp_timer_start(xp, t6);
 		xp->sl.statem.sib_received = 1;
 	}
-	xp_timer_start(xp, t7);
+	__xp_timer_start(xp, t7);
 }
 
 STATIC INLINE void
-sl_txc_clear_rtb(queue_t *q, struct xp *xp)
+sl_txc_clear_rtb(struct xp *xp, queue_t *q)
 {
 	bufq_purge(&xp->sl.rtb);
 	xp->sl.statem.Ct = 0;
@@ -2441,20 +2619,20 @@ sl_txc_clear_rtb(queue_t *q, struct xp *xp)
 	xp->sl.statem.rtb_full = 0;	/* added */
 	/* FIXME: should probably follow more of the ITUT flush_buffers stuff like reseting Z and
 	   FSNF, FSNL, FSNT. */
-	sl_check_congestion(q, xp);
+	sl_check_congestion(xp, q);
 }
 
 STATIC INLINE void
-sl_txc_clear_tb(queue_t *q, struct xp *xp)
+sl_txc_clear_tb(struct xp *xp, queue_t *q)
 {
 	bufq_purge(&xp->sl.tb);
 	flushq(xp->iq, FLUSHDATA);
 	xp->sl.statem.Cm = 0;
-	sl_check_congestion(q, xp);
+	sl_check_congestion(xp, q);
 }
 
 STATIC INLINE void
-sl_txc_flush_buffers(queue_t *q, struct xp *xp)
+sl_txc_flush_buffers(struct xp *xp, queue_t *q)
 {
 	bufq_purge(&xp->sl.rtb);
 	xp->sl.statem.rtb_full = 0;
@@ -2469,18 +2647,18 @@ sl_txc_flush_buffers(queue_t *q, struct xp *xp)
 	    (xp->sl.statem.tx.R.bsn + 1) & xp->sl.statem.sn_mask;
 	xp->sl.statem.tx.L.fsn = xp->sl.statem.rx.R.bsn;
 	xp->sl.statem.rx.T.fsn = xp->sl.statem.rx.R.bsn;
-	xp_timer_stop(xp, t7);
+	__xp_timer_stop(xp, t7);
 	return;
 }
 
 STATIC INLINE void
-sl_rc_fsnt_value(queue_t *q, struct xp *xp)
+sl_rc_fsnt_value(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.rx.T.fsn = xp->sl.statem.tx.N.fsn;
 }
 
 STATIC INLINE int
-sl_txc_retrieval_request_and_fsnc(queue_t *q, struct xp *xp, sl_ulong fsnc)
+sl_txc_retrieval_request_and_fsnc(struct xp *xp, queue_t *q, sl_ulong fsnc)
 {
 	mblk_t *mp;
 	int err;
@@ -2514,11 +2692,11 @@ sl_txc_retrieval_request_and_fsnc(queue_t *q, struct xp *xp, sl_ulong fsnc)
 	    (xp->sl.statem.tx.C.fsn + 1) & xp->sl.statem.sn_mask;
 	while ((mp = bufq_dequeue(&xp->sl.rtb))) {
 		xp->sl.statem.Ct--;
-		if ((err = sl_retrieved_message_ind(q, xp, mp)))
+		if ((err = sl_retrieved_message_ind(xp, q, mp)))
 			return (err);
 	}
 	xp->sl.statem.rtb_full = 0;
-	if ((err = sl_retrieval_complete_ind(q, xp)))
+	if ((err = sl_retrieval_complete_ind(xp, q)))
 		return (err);
 	xp->sl.statem.Cm = 0;
 	xp->sl.statem.Ct = 0;
@@ -2527,7 +2705,7 @@ sl_txc_retrieval_request_and_fsnc(queue_t *q, struct xp *xp, sl_ulong fsnc)
 }
 
 STATIC INLINE void
-sl_daedt_fisu(queue_t *q, struct xp *xp, mblk_t *mp)
+sl_daedt_fisu(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	if (xp->option.popt & SS7_POPT_XSN) {
 		*(sl_ushort *) mp->b_wptr = htons(xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
@@ -2547,7 +2725,7 @@ sl_daedt_fisu(queue_t *q, struct xp *xp, mblk_t *mp)
 }
 
 STATIC INLINE void
-sl_daedt_lssu(queue_t *q, struct xp *xp, mblk_t *mp)
+sl_daedt_lssu(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	if (xp->option.popt & SS7_POPT_XSN) {
 		*(sl_ushort *) mp->b_wptr = htons(xp->sl.statem.tx.N.bsn | xp->sl.statem.tx.N.bib);
@@ -2569,7 +2747,7 @@ sl_daedt_lssu(queue_t *q, struct xp *xp, mblk_t *mp)
 }
 
 STATIC INLINE void
-sl_daedt_msu(queue_t *q, struct xp *xp, mblk_t *mp)
+sl_daedt_msu(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	int len = msgdsize(mp);
 
@@ -2587,7 +2765,7 @@ sl_daedt_msu(queue_t *q, struct xp *xp, mblk_t *mp)
 }
 
 STATIC INLINE mblk_t *
-sl_txc_transmission_request(queue_t *q, struct xp *xp)
+sl_txc_transmission_request(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp = NULL;
 	int pcr;
@@ -2604,7 +2782,7 @@ sl_txc_transmission_request(queue_t *q, struct xp *xp)
 			xp->sl.statem.tx.N.bsn =
 			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
-			sl_daedt_lssu(q, xp, mp);
+			sl_daedt_lssu(xp, q, mp);
 		}
 		return (mp);
 	}
@@ -2615,7 +2793,7 @@ sl_txc_transmission_request(queue_t *q, struct xp *xp)
 			xp->sl.statem.tx.N.bsn =
 			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
-			sl_daedt_fisu(q, xp, mp);
+			sl_daedt_fisu(xp, q, mp);
 		}
 		return (mp);
 	}
@@ -2659,7 +2837,7 @@ sl_txc_transmission_request(queue_t *q, struct xp *xp)
 				    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 				xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib;
 			}
-			sl_daedt_msu(q, xp, mp);
+			sl_daedt_msu(xp, q, mp);
 			if (xp->sl.statem.tx.N.fsn == xp->sl.statem.tx.L.fsn
 			    || xp->sl.statem.z_ptr == NULL)
 				xp->sl.statem.retrans_cycle = 0;
@@ -2674,7 +2852,7 @@ sl_txc_transmission_request(queue_t *q, struct xp *xp)
 			xp->sl.statem.tx.N.bsn =
 			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
-			sl_daedt_fisu(q, xp, mp);
+			sl_daedt_fisu(xp, q, mp);
 		}
 		return (mp);
 	} else {
@@ -2689,10 +2867,10 @@ sl_txc_transmission_request(queue_t *q, struct xp *xp)
 			    (xp->sl.statem.tx.L.fsn + 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fsn = xp->sl.statem.tx.L.fsn;
 			if (!xp->sl.rtb.q_count)
-				xp_timer_start(xp, t7);
+				__xp_timer_start(xp, t7);
 			bufq_queue(&xp->sl.rtb, bp);
 			xp->sl.statem.Ct++;
-			sl_rc_fsnt_value(q, xp);
+			sl_rc_fsnt_value(xp, q);
 			if (pcr) {
 				if ((xp->sl.rtb.q_msgs >= xp->sl.config.N1)
 				    || (xp->sl.rtb.q_count >= xp->sl.config.N2)) {
@@ -2710,7 +2888,7 @@ sl_txc_transmission_request(queue_t *q, struct xp *xp)
 			xp->sl.statem.tx.N.bsn =
 			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
-			sl_daedt_msu(q, xp, mp);
+			sl_daedt_msu(xp, q, mp);
 		}
 		spin_unlock(&xp->sl.tb.q_lock);
 		return (mp);
@@ -2718,7 +2896,7 @@ sl_txc_transmission_request(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_daedr_start(queue_t *q, struct xp *xp)
+sl_daedr_start(struct xp *xp, queue_t *q)
 {
 	xp->sdt.statem.daedr_state = SDT_STATE_IN_SERVICE;
 	xp->sdl.statem.rx_state = SDL_STATE_IN_SERVICE;
@@ -2726,7 +2904,7 @@ sl_daedr_start(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_rc_start(queue_t *q, struct xp *xp)
+sl_rc_start(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.rc_state == SL_STATE_IDLE) {
 		xp->sl.statem.rx.X.fsn = 0;
@@ -2742,7 +2920,7 @@ sl_rc_start(queue_t *q, struct xp *xp)
 		xp->sl.statem.abnormal_fibr = 0;	/* Basic only (note 1). */
 		xp->sl.statem.congestion_discard = 0;
 		xp->sl.statem.congestion_accept = 0;
-		sl_daedr_start(q, xp);
+		sl_daedr_start(xp, q);
 		xp->sl.statem.rc_state = SL_STATE_IN_SERVICE;
 		return;
 		/* 
@@ -2754,122 +2932,122 @@ sl_rc_start(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_rc_reject_msu_fisu(queue_t *q, struct xp *xp)
+sl_rc_reject_msu_fisu(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.msu_fisu_accepted = 0;
 }
 
 STATIC INLINE void
-sl_rc_accept_msu_fisu(queue_t *q, struct xp *xp)
+sl_rc_accept_msu_fisu(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.msu_fisu_accepted = 1;
 }
 
 STATIC INLINE void
-sl_rc_retrieve_fsnx(queue_t *q, struct xp *xp)
+sl_rc_retrieve_fsnx(struct xp *xp, queue_t *q)
 {
-	sl_txc_fsnx_value(q, xp);	/* error in 93 spec */
+	sl_txc_fsnx_value(xp, q);	/* error in 93 spec */
 	xp->sl.statem.congestion_discard = 0;
 	xp->sl.statem.congestion_accept = 0;
-	sl_cc_normal(q, xp);
+	sl_cc_normal(xp, q);
 	xp->sl.statem.rtr = 0;	/* basic only */
 }
 
 STATIC INLINE void
-sl_rc_align_fsnx(queue_t *q, struct xp *xp)
+sl_rc_align_fsnx(struct xp *xp, queue_t *q)
 {
-	sl_txc_fsnx_value(q, xp);
+	sl_txc_fsnx_value(xp, q);
 }
 
 STATIC INLINE int
-sl_rc_clear_rb(queue_t *q, struct xp *xp)
+sl_rc_clear_rb(struct xp *xp, queue_t *q)
 {
 	bufq_purge(&xp->sl.rb);
 	flushq(xp->oq, FLUSHDATA);
 	xp->sl.statem.Cr = 0;
-	return sl_rb_cleared_ind(q, xp);
+	return sl_rb_cleared_ind(xp, q);
 }
 
 STATIC INLINE int
-sl_rc_retrieve_bsnt(queue_t *q, struct xp *xp)
+sl_rc_retrieve_bsnt(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.rx.T.bsn = (xp->sl.statem.rx.X.fsn - 1) & 0x7F;
-	return sl_bsnt_ind(q, xp, xp->sl.statem.rx.T.bsn);
+	return sl_bsnt_ind(xp, q, xp->sl.statem.rx.T.bsn);
 }
 
 STATIC INLINE void
-sl_cc_busy(queue_t *q, struct xp *xp)
+sl_cc_busy(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.cc_state == SL_STATE_NORMAL) {
-		ctrace(sl_txc_send_sib(q, xp));
-		xp_timer_start(xp, t5);
+		ctrace(sl_txc_send_sib(xp, q));
+		__xp_timer_start(xp, t5);
 		xp->sl.statem.cc_state = SL_STATE_BUSY;
 	}
 }
 
 STATIC INLINE void
-sl_rc_congestion_discard(queue_t *q, struct xp *xp)
+sl_rc_congestion_discard(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.congestion_discard = 1;
-	sl_cc_busy(q, xp);
+	sl_cc_busy(xp, q);
 }
 
 STATIC INLINE void
-sl_rc_congestion_accept(queue_t *q, struct xp *xp)
+sl_rc_congestion_accept(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.congestion_accept = 1;
-	sl_cc_busy(q, xp);
+	sl_cc_busy(xp, q);
 }
 
 STATIC INLINE void
-sl_rc_no_congestion(queue_t *q, struct xp *xp)
+sl_rc_no_congestion(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.congestion_discard = 0;
 	xp->sl.statem.congestion_accept = 0;
-	sl_cc_normal(q, xp);
-	sl_txc_fsnx_value(q, xp);
+	sl_cc_normal(xp, q);
+	sl_txc_fsnx_value(xp, q);
 	if (xp->sl.statem.rtr == 1) {	/* rtr never set for PCR */
-		sl_txc_nack_to_be_sent(q, xp);
+		sl_txc_nack_to_be_sent(xp, q);
 		xp->sl.statem.rx.X.fib = xp->sl.statem.rx.X.fib ? 0 : xp->sl.statem.ib_mask;
 	}
 }
 
 STATIC INLINE void
-sl_lsc_congestion_discard(queue_t *q, struct xp *xp)
+sl_lsc_congestion_discard(struct xp *xp, queue_t *q)
 {
-	sl_rc_congestion_discard(q, xp);
+	sl_rc_congestion_discard(xp, q);
 	xp->sl.statem.l3_congestion_detect = 1;
 }
 
 STATIC INLINE void
-sl_lsc_congestion_accept(queue_t *q, struct xp *xp)
+sl_lsc_congestion_accept(struct xp *xp, queue_t *q)
 {
-	sl_rc_congestion_accept(q, xp);
+	sl_rc_congestion_accept(xp, q);
 	xp->sl.statem.l3_congestion_detect = 1;
 }
 
 STATIC INLINE void
-sl_lsc_no_congestion(queue_t *q, struct xp *xp)
+sl_lsc_no_congestion(struct xp *xp, queue_t *q)
 {
-	sl_rc_no_congestion(q, xp);
+	sl_rc_no_congestion(xp, q);
 	xp->sl.statem.l3_congestion_detect = 0;
 }
 
 STATIC INLINE void
-sl_lsc_sio(queue_t *q, struct xp *xp)
+sl_lsc_sio(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 	case SL_STATE_INITIAL_ALIGNMENT:
 		break;
 	default:
-		xp_timer_stop(xp, t1);	/* ok if not running */
-		sl_out_of_service_ind(q, xp, SL_FAIL_RECEIVED_SIO);
+		__xp_timer_stop(xp, t1);	/* ok if not running */
+		sl_out_of_service_ind(xp, q, SL_FAIL_RECEIVED_SIO);
 		xp->sl.statem.failure_reason = SL_FAIL_RECEIVED_SIO;
-		sl_rc_stop(q, xp);
-		sl_suerm_stop(q, xp);
-		sl_poc_stop(q, xp);	/* ok if ANSI */
-		ctrace(sl_txc_send_sios(q, xp));
+		sl_rc_stop(xp, q);
+		sl_suerm_stop(xp, q);
+		sl_poc_stop(xp, q);	/* ok if ANSI */
+		ctrace(sl_txc_send_sios(xp, q));
 		xp->sl.statem.emergency = 0;
 		/* FIXME: reinspect */
 		xp->sl.statem.local_processor_outage = 0;
@@ -2880,15 +3058,15 @@ sl_lsc_sio(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE int
-sl_lsc_alignment_not_possible(queue_t *q, struct xp *xp)
+sl_lsc_alignment_not_possible(struct xp *xp, queue_t *q)
 {
 	int err;
 
-	if ((err = sl_out_of_service_ind(q, xp, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)))
+	if ((err = sl_out_of_service_ind(xp, q, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)))
 		return (err);
 	xp->sl.statem.failure_reason = SL_FAIL_ALIGNMENT_NOT_POSSIBLE;
-	sl_rc_stop(q, xp);
-	ctrace(sl_txc_send_sios(q, xp));
+	sl_rc_stop(xp, q);
+	ctrace(sl_txc_send_sios(xp, q));
 	xp->sl.statem.local_processor_outage = 0;
 	xp->sl.statem.emergency = 0;
 	xp->sl.statem.lsc_state = SL_STATE_OUT_OF_SERVICE;
@@ -2896,41 +3074,41 @@ sl_lsc_alignment_not_possible(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_iac_sio(queue_t *q, struct xp *xp)
+sl_iac_sio(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.iac_state) {
 	case SL_STATE_NOT_ALIGNED:
-		xp_timer_stop(xp, t2);
+		__xp_timer_stop(xp, t2);
 		if (xp->sl.statem.emergency) {
 			xp->sl.statem.t4v = xp->sl.config.t4e;
 			printd(("Sending SIE at %lu\n", jiffies));
-			ctrace(sl_txc_send_sie(q, xp));
+			ctrace(sl_txc_send_sie(xp, q));
 		} else {
 			xp->sl.statem.t4v = xp->sl.config.t4n;
-			ctrace(sl_txc_send_sin(q, xp));
+			ctrace(sl_txc_send_sin(xp, q));
 		}
-		xp_timer_start(xp, t3);
+		__xp_timer_start(xp, t3);
 		xp->sl.statem.iac_state = SL_STATE_ALIGNED;
 		break;
 	case SL_STATE_PROVING:
-		ctrace(xp_timer_stop(xp, t4));
-		sl_aerm_stop(q, xp);
-		xp_timer_start(xp, t3);
+		ctrace(__xp_timer_stop(xp, t4));
+		sl_aerm_stop(xp, q);
+		__xp_timer_start(xp, t3);
 		xp->sl.statem.iac_state = SL_STATE_ALIGNED;
 		break;
 	}
 }
 
 STATIC INLINE void
-sl_iac_sios(queue_t *q, struct xp *xp)
+sl_iac_sios(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.iac_state) {
 	case SL_STATE_ALIGNED:
 	case SL_STATE_PROVING:
-		ctrace(xp_timer_stop(xp, t4));	/* ok if not running */
-		ctrace(sl_lsc_alignment_not_possible(q, xp));
-		sl_aerm_stop(q, xp);	/* ok if not running */
-		xp_timer_stop(xp, t3);	/* ok if not running */
+		ctrace(__xp_timer_stop(xp, t4));	/* ok if not running */
+		ctrace(sl_lsc_alignment_not_possible(xp, q));
+		sl_aerm_stop(xp, q);	/* ok if not running */
+		__xp_timer_stop(xp, t3);	/* ok if not running */
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.iac_state = SL_STATE_IDLE;
 		break;
@@ -2938,20 +3116,20 @@ sl_iac_sios(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_lsc_sios(queue_t *q, struct xp *xp)
+sl_lsc_sios(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_ALIGNED_READY:
 	case SL_STATE_ALIGNED_NOT_READY:
-		xp_timer_stop(xp, t1);	/* ok to stop if not running */
+		__xp_timer_stop(xp, t1);	/* ok to stop if not running */
 	case SL_STATE_IN_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
-		sl_out_of_service_ind(q, xp, SL_FAIL_RECEIVED_SIOS);
+		sl_out_of_service_ind(xp, q, SL_FAIL_RECEIVED_SIOS);
 		xp->sl.statem.failure_reason = SL_FAIL_RECEIVED_SIOS;
-		sl_suerm_stop(q, xp);	/* ok to stop if not running */
-		sl_rc_stop(q, xp);
-		sl_poc_stop(q, xp);	/* ok if ANSI */
-		ctrace(sl_txc_send_sios(q, xp));
+		sl_suerm_stop(xp, q);	/* ok to stop if not running */
+		sl_rc_stop(xp, q);
+		sl_poc_stop(xp, q);	/* ok if ANSI */
+		ctrace(sl_txc_send_sios(xp, q));
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.local_processor_outage = 0;
 		xp->sl.statem.remote_processor_outage = 0;	/* ok if ITU */
@@ -2961,26 +3139,26 @@ sl_lsc_sios(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_lsc_no_processor_outage(queue_t *q, struct xp *xp)
+sl_lsc_no_processor_outage(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		xp->sl.statem.processor_outage = 0;
 		if (!xp->sl.statem.l3_indication_received)
 			return;
 		xp->sl.statem.l3_indication_received = 0;
-		sl_txc_send_msu(q, xp);
+		sl_txc_send_msu(xp, q);
 		xp->sl.statem.local_processor_outage = 0;
-		sl_rc_accept_msu_fisu(q, xp);
+		sl_rc_accept_msu_fisu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 	}
 }
 
 STATIC INLINE void
-sl_poc_remote_processor_recovered(queue_t *q, struct xp *xp)
+sl_poc_remote_processor_recovered(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_REMOTE_PROCESSOR_OUTAGE:
-		sl_lsc_no_processor_outage(q, xp);
+		sl_lsc_no_processor_outage(xp, q);
 		xp->sl.statem.poc_state = SL_STATE_IDLE;
 		return;
 	case SL_STATE_BOTH_PROCESSORS_OUT:
@@ -2990,35 +3168,35 @@ sl_poc_remote_processor_recovered(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE int
-sl_lsc_fisu_msu_received(queue_t *q, struct xp *xp)
+sl_lsc_fisu_msu_received(struct xp *xp, queue_t *q)
 {
 	int err;
 
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_ALIGNED_READY:
-		if ((err = sl_in_service_ind(q, xp)))
+		if ((err = sl_in_service_ind(xp, q)))
 			return (err);
 		if (xp->option.pvar == SS7_PVAR_ITUT_93)
-			sl_rc_accept_msu_fisu(q, xp);	/* unnecessary */
-		xp_timer_stop(xp, t1);
-		sl_txc_send_msu(q, xp);
+			sl_rc_accept_msu_fisu(xp, q);	/* unnecessary */
+		__xp_timer_stop(xp, t1);
+		sl_txc_send_msu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 		break;
 	case SL_STATE_ALIGNED_NOT_READY:
-		if ((err = sl_in_service_ind(q, xp)))
+		if ((err = sl_in_service_ind(xp, q)))
 			return (err);
-		xp_timer_stop(xp, t1);
+		__xp_timer_stop(xp, t1);
 		xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 		break;
 	case SL_STATE_PROCESSOR_OUTAGE:
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			sl_poc_remote_processor_recovered(q, xp);
-			return sl_remote_processor_recovered_ind(q, xp);
+			sl_poc_remote_processor_recovered(xp, q);
+			return sl_remote_processor_recovered_ind(xp, q);
 		case SS7_PVAR_ANSI_92:
 			xp->sl.statem.remote_processor_outage = 0;
-			return sl_remote_processor_recovered_ind(q, xp);
+			return sl_remote_processor_recovered_ind(xp, q);
 		default:
 			/* 
 			 *  A deviation from the SDLs has been placed here to limit the number of remote
@@ -3027,7 +3205,7 @@ sl_lsc_fisu_msu_received(queue_t *q, struct xp *xp)
 			 */
 			if (xp->sl.statem.remote_processor_outage) {
 				xp->sl.statem.remote_processor_outage = 0;
-				return sl_remote_processor_recovered_ind(q, xp);
+				return sl_remote_processor_recovered_ind(xp, q);
 			}
 			break;
 		}
@@ -3037,7 +3215,7 @@ sl_lsc_fisu_msu_received(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_poc_remote_processor_outage(queue_t *q, struct xp *xp)
+sl_poc_remote_processor_outage(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_IDLE:
@@ -3050,18 +3228,18 @@ sl_poc_remote_processor_outage(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_lsc_sib(queue_t *q, struct xp *xp)
+sl_lsc_sib(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_IN_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
-		sl_txc_sib_received(q, xp);
+		sl_txc_sib_received(xp, q);
 		break;
 	}
 }
 
 STATIC INLINE int
-sl_lsc_sipo(queue_t *q, struct xp *xp)
+sl_lsc_sipo(struct xp *xp, queue_t *q)
 {
 	int err;
 
@@ -3070,15 +3248,15 @@ sl_lsc_sipo(queue_t *q, struct xp *xp)
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			xp_timer_stop(xp, t1);
-			if ((err = sl_remote_processor_outage_ind(q, xp)))
+			__xp_timer_stop(xp, t1);
+			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
-			sl_poc_remote_processor_outage(q, xp);
+			sl_poc_remote_processor_outage(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 			break;
 		case SS7_PVAR_ANSI_92:
-			xp_timer_stop(xp, t1);
-			if ((err = sl_remote_processor_outage_ind(q, xp)))
+			__xp_timer_stop(xp, t1);
+			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
 			xp->sl.statem.remote_processor_outage = 1;
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
@@ -3089,17 +3267,17 @@ sl_lsc_sipo(queue_t *q, struct xp *xp)
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			if ((err = sl_remote_processor_outage_ind(q, xp)))
+			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
-			sl_poc_remote_processor_outage(q, xp);
-			xp_timer_stop(xp, t1);
+			sl_poc_remote_processor_outage(xp, q);
+			__xp_timer_stop(xp, t1);
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 			break;
 		case SS7_PVAR_ANSI_92:
-			if ((err = sl_remote_processor_outage_ind(q, xp)))
+			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
 			xp->sl.statem.remote_processor_outage = 1;
-			xp_timer_stop(xp, t1);
+			__xp_timer_stop(xp, t1);
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 			break;
 		}
@@ -3108,20 +3286,20 @@ sl_lsc_sipo(queue_t *q, struct xp *xp)
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			sl_txc_send_fisu(q, xp);
-			if ((err = sl_remote_processor_outage_ind(q, xp)))
+			sl_txc_send_fisu(xp, q);
+			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
-			sl_poc_remote_processor_outage(q, xp);
+			sl_poc_remote_processor_outage(xp, q);
 			xp->sl.statem.processor_outage = 1;	/* remote? */
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 			break;
 		case SS7_PVAR_ANSI_92:
-			sl_txc_send_fisu(q, xp);
-			if ((err = sl_remote_processor_outage_ind(q, xp)))
+			sl_txc_send_fisu(xp, q);
+			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
 			xp->sl.statem.remote_processor_outage = 1;
-			sl_rc_align_fsnx(q, xp);
-			sl_cc_stop(q, xp);
+			sl_rc_align_fsnx(xp, q);
+			sl_cc_stop(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 			break;
 		}
@@ -3130,13 +3308,13 @@ sl_lsc_sipo(queue_t *q, struct xp *xp)
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			if ((err = sl_remote_processor_outage_ind(q, xp)))
+			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
-			sl_poc_remote_processor_outage(q, xp);
+			sl_poc_remote_processor_outage(xp, q);
 			break;
 		case SS7_PVAR_ANSI_92:
 			xp->sl.statem.remote_processor_outage = 1;
-			return sl_remote_processor_outage_ind(q, xp);
+			return sl_remote_processor_outage_ind(xp, q);
 		default:
 			/* 
 			 *  A deviation from the SDLs has been placed here to limit the number of remote
@@ -3145,7 +3323,7 @@ sl_lsc_sipo(queue_t *q, struct xp *xp)
 			 */
 			if (!xp->sl.statem.remote_processor_outage) {
 				xp->sl.statem.remote_processor_outage = 1;
-				return sl_remote_processor_outage_ind(q, xp);
+				return sl_remote_processor_outage_ind(xp, q);
 			}
 			break;
 		}
@@ -3155,7 +3333,7 @@ sl_lsc_sipo(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_poc_local_processor_outage(queue_t *q, struct xp *xp)
+sl_poc_local_processor_outage(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_IDLE:
@@ -3168,20 +3346,20 @@ sl_poc_local_processor_outage(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_eim_start(queue_t *q, struct xp *xp)
+sl_eim_start(struct xp *xp, queue_t *q)
 {
 	xp->sdt.statem.Ce = 0;
 	xp->sdt.statem.interval_error = 0;
 	xp->sdt.statem.su_received = 0;
-	xp_timer_start(xp, t8);
+	__xp_timer_start(xp, t8);
 	xp->sdt.statem.eim_state = SDT_STATE_MONITORING;
 }
 
 STATIC INLINE void
-sl_suerm_start(queue_t *q, struct xp *xp)
+sl_suerm_start(struct xp *xp, queue_t *q)
 {
 	if (xp->option.popt & SS7_POPT_HSL)
-		sl_eim_start(q, xp);
+		sl_eim_start(xp, q);
 	else {
 		xp->sdt.statem.Cs = 0;
 		xp->sdt.statem.Ns = 0;
@@ -3190,46 +3368,46 @@ sl_suerm_start(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_lsc_alignment_complete(queue_t *q, struct xp *xp)
+sl_lsc_alignment_complete(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.lsc_state == SL_STATE_INITIAL_ALIGNMENT) {
-		sl_suerm_start(q, xp);
-		xp_timer_start(xp, t1);
+		sl_suerm_start(xp, q);
+		__xp_timer_start(xp, t1);
 		if (xp->sl.statem.local_processor_outage) {
 			if (xp->option.pvar != SS7_PVAR_ANSI_92)
-				sl_poc_local_processor_outage(q, xp);
-			ctrace(sl_txc_send_sipo(q, xp));
+				sl_poc_local_processor_outage(xp, q);
+			ctrace(sl_txc_send_sipo(xp, q));
 			if (xp->option.pvar != SS7_PVAR_ITUT_93)	/* possible error */
-				sl_rc_reject_msu_fisu(q, xp);
+				sl_rc_reject_msu_fisu(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_ALIGNED_NOT_READY;
 		} else {
-			ctrace(sl_txc_send_msu(q, xp));	/* changed from send_fisu for Q.781 */
-			sl_rc_accept_msu_fisu(q, xp);	/* error in ANSI spec? */
+			ctrace(sl_txc_send_msu(xp, q));	/* changed from send_fisu for Q.781 */
+			sl_rc_accept_msu_fisu(xp, q);	/* error in ANSI spec? */
 			xp->sl.statem.lsc_state = SL_STATE_ALIGNED_READY;
 		}
 	}
 }
 
 STATIC INLINE void
-sl_lsc_sin(queue_t *q, struct xp *xp)
+sl_lsc_sin(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_IN_SERVICE:
-		sl_out_of_service_ind(q, xp, SL_FAIL_RECEIVED_SIN);
+		sl_out_of_service_ind(xp, q, SL_FAIL_RECEIVED_SIN);
 		xp->sl.statem.failure_reason = SL_FAIL_RECEIVED_SIN;
-		sl_suerm_stop(q, xp);
-		sl_rc_stop(q, xp);
-		ctrace(sl_txc_send_sios(q, xp));
+		sl_suerm_stop(xp, q);
+		sl_rc_stop(xp, q);
+		ctrace(sl_txc_send_sios(xp, q));
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.lsc_state = SL_STATE_OUT_OF_SERVICE;
 		break;
 	case SL_STATE_PROCESSOR_OUTAGE:
-		sl_out_of_service_ind(q, xp, SL_FAIL_RECEIVED_SIN);
+		sl_out_of_service_ind(xp, q, SL_FAIL_RECEIVED_SIN);
 		xp->sl.statem.failure_reason = SL_FAIL_RECEIVED_SIN;
-		sl_suerm_stop(q, xp);
-		sl_rc_stop(q, xp);
-		sl_poc_stop(q, xp);	/* ok if not ITUT */
-		ctrace(sl_txc_send_sios(q, xp));
+		sl_suerm_stop(xp, q);
+		sl_rc_stop(xp, q);
+		sl_poc_stop(xp, q);	/* ok if not ITUT */
+		ctrace(sl_txc_send_sios(xp, q));
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.local_processor_outage = 0;
 		xp->sl.statem.remote_processor_outage = 0;	/* ok if not ANSI */
@@ -3239,14 +3417,14 @@ sl_lsc_sin(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_aerm_set_ti_to_tie(queue_t *q, struct xp *xp)
+sl_aerm_set_ti_to_tie(struct xp *xp, queue_t *q)
 {
 	if (xp->sdt.statem.aerm_state == SDT_STATE_IDLE)
 		xp->sdt.statem.Ti = xp->sdt.config.Tie;
 }
 
 STATIC INLINE void
-sl_aerm_start(queue_t *q, struct xp *xp)
+sl_aerm_start(struct xp *xp, queue_t *q)
 {
 	xp->sdt.statem.Ca = 0;
 	xp->sdt.statem.aborted_proving = 0;
@@ -3254,27 +3432,27 @@ sl_aerm_start(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_iac_sin(queue_t *q, struct xp *xp)
+sl_iac_sin(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.iac_state) {
 	case SL_STATE_NOT_ALIGNED:
-		xp_timer_stop(xp, t2);
+		__xp_timer_stop(xp, t2);
 		if (xp->sl.statem.emergency) {
 			xp->sl.statem.t4v = xp->sl.config.t4e;
-			ctrace(sl_txc_send_sie(q, xp));
+			ctrace(sl_txc_send_sie(xp, q));
 		} else {
 			xp->sl.statem.t4v = xp->sl.config.t4n;
-			ctrace(sl_txc_send_sin(q, xp));
+			ctrace(sl_txc_send_sin(xp, q));
 		}
-		xp_timer_start(xp, t3);
+		__xp_timer_start(xp, t3);
 		xp->sl.statem.iac_state = SL_STATE_ALIGNED;
 		return;
 	case SL_STATE_ALIGNED:
-		xp_timer_stop(xp, t3);
+		__xp_timer_stop(xp, t3);
 		if (xp->sl.statem.t4v == xp->sl.config.t4e)
-			sl_aerm_set_ti_to_tie(q, xp);
-		sl_aerm_start(q, xp);
-		ctrace(xp_timer_start(xp, t4));
+			sl_aerm_set_ti_to_tie(xp, q);
+		sl_aerm_start(xp, q);
+		ctrace(__xp_timer_start(xp, t4));
 		xp->sl.statem.further_proving = 0;
 		xp->sl.statem.Cp = 0;
 		xp->sl.statem.iac_state = SL_STATE_PROVING;
@@ -3283,25 +3461,25 @@ sl_iac_sin(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_lsc_sie(queue_t *q, struct xp *xp)
+sl_lsc_sie(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_IN_SERVICE:
-		sl_out_of_service_ind(q, xp, SL_FAIL_RECEIVED_SIE);
+		sl_out_of_service_ind(xp, q, SL_FAIL_RECEIVED_SIE);
 		xp->sl.statem.failure_reason = SL_FAIL_RECEIVED_SIE;
-		sl_suerm_stop(q, xp);
-		sl_rc_stop(q, xp);
-		ctrace(sl_txc_send_sios(q, xp));
+		sl_suerm_stop(xp, q);
+		sl_rc_stop(xp, q);
+		ctrace(sl_txc_send_sios(xp, q));
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.lsc_state = SL_STATE_OUT_OF_SERVICE;
 		break;
 	case SL_STATE_PROCESSOR_OUTAGE:
-		sl_out_of_service_ind(q, xp, SL_FAIL_RECEIVED_SIE);
+		sl_out_of_service_ind(xp, q, SL_FAIL_RECEIVED_SIE);
 		xp->sl.statem.failure_reason = SL_FAIL_RECEIVED_SIE;
-		sl_suerm_stop(q, xp);
-		sl_rc_stop(q, xp);
-		sl_poc_stop(q, xp);	/* ok if not ITUT */
-		ctrace(sl_txc_send_sios(q, xp));
+		sl_suerm_stop(xp, q);
+		sl_rc_stop(xp, q);
+		sl_poc_stop(xp, q);	/* ok if not ITUT */
+		ctrace(sl_txc_send_sios(xp, q));
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.local_processor_outage = 0;
 		xp->sl.statem.remote_processor_outage = 0;	/* ok if not ANSI */
@@ -3311,28 +3489,28 @@ sl_lsc_sie(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_iac_sie(queue_t *q, struct xp *xp)
+sl_iac_sie(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.iac_state) {
 	case SL_STATE_NOT_ALIGNED:
-		xp_timer_stop(xp, t2);
+		__xp_timer_stop(xp, t2);
 		if (xp->sl.statem.emergency) {
 			xp->sl.statem.t4v = xp->sl.config.t4e;
-			ctrace(sl_txc_send_sie(q, xp));
+			ctrace(sl_txc_send_sie(xp, q));
 		} else {
 			xp->sl.statem.t4v = xp->sl.config.t4e;	/* yes e */
-			ctrace(sl_txc_send_sin(q, xp));
+			ctrace(sl_txc_send_sin(xp, q));
 		}
-		xp_timer_start(xp, t3);
+		__xp_timer_start(xp, t3);
 		xp->sl.statem.iac_state = SL_STATE_ALIGNED;
 		return;
 	case SL_STATE_ALIGNED:
 		printd(("Receiving SIE at %lu\n", jiffies));
 		xp->sl.statem.t4v = xp->sl.config.t4e;
-		xp_timer_stop(xp, t3);
-		sl_aerm_set_ti_to_tie(q, xp);
-		sl_aerm_start(q, xp);
-		ctrace(xp_timer_start(xp, t4));
+		__xp_timer_stop(xp, t3);
+		sl_aerm_set_ti_to_tie(xp, q);
+		sl_aerm_start(xp, q);
+		ctrace(__xp_timer_start(xp, t4));
 		xp->sl.statem.further_proving = 0;
 		xp->sl.statem.Cp = 0;
 		xp->sl.statem.iac_state = SL_STATE_PROVING;
@@ -3340,12 +3518,12 @@ sl_iac_sie(queue_t *q, struct xp *xp)
 	case SL_STATE_PROVING:
 		if (xp->sl.statem.t4v == xp->sl.config.t4e)
 			return;
-		ctrace(xp_timer_stop(xp, t4));
+		ctrace(__xp_timer_stop(xp, t4));
 		xp->sl.statem.t4v = xp->sl.config.t4e;
-		sl_aerm_stop(q, xp);
-		sl_aerm_set_ti_to_tie(q, xp);
-		sl_aerm_start(q, xp);
-		ctrace(xp_timer_start(xp, t4));
+		sl_aerm_stop(xp, q);
+		sl_aerm_set_ti_to_tie(xp, q);
+		sl_aerm_start(xp, q);
+		ctrace(__xp_timer_start(xp, t4));
 		xp->sl.statem.further_proving = 0;
 		return;
 	}
@@ -3368,21 +3546,21 @@ sl_iac_sie(queue_t *q, struct xp *xp)
  */
 
 STATIC INLINE void
-sl_rb_congestion_function(queue_t *q, struct xp *xp)
+sl_rb_congestion_function(struct xp *xp, queue_t *q)
 {
 	if (!xp->sl.statem.l3_congestion_detect) {
 		if (xp->sl.statem.l2_congestion_detect) {
 			if (xp->sl.statem.Cr <= xp->sl.config.rb_abate && canputnext(xp->oq)) {
-				sl_rc_no_congestion(q, xp);
+				sl_rc_no_congestion(xp, q);
 				xp->sl.statem.l2_congestion_detect = 0;
 			}
 		} else {
 			if (xp->sl.statem.Cr >= xp->sl.config.rb_discard || !canput(xp->oq)) {
-				sl_rc_congestion_discard(q, xp);
+				sl_rc_congestion_discard(xp, q);
 				xp->sl.statem.l2_congestion_detect = 1;
 			} else if (xp->sl.statem.Cr >= xp->sl.config.rb_accept
 				   || !canputnext(xp->oq)) {
-				sl_rc_congestion_accept(q, xp);
+				sl_rc_congestion_accept(xp, q);
 				xp->sl.statem.l2_congestion_detect = 1;
 			}
 		}
@@ -3390,7 +3568,7 @@ sl_rb_congestion_function(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
+sl_rc_signal_unit(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	int pcr = xp->option.popt & SS7_POPT_PCR;
 
@@ -3431,31 +3609,31 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 	if (((xp->sl.statem.rx.len) == 1) || ((xp->sl.statem.rx.len) == 2)) {
 		switch (xp->sl.statem.rx.sio) {
 		case LSSU_SIO:{
-			sl_iac_sio(q, xp);
-			sl_lsc_sio(q, xp);
+			sl_iac_sio(xp, q);
+			sl_lsc_sio(xp, q);
 			break;
 		}
 		case LSSU_SIN:{
-			sl_iac_sin(q, xp);
-			sl_lsc_sin(q, xp);
+			sl_iac_sin(xp, q);
+			sl_lsc_sin(xp, q);
 			break;
 		}
 		case LSSU_SIE:{
-			sl_iac_sie(q, xp);
-			sl_lsc_sie(q, xp);
+			sl_iac_sie(xp, q);
+			sl_lsc_sie(xp, q);
 			break;
 		}
 		case LSSU_SIOS:{
-			sl_iac_sios(q, xp);
-			sl_lsc_sios(q, xp);
+			sl_iac_sios(xp, q);
+			sl_lsc_sios(xp, q);
 			break;
 		}
 		case LSSU_SIPO:{
-			sl_lsc_sipo(q, xp);
+			sl_lsc_sipo(xp, q);
 			break;
 		}
 		case LSSU_SIB:{
-			sl_lsc_sib(q, xp);
+			sl_lsc_sib(xp, q);
 			break;
 		}
 		}
@@ -3466,7 +3644,7 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 	    (((xp->sl.statem.rx.F.fsn - 1) & xp->sl.statem.sn_mask), xp->sl.statem.rx.R.bsn,
 	     xp->sl.statem.rx.T.fsn)) {
 		if (xp->sl.statem.abnormal_bsnr) {
-			sl_lsc_link_failure(q, xp, SL_FAIL_ABNORMAL_BSNR);
+			sl_lsc_link_failure(xp, q, SL_FAIL_ABNORMAL_BSNR);
 			xp->sl.statem.rc_state = SL_STATE_IDLE;
 			freemsg(mp);
 			return;
@@ -3487,16 +3665,16 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 		}
 	}
 	if (pcr) {
-		sl_lsc_fisu_msu_received(q, xp);
-		sl_txc_bsnr_and_bibr(q, xp);
+		sl_lsc_fisu_msu_received(xp, q);
+		sl_txc_bsnr_and_bibr(xp, q);
 		xp->sl.statem.rx.F.fsn = (xp->sl.statem.rx.R.bsn + 1) & xp->sl.statem.sn_mask;
 		if (!xp->sl.statem.msu_fisu_accepted) {
 			freemsg(mp);
 			return;
 		}
-		sl_rb_congestion_function(q, xp);
+		sl_rb_congestion_function(xp, q);
 		if (xp->sl.statem.congestion_discard) {
-			sl_cc_busy(q, xp);
+			sl_cc_busy(xp, q);
 			freemsg(mp);
 			return;
 		}
@@ -3507,9 +3685,9 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 			putq(q, mp);
 			xp->sl.statem.Cr++;
 			if (xp->sl.statem.congestion_accept)
-				sl_cc_busy(q, xp);
+				sl_cc_busy(xp, q);
 			else
-				sl_txc_fsnx_value(q, xp);
+				sl_txc_fsnx_value(xp, q);
 			return;
 		} else {
 			freemsg(mp);
@@ -3527,18 +3705,18 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 				return;
 			}
 		}
-		sl_lsc_fisu_msu_received(q, xp);
-		sl_txc_bsnr_and_bibr(q, xp);
+		sl_lsc_fisu_msu_received(xp, q);
+		sl_txc_bsnr_and_bibr(xp, q);
 		xp->sl.statem.rx.F.fsn = (xp->sl.statem.rx.R.bsn + 1) & xp->sl.statem.sn_mask;
 		if (!xp->sl.statem.msu_fisu_accepted) {
 			freemsg(mp);
 			return;
 		}
-		sl_rb_congestion_function(q, xp);
+		sl_rb_congestion_function(xp, q);
 		if (xp->sl.statem.congestion_discard) {
 			xp->sl.statem.rtr = 1;
 			freemsg(mp);
-			sl_cc_busy(q, xp);
+			sl_cc_busy(xp, q);
 			return;
 		}
 		if ((xp->sl.statem.rx.R.fsn == xp->sl.statem.rx.X.fsn)
@@ -3549,9 +3727,9 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 			putq(q, mp);
 			xp->sl.statem.Cr++;
 			if (xp->sl.statem.congestion_accept)
-				sl_cc_busy(q, xp);
+				sl_cc_busy(xp, q);
 			else
-				sl_txc_fsnx_value(q, xp);
+				sl_txc_fsnx_value(xp, q);
 			return;
 		}
 		if ((xp->sl.statem.rx.R.fsn ==
@@ -3561,11 +3739,11 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 		} else {
 			if (xp->sl.statem.congestion_accept) {
 				xp->sl.statem.rtr = 1;
-				sl_cc_busy(q, xp);	/* not required? */
+				sl_cc_busy(xp, q);	/* not required? */
 				freemsg(mp);
 				return;
 			} else {
-				sl_txc_nack_to_be_sent(q, xp);
+				sl_txc_nack_to_be_sent(xp, q);
 				xp->sl.statem.rtr = 1;
 				xp->sl.statem.rx.X.fib =
 				    xp->sl.statem.rx.X.fib ? 0 : xp->sl.statem.ib_mask;
@@ -3575,12 +3753,12 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 		}
 	} else {
 		if (xp->sl.statem.abnormal_fibr) {
-			sl_lsc_link_failure(q, xp, SL_FAIL_ABNORMAL_FIBR);
+			sl_lsc_link_failure(xp, q, SL_FAIL_ABNORMAL_FIBR);
 			freemsg(mp);
 			return;
 		}
 		if (xp->sl.statem.rtr == 1) {
-			sl_txc_bsnr_and_bibr(q, xp);
+			sl_txc_bsnr_and_bibr(xp, q);
 			xp->sl.statem.rx.F.fsn =
 			    (xp->sl.statem.rx.R.bsn + 1) & xp->sl.statem.sn_mask;
 			freemsg(mp);
@@ -3594,15 +3772,15 @@ sl_rc_signal_unit(queue_t *q, struct xp *xp, mblk_t *mp)
 }
 
 STATIC INLINE void
-sl_lsc_stop(queue_t *q, struct xp *xp)
+sl_lsc_stop(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.lsc_state != SL_STATE_OUT_OF_SERVICE) {
-		sl_iac_stop(q, xp);	/* ok if not running */
-		xp_timer_stop(xp, t1);	/* ok if not running */
-		sl_rc_stop(q, xp);
-		sl_suerm_stop(q, xp);	/* ok if not running */
-		sl_poc_stop(q, xp);	/* ok if not running or not ITUT */
-		ctrace(sl_txc_send_sios(q, xp));
+		sl_iac_stop(xp, q);	/* ok if not running */
+		__xp_timer_stop(xp, t1);	/* ok if not running */
+		sl_rc_stop(xp, q);
+		sl_suerm_stop(xp, q);	/* ok if not running */
+		sl_poc_stop(xp, q);	/* ok if not running or not ITUT */
+		ctrace(sl_txc_send_sios(xp, q));
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.local_processor_outage = 0;
 		xp->sl.statem.remote_processor_outage = 0;	/* ok of not ANSI */
@@ -3611,37 +3789,37 @@ sl_lsc_stop(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_lsc_clear_rtb(queue_t *q, struct xp *xp)
+sl_lsc_clear_rtb(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		xp->sl.statem.local_processor_outage = 0;
-		sl_txc_send_fisu(q, xp);
-		sl_txc_clear_rtb(q, xp);
+		sl_txc_send_fisu(xp, q);
+		sl_txc_clear_rtb(xp, q);
 	}
 }
 
 STATIC INLINE void
-sl_iac_correct_su(queue_t *q, struct xp *xp)
+sl_iac_correct_su(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.iac_state == SL_STATE_PROVING) {
 		if (xp->sl.statem.further_proving) {
-			ctrace(xp_timer_stop(xp, t4));
-			sl_aerm_start(q, xp);
-			ctrace(xp_timer_start(xp, t4));
+			ctrace(__xp_timer_stop(xp, t4));
+			sl_aerm_start(xp, q);
+			ctrace(__xp_timer_start(xp, t4));
 			xp->sl.statem.further_proving = 0;
 		}
 	}
 }
 
 STATIC INLINE void
-sl_iac_abort_proving(queue_t *q, struct xp *xp)
+sl_iac_abort_proving(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.iac_state == SL_STATE_PROVING) {
 		xp->sl.statem.Cp++;
 		if (xp->sl.statem.Cp == xp->sl.config.M) {
-			ctrace(sl_lsc_alignment_not_possible(q, xp));
-			ctrace(xp_timer_stop(xp, t4));
-			sl_aerm_stop(q, xp);
+			ctrace(sl_lsc_alignment_not_possible(xp, q));
+			ctrace(__xp_timer_stop(xp, t4));
+			sl_aerm_stop(xp, q);
 			xp->sl.statem.emergency = 0;
 			xp->sl.statem.iac_state = SL_STATE_IDLE;
 			return;
@@ -3652,7 +3830,7 @@ sl_iac_abort_proving(queue_t *q, struct xp *xp)
 
 #define sl_lsc_flush_buffers sl_lsc_clear_buffers
 STATIC INLINE int
-sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
+sl_lsc_clear_buffers(struct xp *xp, queue_t *q)
 {
 	int err;
 
@@ -3663,7 +3841,7 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 		case SS7_PVAR_ITUT_96:
 			return (QR_DONE);
 		case SS7_PVAR_ANSI_92:
-			if ((err = sl_rtb_cleared_ind(q, xp)))
+			if ((err = sl_rtb_cleared_ind(xp, q)))
 				return (err);
 			xp->sl.statem.local_processor_outage = 0;	/* ??? */
 			return (QR_DONE);
@@ -3674,7 +3852,7 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 		case SS7_PVAR_ITUT_96:
 			return (QR_DONE);
 		case SS7_PVAR_ANSI_92:
-			if ((err = sl_rtb_cleared_ind(q, xp)))
+			if ((err = sl_rtb_cleared_ind(xp, q)))
 				return (err);
 			xp->sl.statem.local_processor_outage = 0;
 			return (QR_DONE);
@@ -3685,10 +3863,10 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 		case SS7_PVAR_ITUT_96:
 			return (QR_DONE);
 		case SS7_PVAR_ANSI_92:
-			if ((err = sl_rtb_cleared_ind(q, xp)))
+			if ((err = sl_rtb_cleared_ind(xp, q)))
 				return (err);
 			xp->sl.statem.local_processor_outage = 0;
-			sl_txc_send_fisu(q, xp);
+			sl_txc_send_fisu(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_ALIGNED_READY;
 			return (QR_DONE);
 		}
@@ -3696,24 +3874,24 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			sl_txc_flush_buffers(q, xp);
+			sl_txc_flush_buffers(xp, q);
 			xp->sl.statem.l3_indication_received = 1;
 			if (xp->sl.statem.processor_outage)
 				return (QR_DONE);
 			xp->sl.statem.l3_indication_received = 0;
-			sl_txc_send_msu(q, xp);
+			sl_txc_send_msu(xp, q);
 			xp->sl.statem.local_processor_outage = 0;
-			sl_rc_accept_msu_fisu(q, xp);
+			sl_rc_accept_msu_fisu(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 			return (QR_DONE);
 		case SS7_PVAR_ANSI_92:
 			xp->sl.statem.local_processor_outage = 0;
-			if ((err = sl_rc_clear_rb(q, xp)))
+			if ((err = sl_rc_clear_rb(xp, q)))
 				return (err);
-			sl_rc_accept_msu_fisu(q, xp);
-			sl_txc_send_fisu(q, xp);
-			sl_txc_clear_tb(q, xp);
-			sl_txc_clear_rtb(q, xp);
+			sl_rc_accept_msu_fisu(xp, q);
+			sl_txc_send_fisu(xp, q);
+			sl_txc_clear_tb(xp, q);
+			sl_txc_clear_rtb(xp, q);
 			return (QR_DONE);
 		}
 	}
@@ -3721,25 +3899,25 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_lsc_continue(queue_t *q, struct xp *xp, mblk_t *mp)
+sl_lsc_continue(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	if (xp->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		if (xp->sl.statem.processor_outage)
 			return;
 		xp->sl.statem.l3_indication_received = 0;
-		sl_txc_send_msu(q, xp);
+		sl_txc_send_msu(xp, q);
 		xp->sl.statem.local_processor_outage = 0;
-		sl_rc_accept_msu_fisu(q, xp);
+		sl_rc_accept_msu_fisu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 	}
 }
 
 STATIC INLINE void
-sl_poc_local_processor_recovered(queue_t *q, struct xp *xp)
+sl_poc_local_processor_recovered(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_LOCAL_PROCESSOR_OUTAGE:
-		sl_lsc_no_processor_outage(q, xp);
+		sl_lsc_no_processor_outage(xp, q);
 		xp->sl.statem.poc_state = SL_STATE_IDLE;
 		return;
 	case SL_STATE_BOTH_PROCESSORS_OUT:
@@ -3750,7 +3928,7 @@ sl_poc_local_processor_recovered(queue_t *q, struct xp *xp)
 
 #define sl_lsc_resume sl_lsc_local_processor_recovered
 STATIC INLINE void
-sl_lsc_local_processor_recovered(queue_t *q, struct xp *xp)
+sl_lsc_local_processor_recovered(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
@@ -3763,31 +3941,31 @@ sl_lsc_local_processor_recovered(queue_t *q, struct xp *xp)
 		return;
 	case SL_STATE_ALIGNED_NOT_READY:
 		if (xp->option.pvar != SS7_PVAR_ANSI_92)
-			sl_poc_local_processor_recovered(q, xp);
+			sl_poc_local_processor_recovered(xp, q);
 		xp->sl.statem.local_processor_outage = 0;
-		sl_txc_send_fisu(q, xp);
+		sl_txc_send_fisu(xp, q);
 		if (xp->option.pvar == SS7_PVAR_ITUT_96)
-			sl_rc_accept_msu_fisu(q, xp);
+			sl_rc_accept_msu_fisu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_ALIGNED_READY;
 		return;
 	case SL_STATE_PROCESSOR_OUTAGE:
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			sl_poc_local_processor_recovered(q, xp);
-			sl_rc_retrieve_fsnx(q, xp);
-			sl_txc_send_fisu(q, xp);	/* note 3: in fisu BSN <= FSNX-1 */
+			sl_poc_local_processor_recovered(xp, q);
+			sl_rc_retrieve_fsnx(xp, q);
+			sl_txc_send_fisu(xp, q);	/* note 3: in fisu BSN <= FSNX-1 */
 			xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 			return;
 		case SS7_PVAR_ANSI_92:
 			xp->sl.statem.local_processor_outage = 0;
-			sl_rc_accept_msu_fisu(q, xp);
+			sl_rc_accept_msu_fisu(xp, q);
 			if (xp->sl.statem.remote_processor_outage) {
-				sl_txc_send_fisu(q, xp);
-				sl_remote_processor_outage_ind(q, xp);
+				sl_txc_send_fisu(xp, q);
+				sl_remote_processor_outage_ind(xp, q);
 				return;
 			}
-			sl_txc_send_msu(q, xp);
+			sl_txc_send_msu(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 			return;
 		}
@@ -3797,7 +3975,7 @@ sl_lsc_local_processor_recovered(queue_t *q, struct xp *xp)
 
 #define sl_lsc_level_3_failure sl_lsc_local_processor_outage
 STATIC INLINE void
-sl_lsc_local_processor_outage(queue_t *q, struct xp *xp)
+sl_lsc_local_processor_outage(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
@@ -3808,24 +3986,24 @@ sl_lsc_local_processor_outage(queue_t *q, struct xp *xp)
 		if (xp->option.pvar == SS7_PVAR_ANSI_92)
 			xp->sl.statem.local_processor_outage = 1;
 		else
-			sl_poc_local_processor_outage(q, xp);
-		ctrace(sl_txc_send_sipo(q, xp));
+			sl_poc_local_processor_outage(xp, q);
+		ctrace(sl_txc_send_sipo(xp, q));
 		if (xp->option.pvar != SS7_PVAR_ITUT_93)	/* possible error 93 specs */
-			sl_rc_reject_msu_fisu(q, xp);
+			sl_rc_reject_msu_fisu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_ALIGNED_NOT_READY;
 		return;
 	case SL_STATE_IN_SERVICE:
 		if (xp->option.pvar == SS7_PVAR_ANSI_92) {
 			xp->sl.statem.local_processor_outage = 1;
 		} else {
-			sl_poc_local_processor_outage(q, xp);
+			sl_poc_local_processor_outage(xp, q);
 			xp->sl.statem.processor_outage = 1;
 		}
-		ctrace(sl_txc_send_sipo(q, xp));
-		sl_rc_reject_msu_fisu(q, xp);
+		ctrace(sl_txc_send_sipo(xp, q));
+		sl_rc_reject_msu_fisu(xp, q);
 		if (xp->option.pvar == SS7_PVAR_ANSI_92) {
-			sl_rc_align_fsnx(q, xp);
-			sl_cc_stop(q, xp);
+			sl_rc_align_fsnx(xp, q);
+			sl_cc_stop(xp, q);
 		}
 		xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 		return;
@@ -3833,28 +4011,28 @@ sl_lsc_local_processor_outage(queue_t *q, struct xp *xp)
 		if (xp->option.pvar == SS7_PVAR_ANSI_92)
 			xp->sl.statem.local_processor_outage = 1;
 		else
-			sl_poc_local_processor_outage(q, xp);
-		ctrace(sl_txc_send_sipo(q, xp));
+			sl_poc_local_processor_outage(xp, q);
+		ctrace(sl_txc_send_sipo(xp, q));
 		return;
 	}
 }
 
 STATIC INLINE void
-sl_iac_emergency(queue_t *q, struct xp *xp)
+sl_iac_emergency(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.iac_state) {
 	case SL_STATE_PROVING:
-		ctrace(sl_txc_send_sie(q, xp));
-		ctrace(xp_timer_stop(xp, t4));
+		ctrace(sl_txc_send_sie(xp, q));
+		ctrace(__xp_timer_stop(xp, t4));
 		xp->sl.statem.t4v = xp->sl.config.t4e;
-		sl_aerm_stop(q, xp);
-		sl_aerm_set_ti_to_tie(q, xp);
-		sl_aerm_start(q, xp);
-		ctrace(xp_timer_start(xp, t4));
+		sl_aerm_stop(xp, q);
+		sl_aerm_set_ti_to_tie(xp, q);
+		sl_aerm_start(xp, q);
+		ctrace(__xp_timer_start(xp, t4));
 		xp->sl.statem.further_proving = 0;
 		return;
 	case SL_STATE_ALIGNED:
-		ctrace(sl_txc_send_sie(q, xp));
+		ctrace(sl_txc_send_sie(xp, q));
 		xp->sl.statem.t4v = xp->sl.config.t4e;
 		return;
 	case SL_STATE_IDLE:
@@ -3864,30 +4042,30 @@ sl_iac_emergency(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_lsc_emergency(queue_t *q, struct xp *xp)
+sl_lsc_emergency(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.emergency = 1;
-	sl_iac_emergency(q, xp);	/* added to pass Q.781/Test 1.20 */
+	sl_iac_emergency(xp, q);	/* added to pass Q.781/Test 1.20 */
 }
 
 STATIC INLINE void
-sl_lsc_emergency_ceases(queue_t *q, struct xp *xp)
+sl_lsc_emergency_ceases(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.emergency = 0;
 }
 
 STATIC INLINE void
-sl_iac_start(queue_t *q, struct xp *xp)
+sl_iac_start(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.iac_state == SL_STATE_IDLE) {
-		ctrace(sl_txc_send_sio(q, xp));
-		xp_timer_start(xp, t2);
+		ctrace(sl_txc_send_sio(xp, q));
+		__xp_timer_start(xp, t2);
 		xp->sl.statem.iac_state = SL_STATE_NOT_ALIGNED;
 	}
 }
 
 STATIC INLINE void
-sl_daedt_start(queue_t *q, struct xp *xp)
+sl_daedt_start(struct xp *xp, queue_t *q)
 {
 	xp->sdt.statem.daedt_state = SDT_STATE_IN_SERVICE;
 	xp->sdl.statem.tx_state = SDL_STATE_IN_SERVICE;
@@ -3895,7 +4073,7 @@ sl_daedt_start(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_txc_start(queue_t *q, struct xp *xp)
+sl_txc_start(struct xp *xp, queue_t *q)
 {
 	xp->sl.statem.forced_retransmission = 0;	/* ok if basic */
 	xp->sl.statem.sib_received = 0;
@@ -3924,22 +4102,22 @@ sl_txc_start(queue_t *q, struct xp *xp)
 	if (xp->sl.statem.txc_state == SL_STATE_IDLE) {
 		if (xp->option.pvar != SS7_PVAR_ANSI_92)
 			xp->sl.statem.lssu_available = 0;
-		sl_daedt_start(q, xp);
+		sl_daedt_start(xp, q);
 	}
 	xp->sl.statem.txc_state = SL_STATE_IN_SERVICE;
 	return;
 }
 
 STATIC INLINE void
-sl_lsc_start(queue_t *q, struct xp *xp)
+sl_lsc_start(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
-		sl_rc_start(q, xp);
-		sl_txc_start(q, xp);	/* Note 2 */
+		sl_rc_start(xp, q);
+		sl_txc_start(xp, q);	/* Note 2 */
 		if (xp->sl.statem.emergency)
-			sl_iac_emergency(q, xp);
-		sl_iac_start(q, xp);
+			sl_iac_emergency(xp, q);
+		sl_iac_start(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_INITIAL_ALIGNMENT;
 	}
 }
@@ -3954,29 +4132,29 @@ sl_lsc_start(queue_t *q, struct xp *xp)
  */
 
 STATIC INLINE int
-sl_lsc_retrieve_bsnt(queue_t *q, struct xp *xp)
+sl_lsc_retrieve_bsnt(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
-		return sl_rc_retrieve_bsnt(q, xp);
+		return sl_rc_retrieve_bsnt(xp, q);
 	}
 	return (QR_DONE);
 }
 
 STATIC INLINE int
-sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct xp *xp, sl_ulong fsnc)
+sl_lsc_retrieval_request_and_fsnc(struct xp *xp, queue_t *q, sl_ulong fsnc)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
-		return sl_txc_retrieval_request_and_fsnc(q, xp, fsnc);
+		return sl_txc_retrieval_request_and_fsnc(xp, q, fsnc);
 	}
 	return (QR_DONE);
 }
 
 STATIC INLINE void
-sl_aerm_set_ti_to_tin(queue_t *q, struct xp *xp)
+sl_aerm_set_ti_to_tin(struct xp *xp, queue_t *q)
 {
 	if (xp->sdt.statem.aerm_state == SDT_STATE_IDLE)
 		xp->sdt.statem.Ti = xp->sdt.config.Tin;
@@ -3989,13 +4167,13 @@ sl_aerm_set_ti_to_tin(queue_t *q, struct xp *xp)
  */
 
 STATIC INLINE void
-sl_lsc_power_on(queue_t *q, struct xp *xp)
+sl_lsc_power_on(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_POWER_OFF:
-		sl_txc_start(q, xp);	/* Note 3 */
-		ctrace(sl_txc_send_sios(q, xp));	/* not necessary for ANSI */
-		sl_aerm_set_ti_to_tin(q, xp);
+		sl_txc_start(xp, q);	/* Note 3 */
+		ctrace(sl_txc_send_sios(xp, q));	/* not necessary for ANSI */
+		sl_aerm_set_ti_to_tin(xp, q);
 		xp->sl.statem.local_processor_outage = 0;
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.lsc_state = SL_STATE_OUT_OF_SERVICE;
@@ -4021,7 +4199,7 @@ sl_lsc_power_on(queue_t *q, struct xp *xp)
  *  control signal as per configured abatement, onset and discard thresholds.
  */
 STATIC void
-sl_check_congestion(queue_t *q, struct xp *xp)
+sl_check_congestion(struct xp *xp, queue_t *q)
 {
 	unsigned int occupancy = xp->iq->q_count + xp->sl.tb.q_count + xp->sl.rtb.q_count;
 	int old_cong_status = xp->sl.statem.cong_status;
@@ -4115,40 +4293,40 @@ sl_check_congestion(queue_t *q, struct xp *xp)
 	if (xp->sl.statem.cong_status != old_cong_status
 	    || xp->sl.statem.disc_status != old_disc_status) {
 		if (xp->sl.statem.cong_status < old_cong_status)
-			sl_link_congestion_ceased_ind(q, xp, xp->sl.statem.cong_status,
+			sl_link_congestion_ceased_ind(xp, q, xp->sl.statem.cong_status,
 						      xp->sl.statem.disc_status);
 		else {
 			if (xp->sl.statem.cong_status > old_cong_status) {
 				if (xp->sl.notify.events & SL_EVT_CONGEST_ONSET_IND &&
 				    !xp->sl.stats.sl_cong_onset_ind[xp->sl.statem.cong_status]++) {
-					sl_link_congested_ind(q, xp, xp->sl.statem.cong_status,
+					sl_link_congested_ind(xp, q, xp->sl.statem.cong_status,
 							      xp->sl.statem.disc_status);
 					return;
 				}
 			} else {
 				if (xp->sl.notify.events & SL_EVT_CONGEST_DISCD_IND &&
 				    !xp->sl.stats.sl_cong_discd_ind[xp->sl.statem.disc_status]++) {
-					sl_link_congested_ind(q, xp, xp->sl.statem.cong_status,
+					sl_link_congested_ind(xp, q, xp->sl.statem.cong_status,
 							      xp->sl.statem.disc_status);
 					return;
 				}
 			}
-			sl_link_congested_ind(q, xp, xp->sl.statem.cong_status,
+			sl_link_congested_ind(xp, q, xp->sl.statem.cong_status,
 					      xp->sl.statem.disc_status);
 		}
 	}
 }
 
 STATIC INLINE void
-sl_txc_message_for_transmission(queue_t *q, struct xp *xp, mblk_t *mp)
+sl_txc_message_for_transmission(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	bufq_queue(&xp->sl.tb, mp);
 	xp->sl.statem.Cm++;
-	sl_check_congestion(q, xp);
+	sl_check_congestion(xp, q);
 }
 
 STATIC INLINE int
-sl_lsc_pdu(queue_t *q, struct xp *xp, mblk_t *mp)
+sl_lsc_pdu(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	mblk_t *dp = mp;
 	int hlen = (xp->option.popt & SS7_POPT_XSN) ? 6 : 3;
@@ -4174,18 +4352,18 @@ sl_lsc_pdu(queue_t *q, struct xp *xp, mblk_t *mp)
 	} else {
 		return (-ENOBUFS);
 	}
-	sl_txc_message_for_transmission(q, xp, mp);
+	sl_txc_message_for_transmission(xp, q, mp);
 	return (QR_ABSORBED);
 }
 
 STATIC INLINE void
-sl_aerm_su_in_error(queue_t *q, struct xp *xp)
+sl_aerm_su_in_error(struct xp *xp, queue_t *q)
 {
 	if (xp->sdt.statem.aerm_state == SDT_STATE_MONITORING) {
 		xp->sdt.statem.Ca++;
 		if (xp->sdt.statem.Ca == xp->sdt.statem.Ti) {
 			xp->sdt.statem.aborted_proving = 1;
-			sl_iac_abort_proving(q, xp);
+			sl_iac_abort_proving(xp, q);
 			xp->sdt.statem.Ca--;
 			xp->sdt.statem.aerm_state = SDT_STATE_IDLE;
 		}
@@ -4193,23 +4371,23 @@ sl_aerm_su_in_error(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_aerm_correct_su(queue_t *q, struct xp *xp)
+sl_aerm_correct_su(struct xp *xp, queue_t *q)
 {
 	if (xp->sdt.statem.aerm_state == SDT_STATE_IDLE) {
 		if (xp->sdt.statem.aborted_proving) {
-			sl_iac_correct_su(q, xp);
+			sl_iac_correct_su(xp, q);
 			xp->sdt.statem.aborted_proving = 0;
 		}
 	}
 }
 
 STATIC INLINE void
-sl_suerm_su_in_error(queue_t *q, struct xp *xp)
+sl_suerm_su_in_error(struct xp *xp, queue_t *q)
 {
 	if (xp->sdt.statem.suerm_state == SDT_STATE_IN_SERVICE) {
 		xp->sdt.statem.Cs++;
 		if (xp->sdt.statem.Cs >= xp->sdt.config.T) {
-			sl_lsc_link_failure(q, xp, SL_FAIL_SUERM_EIM);
+			sl_lsc_link_failure(xp, q, SL_FAIL_SUERM_EIM);
 			xp->sdt.statem.Ca--;
 			xp->sdt.statem.suerm_state = SDT_STATE_IDLE;
 			return;
@@ -4224,14 +4402,14 @@ sl_suerm_su_in_error(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_eim_su_in_error(queue_t *q, struct xp *xp)
+sl_eim_su_in_error(struct xp *xp, queue_t *q)
 {
 	if (xp->sdt.statem.eim_state == SDT_STATE_MONITORING)
 		xp->sdt.statem.interval_error = 1;
 }
 
 STATIC INLINE void
-sl_suerm_correct_su(queue_t *q, struct xp *xp)
+sl_suerm_correct_su(struct xp *xp, queue_t *q)
 {
 	if (xp->sdt.statem.suerm_state == SDT_STATE_IN_SERVICE) {
 		xp->sdt.statem.Ns++;
@@ -4244,18 +4422,18 @@ sl_suerm_correct_su(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_eim_correct_su(queue_t *q, struct xp *xp)
+sl_eim_correct_su(struct xp *xp, queue_t *q)
 {
 	if (xp->sdt.statem.eim_state == SDT_STATE_MONITORING)
 		xp->sdt.statem.su_received = 1;
 }
 
 STATIC INLINE void
-sl_daedr_correct_su(queue_t *q, struct xp *xp)
+sl_daedr_correct_su(struct xp *xp, queue_t *q)
 {
-	sl_eim_correct_su(q, xp);
-	sl_suerm_correct_su(q, xp);
-	sl_aerm_correct_su(q, xp);
+	sl_eim_correct_su(xp, q);
+	sl_suerm_correct_su(xp, q);
+	sl_aerm_correct_su(xp, q);
 }
 
 /*
@@ -4263,12 +4441,12 @@ sl_daedr_correct_su(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE void
-sl_daedr_su_in_error(queue_t *q, struct xp *xp)
+sl_daedr_su_in_error(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
-		sl_eim_su_in_error(q, xp);
-		sl_suerm_su_in_error(q, xp);
-		sl_aerm_su_in_error(q, xp);
+		sl_eim_su_in_error(xp, q);
+		sl_suerm_su_in_error(xp, q);
+		sl_aerm_su_in_error(xp, q);
 	} else {
 		/* cancel compression */
 		if (xp->rx.cmp) {
@@ -4280,11 +4458,11 @@ sl_daedr_su_in_error(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
-sl_daedr_received_bits(queue_t *q, struct xp *xp, mblk_t *mp)
+sl_daedr_received_bits(struct xp *xp, queue_t *q, mblk_t *mp)
 {
 	if (xp->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
-		sl_rc_signal_unit(q, xp, mp);
-		sl_daedr_correct_su(q, xp);
+		sl_rc_signal_unit(xp, q, mp);
+		sl_daedr_correct_su(xp, q);
 	} else {
 		int i, len, mlen = (xp->option.popt & SS7_POPT_XSN) ? 8 : 5;
 
@@ -4310,7 +4488,7 @@ sl_daedr_received_bits(queue_t *q, struct xp *xp, mblk_t *mp)
 					mblk_t *cd;
 
 					if ((cd = dupb(xp->rx.cmp)))
-						if (sdt_rc_signal_unit_ind(q, xp, cd, xp->rx.repeat)
+						if (sdt_rc_signal_unit_ind(xp, q, cd, xp->rx.repeat)
 						    != QR_ABSORBED) {
 							xp->sdt.stats.rx_buffer_overflows++;
 							freeb(cd);
@@ -4327,7 +4505,7 @@ sl_daedr_received_bits(queue_t *q, struct xp *xp, mblk_t *mp)
 					xp->rx.repeat = 0;
 				}
 			}
-			if (sdt_rc_signal_unit_ind(q, xp, mp, 1) != QR_ABSORBED) {
+			if (sdt_rc_signal_unit_ind(xp, q, mp, 1) != QR_ABSORBED) {
 				xp->sdt.stats.rx_buffer_overflows++;
 				freemsg(mp);
 			}
@@ -4337,12 +4515,12 @@ sl_daedr_received_bits(queue_t *q, struct xp *xp, mblk_t *mp)
 }
 
 STATIC INLINE mblk_t *
-sl_daedt_transmission_request(queue_t *q, struct xp *xp)
+sl_daedt_transmission_request(struct xp *xp, queue_t *q)
 {
 	mblk_t *mp;
 
 	if (xp->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
-		if (!(mp = sl_txc_transmission_request(q, xp)))
+		if (!(mp = sl_txc_transmission_request(xp, q)))
 			xp->sdt.stats.tx_buffer_overflows++;
 		return (mp);
 	} else if (xp->sdt.statem.daedt_state != SDT_STATE_IDLE) {
@@ -4443,20 +4621,19 @@ sl_daedt_transmission_request(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC int
-xp_t1_timeout(struct xp *xp)
+xp_t1_timeout(struct xp *xp, queue_t *q)
 {
-	queue_t *q = NULL;
 	int err;
 
-	if ((err = sl_out_of_service_ind(q, xp, SL_FAIL_T1_TIMEOUT)))
+	if ((err = sl_out_of_service_ind(xp, q, SL_FAIL_T1_TIMEOUT)))
 		return (err);
 	xp->sl.statem.failure_reason = SL_FAIL_T1_TIMEOUT;
-	sl_rc_stop(q, xp);
-	sl_suerm_stop(q, xp);
-	ctrace(sl_txc_send_sios(q, xp));
+	sl_rc_stop(xp, q);
+	sl_suerm_stop(xp, q);
+	ctrace(sl_txc_send_sios(xp, q));
 	xp->sl.statem.emergency = 0;
 	if (xp->sl.statem.lsc_state == SL_STATE_ALIGNED_NOT_READY) {
-		sl_poc_stop(q, xp);	/* ok if ANSI */
+		sl_poc_stop(xp, q);	/* ok if ANSI */
 		xp->sl.statem.local_processor_outage = 0;
 	}
 	xp->sl.statem.lsc_state = SL_STATE_OUT_OF_SERVICE;
@@ -4468,13 +4645,12 @@ xp_t1_timeout(struct xp *xp)
  *  -----------------------------------
  */
 STATIC int
-xp_t2_timeout(struct xp *xp)
+xp_t2_timeout(struct xp *xp, queue_t *q)
 {
-	queue_t *q = NULL;
 	int err;
 
 	if (xp->sl.statem.iac_state == SL_STATE_NOT_ALIGNED) {
-		if ((err = ctrace(sl_lsc_alignment_not_possible(q, xp))))
+		if ((err = ctrace(sl_lsc_alignment_not_possible(xp, q))))
 			return (err);
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.iac_state = SL_STATE_IDLE;
@@ -4487,13 +4663,12 @@ xp_t2_timeout(struct xp *xp)
  *  -----------------------------------
  */
 STATIC int
-xp_t3_timeout(struct xp *xp)
+xp_t3_timeout(struct xp *xp, queue_t *q)
 {
-	queue_t *q = NULL;
 	int err;
 
 	if (xp->sl.statem.iac_state == SL_STATE_ALIGNED) {
-		if ((err = ctrace(sl_lsc_alignment_not_possible(q, xp))))
+		if ((err = ctrace(sl_lsc_alignment_not_possible(xp, q))))
 			return (err);
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.iac_state = SL_STATE_IDLE;
@@ -4506,18 +4681,16 @@ xp_t3_timeout(struct xp *xp)
  *  -----------------------------------
  */
 STATIC int
-xp_t4_timeout(struct xp *xp)
+xp_t4_timeout(struct xp *xp, queue_t *q)
 {
-	queue_t *q = NULL;
-
 	if (xp->sl.statem.iac_state == SL_STATE_PROVING) {
 		if (xp->sl.statem.further_proving) {
-			sl_aerm_start(q, xp);
-			ctrace(xp_timer_start(xp, t4));
+			sl_aerm_start(xp, q);
+			ctrace(__xp_timer_start(xp, t4));
 			xp->sl.statem.further_proving = 0;
 		} else {
-			sl_lsc_alignment_complete(q, xp);
-			sl_aerm_stop(q, xp);
+			sl_lsc_alignment_complete(xp, q);
+			sl_aerm_stop(xp, q);
 			xp->sl.statem.emergency = 0;
 			xp->sl.statem.iac_state = SL_STATE_IDLE;
 		}
@@ -4530,13 +4703,11 @@ xp_t4_timeout(struct xp *xp)
  *  -----------------------------------
  */
 STATIC int
-xp_t5_timeout(struct xp *xp)
+xp_t5_timeout(struct xp *xp, queue_t *q)
 {
-	queue_t *q = NULL;
-
 	if (xp->sl.statem.cc_state == SL_STATE_BUSY) {
-		ctrace(sl_txc_send_sib(q, xp));
-		xp_timer_start(xp, t5);
+		ctrace(sl_txc_send_sib(xp, q));
+		__xp_timer_start(xp, t5);
 	}
 	return (QR_DONE);
 }
@@ -4546,15 +4717,14 @@ xp_t5_timeout(struct xp *xp)
  *  -----------------------------------
  */
 STATIC int
-xp_t6_timeout(struct xp *xp)
+xp_t6_timeout(struct xp *xp, queue_t *q)
 {
-	queue_t *q = NULL;
 	int err;
 
-	if ((err = sl_lsc_link_failure(q, xp, SL_FAIL_CONG_TIMEOUT)))
+	if ((err = sl_lsc_link_failure(xp, q, SL_FAIL_CONG_TIMEOUT)))
 		return (err);
 	xp->sl.statem.sib_received = 0;
-	xp_timer_stop(xp, t7);
+	__xp_timer_stop(xp, t7);
 	return (QR_DONE);
 }
 
@@ -4563,14 +4733,13 @@ xp_t6_timeout(struct xp *xp)
  *  -----------------------------------
  */
 STATIC int
-xp_t7_timeout(struct xp *xp)
+xp_t7_timeout(struct xp *xp, queue_t *q)
 {
-	queue_t *q = NULL;
 	int err;
 
-	if ((err = sl_lsc_link_failure(q, xp, SL_FAIL_ACK_TIMEOUT)))
+	if ((err = sl_lsc_link_failure(xp, q, SL_FAIL_ACK_TIMEOUT)))
 		return (err);
-	xp_timer_stop(xp, t6);
+	__xp_timer_stop(xp, t6);
 	if (xp->option.pvar == SS7_PVAR_ITUT_96)
 		xp->sl.statem.sib_received = 0;
 	return (QR_DONE);
@@ -4581,13 +4750,12 @@ xp_t7_timeout(struct xp *xp)
  *  -----------------------------------
  */
 STATIC int
-xp_t8_timeout(struct xp *xp)
+xp_t8_timeout(struct xp *xp, queue_t *q)
 {
-	queue_t *q = NULL;
 	int err;
 
 	if (xp->sdt.statem.eim_state == SDT_STATE_MONITORING) {
-		xp_timer_start(xp, t8);
+		__xp_timer_start(xp, t8);
 		if (xp->sdt.statem.su_received) {
 			xp->sdt.statem.su_received = 0;
 			if (!xp->sdt.statem.interval_error) {
@@ -4598,7 +4766,7 @@ xp_t8_timeout(struct xp *xp)
 		}
 		xp->sdt.statem.Ce += xp->sdt.config.Ue;
 		if (xp->sdt.statem.Ce > xp->sdt.config.Te) {
-			if ((err = sl_lsc_link_failure(q, xp, SL_FAIL_SUERM_EIM))) {
+			if ((err = sl_lsc_link_failure(xp, q, SL_FAIL_SUERM_EIM))) {
 				xp->sdt.statem.Ce -= xp->sdt.config.Ue;
 				return (err);
 			}
@@ -4785,7 +4953,7 @@ xp_tx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 			      next_message:
 				if (tx->msg && tx->msg != tx->cmp)
 					freemsg(tx->msg);
-				if ((tx->msg = tx->nxt = sl_daedt_transmission_request(q, xp)))
+				if ((tx->msg = tx->nxt = sl_daedt_transmission_request(xp, q)))
 					tx->mode = TX_MODE_BOF;
 			}
 		}
@@ -4799,7 +4967,7 @@ xp_tx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 				switch (type) {
 				default:
 				case SDL_TYPE_DS0:
-					printd(("Tx: %p: 0x%02x\n", xp, xp_rev(*bp)));
+					_printd(("Tx: %p: 0x%02x\n", xp, xp_rev(*bp)));
 					*bp = xp_rev(tx->residue);
 					break;
 				case SDL_TYPE_DS0A:
@@ -4897,7 +5065,7 @@ xp_tx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 				/* next block */
 				if (tx->msg)
 					ss7_fast_freemsg(&xp_bufpool, tx->msg);
-				if (!(tx->msg = tx->nxt = sl_daedt_transmission_request(q, xp))) {
+				if (!(tx->msg = tx->nxt = sl_daedt_transmission_request(xp, q))) {
 					xp->sdl.stats.tx_buffer_overflows++;
 					return;
 				}
@@ -5070,7 +5238,7 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 			switch (type) {
 			default:
 			case SDL_TYPE_DS0:
-				printd(("Rx: %p: 0x%02x\n", xp, *bp));
+				_printd(("Rx: %p: 0x%02x\n", xp, *bp));
 				r = rx_index8(rx->state, xp_rev(*bp));
 				break;
 			case SDL_TYPE_DS0A:
@@ -5143,7 +5311,7 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 					if (len != li && (li != mlen || len <= li))
 						goto length_error;
 					stats->rx_sus++;
-					sl_daedr_received_bits(q, xp, xchg(&rx->msg, NULL));
+					sl_daedr_received_bits(xp, q, xchg(&rx->msg, NULL));
 				      new_frame:
 					rx->mode = RX_MODE_SYNC;
 					rx->residue = 0;
@@ -5193,7 +5361,7 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 				if (rx->msg)
 					ss7_fast_freemsg(&xp_bufpool, xchg(&rx->msg, NULL));
 				stats->rx_sus_in_error++;
-				sl_daedr_su_in_error(q, xp);
+				sl_daedr_su_in_error(xp, q);
 				if (r->flag)
 					goto new_frame;
 				rx->mode = RX_MODE_HUNT;
@@ -5211,7 +5379,7 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 				if (!r->flag) {
 					if ((++rx->octets) >= N) {
 						stats->rx_sus_in_error++;
-						sl_daedr_su_in_error(q, xp);
+						sl_daedr_su_in_error(xp, q);
 						rx->octets -= N;
 					}
 					stats->rx_bits_octet_counted += 8;
@@ -5233,7 +5401,7 @@ xp_rx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const ulon
 					if (rx->nxt->b_wptr <
 					    rx->nxt->b_rptr + xp->sdl.config.ifblksize)
 						goto rx_process_block;
-					if (sdl_received_bits_ind(q, xp, rx->nxt) != QR_ABSORBED)
+					if (sdl_received_bits_ind(xp, q, rx->nxt) != QR_ABSORBED)
 						goto rx_process_block;
 					xp->sdl.stats.rx_buffer_overflows++;
 				}
@@ -5737,7 +5905,7 @@ xp_send_data(queue_t *q, mblk_t *mp)
 	{
 		if (xp->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 			/* SL mode */
-			ret = sl_lsc_pdu(q, xp, mp);
+			ret = sl_lsc_pdu(xp, q, mp);
 		} else if (xp->sdt.statem.daedt_state != SDT_STATE_IDLE) {
 			/* SDT mode */
 			if (xp->sdt.tb.q_count > 1024)
@@ -5762,7 +5930,7 @@ xp_send_data(queue_t *q, mblk_t *mp)
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (ret);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5780,7 +5948,7 @@ sl_pdu_req(queue_t *q, mblk_t *mp)
 		goto discard;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		ret = sl_lsc_pdu(q, xp, mp);
+		ret = sl_lsc_pdu(xp, q, mp);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (ret);
@@ -5803,12 +5971,12 @@ sl_emergency_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_emergency(q, xp);
+		sl_lsc_emergency(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5826,12 +5994,12 @@ sl_emergency_ceases_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_emergency_ceases(q, xp);
+		sl_lsc_emergency_ceases(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5849,12 +6017,12 @@ sl_start_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_start(q, xp);
+		sl_lsc_start(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5872,12 +6040,12 @@ sl_stop_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_stop(q, xp);
+		sl_lsc_stop(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5896,12 +6064,12 @@ sl_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		err = sl_lsc_retrieve_bsnt(q, xp);
+		err = sl_lsc_retrieve_bsnt(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (err);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5923,7 +6091,7 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 			goto eproto;
 		spin_lock_irqsave(&xp->lock, flags);
 		{
-			err = sl_lsc_retrieval_request_and_fsnc(q, xp, p->sl_fsnc);
+			err = sl_lsc_retrieval_request_and_fsnc(xp, q, p->sl_fsnc);
 		}
 		spin_unlock_irqrestore(&xp->lock, flags);
 		return (err);
@@ -5931,7 +6099,7 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 	swerr();
 	return (-EMSGSIZE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5949,12 +6117,12 @@ sl_resume_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_resume(q, xp);
+		sl_lsc_resume(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5972,12 +6140,12 @@ sl_clear_buffers_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		err = sl_lsc_clear_buffers(q, xp);
+		err = sl_lsc_clear_buffers(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (err);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -5995,12 +6163,12 @@ sl_clear_rtb_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_clear_rtb(q, xp);
+		sl_lsc_clear_rtb(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6018,12 +6186,12 @@ sl_local_processor_outage_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_local_processor_outage(q, xp);
+		sl_lsc_local_processor_outage(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6041,12 +6209,12 @@ sl_congestion_discard_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_congestion_discard(q, xp);
+		sl_lsc_congestion_discard(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6064,12 +6232,12 @@ sl_congestion_accept_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_congestion_accept(q, xp);
+		sl_lsc_congestion_accept(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6087,12 +6255,12 @@ sl_no_congestion_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_no_congestion(q, xp);
+		sl_lsc_no_congestion(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6110,12 +6278,12 @@ sl_power_on_req(queue_t *q, mblk_t *mp)
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		(void) mp;
-		sl_lsc_power_on(q, xp);
+		sl_lsc_power_on(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 #if 0
@@ -6166,12 +6334,12 @@ sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_daedt_start(q, xp);
+		sl_daedt_start(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6188,12 +6356,12 @@ sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_daedr_start(q, xp);
+		sl_daedr_start(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6210,12 +6378,12 @@ sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_aerm_start(q, xp);
+		sl_aerm_start(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6232,12 +6400,12 @@ sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_aerm_stop(q, xp);
+		sl_aerm_stop(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6254,12 +6422,12 @@ sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_aerm_set_ti_to_tin(q, xp);
+		sl_aerm_set_ti_to_tin(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6276,12 +6444,12 @@ sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_aerm_set_ti_to_tie(q, xp);
+		sl_aerm_set_ti_to_tie(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6298,12 +6466,12 @@ sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_suerm_start(q, xp);
+		sl_suerm_start(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6320,12 +6488,12 @@ sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_suerm_stop(q, xp);
+		sl_suerm_stop(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6377,7 +6545,7 @@ sdl_connect_req(queue_t *q, mblk_t *mp)
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /*
@@ -6415,7 +6583,7 @@ sdl_disconnect_req(queue_t *q, mblk_t *mp)
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
       eproto:
-	return m_error(q, xp, EPROTO);
+	return m_error(xp, q, EPROTO);
 }
 
 /* 
@@ -6438,11 +6606,11 @@ lmi_info_req(queue_t *q, mblk_t *mp)
 			uint16_t ppa =
 			    (xp->
 			     chan & 0xff) | ((sp->span & 0x0f) << 8) | ((cd->card & 0x0f) << 12);
-			return lmi_info_ack(q, xp, (caddr_t) &ppa, sizeof(ppa));
+			return lmi_info_ack(xp, q, (caddr_t) &ppa, sizeof(ppa));
 		}
 	}
 	}
-	return lmi_info_ack(q, xp, NULL, 0);
+	return lmi_info_ack(xp, q, NULL, 0);
 }
 
 /* 
@@ -6461,8 +6629,8 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
 
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
-		ptrace(("%s: ERROR: primitive too small = %d bytes\n", DRV_NAME,
-			mp->b_wptr - mp->b_rptr));
+		ptrace(("%s: ERROR: primitive too small = %ld bytes\n", DRV_NAME,
+			(long)(mp->b_wptr - mp->b_rptr)));
 		goto lmi_badprim;
 	}
 	if (xp->i_state != LMI_UNATTACHED) {
@@ -6508,7 +6676,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 				ptrace(("%s: ERROR: slot %d in use\n", DRV_NAME, slot));
 				goto lmi_badppa;
 			}
-			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
+			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
@@ -6551,7 +6719,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 				ptrace(("%s: ERROR: slot %d in use\n", DRV_NAME, slot));
 				goto lmi_badppa;
 			}
-			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
+			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
@@ -6594,7 +6762,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 				ptrace(("%s: ERROR: slot %d in use\n", DRV_NAME, slot));
 				goto lmi_badppa;
 			}
-			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
+			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
@@ -6640,7 +6808,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 						DRV_NAME, c));
 					goto lmi_badppa;
 				}
-			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
+			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			printd(("%s: attaching card %d, entire span %d\n", DRV_NAME, card, span));
@@ -6683,7 +6851,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 						DRV_NAME, c));
 					goto lmi_badppa;
 				}
-			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
+			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			spin_lock_irqsave(&xp->lock, flags);
@@ -6728,7 +6896,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 						DRV_NAME, c));
 					goto lmi_badppa;
 				}
-			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
+			if ((err = lmi_ok_ack(xp, q, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			spin_lock_irqsave(&xp->lock, flags);
@@ -6789,7 +6957,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		reason = LMI_BADPPA;
 		goto error_out;
 	      error_out:
-		return lmi_error_ack(q, xp, LMI_UNATTACHED, LMI_ATTACH_REQ, errno, reason);
+		return lmi_error_ack(xp, q, LMI_UNATTACHED, LMI_ATTACH_REQ, errno, reason);
 	}
 }
 
@@ -6808,13 +6976,13 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 
 	/* validate detach */
 	if (xp->i_state != LMI_DISABLED)
-		return lmi_error_ack(q, xp, xp->i_state, LMI_DETACH_REQ, 0, LMI_OUTSTATE);
+		return lmi_error_ack(xp, q, xp->i_state, LMI_DETACH_REQ, 0, LMI_OUTSTATE);
 	if (!(sp = xp->sp) || !(cd = sp->cd)) {
 		swerr();
-		return m_error(q, xp, EFAULT);
+		return m_error(xp, q, EFAULT);
 	}
 	xp->i_state = LMI_DETACH_PENDING;
-	if ((err = lmi_ok_ack(q, xp, LMI_UNATTACHED, LMI_DETACH_REQ)))
+	if ((err = lmi_ok_ack(xp, q, LMI_UNATTACHED, LMI_DETACH_REQ)))
 		return (err);
 	/* commit detach */
 	spin_lock_irqsave(&xp->lock, flags);
@@ -6858,14 +7026,14 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	if (cd->config.ifgtype != SDL_GTYPE_E1 && cd->config.ifgtype != SDL_GTYPE_T1
 	    && cd->config.ifgtype != SDL_GTYPE_J1) {
 		ptrace(("%s: ERROR: card group type = %u\n", DRV_NAME, cd->config.ifgtype));
-		return m_error(q, xp, EFAULT);
+		return m_error(xp, q, EFAULT);
 	}
 #endif
 	if (xp->sdl.config.ifflags & SDL_IF_UP) {
 		ptrace(("%s: ERROR: out of state: device already up\n", DRV_NAME));
 		goto lmi_outstate;
 	}
-	if ((err = lmi_enable_con(q, xp)))
+	if ((err = lmi_enable_con(xp, q)))
 		return (err);
 	/* commit enable */
 	printd(("%s: performing enable\n", DRV_NAME));
@@ -7389,7 +7557,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       lmi_outstate:
-	return lmi_error_ack(q, xp, xp->i_state, LMI_ENABLE_REQ, 0, LMI_OUTSTATE);
+	return lmi_error_ack(xp, q, xp->i_state, LMI_ENABLE_REQ, 0, LMI_OUTSTATE);
 }
 
 /* 
@@ -7409,7 +7577,7 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 		goto lmi_outstate;
 	xp->i_state = LMI_DISABLE_PENDING;
 	/* perform disable */
-	if ((err = lmi_disable_con(q, xp)))
+	if ((err = lmi_disable_con(xp, q)))
 		return (err);
 	/* commit disable */
 	if ((sp = xp->sp) && (cd = sp->cd)) {
@@ -7447,8 +7615,7 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 			xp->sdt.statem.Ti = xp->sdt.config.Tin;
 			/* stop eim */
 			xp->sdt.statem.eim_state = SDT_STATE_IDLE;
-			if (xp->sdt.timers.t8)
-				untimeout(xchg(&xp->sdt.timers.t8, 0));
+			__xp_timer_stop(xp, t8);
 			/* stop suerm */
 			xp->sdt.statem.suerm_state = SDT_STATE_IDLE;
 			/* reset transmitter and receiver state */
@@ -7470,7 +7637,7 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 		swerr();
 	return (QR_DONE);
       lmi_outstate:
-	return lmi_error_ack(q, xp, xp->i_state, LMI_DISABLE_REQ, 0, LMI_OUTSTATE);
+	return lmi_error_ack(xp, q, xp->i_state, LMI_DISABLE_REQ, 0, LMI_OUTSTATE);
 }
 
 /* 
@@ -8310,7 +8477,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 			case SDL_CODING_AMI:	/* */
 				break;
 			case SDL_CODING_B8ZS:	/* */
-				if (arg->ifgtype != SDL_GTYPE_T1 || arg->ifgtype != SDL_GTYPE_J1) {
+				if (arg->ifgtype != SDL_GTYPE_T1 && arg->ifgtype != SDL_GTYPE_J1) {
 					trace();
 					ret = (-EINVAL);
 					break;
@@ -8345,7 +8512,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 				break;
 			case SDL_FRAMING_SF:	/* */
 			case SDL_FRAMING_ESF:	/* */
-				if (arg->ifgtype != SDL_GTYPE_T1 || arg->ifgtype != SDL_GTYPE_J1) {
+				if (arg->ifgtype != SDL_GTYPE_T1 && arg->ifgtype != SDL_GTYPE_J1) {
 					trace();
 					ret = (-EINVAL);
 					break;
@@ -9706,7 +9873,7 @@ xp_overflow(struct cd *cd)
 {
 	int span;
 
-	printd(("%s: card %d elastic buffer overrun!\n", __FUNCTION__, cd->card));
+	_printd(("%s: card %d elastic buffer overrun!\n", __FUNCTION__, cd->card));
 	for (span = 0; span < X400_SPANS; span++) {
 		struct xp *xp;
 		struct sp *sp;
@@ -10798,6 +10965,57 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 }
 
 /*
+ *  M_SIG/M_PCSIG Handling
+ *  -------------------------------------------------------------------------
+ */
+static int
+xp_r_sig(queue_t *q, mblk_t *mp)
+{
+	struct xp *xp = XP_PRIV(q);
+	int rtn = QR_ABSORBED;
+
+	if (likely(mi_timer_valid(mp))) {
+		switch (*(int *) mp->b_rptr) {
+		case t1:
+			rtn = xp_t1_timeout(xp, q);
+			break;
+		case t2:
+			rtn = xp_t2_timeout(xp, q);
+			break;
+		case t3:
+			rtn = xp_t3_timeout(xp, q);
+			break;
+		case t4:
+			rtn = xp_t4_timeout(xp, q);
+			break;
+		case t5:
+			rtn = xp_t5_timeout(xp, q);
+			break;
+		case t6:
+			rtn = xp_t6_timeout(xp, q);
+			break;
+		case t7:
+			rtn = xp_t7_timeout(xp, q);
+			break;
+		case t8:
+			rtn = xp_t8_timeout(xp, q);
+			break;
+#if 0
+		case t9:
+			rtn = xp_t9_timeout(xp, q);
+			break;
+#endif
+		default:
+			swerr();
+			rtn = QR_ABSORBED;
+			break;
+		}
+		if (rtn == QR_DONE)
+			rtn = QR_ABSORBED;
+	}
+	return (rtn);
+}
+/*
  *  M_DATA Handling
  *  -------------------------------------------------------------------------
  */
@@ -10883,6 +11101,9 @@ xp_r_prim(queue_t *q, mblk_t *mp)
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		return xp_r_data(q, mp);
+	case M_SIG:
+	case M_PCSIG:
+		return xp_r_sig(q, mp);
 	}
 	return (QR_PASSFLOW);
 }
@@ -11127,26 +11348,35 @@ xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 		xp->i_version = 1;
 		xp->i_style = LMI_STYLE2;
 		xp->i_state = LMI_UNATTACHED;
-		if ((xp->next = *xpp))
-			xp->next->prev = &xp->next;
-		xp->prev = xpp;
-		*xpp = xp_get(xp);
-		printd(("%s: linked device private structure\n", DRV_NAME));
-		/* LMI configuration defaults */
-		xp->option = lmi_default_e1_chan;
-		/* SDL configuration defaults */
-		bufq_init(&xp->sdl.tb);
-		xp->sdl.config = sdl_default_e1_chan;
-		/* SDT configuration defaults */
-		bufq_init(&xp->sdt.tb);
-		ss7_bufpool_reserve(&xp_bufpool, 2);
-		xp->sdt.config = sdt_default_e1_chan;
-		/* SL configuration defaults */
-		bufq_init(&xp->sl.rb);
-		bufq_init(&xp->sl.tb);
-		bufq_init(&xp->sl.rtb);
-		xp->sl.config = sl_default_e1_chan;
-		printd(("%s: setting device private structure defaults\n", DRV_NAME));
+#ifdef _MPS_SOURCE
+		if (xp_alloc_timers(xp)) {
+			xp_put(XCHG(&xp->iq->q_ptr, NULL));
+			xp_put(XCHG(&xp->oq->q_ptr, NULL));
+			xp_put(XCHG(&xp, NULL));
+		} else
+#endif				/* _MPS_SOURCE */
+		{
+			if ((xp->next = *xpp))
+				xp->next->prev = &xp->next;
+			xp->prev = xpp;
+			*xpp = xp_get(xp);
+			printd(("%s: linked device private structure\n", DRV_NAME));
+			/* LMI configuration defaults */
+			xp->option = lmi_default_e1_chan;
+			/* SDL configuration defaults */
+			bufq_init(&xp->sdl.tb);
+			xp->sdl.config = sdl_default_e1_chan;
+			/* SDT configuration defaults */
+			bufq_init(&xp->sdt.tb);
+			ss7_bufpool_reserve(&xp_bufpool, 2);
+			xp->sdt.config = sdt_default_e1_chan;
+			/* SL configuration defaults */
+			bufq_init(&xp->sl.rb);
+			bufq_init(&xp->sl.tb);
+			bufq_init(&xp->sl.rtb);
+			xp->sl.config = sl_default_e1_chan;
+			printd(("%s: setting device private structure defaults\n", DRV_NAME));
+		}
 	} else
 		ptrace(("%s: ERROR: Could not allocate device private structure\n", DRV_NAME));
 	return (xp);
@@ -11200,7 +11430,11 @@ xp_free_priv(struct xp *xp)
 			printd(("%s: unlinked device private structure from span\n", DRV_NAME));
 		}
 		ss7_unbufcall((str_t *) xp);
+#ifdef _MPS_SOURCE
+		xp_free_timers(xp);
+#else				/* _MPS_SOURCE */
 		__xp_timer_stop(xp, tall);
+#endif				/* _MPS_SOURCE */
 		if (xp->tx.msg && xp->tx.msg != xp->tx.cmp)
 			freemsg(xchg(&xp->tx.msg, NULL));
 		if (xp->tx.cmp)

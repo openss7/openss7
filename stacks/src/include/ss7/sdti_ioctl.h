@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdti_ioctl.h,v 0.9.2.5 2006/10/31 21:04:37 brian Exp $
+ @(#) $Id: sdti_ioctl.h,v 0.9.2.6 2006/12/08 05:32:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:37 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:32:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SDTI_IOCTL_H__
 #define __SDTI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdti_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sdti_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -71,10 +71,17 @@
  *  CONFIGURATION
  */
 #ifdef __KERNEL__
+#ifdef _MPS_SOURCE
+typedef struct sdt_timers {
+	mblk_t *t8;			/* T8 timer */
+} sdt_timers_t;
+#else				/* _MPS_SOURCE */
 typedef struct sdt_timers {
 	toid_t t8;			/* T8 timer */
 } sdt_timers_t;
-#endif
+#endif				/* _MPS_SOURCE */
+#endif				/* __KERNEL__ */
+
 typedef struct sdt_config {
 	sdt_ulong t8;			/* T8 timeout (milliseconds) */
 	sdt_ulong Tin;			/* AERM normal proving threshold */
