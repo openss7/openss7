@@ -1,3 +1,7 @@
+2006-12-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strxnet.sh: name correction for debian init script
+
 2006-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: added ability to sync between test cases

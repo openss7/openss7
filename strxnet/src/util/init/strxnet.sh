@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:21:27 $
+# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/08 05:21:16 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -12,9 +12,9 @@
 # by openss7 install_initd and remove_initd scripts.  Each line specifies
 # arguments to add and remove links after the the name argument:
 #
-# streams:	start and stop strxnet subsystem
+# strxnet:	start and stop strxnet subsystem
 # update-rc.d:	start 33 S . stop 33 0 6 .
-# config:	/etc/default/streams
+# config:	/etc/default/strxnet
 # probe:	false
 # hide:		false
 # license:	GPL
@@ -202,7 +202,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:21:27 $
+# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/08 05:21:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -247,7 +247,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 00:21:27 $ by $Author: brian $
+# Last Modified $Date: 2006/12/08 05:21:16 $ by $Author: brian $
 #
 # =============================================================================
 
