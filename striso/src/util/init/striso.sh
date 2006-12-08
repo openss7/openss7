@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 06:06:22 $
+# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/08 05:25:48 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -12,9 +12,9 @@
 # by openss7 install_initd and remove_initd scripts.  Each line specifies
 # arguments to add and remove links after the the name argument:
 #
-# streams:	start and stop striso subsystem
+# striso:	start and stop striso subsystem
 # update-rc.d:	start 33 S . stop 33 0 6 .
-# config:	/etc/default/streams
+# config:	/etc/default/striso
 # probe:	false
 # hide:		false
 # license:	GPL
@@ -202,7 +202,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 06:06:22 $
+# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/08 05:25:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -247,7 +247,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 06:06:22 $ by $Author: brian $
+# Last Modified $Date: 2006/12/08 05:25:48 $ by $Author: brian $
 #
 # =============================================================================
 
