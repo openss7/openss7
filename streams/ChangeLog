@@ -1,3 +1,7 @@
+2006-12-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/bufq.h: corrections to buffer queue locks (not used much)
+
 2006-12-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: updated news
