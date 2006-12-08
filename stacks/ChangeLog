@@ -9,6 +9,7 @@
 	- defeated bufpools
 	- more corrections from testing
 	- changed a lot of M_PCPROTOs to M_PROTOs
+	- lock correction
 
 	* src/test/x400p-ss7/test-x400p.c:
 	- some corrections from initial testing
