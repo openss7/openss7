@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.15 2006/11/03 10:39:24 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.16 2006/12/08 05:08:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:24 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.16  2006/12/08 05:08:20  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.15  2006/11/03 10:39:24  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_SVR3_DDI_H__
 #define __SYS_SVR3_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -69,7 +72,7 @@
 #endif
 
 #ifndef __SVR3_EXTERN_INLINE
-#define __SVR3_EXTERN_INLINE __EXTERN_INLINE
+#define __SVR3_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __SVR3_EXTERN_INLINE */
 
 #ifndef _SVR3_SOURCE

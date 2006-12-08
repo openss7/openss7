@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.6 2006/11/03 10:39:21 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2006/12/08 05:08:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.7  2006/12/08 05:08:15  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.6  2006/11/03 10:39:21  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_OS7_DDI_H__
 #define __SYS_OS7_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -69,7 +72,7 @@
 #endif
 
 #ifndef __OS7_EXTERN_INLINE
-#define __OS7_EXTERN_INLINE __EXTERN_INLINE
+#define __OS7_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __OS7_EXTERN_INLINE */
 
 #ifndef _OS7_SOURCE

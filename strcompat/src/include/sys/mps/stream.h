@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.11 2006/11/03 10:39:21 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.12 2006/12/08 05:08:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.12  2006/12/08 05:08:14  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.11  2006/11/03 10:39:21  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -88,7 +91,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -103,7 +106,7 @@
 #endif
 
 #ifndef __MPS_EXTERN_INLINE
-#define __MPS_EXTERN_INLINE __EXTERN_INLINE
+#define __MPS_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif
 
 #ifndef _MPS_SOURCE

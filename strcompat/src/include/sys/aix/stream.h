@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.9 2006/11/03 10:39:15 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.10 2006/12/08 05:08:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:15 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.10  2006/12/08 05:08:04  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.9  2006/11/03 10:39:15  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -82,7 +85,7 @@
 #ifndef __SYS_AIX_STREAM_H__
 #define __SYS_AIX_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/aix/stream.h directly, include sys/stream.h instead."
@@ -97,7 +100,7 @@
 #endif
 
 #ifndef __AIX_EXTERN_INLINE
-#define __AIX_EXTERN_INLINE __EXTERN_INLINE
+#define __AIX_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif
 
 #ifndef _AIX_SOURCE

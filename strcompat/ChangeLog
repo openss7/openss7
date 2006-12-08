@@ -1,3 +1,54 @@
+2006-12-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/aix/ddi.h: default to streamscall interface
+	* src/include/sys/aix/strconf.h: default to streamscall interface
+	* src/include/sys/aix/stream.h: default to streamscall interface
+	* src/include/sys/hpux/ddi.h: default to streamscall interface
+	* src/include/sys/hpux/strconf.h: default to streamscall interface
+	* src/include/sys/hpux/stream.h: default to streamscall interface
+	* src/include/sys/irix/ddi.h: default to streamscall interface
+	* src/include/sys/irix/strconf.h: default to streamscall interface
+	* src/include/sys/irix/stream.h: default to streamscall interface
+	* src/include/sys/lfs/ddi.h: default to streamscall interface
+	* src/include/sys/lfs/strconf.h: default to streamscall interface
+	* src/include/sys/lfs/stream.h: default to streamscall interface
+	* src/include/sys/lis/ddi.h: default to streamscall interface
+	* src/include/sys/lis/strconf.h: default to streamscall interface
+	* src/include/sys/lis/stream.h: default to streamscall interface
+	* src/include/sys/mac/ddi.h: default to streamscall interface
+	* src/include/sys/mac/strconf.h: default to streamscall interface
+	* src/include/sys/mac/stream.h: default to streamscall interface
+	* src/include/sys/mps/ddi.h: default to streamscall interface
+	* src/include/sys/mps/strconf.h: default to streamscall interface
+	* src/include/sys/mps/stream.h: default to streamscall interface
+	* src/include/sys/os7/ddi.h: default to streamscall interface
+	* src/include/sys/os7/strconf.h: default to streamscall interface
+	* src/include/sys/os7/stream.h: default to streamscall interface
+	* src/include/sys/osf/ddi.h: default to streamscall interface
+	* src/include/sys/osf/strconf.h: default to streamscall interface
+	* src/include/sys/osf/stream.h: default to streamscall interface
+	* src/include/sys/sun/ddi.h: default to streamscall interface
+	* src/include/sys/sun/strconf.h: default to streamscall interface
+	* src/include/sys/sun/stream.h: default to streamscall interface
+	* src/include/sys/sun/strsun.h: default to streamscall interface
+	* src/include/sys/svr3/ddi.h: default to streamscall interface
+	* src/include/sys/svr3/strconf.h: default to streamscall interface
+	* src/include/sys/svr3/stream.h: default to streamscall interface
+	* src/include/sys/svr4/ddi.h: default to streamscall interface
+	* src/include/sys/svr4/strconf.h: default to streamscall interface
+	* src/include/sys/svr4/stream.h: default to streamscall interface
+	* src/include/sys/uw7/ddi.h: default to streamscall interface
+	* src/include/sys/uw7/strconf.h: default to streamscall interface
+	* src/include/sys/uw7/stream.h: default to streamscall interface
+
+	* src/kernel/mpscompat.c: major rework of mi_timer functions
+
+	* src/include/sys/os7/bufpool.h: correct bufq locking
+	* src/include/sys/os7/bufq.h: correct bufq locking
+	* src/kernel/os7compat.c: correct bufq locking
+
+	* src/util/init/strcompat.sh: correct names in debian script
+
 2006-11-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/strlog.9.man: documentation update

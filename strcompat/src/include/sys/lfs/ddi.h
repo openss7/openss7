@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.13 2006/11/03 10:39:18 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.14 2006/12/08 05:08:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:18 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.14  2006/12/08 05:08:10  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.13  2006/11/03 10:39:18  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -94,7 +97,7 @@
 #ifndef __SYS_LFS_DDI_H__
 #define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -105,7 +108,7 @@
 #endif
 
 #ifndef __LFS_EXTERN_INLINE
-#define __LFS_EXTERN_INLINE __EXTERN_INLINE
+#define __LFS_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __LFS_EXTERN_INLINE */
 
 #include <linux/delay.h>	/* for udelay */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.16 2006/11/03 10:39:19 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.17 2006/12/08 05:08:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:19 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.17  2006/12/08 05:08:11  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.16  2006/11/03 10:39:19  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -84,7 +87,7 @@
 #endif
 
 #ifndef __LIS_EXTERN_INLINE
-#define __LIS_EXTERN_INLINE __EXTERN_INLINE
+#define __LIS_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __LIS_EXTERN_INLINE */
 
 #ifndef _LIS_SOURCE

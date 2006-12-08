@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/02 12:50:06 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/08 05:08:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/02 12:50:06 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.26  2006/12/08 05:08:24  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.25  2006/11/02 12:50:06  brian
  - put procedure needs to call wakeup
 
@@ -131,10 +134,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/02 12:50:06 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/08 05:08:24 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/02 12:50:06 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/08 05:08:24 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -155,7 +158,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/11/02 12:50:06 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/08 05:08:24 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -219,28 +222,18 @@ __OS7_EXTERN_INLINE streamscall mblk_t *ss7_fast_allocb(struct ss7_bufpool *pool
 							int prior);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_allocb);
-__OS7_EXTERN_INLINE streamscall mblk_t *ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size,
-							   int prior);
-
-EXPORT_SYMBOL_NOVERS(ss7_fast_allocb_bh);
 __OS7_EXTERN_INLINE streamscall void __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(__ss7_fast_freeb);
 __OS7_EXTERN_INLINE streamscall void ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_freeb);
-__OS7_EXTERN_INLINE streamscall void ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp);
-
-EXPORT_SYMBOL_NOVERS(ss7_fast_freeb_bh);
 __OS7_EXTERN_INLINE streamscall void __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(__ss7_fast_freemsg);
 __OS7_EXTERN_INLINE streamscall void ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(ss7_fast_freemsg);
-__OS7_EXTERN_INLINE streamscall void ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp);
-
-EXPORT_SYMBOL_NOVERS(ss7_fast_freemsg_bh);
 __OS7_EXTERN_INLINE void ss7_bufpool_init(struct ss7_bufpool *pool);
 
 EXPORT_SYMBOL_NOVERS(ss7_bufpool_init);
@@ -257,10 +250,10 @@ EXPORT_SYMBOL_NOVERS(ss7_bufpool_term);
 __OS7_EXTERN_INLINE void bufq_init(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_init);
-__OS7_EXTERN_INLINE streamscall void bufq_lock(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall psw_t bufq_lock(bufq_t * q);
 
 EXPORT_SYMBOL_NOVERS(bufq_lock);
-__OS7_EXTERN_INLINE streamscall void bufq_unlock(bufq_t * q);
+__OS7_EXTERN_INLINE streamscall void bufq_unlock(bufq_t * q, psw_t pl);
 
 EXPORT_SYMBOL_NOVERS(bufq_unlock);
 __OS7_EXTERN_INLINE streamscall size_t bufq_length(bufq_t * q);

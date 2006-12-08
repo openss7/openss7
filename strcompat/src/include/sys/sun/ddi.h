@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.22 2006/11/03 10:39:23 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.23 2006/12/08 05:08:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:23 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.23  2006/12/08 05:08:18  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.22  2006/11/03 10:39:23  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.22 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.23 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -73,7 +76,7 @@
 #endif
 
 #ifndef __SUN_EXTERN_INLINE
-#define __SUN_EXTERN_INLINE __EXTERN_INLINE
+#define __SUN_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __SUN_EXTERN_INLINE */
 
 #ifndef _SUN_SOURCE

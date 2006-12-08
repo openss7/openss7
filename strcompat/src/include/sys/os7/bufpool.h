@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 0.9.2.12 2006/11/03 10:39:21 brian Exp $
+ @(#) $Id: bufpool.h,v 0.9.2.13 2006/12/08 05:08:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:21 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufpool.h,v $
+ Revision 0.9.2.13  2006/12/08 05:08:15  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.12  2006/11/03 10:39:21  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -58,7 +61,7 @@
 #ifndef __OS7_BUFPOOL_H__
 #define __OS7_BUFPOOL_H__
 
-#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  *  -------------------------------------------------------------------------
@@ -106,9 +109,7 @@ __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 	return (mp);
 }
 
-/*
-   for use in the bottom half or tasklet 
- */
+/* if you need local irq or bottom half suppression, do it yourself */
 __OS7_EXTERN_INLINE streamscall mblk_t *
 ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
@@ -125,31 +126,6 @@ ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 			mp->b_datap->db_type = M_DATA;
 		} else
 			spin_unlock(&pool->lock);
-	}
-	if (!mp)
-		mp = allocb(size, prior);
-	return (mp);
-}
-
-/*
-   for use outside the bottom half 
- */
-__OS7_EXTERN_INLINE streamscall mblk_t *
-ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior)
-{
-	mblk_t *mp = NULL;
-
-	if (size <= FASTBUF && prior == BPRI_HI) {
-		spin_lock_bh(&pool->lock);
-		if ((mp = pool->head)) {
-			pool->head = mp->b_cont;
-			spin_unlock_bh(&pool->lock);
-			atomic_dec(&pool->count);
-			mp->b_cont = NULL;
-			mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
-			mp->b_datap->db_type = M_DATA;
-		} else
-			spin_unlock_bh(&pool->lock);
 	}
 	if (!mp)
 		mp = allocb(size, prior);
@@ -181,9 +157,7 @@ __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 	}
 }
 
-/*
-   for use inside the bottom half 
- */
+/* if you need local irq or bottom half suppression, do it yourself */
 __OS7_EXTERN_INLINE streamscall void
 ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
@@ -192,25 +166,6 @@ ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 		spin_lock(&pool->lock);
 		mp->b_cont = xchg(&pool->head, mp);
 		spin_unlock(&pool->lock);
-		atomic_inc(&pool->count);
-	} else {
-		/* 
-		   other references, use normal free mechanism */
-		freeb(mp);
-	}
-}
-
-/*
-   for use outside the bottom half 
- */
-__OS7_EXTERN_INLINE streamscall void
-ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp)
-{
-	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
-	    atomic_read(&pool->count) < atomic_read(&pool->reserve)) {
-		spin_lock_bh(&pool->lock);
-		mp->b_cont = xchg(&pool->head, mp);
-		spin_unlock_bh(&pool->lock);
 		atomic_inc(&pool->count);
 	} else {
 		/* 
@@ -241,9 +196,6 @@ __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 	}
 }
 
-/*
-   for use inside the bottom half 
- */
 __OS7_EXTERN_INLINE streamscall void
 ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
@@ -252,20 +204,6 @@ ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 	while ((bp = bp_next)) {
 		bp_next = bp->b_cont;
 		ss7_fast_freeb(pool, bp);
-	}
-}
-
-/*
-   for use outside the bottom half 
- */
-__OS7_EXTERN_INLINE streamscall void
-ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp)
-{
-	mblk_t *bp, *bp_next = mp;
-
-	while ((bp = bp_next)) {
-		bp_next = bp->b_cont;
-		ss7_fast_freeb_bh(pool, bp);
 	}
 }
 
@@ -280,6 +218,7 @@ ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp)
  *  -----------------------------------
  *  Initialized the buffer pool for operation.
  */
+/* if you need local irq or bottom half suppression, do it yourself */
 __OS7_EXTERN_INLINE void
 ss7_bufpool_init(struct ss7_bufpool *pool)
 {
@@ -310,7 +249,7 @@ ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
 	while (n--) {
 		if (!(mp = allocb(FASTBUF, BPRI_LO)))
 			break;
-		ss7_fast_freemsg_bh(pool, mp);
+		ss7_fast_freemsg(pool, mp);
 	}
 }
 
@@ -326,33 +265,16 @@ ss7_bufpool_release(struct ss7_bufpool *pool, int n)
 	atomic_sub(n, &pool->reserve);
 }
 
-#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
-
-#define spin_lock_str(__lkp, __flags) \
-	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
-#define spin_unlock_str(__lkp, __flags) \
-	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
-
-#else
-
-#define spin_lock_str(__lkp, __flags) \
-	spin_lock_irqsave(__lkp, __flags)
-#define spin_unlock_str(__lkp, __flags) \
-	spin_unlock_irqrestore(__lkp, __flags)
-
-#endif
-
 /*
  *  BUFPOOL TERM
  *  -----------------------------------
  *  Terminate the buffer pool and free any blocks in the pool.
  */
+/* if you need local irq or bottom half suppression, do it yourself */
 __OS7_EXTERN_INLINE void
 ss7_bufpool_term(struct ss7_bufpool *pool)
 {
-	unsigned long flags;
-
-	spin_lock_str(&pool->lock, flags);
+	spin_lock(&pool->lock);
 	if (pool->initialized) {
 		mblk_t *bp;
 
@@ -364,7 +286,7 @@ ss7_bufpool_term(struct ss7_bufpool *pool)
 		atomic_set(&pool->reserve, 0);
 		pool->initialized = 0;
 	}
-	spin_unlock_str(&pool->lock, flags);
+	spin_unlock(&pool->lock);
 }
 
 #endif				/* __OS7_BUFPOOL_H__ */

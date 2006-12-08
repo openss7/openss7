@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.11 2006/11/03 10:39:26 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.12 2006/12/08 05:08:23 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:26 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.12  2006/12/08 05:08:23  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.11  2006/11/03 10:39:26  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_UW7_STRCONF_H__
 #define __SYS_UW7_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -73,7 +76,7 @@
 #endif
 
 #ifndef __UW7_EXTERN_INLINE
-#define __UW7_EXTERN_INLINE __EXTERN_INLINE
+#define __UW7_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __UW7_EXTERN_INLINE */
 
 #ifndef _UW7_SOURCE

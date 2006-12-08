@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/11/03 10:39:28 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/08 05:08:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:28 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.29  2006/12/08 05:08:24  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.28  2006/11/03 10:39:28  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -139,9 +142,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/11/03 10:39:28 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/08 05:08:24 $"
 
-static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/11/03 10:39:28 $";
+static char const ident[] =
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/08 05:08:24 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -169,7 +173,7 @@ static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/11/03 10:39:28 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/08 05:08:24 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -932,19 +936,19 @@ EXPORT_SYMBOL_NOVERS(mi_copy_set_rval);
  *  =========================================================================
  */
 
-#define TB_ZOMBIE	-2	/* tb is a zombie, waiting to be freed */
-#define TB_CANCELLED	-1	/* tb has been cancelled - but is still on queue */
-#define TB_IDLE		 0	/* tb is idle */
-#define TB_ACTIVE	 1	/* tb has timer actively running */
-#define TB_RESCHEDULED	 2	/* tb is being rescheduled */
-#define TB_TRANSIENT	 3	/* tb is in a transient state */
+#define TB_ZOMBIE	-2	/* tb is a zombie, waiting to be freed, but may be on queue */
+#define TB_CANCELLED	-1	/* tb has been cancelled, but may be on queue */
+#define TB_IDLE		 0	/* tb is idle, not on queue */
+#define TB_ACTIVE	 1	/* tb has timer actively running, but may be on queue */
+#define TB_RESCHEDULED	 2	/* tb is being rescheduled, but may be on queue */
+#define TB_TRANSIENT	 3	/* tb is in a transient state (unused) */
 
 typedef struct mi_timeb {
-	long tb_state;
-	toid_t tb_tid;
-	clock_t tb_time;
-	mblk_t *tb_mp;
-	queue_t *tb_q;
+	spinlock_t tb_lock;
+	long tb_state;			/* the state of the timer */
+	toid_t tb_tid;			/* the timeout id when a timeout is running */
+	clock_t tb_time;		/* the time of expiry */
+	queue_t *tb_q;			/* where to queue the timer message on timeout */
 } tblk_t;
 
 #undef mi_timer_alloc
@@ -953,14 +957,12 @@ typedef struct mi_timeb {
 static streamscall void
 mi_timer_expiry(caddr_t data)
 {
-	tblk_t *tb = (typeof(tb)) data;
-	toid_t tid;
+	mblk_t *mp = (typeof(mp)) data;
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 
-	if ((tid = xchg(&tb->tb_tid, 0))) {
-		if (tb->tb_q && tb->tb_mp)
-			put(tb->tb_q, tb->tb_mp);
-		else
-			swerr();
+	if (xchg(&tb->tb_tid, 0)) {
+		dassert(tb->tb_q != NULL);
+		put(tb->tb_q, mp);
 	}
 }
 
@@ -982,10 +984,10 @@ mi_timer_alloc_MAC(queue_t *q, size_t size)
 		tb = (typeof(tb)) mp->b_rptr;
 		mp->b_rptr = (typeof(mp->b_rptr)) (tb + 1);
 		mp->b_wptr = mp->b_rptr + size;
+		tb->tb_lock = SPIN_LOCK_UNLOCKED;
 		tb->tb_state = TB_IDLE;
 		tb->tb_tid = (toid_t) (0);
 		tb->tb_time = (clock_t) (0);
-		tb->tb_mp = mp;
 		tb->tb_q = q;
 	}
 	return (mp);
@@ -1016,33 +1018,49 @@ int
 mi_timer_cancel(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
-	long state;
+	unsigned long flags;
+	toid_t tid;
+	int rval;
 
-	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
-	case TB_ACTIVE:
-	{
-		toid_t tid;
-
-		if (!(tid = xchg(&tb->tb_tid, 0))) {
-			tb->tb_state = TB_CANCELLED;
-			return (-1);
-		}
+	if ((tid = xchg(&tb->tb_tid, 0)))
 		untimeout(tid);
-		tb->tb_state = TB_IDLE;
-		return (0);
-	}
+
+	spin_lock_irqsave(&tb->tb_lock, flags);
+	switch (tb->tb_state) {
+	case TB_ACTIVE:
+		if (tid) {
+			/* sucessful cancel, not on queue */
+			tb->tb_state = TB_IDLE;
+			rval = 0;
+			break;
+		} else {
+			/* unsuccessful cancel, will be queued */
+			tb->tb_state = TB_CANCELLED;
+			rval = -1;
+			break;
+		}
 	case TB_RESCHEDULED:
+		/* unsuccessful cancel, will be queued */
 		tb->tb_state = TB_CANCELLED;
-		return (-1);
-	case TB_CANCELLED:
-	case TB_TRANSIENT:
-	case TB_ZOMBIE:
+		rval = -1;
+		break;
 	case TB_IDLE:
+		/* already successfully cancelled, not on queue */
+		rval = 0;
+		break;
+	case TB_CANCELLED:
+	case TB_ZOMBIE:
+		/* already unsuccessfully cancelled, will be queued */
+		rval = -1;
+		break;
+	case TB_TRANSIENT:
 	default:
-		tb->tb_state = state;
 		swerr();
-		return (-1);
+		rval = -1;
+		break;
 	}
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
+	return (rval);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_timer_cancel);
@@ -1055,15 +1073,16 @@ mblk_t *
 mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
-	tblk_t *t2 = (typeof(t2)) new_mp->b_datap->db_base;
 
 	if (!mi_timer_cancel(mp)) {
+		/* not on queue, can be rescheduled on new queue */
+		mi_timer_SUN(q, mp, drv_hztomsec(tb->tb_time - jiffies));
+		return (mp);
+	} else {
+		/* possibly on queue, use new timer block */
 		mi_timer_SUN(q, new_mp, drv_hztomsec(tb->tb_time - jiffies));
 		return (new_mp);
 	}
-	tb->tb_state = TB_IDLE;
-	mi_timer_SUN(q, mp, drv_hztomsec(tb->tb_time - jiffies));
-	return (mp);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_timer_q_switch);
@@ -1093,56 +1112,58 @@ mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 
 	if (msec >= 0) {
-		long state;
+		unsigned long flags;
+		toid_t tid;
 
-		tb->tb_q = q;
-		switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
-		case TB_ACTIVE:
-			/* tb has timer actively running */
-		{
-			toid_t tid;
-
-			if (!(tid = xchg(&tb->tb_tid, 0)))
-				goto reschedule;
+		/* tb has timer actively running */
+		if ((tid = xchg(&tb->tb_tid, 0)))
 			untimeout(tid);
-		}
+
+		spin_lock_irqsave(&tb->tb_lock, flags);
+		switch (tb->tb_state) {
+		case TB_ACTIVE:
+			/* tb is running */
+			if (!tid)
+				/* unsuccessful cancel, will be queued */
+				goto reschedule;
 			/* fall through */
 		case TB_IDLE:
-			/* tb is idle */
+			/* tb is idle, not on queue */
+			tb->tb_q = q;
 			tb->tb_state = TB_ACTIVE;
 			tb->tb_time = jiffies + drv_msectohz(msec);
-			if (!
-			    (tb->tb_tid =
-			     timeout(mi_timer_expiry, (caddr_t) tb, tb->tb_time - jiffies))) {
-				/* failed timeout allocation */
-				if (tb->tb_q) {
-					tb->tb_state = TB_RESCHEDULED;
-					put(tb->tb_q, mp);
-					break;
-				}
-				swerr();
-				tb->tb_state = TB_IDLE;
-				break;
+			if (tb->tb_time > jiffies &&
+			    !(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp,
+						   tb->tb_time - jiffies)))
+				tb->tb_state = TB_RESCHEDULED;
+			if (!tb->tb_tid) {
+				/* expired or needs reschedule */
+				spin_unlock_irqrestore(&tb->tb_lock, flags);
+				put(tb->tb_q, mp);
+				return;
 			}
 			break;
 		case TB_CANCELLED:
-			/* tb has been cancelled - but is still on queue */
+			/* tb has been cancelled, but will be queued */
 		      reschedule:
 			/* fall through */
 		case TB_RESCHEDULED:
-			/* tb is being rescheduled */
+			/* tb is being rescheduled, and will be queued */
+			tb->tb_q = q;
 			tb->tb_state = TB_RESCHEDULED;
 			tb->tb_time = jiffies + drv_msectohz(msec);
 			break;
+#if 0
 		case TB_TRANSIENT:
 			/* tb is in a transient state */
+#endif
 		case TB_ZOMBIE:
 			/* tb is a zombie, waiting to be freed */
 		default:
-			tb->tb_state = state;
 			swerr();
 			break;
 		}
+		spin_unlock_irqrestore(&tb->tb_lock, flags);
 	} else {
 		switch (msec) {
 		case ((clock_t) (-1)):
@@ -1180,56 +1201,49 @@ void
 mi_timer_move(queue_t *q, mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
-	long state;
+	unsigned long flags;
+	toid_t tid;
 
-	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
-	case TB_ACTIVE:
-	{
-		toid_t tid;
-
-		if (!(tid = xchg(&tb->tb_tid, 0)))
-			goto dequeue;
+	if ((tid = xchg(&tb->tb_tid, 0)))
 		untimeout(tid);
-		tb->tb_q = q;
-		if (!(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) tb, tb->tb_time - jiffies))) {
-			/* failed timeout allocation */
-			if (q) {
-				tb->tb_state = TB_RESCHEDULED;
-				put(q, mp);
-			} else {
-				tb->tb_state = TB_IDLE;
-				swerr();
-			}
-		}
-		break;
-	}
-	default:
-	{
-		queue_t *oldq;
 
-	      dequeue:
-		/* double race breaker */
-		if ((oldq = xchg(&tb->tb_q, NULL))) {
-			/* did we make it to a queue */
-			if (mp->b_next || mp->b_prev) {
-				fixme(("too dangerous"));	/* FIXME: too dangerous */
-				rmvq(oldq, mp);
+	spin_lock_irqsave(&tb->tb_lock, flags);
+	switch (tb->tb_state) {
+	case TB_ACTIVE:
+		/* tb is running */
+		if (tid) {
+			/* sucessful cancel, not on queue, simply start */
+			tb->tb_q = q;
+			tb->tb_state = TB_ACTIVE;
+			if (tb->tb_time > jiffies &&
+			    !(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp,
+						   tb->tb_time - jiffies)))
+				tb->tb_state = TB_RESCHEDULED;
+			if (!tb->tb_tid) {
+				/* expired or needs reschedule */
+				spin_unlock_irqrestore(&tb->tb_lock, flags);
+				put(tb->tb_q, mp);
+				return;
 			}
+		} else {
+			/* unsuccessful cancel, will be queued */
+			/* ask for reschedule on new queue */
+			tb->tb_q = q;
+			tb->tb_state = TB_RESCHEDULED;
 		}
-		if ((tb->tb_q = q))
-			put(q, mp);
-		else
-			swerr();
-		break;
-	}
-	case TB_ZOMBIE:
-		swerr();
 		break;
 	case TB_IDLE:
+		/* tb is idle, not on queue */
+	case TB_CANCELLED:
+	case TB_RESCHEDULED:
 		tb->tb_q = q;
 		break;
+	case TB_ZOMBIE:
+	default:
+		swerr();
+		break;
 	}
-	tb->tb_state = state;
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_timer_move);
@@ -1245,34 +1259,52 @@ int
 mi_timer_valid(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
-	long state;
+	unsigned long flags;
+	int rval;
 
-	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
+	spin_lock_irqsave(&tb->tb_lock, flags);
+	switch (tb->tb_state) {
 	case TB_ACTIVE:
-	default:
-		tb->tb_state = TB_IDLE;
-		return (1);
-	case TB_ZOMBIE:
-		freemsg(mp);
-		return (0);
+		if (tb->tb_tid == (toid_t) 0) {
+			/* queued as a result of a timeout */
+			tb->tb_state = TB_IDLE;
+			rval = (1);
+			break;
+		} else {
+			/* timer still running, will be requeued */
+			rval = (0);
+			break;
+		}
 	case TB_CANCELLED:
+		/* were cancelled, now we are idle (off queue) */
 		tb->tb_state = TB_IDLE;
+	case TB_IDLE:
+		rval = (0);
+		break;
+	case TB_ZOMBIE:
+		/* were zombied, now we can be freed (off queue) */
+		local_irq_restore(flags);
+		freemsg(mp);
 		return (0);
 	case TB_RESCHEDULED:
 		tb->tb_state = TB_ACTIVE;
-		if (!(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) tb, tb->tb_time - jiffies))) {
-			/* failed timeout allocation */
+		if (tb->tb_time > jiffies &&
+		    !(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp, tb->tb_time - jiffies)))
 			tb->tb_state = TB_RESCHEDULED;
-			if (tb->tb_q) {
-				put(tb->tb_q, mp);
-				return (0);
-			}
-			swerr();
-			tb->tb_state = TB_IDLE;
-			return (1);
+		if (!tb->tb_tid) {
+			spin_unlock_irqrestore(&tb->tb_lock, flags);
+			put(tb->tb_q, mp);
+			return (0);
 		}
-		return (0);
+		rval = (0);
+		break;
+	default:
+		swerr();
+		rval = (0);
+		break;
 	}
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
+	return (rval);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_timer_valid);
@@ -1285,25 +1317,30 @@ void
 mi_timer_free(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
-	long state;
+	unsigned long flags;
+	toid_t tid;
 
-	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
-	case TB_ACTIVE:
-	{
-		toid_t tid;
-
-		if (!(tid = xchg(&tb->tb_tid, 0)))
-			goto zombie;
+	if ((tid = xchg(&tb->tb_tid, 0)))
 		untimeout(tid);
-	}
+
+	spin_lock_irqsave(&tb->tb_lock, flags);
+	switch (tb->tb_state) {
+	case TB_ACTIVE:
+		if (!tid)
+			/* unsuccessful cancel, will be queued */
+			goto zombie;
+		/* fall through */
 	case TB_IDLE:
-		break;
+		/* not on queue */
+		local_irq_restore(flags);
+		freemsg(mp);
+		return;
 	default:
 	      zombie:
 		tb->tb_state = TB_ZOMBIE;
-		return;
+		break;
 	}
-	freemsg(mp);
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_timer_free);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.6 2006/11/03 10:39:20 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.7 2006/12/08 05:08:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:20 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.7  2006/12/08 05:08:12  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.6  2006/11/03 10:39:20  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_MAC_STREAM_H__
 #define __SYS_MAC_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mac/stream.h directly, include sys/stream.h instead."
@@ -88,7 +91,7 @@
 #endif
 
 #ifndef __MAC_EXTERN_INLINE
-#define __MAC_EXTERN_INLINE __EXTERN_INLINE
+#define __MAC_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif
 
 #ifndef _MAC_SOURCE

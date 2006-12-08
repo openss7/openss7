@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/16 00:21:19 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/08 05:08:26 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -12,9 +12,9 @@
 # by openss7 install_initd and remove_initd scripts.  Each line specifies
 # arguments to add and remove links after the the name argument:
 #
-# streams:	start and stop streams compatibility subsystem
+# strcompat:	start and stop strcompat compatibility subsystem
 # update-rc.d:	start 33 S . stop 33 0 6 .
-# config:	/etc/default/streams
+# config:	/etc/default/strcompat
 # probe:	false
 # hide:		false
 # license:	GPL
@@ -244,7 +244,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/16 00:21:19 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/08 05:08:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -289,7 +289,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 00:21:19 $ by $Author: brian $
+# Last Modified $Date: 2006/12/08 05:08:26 $ by $Author: brian $
 #
 # =============================================================================
 

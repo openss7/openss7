@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.10 2006/11/03 10:39:23 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.11 2006/12/08 05:08:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:23 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:08:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsun.h,v $
+ Revision 0.9.2.11  2006/12/08 05:08:19  brian
+ - some rework resulting from testing and inspection
+
  Revision 0.9.2.10  2006/11/03 10:39:23  brian
  - updated headers, correction to mi_timer_expiry type
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
@@ -73,7 +76,7 @@
 #endif
 
 #ifndef __SUN_EXTERN_INLINE
-#define __SUN_EXTERN_INLINE __EXTERN_INLINE
+#define __SUN_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __SUN_EXTERN_INLINE */
 
 #include <linux/types.h>
