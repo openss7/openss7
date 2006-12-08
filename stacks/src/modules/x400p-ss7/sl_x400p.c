@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/08 05:32:09 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/08 11:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:32:09 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 11:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.23  2006/12/08 11:46:32  brian
+ - a few more corrections from testing
+
  Revision 0.9.2.22  2006/12/08 05:32:09  brian
  - changes from testing of X400P-SS7 driver
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/08 05:32:09 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/08 11:46:32 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/08 05:32:09 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/08 11:46:32 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -104,11 +107,13 @@ static char const ident[] =
 #include <linux/pci.h>
 
 #include <linux/interrupt.h>
+#ifndef _MPS_SOURCE
 #if 0
 #include "bufpool.h"
 #else
 #include <sys/os7/bufpool.h>
 #endif
+#endif				/* _MPS_SOURCE */
 #endif				/* LINUX */
 
 #include <ss7/lmi.h>
@@ -127,7 +132,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/08 05:32:09 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/08 11:46:32 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -360,7 +365,16 @@ STATIC void xp_free_cd(struct cd *);
 STATIC struct cd *cd_get(struct cd *);
 STATIC void cd_put(struct cd *);
 
+#ifdef _MPS_SOURCE
+#define ss7_fast_allocb(__bufpoolp, __size, __priority)	allocb(__size, __priority)
+#define ss7_fast_freemsg(__bufpoolp, __mp) freemsg(__mp)
+#define ss7_bufpool_reserve(__bufpoolp, __numb) do { } while (0)
+#define ss7_bufpool_release(__bufpoolp, __numb) do { } while (0)
+#define ss7_bufpool_init(__bufpoolp) do { } while (0)
+#define ss7_bufpool_term(__bufpoolp) do { } while (0)
+#else				/* _MPS_SOURCE */
 STATIC struct ss7_bufpool xp_bufpool = { 0, };
+#endif				/* _MPS_SOURCE */
 
 /*
  *  ------------------------------------------------------------------------
@@ -521,7 +535,7 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400P},
 	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400PSS7},
 	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V400P},
-	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PT},
+	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
 	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
 	{0,}
 };
@@ -586,6 +600,7 @@ m_error(struct xp *xp, queue_t *q, int err)
 		mp->b_datap->db_type = M_ERROR;
 		*mp->b_wptr++ = err < 0 ? -err : err;
 		*mp->b_wptr++ = err < 0 ? -err : err;
+		printd(("%s: %p: <- M_ERROR\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -610,6 +625,7 @@ sl_pdu_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_PDU_IND;
 		mp->b_cont = dp;
+		printd(("%s: %p: <- SL_PDU_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -628,12 +644,13 @@ sl_link_congested_ind(struct xp *xp, queue_t *q, ulong cong, ulong disc)
 	sl_link_cong_ind_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LINK_CONGESTED_IND;
 		p->sl_cong_status = cong;
 		p->sl_disc_status = disc;
+		printd(("%s: %p: <- SL_LINK_CONGESTED_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -652,13 +669,14 @@ sl_link_congestion_ceased_ind(struct xp *xp, queue_t *q, ulong cong, ulong disc)
 	sl_link_cong_ceased_ind_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LINK_CONGESTION_CEASED_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_cong_status = cong;
 		p->sl_disc_status = disc;
+		printd(("%s: %p: <- SL_LINK_CONGESTION_CEASED_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -682,6 +700,7 @@ sl_retrieved_message_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVED_MESSAGE_IND;
 		mp->b_cont = dp;
+		printd(("%s: %p: <- SL_RETRIEVED_MESSGAGE_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -704,6 +723,7 @@ sl_retrieval_complete_ind(struct xp *xp, queue_t *q)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
+		printd(("%s: %p: <- SL_RETIREVAL_COMPLETE_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -726,6 +746,7 @@ sl_rb_cleared_ind(struct xp *xp, queue_t *q)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RB_CLEARED_IND;
+		printd(("%s: %p: <- SL_RB_CLEARED_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -749,6 +770,7 @@ sl_bsnt_ind(struct xp *xp, queue_t *q, ulong bsnt)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_BSNT_IND;
 		p->sl_bsnt = bsnt;
+		printd(("%s: %p: <- SL_BSNT_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -771,6 +793,7 @@ sl_in_service_ind(struct xp *xp, queue_t *q)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_IN_SERVICE_IND;
+		printd(("%s: %p: <- SL_IN_SERVICE_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -789,12 +812,13 @@ sl_out_of_service_ind(struct xp *xp, queue_t *q, ulong reason)
 	sl_out_of_service_ind_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_reason = reason;
+		printd(("%s: %p: <- SL_OUT_OF_SERVICE_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -813,11 +837,12 @@ sl_remote_processor_outage_ind(struct xp *xp, queue_t *q)
 	sl_rem_proc_out_ind_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
 		p->sl_timestamp = jiffies;
+		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_OUTAGE_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -836,11 +861,12 @@ sl_remote_processor_recovered_ind(struct xp *xp, queue_t *q)
 	sl_rem_proc_recovered_ind_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
 		p->sl_timestamp = jiffies;
+		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_RECOVERED_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -863,6 +889,7 @@ sl_rtb_cleared_ind(struct xp *xp, queue_t *q)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RTB_CLEARED_IND;
+		printd(("%s: %p: <- SL_RTB_CLEARED_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -885,6 +912,7 @@ sl_retrieval_not_possible_ind(struct xp *xp, queue_t *q)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_NOT_POSSIBLE_IND;
+		printd(("%s: %p: <- SL_RETRIEVAL_NOT_POSSIBLE_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -908,6 +936,7 @@ sl_bsnt_not_retrievable_ind(struct xp *xp, queue_t *q, ulong bsnt)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_BSNT_NOT_RETRIEVABLE_IND;
 		p->sl_bsnt = bsnt;
+		printd(("%s: %p: <- SL_BSNT_NOT_RETRIEVABLE_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -927,7 +956,7 @@ sl_optmgmt_ack(struct xp *xp, queue_t *q, caddr_t opt_ptr, size_t opt_len, ulong
 	sl_optmgmt_ack_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_OPTMGMT_ACK;
@@ -936,6 +965,7 @@ sl_optmgmt_ack(struct xp *xp, queue_t *q, caddr_t opt_ptr, size_t opt_len, ulong
 		p->mgmt_flags = flags;
 		bcopy(opt_ptr, mp->b_wptr, opt_len);
 		mp->b_wptr += opt_len;
+		printd(("%s: %p: <- SL_OPTMGMT_ACK\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -954,10 +984,11 @@ sl_notify_ind(struct xp *xp, queue_t *q)
 	sl_notify_ind_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_NOTIFY_IND;
+		printd(("%s: %p: <- SL_NOTIFY_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -989,6 +1020,7 @@ lmi_info_ack(struct xp *xp, queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 		p->lmi_ppa_style = LMI_STYLE2;
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
+		printd(("%s: %p: <- LMI_INFO_ACK\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1022,6 +1054,7 @@ sdt_rc_signal_unit_ind(struct xp *xp, queue_t *q, mblk_t *dp, ulong count)
 				p->sdt_primitive = SDT_RC_SIGNAL_UNIT_IND;
 				p->sdt_count = count;
 				mp->b_cont = dp;
+				printd(("%s: %p: <- SDT_RC_SIGNAL_UNIT_IND\n", DRV_NAME, xp));
 				ss7_oput(xp->oq, mp);
 				return (QR_ABSORBED);
 			}
@@ -1049,10 +1082,11 @@ sdt_rc_congestion_accept_ind(struct xp *xp, queue_t *q)
 	sdt_rc_congestion_accept_ind_t *p;
 
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_CONGESTION_ACCEPT_IND;
+		printd(("%s: %p: <- SDT_RC_CONGESTION_ACCEPT_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1071,10 +1105,11 @@ sdt_rc_congestion_discard_ind(struct xp *xp, queue_t *q)
 	sdt_rc_congestion_discard_ind_t *p;
 
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_CONGESTION_DISCARD_IND;
+		printd(("%s: %p: <- SDT_RC_CONGESTION_DISCARD_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1093,10 +1128,11 @@ sdt_rc_no_congestion_ind(struct xp *xp, queue_t *q)
 	sdt_rc_no_congestion_ind_t *p;
 
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_NO_CONGESTION_IND;
+		printd(("%s: %p: <- SDT_RC_NO_CONGESTION_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1120,6 +1156,7 @@ sdt_iac_correct_su_ind(struct xp *xp, queue_t *q)
 			p = (typeof(p)) mp->b_wptr;
 			mp->b_wptr += sizeof(*p);
 			p->sdt_primitive = SDT_IAC_CORRECT_SU_IND;
+			printd(("%s: %p: <- SDT_IAC_CORRECT_SU_IND\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -1141,10 +1178,11 @@ sdt_iac_abort_proving_ind(struct xp *xp, queue_t *q)
 	sdt_iac_abort_proving_ind_t *p;
 
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_IAC_ABORT_PROVING_IND;
+		printd(("%s: %p: <- SDT_IAC_ABORT_PROVING_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1163,10 +1201,11 @@ sdt_lsc_link_failure_ind(struct xp *xp, queue_t *q)
 	sdt_lsc_link_failure_ind_t *p;
 
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_LSC_LINK_FAILURE_IND;
+		printd(("%s: %p: <- SDT_LSC_LINK_FAILURE_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1189,6 +1228,7 @@ sdt_txc_transmission_request_ind(struct xp *xp, queue_t *q)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_TXC_TRANSMISSION_REQUEST_IND;
+		printd(("%s: %p: <- SDT_TXC_TRANSMISSION_REQUEST_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1206,6 +1246,7 @@ STATIC INLINE int
 sdl_received_bits_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 {
 	if (canputnext(xp->oq)) {
+		_printd(("%s: %p: <- SDL_RECEIVED_BITS_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, dp);
 		return (QR_ABSORBED);
 	}
@@ -1226,10 +1267,11 @@ sdl_disconnect_ind(struct xp *xp, queue_t *q)
 
 	(void) xp;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sdl_primitive = SDL_DISCONNECT_IND;
+		printd(("%s: %p: <- SDL_DISCONNECT_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1254,6 +1296,7 @@ lmi_ok_ack(struct xp *xp, queue_t *q, ulong state, long prim)
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = prim;
 		p->lmi_state = xp->i_state = state;
+		printd(("%s: %p: <- LMI_OK_ACK\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1280,6 +1323,7 @@ lmi_error_ack(struct xp *xp, queue_t *q, ulong state, long prim, ulong errno, ul
 		p->lmi_reason = reason;
 		p->lmi_error_primitive = prim;
 		p->lmi_state = xp->i_state = state;
+		printd(("%s: %p: <- LMI_ERROR_ACK\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1298,11 +1342,12 @@ lmi_enable_con(struct xp *xp, queue_t *q)
 	lmi_enable_con_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = xp->i_state = LMI_ENABLED;
+		printd(("%s: %p: <- LMI_ENABLE_CON\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1321,11 +1366,12 @@ lmi_disable_con(struct xp *xp, queue_t *q)
 	lmi_disable_con_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = xp->i_state = LMI_DISABLED;
+		printd(("%s: %p: <- LMI_DISABLE_CON\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1351,6 +1397,7 @@ lmi_optmgmt_ack(struct xp *xp, queue_t *q, ulong flags, caddr_t opt_ptr, size_t 
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
 		p->lmi_mgmt_flags = flags;
+		printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1376,6 +1423,7 @@ lmi_error_ind(struct xp *xp, queue_t *q, ulong errno, ulong reason)
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
 		p->lmi_state = xp->i_state;
+		printd(("%s: %p: <- LMI_ERROR_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1401,6 +1449,7 @@ lmi_stats_ind(struct xp *xp, queue_t *q, ulong interval)
 			p->lmi_primitive = LMI_STATS_IND;
 			p->lmi_interval = interval;
 			p->lmi_timestamp = jiffies;
+			printd(("%s: %p: <- LMI_STATS_IND\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -1430,6 +1479,7 @@ lmi_event_ind(struct xp *xp, queue_t *q, ulong oid, ulong level)
 			p->lmi_objectid = oid;
 			p->lmi_timestamp = jiffies;
 			p->lmi_severity = level;
+			printd(("%s: %p: <- LMI_EVENT_IND\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2377,7 +2427,7 @@ sl_iac_stop(struct xp *xp, queue_t *q)
 	if (xp->sl.statem.iac_state != SL_STATE_IDLE) {
 		__xp_timer_stop(xp, t3);
 		__xp_timer_stop(xp, t2);
-		ctrace(__xp_timer_stop(xp, t4));
+		__xp_timer_stop(xp, t4);
 		sl_aerm_stop(xp, q);
 		xp->sl.statem.emergency = 0;
 		xp->sl.statem.iac_state = SL_STATE_IDLE;
@@ -2920,7 +2970,7 @@ sl_rc_start(struct xp *xp, queue_t *q)
 		xp->sl.statem.abnormal_fibr = 0;	/* Basic only (note 1). */
 		xp->sl.statem.congestion_discard = 0;
 		xp->sl.statem.congestion_accept = 0;
-		sl_daedr_start(xp, q);
+		ctrace(sl_daedr_start(xp, q));
 		xp->sl.statem.rc_state = SL_STATE_IN_SERVICE;
 		return;
 		/* 
@@ -4102,7 +4152,7 @@ sl_txc_start(struct xp *xp, queue_t *q)
 	if (xp->sl.statem.txc_state == SL_STATE_IDLE) {
 		if (xp->option.pvar != SS7_PVAR_ANSI_92)
 			xp->sl.statem.lssu_available = 0;
-		sl_daedt_start(xp, q);
+		ctrace(sl_daedt_start(xp, q));
 	}
 	xp->sl.statem.txc_state = SL_STATE_IN_SERVICE;
 	return;
@@ -4113,8 +4163,8 @@ sl_lsc_start(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
-		sl_rc_start(xp, q);
-		sl_txc_start(xp, q);	/* Note 2 */
+		ctrace(sl_rc_start(xp, q));
+		ctrace(sl_txc_start(xp, q));	/* Note 2 */
 		if (xp->sl.statem.emergency)
 			sl_iac_emergency(xp, q);
 		sl_iac_start(xp, q);
@@ -4171,7 +4221,7 @@ sl_lsc_power_on(struct xp *xp, queue_t *q)
 {
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_POWER_OFF:
-		sl_txc_start(xp, q);	/* Note 3 */
+		ctrace(sl_txc_start(xp, q));	/* Note 3 */
 		ctrace(sl_txc_send_sios(xp, q));	/* not necessary for ANSI */
 		sl_aerm_set_ti_to_tin(xp, q);
 		xp->sl.statem.local_processor_outage = 0;
@@ -6334,7 +6384,7 @@ sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_daedt_start(xp, q);
+		ctrace(sl_daedt_start(xp, q));
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
@@ -6356,7 +6406,7 @@ sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 		goto eproto;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
-		sl_daedr_start(xp, q);
+		ctrace(sl_daedr_start(xp, q));
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
@@ -7036,7 +7086,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	if ((err = lmi_enable_con(xp, q)))
 		return (err);
 	/* commit enable */
-	printd(("%s: performing enable\n", DRV_NAME));
+	printd(("%s: %p: performing enable\n", DRV_NAME, xp));
 	xp->i_state = LMI_ENABLE_PENDING;
 	xp->sdl.config.ifname = sp->config.ifname;
 	xp->sdl.config.ifflags |= SDL_IF_UP;
@@ -9945,6 +9995,7 @@ xp_e1_txrx_burst(struct cd *cd)
 	int lebno;
 
 	if ((lebno = (cd->lebno + 1) & (X400P_EBUFNO - 1)) != cd->uebno) {
+#if 0
 		register int slot;
 		register volatile uint32_t *xll;
 
@@ -9975,6 +10026,20 @@ xp_e1_txrx_burst(struct cd *cd)
 					*rbuf = *xll;
 				}
 		}
+#else
+		unsigned int offset = lebno << 8;
+		register int word, slot;
+		uint32_t *wbuf = cd->wbuf + offset;
+		uint32_t *rbuf = cd->rbuf + offset;
+		volatile uint32_t *xll = cd->xll;
+
+		for (word = 0; word < 256; word += 32)
+			for (slot = word + 1; slot < word + 32; slot++)
+				xll[slot] = wbuf[slot];
+		for (word = 0; word < 256; word += 32)
+			for (slot = word + 1; slot < word + 32; slot++)
+				rbuf[slot] = xll[slot];
+#endif
 		cd->lebno = lebno;
 		tasklet_schedule(&cd->tasklet);
 	} else
@@ -10761,54 +10826,71 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (cmd) {
 		case SDL_IOCGOPTIONS:	/* lmi_option_t */
+			printd(("%s: %p: SDL_IOCGOPTIONS\n", DRV_NAME, xp));
 			ret = sdl_iocgoptions(q, mp);
 			break;
 		case SDL_IOCSOPTIONS:	/* lmi_option_t */
+			printd(("%s: %p: SDL_IOCSOPTIONS\n", DRV_NAME, xp));
 			ret = sdl_iocsoptions(q, mp);
 			break;
 		case SDL_IOCGCONFIG:	/* sdl_config_t */
+			printd(("%s: %p: SDL_IOCGCONFIG\n", DRV_NAME, xp));
 			ret = sdl_iocgconfig(q, mp);
 			break;
 		case SDL_IOCSCONFIG:	/* sdl_config_t */
+			printd(("%s: %p: SDL_IOCSCONFIG\n", DRV_NAME, xp));
 			ret = sdl_iocsconfig(q, mp);
 			break;
 		case SDL_IOCTCONFIG:	/* sdl_config_t */
+			printd(("%s: %p: SDL_IOCTCONFIG\n", DRV_NAME, xp));
 			ret = sdl_ioctconfig(q, mp);
 			break;
 		case SDL_IOCCCONFIG:	/* sdl_config_t */
+			printd(("%s: %p: SDL_IOCCCONFIG\n", DRV_NAME, xp));
 			ret = sdl_ioccconfig(q, mp);
 			break;
 		case SDL_IOCGSTATEM:	/* sdl_statem_t */
+			printd(("%s: %p: SDL_IOCGSTATEM\n", DRV_NAME, xp));
 			ret = sdl_iocgstatem(q, mp);
 			break;
 		case SDL_IOCCMRESET:	/* sdl_statem_t */
+			printd(("%s: %p: SDL_IOCCMRESET\n", DRV_NAME, xp));
 			ret = sdl_ioccmreset(q, mp);
 			break;
 		case SDL_IOCGSTATSP:	/* sdl_stats_t */
+			printd(("%s: %p: SDL_IOCGSTATSP\n", DRV_NAME, xp));
 			ret = sdl_iocgstatsp(q, mp);
 			break;
 		case SDL_IOCSSTATSP:	/* sdl_stats_t */
+			printd(("%s: %p: SDL_IOCSSTATSP\n", DRV_NAME, xp));
 			ret = sdl_iocsstatsp(q, mp);
 			break;
 		case SDL_IOCGSTATS:	/* sdl_stats_t */
+			printd(("%s: %p: SDL_IOCGSTATS\n", DRV_NAME, xp));
 			ret = sdl_iocgstats(q, mp);
 			break;
 		case SDL_IOCCSTATS:	/* sdl_stats_t */
+			printd(("%s: %p: SDL_IOCCSTATS\n", DRV_NAME, xp));
 			ret = sdl_ioccstats(q, mp);
 			break;
 		case SDL_IOCGNOTIFY:	/* sdl_notify_t */
+			printd(("%s: %p: SDL_IOCGNOTIFY\n", DRV_NAME, xp));
 			ret = sdl_iocgnotify(q, mp);
 			break;
 		case SDL_IOCSNOTIFY:	/* sdl_notify_t */
+			printd(("%s: %p: SDL_IOCSNOTIFY\n", DRV_NAME, xp));
 			ret = sdl_iocsnotify(q, mp);
 			break;
 		case SDL_IOCCNOTIFY:	/* sdl_notify_t */
+			printd(("%s: %p: SDL_IOCCNOTIFY\n", DRV_NAME, xp));
 			ret = sdl_ioccnotify(q, mp);
 			break;
 		case SDL_IOCCDISCTX:	/* */
+			printd(("%s: %p: SDL_IOCCDISCTX\n", DRV_NAME, xp));
 			ret = sdl_ioccdisctx(q, mp);
 			break;
 		case SDL_IOCCCONNTX:	/* */
+			printd(("%s: %p: SDL_IOCCCONNTX\n", DRV_NAME, xp));
 			ret = sdl_ioccconntx(q, mp);
 			break;
 		default:
@@ -10848,75 +10930,99 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case SL_PDU_REQ:
+		printd(("%s: %p: -> SL_PDU_REQ\n", DRV_NAME, xp));
 		rtn = sl_pdu_req(q, mp);
 		break;
 	case SL_EMERGENCY_REQ:
+		printd(("%s: %p: -> SL_EMERGENCY_REQ\n", DRV_NAME, xp));
 		rtn = sl_emergency_req(q, mp);
 		break;
 	case SL_EMERGENCY_CEASES_REQ:
+		printd(("%s: %p: -> SL_EMERGENCY_CEASES_REQ\n", DRV_NAME, xp));
 		rtn = sl_emergency_ceases_req(q, mp);
 		break;
 	case SL_START_REQ:
+		printd(("%s: %p: -> SL_START_REQ\n", DRV_NAME, xp));
 		rtn = sl_start_req(q, mp);
 		break;
 	case SL_STOP_REQ:
+		printd(("%s: %p: -> SL_STOP_REQ\n", DRV_NAME, xp));
 		rtn = sl_stop_req(q, mp);
 		break;
 	case SL_RETRIEVE_BSNT_REQ:
+		printd(("%s: %p: -> SL_RETRIEVE_BSNT_REQ\n", DRV_NAME, xp));
 		rtn = sl_retrieve_bsnt_req(q, mp);
 		break;
 	case SL_RETRIEVAL_REQUEST_AND_FSNC_REQ:
+		printd(("%s: %p: -> SL_RETRIEVAL_REQUEST_AND_FSNC_REQ\n", DRV_NAME, xp));
 		rtn = sl_retrieval_request_and_fsnc_req(q, mp);
 		break;
 	case SL_RESUME_REQ:
+		printd(("%s: %p: -> SL_RESUME_REQ\n", DRV_NAME, xp));
 		rtn = sl_resume_req(q, mp);
 		break;
 	case SL_CLEAR_BUFFERS_REQ:
+		printd(("%s: %p: -> SL_CLEAR_BUFFERS_REQ\n", DRV_NAME, xp));
 		rtn = sl_clear_buffers_req(q, mp);
 		break;
 	case SL_CLEAR_RTB_REQ:
+		printd(("%s: %p: -> SL_CLEAR_RTB_REQ\n", DRV_NAME, xp));
 		rtn = sl_clear_rtb_req(q, mp);
 		break;
 	case SL_LOCAL_PROCESSOR_OUTAGE_REQ:
+		printd(("%s: %p: -> SL_LOCAL_PROCESSOR_OUTAGE_REQ\n", DRV_NAME, xp));
 		rtn = sl_local_processor_outage_req(q, mp);
 		break;
 	case SL_CONGESTION_DISCARD_REQ:
+		printd(("%s: %p: -> SL_CONGESTION_DISCARD_REQ\n", DRV_NAME, xp));
 		rtn = sl_congestion_discard_req(q, mp);
 		break;
 	case SL_CONGESTION_ACCEPT_REQ:
+		printd(("%s: %p: -> SL_CONGESTION_ACCEPT_REQ\n", DRV_NAME, xp));
 		rtn = sl_congestion_accept_req(q, mp);
 		break;
 	case SL_NO_CONGESTION_REQ:
+		printd(("%s: %p: -> SL_NO_CONGESTION_REQUEST\n", DRV_NAME, xp));
 		rtn = sl_no_congestion_req(q, mp);
 		break;
 	case SL_POWER_ON_REQ:
+		printd(("%s: %p: -> SL_POWER_ON_REQ\n", DRV_NAME, xp));
 		rtn = sl_power_on_req(q, mp);
 		break;
 	case SDT_DAEDT_TRANSMISSION_REQ:
+		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ\n", DRV_NAME, xp));
 		rtn = sdt_daedt_transmission_req(q, mp);
 		break;
 	case SDT_DAEDT_START_REQ:
+		printd(("%s: %p: -> SDT_DAEDT_START_REQ\n", DRV_NAME, xp));
 		rtn = sdt_daedt_start_req(q, mp);
 		break;
 	case SDT_DAEDR_START_REQ:
+		printd(("%s: %p: -> SDT_DAEDR_START_REQ\n", DRV_NAME, xp));
 		rtn = sdt_daedr_start_req(q, mp);
 		break;
 	case SDT_AERM_START_REQ:
+		printd(("%s: %p: -> SDT_AERM_START_REQ\n", DRV_NAME, xp));
 		rtn = sdt_aerm_start_req(q, mp);
 		break;
 	case SDT_AERM_STOP_REQ:
+		printd(("%s: %p: -> SDT_AERM_STOP_REQ\n", DRV_NAME, xp));
 		rtn = sdt_aerm_stop_req(q, mp);
 		break;
 	case SDT_AERM_SET_TI_TO_TIN_REQ:
+		printd(("%s: %p: -> SDT_AERM_SET_TI_TO_TIN_REQ\n", DRV_NAME, xp));
 		rtn = sdt_aerm_set_ti_to_tin_req(q, mp);
 		break;
 	case SDT_AERM_SET_TI_TO_TIE_REQ:
+		printd(("%s: %p: -> SDT_AERM_SET_TI_TO_TIE_REQ\n", DRV_NAME, xp));
 		rtn = sdt_aerm_set_ti_to_tie_req(q, mp);
 		break;
 	case SDT_SUERM_START_REQ:
+		printd(("%s: %p: -> SDT_SUERM_START_REQ\n", DRV_NAME, xp));
 		rtn = sdt_suerm_start_req(q, mp);
 		break;
 	case SDT_SUERM_STOP_REQ:
+		printd(("%s: %p: -> SDT_SUERM_STOP_REQ\n", DRV_NAME, xp));
 		rtn = sdt_suerm_stop_req(q, mp);
 		break;
 	case SDL_BITS_FOR_TRANSMISSION_REQ:
@@ -10974,34 +11080,43 @@ xp_r_sig(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	int rtn = QR_ABSORBED;
 
-	if (likely(mi_timer_valid(mp))) {
+	if (likely(ctrace(mi_timer_valid(mp)))) {
 		switch (*(int *) mp->b_rptr) {
 		case t1:
+			printd(("%s: %p: -> T1 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t1_timeout(xp, q);
 			break;
 		case t2:
+			printd(("%s: %p: -> T2 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t2_timeout(xp, q);
 			break;
 		case t3:
+			printd(("%s: %p: -> T3 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t3_timeout(xp, q);
 			break;
 		case t4:
+			printd(("%s: %p: -> T4 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t4_timeout(xp, q);
 			break;
 		case t5:
+			printd(("%s: %p: -> T5 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t5_timeout(xp, q);
 			break;
 		case t6:
+			printd(("%s: %p: -> T6 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t6_timeout(xp, q);
 			break;
 		case t7:
+			printd(("%s: %p: -> T7 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t7_timeout(xp, q);
 			break;
 		case t8:
+			printd(("%s: %p: -> T8 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t8_timeout(xp, q);
 			break;
 #if 0
 		case t9:
+			printd(("%s: %p: -> T9 TIMEOUT <-\n", DRV_NAME, xp));
 			rtn = xp_t9_timeout(xp, q);
 			break;
 #endif

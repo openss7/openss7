@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/08 05:32:11 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/08 11:46:35 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:32:11 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 11:46:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.10  2006/12/08 11:46:35  brian
+ - a few more corrections from testing
+
  Revision 0.9.2.9  2006/12/08 05:32:11  brian
  - changes from testing of X400P-SS7 driver
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/08 05:32:11 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/08 11:46:35 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/08 05:32:11 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/08 11:46:35 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -451,7 +454,7 @@ enum {
 	__TEST_ATTACH_REQ = 400, __TEST_DETACH_REQ, __TEST_ENABLE_REQ, __TEST_ENABLE_CON,
 	__TEST_DISABLE_REQ, __TEST_DISABLE_CON, __TEST_ERROR_IND, __TEST_SDL_OPTIONS,
 	__TEST_SDL_CONFIG, __TEST_SDT_OPTIONS, __TEST_SDT_CONFIG, __TEST_SL_OPTIONS,
-	__TEST_SL_CONFIG,
+	__TEST_SL_CONFIG, __TEST_SDL_STATS, __TEST_SDT_STATS, __TEST_SL_STATS,
 };
 
 /*
@@ -463,6 +466,12 @@ enum {
  */
 
 static int ss7_pvar = SS7_PVAR_ITUT_96;
+
+struct test_stats {
+	sdl_stats_t sdl;
+	sdt_stats_t sdt;
+	sl_stats_t sl;
+} iutstat;
 
 struct test_config {
 	lmi_option_t opt;
@@ -479,14 +488,14 @@ struct test_config {
 		    .ifflags = 0,	/* */
 		    .iftype = SDL_TYPE_DS0,	/* */
 		    .ifrate = 64000,	/* */
-		    .ifgtype = SDL_GTYPE_T1,	/* */
+		    .ifgtype = SDL_GTYPE_NONE,	/* */
 		    .ifgrate = 0,	/* */
 		    .ifmode = SDL_MODE_NONE,	/* */
 		    .ifgmode = SDL_GMODE_NONE,	/* */
-		    .ifgcrc = SDL_GCRC_CRC6,	/* */
+		    .ifgcrc = SDL_GCRC_NONE,	/* */
 		    .ifclock = SDL_CLOCK_NONE,	/* */
-		    .ifcoding = SDL_CODING_B8ZS,	/* */
-		    .ifframing = SDL_FRAMING_ESF,	/* */
+		    .ifcoding = SDL_CODING_NONE,	/* */
+		    .ifframing = SDL_FRAMING_NONE,	/* */
 		    .ifblksize = 0,	/* */
 		    .ifleads = 0,	/* */
 		    .ifbpv = 0,	/* */
@@ -507,7 +516,7 @@ struct test_config {
 		    .N = 16,	/* N */
 		    .m = 272,	/* m */
 		    .b = 64,	/* b */
-		    .f = 1,	/* f */
+		    .f = SDT_FLAGS_ONE,	/* f */
 	},			/* sdt */
 	{
 		.t1 = 45 * 1000,	/* t1 - timer t1 duration (milliseconds) */
@@ -538,6 +547,7 @@ struct test_config {
 } /* sl */ };
 
 struct test_config *config = &iutconf;
+struct test_stats  *stats = &iutstat;
 
 /*
  *  -------------------------------------------------------------------------
@@ -1950,6 +1960,134 @@ print_ppa(int child, ppa_t * ppa)
 
 	snprintf(buf, sizeof(buf), "%d:%d:%d", ((*ppa) >> 12) & 0x0f, ((*ppa) >> 8) & 0x0f, (*ppa) & 0x0ff);
 	print_string(child, buf);
+}
+void print_string_val(int child, const char *string, ulong val);
+void
+print_sdl_stats(int child, sdl_stats_t * s)
+{
+	if (s->rx_octets)
+		print_string_val(child, "rx_octets", s->rx_octets);
+	if (s->tx_octets)
+		print_string_val(child, "tx_octets", s->tx_octets);
+	if (s->rx_overruns)
+		print_string_val(child, "rx_overruns", s->rx_overruns);
+	if (s->tx_underruns)
+		print_string_val(child, "tx_underruns", s->tx_underruns);
+	if (s->rx_buffer_overflows)
+		print_string_val(child, "rx_buffer_overflows", s->rx_buffer_overflows);
+	if (s->tx_buffer_overflows)
+		print_string_val(child, "tx_buffer_overflows", s->tx_buffer_overflows);
+	if (s->lead_cts_lost)
+		print_string_val(child, "lead_cts_lost", s->lead_cts_lost);
+	if (s->lead_dcd_lost)
+		print_string_val(child, "lead_dcd_lost", s->lead_dcd_lost);
+	if (s->carrier_lost)
+		print_string_val(child, "carrier_lost", s->carrier_lost);
+}
+
+void
+print_sdt_stats(int child, sdt_stats_t * s)
+{
+	if (s->tx_bytes)
+		print_string_val(child, "tx_bytes", s->tx_bytes);
+	if (s->tx_sus)
+		print_string_val(child, "tx_sus", s->tx_sus);
+	if (s->tx_sus_repeated)
+		print_string_val(child, "tx_sus_repeated", s->tx_sus_repeated);
+	if (s->tx_underruns)
+		print_string_val(child, "tx_underruns", s->tx_underruns);
+	if (s->tx_aborts)
+		print_string_val(child, "tx_aborts", s->tx_aborts);
+	if (s->tx_buffer_overflows)
+		print_string_val(child, "tx_buffer_overflows", s->tx_buffer_overflows);
+	if (s->tx_sus_in_error)
+		print_string_val(child, "tx_sus_in_error", s->tx_sus_in_error);
+	if (s->rx_bytes)
+		print_string_val(child, "rx_bytes", s->rx_bytes);
+	if (s->rx_sus)
+		print_string_val(child, "rx_sus", s->rx_sus);
+	if (s->rx_sus_compressed)
+		print_string_val(child, "rx_sus_compressed", s->rx_sus_compressed);
+	if (s->rx_overruns)
+		print_string_val(child, "rx_overruns", s->rx_overruns);
+	if (s->rx_aborts)
+		print_string_val(child, "rx_aborts", s->rx_aborts);
+	if (s->rx_buffer_overflows)
+		print_string_val(child, "rx_buffer_overflows", s->rx_buffer_overflows);
+	if (s->rx_sus_in_error)
+		print_string_val(child, "rx_sus_in_error", s->rx_sus_in_error);
+	if (s->rx_sync_transitions)
+		print_string_val(child, "rx_sync_transitions", s->rx_sync_transitions);
+	if (s->rx_bits_octet_counted)
+		print_string_val(child, "rx_bits_octet_counted", s->rx_bits_octet_counted);
+	if (s->rx_crc_errors)
+		print_string_val(child, "rx_crc_errors", s->rx_crc_errors);
+	if (s->rx_frame_errors)
+		print_string_val(child, "rx_frame_errors", s->rx_frame_errors);
+	if (s->rx_frame_overflows)
+		print_string_val(child, "rx_frame_overflows", s->rx_frame_overflows);
+	if (s->rx_frame_too_long)
+		print_string_val(child, "rx_frame_too_long", s->rx_frame_too_long);
+	if (s->rx_frame_too_short)
+		print_string_val(child, "rx_frame_too_short", s->rx_frame_too_short);
+	if (s->rx_residue_errors)
+		print_string_val(child, "rx_residue_errors", s->rx_residue_errors);
+	if (s->rx_length_error)
+		print_string_val(child, "rx_length_error", s->rx_length_error);
+	if (s->carrier_cts_lost)
+		print_string_val(child, "carrier_cts_lost", s->carrier_cts_lost);
+	if (s->carrier_dcd_lost)
+		print_string_val(child, "carrier_dcd_lost", s->carrier_dcd_lost);
+	if (s->carrier_lost)
+		print_string_val(child, "carrier_lost", s->carrier_lost);
+}
+void
+print_sl_stats(int child, sl_stats_t *s)
+{
+	if (s->sl_dur_in_service)
+		print_string_val(child, "sl_dur_in_service", s->sl_dur_in_service);
+	if (s->sl_fail_align_or_proving)
+		print_string_val(child, "sl_fail_align_or_proving", s->sl_fail_align_or_proving);
+	if (s->sl_nacks_received)
+		print_string_val(child, "sl_nacks_received", s->sl_nacks_received);
+	if (s->sl_dur_unavail)
+		print_string_val(child, "sl_dur_unavail", s->sl_dur_unavail);
+	if (s->sl_dur_unavail_failed)
+		print_string_val(child, "sl_dur_unavail_failed", s->sl_dur_unavail_failed);
+	if (s->sl_sibs_sent)
+		print_string_val(child, "sl_sibs_sent", s->sl_sibs_sent);
+	if (s->sl_tran_sio_sif_octets)
+		print_string_val(child, "sl_tran_sio_sif_octets", s->sl_tran_sio_sif_octets);
+	if (s->sl_tran_msus)
+		print_string_val(child, "sl_tran_msus", s->sl_tran_msus);
+	if (s->sl_recv_sio_sif_octets)
+		print_string_val(child, "sl_recv_sio_sif_octets", s->sl_recv_sio_sif_octets);
+	if (s->sl_recv_msus)
+		print_string_val(child, "sl_recv_msus", s->sl_recv_msus);
+	if (s->sl_cong_onset_ind[0])
+		print_string_val(child, "sl_cong_onset_ind[0]", s->sl_cong_onset_ind[0]);
+	if (s->sl_cong_onset_ind[1])
+		print_string_val(child, "sl_cong_onset_ind[1]", s->sl_cong_onset_ind[1]);
+	if (s->sl_cong_onset_ind[2])
+		print_string_val(child, "sl_cong_onset_ind[2]", s->sl_cong_onset_ind[2]);
+	if (s->sl_cong_onset_ind[3])
+		print_string_val(child, "sl_cong_onset_ind[3]", s->sl_cong_onset_ind[3]);
+	if (s->sl_dur_cong_status[0])
+		print_string_val(child, "sl_dur_cong_status[0]", s->sl_dur_cong_status[0]);
+	if (s->sl_dur_cong_status[1])
+		print_string_val(child, "sl_dur_cong_status[1]", s->sl_dur_cong_status[1]);
+	if (s->sl_dur_cong_status[2])
+		print_string_val(child, "sl_dur_cong_status[2]", s->sl_dur_cong_status[2]);
+	if (s->sl_dur_cong_status[3])
+		print_string_val(child, "sl_dur_cong_status[3]", s->sl_dur_cong_status[3]);
+	if (s->sl_cong_discd_ind[0])
+		print_string_val(child, "sl_cong_discd_ind[0]", s->sl_cong_discd_ind[0]);
+	if (s->sl_cong_discd_ind[1])
+		print_string_val(child, "sl_cong_discd_ind[1]", s->sl_cong_discd_ind[1]);
+	if (s->sl_cong_discd_ind[2])
+		print_string_val(child, "sl_cong_discd_ind[2]", s->sl_cong_discd_ind[2]);
+	if (s->sl_cong_discd_ind[3])
+		print_string_val(child, "sl_cong_discd_ind[3]", s->sl_cong_discd_ind[3]);
 }
 #endif
 
@@ -3831,6 +3969,24 @@ print_string(int child, const char *string)
 }
 
 void
+print_string_val(int child, const char *string, ulong val)
+{
+	static const char *msgs[] = {
+		"%1$20.20s|          %2$15u          |                    \n",
+		"                    |          %2$15u          |%1$-20.20s\n",
+		"                    |          %2$15u       |   %1$-20.20s\n",
+		"                    |%1$-20.20s%2$15u|                    \n",
+	};
+
+	if (show && verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, msgs[child], string, val);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
 print_command_state(int child, const char *string)
 {
 	static const char *msgs[] = {
@@ -5043,6 +5199,7 @@ do_signal(int child, int action)
 	char cbuf[BUFSIZE], dbuf[BUFSIZE];
 	union primitives *p = (typeof(p)) cbuf;
 	struct strioctl ic;
+	int err;
 
 	if (action != oldact) {
 		oldact = action;
@@ -6067,7 +6224,6 @@ do_signal(int child, int action)
 		ic.ic_len = 0;
 		ic.ic_dp = NULL;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
-		return __RESULT_FAILURE;
 	case __TEST_TX_MAKE:
 		print_command_state(child, ":reconnect Tx");
 		ic.ic_cmd = SDL_IOCCCONNTX;
@@ -6092,6 +6248,17 @@ do_signal(int child, int action)
 		ic.ic_len = sizeof(config->sdl);
 		ic.ic_dp = (char *) &config->sdl;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SDL_STATS:
+		if (show && verbose > 1)
+			print_command_state(child, ":stats sdl");
+		ic.ic_cmd = SDL_IOCGSTATS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(stats->sdl);
+		ic.ic_dp = (char *) &stats->sdl;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sdl_stats(child, &stats->sdl);
+		return (err);
 	case __TEST_SDT_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sdt");
@@ -6108,6 +6275,17 @@ do_signal(int child, int action)
 		ic.ic_len = sizeof(config->sdt);
 		ic.ic_dp = (char *) &config->sdt;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SDT_STATS:
+		if (show && verbose > 1)
+			print_command_state(child, ":stats sdt");
+		ic.ic_cmd = SDT_IOCGSTATS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(stats->sdt);
+		ic.ic_dp = (char *) &stats->sdt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sdt_stats(child, &stats->sdt);
+		return (err);
 	case __TEST_SL_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sl");
@@ -6124,6 +6302,17 @@ do_signal(int child, int action)
 		ic.ic_len = sizeof(config->sl);
 		ic.ic_dp = (char *) &config->sl;
 		return test_ioctl(child, I_STR, (intptr_t) &ic);
+	case __TEST_SL_STATS:
+		if (show && verbose > 1)
+			print_command_state(child, ":stats sl");
+		ic.ic_cmd = SL_IOCGSTATS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(stats->sl);
+		ic.ic_dp = (char *) &stats->sl;
+		if ((err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sl_stats(child, &stats->sl);
+		return (err);
 
 	case __TEST_ATTACH_REQ:
 		ctrl->len = sizeof(p->lmi.attach_req) + (ADDR_buffer ? ADDR_length : 0);
@@ -7506,6 +7695,7 @@ preamble_config(int child)
 	state++;
 #endif
 	{
+#if 0
 		if (do_signal(child, __TEST_SDL_OPTIONS))
 			goto failure;
 		state++;
@@ -7518,6 +7708,7 @@ preamble_config(int child)
 		if (do_signal(child, __TEST_SDT_CONFIG))
 			goto failure;
 		state++;
+#endif
 	}
 	if (child == CHILD_IUT) {
 		if (do_signal(child, __TEST_SL_OPTIONS))
@@ -7591,6 +7782,31 @@ postamble_detach(int child)
 }
 
 static int
+postamble_stats(int child)
+{
+	int failed = 0;
+	
+	if (child != CHILD_PTU) {
+		state++;
+		if (do_signal(child, __TEST_SL_STATS))
+			failed = failed ? : state;
+	}
+	state++;
+	if (do_signal(child, __TEST_SDT_STATS))
+		failed = failed ? : state;
+	state++;
+	if (do_signal(child, __TEST_SDL_STATS))
+		failed = failed ? : state;
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
 preamble_enable(int child)
 {
 	if (preamble_attach(child))
@@ -7639,6 +7855,8 @@ postamble_disable(int child)
 	}
 	state++;
 #endif
+	if (postamble_stats(child))
+		failed = failed ? : state;
 	if (postamble_detach(child))
 		failed = failed ? : state;
 	if (failed) {
@@ -8252,15 +8470,18 @@ test_power_on_pt(int child)
 		if (do_signal(child, __TEST_POWER_ON))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
+		if (do_signal(child, __TEST_SIOS))
 			goto failure;
 		state++;
-		if (do_signal(child, __TEST_SIOS))
+		if (expect(child, LONGER_WAIT, __TEST_SIOS) || check_snibs(child, 0x7f, 0x7f))
 			goto failure;
 		state++;
 		break;
 	case CHILD_IUT:
 		if (do_signal(child, __TEST_POWER_ON))
+			goto failure;
+		state++;
+		if (expect(child, LONG_WAIT, __EVENT_NO_MSG))
 			goto failure;
 		state++;
 		break;
@@ -8320,15 +8541,18 @@ test_power_on_sut(int child)
 		if (do_signal(child, __TEST_POWER_ON))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
+		if (do_signal(child, __TEST_SIOS))
 			goto failure;
 		state++;
-		if (do_signal(child, __TEST_SIOS))
+		if (expect(child, LONG_WAIT, __TEST_SIOS) || check_snibs(child, 0x7f, 0x7f))
 			goto failure;
 		state++;
 		break;
 	case CHILD_IUT:
 		if (do_signal(child, __TEST_POWER_ON))
+			goto failure;
+		state++;
+		if (expect(child, LONG_WAIT, __EVENT_NO_MSG))
 			goto failure;
 		state++;
 		break;
@@ -8386,10 +8610,10 @@ test_out_of_service_sut(int child)
 {
 	switch (child) {
 	case CHILD_PTU:
-		if (expect(child, INFINITE_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
+		if (do_signal(child, __TEST_SIOS))
 			goto failure;
 		state++;
-		if (do_signal(child, __TEST_SIOS))
+		if (expect(child, LONGER_WAIT, __TEST_SIOS) || check_snibs(child, 0x7f, 0x7f))
 			goto failure;
 		state++;
 		break;
@@ -8536,6 +8760,7 @@ test_proving_sut(int child, int proving)
 				}
 				break;
 			}
+			break;
 		default:
 			return __RESULT_SCRIPT_ERROR;
 		}
@@ -9157,13 +9382,13 @@ Normal alignment procedure - correct procedure (MSU)\
 static int
 test_1_6_ptu(int child, int proving)
 {
-	if (test_alignment_sut(child, proving, __TEST_SEND_MSU))
+	if (test_alignment_sut(child, proving, __TEST_FISU))
 		goto failure;
 	state++;
-	if (do_signal(child, __TEST_DATA))
+	if (do_signal(child, __TEST_MSU))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_ACK))
+	if (expect(child, INFINITE_WAIT, __TEST_FISU))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9983,13 +10208,13 @@ Set RPO when \"Aligned not ready\"\
 static int
 test_1_11_ptu(int child, int proving)
 {
-	if (expect(child, INFINITE_WAIT, __TEST_SIOS))
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_POWER_ON))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SIOS))
+		goto failure;
+	state++;
+	if (expect(child, INFINITE_WAIT, __TEST_SIOS))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_LPO))
@@ -19590,34 +19815,34 @@ struct test_case {
 	numb_case_1_4, tgrp_case_1_4, sgrp_case_1_4, name_case_1_4, xtra_case_1_4, desc_case_1_4, sref_case_1_4, test_case_1_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_5a_p, tgrp_case_1_5a_p, sgrp_case_1_5a_p, name_case_1_5a_p, xtra_case_1_5a_p, desc_case_1_5a_p, sref_case_1_5a_p, test_case_1_5a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_5b_p, tgrp_case_1_5b_p, sgrp_case_1_5b_p, name_case_1_5b_p, xtra_case_1_5b_p, desc_case_1_5b_p, sref_case_1_5b_p, test_case_1_5b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_5a_np, tgrp_case_1_5a_np, sgrp_case_1_5a_np, name_case_1_5a_np, xtra_case_1_5a_np, desc_case_1_5a_np, sref_case_1_5a_np, test_case_1_5a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_5b_np, tgrp_case_1_5b_np, sgrp_case_1_5b_np, name_case_1_5b_np, xtra_case_1_5b_np, desc_case_1_5b_np, sref_case_1_5b_np, test_case_1_5b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_5a_np, tgrp_case_1_5a_np, sgrp_case_1_5a_np, name_case_1_5a_np, xtra_case_1_5a_np, desc_case_1_5a_np, sref_case_1_5a_np, test_case_1_5a_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_1_5b_np, tgrp_case_1_5b_np, sgrp_case_1_5b_np, name_case_1_5b_np, xtra_case_1_5b_np, desc_case_1_5b_np, sref_case_1_5b_np, test_case_1_5b_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_6_p, tgrp_case_1_6_p, sgrp_case_1_6_p, name_case_1_6_p, xtra_case_1_6_p, desc_case_1_6_p, sref_case_1_6_p, test_case_1_6_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_6_np, tgrp_case_1_6_np, sgrp_case_1_6_np, name_case_1_6_np, xtra_case_1_6_np, desc_case_1_6_np, sref_case_1_6_np, test_case_1_6_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_6_np, tgrp_case_1_6_np, sgrp_case_1_6_np, name_case_1_6_np, xtra_case_1_6_np, desc_case_1_6_np, sref_case_1_6_np, test_case_1_6_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_7, tgrp_case_1_7, sgrp_case_1_7, name_case_1_7, xtra_case_1_7, desc_case_1_7, sref_case_1_7, test_case_1_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_8a_p, tgrp_case_1_8a_p, sgrp_case_1_8a_p, name_case_1_8a_p, xtra_case_1_8a_p, desc_case_1_8a_p, sref_case_1_8a_p, test_case_1_8a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_8b_p, tgrp_case_1_8b_p, sgrp_case_1_8b_p, name_case_1_8b_p, xtra_case_1_8b_p, desc_case_1_8b_p, sref_case_1_8b_p, test_case_1_8b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_8a_np, tgrp_case_1_8a_np, sgrp_case_1_8a_np, name_case_1_8a_np, xtra_case_1_8a_np, desc_case_1_8a_np, sref_case_1_8a_np, test_case_1_8a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_8b_np, tgrp_case_1_8b_np, sgrp_case_1_8b_np, name_case_1_8b_np, xtra_case_1_8b_np, desc_case_1_8b_np, sref_case_1_8b_np, test_case_1_8b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_8a_np, tgrp_case_1_8a_np, sgrp_case_1_8a_np, name_case_1_8a_np, xtra_case_1_8a_np, desc_case_1_8a_np, sref_case_1_8a_np, test_case_1_8a_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_1_8b_np, tgrp_case_1_8b_np, sgrp_case_1_8b_np, name_case_1_8b_np, xtra_case_1_8b_np, desc_case_1_8b_np, sref_case_1_8b_np, test_case_1_8b_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_9a_p, tgrp_case_1_9a_p, sgrp_case_1_9a_p, name_case_1_9a_p, xtra_case_1_9a_p, desc_case_1_9a_p, sref_case_1_9a_p, test_case_1_9a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_9b_p, tgrp_case_1_9b_p, sgrp_case_1_9b_p, name_case_1_9b_p, xtra_case_1_9b_p, desc_case_1_9b_p, sref_case_1_9b_p, test_case_1_9b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_9a_np, tgrp_case_1_9a_np, sgrp_case_1_9a_np, name_case_1_9a_np, xtra_case_1_9a_np, desc_case_1_9a_np, sref_case_1_9a_np, test_case_1_9a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_9b_np, tgrp_case_1_9b_np, sgrp_case_1_9b_np, name_case_1_9b_np, xtra_case_1_9b_np, desc_case_1_9b_np, sref_case_1_9b_np, test_case_1_9b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_9a_np, tgrp_case_1_9a_np, sgrp_case_1_9a_np, name_case_1_9a_np, xtra_case_1_9a_np, desc_case_1_9a_np, sref_case_1_9a_np, test_case_1_9a_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_1_9b_np, tgrp_case_1_9b_np, sgrp_case_1_9b_np, name_case_1_9b_np, xtra_case_1_9b_np, desc_case_1_9b_np, sref_case_1_9b_np, test_case_1_9b_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_10_p, tgrp_case_1_10_p, sgrp_case_1_10_p, name_case_1_10_p, xtra_case_1_10_p, desc_case_1_10_p, sref_case_1_10_p, test_case_1_10_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_10_np, tgrp_case_1_10_np, sgrp_case_1_10_np, name_case_1_10_np, xtra_case_1_10_np, desc_case_1_10_np, sref_case_1_10_np, test_case_1_10_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_10_np, tgrp_case_1_10_np, sgrp_case_1_10_np, name_case_1_10_np, xtra_case_1_10_np, desc_case_1_10_np, sref_case_1_10_np, test_case_1_10_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_11_p, tgrp_case_1_11_p, sgrp_case_1_11_p, name_case_1_11_p, xtra_case_1_11_p, desc_case_1_11_p, sref_case_1_11_p, test_case_1_11_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_11_np, tgrp_case_1_11_np, sgrp_case_1_11_np, name_case_1_11_np, xtra_case_1_11_np, desc_case_1_11_np, sref_case_1_11_np, test_case_1_11_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_11_np, tgrp_case_1_11_np, sgrp_case_1_11_np, name_case_1_11_np, xtra_case_1_11_np, desc_case_1_11_np, sref_case_1_11_np, test_case_1_11_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_12a_p, tgrp_case_1_12a_p, sgrp_case_1_12a_p, name_case_1_12a_p, xtra_case_1_12a_p, desc_case_1_12a_p, sref_case_1_12a_p, test_case_1_12a_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_12b_p, tgrp_case_1_12b_p, sgrp_case_1_12b_p, name_case_1_12b_p, xtra_case_1_12b_p, desc_case_1_12b_p, sref_case_1_12b_p, test_case_1_12b_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_12a_np, tgrp_case_1_12a_np, sgrp_case_1_12a_np, name_case_1_12a_np, xtra_case_1_12a_np, desc_case_1_12a_np, sref_case_1_12a_np, test_case_1_12a_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_12b_np, tgrp_case_1_12b_np, sgrp_case_1_12b_np, name_case_1_12b_np, xtra_case_1_12b_np, desc_case_1_12b_np, sref_case_1_12b_np, test_case_1_12b_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_12a_np, tgrp_case_1_12a_np, sgrp_case_1_12a_np, name_case_1_12a_np, xtra_case_1_12a_np, desc_case_1_12a_np, sref_case_1_12a_np, test_case_1_12a_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
+	numb_case_1_12b_np, tgrp_case_1_12b_np, sgrp_case_1_12b_np, name_case_1_12b_np, xtra_case_1_12b_np, desc_case_1_12b_np, sref_case_1_12b_np, test_case_1_12b_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_13_p, tgrp_case_1_13_p, sgrp_case_1_13_p, name_case_1_13_p, xtra_case_1_13_p, desc_case_1_13_p, sref_case_1_13_p, test_case_1_13_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_13_np, tgrp_case_1_13_np, sgrp_case_1_13_np, name_case_1_13_np, xtra_case_1_13_np, desc_case_1_13_np, sref_case_1_13_np, test_case_1_13_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_13_np, tgrp_case_1_13_np, sgrp_case_1_13_np, name_case_1_13_np, xtra_case_1_13_np, desc_case_1_13_np, sref_case_1_13_np, test_case_1_13_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_14, tgrp_case_1_14, sgrp_case_1_14, name_case_1_14, xtra_case_1_14, desc_case_1_14, sref_case_1_14, test_case_1_14, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_15_p, tgrp_case_1_15_p, sgrp_case_1_15_p, name_case_1_15_p, xtra_case_1_15_p, desc_case_1_15_p, sref_case_1_15_p, test_case_1_15_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_15_np, tgrp_case_1_15_np, sgrp_case_1_15_np, name_case_1_15_np, xtra_case_1_15_np, desc_case_1_15_np, sref_case_1_15_np, test_case_1_15_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_15_np, tgrp_case_1_15_np, sgrp_case_1_15_np, name_case_1_15_np, xtra_case_1_15_np, desc_case_1_15_np, sref_case_1_15_np, test_case_1_15_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_16_p, tgrp_case_1_16_p, sgrp_case_1_16_p, name_case_1_16_p, xtra_case_1_16_p, desc_case_1_16_p, sref_case_1_16_p, test_case_1_16_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_16_np, tgrp_case_1_16_np, sgrp_case_1_16_np, name_case_1_16_np, xtra_case_1_16_np, desc_case_1_16_np, sref_case_1_16_np, test_case_1_16_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_16_np, tgrp_case_1_16_np, sgrp_case_1_16_np, name_case_1_16_np, xtra_case_1_16_np, desc_case_1_16_np, sref_case_1_16_np, test_case_1_16_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_17, tgrp_case_1_17, sgrp_case_1_17, name_case_1_17, xtra_case_1_17, desc_case_1_17, sref_case_1_17, test_case_1_17, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_18, tgrp_case_1_18, sgrp_case_1_18, name_case_1_18, xtra_case_1_18, desc_case_1_18, sref_case_1_18, test_case_1_18, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_19, tgrp_case_1_19, sgrp_case_1_19, name_case_1_19, xtra_case_1_19, desc_case_1_19, sref_case_1_19, test_case_1_19, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
@@ -19629,7 +19854,7 @@ struct test_case {
 	numb_case_1_25, tgrp_case_1_25, sgrp_case_1_25, name_case_1_25, xtra_case_1_25, desc_case_1_25, sref_case_1_25, test_case_1_25, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_26, tgrp_case_1_26, sgrp_case_1_26, name_case_1_26, xtra_case_1_26, desc_case_1_26, sref_case_1_26, test_case_1_26, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_27_p, tgrp_case_1_27_p, sgrp_case_1_27_p, name_case_1_27_p, xtra_case_1_27_p, desc_case_1_27_p, sref_case_1_27_p, test_case_1_27_p, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_27_np, tgrp_case_1_27_np, sgrp_case_1_27_np, name_case_1_27_np, xtra_case_1_27_np, desc_case_1_27_np, sref_case_1_27_np, test_case_1_27_np, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_27_np, tgrp_case_1_27_np, sgrp_case_1_27_np, name_case_1_27_np, xtra_case_1_27_np, desc_case_1_27_np, sref_case_1_27_np, test_case_1_27_np, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL,}, {
 	numb_case_1_28, tgrp_case_1_28, sgrp_case_1_28, name_case_1_28, xtra_case_1_28, desc_case_1_28, sref_case_1_28, test_case_1_28, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_29a, tgrp_case_1_29a, sgrp_case_1_29a, name_case_1_29a, xtra_case_1_29a, desc_case_1_29a, sref_case_1_29a, test_case_1_29a, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_29b, tgrp_case_1_29b, sgrp_case_1_29b, name_case_1_29b, xtra_case_1_29b, desc_case_1_29b, sref_case_1_29b, test_case_1_29b, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {

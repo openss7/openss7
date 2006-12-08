@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/07 12:56:20 $
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/08 11:46:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/07 12:56:20 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 11:46:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/07 12:56:20 $"
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/08 11:46:39 $"
 
 static char const ident[] =
-    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/07 12:56:20 $";
+    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/08 11:46:39 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -154,10 +154,10 @@ static struct key_val coding_names[] = {
 	{"ami", SDL_CODING_AMI},
 	{"b6zs", SDL_CODING_B6ZS},
 	{"b8zs", SDL_CODING_B8ZS},
+	{"hbd3", SDL_CODING_HDB3},
 	{"aal1", SDL_CODING_AAL1},
 	{"aal2", SDL_CODING_AAL2},
-	{"aal5", SDL_CODING_AAL5},
-	{"hbd3", SDL_CODING_HDB3}
+	{"aal5", SDL_CODING_AAL5}
 };
 static struct key_val framing_names[] = {
 	{"default", SDL_FRAMING_NONE},
@@ -488,12 +488,33 @@ show_config(sdl_config_t * cfg, int get)
 	}
 }
 
+#if 0
+void
+show_stats(sdl_stats_t * sta)
+{
+	printf("Statistics:");
+	printf("  %s card %d, span %d, slot %d\n", devname, card, span, slot);
+	printf("  rx_octets:           %12u\n", sta->rx_octets);
+	printf("  tx_octets:           %12u\n", sta->tx_octets);
+	printf("  rx_overruns:         %12u\n", sta->rx_overruns);
+	printf("  tx_underruns:        %12u\n", sta->tx_underruns);
+	printf("  rx_buffer_overflows: %12u\n", sta->rx_buffer_overflows);
+	printf("  rx_buffer_overflows: %12u\n", sta->rx_buffer_overflows);
+	printf("  lead_cts_lost:       %12u\n", sta->lead_cts_lost);
+	printf("  lead_dcd_lost:       %12u\n", sta->lead_dcd_lost);
+	printf("  carrier_lost:        %12u\n", sta->carrier_lost);
+}
+#endif
+
 #define BUFSIZE 128
 
 void
 slconf_get(void)
 {
 	sdl_config_t cfg;
+#if 0
+	sdl_stats_t sta;
+#endif
 	struct strioctl ctl;
 	char cbuf[BUFSIZE];
 	char dbuf[BUFSIZE];
@@ -543,6 +564,16 @@ slconf_get(void)
 		perror(__FUNCTION__);
 		exit(1);
 	}
+#if 0
+	ctl.ic_cmd = SDL_IOCGSTATS;
+	ctl.ic_timout = 0;
+	ctl.ic_len = sizeof(sta);
+	ctl.ic_dp = (char *) &sta;
+	if (ioctl(fd, I_STR, &ctl) < 0) {
+		perror(__FUNCTION__);
+		exit(1);
+	}
+#endif
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->detach_req);
 	ctrl.buf = cbuf;
@@ -551,8 +582,12 @@ slconf_get(void)
 		perror(__FUNCTION__);
 		exit(1);
 	}
-	if (output)
+	if (output) {
 		show_config(&cfg, 1);
+#if 0
+		show_stats(&sta);
+#endif
+	}
 }
 
 void

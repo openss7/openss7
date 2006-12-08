@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdli_ioctl.h,v 0.9.2.8 2006/12/08 05:32:08 brian Exp $
+ @(#) $Id: sdli_ioctl.h,v 0.9.2.9 2006/12/08 11:46:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:32:08 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 11:46:31 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SDLI_IOCTL_H__
 #define __SDLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -167,10 +167,10 @@ typedef struct sdl_config {
 #	define	SDL_CODING_AMI		3	/* */
 #	define	SDL_CODING_B6ZS		4	/* */
 #	define	SDL_CODING_B8ZS		5	/* */
+#	define	SDL_CODING_HDB3		6	/* */
 #	define	SDL_CODING_AAL1		7	/* */
 #	define	SDL_CODING_AAL2		8	/* */
 #	define	SDL_CODING_AAL5		9	/* */
-#	define	SDL_CODING_HDB3		10	/* */
 	sdl_ulong ifframing;		/* interface framing */
 #	define	SDL_FRAMING_NONE	0	/* */
 #	define	SDL_FRAMING_CCS		1	/* */
