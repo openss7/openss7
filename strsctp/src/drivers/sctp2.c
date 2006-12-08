@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/30 20:26:18 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/08 05:28:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/30 20:26:18 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:28:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.57  2006/12/08 05:28:08  brian
+ - bufq locking change and debian init script name correction
+
  Revision 0.9.2.56  2006/10/30 20:26:18  brian
  - bug hunting
 
@@ -103,10 +106,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/30 20:26:18 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/08 05:28:08 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/30 20:26:18 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/08 05:28:08 $";
+
+#define _LFS_SOURCE
+#define _SVR4_SOURCE
 
 #include "sctp_compat.h"
 
@@ -125,7 +131,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/30 20:26:18 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/08 05:28:08 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2793,6 +2799,7 @@ sctp_del_daddr(struct sctp_daddr *sd)
 {
 	sctp_t *sp;
 	mblk_t *mp;
+	pl_t pl;
 
 	ensure(sd, return);
 	ensure(sd->sp, return);
@@ -2801,63 +2808,63 @@ sctp_del_daddr(struct sctp_daddr *sd)
 		/* IMPLEMENTATION NOTE:- This is the lazy way to do this, if we maintained
 		   reference counts on sctp_daddr structures, then we could at least check if
 		   walking all these queues was necessary. */
-		bufq_lock(&sp->rcvq);
+		pl = bufq_lock(&sp->rcvq);
 		for (mp = bufq_head(&sp->rcvq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
 			if (cb->daddr == sd)
 				cb->daddr = NULL;
 		}
-		bufq_unlock(&sp->rcvq);
-		bufq_lock(&sp->expq);
+		bufq_unlock(&sp->rcvq, pl);
+		pl = bufq_lock(&sp->expq);
 		for (mp = bufq_head(&sp->expq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
 			if (cb->daddr == sd)
 				cb->daddr = NULL;
 		}
-		bufq_unlock(&sp->expq);
-		bufq_lock(&sp->sndq);
+		bufq_unlock(&sp->expq, pl);
+		pl = bufq_lock(&sp->sndq);
 		for (mp = bufq_head(&sp->sndq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
 			if (cb->daddr == sd)
 				cb->daddr = NULL;
 		}
-		bufq_unlock(&sp->sndq);
-		bufq_lock(&sp->urgq);
+		bufq_unlock(&sp->sndq, pl);
+		pl = bufq_lock(&sp->urgq);
 		for (mp = bufq_head(&sp->urgq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
 			if (cb->daddr == sd)
 				cb->daddr = NULL;
 		}
-		bufq_unlock(&sp->urgq);
-		bufq_lock(&sp->oooq);
+		bufq_unlock(&sp->urgq, pl);
+		pl = bufq_lock(&sp->oooq);
 		for (mp = bufq_head(&sp->oooq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
 			if (cb->daddr == sd)
 				cb->daddr = NULL;
 		}
-		bufq_unlock(&sp->oooq);
-		bufq_lock(&sp->dupq);
+		bufq_unlock(&sp->oooq, pl);
+		pl = bufq_lock(&sp->dupq);
 		for (mp = bufq_head(&sp->dupq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
 			if (cb->daddr == sd)
 				cb->daddr = NULL;
 		}
-		bufq_unlock(&sp->dupq);
+		bufq_unlock(&sp->dupq, pl);
 #if 1
-		bufq_lock(&sp->ackq);
+		pl = bufq_lock(&sp->ackq);
 		for (mp = bufq_head(&sp->ackq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
 			if (cb->daddr == sd)
 				cb->daddr = NULL;
 		}
-		bufq_unlock(&sp->ackq);
+		bufq_unlock(&sp->ackq, pl);
 #endif
 		sd_del_timeout(sd, &sd->timer_heartbeat);
 		sd_del_timeout(sd, &sd->timer_idle);
@@ -2866,14 +2873,14 @@ sctp_del_daddr(struct sctp_daddr *sd)
 			dst_release(xchg(&sd->dst_cache, NULL));
 	}
 	if (!sctp_timeout_pending(&sd->timer_retrans) && !sd->in_flight) {
-		bufq_lock(&sp->rtxq);
+		pl = bufq_lock(&sp->rtxq);
 		for (mp = bufq_head(&sp->rtxq); mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 
 			if (cb->daddr == sd)
 				cb->daddr = NULL;
 		}
-		bufq_unlock(&sp->rtxq);
+		bufq_unlock(&sp->rtxq, pl);
 		__sctp_daddr_free(sd);
 	}
 }
@@ -5395,12 +5402,13 @@ sctp_bundle_fsn(struct sctp *sp,	/* association */
 	size_t nstrs = 0;
 	size_t mstrs = (sd->dmps - sizeof(*m)) / sizeof(uint32_t);
 	uint32_t l_fsn = sp->t_ack;
+	pl_t pl;
 
 	if ((1 << sp->state) & ~(SCTPF_SENDING))
 		goto outstate;
 	if (!after(sp->l_fsn, sp->t_ack))
 		goto outstate;
-	bufq_lock(&sp->rtxq);
+	pl = bufq_lock(&sp->rtxq);
 	for (db = bufq_head(&sp->rtxq); db; db = db->b_next) {
 		sctp_tcb_t *cb = SCTP_TCB(db);
 
@@ -5417,7 +5425,7 @@ sctp_bundle_fsn(struct sctp *sp,	/* association */
 				break;
 		}
 	}
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	clen += nstrs * sizeof(uint32_t);
 	plen = PADC(clen);
 	if (plen >= ckp->mrem && plen <= sd->dmps)
@@ -5433,7 +5441,7 @@ sctp_bundle_fsn(struct sctp *sp,	/* association */
 		m->f_tsn = htonl(l_fsn);
 		mp->b_wptr += sizeof(*m);
 		/* run backwards to build stream number list */
-		bufq_lock(&sp->rtxq);
+		pl = bufq_lock(&sp->rtxq);
 		for (db = bufq_tail(&sp->rtxq); db; db = db->b_prev) {
 			sctp_tcb_t *cb = SCTP_TCB(db);
 
@@ -5452,7 +5460,7 @@ sctp_bundle_fsn(struct sctp *sp,	/* association */
 				nstrs--;
 			}
 		}
-		bufq_unlock(&sp->rtxq);
+		bufq_unlock(&sp->rtxq, pl);
 		assure(!nstrs);
 		sp->sackf &= ~SCTP_SACKF_FSN;
 		if (!(sp->sackf & SCTP_SACKF_ANY))
@@ -5540,11 +5548,12 @@ sctp_bundle_error(struct sctp *sp,	/* association */
 		  struct sctp_bundle_cookie *ckp /* lumped arguments */ )
 {
 	mblk_t *mp;
+	pl_t pl;
 
 	/* SCTP IG 2.27 - Bundle errors with COOKIE-ECHO or after receiving COOKIE-WAIT */
 	if ((1 << sp->state) & (SCTPF_COOKIE_ECHOED | SCTPF_DISCONNECTED))
 		goto outstate;
-	bufq_lock(&sp->errq);
+	pl = bufq_lock(&sp->errq);
 	while (ckp->mrem && (mp = bufq_head(&sp->errq))) {
 		size_t clen = mp->b_wptr - mp->b_rptr;
 		size_t plen = PADC(clen);
@@ -5559,11 +5568,11 @@ sctp_bundle_error(struct sctp *sp,	/* association */
 		SCTP_INC_STATS(SctpOutCtrlChunks);
 		printd(("INFO: Bundled ERROR chunk.\n"));
 	}
-	bufq_unlock(&sp->errq);
+	bufq_unlock(&sp->errq, pl);
 	return (0);
       wait_for_next_packet:
 	rare();
-	bufq_unlock(&sp->errq);
+	bufq_unlock(&sp->errq, pl);
 	return (1);
       outstate:
 	swerr();
@@ -5727,8 +5736,9 @@ sctp_bundle_data_retrans(struct sctp *sp,	/* association */
 			 struct sctp_bundle_cookie *ckp /* lumped arguments */ )
 {
 	mblk_t *mp;
+	pl_t pl;
 
-	bufq_lock(&sp->rtxq);
+	pl = bufq_lock(&sp->rtxq);
 	for (mp = bufq_head(&sp->rtxq); mp && ckp->mrem && ckp->swnd; mp = mp->b_next) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
 
@@ -5758,17 +5768,17 @@ sctp_bundle_data_retrans(struct sctp *sp,	/* association */
 			db->b_next = NULL;
 		}
 	}
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	return (0);
       congested:
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	return (0);
       wait_for_next_packet:
 	rare();
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	return (1);
       enobufs:
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	return (1);
 }
 
@@ -5782,8 +5792,9 @@ sctp_bundle_data_urgent(struct sctp *sp,	/* association */
 			struct sctp_bundle_cookie *ckp /* lumped arguments */ )
 {
 	mblk_t *mp;
+	pl_t pl;
 
-	bufq_lock(&sp->urgq);
+	pl = bufq_lock(&sp->urgq);
 	while (ckp->mrem && ckp->swnd && (mp = bufq_head(&sp->urgq))) {
 		mblk_t *db;
 		struct sctp_data *m = (typeof(m)) mp->b_rptr;
@@ -5830,17 +5841,17 @@ sctp_bundle_data_urgent(struct sctp *sp,	/* association */
 		SCTP_INC_STATS(SctpOutUnorderChunks);
 		printd(("INFO: Bundling DATA chunk (unordered).\n"));
 	}
-	bufq_unlock(&sp->urgq);
+	bufq_unlock(&sp->urgq, pl);
 	return (0);
       congested:
-	bufq_unlock(&sp->urgq);
+	bufq_unlock(&sp->urgq, pl);
 	return (0);
       wait_for_next_packet:
 	rare();
-	bufq_unlock(&sp->urgq);
+	bufq_unlock(&sp->urgq, pl);
 	return (1);
       enobufs:
-	bufq_unlock(&sp->urgq);
+	bufq_unlock(&sp->urgq, pl);
 	return (1);
 }
 
@@ -5854,8 +5865,9 @@ sctp_bundle_data_normal(struct sctp *sp,	/* association */
 			struct sctp_bundle_cookie *ckp /* lumped arguments */ )
 {
 	mblk_t *mp;
+	pl_t pl;
 
-	bufq_lock(&sp->sndq);
+	pl = bufq_lock(&sp->sndq);
 	while (ckp->mrem && ckp->swnd && (mp = bufq_head(&sp->sndq))) {
 		mblk_t *db;
 		struct sctp_data *m = (typeof(m)) mp->b_rptr;
@@ -5902,17 +5914,17 @@ sctp_bundle_data_normal(struct sctp *sp,	/* association */
 		SCTP_INC_STATS(SctpOutOrderChunks);
 		printd(("INFO: Bundling DATA chunk (ordered).\n"));
 	}
-	bufq_unlock(&sp->sndq);
+	bufq_unlock(&sp->sndq, pl);
 	return (0);
       congested:
-	bufq_unlock(&sp->sndq);
+	bufq_unlock(&sp->sndq, pl);
 	return (0);
       wait_for_next_packet:
 	seldom();
-	bufq_unlock(&sp->sndq);
+	bufq_unlock(&sp->sndq, pl);
 	return (1);
       enobufs:
-	bufq_unlock(&sp->sndq);
+	bufq_unlock(&sp->sndq, pl);
 	return (1);
 }
 
@@ -6739,6 +6751,7 @@ sctp_cookie_timeout(caddr_t data)
 	sctp_t *sp = (typeof(sp)) data;
 	struct sctp_daddr *sd;
 	mblk_t *mp;
+	pl_t pl;
 
 	ensure(sp, return);
 	sd = sp->taddr;
@@ -6753,7 +6766,7 @@ sctp_cookie_timeout(caddr_t data)
 	if (sctp_assoc_timedout(sp, sd, sp->max_retrans ? sp->max_retrans : 1, sp->p_rwnd))
 		goto timedout;
 	/* See RFC 2960 6.3.3 E3 */
-	bufq_lock(&sp->rtxq);
+	pl = bufq_lock(&sp->rtxq);
 	for (mp = bufq_head(&sp->rtxq); mp; mp = mp->b_next) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
 
@@ -6765,7 +6778,7 @@ sctp_cookie_timeout(caddr_t data)
 			cb->sacks = SCTP_FR_COUNT;	/* not eligible for FR now */
 		}
 	}
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	sd = sp->taddr;		/* might have new primary */
 	ensure(sd, goto done);
 	sp_set_timeout(sp, &sp->timer_cookie, sd->rto);
@@ -6827,6 +6840,7 @@ sctp_retrans_timeout(caddr_t data)
 	sctp_t *sp;
 	struct sctp_daddr *sd = (typeof(sd)) data;
 	int retransmits = 0;
+	pl_t pl;
 
 	ensure(sd, return);
 	sp = sd->sp;
@@ -6841,7 +6855,7 @@ sctp_retrans_timeout(caddr_t data)
 	if (sctp_assoc_timedout(sp, sd, sp->max_retrans ? sp->max_retrans : 1, sp->p_rwnd))
 		goto timedout;
 	/* See RFC 2960 6.3.3 E3 */
-	bufq_lock(&sp->rtxq);
+	pl = bufq_lock(&sp->rtxq);
 	for (mp = bufq_head(&sp->rtxq); mp; mp = mp->b_next) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
 		size_t dlen = cb->dlen;
@@ -6860,7 +6874,7 @@ sctp_retrans_timeout(caddr_t data)
 			retransmits++;
 		}
 	}
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	normal(retransmits);
 #ifdef SCTP_CONFIG_ADD_IP
 	if (sd->flags & SCTP_DESTF_UNUSABLE)
@@ -7201,6 +7215,7 @@ sctp_life_timeout(caddr_t data)
 	struct sctp *sp = (typeof(sp)) data;
 	mblk_t *mp, *mp_next;
 	unsigned long expires = -1;
+	pl_t pl;
 
 	ensure(sp, return);
 	bh_lock_sctp(sp);
@@ -7210,7 +7225,7 @@ sctp_life_timeout(caddr_t data)
 		goto locked;
 	if ((1 << sp->state) & ~(SCTPF_SENDING))
 		goto outstate;
-	bufq_lock(&sp->sndq);
+	pl = bufq_lock(&sp->sndq);
 	mp_next = bufq_head(&sp->sndq);
 	while ((mp = mp_next)) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
@@ -7232,8 +7247,8 @@ sctp_life_timeout(caddr_t data)
 		else
 			freemsg(mp);
 	}
-	bufq_unlock(&sp->sndq);
-	bufq_lock(&sp->urgq);
+	bufq_unlock(&sp->sndq, pl);
+	pl = bufq_lock(&sp->urgq);
 	mp_next = bufq_head(&sp->urgq);
 	while ((mp = mp_next)) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
@@ -7255,12 +7270,12 @@ sctp_life_timeout(caddr_t data)
 		else
 			freemsg(mp);
 	}
-	bufq_unlock(&sp->urgq);
+	bufq_unlock(&sp->urgq, pl);
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 	/* need to walk through retransmit queue as well */
 	if (!(sp->p_caps & SCTP_CAPS_PR))
 		goto nocaps;
-	bufq_lock(&sp->rtxq);
+	pl = bufq_lock(&sp->rtxq);
 	for (mp = bufq_head(&sp->rtxq); mp; mp = mp->b_next) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
 
@@ -7304,7 +7319,7 @@ sctp_life_timeout(caddr_t data)
 			sp->l_fsn++;
 		}
 	}
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	if (expires != -1)
 		sp_set_timeout(sp, &sp->timer_life, expires - jiffies);
 	if (after(sp->l_fsn, sp->t_ack)) {
@@ -7430,8 +7445,9 @@ sctp_send_data(struct sctp *sp, struct sctp_strm *st, t_uscalar_t flags, mblk_t 
 			if (*more && *head && plen + SCTP_TCB(*head)->dlen <= amps) {
 				struct sctp_data *m;
 				sctp_tcb_t *cb;
+				pl_t pl;
 
-				bufq_lock(sndq);
+				pl = bufq_lock(sndq);
 				cb = SCTP_TCB(*head);
 				cb->flags |= (dflags & 0x7);
 				cb->dlen += dlen;
@@ -7445,7 +7461,7 @@ sctp_send_data(struct sctp *sp, struct sctp_strm *st, t_uscalar_t flags, mblk_t 
 					*head = NULL;
 					*more = 0;
 				}
-				bufq_unlock(sndq);
+				bufq_unlock(sndq, pl);
 				return (0);
 			}
 		}
@@ -8867,11 +8883,12 @@ STATIC void
 sctp_cumm_ack(struct sctp *sp, uint32_t ack)
 {
 	mblk_t *mp;
+	pl_t pl;
 
 	assert(sp);
 	/* PR-SCTP 3.5 (A3) */
 	sp->t_ack = ack;
-	bufq_lock(&sp->rtxq);
+	pl = bufq_lock(&sp->rtxq);
 	while ((mp = bufq_head(&sp->rtxq)) && !after(SCTP_TCB(mp)->tsn, ack)) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
 
@@ -8946,7 +8963,7 @@ sctp_cumm_ack(struct sctp *sp, uint32_t ack)
 			sp_del_timeout(sp, &sp->timer_sack);
 	}
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	return;
 }
 
@@ -9017,13 +9034,15 @@ sctp_deliver_data(struct sctp *sp)
 				}
 			}
 			if ((db = dupb(mp))) {
-				bufq_lock(&sp->oooq);
+				pl_t pl;
+
+				pl = bufq_lock(&sp->oooq);
 				sp->oooq.q_count -= cb->dlen;
 				db->b_cont = xchg(&mp->b_cont, NULL);
 				cb->flags |= SCTPCB_FLAG_DELIV;
-				bufq_unlock(&sp->oooq);
+				bufq_unlock(&sp->oooq, pl);
 				if (ord) {
-					bufq_lock(&sp->rcvq);
+					pl = bufq_lock(&sp->rcvq);
 					__bufq_queue(&sp->rcvq, db);
 					/* IMPLEMENTATION NOTE:- Sockets version indicates data
 					   here.  STREAMS doesn't because it indicates data only
@@ -9033,10 +9052,10 @@ sctp_deliver_data(struct sctp *sp)
 						st->ssn = cb->ssn;
 					} else
 						st->n.more |= SCTP_STRMF_MORE;
-					bufq_unlock(&sp->rcvq);
+					bufq_unlock(&sp->rcvq, pl);
 					SCTP_INC_STATS(SctpInOrderChunks);
 				} else {
-					bufq_lock(&sp->expq);
+					pl = bufq_lock(&sp->expq);
 					__bufq_queue(&sp->expq, db);
 					/* IMPLEMENTATION NOTE:- Sockets version indicates data
 					   here.  STREAMS doesn't because it indicates data only
@@ -9045,7 +9064,7 @@ sctp_deliver_data(struct sctp *sp)
 						st->x.more &= ~SCTP_STRMF_MORE;
 					else
 						st->x.more |= SCTP_STRMF_MORE;
-					bufq_unlock(&sp->expq);
+					bufq_unlock(&sp->expq, pl);
 					SCTP_INC_STATS(SctpInUnorderChunks);
 				}
 				/* STREAMS calculates reassembled user messages here.  Sockets does
@@ -9534,6 +9553,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 	size_t ngaps, ndups;
 	uint32_t ack, rwnd;
 	uint16_t *gaps;
+	pl_t pl;
 
 	printd(("Received SACK on stream %p\n", sp));
 	assert(sp);
@@ -9589,7 +9609,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 		if (!sp->nsack)
 			goto skip_rtx_analysis;
 		/* process renegs, fast retransmission cannot occur because we have no gaps */
-		bufq_lock(&sp->rtxq);
+		pl = bufq_lock(&sp->rtxq);
 		for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(dp);
 
@@ -9606,7 +9626,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 					seldom();
 			}
 		}
-		bufq_unlock(&sp->rtxq);
+		bufq_unlock(&sp->rtxq, pl);
 	} else {
 		int eligible = 0;
 
@@ -9633,7 +9653,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 				continue;
 			}
 			/* move to the acks */
-			bufq_lock(&sp->rtxq);
+			pl = bufq_lock(&sp->rtxq);
 			dp = bufq_head(&sp->rtxq);
 			for (; dp && before(SCTP_TCB(dp)->tsn, beg); dp = dp->b_next) {
 				sctp_tcb_t *cb = SCTP_TCB(dp);
@@ -9662,10 +9682,10 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 					eligible++;
 				}
 			}
-			bufq_unlock(&sp->rtxq);
+			bufq_unlock(&sp->rtxq, pl);
 		}
 		/* walk the whole retrans buffer looking for holes and renegs */
-		bufq_lock(&sp->rtxq);
+		pl = bufq_lock(&sp->rtxq);
 		for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(dp);
 			struct sctp_daddr *sd = cb->daddr;
@@ -9769,7 +9789,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			/* msg is after all gapack blocks */
 			break;
 		}
-		bufq_unlock(&sp->rtxq);
+		bufq_unlock(&sp->rtxq, pl);
 	}
       skip_rtx_analysis:
 	sctp_dest_calc(sp);
@@ -10014,11 +10034,12 @@ sctp_recv_abort_listening(struct sctp *sp, mblk_t *mp)
 	struct sctphdr *sh = SCTP_SH(mp);
 	struct sctp_abort *m = (typeof(m)) mp->b_rptr;
 	t_uscalar_t orig = (m->ch.flags & 0x1) ? SCTP_ORIG_PROVIDER : SCTP_ORIG_USER;
+	pl_t pl;
 
 	/* FIXME: above orig is not completely true, it also depends on whether there is a cause
 	   value, what the cause value is, and the state. */
 	printd(("Received ABORT in listening state on stream %p\n", sp));
-	bufq_lock(&sp->conq);
+	pl = bufq_lock(&sp->conq);
 	for (cp = bufq_head(&sp->conq); cp; cp = cp->b_next) {
 		struct sctp_cookie_echo *ce = (typeof(ce)) cp->b_rptr;
 		struct sctp_cookie *ck = (typeof(ck)) ce->cookie;
@@ -10037,7 +10058,7 @@ sctp_recv_abort_listening(struct sctp *sp, mblk_t *mp)
 			/* NOTE: The disconnect indicaiton function will unlink and free the
 			   connection indication when the function does not return an error */
 			if ((err = sctp_discon_ind(sp, orig, -ECONNRESET, cp))) {
-				bufq_unlock(&sp->conq);
+				bufq_unlock(&sp->conq, pl);
 				return (err);
 			}
 			break;
@@ -10056,7 +10077,7 @@ sctp_recv_abort_listening(struct sctp *sp, mblk_t *mp)
 				(int) iph->saddr));
 		}
 	}
-	bufq_unlock(&sp->conq);
+	bufq_unlock(&sp->conq, pl);
 	usual(cp);
 	return sctp_return_stop(mp);
 }
@@ -10893,9 +10914,10 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 	printd(("INFO: Performing cookie echo (LISTEN)\n"));
 	if (sp->conind) {
 		mblk_t *cp;
+		pl_t pl;
 
 		/* check for existing connection indication */
-		bufq_lock(&sp->conq);
+		pl = bufq_lock(&sp->conq);
 		for (cp = bufq_head(&sp->conq); cp; cp = cp->b_next) {
 			struct sctp_cookie_echo *ce = (typeof(ce)) cp->b_rptr;
 			struct sctp_cookie *co = (typeof(co)) ce->cookie;
@@ -10905,11 +10927,11 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 			    || (co->dport == ck->dport && co->sport == ck->sport
 				&& co->daddr == ck->daddr && co->saddr == ck->saddr)) {
 				printd(("INFO: Discarding multiple COOKIE-ECHO\n"));
-				bufq_unlock(&sp->conq);
+				bufq_unlock(&sp->conq, pl);
 				return (0);	/* discard multiple */
 			}
 		}
-		bufq_unlock(&sp->conq);
+		bufq_unlock(&sp->conq, pl);
 		/* RFC 2960 5.2.4 (4) */
 		if ((err = sctp_conn_ind(sp, mp)))
 			goto no_resource;
@@ -11347,6 +11369,7 @@ sctp_recv_ecne(struct sctp *sp, mblk_t *mp)
 	struct sctp_ecne *m = (typeof(m)) mp->b_rptr;
 	uint32_t l_tsn = ntohl(m->l_tsn);
 	struct sctp_daddr *sd;
+	pl_t pl;
 
 	printd(("Received ECNE on stream %p\n", sp));
 	if (ntohs(m->ch.len) < sizeof(*m))
@@ -11358,18 +11381,18 @@ sctp_recv_ecne(struct sctp *sp, mblk_t *mp)
 		goto done;
 	sp->p_lsn = l_tsn;
 	/* need to find the destination to which this TSN was transmitted */
-	bufq_lock(&sp->rtxq);
+	pl = bufq_lock(&sp->rtxq);
 	for (mp = bufq_head(&sp->rtxq); mp && SCTP_TCB(mp)->tsn != l_tsn; mp = mp->b_next) ;
 	if (!mp)
 		goto unlock_done;
 	if (!(sd = SCTP_TCB(mp)->daddr))
 		goto unlock_done;
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	sctp_assoc_timedout(sp, sd, 0, 0);
       done:
 	return sctp_return_more(mp);
       unlock_done:
-	bufq_unlock(&sp->rtxq);
+	bufq_unlock(&sp->rtxq, pl);
 	goto done;
       emsgsize:
 	return (-EMSGSIZE);
@@ -13465,10 +13488,11 @@ STATIC streamscall void
 sctp_cleanup_read(struct sctp *sp)
 {
 	mblk_t *mp;
+	unsigned long flags;
 
 	assert(sp);
 #if 1
-	bufq_lock(&sp->ackq);
+	flags = bufq_lock(&sp->ackq);
 	while ((mp = bufq_head(&sp->ackq))) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
 
@@ -13478,7 +13502,7 @@ sctp_cleanup_read(struct sctp *sp)
 		}
 		break;		/* error on delivery (ENOBUFS, EBUSY) */
 	}
-	bufq_unlock(&sp->ackq);
+	bufq_unlock(&sp->ackq, flags);
 #endif
 	if (bufq_head(&sp->rcvq) || bufq_head(&sp->expq)) {
 		int need_sack = (sp->a_rwnd <= bufq_size(&sp->oooq)
@@ -13486,8 +13510,9 @@ sctp_cleanup_read(struct sctp *sp)
 				 + bufq_size(&sp->rcvq)
 				 + bufq_size(&sp->expq));
 
-		bufq_lock(&sp->expq);
-		bufq_lock(&sp->rcvq);
+		local_irq_save(flags);
+		spin_lock(&sp->expq.q_lock);
+		spin_lock(&sp->rcvq.q_lock);
 		while ((mp = bufq_head(&sp->expq)) || (mp = bufq_head(&sp->rcvq))) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 			struct sctp_strm *st = cb->st;
@@ -13526,8 +13551,9 @@ sctp_cleanup_read(struct sctp *sp)
 			}
 			break;	/* error on delivery (ENOBUFS, EBUSY, EPROTO) */
 		}
-		bufq_unlock(&sp->rcvq);
-		bufq_unlock(&sp->expq);
+		spin_unlock(&sp->rcvq.q_lock);
+		spin_unlock(&sp->expq.q_lock);
+		local_irq_restore(flags);
 	}
 	if (sp->origin && sp->reason) {
 		if (sctp_discon_ind(sp, sp->origin, sp->reason, NULL) < 0) {
@@ -14920,8 +14946,6 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 	}
 	/* Note: if we are not in a WACK state we simply do not change state.  This occurs normally 
 	   when we are responding to an N_OPTMGMT_REQ in other than the NS_IDLE state. */
-	if (cp != NULL)
-		bufq_unlock(&sp->conq);
 	putnext(sp->rq, mp);
 	return (0);
       enobufs:
@@ -15349,11 +15373,8 @@ n_seq_check(struct sctp *sp, t_uscalar_t seq)
 {
 	mblk_t *mp;
 
-	bufq_lock(&sp->conq);
 	for (mp = bufq_head(&sp->conq); mp && (t_uscalar_t) (long) mp != seq; mp = mp->b_next) ;
 	usual(mp);
-	if (mp == NULL)
-		bufq_unlock(&sp->conq);
 	return (mp);
 }
 STATIC struct sctp *
@@ -15375,6 +15396,7 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 	struct sctp *ap;
 	N_conn_res_t *p = (N_conn_res_t *) mp->b_rptr;
 	N_qos_sel_conn_sctp_t *q = (N_qos_sel_conn_sctp_t *) (mp->b_rptr + p->QOS_offset);
+	pl_t pl;
 
 	if (sp->i_state != NS_WRES_CIND)
 		goto outstate;
@@ -15391,6 +15413,7 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 		if (p->QOS_length != sizeof(*q))
 			goto badopt2;
 	}
+	pl = bufq_lock(&sp->conq);
 	if (!(cp = n_seq_check(sp, p->SEQ_number)))
 		goto badseq;
 	if (!(ap = n_tok_check(sp, p->TOKEN_value)))
@@ -15415,32 +15438,33 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 		if ((err = sctp_conn_res(sp, cp, ap, mp->b_cont))) {
 			ap->i_state = ap_oldstate;
 			ap->flags = ap_oldflags;
-			goto error;
+			goto unlock_error;
 		}
 		mp->b_cont = NULL;	/* absorbed mp->b_cont */
 		if ((err = n_ok_ack(sp, N_CONN_RES, cp, ap))) {
 			ap->i_state = ap_oldstate;
 			ap->flags = ap_oldflags;
-			goto error;
+			goto unlock_error;
 		}
+		bufq_unlock(&sp->conq, pl);
 		return (QR_DONE);
 	}
       access:
 	seldom();
 	err = NACCESS;
-	goto error;		/* no access to accepting queue */
+	goto unlock_error;		/* no access to accepting queue */
       badtoken2:
 	seldom();
 	err = NBADTOKEN;
-	goto error;		/* accepting queue is listening */
+	goto unlock_error;		/* accepting queue is listening */
       badtoken1:
 	seldom();
 	err = NBADTOKEN;
-	goto error;		/* accepting queue id is invalid */
+	goto unlock_error;		/* accepting queue id is invalid */
       badseq:
 	seldom();
 	err = NBADSEQ;
-	goto error;		/* connection ind reference is invalid */
+	goto unlock_error;		/* connection ind reference is invalid */
       badopt2:
 	seldom();
 	err = NBADOPT;
@@ -15461,10 +15485,10 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 	seldom();
 	err = NOUTSTATE;
 	goto error;		/* would place interface out of state */
+      unlock_error:
+	bufq_unlock(&sp->conq, pl);
       error:
 	seldom();
-	if (cp != NULL)
-		bufq_unlock(&sp->conq);
 	return n_error_ack(sp, N_CONN_RES, err);
 }
 
@@ -15478,6 +15502,7 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 	int err;
 	mblk_t *cp = NULL;
 	N_discon_req_t *p = (N_discon_req_t *) mp->b_rptr;
+	pl_t pl;
 
 	if (!((1 << sp->i_state) & (NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER
 				    | NSF_WCON_RREQ | NSF_WRES_RIND)))
@@ -15505,20 +15530,23 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 		goto einval;
 	if (p->RES_length)
 		goto badaddr;
+	pl = bufq_lock(&sp->conq);
 	if (sp->i_state == NS_WACK_DREQ7 && !(cp = n_seq_check(sp, p->SEQ_number)))
 		goto badseq;
 	if (sp->i_state != NS_WACK_DREQ7 && (p->SEQ_number != 0))
 		goto badseq;
 	/* XXX: What do we do with the disconnect reason? Nothing? */
 	if ((err = sctp_discon_req(sp, cp)))
-		goto error;
+		goto unlock_error;
+
 	if ((err = n_ok_ack(sp, N_DISCON_REQ, cp, NULL)))
-		goto error;
+		goto unlock_error;
+	bufq_unlock(&sp->conq, pl);
 	return (QR_DONE);
       badseq:
 	seldom();
 	err = NBADSEQ;
-	goto error;		/* connection ind reference is invalid */
+	goto unlock_error;		/* connection ind reference is invalid */
       badaddr:
 	seldom();
 	err = NBADADDR;
@@ -15531,10 +15559,10 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 	seldom();
 	err = NOUTSTATE;
 	goto error;		/* would place interface out of state */
+      unlock_error:
+	bufq_unlock(&sp->conq, pl);
       error:
 	seldom();
-	if (cp != NULL)
-		bufq_unlock(&sp->conq);
 	return n_error_ack(sp, N_DISCON_REQ, err);
 }
 
@@ -25896,8 +25924,6 @@ t_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 	}
 	/* Note: if we are not in a WACK state we simply do not change state.  This occurs normally 
 	   when we are responding to a T_OPTMGMT_REQ in other than the TS_IDLE state. */
-	if (cp != NULL)
-		bufq_unlock(&sp->conq);
 	putnext(sp->rq, mp);
 	return (0);
       enobufs:
@@ -26410,11 +26436,8 @@ t_seq_check(struct sctp *sp, t_uscalar_t seq)
 {
 	mblk_t *mp;
 
-	bufq_lock(&sp->conq);
 	for (mp = bufq_head(&sp->conq); mp && (t_uscalar_t) (long) mp != seq; mp = mp->b_next) ;
 	usual(mp);
-	if (mp == NULL)
-		bufq_unlock(&sp->conq);
 	/* leave list locked while reference held on message block */
 	return (mp);
 }
@@ -26437,6 +26460,7 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	mblk_t *cp = NULL;
 	struct sctp *ap;
 	const struct T_conn_res *p = (struct T_conn_res *) mp->b_rptr;
+	pl_t pl;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -26453,6 +26477,7 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	}
 	if (p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 		goto badopt;
+	pl = bufq_lock(&sp->conq);
 	if (!(cp = t_seq_check(sp, p->SEQ_number)))
 		goto badseq;
 	if (!(ap = t_tok_check(p->ACCEPTOR_id))
@@ -26466,11 +26491,11 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	if ((err = t_parse_conn_opts(ap, mp->b_rptr + p->OPT_offset, p->OPT_length, 0)) < 0) {
 		switch (-err) {
 		case EINVAL:
-			goto badopt;
+			goto unlock_badopt;
 		case EACCES:
 			goto acces;
 		default:
-			goto error;
+			goto unlock_error;
 		}
 	}
 	{
@@ -26492,10 +26517,10 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 					sd->max_retrans = op->max_retrans;
 					continue;
 				}
-				goto badopt;
+				goto unlock_badopt;
 			}
 			if (op != oe)
-				goto badopt;
+				goto unlock_badopt;
 			if (err)
 				goto error;
 		}
@@ -26511,10 +26536,10 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 					sd->hb_itvl = op->hb_itvl;
 					continue;
 				}
-				goto badopt;
+				goto unlock_badopt;
 			}
 			if (op != oe)
-				goto badopt;
+				goto unlock_badopt;
 			if (err)
 				goto error;
 		}
@@ -26522,31 +26547,34 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 		ap->i_state = TS_DATA_XFER;
 		if ((err = sctp_conn_res(sp, cp, ap, mp->b_cont))) {
 			ap->i_state = ap_oldstate;
-			goto error;
+			goto unlock_error;
 		}
 		mp->b_cont = NULL;	/* absorbed mp->b_cont */
 		if ((err = t_ok_ack(sp, T_CONN_RES, cp, ap))) {
 			ap->i_state = ap_oldstate;
-			goto error;
+			goto unlock_error;
 		}
+		bufq_unlock(&sp->conq, pl);
 		return (QR_DONE);
 	}
       acces:
 	err = TACCES;
 	ptrace(("%s: %p: ERROR: no access to accepting queue\n", DRV_NAME, sp));
-	goto error;
+	goto unlock_error;
       resqlen:
 	err = TRESQLEN;
 	ptrace(("%s: %p: ERROR: accepting queue is listening\n", DRV_NAME, sp));
-	goto error;
+	goto unlock_error;
       badf:
 	err = TBADF;
 	ptrace(("%s: %p: ERROR: accepting queue id is invalid\n", DRV_NAME, sp));
-	goto error;
+	goto unlock_error;
       badseq:
 	err = TBADSEQ;
 	ptrace(("%s: %p: ERROR: connection ind referenced is invalid\n", DRV_NAME, sp));
-	goto error;
+	goto unlock_error;
+      unlock_badopt:
+	bufq_unlock(&sp->conq, pl);
       badopt:
 	err = TBADOPT;
 	ptrace(("%s: %p: ERROR: options are bad\n", DRV_NAME, sp));
@@ -26563,9 +26591,9 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	err = TOUTSTATE;
 	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sp));
 	goto error;
+      unlock_error:
+	bufq_unlock(&sp->conq, pl);
       error:
-	if (cp != NULL)
-		bufq_unlock(&sp->conq);
 	return t_error_ack(sp, T_CONN_RES, err);
 }
 
@@ -26683,8 +26711,6 @@ t_discon_req(struct sctp *sp, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sp));
 	goto error;
       error:
-	if (cp != NULL)
-		bufq_unlock(&sp->conq);
 	return t_error_ack(sp, T_DISCON_REQ, err);
 }
 

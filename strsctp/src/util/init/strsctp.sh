@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 00:15:07 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/08 05:28:21 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -12,9 +12,9 @@
 # by openss7 install_initd and remove_initd scripts.  Each line specifies
 # arguments to add and remove links after the the name argument:
 #
-# streams:	start and stop strsctp subsystem
+# strsctp:	start and stop strsctp subsystem
 # update-rc.d:	start 33 S . stop 33 0 6 .
-# config:	/etc/default/streams
+# config:	/etc/default/strsctp
 # probe:	false
 # hide:		false
 # license:	GPL
@@ -202,7 +202,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 00:15:07 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/08 05:28:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -247,7 +247,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 00:15:07 $ by $Author: brian $
+# Last Modified $Date: 2006/12/08 05:28:21 $ by $Author: brian $
 #
 # =============================================================================
 
