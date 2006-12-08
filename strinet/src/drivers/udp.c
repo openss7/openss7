@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/12 10:23:56 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/12/08 05:23:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:23:56 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:23:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.51  2006/12/08 05:23:57  brian
+ - bufq locking changes and debian init script name correction
+
  Revision 0.9.2.50  2006/10/12 10:23:56  brian
  - removed redundant debug flags
 
@@ -221,10 +224,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/12 10:23:56 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/12/08 05:23:57 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/12 10:23:56 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/12/08 05:23:57 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -246,6 +249,9 @@ static char const ident[] =
  *  these approaches is to determine the relative merits (performance and
  *  otherwise) of each approach.
  */
+
+#define _SVR4_SOURCE
+#define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
@@ -303,7 +309,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/10/12 10:23:56 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/12/08 05:23:57 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -5683,6 +5689,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 	mblk_t *mp;
 	const size_t size = sizeof(*p);
 	int err = QR_DONE;
+	pl_t pl;
 
 	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
@@ -5698,9 +5705,9 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		err = tp_optmgmt(tp, OPT_buffer, flags);
 		if (unlikely(err != 0))
 			goto free_error;
-		bufq_lock(&tp->conq);
+		pl = bufq_lock(&tp->conq);
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
-		bufq_unlock(&tp->conq);
+		bufq_unlock(&tp->conq, pl);
 		break;
 #endif
 	case TS_WACK_UREQ:
@@ -5739,9 +5746,9 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 			goto error;
 		}
 		if (tp != ACCEPTOR_id) {
-			bufq_lock(&tp->conq);
+			pl = bufq_lock(&tp->conq);
 			tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
-			bufq_unlock(&tp->conq);
+			bufq_unlock(&tp->conq, pl);
 		}
 		break;
 #if 0
@@ -5749,9 +5756,9 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		err = np_reset_rem(np, N_USER, N_REASON_UNDEFINED);
 		if (unlikely(err != 0))
 			goto free_error;
-		bufq_lock(&np->resq);
+		pl = bufq_lock(&np->resq);
 		np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-		bufq_unlock(&np->resq);
+		bufq_unlock(&np->resq, pl);
 		break;
 #endif
 	case TS_WACK_DREQ6:
@@ -5762,9 +5769,9 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		err = tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
 		if (unlikely(err != QR_ABSORBED))
 			goto error;
-		bufq_lock(&tp->conq);
+		pl = bufq_lock(&tp->conq);
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
-		bufq_unlock(&tp->conq);
+		bufq_unlock(&tp->conq, pl);
 		break;
 	default:
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
@@ -5890,6 +5897,7 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	N_reset_con_t *p;
 	size_t size = sizeof(*p);
 	int err;
+	pl_t pl;
 
 	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
@@ -5900,9 +5908,9 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_CON;
 	mp->b_wptr += sizeof(*p);
-	bufq_lock(&np->resq);
+	pl = bufq_lock(&np->resq);
 	np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-	bufq_unlock(&np->resq);
+	bufq_unlock(&np->resq, pl);
 	_printd(("%s: <- N_RESET_CON\n", DRV_NAME));
 	qreply(q, mp);
 	return (QR_DONE);

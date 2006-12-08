@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/16 00:21:22 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/08 05:24:00 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -12,9 +12,9 @@
 # by openss7 install_initd and remove_initd scripts.  Each line specifies
 # arguments to add and remove links after the the name argument:
 #
-# streams:	start and stop strinet subsystem
+# strinet:	start and stop strinet subsystem
 # update-rc.d:	start 33 S . stop 33 0 6 .
-# config:	/etc/default/streams
+# config:	/etc/default/strinet
 # probe:	false
 # hide:		false
 # license:	GPL
@@ -236,7 +236,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/16 00:21:22 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/08 05:24:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -281,7 +281,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 00:21:22 $ by $Author: brian $
+# Last Modified $Date: 2006/12/08 05:24:00 $ by $Author: brian $
 #
 # =============================================================================
 
