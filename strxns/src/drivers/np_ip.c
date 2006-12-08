@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/10/31 21:00:01 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/08 05:18:48 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:00:01 $ by $Author: brian $
+ Last Modified $Date: 2006/12/08 05:18:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.35  2006/12/08 05:18:48  brian
+ - minor updates and corrections
+
  Revision 0.9.2.34  2006/10/31 21:00:01  brian
  - optimization correction
 
@@ -172,10 +175,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/10/31 21:00:01 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/08 05:18:48 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/10/31 21:00:01 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/08 05:18:48 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -188,6 +191,9 @@ static char const ident[] =
 */
 
 // #define _DEBUG 1
+
+#define _SVR4_SOURCE
+#define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
@@ -233,7 +239,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.34 $) $Date: 2006/10/31 21:00:01 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.35 $) $Date: 2006/12/08 05:18:48 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -3016,6 +3022,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 	mblk_t *mp;
 	const size_t size = sizeof(*p);
 	int err = QR_DONE;
+	pl_t pl;
 
 	if (unlikely((mp = np_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
@@ -3031,9 +3038,9 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		err = np_optmgmt(np, QOS_buffer, flags);
 		if (unlikely(err != 0))
 			goto free_error;
-		bufq_lock(&np->conq);
+		pl = bufq_lock(&np->conq);
 		np_set_state(np, bufq_length(&np->conq) > 0 ? NS_WRES_CIND : NS_IDLE);
-		bufq_unlock(&np->conq);
+		bufq_unlock(&np->conq, pl);
 		break;
 #endif
 	case NS_WACK_UREQ:
@@ -3064,9 +3071,9 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 			goto free_error;
 		}
 		if (np != TOKEN_value) {
-			bufq_lock(&np->conq);
+			pl = bufq_lock(&np->conq);
 			np_set_state(np, bufq_length(&np->conq) > 0 ? NS_WRES_CIND : NS_IDLE);
-			bufq_unlock(&np->conq);
+			bufq_unlock(&np->conq, pl);
 		}
 		break;
 #if 1
@@ -3074,9 +3081,9 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		err = np_reset_rem(np, N_USER, N_REASON_UNDEFINED);
 		if (unlikely(err != 0))
 			goto free_error;
-		bufq_lock(&np->resq);
+		pl = bufq_lock(&np->resq);
 		np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-		bufq_unlock(&np->resq);
+		bufq_unlock(&np->resq, pl);
 		break;
 #endif
 	case NS_WACK_DREQ6:
@@ -3087,9 +3094,9 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
 		err = np_disconnect(np, ADDR_buffer, SEQ_number, flags, dp);
 		if (unlikely(err != QR_ABSORBED))
 			goto free_error;
-		bufq_lock(&np->conq);
+		pl = bufq_lock(&np->conq);
 		np_set_state(np, bufq_length(&np->conq) > 0 ? NS_WRES_CIND : NS_IDLE);
-		bufq_unlock(&np->conq);
+		bufq_unlock(&np->conq, pl);
 		break;
 	default:
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
@@ -3215,6 +3222,7 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	N_reset_con_t *p;
 	size_t size = sizeof(*p);
 	int err;
+	pl_t pl;
 
 	if (unlikely((mp = np_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
@@ -3225,9 +3233,9 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_CON;
 	mp->b_wptr += sizeof(*p);
-	bufq_lock(&np->resq);
+	pl = bufq_lock(&np->resq);
 	np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-	bufq_unlock(&np->resq);
+	bufq_unlock(&np->resq, pl);
 	_printd(("%s: <- N_RESET_CON\n", DRV_NAME));
 	qreply(q, mp);
 	return (QR_DONE);

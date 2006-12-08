@@ -1,3 +1,8 @@
+2006-12-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: changes to buffer locking
+	* src/util/init/strxns.sh: name correction for debia init script
+
 2006-10-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/np_ip.c: optimization correction
