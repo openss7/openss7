@@ -7415,10 +7415,12 @@ preamble_unbound(int child)
 		failure_string = FAILURE_STRING("bad CURRENT_state");
 		goto failure;
 	}
-	return __RESULT_SUCCESS;
-      failure:
 #endif
+	return __RESULT_SUCCESS;
+#if 0
+      failure:
 	return __RESULT_FAILURE;
+#endif
 }
 
 static int
@@ -7659,10 +7661,12 @@ preamble_push(int child)
 		if (do_signal(child, __TEST_PUSH))
 			goto failure;
 	}
-	return __RESULT_SUCCESS;
-      failure:
 #endif
+	return __RESULT_SUCCESS;
+#if 0
+      failure:
 	return __RESULT_FAILURE;
+#endif
 }
 
 static int
@@ -7680,10 +7684,12 @@ postamble_pop(int child)
 		state = failed;
 		goto failure;
 	}
-	return __RESULT_SUCCESS;
-      failure:
 #endif
+	return __RESULT_SUCCESS;
+#if 0
+      failure:
 	return __RESULT_FAILURE;
+#endif
 }
 
 static int
@@ -9896,7 +9902,7 @@ test_1_9a_ptu(int child, int proving)
 	if (test_alignment_lpo_sut(child, proving, __TEST_SIPO))
 		goto failure;
 	state++;
-	if (do_signal(child, __TEST_DATA))
+	if (do_signal(child, __TEST_MSU))
 		goto failure;
 	state++;
 	if (start_tt(config->sl.t7 * 2))
@@ -9959,7 +9965,7 @@ Reverse direction\
 static int
 test_1_9b_ptu(int child, int proving)
 {
-	if (test_alignment_lpo_pt(child, proving, __TEST_DATA))
+	if (test_alignment_lpo_pt(child, proving, __TEST_MSU))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SIPO))
@@ -10208,9 +10214,6 @@ Set RPO when \"Aligned not ready\"\
 static int
 test_1_11_ptu(int child, int proving)
 {
-	if (do_signal(child, __TEST_POWER_ON))
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_SIOS))
 		goto failure;
 	state++;
@@ -10341,6 +10344,9 @@ test_1_11_iut(int child, int proving)
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPO))
+		goto failure;
+	state++;
+	if (expect(child, 1100, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -17010,7 +17016,7 @@ Reverse direction\
 static int
 test_8_9b_ptu(int child)
 {
-	if (expect(child, INFINITE_WAIT, __TEST_DATA))
+	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
 	state++;
 	bsn[0] = fsn[1];
@@ -17018,8 +17024,9 @@ test_8_9b_ptu(int child)
 		goto failure;
 	state++;
 	bsn[0] = fsn[1];
-	if (do_signal(child, __TEST_ACK))
+	if (do_signal(child, __TEST_FISU))
 		goto failure;
+	/* FIXME: check snibs for ack */
 	state++;
 	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_ENDED))
 		goto failure;
@@ -17027,12 +17034,13 @@ test_8_9b_ptu(int child)
 	if (do_signal(child, __STATUS_SEQUENCE_SYNC))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_DATA))
+	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
 	state++;
 	bsn[0] = fsn[1];
-	if (do_signal(child, __TEST_ACK))
+	if (do_signal(child, __TEST_FISU))
 		goto failure;
+	/* FIXME: check snibs for ack */
 	state++;
 	return __RESULT_SUCCESS;
       failure:
@@ -17386,14 +17394,14 @@ test_8_12b_ptu(int child)
 {
 	long beg_time = 0;
 
-	if (expect(child, INFINITE_WAIT, __TEST_DATA))
+	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
 	state++;
 	beg_time = milliseconds(child, t7);
 	state++;
 	for (;;) {
 		switch (get_event(child)) {
-		case __TEST_DATA:
+		case __TEST_MSU:
 			state++;
 			continue;
 		case __TEST_SIOS:
@@ -17501,11 +17509,12 @@ static int
 test_8_14_ptu(int child)
 {
 	bsn[0] = 0x7f;
-	if (do_signal(child, __TEST_DATA))
+	if (do_signal(child, __TEST_MSU))
 		goto failure;
 	state++;
-	if (expect(child, INFINITE_WAIT, __TEST_ACK))
+	if (expect(child, INFINITE_WAIT, __TEST_FISU))
 		goto failure;
+	/* FIXME: check snibs for ack */
 	state++;
 	if (fsn[1] != 0x7f)
 		goto failure;
@@ -17513,7 +17522,7 @@ test_8_14_ptu(int child)
 		if (bsn[1] != 0)
 			goto failure;
 	fsn[0] = 1;
-	if (do_signal(child, __TEST_DATA))
+	if (do_signal(child, __TEST_MSU))
 		goto failure;
 	state++;
 	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
@@ -17679,9 +17688,9 @@ test_9_2_ptu(int child)
 			if (start_tt(20000))
 				goto failure;
 			fsn_lo = 0;
-			if (do_signal(CHILD_IUT, __TEST_SEND_MSU))
+			if (do_signal(CHILD_IUT, __TEST_MSU))
 				goto failure;
-			if (do_signal(CHILD_IUT, __TEST_SEND_MSU))
+			if (do_signal(CHILD_IUT, __TEST_MSU))
 				goto failure;
 			fsn_hi = 1;
 			fsn_ex = fsn_lo;
@@ -17719,7 +17728,7 @@ test_9_2_ptu(int child)
 				bsn[0] = 0x7f;
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
-				if (do_signal(CHILD_IUT, __TEST_SEND_MSU))
+				if (do_signal(CHILD_IUT, __TEST_MSU))
 					goto failure;
 				fsn_hi++;
 				state++;
@@ -19298,7 +19307,7 @@ test_10_2b_ptu(int child)
 {
 	long beg_time = 0;
 
-	if (expect(child, INFINITE_WAIT, __TEST_DATA))
+	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SIB))
@@ -19359,7 +19368,7 @@ test_10_2c_ptu(int child)
 {
 	long beg_time = 0;
 
-	if (expect(child, INFINITE_WAIT, __TEST_DATA))
+	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SIB))
@@ -19379,8 +19388,9 @@ test_10_2c_ptu(int child)
 		goto failure;
 	state++;
 	bsn[0] = fsn[1];
-	if (do_signal(child, __TEST_ACK))
+	if (do_signal(child, __TEST_FISU))
 		goto failure;
+	/* FIXME: check snibs for ack */
 	state++;
 	return __RESULT_SUCCESS;
       failure:
@@ -19804,7 +19814,7 @@ struct test_case {
 	numb_case_0_2_1, tgrp_case_0_2_1, sgrp_case_0_2_1, name_case_0_2_1, xtra_case_0_2_1, desc_case_0_2_1, sref_case_0_2_1, test_case_0_2_1, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_0_2_2, tgrp_case_0_2_2, sgrp_case_0_2_2, name_case_0_2_2, xtra_case_0_2_2, desc_case_0_2_2, sref_case_0_2_2, test_case_0_2_2, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_0_2_3, tgrp_case_0_2_3, sgrp_case_0_2_3, name_case_0_2_3, xtra_case_0_2_3, desc_case_0_2_3, sref_case_0_2_3, test_case_0_2_3, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_0_2_4, tgrp_case_0_2_4, sgrp_case_0_2_4, name_case_0_2_4, xtra_case_0_2_4, desc_case_0_2_4, sref_case_0_2_4, test_case_0_2_4, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_0_2_4, tgrp_case_0_2_4, sgrp_case_0_2_4, name_case_0_2_4, xtra_case_0_2_4, desc_case_0_2_4, sref_case_0_2_4, test_case_0_2_4, &begin_tests, &end_tests, 0, 0, __RESULT_FAILURE,}, {
 	numb_case_0_2_5, tgrp_case_0_2_5, sgrp_case_0_2_5, name_case_0_2_5, xtra_case_0_2_5, desc_case_0_2_5, sref_case_0_2_5, test_case_0_2_5, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_0_2_6, tgrp_case_0_2_6, sgrp_case_0_2_6, name_case_0_2_6, xtra_case_0_2_6, desc_case_0_2_6, sref_case_0_2_6, test_case_0_2_6, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_0_2_7, tgrp_case_0_2_7, sgrp_case_0_2_7, name_case_0_2_7, xtra_case_0_2_7, desc_case_0_2_7, sref_case_0_2_7, test_case_0_2_7, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS,}, {

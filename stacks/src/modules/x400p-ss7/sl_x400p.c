@@ -3207,18 +3207,29 @@ sl_lsc_no_processor_outage(struct xp *xp, queue_t *q)
 	}
 }
 
-STATIC INLINE void
+STATIC INLINE int
 sl_poc_remote_processor_recovered(struct xp *xp, queue_t *q)
 {
+	int err;
+
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_REMOTE_PROCESSOR_OUTAGE:
+		/* Indication moved from caller to remove spurious remote processor recovered
+		 * indications. */
+		if ((err = sl_remote_processor_recovered_ind(xp, q)))
+			return (err);
 		sl_lsc_no_processor_outage(xp, q);
 		xp->sl.statem.poc_state = SL_STATE_IDLE;
-		return;
+		break;
 	case SL_STATE_BOTH_PROCESSORS_OUT:
+		/* Indication moved from caller to remove spurious remote processor recovered
+		 * indications. */
+		if ((err = sl_remote_processor_recovered_ind(xp, q)))
+			return (err);
 		xp->sl.statem.poc_state = SL_STATE_LOCAL_PROCESSOR_OUTAGE;
-		return;
+		break;
 	}
+	return (QR_DONE);
 }
 
 STATIC INLINE int
@@ -3246,11 +3257,9 @@ sl_lsc_fisu_msu_received(struct xp *xp, queue_t *q)
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			sl_poc_remote_processor_recovered(xp, q);
-			return sl_remote_processor_recovered_ind(xp, q);
-		case SS7_PVAR_ANSI_92:
-			xp->sl.statem.remote_processor_outage = 0;
-			return sl_remote_processor_recovered_ind(xp, q);
+			if ((err = sl_poc_remote_processor_recovered(xp, q)))
+				return (err);
+			break;
 		default:
 			/* 
 			 *  A deviation from the SDLs has been placed here to limit the number of remote
@@ -3258,8 +3267,9 @@ sl_lsc_fisu_msu_received(struct xp *xp, queue_t *q)
 			 *  sufficient.
 			 */
 			if (xp->sl.statem.remote_processor_outage) {
+				if ((err = sl_remote_processor_recovered_ind(xp, q)))
+					return (err);
 				xp->sl.statem.remote_processor_outage = 0;
-				return sl_remote_processor_recovered_ind(xp, q);
 			}
 			break;
 		}
@@ -3268,17 +3278,28 @@ sl_lsc_fisu_msu_received(struct xp *xp, queue_t *q)
 	return (QR_DONE);
 }
 
-STATIC INLINE void
+STATIC INLINE int
 sl_poc_remote_processor_outage(struct xp *xp, queue_t *q)
 {
+	int err = 0;
+
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_IDLE:
+		/* Moved here from caller to limit the number of remote processor outage
+		   indications delivered to L3. */
+		if ((err = sl_remote_processor_outage_ind(xp, q)))
+			return (err);
 		xp->sl.statem.poc_state = SL_STATE_REMOTE_PROCESSOR_OUTAGE;
-		return;
+		break;
 	case SL_STATE_LOCAL_PROCESSOR_OUTAGE:
+		/* Moved here from caller to limit the number of remote processor outage
+		   indications delivered to L3. */
+		if ((err = sl_remote_processor_outage_ind(xp, q)))
+			return (err);
 		xp->sl.statem.poc_state = SL_STATE_BOTH_PROCESSORS_OUT;
-		return;
+		break;
 	}
+	return (err);
 }
 
 STATIC INLINE void
@@ -3303,9 +3324,8 @@ sl_lsc_sipo(struct xp *xp, queue_t *q)
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
 			__xp_timer_stop(xp, t1);
-			if ((err = sl_remote_processor_outage_ind(xp, q)))
+			if ((err = sl_poc_remote_processor_outage(xp, q)))
 				return (err);
-			sl_poc_remote_processor_outage(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 			break;
 		case SS7_PVAR_ANSI_92:
@@ -3321,9 +3341,8 @@ sl_lsc_sipo(struct xp *xp, queue_t *q)
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			if ((err = sl_remote_processor_outage_ind(xp, q)))
+			if ((err = sl_poc_remote_processor_outage(xp, q)))
 				return (err);
-			sl_poc_remote_processor_outage(xp, q);
 			__xp_timer_stop(xp, t1);
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 			break;
@@ -3341,9 +3360,8 @@ sl_lsc_sipo(struct xp *xp, queue_t *q)
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
 			sl_txc_send_fisu(xp, q);
-			if ((err = sl_remote_processor_outage_ind(xp, q)))
+			if ((err = sl_poc_remote_processor_outage(xp, q)))
 				return (err);
-			sl_poc_remote_processor_outage(xp, q);
 			xp->sl.statem.processor_outage = 1;	/* remote? */
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 			break;
@@ -3362,9 +3380,8 @@ sl_lsc_sipo(struct xp *xp, queue_t *q)
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			if ((err = sl_remote_processor_outage_ind(xp, q)))
+			if ((err = sl_poc_remote_processor_outage(xp, q)))
 				return (err);
-			sl_poc_remote_processor_outage(xp, q);
 			break;
 		case SS7_PVAR_ANSI_92:
 			xp->sl.statem.remote_processor_outage = 1;
