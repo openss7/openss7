@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/08 11:46:35 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/09 10:40:26 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 11:46:35 $ by $Author: brian $
+ Last Modified $Date: 2006/12/09 10:40:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.11  2006/12/09 10:40:26  brian
+ - corrections from testing
+
  Revision 0.9.2.10  2006/12/08 11:46:35  brian
  - a few more corrections from testing
 
@@ -87,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/08 11:46:35 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/09 10:40:26 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/08 11:46:35 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/09 10:40:26 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -257,10 +260,10 @@ static int RESERVED_field[2] = { 0, 0 };
 #define CHILD_IUT   1
 
 int test_fd[3] = { 0, 0, 0 };
-uint32_t bsn[3] = { 0, 0, 0 };
-uint32_t fsn[3] = { 0, 0, 0 };
-uint8_t fib[3] = { 0, 0, 0, };
-uint8_t bib[3] = { 0, 0, 0, };
+uint32_t bsn[3] = { 0x7f, 0x7f, 0x7f };
+uint32_t fsn[3] = { 0x7f, 0x7f, 0x7f };
+uint8_t fib[3] = { 0x80, 0x80, 0x80, };
+uint8_t bib[3] = { 0x80, 0x80, 0x80, };
 uint8_t li[3] = { 0, 0, 0, };
 uint8_t sio[3] = { 0, 0, 0, };
 
@@ -579,7 +582,7 @@ static timer_range_t timer[tmax] = {
 	{5000, 150000, "T2"},	/* Timer T2 5000 */
 	{1000, 1500, "T3"},	/* Timer T3 100 */
 	{7500, 9500, "T4(Pn)"},	/* Timer T4n 3000 */
-	{400, 600, "T4(Pe)"},	/* Timer T4e 50 */
+	{200, 800, "T4(Pe)"},	/* Timer T4e 50 */
 	{125, 125, "T5"},	/* Timer T5 10 */
 	{3000, 6000, "T6"},	/* Timer T6 300 */
 	{500, 2000, "T7"}	/* Timer T7 50 */
@@ -884,17 +887,17 @@ static int expand = 0;
 static long beg_time = 0;
 
 int pt_fd = 0;
-unsigned char pt_fib = 0x80;
+unsigned char pt_fib = 0x00;
 unsigned char pt_fsn = 0x7f;
-unsigned char pt_bib = 0x80;
+unsigned char pt_bib = 0x00;
 unsigned char pt_bsn = 0x7f;
 unsigned char pt_li = 0;
 unsigned char pt_sio = 0;
 
 int iut_fd = 0;
-unsigned char iut_fib = 0x80;
+unsigned char iut_fib = 0x00;
 unsigned char iut_fsn = 0x7f;
-unsigned char iut_bib = 0x80;
+unsigned char iut_bib = 0x00;
 unsigned char iut_bsn = 0x7f;
 unsigned char iut_li = 0;
 unsigned char iut_sio = 0;
@@ -1410,16 +1413,6 @@ event_string(int child, int event)
 			return ("!rpr");
 		case __EVENT_IUT_DATA:
 			return ("!msu");
-		case __TEST_ENABLE_CON:
-			return ("!enable con");
-		case __TEST_DISABLE_CON:
-			return ("!disable con");
-		case __TEST_OK_ACK:
-			return ("!ok ack");
-		case __TEST_ERROR_ACK:
-			return ("!error ack");
-		case __TEST_ERROR_IND:
-			return ("!error ind");
 		}
 		break;
 	default:
@@ -1535,6 +1528,17 @@ event_string(int child, int event)
 		return ("SUCCESS");
 	case __RESULT_FAILURE:
 		return ("FAILURE");
+	case __TEST_ENABLE_CON:
+		return ("!enable con");
+	case __TEST_DISABLE_CON:
+		return ("!disable con");
+	case __TEST_OK_ACK:
+		return ("!ok ack");
+	case __TEST_ERROR_ACK:
+		return ("!error ack");
+	case __TEST_ERROR_IND:
+		return ("!error ind");
+#if 0
 	case __TEST_CONN_REQ:
 		return ("N_CONN_REQ");
 	case __TEST_CONN_RES:
@@ -1589,6 +1593,7 @@ event_string(int child, int event)
 		return ("N_RESET_RES");
 	case __TEST_RESET_CON:
 		return ("N_RESET_CON");
+#endif
 	case __TEST_COUNT:
 		return ("COUNT");
 	case __TEST_TRIES:
@@ -3643,6 +3648,7 @@ print_rx_msg_sn(int child, const char *string, uint32_t bsn, uint32_t fsn)
 void
 print_tx_msg(int child, const char *string)
 {
+#if 0
 	static const char *msgs[] = {
 		"%20.20s| --------------------------------> |                    [%d:%03d]\n",
 		"                    | <-------------------------------- |%-20.20s[%d:%03d]\n",
@@ -3650,17 +3656,23 @@ print_tx_msg(int child, const char *string)
 		"                    |      <%-20.20s>       |                    [%d:%03d]\n",
 	};
 
+#endif
 	if (show && verbose > 0) {
+#if 0
 		if (fsn[child] != 0x7f || bsn[child] != 0x7f || fib[child] != 0 || bib[child] != 0)
+#endif
 			print_tx_msg_sn(child, string, bib[child] | bsn[child], fib[child] | fsn[child]);
+#if 0
 		else
 			print_string_state(child, msgs, string);
+#endif
 	}
 }
 
 void
 print_rx_msg(int child, const char *string)
 {
+#if 0
 	static const char *msgs[] = {
 		"%20.20s| <-------------------------------- |                    [%d:%03d]\n",
 		"                    | --------------------------------> |%-20.20s[%d:%03d]\n",
@@ -3668,13 +3680,18 @@ print_rx_msg(int child, const char *string)
 		"                    |       <%20.20s>      |                    [%d:%03d]\n",
 	};
 
+#endif
 	if (show && verbose > 0) {
 		int other = (child + 1) % 2;
+#if 0
 
 		if (fsn[other] != 0x7f || bsn[other] != 0x7f || fib[other] != 0 || bib[other] != 0)
+#endif
 			print_rx_msg_sn(child, string, bib[other] | bsn[other], fib[other] | fsn[other]);
+#if 0
 		else
 			print_string_state(child, msgs, string);
+#endif
 	}
 }
 
@@ -4364,11 +4381,11 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 		fprintf(stdout, "fdinsert to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
 		fprintf(stdout, "[");
 		for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
-			fprintf(stdout, "%02X", ctrl->buf[i]);
+			fprintf(stdout, "%02X", (uint8_t) ctrl->buf[i]);
 		fprintf(stdout, "]\n");
 		fprintf(stdout, "[");
 		for (i = 0; i < (data ? data->len : 0); i++)
-			fprintf(stdout, "%02X", data->buf[i]);
+			fprintf(stdout, "%02X", (uint8_t) data->buf[i]);
 		fprintf(stdout, "]\n");
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
@@ -4401,11 +4418,11 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
 			fprintf(stdout, "[");
 			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
-				fprintf(stdout, "%02X", ctrl->buf[i]);
+				fprintf(stdout, "%02X", (uint8_t) ctrl->buf[i]);
 			fprintf(stdout, "]\n");
 			fprintf(stdout, "[");
 			for (i = 0; i < (data ? data->len : 0); i++)
-				fprintf(stdout, "%02X", data->buf[i]);
+				fprintf(stdout, "%02X", (uint8_t) data->buf[i]);
 			fprintf(stdout, "]\n");
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
@@ -6467,6 +6484,7 @@ static int
 do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
+	int other = (child + 1) % 2;
 
 	if (data->len >= 0) {
 		switch (child) {
@@ -6477,20 +6495,20 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 		case 0:
 		{
 #if 1
-			bib[child] = data->buf[0] & 0x80;
-			bsn[child] = data->buf[0] & 0x7f;
-			fib[child] = data->buf[1] & 0x80;
-			fsn[child] = data->buf[1] & 0x7f;
-			li[child] = data->buf[2] & 0x3f;
-			sio[child] = data->buf[3] & 0x7;
-			bsn[(child + 1) % 2] = fsn[child];
-			switch (li[child]) {
+			bib[other] = data->buf[0] & 0x80;
+			bsn[other] = data->buf[0] & 0x7f;
+			fib[other] = data->buf[1] & 0x80;
+			fsn[other] = data->buf[1] & 0x7f;
+			li[other] = data->buf[2] & 0x3f;
+			sio[other] = data->buf[3] & 0x7;
+			bsn[child] = fsn[other];
+			switch (li[other]) {
 			case 0:
 				event = __TEST_FISU;
 				break;
 			case 1:
-				event = sio[child] = data->buf[3] & 0x7;
-				switch (sio[child]) {
+				event = sio[other] = data->buf[3] & 0x7;
+				switch (sio[other]) {
 				case LSSU_SIO:
 					event = __TEST_SIO;
 					break;
@@ -6515,8 +6533,8 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				}
 				break;
 			case 2:
-				event = sio[child] = data->buf[4] & 0x7;
-				switch (sio[child]) {
+				event = sio[other] = data->buf[4] & 0x7;
+				switch (sio[other]) {
 				case LSSU_SIO:
 					event = __TEST_SIO2;
 					break;
@@ -6545,10 +6563,10 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				break;
 			}
 			if (show_fisus || event != __TEST_FISU) {
-				if (event != oldret || oldisb != (((bib[child] | bsn[child]) << 8) | (fib[child] | fsn[child]))) {
-					// if (oldisb == (((bib[child] | bsn[child]) << 8) |
-					// (fib[child] |
-					// fsn[child])) &&
+				if (event != oldret || oldisb != (((bib[other] | bsn[other]) << 8) | (fib[other] | fsn[other]))) {
+					// if (oldisb == (((bib[other] | bsn[other]) << 8) |
+					// (fib[other] |
+					// fsn[other])) &&
 					// ((event == __TEST_FISU && oldret == __TEST_MSU) ||
 					// (event == __TEST_MSU && oldret == __TEST_FISU))) {
 					// if (event == __TEST_MSU && !expand)
@@ -6556,7 +6574,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 					// } else
 					// cntret = 0;
 					oldret = event;
-					oldisb = ((bib[child] | bsn[child]) << 8) | (fib[child] | fsn[child]);
+					oldisb = ((bib[other] | bsn[other]) << 8) | (fib[other] | fsn[other]);
 					// if (cntret) {
 					// printf(" Ct=%d\n", cntret + 1);
 					// fflush(stdout);
@@ -6576,58 +6594,58 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 					}
 					break;
 				case __TEST_SIO:
-					if (li[child] == 1)
+					if (li[other] == 1)
 						snprintf(buf, sizeof(buf), "SIO");
 					else
-						snprintf(buf, sizeof(buf), "SIO[%d]", li[child]);
+						snprintf(buf, sizeof(buf), "SIO[%d]", li[other]);
 					print_rx_msg(child, buf);
 					break;
 				case __TEST_SIN:
-					if (li[child] == 1)
+					if (li[other] == 1)
 						snprintf(buf, sizeof(buf), "SIN");
 					else
-						snprintf(buf, sizeof(buf), "SIN[%d]", li[child]);
+						snprintf(buf, sizeof(buf), "SIN[%d]", li[other]);
 					print_rx_msg(child, buf);
 					break;
 				case __TEST_SIE:
-					if (li[child] == 1)
+					if (li[other] == 1)
 						snprintf(buf, sizeof(buf), "SIE");
 					else
-						snprintf(buf, sizeof(buf), "SIE[%d]", li[child]);
+						snprintf(buf, sizeof(buf), "SIE[%d]", li[other]);
 					print_rx_msg(child, buf);
 					break;
 				case __TEST_SIOS:
-					if (li[child] == 1)
+					if (li[other] == 1)
 						snprintf(buf, sizeof(buf), "SIOS");
 					else
-						snprintf(buf, sizeof(buf), "SIOS[%d]", li[child]);
+						snprintf(buf, sizeof(buf), "SIOS[%d]", li[other]);
 					print_rx_msg(child, buf);
 					break;
 				case __TEST_SIPO:
-					if (li[child] == 1)
+					if (li[other] == 1)
 						snprintf(buf, sizeof(buf), "SIPO");
 					else
-						snprintf(buf, sizeof(buf), "SIPO[%d]", li[child]);
+						snprintf(buf, sizeof(buf), "SIPO[%d]", li[other]);
 					print_rx_msg(child, buf);
 					break;
 				case __TEST_SIB:
-					if (li[child] == 1)
+					if (li[other] == 1)
 						snprintf(buf, sizeof(buf), "SIB");
 					else
-						snprintf(buf, sizeof(buf), "SIB[%d]", li[child]);
+						snprintf(buf, sizeof(buf), "SIB[%d]", li[other]);
 					print_rx_msg(child, buf);
 					break;
 				case __TEST_SIX:
-					snprintf(buf, sizeof(buf), "LSSU(invalid)[%d]", li[child]);
+					snprintf(buf, sizeof(buf), "LSSU(invalid)[%d]", li[other]);
 					print_rx_msg(child, buf);
 					break;
 				case __TEST_SIX2:
-					snprintf(buf, sizeof(buf), "LSSU(invalid)[%d]", li[child]);
+					snprintf(buf, sizeof(buf), "LSSU(invalid)[%d]", li[other]);
 					print_rx_msg(child, buf);
 					break;
 				case __TEST_MSU:
 					if (show_msus) {
-						snprintf(buf, sizeof(buf), "MSU[%d]", li[child]);
+						snprintf(buf, sizeof(buf), "MSU[%d]", li[other]);
 						print_rx_msg(child, buf);
 					}
 					break;
@@ -6651,8 +6669,8 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				case M2PA_VERSION_DRAFT4:
 				case M2PA_VERSION_DRAFT4_1:
 					mystatus = ((uint32_t *) data->buf)[3];
-					bsn[child] = ntohs(((uint16_t *) data->buf)[4]);
-					fsn[child] = ntohs(((uint16_t *) data->buf)[5]);
+					bsn[other] = ntohs(((uint16_t *) data->buf)[4]);
+					fsn[other] = ntohs(((uint16_t *) data->buf)[5]);
 					break;
 				case M2PA_VERSION_DRAFT4_9:
 				case M2PA_VERSION_DRAFT5:
@@ -6663,13 +6681,13 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				case M2PA_VERSION_DRAFT10:
 				case M2PA_VERSION_DRAFT11:
 					mystatus = ((uint32_t *) data->buf)[4];
-					bsn[child] = ntohl(((uint32_t *) data->buf)[2]);
-					fsn[child] = ntohl(((uint32_t *) data->buf)[3]);
+					bsn[other] = ntohl(((uint32_t *) data->buf)[2]);
+					fsn[other] = ntohl(((uint32_t *) data->buf)[3]);
 					break;
 				case M2PA_VERSION_RFC4165:
 					mystatus = ((uint32_t *) data->buf)[4];
-					// bsn[child] = ntohl(((uint32_t *) data->buf)[2]);
-					// fsn[child] = ntohl(((uint32_t *) data->buf)[3]);
+					// bsn[other] = ntohl(((uint32_t *) data->buf)[2]);
+					// fsn[other] = ntohl(((uint32_t *) data->buf)[3]);
 					break;
 				default:
 					return __RESULT_SCRIPT_ERROR;
@@ -6742,14 +6760,14 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 					break;
 				case M2PA_VERSION_DRAFT4:
 				case M2PA_VERSION_DRAFT4_1:
-					bsn[child] = ntohs(((uint16_t *) data->buf)[4]);
-					fsn[child] = ntohs(((uint16_t *) data->buf)[5]);
+					bsn[other] = ntohs(((uint16_t *) data->buf)[4]);
+					fsn[other] = ntohs(((uint16_t *) data->buf)[5]);
 					break;
 				case M2PA_VERSION_DRAFT4_9:
 				case M2PA_VERSION_DRAFT5:
 				case M2PA_VERSION_DRAFT5_1:
-					bsn[child] = ntohl(((uint32_t *) data->buf)[2]);
-					fsn[child] = ntohl(((uint32_t *) data->buf)[3]);
+					bsn[other] = ntohl(((uint32_t *) data->buf)[2]);
+					fsn[other] = ntohl(((uint32_t *) data->buf)[3]);
 					break;
 				case M2PA_VERSION_DRAFT6:
 				case M2PA_VERSION_DRAFT6_1:
@@ -6759,8 +6777,8 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				case M2PA_VERSION_DRAFT10:
 				case M2PA_VERSION_DRAFT11:
 				case M2PA_VERSION_RFC4165:
-					bsn[child] = ntohl(((uint32_t *) data->buf)[2]);
-					fsn[child] = ntohl(((uint32_t *) data->buf)[3]);
+					bsn[other] = ntohl(((uint32_t *) data->buf)[2]);
+					fsn[other] = ntohl(((uint32_t *) data->buf)[3]);
 					if (ntohl(((uint32_t *) data->buf)[1]) == 4 * sizeof(uint32_t)) {
 						event = __TEST_ACK;
 					}
@@ -6788,12 +6806,12 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				switch (m2pa_version) {
 				case M2PA_VERSION_DRAFT4:
 				case M2PA_VERSION_DRAFT4_1:
-					bsn[CHILD_IUT] = ntohl(((uint32_t *) data->buf)[2]) >> 16;
-					fsn[CHILD_IUT] = ntohl(((uint32_t *) data->buf)[2]) & 0x0000ffff;
+					bsn[other] = ntohl(((uint32_t *) data->buf)[2]) >> 16;
+					fsn[other] = ntohl(((uint32_t *) data->buf)[2]) & 0x0000ffff;
 					break;
 				default:
-					bsn[CHILD_IUT] = ntohl(((uint32_t *) data->buf)[2]) & 0x00ffffff;
-					fsn[CHILD_IUT] = ntohl(((uint32_t *) data->buf)[3]) & 0x00ffffff;
+					bsn[other] = ntohl(((uint32_t *) data->buf)[2]) & 0x00ffffff;
+					fsn[other] = ntohl(((uint32_t *) data->buf)[3]) & 0x00ffffff;
 					break;
 				}
 				switch (m2pa_version) {
@@ -7301,11 +7319,11 @@ wait_event(int child, int wait)
 						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
 						fprintf(stdout, "[");
 						for (i = 0; i < ctrl.len; i++)
-							fprintf(stdout, "%02X", ctrl.buf[i]);
+							fprintf(stdout, "%02X", (uint8_t) ctrl.buf[i]);
 						fprintf(stdout, "]\n");
 						fprintf(stdout, "[");
 						for (i = 0; i < data.len; i++)
-							fprintf(stdout, "%02X", data.buf[i]);
+							fprintf(stdout, "%02X", (uint8_t) data.buf[i]);
 						fprintf(stdout, "]\n");
 						fflush(stdout);
 						dummy = lockf(fileno(stdout), F_ULOCK, 0);
@@ -7540,8 +7558,10 @@ preamble_connect(int child)
 	if ((child == CHILD_PTU && iut_connects == 0) || (child == CHILD_IUT && iut_connects != 0)) {
 		/* keep trying to connect until successful or the child times out */
 		for (;;) {
-			ADDR_buffer = addrs[(child + 1) % 2];
-			ADDR_length = anums[(child + 1) % 2] * sizeof(addrs[(child + 1) % 2][0]);
+			int other = (child + 1) % 2;
+
+			ADDR_buffer = addrs[other];
+			ADDR_length = anums[other] * sizeof(addrs[other][0]);
 			CONN_flags = 0;
 			QOS_buffer = NULL;
 			QOS_length = 0;
@@ -7819,8 +7839,10 @@ preamble_enable(int child)
 		goto failure;
 	state++;
 	{
-		ADDR_buffer = addrs[(child + 1) % 2];
-		ADDR_length = anums[(child + 1) % 2] * sizeof(addrs[(child + 1) % 2][0]);
+		int other = (child + 1) % 2;
+
+		ADDR_buffer = addrs[other];
+		ADDR_length = anums[other] * sizeof(addrs[other][0]);
 		if (do_signal(child, __TEST_ENABLE_REQ))
 			goto failure;
 		state++;
@@ -7927,7 +7949,7 @@ preamble_link_power_off(int child)
 {
 	show_timeout = 0;
 
-	bib[0] = fib[0] = bib[1] = fib[1] = 0x0;
+	bib[0] = fib[0] = bib[1] = fib[1] = 0x80;
 #if 0
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT9:
@@ -8058,9 +8080,17 @@ postamble_link_out_of_service(int child)
 	if (stop_tt())
 		failed = failed ? : state;
 	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
-		failed = failed ? : state;
-	state++;
+	if (child == CHILD_PTU) {
+		if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+			if (last_event != __TEST_SIOS)
+				failed = failed ? : state;
+		state++;
+	} else {
+		if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
+			if (last_event != __EVENT_IUT_OUT_OF_SERVICE)
+				failed = failed ? : state;
+		state++;
+	}
 	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (postamble_disable(child))
@@ -8084,12 +8114,23 @@ preamble_link_in_service(int child)
 		if (do_signal(child, __TEST_START))
 			goto failure;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_SIO))
-			goto failure;
-		state++;
-		if (do_signal(child, __TEST_SIO))
-			goto failure;
-		state++;
+		for (;;) {
+			switch (get_event(child)) {
+			case __TEST_SIOS:
+				if (do_signal(child, __TEST_SIOS))
+					goto failure;
+				state++;
+				continue;
+			case __TEST_SIO:
+				if (do_signal(child, __TEST_SIO))
+					goto failure;
+				state++;
+				break;
+			default:
+				goto failure;
+			}
+			break;
+		}
 		if (!(config->opt.popt & SS7_POPT_NOPR)) {
 			for (;;) {
 				switch (get_event(child)) {
@@ -8101,7 +8142,7 @@ preamble_link_in_service(int child)
 					state++;
 					print_less(child);
 					continue;
-				case __STATUS_IN_SERVICE:
+				case __TEST_FISU:
 					state++;
 					print_more(child);
 					break;
@@ -8109,7 +8150,7 @@ preamble_link_in_service(int child)
 				break;
 			}
 		}
-		if (do_signal(child, __STATUS_IN_SERVICE))
+		if (do_signal(child, __TEST_FISU))
 			goto failure;
 		break;
 	case CHILD_IUT:
@@ -8163,15 +8204,27 @@ postamble_link_in_service(int child)
 	if (stop_tt())
 		failed = failed ? : state;
 	state++;
-	if (child == CHILD_IUT) {
-		if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
-			failed = failed ? : state;
-		state++;
-	} else {
+	if (child == CHILD_PTU) {
 		if (do_signal(child, __TEST_SIOS))
 			failed = failed ? : state;
 		state++;
-		if (expect(child, INFINITE_WAIT, __TEST_SIOS))
+		for (;;) {
+			switch (get_event(child)) {
+			case __TEST_SIOS:
+				break;
+			case __TEST_FISU:
+			case __TEST_SIPO:
+			case __TEST_MSU:
+				if (do_signal(child, __TEST_SIOS))
+					failed = failed ? : state;
+				state++;
+				continue;
+			}
+			break;
+		}
+		state++;
+	} else {
+		if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
 			failed = failed ? : state;
 		state++;
 	}
@@ -8479,7 +8532,7 @@ test_power_on_pt(int child)
 		if (do_signal(child, __TEST_SIOS))
 			goto failure;
 		state++;
-		if (expect(child, LONGER_WAIT, __TEST_SIOS) || check_snibs(child, 0x7f, 0x7f))
+		if (expect(child, LONGER_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
 			goto failure;
 		state++;
 		break;
@@ -8550,7 +8603,7 @@ test_power_on_sut(int child)
 		if (do_signal(child, __TEST_SIOS))
 			goto failure;
 		state++;
-		if (expect(child, LONG_WAIT, __TEST_SIOS) || check_snibs(child, 0x7f, 0x7f))
+		if (expect(child, LONG_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
 			goto failure;
 		state++;
 		break;
@@ -8619,7 +8672,7 @@ test_out_of_service_sut(int child)
 		if (do_signal(child, __TEST_SIOS))
 			goto failure;
 		state++;
-		if (expect(child, LONGER_WAIT, __TEST_SIOS) || check_snibs(child, 0x7f, 0x7f))
+		if (expect(child, LONGER_WAIT, __TEST_SIOS) || check_snibs(child, 0xff, 0xff))
 			goto failure;
 		state++;
 		break;
@@ -8670,8 +8723,6 @@ test_aligned_sut(int child)
 static int
 test_1_2_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (test_aligned_sut(child))
 		goto failure;
 	state++;
@@ -8784,8 +8835,6 @@ test_proving_sut(int child, int proving)
 static int
 test_1_3_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (test_proving_sut(child, 1))
 		goto failure;
 	state++;
@@ -8851,8 +8900,6 @@ IUT until the SIOS received from the IUT."
 static int
 test_1_4_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (test_aligned_sut(child))
 		goto failure;
 	state++;
@@ -9219,9 +9266,6 @@ test_1_5a_ptu(int child, int proving)
 	if (test_alignment_pt(child, proving, __TEST_FISU, __TEST_FISU))
 		goto failure;
 	state++;
-	if (expect(child, LONGEST_WAIT, __EVENT_NO_MSG))
-		goto failure;
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -9249,9 +9293,6 @@ test_1_5b_ptu(int child, int proving)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_FISU))
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -9483,8 +9524,6 @@ SIO received during normal proving period\
 static int
 test_1_7_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (test_proving_sut(child, 1))
 		goto failure;
 	state++;
@@ -9949,7 +9988,10 @@ test_1_9a_ptu(int child, int proving)
 static int
 test_1_9a_iut(int child, int proving)
 {
-	if (test_alignment_lpo_sut(child, proving, __EVENT_IUT_OUT_OF_SERVICE))
+	if (test_alignment_lpo_sut(child, proving, __EVENT_IUT_IN_SERVICE))
+		goto failure;
+	state++;
+	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -10312,23 +10354,6 @@ test_1_11_ptu(int child, int proving)
 	if (do_signal(child, __TEST_SIPO))
 		goto failure;
 	state++;
-	start_tt(1000);
-	state++;
-	for (;;) {
-		switch (get_event(child)) {
-		case __TEST_SIPO:
-			if (do_signal(child, __TEST_SIPO))
-				goto failure;
-			state++;
-			continue;
-		case __EVENT_TIMEOUT:
-			break;
-		default:
-			goto failure;
-		}
-		break;
-	}
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	print_more(child);
@@ -10344,9 +10369,6 @@ test_1_11_iut(int child, int proving)
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPO))
-		goto failure;
-	state++;
-	if (expect(child, 1100, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -10858,8 +10880,6 @@ test_1_15_ptu(int child, int proving)
 	if (do_signal(child, __TEST_FISU))
 		goto failure;
 	state++;
-	test_msleep(child, 5000);
-	state++;
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -10876,12 +10896,8 @@ test_1_15_iut(int child, int proving)
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
-	test_msleep(child, 1000);
-	state++;
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
-	state++;
-	test_msleep(child, 4000);
 	state++;
 	return __RESULT_SUCCESS;
       failure:
@@ -10949,8 +10965,6 @@ Timer T1 in \"Aligned not ready\" state\
 static int
 test_1_16_ptu(int child, int proving)
 {
-	long beg_time = 0;
-
 	if (test_alignment_lpo_sut(child, proving, __TEST_SIPO))
 		goto failure;
 	state++;
@@ -11060,8 +11074,6 @@ No SIO sent during normal proving period\
 static int
 test_1_17_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (test_out_of_service_sut(child))
 		goto failure;
 	state++;
@@ -11148,8 +11160,6 @@ Set and cease emergency prior to \"start alignment\"\
 static int
 test_1_18_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (test_proving_sut(child, 1))
 		goto failure;
 	state++;
@@ -11221,7 +11231,6 @@ Set emergency while in \"not aligned state\"\
 static int
 test_1_19_ptu(int child)
 {
-	long beg_time = 0;
 	int origin = state;
 
 	for (;;) {
@@ -11229,6 +11238,7 @@ test_1_19_ptu(int child)
 		case 0:
 			if (test_aligned_sut(child))
 				goto failure;
+			origin = state;
 			if (start_tt(LONG_WAIT))
 				goto failure;
 			state++;
@@ -11338,7 +11348,6 @@ Set emergency when \"aligned\"\
 static int
 test_1_20_ptu(int child)
 {
-	long beg_time = 0;
 	int origin = state;
 
 	for (;;) {
@@ -11346,16 +11355,15 @@ test_1_20_ptu(int child)
 		case 0:
 			if (test_proving_sut(child, 1))
 				goto failure;
+			origin = state;
+			beg_time = milliseconds(child, t4e);
 			if (do_signal(child, last_event))
 				goto failure;
-			beg_time = 0;
 			state++;
 			continue;
 		case 1:
 			switch (get_event(child)) {
 			case __MSG_PROVING:
-				if (!beg_time)
-					beg_time = milliseconds(child, t4e);
 				if (do_signal(child, __MSG_PROVING))
 					goto failure;
 				print_less(child);
@@ -11366,15 +11374,13 @@ test_1_20_ptu(int child)
 				print_less(child);
 				continue;
 			case __TEST_SIE:
-				if (!beg_time)
-					beg_time = milliseconds(child, t4e);
 				if (do_signal(child, __TEST_SIN))
 					goto failure;
 				print_less(child);
 				continue;
 			case __TEST_FISU:
 				print_more(child);
-				if (!beg_time || check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
+				if (check_time(child, "T4  ", beg_time, timer[t4e].lo, timer[t4e].hi))
 					goto failure;
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
@@ -11534,7 +11540,6 @@ Set emergency during normal proving\
 static int
 test_1_23_ptu(int child)
 {
-	long beg_time = 0;
 	int origin = state;
 
 	for (;;) {
@@ -11542,6 +11547,7 @@ test_1_23_ptu(int child)
 		case 0:
 			if (test_proving_sut(child, 1))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_SIN))
 				goto failure;
 			beg_time = 0;
@@ -11617,7 +11623,6 @@ No SIO sent during emergency alignment\
 static int
 test_1_24_ptu(int child)
 {
-	long beg_time = 0;
 	int origin = state;
 
 	for (;;) {
@@ -11625,6 +11630,7 @@ test_1_24_ptu(int child)
 		case 0:
 			if (test_out_of_service_sut(child))
 				goto failure;
+			origin = state;
 			state++;
 			continue;
 		case 1:
@@ -11714,6 +11720,7 @@ test_1_25_ptu(int child)
 		case 0:
 			if (test_aligned_sut(child))
 				goto failure;
+			origin = state;
 			state++;
 			continue;
 		case 1:
@@ -11780,6 +11787,7 @@ test_1_26_ptu(int child)
 		case 0:
 			if (test_aligned_sut(child))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
@@ -11842,6 +11850,7 @@ test_1_27_ptu(int child, int proving)
 		case 0:
 			if (test_alignment_lpo_sut(child, proving, __TEST_SIPO))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
@@ -12412,6 +12421,7 @@ test_1_32a_ptu(int child)
 		case 0:
 			if (test_proving_sut(child, 1))
 				goto failure;
+			origin = state;
 			if (do_signal(child, last_event))
 				goto failure;
 			if (start_tt(config->sl.t4n / 2))
@@ -12545,6 +12555,7 @@ test_1_33_ptu(int child)
 		case 0:
 			if (test_alignment_sut(child, 1, __TEST_FISU))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
@@ -12607,6 +12618,7 @@ test_1_34_ptu(int child)
 		case 0:
 			if (test_alignment_sut(child, 1, __TEST_FISU))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_SIOS))
 				goto failure;
 			state++;
@@ -12825,6 +12837,7 @@ test_2_2_ptu(int child)
 		case 0:
 			if (test_aligned_sut(child))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_SIOS))
 				goto failure;
 			if (do_signal(child, __TEST_SIPO))
@@ -12914,6 +12927,7 @@ test_2_3_ptu(int child)
 		case 0:
 			if (test_proving_sut(child, 1))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			if (do_signal(child, __TEST_SIPO))
@@ -13004,6 +13018,7 @@ test_2_4_ptu(int child)
 		case 0:
 			if (test_proving_sut(child, 1))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_SIN))
 				goto failure;
 			if (do_signal(child, __TEST_SIPO))
@@ -13011,10 +13026,6 @@ test_2_4_ptu(int child)
 			if (do_signal(child, __TEST_SIB))
 				goto failure;
 			if (do_signal(child, __TEST_SIX))
-				goto failure;
-			if (do_signal(child, __TEST_FISU))
-				goto failure;
-			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
 			continue;
@@ -13384,6 +13395,7 @@ test_3_1_ptu(int child)
 		case 0:
 			if (test_alignment_sut(child, 1, __TEST_FISU))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
@@ -13520,6 +13532,7 @@ test_3_3_ptu(int child)
 		case 0:
 			if (test_alignment_lpo_sut(child, 1, __TEST_SIPO))
 				goto failure;
+			origin = state;
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
@@ -13583,7 +13596,9 @@ test_3_4_ptu(int child)
 		case 0:
 			if (test_alignment_lpo_sut(child, 1, __TEST_SIPO))
 				goto failure;
-			if (do_signal(child, __TEST_BAD_ACK))
+			origin = state;
+			fib[child] ^= 0x80;
+			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
 			continue;
@@ -13591,8 +13606,9 @@ test_3_4_ptu(int child)
 			switch (wait_event(child, SHORT_WAIT)) {
 			case __TEST_SIPO:
 			case __EVENT_NO_MSG:
-				if (do_signal(child, __TEST_BAD_ACK))
+				if (do_signal(child, __TEST_FISU))
 					goto failure;
+				fib[child] ^= 0x80;
 				state++;
 				continue;
 			default:
@@ -14198,11 +14214,13 @@ test_4_1b_ptu(int child)
 		}
 		break;
 	}
+#if 0
 	/* ( 5) Send another data message from SP B to SP A and send another MSU from SP A to SP B
 	   (during the processor outage period). */
 	if (do_signal(child, __TEST_MSU))
 		goto failure;
 	state++;
+#endif
 	/* ( 6) Check that SP A acknowledges the data message sent to it during the processor
 	   outage period. */
 	for (;;) {
@@ -14320,9 +14338,11 @@ test_4_1b_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
+#if 0
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
+#endif
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPR))
 		goto failure;
 	state++;
@@ -14404,6 +14424,9 @@ test_4_2_iut(int child)
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPR))
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_LPR))
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -17028,11 +17051,12 @@ test_8_9b_ptu(int child)
 		goto failure;
 	/* FIXME: check snibs for ack */
 	state++;
-	if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_ENDED))
+	if (expect(child, INFINITE_WAIT, __TEST_SIPO))
 		goto failure;
 	state++;
-	if (do_signal(child, __STATUS_SEQUENCE_SYNC))
+	if (do_signal(child, __TEST_FISU))
 		goto failure;
+	/* FIXME: check snibs for synchronizing fisu */
 	state++;
 	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
@@ -17295,7 +17319,6 @@ Single data\
 static int
 test_8_12a_ptu(int child)
 {
-	long beg_time = 0;
 	int origin = state;
 
 	for (;;) {
@@ -17392,8 +17415,6 @@ Multiple data\
 static int
 test_8_12b_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
 	state++;
@@ -19305,20 +19326,16 @@ After receive congestion\
 static int
 test_10_2b_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SIB))
 		goto failure;
 	state++;
+	/* FIXME: need to send sib every t5 */
 	beg_time = milliseconds(child, t6);
 	state++;
 	if (expect(child, config->sl.t6 - 300, __EVENT_NO_MSG))
-		goto failure;
-	state++;
-	if (do_signal(child, __STATUS_BUSY_ENDED))
 		goto failure;
 	state++;
 	beg_time = milliseconds(child, t7);
@@ -19366,20 +19383,16 @@ After receive congestion\
 static int
 test_10_2c_ptu(int child)
 {
-	long beg_time = 0;
-
 	if (expect(child, INFINITE_WAIT, __TEST_MSU))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SIB))
 		goto failure;
 	state++;
+	/* FIXME: need to send sib every t5 */
 	beg_time = milliseconds(child, t6);
 	state++;
 	if (expect(child, config->sl.t6 - 300, __EVENT_NO_MSG))
-		goto failure;
-	state++;
-	if (do_signal(child, __STATUS_BUSY_ENDED))
 		goto failure;
 	state++;
 	beg_time = milliseconds(child, t7);

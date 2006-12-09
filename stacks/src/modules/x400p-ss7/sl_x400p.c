@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/08 12:16:13 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 12:16:13 $ by $Author: brian $
+ Last Modified $Date: 2006/12/09 10:40:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.25  2006/12/09 10:40:24  brian
+ - corrections from testing
+
  Revision 0.9.2.24  2006/12/08 12:16:13  brian
  - bufq lock correction
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/08 12:16:13 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/08 12:16:13 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -135,7 +138,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/08 12:16:13 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -628,7 +631,7 @@ sl_pdu_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_PDU_IND;
 		mp->b_cont = dp;
-		printd(("%s: %p: <- SL_PDU_IND\n", DRV_NAME, xp));
+		_printd(("%s: %p: <- SL_PDU_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -1057,7 +1060,7 @@ sdt_rc_signal_unit_ind(struct xp *xp, queue_t *q, mblk_t *dp, ulong count)
 				p->sdt_primitive = SDT_RC_SIGNAL_UNIT_IND;
 				p->sdt_count = count;
 				mp->b_cont = dp;
-				printd(("%s: %p: <- SDT_RC_SIGNAL_UNIT_IND\n", DRV_NAME, xp));
+				_printd(("%s: %p: <- SDT_RC_SIGNAL_UNIT_IND\n", DRV_NAME, xp));
 				ss7_oput(xp->oq, mp);
 				return (QR_ABSORBED);
 			}
@@ -1227,11 +1230,11 @@ sdt_txc_transmission_request_ind(struct xp *xp, queue_t *q)
 	sdt_txc_transmission_request_ind_t *p;
 
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_TXC_TRANSMISSION_REQUEST_IND;
-		printd(("%s: %p: <- SDT_TXC_TRANSMISSION_REQUEST_IND\n", DRV_NAME, xp));
+		_printd(("%s: %p: <- SDT_TXC_TRANSMISSION_REQUEST_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1368,15 +1371,17 @@ lmi_disable_con(struct xp *xp, queue_t *q)
 	mblk_t *mp;
 	lmi_disable_con_t *p;
 
-	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
-		p->lmi_primitive = LMI_DISABLE_CON;
-		p->lmi_state = xp->i_state = LMI_DISABLED;
-		printd(("%s: %p: <- LMI_DISABLE_CON\n", DRV_NAME, xp));
-		ss7_oput(xp->oq, mp);
-		return (QR_DONE);
+	if (putctl2(xp->oq, M_FLUSH, FLUSHRW, 0)) {
+		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
+			mp->b_datap->db_type = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
+			p->lmi_primitive = LMI_DISABLE_CON;
+			p->lmi_state = xp->i_state = LMI_DISABLED;
+			printd(("%s: %p: <- LMI_DISABLE_CON\n", DRV_NAME, xp));
+			ss7_oput(xp->oq, mp);
+			return (QR_DONE);
+		}
 	}
 	rare();
 	return (-ENOBUFS);
@@ -1419,7 +1424,7 @@ lmi_error_ind(struct xp *xp, queue_t *q, ulong errno, ulong reason)
 	lmi_error_ind_t *p;
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_IND;
@@ -1810,8 +1815,8 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifgmode = SDL_GMODE_NONE,
 	.ifgcrc = SDL_GCRC_CRC6,
 	.ifclock = SDL_CLOCK_SLAVE,
-	.ifcoding = SDL_CODING_AMI,
-	.ifframing = SDL_FRAMING_SF,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
 	.ifblksize = 8,
 	.ifleads = 0,
 	.ifbpv = 0,
@@ -1830,10 +1835,10 @@ STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifgrate = 1544000,
 	.ifmode = SDL_MODE_PEER,
 	.ifgmode = SDL_GMODE_NONE,
-	.ifgcrc = SDL_GCRC_CRC6,
+	.ifgcrc = SDL_GCRC_CRC6J,
 	.ifclock = SDL_CLOCK_SLAVE,
-	.ifcoding = SDL_CODING_AMI,
-	.ifframing = SDL_FRAMING_SF,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
 	.ifblksize = 8,
 	.ifleads = 0,
 	.ifbpv = 0,
@@ -1858,92 +1863,110 @@ enum { tall, t1, t2, t3, t4, t5, t6, t7, t8, t9 };
 static void
 xp_stop_timer_t1(struct xp *xp)
 {
+	printd(("%s: %p: -> T1 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sl.timers.t1);
 }
 static void
 xp_start_timer_t1(struct xp *xp)
 {
+	printd(("%s: %p: -> T1 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t1, drv_hztomsec(xp->sl.config.t1), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t1, xp->sl.config.t1);
 }
 static void
 xp_stop_timer_t2(struct xp *xp)
 {
+	printd(("%s: %p: -> T2 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sl.timers.t2);
 }
 static void
 xp_start_timer_t2(struct xp *xp)
 {
+	printd(("%s: %p: -> T2 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t2, drv_hztomsec(xp->sl.config.t2), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t2, xp->sl.config.t2);
 }
 static void
 xp_stop_timer_t3(struct xp *xp)
 {
+	printd(("%s: %p: -> T3 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sl.timers.t3);
 }
 static void
 xp_start_timer_t3(struct xp *xp)
 {
+	printd(("%s: %p: -> T3 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t3, drv_hztomsec(xp->sl.config.t3), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t3, xp->sl.config.t3);
 }
 static void
 xp_stop_timer_t4(struct xp *xp)
 {
+	printd(("%s: %p: -> T4 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sl.timers.t4);
 }
 static void
 xp_start_timer_t4(struct xp *xp)
 {
+	printd(("%s: %p: -> T4 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.statem.t4v, drv_hztomsec(xp->sl.statem.t4v), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t4, xp->sl.statem.t4v);
 }
 static void
 xp_stop_timer_t5(struct xp *xp)
 {
+	printd(("%s: %p: -> T5 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sl.timers.t5);
 }
 static void
 xp_start_timer_t5(struct xp *xp)
 {
+	printd(("%s: %p: -> T5 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t5, drv_hztomsec(xp->sl.config.t5), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t5, xp->sl.config.t5);
 }
 static void
 xp_stop_timer_t6(struct xp *xp)
 {
+	printd(("%s: %p: -> T6 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sl.timers.t6);
 }
 static void
 xp_start_timer_t6(struct xp *xp)
 {
+	printd(("%s: %p: -> T6 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t6, drv_hztomsec(xp->sl.config.t6), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t6, xp->sl.config.t6);
 }
 static void
 xp_stop_timer_t7(struct xp *xp)
 {
+	printd(("%s: %p: -> T7 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sl.timers.t7);
 }
 static void
 xp_start_timer_t7(struct xp *xp)
 {
+	printd(("%s: %p: -> T7 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t7, drv_hztomsec(xp->sl.config.t7), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t7, xp->sl.config.t7);
 }
 static void
 xp_stop_timer_t8(struct xp *xp)
 {
+	printd(("%s: %p: -> T8 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sdt.timers.t8);
 }
 static void
 xp_start_timer_t8(struct xp *xp)
 {
+	printd(("%s: %p: -> T8 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sdt.config.t8, drv_hztomsec(xp->sdt.config.t8), (uint) HZ));
 	mi_timer_MAC(xp->sdt.timers.t8, xp->sdt.config.t8);
 }
 #if 0
 static void
 xp_stop_timer_t9(struct xp *xp)
 {
+	printd(("%s: %p: -> T9 STOP <-\n", DRV_NAME, xp));
 	mi_timer_stop(xp->sdl.timers.t9);
 }
 static void
 xp_start_timer_t9(struct xp *xp)
 {
+	printd(("%s: %p: -> T9 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sdl.config.t9, drv_hztomsec(xp->sdl.config.t9), (uint) HZ));
 	mi_timer_MAC(xp->sdl.timers.t9, xp->sdl.config.t9);
 }
 #endif
@@ -7166,21 +7189,26 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			cd->eval_syncsrc = 1;
 			cd->xlb[CTLREG] = (E1DIV);
 			cd->xlb[LEDREG] = 0xff;
+#if 0
 			/* zero all span registers */
 			for (offset = 0; offset < 192; offset++)
 				xlb[offset] = 0x00;
+#endif
 			switch (cd->board) {
 			case E400P:
 			case E400PSS7:
 			{
 				uint8_t ccr1 = 0, tcr1 = 0;
 
+#if 0
 				/* Set up for interleaved serial bus operation, byte mode */
 				if (sp->span == 0)
 					xlb[0xb5] = 0x09;
 				else
 					xlb[0xb5] = 0x08;
+#endif
 				xlb[0x1a] = 0x04;	/* CCR2: set LOTCMC */
+				/* wierd thing to do */
 				for (offset = 0; offset <= 8; offset++)
 					xlb[offset] = 0x00;
 				for (offset = 0x10; offset <= 0x4f; offset++)
@@ -7245,6 +7273,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 				xlb[0x20] = 0x1b;	/* TAFR */
 				xlb[0x21] = 0x5f;	/* TNAFR */
 				xlb[0x40] = 0x0b;	/* TSR1 */
+				/* wierd thing to do */
 				for (offset = 0x41; offset <= 0x4f; offset++)
 					xlb[offset] = 0x55;
 				for (offset = 0x22; offset <= 0x25; offset++)
@@ -7274,12 +7303,14 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 				   TSYSCLK and RSYSCLK inputs are stable, the receive and transmit
 				   elastic stores should be reset (this step can be skipped if the
 				   elastic stores are disabled). */
+#if 0
 				xlb[0x00] = 0x02;	/* E1 mode */
 				/* Note that we could change the order of interleave here (3 -
 				   span) to accomodate little-endian or big-endian word reads, hah! 
 				 */
 				xlb[0xc5] = 0x28 + sp->span;	/* 4 devices channel interleaved on 
 								   bus */
+#endif
 				/* There are three other synchronization modes: 0x00 TCLK only,
 				   0x02 switch to RCLK if TCLK fails, 0x04 external clock, 0x06
 				   loop.  And then 0x80 selects the TSYSCLK pin instead of the MCLK 
@@ -7401,8 +7432,10 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			cd->eval_syncsrc = 1;
 			cd->xlb[CTLREG] = 0;
 			cd->xlb[LEDREG] = 0xff;
+#if 0
 			for (offset = 0; offset < 160; offset++)
 				xlb[offset] = 0x00;
+#endif
 
 			switch (cd->board) {
 			case T400P:
@@ -7410,11 +7443,13 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			{
 				unsigned char val;
 
+#if 0
 				/* Set up for interleaved serial bus operation, byte mode */
 				if (sp->span == 0)
 					xlb[0x94] = 0x09;
 				else
 					xlb[0x94] = 0x08;
+#endif
 				xlb[0x2b] = 0x08;	/* Full-on sync required (RCR1) */
 				xlb[0x2c] = 0x08;	/* RSYNC is an input (RCR2) */
 				xlb[0x35] = 0x10;	/* RBS enable (TCR1) */
@@ -7518,12 +7553,14 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 				   TSYSCLK and RSYSCLK inputs are stable, the receive and transmit
 				   elastic stores should be reset (this step can be skipped if the
 				   elastic stores are disabled). */
+#if 0
 				xlb[0x00] = 0x00;	/* T1 mode */
 				/* Note that we could change the order of interleave here (3 -
 				   span) to accomodate little-endian or big-endian word reads, hah! 
 				 */
 				xlb[0xc5] = 0x28 + sp->span;	/* 4 devices channel interleaved on 
 								   bus */
+#endif
 				/* There are three other synchronization modes: 0x00 TCLK only,
 				   0x02 switch to RCLK if TCLK fails, 0x04 external clock, 0x06
 				   loop.  And then 0x80 selects the TSYSCLK pin instead of the MCLK 
@@ -7803,6 +7840,19 @@ sl_iocgconfig(queue_t *q, mblk_t *mp)
 			*arg = xp->sl.config;
 		}
 		spin_unlock_irqrestore(&xp->lock, flags);
+
+		/* convert HZ to milliseconds for output */
+		arg->t1 = drv_hztomsec(arg->t1);
+		arg->t2 = drv_hztomsec(arg->t2);
+		arg->t2l = drv_hztomsec(arg->t2l);
+		arg->t2h = drv_hztomsec(arg->t2h);
+		arg->t3 = drv_hztomsec(arg->t3);
+		arg->t4n = drv_hztomsec(arg->t4n);
+		arg->t4e = drv_hztomsec(arg->t4e);
+		arg->t5 = drv_hztomsec(arg->t5);
+		arg->t6 = drv_hztomsec(arg->t6);
+		arg->t7 = drv_hztomsec(arg->t7);
+
 		return (ret);
 	}
 	rare();
@@ -7816,6 +7866,18 @@ sl_iocsconfig(queue_t *q, mblk_t *mp)
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
 		psw_t flags = 0;
+
+		/* convert milliseconds to HZ for input */
+		arg->t1 = drv_msectohz(arg->t1);
+		arg->t2 = drv_msectohz(arg->t2);
+		arg->t2l = drv_msectohz(arg->t2l);
+		arg->t2h = drv_msectohz(arg->t2h);
+		arg->t3 = drv_msectohz(arg->t3);
+		arg->t4n = drv_msectohz(arg->t4n);
+		arg->t4e = drv_msectohz(arg->t4e);
+		arg->t5 = drv_msectohz(arg->t5);
+		arg->t6 = drv_msectohz(arg->t6);
+		arg->t7 = drv_msectohz(arg->t7);
 
 		spin_lock_irqsave(&xp->lock, flags);
 		{
@@ -8087,6 +8149,8 @@ sdt_commit_config(struct xp *xp, sdt_config_t * arg)
 {
 	psw_t flags = 0;
 
+	arg->t8 = drv_msectohz(arg->t8);
+
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		sdt_test_config(xp, arg);
@@ -8145,6 +8209,9 @@ sdt_iocgconfig(queue_t *q, mblk_t *mp)
 			*arg = xp->sdt.config;
 		}
 		spin_unlock_irqrestore(&xp->lock, flags);
+
+		arg->t8 = drv_hztomsec(arg->t8);
+
 		return (0);
 	}
 	rare();
@@ -8157,6 +8224,8 @@ sdt_iocsconfig(queue_t *q, mblk_t *mp)
 		struct xp *xp = XP_PRIV(q);
 		psw_t flags = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
+		arg->t8 = drv_msectohz(arg->t8);
 
 		spin_lock_irqsave(&xp->lock, flags);
 		{
@@ -10951,7 +11020,7 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case SL_PDU_REQ:
-		printd(("%s: %p: -> SL_PDU_REQ\n", DRV_NAME, xp));
+		_printd(("%s: %p: -> SL_PDU_REQ\n", DRV_NAME, xp));
 		rtn = sl_pdu_req(q, mp);
 		break;
 	case SL_EMERGENCY_REQ:
@@ -11011,7 +11080,7 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 		rtn = sl_power_on_req(q, mp);
 		break;
 	case SDT_DAEDT_TRANSMISSION_REQ:
-		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ\n", DRV_NAME, xp));
+		_printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ\n", DRV_NAME, xp));
 		rtn = sdt_daedt_transmission_req(q, mp);
 		break;
 	case SDT_DAEDT_START_REQ:
@@ -11047,7 +11116,7 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 		rtn = sdt_suerm_stop_req(q, mp);
 		break;
 	case SDL_BITS_FOR_TRANSMISSION_REQ:
-		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ\n", DRV_NAME, xp));
+		_printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ\n", DRV_NAME, xp));
 		rtn = sdl_bits_for_transmission_req(q, mp);
 		break;
 	case SDL_CONNECT_REQ:
@@ -12093,12 +12162,9 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		  xp_device_info[cd->device].name, (char) (cd->devrev + 65)));
 
 	{
-		int word, idle_word = xp_board_info[cd->board].idle_word;
-
+		int ebuf, word, idle_word = xp_board_info[cd->board].idle_word;
 		/* idle out all channels */
 		for (word = 0; word < 256; word++) {
-			int ebuf;
-
 			cd->xll[word] = idle_word;
 			for (ebuf = 0; ebuf < X400P_EBUFNO; ebuf++)
 				cd->wbuf[(ebuf << 8) + word] = idle_word;
@@ -12109,18 +12175,44 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	case V400PE:
 	case E400P:
 	case E400PSS7:
+	{
+		int span, offset;
+
 		/* setup E1 card defaults */
 		cd->config = sdl_default_e1_chan;
 		cd->isr = &xp_e400_interrupt;
+		/* zero all span registers */
+		for (span = 0; span < X400_SPANS; span++)
+			for (offset = 0; offset < 192; offset++)
+				cd->xlb[(span << 8) + offset] = 0x00;
+		/* set up for interleaved serial bus operation, byte mode */
+		cd->xlb[(0 << 8) + 0xb5] = 0x09;
+		cd->xlb[(1 << 8) + 0xb5] = 0x08;
+		cd->xlb[(2 << 8) + 0xb5] = 0x08;
+		cd->xlb[(3 << 8) + 0xb5] = 0x08;
+	}
 		break;
 	case V401PE:
 		/* setup E1 card defaults */
 		cd->config = sdl_default_e1_chan;
 		cd->isr = &xp_e401_interrupt;
+		/* place all framers in E1 mode */
+		cd->xlb[(0 << 8) + 0x00] = 0x02;
+		cd->xlb[(1 << 8) + 0x00] = 0x02;
+		cd->xlb[(2 << 8) + 0x00] = 0x02;
+		cd->xlb[(3 << 8) + 0x00] = 0x02;
+		/* set up for interleaved serial bus operation, byte mode */
+		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
+		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
+		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
+		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
 		break;
 	case V400PT:
 	case T400P:
 	case T400PSS7:
+	{
+		int span, offset;
+
 #if 0
 		if (!japan) {
 			/* setup T1 card defaults */
@@ -12136,6 +12228,16 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->config = sdl_default_t1_chan;
 		cd->isr = &xp_t400_interrupt;
 #endif
+		/* zero all span registers */
+		for (span = 0; span < X400_SPANS; span++)
+			for (offset = 0; offset < 160; offset++)
+				cd->xlb[(span << 8) + offset] = 0x00;
+		/* set up for interleaved serial bus operation, byte mode */
+		cd->xlb[(0 << 8) + 0x94] = 0x09;
+		cd->xlb[(1 << 8) + 0x94] = 0x08;
+		cd->xlb[(2 << 8) + 0x94] = 0x08;
+		cd->xlb[(3 << 8) + 0x94] = 0x08;
+	}
 		break;
 	case V401PT:
 #if 0
@@ -12154,6 +12256,16 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->config = sdl_default_t1_chan;
 		cd->isr = &xp_t401_interrupt;
 #endif
+		/* place all framers in T1 mode */
+		cd->xlb[(0 << 8) + 0x00] = 0x00;
+		cd->xlb[(1 << 8) + 0x00] = 0x00;
+		cd->xlb[(2 << 8) + 0x00] = 0x00;
+		cd->xlb[(3 << 8) + 0x00] = 0x00;
+		/* set up for interleaved serial bus operation, byte mode */
+		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
+		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
+		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
+		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
 		break;
 	default:
 		swerr();
