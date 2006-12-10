@@ -106,6 +106,8 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
+#include <stdbool.h>
+
 #ifdef LINUX
 #include <linux/ioport.h>
 #include <asm/io.h>
@@ -1816,7 +1818,7 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifgcrc = SDL_GCRC_CRC6,
 	.ifclock = SDL_CLOCK_SLAVE,
 	.ifcoding = SDL_CODING_B8ZS,
-	.ifframing = SDL_FRAMING_ESF,
+	.ifframing = SDL_FRAMING_D4,
 	.ifblksize = 8,
 	.ifleads = 0,
 	.ifbpv = 0,
@@ -1838,7 +1840,7 @@ STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifgcrc = SDL_GCRC_CRC6J,
 	.ifclock = SDL_CLOCK_SLAVE,
 	.ifcoding = SDL_CODING_B8ZS,
-	.ifframing = SDL_FRAMING_ESF,
+	.ifframing = SDL_FRAMING_D4,
 	.ifblksize = 8,
 	.ifleads = 0,
 	.ifbpv = 0,
@@ -1849,6 +1851,409 @@ STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifsyncsrc = {0, 0, 0, 0}
 	,
 };
+
+STATIC int
+xp_span_config(struct cd *cd, int span, bool enable)
+{
+	struct sp *sp = cd->spans[span];
+	volatile unsigned char *xlb = &cd->xlb[span << 8];
+	int offset;
+#if 0
+	unsigned long timeout;
+#endif
+	switch (cd->board) {
+	case E400P:
+	case E400PSS7:
+	{
+		uint8_t ccr1 = 0, tcr1 = 0, reg18 = 0, regac = 0;
+
+		xlb[0x1a] = 0x04;	/* CCR2: set LOTCMC */
+#if 1
+		/* wierd thing to do */
+		for (offset = 0; offset <= 8; offset++)
+			xlb[offset] = 0x00;
+		for (offset = 0x10; offset <= 0x4f; offset++)
+			if (offset != 0x1a)
+				xlb[offset] = 0x00;
+#endif
+		xlb[0x10] = 0x20;	/* RCR1: Rsync as input */
+		xlb[0x11] = 0x06;	/* RCR2: Sysclk = 2.048 Mhz */
+		xlb[0x12] = 0x09;	/* TCR1: TSiS mode */
+		tcr1 = 0x09;	/* TCR1: TSiS mode */
+		switch (sp->config.ifframing) {
+		default:
+		case SDL_FRAMING_CCS:
+			ccr1 |= 0x08;
+			break;
+		case SDL_FRAMING_CAS:
+			tcr1 |= 0x20;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+		case SDL_CODING_HDB3:
+			ccr1 |= 0x44;
+			break;
+		case SDL_CODING_AMI:
+			ccr1 |= 0x00;
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			ccr1 |= 0x11;
+			break;
+		default:
+			ccr1 |= 0x00;
+			break;
+		}
+		xlb[0x12] = tcr1;
+		xlb[0x14] = ccr1;
+
+		if (sp->config.iftxlevel < 8) {
+			/* not monitoring mode */
+			regac = 0x00;	/* TEST3 no gain */
+			reg18 = 0x00;	/* 75 Ohm, Normal, transmitter on */
+			reg18 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			regac = 0x00;	/* TEST3 no gain */
+			reg18 = 0x01;	/* 75 Ohm norm, transmitter off */
+			switch (sp->config.iftxlevel & 0x3) {
+			case 0:
+				break;
+			case 1:
+				regac |= 0x72;	/* TEST3 12dB gain */
+				break;
+			case 2:
+			case 3:
+				regac |= 0x70;	/* TEST3 30dB gain */
+				break;
+			}
+		}
+		reg18 |= (enable ? 0x00 : 0x01);	/* power transmitters? */
+
+		xlb[0xac] = regac;
+		xlb[0x18] = reg18;
+
+		xlb[0x1b] = 0x8a;	/* CRC3: LIRST & TSCLKM */
+		xlb[0x20] = 0x1b;	/* TAFR */
+		xlb[0x21] = 0x5f;	/* TNAFR */
+		xlb[0x40] = 0x0b;	/* TSR1 */
+		/* wierd thing to do */
+		for (offset = 0x41; offset <= 0x4f; offset++)
+			xlb[offset] = 0x55;
+		for (offset = 0x22; offset <= 0x25; offset++)
+			xlb[offset] = 0xff;
+#if 0
+		timeout = jiffies + 100 * HZ / 1000;
+		spin_unlock_irqrestore(&cd->lock, flags);
+		while (jiffies < timeout) ;
+		spin_lock_irqsave(&cd->lock, flags);
+#endif
+		xlb[0x1b] = 0x9a;	/* CRC3: set ESR as well */
+		xlb[0x1b] = 0x82;	/* CRC3: TSCLKM only */
+		break;
+	}
+	case V401PE:
+	{
+		u_char reg33, reg35, reg40, reg78, reg7a;
+
+		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK 
+		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
+		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
+		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
+		xlb[0x70] = 0x02;	/* LOTCMC into TCSS0 */
+		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 
+		   RSYNC is an input (elastic store). */
+		xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
+		xlb[0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#if 0
+		/* We should really reset the elastic store after reset like so: */
+		xlb[0x4f] = 0x55;	/* RES/TES (elastic store) reset */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+		/* And even align it like so: */
+		xlb[0x4f] = 0x99;	/* RES/TES (elastic store) reset */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#endif
+		reg33 = 0x00;
+		reg35 = 0x10;	/* TSiS */
+		reg40 = 0x00;
+
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
+		case SDL_FRAMING_CCS:
+			reg40 |= 0x06;
+			reg33 |= 0x40;
+			break;
+		case SDL_FRAMING_CAS:
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
+		case SDL_CODING_HDB3:
+			reg33 |= 0x20;
+			reg35 |= 0x04;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			reg33 |= 0x08;
+			reg35 |= 0x01;
+			break;
+		default:
+			break;
+		}
+		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic
+		   AIS generation (0x02) (E1). */
+		xlb[0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from O14.6) */
+		xlb[0x36] = 0x04;	/* AEBE 36.2 */
+		xlb[0x33] = reg33;	/* RCR4, RHDB3, RSM */
+		xlb[0x34] = 0x01;	/* RCL (1ms) */
+		xlb[0x40] = reg40;	/* RCCS, TCCS */
+		/* This is a little peculiar: the host should be using Method 3 in section 22.3 of
+		   the DS2155 manual instead of this method that only permits 250us to read or
+		   write the bits. */
+		xlb[0xd0] = 0x1b;	/* TAFR */
+		xlb[0xd1] = 0x5f;	/* TNAFR */
+
+		xlb[0x79] = 0x98;	/* JACLK on for E1 */
+		xlb[0x7b] = 0x0f;	/* 120 Ohm term, MCLK 2.048 MHz */
+
+		/* We use TX levels to determine LBO, impedance, CSU operation, or monitoring
+		   operation.  During monitoring operation, the transmitters are powered off. */
+		/* For E1, LBO is: 000XXXXX 75 Ohm normal 001XXXXX 120 Ohm normal 100XXXXX 75 Ohm
+		   high return loss 101XXXXX 120 Ohm high return loss For T1, LBO is: 000XXXXX
+		   DSX-1 ( 0ft - 133ft) / 0dB CSU 001XXXXX DSX-1 (133ft - 266ft) 010XXXXX DSX-1
+		   (266ft - 399ft) 011XXXXX DSX-1 (399ft - 533ft) 100XXXXX DSX-1 (533ft - 666ft)
+		   101XXXXX -7.5dB CSU 110XXXXX -15.0dB CSU 111XXXXX -22.5dB CSU txlevel 0000 TX on 
+		   DSX-1 ( 0ft - 133ft) / 0dB CSU or 75 Ohm normal 0001 TX on DSX-1 (133ft - 266ft) 
+		   or 120 Ohm normal 0010 TX on DSX-1 (266ft - 399ft) or (invalid) 0011 TX on DSX-1 
+		   (399ft - 533ft) or (invalid) 0100 TX on DSX-1 (533ft - 666ft) or 75 Ohm high RL
+		   0101 TX on -7.5dB CSU or 120 Ohm high RL 0110 TX on -15.0dB CSU or (invalid)
+		   0111 TX on -22.5dB CSU or (invalid) 1000 TX off 0dB Gain monitoring mode 1001 TX 
+		   off 20dB Gain monitoring mode 1010 TX off 26dB Gain monitoring mode 1011 TX off
+		   32dB Gain monitoring mode 1100 (invalid) 1101 (invalid) 1110 (invalid) 1111
+		   (invalid) */
+
+		if (sp->config.iftxlevel < 8) {
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x01;	/* 120 Ohm normal, transmitter on */
+			reg78 |= ((sp->config.iftxlevel & 0x1) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x20;	/* 120 Ohm normal, transmitter off */
+			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
+		}
+		reg78 &= (enable ? ~0x00 : ~0x01);	/* power transmitters? */
+
+		xlb[0x7a] = reg7a;
+		xlb[0x78] = reg78;
+		break;
+	}
+	case T400P:
+	case T400PSS7:
+	{
+		unsigned char val, reg09, reg7c;
+		int japan = (cd->config.ifgtype == SDL_GTYPE_J1);
+
+		xlb[0x2b] = 0x08;	/* Full-on sync required (RCR1) */
+		xlb[0x2c] = 0x08;	/* RSYNC is an input (RCR2) */
+		xlb[0x35] = 0x10;	/* RBS enable (TCR1) */
+		xlb[0x36] = 0x04;	/* TSYNC to be output (TCR2) */
+		xlb[0x37] = 0x9c;	/* Tx & Rx Elastic stor, sysclk(s) = 2.048 mhz, loopback
+					   controls (CCR1) */
+
+		xlb[0x12] = 0x22;	/* IBCC 5-bit loop up, 3-bit loop down code */
+		xlb[0x13] = 0x80;	/* TCD - 10000 */
+		xlb[0x14] = 0x80;	/* RUPCD - 10000 */
+		xlb[0x15] = 0x80;	/* RDNCD - 100 */
+
+		xlb[0x19] = japan ? 0x80 : 0x00;	/* set japanese mode, no local loop */
+		xlb[0x1e] = japan ? 0x80 : 0x00;	/* set japanese mode, no local loop */
+
+		/* Enable F bits pattern */
+		switch (sp->config.ifframing) {
+		default:
+		case SDL_FRAMING_SF:
+			val = 0x20;
+			break;
+		case SDL_FRAMING_ESF:
+			val = 0x88;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+		case SDL_CODING_AMI:
+			break;
+		case SDL_CODING_B8ZS:
+			val |= 0x44;
+			break;
+		}
+		xlb[0x38] = val;
+		if (sp->config.ifcoding != SDL_CODING_B8ZS)
+			xlb[0x7e] = 0x1c;	/* Set FDL register to 0x1c */
+		if (sp->config.iftxlevel < 8) {
+			/* not monitoring mode */
+			reg09 = 0x00;	/* TEST2 no gain */
+			reg7c = 0x00;	/* 0dB CSU, transmitters on */
+			reg7c |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg09 = 0x00;	/* TEST2 no gain */
+			reg7c = 0x01;	/* 0dB CSU, transmitters off */
+			switch (sp->config.iftxlevel & 0x3) {
+			case 1:
+				reg09 |= 0x72;	/* TEST2 12dB gain */
+				break;
+			case 2:
+			case 3:
+				reg09 |= 0x70;	/* TEST2 20db gain */
+				break;
+			}
+		}
+		reg7c |= (enable ? 0x00 : 0x01);	/* power trasnmitters? */
+
+		xlb[0x09] = reg09;
+		xlb[0x7c] = reg7c;
+#if 0
+		xlb[0x0a] = 0x80;	/* LIRST to reset line interface */
+		timeout = jiffies + 100 * HZ / 1000;
+		spin_unlock_irqrestore(&cd->lock, flags);
+		while (jiffies < timeout) ;
+		spin_lock_irqsave(&cd->lock, flags);
+#endif
+		xlb[0x0a] = 0x30;	/* LIRST bask to normal, Resetting elastic buffers */
+		{
+			int byte, c;
+			unsigned short mask = 0;
+
+			/* establish which channels are clear channel */
+			for (c = 0; c < 24; c++) {
+				int slot = xp_t1_chan_map[c];
+
+				byte = c >> 3;
+				if (!cd->spans[sp->span]->slots[slot]
+				    || cd->spans[sp->span]->slots[slot]->sdl.config.
+				    iftype != SDL_TYPE_DS0A)
+					mask |= 1 << (c % 8);
+				if ((c % 8) == 7)
+					xlb[0x39 + byte] = mask;
+			}
+		}
+		break;
+	}
+	case V401PT:
+	{
+		unsigned char reg04, reg05, reg06, reg07, reg78, reg7a;
+
+		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK 
+		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
+		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
+		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
+		xlb[0x70] = 0x06;	/* LOTCMC into TCSS0 */
+		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 
+		   RSYNC is an input (elastic store). */
+		xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
+		xlb[0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#if 0
+		/* We should really reset the elastic store after reset like so: */
+		xlb[0x4f] = 0x55;	/* RES/TES (elastic store) reset */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+		/* And even align it like so: */
+		xlb[0x4f] = 0x99;	/* RES/TES (elastic store) reset */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#endif
+		xlb[0xb6] = 0x22;	/* IBCC 5-bit loop up, 3-bit loop down code */
+		xlb[0xb7] = 0x80;	/* TCD1 - 10000 loop up code (for now) */
+		xlb[0xb8] = 0x00;	/* TCD2 don't care */
+		xlb[0xb9] = 0x80;	/* RUPCD1 - 10000 receive loop up code */
+		xlb[0xba] = 0x00;	/* RUPCD2 don't care */
+		xlb[0xbb] = 0x80;	/* RDNCD1 - 100 receive loop down code */
+		xlb[0xbc] = 0x00;	/* RDNCD2 don't card */
+
+		reg04 = 0x00;
+#if 0
+		reg05 = 0x10;	/* TSSE */
+#else
+		reg05 = 0x00;	/* no TSSE */
+#endif
+		reg06 = 0x00;
+		reg07 = 0x00;
+
+		switch (sp->config.ifgcrc) {
+		default:
+			sp->config.ifgcrc = SDL_GCRC_CRC6;
+		case SDL_GCRC_CRC6:
+			break;
+		case SDL_GCRC_CRC6J:
+			reg04 |= 0x02;
+			reg05 |= 0x80;
+			break;
+		}
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_ESF;
+		case SDL_FRAMING_ESF:
+			reg04 |= 0x40;
+			reg07 |= 0x04;
+			break;
+		case SDL_FRAMING_SF:	/* D4 */
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_B8ZS;
+		case SDL_CODING_B8ZS:
+			reg04 |= 0x20;
+			reg06 |= 0x80;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		xlb[0x03] = 0x08;	/* SYNCC */
+		xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
+		xlb[0x05] = reg05;	/* TSSE TCRC6J */
+		xlb[0x06] = reg06;	/* TB8ZS */
+		xlb[0x07] = reg07;	/* TESF */
+
+		xlb[0x40] = 0x00;	/* RCCS, TCCS set to zero for T1 */
+
+#if 0
+		xlb[0x79] = 0x58;	/* JACLK on for T1 (and reset) */
+		timeout = jiffies + 100 * HZ / 1000;
+		spin_unlock_irqrestore(&cd->lock, flags);
+		while (jiffies < timeout) ;
+		spin_lock_irqsave(&cd->lock, flags);
+#endif
+		xlb[0x79] = 0x18;	/* JACLK on for T1 */
+		xlb[0x7b] = 0x0a;	/* 100 ohm, MCLK 2.048 MHz */
+
+		if (sp->config.iftxlevel < 8) {
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x01;	/* 0dB CSU, trasnmitter on */
+			reg78 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x00;	/* 0db CSU, transmitter off */
+			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
+		}
+		reg78 &= (enable ? ~0x00 : ~0x01);	/* power transmitters? */
+
+		xlb[0x7a] = reg7a;
+		xlb[0x78] = reg78;
+		break;
+	}
+	}
+	return (0);
+}
 
 /*
  *  ------------------------------------------------------------------------
@@ -7098,7 +7503,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 STATIC int
 lmi_enable_req(queue_t *q, mblk_t *mp)
 {
-	int err, offset;
+	int err;
 	struct xp *xp = XP_PRIV(q);
 	struct cd *cd;
 	struct sp *sp;
@@ -7175,13 +7580,11 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	xp->i_state = LMI_ENABLED;
 	if (!(sp->config.ifflags & SDL_IF_UP)) {
 		/* need to bring up span */
-		psw_t flags = 0;
-		unsigned long timeout;
-		volatile unsigned char *xlb = &cd->xlb[sp->span << 8];
-
 		switch (cd->config.ifgtype) {
 		case SDL_GTYPE_E1:
 		{
+			psw_t flags;
+
 			printd(("%s: performing enable on E1 span %d\n", DRV_NAME, sp->span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -7192,227 +7595,9 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 #if 0
 			/* zero all span registers */
 			for (offset = 0; offset < 192; offset++)
-				xlb[offset] = 0x00;
+				cd->xlb[(sp->span << 8) + offset] = 0x00;
 #endif
-			switch (cd->board) {
-			case E400P:
-			case E400PSS7:
-			{
-				uint8_t ccr1 = 0, tcr1 = 0;
-
-#if 0
-				/* Set up for interleaved serial bus operation, byte mode */
-				if (sp->span == 0)
-					xlb[0xb5] = 0x09;
-				else
-					xlb[0xb5] = 0x08;
-#endif
-				xlb[0x1a] = 0x04;	/* CCR2: set LOTCMC */
-				/* wierd thing to do */
-				for (offset = 0; offset <= 8; offset++)
-					xlb[offset] = 0x00;
-				for (offset = 0x10; offset <= 0x4f; offset++)
-					if (offset != 0x1a)
-						xlb[offset] = 0x00;
-				xlb[0x10] = 0x20;	/* RCR1: Rsync as input */
-				xlb[0x11] = 0x06;	/* RCR2: Sysclk = 2.048 Mhz */
-				xlb[0x12] = 0x09;	/* TCR1: TSiS mode */
-				tcr1 = 0x09;	/* TCR1: TSiS mode */
-				switch (sp->config.ifframing) {
-				default:
-				case SDL_FRAMING_CCS:
-					ccr1 |= 0x08;
-					break;
-				case SDL_FRAMING_CAS:
-					tcr1 |= 0x20;
-					break;
-				}
-				switch (sp->config.ifcoding) {
-				default:
-				case SDL_CODING_HDB3:
-					ccr1 |= 0x44;
-					break;
-				case SDL_CODING_AMI:
-					ccr1 |= 0x00;
-					break;
-				}
-				switch (sp->config.ifgcrc) {
-				case SDL_GCRC_CRC4:
-					ccr1 |= 0x11;
-					break;
-				default:
-					ccr1 |= 0x00;
-					break;
-				}
-				xlb[0x12] = tcr1;
-				xlb[0x14] = ccr1;
-
-				if (sp->config.iftxlevel < 8) {
-					/* not monitoring mode */
-					xlb[0x18] = ((sp->config.iftxlevel & 0x7) << 5);
-					/* 120 Ohm, Normal */
-					xlb[0xac] = 0x00;	/* TEST3 no gain */
-				} else {
-					/* monitoring mode */
-					xlb[0x18] = 0x21;	/* 120 Ohm norm, transmitters off */
-					switch (sp->config.iftxlevel & 0x3) {
-					case 0:
-						xlb[0xac] = 0x00;	/* TEST3 no gain */
-						break;
-					case 1:
-						xlb[0xac] = 0x72;	/* TEST3 12dB gain */
-						break;
-					case 2:
-					case 3:
-						xlb[0xac] = 0x70;	/* TEST3 30dB gain */
-						break;
-					}
-				}
-
-				xlb[0x1b] = 0x8a;	/* CRC3: LIRST & TSCLKM */
-				xlb[0x20] = 0x1b;	/* TAFR */
-				xlb[0x21] = 0x5f;	/* TNAFR */
-				xlb[0x40] = 0x0b;	/* TSR1 */
-				/* wierd thing to do */
-				for (offset = 0x41; offset <= 0x4f; offset++)
-					xlb[offset] = 0x55;
-				for (offset = 0x22; offset <= 0x25; offset++)
-					xlb[offset] = 0xff;
-				timeout = jiffies + 100 * HZ / 1000;
-				spin_unlock_irqrestore(&cd->lock, flags);
-				while (jiffies < timeout) ;
-				spin_lock_irqsave(&cd->lock, flags);
-				xlb[0x1b] = 0x9a;	/* CRC3: set ESR as well */
-				xlb[0x1b] = 0x82;	/* CRC3: TSCLKM only */
-				break;
-			}
-			case V401PE:
-			{
-				u_char reg33, reg35, reg40;
-
-				/* The DS2155 contains an on-chip power-up reset function that
-				   automatically clears the writeable register space immediately
-				   after power is supplied to the DS2155. The user can issue a chip 
-				   reset at any time.  Issuing a reset disrupts traffic flowing
-				   through the DS2155 until the device is reprogrammed.  The reset
-				   can be issued through hardware using the TSTRST pin or through
-				   software using the SFTRST function in the master mode register.
-				   The LIRST (LIC2.6) should be toggled from 0 to 1 to reset the
-				   line interface circuitry.  (It takes the DS2155 about 40ms to
-				   recover from the LIRST bit being toggled.) Finally, after the
-				   TSYSCLK and RSYSCLK inputs are stable, the receive and transmit
-				   elastic stores should be reset (this step can be skipped if the
-				   elastic stores are disabled). */
-#if 0
-				xlb[0x00] = 0x02;	/* E1 mode */
-				/* Note that we could change the order of interleave here (3 -
-				   span) to accomodate little-endian or big-endian word reads, hah! 
-				 */
-				xlb[0xc5] = 0x28 + sp->span;	/* 4 devices channel interleaved on 
-								   bus */
-#endif
-				/* There are three other synchronization modes: 0x00 TCLK only,
-				   0x02 switch to RCLK if TCLK fails, 0x04 external clock, 0x06
-				   loop.  And then 0x80 selects the TSYSCLK pin instead of the MCLK 
-				   pin when in external clock mode. */
-				/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails
-				   for E1! */
-				xlb[0x70] = 0x02;	/* LOTCMC into TCSS0 */
-				/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an
-				   output, IOCR1.4=1 RSYNC is an input (elastic store). */
-				xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
-				xlb[0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
-				xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
-#if 0
-				/* We should really reset the elastic store after reset like so: */
-				xlb[0x4f] = 0x55;	/* RES/TES (elastic store) reset */
-				xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
-				/* And even align it like so: */
-				xlb[0x4f] = 0x99;	/* RES/TES (elastic store) reset */
-				xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
-#endif
-
-				reg33 = 0x00;
-				reg35 = 0x10;	/* TSiS */
-				reg40 = 0x00;
-
-				switch (sp->config.ifframing) {
-				default:
-					sp->config.ifframing = SDL_FRAMING_CCS;
-				case SDL_FRAMING_CCS:
-					reg40 |= 0x06;
-					reg33 |= 0x40;
-					break;
-				case SDL_FRAMING_CAS:
-					break;
-				}
-				switch (sp->config.ifcoding) {
-				default:
-					sp->config.ifcoding = SDL_CODING_HDB3;
-				case SDL_CODING_HDB3:
-					reg33 |= 0x20;
-					reg35 |= 0x04;
-					break;
-				case SDL_CODING_AMI:
-					break;
-				}
-				switch (sp->config.ifgcrc) {
-				case SDL_GCRC_CRC4:
-					reg33 |= 0x08;
-					reg35 |= 0x01;
-					break;
-				default:
-					break;
-				}
-				/* We could be setting automatic report alarm generation (0x01)
-				   (T1) or automatic AIS generation (0x02) (E1). */
-				xlb[0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from
-							   O14.6) */
-				xlb[0x36] = 0x04;	/* AEBE 36.2 */
-				xlb[0x33] = reg33;	/* RCR4, RHDB3, RSM */
-				xlb[0x34] = 0x01;	/* RCL (1ms) */
-				xlb[0x40] = reg40;	/* RCCS, TCCS */
-				/* This is a little peculiar: the host should be using Method 3 in
-				   section 22.3 of the DS2155 manual instead of this method that
-				   only permits 250us to read or write the bits. */
-				xlb[0xd0] = 0x1b;	/* TAFR */
-				xlb[0xd1] = 0x5f;	/* TNAFR */
-
-				xlb[0x79] = 0x98;	/* JACLK on for E1 */
-				xlb[0x7b] = 0x0f;	/* 120 Ohm term, MCLK 2.048 MHz */
-
-				/* We use TX levels to determine LBO, impedance, CSU operation, or
-				   monitoring operation.  During monitoring operation, the
-				   transmitters are powered off. */
-				/* For E1, LBO is: 000XXXXX 75 Ohm normal 001XXXXX 120 Ohm normal
-				   100XXXXX 75 Ohm high return loss 101XXXXX 120 Ohm high return
-				   loss For T1, LBO is: 000XXXXX DSX-1 ( 0ft - 133ft) / 0dB CSU
-				   001XXXXX DSX-1 (133ft - 266ft) 010XXXXX DSX-1 (266ft - 399ft)
-				   011XXXXX DSX-1 (399ft - 533ft) 100XXXXX DSX-1 (533ft - 666ft)
-				   101XXXXX -7.5dB CSU 110XXXXX -15.0dB CSU 111XXXXX -22.5dB CSU
-				   txlevel 0000 TX on DSX-1 ( 0ft - 133ft) / 0dB CSU or 75 Ohm
-				   normal 0001 TX on DSX-1 (133ft - 266ft) or 120 Ohm normal 0010
-				   TX on DSX-1 (266ft - 399ft) or (invalid) 0011 TX on DSX-1 (399ft 
-				   - 533ft) or (invalid) 0100 TX on DSX-1 (533ft - 666ft) or 75 Ohm 
-				   high RL 0101 TX on -7.5dB CSU or 120 Ohm high RL 0110 TX on
-				   -15.0dB CSU or (invalid) 0111 TX on -22.5dB CSU or (invalid)
-				   1000 TX off 0dB Gain monitoring mode 1001 TX off 20dB Gain
-				   monitoring mode 1010 TX off 26dB Gain monitoring mode 1011 TX
-				   off 32dB Gain monitoring mode 1100 (invalid) 1101 (invalid) 1110 
-				   (invalid) 1111 (invalid) */
-
-				if (sp->config.iftxlevel < 8) {
-					xlb[0x7a] = 0x00;	/* no boost, not monitoring */
-					/* 120 Ohm normal, power transmitter */
-					xlb[0x78] = 0x01 | ((sp->config.iftxlevel & 0x1) << 5);
-				} else {
-					/* monitoring mode */
-					xlb[0x78] = 0x20;	/* 120 Ohm normal, TX powered off */
-					xlb[0x7a] = 0x00 | ((sp->config.iftxlevel & 0x3) << 3);
-				}
-				break;
-			}
-			}
+			xp_span_config(cd, sp->span, true);
 			sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 			/* enable interrupts */
 			cd->xlb[CTLREG] = (INTENA | E1DIV);
@@ -7423,6 +7608,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_J1:
 		{
 			int japan = (cd->config.ifgtype == SDL_GTYPE_J1);
+			psw_t flags;
 
 			printd(("%s: performing enable on %s span %d\n", DRV_NAME,
 				japan ? "J1" : "T1", sp->span));
@@ -7434,224 +7620,9 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			cd->xlb[LEDREG] = 0xff;
 #if 0
 			for (offset = 0; offset < 160; offset++)
-				xlb[offset] = 0x00;
+				cd->xlb[(sp->span << 8) + offset] = 0x00;
 #endif
-
-			switch (cd->board) {
-			case T400P:
-			case T400PSS7:
-			{
-				unsigned char val;
-
-#if 0
-				/* Set up for interleaved serial bus operation, byte mode */
-				if (sp->span == 0)
-					xlb[0x94] = 0x09;
-				else
-					xlb[0x94] = 0x08;
-#endif
-				xlb[0x2b] = 0x08;	/* Full-on sync required (RCR1) */
-				xlb[0x2c] = 0x08;	/* RSYNC is an input (RCR2) */
-				xlb[0x35] = 0x10;	/* RBS enable (TCR1) */
-				xlb[0x36] = 0x04;	/* TSYNC to be output (TCR2) */
-				xlb[0x37] = 0x9c;	/* Tx & Rx Elastic stor, sysclk(s) = 2.048
-							   mhz, loopback controls (CCR1) */
-
-				xlb[0x12] = 0x22;	/* IBCC 5-bit loop up, 3-bit loop down code 
-							 */
-				xlb[0x13] = 0x80;	/* TCD - 10000 */
-				xlb[0x14] = 0x80;	/* RUPCD - 10000 */
-				xlb[0x15] = 0x80;	/* RDNCD - 100 */
-
-				xlb[0x19] = japan ? 0x80 : 0x00;	/* set japanese mode, no
-									   local loop */
-				xlb[0x1e] = japan ? 0x80 : 0x00;	/* set japanese mode, no
-									   local loop */
-
-				/* Enable F bits pattern */
-				switch (sp->config.ifframing) {
-				default:
-				case SDL_FRAMING_SF:
-					val = 0x20;
-					break;
-				case SDL_FRAMING_ESF:
-					val = 0x88;
-					break;
-				}
-				switch (sp->config.ifcoding) {
-				default:
-				case SDL_CODING_AMI:
-					break;
-				case SDL_CODING_B8ZS:
-					val |= 0x44;
-					break;
-				}
-				xlb[0x38] = val;
-				if (sp->config.ifcoding != SDL_CODING_B8ZS)
-					xlb[0x7e] = 0x1c;	/* Set FDL register to 0x1c */
-				if (sp->config.iftxlevel < 8) {
-					/* not monitoring mode */
-					xlb[0x09] = 0x00;	/* TEST2 no gain */
-					xlb[0x7c] = ((sp->config.iftxlevel & 0x7) << 5);	/* LBO 
-												 */
-				} else {
-					/* monitoring mode */
-					xlb[0x7c] = 0x01;	/* 0dB CSU, transmitters off */
-					switch (sp->config.iftxlevel & 0x3) {
-					case 0:
-						xlb[0x09] = 0x00;	/* TEST2 no gain */
-						break;
-					case 1:
-						xlb[0x09] = 0x72;	/* TEST2 12dB gain */
-						break;
-					case 2:
-					case 3:
-						xlb[0x09] = 0x70;	/* TEST2 20db gain */
-						break;
-					}
-				}
-				xlb[0x0a] = 0x80;	/* LIRST to reset line interface */
-				timeout = jiffies + 100 * HZ / 1000;
-				spin_unlock_irqrestore(&cd->lock, flags);
-				while (jiffies < timeout) ;
-				spin_lock_irqsave(&cd->lock, flags);
-				xlb[0x0a] = 0x30;	/* LIRST bask to normal, Resetting elastic
-							   buffers */
-				{
-					int byte, c;
-					unsigned short mask = 0;
-
-					/* establish which channels are clear channel */
-					for (c = 0; c < 24; c++) {
-						int slot = xp_t1_chan_map[c];
-
-						byte = c >> 3;
-						if (!cd->spans[sp->span]->slots[slot]
-						    || cd->spans[sp->span]->slots[slot]->sdl.config.
-						    iftype != SDL_TYPE_DS0A)
-							mask |= 1 << (c % 8);
-						if ((c % 8) == 7)
-							xlb[0x39 + byte] = mask;
-					}
-				}
-				break;
-			}
-			case V401PT:
-			{
-				unsigned char reg04, reg05, reg06, reg07;
-
-				/* The DS2155 contains an on-chip power-up reset function that
-				   automatically clears the writeable register space immediately
-				   after power is supplied to the DS2155. The user can issue a chip 
-				   reset at any time.  Issuing a reset disrupts traffic flowing
-				   through the DS2155 until the device is reprogrammed.  The reset
-				   can be issued through hardware using the TSTRST pin or through
-				   software using the SFTRST function in the master mode register.
-				   The LIRST (LIC2.6) should be toggled from 0 to 1 to reset the
-				   line interface circuitry.  (It takes the DS2155 about 40ms to
-				   recover from the LIRST bit being toggled.) Finally, after the
-				   TSYSCLK and RSYSCLK inputs are stable, the receive and transmit
-				   elastic stores should be reset (this step can be skipped if the
-				   elastic stores are disabled). */
-#if 0
-				xlb[0x00] = 0x00;	/* T1 mode */
-				/* Note that we could change the order of interleave here (3 -
-				   span) to accomodate little-endian or big-endian word reads, hah! 
-				 */
-				xlb[0xc5] = 0x28 + sp->span;	/* 4 devices channel interleaved on 
-								   bus */
-#endif
-				/* There are three other synchronization modes: 0x00 TCLK only,
-				   0x02 switch to RCLK if TCLK fails, 0x04 external clock, 0x06
-				   loop.  And then 0x80 selects the TSYSCLK pin instead of the MCLK 
-				   pin when in external clock mode. */
-				/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails
-				   for E1! */
-				xlb[0x70] = 0x00;	/* LOTCMC into TCSS0 */
-				/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an
-				   output, IOCR1.4=1 RSYNC is an input (elastic store). */
-				xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
-				xlb[0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
-				xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
-#if 0
-				/* We should really reset the elastic store after reset like so: */
-				xlb[0x4f] = 0x55;	/* RES/TES (elastic store) reset */
-				xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
-				/* And even align it like so: */
-				xlb[0x4f] = 0x99;	/* RES/TES (elastic store) reset */
-				xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
-#endif
-				xlb[0xb6] = 0x22;	/* IBCC 5-bit loop up, 3-bit loop down code 
-							 */
-				xlb[0xb7] = 0x80;	/* TCD1 - 10000 loop up code (for now) */
-				xlb[0xb8] = 0x00;	/* TCD2 don't care */
-				xlb[0xb9] = 0x80;	/* RUPCD1 - 10000 receive loop up code */
-				xlb[0xba] = 0x00;	/* RUPCD2 don't care */
-				xlb[0xbb] = 0x80;	/* RDNCD1 - 100 receive loop down code */
-				xlb[0xbc] = 0x00;	/* RDNCD2 don't card */
-
-				reg04 = 0x00;
-				reg05 = 0x10;	/* TSSE */
-				reg06 = 0x00;
-				reg07 = 0x00;
-
-				switch (sp->config.ifgcrc) {
-				default:
-					sp->config.ifgcrc = SDL_GCRC_CRC6;
-				case SDL_GCRC_CRC6:
-					break;
-				case SDL_GCRC_CRC6J:
-					reg04 |= 0x02;
-					reg05 |= 0x80;
-					break;
-				}
-				switch (sp->config.ifframing) {
-				default:
-					sp->config.ifframing = SDL_FRAMING_ESF;
-				case SDL_FRAMING_ESF:
-					reg04 |= 0x40;
-					reg07 |= 0x04;
-					break;
-				case SDL_FRAMING_SF:	/* D4 */
-					break;
-				}
-				switch (sp->config.ifcoding) {
-				default:
-					sp->config.ifcoding = SDL_CODING_B8ZS;
-				case SDL_CODING_B8ZS:
-					reg04 |= 0x20;
-					reg06 |= 0x80;
-					break;
-				case SDL_CODING_AMI:
-					break;
-				}
-				xlb[0x03] = 0x08;	/* SYNCC */
-				xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
-				xlb[0x05] = reg05;	/* TSSE TCRC6J */
-				xlb[0x06] = reg06;	/* TB8ZS */
-				xlb[0x07] = reg07;	/* TESF */
-
-				xlb[0x40] = 0x00;	/* RCCS, TCCS set to zero for T1 */
-
-				xlb[0x79] = 0x58;	/* JACLK on for T1 (and reset) */
-				timeout = jiffies + 100 * HZ / 1000;
-				spin_unlock_irqrestore(&cd->lock, flags);
-				while (jiffies < timeout) ;
-				spin_lock_irqsave(&cd->lock, flags);
-				xlb[0x79] = 0x18;	/* JACLK on for T1 */
-				xlb[0x7b] = 0x0a;	/* 100 ohm, MCLK 2.048 MHz */
-
-				if (sp->config.iftxlevel < 8) {
-					xlb[0x7a] = 0x00;	/* no boost, not monitoring */
-					xlb[0x78] = 0x01 | ((sp->config.iftxlevel & 0x7) << 5);
-				} else {
-					/* monitoring mode */
-					xlb[0x78] = 0x00;	/* 0db CSU, transmitters off */
-					xlb[0x7a] = 0x00 | ((sp->config.iftxlevel & 0x3) << 3);
-				}
-				break;
-			}
-			}
+			xp_span_config(cd, sp->span, true);
 			sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 			/* enable interrupts */
 			cd->xlb[CTLREG] = (INTENA);
@@ -8846,391 +8817,27 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 		}
 		if (sp && span_reconfig && (sp->config.ifflags & SDL_IF_UP) && cd) {
 			/* need to bring up span */
-			volatile unsigned char *xlb = &cd->xlb[sp->span << 8];
-
 			switch (cd->config.ifgtype) {
 			case SDL_GTYPE_E1:
-			{
 				printd(("%s: performing reconfiguration of E1 span %d\n",
 					DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
-				switch (cd->device) {
-				case XP_DEV_DS2154:
-				case XP_DEV_DS21354:
-				case XP_DEV_DS21554:
-				{
-					uint8_t ccr1 = 0, tcr1 = 0;
-
-					tcr1 = 0x09;	/* TCR1: TSiS mode */
-					switch (sp->config.ifframing) {
-					default:
-					case SDL_FRAMING_CCS:
-						ccr1 |= 0x08;
-						break;
-					case SDL_FRAMING_CAS:
-						tcr1 |= 0x20;
-						break;
-					}
-					switch (sp->config.ifcoding) {
-					case SDL_CODING_HDB3:
-						ccr1 |= 0x44;
-						break;
-					default:
-					case SDL_CODING_AMI:
-						ccr1 |= 0x00;
-						break;
-					}
-					switch (sp->config.ifgcrc) {
-					case SDL_GCRC_CRC4:
-						ccr1 |= 0x11;
-						break;
-					default:
-						ccr1 |= 0x00;
-						break;
-					}
-					xlb[0x12] = tcr1;
-					xlb[0x14] = ccr1;
-
-					if (sp->config.iftxlevel < 8) {
-						/* not monitoring mode */
-						xlb[0x18] = ((sp->config.iftxlevel & 0x7) << 5);	/* 120 
-													   Ohm, 
-													   Normal 
-													 */
-						xlb[0xac] = 0x00;	/* TEST3 no gain */
-					} else {
-						/* monitoring mode */
-						xlb[0x18] = 0x21;	/* 120 Ohm normal,
-									   transmitters off */
-						switch (sp->config.iftxlevel & 0x3) {
-						case 0:
-							xlb[0xac] = 0x00;	/* TEST3 no gain */
-							break;
-						case 1:
-							xlb[0xac] = 0x72;	/* TEST3 12dB gain */
-							break;
-						case 2:
-						case 3:
-							xlb[0xac] = 0x70;	/* TEST3 30dB gain */
-							break;
-						}
-					}
-					break;
-				}
-				case XP_DEV_DS2155:
-				{
-					unsigned char reg33, reg35, reg40;
-
-					reg33 = 0x00;
-					reg35 = 0x10;	/* TSiS */
-					reg40 = 0x00;
-
-					switch (sp->config.ifframing) {
-					default:
-					case SDL_FRAMING_CCS:
-						reg40 |= 0x06;
-						reg33 |= 0x40;
-						break;
-					case SDL_FRAMING_CAS:
-						break;
-					}
-					switch (sp->config.ifcoding) {
-					default:
-					case SDL_CODING_HDB3:
-						reg33 |= 0x20;
-						reg35 |= 0x04;
-						break;
-					case SDL_CODING_AMI:
-						break;
-					}
-					switch (sp->config.ifgcrc) {
-					case SDL_GCRC_CRC4:
-						reg33 |= 0x08;
-						reg35 |= 0x01;
-						break;
-					default:
-						break;
-					}
-					xlb[0x35] = reg35;	/* TSiS, TCRC4, THDB3 */
-					xlb[0x36] = 0x04;	/* AEBE 36.2 */
-					xlb[0x33] = reg33;	/* RCR4, RHDB3, RSM */
-					xlb[0x34] = 0x01;	/* RCL (1ms) */
-					xlb[0x40] = reg40;	/* RCCS, TCCS */
-
-					xlb[0x7b] = 0x0f;	/* 120 Ohm term, MCLK 2.048 MHz */
-
-					if (sp->config.iftxlevel < 8) {
-						xlb[0x7a] = 0x00;	/* no boost, not monitoring 
-									 */
-						xlb[0x78] =
-						    0x01 | ((sp->config.iftxlevel & 0x7) << 5);
-					} else {
-						/* monitoring mode */
-						xlb[0x78] = 0x00;	/* 0db CSU, transmitters
-									   off */
-						xlb[0x7a] =
-						    0x00 | ((sp->config.iftxlevel & 0x3) << 3);
-					}
-					break;
-				}
-				}
-			}
+				xp_span_config(cd, sp->span, true);
 			case SDL_GTYPE_T1:
-			{
-				int byte, val, c;
-				unsigned short mask = 0;
-
 				printd(("%s: performing reconfiguration of T1 span %d\n",
 					DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
-				switch (cd->device) {
-				case XP_DEV_DS2152:
-				case XP_DEV_DS21352:
-				case XP_DEV_DS21552:
-
-				{
-					/* Enable F bits pattern */
-					switch (sp->config.ifframing) {
-					default:
-					case SDL_FRAMING_SF:
-						val = 0x20;
-						break;
-					case SDL_FRAMING_ESF:
-						val = 0x88;
-						break;
-					}
-					switch (sp->config.ifcoding) {
-					default:
-					case SDL_CODING_AMI:
-						break;
-					case SDL_CODING_B8ZS:
-						val |= 0x44;
-						break;
-					}
-					xlb[0x38] = val;
-					if (sp->config.ifcoding != SDL_CODING_B8ZS)
-						xlb[0x7e] = 0x1c;	/* Set FDL reg to 0x1c */
-					if (sp->config.iftxlevel < 8) {
-						/* not monitoring mode */
-						xlb[0x09] = 0x00;	/* TEST2 no gain */
-						xlb[0x7c] = ((sp->config.iftxlevel & 0x7) << 5);	/* LBO 
-													 */
-					} else {
-						/* monitoring mode */
-						xlb[0x7c] = 0x01;	/* transmitters off */
-						switch (sp->config.iftxlevel & 0x3) {
-						case 0x00:
-							xlb[0x09] = 0x00;	/* TEST2 no gain */
-							break;
-						case 0x01:
-							xlb[0x09] = 0x72;	/* TEST2 12dB gain */
-							break;
-						case 0x02:
-						case 0x03:
-							xlb[0x09] = 0x70;	/* TEST2 20dB gain */
-							break;
-						}
-					}
-					/* establish which channels are clear channel */
-					for (c = 0; c < 24; c++) {
-						byte = c >> 3;
-						if (!cd->spans[sp->span]->slots[xp_t1_chan_map[c]]
-						    || cd->spans[sp->span]->
-						    slots[xp_t1_chan_map[c]]->sdl.config.
-						    iftype != SDL_TYPE_DS0A)
-							mask |= 1 << (c % 8);
-						if ((c % 8) == 7)
-							xlb[0x39 + byte] = mask;
-					}
-					break;
-				}
-				case XP_DEV_DS2155:
-				{
-					unsigned char reg04, reg05, reg06, reg07;
-
-					reg04 = 0x00;
-					reg05 = 0x10;	/* TSSE */
-					reg06 = 0x00;
-					reg07 = 0x00;
-
-					switch (sp->config.ifgcrc) {
-					default:
-					case SDL_GCRC_CRC6:
-						break;
-					case SDL_GCRC_CRC6J:
-						reg04 |= 0x02;
-						reg05 |= 0x80;
-						break;
-					}
-					switch (sp->config.ifframing) {
-					default:
-					case SDL_FRAMING_ESF:
-						reg04 |= 0x40;
-						reg07 |= 0x04;
-						break;
-					case SDL_FRAMING_SF:	/* D4 */
-						break;
-					}
-					switch (sp->config.ifcoding) {
-					default:
-					case SDL_CODING_B8ZS:
-						reg04 |= 0x20;
-						reg06 |= 0x80;
-						break;
-					case SDL_CODING_AMI:
-						break;
-					}
-					xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
-					xlb[0x05] = reg05;	/* TSSE TCRC6J */
-					xlb[0x06] = reg06;	/* TB8ZS */
-					xlb[0x07] = reg07;	/* TESF */
-
-					if (sp->config.iftxlevel < 8) {
-						xlb[0x7a] = 0x00;	/* no boost, not monitoring 
-									 */
-						xlb[0x78] =
-						    0x01 | ((sp->config.iftxlevel & 0x7) << 5);
-					} else {
-						/* monitoring mode */
-						xlb[0x78] = 0x00;	/* 0db CSU, transmitters
-									   off */
-						xlb[0x7a] =
-						    0x00 | ((sp->config.iftxlevel & 0x3) << 3);
-					}
-					break;
-				}
-				}
+				xp_span_config(cd, sp->span, true);
 				break;
-			}
 			case SDL_GTYPE_J1:
-			{
-				int byte, val, c;
-				unsigned short mask = 0;
-
 				printd(("%s: performing reconfiguration of J1 span %d\n",
 					DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
-				switch (cd->device) {
-				case XP_DEV_DS2152:
-				case XP_DEV_DS21352:
-				case XP_DEV_DS21552:
-				{
-					/* Enable F bits pattern */
-					switch (sp->config.ifframing) {
-					default:
-					case SDL_FRAMING_SF:
-						val = 0x20;
-						break;
-					case SDL_FRAMING_ESF:
-						val = 0x88;
-						break;
-					}
-					switch (sp->config.ifcoding) {
-					default:
-					case SDL_CODING_AMI:
-						break;
-					case SDL_CODING_B8ZS:
-						val |= 0x44;
-						break;
-					}
-					xlb[0x38] = val;
-					if (sp->config.ifcoding != SDL_CODING_B8ZS)
-						xlb[0x7e] = 0x1c;	/* Set FDL register to 0x1c 
-									 */
-					if (sp->config.iftxlevel < 8) {
-						/* not monitoring mode */
-						xlb[0x09] = 0x00;	/* TEST2 no gain */
-						xlb[0x7c] = ((sp->config.iftxlevel & 0x7) << 5);	/* LBO 
-													 */
-					} else {
-						/* monitoring mode */
-						xlb[0x7c] = 0x01;	/* transmitters off */
-						switch (sp->config.iftxlevel & 0x3) {
-						case 0x00:
-							xlb[0x09] = 0x00;	/* TEST2 no gain */
-							break;
-						case 0x01:
-							xlb[0x09] = 0x72;	/* TEST2 12dB gain */
-							break;
-						case 0x02:
-						case 0x03:
-							xlb[0x09] = 0x70;	/* TEST2 20dB gain */
-							break;
-						}
-					}
-					/* establish which channels are clear channel */
-					for (c = 0; c < 24; c++) {
-						byte = c >> 3;
-						if (!cd->spans[sp->span]->slots[xp_t1_chan_map[c]]
-						    || cd->spans[sp->span]->
-						    slots[xp_t1_chan_map[c]]->sdl.config.iftype !=
-						    SDL_TYPE_DS0A)
-							mask |= 1 << (c % 8);
-						if ((c % 8) == 7)
-							xlb[0x39 + byte] = mask;
-					}
-					break;
-				}
-				case XP_DEV_DS2155:
-				{
-					unsigned char reg04, reg05, reg06, reg07;
-
-					reg04 = 0x00;
-					reg05 = 0x10;	/* TSSE */
-					reg06 = 0x00;
-					reg07 = 0x00;
-
-					switch (sp->config.ifgcrc) {
-					default:
-					case SDL_GCRC_CRC6:
-						break;
-					case SDL_GCRC_CRC6J:
-						reg04 |= 0x02;
-						reg05 |= 0x80;
-						break;
-					}
-					switch (sp->config.ifframing) {
-					default:
-					case SDL_FRAMING_ESF:
-						reg04 |= 0x40;
-						reg07 |= 0x04;
-						break;
-					case SDL_FRAMING_SF:	/* D4 */
-						break;
-					}
-					switch (sp->config.ifcoding) {
-					default:
-					case SDL_CODING_B8ZS:
-						reg04 |= 0x20;
-						reg06 |= 0x80;
-						break;
-					case SDL_CODING_AMI:
-						break;
-					}
-					xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
-					xlb[0x05] = reg05;	/* TSSE TCRC6J */
-					xlb[0x06] = reg06;	/* TB8ZS */
-					xlb[0x07] = reg07;	/* TESF */
-
-					if (sp->config.iftxlevel < 8) {
-						xlb[0x7a] = 0x00;	/* no boost, not monitoring 
-									 */
-						xlb[0x78] =
-						    0x01 | ((sp->config.iftxlevel & 0x7) << 5);
-					} else {
-						/* monitoring mode */
-						xlb[0x78] = 0x00;	/* 0db CSU, transmitters
-									   off */
-						xlb[0x7a] =
-						    0x00 | ((sp->config.iftxlevel & 0x3) << 3);
-					}
-					break;
-				}
-				}
-			}
+				xp_span_config(cd, sp->span, true);
+				break;
 			default:
 				swerr();
 				break;
@@ -10622,9 +10229,13 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				if (sp->recovertime && !--sp->recovertime) {
 					u_char japan =
 					    (sp->config.ifgcrc == SDL_GCRC_CRC6J) ? 0x80 : 0x00;
-					/* alarm recovery complete */
+					printd(("%s: alarm recovery complete\n", __FUNCTION__));
 					sp->config.ifalarms &= ~SDL_ALARM_REC;
+#if 0
 					xlb[0x05] = 0x10 | japan;	/* turn off yellow */
+#else
+					xlb[0x05] = 0x00 | japan;
+#endif
 					cd->eval_syncsrc = 1;
 				}
 			}
@@ -10680,7 +10291,11 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 					    (sp->config.ifgcrc == SDL_GCRC_CRC6J) ? 0x80 : 0x00;
 
 					/* alarms have just begun */
+#if 0
 					xlb[0x05] = 0x11 | japan;	/* set yellow alarm */
+#else
+					xlb[0x05] = 0x01 | japan;	/* set yellow alarm */
+#endif
 					cd->eval_syncsrc = 1;
 				}
 			} else {
@@ -12296,6 +11911,11 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	for (span = 0; span < X400_SPANS; span++)
 		if (!xp_alloc_sp(cd, span))
 			goto error_remove;
+	/* set up span defaults */
+	xp_span_config(cd, 0, false);
+	xp_span_config(cd, 1, false);
+	xp_span_config(cd, 2, false);
+	xp_span_config(cd, 3, false);
 	cd->plx[INTCSR] = PLX_INTENA;	/* enable interrupts */
 	return (0);
       error_remove:
