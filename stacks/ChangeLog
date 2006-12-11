@@ -9,6 +9,7 @@
 	  - corrected naming
 	  - correct T1 configuration
 	  - turned off debugs
+	  - performance enhancements (new tables, hot sections)
 	* src/test/x400p-ss7/test-x400p.c: many corrections from testing
 	* src/test/m2pa/test-m2pa.c: rationalized to X400P driver
 	* tests/local.at: added --wait option for long duration tests
