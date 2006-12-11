@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/11 07:40:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/09 10:40:24 $ by $Author: brian $
+ Last Modified $Date: 2006/12/11 07:40:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.26  2006/12/11 07:40:12  brian
+ - corrections from testing
+
  Revision 0.9.2.25  2006/12/09 10:40:24  brian
  - corrections from testing
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/11 07:40:12 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/11 07:40:12 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -96,7 +99,8 @@ static char const ident[] =
  *  complete SS7 MTP Level 2 OpenSS7 implementation.
  */
 
-#define _DEBUG 1
+//#define _DEBUG 1
+#undef _DEBUG
 
 #define _LFS_SOURCE	1
 #define _MPS_SOURCE	1
@@ -138,11 +142,11 @@ static char const ident[] =
 #include "v401pfw.h"
 #endif
 
-#define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
+#define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/11 07:40:12 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
+#define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X400P_LICENSE	"GPL"
 #define SL_X400P_BANNER		SL_X400P_DESCRIP	"\n" \
@@ -165,7 +169,8 @@ MODULE_LICENSE(SL_X400P_LICENSE);
 MODULE_ALIAS("streams-sl_x400p");
 #endif
 #if defined MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-"
+	       PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 
@@ -364,7 +369,7 @@ typedef struct cd {
 	ulong irq;			/* card irq */
 	ulong iobase;			/* card iobase */
 	struct tasklet_struct tasklet;	/* card tasklet */
-	irqreturn_t (*isr)(int, void *, struct pt_regs *); /* interrupt service routine */
+	 irqreturn_t(*isr) (int, void *, struct pt_regs *);	/* interrupt service routine */
 	sdl_config_t config;		/* card configuration */
 } cd_t;
 
@@ -412,10 +417,14 @@ STATIC struct ss7_bufpool xp_bufpool = { 0, };
 #define LOOPUP	0x80
 #define LOOPDN	0x40
 
-#define INTENA	0x01
-#define OUTBIT	0x02
-#define E1DIV	0x10
-#define INTACK	0x80
+#define INTENA	0x01		/* Interrupt Enable */
+#define OUTBIT	0x02		/* Drives "TEST1" signal ("Interrupt" outbit) */
+#define DINTENA	0x04		/* Dallas Interrupt Enable (Allows DINT signal to driver INT) */
+#define MASTER	0x08		/* External Syncrhonization Enable (MASTER signal). */
+#define E1DIV	0x10		/* Select E1 Divisor Mode (0 to T1, 1 for E1). */
+#define RSERLB	0x20		/* Local serial loopback. */
+#define LSERLB	0x40		/* Remote serial loopback. */
+#define INTACK	0x80		/* Interrupt Acknowledge (set to 1 to acknowledge interrupt) */
 
 #define INTACTIVE 2
 
@@ -538,13 +547,20 @@ STATIC struct {
 /* *INDENT-ON* */
 
 STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
-	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLX9030},
-	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLXDEVBRD},
-	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400P},
-	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400PSS7},
-	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V400P},
-	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
-	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
+	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 PLX9030},
+	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 PLXDEVBRD},
+	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 X400P},
+	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 X400PSS7},
+	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 V400P},
+	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 V401PT},
+	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 V401PE},
 	{0,}
 };
 
@@ -633,7 +649,7 @@ sl_pdu_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_PDU_IND;
 		mp->b_cont = dp;
-		_printd(("%s: %p: <- SL_PDU_IND\n", DRV_NAME, xp));
+		printd(("%s: %p: <- SL_PDU_IND\n", DRV_NAME, xp));
 		ss7_oput(xp->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -1804,7 +1820,8 @@ STATIC sdl_config_t sdl_default_e1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 1,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0},
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
 };
 STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifname = NULL,
@@ -1818,7 +1835,7 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifgcrc = SDL_GCRC_CRC6,
 	.ifclock = SDL_CLOCK_SLAVE,
 	.ifcoding = SDL_CODING_B8ZS,
-	.ifframing = SDL_FRAMING_D4,
+	.ifframing = SDL_FRAMING_ESF,
 	.ifblksize = 8,
 	.ifleads = 0,
 	.ifbpv = 0,
@@ -1826,7 +1843,8 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 0,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0},
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
 };
 STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifname = NULL,
@@ -1840,7 +1858,7 @@ STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifgcrc = SDL_GCRC_CRC6J,
 	.ifclock = SDL_CLOCK_SLAVE,
 	.ifcoding = SDL_CODING_B8ZS,
-	.ifframing = SDL_FRAMING_D4,
+	.ifframing = SDL_FRAMING_ESF,
 	.ifblksize = 8,
 	.ifleads = 0,
 	.ifbpv = 0,
@@ -1853,15 +1871,15 @@ STATIC sdl_config_t sdl_default_j1_chan = {
 };
 
 STATIC int
-xp_span_config(struct cd *cd, int span, bool enable)
+xp_span_config(struct cd *cd, int span, bool timeouts)
 {
 	struct sp *sp = cd->spans[span];
 	volatile unsigned char *xlb = &cd->xlb[span << 8];
 	int offset;
-#if 0
 	unsigned long timeout;
-#endif
+
 	switch (cd->board) {
+	case V400PE:
 	case E400P:
 	case E400PSS7:
 	{
@@ -1930,7 +1948,7 @@ xp_span_config(struct cd *cd, int span, bool enable)
 				break;
 			}
 		}
-		reg18 |= (enable ? 0x00 : 0x01);	/* power transmitters? */
+		// reg18 |= 0x01; /* disable transmitter */
 
 		xlb[0xac] = regac;
 		xlb[0x18] = reg18;
@@ -1939,17 +1957,17 @@ xp_span_config(struct cd *cd, int span, bool enable)
 		xlb[0x20] = 0x1b;	/* TAFR */
 		xlb[0x21] = 0x5f;	/* TNAFR */
 		xlb[0x40] = 0x0b;	/* TSR1 */
-		/* wierd thing to do */
-		for (offset = 0x41; offset <= 0x4f; offset++)
-			xlb[offset] = 0x55;
-		for (offset = 0x22; offset <= 0x25; offset++)
-			xlb[offset] = 0xff;
-#if 0
-		timeout = jiffies + 100 * HZ / 1000;
-		spin_unlock_irqrestore(&cd->lock, flags);
-		while (jiffies < timeout) ;
-		spin_lock_irqsave(&cd->lock, flags);
-#endif
+
+		if (timeouts) {
+			/* wierd thing to do */
+			for (offset = 0x41; offset <= 0x4f; offset++)
+				xlb[offset] = 0x55;
+			for (offset = 0x22; offset <= 0x25; offset++)
+				xlb[offset] = 0xff;
+			timeout = jiffies + 100 * HZ / 1000;
+			while (jiffies < timeout) ;
+		}
+
 		xlb[0x1b] = 0x9a;	/* CRC3: set ESR as well */
 		xlb[0x1b] = 0x82;	/* CRC3: TSCLKM only */
 		break;
@@ -2012,9 +2030,10 @@ xp_span_config(struct cd *cd, int span, bool enable)
 		   AIS generation (0x02) (E1). */
 		xlb[0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from O14.6) */
 		xlb[0x36] = 0x04;	/* AEBE 36.2 */
-		xlb[0x33] = reg33;	/* RCR4, RHDB3, RSM */
 		xlb[0x34] = 0x01;	/* RCL (1ms) */
 		xlb[0x40] = reg40;	/* RCCS, TCCS */
+		xlb[0x33] = reg33 | 0x01;	/* RCR4, RHDB3, RSM, SYNCE, RESYNC */
+		xlb[0x33] = reg33 | 0x00;	/* RCR4, RHDB3, RSM, SYNCE */
 		/* This is a little peculiar: the host should be using Method 3 in section 22.3 of
 		   the DS2155 manual instead of this method that only permits 250us to read or
 		   write the bits. */
@@ -2023,6 +2042,7 @@ xp_span_config(struct cd *cd, int span, bool enable)
 
 		xlb[0x79] = 0x98;	/* JACLK on for E1 */
 		xlb[0x7b] = 0x0f;	/* 120 Ohm term, MCLK 2.048 MHz */
+		xlb[0x7d] = 0x00;	/* Automatic gain control */
 
 		/* We use TX levels to determine LBO, impedance, CSU operation, or monitoring
 		   operation.  During monitoring operation, the transmitters are powered off. */
@@ -2042,20 +2062,21 @@ xp_span_config(struct cd *cd, int span, bool enable)
 
 		if (sp->config.iftxlevel < 8) {
 			reg7a = 0x00;	/* no gain */
-			reg78 = 0x01;	/* 120 Ohm normal, transmitter on */
-			reg78 |= ((sp->config.iftxlevel & 0x1) << 5);	/* LBO */
+			reg78 = 0x31;	/* 120 Ohm normal, transmitter on, -43dB EGL */
+			// reg78 |= ((sp->config.iftxlevel & 0x1) << 5); /* LBO */
 		} else {
 			/* monitoring mode */
 			reg7a = 0x00;	/* no gain */
-			reg78 = 0x20;	/* 120 Ohm normal, transmitter off */
+			reg78 = 0x30;	/* 120 Ohm normal, transmitter off, -43dB EGL */
 			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
 		}
-		reg78 &= (enable ? ~0x00 : ~0x01);	/* power transmitters? */
+		// reg78 &= ~0x01; /* disable transmitter */
 
-		xlb[0x7a] = reg7a;
 		xlb[0x78] = reg78;
+		xlb[0x7a] = reg7a;
 		break;
 	}
+	case V400PT:
 	case T400P:
 	case T400PSS7:
 	{
@@ -2117,16 +2138,17 @@ xp_span_config(struct cd *cd, int span, bool enable)
 				break;
 			}
 		}
-		reg7c |= (enable ? 0x00 : 0x01);	/* power trasnmitters? */
+		// reg7c |= 0x01; /* disable trasnmitter */
 
 		xlb[0x09] = reg09;
 		xlb[0x7c] = reg7c;
+
 #if 0
-		xlb[0x0a] = 0x80;	/* LIRST to reset line interface */
-		timeout = jiffies + 100 * HZ / 1000;
-		spin_unlock_irqrestore(&cd->lock, flags);
-		while (jiffies < timeout) ;
-		spin_lock_irqsave(&cd->lock, flags);
+		if (timeouts) {
+			xlb[0x0a] = 0x80;	/* LIRST to reset line interface */
+			timeout = jiffies + 100 * HZ / 1000;
+			while (jiffies < timeout) ;
+		}
 #endif
 		xlb[0x0a] = 0x30;	/* LIRST bask to normal, Resetting elastic buffers */
 		{
@@ -2156,7 +2178,7 @@ xp_span_config(struct cd *cd, int span, bool enable)
 		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
 		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
 		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
-		xlb[0x70] = 0x06;	/* LOTCMC into TCSS0 */
+		xlb[0x70] = 0x02;	/* LOTCMC into TCSS0 */
 		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 
 		   RSYNC is an input (elastic store). */
 		xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
@@ -2179,11 +2201,7 @@ xp_span_config(struct cd *cd, int span, bool enable)
 		xlb[0xbc] = 0x00;	/* RDNCD2 don't card */
 
 		reg04 = 0x00;
-#if 0
 		reg05 = 0x10;	/* TSSE */
-#else
-		reg05 = 0x00;	/* no TSSE */
-#endif
 		reg06 = 0x00;
 		reg07 = 0x00;
 
@@ -2217,23 +2235,359 @@ xp_span_config(struct cd *cd, int span, bool enable)
 		case SDL_CODING_AMI:
 			break;
 		}
-		xlb[0x03] = 0x08;	/* SYNCC */
 		xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
 		xlb[0x05] = reg05;	/* TSSE TCRC6J */
 		xlb[0x06] = reg06;	/* TB8ZS */
 		xlb[0x07] = reg07;	/* TESF */
 
+		xlb[0x03] = 0x08 | 0x01;	/* SYNCC/SYNCE, RESYNC */
+		xlb[0x03] = 0x08 | 0x00;	/* SYNCC/SYNCE */
+
 		xlb[0x40] = 0x00;	/* RCCS, TCCS set to zero for T1 */
 
 #if 0
-		xlb[0x79] = 0x58;	/* JACLK on for T1 (and reset) */
-		timeout = jiffies + 100 * HZ / 1000;
-		spin_unlock_irqrestore(&cd->lock, flags);
-		while (jiffies < timeout) ;
-		spin_lock_irqsave(&cd->lock, flags);
+		if (timeouts) {
+			xlb[0x79] = 0x58;	/* JACLK on for T1 (and reset) */
+			timeout = jiffies + 100 * HZ / 1000;
+			while (jiffies < timeout) ;
+		}
 #endif
 		xlb[0x79] = 0x18;	/* JACLK on for T1 */
 		xlb[0x7b] = 0x0a;	/* 100 ohm, MCLK 2.048 MHz */
+		xlb[0x7d] = 0x00;	/* Automatic gain control */
+
+		if (sp->config.iftxlevel < 8) {
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x01;	/* 0dB CSU, trasnmitter on, -36dB EGL */
+			reg78 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x00;	/* 0db CSU, transmitter off, -36dB EGL */
+			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
+		}
+		// reg78 &= ~0x01; /* disable transmitter */
+
+		xlb[0x78] = reg78;
+		xlb[0x7a] = reg7a;
+
+		{
+			int byte, c;
+			unsigned short mask = 0;
+
+			/* establish which channels are clear channel */
+			for (c = 0; c < 24; c++) {
+				int slot = xp_t1_chan_map[c];
+
+				byte = c >> 3;
+				if (sp->slots[slot]
+				    && sp->slots[slot]->sdl.config.iftype == SDL_TYPE_DS0A)
+					mask |= 1 << (c % 8);
+				if ((c % 8) == 7)
+					xlb[0x08 + byte] = mask;
+			}
+		}
+		break;
+	}
+	}
+	// sp->config.ifflags = SDL_IF_UP;
+	return (0);
+}
+
+STATIC int
+xp_span_reconfig(struct cd *cd, int span)
+{
+	struct sp *sp = cd->spans[span];
+	volatile unsigned char *xlb = &cd->xlb[span << 8];
+
+	switch (cd->board) {
+	case V400PE:
+	case E400P:
+	case E400PSS7:
+	{
+		uint8_t ccr1 = 0, tcr1 = 0, reg18 = 0, regac = 0;
+
+		switch (sp->config.ifframing) {
+		default:
+		case SDL_FRAMING_CCS:
+			ccr1 |= 0x08;
+			break;
+		case SDL_FRAMING_CAS:
+			tcr1 |= 0x20;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+		case SDL_CODING_HDB3:
+			ccr1 |= 0x44;
+			break;
+		case SDL_CODING_AMI:
+			ccr1 |= 0x00;
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			ccr1 |= 0x11;
+			break;
+		default:
+			ccr1 |= 0x00;
+			break;
+		}
+		xlb[0x12] = tcr1;
+		xlb[0x14] = ccr1;
+
+		if (sp->config.iftxlevel < 8) {
+			/* not monitoring mode */
+			regac = 0x00;	/* TEST3 no gain */
+			reg18 = 0x00;	/* 75 Ohm, Normal, transmitter on */
+			reg18 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			regac = 0x00;	/* TEST3 no gain */
+			reg18 = 0x01;	/* 75 Ohm norm, transmitter off */
+			switch (sp->config.iftxlevel & 0x3) {
+			case 0:
+				break;
+			case 1:
+				regac |= 0x72;	/* TEST3 12dB gain */
+				break;
+			case 2:
+			case 3:
+				regac |= 0x70;	/* TEST3 30dB gain */
+				break;
+			}
+		}
+
+		xlb[0xac] = regac;
+		xlb[0x18] = reg18;
+		break;
+	}
+	case V401PE:
+	{
+		u_char reg33, reg35, reg40, reg70, reg78, reg7a;
+
+		switch (sp->config.ifclock) {
+		default:
+			sp->config.ifclock = SDL_CLOCK_LOOP;
+		case SDL_CLOCK_LOOP:
+			reg70 = 0x06;	/* Use the signal present at RCLK as the transmit clokc.
+					   The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_INT:
+			reg70 = 0x00;	/* The TCLK pin is always the source of transmit clock. */
+			break;
+		case SDL_CLOCK_MASTER:
+			reg70 = 0x04;	/* Use the scaled signal present at MCLK as the transmit
+					   clock.  The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_EXT:
+			reg70 = 0x84;	/* Use the scaled signal present at TSYSCLK as the transmit
+					   clock.  The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_SLAVE:
+			reg70 = 0x02;	/* Switch to the clock present at RCLK when the signal at
+					   the TCLK pin fails to transition after 1 channel time. */
+			break;
+		}
+
+		/* There are four synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK if
+		   TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the TSYSCLK
+		   pin instead of the MCLK pin when in external clock mode. */
+		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
+		xlb[0x70] = reg70;	/* LOTCMC into TCSS0 */
+		xlb[0x70] = reg70;
+
+		reg33 = 0x00;
+		reg35 = 0x10;	/* TSiS */
+		reg40 = 0x00;
+
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
+		case SDL_FRAMING_CCS:
+			reg40 |= 0x06;
+			reg33 |= 0x40;
+			break;
+		case SDL_FRAMING_CAS:
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
+		case SDL_CODING_HDB3:
+			reg33 |= 0x20;
+			reg35 |= 0x04;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			reg33 |= 0x08;
+			reg35 |= 0x01;
+			break;
+		default:
+			break;
+		}
+		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic
+		   AIS generation (0x02) (E1). */
+		xlb[0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from O14.6) */
+		xlb[0x40] = reg40;	/* RCCS, TCCS */
+		xlb[0x33] = reg33 | 0x01;	/* RCR4, RHDB3, RSM, SYNCE, RESYNC */
+		xlb[0x33] = reg33 | 0x00;	/* RCR4, RHDB3, RSM, SYNCE */
+
+		if (sp->config.iftxlevel < 8) {
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x31;	/* 120 Ohm normal, transmitter on, -43dB EGL */
+			// reg78 |= ((sp->config.iftxlevel & 0x1) << 5); /* LBO */
+		} else {
+			/* monitoring mode */
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x30;	/* 120 Ohm normal, transmitter off, -43dB EGL */
+			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
+		}
+
+		xlb[0x78] = reg78;
+		xlb[0x7a] = reg7a;
+		break;
+	}
+	case V400PT:
+	case T400P:
+	case T400PSS7:
+	{
+		unsigned char val, reg09, reg7c;
+
+		switch (sp->config.ifframing) {
+		default:
+		case SDL_FRAMING_SF:
+			val = 0x20;
+			break;
+		case SDL_FRAMING_ESF:
+			val = 0x88;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+		case SDL_CODING_AMI:
+			break;
+		case SDL_CODING_B8ZS:
+			val |= 0x44;
+			break;
+		}
+		xlb[0x38] = val;
+		if (sp->config.ifcoding != SDL_CODING_B8ZS)
+			xlb[0x7e] = 0x1c;	/* Set FDL register to 0x1c */
+		if (sp->config.iftxlevel < 8) {
+			/* not monitoring mode */
+			reg09 = 0x00;	/* TEST2 no gain */
+			reg7c = 0x00;	/* 0dB CSU, transmitters on */
+			reg7c |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg09 = 0x00;	/* TEST2 no gain */
+			reg7c = 0x01;	/* 0dB CSU, transmitters off */
+			switch (sp->config.iftxlevel & 0x3) {
+			case 1:
+				reg09 |= 0x72;	/* TEST2 12dB gain */
+				break;
+			case 2:
+			case 3:
+				reg09 |= 0x70;	/* TEST2 20db gain */
+				break;
+			}
+		}
+
+		xlb[0x09] = reg09;
+		xlb[0x7c] = reg7c;
+
+		{
+			int byte, c;
+			unsigned short mask = 0;
+
+			/* establish which channels are clear channel */
+			for (c = 0; c < 24; c++) {
+				int slot = xp_t1_chan_map[c];
+
+				byte = c >> 3;
+				if (!sp->slots[slot]
+				    || sp->slots[slot]->sdl.config.iftype != SDL_TYPE_DS0A)
+					mask |= 1 << (c % 8);
+				if ((c % 8) == 7)
+					xlb[0x39 + byte] = mask;
+			}
+		}
+		break;
+	}
+	case V401PT:
+	{
+		unsigned char reg04, reg05, reg06, reg07, reg70, reg78, reg7a;
+
+		switch (sp->config.ifclock) {
+		default:
+			sp->config.ifclock = SDL_CLOCK_LOOP;
+		case SDL_CLOCK_LOOP:
+			reg70 = 0x06;	/* Use the signal present at RCLK as the transmit clokc.
+					   The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_INT:
+			reg70 = 0x00;	/* The TCLK pin is always the source of transmit clock. */
+			break;
+		case SDL_CLOCK_MASTER:
+			reg70 = 0x04;	/* Use the scaled signal present at MCLK as the transmit
+					   clock.  The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_EXT:
+			reg70 = 0x84;	/* Use the scaled signal present at TSYSCLK as the transmit
+					   clock.  The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_SLAVE:
+			reg70 = 0x02;	/* Switch to the clock present at RCLK when the signal at
+					   the TCLK pin fails to transition after 1 channel time. */
+			break;
+		}
+
+		reg04 = 0x00;
+		reg05 = 0x10;	/* TSSE */
+		reg06 = 0x00;
+		reg07 = 0x00;
+
+		switch (sp->config.ifgcrc) {
+		default:
+			sp->config.ifgcrc = SDL_GCRC_CRC6;
+		case SDL_GCRC_CRC6:
+			break;
+		case SDL_GCRC_CRC6J:
+			reg04 |= 0x02;
+			reg05 |= 0x80;
+			break;
+		}
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_ESF;
+		case SDL_FRAMING_ESF:
+			reg04 |= 0x40;
+			reg07 |= 0x04;
+			break;
+		case SDL_FRAMING_SF:	/* D4 */
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_B8ZS;
+		case SDL_CODING_B8ZS:
+			reg04 |= 0x20;
+			reg06 |= 0x80;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
+		xlb[0x05] = reg05;	/* TSSE TCRC6J */
+		xlb[0x06] = reg06;	/* TB8ZS */
+		xlb[0x07] = reg07;	/* TESF */
+
+		xlb[0x03] = 0x08 | 0x01;	/* SYNCC/SYNCE, RESYNC */
+		xlb[0x03] = 0x08 | 0x00;	/* SYNCC/SYNCE */
 
 		if (sp->config.iftxlevel < 8) {
 			reg7a = 0x00;	/* no gain */
@@ -2245,12 +2599,31 @@ xp_span_config(struct cd *cd, int span, bool enable)
 			reg78 = 0x00;	/* 0db CSU, transmitter off */
 			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
 		}
-		reg78 &= (enable ? ~0x00 : ~0x01);	/* power transmitters? */
 
-		xlb[0x7a] = reg7a;
 		xlb[0x78] = reg78;
+		xlb[0x7a] = reg7a;
+
+		{
+			int byte, c;
+			unsigned short mask = 0;
+
+			/* establish which channels are clear channel */
+			for (c = 0; c < 24; c++) {
+				int slot = xp_t1_chan_map[c];
+
+				byte = c >> 3;
+				if (sp->slots[slot]
+				    && sp->slots[slot]->sdl.config.iftype == SDL_TYPE_DS0A)
+					mask |= 1 << (c % 8);
+				if ((c % 8) == 7)
+					xlb[0x08 + byte] = mask;
+			}
+		}
 		break;
 	}
+	default:
+		swerr();
+		break;
 	}
 	return (0);
 }
@@ -2274,7 +2647,8 @@ xp_stop_timer_t1(struct xp *xp)
 static void
 xp_start_timer_t1(struct xp *xp)
 {
-	printd(("%s: %p: -> T1 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t1, drv_hztomsec(xp->sl.config.t1), (uint) HZ));
+	printd(("%s: %p: -> T1 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sl.config.t1, drv_hztomsec(xp->sl.config.t1), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t1, xp->sl.config.t1);
 }
 static void
@@ -2286,7 +2660,8 @@ xp_stop_timer_t2(struct xp *xp)
 static void
 xp_start_timer_t2(struct xp *xp)
 {
-	printd(("%s: %p: -> T2 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t2, drv_hztomsec(xp->sl.config.t2), (uint) HZ));
+	printd(("%s: %p: -> T2 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sl.config.t2, drv_hztomsec(xp->sl.config.t2), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t2, xp->sl.config.t2);
 }
 static void
@@ -2298,7 +2673,8 @@ xp_stop_timer_t3(struct xp *xp)
 static void
 xp_start_timer_t3(struct xp *xp)
 {
-	printd(("%s: %p: -> T3 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t3, drv_hztomsec(xp->sl.config.t3), (uint) HZ));
+	printd(("%s: %p: -> T3 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sl.config.t3, drv_hztomsec(xp->sl.config.t3), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t3, xp->sl.config.t3);
 }
 static void
@@ -2310,7 +2686,8 @@ xp_stop_timer_t4(struct xp *xp)
 static void
 xp_start_timer_t4(struct xp *xp)
 {
-	printd(("%s: %p: -> T4 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.statem.t4v, drv_hztomsec(xp->sl.statem.t4v), (uint) HZ));
+	printd(("%s: %p: -> T4 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sl.statem.t4v, drv_hztomsec(xp->sl.statem.t4v), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t4, xp->sl.statem.t4v);
 }
 static void
@@ -2322,7 +2699,8 @@ xp_stop_timer_t5(struct xp *xp)
 static void
 xp_start_timer_t5(struct xp *xp)
 {
-	printd(("%s: %p: -> T5 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t5, drv_hztomsec(xp->sl.config.t5), (uint) HZ));
+	printd(("%s: %p: -> T5 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sl.config.t5, drv_hztomsec(xp->sl.config.t5), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t5, xp->sl.config.t5);
 }
 static void
@@ -2334,7 +2712,8 @@ xp_stop_timer_t6(struct xp *xp)
 static void
 xp_start_timer_t6(struct xp *xp)
 {
-	printd(("%s: %p: -> T6 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t6, drv_hztomsec(xp->sl.config.t6), (uint) HZ));
+	printd(("%s: %p: -> T6 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sl.config.t6, drv_hztomsec(xp->sl.config.t6), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t6, xp->sl.config.t6);
 }
 static void
@@ -2346,7 +2725,8 @@ xp_stop_timer_t7(struct xp *xp)
 static void
 xp_start_timer_t7(struct xp *xp)
 {
-	printd(("%s: %p: -> T7 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sl.config.t7, drv_hztomsec(xp->sl.config.t7), (uint) HZ));
+	printd(("%s: %p: -> T7 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sl.config.t7, drv_hztomsec(xp->sl.config.t7), (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t7, xp->sl.config.t7);
 }
 static void
@@ -2358,9 +2738,11 @@ xp_stop_timer_t8(struct xp *xp)
 static void
 xp_start_timer_t8(struct xp *xp)
 {
-	printd(("%s: %p: -> T8 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sdt.config.t8, drv_hztomsec(xp->sdt.config.t8), (uint) HZ));
+	printd(("%s: %p: -> T8 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sdt.config.t8, drv_hztomsec(xp->sdt.config.t8), (uint) HZ));
 	mi_timer_MAC(xp->sdt.timers.t8, xp->sdt.config.t8);
 }
+
 #if 0
 static void
 xp_stop_timer_t9(struct xp *xp)
@@ -2371,7 +2753,8 @@ xp_stop_timer_t9(struct xp *xp)
 static void
 xp_start_timer_t9(struct xp *xp)
 {
-	printd(("%s: %p: -> T9 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp, xp->sdl.config.t9, drv_hztomsec(xp->sdl.config.t9), (uint) HZ));
+	printd(("%s: %p: -> T9 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
+		xp->sdl.config.t9, drv_hztomsec(xp->sdl.config.t9), (uint) HZ));
 	mi_timer_MAC(xp->sdl.timers.t9, xp->sdl.config.t9);
 }
 #endif
@@ -2710,34 +3093,34 @@ xp_alloc_timers(struct xp *xp)
 #if 0
 	if (!(tp = xp->sdl.timers.t9 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t9;
+	*(int *) tp->b_rptr = t9;
 #endif
 	/* SDT timer allocation */
 	if (!(tp = xp->sdt.timers.t8 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t8;
+	*(int *) tp->b_rptr = t8;
 	/* SL timer allocation */
 	if (!(tp = xp->sl.timers.t7 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t7;
+	*(int *) tp->b_rptr = t7;
 	if (!(tp = xp->sl.timers.t6 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t6;
+	*(int *) tp->b_rptr = t6;
 	if (!(tp = xp->sl.timers.t5 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t5;
+	*(int *) tp->b_rptr = t5;
 	if (!(tp = xp->sl.timers.t4 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t4;
+	*(int *) tp->b_rptr = t4;
 	if (!(tp = xp->sl.timers.t3 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t3;
+	*(int *) tp->b_rptr = t3;
 	if (!(tp = xp->sl.timers.t2 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t2;
+	*(int *) tp->b_rptr = t2;
 	if (!(tp = xp->sl.timers.t1 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t1;
+	*(int *) tp->b_rptr = t1;
 	return (0);
       enobufs:
 	xp_free_timers(xp);
@@ -2869,7 +3252,8 @@ STATIC INLINE void
 sl_txc_send_sios(struct xp *xp, queue_t *q)
 {
 	__xp_timer_stop(xp, t7);
-	if (xp->option.pvar == SS7_PVAR_ANSI_92)
+	if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+	    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88))
 		__xp_timer_stop(xp, t6);
 	xp->sl.statem.lssu_available = 1;
 	xp->sl.statem.tx.sio = LSSU_SIOS;
@@ -2929,7 +3313,8 @@ STATIC INLINE void
 sl_txc_send_sipo(struct xp *xp, queue_t *q)
 {
 	__xp_timer_stop(xp, t7);
-	if (xp->option.pvar == SS7_PVAR_ANSI_92)
+	if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+	    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88))
 		__xp_timer_stop(xp, t6);
 	xp->sl.statem.tx.sio = LSSU_SIPO;
 	xp->sl.statem.lssu_available = 1;
@@ -2969,8 +3354,10 @@ STATIC INLINE void
 sl_txc_send_fisu(struct xp *xp, queue_t *q)
 {
 	__xp_timer_stop(xp, t7);
-	if (xp->option.pvar == SS7_PVAR_ANSI_92 && !(xp->option.popt & SS7_POPT_PCR))
-		__xp_timer_stop(xp, t6);
+	if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+	    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88))
+		if (!(xp->option.popt & SS7_POPT_PCR))
+			__xp_timer_stop(xp, t6);
 	xp->sl.statem.msu_inhibited = 1;
 	xp->sl.statem.lssu_available = 0;
 }
@@ -3079,11 +3466,13 @@ STATIC INLINE void
 sl_txc_sib_received(struct xp *xp, queue_t *q)
 {
 	/* FIXME: consider these variations for all */
-	if (xp->option.pvar == SS7_PVAR_ANSI_92 && xp->sl.statem.lssu_available)
-		if (xp->sl.statem.tx.sio != LSSU_SIB)
+	if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+	    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88))
+		if (xp->sl.statem.lssu_available && xp->sl.statem.tx.sio != LSSU_SIB)
 			return;
-	if (xp->option.pvar != SS7_PVAR_ITUT_93 && !xp->sl.rtb.q_count)
-		return;
+	if (xp->option.pvar != SS7_PVAR_ITUT_93)
+		if (!xp->sl.rtb.q_count)
+			return;
 	if (!xp->sl.statem.sib_received) {
 		__xp_timer_start(xp, t6);
 		xp->sl.statem.sib_received = 1;
@@ -3318,7 +3707,7 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 				    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 				xp->sl.statem.tx.N.bib = xp->sl.statem.tx.N.bib;
 			}
-			sl_daedt_msu(xp, q, mp);
+			ctrace(sl_daedt_msu(xp, q, mp));
 			if (xp->sl.statem.tx.N.fsn == xp->sl.statem.tx.L.fsn
 			    || xp->sl.statem.z_ptr == NULL)
 				xp->sl.statem.retrans_cycle = 0;
@@ -3370,7 +3759,7 @@ sl_txc_transmission_request(struct xp *xp, queue_t *q)
 			xp->sl.statem.tx.N.bsn =
 			    (xp->sl.statem.tx.X.fsn - 1) & xp->sl.statem.sn_mask;
 			xp->sl.statem.tx.N.fib = xp->sl.statem.tx.N.fib;
-			sl_daedt_msu(xp, q, mp);
+			ctrace(sl_daedt_msu(xp, q, mp));
 		} else
 			spin_unlock(&xp->sl.tb.q_lock);
 		return (mp);
@@ -3394,7 +3783,8 @@ sl_rc_start(struct xp *xp, queue_t *q)
 		xp->sl.statem.rx.F.fsn = 0;
 		xp->sl.statem.rx.T.fsn = xp->sl.statem.sn_mask;
 		xp->sl.statem.rtr = 0;	/* Basic only (note 1). */
-		if (xp->option.pvar == SS7_PVAR_ANSI_92)
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88))
 			xp->sl.statem.msu_fisu_accepted = 1;
 		else
 			xp->sl.statem.msu_fisu_accepted = 0;
@@ -3625,10 +4015,12 @@ sl_lsc_no_processor_outage(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		xp->sl.statem.processor_outage = 0;
-		if (!xp->sl.statem.l3_indication_received)
+		if (!xp->sl.statem.l3_indication_received) {
+			trace();
 			return;
+		}
 		xp->sl.statem.l3_indication_received = 0;
-		sl_txc_send_msu(xp, q);
+		ctrace(sl_txc_send_msu(xp, q));
 		xp->sl.statem.local_processor_outage = 0;
 		sl_rc_accept_msu_fisu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
@@ -3643,7 +4035,7 @@ sl_poc_remote_processor_recovered(struct xp *xp, queue_t *q)
 	switch (xp->sl.statem.poc_state) {
 	case SL_STATE_REMOTE_PROCESSOR_OUTAGE:
 		/* Indication moved from caller to remove spurious remote processor recovered
-		 * indications. */
+		   indications. */
 		if ((err = sl_remote_processor_recovered_ind(xp, q)))
 			return (err);
 		sl_lsc_no_processor_outage(xp, q);
@@ -3651,7 +4043,7 @@ sl_poc_remote_processor_recovered(struct xp *xp, queue_t *q)
 		break;
 	case SL_STATE_BOTH_PROCESSORS_OUT:
 		/* Indication moved from caller to remove spurious remote processor recovered
-		 * indications. */
+		   indications. */
 		if ((err = sl_remote_processor_recovered_ind(xp, q)))
 			return (err);
 		xp->sl.statem.poc_state = SL_STATE_LOCAL_PROCESSOR_OUTAGE;
@@ -3682,13 +4074,8 @@ sl_lsc_fisu_msu_received(struct xp *xp, queue_t *q)
 		xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 		break;
 	case SL_STATE_PROCESSOR_OUTAGE:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
-			if ((err = sl_poc_remote_processor_recovered(xp, q)))
-				return (err);
-			break;
-		default:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			/* 
 			 *  A deviation from the SDLs has been placed here to limit the number of remote
 			 *  processor recovered indications which are delivered to L3.  One indication is
@@ -3699,7 +4086,9 @@ sl_lsc_fisu_msu_received(struct xp *xp, queue_t *q)
 					return (err);
 				xp->sl.statem.remote_processor_outage = 0;
 			}
-			break;
+		} else {
+			if ((err = sl_poc_remote_processor_recovered(xp, q)))
+				return (err);
 		}
 		break;
 	}
@@ -3748,52 +4137,38 @@ sl_lsc_sipo(struct xp *xp, queue_t *q)
 
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_ALIGNED_READY:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
-			__xp_timer_stop(xp, t1);
-			if ((err = sl_poc_remote_processor_outage(xp, q)))
-				return (err);
-			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
-			break;
-		case SS7_PVAR_ANSI_92:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			__xp_timer_stop(xp, t1);
 			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
 			xp->sl.statem.remote_processor_outage = 1;
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
-			break;
+		} else {
+			__xp_timer_stop(xp, t1);
+			if ((err = sl_poc_remote_processor_outage(xp, q)))
+				return (err);
+			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 		}
 		break;
 	case SL_STATE_ALIGNED_NOT_READY:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
-			if ((err = sl_poc_remote_processor_outage(xp, q)))
-				return (err);
-			__xp_timer_stop(xp, t1);
-			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
-			break;
-		case SS7_PVAR_ANSI_92:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
 			xp->sl.statem.remote_processor_outage = 1;
 			__xp_timer_stop(xp, t1);
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
-			break;
+		} else {
+			if ((err = sl_poc_remote_processor_outage(xp, q)))
+				return (err);
+			__xp_timer_stop(xp, t1);
+			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 		}
 		break;
 	case SL_STATE_IN_SERVICE:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
-			sl_txc_send_fisu(xp, q);
-			if ((err = sl_poc_remote_processor_outage(xp, q)))
-				return (err);
-			xp->sl.statem.processor_outage = 1;	/* remote? */
-			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
-			break;
-		case SS7_PVAR_ANSI_92:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			sl_txc_send_fisu(xp, q);
 			if ((err = sl_remote_processor_outage_ind(xp, q)))
 				return (err);
@@ -3801,30 +4176,34 @@ sl_lsc_sipo(struct xp *xp, queue_t *q)
 			sl_rc_align_fsnx(xp, q);
 			sl_cc_stop(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
-			break;
+		} else {
+			sl_txc_send_fisu(xp, q);
+			if ((err = sl_poc_remote_processor_outage(xp, q)))
+				return (err);
+			xp->sl.statem.processor_outage = 1;	/* remote? */
+			xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 		}
 		break;
 	case SL_STATE_PROCESSOR_OUTAGE:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
-			if ((err = sl_poc_remote_processor_outage(xp, q)))
-				return (err);
-			break;
-		case SS7_PVAR_ANSI_92:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
+#if 0
 			xp->sl.statem.remote_processor_outage = 1;
 			return sl_remote_processor_outage_ind(xp, q);
-		default:
+#else
 			/* 
-			 *  A deviation from the SDLs has been placed here to limit the number of remote
-			 *  processor outage indications which are delivered to L3.  One indication is
-			 *  sufficient.
+			 *  A deviation from the SDLs has been placed here to limit the number of
+			 *  remote processor outage indications which are delivered to L3.  One
+			 *  indication is sufficient.
 			 */
 			if (!xp->sl.statem.remote_processor_outage) {
 				xp->sl.statem.remote_processor_outage = 1;
 				return sl_remote_processor_outage_ind(xp, q);
 			}
-			break;
+#endif
+		} else {
+			if ((err = sl_poc_remote_processor_outage(xp, q)))
+				return (err);
 		}
 		break;
 	}
@@ -3873,7 +4252,8 @@ sl_lsc_alignment_complete(struct xp *xp, queue_t *q)
 		sl_suerm_start(xp, q);
 		__xp_timer_start(xp, t1);
 		if (xp->sl.statem.local_processor_outage) {
-			if (xp->option.pvar != SS7_PVAR_ANSI_92)
+			if (((xp->option.pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
+			    || ((xp->option.pvar & SS7_PVAR_YR) <= SS7_PVAR_88))
 				sl_poc_local_processor_outage(xp, q);
 			ctrace(sl_txc_send_sipo(xp, q));
 			if (xp->option.pvar != SS7_PVAR_ITUT_93)	/* possible error */
@@ -4335,44 +4715,42 @@ sl_lsc_clear_buffers(struct xp *xp, queue_t *q)
 
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
-			return (QR_DONE);
-		case SS7_PVAR_ANSI_92:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			if ((err = sl_rtb_cleared_ind(xp, q)))
 				return (err);
 			xp->sl.statem.local_processor_outage = 0;	/* ??? */
-			return (QR_DONE);
 		}
+		break;
 	case SL_STATE_INITIAL_ALIGNMENT:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
-			return (QR_DONE);
-		case SS7_PVAR_ANSI_92:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			if ((err = sl_rtb_cleared_ind(xp, q)))
 				return (err);
 			xp->sl.statem.local_processor_outage = 0;
-			return (QR_DONE);
 		}
+		break;
 	case SL_STATE_ALIGNED_NOT_READY:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
-			return (QR_DONE);
-		case SS7_PVAR_ANSI_92:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			if ((err = sl_rtb_cleared_ind(xp, q)))
 				return (err);
 			xp->sl.statem.local_processor_outage = 0;
 			sl_txc_send_fisu(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_ALIGNED_READY;
-			return (QR_DONE);
 		}
+		break;
 	case SL_STATE_PROCESSOR_OUTAGE:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
+			xp->sl.statem.local_processor_outage = 0;
+			if ((err = sl_rc_clear_rb(xp, q)))
+				return (err);
+			sl_rc_accept_msu_fisu(xp, q);
+			sl_txc_send_fisu(xp, q);
+			sl_txc_clear_tb(xp, q);
+			sl_txc_clear_rtb(xp, q);
+		} else {
 			sl_txc_flush_buffers(xp, q);
 			xp->sl.statem.l3_indication_received = 1;
 			if (xp->sl.statem.processor_outage)
@@ -4382,29 +4760,23 @@ sl_lsc_clear_buffers(struct xp *xp, queue_t *q)
 			xp->sl.statem.local_processor_outage = 0;
 			sl_rc_accept_msu_fisu(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
-			return (QR_DONE);
-		case SS7_PVAR_ANSI_92:
-			xp->sl.statem.local_processor_outage = 0;
-			if ((err = sl_rc_clear_rb(xp, q)))
-				return (err);
-			sl_rc_accept_msu_fisu(xp, q);
-			sl_txc_send_fisu(xp, q);
-			sl_txc_clear_tb(xp, q);
-			sl_txc_clear_rtb(xp, q);
-			return (QR_DONE);
 		}
+		break;
 	}
 	return (QR_DONE);
 }
 
 STATIC INLINE void
-sl_lsc_continue(struct xp *xp, queue_t *q, mblk_t *mp)
+sl_lsc_continue(struct xp *xp, queue_t *q)
 {
 	if (xp->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
-		if (xp->sl.statem.processor_outage)
+		xp->sl.statem.l3_indication_received = 1;
+		if (xp->sl.statem.processor_outage) {
+			trace();
 			return;
+		}
 		xp->sl.statem.l3_indication_received = 0;
-		sl_txc_send_msu(xp, q);
+		ctrace(sl_txc_send_msu(xp, q));
 		xp->sl.statem.local_processor_outage = 0;
 		sl_rc_accept_msu_fisu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
@@ -4432,31 +4804,31 @@ sl_lsc_local_processor_recovered(struct xp *xp, queue_t *q)
 	switch (xp->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 		xp->sl.statem.local_processor_outage = 0;
-		return;
+		break;
 	case SL_STATE_INITIAL_ALIGNMENT:
 		xp->sl.statem.local_processor_outage = 0;
-		return;
+		break;
 	case SL_STATE_ALIGNED_READY:
-		return;
+		break;
 	case SL_STATE_ALIGNED_NOT_READY:
-		if (xp->option.pvar != SS7_PVAR_ANSI_92)
+		if (((xp->option.pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
+		    || ((xp->option.pvar & SS7_PVAR_YR) <= SS7_PVAR_88))
 			sl_poc_local_processor_recovered(xp, q);
 		xp->sl.statem.local_processor_outage = 0;
 		sl_txc_send_fisu(xp, q);
 		if (xp->option.pvar == SS7_PVAR_ITUT_96)
 			sl_rc_accept_msu_fisu(xp, q);
 		xp->sl.statem.lsc_state = SL_STATE_ALIGNED_READY;
-		return;
+		break;
 	case SL_STATE_PROCESSOR_OUTAGE:
-		switch (xp->option.pvar) {
-		case SS7_PVAR_ITUT_93:
-		case SS7_PVAR_ITUT_96:
+		if (((xp->option.pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
+		    || ((xp->option.pvar & SS7_PVAR_YR) <= SS7_PVAR_88)) {
 			sl_poc_local_processor_recovered(xp, q);
 			sl_rc_retrieve_fsnx(xp, q);
-			sl_txc_send_fisu(xp, q);	/* note 3: in fisu BSN <= FSNX-1 */
-			xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
-			return;
-		case SS7_PVAR_ANSI_92:
+			if (xp->sl.statem.poc_state != SL_STATE_IDLE)
+				sl_txc_send_fisu(xp, q);	/* note 3: in fisu BSN <= FSNX-1 */
+			// xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
+		} else {
 			xp->sl.statem.local_processor_outage = 0;
 			sl_rc_accept_msu_fisu(xp, q);
 			if (xp->sl.statem.remote_processor_outage) {
@@ -4466,9 +4838,8 @@ sl_lsc_local_processor_recovered(struct xp *xp, queue_t *q)
 			}
 			sl_txc_send_msu(xp, q);
 			xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
-			return;
 		}
-		return;
+		break;
 	}
 }
 
@@ -4482,7 +4853,8 @@ sl_lsc_local_processor_outage(struct xp *xp, queue_t *q)
 		xp->sl.statem.local_processor_outage = 1;
 		return;
 	case SL_STATE_ALIGNED_READY:
-		if (xp->option.pvar == SS7_PVAR_ANSI_92)
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88))
 			xp->sl.statem.local_processor_outage = 1;
 		else
 			sl_poc_local_processor_outage(xp, q);
@@ -4492,7 +4864,8 @@ sl_lsc_local_processor_outage(struct xp *xp, queue_t *q)
 		xp->sl.statem.lsc_state = SL_STATE_ALIGNED_NOT_READY;
 		return;
 	case SL_STATE_IN_SERVICE:
-		if (xp->option.pvar == SS7_PVAR_ANSI_92) {
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			xp->sl.statem.local_processor_outage = 1;
 		} else {
 			sl_poc_local_processor_outage(xp, q);
@@ -4500,14 +4873,16 @@ sl_lsc_local_processor_outage(struct xp *xp, queue_t *q)
 		}
 		ctrace(sl_txc_send_sipo(xp, q));
 		sl_rc_reject_msu_fisu(xp, q);
-		if (xp->option.pvar == SS7_PVAR_ANSI_92) {
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 			sl_rc_align_fsnx(xp, q);
 			sl_cc_stop(xp, q);
 		}
 		xp->sl.statem.lsc_state = SL_STATE_PROCESSOR_OUTAGE;
 		return;
 	case SL_STATE_PROCESSOR_OUTAGE:
-		if (xp->option.pvar == SS7_PVAR_ANSI_92)
+		if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+		    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88))
 			xp->sl.statem.local_processor_outage = 1;
 		else
 			sl_poc_local_processor_outage(xp, q);
@@ -4579,7 +4954,8 @@ sl_txc_start(struct xp *xp, queue_t *q)
 	xp->sl.statem.Ct = 0;
 	xp->sl.statem.rtb_full = 0;
 	xp->sl.statem.clear_rtb = 0;	/* ok if ITU */
-	if (xp->option.pvar == SS7_PVAR_ANSI_92) {
+	if (((xp->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
+	    && ((xp->option.pvar & SS7_PVAR_YR) > SS7_PVAR_88)) {
 		xp->sl.statem.tx.sio = LSSU_SIOS;
 		xp->sl.statem.lssu_available = 1;
 	}
@@ -4599,7 +4975,8 @@ sl_txc_start(struct xp *xp, queue_t *q)
 	xp->sl.statem.Z = 0;
 	xp->sl.statem.z_ptr = NULL;	/* ok if basic */
 	if (xp->sl.statem.txc_state == SL_STATE_IDLE) {
-		if (xp->option.pvar != SS7_PVAR_ANSI_92)
+		if (((xp->option.pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
+		    || ((xp->option.pvar & SS7_PVAR_YR) <= SS7_PVAR_88))
 			xp->sl.statem.lssu_available = 0;
 		ctrace(sl_daedt_start(xp, q));
 	}
@@ -5239,7 +5616,8 @@ xp_t7_timeout(struct xp *xp, queue_t *q)
 	if ((err = sl_lsc_link_failure(xp, q, SL_FAIL_ACK_TIMEOUT)))
 		return (err);
 	__xp_timer_stop(xp, t6);
-	if (xp->option.pvar == SS7_PVAR_ITUT_96)
+	if (((xp->option.pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
+	    || ((xp->option.pvar & SS7_PVAR_YR) <= SS7_PVAR_88))
 		xp->sl.statem.sib_received = 0;
 	return (QR_DONE);
 }
@@ -6602,29 +6980,6 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 }
 
 /*
- *  SL_RESUME_REQ
- *  -----------------------------------
- */
-STATIC int
-sl_resume_req(queue_t *q, mblk_t *mp)
-{
-	struct xp *xp = XP_PRIV(q);
-	psw_t flags;
-
-	if (xp->i_state != LMI_ENABLED)
-		goto eproto;
-	spin_lock_irqsave(&xp->lock, flags);
-	{
-		(void) mp;
-		sl_lsc_resume(xp, q);
-	}
-	spin_unlock_irqrestore(&xp->lock, flags);
-	return (QR_DONE);
-      eproto:
-	return m_error(xp, q, EPROTO);
-}
-
-/*
  *  SL_CLEAR_BUFFERS_REQ
  *  -----------------------------------
  */
@@ -6671,6 +7026,29 @@ sl_clear_rtb_req(queue_t *q, mblk_t *mp)
 }
 
 /*
+ *  SL_CONTINUE_REQ
+ *  -----------------------------------
+ */
+STATIC int
+sl_continue_req(queue_t *q, mblk_t *mp)
+{
+	struct xp *xp = XP_PRIV(q);
+	psw_t flags;
+
+	if (xp->i_state != LMI_ENABLED)
+		goto eproto;
+	spin_lock_irqsave(&xp->lock, flags);
+	{
+		(void) mp;
+		sl_lsc_continue(xp, q);
+	}
+	spin_unlock_irqrestore(&xp->lock, flags);
+	return (QR_DONE);
+      eproto:
+	return m_error(xp, q, EPROTO);
+}
+
+/*
  *  SL_LOCAL_PROCESSOR_OUTAGE_REQ
  *  -----------------------------------
  */
@@ -6686,6 +7064,29 @@ sl_local_processor_outage_req(queue_t *q, mblk_t *mp)
 	{
 		(void) mp;
 		sl_lsc_local_processor_outage(xp, q);
+	}
+	spin_unlock_irqrestore(&xp->lock, flags);
+	return (QR_DONE);
+      eproto:
+	return m_error(xp, q, EPROTO);
+}
+
+/*
+ *  SL_RESUME_REQ
+ *  -----------------------------------
+ */
+STATIC int
+sl_resume_req(queue_t *q, mblk_t *mp)
+{
+	struct xp *xp = XP_PRIV(q);
+	psw_t flags;
+
+	if (xp->i_state != LMI_ENABLED)
+		goto eproto;
+	spin_lock_irqsave(&xp->lock, flags);
+	{
+		(void) mp;
+		sl_lsc_resume(xp, q);
 	}
 	spin_unlock_irqrestore(&xp->lock, flags);
 	return (QR_DONE);
@@ -7129,7 +7530,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
 		ptrace(("%s: ERROR: primitive too small = %ld bytes\n", DRV_NAME,
-			(long)(mp->b_wptr - mp->b_rptr)));
+			(long) (mp->b_wptr - mp->b_rptr)));
 		goto lmi_badprim;
 	}
 	if (xp->i_state != LMI_UNATTACHED) {
@@ -7580,11 +7981,11 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	xp->i_state = LMI_ENABLED;
 	if (!(sp->config.ifflags & SDL_IF_UP)) {
 		/* need to bring up span */
+		psw_t flags;
+
 		switch (cd->config.ifgtype) {
 		case SDL_GTYPE_E1:
 		{
-			psw_t flags;
-
 			printd(("%s: performing enable on E1 span %d\n", DRV_NAME, sp->span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -7592,13 +7993,10 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			cd->eval_syncsrc = 1;
 			cd->xlb[CTLREG] = (E1DIV);
 			cd->xlb[LEDREG] = 0xff;
-#if 0
-			/* zero all span registers */
-			for (offset = 0; offset < 192; offset++)
-				cd->xlb[(sp->span << 8) + offset] = 0x00;
-#endif
-			xp_span_config(cd, sp->span, true);
+
+			xp_span_reconfig(cd, sp->span);
 			sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
+
 			/* enable interrupts */
 			cd->xlb[CTLREG] = (INTENA | E1DIV);
 			spin_unlock_irqrestore(&cd->lock, flags);
@@ -7607,23 +8005,18 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_T1:
 		case SDL_GTYPE_J1:
 		{
-			int japan = (cd->config.ifgtype == SDL_GTYPE_J1);
-			psw_t flags;
-
 			printd(("%s: performing enable on %s span %d\n", DRV_NAME,
-				japan ? "J1" : "T1", sp->span));
+				(cd->config.ifgtype == SDL_GTYPE_J1) ? "J1" : "T1", sp->span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
 			cd->eval_syncsrc = 1;
 			cd->xlb[CTLREG] = 0;
 			cd->xlb[LEDREG] = 0xff;
-#if 0
-			for (offset = 0; offset < 160; offset++)
-				cd->xlb[(sp->span << 8) + offset] = 0x00;
-#endif
-			xp_span_config(cd, sp->span, true);
+
+			xp_span_reconfig(cd, sp->span);
 			sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
+
 			/* enable interrupts */
 			cd->xlb[CTLREG] = (INTENA);
 			spin_unlock_irqrestore(&cd->lock, flags);
@@ -8819,25 +9212,32 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 			/* need to bring up span */
 			switch (cd->config.ifgtype) {
 			case SDL_GTYPE_E1:
+			{
 				printd(("%s: performing reconfiguration of E1 span %d\n",
 					DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
-				xp_span_config(cd, sp->span, true);
+				xp_span_reconfig(cd, sp->span);
+				break;
+			}
 			case SDL_GTYPE_T1:
+			{
 				printd(("%s: performing reconfiguration of T1 span %d\n",
 					DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
-				xp_span_config(cd, sp->span, true);
+				xp_span_reconfig(cd, sp->span);
 				break;
+			}
 			case SDL_GTYPE_J1:
+			{
 				printd(("%s: performing reconfiguration of J1 span %d\n",
 					DRV_NAME, sp->span));
 				/* Tell ISR to re-evaluate the sync source */
 				cd->eval_syncsrc = 1;
-				xp_span_config(cd, sp->span, true);
+				xp_span_reconfig(cd, sp->span);
 				break;
+			}
 			default:
 				swerr();
 				break;
@@ -9358,7 +9758,7 @@ xp_e1_card_tasklet(unsigned long data)
 				}
 			}
 			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
-				tasklet_schedule(&cd->tasklet);
+				tasklet_hi_schedule(&cd->tasklet);
 		}
 	}
 	spin_unlock(&cd->lock);
@@ -9479,7 +9879,7 @@ xp_t1_card_tasklet(unsigned long data)
 				}
 			}
 			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
-				tasklet_schedule(&cd->tasklet);
+				tasklet_hi_schedule(&cd->tasklet);
 		}
 	}
 	spin_unlock(&cd->lock);
@@ -9601,7 +10001,7 @@ xp_j1_card_tasklet(unsigned long data)
 				}
 			}
 			if ((cd->uebno = (cd->uebno + 1) & (X400P_EBUFNO - 1)) != cd->lebno)
-				tasklet_schedule(&cd->tasklet);
+				tasklet_hi_schedule(&cd->tasklet);
 		}
 	}
 	spin_unlock(&cd->lock);
@@ -9738,7 +10138,7 @@ xp_e1_txrx_burst(struct cd *cd)
 				rbuf[slot] = xll[slot];
 #endif
 		cd->lebno = lebno;
-		tasklet_schedule(&cd->tasklet);
+		tasklet_hi_schedule(&cd->tasklet);
 	} else
 		xp_overflow(cd);
 }
@@ -9914,6 +10314,14 @@ xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 			int status, alarms = 0, leds = 0, all_leds;
 			volatile uint8_t *xlb = &cd->xlb[span << 8];
 
+			/** Old rxlevel 00 => New tx level 0000, 0001, 0010  -0.0dB -  -7.5dB
+			 **             01 =>              0011, 0100, 0101  -7.5dB - -15.0dB
+			 **             10 =>              0110, 0111, 1000 -15.0dB - -22.5dB
+			 **             11 =>              1001, 1010, 1011 -22.5dB - -30.0dB
+			 **                                1100, 1101, 1110 -30.0dB - -37.5dB
+			 **                                1111             -37.5dB and less  */
+			sp->config.ifrxlevel = (xlb[0x11] & 0x0f) / 3;
+
 			/* write-read cycle */
 			xlb[0x18] = 0x07;
 			status = xlb[0x18];
@@ -10031,7 +10439,7 @@ xp_t1_txrx_burst(struct cd *cd)
 					}
 		}
 		cd->lebno = lebno;
-		tasklet_schedule(&cd->tasklet);
+		tasklet_hi_schedule(&cd->tasklet);
 	} else
 		xp_overflow(cd);
 }
@@ -10231,11 +10639,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 					    (sp->config.ifgcrc == SDL_GCRC_CRC6J) ? 0x80 : 0x00;
 					printd(("%s: alarm recovery complete\n", __FUNCTION__));
 					sp->config.ifalarms &= ~SDL_ALARM_REC;
-#if 0
-					xlb[0x05] = 0x10 | japan;	/* turn off yellow */
-#else
-					xlb[0x05] = 0x00 | japan;
-#endif
+					xlb[0x05] = 0x10 | japan;	/* TSSE, turn off yellow */
 					cd->eval_syncsrc = 1;
 				}
 			}
@@ -10253,7 +10657,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 			 **             11 =>              1001, 1010, 1011 -22.5dB - -30.0dB
 			 **                                1100, 1101, 1110 -30.0dB - -37.5dB
 			 **                                1111             -37.5dB and less  */
-			sp->config.ifrxlevel = ((xlb[0x11] & 0x0f) + 2) / 3;
+			sp->config.ifrxlevel = (xlb[0x11] & 0x0f) / 3;
 
 			/* write-read cycle */
 			xlb[0x1a] = 0xff;
@@ -10291,11 +10695,7 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 					    (sp->config.ifgcrc == SDL_GCRC_CRC6J) ? 0x80 : 0x00;
 
 					/* alarms have just begun */
-#if 0
-					xlb[0x05] = 0x11 | japan;	/* set yellow alarm */
-#else
-					xlb[0x05] = 0x01 | japan;	/* set yellow alarm */
-#endif
+					xlb[0x05] = 0x11 | japan;	/* TSSE, set yellow alarm */
 					cd->eval_syncsrc = 1;
 				}
 			} else {
@@ -10635,7 +11035,7 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case SL_PDU_REQ:
-		_printd(("%s: %p: -> SL_PDU_REQ\n", DRV_NAME, xp));
+		printd(("%s: %p: -> SL_PDU_REQ\n", DRV_NAME, xp));
 		rtn = sl_pdu_req(q, mp);
 		break;
 	case SL_EMERGENCY_REQ:
@@ -10662,10 +11062,6 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 		printd(("%s: %p: -> SL_RETRIEVAL_REQUEST_AND_FSNC_REQ\n", DRV_NAME, xp));
 		rtn = sl_retrieval_request_and_fsnc_req(q, mp);
 		break;
-	case SL_RESUME_REQ:
-		printd(("%s: %p: -> SL_RESUME_REQ\n", DRV_NAME, xp));
-		rtn = sl_resume_req(q, mp);
-		break;
 	case SL_CLEAR_BUFFERS_REQ:
 		printd(("%s: %p: -> SL_CLEAR_BUFFERS_REQ\n", DRV_NAME, xp));
 		rtn = sl_clear_buffers_req(q, mp);
@@ -10677,6 +11073,14 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 	case SL_LOCAL_PROCESSOR_OUTAGE_REQ:
 		printd(("%s: %p: -> SL_LOCAL_PROCESSOR_OUTAGE_REQ\n", DRV_NAME, xp));
 		rtn = sl_local_processor_outage_req(q, mp);
+		break;
+	case SL_CONTINUE_REQ:
+		printd(("%s: %p: -> SL_CONTINUE_REQ\n", DRV_NAME, xp));
+		rtn = sl_continue_req(q, mp);
+		break;
+	case SL_RESUME_REQ:
+		printd(("%s: %p: -> SL_RESUME_REQ\n", DRV_NAME, xp));
+		rtn = sl_resume_req(q, mp);
 		break;
 	case SL_CONGESTION_DISCARD_REQ:
 		printd(("%s: %p: -> SL_CONGESTION_DISCARD_REQ\n", DRV_NAME, xp));
@@ -10835,6 +11239,7 @@ xp_r_sig(queue_t *q, mblk_t *mp)
 	}
 	return (rtn);
 }
+
 /*
  *  M_DATA Handling
  *  -------------------------------------------------------------------------
@@ -11362,7 +11767,7 @@ xp_free_sp(struct sp *sp)
 	} else
 		ptrace(("%s: ERROR: spans cannot exist without cards\n", DRV_NAME));
 	assure(atomic_read(&sp->refcnt) == 1);
-	sp_put(sp); /* final put */
+	sp_put(sp);		/* final put */
 }
 STATIC struct sp *
 sp_get(struct sp *sp)
@@ -11620,6 +12025,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	int span, board;
 	struct cd *cd;
 	const char *name;
+	unsigned long timeout;
 
 	if (!dev || !id) {
 		ptrace(("%s: ERROR: Device or id is null!\n", DRV_NAME));
@@ -11777,9 +12183,12 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		  xp_device_info[cd->device].name, (char) (cd->devrev + 65)));
 
 	{
-		int ebuf, word, idle_word = xp_board_info[cd->board].idle_word;
+		int word, idle_word = xp_board_info[cd->board].idle_word;
+
 		/* idle out all channels */
 		for (word = 0; word < 256; word++) {
+			int ebuf;
+
 			cd->xll[word] = idle_word;
 			for (ebuf = 0; ebuf < X400P_EBUFNO; ebuf++)
 				cd->wbuf[(ebuf << 8) + word] = idle_word;
@@ -11805,9 +12214,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[(1 << 8) + 0xb5] = 0x08;
 		cd->xlb[(2 << 8) + 0xb5] = 0x08;
 		cd->xlb[(3 << 8) + 0xb5] = 0x08;
-	}
 		break;
+	}
 	case V401PE:
+	{
 		/* setup E1 card defaults */
 		cd->config = sdl_default_e1_chan;
 		cd->isr = &xp_e401_interrupt;
@@ -11816,12 +12226,49 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[(1 << 8) + 0x00] = 0x02;
 		cd->xlb[(2 << 8) + 0x00] = 0x02;
 		cd->xlb[(3 << 8) + 0x00] = 0x02;
+#if 0
+		/* place all framers in E1 mode - and soft reset */
+		cd->xlb[(0 << 8) + 0x00] = 0x03;
+		cd->xlb[(1 << 8) + 0x00] = 0x03;
+		cd->xlb[(2 << 8) + 0x00] = 0x03;
+		cd->xlb[(3 << 8) + 0x00] = 0x03;
+		/* wait for reset to clear */
+		while (cd->xlb[(0 << 8) + 0x00] & 0x1) ;
+		printd(("%s: reset cleared on span 0\n", DRV_NAME));
+		while (cd->xlb[(1 << 8) + 0x00] & 0x1) ;
+		printd(("%s: reset cleared on span 1\n", DRV_NAME));
+		while (cd->xlb[(2 << 8) + 0x00] & 0x1) ;
+		printd(("%s: reset cleared on span 2\n", DRV_NAME));
+		while (cd->xlb[(3 << 8) + 0x00] & 0x1) ;
+		printd(("%s: reset cleared on span 3\n", DRV_NAME));
+		/* wait for 40 ms */
+		timeout = jiffies + 100 * HZ / 1000;
+		while (jiffies < timeout) ;
+#endif
+		/* link interface reset */
+		cd->xlb[(0 << 8) + 0x79] = 0xd8;	/* E1, transmit all ones, LIRST */
+		printd(("%s: LIRST on span 0\n", DRV_NAME));
+		cd->xlb[(1 << 8) + 0x79] = 0xd8;	/* E1, transmit all ones, LIRST */
+		printd(("%s: LIRST on span 1\n", DRV_NAME));
+		cd->xlb[(2 << 8) + 0x79] = 0xd8;	/* E1, transmit all ones, LIRST */
+		printd(("%s: LIRST on span 2\n", DRV_NAME));
+		cd->xlb[(3 << 8) + 0x79] = 0xd8;	/* E1, transmit all ones, LIRST */
+		printd(("%s: LIRST on span 3\n", DRV_NAME));
+		/* wait for 40 ms */
+		timeout = jiffies + 100 * HZ / 1000;
+		while (jiffies < timeout) ;
+		/* release LIRST bit */
+		cd->xlb[(0 << 8) + 0x79] = 0x98;	/* E1, normal */
+		cd->xlb[(1 << 8) + 0x79] = 0x98;	/* E1, normal */
+		cd->xlb[(2 << 8) + 0x79] = 0x98;	/* E1, normal */
+		cd->xlb[(3 << 8) + 0x79] = 0x98;	/* E1, normal */
 		/* set up for interleaved serial bus operation, byte mode */
 		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
 		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
 		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
 		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
 		break;
+	}
 	case V400PT:
 	case T400P:
 	case T400PSS7:
@@ -11852,9 +12299,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[(1 << 8) + 0x94] = 0x08;
 		cd->xlb[(2 << 8) + 0x94] = 0x08;
 		cd->xlb[(3 << 8) + 0x94] = 0x08;
-	}
 		break;
+	}
 	case V401PT:
+	{
 #if 0
 		if (!japan) {
 			/* setup T1 card defaults */
@@ -11876,12 +12324,49 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[(1 << 8) + 0x00] = 0x00;
 		cd->xlb[(2 << 8) + 0x00] = 0x00;
 		cd->xlb[(3 << 8) + 0x00] = 0x00;
+#if 0
+		/* place all framers in T1 mode - and soft reset */
+		cd->xlb[(0 << 8) + 0x00] = 0x01;
+		cd->xlb[(1 << 8) + 0x00] = 0x01;
+		cd->xlb[(2 << 8) + 0x00] = 0x01;
+		cd->xlb[(3 << 8) + 0x00] = 0x01;
+		/* wait for reset to clear */
+		while (cd->xlb[(0 << 8) + 0x00] & 0x1) ;
+		printd(("%s: reset cleared on span 0\n", DRV_NAME));
+		while (cd->xlb[(1 << 8) + 0x00] & 0x1) ;
+		printd(("%s: reset cleared on span 1\n", DRV_NAME));
+		while (cd->xlb[(2 << 8) + 0x00] & 0x1) ;
+		printd(("%s: reset cleared on span 2\n", DRV_NAME));
+		while (cd->xlb[(3 << 8) + 0x00] & 0x1) ;
+		printd(("%s: reset cleared on span 3\n", DRV_NAME));
+		/* wait for 40 ms */
+		timeout = jiffies + 100 * HZ / 1000;
+		while (jiffies < timeout) ;
+#endif
+		/* link interface reset */
+		cd->xlb[(0 << 8) + 0x79] = 0x48;	/* T1, transmit all ones, LIRST */
+		printd(("%s: LIRST on span 0\n", DRV_NAME));
+		cd->xlb[(1 << 8) + 0x79] = 0x48;	/* T1, transmit all ones, LIRST */
+		printd(("%s: LIRST on span 1\n", DRV_NAME));
+		cd->xlb[(2 << 8) + 0x79] = 0x48;	/* T1, transmit all ones, LIRST */
+		printd(("%s: LIRST on span 2\n", DRV_NAME));
+		cd->xlb[(3 << 8) + 0x79] = 0x48;	/* T1, transmit all ones, LIRST */
+		printd(("%s: LIRST on span 3\n", DRV_NAME));
+		/* wait for 40 ms */
+		timeout = jiffies + 100 * HZ / 1000;
+		while (jiffies < timeout) ;
+		/* release LIRST bit */
+		cd->xlb[(0 << 8) + 0x79] = 0x18;	/* T1, normal */
+		cd->xlb[(1 << 8) + 0x79] = 0x18;	/* T1, normal */
+		cd->xlb[(2 << 8) + 0x79] = 0x18;	/* T1, normal */
+		cd->xlb[(3 << 8) + 0x79] = 0x18;	/* T1, normal */
 		/* set up for interleaved serial bus operation, byte mode */
 		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
 		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
 		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
 		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
 		break;
+	}
 	default:
 		swerr();
 		goto error_remove;
@@ -11912,10 +12397,11 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		if (!xp_alloc_sp(cd, span))
 			goto error_remove;
 	/* set up span defaults */
-	xp_span_config(cd, 0, false);
-	xp_span_config(cd, 1, false);
-	xp_span_config(cd, 2, false);
-	xp_span_config(cd, 3, false);
+	xp_span_config(cd, 0, true);
+	xp_span_config(cd, 1, true);
+	xp_span_config(cd, 2, true);
+	xp_span_config(cd, 3, true);
+
 	cd->plx[INTCSR] = PLX_INTENA;	/* enable interrupts */
 	return (0);
       error_remove:
@@ -12000,7 +12486,7 @@ MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif
-MODULE_PARM_DESC(modid, "Module ID for the X400P-SL driver. (0 for allocation.)");
+MODULE_PARM_DESC(modid, "Module ID for the SL-X400P driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
 
@@ -12009,7 +12495,7 @@ MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0);
 #endif
-MODULE_PARM_DESC(major, "Device number for the X400P-SL driver. (0 for allocation.)");
+MODULE_PARM_DESC(major, "Device number for the SL-X400P driver. (0 for allocation.)");
 
 /*
  *  Linux Fast-STREAMS Registration

@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/30 06:50:13 $
+dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/11 07:40:22 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/10/30 06:50:13 $ by $Author: brian $
+dnl Last Modified $Date: 2006/12/11 07:40:22 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: local.at,v $
+dnl Revision 0.9.2.7  2006/12/11 07:40:22  brian
+dnl - corrections from testing
+dnl
 dnl Revision 0.9.2.6  2006/10/30 06:50:13  brian
 dnl - added ability to sync between test cases
 dnl
@@ -115,6 +118,9 @@ AT_ARG_OPTION([messages], AS_HELP_STRING([--messages],
 
 AT_ARG_OPTION([quiet], AS_HELP_STRING([--quiet],
 	[suppress normal output]))
+
+AT_ARG_OPTION([wait], AS_HELP_STRING([--wait],
+	[run even time consuming tests @<:default: off@:>@]))
 
 AT_ARG_OPTION([sync], AS_HELP_STRING([--sync],
 	[do a disk sync before running tests @<:@default: off@:>@]))

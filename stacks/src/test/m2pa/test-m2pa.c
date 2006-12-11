@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/12/06 11:45:26 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/11 07:40:15 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:45:26 $ by $Author: brian $
+ Last Modified $Date: 2006/12/11 07:40:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.19  2006/12/11 07:40:15  brian
+ - corrections from testing
+
  Revision 0.9.2.18  2006/12/06 11:45:26  brian
  - updated X400P driver and test suites
 
@@ -93,9 +96,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/12/06 11:45:26 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/11 07:40:15 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/12/06 11:45:26 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/11 07:40:15 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0

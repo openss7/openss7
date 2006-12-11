@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sli.h,v 0.9.2.3 2006/09/18 13:52:34 brian Exp $
+ @(#) $Id: sli.h,v 0.9.2.4 2006/12/11 07:40:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
+ Last Modified $Date: 2006/12/11 07:40:11 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_SLI_H__
 #define __SS7_SLI_H__
 
-#ident "@(#) $RCSfile: sli.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sli.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -415,6 +415,7 @@ union SL_primitives {
 	sl_retrieve_bsnt_req_t retrieve_bsnt_req;
 	sl_retrieval_req_and_fsnc_t retrieval_req_and_fsnc;
 	sl_resume_req_t resume_req;
+	sl_continue_req_t continue_req;
 	sl_clear_buffers_req_t clear_buffers_req;
 	sl_clear_rtb_req_t clear_rtb_req;
 	sl_local_proc_outage_req_t local_proc_outage_req;
@@ -453,6 +454,7 @@ typedef union SL_primitives sl_prim_t;
 #define SL_RETRIEVE_BSNT_REQ_SIZE	sizeof(sl_retrieve_bsnt_req_t)
 #define SL_RETRIEVAL_REQ_AND_FSNC_SIZE	sizeof(sl_retrieval_req_and_fsnc_t)
 #define SL_RESUME_REQ_SIZE		sizeof(sl_resume_req_t)
+#define SL_CONTINUE_REQ_SIZE		sizeof(sl_continue_req_t)
 #define SL_CLEAR_BUFFERS_REQ_SIZE	sizeof(sl_clear_buffers_req_t)
 #define SL_CLEAR_RTB_REQ_SIZE		sizeof(sl_clear_rtb_req_t)
 #define SL_LOCAL_PROC_OUTAGE_REQ_SIZE	sizeof(sl_local_proc_outage_req_t)

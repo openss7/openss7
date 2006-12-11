@@ -1,3 +1,16 @@
+2006-12-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/ss7/sli.h: complete paraphenalia for SL_CONTINUE_REQ
+	* src/modules/x400p-ss7/sl_x400p.c:
+	  - better configuration
+	  - support for more protocol variants
+	  - corrections from testing (mostly processor outage handling)
+	  - corrected naming
+	* src/test/x400p-ss7/test-x400p.c: many corrections from testing
+	* src/test/m2pa/test-m2pa.c: rationalized to X400P driver
+	* tests/local.at: added --wait option for long duration tests
+	* tests/testsuite-x400p-sl.at: added --wait option for long duration tests
+
 2006-12-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/x400p-ss7/sl_x400p.c: corrections from testing
