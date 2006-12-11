@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/11 11:57:51 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/11 12:31:44 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/11 11:57:51 $ by $Author: brian $
+ Last Modified $Date: 2006/12/11 12:31:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.14  2006/12/11 12:31:44  brian
+ - testcase timing tweaks
+
  Revision 0.9.2.13  2006/12/11 11:57:51  brian
  - T1 works correctly, almost all test cases pass
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/11 11:57:51 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/11 12:31:44 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/11 11:57:51 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/11 12:31:44 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   1
@@ -14428,7 +14431,7 @@ test_4_1a_ptu(int child)
 					goto failure;
 				break;
 			case __TEST_FISU:
-				if (bsn[1] != fsn[0])
+				if (bsn[1] != fsn[0] - 1 && bsn[1] != fsn[0])
 					continue;
 				if (ack == 0) {
 					ack++;
@@ -14533,7 +14536,7 @@ test_4_1a_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
-	test_msleep(child, config->sl.t7 / 2);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
@@ -16630,9 +16633,13 @@ test_8_1_ptu(int child)
 				goto failure;
 			state++;
 		case 1:
-			if (expect(child, INFINITE_WAIT, __TEST_FISU))
+			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
+				if (last_event == __TEST_MSU) {
+					state++;
+					goto got_msu;
+				}
 				goto failure;
-#if TEST_X400
+			}
 			if ((bib[1] | bsn[1]) == 0xff && (fib[1] | fsn[1]) == 0xff) {
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
@@ -16642,42 +16649,23 @@ test_8_1_ptu(int child)
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
-#endif				/* TEST_X400 */
 			state++;
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
-#if TEST_X400
 					if (check_snibs(child, 0x80, 0xff))
 						goto failure;
 					if (do_signal(child, __TEST_FISU))
 						goto failure;
-#endif				/* TEST_X400 */
 					continue;
 				}
 				goto failure;
 			}
-#if TEST_X400
+		      got_msu:
 			if (check_snibs(child, 0x80, 0x80))
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
-#endif				/* TEST_X400 */
-#if TEST_M2PA
-			switch (m2pa_version) {
-			case M2PA_VERSION_DRAFT6:
-			case M2PA_VERSION_DRAFT6_1:
-			case M2PA_VERSION_DRAFT6_9:
-			case M2PA_VERSION_DRAFT7:
-			case M2PA_VERSION_DRAFT10:
-			case M2PA_VERSION_DRAFT11:
-			case M2PA_VERSION_RFC4165:
-				bsn[0] = fsn[1];
-				break;
-			}
-			if (do_signal(child, __TEST_ACK))
-				goto failure;
-#endif				/* TEST_M2PA */
 			state++;
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
