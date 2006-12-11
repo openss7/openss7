@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/11 07:40:12 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/12/11 11:57:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/11 07:40:12 $ by $Author: brian $
+ Last Modified $Date: 2006/12/11 11:57:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.27  2006/12/11 11:57:40  brian
+ - T1 works correctly, almost all test cases pass
+
  Revision 0.9.2.26  2006/12/11 07:40:12  brian
  - corrections from testing
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/11 07:40:12 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/12/11 11:57:40 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/11 07:40:12 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/12/11 11:57:40 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -144,7 +147,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/11 07:40:12 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/12/11 11:57:40 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2164,8 +2167,10 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 				    || cd->spans[sp->span]->slots[slot]->sdl.config.
 				    iftype != SDL_TYPE_DS0A)
 					mask |= 1 << (c % 8);
-				if ((c % 8) == 7)
+				if ((c % 8) == 7) {
 					xlb[0x39 + byte] = mask;
+					mask = 0;
+				}
 			}
 		}
 		break;
@@ -2178,7 +2183,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
 		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
 		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
-		xlb[0x70] = 0x02;	/* LOTCMC into TCSS0 */
+		xlb[0x70] = 0x06;	/* LOTCMC into TCSS0 */
 		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 
 		   RSYNC is an input (elastic store). */
 		xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
@@ -2240,8 +2245,10 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		xlb[0x06] = reg06;	/* TB8ZS */
 		xlb[0x07] = reg07;	/* TESF */
 
+#if 0
 		xlb[0x03] = 0x08 | 0x01;	/* SYNCC/SYNCE, RESYNC */
 		xlb[0x03] = 0x08 | 0x00;	/* SYNCC/SYNCE */
+#endif
 
 		xlb[0x40] = 0x00;	/* RCCS, TCCS set to zero for T1 */
 
@@ -2253,7 +2260,6 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		}
 #endif
 		xlb[0x79] = 0x18;	/* JACLK on for T1 */
-		xlb[0x7b] = 0x0a;	/* 100 ohm, MCLK 2.048 MHz */
 		xlb[0x7d] = 0x00;	/* Automatic gain control */
 
 		if (sp->config.iftxlevel < 8) {
@@ -2269,6 +2275,7 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		// reg78 &= ~0x01; /* disable transmitter */
 
 		xlb[0x78] = reg78;
+		xlb[0x7b] = 0x0a;	/* 100 ohm, MCLK 2.048 MHz */
 		xlb[0x7a] = reg7a;
 
 		{
@@ -2283,8 +2290,10 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 				if (sp->slots[slot]
 				    && sp->slots[slot]->sdl.config.iftype == SDL_TYPE_DS0A)
 					mask |= 1 << (c % 8);
-				if ((c % 8) == 7)
+				if ((c % 8) == 7) {
 					xlb[0x08 + byte] = mask;
+					mask = 0;
+				}
 			}
 		}
 		break;
@@ -2512,8 +2521,10 @@ xp_span_reconfig(struct cd *cd, int span)
 				if (!sp->slots[slot]
 				    || sp->slots[slot]->sdl.config.iftype != SDL_TYPE_DS0A)
 					mask |= 1 << (c % 8);
-				if ((c % 8) == 7)
+				if ((c % 8) == 7) {
 					xlb[0x39 + byte] = mask;
+					mask = 0;
+				}
 			}
 		}
 		break;
@@ -2615,8 +2626,10 @@ xp_span_reconfig(struct cd *cd, int span)
 				if (sp->slots[slot]
 				    && sp->slots[slot]->sdl.config.iftype == SDL_TYPE_DS0A)
 					mask |= 1 << (c % 8);
-				if ((c % 8) == 7)
+				if ((c % 8) == 7) {
 					xlb[0x08 + byte] = mask;
+					mask = 0;
+				}
 			}
 		}
 		break;
@@ -10749,8 +10762,20 @@ xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 				}
 			}
 			if (cd->config.ifsync != syncsrc) {
-				cd->xlb[SYNREG] = syncsrc;
 				cd->config.ifsync = syncsrc;
+				if (syncsrc) {
+					cd->xlb[(0 << 8) + 0x70] = 0x00;
+					cd->xlb[(1 << 8) + 0x70] = 0x00;
+					cd->xlb[(2 << 8) + 0x70] = 0x00;
+					cd->xlb[(3 << 8) + 0x70] = 0x00;
+				} else {
+					cd->xlb[(0 << 8) + 0x70] = 0x06;
+					cd->xlb[(1 << 8) + 0x70] = 0x06;
+					cd->xlb[(2 << 8) + 0x70] = 0x06;
+					cd->xlb[(3 << 8) + 0x70] = 0x06;
+					syncsrc = SYNC1;
+				}
+				cd->xlb[SYNREG] = syncsrc;
 			}
 		}
 		cd->frame += 8;
@@ -12226,33 +12251,19 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[(1 << 8) + 0x00] = 0x02;
 		cd->xlb[(2 << 8) + 0x00] = 0x02;
 		cd->xlb[(3 << 8) + 0x00] = 0x02;
-#if 0
-		/* place all framers in E1 mode - and soft reset */
-		cd->xlb[(0 << 8) + 0x00] = 0x03;
-		cd->xlb[(1 << 8) + 0x00] = 0x03;
-		cd->xlb[(2 << 8) + 0x00] = 0x03;
-		cd->xlb[(3 << 8) + 0x00] = 0x03;
-		/* wait for reset to clear */
-		while (cd->xlb[(0 << 8) + 0x00] & 0x1) ;
-		printd(("%s: reset cleared on span 0\n", DRV_NAME));
-		while (cd->xlb[(1 << 8) + 0x00] & 0x1) ;
-		printd(("%s: reset cleared on span 1\n", DRV_NAME));
-		while (cd->xlb[(2 << 8) + 0x00] & 0x1) ;
-		printd(("%s: reset cleared on span 2\n", DRV_NAME));
-		while (cd->xlb[(3 << 8) + 0x00] & 0x1) ;
-		printd(("%s: reset cleared on span 3\n", DRV_NAME));
-		/* wait for 40 ms */
-		timeout = jiffies + 100 * HZ / 1000;
-		while (jiffies < timeout) ;
-#endif
+		/* set up for interleaved serial bus operation, byte mode */
+		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
+		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
+		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
+		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
 		/* link interface reset */
-		cd->xlb[(0 << 8) + 0x79] = 0xd8;	/* E1, transmit all ones, LIRST */
+		cd->xlb[(0 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
 		printd(("%s: LIRST on span 0\n", DRV_NAME));
-		cd->xlb[(1 << 8) + 0x79] = 0xd8;	/* E1, transmit all ones, LIRST */
+		cd->xlb[(1 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
 		printd(("%s: LIRST on span 1\n", DRV_NAME));
-		cd->xlb[(2 << 8) + 0x79] = 0xd8;	/* E1, transmit all ones, LIRST */
+		cd->xlb[(2 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
 		printd(("%s: LIRST on span 2\n", DRV_NAME));
-		cd->xlb[(3 << 8) + 0x79] = 0xd8;	/* E1, transmit all ones, LIRST */
+		cd->xlb[(3 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
 		printd(("%s: LIRST on span 3\n", DRV_NAME));
 		/* wait for 40 ms */
 		timeout = jiffies + 100 * HZ / 1000;
@@ -12262,11 +12273,6 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[(1 << 8) + 0x79] = 0x98;	/* E1, normal */
 		cd->xlb[(2 << 8) + 0x79] = 0x98;	/* E1, normal */
 		cd->xlb[(3 << 8) + 0x79] = 0x98;	/* E1, normal */
-		/* set up for interleaved serial bus operation, byte mode */
-		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
-		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
-		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
-		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
 		break;
 	}
 	case V400PT:
@@ -12319,38 +12325,25 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->config = sdl_default_t1_chan;
 		cd->isr = &xp_t401_interrupt;
 #endif
+		cd->xlb[SYNREG] = SYNC1;	/* default span1 */
 		/* place all framers in T1 mode */
 		cd->xlb[(0 << 8) + 0x00] = 0x00;
 		cd->xlb[(1 << 8) + 0x00] = 0x00;
 		cd->xlb[(2 << 8) + 0x00] = 0x00;
 		cd->xlb[(3 << 8) + 0x00] = 0x00;
-#if 0
-		/* place all framers in T1 mode - and soft reset */
-		cd->xlb[(0 << 8) + 0x00] = 0x01;
-		cd->xlb[(1 << 8) + 0x00] = 0x01;
-		cd->xlb[(2 << 8) + 0x00] = 0x01;
-		cd->xlb[(3 << 8) + 0x00] = 0x01;
-		/* wait for reset to clear */
-		while (cd->xlb[(0 << 8) + 0x00] & 0x1) ;
-		printd(("%s: reset cleared on span 0\n", DRV_NAME));
-		while (cd->xlb[(1 << 8) + 0x00] & 0x1) ;
-		printd(("%s: reset cleared on span 1\n", DRV_NAME));
-		while (cd->xlb[(2 << 8) + 0x00] & 0x1) ;
-		printd(("%s: reset cleared on span 2\n", DRV_NAME));
-		while (cd->xlb[(3 << 8) + 0x00] & 0x1) ;
-		printd(("%s: reset cleared on span 3\n", DRV_NAME));
-		/* wait for 40 ms */
-		timeout = jiffies + 100 * HZ / 1000;
-		while (jiffies < timeout) ;
-#endif
+		/* set up for interleaved serial bus operation, byte mode */
+		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
+		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
+		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
+		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
 		/* link interface reset */
-		cd->xlb[(0 << 8) + 0x79] = 0x48;	/* T1, transmit all ones, LIRST */
+		cd->xlb[(0 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
 		printd(("%s: LIRST on span 0\n", DRV_NAME));
-		cd->xlb[(1 << 8) + 0x79] = 0x48;	/* T1, transmit all ones, LIRST */
+		cd->xlb[(1 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
 		printd(("%s: LIRST on span 1\n", DRV_NAME));
-		cd->xlb[(2 << 8) + 0x79] = 0x48;	/* T1, transmit all ones, LIRST */
+		cd->xlb[(2 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
 		printd(("%s: LIRST on span 2\n", DRV_NAME));
-		cd->xlb[(3 << 8) + 0x79] = 0x48;	/* T1, transmit all ones, LIRST */
+		cd->xlb[(3 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
 		printd(("%s: LIRST on span 3\n", DRV_NAME));
 		/* wait for 40 ms */
 		timeout = jiffies + 100 * HZ / 1000;
@@ -12360,11 +12353,6 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->xlb[(1 << 8) + 0x79] = 0x18;	/* T1, normal */
 		cd->xlb[(2 << 8) + 0x79] = 0x18;	/* T1, normal */
 		cd->xlb[(3 << 8) + 0x79] = 0x18;	/* T1, normal */
-		/* set up for interleaved serial bus operation, byte mode */
-		cd->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
-		cd->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
-		cd->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
-		cd->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
 		break;
 	}
 	default:

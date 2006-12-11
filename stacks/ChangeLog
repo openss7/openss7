@@ -1,11 +1,14 @@
 2006-12-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/testsuite.at.in: strapped out M2PA test suite for now
 	* src/include/ss7/sli.h: complete paraphenalia for SL_CONTINUE_REQ
 	* src/modules/x400p-ss7/sl_x400p.c:
 	  - better configuration
 	  - support for more protocol variants
 	  - corrections from testing (mostly processor outage handling)
 	  - corrected naming
+	  - correct T1 configuration
+	  - turned off debugs
 	* src/test/x400p-ss7/test-x400p.c: many corrections from testing
 	* src/test/m2pa/test-m2pa.c: rationalized to X400P driver
 	* tests/local.at: added --wait option for long duration tests
