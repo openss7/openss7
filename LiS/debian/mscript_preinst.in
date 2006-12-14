@@ -2,7 +2,7 @@
 ## @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: mscript_preinst.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/26 03:11:22 $
+# @(#) $RCSfile: mscript_preinst.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/14 02:41:54 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/26 03:11:22 $ by $Author: brian $
+## Last Modified $Date: 2006/12/14 02:41:54 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -60,7 +60,7 @@ case "$1" in
 
     (install) : # install fresh or some configuration
 	# new-preinst install [old-version]
-	if [ ${2+set} = set ]
+	if [ "${2+set}" = "set" ]
 	then : # install with some configuration
 	    eval "upgrade_${subpkg}_preinst"
 	else : # install fresh
@@ -77,7 +77,7 @@ case "$1" in
 	# old-postrm upgrade new-version ... failed
 	# new-postrm failed-upgrade old-version ... failed
 	# old-preinst abort-upgrade new-version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: library in use." > &2
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: library in use." >&2
 	;;
 
 esac
@@ -93,6 +93,9 @@ esac
 ## =============================================================================
 ##
 ## $Log: mscript_preinst.in,v $
+## Revision 0.9.2.2  2006/12/14 02:41:54  brian
+## - debian script corrections
+##
 ## Revision 0.9.2.1  2005/03/26 03:11:22  brian
 ## - Reworking maintainance scripts
 ##

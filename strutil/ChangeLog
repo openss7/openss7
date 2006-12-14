@@ -1,3 +1,13 @@
+2006-12-14  Brian Bidulock  <bidulock@openss7.org>
+
+	- debian script corrections from Michael Fig <fig@marketsystems.com>
+
+	* debian/mscript_postinst.in: debian script corrections
+	* debian/mscript_postrm.in: debian script corrections
+	* debian/mscript_preinst.in: debian script corrections
+	* debian/rules.in: debian script corrections
+	* debian/strutil-devel.preinst.in: debian script corrections
+
 2006-11-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/strutil/strlog.h: rationalizations and corrections to Linux Fast-STREAMS

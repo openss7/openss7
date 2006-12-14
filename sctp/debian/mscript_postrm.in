@@ -2,7 +2,7 @@
 ## @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: mscript_postrm.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 12:55:35 $
+# @(#) $RCSfile: mscript_postrm.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/14 02:42:03 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/26 12:55:35 $ by $Author: brian $
+## Last Modified $Date: 2006/12/14 02:42:03 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -82,13 +82,13 @@ case "$1" in
     (abort-install) :
 	# new-preinst install [old-version] ... failed
 	# new-postrm abort-install [old-version]
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
 	;;
 
     (abort-upgrade) :
 	# new-preinst upgrade old-version ... failed
 	# new-postrm abort-upgrade old-version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
 	;;
 
     (disappear) :
@@ -109,6 +109,9 @@ esac
 ## =============================================================================
 ##
 ## $Log: mscript_postrm.in,v $
+## Revision 0.9.2.3  2006/12/14 02:42:03  brian
+## - debian script corrections
+##
 ## Revision 0.9.2.2  2005/03/26 12:55:35  brian
 ## - working up debian scripts
 ##

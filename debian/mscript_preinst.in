@@ -2,7 +2,7 @@
 ## @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: mscript_preinst.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 12:55:34 $
+# @(#) $RCSfile: mscript_preinst.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/14 02:41:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/26 12:55:34 $ by $Author: brian $
+## Last Modified $Date: 2006/12/14 02:41:56 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -77,7 +77,7 @@ case "$1" in
 	# old-postrm upgrade new-version ... failed
 	# new-postrm failed-upgrade old-version ... failed
 	# old-preinst abort-upgrade new-version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: library in use." > &2
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: library in use." >&2
 	;;
 
 esac
@@ -93,6 +93,9 @@ esac
 ## =============================================================================
 ##
 ## $Log: mscript_preinst.in,v $
+## Revision 0.9.2.3  2006/12/14 02:41:56  brian
+## - debian script corrections
+##
 ## Revision 0.9.2.2  2005/03/26 12:55:34  brian
 ## - working up debian scripts
 ##

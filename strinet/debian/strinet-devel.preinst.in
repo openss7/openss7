@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet-devel.preinst.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/02 11:31:42 $
+# @(#) $RCSfile: strinet-devel.preinst.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/14 02:42:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:42 $ by $Author: brian $
+# Last Modified $Date: 2006/12/14 02:42:26 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -78,7 +78,7 @@ function remove_warn_dir() {
 function remove_warn_dirs() {
     local d
     for d in $@ ; do
-	move_warn_dir $d
+	remove_warn_dir $d
     done
 }
 
@@ -121,6 +121,9 @@ subpkg=devel
 # =============================================================================
 #
 # $Log: strinet-devel.preinst.in,v $
+# Revision 0.9.2.4  2006/12/14 02:42:26  brian
+# - debian script corrections
+#
 # Revision 0.9.2.3  2006/10/02 11:31:42  brian
 # - changes to get master builds working for RPM and DEB
 # - added outside licenses to package documentation

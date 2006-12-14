@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:42 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/14 02:42:05 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 10:42:42 $ by $Author: brian $
+## Last Modified $Date: 2006/12/14 02:42:05 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -98,7 +98,7 @@ export DEB_HOST_ARCH
 export DH_VERBOSE = 1
 export DH_COMPAT = 4
 export DH_OPTIONS =
-export BUILD_CFGOPTIONS = '--with-lfs --without-lis'
+export BUILD_CFGOPTIONS = --with-lfs --without-lis
 
 name = $(PACKAGE)
 epoch = @PACKAGE_RPMEPOCH@
@@ -357,6 +357,7 @@ install:
 	dh_testroot -v
 	dh_clean -v -k
 	dh_installdirs -v
+	[ -d $(debtmpdir) ] || mkdir -p -- $(debtmpdir)
 	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
 	$(MAKE) -f debian/rules $(control)
 	dh_install -v --list-missing
@@ -454,6 +455,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.2  2006/12/14 02:42:05  brian
+# - debian script corrections
+#
 # Revision 0.9.2.1  2006/10/16 10:42:42  brian
 # - added new package files
 #

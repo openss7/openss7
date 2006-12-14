@@ -2,7 +2,7 @@
 ## @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: mscript_postinst.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:28 $
+# @(#) $RCSfile: mscript_postinst.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/14 02:42:13 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/13 07:57:28 $ by $Author: brian $
+## Last Modified $Date: 2006/12/14 02:42:13 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -66,19 +66,19 @@ case "$1" in
 	# old-prerm upgrade new-version ... failed
 	# new-prerm failed-upgrade new-version ... failed
 	# old-posinst abort-upgrade new-version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
 	;;
 
     (abort-remove) :
 	# conflict-prerm remove in-favour package new-version ... failed
 	# conflict-postinst abort-remove in-favour package new-version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
 	;;
 
     (abort-deconfigure) :
 	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version .. failed
 	# deconfigure-postinst abort-deconfigurein-favour package-being-installed-but-failed version removing conflicting-package version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
 	;;
 
 esac
@@ -94,6 +94,9 @@ esac
 ## =============================================================================
 ##
 ## $Log: mscript_postinst.in,v $
+## Revision 0.9.2.2  2006/12/14 02:42:13  brian
+## - debian script corrections
+##
 ## Revision 0.9.2.1  2006/10/13 07:57:28  brian
 ## - added initial STREAMS Channel package
 ##
