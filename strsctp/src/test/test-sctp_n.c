@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/30 20:26:32 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/15 00:22:15 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/30 20:26:32 $ by $Author: brian $
+ Last Modified $Date: 2006/12/15 00:22:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.22  2006/12/15 00:22:15  brian
+ - bufq locking changes and test suite upgrade
+
  Revision 0.9.2.21  2006/10/30 20:26:32  brian
  - bug hunting
 
@@ -93,9 +96,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/30 20:26:32 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/15 00:22:15 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/30 20:26:32 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/15 00:22:15 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -159,6 +162,7 @@ static const char *sstdname = "XNS/NPI";
 static const char *shortname = "SCTP";
 static char devname[256] = "/dev/sctp_n";
 
+static int repeat_verbose = 0;
 static int repeat_on_success = 0;
 static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
@@ -178,10 +182,12 @@ static int show_acks = 0;
 static int show_timeout = 0;
 //static int show_data = 1;
 
-static int last_event = 0;
-static int last_retval = 0;
 static int PRIM_type = 0;
+static int last_event = 0;
 static int last_errno = 0;
+static int last_retval = 0;
+static int last_prio = 0;
+
 static int NPI_error = 0;
 static int CONIND_number = 2;
 static int TOKEN_value = 0;
@@ -189,7 +195,6 @@ static int SEQ_number = 1;
 static int SERV_type = N_CLNS;
 static int CURRENT_state = NS_UNBND;
 N_info_ack_t last_info = { 0, };
-static int last_prio = 0;
 
 static int DATA_xfer_flags = 0;
 static int BIND_flags = 0;
@@ -206,8 +211,6 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define BUFSIZE 32*4096
 
-#define FFLUSH(stream)
-
 #define SHORT_WAIT	  20	// 100 // 10
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
@@ -216,7 +219,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define TEST_DURATION	20000
 #define INFINITE_WAIT	-1
 
-static int test_duration = TEST_DURATION; /* wait on other side */
+static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
 ulong seq[10] = { 0, };
 ulong tok[10] = { 0, };
@@ -236,6 +239,8 @@ static int test_pflags = MSG_BAND;	/* MSG_BAND | MSG_HIPRI */
 static int test_pband = 0;
 static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
+static int test_timout = 200;
+
 static int test_bufsize = 256;
 static int test_nidu = 256;
 static int OPTMGMT_flags = 0;
@@ -250,7 +255,6 @@ static size_t PROTOID_length = 0;
 static char *DATA_buffer = NULL;
 static size_t DATA_length = 0;
 static int test_resfd = -1;
-static int test_timout = 200;
 static void *QOS_buffer = NULL;
 static int QOS_length = 0;
 
@@ -362,6 +366,10 @@ long test_start = 0;
 static int state = 0;
 static const char *failure_string = NULL;
 
+#define __stringify_1(x) #x
+#define __stringify(x) __stringify_1(x)
+#define FAILURE_STRING(string) "[" __stringify(__LINE__) "] " string
+
 #if 1
 #undef lockf
 #define lockf(x,y,z) 0
@@ -372,51 +380,86 @@ static const char *failure_string = NULL;
  *  Return the current time in milliseconds.
  */
 static long
-now(void)
+dual_milliseconds(int child, int t1, int t2)
 {
 	long ret;
 	struct timeval now;
+	static const char *msgs[] = {
+		"             %1$-6.6s !      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld     :                    [%7$d:%8$03d]\n",
+		"                    :      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld     ! %1$-6.6s             [%7$d:%8$03d]\n",
+		"                    :      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld  !  : %1$-6.6s             [%7$d:%8$03d]\n",
+		"                    !  %1$-6.6s %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld  !                    [%7$d:%8$03d]\n",
+	};
+	static const char *blank[] = {
+		"                    !                                   :                    \n",
+		"                    :                                   !                    \n",
+		"                    :                                !  :                    \n",
+		"                    !                                   !                    \n",
+	};
+	static const char *plus[] = {
+		"               +    !                                   :                    \n",
+		"                    :                                   !    +               \n",
+		"                    :                                !  :    +               \n",
+		"                    !      +                            !                    \n",
+	};
 
-	if (gettimeofday(&now, NULL)) {
-		last_errno = errno;
-		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "***************ERROR! couldn't get time!            !  !                    \n");
-		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(last_errno));
-		fflush(stdout);
-		dummy = lockf(fileno(stdout), F_ULOCK, 0);
-		return (0);
-	}
+	gettimeofday(&now, NULL);
 	if (!test_start)	/* avoid blowing over precision */
 		test_start = now.tv_sec;
-	ret = (now.tv_sec - test_start) * 1000L;
-	ret += (now.tv_usec + 999L) / 1000L;
+	ret = (now.tv_sec - test_start) * 1000;
+	ret += (now.tv_usec + 500) / 1000;
+
+	if (show && verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, blank[child]);
+		fprintf(stdout, msgs[child], timer[t1].name, timer[t1].lo / 1000, timer[t1].lo - ((timer[t1].lo / 1000) * 1000), timer[t1].name, timer[t1].hi / 1000, timer[t1].hi - ((timer[t1].hi / 1000) * 1000), child, state);
+		fprintf(stdout, plus[child]);
+		fprintf(stdout, msgs[child], timer[t2].name, timer[t2].lo / 1000, timer[t2].lo - ((timer[t2].lo / 1000) * 1000), timer[t2].name, timer[t2].hi / 1000, timer[t2].hi - ((timer[t2].hi / 1000) * 1000), child, state);
+		fprintf(stdout, blank[child]);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+
 	return ret;
 }
+
+/*
+ *  Return the current time in milliseconds.
+ */
 static long
-milliseconds(char *t)
+milliseconds(int child, int t)
 {
-	if (verbose > 0) {
+	long ret;
+	struct timeval now;
+	static const char *msgs[] = {
+		"             %1$-6.6s !      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld     :                    [%7$d:%8$03d]\n",
+		"                    :      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld     ! %1$-6.6s             [%7$d:%8$03d]\n",
+		"                    :      %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld  !  : %1$-6.6s             [%7$d:%8$03d]\n",
+		"                    !  %1$-6.6s %2$3ld.%3$03ld <= %4$-2.2s <= %5$3ld.%6$03ld  !                    [%7$d:%8$03d]\n",
+	};
+	static const char *blank[] = {
+		"                    !                                   :                    \n",
+		"                    :                                   !                    \n",
+		"                    :                                !  :                    \n",
+		"                    !                                   !                    \n",
+	};
+
+	gettimeofday(&now, NULL);
+	if (!test_start)	/* avoid blowing over precision */
+		test_start = now.tv_sec;
+	ret = (now.tv_sec - test_start) * 1000;
+	ret += (now.tv_usec + 500) / 1000;
+
+	if (show && verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    .               :               .  .                    \n");
-		fprintf(stdout, "                    .             %6s            .  .                    <%d>\n", t, state);
-		fprintf(stdout, "                    .               :               .  .                    \n");
+		fprintf(stdout, blank[child]);
+		fprintf(stdout, msgs[child], timer[t].name, timer[t].lo / 1000, timer[t].lo - ((timer[t].lo / 1000) * 1000), timer[t].name, timer[t].hi / 1000, timer[t].hi - ((timer[t].hi / 1000) * 1000), child, state);
+		fprintf(stdout, blank[child]);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	return now();
-}
-static long
-milliseconds_2nd(char *t)
-{
-	if (verbose > 0) {
-		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    .               :   :           .  .                    \n");
-		fprintf(stdout, "                    .               : %6s        .  .                    <%d>\n", t, state);
-		fprintf(stdout, "                    .               :   :           .  .                    \n");
-		fflush(stdout);
-		dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	}
-	return now();
+
+	return ret;
 }
 
 /*
@@ -426,25 +469,36 @@ milliseconds_2nd(char *t)
  *  the allowable range and FAILURE otherwise.
  */
 static int
-check_time(const char *t, long i, long lo, long hi)
+check_time(int child, const char *t, long beg, long lo, long hi)
 {
-	float tol, dlo, dhi, itv;
+	long i;
+	struct timeval now;
+	static const char *msgs[] = {
+		"       check %1$-6.6s ? [%2$3ld.%3$03ld <= %4$3ld.%5$03ld <= %6$3ld.%7$03ld]   |                    [%8$d:%9$03d]\n",
+		"                    | [%2$3ld.%3$03ld <= %4$3ld.%5$03ld <= %6$3ld.%7$03ld]   ? %1$-6.6s check       [%8$d:%9$03d]\n",
+		"                    | [%2$3ld.%3$03ld <= %4$3ld.%5$03ld <= %6$3ld.%7$03ld]?  | %1$-6.6s check       [%8$d:%9$03d]\n",
+		"       check %1$-6.6s ? [%2$3ld.%3$03ld <= %4$3ld.%5$03ld <= %6$3ld.%7$03ld]   ?                    [%8$d:%9$03d]\n",
+	};
 
-	itv = i * timer_scale;
-	dlo = lo;
-	dhi = hi;
-	tol = 100 * timer_scale;
-	itv = itv / 1000;
-	dlo = dlo / 1000;
-	dhi = dhi / 1000;
-	tol = tol / 1000;
-	if (verbose > 0) {
+	if (gettimeofday(&now, NULL)) {
+		printf("****ERROR: gettimeofday\n");
+		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+		fflush(stdout);
+		return __RESULT_FAILURE;
+	}
+
+	i = (now.tv_sec - test_start) * 1000;
+	i += (now.tv_usec + 500) / 1000;
+	i -= beg;
+
+	if (show && verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    |(%7.3g <= %7.3g <= %7.3g)|  | %6s             <%d>\n", dlo - tol, itv, dhi + tol, t, state);
+		fprintf(stdout, msgs[child], t, (lo - 100) / 1000, (lo - 100) - (((lo - 100) / 1000) * 1000), i / 1000, i - ((i / 1000) * 1000), (hi + 100) / 1000, (hi + 100) - (((hi + 100) / 1000) * 1000), child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (dlo - tol <= itv && itv <= dhi + tol)
+
+	if (lo - 100 <= i && i <= hi + 100)
 		return __RESULT_SUCCESS;
 	else
 		return __RESULT_FAILURE;
@@ -454,6 +508,13 @@ check_time(const char *t, long i, long lo, long hi)
 static int
 time_event(int child, int event)
 {
+	static const char *msgs[] = {
+		"                    ! %11.6g                       |                    <%d:%03d>\n",
+		"                    |                       %11.6g !                    <%d:%03d>\n",
+		"                    |                    %11.6g !  |                    <%d:%03d>\n",
+		"                    !            %11.6g            !                    <%d:%03d>\n",
+	};
+
 	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
 		float t, m;
 		struct timeval now;
@@ -465,8 +526,9 @@ time_event(int child, int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
+
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                    |  |                    <%d:%03d>\n", t, child, state);
+		fprintf(stdout, msgs[child], t, child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -492,7 +554,7 @@ start_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = signal_handler;
-//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
@@ -531,7 +593,7 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
-	if (duration == (long)INFINITE_WAIT)
+	if (duration == (long) INFINITE_WAIT)
 		return __RESULT_SUCCESS;
 	if (start_signals())
 		return __RESULT_FAILURE;
@@ -956,7 +1018,7 @@ nerrno_string(ulong nerr, long uerr)
 }
 
 const char *
-event_string(int event)
+event_string(int child, int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -1031,9 +1093,8 @@ event_string(int event)
 		return ("N_RESET_RES");
 	case __TEST_RESET_CON:
 		return ("N_RESET_CON");
-	default:
-		return ("(unexpected");
 	}
+	return ("(unexpected)");
 }
 
 const char *
@@ -1370,7 +1431,7 @@ service_type(np_ulong type)
 		return ("N_CLNS");
 	case N_CONS:
 		return ("N_CONS");
-	case N_CLNS|N_CONS:
+	case N_CLNS | N_CONS:
 		return ("N_CLNS|N_CONS");
 	default:
 		return ("(unknown)");
@@ -1541,8 +1602,10 @@ print_addrs(int child, char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *sin;
 
-	if (verbose < 3)
+	if (verbose < 3 || !show)
 		return;
+	if (add_len == 0)
+		print_string(child, "(no address)");
 	for (sin = (typeof(sin)) add_ptr; add_len >= sizeof(*sin); sin++, add_len -= sizeof(*sin)) {
 		char buf[128];
 
@@ -1565,14 +1628,18 @@ prot_string(char *pro_ptr, size_t pro_len)
 	}
 	return (buf);
 }
+
+void print_string(int child, const char *string);
 void
 print_prots(int child, char *pro_ptr, size_t pro_len)
 {
 	unsigned char *prot;
-	if (verbose < 3)
+
+	if (verbose < 3 || !show)
 		return;
 	for (prot = (typeof(prot)) pro_ptr; pro_len > 0; prot++, pro_len--) {
 		char buf[32];
+
 		snprintf(buf, sizeof(buf), "<%u>", (unsigned int) *prot);
 		print_string(child, buf);
 	}
@@ -2115,6 +2182,8 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 	N_qos_sctp_t *qos = (N_qos_sctp_t *) qos_ptr;
 	char buf[64];
 
+	if (verbose < 3 || !show)
+		return;
 	if (qos_len) {
 		switch (qos->n_qos_type) {
 		case N_QOS_SEL_CONN_SCTP:
@@ -2233,7 +2302,7 @@ print_size(ulong size)
 }
 
 const char *
-prim_string(np_ulong prim)
+prim_string(int prim)
 {
 	switch (prim) {
 	case N_CONN_REQ:
@@ -2296,41 +2365,6 @@ prim_string(np_ulong prim)
 }
 
 void
-print_less(int child)
-{
-	if (verbose < 1 || !show)
-		return;
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	switch (child) {
-	case 0:
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		fprintf(stdout, " .  (more) .  <---->|               .               :  :                     [%d:%03d]\n", child, state);
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		break;
-	case 1:
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		break;
-	case 2:
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		break;
-	}
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	show = 0;
-	return;
-}
-
-void
-print_more(void)
-{
-	show = 1;
-}
-
-void
 print_simple(int child, const char *msgs[])
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -2376,6 +2410,47 @@ print_simple_string(int child, const char *msgs[], const char *string)
 }
 
 void
+print_string_state(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_triple_string(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], "", child, state);
+	fprintf(stdout, msgs[child], string, child, state);
+	fprintf(stdout, msgs[child], "", child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_more(int child)
+{
+	show = 1;
+}
+
+void
+print_less(int child)
+{
+	static const char *msgs[] = {
+		"         . %1$6.6s . | <------         .         ------> :                    [%2$d:%3$03d]\n",
+		"                    : <------         .         ------> | . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"                    : <------         .      ------> |  : . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"         . %1$6.6s . : <------         .      ------> :> : . %1$-6.6s .         [%2$d:%3$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_triple_string(child, msgs, "(more)");
+	show = 0;
+}
+
+void
 print_pipe(int child)
 {
 	static const char *msgs[] = {
@@ -2384,7 +2459,7 @@ print_pipe(int child)
 		"                    .  .                                .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
@@ -2398,7 +2473,7 @@ print_open(int child, const char *name)
 		"                    . %-30.30s .  .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple_string(child, msgs, name);
 }
 
@@ -2412,7 +2487,7 @@ print_close(int child)
 		"                    .                                .  .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
@@ -2429,8 +2504,6 @@ print_preamble(int child)
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
-
-void print_string_state(int child, const char *msgs[], const char *string);
 
 void
 print_failure(int child, const char *string)
@@ -2450,10 +2523,10 @@ void
 print_notapplicable(int child)
 {
 	static const char *msgs[] = {
-		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|-X|                    [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
 		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|  |X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
-		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
-		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"                    |X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2632,17 +2705,8 @@ print_nothing(int child)
 		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_double_int(child, msgs, child, state);
-}
-
-void
-print_string_state(int child, const char *msgs[], const char *string)
-{
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, child, state);
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
@@ -2663,13 +2727,13 @@ void
 print_tx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"--%16s->| - - - - - - - - - - - - - - - >|->|                    [%d:%03d]\n",
+		"--%16s->|- - - - - - - - - - - - - - - ->|->|                    [%d:%03d]\n",
 		"                    |<- - - - - - - - - - - - - - - -|- |<-%16s- [%d:%03d]\n",
 		"                    |<- - - - - - - - - - - - - - - -|<----%16s- [%d:%03d]\n",
 		"                    |         %-16s       |  |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -2678,12 +2742,12 @@ print_rx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"<-%16s--|<- - - - - - - - - - - - - - - -| -|                    [%d:%03d]\n",
-		"                    |- - - - - - - - - - - - - - - ->|->|--%16s> [%d:%03d]\n",
+		"                    |- - - - - - - - - - - - - - - ->|  |--%16s> [%d:%03d]\n",
 		"                    |- - - - - - - - - - - - - - - ->|--+--%16s> [%d:%03d]\n",
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -2697,7 +2761,7 @@ print_ack_prim(int child, const char *command)
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -2720,7 +2784,7 @@ print_no_prim(int child, long prim)
 		"                    | ? - - - - - - %4ld  - - - - ? |  |                     [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (verbose > 1)
 		print_long_state(child, msgs, prim);
 }
 
@@ -2728,10 +2792,10 @@ void
 print_signal(int child, int signum)
 {
 	static const char *msgs[] = {
-		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
-		"  >>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
-		"    >>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
-		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|                    [%d:%03d]\n",
+		"                    |>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		"                    |>>>>>>>>>>>> %-8.8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -2757,7 +2821,7 @@ print_command_info(int child, const char *command, const char *info)
 		"                    | %1$-14s %2$-16.16s|  |                    [%3$d:%4$03d]\n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_double_string_state(child, msgs, command, info);
 }
 
@@ -2789,8 +2853,8 @@ print_rx_data(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
 		"<-%1$16s--|<- -%2$4d bytes- - - - - - - - - |- |                    [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes- - - - - - - - ->|->|--%1$16s> [%3$d:%4$03d]\n",
-		"                    |- - %2$4d bytes- - - - - - - - ->|--+--%1$16s> [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes- - - - - - - - ->|  |--%1$16s> [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes- - - - - - - - - |->|--%1$16s> [%3$d:%4$03d]\n",
 		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 
@@ -2859,7 +2923,7 @@ print_poll_value(int child, int value, short revents)
 		"                    | %2$-17.17s [%1$10d] |  |                    [%3$d:%4$03d]\n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_int_string_state(child, msgs, value, poll_events_string(revents));
 }
 
@@ -2873,7 +2937,7 @@ print_ti_ioctl(int child, int cmd, intptr_t arg)
 		"                    |       %16s ioctl(2)|  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, ioctl_string(cmd, arg));
 }
 
@@ -2913,7 +2977,7 @@ print_libcall(int child, const char *command)
 		"                    |        [%16s]      |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -2928,7 +2992,7 @@ print_terror(int child, long error, long terror)
 		"                    |          [%14s]      |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, t_errno_string(terror, error));
 }
 #endif
@@ -2944,7 +3008,7 @@ print_tlook(int child, int tlook)
 		"                    |          [%14s]      |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, t_look_string(tlook));
 }
 #endif
@@ -2960,7 +3024,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 1 && show)
-		print_string_state(child, msgs, event_string(want));
+		print_string_state(child, msgs, event_string(child, want));
 }
 
 void
@@ -2973,8 +3037,26 @@ print_string(int child, const char *string)
 		"                    |       %-20s     |  |                    \n",
 	};
 
-	if (verbose > 1 && show)
+	if (show && verbose > 1)
 		print_simple_string(child, msgs, string);
+}
+
+void
+print_string_val(int child, const char *string, ulong val)
+{
+	static const char *msgs[] = {
+		"%1$20.20s|          %2$15u          |                    \n",
+		"                    |          %2$15u          |%1$-20.20s\n",
+		"                    |          %2$15u       |   %1$-20.20s\n",
+		"                    |%1$-20.20s%2$15u|                    \n",
+	};
+
+	if (show && verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, msgs[child], string, val);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
 }
 
 void
@@ -2987,7 +3069,7 @@ print_command_state(int child, const char *string)
 		"                    |       %-20s     |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1 && show)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, string);
 }
 
@@ -3103,10 +3185,12 @@ print_opt_value(int child, struct t_opthdr *oh)
 void
 print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 {
-	unsigned char *qos_ptr = (unsigned char *)(cmd_buf + qos_ofs);
+	unsigned char *qos_ptr = (unsigned char *) (cmd_buf + qos_ofs);
 	union N_qos_ip_types *qos = (union N_qos_ip_types *) qos_ptr;
 	char buf[64];
 
+	if (verbose < 3 || !show)
+		return;
 	if (qos_len) {
 		switch (qos->n_qos_type) {
 		case N_QOS_SEL_CONN_IP:
@@ -3184,7 +3268,7 @@ print_info(int child, N_info_ack_t *info)
 {
 	char buf[64];
 
-	if (verbose < 4)
+	if (verbose < 4 || !show)
 		return;
 	snprintf(buf, sizeof(buf), "NSDU_size = %d", (int) info->NSDU_size);
 	print_string(child, buf);
@@ -3310,7 +3394,7 @@ test_ioctl(int child, int cmd, intptr_t arg)
 				continue;
 			return (__RESULT_FAILURE);
 		}
-		if (verbose > 3)
+		if (show && verbose > 3)
 			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	}
@@ -3342,25 +3426,37 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (verbose > 4) {
+	if (show && verbose > 4) {
 		int i;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "fdinsert to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
 		fprintf(stdout, "[");
 		for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
-			fprintf(stdout, "%02X", ctrl->buf[i]);
+			fprintf(stdout, "%02X", (uint8_t) ctrl->buf[i]);
 		fprintf(stdout, "]\n");
 		fprintf(stdout, "[");
 		for (i = 0; i < (data ? data->len : 0); i++)
-			fprintf(stdout, "%02X", data->buf[i]);
+			fprintf(stdout, "%02X", (uint8_t) data->buf[i]);
 		fprintf(stdout, "]\n");
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
+}
+
+int
+test_putmsg(int child, struct strbuf *ctrl, struct strbuf *data, int flags)
+{
+	print_datcall(child, "putmsg(2)-----", data ? data->len : -1);
+	if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+	print_success_value(child, last_retval);
+	return (__RESULT_SUCCESS);
 }
 
 int
@@ -3374,11 +3470,11 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
 			fprintf(stdout, "[");
 			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
-				fprintf(stdout, "%02X", ctrl->buf[i]);
+				fprintf(stdout, "%02X", (uint8_t) ctrl->buf[i]);
 			fprintf(stdout, "]\n");
 			fprintf(stdout, "[");
 			for (i = 0; i < (data ? data->len : 0); i++)
-				fprintf(stdout, "%02X", data->buf[i]);
+				fprintf(stdout, "%02X", (uint8_t) data->buf[i]);
 			fprintf(stdout, "]\n");
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
@@ -3459,6 +3555,8 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 	print_syscall(child, "getmsg(2)-----");
 	for (;;) {
 		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -3474,6 +3572,8 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 	print_syscall(child, "getpmsg(2)----");
 	for (;;) {
 		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -3489,6 +3589,8 @@ test_read(int child, void *buf, size_t count)
 	print_syscall(child, "read(2)-------");
 	for (;;) {
 		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -3504,6 +3606,8 @@ test_readv(int child, const struct iovec *iov, int count)
 	print_syscall(child, "readv(2)------");
 	for (;;) {
 		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -3527,16 +3631,16 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 	print_ti_ioctl(child, cmd, arg);
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
-		if (verbose > 3)
+		if (show && verbose > 3)
 			print_success_value(child, last_retval);
 		break;
 	}
-	if (cmd == I_STR && verbose > 3) {
+	if (cmd == I_STR && show && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -3549,7 +3653,7 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 	if (verbose) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "***************ERROR: ioctl failed\n");
-		if (verbose > 3)
+		if (show && verbose > 3)
 			fprintf(stdout, "                    : %s; result = %d\n", __FUNCTION__, last_retval);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		fflush(stdout);
@@ -3565,9 +3669,9 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3576,9 +3680,9 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3595,9 +3699,9 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3606,9 +3710,9 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3623,28 +3727,38 @@ test_isastream(int child)
 	int result;
 
 	print_syscall(child, "isastream(2)--");
-	if ((result = last_retval = isastream(test_fd[child])) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((result = last_retval = isastream(test_fd[child])) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
 	}
-	print_success_value(child, last_retval);
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_poll(int child, const short events, short *revents, long ms)
 {
-	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
+	struct pollfd pfd = {.fd = test_fd[child],.events = events,.revents = 0 };
 	int result;
 
 	print_poll(child, events);
-	if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
+	for (;;) {
+		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_poll_value(child, last_retval, pfd.revents);
+		if (last_retval == 1 && revents)
+			*revents = pfd.revents;
+		break;
 	}
-	print_poll_value(child, last_retval, pfd.revents);
-	if (last_retval == 1 && revents)
-		*revents = pfd.revents;
 	return (__RESULT_SUCCESS);
 }
 
@@ -3735,6 +3849,8 @@ test_close(int child)
 int
 test_push(int child, const char *name)
 {
+	if (show && verbose > 1)
+		print_command_state(child, ":push");
 	if (test_ioctl(child, I_PUSH, (intptr_t) name))
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
@@ -3743,6 +3859,8 @@ test_push(int child, const char *name)
 int
 test_pop(int child)
 {
+	if (show && verbose > 1)
+		print_command_state(child, ":pop");
 	if (test_ioctl(child, I_POP, (intptr_t) 0))
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
@@ -3782,13 +3900,11 @@ stream_start(int child, int index)
 			inet_aton(addr_strings[i], &addrs[child].addr[i]);
 #else				/* SCTP_VERSION_2 */
 			addrs[child][i].sin_family = AF_INET;
-			if ((child == 0 && !client_port_specified) ||
-			    ((child == 1 || child == 2) && !server_port_specified))
+			if ((child == 0 && !client_port_specified) || ((child == 1 || child == 2) && !server_port_specified))
 				addrs[child][i].sin_port = htons(ports[child] + offset);
 			else
 				addrs[child][i].sin_port = htons(ports[child]);
-			if ((child == 0 && !client_host_specified) ||
-			    ((child == 1 || child == 2) && !server_host_specified))
+			if ((child == 0 && !client_host_specified) || ((child == 1 || child == 2) && !server_host_specified))
 				inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 		}
@@ -3902,7 +4018,6 @@ do_signal(int child, int action)
 	char cbuf[BUFSIZE], dbuf[BUFSIZE];
 	union N_primitives *p = (typeof(p)) cbuf;
 	struct strioctl ic;
-	char buf[64];
 
 	ic.ic_cmd = 0;
 	ic.ic_timout = test_timout;
@@ -3935,9 +4050,9 @@ do_signal(int child, int action)
 	}
 	switch (action) {
 	case __TEST_PUSH:
-		return test_ti_ioctl(child, I_PUSH, (intptr_t) "tirdwr");
+		return test_push(child, "tirdwr");
 	case __TEST_POP:
-		return test_ti_ioctl(child, I_POP, (intptr_t) NULL);
+		return test_pop(child);
 	case __TEST_PUTMSG_DATA:
 		ctrl = NULL;
 		data->len = snprintf(dbuf, BUFSIZE, "%s", "Putmsg test data.");
@@ -3981,9 +4096,9 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_IND:
 		ctrl->len = sizeof(p->conn_ind)
-			+ (DEST_buffer ? DEST_length : 0)
-			+ (SRC_buffer ? SRC_length : 0)
-			+ (QOS_buffer ? QOS_length : 0);
+		    + (DEST_buffer ? DEST_length : 0)
+		    + (SRC_buffer ? SRC_length : 0)
+		    + (QOS_buffer ? QOS_length : 0);
 		p->conn_ind.PRIM_type = N_CONN_IND;
 		p->conn_ind.DEST_length = DEST_buffer ? DEST_length : 0;
 		p->conn_ind.DEST_offset = DEST_buffer ? sizeof(p->conn_ind) : 0;
@@ -4178,8 +4293,8 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
 		ctrl->len = sizeof(p->bind_req)
-			+ (ADDR_buffer ? ADDR_length : 0)
-			+ (PROTOID_buffer ? PROTOID_length : 0);
+		    + (ADDR_buffer ? ADDR_length : 0)
+		    + (PROTOID_buffer ? PROTOID_length : 0);
 		p->bind_req.PRIM_type = N_BIND_REQ;
 		p->bind_req.ADDR_length = ADDR_buffer ? ADDR_length : 0;
 		p->bind_req.ADDR_offset = ADDR_buffer ? sizeof(p->bind_req) : 0;
@@ -4202,6 +4317,8 @@ do_signal(int child, int action)
 		print_addrs(child, cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length);
 #endif
 		if (verbose > 3) {
+			char buf[64];
+
 			snprintf(buf, sizeof(buf), "CONIND_number = %d", CONIND_number);
 			print_string(child, buf);
 			snprintf(buf, sizeof(buf), "BIND_flags = %x", BIND_flags);
@@ -4210,8 +4327,8 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_ACK:
 		ctrl->len = sizeof(p->bind_ack)
-			+ (ADDR_buffer ? ADDR_length : 0)
-			+ (PROTOID_buffer ? PROTOID_length : 0);
+		    + (ADDR_buffer ? ADDR_length : 0)
+		    + (PROTOID_buffer ? PROTOID_length : 0);
 		p->bind_ack.PRIM_type = N_BIND_ACK;
 		p->bind_ack.ADDR_length = ADDR_buffer ? ADDR_length : 0;
 		p->bind_ack.ADDR_offset = ADDR_buffer ? sizeof(p->bind_ack) : 0;
@@ -4386,6 +4503,8 @@ do_signal(int child, int action)
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	default:
+		if (show && verbose > 1)
+			print_command_state(child, ":????????");
 		return __RESULT_SCRIPT_ERROR;
 	}
 	return __RESULT_SCRIPT_ERROR;
@@ -4400,7 +4519,7 @@ do_signal(int child, int action)
  */
 
 static int
-do_decode_data(int child, struct strbuf *data)
+do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 
@@ -4416,7 +4535,6 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 	union N_primitives *p = (union N_primitives *) ctrl->buf;
-	char buf[64];
 
 	if (ctrl->len >= sizeof(p->type)) {
 		switch ((PRIM_type = p->type)) {
@@ -4548,7 +4666,9 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 #else
 			print_addrs(child, cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length);
 #endif
-			if (verbose > 3) {
+			if (show && verbose > 3) {
+				char buf[64];
+
 				snprintf(buf, sizeof(buf), "CONIND_number = %d", CONIND_number);
 				print_string(child, buf);
 				snprintf(buf, sizeof(buf), "TOKEN_value = %x", TOKEN_value);
@@ -4594,8 +4714,8 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		}
 		if (data && data->len >= 0)
-			if (do_decode_data(child, data) != __TEST_DATA)
-				event = __RESULT_FAILURE;
+			if ((last_event = do_decode_data(child, ctrl, data)) != __TEST_DATA)
+				event = last_event;
 	}
 	return ((last_event = event));
 }
@@ -4607,7 +4727,7 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
 			return time_event(child, last_event);
 	} else if (data->len > 0) {
-		if ((last_event = do_decode_data(child, data)) != __EVENT_UNKNOWN)
+		if ((last_event = do_decode_data(child, ctrl, data)) != __TEST_DATA)
 			return time_event(child, last_event);
 	}
 	return ((last_event = __EVENT_NO_MSG));
@@ -4625,25 +4745,25 @@ wait_event(int child, int wait)
 			last_event = __EVENT_TIMEOUT;
 			return time_event(child, __EVENT_TIMEOUT);
 		}
-		if (verbose > 4)
+		if (show && verbose > 4)
 			print_syscall(child, "poll()");
 		pfd[0].fd = test_fd[child];
 		pfd[0].events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		switch (poll(pfd, 1, wait)) {
 		case -1:
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
-				break;
+			if (errno == EINTR || errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		case 0:
-			if (verbose > 4)
+			if (show && verbose > 4)
 				print_success(child);
 			print_nothing(child);
 			last_event = __EVENT_NO_MSG;
 			return time_event(child, __EVENT_NO_MSG);
 		case 1:
-			if (verbose > 4)
+			if (show && verbose > 4)
 				print_success(child);
 			if (pfd[0].revents) {
 				int ret;
@@ -4660,10 +4780,10 @@ wait_event(int child, int wait)
 						print_syscall(child, "getmsg()");
 					if ((ret = getmsg(test_fd[child], &ctrl, &data, &flags)) >= 0)
 						break;
-					if (last_errno == EINTR || last_errno == ERESTART)
+					if (errno == EINTR || errno == ERESTART)
 						continue;
 					print_errno(child, (last_errno = errno));
-					if (last_errno == EAGAIN)
+					if (errno == EAGAIN)
 						break;
 					return __RESULT_FAILURE;
 				}
@@ -4679,11 +4799,11 @@ wait_event(int child, int wait)
 						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
 						fprintf(stdout, "[");
 						for (i = 0; i < ctrl.len; i++)
-							fprintf(stdout, "%02X", ctrl.buf[i]);
+							fprintf(stdout, "%02X", (uint8_t) ctrl.buf[i]);
 						fprintf(stdout, "]\n");
 						fprintf(stdout, "[");
 						for (i = 0; i < data.len; i++)
-							fprintf(stdout, "%02X", data.buf[i]);
+							fprintf(stdout, "%02X", (uint8_t) data.buf[i]);
 						fprintf(stdout, "]\n");
 						fflush(stdout);
 						dummy = lockf(fileno(stdout), F_ULOCK, 0);
@@ -4926,42 +5046,42 @@ preamble_1_idle_cons(int child)
 		goto failure;
 	state++;
 	if (CONIND_number != coninds) {
-		failure_string = "bad CONIND_number";
+		failure_string = FAILURE_STRING("bad CONIND_number");
 		goto failure;
 	}
 	state++;
 	if (TOKEN_value == 0) {
-		failure_string = "bad TOKEN_value";
+		failure_string = FAILURE_STRING("bad TOKEN_value");
 		goto failure;
 	}
 	state++;
 	if (PROTOID_length != 0 && PROTOID_length != sizeof(prot)) {
-		failure_string = "bad PROTOID_length";
+		failure_string = FAILURE_STRING("bad PROTOID_length");
 		goto failure;
 	}
 	state++;
 	if (PROTOID_length != 0 && PROTOID_buffer[0] != proto) {
-		failure_string = "bad PROTOID_buffer";
+		failure_string = FAILURE_STRING("bad PROTOID_buffer");
 		goto failure;
 	}
 	state++;
 	if (ADDR_length == 0) {
-		failure_string = "zero ADDR_length";
+		failure_string = FAILURE_STRING("zero ADDR_length");
 		goto failure;
 	}
 	state++;
-	if (ADDR_length != anums[child]*sizeof(addrs[child][0])) {
-		failure_string = "bad ADDR_length";
+	if (ADDR_length != anums[child] * sizeof(addrs[child][0])) {
+		failure_string = FAILURE_STRING("bad ADDR_length");
 		goto failure;
 	}
 	state++;
 	if (ADDR_buffer->sin_family != AF_INET) {
-		failure_string = "bad sin_family";
+		failure_string = FAILURE_STRING("bad sin_family");
 		goto failure;
 	}
 	state++;
 	if (ADDR_buffer->sin_addr.s_addr != addrs[child][0].sin_addr.s_addr) {
-		failure_string = "bad sin_addr";
+		failure_string = FAILURE_STRING("bad sin_addr");
 		goto failure;
 	}
 	state++;
@@ -4971,12 +5091,13 @@ preamble_1_idle_cons(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (last_info.SERV_type != N_CONS)
+	if (last_info.SERV_type != N_CONS) {
+		failure_string = FAILURE_STRING("bad SERV_type");
 		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
+	}
+	return __RESULT_SUCCESS;
       failure:
-	return (__RESULT_FAILURE);
+	return __RESULT_FAILURE;
 }
 #if 0
 #define preamble_1_idle preamble_1_idle_clns
@@ -6885,7 +7006,7 @@ test_case_7_1_list(int child)
 		case __EVENT_NO_MSG:
 			continue;
 		default:
-			failure_string = event_string(last_event);
+			failure_string = event_string(child, last_event);
 			goto failure;
 		}
 		state++;
@@ -6938,10 +7059,10 @@ test_case_7_2_conn(int child)
 	while (s < 5000) {
 		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
 			state++;
-			print_more();
+			print_more(child);
 			test_sleep(child, 1);
 			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
-				failure_string = event_string(last_event);
+				failure_string = event_string(child, last_event);
 				goto failure;
 			}
 		}
@@ -6950,7 +7071,7 @@ test_case_7_2_conn(int child)
 		state++;
 		if (s > 3) {
 			if (s > 9997)
-				print_more();
+				print_more(child);
 			else
 				print_less(child);
 		}
@@ -6961,7 +7082,7 @@ test_case_7_2_conn(int child)
 	do_signal(child, __TEST_DATA_REQ);
 	snd_bytes += DATA_length;
 	state++;
-	print_more();
+	print_more(child);
 	state++;
 	test_sleep(child, 3);
 	state++;
@@ -6971,7 +7092,7 @@ test_case_7_2_conn(int child)
 	fprintf(stdout, "Sent %3d messages making %6lu bytes.\n", s, (ulong) snd_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	print_more();
+	print_more(child);
 	return (__RESULT_FAILURE);
 }
 
@@ -6994,7 +7115,7 @@ test_case_7_2_list(int child)
 	state++;
 	while (r < 4) {
 		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS) {
-			failure_string = event_string(last_event);
+			failure_string = event_string(child, last_event);
 			goto failure;
 		}
 		if (data.len > 10)
@@ -7006,7 +7127,7 @@ test_case_7_2_list(int child)
 	print_less(child);
 	while (rcv_bytes < 50000 + 10) {
 		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS) {
-			failure_string = event_string(last_event);
+			failure_string = event_string(child, last_event);
 			goto failure;
 		}
 		if (data.len > 10)
@@ -7020,7 +7141,7 @@ test_case_7_2_list(int child)
 		goto failure;
 	}
 	state++;
-	print_more();
+	print_more(child);
 	state++;
 	test_sleep(child, 2);
 	state++;
@@ -7030,7 +7151,7 @@ test_case_7_2_list(int child)
 	fprintf(stdout, "Rcvd %3d messages making %6lu bytes.\n", r, (ulong) rcv_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	print_more();
+	print_more(child);
 	return (__RESULT_FAILURE);
 }
 
@@ -8194,13 +8315,13 @@ run_stream(int child, struct test_stream *stream)
  */
 
 int
-test_run(struct test_stream *stream[])
+test_run(struct test_stream *stream[], ulong duration)
 {
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 
-	if (start_tt(test_duration) != __RESULT_SUCCESS)
+	if (start_tt(duration) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (server_exec && stream[2]) {
 		switch ((child[2] = fork())) {
@@ -8383,65 +8504,68 @@ struct test_case {
 	const char *tgrp;		/* test case group */
 	const char *sgrp;		/* test case subgroup */
 	const char *name;		/* test case name */
+	const char *xtra;		/* test case extra information */
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
 	struct test_stream *stream[3];	/* test streams */
 	int (*start) (int);		/* start function */
 	int (*stop) (int);		/* stop function */
+	ulong duration;			/* maximum duration */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
+	int expect;			/* expected result */
 } tests[] = {
 	{
-		numb_case_0_1, tgrp_case_0_1, sgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, {
-	&test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_1, tgrp_case_1_1, sgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
-	&test_1_1_conn, &test_1_1_resp, &test_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_2, tgrp_case_1_2, sgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
-	&test_1_2_conn, &test_1_2_resp, &test_1_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1, tgrp_case_2_1, sgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, {
-	&test_2_1_conn, &test_2_1_resp, &test_2_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_2, tgrp_case_2_2, sgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, {
-	&test_2_2_conn, &test_2_2_resp, &test_2_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, {
-	&test_3_1_conn, &test_3_1_resp, &test_3_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_2, tgrp_case_3_2, sgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, {
-	&test_3_2_conn, &test_3_2_resp, &test_3_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1, tgrp_case_4_1, sgrp_case_4_1, name_case_4_1, desc_case_4_1, sref_case_4_1, {
-	&test_4_1_conn, &test_4_1_resp, &test_4_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2, tgrp_case_4_2, sgrp_case_4_2, name_case_4_2, desc_case_4_2, sref_case_4_2, {
-	&test_4_2_conn, &test_4_2_resp, &test_4_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, desc_case_5_1, sref_case_5_1, {
-	&test_5_1_conn, &test_5_1_resp, &test_5_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2, tgrp_case_5_2, sgrp_case_5_2, name_case_5_2, desc_case_5_2, sref_case_5_2, {
-	&test_5_2_conn, &test_5_2_resp, &test_5_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3, tgrp_case_5_3, sgrp_case_5_3, name_case_5_3, desc_case_5_3, sref_case_5_3, {
-	&test_5_3_conn, &test_5_3_resp, &test_5_3_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1, tgrp_case_6_1, sgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, {
-	&test_6_1_conn, &test_6_1_resp, &test_6_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_2, tgrp_case_6_2, sgrp_case_6_2, name_case_6_2, desc_case_6_2, sref_case_6_2, {
-	&test_6_2_conn, &test_6_2_resp, &test_6_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3, tgrp_case_6_3, sgrp_case_6_3, name_case_6_3, desc_case_6_3, sref_case_6_3, {
-	&test_6_3_conn, &test_6_3_resp, &test_6_3_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_1, tgrp_case_7_1, sgrp_case_7_1, name_case_7_1, desc_case_7_1, sref_case_7_1, {
-	&test_7_1_conn, &test_7_1_resp, &test_7_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_2, tgrp_case_7_2, sgrp_case_7_2, name_case_7_2, desc_case_7_2, sref_case_7_2, {
-	&test_7_2_conn, &test_7_2_resp, &test_7_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_1, tgrp_case_8_1, sgrp_case_8_1, name_case_8_1, desc_case_8_1, sref_case_8_1, {
-	&test_8_1_conn, &test_8_1_resp, &test_8_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_2, tgrp_case_8_2, sgrp_case_8_2, name_case_8_2, desc_case_8_2, sref_case_8_2, {
-	&test_8_2_conn, &test_8_2_resp, &test_8_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_9_1, tgrp_case_9_1, sgrp_case_9_1, name_case_9_1, desc_case_9_1, sref_case_9_1, {
-	&test_9_1_conn, &test_9_1_resp, &test_9_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_9_2, tgrp_case_9_2, sgrp_case_9_2, name_case_9_2, desc_case_9_2, sref_case_9_2, {
-	&test_9_2_conn, &test_9_2_resp, &test_9_2_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_9_3, tgrp_case_9_3, sgrp_case_9_3, name_case_9_3, desc_case_9_3, sref_case_9_3, {
-	&test_9_3_conn, &test_9_3_resp, &test_9_3_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_9_4, tgrp_case_9_4, sgrp_case_9_4, name_case_9_4, desc_case_9_4, sref_case_9_4, {
-	&test_9_4_conn, &test_9_4_resp, &test_9_4_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_10_1, tgrp_case_10_1, sgrp_case_10_1, name_case_10_1, desc_case_10_1, sref_case_10_1, {
-	&test_10_1_conn, &test_10_1_resp, &test_10_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_10_2, tgrp_case_10_2, sgrp_case_10_2, name_case_10_2, desc_case_10_2, sref_case_10_2, {
-	&test_10_2_conn, &test_10_2_resp, &test_10_2_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_0_1, tgrp_case_0_1, sgrp_case_0_1, name_case_0_1, NULL, desc_case_0_1, sref_case_0_1, {
+	&test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_1_1, tgrp_case_1_1, sgrp_case_1_1, name_case_1_1, NULL, desc_case_1_1, sref_case_1_1, {
+	&test_1_1_conn, &test_1_1_resp, &test_1_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_1_2, tgrp_case_1_2, sgrp_case_1_2, name_case_1_2, NULL, desc_case_1_2, sref_case_1_2, {
+	&test_1_2_conn, &test_1_2_resp, &test_1_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_1, tgrp_case_2_1, sgrp_case_2_1, name_case_2_1, NULL, desc_case_2_1, sref_case_2_1, {
+	&test_2_1_conn, &test_2_1_resp, &test_2_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_2_2, tgrp_case_2_2, sgrp_case_2_2, name_case_2_2, NULL, desc_case_2_2, sref_case_2_2, {
+	&test_2_2_conn, &test_2_2_resp, &test_2_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_1, tgrp_case_3_1, sgrp_case_3_1, name_case_3_1, NULL, desc_case_3_1, sref_case_3_1, {
+	&test_3_1_conn, &test_3_1_resp, &test_3_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_2, tgrp_case_3_2, sgrp_case_3_2, name_case_3_2, NULL, desc_case_3_2, sref_case_3_2, {
+	&test_3_2_conn, &test_3_2_resp, &test_3_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_4_1, tgrp_case_4_1, sgrp_case_4_1, name_case_4_1, NULL, desc_case_4_1, sref_case_4_1, {
+	&test_4_1_conn, &test_4_1_resp, &test_4_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_4_2, tgrp_case_4_2, sgrp_case_4_2, name_case_4_2, NULL, desc_case_4_2, sref_case_4_2, {
+	&test_4_2_conn, &test_4_2_resp, &test_4_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_5_1, tgrp_case_5_1, sgrp_case_5_1, name_case_5_1, NULL, desc_case_5_1, sref_case_5_1, {
+	&test_5_1_conn, &test_5_1_resp, &test_5_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_5_2, tgrp_case_5_2, sgrp_case_5_2, name_case_5_2, NULL, desc_case_5_2, sref_case_5_2, {
+	&test_5_2_conn, &test_5_2_resp, &test_5_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_5_3, tgrp_case_5_3, sgrp_case_5_3, name_case_5_3, NULL, desc_case_5_3, sref_case_5_3, {
+	&test_5_3_conn, &test_5_3_resp, &test_5_3_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_6_1, tgrp_case_6_1, sgrp_case_6_1, name_case_6_1, NULL, desc_case_6_1, sref_case_6_1, {
+	&test_6_1_conn, &test_6_1_resp, &test_6_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_6_2, tgrp_case_6_2, sgrp_case_6_2, name_case_6_2, NULL, desc_case_6_2, sref_case_6_2, {
+	&test_6_2_conn, &test_6_2_resp, &test_6_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_6_3, tgrp_case_6_3, sgrp_case_6_3, name_case_6_3, NULL, desc_case_6_3, sref_case_6_3, {
+	&test_6_3_conn, &test_6_3_resp, &test_6_3_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_7_1, tgrp_case_7_1, sgrp_case_7_1, name_case_7_1, NULL, desc_case_7_1, sref_case_7_1, {
+	&test_7_1_conn, &test_7_1_resp, &test_7_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_7_2, tgrp_case_7_2, sgrp_case_7_2, name_case_7_2, NULL, desc_case_7_2, sref_case_7_2, {
+	&test_7_2_conn, &test_7_2_resp, &test_7_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_8_1, tgrp_case_8_1, sgrp_case_8_1, name_case_8_1, NULL, desc_case_8_1, sref_case_8_1, {
+	&test_8_1_conn, &test_8_1_resp, &test_8_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_8_2, tgrp_case_8_2, sgrp_case_8_2, name_case_8_2, NULL, desc_case_8_2, sref_case_8_2, {
+	&test_8_2_conn, &test_8_2_resp, &test_8_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_9_1, tgrp_case_9_1, sgrp_case_9_1, name_case_9_1, NULL, desc_case_9_1, sref_case_9_1, {
+	&test_9_1_conn, &test_9_1_resp, &test_9_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_9_2, tgrp_case_9_2, sgrp_case_9_2, name_case_9_2, NULL, desc_case_9_2, sref_case_9_2, {
+	&test_9_2_conn, &test_9_2_resp, &test_9_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_9_3, tgrp_case_9_3, sgrp_case_9_3, name_case_9_3, NULL, desc_case_9_3, sref_case_9_3, {
+	&test_9_3_conn, &test_9_3_resp, &test_9_3_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_9_4, tgrp_case_9_4, sgrp_case_9_4, name_case_9_4, NULL, desc_case_9_4, sref_case_9_4, {
+	&test_9_4_conn, &test_9_4_resp, &test_9_4_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_10_1, tgrp_case_10_1, sgrp_case_10_1, name_case_10_1, NULL, desc_case_10_1, sref_case_10_1, {
+	&test_10_1_conn, &test_10_1_resp, &test_10_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_10_2, tgrp_case_10_2, sgrp_case_10_2, name_case_10_2, NULL, desc_case_10_2, sref_case_10_2, {
+	&test_10_2_conn, &test_10_2_resp, &test_10_2_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
 	NULL,}
 };
 
@@ -8470,6 +8594,8 @@ do_tests(int num_tests)
 	int skipped = 0;
 	int notselected = 0;
 	int aborted = 0;
+	int repeat = 0;
+	int oldverbose = verbose;
 
 	print_header();
 	show = 0;
@@ -8501,7 +8627,10 @@ do_tests(int num_tests)
 					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
 				if (verbose > 1 && tests[i].sgrp)
 					fprintf(stdout, "\nTest Subgroup: %s", tests[i].sgrp);
-				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
+				if (tests[i].xtra)
+					fprintf(stdout, "\nTest Case %s-%s/%s: %s (%s)\n", sstdname, shortname, tests[i].numb, tests[i].name, tests[i].xtra);
+				else
+					fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
 				if (verbose > 1 && tests[i].sref)
 					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
 				if (verbose > 1 && tests[i].desc)
@@ -8511,11 +8640,48 @@ do_tests(int num_tests)
 				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			if ((result = tests[i].result) == 0) {
-				if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
-					goto inconclusive;
-				result = test_run(tests[i].stream);
-				(*tests[i].stop) (i);
+				ulong duration = test_duration;
+
+				if (duration > tests[i].duration) {
+					if (tests[i].duration && duration > tests[i].duration)
+						duration = tests[i].duration;
+					if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
+						goto inconclusive;
+					result = test_run(tests[i].stream, duration);
+					(*tests[i].stop) (i);
+				} else
+					result = __RESULT_SKIPPED;
+				if (result == tests[i].expect) {
+					switch (result) {
+					case __RESULT_SUCCESS:
+					case __RESULT_NOTAPPL:
+					case __RESULT_SKIPPED:
+						/* autotest can handle these */
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+					case __RESULT_FAILURE:
+						/* these are expected failures */
+						result = __RESULT_SUCCESS;
+						break;
+					}
+				}
 			} else {
+				if (result == tests[i].expect) {
+					switch (result) {
+					case __RESULT_SUCCESS:
+					case __RESULT_NOTAPPL:
+					case __RESULT_SKIPPED:
+						/* autotest can handle these */
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+					case __RESULT_FAILURE:
+						/* these are expected failures */
+						result = __RESULT_SUCCESS;
+						break;
+					}
+				}
 				switch (result) {
 				case __RESULT_SUCCESS:
 					print_passed(3);
@@ -8549,7 +8715,8 @@ do_tests(int num_tests)
 				}
 				break;
 			case __RESULT_FAILURE:
-				failures++;
+				if (!repeat_verbose || repeat)
+					failures++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "\n");
@@ -8587,7 +8754,8 @@ do_tests(int num_tests)
 			default:
 			case __RESULT_INCONCLUSIVE:
 			      inconclusive:
-				inconclusive++;
+				if (!repeat_verbose || repeat)
+					inconclusive++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "\n");
@@ -8603,6 +8771,14 @@ do_tests(int num_tests)
 				goto rerun;
 			if (repeat_on_success && (result == __RESULT_SUCCESS))
 				goto rerun;
+			if (repeat) {
+				repeat = 0;
+				verbose = oldverbose;
+			} else if (repeat_verbose && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE)) {
+				repeat = 1;
+				verbose = 5;
+				goto rerun;
+			}
 			tests[i].result = result;
 			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
 				aborted = 1;
@@ -8816,9 +8992,11 @@ Arguments:\n\
     (none)\n\
 Options:\n\
     -c, --client\n\
-        execute client side of test case only.\n\
+        execute client side (PTU) of test case only.\n\
     -S, --server\n\
-        execute server side of test case only.\n\
+        execute server side (IUT) of test case only.\n\
+    -a, --again\n\
+        repeat failed tests verbose.\n\
     -w, --wait\n\
         have server wait indefinitely.\n\
     -r, --repeat\n\
@@ -8897,6 +9075,7 @@ main(int argc, char *argv[])
 		static struct option long_options[] = {
 			{"client",	no_argument,		NULL, 'c'},
 			{"server",	no_argument,		NULL, 'S'},
+			{"again",	no_argument,		NULL, 'a'},
 			{"wait",	no_argument,		NULL, 'w'},
 			{"client-port",	required_argument,	NULL, 'p'},
 			{"server-port",	required_argument,	NULL, 'P'},
@@ -8922,9 +9101,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -8934,6 +9113,9 @@ main(int argc, char *argv[])
 			break;
 		case 'S':	/* --server */
 			server_exec = 1;
+			break;
+		case 'a':	/* --again */
+			repeat_verbose = 1;
 			break;
 		case 'w':	/* --wait */
 			test_duration = INFINITE_WAIT;
@@ -8985,7 +9167,10 @@ main(int argc, char *argv[])
 							fprintf(stdout, "Test Group: %s\n", t->tgrp);
 						if (verbose > 2 && t->sgrp)
 							fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
-						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+						if (t->xtra)
+							fprintf(stdout, "Test Case %s-%s/%s: %s (%s)\n", sstdname, shortname, t->numb, t->name, t->xtra);
+						else
+							fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 						if (verbose > 2 && t->sref)
 							fprintf(stdout, "Test Reference: %s\n", t->sref);
 						if (verbose > 1 && t->desc)
@@ -9009,7 +9194,10 @@ main(int argc, char *argv[])
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
 					if (verbose > 2 && t->sgrp)
 						fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
-					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+					if (t->xtra)
+						fprintf(stdout, "Test Case %s-%s/%s: %s (%s)\n", sstdname, shortname, t->numb, t->name, t->xtra);
+					else
+						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 					if (verbose > 2 && t->sref)
 						fprintf(stdout, "Test Reference: %s\n", t->sref);
 					if (verbose > 1 && t->desc)

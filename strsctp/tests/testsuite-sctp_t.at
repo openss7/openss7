@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-sctp_t.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/30 06:50:51 $
+dnl @(#) $RCSfile: testsuite-sctp_t.at,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/15 00:22:29 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/10/30 06:50:51 $ by $Author: brian $
+dnl Last Modified $Date: 2006/12/15 00:22:29 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-sctp_t.at,v $
+dnl Revision 0.9.2.9  2006/12/15 00:22:29  brian
+dnl - bufq locking changes and test suite upgrade
+dnl
 dnl Revision 0.9.2.8  2006/10/30 06:50:51  brian
 dnl - added ability to sync between test cases
 dnl
@@ -112,11 +115,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_sctp_t() {
-    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--verbose=3' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    if test $at_arg_given_sync = : ; then sync || : ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
     if test-sctp_t $options -e -o $1
     then

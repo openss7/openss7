@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/08 05:28:08 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/12/15 00:22:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:28:08 $ by $Author: brian $
+ Last Modified $Date: 2006/12/15 00:22:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.58  2006/12/15 00:22:00  brian
+ - bufq locking changes and test suite upgrade
+
  Revision 0.9.2.57  2006/12/08 05:28:08  brian
  - bufq locking change and debian init script name correction
 
@@ -106,10 +109,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/08 05:28:08 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/12/15 00:22:00 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/08 05:28:08 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/12/15 00:22:00 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -120,8 +123,8 @@ static char const ident[] =
 #define t_set_bit(nr,addr)  sctp_set_bit(nr,addr)
 #define t_clr_bit(nr,addr)  sctp_clr_bit(nr,addr)
 
-#define SCTP_SPECIAL_DEBUG 1
-//#undef SCTP_SPECIAL_DEBUG
+//#define SCTP_SPECIAL_DEBUG 1
+#undef SCTP_SPECIAL_DEBUG
 #undef ETSI
 
 #define STREAMS 1
@@ -131,7 +134,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/08 05:28:08 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/12/15 00:22:00 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6465,10 +6468,8 @@ sctp_discon_ind(struct sctp *sp, t_uscalar_t origin, t_scalar_t reason, mblk_t *
 			return sp->ops->discon_ind(sp, origin, reason, cp);
 	}
 	rare();
-	if (cp) {
-		__bufq_unlink(&sp->conq, cp);
+	if (cp)
 		freemsg(cp);
-	}
 	return (0);
 }
 
@@ -10055,13 +10056,15 @@ sctp_recv_abort_listening(struct sctp *sp, mblk_t *mp)
 			   abort message. If there is a cause value, the reason should reflect the
 			   cause value if it makes sense. */
 			printd(("INFO: Removing Connection Indication on ABORT\n"));
-			/* NOTE: The disconnect indicaiton function will unlink and free the
-			   connection indication when the function does not return an error */
+			/* NOTE: The disconnect indication function will free the connection
+			   indication when the function does not return an error */
+			__bufq_unlink(&sp->conq, cp);
+			bufq_unlock(&sp->conq, pl);
 			if ((err = sctp_discon_ind(sp, orig, -ECONNRESET, cp))) {
-				bufq_unlock(&sp->conq, pl);
+				bufq_queue(&sp->conq, cp);
 				return (err);
 			}
-			break;
+			goto done;
 		} else {
 			(void) iph;
 			printd(("WARNING: Connection indication %p did not match\n", cp));
@@ -10079,6 +10082,7 @@ sctp_recv_abort_listening(struct sctp *sp, mblk_t *mp)
 	}
 	bufq_unlock(&sp->conq, pl);
 	usual(cp);
+      done:
 	return sctp_return_stop(mp);
 }
 STATIC int
@@ -12530,8 +12534,10 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 
 	printd(("%p: X_CONN_REQ <- \n", sp));
 	assert(sp);
+#ifndef SCTP_SPECIAL_DEBUG
 	local_bh_disable();
 	bh_lock_sctp(sp);
+#endif
 	if (!dnum)
 		goto einval;
 	if (dsin->sin_family != AF_INET && dsin->sin_family)
@@ -12607,8 +12613,10 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 		goto unhash_error;
 	if ((err = sctp_send_init(sp)))
 		goto unhash_error;
+#ifndef SCTP_SPECIAL_DEBUG
 	bh_unlock_sctp(sp);
 	local_bh_enable();
+#endif
 	return (0);
       einval:
 	err = -EINVAL;
@@ -12629,8 +12637,10 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 	sctp_unhash(sp);
 	goto error;
       error:
+#ifndef SCTP_SPECIAL_DEBUG
 	bh_unlock_sctp(sp);
 	local_bh_enable();
+#endif
 	return (err);
 }
 
@@ -13556,6 +13566,9 @@ sctp_cleanup_read(struct sctp *sp)
 		local_irq_restore(flags);
 	}
 	if (sp->origin && sp->reason) {
+		/* This is, I believe, the source of a lot of out of state disconnect indication
+		   errors.  There are a bunch in the idle state and one in the TS_WACK_CREQ state,
+		   but I belive that the latter is due to a flush instead. */
 		if (sctp_discon_ind(sp, sp->origin, sp->reason, NULL) < 0) {
 			qenable(sp->rq);
 			return;
@@ -13731,11 +13744,13 @@ sctp_r_prim(queue_t *q, mblk_t *mp)
 	return sctp_r_prim_slow(q, mp);
 }
 
+#define OLD_PROCEDURES 1
+
 /*
  *  PUTQ Put Routine
  *  -----------------------------------
  */
-#if 0
+#if OLD_PROCEDURES
 STATIC INLINE int
 sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 	  streamscall void (*procwake) (queue_t *q))
@@ -13746,7 +13761,7 @@ sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 	ensure(q, freemsg(mp); return (-EFAULT));
 
 	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || (q->q_flag & QSVCBUSY))) {
-		seldom();
+		_seldom();
 		if (unlikely(putq(q, mp) == 0))
 			_ctrace(freemsg(mp));
 		return (0);
@@ -13825,6 +13840,7 @@ sctp_putq(queue_t *q, mblk_t *mp, streamscall int (*proc) (queue_t *, mblk_t *),
 }
 #endif
 
+#if !OLD_PROCEDURES
 STATIC noinline streams_fastcall void
 sctp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
@@ -13876,10 +13892,12 @@ sctp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	}
 	return;
 }
+#endif
 
 STATIC streamscall __hot_in int
 sctp_rput(queue_t *q, mblk_t *mp)
 {
+#if !OLD_PROCEDURES
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		// q->q_qinfo->qi_mstat.ms_acnt++;
 		if (unlikely(!putq(q, mp)))
@@ -13899,7 +13917,7 @@ sctp_rput(queue_t *q, mblk_t *mp)
 	}
 	return (0);
 
-#if 0
+#else
 	return (int) sctp_putq(q, mp, &sctp_r_prim, &_sctp_cleanup_read);
 #endif
 }
@@ -13908,7 +13926,7 @@ sctp_rput(queue_t *q, mblk_t *mp)
  *  SRVQ Service Routine
  *  -----------------------------------
  */
-#if 0
+#if OLD_PROCEDURES
 STATIC INLINE int
 sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 	  streamscall void (*procwake) (queue_t *q))
@@ -14018,6 +14036,7 @@ sctp_srvq(queue_t *q, streamscall int (*proc) (queue_t *, mblk_t *),
 }
 #endif
 
+#if !OLD_PROCEDURES
 STATIC noinline streams_fastcall int
 sctp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
@@ -14099,10 +14118,12 @@ sctp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		return (1);
 	}
 }
+#endif
 
 STATIC streamscall __hot_in int
 sctp_rsrv(queue_t *q)
 {
+#if !OLD_PROCEDURES
 	mblk_t *mp;
 
 #if 1
@@ -14126,7 +14147,7 @@ sctp_rsrv(queue_t *q)
 #endif
 	return (0);
 
-#if 0
+#else
 	return (int) sctp_srvq(q, &sctp_r_prim, &_sctp_cleanup_read);
 #endif
 }
@@ -14497,8 +14518,8 @@ n_conn_con(struct sctp *sp)
  *  ---------------------------------------------------------------
  *  For SCTP the responding address in a NC connection refusal is always the destination address to
  *  which the NC connection request was sent.  If a connection indication identifier (seq) is
- *  provided, this function must either unlink and free it or return an error.  The origin is used
- *  only by the STREAMS NPI interface.
+ *  provided, this function must either free it or return an error.  The origin is used only by the
+ *  STREAMS NPI interface.
  */
 STATIC int
 n_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
@@ -14531,7 +14552,7 @@ n_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
 	p->SEQ_number = (t_uscalar_t) (long) seq;
 	mp->b_wptr += sizeof(*p);
 	if (seq)
-		freemsg(__bufq_unlink(&sp->conq, seq));
+		freemsg(seq);
 	if (!bufq_length(&sp->conq))
 		sp->i_state = NS_IDLE;
 	else
@@ -14544,7 +14565,9 @@ n_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
 	freemsg(mp);
 	return (-EBUSY);
       outstate:
-	swerr();
+	/* Sometimes this function is called in the idle state. */
+	if (sp->i_state != NS_IDLE)
+		swerr();
 	return (0);
 }
 
@@ -14909,7 +14932,7 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 		if (ap != NULL)
 			ap->i_state = NS_DATA_XFER;
 		if (cp != NULL)
-			freemsg(__bufq_unlink(&sp->conq, cp));
+			freemsg(cp);
 		if (ap == NULL || ap->rq != sp->rq) {
 			if (bufq_length(&sp->conq))
 				sp->i_state = NS_WRES_CIND;
@@ -14921,7 +14944,7 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 		switch (sp->i_state) {
 		case NS_WACK_DREQ7:
 			if (cp != NULL)
-				freemsg(__bufq_unlink(&sp->conq, cp));
+				freemsg(cp);
 		case NS_WACK_DREQ6:
 			if (bufq_length(&sp->conq))
 				sp->i_state = NS_WRES_CIND;
@@ -15372,8 +15395,13 @@ STATIC mblk_t *
 n_seq_check(struct sctp *sp, t_uscalar_t seq)
 {
 	mblk_t *mp;
+	pl_t pl;
 
+	pl = bufq_lock(&sp->conq);
 	for (mp = bufq_head(&sp->conq); mp && (t_uscalar_t) (long) mp != seq; mp = mp->b_next) ;
+	if (mp)
+		__bufq_unlink(&sp->conq, mp);
+	bufq_unlock(&sp->conq, pl);
 	usual(mp);
 	return (mp);
 }
@@ -15396,7 +15424,6 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 	struct sctp *ap;
 	N_conn_res_t *p = (N_conn_res_t *) mp->b_rptr;
 	N_qos_sel_conn_sctp_t *q = (N_qos_sel_conn_sctp_t *) (mp->b_rptr + p->QOS_offset);
-	pl_t pl;
 
 	if (sp->i_state != NS_WRES_CIND)
 		goto outstate;
@@ -15413,7 +15440,6 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 		if (p->QOS_length != sizeof(*q))
 			goto badopt2;
 	}
-	pl = bufq_lock(&sp->conq);
 	if (!(cp = n_seq_check(sp, p->SEQ_number)))
 		goto badseq;
 	if (!(ap = n_tok_check(sp, p->TOKEN_value)))
@@ -15438,33 +15464,32 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 		if ((err = sctp_conn_res(sp, cp, ap, mp->b_cont))) {
 			ap->i_state = ap_oldstate;
 			ap->flags = ap_oldflags;
-			goto unlock_error;
+			goto error;
 		}
 		mp->b_cont = NULL;	/* absorbed mp->b_cont */
 		if ((err = n_ok_ack(sp, N_CONN_RES, cp, ap))) {
 			ap->i_state = ap_oldstate;
 			ap->flags = ap_oldflags;
-			goto unlock_error;
+			goto error;
 		}
-		bufq_unlock(&sp->conq, pl);
 		return (QR_DONE);
 	}
       access:
 	seldom();
 	err = NACCESS;
-	goto unlock_error;		/* no access to accepting queue */
+	goto error;	/* no access to accepting queue */
       badtoken2:
 	seldom();
 	err = NBADTOKEN;
-	goto unlock_error;		/* accepting queue is listening */
+	goto error;	/* accepting queue is listening */
       badtoken1:
 	seldom();
 	err = NBADTOKEN;
-	goto unlock_error;		/* accepting queue id is invalid */
+	goto error;	/* accepting queue id is invalid */
       badseq:
 	seldom();
 	err = NBADSEQ;
-	goto unlock_error;		/* connection ind reference is invalid */
+	goto error;		/* connection ind reference is invalid */
       badopt2:
 	seldom();
 	err = NBADOPT;
@@ -15485,9 +15510,9 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 	seldom();
 	err = NOUTSTATE;
 	goto error;		/* would place interface out of state */
-      unlock_error:
-	bufq_unlock(&sp->conq, pl);
       error:
+	if (cp)
+		bufq_queue(&sp->conq, cp);
 	seldom();
 	return n_error_ack(sp, N_CONN_RES, err);
 }
@@ -15502,7 +15527,6 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 	int err;
 	mblk_t *cp = NULL;
 	N_discon_req_t *p = (N_discon_req_t *) mp->b_rptr;
-	pl_t pl;
 
 	if (!((1 << sp->i_state) & (NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER
 				    | NSF_WCON_RREQ | NSF_WRES_RIND)))
@@ -15530,23 +15554,21 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 		goto einval;
 	if (p->RES_length)
 		goto badaddr;
-	pl = bufq_lock(&sp->conq);
 	if (sp->i_state == NS_WACK_DREQ7 && !(cp = n_seq_check(sp, p->SEQ_number)))
 		goto badseq;
 	if (sp->i_state != NS_WACK_DREQ7 && (p->SEQ_number != 0))
 		goto badseq;
 	/* XXX: What do we do with the disconnect reason? Nothing? */
 	if ((err = sctp_discon_req(sp, cp)))
-		goto unlock_error;
+		goto error;
 
 	if ((err = n_ok_ack(sp, N_DISCON_REQ, cp, NULL)))
-		goto unlock_error;
-	bufq_unlock(&sp->conq, pl);
+		goto error;
 	return (QR_DONE);
       badseq:
 	seldom();
 	err = NBADSEQ;
-	goto unlock_error;		/* connection ind reference is invalid */
+	goto error;	/* connection ind reference is invalid */
       badaddr:
 	seldom();
 	err = NBADADDR;
@@ -15559,9 +15581,9 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 	seldom();
 	err = NOUTSTATE;
 	goto error;		/* would place interface out of state */
-      unlock_error:
-	bufq_unlock(&sp->conq, pl);
       error:
+	if (cp)
+		bufq_queue(&sp->conq, cp);
 	seldom();
 	return n_error_ack(sp, N_DISCON_REQ, err);
 }
@@ -16366,6 +16388,7 @@ sctp_n_w_prim(queue_t *q, mblk_t *mp)
 STATIC streamscall __hot_out int
 sctp_n_wput(queue_t *q, mblk_t *mp)
 {
+#if !OLD_PROCEDURES
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		// q->q_qinfo->qi_minfo->mi_mstat->ms_acnt++;
 		if (unlikely(!putq(q, mp)))
@@ -16383,13 +16406,14 @@ sctp_n_wput(queue_t *q, mblk_t *mp)
 		_sctp_transmit_wakeup(q);
 	}
 	return (0);
-#if 0
+#else
 	return (int) sctp_putq(q, mp, &sctp_n_w_prim, &_sctp_transmit_wakeup);
 #endif
 }
 STATIC streamscall __hot_out int
 sctp_n_wsrv(queue_t *q)
 {
+#if !OLD_PROCEDURES
 	mblk_t *mp;
 
 #if 0
@@ -16411,7 +16435,7 @@ sctp_n_wsrv(queue_t *q)
 	local_bh_enable();
 #endif
 	return (0);
-#if 0
+#else
 	return (int) sctp_srvq(q, &sctp_n_w_prim, &_sctp_transmit_wakeup);
 #endif
 }
@@ -25575,8 +25599,8 @@ t_conn_con(struct sctp *sp)
  *  ssn fields so that the user can examine them with T_OPTMGMT_REQ T_CURRENT if it has need to know
  *  them.
  *
- *  If a connection indication identifier (seq) is provided, this function muse either unlink and
- *  free it or return an error.  The origin is used only by the STREAMS NPI interface.
+ *  If a connection indication identifier (seq) is provided, this function muse either free it or
+ *  return an error.  The origin is used only by the STREAMS NPI interface.
  */
 STATIC int
 t_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
@@ -25606,7 +25630,7 @@ t_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
 	   negative reasons are UNIX error codes, all positive reasons are SCTP cause values. */
 	p->SEQ_number = (t_uscalar_t) (long) seq;
 	if (seq)
-		freemsg(__bufq_unlink(&sp->conq, seq));
+		freemsg(seq);
 	if (!bufq_length(&sp->conq))
 		sp->i_state = TS_IDLE;
 	else
@@ -25619,7 +25643,9 @@ t_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
 	freemsg(mp);
 	return (-EBUSY);
       outstate:
-	pswerr(("t_discon_ind() requested in TPI state %d\n", (int) sp->i_state));
+	/* Sometimes this function is called in the idle state. */
+	if (sp->i_state != TS_IDLE)
+		pswerr(("t_discon_ind() requested in TPI state %d\n", (int) sp->i_state));
 	return (0);
 }
 
@@ -25887,7 +25913,7 @@ t_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 		if (ap != NULL)
 			ap->i_state = TS_DATA_XFER;
 		if (cp != NULL)
-			freemsg(__bufq_unlink(&sp->conq, cp));
+			freemsg(cp);
 		if (ap == NULL || ap->rq != sp->rq) {
 			if (bufq_length(&sp->conq))
 				sp->i_state = TS_WRES_CIND;
@@ -25899,7 +25925,7 @@ t_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 		switch (sp->i_state) {
 		case TS_WACK_DREQ7:
 			if (cp != NULL)
-				freemsg(__bufq_unlink(&sp->conq, cp));
+				freemsg(cp);
 		case TS_WACK_DREQ6:
 			if (bufq_length(&sp->conq))
 				sp->i_state = TS_WRES_CIND;
@@ -26435,8 +26461,13 @@ STATIC mblk_t *
 t_seq_check(struct sctp *sp, t_uscalar_t seq)
 {
 	mblk_t *mp;
+	pl_t pl;
 
+	pl = bufq_lock(&sp->conq);
 	for (mp = bufq_head(&sp->conq); mp && (t_uscalar_t) (long) mp != seq; mp = mp->b_next) ;
+	if (mp)
+		__bufq_unlink(&sp->conq, mp);
+	bufq_unlock(&sp->conq, pl);
 	usual(mp);
 	/* leave list locked while reference held on message block */
 	return (mp);
@@ -26460,7 +26491,6 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	mblk_t *cp = NULL;
 	struct sctp *ap;
 	const struct T_conn_res *p = (struct T_conn_res *) mp->b_rptr;
-	pl_t pl;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -26477,7 +26507,6 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	}
 	if (p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 		goto badopt;
-	pl = bufq_lock(&sp->conq);
 	if (!(cp = t_seq_check(sp, p->SEQ_number)))
 		goto badseq;
 	if (!(ap = t_tok_check(p->ACCEPTOR_id))
@@ -26491,11 +26520,11 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	if ((err = t_parse_conn_opts(ap, mp->b_rptr + p->OPT_offset, p->OPT_length, 0)) < 0) {
 		switch (-err) {
 		case EINVAL:
-			goto unlock_badopt;
+			goto badopt;
 		case EACCES:
 			goto acces;
 		default:
-			goto unlock_error;
+			goto error;
 		}
 	}
 	{
@@ -26517,10 +26546,10 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 					sd->max_retrans = op->max_retrans;
 					continue;
 				}
-				goto unlock_badopt;
+				goto badopt;
 			}
 			if (op != oe)
-				goto unlock_badopt;
+				goto badopt;
 			if (err)
 				goto error;
 		}
@@ -26536,10 +26565,10 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 					sd->hb_itvl = op->hb_itvl;
 					continue;
 				}
-				goto unlock_badopt;
+				goto badopt;
 			}
 			if (op != oe)
-				goto unlock_badopt;
+				goto badopt;
 			if (err)
 				goto error;
 		}
@@ -26547,34 +26576,31 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 		ap->i_state = TS_DATA_XFER;
 		if ((err = sctp_conn_res(sp, cp, ap, mp->b_cont))) {
 			ap->i_state = ap_oldstate;
-			goto unlock_error;
+			goto error;
 		}
 		mp->b_cont = NULL;	/* absorbed mp->b_cont */
 		if ((err = t_ok_ack(sp, T_CONN_RES, cp, ap))) {
 			ap->i_state = ap_oldstate;
-			goto unlock_error;
+			goto error;
 		}
-		bufq_unlock(&sp->conq, pl);
 		return (QR_DONE);
 	}
       acces:
 	err = TACCES;
 	ptrace(("%s: %p: ERROR: no access to accepting queue\n", DRV_NAME, sp));
-	goto unlock_error;
+	goto error;
       resqlen:
 	err = TRESQLEN;
 	ptrace(("%s: %p: ERROR: accepting queue is listening\n", DRV_NAME, sp));
-	goto unlock_error;
+	goto error;
       badf:
 	err = TBADF;
 	ptrace(("%s: %p: ERROR: accepting queue id is invalid\n", DRV_NAME, sp));
-	goto unlock_error;
+	goto error;
       badseq:
 	err = TBADSEQ;
 	ptrace(("%s: %p: ERROR: connection ind referenced is invalid\n", DRV_NAME, sp));
-	goto unlock_error;
-      unlock_badopt:
-	bufq_unlock(&sp->conq, pl);
+	goto error;
       badopt:
 	err = TBADOPT;
 	ptrace(("%s: %p: ERROR: options are bad\n", DRV_NAME, sp));
@@ -26591,9 +26617,9 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	err = TOUTSTATE;
 	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sp));
 	goto error;
-      unlock_error:
-	bufq_unlock(&sp->conq, pl);
       error:
+	if (cp)
+		bufq_queue(&sp->conq, cp);
 	return t_error_ack(sp, T_CONN_RES, err);
 }
 
@@ -26711,6 +26737,8 @@ t_discon_req(struct sctp *sp, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sp));
 	goto error;
       error:
+	if (cp)
+		bufq_queue(&sp->conq, cp);
 	return t_error_ack(sp, T_DISCON_REQ, err);
 }
 
@@ -27580,6 +27608,7 @@ sctp_t_w_prim(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 sctp_t_wput(queue_t *q, mblk_t *mp)
 {
+#if !OLD_PROCEDURES
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		// q->q_qinfo->qi_minfo->mi_mstat->ms_acnt++;
 		if (unlikely(!putq(q, mp)))
@@ -27597,13 +27626,14 @@ sctp_t_wput(queue_t *q, mblk_t *mp)
 		_sctp_transmit_wakeup(q);
 	}
 	return (0);
-#if 0
+#else
 	return (int) sctp_putq(q, mp, &sctp_t_w_prim, &_sctp_transmit_wakeup);
 #endif
 }
 STATIC streamscall int
 sctp_t_wsrv(queue_t *q)
 {
+#if !OLD_PROCEDURES
 	mblk_t *mp;
 
 #if 0
@@ -27625,7 +27655,7 @@ sctp_t_wsrv(queue_t *q)
 	local_bh_enable();
 #endif
 	return (0);
-#if 0
+#else
 	return (int) sctp_srvq(q, &sctp_t_w_prim, &_sctp_transmit_wakeup);
 #endif
 }
