@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/10/06 12:12:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/16 16:12:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/06 12:12:56 $ by $Author: brian $
+# Last Modified $Date: 2006/12/16 16:12:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.22  2006/12/16 16:12:54  brian
+# - strapped out unused manpages and allow mi_timers to be placed back on queue
+#
 # Revision 0.9.2.21  2006/10/06 12:12:56  brian
 # - updated manual pages to pass make check and for release
 # - updated release files for release
@@ -1026,11 +1029,8 @@ os7_compat_pages = \
 	man9/ss7_esballoc.9 \
 	man9/ss7_esbbcall.9 \
 	man9/ss7_fast_allocb.9 \
-	man9/ss7_fast_allocb_bh.9 \
 	man9/ss7_fast_freeb.9 \
-	man9/ss7_fast_freeb_bh.9 \
 	man9/ss7_fast_freemsg.9 \
-	man9/ss7_fast_freemsg_bh.9 \
 	man9/ss7_iput.9 \
 	man9/ss7_isrv.9 \
 	man9/ss7_oput.9 \
@@ -1045,6 +1045,10 @@ os7_compat_pages = \
 	man9/ss7_unbufcall.9 \
 	man9/ss7_unlockq.9 \
 	man9/ss7_w_flush.9
+
+#	man9/ss7_fast_allocb_bh.9
+#	man9/ss7_fast_freeb_bh.9
+#	man9/ss7_fast_freemsg_bh.9
 
 man_MANS = \
 	man8/strcompat_mknod.8 \
@@ -2086,11 +2090,8 @@ dist_noinst_os7_compat_pages = \
 	man9/ss7_esballoc.9.man \
 	man9/ss7_esbbcall.9.man \
 	man9/ss7_fast_allocb.9.man \
-	man9/ss7_fast_allocb_bh.9.man \
 	man9/ss7_fast_freeb.9.man \
-	man9/ss7_fast_freeb_bh.9.man \
 	man9/ss7_fast_freemsg.9.man \
-	man9/ss7_fast_freemsg_bh.9.man \
 	man9/ss7_iput.9.man \
 	man9/ss7_isrv.9.man \
 	man9/ss7_oput.9.man \
@@ -2105,6 +2106,10 @@ dist_noinst_os7_compat_pages = \
 	man9/ss7_unbufcall.9.man \
 	man9/ss7_unlockq.9.man \
 	man9/ss7_w_flush.9.man
+
+#	man9/ss7_fast_allocb_bh.9.man
+#	man9/ss7_fast_freeb_bh.9.man
+#	man9/ss7_fast_freemsg_bh.9.man
 
 dist_noinst_MANS = \
 	man8/strcompat_mknod.8.man \

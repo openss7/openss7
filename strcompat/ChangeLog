@@ -1,3 +1,9 @@
+2006-12-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/mpscompat.c: handle timers place back on queue
+	* doc/man/Makefile.am: strap out manpages for removed _bh functions
+
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>

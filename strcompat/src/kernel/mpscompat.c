@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/08 05:08:24 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/12/16 16:12:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:24 $ by $Author: brian $
+ Last Modified $Date: 2006/12/16 16:12:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.30  2006/12/16 16:12:56  brian
+ - strapped out unused manpages and allow mi_timers to be placed back on queue
+
  Revision 0.9.2.29  2006/12/08 05:08:24  brian
  - some rework resulting from testing and inspection
 
@@ -142,10 +145,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/08 05:08:24 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/12/16 16:12:56 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/08 05:08:24 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/12/16 16:12:56 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -173,7 +176,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/08 05:08:24 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/12/16 16:12:56 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -1046,6 +1049,7 @@ mi_timer_cancel(mblk_t *mp)
 		break;
 	case TB_IDLE:
 		/* already successfully cancelled, not on queue */
+		mp->b_datap->db_type = M_PCSIG;
 		rval = 0;
 		break;
 	case TB_CANCELLED:
@@ -1102,6 +1106,7 @@ mi_timer_alloc_SUN(size_t size)
 
 EXPORT_SYMBOL_NOVERS(mi_timer_alloc_SUN);
 
+
 /*
  *  MI_TIMER (OpenSolaris variety)
  *  -------------------------------------------------------------------------
@@ -1118,6 +1123,10 @@ mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 		/* tb has timer actively running */
 		if ((tid = xchg(&tb->tb_tid, 0)))
 			untimeout(tid);
+
+		if (xchg(&mp->b_datap->db_type, M_PCSIG) == M_SIG)
+			if (mp->b_next || tb->tb_q->q_first == mp)
+				rmvq(tb->tb_q, mp);
 
 		spin_lock_irqsave(&tb->tb_lock, flags);
 		switch (tb->tb_state) {
@@ -1254,6 +1263,13 @@ EXPORT_SYMBOL_NOVERS(mi_timer_move);
 /*
  *  MI_TIMER_VALID (Common)
  *  -------------------------------------------------------------------------
+ *  Slight variation on a theme here.  We allow the message to be requeued and
+ *  processed later.  We mark the message type to M_SIG when valid is returned
+ *  so that the message will be requeued as a normal priority message.  When
+ *  mi_timer_valid is called for the second time on the message, this function
+ *  returns true again if no other action has been taken on the timer while it
+ *  was waiting on queue.  If any other action was taken, the second pass
+ *  will return false.
  */
 int
 mi_timer_valid(mblk_t *mp)
@@ -1268,6 +1284,7 @@ mi_timer_valid(mblk_t *mp)
 		if (tb->tb_tid == (toid_t) 0) {
 			/* queued as a result of a timeout */
 			tb->tb_state = TB_IDLE;
+			mp->b_datap->db_type = M_SIG;
 			rval = (1);
 			break;
 		} else {
@@ -1278,8 +1295,10 @@ mi_timer_valid(mblk_t *mp)
 	case TB_CANCELLED:
 		/* were cancelled, now we are idle (off queue) */
 		tb->tb_state = TB_IDLE;
-	case TB_IDLE:
 		rval = (0);
+		break;
+	case TB_IDLE:
+		rval = (mp->b_datap->db_type != M_PCSIG);
 		break;
 	case TB_ZOMBIE:
 		/* were zombied, now we can be freed (off queue) */
@@ -1332,6 +1351,7 @@ mi_timer_free(mblk_t *mp)
 		/* fall through */
 	case TB_IDLE:
 		/* not on queue */
+		mp->b_datap->db_type = M_PCSIG;
 		local_irq_restore(flags);
 		freemsg(mp);
 		return;
