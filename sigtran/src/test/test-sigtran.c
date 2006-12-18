@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:43 $
+ @(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:51:41 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:50:43 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:51:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sigtran.c,v $
+ Revision 0.9.2.3  2006/12/18 08:51:41  brian
+ - corections from testing, resolve device numbering
+
  Revision 0.9.2.2  2006/10/27 22:50:43  brian
  - working up modules and testsuite
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:43 $"
+#ident "@(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:51:41 $"
 
-static char const ident[] = "$RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:50:43 $";
+static char const ident[] = "$RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:51:41 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -132,7 +135,11 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX SVID/ABI";
 static const char *sstdname = "SVID/ABI";
 static const char *shortname = "ABI";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/ch";
+#else
 static char devname[256] = "/dev/ch";
+#endif
 
 static int repeat_on_success = 0;
 static int repeat_on_failure = 0;

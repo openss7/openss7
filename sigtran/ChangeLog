@@ -1,3 +1,22 @@
+2006-12-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: adjusted base major
+	* src/modules/m2pa_sl.c:
+	- timers convered to mi_timers
+	- corrections from further testing
+	* src/test/test-m2pa.c:
+	- corrections from testing
+	- use clone directory device names
+	* src/test/test-sigtran.c:
+	- use clone directory device names
+
+2006-12-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/m2pa_sl.c:
+	- timers convered to mi_timers
+	- corrections from further testing
+	* src/test/test-m2pa.c: corrections from testing
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>

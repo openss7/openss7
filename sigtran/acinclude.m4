@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:40 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:51:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 10:42:40 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 08:51:34 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.2  2006/12/18 08:51:34  brian
+# - corections from testing, resolve device numbering
+#
 # Revision 0.9.2.1  2006/10/16 10:42:40  brian
 # - added new package files
 #
@@ -266,8 +269,8 @@ AC_DEFUN([_SIGTRAN_CONFIG_KERNEL], [dnl
 AC_DEFUN([_SIGTRAN_OUTPUT], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=242
-    strconf_cv_midbase=20
+    strconf_cv_majbase=165
+    strconf_cv_midbase=150
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/11 12:34:36 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 08:51:38 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/11 12:34:36 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:51:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.8  2006/12/18 08:51:38  brian
+ - corections from testing, resolve device numbering
+
  Revision 0.9.2.7  2006/12/11 12:34:36  brian
  - rationalized test program to x400p test program
 
@@ -105,9 +108,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/11 12:34:36 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 08:51:38 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/11 12:34:36 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 08:51:38 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -197,7 +200,11 @@ static const char *lpkgname = "SIGnalling TRANsport";
 static const char *lstdname = "draft-bidulock-sigtran-m2pa-test";
 static const char *sstdname = "Q.781";
 static const char *shortname = "M2PA";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/sctp_n";
+#else
 static char devname[256] = "/dev/sctp_n";
+#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;
@@ -231,9 +238,9 @@ static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 static int last_prio = 0;
-static int PRIM_type = 0;
 
 #if TEST_M2PA
+static int PRIM_type = 0;
 static int NPI_error = 0;
 static int CONIND_number = 2;
 static int TOKEN_value = 0;
@@ -1475,7 +1482,7 @@ lmi_strreason(unsigned int reason)
 }
 
 char *
-lmerrno_string(ulong lmerr, long uerr)
+lmerrno_string(long uerr, ulong lmerr)
 {
 	switch (lmerr) {
 	case LMI_UNSPEC:	/* Unknown or unspecified */
@@ -3729,7 +3736,7 @@ print_timeout(int child)
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
-	if (show_timeout || verbose > 0) {
+	if (show_timeout || verbose > 1) {
 		print_double_int(child, msgs, child, state);
 		show_timeout--;
 	}
@@ -4247,7 +4254,7 @@ print_waiting(int child, ulong time)
 		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 
-	if (verbose > 0 && show)
+	if (verbose > 1 && show)
 		print_time_state(child, msgs, time);
 }
 
@@ -4270,7 +4277,7 @@ print_mwaiting(int child, struct timespec *time)
 		"/ / / / / / / / / / | / / Waiting %8.4f seconds/ / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 
-	if (verbose > 0 && show) {
+	if (verbose > 1 && show) {
 		float delay;
 
 		delay = time->tv_nsec;
@@ -4422,25 +4429,25 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 
 #if TEST_M2PA
 void
-print_info(int child, N_info_ack_t * info)
+print_info(int child, N_info_ack_t *info)
 {
 	char buf[64];
 
 	if (verbose < 4 || !show)
 		return;
-	snprintf(buf, sizeof(buf), "NSDU_size = %d", (int) info->NSDU_size);
+	snprintf(buf, sizeof(buf), "NSDU_size = %ld", (long) info->NSDU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "ENSDU_size = %d", (int) info->ENSDU_size);
+	snprintf(buf, sizeof(buf), "ENSDU_size = %ld", (long) info->ENSDU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "CDATA_size = %d", (int) info->CDATA_size);
+	snprintf(buf, sizeof(buf), "CDATA_size = %ld", (long) info->CDATA_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "DDATA_size = %d", (int) info->DDATA_size);
+	snprintf(buf, sizeof(buf), "DDATA_size = %ld", (long) info->DDATA_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "ADDR_size = %d", (int) info->ADDR_size);
+	snprintf(buf, sizeof(buf), "ADDR_size = %ld", (long) info->ADDR_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "OPTIONS_flags = %x", (int) info->OPTIONS_flags);
+	snprintf(buf, sizeof(buf), "OPTIONS_flags = %lx", (long) info->OPTIONS_flags);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "NIDU_size = %d", (int) info->NIDU_size);
+	snprintf(buf, sizeof(buf), "NIDU_size = %ld", (long) info->NIDU_size);
 	print_string(child, buf);
 	snprintf(buf, sizeof(buf), "<%s>", service_type(info->SERV_type));
 	print_string(child, buf);
@@ -4448,9 +4455,9 @@ print_info(int child, N_info_ack_t * info)
 	print_string(child, buf);
 	snprintf(buf, sizeof(buf), "<%s>", provider_type(info->PROVIDER_type));
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "NODU_size = %d", (int) info->NODU_size);
+	snprintf(buf, sizeof(buf), "NODU_size = %ld", (long) info->NODU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "NPI_version = %d", (int) info->NPI_version);
+	snprintf(buf, sizeof(buf), "NPI_version = %ld", (long) info->NPI_version);
 	print_string(child, buf);
 }
 
@@ -7147,7 +7154,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	union primitives *p = (union primitives *) ctrl->buf;
 
 	if (ctrl->len >= sizeof(p->prim)) {
-		switch ((last_prim = PRIM_type = p->prim)) {
+		switch ((last_prim = p->prim)) {
 #if TEST_M2PA
 		case N_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -7241,22 +7248,19 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			DATA_xfer_flags = p->npi.data_ind.DATA_xfer_flags;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.data_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.data_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.data_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_EXDATA_IND:
 			event = __TEST_EXDATA_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.exdata_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.exdata_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.exdata_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_DATACK_IND:
 			event = __TEST_DATACK_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.datack_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.datack_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.datack_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_INFO_ACK:
 			event = __TEST_INFO_ACK;
@@ -7929,12 +7933,43 @@ postamble_pop(int child)
 }
 
 static int
+preamble_attach(int child)
+{
+	int failed = 0;
+
+#if TEST_M2PA
+	if (child == CHILD_IUT)
+#endif				/* TEST_M2PA */
+	{
+#if TEST_M2PA
+		if (preamble_push(child))
+			goto failure;
+		state++;
+#endif				/* TEST_M2PA */
+		ADDR_buffer = addrs[child];
+		ADDR_length = anums[child] * sizeof(addrs[child][0]);
+		if (do_signal(child, __TEST_ATTACH_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+			failed = failed ? : state;
+	}
+#if TEST_M2PA
+	if (child == CHILD_PTU) {
+		return preamble_bind(child);
+	}
+#endif				/* TEST_M2PA */
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
 preamble_config(int child)
 {
-#if TEST_M2PA
-	if (preamble_push(child))
+	if (preamble_attach(child))
 		goto failure;
-	state++;
+#if TEST_M2PA
 	if (child == CHILD_IUT) {
 		if (do_signal(child, __TEST_SDL_OPTIONS))
 			goto failure;
@@ -7957,36 +7992,6 @@ preamble_config(int child)
 		if (do_signal(child, __TEST_SL_CONFIG))
 			goto failure;
 	}
-	return __RESULT_SUCCESS;
-      failure:
-	return __RESULT_FAILURE;
-}
-
-static int
-preamble_attach(int child)
-{
-	int failed = 0;
-
-#if TEST_M2PA
-	if (child == CHILD_IUT)
-#endif				/* TEST_M2PA */
-	{
-		ADDR_buffer = addrs[child];
-		ADDR_length = anums[child] * sizeof(addrs[child][0]);
-		if (do_signal(child, __TEST_ATTACH_REQ))
-			failed = failed ? : state;
-		state++;
-		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
-			failed = failed ? : state;
-	}
-	state++;
-	if (preamble_config(child))
-		goto failure;
-#if TEST_M2PA
-	if (child == CHILD_PTU) {
-		return preamble_bind(child);
-	}
-#endif				/* TEST_M2PA */
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -8038,11 +8043,13 @@ postamble_stats(int child)
 			failed = failed ? : state;
 	}
 	state++;
+#if TEST_X400
 	if (do_signal(child, __TEST_SDT_STATS))
 		failed = failed ? : state;
 	state++;
 	if (do_signal(child, __TEST_SDL_STATS))
 		failed = failed ? : state;
+#endif
 	if (failed) {
 		state = failed;
 		goto failure;
@@ -8055,7 +8062,7 @@ postamble_stats(int child)
 static int
 preamble_enable(int child)
 {
-	if (preamble_attach(child))
+	if (preamble_config(child))
 		goto failure;
 	state++;
 #if TEST_M2PA
@@ -11984,8 +11991,7 @@ test_1_25_iut(int child)
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG))
-		goto failure;
+	test_msleep(child, config->sl.t2 >> 1);
 	state++;
 	if (do_signal(child, __TEST_STOP))
 		goto failure;
@@ -12058,8 +12064,7 @@ test_1_26_iut(int child)
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG))
-		goto failure;
+	test_msleep(child, config->sl.t2 >> 1);
 	state++;
 	if (do_signal(child, __TEST_STOP))
 		goto failure;
@@ -14485,7 +14490,7 @@ test_4_1a_11_ptu(int child)
 			/* (9) Issue a Level 3 "Clear Buffers" and Level 3 "Clear Local Processor
 			   Outage" commands at SP A and send another MSU from SP A.  */
 			/* (10) Check that SP A sends a status "Processor Outage Ended" message. */
-			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
+			if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_ENDED)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE) {
 					if (do_signal(child, __STATUS_IN_SERVICE))
 						goto failure;
@@ -16700,8 +16705,17 @@ test_8_1_ptu(int child)
 #endif				/* TEST_M2PA */
 			state++;
 		case 3:
+#if TEST_X400
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
+			if (check_snibs(child, 0x80, 0x80))
+				goto failure;
+#endif
+#if TEST_M2PA
+			if (expect(child, config->sl.t7 >> 1, __EVENT_NO_MSG))
+				if (last_event != __TEST_ACK)
+					goto failure;
+#endif
 			state++;
 		case 4:
 			break;
@@ -17006,27 +17020,27 @@ test_8_3_ptu(int child)
 					print_less(child);
 					continue;
 				}
-					print_more(child);
-					nacks = n;
-					do_signal(child, __TEST_ETC);
-					do_signal(child, __TEST_COUNT);
-					switch (m2pa_version) {
-					case M2PA_VERSION_DRAFT6:
-					case M2PA_VERSION_DRAFT6_1:
-					case M2PA_VERSION_DRAFT6_9:
-					case M2PA_VERSION_DRAFT7:
-					case M2PA_VERSION_DRAFT10:
-					case M2PA_VERSION_DRAFT11:
-					case M2PA_VERSION_RFC4165:
-						bsn[0] += nacks;
-						bsn[0] &= 0xffffff;
-						break;
-					}
-					if (do_signal(child, __TEST_ACK))
-						goto failure;
-					nacks = 1;
-					if (start_tt(config->sl.t7 + 200))
-						goto failure;
+				print_more(child);
+				nacks = n;
+				do_signal(child, __TEST_ETC);
+				do_signal(child, __TEST_COUNT);
+				switch (m2pa_version) {
+				case M2PA_VERSION_DRAFT6:
+				case M2PA_VERSION_DRAFT6_1:
+				case M2PA_VERSION_DRAFT6_9:
+				case M2PA_VERSION_DRAFT7:
+				case M2PA_VERSION_DRAFT10:
+				case M2PA_VERSION_DRAFT11:
+				case M2PA_VERSION_RFC4165:
+					bsn[0] += nacks;
+					bsn[0] &= 0xffffff;
+					break;
+				}
+				if (do_signal(child, __TEST_ACK))
+					goto failure;
+				nacks = 1;
+				if (start_tt(config->sl.t7 + 200))
+					goto failure;
 				break;
 #endif				/* TEST_M2PA */
 			default:
@@ -17148,9 +17162,11 @@ test_8_4_ptu(int child)
 static int
 test_8_4_iut(int child)
 {
+#if TEST_M2PA
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
+#endif
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
@@ -17649,6 +17665,11 @@ test_8_9a_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
+#if TEST_X400
+	if (do_signal(child, __TEST_CONTINUE))
+		goto failure;
+	state++;
+#endif
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
@@ -17722,6 +17743,11 @@ test_8_9b_iut(int child)
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
 	state++;
+#if TEST_X400
+	if (do_signal(child, __TEST_CONTINUE))
+		goto failure;
+	state++;
+#endif
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
@@ -17864,9 +17890,11 @@ test_8_10_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
+#if TEST_M2PA
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
+#endif
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -18118,12 +18146,14 @@ test_8_12b_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
+#if TEST_M2PA
 	if (expect(child, config->sl.t7 / 2, __EVENT_NO_MSG))
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
+#endif
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
 	state++;
@@ -18202,7 +18232,7 @@ test_8_14_ptu(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
-		goto notappl;	/* can't do this */
+		return __RESULT_NOTAPPL; /* can't do this */
 	}
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT9:
@@ -18263,8 +18293,6 @@ test_8_14_ptu(int child)
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
-      notappl:
-	return __RESULT_NOTAPPL;
 }
 static int
 test_8_14_iut(int child)
@@ -18272,7 +18300,7 @@ test_8_14_iut(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
-		goto notappl;	/* can't do this */
+		return __RESULT_NOTAPPL; /* can't do this */
 	}
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
@@ -18293,8 +18321,6 @@ test_8_14_iut(int child)
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
-      notappl:
-	return __RESULT_NOTAPPL;
 }
 
 static struct test_stream test_case_8_14_ptu = { preamble_link_in_service, test_8_14_ptu, postamble_link_in_service };
