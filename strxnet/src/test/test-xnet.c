@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:39 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/12/18 07:43:20 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/08 07:26:39 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:43:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.27  2006/12/18 07:43:20  brian
+ - resolve device numbering
+
  Revision 0.9.2.26  2006/07/08 07:26:39  brian
  - removed trigraphs
 
@@ -129,9 +132,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:39 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/12/18 07:43:20 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/07/08 07:26:39 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/12/18 07:43:20 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -253,7 +256,11 @@ static const char *lpkgname = "OpenSS7 XTI/TLI Library";
 static const char *lstdname = "XNS 5.2";
 static const char *sstdname = "XNS";
 static const char *shortname = "XNET";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/echo";
+#else
 static char devname[256] = "/dev/echo";
+#endif
 
 static int exit_on_failure = 0;
 

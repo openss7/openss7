@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:16 $
+ @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 07:43:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 00:03:16 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:43:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnsl.c,v $
+ Revision 0.9.2.2  2006/12/18 07:43:25  brian
+ - resolve device numbering
+
  Revision 0.9.2.1  2006/09/18 00:03:16  brian
  - added libxnsl source files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:16 $"
+#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 07:43:25 $"
 
-static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/18 00:03:16 $";
+static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 07:43:25 $";
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,
@@ -125,7 +128,11 @@ static const char *lpkgname = "OpenSS7 XTI/TLI Library";
 static const char *lstdname = "XNS 5.2";
 static const char *sstdname = "XNS";
 static const char *shortname = "XNET";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/echo";
+#else
 static char devname[256] = "/dev/echo";
+#endif
 
 static int exit_on_failure = 0;
 

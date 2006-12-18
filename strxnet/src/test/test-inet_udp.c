@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/23 11:51:06 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 07:43:18 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/23 11:51:06 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:43:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.10  2006/12/18 07:43:18  brian
+ - resolve device numbering
+
  Revision 0.9.2.9  2006/02/23 11:51:06  brian
  - updated headers
 
@@ -135,9 +138,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/23 11:51:06 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 07:43:18 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/23 11:51:06 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 07:43:18 $";
 
 /* 
  *  Simple test program for INET streams.
@@ -267,7 +270,11 @@ enum {
 /* 
  *  -------------------------------------------------------------------------
  */
+#ifdef LFS
+const char *device = "/dev/streams/clone/udp";
+#else
 const char *device = "/dev/udp";
+#endif
 int show = 1;
 struct sockaddr_in addr1, addr2, addr3, addr4;
 unsigned short port1 = 10000, port2 = 10001, port3 = 10002, port4 = 10003;
