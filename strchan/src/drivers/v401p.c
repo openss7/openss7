@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/06 11:26:10 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:26:10 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:59:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.5  2006/12/18 08:59:34  brian
+ - working up strchan package
+
  Revision 0.9.2.4  2006/12/06 11:26:10  brian
  - current development updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/06 11:26:10 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:34 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/06 11:26:10 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:34 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -235,6 +238,89 @@ static char const ident[] =
  *  layer module.
  */
 
+#define _DEBUG 1
+// #undef _DEBUG
+
+#define _LSF_SOURCE 1
+#define _SVR4_SOURCE 1
+#define _MSP_SOURCE 1
+
+#include <sys/os7/compat.h>
+
+#include <stdbool.h>
+
+#ifdef LINUX
+#include <linux/ioport.h>
+#include <asm/io.h>
+#include <asm/dma.h>
+#include <linux/pci.h>
+
+#include <linux/interrupt.h>
+#endif				/* LINUX */
+
+#include <sys/chi.h>
+#include <sys/chi_ioctl.h>
+#include <sys/mxi.h>
+#include <sys/mxi_ioctl.h>
+
+#include "v400pfw.h"
+#include "v401pfw.h"
+
+#define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
+#define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:34 $"
+#define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
+#define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define MX_V400P_LICENCE	"GPL"
+#define MX_V400P_BANNER		MX_V400P_DESCRIP	"\n" \
+				MX_V400P_EXTRA	"\n" \
+				MX_V400P_REVISION	"\n" \
+				MX_V400P_COPYRIGHT	"\n" \
+				MX_V400P_DEVICE	"\n" \
+				MX_V400P_CONTACT	"\n"
+#define MX_V400P_SPLASH		MX_V400P_DESCRIP	" - " \
+				MX_V400P_REVISION
+
+#ifdef LINUX
+MODULE_AUTHOR(MX_V400P_CONTACT);
+MODULE_DESCRIPTION(MX_V400P_DESCRIP);
+MODULE_SUPPORTED_DEVICE(MX_V400P_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(MX_V400P_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-mx_v400p");
+#endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+#endif				/* MODULE_VERSION */
+#endif				/* LINUX */
+
+#ifdef LFS
+#define MX_V400P_DRV_ID		CONFIG_STREAMS_MX_V400P_MODID
+#define MX_V400P_DRV_NAME	CONFIG_STREAMS_MX_V400P_NAME
+#define MX_V400P_CMAJORS	CONFIG_STREAMS_MX_V400P_NMAJORS
+#define MX_V400P_CMAJOR_0	CONFIG_STREAMS_MX_V400P_MAJOR
+#define MX_V400P_UNITS		CONFIG_STREAMS_MX_V400P_NMINORS
+#endif
+
+#ifdef LINUX
+#ifdef MODULE_ALIAS
+#ifdef LFS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MX_V400P_MODID));
+MODULE_ALIAS("streams-driver-mx-v400p");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MX_V400P_MAJOR));
+MODULE_ALIAS("/dev/streams/v400p-mx");
+MODULE_ALIAS("/dev/streams/v400p-mx/*");
+MODULE_ALIAS("/dev/streams/clone/v400p-mx");
+#endif				/* LFS */
+MODULE_ALIAS("char-major-" __stringify(MX_V400P_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(MX_V400P_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(MX_V400P_CMAJOR_0) "-0");
+MODULE_ALIAS("/dev/v400p-mx");
+#endif				/* MODULE_ALIAS */
+#endif				/* LINUX */
+
 enum vp_board {
 	PLX9030 = 0,
 	PLXDEVBRD,
@@ -385,8 +471,8 @@ struct ch {
 
 	uint32_t addr;			/* address */
 	uint32_t smask;			/* span mask, 4 bits now, 8 bits later */
-	uint32_t cmask;			/* overall channel mask (OR of cmasks) */
-	uint32_t cmasks[8];		/* channel mask, 4 for now, 8 later */
+	uint32_t cmask;			/* overall slot mask (OR of cmasks) */
+	uint32_t cmasks[4];		/* channel mask, 4 for now, 8 later */
 	struct CH_parms_circuit parm;	/* parameters */
 
 	int spans;			/* Number of spans in span mask (0-8) */
@@ -398,16 +484,25 @@ struct ch {
 	struct ch_notify notify;	/* notification events */
 
 	struct {
+		uint32_t smask;		/* Mask of spans to which we are attached. */
+		uint32_t cmask;		/* Mask of slots to which we are attached. */
+		uint32_t cmasks[4];	/* Mask of channels to which we are attached. */
 		struct vp *vp;		/* VP card to which we are attached */
 		struct ch *next;	/* VP card attach list linkage */
 		struct ch **prev;	/* VP card attach list linkage */
 	} a;
 	struct {
+		uint32_t smask;		/* Mask of spans to which we are connected. */
+		uint32_t cmask;		/* Mask of slots to which we are connected. */
+		uint32_t cmasks[4];	/* Mask of channels to which we are connected. */
 		struct vp *vp;		/* VP card to which we are connected */
 		struct ch *next;	/* VP card connect list linkage */
 		struct ch **prev;	/* VP card connect list linkage */
 	} c;
 	struct {
+		uint32_t smask;		/* Mask of spans to which we are cross-connected. */
+		uint32_t cmask;		/* Mask of slots to which we are cross-connected. */
+		uint32_t cmasks[4];	/* Mask of channels to which we are cross-connected. */
 		struct vp *vp;		/* VP card to which we are cross-connected */
 		struct ch *next;	/* VP card cross-connect list linkage */
 		struct ch **prev;	/* VP card cross-connect list linkage */
@@ -437,9 +532,6 @@ struct mx {
 	struct MX_info_ack info;	/* information */
 
 	uint32_t addr;			/* address */
-	uint32_t smask;			/* span mask, 4 bits now, 8 bits later */
-	uint32_t cmask;			/* overall channel mask (OR of cmasks) */
-	uint32_t cmasks[8];		/* channel mask, 4 for now, 8 later */
 	struct MX_parms_circuit parm;	/* parameters */
 
 	int spans;			/* Number of spans in span mask (0-8) */
@@ -451,16 +543,25 @@ struct mx {
 	struct mx_notify notify;	/* notification events */
 
 	struct {
+		uint32_t smask;		/* Mask of spans to which we are attached. */
+		uint32_t cmask;		/* Mask of slots to which we are attached. */
+		uint32_t cmasks[4];	/* Mask of channels to which we are attached. */
 		struct vp *vp;		/* VP card to which we are attached */
 		struct mx *next;	/* VP card attach list linkage */
 		struct mx **prev;	/* VP card attach list linkage */
 	} a;
 	struct {
+		uint32_t smask;		/* Mask of spans to which we are connected. */
+		uint32_t cmask;		/* Mask of slots to which we are connected. */
+		uint32_t cmasks[4];	/* Mask of channels to which we are connected. */
 		struct vp *vp;		/* VP card to which we are connected */
 		struct mx *next;	/* VP card connect list linkage */
 		struct mx **prev;	/* VP card connect list linkage */
 	} c;
 	struct {
+		uint32_t smask;		/* Mask of spans to which we are cross-connected. */
+		uint32_t cmask;		/* Mask of slots to which we are cross-connected. */
+		uint32_t cmasks[4];	/* Mask of channels to which we are cross-connected. */
 		struct vp *vp;		/* VP card to which we are cross-connected */
 		struct mx *next;	/* VP card cross-connect list linkage */
 		struct mx **prev;	/* VP card cross-connect list linkage */
@@ -500,12 +601,11 @@ struct sp {
 };
 
 struct vp {
+	uint card;			/* card number */
 	uint board;
 	uint device;
 	uint devrev;
 	uint hw_flags;
-	const char *brdname;
-	const char *devname;
 	spinlock_t lock;
 	uint flags;
 	struct tasklet_struct tasklet;
@@ -547,10 +647,18 @@ struct vp {
 	uint32_t smask;			/* Mask of enabled spans. */
 	uint32_t cmask;			/* Mask of enabled channels (for any span). */
 	uint32_t xmask;			/* Mask of cross-connected channels (for any span). */
-	int txdccs;			/* Number of digital cross-connect to this card from other
+	struct {
+		volatile uint32_t *buf;	/* elastic buffer */
+		int uebno;		/* upper elastic buffer number */
+		int dccs;		/* Number of digital cross-connect to this card from other
 					   cards. */
-	int rxdccs;			/* Number of digital cross-connect from this card to other
+	} tx;
+	struct {
+		volatile uint32_t *buf;	/* elastic buffer */
+		int uebno;		/* upper elastic buffer number */
+		int dccs;		/* Number of digital cross-connect from this card to other
 					   cards. */
+	} rx;
 	struct sp spans[4];		/* Only four of 'em for now. */
 	volatile uint8_t *map[32][4];	/* Digital cross-connect map from this card. */
 };
@@ -562,8 +670,10 @@ STATIC spinlock_t vp_daccs_lock = SPIN_LOCK_UNLOCKED;
 #define V400P_EBUFNO	(1<<7)	/* 128k of elastic buffers per card. */
 
 STATIC __unlikely void
-mx_init_priv(struct mx *mx, queue_t *q, major_t major, minor_t minor)
+mx_init_priv(queue_t *q, major_t major, minor_t minor)
 {
+	struct mx *mx = MX_PRIV(q);
+
 	bzero(mx, sizeof(*mx));
 	mx->mid = major;
 	mx->sid = minor;
@@ -626,8 +736,10 @@ STATIC __unlikely void mx_disable(struct mx *mx, bool force);
 STATIC __unlikely void mx_detach(struct mx *mx, bool force);
 
 STATIC __unlikely void
-mx_term_priv(struct mx *mx)
+mx_term_priv(queue_t *q)
 {
+	struct mx *mx = MX_PRIV(q);
+
 	switch (mx_get_state(mx)) {
 	default:
 		/* don't know, run them anyway */
@@ -649,7 +761,7 @@ mx_term_priv(struct mx *mx)
 
 /**
  * mx_attach: attach an MX stream
- * @mx: MX private structure
+ * @q: active queue (read or write queue)
  * @ppa: PPA to which to attach
  * @style: resulting style
  *
@@ -665,8 +777,9 @@ mx_term_priv(struct mx *mx)
  * MX_STYLE1.
  */
 STATIC __unlikely void
-mx_attach(struct mx *mx, mx_ulong ppa, mx_ulong style)
+mx_attach(queue_t *q, mx_ulong ppa, mx_ulong style)
 {
+	struct mx *mx = MX_PRIV(q);
 	uint32_t smask, cmask, xmask;
 	struct vp *vp;
 	int card = (ppa >> 16) & 0x0ff;
@@ -1645,7 +1758,7 @@ mx_attach_ack(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong ppa)
 		p->mx_correct_prim = MX_ATTACH_REQ;
 		p->mx_state = MXS_ATTACHED;
 		mp->b_wptr += sizeof(*p);
-		mx_attach(mx, ppa, MX_STYLE2);
+		mx_attach(q, ppa, MX_STYLE2);
 		freemsg(msg);
 		strlog(mx->mid, mx->sid, MXLOGTX, SL_TRACE, "<- MX_OK_ACK");
 		putnext(RD(q), mp);
@@ -1967,6 +2080,822 @@ mx_event_ind(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong event, mx_ulong sl
 	return (-ENOBUFS);
 }
 
+/**
+ * vp_span_config: - initial configuration of a single span
+ * @vp: card structure
+ * @span: span number to configure
+ * @timeouts: whether busy looping is permissable
+ *
+ * NOTE: we should actually do a schedule_timeout instead of a busy loop to get the 100ms delay that
+ * are necessary.  What we are really looking for is usleep() from SVR4.  For now we busy loop but
+ * it MUST CHANGE.  Once spans are configured at start-up with this longer configuration process,
+ * all but a few registers do not need to change.
+ *
+ * A couple notes.  It migth be an idea to leave transmitters powered off or transmit all ones to
+ * blue alarm the other end.  When the span is reconfigured, we can power transmitters or resume
+ * normal framing operation.  During the first configuration, it might be an idea to set up the
+ * DS2155 idle registers and per-channel idle registers.
+ */
+STATIC noinline __unlikely int
+vp_span_config(struct vp *vp, int span, bool timeouts)
+{
+	struct sp *sp = vp->spans[span];
+	volatile unsigned char *xlb = &vp->xlb[span << 8];
+	int offset;
+	unsigned long timeout;
+
+	switch (vp->board) {
+	case V400PE:
+	case E400P:
+	case E400PSS7:
+	{
+		uint8_t reg14 = 0, reg12 = 0, reg18 = 0, regac = 0;
+
+		xlb[0x1a] = 0x04;	/* CCR2: set LOTCMC */
+
+		for (offset = 0; offset <= 8; offset++)
+			xlb[offset] = 0x00;
+		for (offset = 0x10; offset <= 0x4f; offset++)
+			if (offset != 0x1a)
+				xlb[offset] = 0x00;
+
+		xlb[0x10] = 0x20;	/* RCR1: Rsync as input */
+		xlb[0x11] = 0x06;	/* RCR2: Sysclk = 2.048 Mhz */
+
+		reg12 = 0x09;	/* TCR1: TSiS mode */
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
+		case SDL_FRAMING_CCS:
+			reg14 |= 0x08;
+			break;
+		case SDL_FRAMING_CAS:
+			reg12 |= 0x20;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
+		case SDL_CODING_HDB3:
+			reg14 |= 0x44;
+			break;
+		case SDL_CODING_AMI:
+			reg14 |= 0x00;
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		default:
+			sp->config.ifgcrc = SDL_GCRC_CRC5;
+		case SDL_GCRC_CRC5:
+			reg14 |= 0x00;
+			break;
+		case SDL_GCRC_CRC4:
+			reg14 |= 0x11;
+			break;
+		}
+		xlb[0x12] = reg12;
+		xlb[0x14] = reg14;
+
+		if (sp->config.iftxlevel < 8) {
+			/* not monitoring mode */
+			regac = 0x00;	/* TEST3 no gain */
+			reg18 = 0x00;	/* 75 Ohm, Normal, transmitter on */
+			reg18 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			regac = 0x00;	/* TEST3 no gain */
+			reg18 = 0x01;	/* 75 Ohm norm, transmitter off */
+			switch (sp->config.iftxlevel & 0x3) {
+			case 0:
+				break;
+			case 1:
+				regac |= 0x72;	/* TEST3 12dB gain */
+				break;
+			case 2:
+			case 3:
+				regac |= 0x70;	/* TEST3 30dB gain */
+				break;
+			}
+		}
+		// reg18 |= 0x01; /* disable transmitter */
+
+		xlb[0xac] = regac;
+		xlb[0x18] = reg18;
+
+		xlb[0x1b] = 0x8a;	/* CRC3: LIRST & TSCLKM */
+		xlb[0x20] = 0x1b;	/* TAFR */
+		xlb[0x21] = 0x5f;	/* TNAFR */
+		xlb[0x40] = 0x0b;	/* TSR1 */
+
+		if (timeouts) {
+			/* wierd thing to do */
+			for (offset = 0x41; offset <= 0x4f; offset++)
+				xlb[offset] = 0x55;
+			for (offset = 0x22; offset <= 0x25; offset++)
+				xlb[offset] = 0xff;
+			timeout = jiffies + 100 * HZ / 1000;
+			while (jiffies < timeout) ;
+		}
+
+		xlb[0x1b] = 0x9a;	/* CRC3: set ESR as well */
+		xlb[0x1b] = 0x82;	/* CRC3: TSCLKM only */
+		break;
+	}
+	case V401PE:
+	{
+		uint8_t reg33, reg35, reg40, reg78, reg7a;
+
+		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK 
+		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
+		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
+		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
+		xlb[0x70] = 0x02;	/* LOTCMC into TCSS0 */
+
+		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 
+		   RSYNC is an input (elastic store). */
+		xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
+		xlb[0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#if 0
+		/* We should really reset the elastic store after reset like so: */
+		xlb[0x4f] = 0x55;	/* RES/TES (elastic store) reset */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+		/* And even align it like so: */
+		xlb[0x4f] = 0x99;	/* RES/TES (elastic store) reset */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#endif
+		reg33 = 0x00;
+		reg35 = 0x10;	/* TSiS */
+		reg40 = 0x00;
+
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
+		case SDL_FRAMING_CCS:
+			reg40 |= 0x06;
+			reg33 |= 0x40;
+			break;
+		case SDL_FRAMING_CAS:
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
+		case SDL_CODING_HDB3:
+			reg33 |= 0x20;
+			reg35 |= 0x04;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			reg33 |= 0x08;
+			reg35 |= 0x01;
+			break;
+		default:
+			break;
+		}
+		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic
+		   AIS generation (0x02) (E1). */
+		xlb[0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from O14.6) */
+		xlb[0x36] = 0x04;	/* AEBE 36.2 */
+		xlb[0x34] = 0x01;	/* RCL (1ms) */
+		xlb[0x40] = reg40;	/* RCCS, TCCS */
+		xlb[0x33] = reg33 | 0x01;	/* RCR4, RHDB3, RSM, SYNCE, RESYNC */
+		xlb[0x33] = reg33 | 0x00;	/* RCR4, RHDB3, RSM, SYNCE */
+		/* This is a little peculiar: the host should be using Method 3 in section 22.3 of
+		   the DS2155 manual instead of this method that only permits 250us to read or
+		   write the bits. */
+		xlb[0xd0] = 0x1b;	/* TAFR */
+		xlb[0xd1] = 0x5f;	/* TNAFR */
+
+		xlb[0x79] = 0x98;	/* JACLK on for E1 */
+		xlb[0x7b] = 0x0f;	/* 120 Ohm term, MCLK 2.048 MHz */
+		xlb[0x7d] = 0x00;	/* Automatic gain control */
+
+		/* We use TX levels to determine LBO, impedance, CSU operation, or monitoring
+		   operation.  During monitoring operation, the transmitters are powered off. */
+		/* For E1, LBO is: 000XXXXX 75 Ohm normal 001XXXXX 120 Ohm normal 100XXXXX 75 Ohm
+		   high return loss 101XXXXX 120 Ohm high return loss For T1, LBO is: 000XXXXX
+		   DSX-1 ( 0ft - 133ft) / 0dB CSU 001XXXXX DSX-1 (133ft - 266ft) 010XXXXX DSX-1
+		   (266ft - 399ft) 011XXXXX DSX-1 (399ft - 533ft) 100XXXXX DSX-1 (533ft - 666ft)
+		   101XXXXX -7.5dB CSU 110XXXXX -15.0dB CSU 111XXXXX -22.5dB CSU txlevel 0000 TX on 
+		   DSX-1 ( 0ft - 133ft) / 0dB CSU or 75 Ohm normal 0001 TX on DSX-1 (133ft - 266ft) 
+		   or 120 Ohm normal 0010 TX on DSX-1 (266ft - 399ft) or (invalid) 0011 TX on DSX-1 
+		   (399ft - 533ft) or (invalid) 0100 TX on DSX-1 (533ft - 666ft) or 75 Ohm high RL
+		   0101 TX on -7.5dB CSU or 120 Ohm high RL 0110 TX on -15.0dB CSU or (invalid)
+		   0111 TX on -22.5dB CSU or (invalid) 1000 TX off 0dB Gain monitoring mode 1001 TX 
+		   off 20dB Gain monitoring mode 1010 TX off 26dB Gain monitoring mode 1011 TX off
+		   32dB Gain monitoring mode 1100 (invalid) 1101 (invalid) 1110 (invalid) 1111
+		   (invalid) */
+
+		if (sp->config.iftxlevel < 8) {
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x31;	/* 120 Ohm normal, transmitter on, -43dB EGL */
+			reg78 |= ((sp->config.iftxlevel & 0x1) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x30;	/* 120 Ohm normal, transmitter off, -43dB EGL */
+			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
+		}
+		// reg78 &= ~0x01; /* disable transmitter */
+
+		xlb[0x78] = reg78;
+		xlb[0x7a] = reg7a;
+		break;
+	}
+	case V400PT:
+	case T400P:
+	case T400PSS7:
+	{
+		uint8_t reg38, reg09, reg7c;
+		int japan = (vp->config.ifgtype == SDL_GTYPE_J1);
+
+		xlb[0x2b] = 0x08;	/* Full-on sync required (RCR1) */
+		xlb[0x2c] = 0x08;	/* RSYNC is an input (RCR2) */
+		xlb[0x35] = 0x10;	/* RBS enable (TCR1) */
+		xlb[0x36] = 0x04;	/* TSYNC to be output (TCR2) */
+		xlb[0x37] = 0x9c;	/* Tx & Rx Elastic stor, sysclk(s) = 2.048 mhz, loopback
+					   controls (CCR1) */
+
+		xlb[0x12] = 0x22;	/* IBCC 5-bit loop up, 3-bit loop down code */
+		xlb[0x13] = 0x80;	/* TCD - 10000 */
+		xlb[0x14] = 0x80;	/* RUPCD - 10000 */
+		xlb[0x15] = 0x80;	/* RDNCD - 100 */
+
+		xlb[0x19] = japan ? 0x80 : 0x00;	/* set japanese mode, no local loop */
+		xlb[0x1e] = japan ? 0x80 : 0x00;	/* set japanese mode, no local loop */
+
+		/* Enable F bits pattern */
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_ESF;
+		case SDL_FRAMING_ESF:
+			reg38 = 0x88;
+			break;
+		case SDL_FRAMING_SF:
+			reg38 = 0x20;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_B8ZS;
+		case SDL_CODING_B8ZS:
+			reg38 |= 0x44;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		xlb[0x38] = reg38;
+
+		if (sp->config.ifcoding != SDL_CODING_B8ZS)
+			xlb[0x7e] = 0x1c;	/* Set FDL register to 0x1c */
+		if (sp->config.iftxlevel < 8) {
+			/* not monitoring mode */
+			reg09 = 0x00;	/* TEST2 no gain */
+			reg7c = 0x00;	/* 0dB CSU, transmitters on */
+			reg7c |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg09 = 0x00;	/* TEST2 no gain */
+			reg7c = 0x01;	/* 0dB CSU, transmitters off */
+			switch (sp->config.iftxlevel & 0x3) {
+			case 1:
+				reg09 |= 0x72;	/* TEST2 12dB gain */
+				break;
+			case 2:
+			case 3:
+				reg09 |= 0x70;	/* TEST2 20db gain */
+				break;
+			}
+		}
+		// reg7c |= 0x01; /* disable trasnmitter */
+
+		xlb[0x09] = reg09;
+		xlb[0x7c] = reg7c;
+
+		if (timeouts) {
+			xlb[0x0a] = 0x80;	/* LIRST to reset line interface */
+			timeout = jiffies + 100 * HZ / 1000;
+			while (jiffies < timeout) ;
+		}
+		xlb[0x0a] = 0x30;	/* LIRST bask to normal, Resetting elastic buffers */
+		{
+			int byte, c;
+			unsigned short mask = 0;
+
+			/* establish which channels are clear channel */
+			for (c = 0; c < 24; c++) {
+				int slot = vp_t1_chan_map[c];
+
+				byte = c >> 3;
+				if (!sp->slots[slot]
+				    || sp->slots[slot]->sdl.config.iftype != SDL_TYPE_DS0A)
+					mask |= 1 << (c % 8);
+				if ((c % 8) == 7) {
+					xlb[0x39 + byte] = mask;
+					mask = 0;
+				}
+			}
+		}
+		break;
+	}
+	case V401PT:
+	{
+		unsigned char reg04, reg05, reg06, reg07, reg78, reg7a;
+
+		/* There are three other synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK 
+		   if TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the
+		   TSYSCLK pin instead of the MCLK pin when in external clock mode. */
+		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
+		xlb[0x70] = 0x06;	/* LOTCMC into TCSS0 */
+		/* IOCR1.0=0 Output data format is bipolar, IOCR1.1=1 TSYNC is an output, IOCR1.4=1 
+		   RSYNC is an input (elastic store). */
+		xlb[0x01] = 0x12;	/* RSIO + 1 is from O12.0 */
+		xlb[0x02] = 0x03;	/* RSYSCLK/TSYSCLK 8.192MHz IBO */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#if 0
+		/* We should really reset the elastic store after reset like so: */
+		xlb[0x4f] = 0x55;	/* RES/TES (elastic store) reset */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+		/* And even align it like so: */
+		xlb[0x4f] = 0x99;	/* RES/TES (elastic store) reset */
+		xlb[0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
+#endif
+		xlb[0xb6] = 0x22;	/* IBCC 5-bit loop up, 3-bit loop down code */
+		xlb[0xb7] = 0x80;	/* TCD1 - 10000 loop up code (for now) */
+		xlb[0xb8] = 0x00;	/* TCD2 don't care */
+		xlb[0xb9] = 0x80;	/* RUPCD1 - 10000 receive loop up code */
+		xlb[0xba] = 0x00;	/* RUPCD2 don't care */
+		xlb[0xbb] = 0x80;	/* RDNCD1 - 100 receive loop down code */
+		xlb[0xbc] = 0x00;	/* RDNCD2 don't card */
+
+		reg04 = 0x00;
+		reg05 = 0x10;	/* TSSE */
+		reg06 = 0x00;
+		reg07 = 0x00;
+
+		switch (sp->config.ifgcrc) {
+		default:
+			sp->config.ifgcrc = SDL_GCRC_CRC6;
+		case SDL_GCRC_CRC6:
+			break;
+		case SDL_GCRC_CRC6J:
+			reg04 |= 0x02;
+			reg05 |= 0x80;
+			break;
+		}
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_ESF;
+		case SDL_FRAMING_ESF:
+			reg04 |= 0x40;
+			reg07 |= 0x04;
+			break;
+		case SDL_FRAMING_SF:	/* D4 */
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_B8ZS;
+		case SDL_CODING_B8ZS:
+			reg04 |= 0x20;
+			reg06 |= 0x80;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
+		xlb[0x05] = reg05;	/* TSSE TCRC6J */
+		xlb[0x06] = reg06;	/* TB8ZS */
+		xlb[0x07] = reg07;	/* TESF */
+		xlb[0x40] = 0x00;	/* RCCS, TCCS set to zero for T1 */
+		xlb[0x03] = 0x08 | 0x01;	/* SYNCC/SYNCE, RESYNC */
+		xlb[0x03] = 0x08 | 0x00;	/* SYNCC/SYNCE */
+
+		xlb[0x79] = 0x18;	/* JACLK on for T1 */
+		xlb[0x7b] = 0x0a;	/* 100 ohm, MCLK 2.048 MHz */
+		xlb[0x7d] = 0x00;	/* Automatic gain control */
+
+		/* We use TX levels to determine LBO, impedance, CSU operation, or monitoring
+		   operation.  During monitoring operation, the transmitters are powered off. */
+		/* For E1, LBO is: 000XXXXX 75 Ohm normal 001XXXXX 120 Ohm normal 100XXXXX 75 Ohm
+		   high return loss 101XXXXX 120 Ohm high return loss For T1, LBO is: 000XXXXX
+		   DSX-1 ( 0ft - 133ft) / 0dB CSU 001XXXXX DSX-1 (133ft - 266ft) 010XXXXX DSX-1
+		   (266ft - 399ft) 011XXXXX DSX-1 (399ft - 533ft) 100XXXXX DSX-1 (533ft - 666ft)
+		   101XXXXX -7.5dB CSU 110XXXXX -15.0dB CSU 111XXXXX -22.5dB CSU txlevel 0000 TX on 
+		   DSX-1 ( 0ft - 133ft) / 0dB CSU or 75 Ohm normal 0001 TX on DSX-1 (133ft - 266ft) 
+		   or 120 Ohm normal 0010 TX on DSX-1 (266ft - 399ft) or (invalid) 0011 TX on DSX-1 
+		   (399ft - 533ft) or (invalid) 0100 TX on DSX-1 (533ft - 666ft) or 75 Ohm high RL
+		   0101 TX on -7.5dB CSU or 120 Ohm high RL 0110 TX on -15.0dB CSU or (invalid)
+		   0111 TX on -22.5dB CSU or (invalid) 1000 TX off 0dB Gain monitoring mode 1001 TX 
+		   off 20dB Gain monitoring mode 1010 TX off 26dB Gain monitoring mode 1011 TX off
+		   32dB Gain monitoring mode 1100 (invalid) 1101 (invalid) 1110 (invalid) 1111
+		   (invalid) */
+
+		if (sp->config.iftxlevel < 8) {
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x01;	/* 0dB CSU, trasnmitter on, -36dB EGL */
+			reg78 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x00;	/* 0db CSU, transmitter off, -36dB EGL */
+			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
+		}
+		// reg78 &= ~0x01; /* disable transmitter */
+
+		xlb[0x78] = reg78;
+		xlb[0x7a] = reg7a;
+
+		{
+			int byte, c;
+			unsigned short mask = 0;
+
+			/* establish which channels are clear channel */
+			for (c = 0; c < 24; c++) {
+				int slot = vp_t1_chan_map[c];
+
+				byte = c >> 3;
+				if (sp->slots[slot]
+				    && sp->slots[slot]->sdl.config.iftype == SDL_TYPE_DS0A)
+					mask |= 1 << (c % 8);
+				if ((c % 8) == 7) {
+					xlb[0x08 + byte] = mask;
+					mask = 0;
+				}
+			}
+		}
+		break;
+	}
+	}
+	return (0);
+}
+
+/**
+ * vp_span_reconfig: - reconfigure a span
+ * @vp: card structure
+ * @span: span number to reconfigure (0, 1, 2, 3)
+ *
+ * This is the span reconfiguration procedure used to reconfigure a span once the card has been
+ * loaded, configured and is running.  This can be called many times and does is a non-blocking
+ * procedure.  The caller should suppress interrupts and acquire the card spin lock before calling
+ * this function.
+ *
+ * A couple of notes.  When the span is not running it might be an idea to set up the idle registers
+ * and send customer off-line code until a channel is configured.  When a channel is running, the
+ * other channels could be set on the DS2155 to take from per-channel idle registers instead of TSER
+ * and avoid having to write idle codes for the whole span across the PCI bus.
+ */
+STATIC noinline __unlikely int
+vp_span_reconfig(struct vp *vp, int span)
+{
+	struct sp *sp = vp->spans[span];
+	volatile unsigned char *xlb = &vp->xlb[span << 8];
+
+	switch (vp->board) {
+	case V400PE:
+	case E400P:
+	case E400PSS7:
+	{
+		uint8_t reg14 = 0, reg12 = 0, reg18 = 0, regac = 0;
+
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
+		case SDL_FRAMING_CCS:
+			reg14 |= 0x08;
+			break;
+		case SDL_FRAMING_CAS:
+			reg12 |= 0x20;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
+		case SDL_CODING_HDB3:
+			reg14 |= 0x44;
+			break;
+		case SDL_CODING_AMI:
+			reg14 |= 0x00;
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		default:
+			sp->config.ifgcrc = SDL_GCRC_CRC5;
+		case SDL_GCRC_CRC5:
+			reg14 |= 0x00;
+			break;
+		case SDL_GCRC_CRC4:
+			reg14 |= 0x11;
+			break;
+		}
+
+		xlb[0x12] = reg12;
+		xlb[0x14] = reg14;
+
+		if (sp->config.iftxlevel < 8) {
+			/* not monitoring mode */
+			regac = 0x00;	/* TEST3 no gain */
+			reg18 = 0x00;	/* 75 Ohm, Normal, transmitter on */
+			reg18 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			regac = 0x00;	/* TEST3 no gain */
+			reg18 = 0x01;	/* 75 Ohm norm, transmitter off */
+			switch (sp->config.iftxlevel & 0x3) {
+			case 0:
+				break;
+			case 1:
+				regac |= 0x72;	/* TEST3 12dB gain */
+				break;
+			case 2:
+			case 3:
+				regac |= 0x70;	/* TEST3 30dB gain */
+				break;
+			}
+		}
+
+		xlb[0xac] = regac;
+		xlb[0x18] = reg18;
+		break;
+	}
+	case V401PE:
+	{
+		uint8_t reg33, reg35, reg40, reg70, reg78, reg7a;
+
+		switch (sp->config.ifclock) {
+		default:
+			sp->config.ifclock = SDL_CLOCK_LOOP;
+		case SDL_CLOCK_LOOP:
+			reg70 = 0x06;	/* Use the signal present at RCLK as the transmit clokc.
+					   The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_INT:
+			reg70 = 0x00;	/* The TCLK pin is always the source of transmit clock. */
+			break;
+		case SDL_CLOCK_MASTER:
+			reg70 = 0x04;	/* Use the scaled signal present at MCLK as the transmit
+					   clock.  The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_EXT:
+			reg70 = 0x84;	/* Use the scaled signal present at TSYSCLK as the transmit
+					   clock.  The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_SLAVE:
+			reg70 = 0x02;	/* Switch to the clock present at RCLK when the signal at
+					   the TCLK pin fails to transition after 1 channel time. */
+			break;
+		}
+
+		/* There are four synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK if
+		   TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the TSYSCLK
+		   pin instead of the MCLK pin when in external clock mode. */
+		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
+		xlb[0x70] = reg70;
+
+		reg33 = 0x00;
+		reg35 = 0x10;	/* TSiS */
+		reg40 = 0x00;
+
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_CCS;
+		case SDL_FRAMING_CCS:
+			reg40 |= 0x06;
+			reg33 |= 0x40;
+			break;
+		case SDL_FRAMING_CAS:
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_HDB3;
+		case SDL_CODING_HDB3:
+			reg33 |= 0x20;
+			reg35 |= 0x04;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		switch (sp->config.ifgcrc) {
+		case SDL_GCRC_CRC4:
+			reg33 |= 0x08;
+			reg35 |= 0x01;
+			break;
+		default:
+			break;
+		}
+		/* We could be setting automatic report alarm generation (0x01) (T1) or automatic
+		   AIS generation (0x02) (E1). */
+		xlb[0x35] = reg35;	/* TSiS, TCRC4 (from 014.4), THDB3 (from O14.6) */
+		xlb[0x40] = reg40;	/* RCCS, TCCS */
+		xlb[0x33] = reg33 | 0x01;	/* RCR4, RHDB3, RSM, SYNCE, RESYNC */
+		xlb[0x33] = reg33 | 0x00;	/* RCR4, RHDB3, RSM, SYNCE */
+
+		if (sp->config.iftxlevel < 8) {
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x31;	/* 120 Ohm normal, transmitter on, -43dB EGL */
+			reg78 |= ((sp->config.iftxlevel & 0x1) << 5); /* LBO */
+		} else {
+			/* monitoring mode */
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x30;	/* 120 Ohm normal, transmitter off, -43dB EGL */
+			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
+		}
+
+		xlb[0x78] = reg78;
+		xlb[0x7a] = reg7a;
+		break;
+	}
+	case V400PT:
+	case T400P:
+	case T400PSS7:
+	{
+		uint8_t reg38, reg09, reg7c;
+
+		switch (sp->config.ifframing) {
+		default:
+		case SDL_FRAMING_SF:
+			reg38 = 0x20;
+			break;
+		case SDL_FRAMING_ESF:
+			reg38 = 0x88;
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+		case SDL_CODING_AMI:
+			break;
+		case SDL_CODING_B8ZS:
+			reg38 |= 0x44;
+			break;
+		}
+		xlb[0x38] = reg38;
+		if (sp->config.ifcoding != SDL_CODING_B8ZS)
+			xlb[0x7e] = 0x1c;	/* Set FDL register to 0x1c */
+		if (sp->config.iftxlevel < 8) {
+			/* not monitoring mode */
+			reg09 = 0x00;	/* TEST2 no gain */
+			reg7c = 0x00;	/* 0dB CSU, transmitters on */
+			reg7c |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg09 = 0x00;	/* TEST2 no gain */
+			reg7c = 0x01;	/* 0dB CSU, transmitters off */
+			switch (sp->config.iftxlevel & 0x3) {
+			case 1:
+				reg09 |= 0x72;	/* TEST2 12dB gain */
+				break;
+			case 2:
+			case 3:
+				reg09 |= 0x70;	/* TEST2 20db gain */
+				break;
+			}
+		}
+
+		xlb[0x09] = reg09;
+		xlb[0x7c] = reg7c;
+
+		{
+			int byte, c;
+			unsigned short mask = 0;
+
+			/* establish which channels are clear channel */
+			for (c = 0; c < 24; c++) {
+				int slot = vp_t1_chan_map[c];
+
+				byte = c >> 3;
+				if (!sp->slots[slot]
+				    || sp->slots[slot]->sdl.config.iftype != SDL_TYPE_DS0A)
+					mask |= 1 << (c % 8);
+				if ((c % 8) == 7) {
+					xlb[0x39 + byte] = mask;
+					mask = 0;
+				}
+			}
+		}
+		break;
+	}
+	case V401PT:
+	{
+		uint8_t reg04, reg05, reg06, reg07, reg70, reg78, reg7a;
+
+		switch (sp->config.ifclock) {
+		default:
+			sp->config.ifclock = SDL_CLOCK_LOOP;
+		case SDL_CLOCK_LOOP:
+			reg70 = 0x06;	/* Use the signal present at RCLK as the transmit clokc.
+					   The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_INT:
+			reg70 = 0x00;	/* The TCLK pin is always the source of transmit clock. */
+			break;
+		case SDL_CLOCK_MASTER:
+			reg70 = 0x04;	/* Use the scaled signal present at MCLK as the transmit
+					   clock.  The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_EXT:
+			reg70 = 0x84;	/* Use the scaled signal present at TSYSCLK as the transmit
+					   clock.  The TCLK pin is ignored. */
+			break;
+		case SDL_CLOCK_SLAVE:
+			reg70 = 0x02;	/* Switch to the clock present at RCLK when the signal at
+					   the TCLK pin fails to transition after 1 channel time. */
+			break;
+		}
+		/* There are four synchronization modes: 0x00 TCLK only, 0x02 switch to RCLK if
+		   TCLK fails, 0x04 external clock, 0x06 loop.  And then 0x80 selects the TSYSCLK
+		   pin instead of the MCLK pin when in external clock mode. */
+		xlb[0x70] = reg70;
+
+		reg04 = 0x00;
+		reg05 = 0x10;	/* TSSE */
+		reg06 = 0x00;
+		reg07 = 0x00;
+
+		switch (sp->config.ifgcrc) {
+		default:
+			sp->config.ifgcrc = SDL_GCRC_CRC6;
+		case SDL_GCRC_CRC6:
+			break;
+		case SDL_GCRC_CRC6J:
+			reg04 |= 0x02;
+			reg05 |= 0x80;
+			break;
+		}
+		switch (sp->config.ifframing) {
+		default:
+			sp->config.ifframing = SDL_FRAMING_ESF;
+		case SDL_FRAMING_ESF:
+			reg04 |= 0x40;
+			reg07 |= 0x04;
+			break;
+		case SDL_FRAMING_SF:	/* D4 */
+			break;
+		}
+		switch (sp->config.ifcoding) {
+		default:
+			sp->config.ifcoding = SDL_CODING_B8ZS;
+		case SDL_CODING_B8ZS:
+			reg04 |= 0x20;
+			reg06 |= 0x80;
+			break;
+		case SDL_CODING_AMI:
+			break;
+		}
+		xlb[0x04] = reg04;	/* RESF RB8ZS RCRC6J */
+		xlb[0x05] = reg05;	/* TSSE TCRC6J */
+		xlb[0x06] = reg06;	/* TB8ZS */
+		xlb[0x07] = reg07;	/* TESF */
+
+		xlb[0x03] = 0x08 | 0x01;	/* SYNCC/SYNCE, RESYNC */
+		xlb[0x03] = 0x08 | 0x00;	/* SYNCC/SYNCE */
+
+		if (sp->config.iftxlevel < 8) {
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x01;	/* 0dB CSU, trasnmitter on */
+			reg78 |= ((sp->config.iftxlevel & 0x7) << 5);	/* LBO */
+		} else {
+			/* monitoring mode */
+			reg7a = 0x00;	/* no gain */
+			reg78 = 0x00;	/* 0db CSU, transmitter off */
+			reg7a |= ((sp->config.iftxlevel & 0x3) << 3);	/* Linear gain */
+		}
+
+		xlb[0x78] = reg78;
+		xlb[0x7a] = reg7a;
+
+		{
+			int byte, c;
+			unsigned short mask = 0;
+
+			/* establish which channels are clear channel */
+			for (c = 0; c < 24; c++) {
+				int slot = vp_t1_chan_map[c];
+
+				byte = c >> 3;
+				if (sp->slots[slot]
+				    && sp->slots[slot]->sdl.config.iftype == SDL_TYPE_DS0A)
+					mask |= 1 << (c % 8);
+				if ((c % 8) == 7) {
+					xlb[0x08 + byte] = mask;
+					mask = 0;
+				}
+			}
+		}
+		break;
+	}
+	default:
+		swerr();
+		break;
+	}
+	return (0);
+}
+
+
 /*
  *  State Machine and Zaptel Integration.
  *  =====================================
@@ -2125,21 +3054,21 @@ __vp_start_span(struct vp *vp, int span)
 		vp->xlb[base + 0x38] = val;
 		if (sp->config.ifcoding != SDL_CODING_B8ZS)
 			vp->xlb[base + 0x7e] = 0x1c;	/* Set FDL register to 0x1c */
-		cd->xlb[base + 0x7c] = sp->config.iftxlevel << 5;	/* LBO */
-		cd->xlb[base + 0x0a] = 0x80;	/* LIRST to reset line interface */
+		vp->xlb[base + 0x7c] = sp->config.iftxlevel << 5;	/* LBO */
+		vp->xlb[base + 0x0a] = 0x80;	/* LIRST to reset line interface */
 		timeout = jiffies + 100 * HZ / 1000;
 		spin_unlock_irqrestore(&vp->lock, flags);
 		/* XXX: WHAT THE H*** IS THIS? */
 		while (jiffies < timeout) ;
 		spin_lock_irqsave(&vp->lock, flags);
-		cd->xlb[base + 0x0a] = 0x30;	/* LISRT back to normal, resetting elastic buffers */
+		vp->xlb[base + 0x0a] = 0x30;	/* LISRT back to normal, resetting elastic buffers */
 		vp->smask |= (1 << span);
 		/* enable interrupts */
 		vp->xlb[CTLREG] = (INTENA);
 		spin_unlock_irqrestore(&vp->lock, flags);
 		/* establish which channels are clear channel */
 		for (c = 0; c < 24; c++) {
-			int slot = xp_t1_chan_map[c];
+			int slot = vp_t1_chan_map[c];
 
 			byte = c >> 3;
 			if (!vp->spans[span]->slots[slot]
@@ -2291,7 +3220,7 @@ __vp_start_span(struct vp *vp, int span)
 		vp->xlb[base + 0x4f] = 0x11;	/* RES/TES (elastic store) enabled */
 #endif
 		reg04 = japan ? 0x02 : 0x00;
-		reg05 = japan ? 0x90 : 0x00; /* japan always as TSSE? */
+		reg05 = japan ? 0x90 : 0x00;	/* japan always as TSSE? */
 		reg06 = 0x00;
 
 		switch (sp->config.ifframing) {
@@ -2353,7 +3282,7 @@ static void
 __vp_stop_span(struct vp *vp, int span)
 {
 	/* FIXME: stop the span */
-	vp->smask &= ~(1<<span);
+	vp->smask &= ~(1 << span);
 	if (!vp->span)
 		__vp_stop_card(vp);
 }
@@ -2370,7 +3299,7 @@ __vp_stop_span(struct vp *vp, int span)
 static int
 vp_setchunksize(struct zt_span *span, int chunksize)
 {
-	struct vp *vp = (struct vp *)span->pvt;
+	struct vp *vp = (struct vp *) span->pvt;
 
 	if (chunksize != ZT_CHUNKSIZE)
 		return (-1);
@@ -2422,7 +3351,7 @@ vp_startup(struct zt_span *span)
 
 		spin_lock_irqsave(&vp->lock, flags);
 		{
-			if (!(vp->smask & (1<<span)))
+			if (!(vp->smask & (1 << span)))
 				__vp_start_span(vp, span);
 		}
 		spin_unlock_irqrestore(&vp->lock, flags);
@@ -2451,12 +3380,12 @@ vp_shutdown(struct zt_span *span)
 
 		spin_lock_irqsave(&vp->lock, flags);
 		{
-			if ((vp->smask & (1<<spanno))) {
+			if ((vp->smask & (1 << spanno))) {
 				for (ch = vp->ch.enabled; ch; ch = ch->e.next)
 					smask |= ch->smask;
 				for (mx = vp->mx.enabled; mx; mx = mx->e.next)
 					smask |= mx->smask;
-				if (!(smask & (1<<spanno)) && (vp->smask & (1<<spanno)))
+				if (!(smask & (1 << spanno)) && (vp->smask & (1 << spanno)))
 					__vp_stop_span(vp, spanno);
 			}
 		}
@@ -2681,7 +3610,8 @@ vp_open(struct zt_chan *chan)
 
 	spin_lock_irqsave(&vp->lock, flags);
 	{
-		for (c = chan; c->chanpos != chan->span->channels - 1 && c->master == chan->master; c++)
+		for (c = chan; c->chanpos != chan->span->channels - 1 && c->master == chan->master;
+		     c++)
 			cmask |= (1 << c->chanpos);
 		if (!(cmask & vp->cmasks[span])) {
 			vp->cmasks[span] |= cmask;
@@ -2719,7 +3649,8 @@ vp_close(struct zt_chan *chan)
 
 	spin_lock_irqsave(&vp->lock, flags);
 	{
-		for (c = chan; c->chanpos != chan->span->channels - 1 && c->master == chan->master; c++)
+		for (c = chan; c->chanpos != chan->span->channels - 1 && c->master == chan->master;
+		     c++)
 			cmask |= (1 << c->chanpos);
 		if (!((cmask ^ vp->cmasks[span]) & cmask)) {
 			vp->cmasks[span] &= ~cmask;
@@ -2767,7 +3698,7 @@ vp_ioctl(struct zt_chan *chan, unsigned int cmd, unsigned long data)
 static int
 vp_echocan(struct zt_chan *chan, int ecval)
 {
-	struct vp *vp = (struct vp *)chan->span->pvt;
+	struct vp *vp = (struct vp *) chan->span->pvt;
 }
 
 /**
@@ -2781,7 +3712,8 @@ vp_echocan(struct zt_chan *chan, int ecval)
 static int
 vp_rbsbits(struct zt_chan *chan, int bit)
 {
-	struct vp *vp = (struct vp *)chan->span->pvt;
+	struct vp *vp = (struct vp *) chan->span->pvt;
+
 	/* Option 1: If you're a T1 like interface, you can just provide a rbsbits function and
 	   we'll assert robbed bits for you.  Be sure to set the ZT_FLAG_RBS in this case.  */
 
@@ -2792,7 +3724,8 @@ vp_rbsbits(struct zt_chan *chan, int bit)
 static int
 vp_hooksig(struct zt_chan *chan, zt_txsig_t hookstate)
 {
-	struct vp *vp = (struct vp *)chan->span->pvt;
+	struct vp *vp = (struct vp *) chan->span->pvt;
+
 	/* Option 2: If you don't know about sig bits, but do have their equivalents (i.e. you can
 	   disconnect battery, detect off hook, generate ring, etc directly) then you can just
 	   specify a sethook function, and we'll call you with appropriate hook states to set.
@@ -2802,7 +3735,8 @@ vp_hooksig(struct zt_chan *chan, zt_txsig_t hookstate)
 static int
 vp_sethook(struct zt_chan *chan, int hookstate)
 {
-	struct vp *vp = (struct vp *)chan->span->pvt;
+	struct vp *vp = (struct vp *) chan->span->pvt;
+
 	/* Option 3: If you can't use sig bits, you can write a function which handles the
 	   individual hook states */
 }
@@ -2819,7 +3753,971 @@ vp_sethook(struct zt_chan *chan, int hookstate)
 static int
 vp_dacs(struct zt_chan *chan1, struct zt_chan *chan2)
 {
-	struct vp *vp = (struct vp *)chan->span->pvt;
+	struct vp *vp = (struct vp *) chan->span->pvt;
+}
+
+/*
+ * Interleaved elastic store operation: Each ISR RX and TX multiframe is a 1k area representing 8
+ * frames or 1ms.  For each 4096k page in the elastic store, the first 0-1024 is a TX multiframe,
+ * 1025-2048 is an RX multiframe, 2049-3072 TX, 3073-4096 RX.  Initial esballoced buffers
+ * representing these ranges are also maintained in sequence (so that buffers also occupy mdbblock
+ * cache page slots in the same order).  A maximum elastic buffer of 128k is allocated, representing
+ * 512 multiframes.  Each card has its own elastic buffer to avoid page contention between multiple
+ * processors separately servicing the interrupts for each card.  The service routine transfers an
+ * M_READ esballoc'ed block for the appropriate TX block upstream followed by an M_DATA message for
+ * the appropriate RX block upstream.  When the upper layer module receives the M_READ message
+ * block, it fills the block and passes it as an M_DATA message downstream.  If it cannot fill the
+ * block, the previously transmitted block can be repeated by zeroing the block (b_wptr <- b_rptr)
+ * and passing it as an M_DATA message block downstream.  When it receives the M_DATA message block,
+ * it processes the contents of the RX block and returns the block downstream as an M_READ message
+ * block.
+ *
+ * The write put and service procedures adjust the future position of the TX block within the
+ * elastic store based on the differential between the current TX block and the current RX block and
+ * the knowledge of the number of TX M_READ messages outstanding.  The objective of this process is
+ * to have the current TX block immediately precede the current RX block to maximize the efficiency
+ * of channel data transfers from the elastic store.  Also, the used portion within the elastic
+ * store can be trimmed using outstanding block information to a point for which wraps are not
+ * likely to occur, keeping the used pages hotter.
+ *
+ * An easy algorithm to acheive this is to always set the RX message block to the block following
+ * the current transmit message block.  When the card starts up, the receive must idle quiet code
+ * until the first transmit message block is received on the write side.  While locked, TX and RX
+ * blocks will be adjacent in the elastic store.
+ *
+ * Upper layer modules must never free these message blocks and must always promptly recycle M_READ
+ * into M_DATA and M_DATA into M_READ.  Because these are eballoc'ed blocks, if one is freed, it
+ * does not break the process; however, message block may be allocated adjacent to keep them hot.
+ * It is also possible for the upper layer module to generate its own TX blocks instead of recycling
+ * M_READ messages.
+ */
+
+/*
+ *  Once more:
+ *  There is one MX stream per card.  The read service procedure checks for RX blocks from the
+ *  RX ISR.  If there are RX blocks, it esballoc's RX blocks as an M_DATA message and TX blocks as
+ *  an M_READ message and passes them upstream, TX then RX.  The upper module can queue as many TX
+ *  blocks as it would like.  Any TX blocks that it does not wish to fill can be freed.  TX blocks
+ *  that are filled are recycled downstream as M_DATA blocks.  TX blocks must be processed in the
+ *  order in which they are received.  Once RX blocks are processed, they are freed.  Upper modules
+ *  must free RX blocks promptly and in the order in which they were received, and should not queue
+ *  them.  When RX or TX blocks are freed, the buffer free routine advances leading or trailing edge
+ *  elastic buffer pointers.  When TX blocks are freed, their contents are set to predetermined
+ *  values (e.g.  the values from the last frame or an idle code).  If the upper layer module is
+ *  concerned about the code, it should complete the blocks and send them downstream as M_DATA
+ *  blocks.  When a TX block is received on the write side, the trailing edge pointer is advanced
+ *  and the block is freed.  (The fact that the pointer was advanced is a cue to the free routine
+ *  that the block has been filled.)
+ */
+
+/*
+ *  Again:
+ *  There is one MX stream per card.  The read service procedure first drains any queued messages
+ *  subject to flow control.  The read service procedure then checks for RX blocks from the
+ *  RX ISR.  If there are RX blocks, it passes an esballoc'ed message block upstream subject also to
+ *  flow control.  If the upstream module is flow controlled, the routine places the message blocks
+ *  on its own queue (using putq with noenable in effect).  When the RX ISR runs and there are
+ *  RX blocks to be processed it uses qenable to enable the q.  The queue may also become
+ *  backenabled by the upstream module when congestion clears.
+ *
+ *  The upstream module (acting as a multiplexing driver) should perform the following actions:
+ *  starting with delay sensitive upper multiplex streams (i.e. voice channels), if the frame can be
+ *  passed to a stream on the upper multiplex considering flow control, it should duplicate the
+ *  message block and pass the duplicate upstream for processing.  If flow control is in effect, the
+ *  upper stream should simply be skipped.  Then for non-delay sensitive upper streams (i.e. data
+ *  channels), the same approach is taken.  It then frees the original which releases the RX block
+ *  back to the RX ISR.  On the upper multiplex, for delay sensitive streams, the read put procedure
+ *  should simply copy the data into a single RX block an signal a timing pulse upstream.  Here RX
+ *  data overwrites any RX data from the last RX block processed.  For delay sensitive upper
+ *  streams, the read put procedure should copy necessary RX data into a private RX block queued
+ *  upstream and then free the received block and return promptly.
+ *
+ *  The free routine advances the received data pointer allowing the RX ISR to receive more blocks.
+ *  If the received data pointer is not advanced sufficiently, the RX ISR will eventually run out of
+ *  buffer.
+ *
+ *  The upper layer module is responsible for managing its own TX buffer and TX blocks.
+ *
+ *  When the RX ISR wishes to enable the queue with qenable(9), it should spawn a tasklet with
+ *  the queue as an argument.  The tasklet should simply call qenable(9) followed by runqueues(9).
+ *  This will allow another processor to pick up the read service procedure and run it at bottom
+ *  half (runqueues(9) will simply return if it is already running or if the queue has already been
+ *  scheduled for another processor.  runqueues(9) when called should always put an awoken kernel
+ *  thread process back to sleep before returning.)
+ */
+
+#define V400P_BLOCK_SHIFT   10
+#define V400P_BLOCK_SIZE    (1<<V400P_BLOCK_SHIFT)
+
+/* There needs to be three pointers: head, mark and tail.  RX allocates block passing them upstream
+ * and pushes the mark to the tail.  As blocks are freed, it pushes the head toward the mark.  RX
+ * ISR pushes the tail but short of the head. */
+
+/*
+ * Bottom end.
+ *
+ * Works quite simple.  In the ISR copy RX data to the read buf and copy the write buf to TX data.
+ * Issue the tasklet to pass the timing pulse (and esballoc'ed RX/TX block) to the upper layer
+ * driver.
+ */
+
+/* Firmware */
+#define GPIOC		(0x54 >> 1)	/* GPIO control register */
+#define GPIO_WRITE	(0x0004000)	/* GPIO4 data */
+#define GPIO_PROGRAM	(0x0020000)	/* GPIO5 data */
+#define GPIO_INIT	(0x0100000)	/* GPIO6 data */
+#define GPIO_DONE	(0x0800000)	/* GPIO7 data */
+
+#define INTCSR		(0x4c >> 1)
+#define PLX_INTENA	0x43
+
+/* Xilinx */
+#define SYNREG	0x400
+#define	    SYNCSELF	0	/* Free run */
+#define	    SYNC1	1	/* Synchronize to span 1 */
+#define	    SYNC2	2	/* Synchronize to span 2 */
+#define	    SYNC3	3	/* Synchronize to span 3 */
+#define	    SYNC4	4	/* Synchronize to span 4 */
+#define	    SYNCEXTERN	5	/* External Synchornization (Drive TCLK from MASTER) */
+
+#define STAREG	0x400		/* Status Register */
+#define	    INTENA	0x01	/* Interrupt Enabled */
+#define	    INTACTIVE	0x02	/* Interrupt Active */
+#define	    DINTACTIVE	0x04	/* Dallas Interrupt Active */
+
+#define CTLREG	0x401
+#define	    INTENA	0x01	/* Interrupt Enable */
+#define	    OUTBIT	0x02	/* Drives "TEST1" signal ("Interrupt" outbit) */
+#define	    DINTENA	0x04	/* Dallas Interrupt Enable (Allows DINT to drive INT) */
+#define	    MASTER	0x08	/* External Synchronzation Enable (MASTER signal) */
+#define	    E1DIV	0x10	/* Select E1 Divisor Mode (0 for T1, 1 for E1) */
+#define	    REMSLB	0x20	/* Remote serial loopback (When set, TSER is driven from RSER) */
+#define	    LOCSLB	0x40	/* Local serial loopback (When set, Rx buffers driven from Tx
+				   buffers) */
+#define	    INTACK	0x80	/* Interrupt Acknowledge */
+
+#define LEDREG	0x402		/* R4 G4 R3 G3 R2 G2 R1 G1 */
+#define TS2REG	0x403		/* When bit 0 set, drivers TEST2 pin. */
+#define REVREG	0x404		/* Set bit 0 for Dallas chils later than Rev. A */
+
+/**
+ * vp_rx_free: - free an RX block buffer
+ * @arg: client data (vp structure)
+ *
+ * Simply mark the RX/TX block as consumed.
+ */
+STATIC streamscall __hot_read void
+vp_rx_free(caddr_t arg)
+{
+	((struct mx *) data)->rx.nxt = NULL;
+}
+
+/**
+ * vp_tasklet: - process received block event
+ * @data: caller data (vp pointer)
+ *
+ * The purpose of the RX tasklet is to process a received block and pass data to connected MX
+ * streams.  Each MX stream is handed an esballoc'ed message that contains the RX/TX block for the
+ * current cycle.  All streams are processed in order.
+ *
+ * Probably the best way to handle MX blocks is to esballoc one, dup the rest, and then free the
+ * original.  Issue them directly to the upper module put procedure from here for minium latency to
+ * the upper layer.  Each MX Stream gets the entire RX/TX block in Tormenta channel map
+ * configuration regardless of how man spans or channels to which it has subscribed.
+ *
+ * The upper module can either complete the TX block in place and return the M_DATA back down
+ * stream, or can save the M_DATA for passing downstream later, or can free the M_DATA.  In the
+ * later case (which is what the stream head does), the upper module is responsible for generating
+ * its own M_DATA TX blocks and a penalty will be incurred transfering bytes from the M_DATA block
+ * to the TX block.
+ *
+ * If another block has become available, the tasklet is redispatched.
+ *
+ * Note that when processing data channels, we recycle the transmit block into the receive block
+ * (because they are the same size) on the fly (read a byte, write a byte).  That is one of the
+ * advantages of placing the channel in the driver (it could be implemented as a pushable module
+ * pushed over a multiplex stream).  The upper layer module needs to keep TX blocks coming, but with
+ * STREAMS flow control that is easy: extra TX blocks are queued and the upper layer modules needs
+ * to simply supply them until flow control is acheived. 
+ *
+ * For multiplexes, recycled blocks represent blocks that have already transferred data to the
+ * transmit block and are available to be used by the receive side.
+ */
+STATIC __hot_in void
+vp_tasklet(unsigned long data)
+{
+	struct vp *vp = (struct vp *) data;
+	mblk_t *mp;
+	struct ch *ch;
+	struct mx *mx;
+
+	/* To only use spin locks here requires that the ISR never run (on the same processor)
+	   while this tasklet is running.  Rather than block all interrupts on the processor, we
+	   need to only block interrupts on the current card (e.g. by deferring acknowledgment of
+	   the interrupt until after this procedure completes). */
+	spin_lock(&vp->lock);
+
+	/* process statitical multiplexed data channels */
+	for (ch = vp->ch.connects; ch; ch = ch->c.next) {
+		if (canput(ch->rq) && (mp = xchg(ch->tx.nxt, NULL))) {
+			unsigned char *frame;
+			unsigned char *bptr;
+
+			for (bptr = mp->b_rptr, frame = vp->buf;
+			     frame < vp->buf + V400P_BLOCK_SIZE; frame += 128) {
+				uint32_t smask;
+				int span;
+
+				for (smask = ch->smask, span = 0; smask & span < 4;
+				     span++, smask >>= 1) {
+					unsigned char *pos;
+					uint32_t cmask;
+
+					if (!(smask & 0x1))
+						continue;
+					for (cmask = mx->cmasks[span], pos = frame + span;
+					     cmask && pos < frame + 128; pos += 4, cmask >>= 1) {
+						if (!(cmask & 0x1))
+							continue;
+						pos[1024] = *bptr;
+						*bptr = *pos;
+						bptr++;
+					}
+				}
+			}
+			/* The upper layer module must be very careful to simply process the data
+			   quickly and return.  In the case of data channels, this should really be 
+			   just a putq unless minimal latency is required. */
+			putnext(ch->rq, mp);
+			qenable(ch->wq);	/* resupply buffers */
+		} else {
+			ch->tx.underruns += ch->channels * 8;
+			ch->rx.overflows += ch->channels * 8;
+		}
+	}
+
+	/* process switching matrix multiplexers */
+	for (mx = vp->mx.connects; mx; mx = mx->c.next) {
+		/* No flow control check because only 1 block can be outstanding. */
+		if (!mx->rx.nxt && (mp = xchg(ch->tx.nxt, NULL))) {
+			mx->rx.nxt = mp;
+			/* The upper layer module must be very careful to simply process the data
+			   quickly and return.  In the case of multiplexers, this should really be
+			   just a copy, qreply of the message and return. */
+			putnext(mx->rq, mp);
+			qenable(mx->wq);	/* resupply buffers */
+		} else {
+			mx->rx.overflows += mx->channels * 8;
+			mx->tx.underruns += mx->channels * 8;
+		}
+	}
+
+	spin_unlock(&vp->lock);
+
+	runqueues();
+}
+
+/**
+ * vp_cross_connect: - peform a cross-connect between channels
+ * @addr1: card, span and base channel, first
+ * @addr2: card, span and base channel, second
+ * @chans: channel map
+ *
+ * Add a both-way cross-connect between a group of channels.  The cross-connect will begin on the
+ * next RX cycle for either card.  This function checks if there is already a cross-connect
+ * specified for any channel.  It does not, however, check if any of the channels is active.  If a
+ * channel is active, the RX data will still be delivered to the channel, but TX data will be
+ * ignored for the channel.  This permits establishment of monitoring taps.  Two channels can be
+ * opened, attached, cross-connected and then enabled.  RX data for each channel will appear on
+ * each channel.  Two MX streams can be opened, attached, cross-connected.  Then individual channels
+ * can be enabled.  This can easily satisfy CALEA type requirements.
+ *
+ * The cross-connect map is laid out as an array of 32 arrays of 4 pointers.  The first array index
+ * is the channel number, the second array index the span number.  When the pointer is null, there
+ * is no cross-connect for the channel.  When any pointer for the same channel in any span is
+ * non-NULL, the corresponding bit is set in vp->xmask.  When set, a pointer points to the first
+ * byte corresponding to the output channel in the appropriate output TX block.
+ */
+STATIC noinline __unlikely int
+vp_cross_connect(uint32_t addr1, uint32_t addr2, uint32_t chans)
+{
+	int card1 = (addr1 >> 16) & 0x0ff;
+	int span1 = (addr1 >> 8) & 0x0ff;
+	int chan1 = (addr1 >> 0) & 0x0ff;
+	int card2 = (addr2 >> 16) & 0x0ff;
+	int span2 = (addr2 >> 8) & 0x0ff;
+	int chan2 = (addr2 >> 0) & 0x0ff;
+	unsigned long flags;
+	uint32_t cmask;
+	int c1, c2;
+	int err = 0;
+
+	if (card1 == card2) {
+		/* same card cross-connects are easier */
+		struct vp *vp = &cards[card1];
+
+		spin_lock_irqsave(&vp->lock, flags);
+		do {
+			/* check first */
+			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
+				if (cmask & 0x01) {
+					if (vp->map[c1][span1] || vp->map[c2][span2]) {
+						err = -EINVAL;
+						break;
+					}
+				}
+			}
+			if (err)
+				break;
+			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
+				if (cmask & 0x01) {
+					vp->map[c1][span1] = (uint8_t *) vp->buf[c2 + 256] + span2;
+					vp->xmask |= (1 << c1);
+					vp->map[c2][span2] = (uint8_t *) vp->buf[c1 + 256] + span1;
+					vp->xmask |= (1 << c2);
+				}
+			}
+		} while (0);
+		spin_unlock_irqrestore(&vp->lock, flags);
+	} else {
+		struct vp *vp1 = &cards[card1];
+		struct vp *vp2 = &cards[card2];
+
+		if (vp1 < vp2) {
+			spin_lock_irqsave(&vp1->lock, flags);
+			spin_lock(&vp2->lock);
+		} else {
+			spin_lock_irqsave(&vp2->lock, flags);
+			spin_lock(&vp1->lock);
+		}
+		do {
+			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
+				if (cmask & 0x01) {
+					if (vp1->map[c1][span1] || vp2->map[c2][span2]) {
+						err = -EINVAL;
+						break;
+					}
+				}
+			}
+			if (err)
+				break;
+			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
+				if (cmask & 0x01) {
+					vp1->map[c1][span1] =
+					    (uint8_t *) vp2->buf[c2 + 256] + span2;
+					vp1->xmask |= (1 << c1);
+					vp1->rx.dccs++;
+					vp2->tx.dccs++;
+					vp2->map[c2][span2] =
+					    (uint8_t *) vp1->buf[c1 + 256] + span1;
+					vp2->xmask |= (1 << c2);
+					vp2->rx.dccs++;
+					vp1->tx.dccs++;
+				}
+			}
+		} while (0);
+		if (vp1 < vp2) {
+			spin_unlock(&vp2->lock);
+			spin_unlock_irqrestore(&vp1->lock, flags);
+		} else {
+			spin_unlock(&vp1->lock);
+			spin_unlock_irqrestore(&vp2->lock, flags);
+		}
+	}
+	return (err);
+}
+
+/**
+ * vp_cross_disconnect: - remove a cross-connect between channels
+ * @addr1: card, span and base channel, first
+ * @addr2: card, span and base channel, second
+ * @chans: channel map
+ *
+ * Remove a both-way cross-connect between a group of channels.
+ */
+STATIC noinline __unlikely int
+vp_cross_disconnect(uint32_t addr1, uint32_t addr2, uint32_t chans)
+{
+	int card1 = (addr1 >> 16) & 0x0ff;
+	int span1 = (addr1 >> 8) & 0x0ff;
+	int chan1 = (addr1 >> 0) & 0x0ff;
+	int card2 = (addr2 >> 16) & 0x0ff;
+	int span2 = (addr2 >> 8) & 0x0ff;
+	int chan2 = (addr2 >> 0) & 0x0ff;
+	unsigned long flags;
+	uint32_t cmask;
+	int c1, c2;
+	int err = 0;
+
+	if (card1 == card2) {
+		/* same card cross-connects are easier */
+		struct vp *vp = &cards[card1];
+
+		spin_lock_irqsave(&vp->lock, flags);
+		do {
+			/* check first */
+			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
+				if (cmask & 0x01) {
+					if (!vp->map[c1][span1] || !vp->map[c2][span2]) {
+						err = -EINVAL;
+						break;
+					}
+				}
+			}
+			if (err)
+				break;
+			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
+				if (cmask & 0x01) {
+					long mapused;
+					int span;
+
+					vp->map[c1][span1] = NULL;
+					mapused = 0;
+					for (span = 0; span < vp->spans; span++)
+						mapused |= (long) vp->map[c1][span];
+					if (!mapused)
+						vp->xmask &= ~(1 << c1);
+					vp->map[c2][span2] = NULL;
+					mapused = 0;
+					for (span = 0; span < vp->spans; span++)
+						mapused |= (long) vp->map[c2][span];
+					if (!mapused)
+						vp->xmask &= ~(1 << c2);
+				}
+			}
+		} while (0);
+		spin_unlock_irqrestore(&vp->lock, flags);
+	} else {
+		struct vp *vp1 = &cards[card1];
+		struct vp *vp2 = &cards[card2];
+
+		if (vp1 < vp2) {
+			spin_lock_irqsave(&vp1->lock, flags);
+			spin_lock(&vp2->lock);
+		} else {
+			spin_lock_irqsave(&vp2->lock, flags);
+			spin_lock(&vp1->lock);
+		}
+		do {
+			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
+				if (cmask & 0x01) {
+					if (!vp1->map[c1][span1] || !vp2->map[c2][span2]) {
+						err = -EINVAL;
+						break;
+					}
+				}
+			}
+			if (err)
+				break;
+			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
+				if (cmask & 0x01) {
+					long mapused;
+					int span;
+
+					vp1->map[c1][span1] = NULL;
+					mapused = 0;
+					for (span = 0; span < vp1->spans; span++)
+						mapused |= (long) vp1->map[c1][span];
+					if (!mapused)
+						vp1->xmask &= ~(1 << c1);
+					vp1->rx.dccs--;
+					vp2->tx.dccs--;
+					vp2->map[c2][span2] = NULL;
+					mapused = 0;
+					for (span = 0; span < vp2->spans; span++)
+						mapused |= (long) vp2->map[c2][span];
+					if (!mapused)
+						vp2->xmask &= ~(1 << c2);
+					vp2->rx.dccs--;
+					vp1->tx.dccs--;
+				}
+			}
+		} while (0);
+		if (vp1 < vp2) {
+			spin_unlock(&vp2->lock);
+			spin_unlock_irqrestore(&vp1->lock, flags);
+		} else {
+			spin_unlock(&vp1->lock);
+			spin_unlock_irqrestore(&vp2->lock, flags);
+		}
+	}
+	return (err);
+}
+
+/**
+ * vp_daccs: - perform fast pseudo-digital cross-connect
+ * @vp: card structure
+ *
+ * Both same-card and card-to-card cross-connect is performed here.  To avoid slipage across card to
+ * card cross-connect, a spin lock is taken to protect the state of all TX blocks while performing
+ * the cross-connect.  The ramifications of this is that same-card cross-connect will be ultra low
+ * latency (same cycle 1ms latency), where as card-to-card cross-connect could delay one cycle
+ * (minimum 1ms, maximum 2ms latency).  It is not expected that cards for different drivers be mixed
+ * in a single system, because they would have to perform cross-connect one layer up.  This means
+ * that each cross-connect specification consists of a txbuf pointer offset to the channel within
+ * the txbuf to be written.  For 4 cards, our rxbufs and txbufs are within 2 (4k) kernel, so cache
+ * thrashing should not be a terrible problem.
+ *
+ * The cross-connect map is laid out as an array of 32 arrays of 4 pointers.  The first array index
+ * is the channel number, the second array index the span number.  When the pointer is null, there
+ * is no cross-connect for the channel.  When any pointer for the same channel in any span is
+ * non-NULL, the corresponding bit is set in vp->xmask.  When set, a pointer points to the first
+ * byte corresponding to the output channel in the appropriate output TX block.
+ *
+ * If rx.dccs is non-zero then this card is cross-connecting RX channels to another card and must
+ * take the global daccs spin lock to keep another processor from transmitting another card's TX
+ * block while this card is building it.  rx.dccs is zero when this card only has digital
+ * cross-connect within the same card.  Any process changing rx.dccs must irq lock the structure
+ * first.  When rx.dccs is non-zero the tx.dccs of the other card is also non-zero.  When installing a
+ * cross-connect map, both the sending and receiving structure must be locked (in card address
+ * order) and then maps and rx.dccs and tx.dccs members can be modified and the locks released.  It is
+ * atypical to install half-cross-connects.  Typically the RX and TX directions are connected.  When
+ * mapping between cards, both cards will typically has a non-zero rx.dccs and tx.dccs and a channel
+ * map entry will be created for each card.  When mapping within the same card, neither rx.dccs nor
+ * tx.dccs is adjusted.
+ */
+STATIC noinline fastcall __hot void
+vp_daccs(struct vp *vp)
+{
+	uint32_t xmask_save;
+
+	if (unlikely((xmask_save = vp->xmask))) {
+		register uint32_t *buf = vp->buf;
+		register int byte, slot, chan;
+		register uint32_t xmask, xmask_save = vp->xmask;
+		register uint8_t **map = vp->map;
+
+#ifdef CONFIG_SMP
+		if (vp->rx.dccs)
+			spin_lock(&vp_daccs_lock);
+#endif
+		for (byte = 0; byte < 1024; byte += 128) {
+			for (xmask = xmask_save, slot = (byte >> 2) + 1, chan = 1;
+			     chan < 32; slot++, chan++, xmask <<= 1) {
+				if (xmask & 0x01) {
+					uint32_t data = buf[slot];
+					uint8_t *dest;
+
+					if ((dest = map[chan][0]))
+						dest[byte] = data;
+					data >>= 8;
+					if ((dest = map[chan][1]))
+						dest[byte] = data;
+					data >>= 8;
+					if ((dest = map[chan][2]))
+						dest[byte] = data;
+					data >>= 8;
+					if ((dest = map[chan][3]))
+						dest[byte] = data;
+				}
+			}
+		}
+#ifdef CONFIG_SMP
+		if (vp->rx.dccs)
+			spin_unlock(&vp_daccs_lock);
+#endif
+	}
+}
+
+/**
+ * vp_rxtx_burst: - do a burst rx/tx transfer
+ * @vp: card structure
+ *
+ * We have the ability here to perform some unique local serial loopback for testing.  We can set
+ * LOCSLB which will feed RSER from TSER (anything written to xll (for valid channels) will be
+ * read from xll); however, for testing we could swap bytes on read an effectively connect span 1 to
+ * span 4 and span 2 to span 3.  This could allow some loopback testing without installing a
+ * physical loopback cable.  However, this can be done just as easily by the upper module.
+ *
+ * If tx.dccs is non-zero then another card is cross-connecting to this card's TX buffer and the
+ * globcal daccs spin lock must be aquired to keep another processor from writing to the TX buffer
+ * while this card is transferring it (leading to mysterious slippages).  Any process changing
+ * tx.dccs must irq lock the structure first.
+ */
+STATIC inline fastcall __hot void
+vp_rxtx_burst(struct vp *vp)
+{
+	uint32_t cmask, xmask;
+	struct mx *mx;
+	int lebno;
+
+	/* first set of 4 channels are always dead */
+	if (unlikely(!((cmask = vp->cmask | vp->xmask) >> 1)))
+		goto done;
+	else {
+		register int frame, slot;
+		register uint32_t x, amask, dmask;
+
+		dmask = (vp->channels == 24) ? VP_TI_CHAN_VALID_MASK : VP_E1_CHAN_VALID_MASK;
+		xmask = vp->xmask >> 1;
+
+		/* Perform a receive cycle.  For the receive cycle, the elastic buffer number is
+		   increased before the cycle is run.  If the elastic buffer would wrap, the
+		   receive cycle is skipped and the data associated with the cycle are lost. If,
+		   however, pseudo-digital cross-connect is being performed, an overlapping receive 
+		   cycle is still performed, but only for those channels active in cross-connect. */
+		lebno = (vp->rx.lebno + 1) & (V400P_EBUFNO - 1);
+		if (lebno != vp->rx.uebno)
+			vp->rx.lebno = lebno;
+		amask = (lebno == vp->rx.uebno) ? cmask : xmask;
+		if (lebno != vp->rx.uebno || amask) {
+			register uint32_t *buf = vp->rx.buf + (vp->rx.lebno << 8);
+			register volatile uint32_t *xll = vp->xll;
+
+			/* Note that although receive elastic buffer blocks are 1024 bytes long,
+			   only the first 992 bytes are used for E1 and only the first 768 bytes
+			   are used for T1/J1. */
+			for (frame = 0; frame < 8; frame++) {
+				for (x = 1, xll++, slot = 1; slot < 32; slot++, xll++, x <<= 1) {
+					if (amask & x) {
+						prefetchw(buf + 32);
+						*buf++ = *xll;
+					} else if (dmask & x)
+						buf++;
+				}
+			}
+		}
+		/* perform receive cycle overflow accounting */
+		if (lebno == vp->rx.uebno)
+			vp_rx_overflow(vp);
+
+		/* Perform psudo-digital cross-connect if necessary.  Note that vp->rx.lebno always
+		   indicates the currently received block and vp->tx.lebno always indicates the to
+		   be transmitted block, regardless of wrapping or overflow conditions on either the 
+		   receive or transmit cycles. */
+		if (vp->xmask)
+			vp_daccs(vp);
+
+#ifdef CONFIG_SMP
+		/* If the card has been set up for pseudo digital cross-connect and the card is the
+		   recipient of transmit bytes from a cross-connect, we must lock out other cards
+		   from altering out cross-connect trasnmit data in the middle of a transmit cycle.
+		   If, on the other hand, this card is not the recipient of pseudo digital
+		   cross-connect transmit data, the transmit cycle can proceed without locks. */
+		if (vp->tx.dccs)
+			spin_lock(&vp_daccs_lock);
+#endif
+		/* Perform a transmit cycle.  For the transmit cycle, the elastic buffer number is
+		   increased after the cycle is run.  If the elastic buffer would wrap, the
+		   transmit cycle is skipped and the data associated with the cycle is lost. If,
+		   however, pseudo-digital cross-connect is being performed, an overlapping
+		   transmit cycle is still performed, but only for those channels active in
+		   cross-connect. */
+		lebno = (vp->tx.lebno + 1) & (V400P_EBUFNO - 1);
+		amask = (lebno == vp->tx.uebno) ? cmask : xmask;
+		if (lebno != vp->tx.uebno || amask) {
+			register const uint32_t *buf = vp->tx.buf + (vp->tx.lebno << 8);
+			register volatile uint32_t *xll = vp->xll;
+
+			/* Note that although receive elastic buffer blocks are 1024 bytes long,
+			   only the first 992 bytes are used for E1 and only the first 768 bytes
+			   are used for T1/J1. */
+			for (frame = 0; frame < 8; frame++) {
+				for (prefetch(buf + 32), x = 1, xll++, slot = 1; slot < 32;
+				     slot++, xll++, x <<= 1) {
+					if (amask & x) {	/* transfer only active channels */
+						prefetch(buf + 32);
+						*xll = *buf++;
+					} else if (dmask & x)	/* step over inactive channels */
+						buf++;
+				}
+			}
+		}
+		if (lebno != vp->tx.uebno)
+			vp->tx.lebno = lebno;
+		/* perform transmit cycle overflow accounting */
+		if (lebno == vp->tx.uebno)
+			vp_tx_overflow(vp);
+#ifdef CONFIG_SMP
+		if (vp->tx.dccs)
+			spin_unlock(&vp_daccs_lock);
+#endif
+	}
+	tasklet_hi_schedule(&vp->tasklet);
+      done:
+	return;
+}
+
+/**
+ * vp_alarms: - process alarm status for one span
+ * @vp: card structure
+ * @span: span number
+ *
+ * Want this function to be fast, but we want it separate from the main loop because it is only
+ * executed 4 times in 64 cycles.
+ */
+STATIC noinline fastcall __hot void
+vp_alarms(register struct vp *vp, register int span)
+{
+}
+
+#define VP_STATS(vp, reg) (((uint)vp->xlb[reg+1]) + ((uint)vp->xlb[reg] << 8))
+#define VP_STATS_CRC(vp, reg) (((uint)vp->xlb[reg+1]) + (((uint)vp->xlb[reg] & 0x03) << 8))
+#define VP_STATS_FAS(vp, reg) (((uint)vp->xlb[reg+2]>>2) + (((uint)vp->xlb[reg] & 0x3c) << 6))
+
+/**
+ * vp_bpv: - accumulate bipolar violations per span
+ * @vp: card structure
+ *
+ * Want this function to be fast, but we want it separate from the main loop because it is only
+ * executed 1 time in 1000 cycles.  The purpose of this function is to collect span statistics for
+ * each span for the last one second interval.
+ */
+STATIC noinline fastcall __hot void
+vp_bpv(register struct vp *vp)
+{
+	int base, smask = vp->smask;
+	struct sp *sp;
+
+	for (sp = vp->spans, base = 0; smask && base < (vp->spans << 8);
+	     sp++, base += 256, smask >>= 1)
+		if (smask & 0x01) {
+			/* Hopefully the compiler is smart enough to unroll this. */
+			switch (vp->board) {
+			case E400P:
+			case E400PSS7:
+				if (crc4) {
+					sp->crc4 += VP_STATS_CRC(vp, base + 0x02);
+					sp->ebit += VP_STATS_CRC(vp, base + 0x04);
+				}
+				sp->fass += VP_STATS_FAS(vp, base + 0x02);
+				sp->bpvs += VP_STATS(vp, base + 0x00);
+				continue;
+			case T400P:
+			case T400PSS7:
+				sp->bpvs += VP_STATS(vp, base + 0x23);
+				continue;
+			case V401PE:
+				if (crc4) {
+					sp->crc4 += VP_STATS(vp, base + 0x44);
+					sp->ebit += VP_STATS(vp, base + 0x48);
+				}
+				sp->fass += VP_STATS(vp, base + 0x46);
+				sp->bpvs += VP_STATS(vp, base + 0x42);
+				continue;
+			case V401PT:
+				sp->bpvs += VP_STATS(vp, base + 0x42);
+				continue;
+			default:
+				return;
+			}
+		}
+}
+
+STATIC noinline fastcall __hot void
+vp_eval_syncsrc(register struct vp *vp)
+{
+}
+
+/**
+ * vp_t1_interrupt: - process interrupt on an E1 card
+ * @irq: interrupt number (useless)
+ * @dev_id: client data (vp structure)
+ * @regs: regsiters at interrupt (useless)
+ *
+ * Simply copy the RX data to the read buffer and write buffer to the TX data.  However, we are a
+ * little bit smarter than in the X400P-SS7 driver in that we only copy channels that are enabled
+ * in some span.
+ *
+ * Locking is to keep another processor from altering the vp structure while this processor is
+ * servicing an interrupt for the same card.
+ */
+STATIC __hot irqreturn_t
+vp_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+{
+	register struct vp *vp = (struct vp *) dev_id;
+
+	spin_lock(&vp->lock);
+	if (vp->xlb[STAREG] & INTACTIVE) {
+		/* ctlreg can contain INTENA | E1DIV | MASTER | REMSLB | LOCSLB */
+		vp->xlb[CTLREG] = (vp->ctlreg | OUTBIT | INTACK);
+
+		vp_rxtx_burst(vp);
+
+		if (unlikely((vp->frame & 0x1e7) == 400)) {
+			register int span;
+
+			/* frame 400/512, 408/512, 416/512 and 424/512 */
+			if (vp->smask & (1 << (span = ((vp->frame & 0x18) >> 3))))
+				vp_alarms(vp, span);
+		}
+		/* accumulate bipolar violations every 1.000000 seconds */
+		if (unlikely((vp->bpv_timer & 0x1fff) == (vp->frame & 0x1fff))) {
+			vp->bpv_timer = vp->frame + 8000;
+			vp_bpv(vp);
+		}
+		if (unlikely(xchg(&vp->eval_syncsrc, 0)))
+			vp_eval_syncsrc(vp);
+
+		vp->frame += 8;	/* Eight E1/T1/J1 frames per RX/TX block (interrupt). */
+		/* clear OUTBIT and INTACK */
+		vp->xlb[CTLREG] = (vp->ctlreg);
+	}
+	spin_unlock(&vp->lock);
+	return (irqreturn_t) (IRQ_NONE);
+}
+
+/**
+ * vp_tasklet: - process rx block event
+ * @data: caller data (vp pointer)
+ *
+ * The purpose of the tasklet is to process a receive block and pass data to the connected CH and MX
+ * streams.  Note that the order of reading shared memory across the PCI bus does not affect
+ * performance as it does with normal memory.  Also, it does not matter if receive data is provided
+ * to multiple MX Streams as long as it is at least provided to the stream which is active for the
+ * data.  Thefore, on an MX run, we can read each active (4-span) slot and write it to the
+ * appropriate position in each MX stream.  Whether an MX stream is active for a particular slot can
+ * be determined with a slot mask.  The, 32 list pointers can be used in the card structure and 32
+ * list pointers in each MX structure to link the MX streams associated with a given slot.
+ *
+ * The characteristic of the CH streams are that there can be zero to four streams for each slot.
+ * Whether there is any CH stream for a paricular slot can be determined using a precalculated slot
+ * mask.  And then, each slot can have up to 4 streams associated with it (for a total array size of
+ * 128 pointers).
+ *
+ * Because the order of reading the PCI bus is insignificant, all 8 samples for each slot can be
+ * processed before moving on to the next slot to keep the CH and MX structures hotter.
+ */
+STATIC __hot_in void
+vp_tasklet(unsigned long data)
+{
+	pl_t pl;
+
+	/* should probably take the daccs lock instead */
+	pl = LOCK(&vp->lock);
+	{
+		register uint32_t mask,
+		    cmask = vp->ch.mask, mmask = vp->mx.mask, bmask = cmask | mmask;
+
+		/* This is an RX burst moving words directly from shared memory into channel and
+		   multiplex buffers.  Although full word reads are performed, no word is read that
+		   does not contain a byte that needs reading. */
+		vp->xlb[CTLREG] = vp->ctlreg | OUTBIT;
+		for (mask = 0x2, slot = 4; bmask & ~(mask - 1) && slot < 128; slot += 4, mask <<= 1)
+			if (bmask & mask) {
+				register int offset;
+
+				for (offset = (slot >> 2); offset < 256 + (slot >> 2); offset += 32) {
+					register uint32_t word = vp->xll[offset];
+
+					if (mmask & mask)
+						for (mux = 0; mux < 4; mux++) {
+							unsigned char *buf;
+
+							buf = vp->mx.slots[slot + mux];
+							if (buf)
+								buf[offset] = word;
+						}
+					if (cmask & mask)
+						for (span = 0; span < 4; span++, word >>= 8) {
+							unsigned char **bpp;
+
+							bpp =
+							    vp->ch.slots[slot + span_to_byte(span)];
+							if (bpp) {
+								/* write byte to channel receive
+								   block */
+								**bpp = word;
+								(*bpp) += 1;
+							}
+						}
+				}
+			}
+
+		vp->interrupts--;
+		vp->xlb[CTLREG] = vp->ctlreg;
+		{
+			struct ch *ch;
+
+			for (ch = vp->ch.connects; ch; ch = ch->c.next) {
+				mblk_t *b;
+
+				/* room for another block in the buffer? */
+				if ((b = ch->rx.nxt)) {
+					if (b->b_datap->db_lim >= b->b_wptr + ch->blocksize)
+						continue;	/* reuse same buffer */
+					/* release the buffer */
+					ch->rx.nxt = NULL;
+
+					UNLOCK(&vp->lock, pl);
+					{
+						putnext(ch->oq, b);	/* process upper module
+									   outside locks */
+					}
+					pl = LOCK(&vp->lock, pl);
+				}
+				{
+					unsigned char **bp;
+
+					/* acquire next buffer (might actually be same buffer) */
+					if ((b = ch->rx.nxt = XCHG(&ch->tx.nxt, NULL))
+					    || (b = ch->rx.nxt = allocb(ch->blocksize, BPRI_MED))) {
+						b->b_rptr = b->b_wptr = b->b_datap->db_base;
+						bp = &b->b_wptr;
+					} else {
+						bp = NULL;
+						ch->rx.overflows += ch->blocksize;
+					}
+					if (vp->interrupts)
+						ch->rx.overflows += ch->blocksize + vp->interrupts;
+					for (cmask = ch->cmask >> 1, cmask & slot = 1; slot < 32;
+					     slot++, cmask >>= 1) {
+						if (cmask & 0x1) {
+							int span;
+
+							if ((span = ch->span) == -1)
+								span = 0;
+							do {
+								vp->slots[(slot << 2) + span] = bp;
+							} while (ch->span == -1 && ++span < 4);
+						}
+					}
+				}
+			}
+		}
+		{
+			struct mx *mx;
+
+			for (mx = vp->mx.connects; mx; mx = mx->c.next) {
+				mblk_t *b;
+			}
+		}
+	}
+	UNLOCK(&vp->lock, pl);
+
+}
+
+/**
+ * vp_interrupt: process interrupt on a card
+ * @irq: interrupt number (useless)
+ * @dev_id: client data (vp structure)
+ * @regs: registers at interrupt (useless)
+ *
+ * Yet another run at this.  Instead of transferring bytes in the interrupt service routine, simply
+ * use the interrupt as a 1ms clock source and acknowledge the interrupt and spawn a tasklet.  Take
+ * the card spin lock to avoid acknowledging an interrupt during reads and writes from shared memory.
+ * Any writes have already occured or can still occur after the interrupt but before the card clocks
+ * TSER data to the framer, skipping double buffering in both directions.  I am not positive that
+ * this will work as it is not the normal use of OUTBIT by the zaptel drivers, but in theory it
+ * should work.
+ */
+STATIC __hot irqreturn_t
+vp_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+{
+	register struct vp *vp = (struct vp *) dev_id;
+
+	spin_lock(&vp->lock);
+	if (vp->xlb[STAREG] & INTACTIVE) {
+		/* acknowledge the interrupt */
+		vp->xlb[CTLREG] = vp->ctlreg | INTACK;
+		vp->xlb[CTLREG] = vp->ctlreg;
+		if (!vp->interrupts++)
+			tasklet_hi_schedule(&vp->tasklet);
+		spin_unlock(&vp->lock);
+		return (irqreturn_t) (IRQ_HANDLED);
+	}
+	spin_unlock(&vp->lock);
+	return (irqreturn_t) (IRQ_NONE);
 }
 
 
@@ -3091,6 +4989,15 @@ ch_w_msg_slow(queue_t *q, mblk_t *mp)
  * ch_w_data: write data for CH stream
  * @q: write queue
  * @mp: M_DATA message
+ *
+ * If the channel Stream is attached (to a card) and enabled, then the card structure is locked and
+ * data written directly to the next outgoing transmit buffer in the appropriate locations.  If the
+ * the transmit elastic buffer number for the channel wraps on the lower elastic buffer number, the
+ * message is returned to the queue.
+ *
+ * If the written buffer is too small to fill an entire outgoing transmission block (the number of
+ * channels times 8 samples per channel), the message is held in ch->nxt.  When new messages arrive
+ * they are linked to ch->nxt and another attempt is made to pull up the necessary number of bytes.
  */
 STATIC inline fastcall __hot_write int
 ch_w_data(queue_t *q, mblk_t *mp)
@@ -3098,7 +5005,7 @@ ch_w_data(queue_t *q, mblk_t *mp)
 	struct ch *ch = CH_PRIV(q);
 	struct vp *vp;
 
-	if (likely((vp = ch->c.vp) != NULL)) {
+	if (likely((vp = ch->e.vp) != NULL)) {
 		if (ch->tx.nxt)
 			return (-EBUSY);
 		ch->tx.nxt = mp;
@@ -3120,11 +5027,14 @@ ch_w_msg(queue_t *q, mblk_t *mp)
  * ch_wput: CH write put procedure
  * @q: write queue
  * @mp: message to put
+ *
+ * Simple queueing put procedure, queues messages to ch_w_msg().
  */
 STATIC streamscall __hot_write int
 ch_wput(queue_t *q, mblk_t *mp)
 {
-	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY))) || ch_w_msg(q, mp))
+	if ((likely(!pcmsg(DB_TYPE(mp))) && unlikely(q->q_first || (q->q_flag & QSVCBUSY)))
+	    || unlikely(ch_w_msg(q, mp)))
 		putq(q, mp);
 	return (0);
 }
@@ -3132,14 +5042,16 @@ ch_wput(queue_t *q, mblk_t *mp)
 /**
  * ch_wsrv: CH write service procedure
  * @q: write queue to service
+ * 
+ * Simple draining service procedure, drains messages into ch_w_msg().
  */
 STATIC streamscall __hot_out int
 ch_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
-	while ((mp = getq(q))) {
-		if (ch_w_msg(q, mp)) {
+	while (likely(!!(mp = getq(q)))) {
+		if (unlikely(ch_w_msg(q, mp))) {
 			putbq(q, mp);
 			break;
 		}
@@ -3602,7 +5514,7 @@ mx_w_flush(queue_t *q, mblk_t *mp)
 }
 
 STATIC noinline fastcall __hot_put int
-mx_w_msg(queue_t *q, mblk_t *mp, int type)
+mx_w_msg_slow(queue_t *q, mblk_t *mp, int type)
 {
 	switch (type) {
 	case M_PROTO:
@@ -3696,7 +5608,7 @@ mx_w_data_slow(queue_t *q, mblk_t *mp)
 	if (unlikely(test_and_set_bit(MXB_LOCK, &mx->lock)))
 		goto cannot_lock;
 	/* Ok, the upper module is not smart, but we managed to get 1024 bytes into a single data
-	   block and are prepared to trasnfer them to the TX buffer.  Try to do this fairly
+	   block and are prepared to transfer them to the TX buffer.  Try to do this fairly
 	   efficiently and lay out bytes in order of ascending addresses. */
 	{
 		unsigned char *frame;
@@ -3779,17 +5691,94 @@ mx_w_data(queue_t *q, mblk_t *mp)
 }
 
 /**
+ * mx_w_data: write data for MX stream
+ * @q: write queue
+ * @mp: M_DATA message
+ *
+ * One more kick at this can too.  When transmit data is available, we write it directly to transmit
+ * backing store and then burst active words to the shared memory.  For multiplex switching streams,
+ * if there is already transmit data written to the card for the stream, incoming data is discarded
+ * (transmitter overrun).  For channel streams, if there is already transmit data written to the
+ * card for the stream, data is queued.
+ */
+STATIC inline fastcall __hot_write int
+mx_w_data(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+	struct vp *vp;
+
+	if (unlikely(!(vp = mx->cvp)))
+		goto discard;
+	if (unlikely(mx->tx.nxt != NULL))
+		goto overrun;
+	{
+		/* first write to transmit backing store - the problem here being that there is no
+		 * way to read transmit data from shared memory. */
+		for (frame = 0; frame < 1024; frame += 128) {
+			for (cbit = 1, slot = frame; (mx->c.cmask & ~(cbit - 1)) && slot < frame + 128;
+			     slot += 4, cbit <<= 1) {
+				if (!(mx->c.cmask & cbit))
+					continue;
+				for (sbit = 1, span = slot; (mx->c.smask & ~(sbit - 1)) && span < slot + 4;
+				     span++, sbit <<= 1) {
+					if (!(mx->c.smask & sbit))
+						continue;
+					vp->wbuf[span] = mx->tx.nxt->b_rptr[span];
+				}
+			}
+		}
+	}
+	{
+		pl_t pl;
+
+		pl = LOCK(&vp->lock);
+		vp->xlb[CTLREG] = vp->ctlreg | OUTBIT;
+		{
+		}
+		vp->xlb[CTLREG] = vp->ctlreg;
+		UNLOCK(&vp->lock, pl);
+	}
+      overrun:
+	mx->tx.overruns++;
+      discard:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * mx_w_msg: write message handling
+ * @q: write queue
+ * @mp: message to handle
+ *
+ * Message handling with a fast path and a slow path.  Fast path is for queueable data messages
+ * (M_DATA), low latency, non-queuable data messages (M_HPDATA), and queueable signalling
+ * information messages (M_CTL) messages, and non-queuable signalling information messages
+ * (M_PCCTL).
+ */
+STATIC inline fastcall __hot_write int
+mx_w_msg(queue_t *q, mblk_t *mp)
+{
+	if (likely(DB_TYPE(mp) == M_DATA))
+		return mx_w_data(q, mp);
+	if (likely(DB_TYPE(mp) == M_HPDATA))
+		return mx_w_hpdata(q, mp);
+	if (likely(DB_TYPE(mp) == M_CTL))
+		return mx_w_ctl(q, mp);
+	return mx_w_msg_slow(q, mp);
+}
+
+/**
  * mx_wput: MX write put procedure
  * @q: write queue
  * @mp: message to put
+ *
+ * Simple queueing put procedure.
  */
 STATIC streamscall __hot_write int
 mx_wput(queue_t *q, mblk_t *mp)
 {
-	if (likely(DB_TYPE(mp) == M_DATA))
-		return mx_w_data(q, mp);
-	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY)))
-	    || mx_w_msg(q, mp))
+	if ((likely(!pcmsg(DB_TYPE(mp))) && unlikely(q->q_first || (q->q_flag & QSVCBUSY)))
+	    || unlikely(mx_w_msg(q, mp)))
 		putq(q, mp);
 	return (0);
 }
@@ -3797,17 +5786,21 @@ mx_wput(queue_t *q, mblk_t *mp)
 /**
  * mx_wsrv: MX write service procedure
  * @q: write queue to service
+ *
+ * Simple queue draining service procedure with a buffer resupply wakeup function.
  */
 STATIC streamscall __hot_out int
 mx_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
-	while ((mp = getq(q))) {
-		if (mx_w_msg(q, mp)) {
-			putbq(q, mp);
-			break;
-		}
+	if (likely(!!(mp = getq(q)))) {
+		do {
+			if (unlikely(mx_w_msg(q, mp))) {
+				putbq(q, mp);
+				break;
+			}
+		} while (unlikely(!!(mp = getq(q))));
 	}
 	/* resupply buffers to tasklet if necessary */
 	if (mx->c.vp && mx->tx.nxt == NULL) {
@@ -3819,103 +5812,6 @@ mx_wsrv(queue_t *q)
 }
 
 /*
- * Interleaved elastic store operation: Each ISR RX and TX multiframe is a 1k area representing 8
- * frames or 1ms.  For each 4096k page in the elastic store, the first 0-1024 is a TX multiframe,
- * 1025-2048 is an RX multiframe, 2049-3072 TX, 3073-4096 RX.  Initial esballoced buffers
- * representing these ranges are also maintained in sequence (so that buffers also occupy mdbblock
- * cache page slots in the same order).  A maximum elastic buffer of 128k is allocated, representing
- * 512 multiframes.  Each card has its own elastic buffer to avoid page contention between multiple
- * processors separately servicing the interrupts for each card.  The service routine transfers an
- * M_READ esballoc'ed block for the appropriate TX block upstream followed by an M_DATA message for
- * the appropriate RX block upstream.  When the upper layer module receives the M_READ message
- * block, it fills the block and passes it as an M_DATA message downstream.  If it cannot fill the
- * block, the previously transmitted block can be repeated by zeroing the block (b_wptr <- b_rptr)
- * and passing it as an M_DATA message block downstream.  When it receives the M_DATA message block,
- * it processes the contents of the RX block and returns the block downstream as an M_READ message
- * block.
- *
- * The write put and service procedures adjust the future position of the TX block within the
- * elastic store based on the differential between the current TX block and the current RX block and
- * the knowledge of the number of TX M_READ messages outstanding.  The objective of this process is
- * to have the current TX block immediately precede the current RX block to maximize the efficiency
- * of channel data transfers from the elastic store.  Also, the used portion within the elastic
- * store can be trimmed using outstanding block information to a point for which wraps are not
- * likely to occur, keeping the used pages hotter.
- *
- * An easy algorithm to acheive this is to always set the RX message block to the block following
- * the current transmit message block.  When the card starts up, the receive must idle quiet code
- * until the first transmit message block is received on the write side.  While locked, TX and RX
- * blocks will be adjacent in the elastic store.
- *
- * Upper layer modules must never free these message blocks and must always promptly recycle M_READ
- * into M_DATA and M_DATA into M_READ.  Because these are eballoc'ed blocks, if one is freed, it
- * does not break the process; however, message block may be allocated adjacent to keep them hot.
- * It is also possible for the upper layer module to generate its own TX blocks instead of recycling
- * M_READ messages.
- */
-
-/*
- *  Once more:
- *  There is one MX stream per card.  The read service procedure checks for RX blocks from the
- *  RX ISR.  If there are RX blocks, it esballoc's RX blocks as an M_DATA message and TX blocks as
- *  an M_READ message and passes them upstream, TX then RX.  The upper module can queue as many TX
- *  blocks as it would like.  Any TX blocks that it does not wish to fill can be freed.  TX blocks
- *  that are filled are recycled downstream as M_DATA blocks.  TX blocks must be processed in the
- *  order in which they are received.  Once RX blocks are processed, they are freed.  Upper modules
- *  must free RX blocks promptly and in the order in which they were received, and should not queue
- *  them.  When RX or TX blocks are freed, the buffer free routine advances leading or trailing edge
- *  elastic buffer pointers.  When TX blocks are freed, their contents are set to predetermined
- *  values (e.g.  the values from the last frame or an idle code).  If the upper layer module is
- *  concerned about the code, it should complete the blocks and send them downstream as M_DATA
- *  blocks.  When a TX block is received on the write side, the trailing edge pointer is advanced
- *  and the block is freed.  (The fact that the pointer was advanced is a cue to the free routine
- *  that the block has been filled.)
- */
-
-/*
- *  Again:
- *  There is one MX stream per card.  The read service procedure first drains any queued messages
- *  subject to flow control.  The read service procedure then checks for RX blocks from the
- *  RX ISR.  If there are RX blocks, it passes an esballoc'ed message block upstream subject also to
- *  flow control.  If the upstream module is flow controlled, the routine places the message blocks
- *  on its own queue (using putq with noenable in effect).  When the RX ISR runs and there are
- *  RX blocks to be processed it uses qenable to enable the q.  The queue may also become
- *  backenabled by the upstream module when congestion clears.
- *
- *  The upstream module (acting as a multiplexing driver) should perform the following actions:
- *  starting with delay sensitive upper multiplex streams (i.e. voice channels), if the frame can be
- *  passed to a stream on the upper multiplex considering flow control, it should duplicate the
- *  message block and pass the duplicate upstream for processing.  If flow control is in effect, the
- *  upper stream should simply be skipped.  Then for non-delay sensitive upper streams (i.e. data
- *  channels), the same approach is taken.  It then frees the original which releases the RX block
- *  back to the RX ISR.  On the upper multiplex, for delay sensitive streams, the read put procedure
- *  should simply copy the data into a single RX block an signal a timing pulse upstream.  Here RX
- *  data overwrites any RX data from the last RX block processed.  For delay sensitive upper
- *  streams, the read put procedure should copy necessary RX data into a private RX block queued
- *  upstream and then free the received block and return promptly.
- *
- *  The free routine advances the received data pointer allowing the RX ISR to receive more blocks.
- *  If the received data pointer is not advanced sufficiently, the RX ISR will eventually run out of
- *  buffer.
- *
- *  The upper layer module is responsible for managing its own TX buffer and TX blocks.
- *
- *  When the RX ISR wishes to enable the queue with qenable(9), it should spawn a tasklet with
- *  the queue as an argument.  The tasklet should simply call qenable(9) followed by runqueues(9).
- *  This will allow another processor to pick up the read service procedure and run it at bottom
- *  half (runqueues(9) will simply return if it is already running or if the queue has already been
- *  scheduled for another processor.  runqueues(9) when called should always put an awoken kernel
- *  thread process back to sleep before returning.)
- */
-
-#define V400P_BLOCK_SHIFT   10
-#define V400P_BLOCK_SIZE    (1<<V400P_BLOCK_SHIFT)
-
-/* There needs to be three pointers: head, mark and tail.  RX allocates block passing them upstream
- * and pushes the mark to the tail.  As blocks are freed, it pushes the head toward the mark.  RX
- * ISR pushes the tail but short of the head. */
-
-/*
  *  STREAMS open and close.
  *  =======================
  */
@@ -3925,7 +5821,6 @@ static caddr_t mx_head = NULL;
 STATIC streamscall int
 mx_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
-	struct mx *mx;
 	int err;
 	minor_t minor = getminor(*devp);
 	major_t major = getmajor(*devp);
@@ -3938,12 +5833,11 @@ mx_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		if (!(vp->hw_flags & VPF_SUPPORTED))
 			return (ENXIO);
 	}
-	if ((err = mi_open_comm(&mx_head, sizeof(*mx), q, devp, oflag, sflag, crp)))
+	if ((err = mi_open_comm(&mx_head, sizeof(struct mx), q, devp, oflag, sflag, crp)))
 		return (err);
-	mx = MX_PRIV(q);
-	mx_init_priv(mx, q, major, minor);
+	mx_init_priv(q, major, minor);
 	if (vp)
-		mx_attach(mx, (minor << 16), MX_STYLE1);
+		mx_attach(q, (minor << 16), MX_STYLE1);
 	qprocson(q);
 	return (0);
 }
@@ -3951,677 +5845,10 @@ STATIC streamscall int
 mx_qclose(queue_t *q, int oflags, cred_t *crp)
 {
 	qprocsoff(q);
-	mx_term_priv(mx);
+	mx_term_priv(q);
 	if ((err = mi_close_comm(&mx_head, q)))
 		return (err);
 	return (0);
-}
-
-/*
- * Bottom end.
- *
- * Works quite simple.  In the ISR copy RX data to the read buf and copy the write buf to TX data.
- * Issue the tasklet to pass the timing pulse (and esballoc'ed RX/TX block) to the upper layer
- * driver.
- */
-
-/* Firmware */
-#define GPIOC		(0x54 >> 1)	/* GPIO control register */
-#define GPIO_WRITE	(0x0004000)	/* GPIO4 data */
-#define GPIO_PROGRAM	(0x0020000)	/* GPIO5 data */
-#define GPIO_INIT	(0x0100000)	/* GPIO6 data */
-#define GPIO_DONE	(0x0800000)	/* GPIO7 data */
-
-#define INTCSR		(0x4c >> 1)
-#define PLX_INTENA	0x43
-
-/* Xilinx */
-#define SYNREG	0x400
-#define	    SYNCSELF	0	/* Free run */
-#define	    SYNC1	1	/* Synchronize to span 1 */
-#define	    SYNC2	2	/* Synchronize to span 2 */
-#define	    SYNC3	3	/* Synchronize to span 3 */
-#define	    SYNC4	4	/* Synchronize to span 4 */
-#define	    SYNCEXTERN	5	/* External Synchornization (Drive TCLK from MASTER) */
-
-#define STAREG	0x400		/* Status Register */
-#define	    INTENA	0x01	/* Interrupt Enabled */
-#define	    INTACTIVE	0x02	/* Interrupt Active */
-#define	    DINTACTIVE	0x04	/* Dallas Interrupt Active */
-
-#define CTLREG	0x401
-#define	    INTENA	0x01	/* Interrupt Enable */
-#define	    OUTBIT	0x02	/* Drives "TEST1" signal ("Interrupt" outbit) */
-#define	    DINTENA	0x04	/* Dallas Interrupt Enable (Allows DINT to drive INT) */
-#define	    MASTER	0x08	/* External Synchronzation Enable (MASTER signal) */
-#define	    E1DIV	0x10	/* Select E1 Divisor Mode (0 for T1, 1 for E1) */
-#define	    REMSLB	0x20	/* Remote serial loopback (When set, TSER is driven from RSER) */
-#define	    LOCSLB	0x40	/* Local serial loopback (When set, Rx buffers driven from Tx
-				   buffers) */
-#define	    INTACK	0x80	/* Interrupt Acknowledge */
-
-#define LEDREG	0x402		/* R4 G4 R3 G3 R2 G2 R1 G1 */
-#define TS2REG	0x403		/* When bit 0 set, drivers TEST2 pin. */
-#define REVREG	0x404		/* Set bit 0 for Dallas chils later than Rev. A */
-
-/**
- * vp_rx_free: - free an RX block buffer
- * @arg: client data (vp structure)
- *
- * Simply mark the RX/TX block as consumed.
- */
-STATIC streamscall __hot_read void
-vp_rx_free(caddr_t arg)
-{
-	((struct mx *) data)->rx.nxt = NULL;
-}
-
-/**
- * vp_tasklet: - process received block event
- * @data: caller data (vp pointer)
- *
- * The purpose of the RX tasklet is to process a received block and pass data to connected MX
- * streams.  Each MX stream is handed an esballoc'ed message that contains the RX/TX block for the
- * current cycle.  All streams are processed in order.
- *
- * Probably the best way to handle MX blocks is to esballoc one, dup the rest, and then free the
- * original.  Issue them directly to the upper module put procedure from here for minium latency to
- * the upper layer.  Each MX Stream gets the entire RX/TX block in Tormenta channel map
- * configuration regardless of how man spans or channels to which it has subscribed.
- *
- * The upper module can either complete the TX block in place and return the M_DATA back down
- * stream, or can save the M_DATA for passing downstream later, or can free the M_DATA.  In the
- * later case (which is what the stream head does), the upper module is responsible for generating
- * its own M_DATA TX blocks and a penalty will be incurred transfering bytes from the M_DATA block
- * to the TX block.
- *
- * If another block has become available, the tasklet is redispatched.
- *
- * Note that when processing data channels, we recycle the transmit block into the receive block
- * (because they are the same size) on the fly (read a byte, write a byte).  That is one of the
- * advantages of placing the channel in the driver (it could be implemented as a pushable module
- * pushed over a multiplex stream).  The upper layer module needs to keep TX blocks coming, but with
- * STREAMS flow control that is easy: extra TX blocks are queued and the upper layer modules needs
- * to simply supply them until flow control is acheived. 
- *
- * For multiplexes, recycled blocks represent blocks that have already transferred data to the
- * transmit block and are available to be used by the receive side.
- */
-STATIC __hot_in void
-vp_tasklet(unsigned long data)
-{
-	struct vp *vp = (struct vp *) data;
-	mblk_t *mp;
-	struct ch *ch;
-	struct mx *mx;
-
-	/* To only use spin locks here requires that the ISR never run (on the same processor)
-	   while this tasklet is running.  Rather than block all interrupts on the processor, we
-	   need to only block interrupts on the current card (e.g. by deferring acknowledgment of
-	   the interrupt until after this procedure completes). */
-	spin_lock(&vp->lock);
-
-	/* process statitical multiplexed data channels */
-	for (ch = vp->ch.connects; ch; ch = ch->c.next) {
-		if (canput(ch->rq) && (mp = xchg(ch->tx.nxt, NULL))) {
-			unsigned char *frame;
-			unsigned char *bptr;
-
-			for (bptr = mp->b_rptr, frame = vp->buf;
-			     frame < vp->buf + V400P_BLOCK_SIZE; frame += 128) {
-				uint32_t smask;
-				int span;
-
-				for (smask = ch->smask, span = 0; smask & span < 4;
-				     span++, smask >>= 1) {
-					unsigned char *pos;
-					uint32_t cmask;
-
-					if (!(smask & 0x1))
-						continue;
-					for (cmask = mx->cmasks[span], pos = frame + span;
-					     cmask && pos < frame + 128; pos += 4, cmask >>= 1) {
-						if (!(cmask & 0x1))
-							continue;
-						pos[1024] = *bptr;
-						*bptr = *pos;
-						bptr++;
-					}
-				}
-			}
-			/* The upper layer module must be very careful to simply process the data
-			   quickly and return.  In the case of data channels, this should really be 
-			   just a putq unless minimal latency is required. */
-			putnext(ch->rq, mp);
-			qenable(ch->wq);	/* resupply buffers */
-		} else {
-			ch->tx.underruns += ch->channels * 8;
-			ch->rx.overflows += ch->channels * 8;
-		}
-	}
-
-	/* process switching matrix multiplexers */
-	for (mx = vp->mx.connects; mx; mx = mx->c.next) {
-		/* No flow control check because only 1 block can be outstanding. */
-		if (!mx->rx.nxt && (mp = xchg(ch->tx.nxt, NULL))) {
-			mx->rx.nxt = mp;
-			/* The upper layer module must be very careful to simply process the data
-			   quickly and return.  In the case of multiplexers, this should really be
-			   just a copy, qreply of the message and return. */
-			putnext(mx->rq, mp);
-			qenable(mx->wq);	/* resupply buffers */
-		} else {
-			mx->rx.overflows += mx->channels * 8;
-			mx->tx.underruns += mx->channels * 8;
-		}
-	}
-
-	spin_unlock(&vp->lock);
-
-	runqueues();
-}
-
-/**
- * vp_cross_connect: - peform a cross-connect between channels
- * @addr1: card, span and base channel, first
- * @addr2: card, span and base channel, second
- * @chans: channel map
- *
- * Add a both-way cross-connect between a group of channels.  The cross-connect will begin on the
- * next RX cycle for either card.  This function checks if there is already a cross-connect
- * specified for any channel.  It does not, however, check if any of the channels is active.  If a
- * channel is active, the RX data will still be delivered to the channel, but TX data will be
- * ignored for the channel.  This permits establishment of monitoring taps.  Two channels can be
- * opened, attached, cross-connected and then enabled.  RX data for each channel will appear on
- * each channel.  Two MX streams can be opened, attached, cross-connected.  Then individual channels
- * can be enabled.  This can easily satisfy CALEA type requirements.
- *
- * The cross-connect map is laid out as an array of 32 arrays of 4 pointers.  The first array index
- * is the channel number, the second array index the span number.  When the pointer is null, there
- * is no cross-connect for the channel.  When any pointer for the same channel in any span is
- * non-NULL, the corresponding bit is set in vp->xmask.  When set, a pointer points to the first
- * byte corresponding to the output channel in the appropriate output TX block.
- */
-STATIC noinline __unlikely int
-vp_cross_connect(uint32_t addr1, uint32_t addr2, uint32_t chans)
-{
-	int card1 = (addr1 >> 16) & 0x0ff;
-	int span1 = (addr1 >> 8) & 0x0ff;
-	int chan1 = (addr1 >> 0) & 0x0ff;
-	int card2 = (addr2 >> 16) & 0x0ff;
-	int span2 = (addr2 >> 8) & 0x0ff;
-	int chan2 = (addr2 >> 0) & 0x0ff;
-	unsigned long flags;
-	uint32_t cmask;
-	int c1, c2;
-	int err = 0;
-
-	if (card1 == card2) {
-		/* same card cross-connects are easier */
-		struct vp *vp = &cards[card1];
-
-		spin_lock_irqsave(&vp->lock, flags);
-		do {
-			/* check first */
-			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
-				if (cmask & 0x01) {
-					if (vp->map[c1][span1] || vp->map[c2][span2]) {
-						err = -EINVAL;
-						break;
-					}
-				}
-			}
-			if (err)
-				break;
-			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
-				if (cmask & 0x01) {
-					vp->map[c1][span1] = (uint8_t *) vp->buf[c2 + 256] + span2;
-					vp->xmask |= (1 << c1);
-					vp->map[c2][span2] = (uint8_t *) vp->buf[c1 + 256] + span1;
-					vp->xmask |= (1 << c2);
-				}
-			}
-		} while (0);
-		spin_unlock_irqrestore(&vp->lock, flags);
-	} else {
-		struct vp *vp1 = &cards[card1];
-		struct vp *vp2 = &cards[card2];
-
-		if (vp1 < vp2) {
-			spin_lock_irqsave(&vp1->lock, flags);
-			spin_lock(&vp2->lock);
-		} else {
-			spin_lock_irqsave(&vp2->lock, flags);
-			spin_lock(&vp1->lock);
-		}
-		do {
-			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
-				if (cmask & 0x01) {
-					if (vp1->map[c1][span1] || vp2->map[c2][span2]) {
-						err = -EINVAL;
-						break;
-					}
-				}
-			}
-			if (err)
-				break;
-			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
-				if (cmask & 0x01) {
-					vp1->map[c1][span1] =
-					    (uint8_t *) vp2->buf[c2 + 256] + span2;
-					vp1->xmask |= (1 << c1);
-					vp1->rxdccs++;
-					vp2->txdccs++;
-					vp2->map[c2][span2] =
-					    (uint8_t *) vp1->buf[c1 + 256] + span1;
-					vp2->xmask |= (1 << c2);
-					vp2->rxdccs++;
-					vp1->txdccs++;
-				}
-			}
-		} while (0);
-		if (vp1 < vp2) {
-			spin_unlock(&vp2->lock);
-			spin_unlock_irqrestore(&vp1->lock, flags);
-		} else {
-			spin_unlock(&vp1->lock);
-			spin_unlock_irqrestore(&vp2->lock, flags);
-		}
-	}
-	return (err);
-}
-
-/**
- * vp_cross_disconnect: - remove a cross-connect between channels
- * @addr1: card, span and base channel, first
- * @addr2: card, span and base channel, second
- * @chans: channel map
- *
- * Remove a both-way cross-connect between a group of channels.
- */
-STATIC noinline __unlikely int
-vp_cross_disconnect(uint32_t addr1, uint32_t addr2, uint32_t chans)
-{
-	int card1 = (addr1 >> 16) & 0x0ff;
-	int span1 = (addr1 >> 8) & 0x0ff;
-	int chan1 = (addr1 >> 0) & 0x0ff;
-	int card2 = (addr2 >> 16) & 0x0ff;
-	int span2 = (addr2 >> 8) & 0x0ff;
-	int chan2 = (addr2 >> 0) & 0x0ff;
-	unsigned long flags;
-	uint32_t cmask;
-	int c1, c2;
-	int err = 0;
-
-	if (card1 == card2) {
-		/* same card cross-connects are easier */
-		struct vp *vp = &cards[card1];
-
-		spin_lock_irqsave(&vp->lock, flags);
-		do {
-			/* check first */
-			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
-				if (cmask & 0x01) {
-					if (!vp->map[c1][span1] || !vp->map[c2][span2]) {
-						err = -EINVAL;
-						break;
-					}
-				}
-			}
-			if (err)
-				break;
-			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
-				if (cmask & 0x01) {
-					long mapused;
-					int span;
-
-					vp->map[c1][span1] = NULL;
-					mapused = 0;
-					for (span = 0; span < vp->spans; span++)
-						mapused |= (long) vp->map[c1][span];
-					if (!mapused)
-						vp->xmask &= ~(1 << c1);
-					vp->map[c2][span2] = NULL;
-					mapused = 0;
-					for (span = 0; span < vp->spans; span++)
-						mapused |= (long) vp->map[c2][span];
-					if (!mapused)
-						vp->xmask &= ~(1 << c2);
-				}
-			}
-		} while (0);
-		spin_unlock_irqrestore(&vp->lock, flags);
-	} else {
-		struct vp *vp1 = &cards[card1];
-		struct vp *vp2 = &cards[card2];
-
-		if (vp1 < vp2) {
-			spin_lock_irqsave(&vp1->lock, flags);
-			spin_lock(&vp2->lock);
-		} else {
-			spin_lock_irqsave(&vp2->lock, flags);
-			spin_lock(&vp1->lock);
-		}
-		do {
-			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
-				if (cmask & 0x01) {
-					if (!vp1->map[c1][span1] || !vp2->map[c2][span2]) {
-						err = -EINVAL;
-						break;
-					}
-				}
-			}
-			if (err)
-				break;
-			for (cmask = chans, c1 = chan1, c2 = chan2; cmask; c1++, c2++, cmask >>= 1) {
-				if (cmask & 0x01) {
-					long mapused;
-					int span;
-
-					vp1->map[c1][span1] = NULL;
-					mapused = 0;
-					for (span = 0; span < vp1->spans; span++)
-						mapused |= (long) vp1->map[c1][span];
-					if (!mapused)
-						vp1->xmask &= ~(1 << c1);
-					vp1->rxdccs--;
-					vp2->txdccs--;
-					vp2->map[c2][span2] = NULL;
-					mapused = 0;
-					for (span = 0; span < vp2->spans; span++)
-						mapused |= (long) vp2->map[c2][span];
-					if (!mapused)
-						vp2->xmask &= ~(1 << c2);
-					vp2->rxdccs--;
-					vp1->txdccs--;
-				}
-			}
-		} while (0);
-		if (vp1 < vp2) {
-			spin_unlock(&vp2->lock);
-			spin_unlock_irqrestore(&vp1->lock, flags);
-		} else {
-			spin_unlock(&vp1->lock);
-			spin_unlock_irqrestore(&vp2->lock, flags);
-		}
-	}
-	return (err);
-}
-
-/**
- * vp_daccs: - perform within-card fast digital cross-connect
- * @vp: card structure
- *
- * Both same-card and card-to-card cross-connect is performed here.  To avoid slipage across card to
- * card cross-connect, a spin lock is taken to protect the state of all TX blocks while performing
- * the cross-connect.  The ramifications of this is that same-card cross-connect will be ultra low
- * latency (same cycle 1ms latency), where as card-to-card cross-connect could delay one cycle
- * (minimum 1ms, maximum 2ms latency).  It is not expected that cards for different drivers be mixed
- * in a single system, because they would have to perform cross-connect one layer up.  This means
- * that each cross-connect specification consists of a txbuf pointer offset to the channel within
- * the txbuf to be written.  For 4 cards, our rxbufs and txbufs are within 2 (4k) kernel, so cache
- * thrashing should not be a terrible problem.
- *
- * The cross-connect map is laid out as an array of 32 arrays of 4 pointers.  The first array index
- * is the channel number, the second array index the span number.  When the pointer is null, there
- * is no cross-connect for the channel.  When any pointer for the same channel in any span is
- * non-NULL, the corresponding bit is set in vp->xmask.  When set, a pointer points to the first
- * byte corresponding to the output channel in the appropriate output TX block.
- *
- * If rxdccs is non-zero then this card is cross-connecting RX channels to another card and must
- * take the global daccs spin lock to keep another processor from transmitting another card's TX
- * block while this card is building it.  rxdccs is zero when this card only has digital
- * cross-connect within the same card.  Any process changing rxdccs must irq lock the structure
- * first.  When rxdccs is non-zero the txdccs of the other card is also non-zero.  When installing a
- * cross-connect map, both the sending and receiving structure must be locked (in card address
- * order) and then maps and rxdccs and txdccs members can be modified and the locks released.  It is
- * atypical to install half-cross-connects.  Typically the RX and TX directions are connected.  When
- * mapping between cards, both cards will typically has a non-zero rxdccs and txdccs and a channel
- * map entry will be created for each card.  When mapping within the same card, neither rxdccs nor
- * txdccs is adjusted.
- */
-STATIC noinline fastcall __hot void
-vp_daccs(struct vp *vp)
-{
-	uint32_t xmask_save;
-
-	if (unlikely((xmask_save = vp->xmask))) {
-		register uint32_t *buf = vp->buf;
-		register int byte, slot, chan;
-		register uint32_t xmask, xmask_save = vp->xmask;
-		register uint8_t **map = vp->map;
-
-#ifdef CONFIG_SMP
-		int rxdccs = vp->rxdccs;
-
-		if (rxdccs)
-			spin_lock(&vp_daccs_lock);
-#endif
-		for (byte = 0; byte < 1024; byte += 128) {
-			for (xmask = xmask_save, slot = (byte >> 2) + 1, chan = 1;
-			     chan < 32; slot++, chan++, xmask <<= 1) {
-				if (xmask & 0x01) {
-					uint32_t data = buf[slot];
-					uint8_t *dest;
-
-					if ((dest = map[chan][0]))
-						dest[byte] = data;
-					data >>= 8;
-					if ((dest = map[chan][1]))
-						dest[byte] = data;
-					data >>= 8;
-					if ((dest = map[chan][2]))
-						dest[byte] = data;
-					data >>= 8;
-					if ((dest = map[chan][3]))
-						dest[byte] = data;
-				}
-			}
-		}
-#ifdef CONFIG_SMP
-		if (rxdccs)
-			spin_unlock(&vp_daccs_lock);
-#endif
-	}
-}
-
-/**
- * vp_rxtx_burst: - do a burst rx/tx transfer
- * @vp: card structure
- *
- * We have the ability here to perform some unique local serial loopback for testing.  We can set
- * LOCSLB which will feed RSER from TSER (anything written to xll (for valid channels) will be
- * read from xll); however, for testing we could swap bytes on read an effectively connect span 1 to
- * span 4 and span 2 to span 3.  This could allow some loopback testing without installing a
- * physical loopback cable.  However, this can be done just as easily by the upper module.
- *
- * If txdccs is non-zero then another card is cross-connecting to this card's TX buffer and the
- * globcal daccs spin lock must be aquired to keep another processor from writing to the TX buffer
- * while this card is transferring it (leading to mysterious slippages).  Any process changing
- * txdccs must irq lock the structure first.
- */
-STATIC inline fastcall __hot void
-vp_rxtx_burst(struct vp *vp)
-{
-	uint32_t cmask, dmask;
-	struct mx *mx;
-
-	/* first set of 4 channels are always dead */
-	if (unlikely(!((cmask = vp->cmask | vp->xmask) >> 1)))
-		goto done;
-
-	dmask = (vp->channels == 24) ? VP_TI_CHAN_VALID_MASK : VP_E1_CHAN_VALID_MASK;
-
-	if (likely(!vp->blocks)) {
-		register int chans = ((vp->channels + 7) & ~7);	/* 24 or 32 */
-		register volatile uint32_t *xll = vp->xll;
-		register uint32_t *buf = vp->buf;
-		register int iword, islot, oword, oslot;
-		register uint32_t x;
-
-		/* first half of buffer is receive */
-		for (oword = 0, iword = 0; iword < 256; iword += 32, oword += chans) {
-			prefetchw(&buf[oword + chans]);
-			for (x = 0x01, oslot = oword, islot = iword + 1;
-			     (cmask & ~(x - 1)) && islot < iword + 32; islot++, x <<= 1) {
-				if (cmask & x)	/* skip disabled channels */
-					buf[oslot++] = xll[islot];
-				else if (dmask & x)	/* step over allocated channels */
-					oslot++;
-			}
-
-		}
-		buf += chans << 3;	/* 8 words per channel */
-		/* perform digital cross-connect if necessary */
-		if (vp->xmask)
-			vp_daccs(vp);
-#ifdef CONFIG_SMP
-		/* second half of buffer is transmit */
-		if (vp->txdccs)
-			spin_lock(&vp_daccs_lock);
-#endif
-		for (iword = 0, oword = 0; oword < 256; oword += 32, iword += chans) {
-			prefetch(&buf[iword + chans]);
-			for (x = 0x01, islot = iword, oslot = oword + 1;
-			     (cmask & ~(x - 1)) && oslot < oword + 32; oslot++, x <<= 1) {
-				if (cmask & x)	/* skip disabled channels */
-					xll[oslot] = buf[islot++];
-				else if (dmask & x)
-					islot++;
-			}
-		}
-#ifdef CONFIG_SMP
-		if (vp->txdccs)
-			spin_unlock(&vp_daccs_lock);
-#endif
-
-		vp->blocks++;	/* keep track of outstanding blocks */
-		tasklet_hi_schedule(&vp->tasklet);
-	} else {
-		vp->rx.overflows += 8;
-		vp->tx.underruns += 8;
-	}
-      done:
-	return;
-}
-
-/**
- * vp_alarms: - process alarm status for one span
- * @vp: card structure
- * @span: span number
- *
- * Want this function to be fast, but we want it separate from the main loop because it is only
- * executed 4 times in 64 cycles.
- */
-STATIC noinline fastcall __hot void
-vp_alarms(register struct vp *vp, register int span)
-{
-}
-
-#define VP_STATS(vp, reg) (((uint)vp->xlb[reg+1]) + ((uint)vp->xlb[reg] << 8))
-#define VP_STATS_CRC(vp, reg) (((uint)vp->xlb[reg+1]) + (((uint)vp->xlb[reg] & 0x03) << 8))
-#define VP_STATS_FAS(vp, reg) (((uint)vp->xlb[reg+2]>>2) + (((uint)vp->xlb[reg] & 0x3c) << 6))
-
-/**
- * vp_bpv: - accumulate bipolar violations per span
- * @vp: card structure
- *
- * Want this function to be fast, but we want it separate from the main loop because it is only
- * executed 1 time in 1000 cycles.  The purpose of this function is to collect span statistics for
- * each span for the last one second interval.
- */
-STATIC noinline fastcall __hot void
-vp_bpv(register struct vp *vp)
-{
-	int base, smask = vp->smask;
-	struct sp *sp;
-
-	for (sp = vp->spans, base = 0; smask && base < (vp->spans << 8);
-	     sp++, base += 256, smask >>= 1)
-		if (smask & 0x01) {
-			/* Hopefully the compiler is smart enough to unroll this. */
-			switch (vp->board) {
-			case E400P:
-			case E400PSS7:
-				if (crc4) {
-					sp->crc4 += VP_STATS_CRC(vp, base + 0x02);
-					sp->ebit += VP_STATS_CRC(vp, base + 0x04);
-				}
-				sp->fass += VP_STATS_FAS(vp, base + 0x02);
-				sp->bpvs += VP_STATS(vp, base + 0x00);
-				continue;
-			case T400P:
-			case T400PSS7:
-				sp->bpvs += VP_STATS(vp, base + 0x23);
-				continue;
-			case V401PE:
-				if (crc4) {
-					sp->crc4 += VP_STATS(vp, base + 0x44);
-					sp->ebit += VP_STATS(vp, base + 0x48);
-				}
-				sp->fass += VP_STATS(vp, base + 0x46);
-				sp->bpvs += VP_STATS(vp, base + 0x42);
-				continue;
-			case V401PT:
-				sp->bpvs += VP_STATS(vp, base + 0x42);
-				continue;
-			default:
-				return;
-			}
-		}
-}
-
-STATIC noinline fastcall __hot void
-vp_eval_syncsrc(register struct vp *vp)
-{
-}
-
-/**
- * vp_t1_interrupt: - process interrupt on an E1 card
- * @irq: interrupt number (useless)
- * @dev_id: client data (vp structure)
- * @regs: regsiters at interrupt (useless)
- *
- * Simply copy the RX data to the read buffer and write buffer to the TX data.  However, we are a
- * little bit smarter than in the X400P-SS7 driver in that we only copy channels that are enabled
- * in some span.
- *
- * Locking is to keep another processor from altering the vp structure while this processor is
- * servicing an interrupt for the same card.
- */
-STATIC __hot irqreturn_t
-vp_interrupt(int irq, void *dev_id, struct pt_regs *regs)
-{
-	register struct vp *vp = (struct vp *) dev_id;
-
-	spin_lock(&vp->lock);
-	if (vp->xlb[STAREG] & INTACTIVE) {
-		/* ctlreg can contain INTENA | E1DIV | MASTER | REMSLB | LOCSLB */
-		vp->xlb[CTLREG] = (vp->ctlreg | OUTBIT | INTACK);
-
-		vp_rxtx_burst(vp);
-
-		if (unlikely((vp->frame & 0x1e7) == 400)) {
-			register int span;
-
-			/* frame 400/512, 408/512, 416/512 and 424/512 */
-			if (vp->smask & (1 << (span = ((vp->frame & 0x18) >> 3))))
-				vp_alarms(vp, span);
-		}
-		/* accumulate bipolar violations every 1.000000 seconds */
-		if (unlikely((vp->bpv_timer & 0x1fff) == (vp->frame & 0x1fff))) {
-			vp->bpv_timer = vp->frame + 8000;
-			vp_bpv(vp);
-		}
-		if (unlikely(xchg(&vp->eval_syncsrc, 0)))
-			vp_eval_syncsrc(vp);
-
-		vp->frame += 8;	/* Eight E1/T1/J1 frames per RX/TX block (interrupt). */
-		/* clear OUTBIT and INTACK */
-		vp->xlb[CTLREG] = (vp->ctlreg);
-	}
-	spin_unlock(&vp->lock);
-	return (irqreturn_t) (IRQ_NONE);
 }
 
 /*
@@ -4629,6 +5856,14 @@ vp_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  ===============================
  */
 
+/**
+ * vp_remove: V40XP card removal
+ * @dev: PCI device
+ *
+ * These cards do not support hotplug, so removes only occur after all the channels have been
+ * closed, so we only have to stop interrupts and deallocate board-level resources.  Nevertheless,
+ * if we get a hot removal of a card, we must be prepared to deallocate the span structures.
+ */
 STATIC void __devexit
 vp_remove(struct pci_dev *dev)
 {
@@ -4648,43 +5883,43 @@ vp_remove(struct pci_dev *dev)
 	}
 	if (vp->irq) {
 		free_irq(vp->irq, vp);
-		printd(("%s: freed irq\n", DRV_NAME));
+		strlog(DRV_ID, vp->card, 0, SL_TRACE, "freed irq\n");
 		vp->irq = 0;
 	}
 	if (vp->xlb_region) {
 		release_mem_region(vp->xlb_region, vp->xlb_length);
-		printd(("%s: released xlb region %lx length %ld\n", DRV_NAME,
-			vp->xlb_region, vp->xlb_length));
+		strlog(DRV_ID, vp->card, 0, SL_TRACE, "released xlb region %lx length %ld\n",
+		       vp->xlb_region, vp->xlb_length);
 		vp->xlb_region = NULL;
 		vp->xlb_length = 0;
 	}
 	if (vp->xll_region) {
 		release_mem_region(vp->xll_region, vp->xll_length);
-		printd(("%s: released xll region %lx length %ld\n", DRV_NAME,
-			vp->xll_region, vp->xll_length));
+		strlog(DRV_ID, vp->card, 0, SL_TRACE, "released xll region %lx length %ld\n",
+		       vp->xll_region, vp->xll_length);
 		vp->xll_region = NULL;
 		vp->xll_length = 0;
 	}
 	if (vp->plx_region) {
 		release_mem_region(vp->plx_region, vp->plx_length);
-		printd(("%s: released plx region %lx length %ld\n", DRV_NAME,
-			vp->plx_region, vp->plx_length));
+		strlog(DRV_ID, vp->card, 0, SL_TRACE, "released plx region %lx length %ld\n",
+		       vp->plx_region, vp->plx_length);
 		vp->plx_region = NULL;
 		vp->plx_length = 0;
 	}
 	if (vp->xlb) {
 		iounmap((void *) vp->xlb);
-		printd(("%s: unmapped xlb memory at %p\n", DRV_NAME, vp->xlb));
+		strlog(DRV_ID, vp->card, 0, SL_TRACE, "unmapped xlb memory at %p\n", vp->xlb);
 		vp->xlb = NULL;
 	}
 	if (vp->xll) {
 		iounmap((void *) vp->xll);
-		printd(("%s: unmapped xll memory at %p\n", DRV_NAME, vp->xll));
+		strlog(DRV_ID, vp->card, 0, SL_TRACE, "unmapped xll memory at %p\n", vp->xll);
 		vp->xll = NULL;
 	}
 	if (vp->plx) {
 		iounmap((void *) vp->plx);
-		printd(("%s: unmapped plx memory at %p\n", DRV_NAME, vp->plx));
+		strlog(DRV_ID, vp->card, 0, SL_TRACE, "unmapped plx memory at %p\n", vp->plx);
 		vp->plx = NULL;
 	}
 	vp_term_card(vp);
@@ -4696,7 +5931,7 @@ vp_remove(struct pci_dev *dev)
 #include "v401pfw.h"
 
 STATIC int __devinit
-vp_download_firmware(struct vp *vp, enum vp_board board)
+vp_download_fw(struct vp *vp, enum vp_board board)
 {
 	unsigned int byte;
 	unsigned char *f;
@@ -4706,7 +5941,8 @@ vp_download_firmware(struct vp *vp, enum vp_board board)
 
 	switch (board) {
 	case V400P:
-	case V400PSS7:
+	case X400P:
+	case X400PSS7:
 		f = (unsigned char *) v400pfw;
 		flen = sizeof(v400pfw);
 		break;
@@ -4723,12 +5959,12 @@ vp_download_firmware(struct vp *vp, enum vp_board board)
 	*data |= GPIO_WRITE;
 	*data &= ~GPIO_PROGRAM;
 	while (*data & (GPIO_INIT | GPIO_DONE)) ;
-	printd(("%s: Xilinx Firmware Load: Init and done are low\n", DRV_NAME));
+	strlog(DRV_ID, 0, 0, SL_TRACE, "Xilinx Firmware Load: Init and done are low.");
 	*data |= GPIO_PROGRAM;
 	while (!(*data & GPIO_INIT)) ;
-	printd(("%s: Xilinx Firmware Load: Init is high\n", DRV_NAME));
+	strlog(DRV_ID, 0, 0, SL_TRACE, "Xilinx Firmware Load: Init is high.");
 	*data &= ~GPIO_WRITE;
-	printd(("%s: Xilinx Firmware Load: Loading\n", DRV_NAME));
+	strlog(DRV_ID, 0, 0, SL_TRACE, "Xilinx Firmware Load: Loading.");
 	for (byte = 0; byte < flen; byte++) {
 		*vp->xlb = *f++;
 		if (*data & GPIO_DONE)
@@ -4737,122 +5973,139 @@ vp_download_firmware(struct vp *vp, enum vp_board board)
 			break;
 	}
 	if (!(*data & GPIO_INIT)) {
-		printd(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
+		strlog(DRV_ID, 0, 0, SL_ERROR | SL_TRACE, "ERROR: Xilinx Firmware Load: Failed.");
 		return (-EIO);
 	}
-	printd(("%s: Xilinx Firmware Load: Loaded %d bytes\n", DRV_NAME, byte));
+	strlog(DRV_ID, 0, 0, SL_TRACE, "Xilinx Firmware Load: Loaded %d bytes.", byte);
 	timeout = jiffies + 20 * HZ / 1000;
 	while (jiffies < timeout) ;
 	*data |= GPIO_WRITE;
-	printd(("%s: Xilinx Firmware Load: Done\n", DRV_NAME));
+	strlog(DRV_ID, 0, 0, SL_TRACE, "Xilinx Firmware Load: Done\n");
 	timeout = jiffies + 20 * HZ / 1000;
 	while (jiffies < timeout) ;
 	if (!(*data & GPIO_INIT)) {
-		ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
+		strlog(DRV_ID, 0, 0, SL_ERROR | SL_TRACE, "ERROR: Xilinx Firmware Load: Failed.");
 		return (-EIO);
 	}
 	if (!(*data & GPIO_DONE)) {
-		ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
+		strlog(DRV_ID, 0, 0, SL_ERROR | SL_TRACE, "ERROR: Xilinx Firmware Load: Failed.");
 		return (-EIO);
 	}
-	__printd(("%s: Xilinx Firmware Load: Successful\n", DRV_NAME));
+	strlog(DRV_ID, 0, 0, SL_CONSOLE, "Xilinx Firmware Load: Successful.");
 	return (0);
 }
 
-unsigned short vp_loadfw = 1;
+unsigned short vp_loadfw = 1;	 /* Yes, download firmware by default. */
 
 #define VP_MAX_CARDS	8	/* No machines with more than 8 PCI slots? */
 
 /* A static array of cards for speed. */
 STATIC struct vp vp_cards[VP_MAX_CARDS];
 
-STATIC int vp_card;
+STATIC atomic_t vp_card = ATOMIC_INIT(0);
 
+/**
+ * vp_probe: - V40XP card probe
+ * @dev: PCI device
+ * @id: PCI device identifier (from our table)
+ *
+ * Probes will be called for all PCI devices that match our criteria at PCI init time (module load).
+ * Successful return from the probe function will have the device configured for operation.
+ */
 STATIC int __devinit
 vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
-	int span, b, board, device, devrev, hw_flags;
+	int span, board, card;
 	const char *name;
 	struct vp *vp;
+	unsigned long timeout;
 
-	if (vp_card >= VP_MAX_CARDS) {
-		printd(("%s: ERROR: Too many cards.\n", DRV_NAME));
+	if ((card = atomic_add_return(&vp_card, 1)) >= VP_MAX_CARDS) {
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE, "ERROR: too many cards.");
 		return (-ENXIO);
 	}
 	if (!dev || !id) {
-		pswerr(("Device or id is null!\n"));
+		strlog(DRV_ID, card, 0, SL_CONSOLE, "ERROR: device or id is null!");
 		return (-EIO);
 	}
 	board = id->driver_data;
 	name = vp_board_info[board].name;
 
 	if (!(vp_board_info[board].hw_flags & VPF_SUPPORTED)) {
-		printd(("%s: ERROR: Driver does not support %s device.\n", DRV_NAME, name));
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: driver does not support %s device.", name);
 		return (-ENXIO);
 	}
 	if (dev->irq < 1) {
-		printd(("%s: ERROR: No IRQ allocated for %s device.\n", DRV_NAME, name));
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: no IRQ allocated for %s device.", name);
 		return (-ENXIO);
 	}
-	printd(("%s: %s device allocated IRQ %d\n", DRV_NAME, name, dev->irq));
+	strlog(DRV_ID, card, 0, SL_TRACE, "%s device allocated IRQ %d", name, dev->irq);
 	if (pci_enable_dev(dev)) {
-		printd(("%s: ERROR: Could not enable %s pci device\n", DRV_NAME, name));
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: could not enable %s pci device.", name);
 		return (-ENODEV);
 	}
-	if (!(vp = vp_init_card(vp_card))) {
-		/* do not print debug messages when out of memory */
+	strlog(DRV_ID, card, 0, SL_TRACE, "enable %s pci card type %ld", name id->driver_data);
+	if (!(vp = vp_init_card(card)))
 		return (-ENOMEM);
-	}
 	pci_set_drvdata(dev, vp);
 	if ((pci_resource_flags(dev, 0) & IORESOURCE_IO)
 	    || !(vp->plx_region = pci_resource_start(dev, 0))
 	    || !(vp->plx_length = pci_resource_len(dev, 0))
 	    || !(vp->plx = ioremap(vp->plx_region, vp->plx_length))) {
-		printd(("%s: ERROR: Invalid PLX 9030 base resource\n", DRV_NAME));
-		goto error_remove;
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: invalid PLX 9030 base resource.")
+		    goto error_remove;
 	}
-	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", DRV_NAME,
-		vp->plx_length, vp->plx_region, vp->plx));
+	strlog(DRV_ID, card, 0, SL_TRACE, "plx region %ld bytes at %lx, remapped %p",
+	       vp->plx_length, vp->plx_region, vp->plx);
 	if ((pci_resource_flags(dev, 2) & IORESOURCE_IO)
 	    || !(vp->xll_region = pci_resource_start(dev, 2))
 	    || !(vp->xll_length = pci_resource_len(dev, 2))
 	    || !(vp->xll = ioremap(vp->xll_region, vp->xll_length))) {
-		printd(("%s: ERROR: Invalid Xilinx 32-bit base resource\n", DRV_NAME));
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: invalid Xilinx 32-bit base resource.");
 		goto error_remove;
 	}
-	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", DRV_NAME,
-		vp->xll_length, vp->xll_region, vp->xll));
+	strlog(DRV_ID, card, 0, SL_TRACE, "xll region %ld bytes at %lx, remapped %p",
+	       vp->xll_length, vp->xll_region, vp->xll);
 	if ((pci_resource_flags(dev, 3) & IORESOURCE_IO)
 	    || !(vp->xlb_region = pci_resource_start(dev, 3))
 	    || !(vp->xlb_length = pci_resource_len(dev, 3))
 	    || !(vp->xlb = ioremap(vp->xlb_region, vp->xlb_length))) {
-		printd(("%s: ERROR: Invalid Xilinx 32-bit base resource\n", DRV_NAME));
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: invalid Xilinx 32-bit base resource.");
 		goto error_remove;
 	}
-	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME,
-		vp->xlb_length, vp->xlb_region, vp->xlb));
+	strlog(DRV_ID, card, 0, SL_TRACE, "xlb region %ld bytes at %lx, remapped %p.",
+	       vp->xlb_length, vp->xlb_region, vp->xlb);
 	if (!request_mem_region(vp->plx_region, vp->plx_length, name)) {
-		printd(("%s: ERROR: Unable to reserve PLX memory\n", DRV_NAME));
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: unable to reserve PLX memory.");
 		goto error_remove;
 	}
-	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME,
-		vp->plx_region, vp->plx_length));
+	strlog(DRV_ID, card, 0, SL_TRACE < "xll region %lx reserved %ld bytes.", vp->plx_region,
+	       vp->plx_length);
 	if (!request_mem_region(vp->xll_region, vp->xll_length, name)) {
-		printd(("%s: ERROR: Unable to reserve Xilinx 32-bit memory\n", DRV_NAME));
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: unable to reserve Xilinx 32-bit memory.");
 		goto error_remove;
 	}
-	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME,
-		vp->xll_region, vp->xll_length));
+	strlog(DRV_ID, card, 0, SL_TRACE, "xll region %lx reserved %ld bytes.", vp->xll_region,
+	       vp->xll_length);
 	if (!request_mem_region(vp->xlb_region, vp->xlb_length, name)) {
-		printd(("%s: ERROR: Unable to reserve Xilinx 8-bit memory\n", DRV_NAME));
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: unable to reserve Xilinx 8-bit memory.");
 		goto error_remove;
 	}
-	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME,
-		vp->xlb_region, vp->xlb_length));
-	__printd(("%s: %s card detected at 0x%lx/0x%lx irq %d\n", DRV_NAME, name, vp->xll_region,
-		  vp->xlb_region, dev->irq));
+	strlog(DRV_ID, card, 0, SL_TRACE, "xll region %lx reserved %ld bytes.", vp->xlb_region,
+	       vp->xlb_length);
+	strlog(DRV_ID, card, 0, SL_CONSOLE, "%s card detected at 0x%lx/0x%lx irq %d.", name,
+	       vp->xll_region, vp->xlb_region, dev->irq);
 	/* Only load firmware when requested to do so. */
-	if (vp_loadfw && vp_download_firmware(vp, board) != 0)
+	if (vp_loadfw && vp_download_fw(vp, board) != 0)
 		goto error_remove;
 
 	vp->plx[INTCSR] = 0;	/* disable interrupts */
@@ -4863,123 +6116,262 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	vp->xlb[CTLREG] = 0;	/* */
 	vp->xlb[LEDREG] = 0xff;	/* turn off leds */
 
-	/* Note: only check the device id of the first framer of 4.  The V401P can mix E1 and T1 on
-	   the same card, but I think the SLIC has to be different.  Perhaps not... */
+	/* Note: only check the device id of the first framer of 4. */
 
-	devrev = vp->xlb[0x0f];	/* Device id - same place for all Dallas chips. */
-	device = (devrev & VP_DEV_IDMASK) >> VP_DEV_SHIFT;
-	devrev &= VP_DEV_REVMASK;
+	vp->devrev = vp->xlb[0x0f];	/* Device id - same place for all Dallas chips. */
+	vp->device = (vp->devrev & VP_DEV_IDMASK) >> VP_DEV_SHIFT;
+	vp->devrev &= VP_DEV_REVMASK;
 
-	if (!(vp_device_info[device].hw_flags & VDF_SUPPORTED)) {
-		printd(("%s: Unsupported framer device %s\n", DRV_NAME,
-			vp_device_info[device].name));
+	if (!(vp_device_info[vp->device].hw_flags & VDF_SUPPORTED)) {
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE, "ERROR: unsupported framer device %s.",
+		       vp_device_info[vp->device].name);
 		goto error_remove;
 	}
-	switch (device) {
+	switch (vp->device) {
 	case VP_DEV_DS2154:
 	case VP_DEV_DS21354:
 	case VP_DEV_DS21554:
 		switch (board) {
 		case V400P:
-			board = E400P;
-			name = vp_board_info[board].name;
+			vp->board = V400PE;
 			break;
-		case V400PSS7:
-			board = E400PSS7;
-			name = vp_board_info[board].name;
+		case X400P:
+			vp->board = E400P;
+			break;
+		case X400PSS7:
+			vp->board = E400PSS7;
 			break;
 		default:
-			printd(("%s: Device %s not supported for card %s\n", DRV_NAME,
-				vp_board_info[board].name, vp_device_info[device].name));
-			goto error_remove;
+			vp->board = -1;
+			break;
 		}
 	case VP_DEV_DS2152:
 	case VP_DEV_DS21352:
 	case VP_DEV_DS21552:
 		switch (board) {
 		case V400P:
-			board = T400P;
-			name = vp_board_info[board].name;
+			vp->board = V400PT;
 			break;
-		case V400PSS7:
-			board = T400PSS7;
-			name = vp_board_info[board].name;
+		case X400P:
+			vp->board = T400P;
+			break;
+		case X400PSS7:
+			vp->board = T400PSS7;
 			break;
 		default:
-			printd(("%s: Device %s not supported for card %s\n", DRV_NAME,
-				vp_board_info[board].name, vp_device_info[device].name));
-			goto error_remove;
+			vp->board = -1;
+			break;
 		}
 	case VP_DEV_DS2155:
 		switch (board) {
 		case V401PE:
+			vp->board = V401PE;
+			break;
 		case V401PT:
+			vd->board = V401PT;
 			break;
 		default:
-			printd(("%s: Device %s not supported for card %s\n", DRV_NAME,
-				vp_board_info[board].name, vp_device_info[device].name));
-			goto error_remove;
+			vp->board = -1;
+			break;
 		}
 	}
-	vp->board = board;
-	vp->device = device;
-	vp->devrev = devrev;
-	vp->brdname = vp_board_info[board].name;
-	vp->devname = vp_device_info[device].name;
+	if (vp->board == -1) {
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE,
+		       "ERROR: device %s not supported for card %s.", vp_board_info[board].name,
+		       vp_device_info[vp->device].name);
+		goto error_remove;
+	}
 	vp->hw_flags = vp_board_info[board].hw_flags;
-	vp->hw_flags |= vp_device_info[device].hw_flags;
+	vp->hw_flags |= vp_device_info[vp->device].hw_flags;
 
-	__printd(("%s: %s (%s Rev. %d)\n", DRV_NAME, vp->brdname, vp->devname, vp->devrev));
+	strlog(DRV_ID, card, 0, SL_CONSOLE, "%s (%s Rev. %d).", vp_board_info[vp->board].name,
+	       vp_device_info[vp->device].name, (char) (cp->devrev + 65));
+
+	{
+		int word, idle_word = vp_board_info[vp->board].idle_word;
+
+		/* idle out all channels */
+		for (word = 0; word < 256; word++) {
+			int ebuf;
+
+			vp->xll[word] = idle_word;
+			for (ebuf = 0; ebuf < V400P_EBUFNO; ebuf++)
+				vp->wbuf[(ebuf << 8) + word] = idle_word;
+		}
+	}
 
 	switch (vp->board) {
 		int word;
 
-#if 0
-		int ebuf;
-#endif
-
-	case V401PT:
-	case T400P:
-	case T400PSS7:
-		/* setup T1 card defaults */
-		vp->config = vp_default_t1_card;
-		/* initialize channel values for T1 */
-		for (word = 0; word < 256; word++) {
-			vp->xll[word] = 0x7f7f7f7f;
-#if 0
-			for (ebuf = 0; ebuf < V400P_EBUFNO; ebuf++)
-				vp->wbuf[(ebuf << 8) + word] = 0x7f7f7f7f;
-#endif
-		}
-		break;
-	case V401PE:
+	case V400PE:
 	case E400P:
 	case E400PSS7:
+	{
+		int span, offset;
+
 		/* setup E1 card defaults */
 		vp->config = vp_default_e1_card;
-		/* initialize channel values for E1 */
-		for (word = 0; word < 256; word++) {
-			vp->xll[word] = 0xffffffff;
-#if 0
-			for (ebuf = 0; ebuf < V400P_EBUFNO; ebuf++)
-				vp->wbuf[(ebuf << 8) + word] = 0xffffffff;
-#endif
-		}
+		vp->isr = &vp_e400_interrupt;
+		/* zero all span registers */
+		for (span = 0; span < X400_SPANS; span++)
+			for (offset = 0; offset < 192; offset++)
+				vp->xlb[(span << 8) + offset] = 0x00;
+		/* set up for interleaved serial bus operation, byte mode */
+		vp->xlb[(0 << 8) + 0xb5] = 0x09;
+		vp->xlb[(1 << 8) + 0xb5] = 0x08;
+		vp->xlb[(2 << 8) + 0xb5] = 0x08;
+		vp->xlb[(3 << 8) + 0xb5] = 0x08;
 		break;
+	}
+	case V401PE:
+	{
+		/* setup E1 card defaults */
+		vp->config = vp_default_e1_card;
+		vp->isr = &vp_e401_interrupt;
+		/* place all framers in E1 mode */
+		vp->xlb[(0 << 8) + 0x00] = 0x02;
+		vp->xlb[(1 << 8) + 0x00] = 0x02;
+		vp->xlb[(2 << 8) + 0x00] = 0x02;
+		vp->xlb[(3 << 8) + 0x00] = 0x02;
+		/* set up for interleaved serial bus operation, byte mode */
+		vp->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
+		vp->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
+		vp->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
+		vp->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
+		/* link interface reset */
+		vp->xlb[(0 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
+		strlog(DRV_ID, card, 0, SL_TRACE, "LIRST on E1 span 1.");
+		vp->xlb[(1 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
+		strlog(DRV_ID, card, 0, SL_TRACE, "LIRST on E1 span 2.");
+		vp->xlb[(2 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
+		strlog(DRV_ID, card, 0, SL_TRACE, "LIRST on E1 span 3.");
+		vp->xlb[(3 << 8) + 0x79] = 0xd8;	/* E1, normal, LIRST */
+		strlog(DRV_ID, card, 0, SL_TRACE, "LIRST on E1 span 4.");
+		/* wait for 40 ms */
+		timeout = jiffies + 100 * HZ / 1000;
+		while (jiffies < timeout) ;
+		/* release LIRST bit */
+		vp->xlb[(0 << 8) + 0x79] = 0x98;	/* E1, normal */
+		vp->xlb[(1 << 8) + 0x79] = 0x98;	/* E1, normal */
+		vp->xlb[(2 << 8) + 0x79] = 0x98;	/* E1, normal */
+		vp->xlb[(3 << 8) + 0x79] = 0x98;	/* E1, normal */
+		break;
+	}
+	case V400PT:
+	case T400P:
+	case T400PSS7:
+	{
+		int span, offset;
+
+#if 0
+		if (!japan) {
+			/* setup T1 card defaults */
+			vp->config = sdl_default_t1_chan;
+			vp->isr = &vp_t400_interrupt;
+		} else {
+			/* setup T1 card defaults */
+			vp->config = sdl_default_t1_chan;
+			vp->isr = &vp_j400_interrupt;
+		}
+#else
+		/* setup T1 card defaults */
+		vp->config = sdl_default_t1_chan;
+		vp->isr = &vp_t400_interrupt;
+#endif
+		/* zero all span registers */
+		for (span = 0; span < X400_SPANS; span++)
+			for (offset = 0; offset < 160; offset++)
+				vp->xlb[(span << 8) + offset] = 0x00;
+		/* set up for interleaved serial bus operation, byte mode */
+		vp->xlb[(0 << 8) + 0x94] = 0x09;
+		vp->xlb[(1 << 8) + 0x94] = 0x08;
+		vp->xlb[(2 << 8) + 0x94] = 0x08;
+		vp->xlb[(3 << 8) + 0x94] = 0x08;
+		break;
+	}
+	case V401PT:
+	{
+#if 0
+		if (!japan) {
+			/* setup T1 card defaults */
+			vp->config = sdl_default_t1_chan;
+			vp->isr = &vp_t401_interrupt;
+		} else {
+			/* setup J1 card defaults */
+			vp->config = sdl_default_j1_chan;
+			vp->isr = &vp_j401_interrupt;
+		}
+#else
+		(void) sdl_default_j1_chan;
+		/* setup T1 card defaults */
+		vp->config = sdl_default_t1_chan;
+		vp->isr = &vp_t401_interrupt;
+#endif
+		vp->xlb[SYNREG] = SYNC1;	/* default span1 */
+		/* place all framers in T1 mode */
+		vp->xlb[(0 << 8) + 0x00] = 0x00;
+		vp->xlb[(1 << 8) + 0x00] = 0x00;
+		vp->xlb[(2 << 8) + 0x00] = 0x00;
+		vp->xlb[(3 << 8) + 0x00] = 0x00;
+		/* set up for interleaved serial bus operation, byte mode */
+		vp->xlb[(0 << 8) + 0xc5] = 0x28 + 0;
+		vp->xlb[(1 << 8) + 0xc5] = 0x28 + 1;
+		vp->xlb[(2 << 8) + 0xc5] = 0x28 + 2;
+		vp->xlb[(3 << 8) + 0xc5] = 0x28 + 3;
+		/* link interface reset */
+		vp->xlb[(0 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
+		strlog(DRV_ID, card, 0, SL_TRACE, "LIRST on T1 span 1.");
+		vp->xlb[(1 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
+		strlog(DRV_ID, card, 0, SL_TRACE, "LIRST on T1 span 2.");
+		vp->xlb[(2 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
+		strlog(DRV_ID, card, 0, SL_TRACE, "LIRST on T1 span 3.");
+		vp->xlb[(3 << 8) + 0x79] = 0x58;	/* T1, normal, LIRST */
+		strlog(DRV_ID, card, 0, SL_TRACE, "LIRST on T1 span 4.");
+		/* wait for 40 ms */
+		timeout = jiffies + 100 * HZ / 1000;
+		while (jiffies < timeout) ;
+		/* release LIRST bit */
+		vp->xlb[(0 << 8) + 0x79] = 0x18;	/* T1, normal */
+		vp->xlb[(1 << 8) + 0x79] = 0x18;	/* T1, normal */
+		vp->xlb[(2 << 8) + 0x79] = 0x18;	/* T1, normal */
+		vp->xlb[(3 << 8) + 0x79] = 0x18;	/* T1, normal */
+		break;
+	}
 	default:
-		swerr();
+		strlog(DRV_ID, card, 0, SL_FATAL, "SWERR: should never arrive here.");
 		goto error_remove;
 	}
-	if (request_irq(dev->irq, vp_interrupt, SA_INTERRUPT | SA_SHIRQ, DRV_NAME, vp)) {
-		ptrace(("%s: ERROR: Unable to request IRQ %d\n", DRV_NAME, dev->irq));
+	if (request_irq(dev->irq, vp->isr, SA_INTERRUPT | SA_SHIRQ, DRV_NAME, vp)) {
+		strlog(DRV_ID, card, 0, SL_ERROR | SL_TRACE, "ERROR: unable to request IRQ %d.",
+		       dev->irq);
 		goto error_remove;
 	}
 	vp->irq = dev->irq;
-	printd(("%s: acquired IRQ %ld for %s card\n", DRV_NAME, vp->irq, vp->brdname));
+	strlog(DRV_ID, card, 0, SL_TRACE, "acquired IRQ %ld for %s card.", vp->irq, vp->brdname);
+
+	switch (vp->config.ifgtype) {
+	case SDL_GTYPE_E1:
+		taslet_init(&vp->tasklet, &vp_e1_card_tasklet, (unsigned long) vp);
+		break;
+	case SDL_GTYPE_T1:
+		taslet_init(&vp->tasklet, &vp_t1_card_tasklet, (unsigned long) vp);
+		break;
+	case SDL_GTYPE_J1:
+		taslet_init(&vp->tasklet, &vp_j1_card_tasklet, (unsigned long) vp);
+		break;
+	default:
+		strlog(DRV_ID, card, 0, SL_FATAL, "SWERR: should never arrive here.");
+		break;
+	}
+
+	/* set up span defaults */
+	vp_span_config(vp, 0, true);
+	vp_span_config(vp, 1, true);
+	vp_span_config(vp, 2, true);
+	vp_span_config(vp, 3, true);
+
 	vp->plx[INTCSR] = PLX_INTENA;	/* enable interrupts */
-	/* I don't think that we need an atomic here.  I think that hardware probes are never done
-	   in parallel. */
-	vp_card++;
+
 	return (0);
       error_remove:
 	vp_remove(dev);
@@ -5004,7 +6396,7 @@ vp_resume(struct pci_dev *pdev)
 STATIC struct pci_driver vp_driver = {
 	.name = DRV_NAME,
 	.probe = vp_probe,
-	.remove = __devexit_p(vp_remove),
+	.remove = vp_remove,
 	.id_table = &vp_pci_table,
 #ifdef CONFIG_PM
 	.suspend = vp_suspend,
@@ -5014,6 +6406,14 @@ STATIC struct pci_driver vp_driver = {
 
 /**
  * vp_pci_init: - init PCI for the V401P driver
+ *
+ * Here we need to scan for all available borads, configure the board-level structures, and the
+ * release all system resources.  The purpose of this is to identify the boards in the system at
+ * module startup or STREAMS inititialization.
+ *
+ * Later, when a Stream is opened for any span, the span is configured, the drivers will be enabled
+ * and all channels in the span will have their power-on sequences completed and each channel will
+ * idle.  Closing channels will result in the transmitters resuming idle operation.
  */
 STATIC noinline __unlikely int
 vp_pci_init(void)
@@ -5023,6 +6423,10 @@ vp_pci_init(void)
 
 /**
  * vp_pci_cleanup: - cleanup PCI for the V401P driver
+ *
+ * Because this can be a Style 2 driver (when the appropriate minor device number is opened, if
+ * there are any boards that are still configured, we need to stop the boards and deallocated the
+ * board-level resources and structures.
  */
 STATIC noinline __unlikely int
 vp_pci_cleanup(void)
@@ -5057,44 +6461,44 @@ MODULE_PARM_DESC(vp_loadfw, "Load firmware for the V401P driver.");
  */
 
 STATIC struct module_info mx_minfo = {
-	.mi_idnum = DRV_ID,
-	.mi_idname = DRV_NAME,
-	.mi_minpsz = STRMINPSZ,
-	.mi_maxpsz = STRMAXPSZ,
-	.mi_hiwat = STRHIGH,
-	.mi_lowat = STRLOW,
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = STRMINPSZ,		/* Min packet size accepted */
+	.mi_maxpsz = STRMAXPSZ,		/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Low water mark */
 };
 
 STATIC struct module_stat mx_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 STATIC struct qinit mx_rinit = {
-	.qi_putp = NULL,
-	.qi_srvp = NULL,
-	.qi_qopen = mx_qopen,
-	.qi_qclose = mx_qclose,
-	.qi_minfo = &mx_minfo,
-	.qi_mstat = &mx_mstat,
+	.qi_putp = NULL,		/* Read put (message from below) */
+	.qi_srvp = NULL,		/* Read queue service */
+	.qi_qopen = mx_qopen,		/* Each open */
+	.qi_qclose = mx_qclose,		/* Last close */
+	.qi_minfo = &mx_minfo,		/* Infomration */
+	.qi_mstat = &mx_mstat,		/* Statistics */
 };
 
 STATIC struct qinit mx_winit = {
-	.qi_putp = mx_wput,
-	.qi_srvp = mx_wsrv,
-	.qi_minfo = &mx_minfo,
-	.qi_mstat = &mx_mstat,
+	.qi_putp = mx_wput,		/* Write put (message from above) */
+	.qi_srvp = mx_wsrv,		/* Write queue service */
+	.qi_minfo = &mx_minfo,		/* Information */
+	.qi_mstat = &mx_mstat,		/* Statistics */
 };
 
 STATIC struct streamtab v400mxinfo = {
-	.st_rdinit = &mx_rinit,
-	.st_wrinit = &mx_winit,
+	.st_rdinit = &mx_rinit,		/* Upper multiplex read queue */
+	.st_wrinit = &mx_winit,		/* Upper multiplex write queue */
 };
 
 STATIC struct cdevsw mx_cdev = {
-	.d_name = DRV_NAME,
-	.d_str = &v400mxinfo,
-	.d_flag = D_MP,
-	.d_fop = NULL,
-	.d_mode = S_IFCHR,
-	.d_kmod = THIS_MODULE,
+	.d_name = DRV_NAME,		/* Driver name */
+	.d_str = &v400mxinfo,		/* Driver streamtab */
+	.d_flag = D_MP,			/* Driver flags */
+	.d_fop = NULL,			/* Driver operations (NULL for stream head) */
+	.d_mode = S_IFCHR,		/* Device type */
+	.d_kmod = THIS_MODULE,		/* Module owner */
 };
 
 STATIC major_t mx_majors[MX_CMAJORS] = { MX_CMAJOR_0, };

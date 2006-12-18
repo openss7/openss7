@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/14 06:48:34 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:59:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/14 06:48:34 $ by $Author: brian $
+## Last Modified $Date: 2006/12/18 08:59:35 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Config.in,v $
+## Revision 0.9.2.3  2006/12/18 08:59:35  brian
+## - working up strchan package
+##
 ## Revision 0.9.2.2  2006/10/14 06:48:34  brian
 ## - updates to include files from strss7 package
 ##
@@ -65,16 +68,25 @@
 ## Pushable module specifications
 ## -----------------------------------------------------------
 ##	name	    prefix
+module	cd	    cd
+module	cd-hdlc	    cd_hdlc
+module	cd-daed	    cd_daed
 
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
+objname	module	cd	    cd
+objname	module	cd-hdlc	    cd-hdlc
+objname	module	cd-daed	    cd-daed
 objname	module	zaptel	    zaptel
 
 ##
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##		name
+loadable	cd
+loadable	cd-hdlc
+loadable	cd-daed
 loadable	zaptel
 
 ##   Node specifications

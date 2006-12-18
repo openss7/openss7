@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:01:05 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:01:05 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:59:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.2  2006/12/18 08:59:35  brian
+ - working up strchan package
+
  Revision 0.9.2.1  2006/11/30 13:01:05  brian
  - added working files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:01:05 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:35 $"
 
-static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:01:05 $";
+static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:35 $";
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link
@@ -98,7 +101,7 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMD FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:01:05 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:35 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"
@@ -350,6 +353,10 @@ cd_error_ack(struct cd *cd, queue_t *q, mblk_t *msg, cd_ulong prim, cd_long erro
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->cd_primitive = CD_ERROR_ACK;
+		if (error == CD_FATALERR)
+			cd_set_state(cd, CD_UNUSABLE);
+		else
+			cd_set_state(cd, cd->i_oldstate);
 		p->cd_state = cd_get_state(cd);
 		p->cd_error_primitive = prim;
 		p->cd_errno = error < 0 ? CD_SYSERR : error;

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/17 12:12:42 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/17 12:12:42 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 08:59:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.5  2006/12/18 08:59:33  brian
+# - working up strchan package
+#
 # Revision 0.9.2.4  2006/10/17 12:12:42  brian
 # - working up new packages
 #
@@ -266,8 +269,8 @@ AC_DEFUN([_CHAN_CONFIG_KERNEL], [dnl
 AC_DEFUN([_CHAN_OUTPUT], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=242
-    strconf_cv_midbase=20
+    strconf_cv_majbase=211
+    strconf_cv_midbase=110
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl

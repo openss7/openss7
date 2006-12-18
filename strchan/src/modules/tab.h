@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tab.h,v 0.9.2.1 2006/11/30 13:01:06 brian Exp $
+ @(#) $Id: tab.h,v 0.9.2.2 2006/12/18 08:59:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:01:06 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:59:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tab.h,v $
+ Revision 0.9.2.2  2006/12/18 08:59:36  brian
+ - working up strchan package
+
  Revision 0.9.2.1  2006/11/30 13:01:06  brian
  - added working files
 
@@ -58,7 +61,7 @@
 #ifndef __LOCAL_TAB_H__
 #define __LOCAL_TAB_H__
 
-#ident "@(#) $RCSfile: tab.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tab.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  * This file contains 4 tables, one for transmit bit-stuffing and bit-reversal: tx_table; one for
@@ -89,7 +92,7 @@
  * residue = 0;
  * rbits = 0;
  *
- * r = &rx_table7[(state << 8) | input]; // intput does not need to be reversed
+ * r = &rx_table7[(state << 8) | input]; // input does not need to be reversed
  * residue |= r->bit_string << rbits;
  * rbits += r->bit_length;
  *

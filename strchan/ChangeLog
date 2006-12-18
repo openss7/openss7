@@ -1,3 +1,17 @@
+2006-12-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: adjusted base major and modid
+	* src/drivers/mx.c: add clone alias
+	* src/drivers/v401p.c: working up driver
+	* src/modules/Config.in: added in cd modules
+	* src/modules/cd.c: rationalizing cd modules
+	* src/modules/cd_old.c: added in old cd module from strss7 package
+	* src/modules/cd_daed.c: added in old cd module from strss7 package
+	* src/modules/cd_hdlc.c: added in old cd module from strss7 package
+	* src/modules/cd.h: added in old cd module from strss7 package
+	* src/modules/tab.h: typo
+	* src/test/test-chan.c: use clone directory device name
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:47 $
+ @(#) $RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:37 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/13 07:57:47 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:59:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-chan.c,v $
+ Revision 0.9.2.2  2006/12/18 08:59:37  brian
+ - working up strchan package
+
  Revision 0.9.2.1  2006/10/13 07:57:47  brian
  - added initial STREAMS Channel package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:47 $"
+#ident "@(#) $RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:37 $"
 
-static char const ident[] = "$RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:47 $";
+static char const ident[] = "$RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:37 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -123,7 +126,11 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX SVID/ABI";
 static const char *sstdname = "SVID/ABI";
 static const char *shortname = "ABI";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/ch";
+#else
 static char devname[256] = "/dev/ch";
+#endif
 
 static int exit_on_failure = 0;
 
