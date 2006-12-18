@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:27:36 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/12/18 08:16:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:27:36 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:16:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:27:36 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/12/18 08:16:52 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:27:36 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/12/18 08:16:52 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -87,7 +87,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/12 10:27:36 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/12/18 08:16:52 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -151,9 +151,7 @@ MODULE_ALIAS("/dev/conslog");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
 MODULE_ALIAS("/dev/streams/log");
 MODULE_ALIAS("/dev/streams/log/*");
-MODULE_ALIAS("/dev/streams/strlog");
-MODULE_ALIAS("/dev/streams/strlog/*");
-MODULE_ALIAS("/dev/streams/conslog");
+MODULE_ALIAS("/dev/streams/clone/log");
 #endif
 #endif
 
@@ -169,7 +167,7 @@ static struct module_info log_minfo = {
 static struct module_stat log_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat log_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
-#if 0
+#if 1
 /*
  *  Locking
  */

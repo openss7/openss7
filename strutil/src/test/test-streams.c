@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:24:17 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/18 08:16:55 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:17 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:16:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.22  2006/12/18 08:16:55  brian
+ - resolve device numbering
+
  Revision 0.9.2.21  2006/03/10 07:24:17  brian
  - rationalized streams and strutil package sources
 
@@ -131,9 +134,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:24:17 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/18 08:16:55 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/03/10 07:24:17 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/18 08:16:55 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -190,9 +193,15 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "STREAMS";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/echo";
+static char muxname[256] = "/dev/streams/clone/mux";
+static char fifoname[256] = "/dev/streams/fifo/0";
+#else
 static char devname[256] = "/dev/echo";
 static char muxname[256] = "/dev/mux";
 static char fifoname[256] = "/dev/fifo";
+#endif
 
 static int exit_on_failure = 0;
 

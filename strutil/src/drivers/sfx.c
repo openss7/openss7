@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:18 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 08:16:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:18 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:16:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:18 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 08:16:52 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:18 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 08:16:52 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -69,7 +69,7 @@ extern struct file_operations strm_f_ops;
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:18 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 08:16:52 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -134,6 +134,7 @@ MODULE_ALIAS("/dev/sfx");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR));
 MODULE_ALIAS("/dev/streams/sfx");
 MODULE_ALIAS("/dev/streams/sfx/*");
+MODULE_ALIAS("/dev/streams/clone/sfx");
 #endif
 #endif
 

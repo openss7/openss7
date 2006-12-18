@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/10/27 23:05:51 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/12/18 08:16:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/27 23:05:51 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 08:16:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -885,7 +885,7 @@ AC_DEFUN([_UTIL_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=242
-    strconf_cv_midbase=30
+    strconf_cv_midbase=20
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl

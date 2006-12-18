@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/02 11:32:19 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/18 08:16:54 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:19 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:16:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.14  2006/12/18 08:16:54  brian
+ - resolve device numbering
+
  Revision 0.9.2.13  2006/10/02 11:32:19  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -128,9 +131,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/02 11:32:19 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/18 08:16:54 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/02 11:32:19 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/18 08:16:54 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -199,11 +202,12 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "SAD";
-static char devname[256] = "/dev/sad";
 #ifdef LFS
+static char devname[256] = "/dev/streams/clone/sad";
 static char admname[256] = "/dev/streams/sad/admin";
 #endif
 #ifdef LIS
+static char devname[256] = "/dev/sad";
 static char admname[256] = "/dev/sad";
 #endif
 

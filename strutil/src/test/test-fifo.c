@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:24:16 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/18 08:16:54 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:16 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:16:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.13  2006/12/18 08:16:54  brian
+ - resolve device numbering
+
  Revision 0.9.2.12  2006/03/10 07:24:16  brian
  - rationalized streams and strutil package sources
 
@@ -108,9 +111,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:24:16 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/18 08:16:54 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/10 07:24:16 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/18 08:16:54 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -163,7 +166,11 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "FIFO";
+#ifdef LFS
+static char devname[256] = "/dev/streams/fifo/0";
+#else
 static char devname[256] = "/dev/fifo";
+#endif
 
 static int exit_on_failure = 0;
 

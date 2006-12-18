@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/02 11:32:18 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/18 08:16:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:18 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:16:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/02 11:32:18 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/18 08:16:52 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/02 11:32:18 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/18 08:16:52 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/10/02 11:32:18 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/18 08:16:52 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -146,6 +146,8 @@ MODULE_ALIAS("/dev/sad/user");
 #ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SAD_MAJOR));
 MODULE_ALIAS("/dev/streams/sad");
+MODULE_ALIAS("/dev/streams/sad/*");
+MODULE_ALIAS("/dev/streams/clone/sad");
 MODULE_ALIAS("/dev/streams/sad/admin");
 MODULE_ALIAS("/dev/streams/sad/user");
 #endif
