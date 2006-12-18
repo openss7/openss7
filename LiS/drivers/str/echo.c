@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:38:54 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:05:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:38:54 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 09:05:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:38:54 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:05:17 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:38:54 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:05:17 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:38:54 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:05:17 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -155,6 +155,7 @@ MODULE_ALIAS("/dev/echo");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
 MODULE_ALIAS("/dev/streams/echo");
 MODULE_ALIAS("/dev/streams/echo/*");
+MODULE_ALIAS("/dev/streams/clone/echo");
 #endif
 #endif
 
