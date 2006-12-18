@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:37:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 09:37:40 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:37:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.4  2006/12/18 07:37:00  brian
+ - resolve device numbering
+
  Revision 0.9.2.3  2006/10/12 09:37:40  brian
  - completed much of the strtty package
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:37:00 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:37:00 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -96,7 +99,7 @@ static char const ident[] =
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:40 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:37:00 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
@@ -1130,7 +1133,7 @@ MODULE_PARM_DESC(pts_modid, "Module ID for the PTS driver. (0 for allocation.)")
 major_t ptm_major = PTM_CMAJOR_0;
 major_t pts_major = PTS_CMAJOR_0;
 
-#ifdef MODULE_PARM
+#ifndef module_param
 MODULE_PARM(ptm_major, "h");
 MODULE_PARM(pts_major, "h");
 #else

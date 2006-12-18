@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 09:53:23 $
+ @(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 07:37:01 $
 
  -----------------------------------------------------------------------------
 
@@ -59,20 +59,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/23 09:53:23 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:37:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tty.c,v $
+ Revision 0.9.2.2  2006/12/18 07:37:01  brian
+ - resolve device numbering
+
  Revision 0.9.2.1  2006/08/23 09:53:23  brian
  - started STREAMS Terminals package
 
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 09:53:23 $"
+#ident "@(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 07:37:01 $"
 
-static char const ident[] = "$RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/08/23 09:53:23 $";
+static char const ident[] = "$RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 07:37:01 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -124,7 +127,11 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX SVID/ABI";
 static const char *sstdname = "SVID/ABI";
 static const char *shortname = "ABI";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/tty";
+#else
 static char devname[256] = "/dev/tty";
+#endif
 
 static int exit_on_failure = 0;
 
