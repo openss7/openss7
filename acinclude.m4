@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/10/17 12:12:36 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/12/18 10:28:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/17 12:12:36 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 10:28:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,8 +73,8 @@ m4_include([m4/nsl.m4])
 m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
-m4_include([m4/iso.m4])
 m4_include([m4/chan.m4])
+m4_include([m4/iso.m4])
 m4_include([m4/isdn.m4])
 m4_include([m4/ss7.m4])
 m4_include([m4/sigtran.m4])
@@ -175,7 +175,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-SCTP],
 			       [do not include SCTP in master pack @<:@detected@:>@]),
 		[with_SCTP="$withval"],
-		[with_SCTP="${with_ALL:-no}"])
+		[with_SCTP=''])
     if test ! -d "$srcdir/sctp" ; then
 	with_SCTP='no'
     fi
@@ -183,7 +183,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-IPERF],
 			       [do not include IPERF in master pack @<:@detected@:>@]),
 		[with_IPERF="$withval"],
-		[with_IPERF="${with_ALL:-no}"])
+		[with_IPERF=''])
     if test ! -d "$srcdir/iperf" ; then
 	with_IPERF='no'
     fi
@@ -191,7 +191,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-LIS],
 			       [include LIS in master pack @<:@detected@:>@]),
 		[with_LIS="$withval"],
-		[with_LIS="${with_ALL:-no}"])
+		[with_LIS='no'])
     if test ! -d "$srcdir/LiS" ; then
 	with_LIS='no'
     fi
@@ -215,7 +215,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
 		[with_STRUTIL="$withval"],
-		[with_STRUTIL="${with_ALL:-no}"])
+		[with_STRUTIL='no'])
     if test ! -d "$srcdir/strutil" ; then
 	with_STRUTIL='no'
     fi
@@ -223,7 +223,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRBCM],
 			       [include STRBCM in master pack @<:@detected@:>@]),
 		[with_STRBCM="$withval"],
-		[with_STRBCM="${with_ALL:-no}"])
+		[with_STRBCM='no'])
     if test ! -d "$srcdir/strbcm" ; then
 	with_STRBCM='no'
     fi
@@ -283,6 +283,14 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test ! -d "$srcdir/strsctp" ; then
 	with_STRSCTP='no'
     fi
+    AC_ARG_WITH([STRCHAN],
+		AS_HELP_STRING([--without-STRCHAN],
+			       [do not include STRCHAN in master pack @<:@included@:>@]),
+		[with_STRCHAN="$withval"],
+		[with_STRCHAN="${with_ALL:-no}"])
+    if test ! -d "$srcdir/strchan" ; then
+	with_STRCHAN='no'
+    fi
     AC_ARG_WITH([STRISO],
 		AS_HELP_STRING([--with-STRISO],
 			       [include STRISO in master pack @<:@detected@:>@]),
@@ -298,14 +306,6 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		[with_NETPERF='yes'])
     if test ! -d "$srcdir/netperf" ; then
 	with_NETPERF='no'
-    fi
-    AC_ARG_WITH([STRCHAN],
-		AS_HELP_STRING([--without-STRCHAN],
-			       [do not include STRCHAN in master pack @<:@included@:>@]),
-		[with_STRCHAN="$withval"],
-		[with_STRCHAN="${with_ALL:-no}"])
-    if test ! -d "$srcdir/strchan" ; then
-	with_STRCHAN='no'
     fi
     AC_ARG_WITH([STRISDN],
 		AS_HELP_STRING([--without-STRISDN],
@@ -471,19 +471,19 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-sctp'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-sctp"
     fi
-    if test :"${with_STRISO:-yes}" != :no ; then
-	_ISO
-    else
-	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_iso --without-iso\""
-	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-iso'"
-	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-iso"
-    fi
     if test :"${with_STRCHAN:-yes}" != :no ; then
 	_CHAN
     else
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_chan --without-chan\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-chan'"
 	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-chan"
+    fi
+    if test :"${with_STRISO:-yes}" != :no ; then
+	_ISO
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_iso --without-iso\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-iso'"
+	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--without-iso"
     fi
     if test :"${with_STRISDN:-yes}" != :no ; then
 	_ISDN
@@ -586,14 +586,14 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_STRSCTP:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strsctp])
     fi
+    if test :${with_STRCHAN:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strchan])
+    fi
     if test :${with_STRISO:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([striso])
     fi
     if test :${with_NETPERF:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([netperf])
-    fi
-    if test :${with_STRCHAN:-yes} = :yes ; then
-	AC_CONFIG_SUBDIRS([strchan])
     fi
     if test :${with_STRISDN:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strisdn])
