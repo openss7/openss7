@@ -1,3 +1,11 @@
+2006-12-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: device major base
+	* doc/man/man7/dlpi_eth.7.man: correct indirection
+	* src/test/ldltest.c: use LFS device names
+	* src/test/test-ip.c: updated test program
+	* src/test/test-np_ip.c: updated test program
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>

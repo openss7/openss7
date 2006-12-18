@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:23:36 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:40:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/02 12:23:36 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:40:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldltest.c,v $
+ Revision 0.9.2.11  2006/12/18 07:40:14  brian
+ - device number resolution, updated test programs
+
  Revision 0.9.2.10  2006/07/02 12:23:36  brian
  - changes for gcc 4.1.1 compile
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:23:36 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:40:14 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/02 12:23:36 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:40:14 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -600,6 +603,12 @@ do_getname(int fd)
 	return name;
 }
 
+#ifdef LFS
+static const char ldlname[] = "/dev/streams/clone/ldl";
+#else
+static const char ldlname[] = "/dev/ldl";
+#endif
+
 void
 do_global_stats(void)
 {
@@ -607,7 +616,7 @@ do_global_stats(void)
 	struct strioctl strioctl;
 	ldl_gstats_ioctl_t st;
 
-	if ((fd = open("/dev/ldl", O_RDWR)) < 0) {
+	if ((fd = open(ldlname, O_RDWR)) < 0) {
 		perror("open(\"/dev/ldl\")");
 		exit(1);
 	}
@@ -652,7 +661,7 @@ do_set_debug_mask(unsigned long msk)
 	int fd;
 	struct strioctl strioctl;
 
-	if ((fd = open("/dev/ldl", O_RDWR)) < 0) {
+	if ((fd = open(ldlname, O_RDWR)) < 0) {
 		perror("open(\"/dev/ldl\")");
 		exit(1);
 	}
@@ -2408,7 +2417,7 @@ initialize(void)
 	else
 		hw_type = ARPHRD_IEEE802;
 
-	if ((fd = open("/dev/ldl", O_RDWR)) < 0) {
+	if ((fd = open(ldlname, O_RDWR)) < 0) {
 		perror("open(\"/dev/ldl\")");
 		exit(1);
 	}
