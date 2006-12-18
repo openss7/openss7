@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/12 10:26:37 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 08:14:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/12 10:26:37 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 08:14:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.8  2006/12/18 08:14:06  brian
+# - resolve device numbering
+#
 # Revision 0.9.2.7  2006/10/12 10:26:37  brian
 # - removed redundant debug flags
 #
@@ -227,8 +230,8 @@ AC_DEFUN([_SOCK_OUTPUT], [dnl
 AC_DEFUN([_SOCK_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=242
-    strconf_cv_midbase=20
+    strconf_cv_majbase=219
+    strconf_cv_midbase=80
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl

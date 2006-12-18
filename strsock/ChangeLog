@@ -1,3 +1,14 @@
+2006-12-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: resolve base major
+	* src/lib/sockpath.c: correct compiler warning
+	* src/test/test-sock.c: use clone directory device names
+	* src/test/test-socket.c: use clone directory device names
+	* src/test/test-socklib.c: use clone directory device names
+	* src/test/test-sockmod.c: use clone directory device names
+	* src/test/test-sockpath.c: use clone directory device names
+	* src/test/test-socksys.c: use clone directory device names
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>

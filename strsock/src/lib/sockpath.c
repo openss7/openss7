@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $
+ @(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:14:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:53 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:14:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockpath.c,v $
+ Revision 0.9.2.3  2006/12/18 08:14:07  brian
+ - resolve device numbering
+
  Revision 0.9.2.2  2006/09/18 13:52:53  brian
  - added doxygen markers to sources
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $"
+#ident "@(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:14:07 $"
 
-static char const ident[] = "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/18 13:52:53 $";
+static char const ident[] = "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:14:07 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -216,7 +219,7 @@ __sockpath_loadsockpathlist(void)
 
 	/* read file one line at a time */
 	for (linenum = 1; (line = fgets(buffer, sizeof(buffer), file)) != NULL; linenum++) {
-		char *str, *field, *tmp = NULL;
+		char *str, *field = NULL, *tmp = NULL;
 		int fieldnum;
 
 		/* allocate one if we don't already have one */
