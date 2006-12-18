@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/10/27 23:19:36 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/12/18 07:32:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:36 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/10/27 23:19:36 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/12/18 07:32:42 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/10/27 23:19:36 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/12/18 07:32:42 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -497,7 +497,7 @@ cdev_lookup(major_t major, int load)
 			snprintf(devname, sizeof(devname), "streams-major-%d", major);
 			request_module(devname);
 			read_lock(&cdevsw_lock);
-#ifdef CONFIG_DEVFS
+#if defined CONFIG_DEVFS || 1
 			if ((cdev = __cdev_lookup(major)))
 				break;
 			read_unlock(&cdevsw_lock);
@@ -692,7 +692,7 @@ cdev_search(const char *name, int load)
 			snprintf(devname, sizeof(devname), "streams-%s", name);
 			request_module(devname);
 			read_lock(&cdevsw_lock);
-#ifdef CONFIG_DEVFS
+#if defined CONFIG_DEVFS || 1
 			if ((cdev = __cdev_search(name)))
 				break;
 			read_unlock(&cdevsw_lock);
@@ -772,27 +772,50 @@ fmod_search(const char *name, int load)
  *  cmin_search: - looke up a minor device node by name
  *  @cdev: character device major structure
  *  @name: name to look up
+ *  @load: whether to demand load kernel modules
+ *
+ *  The search is exhaustive.  If this function is called multiple times with the same name, the
+ *  peformance impact will be minimal.  If the device is not found by name, an attempt will be made
+ *  to demand load the kernel module "streams-%s-%s" and then "/dev/streams/%s/%s".
+ *
+ *  Demand loading modules by minor device names is primarily for minor device names under the clone
+ *  device.
  */
 STATIC struct devnode *
-cmin_search(const struct cdevsw *cdev, const char *name)
+cmin_search(struct cdevsw *cdev, const char *name, int load)
 {
 	struct devnode *cmin = NULL;
 
-	ensure(cdev->d_minors.next, return (cmin));
-
+#ifdef CONFIG_KMOD
+	int reload;
+#endif				/* CONFIG_KMOD */
 	read_lock(&cdevsw_lock);
-	if (cdev) {
-		register struct list_head *pos;
+#ifdef CONFIG_KMOD
+	for (reload = load ? 0 : 1; reload < 2; reload++) {
+		do {
+			char devname[96];
 
-		list_for_each(pos, &cdev->d_minors) {
-			struct devnode *n = list_entry(pos, struct devnode, n_list);
-
-			if (!strncmp(n->n_name, name, FMNAMESZ)) {
-				cmin = n;
+			if ((cmin = __cmin_search(cdev, name)))
 				break;
-			}
-		}
+			if (!load)
+				break;
+			read_unlock(&cdevsw_lock);
+			snprintf(devname, sizeof(devname), "streams-%s-%s", cdev->d_name, name);
+			request_module(devname);
+			read_lock(&cdevsw_lock);
+#if defined CONFIG_DEVFS || 1
+			if ((cmin = __cmin_search(cdev, name)))
+				break;
+			read_unlock(&cdevsw_lock);
+			snprintf(devname, sizeof(devname), "/dev/streams/%s/%s", cdev->d_name, name);
+			request_module(devname);
+			read_lock(&cdevsw_lock);
+#endif				/* CONFIG_DEVFS */
+		} while (0);
 	}
+#else				/* CONFIG_KMOD */
+	cmin = __cmin_search(cdev, name);
+#endif				/* CONFIG_KMOD */
 	read_unlock(&cdevsw_lock);
 	return (cmin);
 }
@@ -1050,9 +1073,9 @@ fmod_find(const char *name)
 EXPORT_SYMBOL_NOVERS(fmod_find);
 
 streams_fastcall struct devnode *
-cmin_find(const struct cdevsw *cdev, const char *name)
+cmin_find(struct cdevsw *cdev, const char *name)
 {
-	return cmin_search(cdev, name);
+	return cmin_search(cdev, name, !in_interrupt());
 }
 
 EXPORT_SYMBOL_NOVERS(cmin_find);

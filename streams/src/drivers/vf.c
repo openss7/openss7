@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:34 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 07:32:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.9  2006/12/18 07:32:40  brian
+ - lfs device names, autoload clone minors, device numbering, missing manpages
+
  Revision 0.9.2.8  2006/10/27 23:19:34  brian
  - changes for 2.6.18 kernel
 
@@ -77,9 +80,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:34 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 07:32:40 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:34 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 07:32:40 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -107,7 +110,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.8 $) 
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/10/27 23:19:34 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2006/12/18 07:32:40 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"
@@ -169,6 +172,7 @@ MODULE_ALIAS("/dev/vf");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_VF_MAJOR));
 MODULE_ALIAS("/dev/streams/vf");
 MODULE_ALIAS("/dev/streams/vf/*");
+MODULE_ALIAS("/dev/streams/clone/vf");
 #endif
 #endif
 

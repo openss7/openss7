@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin fo+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2006/11/26 15:27:32 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/12/18 07:32:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/11/26 15:27:32 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 07:32:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.130  2006/12/18 07:32:35  brian
+# - lfs device names, autoload clone minors, device numbering, missing manpages
+#
 # Revision 0.9.2.129  2006/11/26 15:27:32  brian
 # - testing and corrections to strlog capabilities
 #
@@ -1617,18 +1620,12 @@ AC_DEFUN([_LFS_OUTPUT], [dnl
 AC_DEFUN([_LFS_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=231
-    strconf_cv_midbase=1
     if test ${linux_cv_minorbits:-8} -gt 8 ; then
-dnl
-dnl Tired of device conflicts on 2.6 kernels.
-dnl
-	((strconf_cv_majbase+=2000))
+	strconf_cv_majbase=2001
+    else
+	strconf_cv_majbase=231
     fi
-dnl
-dnl Get these away from device numbers.
-dnl
-    ((strconf_cv_midbase+=5000))
+    strcont_cv_midbase=5001
     strconf_cv_config='include/sys/config.h'
     strconf_cv_modconf='modconf.h'
     strconf_cv_drvconf='drvconf.mk'

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:23 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:32:42 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:23 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.11  2006/12/18 07:32:42  brian
+ - lfs device names, autoload clone minors, device numbering, missing manpages
+
  Revision 0.9.2.10  2006/07/24 09:01:23  brian
  - results of udp2 optimizations
 
@@ -100,10 +103,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:23 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:32:42 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/07/24 09:01:23 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:32:42 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -595,6 +598,12 @@ test_async(int fds[])
 	return (0);
 }
 
+#ifdef LFS
+static const char fifoname[] = "/dev/streams/fifo/0";
+#else
+static const char fifoname[] = "/dev/fifo";
+#endif
+
 int
 do_tests(void)
 {
@@ -618,12 +627,12 @@ do_tests(void)
 			fprintf(stderr, "Opening fifo\n");
 			fflush(stderr);
 		}
-		if ((fds[0] = open("/dev/fifo", O_RDONLY | O_NONBLOCK)) < 0) {
+		if ((fds[0] = open(fifoname, O_RDONLY | O_NONBLOCK)) < 0) {
 			if (verbose)
 				perror("open()");
 			goto dead;
 		}
-		if ((fds[1] = open("/dev/fifo", O_WRONLY | O_NONBLOCK)) < 0) {
+		if ((fds[1] = open(fifoname, O_WRONLY | O_NONBLOCK)) < 0) {
 			if (verbose)
 				perror("open()");
 			goto dead;

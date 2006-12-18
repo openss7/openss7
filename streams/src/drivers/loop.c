@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:19:34 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/18 07:32:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:19:34 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/18 07:32:40 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:19:34 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/18 07:32:40 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/27 23:19:34 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/18 07:32:40 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -137,11 +137,14 @@ MODULE_PARM_DESC(major, "Major device number for LOOP driver. (0 for auto alloca
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR) "-*");
-MODULE_ALIAS("/dev/loop");
+MODULE_ALIAS("/dev/loop.1");
+MODULE_ALIAS("/dev/loop.2");
+MODULE_ALIAS("/dev/loop_clone");
 #ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
 MODULE_ALIAS("/dev/streams/loop");
 MODULE_ALIAS("/dev/streams/loop/*");
+MODULE_ALIAS("/dev/streams/clone/loop");
 #endif
 #endif
 

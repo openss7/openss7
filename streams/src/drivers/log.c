@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/11/26 18:55:06 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:32:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 18:55:06 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/11/26 18:55:06 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:32:40 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/11/26 18:55:06 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:32:40 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -95,7 +95,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/11/26 18:55:06 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:32:40 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -159,9 +159,7 @@ MODULE_ALIAS("/dev/conslog");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
 MODULE_ALIAS("/dev/streams/log");
 MODULE_ALIAS("/dev/streams/log/*");
-MODULE_ALIAS("/dev/streams/strlog");
-MODULE_ALIAS("/dev/streams/strlog/*");
-MODULE_ALIAS("/dev/streams/conslog");
+MODULE_ALIAS("/dev/streams/clone/log");
 #endif
 #endif
 

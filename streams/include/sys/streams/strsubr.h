@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.73 2006/07/24 09:01:13 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.74 2006/12/18 07:32:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/24 09:01:13 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.74  2006/12/18 07:32:38  brian
+ - lfs device names, autoload clone minors, device numbering, missing manpages
+
  Revision 0.9.2.73  2006/07/24 09:01:13  brian
  - results of udp2 optimizations
 
@@ -79,7 +82,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.73 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.74 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -656,7 +659,7 @@ __STREAMS_EXTERN void fmod_put(struct fmodsw *fmod);
 __STREAMS_EXTERN struct cdevsw *cdev_find(const char *name);
 __STREAMS_EXTERN struct cdevsw *cdev_match(const char *name);
 __STREAMS_EXTERN struct fmodsw *fmod_find(const char *name);
-__STREAMS_EXTERN struct devnode *cmin_find(const struct cdevsw *cdev, const char *name);
+__STREAMS_EXTERN struct devnode *cmin_find(struct cdevsw *cdev, const char *name);
 __STREAMS_EXTERN struct devnode *cmin_get(const struct cdevsw *cdev, minor_t minor);
 __STREAMS_EXTERN struct devnode *cmaj_get(const struct cdevsw *cdev, major_t major);
 __STREAMS_EXTERN minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor);

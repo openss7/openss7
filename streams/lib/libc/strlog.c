@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:08:26 $
+ @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 07:32:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:08:26 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:08:26 $"
+#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 07:32:39 $"
 
-static char const ident[] = "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/30 13:08:26 $";
+static char const ident[] = "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 07:32:39 $";
 
 #include "streams.h"
 
@@ -1021,14 +1021,15 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 }
 
 int
-__streams_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
+__streams_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
 {
-	char sbuf[LOGMSGSZ<<2];
+	char sbuf[LOGMSGSZ << 2];
 	char fchar[] = "          ";
 	char *fstr = fchar, *tp;
 	struct log_ctl lc;
 	time_t ltime;
 	char timebuf[26];
+	int len;
 
 	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < sizeof(lc)) {
 		errno = -EINVAL;
@@ -1037,36 +1038,38 @@ __streams_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 	memcpy(&lc, ctrl->buf, sizeof(lc));
 
 	snprintf_text(sbuf, sizeof(sbuf), (char *) data->buf, data->len);
-	fprintf(file, "%d", lc.seq_no);
-	ctime_r(&ltime, timebuf);
-	for (tp = timebuf;; tp++) {
-		if (*tp == '\n') {
-			*tp = '\0';
-			break;
+	len = fprintf(file, "%d", lc.seq_no);
+	if (len != -1) {
+		ctime_r(&ltime, timebuf);
+		for (tp = timebuf;; tp++) {
+			if (*tp == '\n') {
+				*tp = '\0';
+				break;
+			}
+			if (tp == '\0')
+				break;
+			if (tp > timebuf + sizeof(timebuf) - 1) {
+				*tp = '\0';
+				break;
+			}
 		}
-		if (tp == '\0')
-			break;
-		if (tp > timebuf + sizeof(timebuf) - 1) {
-			*tp = '\0';
-			break;
-		}
+		len += fprintf(file, " %s", timebuf);
+		len += fprintf(file, " %lu", (unsigned long) lc.ttime);
+		len += fprintf(file, " %3d", lc.level);
+		if (lc.flags & SL_ERROR)
+			*fstr++ = 'E';
+		if (lc.flags & SL_FATAL)
+			*fstr++ = 'F';
+		if (lc.flags & SL_NOTIFY)
+			*fstr++ = 'N';
+		*fstr++ = '\0';
+		len += fprintf(file, " %s", fchar);
+		len += fprintf(file, " %d", lc.mid);
+		len += fprintf(file, " %d", lc.sid);
+		len += fprintf(file, " %s", sbuf);
+		len += fprintf(file, "\n");
 	}
-	fprintf(file, " %s", timebuf);
-	fprintf(file, " %lu", (unsigned long) lc.ttime);
-	fprintf(file, " %3d", lc.level);
-	if (lc.flags & SL_ERROR)
-		*fstr++ = 'E';
-	if (lc.flags & SL_FATAL)
-		*fstr++ = 'F';
-	if (lc.flags & SL_NOTIFY)
-		*fstr++ = 'N';
-	*fstr++ = '\0';
-	fprintf(file, " %s", fchar);
-	fprintf(file, " %d", lc.mid);
-	fprintf(file, " %d", lc.sid);
-	fprintf(file, " %s", sbuf);
-	fprintf(file, "\n");
-	return (0);
+	return (len);
 }
 
 /** @fn int vstrlog(short mid, short sid, char level, unsigned short flags, const char *fmt, va_list args)

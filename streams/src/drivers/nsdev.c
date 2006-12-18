@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/27 23:19:34 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/12/18 07:32:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/27 23:19:34 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/12/18 07:32:40 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/27 23:19:34 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/12/18 07:32:40 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/10/27 23:19:34 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/12/18 07:32:40 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -138,6 +138,7 @@ MODULE_ALIAS("/dev/nsdev");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR));
 MODULE_ALIAS("/dev/streams/nsdev");
 MODULE_ALIAS("/dev/streams/nsdev/*");
+MODULE_ALIAS("/dev/streams/clone/nsdev");
 #endif
 #endif
 

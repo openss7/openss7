@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/11/26 15:27:41 $
+ @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/18 07:32:45 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 15:27:41 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sc.c,v $
+ Revision 0.9.2.24  2006/12/18 07:32:45  brian
+ - lfs device names, autoload clone minors, device numbering, missing manpages
+
  Revision 0.9.2.23  2006/11/26 15:27:41  brian
  - testing and corrections to strlog capabilities
 
@@ -143,9 +146,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/11/26 15:27:41 $"
+#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/18 07:32:45 $"
 
-static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/11/26 15:27:41 $";
+static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/18 07:32:45 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -201,7 +204,11 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "SC";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/sad";
+#else
 static char devname[256] = "/dev/sad";
+#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

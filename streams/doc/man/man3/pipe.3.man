@@ -2,7 +2,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pipe.3.man,v 0.9.2.15 2006/10/05 12:16:53 brian Exp $
+.\" @(#) $Id: pipe.3.man,v 0.9.2.16 2006/12/18 07:32:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:16:53 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/18 07:32:37 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pipe.3.man,v $
+.\" Revision 0.9.2.16  2006/12/18 07:32:37  brian
+.\" - lfs device names, autoload clone minors, device numbering, missing manpages
+.\"
 .\" Revision 0.9.2.15  2006/10/05 12:16:53  brian
 .\" - updates for release
 .\"
@@ -113,7 +116,7 @@ sort-adjacent-labels
 .PP
 .B #include <unistd.h>
 .HP
-.BI int pipe( int " filedes "[2] );
+.BI "int pipe(int " filedes[2] );
 .\"
 .\"
 .SH ARGUMENTS

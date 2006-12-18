@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2006/10/05 12:16:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2006/12/18 07:32:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/05 12:16:49 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 07:32:36 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.81  2006/12/18 07:32:36  brian
+# - lfs device names, autoload clone minors, device numbering, missing manpages
+#
 # Revision 0.9.2.80  2006/10/05 12:16:49  brian
 # - updates for release
 #
@@ -1000,6 +1003,9 @@ man_MANS = \
 	man3/LiS.3 \
 	man3/pLiS.3 \
 	man3/pipe.3 \
+	man3/pstrlog.3 \
+	man3/strlog.3 \
+	man3/vstrlog.3 \
 	man4/sth.4 \
 	man5/specfs.5 \
 	man7/I_ANCHOR.7 \
@@ -1047,6 +1053,7 @@ man_MANS = \
 	man8/test-streams.8 \
 	man8/perftest.8 \
 	man8/perftestn.8 \
+	man8/testlog.8 \
 	man9/LfS.9 \
 	man9/OTHERQ.9 \
 	man9/RD.9 \
@@ -2116,6 +2123,9 @@ dist_noinst_MANS = \
 	man3/pLiS.3.man \
 	man3/pipe.3.man \
 	man3/s_pipe.3.man \
+	man3/pstrlog.3.man \
+	man3/strlog.3.man \
+	man3/vstrlog.3.man \
 	man4/sth.4.man \
 	man5/specfs.5.man \
 	man7/I_ANCHOR.7.man \
@@ -2167,6 +2177,7 @@ dist_noinst_MANS = \
 	man8/test-streams.8.man \
 	man8/perftest.8.man \
 	man8/perftestn.8.man \
+	man8/testlog.8.man \
 	man9/DDI.9.man \
 	man9/Intro.9.man \
 	man9/LfS.9.man \

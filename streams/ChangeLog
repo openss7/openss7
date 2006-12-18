@@ -1,3 +1,41 @@
+2006-12-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: adjust major base
+	* doc/man/Makefile.am: added missing manual pages
+	* doc/man/man3/libstreams.3.man: update manual page
+	* doc/man/man3/pipe.3.man: update manual page
+	* doc/man/man3/pstrlog.3.man: added missing manual page
+	* doc/man/man3/strlog.3.man: added missing manual page
+	* doc/man/man3/vstrlog.3.man: added missing manual page
+	* doc/man/man8/testlog.8.man: added missing manual page
+	* include/sys/streams/strsubr.h:
+	* lib/libc/strlog.c: formatting, error handling
+	* src/drivers/echo.c: added clone module alias
+	* src/drivers/log.c: added clone module alias
+	* src/drivers/loop.c: added clone module alias
+	* src/drivers/mux.c: added clone module alias
+	* src/drivers/nsdev.c: added clone module alias
+	* src/drivers/nuls.c: added clone module alias
+	* src/drivers/pipe.c: added clone module alias
+	* src/drivers/sad.c: added clone module alias
+	* src/drivers/sfx.c: added clone module alias
+	* src/drivers/spx.c: added clone module alias
+	* src/drivers/vf.c: added clone module alias
+	* src/kernel/strlookup.c: autoload clone minors
+	* src/test/perftest.c: open lfs device name
+	* src/test/test-clone.c: open lfs device name
+	* src/test/test-connld.c: open lfs device name
+	* src/test/test-echo.c: open lfs device name
+	* src/test/test-fifo.c: open lfs device name
+	* src/test/test-log.c: open lfs device name
+	* src/test/test-loop.c: open lfs device name
+	* src/test/test-mux.c: open lfs device name
+	* src/test/test-nuls.c: open lfs device name
+	* src/test/test-pipemod.c: open lfs device name
+	* src/test/test-sad.c: open lfs device name
+	* src/test/test-sc.c: open lfs device name
+	* src/test/test-streams.c: open lfs device name
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>

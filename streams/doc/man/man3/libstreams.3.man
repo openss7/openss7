@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: libstreams.3.man,v 0.9.2.6 2006/10/05 12:16:53 brian Exp $
+.\" @(#) $Id: libstreams.3.man,v 0.9.2.7 2006/12/18 07:32:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:16:53 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/18 07:32:37 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: libstreams.3.man,v $
+.\" Revision 0.9.2.7  2006/12/18 07:32:37  brian
+.\" - lfs device names, autoload clone minors, device numbering, missing manpages
+.\"
 .\" Revision 0.9.2.6  2006/10/05 12:16:53  brian
 .\" - updates for release
 .\"
@@ -197,6 +200,11 @@ T}
 .hy 0
 wait for some event on a \fISTREAMS\fP special file
 T}
+\fBpstrlog\fR(3):\-:T{
+.ad l
+.hy 0
+print a \fISTREAMS\fP log buffer
+T}
 \fBputmsg\fR(2):\-:T{
 .ad l
 .hy 0
@@ -216,6 +224,16 @@ T}
 read a vector
 .ad l
 .hy 0
+T}
+\fBstrlog\fR(3):\-:T{
+.ad l
+.hy 0
+write a \fISTREAMS\fP log message to the \fBlog\fR(4) driver
+T}
+\fBvstrlog\fR(3):\-:T{
+.ad l
+.hy 0
+write a \fISTREAMS\fP log message to the \fBlog\fR(4) driver
 T}
 \fBwrite\fR(2s):\-:T{
 .ad l
@@ -257,10 +275,13 @@ verions.
 .BR getpmsg (2s),
 .BR pipe (2s),
 .BR poll (2s),
+.BR pstrlog (3),
 .BR putmsg (2),
 .BR putpmsg (2s),
 .BR read (2s),
 .BR readv (2s),
+.BR strlog (3),
+.BR vstrlog (3),
 .BR write (2s),
 .BR writev (2s).
 .\"
@@ -277,7 +298,14 @@ and implementations based on
 .IR "SVR 4.2" ,
 with the following portability considerations:
 .IP \(em '\(em\(em'u
+.BR pstrlog (3),
+.BR strlog (3)
+and
+.BR vstrlog (3)
+are specific to
+.IR "@PACKAGE_TITLE@" .
 .IP \(em
+Most of the system calls are implemented instead as library calls.
 See
 .BR STREAMS (9)
 for more information.

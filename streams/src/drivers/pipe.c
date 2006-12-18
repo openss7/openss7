@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/10/27 23:19:34 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/18 07:32:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:34 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:32:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/10/27 23:19:34 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/18 07:32:40 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/10/27 23:19:34 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/18 07:32:40 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/10/27 23:19:34 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/18 07:32:40 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -138,6 +138,7 @@ MODULE_ALIAS("/dev/pipe");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
 MODULE_ALIAS("/dev/streams/pipe");
 MODULE_ALIAS("/dev/streams/pipe/*");
+MODULE_ALIAS("/dev/streams/clone/pipe");
 #endif
 #endif
 
