@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:48:47 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:27:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 10:48:47 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 08:27:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.2  2006/12/18 08:27:16  brian
+# - resolve device numbering
+#
 # Revision 0.9.2.1  2006/10/16 10:48:47  brian
 # - added new package files
 #
@@ -234,8 +237,8 @@ AC_DEFUN([_ISDN_CONFIG_KERNEL], [dnl
 AC_DEFUN([_ISDN_OUTPUT], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=242
-    strconf_cv_midbase=20
+    strconf_cv_majbase=204
+    strconf_cv_midbase=130
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl
