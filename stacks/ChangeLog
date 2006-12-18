@@ -1,3 +1,27 @@
+2006-12-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/cd/lis.conf: removed static configuration file
+	* src/modules/dl/lis.conf: removed static configuration file
+	* src/modules/m2pa/lis.conf: removed static configuration file
+	* src/modules/m2tp/lis.conf: removed static configuration file
+	* src/modules/m2ua/lis.conf: removed static configuration file
+	* src/modules/m3ua/lis.conf: removed static configuration file
+	* src/modules/ss7ip/lis.conf: removed static configuration file
+	* src/modules/ss7sctp/lis.conf: removed static configuration file
+	* src/modules/sua/lis.conf: removed static configuration file
+	* src/modules/tua/lis.conf: removed static configuration file
+
+	* src/modules/cd/lis.conf.in: added dynamic configuration file
+	* src/modules/dl/lis.conf.in: added dynamic configuration file
+	* src/modules/m2pa/lis.conf.in: added dynamic configuration file
+	* src/modules/m2tp/lis.conf.in: added dynamic configuration file
+	* src/modules/m2ua/lis.conf.in: added dynamic configuration file
+	* src/modules/m3ua/lis.conf.in: added dynamic configuration file
+	* src/modules/ss7ip/lis.conf.in: added dynamic configuration file
+	* src/modules/ss7sctp/lis.conf.in: added dynamic configuration file
+	* src/modules/sua/lis.conf.in: added dynamic configuration file
+	* src/modules/tua/lis.conf.in: added dynamic configuration file
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>

@@ -1,12 +1,13 @@
-## vim: ft=config comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## vim: ft=conf sw=4
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/06 11:45:16 $
+#@WITH_SIGTRAN_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/18 10:40:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#@WITH_SIGTRAN_TRUE@ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+#@WITH_SIGTRAN_TRUE@ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
@@ -46,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/06 11:45:16 $ by $Author: brian $
+## Last Modified $Date: 2006/12/18 10:40:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -57,22 +58,22 @@
 ## Pushable module specifications
 ## -----------------------------------------------------------
 ##	name	    prefix
-module	m2pa-sl	    m2pa_sl
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@module	sdt-tpi	    sdt_tpi
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@module	sl-tpi	    sl_tpi
 
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-objname	module	m2pa-sl	    m2pa-sl
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	module	sdt-tpi	    sdt-tpi
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	module	sl-tpi	    sl-tpi
 
-
-##
 ## Loadable specifications
 ## -----------------------------------------------------------
-##		name
-loadable	m2pa-sl
+##	    name
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable    sdt-tpi
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable    sl-tpi
 
-##   Node specifications
+## Node specifications
 ## -----------------------------------------------------------
 ##	name		    type    perm    major	minor
 
-## vim: ft=config comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

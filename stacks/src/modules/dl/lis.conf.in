@@ -2,19 +2,18 @@
 ## vim: ft=conf sw=4
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:30:59 $
+# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/18 10:40:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
-## Foundation; either version 2 of the License, or (at your option) any later
-## version.
+## Foundation; version 2 of the License.
 ##
 ## This program is distributed in the hope that it will be useful, but WITHOUT
 ## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,14 +47,25 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/05/14 08:30:59 $ by $Author: brian $
+## Last Modified $Date: 2006/12/18 10:40:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
 ## Driver specifications
 ## -----------------------------------------------------------
 ##	name	    prefix	major	n-minors    n-majors
-driver	m3ua	    m3ua	*
+driver	dl	    dl		*		    
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@driver	dl-dua	    dl_dua	*
+driver	dl-gr303    dl_gr303	*
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@driver	dl-gr303ua  dl_gr303ua	*
+driver	dl-gsma	    dl_gsma	*
+driver	dl-h225	    dl_h225	*
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@driver	dl-iua	    dl_iua	*
+driver	dl-lapb	    dl_lapb	*
+driver	dl-lapd	    dl_lapd	*
+driver	dl-lapf	    dl_lapf	*
+driver	dl-v52	    dl_v52	*
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@driver	dl-v5ua	    dl_v5ua	*
 
 ## Pushable module specifications
 ## -----------------------------------------------------------
@@ -64,17 +74,49 @@ driver	m3ua	    m3ua	*
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-objname	module	m3ua	    m3ua
+objname	driver	dl	    dl
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-dua	    dl-dua
+objname	driver	dl-gr303    dl-gr303
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-gr303ua  dl-gr303ua
+objname	driver	dl-gsma	    dl-gsma
+objname	driver	dl-h225	    dl-h225
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-iua	    dl-iua
+objname	driver	dl-lapb	    dl-lapb
+objname	driver	dl-lapd	    dl-lapd
+objname	driver	dl-lapf	    dl-lapf
+objname	driver	dl-v52	    dl-v52
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-v5ua     dl-v5ua
 
 
 ##
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##		name
-loadable	m3ua
+loadable	dl
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl-dua
+loadable	dl-gr303
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl-gr303ua
+loadable	dl-gsma
+loadable	dl-h225
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl-iua
+loadable	dl-lapb
+loadable	dl-lapd
+loadable	dl-lapf
+loadable	dl-v52
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl-v5ua
 
 ##   Node specifications
 ## -----------------------------------------------------------
 ##	name		    type    perm    major	minor
-node	/dev/m3ua		c   0666    m3ua	0
-
+node	/dev/dl			c   0666    dl		0
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@node	/dev/dl-dua		c   0666    dl		1
+node	/dev/dl-gr303		c   0666    dl		2
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@node	/dev/dl-gr303ua		c   0666    dl		3
+node	/dev/dl-gsma		c   0666    dl		4
+node	/dev/dl-h225		c   0666    dl		5
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@node	/dev/dl-iua		c   0666    dl		6
+node	/dev/dl-lapb		c   0666    dl		7
+node	/dev/dl-lapd		c   0666    dl		8
+node	/dev/dl-lapf		c   0666    dl		9
+node	/dev/dl-v52		c   0666    dl		10
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@node	/dev/dl-v5ua		c   0666    dl		11
