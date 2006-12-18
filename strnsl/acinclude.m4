@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/26 00:51:18 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:21:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 00:51:18 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 08:21:17 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.3  2006/12/18 08:21:17  brian
+# - resolve device numbering
+#
 # Revision 0.9.2.2  2006/09/26 00:51:18  brian
 # - corrected macro file name, reordered includes
 #
@@ -207,8 +210,8 @@ dnl _XNSL_STRCONF
 AC_DEFUN([_XNSL_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=242
-    strconf_cv_midbase=20
+    strconf_cv_majbase=220
+    strconf_cv_midbase=70
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl

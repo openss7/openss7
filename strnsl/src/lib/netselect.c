@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $
+ @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:30:57 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:21:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netselect.c,v $
+ Revision 0.9.2.2  2006/12/18 08:21:18  brian
+ - resolve device numbering
+
  Revision 0.9.2.1  2006/09/25 12:30:57  brian
  - added files for new strnsl package
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $"
+#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:18 $"
 
-static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $";
+static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:18 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -268,7 +271,7 @@ __nsl_loadnetconfiglist(void)
 
 	/* read file one line at a time */
 	for (linenum = 1; (line = fgets(buffer, sizeof(buffer), file)) != NULL; linenum++) {
-		char *str, *field, *tmp = NULL;
+		char *str, *field = NULL, *tmp = NULL;
 		int fieldnum;
 
 		/* allocate one if we don't already have one */
