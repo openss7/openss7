@@ -1,0 +1,427 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: strlog.3.man,v 0.9.2.1 2006/12/18 07:26:40 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/12/18 07:26:40 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strlog.3.man,v $
+.\" Revision 0.9.2.1  2006/12/18 07:26:40  brian
+.\" - added missing manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH STRLOG 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B strlog, vstrlog
+\- print a \fISTREAMS\fR log buffer
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stdio.h>
+.br
+.B #include <strlog.h>
+.HP
+.BI "int strlog(short " mid ", short " sid ", char " level ", unsigned short " flags ", char *" fmt ", " ... );
+.PD 0
+.HP
+.BI "int vstrlog(short " mid ", short " sid ", char " level ", unsigned short " flags ", char *" fmt ", va_list " args );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I mid
+specifies the
+.I STREAMS
+module id
+.PD 0
+.TP
+.I sid
+specifies the
+.I STREAMS
+minor device or instance number associated with the module.
+.TP
+.I level
+specifies the priority level.
+.TP
+.I flags
+log flags specifying the severity and options associated with the
+.I STREAMS
+log.
+.TP
+.I fmt
+provides the
+.BR printf (3)
+style format string.
+.TP
+.I ...
+provides the arguments for the
+.BR printf (3)
+style format string for
+.BR strlog ().
+.TP
+.I args
+provides the arguments for the
+.BR printf (3)
+style format string for
+.BR vstrlog ().
+.PD
+.PP
+.BR vstrlog ()
+is a
+.B va_list
+version of
+.BR strlog ().
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR strlog ()
+is the user interface to the
+.I STREAMS
+.BR log (4)
+error and trace logger.  When the
+.BR log (4)
+driver is loaded on the system, log messages will be passed to the
+.BR log (4)
+driver as described in
+.BR strlog (4).
+.PP
+.BR strlog ()
+formulates and passes a
+.I STREAMS
+message to the
+.I STREAMS
+logger,
+.BR log (4),
+to be passed to active
+.BR strerr (8)
+and
+.BR strace (8)
+logging processes listening on the
+.BR log (4)
+device.
+.PP
+.BR vstrlog ()
+is a
+.B va_list
+version of
+.BR strlog ()
+that accepts all the same arguments, with the exception of the variable
+arguments list, which is formulated as the
+.B va_list
+.I args
+argument.
+.PP
+.I mid
+identifies the
+.I STREAMS
+module id associated with the
+.I STREAMS
+driver or module generating the log.
+.I sid
+is the minor device node or module instance within the
+.I STREAMS
+driver or module to which the log applies.
+.I level
+indicates the priority level of the log message with respect to other log
+messages in the same class.
+.I flags
+can contain a bitwise OR of zero or more of the following flags:
+.TP \w'\fBSL_NOPUTBUF\fR\(em'u
+.B SL_FATAL
+log with
+.BR syslog (3)
+.I level
+of
+.BR LOG_CRIT.
+.PD 0
+.TP
+.B SL_ERROR
+log with
+.BR syslog (3)
+.I level
+of
+.BR LOG_ERR.
+.TP
+.B SL_WARN
+log with
+.BR syslog (3)
+.I level
+of
+.BR LOG_WARNING.
+.TP
+.B SL_NOTE
+log with
+.BR syslog (3)
+.I level
+of
+.BR LOG_NOTICE.
+.TP
+.B SL_CONSOLE
+log with
+.BR syslog (3)
+.I level
+of
+.BR LOG_INFO.
+.TP
+.B SL_TRACE
+log with
+.BR syslog (3)
+.I level
+of
+.BR LOG_DEBUG.
+.TP
+.B SL_NOTIFY
+indicates that a copy of the log should be mailed to the system administrator.
+.TP
+.B SL_NOPUTBUF
+indicates that the log should not be buffered.
+.PD
+.PP
+These arguments are placed into the corresponding fields of the
+.I STREAMS
+message to be passed to the error and trace loggers as described in
+.BR strlog (4).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR strlog ()
+is a user space version of the
+.BR strlog (9)
+kernel facility.
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+Upon success,
+.BR strlog ()
+and
+.BR vstrlog ()
+dispatch the log to the logger and return zero (0).  Upon failure,
+.BR strlog ()
+and
+.BR vstrlog ()
+return minus one (-1) and set
+.IR errno (3)
+to an appropriate error number.
+.BR strlog ()
+or
+.BR vstrlog ()
+fail whenever the
+.BR log (4)
+driver is not available, or allocation of necessary memory fails.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR strlog ()
+or
+.BR vstrlog ()
+fail, they return minus one (-1) and set
+.IR errno (3)
+to an appropriate error number as follows:
+.TP
+.RB [ ENOMEM ]
+sufficient memory to complete the request could not be allocated.
+.PP
+In general,
+.BR strlog ()
+and
+.BR vstrlog ()
+can return any error returned by
+.BR putpmsg (2).
+.\"
+.\"
+.SH NOTICES
+.PP
+By default,
+.BR strlog ()
+and
+.BR vstrlog ()
+always log with the
+.BR strlog (3)
+.I facility
+of
+.BR LOG_USER .
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR strlog ()
+and
+.BR vstrlog ()
+are implemented in user space using the same coding as
+.BR strlog (9)
+and
+.BR vstrlog (9),
+but sends the resulting message to the logger using
+.BR putpmsg (2)
+instead of directly passing a
+.I STREAMS
+.BR M_PROTO (9)
+message.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/streams/strlog ", " /dev/streams/log ", " /dev/strlog " or " /dev/log
+the
+.I STREAMS
+logging device.  See
+.BR strlog (4).
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR log (4),
+.BR strlog (1),
+.BR pstrlog (3),
+.BR strlog (4),
+.BR strlog (9),
+.BR vstrlog (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR strlog ()
+has no known bugs.
+.PP
+Validated behavior is provided by the
+.BR test-log (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR strlog ()
+is compatibile with
+.I "SVR 4.2"
+.[
+svr42
+.]
+and systems based on 
+.IR "SVR 4.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR strlog ()
+is specific to
+.BR "@PACKAGE_TITLE@" .
+Most implementations of the
+.BR log (4)
+driver do not provide a mechanism for printing a log buffer.
+.BR strlog ()
+is provided to remove the dependency on the specific format of the log buffer
+from a
+.BR log (4)
+driver application program.
+.IP \(em
+.BR strlog ()
+and
+.BR vstrlog ()
+only support
+.BR printf (3)
+style format specifiers:
+.IR %h ", " %l ", " %q ", " %L ", " %Z ", " %z ", " %t ", " %c ", " %p ", " %o ", " %X ", " %x ", " %d ", " %i ", " %u ", " %s .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strlog ()
+is new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

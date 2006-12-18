@@ -1,0 +1,258 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: pstrlog.3.man,v 0.9.2.1 2006/12/18 07:26:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/12/18 07:26:39 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: pstrlog.3.man,v $
+.\" Revision 0.9.2.1  2006/12/18 07:26:39  brian
+.\" - added missing manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH PSTRLOG 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B pstrlog
+\- print a \fISTREAMS\fR log buffer
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stdio.h>
+.br
+.B #include <strlog.h>
+.HP
+.BI "int pstrlog(FILE *" file ", struct strbuf *" ctrl ", struct strbuf *" data );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I file
+file stream to which to print the message.
+.PD 0
+.TP
+.I ctrl
+control part of the log buffer message.
+.TP
+.I data
+data part of the log buffer message.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR pstrlog ()
+prints the error, trace or console log buffer,
+with control part
+.I ctrl
+and data part
+.IR data ,
+obtained from the
+.BR log (4)
+driver directly with a call to
+.BR getmsg (2)
+to the file stream,
+.IR file .
+.\"
+.\"
+.SH USAGE
+.PP
+.BR pstrlog ()
+is intended for use by the
+.BR strerr (1)
+logging daemon, or application programs reading from the
+.BR log (4)
+driver in a manner similar to the
+.BR strerr (1)
+or
+.BR strace (1)
+loggers.
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+Upon success,
+.BR pstrlog ()
+returns the number of characters printed (not including the trailing '\0' used
+to end string output).
+Upon failure, minus one (-1) and an appropriate error number in
+.IR errno (3).
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR pstrlog ()
+fails, it returns minus one (-1) and an apporpriate error number in
+.IR errno (3)
+as follows:
+.TP
+.RB [ EINVAL ]
+the message contained in
+.I ctrl
+or
+.I data
+is invalid or of an improper format.
+.PP
+In general, any error returned by
+.BR fprintf (3)
+can be returned by
+.BR pstrlog ().
+.\"
+.\"
+.\".SH NOTICES
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\"
+.\"
+.\".SH EXAMPLES
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/streams/strlog ", " /dev/streams/log ", " /dev/strlog " or " /dev/log
+the
+.I STREAMS
+logging device.  See
+.BR strlog (4).
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR log (4),
+.BR strlog (1),
+.BR strlog (3),
+.BR strlog (4),
+.BR strlog (9),
+.BR vstrlog (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR pstrlog ()
+has no known bugs.
+.PP
+Validated behavior is provided by the
+.BR test-log (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR pstrlog ()
+is compatibile with
+.I "SVR 4.2"
+.[
+svr42
+.]
+and systems based on 
+.IR "SVR 4.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR pstrlog ()
+is specific to
+.BR "@PACKAGE_TITLE@" .
+Most implementations of the
+.BR log (4)
+driver do not provide a mechanism for printing a log buffer.
+.BR pstrlog ()
+is provided to remove the dependency on the specific format of the log buffer
+from a
+.BR log (4)
+driver application program.
+.\".IP \(em
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR pstrlog ()
+is new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI
