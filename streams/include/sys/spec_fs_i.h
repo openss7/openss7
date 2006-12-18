@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: spec_fs_i.h,v 0.9.2.6 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: spec_fs_i.h,v 0.9.2.7 2006/12/18 10:08:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:08:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SPEC_FS_I_H__
 #define __SYS_SPEC_FS_I_H__
 
-#ident "@(#) $RCSfile: spec_fs_i.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: spec_fs_i.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
  /* Note: this is identical layout to a socket (rearranged for validation).  The minor exception is 
     that the the sock pointer points to an stdata and the proto_ops pointer points to a stream_ops

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/10/27 23:19:38 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/12/18 10:09:00 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:38 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:09:00 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strsyms.c,v $
+ Revision 0.9.2.45  2006/12/18 10:09:00  brian
+ - updated headers for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/10/27 23:19:38 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/12/18 10:09:00 $"
 
-static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2006/10/27 23:19:38 $";
+static char const ident[] = "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/12/18 10:09:00 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB

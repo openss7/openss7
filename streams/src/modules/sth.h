@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/08/29 10:37:18 $
+ @(#) $Id: sth.h,v 0.9.2.12 2006/12/18 10:09:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,12 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:18 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:09:01 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sth.h,v $
+ Revision 0.9.2.12  2006/12/18 10:09:01  brian
+ - updated headers for release
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STH_H__
 #define __LOCAL_STH_H__
+
+#ident "@(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 extern struct smodule_info str_minfo;	/* for strsysctl.c */
 

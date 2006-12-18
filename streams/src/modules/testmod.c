@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/10/27 23:19:43 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/18 10:09:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:43 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:09:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.15  2006/12/18 10:09:02  brian
+ - updated headers for release
+
  Revision 0.9.2.14  2006/10/27 23:19:43  brian
  - changes for 2.6.18 kernel
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/10/27 23:19:43 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/18 10:09:02 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/10/27 23:19:43 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/18 10:09:02 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -127,7 +130,7 @@ static char const ident[] =
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/10/27 23:19:43 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/18 10:09:02 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -200,8 +203,8 @@ static struct module_info testmod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat testmod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat testmod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat testmod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat testmod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* 
  *  -------------------------------------------------------------------------
@@ -350,14 +353,15 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				err = EINVAL;
 				goto nak;
 			}
+#ifdef LFS
 #if defined __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32)
 				uaddr = (caddr_t) (unsigned long) (uint32_t)
 				    *(unsigned long *) mp->b_cont->b_rptr;
 			else
 #endif				/* defined __LP64__ */
-				uaddr = (caddr_t)
-				    *(unsigned long *) mp->b_cont->b_rptr;
+#endif				/* LFS */
+				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
 
@@ -378,14 +382,15 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				err = EINVAL;
 				goto nak;
 			}
+#ifdef LFS
 #if defined __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32)
 				uaddr = (caddr_t) (unsigned long) (uint32_t)
 				    *(unsigned long *) mp->b_cont->b_rptr;
 			else
 #endif				/* defined __LP64__ */
-				uaddr = (caddr_t)
-				    *(unsigned long *) mp->b_cont->b_rptr;
+#endif				/* LFS */
+				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
 
@@ -426,14 +431,15 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				err = EINVAL;
 				goto nak;
 			}
+#ifdef LFS
 #if defined __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32)
 				uaddr = (caddr_t) (unsigned long) (uint32_t)
 				    *(unsigned long *) mp->b_cont->b_rptr;
 			else
 #endif				/* defined __LP64__ */
-				uaddr = (caddr_t)
-				    *(unsigned long *) mp->b_cont->b_rptr;
+#endif				/* LFS */
+				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
 

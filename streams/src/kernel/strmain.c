@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/10/27 23:19:36 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/18 10:08:59 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:36 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:08:59 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strmain.c,v $
+ Revision 0.9.2.32  2006/12/18 10:08:59  brian
+ - updated headers for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/10/27 23:19:36 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/18 10:08:59 $"
 
-static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/10/27 23:19:36 $";
+static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/18 10:08:59 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -67,7 +71,7 @@ static char const ident[] =
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/10/27 23:19:36 $"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/18 10:08:59 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"

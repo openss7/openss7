@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 0.9.2.12 2005/12/19 12:44:53 brian Exp $
+ @(#) $Id: cmn_err.h,v 0.9.2.13 2006/12/18 10:08:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:08:55 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_CMN_ERR_H__
 #define __SYS_STREAMS_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 12:44:53 $"
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_CMN_ERR_H__
 #warning "Do no include sys/streams/cmn_err.h directly, include sys/cmn_err.h instead."

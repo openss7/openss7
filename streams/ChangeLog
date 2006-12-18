@@ -36,6 +36,62 @@
 	* src/test/test-sc.c: open lfs device name
 	* src/test/test-streams.c: open lfs device name
 
+	* include/log.h: updated headers for release
+	* include/loop.h: updated headers for release
+	* include/sad.h: updated headers for release
+	* include/stropts.h: updated headers for release
+	* include/sys/cmn_err.h: updated headers for release
+	* include/sys/ddi.h: updated headers for release
+	* include/sys/debug.h: updated headers for release
+	* include/sys/dki.h: updated headers for release
+	* include/sys/kmem.h: updated headers for release
+	* include/sys/log.h: updated headers for release
+	* include/sys/loop.h: updated headers for release
+	* include/sys/map.h: updated headers for release
+	* include/sys/sad.h: updated headers for release
+	* include/sys/sc.h: updated headers for release
+	* include/sys/spec_fs_i.h: updated headers for release
+	* include/sys/strconf.h: updated headers for release
+	* include/sys/strdebug.h: updated headers for release
+	* include/sys/stream.h: updated headers for release
+	* include/sys/stropts.h: updated headers for release
+	* include/sys/strsubr.h: updated headers for release
+	* include/sys/testmod.h: updated headers for release
+	* include/sys/streams/cmn_err.h: updated headers for release
+	* include/sys/streams/debug.h: updated headers for release
+	* include/sys/streams/dki.h: updated headers for release
+	* include/sys/streams/loop.h: updated headers for release
+	* include/sys/streams/testmod.h: updated headers for release
+	* lib/libc/fdetach.c: updated headers for release
+	* src/compat/lis/liscompat.h: updated headers for release
+	* src/drivers/clone.c: updated headers for release
+	* src/drivers/echo.c: updated headers for release
+	* src/drivers/fifo.h: updated headers for release
+	* src/drivers/log.h: updated headers for release
+	* src/drivers/loop.c: updated headers for release
+	* src/drivers/mux.c: updated headers for release
+	* src/drivers/pipe.h: updated headers for release
+	* src/drivers/vf.c: updated headers for release
+	* src/kernel/strargs.h: updated headers for release
+	* src/kernel/strattach.c: updated headers for release
+	* src/kernel/strattach.h: updated headers for release
+	* src/kernel/strmain.c: updated headers for release
+	* src/kernel/strpipe.c: updated headers for release
+	* src/kernel/strpipe.h: updated headers for release
+	* src/kernel/strprocfs.h: updated headers for release
+	* src/kernel/strreg.h: updated headers for release
+	* src/kernel/strsad.c: updated headers for release
+	* src/kernel/strsad.h: updated headers for release
+	* src/kernel/strsched.h: updated headers for release
+	* src/kernel/strspecfs.c: updated headers for release
+	* src/kernel/strspecfs.h: updated headers for release
+	* src/kernel/strsyms.c: updated headers for release
+	* src/kernel/strutil.h: updated headers for release
+	* src/modules/bufmod.c: updated headers for release
+	* src/modules/sth.h: updated headers for release
+	* src/modules/testmod.c: updated headers for release
+	* src/util/insf.c: updated headers for release
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>
