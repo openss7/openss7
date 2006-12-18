@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:05:17 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 09:50:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 09:05:17 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 09:50:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:05:17 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 09:50:46 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:05:17 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 09:50:46 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -73,8 +72,8 @@ static char const ident[] =
 #endif
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:05:17 $"
+#define ECHO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 09:50:46 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -176,11 +175,11 @@ static struct module_info echo_minfo = {
 };
 
 #ifdef LIS
-#define trace() while (0) { }
-#define ptrace(__x) while (0) { }
-#define printd(__x) while (0) { }
+#define _trace() while (0) { }
+#define _ptrace(__x) while (0) { }
+#define _printd(__x) while (0) { }
 #define pswerr(__x) while (0) { }
-#define ctrace(__x) __x
+#define _ctrace(__x) __x
 
 #define QSVCBUSY QRUNNING
 
@@ -214,12 +213,12 @@ echo_wput(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	trace();
+	_trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
-		trace();
+		_trace();
 		if (mp->b_rptr[0] & FLUSHW) {
-			trace();
+			_trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, mp->b_rptr[1], FLUSHALL);
 			else
@@ -227,24 +226,24 @@ echo_wput(queue_t *q, mblk_t *mp)
 			mp->b_rptr[0] &= ~FLUSHW;
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
-			trace();
+			_trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
 			else
 				flushq(RD(q), FLUSHALL);
-			ctrace(qreply(q, mp));
+			_ctrace(qreply(q, mp));
 			/* never makes it here */
-			trace();
+			_trace();
 			return (0);
 		}
-		trace();
+		_trace();
 		break;
 	case M_IOCTL:
 	case M_IOCDATA:
 	{
 		union ioctypes *ioc;
 
-		ptrace(("received M_IOCTL or M_IOCDATA, naking it\n"));
+		_ptrace(("received M_IOCTL or M_IOCDATA, naking it\n"));
 		err = -EINVAL;
 
 		mp->b_datap->db_type = M_IOCNAK;
@@ -321,33 +320,33 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 
-	ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
+	_ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
 		sflag));
 	if (q->q_ptr != NULL) {
-		printd(("%s: stream is already open\n", __FUNCTION__));
+		_printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		printd(("%s: cannot open as module\n", __FUNCTION__));
+		_printd(("%s: cannot open as module\n", __FUNCTION__));
 		return (ENXIO);	/* can't open as module */
 	}
 	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP))) {	/* we could sleep */
-		printd(("%s: could not allocate private structure\n", __FUNCTION__));
+		_printd(("%s: could not allocate private structure\n", __FUNCTION__));
 		return (ENOMEM);	/* no memory */
 	}
 	bzero(p, sizeof(*p));
 	switch (sflag) {
 	case CLONEOPEN:
-		printd(("%s: clone open\n", __FUNCTION__));
+		_printd(("%s: clone open\n", __FUNCTION__));
 		if (cminor < 1)
 			cminor = 1;
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
 
-		printd(("%s: driver open\n", __FUNCTION__));
+		_printd(("%s: driver open\n", __FUNCTION__));
 		if (cminor < 1) {
-			printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
+			_printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
 		}
 		spin_lock(&echo_lock);
@@ -372,7 +371,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&echo_lock);
 			kmem_free(p, sizeof(*p));
-			printd(("%s: no minor devices left\n", __FUNCTION__));
+			_printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
@@ -383,7 +382,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&echo_lock);
 		qprocson(q);
-		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
+		_printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
 	}
@@ -396,7 +395,7 @@ echo_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct echo *p;
 
-	trace();
+	_trace();
 	if ((p = q->q_ptr) == NULL) {
 		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
@@ -409,7 +408,7 @@ echo_close(queue_t *q, int oflag, cred_t *crp)
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
 	spin_unlock(&echo_lock);
-	printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
+	_printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 

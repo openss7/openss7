@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.1 2005/07/13 01:37:14 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.2 2006/12/18 09:50:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -10,8 +10,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 01:37:14 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 09:50:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.2  2006/12/18 09:50:57  brian
+ - updated headers for release
+
  Revision 0.9.2.1  2005/07/13 01:37:14  brian
  - added __LIS_INTERNAL__ to hide internal symbol in header files
 
@@ -58,7 +60,7 @@
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 /* nothing here that is not in stream.h */
 

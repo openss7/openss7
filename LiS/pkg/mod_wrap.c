@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:38:58 $
+ @(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 09:51:09 $
 
  -----------------------------------------------------------------------------
 
@@ -11,8 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:38:58 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 09:51:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mod_wrap.c,v $
+ Revision 0.9.2.3  2006/12/18 09:51:09  brian
+ - updated headers for release
+
  Revision 0.9.2.2  2006/10/27 22:38:58  brian
  - changes for 2.6.18 build
 
@@ -59,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:38:58 $"
+#ident "@(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 09:51:09 $"
 
-static char const ident[] = "$RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/27 22:38:58 $";
+static char const ident[] = "$RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 09:51:09 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

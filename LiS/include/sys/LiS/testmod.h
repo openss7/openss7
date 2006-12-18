@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: testmod.h,v 0.9.2.3 2006/09/24 21:56:41 brian Exp $
+ @(#) $Id: testmod.h,v 0.9.2.4 2006/12/18 09:50:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -10,8 +10,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:56:41 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 09:50:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.h,v $
+ Revision 0.9.2.4  2006/12/18 09:50:57  brian
+ - updated headers for release
+
  Revision 0.9.2.3  2006/09/24 21:56:41  brian
  - documentation and library updates
 
@@ -79,7 +81,7 @@
 #ifndef __SYS_STREAMS_TESTMOD_H__
 #define __SYS_STREAMS_TESTMOD_H__
 
-#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

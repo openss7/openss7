@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 09:05:17 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 09:50:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 09:05:17 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 09:50:46 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: mux.c,v $
+ Revision 0.9.2.10  2006/12/18 09:50:46  brian
+ - updated headers for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 09:05:17 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 09:50:46 $"
 
-static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 09:05:17 $";
+static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 09:50:46 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -83,7 +87,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 09:05:17 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 09:50:46 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -184,12 +188,17 @@ STATIC struct module_info mux_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat mux_urstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat mux_uwstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat mux_lrstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat mux_lwstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 #ifdef LIS
-#define trace() while (0) { }
-#define ptrace(__x) while (0) { }
-#define printd(__x) while (0) { }
+#define _trace() while (0) { }
+#define _ptrace(__x) while (0) { }
+#define _printd(__x) while (0) { }
 #define pswerr(__x) while (0) { }
-#define ctrace(__x) __x
+#define _ctrace(__x) __x
 
 #define QSVCBUSY QRUNNING
 
@@ -224,6 +233,41 @@ STATIC rwlock_t mux_lock = RW_LOCK_UNLOCKED;
 STATIC struct mux *mux_opens = NULL;
 STATIC struct mux *mux_links = NULL;
 
+/*
+ *  Locking
+ */
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+
+#define spin_lock_str(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+#define write_lock_str(__lkp, __flags) \
+	do { (void)__flags; write_lock_bh(__lkp); } while (0)
+#define write_unlock_str(__lkp, __flags) \
+	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
+#define read_lock_str(__lkp, __flags) \
+	do { (void)__flags; read_lock_bh(__lkp); } while (0)
+#define read_unlock_str(__lkp, __flags) \
+	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
+
+#else
+
+#define spin_lock_str(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+#define write_lock_str(__lkp, __flags) \
+	write_lock_irqsave(__lkp, __flags)
+#define write_unlock_str(__lkp, __flags) \
+	write_unlock_irqrestore(__lkp, __flags)
+#define read_lock_str(__lkp, __flags) \
+	read_lock_irqsave(__lkp, __flags)
+#define read_unlock_str(__lkp, __flags) \
+	read_unlock_irqrestore(__lkp, __flags)
+
+#endif
+
 #define MUX_UP 1
 #define MUX_DOWN 2
 
@@ -235,33 +279,34 @@ STATIC streamscall int
 mux_uwput(queue_t *q, mblk_t *mp)
 {
 	struct mux *mux = q->q_ptr, *bot;
+	unsigned long flags;
 	int err;
 
-	trace();
+	_trace();
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
-		trace();
+		_trace();
 		switch (ioc->iocblk.ioc_cmd) {
 		case I_LINK:
 		case I_PLINK:
 		{
 			struct linkblk *l;
 
-			trace();
+			_trace();
 			if (!mp->b_cont) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto einval;
 			}
 			if (!(bot = kmem_alloc(sizeof(*bot), KM_NOSLEEP))) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto enomem;
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
-			write_lock_bh(&mux_lock);
+			write_lock_str(&mux_lock, flags);
 			bot->next = mux_links;
 			bot->prev = &mux_links;
 			mux_links = bot;
@@ -271,7 +316,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			bot->other = NULL;
 			noenable(bot->rq);
 			l->l_qtop->q_ptr = RD(l->l_qtop)->q_ptr = bot;
-			write_unlock_bh(&mux_lock);
+			write_unlock_str(&mux_lock, flags);
 
 			goto ack;
 		}
@@ -280,14 +325,14 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			struct linkblk *l;
 
-			trace();
+			_trace();
 			if (!mp->b_cont) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				goto einval;
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
-			write_lock_bh(&mux_lock);
+			write_lock_str(&mux_lock, flags);
 			for (bot = mux_links; bot; bot = bot->next)
 				if (bot->dev == l->l_index)
 					break;
@@ -317,7 +362,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 					}
 				}
 			}
-			write_unlock_bh(&mux_lock);
+			write_unlock_str(&mux_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -326,13 +371,13 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			int l_index;
 
-			trace();
+			_trace();
 			if (ioc->iocblk.ioc_count != sizeof(int))
 				goto einval;
 			if (!mp->b_cont)
 				goto einval;
 			l_index = *(int *) mp->b_cont->b_rptr;
-			write_lock_bh(&mux_lock);
+			write_lock_str(&mux_lock, flags);
 			for (bot = mux_links; bot; bot = bot->next)
 				if (bot->dev == l_index)
 					break;
@@ -344,7 +389,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				} else
 					bot = NULL;
 			}
-			write_unlock_bh(&mux_lock);
+			write_unlock_str(&mux_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
@@ -353,13 +398,13 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			int l_index;
 
-			trace();
+			_trace();
 			if (ioc->iocblk.ioc_count != sizeof(int))
 				goto einval;
 			if (!mp->b_cont)
 				goto einval;
 			l_index = *(int *) mp->b_cont->b_rptr;
-			write_lock_bh(&mux_lock);
+			write_lock_str(&mux_lock, flags);
 			for (bot = mux_links; bot; bot = bot->next)
 				if (bot->dev == l_index)
 					break;
@@ -371,13 +416,13 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				} else
 					bot = NULL;
 			}
-			write_unlock_bh(&mux_lock);
+			write_unlock_str(&mux_lock, flags);
 			if (!bot)
 				goto einval;
 			goto ack;
 		}
 		default:
-			ptrace(("Error path taken!\n"));
+			_ptrace(("Error path taken!\n"));
 			if (mux->other)
 				goto passmsg;
 		      einval:
@@ -412,17 +457,17 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHALL);
 		}
 
-		read_lock_bh(&mux_lock);
+		read_lock_str(&mux_lock, flags);
 		if (mux->other) {
 			queue_t *wq;
 
 			if ((wq = mux->other->wq)) {
 				putnext(wq, mp);
-				read_unlock_bh(&mux_lock);
+				read_unlock_str(&mux_lock, flags);
 				return (0);
 			}
 		}
-		read_unlock_bh(&mux_lock);
+		read_unlock_str(&mux_lock, flags);
 
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
@@ -441,10 +486,10 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	{
 		queue_t *wq = NULL;
 
-		read_lock_bh(&mux_lock);
+		read_lock_str(&mux_lock, flags);
 		if (mux->other)
 			wq = mux->other->wq;
-		read_unlock_bh(&mux_lock);
+		read_unlock_str(&mux_lock, flags);
 
 		/* if not linked behave like echo driver */
 		if (!wq)
@@ -467,6 +512,7 @@ STATIC streamscall int
 mux_lrput(queue_t *q, mblk_t *mp)
 {
 	struct mux *mux = q->q_ptr;
+	unsigned long flags;
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -478,17 +524,17 @@ mux_lrput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHALL);
 		}
 
-		read_lock_bh(&mux_lock);
+		read_lock_str(&mux_lock, flags);
 		if (mux->other) {
 			queue_t *rq;
 
 			if ((rq = mux->other->rq)) {
 				putnext(rq, mp);
-				read_unlock_bh(&mux_lock);
+				read_unlock_str(&mux_lock, flags);
 				return (0);
 			}
 		}
-		read_unlock_bh(&mux_lock);
+		read_unlock_str(&mux_lock, flags);
 
 		if (!(mp->b_flag & MSGNOLOOP)) {
 			if (mp->b_rptr[0] & FLUSHW) {
@@ -510,7 +556,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
 		/* check the QSVCBUSY flag in MP drivers to avoid missequencing of messages when
 		   service procedure is running concurrent with put procedure */
 		if (!q->q_first && !(q->q_flag & QSVCBUSY)) {
-			read_lock_bh(&mux_lock);
+			read_lock_str(&mux_lock, flags);
 			if (mux->other) {
 				queue_t *rq;
 
@@ -518,11 +564,11 @@ mux_lrput(queue_t *q, mblk_t *mp)
 				    && (mp->b_datap->db_type >= QPCTL
 					|| bcanputnext(rq, mp->b_band))) {
 					putnext(rq, mp);
-					read_unlock_bh(&mux_lock);
+					read_unlock_str(&mux_lock, flags);
 					return (0);
 				}
 			}
-			read_unlock_bh(&mux_lock);
+			read_unlock_str(&mux_lock, flags);
 		}
 		putq(q, mp);
 		break;
@@ -544,14 +590,15 @@ STATIC streamscall int
 mux_lwsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
+	unsigned long flags;
 	struct mux *top;
 
 	/* Find the upper queues feeding this one and enable them. */
-	read_lock_bh(&mux_lock);
+	read_lock_str(&mux_lock, flags);
 	for (top = mux_opens; top; top = top->next)
 		if (top->other == mux)
 			qenable(top->wq);
-	read_unlock_bh(&mux_lock);
+	read_unlock_str(&mux_lock, flags);
 	return (0);
 }
 
@@ -571,13 +618,14 @@ STATIC streamscall int
 mux_uwsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
+	unsigned long flags;
 	queue_t *wq = NULL;
 	mblk_t *mp;
 
-	read_lock_bh(&mux_lock);
+	read_lock_str(&mux_lock, flags);
 	if (mux->other)
 		wq = mux->other->wq;
-	read_unlock_bh(&mux_lock);
+	read_unlock_str(&mux_lock, flags);
 
 	if (!wq)
 		wq = RD(q);
@@ -606,17 +654,18 @@ STATIC streamscall int
 mux_ursrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
+	unsigned long flags;
 	struct mux *bot;
 	bool found = false;
 
 	/* Find the lower queues feeding this one and enable them. */
-	read_lock_bh(&mux_lock);
+	read_lock_str(&mux_lock, flags);
 	for (bot = mux_links; bot; bot = bot->next)
 		if (bot->other == mux) {
 			qenable(bot->rq);
 			found = true;
 		}
-	read_unlock_bh(&mux_lock);
+	read_unlock_str(&mux_lock, flags);
 
 	/* echo behaviour otherwise */
 	if (!found)
@@ -639,10 +688,11 @@ STATIC streamscall int
 mux_lrsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
+	unsigned long flags;
 	queue_t *rq = NULL;
 	mblk_t *mp;
 
-	read_lock_bh(&mux_lock);
+	read_lock_str(&mux_lock, flags);
 	if (mux->other)
 		rq = mux->other->rq;
 	if (rq) {
@@ -656,7 +706,7 @@ mux_lrsrv(queue_t *q)
 		}
 	} else
 		noenable(q);
-	read_unlock_bh(&mux_lock);
+	read_unlock_str(&mux_lock, flags);
 	return (0);
 }
 
@@ -666,6 +716,7 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct mux *mux, **muxp = &mux_opens;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
+	unsigned long flags;
 
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
@@ -685,7 +736,7 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		if (cminor < 1)
 			return (ENXIO);
-		write_lock_bh(&mux_lock);
+		write_lock_str(&mux_lock, flags);
 		for (; *muxp && (dmajor = getmajor((*muxp)->dev)) < cmajor; muxp = &(*muxp)->next) ;
 		for (; *muxp && dmajor == getmajor((*muxp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; muxp = &(*muxp)->next) {
@@ -696,14 +747,14 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					write_unlock_bh(&mux_lock);
+					write_unlock_str(&mux_lock, flags);
 					kmem_free(mux, sizeof(*mux));
 					return (EIO);	/* bad error */
 				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
-			write_unlock_bh(&mux_lock);
+			write_unlock_str(&mux_lock, flags);
 			kmem_free(mux, sizeof(*mux));
 			return (EBUSY);	/* no minors left */
 		}
@@ -716,7 +767,7 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		mux->wq = WR(q);
 		noenable(mux->wq);
 		mux->rq->q_ptr = mux->wq->q_ptr = mux;
-		write_unlock_bh(&mux_lock);
+		write_unlock_str(&mux_lock, flags);
 		qprocson(q);
 		return (0);
 	}
@@ -728,17 +779,18 @@ STATIC streamscall int
 mux_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct mux *p;
+	unsigned long flags;
 
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	qprocsoff(q);
-	write_lock_bh(&mux_lock);
+	write_lock_str(&mux_lock, flags);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-	write_unlock_bh(&mux_lock);
+	write_unlock_str(&mux_lock, flags);
 	return (0);
 }
 
@@ -747,23 +799,27 @@ STATIC struct qinit mux_urqinit = {
 	.qi_qopen = mux_open,
 	.qi_qclose = mux_close,
 	.qi_minfo = &mux_minfo,
+	.qi_mstat = &mux_urstat,
 };
 
 STATIC struct qinit mux_uwqinit = {
 	.qi_putp = mux_uwput,
 	.qi_srvp = mux_uwsrv,
 	.qi_minfo = &mux_minfo,
+	.qi_mstat = &mux_uwstat,
 };
 
 STATIC struct qinit mux_lrqinit = {
 	.qi_putp = mux_lrput,
 	.qi_srvp = mux_lrsrv,
 	.qi_minfo = &mux_minfo,
+	.qi_mstat = &mux_lrstat,
 };
 
 STATIC struct qinit mux_lwqinit = {
 	.qi_srvp = mux_lwsrv,
 	.qi_minfo = &mux_minfo,
+	.qi_mstat = &mux_lwstat,
 };
 
 STATIC struct streamtab mux_info = {

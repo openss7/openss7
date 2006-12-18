@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:38:54 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:50:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:38:54 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 09:50:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.7  2006/12/18 09:50:46  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2006/10/27 22:38:54  brian
  - changes for 2.6.18 build
 
@@ -89,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:38:54 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:50:46 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:38:54 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:50:46 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -120,8 +122,8 @@ static char const ident[] =
 #endif
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/27 22:38:54 $"
+#define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 09:50:46 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -194,6 +196,9 @@ static struct module_info testmod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
+static struct module_stat testmod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat testmod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -221,8 +226,8 @@ union ioctypes {
 	struct copyresp copyresp;
 };
 
-#define printd(__x) while (0) { }
-#define ptrace(__x) while (0) { }
+#define _printd(__x) while (0) { }
+#define _ptrace(__x) while (0) { }
 
 int
 ctlmsg(unsigned char type)
@@ -274,8 +279,8 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		{
 			int rwerr;
 
-			rwerr = *(long *) mp->b_cont->b_rptr;
-			printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
+			rwerr = *(unsigned long *) mp->b_cont->b_rptr;
+			_printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with a read error (equal to the arg) */
 			if (putnextctl2(OTHERQ(q), M_ERROR, rwerr, NOERROR))
 				goto ack;
@@ -286,8 +291,8 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		{
 			int rwerr;
 
-			rwerr = *(long *) mp->b_cont->b_rptr;
-			printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
+			rwerr = *(unsigned long *) mp->b_cont->b_rptr;
+			_printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with a write error (equal to the arg) */
 			if (putnextctl2(OTHERQ(q), M_ERROR, NOERROR, rwerr))
 				goto ack;
@@ -298,8 +303,8 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		{
 			int rwerr;
 
-			rwerr = *(long *) mp->b_cont->b_rptr;
-			printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
+			rwerr = *(unsigned long *) mp->b_cont->b_rptr;
+			_printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with an error (equal to the arg) */
 			if (putnextctl1(OTHERQ(q), M_ERROR, rwerr))
 				goto ack;
@@ -310,8 +315,8 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		{
 			int signum;
 
-			signum = *(long *) mp->b_cont->b_rptr;
-			printd(("%s: signal number is %d\n", __FUNCTION__, signum));
+			signum = *(unsigned long *) mp->b_cont->b_rptr;
+			_printd(("%s: signal number is %d\n", __FUNCTION__, signum));
 			/* Synthesize an M_SIG message with a signal (equal to the arg) */
 			if (putnextctl1(OTHERQ(q), M_PCSIG, signum))
 				goto ack;
@@ -322,8 +327,8 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		{
 			int signum;
 
-			signum = *(long *) mp->b_cont->b_rptr;
-			printd(("%s: signal number is %d\n", __FUNCTION__, signum));
+			signum = *(unsigned long *) mp->b_cont->b_rptr;
+			_printd(("%s: signal number is %d\n", __FUNCTION__, signum));
 			/* Synthesize an M_SIG message with a signal (equal to the arg) */
 			if (putnextctl1(OTHERQ(q), M_SIG, signum))
 				goto ack;
@@ -337,11 +342,19 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
 			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_datap->db_base <
 			    FASTBUF) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
-			uaddr = *(caddr_t *) mp->b_cont->b_rptr;
+#ifdef LFS
+#if defined __LP64__
+			if (ioc->iocblk.ioc_flag == IOC_ILP32)
+				uaddr = (caddr_t) (unsigned long) (uint32_t)
+				    *(unsigned long *) mp->b_cont->b_rptr;
+			else
+#endif				/* defined __LP64__ */
+#endif				/* LFS */
+				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
 
@@ -358,11 +371,19 @@ testmod_wput(queue_t *q, mblk_t *mp)
 
 			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
 			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_rptr < FASTBUF) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
-			uaddr = *(caddr_t *) mp->b_cont->b_rptr;
+#ifdef LFS
+#if defined __LP64__
+			if (ioc->iocblk.ioc_flag == IOC_ILP32)
+				uaddr = (caddr_t) (unsigned long) (uint32_t)
+				    *(unsigned long *) mp->b_cont->b_rptr;
+			else
+#endif				/* defined __LP64__ */
+#endif				/* LFS */
+				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
 
@@ -376,13 +397,13 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		case TM_IOC_IOCTL:
 		{
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
 			if (mp->b_cont == NULL
 			    || mp->b_cont->b_wptr - mp->b_cont->b_rptr != ioc->iocblk.ioc_count) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -399,11 +420,19 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
 			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_datap->db_base <
 			    FASTBUF) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
-			uaddr = *(caddr_t *) mp->b_cont->b_rptr;
+#ifdef LFS
+#if defined __LP64__
+			if (ioc->iocblk.ioc_flag == IOC_ILP32)
+				uaddr = (caddr_t) (unsigned long) (uint32_t)
+				    *(unsigned long *) mp->b_cont->b_rptr;
+			else
+#endif				/* defined __LP64__ */
+#endif				/* LFS */
+				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
 
@@ -439,7 +468,7 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				/* abort operations */
 				goto free_it;
 			if (!mp->b_cont || mp->b_cont->b_wptr - mp->b_cont->b_rptr != FASTBUF) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -447,7 +476,7 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				if ((unsigned char) mp->b_cont->b_rptr[i] != (unsigned char) 0xa5)
 					break;
 			if (i == FASTBUF) {
-				ptrace(("Error path taken!\n"));
+				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -472,7 +501,7 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			if (ioc->copyresp.cp_private != NULL) {
 				if (!mp->b_cont
 				    || mp->b_cont->b_wptr - mp->b_cont->b_rptr != FASTBUF) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					err = EINVAL;
 					goto nak;
 				}
@@ -481,7 +510,7 @@ testmod_wput(queue_t *q, mblk_t *mp)
 					    (unsigned char) 0xa5)
 						break;
 				if (i == FASTBUF) {
-					ptrace(("Error path taken!\n"));
+					_ptrace(("Error path taken!\n"));
 					err = EINVAL;
 					goto nak;
 				}
@@ -574,11 +603,13 @@ static struct qinit testmod_rinit = {
 	.qi_qopen = testmod_open,
 	.qi_qclose = testmod_close,
 	.qi_minfo = &testmod_minfo,
+	.qi_mstat = &testmod_rstat,
 };
 
 static struct qinit testmod_winit = {
 	.qi_putp = testmod_wput,
 	.qi_minfo = &testmod_minfo,
+	.qi_mstat = &testmod_wstat,
 };
 
 static struct streamtab testmod_info = {
@@ -595,6 +626,50 @@ static struct fmodsw testmod_fmod = {
 };
 #endif
 
+#ifdef LFS
+struct tm_ioctl {
+	unsigned int cmd;
+	void *opaque;
+};
+
+static struct tm_ioctl tm_map[] = {
+	{.cmd = TM_IOC_HANGUP,}
+	, {.cmd = TM_IOC_RDERR,}
+	, {.cmd = TM_IOC_WRERR,}
+	, {.cmd = TM_IOC_RWERR,}
+	, {.cmd = TM_IOC_PSIGNAL,}
+	, {.cmd = TM_IOC_NSIGNAL,}
+	, {.cmd = TM_IOC_IOCTL,}
+	, {.cmd = TM_IOC_COPYIN,}
+	, {.cmd = TM_IOC_COPYOUT,}
+	, {.cmd = TM_IOC_COPYIO,}
+	, {.cmd = 0,}
+};
+
+static void
+tm_unregister_ioctl32(void)
+{
+	struct tm_ioctl *i;
+
+	for (i = tm_map; i->cmd != 0; i++)
+		if (i->opaque != NULL)
+			unregister_ioctl32(i->opaque);
+}
+static int
+tm_register_ioctl32(void)
+{
+	struct tm_ioctl *i;
+
+	for (i = tm_map; i->cmd != 0; i++) {
+		if ((i->opaque = register_ioctl32(i->cmd)) == NULL) {
+			tm_unregister_ioctl32();
+			return (-ENOMEM);
+		}
+	}
+	return (0);
+}
+#endif				/* LFS */
+
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
 static
 #endif
@@ -610,8 +685,12 @@ testmod_init(void)
 #endif
 	testmod_minfo.mi_idnum = modid;
 #ifdef LFS
-	if ((err = register_strmod(&testmod_fmod)) < 0)
+	if ((err = tm_register_ioctl32()) < 0)
 		return (err);
+	if ((err = register_strmod(&testmod_fmod)) < 0) {
+		tm_unregister_ioctl32();
+		return (err);
+	}
 #endif
 #ifdef LIS
 	if ((err = lis_register_strmod(&testmod_info, CONFIG_STREAMS_TESTMOD_NAME)) < 0)
@@ -628,17 +707,13 @@ static
 void __exit
 testmod_exit(void)
 {
-	int err;
-
 #ifdef LFS
-	if ((err = unregister_strmod(&testmod_fmod)) < 0)
-		return (void) (err);
+	unregister_strmod(&testmod_fmod);
+	tm_unregister_ioctl32();
 #endif
 #ifdef LIS
-	if ((err = lis_unregister_strmod(&testmod_info)) < 0)
-		return (void) (err);
+	lis_unregister_strmod(&testmod_info);
 #endif
-	return (void) (0);
 };
 
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
