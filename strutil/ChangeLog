@@ -20,6 +20,18 @@
 	* src/test/test-sc.c: clone directory device names
 	* src/test/test-streams.c: clone directory device names
 
+	* src/drivers/clone.c: updated headers for release
+	* src/drivers/fifo.h: updated headers for release
+	* src/drivers/log.h: updated headers for release
+	* src/drivers/pipe.h: updated headers for release
+	* src/include/sys/log.h: updated headers for release
+	* src/include/sys/sad.h: updated headers for release
+	* src/include/sys/sc.h: updated headers for release
+	* src/include/sys/strlog.h: updated headers for release
+	* src/lib/gen.c: updated headers for release
+	* src/util/insf.c: updated headers for release
+	* src/util/strlogd.c: updated headers for release
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>

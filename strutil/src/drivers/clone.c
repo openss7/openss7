@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/02 11:32:17 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/12/18 10:56:32 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:17 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:56:32 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: clone.c,v $
+ Revision 0.9.2.42  2006/12/18 10:56:32  brian
+ - updated headers for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/02 11:32:17 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/12/18 10:56:32 $"
 
-static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/02 11:32:17 $";
+static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/12/18 10:56:32 $";
 
 #define _LFS_SOURCE
 
@@ -73,7 +77,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/10/02 11:32:17 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/12/18 10:56:32 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/19 11:15:08 $
+ @(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:56:34 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/19 11:15:08 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:56:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: gen.c,v $
+ Revision 0.9.2.2  2006/12/18 10:56:34  brian
+ - updated headers for release
+
  Revision 0.9.2.1  2005/07/19 11:15:08  brian
  - added syslogd and friends
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/19 11:15:08 $"
+#ident "@(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:56:34 $"
 
-static char const ident[] = "$RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/19 11:15:08 $";
+static char const ident[] = "$RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:56:34 $";
 
 /*
  *  Linux Fast-STREAMS libc replacement functions for logging

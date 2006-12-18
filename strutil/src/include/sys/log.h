@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: log.h,v 0.9.2.8 2005/07/18 12:38:48 brian Exp $
+ @(#) $Id: log.h,v 0.9.2.9 2006/12/18 10:56:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:56:33 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: log.h,v $
+ Revision 0.9.2.9  2006/12/18 10:56:33  brian
+ - updated headers for release
 
  *****************************************************************************/
 
 #ifndef __SYS_LOG_H__
 #define __SYS_LOG_H__
 
-#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:38:48 $"
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
