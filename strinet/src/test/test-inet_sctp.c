@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/29 07:43:28 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/18 07:53:38 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/29 07:43:28 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:53:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.26  2006/12/18 07:53:38  brian
+ - resolve device numbering
+
  Revision 0.9.2.25  2006/07/29 07:43:28  brian
  - CVS checkin of changes before leaving for SCTP interop
 
@@ -202,9 +205,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/29 07:43:28 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/18 07:53:38 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/07/29 07:43:28 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/18 07:53:38 $";
 
 /*
  *  Simple test program for INET streams.
@@ -284,7 +287,11 @@ static const char *lpkgname = "OpenSS7 INET Driver - SCTP";
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/SCTP";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/sctp";
+#else
 static char devname[256] = "/dev/sctp";
+#endif
 
 static const int test_level = T_INET_SCTP;
 

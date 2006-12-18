@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/09/26 00:51:03 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/12/18 07:53:57 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:51:03 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:53:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.48  2006/12/18 07:53:57  brian
+ - resolve device numbering
+
  Revision 0.9.2.47  2006/09/26 00:51:03  brian
  - rationalized to stacks package
 
@@ -253,9 +256,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/09/26 00:51:03 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/12/18 07:53:57 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/09/26 00:51:03 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/12/18 07:53:57 $";
 
 /*
  *  Simple test program for INET streams.
@@ -335,7 +338,11 @@ static const char *lpkgname = "OpenSS7 INET Driver - UDP";
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/UDP";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/udp";
+#else
 static char devname[256] = "/dev/udp";
+#endif
 
 static const int test_level = T_INET_UDP;
 

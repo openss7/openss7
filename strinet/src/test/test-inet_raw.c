@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/09/26 00:50:54 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/12/18 07:53:29 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:50:54 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:53:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.50  2006/12/18 07:53:29  brian
+ - resolve device numbering
+
  Revision 0.9.2.49  2006/09/26 00:50:54  brian
  - rationalized to stacks package
 
@@ -247,9 +250,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/09/26 00:50:54 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/12/18 07:53:29 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/09/26 00:50:54 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/12/18 07:53:29 $";
 
 /*
  *  Simple test program for INET streams.
@@ -329,7 +332,11 @@ static const char *lpkgname = "OpenSS7 INET Driver - RAW";
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/RAW";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/rawip";
+#else
 static char devname[256] = "/dev/rawip";
+#endif
 
 static const int test_level = T_INET_IP;
 

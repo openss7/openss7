@@ -1,3 +1,11 @@
+2006-12-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: resolve device base major
+	* src/test/test-inet_raw.c: use clone directory device names
+	* src/test/test-inet_sctp.c: use clone directory device names
+	* src/test/test-inet_tcp.c: use clone directory device names
+	* src/test/test-inet_udp.c: use clone directory device names
+
 2006-12-14  Brian Bidulock  <bidulock@openss7.org>
 
 	- debian script corrections from Michael Fig <fig@marketsystems.com>
