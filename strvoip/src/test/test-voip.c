@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-voip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:55:18 $
+ @(#) $RCSfile: test-voip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:22:56 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/16 10:55:18 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 08:22:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-voip.c,v $
+ Revision 0.9.2.2  2006/12/18 08:22:56  brian
+ - resolve device numbering
+
  Revision 0.9.2.1  2006/10/16 10:55:18  brian
  - added new package files
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-voip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:55:18 $"
+#ident "@(#) $RCSfile: test-voip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:22:56 $"
 
-static char const ident[] = "$RCSfile: test-voip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:55:18 $";
+static char const ident[] = "$RCSfile: test-voip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:22:56 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -126,7 +129,11 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX SVID/ABI";
 static const char *sstdname = "SVID/ABI";
 static const char *shortname = "ABI";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/ch";
+#else
 static char devname[256] = "/dev/ch";
+#endif
 
 static int exit_on_failure = 0;
 
