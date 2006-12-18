@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.44 2006/08/28 09:21:56 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.45 2006/12/18 11:49:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/28 09:21:56 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/18 11:49:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -1175,11 +1175,14 @@ symbols, checking for standard options for build and installable programs, check
 documentation for built and installable programs.  Normally these checks are only run in maintainer
 mode, but can be enabled and disabled with this option.
 
-@ignore
 @item --enable-autotest
 @itemx --disable-autotest
 @opindex autotest
-@end ignore
+Enable or disable pre- and post-installation testing.  Each @value{pkgtype} package supports a
+number of @command{autotest} test suites that can be performed by invoking the @samp{installcheck}
+target with @manpage{make(1)}.  These currently consist of running installed modules, commands and
+binaries against a number of specific test cases.  Normally these checks are only run in maintainer
+mode, but can be enabled and disabled with this option.
 
 @item --disable-compress-manpages
 @opindex compress-manpages
@@ -1207,6 +1210,13 @@ script configuration, and if one is not found, the @command{init} scripts are in
 directories, but the symbolic links to the run level script directories are not generated and the
 script is not invoked.  Therefore, it is safe to leave this option unchanged, even on distributions
 that do not support System V @command{init} script layout (such as @cite{NexusWare}).
+
+@item --disable-32bit-libs
+@opindex 32bit-libs
+Disables the build and install of 32-bit compatibility libraries and test binaries on 64-bit systems
+that support 32-bit compatibility.  The default is to build and install 32-bit compatibility
+libraries and test binaries.  This option can be usefule when configuring for an embedded target
+where only native shared libraries and binaries are desired.
 
 @item --disable-devel
 @opindex devel
