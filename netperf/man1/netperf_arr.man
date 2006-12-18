@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: netperf_arr.man,v 0.9.2.6 2006/10/10 10:36:48 brian Exp $
+.\" @(#) $Id: netperf_arr.man,v 0.9.2.7 2006/12/18 09:01:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:36:48 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/18 09:01:47 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: netperf_arr.man,v $
+.\" Revision 0.9.2.7  2006/12/18 09:01:47  brian
+.\" - manual page correction
+.\"
 .\" Revision 0.9.2.6  2006/10/10 10:36:48  brian
 .\" - updates for release
 .\"
@@ -246,8 +249,8 @@ command; failure of the
 command.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
