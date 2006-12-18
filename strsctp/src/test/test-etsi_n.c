@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/19 17:18:54 $
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 07:57:43 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 17:18:54 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:57:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_n.c,v $
+ Revision 0.9.2.5  2006/12/18 07:57:43  brian
+ - resolve device numbering
+
  Revision 0.9.2.4  2006/10/19 17:18:54  brian
  - sync
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/19 17:18:54 $"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 07:57:43 $"
 
-static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/19 17:18:54 $";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 07:57:43 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -222,7 +225,11 @@ static const char *lpkgname = "OpenSS7 SCTP Driver";
 static const char *lstdname = "RFC 2960, SCTP-IG, ETSI TS 102 144";
 static const char *sstdname = "RFC2960/TS102144";
 static const char *shortname = "SCTP";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/sctp_t";
+#else
 static char devname[256] = "/dev/sctp_t";
+#endif
 static char modname[256] = "sctp_t";
 
 static const int test_level = T_INET_SCTP;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/15 00:22:15 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/18 07:57:45 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/15 00:22:15 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:57:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.23  2006/12/18 07:57:45  brian
+ - resolve device numbering
+
  Revision 0.9.2.22  2006/12/15 00:22:15  brian
  - bufq locking changes and test suite upgrade
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/15 00:22:15 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/18 07:57:45 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/15 00:22:15 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/18 07:57:45 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -160,7 +163,11 @@ static const char *lpkgname = "OpenSS7 SCTP Driver - NPI-SCTP";
 static const char *lstdname = "XNS 5.2/NPI Rev 2";
 static const char *sstdname = "XNS/NPI";
 static const char *shortname = "SCTP";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/sctp_n";
+#else
 static char devname[256] = "/dev/sctp_n";
+#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

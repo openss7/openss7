@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/27 23:10:12 $
+ @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:57:45 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:10:12 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:57:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-interop.c,v $
+ Revision 0.9.2.4  2006/12/18 07:57:45  brian
+ - resolve device numbering
+
  Revision 0.9.2.3  2006/10/27 23:10:12  brian
  - rationalized to new test suites
 
@@ -105,9 +108,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/27 23:10:12 $"
+#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:57:45 $"
 
-static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/27 23:10:12 $";
+static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:57:45 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -189,7 +192,11 @@ static const char *lpkgname = "OpenSS7 SCTP Driver";
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "SCTP";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/sctp_t";
+#else
 static char devname[256] = "/dev/sctp_t";
+#endif
 
 static const int test_level = T_INET_SCTP;
 

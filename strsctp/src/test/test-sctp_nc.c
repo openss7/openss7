@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $
+ @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:48 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 17:49:47 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:57:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_nc.c,v $
+ Revision 0.9.2.7  2006/12/18 07:57:48  brian
+ - resolve device numbering
+
  Revision 0.9.2.6  2006/10/19 17:49:47  brian
  - ulong becomes np_ulong
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $"
+#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:48 $"
 
-static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $";
+static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:48 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -466,6 +469,12 @@ static addr_t rem_addr = { 0, {{INADDR_ANY}} };
 
 int len = 32;
 
+#ifdef LFS
+static const char sctpname[] = "/dev/streams/clone/sctp_n";
+#else
+static const char sctpname[] = "/dev/sctp_n";
+#endif
+
 int
 test_sctpc(void)
 {
@@ -480,7 +489,7 @@ test_sctpc(void)
 
 	fprintf(stderr, "Opening stream\n");
 
-	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((fd = open(sctpname, O_NONBLOCK | O_RDWR)) < 0) {
 		perror("open");
 		goto dead;
 	}

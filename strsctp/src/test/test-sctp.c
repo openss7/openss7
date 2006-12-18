@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $
+ @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:45 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 17:49:47 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 07:57:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp.c,v $
+ Revision 0.9.2.7  2006/12/18 07:57:45  brian
+ - resolve device numbering
+
  Revision 0.9.2.6  2006/10/19 17:49:47  brian
  - ulong becomes np_ulong
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $"
+#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:45 $"
 
-static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/19 17:49:47 $";
+static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:45 $";
 
 /* 
  *  This file is for testing the sctp_n driver.
@@ -639,13 +642,19 @@ put_and_get(int fd, int flags)
 	get_only(fd, 10);
 }
 
+#ifdef LFS
+static const char sctpname[] = "/dev/streams/clone/sctp_n";
+#else
+static const char sctpname[] = "/dev/sctp_n";
+#endif
+
 int
 sctp_n_open(void)
 {
 	int fd;
 
 	printf("\nOPEN: sctp_n\n");
-	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((fd = open(sctpname, O_NONBLOCK | O_RDWR)) < 0) {
 		printf("ERROR: open: [%d] %s\n", errno, strerror(errno));
 		exit(2);
 	}
