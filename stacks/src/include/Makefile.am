@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/03 13:51:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/18 10:51:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:51:36 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 10:51:00 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/12/18 10:51:00  brian
+# - subpackaging changes for release
+#
 # Revision 0.9.2.12  2006/10/03 13:51:36  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -70,60 +73,162 @@ include ../../am/openss7.am
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-nobase_pkginclude_HEADERS = \
-	ss7/capi.h \
-	ss7/capi_ioctl.h \
-	ss7/cci.h \
+cdi_headers = \
 	ss7/cdi.h \
-	ss7/chi.h \
-	ss7/chi_ioctl.h \
-	ss7/devi.h \
-	ss7/devi_ioctl.h \
+	ss7/hdlc_ioctl.h \
+	sys/cdi_daed.h \
+	sys/cdi.h \
+	sys/cdi_hdlc.h
+
+dlpi_headers = \
 	ss7/dl.h \
 	ss7/dl_ioctl.h \
-	ss7/dlpi_ioctl.h \
+	ss7/dlpi_ioctl.h
+	ss7/lapb_ioctl.h \
+	ss7/lapf_ioctl.h \
+	sys/dlpi.h
+
+npi_headers = \
+	sys/npi.h
+
+tli_headers	= \
+	sys/tihdr.h \
+	sys/timod.h \
+	sys/tirdwr.h \
+	sys/tiuser.h \
+	sys/tli.h \
+	sys/tpi.h \
+	tihdr.h \
+	timod.h \
+	tirdwr.h \
+	tiuser.h
+
+unix_headers	= \
+	sys/ticlts.h \
+	sys/ticots.h \
+	sys/ticotsord.h \
+	ticlts.h \
+	ticots.h \
+	ticotsord.h
+
+xnet_headers	= \
+	sys/xti.h \
+	sys/xti_local.h \
+	sys/xti_xti.h \
+	xti.h
+
+inet_headers	= \
+	sys/npi_ip.h \
+	sys/npi_tcp.h \
+	sys/npi_udp.h \
+	sys/tpi_inet.h \
+	sys/tpi_ip.h \
+	sys/tpi_tcp.h \
+	sys/tpi_udp.h \
+	sys/xti_inet.h \
+	sys/xti_ip.h \
+	sys/xti_tcp.h \
+	sys/xti_udp.h \
+	xti_inet.h
+
+osi_headers	= \
+	sys/dlpi_lapb.h \
+	sys/dlpi_lapf.h \
+	sys/xti_mosi.h \
+	sys/xti_osi.h
+
+atm_headers	= \
+	sys/npi_sscop.h \
+	sys/tpi_sscop.h \
+	sys/xti_atm.h \
+	sys/xti_sscop.h
+
+#xnsl_headers	= \
+#	netdir.h \
+#	netconfig.h \
+#	sys/netconfig.h
+
+sock_headers	= \
+	sys/sockmod.h
+
+sctp_headers	= \
+	ss7/sctp.h \
+	ss7/sctpi.h \
+	ss7/sctpi_ioctl.h \
+	sys/npi_sctp.h \
+	sys/tpi_sctp.h \
+	sys/xti_sctp.h
+
+isdn_headers = \
+	ss7/capi.h \
+	ss7/capi_ioctl.h \
+	ss7/isdni.h \
+	ss7/isdni_ioctl.h \
+	ss7/lapd_ioctl.h \
+	ss7/v52_ioctl.h \
+	sys/dlpi_gr303.h \
+	sys/dlpi_isdn.h \
+	sys/dlpi_lapd.h \
+	sys/dlpi_v52.h
+
+sigtran_headers = \
 	ss7/dua_ioctl.h \
 	ss7/gr303_ioctl.h \
 	ss7/gr303ua_ioctl.h \
-	ss7/gsma_ioctl.h \
-	ss7/h225_ioctl.h \
-	ss7/hdlc_ioctl.h \
-	ss7/isdni.h \
-	ss7/isdni_ioctl.h \
-	ss7/isupi.h \
-	ss7/isupi_ioctl.h \
 	ss7/iua_ioctl.h \
-	ss7/lapb_ioctl.h \
-	ss7/lapd_ioctl.h \
-	ss7/lapf_ioctl.h \
-	ss7/lki.h \
-	ss7/lki_ioctl.h \
-	ss7/lmi.h \
-	ss7/lmi_ioctl.h \
 	ss7/m2pa_ioctl.h \
 	ss7/m2ua_ioctl.h \
 	ss7/m3ua.h \
 	ss7/m3ua_ioctl.h \
+	ss7/ua_lm.h \
+	ss7/ua_lm_ioctl.h \
+	ss7/v5ua_ioctl.h \
+	sys/dlpi_dua.h \
+	sys/dlpi_gr303ua.h \
+	sys/dlpi_iua.h \
+	sys/dlpi_m2ua.h \
+	sys/dlpi_v5ua.h
+
+chan_headers = \
+	ss7/chi.h \
+	ss7/chi_ioctl.h \
 	ss7/mgcp.h \
 	ss7/mgi.h \
 	ss7/mgi_ioctl.h \
+	ss7/mxi.h \
+	ss7/mxi_ioctl.h \
+	ss7/ph.h \
+	ss7/q920.h
+
+voip_headers = \
+	ss7/h225_ioctl.h \
+	sys/dlpi_h225.h
+
+gsm_headers = \
+	ss7/gsma_ioctl.h \
+	sys/dlpi_gsma.h
+
+
+ss7_headers = \
+	ss7/cci.h \
+	ss7/devi.h \
+	ss7/devi_ioctl.h \
+	ss7/isupi.h \
+	ss7/isupi_ioctl.h \
+	ss7/lki.h \
+	ss7/lki_ioctl.h \
+	ss7/lmi.h \
+	ss7/lmi_ioctl.h \
 	ss7/mtp2_ioctl.h \
 	ss7/mtp3b.h \
 	ss7/mtp.h \
 	ss7/mtpi.h \
 	ss7/mtpi_ioctl.h \
 	ss7/mtp_ioctl.h \
-	ss7/mxi.h \
-	ss7/mxi_ioctl.h \
-	ss7/ph.h \
-	ss7/q920.h \
 	ss7/sccp.h \
 	ss7/sccpi.h \
 	ss7/sccpi_ioctl.h \
 	ss7/sccp_ioctl.h \
-	ss7/sctp.h \
-	ss7/sctpi.h \
-	ss7/sctpi_ioctl.h \
 	ss7/sdli.h \
 	ss7/sdli_ioctl.h \
 	ss7/sdti.h \
@@ -141,84 +246,124 @@ nobase_pkginclude_HEADERS = \
 	ss7/tcap_ioctl.h \
 	ss7/tc.h \
 	ss7/tr.h \
-	ss7/ua_lm.h \
-	ss7/ua_lm_ioctl.h \
-	ss7/v52_ioctl.h \
-	ss7/v5ua_ioctl.h \
-	sys/cdi_daed.h \
-	sys/cdi_hdlc.h \
-	sys/dlpi_dua.h \
-	sys/dlpi_gr303.h \
-	sys/dlpi_gr303ua.h \
-	sys/dlpi_gsma.h \
-	sys/dlpi_h225.h \
-	sys/dlpi_isdn.h \
-	sys/dlpi_iua.h \
-	sys/dlpi_lapb.h \
-	sys/dlpi_lapd.h \
-	sys/dlpi_lapf.h \
-	sys/dlpi_m2ua.h \
 	sys/dlpi_mtp2.h \
-	sys/dlpi_v52.h \
-	sys/dlpi_v5ua.h \
 	sys/npi_mtp.h \
 	sys/npi_sccp.h \
-	sys/npi_sctp.h \
 	sys/npi_ss7.h \
-	sys/npi_sscop.h \
 	sys/tpi_mtp.h \
 	sys/tpi_sccp.h \
-	sys/tpi_sctp.h \
 	sys/tpi_sl.h \
 	sys/tpi_ss7.h \
-	sys/tpi_sscop.h \
 	sys/tpi_tcap.h \
-	sys/xti_atm.h \
-	sys/xti_local.h \
-	sys/xti_mosi.h \
 	sys/xti_mtp.h \
-	sys/xti_osi.h \
 	sys/xti_sccp.h \
-	sys/xti_sctp.h \
 	sys/xti_sl.h \
 	sys/xti_ss7.h \
-	sys/xti_sscop.h \
-	sys/xti_tcap.h \
-	sys/xti_xti.h \
-	sys/sockmod.h \
-	sys/ticlts.h \
-	sys/ticots.h \
-	sys/ticotsord.h \
-	sys/tihdr.h \
-	sys/timod.h \
-	sys/tirdwr.h \
-	sys/tiuser.h \
-	sys/cdi.h \
-	sys/dlpi.h \
-	sys/npi.h \
-	sys/tpi.h \
-	sys/tli.h \
-	sys/xti.h \
-	sys/tpi_inet.h \
-	sys/xti_inet.h \
-	sys/npi_tcp.h \
-	sys/tpi_tcp.h \
-	sys/xti_tcp.h \
-	sys/npi_udp.h \
-	sys/tpi_udp.h \
-	sys/xti_udp.h \
-	sys/npi_ip.h \
-	sys/tpi_ip.h \
-	sys/xti_ip.h \
-	ticlts.h \
-	ticots.h \
-	ticotsord.h \
-	tihdr.h \
-	timod.h \
-	tirdwr.h \
-	tiuser.h \
-	xti.h \
-	xti_inet.h
+	sys/xti_tcap.h
+
+nobase_pkginclude_HEADERS = \
+	$(ss7_headers)
+
+if WITH_XNS
+## WITH_XNS
+nobase_pkginclude_HEADERS += \
+	$(cdi_headers) \
+	$(dlpi_headers) \
+	$(npi_headers)
+## WITH_XNS
+endif
+
+if WITH_TLI
+## WITH_TLI
+nobase_pkginclude_HEADERS += \
+	$(tli_headers) \
+	$(unix_headers)
+## WITH_TLI
+endif
+
+if WITH_XNET
+## WITH_XNET
+nobase_pkginclude_HEADERS += \
+	$(xnet_headers) \
+	$(inet_headers) \
+	$(osi_headers) \
+	$(atm_headers)
+## WITH_XNET
+endif
+
+#if WITH_XNSL
+### WITH_XNSL
+#nobase_pkginclude_HEADERS += \
+#	$(xnsl_headers)
+### WITH_XNSL
+#endif
+
+if WITH_SOCK
+## WITH_SOCK
+nobase_pkginclude_HEADERS += \
+	$(sock_headers)
+## WITH_SOCK
+endif
+
+if WITH_SCTP
+## WITH_SCTP
+nobase_pkginclude_HEADERS += \
+	$(sctp_headers)
+## WITH_SCTP
+endif
+
+if WITH_ISDN
+## WITH_ISDN
+nobase_pkginclude_HEADERS += \
+	$(isdn_headers)
+## WITH_ISDN
+endif
+
+if WITH_SIGTRAN
+## WITH_SIGTRAN
+nobase_pkginclude_HEADERS += \
+	$(sigtran_headers)
+## WITH_SIGTRAN
+endif
+
+if WITH_CHAN
+## WITH_CHAN
+nobase_pkginclude_HEADERS += \
+	$(chan_headers)
+## WITH_CHAN
+endif
+
+if WITH_VOIP
+## WITH_VOIP
+nobase_pkginclude_HEADERS += \
+	$(voip_headers)
+## WITH_VOIP
+endif
+
+if WITH_GSM
+## WITH_GSM
+nobase_pkginclude_HEADERS += \
+	$(gsm_headers)
+## WITH_GSM
+endif
+
+dist_noinst_HEADERS = \
+	$(cdi_headers) \
+	$(dlpi_headers) \
+	$(npi_headers) \
+	$(tli_headers) \
+	$(unix_headers) \
+	$(xnet_headers) \
+	$(inet_headers) \
+	$(osi_headers) \
+	$(atm_headers) \
+	$(sock_headers) \
+	$(sctp_headers) \
+	$(isdn_headers) \
+	$(sigtran_headers) \
+	$(chan_headers) \
+	$(voip_headers) \
+	$(gsm_headers)
 
 #	os7/allocb.h
 #	os7/bufpool.h

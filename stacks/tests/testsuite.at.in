@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite.at.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/11 11:57:56 $
+dnl @(#) $RCSfile: testsuite.at.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 10:51:46 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/12/11 11:57:56 $ by $Author: brian $
+dnl Last Modified $Date: 2006/12/18 10:51:46 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite.at.in,v $
+dnl Revision 0.9.2.5  2006/12/18 10:51:46  brian
+dnl - subpackaging changes for release
+dnl
 dnl Revision 0.9.2.4  2006/12/11 11:57:56  brian
 dnl - T1 works correctly, almost all test cases pass
 dnl
@@ -120,7 +123,8 @@ m4_include([kernel.at])
 @WITH_SCTP2_TRUE@m4_include([testsuite-sctp_n.at])
 @WITH_SCTP2_TRUE@m4_include([testsuite-sctp_n2.at])
 
-#m4_include([testsuite-m2pa.at])
+@WITH_SIGTRAN_TRUE@m4_include([testsuite-m2pa.at])
+
 m4_include([testsuite-x400p-sl.at])
 
 #m4_include([dummy1.m4])

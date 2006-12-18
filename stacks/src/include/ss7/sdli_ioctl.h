@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdli_ioctl.h,v 0.9.2.9 2006/12/08 11:46:31 brian Exp $
+ @(#) $Id: sdli_ioctl.h,v 0.9.2.10 2006/12/18 10:51:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 11:46:31 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:51:01 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SDLI_IOCTL_H__
 #define __SDLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -72,15 +72,15 @@
  */
 
 #ifdef __KERNEL__
-#ifdef _MSP_SOURCE
+#ifdef _MPS_SOURCE
 typedef struct sdl_timers {
 	mblk_t *t9;			/* T9 timer */
 } sdl_timers_t;
-#else				/* _MSP_SOURCE */
+#else				/* _MPS_SOURCE */
 typedef struct sdl_timers {
 	toid_t t9;			/* T9 timer */
 } sdl_timers_t;
-#endif				/* _MSP_SOURCE */
+#endif				/* _MPS_SOURCE */
 #endif				/* __KERNEL__ */
 
 #define SDL_SYNCS 4

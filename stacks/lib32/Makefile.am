@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/09/29 11:50:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 10:50:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:11 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 10:50:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/12/18 10:50:58  brian
+# - subpackaging changes for release
+#
 # Revision 0.9.2.4  2006/09/29 11:50:11  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -211,13 +214,18 @@ pkglibexec32_PROGRAMS		+= \
 ## WITH_SCTP2
 endif
 
-pkglibexec32_PROGRAMS		+= test-m2pa
-
 test_m2pa_SOURCES		= $(top_srcdir)/src/test/m2pa/test-m2pa.c
 test_m2pa_LDADD			= $(STREAMS_LDADD32)
 test_m2pa_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_m2pa_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+if WITH_SIGTRAN
+## WITH_SIGTRAN
+pkglibexec32_PROGRAMS		+= \
+				   test-m2pa
+## WITH_SIGTRAN
+endif
 
 pkglibexec32_PROGRAMS		+= test-q781
 

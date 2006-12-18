@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/05/07 22:12:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/12/18 10:50:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/07 22:12:43 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 10:50:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.31  2006/12/18 10:50:57  brian
+# - subpackaging changes for release
+#
 # Revision 0.9.2.30  2006/05/07 22:12:43  brian
 # - updated for NPI-IP driver
 #
@@ -84,8 +87,6 @@ ss7_man_MANS = \
 	man4/bicc_ioctl.4 \
 	man4/bssap.4 \
 	man4/bssap_ioctl.4 \
-	man4/bua.4 \
-	man4/bua_ioctl.4 \
 	man4/capi.4 \
 	man4/capi_ioctl.4 \
 	man4/cd.4 \
@@ -99,26 +100,18 @@ ss7_man_MANS = \
 	man4/dass.4 \
 	man4/dl.4 \
 	man4/dlb.4 \
-	man4/dl_dua.4 \
 	man4/dl_gr303.4 \
-	man4/dl_gr303ua.4 \
 	man4/dl_gsma.4 \
 	man4/dl_h225.4 \
 	man4/dl_ioctl.4 \
-	man4/dl_iua.4 \
 	man4/dl_lapb.4 \
 	man4/dl_lapd.4 \
 	man4/dl_lapf.4 \
 	man4/dl_v52.4 \
-	man4/dl_v5ua.4 \
 	man4/dpnss.4 \
-	man4/dua.4 \
-	man4/dua_ioctl.4 \
 	man4/fr.4 \
 	man4/gr303.4 \
 	man4/gr303_ioctl.4 \
-	man4/gr303ua.4 \
-	man4/gr303ua_ioctl.4 \
 	man4/gsma.4 \
 	man4/h225.4 \
 	man4/h225_ioctl.4 \
@@ -131,26 +124,13 @@ ss7_man_MANS = \
 	man4/ISDN.4 \
 	man4/isdn.4 \
 	man4/isdn_ioctl.4 \
-	man4/isua.4 \
-	man4/isua_ioctl.4 \
 	man4/isup.4 \
 	man4/isup_ioctl.4 \
-	man4/iua.4 \
-	man4/iua_ioctl.4 \
 	man4/lapb.4 \
 	man4/lapd.4 \
 	man4/lapf.4 \
 	man4/lm.4 \
 	man4/lmi_ioctl.4 \
-	man4/m2pa.4 \
-	man4/m2pa_sl.4 \
-	man4/m2tp.4 \
-	man4/m2ua.4 \
-	man4/m2ua_ioctl.4 \
-	man4/m3pa.4 \
-	man4/m3tp.4 \
-	man4/m3ua.4 \
-	man4/m3ua_ioctl.4 \
 	man4/MG.4 \
 	man4/mg.4 \
 	man4/mgc.4 \
@@ -187,22 +167,15 @@ ss7_man_MANS = \
 	man4/sdl-acb56.4 \
 	man4/sdl_eth.4 \
 	man4/sdl_ioctl.4 \
-	man4/sdl_ip.4 \
 	man4/sdlm.4 \
 	man4/sdlm-lm.4 \
 	man4/sdl-mux.4 \
 	man4/sdl_rtp.4 \
-	man4/sdl_sctp.4 \
-	man4/sdl_tcp.4 \
-	man4/sdl_udp.4 \
 	man4/sdl_x400p.4 \
 	man4/sdt.4 \
 	man4/sdt-acb56.4 \
 	man4/sdt_ioctl.4 \
-	man4/sdt_sctp.4 \
-	man4/sdt_tpi.4 \
 	man4/sdt_x400p.4 \
-	man4/SIGTRAN.4 \
 	man4/sipt.4 \
 	man4/sipt_ioctl.4 \
 	man4/sl.4 \
@@ -210,8 +183,6 @@ ss7_man_MANS = \
 	man4/sl_ioctl.4 \
 	man4/slm.4 \
 	man4/sl_mux.4 \
-	man4/sl-sctp.4 \
-	man4/sl_tpi.4 \
 	man4/sl_x100p.4 \
 	man4/sl_x400p.4 \
 	man4/sm_mod.4 \
@@ -232,13 +203,6 @@ ss7_man_MANS = \
 	man4/sscop.4 \
 	man4/sscop_ioctl.4 \
 	man4/sscop_mce.4 \
-	man4/sua.4 \
-	man4/sua-gtt.4 \
-	man4/sua_ioctl.4 \
-	man4/sua-mgmt.4 \
-	man4/sua-npi.4 \
-	man4/sua-sccpi.4 \
-	man4/sua-tpi.4 \
 	man4/tali.4 \
 	man4/tali_ioctl.4 \
 	man4/tali-isup.4 \
@@ -250,14 +214,9 @@ ss7_man_MANS = \
 	man4/tcap-tci.4 \
 	man4/tcap-tpi.4 \
 	man4/tcap-tri.4 \
-	man4/tua.4 \
-	man4/tua_ioctl.4 \
-	man4/ua_ioctl.4 \
 	man4/v52.4 \
 	man4/v5.4 \
 	man4/v5_ioctl.4 \
-	man4/v5ua.4 \
-	man4/v5ua_ioctl.4 \
 	man4/VOIP.4 \
 	man4/x100p.4 \
 	man4/x100p-ch.4 \
@@ -651,14 +610,10 @@ ss7_man_MANS = \
 	man7/CH_optmgmt_req_t.7 \
 	man7/devi.7 \
 	man7/dlpi_dass.7 \
-	man7/dlpi_dua.7 \
 	man7/dlpi_gr303.7 \
-	man7/dlpi_gr303ua.7 \
-	man7/dlpi_iua.7 \
 	man7/dlpi_lapb.7 \
 	man7/dlpi_lapd.7 \
 	man7/dlpi_lapf.7 \
-	man7/dlpli_gr303ua.7 \
 	man7/h225i.7 \
 	man7/isdni.7 \
 	man7/isupi.7 \
@@ -1038,26 +993,17 @@ ss7_man_MANS = \
 	man7/TR_uni_req.7 \
 	man7/TR_uni_req_t.7 \
 	man8/bicc.8 \
-	man8/bua.8 \
 	man8/cpc388.8 \
 	man8/h225.8 \
 	man8/h323confd.8 \
 	man8/isdn.8 \
 	man8/isdnconfd.8 \
-	man8/isua.8 \
 	man8/isup.8 \
-	man8/iua.8 \
-	man8/m2pa.8 \
-	man8/m2tp.8 \
-	man8/m2ua.8 \
-	man8/m3tp.8 \
-	man8/m3ua.8 \
 	man8/mgconfd.8 \
 	man8/mtp.8 \
 	man8/sccp.8 \
 	man8/sdl.8 \
 	man8/sdt.8 \
-	man8/sigtran.8 \
 	man8/sl.8 \
 	man8/sls.8 \
 	man8/soip.8 \
@@ -1065,9 +1011,7 @@ ss7_man_MANS = \
 	man8/ss7confd.8 \
 	man8/ss7d.8 \
 	man8/strss7_mknod.8 \
-	man8/sua.8 \
 	man8/tcap.8 \
-	man8/test-m2pa.8 \
 	man8/test-q781.8 \
 	man8/test-q781-pipe.8 \
 	man8/test-q784.8 \
@@ -1085,8 +1029,6 @@ ss7_man_MANS = \
 	man8/test-x400p-sdt2.8 \
 	man8/test-x400p-sdt.8 \
 	man8/test-x400p-sl.8 \
-	man8/tua.8 \
-	man8/uaconfd.8 \
 	man8/ss7_undoc.8 \
 	man8/voipconfd.8 \
 	man9/mtp_n_uderror_ind.9 \
@@ -1474,6 +1416,69 @@ tli_man_MANS = \
 
 sock_man_MANS	=
 
+sigtran_man_MANS = \
+	man4/bua.4 \
+	man4/bua_ioctl.4 \
+	man4/dl_dua.4 \
+	man4/dl_gr303ua.4 \
+	man4/dl_iua.4 \
+	man4/dl_v5ua.4 \
+	man4/dua.4 \
+	man4/dua_ioctl.4 \
+	man4/gr303ua.4 \
+	man4/gr303ua_ioctl.4 \
+	man4/isua.4 \
+	man4/isua_ioctl.4 \
+	man4/iua.4 \
+	man4/iua_ioctl.4 \
+	man4/m2pa.4 \
+	man4/m2pa_sl.4 \
+	man4/m2tp.4 \
+	man4/m2ua.4 \
+	man4/m2ua_ioctl.4 \
+	man4/m3pa.4 \
+	man4/m3tp.4 \
+	man4/m3ua.4 \
+	man4/m3ua_ioctl.4 \
+	man4/sdl_ip.4 \
+	man4/sdl_sctp.4 \
+	man4/sdl_tcp.4 \
+	man4/sdl_udp.4 \
+	man4/sdt_sctp.4 \
+	man4/sdt_tpi.4 \
+	man4/SIGTRAN.4 \
+	man4/sl-sctp.4 \
+	man4/sl_tpi.4 \
+	man4/sua.4 \
+	man4/sua-gtt.4 \
+	man4/sua_ioctl.4 \
+	man4/sua-mgmt.4 \
+	man4/sua-npi.4 \
+	man4/sua-sccpi.4 \
+	man4/sua-tpi.4 \
+	man4/tua.4 \
+	man4/tua_ioctl.4 \
+	man4/ua_ioctl.4 \
+	man4/v5ua.4 \
+	man4/v5ua_ioctl.4 \
+	man7/dlpi_dua.7 \
+	man7/dlpi_gr303ua.7 \
+	man7/dlpi_iua.7 \
+	man7/dlpli_gr303ua.7 \
+	man8/bua.8 \
+	man8/isua.8 \
+	man8/iua.8 \
+	man8/m2pa.8 \
+	man8/m2tp.8 \
+	man8/m2ua.8 \
+	man8/m3tp.8 \
+	man8/m3ua.8 \
+	man8/sigtran.8 \
+	man8/sua.8 \
+	man8/test-m2pa.8 \
+	man8/tua.8 \
+	man8/uaconfd.8
+
 extra_man_MANS	=
 
 man_MANS	= $(ss7_man_MANS)
@@ -1497,6 +1502,9 @@ man_MANS	+= $(tli_man_MANS)
 endif
 if WITH_SOCK
 man_MANS	+= $(sock_man_MANS)
+endif
+if WITH_SIGTRAN
+man_MANS	+= $(sigtran_man_MANS)
 endif
 
 ss7_dist_noinst_MANS = \
@@ -2903,6 +2911,69 @@ tli_dist_noinst_MANS = \
 
 sock_dist_noinst_MANS	=
 
+sigtran_dist_noinst_MANS = \
+	man4/bua.4.man \
+	man4/bua_ioctl.4.man \
+	man4/dl_dua.4.man \
+	man4/dl_gr303ua.4.man \
+	man4/dl_iua.4.man \
+	man4/dl_v5ua.4.man \
+	man4/dua.4.man \
+	man4/dua_ioctl.4.man \
+	man4/gr303ua.4.man \
+	man4/gr303ua_ioctl.4.man \
+	man4/isua.4.man \
+	man4/isua_ioctl.4.man \
+	man4/iua.4.man \
+	man4/iua_ioctl.4.man \
+	man4/m2pa.4.man \
+	man4/m2pa_sl.4.man \
+	man4/m2tp.4.man \
+	man4/m2ua.4.man \
+	man4/m2ua_ioctl.4.man \
+	man4/m3pa.4.man \
+	man4/m3tp.4.man \
+	man4/m3ua.4.man \
+	man4/m3ua_ioctl.4.man \
+	man4/sdl_ip.4.man \
+	man4/sdl_sctp.4.man \
+	man4/sdl_tcp.4.man \
+	man4/sdl_udp.4.man \
+	man4/sdt_sctp.4.man \
+	man4/sdt_tpi.4.man \
+	man4/SIGTRAN.4.man \
+	man4/sl-sctp.4.man \
+	man4/sl_tpi.4.man \
+	man4/sua.4.man \
+	man4/sua-gtt.4.man \
+	man4/sua_ioctl.4.man \
+	man4/sua-mgmt.4.man \
+	man4/sua-npi.4.man \
+	man4/sua-sccpi.4.man \
+	man4/sua-tpi.4.man \
+	man4/tua.4.man \
+	man4/tua_ioctl.4.man \
+	man4/ua_ioctl.4.man \
+	man4/v5ua.4.man \
+	man4/v5ua_ioctl.4.man \
+	man7/dlpi_dua.7.man \
+	man7/dlpi_gr303ua.7.man \
+	man7/dlpi_iua.7.man \
+	man7/dlpli_gr303ua.7.man \
+	man8/bua.8.man \
+	man8/isua.8.man \
+	man8/iua.8.man \
+	man8/m2pa.8.man \
+	man8/m2tp.8.man \
+	man8/m2ua.8.man \
+	man8/m3tp.8.man \
+	man8/m3ua.8.man \
+	man8/sigtran.8.man \
+	man8/sua.8.man \
+	man8/test-m2pa.8.man \
+	man8/tua.8.man \
+	man8/uaconfd.8.man
+
 extra_dist_noinst_MANS	=
 
 dist_noinst_MANS = \
@@ -2912,7 +2983,8 @@ dist_noinst_MANS = \
 	$(sctp_dist_noinst_MANS) \
 	$(xns_dist_noinst_MANS) \
 	$(tli_dist_noinst_MANS) \
-	$(sock_dist_noinst_MANS)
+	$(sock_dist_noinst_MANS) \
+	$(sigtran_dist_noinst_MANS)
 
 ##
 ## These are not used by any function, device or driver but needs to be included in the

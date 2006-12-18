@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/06 11:45:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/12/18 10:51:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/06 11:45:37 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 10:51:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.16  2006/12/18 10:51:45  brian
+# - subpackaging changes for release
+#
 # Revision 0.9.2.15  2006/12/06 11:45:37  brian
 # - updated X400P driver and test suites
 #
@@ -145,6 +148,13 @@ TESTSUITE_DEPS		+= \
 			$(TESTSUITE)-sctp_n.at \
 			$(TESTSUITE)-sctp_n2.at
 ## WITH_SCTP2
+endif
+
+if WITH_SIGTRAN
+## WITH_SIGTRAN
+TESTSUITE_DEPS		+= \
+			$(TESTSUITE)-m2pa.at
+## WITH_SIGTRAN
 endif
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

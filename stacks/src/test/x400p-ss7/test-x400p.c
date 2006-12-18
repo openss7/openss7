@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/11 12:31:44 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/18 10:51:39 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/11 12:31:44 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:51:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.15  2006/12/18 10:51:39  brian
+ - subpackaging changes for release
+
  Revision 0.9.2.14  2006/12/11 12:31:44  brian
  - testcase timing tweaks
 
@@ -99,9 +102,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/11 12:31:44 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/18 10:51:39 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/12/11 12:31:44 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/12/18 10:51:39 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   1
@@ -274,9 +277,9 @@ static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 static int last_prio = 0;
-static int PRIM_type = 0;
 
 #if TEST_M2PA
+static int PRIM_type = 0;
 static int NPI_error = 0;
 static int CONIND_number = 2;
 static int TOKEN_value = 0;
@@ -1518,7 +1521,7 @@ lmi_strreason(unsigned int reason)
 }
 
 char *
-lmerrno_string(ulong lmerr, long uerr)
+lmerrno_string(long uerr, ulong lmerr)
 {
 	switch (lmerr) {
 	case LMI_UNSPEC:	/* Unknown or unspecified */
@@ -3772,7 +3775,7 @@ print_timeout(int child)
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
-	if (show_timeout || verbose > 0) {
+	if (show_timeout || verbose > 1) {
 		print_double_int(child, msgs, child, state);
 		show_timeout--;
 	}
@@ -4290,7 +4293,7 @@ print_waiting(int child, ulong time)
 		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 
-	if (verbose > 0 && show)
+	if (verbose > 1 && show)
 		print_time_state(child, msgs, time);
 }
 
@@ -4313,7 +4316,7 @@ print_mwaiting(int child, struct timespec *time)
 		"/ / / / / / / / / / | / / Waiting %8.4f seconds/ / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 
-	if (verbose > 0 && show) {
+	if (verbose > 1 && show) {
 		float delay;
 
 		delay = time->tv_nsec;
@@ -4465,7 +4468,7 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 
 #if TEST_M2PA
 void
-print_info(int child, N_info_ack_t * info)
+print_info(int child, N_info_ack_t *info)
 {
 	char buf[64];
 
@@ -6307,6 +6310,7 @@ do_signal(int child, int action)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
 	case __TEST_CONTINUE:
+#if TEST_X400
 		if (((ss7_pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI) || ((ss7_pvar & SS7_PVAR_YR) == SS7_PVAR_88)) {
 			ctrl->len = sizeof(p->sl.continue_req);
 			p->sl.continue_req.sl_primitive = SL_CONTINUE_REQ;
@@ -6317,6 +6321,7 @@ do_signal(int child, int action)
 			if (child != CHILD_PTU)
 				return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		}
+#endif				/* TEST_X400 */
 		return __RESULT_SUCCESS;
 	case __TEST_CONG_A:
 		ctrl->len = sizeof(p->sl.cong_accept_req);
@@ -7188,7 +7193,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	union primitives *p = (union primitives *) ctrl->buf;
 
 	if (ctrl->len >= sizeof(p->prim)) {
-		switch ((last_prim = PRIM_type = p->prim)) {
+		switch ((last_prim = p->prim)) {
 #if TEST_M2PA
 		case N_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -7282,22 +7287,19 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			DATA_xfer_flags = p->npi.data_ind.DATA_xfer_flags;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.data_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.data_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.data_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_EXDATA_IND:
 			event = __TEST_EXDATA_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.exdata_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.exdata_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.exdata_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_DATACK_IND:
 			event = __TEST_DATACK_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.datack_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.datack_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.datack_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_INFO_ACK:
 			event = __TEST_INFO_ACK;
@@ -7970,12 +7972,47 @@ postamble_pop(int child)
 }
 
 static int
+preamble_attach(int child)
+{
+	int failed = 0;
+
+#if TEST_M2PA
+	if (child == CHILD_IUT)
+#endif				/* TEST_M2PA */
+	{
+#if TEST_M2PA
+		if (preamble_push(child))
+			goto failure;
+		state++;
+#endif				/* TEST_M2PA */
+		ADDR_buffer = addrs[child];
+		ADDR_length = anums[child] * sizeof(addrs[child][0]);
+		if (do_signal(child, __TEST_ATTACH_REQ))
+			failed = failed ? : state;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
+			failed = failed ? : state;
+		if (failed) {
+			state = failed;
+			goto failure;
+		}
+	}
+#if TEST_M2PA
+	if (child == CHILD_PTU) {
+		return preamble_bind(child);
+	}
+#endif				/* TEST_M2PA */
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+
+static int
 preamble_config(int child)
 {
-#if TEST_M2PA
-	if (preamble_push(child))
+	if (preamble_attach(child))
 		goto failure;
-	state++;
+#if TEST_M2PA
 	if (child == CHILD_IUT) {
 		if (do_signal(child, __TEST_SDL_OPTIONS))
 			goto failure;
@@ -7998,36 +8035,6 @@ preamble_config(int child)
 		if (do_signal(child, __TEST_SL_CONFIG))
 			goto failure;
 	}
-	return __RESULT_SUCCESS;
-      failure:
-	return __RESULT_FAILURE;
-}
-
-static int
-preamble_attach(int child)
-{
-	int failed = 0;
-
-#if TEST_M2PA
-	if (child == CHILD_IUT)
-#endif				/* TEST_M2PA */
-	{
-		ADDR_buffer = addrs[child];
-		ADDR_length = anums[child] * sizeof(addrs[child][0]);
-		if (do_signal(child, __TEST_ATTACH_REQ))
-			failed = failed ? : state;
-		state++;
-		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
-			failed = failed ? : state;
-	}
-	state++;
-	if (preamble_config(child))
-		goto failure;
-#if TEST_M2PA
-	if (child == CHILD_PTU) {
-		return preamble_bind(child);
-	}
-#endif				/* TEST_M2PA */
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -8079,11 +8086,13 @@ postamble_stats(int child)
 			failed = failed ? : state;
 	}
 	state++;
+#if TEST_X400
 	if (do_signal(child, __TEST_SDT_STATS))
 		failed = failed ? : state;
 	state++;
 	if (do_signal(child, __TEST_SDL_STATS))
 		failed = failed ? : state;
+#endif
 	if (failed) {
 		state = failed;
 		goto failure;
@@ -8096,7 +8105,7 @@ postamble_stats(int child)
 static int
 preamble_enable(int child)
 {
-	if (preamble_attach(child))
+	if (preamble_config(child))
 		goto failure;
 	state++;
 #if TEST_M2PA
@@ -12034,8 +12043,7 @@ test_1_25_iut(int child)
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG))
-		goto failure;
+	test_msleep(child, config->sl.t2 >> 1);
 	state++;
 	if (do_signal(child, __TEST_STOP))
 		goto failure;
@@ -12108,8 +12116,7 @@ test_1_26_iut(int child)
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __EVENT_NO_MSG))
-		goto failure;
+	test_msleep(child, config->sl.t2 >> 1);
 	state++;
 	if (do_signal(child, __TEST_STOP))
 		goto failure;
@@ -16640,6 +16647,7 @@ test_8_1_ptu(int child)
 				}
 				goto failure;
 			}
+#if TEST_X400
 			if ((bib[1] | bsn[1]) == 0xff && (fib[1] | fsn[1]) == 0xff) {
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
@@ -16649,14 +16657,17 @@ test_8_1_ptu(int child)
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
+#endif				/* TEST_X400 */
 			state++;
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
+#if TEST_X400
 					if (check_snibs(child, 0x80, 0xff))
 						goto failure;
 					if (do_signal(child, __TEST_FISU))
 						goto failure;
+#endif				/* TEST_X400 */
 					continue;
 				}
 				goto failure;
@@ -16668,10 +16679,12 @@ test_8_1_ptu(int child)
 				goto failure;
 			state++;
 		case 3:
+#if TEST_X400
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
 			if (check_snibs(child, 0x80, 0x80))
 				goto failure;
+#endif
 			state++;
 		case 4:
 			break;
@@ -16972,7 +16985,7 @@ test_8_3_ptu(int child)
 #endif				/* TEST_X400 */
 #if TEST_M2PA
 			case __TEST_DATA:
-				if (++count != n) {
+				if (++count == n) {
 					print_less(child);
 					continue;
 				}
@@ -17124,6 +17137,11 @@ test_8_4_ptu(int child)
 static int
 test_8_4_iut(int child)
 {
+#if TEST_M2PA
+	if (do_signal(child, __TEST_SEND_MSU))
+		goto failure;
+	state++;
+#endif
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
@@ -17437,8 +17455,13 @@ test_8_7_iut(int child)
 #endif				/* TEST_X400 */
 }
 
+#if TEST_X400
 static struct test_stream test_case_8_7_ptu = { preamble_link_in_service, test_8_7_ptu, postamble_link_out_of_service };
 static struct test_stream test_case_8_7_iut = { preamble_link_in_service, test_8_7_iut, postamble_link_out_of_service };
+#else				/* TEST_X400 */
+static struct test_stream test_case_8_7_ptu = { preamble_link_in_service, test_8_7_ptu, postamble_link_in_service };
+static struct test_stream test_case_8_7_iut = { preamble_link_in_service, test_8_7_iut, postamble_link_in_service };
+#endif				/* TEST_X400 */
 
 #define test_case_8_7 { &test_case_8_7_ptu, &test_case_8_7_iut, NULL }
 
@@ -17625,9 +17648,11 @@ test_8_9a_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_RPR))
 		goto failure;
 	state++;
+#if TEST_X400
 	if (do_signal(child, __TEST_CONTINUE))
 		goto failure;
 	state++;
+#endif
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
@@ -17729,9 +17754,11 @@ test_8_9b_iut(int child)
 	if (do_signal(child, __TEST_LPR))
 		goto failure;
 	state++;
+#if TEST_X400
 	if (do_signal(child, __TEST_CONTINUE))
 		goto failure;
 	state++;
+#endif
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
@@ -17838,6 +17865,11 @@ test_8_10_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
+#if TEST_M2PA
+	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
+		goto failure;
+	state++;
+#endif
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
@@ -18073,6 +18105,14 @@ test_8_12b_iut(int child)
 	if (do_signal(child, __TEST_SEND_MSU))
 		goto failure;
 	state++;
+#if TEST_M2PA
+	if (expect(child, config->sl.t7 / 2, __EVENT_NO_MSG))
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_SEND_MSU))
+		goto failure;
+	state++;
+#endif
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_OUT_OF_SERVICE))
 		goto failure;
 	state++;
@@ -19361,8 +19401,13 @@ test_9_9_iut(int child)
 #endif				/* TEST_X400 */
 }
 
+#if TEST_X400
 static struct test_stream test_case_9_9_ptu = { preamble_link_in_service_pcr, test_9_9_ptu, postamble_link_out_of_service };
 static struct test_stream test_case_9_9_iut = { preamble_link_in_service_pcr, test_9_9_iut, postamble_link_out_of_service };
+#else				/* TEST_X400 */
+static struct test_stream test_case_9_9_ptu = { preamble_link_in_service_pcr, test_9_9_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_9_iut = { preamble_link_in_service_pcr, test_9_9_iut, postamble_link_in_service };
+#endif				/* TEST_X400 */
 
 #define test_case_9_9 { &test_case_9_9_ptu, &test_case_9_9_iut, NULL }
 
@@ -19529,8 +19574,13 @@ test_9_11_iut(int child)
 #endif				/* TEST_X400 */
 }
 
+#if TEST_X400
 static struct test_stream test_case_9_11_ptu = { preamble_link_in_service_pcr, test_9_11_ptu, postamble_link_out_of_service };
 static struct test_stream test_case_9_11_iut = { preamble_link_in_service_pcr, test_9_11_iut, postamble_link_out_of_service };
+#else				/* TEST_X400 */
+static struct test_stream test_case_9_11_ptu = { preamble_link_in_service_pcr, test_9_11_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_11_iut = { preamble_link_in_service_pcr, test_9_11_iut, postamble_link_in_service };
+#endif				/* TEST_X400 */
 
 #define test_case_9_11 { &test_case_9_11_ptu, &test_case_9_11_iut, NULL }
 
@@ -19666,8 +19716,13 @@ test_9_13_iut(int child)
 #endif				/* TEST_X400 */
 }
 
+#if TEST_X400
 static struct test_stream test_case_9_13_ptu = { preamble_link_in_service_pcr, test_9_13_ptu, postamble_link_out_of_service };
 static struct test_stream test_case_9_13_iut = { preamble_link_in_service_pcr, test_9_13_iut, postamble_link_out_of_service };
+#else				/* TEST_X400 */
+static struct test_stream test_case_9_13_ptu = { preamble_link_in_service_pcr, test_9_13_ptu, postamble_link_in_service };
+static struct test_stream test_case_9_13_iut = { preamble_link_in_service_pcr, test_9_13_iut, postamble_link_in_service };
+#endif				/* TEST_X400 */
 
 #define test_case_9_13 { &test_case_9_13_ptu, &test_case_9_13_iut, NULL }
 
@@ -21354,18 +21409,6 @@ main(int argc, char *argv[])
 				break;
 			}
 			goto bad_option;
-		case 'q':
-			verbose = 0;
-			break;
-		case 'v':
-			if (optarg == NULL) {
-				verbose++;
-				break;
-			}
-			if ((val = strtol(optarg, NULL, 0)) < 0)
-				goto bad_option;
-			verbose = val;
-			break;
 		case 't':
 			l = strnlen(optarg, 16);
 			if (!range) {
@@ -21391,11 +21434,23 @@ main(int argc, char *argv[])
 		case 'm':
 			show_msg = 1;
 			break;
+		case 'q':	/* -q, --quiet */
+			verbose = 0;
+			break;
+		case 'v':	/* -v, --verbose */
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
 			help(argc, argv);
 			exit(0);
-		case 'V':
+		case 'V':	/* -V, --version */
 			version(argc, argv);
 			exit(0);
 		case 'C':

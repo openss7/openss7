@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/07 01:15:37 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 10:51:31 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:15:37 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:51:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.5  2006/12/18 10:51:31  brian
+ - subpackaging changes for release
+
  Revision 0.9.2.4  2006/03/07 01:15:37  brian
  - rationalized to stream package version
 
@@ -72,10 +75,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/07 01:15:37 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 10:51:31 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/03/07 01:15:37 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 10:51:31 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -547,6 +550,12 @@ test_async(int fds[])
 	return (0);
 }
 
+#ifdef LFS
+static const char fifoname[] = "/dev/streams/fifo/0";
+#else
+static const char fifoname[] = "/dev/fifo";
+#endif
+
 int
 do_tests(void)
 {
@@ -570,12 +579,12 @@ do_tests(void)
 			fprintf(stderr, "Opening fifo\n");
 			fflush(stderr);
 		}
-		if ((fds[0] = open("/dev/fifo", O_RDONLY | O_NONBLOCK)) < 0) {
+		if ((fds[0] = open(fifoname, O_RDONLY | O_NONBLOCK)) < 0) {
 			if (verbose)
 				perror("open()");
 			goto dead;
 		}
-		if ((fds[1] = open("/dev/fifo", O_WRONLY | O_NONBLOCK)) < 0) {
+		if ((fds[1] = open(fifoname, O_WRONLY | O_NONBLOCK)) < 0) {
 			if (verbose)
 				perror("open()");
 			goto dead;

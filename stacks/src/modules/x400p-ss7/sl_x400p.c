@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/12/11 22:02:51 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 10:51:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/11 22:02:51 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:51:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.29  2006/12/18 10:51:27  brian
+ - subpackaging changes for release
+
  Revision 0.9.2.28  2006/12/11 22:02:51  brian
  - performance tuning
 
@@ -94,10 +97,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/12/11 22:02:51 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 10:51:27 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/12/11 22:02:51 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 10:51:27 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -150,7 +153,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/12/11 22:02:51 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 10:51:27 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -195,6 +198,8 @@ MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SL_X400P_MODID));
 MODULE_ALIAS("streams-driver-sl-x400p");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SL_X400P_MAJOR));
 MODULE_ALIAS("/dev/streams/x400p-sl");
+MODULE_ALIAS("/dev/streams/x400p-sl/*");
+MODULE_ALIAS("/dev/streams/clone/x400p-sl");
 #endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0) "-*");
@@ -1845,7 +1850,7 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifmode = SDL_MODE_PEER,
 	.ifgmode = SDL_GMODE_NONE,
 	.ifgcrc = SDL_GCRC_CRC6,
-	.ifclock = SDL_CLOCK_SLAVE,
+	.ifclock = SDL_CLOCK_LOOP,
 	.ifcoding = SDL_CODING_B8ZS,
 	.ifframing = SDL_FRAMING_ESF,
 	.ifblksize = 8,
@@ -1868,7 +1873,7 @@ STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifmode = SDL_MODE_PEER,
 	.ifgmode = SDL_GMODE_NONE,
 	.ifgcrc = SDL_GCRC_CRC6J,
-	.ifclock = SDL_CLOCK_SLAVE,
+	.ifclock = SDL_CLOCK_LOOP,
 	.ifcoding = SDL_CODING_B8ZS,
 	.ifframing = SDL_FRAMING_ESF,
 	.ifblksize = 8,
@@ -2413,7 +2418,6 @@ xp_span_reconfig(struct cd *cd, int span)
 		   pin instead of the MCLK pin when in external clock mode. */
 		/* Hmmm. tor3 driver has TCLK only for T1, but RCLK if TCLK fails for E1! */
 		xlb[0x70] = reg70;	/* LOTCMC into TCSS0 */
-		xlb[0x70] = reg70;
 
 		reg33 = 0x00;
 		reg35 = 0x10;	/* TSiS */
@@ -2565,6 +2569,7 @@ xp_span_reconfig(struct cd *cd, int span)
 					   the TCLK pin fails to transition after 1 channel time. */
 			break;
 		}
+		xlb[0x70] = reg70;
 
 		reg04 = 0x00;
 		reg05 = 0x10;	/* TSSE */
@@ -12253,7 +12258,7 @@ MODULE_PARM_DESC(major, "Device number for the SL-X400P driver. (0 for allocatio
 STATIC struct cdevsw xp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sl_x400pinfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/20 12:23:31 $
+ @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:51:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/20 12:23:31 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:51:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_mux.c,v $
+ Revision 0.9.2.2  2006/12/18 10:51:15  brian
+ - subpackaging changes for release
+
  Revision 0.9.2.1  2006/03/20 12:23:31  brian
  - first cut of zaptel driver
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/20 12:23:31 $"
+#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:51:15 $"
 
-static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/20 12:23:31 $";
+static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:51:15 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -76,7 +79,7 @@ static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2006/03/20 12:23:31 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:51:15 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -156,6 +159,7 @@ MODULE_ALIAS("/dev/mx");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MX_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/mx");
 MODULE_ALIAS("/dev/streams/mx/*");
+MODULE_ALIAS("/dev/streams/clone/mx");
 #endif				/* LFS */
 #endif				/* MODULE_ALIAS */
 

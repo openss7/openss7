@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/27 22:57:17 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/12/18 10:50:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/27 22:57:17 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 10:50:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.56  2006/12/18 10:50:55  brian
+# - subpackaging changes for release
+#
 # Revision 0.9.2.55  2006/10/27 22:57:17  brian
 # - changes for build on 2.6.18 kernel
 #
@@ -186,6 +189,11 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
 AC_DEFUN([_SS7_OPTIONS], [dnl
     _SS7_CHECK_INET
     _SS7_CHECK_SCTP
+    _SS7_CHECK_SIGTRAN
+    _SS7_CHECK_ISDN
+    _SS7_CHECK_CHAN
+    _SS7_CHECK_VOIP
+    _SS7_CHECK_GSM
 ])# _SS7_OPTIONS
 # =============================================================================
 
@@ -195,7 +203,7 @@ AC_DEFUN([_SS7_OPTIONS], [dnl
 AC_DEFUN([_SS7_CHECK_INET], [dnl
     AC_ARG_WITH([udp],
 	AS_HELP_STRING([--with-udp],
-	    [include udp version 2 driver in build.  @<:@default=yes@:>@]),
+	    [include udp version 2 driver in build.  @<:@default=no@:>@]),
 	[with_udp="$withval"],
 	[with_udp='no'])
     AC_MSG_CHECKING([for UDP Version 2 driver])
@@ -211,7 +219,7 @@ AC_DEFUN([_SS7_CHECK_INET], [dnl
     AM_CONDITIONAL([WITH_UDP], [test :"$ss7_cv_udp_v2" = :yes])dnl
     AC_ARG_WITH([raw],
 	AS_HELP_STRING([--with-raw],
-	    [include raw version 2 driver in build.  @<:@default=yes@:>@]),
+	    [include raw version 2 driver in build.  @<:@default=no@:>@]),
 	[with_raw="$withval"],
 	[with_raw='no'])
     AC_MSG_CHECKING([for RAW Version 2 driver])
@@ -331,6 +339,101 @@ AC_DEFUN([_SS7_OTHER_SCTP], [dnl
     AM_CONDITIONAL([WITH_LKSCTP_SCTP], [ test :"${linux_cv_lksctp_sctp:-no}"  = :yes])dnl
     AM_CONDITIONAL([WITH_OPENSS7_SCTP], [test :"${linux_cv_openss7_sctp:-no}" = :yes])dnl
 ])# _SS7_OTHER_SCTP
+# =============================================================================
+
+# =============================================================================
+# _SS7_CHECK_SIGTRAN
+# -----------------------------------------------------------------------------
+# This check is whether to include SIGTRAN modules in the build.  The SIGTRAN
+# modules have been moved to their own package (the sigtran package) and are
+# not build by default in the strss7 package any longer.  --with-sigtran must
+# be explicity provided to build these packages as part of the strss7 build.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_SIGTRAN], [dnl
+    AC_ARG_WITH([sigtran],
+	AS_HELP_STRING([--with-sigtran],
+	    [include sigtran modules in build. @<:@default=no@:>@]),
+	[with_sigtran="$withval"],
+	[with_sigtran='no'])
+    AC_MSG_CHECKING([for SIGTRAN modules])
+    if test :"$with_sigtran" = :yes ; then
+	ss7_cvs_sigtran='yes'
+    fi
+    AM_CONDITIONAL([WITH_SIGTRAN], [test :"$ss7_cvs_sigtran" = :yes])dnl
+    AC_MSG_RESULT([${ss7_cv_sigtran:-no}])
+])# _SS7_CHECK_SIGTRAN
+# =============================================================================
+
+# =============================================================================
+# _SS7_CHECK_ISDN
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_ISDN], [dnl
+    AC_ARG_WITH([isdn],
+	AS_HELP_STRING([--with-isdn],
+	    [include isdn modules in build. @<:@default=no@:>@]),
+	[with_isdn="$withval"],
+	[with_isdn='no'])
+    AC_MSG_CHECKING([for ISDN modules])
+    if test :"$with_isdn" = :yes ; then
+	ss7_cvs_isdn='yes'
+    fi
+    AM_CONDITIONAL([WITH_ISDN], [test :"$ss7_cvs_isdn" = :yes])dnl
+    AC_MSG_RESULT([${ss7_cv_isdn:-no}])
+])# _SS7_CHECK_ISDN
+# =============================================================================
+
+# =============================================================================
+# _SS7_CHECK_CHAN
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_CHAN], [dnl
+    AC_ARG_WITH([chan],
+	AS_HELP_STRING([--with-chan],
+	    [include chan modules in build. @<:@default=no@:>@]),
+	[with_chan="$withval"],
+	[with_chan='no'])
+    AC_MSG_CHECKING([for CHAN modules])
+    if test :"$with_chan" = :yes ; then
+	ss7_cvs_chan='yes'
+    fi
+    AM_CONDITIONAL([WITH_CHAN], [test :"$ss7_cvs_chan" = :yes])dnl
+    AC_MSG_RESULT([${ss7_cv_chan:-no}])
+])# _SS7_CHECK_CHAN
+# =============================================================================
+
+# =============================================================================
+# _SS7_CHECK_VOIP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_VOIP], [dnl
+    AC_ARG_WITH([voip],
+	AS_HELP_STRING([--with-voip],
+	    [include voip modules in build. @<:@default=no@:>@]),
+	[with_voip="$withval"],
+	[with_voip='no'])
+    AC_MSG_CHECKING([for VOIP modules])
+    if test :"$with_voip" = :yes ; then
+	ss7_cvs_voip='yes'
+    fi
+    AM_CONDITIONAL([WITH_VOIP], [test :"$ss7_cvs_voip" = :yes])dnl
+    AC_MSG_RESULT([${ss7_cv_voip:-no}])
+])# _SS7_CHECK_VOIP
+# =============================================================================
+
+# =============================================================================
+# _SS7_CHECK_GSM
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_GSM], [dnl
+    AC_ARG_WITH([gsm],
+	AS_HELP_STRING([--with-gsm],
+	    [include gsm modules in build. @<:@default=no@:>@]),
+	[with_gsm="$withval"],
+	[with_gsm='no'])
+    AC_MSG_CHECKING([for GSM modules])
+    if test :"$with_gsm" = :yes ; then
+	ss7_cvs_gsm='yes'
+    fi
+    AM_CONDITIONAL([WITH_GSM], [test :"$ss7_cvs_gsm" = :yes])dnl
+    AC_MSG_RESULT([${ss7_cv_gsm:-no}])
+])# _SS7_CHECK_GSM
 # =============================================================================
 
 # =============================================================================
@@ -1331,7 +1434,7 @@ AC_DEFUN([_SS7_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=180
-    strconf_cv_midbase=90
+    strconf_cv_midbase=140
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
 dnl

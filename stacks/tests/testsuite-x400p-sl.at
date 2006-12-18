@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-x400p-sl.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/11 07:40:22 $
+dnl @(#) $RCSfile: testsuite-x400p-sl.at,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:45 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/12/11 07:40:22 $ by $Author: brian $
+dnl Last Modified $Date: 2006/12/18 10:51:45 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-x400p-sl.at,v $
+dnl Revision 0.9.2.4  2006/12/18 10:51:45  brian
+dnl - subpackaging changes for release
+dnl
 dnl Revision 0.9.2.3  2006/12/11 07:40:22  brian
 dnl - corrections from testing
 dnl
@@ -79,6 +82,7 @@ dnl =========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_x400p_sl() {
+    if !(lspci -n -d 0x10b5: | egrep -q ':(930|3001D00D|0557|4000|d33d|d44d)' >/dev/null) ; then return 77; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi

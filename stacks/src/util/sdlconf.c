@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/08 11:46:39 $
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 11:46:39 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:51:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/08 11:46:39 $"
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:44 $"
 
 static char const ident[] =
-    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/08 11:46:39 $";
+    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:44 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -274,39 +274,109 @@ char devname[256] = "/dev/x400p-sl";
 char cfgfile[256] = "/etc/sysconfig/ss7/sdl.config";
 
 void
-version(int argc, char **argv)
+copying(int argc, char *argv[])
 {
 	if (!output)
 		return;
-	fprintf(stderr, "\
-%1$s %2$s:\n\
-    Copyright (c) 2003  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+	fprintf(stdout, "\
+\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+\n\
+");
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (!output)
+		return;
+	fprintf(stdout, "\
+\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2003-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
 ", argv[0], ident);
 }
 
 void
-usage(int argc, char **argv)
+usage(int argc, char *argv[])
 {
 	if (!output)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] {-g|--get} {-d|--device} [{-c|--card} card] [{-p|--span} span] [{-t|--slot} slot]\n\
-    %1$s [options] {-s|--set} {-d|--device} [{-c|--card} card] [{-p|--span} span] [{-t|--slot} slot] [set-options]\n\
-    %1$s [options] {-f|--file} config_file\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
+    %1$s [options] {-g, --get} {-d, --device} [{-c, --card} card] [{-p, --span} span] [{-t, --slot} slot]\n\
+    %1$s [options] {-s, --set} {-d, --device} [{-c, --card} card] [{-p, --span} span] [{-t, --slot} slot] [set-options]\n\
+    %1$s [options] {-f, --file} config_file\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
 void
-help(int argc, char **argv)
+help(int argc, char *argv[])
 {
 	if (!output)
 		return;
-	usage(argc, argv);
-	fprintf(stderr, "\
+	fprintf(stdout, "\
+\n\
+Usage:\n\
+    %1$s [options] {-g, --get} {-d, --device} [{-c, --card} card] [{-p, --span} span] [{-t, --slot} slot]\n\
+    %1$s [options] {-s, --set} {-d, --device} [{-c, --card} card] [{-p, --span} span] [{-t, --slot} slot] [set-options]\n\
+    %1$s [options] {-f, --file} config_file\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
+Arguments:\n\
+    (none)\n\
 General Options:\n\
     -q, --quiet				(default: off)\n\
 	suppress output\n\
@@ -317,45 +387,47 @@ Command Options:\n\
 	get (display) device configuration\n\
     -s, --set\n\
 	set (configure) device configuration\n\
-    -f, --file file			(default: %s)\n\
+    -f, --file file			(default: %2$s)\n\
 	read device configuration from file\n\
     -h, --help\n\
 	prints this usage information and exits\n\
     -V, --version\n\
 	prints the version and exits\n\
+    -C, --copying\n\
+	prints the copying permissions and exits\n\
 Set/Get Options:\n\
-    -d, --device devname		(default: %s)\n\
+    -d, --device devname		(default: %3$s)\n\
 	device name\n\
-    -c, --card card			(default: %d)\n\
+    -c, --card card			(default: %4$d)\n\
 	card in host (numbered from 0)\n\
-    -p, --span span			(default: %d)\n\
+    -p, --span span			(default: %5$d)\n\
 	span on card (numbered from 0)\n\
-    -t, --slot slot			(default: %d)\n\
+    -t, --slot slot			(default: %6$d)\n\
 	timeslot (numbered from 1, 0 for entire span)\n\
 Set Options:\n\
-    --clock				(default: %s)\n\
+    --clock				(default: %7$s)\n\
 	span clock source: default int ext loop master slave dpll abr shaper tick\n\
-    --rate				(default: %u)\n\
+    --rate				(default: %8$u)\n\
 	channel interface rate: 56000 64000 1544000 2048000\n\
-    --type				(default: %s)\n\
+    --type				(default: %9$s)\n\
 	channel interface type: default v35 ds0 ds0a e1 t1 j1 atm packet\n\
-    --mode				(default: %s)\n\
+    --mode				(default: %10$s)\n\
 	channel interface mode: default dsu csu dte dce client server peer echo rem_lb loc_lb lb_echo test\n\
-    --grate				(default: %u)\n\
+    --grate				(default: %11$u)\n\
 	span interface rate: 1544000 2048000 10000000 100000000\n\
-    --gtype				(default: %s)\n\
+    --gtype				(default: %12$s)\n\
 	span interface type: default t1 e1 j1 atm eth ip udp tcp rtp sctp\n\
-    --gmode				(default: %s)\n\
+    --gmode				(default: %13$s)\n\
 	span interface mode: default loc_lb rem_lb\n\
-    --gcrc				(default: %s)\n\
+    --gcrc				(default: %14$s)\n\
 	span CRC calulation: default crc4 crc5 crc6 crc6j\n\
-    --coding				(default: %s)\n\
+    --coding				(default: %15$s)\n\
 	span coding: default nrz nrzi ami b6zs b8zs aal1 aal2 aal5 hbd3\n\
-    --framing				(default: %s)\n\
+    --framing				(default: %16$s)\n\
 	span framing: ccs cas sf esf\n\
     --syncsrc sync1,sync2,sync3,sync4\n\
 	span synchronization: 0 - self, 1 - span1 ...\n\
-", cfgfile, devname, card, span, slot, clock_names[config.ifclock].key, config.ifrate, type_names[config.iftype].key, mode_names[config.ifmode].key, config.ifgrate, gtype_names[config.ifgtype].key, gmode_names[config.ifgmode].key, gcrc_names[config.ifgcrc].key, coding_names[config.ifcoding].key, framing_names[config.ifframing].key);
+", argv[0], cfgfile, devname, card, span, slot, clock_names[config.ifclock].key, config.ifrate, type_names[config.iftype].key, mode_names[config.ifmode].key, config.ifgrate, gtype_names[config.ifgtype].key, gmode_names[config.ifgmode].key, gcrc_names[config.ifgcrc].key, coding_names[config.ifcoding].key, framing_names[config.ifframing].key);
 }
 
 void
@@ -679,6 +751,7 @@ int
 main(int argc, char **argv)
 {
 	int c;
+	int val;
 	enum {
 		CMD_NONE = 0,
 		CMD_GET,		/* get device */
@@ -688,33 +761,38 @@ main(int argc, char **argv)
 
 	while (1) {
 		int option_index = 0;
+		/* *INDENT-OFF* */
 		static struct option long_options[] = {
-			{"get", 0, 0, 'g'},
-			{"set", 0, 0, 's'},
-			{"file", 1, 0, 'f'},
-			{"device", 1, 0, 'd'},
-			{"card", 1, 0, 'c'},
-			{"span", 1, 0, 'p'},
-			{"slot", 1, 0, 't'},
-			{"quiet", 0, 0, 'q'},
-			{"verbose", 0, 0, 'v'},
-			{"help", 0, 0, 'h'},
-			{"version", 0, 0, 'V'},
-			{"type", 1, 0, CFG_TYPE + 1},
-			{"gtype", 1, 0, CFG_GTYPE + 1},
-			{"mode", 1, 0, CFG_MODE + 1},
-			{"gmode", 1, 0, CFG_GMODE + 1},
-			{"gcrc", 1, 0, CFG_GCRC + 1},
-			{"clock", 1, 0, CFG_CLOCK + 1},
-			{"coding", 1, 0, CFG_CODING + 1},
-			{"framing", 1, 0, CFG_FRAMING + 1},
-			{"rate", 1, 0, CFG_RATE + 1},
-			{"grate", 1, 0, CFG_GRATE + 1},
-			{"txlevel", 1, 0, CFG_TXLEVEL + 1},
-			{"syncsrc", 1, 0, CFG_SYNCSRC + 1},
+			{"get",		no_argument,		NULL, 'g'},
+			{"set",		no_argument,		NULL, 's'},
+			{"file",	required_argument,	NULL, 'f'},
+			{"device",	required_argument,	NULL, 'd'},
+			{"card",	required_argument,	NULL, 'c'},
+			{"span",	required_argument,	NULL, 'p'},
+			{"slot",	required_argument,	NULL, 't'},
+			{"type",	required_argument,	NULL, CFG_TYPE + 1},
+			{"gtype",	required_argument,	NULL, CFG_GTYPE + 1},
+			{"mode",	required_argument,	NULL, CFG_MODE + 1},
+			{"gmode",	required_argument,	NULL, CFG_GMODE + 1},
+			{"gcrc",	required_argument,	NULL, CFG_GCRC + 1},
+			{"clock",	required_argument,	NULL, CFG_CLOCK + 1},
+			{"coding",	required_argument,	NULL, CFG_CODING + 1},
+			{"framing",	required_argument,	NULL, CFG_FRAMING + 1},
+			{"rate",	required_argument,	NULL, CFG_RATE + 1},
+			{"grate",	required_argument,	NULL, CFG_GRATE + 1},
+			{"txlevel",	required_argument,	NULL, CFG_TXLEVEL + 1},
+			{"syncsrc",	required_argument,	NULL, CFG_SYNCSRC + 1},
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
+			{"?",		no_argument,		NULL, 'h'},
+			{NULL,		0,			NULL,  0 }
 		};
+		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "gsf:c:p:t:qvhV", long_options, &option_index);
+		c = getopt_long(argc, argv, "gsf:c:p:t:qvhVC?", long_options, &option_index);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -825,7 +903,13 @@ main(int argc, char **argv)
 			output -= output > 0 ? 1 : output;
 			break;
 		case 'v':	/* -v, --verbose */
-			output += 1;
+			if (optarg == NULL) {
+				output += 1;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			output = val;
 			break;
 		case 'h':	/* -h, --help */
 			if (cmd != CMD_NONE)
@@ -836,6 +920,11 @@ main(int argc, char **argv)
 			if (cmd != CMD_NONE)
 				goto bad_option;
 			version(argc, argv);
+			exit(0);
+		case 'C':
+			if (cmd != CMD_NONE)
+				goto bad_option;
+			copying(argc, argv);
 			exit(0);
 		case ':':
 			fprintf(stderr, "%s: missing parm -- %s\n", argv[0], argv[optind - 1]);

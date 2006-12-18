@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/06 11:45:16 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/18 10:51:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:45:16 $ by $Author: brian $
+ Last Modified $Date: 2006/12/18 10:51:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.21  2006/12/18 10:51:10  brian
+ - subpackaging changes for release
+
  Revision 0.9.2.20  2006/12/06 11:45:16  brian
  - updated X400P driver and test suites
 
@@ -58,14 +61,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/06 11:45:16 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/18 10:51:10 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/06 11:45:16 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/18 10:51:10 $";
 
 #define _LFS_SOURCE 1
+#define _SVR4_SOURCE 1
+#define _MPS_SOURCE 1
 
-#define _DEBUG 1
+//#define _DEBUG 1
+#undef _DEBUG
 
 #include <sys/os7/compat.h>
 
@@ -87,7 +93,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/12/06 11:45:16 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/18 10:51:10 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2120,184 +2126,122 @@ sl_send_data(struct sl *sl, queue_t *q, mblk_t *dp)
  */
 enum { tall, t1, t2, t3, t4, t5, t6, t7, t8, t9 };
 
-STATIC int sl_t1_timeout(struct sl *);
-STATIC void streamscall
-sl_t1_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t1", MOD_NAME, &((struct sl *) data)->sl.timers.t1,
-		       (int (*)(struct head *)) &sl_t1_timeout, &sl_t1_expiry);
-}
-STATIC void
+static noinline fastcall void
 sl_stop_timer_t1(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t1", MOD_NAME, &sl->sl.timers.t1);
+	printd(("%s: %p: -> T1 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sl.timers.t1);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t1(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t1", MOD_NAME, &sl->sl.timers.t1,
-			&sl_t1_expiry, sl->sl.config.t1);
-};
-
-STATIC int sl_t2_timeout(struct sl *);
-STATIC void streamscall
-sl_t2_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t2", MOD_NAME, &((struct sl *) data)->sl.timers.t2,
-		       (int (*)(struct head *)) &sl_t2_timeout, &sl_t2_expiry);
+	printd(("%s: %p: -> T1 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t1, drv_hztomsec(sl->sl.config.t1), (uint) HZ));
+	mi_timer_MAC(sl->sl.timers.t1, sl->sl.config.t1);
 }
-STATIC void
+static noinline fastcall void
 sl_stop_timer_t2(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t2", MOD_NAME, &sl->sl.timers.t2);
+	printd(("%s: %p: -> T2 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sl.timers.t2);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t2(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t2", MOD_NAME, &sl->sl.timers.t2,
-			&sl_t2_expiry, sl->sl.config.t2);
-};
-
-STATIC int sl_t3_timeout(struct sl *);
-STATIC void streamscall
-sl_t3_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t3", MOD_NAME, &((struct sl *) data)->sl.timers.t3,
-		       (int (*)(struct head *)) &sl_t3_timeout, &sl_t3_expiry);
+	printd(("%s: %p: -> T2 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t2, drv_hztomsec(sl->sl.config.t2), (uint) HZ));
+	mi_timer_MAC(sl->sl.timers.t2, sl->sl.config.t2);
 }
-STATIC void
+static noinline fastcall void
 sl_stop_timer_t3(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t3", MOD_NAME, &sl->sl.timers.t3);
+	printd(("%s: %p: -> T3 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sl.timers.t3);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t3(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t3", MOD_NAME, &sl->sl.timers.t3,
-			&sl_t3_expiry, sl->sl.config.t3);
-};
-
-STATIC int sl_t4_timeout(struct sl *);
-STATIC void streamscall
-sl_t4_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t4", MOD_NAME, &((struct sl *) data)->sl.timers.t4,
-		       (int (*)(struct head *)) &sl_t4_timeout, &sl_t4_expiry);
+	printd(("%s: %p: -> T3 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t3, drv_hztomsec(sl->sl.config.t3), (uint) HZ));
+	mi_timer_MAC(sl->sl.timers.t3, sl->sl.config.t3);
 }
-STATIC void
+static noinline fastcall void
 sl_stop_timer_t4(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t4", MOD_NAME, &sl->sl.timers.t4);
+	printd(("%s: %p: -> T4 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sl.timers.t4);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t4(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t4", MOD_NAME, &sl->sl.timers.t4,
-			&sl_t4_expiry,
-			(sl->flags & (MF_LOC_EMERG | MF_REM_EMERG)) ? sl->sl.config.t4e : sl->sl.
-			config.t4n);
-};
-
-#if 0
-STATIC int sl_t5_timeout(struct sl *);
-STATIC void streamscall
-sl_t5_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t5", MOD_NAME, &((struct sl *) data)->sl.timers.t5,
-		       (int (*)(struct head *)) &sl_t5_timeout, &sl_t5_expiry);
+	sl_ulong t4v = (sl->flags & (MF_LOC_EMERG | MF_REM_EMERG)) ? sl->sl.config.t4e : sl->sl.config.t4n;
+	printd(("%s: %p: -> T4 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, t4v, drv_hztomsec(t4v), (uint) HZ));
+	mi_timer_MAC(sl->sl.timers.t4, t4v);
 }
-STATIC void
+#if 0
+static noinline fastcall void
 sl_stop_timer_t5(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t5", MOD_NAME, &sl->sl.timers.t5);
+	printd(("%s: %p: -> T5 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sl.timers.t5);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t5(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t5", MOD_NAME, &sl->sl.timers.t5,
-			&sl_t5_expiry, sl->sl.config.t5);
-};
-#endif
-
-STATIC int sl_t6_timeout(struct sl *);
-STATIC void streamscall
-sl_t6_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t6", MOD_NAME, &((struct sl *) data)->sl.timers.t6,
-		       (int (*)(struct head *)) &sl_t6_timeout, &sl_t6_expiry);
+	printd(("%s: %p: -> T5 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t5, drv_hztomsec(sl->sl.config.t5), (uint) HZ));
+	mi_timer_MAC(sl->sl.timers.t5, sl->sl.config.t5);
 }
-STATIC void
+#endif
+static noinline fastcall void
 sl_stop_timer_t6(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t6", MOD_NAME, &sl->sl.timers.t6);
+	printd(("%s: %p: -> T6 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sl.timers.t6);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t6(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t6", MOD_NAME, &sl->sl.timers.t6,
-			&sl_t6_expiry, sl->sl.config.t6);
-};
-
-STATIC int sl_t7_timeout(struct sl *);
-STATIC void streamscall
-sl_t7_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t7", MOD_NAME, &((struct sl *) data)->sl.timers.t7,
-		       (int (*)(struct head *)) &sl_t7_timeout, &sl_t7_expiry);
+	printd(("%s: %p: -> T6 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t6, drv_hztomsec(sl->sl.config.t6), (uint) HZ));
+	mi_timer_MAC(sl->sl.timers.t6, sl->sl.config.t6);
 }
-STATIC void
+static noinline fastcall void
 sl_stop_timer_t7(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t7", MOD_NAME, &sl->sl.timers.t7);
+	printd(("%s: %p: -> T7 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sl.timers.t7);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t7(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t7", MOD_NAME, &sl->sl.timers.t7,
-			&sl_t7_expiry, sl->sl.config.t7);
-};
-
-#if 0
-STATIC int sl_t8_timeout(struct sl *);
-STATIC void streamscall
-sl_t8_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t8", MOD_NAME, &((struct sl *) data)->sdt.timers.t8,
-		       (int (*)(struct head *)) &sl_t8_timeout, &sl_t8_expiry);
+	printd(("%s: %p: -> T7 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t7, drv_hztomsec(sl->sl.config.t7), (uint) HZ));
+	mi_timer_MAC(sl->sl.timers.t7, sl->sl.config.t7);
 }
-STATIC void
+#if 0
+static noinline fastcall void
 sl_stop_timer_t8(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t8", MOD_NAME, &sl->sdt.timers.t8);
+	printd(("%s: %p: -> T8 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sdt.timers.t8);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t8(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t8", MOD_NAME, &sl->sdt.timers.t8,
-			&sl_t8_expiry, sl->sdt.config.t8);
-};
-#endif
-
-STATIC int sl_t9_timeout(struct sl *);
-STATIC void streamscall
-sl_t9_expiry(caddr_t data)
-{
-	ss7_do_timeout(data, "t9", MOD_NAME, &((struct sl *) data)->sdl.timers.t9,
-		       (int (*)(struct head *)) &sl_t9_timeout, &sl_t9_expiry);
+	printd(("%s: %p: -> T8 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sdt.config.t8, drv_hztomsec(sl->sdt.config.t8), (uint) HZ));
+	mi_timer_MAC(sl->sdt.timers.t8, sl->sdt.config.t8);
 }
-STATIC void
+#endif
+static noinline fastcall void
 sl_stop_timer_t9(struct sl *sl)
 {
-	ss7_stop_timer((struct head *) sl, "t9", MOD_NAME, &sl->sdl.timers.t9);
+	printd(("%s: %p: -> T9 STOP <-\n", MOD_NAME, sl));
+	mi_timer_stop(sl->sdl.timers.t9);
 }
-STATIC void
+static noinline fastcall void
 sl_start_timer_t9(struct sl *sl)
 {
-	ss7_start_timer((struct head *) sl, "t9", MOD_NAME, &sl->sdl.timers.t9, &sl_t9_expiry, 2);
-};
+	printd(("%s: %p: -> T9 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, (uint) drv_msectohz(20), 20UL, (uint) HZ));
+	mi_timer_MAC(sl->sdl.timers.t9, drv_msectohz(20));
+}
 
-STATIC INLINE void
-__sl_timer_stop(struct sl *sl, const uint t)
+STATIC inline fastcall __hot void
+sl_timer_stop(struct sl *sl, const uint t)
 {
 	int single = 1;
 
@@ -2360,59 +2304,120 @@ __sl_timer_stop(struct sl *sl, const uint t)
 		break;
 	}
 }
-STATIC INLINE void
-sl_timer_stop(struct sl *sl, const uint t)
-{
-	spin_lock_m2pa(sl);
-	{
-		__sl_timer_stop(sl, t);
-	}
-	spin_unlock_m2pa(sl);
-}
-STATIC INLINE void
+STATIC inline fastcall __hot void
 sl_timer_start(struct sl *sl, const uint t)
 {
-	spin_lock_m2pa(sl);
-	{
-		__sl_timer_stop(sl, t);
-		switch (t) {
-		case t1:
-			sl_start_timer_t1(sl);
-			break;
-		case t2:
-			sl_start_timer_t2(sl);
-			break;
-		case t3:
-			sl_start_timer_t3(sl);
-			break;
-		case t4:
-			sl_start_timer_t4(sl);
-			break;
+	sl_timer_stop(sl, t);
+	switch (t) {
+	case t1:
+		sl_start_timer_t1(sl);
+		break;
+	case t2:
+		sl_start_timer_t2(sl);
+		break;
+	case t3:
+		sl_start_timer_t3(sl);
+		break;
+	case t4:
+		sl_start_timer_t4(sl);
+		break;
 #if 0
-		case t5:
-			sl_start_timer_t5(sl);
-			break;
+	case t5:
+		sl_start_timer_t5(sl);
+		break;
 #endif
-		case t6:
-			sl_start_timer_t6(sl);
-			break;
-		case t7:
-			sl_start_timer_t7(sl);
-			break;
+	case t6:
+		sl_start_timer_t6(sl);
+		break;
+	case t7:
+		sl_start_timer_t7(sl);
+		break;
 #if 0
-		case t8:
-			sl_start_timer_t8(sl);
-			break;
+	case t8:
+		sl_start_timer_t8(sl);
+		break;
 #endif
-		case t9:
-			sl_start_timer_t9(sl);
-			break;
-		default:
-			swerr();
-			break;
-		}
+	case t9:
+		sl_start_timer_t9(sl);
+		break;
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_m2pa(sl);
+}
+
+STATIC noinline __unlikely void
+sl_free_timers(struct sl *sl)
+{
+	mblk_t *tp;
+
+	if ((tp = XCHG(&sl->sl.timers.t1, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&sl->sl.timers.t2, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&sl->sl.timers.t3, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&sl->sl.timers.t4, NULL)))
+		mi_timer_free(tp);
+#if 0
+	if ((tp = XCHG(&sl->sl.timers.t5, NULL)))
+		mi_timer_free(tp);
+#endif
+	if ((tp = XCHG(&sl->sl.timers.t6, NULL)))
+		mi_timer_free(tp);
+	if ((tp = XCHG(&sl->sl.timers.t7, NULL)))
+		mi_timer_free(tp);
+#if 0
+	if ((tp = XCHG(&sl->sdt.timers.t8, NULL)))
+		mi_timer_free(tp);
+#endif
+	if ((tp = XCHG(&sl->sdl.timers.t9, NULL)))
+		mi_timer_free(tp);
+}
+
+STATIC noinline __unlikely int
+sl_alloc_timers(struct sl *sl)
+{
+	mblk_t *tp;
+
+	/* SDL timer allocation */
+	if (!(tp = sl->sdl.timers.t9 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t9;
+#if 0
+	/* SDT timer allocation */
+	if (!(tp = sl->sdt.timers.t8 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t8;
+#endif
+	/* SL timer allocation */
+	if (!(tp = sl->sl.timers.t7 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t7;
+	if (!(tp = sl->sl.timers.t6 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t6;
+#if 0
+	if (!(tp = sl->sl.timers.t5 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t5;
+#endif
+	if (!(tp = sl->sl.timers.t4 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t4;
+	if (!(tp = sl->sl.timers.t3 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t3;
+	if (!(tp = sl->sl.timers.t2 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t2;
+	if (!(tp = sl->sl.timers.t1 = mi_timer_alloc_MAC(sl->oq, sizeof(int))))
+		goto enobufs;
+	*(int *) tp->b_rptr = t1;
+	return (0);
+      enobufs:
+	sl_free_timers(sl);
+	return (-ENOBUFS);
 }
 
 /*
@@ -2454,13 +2459,12 @@ sl_aerm_stop(struct sl *sl, queue_t *q)
 }
 
 STATIC int
-sl_t9_timeout(struct sl *sl)
+sl_t9_timeout(struct sl *sl, queue_t *q)
 {
 	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 
 	if (sl_get_state(sl) == MS_PROVING) {
 		int err;
-		queue_t *q = sl->iq;
 
 		/* We use the t9 tick timer to determine how fast to send proving messages.  We
 		   send a proving message once every t9 during the proving period.  To adjust the
@@ -2699,15 +2703,15 @@ sl_lsc_start(struct sl *sl, queue_t *q)
 	return (-EPROTO);
 }
 STATIC int
-sl_t2_timeout(struct sl *sl)
+sl_t2_timeout(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl_get_state(sl) == MS_NOT_ALIGNED) {
 		if (sl->sl.notify.events & SL_EVT_FAIL_ALIGNMENT)
-			if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
 			return (err);
 		printd(("%s: %p: Link failed: Alignment not possible\n", MOD_NAME, sl));
 		sl->sl.stats.sl_fail_align_or_proving++;
@@ -2981,14 +2985,14 @@ sl_lsc_status_proving_emergency(struct sl *sl, queue_t *q)
 }
 
 STATIC int
-sl_t1_timeout(struct sl *sl)
+sl_t1_timeout(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl->sl.notify.events & SL_EVT_FAIL_T1_TIMEOUT)
-		if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_T1_TIMEOUT, 0, NULL, 0)) < 0)
+		if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_T1_TIMEOUT, 0, NULL, 0)) < 0)
 			return (err);
-	if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_T1_TIMEOUT)) < 0)
+	if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_T1_TIMEOUT)) < 0)
 		return (err);
 	printd(("%s: %p: Link failed: T1 Timeout\n", MOD_NAME, sl));
 	sl->sl.stats.sl_fail_align_or_proving++;
@@ -2996,15 +3000,15 @@ sl_t1_timeout(struct sl *sl)
 }
 
 STATIC int
-sl_t3_timeout(struct sl *sl)
+sl_t3_timeout(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl_get_state(sl) == MS_ALIGNED) {
 		if (sl->sl.notify.events & SL_EVT_FAIL_ALIGNMENT)
-			if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
+			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_ALIGNMENT, 0, NULL, 0)) < 0)
 				return (err);
-		if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
+		if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)) < 0)
 			return (err);
 		printd(("%s: %p: Link failed: T3 Timeout\n", MOD_NAME, sl));
 		sl->sl.stats.sl_fail_align_or_proving++;
@@ -3016,13 +3020,13 @@ sl_t3_timeout(struct sl *sl)
 }
 
 STATIC int
-sl_t4_timeout(struct sl *sl)
+sl_t4_timeout(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl_get_state(sl) == MS_PROVING) {
-		sl_aerm_stop(sl, NULL);
-		if ((err = sl_ready(sl, NULL)))
+		sl_aerm_stop(sl, q);
+		if ((err = sl_ready(sl, q)))
 			return (err);
 		return (0);
 	}
@@ -3591,7 +3595,20 @@ sl_rc_signal_unit(struct sl *sl, queue_t *q, mblk_t *mp)
 
 	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
+	case MS_ALIGNED_NOT_READY:
+		if ((err = sl_rc_sn_check(sl, q, mp)) < 0)
+			return (err);
+		if ((err = sl_in_service_ind(sl, q)) < 0)
+			return (err);
+		sl_timer_stop(sl, t1);
+		sl->flags &= ~MF_SEND_MSU;
+		sl->flags &= ~MF_RECV_MSU;
+		sl_oos_stats(sl, q);
+		sl_set_state(sl, MS_PROCESSOR_OUTAGE);
+		goto receive;
 	case MS_ALIGNED_READY:
+		if ((err = sl_rc_sn_check(sl, q, mp)) < 0)
+			return (err);
 		if ((err = sl_in_service_ind(sl, q)) < 0)
 			return (err);
 		sl_timer_stop(sl, t1);
@@ -3599,10 +3616,11 @@ sl_rc_signal_unit(struct sl *sl, queue_t *q, mblk_t *mp)
 		sl->flags |= MF_RECV_MSU;
 		sl_is_stats(sl, q);
 		sl_set_state(sl, MS_IN_SERVICE);
-		/* fall through */
+		goto receive;
 	default:
 		if ((err = sl_rc_sn_check(sl, q, mp)) < 0)
 			return (err);
+	      receive:
 		if (sl->flags & MF_RECV_MSU) {
 			if (!(sl->flags & MF_CONG_DISCARD)) {
 				if (mp->b_wptr - mp->b_rptr > sizeof(uint32_t)) {
@@ -3680,14 +3698,14 @@ sl_lsc_pdu(struct sl *sl, queue_t *q, mblk_t *mp)
 	return (0);
 }
 STATIC int
-sl_t7_timeout(struct sl *sl)
+sl_t7_timeout(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl->sl.notify.events & SL_EVT_FAIL_ACK_TIMEOUT)
-		if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_ACK_TIMEOUT, 0, NULL, 0)) < 0)
+		if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_ACK_TIMEOUT, 0, NULL, 0)) < 0)
 			return (err);
-	if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_ACK_TIMEOUT)) < 0)
+	if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_ACK_TIMEOUT)) < 0)
 		return (err);
 	printd(("%s: %p: Link failed: T7 Timeout\n", MOD_NAME, sl));
 	return (0);
@@ -3766,14 +3784,14 @@ sl_lsc_status_busy_ended(struct sl *sl, queue_t *q)
 	}
 }
 STATIC int
-sl_t6_timeout(struct sl *sl)
+sl_t6_timeout(struct sl *sl, queue_t *q)
 {
 	int err;
 
 	if (sl->sl.notify.events & SL_EVT_FAIL_CONG_TIMEOUT)
-		if ((err = lmi_event_ind(sl, NULL, SL_EVT_FAIL_CONG_TIMEOUT, 0, NULL, 0)) < 0)
+		if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_CONG_TIMEOUT, 0, NULL, 0)) < 0)
 			return (err);
-	if ((err = sl_lsc_out_of_service(sl, NULL, SL_FAIL_CONG_TIMEOUT)) < 0)
+	if ((err = sl_lsc_out_of_service(sl, q, SL_FAIL_CONG_TIMEOUT)) < 0)
 		return (err);
 	printd(("%s: %p: Link failed: T6 Timeout\n", MOD_NAME, sl));
 	return (0);
@@ -7805,6 +7823,83 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 /*
  *  -------------------------------------------------------------------------
  *
+ *  M_SIG/M_PCSIG Handling
+ *
+ *  -------------------------------------------------------------------------
+ *  One little problem with mi_timers: we can never place them back on the
+ *  queue because mi_timer_valid cannot be called twice for the same timer.
+ */
+STATIC noinline fastcall __unlikely int
+sl_r_sig(queue_t *q, mblk_t *mp)
+{
+	struct sl *sl = SL_PRIV(q);
+	int rtn = QR_ABSORBED;
+
+	if (likely(mi_timer_valid(mp))) {
+		switch (*(int *) mp->b_rptr) {
+		case t1:
+			printd(("%s: %p: -> T1 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t1_timeout(sl, q);
+			break;
+		case t2:
+			printd(("%s: %p: -> T2 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t2_timeout(sl, q);
+			break;
+		case t3:
+			printd(("%s: %p: -> T3 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t3_timeout(sl, q);
+			break;
+		case t4:
+			printd(("%s: %p: -> T4 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t4_timeout(sl, q);
+			break;
+#if 0
+		case t5:
+			printd(("%s: %p: -> T5 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t5_timeout(sl, q);
+			break;
+#endif
+		case t6:
+			printd(("%s: %p: -> T6 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t6_timeout(sl, q);
+			break;
+		case t7:
+			printd(("%s: %p: -> T7 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t7_timeout(sl, q);
+			break;
+#if 0
+		case t8:
+			printd(("%s: %p: -> T8 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t8_timeout(sl, q);
+			break;
+#endif
+		case t9:
+			printd(("%s: %p: -> T9 TIMEOUT <-\n", MOD_NAME, sl));
+			rtn = sl_t9_timeout(sl, q);
+			break;
+		default:
+			swerr();
+			break;
+		}
+		if (rtn >= 0)
+			rtn = QR_ABSORBED;
+		else
+			switch (rtn) {
+			case -ENOBUFS:
+			case -ENOMEM:
+			case -EBUSY:
+			case -EAGAIN:
+				break;
+			default:
+				rtn = QR_ABSORBED;
+			}
+	}
+	return (rtn);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
  *  M_DATA Handling
  *
  *  -------------------------------------------------------------------------
@@ -7848,6 +7943,9 @@ sl_r_prim(queue_t *q, mblk_t *mp)
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		return sl_r_data(q, mp);
+	case M_SIG:
+	case M_PCSIG:
+		return sl_r_sig(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
 		return sl_r_proto(q, mp);
@@ -7953,6 +8051,13 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->i_style = LMI_STYLE2;
 		sl->i_version = M2PA_VERSION_DEFAULT;
 		sl->i_oldstate = sl->i_state;
+
+		if (sl_alloc_timers(sl)) {
+			sl_put(XCHG(&sl->iq->q_ptr, NULL));
+			sl_put(XCHG(&sl->oq->q_ptr, NULL));
+			sl_put(XCHG(&sl, NULL));
+			return (sl);
+		}
 
 		/* link structure */
 		if ((sl->next = *slp))
@@ -8066,7 +8171,7 @@ sl_free_priv(queue_t *q)
 	spin_lock_m2pa(sl);
 	{
 		ss7_unbufcall((str_t *) sl);
-		__sl_timer_stop(sl, tall);
+		sl_free_timers(sl);
 		bufq_purge(&sl->rb);
 		bufq_purge(&sl->tb);
 		bufq_purge(&sl->rtb);

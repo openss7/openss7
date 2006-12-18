@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2006/12/07 10:04:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2006/12/18 10:50:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/07 10:04:34 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 10:50:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.80  2006/12/18 10:50:55  brian
+# - subpackaging changes for release
+#
 # Revision 0.9.2.79  2006/12/07 10:04:34  brian
 # - added init scripts to master makefile
 #
@@ -173,7 +176,6 @@ EXTRA_PROGRAMS			+= \
 				  test-xnet_thr
 
 pkglibexec_PROGRAMS		= \
-				  test-m2pa \
 				  test-q781 \
 				  test-tcpc \
 				  test-tcps \
@@ -326,7 +328,6 @@ noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
-				  src/modules/m2pa/m2pa_sl.c \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \
@@ -334,10 +335,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sl/sl.c \
 				  src/modules/sl/sl_mux.c \
 				  src/modules/sl/sm_mod.c \
-				  src/modules/ss7ip/sdt_tpi.c \
-				  src/modules/ss7ip/sl_tpi.c \
-				  src/modules/ss7sctp/sdt_sctp.c \
-				  src/modules/ss7sctp/sdl_sctp.c \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/sl_x400p.c \
@@ -452,7 +449,6 @@ EXTRA_PROGRAMS			+= \
 				  test-xnet_thr
 
 pkglibexec_PROGRAMS		= \
-				  test-m2pa \
 				  test-q781 \
 				  test-q781-pipe \
 				  test-q784 \
@@ -992,6 +988,13 @@ pkglibexec_PROGRAMS		+= \
 ## WITH_SCTP2
 endif
 
+if WITH_SIGTRAN
+## WITH_SIGTRAN
+pkglibexec_PROGRAMS		+= \
+				  test-m2pa
+## WITH_SIGTRAN
+endif
+
 ## RPM_BUILD_USER
 endif
 
@@ -1015,8 +1018,19 @@ nodist_libSS7mods_a_SOURCES	+= \
 				  src/modules/inet/udp.c \
 				  src/modules/inet/rawip.c \
 				  src/modules/inet/tcp.c \
-				  src/moduels/inet/udp_hooks.h
+				  src/modules/inet/udp_hooks.h
 ## WITH_INET
+endif
+
+if WITH_SIGTRAN
+## WITH_SIGTRAN
+nodist_libSS7mods_a_SOURCES	+= \
+				  src/modules/m2pa/m2pa_sl.c \
+				  src/modules/ss7ip/sdt_tpi.c \
+				  src/modules/ss7ip/sl_tpi.c \
+				  src/modules/ss7sctp/sdt_sctp.c \
+				  src/modules/ss7sctp/sdl_sctp.c
+## WITH_SIGTRAN
 endif
 
 ## RPM_BUILD_KERNEL

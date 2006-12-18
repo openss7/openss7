@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/10/03 13:51:33 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/12/18 10:50:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,14 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:51:33 $ by $Author: brian $
+# Last Modified $Date: 2006/12/18 10:50:55 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.33 2006/10/03 13:51:33 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.34 2006/12/18 10:50:55 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
 
@@ -186,7 +186,17 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/cci/Makefile
 		 src/modules/ti/lis.conf
 		 src/modules/inet/lis.conf
-		 src/modules/sctp/lis.conf])
+		 src/modules/sctp/lis.conf
+		 src/modules/m2pa/lis.conf
+		 src/modules/ss7ip/lis.conf
+		 src/modules/ss7sctp/lis.conf
+		 src/modules/cd/lis.conf
+		 src/modules/dl/lis.conf
+		 src/modules/m2tp/lis.conf
+		 src/modules/m2ua/lis.conf
+		 src/modules/m3ua/lis.conf
+		 src/modules/sua/lis.conf
+		 src/modules/tua/lis.conf])
 
 AC_OUTPUT
 
