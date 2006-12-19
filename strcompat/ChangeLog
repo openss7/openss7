@@ -3,6 +3,10 @@
 	* src/include/sys/mps/stream.h: minor corrections to mi_open/close functions
 	* src/kernel/mpscompat.c: minor corrections to mi_open/close functions
 
+	* doc/man/man9/mi_bufcall.9.man: make mi_bufcall depend on mi_open allocators
+	* src/include/sys/mps/stream.h: make mi_bufcall depend on mi_open allocators
+	* src/kernel/mpscompat.c: make mi_bufcall depend on mi_open allocators
+
 2006-12-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/mpscompat.c: handle timers place back on queue

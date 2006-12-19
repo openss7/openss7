@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/12/19 00:51:55 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/19 11:47:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/19 00:51:55 $ by $Author: brian $
+ Last Modified $Date: 2006/12/19 11:47:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.32  2006/12/19 11:47:58  brian
+ - better mi_bufcall implementation
+
  Revision 0.9.2.31  2006/12/19 00:51:55  brian
  - corrections to mi_open/close functions
 
@@ -148,10 +151,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/12/19 00:51:55 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/19 11:47:58 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/12/19 00:51:55 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/19 11:47:58 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -179,7 +182,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/12/19 00:51:55 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/19 11:47:58 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -265,6 +268,8 @@ struct mi_comm {
 		int index;		/* link index */
 	} mi_u;
 	size_t mi_size;			/* size of this structure plus private data */
+	bcid_t mi_rbid;			/* rd queue bufcall */
+	bcid_t mi_wbid;			/* wr queue bufcall */
 	char mi_priv[0];		/* followed by private data */
 };
 
@@ -524,7 +529,18 @@ EXPORT_SYMBOL_NOVERS(mi_close_free);	/* mps/ddi.h */
  *  MI_DETACH
  *  -------------------------------------------------------------------------
  */
-__MPS_EXTERN_INLINE void mi_detach(queue_t *q, caddr_t ptr);
+void mi_detach(queue_t *q, caddr_t ptr)
+{
+	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+	bcid_t bid;
+
+	if ((bid = xchg(&mi->mi_rbid, 0)))
+		unbufcall(bid);
+	if ((bid = xchg(&mi->mi_wbid, 0)))
+		unbufcall(bid);
+
+	q->q_ptr = WR(q)->q_ptr = NULL;
+}
 
 EXPORT_SYMBOL_NOVERS(mi_detach);	/* mps/ddi.h */
 
@@ -557,7 +573,29 @@ struct mi_iocblk {
  *
  *  =========================================================================
  */
-__MPS_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority);
+static streamscall void
+mi_qenable(long data)
+{
+	queue_t *q = (queue_t *) data;
+	struct mi_comm *mi = ((struct mi_comm *) q->q_ptr) - 1;
+	bcid_t *bidp = (q->q_flag & QREADR) ? &mi->mi_rbid : &mi->mi_wbid;
+
+	xchg(bidp, 0);
+	qenable(q);
+}
+void
+mi_bufcall(queue_t *q, int size, int priority)
+{
+	struct mi_comm *mi = ((struct mi_comm *) q->q_ptr) - 1;
+	bcid_t bid, *bidp = (q->q_flag & QREADR) ? &mi->mi_rbid : &mi->mi_wbid;
+
+	if ((bid = bufcall(size, priority, &mi_qenable, (long) q))) {
+		if ((bid = xchg(bidp, bid)))
+			unbufcall(bid);
+		return;
+	}
+	qenable(q);
+}
 
 EXPORT_SYMBOL_NOVERS(mi_bufcall);
 

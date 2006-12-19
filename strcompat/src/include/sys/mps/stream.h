@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.13 2006/12/19 00:51:53 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.14 2006/12/19 11:47:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/19 00:51:53 $ by $Author: brian $
+ Last Modified $Date: 2006/12/19 11:47:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.14  2006/12/19 11:47:57  brian
+ - better mi_bufcall implementation
+
  Revision 0.9.2.13  2006/12/19 00:51:53  brian
  - corrections to mi_open/close functions
 
@@ -94,7 +97,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -186,11 +189,7 @@ mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, i
 
 extern void mi_close_unlink(caddr_t *mi_head, caddr_t ptr);
 
-__MPS_EXTERN_INLINE void
-mi_detach(queue_t *q, caddr_t ptr)
-{
-	q->q_ptr = WR(q)->q_ptr = NULL;
-}
+extern void mi_detach(queue_t *q, caddr_t ptr);
 
 __MPS_EXTERN_INLINE void
 mi_close_detached(caddr_t *mi_head, caddr_t ptr)
@@ -232,20 +231,7 @@ extern void mi_timer_free(mblk_t *mp);
 /*
  *  Buffer call helper function.
  */
-__MPS_EXTERN_INLINE void
-mi_bufcall(queue_t *q, int size, int priority)
-{
-#ifdef LFS
-	// queue_t *rq = RD(q);
-	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
-	if (__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q) == 0)
-		qenable(q);
-#endif
-#ifdef LIS
-	if (bufcall(size, priority, (void (*)) (long) qenable, (long) q) == 0)
-		qenable(q);
-#endif
-}
+extern void mi_bufcall(queue_t *q, int size, int priority);
 
 /*
  *  Message block allocation helper functions.
