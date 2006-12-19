@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.12 2006/12/08 05:08:14 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.13 2006/12/19 00:51:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:14 $ by $Author: brian $
+ Last Modified $Date: 2006/12/19 00:51:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.13  2006/12/19 00:51:53  brian
+ - corrections to mi_open/close functions
+
  Revision 0.9.2.12  2006/12/08 05:08:14  brian
  - some rework resulting from testing and inspection
 
@@ -91,7 +94,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -186,13 +189,13 @@ extern void mi_close_unlink(caddr_t *mi_head, caddr_t ptr);
 __MPS_EXTERN_INLINE void
 mi_detach(queue_t *q, caddr_t ptr)
 {
-	mi_close_unlink(NULL, ptr);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 }
 
 __MPS_EXTERN_INLINE void
 mi_close_detached(caddr_t *mi_head, caddr_t ptr)
 {
+	mi_close_unlink(mi_head, ptr);
 	mi_close_free(ptr);
 }
 
