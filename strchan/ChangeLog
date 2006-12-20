@@ -1,3 +1,27 @@
+2006-12-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: updated and corrected documentation for release
+	* doc/man/man4/cd.4.man: updated and corrected documentation for release
+	* doc/man/man4/cd_daed.4.man: updated and corrected documentation for release
+	* doc/man/man4/cd_hdlc.4.man: updated and corrected documentation for release
+	* doc/man/man8/test-chan.8.man: updated and corrected documentation for release
+	* doc/manual/descrip.texi: updated and corrected documentation for release
+	* doc/manual/prerequisites.texi: updated and corrected documentation for release
+
+	* src/drivers/Config.in: removed redundant entry
+	* src/drivers/mx.c: working up driver
+	* src/drivers/zapmux.c: working up driver
+
+	* src/drivers/v401p.c: corrections
+	* src/modules/cd.c: corrections
+
+	* src/drivers/ch.c: added new mux drivers
+	* src/drivers/hdlc.c: added new mux drivers (might land somewhere else)
+	* src/drivers/zaptel.c: added new mux drivers (might land somewhere else)
+
+	* src/include/sys/chi_ioctl.h: cosmetic corrections
+	* src/include/sys/mgi_ioctl.h: cosmetic corrections
+
 2006-12-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: adjusted base major and modid

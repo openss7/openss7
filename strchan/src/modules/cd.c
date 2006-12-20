@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:35 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:59:35 $ by $Author: brian $
+ Last Modified $Date: 2006/12/20 23:07:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.3  2006/12/20 23:07:40  brian
+ - updates for release and current development
+
  Revision 0.9.2.2  2006/12/18 08:59:35  brian
  - working up strchan package
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:35 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:40 $"
 
-static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:35 $";
+static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:40 $";
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link
@@ -101,7 +104,7 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMD FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:35 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:40 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"
@@ -2068,9 +2071,9 @@ ch_info_ack(struct ch *ch, queue_t *q, mblk_t *mp)
 		ch->info.ch_addr_length = p->ch_addr_length;
 		ch->info.ch_addr_offset = sizeof(ch->info);
 	}
-	if (p->ch_parm_length == sizeof(ch->parms)
-	    && *(ch_ulong *) (mp->b_rptr + p->ch_parm_offset) == ch->parms.cp_type) {
-		bcopy(mp->b_rptr + p->ch_parm_offset, ch->parms, sizeof(ch->parms));
+	if (p->ch_parm_length == sizeof(ch->parm)
+	    && *(ch_ulong *) (mp->b_rptr + p->ch_parm_offset) == ch->parm.cp_type) {
+		bcopy(mp->b_rptr + p->ch_parm_offset, &ch->parm, sizeof(ch->parm));
 		ch->info.ch_parm_length = p->ch_parm_length;
 		ch->info.ch_parm_offset = sizeof(ch->info) + ch->info.ch_addr_length;
 	}

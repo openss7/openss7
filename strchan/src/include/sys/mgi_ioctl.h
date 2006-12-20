@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mgi_ioctl.h,v 0.9.2.1 2006/10/14 06:37:28 brian Exp $
+ @(#) $Id: mgi_ioctl.h,v 0.9.2.2 2006/12/20 23:07:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/14 06:37:28 $ by $Author: brian $
+ Last Modified $Date: 2006/12/20 23:07:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mgi_ioctl.h,v $
+ Revision 0.9.2.2  2006/12/20 23:07:39  brian
+ - updates for release and current development
+
  Revision 0.9.2.1  2006/10/14 06:37:28  brian
  - added manpages, module, drivers, headers from strss7 package
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_MGI_IOCTL_H__
 #define __SYS_MGI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mgi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mgi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -232,8 +235,7 @@ typedef struct mg_opt_conf_df {
 typedef struct mg_option {
 	ulong type;
 	ulong id;
-	/* 
-	   followed by specific object options structure */
+	/* followed by specific object options structure */
 } mg_option_t;
 
 #define MG_IOCGOPTIONS	_IOWR(	MG_IOC_MAGIC,	 0,	mg_option_t	)
@@ -297,8 +299,7 @@ typedef struct mg_config {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
 	ulong cmd;			/* configuration command */
-	/* 
-	   followed by specific configuration structure */
+	/* followed by specific configuration structure */
 } mg_config_t;
 
 #define MG_GET		0	/* get configuration */
@@ -319,8 +320,7 @@ typedef struct mg_timers_mx {
 } mg_timers_mx_t;
 typedef struct mg_statem_mx {
 	struct mg_timers_mx timers;
-	/* 
-	   followed by the channel associations */
+	/* followed by the channel associations */
 	struct {
 		ulong slot;		/* slot number */
 		ulong chid;		/* channel id */
@@ -357,8 +357,7 @@ typedef struct mg_timers_se {
 } mg_timers_se_t;
 typedef struct mg_statem_se {
 	struct mg_timers_se timers;
-	/* 
-	   followed by the connection leg participation */
+	/* followed by the connection leg participation */
 	struct {
 		ulong role;		/* participant role */
 		ulong flags;		/* topology flags */
@@ -384,8 +383,7 @@ typedef struct mg_timers_df {
 } mg_timers_df_t;
 typedef struct mg_statem_df {
 	struct mg_timers_df timers;
-	/* 
-	   followed by a list of connection sessions */
+	/* followed by a list of connection sessions */
 	struct {
 		ulong seid;		/* session identifier */
 	} sessions[0];
@@ -399,8 +397,7 @@ typedef struct mg_statem {
 	ulong id;			/* object id */
 	ulong flags;			/* object flags */
 	ulong state;			/* object state */
-	/* 
-	   followed by object-specific state structure */
+	/* followed by object-specific state structure */
 } mg_statem_t;
 
 #define	MG_IOCGSTATEM	_IOR(	MG_IOC_MAGIC,	6,	mg_statem_t	)
@@ -517,8 +514,7 @@ typedef struct mg_notify_df {
 typedef struct mg_notify {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
-	/* 
-	   followed by object-specific notification type */
+	/* followed by object-specific notification type */
 } mg_notify_t;
 
 #define	MG_IOCGNOTIFY	_IOR(	MG_IOC_MAGIC,	12,	mg_notify_t	)
@@ -550,8 +546,7 @@ typedef struct mg_pass {
 	ulong band;			/* band of message block */
 	ulong ctl_length;		/* length of cntl part */
 	ulong dat_length;		/* length of data part */
-	/* 
-	   followed by cntl and data part of message to pass to to channel */
+	/* followed by cntl and data part of message to pass to to channel */
 } mg_pass_t;
 
 #define MG_IOCCPASS	_IOWR(	MG_IOC_MAGIC,	16,	mg_pass_t	)

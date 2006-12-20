@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.3 2006/10/17 12:12:44 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.4 2006/12/20 23:07:36 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/17 12:12:44 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/20 23:07:36 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: descrip.texi,v $
+@c Revision 0.9.2.4  2006/12/20 23:07:36  brian
+@c - updates for release and current development
+@c
 @c Revision 0.9.2.3  2006/10/17 12:12:44  brian
 @c - working up new packages
 @c
@@ -82,12 +85,13 @@ link into the @cite{Linux} OSS (Open Sound System) and ALS (Advanced Linux
 Sound).  Specific E1/T1 cards such as the V401P are supported by this package.
 
 This package also supports data channel protocols for data communication over
-isochronous channels such as HDLC and SS7 DAEDR/DAEDT/AERM/SUERM as well as
-upper layer link protocols such as LAPB, LAPF, LAPD, LLC.  These modules are
-provided here because they work directly over an isochronous channel and are
-therefore designed to work with them.  These data links provide support for
-the @cite{OpenSS7 STREAMS ISO/OSI} as well as the @cite{OpenSS7 STREAMS ISDN
-Stacks} and @cite{OpenSS7 STREAMS SS7 Stack} packages.
+isochronous channels such as HDLC and SS7 DAEDR/DAEDT/AERM/SUERM.  Upper layer
+link protocols, such as LAPB, LAPF, LAPM and LLC are supported by separate
+packages.  These modules are provided here because they work directly over an
+isochronous channel and are therefore designed to work with them.  These data
+links provide support for the @cite{OpenSS7 STREAMS ISO/OSI} as well as the
+@cite{OpenSS7 STREAMS ISDN Stacks} and @cite{OpenSS7 STREAMS SS7 Stack}
+packages.
 
 This package builds and installs the following @dfn{STREAMS} kernel modules
 and drivers:
@@ -97,20 +101,28 @@ and drivers:
 @item @tab @minus{} @file{streams_mx.ko} driver @dfn{/dev/mx} @dfn{/dev/mx_mg}
 @item @tab @minus{} @file{streams_mg.ko} driver @dfn{/dev/mg} @dfn{/dev/mg_mg}
 @item @tab @minus{} @file{streams_pwe3.ko} module @dfn{pwe3}
+@ignore
 @item @tab @minus{} @file{streams_rtp.ko} module @dfn{rtp}
+@end ignore
 @item @tab @minus{} @file{streams_zaptel.ko} module @dfn{zaptel}
-@item @tab @minus{} @file{streams_hdlc.ko} module @dfn{hdlc}
-@item @tab @minus{} @file{streams_hdlc.ko} module @dfn{hdlc}
-@item @tab @minus{} @file{streams_q702.ko} module @dfn{q702}
+@item @tab @minus{} @file{streams_cd_hdlc.ko} module @dfn{cd_hdlc}
+@item @tab @minus{} @file{streams_cd_daed.ko} module @dfn{cd_daed}
+@ignore
 @item @tab @minus{} @file{streams_lapb.ko} module @dfn{lapb}
 @item @tab @minus{} @file{streams_lapf.ko} module @dfn{lapf}
 @item @tab @minus{} @file{streams_lapd.ko} module @dfn{lapd}
 @item @tab @minus{} @file{streams_llc.ko} module @dfn{llc}
+@end ignore
 @end multitable
 
 @table @manref
 
 @item ch(4)
+The @manpage{ch(4)} multiplexing pseudo-device driver is a fully functional
+channel device capable of channelized, fractional or full-span E1/T1/J1
+statistically multiplexed channels.  Streams opened on this device driver
+support delivery of the raw octet streams associated with the multiplexed
+channel.
 
 @item mx(4)
 The @manpage{mx(4)} multiplexing pseudo-device driver is a fully functional
@@ -133,28 +145,36 @@ The @manpage{pwe3(4)} module is a pushable @dfn{STREAMS} module that is pushed
 over a @manpage{tcp(4)} or @manpage{sctp(4)} Stream to provide pseudo-wire
 emulation end-to-end.  This device appears as though it is a channel device.
 
+@ignore
 @item rtp(4)
 The @manpage{rtp(4)} module is a pushable @dfn{STREAMS} module that is pushed
 over a @manpage{udp(4)} Stream to provide a full duplex, controlled (RTCP)
 media stream connection.  The resulting Stream is suitable for linking under
 the @manpage{mg(4)} multiplexing driver to provide Ephemeral RTP streams for
 use with the Media Gateway Control Protocol.
+@end ignore
 
 @item zaptel(4)
-The @manpage{zaptel(4)} modules is a pushable @dfn{STREAMS} module that is
-pushed over a @manpage{ch(4)} channel Stream to provide the historical
-@manpage{zaptel(4)} interface for asterisk and other open-PBX packages.
+The @manpage{zaptel(4)} multiplexing pseudo-device driver is a @dfn{STREAMS}
+driver that provides the historical @manpage{zaptel(4)} interface for asterisk
+and other open-PBX packages.  @manpage{mx(4)} streams are linked under the
+driver and represent spans that can be managed by @manpage{zaptel(4)}.
 
-@item hdlc(4)
-The @manpage{hdlc(4)} module a pushable @dfn{STREAMS} module that provides the
-capabilties of the High-Level Data Link Control and can be pushed over a raw
-@manpage{ch(4)} channel to provide a Communications Device Interface (CDI) or
-Data Link Provider Interface (DLPI) suitable for use with ISO/OSI protocols,
-X.25 or ISDN.
+@item cd_hdlc(4)
+The @manpage{cd_hdlc(4)} module is a pushable @dfn{STREAMS} module that
+provides the capabilties of the High-Level Data Link Control and can be pushed
+over a raw @manpage{ch(4)} channel to provide a Communications Device
+Interface (CDI) or Data Link Provider Interface (DLPI) suitable for use with
+ISO/OSI protocols, X.25, ISDN or Frame Relay.
 
-@item q702(4)
-The @manpage{q702(4)}
+@item cd_daed(4)
+The @manpage{cd_daed(4)} module is a pushable @dfn{STREAMS} module that
+provides th capabilities of SS7 High-Level Data Link Control (Q.702) and can
+be pushed over a raw @manpage{ch(4)} channel to provide a Communications
+Device Interface (CDI) or Signalling Data Terminal Interface (SDTI) suitable
+for use with SS7 protocols.
 
+@ignore
 @item lapb(4)
 The @manpage{lapb(4)} module is a pushable @dfn{STREAMS} module that provides
 the capability of the Link Access Procedure (Balanced) and can be pushed over
@@ -178,9 +198,11 @@ The @manpage{llc(4)} module is a @dfn{STREAMS} pseudo-device driver that
 provides the capabilites of the Logical Link Control, ISO 8802, and provides a
 Data Link Provider Interface (DLPI) suitable for use with OSI protocols.  This
 pseudo-device driver hook into the Linux packet handling system.
+@end ignore
 
 @end table
 
+@ignore
 The package builds and installs the following shared object libraries:
 
 @table @manref
@@ -196,6 +218,7 @@ The @manpage{librtp(3)} library provides replacements for the @cite{AT&T}
 The library is incomplete.
 
 @end table
+@end ignore
 
 The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR
 4.2} @dfn{STREAMS} drivers, modules, libraries, utilities, test programs,

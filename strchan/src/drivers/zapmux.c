@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:23:23 $
+ @(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/20 23:07:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:23:23 $ by $Author: brian $
+ Last Modified $Date: 2006/12/20 23:07:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zapmux.c,v $
+ Revision 0.9.2.2  2006/12/20 23:07:37  brian
+ - updates for release and current development
+
  Revision 0.9.2.1  2006/12/06 11:23:23  brian
  - added new files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:23:23 $"
+#ident "@(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/20 23:07:37 $"
 
-static char const ident[] = "$RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/06 11:23:23 $";
+static char const ident[] = "$RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/20 23:07:37 $";
 
 /*
  *  MX Primitives issued down to MX provider.
@@ -1026,7 +1029,7 @@ mx_event_ind(struct mx *mx, queue_t *q, mblk_t *mp)
 	return ch_event_ind(MXCH(mx), q, mp, p->mx_event, p->mx_slot);
 }
 
-static struct mx *mx_links = NULL;
+static caddr_t mx_links = NULL;
 
 static inline fastcall int
 zm_w_msg(queue_t *q, mblk_t *mp)
@@ -1052,11 +1055,13 @@ zm_w_msg(queue_t *q, mblk_t *mp)
 				err = ENOSR;
 				goto nak_it;
 			}
-			if (!(mx = kmem_alloc(sizeof(*mx), KM_NOSLEEP))) {
+			if (!(mx = (struct mx *) mi_open_detached(&mx_links, sizeof(*mx),
+								  (dev_t *) &l->l_index))) {
 				freeb(bp);
 				err = ENOMEM;
 				goto nak_it;
 			}
+			mi_attach(_RD(l->l_qbot), (caddr_t) mx);
 			bzero(mx, sizeof(*mx));
 
 			mx->mid = q->q_init->qi_minfo->mi_idnum;
@@ -1073,23 +1078,16 @@ zm_w_msg(queue_t *q, mblk_t *mp)
 			/* Because this was a priority message, we should already have a response,
 			   or the message disappeared. */
 			if (mx->info.mx_state != MXS_ATTACHED) {
-				mx->rq->q_ptr = mx->wq->q_ptr = NULL;
-				kmem_free(mx, sizeof(*mx));
+				mi_close_comm(&mx_links, _RD(l->l_qbot));
 				err = ENXIO;
 				goto nak_it;
 			}
 			/* initialize the structure some more */
 			if (zt_register(&mx->span, 0) == -1) {
-				mx->rq->q_ptr = mx->wq->q_ptr = NULL;
-				kmem_free(mx, sizeof(*mx));
+				mi_close_comm(&mx_links, _RD(l->l_qbot));
 				err = ENXIO;
 				goto nak_it;
 			}
-			/* link the structure in */
-			if ((mx->next = mx_links))
-				mx->next->prev = &mx->next;
-			mx->prev = &mx_links;
-			mx_links = mx;
 			goto ack_it;
 		case I_PUNLINK:
 			if (ioc->ioc_cr->cr_uid != 0) {
@@ -1098,21 +1096,17 @@ zm_w_msg(queue_t *q, mblk_t *mp)
 			}
 			/* fall through */
 		case I_UNLINK:
-			for (mx = mx_links; mx && mx->sid != l->l_index; mx = mx->next) ;
+			for (mx = (struct mx *) mi_first_ptr(&mx_links);
+			     mx && mx->sid != l->l_index;
+			     mx = mi_next_ptr(&mx_links, (caddr_t) mx)) ;
 			if (!mx) {
 				err = ENXIO;
 				goto nak_it;
 			}
-			/* unlink the structure */
-			if ((*mx->prev = mx->next))
-				mx->next->prev = mx->prev;
-			mx->next = NULL;
-			mx->prev = &mx->next;
 			/* unregister */
 			zt_unregister(&mx->span);
 			flushq(mx->rq, FLUSHALL);
-			mx->rq->q_ptr = mx->wq->q_ptr = NULL;
-			kmem_free(mx, sizeof(*mx));
+			mi_close_comm(&mx_links, mx->rq);
 			goto ack_it;
 		default:
 		      nak_it:
@@ -1268,10 +1262,24 @@ mx_r_data(queue_t *q, mblk_t *mp)
 /*
  *  Put and service procedure.
  */
-static streamscall int
+static streamscall __hot_write int
 zm_wput(queue_t *q, mblk_t *mp)
 {
-	zm_w_msg(q, mp);
+	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY))) || zm_w_msg(q, mp))
+		putq(q, mp);
+	return (0);
+}
+static streamscall __hot_out int
+zm_wsrv(queue_t *q)
+{
+	mblk_t *mp;
+
+	while ((mp = getq(q))) {
+		if (zm_w_msg(q, mp)) {
+			putbq(q, mp);
+			break;
+		}
+	}
 	return (0);
 }
 
@@ -1366,7 +1374,7 @@ static struct qinit zm_rinit = {
 
 static struct qinit zm_winit = {
 	.qi_putp = zm_wput,
-	.qi_srvp = NULL,
+	.qi_srvp = zm_wsrv,
 	.qi_minfo = &zm_minfo,
 	.qi_mstat = &zm_wstat,
 };

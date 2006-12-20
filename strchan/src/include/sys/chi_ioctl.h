@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi_ioctl.h,v 0.9.2.2 2006/11/27 11:41:58 brian Exp $
+ @(#) $Id: chi_ioctl.h,v 0.9.2.3 2006/12/20 23:07:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/27 11:41:58 $ by $Author: brian $
+ Last Modified $Date: 2006/12/20 23:07:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi_ioctl.h,v $
+ Revision 0.9.2.3  2006/12/20 23:07:39  brian
+ - updates for release and current development
+
  Revision 0.9.2.2  2006/11/27 11:41:58  brian
  - updated CH and MX headers to interface version 1.1
 
@@ -61,13 +64,17 @@
 #ifndef __SYS_CHI_IOCTL_H__
 #define __SYS_CHI_IOCTL_H__
 
-#ident "@(#) $RCSfile: chi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: chi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
 #include <linux/ioctl.h>
 
 #define CH_IOC_MAGIC	'c'
+
+#define CH_OBJ_TYPE_CH		1	/* channel */
+#define CH_OBJ_TYPE_MX		2	/* multiplex */
+#define CH_OBJ_TYPE_DF		3	/* default */
 
 /*
  *  CONFIGURATION
@@ -92,7 +99,6 @@ typedef struct ch_config {
 /*
  *  STATE
  */
-
 typedef struct ch_statem {
 	ch_ulong state;
 	ch_ulong flags;
@@ -104,7 +110,6 @@ typedef struct ch_statem {
 /*
  *  STATISTICS
  */
-
 typedef struct ch_stats {
 	ch_ulong header;
 } ch_stats_t;
@@ -117,7 +122,6 @@ typedef struct ch_stats {
 /*
  *  EVENTS
  */
-
 typedef struct ch_notify {
 	ch_ulong events;
 } ch_notify_t;
@@ -126,6 +130,9 @@ typedef struct ch_notify {
 #define	CH_IOCSNOTIFY	_IOW(	CH_IOC_MAGIC,	13, ch_notify_t	    )
 #define	CH_IOCCNOTIFY	_IOW(	CH_IOC_MAGIC,	14, ch_notify_t	    )
 
+/*
+ *  MANAGEMENT
+ */
 typedef struct ch_mgmt {
 	ch_ulong cmd;
 } ch_mgmt_t;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:34 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/20 23:07:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:59:34 $ by $Author: brian $
+ Last Modified $Date: 2006/12/20 23:07:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.6  2006/12/20 23:07:37  brian
+ - updates for release and current development
+
  Revision 0.9.2.5  2006/12/18 08:59:34  brian
  - working up strchan package
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:34 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/20 23:07:37 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:34 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/20 23:07:37 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -241,9 +244,9 @@ static char const ident[] =
 #define _DEBUG 1
 // #undef _DEBUG
 
-#define _LSF_SOURCE 1
+#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
-#define _MSP_SOURCE 1
+#define _MPS_SOURCE 1
 
 #include <sys/os7/compat.h>
 
@@ -268,7 +271,7 @@ static char const ident[] =
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 08:59:34 $"
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/20 23:07:37 $"
 #define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -695,7 +698,7 @@ mx_init_priv(queue_t *q, major_t major, minor_t minor)
 	mx->x.prev = &mx->x.next;
 	mx->x.vp = NULL;
 
-	mx->info.primitive = MX_INFO_ACK;
+	mx->info.mx_primitive = MX_INFO_ACK;
 	mx->info.mx_addr_length = 0;
 	mx->info.mx_addr_offset = 0;
 	mx->info.mx_parm_length = 0;

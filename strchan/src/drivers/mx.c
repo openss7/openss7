@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:34 $
+ @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:59:34 $ by $Author: brian $
+ Last Modified $Date: 2006/12/20 23:07:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx.c,v $
+ Revision 0.9.2.3  2006/12/20 23:07:37  brian
+ - updates for release and current development
+
  Revision 0.9.2.2  2006/12/18 08:59:34  brian
  - working up strchan package
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:34 $"
+#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:37 $"
 
-static char const ident[] = "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:34 $";
+static char const ident[] =
+    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:37 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -72,7 +76,8 @@ static char const ident[] = "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
  *  view of the device driver.  It is then possible to open a single MX upper stream on this
  *  multiplexer and link it, for example, under the MG multiplexer.
  *
- *
+ *  The driver also provides a pseudo-mx device, whereby an stream opened on the upper multiplex can
+ *  also be linked to another stream on the upper multiplex to form an internal switching matrix.
  */
 #include <sys/os7/compat.h>
 
@@ -82,7 +87,7 @@ static char const ident[] = "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:34 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:37 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -417,6 +422,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_INFO_REQ:
 		{
 			struct MX_info_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -424,6 +430,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_OPTMGMT_REQ:
 		{
 			struct MX_optmgmt_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -431,6 +438,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_ATTACH_REQ:
 		{
 			struct MX_attach_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -438,6 +446,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_ENABLE_REQ:
 		{
 			struct MX_enable_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -445,6 +454,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_CONNECT_REQ:
 		{
 			struct MX_connect_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -452,6 +462,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_DATA_REQ:
 		{
 			struct MX_data_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -459,6 +470,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_DISCONNECT_REQ:
 		{
 			struct MX_disconnect_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -466,6 +478,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_DISABLE_REQ:
 		{
 			struct MX_info_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -473,6 +486,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 		case MX_DETACH_REQ:
 		{
 			struct MX_info_req *p = (typeof(p)) mp->b_rptr;
+
 			if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 				/* need to error ack */
 			}
@@ -584,3 +598,767 @@ mx_uwsrv(queue_t *q)
 	}
 	return (0);
 }
+
+static fastcall int
+mx_w_data_slow(queue_t *q, mblk_t *mp)
+{
+}
+static inline fastcall int
+mx_w_data(queue_t *q, mblk_t *mp)
+{
+}
+static fastcall int
+mx_w_proto(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+	int rtn = -EDEADLK;
+
+	if (mx_trylock(mx)) {
+		mx_ulong oldstate = mx_get_state(mx);
+
+		switch (*(mx_ulong *) mp->b_rptr) {
+		case MX_INFO_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_INFO_REQ");
+			rtn = mx_info_req(mx, q, mp);
+			break;
+		case MX_OPTMGMT_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_OPTMGMT_REQ");
+			rtn = mx_optmgmt_req(mx, q, mp);
+			break;
+		case MX_ATTACH_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_ATTACH_REQ");
+			rtn = mx_attach_req(mx, q, mp);
+			break;
+		case MX_ENABLE_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_ENABLE_REQ");
+			rtn = mx_enable_req(mx, q, mp);
+			break;
+		case MX_CONNECT_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_CONNECT_REQ");
+			rtn = mx_connect_req(mx, q, mp);
+			break;
+		case MX_DATA_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_DATA_REQ");
+			rtn = mx_data_req(mx, q, mp);
+			break;
+		case MX_DISCONNECT_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_DISCONNECT_REQ");
+			rtn = mx_disconnect_req(mx, q, mp);
+			break;
+		case MX_DISABLE_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_DISABLE_REQ");
+			rtn = mx_disable_req(mx, q, mp);
+			break;
+		case MX_DETACH_REQ:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_DETACH_REQ");
+			rtn = mx_detach_req(mx, q, mp);
+			break;
+		default:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "-> MX_????_???");
+			rtn = mx_other_req(mx, q, mp);
+			break;
+		}
+		if (rtn)
+			mx_set_state(mx, oldstate);
+		mx_unlock(mx);
+	}
+	return (rtn);
+}
+static fastcall int
+mx_w_ioctl(queue_t *q, mblk_t *mp)
+{
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	mblk_t *dp;
+
+	switch (ioc->ioc_cmd) {
+	case MX_IOCGCONFIG:
+		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(mx->config)))) {
+			bcopy(&mx->config, dp->b_rptr, sizeof(mx->config));
+			mi_copyout(q, mp);
+		}
+		break;
+	case MX_IOCSCONFIG:
+		/* fall through */
+	case MX_IOCTCONFIG:
+		/* fall through */
+	case MX_IOCCCONFIG:
+		mi_copyin(q, mp, NULL, sizeof(mx->config));
+		break;
+	case MX_IOCGSTATEM:
+		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(mx->statem)))) {
+			bcopy(&mx->statem, dp->b_rptr, sizeof(mx->statem));
+			mi_copyout(q, mp);
+		}
+		break;
+	case MX_IOCCMRESET:
+		/* reset state machine */
+		mi_copy_set_rval(mp, 0);
+		mi_copy_done(q, mp, 0);
+		break;
+	case MX_IOCGSTATSP:
+		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(mx->statsp)))) {
+			bcopy(&mx->statsp, dp->b_rptr, sizeof(mx->statsp));
+			mi_copyout(q, mp);
+		}
+		break;
+	case MX_IOCSSTATSP:
+		mi_copyin(q, mp, NULL, sizeof(mx->statsp));
+		break;
+	case MX_IOCGSTATS:
+		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(mx->stats)))) {
+			bcopy(&mx->stats, dp->b_rptr, sizeof(mx->stats));
+			mi_copyout(q, mp);
+		}
+		break;
+	case MX_IOCCSTATS:
+		/* clear statistics */
+		bzero(&mx->stats, sizeof(mx->stats));
+		mi_copy_set_rval(mp, 0);
+		mi_copy_done(q, mp, 0);
+		break;
+	case MX_IOCGNOTIFY:
+		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(mx->events)))) {
+			bcopy(&mx->events, dp->b_rptr, sizeof(mx->events));
+			mi_copyout(q, mp);
+		}
+		break;
+	case MX_IOCSNOTIFY:
+		mi_copyin(q, mp, NULL, sizeof(mx->events));
+		break;
+	case MX_IOCCNOTIFY:
+		/* clear events */
+		bzero(&mx->events, sizeof(mx->events));
+		mi_copy_set_rval(mp, 0);
+		mi_copy_done(q, mp, 0);
+		break;
+	case I_PLINK:
+		if (!drv_priv(ioc->ioc_cr)) {
+			mi_copy_done(q, mp, EPERM);
+			break;
+		}
+		/* fall through */
+	case I_LINK:
+		if (!(mx = mi_open_alloc(sizeof(*mx)))) {
+			mi_copy_done(q, mp, ENOMEM);
+			break;
+		}
+		if ((err = mi_open_link(&mx_links, (caddr_t) mx, (dev_t *) &l->l_index, 0,
+					DRVOPEN, NULL))) {
+			mi_copy_done(q, mp, err);
+			break;
+		}
+		mi_attach(RD(l->l_qbot), (caddr_t) mx);
+		mx_link(mx);
+		break;
+	case I_PUNLINK:
+		if (!drv_priv(ioc->ioc_cr)) {
+			mi_copy_done(q, mp, EPERM);
+			break;
+		}
+		/* fall through */
+	case I_UNLINK:
+		for (mx = mi_first_ptr(&mx_links); mx && mx->sid != l->l_index;
+		     mx = mi_next_ptr(&mx_links, (caddr_t) mx)) ;
+		if (!mx) {
+			mi_copy_done(q, mp, EINVAL);
+			break;
+		}
+		mx_unlink(mx);
+		mi_detach(RD(mx->oq), (caddr_t) mx);
+		mi_close_unlink(&mx_links, (caddr_t) mx);
+		mi_close_free((caddr_t) mx);
+		mi_copy_done(q, mp, 0);
+		break;
+	}
+	return (0);
+}
+static fastcall int
+mx_w_iocdata(queue_t *q, mblk_t *mp)
+{
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	mblk_t *dp;
+
+	switch (ioc->ioc_cmd) {
+	case MX_IOCGCONFIG:
+	case MX_IOCGSTATEM:
+	case MX_IOCGSTATSP:
+	case MX_IOCGSTATS:
+	case MX_IOCGNOTIFY:
+		switch (mi_copy_state(q, mp, &dp)) {
+		case -1:
+			break;
+		case M_COPY_STATE(MI_COPY_OUT, 1):
+			mi_copy_set_rval(mp, 0);
+			mi_copy_done(q, mp, 0);
+			break;
+		}
+		break;
+	case MX_IOCSCONFIG:
+		switch (mi_copy_state(q, mp, &dp)) {
+		case -1:
+			break;
+		case M_COPY_STATE(MI_COPY_IN, 1):
+			struct mx *mx2;
+
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+				mi_copy_done(q, mp, EINVAL);
+				break;
+			}
+			/* must be privileged to set some other configuration */
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+				mi_copy_done(q, mp, EPERM);
+				break;
+			}
+			/* FIXME: check value */
+			bcopy(dp->b_rptr, &mx2->config, sizeof(mx2->config));
+			mi_copy_set_rval(mp, 0);
+			mi_copy_done(q, mp, 0);
+			break;
+		}
+		break;
+	case MX_IOCTCONFIG:
+		switch (mi_copy_state(q, mp, &dp)) {
+		case -1:
+			break;
+		case M_COPY_STATE(MI_COPY_IN, 1):
+			struct mx *mx2;
+
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+				mi_copy_done(q, mp, EINVAL);
+				break;
+			}
+			/* must be privileged to set some other configuration */
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+				mi_copy_done(q, mp, EPERM);
+				break;
+			}
+			/* FIXME: check value */
+			bcopy(dp->b_rptr, &mx2->config, sizeof(mx2->config));
+			mi_copy_set_rval(mp, 0);
+			mi_copy_done(q, mp, 0);
+			break;
+		}
+		break;
+	case MX_IOCCCONFIG:
+		switch (mi_copy_state(q, mp, &dp)) {
+		case -1:
+			break;
+		case M_COPY_STATE(MI_COPY_IN, 1):
+			struct mx *mx2;
+
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+				mi_copy_done(q, mp, EINVAL);
+				break;
+			}
+			/* must be privileged to set some other configuration */
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+				mi_copy_done(q, mp, EPERM);
+				break;
+			}
+			/* FIXME: check value */
+			bcopy(dp->b_rptr, &mx2->config, sizeof(mx2->config));
+			mi_copy_set_rval(mp, 0);
+			mi_copy_done(q, mp, 0);
+			break;
+		}
+		break;
+	case MX_IOCCMRESET:
+		/* should not happen */
+		break;
+	case MX_IOCSSTATSP:
+		switch (mi_copy_state(q, mp, &dp)) {
+		case -1:
+			break;
+		case M_COPY_STATE(MI_COPY_IN, 1):
+			struct mx *mx2;
+
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+				mi_copy_done(q, mp, EINVAL);
+				break;
+			}
+			/* must be privileged to set some other configuration */
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+				mi_copy_done(q, mp, EPERM);
+				break;
+			}
+			/* FIXME: check value */
+			bcopy(dp->b_rptr, &mx2->statsp, sizeof(mx2->statsp));
+			mi_copy_set_rval(mp, 0);
+			mi_copy_done(q, mp, 0);
+			break;
+		}
+		break;
+	case MX_IOCCSTATS:
+		/* should not happen */
+		break;
+	case MX_IOCSNOTIFY:
+		switch (mi_copy_state(q, mp, &dp)) {
+		case -1:
+			break;
+		case M_COPY_STATE(MI_COPY_IN, 1):
+			struct mx *mx2;
+
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+				mi_copy_done(q, mp, EINVAL);
+				break;
+			}
+			/* must be privileged to set some other configuration */
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+				mi_copy_done(q, mp, EPERM);
+				break;
+			}
+			/* FIXME: check value */
+			bcopy(dp->b_rptr, &mx2->events, sizeof(mx2->events));
+			mi_copy_set_rval(mp, 0);
+			mi_copy_done(q, mp, 0);
+			break;
+		}
+		break;
+	case MX_IOCCNOTIFY:
+		/* should not happen */
+		break;
+	}
+	return (0);
+}
+static fastcall int
+mx_w_ctl(queue_t *q, mblk_t *mp)
+{
+}
+static fastcall int
+mx_w_flush(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+	queue_t *oq;
+
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
+		if (mx->other && (oq = mx->other->oq)) {
+			if (oq->q_flag & QREADR) {
+				/* need to reverse sense of flush */
+				switch (mp->b_rptr[0] & FLUSHRW) {
+				case FLUSHR:
+					mp->b_rptr[0] &= ~FLUSHRW;
+					mp->b_rptr[0] |= FLUSHW;
+					break;
+				case FLUSHW:
+					mp->b_rptr[0] &= ~FLUSHRW;
+					mp->b_rptr[0] |= FLUSHR;
+					break;
+				}
+			}
+			putnext(oq, mp);
+			return (0);
+		}
+		mp->b_rptr[0] &= ~FLUSHW;
+	}
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mx->other && (oq = mx->other->oq)) {
+			if (oq->q_flag & QREADR) {
+				/* need to reverse sense of flush */
+				switch (mp->b_rptr[0] & FLUSHRW) {
+				case FLUSHR:
+					mp->b_rptr[0] &= ~FLUSHRW;
+					mp->b_rptr[0] |= FLUSHW;
+					break;
+				case FLUSHW:
+					mp->b_rptr[0] &= ~FLUSHRW;
+					mp->b_rptr[0] |= FLUSHR;
+					break;
+				}
+			}
+			putnext(oq, mp);
+			return (0);
+		}
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(_RD(q), mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(_RD(q), FLUSHDATA);
+		qreply(q, mp);
+		return (0);
+	}
+	freemsg(mp);
+	return (0);
+}
+static fastcall int
+mx_w_other(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+	queue_t *oq;
+
+	/* pass along with flow control */
+	if (mx->other && (oq = mx->other->oq)) {
+		if (pcmsg(DB_TYPE(mp)) || bcanputnext(oq, mp->b_band)) {
+			putnext(oq, mp);
+			return (0);
+		}
+		return (-EBUSY);
+	}
+	freemsg(mp);
+	return (0);
+}
+
+static fastcall int
+mx_r_data_slow(queue_t *q, mblk_t *mp)
+{
+}
+static inline fastcall int
+mx_r_data(queue_t *q, mblk_t *mp)
+{
+}
+static fastcall int
+mx_r_proto(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+	int rtn = -EDEADLK;
+
+	if (mx_trylock(mx)) {
+		mx_ulong oldstate = mx_get_state(mx);
+
+		switch (*(mx_ulong *) mp->b_rptr) {
+		case MX_INFO_ACK:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_INFO_ACK");
+			rtn = mx_info_ack(mx, q, mp);
+			break;
+		case MX_OPTMGMT_ACK:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_OPTMGMT_ACK");
+			rtn = mx_optmgmt_ack(mx, q, mp);
+			break;
+		case MX_OK_ACK:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_OK_ACK");
+			rtn = mx_ok_ack(mx, q, mp);
+			break;
+		case MX_ERROR_ACK:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_ERROR_ACK");
+			rtn = mx_error_ack(mx, q, mp);
+			break;
+		case MX_ENABLE_CON:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_ENABLE_CON");
+			rtn = mx_enable_con(mx, q, mp);
+			break;
+		case MX_CONNECT_CON:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_CONNECT_CON");
+			rtn = mx_connect_con(mx, q, mp);
+			break;
+		case MX_DATA_IND:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_DATA_IND");
+			rtn = mx_data_ind(mx, q, mp);
+			break;
+		case MX_DISCONNECT_IND:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_DISCONNECT_IND");
+			rtn = mx_disconnect_ind(mx, q, mp);
+			break;
+		case MX_DISCONNECT_CON:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_DISCONNECT_CON");
+			rtn = mx_disconnect_con(mx, q, mp);
+			break;
+		case MX_DISABLE_IND:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_DISABLE_IND");
+			rtn = mx_disable_ind(mx, q, mp);
+			break;
+		case MX_DISABLE_CON:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_DISABLE_CON");
+			rtn = mx_disable_con(mx, q, mp);
+			break;
+		case MX_EVENT_IND:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_EVENT_IND");
+			rtn = mx_event_ind(mx, q, mp);
+			break;
+		default:
+			strlog(mx->mid, mx->sid, 0, SL_TRACE, "<- MX_????_???");
+			rtn = mx_other_ind(mx, q, mp);
+			break;
+		}
+		if (rtn)
+			mx_set_state(mx, oldstate);
+		mx_unlock(mx);
+	}
+	return (rtn);
+}
+static fastcall int
+mx_r_ioctl(queue_t *q, mblk_t *mp)
+{
+}
+static fastcall int
+mx_r_ctl(queue_t *q, mblk_t *mp)
+{
+}
+static fastcall int
+mx_r_sig(queue_t *q, mblk_t *mp)
+{
+}
+static fastcall int
+mx_r_flush(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+	queue_t *oq;
+
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
+		if (mx->other && mx->other->oq) {
+			if (!(oq->q_flag & QREADR)) {
+				/* need to reverse sense of flush */
+				switch (mp->b_rptr[0] & FLUSHRW) {
+				case FLUSHR:
+					mp->b_rptr[0] &= ~FLUSHRW;
+					mp->b_rptr[0] |= FLUSHW;
+					break;
+				case FLUSHW:
+					mp->b_rptr[0] &= ~FLUSHRW;
+					mp->b_rptr[0] |= FLUSHR;
+					break;
+				}
+			}
+			putnext(oq, mp);
+			return (0);
+		}
+		mp->b_rptr[0] &= ~FLUSHR;
+	}
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mx->other && (oq = mx->other->oq)) {
+			if (!(oq->q_flag & QREADR)) {
+				/* need to reverse sense of flush */
+				switch (mp->b_rptr[0] & FLUSHRW) {
+				case FLUSHR:
+					mp->b_rptr[0] &= ~FLUSHRW;
+					mp->b_rptr[0] |= FLUSHW;
+					break;
+				case FLUSHW:
+					mp->b_rptr[0] &= ~FLUSHRW;
+					mp->b_rptr[0] |= FLUSHR;
+					break;
+				}
+			}
+			putnext(oq, mp);
+			return (0);
+		}
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(_WR(q), mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(_WR(q), FLUSHDATA);
+		qreply(q, mp);
+		return (0);
+	}
+	freemsg(mp);
+	return (0);
+}
+static fastcall int
+mx_r_other(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+	queue_t *oq;
+
+	/* pass along with flow control */
+	if (mx->other && (oq = mx->other->oq)) {
+		if (pcmsg(DB_TYPE(mp)) || bcanputnext(oq, mp->b_band)) {
+			putnext(oq, mp);
+			return (0);
+		}
+		return (-EBUSY);
+	}
+	freemsg(mp);
+	return (0);
+}
+
+static noinline fastcall int
+mx_w_msg_slow(queue_t *q, mblk_t *mp)
+{
+	switch (DB_TYPE(mp)) {
+	case M_DATA:
+		return mx_w_data_slow(q, mp);
+	case M_PROTO:
+	case M_PCPROTO:
+		return mx_w_proto(q, mp);
+	case M_IOCTL:
+		return mx_w_ioctl(q, mp);
+	case M_IOCDATA:
+		return mx_w_iocdata(q, mp);
+	case M_CTL:
+	case M_PCCTL:
+		return mx_w_ctl(q, mp);
+	case M_FLUSH:
+		return mx_w_flush(q, mp);
+	}
+	return mx_w_other(q, mp);
+}
+static inline fastcall int
+mx_w_msg(queue_t *q, mblk_t *mp)
+{
+	if (DB_TYPE(mp) == M_DATA)
+		return mx_w_data(q, mp);
+	return mx_w_msg_slow(q, mp);
+}
+
+static inline fastcall int
+mx_r_msg_slow(queue_t *q, mblk_t *mp)
+{
+	switch (DB_TYPE(mp)) {
+	case M_DATA:
+		return mx_r_data_slow(q, mp);
+	case M_PROTO:
+	case M_PCPROTO:
+		return mx_r_proto(q, mp);
+	case M_COPYIN:
+	case M_COPYOUT:
+	case M_IOCACK:
+	case M_IOCNAK:
+		return mx_r_ioctl(q, mp);
+	case M_CTL:
+	case M_PCCTL:
+		return mx_r_ctl(q, mp);
+	case M_SIG:
+	case M_PCSIG:
+		return mx_r_sig(q, mp);
+	case M_FLUSH:
+		return mx_r_flush(q, mp);
+	}
+	return mx_r_other(q, mp);
+}
+static noinline fastcall int
+mx_r_msg(queue_t *q, mblk_t *mp)
+{
+	if (DB_TYPE(mp) == M_DATA)
+		return mx_r_data(q, mp);
+	return mx_r_msg_slow(q, mp);
+}
+static streamscall int
+mx_uwput(queue_t *q, mblk_t *mp)
+{
+	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY))) || mx_w_msg(q, mp))
+		putq(q, mp);
+	return (0);
+}
+static streamscall int
+mx_uwsrv(queue_t *q)
+{
+	mblk_t *mp;
+
+	while ((mp = getq(q))) {
+		if (mx_w_msg(q, mp)) {
+			putbq(q, mp);
+			break;
+		}
+	}
+	return (0);
+}
+static streamscall int
+mx_urput(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+
+	strlog(mx->mid, mx->sid, 0, SL_ERROR, "software error: %s", __FUNCTION__);
+	putnext(q, mp);
+	return (0);
+}
+static streamscall int
+mx_ursrv(queue_t *q)
+{
+	struct mx *mx = MX_PRIV(q);
+
+	/* the upper read service procedure is only for back-enabling across the multiplexing
+	   driver */
+	if (mx->other && mx->other->rq)
+		qenable(mx->other->rq);
+	return (0);
+}
+
+static streamscall int
+mx_lwput(queue_t *q, mblk_t *mp)
+{
+	struct mx *mx = MX_PRIV(q);
+
+	strlog(mx->mid, mx->sid, 0, SL_ERROR, "software error: %s", __FUNCTION__);
+	putnext(q, mp);
+	return (0);
+}
+static streamscall int
+mx_lwsrv(queue_t *q)
+{
+	struct mx *mx = MX_PRIV(q);
+
+	/* the lower write service procedure is only for back-enabling across the multiplexing
+	   driver */
+	if (mx->other && mx->other->wq)
+		qenable(mx->other->wq);
+}
+static streamscall int
+mx_lrput(queue_t *q, mblk_t *mp)
+{
+	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY))) || mx_r_msg(q, mp))
+		putq(q, mp);
+	return (0);
+}
+static streamscall int
+mx_lrsrv(queue_t *q)
+{
+	mblk_t *mp;
+
+	while ((mp = getq(q))) {
+		if (mx_r_msg(q, mp)) {
+			putbq(q, mp);
+			break;
+		}
+	}
+	return (0);
+}
+
+static streamscall int
+mx_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
+{
+	minor_t cminor = getminor(*devp);
+	struct mx *mx;
+	int err;
+
+	if (q->q_ptr)
+		return (0);	/* already open */
+	if (!cminor)
+		sflag = CLONEOPEN;
+	if (sflag == CLONEOPEN)
+		/* start half way through minor device range for clone devices */
+		cminor = (getminor(makedevice(0, 0xffffffff)) >> 1) + 1;
+	if ((err = mi_open_comm(&mx_opens, sizeof(*mx), q, devp, oflags, sflag, crp)))
+		return (err);
+	mx = MX_PRIV(q);
+	/* intialize mx structure */
+	return (0);
+}
+static streamscall int
+mx_qclose(queue_t *q, int oflags, cred_t *crp)
+{
+	qprocsoff(q);
+	mi_close_comm(&mx_opens, q);
+	return (0);
+}
+
+static __init int
+mxmuxinit(void)
+{
+	int err;
+
+	if ((err = register_strdev(&mx_cdev, major)) < 0) {
+		strlog(modid, 0, 0, SL_CONSOLE | SL_FATAL,
+		       "could not register STREAMS device, err = %d", err);
+		return (err);
+	}
+	if (major == 0)
+		major = err;
+	return (0);
+}
+static __exit void
+mxmuxexit(void)
+{
+	int err;
+
+	if ((err = unregsiter_strdev(&mx_cdev, major)) < 0)
+		strlog(modid, 0, 0, SL_CONSOLE | SL_FATAL,
+		       "could not register STREAMS device, err = %d", err);
+	return;
+}
+
+module_init(mxmuxinit);
+module_exit(mxmuxexit);

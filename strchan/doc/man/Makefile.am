@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/14 06:48:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/14 06:48:32 $ by $Author: brian $
+# Last Modified $Date: 2006/12/20 23:07:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/12/20 23:07:33  brian
+# - updates for release and current development
+#
 # Revision 0.9.2.2  2006/10/14 06:48:32  brian
 # - updates to include files from strss7 package
 #
@@ -66,6 +69,9 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 man_MANS = \
+	man4/cd.4 \
+	man4/cd_daed.4 \
+	man4/cd_hdlc.4 \
 	man4/ch.4 \
 	man4/ch_ioctl.4 \
 	man4/ch-sdl.4 \
@@ -293,9 +299,13 @@ man_MANS = \
 	man7/MX_OPTMGMT_REQ.7 \
 	man7/MX_optmgmt_req.7 \
 	man7/MX_optmgmt_req_t.7 \
+	man8/test-chan.8 \
 	man8/strchan_mknod.8
 
 dist_noinst_MANS = \
+	man4/cd.4.man \
+	man4/cd_daed.4.man \
+	man4/cd_hdlc.4.man \
 	man4/ch.4.man \
 	man4/ch_ioctl.4.man \
 	man4/ch-sdl.4.man \
@@ -523,10 +533,23 @@ dist_noinst_MANS = \
 	man7/MX_OPTMGMT_REQ.7.man \
 	man7/MX_optmgmt_req.7.man \
 	man7/MX_optmgmt_req_t.7.man \
+	man8/test-chan.8.man \
 	man8/strchan_mknod.8.man
 
 
 MANS_UNUSED = \
+	man4/ch.4 \
+	man4/ch_ioctl.4 \
+	man4/ch-sdl.4 \
+	man4/mgc.4 \
+	man4/mgcp.4 \
+	man4/mgcp_ioctl.4 \
+	man4/mg_ioctl.4 \
+	man4/mx_ioctl.4 \
+	man4/mx_sdl.4 \
+	man4/v401p.4 \
+	man4/x100p.4 \
+	man4/x400p.4 \
 	man5/strchan.5
 
 ## PKG_BUILD_INDEP
