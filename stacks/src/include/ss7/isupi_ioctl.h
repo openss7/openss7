@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: isupi_ioctl.h,v 0.9.2.5 2006/10/31 21:04:37 brian Exp $
+ @(#) $Id: isupi_ioctl.h,v 0.9.2.6 2006/12/20 23:12:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:37 $ by $Author: brian $
+ Last Modified $Date: 2006/12/20 23:12:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isupi_ioctl.h,v $
+ Revision 0.9.2.6  2006/12/20 23:12:51  brian
+ - cosmetic changes
+
  Revision 0.9.2.5  2006/10/31 21:04:37  brian
  - changes for 32-bit compatibility and remove HZ dependency
 
@@ -58,7 +61,7 @@
 #ifndef __ISUPI_IOCTL_H__
 #define __ISUPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: isupi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: isupi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -242,8 +245,7 @@ enum {
 typedef struct isup_option {
 	cc_ulong type;			/* object type */
 	cc_ulong id;			/* object id */
-	/* 
-	   followed by specific proto structure */
+	/* followed by specific proto structure */
 } isup_option_t;
 
 #define ISUP_IOCGOPTIONS	_IOR(	ISUP_IOC_MAGIC,  0,  isup_option_t   )
@@ -256,8 +258,7 @@ typedef struct isup_config {
 	cc_ulong type;			/* object type */
 	cc_ulong id;			/* object id */
 	cc_ulong cmd;			/* object command */
-	/* 
-	   followed by specific configuration structure */
+	/* followed by specific configuration structure */
 } isup_config_t;
 
 #define ISUP_GET	0
@@ -274,8 +275,7 @@ typedef struct isup_config {
  *  STATE
  */
 typedef struct isup_timers_ct {
-	/* 
-	   Call Control Timers */
+	/* Call Control Timers */
 	cc_ulong t1;
 	cc_ulong t2;
 	cc_ulong t3;
@@ -297,8 +297,7 @@ typedef struct isup_timers_ct {
 	cc_ulong tcra;
 	cc_ulong tcrm;
 	cc_ulong texm_d;
-	/* 
-	   Circuit Timers */
+	/* Circuit Timers */
 	cc_ulong t12;
 	cc_ulong t13;
 	cc_ulong t14;
@@ -328,13 +327,11 @@ typedef struct isup_statem_ct {
 	cc_ulong mnt_bind;
 	cc_ulong icc_bind;
 	cc_ulong ogc_bind[0];
-	/* 
-	   followed by bound streams for outgoing calls */
+	/* followed by bound streams for outgoing calls */
 } isup_statem_ct_t;
 
 typedef struct isup_timers_cg {
-	/* 
-	   Circuit Group Timers */
+	/* Circuit Group Timers */
 	cc_ulong t18;
 	cc_ulong t19;
 	cc_ulong t20;
@@ -358,8 +355,7 @@ typedef struct isup_statem_cg {
 	cc_ulong mnt_bind;
 	cc_ulong icc_bind;
 	cc_ulong ogc_bind[0];
-	/* 
-	   followed by bound streams for outgoing calls */
+	/* followed by bound streams for outgoing calls */
 } isup_statem_cg_t;
 
 typedef struct isup_timers_tg {
@@ -372,8 +368,7 @@ typedef struct isup_statem_tg {
 	cc_ulong mnt_bind;
 	cc_ulong icc_bind;
 	cc_ulong ogc_bind[0];
-	/* 
-	   followed by bound streams for outgoing calls */
+	/* followed by bound streams for outgoing calls */
 } isup_statem_tg_t;
 
 typedef struct isup_timers_sr {
@@ -390,8 +385,7 @@ typedef struct isup_statem_sr {
 	cc_ulong mnt_bind;
 	cc_ulong icc_bind;
 	cc_ulong ogc_bind[0];
-	/* 
-	   followed by bound streams for outgoing calls */
+	/* followed by bound streams for outgoing calls */
 } isup_statem_sr_t;
 
 typedef struct isup_timers_sp {
@@ -404,8 +398,7 @@ typedef struct isup_statem_sp {
 	cc_ulong mnt_bind;
 	cc_ulong icc_bind;
 	cc_ulong ogc_bind[0];
-	/* 
-	   followed by bound streams for outgoing calls */
+	/* followed by bound streams for outgoing calls */
 } isup_statem_sp_t;
 
 typedef struct isup_timers_mtp {
@@ -425,8 +418,7 @@ typedef struct isup_statem_df {
 	cc_ulong mnt_bind;
 	cc_ulong icc_bind;
 	cc_ulong ogc_bind[0];
-	/* 
-	   followed by bound streams for outgoing calls */
+	/* followed by bound streams for outgoing calls */
 } isup_statem_df_t;
 
 typedef struct isup_statem {
@@ -434,8 +426,7 @@ typedef struct isup_statem {
 	cc_ulong id;			/* object id */
 	cc_ulong flags;			/* object flags */
 	cc_ulong state;			/* object state */
-	/* 
-	   followed by object-specific state structure */
+	/* followed by object-specific state structure */
 } isup_statem_t;
 
 #define ISUP_IOCGSTATEM		_IOWR(	ISUP_IOC_MAGIC,  6,  isup_statem_t )
@@ -451,8 +442,7 @@ typedef struct isup_stats {
 } isup_stats_t;
 
 typedef struct isup_stats_ct {
-	/* 
-	   circuit stats */
+	/* circuit stats */
 	cc_ulong ct_t17_expiry;		/* Q.752 12.1 */
 	cc_ulong ct_rel_abnormal;	/* Q.752 12.6 */
 	cc_ulong ct_unexpected_bla;	/* Q.752 12.14 */
@@ -471,8 +461,7 @@ typedef struct isup_stats_ct {
 } isup_stats_ct_t;
 
 typedef struct isup_stats_cg {
-	/* 
-	   circuit stats */
+	/* circuit stats */
 	cc_ulong ct_t17_expiry;		/* Q.752 12.1 */
 	cc_ulong ct_t23_expiry;		/* Q.752 12.2 */
 	cc_ulong ct_rel_abnormal;	/* Q.752 12.6 */
@@ -489,8 +478,7 @@ typedef struct isup_stats_cg {
 	cc_ulong ct_missing_ack_cgua;;	/* Q.752 12.9 */
 	cc_ulong ct_abnormal_ack_cgba;;	/* Q.752 12.10 */
 	cc_ulong ct_abnormal_ack_cgua;;	/* Q.752 12.11 */
-	/* 
-	   circuit group stats */
+	/* circuit group stats */
 	cc_ulong cg_unexpected_cgba;	/* Q.752 12.12 */
 	cc_ulong cg_unexpected_cgua;	/* Q.752 12.13 */
 	cc_ulong cg_t19_expiry;		/* Q.752 12.18 */
@@ -499,8 +487,7 @@ typedef struct isup_stats_cg {
 } isup_stats_cg_t;
 
 typedef struct isup_stats_tg {
-	/* 
-	   circuit stats */
+	/* circuit stats */
 	cc_ulong ct_t17_expiry;		/* Q.752 12.1 */
 	cc_ulong ct_t23_expiry;		/* Q.752 12.2 */
 	cc_ulong ct_rel_abnormal;	/* Q.752 12.6 */
@@ -517,14 +504,12 @@ typedef struct isup_stats_tg {
 	cc_ulong ct_missing_ack_cgua;;	/* Q.752 12.9 */
 	cc_ulong ct_abnormal_ack_cgba;;	/* Q.752 12.10 */
 	cc_ulong ct_abnormal_ack_cgua;;	/* Q.752 12.11 */
-	/* 
-	   trunk group stats */
+	/* trunk group stats */
 	cc_ulong tg_dual_siezures;
 } isup_stats_tg_t;
 
 typedef struct isup_stats_sr {
-	/* 
-	   circuit stats */
+	/* circuit stats */
 	cc_ulong ct_t17_expiry;		/* Q.752 12.1 */
 	cc_ulong ct_t23_expiry;		/* Q.752 12.2 */
 	cc_ulong ct_rel_abnormal;	/* Q.752 12.6 */
@@ -541,23 +526,19 @@ typedef struct isup_stats_sr {
 	cc_ulong ct_missing_ack_cgua;;	/* Q.752 12.9 */
 	cc_ulong ct_abnormal_ack_cgba;;	/* Q.752 12.10 */
 	cc_ulong ct_abnormal_ack_cgua;;	/* Q.752 12.11 */
-	/* 
-	   circuit group stats */
+	/* circuit group stats */
 	cc_ulong cg_unexpected_cgba;	/* Q.752 12.12 */
 	cc_ulong cg_unexpected_cgua;	/* Q.752 12.13 */
 	cc_ulong cg_t19_expiry;		/* Q.752 12.18 */
 	cc_ulong cg_t21_expiry;		/* Q.752 12.19 */
 	cc_ulong cg_t23_expiry;
-	/* 
-	   trunk group stats */
+	/* trunk group stats */
 	cc_ulong tg_dual_siezures;
-	/* 
-	   user part stats */
+	/* user part stats */
 	cc_ulong sr_up_unavailable;	/* Q.752 10.4, 10.10 */
 	cc_ulong sr_up_congested;	/* Q.752 10.7, 10.13 */
 	cc_ulong sr_unequipped_cic;
-	/* 
-	   message stats */
+	/* message stats */
 	cc_ulong msgs_sent;		/* Q.752 11.1 */
 	cc_ulong msgs_recv;		/* Q.752 11.2 */
 	cc_ulong msgs_sent_by_type[256];	/* Q.752 11.1 */
@@ -565,8 +546,7 @@ typedef struct isup_stats_sr {
 } isup_stats_sr_t;
 
 typedef struct isup_stats_sp {
-	/* 
-	   circuit stats */
+	/* circuit stats */
 	cc_ulong ct_t17_expiry;		/* Q.752 12.1 */
 	cc_ulong ct_t23_expiry;		/* Q.752 12.2 */
 	cc_ulong ct_rel_abnormal;	/* Q.752 12.6 */
@@ -583,23 +563,19 @@ typedef struct isup_stats_sp {
 	cc_ulong ct_missing_ack_cgua;;	/* Q.752 12.9 */
 	cc_ulong ct_abnormal_ack_cgba;;	/* Q.752 12.10 */
 	cc_ulong ct_abnormal_ack_cgua;;	/* Q.752 12.11 */
-	/* 
-	   circuit group stats */
+	/* circuit group stats */
 	cc_ulong cg_unexpected_cgba;	/* Q.752 12.12 */
 	cc_ulong cg_unexpected_cgua;	/* Q.752 12.13 */
 	cc_ulong cg_t19_expiry;		/* Q.752 12.18 */
 	cc_ulong cg_t21_expiry;		/* Q.752 12.19 */
 	cc_ulong cg_t23_expiry;
-	/* 
-	   trunk group stats */
+	/* trunk group stats */
 	cc_ulong tg_dual_siezures;
-	/* 
-	   user part stats */
+	/* user part stats */
 	cc_ulong sr_up_unavailable;	/* Q.752 10.4, 10.10 */
 	cc_ulong sr_up_congested;	/* Q.752 10.7, 10.13 */
 	cc_ulong sr_unequipped_cic;
-	/* 
-	   message stats */
+	/* message stats */
 	cc_ulong msgs_sent;		/* Q.752 11.1 */
 	cc_ulong msgs_recv;		/* Q.752 11.2 */
 	cc_ulong msgs_sent_by_type[256];	/* Q.752 11.1 */
@@ -610,8 +586,7 @@ typedef struct isup_stats_mtp {
 } isup_stats_mtp_t;
 
 typedef struct isup_stats_df {
-	/* 
-	   circuit stats */
+	/* circuit stats */
 	cc_ulong ct_t17_expiry;		/* Q.752 12.1 */
 	cc_ulong ct_t23_expiry;		/* Q.752 12.2 */
 	cc_ulong ct_rel_abnormal;	/* Q.752 12.6 */
@@ -628,18 +603,15 @@ typedef struct isup_stats_df {
 	cc_ulong ct_missing_ack_cgua;;	/* Q.752 12.9 */
 	cc_ulong ct_abnormal_ack_cgba;;	/* Q.752 12.10 */
 	cc_ulong ct_abnormal_ack_cgua;;	/* Q.752 12.11 */
-	/* 
-	   circuit group stats */
+	/* circuit group stats */
 	cc_ulong cg_unexpected_cgba;	/* Q.752 12.12 */
 	cc_ulong cg_unexpected_cgua;	/* Q.752 12.13 */
 	cc_ulong cg_t19_expiry;		/* Q.752 12.18 */
 	cc_ulong cg_t21_expiry;		/* Q.752 12.19 */
 	cc_ulong cg_t23_expiry;
-	/* 
-	   trunk group stats */
+	/* trunk group stats */
 	cc_ulong tg_dual_siezures;
-	/* 
-	   message stats */
+	/* message stats */
 	cc_ulong msgs_sent;		/* Q.752 11.1 */
 	cc_ulong msgs_recv;		/* Q.752 11.2 */
 	cc_ulong msgs_sent_by_type[256];	/* Q.752 11.1 */
@@ -801,8 +773,7 @@ typedef struct isup_pass {
 	cc_ulong band;			/* band of message block */
 	cc_ulong ctl_length;		/* length of cntl part */
 	cc_ulong dat_length;		/* length of data part */
-	/* 
-	   followed by cntl and data part of message to pass to MTP */
+	/* followed by cntl and data part of message to pass to MTP */
 } isup_pass_t;
 
 #define ISUP_IOCCPASS		_IOWR(	ISUP_IOC_MAGIC, 16,  isup_pass_t )
