@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 11:26:11 $
+ @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/20 23:11:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:26:11 $ by $Author: brian $
+ Last Modified $Date: 2006/12/20 23:11:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_ip.c,v $
+ Revision 0.9.2.4  2006/12/20 23:11:01  brian
+ - current development
+
  Revision 0.9.2.3  2006/05/08 11:26:11  brian
  - post inc problem and working through test cases
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 11:26:11 $"
+#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/20 23:11:01 $"
 
 static char const ident[] =
-    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 11:26:11 $";
+    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/20 23:11:01 $";
 
 /*
  *  This is a DLPI driver for the IP subsystem.  The purpose of the driver is to directly access the
@@ -91,7 +94,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/05/08 11:26:11 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2006/12/20 23:11:01 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI DL_IP Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -413,7 +416,7 @@ dl_error_string(dl_long error)
 /* State transitions */
 
 STATIC INLINE fastcall dl_ulong
-dl_get_state(struct dl * dl)
+dl_get_state(struct dl *dl)
 {
 	return (dl->info.dl_current_state);
 }
@@ -2141,3 +2144,95 @@ STATIC int
 dl_w_ioctl(queue_t *q, mblk_t *mp)
 {
 }
+
+unsigned short modid = DRV_ID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
+MODULE_PARM_DESC(modid, "Module ID for the IP driver. (0 for allocation.)");
+
+major_t major = CMAJOR_0;
+
+#ifndef module_param
+MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
+MODULE_PARM_DESC(major, "Device number for the IP driver. (0 for allocation.)");
+
+
+static struct cdevsw dl_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &dl_info,
+	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+#ifdef LFS
+static struct devnode dl_node_ip = {
+	.n_name = "ip",
+	.n_flag = D_CLONE,
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode dl_node_ipco = {
+	.n_name = "ipco",
+	.n_flag = D_CLONE,
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode dl_node_ipcl = {
+	.n_name = "ipcl",
+	.n_flag = D_CLONE,
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+#endif				/* LFS */
+
+static __init int
+dlipinit(void)
+{
+	int err;
+
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	dl_init_hashes();
+	if ((err = register_strdev(&dl_cdev, major)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME, major);
+		dl_term_hashes();
+		return (err);
+	}
+	if (major == 0)
+		major = err;
+
+#ifdef LFS
+	register_strnod(&dl_cdev, &dl_node_ip, IP_CMINOR);
+	register_strnod(&dl_cdev, &dl_node_ipco, IPCO_CMINOR);
+	register_strnod(&dl_cdev, &dl_node_ipcl, IPCL_CMINOR);
+#endif				/* LFS */
+
+	return (0);
+}
+
+static __exit void
+dlipexit(void)
+{
+	int err;
+
+#ifdef LFS
+	unregister_strnod(&dl_cdev, IP_CMINOR);
+	unregister_strnod(&dl_cdev, IPCO_CMINOR);
+	unregister_strnod(&dl_cdev, IPCL_CMINOR);
+#endif				/* LFS */
+
+	if ((err = unregister_strdev(&dl_cdev, major)) < 0)
+		cmn_err(CE_WARN, "%s: could not unregister major %d", DRV_NAME, major);
+	dl_term_hashes();
+	return;
+}
+
+module_init(dlipinit);
+module_init(dlipexit);
