@@ -1,0 +1,619 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SDLCONFIG 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B sdlconfig
+\- SDL configuration utility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBsdlconfig\fR [\fIoptions\fR] {\fB-g\fR, \fB--get\fR}
+.PD 0
+.HP
+\fBsdlconfig\fR [\fIoptions\fR] {\fB-s\fR, \fB--set\fR}
+.HP
+\fBsdlconfig\fR [\fIoptions\fR] {\fB-f\fR, \fB--file\fR} \fIFILENAME\fR
+.HP
+\fBsdlconfig\fR {\fB-h\fR, \fB--help\fR}
+.HP
+\fBsdlconfig\fR {\fB-V\fR, \fB--version\fR}
+.HP
+\fBsdlconfig\fR {\fB-C\fR, \fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B sdlconfig
+is an SDL configuration program for the
+.BR x400p (4)
+.I STREAMS
+driver.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+(none).
+.\"
+.\"
+.SH OPTIONS
+.PP
+.\"
+.SS "Command Options"
+.PP
+The following command options determine the mode of the command and are mutually exclusive options:
+.TP
+\fB-g\fR, \fB--get\fR
+Obtain information about the configuration of the device.
+.TP
+\fB-s\fR, \fB--set\fR
+Set configuration data on the device.
+.TP
+\fB-f\fR, \fB--file\fR \fIFILENAME\fR
+Set configuration data and devices listed in file,
+.IR FILENAME .
+.PP
+The following options are coding standard options for the OpenSS7 project that are supported by all
+command line utilities:
+.TP
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.SS "General Options"
+.PP
+The following are general options controlling the output of the utility and can be applied to the
+command in many mode:
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller is interested only in the return code and that normal output should be
+suppressed.  This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.  For example,
+.B -vvvvv
+is equivalent to
+.BR --verbose=5 .
+.\"
+.SS "Set/Get Options"
+.PP
+The following options are common to both get and set operations.  The first option specifies the
+device name and the remaining three common options identify the timeslots, spans and card upon which
+the get or set operation is to be performed.
+.TP
+\fB-d\fR, \fB--device\fR \fIDEVNAME\fR
+Specifies the device name,
+.IR DEVNAME ,
+to get or set.  The default device name is
+.RB \(lq /dev/x400p-sl \(rq.
+.PP
+The next three common options specify the PPA (Physical Point of Appearance) to which the
+configuration utility will attach.
+.TP
+\fB-c\fR, \fB--card\fR \fICARD\fR
+Specifies the card number,
+.IR CARD .
+This is a numeral representing the logical card number (in bus order).  The default is zero
+.RB ( 0 ),
+or the first logical card.
+.TP
+\fB-p\fR, \fB--span\fR \fISPAN\fR
+Specifies the span on the card,
+.IR SPAN .
+This is a numeral representing a specific cardinal span number on the card.  The default is zero
+.RB ( 0 ),
+representing all spans on the card.
+.TP
+\fB-t\fR, \fB--slot\fR \fISLOT\fR
+Specifies the time slot on the card,
+.IR SLOT .
+This is a numeral representing the cardinal timeslot number within the span(s), or zero to indicate
+all timeslots in the span(s).  The default is zero
+.RB ( 0 ),
+representing all data carying timeslots with the span(s).
+.\"
+.SS "Set Options"
+.PP
+The following options are only applicable to the
+.BR -s ", " --set
+command option and are used to specify which configuration data elements to set:
+.TP
+\fB--clock\fR \fICLOCK\fR
+Specifies the interface clock source.
+.I CLOCK
+can be one of the following mnemonic strings:
+.RS
+.TP \w'\fBdefault\fR\(em'u
+.B default
+the default clocking for the span.
+.PD 0
+.TP
+.B int
+internal clocking.
+.TP
+.B ext
+external clocking.
+.TP
+.B loop
+loop clocking.
+.TP
+.B master
+master clock.
+.TP
+.B slave
+slave clock.
+.TP
+.B dpll
+digital phase locked loop.
+.TP
+.B abr
+average bit rate.
+.TP
+.B shaper
+traffic shaper.
+.TP
+.B tick
+system tick clock.
+.PD
+.RE
+.TP
+\fB--rate\fR \fIRATE\fR
+Specifies the channel rate.
+.I RATE
+can be one of:
+.RS
+.TP \w'\fB2048000\fR\(em'u
+.B 56000
+DS0A channel.
+.PD 0
+.TP
+.B 64000
+DS0 channel.
+.TP
+.B 1544000
+entire T1/J1 span.
+.TP
+.B 2048000
+entire E1 span.
+.PD
+.RE
+.TP
+\fB--type\fR \fITYPE\fR
+Specifies the channel interface type.
+.I TYPE
+can be one of:
+.RS
+.TP \w'\fBdefault\fR\(em'u
+.B default
+the channel interface is the default for the device.
+.PD 0
+.TP
+.B v35
+the channel interface is a V.35 interface.
+.TP
+.B ds0
+the channel interface is a DS0 interface.
+.TP
+.B ds0a
+the channel interface is a DS0A interface.
+.TP
+.B e1
+the channel interface is an entire statistically multiplexed E1 span.
+.TP
+.B t1
+the channel interface is an entire statistically multiplexed T1 span.
+.TP
+.B j1
+the channel interface is an entire statistically multiplexed J1 span.
+.TP
+.B atm
+the channel interface is ATM.
+.TP
+.B packet
+the channel interface is packet based.
+.PD
+.RE
+.TP
+\fB--mode\fR \fIMODE\fR
+Specifies the mode of the channel interface.
+.I MODE
+can be one of:
+.RS
+.TP \w'\fBdefault\fR\(em'u
+.B default
+the channel mode is the default for the device.
+.PD 0
+.TP
+.B dsu
+the channel is DSU mode.
+.TP
+.B csu
+the channel is CSU mode.
+.TP
+.B dte
+the channel is DTE mode.
+.TP
+.B dce
+the channel is DCE mode.
+.TP
+.B client
+the channel is client mode.
+.TP
+.B server
+the channel is server mode.
+.TP
+.B peer
+the channel is peer mode.
+.TP
+.B echo
+the channel is in echo mode.
+.TP
+.B rem_lb
+the channel is in remote loopback mode.
+.TP
+.B loc_lb
+the channel is in local loopback mode.
+.TP
+.B lb_echo
+the channel is in loopback and echo mode.
+.TP
+.B test
+the channel is in test mode.
+.PD
+.RE
+.TP
+\fB--grate\fR \fIGROUP-RATE\fR
+Specifies the group rate.
+.I GROUP-RATE
+can be one of:
+.RS
+.TP \w'\fB1000000000\fR\(em'u
+.B 1544000
+T1 or J1 span.
+.PD 0
+.TP
+.B 2048000
+E1 span.
+.TP
+.B 10000000
+10baseT Ethernet
+.TP
+.B 100000000
+100baseT Ethernet
+.TP
+.B 1000000000
+GigE
+.PD
+.RE
+.TP
+\fB--gtype\fR \fIGROUP-TYPE\fR
+Specifies the group type.
+.I GROUP-TYPE
+can be one of:
+.RS
+.TP \w'\fBdefault\fR\(em'u
+.B default
+the group is the default for the device.
+.PD 0
+.TP
+.B t1
+the group is a T1 span.
+.TP
+.B e1
+the group is an E1 span.
+.TP
+.B j1
+the group is a J1 span.
+.TP
+.B atm
+the group is ATM AAL5.
+.TP
+.B eth
+the group is Ethernet/IEEE 802.3.
+.TP
+.B ip
+the group is over Internet Protocol (IP).
+.TP
+.B udp
+the group is over User Datagram Protocol (UDP).
+.TP
+.B tcp
+the group is over Transmission Control Protocol (TCP).
+.TP
+.B rtp
+the group is over Real-Time Transport Protocol (RTP).
+.TP
+.B sctp
+the group is over Stream Control Transmission Protocol (SCTP).
+.PD
+.RE
+.TP
+\fB--gmode\fR \fIGROUP-MODE\fR
+Specifies the group mode.
+.I GROUP-MODE
+can be one of:
+.RS
+.TP \w'\fBdefault\fR\(em'u
+.B default
+the group mode is default (normal).
+.PD 0
+.TP
+.B loc_lb
+the group mode is local loopback.
+.TP
+.B rem_lb
+the group mode is remote loopback.
+.PD
+.RE
+.TP
+\fB--gcrc\fR \fIGROUP-CRC\fR
+Specifies the group CRC.
+.I GROUP-CRC
+can be one of:
+.RS
+.TP \w'\fBdefault\fR\(em'u
+.B default
+.PD 0
+.TP
+.B crc4
+G.703 CRC4 calculation.
+.TP
+.B crc5
+G.703 CRC5 calculation.
+.TP
+.B crc6
+G.703 CRC6 calculation.
+.TP
+.B crc6j
+JG.703 CRC6J calculation.
+.PD
+.RE
+.TP
+\fB--coding\fR \fICODING\fR
+Specifies the bit coding for the interface.
+.I CODING
+can be one of:
+.RS
+.TP \w'\fBdefault\fR\(em'u
+.B default
+coding is default for the device.
+.PD 0
+.TP
+.B nrz
+Non-Return to Zero coding.
+.TP
+.B nrzi
+Non-Return to Zero Inverted coding.
+.TP
+.B ami
+Alternate Mark Inversion coding.
+.TP
+.B b6zs
+6 zero bit suppression coding.
+.TP
+.B b8zs
+8 zero bit suppression coding.
+.TP
+.B aal1
+ATM Adaption Layer 1 coding.
+.TP
+.B aal2
+ATM Adaption Layer 2 coding.
+.TP
+.B aal5
+ATM Adaption Layer 5 coding.
+.TP
+.B hdb3
+HDB3 coding.
+.PD
+.RE
+.TP
+\fB--framing\fR \fIFRAMING\fR
+Specifies the framing for the interface.
+.I FRAMING
+can be one of:
+.RS
+.TP
+.B ccs
+CCS (Clear Channel Signalling) framing.
+.PD 0
+.TP
+.B cas
+CAS (Channel Associated Signalling) framing.
+.TP
+.B sf
+Super Frame framing.
+.TP
+.B esf
+Extended Super Frame framing.
+.PD
+.RE
+.TP
+\fB--syncsrc\fR \fISYNC1\fR[,\fISYNC2\fR[,\fISYNC3\fR[,\fISYNC4\fR]]]\fR
+Specifies the synchronization source for the card in order of selection.  Each of
+.IR SYNC1 ", " SYNC2 ", " SYNC3 ", " SYNC4
+can take on one of the following values:
+.RS
+.IP \fB0\fR
+synchronize to internal clock.
+.PD 0
+.IP \fB1\fR
+synchornize to span 1.
+.IP \fB2\fR
+synchornize to span 2.
+.IP \fB3\fR
+synchronize to span 3.
+.IP \fB4\fR
+synchronize to span 4.
+.IP \fB5\fR
+syncrhonize to external clock.
+.PD
+.RE
+.IP ""
+These settings only determine where the card takes it timing source.  The settings of individual
+spans on a card can be set using the
+.B --clock
+option.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.B sdlconfig
+fails, it prints a diagnostic message to
+.I stderr
+and exits with a non-zero return code.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B sdlconfig
+is normally invoked by @PACKAGE@-@VERSION@ configuration scripts.
+.\"
+.\"
+.SH DRIVERS
+.PP
+.BR x400p (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/sdlconfig
+contains the
+.B sdlconfig
+command.
+
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR x400p (4),
+.BR test-x400p (8),
+.BR sdli (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B sdlconfig
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B sdlconfig
+is compatible with previous releases of the utility.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Signalling Data Link configuration is not subject to standardization.
+.B sdlconfig
+conforms to the Signalling Data Link Interface specification
+.BR sdli (7).
+.\"
+.\"
+.SH HISTORY
+.PP
+.B sdlconfig
+is provided with the \(lq@PACKAGE_TITLE@\(rq package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

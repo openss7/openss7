@@ -84,29 +84,112 @@ sort-adjacent-labels
 .\"
 .\"
 .TH M3UA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B m3ua_ioctl
 \- IO controls for M3UA devices
-.SH SYNOPSIS
-.SH DESCRIPTION
-.SH IOCTLS
 .\"
-.XX
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/mtpi_ioctl.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.br
+.B #include <ss7/m3ua_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " m3ua_stream " = open(" \fR/dev/m3ua\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" m3ua_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B M3UA-IOCTL
+supports input-output controls based on the Local Management Interface input-output controls,
+.BR lmi_ioctl (4).
+.B M3UA-IOCTL
+supports the UA managed object model,
+.BR ua_ioctl (4).
+.B M3UA-IOCTL
+supports the MTP input-output controls,
+.BR mtpi_ioctl (4).
+.PP
+.B M3UA-IOCTL
+defines the additional structures and constants necessary to use these input-output
+controls with the
+.BR m3ua (4)
+driver.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B m3ua
+does not have any defined input-output controls at this time.
+.\"
+.\"
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/mtpi_ioctl.h> ,
+.BR <ss7/ua_ioctl.h> ,
+.BR <ss7/m3ua_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/m3ua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m3ua (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B m3ua
+input-output controls are compatible with the MTP input-output controls, see
+.BR mtpi_ioctl (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+M3UA,
 .[
-rfc3332
+m3ua-rfc
 .]
-.[
-rfc2960
-.]
+Q.704,
 .[
 q704
 .]
+T1.111,
 .[
 t1.111
 .]
+JT-Q.704.
 .[
 jtq704
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B m2ua
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
 .\"
 .[
 $LIST$

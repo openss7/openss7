@@ -209,7 +209,8 @@ is normally invoked from the @PACKAGE@-@VERSION@ testsuite.
 .\"
 .SH FILES
 .PP
-.TP /usr/libexec/@PACKAGE@/test-x400p
+.TP
+.B /usr/libexec/@PACKAGE@/test-x400p
 contains the
 .B test-x400p
 command.

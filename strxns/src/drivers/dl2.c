@@ -74,4 +74,86 @@ static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.1 $)
  *  argument the multiplex id and the ascii device name.  Devices mapped in this way begin life as a
  *  network device of the type revealed by interrogating the DL stream but can be configured using
  *  the normal Linux facilities.
+ *
+ *  This driver is a replacement for the unsupported LDL driver.
  */
+
+#define _DEBUG 1
+//#undef _DEBUG
+/
+#define _LFS_SOURCE	1
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+
+#include <sys/os7/compat.h>
+
+#include <stdbool.h>
+#include <sys/dlpi.h>
+
+#include <linux/netdevice.h>
+
+#define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
+#define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define ND_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define ND_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
+#define ND_DEVICE	"Supports Linux HDLC devices."
+#define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define ND_LICENSE	"GPL"
+#define ND_BANNER	ND_DESCRIP	"\n" \
+			ND_EXTRA	"\n" \
+			ND_REVISION	"\n" \
+			ND_COPYRIGHT	"\n" \
+			ND_DEVICE	"\n" \
+			ND_CONTACT	"\n"
+#define ND_SPLASH	ND_DESCRIP	" - " \
+			ND_REVISION
+
+#ifdef LINUX
+MODULE_AUTHOR(ND_CONTACT);
+MODULE_DESCRIPTION(ND_DESCRIP);
+MODULE_SUPPORTED_DEVICE(ND_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(ND_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-nd");
+#endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-"
+	       PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif				/* MODULE_VERSION */
+#endif				/* LINUX */
+
+#ifdef LFS
+#define ND_DRV_ID		CONFIG_STREAMS_ND_MODID
+#define ND_DRV_NAME		CONFIG_STREAMS_ND_NAME
+#define ND_CMAJORS		CONFIG_STREAMS_ND_NMAJORS
+#define ND_CMAJOR_0		CONFIG_STREAMS_ND_MAJOR
+#define ND_UNITS		CONFIG_STREAMS_ND_NMINORS
+#endif				/* LFS */
+
+#ifdef LINUX
+#ifdef MODULE_ALIAS
+#ifdef LFS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_ND_MODID));
+MODULE_ALIAS("stremas-driver-nd");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ND_MAJOR));
+MODULE_ALIAS("/dev/streams/nd");
+MODULE_ALIAS("/dev/streams/nd/*");
+MODULE_ALIAS("/dev/streams/clone/nd");
+#endif				/* LFS */
+MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0) "-0");
+MODULE_ALIAS("/dev/nd");
+#endif				/* MODULE_ALIAS */
+#endif				/* LINUX */
+
+#define NDLOGST	    1		/* log ND stat transitions */
+#define NDLOGTO	    2		/* log ND timeouts */
+#define NDLOGRX	    3		/* log ND received primitives */
+#define NDLOGTX	    4		/* log ND issued primitives */
+#define NDLOGTE	    5		/* log ND timer events */
+#define NDLOGDA	    6		/* log ND data */
+
+

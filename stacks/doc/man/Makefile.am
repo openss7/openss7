@@ -203,11 +203,6 @@ ss7_man_MANS = \
 	man4/sscop.4 \
 	man4/sscop_ioctl.4 \
 	man4/sscop_mce.4 \
-	man4/tali.4 \
-	man4/tali_ioctl.4 \
-	man4/tali-isup.4 \
-	man4/tali-mtp.4 \
-	man4/tali-sccp.4 \
 	man4/tcap.4 \
 	man4/tcap_ioctl.4 \
 	man4/tcap-mgmt.4 \
@@ -1003,6 +998,7 @@ ss7_man_MANS = \
 	man8/mtp.8 \
 	man8/sccp.8 \
 	man8/sdl.8 \
+	man8/sdlconfig.8 \
 	man8/sdt.8 \
 	man8/sl.8 \
 	man8/sls.8 \
@@ -1456,6 +1452,11 @@ sigtran_man_MANS = \
 	man4/sua-npi.4 \
 	man4/sua-sccpi.4 \
 	man4/sua-tpi.4 \
+	man4/tali.4 \
+	man4/tali_ioctl.4 \
+	man4/tali-isup.4 \
+	man4/tali-mtp.4 \
+	man4/tali-sccp.4 \
 	man4/tua.4 \
 	man4/tua_ioctl.4 \
 	man4/ua_ioctl.4 \
@@ -2492,6 +2493,7 @@ ss7_dist_noinst_MANS = \
 	man8/mtp.8.man \
 	man8/sccp.8.man \
 	man8/sdl.8.man \
+	man8/sdlconfig.8.man \
 	man8/sdt.8.man \
 	man8/sigtran.8.man \
 	man8/sl.8.man \

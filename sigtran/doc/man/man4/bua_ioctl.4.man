@@ -81,9 +81,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BUA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B bua_ioctl
 \- SS7 BICC User Adataptation Layer (BUA) \- IO Controls
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stropts.h>
@@ -101,53 +105,93 @@ sort-adjacent-labels
 .BI "int " bua_stream " = open(" \fR/dev/bua\fI ", " flags );
 .HP
 .BI "int " retval " = ioctl(" bua_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B BUA-IOCTL
-supports IO controls based on the Local Management Interface IO controls,
+supports input-output controls based on the Local Management Interface input-output controls,
 .BR lmi_ioctl (4).
 .B BUA-IOCTL
 supports the UA managed object model,
 .BR ua_ioctl (4).
 .B BUA-IOCTL
-supports the BICC IO controls,
+supports the BICC input-output controls,
 .BR bicci_ioctl (4).
 .PP
 .B BUA-IOCTL
-defines the additional structures and constants necessary to use these IO
+defines the additional structures and constants necessary to use these input-output
 controls with the
 .BR bua (4)
 driver.
+.\"
+.\"
 .SH IOCTLS
+.PP
+.B bua
+does not have any defined input-output controls at this time.
+.\"
+.\"
 .SH NOTICES
 .PP
+.B BUA
+.[
+bua
+.]
+was never formally adopted by the SIGTRAN WG within the IETF.
+.\"
+.\"
 .SH BUGS
 .PP
 .B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH FILES
 .PP
 .BR <ss7/bicci_ioctl.h> ,
 .BR <ss7/ua_ioctl.h> ,
 .BR <ss7/bua_ioctl.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/bua .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.SH VERSIONS
+.BR bua (4).
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
+.B bua
+input-output controls are compatible with the ISUP input-output controls, see
+.BR isupi_ioctl (4).
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+BUA,
 .[
 bua
 .]
+Q.1902,
 .[
 q1902
 .]
+T1.BICC.
 .[
 t1bicc
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B bua
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
 .\"
 .[
 $LIST$

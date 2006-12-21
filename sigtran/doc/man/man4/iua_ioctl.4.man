@@ -81,33 +81,108 @@ sort-adjacent-labels
 .\"
 .\"
 .TH IUA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B iua_ioctl
 \- IO controls for IUA drivers
+.\"
+.\"
 .SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/isdni_ioctl.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.br
+.B #include <ss7/iua_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " iua_stream " = open(" \fR/dev/iua\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" iua_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
+.PP
+.B IUA-IOTCTL
+supports input-output controls based on the Local Management Interface input-output controls,
+.BR lmi_ioctl (4).
+.B IUA-IOCTL
+supports the UA managed object model,
+.BR ua_ioctl (4).
+.B IUA-IOCTL
+supports the ISDN input-output controls,
+.BR isdni_ioctl (4).
+.PP
+.B IUA-IOCTL
+defines the additional structures and constants necessary to use these input-output
+controls with the
+.BR iua (4)
+driver.
+.\"
+.\"
 .SH IOCTLS
+.PP
+.B iua
+does not have any defined input-output controls at this time.
 .\"
 .\"
-.XX
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/isdni_ioctl.h> ,
+.BR <ss7/ua_ioctl.h> ,
+.BR <ss7/iua_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/iua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR iua (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B iua
+input-output controls are compatible with the ISDN input-output controls, see
+.BR isdni_ioctl (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+IUA,
 .[
-rfc3057
+iua
 .]
-.[
-rfc3057bis
-.]
-.[
-q920
-.]
+Q.921,
 .[
 q921
 .]
-.[
-q921bis
-.]
+DLPI.
 .[
 dlpi
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B iua
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
 .\"
 .[
 $LIST$

@@ -116,6 +116,10 @@ MODULE_LICENSE(HDLC_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-hldc");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-"
+	       PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -129,9 +133,9 @@ MODULE_ALIAS("streams-hldc");
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 #ifdef LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MXMUX_MODID));
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_HDLC_MODID));
 MODULE_ALIAS("streams-driver-hdlc");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MXMUX_MAJOR));
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_HDLC_MAJOR));
 MODULE_ALIAS("/dev/streams/hdlc");
 MODULE_ALIAS("/dev/streams/hdlc/*");
 MODULE_ALIAS("/dev/streams/clone/hdlc");

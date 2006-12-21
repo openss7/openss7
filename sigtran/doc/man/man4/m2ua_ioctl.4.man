@@ -84,27 +84,485 @@ sort-adjacent-labels
 .\"
 .\"
 .TH M2UA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B m2ua_ioctl
 \- IO controls for M2UA devices
+.\"
+.\"
 .SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/sli_ioctl.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.br
+.B #include <ss7/m2ua_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " m2ua_stream " = open(" \fR/dev/m2ua\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" m2ua_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
+.PP
+.B M2UA-IOCTL
+supports input-output controls based on the Local Management Interface input-output controls,
+.BR lmi_ioctl (4).
+.B M2UA-IOCTL
+supports the UA managed object model,
+.BR ua_ioctl (4).
+.B M2UA-IOCTL
+supports the SL input-output controls,
+.BR sli_ioctl (4).
+.PP
+.B M2UA-IOCTL
+defines the additional structures and constants necessary to use these input-output
+controls with the
+.BR m2ua (4)
+driver.
+.\"
+.\"
 .SH IOCTLS
+.PP
+.SS Object Types
+.TP \w'\fBM2UA_OBJ_TYPE_XP_SSCOP\fR\(em'u
+.B M2UA_OBJ_TYPE_LM
+layer management
+.PD 0
+.TP
+.B M2UA_OBJ_TYPE_AS_U
+application server (user)
+.TP
+.B M2UA_OBJ_TYPE_AS_P
+application server (provider)
+.TP
+.B M2UA_OBJ_TYPE_SP
+signalling process
+.TP
+.B M2UA_OBJ_TYPE_SG
+signalling gateway
+.TP
+.B M2UA_OBJ_TYPE_SPP
+signalling process proxy
+.TP
+.B M2UA_OBJ_TYPE_ASP
+signalling process proxy
+.TP
+.B M2UA_OBJ_TYPE_SGP
+signalling process proxy
+.TP
+.B M2UA_OBJ_TYPE_SL_U
+signalling link (user)
+.TP
+.B M2UA_OBJ_TYPE_SL_P
+signalling link (provider)
+.TP
+.B M2UA_OBJ_TYPE_XP_SCTP
+transport provider
+.TP
+.B M2UA_OBJ_TYPE_XP_TCP
+transport provider
+.TP
+.B M2UA_OBJ_TYPE_XP_SSCOP
+transport provider
+.TP
+.B M2UA_OBJ_TYPE_DF
+default
+.PD
+.\"
+.SS M2UA_OBJ_TYPE_LM
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_AS_U
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_AS_P
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_SP
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_SG
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_SPP
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_ASP
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_SGP
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_SL_U
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_SL_P
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_XP_SCTP
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_XP_TCP
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_XP_SSCOP
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS M2UA_OBJ_TYPE_DF
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.\"
+.SS "Input-Output Controls"
+.TP \w'\fBM2UA_IOCGOPTIONS\fR\(em'u
+.B M2UA_IOCGOPTIONS
+output only.
+Argument is a pointer to an
+.B m2ua_option
+structure.
+.PD 0
+.TP
+.B M2UA_IOCSOPTIONS
+input only.
+Argument is a pointer to an
+.B m2ua_option
+structure.
+.TP
+.B M2UA_IOCGCONFIG
+input-output.
+Argument is a pointer to an
+.B m2ua_config
+structure.
+.TP
+.B M2UA_IOCSCONFIG
+input-output.
+Argument is a pointer to an
+.B m2ua_config
+structure.
+.TP
+.B M2UA_IOCTCONFIG
+input-output.
+Argument is a pointer to an
+.B m2ua_config
+structure.
+.TP
+.B M2UA_IOCCCONFIG
+input-output.
+Argument is a pointer to an
+.B m2ua_config
+structure.
+.TP
+.B M2UA_IOCGSTATEM
+input-output.
+Argument is a pointer to an
+.B m2ua_statem
+structure.
+.TP
+.B M2UA_IOCCMRESET
+input-output.
+Argument is a pointer to an
+.B m2ua_statem
+structure.
+.TP
+.B M2UA_IOCGSTATSP
+input-output.
+Argument is a pointer to an
+.B m2ua_stats
+structure.
+.TP
+.B M2UA_IOCSSTATSP
+input-output.
+Argument is a pointer to an
+.B m2ua_stats
+structure.
+.TP
+.B M2UA_IOCGSTATS
+input-output.
+Argument is a pointer to an
+.B m2ua_stats
+structure.
+.TP
+.B M2UA_IOCCSTATS
+input-output.
+Argument is a pointer to an
+.B m2ua_stats
+structure.
+.TP
+.B M2UA_IOCGNOTIFY
+output only.
+Argument is a pointer to an
+.B m2ua_notify
+structure.
+.TP
+.B M2UA_IOCSNOTIFY
+output only.
+Argument is a pointer to an
+.B m2ua_notify
+structure.
+.TP
+.B M2UA_IOCCNOTIFY
+output only.
+Argument is a pointer to an
+.B m2ua_notify
+structure.
+.TP
+.B M2UA_IOCCMGMT
+input-output.
+Argument is a pointer to an
+.B m2ua_mgmt
+structure.
+.TP
+.B M2UA_IOCCPASS
+input-output.
+Argument is a pointer to an
+.B m2ua_pass
+structure.
+.PD
 .\"
 .\"
-.XX
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/sli_ioctl.h> ,
+.BR <ss7/ua_ioctl.h> ,
+.BR <ss7/m2ua_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/m2ua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m2ua (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B m2ua
+input-output controls are compatible with the SL input-output controls, see
+.BR sli_ioctl (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+M2UA,
 .[
-rfc3331
+m2ua-rfc
 .]
-.[
-rfc2960
-.]
+Q.703,
 .[
 q703
 .]
+T1.111.
 .[
 t1.111
 .]
+JT-Q.703.
+.[
+jtq703
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B m2ua
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
 .\"
 .[
 $LIST$

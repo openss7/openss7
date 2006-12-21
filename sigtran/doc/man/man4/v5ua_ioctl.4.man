@@ -81,24 +81,112 @@ sort-adjacent-labels
 .\"
 .\"
 .TH V5UA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B v5ua_ioctl
 \- IO controls for V5UA devices
-.SH SYNOPSIS
-.SH DESCRIPTION
-.SH IOCTLS
 .\"
-.XX
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/isdni_ioctl.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.br
+.B #include <ss7/iua_ioctl.h>
+.br
+.B #include <ss7/v5ua_ioctl.h>
+.HP
+.BI "struct strioctl *" arg;
+.HP
+.BI "int " retval " = ioctl(" v5ua_stream ", " \fRI_STR\fP ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B V5UA-IOCTL
+supports input-output controls based on the Local Management Interface input-output controls,
+.BR lmi_ioctl (4).
+.B V5UA-IOCTL
+supports the UA managed object model,
+.BR ua_ioctl (4).
+.B V5UA-IOCTL
+supports the ISDN input-output controls,
+.BR isdni_ioctl (4);
+and the IUA input-output controls,
+.BR iua_ioctl (4).
+.PP
+.B V5UA-IOCTL
+defines the additional structures and constants necesssary to use these input-output controls with
+the
+.BR v5ua (4)
+driver.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B v5ua
+does not have any defined input-output controls at this time.
+.\"
+.\"
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/isdni_ioctl.h> ,
+.BR <ss7/ua_ioctl.h> ,
+.BR <ss7/iua_ioctl.h> ,
+.BR <ss7/v5ua_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/v5ua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR v5ua (4),
+.BR iua_ioctl (4),
+.BR ua_ioctl (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B v5ua
+input-output controls are compatible with the ISDN input-output controls, see
+.BR isdni_ioctl (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+V5UA,
 .[
-V5UA-RFC
+v5ua-rfc
 .]
+V5.2.
 .[
 v52
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B v5ua
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
 .\"
 .[
 $LIST$
 .]
 .\"
 .TI
-

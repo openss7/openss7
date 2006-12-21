@@ -196,6 +196,7 @@ AC_CONFIG_FILES([Makefile
 		 src/modules/m2ua/lis.conf
 		 src/modules/m3ua/lis.conf
 		 src/modules/sua/lis.conf
+		 src/modules/tali/lis.conf
 		 src/modules/tua/lis.conf])
 
 AC_OUTPUT

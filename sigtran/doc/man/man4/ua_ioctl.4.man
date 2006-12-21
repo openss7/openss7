@@ -81,9 +81,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH UA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B ua_ioctl
 \- SIGTRAN User Adaptation Layer \- IO Controls
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stropts.h>
@@ -95,6 +99,8 @@ sort-adjacent-labels
 .BI "int " ua_stream " = open(" ua_device ", " flags );
 .HP
 .BI "int " retval " = ioctl(" ua_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B UA-IOCTL
@@ -202,17 +208,117 @@ Signalling gateway.
 .B Events
 .PP
 .B Commands
+.\"
+.\"
 .SH IOCTLS
+.SS Object Types
+.TP
+.B UA_OBJ_TYPE_LM
+layer management
+.TP
+.B UA_OBJ_TYPE_AS_U
+application server (user)
+.TP
+.B UA_OBJ_TYPE_AS_P
+application server (provider)
+.TP
+.B UA_OBJ_TYPE_SP
+signalling process
+.TP
+.B UA_OBJ_TYPE_SG
+signalling gateway
+.TP
+.B UA_OBJ_TYPE_SPP
+signalling process proxy
+.TP
+.B UA_OBJ_TYPE_ASP
+signalling process proxy
+.TP
+.B UA_OBJ_TYPE_SGP
+signalling process proxy
+.TP
+.B UA_OBJ_TYPE_SS_U
+signalling service (user)
+.TP
+.B UA_OBJ_TYPE_SS_P
+signalling service (provider)
+.TP
+.B UA_OBJ_TYPE_XP_SCTP
+transport provider
+.TP
+.B UA_OBJ_TYPE_XP_TCP
+transport provider
+.TP
+.B UA_OBJ_TYPE_XP_SSCOP
+transport provider
+.TP
+.B UA_OBJ_TYPE_DF
+default
+.SS Object Attributes
+.TP
+.B Configuration
+.TP
+.B Timers
+.TP
+.B Options
+.TP
+.B State
+.TP
+.B Statistics
+.TP
+.B Events
+.TP
+.B Commands
+.SS Input-Output Controls
+.TP
+.B UA_IOCSOPTIONS
+.TP
+.B UA_IOCGCONFIG
+.TP
+.B UA_IOCSCONFIG
+.TP
+.B UA_IOCTCONFIG
+.TP
+.B UA_IOCCCONFIG
+.TP
+.B UA_IOCGSTATEM
+.TP
+.B UA_IOCCMRESET
+.TP
+.B UA_IOCGSTATSP
+.TP
+.B UA_IOCSSTATSP
+.TP
+.B UA_IOCGSTATS
+.TP
+.B UA_IOCCSTATS
+.TP
+.B UA_IOCGNOTIFY
+.TP
+.B UA_IOCSNOTIFY
+.TP
+.B UA_IOCCNOTIFY
+.TP
+.B UA_IOCCMGMT
+.TP
+.B UA_IOCCPASS
+.\"
+.\"
 .SH NOTICES
 .PP
-.SH NOTICES
-.PP
+A general purpose object model for the SIGTRAN UAs was never adopted by IETF.
+.\"
+.\"
 .SH BUGS
 .PP
 .B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH FILES
 .PP
 .BR <ss7/ua_ioctl.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/m2ua ,
@@ -225,6 +331,8 @@ Signalling gateway.
 .IR /dev/dua ,
 .IR /dev/v5ua ,
 .IR /dev/gr303ua .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR m2ua (4),
@@ -239,6 +347,8 @@ Signalling gateway.
 .BR gr303ua (4),
 .BR ss7confd (8),
 .BR isdnconfd (8).
+.\"
+.\"
 .SH VERSIONS
 .PP
 The

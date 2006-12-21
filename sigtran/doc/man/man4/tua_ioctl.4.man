@@ -81,18 +81,125 @@ sort-adjacent-labels
 .\"
 .\"
 .TH TUA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B tua_ioctl
 \- IO controls for TUA devices
-.SH SYNOPSIS
-.SH DESCRIPTION
-.SH IOCTLS
 .\"
-.XX
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/mtpi_ioctl.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.br
+.B #include <ss7/tua_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " tua_stream " = open(" \fR/dev/tua\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" tua_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B TUA-IOCTL
+supports input-output controls based on the Local Management Interface input-output controls,
+.BR lmi_ioctl (4).
+.B TUA-IOCTL
+supports the UA managed object model,
+.BR ua_ioctl (4).
+.B TUA-IOCTL
+supports the TCAP input-output controls,
+.BR tri_ioctl "(4) and " tci_ioctl (4).
+.PP
+.B TUA-IOCTL
+defines the additional structures and constants necessary to use these input-output
+controls with the
+.BR tua (4)
+driver.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B tua
+does not have any defined input-output controls at this time.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B TUA
 .[
-tua-01
+tua-02
 .]
+was never formally adopted by the SIGTRAN WG within the IETF.
+.\"
+.\"
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/tri_ioctl.h> ,
+.BR <ss7/tci_ioctl.h> ,
+.BR <ss7/ua_ioctl.h> ,
+.BR <ss7/tua_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/tua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR tua (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B tua
+input-output controls are compatible with the TCAP input-output controls, see
+.BR tri_ioctl "(4) and " tci_ioctl (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+TUA,
+.[
+tua-02
+.]
+Q.771,
+.[
+q771
+.]
+T1.112,
+.[
+t1.112
+.]
+JT-Q.771.
+.[
+jtq771
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B tua
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
+.\"
 .[
 $LIST$
 .]
+.\"
 .TI

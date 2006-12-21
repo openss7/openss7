@@ -81,17 +81,112 @@ sort-adjacent-labels
 .\"
 .\"
 .TH SUA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B sua_ioctl
 \- IO controls for SUA devices
-.SH SYNOPSIS
-.SH DESCRIPTION
-.SH IOCTLS
 .\"
-.XX
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/mtpi_ioctl.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.br
+.B #include <ss7/sua_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " sua_stream " = open(" \fR/dev/sua\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" sua_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B SUA-IOCTL
+supports input-output controls based on the Local Management Interface input-output controls,
+.BR lmi_ioctl (4).
+.B SUA-IOCTL
+supports the UA managed object model,
+.BR ua_ioctl (4).
+.B SUA-IOCTL
+supports the SCCP input-output controls,
+.BR sccpi_ioctl (4).
+.PP
+.B SUA-IOCTL
+defines the additional structures and constants necessary to use these input-output
+controls with the
+.BR sua (4)
+driver.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B sua
+does not have any defined input-output controls at this time.
+.\"
+.\"
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/sccpi_ioctl.h> ,
+.BR <ss7/ua_ioctl.h> ,
+.BR <ss7/sua_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/sua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sua (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B sua
+input-output controls are compatible with the SCCP input-output controls, see
+.BR sccpi_ioctl (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SUA,
 .[
-SUA-RFC
+sua-rfc
 .]
+Q.711,
+.[
+q711
+.]
+T1.112,
+.[
+t1.112
+.]
+JT-Q.711.
+.[
+jtq711
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B sua
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
 .\"
 .[
 $LIST$

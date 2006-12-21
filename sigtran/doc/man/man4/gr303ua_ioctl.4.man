@@ -81,12 +81,119 @@ sort-adjacent-labels
 .\"
 .\"
 .TH GR303UA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B gr303ua_ioctl
 \- IO controls for GR303UA
+.\"
+.\"
 .SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/isdni_ioctl.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.br
+.B #include <ss7/iua_ioctl.h>
+.br
+.B #include <ss7/gr303ua_ioctl.h>
+.HP
+.BI "struct strioctl *" arg;
+.HP
+.BI "int " retval " = ioctl(" gr303ua_stream ", " \fRI_STR\fP ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
+.PP
+.B GR303UA-IOCTL
+supports input-output controls based on the Local Management Interface input-output controls,
+.BR lmi_ioctl (4).
+.B GR303UA-IOCTL
+supports the UA managed object model,
+.BR ua_ioctl (4).
+.B GR303UA-IOCTL
+supports the ISDN input-output controls,
+.BR isdni_ioctl (4);
+and the IUA input-output controls,
+.BR iua_ioctl (4).
+.PP
+.B GR303UA-IOCTL
+defines the additional structures and constants necesssary to use these input-output controls with
+the
+.BR gr303ua (4)
+driver.
+.\"
+.\"
 .SH IOCTLS
+.PP
+.B gr303ua
+does not have any defined input-output controls at this time.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B GR303UA
+.[
+gr303ua
+.]
+was never formally adopted by the SIGTRAN WG within the IETF.
+.\"
+.\"
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/isdni_ioctl.h> ,
+.BR <ss7/ua_ioctl.h> ,
+.BR <ss7/iua_ioctl.h> ,
+.BR <ss7/gr303ua_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/gr303ua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR gr303ua (4),
+.BR iua_ioctl (4),
+.BR ua_ioctl (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B gr303ua
+input-output controls are compatible with the ISDN input-output controls, see
+.BR isdni_ioctl (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+GR303UA,
+.[
+gr303ua
+.]
+GR-303-CORE.
+.[
+gr-303-core
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B gr303ua
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
+.\"
 .[
 $LIST$
 .]

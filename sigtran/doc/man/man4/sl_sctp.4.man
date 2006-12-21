@@ -1,7 +1,8 @@
+.so man4/sl.4.man
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dua_ioctl.4.man,v 0.9.2.1 2006/10/17 11:55:36 brian Exp $
+.\" @(#) $Id: sl-sctp.4.man,v 0.9.2.2 2006/04/05 09:43:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,138 +54,12 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:55:36 $ by $Author: brian $
+.\" Last Modified $Date: 2006/04/05 09:43:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: dua_ioctl.4.man,v $
-.\" Revision 0.9.2.1  2006/10/17 11:55:36  brian
-.\" - copied files into new packages from strss7 package
-.\"
-.\" Revision 0.9.2.7  2006/04/05 09:43:02  brian
+.\" $Log: sl-sctp.4.man,v $
+.\" Revision 0.9.2.2  2006/04/05 09:43:04  brian
 .\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
-.R1
-bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
-no-default-database
-database sigtran.refs
-accumulate
-move-punctuation
-abbreviate A
-join-authors ", " ", " " and "
-et-al " et al" 2 3
-abbreviate-label-ranges ".."
-sort-adjacent-labels
-.R2
-.so sigtran.macros
-.\"
-.\"
-.TH DUA-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
-.\"
-.\"
-.SH NAME
-.B dua_ioctl
-\- SS7 BICC User Adataptation Layer (DUA) \- IO Controls
-.\"
-.\"
-.SH SYNOPSIS
-.PP
-.B #include <sys/stropts.h>
-.br
-.B #include <ss7/lmi_ioctl.h>
-.br
-.B #include <ss7/isdni_ioctl.h>
-.br
-.B #include <ss7/ua_ioctl.h>
-.br
-.B #include <ss7/dua_ioctl.h>
-.HP
-.BI "struct strioctl *" arg ;
-.HP
-.BI "int " dua_stream " = open(" \fR/dev/dua\fI ", " flags );
-.HP
-.BI "int " retval " = ioctl(" dua_stream ", " \fRI_STR\fI ", " arg );
-.\"
-.\"
-.SH DESCRIPTION
-.PP
-.B DUA-IOCTL
-supports input-output controls based on the Local Management Interface input-output controls,
-.BR lmi_ioctl (4).
-.B DUA-IOCTL
-supports the UA managed object model,
-.BR ua_ioctl (4).
-.B DUA-IOCTL
-supports the ISDN input-output controls,
-.BR bicci_ioctl (4).
-.PP
-.B DUA-IOCTL
-defines the additional structures and constants necessary to use these input-output
-controls with the
-.BR dua (4)
-driver.
-.\"
-.\"
-.SH IOCTLS
-.PP
-.B dua
-does not have any defined input-output controls at this time.
-.\"
-.\"
-.SH BUGS
-.PP
-.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
-.\"
-.\"
-.SH FILES
-.PP
-.BR <ss7/bicci_ioctl.h> ,
-.BR <ss7/ua_ioctl.h> ,
-.BR <ss7/dua_ioctl.h> .
-.\"
-.\"
-.SH DEVICES
-.PP
-.IR /dev/dua .
-.\"
-.\"
-.SH "SEE ALSO"
-.PP
-.BR dua (4).
-.\"
-.\"
-.SH COMPATIBILITY
-.PP
-.B dua
-input-output controls are compatible with the ISDN input-output controls, see
-.BR isdni_ioctl (4).
-.\"
-.\"
-.SH CONFORMANCE
-.PP
-DUA,
-.[
-rfc4129
-.]
-DASS/DPNSS
-.[
-btnr 190
-.]
-.[
-btnr 186
-.]
-.\"
-.\"
-.SH HISTORY
-.PP
-.B dua
-was new for
-.RI \(lq "@PACKAGE_TITLE@" \(rq.
-.\"
-.\"
-.[
-$LIST$
-.]
-.\"
-.TI
