@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:10:43 $
+ @(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:33:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:10:43 $ by $Author: brian $
+ Last Modified $Date: 2006/12/21 11:33:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl2.c,v $
+ Revision 0.9.2.2  2006/12/21 11:33:31  brian
+ - updates for release, current development
+
  Revision 0.9.2.1  2006/12/20 23:10:43  brian
  - added new mux drivers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:10:43 $"
+#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:33:31 $"
 
-static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:10:43 $";
+static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:33:31 $";
 
 /*
  *  This is a multiplexing driver use to support linking DL streams.  When DL streams are linked
@@ -94,7 +97,7 @@ static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 
 #define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define ND_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:33:31 $"
 #define ND_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

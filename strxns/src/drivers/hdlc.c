@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:10:43 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:33:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:10:43 $ by $Author: brian $
+ Last Modified $Date: 2006/12/21 11:33:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.2  2006/12/21 11:33:31  brian
+ - updates for release, current development
+
  Revision 0.9.2.1  2006/12/20 23:10:43  brian
  - added new mux drivers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:10:43 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:33:31 $"
 
-static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:10:43 $";
+static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:33:31 $";
 
 /*
  *  This is a multiplexing driver used to support linking CD HDLC streams.  When CD streams are
@@ -92,7 +95,7 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $
 
 #define HDLC_DESCRIP	"HDLC STREAMS MULTIPLEXING DRIVER."
 #define HDLC_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:10:43 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:33:31 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

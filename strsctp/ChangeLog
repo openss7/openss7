@@ -1,3 +1,7 @@
+2006-12-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* strsctp/doc/man/man8/test-sctp_n.8.man: updates for release
+
 2006-12-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: resolve major base
