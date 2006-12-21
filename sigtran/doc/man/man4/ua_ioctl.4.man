@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ua_ioctl.4.man,v 0.9.2.1 2006/10/17 11:55:37 brian Exp $
+.\" @(#) $Id: ua_ioctl.4.man,v 0.9.2.2 2006/12/21 11:00:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:55:37 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/21 11:00:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ua_ioctl.4.man,v $
+.\" Revision 0.9.2.2  2006/12/21 11:00:57  brian
+.\" - updated manual pages for release
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:55:37  brian
 .\" - copied files into new packages from strss7 package
 .\"

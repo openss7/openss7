@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tali_ioctl.4.man,v 0.9.2.1 2006/10/17 11:55:37 brian Exp $
+.\" @(#) $Id: tali_ioctl.4.man,v 0.9.2.2 2006/12/21 11:00:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:55:37 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/21 11:00:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tali_ioctl.4.man,v $
+.\" Revision 0.9.2.2  2006/12/21 11:00:57  brian
+.\" - updated manual pages for release
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:55:37  brian
 .\" - copied files into new packages from strss7 package
 .\"
@@ -84,17 +87,112 @@ sort-adjacent-labels
 .\"
 .\"
 .TH TALI-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B tali_ioctl
 \- IO controls for TALI devices
-.SH SYNOPSIS
-.SH DESCRIPTION
-.SH IOCTLS
 .\"
-.XX
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/mtpi_ioctl.h>
+.br
+.B #include <ss7/ua_ioctl.h>
+.br
+.B #include <ss7/tali_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " tali_stream " = open(" \fR/dev/tali\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" tali_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B TALI-IOCTL
+supports input-output controls based on the Local Management Interface input-output controls,
+.BR lmi_ioctl (4).
+.B TALI-IOCTL
+supports the UA managed object model,
+.BR ua_ioctl (4).
+.B TALI-IOCTL
+supports the MTP input-output controls,
+.BR mtpi_ioctl (4).
+.PP
+.B TALI-IOCTL
+defines the additional structures and constants necessary to use these input-output
+controls with the
+.BR tali (4)
+driver.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B tali
+does not have any defined input-output controls at this time.
+.\"
+.\"
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/mtpi_ioctl.h> ,
+.BR <ss7/ua_ioctl.h> ,
+.BR <ss7/tali_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/tali .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR tali (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B tali
+input-output controls are compatible with the MTP input-output controls, see
+.BR mtpi_ioctl (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+TALI,
 .[
 rfc3094
 .]
+Q.704,
+.[
+q704
+.]
+T1.111,
+.[
+t1.111
+.]
+JT-Q.704.
+.[
+jtq704
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B tali
+was new for
+.RI \(lq "@PACKAGE_TITLE@" \(rq.
+.\"
 .\"
 .[
 $LIST$

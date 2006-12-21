@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: v5ua.4.man,v 0.9.2.1 2006/10/17 11:55:37 brian Exp $
+.\" @(#) $Id: v5ua.4.man,v 0.9.2.2 2006/12/21 11:00:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:55:37 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/21 11:00:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: v5ua.4.man,v $
+.\" Revision 0.9.2.2  2006/12/21 11:00:57  brian
+.\" - updated manual pages for release
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:55:37  brian
 .\" - copied files into new packages from strss7 package
 .\"
@@ -81,51 +84,205 @@ sort-adjacent-labels
 .\"
 .\"
 .TH V5UA 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B v5ua, dl-v5ua
 \- V5.2 User Adatpation Layer (V5UA)
+.\"
+.\"
 .SH SYNOPSIS
-.HP
+.PP
 .B #include <sys/stropts.h>
-.PD 0
-.HP
+.br
 .B #include <sys/dlpi.h>
-.HP
+.br
 .B #include <sys/dlpi_v5ua.h>
-.HP
+.br
 .B #include <sys/v5ua_ioctl.h>
-.PD
 .HP
 .BI "int " v5ua_stream " = open(" v5ua_device ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
+.PP
+.B V5UA
+is an implementation of the
+.I Digital Loop Carrier (IDLC)
+defined in
+.BR V5.2 .
+.B V5UA
+provides a backhaul of the services of
+.BR v5 (4)
+over an IP network using
+Stream Control Transmission Protocol,
+.BR sctp (4),
+as defined in
+.BR "RFC 2960" .
+.PP
+.B V5UA
+is implemented as a
+.IR STREAMS (4)
+multiplexing driver.
+.BR v5 "(4) or " sctp (4)
+streams are linked under the
+.B V5UA
+multiplexing driver using the
+.IR I_LINK "(7) or " I_PLINK (7)
+commands of
+.BR streamio (7),
+to provide transport to remote ASP or SG,
+or direct V5.2 services to
+.BR V5UA .
+Once linked, the streams must be configured using
+.BR v5ua_ioctl (4)
+input-output controls.  This is normally performed by the ISDN Configuration Daemon,
+.BR isdnconfd (8).
+.PP
+.B V5UA
+streams can be linked under a
+.BR v5 (4)
+multiplexing driver using the
+.IR I_LINK "(7) or " I_PLINK (7)
+commands of
+.BR streamio (7),
+to provide data link services to the V5.2 Layer 3 protocol.  This is normally
+performed by the ISDN Configuration Daemon,
+.BR isdnconfd (8).
+.PP
+.B V5UA
+provides the following
+.BR v5 (4)
+devices.  The
+.I v5ua_device
+argument to the
+.BR open (2)
+call can be one of the following:
+.TP
+.I /dev/v5ua
+This device provides the
+.BR v5 (4)
+protocol services using the DL-primitives of the
+.I Data Link Provider Interface (DLPI)
+described in
+.BR dlpi (7),
+with the corrigendum described in
+.BR dlpi_v5ua (7).
+Streams that result from opening this device are directly compatible with
+.BR v5 (4)
+streams.  This interface is suitable for use with other
+.BR ISDN (4)
+modules and drivers or directly by user-level programs using the
+.BR dlpi (7)
+interface.
 .\"
 .\"
 .SH NOTICES
 .PP
+Unlike other
+.B OpenSS7
+protocol modules and drivers providing transport services,
+.B V5UA
+does not provide a
+.BR sockets (3)
+interface.
+.PP
+When acting as a Signalling Gateway (SG), streams on this device are not
+necessarily opened and the SG runs as kernel daemon only.
+.PP
+.B V5UA
+can be configured on a system as a drop in transparent replacement for
+.BR v5 (4).
+In such a configuration, users opening streams as defined in
+.BR v5 (4)
+will be opening
+.BR v5ua ()
+streams, but will be unaware of the difference.  In
+.BR OpenSS7 ,
+.BR v5ua ()
+is used as the primary mechanism of redundancy and distribution of the data
+link layer, and, when properly configured (see
+.BR isdnconfd (8)),
+.BR v5ua ()
+functions transparently to the V5.2 Layer 3.
+.PP
+Also, opening and binding a
+.BR v5ua ()
+stream may result in the opening and binding of a
+.BR v5 (4)
+stream on the local or remote host in direct support of the local V5.2 user.
 .\"
 .\"
 .SH IOCTLS
 .PP
+All interfaces support a set of input-output controls using
+.BR ioctl (2)
+and the
+.IR I_STR (7)
+command to the
+.BR streamio (7)
+system calls on the
+.I v5ua_stream
+file descriptor.  These management controls are documented in
+.BR v5ua_ioctl (4).
+.PP
+In addition,
+.BR v5ua ()
+supports
+.BR dl (4)
+input-output controls (see
+.BR dl_ioctl (4)).
 .\"
 .\"
 .SH FILES
 .PP
+.BR <sys/dlpi.h> ,
+.BR <sys/dlpi_v5.h> ,
+.BR <sys/dlpi_v5ua.h> ,
+.BR <ss7/dl_ioctl.h> ,
+.BR <ss7/v5_ioctl.h> ,
+.BR <ss7/v5ua_ioctl.h> .
 .\"
 .\"
 .SH DEVICES
 .PP
-.IR /dev/v5ua .
+.IR /dev/dl-v5ua .
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR dl (4),
+.BR v5 (4),
+.BR dlpi (7),
+.BR dlpi_v5 (7),
+.BR dlpi_v5ua (7),
+.BR dl_ioctl (4),
+.BR v5_ioctl (4),
+.BR v5ua_ioctl (4).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B V5UA
+driver conforms to the DLPI Specification, Revision 2.0.0.
+.PP
+The
+.B V5UA
+driver will first appear in
+.B strss7
+release 0.8.4.
+.\"
 .\"
 .XX
 .[
-V5UA-RFC
+v5ua-rfc
 .]
 .[
 v52
+.]
+.[
+dlpi
 .]
 .\"
 .[
@@ -133,4 +290,3 @@ $LIST$
 .]
 .\"
 .TI
-

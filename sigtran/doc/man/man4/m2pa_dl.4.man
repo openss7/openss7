@@ -1,0 +1,1 @@
+.so man4/m2pa.4.man

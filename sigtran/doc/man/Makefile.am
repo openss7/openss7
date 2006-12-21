@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:42:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:00:55 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 10:42:44 $ by $Author: brian $
+## Last Modified $Date: 2006/12/21 11:00:55 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2006/12/21 11:00:55  brian
+## - updated manual pages for release
+##
 ## Revision 0.9.2.1  2006/10/16 10:42:44  brian
 ## - added new package files
 ##
@@ -125,7 +128,6 @@ man_MANS = \
 	man4/sdt_tpi.4 \
 	man4/sl_sctp.4 \
 	man4/sl_tpi.4 \
-	man5/sigtran.conf.5 \
 	man7/dlpi_dua.7 \
 	man7/dlpi_gr303ua.7 \
 	man7/dlpi_iua.7 \
@@ -181,7 +183,6 @@ dist_noinst_MANS = \
 	man4/ua_ioctl.4.man \
 	man4/v5ua.4.man \
 	man4/v5ua_ioctl.4.man \
-	man5/sigtran.conf.5.man \
 	man7/dlpi_dua.7.man \
 	man7/dlpi_gr303ua.7.man \
 	man7/dlpi_iua.7.man \

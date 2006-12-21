@@ -1157,6 +1157,70 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc4165.txt
 
+%K m2pa-13
+%L M2PA13
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-13.txt
+%D February 18, 2005
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-13.txt
+
+%K m2pa-12
+%L M2PA12
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-12.txt
+%D June 16, 2004
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-12.txt
+
+%K m2pa-11
+%L M2PA11
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-11.txt
+%D January 29, 2004
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-11.txt
+
+%K m2pa-10
+%L M2PA10
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-10.txt
+%D October 16, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-10.txt
+
 %K m2pa-09
 %L M2PA09
 %A Tom George
@@ -2441,6 +2505,15 @@ Part 1: Protocol Specification
 %T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
 %D 1989
 %I International Organization for Standardization
+
+%K jtq703
+%L JT-Q\)703
+%A TTC
+%R TTC Standard JT-Q\)703
+%T Message Transfer Part \(em Signalling Link
+%D April 28, 1992
+%C Japan
+%I Telecommunication Technology Committee (TTC)
 
 %K jtq704
 %L JT-Q\)704

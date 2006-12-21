@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: gr303ua.4.man,v 0.9.2.1 2006/10/17 11:55:36 brian Exp $
+.\" @(#) $Id: gr303ua.4.man,v 0.9.2.2 2006/12/21 11:00:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:55:36 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/21 11:00:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: gr303ua.4.man,v $
+.\" Revision 0.9.2.2  2006/12/21 11:00:57  brian
+.\" - updated manual pages for release
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:55:36  brian
 .\" - copied files into new packages from strss7 package
 .\"
@@ -81,20 +84,26 @@ sort-adjacent-labels
 .\"
 .\"
 .TH GR303UA 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B gr303ua, dl-gr303ua
 \- GR-303 User Adaptation Layer (GR303UA)
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stropts.h>
 .br
 .B #include <sys/dlpi.h>
 .br
-.B #include <sys/dlpi_iua.h>
+.B #include <sys/dlpi_gr303ua.h>
 .br
-.B #include <ss7/iua_ioctl.h>
+.B #include <sys/gr303ua_ioctl.h>
 .HP
 .BI "int " gua_stream " = open(" gua_device ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B GR303UA
@@ -106,7 +115,7 @@ defined in
 provides a backhaul of the services of
 .BR gr303 (4)
 over an IP network using
-Stream Control Transmission Protoocol,
+Stream Control Transmission Protocol,
 .BR sctp (4),
 as defined in
 .BR "RFC 2960" .
@@ -127,7 +136,7 @@ or direct GR303 services to
 .BR GR303UA .
 Once linked, the streams must be configured using
 .BR gr303ua_ioctl (4)
-IO controls.  This is normally performed by the ISDN Configuration Daemon,
+input-output controls.  This is normally performed by the ISDN Configuration Daemon,
 .BR isdnconfd (8).
 .PP
 .B GR303UA
@@ -166,6 +175,8 @@ streams.  This interface is suitable for use with other
 modules and drivers or directly by user-level programs using the
 .BR dlpi (7)
 interface.
+.\"
+.\"
 .SH NOTICES
 .PP
 Unlike other
@@ -189,7 +200,7 @@ will be opening
 streams, but will be unaware of the difference.  In
 .BR OpenSS7 ,
 .BR gr303ua ()
-is used as the primary mechanism of redunancy and distribution of the data
+is used as the primary mechanism of redundancy and distribution of the data
 link layer, and, when properly configured (see
 .BR isdnconfd (8)),
 .BR gr303ua ()
@@ -200,12 +211,14 @@ Also, opening and binding a
 stream may result in the opening and binding of a
 .BR gr303 (4)
 stream on the local or remote host in direct support of the local IDLC user.
+.\"
+.\"
 .SH IOCTLS
 .PP
-All interfaces support a set of IO controls using
+All interfaces support a set of input-output controls using
 .BR ioctl (2)
 and the
-.I I_STR
+.IR I_STR (7)
 command to the
 .BR streamio (7)
 system calls on the
@@ -217,8 +230,10 @@ In addition,
 .BR gr303ua ()
 supports
 .BR dl (4)
-IO controls (see
+input-output controls (see
 .BR dl_ioctl (4)).
+.\"
+.\"
 .SH FILES
 .PP
 .BR <sys/dlpi.h> ,
@@ -227,9 +242,13 @@ IO controls (see
 .BR <ss7/dl_ioctl.h> ,
 .BR <ss7/gr303_ioctl.h> ,
 .BR <ss7/gr303ua_ioctl.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/dl-gr303ua .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR dl (4),
@@ -241,6 +260,8 @@ IO controls (see
 .BR dl_ioctl (4),
 .BR gr303_ioctl (4),
 .BR gr303ua_ioctl (4).
+.\"
+.\"
 .SH VERSIONS
 .PP
 The
