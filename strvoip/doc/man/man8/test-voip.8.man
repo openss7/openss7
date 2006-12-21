@@ -1,0 +1,539 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: test-voip.8.man,v 0.9.2.1 2006/12/21 11:00:08 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/12/21 11:00:08 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: test-voip.8.man,v $
+.\" Revision 0.9.2.1  2006/12/21 11:00:08  brian
+.\" - added missing manual pages
+.\"
+.\" Revision 0.9.2.1  2006/10/17 11:55:40  brian
+.\" - copied files into new packages from strss7 package
+.\"
+.\" Revision 0.9.2.3  2006/04/05 09:43:24  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strvoip.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strvoip.macros
+.\"
+.\"
+.TH TEST-VOIP 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B test-voip
+\- test suite executable for VOIP(4) STREAMS modules
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBtest-voip\fR [\fIoptions\fR]
+[{\fB-o\fR|\fB--onetest\fR} [\fITESTCASE\fR]]
+[{\fB-t\fR|\fB--tests\fR} [\fIRANGE\fR]]
+.PD 0
+.HP 12
+\fBtest-voip\fR [\fIoptions\fR]
+{\fB-l\fR|\fB--list\fR} [\fIRANGE\fR]
+.HP 12
+\fBtest-voip\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBtest-voip\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBtest-voip\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B test-voip
+is a test suite executable for the
+.BR VOIP (4)
+.I STREAMS
+modules.
+The purpose of the
+.B test-voip
+test suite executable is to provide a means for development, diagnostic, regression and validation
+testing of the
+.BR VOIP (4)
+modules.
+The
+.I @PACKAGE_TITLE@
+package also provides an
+.B autotest
+based test suite that uses the
+.B test-voip
+test case executable to invoke test cases.  The test suite can be used for development, diagnostic,
+regression or validation testing.
+See the
+.I @PACKAGE_TITLE@ Installation and Reference Manual
+for more information on how to invoke the
+.B autotest
+test suite.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B test-voip
+options fall into several categories as detailed in the subsections below.  If
+.B test-voip
+is executed without any options, it will execute all available test cases and report the progress
+and results of each test case.
+.SS Command Options
+.PP
+These command options determine whether test cases are run or whether an informative function is
+performed instead.  If none of these command options are specified, then it is assumed that all test
+cases are to be executed.  Options
+.BR --list ", " --help ", " --version " and " --copying
+will override the
+.BR --onetest " and " --tests
+options.
+.TP
+\fB-o\fR, \fB--onetest\fR [\fITESTCASE\fR]
+Specifies a single test case to run.
+.I TESTCASE
+is the individual test case number.  This option may be repeated and is accumulative: that is, each
+test case added with an occurence of this option will be added to the other test cases selected with
+.B --onetest
+or with
+.BR --tests .
+.TP
+\fB-t\fR, \fB--tests\fR [\fIRANGE\fR]
+Specifies a range of test cases to run.
+.I RANGE
+specifies the range of test cases and will match all test cases that have this string as an initial
+substring of the test case number.  If
+.I RANGE
+is not specified, then all test cases are selected.
+.TP
+\fB-l\fR, \fB--list\fR [\fIRANGE\fR]
+When this option is encountered,
+print a list of test cases to
+.I stdout
+and exit.
+When a
+.I RANGE
+of test cases is specified, only the specified range of tests will be listed.  When a
+.I RANGE
+is not specified, all test cases will be listed.
+When used in combination with
+.B --verbose
+this option will print more or less information about each test case.
+Note that all options specified following this option are ignored.
+.TP
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
+When this option is encountered,
+print usage information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+print version information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+print copying information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.SS General Options
+.PP
+The following options are applicable to all command options.  For other than test case command
+options, these general options must appear ahead of the command option.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller is interested only in the return code and error diagnostics and that
+normal output should be suppressed.
+The default verbosity level if this option is not specified is
+.BR 1 .
+This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.
+The default verbosity level if this option is not specified is
+.BR 1 .
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+.SS Test Case Options
+.PP
+The following options are only applicable if a test case command option is in effect.
+That is, these options are only effective if test cases are being executed and are used to modify
+the manner in which test cases are executed or test case results reported.
+.\".TP
+.\"\fB-d\fR, \fB--device\fR \fIDEVICE\fR
+.\"Specifies the device name to open for the tests.
+.TP
+\fB-w\fR, \fB--wait\fR
+Specifies that the client or server is to wait indefinitely.  Normally a test
+case guard timer is started (40 seconds) that will fire and cause the test
+case to fail if the test cases waits indefinitely for an event to start or
+continue.  This option suppresses the test cause guard timer and allows the 
+client or server to wait indefinitely from some event to occur.  This is
+paricularly useful when one side of the test case (client or server) is being
+run manually.
+.TP
+\fB-e\fR, \fB--exit\fR
+Specifies that the first test case run that is not successful will cause all remaining test cases to
+be skipped and the return code will reflect the result of the failed test case.
+This option is useful in conjunction with option
+.B --onetest
+in that if a single test is being run, the return code will reflect the result of the test case.
+This is used by the
+.B @PACKAGE@-@VERSION@
+test suite to run individual tests under
+.BR autotest .
+.TP
+\fB-R\fR, \fB--repeat\fR
+Repeat the selected test cases on success or failure.  This option causes the
+executable to loop through the selected test cases, one after the other,
+regardless of whether an individual test case succeeds or fails.
+This option is useful in conjunction with \fB--onetest\fR and \fB--client\fR
+or \fB--server\fR when the other end of the test is being executed manually.
+.TP
+\fB-d\fR, \fB--repeat-fail\fR
+Repeat the selected test cases on failure.  This option caues the executable
+to loop individual test cases when they fail, but allows the test sequence to
+continue when an individual test case succeeds.
+This option is useful in conjunction with \fB--onetest\fR and \fB--client\fR
+or \fB--server\fR when the other end of the test is being executed manually.
+.TP
+\fB-f\fR, \fB--fast\fR [\fISCALE\fR]
+When this option is present, test cases are run faster by the integer scaling factor
+.IR SCALE .
+If
+.I SCALE
+is not provided, then the default scale factor is
+.BR 50 .
+This has the effect of scaling timers both in the implementation under test as well as in the test
+suite.  If the scale factor,
+.IR SCALE ,
+is too large, test cases may fail that would otherwise pass.  This option is useful for long test
+suite runs that would otherwise take an inordinate amount of time to execute.  Timers can be scaled
+for development, diagnostic or regression testing, however, for full validation testing this option
+should not be used.
+.TP
+\fB-s\fR, \fB--summary\fR
+Print a test case summary with each test case result at the end of the test suite run.  The default
+if this option is not present is to not print a summary.
+.TP
+\fB-m\fR, \fB--messages\fR
+Indicates whether messages, in hexadecimal, should be included in the test case output.  This is
+independent of any
+.B --verbose
+setting.
+.SS Client Server Options
+.PP
+The following options are applicable to all command options.  These options
+determine whether the test case executes in client mode, server mode, or both
+and the addresses and port numbers associated with the client and server.
+.PP
+The following two options determine whether the test cases execute in client
+mode, server mode or both.  The default (that is used by
+.BR autotest )
+is to execute both the client and server sides in a self-validation test.
+.TP
+\fB-c\fR, \fB--client\fR
+Requests that the client side of the test cases be executed (client mode).
+The default if neither the \fB-c\fR or \fB-S\fR options are specified is to
+execute both the client and server side of the selected test cases.
+Specifying both \fB-S\fR and \fB-c\fR has the same effect as the default
+(specifying neither).
+.TP
+\fB-S\fR, \fB--server\fR
+Requests that the server side of the test cases be executed (server mode).
+The default if neither the \fB-c\fR or \fB-S\fR options are specified is to
+execute both the client and server side of the selected test cases.
+Specifying both \fB-S\fR and \fB-c\fR has the same effect as the default
+(specifying neither).
+.PP
+The following four options determine the IP addresses and port numbers that
+are used on the client and server sides of the test.  The defaults (used by
+.BR autotest )
+are localnet addresses 127.0.0.1, 127.0.0.2 and 127.0.0.3 and test case
+unique port numbers in the range beginning at port number 10000 (to avoid
+timed waits and connections that have otherwise not yet been shut down).
+.TP
+\fB-p\fR, \fB--client-port\fR [\fIPORT\fR]
+Specify the client port number, \fIPORT\fR, from which to connect (client
+mode) or from which to accept connections (server mode).
+This option can be specified in both client and server mode.  In client mode
+it identifies the local port; in server mode, the remote port.
+The default if a port number is not specified is for the client to connect
+from port number \fB10000\fR, offset by the index of the test case time three
+(one for connecting, one for listening and one for responding), resulting in a
+unique port number for each device file descriptor invoved in each test.  So,
+for example, the first test case will connect from port \fB10000\fR, the
+second from port \fB10003\fR, and so on.
+.TP
+\fB-P\fR, \fB--server-port\fR [\fIPORT\fR]
+Specify the server port number, \fIPORT\fR, upon which to listen (server mode)
+or to which to connect (client mode).
+This option can be specified in both client and server mode.  In client mode
+it identifies the remote port; in server mode, the local port.
+The default if a port number is not specified is for the sever to listen on
+port number \fB10002\fR, offset by the index of the test case times three (one
+for connecting, one for listening and one for responding), resulting in a
+unique port number for each device file descriptor invoked in each test.  So,
+for example, the first test case will listen on port \fB10002\fR, the second
+on port \fB10005\fR, and so on.
+.TP
+\fB-i\fR, \fB--client-host\fR [\fIHOSTNAME\fR[\fB,\fIHOSTNAME\fR]*]
+Specify the client hostnames, \fIHOSTNAME\fR, from which to connect (client
+mode), or from which to accept connections (server mode).
+Each \fIHOSTNAME\fR can be either a host name or a numbers-and-dots notation
+IP address.  Multiple host names can be specified, separated by commas.
+This option can be specified in both client and server mode.  In client mode
+it identies the local host; in server mode, the remote host.
+The default if a host name is not specified is the IP addresses
+\fB127.0.0.1\fR, \fB127.0.0.2\fR and \fB127.0.0.3\fR.
+.TP
+\fB-I\fR, \fB--server-host\fR [\fIHOSTNAME\fR[\fB,\fIHOSTNAME\fR]*]
+Specify the server hostnames, \fIHOSTNAME\fR, upon which to listen (server
+mode), or to which to connect (client mode).
+Each \fIHOSTNAME\fR can be either a host name or a numbers-and-dots notation
+IP address.  Multiple host names can be specified, separated by commas.
+This option can be specified in both client and server mode.  In client mode
+it identies the remote host; in server mode, the local host.
+The default if a host name is not specified is the IP addresses
+\fB127.0.0.1\fR, \fB127.0.0.2\fR and \fB127.0.0.3\fR.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.B test-voip
+fails, it prints a diagnostic message to
+.I stderr
+and exits with a non-zero return code.
+The following return codes are generated under the following conditions:
+.IP 0 4
+Execution was successful.
+One test case was selected for execution and that test case succeeded or was not applicable (i.e.
+unsupported).
+This exit code is interpreted by
+.B autotest
+as a
+.I PASS
+condition.
+.IP 1
+One test case was selected for execution and that test case failed or was inconclusive.
+More than one test case was selected and abort on failure was specified using the
+.B --exit
+option, and a test case in the selected test cases failed or was inconclusive.
+This exit code is interpreted by
+.B autotest
+as a
+.IR FAIL " or " XFAIL
+condition.
+.IP 2
+An invalid parameter was provided.
+Test case execution was specified with options
+.BR --onetest " or " --tests ,
+or listing of test cases was specified with option
+.BR --list ,
+but no test case was selected by these options.
+More than one test case was selected for execution and a check of the test suite setup failed.
+This exit code is interpreted by
+.B autotest
+as a
+.IR FAIL " or " XFAIL
+condition.
+.IP 77
+One test case was selected for execution and that test case was skipped.
+This exit code is interpreted by
+.B autotest
+as a
+.I SKIPPED
+condition.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B test-voip
+is normally invoked from the
+.RI \(lq "@PACKAGE@-@VERSION@" \(rq
+test suite.
+.\"
+.\"
+.SH EXAMPLES
+.TP
+\f(CB\)test-m2pa\f(CR\) --list 0.1\fR
+Generates a list of all test cases
+provided by the
+.B test-m2pa
+executable
+with numbers starting with the initial substring of
+.BR 0.1 .
+.TP
+\f(CB\)test-m2pa\f(CR\) -vv --list\fR
+Generates a verbose listing of all test cases
+provided by the
+.B test-m2pa
+executable.
+.TP
+\f(CB\)test-m2pa\f(CR\) --versbose=5 --onetest 0.1\fR
+Verbosely executes test case
+.BR 0.1 ,
+and provides a diagnostic return code.
+.TP
+\f(CB\)test-m2pa\f(CR\) --fast --quiet --exit\fR
+Executes all test cases with a timer scaling factor of
+.B 50
+with normal output suppressed and exiting on the first failed or inconclusive test case result.
+.\"
+.\"
+.SH MODULES
+.PP
+.BR VOIP (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/@PACKAGE@/test-voip
+contains the
+.B test-voip
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR VOIP (4).
+.IR "@PACKAGE_TITLE@ Installation and Reference Manual" .
+.\"
+.\"
+.SH BUGS
+.PP
+.B test-voip
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B test-voip
+test suite, when run using
+.BR autotest ,
+is compatible with the POSIX 1003.3 conformance test methodology, with the following mapping of test
+results:
+.PP
+.RS
+.TS
+tab(:);
+lb|lb|lb
+l|l|l.
+_
+POSIX 1003.3:test-sctp_n:autotest
+_
+PASS:PASS(0):PASS
+FAIL:FAIL(1):FAIL
+XFAIL:FAIL(1):XFAIL
+UNSUPPORTED:NOT APPLICABLE(0):PASS
+UNRESOLVED:INCONCLUSIVE(1):FAIL or XFAIL
+UNTESTED:SKIPPED(77):SKIPPED
+_
+.TE
+.RE
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B test-voip
+tests conformance of the
+.BR VOIP (4)
+module to the specifications listed on the
+.BR VOIP (4)
+manual pages.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B test-voip
+is provided with the
+.RI \(lq "@PACKAGE_TITLE@" \(rq
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -63,12 +63,66 @@ MANMACRO_PFX			= @PACKAGE_TARNAME@
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-man_MANS =
-
-dist_noinst_MANS =
-
 MANS_UNUSED =
 
+man_MANS = \
+	man4/bicc.4 \
+	man4/bicc_ioctl.4 \
+	man4/dl_h225.4 \
+	man4/h225.4 \
+	man4/h225_ioctl.4 \
+	man4/h245.4 \
+	man4/h248.4 \
+	man4/h248_ioctl.4 \
+	man4/mgc.4 \
+	man4/rtp.4 \
+	man4/sipt.4 \
+	man4/sipt_ioctl.4 \
+	man4/VOIP.4 \
+	man7/bicci.7 \
+	man7/cci_bicc.7 \
+	man7/cci_h225.7 \
+	man7/cci_sipt.7 \
+	man7/h225i.7 \
+	man7/mgi_h248.7 \
+	man7/mgi_mgcp.7 \
+	man8/bicc.8 \
+	man8/h225.8 \
+	man8/h323confd.8 \
+	man8/strvoip_mknod.8 \
+	man8/test-voip.8 \
+	man8/voipconfd.8
+
+
+dist_noinst_MANS = \
+	man4/bicc.4.man \
+	man4/bicc_ioctl.4.man \
+	man4/dl_h225.4.man \
+	man4/h225.4.man \
+	man4/h225_ioctl.4.man \
+	man4/h245.4.man \
+	man4/h248.4.man \
+	man4/h248_ioctl.4.man \
+	man4/mgc.4.man \
+	man4/rtp.4.man \
+	man4/sipt.4.man \
+	man4/sipt_ioctl.4.man \
+	man4/VOIP.4.man \
+	man7/bicci.7.man \
+	man7/cci_bicc.7.man \
+	man7/cci_h225.7.man \
+	man7/cci_sipt.7.man \
+	man7/h225i.7.man \
+	man7/mgi_h248.7.man \
+	man7/mgi_mgcp.7.man \
+	man8/bicc.8.man \
+	man8/h225.8.man \
+	man8/h323confd.8.man \
+	man8/strvoip_mknod.8.man \
+	man8/test-voip.8.man \
+	man8/voipconfd.8.man
+
+MANS_UNUSED =
 ## PKG_BUILD_INDEP
 endif
 
