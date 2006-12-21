@@ -1,3 +1,14 @@
+2006-12-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: added dynamic configuration for tali
+	* doc/man/Makefile.am: added missing manpages
+	* doc/man/man8/test-m2pa.8.man: documentation updates for release
+	* doc/man/man8/test-x400p.8.man: documentation updates for release
+	* doc/man/man8/sdlconfig.8.man: added missing manpage
+	* src/modules/tali/lis.conf: removed static configuration
+	* src/modules/tali/lis.conf.in: added dynamic configuration
+	* src/modules/x400p-ss7/sl_x400p.c: cosmetic changes
+
 2006-12-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/ss7/isupi_ioctl.h: cosmetic changes
