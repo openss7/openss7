@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: MG.4.man,v 0.9.2.1 2006/10/14 06:37:21 brian Exp $
+.\" @(#) $Id: MG.4.man,v 0.9.2.2 2006/12/22 07:17:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/14 06:37:21 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/22 07:17:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: MG.4.man,v $
+.\" Revision 0.9.2.2  2006/12/22 07:17:34  brian
+.\" - updated documentation for release (make check target)
+.\"
 .\" Revision 0.9.2.1  2006/10/14 06:37:21  brian
 .\" - added manpages, module, drivers, headers from strss7 package
 .\"
@@ -241,18 +244,20 @@ device drivers:
 .\"
 .SH NOTICES
 .PP
+The devices, drivers and modules associated with the MG subsystem change
+rapidly and have not yet finalized.  The list presented in this manual page
+may be out of date.
 .\"
 .\"
 .SH BUGS
 .PP
+This manual page is incomplete and does not yet contain finalized information.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR mg (4).
 .\"
-.\"
-.SH VERSIONS
-.PP
 .\"
 .[
 $LIST$

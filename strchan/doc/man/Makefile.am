@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/22 07:17:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/20 23:07:33 $ by $Author: brian $
+# Last Modified $Date: 2006/12/22 07:17:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2006/12/22 07:17:33  brian
+# - updated documentation for release (make check target)
+#
 # Revision 0.9.2.3  2006/12/20 23:07:33  brian
 # - updates for release and current development
 #
@@ -74,16 +77,15 @@ man_MANS = \
 	man4/cd_hdlc.4 \
 	man4/ch.4 \
 	man4/ch_ioctl.4 \
-	man4/ch-sdl.4 \
+	man4/chi_ioctl.4 \
 	man4/MG.4 \
 	man4/mg.4 \
-	man4/mgc.4 \
-	man4/mgcp.4 \
-	man4/mgcp_ioctl.4 \
 	man4/mg_ioctl.4 \
+	man4/mgi_ioctl.4 \
 	man4/mg-lm.4 \
 	man4/mx.4 \
 	man4/mx_ioctl.4 \
+	man4/mxi_ioctl.4 \
 	man4/mx_sdl.4 \
 	man4/v401p.4 \
 	man4/x100p.4 \
@@ -199,9 +201,7 @@ man_MANS = \
 	man7/MG_error_ack.7 \
 	man7/MG_error_ack_t.7 \
 	man7/mgi.7 \
-	man7/mgi_h248.7 \
 	man7/mgi_mg.7 \
-	man7/mgi_mgcp.7 \
 	man7/MG_INFO_ACK.7 \
 	man7/MG_info_ack.7 \
 	man7/MG_info_ack_t.7 \
@@ -308,16 +308,15 @@ dist_noinst_MANS = \
 	man4/cd_hdlc.4.man \
 	man4/ch.4.man \
 	man4/ch_ioctl.4.man \
-	man4/ch-sdl.4.man \
+	man4/chi_ioctl.4.man \
 	man4/MG.4.man \
 	man4/mg.4.man \
-	man4/mgc.4.man \
-	man4/mgcp.4.man \
-	man4/mgcp_ioctl.4.man \
 	man4/mg_ioctl.4.man \
+	man4/mgi_ioctl.4.man \
 	man4/mg-lm.4.man \
 	man4/mx.4.man \
 	man4/mx_ioctl.4.man \
+	man4/mxi_ioctl.4.man \
 	man4/mx_sdl.4.man \
 	man4/v401p.4.man \
 	man4/x100p.4.man \
@@ -433,9 +432,7 @@ dist_noinst_MANS = \
 	man7/MG_error_ack.7.man \
 	man7/MG_error_ack_t.7.man \
 	man7/mgi.7.man \
-	man7/mgi_h248.7.man \
 	man7/mgi_mg.7.man \
-	man7/mgi_mgcp.7.man \
 	man7/MG_INFO_ACK.7.man \
 	man7/MG_info_ack.7.man \
 	man7/MG_info_ack_t.7.man \
@@ -540,10 +537,6 @@ dist_noinst_MANS = \
 MANS_UNUSED = \
 	man4/ch.4 \
 	man4/ch_ioctl.4 \
-	man4/ch-sdl.4 \
-	man4/mgc.4 \
-	man4/mgcp.4 \
-	man4/mgcp_ioctl.4 \
 	man4/mg_ioctl.4 \
 	man4/mx_ioctl.4 \
 	man4/mx_sdl.4 \

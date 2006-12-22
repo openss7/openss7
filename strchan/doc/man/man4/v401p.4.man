@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: v401p.4.man,v 0.9.2.1 2006/10/14 06:37:22 brian Exp $
+.\" @(#) $Id: v401p.4.man,v 0.9.2.2 2006/12/22 07:17:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/14 06:37:22 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/22 07:17:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: v401p.4.man,v $
+.\" Revision 0.9.2.2  2006/12/22 07:17:34  brian
+.\" - updated documentation for release (make check target)
+.\"
 .\" Revision 0.9.2.1  2006/10/14 06:37:22  brian
 .\" - added manpages, module, drivers, headers from strss7 package
 .\"
@@ -82,11 +85,20 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B v401P
-\- Varion V401P Card Driver
+\- Varion V401P (Tormenta III) Card Driver
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <sys/chi.h>
+.br
+.B #include <sys/chi_ioctl.h>
+.br
+.B #include <sys/mxi.h>
+.br
+.B #include <sys/mxi_ioctl.h>
+.HP 12
+.BR "int " v401p_stream " = open(" v400p_device ", "  flags );
 .\"
 .\"
 .SH DESCRIPTION
@@ -96,10 +108,61 @@ The
 driver is a
 .I STREAMS
 driver for the Varion V401P (Tormenta III Card).
-.\"
-.\"
-.SH USAGE
 .PP
+.B V401P
+is implemented as a
+.IR STREAMS (4)
+device driver that provides the Channel Interface (CHI),
+.BR chi (7),
+and Multiplex Interface (MXI),
+.BR mxi (7).
+The
+.B chi (7)
+interface can be used directly, or
+.BR ch (4)
+modules can be pushed over a Multiplex Interface (MXI),
+.BR mxi (7).
+.PP
+.B V401P
+provides the several devices that are directly compatible with a number of
+stream types and interface protocols.  To select a stream type,
+.I v401p_device
+can be selected from on of the following devices:
+.TP
+.I /dev/v401p-ch
+This device provides a
+.B CH
+protocol service interface using the CH-Primitives of the
+.BR chi (7).
+The
+.BR chi (7)
+interface to this device is suitable to have a
+.BR cd (4)
+module pushed over the channel to provide a Communications Device Interface,
+.BR cdi (7),
+stream that can then be linked under a multiplexer for data communications
+support.
+.TP
+.I /dev/v401p-mx
+This device provides a
+.B MX
+protocol service interface using the MX-Primitives of the
+.BR mxi (7).
+The
+.BR mxi (7)
+interface to this device is suitable to have a
+.BR ch (4)
+module pushed over the multiplex, or linked under a
+.BR ch (4)
+multiplexing driver,
+to provide a Channel Interface,
+.BR chi (7),
+stream that can then be linked under a multiplexer or have additional modules
+pushed.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH INTERFACE
@@ -153,6 +216,30 @@ addresses the 1st entire span of the 2nd card.
 .\"
 .SH IOCTLS
 .PP
+All interfaces support a set of Local Management Interface input-output
+controls,
+.BR lmi_ioctl (4),
+using the
+.BR ioctl (2)
+and
+.IR I_STR (7)
+comand to the
+.BR streamio (7)
+system call on the
+.I v401p_stream
+file descriptor.
+The
+.I /dev/v401p-ch
+device supports the Local Management Interface input-output controls
+at the
+.BR chi_ioctl (4)
+level.
+The
+.I /dev/v401p-mx
+device supports the Local Management Interface input-output controls
+at the
+.BR mxi_ioctl (4)
+level.
 .\"
 .\"
 .SH NOTICES
@@ -247,8 +334,8 @@ those for the legacy character device interface wc400 zaptel driver.  See
 for more information.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH BUGS

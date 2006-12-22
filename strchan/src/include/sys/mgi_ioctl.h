@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mgi_ioctl.h,v 0.9.2.2 2006/12/20 23:07:39 brian Exp $
+ @(#) $Id: mgi_ioctl.h,v 0.9.2.3 2006/12/22 07:17:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:07:39 $ by $Author: brian $
+ Last Modified $Date: 2006/12/22 07:17:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mgi_ioctl.h,v $
+ Revision 0.9.2.3  2006/12/22 07:17:38  brian
+ - updated documentation for release (make check target)
+
  Revision 0.9.2.2  2006/12/20 23:07:39  brian
  - updates for release and current development
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_MGI_IOCTL_H__
 #define __SYS_MGI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mgi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mgi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -451,8 +454,7 @@ typedef struct mg_stats_df {
 typedef struct mg_stats {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
-	/* 
-	   followed by object-specific statistics type */
+	/* followed by object-specific statistics type */
 } mg_stats_t;
 
 #define	MG_IOCGSTATSP	_IOR(	MG_IOC_MAGIC,	 8,	mg_stats_t	)

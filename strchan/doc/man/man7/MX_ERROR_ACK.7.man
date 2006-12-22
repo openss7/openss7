@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: MX_ERROR_ACK.7.man,v 0.9.2.1 2006/10/14 06:37:25 brian Exp $
+.\" @(#) $Id: MX_ERROR_ACK.7.man,v 0.9.2.2 2006/12/22 07:17:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/14 06:37:25 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/22 07:17:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: MX_ERROR_ACK.7.man,v $
+.\" Revision 0.9.2.2  2006/12/22 07:17:35  brian
+.\" - updated documentation for release (make check target)
+.\"
 .\" Revision 0.9.2.1  2006/10/14 06:37:25  brian
 .\" - added manpages, module, drivers, headers from strss7 package
 .\"
@@ -217,7 +220,6 @@ multiplex service provider on which the errored primitive was issued.
 .I Bad multplex slot.
 The specified multiplex slot was invalid or out of range.
 .SH "SEE ALSO"
-.SH VERSIONS
 .BR MX_INFO_REQ (7),
 .BR MX_OPTMGMT_REQ (7),
 .BR MX_ATTACH_REQ (7),
@@ -226,6 +228,7 @@ The specified multiplex slot was invalid or out of range.
 .BR MX_DISABLE_REQ (7),
 .BR MX_CONNECT_REQ (7),
 .BR MX_DISCONNECT_REQ (7).
+.SH VERSIONS
 This manpage was written for MXI Version 1.
 .XX
 .[

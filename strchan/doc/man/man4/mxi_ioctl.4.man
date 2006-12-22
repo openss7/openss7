@@ -1,0 +1,627 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: mxi_ioctl.4.man,v 0.9.2.1 2006/12/22 07:17:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/12/22 07:17:12 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mxi_ioctl.4.man,v $
+.\" Revision 0.9.2.1  2006/12/22 07:17:12  brian
+.\" - added missing manpages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.\"
+.\"
+.TH MXI-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B mxi_ioctl, mx_ioctl
+\- common input-output controls for MX devices
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/mxi.h>
+.br
+.B #include <sys/mxi_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " mx_stream " = open(" /dev/mx ", " flags );
+.HP
+.BI "int " retval " = ioctl(" mx_streams ", \fRI_STR\fP, " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B MXI-IOCTL
+is a definition of the managed objects and measurement and monitoring model
+for the
+.BR mx (4)
+driver using defined input-output controls.  The
+.BR mx (4)
+driver is an implementation of the Multiplex Interface,
+.BR mxi (7).
+.B MXI-IOCTL
+provides the definition of managed objects for the
+.BR mx (4)
+driver in accordance with a project defined managed object model and
+monitoring measurements and events model.
+.SS "Protocol Service Interface"
+.PP
+.B MX
+provides the following Stream types:
+.TP
+.I /dev/mx
+This device provides the
+.B MX
+protocol services using the
+.I MX-primitives
+of the Multiplex Interface (MXI),
+.BR mxi (7),
+as intepreted for use with switching components.  This interface is suitable
+both for use with other
+.BR MX (4)
+modules and drivers, as well as the
+.BR cframe (3)
+library using the
+.BR OpenSwitch (n)
+call framework.
+.SS "Object Model"
+.PP
+.B MX
+provides for management of a number of managed objects.  These objects are of
+a number of types as follows:
+.TP
+.B MX_OBJ_TYPE_DF
+The default object.  This object refers to the collection of system-wide
+defaults.
+.TP
+.B MX_OBJ_TYPE_MX
+A multiplex object.  This object refers to a multiplex connection Stream on
+the lower multiplex.  This is a specific lower multiplex driver Stream that
+provides MX services to the MX multiplexing driver.  The MX Stream is uniquely
+identified by its multiplex identifier provided by the
+.IR STREAMS (9)
+subsystem when the MX Stream is linked under the driver using an
+.IR I_LINK "(7) or " I_PLINK (7)
+operation.
+.SS "Management Attributes"
+.PP
+Each object has associated with it information in the following categories:
+.TP
+.I Configuration
+All of the primary attributes necessary and sufficient for the creation of
+each object.
+.TP
+.I Timers
+Timers associated with each object.
+.TP
+.I Options
+Options (not necessary for creation) for each object.
+.TP
+.I State
+The state of each object.
+.TP
+.I Statistics
+Statistics associated with each object class in accordance with
+specifications.
+.TP
+.I Events
+Events associated with each object.  This includes both management events and
+monitoring events.
+.TP
+.I Controls
+Management controls applicable to each object.
+.PP
+Each object class is described in each category in the sections below.
+.\"
+.\"
+.SH IOCTLS
+.PP
+All objects must be configured using
+.IR I_STR (7)
+.BR streamio (7)
+input-output control commands before they are usable.
+.\"
+.SS Configuration
+.PP
+Configuration input-output controls all take an argument containing a pointer
+to a
+.B mx_config
+structure, formatted as follows:
+.PP
+.RS
+.nf
+\fC\s-1\
+typedef struct mx_config {
+    mx_ulong type;         /* unused */
+    mx_ulong encoding;     /* encoding */
+    mx_ulong block_size;   /* data block size (bits) */
+    mx_ulong samples;      /* samples per block */
+    mx_ulong sample_size;  /* sample size (bits) */
+    mx_ulong rate;         /* clock rate (samples/second) */
+    mx_ulong tx_channels;  /* number of tx channels */
+    mx_ulong rx_channels;  /* number of rx channels */
+    mx_ulong opt_flags;    /* options flags */
+} mx_config_t
+\s+1\fP
+.fi
+The
+.B mx_config
+structure contains the following members:
+.TP \w'\fIsample_size\fR\(em'u
+.I type
+This field is only to maintain alignment with the equivalent parameter
+structure as defined in
+.BR mxi (7)
+and is unused in the input-output control.
+.TP
+.I encoding
+Indicates or specifies the encoding associated with the multiplex.  When the
+multiplex is used for any form of data,
+.RS
+.PP
+.B MX_ENCODING_NONE
+will be indicated and should be specified.
+.I encoding
+can be one of the following values:
+.TP \w'\fBCH_ENCODING_G711_PCM_U\fR\(em'u
+.B MX_ENCODING_NONE
+No encoding.  Used for data or other clear channel information.
+.PD 0
+.TP
+.B MX_ENCODING_CN
+CN.
+.TP
+.B MX_ENCODING_DVI4
+DVI4.
+.TP
+.B MX_ENCODING_FS1015
+FIPS FS 1015 LPC.
+.TP
+.B MX_ENCODING_FS1016
+FIPS FS 1016 LPC.
+.TP
+.B MX_ENCODING_G711_PCM_A
+G.711 PCM A-law.
+.TP
+.B MX_ENCODING_G711_PCM_L
+G.711 PCM Linear.
+.TP
+.B MX_ENCODING_G711_PCM_U
+G.711 PCM Mu-law.
+.TP
+.B MX_ENCODING_G721
+G.721.
+.TP
+.B MX_ENCODING_G722
+G.722.
+.TP
+.B MX_ENCODING_G723
+G.723.
+.TP
+.B MX_ENCODING_G726
+G.726.
+.TP
+.B MX_ENCODING_G728
+G.728.
+.TP
+.B MX_ENCODING_G729
+G.729.
+.TP
+.B MX_ENCODING_GSM
+GSM.
+.TP
+.B MX_ENCODING_GSM_EFR
+GSM.
+.TP
+.B MX_ENCODING_GSM_HR
+GSM.
+.TP
+.B MX_ENCODING_LPC
+LPC.
+.TP
+.B MX_ENCODING_MPA
+MPA.
+.TP
+.B MX_ENCODING_QCELP
+QCELP.
+.TP
+.B MX_ENCODING_RED
+RED.
+.TP
+.B MX_ENCODING_S16_BE
+Signed 16-bit Big-Endian.
+.TP
+.B MX_ENCODING_S16_LE
+Signed 16-bit Little-Endian.
+.TP
+.B MX_ENCODING_S8
+Signed 8-bit.
+.TP
+.B MX_ENCODING_U16_BE
+Unsigned 16-bit Big-Endian.
+.TP
+.B MX_ENCODING_U16_LE
+Unsigned 16-bit Little-Endian.
+.TP
+.B MX_ENCODING_U8
+Unsigned 8-bit.
+.TP
+.B MX_ENCODING_VDVI
+DVI.
+.PD
+.RE
+.TP
+.I block_size
+Specifies or indicates the block size associated with the multiplex.  The block
+size is the number of samples that are written or read at one time.  If this
+value is less than the size of a
+.IR STREAMS (4)
+fast buffer,
+.BR FASTBUF ,
+then a
+.BR FASTBUF
+of samples will be read or written at once.
+.TP
+.I samples
+Specifies or indicates the number of samples (from the same timeslot) in a block.
+.TP
+.I sample_size
+Specifies or indicates the sample size in bites.  This can normally be 3, 4, 5, 7, 8 or 16.
+.TP
+.I rate
+Specifies or indicates the rate of the multiplex.  This is the rate in samples
+per second.
+.RS
+.PP
+.I rate
+can be one of the following values:
+.TP \w'\fBCH_RATE_VARIABLE\fR\(em'u
+.B MX_RATE_VARIABLE
+rate is variable.
+.PD 0
+.TP
+.B MX_RATE_8000
+56kbps or 64kbps.
+.TP
+.B MX_RATE_11025
+11kHz Audio.
+.TP
+.B MX_RATE_16000
+16kHz Audio.
+.TP
+.B MX_RATE_22050
+22kHz Audio.
+.TP
+.B MX_RATE_44100
+44kHz Audio.
+.TP
+.B MX_RATE_90000
+90kHz Audio.
+.TP
+.B MX_RATE_184000
+23B.
+.TP
+.B MX_RATE_192000
+T1 (24B).
+.TP
+.B MX_RATE_240000
+30B.
+.TP
+.B MX_RATE_248000
+E1 (31B).
+.PD
+.RE
+.TP
+.I tx_channels
+Specifies or indicates the number of transmit channels available.  For the MX
+interface, this value is either 0 or 1.
+.TP
+.I rx_channels
+Specifies or indicates the number of receive channels available.  For the MX
+interface, this value is either 0, 1 or 2.  (The value of 2 is used for
+monitoring mode where two receive channels exists and zero transmit channels.)
+.TP
+.I opt_flags
+Specifies or indicates the options associated with the MX provider.  MX
+provider options are provider specific and no generic options have yet been
+defined.
+.RE
+.TP
+.B MX_IOCGCONFIG
+Gets the multiplex configuration.  Upon success, the multiplex configuration is
+written to the memory extent indicated by the pointer argument to the
+.BR ioctl (2)
+call.
+.\"
+.TP
+.B MX_IOCSCONFIG
+Set the multiplex configuration.  Upon success, the multiplex configuration is
+read from the memory extent specified by the pointer argument to the
+.BR ioctl (2)
+call.
+.\"
+.TP
+.B MX_IOCTCONFIG
+Tests the multiplex configuration.  Upon success, the multiplex configuration is
+read from the memory extent specified by the pointer argument to the
+.BR ioctl (2)
+call, values adjusted according to the rules for configuration, and the
+resulting configuration written back to the memory extent specified by the
+pointer argument to the
+.BR ioctl (2)
+call.  Actual configuration is not changed.
+.\"
+.TP
+.B MX_IOCCCONFIG
+Confirms the multiplex configuration.  Upon success, the multiplex configuration
+is read form the memory extent specified by the pointer argument to the
+.BR ioctl (2)
+call, values adjusted according to the rules for configuration, the
+configuration applied, and then the resulting configuration written back to
+the memory extent specified by the pointer argument to the
+.BR ioctl (2)
+call.
+.IP ""
+Normally, the argument to the
+.B MX_IOCCCONFIG
+call is the same as to an immediately preceding
+.B MX_IOCTCONFIG
+call.
+.\"
+.SS State
+.PP
+State input-output controls all take an argument containing a pointer to a
+.B mx_statem
+structure, formatted as follows:
+.RS
+.nf
+\fC\s-1\
+typedef struct mx_statem {
+    mx_ulong state;
+    mx_ulong flags;
+} mx_statem_t;
+\s+1\fP
+.fi
+The
+.B mx_statem
+structure contains the following members:
+.TP \w'\fIstate\fR\(em'u
+.I state
+Indicates the current state of the multiplex.
+.TP
+.I flags
+Indicates the current state flags associated with the multiplex.
+.RE
+.TP
+.B MX_IOCGSTATEM
+Requests that the state information be obtained and written to the
+.B mx_statem
+structure pointed to by the argument to the input-output control.
+.\"
+.TP
+.B MX_IOCCMRESET
+Requests that the state associated with the multiplex be reset.  This
+input-output control takes no argument.
+.\"
+.SS Statistics
+.PP
+Statistics input-output controls all take an argument containing a pointer to
+a
+.B mx_stats
+structure, formatted as follows:
+.RS
+.nf
+\fC\s-1\
+typedef struct mx_stats {
+    mx_ulong header;
+} mx_stats_t;
+\s+1\fP
+.fi
+The
+.B mx_stats
+structure contains the following members:
+.TP \w'\fIheader\fR\(em'u
+.I header
+Specifies or indicates the statistics period header associated with the
+multiplex.  This header is a statistics collection period in milliseconds.
+.RE
+.TP
+.B MX_IOCGSTATSP
+Requests that the statistics period information associated with the multiplex be
+obtained and written to the
+.B mx_stats
+structure pointed to by the argument to the input-output control.
+.\"
+.TP
+.B MX_IOCSSTATSP
+Requests that the statistics period information associated with the multiplex be
+read from the
+.B mx_stats
+structure pointed to by the argument to the input-output control and assigned
+to the multiplex.
+.\"
+.TP
+.B MX_IOCGSTATS
+Requests that the statistics associated with the multiplex be obtained an
+written to the
+.B mx_stats
+structure pointed to by the argument to the input-output control.
+.\"
+.TP
+.B MX_IOCCSTATS
+Requests that the statistics associated with the multiplex be cleared to zero.
+This input-output control takes no argument.
+.\"
+.SS Notification
+.PP
+Notification input-output controls all take an argument containing a pointer
+to a
+.B mx_notify
+structure, formatted as follows:
+.RS
+.nf
+\fC\s-1\
+typedef struct mx_notify {
+    mx_ulong events;
+} mx_notify_t;
+\s+1\fP
+.fi
+The
+.B mx_notify
+structure contains the following members:
+.TP \w'\fIevents\fR\(em'u
+.I events
+Specifies or indicates a bitwise OR of the events associated with the multiplex.
+When a bit is set, it specifies that event reporting for the specific event is
+enabled for the multiplex; when clear, that the event reporting is disabled.
+.RE
+.TP
+.B MX_IOCGNOTIFY
+Requests that the events associated with the multiplex be obtained an written to
+the
+.B mx_notify
+structure pointed to by the argument to the input-output control.
+.\"
+.TP
+.B MX_IOCSNOTIFY
+Requests that the events associated with the multiplex be read from the
+.B mx_notify
+structure pointed ot by the argument to the input-output control and set
+for the multiplex.
+.\"
+.TP
+.B MX_IOCCNOTIFY
+Requests that the events associated with the multiplex be read from the
+.B mx_notify
+structure pointed ot by the argument to the input-output control and cleared
+for the multiplex.
+.\"
+.SS Management
+.PP
+Management input-output controls all take an argument contianing a pointer to
+a
+.B mx_mgmt
+structure, formatted as follows:
+.RS
+.nf
+\fC\s-1\
+typedef struct mx_mgmt {
+    mx_ulong cmd;
+} mx_mgmt_t;
+\s+1\fP
+.fi
+The
+.B mx_mgmt
+structure contains the following members:
+.TP \w'\fIcmd\fR\(em'u
+.I cmd
+Specifies the management command to effect on the multiplex.
+.RE
+.TP
+.B MX_IOCCMGMT
+Requests that the management command be read from the
+.B mx_mgmt
+structure pointed to be the argument to the input-output control and acted
+upon for the multiplex.
+.\"
+.\"
+.SH NOTICES
+.PP
+The MX interface has gone through a number of incarnations and is as yet not
+finalized.
+.\"
+.\"
+.SH BUGS
+.PP
+This manual page is incomplete and the MX interface has not yet been
+finalized.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mxi (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This is Version 2 of the Multiplex Interface (MXI).
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
