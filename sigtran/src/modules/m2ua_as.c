@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 19:54:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:06:56 $ by $Author: brian $
+ Last Modified $Date: 2006/12/23 19:54:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.3  2006/12/23 19:54:57  brian
+ - void return
+
  Revision 0.9.2.2  2006/12/23 13:06:56  brian
  - manual page and other package updates for release
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 19:54:57 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 19:54:57 $";
 
 /*
  *  This is the AS side of M2UA implemented as a pushable module that pushes over an SCTP NPI
@@ -135,7 +138,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 19:54:57 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3142,6 +3145,7 @@ sl_recv_maup_data(struct sl *sl, queue_t *q, mblk_t *mp)
 
 	if (likely((err = sl_pdu_ind(sl, q, mp)) == 0))
 		return (0);
+	return (err);
 }
 
 /**
