@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.7 2006/12/08 05:08:12 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.8 2006/12/23 13:07:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:12 $ by $Author: brian $
+ Last Modified $Date: 2006/12/23 13:07:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.8  2006/12/23 13:07:13  brian
+ - manual page and other package updates for release
+
  Revision 0.9.2.7  2006/12/08 05:08:12  brian
  - some rework resulting from testing and inspection
 
@@ -76,7 +79,7 @@
 #ifndef __SYS_MAC_STREAM_H__
 #define __SYS_MAC_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mac/stream.h directly, include sys/stream.h instead."
@@ -120,12 +123,12 @@ extern queue_t *mi_allocq(struct streamtab *st);
 extern mblk_t *mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error);
 extern mblk_t *mi_reallocb(mblk_t *mp, size_t size);
 
-extern uint8_t *mi_offset_param(mblk_t *mp, long offset, long len);
-extern uint8_t *mi_offset_paramc(mblk_t *mp, long offset, long len);
+extern uint8_t *mi_offset_param(mblk_t *mp, size_t offset, size_t len);
+extern uint8_t *mi_offset_paramc(mblk_t *mp, size_t offset, size_t len);
 
 extern int mi_set_sth_hiwat(queue_t *q, size_t size);
 extern int mi_set_sth_lowat(queue_t *q, size_t size);
-extern int mi_set_sth_maxblk(queue_t *q, size_t size);
+extern int mi_set_sth_maxblk(queue_t *q, ssize_t size);
 extern int mi_set_sth_wroff(queue_t *q, size_t size);
 
 extern caddr_t mi_next_ptr(caddr_t ptr);

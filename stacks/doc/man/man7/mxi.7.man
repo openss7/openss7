@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mxi.7.man,v 0.9.2.5 2006/04/05 09:43:20 brian Exp $
+.\" @(#) $Id: mxi.7.man,v 0.9.2.6 2006/12/23 13:07:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:20 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/23 13:07:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mxi.7.man,v $
+.\" Revision 0.9.2.6  2006/12/23 13:07:06  brian
+.\" - manual page and other package updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:20  brian
 .\" - moved .so line and updated headers
 .\"
@@ -377,12 +380,30 @@ Indicates that the indicated media data was received on the indicated channel
 within the multiplex.
 .SH OPTIONS
 .PP
+The Multiplex Interface (MXI) does not define any general options at this
+time.  Options specific to the underlying MX provider will be defined in the
+manual page for the specific MX provider.
 .SH CAVEATS
 .PP
+This documentation is not complete and needs some work before it is finalized.
 .SH FILES
 .PP
+The Multiplex Interface (MXI) is defined in the
+.BR <sys/mxi.h>
+and
+.BR <sys/mxi_ioctl.h>
+header files.  Additional header files are specified by specific providers of
+the MXI interface.
 .SH DEVICES
 .PP
+The Multiplex Interface (MXI) does not provide any devices of its own.
+Specific providers of the interface will provide their own devices.
+.SH MODULES
+.PP
+Some generic
+.IR STREAMS (4)
+modules can be provided that convert between the MXI interface and other
+interfaces (such as the CHI).
 .SH "SEE ALSO"
 .PP
 .BR MX_ATTACH_REQ (7),

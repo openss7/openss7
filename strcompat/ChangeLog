@@ -1,3 +1,7 @@
+2006-12-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/mac/stream.h: corrected declarations
+
 2006-12-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/mps/stream.h: minor corrections to mi_open/close functions

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: m2ua_ioctl.h,v 0.9.2.2 2006/11/04 11:35:29 brian Exp $
+ @(#) $Id: m2ua_ioctl.h,v 0.9.2.3 2006/12/23 13:06:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/04 11:35:29 $ by $Author: brian $
+ Last Modified $Date: 2006/12/23 13:06:55 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __M2UA_IOCTL_H__
 #define __M2UA_IOCTL_H__
 
-#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -235,15 +235,9 @@ typedef struct m2ua_statem_as {
 	m2ua_timers_as_t timers;
 	ulong as_numb;			/* number of id/state pairs for AS */
 	ulong spp_numb;			/* number of id/state pairs for SPP */
-	/*
-	   followed by id/state pairs for AS 
-	 */
-	/*
-	   followed by id/state pairs for SPP 
-	 */
-	/*
-	   terminated by zero 
-	 */
+	/* followed by id/state pairs for AS */
+	/* followed by id/state pairs for SPP */
+	/* terminated by zero */
 } m2ua_statem_as_t;
 
 /*
@@ -256,12 +250,8 @@ typedef struct m2ua_timers_sp {
 typedef struct m2ua_statem_sp {
 	m2ua_timers_sp_t timers;
 	ulong sp_numb;			/* number of id/state pairs for SP */
-	/*
-	   followed by id/state pairs for SP 
-	 */
-	/*
-	   terminated by zero 
-	 */
+	/* followed by id/state pairs for SP */
+	/* terminated by zero */
 } m2ua_statem_sp_t;
 
 /*
@@ -276,12 +266,8 @@ typedef struct m2ua_timers_spp {
 typedef struct m2ua_statem_spp {
 	m2ua_timers_spp_t timers;
 	ulong as_numb;			/* number of id/state pairs for AS */
-	/*
-	   followed by id/state pairs for AS 
-	 */
-	/*
-	   terminated by zero 
-	 */
+	/* followed by id/state pairs for AS */
+	/* terminated by zero */
 } m2ua_statem_spp_t;
 
 /*
@@ -324,9 +310,7 @@ typedef struct m2ua_statem {
 	ulong id;			/* object id */
 	ulong flags;			/* object flags */
 	ulong state;			/* object state */
-	/*
-	   followed by object-specific state structure 
-	 */
+	/* followed by object-specific state structure */
 } m2ua_statem_t;
 
 #define M2UA_IOCGSTATEM		_IOWR(	M2UA_IOC_MAGIC,	 6,	m2ua_statem_t	)
@@ -381,9 +365,7 @@ typedef struct m2ua_stats {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
 	ulong header;			/* object stats header */
-	/*
-	   followed by object-specific stats structure 
-	 */
+	/* followed by object-specific stats structure */
 } m2ua_stats_t;
 
 #define M2UA_IOCGSTATSP		_IOWR(	M2UA_IOC_MAGIC,	 8,	m2ua_stats_t	)
@@ -433,9 +415,7 @@ typedef struct m2ua_pass {
 	ulong band;			/* band of message block */
 	ulong ctl_length;		/* length of cntl part */
 	ulong dat_length;		/* length of data part */
-	/*
-	   followed by cntl and data part of message to pass to lower 
-	 */
+	/* followed by cntl and data part of message to pass to lower */
 } m2ua_pass_t;
 
 #define M2UA_IOCCPASS		_IOWR(	M2UA_IOC_MAGIC,	16,	m2ua_pass_t	)

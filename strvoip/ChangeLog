@@ -1,3 +1,11 @@
+2006-12-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: corrected manpage paths and includes
+	* doc/man/Makefile.am: updated manual pages for release
+	* doc/man/man4/mgc.4.man: updated manual pages for release
+	* doc/man/man8/strvoip_mknod.8.man: updated manual pages for release
+	* doc/man/man8/test-voip.8.man: updated manual pages for release
+
 2006-12-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: adjusted major base

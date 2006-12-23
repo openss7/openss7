@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ua_ioctl.h,v 0.9.2.1 2006/11/04 11:31:18 brian Exp $
+ @(#) $Id: ua_ioctl.h,v 0.9.2.2 2006/12/23 13:06:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/04 11:31:18 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
-
- $Log: ua_ioctl.h,v $
- Revision 0.9.2.1  2006/11/04 11:31:18  brian
- - new generic ua files
+ Last Modified $Date: 2006/12/23 13:06:55 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UA_IOCTL_H__
 #define __SYS_UA_IOCTL_H__
 
-#ident "@(#) $RCSfile: ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define UA_IOC_MAGIC	'0'
 

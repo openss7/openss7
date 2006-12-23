@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/16 20:45:41 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/16 20:45:41 $ by $Author: brian $
+ Last Modified $Date: 2006/12/23 13:06:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.3  2006/12/23 13:06:50  brian
+ - manual page and other package updates for release
+
  Revision 0.9.2.2  2006/11/16 20:45:41  brian
  - working up UA driver release
 
@@ -58,13 +61,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/16 20:45:41 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:50 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/16 20:45:41 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:50 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/16 20:45:41 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:50 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4183,20 +4186,20 @@ m2ua_build_maup_retr_req(queue_t *q, uint32_t iid, uint32_t *fsnc)
 		if ((mb = ua_build_optdata_req(q, 0, M2UA_PPI, iid))) {
 			register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-			p[1] = M2UA_MAUP_RETR_REQ;
-			p[2] = __constant_htonl(mlen);
-			p[3] = UA_PARM_IID;
-			p[4] = htonl(iid);
-			p[5] = M2UA_PARM_ACTION;
+			p[0] = M2UA_MAUP_RETR_REQ;
+			p[1] = htonl(mlen);
+			p[2] = UA_PARM_IID;
+			p[3] = htonl(iid);
+			p[4] = M2UA_PARM_ACTION;
 
 			if (fsnc) {
-				p[6] = __constant_htonl(M2UA_ACTION_RTRV_MSGS);
-				p[7] = M2UA_PARM_SEQNO;
-				p[8] = *fsnc;	/* already network byte order */
-				mp->b_wptr = (unsigned char *) &p[9];
+				p[5] = __constant_htonl(M2UA_ACTION_RTRV_MSGS);
+				p[6] = M2UA_PARM_SEQNO;
+				p[7] = *fsnc;	/* already network byte order */
+				mp->b_wptr = (unsigned char *) &p[8];
 			} else {
-				p[6] = __constant_htonl(M2UA_ACTION_RTRV_BSN);
-				mp->b_wptr = (unsigned char *) &p[7];
+				p[5] = __constant_htonl(M2UA_ACTION_RTRV_BSN);
+				mp->b_wptr = (unsigned char *) &p[6];
 			}
 			mb->b_cont = mp;
 			return (mb);
@@ -4486,7 +4489,7 @@ m3ua_build_xfer_data(queue_t *q, uint32_t rc, uint32_t opc, uint32_t dpc, uint8_
 		     uint8_t mp, uint8_t sls, mblk_t *bp)
 {
 	mblk_t *mp;
-	size_t dlen = msgdsize(bp->b_cont) + 3 * sizeof(uint32);
+	size_t dlen = msgdsize(bp->b_cont) + 3 * sizeof(uint32_t);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC) + UA_PHDR_SIZE;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {

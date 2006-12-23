@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi_m2ua.h,v 0.9.2.1 2006/10/17 11:55:45 brian Exp $
+ @(#) $Id: dlpi_m2ua.h,v 0.9.2.2 2006/12/23 13:06:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,11 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:55:45 $ by $Author: brian $
+ Last Modified $Date: 2006/12/23 13:06:55 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __DLPI_M2UA_H__
 #define __DLPI_M2UA_H__
+
+#ident "@(#) $RCSfile: dlpi_m2ua.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #endif				/* __DLPI_M2UA_H__ */

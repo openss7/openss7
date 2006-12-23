@@ -1,3 +1,7 @@
+2006-12-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: corrected manpage paths and includes
+
 2006-12-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxns/src/drivers/dl2.c: added new drivers

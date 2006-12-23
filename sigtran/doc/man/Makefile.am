@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/21 11:00:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:47 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/21 11:00:55 $ by $Author: brian $
+## Last Modified $Date: 2006/12/23 13:06:47 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.3  2006/12/23 13:06:47  brian
+## - manual page and other package updates for release
+##
 ## Revision 0.9.2.2  2006/12/21 11:00:55  brian
 ## - updated manual pages for release
 ##
@@ -82,10 +85,12 @@ MANS_UNUSED = \
 	man4/iua.4 \
 	man4/iua_ioctl.4 \
 	man4/m2ua.4 \
+	man4/m2ua_as.4 \
 	man4/m2ua_ioctl.4 \
 	man4/m3pa.4 \
 	man4/m3tp.4 \
 	man4/m3ua.4 \
+	man4/m3ua_as.4 \
 	man4/m3ua_ioctl.4 \
 	man4/SIGTRAN.4 \
 	man4/sua.4 \
@@ -155,10 +160,12 @@ dist_noinst_MANS = \
 	man4/m2pa_sl.4.man \
 	man4/m2tp.4.man \
 	man4/m2ua.4.man \
+	man4/m2ua_as.4.man \
 	man4/m2ua_ioctl.4.man \
 	man4/m3pa.4.man \
 	man4/m3tp.4.man \
 	man4/m3ua.4.man \
+	man4/m3ua_as.4.man \
 	man4/m3ua_ioctl.4.man \
 	man4/sdl_sctp.4.man \
 	man4/sdt_sctp.4.man \

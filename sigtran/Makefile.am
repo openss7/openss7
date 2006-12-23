@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/17 12:08:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/17 12:08:17 $ by $Author: brian $
+## Last Modified $Date: 2006/12/23 13:06:45 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.3  2006/12/23 13:06:45  brian
+## - manual page and other package updates for release
+##
 ## Revision 0.9.2.2  2006/10/17 12:08:17  brian
 ## - update release files
 ##
@@ -152,6 +155,8 @@ EXTRA_libSIGTRANmods_a_SOURCES	= \
 				src/modules/m2tp.c
 libSIGTRANmods_a_SOURCES	= \
 				src/modules/m2pa_sl.c \
+				src/modules/m2ua_as.c \
+				src/modules/m3ua_as.c \
 				src/modules/sdl_sctp.c \
 				src/modules/sdt_sctp.c \
 				src/modules/sdt_tpi.c \

@@ -1,3 +1,37 @@
+2006-12-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: corrected manpage paths and includes
+
+	* doc/man/Makefile.am: updated manual pages for release
+	* doc/man/man4/m2ua.4.man: updated manual pages for release
+	* doc/man/man4/m2ua_as.4.man: added manual page for new module
+	* doc/man/man4/m3ua_as.4.man: added manual page for new module
+	* doc/man/man8/test-sigtran.8.man: updated manual pages for release
+
+	* src/include/sys/dlpi_dua.h: updated headers
+	* src/include/sys/dlpi_gr303ua.h: updated headers
+	* src/include/sys/dlpi_iua.h: updated headers
+	* src/include/sys/dlpi_m2ua.h: updated headers
+	* src/include/sys/dlpi_v5ua.h: updated headers
+	* src/include/sys/dua_ioctl.h: updated headers
+	* src/include/sys/gr303ua_ioctl.h: updated headers
+	* src/include/sys/iua_ioctl.h: updated headers
+	* src/include/sys/m2pa_ioctl.h: updated headers
+	* src/include/sys/m2ua_ioctl.h: updated headers
+	* src/include/sys/m3ua.h: updated headers
+	* src/include/sys/m3ua_ioctl.h: updated headers
+	* src/include/sys/ua_ioctl.h: updated headers
+	* src/include/sys/ua_lm.h: updated headers
+	* src/include/sys/ua_lm_ioctl.h: updated headers
+	* src/include/sys/v5ua_ioctl.h: updated headers
+
+	* Makefile.am: added new modules
+	* src/drivers/ua.c: minor corrections
+	* src/modules/Config.in: added new modules
+	* src/modules/m2ua_as.c: added new modules
+	* src/modules/m3ua_as.c: added new modules
+	* src/modules/sua_as.c: added new modules
+
 2006-12-21  Brian Bidulock  <bidulock@openss7.org>
 
 	- documentation updates for release (make check target)

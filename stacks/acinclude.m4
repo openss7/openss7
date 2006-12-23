@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/12/18 10:50:55 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/12/23 13:06:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/18 10:50:55 $ by $Author: brian $
+# Last Modified $Date: 2006/12/23 13:06:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.57  2006/12/23 13:06:58  brian
+# - manual page and other package updates for release
+#
 # Revision 0.9.2.56  2006/12/18 10:50:55  brian
 # - subpackaging changes for release
 #
@@ -126,7 +129,7 @@ AC_DEFUN([AC_SS7], [dnl
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
-    USER_LDFLAGS="$LDADD"
+    USER_LDFLAGS="$LDFLAGS"
     _SS7_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
+ @(#) $Id: mtpi.h,v 0.9.2.4 2006/12/23 13:07:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
+ Last Modified $Date: 2006/12/23 13:07:07 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_MTPI_H__
 #define __SS7_MTPI_H__
 
-#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -307,7 +307,8 @@ typedef struct MTP_status_ind {
    Type for MTP_STATUS_IND 
  */
 #define MTP_STATUS_TYPE_CONG		0x00	/* MTP-STATUS refers to congestion */
-#define MTP_STATUS_TYPE_UPU		0x01	/* MTP-STATUS referes to user part unavailability */
+#define MTP_STATUS_TYPE_UPU		0x01	/* MTP-STATUS refers to user part unavailability */
+#define MTP_STATUS_TYPE_RSTR		0x02	/* MTP-STATUS refers to restriction */
 
 /*
    Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_UPU 

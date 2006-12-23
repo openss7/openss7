@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_mtp.3.man,v 0.9.2.8 2006/04/05 09:43:00 brian Exp $
+.\" @(#) $Id: xti_mtp.3.man,v 0.9.2.9 2006/12/23 13:07:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:00 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/23 13:07:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_mtp.3.man,v $
+.\" Revision 0.9.2.9  2006/12/23 13:07:02  brian
+.\" - manual page and other package updates for release
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:00  brian
 .\" - moved .so line and updated headers
 .\"
@@ -266,10 +269,11 @@ the options defined here.
 .PP
 An MTP conforming transport provider supports two levels of options.  These
 two levels are described below.
+.\"
 .SS T_SS7_SS7
 .PP
 Options within this level are specific to Signalling System No. 7 (SS7) and
-are common to the all protocol levels in SS7.  For more information see
+are common to all the protocol levels in SS7.  For more information see
 .BR xti_ss7 (3).
 .\"
 .\"
@@ -435,6 +439,7 @@ The option value is a
 .B t_uscalar_t
 that can have the value
 .BR T_YES " or " T_NO .
+.\"
 .SS T_SS7_MTP
 .PP
 Options within this level are specific to the Message Transfer Part (MTP) yet
@@ -515,6 +520,7 @@ indicating whether the option should be passed to
 .\"
 .SH FUNCTIONS
 .PP
+.\"
 .SS \fB\)t_accept\fR(3)
 .PP
 .B MTP
@@ -524,6 +530,7 @@ XTI/TLI call will fail, return -1, and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_bind\fR(3)
 .PP
 For MTP conforming transport providers, the
@@ -557,11 +564,13 @@ MTP conforming transport providers will return a
 .I ret->qlen
 of zero (0) regardless of the setting of
 .IR req->qlen .
+.\"
 .SS \fB\)t_close\fR(3)
 .PP
 This function operates as described in
 .BR t_close (3)
 without change.
+.\"
 .\"
 .\"
 .SS \fB\)t_connect\fR(3)
@@ -575,6 +584,7 @@ set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .\"
 .\"
 .SS \fB\)t_getinfo\fR(3)
@@ -657,6 +667,7 @@ transport providers will not return
 flags.
 MTP conforming providers may return
 .BR XPG4_1 .
+.\"
 .SS \fB\)t_listen\fR(3)
 .PP
 .B MTP
@@ -673,6 +684,7 @@ to
 .RB [ TQFULL ]
 or
 .RB [ TSYSERR ].
+.\"
 .SS \fB\)t_open\fR(3)
 .PP
 MTP conforming transport providers will return in the
@@ -682,11 +694,13 @@ structure the same information as returned to the
 library call as described above.
 Otherwise this function operates as described in
 .BR t_open (3).
+.\"
 .SS \fB\)t_optmgmt\fR(3)
 .PP
 MTP conforming transport providers support the options described under
 .IR \*(lqOPTIONS\*(rq ,
 above.
+.\"
 .SS \fB\)t_rcvconnect\fR(3)
 .PP
 .B MTP
@@ -696,6 +710,7 @@ XTI/TLI call will fail, return -1, and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_rcvdis\fR(3)
 .PP
 .B MTP
@@ -705,6 +720,7 @@ XTI/TLI call will fail, return -1, and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_rcv\fR(3), \fB\)t_rcvv\fR(3)
 .PP
 For pseudo-connection oriented service providers, these XTI/TLI calls receive data
@@ -714,6 +730,7 @@ set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_rcvreldata\fR(3)
 .PP
 .B MTP
@@ -723,6 +740,7 @@ XTI/TLI call will fail, return -1, and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_rcvrel\fR(3)
 .PP
 .B MTP
@@ -732,6 +750,7 @@ XTI/TLI call will fail, return -1, and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_rcvudata\fR(3), \fB\)t_rcvvudata\fR(3)
 .PP
 For connectionless service providers, this XTI/TLI call sends a unit data to the
@@ -743,6 +762,7 @@ return -1 and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_rcvuderr\fR(3)
 .PP
 .B MTP
@@ -834,6 +854,7 @@ error is returned even if no unit data originated from the MTP user associated
 with this stream.
 .\"
 .\"
+.\"
 .SS \fB\)t_snddis\fR(3)
 .PP
 For pseudo-connection oriented service providers, this XTI/TLI library call releases
@@ -842,12 +863,14 @@ connectionless service providers, this XTI/TLI library call fails, returns -1, a
 sets
 .IR t_errno (3)
 to
-.RB [ TNOSUPPORT ].
+.RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_snd\fR(3), \fB\)t_sndv\fR(3)
 .PP
 For connected pseudo-connection service privders, these XTI/TLI library calls are
 used to send data, with or without gather, to the peer on the signalling
 relation.
+.\"
 .SS \fB\)t_sndreldata\fR(3)
 .PP
 .B MTP
@@ -857,6 +880,7 @@ XTI/TLI call will fail, return -1, and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_sndrel\fR(3)
 .PP
 .B MTP
@@ -866,6 +890,7 @@ XTI/TLI call will fail, return -1, and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_sndudata\fR(3), \fB\)t_sndvudata\fR(3)
 .PP
 For connectionless service providers, this XTI/TLI call sends a unit data to the
@@ -877,6 +902,7 @@ return -1 and set
 .IR t_errno (3)
 to
 .RB [ TNOTSUPPORT ].
+.\"
 .SS \fB\)t_unbind\fR(3)
 .PP
 This function operates as described in

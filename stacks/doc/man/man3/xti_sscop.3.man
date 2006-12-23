@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_sscop.3.man,v 0.9.2.8 2006/04/05 09:43:00 brian Exp $
+.\" @(#) $Id: xti_sscop.3.man,v 0.9.2.9 2006/12/23 13:07:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:00 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/23 13:07:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_sscop.3.man,v $
+.\" Revision 0.9.2.9  2006/12/23 13:07:02  brian
+.\" - manual page and other package updates for release
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:00  brian
 .\" - moved .so line and updated headers
 .\"
@@ -91,40 +94,140 @@ sort-adjacent-labels
 .PP
 .B #include <xti.h>
 .br
-.B #include <xti_ss7.h>
-.br
-.B #include <xti_mtp.h>
-.br
-.B #include <xti_sccp.h>
-.br
-.B #include <xti_tcap.h>
-.br
-.B #include <xti_mosi.h>
+.B #include <xti_sscop.h>
 .\"
 .\"
 .HP
-.BI "int " tcap_xistr " = t_open(" device ", " flags );
+.BI "int " sscop_xistr " = t_open(" device ", " flags );
 .\"
 .\"
 .SH OVERVIEW
+.PP
+This manual section describes the protocol-specific information that is relevant for SSCOP
+.[
+q2110
+.]
+.[
+q2111
+.]
+transport providers; it describes the protocol-specific information that is relevant when SSCOP
+services
+are provided over an IP network using SSCOPMCE.
+.[
+q2111
+.]
+and it defines the data structure and constants required for SSCOP transport providers that are
+exposed through the XTI/TLI
+.[
+xti
+.]
+.[
+xns
+.]
+.B <xti_sscop.h>
+header file.
 .\"
 .\"
 .SH DESCRIPTION
+.PP
+The
+.B XTI-SSCOP
+is an
+.I X/Open Transport Interface
+.[
+xti
+.]
+.[
+xns
+.]
+based interface with specific support of the Service Specific Connection Oriented Protocol (SSCOP).
+.[
+q2110
+.]
 .\"
 .\"
 .SH "ADDRESS FORMAT"
+.PP
+The SSCOP address format is implied.
 .\"
 .\"
 .SH OPTIONS
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+An SSCOP transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in the privileged or
+read-only mode.  SSCOPMCE
+.[
+q2111
+.]
+.RB ( sscop-mce (4))
+transport providers only support a subset of
+the options defined here.
+.\"
+.\"
+.PP
+An SSCOP conforming transport provider may support several levels of options, but supports at least the
+option level as described below.
+.\"
+.SS T_ATM_SSCOP
+.PP
+Options within this level are specific to Service Specific Connection Oriented Protocol (SSCOP) and
+are common to all the providers of SSCOP services.
+.\"
+.\"
+.PP
+The options defined with the option level
+.B T_ATM_SSCOP
+are as follows:
+.\"
+.\"
+.TP
+.B T_SSCOP_OPTIONS
+
 .\"
 .\"
 .SH FUNCTIONS
+.PP
+TODO.
 .\"
 .\"
 .SH CAVEATS
+.PP
+The SSCOP does not support a true connectionless service and only provides a true connection
+oriented or pseudo-connectionless service emulated using on-demand connections.
+.PP
+THIS MANUAL PAGE IS INCOMPLETE.
 .\"
 .\"
 .SH DEVICES
+.PP
+.\"
+.\"
+.PP
+There are a number of SSCOP devices providing the Trasnport Provider Interface
+that provide SSCOP conforming TPI devices as follows:
+.\"
+.\"
+.TP
+.I /dev/sscop
+This device provides a true connection oriented SSCOP transport provider.
+For more information on the SSCOP device, see
+.BR sscop (4).
+.\"
+.\"
+.TP
+.I /dev/sscop-mce
+This device provides a true connection oriented SSCOP trasnport provider.
+For more information on the SSCOPMCE
+.[
+q2111
+.]
+device, see
+.BR sscop-mce (4).
 .\"
 .\"
 .SH "SEE ALSO"

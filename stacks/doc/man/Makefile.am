@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/21 11:14:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/12/23 13:06:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/21 11:14:40 $ by $Author: brian $
+# Last Modified $Date: 2006/12/23 13:06:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.33  2006/12/23 13:06:59  brian
+# - manual page and other package updates for release
+#
 # Revision 0.9.2.32  2006/12/21 11:14:40  brian
 # - documentation updates for release, and moved tali
 #
@@ -90,31 +93,16 @@ ss7_man_MANS = \
 	man4/bicc_ioctl.4 \
 	man4/bssap.4 \
 	man4/bssap_ioctl.4 \
-	man4/capi.4 \
-	man4/capi_ioctl.4 \
-	man4/cd.4 \
-	man4/cd_daed.4 \
-	man4/cd_hdlc.4 \
-	man4/ch.4 \
-	man4/ch_ioctl.4 \
 	man4/ch-sdl.4 \
 	man4/ch_x400p.4 \
 	man4/cpc388.4 \
-	man4/dass.4 \
 	man4/dl.4 \
 	man4/dlb.4 \
-	man4/dl_gr303.4 \
 	man4/dl_gsma.4 \
 	man4/dl_h225.4 \
 	man4/dl_ioctl.4 \
 	man4/dl_lapb.4 \
-	man4/dl_lapd.4 \
-	man4/dl_lapf.4 \
-	man4/dl_v52.4 \
-	man4/dpnss.4 \
 	man4/fr.4 \
-	man4/gr303.4 \
-	man4/gr303_ioctl.4 \
 	man4/gsma.4 \
 	man4/h225.4 \
 	man4/h225_ioctl.4 \
@@ -123,24 +111,15 @@ ss7_man_MANS = \
 	man4/h248_ioctl.4 \
 	man4/hdlc.4 \
 	man4/hdlc_ioctl.4 \
-	man4/idlc.4 \
-	man4/ISDN.4 \
-	man4/isdn.4 \
 	man4/isdn_ioctl.4 \
 	man4/isup.4 \
 	man4/isup_ioctl.4 \
 	man4/lapb.4 \
-	man4/lapd.4 \
-	man4/lapf.4 \
 	man4/lm.4 \
 	man4/lmi_ioctl.4 \
-	man4/MG.4 \
-	man4/mg.4 \
 	man4/mgc.4 \
 	man4/mgcp.4 \
 	man4/mgcp_ioctl.4 \
-	man4/mg_ioctl.4 \
-	man4/mg-lm.4 \
 	man4/mtp.4 \
 	man4/mtp_ioctl.4 \
 	man4/mtp-mgmt.4 \
@@ -149,15 +128,10 @@ ss7_man_MANS = \
 	man4/mtp-npi.4 \
 	man4/mtp_tpi.4 \
 	man4/mtp-tpi.4 \
-	man4/mx.4 \
-	man4/mx_ioctl.4 \
 	man4/mx_sdl.4 \
 	man4/mx_x400p.4 \
 	man4/OpenSS7.4 \
 	man4/pca200e.4 \
-	man4/q921.4 \
-	man4/q922.4 \
-	man4/q931.4 \
 	man4/rtp.4 \
 	man4/sccp.4 \
 	man4/sccp-gtt.4 \
@@ -212,9 +186,6 @@ ss7_man_MANS = \
 	man4/tcap-tci.4 \
 	man4/tcap-tpi.4 \
 	man4/tcap-tri.4 \
-	man4/v52.4 \
-	man4/v5.4 \
-	man4/v5_ioctl.4 \
 	man4/VOIP.4 \
 	man4/x100p.4 \
 	man4/x100p-ch.4 \
@@ -238,108 +209,7 @@ ss7_man_MANS = \
 	man4/x400p-ss7-sdl.4 \
 	man4/ss7_undoc.4 \
 	man7/bicci.7 \
-	man7/capi.7 \
-	man7/CC_addr_ack.7 \
-	man7/CC_ADDR_ACK.7 \
-	man7/CC_addr_ack_t.7 \
-	man7/CC_addr_req.7 \
-	man7/CC_ADDR_REQ.7 \
-	man7/CC_addr_req_t.7 \
-	man7/CC_alerting_ind.7 \
-	man7/CC_ALERTING_IND.7 \
-	man7/CC_alerting_ind_t.7 \
-	man7/CC_alerting_req.7 \
-	man7/CC_ALERTING_REQ.7 \
-	man7/CC_alerting_req_t.7 \
-	man7/CC_bind_ack.7 \
-	man7/CC_BIND_ACK.7 \
-	man7/CC_bind_ack_t.7 \
-	man7/CC_bind_req.7 \
-	man7/CC_BIND_REQ.7 \
-	man7/CC_bind_req_t.7 \
-	man7/CC_blocking_con.7 \
-	man7/CC_BLOCKING_CON.7 \
-	man7/CC_blocking_con_t.7 \
-	man7/CC_blocking_ind.7 \
-	man7/CC_BLOCKING_IND.7 \
-	man7/CC_blocking_ind_t.7 \
-	man7/CC_blocking_req.7 \
-	man7/CC_BLOCKING_REQ.7 \
-	man7/CC_blocking_req_t.7 \
-	man7/CC_blocking_res.7 \
-	man7/CC_BLOCKING_RES.7 \
-	man7/CC_blocking_res_t.7 \
-	man7/CC_call_failure_ind.7 \
-	man7/CC_CALL_FAILURE_IND.7 \
-	man7/CC_call_failure_ind_t.7 \
-	man7/CC_call_reattempt_ind.7 \
-	man7/CC_CALL_REATTEMPT_IND.7 \
-	man7/CC_call_reattempt_ind_t.7 \
-	man7/CC_connect_ind.7 \
-	man7/CC_CONNECT_IND.7 \
-	man7/CC_connect_ind_t.7 \
-	man7/CC_connect_req.7 \
-	man7/CC_CONNECT_REQ.7 \
-	man7/CC_connect_req_t.7 \
-	man7/CC_cont_check_ind.7 \
-	man7/CC_CONT_CHECK_IND.7 \
-	man7/CC_cont_check_ind_t.7 \
-	man7/CC_cont_check_req.7 \
-	man7/CC_CONT_CHECK_REQ.7 \
-	man7/CC_cont_check_req_t.7 \
-	man7/CC_cont_report_ind.7 \
-	man7/CC_CONT_REPORT_IND.7 \
-	man7/CC_cont_report_ind_t.7 \
-	man7/CC_cont_report_req.7 \
-	man7/CC_CONT_REPORT_REQ.7 \
-	man7/CC_cont_report_req_t.7 \
-	man7/CC_cont_test_ind.7 \
-	man7/CC_CONT_TEST_IND.7 \
-	man7/CC_cont_test_ind_t.7 \
-	man7/CC_cont_test_req.7 \
-	man7/CC_CONT_TEST_REQ.7 \
-	man7/CC_cont_test_req_t.7 \
-	man7/CC_datalink_failure_ind.7 \
-	man7/CC_DATALINK_FAILURE_IND.7 \
-	man7/CC_datalink_failure_ind_t.7 \
-	man7/CC_disconnect_ind.7 \
-	man7/CC_DISCONNECT_IND.7 \
-	man7/CC_disconnect_ind_t.7 \
-	man7/CC_disconnect_req.7 \
-	man7/CC_DISCONNECT_REQ.7 \
-	man7/CC_disconnect_req_t.7 \
-	man7/CC_error_ack.7 \
-	man7/CC_ERROR_ACK.7 \
-	man7/CC_error_ack_t.7 \
-	man7/CC_error_ind.7 \
-	man7/CC_ERROR_IND.7 \
-	man7/CC_error_ind_t.7 \
-	man7/CC_facility_ind.7 \
-	man7/CC_FACILITY_IND.7 \
-	man7/CC_facility_req.7 \
-	man7/CC_FACILITY_REQ.7 \
-	man7/CC_forwxfer_ind.7 \
-	man7/CC_FORWXFER_IND.7 \
-	man7/CC_forwxfer_ind_t.7 \
-	man7/CC_forwxfer_req.7 \
-	man7/CC_FORWXFER_REQ.7 \
-	man7/CC_forwxfer_req_t.7 \
-	man7/CC_hold_con.7 \
-	man7/CC_HOLD_CON.7 \
-	man7/CC_hold_ind.7 \
-	man7/CC_HOLD_IND.7 \
-	man7/CC_hold_req.7 \
-	man7/CC_HOLD_REQ.7 \
-	man7/CC_hold_res.7 \
-	man7/CC_HOLD_RES.7 \
-	man7/cci.7 \
 	man7/cci_bicc.7 \
-	man7/CC_ibi_ind.7 \
-	man7/CC_IBI_IND.7 \
-	man7/CC_ibi_ind_t.7 \
-	man7/CC_ibi_req.7 \
-	man7/CC_IBI_REQ.7 \
-	man7/CC_ibi_req_t.7 \
 	man7/cci_bssap.7 \
 	man7/cci_capi.7 \
 	man7/cci_dass.7 \
@@ -348,360 +218,16 @@ ss7_man_MANS = \
 	man7/cci_idlc.7 \
 	man7/cci_isdn.7 \
 	man7/cci_isup.7 \
-	man7/CC_info_ack.7 \
-	man7/CC_INFO_ACK.7 \
-	man7/CC_info_ack_t.7 \
-	man7/CC_info_req.7 \
-	man7/CC_INFO_REQ.7 \
-	man7/CC_info_req_t.7 \
-	man7/CC_information_ind.7 \
-	man7/CC_INFORMATION_IND.7 \
-	man7/CC_information_ind_t.7 \
-	man7/CC_information_req.7 \
-	man7/CC_INFORMATION_REQ.7 \
-	man7/CC_information_req_t.7 \
-	man7/CC_info_timeout_ind.7 \
-	man7/CC_INFO_TIMEOUT_IND.7 \
-	man7/CC_info_timeout_ind_t.7 \
 	man7/cci_sipt.7 \
-	man7/CC_maint_ind.7 \
-	man7/CC_MAINT_IND.7 \
-	man7/CC_maint_ind_t.7 \
-	man7/CC_more_info_ind.7 \
-	man7/CC_MORE_INFO_IND.7 \
-	man7/CC_more_info_ind_t.7 \
-	man7/CC_more_info_req.7 \
-	man7/CC_MORE_INFO_REQ.7 \
-	man7/CC_more_info_req_t.7 \
-	man7/CC_notify_ind.7 \
-	man7/CC_NOTIFY_IND.7 \
-	man7/CC_notify_ind_t.7 \
-	man7/CC_notify_req.7 \
-	man7/CC_NOTIFY_REQ.7 \
-	man7/CC_notify_req_t.7 \
-	man7/CC_ok_ack.7 \
-	man7/CC_OK_ACK.7 \
-	man7/CC_ok_ack_t.7 \
-	man7/CC_optmgmt_ack.7 \
-	man7/CC_OPTMGMT_ACK.7 \
-	man7/CC_optmgmt_ack_t.7 \
-	man7/CC_optmgmt_req.7 \
-	man7/CC_OPTMGMT_REQ.7 \
-	man7/CC_optmgmt_req_t.7 \
-	man7/CC_proceeding_ind.7 \
-	man7/CC_PROCEEDING_IND.7 \
-	man7/CC_proceeding_ind_t.7 \
-	man7/CC_proceeding_req.7 \
-	man7/CC_PROCEEDING_REQ.7 \
-	man7/CC_proceeding_req_t.7 \
-	man7/CC_progress_ind.7 \
-	man7/CC_PROGRESS_IND.7 \
-	man7/CC_progress_ind_t.7 \
-	man7/CC_progress_req.7 \
-	man7/CC_PROGRESS_REQ.7 \
-	man7/CC_progress_req_t.7 \
-	man7/CC_query_con.7 \
-	man7/CC_QUERY_CON.7 \
-	man7/CC_query_con_t.7 \
-	man7/CC_query_ind.7 \
-	man7/CC_QUERY_IND.7 \
-	man7/CC_query_ind_t.7 \
-	man7/CC_query_req.7 \
-	man7/CC_QUERY_REQ.7 \
-	man7/CC_query_req_t.7 \
-	man7/CC_query_res.7 \
-	man7/CC_QUERY_RES.7 \
-	man7/CC_query_res_t.7 \
-	man7/CC_register_ind.7 \
-	man7/CC_REGISTER_IND.7 \
-	man7/CC_register_req.7 \
-	man7/CC_REGISTER_REQ.7 \
-	man7/CC_reject_ind.7 \
-	man7/CC_REJECT_IND.7 \
-	man7/CC_reject_ind_t.7 \
-	man7/CC_reject_req.7 \
-	man7/CC_REJECT_REQ.7 \
-	man7/CC_reject_req_t.7 \
-	man7/CC_release_con.7 \
-	man7/CC_RELEASE_CON.7 \
-	man7/CC_release_con_t.7 \
-	man7/CC_release_ind.7 \
-	man7/CC_RELEASE_IND.7 \
-	man7/CC_release_ind_t.7 \
-	man7/CC_release_req.7 \
-	man7/CC_RELEASE_REQ.7 \
-	man7/CC_release_req_t.7 \
-	man7/CC_release_res.7 \
-	man7/CC_RELEASE_RES.7 \
-	man7/CC_release_res_t.7 \
-	man7/CC_reset_con.7 \
-	man7/CC_RESET_CON.7 \
-	man7/CC_reset_con_t.7 \
-	man7/CC_reset_ind.7 \
-	man7/CC_RESET_IND.7 \
-	man7/CC_reset_ind_t.7 \
-	man7/CC_reset_req.7 \
-	man7/CC_RESET_REQ.7 \
-	man7/CC_reset_req_t.7 \
-	man7/CC_reset_res.7 \
-	man7/CC_RESET_RES.7 \
-	man7/CC_reset_res_t.7 \
-	man7/CC_restart_con.7 \
-	man7/CC_RESTART_CON.7 \
-	man7/CC_restart_con_t.7 \
-	man7/CC_restart_req.7 \
-	man7/CC_RESTART_REQ.7 \
-	man7/CC_restart_req_t.7 \
-	man7/CC_resume_con.7 \
-	man7/CC_RESUME_CON.7 \
-	man7/CC_resume_con_t.7 \
-	man7/CC_resume_ind.7 \
-	man7/CC_RESUME_IND.7 \
-	man7/CC_resume_ind_t.7 \
-	man7/CC_resume_reject_ind.7 \
-	man7/CC_RESUME_REJECT_IND.7 \
-	man7/CC_resume_reject_ind_t.7 \
-	man7/CC_resume_reject_req.7 \
-	man7/CC_RESUME_REJECT_REQ.7 \
-	man7/CC_resume_reject_req_t.7 \
-	man7/CC_resume_req.7 \
-	man7/CC_RESUME_REQ.7 \
-	man7/CC_resume_req_t.7 \
-	man7/CC_resume_res.7 \
-	man7/CC_RESUME_RES.7 \
-	man7/CC_resume_res_t.7 \
-	man7/CC_retrieve_con.7 \
-	man7/CC_RETRIEVE_CON.7 \
-	man7/CC_retrieve_ind.7 \
-	man7/CC_RETRIEVE_IND.7 \
-	man7/CC_retrieve_req.7 \
-	man7/CC_RETRIEVE_REQ.7 \
-	man7/CC_retrieve_res.7 \
-	man7/CC_RETRIEVE_RES.7 \
-	man7/CC_setup_complete_ind.7 \
-	man7/CC_SETUP_COMPLETE_IND.7 \
-	man7/CC_setup_complete_ind_t.7 \
-	man7/CC_setup_complete_req.7 \
-	man7/CC_SETUP_COMPLETE_REQ.7 \
-	man7/CC_setup_complete_req_t.7 \
-	man7/CC_setup_con.7 \
-	man7/CC_SETUP_CON.7 \
-	man7/CC_setup_con_t.7 \
-	man7/CC_setup_ind.7 \
-	man7/CC_SETUP_IND.7 \
-	man7/CC_setup_ind_t.7 \
-	man7/CC_setup_req.7 \
-	man7/CC_SETUP_REQ.7 \
-	man7/CC_setup_req_t.7 \
-	man7/CC_setup_res.7 \
-	man7/CC_SETUP_RES.7 \
-	man7/CC_setup_res_t.7 \
-	man7/CC_start_reset_ind.7 \
-	man7/CC_START_RESET_IND.7 \
-	man7/CC_start_reset_ind_t.7 \
-	man7/CC_status_ind.7 \
-	man7/CC_STATUS_IND.7 \
-	man7/CC_status_ind_t.7 \
-	man7/CC_stop_ind.7 \
-	man7/CC_STOP_IND.7 \
-	man7/CC_stop_ind_t.7 \
-	man7/CC_stop_req.7 \
-	man7/CC_STOP_REQ.7 \
-	man7/CC_stop_req_t.7 \
-	man7/CC_suspend_con.7 \
-	man7/CC_SUSPEND_CON.7 \
-	man7/CC_suspend_con_t.7 \
-	man7/CC_suspend_ind.7 \
-	man7/CC_SUSPEND_IND.7 \
-	man7/CC_suspend_ind_t.7 \
-	man7/CC_suspend_reject_ind.7 \
-	man7/CC_SUSPEND_REJECT_IND.7 \
-	man7/CC_suspend_reject_ind_t.7 \
-	man7/CC_suspend_reject_req.7 \
-	man7/CC_SUSPEND_REJECT_REQ.7 \
-	man7/CC_suspend_reject_req_t.7 \
-	man7/CC_suspend_req.7 \
-	man7/CC_SUSPEND_REQ.7 \
-	man7/CC_suspend_req_t.7 \
-	man7/CC_suspend_res.7 \
-	man7/CC_SUSPEND_RES.7 \
-	man7/CC_suspend_res_t.7 \
-	man7/CC_unbind_req.7 \
-	man7/CC_UNBIND_REQ.7 \
-	man7/CC_unbind_req_t.7 \
-	man7/CC_unblocking_con.7 \
-	man7/CC_UNBLOCKING_CON.7 \
-	man7/CC_unblocking_con_t.7 \
-	man7/CC_unblocking_ind.7 \
-	man7/CC_UNBLOCKING_IND.7 \
-	man7/CC_unblocking_ind_t.7 \
-	man7/CC_unblocking_req.7 \
-	man7/CC_UNBLOCKING_REQ.7 \
-	man7/CC_unblocking_req_t.7 \
-	man7/CC_unblocking_res.7 \
-	man7/CC_UNBLOCKING_RES.7 \
-	man7/CC_unblocking_res_t.7 \
 	man7/cdi_hdlc.7 \
-	man7/CH_attach_req.7 \
-	man7/CH_ATTACH_REQ.7 \
-	man7/CH_attach_req_t.7 \
-	man7/CH_connect_con.7 \
-	man7/CH_CONNECT_CON.7 \
-	man7/CH_connect_con_t.7 \
-	man7/CH_connect_req.7 \
-	man7/CH_CONNECT_REQ.7 \
-	man7/CH_connect_req_t.7 \
-	man7/CH_data_ind.7 \
-	man7/CH_DATA_IND.7 \
-	man7/CH_data_ind_t.7 \
-	man7/CH_data_req.7 \
-	man7/CH_DATA_REQ.7 \
-	man7/CH_data_req_t.7 \
-	man7/CH_detach_req.7 \
-	man7/CH_DETACH_REQ.7 \
-	man7/CH_detach_req_t.7 \
-	man7/CH_disable_con.7 \
-	man7/CH_DISABLE_CON.7 \
-	man7/CH_disable_con_t.7 \
-	man7/CH_disable_ind.7 \
-	man7/CH_DISABLE_IND.7 \
-	man7/CH_disable_ind_t.7 \
-	man7/CH_disable_req.7 \
-	man7/CH_DISABLE_REQ.7 \
-	man7/CH_disable_req_t.7 \
-	man7/CH_disconnect_con.7 \
-	man7/CH_DISCONNECT_CON.7 \
-	man7/CH_disconnect_con_t.7 \
-	man7/CH_disconnect_ind.7 \
-	man7/CH_DISCONNECT_IND.7 \
-	man7/CH_disconnect_ind_t.7 \
-	man7/CH_disconnect_req.7 \
-	man7/CH_DISCONNECT_REQ.7 \
-	man7/CH_disconnect_req_t.7 \
-	man7/CH_enable_con.7 \
-	man7/CH_ENABLE_CON.7 \
-	man7/CH_enable_con_t.7 \
-	man7/CH_enable_req.7 \
-	man7/CH_ENABLE_REQ.7 \
-	man7/CH_enable_req_t.7 \
-	man7/CH_error_ack.7 \
-	man7/CH_ERROR_ACK.7 \
-	man7/CH_error_ack_t.7 \
-	man7/CH_event_ind.7 \
-	man7/CH_EVENT_IND.7 \
-	man7/CH_event_ind_t.7 \
-	man7/chi.7 \
-	man7/CH_info_ack.7 \
-	man7/CH_INFO_ACK.7 \
-	man7/CH_info_ack_t.7 \
-	man7/CH_info_req.7 \
-	man7/CH_INFO_REQ.7 \
-	man7/CH_info_req_t.7 \
-	man7/CH_ok_ack.7 \
-	man7/CH_OK_ACK.7 \
-	man7/CH_ok_ack_t.7 \
-	man7/CH_optmgmt_ack.7 \
-	man7/CH_OPTMGMT_ACK.7 \
-	man7/CH_optmgmt_ack_t.7 \
-	man7/CH_optmgmt_req.7 \
-	man7/CH_OPTMGMT_REQ.7 \
-	man7/CH_optmgmt_req_t.7 \
 	man7/devi.7 \
-	man7/dlpi_dass.7 \
-	man7/dlpi_gr303.7 \
 	man7/dlpi_lapb.7 \
-	man7/dlpi_lapd.7 \
-	man7/dlpi_lapf.7 \
 	man7/h225i.7 \
-	man7/isdni.7 \
 	man7/isupi.7 \
 	man7/isup_socket.7 \
 	man7/lmi.7 \
-	man7/MG_abort_req.7 \
-	man7/MG_ABORT_REQ.7 \
-	man7/MG_abort_req_t.7 \
-	man7/MG_action_con.7 \
-	man7/MG_ACTION_CON.7 \
-	man7/MG_action_con_t.7 \
-	man7/MG_action_ind.7 \
-	man7/MG_ACTION_IND.7 \
-	man7/MG_action_ind_t.7 \
-	man7/MG_action_req.7 \
-	man7/MG_ACTION_REQ.7 \
-	man7/MG_action_req_t.7 \
-	man7/MG_attach_ack.7 \
-	man7/MG_ATTACH_ACK.7 \
-	man7/MG_attach_ack_t.7 \
-	man7/MG_attach_req.7 \
-	man7/MG_ATTACH_REQ.7 \
-	man7/MG_attach_req_t.7 \
-	man7/MG_conn_con.7 \
-	man7/MG_CONN_CON.7 \
-	man7/MG_conn_con_t.7 \
-	man7/MG_conn_req.7 \
-	man7/MG_CONN_REQ.7 \
-	man7/MG_conn_req_t.7 \
-	man7/MG_data_ind.7 \
-	man7/MG_DATA_IND.7 \
-	man7/MG_data_ind_t.7 \
-	man7/MG_data_req.7 \
-	man7/MG_DATA_REQ.7 \
-	man7/MG_data_req_t.7 \
-	man7/MG_detach_req.7 \
-	man7/MG_DETACH_REQ.7 \
-	man7/MG_detach_req_t.7 \
-	man7/MG_discon_con.7 \
-	man7/MG_DISCON_CON.7 \
-	man7/MG_discon_con_t.7 \
-	man7/MG_discon_ind.7 \
-	man7/MG_DISCON_IND.7 \
-	man7/MG_discon_ind_t.7 \
-	man7/MG_discon_req.7 \
-	man7/MG_DISCON_REQ.7 \
-	man7/MG_discon_req_t.7 \
-	man7/MG_error_ack.7 \
-	man7/MG_ERROR_ACK.7 \
-	man7/MG_error_ack_t.7 \
-	man7/mgi.7 \
 	man7/mgi_h248.7 \
-	man7/mgi_mg.7 \
 	man7/mgi_mgcp.7 \
-	man7/MG_info_ack.7 \
-	man7/MG_INFO_ACK.7 \
-	man7/MG_info_ack_t.7 \
-	man7/MG_info_req.7 \
-	man7/MG_INFO_REQ.7 \
-	man7/MG_info_req_t.7 \
-	man7/MG_join_con.7 \
-	man7/MG_JOIN_CON.7 \
-	man7/MG_join_con_t.7 \
-	man7/MG_join_req.7 \
-	man7/MG_JOIN_REQ.7 \
-	man7/MG_join_req_t.7 \
-	man7/MG_leave_con.7 \
-	man7/MG_LEAVE_CON.7 \
-	man7/MG_leave_con_t.7 \
-	man7/MG_leave_ind.7 \
-	man7/MG_LEAVE_IND.7 \
-	man7/MG_leave_ind_t.7 \
-	man7/MG_leave_req.7 \
-	man7/MG_LEAVE_REQ.7 \
-	man7/MG_leave_req_t.7 \
-	man7/MG_notify_ind.7 \
-	man7/MG_NOTIFY_IND.7 \
-	man7/MG_notify_ind_t.7 \
-	man7/MG_notify_req.7 \
-	man7/MG_NOTIFY_REQ.7 \
-	man7/MG_notify_req_t.7 \
-	man7/MG_ok_ack.7 \
-	man7/MG_OK_ACK.7 \
-	man7/MG_ok_ack_t.7 \
-	man7/MG_optmgmt_ack.7 \
-	man7/MG_OPTMGMT_ACK.7 \
-	man7/MG_optmgmt_ack_t.7 \
-	man7/MG_optmgmt_req.7 \
-	man7/MG_OPTMGMT_REQ.7 \
-	man7/MG_optmgmt_req_t.7 \
 	man7/mtp.7 \
 	man7/MTP_ADDR_ACK.7 \
 	man7/MTP_ADDR_REQ.7 \
@@ -727,70 +253,8 @@ ss7_man_MANS = \
 	man7/MTP_TRANSFER_IND.7 \
 	man7/MTP_TRANSFER_REQ.7 \
 	man7/MTP_UNBIND_REQ.7 \
-	man7/MX_attach_req.7 \
-	man7/MX_ATTACH_REQ.7 \
-	man7/MX_attach_req_t.7 \
-	man7/MX_connect_con.7 \
-	man7/MX_CONNECT_CON.7 \
-	man7/MX_connect_con_t.7 \
-	man7/MX_connect_req.7 \
-	man7/MX_CONNECT_REQ.7 \
-	man7/MX_connect_req_t.7 \
-	man7/MX_data_ind.7 \
-	man7/MX_DATA_IND.7 \
-	man7/MX_data_ind_t.7 \
-	man7/MX_data_req.7 \
-	man7/MX_DATA_REQ.7 \
-	man7/MX_data_req_t.7 \
-	man7/MX_detach_req.7 \
-	man7/MX_DETACH_REQ.7 \
-	man7/MX_detach_req_t.7 \
-	man7/MX_disable_con.7 \
-	man7/MX_DISABLE_CON.7 \
-	man7/MX_disable_con_t.7 \
-	man7/MX_disable_ind.7 \
-	man7/MX_DISABLE_IND.7 \
-	man7/MX_disable_ind_t.7 \
-	man7/MX_disable_req.7 \
-	man7/MX_DISABLE_REQ.7 \
-	man7/MX_disable_req_t.7 \
-	man7/MX_disconnect_con.7 \
-	man7/MX_DISCONNECT_CON.7 \
-	man7/MX_disconnect_con_t.7 \
-	man7/MX_disconnect_ind.7 \
-	man7/MX_DISCONNECT_IND.7 \
-	man7/MX_disconnect_ind_t.7 \
-	man7/MX_disconnect_req.7 \
-	man7/MX_DISCONNECT_REQ.7 \
-	man7/MX_disconnect_req_t.7 \
-	man7/MX_enable_con.7 \
-	man7/MX_ENABLE_CON.7 \
-	man7/MX_enable_con_t.7 \
-	man7/MX_enable_req.7 \
-	man7/MX_ENABLE_REQ.7 \
-	man7/MX_enable_req_t.7 \
-	man7/MX_error_ack.7 \
-	man7/MX_ERROR_ACK.7 \
-	man7/MX_error_ack_t.7 \
-	man7/mxi.7 \
-	man7/MX_info_ack.7 \
-	man7/MX_INFO_ACK.7 \
-	man7/MX_info_ack_t.7 \
-	man7/MX_info_req.7 \
-	man7/MX_INFO_REQ.7 \
-	man7/MX_info_req_t.7 \
-	man7/MX_ok_ack.7 \
-	man7/MX_OK_ACK.7 \
-	man7/MX_ok_ack_t.7 \
-	man7/MX_optmgmt_ack.7 \
-	man7/MX_OPTMGMT_ACK.7 \
-	man7/MX_optmgmt_ack_t.7 \
-	man7/MX_optmgmt_req.7 \
-	man7/MX_OPTMGMT_REQ.7 \
-	man7/MX_optmgmt_req_t.7 \
 	man7/npi_iso.7 \
 	man7/npi_mtp.7 \
-	man7/npi_q933.7 \
 	man7/npi_sccp.7 \
 	man7/npi_sscop.7 \
 	man7/rudp.7 \
@@ -994,8 +458,6 @@ ss7_man_MANS = \
 	man8/cpc388.8 \
 	man8/h225.8 \
 	man8/h323confd.8 \
-	man8/isdn.8 \
-	man8/isdnconfd.8 \
 	man8/isup.8 \
 	man8/mgconfd.8 \
 	man8/mtp.8 \
@@ -1483,6 +945,564 @@ sigtran_man_MANS = \
 	man8/tua.8 \
 	man8/uaconfd.8
 
+isdn_man_MANS = \
+	man4/capi.4 \
+	man4/capi_ioctl.4 \
+	man4/dass.4 \
+	man4/dl_gr303.4 \
+	man4/dl_lapd.4 \
+	man4/dl_lapf.4 \
+	man4/dl_v52.4 \
+	man4/dpnss.4 \
+	man4/gr303.4 \
+	man4/gr303_ioctl.4 \
+	man4/idlc.4 \
+	man4/idp.4 \
+	man4/ISDN.4 \
+	man4/isdn.4 \
+	man4/lapd.4 \
+	man4/lapf.4 \
+	man4/q921.4 \
+	man4/q922.4 \
+	man4/q931.4 \
+	man4/v52.4 \
+	man4/v5.4 \
+	man4/v5_ioctl.4 \
+	man7/capi.7 \
+	man7/CC_ADDR_ACK.7 \
+	man7/CC_addr_ack.7 \
+	man7/CC_addr_ack_t.7 \
+	man7/CC_ADDR_REQ.7 \
+	man7/CC_addr_req.7 \
+	man7/CC_addr_req_t.7 \
+	man7/CC_ALERTING_IND.7 \
+	man7/CC_alerting_ind.7 \
+	man7/CC_alerting_ind_t.7 \
+	man7/CC_ALERTING_REQ.7 \
+	man7/CC_alerting_req.7 \
+	man7/CC_alerting_req_t.7 \
+	man7/CC_BIND_ACK.7 \
+	man7/CC_bind_ack.7 \
+	man7/CC_bind_ack_t.7 \
+	man7/CC_BIND_REQ.7 \
+	man7/CC_bind_req.7 \
+	man7/CC_bind_req_t.7 \
+	man7/CC_BLOCKING_CON.7 \
+	man7/CC_blocking_con.7 \
+	man7/CC_blocking_con_t.7 \
+	man7/CC_BLOCKING_IND.7 \
+	man7/CC_blocking_ind.7 \
+	man7/CC_blocking_ind_t.7 \
+	man7/CC_BLOCKING_REQ.7 \
+	man7/CC_blocking_req.7 \
+	man7/CC_blocking_req_t.7 \
+	man7/CC_BLOCKING_RES.7 \
+	man7/CC_blocking_res.7 \
+	man7/CC_blocking_res_t.7 \
+	man7/CC_CALL_FAILURE_IND.7 \
+	man7/CC_call_failure_ind.7 \
+	man7/CC_call_failure_ind_t.7 \
+	man7/CC_CALL_REATTEMPT_IND.7 \
+	man7/CC_call_reattempt_ind.7 \
+	man7/CC_call_reattempt_ind_t.7 \
+	man7/CC_CONNECT_IND.7 \
+	man7/CC_connect_ind.7 \
+	man7/CC_connect_ind_t.7 \
+	man7/CC_CONNECT_REQ.7 \
+	man7/CC_connect_req.7 \
+	man7/CC_connect_req_t.7 \
+	man7/CC_CONT_CHECK_IND.7 \
+	man7/CC_cont_check_ind.7 \
+	man7/CC_cont_check_ind_t.7 \
+	man7/CC_CONT_CHECK_REQ.7 \
+	man7/CC_cont_check_req.7 \
+	man7/CC_cont_check_req_t.7 \
+	man7/CC_CONT_REPORT_IND.7 \
+	man7/CC_cont_report_ind.7 \
+	man7/CC_cont_report_ind_t.7 \
+	man7/CC_CONT_REPORT_REQ.7 \
+	man7/CC_cont_report_req.7 \
+	man7/CC_cont_report_req_t.7 \
+	man7/CC_CONT_TEST_IND.7 \
+	man7/CC_cont_test_ind.7 \
+	man7/CC_cont_test_ind_t.7 \
+	man7/CC_CONT_TEST_REQ.7 \
+	man7/CC_cont_test_req.7 \
+	man7/CC_cont_test_req_t.7 \
+	man7/CC_DATALINK_FAILURE_IND.7 \
+	man7/CC_datalink_failure_ind.7 \
+	man7/CC_datalink_failure_ind_t.7 \
+	man7/CC_DISCONNECT_IND.7 \
+	man7/CC_disconnect_ind.7 \
+	man7/CC_disconnect_ind_t.7 \
+	man7/CC_DISCONNECT_REQ.7 \
+	man7/CC_disconnect_req.7 \
+	man7/CC_disconnect_req_t.7 \
+	man7/CC_ERROR_ACK.7 \
+	man7/CC_error_ack.7 \
+	man7/CC_error_ack_t.7 \
+	man7/CC_ERROR_IND.7 \
+	man7/CC_error_ind.7 \
+	man7/CC_error_ind_t.7 \
+	man7/CC_FACILITY_IND.7 \
+	man7/CC_facility_ind.7 \
+	man7/CC_FACILITY_REQ.7 \
+	man7/CC_facility_req.7 \
+	man7/CC_FORWXFER_IND.7 \
+	man7/CC_forwxfer_ind.7 \
+	man7/CC_forwxfer_ind_t.7 \
+	man7/CC_FORWXFER_REQ.7 \
+	man7/CC_forwxfer_req.7 \
+	man7/CC_forwxfer_req_t.7 \
+	man7/CC_HOLD_CON.7 \
+	man7/CC_hold_con.7 \
+	man7/CC_HOLD_IND.7 \
+	man7/CC_hold_ind.7 \
+	man7/CC_HOLD_REQ.7 \
+	man7/CC_hold_req.7 \
+	man7/CC_HOLD_RES.7 \
+	man7/CC_hold_res.7 \
+	man7/cci.7 \
+	man7/CC_IBI_IND.7 \
+	man7/CC_ibi_ind.7 \
+	man7/CC_ibi_ind_t.7 \
+	man7/CC_IBI_REQ.7 \
+	man7/CC_ibi_req.7 \
+	man7/CC_ibi_req_t.7 \
+	man7/cci_capi.7 \
+	man7/cci_dass.7 \
+	man7/cci_gr303.7 \
+	man7/cci_idlc.7 \
+	man7/cci_isdn.7 \
+	man7/CC_INFO_ACK.7 \
+	man7/CC_info_ack.7 \
+	man7/CC_info_ack_t.7 \
+	man7/CC_INFO_REQ.7 \
+	man7/CC_info_req.7 \
+	man7/CC_info_req_t.7 \
+	man7/CC_INFORMATION_IND.7 \
+	man7/CC_information_ind.7 \
+	man7/CC_information_ind_t.7 \
+	man7/CC_INFORMATION_REQ.7 \
+	man7/CC_information_req.7 \
+	man7/CC_information_req_t.7 \
+	man7/CC_INFO_TIMEOUT_IND.7 \
+	man7/CC_info_timeout_ind.7 \
+	man7/CC_info_timeout_ind_t.7 \
+	man7/CC_MAINT_IND.7 \
+	man7/CC_maint_ind.7 \
+	man7/CC_maint_ind_t.7 \
+	man7/CC_MORE_INFO_IND.7 \
+	man7/CC_more_info_ind.7 \
+	man7/CC_more_info_ind_t.7 \
+	man7/CC_MORE_INFO_REQ.7 \
+	man7/CC_more_info_req.7 \
+	man7/CC_more_info_req_t.7 \
+	man7/CC_NOTIFY_IND.7 \
+	man7/CC_notify_ind.7 \
+	man7/CC_notify_ind_t.7 \
+	man7/CC_NOTIFY_REQ.7 \
+	man7/CC_notify_req.7 \
+	man7/CC_notify_req_t.7 \
+	man7/CC_OK_ACK.7 \
+	man7/CC_ok_ack.7 \
+	man7/CC_ok_ack_t.7 \
+	man7/CC_OPTMGMT_ACK.7 \
+	man7/CC_optmgmt_ack.7 \
+	man7/CC_optmgmt_ack_t.7 \
+	man7/CC_OPTMGMT_REQ.7 \
+	man7/CC_optmgmt_req.7 \
+	man7/CC_optmgmt_req_t.7 \
+	man7/CC_PROCEEDING_IND.7 \
+	man7/CC_proceeding_ind.7 \
+	man7/CC_proceeding_ind_t.7 \
+	man7/CC_PROCEEDING_REQ.7 \
+	man7/CC_proceeding_req.7 \
+	man7/CC_proceeding_req_t.7 \
+	man7/CC_PROGRESS_IND.7 \
+	man7/CC_progress_ind.7 \
+	man7/CC_progress_ind_t.7 \
+	man7/CC_PROGRESS_REQ.7 \
+	man7/CC_progress_req.7 \
+	man7/CC_progress_req_t.7 \
+	man7/CC_QUERY_CON.7 \
+	man7/CC_query_con.7 \
+	man7/CC_query_con_t.7 \
+	man7/CC_QUERY_IND.7 \
+	man7/CC_query_ind.7 \
+	man7/CC_query_ind_t.7 \
+	man7/CC_QUERY_REQ.7 \
+	man7/CC_query_req.7 \
+	man7/CC_query_req_t.7 \
+	man7/CC_QUERY_RES.7 \
+	man7/CC_query_res.7 \
+	man7/CC_query_res_t.7 \
+	man7/CC_REGISTER_IND.7 \
+	man7/CC_register_ind.7 \
+	man7/CC_REGISTER_REQ.7 \
+	man7/CC_register_req.7 \
+	man7/CC_REJECT_IND.7 \
+	man7/CC_reject_ind.7 \
+	man7/CC_reject_ind_t.7 \
+	man7/CC_REJECT_REQ.7 \
+	man7/CC_reject_req.7 \
+	man7/CC_reject_req_t.7 \
+	man7/CC_RELEASE_CON.7 \
+	man7/CC_release_con.7 \
+	man7/CC_release_con_t.7 \
+	man7/CC_RELEASE_IND.7 \
+	man7/CC_release_ind.7 \
+	man7/CC_release_ind_t.7 \
+	man7/CC_RELEASE_REQ.7 \
+	man7/CC_release_req.7 \
+	man7/CC_release_req_t.7 \
+	man7/CC_RELEASE_RES.7 \
+	man7/CC_release_res.7 \
+	man7/CC_release_res_t.7 \
+	man7/CC_RESET_CON.7 \
+	man7/CC_reset_con.7 \
+	man7/CC_reset_con_t.7 \
+	man7/CC_RESET_IND.7 \
+	man7/CC_reset_ind.7 \
+	man7/CC_reset_ind_t.7 \
+	man7/CC_RESET_REQ.7 \
+	man7/CC_reset_req.7 \
+	man7/CC_reset_req_t.7 \
+	man7/CC_RESET_RES.7 \
+	man7/CC_reset_res.7 \
+	man7/CC_reset_res_t.7 \
+	man7/CC_RESTART_CON.7 \
+	man7/CC_restart_con.7 \
+	man7/CC_restart_con_t.7 \
+	man7/CC_RESTART_REQ.7 \
+	man7/CC_restart_req.7 \
+	man7/CC_restart_req_t.7 \
+	man7/CC_RESUME_CON.7 \
+	man7/CC_resume_con.7 \
+	man7/CC_resume_con_t.7 \
+	man7/CC_RESUME_IND.7 \
+	man7/CC_resume_ind.7 \
+	man7/CC_resume_ind_t.7 \
+	man7/CC_RESUME_REJECT_IND.7 \
+	man7/CC_resume_reject_ind.7 \
+	man7/CC_resume_reject_ind_t.7 \
+	man7/CC_RESUME_REJECT_REQ.7 \
+	man7/CC_resume_reject_req.7 \
+	man7/CC_resume_reject_req_t.7 \
+	man7/CC_RESUME_REQ.7 \
+	man7/CC_resume_req.7 \
+	man7/CC_resume_req_t.7 \
+	man7/CC_RESUME_RES.7 \
+	man7/CC_resume_res.7 \
+	man7/CC_resume_res_t.7 \
+	man7/CC_RETRIEVE_CON.7 \
+	man7/CC_retrieve_con.7 \
+	man7/CC_RETRIEVE_IND.7 \
+	man7/CC_retrieve_ind.7 \
+	man7/CC_RETRIEVE_REQ.7 \
+	man7/CC_retrieve_req.7 \
+	man7/CC_RETRIEVE_RES.7 \
+	man7/CC_retrieve_res.7 \
+	man7/CC_SETUP_COMPLETE_IND.7 \
+	man7/CC_setup_complete_ind.7 \
+	man7/CC_setup_complete_ind_t.7 \
+	man7/CC_SETUP_COMPLETE_REQ.7 \
+	man7/CC_setup_complete_req.7 \
+	man7/CC_setup_complete_req_t.7 \
+	man7/CC_SETUP_CON.7 \
+	man7/CC_setup_con.7 \
+	man7/CC_setup_con_t.7 \
+	man7/CC_SETUP_IND.7 \
+	man7/CC_setup_ind.7 \
+	man7/CC_setup_ind_t.7 \
+	man7/CC_SETUP_REQ.7 \
+	man7/CC_setup_req.7 \
+	man7/CC_setup_req_t.7 \
+	man7/CC_SETUP_RES.7 \
+	man7/CC_setup_res.7 \
+	man7/CC_setup_res_t.7 \
+	man7/CC_START_RESET_IND.7 \
+	man7/CC_start_reset_ind.7 \
+	man7/CC_start_reset_ind_t.7 \
+	man7/CC_STATUS_IND.7 \
+	man7/CC_status_ind.7 \
+	man7/CC_status_ind_t.7 \
+	man7/CC_STOP_IND.7 \
+	man7/CC_stop_ind.7 \
+	man7/CC_stop_ind_t.7 \
+	man7/CC_STOP_REQ.7 \
+	man7/CC_stop_req.7 \
+	man7/CC_stop_req_t.7 \
+	man7/CC_SUSPEND_CON.7 \
+	man7/CC_suspend_con.7 \
+	man7/CC_suspend_con_t.7 \
+	man7/CC_SUSPEND_IND.7 \
+	man7/CC_suspend_ind.7 \
+	man7/CC_suspend_ind_t.7 \
+	man7/CC_SUSPEND_REJECT_IND.7 \
+	man7/CC_suspend_reject_ind.7 \
+	man7/CC_suspend_reject_ind_t.7 \
+	man7/CC_SUSPEND_REJECT_REQ.7 \
+	man7/CC_suspend_reject_req.7 \
+	man7/CC_suspend_reject_req_t.7 \
+	man7/CC_SUSPEND_REQ.7 \
+	man7/CC_suspend_req.7 \
+	man7/CC_suspend_req_t.7 \
+	man7/CC_SUSPEND_RES.7 \
+	man7/CC_suspend_res.7 \
+	man7/CC_suspend_res_t.7 \
+	man7/CC_UNBIND_REQ.7 \
+	man7/CC_unbind_req.7 \
+	man7/CC_unbind_req_t.7 \
+	man7/CC_UNBLOCKING_CON.7 \
+	man7/CC_unblocking_con.7 \
+	man7/CC_unblocking_con_t.7 \
+	man7/CC_UNBLOCKING_IND.7 \
+	man7/CC_unblocking_ind.7 \
+	man7/CC_unblocking_ind_t.7 \
+	man7/CC_UNBLOCKING_REQ.7 \
+	man7/CC_unblocking_req.7 \
+	man7/CC_unblocking_req_t.7 \
+	man7/CC_UNBLOCKING_RES.7 \
+	man7/CC_unblocking_res.7 \
+	man7/CC_unblocking_res_t.7 \
+	man7/dlpi_dass.7 \
+	man7/dlpi_gr303.7 \
+	man7/dlpi_lapd.7 \
+	man7/dlpi_lapf.7 \
+	man7/isdni.7 \
+	man7/npi_q933.7 \
+	man8/isdn.8 \
+	man8/isdnconfd.8
+
+voip_man_MANS =
+
+chan_man_MANS = \
+	man4/cd.4 \
+	man4/cd_daed.4 \
+	man4/cd_hdlc.4 \
+	man4/ch.4 \
+	man4/ch_ioctl.4 \
+	man4/chi_ioctl.4 \
+	man4/MG.4 \
+	man4/mg.4 \
+	man4/mg_ioctl.4 \
+	man4/mgi_ioctl.4 \
+	man4/mg-lm.4 \
+	man4/mx.4 \
+	man4/mx_ioctl.4 \
+	man4/mxi_ioctl.4 \
+	man4/mx_sdl.4 \
+	man4/v401p.4 \
+	man7/CH_ATTACH_REQ.7 \
+	man7/CH_attach_req.7 \
+	man7/CH_attach_req_t.7 \
+	man7/CH_CONNECT_CON.7 \
+	man7/CH_connect_con.7 \
+	man7/CH_connect_con_t.7 \
+	man7/CH_CONNECT_REQ.7 \
+	man7/CH_connect_req.7 \
+	man7/CH_connect_req_t.7 \
+	man7/CH_DATA_IND.7 \
+	man7/CH_data_ind.7 \
+	man7/CH_data_ind_t.7 \
+	man7/CH_DATA_REQ.7 \
+	man7/CH_data_req.7 \
+	man7/CH_data_req_t.7 \
+	man7/CH_DETACH_REQ.7 \
+	man7/CH_detach_req.7 \
+	man7/CH_detach_req_t.7 \
+	man7/CH_DISABLE_CON.7 \
+	man7/CH_disable_con.7 \
+	man7/CH_disable_con_t.7 \
+	man7/CH_DISABLE_IND.7 \
+	man7/CH_disable_ind.7 \
+	man7/CH_disable_ind_t.7 \
+	man7/CH_DISABLE_REQ.7 \
+	man7/CH_disable_req.7 \
+	man7/CH_disable_req_t.7 \
+	man7/CH_DISCONNECT_CON.7 \
+	man7/CH_disconnect_con.7 \
+	man7/CH_disconnect_con_t.7 \
+	man7/CH_DISCONNECT_IND.7 \
+	man7/CH_disconnect_ind.7 \
+	man7/CH_disconnect_ind_t.7 \
+	man7/CH_DISCONNECT_REQ.7 \
+	man7/CH_disconnect_req.7 \
+	man7/CH_disconnect_req_t.7 \
+	man7/CH_ENABLE_CON.7 \
+	man7/CH_enable_con.7 \
+	man7/CH_enable_con_t.7 \
+	man7/CH_ENABLE_REQ.7 \
+	man7/CH_enable_req.7 \
+	man7/CH_enable_req_t.7 \
+	man7/CH_ERROR_ACK.7 \
+	man7/CH_error_ack.7 \
+	man7/CH_error_ack_t.7 \
+	man7/CH_EVENT_IND.7 \
+	man7/CH_event_ind.7 \
+	man7/CH_event_ind_t.7 \
+	man7/chi.7 \
+	man7/CH_INFO_ACK.7 \
+	man7/CH_info_ack.7 \
+	man7/CH_info_ack_t.7 \
+	man7/CH_INFO_REQ.7 \
+	man7/CH_info_req.7 \
+	man7/CH_info_req_t.7 \
+	man7/CH_OK_ACK.7 \
+	man7/CH_ok_ack.7 \
+	man7/CH_ok_ack_t.7 \
+	man7/CH_OPTMGMT_ACK.7 \
+	man7/CH_optmgmt_ack.7 \
+	man7/CH_optmgmt_ack_t.7 \
+	man7/CH_OPTMGMT_REQ.7 \
+	man7/CH_optmgmt_req.7 \
+	man7/CH_optmgmt_req_t.7 \
+	man7/MG_ABORT_REQ.7 \
+	man7/MG_abort_req.7 \
+	man7/MG_abort_req_t.7 \
+	man7/MG_ACTION_CON.7 \
+	man7/MG_action_con.7 \
+	man7/MG_action_con_t.7 \
+	man7/MG_ACTION_IND.7 \
+	man7/MG_action_ind.7 \
+	man7/MG_action_ind_t.7 \
+	man7/MG_ACTION_REQ.7 \
+	man7/MG_action_req.7 \
+	man7/MG_action_req_t.7 \
+	man7/MG_ATTACH_ACK.7 \
+	man7/MG_attach_ack.7 \
+	man7/MG_attach_ack_t.7 \
+	man7/MG_ATTACH_REQ.7 \
+	man7/MG_attach_req.7 \
+	man7/MG_attach_req_t.7 \
+	man7/MG_CONN_CON.7 \
+	man7/MG_conn_con.7 \
+	man7/MG_conn_con_t.7 \
+	man7/MG_CONN_REQ.7 \
+	man7/MG_conn_req.7 \
+	man7/MG_conn_req_t.7 \
+	man7/MG_DATA_IND.7 \
+	man7/MG_data_ind.7 \
+	man7/MG_data_ind_t.7 \
+	man7/MG_DATA_REQ.7 \
+	man7/MG_data_req.7 \
+	man7/MG_data_req_t.7 \
+	man7/MG_DETACH_REQ.7 \
+	man7/MG_detach_req.7 \
+	man7/MG_detach_req_t.7 \
+	man7/MG_DISCON_CON.7 \
+	man7/MG_discon_con.7 \
+	man7/MG_discon_con_t.7 \
+	man7/MG_DISCON_IND.7 \
+	man7/MG_discon_ind.7 \
+	man7/MG_discon_ind_t.7 \
+	man7/MG_DISCON_REQ.7 \
+	man7/MG_discon_req.7 \
+	man7/MG_discon_req_t.7 \
+	man7/MG_ERROR_ACK.7 \
+	man7/MG_error_ack.7 \
+	man7/MG_error_ack_t.7 \
+	man7/mgi.7 \
+	man7/mgi_mg.7 \
+	man7/MG_INFO_ACK.7 \
+	man7/MG_info_ack.7 \
+	man7/MG_info_ack_t.7 \
+	man7/MG_INFO_REQ.7 \
+	man7/MG_info_req.7 \
+	man7/MG_info_req_t.7 \
+	man7/MG_JOIN_CON.7 \
+	man7/MG_join_con.7 \
+	man7/MG_join_con_t.7 \
+	man7/MG_JOIN_REQ.7 \
+	man7/MG_join_req.7 \
+	man7/MG_join_req_t.7 \
+	man7/MG_LEAVE_CON.7 \
+	man7/MG_leave_con.7 \
+	man7/MG_leave_con_t.7 \
+	man7/MG_LEAVE_IND.7 \
+	man7/MG_leave_ind.7 \
+	man7/MG_leave_ind_t.7 \
+	man7/MG_LEAVE_REQ.7 \
+	man7/MG_leave_req.7 \
+	man7/MG_leave_req_t.7 \
+	man7/MG_NOTIFY_IND.7 \
+	man7/MG_notify_ind.7 \
+	man7/MG_notify_ind_t.7 \
+	man7/MG_NOTIFY_REQ.7 \
+	man7/MG_notify_req.7 \
+	man7/MG_notify_req_t.7 \
+	man7/MG_OK_ACK.7 \
+	man7/MG_ok_ack.7 \
+	man7/MG_ok_ack_t.7 \
+	man7/MG_OPTMGMT_ACK.7 \
+	man7/MG_optmgmt_ack.7 \
+	man7/MG_optmgmt_ack_t.7 \
+	man7/MG_OPTMGMT_REQ.7 \
+	man7/MG_optmgmt_req.7 \
+	man7/MG_optmgmt_req_t.7 \
+	man7/MX_ATTACH_REQ.7 \
+	man7/MX_attach_req.7 \
+	man7/MX_attach_req_t.7 \
+	man7/MX_CONNECT_CON.7 \
+	man7/MX_connect_con.7 \
+	man7/MX_connect_con_t.7 \
+	man7/MX_CONNECT_REQ.7 \
+	man7/MX_connect_req.7 \
+	man7/MX_connect_req_t.7 \
+	man7/MX_DATA_IND.7 \
+	man7/MX_data_ind.7 \
+	man7/MX_data_ind_t.7 \
+	man7/MX_DATA_REQ.7 \
+	man7/MX_data_req.7 \
+	man7/MX_data_req_t.7 \
+	man7/MX_DETACH_REQ.7 \
+	man7/MX_detach_req.7 \
+	man7/MX_detach_req_t.7 \
+	man7/MX_DISABLE_CON.7 \
+	man7/MX_disable_con.7 \
+	man7/MX_disable_con_t.7 \
+	man7/MX_DISABLE_IND.7 \
+	man7/MX_disable_ind.7 \
+	man7/MX_disable_ind_t.7 \
+	man7/MX_DISABLE_REQ.7 \
+	man7/MX_disable_req.7 \
+	man7/MX_disable_req_t.7 \
+	man7/MX_DISCONNECT_CON.7 \
+	man7/MX_disconnect_con.7 \
+	man7/MX_disconnect_con_t.7 \
+	man7/MX_DISCONNECT_IND.7 \
+	man7/MX_disconnect_ind.7 \
+	man7/MX_disconnect_ind_t.7 \
+	man7/MX_DISCONNECT_REQ.7 \
+	man7/MX_disconnect_req.7 \
+	man7/MX_disconnect_req_t.7 \
+	man7/MX_ENABLE_CON.7 \
+	man7/MX_enable_con.7 \
+	man7/MX_enable_con_t.7 \
+	man7/MX_ENABLE_REQ.7 \
+	man7/MX_enable_req.7 \
+	man7/MX_enable_req_t.7 \
+	man7/MX_ERROR_ACK.7 \
+	man7/MX_error_ack.7 \
+	man7/MX_error_ack_t.7 \
+	man7/mxi.7 \
+	man7/MX_INFO_ACK.7 \
+	man7/MX_info_ack.7 \
+	man7/MX_info_ack_t.7 \
+	man7/MX_INFO_REQ.7 \
+	man7/MX_info_req.7 \
+	man7/MX_info_req_t.7 \
+	man7/MX_OK_ACK.7 \
+	man7/MX_ok_ack.7 \
+	man7/MX_ok_ack_t.7 \
+	man7/MX_OPTMGMT_ACK.7 \
+	man7/MX_optmgmt_ack.7 \
+	man7/MX_optmgmt_ack_t.7 \
+	man7/MX_OPTMGMT_REQ.7 \
+	man7/MX_optmgmt_req.7 \
+	man7/MX_optmgmt_req_t.7
+
 extra_man_MANS	=
 
 man_MANS	= $(ss7_man_MANS)
@@ -1510,6 +1530,15 @@ endif
 if WITH_SIGTRAN
 man_MANS	+= $(sigtran_man_MANS)
 endif
+if WITH_ISDN
+man_MANS	+= $(isdn_man_MANS)
+endif
+if WITH_VOIP
+man_MANS	+= $(voip_man_MANS)
+endif
+if WITH_CHAN
+man_MANS	+= $(chan_man_MANS)
+endif
 
 ss7_dist_noinst_MANS = \
 	man3/cframe.3.man \
@@ -1526,37 +1555,22 @@ ss7_dist_noinst_MANS = \
 	man4/bssap_ioctl.4.man \
 	man4/bua.4.man \
 	man4/bua_ioctl.4.man \
-	man4/capi.4.man \
-	man4/capi_ioctl.4.man \
-	man4/cd.4.man \
-	man4/cd_daed.4.man \
-	man4/cd_hdlc.4.man \
-	man4/ch.4.man \
-	man4/ch_ioctl.4.man \
 	man4/ch-sdl.4.man \
 	man4/ch_x400p.4.man \
 	man4/cpc388.4.man \
-	man4/dass.4.man \
 	man4/dl.4.man \
 	man4/dlb.4.man \
 	man4/dl_dua.4.man \
-	man4/dl_gr303.4.man \
 	man4/dl_gr303ua.4.man \
 	man4/dl_gsma.4.man \
 	man4/dl_h225.4.man \
 	man4/dl_ioctl.4.man \
 	man4/dl_iua.4.man \
 	man4/dl_lapb.4.man \
-	man4/dl_lapd.4.man \
-	man4/dl_lapf.4.man \
-	man4/dl_v52.4.man \
 	man4/dl_v5ua.4.man \
-	man4/dpnss.4.man \
 	man4/dua.4.man \
 	man4/dua_ioctl.4.man \
 	man4/fr.4.man \
-	man4/gr303.4.man \
-	man4/gr303_ioctl.4.man \
 	man4/gr303ua.4.man \
 	man4/gr303ua_ioctl.4.man \
 	man4/gsma.4.man \
@@ -1567,10 +1581,6 @@ ss7_dist_noinst_MANS = \
 	man4/h248_ioctl.4.man \
 	man4/hdlc.4.man \
 	man4/hdlc_ioctl.4.man \
-	man4/idlc.4.man \
-	man4/ISDN.4.man \
-	man4/isdn.4.man \
-	man4/isdn_ioctl.4.man \
 	man4/isua.4.man \
 	man4/isua_ioctl.4.man \
 	man4/isup.4.man \
@@ -1578,8 +1588,6 @@ ss7_dist_noinst_MANS = \
 	man4/iua.4.man \
 	man4/iua_ioctl.4.man \
 	man4/lapb.4.man \
-	man4/lapd.4.man \
-	man4/lapf.4.man \
 	man4/lm.4.man \
 	man4/lmi_ioctl.4.man \
 	man4/m2pa.4.man \
@@ -1612,9 +1620,6 @@ ss7_dist_noinst_MANS = \
 	man4/mx_x400p.4.man \
 	man4/OpenSS7.4.man \
 	man4/pca200e.4.man \
-	man4/q921.4.man \
-	man4/q922.4.man \
-	man4/q931.4.man \
 	man4/rtp.4.man \
 	man4/sccp.4.man \
 	man4/sccp-gtt.4.man \
@@ -1693,9 +1698,6 @@ ss7_dist_noinst_MANS = \
 	man4/tua.4.man \
 	man4/tua_ioctl.4.man \
 	man4/ua_ioctl.4.man \
-	man4/v52.4.man \
-	man4/v5.4.man \
-	man4/v5_ioctl.4.man \
 	man4/v5ua.4.man \
 	man4/v5ua_ioctl.4.man \
 	man4/VOIP.4.man \
@@ -1721,474 +1723,24 @@ ss7_dist_noinst_MANS = \
 	man4/x400p-ss7-sdl.4.man \
 	man4/ss7_undoc.4.man \
 	man7/bicci.7.man \
-	man7/capi.7.man \
-	man7/CC_addr_ack.7.man \
-	man7/CC_ADDR_ACK.7.man \
-	man7/CC_addr_ack_t.7.man \
-	man7/CC_addr_req.7.man \
-	man7/CC_ADDR_REQ.7.man \
-	man7/CC_addr_req_t.7.man \
-	man7/CC_alerting_ind.7.man \
-	man7/CC_ALERTING_IND.7.man \
-	man7/CC_alerting_ind_t.7.man \
-	man7/CC_alerting_req.7.man \
-	man7/CC_ALERTING_REQ.7.man \
-	man7/CC_alerting_req_t.7.man \
-	man7/CC_bind_ack.7.man \
-	man7/CC_BIND_ACK.7.man \
-	man7/CC_bind_ack_t.7.man \
-	man7/CC_bind_req.7.man \
-	man7/CC_BIND_REQ.7.man \
-	man7/CC_bind_req_t.7.man \
-	man7/CC_blocking_con.7.man \
-	man7/CC_BLOCKING_CON.7.man \
-	man7/CC_blocking_con_t.7.man \
-	man7/CC_blocking_ind.7.man \
-	man7/CC_BLOCKING_IND.7.man \
-	man7/CC_blocking_ind_t.7.man \
-	man7/CC_blocking_req.7.man \
-	man7/CC_BLOCKING_REQ.7.man \
-	man7/CC_blocking_req_t.7.man \
-	man7/CC_blocking_res.7.man \
-	man7/CC_BLOCKING_RES.7.man \
-	man7/CC_blocking_res_t.7.man \
-	man7/CC_call_failure_ind.7.man \
-	man7/CC_CALL_FAILURE_IND.7.man \
-	man7/CC_call_failure_ind_t.7.man \
-	man7/CC_call_reattempt_ind.7.man \
-	man7/CC_CALL_REATTEMPT_IND.7.man \
-	man7/CC_call_reattempt_ind_t.7.man \
-	man7/CC_connect_ind.7.man \
-	man7/CC_CONNECT_IND.7.man \
-	man7/CC_connect_ind_t.7.man \
-	man7/CC_connect_req.7.man \
-	man7/CC_CONNECT_REQ.7.man \
-	man7/CC_connect_req_t.7.man \
-	man7/CC_cont_check_ind.7.man \
-	man7/CC_CONT_CHECK_IND.7.man \
-	man7/CC_cont_check_ind_t.7.man \
-	man7/CC_cont_check_req.7.man \
-	man7/CC_CONT_CHECK_REQ.7.man \
-	man7/CC_cont_check_req_t.7.man \
-	man7/CC_cont_report_ind.7.man \
-	man7/CC_CONT_REPORT_IND.7.man \
-	man7/CC_cont_report_ind_t.7.man \
-	man7/CC_cont_report_req.7.man \
-	man7/CC_CONT_REPORT_REQ.7.man \
-	man7/CC_cont_report_req_t.7.man \
-	man7/CC_cont_test_ind.7.man \
-	man7/CC_CONT_TEST_IND.7.man \
-	man7/CC_cont_test_ind_t.7.man \
-	man7/CC_cont_test_req.7.man \
-	man7/CC_CONT_TEST_REQ.7.man \
-	man7/CC_cont_test_req_t.7.man \
-	man7/CC_datalink_failure_ind.7.man \
-	man7/CC_DATALINK_FAILURE_IND.7.man \
-	man7/CC_datalink_failure_ind_t.7.man \
-	man7/CC_disconnect_ind.7.man \
-	man7/CC_DISCONNECT_IND.7.man \
-	man7/CC_disconnect_ind_t.7.man \
-	man7/CC_disconnect_req.7.man \
-	man7/CC_DISCONNECT_REQ.7.man \
-	man7/CC_disconnect_req_t.7.man \
-	man7/CC_error_ack.7.man \
-	man7/CC_ERROR_ACK.7.man \
-	man7/CC_error_ack_t.7.man \
-	man7/CC_error_ind.7.man \
-	man7/CC_ERROR_IND.7.man \
-	man7/CC_error_ind_t.7.man \
-	man7/CC_facility_ind.7.man \
-	man7/CC_FACILITY_IND.7.man \
-	man7/CC_facility_req.7.man \
-	man7/CC_FACILITY_REQ.7.man \
-	man7/CC_forwxfer_ind.7.man \
-	man7/CC_FORWXFER_IND.7.man \
-	man7/CC_forwxfer_ind_t.7.man \
-	man7/CC_forwxfer_req.7.man \
-	man7/CC_FORWXFER_REQ.7.man \
-	man7/CC_forwxfer_req_t.7.man \
-	man7/CC_hold_con.7.man \
-	man7/CC_HOLD_CON.7.man \
-	man7/CC_hold_ind.7.man \
-	man7/CC_HOLD_IND.7.man \
-	man7/CC_hold_req.7.man \
-	man7/CC_HOLD_REQ.7.man \
-	man7/CC_hold_res.7.man \
-	man7/CC_HOLD_RES.7.man \
-	man7/cci.7.man \
 	man7/cci_bicc.7.man \
-	man7/CC_ibi_ind.7.man \
-	man7/CC_IBI_IND.7.man \
-	man7/CC_ibi_ind_t.7.man \
-	man7/CC_ibi_req.7.man \
-	man7/CC_IBI_REQ.7.man \
-	man7/CC_ibi_req_t.7.man \
 	man7/cci_bssap.7.man \
-	man7/cci_capi.7.man \
-	man7/cci_dass.7.man \
-	man7/cci_gr303.7.man \
-	man7/cci_h225.7.man \
 	man7/cci_idlc.7.man \
-	man7/cci_isdn.7.man \
 	man7/cci_isup.7.man \
-	man7/CC_info_ack.7.man \
-	man7/CC_INFO_ACK.7.man \
-	man7/CC_info_ack_t.7.man \
-	man7/CC_info_req.7.man \
-	man7/CC_INFO_REQ.7.man \
-	man7/CC_info_req_t.7.man \
-	man7/CC_information_ind.7.man \
-	man7/CC_INFORMATION_IND.7.man \
-	man7/CC_information_ind_t.7.man \
-	man7/CC_information_req.7.man \
-	man7/CC_INFORMATION_REQ.7.man \
-	man7/CC_information_req_t.7.man \
-	man7/CC_info_timeout_ind.7.man \
-	man7/CC_INFO_TIMEOUT_IND.7.man \
-	man7/CC_info_timeout_ind_t.7.man \
 	man7/cci_sipt.7.man \
-	man7/CC_maint_ind.7.man \
-	man7/CC_MAINT_IND.7.man \
-	man7/CC_maint_ind_t.7.man \
-	man7/CC_more_info_ind.7.man \
-	man7/CC_MORE_INFO_IND.7.man \
-	man7/CC_more_info_ind_t.7.man \
-	man7/CC_more_info_req.7.man \
-	man7/CC_MORE_INFO_REQ.7.man \
-	man7/CC_more_info_req_t.7.man \
-	man7/CC_notify_ind.7.man \
-	man7/CC_NOTIFY_IND.7.man \
-	man7/CC_notify_ind_t.7.man \
-	man7/CC_notify_req.7.man \
-	man7/CC_NOTIFY_REQ.7.man \
-	man7/CC_notify_req_t.7.man \
-	man7/CC_ok_ack.7.man \
-	man7/CC_OK_ACK.7.man \
-	man7/CC_ok_ack_t.7.man \
-	man7/CC_optmgmt_ack.7.man \
-	man7/CC_OPTMGMT_ACK.7.man \
-	man7/CC_optmgmt_ack_t.7.man \
-	man7/CC_optmgmt_req.7.man \
-	man7/CC_OPTMGMT_REQ.7.man \
-	man7/CC_optmgmt_req_t.7.man \
-	man7/CC_proceeding_ind.7.man \
-	man7/CC_PROCEEDING_IND.7.man \
-	man7/CC_proceeding_ind_t.7.man \
-	man7/CC_proceeding_req.7.man \
-	man7/CC_PROCEEDING_REQ.7.man \
-	man7/CC_proceeding_req_t.7.man \
-	man7/CC_progress_ind.7.man \
-	man7/CC_PROGRESS_IND.7.man \
-	man7/CC_progress_ind_t.7.man \
-	man7/CC_progress_req.7.man \
-	man7/CC_PROGRESS_REQ.7.man \
-	man7/CC_progress_req_t.7.man \
-	man7/CC_query_con.7.man \
-	man7/CC_QUERY_CON.7.man \
-	man7/CC_query_con_t.7.man \
-	man7/CC_query_ind.7.man \
-	man7/CC_QUERY_IND.7.man \
-	man7/CC_query_ind_t.7.man \
-	man7/CC_query_req.7.man \
-	man7/CC_QUERY_REQ.7.man \
-	man7/CC_query_req_t.7.man \
-	man7/CC_query_res.7.man \
-	man7/CC_QUERY_RES.7.man \
-	man7/CC_query_res_t.7.man \
-	man7/CC_register_ind.7.man \
-	man7/CC_REGISTER_IND.7.man \
-	man7/CC_register_req.7.man \
-	man7/CC_REGISTER_REQ.7.man \
-	man7/CC_reject_ind.7.man \
-	man7/CC_REJECT_IND.7.man \
-	man7/CC_reject_ind_t.7.man \
-	man7/CC_reject_req.7.man \
-	man7/CC_REJECT_REQ.7.man \
-	man7/CC_reject_req_t.7.man \
-	man7/CC_release_con.7.man \
-	man7/CC_RELEASE_CON.7.man \
-	man7/CC_release_con_t.7.man \
-	man7/CC_release_ind.7.man \
-	man7/CC_RELEASE_IND.7.man \
-	man7/CC_release_ind_t.7.man \
-	man7/CC_release_req.7.man \
-	man7/CC_RELEASE_REQ.7.man \
-	man7/CC_release_req_t.7.man \
-	man7/CC_release_res.7.man \
-	man7/CC_RELEASE_RES.7.man \
-	man7/CC_release_res_t.7.man \
-	man7/CC_reset_con.7.man \
-	man7/CC_RESET_CON.7.man \
-	man7/CC_reset_con_t.7.man \
-	man7/CC_reset_ind.7.man \
-	man7/CC_RESET_IND.7.man \
-	man7/CC_reset_ind_t.7.man \
-	man7/CC_reset_req.7.man \
-	man7/CC_RESET_REQ.7.man \
-	man7/CC_reset_req_t.7.man \
-	man7/CC_reset_res.7.man \
-	man7/CC_RESET_RES.7.man \
-	man7/CC_reset_res_t.7.man \
-	man7/CC_restart_con.7.man \
-	man7/CC_RESTART_CON.7.man \
-	man7/CC_restart_con_t.7.man \
-	man7/CC_restart_req.7.man \
-	man7/CC_RESTART_REQ.7.man \
-	man7/CC_restart_req_t.7.man \
-	man7/CC_resume_con.7.man \
-	man7/CC_RESUME_CON.7.man \
-	man7/CC_resume_con_t.7.man \
-	man7/CC_resume_ind.7.man \
-	man7/CC_RESUME_IND.7.man \
-	man7/CC_resume_ind_t.7.man \
-	man7/CC_resume_reject_ind.7.man \
-	man7/CC_RESUME_REJECT_IND.7.man \
-	man7/CC_resume_reject_ind_t.7.man \
-	man7/CC_resume_reject_req.7.man \
-	man7/CC_RESUME_REJECT_REQ.7.man \
-	man7/CC_resume_reject_req_t.7.man \
-	man7/CC_resume_req.7.man \
-	man7/CC_RESUME_REQ.7.man \
-	man7/CC_resume_req_t.7.man \
-	man7/CC_resume_res.7.man \
-	man7/CC_RESUME_RES.7.man \
-	man7/CC_resume_res_t.7.man \
-	man7/CC_retrieve_con.7.man \
-	man7/CC_RETRIEVE_CON.7.man \
-	man7/CC_retrieve_ind.7.man \
-	man7/CC_RETRIEVE_IND.7.man \
-	man7/CC_retrieve_req.7.man \
-	man7/CC_RETRIEVE_REQ.7.man \
-	man7/CC_retrieve_res.7.man \
-	man7/CC_RETRIEVE_RES.7.man \
-	man7/CC_setup_complete_ind.7.man \
-	man7/CC_SETUP_COMPLETE_IND.7.man \
-	man7/CC_setup_complete_ind_t.7.man \
-	man7/CC_setup_complete_req.7.man \
-	man7/CC_SETUP_COMPLETE_REQ.7.man \
-	man7/CC_setup_complete_req_t.7.man \
-	man7/CC_setup_con.7.man \
-	man7/CC_SETUP_CON.7.man \
-	man7/CC_setup_con_t.7.man \
-	man7/CC_setup_ind.7.man \
-	man7/CC_SETUP_IND.7.man \
-	man7/CC_setup_ind_t.7.man \
-	man7/CC_setup_req.7.man \
-	man7/CC_SETUP_REQ.7.man \
-	man7/CC_setup_req_t.7.man \
-	man7/CC_setup_res.7.man \
-	man7/CC_SETUP_RES.7.man \
-	man7/CC_setup_res_t.7.man \
-	man7/CC_start_reset_ind.7.man \
-	man7/CC_START_RESET_IND.7.man \
-	man7/CC_start_reset_ind_t.7.man \
-	man7/CC_status_ind.7.man \
-	man7/CC_STATUS_IND.7.man \
-	man7/CC_status_ind_t.7.man \
-	man7/CC_stop_ind.7.man \
-	man7/CC_STOP_IND.7.man \
-	man7/CC_stop_ind_t.7.man \
-	man7/CC_stop_req.7.man \
-	man7/CC_STOP_REQ.7.man \
-	man7/CC_stop_req_t.7.man \
-	man7/CC_suspend_con.7.man \
-	man7/CC_SUSPEND_CON.7.man \
-	man7/CC_suspend_con_t.7.man \
-	man7/CC_suspend_ind.7.man \
-	man7/CC_SUSPEND_IND.7.man \
-	man7/CC_suspend_ind_t.7.man \
-	man7/CC_suspend_reject_ind.7.man \
-	man7/CC_SUSPEND_REJECT_IND.7.man \
-	man7/CC_suspend_reject_ind_t.7.man \
-	man7/CC_suspend_reject_req.7.man \
-	man7/CC_SUSPEND_REJECT_REQ.7.man \
-	man7/CC_suspend_reject_req_t.7.man \
-	man7/CC_suspend_req.7.man \
-	man7/CC_SUSPEND_REQ.7.man \
-	man7/CC_suspend_req_t.7.man \
-	man7/CC_suspend_res.7.man \
-	man7/CC_SUSPEND_RES.7.man \
-	man7/CC_suspend_res_t.7.man \
-	man7/CC_unbind_req.7.man \
-	man7/CC_UNBIND_REQ.7.man \
-	man7/CC_unbind_req_t.7.man \
-	man7/CC_unblocking_con.7.man \
-	man7/CC_UNBLOCKING_CON.7.man \
-	man7/CC_unblocking_con_t.7.man \
-	man7/CC_unblocking_ind.7.man \
-	man7/CC_UNBLOCKING_IND.7.man \
-	man7/CC_unblocking_ind_t.7.man \
-	man7/CC_unblocking_req.7.man \
-	man7/CC_UNBLOCKING_REQ.7.man \
-	man7/CC_unblocking_req_t.7.man \
-	man7/CC_unblocking_res.7.man \
-	man7/CC_UNBLOCKING_RES.7.man \
-	man7/CC_unblocking_res_t.7.man \
 	man7/cdi_hdlc.7.man \
-	man7/CH_attach_req.7.man \
-	man7/CH_ATTACH_REQ.7.man \
-	man7/CH_attach_req_t.7.man \
-	man7/CH_connect_con.7.man \
-	man7/CH_CONNECT_CON.7.man \
-	man7/CH_connect_con_t.7.man \
-	man7/CH_connect_req.7.man \
-	man7/CH_CONNECT_REQ.7.man \
-	man7/CH_connect_req_t.7.man \
-	man7/CH_data_ind.7.man \
-	man7/CH_DATA_IND.7.man \
-	man7/CH_data_ind_t.7.man \
-	man7/CH_data_req.7.man \
-	man7/CH_DATA_REQ.7.man \
-	man7/CH_data_req_t.7.man \
-	man7/CH_detach_req.7.man \
-	man7/CH_DETACH_REQ.7.man \
-	man7/CH_detach_req_t.7.man \
-	man7/CH_disable_con.7.man \
-	man7/CH_DISABLE_CON.7.man \
-	man7/CH_disable_con_t.7.man \
-	man7/CH_disable_ind.7.man \
-	man7/CH_DISABLE_IND.7.man \
-	man7/CH_disable_ind_t.7.man \
-	man7/CH_disable_req.7.man \
-	man7/CH_DISABLE_REQ.7.man \
-	man7/CH_disable_req_t.7.man \
-	man7/CH_disconnect_con.7.man \
-	man7/CH_DISCONNECT_CON.7.man \
-	man7/CH_disconnect_con_t.7.man \
-	man7/CH_disconnect_ind.7.man \
-	man7/CH_DISCONNECT_IND.7.man \
-	man7/CH_disconnect_ind_t.7.man \
-	man7/CH_disconnect_req.7.man \
-	man7/CH_DISCONNECT_REQ.7.man \
-	man7/CH_disconnect_req_t.7.man \
-	man7/CH_enable_con.7.man \
-	man7/CH_ENABLE_CON.7.man \
-	man7/CH_enable_con_t.7.man \
-	man7/CH_enable_req.7.man \
-	man7/CH_ENABLE_REQ.7.man \
-	man7/CH_enable_req_t.7.man \
-	man7/CH_error_ack.7.man \
-	man7/CH_ERROR_ACK.7.man \
-	man7/CH_error_ack_t.7.man \
-	man7/CH_event_ind.7.man \
-	man7/CH_EVENT_IND.7.man \
-	man7/CH_event_ind_t.7.man \
-	man7/chi.7.man \
-	man7/CH_info_ack.7.man \
-	man7/CH_INFO_ACK.7.man \
-	man7/CH_info_ack_t.7.man \
-	man7/CH_info_req.7.man \
-	man7/CH_INFO_REQ.7.man \
-	man7/CH_info_req_t.7.man \
-	man7/CH_ok_ack.7.man \
-	man7/CH_OK_ACK.7.man \
-	man7/CH_ok_ack_t.7.man \
-	man7/CH_optmgmt_ack.7.man \
-	man7/CH_OPTMGMT_ACK.7.man \
-	man7/CH_optmgmt_ack_t.7.man \
-	man7/CH_optmgmt_req.7.man \
-	man7/CH_OPTMGMT_REQ.7.man \
-	man7/CH_optmgmt_req_t.7.man \
 	man7/devi.7.man \
-	man7/dlpi_dass.7.man \
 	man7/dlpi_dua.7.man \
-	man7/dlpi_gr303.7.man \
 	man7/dlpi_gr303ua.7.man \
 	man7/dlpi_iua.7.man \
 	man7/dlpi_lapb.7.man \
-	man7/dlpi_lapd.7.man \
-	man7/dlpi_lapf.7.man \
 	man7/dlpli_gr303ua.7.man \
 	man7/h225i.7.man \
-	man7/isdni.7.man \
 	man7/isupi.7.man \
 	man7/isup_socket.7.man \
 	man7/lmi.7.man \
-	man7/MG_abort_req.7.man \
-	man7/MG_ABORT_REQ.7.man \
-	man7/MG_abort_req_t.7.man \
-	man7/MG_action_con.7.man \
-	man7/MG_ACTION_CON.7.man \
-	man7/MG_action_con_t.7.man \
-	man7/MG_action_ind.7.man \
-	man7/MG_ACTION_IND.7.man \
-	man7/MG_action_ind_t.7.man \
-	man7/MG_action_req.7.man \
-	man7/MG_ACTION_REQ.7.man \
-	man7/MG_action_req_t.7.man \
-	man7/MG_attach_ack.7.man \
-	man7/MG_ATTACH_ACK.7.man \
-	man7/MG_attach_ack_t.7.man \
-	man7/MG_attach_req.7.man \
-	man7/MG_ATTACH_REQ.7.man \
-	man7/MG_attach_req_t.7.man \
-	man7/MG_conn_con.7.man \
-	man7/MG_CONN_CON.7.man \
-	man7/MG_conn_con_t.7.man \
-	man7/MG_conn_req.7.man \
-	man7/MG_CONN_REQ.7.man \
-	man7/MG_conn_req_t.7.man \
-	man7/MG_data_ind.7.man \
-	man7/MG_DATA_IND.7.man \
-	man7/MG_data_ind_t.7.man \
-	man7/MG_data_req.7.man \
-	man7/MG_DATA_REQ.7.man \
-	man7/MG_data_req_t.7.man \
-	man7/MG_detach_req.7.man \
-	man7/MG_DETACH_REQ.7.man \
-	man7/MG_detach_req_t.7.man \
-	man7/MG_discon_con.7.man \
-	man7/MG_DISCON_CON.7.man \
-	man7/MG_discon_con_t.7.man \
-	man7/MG_discon_ind.7.man \
-	man7/MG_DISCON_IND.7.man \
-	man7/MG_discon_ind_t.7.man \
-	man7/MG_discon_req.7.man \
-	man7/MG_DISCON_REQ.7.man \
-	man7/MG_discon_req_t.7.man \
-	man7/MG_error_ack.7.man \
-	man7/MG_ERROR_ACK.7.man \
-	man7/MG_error_ack_t.7.man \
-	man7/mgi.7.man \
 	man7/mgi_h248.7.man \
-	man7/mgi_mg.7.man \
 	man7/mgi_mgcp.7.man \
-	man7/MG_info_ack.7.man \
-	man7/MG_INFO_ACK.7.man \
-	man7/MG_info_ack_t.7.man \
-	man7/MG_info_req.7.man \
-	man7/MG_INFO_REQ.7.man \
-	man7/MG_info_req_t.7.man \
-	man7/MG_join_con.7.man \
-	man7/MG_JOIN_CON.7.man \
-	man7/MG_join_con_t.7.man \
-	man7/MG_join_req.7.man \
-	man7/MG_JOIN_REQ.7.man \
-	man7/MG_join_req_t.7.man \
-	man7/MG_leave_con.7.man \
-	man7/MG_LEAVE_CON.7.man \
-	man7/MG_leave_con_t.7.man \
-	man7/MG_leave_ind.7.man \
-	man7/MG_LEAVE_IND.7.man \
-	man7/MG_leave_ind_t.7.man \
-	man7/MG_leave_req.7.man \
-	man7/MG_LEAVE_REQ.7.man \
-	man7/MG_leave_req_t.7.man \
-	man7/MG_notify_ind.7.man \
-	man7/MG_NOTIFY_IND.7.man \
-	man7/MG_notify_ind_t.7.man \
-	man7/MG_notify_req.7.man \
-	man7/MG_NOTIFY_REQ.7.man \
-	man7/MG_notify_req_t.7.man \
-	man7/MG_ok_ack.7.man \
-	man7/MG_OK_ACK.7.man \
-	man7/MG_ok_ack_t.7.man \
-	man7/MG_optmgmt_ack.7.man \
-	man7/MG_OPTMGMT_ACK.7.man \
-	man7/MG_optmgmt_ack_t.7.man \
-	man7/MG_optmgmt_req.7.man \
-	man7/MG_OPTMGMT_REQ.7.man \
-	man7/MG_optmgmt_req_t.7.man \
 	man7/mtp.7.man \
 	man7/MTP_ADDR_ACK.7.man \
 	man7/MTP_ADDR_REQ.7.man \
@@ -2214,70 +1766,8 @@ ss7_dist_noinst_MANS = \
 	man7/MTP_TRANSFER_IND.7.man \
 	man7/MTP_TRANSFER_REQ.7.man \
 	man7/MTP_UNBIND_REQ.7.man \
-	man7/MX_attach_req.7.man \
-	man7/MX_ATTACH_REQ.7.man \
-	man7/MX_attach_req_t.7.man \
-	man7/MX_connect_con.7.man \
-	man7/MX_CONNECT_CON.7.man \
-	man7/MX_connect_con_t.7.man \
-	man7/MX_connect_req.7.man \
-	man7/MX_CONNECT_REQ.7.man \
-	man7/MX_connect_req_t.7.man \
-	man7/MX_data_ind.7.man \
-	man7/MX_DATA_IND.7.man \
-	man7/MX_data_ind_t.7.man \
-	man7/MX_data_req.7.man \
-	man7/MX_DATA_REQ.7.man \
-	man7/MX_data_req_t.7.man \
-	man7/MX_detach_req.7.man \
-	man7/MX_DETACH_REQ.7.man \
-	man7/MX_detach_req_t.7.man \
-	man7/MX_disable_con.7.man \
-	man7/MX_DISABLE_CON.7.man \
-	man7/MX_disable_con_t.7.man \
-	man7/MX_disable_ind.7.man \
-	man7/MX_DISABLE_IND.7.man \
-	man7/MX_disable_ind_t.7.man \
-	man7/MX_disable_req.7.man \
-	man7/MX_DISABLE_REQ.7.man \
-	man7/MX_disable_req_t.7.man \
-	man7/MX_disconnect_con.7.man \
-	man7/MX_DISCONNECT_CON.7.man \
-	man7/MX_disconnect_con_t.7.man \
-	man7/MX_disconnect_ind.7.man \
-	man7/MX_DISCONNECT_IND.7.man \
-	man7/MX_disconnect_ind_t.7.man \
-	man7/MX_disconnect_req.7.man \
-	man7/MX_DISCONNECT_REQ.7.man \
-	man7/MX_disconnect_req_t.7.man \
-	man7/MX_enable_con.7.man \
-	man7/MX_ENABLE_CON.7.man \
-	man7/MX_enable_con_t.7.man \
-	man7/MX_enable_req.7.man \
-	man7/MX_ENABLE_REQ.7.man \
-	man7/MX_enable_req_t.7.man \
-	man7/MX_error_ack.7.man \
-	man7/MX_ERROR_ACK.7.man \
-	man7/MX_error_ack_t.7.man \
-	man7/mxi.7.man \
-	man7/MX_info_ack.7.man \
-	man7/MX_INFO_ACK.7.man \
-	man7/MX_info_ack_t.7.man \
-	man7/MX_info_req.7.man \
-	man7/MX_INFO_REQ.7.man \
-	man7/MX_info_req_t.7.man \
-	man7/MX_ok_ack.7.man \
-	man7/MX_OK_ACK.7.man \
-	man7/MX_ok_ack_t.7.man \
-	man7/MX_optmgmt_ack.7.man \
-	man7/MX_OPTMGMT_ACK.7.man \
-	man7/MX_optmgmt_ack_t.7.man \
-	man7/MX_optmgmt_req.7.man \
-	man7/MX_OPTMGMT_REQ.7.man \
-	man7/MX_optmgmt_req_t.7.man \
 	man7/npi_iso.7.man \
 	man7/npi_mtp.7.man \
-	man7/npi_q933.7.man \
 	man7/npi_sccp.7.man \
 	man7/npi_sscop.7.man \
 	man7/rudp.7.man \
@@ -2482,8 +1972,6 @@ ss7_dist_noinst_MANS = \
 	man8/cpc388.8.man \
 	man8/h225.8.man \
 	man8/h323confd.8.man \
-	man8/isdn.8.man \
-	man8/isdnconfd.8.man \
 	man8/isua.8.man \
 	man8/isup.8.man \
 	man8/iua.8.man \
@@ -2979,6 +2467,564 @@ sigtran_dist_noinst_MANS = \
 	man8/tua.8.man \
 	man8/uaconfd.8.man
 
+isdn_dist_noinst_MANS = \
+	man4/capi.4.man \
+	man4/capi_ioctl.4.man \
+	man4/dass.4.man \
+	man4/dl_gr303.4.man \
+	man4/dl_lapd.4.man \
+	man4/dl_lapf.4.man \
+	man4/dl_v52.4.man \
+	man4/dpnss.4.man \
+	man4/gr303.4.man \
+	man4/gr303_ioctl.4.man \
+	man4/idlc.4.man \
+	man4/idp.4.man \
+	man4/ISDN.4.man \
+	man4/isdn.4.man \
+	man4/lapd.4.man \
+	man4/lapf.4.man \
+	man4/q921.4.man \
+	man4/q922.4.man \
+	man4/q931.4.man \
+	man4/v52.4.man \
+	man4/v5.4.man \
+	man4/v5_ioctl.4.man \
+	man7/capi.7.man \
+	man7/CC_ADDR_ACK.7.man \
+	man7/CC_addr_ack.7.man \
+	man7/CC_addr_ack_t.7.man \
+	man7/CC_ADDR_REQ.7.man \
+	man7/CC_addr_req.7.man \
+	man7/CC_addr_req_t.7.man \
+	man7/CC_ALERTING_IND.7.man \
+	man7/CC_alerting_ind.7.man \
+	man7/CC_alerting_ind_t.7.man \
+	man7/CC_ALERTING_REQ.7.man \
+	man7/CC_alerting_req.7.man \
+	man7/CC_alerting_req_t.7.man \
+	man7/CC_BIND_ACK.7.man \
+	man7/CC_bind_ack.7.man \
+	man7/CC_bind_ack_t.7.man \
+	man7/CC_BIND_REQ.7.man \
+	man7/CC_bind_req.7.man \
+	man7/CC_bind_req_t.7.man \
+	man7/CC_BLOCKING_CON.7.man \
+	man7/CC_blocking_con.7.man \
+	man7/CC_blocking_con_t.7.man \
+	man7/CC_BLOCKING_IND.7.man \
+	man7/CC_blocking_ind.7.man \
+	man7/CC_blocking_ind_t.7.man \
+	man7/CC_BLOCKING_REQ.7.man \
+	man7/CC_blocking_req.7.man \
+	man7/CC_blocking_req_t.7.man \
+	man7/CC_BLOCKING_RES.7.man \
+	man7/CC_blocking_res.7.man \
+	man7/CC_blocking_res_t.7.man \
+	man7/CC_CALL_FAILURE_IND.7.man \
+	man7/CC_call_failure_ind.7.man \
+	man7/CC_call_failure_ind_t.7.man \
+	man7/CC_CALL_REATTEMPT_IND.7.man \
+	man7/CC_call_reattempt_ind.7.man \
+	man7/CC_call_reattempt_ind_t.7.man \
+	man7/CC_CONNECT_IND.7.man \
+	man7/CC_connect_ind.7.man \
+	man7/CC_connect_ind_t.7.man \
+	man7/CC_CONNECT_REQ.7.man \
+	man7/CC_connect_req.7.man \
+	man7/CC_connect_req_t.7.man \
+	man7/CC_CONT_CHECK_IND.7.man \
+	man7/CC_cont_check_ind.7.man \
+	man7/CC_cont_check_ind_t.7.man \
+	man7/CC_CONT_CHECK_REQ.7.man \
+	man7/CC_cont_check_req.7.man \
+	man7/CC_cont_check_req_t.7.man \
+	man7/CC_CONT_REPORT_IND.7.man \
+	man7/CC_cont_report_ind.7.man \
+	man7/CC_cont_report_ind_t.7.man \
+	man7/CC_CONT_REPORT_REQ.7.man \
+	man7/CC_cont_report_req.7.man \
+	man7/CC_cont_report_req_t.7.man \
+	man7/CC_CONT_TEST_IND.7.man \
+	man7/CC_cont_test_ind.7.man \
+	man7/CC_cont_test_ind_t.7.man \
+	man7/CC_CONT_TEST_REQ.7.man \
+	man7/CC_cont_test_req.7.man \
+	man7/CC_cont_test_req_t.7.man \
+	man7/CC_DATALINK_FAILURE_IND.7.man \
+	man7/CC_datalink_failure_ind.7.man \
+	man7/CC_datalink_failure_ind_t.7.man \
+	man7/CC_DISCONNECT_IND.7.man \
+	man7/CC_disconnect_ind.7.man \
+	man7/CC_disconnect_ind_t.7.man \
+	man7/CC_DISCONNECT_REQ.7.man \
+	man7/CC_disconnect_req.7.man \
+	man7/CC_disconnect_req_t.7.man \
+	man7/CC_ERROR_ACK.7.man \
+	man7/CC_error_ack.7.man \
+	man7/CC_error_ack_t.7.man \
+	man7/CC_ERROR_IND.7.man \
+	man7/CC_error_ind.7.man \
+	man7/CC_error_ind_t.7.man \
+	man7/CC_FACILITY_IND.7.man \
+	man7/CC_facility_ind.7.man \
+	man7/CC_FACILITY_REQ.7.man \
+	man7/CC_facility_req.7.man \
+	man7/CC_FORWXFER_IND.7.man \
+	man7/CC_forwxfer_ind.7.man \
+	man7/CC_forwxfer_ind_t.7.man \
+	man7/CC_FORWXFER_REQ.7.man \
+	man7/CC_forwxfer_req.7.man \
+	man7/CC_forwxfer_req_t.7.man \
+	man7/CC_HOLD_CON.7.man \
+	man7/CC_hold_con.7.man \
+	man7/CC_HOLD_IND.7.man \
+	man7/CC_hold_ind.7.man \
+	man7/CC_HOLD_REQ.7.man \
+	man7/CC_hold_req.7.man \
+	man7/CC_HOLD_RES.7.man \
+	man7/CC_hold_res.7.man \
+	man7/cci.7.man \
+	man7/CC_IBI_IND.7.man \
+	man7/CC_ibi_ind.7.man \
+	man7/CC_ibi_ind_t.7.man \
+	man7/CC_IBI_REQ.7.man \
+	man7/CC_ibi_req.7.man \
+	man7/CC_ibi_req_t.7.man \
+	man7/cci_capi.7.man \
+	man7/cci_dass.7.man \
+	man7/cci_gr303.7.man \
+	man7/cci_idlc.7.man \
+	man7/cci_isdn.7.man \
+	man7/CC_INFO_ACK.7.man \
+	man7/CC_info_ack.7.man \
+	man7/CC_info_ack_t.7.man \
+	man7/CC_INFO_REQ.7.man \
+	man7/CC_info_req.7.man \
+	man7/CC_info_req_t.7.man \
+	man7/CC_INFORMATION_IND.7.man \
+	man7/CC_information_ind.7.man \
+	man7/CC_information_ind_t.7.man \
+	man7/CC_INFORMATION_REQ.7.man \
+	man7/CC_information_req.7.man \
+	man7/CC_information_req_t.7.man \
+	man7/CC_INFO_TIMEOUT_IND.7.man \
+	man7/CC_info_timeout_ind.7.man \
+	man7/CC_info_timeout_ind_t.7.man \
+	man7/CC_MAINT_IND.7.man \
+	man7/CC_maint_ind.7.man \
+	man7/CC_maint_ind_t.7.man \
+	man7/CC_MORE_INFO_IND.7.man \
+	man7/CC_more_info_ind.7.man \
+	man7/CC_more_info_ind_t.7.man \
+	man7/CC_MORE_INFO_REQ.7.man \
+	man7/CC_more_info_req.7.man \
+	man7/CC_more_info_req_t.7.man \
+	man7/CC_NOTIFY_IND.7.man \
+	man7/CC_notify_ind.7.man \
+	man7/CC_notify_ind_t.7.man \
+	man7/CC_NOTIFY_REQ.7.man \
+	man7/CC_notify_req.7.man \
+	man7/CC_notify_req_t.7.man \
+	man7/CC_OK_ACK.7.man \
+	man7/CC_ok_ack.7.man \
+	man7/CC_ok_ack_t.7.man \
+	man7/CC_OPTMGMT_ACK.7.man \
+	man7/CC_optmgmt_ack.7.man \
+	man7/CC_optmgmt_ack_t.7.man \
+	man7/CC_OPTMGMT_REQ.7.man \
+	man7/CC_optmgmt_req.7.man \
+	man7/CC_optmgmt_req_t.7.man \
+	man7/CC_PROCEEDING_IND.7.man \
+	man7/CC_proceeding_ind.7.man \
+	man7/CC_proceeding_ind_t.7.man \
+	man7/CC_PROCEEDING_REQ.7.man \
+	man7/CC_proceeding_req.7.man \
+	man7/CC_proceeding_req_t.7.man \
+	man7/CC_PROGRESS_IND.7.man \
+	man7/CC_progress_ind.7.man \
+	man7/CC_progress_ind_t.7.man \
+	man7/CC_PROGRESS_REQ.7.man \
+	man7/CC_progress_req.7.man \
+	man7/CC_progress_req_t.7.man \
+	man7/CC_QUERY_CON.7.man \
+	man7/CC_query_con.7.man \
+	man7/CC_query_con_t.7.man \
+	man7/CC_QUERY_IND.7.man \
+	man7/CC_query_ind.7.man \
+	man7/CC_query_ind_t.7.man \
+	man7/CC_QUERY_REQ.7.man \
+	man7/CC_query_req.7.man \
+	man7/CC_query_req_t.7.man \
+	man7/CC_QUERY_RES.7.man \
+	man7/CC_query_res.7.man \
+	man7/CC_query_res_t.7.man \
+	man7/CC_REGISTER_IND.7.man \
+	man7/CC_register_ind.7.man \
+	man7/CC_REGISTER_REQ.7.man \
+	man7/CC_register_req.7.man \
+	man7/CC_REJECT_IND.7.man \
+	man7/CC_reject_ind.7.man \
+	man7/CC_reject_ind_t.7.man \
+	man7/CC_REJECT_REQ.7.man \
+	man7/CC_reject_req.7.man \
+	man7/CC_reject_req_t.7.man \
+	man7/CC_RELEASE_CON.7.man \
+	man7/CC_release_con.7.man \
+	man7/CC_release_con_t.7.man \
+	man7/CC_RELEASE_IND.7.man \
+	man7/CC_release_ind.7.man \
+	man7/CC_release_ind_t.7.man \
+	man7/CC_RELEASE_REQ.7.man \
+	man7/CC_release_req.7.man \
+	man7/CC_release_req_t.7.man \
+	man7/CC_RELEASE_RES.7.man \
+	man7/CC_release_res.7.man \
+	man7/CC_release_res_t.7.man \
+	man7/CC_RESET_CON.7.man \
+	man7/CC_reset_con.7.man \
+	man7/CC_reset_con_t.7.man \
+	man7/CC_RESET_IND.7.man \
+	man7/CC_reset_ind.7.man \
+	man7/CC_reset_ind_t.7.man \
+	man7/CC_RESET_REQ.7.man \
+	man7/CC_reset_req.7.man \
+	man7/CC_reset_req_t.7.man \
+	man7/CC_RESET_RES.7.man \
+	man7/CC_reset_res.7.man \
+	man7/CC_reset_res_t.7.man \
+	man7/CC_RESTART_CON.7.man \
+	man7/CC_restart_con.7.man \
+	man7/CC_restart_con_t.7.man \
+	man7/CC_RESTART_REQ.7.man \
+	man7/CC_restart_req.7.man \
+	man7/CC_restart_req_t.7.man \
+	man7/CC_RESUME_CON.7.man \
+	man7/CC_resume_con.7.man \
+	man7/CC_resume_con_t.7.man \
+	man7/CC_RESUME_IND.7.man \
+	man7/CC_resume_ind.7.man \
+	man7/CC_resume_ind_t.7.man \
+	man7/CC_RESUME_REJECT_IND.7.man \
+	man7/CC_resume_reject_ind.7.man \
+	man7/CC_resume_reject_ind_t.7.man \
+	man7/CC_RESUME_REJECT_REQ.7.man \
+	man7/CC_resume_reject_req.7.man \
+	man7/CC_resume_reject_req_t.7.man \
+	man7/CC_RESUME_REQ.7.man \
+	man7/CC_resume_req.7.man \
+	man7/CC_resume_req_t.7.man \
+	man7/CC_RESUME_RES.7.man \
+	man7/CC_resume_res.7.man \
+	man7/CC_resume_res_t.7.man \
+	man7/CC_RETRIEVE_CON.7.man \
+	man7/CC_retrieve_con.7.man \
+	man7/CC_RETRIEVE_IND.7.man \
+	man7/CC_retrieve_ind.7.man \
+	man7/CC_RETRIEVE_REQ.7.man \
+	man7/CC_retrieve_req.7.man \
+	man7/CC_RETRIEVE_RES.7.man \
+	man7/CC_retrieve_res.7.man \
+	man7/CC_SETUP_COMPLETE_IND.7.man \
+	man7/CC_setup_complete_ind.7.man \
+	man7/CC_setup_complete_ind_t.7.man \
+	man7/CC_SETUP_COMPLETE_REQ.7.man \
+	man7/CC_setup_complete_req.7.man \
+	man7/CC_setup_complete_req_t.7.man \
+	man7/CC_SETUP_CON.7.man \
+	man7/CC_setup_con.7.man \
+	man7/CC_setup_con_t.7.man \
+	man7/CC_SETUP_IND.7.man \
+	man7/CC_setup_ind.7.man \
+	man7/CC_setup_ind_t.7.man \
+	man7/CC_SETUP_REQ.7.man \
+	man7/CC_setup_req.7.man \
+	man7/CC_setup_req_t.7.man \
+	man7/CC_SETUP_RES.7.man \
+	man7/CC_setup_res.7.man \
+	man7/CC_setup_res_t.7.man \
+	man7/CC_START_RESET_IND.7.man \
+	man7/CC_start_reset_ind.7.man \
+	man7/CC_start_reset_ind_t.7.man \
+	man7/CC_STATUS_IND.7.man \
+	man7/CC_status_ind.7.man \
+	man7/CC_status_ind_t.7.man \
+	man7/CC_STOP_IND.7.man \
+	man7/CC_stop_ind.7.man \
+	man7/CC_stop_ind_t.7.man \
+	man7/CC_STOP_REQ.7.man \
+	man7/CC_stop_req.7.man \
+	man7/CC_stop_req_t.7.man \
+	man7/CC_SUSPEND_CON.7.man \
+	man7/CC_suspend_con.7.man \
+	man7/CC_suspend_con_t.7.man \
+	man7/CC_SUSPEND_IND.7.man \
+	man7/CC_suspend_ind.7.man \
+	man7/CC_suspend_ind_t.7.man \
+	man7/CC_SUSPEND_REJECT_IND.7.man \
+	man7/CC_suspend_reject_ind.7.man \
+	man7/CC_suspend_reject_ind_t.7.man \
+	man7/CC_SUSPEND_REJECT_REQ.7.man \
+	man7/CC_suspend_reject_req.7.man \
+	man7/CC_suspend_reject_req_t.7.man \
+	man7/CC_SUSPEND_REQ.7.man \
+	man7/CC_suspend_req.7.man \
+	man7/CC_suspend_req_t.7.man \
+	man7/CC_SUSPEND_RES.7.man \
+	man7/CC_suspend_res.7.man \
+	man7/CC_suspend_res_t.7.man \
+	man7/CC_UNBIND_REQ.7.man \
+	man7/CC_unbind_req.7.man \
+	man7/CC_unbind_req_t.7.man \
+	man7/CC_UNBLOCKING_CON.7.man \
+	man7/CC_unblocking_con.7.man \
+	man7/CC_unblocking_con_t.7.man \
+	man7/CC_UNBLOCKING_IND.7.man \
+	man7/CC_unblocking_ind.7.man \
+	man7/CC_unblocking_ind_t.7.man \
+	man7/CC_UNBLOCKING_REQ.7.man \
+	man7/CC_unblocking_req.7.man \
+	man7/CC_unblocking_req_t.7.man \
+	man7/CC_UNBLOCKING_RES.7.man \
+	man7/CC_unblocking_res.7.man \
+	man7/CC_unblocking_res_t.7.man \
+	man7/dlpi_dass.7.man \
+	man7/dlpi_gr303.7.man \
+	man7/dlpi_lapd.7.man \
+	man7/dlpi_lapf.7.man \
+	man7/isdni.7.man \
+	man7/npi_q933.7.man \
+	man8/isdn.8.man \
+	man8/isdnconfd.8.man
+
+voip_dist_noinst_MANS =
+
+chan_dist_noinst_MANS = \
+	man4/cd.4.man \
+	man4/cd_daed.4.man \
+	man4/cd_hdlc.4.man \
+	man4/ch.4.man \
+	man4/ch_ioctl.4.man \
+	man4/chi_ioctl.4.man \
+	man4/MG.4.man \
+	man4/mg.4.man \
+	man4/mg_ioctl.4.man \
+	man4/mgi_ioctl.4.man \
+	man4/mg-lm.4.man \
+	man4/mx.4.man \
+	man4/mx_ioctl.4.man \
+	man4/mxi_ioctl.4.man \
+	man4/mx_sdl.4.man \
+	man4/v401p.4.man \
+	man7/CH_ATTACH_REQ.7.man \
+	man7/CH_attach_req.7.man \
+	man7/CH_attach_req_t.7.man \
+	man7/CH_CONNECT_CON.7.man \
+	man7/CH_connect_con.7.man \
+	man7/CH_connect_con_t.7.man \
+	man7/CH_CONNECT_REQ.7.man \
+	man7/CH_connect_req.7.man \
+	man7/CH_connect_req_t.7.man \
+	man7/CH_DATA_IND.7.man \
+	man7/CH_data_ind.7.man \
+	man7/CH_data_ind_t.7.man \
+	man7/CH_DATA_REQ.7.man \
+	man7/CH_data_req.7.man \
+	man7/CH_data_req_t.7.man \
+	man7/CH_DETACH_REQ.7.man \
+	man7/CH_detach_req.7.man \
+	man7/CH_detach_req_t.7.man \
+	man7/CH_DISABLE_CON.7.man \
+	man7/CH_disable_con.7.man \
+	man7/CH_disable_con_t.7.man \
+	man7/CH_DISABLE_IND.7.man \
+	man7/CH_disable_ind.7.man \
+	man7/CH_disable_ind_t.7.man \
+	man7/CH_DISABLE_REQ.7.man \
+	man7/CH_disable_req.7.man \
+	man7/CH_disable_req_t.7.man \
+	man7/CH_DISCONNECT_CON.7.man \
+	man7/CH_disconnect_con.7.man \
+	man7/CH_disconnect_con_t.7.man \
+	man7/CH_DISCONNECT_IND.7.man \
+	man7/CH_disconnect_ind.7.man \
+	man7/CH_disconnect_ind_t.7.man \
+	man7/CH_DISCONNECT_REQ.7.man \
+	man7/CH_disconnect_req.7.man \
+	man7/CH_disconnect_req_t.7.man \
+	man7/CH_ENABLE_CON.7.man \
+	man7/CH_enable_con.7.man \
+	man7/CH_enable_con_t.7.man \
+	man7/CH_ENABLE_REQ.7.man \
+	man7/CH_enable_req.7.man \
+	man7/CH_enable_req_t.7.man \
+	man7/CH_ERROR_ACK.7.man \
+	man7/CH_error_ack.7.man \
+	man7/CH_error_ack_t.7.man \
+	man7/CH_EVENT_IND.7.man \
+	man7/CH_event_ind.7.man \
+	man7/CH_event_ind_t.7.man \
+	man7/chi.7.man \
+	man7/CH_INFO_ACK.7.man \
+	man7/CH_info_ack.7.man \
+	man7/CH_info_ack_t.7.man \
+	man7/CH_INFO_REQ.7.man \
+	man7/CH_info_req.7.man \
+	man7/CH_info_req_t.7.man \
+	man7/CH_OK_ACK.7.man \
+	man7/CH_ok_ack.7.man \
+	man7/CH_ok_ack_t.7.man \
+	man7/CH_OPTMGMT_ACK.7.man \
+	man7/CH_optmgmt_ack.7.man \
+	man7/CH_optmgmt_ack_t.7.man \
+	man7/CH_OPTMGMT_REQ.7.man \
+	man7/CH_optmgmt_req.7.man \
+	man7/CH_optmgmt_req_t.7.man \
+	man7/MG_ABORT_REQ.7.man \
+	man7/MG_abort_req.7.man \
+	man7/MG_abort_req_t.7.man \
+	man7/MG_ACTION_CON.7.man \
+	man7/MG_action_con.7.man \
+	man7/MG_action_con_t.7.man \
+	man7/MG_ACTION_IND.7.man \
+	man7/MG_action_ind.7.man \
+	man7/MG_action_ind_t.7.man \
+	man7/MG_ACTION_REQ.7.man \
+	man7/MG_action_req.7.man \
+	man7/MG_action_req_t.7.man \
+	man7/MG_ATTACH_ACK.7.man \
+	man7/MG_attach_ack.7.man \
+	man7/MG_attach_ack_t.7.man \
+	man7/MG_ATTACH_REQ.7.man \
+	man7/MG_attach_req.7.man \
+	man7/MG_attach_req_t.7.man \
+	man7/MG_CONN_CON.7.man \
+	man7/MG_conn_con.7.man \
+	man7/MG_conn_con_t.7.man \
+	man7/MG_CONN_REQ.7.man \
+	man7/MG_conn_req.7.man \
+	man7/MG_conn_req_t.7.man \
+	man7/MG_DATA_IND.7.man \
+	man7/MG_data_ind.7.man \
+	man7/MG_data_ind_t.7.man \
+	man7/MG_DATA_REQ.7.man \
+	man7/MG_data_req.7.man \
+	man7/MG_data_req_t.7.man \
+	man7/MG_DETACH_REQ.7.man \
+	man7/MG_detach_req.7.man \
+	man7/MG_detach_req_t.7.man \
+	man7/MG_DISCON_CON.7.man \
+	man7/MG_discon_con.7.man \
+	man7/MG_discon_con_t.7.man \
+	man7/MG_DISCON_IND.7.man \
+	man7/MG_discon_ind.7.man \
+	man7/MG_discon_ind_t.7.man \
+	man7/MG_DISCON_REQ.7.man \
+	man7/MG_discon_req.7.man \
+	man7/MG_discon_req_t.7.man \
+	man7/MG_ERROR_ACK.7.man \
+	man7/MG_error_ack.7.man \
+	man7/MG_error_ack_t.7.man \
+	man7/mgi.7.man \
+	man7/mgi_mg.7.man \
+	man7/MG_INFO_ACK.7.man \
+	man7/MG_info_ack.7.man \
+	man7/MG_info_ack_t.7.man \
+	man7/MG_INFO_REQ.7.man \
+	man7/MG_info_req.7.man \
+	man7/MG_info_req_t.7.man \
+	man7/MG_JOIN_CON.7.man \
+	man7/MG_join_con.7.man \
+	man7/MG_join_con_t.7.man \
+	man7/MG_JOIN_REQ.7.man \
+	man7/MG_join_req.7.man \
+	man7/MG_join_req_t.7.man \
+	man7/MG_LEAVE_CON.7.man \
+	man7/MG_leave_con.7.man \
+	man7/MG_leave_con_t.7.man \
+	man7/MG_LEAVE_IND.7.man \
+	man7/MG_leave_ind.7.man \
+	man7/MG_leave_ind_t.7.man \
+	man7/MG_LEAVE_REQ.7.man \
+	man7/MG_leave_req.7.man \
+	man7/MG_leave_req_t.7.man \
+	man7/MG_NOTIFY_IND.7.man \
+	man7/MG_notify_ind.7.man \
+	man7/MG_notify_ind_t.7.man \
+	man7/MG_NOTIFY_REQ.7.man \
+	man7/MG_notify_req.7.man \
+	man7/MG_notify_req_t.7.man \
+	man7/MG_OK_ACK.7.man \
+	man7/MG_ok_ack.7.man \
+	man7/MG_ok_ack_t.7.man \
+	man7/MG_OPTMGMT_ACK.7.man \
+	man7/MG_optmgmt_ack.7.man \
+	man7/MG_optmgmt_ack_t.7.man \
+	man7/MG_OPTMGMT_REQ.7.man \
+	man7/MG_optmgmt_req.7.man \
+	man7/MG_optmgmt_req_t.7.man \
+	man7/MX_ATTACH_REQ.7.man \
+	man7/MX_attach_req.7.man \
+	man7/MX_attach_req_t.7.man \
+	man7/MX_CONNECT_CON.7.man \
+	man7/MX_connect_con.7.man \
+	man7/MX_connect_con_t.7.man \
+	man7/MX_CONNECT_REQ.7.man \
+	man7/MX_connect_req.7.man \
+	man7/MX_connect_req_t.7.man \
+	man7/MX_DATA_IND.7.man \
+	man7/MX_data_ind.7.man \
+	man7/MX_data_ind_t.7.man \
+	man7/MX_DATA_REQ.7.man \
+	man7/MX_data_req.7.man \
+	man7/MX_data_req_t.7.man \
+	man7/MX_DETACH_REQ.7.man \
+	man7/MX_detach_req.7.man \
+	man7/MX_detach_req_t.7.man \
+	man7/MX_DISABLE_CON.7.man \
+	man7/MX_disable_con.7.man \
+	man7/MX_disable_con_t.7.man \
+	man7/MX_DISABLE_IND.7.man \
+	man7/MX_disable_ind.7.man \
+	man7/MX_disable_ind_t.7.man \
+	man7/MX_DISABLE_REQ.7.man \
+	man7/MX_disable_req.7.man \
+	man7/MX_disable_req_t.7.man \
+	man7/MX_DISCONNECT_CON.7.man \
+	man7/MX_disconnect_con.7.man \
+	man7/MX_disconnect_con_t.7.man \
+	man7/MX_DISCONNECT_IND.7.man \
+	man7/MX_disconnect_ind.7.man \
+	man7/MX_disconnect_ind_t.7.man \
+	man7/MX_DISCONNECT_REQ.7.man \
+	man7/MX_disconnect_req.7.man \
+	man7/MX_disconnect_req_t.7.man \
+	man7/MX_ENABLE_CON.7.man \
+	man7/MX_enable_con.7.man \
+	man7/MX_enable_con_t.7.man \
+	man7/MX_ENABLE_REQ.7.man \
+	man7/MX_enable_req.7.man \
+	man7/MX_enable_req_t.7.man \
+	man7/MX_ERROR_ACK.7.man \
+	man7/MX_error_ack.7.man \
+	man7/MX_error_ack_t.7.man \
+	man7/mxi.7.man \
+	man7/MX_INFO_ACK.7.man \
+	man7/MX_info_ack.7.man \
+	man7/MX_info_ack_t.7.man \
+	man7/MX_INFO_REQ.7.man \
+	man7/MX_info_req.7.man \
+	man7/MX_info_req_t.7.man \
+	man7/MX_OK_ACK.7.man \
+	man7/MX_ok_ack.7.man \
+	man7/MX_ok_ack_t.7.man \
+	man7/MX_OPTMGMT_ACK.7.man \
+	man7/MX_optmgmt_ack.7.man \
+	man7/MX_optmgmt_ack_t.7.man \
+	man7/MX_OPTMGMT_REQ.7.man \
+	man7/MX_optmgmt_req.7.man \
+	man7/MX_optmgmt_req_t.7.man
+
 extra_dist_noinst_MANS	=
 
 dist_noinst_MANS = \
@@ -2989,7 +3035,10 @@ dist_noinst_MANS = \
 	$(xns_dist_noinst_MANS) \
 	$(tli_dist_noinst_MANS) \
 	$(sock_dist_noinst_MANS) \
-	$(sigtran_dist_noinst_MANS)
+	$(sigtran_dist_noinst_MANS) \
+	$(isdn_dist_noinst_MANS) \
+	$(voip_dist_noinst_MANS) \
+	$(chan_dist_noinst_MANS)
 
 ##
 ## These are not used by any function, device or driver but needs to be included in the

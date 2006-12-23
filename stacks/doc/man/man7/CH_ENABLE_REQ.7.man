@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: CH_ENABLE_REQ.7.man,v 0.9.2.5 2006/04/05 09:43:13 brian Exp $
+.\" @(#) $Id: CH_ENABLE_REQ.7.man,v 0.9.2.6 2006/12/23 13:07:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:13 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/23 13:07:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: CH_ENABLE_REQ.7.man,v $
+.\" Revision 0.9.2.6  2006/12/23 13:07:06  brian
+.\" - manual page and other package updates for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:13  brian
 .\" - moved .so line and updated headers
 .\"
@@ -188,6 +191,10 @@ channel service provider.
 .\".RB [ CHADDRBUSY ]
 .\"Address is busy.
 .SH "SEE ALSO"
+.BR CH_ENABLE_CON (7),
+.BR CH_DISABLE_IND (7),
+.BR CH_ERROR_ACK (7),
+.BR CH_OK_ACK (7).
 .SH VERSIONS
 This manpage was written for CHI Version 1.
 .XX

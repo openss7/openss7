@@ -1,8 +1,7 @@
-.so man4/ss7_undoc.4.man
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mgc.4.man,v 0.9.2.1 2006/10/17 11:56:19 brian Exp $
+.\" @(#) $Id: mgc.4.man,v 0.9.2.2 2006/12/23 13:07:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:56:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/23 13:07:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mgc.4.man,v $
+.\" Revision 0.9.2.2  2006/12/23 13:07:30  brian
+.\" - manual page and other package updates for release
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:56:19  brian
 .\" - copied files into new packages from strss7 package
 .\"
@@ -79,7 +81,6 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so strvoip.macros
-.R1
 .\"
 .\"
 .TH MGC 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
