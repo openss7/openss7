@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlb.4.man,v 0.9.2.6 2006/12/27 16:35:53 brian Exp $
+.\" @(#) $Id: slpmod.4.man,v 0.9.2.1 2006/12/27 16:35:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -57,12 +57,9 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: dlb.4.man,v $
-.\" Revision 0.9.2.6  2006/12/27 16:35:53  brian
+.\" $Log: slpmod.4.man,v $
+.\" Revision 0.9.2.1  2006/12/27 16:35:53  brian
 .\" - added slpmod module and fixups for make check target
-.\"
-.\" Revision 0.9.2.5  2006/04/05 09:43:03  brian
-.\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
 .R1
@@ -80,89 +77,170 @@ sort-adjacent-labels
 .so strss7.macros
 .\"
 .\"
-.TH DLB 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.TH SLPMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
 .\"
 .\"
 .SH NAME
-.B dlb
-\- dlb \fISTREAMS\fP device
+.B slpmod
+\- SS7 Signalling Link Pipe Module
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <unistd.h>
-.br
 .B #include <sys/stropts.h>
-.HP 12
-.BI "int " fd " = open(" /dev/dlb ", " oflag );
+.br
+.B #include <sys/sli.h>
+.HP 8
+.BI "int " pfds[2] ;
+.HP
+.BI "int pipe(" pfds ");
+.HP
+.BI "int ioctl(" pfds[0] ", " \fRI_PUSH\fP ", " \(lqslpmod\(rq );
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.I fd
-is a file descriptor for an dlb stream opened using the
-.BR open (2)
-system call on one of the following devices:
-.TP
-.RI \*(lq /dev/dlb \*(rq
-This device is accessible to all users.
+.B slpmod
+is a
+.I STREAMS
+module that is pushed over one end of a
+.IR STREAMS -based
+bidirectional
+.BR pipe (4)
+to form a pseudo-Signalling Link similar to
+.I ITU-T Recomendation Q.703
+.[
+q703
+.]
+or
+.IR "ANSI T1.111.3" .
+.[
+t1.111
+.]
+Both ends of the pipe with the
+.B slpmod
+module pushed, present the Signalling Link Interface (SLI),
+.BR sli (7),
+service interface and emulate either end of a signalling link.
 .PP
-The
-.B dlb
-device is characterized by the following behavior:
+.B slpmod
+is implemented as a
+.IR STREAMS (4)
+pushable module.
+The module is pushed over one end of a
+.BR pipe (4)
+Stream using the
+.I I_PUSH
+command of
+.BR streamio (7),
+to provide the
+.BR sli (7)
+interface.
+Once pushed, the module may be configured using
+.BR sli_ioctl (4),
+and provides a Stream providing the
+.B SLI
+protocol service interface using the SL-primitives of the Signalling Link
+Interface described in
+.BR sli (7).
 .\"
 .\"
 .SH USAGE
 .PP
+The major purpose of the
+.B slpmod
+module is to transform a
+.IR STREAMS -based
+.BR pipe (4)
+into a pseudo-signalling link that can be used use to connect virtual MTP signalling
+points within the same host while retaining full signalling link service
+interface and semantics.
+.PP
+To create one of these pseudo signalling links, a
+.IR STREAMS -based
+.BR pipe (4)
+is opened using the
+.BR pipe (2s)
+command.  Then the
+.B slpmod
+module is pushed on one end (either end) of the pipe.  Once pushed, the pipe
+then appears as a signalling link presenting the Signalling Link Interface
+(SLI),
+.BR sli (7),
+service interface on either end of the pipe.
+.PP
+Each pipe end can then be linked under an
+.BR mtp (4)
+multiplexing driver using the
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+.BR streamio (7)
+commands.
 The
-.B dlb
-device can be opened when no other suitable device exists and modules may be
-pushed on the
-.B dlb
-device.
+.BR mtp (4)
+driver will not be able to (not does it need to) distinguish between a real
+SS7 signalling link between to two points and the pipe end with the
+.B slpmod
+module pushed.
+.PP
+The two major uses of the
+.B slpmod
+module are to create pseudo-signalling links for testing of the
+.BR mtp (4)
+multiplexing driver, and to provide a high-speed mechanism for interconnecting
+virtual signaling points within a host.
 .\"
 .\"
 .SH IOCTLS
 .PP
-Not defined yet.
-.\"
-.\"
-.SH EXAMPLES
-.PP
-No examples yet.
-.\"
-.\"
-.SH DEVICES
-.PP
-.B /dev/dlb
+A pipe Stream with the
+.B slpmod
+module pushed supports a set of management IO controls using
+.BR ioctl (2)
+system calls on either Stream.
+These management controls are documented in
+.BR lmi_ioctl (4)
+and
+.BR sli_ioctl (4).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR nuls (4),
+.BR SS7 (4),
+.BR sl (4),
+.BR lmi (7),
+.BR sli (7),
+.BR lmi_ioctl (4),
+.BR sli_ioctl (4).
 .\"
 .\"
-.SH BUGS
+.SH FILES
 .PP
-THIS MANUAL PAGE IS INCOMPLETE AND NEEDS TO BE COMPLETED.
+.BR <ss7/sli.h> ,
+.BR <ss7/sli_ioctl.h> .
 .\"
 .\"
-.SH COMPATIBILITY
+.SH VERSIONS
 .PP
-None.
+The SL interface is specific to the
+.B OpenSS7
+SS7 stack.
+.B slpmod
+supports Version 2 of the interface.
 .\"
 .\"
-.SH CONFORMANCE
-.PP
-None.
-.\"
-.\"
-.SH HISTORY
-.PP
-None.
-.\"
+.XX
+.[
+q703
+.]
+.[
+t1.111
+.]
 .\"
 .[
 $LIST$
 .]
+.\"
 .TI

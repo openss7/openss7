@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2006/12/18 10:50:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2006/12/27 16:35:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/18 10:50:55 $ by $Author: brian $
+# Last Modified $Date: 2006/12/27 16:35:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.81  2006/12/27 16:35:57  brian
+# - added slpmod module and fixups for make check target
+#
 # Revision 0.9.2.80  2006/12/18 10:50:55  brian
 # - subpackaging changes for release
 #
@@ -335,6 +338,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sl/sl.c \
 				  src/modules/sl/sl_mux.c \
 				  src/modules/sl/sm_mod.c \
+				  src/modules/sl/slpmod.c \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/sl_x400p.c \
@@ -644,6 +648,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sl/sl.c \
 				  src/modules/sl/sl_mux.c \
 				  src/modules/sl/sm_mod.c \
+				  src/modules/sl/slpmod.c \
 				  src/modules/ss7ip/sdt_tpi.c \
 				  src/modules/ss7ip/sl_tpi.c \
 				  src/modules/ss7sctp/sdt_sctp.c \

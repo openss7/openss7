@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:10 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/27 16:35:55 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:01:10 $ by $Author: brian $
+ Last Modified $Date: 2006/12/27 16:35:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.17  2006/12/27 16:35:55  brian
+ - added slpmod module and fixups for make check target
+
  Revision 0.9.2.16  2006/05/08 11:01:10  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:10 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/27 16:35:55 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:10 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/27 16:35:55 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -82,7 +85,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:10 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/27 16:35:55 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -91,7 +94,7 @@ static char const ident[] =
 			SL_REVISION	"\n" \
 			SL_COPYRIGHT	"\n" \
 			SL_DEVICE	"\n" \
-			SL_CONTACT
+			SL_CONTACT	"\n"
 #define SL_SPLASH	SL_DESCRIP	"\n" \
 			SL_REVISION	"\n"
 

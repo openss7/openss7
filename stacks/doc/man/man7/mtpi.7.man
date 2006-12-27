@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mtpi.7.man,v 0.9.2.5 2006/04/05 09:43:20 brian Exp $
+.\" @(#) $Id: mtpi.7.man,v 0.9.2.6 2006/12/27 16:36:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:20 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:36:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mtpi.7.man,v $
+.\" Revision 0.9.2.6  2006/12/27 16:36:00  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:20  brian
 .\" - moved .so line and updated headers
 .\"
@@ -77,9 +80,15 @@ sort-adjacent-labels
 .so strss7.macros
 .\"
 .\"
+.\"
+.\"
 .TH MTPI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "MTP Interface (MTPI)"
+.\"
+.\"
 .SH "NAME"
 mtpi \- Message Transfer Part (MTP) Interface (MTPI).
+.\"
+.\"
 .SH "SYNOPSIS"
 .PP
 .B #include <ss7/mtpi.h>
@@ -92,6 +101,8 @@ mtpi \- Message Transfer Part (MTP) Interface (MTPI).
 .HP
 .BI "int " mtp_stream " = open(" /dev/mtp-tpi ", " flags );
 .fi
+.\"
+.\"
 .SH "DESCRIPTION"
 .PP
 .PP
@@ -201,54 +212,56 @@ The Default managed object represents the default options, configuration,
 state, statistics, events and management associated with the Message Transfer
 Part (MTP) provider
 .BR mtp (8).
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_MT
 The MTP User managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_NA
 The Network Appearance managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_SP
 The Signalling Point managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_RS
 The Route Set managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_RL
 The Route List managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_RT
 The Route managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_LS
 The (Combined) Link Set managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_LK
 The Link (Set) managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_SL
 The Signalling Link managed object \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_CB
 The Changeover/Changeback buffer \-
-
+.\"
 .TP
 .B MTP_OBJ_TYPE_CR
 The Controlled Rerouting buffer \-
-
+.\"
+.\"
+.\"
 .SH "LOCAL MANAGEMENT INTERFACE"
 .PP
-
+.\"
 .SS MTP_INFO_REQ
 .PP
 This primitive requests that the MTP return the values of all supported
@@ -294,7 +307,7 @@ Acknowledgement of the primitive with the MTP_INFO_ACK primitive.
 .HP
 .I Non-fatal errors:
 There are no errors associated with the issuance of this primitive.
-
+.\"
 .SS MTP_INFO_ACK
 .PP
 This primitive indicates to the MTP User any relevant protocol-dependent
@@ -318,7 +331,7 @@ typedef struct MTP_info_ack {
         mtp_ulong mtp_serv_type;        /* service type */
         mtp_ulong mtp_version;          /* version of interface */
 } MTP_info_ack_t;
-
+.\"
 #define M_COMS	1		/* Connection-mode MTP service supported */
 #define M_CLMS	2		/* Connection-less MTP service supported */
 \s+2\fR
@@ -368,7 +381,7 @@ Connectionless MTP service provided.
 .B Rules
 .IP \(bu 4
 .IP \(bu 4
-
+.\"
 .SS MTP_ADDR_REQ
 .PP
 Requests that the MTP return the bound and connected MTP addresses.
@@ -411,7 +424,7 @@ Acknowledgement of the primitive with an MTP_ADDR_ACK primitive.
 .HP
 .I Non-fatal errors:
 There are no errors associated with the issuance of this primitive.
-
+.\"
 .SS MTP_ADDR_ACK
 .PP
 This primitive indicates to the MTP User any bound or connected MTP addresses.
@@ -460,7 +473,7 @@ the message block.
 If no local address is bound, the \fImtp_loc_length\fR and \fImtp_rem_length\fR fields will be coded zero (0).
 .IP \(bu 3
 If no remote address is connected, the \fImtp_rem_length\fR field will be coded zero (0).
-
+.\"
 .SS MTP_OPTMGMT_REQ
 .PP
 Requests management of options associated with the requesting stream.
@@ -474,7 +487,7 @@ typedef struct MTP_optmgmt_req {
         mtp_ulong mtp_opt_offset;       /* offset of options */
         mtp_ulong mtp_mgmt_flags;       /* management flags */
 } MTP_optmgmt_req_t;
-
+.\"
 #define MTP_DEFAULT     0UL
 #define MTP_CHECK       1UL
 #define MTP_NEGOTIATE   2UL
@@ -512,7 +525,7 @@ Negotiate the specified options and values.
 .TP
 MTP_CURRENT
 Return the current values of the specified (or all) options.
-
+.\"
 .SS MTP_OPTMGMT_ACK
 .PP
 Returns the results of a previous management option request.
@@ -562,7 +575,7 @@ The success or failure and value of negotiated options as indicated.
 .TP
 MTP_CURRENT
 The current values of selected options as indicated.
-
+.\"
 .SS MTP_BIND_REQ
 .PP
 Binds the requesting stream to an MTP address.
@@ -634,7 +647,7 @@ The length of the bound address.
 .I mtp_addr_offset
 The offset of the bound address from the beginning of the M_PROTO message
 block.
-
+.\"
 .SS MTP_CONN_REQ
 .PP
 .B Format
@@ -660,7 +673,7 @@ Always \fCMTP_CONN_REQ\fR.
 .I mtp_addr_offset
 .TP
 .I mtp_conn_flags
-
+.\"
 .SS MTP_DISCON_REQ
 .PP
 .B Format
@@ -677,11 +690,11 @@ typedef struct MTP_discon_req {
 .TP
 .I mtp_primitive
 Always \fCMTP_DISCON_REQ\fR.
-
+.\"
 .SS MTP_UNBIND_REQ
 .PP
 Unbinds the requested stream from the bound signalling point.
-
+.\"
 .B Format
 .RS
 .PP
@@ -699,7 +712,7 @@ typedef struct MTP_unbind_req {
 .TP
 .I mtp_primitive
 Always \fCMTP_UNBIND_REQ\fR.
-
+.\"
 .SS MTP_OK_ACK
 .PP
 .B Format
@@ -719,7 +732,7 @@ typedef struct MTP_ok_ack {
 Always \fCMTP_OK_ACK\fR.
 .TP
 .I mtp_correct_prim
-
+.\"
 .SS MTP_ERROR_ACK
 .PP
 .B Format
@@ -745,7 +758,8 @@ Always \fCMTP_ERROR_ACK\fR.
 .I mtp_mtpi_error
 .TP
 .I mtp_unix_error
-
+.\"
+.\"
 .SH "PROTOCOL SERVICE INTERFACE"
 .PP
 .SS MTP_TRANSFER_REQ
@@ -776,7 +790,7 @@ Always \fCMTP_TRANSFER_REQ\fR.
 .I mtp_mp
 .TP
 .I mtp_sls
-
+.\"
 .SS MTP_TRANSFER_IND
 .PP
 .B Format
@@ -805,7 +819,7 @@ Always \fCMTP_TRANSFER_IND\fR.
 .I mtp_mp
 .TP
 .I mtp_sls
-
+.\"
 .SS MTP_STATUS_IND
 .PP
 .B Format
@@ -819,17 +833,17 @@ typedef struct MTP_status_ind {
         mtp_ulong mtp_type;             /* type */
         mtp_ulong mtp_status;           /* status */
 } MTP_status_ind_t;
-
+.\"
 /* Type for MTP_STATUS_IND */
 #define MTP_STATUS_TYPE_CONG            0x00    /* MTP-STATUS refers to congestion */
 #define MTP_STATUS_TYPE_UPU             0x01    /* MTP-STATUS referes to user part unavailability */
-
+.\"
 /* Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_UPU */
 #define MTP_STATUS_UPU_UNKNOWN          0x01    /* User part unavailable: unknown */
 #define MTP_STATUS_UPU_UNEQUIPPED       0x02    /* User part unavailable: unequipped remote user. */
 #define MTP_STATUS_UPU_INACCESSIBLE     0x03    /* User part unavailable: inaccessible remote user. 
                                                  */
-
+.\"
 /* Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_CONG */
 #define MTP_STATUS_CONGESTION_LEVEL0    0x00    /* Signalling network congestion level 0 */
 #define MTP_STATUS_CONGESTION_LEVEL1    0x01    /* Signalling network congestion level 1 */
@@ -854,25 +868,25 @@ Always \fCMTP_STATUS_IND\fR.
 .B Flags
 .PP
 Status type:
-
+.\"
 .TP
 MTP_STATUS_TYPE_CONG
 .TP
 MTP_STATUS_TYPE_UPU
-
+.\"
 .PP
 User Part status:
-
+.\"
 .TP
 MTP_STATUS_UPU_UNKNOWN
 .TP
 MTP_STATUS_UPU_UNEQUIPPED
 .TP
 MTP_STATUS_UPU_INACCESSIBLE
-
+.\"
 .PP
 Congestion status:
-
+.\"
 .TP
 MTP_STATUS_CONGESTION_LEVEL0
 .TP
@@ -883,7 +897,7 @@ MTP_STATUS_CONGESTION_LEVEL2
 MTP_STATUS_CONGESTION_LEVEL3
 .TP
 MTP_STATUS_CONGESTION
-
+.\"
 .SS MTP_PAUSE_IND
 .PP
 .B Format
@@ -906,7 +920,7 @@ Always \fCMTP_PAUSE_IND\fR.
 .I mtp_addr_length
 .TP
 .I mtp_addr_offset
-
+.\"
 .SS MTP_RESUME_IND
 .PP
 .B Format
@@ -929,7 +943,7 @@ Always \fCMTP_RESUME_IND\fR.
 .I mtp_addr_length
 .TP
 .I mtp_addr_offset
-
+.\"
 .SS MTP_RESTART_BEGINS_IND
 .PP
 .B Format
@@ -946,7 +960,7 @@ typedef struct MTP_restart_begins_ind {
 .TP
 .I mtp_primitive
 Always \fCMTP_RESTART_BEGINS_IND\fR.
-
+.\"
 .SS MTP_RESTART_COMPLETE_IND
 .PP
 .B Format
@@ -963,7 +977,8 @@ typedef struct MTP_restart_complete_ind {
 .TP
 .I mtp_primitive
 Always \fCMTP_RESTART_COMPLETE_IND\fR.
-
+.\"
+.\"
 .SH "PROTOCOL MANAGEMENT INTERFACE"
 .PP
 .SS "Protocol Options"
@@ -982,10 +997,10 @@ typedef struct mtp_option {
 .RE
 .TP
 .B MTP_IOCGOPTIONS
-
+.\"
 .TP
 .B MTP_IOCSOPTIONS
-
+.\"
 .SS "Protocol Configuration"
 .PP
 .RS
@@ -997,7 +1012,7 @@ typedef struct mtp_config {
         ulong cmd;                              /* configuration command */
         /* followed by object-specific configuration structure */
 } mtp_config_t;
-
+.\"
 #define MTP_GET         0       /* get configuration */
 #define MTP_ADD         1       /* add configuration */
 #define MTP_CHA         2       /* cha configuration */
@@ -1006,53 +1021,53 @@ typedef struct mtp_config {
 .RE
 .TP
 .B MTP_IOCGCONFIG
-
+.\"
 .RS
 .TP
 .B MTP_GET
-
+.\"
 .RE
 .TP
 .B MTP_IOCSCONFIG
-
+.\"
 .RS
 .TP
 .B MTP_ADD
-
+.\"
 .TP
 .B MTP_CHA
-
+.\"
 .TP
 .B MTP_DEL
-
+.\"
 .RE
 .TP
 .B MTP_IOCTCONFIG
-
+.\"
 .RS
 .TP
 .B MTP_ADD
-
+.\"
 .TP
 .B MTP_CHA
-
+.\"
 .TP
 .B MTP_DEL
-
+.\"
 .RE
 .TP
 .B MTP_IOCCCONFIG
-
+.\"
 .RS
 .TP
 .B MTP_ADD
-
+.\"
 .TP
 .B MTP_CHA
-
+.\"
 .TP
 .B MTP_DEL
-
+.\"
 .RE
 .SS "Protocol State"
 .PP
@@ -1071,10 +1086,10 @@ typedef struct mtp_statem {
 .RE
 .TP
 .B MTP_IOCGSTATE
-
+.\"
 .TP
 .B MTP_IOCCMRESET
-
+.\"
 .SS "Protocol Statistics"
 .PP
 .RS
@@ -1091,16 +1106,16 @@ typedef struct mtp_stats {
 .RE
 .TP
 .B MTP_IOCGSTATSP
-
+.\"
 .TP
 .B MTP_IOCSSTATSP
-
+.\"
 .TP
 .B MTP_IOCGSTATS
-
+.\"
 .TP
 .B MTP_IOCCSTATS
-
+.\"
 .SS "Protocol Events"
 .PP
 .RS
@@ -1116,13 +1131,13 @@ typedef struct mtp_notify {
 .RE
 .TP
 .B MTP_IOCGNOTIFY
-
+.\"
 .TP
 .B MTP_IOCSNOTIFY
-
+.\"
 .TP
 .B MTP_IOCCNOTIFY
-
+.\"
 .SS "Protocol Management"
 .PP
 .RS
@@ -1133,7 +1148,7 @@ typedef struct mtp_mgmt {
         ulong id;                               /* object id */
         ulong cmd;                              /* mgmt command */
 } mtp_mgmt_t;
-
+.\"
 #define MTP_MGMT_ALLOW                   0
 #define MTP_MGMT_RESTRICT                1
 #define MTP_MGMT_PROHIBIT                2
@@ -1154,71 +1169,92 @@ typedef struct mtp_mgmt {
 .RE
 .TP
 .B MTP_IOCCMGMT
-
+.\"
 .RS
 .TP
 .B MTP_MGMT_ALLOW
-
+.\"
 .TP
 .B MTP_MGMT_RESTRICT
-
+.\"
 .TP
 .B MTP_MGMT_PROHIBIT
-
+.\"
 .TP
 .B MTP_MGMT_ACTIVATE
-
+.\"
 .TP
 .B MTP_MGMT_DEACTIVATE
-
+.\"
 .TP
 .B MTP_MGMT_BLOCK
-
+.\"
 .TP
 .B MTP_MGMT_UNBLOCK
-
+.\"
 .TP
 .B MTP_MGMT_INHIBIT
-
+.\"
 .TP
 .B MTP_MGMT_UNINHIBIT
-
+.\"
 .TP
 .B MTP_MGMT_CONGEST
-
+.\"
 .TP
 .B MTP_MGMT_UNCONGEST
-
+.\"
 .TP
 .B MTP_MGMT_DANGER
-
+.\"
 .TP
 .B MTP_MGMT_NODANGER
-
+.\"
 .TP
 .B MTP_MGMT_RESTART
-
+.\"
 .TP
 .B MTP_MGMT_RESTARTED
-
+.\"
 .RE
-
+.\"
+.\"
 .SH "IOCTLS"
 .PP
-.SH "ERROR HANDLING"
-.PP
-.SH "NOTES"
-.PP
-.SH "ERRORS"
-.PP
-.SH "STATISTICS"
-.PP
-.SH "CAVEATS"
-.PP
+See
+.BR mtpi_ioctl (4).
+.\"
+.\"
+.\".SH "ERROR HANDLING"
+.\".PP
+.\"
+.\"
+.\".SH "NOTES"
+.\".PP
+.\"
+.\"
+.\".SH "ERRORS"
+.\".PP
+.\"
+.\"
+.\".SH "STATISTICS"
+.\".PP
+.\"
+.\"
+.\".SH "CAVEATS"
+.\".PP
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.SH "VERSIONS"
-.PP
+.BR mtp (4),
+.BR mtpi_ioctl (4).
+.\"
+.\"
+.\".SH "VERSIONS"
+.\".PP
+.\"
+.\"
 .XX
 .[
 q700

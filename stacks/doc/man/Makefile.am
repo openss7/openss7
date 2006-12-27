@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/12/23 13:06:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/12/27 16:35:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/23 13:06:59 $ by $Author: brian $
+# Last Modified $Date: 2006/12/27 16:35:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.34  2006/12/27 16:35:58  brian
+# - added slpmod module and fixups for make check target
+#
 # Revision 0.9.2.33  2006/12/23 13:06:59  brian
 # - manual page and other package updates for release
 #
@@ -101,7 +104,6 @@ ss7_man_MANS = \
 	man4/dl_gsma.4 \
 	man4/dl_h225.4 \
 	man4/dl_ioctl.4 \
-	man4/dl_lapb.4 \
 	man4/fr.4 \
 	man4/gsma.4 \
 	man4/h225.4 \
@@ -114,7 +116,6 @@ ss7_man_MANS = \
 	man4/isdn_ioctl.4 \
 	man4/isup.4 \
 	man4/isup_ioctl.4 \
-	man4/lapb.4 \
 	man4/lm.4 \
 	man4/lmi_ioctl.4 \
 	man4/mgc.4 \
@@ -162,6 +163,7 @@ ss7_man_MANS = \
 	man4/sl_mux.4 \
 	man4/sl_x100p.4 \
 	man4/sl_x400p.4 \
+	man4/slpmod.4 \
 	man4/sm_mod.4 \
 	man4/spm.4 \
 	man4/SS7.4 \
@@ -221,7 +223,6 @@ ss7_man_MANS = \
 	man7/cci_sipt.7 \
 	man7/cdi_hdlc.7 \
 	man7/devi.7 \
-	man7/dlpi_lapb.7 \
 	man7/h225i.7 \
 	man7/isupi.7 \
 	man7/isup_socket.7 \
@@ -253,7 +254,6 @@ ss7_man_MANS = \
 	man7/MTP_TRANSFER_IND.7 \
 	man7/MTP_TRANSFER_REQ.7 \
 	man7/MTP_UNBIND_REQ.7 \
-	man7/npi_iso.7 \
 	man7/npi_mtp.7 \
 	man7/npi_sccp.7 \
 	man7/npi_sscop.7 \
@@ -874,6 +874,12 @@ tli_man_MANS = \
 	man7/T_UNITDATA_IND.7 \
 	man7/T_unitdata_req.7 \
 	man7/T_UNITDATA_REQ.7
+
+iso_man_MANS = \
+	man4/dl_lapb.4 \
+	man4/lapb.4 \
+	man7/dlpi_lapb.7 \
+	man7/npi_iso.7
 
 sock_man_MANS	=
 
@@ -1524,6 +1530,9 @@ endif
 if WITH_TLI
 man_MANS	+= $(tli_man_MANS)
 endif
+if WITH_ISO
+man_MANS	+= $(iso_man_MANS)
+endif
 if WITH_SOCK
 man_MANS	+= $(sock_man_MANS)
 endif
@@ -1566,7 +1575,6 @@ ss7_dist_noinst_MANS = \
 	man4/dl_h225.4.man \
 	man4/dl_ioctl.4.man \
 	man4/dl_iua.4.man \
-	man4/dl_lapb.4.man \
 	man4/dl_v5ua.4.man \
 	man4/dua.4.man \
 	man4/dua_ioctl.4.man \
@@ -1587,7 +1595,6 @@ ss7_dist_noinst_MANS = \
 	man4/isup_ioctl.4.man \
 	man4/iua.4.man \
 	man4/iua_ioctl.4.man \
-	man4/lapb.4.man \
 	man4/lm.4.man \
 	man4/lmi_ioctl.4.man \
 	man4/m2pa.4.man \
@@ -1659,6 +1666,7 @@ ss7_dist_noinst_MANS = \
 	man4/sl_tpi.4.man \
 	man4/sl_x100p.4.man \
 	man4/sl_x400p.4.man \
+	man4/slpmod.4.man \
 	man4/sm_mod.4.man \
 	man4/spm.4.man \
 	man4/SS7.4.man \
@@ -1733,7 +1741,6 @@ ss7_dist_noinst_MANS = \
 	man7/dlpi_dua.7.man \
 	man7/dlpi_gr303ua.7.man \
 	man7/dlpi_iua.7.man \
-	man7/dlpi_lapb.7.man \
 	man7/dlpli_gr303ua.7.man \
 	man7/h225i.7.man \
 	man7/isupi.7.man \
@@ -1766,7 +1773,6 @@ ss7_dist_noinst_MANS = \
 	man7/MTP_TRANSFER_IND.7.man \
 	man7/MTP_TRANSFER_REQ.7.man \
 	man7/MTP_UNBIND_REQ.7.man \
-	man7/npi_iso.7.man \
 	man7/npi_mtp.7.man \
 	man7/npi_sccp.7.man \
 	man7/npi_sscop.7.man \
@@ -2402,6 +2408,12 @@ tli_dist_noinst_MANS = \
 	man7/T_unitdata_req.7.man \
 	man7/T_UNITDATA_REQ.7.man
 
+iso_dist_noinst_MANS = \
+	man4/dl_lapb.4.man \
+	man4/lapb.4.man \
+	man7/dlpi_lapb.7.man \
+	man7/npi_iso.7.man
+
 sock_dist_noinst_MANS	=
 
 sigtran_dist_noinst_MANS = \
@@ -3035,6 +3047,7 @@ dist_noinst_MANS = \
 	$(xns_dist_noinst_MANS) \
 	$(tli_dist_noinst_MANS) \
 	$(sock_dist_noinst_MANS) \
+	$(iso_dist_noinst_MANS) \
 	$(sigtran_dist_noinst_MANS) \
 	$(isdn_dist_noinst_MANS) \
 	$(voip_dist_noinst_MANS) \
@@ -3046,6 +3059,7 @@ dist_noinst_MANS = \
 ##
 MANS_UNUSED = \
 	man3/cframe.3 \
+	man3/xti_sscop.3 \
 	man4/acb56.4 \
 	man4/bicc.4 \
 	man4/bicc_ioctl.4 \
@@ -3082,7 +3096,6 @@ MANS_UNUSED = \
 	man4/isup_ioctl.4 \
 	man4/iua.4 \
 	man4/iua_ioctl.4 \
-	man4/lapb.4 \
 	man4/lapf.4 \
 	man4/m2ua_ioctl.4 \
 	man4/m3pa.4 \
@@ -3160,7 +3173,13 @@ MANS_UNUSED = \
 	man8/tcap.8 \
 	man8/tua.8 \
 	man8/uaconfd.8 \
-	man8/voipconfd.8
+	man8/voipconfd.8 \
+	man9/sctp_datack_ind.9 \
+	man9/sctp_datack_req.9 \
+	man9/sctp_data_ind.9 \
+	man9/sctp_data_req.9 \
+	man9/sctp_exdata_ind.9 \
+	man9/sctp_exdata_req.9
 
 if PUBLIC_RELEASE
 ## PUBLIC_RELEASE

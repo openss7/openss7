@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ss7_undoc.4.man,v 0.9.2.3 2006/04/05 09:43:05 brian Exp $
+.\" @(#) $Id: ss7_undoc.4.man,v 0.9.2.4 2006/12/27 16:35:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:05 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:35:54 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ss7_undoc.4.man,v $
+.\" Revision 0.9.2.4  2006/12/27 16:35:54  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.3  2006/04/05 09:43:05  brian
 .\" - moved .so line and updated headers
 .\"
@@ -77,18 +80,24 @@ sort-adjacent-labels
 .so strss7.macros
 .\"
 .\"
-.TH SS7_UNDOC 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.TH UNDOCUMENTED 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
 .SH NAME
 .B ss7_undoc
-\- undocumented SS7 symbols
+\- undocumented SS7 modules and devices
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBundocumented_symbol\fR()
+\fBundocumented_module\fR
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .hy 6
-These are undocumented SS7 symbols:
+These are undocumented SS7 modules and devices that still need a manual page written for them.
 .TP
 .BR ch ,
 .PD 0
@@ -159,20 +168,30 @@ These are undocumented SS7 symbols:
 .PD
 .\"
 .\"
+.SH USAGE
+.PP
+These symbols are usable, but usage information is not available in manual
+page format.
+.\"
+.\"
 .SH DEVICES
 .PP
+Various.
 .\"
 .\"
 .SH MODULES
 .PP
+Various.
 .\"
 .\"
 .SH IOCTLS
 .PP
+Undocumented.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -182,14 +201,17 @@ These devices and modules need a manual page.
 .\"
 .SH COMPATIBILITY
 .PP
+Unknown.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+Unknown.
 .\"
 .\"
 .SH HISTORY
 .PP
+Unknown.
 .\"
 .\"
 .[

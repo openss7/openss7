@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: bicc_ioctl.4.man,v 0.9.2.8 2006/04/05 09:43:02 brian Exp $
+.\" @(#) $Id: bicc_ioctl.4.man,v 0.9.2.9 2006/12/27 16:35:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:02 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:35:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: bicc_ioctl.4.man,v $
+.\" Revision 0.9.2.9  2006/12/27 16:35:53  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:02  brian
 .\" - moved .so line and updated headers
 .\"
@@ -78,9 +81,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BICC-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B bicc_ioctl
 \- Bearer Independent Call Control (BICC) \- IO Controls
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stropts.h>
@@ -92,6 +99,8 @@ sort-adjacent-labels
 .BI "int " bicc_stream " = open(" \fR/dev/bicc\fI ", " flags );
 .HP
 .BI "int " retval " = ioctl(" bicc_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B BICC-IOCTL
@@ -137,7 +146,13 @@ Signalling point.
 .TP
 .B BICC_OBJ_TYPE_MT
 Message Transfer Part.
+.\"
+.\"
 .SH IOCTLS
+.PP
+Yet to be described.
+.\"
+.\"
 .SH CONFIGURATION
 .PP
 .SS Default
@@ -154,6 +169,8 @@ Message Transfer Part.
 .PP
 .SS "Bearer Circuit"
 .PP
+.\"
+.\"
 .SH TIMERS
 .PP
 .SS "Message Transfer Part"
@@ -168,6 +185,8 @@ Message Transfer Part.
 .PP
 .SS "Bearer Circuit"
 .PP
+.\"
+.\"
 .SH OPTIONS
 .PP
 .SS "Message Transfer Part"
@@ -182,6 +201,8 @@ Message Transfer Part.
 .PP
 .SS "Bearer Circuit"
 .PP
+.\"
+.\"
 .SH STATE
 .PP
 .SS "Message Transfer Part"
@@ -196,6 +217,8 @@ Message Transfer Part.
 .PP
 .SS "Bearer Circuit"
 .PP
+.\"
+.\"
 .SH STATISTICS
 .PP
 .SS "Message Transfer Part"
@@ -210,6 +233,8 @@ Message Transfer Part.
 .PP
 .SS "Bearer Circuit"
 .PP
+.\"
+.\"
 .SH EVENTS
 .PP
 .SS "Message Transfer Part"
@@ -224,25 +249,38 @@ Message Transfer Part.
 .PP
 .SS "Bearer Circuit"
 .PP
+.\"
+.\"
 .SH NOTICES
 .PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH BUGS
 .PP
 .B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH FILES
 .PP
 .BR <ss7/cci.h> ,
 .BR <ss7/bicci.h> ,
 .BR <ss7/bicci_ioctl.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/bicc .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR bicc (4),
 .BR cci (7),
 .BR cci_bicc (7),
 .BR ss7confd (8).
+.\"
+.\"
 .SH VERSIONS
 .PP
 The

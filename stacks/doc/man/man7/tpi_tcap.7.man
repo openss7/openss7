@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tpi_tcap.7.man,v 0.9.2.6 2006/04/05 09:43:21 brian Exp $
+.\" @(#) $Id: tpi_tcap.7.man,v 0.9.2.7 2006/12/27 16:36:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:21 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:36:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tpi_tcap.7.man,v $
+.\" Revision 0.9.2.7  2006/12/27 16:36:01  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:21  brian
 .\" - moved .so line and updated headers
 .\"
@@ -872,8 +875,8 @@ may also be returned in an
 value in reponse to a read or write operation on the stream.
 .\"
 .\"
-.SH "CAVEATS"
-.PP
+.\".SH "CAVEATS"
+.\".PP
 .\"
 .\"
 .SH "BUGS"

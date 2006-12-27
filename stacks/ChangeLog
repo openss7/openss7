@@ -1,3 +1,82 @@
+2006-12-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/isdn/lis.conf: removed
+	* src/modules/mg/lis.conf: removed
+
+	* doc/man/man4/slpmod.4.man: added manpage for slpmod module
+	* src/modules/isdn/lis.conf.in: dynamic configuration
+	* src/modules/mg/lis.conf.in: dynamic configuration
+	* src/modules/sl/slpmod.c: added source for slpmod module
+
+	* Makefile.am: added slpmod
+	* acinclude.m4: added STRISO check
+	* configure.ac: dynamic configuration files added
+	* doc/man/Makefile.am: added slpmod
+	* doc/man/man3/ss7_undoc.3.man: fixup for make check target
+	* doc/man/man4/OpenSS7.4.man: fixup for make check target
+	* doc/man/man4/bicc_ioctl.4.man: fixup for make check target
+	* doc/man/man4/bssap_ioctl.4.man: fixup for make check target
+	* doc/man/man4/dl_ioctl.4.man: fixup for make check target
+	* doc/man/man4/dlb.4.man: fixup for make check target
+	* doc/man/man4/h225_ioctl.4.man: fixup for make check target
+	* doc/man/man4/h248_ioctl.4.man: fixup for make check target
+	* doc/man/man4/hdlc_ioctl.4.man: fixup for make check target
+	* doc/man/man4/isup_ioctl.4.man: fixup for make check target
+	* doc/man/man4/lmi_ioctl.4.man: fixup for make check target
+	* doc/man/man4/mgcp_ioctl.4.man: fixup for make check target
+	* doc/man/man4/mtp_ioctl.4.man: fixup for make check target
+	* doc/man/man4/mx_sdl.4.man: fixup for make check target
+	* doc/man/man4/rtp.4.man: fixup for make check target
+	* doc/man/man4/sccp_ioctl.4.man: fixup for make check target
+	* doc/man/man4/sdl_ioctl.4.man: fixup for make check target
+	* doc/man/man4/sl_ioctl.4.man: fixup for make check target
+	* doc/man/man4/ss7_undoc.4.man: fixup for make check target
+	* doc/man/man4/tcap_ioctl.4.man: fixup for make check target
+	* doc/man/man4/x100p-mx.4.man: fixup for make check target
+	* doc/man/man7/cci_bicc.7.man: fixup for make check target
+	* doc/man/man7/cci_bssap.7.man: fixup for make check target
+	* doc/man/man7/cci_h225.7.man: fixup for make check target
+	* doc/man/man7/cci_isdn.7.man: fixup for make check target
+	* doc/man/man7/cci_isup.7.man: fixup for make check target
+	* doc/man/man7/mtp_socket.7.man: fixup for make check target
+	* doc/man/man7/mtpi.7.man: fixup for make check target
+	* doc/man/man7/sdli_2.7.man: fixup for make check target
+	* doc/man/man7/ss7_undoc.7.man: fixup for make check target
+	* doc/man/man7/tcapi.7.man: fixup for make check target
+	* doc/man/man7/tci_ansi.7.man: fixup for make check target
+	* doc/man/man7/tci_etsi.7.man: fixup for make check target
+	* doc/man/man7/tci_itut.7.man: fixup for make check target
+	* doc/man/man7/tpi_sccp.7.man: fixup for make check target
+	* doc/man/man7/tpi_sscop.7.man: fixup for make check target
+	* doc/man/man7/tpi_tcap.7.man: fixup for make check target
+	* doc/man/man7/tri_ansi.7.man: fixup for make check target
+	* doc/man/man7/tri_etsi.7.man: fixup for make check target
+	* doc/man/man7/tri_itut.7.man: fixup for make check target
+	* doc/man/man8/ss7_undoc.8.man: fixup for make check target
+	* doc/man/man8/test-q781-pipe.8.man: fixup for make check target
+	* doc/man/man8/test-q781.8.man: fixup for make check target
+	* doc/man/man8/test-q784.8.man: fixup for make check target
+	* doc/man/man8/test-tcpc.8.man: fixup for make check target
+	* doc/man/man8/test-tcps.8.man: fixup for make check target
+	* doc/man/man8/test-udpc.8.man: fixup for make check target
+	* doc/man/man8/test-udps.8.man: fixup for make check target
+	* doc/man/man8/test-x100p.8.man: fixup for make check target
+	* doc/man/man8/test-x400p-cap.8.man: fixup for make check target
+	* doc/man/man8/test-x400p-cap2.8.man: fixup for make check target
+	* doc/man/man8/test-x400p-hsl.8.man: fixup for make check target
+	* doc/man/man8/test-x400p-perf.8.man: fixup for make check target
+	* doc/man/man8/test-x400p-sdl.8.man: fixup for make check target
+	* doc/man/man8/test-x400p-sdt.8.man: fixup for make check target
+	* doc/man/man8/test-x400p-sdt2.8.man: fixup for make check target
+	* doc/man/man8/test-x400p-sl.8.man: fixup for make check target
+	* doc/man/man8/test-x400p.8.man: fixup for make check target
+	* doc/man/man9/ss7_undoc.9.man: fixup for make check target
+	* src/include/ss7/mxi_ioctl.h: corrections
+	* src/modules/dl/lis.conf.in: corrections
+	* src/modules/sl/lis.conf: addition for slpmod
+	* src/modules/sl/sl.c: corrections
+	* src/modules/tali/lis.conf.in: corrections
+
 2006-12-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: corrected manpage paths and includes

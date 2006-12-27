@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: bssap_ioctl.4.man,v 0.9.2.6 2006/04/05 09:43:02 brian Exp $
+.\" @(#) $Id: bssap_ioctl.4.man,v 0.9.2.7 2006/12/27 16:35:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:02 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:35:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: bssap_ioctl.4.man,v $
+.\" Revision 0.9.2.7  2006/12/27 16:35:53  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:02  brian
 .\" - moved .so line and updated headers
 .\"
@@ -78,9 +81,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BSSAP-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B bssap_ioctl
 \- Base Station System Application Part (BSSAP) \- IO Controls
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <ss7/cci.h>
@@ -90,6 +97,8 @@ sort-adjacent-labels
 .B #include <ss7/bssap_ioctl.h>
 .HP
 .BI "int " bssap_stream " = open(" \fR/dev/bssap\fI ", " flag );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 The
@@ -106,6 +115,8 @@ Part (BSSAP) Layer 3 protocol as defined in ETSI GSM 04.08.
 provides the definitions of the management objects for the
 .BR bssap (4)
 driver.
+.\"
+.\"
 .SH IOCTLS
 .PP
 This manpage defines the
@@ -565,25 +576,38 @@ typedef struct bssap_stats_msc {
 .B Events
 .PP
 .B Controls
+.\"
+.\"
 .SH NOTICES
 .PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH BUGS
 .PP
 .B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH FILES
 .PP
 .BR <ss7/cci.h> ,
 .BR <ss7/bssapi.h> ,
 .BR <ss7/bssapi_ioctl.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/bssap .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR bssap (4),
 .BR cci (7),
 .BR cci_bssap (7),
 .BR ss7confd (8).
+.\"
+.\"
 .SH VERSIONS
 .PP
 The

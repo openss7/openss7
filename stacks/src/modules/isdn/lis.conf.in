@@ -2,12 +2,12 @@
 ## vim: ft=conf sw=4
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:07 $
+#@WITH_ISDN_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/27 16:35:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#@WITH_ISDN_TRUE@ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+#@WITH_ISDN_TRUE@ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
@@ -47,14 +47,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/18 10:51:07 $ by $Author: brian $
+## Last Modified $Date: 2006/12/27 16:35:51 $ by $Author: brian $
 ##
 ## =============================================================================
 
 ## Driver specifications
 ## -----------------------------------------------------------
 ##	name	    prefix	major	n-minors    n-majors
-driver	isdn	    isdn	*		    
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@driver	isdn	    isdn	*		    
 
 ## Pushable module specifications
 ## -----------------------------------------------------------
@@ -63,16 +63,16 @@ driver	isdn	    isdn	*
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-objname	driver	isdn	    isdn
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	isdn	    isdn
 
 
 ##
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##		name
-loadable	isdn
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	isdn
 
 ##   Node specifications
 ## -----------------------------------------------------------
 ##	name		    type    perm    major	minor
-node	/dev/isdn		c   0666    isdn	0
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@node	/dev/isdn		c   0666    isdn	0

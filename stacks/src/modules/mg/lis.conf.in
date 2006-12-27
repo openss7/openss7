@@ -2,12 +2,12 @@
 ## vim: ft=conf sw=4
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:12 $
+#@WITH_CHAN_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/27 16:35:52 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#@WITH_CHAN_TRUE@ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+#@WITH_CHAN_TRUE@ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
@@ -47,14 +47,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/18 10:51:12 $ by $Author: brian $
+## Last Modified $Date: 2006/12/27 16:35:52 $ by $Author: brian $
 ##
 ## =============================================================================
 
 ## Driver specifications
 ## -----------------------------------------------------------
 ##	name	    prefix	major	n-minors    n-majors
-driver	mg	    mg		*
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@driver	mg	    mg		*
 
 ## Pushable module specifications
 ## -----------------------------------------------------------
@@ -63,18 +63,18 @@ driver	mg	    mg		*
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-objname	module	mg	    mg
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@objname	module	mg	    mg
 
 
 ##
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##		name
-loadable	mg
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@loadable	mg
 
 ##   Node specifications
 ## -----------------------------------------------------------
 ##	name		    type    perm    major	minor
-node	/dev/mg			c   0666    mg		0
-node	/dev/mg-lm		c   0666    mg		1
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@node	/dev/mg			c   0666    mg		0
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@node	/dev/mg-lm		c   0666    mg		1
 

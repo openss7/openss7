@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: OpenSS7.4.man,v 0.9.2.9 2006/04/26 10:45:00 brian Exp $
+.\" @(#) $Id: OpenSS7.4.man,v 0.9.2.10 2006/12/27 16:35:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/26 10:45:00 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:35:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: OpenSS7.4.man,v $
+.\" Revision 0.9.2.10  2006/12/27 16:35:53  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.9  2006/04/26 10:45:00  brian
 .\" - updated manual pages and references
 .\"
@@ -90,14 +93,18 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
+The OpenSS7 stacks provide a wide array of device drviers, pseudo-device
+drivers and modules.  This manual page provides an overview of the major
+device and module groupings and some of the members within each grouping.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .\"
 .\"
-.SS STACKS
+.SS Drivers and Modules
 .PP
+The OpenSS7 stacks provides the following major driver and module groupings:
 .TP
 .BR SS7 (4)
 The
@@ -355,6 +362,7 @@ socksys\fR(4):
 .\"
 .SS Libraries
 .PP
+The OpenSS7 stacks provide the following libraries:
 .TP
 .BR xti "(3), " xnet (3)
 .TP
@@ -372,18 +380,99 @@ This manual page is incomplete.
 .\"
 .SH DEVICES
 .PP
+Need to list these.
 .\"
 .\"
 .SH MODULES
 .PP
+Need to list these.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR SS7 (4),
+.BR isup (4),
+.BR bicc (4),
+.BR tcap (4),
+.BR sccp (4),
+.BR mtp (4),
+.BR sl (4),
+.BR sdt (4),
+.BR sdl (4),
+.BR acb56 (4),
+.BR x100p (4),
+.BR x400p (4),
+.BR pca200e (4),
+.BR cpc388 (4),
+.BR INET (4),
+.BR socksys (4),
+.BR sctp (4),
+.BR sscop (4),
+.BR tcp (4),
+.BR udp (4),
+.BR ip (4),
+.BR timod (4),
+.BR sockmod (4),
+.BR ldl (4),
+.BR SIGTRAN (4),
+.BR bua (4),
+.BR isua (4),
+.BR tua (4),
+.BR sua (4),
+.BR m3ua (4),
+.BR m2ua (4),
+.BR m2pa (4),
+.BR iua (4),
+.BR dua (4),
+.BR v5ua (4),
+.BR gr303ua (4),
+.BR ISDN (4),
+.BR isdn (4),
+.BR capi (4),
+.BR v5 (4),
+.BR gr303 (4),
+.BR dl (4),
+.BR hdlc (4),
+.BR x100p (4),
+.BR x400p (4),
+.BR pca200e (4),
+.BR cpc388 (4),
+.BR VOIP (4),
+.BR h225 (4),
+.BR sipt (4),
+.BR bicc (4),
+.BR MG (4),
+.BR mgc (4),
+.BR mg (4),
+.BR mgcp (4),
+.BR h248 (4),
+.BR mx (4),
+.BR rt (4),
+.BR x100p (4),
+.BR x400p (4),
+.BR pca200e (4),
+.BR cpc388 (4),
+.BR STREAMS (4),
+.BR fifo (4),
+.BR clone (4),
+.BR sad (4),
+.BR ldl (4),
+.BR inet (4),
+.BR pipemod (4),
+.BR timod (4),
+.BR sockmod (4),
+.BR socksys (4),
+.BR xti (3),
+.BR xnet (3),
+.BR sockets (3),
+.BR cframe (3),
+.BR OpenSwitch (3).
 .\"
 .\"
-.SH VERSIONS
-.PP
+.\".SH VERSIONS
+.\".PP
+.\"
+.\"
 .[
 $LIST$
 .]

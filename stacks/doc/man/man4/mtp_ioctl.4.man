@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mtp_ioctl.4.man,v 0.9.2.6 2006/04/05 09:43:04 brian Exp $
+.\" @(#) $Id: mtp_ioctl.4.man,v 0.9.2.7 2006/12/27 16:35:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:04 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:35:54 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mtp_ioctl.4.man,v $
+.\" Revision 0.9.2.7  2006/12/27 16:35:54  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:04  brian
 .\" - moved .so line and updated headers
 .\"
@@ -3566,12 +3569,12 @@ The object identifier.
 .BR xnet (3),
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH VERSIONS
-.PP
+.\".SH VERSIONS
+.\".PP
 .\"
 .\"
 .XX

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ss7_undoc.9.man,v 0.9.2.2 2006/04/05 09:43:25 brian Exp $
+.\" @(#) $Id: ss7_undoc.9.man,v 0.9.2.3 2006/12/27 16:36:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:25 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:36:04 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ss7_undoc.9.man,v $
+.\" Revision 0.9.2.3  2006/12/27 16:36:04  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.2  2006/04/05 09:43:25  brian
 .\" - moved .so line and updated headers
 .\"
@@ -89,7 +92,8 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-Various.
+.HP 12
+\fBundocumented_symbol\fR()
 .\"
 .\"
 .SH ARGUMENTS
@@ -108,39 +112,49 @@ implementation specific.
 .\"
 .SH DESCRIPTION
 .PP
-These are undocumented function that still need a manual page written for them.
+.hy 6
+These are undocumented functions that still need a manual page written for them.
 .\"
 .\"
 .SH USAGE
 .PP
+These symbols are usable, but usage information is not available in manual
+page format.
 .\"
 .\"
 .SH RETURN
 .PP
+Various.
 .\"
 .\"
 .SH ERRORS
 .PP
+Various.
 .\"
 .\"
 .SH CONTEXT
 .PP
+Various.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Unknown.
 .\"
 .\"
 .SH NOTICES
 .PP
+Unknown.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+Various
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -150,18 +164,17 @@ These functions need a manual page.
 .\"
 .SH COMPATIBILITY
 .PP
-.PP
-See
-.BR STREAMS (9)
-for additional compatibility considerations.
+Unknown.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+Unknown.
 .\"
 .\"
 .SH HISTORY
 .PP
+Unknown.
 .\"
 .\"
 .[

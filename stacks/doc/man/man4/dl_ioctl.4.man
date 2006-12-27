@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dl_ioctl.4.man,v 0.9.2.6 2006/04/05 09:43:03 brian Exp $
+.\" @(#) $Id: dl_ioctl.4.man,v 0.9.2.7 2006/12/27 16:35:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:35:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dl_ioctl.4.man,v $
+.\" Revision 0.9.2.7  2006/12/27 16:35:53  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:03  brian
 .\" - moved .so line and updated headers
 .\"
@@ -78,13 +81,21 @@ sort-adjacent-labels
 .\"
 .\"
 .TH DL-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B dl_ioctl
 \- ISDN Q.921/Q.922/X.25 Data Link \- IO Controls
+.\"
+.\"
 .SH DESCRIPTION
-.SH BUGS
-.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED
+.PP
+This manual page is incomplete.
+.\"
+.\"
 .SH SYNOPSIS
+.PP
+Yet to be written.
 .\"
 .\"
 .\".SH NOTICES
@@ -98,6 +109,10 @@ sort-adjacent-labels
 .\"
 .SH MODULES
 .RI streams- dl .o.
+.\"
+.\"
+.SH BUGS
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED
 .\"
 .\"
 .SH "SEE ALSO"

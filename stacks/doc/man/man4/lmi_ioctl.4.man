@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lmi_ioctl.4.man,v 0.9.2.6 2006/04/05 09:43:03 brian Exp $
+.\" @(#) $Id: lmi_ioctl.4.man,v 0.9.2.7 2006/12/27 16:35:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:35:54 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lmi_ioctl.4.man,v $
+.\" Revision 0.9.2.7  2006/12/27 16:35:54  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:03  brian
 .\" - moved .so line and updated headers
 .\"
@@ -78,9 +81,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LMI-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B lmi_ioctl
 \- Local Management Interface \- IO Controls
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <ss7/lmi.h>
@@ -88,6 +95,8 @@ sort-adjacent-labels
 .B #include <ss7/lmi_ioctl.h>
 .HP
 .BI "int " retval " = ioctl(" fd ", " cmd ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B LMI
@@ -152,6 +161,8 @@ indicate that an indentifier should be assigned and returned by the driver.
 Some IO controls have additional members in the
 .B LMI
 header specific to that IO control as detailed below.
+.\"
+.\"
 .SH IOCTLS
 .PP
 .SS Configuration
@@ -530,12 +541,16 @@ Performs a management action.
 .TP
 .B LMI_IOCCPASS
 Passes a IO control to a lower MUX stream.
-
-
-.SH NOTICES
-.PP
-.SH FILES
-.PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
 .SH DEVICES
 .PP
 See
@@ -543,10 +558,19 @@ See
 .BR ISDN (4) ,
 .BR SIGTRAN (4) ,
 .BR INET (4).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.SH VERSIONS
-.PP
+.BR lmi (7),
+.BR SS7 (4) ,
+.BR ISDN (4) ,
+.BR SIGTRAN (4) ,
+.BR INET (4).
+.\"
+.\"
+.\".SH VERSIONS
+.\".PP
 .\"
 .[
 $LIST$

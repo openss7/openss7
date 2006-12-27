@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sccp_ioctl.4.man,v 0.9.2.6 2006/04/05 09:43:04 brian Exp $
+.\" @(#) $Id: sccp_ioctl.4.man,v 0.9.2.7 2006/12/27 16:35:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:04 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:35:54 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sccp_ioctl.4.man,v $
+.\" Revision 0.9.2.7  2006/12/27 16:35:54  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:04  brian
 .\" - moved .so line and updated headers
 .\"
@@ -75,6 +78,8 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so strss7.macros
+.\"
+.\"
 .\"
 .\"
 .TH SCCP-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
@@ -1580,22 +1585,29 @@ SCCP_MGMT_NODANGER:(not used)
 SCCP_MGMT_RESTART:(not used)
 SCCP_MGMT_RESTARTED:(not used)
 .TE
-
-
-
-.SH NOTICES
-.PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
 .SH BUGS
 .PP
-.SH FILES
-.PP
+This manual page is incomplete.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
 .SH DEVICES
 .PP
+.BR sccp (4).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.SH VERSIONS
-.PP
-.\"
+.BR sccp (4).
 .\"
 .XX
 .[

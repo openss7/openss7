@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mtp_socket.7.man,v 0.9.2.5 2006/04/05 09:43:20 brian Exp $
+.\" @(#) $Id: mtp_socket.7.man,v 0.9.2.6 2006/12/27 16:36:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:20 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:36:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mtp_socket.7.man,v $
+.\" Revision 0.9.2.6  2006/12/27 16:36:00  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:20  brian
 .\" - moved .so line and updated headers
 .\"
@@ -77,10 +80,16 @@ sort-adjacent-labels
 .so strss7.macros
 .\"
 .\"
+.\"
+.\"
 .TH MTP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "MTP Interface (MTPI)"
+.\"
+.\"
 .SH NAME
 .B mtp
 \- SS7 Message Transfer Part (MTP) sockets
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/socket.h>
@@ -90,6 +99,8 @@ sort-adjacent-labels
 .B #include <netss7/mtp.h>
 .HP
 .BI "int " mtp_socket " = socket(" \fRPF_SS7\fI ", " \fRSOCK_RDM\fI ", " \fRSS7PROTO_MTP\fI );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B MTP
@@ -129,8 +140,12 @@ A connection oriented socket that preserves message boundaries.
 .PP
 .SS "FEATURES"
 .PP
-.SH "SYSCTLS"
-.PP
+.\"
+.\"
+.\".SH "SYSCTLS"
+.\".PP
+.\"
+.\"
 .SH "SOCKET OPTIONS"
 .PP
 The following
@@ -169,7 +184,6 @@ the argument is a flag that tells the socket whether the
 message should be passed or not.  The message itself can only be sent or
 retrieved as a control message with a packet using
 .BR recvmsg "(3) or " sendmsg (3).
-
 If
 .B MTP_ADDR
 is passed to
@@ -187,20 +201,38 @@ then the outgoing packet will be send with the source address provided.
 .B MTP_RECVSLS
 .TP
 .B MTP_DEBUG
+.\"
+.\"
 .SH IOCTLS
 .PP
-.SH "ERROR HANDLING"
-.PP
-.SH ERRORS
-.PP
-.SH CAVEATS
-.PP
-.SH BUGS
-.PP
+See
+.BR mtpi_ioctl (4).
+.\"
+.\"
+.\".SH "ERROR HANDLING"
+.\".PP
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
+.\"
+.\"
+.\".SH CAVEATS
+.\".PP
+.\"
+.\"
+.\".SH BUGS
+.\".PP
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.SH VERSIONS
-.PP
+.BR mtp (4).
+.\"
+.\"
+.\".SH VERSIONS
+.\".PP
+.\"
 .XX
 .[
 xns

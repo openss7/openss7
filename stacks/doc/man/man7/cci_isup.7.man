@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: cci_isup.7.man,v 0.9.2.6 2006/04/05 09:43:19 brian Exp $
+.\" @(#) $Id: cci_isup.7.man,v 0.9.2.7 2006/12/27 16:36:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/27 16:36:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: cci_isup.7.man,v $
+.\" Revision 0.9.2.7  2006/12/27 16:36:00  brian
+.\" - added slpmod module and fixups for make check target
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:19  brian
 .\" - moved .so line and updated headers
 .\"
@@ -75,6 +78,8 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so strss7.macros
+.\"
+.\"
 .\"
 .\"
 .TH CCI-ISUP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Call Control Interface (CCI)"
@@ -103,8 +108,10 @@ Q.764.
 .[
 q764
 .]
-The Corrigendum must be used along with the generic CCI as defined in the main
-document when implementing a CCS provider that will be configured with the Q.764
+The Corrigendum must be used along with the generic CCI as defined in
+.BR cci (7)
+when implementing a CCS provider that will be configured with the
+Q.764
 call processing layer.
 .\"
 .\"
@@ -114,12 +121,12 @@ The following are the rules that apply to the CCI primitives for Q.764
 compatibility.
 .\"
 .\"
-.SS "CALL CONTROL ADDRESSES"
+.SS CALL CONTROL ADDRESSES
 .PP
 .\"
 .\"
 .PP
-.B "Format"
+.B Format
 .\"
 .\"
 .PP
@@ -127,25 +134,25 @@ The format of call control addresses is as follows:
 .\"
 .\"
 .PP
-.B "Parameters"
+.B Parameters
 .\"
 .\"
 .TP
-.I "cc_addr_length:"
+.I cc_addr_length
 Specifies or indicates the length of the call control address.  If a call
 control address is not included in the primitive, this parameter must be coded
 zero (0).
 .\"
 .\"
 .TP
-.I "cc_addr_offset:"
+.I cc_addr_offset
 Specifies or indicates the offset of the address from the begining of the
 primitive.  If a call control address is not included with the primitive, this
 parameter must be coded zero (0).
 .\"
 .\"
 .PP
-.B "Address Format"
+.B Address Format
 .\"
 .\"
 .PP
@@ -153,41 +160,41 @@ The format of the call control addresses for Q.764 conforming CCS providers is
 as follows:
 .sp
 .nf
-\fC\s-1\
+\fC\s-2\
 typedef struct isup_addr {
-    ulong scope;    /* the scope of the identifier */
-    ulong id;       /* the identifier within the scope */
-    ulong cic;      /* circuit id code within the scope */
+    ulong scope;  /* the scope of the identifier */
+    ulong id;     /* the identifier within the scope */
+    ulong cic;    /* circuit id code within the scope */
 } isup_addr_t;
-\fR\s+1
+\s+2\fP
 .fi
 .\"
 .\"
 .PP
-.B "Address Fields"
+.B Address Fields
 .\"
 .\"
 .TP
-.I "scope:"
+.I scope
 Specifies or indicates the scope of the call control address.  See
-.IR \*(lqScope\*(rq
+.RI \(lq Scope ,\(rq
 below.
 .\"
 .\"
 .TP
-.I "id:"
+.I id
 Specifies or indicates the identifier within the
 .IR scope .
 .\"
 .\"
 .TP
-.I "cic:"
-Specifies or indicates the Circuit Identification Code significant within the
+.I cic
+Specifies or indicates the Circuit Identification Code significant with the
 .IR scope .
 .\"
 .\"
 .PP
-.B "Scope"
+.B Scope
 .\"
 .\"
 .PP
@@ -197,7 +204,7 @@ of the address is one of the following:
 .\"
 .\"
 .TP
-.B "ISUP_SCOPE_CT"
+.B ISUP_SCOPE_CT
 Specifies or indicates that the scope of the call control address is a ISUP
 circuit.  The identifier within the scope is an identifier which uniquely
 identifies a circuit to the CCS provider.  Circuit scope addresses may also be
@@ -212,7 +219,7 @@ group of circuits.
 .\"
 .\"
 .TP
-.B "ISUP_SCOPE_CG"
+.B ISUP_SCOPE_CG
 Specifies or indicates that the scope of the call control address is a ISUP
 circuit group.  The identifier within the scope is an identifier which
 uniquely identifies a circuit group to the CCS provider.  Circuit group scope
@@ -223,7 +230,7 @@ circuit group (lowest numerical value CIC in the circuit group range).
 .\"
 .\"
 .TP
-.B "ISUP_SCOPE_TG"
+.B ISUP_SCOPE_TG
 Specifies or indicates that the scope of the call control address is a ISUP
 trunk group.  The identifier within the scope is an identifier which uniquely
 identifies a trunk group to the CCS provider.  Trunk group scope addresses may
@@ -233,7 +240,7 @@ circuit within the trunk group.
 .\"
 .\"
 .TP
-.B "ISUP_SCOPE_SR"
+.B ISUP_SCOPE_SR
 Specifies or indicates that the scope of the call control address is a ISUP
 signalling relation.  The identifier within the scope is an identifier which
 uniquely identifies a signalling relation to the CCS provider.  Signalling
@@ -243,7 +250,7 @@ circuit (equipped or unequipped) within the signalling relation.
 .\"
 .\"
 .TP
-.B "ISUP_SCOPE_SP"
+.B ISUP_SCOPE_SP
 Specifies or indicates that the scope of the call control address is a ISUP
 signalling point.  The identifier within the scope is an identifier which
 uniquely identifies a local signalling point to the CCS provider.  Signalling
@@ -253,7 +260,7 @@ be coded zero (0) by the CCS provider.
 .\"
 .\"
 .TP
-.B "ISUP_SCOPE_DF"
+.B ISUP_SCOPE_DF
 Specifies or indicates that the scope of the call control address is the
 default scope.  The identifier within the scope and Circuit Identification
 Code are unused and should be ignored by the CCS user and will be coded zero
@@ -268,16 +275,16 @@ Code are unused and should be ignored by the CCS user and will be coded zero
 Rules for scope:
 .\"
 .\"
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 In primitives in which the address parameter occurs, the scope field setting
 indicates the scope of the address parameter.
 .\"
 .\"
-.IP \(em 4
+.IP \(em
 Only one call control address can be specified with a single scope.
 .\"
 .\"
-.IP \(em 4
+.IP \(em
 Not all scopes are necessarily supported by all primitives.  See the
 particular primitive in this Corrigendum.
 .\"
@@ -286,47 +293,47 @@ particular primitive in this Corrigendum.
 Rules for addresses:
 .\"
 .\"
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 The address contained in the primitive contains the following:
 .RS
 .\"
 .\"
-.IP \(bu 3
+.IP \(bu \w'\(bu\(em'u
 A scope.
 .\"
 .\"
-.IP \(bu 3
+.IP \(bu
 An identifier within the scope or zero (0).
 .\"
 .\"
-.IP \(bu 3
+.IP \(bu
 A circuit identification code within the scope or zero (0).
 .RE
 .\"
 .\"
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 If the scope of the address is ISUP_SCOPE_DF, then both the identifier and
 circuit identification code fields should be coded zero (0) and will be
 ignored by the CCS user or provider.
 .\"
 .\"
-.IP \(em 4
+.IP \(em
 If the scope of the address is ISUP_SCOPE_SP, then the circuit identification
 code field should be coded zero (0) and will be ignored by the CCS user or
 provider.
 .\"
 .\"
-.IP \(em 4
+.IP \(em
 In all other scopes, the circuit identification code is optional and is coded
 zero (0) if unused.
 .\"
 .\"
-.SS "OPTIONAL PARAMETERS"
+.SS OPTIONAL PARAMETERS
 .PP
 .\"
 .\"
 .PP
-.B "Format"
+.B Format
 .\"
 .\"
 .PP
@@ -335,11 +342,11 @@ follows:
 .\"
 .\"
 .PP
-.B "Parameters"
+.B Parameters
 .\"
 .\"
 .TP
-.I "cc_opt_length:"
+.I cc_opt_length
 Specifies or indicates the length of the optional parameters associated with
 the primitive.  For Q.764 conforming CCS providers, the format of the optional
 parameters is the format of the Optional Parameters list (without the pointer
@@ -347,20 +354,20 @@ or End of Optional Parameters octets) as specified in Q.763.
 .\"
 .\"
 .TP
-.I "cc_opt_offset:"
+.I cc_opt_offset
 Specifies the offset of the optional parameters from the beginning of the
 block.
 .\"
 .\"
 .PP
-.B "Rules"
+.B Rules
 .\"
 .\"
 .PP
 Rules for optional parameters:
 .\"
 .\"
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 The optional parameters provided by the CCS user may be checked for syntax by
 the CCS provider.  If the CCS provider discovers a syntax error in the format
 of the optional parameters, the CCS provider should respond with a
@@ -369,30 +376,30 @@ primitive with error
 .RB [ CCBADOPT ].
 .\"
 .\"
-.IP \(em 4
+.IP \(em
 For some primitives, specific optional parameters might be interpreted by the
 CCS provider and alter the function of some primitives.  See the specific
 primitive descriptions later in this Corrigendum.
 .\"
 .\"
-.IP \(em 4
+.IP \(em
 Except for optional parameters interpreted by the CCS provider as specified
 later in this Corrigendum, the optional parameters are treated as opaque and
 the optional parameter list is only checked for syntax.  Opaque parameters
 will be passed to the ISUP message without examination by the CCS provider.
 .\"
 .\"
-.IP \(em 4
+.IP \(em
 To perform specific functions, additional optional parameters may be added to
 ISUP messages by the CCS provider.
 .\"
 .\"
-.IP \(em 4
+.IP \(em
 To perform specific functions, optional parameters may be modified by the CCS
 provider before being added to ISUP messages.
 .\"
 .\"
-.SH "Local Management Primitives"
+.SH Local Management Primitives
 .PP
 .\"
 .\"
@@ -404,15 +411,15 @@ with the following protocol-specific considerations:
 .\"
 .\"
 .PP
-.B "Parameters"
+.B Parameters
 .\"
 .\"
 .PP
-.B "Flags"
+.B Flags
 .\"
 .\"
 .PP
-.B "Rules"
+.B Rule"
 .\"
 .\"
 .PP
@@ -426,27 +433,27 @@ with the following protocol-specific considerations:
 .\"
 .\"
 .PP
-.B "Parameters"
+.B Parameters
 .\"
 .\"
 .TP
-.I "cc_addr_length:"
+.I cc_addr_length
 Indicates the length of the address to bind.
 .\"
 .\"
 .TP
-.I "cc_addr_offset:"
+.I cc_addr_offset
 Indicates the offset of the address to bind from the beginning of the block.
 .\"
 .\"
 .TP
-.I "cc_setup_ind:"
+.I cc_setup_ind
 Indicates the maximum number of setup (or continuity check) indications that
 will be outstanding for the listening stream.
 .\"
 .\"
 .TP
-.I "cc_bind_flags:"
+.I cc_bind_flags
 Indicates the options assocated with the bind.
 See
 .IR \*(lqFlags\*(rq ,
@@ -463,8 +470,8 @@ The bind flags can be as follows:
 .\"
 .TP
 .B CC_DEFAULT_LISTENER
-When set, this flag specifies that this stream is the "default listener
-stream."  This stream is used to pass setup indications (or continuity check
+When set, this flag specifies that this stream is the \(lqdefault listener
+stream.\(rq  This stream is used to pass setup indications (or continuity check
 requests) for all incoming calls that contain protocol identifiers that are
 not bound to any other listener, or when a listener stream with cc_setup_ind
 value of greater than zero is not found.  Also, the default listener will
@@ -480,7 +487,7 @@ an error (of type
 .TP
 .B CC_TOKEN_REQUEST
 When set, this flag specifies to the CCS provider that the CCS user has
-requested that a "token" be assigned to the stream (to be used in the call
+requested that a \(lqtoken\(rq be assigned to the stream (to be used in the call
 response message), and the token value be returned to the CCS user via the
 .BR CC_BIND_ACK (7)
 primitive.  The token assigned by the CCS provider can then be used by the CCS
@@ -508,7 +515,7 @@ used for maintenance indications for the specified addresses.
 .\"
 .\"
 .PP
-.B "Rules"
+.B Rules
 .\"
 .\"
 .PP
@@ -653,27 +660,27 @@ with the following protocol-specific considerations:
 .\"
 .\"
 .PP
-.B "Parameters"
+.B Parameters
 .\"
 .\"
 .TP
-.I "cc_addr_length:"
+.I cc_addr_length
 Indicates the length of the address to bind.
 .\"
 .\"
 .TP
-.I "cc_addr_offset:"
+.I cc_addr_offset
 Indicates the offset of the address to bind from the beginning of the block.
 .\"
 .\"
 .TP
-.I "cc_setup_ind:"
+.I cc_setup_ind
 Indicates the maximum number of setup (or continuity check) indications that
 will be outstanding for the listening stream.
 .\"
 .\"
 .PP
-.B "Flags"
+.B Flags
 .\"
 .\"
 .PP
@@ -683,7 +690,7 @@ in this Corrigendum.
 .\"
 .\"
 .PP
-.B "Rules"
+.B Rules
 .\"
 .\"
 .PP
@@ -703,18 +710,18 @@ with the following protocol-specific considerations:
 .\"
 .\"
 .PP
-.B "Parameters"
+.B Parameters
 .\"
 .\"
 .PP
-.B "Flags"
+.B Flags
 .\"
 .\"
 .PP
-.B "Rules"
+.B Rules
 .\"
 .\"
-.SH "Call Setup Primitives"
+.SH Call Setup Primitives
 .PP
 .\"
 .\"
@@ -729,16 +736,16 @@ with the following protocol-specific considerations:
 .\"
 .\"
 .PP
-.B "Parameters"
+.B Parameters
 .\"
 .\"
 .TP
-.I "cc_call_type:"
+.I cc_call_type
 Specifies the type of call to be set up.  See
 .IR "\*(lqCall Types\*(rq" ,
 below.
 .TP
-.I "cc_user_ref:"
+.I cc_user_ref
 Specifies the CCS user call reference to be associated with the call setup
 request.  The CCS provider will use this user call reference in any
 indications given before the
@@ -747,7 +754,7 @@ primitive is issued.
 .\"
 .\"
 .TP
-.I "cc_call_flags:"
+.I cc_call_flags
 Specifies the options associated with the call.
 See
 .IR \*(lqFlags\*(rq ,
@@ -755,7 +762,7 @@ below.
 .\"
 .\"
 .TP
-.I "cc_cdpn_length:"
+.I cc_cdpn_length
 Specifies the length of the called party number.  For Q.764 conforming CCS
 providers, the format of the called party number is the format of the Called
 Party Number parameter (without the parameter type or length octets) as
@@ -763,13 +770,13 @@ specified in Q.763.
 .\"
 .\"
 .TP
-.I "cc_cdpn_offset:"
+.I cc_cdpn_offset
 Specifies the offset of the called party number from the beginning of the
 block.
 .\"
 .\"
 .PP
-.B "Call Types"
+.B Call Types
 .PP
 Q.764 conforming CCS providers must support the following call types:
 .\"
@@ -4108,6 +4115,9 @@ t1.113
 .]
 .[
 isupv4-1
+.]
+.[
+cci
 .]
 .[
 $LIST$
