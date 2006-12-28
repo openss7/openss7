@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: LiS.9.man,v 1.1.4.5 2006/04/05 09:42:43 brian Exp $
+.\" @(#) $Id: LiS.9.man,v 1.1.4.6 2006/12/28 10:42:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 10:42:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: LiS.9.man,v $
+.\" Revision 1.1.4.6  2006/12/28 10:42:09  brian
+.\" - a bit better make check target
+.\"
 .\" Revision 1.1.4.5  2006/04/05 09:42:43  brian
 .\" - moved .so line and updated headers
 .\"
@@ -97,8 +100,8 @@ sort-adjacent-labels
 .B #include <sys/dki.h>
 .\"
 .\"
-.SH DESCRIPTION
-.PP
+.\".SH DESCRIPTION
+.\".PP
 .\"
 .\"
 .SH OVERVIEW

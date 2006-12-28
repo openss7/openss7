@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pipemod.4.man,v 1.1.4.3 2006/04/05 09:42:35 brian Exp $
+.\" @(#) $Id: pipemod.4.man,v 1.1.4.4 2006/12/28 10:42:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:35 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 10:42:08 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pipemod.4.man,v $
+.\" Revision 1.1.4.4  2006/12/28 10:42:08  brian
+.\" - a bit better make check target
+.\"
 .\" Revision 1.1.4.3  2006/04/05 09:42:35  brian
 .\" - moved .so line and updated headers
 .\"
@@ -86,7 +89,12 @@ sort-adjacent-labels
 .\"
 .\"
 .SH SYNOPSIS
-.PP
+.HP
+.BI "int " pfds[2] ;
+.HP
+.BI "int pipe(" pfds );
+.HP
+.BI "int ioctl(" pfds[0] ", " \fRI_PUSH\fP ", " \fR\(lqpipemod\(rq\fP );
 .\"
 .\"
 .SH DESCRIPTION
@@ -131,6 +139,11 @@ function is supported by other means.
 .\"
 .SH MODULES
 .PP
+.B pipemod
+is a
+.I STREAMS
+module named
+.IR pipemod .
 .\"
 .\"
 .SH "SEE ALSO"
