@@ -1,3 +1,14 @@
+2006-12-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: corrected for make check target
+	* doc/man/man4/bicc_ioctl.4.man: corrected for make check target
+	* doc/man/man4/h225_ioctl.4.man: corrected for make check target
+	* doc/man/man4/h248_ioctl.4.man: corrected for make check target
+	* doc/man/man4/mgc.4.man: corrected for make check target
+	* doc/man/man4/rtp.4.man: corrected for make check target
+	* doc/man/man7/cci_bicc.7.man: corrected for make check target
+	* doc/man/man7/cci_h225.7.man: corrected for make check target
+
 2006-12-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: corrected manpage paths and includes

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:07:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:23:33 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/23 13:07:27 $ by $Author: brian $
+## Last Modified $Date: 2006/12/28 05:23:33 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.3  2006/12/28 05:23:33  brian
+## - corrections for make check target
+##
 ## Revision 0.9.2.2  2006/12/23 13:07:27  brian
 ## - manual page and other package updates for release
 ##
@@ -66,7 +69,33 @@ MANMACRO_PFX			= @PACKAGE_TARNAME@
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-MANS_UNUSED =
+MANS_UNUSED = \
+	man4/bicc.4 \
+	man4/bicc_ioctl.4 \
+	man4/dl_h225.4 \
+	man4/h225.4 \
+	man4/h225_ioctl.4 \
+	man4/h245.4 \
+	man4/h248.4 \
+	man4/h248_ioctl.4 \
+	man4/mgc.4 \
+	man4/rtp.4 \
+	man4/sipt.4 \
+	man4/sipt_ioctl.4 \
+	man4/VOIP.4 \
+	man7/bicci.7 \
+	man7/cci_bicc.7 \
+	man7/cci_h225.7 \
+	man7/cci_sipt.7 \
+	man7/h225i.7 \
+	man7/mgi_h248.7 \
+	man7/mgi_mgcp.7 \
+	man8/bicc.8 \
+	man8/h225.8 \
+	man8/h323confd.8 \
+	man8/strvoip_mknod.8 \
+	man8/test-voip.8 \
+	man8/voipconfd.8
 
 man_MANS = \
 	man4/bicc.4 \
@@ -125,7 +154,6 @@ dist_noinst_MANS = \
 	man8/test-voip.8.man \
 	man8/voipconfd.8.man
 
-MANS_UNUSED =
 ## PKG_BUILD_INDEP
 endif
 

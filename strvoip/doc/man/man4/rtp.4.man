@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: rtp.4.man,v 0.9.2.1 2006/10/17 11:56:19 brian Exp $
+.\" @(#) $Id: rtp.4.man,v 0.9.2.2 2006/12/28 05:23:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:56:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 05:23:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: rtp.4.man,v $
+.\" Revision 0.9.2.2  2006/12/28 05:23:34  brian
+.\" - corrections for make check target
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:56:19  brian
 .\" - copied files into new packages from strss7 package
 .\"
@@ -83,10 +86,16 @@ sort-adjacent-labels
 .so strvoip.macros
 .\"
 .\"
+.\"
+.\"
 .TH RTP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B RTP/RTCP
 \- Real Time (Control) Protocol
+.\"
+.\"
 .SH DESCRIPTION
 .B RTP
 is an implementation of the Real-Time Transport Protocol defined in RFC 1889.
@@ -112,12 +121,26 @@ streams can be linked under the
 .BR mx "(4), or " mg (4)
 drivers to provide media streams into the Media Gateway,
 .BR MG (4).
-.SH IOCTLS
-.SH NOTICES
-.SH BUGS
-.SH "SEE ALSO"
-.SH VERSIONS
 .\"
+.\"
+.SH IOCTLS
+.PP
+No input-output controls are defined at this time.
+.\"
+.\"
+.SH NOTICES
+.PP
+This manual page is incomplete.
+.\"
+.\"
+.SH BUGS
+.PP
+This manual page is incomplete.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR VOIP (4).
 .\"
 .XX
 .[
