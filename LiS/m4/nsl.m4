@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/30 07:29:06 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/30 07:29:06 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.8  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.7  2006/09/30 07:29:06  brian
 # - corrected warning message
 # - corrected variable name in xti.m4
@@ -198,18 +201,18 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	if test :"${nsl_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    nsl_search_path="${master_srcdir:+$master_srcdir/strnsl/src/include} ${master_builddir:+$master_builddir/strnsl/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    nsl_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strnsl/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strnsl/src/include}"
 	    for nsl_dir in $nsl_search_path ; do
 		if test -d "$nsl_dir" ; then
 		    AC_MSG_CHECKING([for nsl include directory... $nsl_dir])
 		    if test -r "$nsl_dir/$nsl_what" ; then
 			nsl_cv_includes="$nsl_search_path"
-			nsl_cv_ldadd="$master_builddir/strnsl/libxnsl.la"
-			nsl_cv_ldadd32="$master_builddir/strnsl/lib32/libxnsl.la"
-			nsl_cv_modmap= # "$master_builddir/strnsl/Modules.map"
-			nsl_cv_symver= # "$master_builddir/strnsl/Module.symvers"
-			nsl_cv_manpath="$master_builddir/strnsl/doc/man"
+			nsl_cv_ldadd="$os7_cv_master_builddir/strnsl/libxnsl.la"
+			nsl_cv_ldadd32="$os7_cv_master_builddir/strnsl/lib32/libxnsl.la"
+			nsl_cv_modmap= # "$os7_cv_master_builddir/strnsl/Modules.map"
+			nsl_cv_symver= # "$os7_cv_master_builddir/strnsl/Module.symvers"
+			nsl_cv_manpath="$os7_cv_master_builddir/strnsl/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

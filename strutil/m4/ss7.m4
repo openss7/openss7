@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 08:29:20 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 08:29:20 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.10  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.9  2006/10/16 08:29:20  brian
 # - corrections
 #
@@ -190,18 +193,18 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	if test :"${ss7_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    ss7_search_path="${master_srcdir:+$master_srcdir/stacks/src/include} ${master_builddir:+$master_builddir/stacks/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    ss7_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/stacks/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/stacks/src/include}"
 	    for ss7_dir in $ss7_search_path ; do
 		if test -d "$ss7_dir" ; then
 		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir])
 		    if test -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_search_path"
-			ss7_cv_ldadd= # "$master_builddir/stacks/libss7.la"
-			ss7_cv_ldadd32= # "$master_builddir/stacks/lib32/libss7.la"
-			ss7_cv_modmap= # "$master_builddir/stacks/Modules.map"
-			ss7_cv_symver= # "$master_builddir/stacks/Module.symvers"
-			ss7_cv_manpath="$master_builddir/stacks/doc/man"
+			ss7_cv_ldadd= # "$os7_cv_master_builddir/stacks/libss7.la"
+			ss7_cv_ldadd32= # "$os7_cv_master_builddir/stacks/lib32/libss7.la"
+			ss7_cv_modmap= # "$os7_cv_master_builddir/stacks/Modules.map"
+			ss7_cv_symver= # "$os7_cv_master_builddir/stacks/Module.symvers"
+			ss7_cv_manpath="$os7_cv_master_builddir/stacks/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

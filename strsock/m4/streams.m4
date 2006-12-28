@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2006/10/27 22:17:02 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/27 22:17:02 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -294,18 +294,18 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	fi
 	if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    streams_search_path="${master_srcdir:+$master_srcdir/LiS/include} ${master_builddir:+$master_builddir/LiS/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    streams_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/LiS/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/LiS/include}"
 	    for streams_dir in $streams_search_path ; do
 		if test -d "$streams_dir" ; then
 		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lis_includes="$streams_search_path"
-			streams_cv_lis_ldadd="$master_builddir/LiS/libLiS.la"
-			streams_cv_lis_ldadd32="$master_builddir/LiS/lib32/libLiS.la"
-			streams_cv_lis_modmap="$master_builddir/LiS/Modules.map"
-			streams_cv_lis_symver="$master_builddir/LiS/Module.symvers"
-			streams_cv_lis_manpath="$master_builddir/LiS/man"
+			streams_cv_lis_ldadd="$os7_cv_master_builddir/LiS/libLiS.la"
+			streams_cv_lis_ldadd32="$os7_cv_master_builddir/LiS/lib32/libLiS.la"
+			streams_cv_lis_modmap="$os7_cv_master_builddir/LiS/Modules.map"
+			streams_cv_lis_symver="$os7_cv_master_builddir/LiS/Module.symvers"
+			streams_cv_lis_manpath="$os7_cv_master_builddir/LiS/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -566,18 +566,18 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	fi
 	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    streams_search_path="${master_srcdir:+$master_srcdir/streams/include} ${master_builddir:+$master_builddir/streams/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    streams_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/streams/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/streams/include}"
 	    for streams_dir in $streams_search_path ; do
 		if test -d "$streams_dir" ; then
 		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_includes="$streams_search_path"
-			streams_cv_lfs_ldadd="$master_builddir/streams/libstreams.la"
-			streams_cv_lfs_ldadd32="$master_builddir/streams/lib32/libstreams.la"
-			streams_cv_lfs_modmap="$master_builddir/streams/Modules.map"
-			streams_cv_lfs_symver="$master_builddir/streams/Module.symvers"
-			streams_cv_lfs_manpath="$master_builddir/streams/doc/man"
+			streams_cv_lfs_ldadd="$os7_cv_master_builddir/streams/libstreams.la"
+			streams_cv_lfs_ldadd32="$os7_cv_master_builddir/streams/lib32/libstreams.la"
+			streams_cv_lfs_modmap="$os7_cv_master_builddir/streams/Modules.map"
+			streams_cv_lfs_symver="$os7_cv_master_builddir/streams/Module.symvers"
+			streams_cv_lfs_manpath="$os7_cv_master_builddir/streams/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 10:57:45 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/28 08:32:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 10:57:45 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.32  2006/12/28 08:32:31  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.31  2006/09/29 10:57:45  brian
 # - autoconf does not like multiline cache variables
 #
@@ -187,18 +190,18 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	if test :"${inet_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    inet_search_path="${master_srcdir:+$master_srcdir/strinet/src/includes} ${master_builddir:+$master_builddir/strinet/src/includes}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    inet_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strinet/src/includes} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strinet/src/includes}"
 	    for inet_dir in $inet_search_path ; do
 		if test -d "$inet_dir" ; then
 		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
 		    if test -r "$inet_dir/$inet_what" ; then
 			inet_cv_includes="$inet_search_path"
-			inet_cv_ldadd= # "$master_builddir/strinet/libinet.la"
-			inet_cv_ldadd32= # "$master_builddir/strinet/lib32/libinet.la"
-			inet_cv_modmap= # "$master_builddir/strinet/Modules.map"
-			inet_cv_symver= # "$master_builddir/strinet/Module.symvers"
-			inet_cv_manpath="$master_builddir/strinet/doc/man"
+			inet_cv_ldadd= # "$os7_cv_master_builddir/strinet/libinet.la"
+			inet_cv_ldadd32= # "$os7_cv_master_builddir/strinet/lib32/libinet.la"
+			inet_cv_modmap= # "$os7_cv_master_builddir/strinet/Modules.map"
+			inet_cv_symver= # "$os7_cv_master_builddir/strinet/Module.symvers"
+			inet_cv_manpath="$os7_cv_master_builddir/strinet/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

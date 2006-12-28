@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/30 08:12:45 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/30 08:12:45 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.9  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.8  2006/09/30 08:12:45  brian
 # - corrected search start for includes
 #
@@ -192,18 +195,18 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	if test :"${sock_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    sock_search_path="${master_srcdir:+$master_srcdir/strsock/src/include} ${master_builddir:+$master_builddir/strsock/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    sock_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strsock/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strsock/src/include}"
 	    for sock_dir in $sock_search_path ; do
 		if test -d "$sock_dir" ; then
 		    AC_MSG_CHECKING([for sock include directory... $sock_dir])
 		    if test -r "$sock_dir/$sock_what" ; then
 			sock_cv_includes="$sock_search_path"
-			sock_cv_ldadd="$master_builddir/strsock/libsocket.la"
-			sock_cv_ldadd32="$master_builddir/strsock/lib32/libsocket.la"
-			sock_cv_modmap= # "$master_builddir/strsock/Modules.map"
-			sock_cv_symver= # "$master_builddir/strsock/Module.symvers"
-			sock_cv_manpath="$master_builddir/strsock/doc/man"
+			sock_cv_ldadd="$os7_cv_master_builddir/strsock/libsocket.la"
+			sock_cv_ldadd32="$os7_cv_master_builddir/strsock/lib32/libsocket.la"
+			sock_cv_modmap= # "$os7_cv_master_builddir/strsock/Modules.map"
+			sock_cv_symver= # "$os7_cv_master_builddir/strsock/Module.symvers"
+			sock_cv_manpath="$os7_cv_master_builddir/strsock/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

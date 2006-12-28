@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/30 08:12:45 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/28 08:32:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/30 08:12:45 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.4  2006/12/28 08:32:31  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.3  2006/09/30 08:12:45  brian
 # - corrected search start for includes
 #
@@ -177,18 +180,18 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	if test :"${iso_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    iso_search_path="${master_srcdir:+$master_srcdir/striso/src/include} ${master_builddir:+$master_builddir/striso/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    iso_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/striso/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/striso/src/include}"
 	    for iso_dir in $iso_search_path ; do
 		if test -d "$iso_dir" ; then
 		    AC_MSG_CHECKING([for iso include directory... $iso_dir])
 		    if test -r "$iso_dir/$iso_what" ; then
 			iso_cv_includes="$iso_search_path"
-			iso_cv_ldadd= # "$master_builddir/striso/libiso.la"
-			iso_cv_ldadd32= # "$master_builddir/striso/lib32/libiso.la"
-			iso_cv_modmap= # "$master_builddir/striso/Modules.map"
-			iso_cv_symver= # "$master_builddir/striso/Module.symvers"
-			iso_cv_manpath="$master_builddir/striso/doc/man"
+			iso_cv_ldadd= # "$os7_cv_master_builddir/striso/libiso.la"
+			iso_cv_ldadd32= # "$os7_cv_master_builddir/striso/lib32/libiso.la"
+			iso_cv_modmap= # "$os7_cv_master_builddir/striso/Modules.map"
+			iso_cv_symver= # "$os7_cv_master_builddir/striso/Module.symvers"
+			iso_cv_manpath="$os7_cv_master_builddir/striso/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

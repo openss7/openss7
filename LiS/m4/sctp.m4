@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/29 10:57:46 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.32  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.31  2006/09/29 10:57:46  brian
 # - autoconf does not like multiline cache variables
 #
@@ -190,18 +193,18 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	if test :"${sctp_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    sctp_search_path="${master_srcdir:+$master_srcdir/strsctp/src/include} ${master_builddir:+$master_builddir/strsctp/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    sctp_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strsctp/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strsctp/src/include}"
 	    for sctp_dir in $sctp_search_path ; do
 		if test -d "$sctp_dir" ; then
 		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir])
 		    if test -r "$sctp_dir/$sctp_what" ; then
 			sctp_cv_includes="$sctp_search_path"
-			sctp_cv_ldadd= # "$master_builddir/strsctp/libsctp.la"
-			sctp_cv_ldadd32= # "$master_builddir/strsctp/lib32/libsctp.la"
-			sctp_cv_modmap= # "$master_builddir/strsctp/Modules.map"
-			sctp_cv_symver= # "$master_builddir/strsctp/Module.symvers"
-			sctp_cv_manpath="$master_builddir/strsctp/doc/man"
+			sctp_cv_ldadd= # "$os7_cv_master_builddir/strsctp/libsctp.la"
+			sctp_cv_ldadd32= # "$os7_cv_master_builddir/strsctp/lib32/libsctp.la"
+			sctp_cv_modmap= # "$os7_cv_master_builddir/strsctp/Modules.map"
+			sctp_cv_symver= # "$os7_cv_master_builddir/strsctp/Module.symvers"
+			sctp_cv_manpath="$os7_cv_master_builddir/strsctp/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/10/27 22:17:02 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/27 22:17:02 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.21  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.20  2006/10/27 22:17:02  brian
 # - changes for 2.6.18 kernel
 #
@@ -190,18 +193,18 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	if test :"${strcomp_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    strcomp_search_path="${master_srcdir:+$master_srcdir/strcompat/src/include} ${master_builddir:+$master_builddir/strcompat/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    strcomp_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strcompat/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strcompat/src/include}"
 	    for strcomp_dir in $strcomp_search_path ; do
 		if test -d "$strcomp_dir" ; then
 		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
 		    if test -r "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_includes="$strcomp_search_path"
-			strcomp_cv_ldadd= # "$master_builddir/strcompat/libcompat.la"
-			strcomp_cv_ldadd32= # "$master_builddir/strcompat/lib32/libcompat.la"
-			strcomp_cv_modmap="$master_builddir/strcompat/Modules.map"
-			strcomp_cv_symver="$master_builddir/strcompat/Module.symvers"
-			strcomp_cv_manpath="$master_builddir/strcompat/doc/man"
+			strcomp_cv_ldadd= # "$os7_cv_master_builddir/strcompat/libcompat.la"
+			strcomp_cv_ldadd32= # "$os7_cv_master_builddir/strcompat/lib32/libcompat.la"
+			strcomp_cv_modmap="$os7_cv_master_builddir/strcompat/Modules.map"
+			strcomp_cv_symver="$os7_cv_master_builddir/strcompat/Module.symvers"
+			strcomp_cv_manpath="$os7_cv_master_builddir/strcompat/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

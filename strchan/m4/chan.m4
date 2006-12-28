@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/13 08:38:44 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 08:32:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 08:38:44 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.3  2006/12/28 08:32:31  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.2  2006/10/13 08:38:44  brian
 # - proper check file
 #
@@ -172,18 +175,18 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	if test :"${chan_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    chan_search_path="${master_srcdir:+$master_srcdir/strchan/src/include} ${master_builddir:+$master_builddir/strchan/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    chan_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strchan/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strchan/src/include}"
 	    for chan_dir in $chan_search_path ; do
 		if test -d "$chan_dir" ; then
 		    AC_MSG_CHECKING([for chan include directory... $chan_dir])
 		    if test -r "$chan_dir/$chan_what" ; then
 			chan_cv_includes="$chan_search_path"
-			chan_cv_ldadd= # "$master_builddir/strchan/libchan.la"
-			chan_cv_ldadd32= # "$master_builddir/strchan/lib32/libchan.la"
-			chan_cv_modmap= # "$master_builddir/strchan/Modules.map"
-			chan_cv_symver= # "$master_builddir/strchan/Module.symvers"
-			chan_cv_manpath="$master_builddir/strchan/doc/man"
+			chan_cv_ldadd= # "$os7_cv_master_builddir/strchan/libchan.la"
+			chan_cv_ldadd32= # "$os7_cv_master_builddir/strchan/lib32/libchan.la"
+			chan_cv_modmap= # "$os7_cv_master_builddir/strchan/Modules.map"
+			chan_cv_symver= # "$os7_cv_master_builddir/strchan/Module.symvers"
+			chan_cv_manpath="$os7_cv_master_builddir/strchan/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

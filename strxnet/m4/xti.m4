@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/09/30 07:29:06 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/30 07:29:06 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.43  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.42  2006/09/30 07:29:06  brian
 # - corrected warning message
 # - corrected variable name in xti.m4
@@ -195,18 +198,18 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	if test :"${xti_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    xti_search_path="${master_srcdir:+$master_srcdir/strxnet/src/include} ${master_builddir:+$master_builddir/strxnet/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    xti_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strxnet/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strxnet/src/include}"
 	    for xti_dir in $xti_search_path ; do
 		if test -d "$xti_dir" ; then
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_search_path"
-			xti_cv_ldadd="$master_builddir/strxnet/libxnet.la"
-			xti_cv_ldadd32="$master_builddir/strxnet/lib32/libxnet.la"
-			xti_cv_modmap= # "$master_builddir/strxnet/Modules.map"
-			xti_cv_symver= # "$master_builddir/strxnet/Module.symvers"
-			xti_cv_manpath="$master_builddir/strxnet/doc/man"
+			xti_cv_ldadd="$os7_cv_master_builddir/strxnet/libxnet.la"
+			xti_cv_ldadd32="$os7_cv_master_builddir/strxnet/lib32/libxnet.la"
+			xti_cv_modmap= # "$os7_cv_master_builddir/strxnet/Modules.map"
+			xti_cv_symver= # "$os7_cv_master_builddir/strxnet/Module.symvers"
+			xti_cv_manpath="$os7_cv_master_builddir/strxnet/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

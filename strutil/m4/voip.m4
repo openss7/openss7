@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 11:56:11 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 11:56:11 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.3  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.2  2006/10/16 11:56:11  brian
 # - correct what to search for
 #
@@ -172,18 +175,18 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	if test :"${voip_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    voip_search_path="${master_srcdir:+$master_srcdir/strvoip/src/include} ${master_builddir:+$master_builddir/strvoip/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    voip_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strvoip/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strvoip/src/include}"
 	    for voip_dir in $voip_search_path ; do
 		if test -d "$voip_dir" ; then
 		    AC_MSG_CHECKING([for voip include directory... $voip_dir])
 		    if test -r "$voip_dir/$voip_what" ; then
 			voip_cv_includes="$voip_search_path"
-			voip_cv_ldadd= # "$master_builddir/strvoip/libvoip.la"
-			voip_cv_ldadd32= # "$master_builddir/strvoip/lib32/libvoip.la"
-			voip_cv_modmap= # "$master_builddir/strvoip/Modules.map"
-			voip_cv_symver= # "$master_builddir/strvoip/Module.symvers"
-			voip_cv_manpath="$master_builddir/strvoip/doc/man"
+			voip_cv_ldadd= # "$os7_cv_master_builddir/strvoip/libvoip.la"
+			voip_cv_ldadd32= # "$os7_cv_master_builddir/strvoip/lib32/libvoip.la"
+			voip_cv_modmap= # "$os7_cv_master_builddir/strvoip/Modules.map"
+			voip_cv_symver= # "$os7_cv_master_builddir/strvoip/Module.symvers"
+			voip_cv_manpath="$os7_cv_master_builddir/strvoip/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

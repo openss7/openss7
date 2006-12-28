@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/09/29 10:57:46 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 10:57:46 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.38  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.37  2006/09/29 10:57:46  brian
 # - autoconf does not like multiline cache variables
 #
@@ -190,18 +193,18 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	if test :"${xns_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    xns_search_path="${master_srcdir:+$master_srcdir/strxns/src/include} ${master_builddir:+$master_builddir/strxns/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    xns_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strxns/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strxns/src/include}"
 	    for xns_dir in $xns_search_path ; do
 		if test -d "$xns_dir" ; then
 		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
 		    if test -r "$xns_dir/$xns_what" ; then
 			xns_cv_includes="$xns_search_path"
-			xns_cv_ldadd= # "$master_builddir/strxns/libxns.la"
-			xns_cv_ldadd32= # "$master_builddir/strxns/lib32/libxns.la"
-			xns_cv_modmap= # "$master_builddir/strxns/Modules.map"
-			xns_cv_symver= # "$master_builddir/strxns/Module.symvers"
-			xns_cv_manpath="$master_builddir/strxns/doc/man"
+			xns_cv_ldadd= # "$os7_cv_master_builddir/strxns/libxns.la"
+			xns_cv_ldadd32= # "$os7_cv_master_builddir/strxns/lib32/libxns.la"
+			xns_cv_modmap= # "$os7_cv_master_builddir/strxns/Modules.map"
+			xns_cv_symver= # "$os7_cv_master_builddir/strxns/Module.symvers"
+			xns_cv_manpath="$os7_cv_master_builddir/strxns/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

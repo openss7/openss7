@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 11:56:11 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 08:32:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 11:56:11 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.3  2006/12/28 08:32:32  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.2  2006/10/16 11:56:11  brian
 # - correct what to search for
 #
@@ -172,18 +175,18 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	if test :"${sigtran_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    sigtran_search_path="${master_srcdir:+$master_srcdir/sigtran/src/include} ${master_builddir:+$master_builddir/sigtran/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    sigtran_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/sigtran/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/sigtran/src/include}"
 	    for sigtran_dir in $sigtran_search_path ; do
 		if test -d "$sigtran_dir" ; then
 		    AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir])
 		    if test -r "$sigtran_dir/$sigtran_what" ; then
 			sigtran_cv_includes="$sigtran_search_path"
-			sigtran_cv_ldadd= # "$master_builddir/sigtran/libsigtran.la"
-			sigtran_cv_ldadd32= # "$master_builddir/sigtran/lib32/libsigtran.la"
-			sigtran_cv_modmap= # "$master_builddir/sigtran/Modules.map"
-			sigtran_cv_symver= # "$master_builddir/sigtran/Module.symvers"
-			sigtran_cv_manpath="$master_builddir/sigtran/doc/man"
+			sigtran_cv_ldadd= # "$os7_cv_master_builddir/sigtran/libsigtran.la"
+			sigtran_cv_ldadd32= # "$os7_cv_master_builddir/sigtran/lib32/libsigtran.la"
+			sigtran_cv_modmap= # "$os7_cv_master_builddir/sigtran/Modules.map"
+			sigtran_cv_symver= # "$os7_cv_master_builddir/sigtran/Module.symvers"
+			sigtran_cv_manpath="$os7_cv_master_builddir/sigtran/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi

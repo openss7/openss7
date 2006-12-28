@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 11:44:46 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 08:32:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 11:44:46 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 08:32:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.3  2006/12/28 08:32:31  brian
+# - use cache names for master src and build directories
+#
 # Revision 0.9.2.2  2006/10/16 11:44:46  brian
 # - change search file
 #
@@ -172,18 +175,18 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	if test :"${isdn_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
 	    # directory, if any.
-	    AC_MSG_RESULT([(searching $master_srcdir $master_builddir)])
-	    isdn_search_path="${master_srcdir:+$master_srcdir/strisdn/src/include} ${master_builddir:+$master_builddir/strisdn/src/include}"
+	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
+	    isdn_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strisdn/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strisdn/src/include}"
 	    for isdn_dir in $isdn_search_path ; do
 		if test -d "$isdn_dir" ; then
 		    AC_MSG_CHECKING([for isdn include directory... $isdn_dir])
 		    if test -r "$isdn_dir/$isdn_what" ; then
 			isdn_cv_includes="$isdn_search_path"
-			isdn_cv_ldadd= # "$master_builddir/strisdn/libisdn.la"
-			isdn_cv_ldadd32= # "$master_builddir/strisdn/lib32/libisdn.la"
-			isdn_cv_modmap= # "$master_builddir/strisdn/Modules.map"
-			isdn_cv_symver= # "$master_builddir/strisdn/Module.symvers"
-			isdn_cv_manpath="$master_builddir/strisdn/doc/man"
+			isdn_cv_ldadd= # "$os7_cv_master_builddir/strisdn/libisdn.la"
+			isdn_cv_ldadd32= # "$os7_cv_master_builddir/strisdn/lib32/libisdn.la"
+			isdn_cv_modmap= # "$os7_cv_master_builddir/strisdn/Modules.map"
+			isdn_cv_symver= # "$os7_cv_master_builddir/strisdn/Module.symvers"
+			isdn_cv_manpath="$os7_cv_master_builddir/strisdn/doc/man"
 			AC_MSG_RESULT([yes])
 			break
 		    fi
