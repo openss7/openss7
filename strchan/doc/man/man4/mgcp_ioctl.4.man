@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mgcp_ioctl.4.man,v 0.9.2.1 2006/10/14 06:37:22 brian Exp $
+.\" @(#) $Id: mgcp_ioctl.4.man,v 0.9.2.2 2006/12/28 05:27:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/14 06:37:22 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 05:27:32 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mgcp_ioctl.4.man,v $
+.\" Revision 0.9.2.2  2006/12/28 05:27:32  brian
+.\" - changes for make check target
+.\"
 .\" Revision 0.9.2.1  2006/10/14 06:37:22  brian
 .\" - added manpages, module, drivers, headers from strss7 package
 .\"
@@ -83,13 +86,44 @@ sort-adjacent-labels
 .so strchan.macros
 .\"
 .\"
+.\"
+.\"
 .TH MGCP-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B mgcp_ioctl
 \- common IO controls for MGCP devices
+.\"
+.\"
 .SH SYNOPSIS
+.PP
+.B #include <ss7/mgi.h>
+.br
+.B #include <ss7/mgi_ioctl.h>
+.br
+.B #include <ss7/mgcp_ioctl.h>
+.HP
+.BI "int " retval " = ioctl(" fd ", " cmd ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
+.PP
+.B MGCP-IOCTL
+defines the input-output controls that are specific to MGCP
+.[
+rfc3435
+.]
+Media Gateway Control Protocol.  Generic input-output controls for media
+gateway devices,
+.BR MG (4),
+are described under
+.BR mgi_ioctl (4).
+.\"
+.\"
 .SH IOCTLS
+.PP
+No input-output controls specific to MGCP exist at this time.
 .\"
 .XX
 .[
