@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/12/27 16:35:57 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/12/28 05:32:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,14 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/27 16:35:57 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 05:32:57 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.36 2006/12/27 16:35:57 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.37 2006/12/28 05:32:57 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
 
@@ -199,7 +199,8 @@ AC_CONFIG_FILES([Makefile
 		 src/modules/tali/lis.conf
 		 src/modules/tua/lis.conf
 		 src/modules/mg/lis.conf
-		 src/modules/isdn/lis.conf])
+		 src/modules/isdn/lis.conf
+		 src/modules/h225/lis.conf])
 
 AC_OUTPUT
 

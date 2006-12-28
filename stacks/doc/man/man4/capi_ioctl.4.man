@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: capi_ioctl.4.man,v 0.9.2.7 2006/04/05 09:43:02 brian Exp $
+.\" @(#) $Id: capi_ioctl.4.man,v 0.9.2.8 2006/12/28 05:32:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:02 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 05:32:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: capi_ioctl.4.man,v $
+.\" Revision 0.9.2.8  2006/12/28 05:32:59  brian
+.\" - changes for make check target
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:43:02  brian
 .\" - moved .so line and updated headers
 .\"
@@ -77,10 +80,16 @@ sort-adjacent-labels
 .so strss7.macros
 .\"
 .\"
+.\"
+.\"
 .TH CAPI-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B capi_ioctl
 \- COMMON-ISDN-API (CAPI) \- IO Controls
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stropts.h>
@@ -93,9 +102,11 @@ sort-adjacent-labels
 .HP
 .BI "struct strioctl *" arg ;
 .HP
-.BI "int " bua_stream " = open(" \fR/dev/bua\fI ", " flags );
+.BI "int " capi_stream " = open(" \fR/dev/capi\fI ", " flags );
 .HP
-.BI "int " retval " = ioctl(" bua_stream ", " \fRI_STR\fI ", " arg );
+.BI "int " retval " = ioctl(" capi_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B CAPI-IOCTL
@@ -109,24 +120,158 @@ defines the additional managed objects, structures and constants necessary to
 use the
 .BR capi (4)
 driver.
+.\"
+.\"
 .SH IOCTLS
+.PP
+.TP
+.B CAPI_REGISTER
+.RS
+.PP
+.B CAPI_REGISTER
+takes as an argument a pointer to a
+.B capi_register_parms
+structure, formatted as follows:
+.PP
+.nf
+\fC\s-1\
+typedef struct capi_register_params {
+    uint32_t maxLogicalConnection;  /* maximum number of logical connections */
+    uint32_t maxBDataBlocks;        /* maximum number of received data blocks */
+    uint32_t maxBDataLength;        /* maximum size of application data block */
+} capi_register_params_t;
+\s+1\fP
+.fi
+.PP
+The
+.B capi_resister_parms
+structure contains the following members:
+.TP
+.I maxLogicalConnection
+.TP
+.I maxBDataBlocks
+.TP
+.I maxBDataLength
+.RE
+.TP
+.B CAPI_GET_MANUFACTURER
+.TP
+.B CAPI_GET_VERSION
+.RS
+.PP
+.B CAPI_GET_VERSION
+takes as an argument a pointer to a
+.B capi_version
+structure, formatted as follows:
+.nf
+\fC\s-1\
+typedef struct capi_version {
+	uint32_t major_version;
+	uint32_t minor_version;
+	uint32_t vendor_major_version;
+	uint32_t vendor_minor_version;
+} capi_version_t;
+\s+1\fP
+.fi
+.PP
+The
+.B capi_version
+structure contains the following members:
+.TP
+.I major_version
+.TP
+.I minor_version
+.TP
+.I vendor_major_version
+.TP
+.I vendor_minor_version
+.RE
+.TP
+.B CAPI_GET_SERIAL_NUMBER
+.TP
+.B CAPI_GET_PROFILE
+.RS
+.PP
+.B CAPI_GET_PROFILE
+takes as an argument a pointer to a
+.B capi_profile_parms
+structure, formatted as follows:
+.PP
+.nf
+\fC\s-1\
+typedef union capi_profile_params {
+    struct {
+        uint32_t controller_number;
+    } request;
+    struct {
+        uint16_t num_controllers;
+        uint16_t num_b_channels;
+        uint32_t global_operations;
+        uint32_t b1_protocol_support;
+        uint32_t b2_protocol_support;
+        uint32_t b3_protocol_support;
+        uint8_t reserved[24];
+        uint8_t vendor_specific[20];
+    } result;
+    capi_profile_t result;
+} capi_profile_params_t;
+\s+1\fP
+.fi
+.PP
+The
+.B capi_profile_parms
+structure contains the following members:
+.TP
+.I request.number
+.TP
+.I result.num_controllers
+.TP
+.I result.num_b_channels
+.TP
+.I result.global_operations
+.TP
+.I result.b1_protocol_support
+.TP
+.I result.b2_protocol_support
+.TP
+.I result.b3_protocol_support
+.TP
+.I result.reserved
+.TP
+.I result.vendor_specific
+.RE
+.\"
+.\"
 .SH NOTICES
 .PP
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH BUGS
 .PP
 .B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH FILES
 .PP
 .BR <ss7/isdni_ioctl.h> ,
 .BR <ss7/capi_ioctl.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/capi .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR capi (4).
+.\"
+.\"
 .SH VERSIONS
 .PP
-.\"
+This is Version 2 of the CAPI Interface.
 .\"
 .XX
 .[

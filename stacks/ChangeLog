@@ -1,3 +1,15 @@
+2006-12-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: changes for make check target
+	* doc/man/Makefile.am: changes for make check target
+	* doc/man/man4/capi_ioctl.4.man: changes for make check target
+	* doc/man/man4/gr303_ioctl.4.man: changes for make check target
+	* doc/man/man4/mgc.4.man: changes for make check target
+	* doc/man/man4/v5_ioctl.4.man: changes for make check target
+	* src/modules/dl/lis.conf.in: changes for make check target
+	* src/modules/h225/lis.conf: removed
+	* src/modules/h225/lis.conf.in: added
+
 2006-12-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/isdn/lis.conf: removed

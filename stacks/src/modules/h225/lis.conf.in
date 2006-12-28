@@ -2,12 +2,12 @@
 ## vim: ft=conf sw=4
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:04 $
+#@WITH_VOIP_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/28 05:33:01 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#@WITH_VOIP_TRUE@ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+#@WITH_VOIP_TRUE@ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
@@ -47,14 +47,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/18 10:51:04 $ by $Author: brian $
+## Last Modified $Date: 2006/12/28 05:33:01 $ by $Author: brian $
 ##
 ## =============================================================================
 
 ## Driver specifications
 ## -----------------------------------------------------------
 ##	name	    prefix	major	n-minors    n-majors
-driver	h225	    h225	*		    
+@WITH_VOIP_TRUE@@WITH_VOIP_TRUE@driver	h225	    h225	*		    
 
 ## Pushable module specifications
 ## -----------------------------------------------------------
@@ -63,16 +63,16 @@ driver	h225	    h225	*
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-objname	driver	h225	    h225
+@WITH_VOIP_TRUE@@WITH_VOIP_TRUE@objname	driver	h225	    h225
 
 
 ##
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##		name
-loadable	h225
+@WITH_VOIP_TRUE@@WITH_VOIP_TRUE@loadable	h225
 
 ##   Node specifications
 ## -----------------------------------------------------------
 ##	name		    type    perm    major	minor
-node	/dev/h225		c   0666    h225	0
+@WITH_VOIP_TRUE@@WITH_VOIP_TRUE@node	/dev/h225		c   0666    h225	0

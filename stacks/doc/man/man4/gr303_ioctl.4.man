@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: gr303_ioctl.4.man,v 0.9.2.7 2006/04/05 09:43:03 brian Exp $
+.\" @(#) $Id: gr303_ioctl.4.man,v 0.9.2.8 2006/12/28 05:32:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:03 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 05:32:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: gr303_ioctl.4.man,v $
+.\" Revision 0.9.2.8  2006/12/28 05:32:59  brian
+.\" - changes for make check target
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:43:03  brian
 .\" - moved .so line and updated headers
 .\"
@@ -77,17 +80,59 @@ sort-adjacent-labels
 .so strss7.macros
 .\"
 .\"
+.\"
+.\"
 .TH GR303-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B gr303_ioctl
 \- common IO controls for GR.303 devices
+.\"
+.\"
 .SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/gr303_ioctl.h>
+.HP
+.BI "int " retval " = ioctl(" gr303_stream ", " cmd ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
+.PP
+.B THIS MANUAL PAGE IS INCOMPLETE AND MUST BE COMPLETED.
+.\"
+.\"
 .SH IOCTLS
+.PP
+Input output control have not been described yet.
+.\"
+.\"
+.SH BUGS
+.PP
+.B THIS MANUAL PAGE IS INCOMPLETE AND MUST BE COMPLETED.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+None.
+.\"
 .XX
 .[
 gr-303-core
 .]
+.\"
 .[
 $LIST$
 .]

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/12/27 16:35:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/28 05:32:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/27 16:35:58 $ by $Author: brian $
+# Last Modified $Date: 2006/12/28 05:32:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.35  2006/12/28 05:32:58  brian
+# - changes for make check target
+#
 # Revision 0.9.2.34  2006/12/27 16:35:58  brian
 # - added slpmod module and fixups for make check target
 #
@@ -92,8 +95,6 @@ ss7_man_MANS = \
 	man3/xti_tcap.3 \
 	man3/ss7_undoc.3 \
 	man4/acb56.4 \
-	man4/bicc.4 \
-	man4/bicc_ioctl.4 \
 	man4/bssap.4 \
 	man4/bssap_ioctl.4 \
 	man4/ch-sdl.4 \
@@ -102,15 +103,9 @@ ss7_man_MANS = \
 	man4/dl.4 \
 	man4/dlb.4 \
 	man4/dl_gsma.4 \
-	man4/dl_h225.4 \
 	man4/dl_ioctl.4 \
 	man4/fr.4 \
 	man4/gsma.4 \
-	man4/h225.4 \
-	man4/h225_ioctl.4 \
-	man4/h245.4 \
-	man4/h248.4 \
-	man4/h248_ioctl.4 \
 	man4/hdlc.4 \
 	man4/hdlc_ioctl.4 \
 	man4/isdn_ioctl.4 \
@@ -118,9 +113,6 @@ ss7_man_MANS = \
 	man4/isup_ioctl.4 \
 	man4/lm.4 \
 	man4/lmi_ioctl.4 \
-	man4/mgc.4 \
-	man4/mgcp.4 \
-	man4/mgcp_ioctl.4 \
 	man4/mtp.4 \
 	man4/mtp_ioctl.4 \
 	man4/mtp-mgmt.4 \
@@ -133,7 +125,6 @@ ss7_man_MANS = \
 	man4/mx_x400p.4 \
 	man4/OpenSS7.4 \
 	man4/pca200e.4 \
-	man4/rtp.4 \
 	man4/sccp.4 \
 	man4/sccp-gtt.4 \
 	man4/sccp_ioctl.4 \
@@ -154,8 +145,6 @@ ss7_man_MANS = \
 	man4/sdt-acb56.4 \
 	man4/sdt_ioctl.4 \
 	man4/sdt_x400p.4 \
-	man4/sipt.4 \
-	man4/sipt_ioctl.4 \
 	man4/sl.4 \
 	man4/sl-acb56.4 \
 	man4/sl_ioctl.4 \
@@ -188,7 +177,6 @@ ss7_man_MANS = \
 	man4/tcap-tci.4 \
 	man4/tcap-tpi.4 \
 	man4/tcap-tri.4 \
-	man4/VOIP.4 \
 	man4/x100p.4 \
 	man4/x100p-ch.4 \
 	man4/x100p-mx.4 \
@@ -210,25 +198,18 @@ ss7_man_MANS = \
 	man4/x400p-ss7-lm.4 \
 	man4/x400p-ss7-sdl.4 \
 	man4/ss7_undoc.4 \
-	man7/bicci.7 \
-	man7/cci_bicc.7 \
 	man7/cci_bssap.7 \
 	man7/cci_capi.7 \
 	man7/cci_dass.7 \
 	man7/cci_gr303.7 \
-	man7/cci_h225.7 \
 	man7/cci_idlc.7 \
 	man7/cci_isdn.7 \
 	man7/cci_isup.7 \
-	man7/cci_sipt.7 \
 	man7/cdi_hdlc.7 \
 	man7/devi.7 \
-	man7/h225i.7 \
 	man7/isupi.7 \
 	man7/isup_socket.7 \
 	man7/lmi.7 \
-	man7/mgi_h248.7 \
-	man7/mgi_mgcp.7 \
 	man7/mtp.7 \
 	man7/MTP_ADDR_ACK.7 \
 	man7/MTP_ADDR_REQ.7 \
@@ -454,12 +435,8 @@ ss7_man_MANS = \
 	man7/TR_uni_ind_t.7 \
 	man7/TR_uni_req.7 \
 	man7/TR_uni_req_t.7 \
-	man8/bicc.8 \
 	man8/cpc388.8 \
-	man8/h225.8 \
-	man8/h323confd.8 \
 	man8/isup.8 \
-	man8/mgconfd.8 \
 	man8/mtp.8 \
 	man8/sccp.8 \
 	man8/sdl.8 \
@@ -491,7 +468,6 @@ ss7_man_MANS = \
 	man8/test-x400p-sdt.8 \
 	man8/test-x400p-sl.8 \
 	man8/ss7_undoc.8 \
-	man8/voipconfd.8 \
 	man9/mtp_n_uderror_ind.9 \
 	man9/mtp_n_unitdata_ind.9 \
 	man9/mtp_n_unitdata_req.9 \
@@ -1281,7 +1257,34 @@ isdn_man_MANS = \
 	man8/isdn.8 \
 	man8/isdnconfd.8
 
-voip_man_MANS =
+voip_man_MANS = \
+	man4/bicc.4 \
+	man4/bicc_ioctl.4 \
+	man4/dl_h225.4 \
+	man4/h225.4 \
+	man4/h225_ioctl.4 \
+	man4/h245.4 \
+	man4/h248.4 \
+	man4/h248_ioctl.4 \
+	man4/mgc.4 \
+	man4/mgcp.4 \
+	man4/mgcp_ioctl.4 \
+	man4/rtp.4 \
+	man4/sipt.4 \
+	man4/sipt_ioctl.4 \
+	man4/VOIP.4 \
+	man7/bicci.7 \
+	man7/cci_bicc.7 \
+	man7/cci_h225.7 \
+	man7/cci_sipt.7 \
+	man7/h225i.7 \
+	man7/mgi_h248.7 \
+	man7/mgi_mgcp.7 \
+	man8/bicc.8 \
+	man8/h225.8 \
+	man8/h323confd.8 \
+	man8/mgconfd.8 \
+	man8/voipconfd.8
 
 chan_man_MANS = \
 	man4/cd.4 \
@@ -1558,8 +1561,6 @@ ss7_dist_noinst_MANS = \
 	man3/xti_tcap.3.man \
 	man3/ss7_undoc.3.man \
 	man4/acb56.4.man \
-	man4/bicc.4.man \
-	man4/bicc_ioctl.4.man \
 	man4/bssap.4.man \
 	man4/bssap_ioctl.4.man \
 	man4/bua.4.man \
@@ -1572,7 +1573,6 @@ ss7_dist_noinst_MANS = \
 	man4/dl_dua.4.man \
 	man4/dl_gr303ua.4.man \
 	man4/dl_gsma.4.man \
-	man4/dl_h225.4.man \
 	man4/dl_ioctl.4.man \
 	man4/dl_iua.4.man \
 	man4/dl_v5ua.4.man \
@@ -1582,11 +1582,6 @@ ss7_dist_noinst_MANS = \
 	man4/gr303ua.4.man \
 	man4/gr303ua_ioctl.4.man \
 	man4/gsma.4.man \
-	man4/h225.4.man \
-	man4/h225_ioctl.4.man \
-	man4/h245.4.man \
-	man4/h248.4.man \
-	man4/h248_ioctl.4.man \
 	man4/hdlc.4.man \
 	man4/hdlc_ioctl.4.man \
 	man4/isua.4.man \
@@ -1608,9 +1603,6 @@ ss7_dist_noinst_MANS = \
 	man4/m3ua_ioctl.4.man \
 	man4/MG.4.man \
 	man4/mg.4.man \
-	man4/mgc.4.man \
-	man4/mgcp.4.man \
-	man4/mgcp_ioctl.4.man \
 	man4/mg_ioctl.4.man \
 	man4/mg-lm.4.man \
 	man4/mtp.4.man \
@@ -1627,7 +1619,6 @@ ss7_dist_noinst_MANS = \
 	man4/mx_x400p.4.man \
 	man4/OpenSS7.4.man \
 	man4/pca200e.4.man \
-	man4/rtp.4.man \
 	man4/sccp.4.man \
 	man4/sccp-gtt.4.man \
 	man4/sccp_ioctl.4.man \
@@ -1655,8 +1646,6 @@ ss7_dist_noinst_MANS = \
 	man4/sdt_tpi.4.man \
 	man4/sdt_x400p.4.man \
 	man4/SIGTRAN.4.man \
-	man4/sipt.4.man \
-	man4/sipt_ioctl.4.man \
 	man4/sl.4.man \
 	man4/sl-acb56.4.man \
 	man4/sl_ioctl.4.man \
@@ -1708,7 +1697,6 @@ ss7_dist_noinst_MANS = \
 	man4/ua_ioctl.4.man \
 	man4/v5ua.4.man \
 	man4/v5ua_ioctl.4.man \
-	man4/VOIP.4.man \
 	man4/x100p.4.man \
 	man4/x100p-ch.4.man \
 	man4/x100p-mx.4.man \
@@ -1730,24 +1718,18 @@ ss7_dist_noinst_MANS = \
 	man4/x400p-ss7-lm.4.man \
 	man4/x400p-ss7-sdl.4.man \
 	man4/ss7_undoc.4.man \
-	man7/bicci.7.man \
-	man7/cci_bicc.7.man \
 	man7/cci_bssap.7.man \
 	man7/cci_idlc.7.man \
 	man7/cci_isup.7.man \
-	man7/cci_sipt.7.man \
 	man7/cdi_hdlc.7.man \
 	man7/devi.7.man \
 	man7/dlpi_dua.7.man \
 	man7/dlpi_gr303ua.7.man \
 	man7/dlpi_iua.7.man \
 	man7/dlpli_gr303ua.7.man \
-	man7/h225i.7.man \
 	man7/isupi.7.man \
 	man7/isup_socket.7.man \
 	man7/lmi.7.man \
-	man7/mgi_h248.7.man \
-	man7/mgi_mgcp.7.man \
 	man7/mtp.7.man \
 	man7/MTP_ADDR_ACK.7.man \
 	man7/MTP_ADDR_REQ.7.man \
@@ -1973,11 +1955,8 @@ ss7_dist_noinst_MANS = \
 	man7/TR_uni_ind_t.7.man \
 	man7/TR_uni_req.7.man \
 	man7/TR_uni_req_t.7.man \
-	man8/bicc.8.man \
 	man8/bua.8.man \
 	man8/cpc388.8.man \
-	man8/h225.8.man \
-	man8/h323confd.8.man \
 	man8/isua.8.man \
 	man8/isup.8.man \
 	man8/iua.8.man \
@@ -1986,7 +1965,6 @@ ss7_dist_noinst_MANS = \
 	man8/m2ua.8.man \
 	man8/m3tp.8.man \
 	man8/m3ua.8.man \
-	man8/mgconfd.8.man \
 	man8/mtp.8.man \
 	man8/sccp.8.man \
 	man8/sdl.8.man \
@@ -2023,7 +2001,6 @@ ss7_dist_noinst_MANS = \
 	man8/tua.8.man \
 	man8/uaconfd.8.man \
 	man8/ss7_undoc.8.man \
-	man8/voipconfd.8.man \
 	man9/mtp_n_uderror_ind.9.man \
 	man9/mtp_n_unitdata_ind.9.man \
 	man9/mtp_n_unitdata_req.9.man \
@@ -2809,7 +2786,34 @@ isdn_dist_noinst_MANS = \
 	man8/isdn.8.man \
 	man8/isdnconfd.8.man
 
-voip_dist_noinst_MANS =
+voip_dist_noinst_MANS = \
+	man4/bicc.4.man \
+	man4/bicc_ioctl.4.man \
+	man4/dl_h225.4.man \
+	man4/h225.4.man \
+	man4/h225_ioctl.4.man \
+	man4/h245.4.man \
+	man4/h248.4.man \
+	man4/h248_ioctl.4.man \
+	man4/mgc.4.man \
+	man4/mgcp.4.man \
+	man4/mgcp_ioctl.4.man \
+	man4/rtp.4.man \
+	man4/sipt.4.man \
+	man4/sipt_ioctl.4.man \
+	man4/VOIP.4.man \
+	man7/bicci.7.man \
+	man7/cci_bicc.7.man \
+	man7/cci_h225.7.man \
+	man7/cci_sipt.7.man \
+	man7/h225i.7.man \
+	man7/mgi_h248.7.man \
+	man7/mgi_mgcp.7.man \
+	man8/bicc.8.man \
+	man8/h225.8.man \
+	man8/h323confd.8.man \
+	man8/mgconfd.8.man \
+	man8/voipconfd.8.man
 
 chan_dist_noinst_MANS = \
 	man4/cd.4.man \
