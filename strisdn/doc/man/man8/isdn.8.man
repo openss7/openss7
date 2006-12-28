@@ -1,8 +1,8 @@
-.so man8/ss7_undoc.8.man
+.so man8/isdn_undoc.8.man
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: isdn.8.man,v 0.9.2.1 2006/10/17 11:56:11 brian Exp $
+.\" @(#) $Id: isdn.8.man,v 0.9.2.2 2006/12/28 05:38:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:56:11 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 05:38:10 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: isdn.8.man,v $
+.\" Revision 0.9.2.2  2006/12/28 05:38:10  brian
+.\" - changes for make check target
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:56:11  brian
 .\" - copied files into new packages from strss7 package
 .\"

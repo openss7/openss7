@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: CC_RESTART_REQ.7.man,v 0.9.2.1 2006/10/17 11:56:05 brian Exp $
+.\" @(#) $Id: CC_RESTART_REQ.7.man,v 0.9.2.2 2006/12/28 05:38:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:56:05 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 05:38:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: CC_RESTART_REQ.7.man,v $
+.\" Revision 0.9.2.2  2006/12/28 05:38:09  brian
+.\" - changes for make check target
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:56:05  brian
 .\" - copied files into new packages from strss7 package
 .\"
@@ -92,6 +95,12 @@ sort-adjacent-labels
 .sp
 .nf
 \fC\s-1\
+typedef struct CC_restart_req {
+    cc_ulong cc_primitive;    /* always CC_RESTART_REQ */
+    cc_ulong cc_flags;        /* restart flags */
+    cc_ulong cc_addr_length;  /* adddress length */
+    cc_ulong cc_addr_offset;  /* adddress offset */
+} CC_restart_req_t;
 \fR\s+1
 .fi
 .\"
@@ -107,6 +116,12 @@ This primitive contains the following parameters:
 .I cc_primitive
 specifies the primitive type.  Always
 .BR CC_RSETART_REQ .
+.TP
+.I cc_flags
+.TP
+.I cc_addr_length
+.TP
+.I cc_addr_offset
 .\"
 .\"
 .SS Rules

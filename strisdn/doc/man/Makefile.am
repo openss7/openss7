@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:07:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:38:07 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/23 13:07:17 $ by $Author: brian $
+## Last Modified $Date: 2006/12/28 05:38:07 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.3  2006/12/28 05:38:07  brian
+## - changes for make check target
+##
 ## Revision 0.9.2.2  2006/12/23 13:07:17  brian
 ## - manual page and other package updates for release
 ##
@@ -81,6 +84,7 @@ MANS_UNUSED = \
 	man4/idp.4 \
 	man4/ISDN.4 \
 	man4/isdn.4 \
+	man4/isdn_undoc.4 \
 	man4/lapd.4 \
 	man4/lapf.4 \
 	man4/q921.4 \
@@ -391,9 +395,11 @@ MANS_UNUSED = \
 	man7/dlpi_gr303.7 \
 	man7/dlpi_lapd.7 \
 	man7/dlpi_lapf.7 \
+	man7/isdn_undoc.7 \
 	man7/isdni.7 \
 	man7/npi_q933.7 \
 	man8/isdn.8 \
+	man8/isdn_undoc.8 \
 	man8/isdnconfd.8
 
 man_MANS = \
@@ -416,6 +422,7 @@ dist_noinst_MANS = \
 	man4/idp.4.man \
 	man4/ISDN.4.man \
 	man4/isdn.4.man \
+	man4/isdn_undoc.4.man \
 	man4/lapd.4.man \
 	man4/lapf.4.man \
 	man4/q921.4.man \
@@ -726,9 +733,11 @@ dist_noinst_MANS = \
 	man7/dlpi_gr303.7.man \
 	man7/dlpi_lapd.7.man \
 	man7/dlpi_lapf.7.man \
+	man7/isdn_undoc.7.man \
 	man7/isdni.7.man \
 	man7/npi_q933.7.man \
 	man8/isdn.8.man \
+	man8/isdn_undoc.8.man \
 	man8/isdnconfd.8.man \
 	man8/strisdn_mknod.8.man \
 	man8/test-isdn.8.man

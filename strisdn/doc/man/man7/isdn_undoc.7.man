@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: CC_STATUS_IND.7.man,v 0.9.2.2 2006/12/28 05:38:09 brian Exp $
+.\" @(#) $Id: isdn_undoc.7.man,v 0.9.2.1 2006/12/28 05:38:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -57,17 +57,14 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: CC_STATUS_IND.7.man,v $
-.\" Revision 0.9.2.2  2006/12/28 05:38:09  brian
+.\" $Log: isdn_undoc.7.man,v $
+.\" Revision 0.9.2.1  2006/12/28 05:38:09  brian
 .\" - changes for make check target
 .\"
-.\" Revision 0.9.2.1  2006/10/17 11:56:05  brian
-.\" - copied files into new packages from strss7 package
+.\" Revision 0.9.2.4  2006/12/27 16:36:00  brian
+.\" - added slpmod module and fixups for make check target
 .\"
-.\" Revision 0.9.2.6  2006/10/10 10:38:43  brian
-.\" - updates for release
-.\"
-.\" Revision 0.9.2.5  2006/04/05 09:43:12  brian
+.\" Revision 0.9.2.3  2006/04/05 09:43:21  brian
 .\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
@@ -86,121 +83,147 @@ sort-adjacent-labels
 .so strisdn.macros
 .\"
 .\"
-.TH CC_STATUS_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Call Control Interface (CCI)"
+.TH UNDOCUMENTED 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols and Interfaces"
 .\"
 .\"
 .SH NAME
-.B CC_STATUS_IND
-\- call control status indication
+.B isdn_undoc
+\- undocumented ISDN protocols and interfaces
 .\"
 .\"
 .SH SYNOPSIS
-.sp
-.nf
-\fC\s-1\
-typedef struct CC_status_ind {
-    cc_ulong cc_primitive;    /* always CC_STATUS_IND */
-    cc_ulong cc_flags;        /* status flags */
-    cc_ulong cc_addr_length;  /* adddress length */
-    cc_ulong cc_addr_offset;  /* adddress offset */
-} CC_status_ind_t;
-\fR\s+1
-.fi
+.PP
+.HP 12
+\fBundocumented_interface\fR
 .\"
 .\"
 .SH DESCRIPTION
-.\"
-.\"
-.SS Parameters
-This primitive contains the following parameters:
-.\"
-.\"
+.PP
+.hy 6
+These are undocumented ISDN protocols and interfaces that still need a manual page written for them.
 .TP
-.I cc_primitive
-indicates the primitive type.  Always
-.BR CC_STATUS_IND .
-.\"
-.\"
-.SS Rules
-.\"
-.\"
-.SS State
-This primitive is valid in the
-.BR
-state.
-The new state remains unchanged.
-.\"
-.\"
-.SS Modes
-This primitive is valid in all modes.
-.\"
-.\"
-.SS Originator
-This primitive is originated by the CC User.
-.\"
-.\"
-.SH NOTES
-.sp
-.\"
-.\"
-.SS "Considerations for Q.764 and ANSI T1.113 conformance:"
-CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
-additional rules:
-(See also
-.BR cci_isup (7)
-for address format and
-.BR isup (4))
-.\"
-.\"
-.SS "Considerations for Q.931/932 conformance:"
-CCS providers conforming to Q.931/932 adhere to the following
-additional rules:
-(See also
-.BR cci_isdn (7)
-for address format and
-.BR isdn (4))
-.\"
-.\"
-.SS "Considerations for H.225.0 conformance:"
-CCS providers conforming to H.225.0 adhere to the following
-additional rules:
-(See also
-.BR cci_h225 (7)
-for address format and
-.BR h225 (4))
-.\"
-.\"
-.SS "Considerations for BSSAP conformance:"
-CCS providers conforming to BSSAP adhere to the following
-additional rules:
-(See also
-.BR cci_bssap (7)
-for address format and
-.BR bssap (4))
-.\"
-.\"
-.SH FILES
-.BR <ss7/cci.h> .
+.BR CC_FACILITY_IND ,
+.PD 0
+.TP
+.BR CC_FACILITY_REQ ,
+.TP
+.BR CC_HOLD_CON ,
+.TP
+.BR CC_HOLD_IND ,
+.TP
+.BR CC_HOLD_REQ ,
+.TP
+.BR CC_HOLD_RES ,
+.TP
+.BR cci_capi ,
+.TP
+.BR cci_dass ,
+.TP
+.BR cci_gr303 ,
+.TP
+.BR cci_idlc ,
+.TP
+.BR CC_REGISTER_IND ,
+.TP
+.BR CC_REGISTER_REQ ,
+.TP
+.BR CC_RETRIEVE_CON ,
+.TP
+.BR CC_RETRIEVE_IND ,
+.TP
+.BR CC_RETRIEVE_REQ ,
+.TP
+.BR CC_RETRIEVE_RES ,
+.TP
+.BR cdi_hdlc ,
+.TP
+.BR dlpi_dass ,
+.TP
+.BR dlpi_dua ,
+.TP
+.BR dlpi_eth ,
+.TP
+.BR dlpi_gr303 ,
+.TP
+.BR dlpi_gr303ua ,
+.TP
+.BR dlpi_iua ,
+.TP
+.BR dlpi_lapb ,
+.TP
+.BR dlpi_lapd ,
+.TP
+.BR dlpi_lapf ,
+.TP
+.BR dlpli_gr303ua ,
+.TP
+.BR isup_socket ,
+.TP
+.BR mgi_h248 ,
+.TP
+.BR mgi_mg ,
+.TP
+.BR mgi_mgcp ,
+.TP
+.BR npi_ip ,
+.TP
+.BR npi_iso ,
+.TP
+.BR npi_q933 ,
+.TP
+.BR npi_sccp ,
+.TP
+.BR npi_sctp ,
+.TP
+.BR npi_sscop ,
+.TP
+.BR N_TOKEN_ACK ,
+.TP
+.BR N_TOKEN_REQ ,
+.TP
+.BR rudp ,
+.TP
+.BR saal_sscop ,
+.TP
+.BR sccp_socket ,
+.TP
+.BR sccpi ,
+.TP
+.BR sscop ,
+.TP
+.BR sscopi ,
+.TP
+.BR tcap_socket ,
+.TP
+.BR tpi_ss7 .
+.PD
 .\"
 .\"
 .SH "SEE ALSO"
-.BR cci (7).
+.PP
+.BR STREAMS (9).
 .\"
 .\"
-.SH VERSIONS
-This manpage was written for
-.BR strss7-0.8.4 .
-.br
-The Call Control Interface (CCI) is specific to
-.B OpenSS7
-and first appeared in
-.BR strss7-0.8.4 .
-.br
-This is Version 0.8.4 of the CCI interface.
-.XX
-.[
-cci
-.]
+.SH BUGS
+.PP
+These symbols and libraries need a manual page.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Unknown.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Unknown.
+.\"
+.\"
+.SH HISTORY
+.PP
+Unknown.
+.\"
+.\"
 .[
 $LIST$
 .]

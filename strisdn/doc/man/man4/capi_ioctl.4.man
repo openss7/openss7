@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: capi_ioctl.4.man,v 0.9.2.2 2006/12/23 13:07:19 brian Exp $
+.\" @(#) $Id: capi_ioctl.4.man,v 0.9.2.3 2006/12/28 05:38:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/23 13:07:19 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 05:38:08 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: capi_ioctl.4.man,v $
+.\" Revision 0.9.2.3  2006/12/28 05:38:08  brian
+.\" - changes for make check target
+.\"
 .\" Revision 0.9.2.2  2006/12/23 13:07:19  brian
 .\" - manual page and other package updates for release
 .\"
@@ -83,10 +86,16 @@ sort-adjacent-labels
 .so strisdn.macros
 .\"
 .\"
+.\"
+.\"
 .TH CAPI-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B capi_ioctl
 \- COMMON-ISDN-API (CAPI) \- IO Controls
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stropts.h>
@@ -99,9 +108,11 @@ sort-adjacent-labels
 .HP
 .BI "struct strioctl *" arg ;
 .HP
-.BI "int " bua_stream " = open(" \fR/dev/bua\fI ", " flags );
+.BI "int " capi_stream " = open(" \fR/dev/capi\fI ", " flags );
 .HP
-.BI "int " retval " = ioctl(" bua_stream ", " \fRI_STR\fI ", " arg );
+.BI "int " retval " = ioctl(" capi_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B CAPI-IOCTL
@@ -115,6 +126,8 @@ defines the additional managed objects, structures and constants necessary to
 use the
 .BR capi (4)
 driver.
+.\"
+.\"
 .SH IOCTLS
 .PP
 .TP
@@ -233,27 +246,38 @@ structure contains the following members:
 .TP
 .I result.vendor_specific
 .RE
+.\"
+.\"
 .SH NOTICES
 .PP
 .PP
 .B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH BUGS
 .PP
 .B THIS MANPAGE IS UNDER CONSTRUCTION AND NEEDS TO BE COMPLETED.
+.\"
+.\"
 .SH FILES
 .PP
 .BR <ss7/isdni_ioctl.h> ,
 .BR <ss7/capi_ioctl.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/capi .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR capi (4).
+.\"
+.\"
 .SH VERSIONS
 .PP
 This is Version 2 of the CAPI Interface.
-.\"
 .\"
 .XX
 .[

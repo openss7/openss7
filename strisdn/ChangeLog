@@ -1,3 +1,50 @@
+2006-12-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: changes for make check target
+	* doc/man/man4/capi_ioctl.4.man: changes for make check target
+	* doc/man/man4/dl_gr303.4.man: changes for make check target
+	* doc/man/man4/dl_lapd.4.man: changes for make check target
+	* doc/man/man4/dl_lapf.4.man: changes for make check target
+	* doc/man/man4/dl_v52.4.man: changes for make check target
+	* doc/man/man4/dpnss.4.man: changes for make check target
+	* doc/man/man4/gr303.4.man: changes for make check target
+	* doc/man/man4/gr303_ioctl.4.man: changes for make check target
+	* doc/man/man4/idlc.4.man: changes for make check target
+	* doc/man/man4/idp.4.man: changes for make check target
+	* doc/man/man4/isdn_undoc.4.man: added
+	* doc/man/man4/lapd.4.man: changes for make check target
+	* doc/man/man4/lapf.4.man: changes for make check target
+	* doc/man/man4/q922.4.man: changes for make check target
+	* doc/man/man4/v5.4.man: changes for make check target
+	* doc/man/man4/v5_ioctl.4.man: changes for make check target
+	* doc/man/man7/CC_FACILITY_IND.7.man: changes for make check target
+	* doc/man/man7/CC_FACILITY_REQ.7.man: changes for make check target
+	* doc/man/man7/CC_HOLD_CON.7.man: changes for make check target
+	* doc/man/man7/CC_HOLD_IND.7.man: changes for make check target
+	* doc/man/man7/CC_HOLD_REQ.7.man: changes for make check target
+	* doc/man/man7/CC_HOLD_RES.7.man: changes for make check target
+	* doc/man/man7/CC_NOTIFY_IND.7.man: changes for make check target
+	* doc/man/man7/CC_NOTIFY_REQ.7.man: changes for make check target
+	* doc/man/man7/CC_REGISTER_IND.7.man: changes for make check target
+	* doc/man/man7/CC_REGISTER_REQ.7.man: changes for make check target
+	* doc/man/man7/CC_RESTART_REQ.7.man: changes for make check target
+	* doc/man/man7/CC_RETRIEVE_CON.7.man: changes for make check target
+	* doc/man/man7/CC_RETRIEVE_IND.7.man: changes for make check target
+	* doc/man/man7/CC_RETRIEVE_REQ.7.man: changes for make check target
+	* doc/man/man7/CC_RETRIEVE_RES.7.man: changes for make check target
+	* doc/man/man7/CC_START_RESET_IND.7.man: changes for make check target
+	* doc/man/man7/CC_STATUS_IND.7.man: changes for make check target
+	* doc/man/man7/CC_STOP_IND.7.man: changes for make check target
+	* doc/man/man7/CC_STOP_REQ.7.man: changes for make check target
+	* doc/man/man7/capi.7.man: changes for make check target
+	* doc/man/man7/cci.7.man: changes for make check target
+	* doc/man/man7/cci_isdn.7.man: changes for make check target
+	* doc/man/man7/isdn_undoc.7.man: added
+	* doc/man/man8/isdn.8.man: changes for make check target
+	* doc/man/man8/isdn_undoc.8.man: added
+	* doc/man/man8/isdnconfd.8.man: changes for make check target
+
+
 2006-12-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: corrected manpage paths and includes

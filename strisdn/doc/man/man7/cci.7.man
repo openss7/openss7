@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: cci.7.man,v 0.9.2.1 2006/10/17 11:56:09 brian Exp $
+.\" @(#) $Id: cci.7.man,v 0.9.2.2 2006/12/28 05:38:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/17 11:56:09 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/28 05:38:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: cci.7.man,v $
+.\" Revision 0.9.2.2  2006/12/28 05:38:09  brian
+.\" - changes for make check target
+.\"
 .\" Revision 0.9.2.1  2006/10/17 11:56:09  brian
 .\" - copied files into new packages from strss7 package
 .\"
@@ -1209,7 +1212,7 @@ This primitive indicates to the called CCS user that a timeout occurred while
 waiting for additional information (called party number).  The receiving CCS
 User should determine whether sufficient address digits have been received and
 either disconnect the call with the
-.BR CC_DISCONNECT_REQ
+.BR CC_DISCONNECT_REQ (7)
 primitive or continue
 the call with
 .BR CC_SETUP_RES (7).
@@ -2044,25 +2047,119 @@ call control addresses (signalling interface and circuit group) and has
 returned the remote state and blocking level for each address.
 .\"
 .\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
 .SH "SEE ALSO"
 .PP
+.IR STREAMS (4),
+.BR isdn (4),
+.BR isup (4),
+.BR bicc (4),
+.BR bssap (4),
+.BR h225 (4),
+.BR gr303 (4),
+.BR v5 (4),
+.BR putmsg (2),
+.BR getmsg (2),
+.BR CC_ADDR_ACK (7),
+.BR CC_ADDR_REQ (7),
+.BR CC_ALERTING_IND (7),
+.BR CC_ALERTING_REQ (7),
+.BR CC_BIND_ACK (7),
+.BR CC_BIND_REQ (7),
+.BR CC_BLOCKING_CON (7),
+.BR CC_BLOCKING_IND (7),
+.BR CC_BLOCKING_REQ (7),
+.BR CC_BLOCKING_RES (7),
+.BR CC_CALL_FAILURE_IND (7),
+.BR CC_CALL_REATTEMPT_IND (7),
+.BR CC_CONNECT_IND (7),
+.BR CC_CONNECT_REQ (7),
+.BR CC_CONT_CHECK_IND (7),
+.BR CC_CONT_CHECK_REQ (7),
+.BR CC_CONT_REPORT_IND (7),
+.BR CC_CONT_REPORT_REQ (7),
+.BR CC_CONT_TEST_IND (7),
+.BR CC_CONT_TEST_REQ (7),
+.BR CC_DISCONNECT_IND (7),
+.BR CC_DISCONNECT_REQ (7),
+.BR CC_ERROR_ACK (7),
+.BR CC_IBI_IND (7),
+.BR CC_IBI_REQ (7),
+.BR CC_INFO_ACK (7),
+.BR CC_INFO_REQ (7),
+.BR CC_INFORMATION_IND (7),
+.BR CC_INFORMATION_REQ (7),
+.BR CC_INFO_TIMEOUT_IND (7),
+.BR CC_MAINT_IND (7),
+.BR CC_MORE_INFO_IND (7),
+.BR CC_MORE_INFO_REQ (7),
+.BR CC_OK_ACK (7),
+.BR CC_OPTMGMT_REQ (7),
+.BR CC_PROCEEDING_IND (7),
+.BR CC_PROCEEDING_REQ (7),
+.BR CC_PROGRESS_IND (7),
+.BR CC_PROGRESS_REQ (7),
+.BR CC_QUERY_CON (7),
+.BR CC_QUERY_IND (7),
+.BR CC_QUERY_REQ (7),
+.BR CC_QUERY_RES (7),
+.BR CC_REJECT_IND (7),
+.BR CC_REJECT_REQ (7),
+.BR CC_RELEASE_CON (7),
+.BR CC_RELEASE_IND (7),
+.BR CC_RELEASE_REQ (7),
+.BR CC_RELEASE_RES (7),
+.BR CC_RESET_CON (7),
+.BR CC_RESET_IND (7),
+.BR CC_RESET_REQ (7),
+.BR CC_RESET_RES (7),
+.BR CC_RESTART_CON (7),
+.BR CC_RESTART_REQ (7),
+.BR CC_RESUME_CON (7),
+.BR CC_RESUME_IND (7),
+.BR CC_RESUME_REJECT_IND (7),
+.BR CC_RESUME_REJECT_REQ (7),
+.BR CC_RESUME_REQ (7),
+.BR CC_RESUME_RES (7),
+.BR CC_SETUP_COMPLETE_IND (7),
+.BR CC_SETUP_COMPLETE_REQ (7),
+.BR CC_SETUP_CON (7),
+.BR CC_SETUP_IND (7),
+.BR CC_SETUP_REQ (7),
+.BR CC_SETUP_RES (7),
+.BR CC_SUSPEND_CON (7),
+.BR CC_SUSPEND_IND (7),
+.BR CC_SUSPEND_REJECT_IND (7),
+.BR CC_SUSPEND_REJECT_REQ (7),
+.BR CC_SUSPEND_REQ (7),
+.BR CC_SUSPEND_RES (7),
+.BR CC_UNBIND_REQ (7),
+.BR CC_UNBLOCKING_CON (7),
+.BR CC_UNBLOCKING_IND (7),
+.BR CC_UNBLOCKING_RES (7).
+.\"
+.\"
 .SH FILES
 .PP
+.BR <ss7/cci.h> ,
+.BR <ss7/isupi.h> ,
+.BR <ss7/isdni.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
-.SH VERSIONS
-.PP
+.BR isdn (4),
+.BR isup (4),
+.BR bicc (4),
+.BR bssap (4),
+.BR h225 (4),
+.BR gr303 (4),
+.BR v5 (4).
+.\"
+.\"
+.\".SH VERSIONS
+.\".PP
+.\"
+.\"
 .XX
 .[
 cci
