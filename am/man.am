@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/09/18 00:43:43 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/12/28 12:08:28 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/09/18 00:43:43 $ by $Author: brian $
+## Last Modified $Date: 2006/12/28 12:08:28 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: man.am,v $
+## Revision 0.9.2.49  2006/12/28 12:08:28  brian
+## - move EXTRA_DIST outside conditionals
+##
 ## Revision 0.9.2.48  2006/09/18 00:43:43  brian
 ## - add way to exempt init script manpages from required options
 ##
@@ -73,14 +76,10 @@
 #   for systems (such as debian) that will not do not do grefer on man pages.
 ##
 
-if DEVELOPMENT
-## DEVELOPMENT
-
 man_MACROS		= $(MANMACRO_PFX).macros $(MANMACRO_PFX).refs
 
-EXTRA_DIST		+= \
-			   $(man_MACROS) \
-			   $(dist_noinst_MANS)
+if DEVELOPMENT
+## DEVELOPMENT
 
 MAN_SUBST_STRING = s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g;s|\@PACKAGE_SHORTTITLE\@|$(PACKAGE_SHORTTITLE)|g
 
@@ -632,5 +631,9 @@ endif
 
 ## DEVELOPMENT
 endif
+
+EXTRA_DIST		+= \
+			   $(man_MACROS) \
+			   $(dist_noinst_MANS)
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
