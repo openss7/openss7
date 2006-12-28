@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 19:54:57 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/28 05:19:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 19:54:57 $ by $Author: brian $
+ Last Modified $Date: 2006/12/28 05:19:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.4  2006/12/28 05:19:34  brian
+ - minor changes
+
  Revision 0.9.2.3  2006/12/23 19:54:57  brian
  - void return
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 19:54:57 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/28 05:19:34 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 19:54:57 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/28 05:19:34 $";
 
 /*
  *  This is the AS side of M2UA implemented as a pushable module that pushes over an SCTP NPI
@@ -138,7 +141,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 19:54:57 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/28 05:19:34 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -500,9 +503,9 @@ static inline bool
 sl_trylock(struct sl *sl, queue_t *q)
 {
 	bool rtn = false;
-	unsigned long flags;
+	pl_t pl;
 
-	spin_lock_irqsave(&sl->lock, flags);
+	pl = LOCK(&sl->lock, plbase);
 	if (sl->users == 0 && (q->q_flag & QSVCBUSY)) {
 		rtn = true;
 		sl->users = 1;
@@ -515,7 +518,7 @@ sl_trylock(struct sl *sl, queue_t *q)
 	} else if (sl->waitq != q) {
 		qenable(q);
 	}
-	spin_unlock_irqrestore(&sl->lock, flags);
+	UNLOCK(&sl->lock, pl);
 	return (rtn);
 }
 
@@ -526,14 +529,14 @@ sl_trylock(struct sl *sl, queue_t *q)
 static inline void
 sl_unlock(struct sl *sl)
 {
-	unsigned long flags;
+	pl_t pl;
 
-	spin_lock_irqsave(&sl->lock, flags);
+	pl = LOCK(&sl->lock, plbase);
 	if (--sl->users == 0 && sl->waitq) {
 		qenable(sl->waitq);
 		sl->waitq = NULL;
 	}
-	spin_unlock_irqrestore(&sl->lock, flags);
+	UNLOCK(&sl->lock, pl);
 }
 
 /*

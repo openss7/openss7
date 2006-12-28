@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:19:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:06:56 $ by $Author: brian $
+ Last Modified $Date: 2006/12/28 05:19:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.3  2006/12/28 05:19:34  brian
+ - minor changes
+
  Revision 0.9.2.2  2006/12/23 13:06:56  brian
  - manual page and other package updates for release
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:19:34 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:19:34 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -93,6 +96,9 @@ static char const ident[] =
  *  At this point, MTP-primitmives can be issued by the MTP User that will be translated into M3UA
  *  messages for the activated RC.  M3UA messages received for the activated RC will be translated
  *  into MTP-primitives and sent upstream.
+ *
+ *  Unlike M2UA-AS, instead of a pushable module, M3UA-AS is better implemented as a multiplexing
+ *  driver.  I will probably abandon this module.
  */
 
 #define _LFS_SOURCE	1
@@ -138,7 +144,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:19:34 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
