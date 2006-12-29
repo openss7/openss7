@@ -1,5 +1,7 @@
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
+	* strss7.spec.in: old rpms hate nested ifs
+	* src/modules/sl/slpmod.c: MODULE_PARM correction
 	* Makefile.am: changes for successful master build
 	* acinclude.m4: changes for successful master build
 	* strss7.spec.in: changes for successful master build

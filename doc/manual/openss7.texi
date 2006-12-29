@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.10 2006/12/29 05:50:40 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.11 2006/12/29 12:17:54 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/12/29 05:50:40 $ by $Author: brian $
+% Last Modified $Date: 2006/12/29 12:17:54 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -402,6 +402,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.11  2006/12/29 12:17:54  brian
+- old rpms hate nested ifs, release updates
+
 Revision 0.9.2.10  2006/12/29 05:50:40  brian
 - changes for successful master build
 
@@ -924,12 +927,11 @@ temporarily provide compatibility for both @cite{Linux Fast-STREAMS} and @cite{L
 thus, provide a transition path for @dfn{STREAMS} drivers and modules using other major @cite{UNIX}
 implementations, and even @cite{LiS}, to @cite{Linux Fast-STREAMS}.
 
-This package relies upon the present of the following packages also included in the
+This package relies upon the presence of the following packages also included in the
 @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) or
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}).
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}).
 @end enumerate
 
 This package is contained in the @file{strcompat} subdirectory in the @value{PACKAGE_TITLE} source
@@ -937,6 +939,7 @@ distribution.
 See the installation and reference manual in the @file{strcompat/doc} directory for more information on
 this sub-package.
 
+@ignore
 @node strutil
 @subsection strutil-@value{VERSION_STRUTIL}
 
@@ -948,7 +951,7 @@ these utilities are present in the @command{streams-@value{VERSION_STREAMS}} pac
 @cite{LiS} is now completely deprecated, there is no longer a use for this package.  It is currently
 not part of the build or the distribution of the @value{PACKAGE_TITLE}.
 
-This package relies upon the present of the following packages also included in the
+This package relies upon the presence of the following packages also included in the
 @value{PACKAGE_TITLE}:
 
 @enumerate
@@ -961,6 +964,7 @@ distribution.
 See the installation and reference manual in the @file{strutil/doc} directory for more information on
 this sub-package.
 
+@end ignore
 @node strbcm
 @subsection strbcm-@value{VERSION_STRBCM}
 
@@ -971,7 +975,7 @@ Fast-STREAMS}.  This package would provide the ability to run older, deprecated,
 pre-compiled binaries and run them under a new production @cite{Linux Fast-STREAMS} installation.
 
 This package is currently incomplete and neither forms part of the build, nor part of the
-distribution.  This package relies upon the present of the following packages also included in the
+distribution.  This package relies upon the presence of the following packages also included in the
 @value{PACKAGE_TITLE}:
 
 @enumerate
@@ -1005,7 +1009,7 @@ necessary modules (@file{streams-ldterm}) and drivers (@file{streams-ptem}) and 
 @cite{Linux Fast-STREAMS}.
 
 This package is incomplete and untested and neither forms part of the build, nor part of the
-distribution.  This package relies upon the present of the following packages also included in the
+distribution.  This package relies upon the presence of the following packages also included in the
 @value{PACKAGE_TITLE}:
 
 @enumerate
@@ -1034,13 +1038,12 @@ of @cite{LiS} contained errors.
 This package also provides additional DLPI and NPI drivers that were not present in any @cite{LiS}
 release.
 
-This package is complete but not completely tested.  This package relies upon the present of the
+This package is complete but not completely tested.  This package relies upon the presence of the
 following packages also included in the @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) or
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
-@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}})
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}), and
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}).
 @end enumerate
 
 This package is contained in the @file{strxns} subdirectory in the @value{PACKAGE_TITLE} source
@@ -1066,14 +1069,13 @@ described in the X/Open Networking Services (XNS) 5.2 specification available fr
 Provider Interface (TPI) Revision 2.0.0 interface.  It also provides header files conforming to the
 TPI specification.
 
-This package is complete and completely tested.  This package relies upon the present of the
+This package is complete and completely tested.  This package relies upon the presence of the
 following packages also included in the @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) or
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}), and
-@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}})
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}).
 @end enumerate
 
 
@@ -1109,11 +1111,11 @@ Nevertheless, as @cite{LiS} is now completely deprecated, and there is no longer
 package.  It is currently not part of the build no the distribution of @value{PACKAGE_TITLE}.
 
 This package is incomplete and untested and neither forms part of the build, nor part of the
-distribution.  This package relies upon the present of the following packages also included in the
+distribution.  This package relies upon the presence of the following packages also included in the
 @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}),
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
 @item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}), and
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}).
@@ -1133,11 +1135,11 @@ driver sporting a Transport Provider Interface (TPI) Revision 2.0.0 service inte
 kernel.  Also provided are second generation implementations of @dfn{UDP} and @dfn{RAWIP} that are
 completely implemented using @dfn{STREAMS}.
 
-This package is complete and tested.  This package relies upon the present of the following packages
+This package is complete and tested.  This package relies upon the presence of the following packages
 also included in the @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}),
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
 @item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}), and
@@ -1157,12 +1159,11 @@ driver sporting a Network Provider Interface (NPI) Revision 2.0.0 and Transport 
 (TPI) Revision 2.0.0 service interfaces to an full @dfn{STREAMS} implementation of SCTP
 (@cite{Stream Control Transmission Protocol}).
 
-This package is complete and tested.  This package relies upon the present of the following packages
+This package is complete and tested.  This package relies upon the presence of the following packages
 also included in the @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}), or
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
 @item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}), and
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}).
@@ -1176,7 +1177,34 @@ this sub-package.
 @node strchan
 @subsection strchan-@value{VERSION_STRCHAN}
 
-The @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}) package provides
+The @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}) package provides real device
+drivers and pseudo-device drivers support a Channel Interface (CHI) or Multiplex Interface (MXI) for
+data and media bearer connections.  It also provides several lower level modules for HDLC and SS7
+DAED functions providing the Communications Device Interface (CDI) from the
+@command{strxns-@value{VERSION_STRXNS}} package.  The package also provides documentation for the
+Channel Interface (CHI), Multiplex Interface (MXI) and Media Gateway Interface (MGI).
+
+The HDLC component is a base component for the @command{striso} and @command{strisdn} packages,
+whereas the SS7 DAEDR is a base component for the @command{strss7} package.
+
+The device drivers provided by this package are more generic and have wider applicability than the
+device drivers for the same hardware present in the @command{strss7} package.  Also included in this
+package is the beginning of a @command{zaptel} integrated driver for Asterisk integration support.
+
+This package is incomplete and untested and neither forms part of the build, nor part of the
+distribution.  This package relies upon the presence of the following packages also included in the
+@value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}), and
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}).
+@end enumerate
+
+This package is contained in the @file{strchan} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+See the installation and reference manual in the @file{strchan/doc} directory for more information
+on this sub-package.
 
 @node striso
 @subsection striso-@value{VERSION_STRISO}
@@ -1188,12 +1216,11 @@ Transport Provider Interace (TPI) for ISO TP0, TP1, TP2, TP3, TP4.  It also supp
 over LLC2.  It is intended that this package support ISOT, CMOT, CMISE/CMIP for TMN management.
 
 This package is incomplete and untested and neither forms part of the build, nor part of the
-distribution.  This package relies upon the present of the following packages also included in the
+distribution.  This package relies upon the presence of the following packages also included in the
 @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}), or
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
 @item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}), and
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}).
@@ -1210,17 +1237,17 @@ of the Hewlett-Packard network performance testing tool, @cite{Netperf}, modifie
 @cite{Linux Fast-STREAMS} XTI/TLI, INET and SCTP stack components.  It is used for performance
 testing and measurement on these packages by the OpenSS7 Project.
 
-This package is complete and tested.   This package relies upon the present of the following
+This package is complete and tested.   This package relies upon the presence of the following
 packages also included in the @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}), or
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
 @item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
-@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}), and
-@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}).
+@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
+@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
+@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}).
 @end enumerate
 
 This package is contained in the @file{netperf} subdirectory in the @value{PACKAGE_TITLE} source
@@ -1229,7 +1256,32 @@ distribution.
 @node strisdn
 @subsection strisdn-@value{VERSION_STRISDN}
 
-The @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}) package contains
+The @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}) package contains a wide array of
+signalling and call control packages for use in development of switching platforms and VoIP
+networks.
+
+The components in this subpackage are the
+ISDN
+components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
+package was getting much too large and was split into @command{strchan}, @command{strsio},
+@command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
+
+This package is a work in progress and partially tested.  This package relies upon the presence of
+the following packages also included, in the @value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
+@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
+@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}), and
+@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}).
+@end enumerate
+
+This package is contained in the @file{strisdn} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.  See the installation and reference manual in the @file{strisdn/doc/manual}
+subdirectory for more information on this subpackage.
 
 @node strss7
 @subsection strss7-@value{VERSION_STRSS7}
@@ -1238,17 +1290,24 @@ The @cite{STREAMS SS7/VoIP/ISDN/SIGTRAN} (@command{strss7-@value{VERSION_STRSS7}
 a wide array of signalling and call control packages for use in development of switching platforms
 for legacy and VoIP networks.
 
-This package is a work in progress and partially tested.   This package relies upon the present of
+The components in this subpackage are the
+SS7
+components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
+package was getting much too large and was split into @command{strchan}, @command{strsio},
+@command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
+
+This package is a work in progress and partially tested.   This package relies upon the presence of
 the following packages also included in the @value{PACKAGE_TITLE}:
 
 @enumerate
-@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) or
-@item @cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}); and,
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
 @item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
-@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}), and
-@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}).
+@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
+@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
+@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}), and
+@item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}).
 @end enumerate
 
 This package is contained in the @file{stacks} subdirectory in the @value{PACKAGE_TITLE} source
@@ -1259,8 +1318,46 @@ distribution.
 
 The @cite{STREAMS SIGTRAN} (@command{sigtran-@value{VERSION_SIGTRAN}}) package contains
 
+The components in this subpackage are the
+SIGTRAN
+components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
+package was getting much too large and was split into @command{strchan}, @command{strsio},
+@command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
+@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
+@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
+@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}),
+@item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}), and
+@item @cite{STREAMS SS7} (@command{strisdn-@value{VERSION_STRSS7}}).
+@end enumerate
+
 @node strvoip
 @subsection strvoip-@value{VERSION_STRVOIP}
+
+The components in this subpackage are the
+VoIP
+components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
+package was getting much too large and was split into @command{strchan}, @command{strsio},
+@command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
+@item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
+@item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
+@item @cite{STREAMS Channels} (@command{strsctp-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS ISO} (@command{strsctp-@value{VERSION_STRISO}}),
+@item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}),
+@item @cite{STREAMS SS7} (@command{strisdn-@value{VERSION_STRSS7}}), and
+@item @cite{STREAMS SIGTRAN} (@command{sigtran-@value{VERSION_SIGTRAN}}).
+@end enumerate
 
 The @cite{STREAMS VoIP} (@command{strvoip-@value{VERSION_STRVOIP}}) package contains
 

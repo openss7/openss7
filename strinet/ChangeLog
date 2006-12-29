@@ -1,5 +1,6 @@
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
+	* strinet.spec.in: old rpms hate nested ifs
 	* acinclude.m4: changes for successful master build
 	* strinet.spec.in: changes for successful master build
 	* doc/manual/prerequisites.texi: changes for successful master build

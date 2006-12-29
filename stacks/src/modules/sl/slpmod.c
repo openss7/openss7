@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/27 16:35:55 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 12:18:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/27 16:35:55 $ by $Author: brian $
+ Last Modified $Date: 2006/12/29 12:18:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.2  2006/12/29 12:18:14  brian
+ - old rpms hate nested ifs, release updates
+
  Revision 0.9.2.1  2006/12/27 16:35:55  brian
  - added slpmod module and fixups for make check target
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/27 16:35:55 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 12:18:14 $"
 
-static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/27 16:35:55 $";
+static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 12:18:14 $";
 
 /*
  *  This is SLPMOD, an SL module that is pushed over a pipe end to form an internal
@@ -92,7 +95,7 @@ static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <ss7/sli_ioctl.h>
 
 #define SLPMOD_DESCRIP		"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SLPMOD_REVISION		"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/27 16:35:55 $"
+#define SLPMOD_REVISION		"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 12:18:14 $"
 #define SLPMOD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SLPMOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SLPMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1723,7 +1726,7 @@ static struct streamtab slpmodinfo = {
 static unsigned short modid = MOD_ID;
 
 #ifndef module_param
-MODULE_PARM("h", modid);
+MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif

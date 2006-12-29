@@ -1,5 +1,6 @@
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
+	* strbcm.spec.in: old rpms hate nested ifs
 	* strbcm.spec.in: changes for successful master build
 	* doc/manual/prerequisites.texi: changes for successful master build
 

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/12/29 05:51:23 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/12/29 12:18:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/29 05:51:23 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 12:18:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1445,6 +1445,11 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 fi
 
+%if %{NEED_manrefs}
+%global manrefs %{_mandir}/%{base}.refs*
+%global manmacros %{_mandir}/%{base}.macros*
+%endif
+
 %if %{FILES_doclibs}
 %files doc
 # ---------------------------------------------------------------------------
@@ -1456,10 +1461,8 @@ fi
 %doc doc/manual
 #doc doc/specs doc/projects doc/drafts
 %{_infodir}/*
-%if %{NEED_manrefs}
-%{_mandir}/%{base}.refs*
-%{_mandir}/%{base}.macros*
-%endif
+%{manrefs}
+%{manmacros}
 %{_mandir}/man*/*
 %endif
 
@@ -1473,10 +1476,8 @@ fi
 %doc doc/manual
 #doc doc/specs doc/projects doc/drafts
 %{_infodir}/*
-%if %{NEED_manrefs}
-%{_mandir}/%{base}.refs*
-%{_mandir}/%{base}.macros*
-%endif
+%{manrefs}
+%{manmacros}
 %{_mandir}/man*/*
 %endif
 
@@ -1922,9 +1923,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.148  2006/12/29 05:51:23  brian
-# - changes for successful master build
+# Revision 0.9.2.149  2006/12/29 12:18:30  brian
+# - old rpms hate nested ifs, release updates
 #
+
+* Fri Dec 29 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.148  2006/12/29 05:51:23  brian
+- changes for successful master build
 
 * Mon Oct  2 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.147  2006/10/02 11:31:35  brian

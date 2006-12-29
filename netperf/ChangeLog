@@ -1,5 +1,6 @@
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
+	* netperf.spec.in: old rpms hate nested ifs
 	* Makefile.am: changes for successful master build
 	* acinclude.m4: changes for successful master build
 	* netperf.spec.in: changes for successful master build

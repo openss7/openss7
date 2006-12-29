@@ -1,5 +1,8 @@
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
+	* streams.spec.in: old rpms hate nested ifs
+	* debian/changelog: updated for release
+	* doc/manual/porting.texi: updated for release
 	* streams.spec.in: changes for successful master build
 	* doc/manual/prerequisites.texi: changes for successful master build
 

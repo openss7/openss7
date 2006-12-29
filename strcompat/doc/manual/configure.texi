@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 0.9.2.2 2005/12/30 12:22:06 brian Exp $
+@c @(#) $Id: configure.texi,v 0.9.2.3 2006/12/29 12:18:28 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/12/30 12:22:06 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/29 12:18:28 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -67,7 +67,7 @@ In addition, the following @command{configure} options, specific to the
 @item --disable-compat-os7
 @opindex compat-os7
 Disable @cite{OpenSS7} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{OpenSS7} documentation so that STREAMS drivers and modules written to
 @cite{OpenSS7} specifications will compile with @value{PACKAGE_TITLE}.  When disabled, STREAMS
 drivers and modules written for @cite{OpenSS7} will require porting in more respects.
@@ -76,7 +76,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-svr3
 @opindex compat-svr3
 Disable @cite{UNIX SVR 3.2} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{UNIX SVR 3.2} documentation so that STREAMS drivers and modules written to
 @cite{UNIX SVR 3.2} specifications will compile with @value{PACKAGE_TITLE}.  When disabled, STREAMS
 drivers and modules written for @cite{UNIX SVR 3.2} will require porting in more respects.
@@ -85,7 +85,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-svr4
 @opindex compat-svr4
 Disable @cite{UNIX SVR 4.2 MP} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{UNIX SVR 4.2 MP} documentation so that STREAMS drivers and modules written
 to @cite{UNIX SVR 4.2 MP} specifications will compile with @value{PACKAGE_TITLE}.  When disabled,
 STREAMS drivers and modules written for @cite{UNIX SVR 4.2 MP} will require porting in more
@@ -95,7 +95,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-mps
 @opindex compat-mps
 Disable @cite{Mentat Portable STREAMS} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{Mentat Portable STREAMS} documentation so that STREAMS drivers and modules
 written to @cite{Mentat Portable STREAMS} specifications will compile with @value{PACKAGE_TITLE}.
 When disabled, STREAMS drivers and modules written for @cite{Mentat Portable STREAMS} will require
@@ -105,7 +105,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-sol8
 @opindex compat-sol8
 Disable @cite{Solaris 8} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{Solaris 8} documentation so that STREAMS drivers and modules written to
 @cite{Solaris 8} specifications will compile with @value{PACKAGE_TITLE}.  When disabled, STREAMS
 drivers and modules written for @cite{Solaris 8} will require porting in more respects.
@@ -114,7 +114,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-uw7
 @opindex compat-uw7
 Disable @cite{UnixWare 7} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{UnixWare 7} documentation so that STREAMS drivers and modules written to
 @cite{UnixWare 7} specifications will compile with @value{PACKAGE_TITLE}.  When disabled, STREAMS
 drivers and modules written for @cite{UnixWare 7} will require porting in more respects.
@@ -123,7 +123,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-osf
 @opindex compat-osf
 Disable @cite{OSF/1.2} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{OSF/1.2} documentation so that STREAMS drivers and modules written to
 @cite{OSF/1.2} specifications will compile with @value{PACKAGE_TITLE}.  When disabled, STREAMS
 drivers and modules written for @cite{OSF/1.2} will require porting in more respects.
@@ -132,7 +132,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-aix
 @opindex compat-aix
 Disable @cite{AIX 5L Version 5.1} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{AIX 5L Version 5.1} documentation so that STREAMS drivers and modules
 written to @cite{AIX 5L Version 5.1} specifications will compile with @value{PACKAGE_TITLE}.  When
 disabled, STREAMS drivers and modules written for @cite{AIX 5L Version 5.1} will require porting in
@@ -142,7 +142,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-hpux
 @opindex compat-hpux
 Disable @cite{HPUX STREAMS/UX} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{HPUX STREAMS/UX} documentation so that STREAMS drivers and modules written
 to @cite{HPUX STREAMS/UX} specifications will compile with @value{PACKAGE_TITLE}.  When disabled,
 STREAMS drivers and modules written for @cite{HPUX STREAMS/UX} will require porting in more
@@ -152,7 +152,7 @@ This option defaults to @samp{enabled}.
 @item --disable-compat-irix
 @opindex compat-irix
 Disable @cite{IRIX} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{IRIX} documentation so that STREAMS drivers and modules written to
 @cite{IRIX} specifications will compile with @value{PACKAGE_TITLE}.  When disabled, STREAMS drivers
 and modules written for @cite{IRIX} will require porting in more respects.
@@ -162,7 +162,7 @@ This option defaults to @samp{enabled}.
 @itemx --disable-compat-lis
 @opindex compat-lis
 Disable @cite{LiS} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{LiS} documentation so that STREAMS drivers and modules written to
 @cite{LiS} specifications will compile with @value{PACKAGE_TITLE}.  When disabled, STREAMS drivers
 and modules written for @cite{LiS} will require porting in more respects.
@@ -173,7 +173,7 @@ when compiled with @cite{Linux STREAMS}.
 @itemx --disable-compat-lfs
 @opindex compat-lfs
 Disable @cite{Linux Fast STREAMS} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{Linux Fast STREAMS} documentation so that STREAMS drivers and modules
 written to @cite{Linux Fast STREAMS} specifications will compile with @value{PACKAGE_TITLE}.  When
 disabled, STREAMS drivers and modules written for @cite{Linux Fast STREAMS} will require porting in
@@ -184,7 +184,7 @@ when compiled with @cite{Linux Fast STREAMS}.
 @item --disable-compat-mac
 @opindex compat-mac
 Disable @cite{MacOT} compatibility module.
-When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (witout replicating
+When enabled, @value{PACKAGE_TITLE} will attempt to be as compatible as possible (without replicating
 any bugs) with the @cite{MacOT} documentation so that STREAMS drivers and modules written to
 @cite{MacOT} specifications will compile with @value{PACKAGE_TITLE}.  When disabled, STREAMS drivers
 and modules written for @cite{MacOT} will require porting in more respects.

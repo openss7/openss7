@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: porting.texi,v 0.9.2.19 2006/10/21 10:31:32 brian Exp $
+% @(#) $Id: porting.texi,v 0.9.2.20 2006/12/29 12:18:34 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/21 10:31:32 $ by $Author: brian $
+% Last Modified $Date: 2006/12/29 12:18:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -1177,9 +1177,76 @@ time in ticks since reboot
 @subsection Differences from LiS 2.18.4
 @cindex differences from lis 2.18.4
 
+The many manual pages included with the @command{streams} and @command{strcompat} packages describe
+areas where @cite{LiS} and @cite{Linux Fast-STREAMS} differ for specific DDI/DKI utilities and user
+interface functions, and also provide considerations for portability.
+
+The major difference between @cite{LiS} and @cite{Linux Fast-STREAMS} is bugs: @cite{LiS} is full of
+them.  @cite{LiS 2.18.4} fails about one-third of a thousand or so @cite{POSIX} conformance tests
+(and those test cases mostly test the Stream head).  @cite{Linux Fast-STREAMS} is certainly not
+bug-for-bug compatible with @cite{LiS}.
+
+Some significant differences are summarized as follows:
+
+@table @asis
+@item 32-bit over 64-bit Compatibility
+@cite{LiS} is largely incapable of 32-bit over 64-bit compatibility.  The primary impediment is the
+inability of @cite{LiS} to properly register 32-bit input-output controls with a 64-bit kernel.
+@cite{Linux Fast-STREAMS}, on the other hand, has tested 32-bit over 64-bit compatibility.  All
+test suites are run in 32-bit over 64-bit mode as well as native mode.
+
+@item Proper Handling of M_IOCDATA
+@cite{LiS} improperly waits for an M_IOCNAK after a failed M_COPYIN or M_COPYOUT operation.  All
+other STREAMS implementations (including @cite{Linux Fast-STREAMS}) expect the module or driver to
+abort the input-output control operation when the return value in the M_IOCDATA is non-zero.
+
+@item Proper Stream Head Handling
+@cite{LiS} has many bugs in the Stream head.  Also, @cite{LiS} takes a very narrow view of Stream
+head functionality.  A significant area where @cite{LiS} lacks functionality is in proper signal
+handling for controlling and non-controlling terminals.  Also, the @cite{LiS} Stream head is largely
+unsafe for use by threaded applications.  The @cite{Linux Fast-STREAMS} Stream head properly
+supports FIFOs, pipes, terminals, and sockets, properly signals process groups, handles process
+orphans, and normal UNIX job control (including signals).  @cite{LiS} does not handle polling
+correctly with regard to message bands.  @cite{Linux Fast-STREAMS} properly handles polling with
+regard to message bands, including extended POSIX signals with regard to poll.
+
+@item bufcalls
+@cite{LiS} does not properly implement buffer callbacks.  @cite{LiS} sets a one second timer and
+invokes buffer callbacks upon timeout.  @cite{Linux Fast-STREAMS}, like @cite{SVR 4.2}, keeps track
+of buffers as they are allocated and freed and invokes a callback shortly after a buffer is freed.
+The result is that the buffer callback under @cite{Linux Fast-STREAMS} is always invoked from within
+the @dfn{STREAMS} scheduler context.  For @cite{LiS}, the buffer callback is invoked under timeout
+(bottom half, soft irq) context.
+
+@item qprocson/qprocsoff
+@cite{LiS} does not have a workable mechanism for turning queue procedures on or off.
+@cite{Linux Fast-STREAMS} has a full MP-safe mechanism similar to @cite{SVR 4.2}.
+
+@item freezestr/unfreezestr
+@cite{LiS} does not have a workable mechanism for freezing a Stream.
+@cite{Linux Fast-STREAMS} has a full MP-safe mechanism similar to @cite{SVR 4.2}.
+
+@item q->q_next
+@cite{LiS} has no mechanism for protecting derefencing of the q->q_next pointer from race
+conditions.  Pushing or popping a module to or from a Stream in the process or passsing message
+blocks can cause kernel crashes.  @cite{Linux Fast-STREAMS} has a full MP-safe mechanism for
+protecting q_next pointer derefencing (Stream head read locks) while within a queue put or service
+procedure, timeouts and buffer callbacks.  The full qprocson/qprocsoff mechanism under @cite{Linux
+Fast-STREAMS} properly protects the queue open and close routines.
+
+@item Enhancements
+@cite{Linux Fast-STREAMS} provides a set of enhanced features not present in @cite{LiS} but present
+in other @dfn{STREAMS} implementations.  One important feature that @cite{LiS} lacks, that
+@cite{Linux Fast-STREAMS} provides, is a fully functional @manref{strlog(9)} capability.
+@end table
+
 @node Commonalities with LiS 2.18.4
 @subsection Commonalities with LiS 2.18.4
 @cindex commonalities with lis 2.18.4
+
+For the most part, where @cite{LiS} properly follows @cite{SVR 4} behavior and @cite{SVR 4}
+behavior is consistent with @cite{SVR 4.2} behavior, @cite{Linux Fast-STREAMS} behaves the same as
+@cite{LiS}.
 
 @node Compatibility Functions for LiS 2.18.4
 @subsection Compatibility Functions for LiS 2.18.4

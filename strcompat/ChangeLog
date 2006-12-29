@@ -1,5 +1,11 @@
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
+	* strcompat.spec.in: old rpms hate nested ifs
+	* doc/manual/configure.texi: updated for release
+	* doc/manual/descrip.texi: updated for release
+	* doc/manual/news.texi: updated for release
+	* doc/manual/releases.texi: updated for release
+	* doc/manual/strcompat.texi: updated for release
 	* strcompat.spec.in: changes for successful master build
 	* doc/manual/prerequisites.texi: changes for successful master build
 	* src/kernel/mpscompat.c: changes for successful master build

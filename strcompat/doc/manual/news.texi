@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.8 2006/10/29 02:03:01 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.9 2006/12/29 12:18:28 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/29 02:03:01 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/29 12:18:28 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -102,6 +102,10 @@ Dropped support for @cite{LiS}.
 @item
 Package will now support extended ranges of minor devices on 2.6 kernels under
 @cite{Linux Fast-STREAMS} only.
+
+@item
+Better support for Ubuntu and recent gcc compilers, including debian script
+corrections.
 
 @item
 Better detection of SUSE distributions, release numbers and SLES distributions:
