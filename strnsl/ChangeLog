@@ -1,3 +1,9 @@
+2006-12-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* strnsl.spec.in: changes for successful master build
+	* doc/manual/prerequisites.texi: changes for successful master build
+	* src/lib/netselect.c: changes for successful master build
+
 2006-12-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: adjust base majors and module ids

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2006/12/27 16:35:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2006/12/29 05:51:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/27 16:35:57 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.82  2006/12/29 05:51:03  brian
+# - changes for successful master build
+#
 # Revision 0.9.2.81  2006/12/27 16:35:57  brian
 # - added slpmod module and fixups for make check target
 #
@@ -343,6 +346,8 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/sl_x400p.c \
 				  src/modules/x400p-ss7/sl_x100p.c \
+				  src/modules/x400p-ss7/v400pfw.h \
+				  src/modules/x400p-ss7/v401pfw.h \
 				  src/modules/x400p-ss7/x400pfw.h \
 				  config.h strconf.h
 
@@ -662,6 +667,8 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/x400p-ss7/ch_x400p.c \
 				  src/modules/x400p-ss7/mx_x400p.c \
 				  src/modules/x400p-ss7/x400p_mx.c \
+				  src/modules/x400p-ss7/v400pfw.h \
+				  src/modules/x400p-ss7/v401pfw.h \
 				  src/modules/x400p-ss7/x400pfw.h \
 				  src/modules/lm/lm.h \
 				  src/modules/cd/cd.h \

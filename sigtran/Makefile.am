@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/29 05:50:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/23 13:06:45 $ by $Author: brian $
+## Last Modified $Date: 2006/12/29 05:50:56 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.4  2006/12/29 05:50:56  brian
+## - changes for successful master build
+##
 ## Revision 0.9.2.3  2006/12/23 13:06:45  brian
 ## - manual page and other package updates for release
 ##
@@ -400,6 +403,11 @@ MANUAL_FILE			= doc/manual/$(PACKAGE).txt
 
 include am/release.am
 
+##
+## Rules for doxygen documentation.
+##
+include am/doxy.am
+
 EXTRA_DIST			+= \
 				  debian/README.Debian \
 				  debian/TODO.Debian
@@ -418,6 +426,5 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/ltmain.sh \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
-
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

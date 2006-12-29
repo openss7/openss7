@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 1.1.2.2 2006/08/23 11:00:18 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.3 2006/12/29 05:50:40 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/23 11:00:18 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/29 05:50:40 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -467,6 +467,12 @@ See @manref{tpiperf(4)} for more information.
 @node striso Kernel Modules
 @subsubsection striso
 
+@node strchan Kernel Modules
+@subsubsection strchan
+
+@node strisdn Kernel Modules
+@subsubsection strisdn
+
 @node strss7 Kernel Modules
 @subsubsection strss7
 
@@ -566,6 +572,12 @@ and @cite{V401P} cards.
 See @manref{x400p-ss7(4)} for more information.
 
 @end table
+
+@node sigtran Kernel Modules
+@subsubsection sigtran
+
+@node strvoip Kernel Modules
+@subsubsection strvoip
 
 @node LiS Kernel Modules
 @subsubsection LiS

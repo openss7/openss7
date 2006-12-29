@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2006/10/02 11:31:26 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2006/12/29 05:51:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:26 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,9 +98,9 @@
 #global preloads    
 #global libraries   
 %global tools       strss7_mknod test-m2pa test-q781 test-tcpc test-tcps test-udpc test-udps test-x100p test-x400p
-%global infofiles   %{name} libxnet cci tri tci mapi hlr voip tpi_tcap
-#global initfiles
-#global conffiles   %{name}.conf
+%global infofiles   %{base} libxnet cci tri tci mapi hlr voip tpi_tcap
+%global initfiles   %{base}
+%global conffiles   %{name}.conf
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
@@ -383,7 +383,7 @@
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
 %define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
-%global descripline %{title} provides SS7/ISDN/VoIP/SIGTRAN protocols for %{_STREAMS} STREAMS.
+%global descripline %{title} provides SS7 protocols for %{_STREAMS} STREAMS.
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux.
 Name:           @PACKAGE@
@@ -442,6 +442,9 @@ BuildRequires:    strxns-devel >=     @XNS_VERSION@%{?extrarelease2}
 BuildRequires:   strxnet-devel >=     @XTI_VERSION@%{?extrarelease2}
 BuildRequires:   strinet-devel >=    @INET_VERSION@%{?extrarelease2}
 BuildRequires:   strsctp-devel >=    @SCTP_VERSION@%{?extrarelease2}
+BuildRequires:   strchan-devel >=    @CHAN_VERSION@%{?extrarelease2}
+BuildRequires:    striso-devel >=     @ISO_VERSION@%{?extrarelease2}
+BuildRequires:   strisdn-devel >=    @ISDN_VERSION@%{?extrarelease2}
 
 # these are some needs of the configure script
 # to manipulate manual pages:
@@ -749,7 +752,7 @@ Release:        %{fullrelease}
 The %{name}-%{_streams}-%{core_name} binary package contains the
 kernel modules that provide the Linux kernel %{stitle}
 %{_STREAMS} STREAMS drivers and modules.  This includes assorted
-drivers and modules for additional protocol stacks such as SIGTRAN.
+drivers and modules for additional protocol stacks such as SS7.
 This package is heavily tied to the kernel for which it and the
 %{_STREAMS} STREAMS facility were compiled.  This package
 applies to kernel version %{kernel_version} and requires a
@@ -1921,27 +1924,31 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
-# Revision 0.9.2.80  2006/10/02 11:31:26  brian
-# - changes to get master builds working for RPM and DEB
-# - added outside licenses to package documentation
-# - added LICENSE automated release file
-# - copy MANUAL to source directory
-# - add and remove devices in -dev debian subpackages
-# - get debian rules working better
-# - release library version files
-# - added notes to debian changelog
-# - corrections for cooked manual pages in spec files
-# - added release documentation to spec and rules files
-# - copyright header updates
-# - moved controlling tty checks in stream head
-# - missing some defines for LiS build in various source files
-# - added OSI headers to striso package
-# - added includes and manual page paths to acincludes for various packages
-# - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
-#   files
-# - moved pragma weak statements ahead of declarations
-# - changes for master build of RPMS and DEBS with LiS
+# Revision 0.9.2.81  2006/12/29 05:51:03  brian
+# - changes for successful master build
 #
+
+* Mon Oct  2 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.80  2006/10/02 11:31:26  brian
+- changes to get master builds working for RPM and DEB
+- added outside licenses to package documentation
+- added LICENSE automated release file
+- copy MANUAL to source directory
+- add and remove devices in -dev debian subpackages
+- get debian rules working better
+- release library version files
+- added notes to debian changelog
+- corrections for cooked manual pages in spec files
+- added release documentation to spec and rules files
+- copyright header updates
+- moved controlling tty checks in stream head
+- missing some defines for LiS build in various source files
+- added OSI headers to striso package
+- added includes and manual page paths to acincludes for various packages
+- added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+  files
+- moved pragma weak statements ahead of declarations
+- changes for master build of RPMS and DEBS with LiS
 
 * Fri Sep 29 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.79  2006/09/29 11:50:09  brian

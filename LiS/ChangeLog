@@ -1,3 +1,8 @@
+2006-12-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in: changes for successful master build
+	* manual/prerequisites.texi: changes for successful master build
+
 2006-12-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* man/man4/clone.4.man: a bit better make check target

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/12/28 05:32:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/12/29 05:51:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 05:32:58 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.36  2006/12/29 05:51:06  brian
+# - changes for successful master build
+#
 # Revision 0.9.2.35  2006/12/28 05:32:58  brian
 # - changes for make check target
 #
@@ -108,7 +111,6 @@ ss7_man_MANS = \
 	man4/gsma.4 \
 	man4/hdlc.4 \
 	man4/hdlc_ioctl.4 \
-	man4/isdn_ioctl.4 \
 	man4/isup.4 \
 	man4/isup_ioctl.4 \
 	man4/lm.4 \
@@ -942,6 +944,7 @@ isdn_man_MANS = \
 	man4/idp.4 \
 	man4/ISDN.4 \
 	man4/isdn.4 \
+	man4/isdn_ioctl.4 \
 	man4/lapd.4 \
 	man4/lapf.4 \
 	man4/q921.4 \
@@ -1292,17 +1295,13 @@ chan_man_MANS = \
 	man4/cd_hdlc.4 \
 	man4/ch.4 \
 	man4/ch_ioctl.4 \
-	man4/chi_ioctl.4 \
 	man4/MG.4 \
 	man4/mg.4 \
 	man4/mg_ioctl.4 \
-	man4/mgi_ioctl.4 \
 	man4/mg-lm.4 \
 	man4/mx.4 \
 	man4/mx_ioctl.4 \
-	man4/mxi_ioctl.4 \
 	man4/mx_sdl.4 \
-	man4/v401p.4 \
 	man7/CH_ATTACH_REQ.7 \
 	man7/CH_attach_req.7 \
 	man7/CH_attach_req_t.7 \
@@ -2471,6 +2470,7 @@ isdn_dist_noinst_MANS = \
 	man4/idp.4.man \
 	man4/ISDN.4.man \
 	man4/isdn.4.man \
+	man4/isdn_ioctl.4.man \
 	man4/lapd.4.man \
 	man4/lapf.4.man \
 	man4/q921.4.man \
@@ -2821,17 +2821,13 @@ chan_dist_noinst_MANS = \
 	man4/cd_hdlc.4.man \
 	man4/ch.4.man \
 	man4/ch_ioctl.4.man \
-	man4/chi_ioctl.4.man \
 	man4/MG.4.man \
 	man4/mg.4.man \
 	man4/mg_ioctl.4.man \
-	man4/mgi_ioctl.4.man \
 	man4/mg-lm.4.man \
 	man4/mx.4.man \
 	man4/mx_ioctl.4.man \
-	man4/mxi_ioctl.4.man \
 	man4/mx_sdl.4.man \
-	man4/v401p.4.man \
 	man7/CH_ATTACH_REQ.7.man \
 	man7/CH_attach_req.7.man \
 	man7/CH_attach_req_t.7.man \

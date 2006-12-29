@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:48:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 05:51:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 10:48:57 $ by $Author: brian $
+## Last Modified $Date: 2006/12/29 05:51:32 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2006/12/29 05:51:32  brian
+## - changes for successful master build
+##
 ## Revision 0.9.2.1  2006/10/16 10:48:57  brian
 ## - added new package files
 ##
@@ -61,7 +64,23 @@ include ../../am/openss7.am
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-nobase_pkginclude_HEADERS = 
+nobase_pkginclude_HEADERS =  \
+	sys/capi.h \
+	sys/capi_ioctl.h \
+	sys/cci.h \
+	sys/dlpi_gr303.h \
+	sys/dlpi_isdn.h \
+	sys/dlpi_lapd.h \
+	sys/dlpi_v52.h \
+	sys/dua_ioctl.h \
+	sys/gr303_ioctl.h \
+	sys/isdni.h \
+	sys/isdni_ioctl.h \
+	sys/lapd_ioctl.h \
+	sys/lapf_ioctl.h \
+	sys/ph.h \
+	sys/q920.h \
+	sys/v52_ioctl.h
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \

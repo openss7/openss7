@@ -1,3 +1,10 @@
+2006-12-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: changes for successful master build
+	* acinclude.m4: changes for successful master build
+	* netperf.spec.in: changes for successful master build
+	* manual/prerequisites.texi: changes for successful master build
+
 2006-12-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* man1/netperf_arr.man: remove empty EXAMPLES section

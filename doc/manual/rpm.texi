@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 1.1.2.1 2006/08/22 12:40:13 brian Exp $
+@c @(#) $Id: rpm.texi,v 0.9.2.2 2006/12/29 05:50:40 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/22 12:40:13 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/29 05:50:40 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -173,6 +173,16 @@ The default is to include the
 @cite{STREAMS Stream Control Transmission Protocol (SCTP)} (@command{strsctp-@value{VERSION_STRSCTP}})
 add-on package in the build.
 
+@item --without STRCHAN
+@opindex STRCHAN
+
+When disabled, excludes the @command{strchan-@value{VERSION_STRCHAN}} add-on package from the build.
+When the @command{strchan} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strchan} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}})
+add-on package in the build.
+
 @item --with STRISO
 @opindex --with STRISO
 
@@ -191,6 +201,16 @@ The default is to include the
 @cite{Netperf} (@command{netperf-@value{VERSION_NETPERF}})
 add-on package in the build.
 
+@item --without STRISDN
+@opindex STRISDN
+
+When disabled, excludes the @command{strisdn-@value{VERSION_STRISDN}} add-on package from the build.
+When the @command{strisdn} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strisdn} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS ISDN Stacks} (@command{strisdn-@value{VERSION_STRISDN}})
+add-on package in the build.
+
 @item --without STACKS
 @opindex STACKS
 
@@ -198,7 +218,27 @@ When disabled, excludes the @command{strss7-@value{VERSION_STRSS7}} add-on packa
 When the @command{strss7} add-on package is excluded, none of the packages which depend upon it
 can be built unless the @command{strss7} package was otherwise installed on the build system.
 The default is to include the
-@cite{STREAMS SS7/VoIP/ISDN/SIGTRAN Stacks} (@command{strss7-@value{VERSION_STRSS7}})
+@cite{STREAMS SS7 Stacks} (@command{strss7-@value{VERSION_STRSS7}})
+add-on package in the build.
+
+@item --without SIGTRAN
+@opindex SIGTRAN
+
+When disabled, excludes the @command{sigtran-@value{VERSION_SIGTRAN}} add-on package from the build.
+When the @command{sigtran} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{sigtran} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS SIGTRAN Stacks} (@command{sigtran-@value{VERSION_SIGTRAN}})
+add-on package in the build.
+
+@item --without STRVOIP
+@opindex STRVOIP
+
+When disabled, excludes the @command{strvoip-@value{VERSION_STRVOIP}} add-on package from the build.
+When the @command{strvoip} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{strvoip} package was otherwise installed on the build system.
+The default is to include the
+@cite{STREAMS VoIP Stacks} (@command{strvoip-@value{VERSION_STRVOIP}})
 add-on package in the build.
 
 @item --with LIS

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.8 2006/10/29 02:03:09 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.9 2006/12/29 05:51:53 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/29 02:03:09 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/29 05:51:53 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,7 +89,7 @@ This release was tested at the 10th SCTP Interop in Vancouver, Canada, at the
 beginning of August, 2006.  This implementation showed well and interoperated
 successfully with all implementations present.  Interoperability testing was
 performed using Linux Fast-STREAMS on the latest, at the time, Fedora Core 5
-kernel (2.6.17) and Ubuntu 6.06 Server (2.6.15).
+kernel (2.6.18) and Ubuntu 6.06 Server (2.6.15).
 
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel

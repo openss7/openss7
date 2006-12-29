@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2006/09/26 00:50:45 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/12/29 05:50:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 00:50:45 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:50:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,7 +71,6 @@ m4_include([m4/deb.m4])
 AC_DEFUN([AC_NETPERF], [dnl
     _OPENSS7_PACKAGE([NETPERF], [OpenSS7 NETPERF Utility])
     _NETPERF_OPTIONS
-    with_cooked_manpages='yes'
     _AUTOPR
     _MAN_CONVERSION
     _PUBLIC_RELEASE

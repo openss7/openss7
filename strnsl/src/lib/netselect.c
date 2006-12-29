@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:18 $
+ @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/29 05:51:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:21:18 $ by $Author: brian $
+ Last Modified $Date: 2006/12/29 05:51:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netselect.c,v $
+ Revision 0.9.2.3  2006/12/29 05:51:50  brian
+ - changes for successful master build
+
  Revision 0.9.2.2  2006/12/18 08:21:18  brian
  - resolve device numbering
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:18 $"
+#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/29 05:51:50 $"
 
-static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:18 $";
+static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/29 05:51:50 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -92,6 +95,8 @@ static char const ident[] = "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.
 #define __USE_XOPEN2K
 #define __USE_GNU
 #endif
+
+#undef __USE_STRING_INLINES
 
 #define NEED_T_USCALAR_T 1
 

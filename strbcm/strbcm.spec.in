@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.spec.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/02 11:31:31 $
+# @(#) $RCSfile: strbcm.spec.in,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/12/29 05:51:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:31 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1867,27 +1867,31 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strbcm.spec.in,v $
-# Revision 0.9.2.12  2006/10/02 11:31:31  brian
-# - changes to get master builds working for RPM and DEB
-# - added outside licenses to package documentation
-# - added LICENSE automated release file
-# - copy MANUAL to source directory
-# - add and remove devices in -dev debian subpackages
-# - get debian rules working better
-# - release library version files
-# - added notes to debian changelog
-# - corrections for cooked manual pages in spec files
-# - added release documentation to spec and rules files
-# - copyright header updates
-# - moved controlling tty checks in stream head
-# - missing some defines for LiS build in various source files
-# - added OSI headers to striso package
-# - added includes and manual page paths to acincludes for various packages
-# - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
-#   files
-# - moved pragma weak statements ahead of declarations
-# - changes for master build of RPMS and DEBS with LiS
+# Revision 0.9.2.13  2006/12/29 05:51:10  brian
+# - changes for successful master build
 #
+
+* Mon Oct  2 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.12  2006/10/02 11:31:31  brian
+- changes to get master builds working for RPM and DEB
+- added outside licenses to package documentation
+- added LICENSE automated release file
+- copy MANUAL to source directory
+- add and remove devices in -dev debian subpackages
+- get debian rules working better
+- release library version files
+- added notes to debian changelog
+- corrections for cooked manual pages in spec files
+- added release documentation to spec and rules files
+- copyright header updates
+- moved controlling tty checks in stream head
+- missing some defines for LiS build in various source files
+- added OSI headers to striso package
+- added includes and manual page paths to acincludes for various packages
+- added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+  files
+- moved pragma weak statements ahead of declarations
+- changes for master build of RPMS and DEBS with LiS
 
 * Fri Sep 29 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.11  2006/09/29 11:50:14  brian

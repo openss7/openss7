@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.9 2006/10/21 10:30:43 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.10 2006/12/29 05:50:40 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/21 10:30:43 $ by $Author: brian $
+% Last Modified $Date: 2006/12/29 05:50:40 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -402,6 +402,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.10  2006/12/29 05:50:40  brian
+- changes for successful master build
+
 Revision 0.9.2.9  2006/10/21 10:30:43  brian
 - updated LiS release number
 
@@ -732,12 +735,17 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 * strtty::		STREAMS Terminals
 * strxns::		STREAMS X/Open Networking Services (XNS)
 * strxnet::		STREAMS XTI/TLI Library
+* strnsl::		STREAMS NSL Library
 * strsock::		STREAMS Sockets Library
 * strinet::		STREAMS INET
 * strsctp::		STREAMS SCTP
+* strchan::		STREAMS Channels
 * striso::		STREAMS ISO
 * netperf::		Netperf
-* strss7::		STREAMS SS7/VoIP/ISDN/SIGTRAN Stacks
+* strisdn::		STREAMS ISDN Stacks
+* strss7::		STREAMS SS7 Stacks
+* sigtran::		STREAMS SIGTRAN Stacks
+* strvoip::		STREAMS VoIP Stacks
 * LiS::			Linux STREAMS
 @end menu
 
@@ -761,18 +769,28 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 @tab @ref{strxns}.
 @item STREAMS XTI/TLI Library
 @tab @ref{strxnet}.
+@item STREAMS NSL Library
+@tab @ref{strnsl}.
 @item STREAMS Sockets Library
 @tab @ref{strsock}.
 @item STREAMS INET
 @tab @ref{strinet}.
 @item STREAMS SCTP
 @tab @ref{strsctp}.
+@item STREAMS Channels
+@tab @ref{strchan}.
 @item STREAMS ISO
 @tab @ref{striso}.
 @item Netperf
 @tab @ref{netperf}.
+@item STREAMS ISDN Stacks
+@tab @ref{strisdn}.
 @item STREAMS SS7/@-ISDN/@-VoIP Stacks
 @tab @ref{strss7}.
+@item STREAMS SIGTRAN Stacks
+@tab @ref{sigtran}.
+@item STREAMS VoIP Stacks
+@tab @ref{strvoip}.
 @item Linux STREAMS
 @tab @ref{LiS}.
 @end multitable
@@ -797,18 +815,28 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 @tab @ref{strxns}.
 @item STREAMS XTI/TLI Library
 @tab @ref{strxnet}.
+@item STREAMS NSL Library
+@tab @ref{strnsl}.
 @item STREAMS Sockets Library
 @tab @ref{strsock}.
 @item STREAMS INET
 @tab @ref{strinet}.
 @item STREAMS SCTP
 @tab @ref{strsctp}.
+@item STREAMS Channels
+@tab @ref{strchan}.
 @item STREAMS ISO
 @tab @ref{striso}.
 @item Netperf
 @tab @ref{netperf}.
+@item STREAMS ISDN Stacks
+@tab @ref{strisdn}.
 @item STREAMS SS7/@-ISDN/@-VoIP Stacks
 @tab @ref{strss7}.
+@item STREAMS SIGTRAN Stacks
+@tab @ref{sigtran}.
+@item STREAMS VoIP Stacks
+@tab @ref{strvoip}.
 @item Linux STREAMS
 @tab @ref{LiS}.
 @end multitable
@@ -1054,6 +1082,11 @@ distribution.
 See the installation and reference manual in the @file{strxnet/doc} directory for more information on
 this sub-package.
 
+@node strnsl
+@subsection strnsl-@value{VERSION_STRNSL}
+
+The @cite{STREAMS NSL Library} (@command{strnsl-@value{VERSION_STRNSL}}) package
+
 @node strsock
 @subsection strsock-@value{VERSION_STRSOCK}
 
@@ -1140,6 +1173,11 @@ distribution.
 See the installation and reference manual in the @file{strsctp/doc} directory for more information on
 this sub-package.
 
+@node strchan
+@subsection strchan-@value{VERSION_STRCHAN}
+
+The @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}) package provides
+
 @node striso
 @subsection striso-@value{VERSION_STRISO}
 
@@ -1188,6 +1226,11 @@ packages also included in the @value{PACKAGE_TITLE}:
 This package is contained in the @file{netperf} subdirectory in the @value{PACKAGE_TITLE} source
 distribution.
 
+@node strisdn
+@subsection strisdn-@value{VERSION_STRISDN}
+
+The @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}) package contains
+
 @node strss7
 @subsection strss7-@value{VERSION_STRSS7}
 
@@ -1210,6 +1253,16 @@ the following packages also included in the @value{PACKAGE_TITLE}:
 
 This package is contained in the @file{stacks} subdirectory in the @value{PACKAGE_TITLE} source
 distribution.
+
+@node sigtran
+@subsection sigtran-@value{VERSION_SIGTRAN}
+
+The @cite{STREAMS SIGTRAN} (@command{sigtran-@value{VERSION_SIGTRAN}}) package contains
+
+@node strvoip
+@subsection strvoip-@value{VERSION_STRVOIP}
+
+The @cite{STREAMS VoIP} (@command{strvoip-@value{VERSION_STRVOIP}}) package contains
 
 @node LiS
 @subsection LiS-@value{VERSION_LIS}
@@ -1466,6 +1519,7 @@ See @manref{spm(4)} for more information.
 * streams Libraries::
 * strtty Libraries::
 * strxnet Libraries::
+* strnsl Libraries::
 * strsock Libraries::
 * striso Libraries::
 * netperf Libraries::
@@ -1490,6 +1544,12 @@ and @manref{isastream(2)} system call emulation.
 This is an @dfn{XTI/TLI} library installed by the @command{strxnet-@value{VERSION_STRXNET}} package
 providing a set of XTI/TLI functions described in Section 3 of the manual pages, starting with
 @manref{xti(3)}.
+
+@item libxnsl.so
+
+This is an @dfn{NSL} library installed by the @command{strnsl-@value{VERSION_STRNSL}} package
+providing a set of NSL functions described in Section 3 of the manual pages, starting with
+@manref{nsl(3)}.
 
 @item libsocket.so
 
@@ -1523,6 +1583,11 @@ and @manref{isastream(2)} system call emulation.
 @subsection strxnet
 
 @subsubsection libxnet
+
+@node strnsl Libraries
+@subsection strnsl
+
+@subsubsection libxnsl
 
 @node strsock Libraries
 @subsection strsock
@@ -1578,7 +1643,7 @@ shared libraries, and kernel modules in a structured manner.
 Header files are installed, typically, in the @file{/@-usr/@-include/@-@var{name}/} subdirectory,
 where @var{name} is the name of the package.@footnote{That is, where @emph{name} is one of
 @file{sctp}, @file{iperf}, @file{streams}, @file{strcompat}, @file{strutil}, @file{strxns},
-@file{strxnet}, @file{strinet}, @file{strtty}, @file{striso}, @file{strsctp}, @file{netperf}, or
+@file{strxnet}, @file{strnsl}, @file{strinet}, @file{strtty}, @file{striso}, @file{strchan}, @file{strsctp}, @file{netperf}, or
 @file{LiS}.} To use the header files from one of the packages,
 @samp{-I/@-usr/@-include/@-@var{name}/} must be included as a @command{gcc} compile option.  This is
 true regardless of whether user space or kernel programs are being compiled.
@@ -1588,10 +1653,15 @@ reverse order of the dependencies between packages.  So, for example, if include
 add-on packages are required, the order of these directives should be:
 
 @enumerate
+@item @samp{-I/usr/include/strvoip}
+@item @samp{-I/usr/include/sigtran}
 @item @samp{-I/usr/include/strss7}
+@item @samp{-I/usr/include/strisdn}
+@item @samp{-I/usr/include/strchan}
 @item @samp{-I/usr/include/strsctp}
 @item @samp{-I/usr/include/strinet}
 @item @samp{-I/usr/include/strxnet}
+@item @samp{-I/usr/include/strnsl}
 @item @samp{-I/usr/include/strxns}
 @item @samp{-I/usr/include/strcompat}
 @item @samp{-I/usr/include/streams}
@@ -1610,12 +1680,17 @@ add-on packages:
 * strtty Header Files::
 * strxns Header Files::
 * strxnet Header Files::
+* strnsl Header Files::
 * strsock Header Files::
 * strinet Header Files::
 * strsctp Header Files::
+* strchan Header Files::
 * striso Header Files::
 * netperf Header Files::
+* strisdn Header Files::
 * strss7 Header Files::
+* sigtran Header Files::
+* strvoip Header Files::
 * LiS Header Files::
 @end menu
 
@@ -1800,6 +1875,12 @@ header files in @file{/usr/include/strxnet}:
 @tab system specific header file for the @cite{X/Open Transport Interface (XTI)}, XTI generic declarations.
 @end multitable
 
+@node strnsl Header Files
+@subsubsection strnsl
+
+The @command{strnsl-@value{VERSION_STRNSL}} add-on package provides the following user-visible
+header files in @file{/usr/include/strnsl}:
+
 @node strsock Header Files
 @subsubsection strsock
 
@@ -1863,11 +1944,23 @@ header files in @file{/usr/include/strsctp}:
 @cite{Stream Control Transmission Protocol (SCTP)} specifics.
 @end multitable
 
+@node strchan Header Files
+@subsubsection strchan
+
+The @command{strchan-@value{VERSION_STRCHAN}} add-on package provides the following user-visible
+header files in @file{/usr/include/strchan}:
+
 @node striso Header Files
 @subsubsection striso
 
 @node netperf Header Files
 @subsubsection netperf
+
+@node strisdn Header Files
+@subsubsection strisdn
+
+The @command{strisdn-@value{VERSION_STRISDN}} add-on package provides the following user-visible
+header files in @file{/usr/include/strisdn}:
 
 @node strss7 Header Files
 @subsubsection strss7
@@ -2245,6 +2338,18 @@ header files in @file{/usr/include/strss7}:
 @tab header file for the @manref{v5ua(4)} driver, input-output controls.
 @end multitable
 
+@node sigtran Header Files
+@subsubsection sigtran
+
+The @command{sigtran-@value{VERSION_SIGTRAN}} add-on package provides the following user-visible
+header files in @file{/usr/include/sigtran}:
+
+@node strvoip Header Files
+@subsubsection strvoip
+
+The @command{strvoip-@value{VERSION_STRVOIP}} add-on package provides the following user-visible
+header files in @file{/usr/include/strvoip}:
+
 @node LiS Header Files
 @subsubsection LiS
 
@@ -2253,6 +2358,7 @@ header files in @file{/usr/include/strss7}:
 
 Shared or static libraries must be linked when using the @command{streams-@value{VERSION_STREAMS}}
 (@file{libstreams}), @command{strxnet-@value{VERSION_STRXNET}} (@file{libxnet}),
+@command{strnsl-@value{VERSION_STRNSL}} (@file{libxnsl}),
 @command{strsock-@value{VERSION_STRSOCK}} (@file{libsocket}) or @command{LiS-@value{VERSION_LIS}}
 packages (@file{libLiS} or @file{libpLiS}).  These libraries must either be specified on the
 @command{gcc} command line as shared libraries (e.g. @samp{-lstreams -lxnet -lsocket}) or as static

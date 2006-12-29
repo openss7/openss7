@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 05:51:13 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/13 07:57:26 $ by $Author: brian $
+## Last Modified $Date: 2006/12/29 05:51:13 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2006/12/29 05:51:13  brian
+## - changes for successful master build
+##
 ## Revision 0.9.2.1  2006/10/13 07:57:26  brian
 ## - added initial STREAMS Channel package
 ##
@@ -312,6 +315,11 @@ include am/deb.am
 MANUAL_FILE			= doc/manual/$(PACKAGE).txt
 
 include am/release.am
+
+##
+## Rules for doxygen documentation.
+##
+include am/doxy.am
 
 EXTRA_DIST			+= \
 				  debian/README.Debian \

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/17 12:12:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/29 05:51:01 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/17 12:12:38 $ by $Author: brian $
+## Last Modified $Date: 2006/12/29 05:51:01 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.3  2006/12/29 05:51:01  brian
+## - changes for successful master build
+##
 ## Revision 0.9.2.2  2006/10/17 12:12:38  brian
 ## - working up new packages
 ##
@@ -77,10 +80,10 @@ nobase_pkginclude_HEADERS = \
 	sys/m2ua_ioctl.h \
 	sys/m3ua.h \
 	sys/m3ua_ioctl.h \
+	sys/ua_ioctl.h \
 	sys/ua_lm.h \
 	sys/ua_lm_ioctl.h \
 	sys/v5ua_ioctl.h
-
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \

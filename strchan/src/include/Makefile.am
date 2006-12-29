@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 05:51:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:57:43 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:17 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2006/12/29 05:51:17  brian
+# - changes for successful master build
+#
 # Revision 0.9.2.1  2006/10/13 07:57:43  brian
 # - added initial STREAMS Channel package
 #
@@ -60,7 +63,17 @@ include ../../am/openss7.am
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-nobase_pkginclude_HEADERS = 
+nobase_pkginclude_HEADERS = \
+	sys/ch.h \
+	sys/chi.h \
+	sys/chi_ioctl.h \
+	sys/mgcp.h \
+	sys/mgi.h \
+	sys/mgi_ioctl.h \
+	sys/mxi.h \
+	sys/mxi_ioctl.h \
+	sys/zapata.h
+
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \

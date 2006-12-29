@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: prerequisites.texi,v 0.9.2.4 2006/08/28 10:32:59 brian Exp $
+@c @(#) $Id: prerequisites.texi,v 0.9.2.5 2006/12/29 05:52:02 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/28 10:32:59 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/29 05:52:02 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -69,7 +69,7 @@ Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
 @footnote{See
 @refman{GNU/Linux Distributions},
 for more information.}
-@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.17)
+@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.18)
 @item glibc2 or better.
 @item GNU info (for info files).
 @item GNU groff (for man pages).
@@ -86,16 +86,32 @@ including references in the manual pages.}
 (@uref{http://www.openss7.org/tarballs/strxns-@value{VERSION_STRXNS}.tar.bz2,, strxns-@value{VERSION_STRXNS}} or better)
 @item OpenSS7 STREAMS XTI/TLI Library
 (@uref{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2,, strxnet-@value{VERSION_STRXNET}} or better)
+@item OpenSS7 STREAMS NSL Library
+(@uref{http://www.openss7.org/tarballs/strnsl-@value{VERSION_STRNSL}.tar.bz2,, strnsl-@value{VERSION_STRNSL}} or better)
+@item OpenSS7 STREAMS Sockets Library
+(@uref{http://www.openss7.org/tarballs/strsock-@value{VERSION_STRSOCK}.tar.bz2,, strsock-@value{VERSION_STRSOCK}} or better)
 @item OpenSS7 STREAMS INET
 (@uref{http://www.openss7.org/tarballs/strinet-@value{VERSION_STRINET}.tar.bz2,, strinet-@value{VERSION_STRINET}} or better)
 @item OpenSS7 STREAMS SCTP
 (@uref{http://www.openss7.org/tarballs/strsctp-@value{VERSION_STRSCTP}.tar.bz2,, strsctp-@value{VERSION_STRSCTP}} or better)
+@item OpenSS7 STREAMS Channels
+(@uref{http://www.openss7.org/tarballs/strchan-@value{VERSION_STRCHAN}.tar.bz2,, strchan-@value{VERSION_STRCHAN}} or better)
+@item OpenSS7 STREAMS ISO
+(@uref{http://www.openss7.org/tarballs/striso-@value{VERSION_STRISO}.tar.bz2,, striso-@value{VERSION_STRISO}} or better)
+@item OpenSS7 STREAMS ISDN
+(@uref{http://www.openss7.org/tarballs/strisdn-@value{VERSION_STRISDN}.tar.bz2,, strisdn-@value{VERSION_STRISDN}} or better)
+@item OpenSS7 STREAMS SS7
+(@uref{http://www.openss7.org/tarballs/strss7-@value{VERSION_STRSS7}.tar.bz2,, strss7-@value{VERSION_STRSS7}} or better)
+@item OpenSS7 STREAMS SIGTRAN
+(@uref{http://www.openss7.org/tarballs/sigtran-@value{VERSION_SIGTRA}.tar.bz2,, sigtran-@value{VERSION_SIGTRA}} or better)
+@item OpenSS7 STREAMS VoIP
+(@uref{http://www.openss7.org/tarballs/strvoip-@value{VERSION_STRVOIP}.tar.bz2,, strvoip-@value{VERSION_STRVOIP}} or better)
 @end itemize
 @end ignore
 
 @enumerate 1
 @item @cite{Linux} distribution, somewhat @cite{Linux Standards Base} compliant, with a 2.4 or 2.6
-kernel and the appropriate tool chain for compiling out-of-tree kenrel modules.  Most recent
+kernel and the appropriate tool chain for compiling out-of-tree kernel modules.  Most recent
 @cite{Linux} distributions are okay out of the box, but some development packages must be installed.
 For more information, see
 @refman{Compatibility}.
@@ -111,7 +127,7 @@ for more information.}
 Linux 2.4 kernel (2.4.10 - 2.4.27), or
 
 @item @tab @minus{}
-Linux 2.6 kernel (2.6.3 - 2.6.17);
+Linux 2.6 kernel (2.6.3 - 2.6.18);
 
 @item @tab @minus{}
 glibc2 or better.
@@ -140,8 +156,8 @@ unsupported.}
 @item
 @cite{OpenSS7 STREAMS Compatibility Modules},
 @uref{http://www.openss7.org/tarballs/strcompat-@value{VERSION_STRCOMPAT}.tar.bz2, strcompat-@value{VERSION_STRCOMPAT}}.
-
 @ignore
+
 @item
 @cite{OpenSS7 STREAMS Utilities},
 @uref{http://www.openss7.org/tarballs/strutil-@value{VERSION_STRUTIL}.tar.bz2, strutil-@value{VERSION_STRUTIL}}.
@@ -166,6 +182,11 @@ unsupported.}
 @uref{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2, strxnet-@value{VERSION_STRXNET}}.
 
 @item
+@cite{OpenSS7 STREAM Network Services Library},
+@uref{http://www.openss7.org/tarballs/strnsl-@value{VERSION_STRNSL}.tar.bz2, strnsl-@value{VERSION_STRNSL}}.
+(Optional.)
+
+@item
 @cite{OpenSS7 STREAMS Sockets},
 @uref{http://www.openss7.org/tarballs/strsock-@value{VERSION_STRSOCK}.tar.bz2, strsock-@value{VERSION_STRSOCK}}.
 (Optional.)
@@ -179,8 +200,28 @@ unsupported.}
 @uref{http://www.openss7.org/tarballs/strsctp-@value{VERSION_STRSCTP}.tar.bz2, strsctp-@value{VERSION_STRSCTP}}.
 
 @item
+@cite{OpenSS7 STREAMS Channels},
+@uref{http://www.openss7.org/tarballs/strchan-@value{VERSION_STRCHAN}.tar.bz2, striso-@value{VERSION_STRCHAN}}.
+
+@item
 @cite{OpenSS7 STREAMS ISO},
 @uref{http://www.openss7.org/tarballs/striso-@value{VERSION_STRISO}.tar.bz2, striso-@value{VERSION_STRISO}}.
+
+@item
+@cite{OpenSS7 STREAMS ISDN},
+@uref{http://www.openss7.org/tarballs/strisdn-@value{VERSION_STRISDN}.tar.bz2, strisdn-@value{VERSION_STRISDN}}.
+
+@item
+@cite{OpenSS7 STREAMS SS7},
+@uref{http://www.openss7.org/tarballs/strss7-@value{VERSION_STRSS7}.tar.bz2, strss7-@value{VERSION_STRSS7}}.
+
+@item
+@cite{OpenSS7 STREAMS SIGTRAN},
+@uref{http://www.openss7.org/tarballs/sigtran-@value{VERSION_SIGTRAN}.tar.bz2, sigtran-@value{VERSION_SIGTRAN}}.
+
+@item
+@cite{OpenSS7 STREAMS VoIP},
+@uref{http://www.openss7.org/tarballs/strvoip-@value{VERSION_STRVOIP}.tar.bz2, strvoip-@value{VERSION_STRVOIP}}.
 
 @item
 @cite{OpenSS7 Sockets SCTP},

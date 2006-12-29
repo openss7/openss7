@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/12/23 13:07:15 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/12/29 05:51:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/23 13:07:15 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,7 +72,7 @@ m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
 m4_include([m4/nsl.m4])
 m4_include([m4/sock.m4])
-m4_include([m4/sctp.m4])
+dnl m4_include([m4/sctp.m4])
 
 # =============================================================================
 # AC_INET
@@ -298,7 +298,7 @@ dnl _XOPEN
     _XTI
     _NSL
     _SOCK
-    _SCTP
+    # _SCTP
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _INET_OTHER_SCTP

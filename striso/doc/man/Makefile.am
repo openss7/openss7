@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/12 20:25:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/29 05:51:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/12 20:25:14 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,7 +121,7 @@ dist_noinst_MANS = \
 	man4/x25_plp.4.man \
 	man4/xol.4.man \
 	man4/xot.4.man \
-	man5/strios.5.man \
+	man5/striso.5.man \
 	man7/npi_osi.7.man \
 	man8/striso_mknod.8.man
 
@@ -132,6 +132,9 @@ include ../../am/man.am
 
 # =============================================================================
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/12/29 05:51:44  brian
+# - changes for successful master build
+#
 # Revision 0.9.2.4  2006/10/12 20:25:14  brian
 # - manual page fixups for release
 #

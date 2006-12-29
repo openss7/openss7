@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/10/16 06:09:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/29 05:51:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 06:09:37 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -400,6 +400,11 @@ MANUAL_FILE			= doc/manual/$(PACKAGE).txt
 
 include am/release.am
 
+##
+## Rules for doxygen documentation.
+##
+include am/doxy.am
+
 EXTRA_DIST			+= \
 				  README-LiS \
 				  debian/README.Debian \
@@ -423,6 +428,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.10  2006/12/29 05:51:34  brian
+# - changes for successful master build
+#
 # Revision 0.9.2.9  2006/10/16 06:09:37  brian
 # - added netconfig and sock2path config files for packages
 #

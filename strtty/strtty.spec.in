@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strtty.spec.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 09:37:35 $
+# @(#) $RCSfile: strtty.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/12/29 05:51:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/12 09:37:35 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:51:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -94,7 +94,7 @@
 %global stitle      @PACKAGE_SHORTTITLE@
 %global virtual     STREAMS
 
-global modules     streams-pty streams-ptem streams-pckt streams-ldterm streams-ttcompat
+%global modules     streams-pty streams-ptem streams-pckt streams-ldterm streams-ttcompat
 #global preloads    
 #global libraries   
 %global tools       %{base}_mknod
@@ -1867,9 +1867,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strtty.spec.in,v $
-# Revision 0.9.2.5  2006/10/12 09:37:35  brian
-# - completed much of the strtty package
+# Revision 0.9.2.6  2006/12/29 05:51:57  brian
+# - changes for successful master build
 #
+
+* Thu Oct 12 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.5  2006/10/12 09:37:35  brian
+- completed much of the strtty package
 
 * Mon Oct  2 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.4  2006/10/02 11:32:11  brian
@@ -1889,7 +1893,7 @@ fi
 - added OSI headers to striso package
 - added includes and manual page paths to acincludes for various packages
 - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
--   files
+  files
 - moved pragma weak statements ahead of declarations
 - changes for master build of RPMS and DEBS with LiS
 

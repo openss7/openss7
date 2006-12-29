@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2006/10/02 11:32:21 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2006/12/29 05:52:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:32:21 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:52:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,8 +99,8 @@
 %global libraries   xnet
 %global tools       %{base}_mknod test-xnet test-xnet_thr
 %global infofiles   %{base} libxnet tpi
-#global initfiles   %{base}
-#global conffiles   %{name}.conf
+%global initfiles   %{base}
+%global conffiles   %{name}.conf
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
@@ -1868,27 +1868,31 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.134  2006/10/02 11:32:21  brian
-# - changes to get master builds working for RPM and DEB
-# - added outside licenses to package documentation
-# - added LICENSE automated release file
-# - copy MANUAL to source directory
-# - add and remove devices in -dev debian subpackages
-# - get debian rules working better
-# - release library version files
-# - added notes to debian changelog
-# - corrections for cooked manual pages in spec files
-# - added release documentation to spec and rules files
-# - copyright header updates
-# - moved controlling tty checks in stream head
-# - missing some defines for LiS build in various source files
-# - added OSI headers to striso package
-# - added includes and manual page paths to acincludes for various packages
-# - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
-#   files
-# - moved pragma weak statements ahead of declarations
-# - changes for master build of RPMS and DEBS with LiS
+# Revision 0.9.2.135  2006/12/29 05:52:08  brian
+# - changes for successful master build
 #
+
+* Mon Oct  2 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.134  2006/10/02 11:32:21  brian
+- changes to get master builds working for RPM and DEB
+- added outside licenses to package documentation
+- added LICENSE automated release file
+- copy MANUAL to source directory
+- add and remove devices in -dev debian subpackages
+- get debian rules working better
+- release library version files
+- added notes to debian changelog
+- corrections for cooked manual pages in spec files
+- added release documentation to spec and rules files
+- copyright header updates
+- moved controlling tty checks in stream head
+- missing some defines for LiS build in various source files
+- added OSI headers to striso package
+- added includes and manual page paths to acincludes for various packages
+- added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
+  files
+- moved pragma weak statements ahead of declarations
+- changes for master build of RPMS and DEBS with LiS
 
 * Fri Sep 29 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.133  2006/09/29 11:51:18  brian

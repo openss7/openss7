@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2006/10/01 21:30:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2006/12/29 05:50:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/01 21:30:14 $ by $Author: brian $
+# Last Modified $Date: 2006/12/29 05:50:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.46  2006/12/29 05:50:47  brian
+# - changes for successful master build
+#
 # Revision 0.9.2.45  2006/10/01 21:30:14  brian
 # - distribute release and library version files
 #
@@ -214,6 +217,12 @@ man8_MANS			= \
 				  man8/packet_byte_script.8 \
 				  man8/netserver.8
 
+## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
+endif
+
 dist_noinst_MANS		= \
 				  man1/netperf.man \
 				  man1/netperf_arr.man \
@@ -240,12 +249,6 @@ dist_noinst_MANS		= \
 				  man8/arr_script.man \
 				  man8/packet_byte_script.man \
 				  man8/netserver.man
-
-## PKG_BUILD_INDEP
-endif
-
-## DEVELOPMENT
-endif
 
 include am/man.am
 
