@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/12/28 12:08:28 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/12/29 05:31:54 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/28 12:08:28 $ by $Author: brian $
+## Last Modified $Date: 2006/12/29 05:31:54 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: man.am,v $
+## Revision 0.9.2.50  2006/12/29 05:31:54  brian
+## - used basename for specific section manpages
+##
 ## Revision 0.9.2.49  2006/12/28 12:08:28  brian
 ## - move EXTRA_DIST outside conditionals
 ##
@@ -387,55 +390,55 @@ post-manpages:
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man1_MANS)" ; for f in $$list ; do \
+				list="$(man1_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man1/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man2_MANS)" ; for f in $$list ; do \
+				list="$(man2_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man2/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man3_MANS)" ; for f in $$list ; do \
+				list="$(man3_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man3/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man4_MANS)" ; for f in $$list ; do \
+				list="$(man4_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man4/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man5_MANS)" ; for f in $$list ; do \
+				list="$(man5_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man5/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man6_MANS)" ; for f in $$list ; do \
+				list="$(man6_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man6/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man7_MANS)" ; for f in $$list ; do \
+				list="$(man7_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man7/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man8_MANS)" ; for f in $$list ; do \
+				list="$(man8_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man8/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
 					fi ; \
 				done ; \
-				list="$(man9_MANS)" ; for f in $$list ; do \
+				list="$(man9_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man9/$$f ; then \
 						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
@@ -477,55 +480,55 @@ postun-manpages:
 						rm -f -- $(DESTDIR)$(mandir)/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man1_MANS)" ; for f in $$list ; do \
+				list="$(man1_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man1/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man1/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man1/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man2_MANS)" ; for f in $$list ; do \
+				list="$(man2_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man2/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man2/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man2/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man3_MANS)" ; for f in $$list ; do \
+				list="$(man3_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man3/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man3/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man3/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man4_MANS)" ; for f in $$list ; do \
+				list="$(man4_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man4/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man4/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man4/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man5_MANS)" ; for f in $$list ; do \
+				list="$(man5_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man5/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man5/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man5/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man6_MANS)" ; for f in $$list ; do \
+				list="$(man6_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man6/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man6/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man6/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man7_MANS)" ; for f in $$list ; do \
+				list="$(man7_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man7/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man7/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man7/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man8_MANS)" ; for f in $$list ; do \
+				list="$(man8_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man8/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man8/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man8/$$f$$ext ; \
 					fi ; \
 				done ; \
-				list="$(man9_MANS)" ; for f in $$list ; do \
+				list="$(man9_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man9/$$f$$ext ; then \
 						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man9/$$f$$ext" ; \
 						rm -f -- $(DESTDIR)$(mandir)/man9/$$f$$ext ; \
