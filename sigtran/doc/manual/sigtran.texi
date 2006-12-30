@@ -628,7 +628,79 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Files
 @cindex headers
 
-@include tree.texi
+The following kernel modules are installed by the @cite{@value{PACKAGE_TITLE}} package in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} directory, with either a @samp{.o} or
+@samp{.ko} extension.@footnote{The kernel version, @value{_kversion} is just an example.  When
+installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed to underscores
+(@samp{_}).}
+
+@c @include tree.texi
+
+@table @asis
+
+@item @file{streams-m2pa_sl}
+@pgindex streams-m2pa_sl
+
+This kernel module contains the M2PA @dfn{STREAMS} module.  This module is pushed over an SCTP NPI
+Stream to form a complete SS7 signalling link implementation over IP providing the Signalling Link
+Interface (SLI).
+See @manref{m2pa_sl(4)} for more information.
+
+@item @file{streams-m2ua_as}
+@pgindex streams-m2ua_as
+
+This kernel module contains the M2UA-AS @dfn{STREAMS} module.  This module is pushed over an SCTP
+NPI Stream to form a complete SS7 signalling link implementation over IP providing the Signalling
+Link Interface (SLI).  This is a simpler AS-side only implementation of M2UA.
+See @manref{m2ua_as(4)} for more information.
+
+@item @file{streams-m3ua_as}
+@pgindex streams-m3ua_as
+
+This kernel module contains the M3UA-AS @dfn{STREAMS} module.  This module is pushed over an SCTP
+NPI Stream to form a complete SS7 signalling link implementation over IP providing the Signalling
+Link Interface (SLI).  This is a simpler AS-side only implementation of M3UA.
+See @manref{m3ua_as(4)} for more information.
+
+@item @file{streams-sdl_sctp}
+@pgindex streams-sdl_sctp
+
+This kernel module contains an SCTP @dfn{STREAMS} module.  This module is pushed over an SCTP NPI
+Stream to form a Signalling Data Link implementation over IP providing the Signalling Data Link
+Interface (SDLI).  This is a non-standard but common approach to providing HDLC/DAED communication
+using SCTP and predates M2PA/M2UA.
+See @manref{sdl_sctp(4)} for more information.
+
+@item @file{streams-sdt_sctp}
+@pgindex streams-sdt_sctp
+
+This kernel module contains an SCTP @dfn{STREAMS} module.  This module is pushed over an SCTP NPI
+Stream to form a Signalling Data Terminal implementation over IP providing the Signalling Data
+Terminal Interface (SDTI).  This is a non-standard but common approach to providing HDLC/DAED
+communication using SCTP and predates M2PA/M2UA.
+See @manref{sdt_sctp(4)} for more information.
+
+@item @file{streams-sdt_tpi}
+@pgindex streams-sdt_tpi
+
+This kernel module contains an TPI @dfn{STREAMS} module.  This module is pushed over any TPI
+transport Stream to form a Signalling Data Terminal implementation over IP providing the Signalling
+Data Terminal Interface (SDTI).  This is a non-standard but common approach to providing HDLC/DAED
+communication using any TPI transport (e.g. UDP) and predates M2PA/M2UA.
+See @manref{sdt_tpi(4)} for more information.
+
+@item @file{streams-sl_tpi}
+@pgindex streams-sl_tpi
+
+This kernel module contains an TPI @dfn{STREAMS} module.  This module is pushed over any TPI
+transport Stream to form a Signalling Link implementation over IP providing the Signalling Link
+Interface (SLI).  This is a non-standard but common approach to providing SS7 link communication
+using any TPI transport (e.g. UDP) and predates M2PA/M2UA.
+See @manref{sl_tpi(4)} for more information.
+
+@end table
+
+Additional kernel modules are provided by add-on packages.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -636,6 +708,18 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Drivers
 @section Drivers
 @cindex drivers
+
+The configuration of @dfn{STREAMS} drivers and modules is peformed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{SIGTRAN} subsystem, core drivers and modules are
+part of every @cite{@value{PACKAGE_TITLE}} system.
+
+The following lists the core drivers and modules, @dfn{STREAMS} kernel tunable parameters, and
+@dfn{STREAMS} configuration information:@footnote{Note that documentation for @dfn{SIGTRAN} drivers
+is in the form of manual pages in Section 4 of the manual pages with the same name as the driver.}
+
+@table @asis
+
+@end table
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

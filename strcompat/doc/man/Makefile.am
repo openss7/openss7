@@ -1051,6 +1051,7 @@ os7_compat_pages = \
 #	man9/ss7_fast_freemsg_bh.9
 
 man_MANS = \
+	man5/strcompat.5 \
 	man8/strcompat_mknod.8 \
 	man9/alloc_proto.9 \
 	man9/mkiocb.9
@@ -2112,6 +2113,7 @@ dist_noinst_os7_compat_pages = \
 #	man9/ss7_fast_freemsg_bh.9.man
 
 dist_noinst_MANS = \
+	man5/strcompat.5.man \
 	man8/strcompat_mknod.8.man \
 	man9/alloc_proto.9.man \
 	man9/mkiocb.9.man \

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strchan.5.man,v 0.9.2.1 2006/10/13 07:57:32 brian Exp $
+.\" @(#) $Id$
 .\"
 .\" =========================================================================
 .\"
@@ -53,19 +53,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/13 07:57:32 $ by $Author: brian $
+.\" Last Modified $Date$ by $Author$
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: strchan.5.man,v $
-.\" Revision 0.9.2.1  2006/10/13 07:57:32  brian
-.\" - added initial STREAMS Channel package
-.\"
+.\" $Log$
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database strchan.refs
+database sigtran.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -74,14 +71,14 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
-.so strchan.macros
+.so sigtran.macros
 .\"
 .\"
-.TH STRCHAN 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.TH SIGTRAN 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
 .\"
 .\"
 .SH NAME
-.B @PACKAGE@
+.B sigtran
 \- @PACKAGE_TITLE@ package
 .\"
 .\"
@@ -91,6 +88,22 @@ This is the
 .BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
 package for
 .BR "Linux Fast-STREAMS" .
+.PP
+OpenSS7
+.I STREAMS
+add-on packages are separate add-on packages to the
+.B Linux Fast-STREAMS
+release that provide additional functionality and protocol support not traditionally found on
+UNIX systems, or which have traditionally fallen into the domain of value add system software.
+The
+.B @PACKAGE_TITLE@
+package is one of several packages that provides support for Signalling System Number 7 and is part
+of the thrust of the
+.IR "OpenSS7 Project" .
+.[
+%T The OpenSS7 Project
+%O http://www.openss7.org
+.]
 .\"
 .\"
 .SH DESCRIPTION
@@ -102,45 +115,37 @@ package provides
 modules and drivers, libraries, programs, init scripts, and daemons that
 implement the
 .I STREAMS
-channel subsystem.
+Signalling Transport subsystem
 .PP
 The package builds and installs the following
 .I STREAMS
-kernel modules and drivers:
-.IP \(en \w'\(en\(em'u
-.IP \(en
-.IP \(en
-.IP \(en
+modules and drivers (as kernel modules):
+.IP \(em \w'\(em\(em'u
+.IP \(em
 .TP
-.BR ch (4)
+.BR m2pa_sl (4)
 .TP
-.BR librtp (3)
-The
-.BR librtp (3)
-library provides replacements for
-.I AT&T rtplib
-terminal handling
-functions that are not properly implemented in
-`glibc'.  These functions are:
-.RS
-.TP \w'\fBrtpopen\fR(3)\(em'u
-.BR rtpopen (3)
-\-\ open an RTP stream
-.RE
-.PP
-This library is incomplete.
+.BR m2ua_as (4)
+.TP
+.BR m3ua_as (4)
+.TP
+.BR sdl_sctp (4)
+.TP
+.BR sdt_sctp (4)
+.TP
+.BR sdt_tpi (4)
+.TP
+.BR sl_tpi (4)
 .PP
 The
 .B @PACKAGE_TITLE@
-package includes kernel modules,
-.I "SVR 4.2"
-.I STREAMS
-drivers, modules, libraries, utilities, test programs, daemons, and
-development environment for the development and execution of
+package includes kernel module,
+.I SVR 4.2 STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of
 .B @PACKAGE_TITLE@
 protocol stack components and applications for the
-.I "SVR 4.2"
-.I STREAMS
+.I SVR 4.2 STREAMS
 environment.
 .PP
 This distribution is only currently applicable to
@@ -149,10 +154,12 @@ This distribution is only currently applicable to
 .IR ix86 ", " x86_64 ", " ppc " and " ppc64
 architectures, but should build and install for other architectures as well.
 .PP
-This package is currently incomplete.  It is being released as a reference
-point for the community.  If you are interested in completion of this package,
-contact
-.RB < info@openss7.com >.
+This package represents SIGTRAN components that were previously part of the
+.BR strss7 (5)
+package, but which were separated into this package at the end of 2006.  Although this manual page
+documents all commercial components in the
+.BR sigtran (5)
+package, not all components have been released publicly.
 .\"
 .\"
 .SH "PACKAGE CONTENTS"
@@ -160,76 +167,46 @@ contact
 The
 .BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
 package contains the following manual pages:
-.HP
-.BR strchan (5)\ \-\ \c
-The \fB@PACKAGE_TITLE@\fR package.
-.PD 0
-.HP
-.BR strchan_mknod (8)\ \-\ \c
-create \fB@PACKAGE@\fR device nodes.
-.HP
-.BR test-chan (8)\ \-\ \c
-test case executable for the \fB@PACKAGE@\fR package.
-.PD
-.\"
-.\"
-.\".SH NOTICES
-.\".PP
-.\"
-.\"
-.\".SH EXAMPLES
-.\".PP
 .\"
 .\"
 .SH MODULES
 .PP
 The
-.B strchan
+.B @PACKAGE@
 package provides the following
 .I STREAMS
 modules:
 .HP
-.BR rtp (4)\ \-\ \c
-RTP module.
+\fBm2pa_sl\fR(4)\ \-\ 
+.HP
+\fBm2ua_as\fR(4)\ \-\ 
+.HP
+\fBm3ua_as\fR(4)\ \-\ 
+.HP
+\fBsdl_sctp\fR(4)\ \-\ 
+.HP
+\fBsdt_sctp\fR(4)\ \-\ 
+.HP
+\fBsdt_tpi\fR(4)\ \-\ 
+.HP
+\fBsl_tpi\fR(4)\ \-\ 
 .\"
 .\"
 .SH DEVICES
 .PP
 The
-.B strchan
+.B @PACKAGE@
 package provides the following
 .I STREAMS
-drivers:
-.HP
-.BR ch (4)\ \-\ \c
-channel driver.
-.\"
-.\"
-.\".SH FILES
-.\".PP
+devices:
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR ch (4),
-.BR strchan (5),
-.BR strchan_mknod (8),
-.BR test-chan (8).
-.\"
-.\"
-.\".SH COMPATIBILITY
-.\".PP
-.\"
-.\"
-.\".SH CONFORMANCE
-.\".PP
-.\"
-.\"
-.\".SH HISTORY
-.\".PP
 .\"
 .\"
 .[
 $LIST$
 .]
+.\"
 .TI
