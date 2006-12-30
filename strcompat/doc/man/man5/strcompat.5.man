@@ -1,0 +1,335 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strcompat.macros
+.\"
+.\"
+.TH STRCOMPAT 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B strcompat
+\- @PACKAGE_TITLE@ package
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.BR "Linux Fast-STREAMS" .
+.PP
+OpenSS7
+.I STREAMS
+add-on packages are separate add-on packages to the
+.B Linux Fast-STREAMS
+release that provide additional functionality and protocol support not traditionally found on
+UNIX systems, or which have traditionally fallen into the domain of value add system software, or,
+in this case, where the functionality was applicable to both
+.B "Linux Fast-STREAMS" " and " LiS
+(to provide support for both until
+.B Linux Fast-STREAMS
+became production grade).
+The
+.B @PACKAGE_TITLE@
+package is one of several add-on packages that provides enhanced
+.I STREAMS
+support beyond that provided by the base
+.I STREAMS
+package.  This package provides compatibility modules that provide a significant degree or
+source-level compatibility with other major
+.I STREAMS
+implementations.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package provides
+.I STREAMS
+modules and drviers, libraries, programs, init scripts, and daemons that implement the
+.I STREAMS
+compatibility subsystem.
+.PP
+The package builds and installs the following
+kernel modules:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.TP
+.BR os7compat (9)
+This kernel modules provides utility functions common to previous OpenSS7 release drivers and
+modules.
+See
+.BR os7compat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR svr3compat (9)
+This kernel module provides
+.I STREAMS
+compatibilty functions unique to
+.IR "SVR 3.2" .
+.[
+svr32
+.]
+See
+.BR svr3compat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR svr4compat (9)
+This kernel module provides
+.I STREAMS
+and
+.I DDI/DKI
+compatibility functions unique to
+.IR "SVR 4.2 MP EFT" .
+.[
+usldk
+.]
+See
+.BR svr4compat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR mpscompat (9)
+See
+.BR mpscompat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR suncompat (9)
+See
+.BR suncompat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR uw7compat (9)
+See
+.BR uw7compat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR osfcompat (9)
+See
+.BR osfcompat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR aixcompat (9)
+See
+.BR aixcompat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR hpuxcompat (9)
+See
+.BR hpuxcompat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR liscompat (9)
+See
+.BR liscompat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR lfscompat (9)
+See
+.BR lfscompat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR irixcompat (9)
+See
+.BR irixcompat (9)
+for a listing and overview of the contained functions.
+.TP
+.BR maccompat (9)
+See
+.BR maccompat (9)
+for a listing and overview of the contained functions.
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel modules,
+.I SVR 4.2 STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of
+.B @PACKAGE_TITLE@
+protocol stack components and applications for the
+.I SVR 4.2 STREAMS
+environment.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.PP
+This package represents compatibility components that we previously part of the
+.B streams (5)
+package, but which were separated into this package in 2004 so that they could be used with
+the now deprecated
+.I LiS
+as well.
+As the kernel modules involved represent a significant footprint for embedded targets, the
+.B @PACKAGE@
+package has been maintained as a separate add-on package.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package contains the following manual pages:
+.\"
+.\"
+.SH MODULES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+modules:
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+devices:
+.\"
+.\"
+.SH NOTICES
+.PP
+Although previous releases of the
+.B @PACKAGE@
+package were tested with
+.IR LiS ,
+.I LiS
+is now deprecated and this release of
+.B @PACKAGE@
+has not been tested with
+.IR LiS .
+.I The OpenSS7 Project
+will no longer support this package for
+.IR LiS :
+please upgrade to
+.BR "Linux Fast-STREAMS" .
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production
+.B Linux
+distributions, kernels, and target architectures, and is considered production grade by
+.IR "The OpenSS7 Project" .
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.
+Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR os7compat (9),
+.BR svr3compat (9),
+.BR svr4compat (9),
+.BR mpscompat (9),
+.BR suncompat (9),
+.BR uw7compat (9),
+.BR osfcompat (9),
+.BR aixcompat (9),
+.BR hpuxcompat (9),
+.BR liscompat (9),
+.BR lfscompat (9),
+.BR irixcompat (9),
+.BR maccompat (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
