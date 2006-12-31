@@ -708,7 +708,7 @@ When installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed t
 (@samp{_}).}
 
 The following lists the core drivers, @dfn{STREAMS} kernel tunable parameters, and @dfn{STREAMS}
-configuration information:@footnote{Note that documentation fo @dfn{TTY} drivers is in the form of
+configuration information:@footnote{Note that documentation of @dfn{TTY} drivers is in the form of
 manual pages in Section 4 of the manual pages with the same name as the driver.}
 
 @table @asis
@@ -748,7 +748,7 @@ When installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed t
 (@samp{_}).}
 
 The following lists the core modules, @dfn{STREAMS} kernel tunable parameters, and @dfn{STREAMS}
-configuration information:@footnote{Note that documentation fo @dfn{TTY} modules is in the form of
+configuration information:@footnote{Note that documentation of @dfn{TTY} modules is in the form of
 manual pages in Section 4 of the manual pages with the same name as the modules.}
 
 @table @asis

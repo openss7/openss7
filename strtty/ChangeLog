@@ -1,5 +1,9 @@
 2006-12-31  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man4/TTY.4.man: updated documentation for release
+	* doc/manual/strtty.texi: updated documentation for release
+	* doc/manual/tree.texi: updated documentation for release
+
 	* AUTHORS: updates for release
 	* NEWS: updates for release
 	* README: updates for release

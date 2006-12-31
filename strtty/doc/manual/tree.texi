@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -66,67 +66,6 @@
 @c
 @c
 @c =========================================================================
-
-@ignore
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel modules
-directory @file{lib/modules/@value{_kversion}/}:
-
-@table @file
-@item modules.@value{PACKAGE}
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel modules
-directory @file{lib/modules/@value{_kversion}/@value{PACKAGE}/}:
-
-@table @file
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following header files in the system include directory
-@file{usr/include/@value{PACKAGE}/}:
-
-@table @file
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system libexec directory
-@file{usr/libexec/}:
-
-@table @file
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following utility programs in the system binary directory
-@file{usr/sbin/}:
-
-@table @file
-@item strtty_mknod
-This binary conatins a script for making device nodes for the @dfn{@value{PACKAGE_UCNAME}} package.
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following info files in the system info directory
-@file{usr/share/info/}:
-
-@table @file
-@item @value{PACKAGE}.info
-@itemx @value{PACKAGE}.info-1
-@itemx @value{PACKAGE}.info-2
-@itemx @value{PACKAGE}.info-3
-@itemx @value{PACKAGE}.info-4
-These files contain this manual in info format.
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following manpage macro and reference database files in the
-system man directory @file{usr/share/man/}:
-
-@table @file
-@item @value{PACKAGE}.macros
-This file contain manual page macro definitions included by the manual pages included in the
-package.
-@item @value{PACKAGE}.refs
-This file contains a reference database referenced by the manual pages included in the package.
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following manual pages in the system man directory
-@file{usr/share/man/}:
-@end ignore
 
 @dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel modules
 directory @file{lib/modules/@value{_kversion}/}:
@@ -208,7 +147,7 @@ configuration for the @command{autotest} test suite.
 
 @table @file
 @item @value{PACKAGE}_mknod
-This binary conatins a script for making device nodes for the @dfn{@value{PACKAGE_UCNAME}} package.
+This binary contains a script for making device nodes for the @dfn{@value{PACKAGE_UCNAME}} package.
 @end table
 
 @dfn{@value{PACKAGE_UCNAME}} places the following init scripts in the system
