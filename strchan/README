@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Channels -- read me first file.  2006-10-27
-$Id: README,v 0.9.2.4 2006/10/27 22:23:55 brian Exp $
+OpenSS7 STREAMS Channels -- read me first file.  2006-12-29
+$Id: README,v 0.9.2.5 2006/12/31 13:41:48 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -23,12 +23,12 @@ supported by this package.
 
 This package also supports data channel protocols for data
 communication over isochronous channels such as HDLC and SS7
-DAEDR/DAEDT/AERM/SUERM as well as upper layer link protocols such as
-LAPB, LAPF, LAPD, LLC.  These modules are provided here because they
-work directly over an isochronous channel and are therefore designed to
-work with them.  These data links provide support for the `OpenSS7
-STREAMS ISO/OSI' as well as the `OpenSS7 STREAMS ISDN Stacks' and
-`OpenSS7 STREAMS SS7 Stack' packages.
+DAEDR/DAEDT/AERM/SUERM.  Upper layer link protocols, such as LAPB,
+LAPF, LAPM and LLC are supported by separate packages.  These modules
+are provided here because they work directly over an isochronous
+channel and are therefore designed to work with them.  These data links
+provide support for the `OpenSS7 STREAMS ISO/OSI' as well as the
+`OpenSS7 STREAMS ISDN Stacks' and `OpenSS7 STREAMS SS7 Stack' packages.
 
 This package builds and installs the following "STREAMS" kernel modules
 and drivers:
@@ -37,17 +37,16 @@ and drivers:
      - `streams_mx.ko' driver "/dev/mx" "/dev/mx_mg"
      - `streams_mg.ko' driver "/dev/mg" "/dev/mg_mg"
      - `streams_pwe3.ko' module "pwe3"
-     - `streams_rtp.ko' module "rtp"
      - `streams_zaptel.ko' module "zaptel"
-     - `streams_hdlc.ko' module "hdlc"
-     - `streams_hdlc.ko' module "hdlc"
-     - `streams_q702.ko' module "q702"
-     - `streams_lapb.ko' module "lapb"
-     - `streams_lapf.ko' module "lapf"
-     - `streams_lapd.ko' module "lapd"
-     - `streams_llc.ko' module "llc"
+     - `streams_cd_hdlc.ko' module "cd_hdlc"
+     - `streams_cd_daed.ko' module "cd_daed"
 
 `ch(4)'
+     The `ch(4)' multiplexing pseudo-device driver is a fully functional
+     channel device capable of channelized, fractional or full-span
+     E1/T1/J1 statistically multiplexed channels.  Streams opened on
+     this device driver support delivery of the raw octet streams
+     associated with the multiplexed channel.
 
 `mx(4)'
      The `mx(4)' multiplexing pseudo-device driver is a fully functional
@@ -72,65 +71,26 @@ and drivers:
      emulation end-to-end.  This device appears as though it is a
      channel device.
 
-`rtp(4)'
-     The `rtp(4)' module is a pushable "STREAMS" module that is pushed
-     over a `udp(4)' Stream to provide a full duplex, controlled (RTCP)
-     media stream connection.  The resulting Stream is suitable for
-     linking under the `mg(4)' multiplexing driver to provide Ephemeral
-     RTP streams for use with the Media Gateway Control Protocol.
-
 `zaptel(4)'
-     The `zaptel(4)' modules is a pushable "STREAMS" module that is
-     pushed over a `ch(4)' channel Stream to provide the historical `zaptel(4)'
-     interface for asterisk and other open-PBX packages.
+     The `zaptel(4)' multiplexing pseudo-device driver is a "STREAMS"
+     driver that provides the historical `zaptel(4)' interface for
+     asterisk and other open-PBX packages.  `mx(4)' streams are linked
+     under the driver and represent spans that can be managed by `zaptel(4)'.
 
-`hdlc(4)'
-     The `hdlc(4)' module a pushable "STREAMS" module that provides the
-     capabilties of the High-Level Data Link Control and can be pushed
-     over a raw `ch(4)' channel to provide a Communications Device
-     Interface (CDI) or Data Link Provider Interface (DLPI) suitable
-     for use with ISO/OSI protocols, X.25 or ISDN.
+`cd_hdlc(4)'
+     The `cd_hdlc(4)' module is a pushable "STREAMS" module that
+     provides the capabilties of the High-Level Data Link Control and
+     can be pushed over a raw `ch(4)' channel to provide a
+     Communications Device Interface (CDI) or Data Link Provider
+     Interface (DLPI) suitable for use with ISO/OSI protocols, X.25,
+     ISDN or Frame Relay.
 
-`q702(4)'
-     The `q702(4)'
-
-`lapb(4)'
-     The `lapb(4)' module is a pushable "STREAMS" module that provides
-     the capability of the Link Access Procedure (Balanced) and can be
-     pushed over an `hdlc(4)' module to provide a Data Link Provider
-     Interface (DLPI) suitable for use with X.25 protocols.
-
-`lapf(4)'
-     The `lapf(4)' module is a pushable "STREAMS" module that provides
-     the capability of the Link Access Procedure (Frame) Q.922 and can
-     be pushed over an `hdlc(4)' module to provide a Data Link Provider
-     Interface (DLPI) suitable for use with Frame Relay, Q.932,
-     protocols.
-
-`lapd(4)'
-     The `labd(4)' module is a pushable "STREAMS" module that provides
-     the capabilities of the Link Access Procedure (D-Channel) Q.921
-     and can be pushed over an `hdlc(4)' module to provide a Data Link
-     Provider Interface (DLPI) suitable for use with ISDN, Q.931,
-     protocols.
-
-`llc(4)'
-     The `llc(4)' module is a "STREAMS" pseudo-device driver that
-     provides the capabilites of the Logical Link Control, ISO 8802,
-     and provides a Data Link Provider Interface (DLPI) suitable for
-     use with OSI protocols.  This pseudo-device driver hook into the
-     Linux packet handling system.
-
-
-The package builds and installs the following shared object libraries:
-
-`librtp(3)'
-     The `librtp(3)' library provides replacements for the `AT&T'
-     `rtplib' functions.  These functions are:
-
-     `rtpopen(3)'      - open an RTP channel
-
-     The library is incomplete.
+`cd_daed(4)'
+     The `cd_daed(4)' module is a pushable "STREAMS" module that
+     provides th capabilities of SS7 High-Level Data Link Control
+     (Q.702) and can be pushed over a raw `ch(4)' channel to provide a
+     Communications Device Interface (CDI) or Signalling Data Terminal
+     Interface (SDTI) suitable for use with SS7 protocols.
 
 
 The `OpenSS7 STREAMS Channels' package includes kernel modules, `SVR
@@ -152,7 +112,7 @@ contact <info@openss7.com>.
  Release
 --------
 
-This is the `strchan-0.9.2.1' package, released 2006-10-27.  This
+This is the `strchan-0.9.2.1' package, released 2006-12-29.  This
 `0.9.2.1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -198,14 +158,14 @@ Prerequisites for the OpenSS7 STREAMS Channels package are as follows:
 
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
-     compiling out-of-tree kenrel modules.  Most recent `Linux'
+     compiling out-of-tree kernel modules.  Most recent `Linux'
      distributions are okay out of the box, but some development
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.  (1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.17);
+         - Linux 2.6 kernel (2.6.3 - 2.6.18);
          - glibc2 or better.
          - GNU info (for info files).
          - GNU groff (for man pages).  (2)
@@ -220,6 +180,9 @@ by unpacking the master package.)
   3. `OpenSS7 STREAMS Compatibility Modules',
      strcompat-0.9.2.4
      (http://www.openss7.org/tarballs/strcompat-0.9.2.4.tar.bz2).
+
+  4. `OpenSS7 STREAMS XNS', strxns-0.9.2.4
+     (http://www.openss7.org/tarballs/strxns-0.9.2.4.tar.bz2).
 
 When configuring and building multiple `OpenSS7 Project' release
 packages, place all of the source packages (unpacked tarballs) at the
