@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.1 2006/08/23 09:53:14 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.2 2006/12/31 11:20:20 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/23 09:53:14 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/31 11:20:20 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: tree.texi,v $
+@c Revision 0.9.2.2  2006/12/31 11:20:20  brian
+@c - documentation updates for release
+@c
 @c Revision 0.9.2.1  2006/08/23 09:53:14  brian
 @c - started STREAMS Terminals package
 @c
@@ -123,4 +126,249 @@ This file contains a reference database referenced by the manual pages included 
 
 @dfn{@value{PACKAGE_UCNAME}} places the following manual pages in the system man directory
 @file{usr/share/man/}:
+@end ignore
+
+@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel modules
+directory @file{lib/modules/@value{_kversion}/}:
+
+@table @file
+@item modules.@value{PACKAGE}
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel modules
+directory @file{lib/modules/@value{_kversion}/@value{PACKAGE}/}:
+
+@table @file
+@item streams_pckt.ko
+kernel module containing the @manref{pckt(4)} @dfn{STREAMS} module.
+@item streams_ptem.ko
+kernel module containing the @manref{ptem(4)} @dfn{STREAMS} module.
+@item streams_ttcompat.ko
+kernel module containing the @manref{ttcompat(4)} @dfn{STREAMS} module.
+@item streams_ldterm.ko
+kernel module containing the @manref{ldterm(4)} @dfn{STREAMS} module.
+@item streams_pty.ko
+kernel module containing the @manref{pty(4)} @dfn{STREAMS} driver.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following header files in the system include directory
+@file{usr/include/@value{PACKAGE}/}:
+
+@table @file
+@item sys/strtty/config.h
+@value{PACKAGE} configuration header.
+@item sys/strtty/version.h
+@value{PACKAGE} module version header.
+@item sys/ttydev.h
+replacement SVR 4 terminal subsystem header file.
+@item sys/termios.h
+replacement SVR 4 terminal subsystem header file.
+@item sys/termio.h
+replacement SVR 4 terminal subsystem header file.
+@item sys/sgtty.h
+replacement SVR 4 terminal subsystem header file.
+@item sys/ttyio.h
+replacement SVR 4 terminal subsystem header file.
+@item sys/strtty.h
+replacement SVR 4 terminal subsystem header file.
+@item sys/ttychars.h
+replacement SVR 4 terminal subsystem header file.
+@item sys/pty.h
+standard PTY header for use with the @manref{pty(4)} @dfn{STREAMS} module.
+@item ttychars.h
+replacement SVR 4 terminal subsystem header file.
+@item ttcompat.h
+standard TTY compatibility header for use with the @manref{ttcompat(4)} @dfn{STREAMS} module.
+@item sgtty.h
+replacement SVR 4 terminal subsystem header file.
+@item termios.h
+replacement SVR 4 terminal subsystem header file.
+@item termio.h
+replacement SVR 4 terminal subsystem header file.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system libexec directory
+@file{usr/libexec/@value{PACKAGE}/}:
+
+@table @file
+@item send-pr
+problem report generation script.
+@item send-pr.config
+problem report generation script configuration.
+@item test-tty
+test program.
+@item testsuite
+@command{autotest} test suite.
+@item atlocal
+configuration for the @command{autotest} test suite.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following utility programs in the system binary directory
+@file{usr/sbin/}:
+
+@table @file
+@item @value{PACKAGE}_mknod
+This binary conatins a script for making device nodes for the @dfn{@value{PACKAGE_UCNAME}} package.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following init scripts in the system
+init directory @file{etc/rc.d/init.d/} (non-Debian) or @file{etc/init.d/}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following system configuration files
+in the system configuration directory @file{etc/sysconfig/} (non-Debian) or
+@file{etc/default/} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+System configuration defaults.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following system configuration files
+in the configuration directory @file{etc/}:
+
+@table @file
+@item @value{PACKAGE}.conf
+Configuration values.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following info files in the system info directory
+@file{usr/share/info/}:
+
+@table @file
+@item @value{PACKAGE}.info
+@itemx @value{PACKAGE}.info-1
+@itemx @value{PACKAGE}.info-2
+These files contain this manual in info format.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following manpage macro and reference database files in the
+system man directory @file{usr/share/man/}:
+
+@table @file
+@item @value{PACKAGE}.macros
+This file contain manual page macro definitions included by the manual pages included in the
+package.
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+@end table
+
+@dfn{@value{PACKAGE_UCNAME}} places the following manual pages in the system man directory
+@file{usr/share/man/}:
+
+@table @file
+@item man3/grantpt.3tty
+manual page for the @manref{grantpt(3tty)} library function.
+@item man3/ptsname.3tty
+manual page for the @manref{ptsname(3tty)} library function.
+@item man3/unlockpt.3tty
+manual page for the @manref{unlockpt(3tty)} library function.
+@item man4/ldterm.4
+manual page for the @manref{ldterm(4)} @dfn{STREAMS} module.
+@item man4/pckt.4
+manual page for the @manref{pckt(4)} @dfn{STREAMS} module.
+@item man4/ptc.4
+manual page for the @manref{ptc(4)} @dfn{STREAMS} device.
+@item man4/ptem.4
+manual page for the @manref{ptem(4)} @dfn{STREAMS} module.
+@item man4/ptm.4
+manual page for the @manref{ptm(4)} @dfn{STREAMS} driver.
+@item man4/ptmx.4tty
+manual page for the @manref{ptmx(4tty)} @dfn{STREAMS} device.
+@item man4/pts.4tty
+manual page for the @manref{pts(4tty)} @dfn{STREAMS} driver.
+@item man4/pty.4
+manual page for the @manref{pty(4)} @dfn{STREAMS} driver.
+@item man4/ttcompat.4
+manual page for the @manref{ttcompat(4)} @dfn{STREAMS} module.
+@item man5/strtty.5
+manual page for the @manref{strtty(5)} package.
+@item man8/strtty_mknod.8
+manual page for the @manref{strtty_mknod(8)} utility.
+@item man8/test-tty.8
+manual page for the @manref{test-tty(8)} program.
+@end table
+
+@ignore
+/usr
+/usr/include
+/usr/include/strtty
+/usr/include/strtty/sys
+/usr/include/strtty/sys/strtty
+/usr/include/strtty/sys/strtty/config.h
+/usr/include/strtty/sys/strtty/version.h
+/usr/include/strtty/sys/ttydev.h
+/usr/include/strtty/sys/termios.h
+/usr/include/strtty/sys/termio.h
+/usr/include/strtty/sys/sgtty.h
+/usr/include/strtty/sys/ttyio.h
+/usr/include/strtty/sys/strtty.h
+/usr/include/strtty/sys/ttychars.h
+/usr/include/strtty/sys/pty.h
+/usr/include/strtty/ttychars.h
+/usr/include/strtty/ttcompat.h
+/usr/include/strtty/sgtty.h
+/usr/include/strtty/termios.h
+/usr/include/strtty/termio.h
+/usr/lib
+/usr/bin
+/usr/libexec
+/usr/libexec/strtty
+/usr/libexec/strtty/send-pr
+/usr/libexec/strtty/send-pr.config
+/usr/libexec/strtty/test-tty
+/usr/libexec/strtty/testsuite
+/usr/libexec/strtty/atlocal
+/usr/sbin
+/usr/sbin/strtty_mknod
+/usr/share
+/usr/share/man
+/usr/share/man/strtty.macros
+/usr/share/man/strtty.refs
+/usr/share/man/man3
+/usr/share/man/man3/grantpt.3tty
+/usr/share/man/man3/ptsname.3tty
+/usr/share/man/man3/unlockpt.3tty
+/usr/share/man/man4
+/usr/share/man/man4/ldterm.4
+/usr/share/man/man4/pckt.4
+/usr/share/man/man4/ptc.4
+/usr/share/man/man4/ptem.4
+/usr/share/man/man4/ptm.4
+/usr/share/man/man4/ptmx.4tty
+/usr/share/man/man4/pts.4tty
+/usr/share/man/man4/pty.4
+/usr/share/man/man4/ttcompat.4
+/usr/share/man/man5
+/usr/share/man/man5/strtty.5
+/usr/share/man/man8
+/usr/share/man/man8/strtty_mknod.8
+/usr/share/man/man8/test-tty.8
+/usr/share/info
+/usr/share/info/strtty.info
+/usr/share/info/strtty.info-1
+/usr/share/info/strtty.info-2
+/etc
+/etc/strtty.conf
+/etc/default
+/etc/default/strtty
+/etc/init.d
+/etc/init.d/strtty.sh
+/etc/modutils
+/lib
+/lib/modules
+/lib/modules/2.6.15-27-server
+/lib/modules/2.6.15-27-server/strtty
+/lib/modules/2.6.15-27-server/strtty/streams_pckt.ko
+/lib/modules/2.6.15-27-server/strtty/streams_ptem.ko
+/lib/modules/2.6.15-27-server/strtty/streams_ttcompat.ko
+/lib/modules/2.6.15-27-server/strtty/streams_ldterm.ko
+/lib/modules/2.6.15-27-server/strtty/streams_pty.ko
 @end ignore

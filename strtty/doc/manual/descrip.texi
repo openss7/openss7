@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.6 2006/10/13 08:16:26 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.7 2006/12/31 11:20:19 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/13 08:16:26 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/31 11:20:19 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -136,8 +136,8 @@ This library is incomplete.
 The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR
 4.2} @dfn{STREAMS} drivers, modules, libraries, utilities, test programs,
 daemons, and development environment for the development and execution of
-@cite{@value{PACKAGE_TITLE}} protocol stack components and applications for
-the @cite{SVR 4.2} @dfn{STREAMS} environment.
+@cite{@value{PACKAGE_TITLE}} components and applications for the @cite{SVR
+4.2} @dfn{STREAMS} environment.
 
 This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6
 kernels and was targeted at @samp{ix86}, @samp{x86_64}, @samp{ppc} and

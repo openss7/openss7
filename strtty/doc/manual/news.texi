@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.7 2006/10/29 02:03:12 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.8 2006/12/31 11:20:19 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/29 02:03:12 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/31 11:20:19 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -77,6 +77,11 @@ The sections that follow provide information on OpenSS7 releases of the @*
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
 
 @itemize
+@item
+In this inital release, the package already supports a wide range of
+production distributions as it uses the same build environment as other
+OpenSS7 Project packages.
+
 @item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).

@@ -1,3 +1,18 @@
+2006-12-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* doc/man/strtty.macros: updates for release
+	* doc/man/man5/strtty.5.man: updates for release
+	* doc/manual/descrip.texi: updates for release
+	* doc/manual/news.texi: updates for release
+	* doc/manual/strtty.texi: updates for release
+	* doc/manual/todo.texi: updates for release
+	* doc/manual/tree.texi: updates for release
+
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* strtty.spec.in: old rpms hate nested ifs

@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Terminals -- read me first file.  2006-10-27
-$Id: README,v 0.9.2.11 2006/10/27 22:24:09 brian Exp $
+OpenSS7 STREAMS Terminals -- read me first file.  2006-12-29
+$Id: README,v 0.9.2.12 2006/12/31 11:20:09 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -78,8 +78,8 @@ The package builds and installs the following shared object libraries:
 The `OpenSS7 STREAMS Terminals' package includes kernel modules, `SVR
 4.2' "STREAMS" drivers, modules, libraries, utilities, test programs,
 daemons, and development environment for the development and execution
-of `OpenSS7 STREAMS Terminals' protocol stack components and
-applications for the `SVR 4.2' "STREAMS" environment.
+of `OpenSS7 STREAMS Terminals' components and applications for the `SVR
+4.2' "STREAMS" environment.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
 kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
@@ -93,7 +93,7 @@ of this package, contact <info@openss7.com>.
  Release
 --------
 
-This is the `strtty-0.9.2.1' package, released 2006-10-27.  This
+This is the `strtty-0.9.2.1' package, released 2006-12-29.  This
 `0.9.2.1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -139,14 +139,14 @@ Prerequisites for the OpenSS7 STREAMS Terminals package are as follows:
 
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
-     compiling out-of-tree kenrel modules.  Most recent `Linux'
+     compiling out-of-tree kernel modules.  Most recent `Linux'
      distributions are okay out of the box, but some development
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.  (1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.17);
+         - Linux 2.6 kernel (2.6.3 - 2.6.18);
          - glibc2 or better.
          - GNU info (for info files).
          - GNU groff (for man pages).  (2)
