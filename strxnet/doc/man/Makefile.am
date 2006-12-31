@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/09/25 12:04:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/31 13:59:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/25 12:04:41 $ by $Author: brian $
+# Last Modified $Date: 2006/12/31 13:59:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.22  2006/12/31 13:59:56  brian
+# - updated documentation for release
+#
 # Revision 0.9.2.21  2006/09/25 12:04:41  brian
 # - updated headers, moved xnsl
 #
@@ -333,7 +336,8 @@ sock_man_MANS	= \
 	man4/sockmod.4 \
 	man4/socksys.4
 
-man_MANS	=
+man_MANS	= \
+	man5/strxnet.5
 
 
 if WITH_TLI
@@ -617,6 +621,7 @@ sock_dist_noinst_MANS	= \
 	man4/socksys.4.man
 
 dist_noinst_MANS	= \
+	man5/strxnet.5.man \
 	$(tli_dist_noinst_MANS) \
 	$(xnet_dist_noinst_MANS) \
 	$(xnsl_dist_noinst_MANS) \

@@ -1,0 +1,593 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: strxnet.5.man,v 0.9.2.1 2006/12/31 13:58:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/12/31 13:58:16 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strxnet.5.man,v $
+.\" Revision 0.9.2.1  2006/12/31 13:58:16  brian
+.\" - added package manual page
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxnet.macros
+.\"
+.\"
+.TH STRXNET 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.SH NAME
+.B @PACKAGE@
+\- @PACKAGE_TITLE@ package
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.PP
+OpenSS7
+.I STREAMS
+add-on packages are separate add-on packages to the
+.B "Linux Fast-STREAMS"
+.[
+lfs
+.]
+release that provide additional functionality and protocol support not traditionally found on UNIX
+systems, or which have tranditionally fallen into the domain of valud-add system software, or, in
+this case, where functionality was optional or differently handled in a number of implementations.
+The
+.B @PACKAGE_TITLE@
+package is one of the several optional add-on packages that provide enhanced entwork protocol
+support beyond that provided by the base
+.I STREAMS
+package.  This package provides support for communications protocols based on the
+.IR "Transport Provider Interface (TPI)" ,
+.BR tpi (7),
+not provided by the base package.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package provides
+.I STREAMS
+modules and drivers, libraries, programs, init scripts, and daemons that implement networking
+protocol based on the trasnport layer of the OSI reference model.
+.PP
+The package builds and installs the following
+.I STREAMS
+modules (as kernel modules):
+.IP \(em \w'\(em\(em'u
+.BR timod (4)
+.IP \(em
+.BR tirdwr (4)
+.TP
+.BR tirdwr (4)
+.TP
+.BR timod (4)
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel modules,
+.I SVR 4.2 STREAMS
+driver, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of
+.B @PACKAGE_TITLE@
+protocol stack components and applications for the
+.I SVR 4.2 STREAMS
+environment.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.PP
+This package is complete and has been in production use for both
+.I LiS
+and
+.I Linux Fast-STREAMS
+for a number of years.
+.\"
+.\"
+.SH "PACKAGE_CONTENTS"
+.PP
+.HP
+.BR strxnet (5)\ \- \ 
+.PD 0
+.HP
+.BR strxnet_mknod (8)\ \- \ 
+.PD
+
+.SS "XTI/TLI Library"
+.PP
+.HP
+.BR libxnet (3)\ \- \ 
+.PD 0
+.HP
+.BR xnet (3)\ \- \ 
+.HP
+.BR xti (3)\ \- \ 
+.HP
+.BR netbuf (3)\ \- \ 
+.HP
+.BR t_accept (3)\ \- \ 
+.HP
+.BR t_addleaf (3)\ \- \ 
+.HP
+.BR t_alloc (3)\ \- \ 
+.HP
+.BR t_bind (3)\ \- \ 
+.HP
+.BR t_close (3)\ \- \ 
+.HP
+.BR t_connect (3)\ \- \ 
+.HP
+.BR t_errlist (3)\ \- \ 
+.HP
+.BR t_errno (3)\ \- \ 
+.HP
+.BR t_error (3)\ \- \ 
+.HP
+.BR t_errstr (3)\ \- \ 
+.HP
+.BR t_free (3)\ \- \ 
+.HP
+.BR t_getinfo (3)\ \- \ 
+.HP
+.BR t_getprotaddr (3)\ \- \ 
+.HP
+.BR t_getstate (3)\ \- \ 
+.HP
+.BR t_listen (3)\ \- \ 
+.HP
+.BR t_look (3)\ \- \ 
+.HP
+.BR t_nerr (3)\ \- \ 
+.HP
+.BR t_open (3)\ \- \ 
+.HP
+.BR t_optmgmt (3)\ \- \ 
+.HP
+.BR t_rcv (3)\ \- \ 
+.HP
+.BR t_rcvconnect (3)\ \- \ 
+.HP
+.BR t_rcvdis (3)\ \- \ 
+.HP
+.BR t_rcvleafchange (3)\ \- \ 
+.HP
+.BR t_rcvopt (3)\ \- \ 
+.HP
+.BR t_rcvrel (3)\ \- \ 
+.HP
+.BR t_rcvreldata (3)\ \- \ 
+.HP
+.BR t_rcvudata (3)\ \- \ 
+.HP
+.BR t_rcvuderr (3)\ \- \ 
+.HP
+.BR t_rcvv (3)\ \- \ 
+.HP
+.BR t_rcvvopt (3)\ \- \ 
+.HP
+.BR t_rcvvudata (3)\ \- \ 
+.HP
+.BR t_removeleaf (3)\ \- \ 
+.HP
+.BR t_snd (3)\ \- \ 
+.HP
+.BR t_snddis (3)\ \- \ 
+.HP
+.BR t_sndopt (3)\ \- \ 
+.HP
+.BR t_sndrel (3)\ \- \ 
+.HP
+.BR t_sndreldata (3)\ \- \ 
+.HP
+.BR t_sndudata (3)\ \- \ 
+.HP
+.BR t_sndv (3)\ \- \ 
+.HP
+.BR t_sndvopt (3)\ \- \ 
+.HP
+.BR t_sndvudata (3)\ \- \ 
+.HP
+.BR t_strerror (3)\ \- \ 
+.HP
+.BR t_sync (3)\ \- \ 
+.HP
+.BR t_sysconf (3)\ \- \ 
+.HP
+.BR t_unbind (3)\ \- \ 
+.HP
+.BR timod (4)\ \- \ 
+.HP
+.BR tirdwr (4)\ \- \ 
+.HP
+.BR test-timod (8)\ \- \ 
+.HP
+.BR test-tirdwr (8)\ \- \ 
+.HP
+.BR test-xnet (8)\ \- \ 
+.HP
+.BR test-xnet_thr (8)\ \- \ 
+.PD
+
+.SS "Sockets Library"
+.PP
+.HP
+.BR libsocket (3)\ \- \ 
+.PD 0
+.HP
+.BR accept (3)\ \- \ 
+.HP
+.BR bind (3)\ \- \ 
+.HP
+.BR connect (3)\ \- \ 
+.HP
+.BR getpeername (3)\ \- \ 
+.HP
+.BR getsockname (3)\ \- \ 
+.HP
+.BR getsockopt (3)\ \- \ 
+.HP
+.BR listen (3)\ \- \ 
+.HP
+.BR recv (3)\ \- \ 
+.HP
+.BR recvfrom (3)\ \- \ 
+.HP
+.BR recvmsg (3)\ \- \ 
+.HP
+.BR send (3)\ \- \ 
+.HP
+.BR sendmsg (3)\ \- \ 
+.HP
+.BR sendto (3)\ \- \ 
+.HP
+.BR setsockopt (3)\ \- \ 
+.HP
+.BR shutdown (3)\ \- \ 
+.HP
+.BR socket (3)\ \- \ 
+.HP
+.BR socketpair (3)\ \- \ 
+.HP
+.BR sockets (3)\ \- \ 
+.HP
+.BR sockmod (4)\ \- \ 
+.HP
+.BR socksys (4)\ \- \ 
+.HP
+.BR protosw (5)\ \- \ 
+.PD
+
+.SS "NSL Library"
+.PP
+.HP
+.BR libxnsl (3)\ \- \ 
+.PD 0
+.HP
+.BR xnsl (3)\ \- \ 
+.HP
+.BR endnetconfig (3)\ \- \ 
+.HP
+.BR endnetpath (3)\ \- \ 
+.HP
+.BR freenetconfigent (3)\ \- \ 
+.HP
+.BR getnetconfig (3)\ \- \ 
+.HP
+.BR getnetconfigent (3)\ \- \ 
+.HP
+.BR getnetpath (3)\ \- \ 
+.HP
+.BR inetaddr (3)\ \- \ 
+.HP
+.BR nc_perror (3)\ \- \ 
+.HP
+.BR nc_sperror (3)\ \- \ 
+.HP
+.BR netconfig (3)\ \- \ 
+.HP
+.BR netdir (3)\ \- \ 
+.HP
+.BR netdir_free (3)\ \- \ 
+.HP
+.BR netdir_getbyaddr (3)\ \- \ 
+.HP
+.BR netdir_getbyname (3)\ \- \ 
+.HP
+.BR netdir_options (3)\ \- \ 
+.HP
+.BR netdir_perror (3)\ \- \ 
+.HP
+.BR netdir_sperror (3)\ \- \ 
+.HP
+.BR netpath (3)\ \- \ 
+.HP
+.BR setnetconfig (3)\ \- \ 
+.HP
+.BR setnetpath (3)\ \- \ 
+.HP
+.BR taddr2uaddr (3)\ \- \ 
+.HP
+.BR uaddr2taddr (3)\ \- \ 
+.HP
+.BR netconfig (5)\ \- \ 
+.HP
+.BR netdir (5)\ \- \ 
+.HP
+.BR test-xnsl (8)\ \- \ 
+.HP
+.BR test-xnsl_thr (8)\ \- \ 
+.PD
+
+.SS "TPI Interface"
+.PP
+.HP
+.BR tpi (7)\ \- \ 
+.PD 0
+.HP
+.BR T_ADDR_ACK (7)\ \- \ 
+.HP
+.BR T_ADDR_REQ (7)\ \- \ 
+.HP
+.BR T_BIND_ACK (7)\ \- \ 
+.HP
+.BR T_BIND_REQ (7)\ \- \ 
+.HP
+.BR T_CAPABILITY_ACK (7)\ \- \ 
+.HP
+.BR T_CAPABILITY_REQ (7)\ \- \ 
+.HP
+.BR T_CONN_CON (7)\ \- \ 
+.HP
+.BR T_CONN_IND (7)\ \- \ 
+.HP
+.BR T_CONN_REQ (7)\ \- \ 
+.HP
+.BR T_CONN_RES (7)\ \- \ 
+.HP
+.BR T_DATA_IND (7)\ \- \ 
+.HP
+.BR T_DATA_REQ (7)\ \- \ 
+.HP
+.BR T_DISCON_IND (7)\ \- \ 
+.HP
+.BR T_DISCON_REQ (7)\ \- \ 
+.HP
+.BR T_ERROR_ACK (7)\ \- \ 
+.HP
+.BR T_EXDATA_IND (7)\ \- \ 
+.HP
+.BR T_EXDATA_REQ (7)\ \- \ 
+.HP
+.BR T_INFO_ACK (7)\ \- \ 
+.HP
+.BR T_INFO_REQ (7)\ \- \ 
+.HP
+.BR T_OK_ACK (7)\ \- \ 
+.HP
+.BR T_OPTDATA_IND (7)\ \- \ 
+.HP
+.BR T_OPTDATA_REQ (7)\ \- \ 
+.HP
+.BR T_OPTMGMT_ACK (7)\ \- \ 
+.HP
+.BR T_OPTMGMT_REQ (7)\ \- \ 
+.HP
+.BR T_ORDREL_IND (7)\ \- \ 
+.HP
+.BR T_ORDREL_REQ (7)\ \- \ 
+.HP
+.BR T_UDERROR_IND (7)\ \- \ 
+.HP
+.BR T_UNBIND_REQ (7)\ \- \ 
+.HP
+.BR T_UNITDATA_IND (7)\ \- \ 
+.HP
+.BR T_UNITDATA_REQ (7)\ \- \ 
+.PD
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.B tirdwr (4)
+.TP
+.B timod (4)
+.\"
+.\"
+.SH PREREQUISITES
+.PP
+The
+.B @PACKAGE@
+package requires the following packages to be installed:
+.TP
+.BR streams (5)
+The
+.B Linux Fast-STREAMS
+base package.
+.TP
+.BR strcompat (5)
+The
+.B Linux Fast-STREAMS
+compatiblity modules package.
+.\"
+.\"
+.SH NOTICES
+.PP
+Although previous release of the
+.B @PACKAGE@
+package were tested with
+.IR LiS ,
+.I LiS
+is now deprecated and this release
+.RB ( @VERSION@ )
+of
+.B @PACKAGE@
+has not been tested with
+.IR LiS .
+.I The OpenSS7 Project
+will no longer support this package for
+.IR LiS :
+please upgrade to
+.BR "Linux Fast-STREAMS" .
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production
+.B Linux
+distributions, kernels, and target architectures, and is considered production grade by
+.IR "The OpenSS7 Project" .
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B @PACKAGE@
+package is compatible with
+.I SVR 4.2
+and systems based on
+.I SVR 4.2
+such as
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+.IP \(em
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR TPI ,
+.[
+tpi revision 2.0.0
+.]
+.IR "XNS 5.2" ,
+.[
+xns 5.2
+.]
+.IR UNIX95 .
+.\"
+.\"
+.SH HISTORY
+.PP
+The OpenSS7 XTI/TLI library originally started out as part of the
+.BR strinet (5)
+package and was originally written for
+.IR LiS .
+The library and the
+.BR timod (4)
+and
+.BR tirdwr (4)
+modules were split from the
+.BR strinet (5)
+package and placed in their own
+.BR strxnet (5)
+package.  NSL library and Socket library functions were added to the
+.BR strxnet (5)
+package initially, but subsequently split to separate
+.BR strsock (5)
+and
+.BR strnsl (5)
+packages.
+What remains in the
+.BR strxnet (5)
+package is the XTI/TLI library, header files, and cooperating
+.I STREAMS
+modules, also TPI interface header files and documentation.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
