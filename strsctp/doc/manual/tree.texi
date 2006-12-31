@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.3 2006/08/22 12:57:30 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.4 2006/12/31 13:49:54 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/22 12:57:30 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/31 13:49:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -303,3 +303,82 @@ specific test cases.
 @item strsctp_mknod.8.gz
 Documentation for the @command{strsctp_mknod} utility program.
 @end table
+
+@ignore
+/usr
+/usr/include
+/usr/include/strsctp
+/usr/include/strsctp/sys
+/usr/include/strsctp/sys/strsctp
+/usr/include/strsctp/sys/strsctp/config.h
+/usr/include/strsctp/sys/strsctp/version.h
+/usr/include/strsctp/sys/npi_sctp.h
+/usr/include/strsctp/sys/tpi_sctp.h
+/usr/include/strsctp/sys/xti_sctp.h
+/usr/libexec
+/usr/libexec/strsctp
+/usr/libexec/strsctp/send-pr
+/usr/libexec/strsctp/send-pr.config
+/usr/libexec/strsctp/test-sctp
+/usr/libexec/strsctp/test-sctp_n
+/usr/libexec/strsctp/test-sctp_n2
+/usr/libexec/strsctp/test-sctp_nc
+/usr/libexec/strsctp/test-sctp_ns
+/usr/libexec/strsctp/test-sctp_t
+/usr/libexec/strsctp/test-etsi_n
+/usr/libexec/strsctp/test-etsi_t
+/usr/libexec/strsctp/test-interop
+/usr/libexec/strsctp/testsuite
+/usr/libexec/strsctp/atlocal
+/usr/lib
+/usr/sbin
+/usr/sbin/strsctp_mknod
+/usr/share
+/usr/share/man
+/usr/share/man/strsctp.macros
+/usr/share/man/strsctp.refs
+/usr/share/man/man3
+/usr/share/man/man3/xti_sctp.3
+/usr/share/man/man4
+/usr/share/man/man4/sctp.4
+/usr/share/man/man4/sctp_n.4
+/usr/share/man/man4/sctp_t.4
+/usr/share/man/man4/tpiperf.4
+/usr/share/man/man5
+/usr/share/man/man5/strsctp.5
+/usr/share/man/man7
+/usr/share/man/man7/npi_sctp.7
+/usr/share/man/man7/tpi_sctp.7
+/usr/share/man/man8
+/usr/share/man/man8/strsctp_mknod.8
+/usr/share/man/man8/test-interop.8
+/usr/share/man/man8/test-sctp.8
+/usr/share/man/man8/test-sctp_n.8
+/usr/share/man/man8/test-sctp_n2.8
+/usr/share/man/man8/test-sctp_nc.8
+/usr/share/man/man8/test-sctp_ns.8
+/usr/share/man/man8/test-sctp_t.8
+/usr/share/man/man8/test-etsi_n.8
+/usr/share/man/man8/test-etsi_t.8
+/usr/share/info
+/usr/share/info/strsctp.info
+/usr/share/info/strsctp.info-1
+/usr/share/info/strsctp.info-2
+/etc
+/etc/strsctp.conf
+/etc/default
+/etc/default/strsctp
+/etc/init.d
+/etc/init.d/strsctp.sh
+/etc/modutils
+/etc/netconfig.d
+/etc/netconfig.d/strsctp
+/etc/sock2path.d
+/etc/sock2path.d/strsctp
+/lib
+/lib/modules
+/lib/modules/2.6.15-27-server
+/lib/modules/2.6.15-27-server/strsctp
+/lib/modules/2.6.15-27-server/strsctp/streams_tpiperf.ko
+/lib/modules/2.6.15-27-server/strsctp/streams_sctp.ko
+@end ignore
