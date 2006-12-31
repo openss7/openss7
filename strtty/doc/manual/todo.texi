@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=78 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.4 2006/12/31 11:20:20 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.5 2006/12/31 11:35:06 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 11:20:20 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/31 11:35:06 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -76,7 +76,7 @@ this package:
 @item @tab @manref{unlockpt(3)}
 @end multitable
 
-@emph{*done*}
+This remains to be done.
 
 @item
 Create an @manref{ldterm(4)} @cite{Line Discipline for Terminals}
