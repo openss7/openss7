@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.2 2006/05/23 22:43:35 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.3 2006/12/31 13:32:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/05/23 22:43:35 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/31 13:32:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -142,3 +142,72 @@ directory @file{/@-usr/@-share/@-man/@-man7/@-}:
 @dfn{@value{PACKAGE_UCNAME}} places the following NPI manual pages in the system man
 directory @file{/@-usr/@-share/@-man/@-man7/@-}:
 
+@ignore
+/usr
+/usr/share
+/usr/share/info
+/usr/share/info/netperf.info
+/usr/share/info/netperf.info-1
+/usr/share/info/netperf.info-2
+/usr/share/man
+/usr/share/man/netperf.macros
+/usr/share/man/netperf.refs
+/usr/share/man/man1
+/usr/share/man/man1/netperf.1
+/usr/share/man/man1/netperf_arr.1
+/usr/share/man/man1/netperf_packet_byte.1
+/usr/share/man/man1/netperf_sctp_range.1
+/usr/share/man/man1/netperf_sctp_rr.1
+/usr/share/man/man1/netperf_sctp_stream.1
+/usr/share/man/man1/netperf_snapshot.1
+/usr/share/man/man1/netperf_tcp_range.1
+/usr/share/man/man1/netperf_tcp_rr.1
+/usr/share/man/man1/netperf_tcp_stream.1
+/usr/share/man/man1/netperf_udp_range.1
+/usr/share/man/man1/netperf_udp_rr.1
+/usr/share/man/man1/netperf_udp_stream.1
+/usr/share/man/man8
+/usr/share/man/man8/sctp_range_script.8
+/usr/share/man/man8/sctp_rr_script.8
+/usr/share/man/man8/sctp_stream_script.8
+/usr/share/man/man8/tcp_range_script.8
+/usr/share/man/man8/tcp_rr_script.8
+/usr/share/man/man8/tcp_stream_script.8
+/usr/share/man/man8/udp_rr_script.8
+/usr/share/man/man8/udp_stream_script.8
+/usr/share/man/man8/snapshot_script.8
+/usr/share/man/man8/arr_script.8
+/usr/share/man/man8/packet_byte_script.8
+/usr/share/man/man8/netserver.8
+/usr/bin
+/usr/bin/netperf
+/usr/bin/netperf_arr
+/usr/bin/netperf_packet_byte
+/usr/bin/netperf_sctp_range
+/usr/bin/netperf_sctp_rr
+/usr/bin/netperf_sctp_stream
+/usr/bin/netperf_snapshot
+/usr/bin/netperf_tcp_range
+/usr/bin/netperf_tcp_rr
+/usr/bin/netperf_tcp_stream
+/usr/bin/netperf_udp_range
+/usr/bin/netperf_udp_rr
+/usr/bin/netperf_udp_stream
+/usr/libexec
+/usr/libexec/netperf
+/usr/libexec/netperf/send-pr
+/usr/libexec/netperf/send-pr.config
+/usr/sbin
+/usr/sbin/sctp_stream_script
+/usr/sbin/tcp_stream_script
+/usr/sbin/udp_stream_script
+/usr/sbin/sctp_rr_script
+/usr/sbin/tcp_rr_script
+/usr/sbin/udp_rr_script
+/usr/sbin/sctp_range_script
+/usr/sbin/tcp_range_script
+/usr/sbin/snapshot_script
+/usr/sbin/arr_script
+/usr/sbin/packet_byte_script
+/usr/sbin/netserver
+@end ignore
