@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.33 2006/10/02 11:32:29 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.34 2006/12/31 13:57:44 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/02 11:32:29 $ by $Author: brian $
+% Last Modified $Date: 2006/12/31 13:57:44 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -410,6 +410,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strxns.texi,v $
+Revision 0.9.2.34  2006/12/31 13:57:44  brian
+- updated documentation for release
+
 Revision 0.9.2.33  2006/10/02 11:32:29  brian
 - changes to get master builds working for RPM and DEB
 - added outside licenses to package documentation
@@ -778,9 +781,15 @@ This manual uses @cite{texinfo} typographic conventions.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@page
 @node Reference
 @chapter Reference
 @cindex reference
+
+This chapter provides a reference to the contents of the @cite{@value{PACKAGE_UCNAME}} package.
+Please note that this @command{texinfo} documentation is not updated as regularly as the manual
+pages.  For a more up to date package reference, please begin with the @manref{@value{PACKAGE}(5)}
+manual page (that documents the package).
 
 @menu
 * Files::			Files included in the package
@@ -806,6 +815,20 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Drivers
 @section Drivers
 @cindex drivers
+
+The configuration of @dfn{STREAMS} drivers is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{XNS} subsystem, core drivers are part of every
+@cite{@value{PACKAGE_TITLE}} system.
+
+Kernel modules are installed by the @cite{@value{PACKAGE_TITLE}} package in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} directory, with either a @samp{.o} or
+@samp{.ko} extension.@footnote{The kernel version, @samp{@value{_kversion}} is just an example.
+When installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed to underscores
+(@samp{_}).}
+
+The following lists the core drivers, @dfn{STREAMS} kernel tunable parameters, and @dfn{STREAMS}
+configuration information:@footnote{Note that documentation of @dfn{XNS} drivers is in the form of
+manual pages in Section 4 of the manual pages with the same name as the driver.}
 
 @subsection Linux IP to DLPI Driver (ldl)
 
@@ -840,6 +863,20 @@ An OpenSS7 GPL header has been added to the source code to make this clear.
 @section Modules
 @cindex modules
 
+The configuration of @dfn{STREAMS} modules is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{XNS} subsystem, core modules are part of every
+@cite{@value{PACKAGE_TITLE}} system.
+
+Kernel modules are installed by the @cite{@value{PACKAGE_TITLE}} package in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} directory, with either a @samp{.o} or
+@samp{.ko} extension.@footnote{The kernel version, @samp{@value{_kversion}} is just an example.
+When installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed to underscores
+(@samp{_}).}
+
+The following lists the core modules, @dfn{STREAMS} kernel tunable parameters, and @dfn{STREAMS}
+configuration information:@footnote{Note that documentation of @dfn{XNS} modules is in the form of
+manual pages in Section 4 of the manual pages with the same name as the modules.}
+
 @subsection DLPI to Linux IP Module (ip_strm_mod)
 
 @subsubheading Licensing
@@ -862,6 +899,7 @@ interface drivers.  This allows a DLPI STREAMS driver to act as an interface dri
 @section Libraries
 @cindex libraries
 
+The @cite{@value{PACKAGE_TITLE}} package does not yet install any libraries.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -869,6 +907,96 @@ interface drivers.  This allows a DLPI STREAMS driver to act as an interface dri
 @node Utilities
 @section Utilities
 @cindex utilities
+
+@menu
+* Init Scripts::
+* User Utilities::
+* Administrative Utilities::
+* Performance Test Programs::
+* Conformance Test Programs::
+@end menu
+
+@node Init Scripts
+@subsection Init Scripts
+@cindex init scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}.sh})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{XNS} Subsystem.
+The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount the
+@dfn{XNS} subsystem, @manpage{@value{PACKAGE}(5)}.
+The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
+@manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
+
+See @manref{@value{PACKAGE}(8)} for more information.
+
+@end table
+
+@node User Utilities
+@subsection User Utilities
+@cindex user utilities
+
+Following are user utilities for manipulating @dfn{Streams}:
+
+@c @table @asis
+@c @end table
+
+The @cite{@value{PACKAGE_UCNAME}} package does not currently contain any user utilities.
+
+
+@node Administrative Utilities
+@subsection Administrative Utilities
+@cindex administrative utilities
+
+Following are administrative utilities for manipulating and examining the @dfn{XNS} subsystem:
+
+@c @table @asis
+@c @end table
+
+The @cite{@value{PACKAGE_UCNAME}} package does not currently contain any administrative utilities.
+
+@node Performance Test Programs
+@subsection Performance Test Programs
+@cindex performance test programs
+
+Following are performance test programs:
+
+@c @table @asis
+@c @end table
+
+The @cite{@value{PACKAGE_UCNAME}} package does not currently contain any performance test programs.
+
+@node Conformance Test Programs
+@subsection Conformance Test Programs
+@cindex conformance test programs
+
+Following and conformance and validation testing programs:
+
+@table @asis
+
+@item @manpage{test-xns(8)} (@file{/usr/libexec/@value{PACKAGE}/test-xns})
+@pgindex test-xns
+@pgindex /usr/libexec/@value{PACKAGE}/test-xns
+
+The @manpage{test-xns(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{pty(4)} @dfn{STREAMS} driver.
+
+See @manref{test-xns(8)} for more information.
+
+@end table
+
+For the proper way to execute these validation test programs in a conformance and validation test
+suite, see @refman{Running Test Suites}.
 
 @subsection @command{ldltest}
 
@@ -883,9 +1011,121 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@page
 @node Development
 @section Development
 @cindex developing
+
+The @cite{@value{PACKAGE_UCNAME}} package contains the necessary header files, shared and static
+libraries, manuals and manual pages necessary for the development of kernel modules, @dfn{STREAMS}
+modules and drivers, and applications programs based on the @cite{@value{PACKAGE_UCNAME}} package.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files
+@subsection Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}}
+subdirectory.@footnote{One of the major reasons for using this non-standard subdirectory is to avoid
+conflict with header files already located in the @file{/usr/include} directory.} To use the header
+files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the @command{gcc}
+command line as a compile option.  This is true regardless of whether user space or kernel space
+programs are being compiled.
+
+In general, @samp{-I} include directives on the @command{gcc} command line should be ordered in the
+reverse order of the dependencies between packages.  So, for example, if the include files from all
+add-on packages are required, the order of these directives would be: @samp{-I/usr/include/strss7
+-I/usr/include/strsctp -I/usr/include/strinet -I/usr/include/strxnet -I/usr/include/strxns
+-I/usr/include/strcompat -I/usr/include/streams}.
+
+Following are the user visible header files provided by the
+@command{@value{PACKAGE}-@value{VERSION}} package in directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+@item sys/npi.h
+@pgindex sys/npi.h
+@pgindex /usr/include/@value{PACKAGE}/sys/npi.h
+
+This is a replacement for the standard @cite{UNIX International} header file.
+
+@end table
+
+@subsubsection User Space Programs
+
+Typical include files for interacting with @dfn{STREAMS} from user space include the
+@file{stropts.h} header file.  Additional header files for interacting with specific drivers or
+modules may also be required.
+
+@subsubsection Kernel Space Drivers and Modules
+
+Typical include files for writing @dfn{STREAMS} modules and drivers for kernel space include the
+@file{sys/cmn_err.h}, @file{sys/kmem.h}, @file{sys/dki.h}, @file{sys/stream.h}, @file{sys/ddi.h},
+and @file{sys/strconf.h} header files.  Additional header files for interacting with specific
+drivers or modules may also be required.
+
+@node Static and Shared Libraries
+@subsection Libraries
+
+Shared or static versions of the @file{libstreams} library must be linked when using the
+@command{@value{PACKAGE}-@value{VERSION}} package.  This library must either be specified on the
+@command{gcc} command line as a shared library (e.g. @samp{-lstreams}) or as a static library (e.g.
+@samp{/usr/lib/libstreams.a}).
+
+If the shared library is linked, include the following options on the @command{gcc} command line:
+
+@table @asis
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @asis
+
+@end table
+
+@node Kernel Module Development
+@subsection Kernel Modules
+
+Developing @dfn{STREAMS} kernel modules is similar to user space programs with regard to header
+files.  @file{/usr/include/@value{PACKAGE}} should be placed as an include directory to search in
+the @command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules should be
+followed.  In particular, several important intricacies should be considered:
+
+@itemize @bullet
+
+@item
+The @command{gcc} compiler used to compile the kernel modules must be the same version of compiler
+that was used to compile the kernel.
+
+@item
+The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel.
+
+@item
+The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+
+@item
+The @command{gcc} command line must include several important include files directly on the command
+line such as @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+maybe even @samp{--include
+/@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The kernel version
+@samp{@value{_kversion}} is just an example.  For the running kernel, use the output of @samp{uname
+-r}.}
+
+@end itemize
+
+@node Manual Pages
+@subsection Manual Pages
+
+The @command{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages.  The number
+of manual pages installed totals several hundred manual pages.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

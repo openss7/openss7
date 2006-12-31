@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/05/07 22:12:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/12/31 13:57:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/07 22:12:54 $ by $Author: brian $
+# Last Modified $Date: 2006/12/31 13:57:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.18  2006/12/31 13:57:43  brian
+# - updated documentation for release
+#
 # Revision 0.9.2.17  2006/05/07 22:12:54  brian
 # - updated for NPI-IP driver
 #
@@ -85,6 +88,7 @@ man_MANS = \
 	man4/ip_to_dlpi.4 \
 	man4/ldl.4 \
 	man4/link-driver.4 \
+	man5/strxns.5 \
 	man7/CD_ABORT_OUTPUT_REQ.7 \
 	man7/cd_abort_output_req_t.7 \
 	man7/CD_ALLOW_INPUT_REQ.7 \
@@ -318,6 +322,7 @@ dist_noinst_MANS = \
 	man4/ip_to_dlpi.4.man \
 	man4/ldl.4.man \
 	man4/link-driver.4.man \
+	man5/strxns.5.man \
 	man7/CD_ABORT_OUTPUT_REQ.7.man \
 	man7/cd_abort_output_req_t.7.man \
 	man7/CD_ALLOW_INPUT_REQ.7.man \
