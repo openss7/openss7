@@ -1,3 +1,13 @@
+2006-12-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated documentation for release
+	* NEWS: updated documentation for release
+	* README: updated documentation for release
+	* README-cvs: updated documentation for release
+	* THANKS: updated documentation for release
+	* doc/man/strisdn.macros: updated documentation for release
+	* doc/manual/tree.texi: updated documentation for release
+
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* strisdn.spec.in: old rpms hate nested ifs
