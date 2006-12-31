@@ -1,3 +1,17 @@
+2006-12-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: documentation updates for release
+	* NEWS: documentation updates for release
+	* README: documentation updates for release
+	* README-cvs: documentation updates for release
+	* THANKS: documentation updates for release
+	* doc/man/sigtran.macros: documentation updates for release
+	* doc/man/sigtran.refs: documentation updates for release
+	* doc/man/man4/m2pa.4.man: documentation updates for release
+	* doc/man/man5/sigtran.5.man: documentation updates for release
+	* doc/manual/sigtran.texi: documentation updates for release
+	* doc/manual/tree.texi: documentation updates for release
+
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* sigtran.spec.in: old rpms hate nested ifs

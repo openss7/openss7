@@ -1362,6 +1362,102 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-02.txt
 
+%K m2pa-test-07
+%L M2PATEST07
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-07.txt
+%D June 18, 2006
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-07.txt
+
+%K m2pa-test-06
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-06.txt
+%D October 16, 2005
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-06.txt
+
+%K m2pa-test-05
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-05.txt
+%D February 14, 2004
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-05.txt
+
+%K m2pa-test-04
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-04.txt
+%D July 26, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-04.txt
+
+%K m2pa-test-03
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-03.txt
+%D March 29, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-03.txt
+
+%K m2pa-test-02
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-02.txt
+%D September 15, 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-02.txt
+
+%K m2pa-test-01
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-01.txt
+%D April, 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-01.txt
+
+%K m2pa-test-00
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-00.txt
+%D December, 2001
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-00.txt
+
 %K q700
 %L Q.700
 %A ITU

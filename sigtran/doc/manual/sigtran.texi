@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: sigtran.texi,v 0.9.2.1 2006/10/16 10:42:45 brian Exp $
+% @(#) $Id: sigtran.texi,v 0.9.2.2 2006/12/31 13:37:38 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/16 10:42:45 $ by $Author: brian $
+% Last Modified $Date: 2006/12/31 13:37:38 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -401,6 +401,9 @@ package.
 @smallexample
 
 $Log: sigtran.texi,v $
+Revision 0.9.2.2  2006/12/31 13:37:38  brian
+- documentation updates for release
+
 Revision 0.9.2.1  2006/10/16 10:42:45  brian
 - added new package files
 
@@ -628,79 +631,7 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Files
 @cindex headers
 
-The following kernel modules are installed by the @cite{@value{PACKAGE_TITLE}} package in the
-@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} directory, with either a @samp{.o} or
-@samp{.ko} extension.@footnote{The kernel version, @value{_kversion} is just an example.  When
-installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed to underscores
-(@samp{_}).}
-
-@c @include tree.texi
-
-@table @asis
-
-@item @file{streams-m2pa_sl}
-@pgindex streams-m2pa_sl
-
-This kernel module contains the M2PA @dfn{STREAMS} module.  This module is pushed over an SCTP NPI
-Stream to form a complete SS7 signalling link implementation over IP providing the Signalling Link
-Interface (SLI).
-See @manref{m2pa_sl(4)} for more information.
-
-@item @file{streams-m2ua_as}
-@pgindex streams-m2ua_as
-
-This kernel module contains the M2UA-AS @dfn{STREAMS} module.  This module is pushed over an SCTP
-NPI Stream to form a complete SS7 signalling link implementation over IP providing the Signalling
-Link Interface (SLI).  This is a simpler AS-side only implementation of M2UA.
-See @manref{m2ua_as(4)} for more information.
-
-@item @file{streams-m3ua_as}
-@pgindex streams-m3ua_as
-
-This kernel module contains the M3UA-AS @dfn{STREAMS} module.  This module is pushed over an SCTP
-NPI Stream to form a complete SS7 signalling link implementation over IP providing the Signalling
-Link Interface (SLI).  This is a simpler AS-side only implementation of M3UA.
-See @manref{m3ua_as(4)} for more information.
-
-@item @file{streams-sdl_sctp}
-@pgindex streams-sdl_sctp
-
-This kernel module contains an SCTP @dfn{STREAMS} module.  This module is pushed over an SCTP NPI
-Stream to form a Signalling Data Link implementation over IP providing the Signalling Data Link
-Interface (SDLI).  This is a non-standard but common approach to providing HDLC/DAED communication
-using SCTP and predates M2PA/M2UA.
-See @manref{sdl_sctp(4)} for more information.
-
-@item @file{streams-sdt_sctp}
-@pgindex streams-sdt_sctp
-
-This kernel module contains an SCTP @dfn{STREAMS} module.  This module is pushed over an SCTP NPI
-Stream to form a Signalling Data Terminal implementation over IP providing the Signalling Data
-Terminal Interface (SDTI).  This is a non-standard but common approach to providing HDLC/DAED
-communication using SCTP and predates M2PA/M2UA.
-See @manref{sdt_sctp(4)} for more information.
-
-@item @file{streams-sdt_tpi}
-@pgindex streams-sdt_tpi
-
-This kernel module contains an TPI @dfn{STREAMS} module.  This module is pushed over any TPI
-transport Stream to form a Signalling Data Terminal implementation over IP providing the Signalling
-Data Terminal Interface (SDTI).  This is a non-standard but common approach to providing HDLC/DAED
-communication using any TPI transport (e.g. UDP) and predates M2PA/M2UA.
-See @manref{sdt_tpi(4)} for more information.
-
-@item @file{streams-sl_tpi}
-@pgindex streams-sl_tpi
-
-This kernel module contains an TPI @dfn{STREAMS} module.  This module is pushed over any TPI
-transport Stream to form a Signalling Link implementation over IP providing the Signalling Link
-Interface (SLI).  This is a non-standard but common approach to providing SS7 link communication
-using any TPI transport (e.g. UDP) and predates M2PA/M2UA.
-See @manref{sl_tpi(4)} for more information.
-
-@end table
-
-Additional kernel modules are provided by add-on packages.
+@include tree.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -709,13 +640,19 @@ Additional kernel modules are provided by add-on packages.
 @section Drivers
 @cindex drivers
 
-The configuration of @dfn{STREAMS} drivers and modules is peformed when compiling the
-@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{SIGTRAN} subsystem, core drivers and modules are
-part of every @cite{@value{PACKAGE_TITLE}} system.
+The configuration of @dfn{STREAMS} drivers is peformed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{SIGTRAN} subsystem, core drivers are part of every
+@cite{@value{PACKAGE_TITLE}} system.
 
-The following lists the core drivers and modules, @dfn{STREAMS} kernel tunable parameters, and
-@dfn{STREAMS} configuration information:@footnote{Note that documentation for @dfn{SIGTRAN} drivers
-is in the form of manual pages in Section 4 of the manual pages with the same name as the driver.}
+Kernel modules are installed by the @cite{@value{PACKAGE_TITLE}} package in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} directory, with either a @samp{.o} or
+@samp{.ko} extension.@footnote{The kernel version, @samp{@value{_kversion}} is just an example.
+When installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed to underscores
+(@samp{_}).}
+
+The following lists the core drivers, @dfn{STREAMS} kernel tunable parameters, and @dfn{STREAMS}
+configuration information:@footnote{Note that documentation for @dfn{SIGTRAN} drivers is in the form
+of manual pages in Section 4 of the manual pages with the same name as the driver.}
 
 @table @asis
 
@@ -728,6 +665,82 @@ is in the form of manual pages in Section 4 of the manual pages with the same na
 @section Modules
 @cindex modules
 
+The configuration of @dfn{STREAMS} modules is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{STREAMS} subsystem, core modules are part of every
+@cite{@value{PACKAGE_TITLE}} system.
+
+Kernel modules are installed by the @cite{@value{PACKAGE_TITLE}} package in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} directory, with either a @samp{.o} or
+@samp{.ko} extension.@footnote{The kernel version, @samp{@value{_kversion}} is just an example.
+When installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed to underscores
+(@samp{_}).}
+
+The following lists the core modules:@footnote{Note that documentation of the @dfn{STREAMS} modules
+is in the form of a manual page in Section 4 of the manual pages with the same name as the module.}
+
+@table @asis
+
+@item @manpage{m2pa_sl(4)} (@file{streams-m2pa_sl})
+@pgindex streams-m2pa_sl
+
+This module contains the M2PA @dfn{STREAMS} module.  This module is pushed over an SCTP NPI Stream
+to form a complete SS7 signalling link implementation over IP providing the Signalling Link
+Interface (SLI).
+See @manref{m2pa_sl(4)} for more information.
+
+@item @manpage{m2ua_as(4)} (@file{streams-m2ua_as})
+@pgindex streams-m2ua_as
+
+This module contains the M2UA-AS @dfn{STREAMS} module.  This module is pushed over an SCTP NPI
+Stream to form a complete SS7 signalling link implementation over IP providing the Signalling Link
+Interface (SLI).  This is a simpler AS-side only implementation of M2UA.  See @manref{m2ua_as(4)}
+for more information.
+
+@item @manpage{m3ua_as(4)} (@file{streams-m3ua_as})
+@pgindex streams-m3ua_as
+
+This module contains the M3UA-AS @dfn{STREAMS} module.  This module is pushed over an SCTP NPI
+Stream to form a complete SS7 signalling link implementation over IP providing the Signalling Link
+Interface (SLI).  This is a simpler AS-side only implementation of M3UA.
+See @manref{m3ua_as(4)} for more information.
+
+@item @manpage{sdl_sctp(4)} (@file{streams-sdl_sctp})
+@pgindex streams-sdl_sctp
+
+This module contains an SCTP @dfn{STREAMS} module.  This module is pushed over an SCTP NPI Stream to
+form a Signalling Data Link implementation over IP providing the Signalling Data Link Interface
+(SDLI).  This is a non-standard but common approach to providing HDLC/DAED communication using SCTP
+and predates M2PA/M2UA.
+See @manref{sdl_sctp(4)} for more information.
+
+@item @manpage{sdt_sctp(4)} (@file{streams-sdt_sctp})
+@pgindex streams-sdt_sctp
+
+This module contains an SCTP @dfn{STREAMS} module.  This module is pushed over an SCTP NPI Stream to
+form a Signalling Data Terminal implementation over IP providing the Signalling Data Terminal
+Interface (SDTI).  This is a non-standard but common approach to providing HDLC/DAED communication
+using SCTP and predates M2PA/M2UA.
+See @manref{sdt_sctp(4)} for more information.
+
+@item @manpage{sdt_tpi(4)} (@file{streams-sdt_tpi})
+@pgindex streams-sdt_tpi
+
+This module contains an TPI @dfn{STREAMS} module.  This module is pushed over any TPI transport
+Stream to form a Signalling Data Terminal implementation over IP providing the Signalling Data
+Terminal Interface (SDTI).  This is a non-standard but common approach to providing HDLC/DAED
+communication using any TPI transport (e.g. UDP) and predates M2PA/M2UA.  See @manref{sdt_tpi(4)}
+for more information.
+
+@item @manpage{sl_tpi(4)} (@file{streams-sl_tpi})
+@pgindex streams-sl_tpi
+
+This module contains an TPI @dfn{STREAMS} module.  This module is pushed over any TPI transport
+Stream to form a Signalling Link implementation over IP providing the Signalling Link Interface
+(SLI).  This is a non-standard but common approach to providing SS7 link communication using any TPI
+transport (e.g. UDP) and predates M2PA/M2UA.
+See @manref{sl_tpi(4)} for more information.
+
+@end table
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -744,12 +757,297 @@ is in the form of manual pages in Section 4 of the manual pages with the same na
 @section Utilities
 @cindex utilities
 
+@menu
+* Init Scripts::
+* User Utilities::
+* Administrative Utilities::
+* Performance Test Programs::
+* Conformance Test Programs::
+@end menu
+
+@node Init Scripts
+@subsection Init Scripts
+@cindex init scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{@value{PACKAGE_UCNAME}} Subsystem.
+The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount
+the @dfn{@value{PACKAGE_UCNAME}} subsystem, @manpage{@value{PACKAGE}(5)}.
+The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
+@manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
+
+See @manref{@value{PACKAGE}(8)} for more information.
+
+@end table
+
+@node User Utilities
+@subsection User Utilities
+@cindex user utilities
+
+Following are the user utilities for manipulating @dfn{Streams}:
+
+@table @asis
+@end table
+
+@node Administrative Utilities
+@subsection Administrative Utilities
+@cindex administrative utilities
+
+Following are the administrative utilities for manipulating and examining the
+@dfn{@value{PACKAGE_UCNAME}} subsystem:
+
+@table @asis
+@end table
+
+@node Performance Test Programs
+@subsection Performance Test Programs
+@cindex performance test programs
+
+Following are performance test programs:
+
+@table @asis
+@end table
+
+@node Conformance Test Programs
+@subsection Conformance Test Programs
+@cindex conformance test programs
+
+Following are conformance test programs:
+
+@table @asis
+
+@item @manpage{test-sigtran(8)} (@file{/usr/libexec/@value{PACKAGE}/test-sigtran})
+@pgindex test-sigtran
+@pgindex /usr/libexec/@value{PACKAGE}/test-sigtran
+
+The @manpage{test-sigtran(8)} C-language program is a conformance and validation test program, in
+the OpenSS7 Project style, for the
+@manpage{sigtran(5)} @dfn{STREAMS} package.
+
+See @manref{test-sigtran(8)} for more information.
+
+@item @manpage{test-m2pa(8)} (@file{/usr/libexec/@value{PACKAGE}/test-m2pa})
+@pgindex test-m2pa
+@pgindex /usr/libexec/@value{PACKAGE}/test-m2pa
+
+The @manpage{test-m2pa(8)} C-language program is a conformance and validation test program, in
+the OpenSS7 Project style, for the
+@manpage{m2pa_sl(4)} @dfn{STREAMS} module.
+
+See @manref{test-m2pa(8)} for more information.
+
+@end table
+
+For the proper way to execute these validation test programs in a conformance and validation test
+suite, see @refman{Running Test Suites}.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Development
 @section Development
 @cindex developing
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files
+@subsection Header Files
+@cindex development header files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}} subdirectory.  To
+use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
+@command{gcc} command line as a C preprocessor option.  This is true regardless of whether user
+space or kernel space programs are being compiled.
+
+In general, @samp{-I} include directives on the @command{gcc} command line should be ordered in the
+reverse order of the dependencies between packages.  So, for example, if the include files from all
+add-on packages are required, the order of these directives would be: @samp{-I/usr/include/strvoip
+-I/usr/include/sigtran -I/usr/include/strss7 -I/usr/include/strisdn -I/usr/include/striso
+-I/usr/include/strchan -I/usr/include/strsctp -I/usr/include/strsctp -I/usr/include/strsock
+-I/usr/include/strnsl -I/usr/include/strxnet -I/usr/include/strxns -I/usr/include/strtty
+-I/usr/include/strcompat -I/usr/include/streams}.
+
+Following are the user visable header files provided by the
+@command{@value{PACKAGE}-@value{VERSION}} package in directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+@item sys/ua_lm.h
+@itemx sys/ua_lm_ioctl.h
+@itemx sys/ua_ioctl.h
+
+These are the primary header files for all @manref{SIGTRAN(4)} drivers and modules.
+They are normally only included by user space programs when interacting with a given
+@manpage{SIGTRAN(4)} driver or module.
+See @manref{SIGTRAN(4)} for more information.
+
+@item sys/dlpi_iua.h
+@itemx sys/iua_ioctl.h
+
+These are the primary header files for use with the @manref{iua(4)} driver or @manref{iua_as(4)}
+module.  The @file{sys/dlpi_iua.h} file defines any extensions necessary to the Data Link Provider
+Interface (@manref{dlpi(7)}) for the @manpage{iua(4)} driver or @manpage{iua_as(4)} module.  The
+@file{sys/iua_ioctl.h} file defines any private input-output controls necessary for use by the
+@manpage{iua(4)} driver or @manpage{iua_as(4)} module.  This later file is normally only included by
+user space programs when interacting with the @manpage{iua(4)} driver or @manpage{iua_as(4)} module.
+See @manref{iua(4)} and @manref{iua_as(4)} for more information.
+
+@item sys/dlpi_dua.h
+@itemx sys/dua_ioctl.h
+
+These are the primary header files for use with the @manref{dua(4)} driver or @manref{dua_as(4)}
+module.  The @file{sys/dlpi_dua.h} file defines any extensions necessary to the Data Link Provider
+Interface (@manref{dlpi(7)}) for the @manpage{dua(4)} driver or @manpage{dua_as(4)} module.  The
+@file{sys/dua_ioctl.h} file defines any private input-output controls necessary for use by the
+@manpage{dua(4)} driver or @manpage{dua_as(4)} module.  This later file is normally only included by
+user space programs when interacting with the @manpage{dua(4)} driver or @manpage{dua_as(4)} module.
+See @manref{dua(4)} and @manref{dua_as(4)} for more information.
+
+@item sys/dlpi_gr303ua.h
+@itemx sys/gr303ua_ioctl.h
+
+These are the primary header files for use with the @manref{gr303ua(4)} driver or @manref{gr303ua_as(4)}
+module.  The @file{sys/dlpi_gr303ua.h} file defines any extensions necessary to the Data Link Provider
+Interface (@manref{dlpi(7)}) for the @manpage{gr303ua(4)} driver or @manpage{gr303ua_as(4)} module.  The
+@file{sys/gr303ua_ioctl.h} file defines any private input-output controls necessary for use by the
+@manpage{gr303ua(4)} driver or @manpage{gr303ua_as(4)} module.  This later file is normally only included by
+user space programs when interacting with the @manpage{gr303ua(4)} driver or @manpage{gr303ua_as(4)} module.
+See @manref{gr303ua(4)} and @manref{gr303ua_as(4)} for more information.
+
+@item sys/dlpi_v5ua.h
+@itemx sys/v5ua_ioctl.h
+
+These are the primary header files for use with the @manref{v5ua(4)} driver or @manref{v5ua_as(4)}
+module.  The @file{sys/dlpi_v5ua.h} file defines any extensions necessary to the Data Link Provider
+Interface (@manref{dlpi(7)}) for the @manpage{v5ua(4)} driver or @manpage{v5ua_as(4)} module.  The
+@file{sys/v5ua_ioctl.h} file defines any private input-output controls necessary for use by the
+@manpage{v5ua(4)} driver or @manpage{v5ua_as(4)} module.  This later file is normally only included by
+user space programs when interacting with the @manpage{v5ua(4)} driver or @manpage{v5ua_as(4)} module.
+See @manref{v5ua(4)} and @manref{v5ua_as(4)} for more information.
+
+@item sys/m2pa_ioctl.h
+
+These are the primary header files for use with the @manref{m2pa_sl(4)} driver.  The
+@file{sys/m2pa_ioctl.h} file defines any private input-output controls necessary for use by the
+@manpage{m2pa_sl(4)} driver.  This file is normally only included by user space programs when
+interacting with the @manpage{m2pa_sl(4)} driver.
+See @manref{m2pa_sl(4)} for more information.
+
+@item sys/dlpi_m2ua.h
+@itemx sys/m2ua_ioctl.h
+
+These are the primary header files for use with the @manref{m2ua(4)} driver or @manref{m2ua_as(4)}
+module.  The @file{sys/dlpi_m2ua.h} file defines any extensions necessary to the Data Link Provider
+Interface (@manref{dlpi(7)}) for the @manpage{m2ua(4)} driver or @manpage{m2ua_as(4)} module.  The
+@file{sys/m2ua_ioctl.h} file defines any private input-output controls necessary for use by the
+@manpage{m2ua(4)} driver or @manpage{m2ua_as(4)} module.  This later file is normally only included by
+user space programs when interacting with the @manpage{m2ua(4)} driver or @manpage{m2ua_as(4)} module.
+See @manref{m2ua(4)} and @manref{m2ua_as(4)} for more information.
+
+@item sys/m3ua.h
+@itemx sys/m3ua_ioctl.h
+
+These are the primary header files for use with the @manref{m3ua(4)} driver.  The @file{sys/m3ua.h}
+file defines any extensions necessary to the Message Transfer Part Interface (@manref{mtpi(7)}) for
+the @manpage{m3ua(4)} driver.  The @file{sys/m3ua_ioctl.h} file defines any private input-output
+controls necessary for use by the @manpage{m3ua(4)} driver.  This later file is normally only
+included by user space programs when interacting with the @manpage{m3ua(4)} driver.
+See @manref{m3ua(4)} for more information.
+
+@end table
+
+@subsubsection User Space Programs
+
+Typical include files for interacting with @dfn{@value{PACKAGE_UCNAME}} from user space include the
+@file{stropts.h} and @file{sys/ua_ioctl.h} header files.  Additional header files for interacting
+with specific drivers or modules may also be required.
+
+@subsubsection Kernel Space Drivers and Modules
+
+Typical include files for writing @dfn{STREAMS} modules and drivers for kernel sapce include the
+@file{sys/cmn_err.h}, @file{sys/kmem.h}, @file{sys/dki.h}, @file{sys/stream.h}, @file{sys/ddi.h},
+@file{sys/strconf.h}, @file{sys/ua_lm.h} header files.  Additional header files for interacting with
+specific drivers or modules may also be required.
+
+@node Static and Shared Libraries
+@subsection Libraries
+@cindex static and shared libraries
+
+Shared or static versions of the @file{libstreams} library must be linked when using the
+@command{@value{PACKAGE}-@value{VERSION}} package.  This library must either be specified on the
+@command{gcc} command line as a shared library (e.g. @samp{-lstreams}) or as a static library (e.g.
+@samp{/usr/lib/libstreams.a}).
+
+If the shared library is linked, include the following options on the @command{gcc} command line:
+
+@table @samp
+@item -lstreams
+Link to the @file{/usr/lib/libstreams.so} shared library.
+
+@end table
+
+if the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @samp
+@item /usr/lib/libstreams.a
+Link to the @file{/usr/lib/libstreams.a} static library.
+
+@end table
+
+@node Kernel Module Development
+@subsection Kernel Modules
+@cindex kernel module development
+
+Developing @dfn{STREAMS} kernel modules is similar to user space programs with regard to header
+files.  @file{/usr/include/@value{PACKAGE}} should be placed as an include directory to search in
+the @command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules should be
+followed.  In particular, several important intracacies should be considered:
+
+@itemize @bullet
+
+@item
+The @command{gcc} compiler used to compile the kernel modules must be the same version of compiler
+that was used to compile the kernel.
+
+@item
+The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel.
+
+@item
+The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+
+@item
+The @command{gcc} command line must include several important include files directly on the command
+line such as @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+maybe even @samp{--include
+/@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The kernel
+version @samp{@value{_kversion}} is just an example.  For the running kernel, use the output of
+@samp{uname -r}.}
+
+@end itemize
+
+@node Manual Pages
+@subsection Manual Pages
+@cindex manual pages
+
+The @command{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages.  The number
+of manual pages installed totals several hundred manual pages and they will not be listed here.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
