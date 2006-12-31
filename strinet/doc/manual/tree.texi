@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.2 2005/05/14 08:28:50 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.3 2006/12/31 13:43:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,106 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/14 08:28:50 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/31 13:43:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
+@ignore
+/usr
+/usr/include
+/usr/include/strinet
+/usr/include/strinet/sys
+/usr/include/strinet/sys/strinet
+/usr/include/strinet/sys/strinet/config.h
+/usr/include/strinet/sys/strinet/version.h
+/usr/include/strinet/sys/ticlts.h
+/usr/include/strinet/sys/ticots.h
+/usr/include/strinet/sys/ticotsord.h
+/usr/include/strinet/sys/xti_inet.h
+/usr/include/strinet/sys/xti_ip.h
+/usr/include/strinet/sys/xti_udp.h
+/usr/include/strinet/sys/xti_tcp.h
+/usr/include/strinet/ticlts.h
+/usr/include/strinet/ticots.h
+/usr/include/strinet/ticotsord.h
+/usr/include/strinet/xti.h
+/usr/include/strinet/xti_inet.h
+/usr/libexec
+/usr/libexec/strinet
+/usr/libexec/strinet/send-pr
+/usr/libexec/strinet/send-pr.config
+/usr/libexec/strinet/test-inet_raw
+/usr/libexec/strinet/test-inet_udp
+/usr/libexec/strinet/test-inet_tcp
+/usr/libexec/strinet/testsuite
+/usr/libexec/strinet/atlocal
+/usr/sbin
+/usr/sbin/inet_mkdev
+/usr/sbin/inet_rmdev
+/usr/sbin/strinet_mknod
+/usr/lib
+/usr/share
+/usr/share/man
+/usr/share/man/strinet.macros
+/usr/share/man/strinet.refs
+/usr/share/man/man3
+/usr/share/man/man3/xti_ip.3
+/usr/share/man/man3/xti_udp.3
+/usr/share/man/man3/xti_tcp.3
+/usr/share/man/man3/t_kpalive.3
+/usr/share/man/man3/t_tcp_info.3
+/usr/share/man/man4
+/usr/share/man/man4/arp.4
+/usr/share/man/man4/egp.4
+/usr/share/man/man4/ggp.4
+/usr/share/man/man4/icmp.4
+/usr/share/man/man4/idp.4
+/usr/share/man/man4/inet.4
+/usr/share/man/man4/INET.4
+/usr/share/man/man4/ip.4
+/usr/share/man/man4/ipip.4
+/usr/share/man/man4/pup.4
+/usr/share/man/man4/rawip.4
+/usr/share/man/man4/rawip2.4
+/usr/share/man/man4/rip.4
+/usr/share/man/man4/tcp.4
+/usr/share/man/man4/tcp2.4
+/usr/share/man/man4/ticlts.4
+/usr/share/man/man4/ticots.4
+/usr/share/man/man4/ticots_ord.4
+/usr/share/man/man4/ticotsord.4
+/usr/share/man/man4/udp.4
+/usr/share/man/man4/udp2.4
+/usr/share/man/man7
+/usr/share/man/man7/tpi_ip.7
+/usr/share/man/man7/tpi_udp.7
+/usr/share/man/man7/tpi_tcp.7
+/usr/share/man/man8
+/usr/share/man/man8/strinet_mknod.8
+/usr/share/man/man8/test-inet_raw.8
+/usr/share/man/man8/test-inet_tcp.8
+/usr/share/man/man8/test-inet_udp.8
+/usr/share/info
+/usr/share/info/strinet.info
+/usr/share/info/strinet.info-1
+/usr/share/info/strinet.info-2
+/etc
+/etc/strinet.conf
+/etc/default
+/etc/default/strinet
+/etc/init.d
+/etc/init.d/strinet.sh
+/etc/modutils
+/etc/netconfig.d
+/etc/netconfig.d/strinet
+/etc/sock2path.d
+/etc/sock2path.d/strinet
+/lib
+/lib/modules
+/lib/modules/2.6.15-27-server
+/lib/modules/2.6.15-27-server/strinet
+/lib/modules/2.6.15-27-server/strinet/streams_inet.ko
+/lib/modules/2.6.15-27-server/strinet/streams_udp.ko
+/lib/modules/2.6.15-27-server/strinet/streams_rawip.ko
+/lib/modules/2.6.15-27-server/strinet/streams_tcp.ko
+@end ignore
