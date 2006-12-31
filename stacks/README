@@ -1,5 +1,5 @@
-OpenSS7 SS7 Stack -- read me first file.  2006-10-27
-$Id: README,v 0.9.2.16 2006/10/27 22:23:52 brian Exp $
+OpenSS7 SS7 Stack -- read me first file.  2006-12-29
+$Id: README,v 0.9.2.17 2006/12/31 13:39:33 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -23,7 +23,7 @@ well.
  Release
 --------
 
-This is the `strss7-0.9a.5' package, released 2006-10-27.  This
+This is the `strss7-0.9a.5' package, released 2006-12-29.  This
 `0.9a.5' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -69,14 +69,14 @@ Prerequisites for the OpenSS7 SS7 Stack package are as follows:
 
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
-     compiling out-of-tree kenrel modules.  Most recent `Linux'
+     compiling out-of-tree kernel modules.  Most recent `Linux'
      distributions are okay out of the box, but some development
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.  (1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.17);
+         - Linux 2.6 kernel (2.6.3 - 2.6.18);
          - glibc2 or better.
          - GNU info (for info files).
          - GNU groff (for man pages).  (2)
@@ -112,8 +112,14 @@ unpacking the master package.)
   9. `OpenSS7 STREAMS SCTP', strsctp-0.9.2.6
      (http://www.openss7.org/tarballs/strsctp-0.9.2.6.tar.bz2).
 
- 10. `OpenSS7 STREAMS ISO', striso-0.9.2.1
+ 10. `OpenSS7 STREAMS Channels', striso-0.9.2.1
+     (http://www.openss7.org/tarballs/strchan-0.9.2.1.tar.bz2).
+
+ 11. `OpenSS7 STREAMS ISO', striso-0.9.2.1
      (http://www.openss7.org/tarballs/striso-0.9.2.1.tar.bz2).
+
+ 12. `OpenSS7 STREAMS ISDN', strisdn-0.9.2.1
+     (http://www.openss7.org/tarballs/strisdn-0.9.2.1.tar.bz2).
 
 When configuring and building multiple `OpenSS7 Project' release
 packages, place all of the source packages (unpacked tarballs) at the
