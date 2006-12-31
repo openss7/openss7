@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.2 2006/09/18 01:07:18 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.3 2006/12/31 13:48:51 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/09/18 01:07:18 $ by $Author: brian $
+@c Last Modified $Date: 2006/12/31 13:48:51 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: tree.texi,v $
+@c Revision 0.9.2.3  2006/12/31 13:48:51  brian
+@c - updated documentation for release
+@c
 @c Revision 0.9.2.2  2006/09/18 01:07:18  brian
 @c - updated manuals and release texi docs
 @c
@@ -126,4 +129,116 @@ This file contains a reference database referenced by the manual pages included 
 
 @dfn{@value{PACKAGE_UCNAME}} places the following manual pages in the system man directory
 @file{usr/share/man/}:
+@end ignore
+
+@ignore
+/usr
+/usr/include
+/usr/include/strsock
+/usr/include/strsock/sys
+/usr/include/strsock/sys/strsock
+/usr/include/strsock/sys/strsock/config.h
+/usr/include/strsock/sys/strsock/version.h
+/usr/include/strsock/sys/sockio.h
+/usr/include/strsock/sys/sockmod.h
+/usr/include/strsock/sys/sockpath.h
+/usr/include/strsock/sys/socksys.h
+/usr/include/strsock/sys/socklib.h
+/usr/include/strsock/sockdb.h
+/usr/include/strsock/sockio.h
+/usr/include/strsock/sockmod.h
+/usr/include/strsock/socksys.h
+/usr/share
+/usr/share/man
+/usr/share/man/strsock.macros
+/usr/share/man/strsock.refs
+/usr/share/man/man3
+/usr/share/man/man3/accept.3
+/usr/share/man/man3/bind.3
+/usr/share/man/man3/connect.3
+/usr/share/man/man3/getpeername.3
+/usr/share/man/man3/getsockname.3
+/usr/share/man/man3/getsockopt.3
+/usr/share/man/man3/libsocket.3
+/usr/share/man/man3/listen.3
+/usr/share/man/man3/recv.3
+/usr/share/man/man3/recvfrom.3
+/usr/share/man/man3/recvmsg.3
+/usr/share/man/man3/send.3
+/usr/share/man/man3/sendmsg.3
+/usr/share/man/man3/sendto.3
+/usr/share/man/man3/setsockopt.3
+/usr/share/man/man3/shutdown.3
+/usr/share/man/man3/socket.3
+/usr/share/man/man3/socketpair.3
+/usr/share/man/man3/sockets.3
+/usr/share/man/man3/endsockpath.3
+/usr/share/man/man3/freesockpathent.3
+/usr/share/man/man3/getsockpath.3
+/usr/share/man/man3/getsockpathent.3
+/usr/share/man/man3/setsockpath.3
+/usr/share/man/man3/sockpath.3
+/usr/share/man/man3/sp_perror.3
+/usr/share/man/man3/sp_sperror.3
+/usr/share/man/man3/libsocklib.3
+/usr/share/man/man3/socklib.3
+/usr/share/man/man4
+/usr/share/man/man4/sockmod.4
+/usr/share/man/man4/socksys.4
+/usr/share/man/man5
+/usr/share/man/man5/sock2path.5
+/usr/share/man/man5/strsock.5
+/usr/share/man/man8
+/usr/share/man/man8/initsock.8
+/usr/share/man/man8/soconfig.8
+/usr/share/man/man8/test-socket.8
+/usr/share/man/man8/test-socklib.8
+/usr/share/man/man8/test-sockmod.8
+/usr/share/man/man8/test-sockpath.8
+/usr/share/man/man8/test-socksys.8
+/usr/share/man/man8/strsock_mknod.8
+/usr/share/info
+/usr/share/info/strsock.info
+/usr/share/info/strsock.info-1
+/usr/share/info/strsock.info-2
+/usr/lib
+/usr/lib/libsockpath.so.0.0.0
+/usr/lib/libsockpath.so.0
+/usr/lib/libsockpath.so
+/usr/lib/libsockpath.la
+/usr/lib/libsockpath.a
+/usr/lib/libsocket.la
+/usr/lib/libsocket.a
+/usr/lib/libsocklib.la
+/usr/lib/libsocklib.a
+/usr/bin
+/usr/libexec
+/usr/libexec/strsock
+/usr/libexec/strsock/send-pr
+/usr/libexec/strsock/send-pr.config
+/usr/libexec/strsock/test-sockpath
+/usr/libexec/strsock/test-socket
+/usr/libexec/strsock/test-socklib
+/usr/libexec/strsock/test-sockmod
+/usr/libexec/strsock/test-socksys
+/usr/libexec/strsock/testsuite
+/usr/libexec/strsock/atlocal
+/usr/sbin
+/usr/sbin/initsock
+/usr/sbin/soconfig
+/usr/sbin/strsock_mknod
+/etc
+/etc/strsock.conf
+/etc/sock2path
+/etc/default
+/etc/default/strsock
+/etc/init.d
+/etc/init.d/strsock.sh
+/etc/modutils
+/lib
+/lib/modules
+/lib/modules/2.6.15-27-server
+/lib/modules/2.6.15-27-server/strsock
+/lib/modules/2.6.15-27-server/strsock/streams_sockmod.ko
+/lib/modules/2.6.15-27-server/strsock/streams_socksys.ko
 @end ignore
