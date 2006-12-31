@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/16 16:12:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/31 13:31:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/16 16:12:54 $ by $Author: brian $
+# Last Modified $Date: 2006/12/31 13:31:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.23  2006/12/31 13:31:46  brian
+# - updated documentation for release
+#
 # Revision 0.9.2.22  2006/12/16 16:12:54  brian
 # - strapped out unused manpages and allow mi_timers to be placed back on queue
 #
