@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/02 12:08:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/31 13:55:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 12:08:26 $ by $Author: brian $
+# Last Modified $Date: 2006/12/31 13:55:36 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2006/12/31 13:55:36  brian
+# - updated documentation for release
+#
 # Revision 0.9.2.8  2006/10/02 12:08:26  brian
 # - changes to pass check target
 #
@@ -71,6 +74,7 @@ if PKG_BUILD_INDEP
 man_MANS = \
 	man1/strlog.1 \
 	man4/fifo.4 \
+	man5/strutil.5 \
 	man8/strconf.8 \
 	man8/strlogd.8 \
 	man8/strutil_mknod.8
@@ -150,6 +154,7 @@ dist_noinst_MANS = \
 	man4/strlog.4.man \
 	man5/autopush.5.man \
 	man5/strsetup.conf.5.man \
+	man5/strutil.5.man \
 	man8/autopush.8.man \
 	man8/fattach.8.man \
 	man8/fdetach.8.man \

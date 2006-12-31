@@ -1,3 +1,9 @@
+2006-12-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: updated documentation for release
+	* doc/man/strutil.macros: updated documentation for release
+	* doc/man/man5/strutil.5.man: updated documentation for release
+
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* strutil.spec.in: old rpms hate nested ifs
