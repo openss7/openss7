@@ -1,5 +1,5 @@
-OpenSS7 Master Package -- read me first file.  2006-10-27
-$Id: README,v 0.9.2.16 2006/10/27 22:23:44 brian Exp $
+OpenSS7 Master Package -- read me first file.  2006-12-29
+$Id: README,v 0.9.2.17 2006/12/31 14:09:03 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 Master Package
 =======================
 
-Package `openss7-0.9.2.D' Released 2006-10-27.
+Package `openss7-0.9.2.D' Released 2006-12-29.
 
 This is the `OpenSS7 Master Package' package.  It consists of a master
 package that contains all other OpenSS7 Project package releases.  Use
@@ -43,7 +43,7 @@ the `OpenSS7 Master Package' package is the easiest way to do so.
  Release
 --------
 
-This is the `openss7-0.9.2.D' package, released 2006-10-27.  This
+This is the `openss7-0.9.2.D' package, released 2006-12-29.  This
 `0.9.2.D' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -96,7 +96,7 @@ Prerequisites for the OpenSS7 Master Package package are as follows:
 
          - A fairly LSB compliant GNU/Linux distribution.  (1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.17);
+         - Linux 2.6 kernel (2.6.3 - 2.6.18);
          - glibc2 or better.
          - GNU info (for info files).
          - GNU groff (for man pages).  (2)
