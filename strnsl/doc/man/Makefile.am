@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/26 00:51:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/31 13:47:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/26 00:51:19 $ by $Author: brian $
+# Last Modified $Date: 2006/12/31 13:47:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2006/12/31 13:47:42  brian
+# - updated documentation for release
+#
 # Revision 0.9.2.2  2006/09/26 00:51:19  brian
 # - corrected macro file name, reordered includes
 #
@@ -97,7 +100,9 @@ xnsl_man_MANS 	= \
 	man8/test-xnsl.8 \
 	man8/test-xnsl_thr.8
 
-man_MANS		= $(xnsl_man_MANS)
+man_MANS	= \
+	man5/strnsl.5 \
+	$(xnsl_man_MANS)
 
 MANS_UNUSED = \
 	man3/netbuf.3 \
@@ -132,6 +137,7 @@ xnsl_dist_noinst_MANS 	= \
 	man3/inetaddr.3.man \
 	man5/netconfig.5.man \
 	man5/netdir.5.man \
+	man5/strnsl.5.man \
 	man8/test-xnsl.8.man \
 	man8/test-xnsl_thr.8.man
 
