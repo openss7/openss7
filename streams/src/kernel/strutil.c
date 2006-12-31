@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/11/06 08:26:04 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/12/30 22:06:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/06 08:26:04 $ by $Author: brian $
+ Last Modified $Date: 2006/12/30 22:06:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.137  2006/12/30 22:06:25  brian
+ - fix to flushband from John Wolthuis
+
  Revision 0.9.2.136  2006/11/06 08:26:04  brian
  - found msgpullup() bug
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/11/06 08:26:04 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/12/30 22:06:25 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2006/11/06 08:26:04 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/12/30 22:06:25 $";
 
 #include <linux/autoconf.h>
 #ifdef HAVE_KINC_LINUX_COMPILE_H
@@ -3227,7 +3230,7 @@ flushband(register queue_t *q, int band, int flag)
 	assure(not_frozen_by_caller(q));
 
 	qwlock(q, pl);
-	backenable = __flushband(q, flag, band, &mpp);
+	backenable = __flushband(q, band, flag, &mpp);
 	qwunlock(q, pl);
 
 	if (unlikely(backenable != 0))
