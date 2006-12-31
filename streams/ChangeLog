@@ -1,3 +1,29 @@
+2006-12-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: documentation updates for release
+	* NEWS: documentation updates for release
+	* README: documentation updates for release
+	* README-cvs: documentation updates for release
+	* THANKS: documentation updates for release
+	* doc/man/Makefile.am: documentation updates for release
+	* doc/man/streams.macros: documentation updates for release
+	* doc/man/man4/connld.4.man: documentation updates for release
+	* doc/man/man5/streams.5.man: documentation updates for release
+	* doc/man/man7/I_EGETSIG.7.man: documentation updates for release
+	* doc/man/man7/I_ESETSIG.7.man: documentation updates for release
+	* doc/man/man7/I_FATTACH.7.man: documentation updates for release
+	* doc/man/man7/I_FDETACH.7.man: documentation updates for release
+	* doc/man/man7/I_FLUSHBAND.7.man: documentation updates for release
+	* doc/man/man7/I_GERROPT.7.man: documentation updates for release
+	* doc/man/man7/I_GETCLTIME.7.man: documentation updates for release
+	* doc/man/man7/I_SERROPT.7.man: documentation updates for release
+	* doc/man/man7/I_SETCLTIME.7.man: documentation updates for release
+	* doc/man/man9/STREAMS.9.man: documentation updates for release
+	* doc/manual/STREAMS.texi: documentation updates for release
+	* doc/manual/configure.texi: documentation updates for release
+	* doc/manual/releases.texi: documentation updates for release
+	* doc/manual/tree.texi: documentation updates for release
+
 2006-12-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams.spec.in: old rpms hate nested ifs

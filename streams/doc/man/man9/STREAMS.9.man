@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.40 2006/10/05 12:17:06 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.41 2006/12/31 13:26:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:17:06 $ by $Author: brian $
+.\" Last Modified $Date: 2006/12/31 13:26:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: STREAMS.9.man,v $
+.\" Revision 0.9.2.41  2006/12/31 13:26:35  brian
+.\" - documentation updates for release
+.\"
 .\" Revision 0.9.2.40  2006/10/05 12:17:06  brian
 .\" - updates for release
 .\"
@@ -375,7 +378,7 @@ likely driven by its use for porting existing OSI protocol stacks to
 .BR Linux .
 In 2000,
 .I The OpenSS7 Project
-abandonned using the
+abandoned using the
 .B Linux
 networking model for implementation of the
 .I Signalling System No. 7
@@ -456,7 +459,7 @@ unsuitable for mainline kernel adoption due to coding style and organization;
 .IP b)
 poorly adapted to distribution production kernels;
 .IP c)
-is unsuitable for packaging and repetability;
+is unsuitable for packaging and repeatability;
 .IP d)
 portability objective unsuitable for mainline kernel adoption;
 .IP e)
@@ -464,7 +467,7 @@ ports from the same baseline obfuscate the code;
 .IP f)
 performs poorly due to portability and coding style;
 .IP g)
-code bloat and oversized memory footprint;
+code bloat and over-sized memory footprint;
 .IP h)
 redundant debug statements obscuring defects and obfuscating code;
 .IP i)
@@ -483,7 +486,7 @@ or any release of the
 .IP m)
 limited set of standard drivers and modules;
 .IP n)
-limited set of diagnostic and adminstrative utilities;
+limited set of diagnostic and administrative utilities;
 .IP o)
 limited test programs;
 .IP p)
@@ -508,9 +511,9 @@ designed and implemented specifically for
 .IP e)
 no ports considered;
 .IP f)
-twice the performance;
+order of magnitude faster performance;
 .IP g)
-an eigth of the memory footprint;
+order of magnitude smaller memory footprint;
 .IP h)
 proper programming by assertion;
 .IP i)
@@ -595,7 +598,7 @@ for more information.
 .PP
 .PD 0
 .HP
-.BR pipemod "(4)\ \-\ \fISTREAMS\fP module supporting flush handling in \fISTREAMS\fP fifos and pipes
+.BR pipemod "(4)\ \-\ \fISTREAMS\fP module supporting flush handling in \fISTREAMS\fP FIFOs and pipes
 .HP
 .BR ldl "(4)\ \-\ a \fISTREAMS\fP DLPI interface to Linux network devices
 .HP
@@ -604,7 +607,7 @@ an existing pipe end
 .HP
 .BR timod "(4)\ \-\ a \fISTREAMS\fP XTI/TLI compatibility interface
 .HP
-.BR tirdwr "(4)\ \-\ a \fISTREAMS\fP XTI/TLI read write comptibility interface
+.BR tirdwr "(4)\ \-\ a \fISTREAMS\fP XTI/TLI read write compatibility interface
 .HP
 .BR sockmod "(4)\ \-\ a \fISTREAMS\fP TPI to sockets compatibility module
 .PD
@@ -680,7 +683,7 @@ an existing pipe end
 .HP
 .BR qband "(9)\ \-\ \fISTREAMS\fP queue band structure
 .HP
-.BR qinit "(9)\ \-\ \fISTREAMS\fP queue initilization structures
+.BR qinit "(9)\ \-\ \fISTREAMS\fP queue initialization structures
 .HP
 .BR queinfo "(9)\ \-\ \fISTREAMS\fP queue info structure
 .HP
@@ -702,11 +705,11 @@ an existing pipe end
 .HP
 .BR autopush_vml "(9)\ \-\ verify a \fISTREAMS\fP module list"
 .HP
-.BR getadmin "(9)\ \-\ get the adminstration function pointer for a \fISTREAMS\fP module
+.BR getadmin "(9)\ \-\ get the administration function pointer for a \fISTREAMS\fP module
 .HP
 .BR getmid "(9)\ \-\ get the \fISTREAMS\fP module id for a name
 .HP
-.BR register_inode "(9)\ \-\ register a \fISTREAMS\fP special filesystem node
+.BR register_inode "(9)\ \-\ register a \fISTREAMS\fP special file system node
 .HP
 .BR register_inode_major "(9)\ \-\ register a Stream head to a major device number
 .HP
@@ -720,7 +723,7 @@ an existing pipe end
 .HP
 .BR register_strmod "(9)\ \-\ register a \fISTREAMS\fP module to a module id
 .HP
-.BR unregister_inode "(9)\ \-\ unregister a \fISTREAMS\fP special filesystem node
+.BR unregister_inode "(9)\ \-\ unregister a \fISTREAMS\fP special file system node
 .HP
 .BR unregister_inode_major "(9)\ \-\ unregister a Stream head from a major device number
 .HP
@@ -819,7 +822,7 @@ an existing pipe end
 .HP
 .BR qenable "(9)\ \-\ schedules a \fISTREAMS\fP message queue service routine
 .HP
-.BR qreply "(9)\ \-\ replys to a message from a \fISTREAMS\fP message queue
+.BR qreply "(9)\ \-\ replies to a message from a \fISTREAMS\fP message queue
 .HP
 .BR qsize "(9)\ \-\ return the number of messages on a queue
 .HP
@@ -827,7 +830,7 @@ an existing pipe end
 .HP
 .BR rmvq "(9)\ \-\ remove a message from a \fISTREAMS\fP message queue
 .HP
-.BR SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or fifo
+.BR SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or FIFO
 .HP
 .BR WR "(9)\ \-\ return the write queue of a \fISTREAMS\fP queue pair
 .PD
@@ -893,7 +896,7 @@ an existing pipe end
 .HP
 .BR drv_msectohz "(9)\-\ convert milliseconds to clock ticks
 .HP
-.BR drv_priv "(9)\-\ determine if user is priviledged
+.BR drv_priv "(9)\-\ determine if user is privileged
 .HP
 .BR drv_usectohz "(9)\ \-\ convert microseconds to clock ticks
 .HP
@@ -917,7 +920,7 @@ an existing pipe end
 .HP
 .BR timeout "(9)\ \-\ start a timer
 .HP
-.BR umount "(9)\ \-\ unmount a filesystem
+.BR umount "(9)\ \-\ unmount a file system
 .HP
 .BR unlink "(9)\ \-\ remove a file
 .HP
@@ -964,7 +967,7 @@ internal functions listed below:
 .HP
 .BR bcanget "(9)\ \-\ test retrieval on a \fISTREAMS\fP message queue
 .HP
-.BR canget "(9)\ \-\ test retreival on a \fISTREAMS\fP message queue
+.BR canget "(9)\ \-\ test retrieval on a \fISTREAMS\fP message queue
 .HP
 .BR freeq "(9)\ \-\ deallocate a \fISTREAMS\fP queue pair
 .HP
@@ -976,7 +979,7 @@ internal functions listed below:
 .HP
 .BR qopen "(9)\ \-\ call a \fISTREAMS\fP driver or module open routine
 .HP
-.BR setq "(9)\ \-\ asign a queue pair to a \fISTREAMS\fP module
+.BR setq "(9)\ \-\ assign a queue pair to a \fISTREAMS\fP module
 .PD
 .PP
 .SH "Linux Fast-STREAMS Extensions from LiS"
@@ -1032,7 +1035,7 @@ lock a \fISTREAMS\fP queue for mutual exclusion
 release lock on a \fISTREAMS\fP queue
 .HP
 .BR MPSTR_STPLOCK "(9)\ \-\ 
-lock \fISTREAMS\fP stream head in multithreaded code
+lock \fISTREAMS\fP stream head in multi-threaded code
 .HP
 .BR MPSTR_STPRELE "(9)\ \-\ 
 release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
@@ -1235,7 +1238,7 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR itoemajor "(9)\ \-\ 
 .HP
-.BR msgphysreq "(9)\ \-\ physical alignement request structure
+.BR msgphysreq "(9)\ \-\ physical alignment request structure
 .HP
 .BR msgpullup_physreq "(9)\ \-\ pull up bytes in a \fISTREAMS\fR message with physical requirements
 .HP
@@ -1583,7 +1586,7 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR lis_qprocson "(9)\ \-\ enables a \fISTREAMS\fP message queue for multi-processing
 .HP
-.BR lis_qreply "(9)\ \-\ replys to a message from a \fISTREAMS\fP message queue
+.BR lis_qreply "(9)\ \-\ replies to a message from a \fISTREAMS\fP message queue
 .HP
 .BR lis_qsize "(9)\ \-\ return the number of messages on a queue
 .HP
@@ -1607,15 +1610,15 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR lis_safe_putnext "(9)\ \-\ puts a message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR lis_safe_qreply "(9)\ \-\ replys to a message from a \fISTREAMS\fP message queue
+.BR lis_safe_qreply "(9)\ \-\ replies to a message from a \fISTREAMS\fP message queue
 .HP
 .BR lis_safe_RD "(9)\ \-\ return the read queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_safe_SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or fifo
+.BR lis_safe_SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or FIFO
 .HP
 .BR lis_safe_WR "(9)\ \-\ return the write queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or fifo
+.BR lis_SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or FIFO
 .HP
 .BR lis_strqget "(9)\ \-\ gets information about a \fISTREAMS\fP message queue
 .HP
@@ -1625,9 +1628,9 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR lis_timeout "(9)\ \-\ start a timer
 .HP
-.BR lis_umount2 "(9)\ \-\ unmount a filesystem
+.BR lis_umount2 "(9)\ \-\ unmount a file system
 .HP
-.BR lis_umount "(9)\ \-\ unmount a filesystem
+.BR lis_umount "(9)\ \-\ unmount a file system
 .HP
 .BR lis_unbufcall "(9)\ \-\ removes a \fISTREAMS\fP buffer callback
 .HP

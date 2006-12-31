@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2006/12/18 07:32:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2006/12/31 13:26:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/18 07:32:36 $ by $Author: brian $
+# Last Modified $Date: 2006/12/31 13:26:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.82  2006/12/31 13:26:31  brian
+# - documentation updates for release
+#
 # Revision 0.9.2.81  2006/12/18 07:32:36  brian
 # - lfs device names, autoload clone minors, device numbering, missing manpages
 #
@@ -1008,6 +1011,7 @@ man_MANS = \
 	man3/vstrlog.3 \
 	man4/sth.4 \
 	man5/specfs.5 \
+	man5/streams.5 \
 	man7/I_ANCHOR.7 \
 	man7/I_ATMARK.7 \
 	man7/I_CANPUT.7 \
@@ -2128,6 +2132,7 @@ dist_noinst_MANS = \
 	man3/vstrlog.3.man \
 	man4/sth.4.man \
 	man5/specfs.5.man \
+	man5/streams.5.man \
 	man7/I_ANCHOR.7.man \
 	man7/I_ATMARK.7.man \
 	man7/I_CANPUT.7.man \

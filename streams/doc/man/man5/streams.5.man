@@ -1,0 +1,2468 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: streams.5.man,v 0.9.2.1 2006/12/31 13:24:13 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2006/12/31 13:24:13 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: streams.5.man,v $
+.\" Revision 0.9.2.1  2006/12/31 13:24:13  brian
+.\" - added package manual page
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH STREAMS 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B @PACKAGE@
+\- @PACKAGE_TITLE@ package
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
+package: the base package for
+.BR "Linux Fast-STREAMS" .
+.PP
+OpenSS7
+.I STREAMS
+ships as a base package for
+.B Linux Fast-STREAMS
+and separate add-on packages to the
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+release that provide additional functionality and protocol support not
+traditionally found on UNIX systems, or which have traditionallly fallen into
+the domain fo value-add system software, or, where the functiionality was
+optional for, or differently handleld by, a number of implementations.
+.PP
+The
+.B @PACKAGE_TITLE@
+package is the base package for
+.BR "Linux Fast-STREAMS" .
+This package provide support for fundamental
+.I STREAMS
+components, drivers and modules, necessary for
+.I STREAMS
+subsystem operation.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package provides
+.I STREAMS
+subsystem, core modules and rviers, libraries, programs, init scripts, and
+daemons that implement the classical
+.I SVR 4.2 STREAMS
+subsystem.
+.PP
+The package builds and installs the following
+.I STREAMS
+kernel modules and drivers:
+.IP \(en \w'\(en\(em'u
+.B specfs.ko
+kernel module
+.PD 0
+.IP \(en
+.B streams.ko
+kernel module
+.IP \(en
+.B streams_fifo.ko
+driver
+.RI \(lq /dev/fifo \(rq
+.IP \(en
+.B streams_sad.ko
+driver
+.RI \(lq /dev/sad/user \(rq
+.RI \(lq /dev/sad/admin \(rq
+.IP \(en
+.B streams_nsdev.ko
+driver
+.RI \(lq /dev/nsdev \(rq
+.IP \(en
+.B streams_echo.ko
+driver
+.RI \(lq /dev/echo \(rq
+.IP \(en
+.B streams_mux.ko
+driver
+.RI \(lq /dev/mux \(rq
+.IP \(en
+.B streams_nuls.ko
+driver
+.RI \(lq /dev/nuls \(rq
+.IP \(en
+.B streams_pipe.ko
+driver
+.RI \(lq /dev/pipe \(rq
+.IP \(en
+.B streams_log.ko
+driver
+.RI \(lq /dev/conslog \(rq
+.RI \(lq /dev/strlog \(rq
+.IP \(en
+.B streams_loop.ko
+driver
+.RI \(lq /dev/loop.0 \(rq
+.RI \(lq /dev/loop.1 \(rq
+.IP \(en
+.B streams_sfx.ko
+driver
+.RI \(lq /dev/sfx \(rq
+.IP \(en
+.B streams_spx.ko
+driver
+.RI \(lq /dev/spx \(rq
+.IP \(en
+.B streams_bufmod.ko
+module
+.RI \(lq bufmod \(rq
+.IP \(en
+.B streams_nullmod.ko
+module
+.RI \(lq nullmod \(rq
+.IP \(en
+.B streams_pipemod.ko
+module
+.RI \(lq pipemod \(rq
+.IP \(en
+.B streams_connld.ko
+module
+.RI \(lq connld \(rq
+.IP \(en
+.B streams_sc.ko
+module
+.RI \(lq sc \(rq
+.IP \(en
+.B streams_testmod.ko
+module
+.RI \(lq testmod \(rq
+.PD
+.\"
+.SS "Kernel Modules"
+.PP
+The following are kernel modules installed by the
+.B @PACKAGE@
+package:
+.\"
+.TP
+.BR specfs (5)
+The
+.BR specfs (5)
+kernel module provides the Special Shadown File System that is used by
+.I STREAMS
+to implement Streams as character devices under
+.BR Linux .
+It includes the mountable
+.BR specfs (5)
+file system, as well as registration and deregistration functions necessary to
+register
+.I STREAMS
+modules and drivers with the file system.
+This kernel module is complete and is rigorously tested by the conformance test suite.
+See
+.BR specfs (5)
+for more information.
+.\"
+.TP
+.BR STREAMS (9)
+The
+.BR STREAMS (9)
+kernel module provides the
+.I STREAMS
+Scheduler and utility functions as well as the majority of the DDI/DKI utility
+functions.
+This kernel module is complete and is rigorously tested by the conformance test suite.
+See
+.BR STREAMS (9)
+for more information.
+.\"
+.SS "STREAMS Modules"
+.PP
+The following are
+.I STREAMS
+modules installed by the
+.B @PACKAGE@
+package:
+.\"
+.TP
+.BR sth (4)
+The
+.BR sth (4)
+module is the (specialized) Stream Head module that implements the Stream Head
+for the
+.I STREAMS
+subsystem.
+This
+.I STREAMS
+module is normally built as part of the
+.B streams
+kernel module.
+This module is complete and is rigorously tested by the conformance test suite.
+See
+.BR sth (4)
+for more information.
+.\"
+.TP
+.BR connld (4)
+The
+.BR connld (4)
+module is the (specialized) Connection Line Discipline module for
+.IR STREAMS -based
+pipes that generates a new unique pipe end on each open of an exising
+.B fattach (3)ed
+pipe end.
+This
+.I STREAMS
+module is normally built as part of the
+.B streams
+kernel module.
+This module is complete, but has received little testing.
+See
+.BR connld (4)
+for more information.
+.\"
+.TP
+.BR nullmod (4)
+The
+.BR nullmod (4)
+module is a simple null module that merely passes all messages along both
+queues used for performance testing put procedures.
+This module is complete and is rigorously tested by the conformance test suite.
+See
+.BR nullmod (4)
+for more information.
+.\"
+.TP
+.BR bufmod (4)
+The
+.BR bufmod (4)
+module is a simple null module that merely queues all messages along both
+queue and drains each queue from its service procedure.  It is used for
+performance testing service procedures and the
+.I STREAMS
+scheduler.
+This module is complete and is rigorously tested by the conformance test suite.
+See
+.BR bufmod (4)
+for more information.
+.\"
+.TP
+.BR pipemod (4)
+The
+.BR pipemod (4)
+module is a simple module that reverses the send of flush bits when pushed
+over one end of a
+.IR STREAMS -based
+pipe.
+This module is complete and is rigorously tested by the conformance test suite.
+See
+.BR pipemod (4)
+for more information.
+.\"
+.TP
+.BR sc (4)
+The
+.BR sc (4)
+module is an administrative module, normally pushed over the
+.BR nuls (4)
+or
+.BR sad (4)
+module to obtain additional information about a Stream over that provided by
+the
+.BR sad (4)
+driver.  It is used with the
+.BR scls (8)
+utility.
+This module is complete and is rigorously tested by the conformance test suite.
+See
+.BR sc (4)
+for more information.
+.\"
+.TP
+.BR testmod (4)
+The
+.BR testmod (4)
+module is a test module that recognizes a specialized set of input-output
+controls used for testing the Stream Head.
+This module is complete and is rigorously tested by the conformance test suite.
+See
+.BR testmod (4)
+for more information.
+.\"
+.SS "STREAMS Drivers"
+.PP
+The following are
+.I STREAMS
+drivers installed by the
+.B @PACKAGE@
+package:
+.\"
+.TP
+.BR clone (4)
+The
+.BR clone (4)
+driver is a standard part of
+.I STREAMS
+and provides the ability to dynamically assign minor device numbers.
+This
+.I STREAMS
+driver is normally built as part of the
+.B streams
+kernel module.
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR clone (4)
+for more information.
+.\"
+.TP
+.BR echo (4)
+The
+.BR echo (4)
+driver is a simple driver that passes messages from its write queue to its
+read queue in a fashion similar to a FIFO.  However, where are FIFOs are
+attached to a file system node and cannot be cloned, the
+.BR echo (4)
+is not attached to a file system node and may be cloned.
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR echo (4)
+for more information.
+.\"
+.TP
+.BR log (4)
+The
+.BR log (4)
+driver is the
+.I STREAMS
+logging driver that supports the
+.BR strerr (8)
+and
+.BR strace (8)
+facilities as well as the
+.BR strlog (9)
+utility.
+This
+.I STREAMS
+driver is normally built as part of the
+.B streams
+kernel module.
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR log (4)
+for more information.
+.\"
+.TP
+.BR loop (4)
+The
+.BR loop (4)
+driver is an implementation of the example driver of the same name from the
+.IR "SVR 4.2 STREAMS Programming Guide" .
+.[
+svr42spg
+.]
+It serves little purpose.
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR loop (4)
+for more information.
+.\"
+.TP
+.BR mux (4)
+The
+.BR mux (4)
+driver is an implementation of the example driver of the same name from the
+.IR "SVR 4.2 STREAMS Programming Guide" .
+.[
+svr42spg
+.]
+It serves little purpose.
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR mux (4)
+for more information.
+.\"
+.TP
+.BR nsdev (4)
+The
+.BR nsdev (4)
+driver provides a novel (unique to
+.BR "@PACKAGE_TITLE@" )
+implementation of a
+\(lqNamed
+.I STREAMS
+Device\(rq.
+A Named STREAMS Device is similar to a
+.BR clone (4)
+device, however, it retains the minor device number (instead of the major) and
+creates the major device number from some portion of the name of the device
+node (instead of from the device node major number).
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR nsdev (4)
+for more information.
+.\"
+.TP
+.BR nuls (4)
+The
+.BR nuls (4)
+driver is a Null
+.I STREAMS
+driver.  All messages that appear on the write queue are discarded.  No
+messages are ever delivered to the read queue.  This driver serves a purpose
+to push modules that define input-output controls and that do not process
+messages on any queue (such as
+.BR sc (4)).
+Another purpose is for use by libraries to obtain an anonymous Stream Head for
+invocation of input-output controls that emulate a system call that acts upon
+no Stream (such as
+.BR I_FDETACH (7)).
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR nuls (4)
+for more information.
+.\"
+.TP
+.BR sad (4)
+The
+.BR sad (4)
+defiver is the standard
+.I STREAMS
+Administrative Driver described in the
+.IR "SVR 4.2 STREAMS Programming Guide" .
+.[
+svr42spg
+.]
+This
+.I STREAMS
+driver is normally built as part of the
+.B streams
+kernel module.
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR sad (4)
+for more information.
+.\"
+.TP
+.BR sfx "(4), " fifo (4)
+The
+.BR sfx (4)
+driver provides a mechanism for creating character-based FIFOs as well as
+providing a
+.I STREAMS
+implementation of FIFOs in the file system.
+This
+.I STREAMS
+driver is normally built as part of the
+.B streams
+kernel module.
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR sfx "(4), or " fifo (4),
+for more information.
+.\"
+.TP
+.BR spx "(4), " pipe (4)
+The
+.B spx (4)
+driver provides a mechanism for obtaining character-based
+.I STREAMS
+pipes as well an implementation of
+.I STREAMS
+pipes for system call emulation.
+This
+.I STREAMS
+driver is normally built as part of the
+.B streams
+kernel module.
+This driver is complete and is rigorously tested by the conformance test suite.
+See
+.BR spx "(4), or " pipe (4)
+for more information.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
+package contains the following manual pages:
+.\"
+.HP
+.BR strchg (1)\ \-\ 
+changes stream configuration
+.PD 0
+.HP
+.BR strconf (1)\ \-\ 
+queries stream configuration
+.HP
+.BR strreset (1)\ \-\ 
+resets a Stream
+.PD
+.\"
+.HP
+.BR fattach (2)\ \-\ 
+name a \fISTREAMS\fP special file
+.PD 0
+.HP
+.BR fdetach (2)\ \-\ 
+unname a \fISTREAMS\fP special file
+.HP
+.BR getmsg (2)\ \-\ 
+get next message off a stream
+.HP
+.BR getpmsg (2s)\ \-\ 
+get next message off a stream
+.HP
+.BR isastream (2)\ \-\ 
+test for a \fISTREAMS\fP special file
+.HP
+.BR pipe (2s)\ \-\ 
+create a \fISTREAMS\fP pipe
+.HP
+.BR putmsg (2)\ \-\ 
+put a message to a \fISTREAMS\fP character device
+.HP
+.BR putpmsg (2s)\ \-\ 
+put a band message to a \fISTREAMS\fP character device
+.HP
+.BR poll (2s)\ \-\ 
+wait for some event on a \fISTREAMS\fP file descriptor
+.HP
+.BR read (2s)\ \-\ 
+read from a file descriptor
+.HP
+.BR readv (2s)\ \-\ 
+read or write a vector
+.HP
+.BR write (2s)\ \-\ 
+write to a file descriptor
+.HP
+.BR writev (2s)\ \-\ 
+read or write a vector
+.PD
+.\"
+.HP
+.BR fattach (3)\ \-\ 
+attach a \fISTREAMS\fP open file to a path name in the file system
+.PD 0
+.HP
+.BR fdetach (3)\ \-\ 
+detach any \fISTREAMS\fP file from a path name in the file system
+.HP
+.BR isastream (3)\ \-\ 
+determine whether an open file is \fISTREAMS\fR-based
+.HP
+.BR libstreams (3)\ \-\ 
+.I STREAMS
+system call library
+.HP
+.BR libLiS (3)\ \-\ 
+.I STREAMS
+system call library
+.HP
+.BR libpLiS (3)\ \-\ 
+.I STREAMS
+system call library
+.HP
+.BR streams (3)\ \-\ 
+.I STREAMS
+system call library
+.HP
+.BR LiS (3)\ \-\ 
+.I STREAMS
+system call library
+.HP
+.BR pLiS (3)\ \-\ 
+.I STREAMS
+system call library
+.HP
+.BR pipe (3)\ \-\ 
+create a
+.I STREAMS
+pipe
+.HP
+.BR pstrlog (3)\ \-\ 
+print a
+.I STREAMS
+log buffer
+.HP
+.BR strlog (3)\ \-\ 
+print a
+.I STREAMS
+log buffer
+.HP
+.BR vstrlog (3)\ \-\ 
+print a
+.I STREAMS
+log buffer
+.HP
+.BR s_pipe (3)\ \-\ 
+create a
+.I STREAMS
+pipe
+.PD
+.\"
+.HP
+.BR sth (4)\ \-\ 
+.I STREAMS
+ioctl commands
+.PD 0
+.HP
+.BR s_fifo (4)\ \-\ 
+.IR STREAMS -based
+first-in first-out special file, named pipe
+.HP
+.BR clone (4)\ \-\ 
+the
+.I STREAMS
+clone driver
+.HP
+.BR echo (4)\ \-\ 
+echo
+.I STREAMS
+device
+.HP
+.BR fifo (4s)\ \-\ 
+.IR STREAMS -based
+FIFO device
+.HP
+.BR conslog (4)\ \-\ 
+.I STREAMS
+log device
+.HP
+.BR log (4)\ \-\ 
+.I STREAMS
+log device
+.HP
+.BR strlog (4)\ \-\ 
+.I STREAMS
+log device
+.HP
+.BR loop (4)\ \-\ 
+.I STREAMS
+loop-around pseudo-device driver
+.HP
+.BR loop_clone (4)\ \-\ 
+.I STREAMS
+loop-around pseudo-device driver
+.HP
+.BR sloop (4)\ \-\ 
+.I STREAMS
+loop-around pseudo-device driver
+.HP
+.BR mux (4)\ \-\ 
+.I STREAMS
+multiplexing pseudo-device driver
+.HP
+.BR nsdev (4)\ \-\ 
+named
+.I STREAMS
+device
+.HP
+.BR nuls (4)\ \-\ 
+null
+.I STREAMS
+device
+.HP
+.BR pipe (4)\ \-\ 
+.I STREAMS
+bi-directional pipe device
+.HP
+.BR sad (4)\ \-\ 
+.I STREAMS
+Administrative Driver
+.HP
+.BR sfx (4)\ \-\ 
+.I STREAMS
+FIFO device
+.HP
+.BR spx (4)\ \-\ 
+.I STREAMS
+bi-directional pipe device
+.HP
+.BR connld (4)\ \-\ 
+.I STREAMS
+connection line discipline module
+.HP
+.BR nullmod (4)\ \-\ 
+.I STREAMS
+null module
+.HP
+.BR bufmod (4)\ \-\ 
+.I STREAMS
+null module
+.HP
+.BR pipemod (4)\ \-\ 
+.IR STREAMS -based
+pipe module
+.HP
+.BR sc (4)\ \-\ 
+.I STREAMS
+configuration module
+.HP
+.BR testmod (4)\ \-\ 
+.I STREAMS
+test module
+.PD
+.\"
+.HP
+.BR specfs (5)\ \-\ 
+.I STREAMS
+special device shadow file system
+.PD 0
+.HP
+.BR strioctl (5)\ \-\ 
+.I STREAMS
+input-output control data structure
+.HP
+.BR autopush (5)\ \-\ 
+control the autopush module list for a
+.I STREAMS
+device
+.HP
+.BR strapush (5)\ \-\ 
+.I STREAMS
+autopush structure
+.HP
+.BR strsetup.conf (5)\ \-\ 
+configuration file for
+.I STREAMS
+drivers
+.PD
+.\"
+.HP
+.BR streamio (7)\ \-\ 
+.I STREAMS
+ioctl commands
+.PD 0
+.HP
+.BR I_ANCHOR (7)\ \-\ 
+.I STREAMS
+anchor input-output-control
+.HP
+.BR I_ATMARK (7)\ \-\ 
+checks if
+.I STREAMS
+message is marked
+.HP
+.BR I_CANPUT (7)\ \-\ 
+cehcks if a
+.I STREAMS
+message band is writable
+.HP
+.BR I_CKBAND (7)\ \-\ 
+checks whether a
+.I STREAMS
+band is ready to be read
+.HP
+.BR I_FATTACH (7)\ \-\ 
+emulate the
+.BR fattach (2)
+system call
+.HP
+.BR I_FDETACH (7)\ \-\ 
+emulate the
+.BR fdetach (2)
+system call
+.HP
+.BR I_FDINSERT (7)\ \-\ 
+insert a stream identifier into a
+.I STREAMS
+message and send it downstream
+.HP
+.BR I_FIND (7)\ \-\ 
+find a
+.I STREAMS
+module on a Stream
+.HP
+.BR I_FLUSH (7)\ \-\ 
+flush messages from a
+.I STREAMS
+special file
+.HP
+.BR I_FLUSHBAND (7)\ \-\ 
+flush messages for a band from a
+.I STREAMS
+special file
+.HP
+.BR I_GERROPT (7)\ \-\ 
+get error options for a
+.I STREAMS
+file
+.HP
+.BR I_GETBAND (7)\ \-\ 
+get band number of messge on a
+.I STREAMS
+file
+.HP
+.BR I_GETCLTIME (7)\ \-\ 
+get close time for a
+.I STREAMS
+file
+.HP
+.BR I_GETPMSG (7)\ \-\ 
+.I STREAMS
+.BR getpmsg (2s)
+system call emulation
+.HP
+.BR I_GETSIG (7)\ \-\ 
+get
+.I STREAMS
+.B SIGPOLL
+events
+.HP
+.BR I_EGETSIG (7)\ \-\ 
+get enhanced
+.I STREAMS
+.B SIGPOLL
+events
+.HP
+.BR I_GRDOPT (7)\ \-\ 
+get
+.I STREAMS
+read options
+.HP
+.BR I_GWROPT (7)\ \-\ 
+get
+.I STREAMS
+write options
+.HP
+.BR I_ISASTREAM (7)\ \-\ 
+emulate the
+.BR isastream (2)
+system call
+.HP
+.BR I_LINK (7)\ \-\ 
+link a Stream beneath a
+.I STREAMS
+multiplexing driver
+.HP
+.BR I_LIST (7)\ \-\ 
+list
+.I STREAMS
+module names on a Stream
+.HP
+.BR I_LOOK (7)\ \-\ 
+look at topmost
+.I STREAMS
+module on a Stream
+.HP
+.BR I_NREAD (7)\ \-\ 
+number of unread bytes on a Stream
+.HP
+.BR I_PEEK (7)\ \-\ 
+peek a
+.I STREAMS
+message on read queue
+.HP
+.BR I_PIPE (7)\ \-\ 
+obtain a
+.IR STREAMS -based
+pipe
+.HP
+.BR I_PLINK (7)\ \-\ 
+persistently link a Stream beneath a
+.I STREAMS
+multiplexing driver
+.HP
+.BR I_POP (7)\ \-\ 
+pop a
+.I STREAMS
+module from a Stream
+.HP
+.BR I_PUNLINK (7)\ \-\ 
+unlink a
+.I STREAMS
+permanent link
+.HP
+.BR I_PUSH (7)\ \-\ 
+push a
+.I STREAMS
+module on a Stream
+.HP
+.BR I_PUTPMSG (7)\ \-\ 
+.I STREAMS
+.BR putpmsg (2s)
+system call emulation
+.HP
+.BR I_RECVFD (7)\ \-\ 
+receive a file descriptor on a Stream
+.HP
+.BR I_SENDFD (7)\ \-\ 
+send a file descriptor on a Stream
+.HP
+.BR I_SERROPT (7)\ \-\ 
+set error options for a
+.I STREAMS
+file
+.HP
+.BR I_SETCLTIME (7)\ \-\ 
+set close time for a
+.I STREAMS
+file
+.HP
+.BR I_SETSIG (7)\ \-\ 
+set
+.I STREAMS
+.B SIGPOLL
+events
+.HP
+.BR I_ESETSIG (7)\ \-\ 
+set enhanced
+.I STREAMS
+.B SIGPOLL
+events
+.HP
+.BR I_SRDOPT (7)\ \-\ 
+set
+.I STREAMS
+read options
+.HP
+.BR I_STR (7)\ \-\ 
+.I STREAMS
+input-output-control
+.HP
+.BR I_SWROPT (7)\ \-\ 
+set
+.I STREAMS
+write options
+.HP
+.BR I_UNLINK (7)\ \-\ 
+unlink a Stream from a
+.I STREAMS
+multiplexing driver
+.PD
+.\"
+.HP
+.BR autopush (8)\ \-\ 
+control the autopush module list for a
+.I STREAMS
+device
+.PD 0
+.HP
+.BR fattach (8)\ \-\ 
+name a
+.I STREAMS
+file
+.HP
+.BR fdetach (8)\ \-\ 
+unlink a named
+.I STREAMS
+file
+.HP
+.BR insf (8)\ \-\ 
+install special device files
+.HP
+.BR scls (8)\ \-\ 
+produce a list of module and driver names
+.HP
+.BR specfs (8)\ \-\ 
+System V Init Script for the
+.I STREAMS
+Shadow Special Filesystem
+.HP
+.BR specfs.sh (8)\ \-\ 
+System V Init Script for the
+.I STREAMS
+Shadow Special Filesystem
+.HP
+.BR strace (8)\ \-\ 
+write
+.I STREAMS
+event trace message to the standard output
+.HP
+.BR strclean (8)\ \-\ 
+cleans up the
+.I STREAMS
+error logger
+.HP
+.BR streams (8)\ \-\ 
+System V Init Script for the
+.I STREAMS
+subsystem
+.HP
+.BR streams_mknod (8)\ \-\ 
+create or remove
+.I STREAMS
+device nodes
+.HP
+.BR streams.sh (8)\ \-\ 
+System V Init Script for the
+.I STREAMS
+subsystem
+.HP
+.BR strerr (8)\ \-\ 
+receive error log message from the
+.I STREAMS
+.BR log (4)
+driver
+.HP
+.BR strinfo (8)\ \-\ 
+display infrmation about
+.I STREAMS
+devices
+.HP
+.BR strload (8)\ \-\ 
+loads the
+.I STREAMS
+subsystem
+.HP
+.BR strsetup (8)\ \-\ 
+.I STREAMS
+setup command
+.HP
+.BR strvf (8)\ \-\ 
+.I STREAMS
+verification tool
+.PD
+.\"
+.HP
+.BR perftest (8)\ \-\ 
+.I STREAMS
+benchmark performance tests on a pipe
+.PD 0
+.HP
+.BR perftestn (8)\ \-\ 
+.I STREAMS
+benchmark performance tests on a pipe
+.HP
+.BR test-clone (8)\ \-\ 
+a test suite executable for the
+.BR clone (4)
+.I STREAMS
+driver
+.HP
+.BR test-connld (8)\ \-\ 
+a test suite executable for the
+.BR connld (4)
+.I STREAMS
+module
+.HP
+.BR test-echo (8)\ \-\ 
+a test suite executable for the
+.BR echo (4)
+.I STREAMS
+driver
+.HP
+.BR test-fifo (8)\ \-\ 
+a test suite executable for the
+.BR fifo (4)
+.I STREAMS
+driver
+.HP
+.BR test-log (8)\ \-\ 
+a test suite executable for the
+.BR log (4)
+.I STREAMS
+driver
+.HP
+.BR test-loop (8)\ \-\ 
+a test suite executable for the
+.BR loop (4)
+.I STREAMS
+driver
+.HP
+.BR test-mux (8)\ \-\ 
+a test suite executable for the
+.BR mux (4)
+.I STREAMS
+driver
+.HP
+.BR test-nsdev (8)\ \-\ 
+a test suite executable for the
+.BR nsdev (4)
+.I STREAMS
+driver
+.HP
+.BR test-nuls (8)\ \-\ 
+a test suite executable for the
+.BR nuls (4)
+.I STREAMS
+driver
+.HP
+.BR test-pipe (8)\ \-\ 
+a test suite executable for the
+.BR pipe (4s)
+.I STREAMS
+driver
+.HP
+.BR test-pipemod (8)\ \-\ 
+a test suite executable for the
+.BR pipemod (4)
+.I STREAMS
+module
+.HP
+.BR test-sad (8)\ \-\ 
+a test suite executable for the
+.BR sad (4)
+.I STREAMS
+driver
+.HP
+.BR test-sc (8)\ \-\ 
+a test suite executable for the
+.BR sc (4)
+.I STREAMS
+module
+.HP
+.BR test-streams (8)\ \-\ 
+a test suite executable for the
+.BR sth (4)
+.I STREAMS
+stream head
+.PD
+.\"
+.HP
+.BR LfS (9)\ \-\ 
+introduction to
+.I STREAMS
+kernel functions
+.PD 0
+.HP
+.BR DDI (9)\ \-\ 
+Device Driver Interface/Driver Kernel Interface
+.HP
+.BR Intro (9)\ \-\ 
+introduction to
+.I STREAMS
+kernel functions
+.HP
+.BR mp-streams (9)\ \-\ 
+multiprocessor
+.I STREAMS
+executive
+.HP
+.BR SPG (9)\ \-\ 
+.B @PACKAGE_TITLE@
+.I STREAMS
+Programmers Guide (incomplete)
+.PD
+.PP
+The package also installs a hundred or so manual pages in section 9.  See
+.BR LfS (9)
+for a list of these manual pages.
+.\"
+.\".HP
+.\".BR OTHERQ (9)\ \-\ 
+.\".PD 0
+.\".HP
+.\".BR RD (9)\ \-\ 
+.\".HP
+.\".BR SAMESTR (9)\ \-\ 
+.\".HP
+.\".BR STREAMS (9)\ \-\ 
+.\".HP
+.\".BR WR (9)\ \-\ 
+.\".HP
+.\".BR M_BACKDONE (9)\ \-\ 
+.\".HP
+.\".BR M_BACKWASH (9)\ \-\ 
+.\".HP
+.\".BR M_BREAK (9)\ \-\ 
+.\".HP
+.\".BR M_COPYIN (9)\ \-\ 
+.\".HP
+.\".BR M_COPYOUT (9)\ \-\ 
+.\".HP
+.\".BR M_CTL (9)\ \-\ 
+.\".HP
+.\".BR M_DATA (9)\ \-\ 
+.\".HP
+.\".BR M_DELAY (9)\ \-\ 
+.\".HP
+.\".BR M_DONTPLAY (9)\ \-\ 
+.\".HP
+.\".BR M_ERROR (9)\ \-\ 
+.\".HP
+.\".BR M_EVENT (9)\ \-\ 
+.\".HP
+.\".BR M_FLUSH (9)\ \-\ 
+.\".HP
+.\".BR M_HANGUP (9)\ \-\ 
+.\".HP
+.\".BR M_HPDATA (9)\ \-\ 
+.\".HP
+.\".BR M_IOCACK (9)\ \-\ 
+.\".HP
+.\".BR M_IOCDATA (9)\ \-\ 
+.\".HP
+.\".BR M_IOCNAK (9)\ \-\ 
+.\".HP
+.\".BR M_IOCTL (9)\ \-\ 
+.\".HP
+.\".BR M_LETSPLAY (9)\ \-\ 
+.\".HP
+.\".BR M_NOTIFY (9)\ \-\ 
+.\".HP
+.\".BR M_PASSFP (9)\ \-\ 
+.\".HP
+.\".BR M_PCCTL (9)\ \-\ 
+.\".HP
+.\".BR M_PCEVENT (9)\ \-\ 
+.\".HP
+.\".BR M_PCPROTO (9)\ \-\ 
+.\".HP
+.\".BR M_PCRSE (9)\ \-\ 
+.\".HP
+.\".BR M_PCSETOPTS (9)\ \-\ 
+.\".HP
+.\".BR M_PCSIG (9)\ \-\ 
+.\".HP
+.\".BR M_PROTO (9)\ \-\ 
+.\".HP
+.\".BR M_READ (9)\ \-\ 
+.\".HP
+.\".BR M_RSE (9)\ \-\ 
+.\".HP
+.\".BR M_SETOPTS (9)\ \-\ 
+.\".HP
+.\".BR M_SIG (9)\ \-\ 
+.\".HP
+.\".BR M_START (9)\ \-\ 
+.\".HP
+.\".BR M_STARTI (9)\ \-\ 
+.\".HP
+.\".BR M_STOP (9)\ \-\ 
+.\".HP
+.\".BR M_STOPI (9)\ \-\ 
+.\".HP
+.\".BR M_TRAIL (9)\ \-\ 
+.\".HP
+.\".BR M_UNHANGUP (9)\ \-\ 
+.\".HP
+.\".BR QNORM (9)\ \-\ 
+.\".HP
+.\".BR QPCTL (9)\ \-\ 
+.\".HP
+.\".BR adjmsg (9)\ \-\ 
+.\".HP
+.\".BR allocb (9)\ \-\ 
+.\".HP
+.\".BR alloclk (9)\ \-\ 
+.\".HP
+.\".BR allocq (9)\ \-\ 
+.\".HP
+.\".BR allocstr (9)\ \-\ 
+.\".HP
+.\".BR appq (9)\ \-\ 
+.\".HP
+.\".BR apush_get (9)\ \-\ 
+.\".HP
+.\".BR apush_set (9)\ \-\ 
+.\".HP
+.\".BR apush_vml (9)\ \-\ 
+.\".HP
+.\".BR autopush (9)\ \-\ 
+.\".HP
+.\".BR autopush_add (9)\ \-\ 
+.\".HP
+.\".BR autopush_del (9)\ \-\ 
+.\".HP
+.\".BR autopush_find (9)\ \-\ 
+.\".HP
+.\".BR autopush_search (9)\ \-\ 
+.\".HP
+.\".BR autopush_vml (9)\ \-\ 
+.\".HP
+.\".BR backq (9)\ \-\ 
+.\".HP
+.\".BR bcanget (9)\ \-\ 
+.\".HP
+.\".BR bcanput (9)\ \-\ 
+.\".HP
+.\".BR bcanputnext (9)\ \-\ 
+.\".HP
+.\".BR bcid_t (9)\ \-\ 
+.\".HP
+.\".BR bcmp (9)\ \-\ 
+.\".HP
+.\".BR bcopy (9)\ \-\ 
+.\".HP
+.\".BR bufcall (9)\ \-\ 
+.\".HP
+.\".BR bufcall_id_t (9)\ \-\ 
+.\".HP
+.\".BR bzero (9)\ \-\ 
+.\".HP
+.\".BR canenable (9)\ \-\ 
+.\".HP
+.\".BR canget (9)\ \-\ 
+.\".HP
+.\".BR canput (9)\ \-\ 
+.\".HP
+.\".BR canputnext (9)\ \-\ 
+.\".HP
+.\".BR cdev_count (9)\ \-\ 
+.\".HP
+.\".BR cdev_find (9)\ \-\ 
+.\".HP
+.\".BR cdev_match (9)\ \-\ 
+.\".HP
+.\".BR cdev_minor (9)\ \-\ 
+.\".HP
+.\".BR cdev_str (9)\ \-\ 
+.\".HP
+.\".BR cdevsw (9)\ \-\ 
+.\".HP
+.\".BR cdevsw_list (9)\ \-\ 
+.\".HP
+.\".BR cdevsw_lock (9)\ \-\ 
+.\".HP
+.\".BR cdrv_get (9)\ \-\ 
+.\".HP
+.\".BR cdrv_put (9)\ \-\ 
+.\".HP
+.\".BR cmaj_add (9)\ \-\ 
+.\".HP
+.\".BR cmaj_del (9)\ \-\ 
+.\".HP
+.\".BR cmaj_get (9)\ \-\ 
+.\".HP
+.\".BR cmin_add (9)\ \-\ 
+.\".HP
+.\".BR cmin_count (9)\ \-\ 
+.\".HP
+.\".BR cmin_del (9)\ \-\ 
+.\".HP
+.\".BR cmin_find (9)\ \-\ 
+.\".HP
+.\".BR cmin_get (9)\ \-\ 
+.\".HP
+.\".BR cmin_ini (9)\ \-\ 
+.\".HP
+.\".BR cmin_rel (9)\ \-\ 
+.\".HP
+.\".BR cmn_err (9)\ \-\ 
+.\".HP
+.\".BR copyb (9)\ \-\ 
+.\".HP
+.\".BR copyin (9)\ \-\ 
+.\".HP
+.\".BR copymsg (9)\ \-\ 
+.\".HP
+.\".BR copyout (9)\ \-\ 
+.\".HP
+.\".BR copyreq (9)\ \-\ 
+.\".HP
+.\".BR copyresp (9)\ \-\ 
+.\".HP
+.\".BR cred_t (9)\ \-\ 
+.\".HP
+.\".BR ctlmsg (9)\ \-\ 
+.\".HP
+.\".BR datab (9)\ \-\ 
+.\".HP
+.\".BR datamsg (9)\ \-\ 
+.\".HP
+.\".BR dblk_t (9)\ \-\ 
+.\".HP
+.\".BR delay (9)\ \-\ 
+.\".HP
+.\".BR devnode (9)\ \-\ 
+.\".HP
+.\".BR dev_t (9)\ \-\ 
+.\".HP
+.\".BR do_fattach (9)\ \-\ 
+.\".HP
+.\".BR do_fdetach (9)\ \-\ 
+.\".HP
+.\".BR do_spipe (9)\ \-\ 
+.\".HP
+.\".BR drv_getparm (9)\ \-\ 
+.\".HP
+.\".BR drv_hztomsec (9)\ \-\ 
+.\".HP
+.\".BR drv_hztousec (9)\ \-\ 
+.\".HP
+.\".BR drv_msectohz (9)\ \-\ 
+.\".HP
+.\".BR drv_priv (9)\ \-\ 
+.\".HP
+.\".BR drv_usectohz (9)\ \-\ 
+.\".HP
+.\".BR drv_usecwait (9)\ \-\ 
+.\".HP
+.\".BR dupb (9)\ \-\ 
+.\".HP
+.\".BR dupmsg (9)\ \-\ 
+.\".HP
+.\".BR enableok (9)\ \-\ 
+.\".HP
+.\".BR enableq (9)\ \-\ 
+.\".HP
+.\".BR esballoc (9)\ \-\ 
+.\".HP
+.\".BR esbbcall (9)\ \-\ 
+.\".HP
+.\".BR flushband (9)\ \-\ 
+.\".HP
+.\".BR flushq (9)\ \-\ 
+.\".HP
+.\".BR fmod_add (9)\ \-\ 
+.\".HP
+.\".BR fmod_count (9)\ \-\ 
+.\".HP
+.\".BR fmod_del (9)\ \-\ 
+.\".HP
+.\".BR fmod_find (9)\ \-\ 
+.\".HP
+.\".BR fmod_get (9)\ \-\ 
+.\".HP
+.\".BR fmod_put (9)\ \-\ 
+.\".HP
+.\".BR fmod_str (9)\ \-\ 
+.\".HP
+.\".BR fmodsw (9)\ \-\ 
+.\".HP
+.\".BR fmodsw_list (9)\ \-\ 
+.\".HP
+.\".BR fmodsw_lock (9)\ \-\ 
+.\".HP
+.\".BR freeb (9)\ \-\ 
+.\".HP
+.\".BR freelk (9)\ \-\ 
+.\".HP
+.\".BR freemsg (9)\ \-\ 
+.\".HP
+.\".BR freeq (9)\ \-\ 
+.\".HP
+.\".BR freestr (9)\ \-\ 
+.\".HP
+.\".BR freezestr (9)\ \-\ 
+.\".HP
+.\".BR frtn_t (9)\ \-\ 
+.\".HP
+.\".BR getadmin (9)\ \-\ 
+.\".HP
+.\".BR getmajor (9)\ \-\ 
+.\".HP
+.\".BR getmid (9)\ \-\ 
+.\".HP
+.\".BR getminor (9)\ \-\ 
+.\".HP
+.\".BR getq (9)\ \-\ 
+.\".HP
+.\".BR insq (9)\ \-\ 
+.\".HP
+.\".BR iocblk (9)\ \-\ 
+.\".HP
+.\".BR isdatablk (9)\ \-\ 
+.\".HP
+.\".BR isdatamsg (9)\ \-\ 
+.\".HP
+.\".BR kmem_alloc (9)\ \-\ 
+.\".HP
+.\".BR kmem_alloc_node (9)\ \-\ 
+.\".HP
+.\".BR kmem_free (9)\ \-\ 
+.\".HP
+.\".BR kmem_zalloc (9)\ \-\ 
+.\".HP
+.\".BR kmem_zalloc_node (9)\ \-\ 
+.\".HP
+.\".BR linkb (9)\ \-\ 
+.\".HP
+.\".BR linkblk (9)\ \-\ 
+.\".HP
+.\".BR linkmsg (9)\ \-\ 
+.\".HP
+.\".BR major_t (9)\ \-\ 
+.\".HP
+.\".BR makedevice (9)\ \-\ 
+.\".HP
+.\".BR max (9)\ \-\ 
+.\".HP
+.\".BR mblk_t (9)\ \-\ 
+.\".HP
+.\".BR min (9)\ \-\ 
+.\".HP
+.\".BR minor_t (9)\ \-\ 
+.\".HP
+.\".BR modID_t (9)\ \-\ 
+.\".HP
+.\".BR module_info (9)\ \-\ 
+.\".HP
+.\".BR module_stat (9)\ \-\ 
+.\".HP
+.\".BR module_stat_t (9)\ \-\ 
+.\".HP
+.\".BR msgb (9)\ \-\ 
+.\".HP
+.\".BR msgdsize (9)\ \-\ 
+.\".HP
+.\".BR msgpullup (9)\ \-\ 
+.\".HP
+.\".BR msgsize (9)\ \-\ 
+.\".HP
+.\".BR noenable (9)\ \-\ 
+.\".HP
+.\".BR pcmsg (9)\ \-\ 
+.\".HP
+.\".BR pullupmsg (9)\ \-\ 
+.\".HP
+.\".BR put (9)\ \-\ 
+.\".HP
+.\".BR putbq (9)\ \-\ 
+.\".HP
+.\".BR putctl (9)\ \-\ 
+.\".HP
+.\".BR putctl1 (9)\ \-\ 
+.\".HP
+.\".BR putctl2 (9)\ \-\ 
+.\".HP
+.\".BR putnext (9)\ \-\ 
+.\".HP
+.\".BR putnextctl (9)\ \-\ 
+.\".HP
+.\".BR putnextctl1 (9)\ \-\ 
+.\".HP
+.\".BR putnextctl2 (9)\ \-\ 
+.\".HP
+.\".BR putq (9)\ \-\ 
+.\".HP
+.\".BR qattach (9)\ \-\ 
+.\".HP
+.\".BR qbackenable (9)\ \-\ 
+.\".HP
+.\".BR qband (9)\ \-\ 
+.\".HP
+.\".BR qband_t (9)\ \-\ 
+.\".HP
+.\".BR qclose (9)\ \-\ 
+.\".HP
+.\".BR qcountstrm (9)\ \-\ 
+.\".HP
+.\".BR qdelete (9)\ \-\ 
+.\".HP
+.\".BR qdetach (9)\ \-\ 
+.\".HP
+.\".BR qenable (9)\ \-\ 
+.\".HP
+.\".BR qfields (9)\ \-\ 
+.\".HP
+.\".BR qfields_t (9)\ \-\ 
+.\".HP
+.\".BR qi_putp_t (9)\ \-\ 
+.\".HP
+.\".BR qi_qadmin_t (9)\ \-\ 
+.\".HP
+.\".BR qi_qclose_t (9)\ \-\ 
+.\".HP
+.\".BR qi_qopen_t (9)\ \-\ 
+.\".HP
+.\".BR qi_srvp_t (9)\ \-\ 
+.\".HP
+.\".BR qi_putp (9)\ \-\ 
+.\".HP
+.\".BR qi_qadmin (9)\ \-\ 
+.\".HP
+.\".BR qi_qclose (9)\ \-\ 
+.\".HP
+.\".BR qinit (9)\ \-\ 
+.\".HP
+.\".BR qi_qopen (9)\ \-\ 
+.\".HP
+.\".BR qi_srvp (9)\ \-\ 
+.\".HP
+.\".BR qinsert (9)\ \-\ 
+.\".HP
+.\".BR qopen (9)\ \-\ 
+.\".HP
+.\".BR qprocsoff (9)\ \-\ 
+.\".HP
+.\".BR qprocson (9)\ \-\ 
+.\".HP
+.\".BR qready (9)\ \-\ 
+.\".HP
+.\".BR qreply (9)\ \-\ 
+.\".HP
+.\".BR qscan (9)\ \-\ 
+.\".HP
+.\".BR qsize (9)\ \-\ 
+.\".HP
+.\".BR queue (9)\ \-\ 
+.\".HP
+.\".BR queue_t (9)\ \-\ 
+.\".HP
+.\".BR register_clone (9)\ \-\ 
+.\".HP
+.\".BR register_cmajor (9)\ \-\ 
+.\".HP
+.\".BR register_ioctl32 (9)\ \-\ 
+.\".HP
+.\".BR register_strdev (9)\ \-\ 
+.\".HP
+.\".BR register_strdrv (9)\ \-\ 
+.\".HP
+.\".BR register_strmod (9)\ \-\ 
+.\".HP
+.\".BR register_strnod (9)\ \-\ 
+.\".HP
+.\".BR register_strlog (9)\ \-\ 
+.\".HP
+.\".BR rmvb (9)\ \-\ 
+.\".HP
+.\".BR rmvq (9)\ \-\ 
+.\".HP
+.\".BR runqueues (9)\ \-\ 
+.\".HP
+.\".BR sd_get (9)\ \-\ 
+.\".HP
+.\".BR sd_put (9)\ \-\ 
+.\".HP
+.\".BR sdev_add (9)\ \-\ 
+.\".HP
+.\".BR sdev_del (9)\ \-\ 
+.\".HP
+.\".BR sdev_get (9)\ \-\ 
+.\".HP
+.\".BR sdev_ini (9)\ \-\ 
+.\".HP
+.\".BR sdev_put (9)\ \-\ 
+.\".HP
+.\".BR sdev_rel (9)\ \-\ 
+.\".HP
+.\".BR sealloc (9)\ \-\ 
+.\".HP
+.\".BR sefree (9)\ \-\ 
+.\".HP
+.\".BR setq (9)\ \-\ 
+.\".HP
+.\".BR setsq (9)\ \-\ 
+.\".HP
+.\".BR setqsched (9)\ \-\ 
+.\".HP
+.\".BR skballoc (9)\ \-\ 
+.\".HP
+.\".BR spec_open (9)\ \-\ 
+.\".HP
+.\".BR spec_reparent (9)\ \-\ 
+.\".HP
+.\".BR specfs_mount (9)\ \-\ 
+.\".HP
+.\".BR specfs_umount (9)\ \-\ 
+.\".HP
+.\".BR streamtab (9)\ \-\ 
+.\".HP
+.\".BR streamtab_t (9)\ \-\ 
+.\".HP
+.\".BR strgetpmsg (9)\ \-\ 
+.\".HP
+.\".BR strlog (9)\ \-\ 
+.\".HP
+.\".BR str_close (9)\ \-\ 
+.\".HP
+.\".BR str_open (9)\ \-\ 
+.\".HP
+.\".BR strm_f_ops (9)\ \-\ 
+.\".HP
+.\".BR stroptions (9)\ \-\ 
+.\".HP
+.\".BR strputpmsg (9)\ \-\ 
+.\".HP
+.\".BR strqget (9)\ \-\ 
+.\".HP
+.\".BR strqset (9)\ \-\ 
+.\".HP
+.\".BR strrput (9)\ \-\ 
+.\".HP
+.\".BR strthread (9)\ \-\ 
+.\".HP
+.\".BR strthreads (9)\ \-\ 
+.\".HP
+.\".BR strwput (9)\ \-\ 
+.\".HP
+.\".BR strwsrv (9)\ \-\ 
+.\".HP
+.\".BR sysctl_str_nstrpush (9)\ \-\ 
+.\".HP
+.\".BR sysctl_str_strctlsz (9)\ \-\ 
+.\".HP
+.\".BR sysctl_str_strmsgsz (9)\ \-\ 
+.\".HP
+.\".BR testb (9)\ \-\ 
+.\".HP
+.\".BR timeout (9)\ \-\ 
+.\".HP
+.\".BR timeout_id_t (9)\ \-\ 
+.\".HP
+.\".BR timo_fcn_t (9)\ \-\ 
+.\".HP
+.\".BR toid_t (9)\ \-\ 
+.\".HP
+.\".BR unbufcall (9)\ \-\ 
+.\".HP
+.\".BR unfreezestr (9)\ \-\ 
+.\".HP
+.\".BR unlinkb (9)\ \-\ 
+.\".HP
+.\".BR unlinkmsg (9)\ \-\ 
+.\".HP
+.\".BR unregister_clone (9)\ \-\ 
+.\".HP
+.\".BR unregister_cmajor (9)\ \-\ 
+.\".HP
+.\".BR unregister_ioctl32 (9)\ \-\ 
+.\".HP
+.\".BR unregister_strdev (9)\ \-\ 
+.\".HP
+.\".BR unregister_strdrv (9)\ \-\ 
+.\".HP
+.\".BR unregister_strmod (9)\ \-\ 
+.\".HP
+.\".BR unregister_strnod (9)\ \-\ 
+.\".HP
+.\".BR untimeout (9)\ \-\ 
+.\".HP
+.\".BR unweldq (9)\ \-\ 
+.\".HP
+.\".BR vcmn_err (9)\ \-\ 
+.\".HP
+.\".BR vstrlog (9)\ \-\ 
+.\".HP
+.\".BR vstrlog_t (9)\ \-\ 
+.\".HP
+.\".BR weld_arg_t (9)\ \-\ 
+.\".HP
+.\".BR weld_fcn_t (9)\ \-\ 
+.\".HP
+.\".BR weldq (9)\ \-\ 
+.\".HP
+.\".BR xmsgsize (9)\ \-\ 
+.\".HP
+.\".BR bcangetany (9)\ \-\ 
+.\".HP
+.\".BR bcanputany (9)\ \-\ 
+.\".HP
+.\".BR bcanputnextany (9)\ \-\ 
+.\".HP
+.\".BR strioctl (9)\ \-\ 
+.\".HP
+.\".BR strpoll (9)\ \-\ 
+.\".HP
+.\".BR strread (9)\ \-\ 
+.\".HP
+.\".BR strsendpage (9)\ \-\ 
+.\".HP
+.\".BR strwrite (9)\ \-\ 
+.\".PD
+.\"
+.\"
+.SH PREREQUISITES
+.PP
+The
+.B @PACKAGE_TITLE@
+package relies on no other packages (at least none that are not normally found
+on a basic
+.B Linux
+distribution).  See the
+.I Installation and Reference Manual
+for more information.
+.\"
+.\"
+.SH MODULES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+modules:
+.TP \w'\fBpipemod\fR(4)\ \-\ \(en'u
+.BR sth (4)\ \-\ 
+.I STREAMS
+Stream Head module
+.PD 0
+.TP
+.BR connld (4)\ \-\ 
+.I STREAMS
+Connection Line Discipline module
+.TP
+.BR nullmod (4)\ \-\ 
+.I STREAMS
+Null module
+.TP
+.BR bufmod (4)\ \-\ 
+.I STREAMS
+Null (buffering) module
+.TP
+.BR pipemod (4)\ \-\ 
+.I STREAMS
+Pipe module
+.TP
+.BR sc (4)\ \-\ 
+.I STREAMS
+Configuration module
+.TP
+.BR testmod (4)\ \-\ 
+.I STREAMS
+Test module
+.PD
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+devices:
+.TP \w'\fBpipemod\fR(4)\ \-\ \(en'u
+.BR clone (4)\ \-\ 
+.I STREAMS
+clone driver
+.PD 0
+.TP
+.BR echo (4)\ \-\ 
+.I STREAMS
+echo driver
+.TP
+.BR fifo (4)\ \-\ 
+.I STREAMS
+FIFO driver
+.TP
+.BR log (4)\ \-\ 
+.I STREAMS
+Log driver
+.TP
+.BR loop (4)\ \-\ 
+.I STREAMS
+looparound driver
+.TP
+.BR mux (4)\ \-\ 
+.I STREAMS
+multiplexing driver
+.TP
+.BR nsdev (4)\ \-\ 
+Named
+.I STREAMS
+Device
+.TP
+.BR nuls (4)\ \-\ 
+.I STREAMS
+Null Stream Device
+.TP
+.BR pipe (4)\ \-\ 
+.IR STREAMS -based
+pipe
+.TP
+.BR sad (4)\ \-\ 
+.I STREAMS
+Administrative Driver
+.TP
+.BR sfx (4)\ \-\ 
+.I STREAMS
+FIFO
+device
+.TP
+.BR spx (4)\ \-\ 
+.I STREAMS
+pipe
+device
+.PD
+.\"
+.\"
+.SH NOTICES
+.PP
+.B @PACKAGE_TITLE@
+is an enhanced production replacement for the now deprecated
+.IR LiS .
+.PP
+.I Production
+releases are releases that have received exhaustive testing within the project
+and validated on specific distributions and architectures.
+.I Production
+release packages do not ship with known defects.  Please rememaber that there
+is
+.B NO WARRANTY
+on public release packages.
+.PP
+.I Production
+packages ship containing a list of validated distributions and architectures.
+Full regression testing of any maintenance changes is performed.  Suitability
+of software in this category for production use on the specified target
+distributions and architectures is at the discretion of the user.  It should
+not be necessary to perform validation tests on the set of supported target
+systems before considering production use.
+.PP
+.B @PACKAGE_TITLE@
+could possibly contain unknown defects.  This is a
+.I production
+release.  Nevertheless, some remaining unknown defects could possibly be
+harmful.  Validation testing has been performed by the
+.I OpenSS7 Project
+and external entities on this software for the set of systems listed in the
+release notes.  Nevertheless, the software might still fail to configure or
+compile on other systems.  The
+.I OpenSS7 Project
+recommends that you validate this software for your target system before using
+this software.  Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" \(rq,
+in the manual.)
+.PP
+This software is
+.I production
+software.  As such, it is stable on validated systems but might still crash
+your kernel in unique circumstances.  Installation of the software on a
+non-validated distribution might mangle your header files or Linux
+distribution in such a way as to make it unusable and rebooting the system
+might not repair the problem.  You possibly lose all the data on your system.
+Because this software stands a chance of crashing your kernel, the resulting
+unstable system could possibly destroy computer hardware or peripherals making
+them unusable.  You might void the warranty on any system on which you run
+this software.
+.B YOU HAVE BEEN WARNED.
+.\"
+.\"
+.SH BUGS
+.PP
+With the exception of packages not originally created by the
+.IR "OpenSS7 Project" ,
+the
+.I OpenSS7 Project
+software does not ship with known bugs in any release stage except
+.RI \(lq "pre-alpha" \(rq.
+.B @PACKAGE_TITLE@
+had no known bugs at the time of release.
+.\"
+.SS "Problem Report Guidelines"
+.PP
+Problem reports in the following categories should include a log file as
+indicated in the table below:
+.TP
+.B ./configure
+A problem with the configuration process occurs that causes the
+.B ./configure
+command to fail.  The problem report must include the
+.I config.log
+file that was generated by
+.BR configure .
+.TP
+.B make compile.log
+A problem with the build process occurs that causes the
+.BR make (1)
+command to fail.
+Perform
+.B make clean
+and then
+.B make compile.log
+and attach the
+.I config.log
+and
+.I compile.log
+files to the problem report.
+.TP
+.B sudo make install.log
+A problem occurs with
+.B sudo make install
+that causes it to fail.
+Perform
+.B sudo make uninstall
+and
+.B sudo make install.log
+and
+attach the
+.IR config.log ", " compile.log ", " check.log ", and " install.log
+files to the problem report.
+.TP
+.RB [ sudo "] " "make installcheck.log"
+A problem occurs with the
+.B make installcheck
+target that causes the test suite to fail.  Attach the resulting
+.IR tests/testsuite.log " and " installcheck.log
+file to the problem report.  There is no need to attach the other files as
+they are included in
+.IR tests/testsuite.log .
+.TP
+.RB [ sudo "] " "make uninstall.log"
+A problem occurs with the
+.B make uninstall
+target that causes the test suite to fail.  Perform
+.B sudo make uninstall.log
+and attach the
+.IR config.log ", " compile.log ", " check.log ", " install.log ", " installcheck.log ", " tests/testsuite.log " and " uninstall.log
+file to the problem report.
+.TP
+.RB [ sudo "] " "make remove.log"
+A problem occurs with the
+.B make remove
+target that causes the test suite to fail.  Perform
+.B sudo make remove.log
+and attach the
+.IR config.log ", " compile.log ", " check.log ", " install.log ", " installcheck.log ", " tests/testsuite.log " and " remove.log
+file to the problem report.
+.PP
+For other problems that occur during the use of the
+.B @PACKAGE_TITLE@
+package, please write a test case for the test suite that recreates the
+problem if one does not yet exist and provide a test program patch with the
+problem report.  Also include whatever log files are generated by the kernel
+.RB ( cmn_err "(9), or " strlog (9)),
+or by the
+.BR strerr "(8) or " strace (1)
+facilities
+.RB ( strlog (9)).
+.SS "Generating Problem Reports"
+.PP
+.I The OpenSS7 Project
+uses the
+.B GNU GNATS
+system for problem
+reporting.  Although the
+.B send-pr
+tool from the
+.B GNU GNATS
+package can be used for bug reporting to the project's
+.B GNATS
+database using electronic mail, it is not always convenient to download and
+install the
+.B GNATS
+system to gain access to the
+.B send-pr
+tool.
+.PP
+Therefore, the
+.B @PACKAGE_TITLE@
+package provides the
+.B send-pr
+shell script that can be used for problem reporting.  The
+.B send-pr
+shell script can invoked directly and is a work-alike for the
+.B GNU send-pr
+tool.
+.PP
+The
+.B send-pr
+tool takes the same flags and can be used in the same fashion, however,
+whereas
+.B send-pr
+is an interactive tool
+.RB ( send-pr
+launches the user's
+.I EDITOR
+to edit the problem report before submitting it),
+.B send-pr
+is also able to perform batch processing.  Whereas
+.B send-pr
+takes its field information from local databases or from using the
+.B query-pr
+C-language program to query a remote database, the
+.B send-pr
+tool has the field database internal to the tool.
+.PP
+Problem reports can be generate using
+.BR make (1),
+see
+.RI \(lq "Problem Report Targets" \(rq,
+in the manual.  An example of how simple it is to generate a problem report is
+illustrated in
+.RI \(lq "Example 1" \(rq,
+below.
+.PP
+.RS
+.nf
+\fC\s-1\
+% make pr
+SEND-PR:
+SEND-PR: send-pr:  send-pr was invoked to generate an external report.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@openss7.org by calling this script as
+SEND-PR: '/home/brian/os7/scripts/send-pr --file="problem.pr"'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% make send-pr
+\s+1\fP
+.fi
+.ce 1
+\fBExample 1:\fI Invoking Problem Report Generation\fP
+.RE
+.PP
+Using the
+.B make pr
+target to generate a problem report has the advantages that it will assemble
+any available
+.I *.log
+files in the build directory and attach them to the problem report.
+.\"
+.SS "Automatic Problem Reports"
+.PP
+The
+.B @PACKAGE_TITLE@
+package also provides a feature for automatic problem report generation that
+meets the problem report submission guidelines detailed in the preceding
+sections.
+.PP
+Whenever a logging makefile target (see
+.RI \(lq "Logging Targets" \(rq,
+in the manual) is invoked, if the primary target fails, the
+.B send-pr
+shell script is invoked to automatically generate a problem report file
+suitable for the corresponding target (as described above under see
+.RI \(lq "Problem Report Guidelines" \(rq,
+in the manual).  An example is shown in
+.RI \(lq "Example 2" \(rq,
+below.
+.PP
+.RS
+.nf
+\fC\s-1\
+% make compile.log
+...
+...
+make[5]: *** [libXNSdrvs_a-ip.o] Error 1
+make[5]: Leaving directory `/u6/buildel4/strxns'
+make[4]: *** [all-recursive] Error 1
+make[4]: Leaving directory `/u6/buildel4/strxns'
+make[3]: *** [all] Error 2
+make[3]: Leaving directory `/u6/buildel4/strxns'
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory `/u6/buildel4'
+make[1]: *** [all] Error 2
+make[1]: Leaving directory `/u6/buildel4'
+SEND-PR:
+SEND-PR: send-pr:  Make target compile.log failed in the compile stage.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@openss7.org by calling 'make send-pr'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% make send-pr
+\s+1\fP
+.fi
+.ce 1
+\fBExample 2:\fI Problem Report from Failed Logging Target\fR
+.RE
+.\"
+.SS "Stand Alone Problem Reports"
+.PP
+The
+.B @PACKAGE_TITLE@
+package installs the
+.B send-pr
+script and its configuration file
+.I send-pr.config
+in
+.I /usr/libexec/streams
+along with the validation
+.BR testsuite ,
+see
+.RI \(lq "Test Suites" \(rq,
+in the manual.  As with the
+.BR testsuite ,
+this allows the
+.B send-pr
+script to be used for problem report generation on an installed system that
+does not have a build directory.
+.PP
+An example of invoking the package
+.B testsuite
+and then generating a problem report for failed cases is shown in
+.RI \(lq "Example 3" \(rq,
+below.
+.PP
+.RS
+.nf
+\fC\s-1\
+% [sudo] /usr/libexec/streams/testsuite
+% # test cases failed...
+% /usr/libexec/streams/send-pr
+SEND-PR:
+SEND-PR: send-pr:  send-pr was invoked to generate an external report.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@openss7.org by calling this script as
+SEND-PR: '/usr/libexec/streams/send-pr --file problem.pr'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% /usr/libexec/streams/send-pr --file problem.pr
+\s-1\fP
+.fi
+.ce 1
+\fBExample 3:\fI Invoking \fBsend-pr\fI Directly\fR
+.RE
+.PP
+The advantage of the approach shown in the example is that the
+`send-pr' script is capable of collecting the `testsuite.log' file and
+the failed test cases and debugging scripts from the `testsuite.dir'
+directory and including them in the problem report, as well as all
+package pertinent information from the installed `send-pr.config'.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR specfs (5),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B @PACKAGE@
+package is compatible with
+.I SVR 4.2
+and systems based on
+.I SVR 4.2
+such as
+.IR Solaris \(rg,
+.IR UnixWare \(rg,
+.IR AIX \(rg,
+.IR OSF/1 \(rg,
+.IR HP-UX \(rg,
+.IR "Mentat MPS" \(rg,
+.IR "Mac OpenTransport" \(rg,
+.IR IRIX \(rg,
+.IR UXP/V \(rg,
+.IR SUPER-UX \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+provides only the base functionality that is common to most of these
+implementations and some specialized facilities.  Compatibility with specific
+implementations (including
+.IR "SVR 4.2" )
+is provided by a separate source compatibility add-on package,
+.BR strcompat (5).
+.IP \(em
+.B @PACKAGE_TITLE@
+attempts to be as compatibile with as many of the documented mainstream
+implementations of
+.I STREAMS
+as possible.  Aside from the basic behaviour described in the
+.IR "STREAMS Programming Guide" ,
+.[
+svr42spg
+.]
+.B @PACKAGE_TITLE@
+attempts to support also the variations provided by other (and subsequent)
+.I STREAMS
+implementations.
+.IP ""
+Primary differences (aside from simple utility behavior or declarations)
+involve mostly multiprocessing syncrhonization models,
+the syncrhonization mechanism (i.e.
+.BR mp-streams (9)),
+the mechanism for
+.I q_next
+dereference protection (i.e.
+.BR qprocson (9)/ qprocsoff (9)
+implementation), and the mechanism for freezing Streams (i.e.
+.BR freezestr (9)/ unfreezestr (9)
+implementation).
+.IP \(em
+Another common area of compatibility differences is in enhanced Stream head,
+messaging and input-output control implementation and behavior.
+.B @PACKAGE_TITLE@
+attempts to implement the super-set of Stream head capabilities exhibited by
+other implementations (including
+.IR Solaris \(rq).
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.PP
+Compatibility is tested using the
+.BR test-streams (8),
+.BR test-clone (8),
+.BR test-echo (8),
+.BR test-fifo (8),
+.BR test-log (8),
+.BR test-loop (8),
+.BR test-mux (8),
+.BR test-nsdev (8),
+.BR test-nuls (8),
+.BR test-pipe (8),
+.BR test-sad (8),
+.BR test-connld (8),
+.BR test-pipemod (8)
+and
+.BR test-sc (8),
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP EFT" ,
+.[
+svr42spg
+.]
+.IR "USL DDI/DKI" ,
+.[
+usldk
+.]
+.IR XPG4 ,
+.IR XPG5 ,
+.IR POSIX ,
+.IR SUSv2 ,
+.[
+susv2
+.]
+.IR SUSv3 .
+.[
+susv3
+.]
+Conformance is tested using the
+.BR test-streams (8),
+.BR test-clone (8),
+.BR test-echo (8),
+.BR test-fifo (8),
+.BR test-log (8),
+.BR test-loop (8),
+.BR test-mux (8),
+.BR test-nsdev (8),
+.BR test-nuls (8),
+.BR test-pipe (8),
+.BR test-sad (8),
+.BR test-connld (8),
+.BR test-pipemod (8)
+and
+.BR test-sc (8),
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B @PACKAGE_TITLE@
+package was started in early 2003 as a production replacement for the aging
+.I LiS
+package that was full of bugs and was unstable on most production
+distributions.
+The
+.B @PACKAGE_TITLE@
+package has since undergone 6 public releases:
+.TP \w'\fB0.7a.6.rc2\fP\(em'u
+.B 0.7a.3
+alpha release
+.PD 0
+.TP
+.B 0.7a.4
+beta release
+.TP
+.B 0.7a.5
+gamma release
+.TP
+.B 0.7a.6rc1
+production release candidate
+.TP
+.B 0.7a.6.rc2
+production release candidate
+.TP
+.B 0.9.2.1
+first production release
+.PD
+.PP
+The
+.B @PACKAGE@-@VERSION@
+package is a stable, production grade release.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
