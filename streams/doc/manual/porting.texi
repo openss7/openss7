@@ -303,128 +303,243 @@ Porting information is organized into sections as follows:
 @section Base Functions
 @cindex Base Functions
 
+@cite{@value{PACKAGE_TITLE}} provides a complete set of base functions and utilities for
+@dfn{STREAMS} as defined in the @cite{SVR 4 Programmer's Guide -- STREAMS}.  These are the base set
+of functions with which the @dfn{STREAMS} module and driver writer is familiar.
+
 @subsection Message Functions
 @cindex message functions
 
+Following are the basic @dfn{STREAMS} message functions.  Most portability issues concerning
+@dfn{STREAMS} message functions have to do with allocation, alignment of the data buffer, priority
+of allocation, disposition of unused message blocks, handling of @var{NULL} pointer arguments,
+buffer callback and message free routine handling.
+
 @ftable @asis
-@item @b{adjmsg}(9)
-trim bytes from the front or back of a @cite{STREAMS} message
-@item @b{allocb}(9)
-allocate a @cite{STREAMS} message and data block
-@item @b{bufcall}(9)
-install a buffer callback
-@item @b{copyb}(9)
-copy a @cite{STREAMS} message block
-@item @b{copymsg}(9)
-copy a @cite{STREAMS} message
-@item @b{datamsg}(9)
-tests a @cite{STREAMS} message type for data
-@item @b{dupb}(9)
-duplicate a @cite{STREAMS} message block
-@item @b{dupmsg}(9)
-duplicate a @cite{STREAMS} message
-@item @b{esballoc}(9)
-allocate a @cite{STREAMS} message and data block with a caller supplied data buffer
-@item @b{freeb}(9)
-frees a @cite{STREAMS} message block
-@item @b{freemsg}(9)
-frees a @cite{STREAMS} message
-@item @b{linkb}(9)
-link a message block to a @cite{STREAMS} message
-@item @b{msgdsize}(9)
-calculate the size of the data in a @cite{STREAMS} message
-@item @b{msgpullup}(9)
-pull up bytes in a @cite{STREAMS} message
-@item @b{pcmsg}(9)
-test a data block message type for priority control
-@item @b{pullupmsg}(9)
-pull up the bytes in a @cite{STREAMS} message
-@item @b{rmvb}(9)
-remove a message block from a @cite{STREAMS} message
-@item @b{testb}(9)
-test if a @cite{STREAMS} message can be allocated
-@item @b{unbufcall}(9)
-remove a @cite{STREAMS} buffer callback
-@item @b{unlinkb}(9)
-unlink a message block from a @cite{STREAMS} message
+
+@item @manref{@b{adjmsg}(9)}
+Trim bytes from the front or back of a @cite{STREAMS} message.  Trimmed message blocks are not freed
+but simply have their @var{b_wptr} set to their @var{b_rptr}.
+
+@item @manref{@b{allocb}(9)}
+Allocate a @cite{STREAMS} message and data block.  This function also accepts the @var{BPRI_WAITOK}
+flag which allocates all parts of the message 3-tuple using @var{KM_SLEEP} allocation.  Allocation
+of less than @var{FASTBUF} bytes will allocate a data buffer of size @var{FASTBUF}.  @var{FASTBUF}
+sized data buffers are internal to the data block, and message block, data block and data buffer
+3-types are allocated as a unit for speed.  Data buffers are allocated on a memory boundary that is
+the same as the next power of two sized buffer.
+
+@item @manref{@b{bufcall}(9)}
+Install a buffer callback.  @cite{@value{PACKAGE_TITLE}} provides the additional assurance that the
+callback routine will not be called until the caller returns from the calling function block.
+
+@item @manref{@b{copyb}(9)}
+Copy a @cite{STREAMS} message block.  A @var{NULL} pointer passed as an argument will panic the
+kernel.
+
+@item @manref{@b{copymsg}(9)}
+Copy a @cite{STREAMS} message.  Performs a block-wise copy using @manpage{@b{copyb}(9)}.
+
+@item @manref{@b{datamsg}(9)}
+Tests a @cite{STREAMS} message type for data.
+
+@item @manref{@b{dupb}(9)}
+Duplicate a @cite{STREAMS} message block.  @cite{@value{PACKAGE_TITLE}} uses a global lock to
+protect the @var{db_refs} member of the data block.
+
+@item @manref{@b{dupmsg}(9)}
+Duplicate a @cite{STREAMS} message.  Performs a block-wise duplication using @manpage{@b{dupb}(9)}.
+
+@item @manref{@b{esballoc}(9)}
+Allocate a @cite{STREAMS} message and data block with a caller supplied data buffer.  This is the
+most portable method of allocating a data buffer that requires some particular alignment.  The
+callback free routine is inherently unsafe when the function is provided by a module and modules are
+permitted to unload.
+
+@item @manref{@b{freeb}(9)}
+Frees a @cite{STREAMS} message block.
+
+@item @manref{@b{freemsg}(9)}
+Frees a @cite{STREAMS} message.  Performs a block-wise free using @manpage{@b{freeb}(9)}.
+
+@item @manref{@b{linkb}(9)}
+Link a message block to a @cite{STREAMS} message.  Panics if either argument is @var{NULL}.
+
+@item @manref{@b{msgdsize}(9)}
+Calculate the size of the data in a @cite{STREAMS} message.  Accepts a @var{NULL} pointer, in which
+case the function returns zero (@samp{0}).
+
+@item @manref{@b{msgpullup}(9)}
+Pull up bytes in a @cite{STREAMS} message.  Might allocate a new message to satisfy the request.
+
+@item @manref{@b{pcmsg}(9)}
+Test a data block message type for priority control.
+
+@item @manref{@b{pullupmsg}(9)}
+Pull up the bytes in a @cite{STREAMS} message.  Does not allocate a new initial message block, but
+may allocate a new initial data block and data buffer.  The pointers @samp{mp->b_wptr} and
+@samp{mp->b_rptr} are potentially invalidated by the call.
+
+@item @manref{@b{rmvb}(9)}
+Remove a message block from a @cite{STREAMS} message.  The message block must exist in the message.
+Passing @var{NULL} pointers will panic the kernel.
+
+@item @manref{@b{testb}(9)}
+Test if a @cite{STREAMS} message can be allocated.  Because the test is not atomic, when this
+function returns true, a subsequent call to @manpage{@b{allocb}(9)} could still fail.
+
+@item @manref{@b{unbufcall}(9)}
+Remove a @cite{STREAMS} buffer callback.  @cite{@value{PACKAGE_TITLE}} provides the @cite{SVR 4}
+assurance that before the call returns the callback function will either have been cancelled or
+execution of the callback will be complete.
+
+@item @manref{@b{unlinkb}(9)}
+Unlink a message block from a @cite{STREAMS} message.
+
 @end ftable
 
 @subsection UP Queue Functions
 @cindex UP queue functions
 
-@ftable @asis
+Single processor queue functions are those functions that existed in @cite{SVR 4} before
+multi-processor support was added in @cite{SVR 4.1 MP} and @cite{SVR 4.2}.  Most portability issues
+associated with these functions concern queue @var{q_next} pointer derefencing and freezing of
+Streams when directly manipulating queues.  @cite{@value{PACKAGE_TITLE}} provides the added
+assurance that @var{q_next} pointers can always be reliably dereferenced from within a queue put,
+service, open, close or syncrhonized callback procedure.
+
+@ftable @manref
+
 @item @b{backq}(9)
-find the upstream or downstream queue
+Find the upstream or downstream queue.  @cite{@value{PACKAGE_TITLE}} protects this pointer
+dereference when called from within a put, service, open, close or callback procedure.
+
 @item @b{bcanput}(9)
-test flow control on a @cite{STREAMS} message queue
+Test flow control on a @cite{STREAMS} message queue.
+@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling, queue flags and
+backenabling.
+
 @item @b{canenable}(9)
-test whether a @cite{STREAMS} message queue can be scheduled
+Test whether a @cite{STREAMS} message queue can be scheduled.
+This only effects normal priority messages as per @cite{SVR 4} semantics.
+
 @item @b{enableok}(9)
-allow a @cite{STREAMS} message queue to be scheduled
+Allow a @cite{STREAMS} message queue to be scheduled.
+This only effects normal priority messages as per @cite{SVR 4} semantics.
+
 @item @b{flushband}(9)
-flushes band @cite{STREAMS} messages from a message queue
+Flushes band @cite{STREAMS} messages from a message queue. @cite{@value{PACKAGE_TITLE}} provides a
+mechanism that efficiently flushes large numbers of messages from a queue: messages are unlinked
+from the queue and freed later by the @dfn{STREAMS} scheduler.
+
 @item @b{flushq}(9)
-flushes messages from a @cite{STREAMS} message queue
+Flushes messages from a @cite{STREAMS} message queue. @cite{@value{PACKAGE_TITLE}} provides a
+mechanism that efficiently flushes large numbers of messages from a queue: messages are unlinked
+from the queue and freed later by the @dfn{STREAMS} scheduler.
+
 @item @b{getq}(9)
-gets a message from a @cite{STREAMS} message queue
+Gets a message from a @cite{STREAMS} message queue.
+@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling, queue flags and
+backenabling.
+
 @item @b{insq}(9)
-inserts a message into a @cite{STREAMS} message queue
+Inserts a message into a @cite{STREAMS} message queue.
+@cite{@value{PACKAGE_TITLE}} recommends, but does not require, that the Stream be first frozen by
+the caller with a call to @manpage{@b{freezestr}(9)}.
+
 @item @b{noenable}(9)
-disable a @cite{STREAMS} message queue from being scheduled
+Disable a @cite{STREAMS} message queue from being scheduled.
+This only effects normal priority messages as per @cite{SVR 4} semantics.
+
 @item @b{OTHERQ}(9)
-return the other queue of a @cite{STREAMS} queue pair
+Return the other queue of a @cite{STREAMS} queue pair.
+
 @item @b{putbq}(9)
-put a message back on a @cite{STREAMS} message queue
+Put a message back on a @cite{STREAMS} message queue.
+@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling, queue flags and
+backenabling.
+
 @item @b{putctl}(9)
-put a control message on a @cite{STREAMS} message queue
+Put a control message on a @cite{STREAMS} message queue.
+
 @item @b{putctl1}(9)
-put a 1 byte control message on a @cite{STREAMS} message queue
+Put a 1 byte control message on a @cite{STREAMS} message queue.
+
 @item @b{putq}(9)
-put a message on a @cite{STREAMS} message queue
+Put a message on a @cite{STREAMS} message queue.
+@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling, queue flags and
+backenabling.
+
 @item @b{qenable}(9)
-schedules a @cite{STREAMS} message queue service routine
+Schedules a @cite{STREAMS} message queue service routine.
+
 @item @b{qreply}(9)
-replys to a message from a @cite{STREAMS} message queue
+Replies to a message from a @cite{STREAMS} message queue.
+
 @item @b{qsize}(9)
-return the number of message on a queue
+Return the number of messages on a queue.
+
 @item @b{RD}(9)
-return the read queue of a @cite{STREAMS} queue pair
+Return the read queue of a @cite{STREAMS} queue pair.  Although @cite{@value{PACKAGE_TITLE}}
+accepts a read queue pointer as an argument, doing so could panic some implementations.
+The macro @manpage{@b{_RD}(9)} is also provided that has this stricter behavior.
+
 @item @b{rmvq}(9)
-remove a message from a @cite{STREAMS} message queue
+Remove a message from a @cite{STREAMS} message queue.
+@cite{@value{PACKAGE_TITLE}} recommends, but does not require, that the Stream be first frozen by
+the caller with a call to @manpage{@b{freezestr}(9)}.
+
 @item @b{SAMESTR}(9)
-test for @cite{STREAMS} pipe or fifo
+Test for @cite{STREAMS} pipe or fifo.
+
 @item @b{WR}(9)
-return the write queue of a @cite{STREAMS} queue pair
+Return the write queue of a @cite{STREAMS} queue pair.  Although @cite{@value{PACKAGE_TITLE}}
+accepts a write queue pointer as an argument, doing so could panic some implementations.
+The macro @manpage{@b{_WR}(9)} is also provided that has this stricter behavior.
+
 @end ftable
 
 @subsection MP Queue Functions
 @cindex MP queue functions
 
 @ftable @asis
+
 @item @b{bcanputnext}(9)
-test flow control on a message queue
+Test flow control on a message queue.
+
 @item @b{canputnext}(9)
-test flow control on a message queue
+Test flow control on a message queue.
+
 @item @b{freezestr}(9)
-freeze the state of a stream queue
+Freeze the state of a stream queue.
+
 @item @b{put}(9)
-invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
+Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
+
 @item @b{putnext}(9)
-put a message on the downstream @cite{STREAMS} message queue
+Put a message on the downstream @cite{STREAMS} message queue.
+
 @item @b{putnextctl1}(9)
-put a 1 byte control message on the downstream @cite{STREAMS} message queue
+Put a 1 byte control message on the downstream @cite{STREAMS} message queue.
+
 @item @b{putnextctl}(9)
-put a control message on the downstream @cite{STREAMS} message queue
+Put a control message on the downstream @cite{STREAMS} message queue.
+
 @item @b{qprocsoff}(9)
-disables @cite{STREAMS} message queue processing for multi-processing
+Disables @cite{STREAMS} message queue processing for multi-processing.
+
 @item @b{qprocson}(9)
-enables @cite{STREAMS} message queue processing for multi-processing
+Enables @cite{STREAMS} message queue processing for multi-processing.
+
 @item @b{strqget}(9)
-gets information about a @cite{STREAMS} message queue
+Gets information about a @cite{STREAMS} message queue.
+
 @item @b{strqset}(9)
-sets attributes of a @cite{STREAMS} message queue
+Sets attributes of a @cite{STREAMS} message queue.
+
 @item @b{unfreezestr}(9)
-thaw the state of a stream queue
+Thaw the state of a stream queue.
+
 @end ftable
 
 @subsection DDI/DKI Functions
