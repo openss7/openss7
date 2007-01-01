@@ -205,6 +205,7 @@ Overview
 
 Porting
 
+* Porting from SVR 3.2::
 * Porting from SVR 4.2 MP::
 * Porting from AIX 5L Version 5.1::
 * Porting from HP-UX 11.0i v2::
@@ -214,6 +215,8 @@ Porting
 * Porting from SUPER-UX::
 * Porting from UXP/V::
 * Porting from Linux STREAMS (LiS) 2.18.4::
+* Porting from Mac Open Transport::
+* Porting from Mentat Portable STREAMS::
 
 Development
 
@@ -288,6 +291,7 @@ information.
 Porting information is organized into sections as follows:
 
 @menu
+* Porting from SVR 3.2::
 * Porting from SVR 4.2 MP::
 * Porting from AIX 5L Version 5.1::
 * Porting from HP-UX 11.0i v2::
@@ -297,6 +301,8 @@ Porting information is organized into sections as follows:
 * Porting from SUPER-UX::
 * Porting from UXP/V::
 * Porting from Linux STREAMS (LiS) 2.18.4::
+* Porting from Mac Open Transport::
+* Porting from Mentat Portable STREAMS::
 * Development::
 @end menu
 
@@ -310,18 +316,48 @@ of functions with which the @dfn{STREAMS} module and driver writer is familiar.
 @subsection Message Functions
 @cindex message functions
 
-Following are the basic @dfn{STREAMS} message functions.  Most portability issues concerning
-@dfn{STREAMS} message functions have to do with allocation, alignment of the data buffer, priority
-of allocation, disposition of unused message blocks, handling of @var{NULL} pointer arguments,
-buffer callback and message free routine handling.
+@cite{@value{PACKAGE_TITLE}} performs stricter message block, data block and
+buffer alignement than most @dfn{STREAMS} implementations to maintain maximum
+compatibility with other implementations.  Message blocks, data blocks and data
+buffers are always aligned at least to an SMP cache boundary, permitting DMA of
+message blocks, data blocks and data buffers.  ISA DMA capability is not ensured
+for message blocks or data blocks, however, external data buffers can be so
+allocated with @cite{Linux} allocators and attached to a message and data buffer
+with @manref{@b{esballoc}(9)}.
 
-@ftable @asis
+Data buffers of size less than the value @var{FASTBUF} are allocated of size
+@var{FASTBUF} and are internal to the data block.  A @var{FASTBUF} is at least
+64-bytes on 32-bit architectures and at least 128-bytes on 64-bit architectures.
+Internal data buffers of size @var{FASTBUF} are aligned to a 64-byte boundary on
+32-bit architecture and to a 128-byte boundary on 64-bit architectures.
 
-@item @manref{@b{adjmsg}(9)}
+Data buffers of larger than a @var{FASTBUF} are allocated using general purpose
+@cite{Linux} allocators (i.e. @manref{@b{kmem_alloc}(9)}).  @cite{Linux} always
+allocates a memory extent of a power of two in size that fits the requested
+number of bytes and always aligns the memory extent to the memory boundary that
+is the same power of two as the resulting size.  This is stricter in alignment
+than the description of most @cite{UNIX} memory allocators.
+
+@cite{@value{PACKAGE_TITLE}} also supports the @var{BPRI_WAITOK} priority to
+@manpage{@b{allocb}(9)} that will allocate memory block, data block and data
+buffer using @var{KM_SLEEP} and will block the calling process if either memory
+block, data block or data buffer are not immediately available.
+
+@subsubsection Compatibilty Functions
+
+Following are the basic @dfn{STREAMS} message functions.  Most portability
+issues concerning @dfn{STREAMS} message functions have to do with allocation,
+alignment of the data buffer, priority of allocation, disposition of unused
+message blocks, handling of @var{NULL} pointer arguments, buffer callback and
+message free routine handling.
+
+@ftable @manref
+
+@item @b{adjmsg}(9)
 Trim bytes from the front or back of a @cite{STREAMS} message.  Trimmed message blocks are not freed
 but simply have their @var{b_wptr} set to their @var{b_rptr}.
 
-@item @manref{@b{allocb}(9)}
+@item @b{allocb}(9)
 Allocate a @cite{STREAMS} message and data block.  This function also accepts the @var{BPRI_WAITOK}
 flag which allocates all parts of the message 3-tuple using @var{KM_SLEEP} allocation.  Allocation
 of less than @var{FASTBUF} bytes will allocate a data buffer of size @var{FASTBUF}.  @var{FASTBUF}
@@ -329,71 +365,71 @@ sized data buffers are internal to the data block, and message block, data block
 3-types are allocated as a unit for speed.  Data buffers are allocated on a memory boundary that is
 the same as the next power of two sized buffer.
 
-@item @manref{@b{bufcall}(9)}
+@item @b{bufcall}(9)
 Install a buffer callback.  @cite{@value{PACKAGE_TITLE}} provides the additional assurance that the
 callback routine will not be called until the caller returns from the calling function block.
 
-@item @manref{@b{copyb}(9)}
+@item @b{copyb}(9)
 Copy a @cite{STREAMS} message block.  A @var{NULL} pointer passed as an argument will panic the
 kernel.
 
-@item @manref{@b{copymsg}(9)}
+@item @b{copymsg}(9)
 Copy a @cite{STREAMS} message.  Performs a block-wise copy using @manpage{@b{copyb}(9)}.
 
-@item @manref{@b{datamsg}(9)}
+@item @b{datamsg}(9)
 Tests a @cite{STREAMS} message type for data.
 
-@item @manref{@b{dupb}(9)}
+@item @b{dupb}(9)
 Duplicate a @cite{STREAMS} message block.  @cite{@value{PACKAGE_TITLE}} uses a global lock to
 protect the @var{db_refs} member of the data block.
 
-@item @manref{@b{dupmsg}(9)}
+@item @b{dupmsg}(9)
 Duplicate a @cite{STREAMS} message.  Performs a block-wise duplication using @manpage{@b{dupb}(9)}.
 
-@item @manref{@b{esballoc}(9)}
+@item @b{esballoc}(9)
 Allocate a @cite{STREAMS} message and data block with a caller supplied data buffer.  This is the
 most portable method of allocating a data buffer that requires some particular alignment.  The
 callback free routine is inherently unsafe when the function is provided by a module and modules are
 permitted to unload.
 
-@item @manref{@b{freeb}(9)}
+@item @b{freeb}(9)
 Frees a @cite{STREAMS} message block.
 
-@item @manref{@b{freemsg}(9)}
+@item @b{freemsg}(9)
 Frees a @cite{STREAMS} message.  Performs a block-wise free using @manpage{@b{freeb}(9)}.
 
-@item @manref{@b{linkb}(9)}
+@item @b{linkb}(9)
 Link a message block to a @cite{STREAMS} message.  Panics if either argument is @var{NULL}.
 
-@item @manref{@b{msgdsize}(9)}
+@item @b{msgdsize}(9)
 Calculate the size of the data in a @cite{STREAMS} message.  Accepts a @var{NULL} pointer, in which
 case the function returns zero (@samp{0}).
 
-@item @manref{@b{msgpullup}(9)}
+@item @b{msgpullup}(9)
 Pull up bytes in a @cite{STREAMS} message.  Might allocate a new message to satisfy the request.
 
-@item @manref{@b{pcmsg}(9)}
+@item @b{pcmsg}(9)
 Test a data block message type for priority control.
 
-@item @manref{@b{pullupmsg}(9)}
+@item @b{pullupmsg}(9)
 Pull up the bytes in a @cite{STREAMS} message.  Does not allocate a new initial message block, but
 may allocate a new initial data block and data buffer.  The pointers @samp{mp->b_wptr} and
 @samp{mp->b_rptr} are potentially invalidated by the call.
 
-@item @manref{@b{rmvb}(9)}
+@item @b{rmvb}(9)
 Remove a message block from a @cite{STREAMS} message.  The message block must exist in the message.
 Passing @var{NULL} pointers will panic the kernel.
 
-@item @manref{@b{testb}(9)}
+@item @b{testb}(9)
 Test if a @cite{STREAMS} message can be allocated.  Because the test is not atomic, when this
 function returns true, a subsequent call to @manpage{@b{allocb}(9)} could still fail.
 
-@item @manref{@b{unbufcall}(9)}
+@item @b{unbufcall}(9)
 Remove a @cite{STREAMS} buffer callback.  @cite{@value{PACKAGE_TITLE}} provides the @cite{SVR 4}
 assurance that before the call returns the callback function will either have been cancelled or
 execution of the callback will be complete.
 
-@item @manref{@b{unlinkb}(9)}
+@item @b{unlinkb}(9)
 Unlink a message block from a @cite{STREAMS} message.
 
 @end ftable
@@ -401,63 +437,71 @@ Unlink a message block from a @cite{STREAMS} message.
 @subsection UP Queue Functions
 @cindex UP queue functions
 
-Single processor queue functions are those functions that existed in @cite{SVR 4} before
-multi-processor support was added in @cite{SVR 4.1 MP} and @cite{SVR 4.2}.  Most portability issues
-associated with these functions concern queue @var{q_next} pointer derefencing and freezing of
-Streams when directly manipulating queues.  @cite{@value{PACKAGE_TITLE}} provides the added
-assurance that @var{q_next} pointers can always be reliably dereferenced from within a queue put,
-service, open, close or syncrhonized callback procedure.
+Single processor queue functions are those functions that existed in @cite{SVR
+4} before multi-processor support was added in @cite{SVR 4.1 MP} and @cite{SVR
+4.2}.  Most portability issues associated with these functions concern queue
+@var{q_next} pointer derefencing and freezing of Streams when directly
+manipulating queues.  @cite{@value{PACKAGE_TITLE}} provides the added assurance
+that @var{q_next} pointers can always be reliably dereferenced from within a
+queue put, service, open, close or syncrhonized callback procedure.
 
 @ftable @manref
 
 @item @b{backq}(9)
-Find the upstream or downstream queue.  @cite{@value{PACKAGE_TITLE}} protects this pointer
-dereference when called from within a put, service, open, close or callback procedure.
+Find the upstream or downstream queue.  @cite{@value{PACKAGE_TITLE}} protects
+this pointer dereference when called from within a put, service, open, close or
+callback procedure.
 
 @item @b{bcanput}(9)
 Test flow control on a @cite{STREAMS} message queue.
-@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling, queue flags and
-backenabling.
+@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling,
+queue flags and backenabling.
 
 @item @b{canenable}(9)
-Test whether a @cite{STREAMS} message queue can be scheduled.
-This only effects normal priority messages as per @cite{SVR 4} semantics.
+Test whether a @cite{STREAMS} message queue can be scheduled.  This only effects
+normal priority messages as per @cite{SVR 4} semantics.
 
 @item @b{enableok}(9)
-Allow a @cite{STREAMS} message queue to be scheduled.
-This only effects normal priority messages as per @cite{SVR 4} semantics.
+Allow a @cite{STREAMS} message queue to be scheduled.  This only effects normal
+priority messages as per @cite{SVR 4} semantics.
 
 @item @b{flushband}(9)
-Flushes band @cite{STREAMS} messages from a message queue. @cite{@value{PACKAGE_TITLE}} provides a
-mechanism that efficiently flushes large numbers of messages from a queue: messages are unlinked
-from the queue and freed later by the @dfn{STREAMS} scheduler.
+Flushes band @cite{STREAMS} messages from a message queue.
+@cite{@value{PACKAGE_TITLE}} provides a mechanism that efficiently flushes large
+numbers of messages from a queue: messages are unlinked from the queue and freed
+later by the @dfn{STREAMS} scheduler.
 
 @item @b{flushq}(9)
-Flushes messages from a @cite{STREAMS} message queue. @cite{@value{PACKAGE_TITLE}} provides a
-mechanism that efficiently flushes large numbers of messages from a queue: messages are unlinked
-from the queue and freed later by the @dfn{STREAMS} scheduler.
+Flushes messages from a @cite{STREAMS} message queue.
+@cite{@value{PACKAGE_TITLE}} provides a mechanism that efficiently flushes large
+numbers of messages from a queue: messages are unlinked from the queue and freed
+later by the @dfn{STREAMS} scheduler.
 
 @item @b{getq}(9)
 Gets a message from a @cite{STREAMS} message queue.
-@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling, queue flags and
-backenabling.
+@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling,
+queue flags and backenabling.
 
 @item @b{insq}(9)
 Inserts a message into a @cite{STREAMS} message queue.
-@cite{@value{PACKAGE_TITLE}} recommends, but does not require, that the Stream be first frozen by
-the caller with a call to @manpage{@b{freezestr}(9)}.
+@cite{@value{PACKAGE_TITLE}} recommends, but does not require, that the Stream
+be first frozen by the caller with a call to
+@manpage{@b{freezestr}(9)}.@footnote{It is possible that the @dfn{STREAMS}
+module or driver writer can make such assurances with mechanisms other than
+@manpage{@b{freezestr}(9)}.  See the @manref{@b{freezestr}(9)} manual page for
+more information.}
 
 @item @b{noenable}(9)
-Disable a @cite{STREAMS} message queue from being scheduled.
-This only effects normal priority messages as per @cite{SVR 4} semantics.
+Disable a @cite{STREAMS} message queue from being scheduled.  This only effects
+normal priority messages as per @cite{SVR 4} semantics.
 
 @item @b{OTHERQ}(9)
 Return the other queue of a @cite{STREAMS} queue pair.
 
 @item @b{putbq}(9)
 Put a message back on a @cite{STREAMS} message queue.
-@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling, queue flags and
-backenabling.
+@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling,
+queue flags and backenabling.
 
 @item @b{putctl}(9)
 Put a control message on a @cite{STREAMS} message queue.
@@ -466,9 +510,8 @@ Put a control message on a @cite{STREAMS} message queue.
 Put a 1 byte control message on a @cite{STREAMS} message queue.
 
 @item @b{putq}(9)
-Put a message on a @cite{STREAMS} message queue.
-@cite{@value{PACKAGE_TITLE}} follows @cite{SVR 4} semantics for queue enabling, queue flags and
-backenabling.
+Put a message on a @cite{STREAMS} message queue.  @cite{@value{PACKAGE_TITLE}}
+follows @cite{SVR 4} semantics for queue enabling, queue flags and backenabling.
 
 @item @b{qenable}(9)
 Schedules a @cite{STREAMS} message queue service routine.
@@ -480,203 +523,491 @@ Replies to a message from a @cite{STREAMS} message queue.
 Return the number of messages on a queue.
 
 @item @b{RD}(9)
-Return the read queue of a @cite{STREAMS} queue pair.  Although @cite{@value{PACKAGE_TITLE}}
-accepts a read queue pointer as an argument, doing so could panic some implementations.
-The macro @manpage{@b{_RD}(9)} is also provided that has this stricter behavior.
+Return the read queue of a @cite{STREAMS} queue pair.  Although
+@cite{@value{PACKAGE_TITLE}} accepts a read queue pointer as an argument, doing
+so could panic some implementations.  The macro @manpage{@b{_RD}(9)} is also
+provided that has this stricter behavior.
 
 @item @b{rmvq}(9)
 Remove a message from a @cite{STREAMS} message queue.
-@cite{@value{PACKAGE_TITLE}} recommends, but does not require, that the Stream be first frozen by
-the caller with a call to @manpage{@b{freezestr}(9)}.
+@cite{@value{PACKAGE_TITLE}} recommends, but does not require, that the Stream
+be first frozen by the caller with a call to
+@manpage{@b{freezestr}(9)}.@footnote{It is possible that the @dfn{STREAMS}
+module or driver writer can make such assurances with mechanisms other than
+@manpage{@b{freezestr}(9)}.  See the @manref{@b{freezestr}(9)} manual page for
+more information.}
 
 @item @b{SAMESTR}(9)
 Test for @cite{STREAMS} pipe or fifo.
 
 @item @b{WR}(9)
-Return the write queue of a @cite{STREAMS} queue pair.  Although @cite{@value{PACKAGE_TITLE}}
-accepts a write queue pointer as an argument, doing so could panic some implementations.
-The macro @manpage{@b{_WR}(9)} is also provided that has this stricter behavior.
+Return the write queue of a @cite{STREAMS} queue pair.  Although
+@cite{@value{PACKAGE_TITLE}} accepts a write queue pointer as an argument, doing
+so could panic some implementations.  The macro @manpage{@b{_WR}(9)} is also
+provided that has this stricter behavior.
 
 @end ftable
 
 @subsection MP Queue Functions
 @cindex MP queue functions
 
-@ftable @asis
+When multiprocessing support was added to @dfn{STREAMS} in @cite{SVR 4.1 MP} and
+@cite{SVR 4.2}, it became necessary to enhance the @dfn{STREAMS} interface with
+a number of additional functions intended on easing multiprocessor
+implementation of @dfn{STREAMS}.  Most portability issues with functions in this
+category involve queue pointer dereferencing, and queue manipulation.
+
+@cite{@value{PACKAGE_TITLE}} provides stronger assurances for @var{q_next}
+pointer dereferencing that are experienced on most other @dfn{STREAMS}
+implementations, to maintain maximum compatibility.
+@cite{@value{PACKAGE_TITLE}} acquires a Stream head plumbing read lock before
+entering queue put, service, open, close and queue synchronous callback
+procedures within the Stream.  This means that a function call such as
+@samp{canput(q->q_next)} and @samp{canputnext(q)} have identical effect within
+the synchronous procedure.
+
+@ftable @manref
 
 @item @b{bcanputnext}(9)
 Test flow control on a message queue.
+@cite{@value{PACKAGE_TITLE}} ensures the validity of @var{q_next} pointer
+dereferencing for any queue in the queue pair for which a queue put, service,
+open, close or sycnrhonized callback procedure is the context of the
+dereference.  For other @var{q_next} dereferences (e.g. at a Stream end or
+across a multiplexing driver), the @manpage{@b{bcanputnext}(9)} utility should
+be used instead of the @manpage{@b{bcanput}(9)} utility.  @samp{bcanputnext(q,
+band)} should always be preferred over @samp{bcanput(q->q_next, band)}.
 
 @item @b{canputnext}(9)
 Test flow control on a message queue.
+@cite{@value{PACKAGE_TITLE}} ensures the validity of @var{q_next} pointer
+dereferencing for any queue in the queue pair for which a queue put, service,
+open, close or sycnrhonized callback procedure is the context of the
+dereference.  For other @var{q_next} dereferences (e.g. at a Stream end or
+across a multiplexing driver), the @manpage{@b{canputnext}(9)} utility should be
+used instead of the @manpage{@b{canput}(9)} utility.  @samp{canputnext(q)}
+should always be preferred over @samp{canput(q->q_next)}.
 
 @item @b{freezestr}(9)
 Freeze the state of a stream queue.
+@manpage{@b{freezestr}(9)} was provided in the MP environment to behave in the
+same fashion as @manpage{@b{spl}(9)} did in the UP environment.  In the UP
+environment it was a simply matter to suppress interrupts before directly
+manipulating queue structures and then re-enable interrupts after queue
+manipulation was complete.
 
 @item @b{put}(9)
 Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
+In the UP environment, the queue at a Stream end could be called directly such
+as @samp{(*q->q_qinfo->qi_putp)(q, mp)}.  In the MP environment, this would
+circumvent the @cite{STREAMS} synchronization model and the @manpage{@b{put}(9)}
+utility function should be used instead.
 
 @item @b{putnext}(9)
 Put a message on the downstream @cite{STREAMS} message queue.
+In the UP environment, the adjacent queue put procedure could be called directly
+such as @samp{(*q->q_next->q_qinfo->qi_putp)(q, mp)}.  In the MP environment,
+this would circumvent the @cite{STREAMS} synchronization model and the
+@manpage{@b{putnext}(9)} utility function should be used instead.
+@samp{putnext(q, mp)} should always be used in preference to
+@samp{put(q->q_next, mp)}.
 
 @item @b{putnextctl1}(9)
 Put a 1 byte control message on the downstream @cite{STREAMS} message queue.
+A @var{q_next} pointer dereferencing version of @manpage{@b{putctl1}(9)}.
+@samp{putnextctl1(q, type, param)} should always be used in preference to
+@samp{putctl1(q->q_next, type, param)}.
 
 @item @b{putnextctl}(9)
 Put a control message on the downstream @cite{STREAMS} message queue.
+A @var{q_next} pointer dereferencing version of @manpage{@b{putctl}(9)}.
+@samp{putnextctl(q, type)} should always be used in preference to
+@samp{putctl(q->q_next, type)}.
 
 @item @b{qprocsoff}(9)
 Disables @cite{STREAMS} message queue processing for multi-processing.
 
 @item @b{qprocson}(9)
 Enables @cite{STREAMS} message queue processing for multi-processing.
+In the UP environment, it was possible to prepare the queue service and put
+procedures for proper operation before returning and permitting the queue to run
+put or service procedures.  In the MP environment, it became necessary to
+indicate within the open procedure when queue procedures are to be permitted to
+run before returning (or blocking).  @manpage{@b{qprocson}(9)} was added to
+accomplish this.  @cite{SVR 4} says that this function must be cause before
+returning from the queue open routine.  @cite{@value{PACKAGE_TITLE}} will invoke
+the function implicitly if it is not called before the queue open routine
+returns (but must still be called explicitly if the queue open routine blocks
+awaiting an event on the queue).
 
 @item @b{strqget}(9)
 Gets information about a @cite{STREAMS} message queue.
+In the UP environment, it was possible to directly manipulate streamtab or queue
+structures after suppressing interrupts.  The @manpage{@b{strqget}(9)} utility
+provides a mechanism for manipulating these structures in the MP environment.
+Some implementations conflict on whether a Stream must first be frozen with
+@manpage{@b{freezestr}(9)} or not.  @cite{@value{PACKAGE_TITLE}} recommends that
+the Stream be frozen across a call to @manpage{@b{strqget}(9)}, but it is not
+required.
 
 @item @b{strqset}(9)
 Sets attributes of a @cite{STREAMS} message queue.
+In the UP environment, it was possible to directly manipulate streamtab or queue
+structures after suppressing interrupts.  The @manpage{@b{strqset}(9)} utility
+provides a mechanism for manipulating these structures in the MP environment.
+Some implementations conflict on whether a Stream must first be frozen with
+@manpage{@b{freezestr}(9)} or not.  @cite{@value{PACKAGE_TITLE}} recommends that
+the Stream be frozen across a call to @manpage{@b{strqset}(9)}, but it is not
+required.
 
 @item @b{unfreezestr}(9)
 Thaw the state of a stream queue.
+@manpage{@b{unfreezestr}(9)} was provided in the MP environment to behave in the
+same fashion as @manpage{@b{splx}(9)} did in the UP environment.
 
 @end ftable
 
 @subsection DDI/DKI Functions
 @cindex DDI/DKI functions
 
-@ftable @asis
+Traditionally, @cite{SVR 4} provided some DDI/DKI (Device Driver Interface/Driver Kernel Interface)
+functions for use by device drivers, including @dfn{STREAMS} device drivers.  Many of these function
+have survived into kernel/driver interfaces today in one form or another.  Some implementations
+(particularly @cite{Solaris@registeredsymbol{}}) provide a wide array of additional DDI/DKI functions.
+Additional functions are supported by compatibility modules, and the base @cite{SVR 4} functions are
+provided by the base @cite{@value{PACKAGE_TITLE}} package.
+
+@ftable @manref
+
 @item @b{kmem_alloc}(9)
-allocate kernel memory
+Allocate kernel memory.
+
 @item @b{kmem_free}(9)
-deallocates kernel memory
+Deallocates kernel memory.
+
 @item @b{kmem_zalloc}(9)
-allocate and zero kernel memory
+Allocate and zero kernel memory.
+
 @item @b{cmn_err}(9)
-print a kernel command error
+Print a kernel command error.
+
 @item @b{bcopy}(9)
-copy byte strings
+Copy byte strings.
+This is the basic BSD-style function for copying bytes.  Traditionally @dfn{STREAMS} has used the
+BSD-style function @manpage{@b{bcopy}(9)} instead of the SVR3-style
+@manpage{@b{memcpy}(9)}.@footnote{Perhaps this has something to do with @dfn{STREAMS} first being
+implemented on BSD 4.2.}
+
 @item @b{bzero}(9)
-zero a byte string
+Zero a byte string.
+This is the basic BSD-style function for zeroing bytes.  Traditionally @dfn{STREAMS} has used the
+BSD-style function @manpage{@b{bzero}(9)} instead of the SVR3-style
+@manpage{@b{memset}(9)}.@footnote{Perhaps this has something to do with @dfn{STREAMS} first being
+implemented on BSD 4.2.}
+
 @item @b{copyin}(9)
-copy user data in from user space to kernel space
+Copy user data in from user space to kernel space.
+In the UP environment, the top module put procedure was called in user context and it was possible
+to copy bytes directly from the user and block in this context.  In the MP environment and with an
+MP @dfn{STREAMS} synchronization model, the top module put procedure could be called outside of the
+Stream head user context.  Therefore, this function has little use under @dfn{STREAMS}.
+
 @item @b{copyout}(9)
-copy user data in from kernel space to user space
+Copy user data in from kernel space to user space.
+In the UP environment, the top module put procedure was called in user context and it was possible
+to copy bytes directly to the user and block in this context.  In the MP environment and with an
+MP @dfn{STREAMS} synchronization model, the top module put procedure could be called outside of the
+Stream head user context.  Therefore, this function has little use under @dfn{STREAMS}.
+
 @item @b{delay}(9)
-postpone the calling process for a number of clock ticks
+Postpone the calling process for a number of clock ticks.
+
 @item @b{drv_getparm}(9)
-driver retrieve kernel parameter
+Driver retrieve kernel parameter.
+
 @item @b{drv_hztomsec}(9)
-convert kernel tick time between microseconds or milliseconds
+Convert kernel tick time between microseconds or milliseconds.
+
 @item @b{drv_htztousec}(9)
-convert kernel tick time between microseconds or milliseconds
+Convert kernel tick time between microseconds or milliseconds.
+
 @item @b{drv_msectohz}(9)
-convert kernel tick time between microseconds or milliseconds
+Convert kernel tick time between microseconds or milliseconds.
+
 @item @b{drv_priv}(9)
-check if the current process is priviledged
+Check if the current process is priviledged.
+
 @item @b{drv_usectohz}(9)
-convert kernel tick time between microseconds or milliseconds
+Convert kernel tick time between microseconds or milliseconds.
+
 @item @b{drv_usecwait}(9)
-delay for a number of microseconds
+Delay for a number of microseconds.
+
 @item @b{min}(9)
-determine the minimum of two integers
+Determine the minimum of two integers.
+
 @item @b{max}(9)
-determine the maximum of two integers
+Determine the maximum of two integers.
+
 @item @b{getmajor}(9)
-get the internal major device number for a device
+Get the internal major device number for a device.
+
 @item @b{getminor}(9)
-get the extended minor device number for a device
+Get the extended minor device number for a device.
+
 @item @b{makedevice}(9)
-create a device from a major and minor device numbers
+Create a device from a major and minor device numbers.
+
 @item @b{strlog}(9)
-pass a message to the @cite{STREAMS} logger
+Pass a message to the @cite{STREAMS} logger.
+
 @item @b{timeout}(9)
-start a timer
+Start a timer.
+Although general purpose in nature, the @manpage{@b{timeout}(9)} and @manpage{@b{untimeout}(9)}
+utilities were most often used for @dfn{STREAMS} modules and drivers.  Some implementations only
+support these functions for @dfn{STREAMS}.
+
 @item @b{untimeout}(9)
-stop a timer
+Stop a timer.
+Although general purpose in nature, the @manpage{@b{timeout}(9)} and @manpage{@b{untimeout}(9)}
+utilities were most often used for @dfn{STREAMS} modules and drivers.  Some implementations only
+support these functions for @dfn{STREAMS}.
+
 @end ftable
 
-@ftable @asis
+@ftable @manref
+
 @item @b{mknod}(9)
-make block or character special files
+Make block or character special files.
+
 @item @b{mount}(9)
-mount and unmount filesystems
+Mount and unmount filesystems.
+
 @item @b{umount}(9)
-mount and unmount filesystems
+Mount and unmount filesystems.
+
 @item @b{unlink}(9)
-remove a file
+Remove a file.
+
 @end ftable
 
 @subsection Some Common Extension Functions
 @cindex some common extension functions
 
-@ftable @asis
+One of the most common extension functions is the ability to put a control
+message with two bytes as parameters.  At some point the
+@manpage{@b{M_ERROR}(9)} message was extended to include a separate error code
+for the Stream head write and read side.  Also, at some point the
+@manpage{@b{M_FLUSH}(9)} message was extended to include a band number as well
+as a flag byte.  @manpage{@b{putctl2}(9)} and @manpage{@b{putnextctl2}(9)} were
+provided to accept and generate two arguments instead of one as their
+@manpage{@b{putctl1}(9)} and @manpage{@b{putnextctl1}(9)} counterparts provide.
+@cite{@value{PACKAGE_TITLE}} supports these functions as part of the base
+package.
+
+Another common extension of @cite{OSF/1} or @cite{Mentat} derived @dfn{STREAMS}
+implementations is the ability to weld two queues together in pipe- or FIFO-like
+arrangements while maintaining queue sychronization.  The two utilities
+@manpage{@b{weldq}(9)} and @manpage{@b{unweldq}(9)} were often included to
+provide this facility.  @cite{@value{PACKAGE_TITLE}} supports these functions as
+part of the base package.
+
+@ftable @manref
+
 @item @b{linkmsg}(9)
-link a message block to a @cite{STREAMS} message
+Link a message block to a @cite{STREAMS} message.
+
 @item @b{putctl2}(9)
-put a two byte control message on a @cite{STREAMS} message queue
+Put a two byte control message on a @cite{STREAMS} message queue.
+
 @item @b{putnextctl2}(9)
-put a two byte control message on the downstream @cite{STREAMS} message queue
+Put a two byte control message on the downstream @cite{STREAMS} message queue.
+
 @item @b{weldq}(9)
-weld two (or four) queues together
+Weld two (or four) queues together.
+
 @item @b{unweldq}(9)
-unweld two (or four) queues
+Unweld two (or four) queues.
+
 @end ftable
 
 @subsection Some Internal Functions
 @cindex some internal functions
 
-@ftable @asis
+@cite{@value{PACKAGE_TITLE}} exposes some internal @dfn{STREAMS} functions that
+are exposed by many @dfn{STREAMS} implementations but which are not documented
+as available to the @dfn{STREAMS} module and driver writer.  These functions are
+exposed for the purpose of compatibilty with other implementations as well as
+providing some functions that are necessary to implement enhanced Stream heads,
+specialized drivers or modules such as the @manref{@b{clone}(4)} driver or
+@manref{@b{connld}(4)} module.
+
+Following are some of the exposed functions that are typically exposed by other
+@dfn{STREAMS} implementations as well:
+
+@ftable @manref
+
 @item @b{allocq}(9)
-allocate a @cite{STREAMS} queue pair
+Allocate a @cite{STREAMS} queue pair.
+
 @item @b{bcanget}(9)
-test for message arrival on a band on a stream
+Test for message arrival on a band on a stream.
+
 @item @b{canget}(9)
-test for message arrival on a stream
+Test for message arrival on a stream.
+
 @item @b{freeq}(9)
-deallocate a @cite{STREAMS} queue pair
+Deallocate a @cite{STREAMS} queue pair.
+
 @item @b{qattach}(9)
-attach a module onto a @cite{STREAMS} file
+Attach a module onto a @cite{STREAMS} file.
+
 @item @b{qclose}(9)
-close a @cite{STREAMS} module or driver
+Close a @cite{STREAMS} module or driver.
+
 @item @b{qdetach}(9)
-detach a module from a @cite{STREAMS} file
+Detach a module from a @cite{STREAMS} file.
+
 @item @b{qopen}(9)
-call a @cite{STREAMS} module or driver open routine
+Call a @cite{STREAMS} module or driver open routine.
+
 @item @b{setq}(9)
-set sizes and procedures associated with a @cite{STREAMS} message queue
+Set sizes and procedures associated with a @cite{STREAMS} message queue.
+
 @end ftable
 
 @subsection Some Oddball Functions
 @cindex some oddball functions
 
-@ftable @asis
+@ftable @manref
+
 @item @b{appq}(9)
-append one @cite{STREAMS} message after another
+Append one @cite{STREAMS} message after another.
+
 @item @b{esbbcall}(9)
-install a buffer callback for an extended @cite{STREAMS} message block
+Install a buffer callback for an extended @cite{STREAMS} message block.
+
 @item @b{isdatablk}(9)
-test a @cite{STREAMS} data block for data type
+Test a @cite{STREAMS} data block for data type.
+
 @item @b{isdatamsg}(9)
-test a @cite{STREAMS} data block for data type
+Test a @cite{STREAMS} data block for data type.
+
 @item @b{kmem_zalloc_node}(9)
+Allocate and zero a NUMA memory extent.
+
 @item @b{msgsize}(9)
-calculate the size of the message blocks in a @cite{STREAMS} message
+Calculate the size of the message blocks in a @cite{STREAMS} message.
+
 @item @b{qcountstrm}(9)
-add all counts on all @cite{STREAMS} message queues in a stream
+Add all counts on all @cite{STREAMS} message queues in a stream.
+
 @item @b{xmsgsize}(9)
-calculate the size of message blocks in a @cite{STREAMS} message
+Calculate the size of message blocks in a @cite{STREAMS} message.
+
 @end ftable
 
+@page
+@node Porting from SVR 3.2
+@section Porting from SVR 3.2
+@cindex Porting from SVR 3.2
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{SVR 3.2} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{svr3compat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{SVR 3.2} specific compatibility
+functions.
+
+@menu
+* Differences from SVR 3.2::
+* Commonalities with SVR 3.2::
+* Compatibility functions for SVR 3.2::
+* Configuration ala SVR 3.2::
+@end menu
+
+This section captures portability information for @cite{SVR 3.2} based systems.
+If the operating system from which you are porting more closely fits one of the
+other portability sections, please see that section.
+
+For the most part, porting from @cite{SVR 3.2} to @cite{@value{PACKAGE_TITLE}}
+is not much different than porting forward from @cite{SVR 3.2} to @cite{SVR 4.2
+MP}.  If you wish to be able to access some backwards compatible @cite{SVR 3.2}
+functions, use the @cite{SVR 3} compatibility module from the @file{strcompat}
+package.
+
+Therefore, it is recommmended that @dfn{STREAMS} modules and drivers for
+@cite{SVR 3.2} be ported forward to @cite{SVR 4.2 MP} before being ported to
+@cite{@value{PACKAGE_TITLE}}.
+
+
+@node Differences from SVR 3.2
+@subsection Differences from SVR 3.2
+@cindex Differences from SVR 3.2
+
+The most significant different in @cite{SVR 3.2} and @cite{SVR 4} was the
+declaration of the queue open and close routine entry points.  Some
+@dfn{STREAMS} implementations still support both @cite{SVR 3.2} entry point
+declarations as well as @cite{SVR 4} entry point declarations.
+@cite{@value{PACKAGE_TITLE}} only supports the @cite{SVR 4} style entry points.
+
+@cite{SVR 3.2} was not MP-safe.  @cite{@value{PACKAGE_TITLE}} is MP-safe.
+
+A significant number of utilities were implemented in @cite{SVR 3.2} as
+architecture dependent macros.  In @cite{SVR 4} these became architecture
+independent function calls.
+
+In general, @cite{@value{PACKAGE_TITLE}} is different from @cite{SVR 3.2} in any
+way that @cite{SVR 3.2} is different from @cite{SVR 4.2 MP}.
+
+@node Commonalities with SVR 3.2
+@subsection Commonalities with SVR 3.2
+@cindex Commonalities with SVR 3.2
+
+In general, most of the @dfn{STREAMS} utility functions that were present in
+@cite{SVR 3.2} also made it into @cite{SVR 4} (with few exceptions).  @cite{SVR
+3.2} did not yet have the concept of a DDI/DKI, but the @dfn{STREAMS} functions
+present in @cite{SVR 3.2} appear in the @cite{SVR 4.2 MP} DDI/DKI.
+
+@node Compatibility functions for SVR 3.2
+@subsection Compatibility functions for SVR 3.2
+@cindex Compatibility functions for SVR 3.2
+
+@ftable @manref
+
+@item @b{alloc_proto}(9)
+Allocate control and data message blocks.
+
+@item @b{emajor}(9)
+Get the external (real) major device number from the device number.
+
+@item @b{eminor}(9)
+Get the external extended minor device number from the device number.
+
+@end ftable
+
+@node Configuration ala SVR 3.2
+@subsection Configuration ala SVR 3.2
+@cindex Configuration ala SVR 3.2
+
+I have never seen a description of @cite{SVR 3.2} @dfn{STREAMS} configuration.
+I can only assume that it involved relinking the kernel in some fashion.
 
 @page
 @node Porting from SVR 4.2 MP
 @section Porting from SVR 4.2 MP
 @cindex Porting from SVR 4.2 MP
 
-This section captures portability information for SVR 4.2 MP based systems.
-If the operating system from which you are porting more closely fits one of
-the other portability sections, please see that section.
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{SVR 4.2 MP} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{svr4compat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{SVR 4.2 MP} specific compatibility
+functions.
+
+This section captures portability information for SVR 4.2 MP based systems.  If
+the operating system from which you are porting more closely fits one of the
+other portability sections, please see that section.
 
 @menu
 * Differences from SVR 4.2 MP::
@@ -689,10 +1020,11 @@ the other portability sections, please see that section.
 @subsection Differences from SVR 4.2 MP
 @cindex differences from svr 4.2 mp
 
-@b{Linux Fast-STREAMS} has very few differences from @cite{SVR 4.2 MP}.  Not all
-@cite{SVR 4.2 MP} functions are implemented in the base @b{Linux Fast-STREAMS}
-kernel modules.  Some functions are included in the @cite{SVR 4.2 MP}
-compatibility module, @file{streams-svr4compat.o}.
+@cite{@value{PACKAGE_TITLE}} has very few differences from @cite{SVR 4.2 MP}.
+Not all @cite{SVR 4.2 MP} functions are implemented in the base
+@cite{@value{PACKAGE_TITLE}} kernel modules.  Some functions are included in the
+@cite{SVR 4.2 MP} compatibility module (@file{streams_svr4compat.ko}) from the
+@file{strcompat} package.
 
 @menu
 * Priority Levels::
@@ -761,123 +1093,238 @@ This priority level exists in all kernels.
 @subsection Compatibility functions for SVR 4.2 MP
 @cindex compatibility functions for svr 4.2 mp
 
-@ftable @asis
-@item @b{ATOMIC_INT_ADD}(9)
-add an integer value to an atomic integer
-@item @b{ATOMIC_INT_ALLOC}(9)
-allocate and initalize an atomic integer
-@item @b{ATOMIC_INT_DEALLOC}(9)
-deallocate an atomic integer
-@item @b{ATOMIC_INT_DECR}(9)
-decrement and test an atomic integer
-@item @b{ATOMIC_INT_INCR}(9)
-increment an atomic integer
-@item @b{ATOMIC_INT_INIT}(9)
-initialize an atomic integer
-@item @b{ATOMIC_INT_READ}(9)
-read an atomic integer
-@item @b{ATOMIC_INT_SUB}(9)
-subtract and integer value from an atomic integer
-@item @b{ATOMIC_INT_WRITE}(9)
-write an integer value to an atomic integer
-@item @b{itimeout}(9)
-perform a timeout at an interrupt level
-@item @b{lbolt}(9)
-time in ticks since reboot
-@item @b{LOCK}(9)
-lock a basic lock
-@item @b{LOCK_ALLOC}(9)
-allocate a basic lock
-@item @b{LOCK_DEALLOC}(9)
-deallocate a basic lock
-@item @b{LOCK_OWNED}(9)
-determine whether a basic lock is head by the caller
+@subsubsection STREAMS Locks
+
+@ftable @manref
+
 @item @b{MPSTR_QLOCK}(9)
 release a queue from exclusive access
+
 @item @b{MPSTR_QRELE}(9)
 acquire a queue for exclusive access
+
 @item @b{MPSTR_STPLOCK}(9)
 acquire a stream head for exclusive access
+
 @item @b{MPSTR_STPRELE}(9)
 release a stream head from exclusive access
-@item @b{major}(9)
-get the internal major number of a device
-@item @b{makedev}(9)
-make a device number from internal major and minor device numbers
-@item @b{minor}(9)
-get the internal minor number of a device
-@item @b{RW_ALLOC}(9)
-allocate and initialize a read/write lock
-@item @b{RW_DEALLOC}(9)
-deallocate a read/write lock
-@item @b{RW_RDLOCK}(9)
-acquire a read/write lock in read mode
-@item @b{RW_TRYRDLOCK}(9)
-attempt to acquire a read/write lock in read mode
-@item @b{RW_TRYWRLOCK}(9)
-attempt to acquire a read/write lock in write mode
-@item @b{RW_UNLOCK}(9)
-release a read/write lock
-@item @b{RW_WRLOCK}(9)
-acquire a read/write lock in write mode
-@item @b{sleep}(9)
-put a process to sleep
-@item @b{SLEEP_ALLOC}(9)
-allocate a sleep lock
-@item @b{SLEEP_DEALLOC}(9)
-deallocate a sleep lock
-@item @b{SLEEP_LOCK}(9)
-acquire a sleep lock
-@item @b{SLEEP_LOCKAVAIL}(9)
-determine whether a sleep lock is available
-@item @b{SLEEP_LOCKOWNED}(9)
-determine whether a sleep lock is held by the caller
-@item @b{SLEEP_LOCK_SIG}(9)
-acquire a sleep lock
-@item @b{SLEEP_TRYLOCK}(9)
-attempt to acquire a sleep lock
-@item @b{SLEEP_UNLOCK}(9)
-release a sleep lock
-@item @b{spl0}(9)
-set priority level 0
-@item @b{spl1}(9)
-set priority level 1
-@item @b{spl2}(9)
-set priority level 2
-@item @b{spl3}(9)
-set priority level 3
-@item @b{spl4}(9)
-set priority level 4
-@item @b{spl5}(9)
-set priority level 5
-@item @b{spl6}(9)
-set priority level 6
-@item @b{spl7}(9)
-set priority level 7
-@item @b{spl}(9)
-set priority level
-@item @b{splx}(9)
-set priority level x
-@item @b{SV_ALLOC}(9)
-allocate a basic condition variable
-@item @b{SV_BROADCAST}(9)
-broadcast a basic condition variable
-@item @b{SV_DEALLOC}(9)
-deallocate a basic condition variable
-@item @b{SV_SIGNAL}(9)
-signal a basic condition variable
-@item @b{SV_WAIT}(9)
-wait on a basic condition variable
-@item @b{SV_WAIT_SIG}(9)
-interruptible wait on a basic condition variable
+
+@end ftable
+
+@subsubsection Basic Locks
+
+Basic locks are similar to @cite{Linux} spin locks.
+
+@ftable @manref
+
+@item @b{LOCK}(9)
+lock a basic lock
+
+@item @b{LOCK_ALLOC}(9)
+allocate a basic lock
+
+@item @b{LOCK_DEALLOC}(9)
+deallocate a basic lock
+
+@item @b{LOCK_OWNED}(9)
+determine whether a basic lock is head by the caller
+
 @item @b{TRYLOCK}(9)
 try to lock a basic lock
+
 @item @b{UNLOCK}(9)
 unlock a basic lock
+
+@end ftable
+
+@subsubsection Read-Write Locks
+
+Read-write locks are similar to @cite{Linux} read-write locks.
+
+@ftable @manref
+
+@item @b{RW_ALLOC}(9)
+allocate and initialize a read/write lock
+
+@item @b{RW_DEALLOC}(9)
+deallocate a read/write lock
+
+@item @b{RW_RDLOCK}(9)
+acquire a read/write lock in read mode
+
+@item @b{RW_TRYRDLOCK}(9)
+attempt to acquire a read/write lock in read mode
+
+@item @b{RW_TRYWRLOCK}(9)
+attempt to acquire a read/write lock in write mode
+
+@item @b{RW_UNLOCK}(9)
+release a read/write lock
+
+@item @b{RW_WRLOCK}(9)
+acquire a read/write lock in write mode
+
+@end ftable
+
+@subsubsection Sleep Locks
+
+Sleep locks are similar to @cite{Linux} semaphores or mutexes.
+
+@ftable @manref
+
+@item @b{SLEEP_ALLOC}(9)
+allocate a sleep lock
+
+@item @b{SLEEP_DEALLOC}(9)
+deallocate a sleep lock
+
+@item @b{SLEEP_LOCK}(9)
+acquire a sleep lock
+
+@item @b{SLEEP_LOCKAVAIL}(9)
+determine whether a sleep lock is available
+
+@item @b{SLEEP_LOCKOWNED}(9)
+determine whether a sleep lock is held by the caller
+
+@item @b{SLEEP_LOCK_SIG}(9)
+acquire a sleep lock
+
+@item @b{SLEEP_TRYLOCK}(9)
+attempt to acquire a sleep lock
+
+@item @b{SLEEP_UNLOCK}(9)
+release a sleep lock
+
+@end ftable
+
+@subsubsection Synchronization Variables
+
+Synchronization variables are similar to @cite{Linux} wait queues.
+
+@ftable @manref
+
+@item @b{SV_ALLOC}(9)
+allocate a basic condition variable
+
+@item @b{SV_BROADCAST}(9)
+broadcast a basic condition variable
+
+@item @b{SV_DEALLOC}(9)
+deallocate a basic condition variable
+
+@item @b{SV_SIGNAL}(9)
+signal a basic condition variable
+
+@item @b{SV_WAIT}(9)
+wait on a basic condition variable
+
+@item @b{SV_WAIT_SIG}(9)
+interruptible wait on a basic condition variable
+
+@end ftable
+
+@subsubsection Atomic Integers
+
+Atomic Integers are similar to @cite{Linux} atomic integers.
+
+@ftable @manref
+
+@item @b{ATOMIC_INT_ADD}(9)
+add an integer value to an atomic integer
+
+@item @b{ATOMIC_INT_ALLOC}(9)
+allocate and initalize an atomic integer
+
+@item @b{ATOMIC_INT_DEALLOC}(9)
+deallocate an atomic integer
+
+@item @b{ATOMIC_INT_DECR}(9)
+decrement and test an atomic integer
+
+@item @b{ATOMIC_INT_INCR}(9)
+increment an atomic integer
+
+@item @b{ATOMIC_INT_INIT}(9)
+initialize an atomic integer
+
+@item @b{ATOMIC_INT_READ}(9)
+read an atomic integer
+
+@item @b{ATOMIC_INT_SUB}(9)
+subtract and integer value from an atomic integer
+
+@item @b{ATOMIC_INT_WRITE}(9)
+write an integer value to an atomic integer
+
+@end ftable
+
+@subsubsection Set Processor Level
+
+Processor levels are similar to @cite{Linux} local irq or soft irq suppression.
+
+@ftable @manref
+
+@item @b{spl0}(9)
+set priority level 0
+
+@item @b{spl1}(9)
+set priority level 1
+
+@item @b{spl2}(9)
+set priority level 2
+
+@item @b{spl3}(9)
+set priority level 3
+
+@item @b{spl4}(9)
+set priority level 4
+
+@item @b{spl5}(9)
+set priority level 5
+
+@item @b{spl6}(9)
+set priority level 6
+
+@item @b{spl7}(9)
+set priority level 7
+
+@item @b{spl}(9)
+set priority level
+
+@item @b{splx}(9)
+set priority level x
+
+@end ftable
+
+@subsubsection Additional Compatibility Functions
+
+@ftable @manref
+
+@item @b{itimeout}(9)
+perform a timeout at an interrupt level
+
+@item @b{lbolt}(9)
+time in ticks since reboot
+
+@item @b{major}(9)
+get the internal major number of a device
+
+@item @b{makedev}(9)
+make a device number from internal major and minor device numbers
+
+@item @b{minor}(9)
+get the internal minor number of a device
+
+@item @b{sleep}(9)
+put a process to sleep
+
 @item @b{vtop}(9)
 convert virtual to physical address
+
 @item @b{wakeup}(9)
 wake a process
+
 @end ftable
 
 @node Configuration ala SVR 4.2 MP
@@ -888,6 +1335,19 @@ wake a process
 @node Porting from AIX 5L Version 5.1
 @section Porting from AIX 5L Version 5.1
 @cindex Porting from AIX 5L Version 5.1
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{AIX} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{aixcompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{AIX} specific compatibility
+functions.
+
+Most of the @dfn{STREAMS} functions and DDI/DKI functions provided by
+@cite{AIX@registeredsymbol{}} are also provided by the
+@cite{@value{PACKAGE_TITLE}} base package.  Some utilities, however, are
+provided by the @cite{AIX} compatibility module (@file{streams_aixcompat.ko})
+from the @dfn{STREAMS} Compatibility Module package (@file{strcompat}).
 
 @menu
 * Differences from AIX 5L Version 5.1::
@@ -908,46 +1368,114 @@ wake a process
 @subsection Compatibility Functions for AIX 5L Version 5.1
 @cindex compatibility functions for aix 5l version 5.1
 
-@ftable @asis
+The compatibility functions decribed below are described in the @dfn{STREAMS}
+module and driver documentation for @cite{AIX}.  Some of these functions are
+provided also with other implementations (such as @cite{OSF/1} or
+@cite{Mentat}).
+
+The following functions are typically also provided by @emph{most} @dfn{STREAMS}
+implementations:
+
+@ftable @manref
+
 @item @b{putctl2}(9)
-put a 2 byte control message on a @cite{STREAMS}
+Put a 2 byte control message on a @cite{STREAMS}.
+
 @item @b{splstr}(9)
-set or restore priority levels
+Set processor level for @dfn{STREAMS}.
+
 @item @b{splx}(9)
-set or restore priority levels
+Set or restore processor level.
+
 @item @b{unweldq}(9)
-unweld two pairs of streams queues
+Unweld two pairs of streams queues.
+
 @item @b{weldq}(9)
-weld together two paris of streams queues
+Weld together two paris of streams queues.
+
 @end ftable
 
-@ftable @asis
+The following functions are really just @cite{Mentat Portable @dfn{STREAMS}}
+functions that made their way into @cite{AIX}:  (Portability considerations for
+@cite{Mentat Portable @dfn{STREAMS}} functions is described in.)
+
+@ftable @manref
+
 @item @b{mi_bufcall}(9)
-reliable alternative to @b{buffcall}(9)
+Reliable alternative to @manpage{@b{buffcall}(9)}.
+This is really just a @cite{Mentat Portable @dfn{STREAMS}} function that made
+its way into @cite{AIX}.
+
 @item @b{mi_close_comm}(9)
-@cite{STREAMS} common minor device close utility
+@cite{STREAMS} common minor device close utility.
+This is really just a @cite{Mentat Portable @dfn{STREAMS}} function that made
+its way into @cite{AIX}.
+
 @item @b{mi_next_ptr}(9)
-@cite{STREAMS} minor device list traversal
+@cite{STREAMS} minor device list traversal.
+This is really just a @cite{Mentat Portable @dfn{STREAMS}} function that made
+its way into @cite{AIX}.
+
 @item @b{mi_open_comm}(9)
-@cite{STREAMS} common minor device open utility
+@cite{STREAMS} common minor device open utility.
+This is really just a @cite{Mentat Portable @dfn{STREAMS}} function that made
+its way into @cite{AIX}.
+
 @item @b{mi_prev_ptr}(9)
-@cite{STREAMS} minor device list traversal
-@item @b{str_install}(9)
-install a @cite{STREAMS} module or driver
+@cite{STREAMS} minor device list traversal.
+This is really just a @cite{Mentat Portable @dfn{STREAMS}} function that made
+its way into @cite{AIX}.
+
+@end ftable
+
+The following functions are unique to @cite{AIX}:
+
+In particular, the @manpage{@b{wantio}(9)} and @manpage{@b{wantmsg}(9)}
+facilities are incredibly convoluted and complex and only documented by
+@cite{AIX}.  Although @cite{@value{PACKAGE_TITLE}} implements these functions
+(in the @cite{AIX} compatibility module, @file{streams_aixcompat.ko}, from the
+@dfn{STREAMS} compatibility module package, @file{strcompat}) as faithfully as
+possible, their use should be completely avoided by portable programs.
+
+@ftable @manref
+
 @item @b{wantio}(9)
-perform direct I/O from a @cite{STREAMS} driver
+Perform direct I/O from a @cite{STREAMS} driver.
+
 @item @b{wantmsg}(9)
-provide a filter of wanted messages from a @cite{STREAMS} module
+Provide a filter of wanted messages from a @cite{STREAMS} module.
+
 @end ftable
 
 @node Configuration ala AIX 5L Version 5.1
 @subsection Configuration ala AIX 5L Version 5.1
 @cindex configuration ala aix 5l version 5.1
 
+@ftable @manref
+
+@item @b{str_install}(9)
+Install a @cite{STREAMS} module or driver.
+Each implementation has a different mechanism for registeration and
+deregistration of @dfn{STREAMS} modules and drivers.  This is the mechanism
+used by @cite{AIX}.  It should be avoided by programs that are not being ported
+from @cite{AIX}.  @cite{AIX}-style @dfn{STREAMS} registration and deregistration
+is implemented in the @cite{AIX} compatibility module,
+@file{streams_aixcompat.ko}, from the @dfn{STREAMS} compatibility module package,
+@file{strcompat}.
+
+@end ftable
+
 @page
 @node Porting from HP-UX 11.0i v2
 @section Porting from HP-UX 11.0i v2
 @cindex Porting from HP-UX 11.0i v2
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{HP-UX} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{hpuxcompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{HP-UX} specific compatibility
+functions.
 
 @menu
 * Differences from HP-UX 11.0i v2::
@@ -960,6 +1488,16 @@ provide a filter of wanted messages from a @cite{STREAMS} module
 @subsection Differences from HP-UX 11.0i v2
 @cindex differences from hp-ux 11.0i v2
 
+@cite{HP-UX} stubs out the @manpage{@b{qprocson}(9)},
+@manpage{@b{qprocsoff}(9)}, @manpage{@b{freezestr}(9)} and
+@manpage{@b{unfreezestr}(9)} utility functions.  @cite{HP-UX} expects that the
+appropriate level of synchronization be used instead.@footnote{@i{STREAMS/UX for
+the HP 9000 Reference Manual}, 1995, (Palo Alto, California), Hewlett-Package
+Company, HP.  @url{http://docs.hp.com/}} Because of this, it is recommended that
+@cite{HP-UX} drivers and modules mport directly to the
+@cite{@value{PACKAGE_TITLE}} environment, not be run at synchronization level
+@var{SQLVL_NOP}.  See @manref{@b{str_install_HPUX}(9)}.
+
 @node Commonalities with HP-UX 11.0i v2
 @subsection Commonalities with HP-UX 11.0i v2
 @cindex commonalities with hp-ux 11.0i v2
@@ -968,36 +1506,81 @@ provide a filter of wanted messages from a @cite{STREAMS} module
 @subsection Compatibility Functions for HP-UX 11.0i v2
 @cindex compatibility functions for hp-ux 11.0i v2
 
-@ftable @asis
+The following compatibility functions are typical extensions and are also
+provided by the @cite{@value{PACKAGE_TITLE}} base package:
+
+@ftable @manref
+
 @item @b{putctl2}(9)
 put a 2 byte control message on a @cite{STREAMS} message queue
+
 @item @b{putnextctl2}(9)
 put a 2 byte control message on the downstream @cite{STREAMS} message queue
+
 @item @b{unweldq}(9)
 unweld two pairs of streams queues
+
 @item @b{weldq}(9)
 weld together two paris of streams queues
+
 @end ftable
 
-@ftable @asis
-@item @b{str_install}(9)
-install a @cite{STREAMS} module or driver
-@item @b{str_uninstall}(9)
-uninstall a @cite{STREAMS} module or driver
+The following compatibility functions are peculiar to
+@cite{HP-UX}@footnote{@i{STREAMS/UX for the HP 9000 Reference Manual}, 1995,
+(Palo Alto, California), Hewlett-Package Company, HP.
+@url{http://docs.hp.com/}} and are only part of the @cite{HP-UX} compatibiltiy
+module, @file{streams_hpuxcompat.ko}, from the @dfn{STREAMS} Compatibility
+Modules, @file{strcompat}, package:
+
+@ftable @manref
+
+@item @b{get_sleep_lock}(9)
+Provide access to the global sleep lock.
+
 @item @b{streams_get_sleep_lock}(9)
-provide access to the global sleep lock
+Provide access to the global sleep lock.
+
+@item @b{streams_mpsleep}(9)
+Put a process to sleep.
+
 @item @b{streams_put}(9)
-invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
+Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
+
 @end ftable
+
 
 @node Configuration ala HP-UX 11.0i v2
 @subsection Configuration ala HP-UX 11.0i v2
 @cindex configuration ala hp-ux 11.0i v2
 
+Installation, registration and deregistration of @dfn{STREAMS} modules and
+drivers is one of the least standardized mechanisms across the various
+@dfn{STREAMS} implementations.  Each implementation has its own mechanism and
+@cite{HP-UX} is no different.  The following compatibility functions provide the
+@cite{HP-UX} specific @dfn{STREAMS} driver installation, registration and
+deregistration style:
+
+@ftable @manref
+
+@item @b{str_install}(9)
+Install a @cite{STREAMS} module or driver.
+
+@item @b{str_uninstall}(9)
+Uninstall a @cite{STREAMS} module or driver.
+
+@end ftable
+
 @page
 @node Porting from OSF/1 1.2/Digital UNIX
 @section Porting from OSF/1 1.2/Digital UNIX
 @cindex Porting from OSF/1 1.2/Digital UNIX
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{OSF/1} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{osfcompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{OSF/1} specific compatibility
+functions.
 
 @menu
 * Differences from OSF/1 1.2/Digial UNIX::
@@ -1018,40 +1601,63 @@ invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STRE
 @subsection Compatibility Functions for OSF/1 1.2/Digial UNIX
 @cindex compatibility functions for osf/1 1.2/digial unix
 
-@ftable @asis
+@ftable @manref
+
 @item @b{unweldq}(9)
 unweld two pairs of streams queues
+
 @item @b{weldq}(9)
 weld together two paris of streams queues
+
 @end ftable
 
-@ftable @asis
+@ftable @manref
+
 @item @b{lbolt}(9)
 time in ticks since reboot
+
 @item @b{puthere}(9)
 invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
+
 @item @b{streams_close_comm}(9)
 common minor device close utility
+
 @item @b{streams_open_comm}(9)
 common minor device open utility
+
 @item @b{streams_open_ocomm}(9)
 common minor device open utility
-@item @b{strmod_add}(9)
-add a @cite{STREAMS} module
-@item @b{strmod_del}(9)
-delete a @cite{STREAMS} module or driver from the kernel
+
 @item @b{time}(9)
 (undoc)
+
 @end ftable
 
 @node Configuration ala OSF/1 1.2/Digial UNIX
 @subsection Configuration ala OSF/1 1.2/Digial UNIX
 @cindex configuration ala osf/1 1.2/digial unix
 
+@ftable @manref
+
+@item @b{strmod_add}(9)
+add a @cite{STREAMS} module
+
+@item @b{strmod_del}(9)
+delete a @cite{STREAMS} module or driver from the kernel
+
+@end ftable
+
 @page
 @node Porting from UnixWare 7.1.3 (OpenUnix 8)
 @section Porting from UnixWare 7.1.3 (OpenUnix 8)
 @cindex Porting from UnixWare 7.1.3 (OpenUnix 8)
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{UnixWare} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{uw7compat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{UnixWare} specific compatibility
+functions.
 
 @menu
 * Differences from UnixWare 7.1.3 (OpenUnix 8)::
@@ -1075,32 +1681,45 @@ delete a @cite{STREAMS} module or driver from the kernel
 The following compatibility functions are in addition to all SVR 4.2
 compatibility functions.
 
-@ftable @asis
+@ftable @manref
+
 @end ftable
 
-@ftable @asis
+@ftable @manref
+
 @item @b{allocb_physreq}(9)
-allocate a @cite{STREAMS} message and data block
+Allocate a @cite{STREAMS} message and data block.
+
 @item @b{emajor}(9)
-get the external (real) majore device number from the device number
+Get the external (real) major device number from the device number.
+
 @item @b{eminor}(9)
-get the external extended minor device number from the device number
+Get the external extended minor device number from the device number.
+
 @item @b{etoimajor}(9)
-convert an external major device number to an internal major device number
+Convert an external major device number to an internal major device number.
+
 @item @b{getemajor}(9)
-get the external (real) majore device number
+Get the external (real) major device number.
+
 @item @b{geteminor}(9)
-get the external minor device number
+Get the external minor device number.
+
 @item @b{itoemajor}(9)
-convert an internal major device number to an external major device number
+Convert an internal major device number to an external major device number.
+
 @item @b{msgphysreq}(9)
-cause a message block to meet physical requirements
+Cause a message block to meet physical requirements.
+
 @item @b{msgpullup_physreq}(9)
-pull up bytes in a @cite{STREAMS} message
+Pull up bytes in a @cite{STREAMS} message.
+
 @item @b{msgscgth}(9)
 (undoc)
+
 @item @b{strioccall}(9)
 (undoc)
+
 @end ftable
 
 @node Configuration ala UnixWare 7.1.3 (OpenUnix 8)
@@ -1111,6 +1730,13 @@ pull up bytes in a @cite{STREAMS} message
 @node Porting from Solaris 9/SunOS 5.9
 @section Porting from Solaris 9/SunOS 5.9
 @cindex Porting from Solaris 9/SunOS 5.9
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{Solaris} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{suncompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{Solaris} specific compatibility
+functions.
 
 @menu
 * Differences from Solaris 9/SunOS 5.9::
@@ -1131,34 +1757,38 @@ pull up bytes in a @cite{STREAMS} message
 @subsection Compatibility Functions for Solaris 9/SunOS 5.9
 @cindex compatibility functions for solaris 9/sunos 5.9
 
-@ftable @asis
-@item @b{_fini}(9)
-@item @b{_info}(9)
-@item @b{_init}(9)
-@item @b{attach}(9)
-attach a device to the system or resume a suspended device
+@ftable @manref
+
 @item @b{ddi_create_minor_node}(9)
 create a minor node for this device
+
 @item @b{ddi_driver_major}(9)
 find the major device number associated with a driver
+
 @item @b{ddi_driver_name}(9)
 return normalized driver name
+
 @item @b{ddi_get_cred}(9)
 get a reference to the credentials of the current user
+
 @item @b{ddi_getiminor}(9)
 
 @item @b{ddi_get_instance}(9)
 get device instance number
+
 @item @b{ddi_get_lbolt}(9)
 get the current value of the system tick clock
+
 @item @b{ddi_get_pid}(9)
 
 @item @b{ddi_get_soft_state}(9)
 
 @item @b{ddi_get_time}(9)
 get the current time in seconds since the epoch
+
 @item @b{ddi_remove_minor_node}(9)
 remove a minor node for a device
+
 @item @b{ddi_removing_power}(9)
 
 @item @b{ddi_soft_state}(9)
@@ -1173,30 +1803,20 @@ remove a minor node for a device
 
 @item @b{ddi_umem_alloc}(9)
 allocate page aligned kernel memory
+
 @item @b{ddi_umem_free}(9)
 
-@item @b{detach}(9)
-detach a device from the system or suspend a device
-@item @b{getinfo}(9)
-
-@item @b{identify}(9)
-determine if a driver is associated with a device
-@item @b{install_driver}(9)
-install a device driver
-@item @b{mod_info}(9)
-provides information on a loadable kernel module to the @cite{STREAMS} executive
-@item @b{mod_install}(9)
-installs a loadable kernel module in the @cite{STREAMS} executive
-@item @b{mod_remove}(9)
-removes a loadable module from the @cite{STREAMS} executive
 @item @b{power}(9)
 power a device attached to the system
+
 @item @b{probe}(9)
 
 @item @b{qbufcall}(9)
 install a buffer callback
+
 @item @b{qtimeout}(9)
 start a timer associated with a queue
+
 @item @b{queclass}(9)
 
 @item @b{qunbufcall}(9)
@@ -1205,8 +1825,10 @@ start a timer associated with a queue
 
 @item @b{qwait}(9)
 wait for a queue message
+
 @item @b{qwait_sig}(9)
 wait for a queue message or signal
+
 @item @b{qwriter}(9)
 
 @end ftable
@@ -1215,10 +1837,50 @@ wait for a queue message or signal
 @subsection Configuration ala Solaris 9/SunOS 5.9
 @cindex configuration ala solaris 9/sunos 5.9
 
+@ftable @manref
+
+@item @b{_fini}(9)
+
+@item @b{_info}(9)
+
+@item @b{_init}(9)
+
+@item @b{attach}(9)
+attach a device to the system or resume a suspended device
+
+@item @b{detach}(9)
+detach a device from the system or suspend a device
+
+@item @b{getinfo}(9)
+
+@item @b{identify}(9)
+determine if a driver is associated with a device
+
+@item @b{install_driver}(9)
+install a device driver
+
+@item @b{mod_info}(9)
+provides information on a loadable kernel module to the @cite{STREAMS} executive
+
+@item @b{mod_install}(9)
+installs a loadable kernel module in the @cite{STREAMS} executive
+
+@item @b{mod_remove}(9)
+removes a loadable module from the @cite{STREAMS} executive
+
+@end ftable
+
 @page
 @node Porting from SUPER-UX
 @section Porting from SUPER-UX
 @cindex Porting from SUPER-UX
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{SUPER-UX} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{suxcompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{SUPER-UX} specific compatibility
+functions.
 
 @menu
 * Differences from SUPER-UX::
@@ -1239,9 +1901,11 @@ wait for a queue message or signal
 @subsection Compatibility Functions for SUPER-UX
 @cindex compatibility functions for super-ux
 
-@ftable @asis
+@ftable @manref
+
 @item @b{lbolt}(9)
 time in ticks since reboot
+
 @end ftable
 
 @node Configuration ala SUPER-UX
@@ -1252,6 +1916,13 @@ time in ticks since reboot
 @node Porting from UXP/V
 @section Porting from UXP/V
 @cindex Porting from UXP/V
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{UXP/V} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{uxpcompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{UXP/V} specific compatibility
+functions.
 
 @menu
 * Differences from UXP/V::
@@ -1281,6 +1952,13 @@ time in ticks since reboot
 @section Porting from Linux STREAMS (LiS) 2.18.4
 @cindex Porting from Linux STREAMS (LiS) 2.18.4
 
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{LiS} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{liscompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{LiS} specific compatibility
+functions.
+
 @menu
 * Differences from LiS 2.18.4::
 * Commonalities with LiS 2.18.4::
@@ -1288,121 +1966,507 @@ time in ticks since reboot
 * Configuration ala LiS 2.18.4::
 @end menu
 
+In general, @cite{LiS} @dfn{STREAMS} drivers and modules are easily portable to
+@cite{@value{PACKAGE_TITLE}}.  @dfn{STREAMS} drivers and modules, up until
+recently, were capable of running under both @cite{LiS} and
+@cite{@value{PACKAGE_TITLE}}.  For the most part, @dfn{STREAMS} driver and
+modules ported from @cite{LiS} to @cite{@value{PACKAGE_TITLE}} experience
+performance, conformance and bug-free operation on @cite{@value{PACKAGE_TILTE}}.
+Mechansims used to circumvent @cite{LiS} deficiencies, bugs and race conditions,
+are no longer necessary under @cite{@value{PACKAGE_TITLE}}.
+
 @node Differences from LiS 2.18.4
 @subsection Differences from LiS 2.18.4
 @cindex differences from lis 2.18.4
 
-The many manual pages included with the @command{streams} and @command{strcompat} packages describe
-areas where @cite{LiS} and @cite{Linux Fast-STREAMS} differ for specific DDI/DKI utilities and user
-interface functions, and also provide considerations for portability.
+The many manual pages included with the @command{streams} and
+@command{strcompat} packages describe areas where @cite{LiS} and @cite{Linux
+Fast-STREAMS} differ for specific DDI/DKI utilities and user interface
+functions, and also provide considerations for portability.
 
-The major difference between @cite{LiS} and @cite{Linux Fast-STREAMS} is bugs: @cite{LiS} is full of
-them.  @cite{LiS 2.18.4} fails about one-third of a thousand or so @cite{POSIX} conformance tests
-(and those test cases mostly test the Stream head).  @cite{Linux Fast-STREAMS} is certainly not
-bug-for-bug compatible with @cite{LiS}.
+The major difference between @cite{LiS} and @cite{Linux Fast-STREAMS} is bugs:
+@cite{LiS} is full of them.  @cite{LiS 2.18.4} fails about one-third of a
+thousand or so @cite{POSIX} conformance tests (and those test cases mostly test
+the Stream head).  @cite{Linux Fast-STREAMS} is certainly not bug-for-bug
+compatible with @cite{LiS}.
 
 Some significant differences are summarized as follows:
 
-@table @asis
-@item 32-bit over 64-bit Compatibility
-@cite{LiS} is largely incapable of 32-bit over 64-bit compatibility.  The primary impediment is the
-inability of @cite{LiS} to properly register 32-bit input-output controls with a 64-bit kernel.
-@cite{Linux Fast-STREAMS}, on the other hand, has tested 32-bit over 64-bit compatibility.  All
-test suites are run in 32-bit over 64-bit mode as well as native mode.
+@subsubsection 32-bit over 64-bit Compatibility
 
-@item Proper Handling of M_IOCDATA
-@cite{LiS} improperly waits for an M_IOCNAK after a failed M_COPYIN or M_COPYOUT operation.  All
-other STREAMS implementations (including @cite{Linux Fast-STREAMS}) expect the module or driver to
-abort the input-output control operation when the return value in the M_IOCDATA is non-zero.
+@cite{LiS} is largely incapable of 32-bit over 64-bit compatibility.  The
+primary impediment is the inability of @cite{LiS} to properly register 32-bit
+input-output controls with a 64-bit kernel.  @cite{Linux Fast-STREAMS}, on the
+other hand, has tested 32-bit over 64-bit compatibility.  All test suites are
+run in 32-bit over 64-bit mode as well as native mode.
 
-@item Proper Stream Head Handling
-@cite{LiS} has many bugs in the Stream head.  Also, @cite{LiS} takes a very narrow view of Stream
-head functionality.  A significant area where @cite{LiS} lacks functionality is in proper signal
-handling for controlling and non-controlling terminals.  Also, the @cite{LiS} Stream head is largely
-unsafe for use by threaded applications.  The @cite{Linux Fast-STREAMS} Stream head properly
-supports FIFOs, pipes, terminals, and sockets, properly signals process groups, handles process
-orphans, and normal UNIX job control (including signals).  @cite{LiS} does not handle polling
-correctly with regard to message bands.  @cite{Linux Fast-STREAMS} properly handles polling with
-regard to message bands, including extended POSIX signals with regard to poll.
+@cite{@value{PACKAGE_TITLE}} passes the model of the calling process to the
+queue open procedure (in the @var{oflags} argument).  It also passes the model
+of the calling process to the @dfn{STREAMS} driver or module in the
+@manpage{@b{M_IOCTL}(9)} message (in the @var{ioc_flag} member), permitting
+modules and drivers with the ability to invoke 32-bit implicit or explicit
+@manpage{@b{M_COPYIN}(9)} or @manpage{@b{M_COPYOUT}(9)} operations.
+See section @cite{32-bit Compatibility Input-Output Controls} on the
+@manref{@b{M_IOCTL}(9)} manual page for more information.
 
-@item bufcalls
-@cite{LiS} does not properly implement buffer callbacks.  @cite{LiS} sets a one second timer and
-invokes buffer callbacks upon timeout.  @cite{Linux Fast-STREAMS}, like @cite{SVR 4.2}, keeps track
-of buffers as they are allocated and freed and invokes a callback shortly after a buffer is freed.
-The result is that the buffer callback under @cite{Linux Fast-STREAMS} is always invoked from within
-the @dfn{STREAMS} scheduler context.  For @cite{LiS}, the buffer callback is invoked under timeout
-(bottom half, soft irq) context.
+@subsubsection Proper Handling of M_IOCDATA
 
-@item qprocson/qprocsoff
-@cite{LiS} does not have a workable mechanism for turning queue procedures on or off.
-@cite{Linux Fast-STREAMS} has a full MP-safe mechanism similar to @cite{SVR 4.2}.
+@cite{LiS} improperly waits for an @manpage{@b{M_IOCNAK}(9)} after a failed
+@manpage{@b{M_COPYIN}(9)} or @manpage{@b{M_COPYOUT}(9)} operation.  All other
+@dfn{STREAMS} implementations (including @cite{Linux Fast-STREAMS}) expect the
+module or driver to abort the input-output control operation when the return
+value in the @manpage{@b{M_IOCDATA}(9)} is non-zero.
 
-@item freezestr/unfreezestr
-@cite{LiS} does not have a workable mechanism for freezing a Stream.
-@cite{Linux Fast-STREAMS} has a full MP-safe mechanism similar to @cite{SVR 4.2}.
+@subsubsection Proper Stream Head Handling
 
-@item q->q_next
-@cite{LiS} has no mechanism for protecting derefencing of the q->q_next pointer from race
-conditions.  Pushing or popping a module to or from a Stream in the process or passsing message
-blocks can cause kernel crashes.  @cite{Linux Fast-STREAMS} has a full MP-safe mechanism for
-protecting q_next pointer derefencing (Stream head read locks) while within a queue put or service
-procedure, timeouts and buffer callbacks.  The full qprocson/qprocsoff mechanism under @cite{Linux
+@cite{LiS} has many bugs and races in the Stream head.  Also, @cite{LiS} takes a
+very narrow view of Stream head functionality.  A significant area where
+@cite{LiS} lacks functionality is in proper signal handling for controlling and
+non-controlling terminals.  Also, the @cite{LiS} Stream head is largely unsafe
+for use by threaded applications.  The @cite{Linux Fast-STREAMS} Stream head
+properly supports FIFOs, pipes, terminals, and sockets, properly signals process
+groups, handles process orphans, and normal @cite{UNIX} job control (including
+signals).  @cite{LiS} does not handle polling correctly with regard to message
+bands.  @cite{Linux Fast-STREAMS} properly handles polling with regard to
+message bands, including extended @cite{POSIX} signals with regard to poll.
+
+@cite{LiS} is constructed with an annoying write side Stream head behavior:
+messages written with @manpage{@b{write}(2s)} or @manpage{@b{putmsg}(2)} are
+queued to the Stream head write side queue and then processed from the Stream
+head write side queue service procedure.  This introduces one more level of
+write side buffering than is necessary.  @cite{@value{PACKAGE_TITLE}} directly
+calls the topmost module write side put procedure.  A Stream head write side
+service procedure is provided, not to pass messages, but to perform write side
+@manpage{@b{poll}(2s)} actions when back-enabled.
+
+@subsubsection Buffer Callbacks
+
+@cite{LiS} does not properly implement buffer callbacks.  @cite{LiS} sets a one
+second timer and invokes buffer callbacks upon timeout.  @cite{Linux
+Fast-STREAMS}, like @cite{SVR 4.2}, keeps track of buffers as they are allocated
+and freed and invokes a callback shortly after a buffer is freed.  The result is
+that the buffer callback under @cite{Linux Fast-STREAMS} is always invoked from
+within the @dfn{STREAMS} scheduler context.  For @cite{LiS}, the buffer callback
+is invoked under timeout (bottom half, soft irq) context.
+
+@subsubsection Queue Procedure On and Off
+
+@cite{LiS} does not have a workable mechanism for turning queue procedures on or
+off.  @cite{Linux Fast-STREAMS} has a full MP-safe mechanism similar to
+@cite{SVR 4.2 MP}.  @cite{SVR 4.2 MP} specifies that before the first call to
+@manpage{@b{qprocson}(9)}, messages flow around the module as though it did not
+exist in the Stream.  Also, that after the call to @manpage{@b{qprocsoff}(9)},
+messages flow around the module also.  @cite{LiS} does not ensure that this will
+happen and, in fact, will annoyingly discard messages that are put to the queue
+during this period.  @cite{@value{PACKAGE_TITLE}} performs half-insertion and
+half-deletion to permit message to flow around the module and properly protects
+agains @var{q_next} pointer dereferencing while performing half-insertions and
+deletions.
+
+@subsubsection Freezing and Unfreezing Streams
+
+@cite{LiS} does not have a fully functional mechanism for freezing a Stream.
+@cite{Linux Fast-STREAMS} has a full MP-safe mechanism similar to @cite{SVR
+4.2}. When a Stream is frozen with @manpage{@b{freezestr}(9)} it is necessary
+not only to suppress interrupts and take a write lock on the queue structure
+passed as the argument to the call, but to also prohibit other queue procedures
+from being invoked by threads other than the caller along the entire Stream.
+Under @cite{LiS}, @manpage{@b{freezestr}(9)} only protects the state of the
+queue named in the argument to the call.  Under @cite{@value{PACKAGE_TITLE}},
+the state of the entire Stream including queue (along with the Stream head)
+is protected by the call in accordance with @cite{SVR 4.2 MP} specifications.
+
+@subsubsection Queue Pointer Dereferencing
+
+@cite{LiS} has no mechanism for protecting derefencing of the @samp{q->q_next}
+pointer from race conditions.  Pushing or popping a module to or from a Stream
+in the process or passsing message blocks can cause kernel crashes.  @cite{Linux
+Fast-STREAMS} has a full MP-safe mechanism for protecting @var{q_next} pointer
+derefencing (Stream head read locks) while within a queue put or service
+procedure, timeouts and buffer callbacks.  The full
+@manpage{@b{qprocson}(9)}/@manpage{@b{qprocsoff}(9)} mechanism under @cite{Linux
 Fast-STREAMS} properly protects the queue open and close routines.
 
-@item Enhancements
-@cite{Linux Fast-STREAMS} provides a set of enhanced features not present in @cite{LiS} but present
-in other @dfn{STREAMS} implementations.  One important feature that @cite{LiS} lacks, that
-@cite{Linux Fast-STREAMS} provides, is a fully functional @manref{strlog(9)} capability.
-@end table
+@subsubsection Enhancements
+
+@cite{Linux Fast-STREAMS} provides a set of enhanced features not present in
+@cite{LiS} but present in other @dfn{STREAMS} implementations.  One important
+feature that @cite{LiS} lacks, that @cite{Linux Fast-STREAMS} provides, is a
+fully functional @manref{strlog(9)} capability.
 
 @node Commonalities with LiS 2.18.4
 @subsection Commonalities with LiS 2.18.4
 @cindex commonalities with lis 2.18.4
 
-For the most part, where @cite{LiS} properly follows @cite{SVR 4} behavior and @cite{SVR 4}
-behavior is consistent with @cite{SVR 4.2} behavior, @cite{Linux Fast-STREAMS} behaves the same as
-@cite{LiS}.
+For the most part, where @cite{LiS} properly follows @cite{SVR 4} behavior and
+@cite{SVR 4} behavior is consistent with @cite{SVR 4.2} behavior, @cite{Linux
+Fast-STREAMS} is compatible with @cite{LiS}.
 
 @node Compatibility Functions for LiS 2.18.4
 @subsection Compatibility Functions for LiS 2.18.4
 @cindex compatibility functions for lis 2.18.4
 
-@ftable @asis
+@ftable @manref
+
 @item @b{lis_appq}(9)
-append one @cite{STREAMS} message after another
+Append one @cite{STREAMS} message after another.
+
 @item @b{lis_date}(9)
+Return the date of LiS.
+
 @item @b{lis_esbbcall}(9)
-install a buffer callback for an extended @cite{STREAMS} message block
+Install a buffer callback for an extended @cite{STREAMS} message block.
+
 @item @b{lis_find_strdev}(9)
+
 @item @b{lis_mknod}(9)
-make block or character special files
+Make block or character special files.
+
 @item @b{lis_mount}(9)
-mount a file system
+Mount a file system.
+
 @item @b{lis_OTHER}(9)
-return the other queue of a @cite{STREAMS} queue pair
-@item @b{lis_register_strdev}(9)
-register a @cite{STREAMS} device
-@item @b{lis_register_strmod}(9)
-register a @cite{STREAMS} module
+Return the other queue of a @cite{STREAMS} queue pair.
+
 @item @b{lis_umount2}(9)
-unmount a file system
+Unmount a file system.
+
 @item @b{lis_umount}(9)
-unmount a file system
+Unmount a file system.
+
 @item @b{lis_unlink}(9)
-remove a file
-@item @b{lis_unregister_strdev}(9)
-unregister a @cite{STREAMS} device
-@item @b{lis_unregsiter_strmod}(9)
-unregister a @cite{STREAMS} module
+Remove a file.
+
 @item @b{lis_version}(9)
+Return the version of LiS.
 
 @item @b{lis_xmsgsize}(9)
-calculate the size of message blocks in a @cite{STREAMS} message
+Calculate the size of message blocks in a @cite{STREAMS} message.
+
 @end ftable
 
 @node Configuration ala LiS 2.18.4
 @subsection Configuration ala LiS 2.18.4
 @cindex configuration ala lis 2.18.4
+
+@ftable @manref
+
+@item @b{lis_register_strdev}(9)
+register a @cite{STREAMS} device
+
+@item @b{lis_register_strmod}(9)
+register a @cite{STREAMS} module
+
+@item @b{lis_unregister_strdev}(9)
+unregister a @cite{STREAMS} device
+
+@item @b{lis_unregsiter_strmod}(9)
+unregister a @cite{STREAMS} module
+
+@end ftable
+
+@page
+@node Porting from Mac Open Transport
+@section Porting from Mac Open Transport
+@cindex Porting from Mac Open Transport
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{Mac Open Transport} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{maccompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{Mac Open Transport} specific compatibility
+functions.
+
+@menu
+* Differences from Mac Open Transport::
+* Commonalities with Mac Open Transport::
+* Compatibility Functions for Mac Open Transport::
+* Configuration ala Mac Open Transport::
+@end menu
+
+@node Differences from Mac Open Transport
+@subsection Differences from Mac Open Transport
+@cindex differences from mac open transport
+
+@node Commonalities with Mac Open Transport
+@subsection Commonalities with Mac Open Transport
+@cindex commonalities with mac open transport
+
+@node Compatibility Functions for Mac Open Transport
+@subsection Compatibility Functions for Mac Open Transport
+@cindex compatibility functions for mac open transport
+
+@node Configuration ala Mac Open Transport
+@subsection Configuration ala Mac Open Transport
+@cindex configuration ala mac open transport
+
+@page
+@node Porting from Mentat Portable STREAMS
+@section Porting from Mentat Portable STREAMS
+@cindex Porting from Mentat Portable STREAMS
+
+Detailed portability information for porting @dfn{STREAMS} modules and drivers
+from @cite{Mentat Portable STREAMS} to @cite{@value{PACKAGE_TITLE}} is contained the the
+@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
+@manref{@b{mpscompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
+Modules} package also provides some @cite{Mentat Portable STREAMS} specific compatibility
+functions.
+
+@menu
+* Differences from Mentat Portable STREAMS::
+* Commonalities with Mentat Portable STREAMS::
+* Compatibility Functions for Mentat Portable STREAMS::
+* Configuration ala Mentat Portable STREAMS::
+@end menu
+
+@node Differences from Mentat Portable STREAMS
+@subsection Differences from Mentat Portable STREAMS
+@cindex differences from mentat portable streams
+
+@node Commonalities with Mentat Portable STREAMS
+@subsection Commonalities with Mentat Portable STREAMS
+@cindex commonalities with mentat portable streams
+
+@node Compatibility Functions for Mentat Portable STREAMS
+@subsection Compatibility Functions for Mentat Portable STREAMS
+@cindex compatibility functions for mentat portable streams
+
+@ftable @manref
+
+@item @b{mi_alloc}(9)
+Allocate and free kernel memory without later regard to size.
+
+@item @b{mi_allocq}(9)
+@manpage{@b{allocq}(9)} replacement.
+
+@item @b{mi_alloc_sleep}(9)
+@manpage{@b{kmem_alloc}(9)} replacement.
+
+@item @b{mi_attach}(9)
+Associate instance data with a @dfn{STREAMS} queue.
+
+@item @b{mi_bcmp}(9)
+@manpage{@b{bcmp}(9)} replacement.
+
+@item @b{mi_bufcall}(9)
+Reliable alternative to @manpage{@b{bufcall}(9)}.
+
+@item @b{mi_close_comm}(9)
+@dfn{STREAMS} common minor device close utility.
+
+@item @b{mi_close_detached}(9)
+Release instance data from the @dfn{STREAMS} queue and perform close cleanup.
+
+@item @b{mi_close_free}(9)
+Free a @dfn{STREAMS} driver or module instance on close.
+
+@item @b{mi_copy_done}(9)
+@manpage{@b{ioctl}(2s)} complete.
+
+@item @b{mi_copyin}(9)
+Copy data to a user buffer.
+
+@item @b{mi_copyin_n}(9)
+Copy data to a user buffer.
+
+@item @b{mi_copyout}(9)
+Copy data from a user buffer.
+
+@item @b{mi_copyout_alloc}(9)
+Allocate a buffer to be copied out using @manpage{@b{mi_copyout}(9)}.
+
+@item @b{mi_copy_set_rval}(9)
+Set return value for input-output control.
+
+@item @b{mi_copy_state}(9)
+Current state of the input-output control process.
+
+@item @b{mi_detach}(9)
+Disassociate instance data from the @dfn{STREAMS} queue.
+
+@item @b{mi_first_dev_ptr}(9)
+Obtain first device instance pointer.
+
+@item @b{mi_first_ptr}(9)
+Obtain first instance pointer.
+
+@item @b{mi_free}(9)
+@manpage{@b{kmem_free}(9)} replacement.
+
+@item @b{mi_freeq}(9)
+@manpage{@b{freeq}(9)} replacement.
+
+@item @b{mi_mpprintf}(9)
+Print a formatted string to a message buffer.
+
+@item @b{mi_mpprintf_nr}(9)
+Continue to print a formatted string to a message buffer.
+
+@item @b{mi_next_dev_ptr}(9)
+Obtain next device instance pointer.
+
+@item @b{mi_next_ptr}(9)
+@dfn{STREAMS} minor device list traversal.
+
+@item @b{mi_offset_param}(9)
+Obtain parameter location within @dfn{STREAMS} message block.
+
+@item @b{mi_offset_paramc}(9)
+Obtain parameter location within @dfn{STREAMS} message block chain.
+
+@item @b{mi_open_alloc}(9)
+Allocate a @dfn{STREAMS} module or driver instance.
+
+@item @b{mi_open_alloc_sleep}(9)
+Allocate a @dfn{STREAMS} module or driver instance (may sleep).
+
+@item @b{mi_open_comm}(9)
+@dfn{STREAMS} common minor device open utility.
+
+@item @b{mi_open_detached}(9)
+@dfn{STREAMS} create detached instance data.
+
+@item @b{mi_open_link}(9)
+Link a @dfn{STREAMS} driver or module instance on open.
+
+@item @b{mi_prev_ptr}(9)
+@dfn{STREAMS} minor list traversal.
+
+@item @b{mi_timer_q_switch}(9)
+Switch @dfn{STREAMS} queues for a timer message.
+
+@item @b{mi_reallocb}(9)
+Reallocated a @dfn{STREAMS} message block.
+
+@item @b{mi_reuse_proto}(9)
+Reuse a @dfn{STREAMS} protocol message block.
+
+@item @b{mi_set_sth_copyopt}(9)
+Set the @dfn{STREAMS} Stream head copy options.
+
+@item @b{mi_set_sth_hiwat}(9)
+Set the @dfn{STREAMS} Stream head high water mark.
+
+@item @b{mi_set_sth_lowat}(9)
+Set the @dfn{STREAMS} Stream head low water mark.
+
+@item @b{mi_set_sth_maxblk}(9)
+Set the @dfn{STREAMS} Stream head maximum block size.
+
+@item @b{mi_set_sth_wroff}(9)
+Set the @dfn{STREAMS} Stream head write offset.
+
+@item @b{mi_sprintf}(9)
+@manpage{@b{sprintf}(9)} replacement.
+
+@item @b{mi_sprintf_putc}(9)
+Put a character in a sprintf buffer.
+
+@item @b{mi_strcmp}(9)
+@manpage{@b{strcmp}(9)} replacement.
+
+@item @b{mi_strlen}(9)
+@manpage{@b{strlen}(9)} replacement.
+
+@item @b{mi_strlog}(9)
+@manpage{@b{strlog}(9)} replacement.
+
+@item @b{mi_strtol}(9)
+@manpage{@b{strtol}(9)} replacement.
+
+@item @b{mi_timer}(9)
+Process a @dfn{STREAMS} timer.
+
+@item @b{mi_timer_alloc}(9)
+Allocate a @dfn{STREAMS} timer.
+
+@item @b{mi_timer_cancel}(9)
+Cancel a @dfn{STREAMS} timer.
+
+@item @b{mi_timer_free}(9)
+Free a @dfn{STREAMS} timer.
+
+@item @b{mi_timer_move}(9)
+Move a @dfn{STREAMS} timer.
+
+@item @b{mi_timer_q_switch}(9)
+Switch queues for a @dfn{STREAMS} timer.
+
+@item @b{mi_timer_stop}(9)
+Stop a @dfn{STREAMS} timer.
+
+@item @b{mi_timer_valid}(9)
+Check a @dfn{STREAMS} timer.
+
+@item @b{mi_zalloc}(9)
+@manpage{@b{kmem_zalloc}(9)} replacement.
+
+@item @b{mi_zalloc_sleep}(9)
+@manpage{@b{kmem_zalloc}(9)} replacement.
+
+@end ftable
+
+@ftable @manref
+
+@item @b{mi_tpi_ack_alloc}(9)
+Allocate a @manpage{@b{T_OK_ACK}(7)} or @manpage{@b{T_ERROR_ACK}(7)} primitive.
+
+@item @b{mi_tpi_conn_con}(9)
+Generate a @manpage{@b{T_CONN_CON}(7)} primitive.
+
+@item @b{mi_tpi_conn_ind}(9)
+Generate a @manpage{@b{T_CONN_IND}(7)} primitive.
+
+@item @b{mi_tpi_conn_req}(9)
+Generate a @manpage{@b{T_CONN_REQ}(7)} primitive.
+
+@item @b{mi_tpi_data_ind}(9)
+Generate a @manpage{@b{T_DATA_IND}(7)} primitive.
+
+@item @b{mi_tpi_data_req}(9)
+Generate a @manpage{@b{T_DATA_REQ}(7)} primitive.
+
+@item @b{mi_tpi_discon_ind}(9)
+Generate a @manpage{@b{T_DISCON_IND}(7)} primitive.
+
+@item @b{mi_tpi_discon_req}(9)
+Generate a @manpage{@b{T_DISCON_REQ}(7)} primitive.
+
+@item @b{mi_tpi_err_ack_alloc}(9)
+Generate a @manpage{@b{T_ERROR_ACK}(7)} primitive.
+
+@item @b{mi_tpi_exdata_ind}(9)
+Generate a @manpage{@b{T_EXDATA_IND}(7)} primitive.
+
+@item @b{mi_tpi_exdata_req}(9)
+Generate a @manpage{@b{T_EXDATA_REQ}(7)} primitive.
+
+@item @b{mi_tpi_info_req}(9)
+Generate a @manpage{@b{T_INFO_REQ}(7)} primitive.
+
+@item @b{mi_tpi_ok_ack_alloc}(9)
+Generate a @manpage{@b{T_OK_ACK}(7)} primitive.
+
+@item @b{mi_tpi_ordrel_ind}(9)
+Generate a @manpage{@b{T_ORDREL_IND}(7)} primitive.
+
+@item @b{mi_tpi_ordrel_req}(9)
+Generate a @manpage{@b{T_ORDREL_REQ}(7)} primitive.
+
+@item @b{mi_tpi_uderror_ind}(9)
+Generate a @manpage{@b{T_UDERROR_IND}(7)} primitive.
+
+@item @b{mi_tpi_unitdata_ind}(9)
+Generate a @manpage{@b{T_UNITDATA_IND}(7)} primitive.
+
+@item @b{mi_tpi_unitdata_req}(9)
+Generate a @manpage{@b{T_UNITDATA_REQ}(7)} primitive.
+
+@end ftable
+
+@node Configuration ala Mentat Portable STREAMS
+@subsection Configuration ala Mentat Portable STREAMS
+@cindex configuration ala mentat portable streams
 
 @node Development
 @chapter Development
@@ -1730,15 +2794,20 @@ device number can exists with no corresponding external device number (accessed
 only via a clone device or direct access to the mounted @file{specfs} shadow
 special character device filesystem).
 
-@ftable @asis
+@ftable @manref
+
 @item @b{etoimajor}(9)
 change external to internal major device number
+
 @item @b{getemajor}(9)
 get external major device number
+
 @item @b{geteminor}(9)
 get external minor device number
+
 @item @b{itoemajor}(9)
 change internal to external major device number
+
 @end ftable
 
 @node Copying
