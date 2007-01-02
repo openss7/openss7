@@ -674,7 +674,7 @@ Traditionally, @cite{SVR 4} provided some DDI/DKI (Device Driver Interface/Drive
 functions for use by device drivers, including @dfn{STREAMS} device drivers.  Many of these function
 have survived into kernel/driver interfaces today in one form or another.  Some implementations
 (particularly @cite{Solaris@registeredsymbol{}}) provide a wide array of additional DDI/DKI functions.
-Additional functions are supported by compatibility modules, and the base @cite{SVR 4} functions are
+Additional functions are supported by Compatibility Modules, and the base @cite{SVR 4} functions are
 provided by the base @cite{@value{PACKAGE_TITLE}} package.
 
 @ftable @manref
@@ -933,7 +933,7 @@ other portability sections, please see that section.
 For the most part, porting from @cite{SVR 3.2} to @cite{@value{PACKAGE_TITLE}}
 is not much different than porting forward from @cite{SVR 3.2} to @cite{SVR 4.2
 MP}.  If you wish to be able to access some backwards compatible @cite{SVR 3.2}
-functions, use the @cite{SVR 3} compatibility module from the @file{strcompat}
+functions, use the @cite{SVR 3} Compatibility Module from the @file{strcompat}
 package.
 
 Therefore, it is recommmended that @dfn{STREAMS} modules and drivers for
@@ -1023,15 +1023,9 @@ other portability sections, please see that section.
 @cite{@value{PACKAGE_TITLE}} has very few differences from @cite{SVR 4.2 MP}.
 Not all @cite{SVR 4.2 MP} functions are implemented in the base
 @cite{@value{PACKAGE_TITLE}} kernel modules.  Some functions are included in the
-@cite{SVR 4.2 MP} compatibility module (@file{streams_svr4compat.ko}) from the
+@cite{SVR 4.2 MP} Compatibility Module (@file{streams_svr4compat.ko}) from the
 @file{strcompat} package.
 
-@menu
-* Priority Levels::
-* Basic Locks::
-@end menu
-
-@node Priority Levels
 @subsubsection Priority Levels
 @cindex priority levels
 
@@ -1081,10 +1075,6 @@ This priority level exists in all kernels.
 
 @end enumerate
 
-@node Basic Locks
-@subsubsection Basic Locks
-@cindex basic locks
-
 @node Commonalities with SVR 4.2 MP
 @subsection Commonalities with SVR 4.2 MP
 @cindex commonalities with svr 4.2 mp
@@ -1095,74 +1085,88 @@ This priority level exists in all kernels.
 
 @subsubsection STREAMS Locks
 
+@dfn{STREAMS} locks are those that are mentioned in the @cite{SVR 4 Programmer's Guide -- STREAMS}.
+These locks lock a queue or Stream head for exclusive access.  @cite{@value{PACKAGE_TITLE}}
+implements queue and Stream head locks as read-write locks, so these locks translate to taking a
+write lock on the queue or Stream head.
+These locks are not normally used by @dfn{STREAMS} modules and drivers and are therefore left in the
+@cite{SVR 4.2 MP} Compatibility Module, @file{streams_svr4compat.ko}, from the @dfn{STREAMS}
+Compatibility Modules package, @file{strcompat}.
+
 @ftable @manref
 
 @item @b{MPSTR_QLOCK}(9)
-release a queue from exclusive access
+Release a queue from exclusive access.
 
 @item @b{MPSTR_QRELE}(9)
-acquire a queue for exclusive access
+Acquire a queue for exclusive access.
 
 @item @b{MPSTR_STPLOCK}(9)
-acquire a stream head for exclusive access
+Acquire a stream head for exclusive access.
 
 @item @b{MPSTR_STPRELE}(9)
-release a stream head from exclusive access
+Release a stream head from exclusive access.
 
 @end ftable
 
 @subsubsection Basic Locks
 
-Basic locks are similar to @cite{Linux} spin locks.
+Basic locks are similar to @cite{Linux} spin locks and can be used as an ABI replacement for
+@cite{Linux} spin locks.
+It is rather typical for @cite{OpenSS7 Project} @dfn{STREAMS} modules and drivers to use
+@cite{Linux} spin locks directly instead of via these functions.  Therefore these locks are left in
+the @cite{SVR 4.2 MP} Compatibility Module, @file{streams_svr4compat.ko}, from the @dfn{STREAMS}
+Compatibility Modules package, @file{strcompat}.
 
 @ftable @manref
 
 @item @b{LOCK}(9)
-lock a basic lock
+Lock a basic lock.
 
 @item @b{LOCK_ALLOC}(9)
-allocate a basic lock
+Allocate a basic lock.
 
 @item @b{LOCK_DEALLOC}(9)
-deallocate a basic lock
+Deallocate a basic lock.
 
 @item @b{LOCK_OWNED}(9)
-determine whether a basic lock is head by the caller
+Determine whether a basic lock is head by the caller.
 
 @item @b{TRYLOCK}(9)
-try to lock a basic lock
+Try to lock a basic lock.
 
 @item @b{UNLOCK}(9)
-unlock a basic lock
+Unlock a basic lock.
 
 @end ftable
 
 @subsubsection Read-Write Locks
 
-Read-write locks are similar to @cite{Linux} read-write locks.
+Read-write locks are similar to @cite{Linux} read-write locks and can be used as an ABI replacement
+for @cite{Linux} read-write locks.
 
 @ftable @manref
 
 @item @b{RW_ALLOC}(9)
-allocate and initialize a read/write lock
+Allocate and initialize a read/write lock.
 
 @item @b{RW_DEALLOC}(9)
-deallocate a read/write lock
+Deallocate a read/write lock.
 
 @item @b{RW_RDLOCK}(9)
-acquire a read/write lock in read mode
+Acquire a read/write lock in read mode.
 
 @item @b{RW_TRYRDLOCK}(9)
-attempt to acquire a read/write lock in read mode
+Attempt to acquire a read/write lock in read mode.
 
 @item @b{RW_TRYWRLOCK}(9)
-attempt to acquire a read/write lock in write mode
+Attempt to acquire a read/write lock in write mode.
 
 @item @b{RW_UNLOCK}(9)
-release a read/write lock
+Release a read/write lock.
 
 @item @b{RW_WRLOCK}(9)
-acquire a read/write lock in write mode
+Acquire a read/write lock in write mode.
 
 @end ftable
 
@@ -1173,28 +1177,28 @@ Sleep locks are similar to @cite{Linux} semaphores or mutexes.
 @ftable @manref
 
 @item @b{SLEEP_ALLOC}(9)
-allocate a sleep lock
+Allocate a sleep lock.
 
 @item @b{SLEEP_DEALLOC}(9)
-deallocate a sleep lock
+Deallocate a sleep lock.
 
 @item @b{SLEEP_LOCK}(9)
-acquire a sleep lock
+Acquire a sleep lock.
 
 @item @b{SLEEP_LOCKAVAIL}(9)
-determine whether a sleep lock is available
+Determine whether a sleep lock is available.
 
 @item @b{SLEEP_LOCKOWNED}(9)
-determine whether a sleep lock is held by the caller
+Determine whether a sleep lock is held by the caller.
 
 @item @b{SLEEP_LOCK_SIG}(9)
-acquire a sleep lock
+Acquire a sleep lock.
 
 @item @b{SLEEP_TRYLOCK}(9)
-attempt to acquire a sleep lock
+Attempt to acquire a sleep lock.
 
 @item @b{SLEEP_UNLOCK}(9)
-release a sleep lock
+Release a sleep lock.
 
 @end ftable
 
@@ -1205,22 +1209,22 @@ Synchronization variables are similar to @cite{Linux} wait queues.
 @ftable @manref
 
 @item @b{SV_ALLOC}(9)
-allocate a basic condition variable
+Allocate a basic condition variable.
 
 @item @b{SV_BROADCAST}(9)
-broadcast a basic condition variable
+Broadcast a basic condition variable.
 
 @item @b{SV_DEALLOC}(9)
-deallocate a basic condition variable
+Deallocate a basic condition variable.
 
 @item @b{SV_SIGNAL}(9)
-signal a basic condition variable
+Signal a basic condition variable.
 
 @item @b{SV_WAIT}(9)
-wait on a basic condition variable
+Wait on a basic condition variable.
 
 @item @b{SV_WAIT_SIG}(9)
-interruptible wait on a basic condition variable
+Interruptible wait on a basic condition variable.
 
 @end ftable
 
@@ -1231,31 +1235,31 @@ Atomic Integers are similar to @cite{Linux} atomic integers.
 @ftable @manref
 
 @item @b{ATOMIC_INT_ADD}(9)
-add an integer value to an atomic integer
+Add an integer value to an atomic integer.
 
 @item @b{ATOMIC_INT_ALLOC}(9)
-allocate and initalize an atomic integer
+Allocate and initalize an atomic integer.
 
 @item @b{ATOMIC_INT_DEALLOC}(9)
-deallocate an atomic integer
+Deallocate an atomic integer.
 
 @item @b{ATOMIC_INT_DECR}(9)
-decrement and test an atomic integer
+Decrement and test an atomic integer.
 
 @item @b{ATOMIC_INT_INCR}(9)
-increment an atomic integer
+Increment an atomic integer.
 
 @item @b{ATOMIC_INT_INIT}(9)
-initialize an atomic integer
+Initialize an atomic integer.
 
 @item @b{ATOMIC_INT_READ}(9)
-read an atomic integer
+Read an atomic integer.
 
 @item @b{ATOMIC_INT_SUB}(9)
-subtract and integer value from an atomic integer
+Subtract and integer value from an atomic integer.
 
 @item @b{ATOMIC_INT_WRITE}(9)
-write an integer value to an atomic integer
+Write an integer value to an atomic integer.
 
 @end ftable
 
@@ -1266,34 +1270,34 @@ Processor levels are similar to @cite{Linux} local irq or soft irq suppression.
 @ftable @manref
 
 @item @b{spl0}(9)
-set priority level 0
+Set priority level 0.
 
 @item @b{spl1}(9)
-set priority level 1
+Set priority level 1.
 
 @item @b{spl2}(9)
-set priority level 2
+Set priority level 2.
 
 @item @b{spl3}(9)
-set priority level 3
+Set priority level 3.
 
 @item @b{spl4}(9)
-set priority level 4
+Set priority level 4.
 
 @item @b{spl5}(9)
-set priority level 5
+Set priority level 5.
 
 @item @b{spl6}(9)
-set priority level 6
+Set priority level 6.
 
 @item @b{spl7}(9)
-set priority level 7
+Set priority level 7.
 
 @item @b{spl}(9)
-set priority level
+Set priority level.
 
 @item @b{splx}(9)
-set priority level x
+Set priority level x.
 
 @end ftable
 
@@ -1302,28 +1306,28 @@ set priority level x
 @ftable @manref
 
 @item @b{itimeout}(9)
-perform a timeout at an interrupt level
+Perform a timeout at an interrupt level.
 
 @item @b{lbolt}(9)
-time in ticks since reboot
+Time in ticks since reboot.
 
 @item @b{major}(9)
-get the internal major number of a device
+Get the internal major number of a device.
 
 @item @b{makedev}(9)
-make a device number from internal major and minor device numbers
+Make a device number from internal major and minor device numbers.
 
 @item @b{minor}(9)
-get the internal minor number of a device
+Get the internal minor number of a device.
 
 @item @b{sleep}(9)
-put a process to sleep
+Put a process to sleep.
 
 @item @b{vtop}(9)
-convert virtual to physical address
+Convert virtual to physical address.
 
 @item @b{wakeup}(9)
-wake a process
+Wake a process.
 
 @end ftable
 
@@ -1346,7 +1350,7 @@ functions.
 Most of the @dfn{STREAMS} functions and DDI/DKI functions provided by
 @cite{AIX@registeredsymbol{}} are also provided by the
 @cite{@value{PACKAGE_TITLE}} base package.  Some utilities, however, are
-provided by the @cite{AIX} compatibility module (@file{streams_aixcompat.ko})
+provided by the @cite{AIX} Compatibility Module (@file{streams_aixcompat.ko})
 from the @dfn{STREAMS} Compatibility Module package (@file{strcompat}).
 
 @menu
@@ -1433,8 +1437,8 @@ The following functions are unique to @cite{AIX}:
 In particular, the @manpage{@b{wantio}(9)} and @manpage{@b{wantmsg}(9)}
 facilities are incredibly convoluted and complex and only documented by
 @cite{AIX}.  Although @cite{@value{PACKAGE_TITLE}} implements these functions
-(in the @cite{AIX} compatibility module, @file{streams_aixcompat.ko}, from the
-@dfn{STREAMS} compatibility module package, @file{strcompat}) as faithfully as
+(in the @cite{AIX} Compatibility Module, @file{streams_aixcompat.ko}, from the
+@dfn{STREAMS} Compatibility Module package, @file{strcompat}) as faithfully as
 possible, their use should be completely avoided by portable programs.
 
 @ftable @manref
@@ -1459,8 +1463,8 @@ Each implementation has a different mechanism for registeration and
 deregistration of @dfn{STREAMS} modules and drivers.  This is the mechanism
 used by @cite{AIX}.  It should be avoided by programs that are not being ported
 from @cite{AIX}.  @cite{AIX}-style @dfn{STREAMS} registration and deregistration
-is implemented in the @cite{AIX} compatibility module,
-@file{streams_aixcompat.ko}, from the @dfn{STREAMS} compatibility module package,
+is implemented in the @cite{AIX} Compatibility Module,
+@file{streams_aixcompat.ko}, from the @dfn{STREAMS} Compatibility Module package,
 @file{strcompat}.
 
 @end ftable
@@ -1604,29 +1608,29 @@ functions.
 @ftable @manref
 
 @item @b{unweldq}(9)
-unweld two pairs of streams queues
+Unweld two pairs of streams queues.
 
 @item @b{weldq}(9)
-weld together two paris of streams queues
+Weld together two paris of streams queues.
 
 @end ftable
 
 @ftable @manref
 
 @item @b{lbolt}(9)
-time in ticks since reboot
+Time in ticks since reboot.
 
 @item @b{puthere}(9)
-invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
+Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
 
 @item @b{streams_close_comm}(9)
-common minor device close utility
+Common minor device close utility.
 
 @item @b{streams_open_comm}(9)
-common minor device open utility
+Common minor device open utility.
 
 @item @b{streams_open_ocomm}(9)
-common minor device open utility
+Common minor device open utility.
 
 @item @b{time}(9)
 (undoc)
@@ -1640,10 +1644,10 @@ common minor device open utility
 @ftable @manref
 
 @item @b{strmod_add}(9)
-add a @cite{STREAMS} module
+Add a @cite{STREAMS} module.
 
 @item @b{strmod_del}(9)
-delete a @cite{STREAMS} module or driver from the kernel
+Delete a @cite{STREAMS} module or driver from the kernel.
 
 @end ftable
 
@@ -1760,34 +1764,34 @@ functions.
 @ftable @manref
 
 @item @b{ddi_create_minor_node}(9)
-create a minor node for this device
+Create a minor node for this device.
 
 @item @b{ddi_driver_major}(9)
-find the major device number associated with a driver
+Find the major device number associated with a driver.
 
 @item @b{ddi_driver_name}(9)
-return normalized driver name
+Return normalized driver name.
 
 @item @b{ddi_get_cred}(9)
-get a reference to the credentials of the current user
+Get a reference to the credentials of the current user.
 
 @item @b{ddi_getiminor}(9)
 
 @item @b{ddi_get_instance}(9)
-get device instance number
+Get device instance number.
 
 @item @b{ddi_get_lbolt}(9)
-get the current value of the system tick clock
+Get the current value of the system tick clock.
 
 @item @b{ddi_get_pid}(9)
 
 @item @b{ddi_get_soft_state}(9)
 
 @item @b{ddi_get_time}(9)
-get the current time in seconds since the epoch
+Get the current time in seconds since the epoch.
 
 @item @b{ddi_remove_minor_node}(9)
-remove a minor node for a device
+Remove a minor node for a device.
 
 @item @b{ddi_removing_power}(9)
 
@@ -1802,20 +1806,20 @@ remove a minor node for a device
 @item @b{ddi_soft_state_zalloc}(9)
 
 @item @b{ddi_umem_alloc}(9)
-allocate page aligned kernel memory
+Allocate page aligned kernel memory.
 
 @item @b{ddi_umem_free}(9)
 
 @item @b{power}(9)
-power a device attached to the system
+Power a device attached to the system.
 
 @item @b{probe}(9)
 
 @item @b{qbufcall}(9)
-install a buffer callback
+Install a buffer callback.
 
 @item @b{qtimeout}(9)
-start a timer associated with a queue
+Start a timer associated with a queue.
 
 @item @b{queclass}(9)
 
@@ -1824,10 +1828,10 @@ start a timer associated with a queue
 @item @b{quntimeout}(9)
 
 @item @b{qwait}(9)
-wait for a queue message
+Wait for a queue message.
 
 @item @b{qwait_sig}(9)
-wait for a queue message or signal
+Wait for a queue message or signal.
 
 @item @b{qwriter}(9)
 
@@ -1846,27 +1850,27 @@ wait for a queue message or signal
 @item @b{_init}(9)
 
 @item @b{attach}(9)
-attach a device to the system or resume a suspended device
+Attach a device to the system or resume a suspended device.
 
 @item @b{detach}(9)
-detach a device from the system or suspend a device
+Detach a device from the system or suspend a device.
 
 @item @b{getinfo}(9)
 
 @item @b{identify}(9)
-determine if a driver is associated with a device
+Determine if a driver is associated with a device.
 
 @item @b{install_driver}(9)
-install a device driver
+Install a device driver.
 
 @item @b{mod_info}(9)
-provides information on a loadable kernel module to the @cite{STREAMS} executive
+Provides information on a loadable kernel module to the @cite{STREAMS} executive.
 
 @item @b{mod_install}(9)
-installs a loadable kernel module in the @cite{STREAMS} executive
+Installs a loadable kernel module in the @cite{STREAMS} executive.
 
 @item @b{mod_remove}(9)
-removes a loadable module from the @cite{STREAMS} executive
+Removes a loadable module from the @cite{STREAMS} executive.
 
 @end ftable
 
@@ -1904,7 +1908,7 @@ functions.
 @ftable @manref
 
 @item @b{lbolt}(9)
-time in ticks since reboot
+Time in ticks since reboot.
 
 @end ftable
 
@@ -2152,16 +2156,16 @@ Calculate the size of message blocks in a @cite{STREAMS} message.
 @ftable @manref
 
 @item @b{lis_register_strdev}(9)
-register a @cite{STREAMS} device
+Register a @cite{STREAMS} device.
 
 @item @b{lis_register_strmod}(9)
-register a @cite{STREAMS} module
+Register a @cite{STREAMS} module.
 
 @item @b{lis_unregister_strdev}(9)
-unregister a @cite{STREAMS} device
+Unregister a @cite{STREAMS} device.
 
 @item @b{lis_unregsiter_strmod}(9)
-unregister a @cite{STREAMS} module
+Unregister a @cite{STREAMS} module.
 
 @end ftable
 
