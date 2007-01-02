@@ -380,8 +380,2167 @@ These are NPI manual pages.
 
 @end ignore
 
-@ignore
+@subsection Header Files
 
+@cite{@value{PACKAGE_TITLE}} installs the following header files in the
+@file{/usr/include/@value{PACKAGE}/} subdirectory:
+
+@table @file
+
+@item sys/strcompat/config.h
+Contains configuration defines for the @file{strcompat} package.
+
+@item sys/strcompat/version.h
+Contains module versions (on 2.4 kernels) for the @file{strcompat} package.
+
+@item sys/os7/allocb.h
+Contains declarations of OpenSS7 buffer allocation helper functions.
+
+@item sys/os7/bufpool.h
+Contains declarations of OpenSS7 buffer pool helper functions.
+
+@item sys/os7/bufq.h
+Contains declarations of OpenSS7 private buffer queue helper functions.
+
+@item sys/os7/compat.h
+Contains declarations of OpenSS7 compatibility defines and includes.  This is the only header file
+that needs to be included for a @dfn{STREAMS} module or driver that needs to be compatibile with
+both @cite{LiS} and @cite{Linux Fast-STREAMS}.
+
+@item sys/os7/debug.h
+Contains declarations of OpenSS7 debugging macros.
+
+@item sys/os7/lock.h
+Contains declarations of OpenSS7 queue locking helper functions.
+
+@item sys/os7/priv.h
+Contains declarations of OpenSS7 queue private structure helper functions.
+
+@item sys/os7/queue.h
+Contains declarations of OpenSS7 queue put and service procedure helper functions.
+
+@item sys/os7/timer.h
+Contains declarations of OpenSS7 timer helper functions.
+
+@item sys/os7/ddi.h
+Contains declarations of OpenSS7 additional helper functions.
+
+@item sys/os7/strconf.h
+Contains declarations of OpenSS7 @dfn{STREAMS} configuration helper functions.
+
+@item sys/os7/stream.h
+Contains declarations of OpenSS7 @dfn{STREAMS} helper functions.
+
+@item sys/stream.h
+Contains a main header file providing @dfn{STREAMS} utility function declarations.  Depending on
+defines when including this file, this file may include @file{stream.h} files for specific
+implementations.
+
+@item sys/strconf.h
+Contains a main header file providing @dfn{STREAMS} configuration function declarations.  Depending
+on defines when including this file, this file may include @file{stream.h} files for specific
+implementations.
+
+@item sys/ddi.h
+Contains a main header file providing @dfn{STREAMS} DDI/DKI function declarations.  Depending on
+defines when including this file, this file may include @file{stream.h} files for specific
+implementations.
+
+
+@item sys/aix/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{AIX}.
+
+@item sys/aix/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{AIX}.
+
+@item sys/aix/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{AIX}.
+
+@item sys/hpux/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{HP-UX}.
+
+@item sys/hpux/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{HP-UX}.
+
+@item sys/hpux/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{HP-UX}.
+
+
+@item sys/irix/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{IRIX}.
+
+@item sys/irix/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{IRIX}.
+
+@item sys/irix/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{IRIX}.
+
+
+@item sys/lis/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{LiS}.
+
+@item sys/lis/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{LiS}.
+
+@item sys/lis/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{LiS}.
+
+
+@item sys/mac/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{Mac OT}.
+
+@item sys/mac/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{Mac OT}.
+
+@item sys/mac/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{Mac OT}.
+
+
+@item sys/mps/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{MPS}.
+
+@item sys/mps/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{MPS}.
+
+@item sys/mps/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{MPS}.
+
+
+@item sys/osf/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{OSF/1}.
+
+@item sys/osf/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{OSF/1}.
+
+@item sys/osf/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{OSF/1}.
+
+
+@item sys/sun/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{Solaris}.
+
+@item sys/sun/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{Solaris}.
+
+@item sys/sun/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{Solaris}.
+
+
+@item sys/sun/strsun.h
+Contains specific declarations for @cite{Solaris} helper functions.
+
+@item sys/sunddi.h
+Main header file used to include @cite{Solaris} DDI/DKI function declarations.
+
+@item sys/strsun.h
+Main header file used to include @cite{Solaris} @cite{Solaris} function declarations.
+
+@item sys/svr3/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{SVR 3}.
+
+@item sys/svr3/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{SVR 3}.
+
+@item sys/svr3/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{SVR 3}.
+
+
+@item sys/svr4/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{SVR 4.2 MP}.
+
+@item sys/svr4/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{SVR 4.2 MP}.
+
+@item sys/svr4/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{SVR 4.2 MP}.
+
+
+@item sys/uw7/stream.h
+Contains declarations of @dfn{STREAMS} functions unique to @cite{UnixWare}.
+
+@item sys/uw7/strconf.h
+Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{UnixWare}.
+
+@item sys/uw7/ddi.h
+Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{UnixWare}.
+
+@end table
+
+@subsection Maintenance Programs
+
+@cite{@value{PACKAGE_TITLE}} places the following test programs in the system libexec directory
+@file{usr/libexec/@value{PACKAGE}/}:
+
+@table @file
+
+@item send-pr
+problem report generation script.
+
+@item send-pr.config
+problem report generation script configuration.
+
+@item testsuite
+@command{autotest} test suite.
+
+@item atlocal
+configuration for the @command{autotest} test suite.
+
+@end table
+
+@subsection Manual Pages
+
+@cite{@value{PACKAGE_TITLE}} installs the following manual pages in the @file{/usr/share/man}
+subdirectory:
+
+The @cite{@value{PACKAGE_TITLE}} package installs several hundred manual pages that are too many to
+list here.  Following are just the primary manual pages.  Begin with any of these manual pages to
+obtain references to the remaining pages.
+
+@table @file
+
+@item man5/strcompat.5
+@manref{strcompat(5)}
+
+@item man8/strcompat_mknod.8
+@manref{strcompat_mknod(8)}
+
+@item man9/os7compat.9
+@manref{os7compat(9)}
+
+@item man9/svr3compat.9
+@manref{svr3compat(9)}
+
+@item man9/svr4compat.9
+@manref{svr4compat(9)}
+
+@item man9/mpscompat.9
+@manref{mpscompat(9)}
+
+@item man9/suncompat.9
+@manref{suncompat(9)}
+
+@item man9/uw7compat.9
+@manref{uw7compat(9)}
+
+@item man9/osfcompat.9
+@manref{osfcompat(9)}
+
+@item man9/aixcompat.9
+@manref{aixcompat(9)}
+
+@item man9/hpuxcompat.9
+@manref{hpuxcompat(9)}
+
+@item man9/irixcompat.9
+@manref{irixcompat(9)}
+
+@item man9/liscompat.9
+@manref{liscompat(9)}
+
+@item man9/maccompat.9
+@manref{maccompat(9)}
+
+@end table
+
+@ignore
+@table @file
+
+@item man5/strcompat.5
+@manref{strcompat(5)}
+
+@item man8/strcompat_mknod.8
+@manref{strcompat_mknod(8)}
+
+@item man9/alloc_proto.9
+@manref{alloc_proto(9)}
+@item man9/mkiocb.9
+@manref{mkiocb(9)}
+
+@item man9/os7compat.9
+@manref{os7compat(9)}
+
+@item man9/bufq_append.9
+@manref{bufq_append(9)}
+@item man9/bufq_dequeue.9
+@manref{bufq_dequeue(9)}
+@item man9/bufq_dequeue_tail.9
+@manref{bufq_dequeue_tail(9)}
+@item man9/bufq_freehead.9
+@manref{bufq_freehead(9)}
+@item man9/bufq_head.9
+@manref{bufq_head(9)}
+@item man9/bufq_init.9
+@manref{bufq_init(9)}
+@item man9/bufq_insert.9
+@manref{bufq_insert(9)}
+@item man9/bufq_length.9
+@manref{bufq_length(9)}
+@item man9/bufq_lock.9
+@manref{bufq_lock(9)}
+@item man9/bufq_purge.9
+@manref{bufq_purge(9)}
+@item man9/bufq_queue.9
+@manref{bufq_queue(9)}
+@item man9/bufq_queue_head.9
+@manref{bufq_queue_head(9)}
+@item man9/bufq_resupply.9
+@manref{bufq_resupply(9)}
+@item man9/bufq_size.9
+@manref{bufq_size(9)}
+@item man9/bufq_splice_head.9
+@manref{bufq_splice_head(9)}
+@item man9/bufq_splice_tail.9
+@manref{bufq_splice_tail(9)}
+@item man9/bufq_supply.9
+@manref{bufq_supply(9)}
+@item man9/bufq_tail.9
+@manref{bufq_tail(9)}
+@item man9/bufq_unlink.9
+@manref{bufq_unlink(9)}
+@item man9/bufq_unlock.9
+@manref{bufq_unlock(9)}
+@item man9/freechunks.9
+@manref{freechunks(9)}
+@item man9/ss7_allocb.9
+@manref{ss7_allocb(9)}
+@item man9/ss7_bufcall.9
+@manref{ss7_bufcall(9)}
+@item man9/ss7_bufpool_init.9
+@manref{ss7_bufpool_init(9)}
+@item man9/ss7_bufpool_release.9
+@manref{ss7_bufpool_release(9)}
+@item man9/ss7_bufpool_reserve.9
+@manref{ss7_bufpool_reserve(9)}
+@item man9/ss7_bufpool_term.9
+@manref{ss7_bufpool_term(9)}
+@item man9/ss7_bufsrv.9
+@manref{ss7_bufsrv(9)}
+@item man9/ss7_copyb.9
+@manref{ss7_copyb(9)}
+@item man9/ss7_copymsg.9
+@manref{ss7_copymsg(9)}
+@item man9/ss7_do_timeout.9
+@manref{ss7_do_timeout(9)}
+@item man9/ss7_dupb.9
+@manref{ss7_dupb(9)}
+@item man9/ss7_dupmsg.9
+@manref{ss7_dupmsg(9)}
+@item man9/ss7_esballoc.9
+@manref{ss7_esballoc(9)}
+@item man9/ss7_esbbcall.9
+@manref{ss7_sebbcall(9)}
+@item man9/ss7_fast_allocb.9
+@manref{ss7_fast_allocb(9)}
+@item man9/ss7_fast_freeb.9
+@manref{ss7_fast_freeb(9)}
+@item man9/ss7_fast_freemsg.9
+@manref{ss7_fast_freemsg(9)}
+@item man9/ss7_iput.9
+@manref{ss7_iput(9)}
+@item man9/ss7_isrv.9
+@manref{ss7_isrv(9)}
+@item man9/ss7_oput.9
+@manref{ss7_oput(9)}
+@item man9/ss7_osrv.9
+@manref{ss7_osrv(9)}
+@item man9/ss7_pullupmsg.9
+@manref{ss7_pullupmsg(9)}
+@item man9/ss7_putq.9
+@manref{ss7_putq(9)}
+@item man9/ss7_r_flush.9
+@manref{ss7_r_flush(9)}
+@item man9/ss7_srvq.9
+@manref{ss7_srvq(9)}
+@item man9/ss7_start_timer.9
+@manref{ss7_start_timer(9)}
+@item man9/ss7_stop_timer.9
+@manref{ss7_stop_timer(9)}
+@item man9/ss7_trylockq.9
+@manref{ss7_trylockq(9)}
+@item man9/ss7_unbufcall.9
+@manref{ss7_unbufcall(9)}
+@item man9/ss7_unlockq.9
+@manref{ss7_unlockq(9)}
+@item man9/ss7_w_flush.9
+@manref{ss7_w_flush(9)}
+
+@item man9/svr3compat.9
+@manref{svr3compat(9)}
+
+@item man9/emajor.9
+@manref{emajor(9)}
+@item man9/eminor.9
+@manref{eminor(9)}
+
+@item man9/svr4compat.9
+@manref{svr4compat(9)}
+
+@item man9/dtimeout.9
+@manref{dtimeout(9)}
+@item man9/etoimajor.9
+@manref{etoimajor(9)}
+@item man9/getemajor.9
+@manref{getemajor(9)}
+@item man9/geteminor.9
+@manref{geteminor(9)}
+@item man9/itimeout.9
+@manref{itimeout(9)}
+@item man9/itoemajor.9
+@manref{itoemajor(9)}
+@item man9/LOCK.9
+@manref{LOCK(9)}
+@item man9/LOCK_ALLOC.9
+@manref{LOCK_ALLOC(9)}
+@item man9/LOCK_DEALLOC.9
+@manref{LOCK_DEALLOC(9)}
+@item man9/LOCK_OWNED.9
+@manref{LOCK_OWNED(9)}
+@item man9/MPSTR_QLOCK.9
+@manref{MPSTR_QLOCK(9)}
+@item man9/MPSTR_QRELE.9
+@manref{MPSTR_QRELE(9)}
+@item man9/MPSTR_STPLOCK.9
+@manref{MPSTR_STPLOCK(9)}
+@item man9/MPSTR_STPRELE.9
+@manref{MTPSTR_STPRELE(9)}
+@item man9/RW_ALLOC.9
+@manref{RW_ALLOC(9)}
+@item man9/RW_DEALLOC.9
+@manref{RW_DEALLOC(9)}
+@item man9/RW_RDLOCK.9
+@manref{RW_RDLOCK(9)}
+@item man9/RW_TRYRDLOCK.9
+@manref{RW_TRYRDLOCK(9)}
+@item man9/RW_TRYWRLOCK.9
+@manref{RW_TRYWRLOCK(9)}
+@item man9/RW_UNLOCK.9
+@manref{RW_UNLOCK(9)}
+@item man9/RW_WRLOCK.9
+@manref{RW_WRLOCK(9)}
+@item man9/sleep.9
+@manref{sleep(9)}
+@item man9/SLEEP_ALLOC.9
+@manref{SLEEP_ALLOC(9)}
+@item man9/SLEEP_DEALLOC.9
+@manref{SLEEP_DEALLOC(9)}
+@item man9/SLEEP_LOCK.9
+@manref{SLEEP_LOCK(9)}
+@item man9/SLEEP_LOCKAVAIL.9
+@manref{SLEEP_LOCKAVAIL(9)}
+@item man9/SLEEP_LOCKOWNED.9
+@manref{SLEEP_LOCKOWNED(9)}
+@item man9/SLEEP_LOCK_SIG.9
+@manref{SLEEP_LOCK_SIG(9)}
+@item man9/SLEEP_TRYLOCK.9
+@manref{SLEEP_TRYLOCK(9)}
+@item man9/SLEEP_UNLOCK.9
+@manref{SLEEP_UNLOCK(9)}
+@item man9/spl0.9
+@manref{spl0(9)}
+@item man9/spl1.9
+@manref{spl1(9)}
+@item man9/spl2.9
+@manref{spl2(9)}
+@item man9/spl3.9
+@manref{spl3(9)}
+@item man9/spl4.9
+@manref{spl4(9)}
+@item man9/spl5.9
+@manref{spl5(9)}
+@item man9/spl6.9
+@manref{spl6(9)}
+@item man9/spl7.9
+@manref{spl7(9)}
+@item man9/spl.9
+@manref{splbase(9)}
+@item man9/splbase.9
+@manref{spldisk(9)}
+@item man9/spldisk.9
+@manref{splhi(9)}
+@item man9/splhi.9
+@manref{splstr(9)}
+@item man9/splstr.9
+@manref{spltimeout(9)}
+@item man9/spltimeout.9
+@manref{spltty(9)}
+@item man9/spltty.9
+@manref{splx(9)}
+@item man9/splx.9
+@manref{SV_ALLOC(9)}
+@item man9/SV_ALLOC.9
+@manref{SV_BROADCAST(9)}
+@item man9/SV_BROADCAST.9
+@manref{SV_DEALLOC(9)}
+@item man9/SV_DEALLOC.9
+@manref{SV_SIGNAL(9)}
+@item man9/SV_SIGNAL.9
+@manref{SV_WAIT(9)}
+@item man9/SV_WAIT.9
+@manref{SV_WAIT_SIG(9)}
+@item man9/SV_WAIT_SIG.9
+@manref{TRYLOCK(9)}
+@item man9/TRYLOCK.9
+@manref{UNLOCK(9)}
+@item man9/UNLOCK.9
+@manref{wakeup(9)}
+@item man9/wakeup.9
+
+@manref{mpscompat(9)}
+@item man9/mpscompat.9
+
+@manref{mi_alloc(9)}
+@item man9/mi_alloc.9
+@manref{mi_allocq(9)}
+@item man9/mi_allocq.9
+@manref{mi_alloc_sleep(9)}
+@item man9/mi_alloc_sleep.9
+@manref{mi_attach(9)}
+@item man9/mi_attach.9
+@manref{mi_bcmp(9)}
+@item man9/mi_bcmp.9
+@manref{mi_bufcall(9)}
+@item man9/mi_bufcall.9
+@manref{mi_close_comm(9)}
+@item man9/mi_close_comm.9
+@manref{mi_close_detached(9)}
+@item man9/mi_close_detached.9
+@manref{mi_close_free(9)}
+@item man9/mi_close_free.9
+@manref{mi_close_unlink(9)}
+@item man9/mi_close_unlink.9
+@manref{mi_copy_done(9)}
+@item man9/mi_copy_done.9
+@manref{mi_copyin(9)}
+@item man9/mi_copyin.9
+@manref{mi_copyin_n(9)}
+@item man9/mi_copyin_n.9
+@manref{mi_copyout(9)}
+@item man9/mi_copyout.9
+@manref{mi_copyout_alloc(9)}
+@item man9/mi_copyout_alloc.9
+@manref{mi_copy_set_rval(9)}
+@item man9/mi_copy_set_rval.9
+@manref{mi_copy_state(9)}
+@item man9/mi_copy_state.9
+@manref{mi_detach(9)}
+@item man9/mi_detach.9
+@manref{mi_first_dev_ptr(9)}
+@item man9/mi_first_dev_ptr.9
+@manref{mi_first_ptr(9)}
+@item man9/mi_first_ptr.9
+@manref{mi_free(9)}
+@item man9/mi_free.9
+@manref{mi_freeq(9)}
+@item man9/mi_freeq.9
+@manref{mi_mpprintf(9)}
+@item man9/mi_mpprintf.9
+@manref{mi_mpprintf_nr(9)}
+@item man9/mi_mpprintf_nr.9
+@manref{mi_next_dev_ptr(9)}
+@item man9/mi_next_dev_ptr.9
+@manref{mi_next_ptr(9)}
+@item man9/mi_next_ptr.9
+@manref{mi_offset_param(9)}
+@item man9/mi_offset_param.9
+@manref{mi_offset_paramc(9)}
+@item man9/mi_offset_paramc.9
+@manref{mi_open_alloc(9)}
+@item man9/mi_open_alloc.9
+@manref{mi_open_alloc_sleep(9)}
+@item man9/mi_open_alloc_sleep.9
+@manref{mi_open_comm(9)}
+@item man9/mi_open_comm.9
+@manref{mi_open_detached(9)}
+@item man9/mi_open_detached.9
+@manref{mi_open_link(9)}
+@item man9/mi_open_link.9
+@manref{mi_prev_ptr(9)}
+@item man9/mi_prev_ptr.9
+@manref{mi_reallocb(9)}
+@item man9/mi_reallocb.9
+@manref{mi_reuse_proto(9)}
+@item man9/mi_reuse_proto.9
+@manref{mi_set_sth_copyopt(9)}
+@item man9/mi_set_sth_copyopt.9
+@manref{mi_set_sth_hiwat(9)}
+@item man9/mi_set_sth_hiwat.9
+@manref{mi_set_sth_lowat(9)}
+@item man9/mi_set_sth_lowat.9
+@manref{mi_set_sth_maxblk(9)}
+@item man9/mi_set_sth_maxblk.9
+@manref{mi_set_sth_wroff(9)}
+@item man9/mi_set_sth_wroff.9
+@manref{mi_sprintf(9)}
+@item man9/mi_sprintf.9
+@manref{mi_sprintf(9)}
+@item man9/mi_strcmp.9
+@manref{mi_strcmp(9)}
+@item man9/mi_strlen.9
+@manref{mi_strlen(9)}
+@item man9/mi_strlog.9
+@manref{mi_strlog(9)}
+@item man9/mi_strtol.9
+@manref{mi_strtol(9)}
+@item man9/mi_timer.9
+@manref{mi_timer(9)}
+@item man9/mi_timer_MAC.9
+@manref{mi_timer_MAC(9)}
+@item man9/mi_timer_SUN.9
+@manref{mi_timer_SUN(9)}
+@item man9/mi_timer_alloc.9
+@manref{mi_timer_alloc(9)}
+@item man9/mi_timer_alloc_MAC.9
+@manref{mi_timer_alloc_MAC(9)}
+@item man9/mi_timer_alloc_SUN.9
+@manref{mi_timer_alloc_SUN(9)}
+@item man9/mi_timer_cancel.9
+@manref{mi_timer_cancel(9)}
+@item man9/mi_timer_free.9
+@manref{mi_timer_fre(9)}
+@item man9/mi_timer_move.9
+@manref{mi_timer_move(9)}
+@item man9/mi_timer_q_switch.9
+@manref{mi_timer_q_switch(9)}
+@item man9/mi_timer_stop.9
+@manref{mi_timer_stop(9)}
+@item man9/mi_timer_valid.9
+@manref{mi_timer_valid(9)}
+@item man9/mi_zalloc.9
+@manref{mi_zalloc(9)}
+@item man9/mi_zalloc_sleep.9
+@manref{mi_zalloc_sleep(9)}
+@item man9/mps_become_writer.9
+@manref{mps_become_writer(9)}
+@item man9/mps_intr_disable.9
+@manref{mps_intr_disable(9)}
+@item man9/mps_intr_enable.9
+@manref{mps_intr_enable(9)}
+@item man9/mi_sprintf_putc.9
+@manref{mi_sprintf_putc(9)}
+
+@item man9/suncompat.9
+@manref{suncompat(9)}
+
+@item man9/mi_tpi_ack_alloc.9
+@manref{mi_tpi_ack_alloc(9)}
+@item man9/mi_tpi_conn_con.9
+@manref{mi_tpi_ack_alloc(9)}
+@item man9/mi_tpi_conn_ind.9
+@manref{mi_tpi_conn_con(9)}
+@item man9/mi_tpi_conn_req.9
+@manref{mi_tpi_conn_ind(9)}
+@item man9/mi_tpi_data_ind.9
+@manref{mp_tpi_conn_req(9)}
+@item man9/mi_tpi_data_req.9
+@manref{mi_tpi_data_ind(9)}
+@item man9/mi_tpi_discon_ind.9
+@manref{mi_tpi_data_req(9)}
+@item man9/mi_tpi_discon_req.9
+@manref{mi_tpi_discon_req(9)}
+@item man9/mi_tpi_err_ack_alloc.9
+@manref{mi_tpi_err_ack_alloc(9)}
+@item man9/mi_tpi_exdata_ind.9
+@manref{mi_tpi_exdata_ind(9)}
+@item man9/mi_tpi_exdata_req.9
+@manref{mi_tpi_exdata_req(9)}
+@item man9/mi_tpi_info_req.9
+@manref{mi_tpi_info_req(9)}
+@item man9/mi_tpi_ok_ack_alloc.9
+@manref{mi_tpi_ok_ack_alloc(9)}
+@item man9/mi_tpi_ordrel_ind.9
+@manref{mi_tpi_ordrel_ind(9)}
+@item man9/mi_tpi_ordrel_req.9
+@manref{mi_tpi_ordrel_req(9)}
+@item man9/mi_tpi_uderror_ind.9
+@manref{mi_tpi_uderror_ind(9)}
+@item man9/mi_tpi_unitdata_ind.9
+@manref{mi_tpi_unitdata_ind(9)}
+@item man9/mi_tpi_unitdata_req.9
+@manref{mi_tpi_unitdata_req(9)}
+
+@item man9/DB_BASE.9
+@manref{DB_BASE(9)}
+@item man9/DB_LIM.9
+@manref{DB_LIM(9)}
+@item man9/DB_REF.9
+@manref{DB_REF(9)}
+@item man9/DB_TYPE.9
+@manref{DB_TYPE(9)}
+
+@item man9/ddi_get_cred.9
+@manref{ddi_get_cred(9)}
+@item man9/ddi_getiminor.9
+@manref{ddi_getiminor(9)}
+@item man9/ddi_get_lbolt.9
+@manref{ddi_get_lbolt(9)}
+@item man9/ddi_get_pid.9
+@manref{ddi_get_pid(9)}
+@item man9/ddi_get_time.9
+@manref{ddi_get_time(9)}
+@item man9/ddi_prop_op.9
+@manref{ddi_prop_op(9)}
+@item man9/ddi_umem_alloc.9
+@manref{ddi_umem_alloc(9)}
+@item man9/ddi_umem_free.9
+@manref{ddi_umem_free(9)}
+@item man9/freezestr_SUN.9
+@manref{freezestr_SUN(9)}
+@item man9/MBLKHEAD.9
+@manref{MBLKHEAD(9)}
+@item man9/MBLKIN.9
+@manref{MBLKIN(9)}
+@item man9/MBLKL.9
+@manref{MBLKL(9)}
+@item man9/MBLKSIZE.9
+@manref{MBLKSIZE(9)}
+@item man9/MBLKTAIL.9
+@manref{MBLKTAIL(9)}
+@item man9/mcopyin.9
+@manref{mcopyin(9)}
+@item man9/mcopymsg.9
+@manref{mcopymsg(9)}
+@item man9/mcopyout.9
+@manref{mcopyout(9)}
+@item man9/merror.9
+@manref{merror(9)}
+@item man9/mexchange.9
+@manref{mexchange(9)}
+@item man9/mexpandb.9
+@manref{mexpandb(9)}
+@item man9/mioc2ack.9
+@manref{mioc2ack(9)}
+@item man9/miocack.9
+@manref{miocack(9)}
+@item man9/miocnak.9
+@manref{miocnak(9)}
+@item man9/miocpullup.9
+@manref{miocpullup(9)}
+@item man9/mod_info.9
+@manref{mod_info(9)}
+@item man9/mod_install.9
+@manref{mod_install(9)}
+@item man9/mod_remove.9
+@manref{mod_remove(9)}
+@item man9/mod_strmops.9
+@manref{mod_strmops(9)}
+@item man9/nochpoll.9
+@manref{nochpoll(9)}
+@item man9/nodev.9
+@manref{nodev(9)}
+@item man9/nulldev.9
+@manref{nulldev(9)}
+@item man9/OFFSET.9
+@manref{OFFSET(9)}
+@item man9/qbufcall.9
+@manref{qbufcall(9)}
+@item man9/qtimeout.9
+@manref{qtimeout(9)}
+@item man9/queclass.9
+@manref{queuclass(9)}
+@item man9/qunbufcall.9
+@manref{qunbufcall(9)}
+@item man9/quntimeout.9
+@manref{quntimeout(9)}
+@item man9/qwait.9
+@manref{qwait(9)}
+@item man9/qwait_sig.9
+@manref{qwait_sig(9)}
+@item man9/qwriter.9
+@manref{qwriter(9)}
+@item man9/unfreezestr_SUN.9
+@manref{unfreezestr(9)}
+@item man9/ddi_add_intr.9
+@manref{ddi_add_intr(9)}
+@item man9/ddi_add_softintr.9
+@manref{ddi_add_softintr(9)}
+@item man9/ddi_binding_name.9
+@manref{ddi_binding_name(9)}
+@item man9/ddi_btop.9
+@manref{ddi_btop(9)}
+@item man9/ddi_btopr.9
+@manref{ddi_btopr(9)}
+@item man9/ddi_check_acc_handle.9
+@manref{ddi_check_acc_handle(9)}
+@item man9/ddi_check_dma_handle.9
+@manref{ddi_check_dma_handle(9)}
+@item man9/ddi_copyin.9
+@manref{ddi_copyin(9)}
+@item man9/ddi_copyout.9
+@manref{ddi_copyout(9)}
+@item man9/ddi_create_minor_node.9
+@manref{ddi_create_minor_node(9)}
+@item man9/ddi_device_copy.9
+@manref{ddi_device_copy(9)}
+@item man9/ddi_device_zero.9
+@manref{ddi_device_zero(9)}
+@item man9/ddi_devid_compare.9
+@manref{ddi_devid_compare(9)}
+@item man9/ddi_devid_free.9
+@manref{ddi_devid_free(9)}
+@item man9/ddi_devid_init.9
+@manref{ddi_devid_init(9)}
+@item man9/ddi_devid_register.9
+@manref{ddi_devid_register(9)}
+@item man9/ddi_devid_sizeof.9
+@manref{ddi_devid_sizeof(9)}
+@item man9/ddi_devid_str_decode.9
+@manref{ddi_devid_str_decode(9)}
+@item man9/ddi_devid_str_encode.9
+@manref{ddi_devid_str_encond(9)}
+@item man9/ddi_devid_str_free.9
+@manref{ddi_devid_str_free(9)}
+@item man9/ddi_devid_unregister.9
+@manref{ddi_devid_unregister(9)}
+@item man9/ddi_devid_valid.9
+@manref{ddi_devid_valid(9)}
+@item man9/ddi_dev_is_needed.9
+@manref{dddi_dev_is_needed(9)}
+@item man9/ddi_dev_is_sid.9
+@manref{ddi_dev_is_sid(9)}
+@item man9/ddi_devmap_segmap.9
+@manref{ddi_devmap_segmap(9)}
+@item man9/ddi_dev_nintrs.9
+@manref{ddi_dev_nintrs(9)}
+@item man9/ddi_dev_nregs.9
+@manref{ddi_dev_nregs(9)}
+@item man9/ddi_dev_regsize.9
+@manref{ddi_dev_regsize(9)}
+@item man9/ddi_dev_report_fault.9
+@manref{ddi_dev_report_fault(9)}
+@item man9/ddi_dma_addr_bind_handle.9
+@manref{ddi_dma_addr_bind_handle(9)}
+@item man9/ddi_dma_addr_setup.9
+@manref{ddi_dma_addr_setup(9)}
+@item man9/ddi_dma_alloc_handle.9
+@manref{ddi_dma_alloc_handle(9)}
+@item man9/ddi_dma_buf_bind_handle.9
+@manref{ddi_dma_buf_bind_handle(9)}
+@item man9/ddi_dma_buf_setup.9
+@manref{ddi_dma_buf_setup(9)}
+@item man9/ddi_dma_burstsizes.9
+@manref{ddi_dma_burstsizes(9)}
+@item man9/ddi_dma_coff.9
+@manref{ddi_dma_coff(9)}
+@item man9/ddi_dma_curwin.9
+@manref{ddi_dma_curwin(9)}
+@item man9/ddi_dma_devalign.9
+@manref{ddi_dma_devalign(9)}
+@item man9/ddi_dmae_1stparty.9
+@manref{ddi_dmae_1stparty(9)}
+@item man9/ddi_dmae.9
+@manref{ddi_dmae(9)}
+@item man9/ddi_dmae_alloc.9
+@manref{ddi_dmae_alloc(9)}
+@item man9/ddi_dmae_disable.9
+@manref{ddi_dmae_disable(9)}
+@item man9/ddi_dmae_enable.9
+@manref{ddi_dmae_enable(9)}
+@item man9/ddi_dmae_getattr.9
+@manref{ddi_dmae_getattr(9)}
+@item man9/ddi_dmae_getcnt.9
+@manref{ddi_dmae_getcnt(9)}
+@item man9/ddi_dmae_getlim.9
+@manref{ddi_dmae_getlim(9)}
+@item man9/ddi_dmae_prog.9
+@manref{ddi_dmae_prog(9)}
+@item man9/ddi_dmae_release.9
+@manref{ddi_dmae_release(9)}
+@item man9/ddi_dmae_stop.9
+@manref{ddi_dmae_stop(9)}
+@item man9/ddi_dma_free.9
+@manref{ddi_dma_free(9)}
+@item man9/ddi_dma_free_handle.9
+@manref{ddi_dma_free_handle(9)}
+@item man9/ddi_dma_get_attr.9
+@manref{ddi_dma_get_attr(9)}
+@item man9/ddi_dma_getwin.9
+@manref{ddi_dma_getwin(9)}
+@item man9/ddi_dma_htoc.9
+@manref{ddi_dma_htoc(9)}
+@item man9/ddi_dma_mem_alloc.9
+@manref{ddi_dma_mem_alloc(9)}
+@item man9/ddi_dma_mem_free.9
+@manref{ddi_dma_mem_free(9)}
+@item man9/ddi_dma_movwin.9
+@manref{ddi_dma_movwin(9)}
+@item man9/ddi_dma_nextcookie.9
+@manref{ddi_dma_nextcookie(9)}
+@item man9/ddi_dma_nextseg.9
+@manref{ddi_dma_nextseg(9)}
+@item man9/ddi_dma_nextwin.9
+@manref{ddi_dma_nextwin(9)}
+@item man9/ddi_dma_numwin.9
+@manref{ddi_dma_numwin(9)}
+@item man9/ddi_dma_segtocookie.9
+@manref{ddi_dma_segtocookie(9)}
+@item man9/ddi_dma_set_sbus64.9
+@manref{ddi_dma_set_sbus64(9)}
+@item man9/ddi_dma_setup.9
+@manref{ddi_dma_setup(9)}
+@item man9/ddi_dma_sync.9
+@manref{ddi_dma_sync(9)}
+@item man9/ddi_dma_unbind_handle.9
+@manref{ddi_dma_unbind_handle(9)}
+@item man9/ddi_driver_major.9
+@manref{ddi_driver_major(9)}
+@item man9/ddi_driver_name.9
+@manref{ddi_driver_name(9)}
+@item man9/ddi_enter_critical.9
+@manref{ddi_enter_critical(9)}
+@item man9/ddi_exit_critical.9
+@manref{ddi_exit_critical(9)}
+@item man9/ddi_ffs.9
+@manref{ddi_ffs(9)}
+@item man9/ddi_fls.9
+@manref{ddi_fls(9)}
+@item man9/ddi_get16.9
+@manref{ddi_get16(9)}
+@item man9/ddi_get32.9
+@manref{ddi_get32(9)}
+@item man9/ddi_get64.9
+@manref{ddi_get64(9)}
+@item man9/ddi_get8.9
+@manref{ddi_get8(9)}
+@item man9/ddi_getb.9
+@manref{ddi_getb(9)}
+@item man9/ddi_get_devstate.9
+@manref{ddi_get_devstate(9)}
+@item man9/ddi_get_driver_private.9
+@manref{ddi_get_driver_private(9)}
+@item man9/ddi_get_iblock_cookie.9
+@manref{ddi_get_iblock_cookie(9)}
+@item man9/ddi_get_instance.9
+@manref{ddi_get_instance(9)}
+@item man9/ddi_get_kt_did.9
+@manref{ddi_get_kt_did(9)}
+@item man9/ddi_getl.9
+@manref{ddi_getl(9)}
+@item man9/ddi_getll.9
+@manref{ddi_getll(9)}
+@item man9/ddi_getlongprop.9
+@manref{ddi_getlongprop(9)}
+@item man9/ddi_getlongprop_buf.9
+@manref{ddi_getlongprop_buf(9)}
+@item man9/ddi_get_name.9
+@manref{ddi_get_name(9)}
+@item man9/ddi_get_parent.9
+@manref{ddi_get_parent(9)}
+@item man9/ddi_getprop.9
+@manref{ddi_getprop(9)}
+@item man9/ddi_getproplen.9
+@manref{ddi_getproplen(9)}
+@item man9/ddi_get_soft_iblock_cookie.9
+@manref{ddi_get_soft_iblock_cookie(9)}
+@item man9/ddi_get_soft_state.9
+@manref{ddi_get_soft_state(9)}
+@item man9/ddi_getw.9
+@manref{ddi_getw(9)}
+@item man9/ddi_in_panic.9
+@manref{ddi_in_panic(9)}
+@item man9/ddi_intr_hilevel.9
+@manref{ddi_intr_hilevel(9)}
+@item man9/ddi_io_get16.9
+@manref{ddi_io_get16(9)}
+@item man9/ddi_io_get32.9
+@manref{ddi_io_get32(9)}
+@item man9/ddi_io_get64.9
+@manref{ddi_io_get64(9)}
+@item man9/ddi_io_get8.9
+@manref{ddi_io_get8(9)}
+@item man9/ddi_io_getb.9
+@manref{ddi_io_getb(9)}
+@item man9/ddi_io_getl.9
+@manref{ddi_io_getl(9)}
+@item man9/ddi_io_getw.9
+@manref{ddi_io_getw(9)}
+@item man9/ddi_iomin.9
+@manref{ddi_iomin(9)}
+@item man9/ddi_iopb_alloc.9
+@manref{ddi_iopb_alloc(9)}
+@item man9/ddi_iopb_free.9
+@manref{ddi_iopb_free(9)}
+@item man9/ddi_io_put16.9
+@manref{ddi_io_put16(9)}
+@item man9/ddi_io_put32.9
+@manref{ddi_io_put32(9)}
+@item man9/ddi_io_put64.9
+@manref{ddi_io_put64(9)}
+@item man9/ddi_io_put8.9
+@manref{ddi_io_put8(9)}
+@item man9/ddi_io_putb.9
+@manref{ddi_io_putb(9)}
+@item man9/ddi_io_putl.9
+@manref{ddi_io_putl(9)}
+@item man9/ddi_io_putw.9
+@manref{ddi_io_putw(9)}
+@item man9/ddi_io_rep_get16.9
+@manref{ddi_io_rep_get16(9)}
+@item man9/ddi_io_rep_get32.9
+@manref{ddi_io_rep_get32(9)}
+@item man9/ddi_io_rep_get64.9
+@manref{ddi_io_rep_get64(9)}
+@item man9/ddi_io_rep_get8.9
+@manref{ddi_io_rep_get8(9)}
+@item man9/ddi_io_rep_getb.9
+@manref{ddi_io_rep_getb(9)}
+@item man9/ddi_io_rep_getl.9
+@manref{ddi_io_rep_getl(9)}
+@item man9/ddi_io_rep_getw.9
+@manref{ddi_io_rep_getw(9)}
+@item man9/ddi_io_rep_put16.9
+@manref{ddi_io_rep_put16(9)}
+@item man9/ddi_io_rep_put32.9
+@manref{ddi_io_rep_put32(9)}
+@item man9/ddi_io_rep_put64.9
+@manref{ddi_io_rep_put64(9)}
+@item man9/ddi_io_rep_put8.9
+@manref{ddi_io_rep_put8(9)}
+@item man9/ddi_io_rep_putb.9
+@manref{ddi_io_rep_putb(9)}
+@item man9/ddi_io_rep_putl.9
+@manref{ddi_io_rep_putl(9)}
+@item man9/ddi_io_rep_putw.9
+@manref{ddi_io_rep_putw(9)}
+@item man9/ddi_log_sysevent.9
+@manref{ddi_log_sysevent(9)}
+@item man9/ddi_mapdev.9
+@manref{ddi_mapdev(9)}
+@item man9/ddi_mapdev_intercept.9
+@manref{ddi_mapdev_intercept(9)}
+@item man9/ddi_mapdev_nointercept.9
+@manref{ddi_mapdev_nointercept(9)}
+@item man9/ddi_map_regs.9
+@manref{ddi_map_regs(9)}
+@item man9/ddi_mem_alloc.9
+@manref{ddi_mem_alloc(9)}
+@item man9/ddi_mem_free.9
+@manref{ddi_mem_free(9)}
+@item man9/ddi_mem_get16.9
+@manref{ddi_mem_get16(9)}
+@item man9/ddi_mem_get32.9
+@manref{ddi_mem_get32(9)}
+@item man9/ddi_mem_get64.9
+@manref{ddi_mem_get64(9)}
+@item man9/ddi_mem_get8.9
+@manref{ddi_mem_get8(9)}
+@item man9/ddi_mem_getb.9
+@manref{ddi_mem_getb(9)}
+@item man9/ddi_mem_getl.9
+@manref{ddi_mem_getl(9)}
+@item man9/ddi_mem_getll.9
+@manref{ddi_mem_getll(9)}
+@item man9/ddi_mem_getw.9
+@manref{ddi_mem_getw(9)}
+@item man9/ddi_mem_put16.9
+@manref{ddi_mem_put16(9)}
+@item man9/ddi_mem_put32.9
+@manref{ddi_mem_put32(9)}
+@item man9/ddi_mem_put64.9
+@manref{ddi_mem_put64(9)}
+@item man9/ddi_mem_put8.9
+@manref{ddi_mem_put8(9)}
+@item man9/ddi_mem_putb.9
+@manref{ddi_mem_putb(9)}
+@item man9/ddi_mem_putl.9
+@manref{ddi_mem_putl(9)}
+@item man9/ddi_mem_putll.9
+@manref{ddi_mem_putll(9)}
+@item man9/ddi_mem_putw.9
+@manref{ddi_mem_putw(9)}
+@item man9/ddi_mem_rep_get16.9
+@manref{ddi_mem_rep_get16(9)}
+@item man9/ddi_mem_rep_get32.9
+@manref{ddi_mem_rep_get32(9)}
+@item man9/ddi_mem_rep_get64.9
+@manref{ddi_mem_rep_get64(9)}
+@item man9/ddi_mem_rep_get8.9
+@manref{ddi_mem_rep_get8(9)}
+@item man9/ddi_mem_rep_getb.9
+@manref{ddi_mem_rep_getb(9)}
+@item man9/ddi_mem_rep_getl.9
+@manref{ddi_mem_rep_getl(9)}
+@item man9/ddi_mem_rep_getll.9
+@manref{ddi_mem_rep_getll(9)}
+@item man9/ddi_mem_rep_getw.9
+@manref{ddi_mem_rep_getw(9)}
+@item man9/ddi_mem_rep_put16.9
+@manref{ddi_mem_rep_put16(9)}
+@item man9/ddi_mem_rep_put32.9
+@manref{ddi_mem_rep_put32(9)}
+@item man9/ddi_mem_rep_put64.9
+@manref{ddi_mem_rep_put64(9)}
+@item man9/ddi_mem_rep_put8.9
+@manref{ddi_mem_rep_put8(9)}
+@item man9/ddi_mem_rep_putb.9
+@manref{ddi_mem_rep_putb(9)}
+@item man9/ddi_mem_rep_putl.9
+@manref{ddi_mem_rep_putl(9)}
+@item man9/ddi_mem_rep_putll.9
+@manref{ddi_mem_rep_putll(9)}
+@item man9/ddi_mem_rep_putw.9
+@manref{ddi_mem_rep_putw(9)}
+@item man9/ddi_mmap_get_model.9
+@manref{ddi_mmap_get_model(9)}
+@item man9/ddi_model_convert_from.9
+@manref{ddi_model_convert_from(9)}
+@item man9/ddi_node_name.9
+@manref{ddi_node_name(9)}
+@item man9/ddi_peek16.9
+@manref{ddi_peek16(9)}
+@item man9/ddi_peek32.9
+@manref{ddi_peek32(9)}
+@item man9/ddi_peek64.9
+@manref{ddi_peek64(9)}
+@item man9/ddi_peek8.9
+@manref{ddi_peek8(9)}
+@item man9/ddi_peek.9
+@manref{ddi_peek(9)}
+@item man9/ddi_peekc.9
+@manref{ddi_peekc(9)}
+@item man9/ddi_peekd.9
+@manref{ddi_peekd(9)}
+@item man9/ddi_peekl.9
+@manref{ddi_peekl(9)}
+@item man9/ddi_peeks.9
+@manref{ddi_peeks(9)}
+@item man9/ddi_poke16.9
+@manref{ddi_poke16(9)}
+@item man9/ddi_poke32.9
+@manref{ddi_poke32(9)}
+@item man9/ddi_poke64.9
+@manref{ddi_poke64(9)}
+@item man9/ddi_poke8.9
+@manref{ddi_poke8(9)}
+@item man9/ddi_poke.9
+@manref{ddi_poke(9)}
+@item man9/ddi_pokec.9
+@manref{ddi_pokec(9)}
+@item man9/ddi_poked.9
+@manref{ddi_poked(9)}
+@item man9/ddi_pokel.9
+@manref{ddi_pokel(9)}
+@item man9/ddi_pokes.9
+@manref{ddi_pokes(9)}
+@item man9/ddi_prop_create.9
+@manref{ddi_prop_create(9)}
+@item man9/ddi_prop_exists.9
+@manref{ddi_prop_exists(9)}
+@item man9/ddi_prop_free.9
+@manref{ddi_prop_free(9)}
+@item man9/ddi_prop_get_int64.9
+@manref{ddi_prop_get_int64(9)}
+@item man9/ddi_prop_get_int.9
+@manref{ddi_prop_get_int(9)}
+@item man9/ddi_prop_lookup.9
+@manref{ddi_prop_lookup(9)}
+@item man9/ddi_prop_lookup_byte_array.9
+@manref{ddi_prop_lookup_byte_array(9)}
+@item man9/ddi_prop_lookup_int64_array.9
+@manref{ddi_prop_lookup_int64_array(9)}
+@item man9/ddi_prop_lookup_int_array.9
+@manref{ddi_prop_lookup_in_array(9)}
+@item man9/ddi_prop_lookup_string.9
+@manref{ddi_prop_lookup_string(9)}
+@item man9/ddi_prop_lookup_string_array.9
+@manref{ddi_prop_lookup_string_array(9)}
+@item man9/ddi_prop_modify.9
+@manref{ddi_prop_modify(9)}
+@item man9/ddi_prop_remove.9
+@manref{ddi_prop_remove(9)}
+@item man9/ddi_prop_remove_all.9
+@manref{ddi_prop_remove_all(9)}
+@item man9/ddi_prop_undefine.9
+@manref{ddi_prop_undefine(9)}
+@item man9/ddi_prop_update.9
+@manref{ddi_prop_update(9)}
+@item man9/ddi_prop_update_byte_array.9
+@manref{ddi_prop_update_byte_array(9)}
+@item man9/ddi_prop_update_int64.9
+@manref{ddi_prop_update_int64(9)}
+@item man9/ddi_prop_update_int64_array.9
+@manref{ddi_prop_update_int64_array(9)}
+@item man9/ddi_prop_update_int.9
+@manref{ddi_prop_update_int(9)}
+@item man9/ddi_prop_update_string.9
+@manref{ddi_prop_update_string(9)}
+@item man9/ddi_prop_update_string_array.9
+@manref{ddi_prop_update_string_array(9)}
+@item man9/ddi_ptob.9
+@manref{ddi_ptob(9)}
+@item man9/ddi_put16.9
+@manref{ddi_put16(9)}
+@item man9/ddi_put32.9
+@manref{ddi_put32(9)}
+@item man9/ddi_put64.9
+@manref{ddi_put64(9)}
+@item man9/ddi_put8.9
+@manref{ddi_put8(9)}
+@item man9/ddi_putb.9
+@manref{ddi_putb(9)}
+@item man9/ddi_putl.9
+@manref{ddi_putl(9)}
+@item man9/ddi_putll.9
+@manref{ddi_putll(9)}
+@item man9/ddi_putw.9
+@manref{ddi_putw(9)}
+@item man9/ddi_regs_map_free.9
+@manref{ddi_regs_map_free(9)}
+@item man9/ddi_regs_map_setup.9
+@manref{ddi_regs_map_setup(9)}
+@item man9/ddi_remove_intr.9
+@manref{ddi_remove_intr(9)}
+@item man9/ddi_remove_minor_node.9
+@manref{ddi_remove_minor_node(9)}
+@item man9/ddi_remove_softintr.9
+@manref{ddi_remove_softintr(9)}
+@item man9/ddi_removing_power.9
+@manref{ddi_removing_power(9)}
+@item man9/ddi_rep_get16.9
+@manref{ddi_rep_get16(9)}
+@item man9/ddi_rep_get32.9
+@manref{ddi_rep_get32(9)}
+@item man9/ddi_rep_get64.9
+@manref{ddi_rep_get64(9)}
+@item man9/ddi_rep_get8.9
+@manref{ddi_rep_get8(9)}
+@item man9/ddi_rep_getb.9
+@manref{ddi_rep_getb(9)}
+@item man9/ddi_rep_getl.9
+@manref{ddi_rep_getl(9)}
+@item man9/ddi_rep_getll.9
+@manref{ddi_rep_getll(9)}
+@item man9/ddi_rep_getw.9
+@manref{ddi_rep_getw(9)}
+@item man9/ddi_report_dev.9
+@manref{ddi_report_dev(9)}
+@item man9/ddi_rep_put16.9
+@manref{ddi_rep_put16(9)}
+@item man9/ddi_rep_put32.9
+@manref{ddi_rep_put32(9)}
+@item man9/ddi_rep_put64.9
+@manref{ddi_rep_put64(9)}
+@item man9/ddi_rep_put8.9
+@manref{ddi_rep_put8(9)}
+@item man9/ddi_rep_putb.9
+@manref{ddi_rep_putb(9)}
+@item man9/ddi_rep_putl.9
+@manref{ddi_rep_putl(9)}
+@item man9/ddi_rep_putll.9
+@manref{ddi_rep_putll(9)}
+@item man9/ddi_rep_putw.9
+@manref{ddi_rep_putw(9)}
+@item man9/ddi_root_node.9
+@manref{ddi_root_node(9)}
+@item man9/ddi_segmap.9
+@manref{ddi_segmap(9)}
+@item man9/ddi_segmap_setup.9
+@manref{ddi_segmap_setup(9)}
+@item man9/ddi_set_driver_private.9
+@manref{ddi_set_driver_private(9)}
+@item man9/ddi_slaveonly.9
+@manref{ddi_slaveonly(9)}
+@item man9/ddi_soft_state.9
+@manref{ddi_soft_state(9)}
+@item man9/ddi_soft_state_fini.9
+@manref{ddi_soft_state_fini(9)}
+@item man9/ddi_soft_state_free.9
+@manref{ddi_soft_state_free(9)}
+@item man9/ddi_soft_state_init.9
+@manref{ddi_soft_state_init(9)}
+@item man9/ddi_soft_state_zalloc.9
+@manref{ddi_soft_state_zalloc(9)}
+@item man9/ddi_trigger_softintr.9
+@manref{ddi_trigger_softintr(9)}
+@item man9/ddi_umem_lock.9
+@manref{ddi_umem_lock(9)}
+@item man9/ddi_umem_unlock.9
+@manref{ddi_umem_unlock(9)}
+@item man9/ddi_unmap_regs.9
+@manref{ddi_unmap_regs(9)}
+
+@item man9/uw7compat.9
+@manref{uw7compat(9)}
+
+@item man9/allocb_physreq.9
+@manref{allocb_physreq(9)}
+@item man9/ATOMIC_INT_ADD.9
+@manref{ATOMIC_INT_ADD(9)}
+@item man9/ATOMIC_INT_ALLOC.9
+@manref{ATOMIC_INT_ALLOC(9)}
+@item man9/ATOMIC_INT_DEALLOC.9
+@manref{ATOMIC_INT_DEALLOC(9)}
+@item man9/ATOMIC_INT_DECR.9
+@manref{ATOMIC_INT_DECR(9)}
+@item man9/ATOMIC_INT_INCR.9
+@manref{ATOMIC_INT_INCR(9)}
+@item man9/ATOMIC_INT_INIT.9
+@manref{ATOMIC_INT_INIT(9)}
+@item man9/ATOMIC_INT_READ.9
+@manref{ATOMIC_INT_READ(9)}
+@item man9/ATOMIC_INT_SUB.9
+@manref{ATOMIC_INT_SUB(9)}
+@item man9/ATOMIC_INT_WRITE.9
+@manref{ATOMIC_INT_WRITE(9)}
+@item man9/msgphysreq.9
+@manref{msgphysreq(9)}
+@item man9/msgpullup_physreq.9
+@manref{msgpullup_physreq(9)}
+@item man9/msgscgth.9
+@manref{msgscgth(9)}
+@item man9/printf_UW7.9
+@manref{printf_UW7(9)}
+@item man9/strioccall.9
+@manref{strioccall(9)}
+
+@item man9/osfcompat.9
+@manref{osfcompat(9)}
+
+@item man9/DELAY.9
+@manref{DELAY(9)}
+@item man9/lbolt.9
+@manref{lbolt(9)}
+@item man9/puthere.9
+@manref{puthere(9)}
+@item man9/streams_close_comm.9
+@manref{streams_close_comm(9)}
+@item man9/streams_open_comm.9
+@manref{streams_open_comm(9)}
+@item man9/streams_open_ocomm.9
+@manref{streams_open_ocomm(9)}
+@item man9/strmod_add.9
+@manref{strmod_add(9)}
+@item man9/strmod_del.9
+@manref{strmod_del(9)}
+@item man9/time.9
+@manref{time(9)}
+@item man9/uprintf.9
+@manref{uprintf(9)}
+
+@item man9/aixcompat.9
+@manref{aixcompat(9)}
+
+@item man9/str_install_AIX.9
+@manref{str_install_AIX(9)}
+@item man9/wantio.9
+@manref{wantio(9)}
+@item man9/wantmsg.9
+@manref{wantmsg(9)}
+
+@item man9/hpuxcompat.9
+@manref{hpuxcompat(9)}
+
+@item man9/get_sleep_lock.9
+@manref{get_sleep_lock(9)}
+@item man9/str_install_HPUX.9
+@manref{str_install_HPUX(9)}
+@item man9/str_uninstall.9
+@manref{str_uninstall(9)}
+@item man9/streams_get_sleep_lock.9
+@manref{streams_get_sleep_lock(9)}
+@item man9/streams_put.9
+@manref{streams_put(9)}
+@item man9/mpsleep.9
+@manref{mpsleep(9)}
+@item man9/streams_mpsleep.9
+@manref{streams_mpsleep(9)}
+
+@item man9/irixcompat.9
+@manref{irixcompat(9)}
+
+@item man9/cmn_err_tag.9
+@manref{cmn_err_tag(9)}
+@item man9/icmn_err.9
+@manref{icmn_err(9)}
+
+@item man9/liscompat.9
+@manref{liscompat(9)}
+
+@item man9/lisdeprec.9
+@manref{lisdeprec(9)}
+@item man9/lis_adjmsg.9
+@manref{lis_adjmsg(9)}
+@item man9/lis_alloc_atomic_fcn.9
+@manref{lis_alloc_atomic_fcn(9)}
+@item man9/lis_allocb.9
+@manref{lis_allocb(9)}
+@item man9/lis_allocb_physreq.9
+@manref{lis_allocb_physreq(9)}
+@item man9/lis_alloc_dma_fcn.9
+@manref{lis_alloc_dma_fcn(9)}
+@item man9/lis_alloc_kernel_fcn.9
+@manref{lis_alloc_kernel_fcn(9)}
+@item man9/lis_appq.9
+@manref{lis_appq(9)}
+@item man9/lis_apush_get.9
+@manref{lis_apush_get(9)}
+@item man9/lis_apush_set.9
+@manref{lis_apush_set(9)}
+@item man9/lis_apush_vml.9
+@manref{lis_apush_vml(9)}
+@item man9/lis_assert_fail.9
+@manref{lis_assert_fail(9)}
+@item man9/lis_atomic_add.9
+@manref{lis_atomic_add(9)}
+@item man9/lis_atomic_dec.9
+@manref{lis_atomic_dec(9)}
+@item man9/lis_atomic_dec_and_test.9
+@manref{lis_atomic_dec_and_test(9)}
+@item man9/lis_atomic_inc.9
+@manref{lis_atomic_inc(9)}
+@item man9/lis_atomic_read.9
+@manref{lis_atomic_read(9)}
+@item man9/lis_atomic_set.9
+@manref{lis_atomic_set(9)}
+@item man9/lis_atomic_sub.9
+@manref{lis_atomic_sub(9)}
+@item man9/lis_backq.9
+@manref{lis_backq(9)}
+@item man9/lis_backq_fcn.9
+@manref{lis_backq_fcn(9)}
+@item man9/lis_bcanput.9
+@manref{lis_bcanput(9)}
+@item man9/lis_bcanputnext.9
+@manref{lis_bcanputnext(9)}
+@item man9/lis_bcanputnext_anyband.9
+@manref{lis_bcanputnext_anyband(9)}
+@item man9/lis_bufcall.9
+@manref{lis_bufcall(9)}
+@item man9/lis_clone_major.9
+@manref{lis_clone_major(9)}
+@item man9/lis_cmn_err.9
+@manref{lis_cmn_err(9)}
+@item man9/lis_copyb.9
+@manref{lis_copyb(9)}
+@item man9/lis_copymsg.9
+@manref{lis_copymsg(9)}
+@item man9/lis_date.9
+@manref{lis_date(9)}
+@item man9/lis_debug_mask2.9
+@manref{lis_debug_mask2(9)}
+@item man9/lis_debug_mask.9
+@manref{lis_debug_mask(9)}
+@item man9/lis_disable_irq.9
+@manref{lis_disable_irq(9)}
+@item man9/lis_down_fcn.9
+@manref{lis_down_fcn(9)}
+@item man9/lis_dsecs.9
+@manref{lis_dsecs(9)}
+@item man9/lis_dupb.9
+@manref{lis_dupb(9)}
+@item man9/lis_dupmsg.9
+@manref{lis_dupmsg(9)}
+@item man9/lis_enable_irq.9
+@manref{lis_enable_irq(9)}
+@item man9/lis_esballoc.9
+@manref{lis_esballoc(9)}
+@item man9/lis_esbbcall.9
+@manref{lis_esbbcall(9)}
+@item man9/lis_flushband.9
+@manref{lis_flushband(9)}
+@item man9/lis_flushq.9
+@manref{lis_flushq(9)}
+@item man9/lis_free.9
+@manref{lis_free(9)}
+@item man9/lis_freeb.9
+@manref{lis_freeb(9)}
+@item man9/lis_free_dma.9
+@manref{lis_free_dma(9)}
+@item man9/lis_free_irq.9
+@manref{lis_free_ireq(9)}
+@item man9/lis_free_mem_fcn.9
+@manref{lis_free_mem_fcn(9)}
+@item man9/lis_freemsg.9
+@manref{lis_freemsg(9)}
+@item man9/lis_free_pages_fcn.9
+@manref{lis_free_pages_fcn(9)}
+@item man9/lis_freezestr.9
+@manref{lis_freezestr(9)}
+@item man9/lis_get_free_pages_atomic_fcn.9
+@manref{lis_get_free_pages_atomic_fcn(9)}
+@item man9/lis_get_free_pages_fcn.9
+@manref{lis_get_free_pages_fcn(9)}
+@item man9/lis_get_free_pages_kernel_fcn.9
+@manref{lis_get_free_pages_kernel_fcn(9)}
+@item man9/lis_getint.9
+@manref{lis_getint(9)}
+@item man9/lis_getq.9
+@manref{lis_getq(9)}
+@item man9/lis_gettimeofday.9
+@manref{lis_gettimeofday(9)}
+@item man9/lis_hitime.9
+@manref{lis_hitime(9)}
+@item man9/lis_insq.9
+@manref{lis_insq(9)}
+@item man9/lis_interruptible_sleep_on.9
+@manref{lis_interruptible_sleep_on(9)}
+@item man9/lis_ioremap.9
+@manref{lis_ioremap(9)}
+@item man9/lis_ioremap_nocache.9
+@manref{lis_ioremap_nocache(9)}
+@item man9/lis_iounmap.9
+@manref{lis_iounmap(9)}
+@item man9/lis_jiffies.9
+@manref{lis_jiffies(9)}
+@item man9/lis_kernel_down.9
+@manref{lis_kernel_down(9)}
+@item man9/lis_kernel_up.9
+@manref{lis_kernel_up(9)}
+@item man9/lis_kernel_version.9
+@manref{lis_kernel_version(9)}
+@item man9/lis_linkb.9
+@manref{lis_linkb(9)}
+@item man9/lis_major.9
+@manref{lis_major(9)}
+@item man9/lis_malloc.9
+@manref{lis_malloc(9)}
+@item man9/lis_max.9
+@manref{lis_max(9)}
+@item man9/lis_milli_to_ticks.9
+@manref{lis_milli_to_ticks(9)}
+@item man9/lis_min.9
+@manref{lis_min(9)}
+@item man9/lis_mknod.9
+@manref{lis_mknod(9)}
+@item man9/lis_mount.9
+@manref{lis_mount(9)}
+@item man9/lis_msecs.9
+@manref{lis_msecs(9)}
+@item man9/lis_msgdsize.9
+@manref{lis_msgdsize(9)}
+@item man9/lis_msgpullup.9
+@manref{lis_msgpullup(9)}
+@item man9/lis_msgsize.9
+@manref{lis_msgsize(9)}
+@item man9/lis_msg_type_name.9
+@manref{lis_msg_type_name(9)}
+@item man9/lis_num_cpus.9
+@manref{lis_num_cpus(9)}
+@item man9/lis_osif_cli.9
+@manref{lis_osif_cli(9)}
+@item man9/lis_osif_do_gettimeofday.9
+@manref{lis_osif_do_gettimeofday(9)}
+@item man9/lis_osif_do_settimeofday.9
+@manref{lis_osif_do_settimeofday(9)}
+@item man9/lis_osif_pci_alloc_consistent.9
+@manref{lis_osif_pci_alloc_consistent(9)}
+@item man9/lis_osif_pci_dac_dma_supported.9
+@manref{lis_osif_pci_dac_dma_supported(9)}
+@item man9/lis_osif_pci_dac_dma_sync_single.9
+@manref{lis_osif_pci_dac_dma_sync_single(9)}
+@item man9/lis_osif_pci_dac_dma_sync_single_for_cpu.9
+@manref{lis_osif_pci_dac_dma_sync_single_for_cpu(9)}
+@item man9/lis_osif_pci_dac_dma_sync_single_for_device.9
+@manref{lis_osif_pci_dac_dma_sync_single_for_device(9)}
+@item man9/lis_osif_pci_dac_dma_to_offset.9
+@manref{lis_osif_pci_dac_dma_to_offset(9)}
+@item man9/lis_osif_pci_dac_dma_to_page.9
+@manref{lis_osif_pci_dac_dma_to_page(9)}
+@item man9/lis_osif_pci_dac_page_to_dma.9
+@manref{lis_osif_pci_dac_page_to_dma(9)}
+@item man9/lis_osif_pci_dac_set_dma_mask.9
+@manref{lis_osif_pci_dac_set_dma_mask(9)}
+@item man9/lis_osif_pci_disable_device.9
+@manref{lis_osif_pci_disable_device(9)}
+@item man9/lis_osif_pci_dma_supported.9
+@manref{lis_osif_pci_dma_supported(9)}
+@item man9/lis_osif_pci_dma_sync_sg.9
+@manref{lis_osif_pci_dma_sync_sg(9)}
+@item man9/lis_osif_pci_dma_sync_single.9
+@manref{lis_osif_pci_dma_sync_single(9)}
+@item man9/lis_osif_pci_enable_device.9
+@manref{lis_osif_pci_enable_device(9)}
+@item man9/lis_osif_pci_find_class.9
+@manref{lis_osif_pci_find_class(9)}
+@item man9/lis_osif_pci_find_device.9
+@manref{lis_osif_pci_find_device(9)}
+@item man9/lis_osif_pci_find_slot.9
+@manref{lis_osif_pci_find_slot(9)}
+@item man9/lis_osif_pci_free_consistent.9
+@manref{lis_osif_pci_free_consistent(9)}
+@item man9/lis_osif_pci_map_page.9
+@manref{lis_osif_pci_map_page(9)}
+@item man9/lis_osif_pci_map_sg.9
+@manref{lis_osif_pci_map_sg(9)}
+@item man9/lis_osif_pci_map_single.9
+@manref{lis_osif_pci_map_single(9)}
+@item man9/lis_osif_pci_module_init.9
+@manref{lis_osif_pci_module_init(9)}
+@item man9/lis_osif_pci_read_config_byte.9
+@manref{lis_osif_pci_read_config_byte(9)}
+@item man9/lis_osif_pci_read_config_dword.9
+@manref{lis_osif_pci_read_config_dword(9)}
+@item man9/lis_osif_pci_read_config_word.9
+@manref{lis_osif_pci_read_config_word(9)}
+@item man9/lis_osif_pci_set_dma_mask.9
+@manref{lis_osif_pci_set_dma_mask(9)}
+@item man9/lis_osif_pci_set_master.9
+@manref{lis_osif_pci_set_master(9)}
+@item man9/lis_osif_pci_unmap_page.9
+@manref{lis_osif_pci_unmap_page(9)}
+@item man9/lis_osif_pci_unmap_sg.9
+@manref{lis_osif_pci_unmap_sg(9)}
+@item man9/lis_osif_pci_unmap_single.9
+@manref{lis_osif_pci_unmap_single(9)}
+@item man9/lis_osif_pci_unregister_driver.9
+@manref{lis_osif_pci_unregister_driver(9)}
+@item man9/lis_osif_pci_write_config_byte.9
+@manref{lis_osif_pci_write_config_byte(9)}
+@item man9/lis_osif_pci_write_config_dword.9
+@manref{lis_osif_pci_write_config_dword(9)}
+@item man9/lis_osif_pci_write_config_word.9
+@manref{lis_osif_pci_write_config_word(9)}
+@item man9/lis_osif_sg_dma_address.9
+@manref{lis_osif_sg_dma_address(9)}
+@item man9/lis_osif_sg_dma_len.9
+@manref{lis_osif_sg_dma_len(9)}
+@item man9/lis_osif_sti.9
+@manref{lis_osif_sti(9)}
+@item man9/lis_OTHER.9
+@manref{lis_OTHER(9)}
+@item man9/lis_own_spl.9
+@manref{lis_own_spl(9)}
+@item man9/lis_pcibios_find_class.9
+@manref{lis_pcibios_find_class(9)}
+@item man9/lis_pcibios_find_device.9
+@manref{lis_pcibios_find_device(9)}
+@item man9/lis_pcibios_init.9
+@manref{lis_pcibios_init(9)}
+@item man9/lis_pcibios_present.9
+@manref{lis_pcibios_present(9)}
+@item man9/lis_pcibios_read_config_byte.9
+@manref{lis_pcibios_read_config_byte(9)}
+@item man9/lis_pcibios_read_config_dword.9
+@manref{lis_pcibios_read_config_dword(9)}
+@item man9/lis_pcibios_read_config_word.9
+@manref{lis_pcibios_read_config_word(9)}
+@item man9/lis_pcibios_strerror.9
+@manref{lis_pcibios_strerror(9)}
+@item man9/lis_pcibios_write_config_byte.9
+@manref{lis_pcibios_write_config_byte(9)}
+@item man9/lis_pcibios_write_config_dword.9
+@manref{lis_pcibios_write_config_dword(9)}
+@item man9/lis_pcibios_write_config_word.9
+@manref{lis_pcibios_write_config_word(9)}
+@item man9/lis_pci_disable_device.9
+@manref{lis_pci_disable_device(9)}
+@item man9/lis_pci_enable_device.9
+@manref{lis_pci_enable_device(9)}
+@item man9/lis_pci_find_class.9
+@manref{lis_pci_find_class(9)}
+@item man9/lis_pci_find_device.9
+@manref{lis_pci_find_device(9)}
+@item man9/lis_pci_find_slot.9
+@manref{lis_pci_find_slot(9)}
+@item man9/lis_pci_read_config_byte.9
+@manref{lis_pci_read_config_byte(9)}
+@item man9/lis_pci_read_config_dword.9
+@manref{lis_pci_read_config_dword(9)}
+@item man9/lis_pci_read_config_word.9
+@manref{lis_pci_read_config_word(9)}
+@item man9/lis_pci_set_master.9
+@manref{lis_pci_set_master(9)}
+@item man9/lis_pci_write_config_byte.9
+@manref{lis_pci_write_config_byte(9)}
+@item man9/lis_pci_write_config_dword.9
+@manref{lis_pci_write_config_dword(9)}
+@item man9/lis_pci_write_config_word.9
+@manref{lis_pci_write_config_word(9)}
+@item man9/lis_phys_to_virt.9
+@manref{lis_phys_to_virt(9)}
+@item man9/lis_print_block.9
+@manref{lis_print_block(9)}
+@item man9/lis_print_data.9
+@manref{lis_print_data(9)}
+@item man9/lis_printk.9
+@manref{lis_printk(9)}
+@item man9/lis_print_mem.9
+@manref{lis_print_mem(9)}
+@item man9/lis_print_msg.9
+@manref{lis_print_msg(9)}
+@item man9/lis_print_queue.9
+@manref{lis_print_queue(9)}
+@item man9/lis_pullupmsg.9
+@manref{lis_pullupmsg(9)}
+@item man9/lis_putbq.9
+@manref{lis_putbq(9)}
+@item man9/lis_putbyte.9
+@manref{lis_putbyte(9)}
+@item man9/lis_putctl1.9
+@manref{lis_putctl1(9)}
+@item man9/lis_putctl.9
+@manref{lis_putctl(9)}
+@item man9/lis_putnextctl1.9
+@manref{lis_putnextctl1(9)}
+@item man9/lis_putnextctl.9
+@manref{lis_putnextctl(9)}
+@item man9/lis_putq.9
+@manref{lis_putq(9)}
+@item man9/lis_qcountstrm.9
+@manref{lis_qcountstrm(9)}
+@item man9/lis_qenable.9
+@manref{lis_qenable(9)}
+@item man9/lis_qprocsoff.9
+@manref{lis_qprocsoff(9)}
+@item man9/lis_qprocson.9
+@manref{lis_qprocson(9)}
+@item man9/lis_qsize.9
+@manref{lis_qsize(9)}
+@item man9/lis_queue_name.9
+@manref{lis_queue_name(9)}
+@item man9/lis_register_strdev.9
+@manref{lis_register_strdev(9)}
+@item man9/lis_register_strmod.9
+@manref{lis_register_strmod(9)}
+@item man9/lis_release_region.9
+@manref{lis_release_region(9)}
+@item man9/lis_request_dma.9
+@manref{lis_request_dma(9)}
+@item man9/lis_request_irq.9
+@manref{lis_request_irq(9)}
+@item man9/lis_request_region.9
+@manref{lis_request_region(9)}
+@item man9/lis_rmvb.9
+@manref{lis_rmvb(9)}
+@item man9/lis_rmvq.9
+@manref{lis_rmvq(9)}
+@item man9/lis_rw_lock_alloc_fcn.9
+@manref{lis_rw_lock_alloc_fcn(9)}
+@item man9/lis_rw_lock_free_fcn.9
+@manref{lis_rw_lock_free_fcn(9)}
+@item man9/lis_rw_lock_init_fcn.9
+@manref{lis_rw_lock_init_fcn(9)}
+@item man9/lis_rw_read_lock_fcn.9
+@manref{lis_rc_read_lock_fcn(9)}
+@item man9/lis_rw_read_lock_irq_fcn.9
+@manref{lis_rw_read_lock_irq_fcn(9)}
+@item man9/lis_rw_read_lock_irqsave_fcn.9
+@manref{lis_rw_read_lock_irqsave_fcn(9)}
+@item man9/lis_rw_read_unlock_fcn.9
+@manref{lis_rw_read_unlock_fcn(9)}
+@item man9/lis_rw_read_unlock_irq_fcn.9
+@manref{lis_rw_read_unlock_irq_fcn(9)}
+@item man9/lis_rw_read_unlock_irqrestore_fcn.9
+@manref{lis_rw_read_unlock_irqrestore_fcn(9)}
+@item man9/lis_rw_write_lock_fcn.9
+@manref{lis_rw_write_lock_fcn(9)}
+@item man9/lis_rw_write_lock_irq_fcn.9
+@manref{lis_rw_write_lock_irq_fcn(9)}
+@item man9/lis_rw_write_lock_irqsave_fcn.9
+@manref{lis_rw_write_lock_irqsave_fcn(9)}
+@item man9/lis_rw_write_unlock_fcn.9
+@manref{lis_rw_write_unlock_fcn(9)}
+@item man9/lis_rw_write_unlock_irq_fcn.9
+@manref{lis_rw_write_unlock_irq_fcn(9)}
+@item man9/lis_rw_write_unlock_irqrestore_fcn.9
+@manref{lis_rw_write_unlock_irqrestore_fcn(9)}
+@item man9/lis_safe_canenable.9
+@manref{lis_safe_canenable(9)}
+@item man9/lis_safe_enableok.9
+@manref{lis_safe_enableok(9)}
+@item man9/lis_safe_noenable.9
+@manref{lis_safe_noenable(9)}
+@item man9/lis_safe_OTHERQ.9
+@manref{lis_safe_OTHERQ(9)}
+@item man9/lis_safe_putmsg.9
+@manref{lis_safe_putmsg(9)}
+@item man9/lis_safe_putnext.9
+@manref{lis_safe_putnext(9)}
+@item man9/lis_safe_qreply.9
+@manref{lis_safe_qreply(9)}
+@item man9/lis_safe_RD.9
+@manref{lis_safe_RD(9)}
+@item man9/lis_safe_SAMESTR.9
+@manref{lis_safe_SAMESTR(9)}
+@item man9/lis_safe_WR.9
+@manref{lis_safe_WR(9)}
+@item man9/lis_secs.9
+@manref{lis_secs(9)}
+@item man9/lis_sem_alloc.9
+@manref{lis_sem_alloc(9)}
+@item man9/lis_sem_destroy.9
+@manref{lis_sem_destroy(9)}
+@item man9/lis_sem_init.9
+@manref{lis_sem_init(9)}
+@item man9/lis_sleep_on.9
+@manref{lis_sleep_on(9)}
+@item man9/lis_spin_is_locked_fcn.9
+@manref{lis_spin_is_locked_fcn(9)}
+@item man9/lis_spin_lock_alloc_fcn.9
+@manref{lis_spin_lock_alloc_fcn(9)}
+@item man9/lis_spin_lock_fcn.9
+@manref{lis_spin_lock_fcn(9)}
+@item man9/lis_spin_lock_free_fcn.9
+@manref{lis_spin_lock_free_fcn(9)}
+@item man9/lis_spin_lock_init_fcn.9
+@manref{lis_spin_lock_init_fcn(9)}
+@item man9/lis_spin_lock_irq_fcn.9
+@manref{lis_spin_lock_irq_fcn(9)}
+@item man9/lis_spin_lock_irqsave_fcn.9
+@manref{lis_spin_lock_irqsave_fcn(9)}
+@item man9/lis_spin_trylock_fcn.9
+@manref{lis_spin_trylock_fcn(9)}
+@item man9/lis_spin_unlock_fcn.9
+@manref{lis_spin_unlock_fcn(9)}
+@item man9/lis_spin_unlock_irq_fcn.9
+@manref{lis_spin_unlock_irq_fcn(9)}
+@item man9/lis_spin_unlock_irqrestore_fcn.9
+@manref{lis_spin_unlock_irqrestore_fcn(9)}
+@item man9/lis_spl0_fcn.9
+@manref{lis_spl0_fcn(9)}
+@item man9/lis_splstr_fcn.9
+@manref{lis_splstr_fcn(9)}
+@item man9/lis_splx_fcn.9
+@manref{lis_splx_fcn(9)}
+@item man9/lis_sprintf.9
+@manref{lis_sprintf(9)}
+@item man9/lis_strm_name.9
+@manref{lis_strm_name(9)}
+@item man9/lis_strm_name_from_queue.9
+@manref{lis_strm_name_from_queue(9)}
+@item man9/lis_stropts_file.9
+@manref{lis_stropts_file(9)}
+@item man9/lis_strqget.9
+@manref{lis_strqget(9)}
+@item man9/lis_strqset.9
+@manref{lis_strqset(9)}
+@item man9/lis_testb.9
+@manref{lis_testb(9)}
+@item man9/lis_thread_start.9
+@manref{lis_thread_start(9)}
+@item man9/lis_thread_stop.9
+@manref{lis_thread_stop(9)}
+@item man9/lis_timeout_fcn.9
+@manref{lis_timeout_fcn(9)}
+@item man9/lis_udelay.9
+@manref{lis_udelay(9)}
+@item man9/lis_unbufcall.9
+@manref{lis_unbufcall(9)}
+@item man9/lis_unfreezestr.9
+@manref{lis_unfreezestr(9)}
+@item man9/lis_unlink.9
+@manref{lis_unlink(9)}
+@item man9/lis_unlinkb.9
+@manref{lis_unlinkb(9)}
+@item man9/lis_unregister_strdev.9
+@manref{lis_unregister_strdev(9)}
+@item man9/lis_unregister_strmod.9
+@manref{lis_unregister_strmod(9)}
+@item man9/lis_untimeout.9
+@manref{lis_untimeout(9)}
+@item man9/lis_up_fcn.9
+@manref{lis_up_fcn(9)}
+@item man9/lis_usecs.9
+@manref{lis_usecs(9)}
+@item man9/lis_usectohz.9
+@manref{lis_usectohz(9)}
+@item man9/lis_version.9
+@manref{lis_version(9)}
+@item man9/lis_vfree.9
+@manref{lis_vfree(9)}
+@item man9/lis_virt_to_phys.9
+@manref{lis_virt_to_phys(9)}
+@item man9/lis_vmalloc.9
+@manref{lis_vmalloc(9)}
+@item man9/lis_vremap.9
+@manref{lis_vremap(9)}
+@item man9/lis_vsprintf.9
+@manref{lis_vsprintf(9)}
+@item man9/lis_wake_up.9
+@manref{lis_wake_up(9)}
+@item man9/lis_wake_up_interruptible.9
+@manref{lis_wake_up_interruptible(9)}
+@item man9/lis_xmsgsize.9
+@manref{lis_xmsgsize(9)}
+@item man9/lis_zmalloc.9
+@manref{lis_zmalloc(9)}
+@item man9/lis_add_timer.9
+@manref{lis_add_timer(9)}
+@item man9/lis_allocq.9
+@manref{lis_allocq(9)}
+@item man9/lis_apushm.9
+@manref{lis_apushm(9)}
+@item man9/lis_basename.9
+@manref{lis_basename(9)}
+@item man9/lis_bprintf.9
+@manref{lis_bprintf(9)}
+@item man9/lis_can_unload.9
+@manref{lis_can_unload(9)}
+@item man9/lis_check_guard.9
+@manref{lis_check_guard(9)}
+@item man9/lis_check_mem.9
+@manref{lis_check_mem(9)}
+@item man9/lis_check_mem_region.9
+@manref{lis_check_mem_region(9)}
+@item man9/lis_check_q_magic.9
+@manref{lis_check_q_magic(9)}
+@item man9/lis_check_region.9
+@manref{lis_check_region(9)}
+@item man9/lis_check_umem.9
+@manref{lis_check_umem(9)}
+@item man9/lis_copyin.9
+@manref{lis_copyin(9)}
+@item man9/lis_copyout.9
+@manref{lis_copyout(9)}
+@item man9/lis_dec_mod_cnt_fcn.9
+@manref{lis_dec_mod_cnt_fcn(9)}
+@item man9/lis_del_timer.9
+@manref{lis_del_timer(9)}
+@item man9/lis_dobufcall.9
+@manref{lis_dobufcall(9)}
+@item man9/lis_doclose.9
+@manref{lis_doclose(9)}
+@item man9/lis_enable_intr.9
+@manref{lis_enable_intr(9)}
+@item man9/lis_fattach.9
+@manref{lis_fattach(9)}
+@item man9/lis_fdetach.9
+@manref{lis_fdetach(9)}
+@item man9/lis_fdetach_all.9
+@manref{lis_fdetach_all(9)}
+@item man9/lis_fdetach_stream.9
+@manref{lis_fdetach_stream(9)}
+@item man9/lis_fifo_close_sync.9
+@manref{lis_fifo_close_sync(9)}
+@item man9/lis_fifo_open_sync.9
+@manref{lis_fifo_open_sync(9)}
+@item man9/lis_fifo_write_sync.9
+@manref{lis_fifo_write_sync(9)}
+@item man9/lis_file_inode.9
+@manref{lis_file_inode(9)}
+@item man9/lis_file_str.9
+@manref{lis_file_str(9)}
+@item man9/lis_find_strdev.9
+@manref{lis_find_strdev(9)}
+@item man9/lis_flush_print_buffer.9
+@manref{lis_flush_print_buffer(9)}
+@item man9/lis_fmod_sw.9
+@manref{lis_fmod_sw(9)}
+@item man9/lis_freedb.9
+@manref{lis_freedb(9)}
+@item man9/lis_free_passfp.9
+@manref{lis_free_passfp(9)}
+@item man9/lis_freeq.9
+@manref{lis_freeq(9)}
+@item man9/lis_fstr_sw.9
+@manref{lis_fstr_sw(9)}
+@item man9/lis_get_fifo.9
+@manref{lis_get_fifo(9)}
+@item man9/lis_get_passfp.9
+@manref{lis_get_passfp(9)}
+@item man9/lis_get_pipe.9
+@manref{lis_get_pipe(9)}
+@item man9/lis_inc_mod_cnt_fcn.9
+@manref{lis_inc_mod_cnt_fcn(9)}
+@item man9/lis_init_bufcall.9
+@manref{lis_init_bufcall(9)}
+@item man9/lis_in_syscall.9
+@manref{lis_in_syscall(9)}
+@item man9/lis_ioc_fattach.9
+@manref{lis_ioc_fattach(9)}
+@item man9/lis_ioc_fdetach.9
+@manref{lis_ioc_fdetach(9)}
+@item man9/lis_ioc_pipe.9
+@manref{lis_ioc_pipe(9)}
+@item man9/lis__kfree.9
+@manref{lis__kfree(9)}
+@item man9/lis_kfree.9
+@manref{lis_kfree(9)}
+@item man9/lis_kmalloc.9
+@manref{lis_kmalloc(9)}
+@item man9/lis_kill_pg.9
+@manref{lis_kill_pg(9)}
+@item man9/lis_kill_proc.9
+@manref{lis_kill_proc(9)}
+@item man9/lis__kmalloc.9
+@manref{lis__kmalloc(9)}
+@item man9/lis_loadable_load.9
+@manref{lis_loadable_load(9)}
+@item man9/lis_maj_min_name.9
+@manref{lis_maj_min_name(9)}
+@item man9/lis_mark_mem.9
+@manref{lis_mark_mem(9)}
+@item man9/lis_max_mem.9
+@manref{lis_max_mem(9)}
+@item man9/lis_old_inode.9
+@manref{lis_old_inode(9)}
+@item man9/lis_open_cnt.9
+@manref{lis_open_cnt(9)}
+@item man9/lis_pci_cleanup.9
+@manref{lis_pci_cleanup(9)}
+@item man9/lis_pipe.9
+@manref{lis_pipe(9)}
+@item man9/lis_poll_2_1.9
+@manref{lis_poll_2_1(9)}
+@item man9/lis_poll_bits.9
+@manref{lis_poll_bits(9)}
+@item man9/lis_poll_events.9
+@manref{lis_poll_events(9)}
+@item man9/lis_poll_file.9
+@manref{lis_poll_file(9)}
+@item man9/lis_print_queues.9
+@manref{lis_print_queues(9)}
+@item man9/lis_print_spl_track.9
+@manref{lis_print_spl_track(9)}
+@item man9/lis_print_stream.9
+@manref{lis_print_stream(9)}
+@item man9/lis_qattach.9
+@manref{lis_qattach(9)}
+@item man9/lis_qdetach.9
+@manref{lis_qdetach(9)}
+@item man9/lis_queuerun_cnts.9
+@manref{lis_queuerun_cnts(9)}
+@item man9/lis_queues_running.9
+@manref{lis_queue_running(9)}
+@item man9/lis_recvfd.9
+@manref{lis_recvfd(9)}
+@item man9/lis_release_mem_region.9
+@manref{lis_release_mem_region(9)}
+@item man9/lis_request_mem_region.9
+@manref{lis_request_mem_region(9)}
+@item man9/lis_runq_cnts.9
+@manref{lis_runq_cnt(9)}
+@item man9/lis_runq_req_cnt.9
+@manref{lis_runq_req_cnt(9)}
+@item man9/lis_sendfd.9
+@manref{lis_sendfd(9)}
+@item man9/lis_set_file_str.9
+@manref{lis_set_file_str(9)}
+@item man9/lis_setq.9
+@manref{lis_setq(9)}
+@item man9/lis_setqsched.9
+@manref{lis_setqsched(9)}
+@item man9/lis_setqsched_cnts.9
+@manref{lis_setqsched_cnts(9)}
+@item man9/lis_setqsched_isr_cnts.9
+@manref{lis_setqsched_isr_cnts(9)}
+@item man9/lis_stdata_cnt.9
+@manref{lis_stdata_cnt(9)}
+@item man9/lis_strclose.9
+@manref{lis_strclose(9)}
+@item man9/lis_strcount.9
+@manref{lis_strcount(9)}
+@item man9/lis_strgetpmsg.9
+@manref{lis_strgetpmsg(9)}
+@item man9/lis_strioctl.9
+@manref{lis_strioctl(9)}
+@item man9/lis_stropen.9
+@manref{lis_stropen(9)}
+@item man9/lis_strputpmsg.9
+@manref{lis_strputpmsg(9)}
+@item man9/lis_strread.9
+@manref{lis_strread(9)}
+@item man9/lis_strstats.9
+@manref{lis_strstats(9)}
+@item man9/lis_strwrite.9
+@manref{lis_strwrite(9)}
+@item man9/lis_umount2.9
+@manref{lis_umount2(9)}
+@item man9/lis_valid_mod_list.9
+@manref{lis_valid_mod_list(9)}
+
+@item man9/maccompat.9
+@manref{maccompat(9)}
+
+@item man9/allocbi.9
+@manref{allocbi(9)}
+@item man9/esballoca.9
+@manref{esballoca(9)}
+@item man9/mpnotify.9
+@manref{mpnotify(9)}
+
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_TITLE}} installs the following manuals in the @file{/usr/share/info} subdirectory:
+
+@table @file
+
+@item strcompat.info
+@command{info} version of this file.
+
+@item strcompat.info-1
+@command{info} version of this file.
+
+@item strcompat.info-2
+@command{info} version of this file.
+
+@end table
+
+@cite{@value{PACKAGE_TITLE}} places the following init scripts in the system
+init directory @file{etc/rc.d/init.d/} (non-Debian) or @file{etc/init.d/}
+(Debian):
+
+@table @file
+
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@cite{@value{PACKAGE_TITLE}} places the following system configuration files
+in the system configuration directory @file{etc/sysconfig/} (non-Debian) or
+@file{etc/default/} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+System configuration defaults.
+@end table
+
+@cite{@value{PACKAGE_TITLE}} places the following system configuration files
+in the configuration directory @file{etc/}:
+
+@table @file
+@item @value{PACKAGE}.conf
+Configuration values.
+
+@end table
+
+The @cite{@value{PACKAGE_TITLE}} package installs the following kernel modules in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} subdirectory:@footnote{The kernel version,
+@value{_kversion}, here is just an example.}
+
+@table @file
+
+@item streams_os7compat.ko
+@cite{OpenSS7} compatibility module.
+
+@item streams_svr3compat.ko
+@cite{SVR 3} compatibility module.
+
+@item streams_svr4compat.ko
+@cite{SVR 4.2 MP} compatibility module.
+
+@item streams_mpscompat.ko
+@cite{MPS} compatibility module.
+
+@item streams_suncompat.ko
+@cite{Solaris} compatibility module.
+
+@item streams_uw7compat.ko
+@cite{UnixWare} compatibility module.
+
+@item streams_osfcompat.ko
+@cite{OSF/1} compatibility module.
+
+@item streams_aixcompat.ko
+@cite{AIX} compatibility module.
+
+@item streams_hpuxcompat.ko
+@cite{HP-UX} compatibility module.
+
+@item streams_irixcompat.ko
+@cite{IRIX} compatibility module.
+
+@item streams_liscompat.ko
+@cite{LiS} compatibility module.
+
+@item streams_maccompat.ko
+@cite{Mac OT} compatibility module.
+
+@end table
+
+@ignore
 /usr
 /usr/include
 /usr/include/strcompat

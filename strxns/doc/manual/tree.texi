@@ -100,22 +100,31 @@ This file contains the NPI header file.
 This file contains an NPI header file for IP.
 @end table
 
+@subsection Maintenance Programs
+
 @dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system libexec directory
 @file{usr/libexec/@value{PACKAGE}/}:
 
 @table @file
+
 @item send-pr
 problem report generation script.
+
 @item send-pr.config
 problem report generation script configuration.
+
 @item ldltest
 This binary contains a test program for the Linux DL driver.
+
 @item test-np_ip
 test program.
+
 @item testsuite
 @command{autotest} test suite.
+
 @item atlocal
 configuration for the @command{autotest} test suite.
+
 @end table
 
 @dfn{@value{PACKAGE_UCNAME}} places the following utility programs in the system binary directory
