@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.11 2006/12/06 11:28:26 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.12 2007/01/02 16:32:03 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/06 11:28:26 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/02 16:32:03 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -85,6 +85,10 @@ The sections that follow provide information on OpenSS7 releases of the
 
 @itemize
 @item
+The release is now considered @emph{production} grade by the @cite{OpenSS7
+Project}.
+
+@item
 Testing of, and a few bug corrections to, the strlog() feature.  Trace and
 error logging working well.
 
@@ -93,10 +97,10 @@ Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
 
 @item
-The package now builds a replacement libLiS and libpLiS library so that
-user applications written to work with LiS-2.18.1 through LiS-@value{VERSION_LIS} do no need
-to be recompiled.  Added versioning of all library symbols in all three
-libraries.
+The package now builds a replacement libLiS and libpLiS library so that user
+applications written to work with LiS-2.18.1 through LiS-@value{VERSION_LIS}
+do no need to be recompiled.  Added versioning of all library symbols in all
+three libraries.
 
 @item
 Minor bug fixes to STREAMS library.  isastream(3) and fattach(3) must not
@@ -106,14 +110,14 @@ thread cancellation points.
 
 @item
 Now builds 32-bit compatibility libraries, as well, and tests them against
-64-bit kernel modules and drivers.  The @samp{make installcheck} target will now
-automatically test both 64-bit native and 32-bit compatibility versions, one
-after the other, on 64-bit platforms.
+64-bit kernel modules and drivers.  The @samp{make installcheck} target will
+now automatically test both 64-bit native and 32-bit compatibility versions,
+one after the other, on 64-bit platforms.
 
 @item
-Many documentation updates for all @uref{http://www.openss7.org/,,
-OpenSS7} packages.  Automated release file generation making for vastly improved
-and timely text documentation present in the release directory.
+Many documentation updates for all @uref{http://www.openss7.org/,, OpenSS7}
+packages.  Automated release file generation making for vastly improved and
+timely text documentation present in the release directory.
 
 @item
 Dropped support for @cite{LiS}.
@@ -126,8 +130,8 @@ Start assigning majors at major device number 231 instead of major device
 number 230.  Assign major device number 230 explicitly to the clone device.
 Package will now support extended ranges of minor devices on 2.6 kernels under
 @cite{Linux Fast-STREAMS} only.  @cite{@value{PACKAGE}} now supports expanded
-addressable minor device numbers, permitting 2^16 addressable minor devices per
-major device number on 2.6 kernels: @cite{LiS} cannot support this change.
+addressable minor device numbers, permitting 2^16 addressable minor devices
+per major device number on 2.6 kernels: @cite{LiS} cannot support this change.
 
 @item
 Better detection of SUSE distributions, release numbers and SLES

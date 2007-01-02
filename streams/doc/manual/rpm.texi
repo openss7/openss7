@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 0.9.2.6 2006/02/22 11:35:45 brian Exp $
+@c @(#) $Id: rpm.texi,v 0.9.2.7 2007/01/02 16:32:03 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/02/22 11:35:45 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/02 16:32:03 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -214,13 +214,14 @@ Enable override of system fifos with STREAMS-based fifos.
 This option defaults to @samp{disabled}.
 This option is not tested.  Do not enable this option yet.
 
-@item --without streams-bcm
+@item --with streams-bcm
 @opindex streams-bcm
-Disable STREAMS binary compatibility mode.
-When enabled, exported functions (and callouts) will always pass three arguments in registers on
+Enable STREAMS binary compatibility mode.
+When enabled, exported functions (and callouts) will never pass three arguments in registers on
 architectures supporting @code{regparm} (i.e. @var{__i386__}, @var{__x86_64__}, @var{__k8__})
-regardless of how the kernel was compiled.
-This option defaults to @samp{enabled}.
+regardless of how the kernel was compiled.  Additional @cite{LiS} binary compatibility is also
+enabled (e.g. credentials).
+This option defaults to @samp{disabled}.
 
 @end table
 

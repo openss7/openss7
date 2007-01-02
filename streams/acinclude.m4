@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin fo+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2006/12/18 07:32:35 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2007/01/02 16:32:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/18 07:32:35 $ by $Author: brian $
+# Last Modified $Date: 2007/01/02 16:32:02 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.131  2007/01/02 16:32:02  brian
+# - updates for release, disable streams-bcm by default
+#
 # Revision 0.9.2.130  2006/12/18 07:32:35  brian
 # - lfs device names, autoload clone minors, device numbering, missing manpages
 #
@@ -990,12 +993,12 @@ AC_DEFUN([_LFS_SETUP], [dnl
 AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
     AC_CACHE_CHECK([for STREAMS binary compatibilty mode], [lfs_cv_bcm], [dnl
 	AC_ARG_ENABLE([streams-bcm],
-	    AS_HELP_STRING([--disable-streams-bcm],
+	    AS_HELP_STRING([--enable-streams-bcm],
 		[disable STREAMS binary compatibility mode.
-		@<:@default=enabled@:>@]),
+		@<:@default=disabled@:>@]),
 		[enable_streams_bcm="$enableval"],
-		[enable_streams_bcm='yes'])
-	lfs_cv_bcm="${enable_streams_bcm:-yes}"])
+		[enable_streams_bcm='no'])
+	lfs_cv_bcm="${enable_streams_bcm:-no}"])
     AH_TEMPLATE([CONFIG_STREAMS_LIS_BCM], [Defined when] AC_PACKAGE_TITLE [was
 	compiled for LiS Binary Compatibility.])
     AH_VERBATIM([streamscall], m4_text_wrap([Use this macro like fastcall.  It
@@ -1020,7 +1023,7 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 #else
 #define STREAMSCALL(__x) __x
 #endif])
-    if test :"${lfs_cv_bcm:-yes}" = :yes
+    if test :"${lfs_cv_bcm:-no}" = :yes
     then
 	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LIS_BCM], [1])
 	AC_DEFINE_UNQUOTED([streamscall], [__attribute__((__regparm__(0)))])

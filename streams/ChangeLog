@@ -1,5 +1,11 @@
 2007-01-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: set --enable-streams-bcm to default to disabled.
+	* doc/manual/STREAMS.texi: updates for release.
+	* doc/manual/configure.texi: updates for release.
+	* doc/manual/news.texi: updates for release.
+	* doc/manual/rpm.texi: updates for release.
+
 	* streams.spec.in: remove porting manual from build (see strcompat package)
 	* debian/rules.in: remove porting manual from build (see strcompat package)
 	* doc/manual/Makefile.am: remove porting manual from build (see strcompat package)

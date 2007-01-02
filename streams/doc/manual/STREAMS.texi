@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.34 2006/12/31 13:26:37 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.35 2007/01/02 16:32:03 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/12/31 13:26:37 $ by $Author: brian $
+% Last Modified $Date: 2007/01/02 16:32:03 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -219,6 +219,8 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
+* Porting::			Porting to the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -263,12 +265,26 @@ Reference
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
+
+Development
+
+* Development Header Files::	Header Files in the package
+* Static and Shared Libraries::	Libraries in the package
+* Kernel Module Development::	Kernel development with the package
+* Manual Pages::		Manual Pages in the package
+
+Porting
+
+* Porting from LiS::		Porting from LiS to this package
+* Porting from SVR 4.2 MP::	Porting from SVR 4.2 to this package
+* Porting from Solaris::	Porting from Solaris to this package
+* Porting from UnixWare::	Porting from UnixWare to this package
+* Porting from Mentat::		Porting from Mentat to this package
 
 Conformance
 
+* Standards Compliance::	Compliacne with standards
 * STREAMS Compatibility::	Compatibility with other STREAMS packages
-* Porting::			Porting to this STREAMS package
 
 Releases
 
@@ -410,6 +426,9 @@ package.
 @smallexample
 
 $Log: STREAMS.texi,v $
+Revision 0.9.2.35  2007/01/02 16:32:03  brian
+- updates for release, disable streams-bcm by default
+
 Revision 0.9.2.34  2006/12/31 13:26:37  brian
 - documentation updates for release
 
@@ -655,6 +674,8 @@ This manual is organized (loosely) into several sections as follows:
   Introduction::		This introduction
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
+* Porting::			Porting to the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -669,6 +690,10 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @ref{Reference}.
 @tab Contents of the package
+@item @ref{Development}.
+@tab Developing with the package
+@item @ref{Porting}.
+@tab Porting to the package
 @item @ref{Conformance}.
 @tab Conformance of the package
 @item @ref{Releases}.
@@ -687,6 +712,10 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @cite{Reference}.
 @tab Contents of the package
+@item @cite{Development}.
+@tab Developing with the package
+@item @cite{Porting}.
+@tab Porting to the package
 @item @cite{Conformance}.
 @tab Conformance of the package
 @item @cite{Releases}.
@@ -980,7 +1009,6 @@ filesystem for support and debugging.
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -1416,6 +1444,219 @@ Additional modules are provided by add-on packages.
 @node Libraries
 @section Libraries
 @cindex libraries
+
+During the installation process of @cite{@value{PACKAGE_TITLE}} a subroutine library is built and
+installed on your system.  For 64-bit systems that support 32-bit compatibility, two versions of
+each library are built and installed: one 64-bit native library and one 32-bit compatibility
+library.  64-bit native libraries are installed to the @file{/usr/lib64} subdirectory.  32-bit
+native and 32-bit compatibility libraries are installed to the @file{/usr/lib} subdirectory.
+
+@table @file
+
+@item libstreams.so.0.0.1
+@itemx libstreams.so.0
+@itemx libstreams.so
+Provides a shared object library for use by @dfn{STREAMS} applications programs.
+
+@item libstreams.a
+Provides a static library for use by @dfn{STREAMS} applications programs.
+
+@item libstreams.la
+Provides the @command{libtool} definitions for the library.
+
+@end table
+
+In addition to the @file{libstreams} library, @cite{@value{PACKAGE_TITLE}} also installs
+compatibility libraries for @cite{LiS}.  These compatibility libraries permit applications
+previously linked with @cite{LiS} shared libraries to function with @cite{@value{PACKAGE_TITLE}}
+without recompiling or relinking.
+
+@table @file
+
+@item libLiS.so.0.0.1
+@itemx libLiS.so.0
+@itemx libLiS.so
+Provides a shared object library for use by legacy @cite{LiS} applications programs.
+
+@item libLiS.a
+Provides a static library for use by legacy @cite{LiS} applications programs.
+
+@item libLiS.la
+Provides the @command{libtool} definitions for the library.
+
+@itemx libpLiS.so.0.0.1
+@itemx libpLiS.so.0
+@itemx libpLiS.so
+Provides a shared object library for use by legacy @cite{LiS} applications programs.
+
+@item libpLiS.a
+Provides a static library for use by legacy @cite{LiS} applications programs.
+
+@item libpLiS.la
+Provides the @command{libtool} definitions for the library.
+
+@end table
+
+@subsection libstreams Library Routines
+
+The following routines are present in the @file{libstreams} libraries.  The routines in these
+libraries are standard @dfn{STREAMS} interface system calls documented in the @cite{System V Release
+4.2 Programmer's Manual -- STREAMS}.  Refer to the associated manual pages for detailed information
+on these routines.
+
+@ftable @manref
+
+@item fattach(2)
+Name a @dfn{STREAMS} special file.
+
+@item fdetach(2)
+Unname a @dfn{STREAMS} special file.
+
+@item getmsg(2)
+Get next message off of a Stream.
+
+@item getpmsg(2s)
+Get next message off of a Stream.
+
+@item isastream(2)
+Test for a @dfn{STREAMS} special file.
+
+@item pipe(2s)
+Create a @dfn{STREAMS} pipe.
+
+@item putmsg(2)
+Put a message to a @dfn{STREAMS} character device.
+
+@item putpmsg(2s)
+Put a band message to a @dfn{STREAMS} character device.
+
+@item pstrlog(3)
+Print a @dfn{STREAMS} log buffer.
+
+@item strlog(3)
+Print a @dfn{STREAMS} log buffer.
+
+@item vstrlog(3)
+Print a @dfn{STREAMS} log buffer.
+
+@end ftable
+
+@subsection libLiS Library Routines
+
+The following routines are present in the @file{libLiS} libraries.  The routines are identical to
+the routines present in the @file{libstreams} library and are provided in the @file{libLiS} library
+for compatibility with existing applications linked against @file{libLiS}.
+
+@ftable @manref
+
+@item fattach(2)
+Name a @dfn{STREAMS} special file.
+
+@item fdetach(2)
+Unname a @dfn{STREAMS} special file.
+
+@item getmsg(2)
+Get next message off of a Stream.
+
+@item getpmsg(2s)
+Get next message off of a Stream.
+
+@item isastream(2)
+Test for a @dfn{STREAMS} special file.
+
+@item pipe(2s)
+Create a @dfn{STREAMS} pipe.
+
+@item putmsg(2)
+Put a message to a @dfn{STREAMS} character device.
+
+@item putpmsg(2s)
+Put a band message to a @dfn{STREAMS} character device.
+
+@ignore
+@item pstrlog(3)
+Print a @dfn{STREAMS} log buffer.
+@item strlog(3)
+Print a @dfn{STREAMS} log buffer.
+@item vstrlog(3)
+Print a @dfn{STREAMS} log buffer.
+@end ignore
+
+@end ftable
+
+@subsection libpLiS Library Routines
+
+The following routines are present in the @file{libpLiS} libraries.  The @file{libpLiS} library is
+the same as the @file{libLiS} and @file{libstreams} libraries but omits the @manpage{pipe(2s)}
+subroutine.  The purpose of the @file{libpLiS} library was to permit it to be used as a library
+preload without affecting the @manpage{pipe(2s)} function used by existing programs linked against
+@file{libc}.
+
+@ftable @manref
+
+@item fattach(2)
+Name a @dfn{STREAMS} special file.
+
+@item fdetach(2)
+Unname a @dfn{STREAMS} special file.
+
+@item getmsg(2)
+Get next message off of a Stream.
+
+@item getpmsg(2s)
+Get next message off of a Stream.
+
+@item isastream(2)
+Test for a @dfn{STREAMS} special file.
+
+@item putmsg(2)
+Put a message to a @dfn{STREAMS} character device.
+
+@item putpmsg(2s)
+Put a band message to a @dfn{STREAMS} character device.
+
+@ignore
+@item pstrlog(3)
+Print a @dfn{STREAMS} log buffer.
+@item strlog(3)
+Print a @dfn{STREAMS} log buffer.
+@item vstrlog(3)
+Print a @dfn{STREAMS} log buffer.
+@end ignore
+
+@end ftable
+
+@subsection Using the Library
+
+To use one of the @cite{@value{PACKAGE_TITLE}} libraries you can include the file
+@file{sys/stropts.h} in you application program source code.  On you compiler command line, add the
+option @samp{-I/usr/include/@value{PACKAGE}} to include the version of @file{sys/stropts.h} that is
+distributed with @cite{@value{PACKAGE_TITLE}}.
+
+When linking our program, or performing a final @command{gcc} to build your executable, include one
+of the following options on your command line:
+
+@table @samp
+
+@item /usr/lib/libstreams.a
+@itemx -lstreams -static
+Link against the static version of the library.
+
+@item -lstreams
+Link against the shared object version of the library.
+
+@item /usr/lib/libstreams.la
+Use with @command{libtool} to link additional convenience libraries against the shared or static
+versions of the library.
+
+@end table
+
+Failure to link the executable runtime path for @file{libstreams} will result in linker-loader
+warnings that the functions @manpage{getpmsg(2s)} or @manpage{putpmsg(2s)} are not implemented and
+will always fail.@footnote{These warnings are generated when linking only against the @file{libc}
+library that includes only failing stubs for @manpage{getpmsg(2)} and @manpage{putpmsg(2)}}.
+
+See also @refman{Development} for more information.
 
 
 @c ----------------------------------------------------------------------------
@@ -1908,9 +2149,8 @@ suite, see @refman{Running Test Suites}.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@page
 @node Development
-@section Development
+@chapter Development
 @cindex developing
 
 For development using the @cite{@value{PACKAGE_NAME}} package, @xref{Top, About This Manual, About
@@ -1924,7 +2164,7 @@ This Manual, SPG, STREAMS Programmer's Guide}.
 @end menu
 
 @node Development Header Files
-@subsection Header Files
+@section Header Files
 
 Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}} subdirectory.  To
 use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
@@ -2115,13 +2355,13 @@ See @manref{testmod(4)} for more information.
 
 @end table
 
-@subsubsection User Space Programs
+@subsection User Space Programs
 
 Typical include files for interacting with @dfn{STREAMS} from user space include the
 @file{stropts.h} header file.  Additional header files for interacting with specific drivers or
 modules may also be required.
 
-@subsubsection Kernel Space Drivers and Modules
+@subsection Kernel Space Drivers and Modules
 
 Typical include files for writing @dfn{STREAMS} modules and drivers for kernel space include the
 @file{sys/cmn_err.h}, @file{sys/kmem.h}, @file{sys/dki.h}, @file{sys/stream.h}, @file{sys/ddi.h},
@@ -2129,7 +2369,7 @@ and @file{sys/strconf.h} header files.  Additional header files for interacting 
 drivers or modules may also be required.
 
 @node Static and Shared Libraries
-@subsection Libraries
+@section Libraries
 
 Shared or static versions of the @file{libstreams} library must be linked when using the
 @command{@value{PACKAGE}-@value{VERSION}} package.  This library must either be specified on the
@@ -2155,7 +2395,7 @@ Link to the @file{/usr/lib/libstreams.a} static library.
 @end table
 
 @node Kernel Module Development
-@subsection Kernel Modules
+@section Kernel Modules
 
 Developing @dfn{STREAMS} kernel modules is similar to user space programs with regard to header
 files.  @file{/usr/include/@value{PACKAGE}} should be placed as an include directory to search in
@@ -2187,10 +2427,759 @@ maybe even @samp{--include
 @end itemize
 
 @node Manual Pages
-@subsection Manual Pages
+@section Manual Pages
 
-The @command{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages.  The number
-of manual pages installed totals several hundred manual pages.
+The @command{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages in the
+@file{/usr/share/man} directory as follows:
+
+The following manual pages are installed in Section 1 of the manual (in the subdirectory @file{/usr/share/man/man1}):
+
+@multitable @columnfractions .40 .60
+
+@item @manref{strchg(1)} -- @tab change Stream configuration.
+@item @manref{strconf(1)} -- @tab query Stream configuration.
+@item @manref{strreset(1)} -- @tab reset a Stream.
+
+@end multitable
+
+The following manual pages are installed in Section 2 of the manual (in the subdirectory @file{/usr/share/man/man2}):
+
+@multitable @columnfractions .40 .60
+
+@item @manref{fattach(2)} -- @tab name a @dfn{STREAMS} special file.
+@item @manref{fdetach(2)} -- @tab unname a @dfn{STREAMS} special file.
+@item @manref{getmsg(2)} -- @tab get next message off a Stream.
+@item @manref{getpmsg(2s)} -- @tab get next message off a Stream.
+@item @manref{isastream(2)} -- @tab test for a @dfn{STREAMS} special file.
+@item @manref{pipe(2s)} -- @tab create a @dfn{STREAMS} pipe.
+@item @manref{poll(2s)} -- @tab wait for an event on a @dfn{STREAMS} file descriptor.
+@item @manref{putmsg(2)} -- @tab put a message to a @dfn{STREAMS} character device.
+@item @manref{putpmsg(2s)} -- @tab put a band message to a @dfn{STREAMS} character device.
+@item @manref{read(2s)} -- @tab read from a file descriptor.
+@item @manref{readv(2s)} -- @tab read or write a vector.
+@item @manref{write(2s)} -- @tab write to a file descriptor.
+@item @manref{writev(2s)} -- @tab read or write a vector.
+
+@end multitable
+
+The following manual pages are installed in Section 3 of the manual (in the subdirectory @file{/usr/share/man/man3}):
+
+@multitable @columnfractions .40 .60
+
+@item @manref{streams(3)} -- @tab @dfn{STREAMS} system call library.
+@item @manref{libstreams(3)} -- @tab @dfn{STREAMS} system call library.
+@item @manref{LiS(3)} -- @tab @dfn{STREAMS} system call library.
+@item @manref{pLiS(3)} -- @tab @dfn{STREAMS} system call library.
+@item @manref{libLiS(3)} -- @tab @dfn{STREAMS} system call library.
+@item @manref{libpLiS(3)} -- @tab @dfn{STREAMS} system call library.
+
+@item @manref{fattach(3)} -- @tab name a @dfn{STREAMS} special file.
+@item @manref{fdetach(3)} -- @tab unname a @dfn{STREAMS} special file.
+@item @manref{isastream(3)} -- @tab test for a @dfn{STREAMS} special file.
+@item @manref{pipe(3)} -- @tab create a @dfn{STREAMS} pipe.
+@item @manref{pstrlog(3)} -- @tab print a @dfn{STREAMS} log buffer.
+@item @manref{s_pipe(3)} -- @tab create a @dfn{STREAMS} pipe.
+@item @manref{strlog(3)} -- @tab print a @dfn{STREAMS} log buffer.
+@item @manref{vstrlog(3)} -- @tab print a @dfn{STREAMS} log buffer.
+
+@end multitable
+
+The following manual pages are installed in Section 4 of the manual (in the subdirectory @file{/usr/share/man/man4}):
+
+@multitable @columnfractions .40 .60
+
+@item @manref{bufmod(4)} -- @tab @dfn{STREAMS} buffering null module.
+@item @manref{clone(4)} -- @tab the @dfn{STREAMS} clone driver.
+@item @manref{connld(4)} -- @tab @dfn{STREAMS} connection line discipline module.
+@item @manref{conslog(4)} -- @tab @dfn{STREAMS} log device.
+@item @manref{echo(4)} -- @tab echo @dfn{STREAMS} device.
+@item @manref{fifo(4s)} -- @tab @dfn{STREAMS}-based FIFO device.
+@item @manref{log(4)} -- @tab @dfn{STREAMS} log device.
+@item @manref{loop(4)} -- @tab @dfn{STREAMS} loop-around pseudo-device driver.
+@item @manref{loop_clone(4)} -- @tab @dfn{STREAMS} loop-around pseudo-device driver.
+@item @manref{mux(4)} -- @tab @dfn{STREAMS} multiplexing pseudo-device driver.
+@item @manref{nsdev(4)} -- @tab named @dfn{STREAMS} device.
+@item @manref{nullmod(4)} -- @tab @dfn{STREAMS} null module.
+@item @manref{nuls(4)} -- @tab null @dfn{STREAMS} device.
+@item @manref{pipe(4)} -- @tab @dfn{STREAMS} bi-directional pipe device.
+@item @manref{pipemod(4)} -- @tab @dfn{STREAMS}-based pipe module.
+@item @manref{s_fifo(4)} -- @tab @dfn{STREAMS}-based FIFO device.
+@item @manref{sad(4)} -- @tab @dfn{STREAMS} Administrative Driver.
+@item @manref{sc(4)} -- @tab @dfn{STREAMS} Configuration module.
+@item @manref{sfx(4)} -- @tab @dfn{STREAMS}-based FIFO device.
+@item @manref{sloop(4)} -- @tab @dfn{STREAMS} loop-around pseudo-device driver.
+@item @manref{spx(4)} -- @tab @dfn{STREAMS} bi-directional pipe device.
+@item @manref{sth(4)} -- @tab @dfn{STREAMS} Stream head module.
+@item @manref{strlog(4)} -- @tab @dfn{STREAMS} log device.
+@item @manref{testmod(4)} -- @tab @dfn{STREAMS} test module.
+
+@end multitable
+
+The following manual pages are installed in Section 5 of the manual (in the subdirectory @file{/usr/share/man/man5}):
+
+@multitable @columnfractions .40 .60
+
+@item @manref{autopush(5)} -- @tab control the autopush module list for a @dfn{STREAMS} device.
+@item @manref{specfs(5)} -- @tab @dfn{STREAMS} special device shadow file system.
+@item @manref{strapush(5)} -- @tab @dfn{STREAMS} autopush structure.
+@item @manref{strioctl(5)} -- @tab @dfn{STREAMS} I/O control data structure.
+@item @manref{strsetup.conf(5)} -- @tab configuration file for @dfn{STREAMS} drivers.
+
+@end multitable
+
+The following manual pages are installed in Section 7 of the manual (in the subdirectory @file{/usr/share/man/man7}):
+
+@multitable @columnfractions .40 .60
+
+@item @manref{streamio(7)} -- @tab @dfn{STREAMS} ioctl commands.
+
+@item @manref{I_ANCHOR(7)} -- @tab @dfn{STREAMS} anchor input-output control.
+@item @manref{I_ATMARK(7)} -- @tab check if a @dfn{STREAMS} message is marked.
+@item @manref{I_CANPUT(7)} -- @tab check if a @dfn{STREAMS} band is writable.
+@item @manref{I_CKBAND(7)} -- @tab check if a @dfn{STREAMS} band is readable.
+@item @manref{I_EGETSIG(7)} -- @tab get enhanced @dfn{STREAMS} SIGPOLL events.
+@item @manref{I_ESETSIG(7)} -- @tab set enhanced @dfn{STREAMS} SIGPOLL events.
+@item @manref{I_FATTACH(7)} -- @tab emulate @manpage{fattach(2)} system call.
+@item @manref{I_FDETACH(7)} -- @tab emulate @manpage{fdetach(2)} system call.
+@item @manref{I_FDINSERT(7)} -- @tab insert a Stream identifier into a @dfn{STREAMS} message and send it downstream.
+@item @manref{I_FIND(7)} -- @tab find a @dfn{STREAMS} module on a Stream.
+@item @manref{I_FLUSH(7)} -- @tab flush messages from a @dfn{STREAMS} special file.
+@item @manref{I_FLUSHBAND(7)} -- @tab flush messages for a band from a @dfn{STREAMS} special file.
+@item @manref{I_GERROPT(7)} -- @tab get error options for a @dfn{STREAMS} file.
+@item @manref{I_GETBAND(7)} -- @tab get band number of a message on a Stream.
+@item @manref{I_GETCLTIME(7)} -- @tab get close time for a @dfn{STREAMS} file.
+@item @manref{I_GETPMSG(7)} -- @tab @dfn{STREAMS} @manpage{getpmsg(2s)} system call emulation.
+@item @manref{I_GETSIG(7)} -- @tab get SIGPOLL events.
+@item @manref{I_GRDOPT(7)} -- @tab get @dfn{STREAMS} read options.
+@item @manref{I_GWROPT(7)} -- @tab get @dfn{STREAMS} write options.
+@item @manref{I_ISASTREAM(7)} -- @tab emulate @manpage{isastream(2)} system call.
+@item @manref{I_LINK(7)} -- @tab link a Stream beneath a @dfn{STREAMS} multiplexing driver.
+@item @manref{I_LIST(7)} -- @tab list @dfn{STREAMS} module names on a Stream.
+@item @manref{I_LOOK(7)} -- @tab look at topmost @dfn{STREAMS} module on a Stream.
+@item @manref{I_NREAD(7)} -- @tab number of unread bytes on a Stream.
+@item @manref{I_PEEK(7)} -- @tab peek at @dfn{STREAMS} message on read queue.
+@item @manref{I_PIPE(7)} -- @tab obtain a @dfn{STREAMS} based pipe.
+@item @manref{I_PLINK(7)} -- @tab persistently link a Stream beneath a @dfn{STREAMS} multiplexing driver.
+@item @manref{I_POP(7)} -- @tab pop a @dfn{STREAMS} module from a Stream.
+@item @manref{I_PUNLINK(7)} -- @tab unlink a @dfn{STREAMS} persistent link.
+@item @manref{I_PUSH(7)} -- @tab push a @dfn{STREAMS} module on a Stream.
+@item @manref{I_PUTPMSG(7)} -- @tab @dfn{STREAMS} @manpage{putpmsg(2s)} system call emulation.
+@item @manref{I_RECVFD(7)} -- @tab receive a file descriptor on a Stream.
+@item @manref{I_SENDFD(7)} -- @tab send a file descriptor on a Stream.
+@item @manref{I_SERROPT(7)} -- @tab set error options for a @dfn{STREAMS} file.
+@item @manref{I_SETCLTIME(7)} -- @tab set close time for a @dfn{STREAMS} file.
+@item @manref{I_SETSIG(7)} -- @tab set SIGPOLL events.
+@item @manref{I_SRDOPT(7)} -- @tab set @dfn{STREAMS} read options.
+@item @manref{I_STR(7)} -- @tab @dfn{STREAMS} intput-output control.
+@item @manref{I_SWROPT(7)} -- @tab set @dfn{STREAMS} write options.
+@item @manref{I_UNLINK(7)} -- @tab unlink a Stream from a @dfn{STREAMS} multiplexing driver.
+
+@end multitable
+
+The following manual pages are installed in Section 8 of the manual (in the subdirectory @file{/usr/share/man/man8}):
+
+@multitable @columnfractions .40 .60
+
+@item @manref{autopush(8)} -- @tab control the autopush module list for a @dfn{STREAMS} device.
+@item @manref{fattach(8)} -- @tab name a @dfn{STREAMS} file.
+@item @manref{fdetach(8)} -- @tab unname a @dfn{STREAMS} file.
+@item @manref{insf(8)} -- @tab instal special device files.
+@item @manref{perftest(8)} -- @tab @dfn{STREAMS} benchmark performance tests on a pipe.
+@item @manref{perftestn(8)} -- @tab @dfn{STREAMS} benchmark performance tests on a pipe.
+@item @manref{scls(8)} -- @tab produce a list of @dfn{STREAMS} module and driver names.
+@item @manref{specfs(8)} -- @tab System V Init Script for the @dfn{STREAMS} Shadow Special Filesystem.
+@item @manref{specfs.sh(8)} -- @tab System V Init Script for the @dfn{STREAMS} Shadow Special Filesystem.
+@item @manref{strace(8)} -- @tab write @dfn{STREAMS} event trace messages to the standard output.
+@item @manref{strclean(8)} -- @tab clean up the @dfn{STREAMS} error logger.
+@item @manref{streams(8)} -- @tab System V Init Script for the @dfn{STREAMS} subsystem.
+@item @manref{streams_mknod(8)} -- @tab create or remove @dfn{STREAMS} device nodes.
+@item @manref{streams.sh(8)} -- @tab System V Init Script for the @dfn{STREAMS} subsystem.
+@item @manref{strerr(8)} -- @tab receive error log messages from the @dfn{STREAMS} @manpage{log(4)} driver.
+@item @manref{strinfo(8)} -- @tab display information about @dfn{STREAMS} devices.
+@item @manref{strload(8)} -- @tab load the @dfn{STREAMS} subsystem.
+@item @manref{strsetup(8)} -- @tab @dfn{STREAMS} setup command.
+@item @manref{strvf(8)} -- @tab @dfn{STREAMS} verification tool.
+@item @manref{test-clone(8)} -- @tab a test suite executable for the @manpage{clone(4)} @dfn{STREAMS} driver.
+@item @manref{test-connld(8)} -- @tab a test suite executable for the @manpage{connld(4)} @dfn{STREAMS} module.
+@item @manref{test-echo(8)} -- @tab a test suite executable for the @manpage{echo(4)} @dfn{STREAMS} driver.
+@item @manref{test-fifo(8)} -- @tab a test suite executable for the @manpage{fifo(4)} @dfn{STREAMS} driver.
+@item @manref{test-log(8)} -- @tab a test suite executable for the @manpage{log(4)} @dfn{STREAMS} driver.
+@item @manref{test-loop(8)} -- @tab a test suite executable for the @manpage{loop(4)} @dfn{STREAMS} driver.
+@item @manref{test-mux(8)} -- @tab a test suite executable for the @manpage{mux(4)} @dfn{STREAMS} driver.
+@item @manref{test-nsdev(8)} -- @tab a test suite executable for the @manpage{nsdev(4)} @dfn{STREAMS} driver.
+@item @manref{test-nuls(8)} -- @tab a test suite executable for the @manpage{nuls(4)} @dfn{STREAMS} driver.
+@item @manref{test-pipe(8)} -- @tab a test suite executable for the @manpage{pipe(4)} @dfn{STREAMS} driver.
+@item @manref{test-pipemod(8)} -- @tab a test suite executable for the @manpage{pipemod(4)} @dfn{STREAMS} module.
+@item @manref{test-sad(8)} -- @tab a test suite executable for the @manpage{sad(4)} @dfn{STREAMS} driver.
+@item @manref{test-sc(8)} -- @tab a test suite executable for the @manpage{sc(4)} @dfn{STREAMS} module.
+@item @manref{test-streams(8)} -- @tab a test suite executable for @dfn{STREAMS}.
+
+@end multitable
+
+The following manual pages are installed in Section 9 of the manual (in the subdirectory @file{/usr/share/man/man9}):
+
+@multitable @columnfractions .40 .60
+
+@item @manref{Intro(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
+@item @manref{STREAMS(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
+@item @manref{SPG(9)} -- @tab @cite{Linux Fast-STREAMS} Programmers Guide.
+@item @manref{DDI(9)} -- @tab Device Driver interface/Driver Kernel Interface.
+@item @manref{LfS(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
+@item @manref{mp-streams(9)} -- @tab multi-processor @dfn{STREAMS} executive.
+
+@item @manref{M_BACKDONE(9)} -- @tab @dfn{STREAMS} backwash done direct I/O message.
+@item @manref{M_BACKWASH(9)} -- @tab @dfn{STREAMS} backwash direct I/O message.
+@item @manref{M_BREAK(9)} -- @tab @dfn{STREAMS} break message.
+@item @manref{M_COPYIN(9)} -- @tab @dfn{STREAMS} copyin message.
+@item @manref{M_COPYOUT(9)} -- @tab @dfn{STREAMS} copyout message.
+@item @manref{M_CTL(9)} -- @tab @dfn{STREAMS} control message.
+@item @manref{M_DATA(9)} -- @tab @dfn{STREAMS} data message.
+@item @manref{M_DELAY(9)} -- @tab @dfn{STREAMS} delay message.
+@item @manref{M_DONTPLAY(9)} -- @tab @dfn{STREAMS} don't play direct I/O message.
+@item @manref{M_ERROR(9)} -- @tab @dfn{STREAMS} error message.
+@item @manref{M_EVENT(9)} -- @tab @dfn{STREAMS} event message.
+@item @manref{M_FLUSH(9)} -- @tab @dfn{STREAMS} flush message.
+@item @manref{M_HANGUP(9)} -- @tab @dfn{STREAMS} hangup message.
+@item @manref{M_HPDATA(9)} -- @tab @dfn{STREAMS} high priority data message.
+@item @manref{M_IOCACK(9)} -- @tab @dfn{STREAMS} IO control acknowledgement message.
+@item @manref{M_IOCDATA(9)} -- @tab @dfn{STREAMS} IO control data message.
+@item @manref{M_IOCNAK(9)} -- @tab @dfn{STREAMS} IO control negative acknowledgement message.
+@item @manref{M_IOCTL(9)} -- @tab @dfn{STREAMS} IO control message.
+@item @manref{M_LETSPLAY(9)} -- @tab @dfn{STREAMS} let's plan direct I/O message.
+@item @manref{M_NOTIFY(9)} -- @tab @dfn{STREAMS} notify message.
+@item @manref{M_PASSFP(9)} -- @tab @dfn{STREAMS} pass file pointer message.
+@item @manref{M_PCCTL(9)} -- @tab @dfn{STREAMS} priority control message.
+@item @manref{M_PCEVENT(9)} -- @tab @dfn{STREAMS} priority event message.
+@item @manref{M_PCPROTO(9)} -- @tab @dfn{STREAMS} priority protocol message.
+@item @manref{M_PCRSE(9)} -- @tab @dfn{STREAMS} priority reserved message.
+@item @manref{M_PCSETOPTS(9)} -- @tab @dfn{STREAMS} priority set options message.
+@item @manref{M_PCSIG(9)} -- @tab @dfn{STREAMS} priority signal message.
+@item @manref{M_PROTO(9)} -- @tab @dfn{STREAMS} protocol message.
+@item @manref{M_READ(9)} -- @tab @dfn{STREAMS} read message.
+@item @manref{M_RSE(9)} -- @tab @dfn{STREAMS} reserved message.
+@item @manref{M_SETOPTS(9)} -- @tab @dfn{STREAMS} set options message.
+@item @manref{M_SIG(9)} -- @tab @dfn{STREAMS} signal message.
+@item @manref{M_START(9)} -- @tab @dfn{STREAMS} start message.
+@item @manref{M_STARTI(9)} -- @tab @dfn{STREAMS} start input message.
+@item @manref{M_STOP(9)} -- @tab @dfn{STREAMS} stop message.
+@item @manref{M_STOPI(9)} -- @tab @dfn{STREAMS} stop input message.
+@item @manref{M_TRAIL(9)} -- @tab @dfn{STREAMS} trail message.
+@item @manref{M_UNHANGUP(9)} -- @tab @dfn{STREAMS} unhangup message.
+@item @manref{OTHERQ(9)} -- @tab return other queue of a @dfn{STREAMS} queue pair.
+@item @manref{QNORM(9)} -- @tab @dfn{STREAMS} data block structure.
+@item @manref{QPCTL(9)} -- @tab @dfn{STREAMS} data block structure.
+@item @manref{RD(9)} -- @tab return the read queue of a @dfn{STREAMS} queue pair.
+@item @manref{SAMESTR(9)} -- @tab test for a @dfn{STREAMS} pipe or FIFO.
+@item @manref{WR(9)} -- @tab return the write queue of a @dfn{STREAMS} queue pair.
+@item @manref{adjmsg(9)} -- @tab trim bytes from the front or back of a @dfn{STREAMS} message.
+@item @manref{allocb(9)} -- @tab allocate a @dfn{STREAMS} message and data block.
+@item @manref{alloclk(9)} -- @tab allocate or free a @dfn{STREAMS} link block.
+@item @manref{allocq(9)} -- @tab allocate a @dfn{STREAMS} queue pair.
+@item @manref{allocstr(9)} -- @tab allocate a @dfn{STREAMS} Stream head.
+@item @manref{appq(9)} -- @tab append one @dfn{STREAMS} message after another.
+@item @manref{apush_get(9)} -- @tab get the autopush list associated with a @dfn{STREAMS} driver.
+@item @manref{apush_set(9)} -- @tab set the autopush list associated with a @dfn{STREAMS} driver.
+@item @manref{apush_vml(9)} -- @tab verify a @dfn{STREAMS} module list.
+@item @manref{autopush(9)} -- @tab perform autopush operations on a newly opened Stream.
+@item @manref{autopush_add(9)} -- @tab add an autopush list entry for a given @dfn{STREAMS} device number.
+@item @manref{autopush_del(9)} -- @tab delete an autopush list entry for a given @dfn{STREAMS} device number.
+@item @manref{autopush_find(9)} -- @tab find an autopush list entry for a given @dfn{STREAMS} device number.
+@item @manref{autopush_search(9)} -- @tab find an autopush list entry for a given @dfn{STREAMS} device name and number.
+@item @manref{autopush_vml(9)} -- @tab verify a @dfn{STREAMS} module list.
+@item @manref{backq(9)} -- @tab find the upstream or downstream queue.
+@item @manref{bcanget(9)} -- @tab test for message arrival on a band on a Stream.
+@item @manref{bcangetany(9)} -- @tab check whether messages are in any (non-zero) band.
+@item @manref{bcanput(9)} -- @tab test flow control on a @dfn{STREAMS} message queue.
+@item @manref{bcanputany(9)} -- @tab check if a message can be put to any (non-zero) band on a queue.
+@item @manref{bcanputnext(9)} -- @tab test flow control on the next @dfn{STREAMS} message queue.
+@item @manref{bcanputnextany(9)} -- @tab check if a message can be put to any (non-zero) band on the next queue.
+@item @manref{bcid_t(9)} -- @tab install a buffer callback.
+@item @manref{bcmp(9)} -- @tab compare byte strings.
+@item @manref{bcopy(9)} -- @tab copy byte strings.
+@item @manref{bufcall(9)} -- @tab install a buffer callback.
+@item @manref{bufcall_id_t(9)} -- @tab install a buffer callback.
+@item @manref{bzero(9)} -- @tab zero a byte string.
+@item @manref{canenable(9)} -- @tab test whether a @dfn{STREAMS} message queue can be scheduled.
+@item @manref{canget(9)} -- @tab test for message arrival on a Stream.
+@item @manref{canput(9)} -- @tab test flow control on a @dfn{STREAMS} message queue.
+@item @manref{canputnext(9)} -- @tab test flow control on the next @dfn{STREAMS} message queue.
+@item @manref{cdev_count(9)} -- @tab character device switch table helper functions.
+@item @manref{cdev_find(9)} -- @tab character device switch table helper functions.
+@item @manref{cdev_match(9)} -- @tab character device switch table helper functions.
+@item @manref{cdev_minor(9)} -- @tab character device switch table helper functions.
+@item @manref{cdev_str(9)} -- @tab character device switch table helper functions.
+@item @manref{cdevsw(9)} -- @tab the @cite{SVR 4} character device switch table structure.
+@item @manref{cdevsw_list(9)} -- @tab the @cite{SVR 4} character device switch table structure.
+@item @manref{cdevsw_lock(9)} -- @tab the @cite{SVR 4} character device switch table structure.
+@item @manref{cdrv_get(9)} -- @tab the @cite{SVR 4} character device switch table structure.
+@item @manref{cdrv_put(9)} -- @tab the @cite{SVR 4} character device switch table structure.
+@item @manref{cmaj_add(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmaj_del(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmaj_get(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmin_add(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmin_count(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmin_del(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmin_find(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmin_get(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmin_ini(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmin_rel(9)} -- @tab major/minor character device node helper functions.
+@item @manref{cmn_err(9)} -- @tab print a kernel command error.
+@item @manref{copyb(9)} -- @tab copy a @dfn{STREAMS} message block.
+@item @manref{copyin(9)} -- @tab copy user data in from user space to kernel space.
+@item @manref{copymsg(9)} -- @tab copy a @dfn{STREAMS} message.
+@item @manref{copyout(9)} -- @tab copy user data in from kernel space to user space.
+@item @manref{copyreq(9)} -- @tab @dfn{STREAMS} copy request block structure.
+@item @manref{copyresp(9)} -- @tab @dfn{STREAMS} copy response block structure.
+@item @manref{cred_t(9)} -- @tab credentials structure.
+@item @manref{ctlmsg(9)} -- @tab test a @dfn{STREAMS} message type for control.
+@item @manref{datab(9)} -- @tab @dfn{STREAMS} data block structure.
+@item @manref{datamsg(9)} -- @tab test a @dfn{STREAMS} message type for data.
+@item @manref{dblk_t(9)} -- @tab @dfn{STREAMS} data block structure.
+@item @manref{delay(9)} -- @tab postpone the calling process for a number of clock ticks.
+@item @manref{dev_t(9)} -- @tab @dfn{STREAMS} device type.
+@item @manref{devnode(9)} -- @tab @dfn{STREAMS} character device node structure.
+@item @manref{do_fattach(9)} -- @tab implement the @manpage{fattach(2)} system call.
+@item @manref{do_fdetach(9)} -- @tab implement the @manpage{fdetach(2)} system call.
+@item @manref{do_spipe(9)} -- @tab implement the @manpage{pipe(2s)} system call.
+@item @manref{drv_getparm(9)} -- @tab driver retrieve kernel parameter.
+@item @manref{drv_hztomsec(9)} -- @tab convert kernel tick time between microseconds or milliseconds.
+@item @manref{drv_hztousec(9)} -- @tab convert kernel tick time between microseconds or milliseconds.
+@item @manref{drv_msectohz(9)} -- @tab convert kernel tick time between microseconds or milliseconds.
+@item @manref{drv_priv(9)} -- @tab check if current process is privileged.
+@item @manref{drv_usectohz(9)} -- @tab convert kernel tick time between microseconds or milliseconds.
+@item @manref{drv_usecwait(9)} -- @tab delay for a number of microseconds.
+@item @manref{dupb(9)} -- @tab duplicate a @dfn{STREAMS} message block.
+@item @manref{dupmsg(9)} -- @tab duplicate a @dfn{STREAMS} message.
+@item @manref{enableok(9)} -- @tab allow a @dfn{STREAMS} message queue to be scheduled.
+@item @manref{enableq(9)} -- @tab schedule a @dfn{STREAMS} message queue service procedure.
+@item @manref{esballoc(9)} -- @tab allocate a @dfn{STREAMS} message and data block with caller supplied data buffer.
+@item @manref{esbbcall(9)} -- @tab install a buffer callback for an extended @dfn{STREAMS} message block.
+@item @manref{flushband(9)} -- @tab flushes a band of @dfn{STREAMS} messages from a queue.
+@item @manref{flushq(9)} -- @tab flush messages from a @dfn{STERAMS} message queue.
+@item @manref{fmod_add(9)} -- @tab file module switch table helper functions.
+@item @manref{fmod_count(9)} -- @tab file module switch table helper functions.
+@item @manref{fmod_del(9)} -- @tab file module switch table helper functions.
+@item @manref{fmod_find(9)} -- @tab file module switch table helper functions.
+@item @manref{fmod_get(9)} -- @tab file module switch table helper functions.
+@item @manref{fmod_put(9)} -- @tab file module switch table helper functions.
+@item @manref{fmod_str(9)} -- @tab file module switch table helper functions.
+@item @manref{fmodsw(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} module switch table.
+@item @manref{fmodsw_list(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} module switch table.
+@item @manref{fmodsw_lock(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} module switch table.
+@item @manref{freeb(9)} -- @tab frees a @dfn{STREAMS} message block.
+@item @manref{freelk(9)} -- @tab allocate or free a @dfn{STREAMS} link block.
+@item @manref{freemsg(9)} -- @tab frees a @dfn{STREAMS} message.
+@item @manref{freeq(9)} -- @tab deallocate a @dfn{STREAMS} queue pair.
+@item @manref{freestr(9)} -- @tab deallocate a @dfn{STREAMS} Stream head.
+@item @manref{freezestr(9)} -- @tab freeze the state of a Stream.
+@item @manref{frtn_t(9)} -- @tab allocate a @dfn{STREAMS} message and data block with caller supplied data buffer.
+@item @manref{getadmin(9)} -- @tab get the administrative function pointer for a @dfn{STREAMS} module.
+@item @manref{getmajor(9)} -- @tab get the internal major device number for a device.
+@item @manref{getmid(9)} -- @tab get the @dfn{STREAMS} module id for a name.
+@item @manref{getminor(9)} -- @tab get the extended minor device number for a device.
+@item @manref{getq(9)} -- @tab get a message from a @dfn{STREAMS} message queue.
+@item @manref{insq(9)} -- @tab insert a message into a @dfn{STREAMS} message queue.
+@item @manref{iocblk(9)} -- @tab @dfn{STREAMS} intout-output control block structure.
+@item @manref{isdatablk(9)} -- @tab test a @dfn{STREAMS} data block for data type.
+@item @manref{isdatamsg(9)} -- @tab test a @dfn{STREAMS} data block for data type.
+@item @manref{kmem_alloc(9)} -- @tab allocate kernel memory.
+@item @manref{kmem_alloc_node(9)} -- @tab allocate kernel memory.
+@item @manref{kmem_free(9)} -- @tab deallocate kernel memory.
+@item @manref{kmem_zalloc(9)} -- @tab allocate and zero kernel memory.
+@item @manref{kmem_zalloc_node(9)} -- @tab allocate and zero kernel memory.
+@item @manref{linkb(9)} -- @tab link a message block to a @dfn{STREAMS} message.
+@item @manref{linkblk(9)} -- @tab @dfn{STREAMS} link block structure.
+@item @manref{linkmsg(9)} -- @tab link a message block to a @dfn{STREAMS} message.
+@item @manref{major_t(9)} -- @tab get the internal major device number for a device.
+@item @manref{makedevice(9)} -- @tab create a device from major and minor device numbers.
+@item @manref{max(9)} -- @tab determine the maximum of two integers.
+@item @manref{mblk_t(9)} -- @tab @dfn{STREAMS} message block structure.
+@item @manref{min(9)} -- @tab determine the minimum of two integers.
+@item @manref{minor_t(9)} -- @tab get the extended minor device number for a device.
+@item @manref{modID_t(9)} -- @tab get the @dfn{STREAMS} module id for a name.
+@item @manref{module_info(9)} -- @tab @dfn{STREAMS} module information structure.
+@item @manref{module_stat(9)} -- @tab @dfn{STREAMS} module statistics structure.
+@item @manref{module_stat_t(9)} -- @tab @dfn{STREAMS} module statistics structure.
+@item @manref{msgb(9)} -- @tab @dfn{STREAMS} message block structure.
+@item @manref{msgdsize(9)} -- @tab calculate the size of the data in a @dfn{STREAMS} message.
+@item @manref{msgpullup(9)} -- @tab pull up bytes in a @dfn{STREAMS} message.
+@item @manref{msgsize(9)} -- @tab calculate the size of the message blocks in a @dfn{STREAMS} message.
+@item @manref{noenable(9)} -- @tab disable a @dfn{STREAMS} message queue fom being scheduled.
+@item @manref{pcmsg(9)} -- @tab test a data block message type for priority control.
+@item @manref{pullupmsg(9)} -- @tab pull up the bytes in a @dfn{STREAMS} message.
+@item @manref{put(9)} -- @tab invoke the put procedure for a @dfn{STREAMS} driver of module with a @dfn{STREAMS} message.
+@item @manref{putbq(9)} -- @tab put a message back on a @dfn{STREAMS} message queue.
+@item @manref{putctl(9)} -- @tab put a control message on a @dfn{STREAMS} message queue.
+@item @manref{putctl1(9)} -- @tab put a one-byte control message on a @dfn{STREAMS} message queue.
+@item @manref{putctl2(9)} -- @tab put a two-byte control message on a @dfn{STREAMS} message queue.
+@item @manref{putnext(9)} -- @tab put a message on the downstream @dfn{STREAMS} message queue.
+@item @manref{putnextctl(9)} -- @tab put a control message on the next @dfn{STREAMS} message queue.
+@item @manref{putnextctl1(9)} -- @tab put a one-byte control message on the next @dfn{STREAMS} message queue.
+@item @manref{putnextctl2(9)} -- @tab put a two-byte control message on the next @dfn{STREAMS} message queue.
+@item @manref{putq(9)} -- @tab put a message on a @dfn{STREAMS} message queue.
+@item @manref{qattach(9)} -- @tab attach a module onto a @dfn{STREAMS} file.
+@item @manref{qbackenable(9)} -- @tab perform back enabling on a @dfn{STREAMS} queue.
+@item @manref{qband(9)} -- @tab queue band structure.
+@item @manref{qband_t(9)} -- @tab queue band structure.
+@item @manref{qclose(9)} -- @tab close a @dfn{STREAMS} driver or module.
+@item @manref{qcountstrm(9)} -- @tab add all counts on all @dfn{STREAMS} message queues in a Stream.
+@item @manref{qdelete(9)} -- @tab delete a queue pair from a Stream.
+@item @manref{qdetach(9)} -- @tab detach a module from a @dfn{STREAMS} file.
+@item @manref{qenable(9)} -- @tab schedule a @dfn{STREAMS} message queue service procedure.
+@item @manref{qfields(9)} -- @tab set attributes of a @dfn{STREAMS} message queue.
+@item @manref{qfields_t(9)} -- @tab set attributes of a @dfn{STREAMS} message queue.
+@item @manref{qi_putp(9)} -- @tab @dfn{STREAMS} driver or module put procedure.
+@item @manref{qi_putp_t(9)} -- @tab @dfn{STREAMS} driver or module put procedure.
+@item @manref{qi_qadmin(9)} -- @tab @dfn{STREAMS} driver or module admin routine.
+@item @manref{qi_qadmin_t(9)} -- @tab @dfn{STREAMS} driver or module admin routine.
+@item @manref{qi_qclose(9)} -- @tab @dfn{STREAMS} driver or module close routine.
+@item @manref{qi_qclose_t(9)} -- @tab @dfn{STREAMS} driver or module close routine.
+@item @manref{qi_qopen(9)} -- @tab @dfn{STREAMS} driver or module open routine.
+@item @manref{qi_qopen_t(9)} -- @tab @dfn{STREAMS} driver or module open routine.
+@item @manref{qi_srvp(9)} -- @tab @dfn{STREAMS} driver or module service procedure.
+@item @manref{qi_srvp_t(9)} -- @tab @dfn{STREAMS} driver or module service procedure.
+@item @manref{qinit(9)} -- @tab @dfn{STREAMS} queue initialization structure.
+@item @manref{qinsert(9)} -- @tab insert a queue pair beneath another queue pair in a Stream.
+@item @manref{qopen(9)} -- @tab call a @dfn{STREAMS} driver or module open routine.
+@item @manref{qprocsoff(9)} -- @tab disable @dfn{STREAMS} message queue processing for multi-processing.
+@item @manref{qprocson(9)} -- @tab enable a @dfn{STREAMS} message queue for multi-processing.
+@item @manref{qready(9)} -- @tab test if queue procedures are scheduled.
+@item @manref{qreply(9)} -- @tab replies to a message from a @dfn{STREAMS} message queue.
+@item @manref{qscan(9)} -- @tab place a queue on the scan list.
+@item @manref{qsize(9)} -- @tab return the number of messages on a queue.
+@item @manref{queue(9)} -- @tab @dfn{STREAMS} message queue structure.
+@item @manref{queue_t(9)} -- @tab @dfn{STREAMS} message queue structure.
+@item @manref{register_clone(9)} -- @tab register a @manpage{clone(4)} minor.
+@item @manref{register_cmajor(9)} -- @tab register external device major number.
+@item @manref{register_ioctl32(9)} -- @tab register a 32-bit IO control command.
+@item @manref{register_strdev(9)} -- @tab register a @dfn{STREAMS} device.
+@item @manref{register_strdrv(9)} -- @tab register a @dfn{STREAMS} driver.
+@item @manref{register_strlog(9)} -- @tab register a @dfn{STREAMS} logger.
+@item @manref{register_strmod(9)} -- @tab register a @dfn{STREAMS} module.
+@item @manref{register_strnod(9)} -- @tab register a @dfn{STREAMS} minor device node.
+@item @manref{rmvb(9)} -- @tab remove a message block from a @dfn{STREAMS} message.
+@item @manref{rmvq(9)} -- @tab remove a message from a @dfn{STREAMS} message queue.
+@item @manref{runqueues(9)} -- @tab run queue service procedures and other asynchronous @dfn{STREAMS} events.
+@item @manref{sd_get(9)} -- @tab acquire and release a reference to the Stream head.
+@item @manref{sd_put(9)} -- @tab acquire and release a reference to the Stream head.
+@item @manref{sdev_add(9)} -- @tab character device switch table helper functions.
+@item @manref{sdev_del(9)} -- @tab character device switch table helper functions.
+@item @manref{sdev_get(9)} -- @tab character device switch table helper functions.
+@item @manref{sdev_ini(9)} -- @tab character device switch table helper functions.
+@item @manref{sdev_put(9)} -- @tab character device switch table helper functions.
+@item @manref{sdev_rel(9)} -- @tab character device switch table helper functions.
+@item @manref{sealloc(9)} -- @tab @dfn{STREAMS} event allocators.
+@item @manref{sefree(9)} -- @tab @dfn{STREAMS} event allocators.
+@item @manref{setq(9)} -- @tab set sizes and procedures associated with a @dfn{STREAMS} message queue.
+@item @manref{setqsched(9)} -- @tab invoke the @dfn{STREAMS} scheduler.
+@item @manref{setsq(9)} -- @tab set synchronization queues, sizes and procedures associated with a @dfn{STREAMS} message queue.
+@item @manref{skballoc(9)} -- @tab allocate a @dfn{STREAMS} message and data block with a caller supplied socket buffer.
+@item @manref{spec_open(9)} -- @tab @dfn{STREAMS} special device shadow file system.
+@item @manref{spec_reparent(9)} -- @tab @dfn{STREAMS} special device shadow file system.
+@item @manref{specfs_mount(9)} -- @tab @dfn{STREAMS} special device shadow file system.
+@item @manref{specfs_umount(9)} -- @tab @dfn{STREAMS} special device shadow file system.
+@item @manref{str_close(9)} -- @tab Stream head module procedures.
+@item @manref{str_open(9)} -- @tab Stream head module procedures.
+@item @manref{streamtab(9)} -- @tab @dfn{STREAMS} module definition structure.
+@item @manref{streamtab_t(9)} -- @tab @dfn{STREAMS} module definition structure.
+@item @manref{strgetpmsg(9)} -- @tab perform a @manpage{getpmsg(2s)} operation on a Stream head.
+@item @manref{strioctl(9)} -- @tab perform a @manpage{ioctl(2s)} operation on a Stream head.
+@item @manref{strlog(9)} -- @tab pass a message to the @dfn{STREAMS} logger.
+@item @manref{strm_f_ops(9)} -- @tab file operations for Stream heads.
+@item @manref{stroptions(9)} -- @tab @dfn{STREAMS} Strema head options structure.
+@item @manref{strpoll(9)} -- @tab perform a @manpage{poll(2s)} operation on a Stream head.
+@item @manref{strputpmsg(9)} -- @tab perform a @manpage{putpmsg(2s)} operation on a Stream head.
+@item @manref{strqget(9)} -- @tab get attributes of a @dfn{STREAMS} message queue.
+@item @manref{strqset(9)} -- @tab set attributes of a @dfn{STREAMS} message queue.
+@item @manref{strread(9)} -- @tab perform a @manpage{read(2s)} operation on a Stream head.
+@item @manref{strrput(9)} -- @tab Stream head module procedures.
+@item @manref{strsendpage(9)} -- @tab perform a @manpage{sendfile(2s)} operation on a Stream head.
+@item @manref{strthread(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} scheduler thread structure and array.
+@item @manref{strthreads(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} scheduler thread structure and array.
+@item @manref{strwput(9)} -- @tab Stream head module procedures.
+@item @manref{strwrite(9)} -- @tab perform a @manpage{write(2s)} operation on a Stream head.
+@item @manref{strwsrv(9)} -- @tab Stream head module procedures.
+@item @manref{sysctl_str_nstrpush(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
+@item @manref{sysctl_str_strctlsz(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
+@item @manref{sysctl_str_strmsgsz(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
+@item @manref{testb(9)} -- @tab test if a @dfn{STREAMS} message can be allocated.
+@item @manref{timeout(9)} -- @tab start a timer.
+@item @manref{timeout_id_t(9)} -- @tab start a timer.
+@item @manref{timo_fcn_t(9)} -- @tab start a timer.
+@item @manref{toid_t(9)} -- @tab start a timer.
+@item @manref{unbufcall(9)} -- @tab remove a @dfn{STREAMS} buffer callback.
+@item @manref{unfreezestr(9)} -- @tab thaw the state of a Stream queue.
+@item @manref{unlinkb(9)} -- @tab unlink a message block from a @dfn{STREAMS} message.
+@item @manref{unlinkmsg(9)} -- @tab unlink a message block from a @dfn{STREAMS} message.
+@item @manref{unregister_clone(9)} -- @tab unregister a @manpage{clone(4)} minor.
+@item @manref{unregister_cmajor(9)} -- @tab unregister external device major number.
+@item @manref{unregister_ioctl32(9)} -- @tab unregister a 32-bit IO control command.
+@item @manref{unregister_strdev(9)} -- @tab unregister a @dfn{STREAMS} device.
+@item @manref{unregister_strdrv(9)} -- @tab unregister a @dfn{STREAMS} driver.
+@item @manref{unregister_strmod(9)} -- @tab unregister a @dfn{STREAMS} module.
+@item @manref{unregister_strnod(9)} -- @tab unregister a @dfn{STREAMS} minor device node.
+@item @manref{untimeout(9)} -- @tab stop a timer.
+@item @manref{unweldq(9)} -- @tab unweld two queues.
+@item @manref{vcmn_err(9)} -- @tab print a kernel command error.
+@item @manref{vstrlog(9)} -- @tab pass a message to the @dfn{STREAMS} logger.
+@item @manref{vstrlog_t(9)} -- @tab register a new @dfn{STREAMS} log device.
+@item @manref{weld_arg_t(9)} -- @tab weld two (or four) queues together.
+@item @manref{weld_fcn_t(9)} -- @tab weld two (or four) queues together.
+@item @manref{weldq(9)} -- @tab weld two (or four) queues together.
+@item @manref{xmsgsize(9)} -- @tab calculate the size of message blocks in a @dfn{STREAMS} message.
+
+@end multitable
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Porting
+@chapter Porting
+@cindex porting
+
+@menu
+* Porting from LiS::
+* Porting from SVR 4.2 MP::
+* Porting from Solaris::
+* Porting from UnixWare::
+* Porting from Mentat::
+@end menu
+
+@cite{@value{PACKAGE_TITLE}} provides a rich set of @dfn{STREAMS} functions, DDI/DKI functions and
+utilities based on @cite{SVR 4.2 MP} for the development of @dfn{STREAMS} modules and drivers.
+Although these functions and capabilities provide all of the utilities necessary for the development
+of @dfn{STREAMS} modules and drivers, it represents the common set of functions provided by other
+@dfn{STREAMS} implementations.
+
+Some other @dfn{STREAMS} implementations provide interfaces, utilities and helper functions specific
+to those implementations.  Where @dfn{STREAMS} implementations differ the most is in the manner in
+which they configure and register @dfn{STREAMS} drivers and modules for interface to the operating
+system, including registration functions, device numbering, creation of minor device nodes,
+administration and other mechanisms not specified by the @cite{System V Release 4 Programmer's Guide
+-- STREAMS}.
+
+To assist with porting of @dfn{STREAMS} drivers and modules from other @dfn{STREAMS} implementations
+and @cite{UNIX} based operating systems to @cite{@value{PACKAGE_TITLE}},
+@cite{@value{PACKAGE_TITLE}} provides a separate @cite{@dfn{STREAMS} Compatibility} add-on package,
+called @file{strcompat-@value{VERSION_STRCOMPAT}},@footnote{Previously the @cite{@dfn{STREAMS}
+Compatibility} modules were part of the @cite{@value{PACKAGE_TITLE}} base package.  They were
+separated to an add-on package for a number of reasons that are described in the @cite{OpenSS7
+STREAMS Compatibility -- Installation and Reference Manual.}} that provide source level compatibility
+with a wide range of mainstream @dfn{STREAMS} implementations and significant groups of
+compatibility and helper functions (such as those from @cite{Solaris} and @cite{Mentat}).  These
+compatibility packages also provide separate demand loadable kernel modules that provide the
+additional compatibility functionality with @cite{@value{PACKAGE_TITLE}}.
+
+Perhaps one of the most important ports to @cite{@value{PACKAGE_TITLE}} is from the deprecated and
+deficient @cite{LiS} package to @cite{@value{PACKAGE_TITLE}}.  The @cite{@dfn{STREAMS}
+Compatibility} package, @file{strcompat}, also provides a source level compatibility module that
+provides source level compatibility to @cite{LiS} to ease porting @cite{LiS} drivers and modules to
+the superior @cite{@value{PACKAGE_TITLE}}.
+
+In general, when porting to @cite{@value{PACKAGE_TITLE}} from another @dfn{STREAMS} implementation,
+the following items will need the most attention:
+
+@table @emph
+
+@item Header Files
+The @dfn{STREAMS} and operating system specific header files that must be included by kernel modules
+to implement @dfn{STREAMS} drivers or modules are specific to each @cite{STREAMS} implementation.
+Although there are some basic header files to include (@file{sys/stream.h}, @file{sys/strconf.h},
+@file{sys/ddi.h}, @cite{sys/cmn_err.h}, @cite{sys/dki.h}, @cite{sys/kmem.h}), the order in which
+these headers are included and the additional operating system specific headers are implementation
+specific.  See the example drivers and modules for the header files that are necessary for
+@cite{@value{PACKAGE_TITLE}} @dfn{STREAMS} modules and drivers.
+
+@item Kernel Module Mechanism
+The mechanism for creating, configuring and loading kernel modules is specific to the operating
+system implementation.  @cite{@value{PACKAGE_TITLE}} uses the normal @cite{Linux} mechanisms for
+kernel modules also for @dfn{STREAMS} drivers and modules.
+
+@item Configuration and Registration
+The @dfn{STREAMS} driver or module will need to be converted to use the @cite{@value{PACKAGE_TITLE}}
+configuration and registration mechanisms.  See @manref{register_strdev(9)},
+@manref{unregister_strdev(9)}, @manref{register_strmod(9)} and @manref{unregister_strmod(9)} for
+more specific information on the @cite{@value{PACKAGE_TITLE}} configuration and registration
+mechanisms.
+
+@item Non-@dfn{STREAMS} DDI/DKI Facilities
+Any of the non-@dfn{STREAMS} DDI/DKI facilities or operating system specific facilities that are
+used by the @dfn{STREAMS} driver or module may need to be replaced with the @cite{Linux} equivalent.
+Examples of such facilities include basic locks, read-write locks, semaphores and mutexes, atomic
+integers, interrupt suppression, bus access and memory mapping functions.
+
+@item Binary Modules
+When @dfn{STREAMS} drivers or modules are released as binary objects and source code is not
+availble, it is still possible to convert the binary module for use with
+@cite{@value{PACKAGE_TITLE}}.  The facility to convert binary modules for use with
+@cite{@value{PACKAGE_TITLE}} is not, however, part of the base package and is not part of the
+@cite{STREAMS Compatibility} package.  A separate add-on package, the @cite{Binary Compatibility
+Modules} package, @file{strbcm-@value{VERSION_STRBCM}} was developed explicitly for this
+purpose.@footnote{Because binary compatibility is a thorny issue, both from the standpoint of
+technical merit and licensing issues, the @file{strbcm} package is only currently available to
+subscribers and sponsors of the @cite{OpenSS7 Project}.}
+
+@end table
+
+@node Porting from LiS
+@section Porting from LiS
+@cindex porting from LiS
+
+Applications programs to not need to be ported, or even recompiled when they use shared libraries.
+@cite{@value{PACKAGE_TITLE}} provides @cite{LiS} compatible shared object libraries.  Applications
+compiled against static libraries will need to be recompiled unless @cite{@value{PACKAGE_TITLE}} was
+configured for @dfn{STREAMS} binary compatibility mode.@footnote{See the @samp{--enable-streams-bcm}
+option to @command{configure} in @refman{Configure Options}.}
+
+In general, if no @cite{LiS} specific functions are used (other than @dfn{STREAMS} driver or module
+registration functions), porting of @cite{LiS} drivers and modules to @cite{@value{PACKAGE_TITLE}}
+is straightforward.  @cite{@value{PACKAGE_TITLE}} provides several @dfn{STREAMS} drivers and modules
+that are common to both OpenSS7 @cite{@value{PACKAGE_TITLE}} and @cite{LiS} releases.  These drivers
+and modules provide examples of how to write @dfn{STREAMS} drivers or modules that can run under
+either @cite{LiS} or @cite{@value{PACKAGE_TITLE}}.  The common modules and drivers are as follows:
+
+@multitable @columnfractions 0.5 0.5
+@item @file{src/drivers/echo.c} @tab @manref{echo(4)}
+@item @file{src/drivers/mux.c} @tab @manref{mux(4)}
+@item @file{src/drivers/nuls.c} @tab @manref{nuls(4)}
+@item @file{src/modules/nullmod.c} @tab @manref{nullmod(4)}
+@item @file{src/modules/sc.c} @tab @manref{sc(4)}
+@item @file{src/modules/testmod.c} @tab @manref{testmod(4)}
+@end multitable
+
+When built for @cite{@value{PACKAGE_TITLE}}, @samp{C} preprocessor symbol @samp{LFS} is defined; when
+built for @cite{LiS}, @samp{LIS} is defined.
+
+@cite{LiS} provides many simple wrapper functions that are @cite{Linux} kernel functions with
+@samp{lis_} prepended to the name.  Aside from licensing issues associated with using these wrapper
+functions, in many cases it is possible to simply drop the @samp{lis_} from the function call and
+use the @cite{Linux} functions directly.  This is true for most spin locks, read-write locks,
+semaphores, mutexes, atomic integers, bus access and memory mapping functions.
+
+When many or specific @cite{LiS} functions calls are necessary, it is better to use the @cite{LiS}
+compatibility module present in the @file{strcompat-@value{VERSION_STRCOMPAT}} package.
+
+@node Porting from SVR 4.2 MP
+@section Porting from SVR 4.2 MP
+@cindex porting from SVR 4.2 MP
+
+When porting from @cite{SVR 4.2 MP} or a @dfn{STREAMS} implementation based closely on @cite{SVR 4.2
+MP}, such as @cite{SUPER-UX}, @cite{UXP/V}, @cite{IRIX} or many of the real-time operating system
+implementations (e.g. @cite{VxWorks}), it is possible to port directly to
+@cite{@value{PACKAGE_TITLE}} without using the @cite{STREAMS Compatibility} package.  Event when
+porting from @cite{AIX}, @cite{HP-UX} and @cite{OSF/1} it is possible to avoid using the
+compatibility package.
+
+Most pseudo-device drivers and modules should not require any special facilities beyond basic locks
+and porting may be straightforward.  Where extensive implementation specific DDI/DKI or operating
+system functions are required, it is better to use the @cite{STREAMS Compatibility} package and
+modules closest to the specific implementation being ported from.
+
+@node Porting from Solaris
+@section Porting from Solaris
+@cindex porting from Solaris
+
+When porting from @cite{Solaris} there are both @dfn{STREAMS} facilities and extensive DDI/DKI
+facilities that differ greatly from basic @cite{SVR 4.2 MP} @dfn{STREAMS} and DDI/DKI functions.
+For porting all but the most trivial of @dfn{STREAMS} drivers and modules written specifically for
+@cite{Solaris}, it is better to use the @cite{STREAMS Compatibility} package and the @cite{Solaris}
+compatibility module provided by that package.@footnote{The compatibility package also provides a
+version of the @file{strsun.h} header file and the helper functions provided there.}
+
+@node Porting from UnixWare
+@section Porting from UnixWare
+@cindex porting from UnixWare
+
+When porting from @cite{UnixWare} there are extensive operating system facilities that differ
+greatly from basic @cite{Linux} facilities.  For the most part these are basic locks, read-write
+locks, condition variables, sleep locks, atomic integers, bus access and mapping functions.
+Although @cite{Linux} provides equivalents in most of these categories, the @cite{STREAMS
+Compatibility} package contains a compatibility module for @cite{UnixWare} that provides source
+compatibility with most of these functions.  It is recommended that all but the most trivial of
+@cite{UnixWare} drivers and modules use the @cite{STREAMS Compatibility} package when porting.
+
+@node Porting from Mentat
+@section Porting from Mentat
+@cindex porting from Mentat
+
+When porting a @dfn{STREAMS} driver or module from a @cite{Mentat} implementation (such as
+@cite{AIX}, @cite{HP-UX}, @cite{OSF/1}, @cite{Mac OT}) that makes heavy use of the @cite{Mentat}
+@samp{mi_} or @samp{mps_} helper functions, it is best to use the OpenSS7 implementations of those
+functions available in the @cite{STREAMS Compatibility} package directly.  The @cite{STREAMS
+Compatibility} package provides a @cite{Mentat Portable STREAMS} compatibility module that provides
+implementations of the @cite{Mentat} functions found in @cite{AIX}, @cite{OSF/1} and @cite{Mac
+OT}.@footnote{Note that @cite{Solaris} also provides versions of the @cite{Mentat} functions which
+appear in the @cite{Solaris} compatiblity module.}
+
+@ignore
+@table @cite
+@item --- SVR 4.2 ES/MP
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{SVR 4.2 ES/MP}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from SVR 4.2 MP, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- AIX 5L Version 5.1
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{AIX 5L Version 5.1}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from AIX 5L Version 5.1, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- HP-UX 11.0i v2
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{HP-UX 11.0i v2}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from HP-UX 11.0i v2, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- OSF/1 1.2/Digital UNIX/True 64
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{OSF/1 1.2/Digital UNIX/True 64}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from OSF/1 1.2/Digital UNIX, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- UnixWare 7.1.3 (OpenUnix 8)
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{UnixWare 7.1.3 (OpenUnix 8)}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from UnixWare 7.1.3 (OpenUnix 8), , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- Solaris 9/SunOS 5.9
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{Solaris 9/SunOS 5.9}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from Solaris 9/SunOS 5.9, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- SUPER-UX
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{SUPER-UX}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from SUPER-UX, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- UXP/V
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{UXP/V}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from UXP/V, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- LiS-2.16.18
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{LiS-2.16.18} and @cite{LiS-2.18.0},
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are maintained in a separate manual:
+@pxref{Porting from Linux STREAMS (LiS) 2.16.18, , , porting, Linux Fast-STREAMS Porting Guide}.
+@end table
+
+For additional details,
+@pxref{Top, , About This Manual, proting, Linux Fast-STREAMS Porting Guide}.
+@end ignore
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -2200,147 +3189,178 @@ of manual pages installed totals several hundred manual pages.
 @cindex conformance
 
 @menu
+* Standards Compliance::
 * STREAMS Compatibility::
-* Porting::
 @end menu
+
+@node Standards Compliance
+@section Standards Compliance
+@cindex standard compliance
+
+@cite{@value{PACKAGE_TITLE}} was designed and implemented to be compliant with as many standards
+impinging on @dfn{STREAMS} as possible.  There are three areas of standards compliance as follows:
+
+@subsection User Interface Compliance
+
+The @dfn{STREAMS} user interface standards are primarily specified by the @cite{IEEE} and
+@cite{OpenGroup} standards and take the form of the @cite{POSIX 2003} and @cite{Single UNIX
+Specification} standards simultaneously released by the @cite{OpenGroup} in conjunction with
+@cite{IEEE}.  The latest @cite{POSIX/IEEE/OpenGroup} standard provide an @cite{XSI} extension that
+includes the @dfn{STREAMS} user interface.  For the most part, the @cite{OpenGroup} XSI interface is
+completely compatible with the user interface described in the @cite{System V Release 4
+Programmer's Manual -- STREAMS}, and where it does not, Stream head options are provided to select
+between the default @cite{OpenGroup} XSI behaviour and the traditional @cite{SVR 4} behaviour.
+
+Most of the XSI specifications of the @cite{OpenGroup} describe the behaviour of the Stream head and
+the behaviour of specific @dfn{STREAMS} drivers or modules (such as pipes, FIFOs and terminals).
+Also described is the @manpage{poll(2s)} behaviour, generation of signals, and @manpage{read(2s)} and
+@manpage{write(2s)} behaviour as it applies to @dfn{STREAMS} character special devices.@footnote{One
+of the major deficiencies of the deprecated @cite{LiS} implemntation was its inability to conform to
+the standards imposed on the user interface and behaviour of the Stream head.}
+
+User interface compliance of the @cite{@value{PACKAGE_TITLE}} is tested with custom validation test
+suites that ship with the package.  See @refman{Conformance Test Programs} for more information on
+conformance and validation test suites.
+
+@subsection Service Interface Compliance
+
+The @cite{OpenGroup} (now and in previous incarnations) have issued standardized service interface
+specifications as part of the Common Application Environment (CAE) specifications.  These service
+interface specifications usually concern networking interfaces such as the @cite{Data Link Provider
+Interface (DLPI)}, the @cite{Network Provider Interface (NPI)}, the @cite{Transport Provider
+Interface (TPI)}, the @cite{X/Open Transport Interface (XTI)} and the @cite{Sockets} API.  Although
+these standards impinge upon various networking add-on packages for @cite{@value{PACKAGE_TITLE}},
+they do not impinge upon the base @dfn{STREAMS} package documented here.  See the @cite{Installation
+and Reference Manual} for the appropriate add-on package.
+
+@subsection Kernel Interface Compliance
+
+The @dfn{STREAMS} kernel interfaces, DDI/DKI and other facilities available to the @dfn{STREAMS}
+driver or module writer has not been subjected to formal standardization.  For the most part, the
+descriptions that are present in the @cite{System V Programmer's Manual -- STREAMS} provide the most
+definitive ipso facto standard for @dfn{STREAMS} implementation.  In addition to this, some
+@dfn{STREAMS} implementations have provided some enhancements or restrictions over the @cite{SVR 4}
+descriptions.  Perhaps the most extensive embellishments have been provided for the @cite{Solaris}
+implementation of @cite{STREAMS}.
+
+@cite{@value{PACKAGE_TITLE}} has been implemented to provide maximum compatibility over a wide range
+of @dfn{STREAMS} implementations based on @cite{SVR 4} and provides additional capabilities similar
+to those specific embellishments found in implementations such as @cite{Solaris} through an add-on
+@cite{STREAMS Compatibility} package.
+
+The most delicate areas of compatibility across @dfn{STREAMS} implementations regard, not the use of
+@dfn{STREAMS} or DDI/DKI functions from within the @dfn{STREAMS} environment, but the invocation of
+@dfn{STREAMS} functions from outside the @dfn{STREAMS} environment.  In particular, use of private
+locks and synchronization in the face of interrupts and external asynchronous callbacks is where
+implementations deviate the greatest.  @cite{@value{PACKAGE_TITLE}} attempts to address these
+differences by providing a greater level of assurance and wider range of calling contexts for each
+of the @dfn{STREAMS} facilities.
+
+Kernel interface compliance of the @cite{@value{PACKAGE_TITLE}} to @cite{SVR 4} specifications is
+tested with custom validation test suites, test modules and test drivers that ship with the package.
+See @refman{Conformance Test Programs} for more information on conformance and validation test
+suites.
 
 @node STREAMS Compatibility
 @section STREAMS Compatibility
 @cindex compatibility
 
-@cite{@value{PACKAGE_TITLE}} provides some degree of compatibility with other @dfn{STREAMS}
-implementation as follows:
+@cite{@value{PACKAGE_TITLE}} provides a high degree of compatibility with other @dfn{STREAMS}
+implementation as listed below.  Through the separate add-on @cite{STREAMS Compatibility} package,
+source level compatibility is also provided.
 
 @table @cite
+
+@item --- SVR 3.2
+@cite{@value{PACKAGE_TITLE}} provides a degree of operational compatibility with
+@cite{SVR 3.2}
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{SVR 3.2}.
+
 @item --- SVR 4.2 ES/MP
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
 @cite{SVR 4.2 ES/MP}
-to ease portability and common comprehension,
-@pxref{SVR 4.2 Compatibility, , , SPG, STREAMS Programmer's Guide}.
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{SVR 4.2 ES/MP}.
+
+@item --- Mentat Portable STREAMS
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
+@cite{Mentat Portable STREAMS}
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{Mentat Portable STREAMS}.
 
 @item --- AIX 5L Version 5.1
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
 @cite{AIX 5L Version 5.1}
-to ease portability and common comprehension,
-@pxref{AIX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{AIX 5L Version 5.1}.
 
 @item --- HP-UX 11.0i v2
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
 @cite{HP-UX 11.0i v2}
-to ease portability and common comprehension,
-@pxref{HP-UX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{HP-UX 11.0i v2}.
 
 @item --- OSF/1 1.2/Digital UNIX/True 64
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
 @cite{OSF/1 1.2/Digital UNIX}
-to ease portability and common comprehension,
-@pxref{OSF/1 Compatibility, , , SPG, STREAMS Programmer's Guide}.
+to ease portability and common comprehension.
 
 @item --- UnixWare 7.1.3 (OpenUnix 8)
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
 @cite{UnixWare 7.1.3 (OpenUnix 8)}
-to ease portability and common comprehension,
-@pxref{UnixWare Compatibility, , , SPG, STREAMS Programmer's Guide}.
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{UnixWare 7.1.3 (OpenUnix 8)}.
 
 @item --- Solaris 9/SunOS 5.9
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
 @cite{Solaris 9/SunOS 5.9}
-to ease portability and common comprehension,
-@pxref{Solaris Compatibility, , , SPG, STREAMS Programmer's Guide}.
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{Solaris 9/SunOS 5.9}.
+
+@item --- IRIX 6.5.17
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
+@cite{IRIX 6.5.17}
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{IRIX 6.5.17}.
+
+@item --- Mac OS 9 Open Transport
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
+@cite{Mac OS 9 Open Transport}
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{Mac OS 9 Open Transport}.
 
 @item --- SUPER-UX
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
 @cite{SUPER-UX}
-to ease portability and common comprehension,
-@pxref{SUX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+to ease portability and common comprehension.
 
 @item --- UXP/V
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
 @cite{UXP/V}
-to ease portability and common comprehension,
-@pxref{UXP Compatibility, , , SPG, STREAMS Programmer's Guide}.
+to ease portability and common comprehension.
 
-@item --- LiS-2.16.18
-@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
-@cite{LiS 2.16}
-to ease portability and common comprehension,
-@pxref{LiS Compatibility, , , SPG, STREAMS Programmer's Guide}.
+@item --- LiS-2.16.18 and LiS 2.18.0
+@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
+@cite{LiS 2.16.18} and @cite{LiS 2.18.0}
+to ease portability and common comprehension.
+to ease portability and common comprehension.  Specific kernel utilities are provided by the
+@cite{STREAMS Compatibility} package to provide full source level compatibility with
+@cite{LiS 2.16.18} and @cite{LiS 2.18.0}.
+
 @end table
 
 For additional details,
 @pxref{Top, , About This Manual, SPG, STREAMS Programmer's Guide}.
-
-@node Porting
-@section Porting
-@cindex porting
-
-@table @cite
-@item --- SVR 4.2 ES/MP
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{SVR 4.2 ES/MP}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from SVR 4.2 MP, , , porting, Linux Fast-STREAMS Porting Guide}.
-
-@item --- AIX 5L Version 5.1
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{AIX 5L Version 5.1}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from AIX 5L Version 5.1, , , porting, Linux Fast-STREAMS Porting Guide}.
-
-@item --- HP-UX 11.0i v2
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{HP-UX 11.0i v2}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from HP-UX 11.0i v2, , , porting, Linux Fast-STREAMS Porting Guide}.
-
-@item --- OSF/1 1.2/Digital UNIX/True 64
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{OSF/1 1.2/Digital UNIX/True 64}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from OSF/1 1.2/Digital UNIX, , , porting, Linux Fast-STREAMS Porting Guide}.
-
-@item --- UnixWare 7.1.3 (OpenUnix 8)
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{UnixWare 7.1.3 (OpenUnix 8)}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from UnixWare 7.1.3 (OpenUnix 8), , , porting, Linux Fast-STREAMS Porting Guide}.
-
-@item --- Solaris 9/SunOS 5.9
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{Solaris 9/SunOS 5.9}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from Solaris 9/SunOS 5.9, , , porting, Linux Fast-STREAMS Porting Guide}.
-
-@item --- SUPER-UX
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{SUPER-UX}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from SUPER-UX, , , porting, Linux Fast-STREAMS Porting Guide}.
-
-@item --- UXP/V
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{UXP/V}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from UXP/V, , , porting, Linux Fast-STREAMS Porting Guide}.
-
-@item --- LiS-2.16.18
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{LiS-2.16.18}
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
-@pxref{Porting from Linux STREAMS (LiS) 2.16.18, , , porting, Linux Fast-STREAMS Porting Guide}.
-@end table
-
-For additional details,
-@pxref{Top, , About This Manual, proting, Linux Fast-STREAMS Porting Guide}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
