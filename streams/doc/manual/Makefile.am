@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2006/09/18 01:18:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/01/02 11:10:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:38 $ by $Author: brian $
+# Last Modified $Date: 2007/01/02 11:10:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.49  2007/01/02 11:10:57  brian
+# - removed porting manual from build (see strcompat)
+#
 # Revision 0.9.2.48  2006/09/18 01:18:38  brian
 # - updated documentation and include file makefiles
 #
@@ -86,7 +89,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= STREAMS.texi porting.texi STREAMS_FAQ.texi SPG2.texi # SPG.texi
+info_TEXINFOS		+= STREAMS.texi STREAMS_FAQ.texi SPG2.texi # SPG.texi porting.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \

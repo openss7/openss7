@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/12/18 10:25:29 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/01/02 11:10:55 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/18 10:25:29 $ by $Author: brian $
+## Last Modified $Date: 2007/01/02 11:10:55 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -118,7 +118,7 @@ modules = streams-ip_strm_mod streams-ip_to_dlpi streams-ldl
 preloads =
 libraries =
 tools = strxns_mknod ldlconfig ldltest
-infofiles = STREAMS SPG2 porting
+infofiles = STREAMS SPG2
 initfiles = 
 
 @WITH_KO_MODULES_TRUE@with_ko_modules = 1
@@ -453,6 +453,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 0.9.2.20  2007/01/02 11:10:55  brian
+# - removed porting manual from build (see strcompat)
+#
 # Revision 0.9.2.19  2006/12/18 10:25:29  brian
 # - updated headers for release
 #

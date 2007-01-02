@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2006/12/29 12:18:30 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2007/01/02 11:10:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/29 12:18:30 $ by $Author: brian $
+# Last Modified $Date: 2007/01/02 11:10:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,7 +98,7 @@
 %global preloads    specfs streams
 %global libraries   streams LiS pLiS
 %global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2
-%global infofiles   %{base} %{virtual} SPG2 porting
+%global infofiles   %{base} %{virtual} SPG2
 %global initfiles   %{base} specfs streams strerr strace
 %global conffiles   *.conf
 
@@ -1923,9 +1923,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.149  2006/12/29 12:18:30  brian
-# - old rpms hate nested ifs, release updates
+# Revision 0.9.2.150  2007/01/02 11:10:52  brian
+# - removed porting manual from build (see strcompat)
 #
+
+* Fri Dec 29 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.149  2006/12/29 12:18:30  brian
+- old rpms hate nested ifs, release updates
 
 * Fri Dec 29 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.148  2006/12/29 05:51:23  brian
