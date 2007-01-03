@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strxnet.texi,v 0.9.2.28 2007/01/03 10:11:51 brian Exp $
+% @(#) $Id: strxnet.texi,v 0.9.2.29 2007/01/03 12:33:12 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/03 10:11:51 $ by $Author: brian $
+% Last Modified $Date: 2007/01/03 12:33:12 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -420,6 +420,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strxnet.texi,v $
+Revision 0.9.2.29  2007/01/03 12:33:12  brian
+- corrections
+
 Revision 0.9.2.28  2007/01/03 10:11:51  brian
 - documentation updates for release
 
@@ -1338,7 +1341,7 @@ and modules.  Additional header files for interacting with specific drivers or m
 required.
 
 Aside from including these header files, the general procedures for compiling @dfn{STREAMS} modules
-and drivers also apply to @dfn{STREAMS} modules and drivers written to the Trasnport Provider
+and drivers also apply to @dfn{STREAMS} modules and drivers written to the Transport Provider
 Interface.  Examples can be found in the @file{strinet-@value{VERSION_STRINET}},
 @file{strsctp-@value{VERSION_STRSCTP}} and @file{striso-@value{VERSION_STRISO}} packages that
 implement a number of transport providers.
@@ -1346,7 +1349,7 @@ implement a number of transport providers.
 @node Static and Shared Libraries
 @section Libraries
 
-Shared or static version of the @cite{libxnet} library must be liked when using the
+Shared or static version of the @cite{libxnet} library must be linked when using the
 @file{@value{PACKAGE}-@value{VERSION}} package.  The library must either be specified on the
 @command{gcc} command line as a shared library (e.g. @samp{-lxnet}) or as a static library (e.g.
 @samp{/usr/lib/libxnet.a}).
